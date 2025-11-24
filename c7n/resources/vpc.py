@@ -545,7 +545,7 @@ class DhcpOptionsFilter(Filter):
                    match-all: true
                    present: false
                    domain-name-servers: >-
-                     ^(AmazonProvidedDNS|169\.254\.169\.253|10\.\d{1,3}\.\d{1,3}\.2)$
+                     ^(AmazonProvidedDNS|169\\.254\\.169\\.253|10\\.\\d{1,3}\\.\\d{1,3}\\.2)$
 
     """
 
