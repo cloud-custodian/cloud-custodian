@@ -544,7 +544,8 @@ class DhcpOptionsFilter(Filter):
                    match-operator: regex
                    match-all: true
                    present: false
-                   domain-name-servers: '^(AmazonProvidedDNS|169\\.254\\.169\\.253|10\\.\\d{1,3}\\.\\d{1,3}\\.2)$'
+                   domain-name-servers: >-
+                     ^(AmazonProvidedDNS|169\.254\.169\.253|10\.\d{1,3}\.\d{1,3}\.2)$
 
     """
 
@@ -587,12 +588,12 @@ class DhcpOptionsFilter(Filter):
         found = True
         match_operator = self.data.get('match-operator', 'exact')
         match_all = self.data.get('match-all', False)
-        
+
         for k in self.option_keys:
             if k not in self.data:
                 continue
             is_list = isinstance(self.data[k], list)
-            
+
             if k not in dhcp:
                 found = False
             elif match_operator == 'regex':

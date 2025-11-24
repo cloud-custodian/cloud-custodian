@@ -473,7 +473,10 @@ class VpcTest(BaseTest):
                         "type": "dhcp-options",
                         "match-operator": "regex",
                         "match-all": True,
-                        "domain-name-servers": r"^(AmazonProvidedDNS|169\.254\.169\.253|10\.\d{1,3}\.\d{1,3}\.2)$",
+                        "domain-name-servers": (
+                            r"^(AmazonProvidedDNS|169\.254\.169\.253|"
+                            r"10\.\d{1,3}\.\d{1,3}\.2)$"
+                        ),
                     }
                 ],
             },
@@ -484,10 +487,14 @@ class VpcTest(BaseTest):
         self.assertTrue(len(resources) >= 0)
         for resource in resources:
             self.assertTrue("c7n:DhcpConfiguration" in resource)
-            dns_servers = resource["c7n:DhcpConfiguration"].get("domain-name-servers", [])
+            dns_servers = resource["c7n:DhcpConfiguration"].get(
+                "domain-name-servers", []
+            )
             # Verify all DNS servers match the pattern
             import re
-            pattern = re.compile(r"^(AmazonProvidedDNS|169\.254\.169\.253|10\.\d{1,3}\.\d{1,3}\.2)$")
+            pattern = re.compile(
+                r"^(AmazonProvidedDNS|169\.254\.169\.253|10\.\d{1,3}\.\d{1,3}\.2)$"
+            )
             for dns in dns_servers:
                 self.assertTrue(pattern.match(dns), f"DNS {dns} should match the pattern")
 
