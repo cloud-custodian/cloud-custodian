@@ -516,6 +516,36 @@ class DhcpOptionsFilter(Filter):
     vpcs not matching a given option value can be found via specifying
     a `present: false` parameter.
 
+    Use `match-operator: regex` to match values against a regular expression:
+
+     :example:
+
+     .. code-block:: yaml
+
+          policies:
+             - name: vpcs-with-vpc-plus-two-dns
+               resource: vpc
+               filters:
+                 - type: dhcp-options
+                   match-operator: regex
+                   domain-name-servers: '^10\\.\\d{1,3}\\.\\d{1,3}\\.2$'
+
+    Use `match-all: true` with regex to require ALL values match the pattern:
+
+     :example:
+
+     .. code-block:: yaml
+
+          policies:
+             - name: vpcs-with-only-valid-dns
+               resource: vpc
+               filters:
+                 - type: dhcp-options
+                   match-operator: regex
+                   match-all: true
+                   present: false
+                   domain-name-servers: '^(AmazonProvidedDNS|169\\.254\\.169\\.253|10\\.\\d{1,3}\\.\\d{1,3}\\.2)$'
+
     """
 
     option_keys = ('domain-name', 'domain-name-servers', 'ntp-servers')
@@ -525,6 +555,8 @@ class DhcpOptionsFilter(Filter):
             {'type': 'string'}]}
         for k in option_keys})
     schema['properties']['present'] = {'type': 'boolean'}
+    schema['properties']['match-operator'] = {'type': 'string', 'enum': ['exact', 'regex']}
+    schema['properties']['match-all'] = {'type': 'boolean'}
     permissions = ('ec2:DescribeDhcpOptions',)
 
     def validate(self):
@@ -553,12 +585,37 @@ class DhcpOptionsFilter(Filter):
     def process_vpc(self, vpc, dhcp):
         vpc['c7n:DhcpConfiguration'] = dhcp
         found = True
+        match_operator = self.data.get('match-operator', 'exact')
+        match_all = self.data.get('match-all', False)
+        
         for k in self.option_keys:
             if k not in self.data:
                 continue
             is_list = isinstance(self.data[k], list)
+            
             if k not in dhcp:
                 found = False
+            elif match_operator == 'regex':
+                # For regex matching
+                pattern = self.data[k]
+                if is_list:
+                    # If pattern is a list, all patterns must match at least one value
+                    for p in pattern:
+                        regex = re.compile(p)
+                        if not any(regex.match(v) for v in dhcp[k]):
+                            found = False
+                            break
+                else:
+                    # Single pattern
+                    regex = re.compile(pattern)
+                    if match_all:
+                        # All values must match the pattern
+                        if not all(regex.match(v) for v in dhcp[k]):
+                            found = False
+                    else:
+                        # At least one value must match the pattern
+                        if not any(regex.match(v) for v in dhcp[k]):
+                            found = False
             elif not is_list and self.data[k] not in dhcp[k]:
                 found = False
             elif is_list and sorted(self.data[k]) != sorted(dhcp[k]):

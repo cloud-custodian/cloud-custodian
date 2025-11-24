@@ -1,0 +1,66 @@
+{
+    "status_code": 200, 
+    "data": {
+        "Vpcs": [
+            {
+                "VpcId": "vpc-matchall001", 
+                "InstanceTenancy": "default", 
+                "Tags": [
+                    {
+                        "Value": "MatchAllTestVPC", 
+                        "Key": "Name"
+                    }
+                ], 
+                "CidrBlockAssociationSet": [
+                    {
+                        "AssociationId": "vpc-cidr-assoc-matchall01", 
+                        "CidrBlock": "10.0.20.0/24", 
+                        "CidrBlockState": {
+                            "State": "associated"
+                        }
+                    }
+                ], 
+                "State": "available", 
+                "DhcpOptionsId": "dopt-matchall001", 
+                "CidrBlock": "10.0.20.0/24", 
+                "IsDefault": false
+            },
+            {
+                "VpcId": "vpc-matchall002", 
+                "InstanceTenancy": "default", 
+                "Tags": [
+                    {
+                        "Value": "MatchAllTestVPC2", 
+                        "Key": "Name"
+                    }
+                ], 
+                "CidrBlockAssociationSet": [
+                    {
+                        "AssociationId": "vpc-cidr-assoc-matchall02", 
+                        "CidrBlock": "10.0.30.0/24", 
+                        "CidrBlockState": {
+                            "State": "associated"
+                        }
+                    }
+                ], 
+                "State": "available", 
+                "DhcpOptionsId": "dopt-matchall002", 
+                "CidrBlock": "10.0.30.0/24", 
+                "IsDefault": false
+            }
+        ], 
+        "ResponseMetadata": {
+            "RetryAttempts": 0, 
+            "HTTPStatusCode": 200, 
+            "RequestId": "test-matchall-001", 
+            "HTTPHeaders": {
+                "transfer-encoding": "chunked", 
+                "vary": "Accept-Encoding", 
+                "server": "AmazonEC2", 
+                "content-type": "text/xml;charset=UTF-8", 
+                "date": "Mon, 24 Nov 2025 00:00:00 GMT"
+            }
+        }
+    }
+}
+

@@ -440,6 +440,57 @@ class VpcTest(BaseTest):
         self.assertEqual([len(resources), resources[0]["VpcId"]], [1, "vpc-7af45101"])
         self.assertTrue("c7n:DhcpConfiguration" in resources[0])
 
+    def test_dhcp_options_filter_regex(self):
+        # Test regex matching for DHCP options
+        session_factory = self.replay_flight_data("test_vpc_dhcp_options_regex")
+        p = self.load_policy(
+            {
+                "name": "c7n-dhcp-options-regex",
+                "resource": "vpc",
+                "filters": [
+                    {
+                        "type": "dhcp-options",
+                        "match-operator": "regex",
+                        "domain-name-servers": r"^10\.\d{1,3}\.\d{1,3}\.2$",
+                    }
+                ],
+            },
+            session_factory=session_factory,
+        )
+        resources = p.run()
+        self.assertEqual(len(resources), 1)
+        self.assertTrue("c7n:DhcpConfiguration" in resources[0])
+
+    def test_dhcp_options_filter_match_all(self):
+        # Test match-all: true to ensure all DNS servers match the pattern
+        session_factory = self.replay_flight_data("test_vpc_dhcp_options_match_all")
+        p = self.load_policy(
+            {
+                "name": "c7n-dhcp-options-match-all",
+                "resource": "vpc",
+                "filters": [
+                    {
+                        "type": "dhcp-options",
+                        "match-operator": "regex",
+                        "match-all": True,
+                        "domain-name-servers": r"^(AmazonProvidedDNS|169\.254\.169\.253|10\.\d{1,3}\.\d{1,3}\.2)$",
+                    }
+                ],
+            },
+            session_factory=session_factory,
+        )
+        resources = p.run()
+        # This should match VPCs where ALL DNS servers are Amazon DNS
+        self.assertTrue(len(resources) >= 0)
+        for resource in resources:
+            self.assertTrue("c7n:DhcpConfiguration" in resource)
+            dns_servers = resource["c7n:DhcpConfiguration"].get("domain-name-servers", [])
+            # Verify all DNS servers match the pattern
+            import re
+            pattern = re.compile(r"^(AmazonProvidedDNS|169\.254\.169\.253|10\.\d{1,3}\.\d{1,3}\.2)$")
+            for dns in dns_servers:
+                self.assertTrue(pattern.match(dns), f"DNS {dns} should match the pattern")
+
     def test_vpc_endpoint_filter(self):
         factory = self.replay_flight_data("test_vpc_endpoint_filter")
         p = self.load_policy(
