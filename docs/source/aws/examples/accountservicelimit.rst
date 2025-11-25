@@ -9,21 +9,21 @@ have an open support case will be skipped.
 
 .. code-block:: yaml
 
-  policies:
-    - name: account-service-limits
-      resource: aws.service-quota
-      filters:
-        - UsageMetric: present
-        - type: usage-metric
-          limit: 50
-        - type: request-history
-          key: "[].Status"
-          value: CASE_OPENED
-          value_type: swap
-          op: not-in
-      actions:
-        - type: request-increase
-          multiplier: 1.25
+   policies:
+     - name: account-service-limits
+       resource: aws.service-quota
+       filters:
+         - UsageMetric: present
+         - type: usage-metric
+           limit: 50
+         - type: request-history
+           key: "[].Status"
+           value: CASE_OPENED
+           value_type: swap
+           op: not-in
+       actions:
+         - type: request-increase
+           multiplier: 1.25
 
 As there are numerous services available in AWS, you have the option to specify
 the services you wish to include or exclude, thereby preventing prolonged execution times
@@ -51,6 +51,8 @@ Global Services
      policies:
       - name: iam-service-quotas
         resource: aws.service-quota
+        conditions:
+          - region: us-east-1
         query:
           - include_service_codes:
               - iam
