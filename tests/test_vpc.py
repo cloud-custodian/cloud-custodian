@@ -491,7 +491,7 @@ class VpcTest(BaseTest):
             for dns in dns_servers:
                 self.assertIn(
                     dns,
-                    ["AmazonProvidedDNS", "169.254.169.253", "10.0.0.2"],
+                    ["AmazonProvidedDNS", "169.254.169.253", "10.0.20.2"],
                     f"DNS {dns} should be Amazon-provided"
                 )
 
@@ -543,7 +543,8 @@ class VpcTest(BaseTest):
         )
         resources = p.run()
         # Should match VPCs that have at least one Amazon DNS (even if mixed)
-        self.assertEqual(len(resources), 1)
+        # Test data has 2 VPCs, both with at least one Amazon DNS
+        self.assertEqual(len(resources), 2)
         for resource in resources:
             self.assertTrue("c7n:DhcpConfiguration" in resource)
             dns_servers = resource["c7n:DhcpConfiguration"].get(
@@ -551,7 +552,7 @@ class VpcTest(BaseTest):
             )
             # At least one DNS server should be Amazon-provided
             amazon_dns_found = any(
-                dns in ["AmazonProvidedDNS", "169.254.169.253", "10.0.0.2"]
+                dns in ["AmazonProvidedDNS", "169.254.169.253", "10.0.20.2", "10.0.30.2"]
                 for dns in dns_servers
             )
             self.assertTrue(amazon_dns_found)
