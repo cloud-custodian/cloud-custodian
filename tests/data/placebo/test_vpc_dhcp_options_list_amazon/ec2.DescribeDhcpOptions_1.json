@@ -5,7 +5,7 @@
             {
                 "Tags": [
                     {
-                        "Value": "MixedListDhcp", 
+                        "Value": "ListAmazonDhcp", 
                         "Key": "Name"
                     }
                 ], 
@@ -27,22 +27,19 @@
                                 "Value": "169.254.169.253"
                             },
                             {
-                                "Value": "10.5.0.2"
-                            },
-                            {
-                                "Value": "1.1.1.1"
+                                "Value": "10.6.0.2"
                             }
                         ], 
                         "Key": "domain-name-servers"
                     }
                 ], 
-                "DhcpOptionsId": "dopt-mixedlist001"
+                "DhcpOptionsId": "dopt-listamazon001"
             }
         ], 
         "ResponseMetadata": {
             "RetryAttempts": 0, 
             "HTTPStatusCode": 200, 
-            "RequestId": "test-mixedlist-dhcp-001", 
+            "RequestId": "test-listamazon-dhcp-001", 
             "HTTPHeaders": {
                 "transfer-encoding": "chunked", 
                 "vary": "Accept-Encoding", 

@@ -3,33 +3,33 @@
     "data": {
         "Vpcs": [
             {
-                "VpcId": "vpc-mixedlist001", 
+                "VpcId": "vpc-listamazon001", 
                 "InstanceTenancy": "default", 
                 "Tags": [
                     {
-                        "Value": "MixedListTestVPC", 
+                        "Value": "ListAmazonTestVPC", 
                         "Key": "Name"
                     }
                 ], 
                 "CidrBlockAssociationSet": [
                     {
-                        "AssociationId": "vpc-cidr-assoc-mixedlist01", 
-                        "CidrBlock": "10.5.0.0/16", 
+                        "AssociationId": "vpc-cidr-assoc-listamazon01", 
+                        "CidrBlock": "10.6.0.0/16", 
                         "CidrBlockState": {
                             "State": "associated"
                         }
                     }
                 ], 
                 "State": "available", 
-                "DhcpOptionsId": "dopt-mixedlist001", 
-                "CidrBlock": "10.5.0.0/16", 
+                "DhcpOptionsId": "dopt-listamazon001", 
+                "CidrBlock": "10.6.0.0/16", 
                 "IsDefault": false
             }
         ], 
         "ResponseMetadata": {
             "RetryAttempts": 0, 
             "HTTPStatusCode": 200, 
-            "RequestId": "test-mixedlist-001", 
+            "RequestId": "test-listamazon-001", 
             "HTTPHeaders": {
                 "transfer-encoding": "chunked", 
                 "vary": "Accept-Encoding", 

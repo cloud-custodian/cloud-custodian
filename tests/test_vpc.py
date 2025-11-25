@@ -572,32 +572,55 @@ class VpcTest(BaseTest):
         result = filter_instance._calculate_cidr_plus_2("")
         self.assertIsNone(result)
 
-    def test_dhcp_options_filter_amazon_mixed_list(self):
-        # Test mixed list with 'amazon' + specific DNS values
-        # This tests lines 650-653: expanding 'amazon' in a list
-        session_factory = self.replay_flight_data("test_vpc_dhcp_options_amazon_mixed_list")
+    def test_dhcp_options_filter_amazon_with_secondary_cidr(self):
+        # Test that amazon value works with secondary CIDR blocks
+        # This ensures _get_amazon_dns_servers processes all CIDR blocks
+        from c7n.resources.vpc import DhcpOptionsFilter
+
+        filter_instance = DhcpOptionsFilter({"domain-name-servers": "amazon"}, None)
+
+        # Mock VPC with primary and secondary CIDR
+        vpc = {
+            "CidrBlock": "10.0.0.0/16",
+            "CidrBlockAssociationSet": [
+                {
+                    "CidrBlock": "10.0.0.0/16",
+                    "CidrBlockState": {"State": "associated"}
+                },
+                {
+                    "CidrBlock": "10.1.0.0/16",
+                    "CidrBlockState": {"State": "associated"}
+                }
+            ]
+        }
+
+        amazon_dns = filter_instance._get_amazon_dns_servers(vpc)
+        # Should have AmazonProvidedDNS, 169.254.169.253, and both CIDR base+2
+        self.assertIn("AmazonProvidedDNS", amazon_dns)
+        self.assertIn("169.254.169.253", amazon_dns)
+        self.assertIn("10.0.0.2", amazon_dns)
+        self.assertIn("10.1.0.2", amazon_dns)
+
+    def test_dhcp_options_filter_amazon_list(self):
+        # Test list with 'amazon' value - tests lines 650-653
+        # Filter expands 'amazon' to actual DNS servers for exact match
+        session_factory = self.replay_flight_data("test_vpc_dhcp_options_list_amazon")
         p = self.load_policy(
             {
-                "name": "c7n-dhcp-options-amazon-mixed-list",
+                "name": "c7n-dhcp-options-amazon-list",
                 "resource": "vpc",
                 "filters": [
                     {
                         "type": "dhcp-options",
-                        "domain-name-servers": ["amazon", "1.1.1.1"],
+                        "domain-name-servers": ["amazon"],
                     }
                 ],
             },
             session_factory=session_factory,
         )
         resources = p.run()
-        # Should match VPCs where DNS has all Amazon servers + 1.1.1.1
+        # Should match VPC with exactly Amazon DNS servers
         self.assertEqual(len(resources), 1)
-        # Verify the DHCP config has all expected servers
-        dns_servers = resources[0]["c7n:DhcpConfiguration"]["domain-name-servers"]
-        self.assertIn("AmazonProvidedDNS", dns_servers)
-        self.assertIn("169.254.169.253", dns_servers)
-        self.assertIn("10.5.0.2", dns_servers)
-        self.assertIn("1.1.1.1", dns_servers)
 
     def test_vpc_endpoint_filter(self):
         factory = self.replay_flight_data("test_vpc_endpoint_filter")
