@@ -516,36 +516,36 @@ class DhcpOptionsFilter(Filter):
     vpcs not matching a given option value can be found via specifying
     a `present: false` parameter.
 
-    Use `match-operator: regex` to match values against a regular expression:
+    Use the synthetic value `amazon` to validate Amazon-provided DNS servers.
+    This checks for AmazonProvidedDNS, 169.254.169.253, and VPC CIDR base + 2:
 
      :example:
 
      .. code-block:: yaml
 
           policies:
-             - name: vpcs-with-vpc-plus-two-dns
+             - name: vpcs-with-only-amazon-dns
                resource: vpc
                filters:
                  - type: dhcp-options
-                   match-operator: regex
-                   domain-name-servers: '^10\\.\\d{1,3}\\.\\d{1,3}\\.2$'
-
-    Use `match-all: true` with regex to require ALL values match the pattern:
-
-     :example:
-
-     .. code-block:: yaml
-
-          policies:
-             - name: vpcs-with-only-valid-dns
-               resource: vpc
-               filters:
-                 - type: dhcp-options
-                   match-operator: regex
                    match-all: true
                    present: false
-                   domain-name-servers: >-
-                     ^(AmazonProvidedDNS|169\\.254\\.169\\.253|10\\.\\d{1,3}\\.\\d{1,3}\\.2)$
+                   domain-name-servers: amazon
+
+    Use `match-all: true` to require ALL values match the criteria:
+
+     :example:
+
+     .. code-block:: yaml
+
+          policies:
+             - name: vpcs-without-amazon-dns
+               resource: vpc
+               filters:
+                 - type: dhcp-options
+                   match-all: true
+                   present: false
+                   domain-name-servers: amazon
 
     """
 
@@ -556,7 +556,6 @@ class DhcpOptionsFilter(Filter):
             {'type': 'string'}]}
         for k in option_keys})
     schema['properties']['present'] = {'type': 'boolean'}
-    schema['properties']['match-operator'] = {'type': 'string', 'enum': ['exact', 'regex']}
     schema['properties']['match-all'] = {'type': 'boolean'}
     permissions = ('ec2:DescribeDhcpOptions',)
 
@@ -583,44 +582,81 @@ class DhcpOptionsFilter(Filter):
                 results.append(vpc)
         return results
 
+    def _get_amazon_dns_servers(self, vpc):
+        """Get list of valid Amazon DNS server addresses for this VPC."""
+        amazon_dns = ['AmazonProvidedDNS', '169.254.169.253']
+
+        # Add CIDR base + 2 for primary CIDR block
+        if 'CidrBlock' in vpc:
+            cidr_base_plus_2 = self._calculate_cidr_plus_2(vpc['CidrBlock'])
+            if cidr_base_plus_2:
+                amazon_dns.append(cidr_base_plus_2)
+
+        # Add CIDR base + 2 for secondary CIDR blocks
+        for assoc in vpc.get('CidrBlockAssociationSet', []):
+            if assoc.get('CidrBlockState', {}).get('State') == 'associated':
+                cidr_base_plus_2 = self._calculate_cidr_plus_2(assoc['CidrBlock'])
+                if cidr_base_plus_2:
+                    amazon_dns.append(cidr_base_plus_2)
+
+        return amazon_dns
+
+    def _calculate_cidr_plus_2(self, cidr_block):
+        """Calculate the base + 2 IP address for a given CIDR block."""
+        try:
+            import ipaddress
+            network = ipaddress.ip_network(cidr_block, strict=False)
+            # Base + 2 is the third address in the network
+            base_plus_2 = network.network_address + 2
+            return str(base_plus_2)
+        except (ValueError, ImportError):
+            return None
+
+    def _is_amazon_dns(self, value, vpc):
+        """Check if a DNS server value is Amazon-provided DNS."""
+        amazon_dns_servers = self._get_amazon_dns_servers(vpc)
+        return value in amazon_dns_servers
+
     def process_vpc(self, vpc, dhcp):
         vpc['c7n:DhcpConfiguration'] = dhcp
         found = True
-        match_operator = self.data.get('match-operator', 'exact')
         match_all = self.data.get('match-all', False)
 
         for k in self.option_keys:
             if k not in self.data:
                 continue
+
             is_list = isinstance(self.data[k], list)
+            expected_value = self.data[k]
 
             if k not in dhcp:
                 found = False
-            elif match_operator == 'regex':
-                # For regex matching
-                pattern = self.data[k]
-                if is_list:
-                    # If pattern is a list, all patterns must match at least one value
-                    for p in pattern:
-                        regex = re.compile(p)
-                        if not any(regex.match(v) for v in dhcp[k]):
-                            found = False
-                            break
+            elif expected_value == 'amazon':
+                # Synthetic value: check if DNS servers are Amazon-provided
+                if match_all:
+                    # All DNS servers must be Amazon DNS
+                    found = all(
+                        self._is_amazon_dns(v, vpc) for v in dhcp[k]
+                    )
                 else:
-                    # Single pattern
-                    regex = re.compile(pattern)
-                    if match_all:
-                        # All values must match the pattern
-                        if not all(regex.match(v) for v in dhcp[k]):
-                            found = False
-                    else:
-                        # At least one value must match the pattern
-                        if not any(regex.match(v) for v in dhcp[k]):
-                            found = False
-            elif not is_list and self.data[k] not in dhcp[k]:
+                    # At least one DNS server must be Amazon DNS
+                    found = any(
+                        self._is_amazon_dns(v, vpc) for v in dhcp[k]
+                    )
+            elif is_list and isinstance(expected_value, list):
+                # Check if list contains 'amazon' synthetic value
+                if 'amazon' in expected_value:
+                    # Mixed list with amazon - check each value
+                    amazon_dns = self._get_amazon_dns_servers(vpc)
+                    non_amazon_values = [v for v in expected_value if v != 'amazon']
+                    expected_values = amazon_dns + non_amazon_values
+                    found = sorted(dhcp[k]) == sorted(expected_values)
+                else:
+                    # Regular list matching
+                    found = sorted(dhcp[k]) == sorted(expected_value)
+            elif not is_list and expected_value not in dhcp[k]:
                 found = False
-            elif is_list and sorted(self.data[k]) != sorted(dhcp[k]):
-                found = False
+
         if not self.data.get('present', True):
             found = not found
         return found

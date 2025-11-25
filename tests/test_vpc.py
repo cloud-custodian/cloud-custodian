@@ -440,18 +440,17 @@ class VpcTest(BaseTest):
         self.assertEqual([len(resources), resources[0]["VpcId"]], [1, "vpc-7af45101"])
         self.assertTrue("c7n:DhcpConfiguration" in resources[0])
 
-    def test_dhcp_options_filter_regex(self):
-        # Test regex matching for DHCP options
-        session_factory = self.replay_flight_data("test_vpc_dhcp_options_regex")
+    def test_dhcp_options_filter_amazon(self):
+        # Test amazon synthetic value for Amazon-provided DNS
+        session_factory = self.replay_flight_data("test_vpc_dhcp_options_amazon")
         p = self.load_policy(
             {
-                "name": "c7n-dhcp-options-regex",
+                "name": "c7n-dhcp-options-amazon",
                 "resource": "vpc",
                 "filters": [
                     {
                         "type": "dhcp-options",
-                        "match-operator": "regex",
-                        "domain-name-servers": r"^10\.\d{1,3}\.\d{1,3}\.2$",
+                        "domain-name-servers": "amazon",
                     }
                 ],
             },
@@ -461,22 +460,18 @@ class VpcTest(BaseTest):
         self.assertEqual(len(resources), 1)
         self.assertTrue("c7n:DhcpConfiguration" in resources[0])
 
-    def test_dhcp_options_filter_match_all(self):
-        # Test match-all: true to ensure all DNS servers match the pattern
-        session_factory = self.replay_flight_data("test_vpc_dhcp_options_match_all")
+    def test_dhcp_options_filter_amazon_match_all(self):
+        # Test match-all: true with amazon to ensure all DNS servers are Amazon DNS
+        session_factory = self.replay_flight_data("test_vpc_dhcp_options_amazon_all")
         p = self.load_policy(
             {
-                "name": "c7n-dhcp-options-match-all",
+                "name": "c7n-dhcp-options-amazon-all",
                 "resource": "vpc",
                 "filters": [
                     {
                         "type": "dhcp-options",
-                        "match-operator": "regex",
                         "match-all": True,
-                        "domain-name-servers": (
-                            r"^(AmazonProvidedDNS|169\.254\.169\.253|"
-                            r"10\.\d{1,3}\.\d{1,3}\.2)$"
-                        ),
+                        "domain-name-servers": "amazon",
                     }
                 ],
             },
@@ -484,80 +479,82 @@ class VpcTest(BaseTest):
         )
         resources = p.run()
         # This should match VPCs where ALL DNS servers are Amazon DNS
-        self.assertTrue(len(resources) >= 0)
+        self.assertEqual(len(resources), 1)
         for resource in resources:
             self.assertTrue("c7n:DhcpConfiguration" in resource)
             dns_servers = resource["c7n:DhcpConfiguration"].get(
                 "domain-name-servers", []
             )
-            # Verify all DNS servers match the pattern
-            import re
-            pattern = re.compile(
-                r"^(AmazonProvidedDNS|169\.254\.169\.253|10\.\d{1,3}\.\d{1,3}\.2)$"
-            )
+            # Verify all DNS servers are Amazon-provided
+            self.assertTrue(len(dns_servers) > 0)
+            # Should have only Amazon DNS servers
             for dns in dns_servers:
-                self.assertTrue(pattern.match(dns), f"DNS {dns} should match the pattern")
+                self.assertIn(
+                    dns,
+                    ["AmazonProvidedDNS", "169.254.169.253", "10.0.0.2"],
+                    f"DNS {dns} should be Amazon-provided"
+                )
 
-    def test_dhcp_options_filter_regex_list(self):
-        # Test regex matching with a list of patterns (all must match at least one value)
-        # Using test data that has multiple DNS servers to match multiple patterns
-        session_factory = self.replay_flight_data("test_vpc_dhcp_options_match_all")
+    def test_dhcp_options_filter_amazon_present_false(self):
+        # Test amazon with present: false to catch non-Amazon DNS
+        # Using test data with mixed DNS (Amazon + external)
+        session_factory = self.replay_flight_data("test_vpc_dhcp_options_mixed")
         p = self.load_policy(
             {
-                "name": "c7n-dhcp-options-regex-list",
+                "name": "c7n-dhcp-options-mixed",
                 "resource": "vpc",
                 "filters": [
                     {
                         "type": "dhcp-options",
-                        "match-operator": "regex",
-                        "domain-name-servers": [
-                            r"^AmazonProvidedDNS$",
-                            r"^169\.254\.169\.253$",
-                        ],
+                        "match-all": True,
+                        "present": False,
+                        "domain-name-servers": "amazon",
                     }
                 ],
             },
             session_factory=session_factory,
         )
         resources = p.run()
-        # Should match VPCs that have both AmazonProvidedDNS and 169.254.169.253
-        self.assertTrue(len(resources) >= 1)
+        # Should match VPCs that have at least one non-Amazon DNS
+        self.assertEqual(len(resources), 1)
         for resource in resources:
             self.assertTrue("c7n:DhcpConfiguration" in resource)
             dns_servers = resource["c7n:DhcpConfiguration"].get(
                 "domain-name-servers", []
             )
-            # Should have both patterns matched
-            self.assertIn("AmazonProvidedDNS", dns_servers)
-            self.assertIn("169.254.169.253", dns_servers)
+            # Should have at least one non-Amazon DNS
+            self.assertIn("8.8.8.8", dns_servers)
 
-    def test_dhcp_options_filter_regex_no_match_all(self):
-        # Test regex without match-all (at least one value must match)
-        session_factory = self.replay_flight_data("test_vpc_dhcp_options_match_all")
+    def test_dhcp_options_filter_amazon_no_match_all(self):
+        # Test amazon without match-all (at least one must be Amazon DNS)
+        session_factory = self.replay_flight_data("test_vpc_dhcp_options_mixed")
         p = self.load_policy(
             {
-                "name": "c7n-dhcp-options-regex-no-match-all",
+                "name": "c7n-dhcp-options-amazon-any",
                 "resource": "vpc",
                 "filters": [
                     {
                         "type": "dhcp-options",
-                        "match-operator": "regex",
-                        "domain-name-servers": r"^AmazonProvidedDNS$",
+                        "domain-name-servers": "amazon",
                     }
                 ],
             },
             session_factory=session_factory,
         )
         resources = p.run()
-        # Should match VPCs that have at least one AmazonProvidedDNS entry
-        self.assertTrue(len(resources) >= 1)
+        # Should match VPCs that have at least one Amazon DNS (even if mixed)
+        self.assertEqual(len(resources), 1)
         for resource in resources:
             self.assertTrue("c7n:DhcpConfiguration" in resource)
             dns_servers = resource["c7n:DhcpConfiguration"].get(
                 "domain-name-servers", []
             )
-            # At least one DNS server should be AmazonProvidedDNS
-            self.assertIn("AmazonProvidedDNS", dns_servers)
+            # At least one DNS server should be Amazon-provided
+            amazon_dns_found = any(
+                dns in ["AmazonProvidedDNS", "169.254.169.253", "10.0.0.2"]
+                for dns in dns_servers
+            )
+            self.assertTrue(amazon_dns_found)
 
     def test_vpc_endpoint_filter(self):
         factory = self.replay_flight_data("test_vpc_endpoint_filter")
