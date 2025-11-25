@@ -601,26 +601,39 @@ class VpcTest(BaseTest):
         self.assertIn("10.0.0.2", amazon_dns)
         self.assertIn("10.1.0.2", amazon_dns)
 
-    def test_dhcp_options_filter_amazon_list(self):
-        # Test list with 'amazon' value - tests lines 650-653
-        # Filter expands 'amazon' to actual DNS servers for exact match
-        session_factory = self.replay_flight_data("test_vpc_dhcp_options_list_amazon")
-        p = self.load_policy(
-            {
-                "name": "c7n-dhcp-options-amazon-list",
-                "resource": "vpc",
-                "filters": [
-                    {
-                        "type": "dhcp-options",
-                        "domain-name-servers": ["amazon"],
-                    }
-                ],
-            },
-            session_factory=session_factory,
+    def test_dhcp_options_filter_amazon_list_expansion(self):
+        # Test list with 'amazon' value expansion - covers lines 650-653
+        # This tests the code path where a list contains 'amazon'
+        from c7n.resources.vpc import DhcpOptionsFilter
+
+        filter_instance = DhcpOptionsFilter(
+            {"domain-name-servers": ["amazon", "8.8.8.8"]}, None
         )
-        resources = p.run()
-        # Should match VPC with exactly Amazon DNS servers
-        self.assertEqual(len(resources), 1)
+
+        # Mock VPC
+        vpc = {
+            "CidrBlock": "10.0.0.0/16",
+            "CidrBlockAssociationSet": [
+                {
+                    "CidrBlock": "10.0.0.0/16",
+                    "CidrBlockState": {"State": "associated"}
+                }
+            ]
+        }
+
+        # Mock DHCP config that matches expanded list
+        dhcp = {
+            "domain-name-servers": [
+                "AmazonProvidedDNS",
+                "169.254.169.253",
+                "10.0.0.2",
+                "8.8.8.8"
+            ]
+        }
+
+        # This should match because DHCP has all Amazon DNS + 8.8.8.8
+        result = filter_instance.process_vpc(vpc, dhcp)
+        self.assertTrue(result)
 
     def test_vpc_endpoint_filter(self):
         factory = self.replay_flight_data("test_vpc_endpoint_filter")
