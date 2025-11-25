@@ -380,10 +380,12 @@ class UserSetBoundary(SetBoundary):
 class DescribePolicy(DescribeSource):
 
     def resources(self, query=None):
-        qfilters = PolicyQueryParser.parse(self.manager.data.get('query', []))
+        queries = PolicyQueryParser.parse(self.manager.data.get('query', []))
         query = query or {}
-        if qfilters:
-            query = {t['Name']: t['Value'] for t in qfilters}
+        for q in queries:
+            query.update(q)
+        if 'Scope' not in query:
+            query['Scope'] = 'Local'
         return super(DescribePolicy, self).resources(query=query)
 
     def get_resources(self, resource_ids, cache=True):
@@ -408,7 +410,7 @@ class Policy(QueryResourceManager):
     class resource_type(TypeInfo):
         service = 'iam'
         arn_type = 'policy'
-        enum_spec = ('list_policies', 'Policies', {'Scope': 'Local'})
+        enum_spec = ('list_policies', 'Policies', None)
         id = 'PolicyId'
         name = 'PolicyName'
         date = 'CreateDate'
@@ -430,10 +432,11 @@ class PolicyQueryParser(QueryParser):
         'Scope': ('All', 'AWS', 'Local'),
         'PolicyUsageFilter': ('PermissionsPolicy', 'PermissionsBoundary'),
         'PathPrefix': str,
-        'OnlyAttached': bool
+        'OnlyAttached': bool,
+        'MaxItems': int,
     }
     multi_value = False
-    value_key = 'Value'
+    type_name = 'IAM Policy'
 
 
 @resources.register('iam-profile')

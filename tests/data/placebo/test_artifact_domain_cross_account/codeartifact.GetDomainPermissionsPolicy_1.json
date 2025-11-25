@@ -1,0 +1,11 @@
+{
+    "status_code": 200,
+    "data": {
+        "ResponseMetadata": {},
+        "policy": {
+            "resourceArn": "arn:aws:codeartifact:us-east-2:644160558196:domain/c7n-test",
+            "revision": "pmQ3XEZ8pSPYvFpTn0mHKthtxxDIjp7CnivtwIKJz+U=",
+            "document": "{\"Version\":\"2012-10-17\",\"Statement\":[{\"Sid\":\"ContributorPolicy\",\"Effect\":\"Allow\",\"Principal\":{\"AWS\":\"*\"},\"Action\":\"codeartifact:DescribeDomain\",\"Resource\":\"*\"}]}"
+        }
+    }
+}

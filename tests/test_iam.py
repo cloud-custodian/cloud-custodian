@@ -1441,12 +1441,12 @@ class IamPolicyFilterUsage(BaseTest):
 
 
 class IamPolicy(BaseTest):
-
     def test_iam_policy_delete(self):
         factory = self.replay_flight_data('test_iam_policy_delete')
         p = self.load_policy({
             'name': 'delete-policy',
             'resource': 'iam-policy',
+            # Deprecated query format.  Use [{'Scope': 'Local'}] instead.
             'query': [{'Name': 'Scope', 'Value': 'Local'}],
             'filters': [
                 {'AttachmentCount': 0},
@@ -1469,15 +1469,43 @@ class IamPolicy(BaseTest):
             PolicyArn=resources[0]['Arn'])
 
     def test_iam_query_parser(self):
-        qfilters = [
-            {'Name': 'Scope', 'Value': 'Local'},
-            {'Name': 'OnlyAttached', 'Value': True}]
+        queries = [
+            {'Scope': 'Local'},
+            {'OnlyAttached': True},
+            {'MaxItems': 100}
+        ]
 
-        self.assertEqual(qfilters, PolicyQueryParser.parse(qfilters))
-        self.assertRaises(
-            PolicyValidationError,
-            PolicyQueryParser.parse,
-            {'Name': 'Scope', 'Value': ['All', 'Local']})
+        self.assertEqual(queries, PolicyQueryParser.parse(queries))
+
+        queries = [{'Name': 'Scope', 'Value': 'Local'}, {'Name': 'OnlyAttached', 'Value': True}]
+        result_queries = [{'Scope': 'Local'}, {'OnlyAttached': True}]
+        self.assertEqual(result_queries, PolicyQueryParser.parse(queries))
+
+        self.assertRaises(PolicyValidationError, PolicyQueryParser.parse,
+                          {'Name': 'Scope', 'Value': ['All', 'Local']})
+
+        self.assertRaises(PolicyValidationError, PolicyQueryParser.parse,
+                          [{'Name': 'Scope', 'Value': 'Local'}, {'OnlyAttached': True}])
+
+        self.assertRaises(PolicyValidationError, PolicyQueryParser.parse,
+                          [{'Scope': ['All', 'Local']}])
+
+        self.assertRaises(PolicyValidationError, PolicyQueryParser.parse, [{'scope': 'Local'}])
+
+        self.assertRaises(PolicyValidationError, PolicyQueryParser.parse,
+                          [{'OnlyAttached': 'True'}])
+
+        self.assertRaises(PolicyValidationError, PolicyQueryParser.parse,
+                          [{'Filters': [{'Name': 'Scope'}, {'Values': ['Local']}]}])
+
+        self.assertRaises(PolicyValidationError, PolicyQueryParser.parse,
+                          [{'Filters': [{'Name': 'Scope'}, {'Values': ['Local']}]}])
+
+        self.assertRaises(PolicyValidationError, PolicyQueryParser.parse,
+                          [{'Scope': 'Local'}, {'Scope': 'All'}])
+
+        self.assertRaises(PolicyValidationError, PolicyQueryParser.parse,
+                          [{'MaxItems': '100'}])
 
     def test_iam_has_allow_all_policies(self):
         session_factory = self.replay_flight_data("test_iam_policy_allow_all")
