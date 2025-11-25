@@ -1696,6 +1696,7 @@ dependencies = [
     { name = "pyyaml" },
     { name = "redis" },
     { name = "sendgrid" },
+    { name = "setuptools" },
     { name = "types-six" },
 ]
 
@@ -1733,6 +1734,7 @@ requires-dist = [
     { name = "pyyaml", specifier = ">=5.4.0" },
     { name = "redis", specifier = ">=5.0,<6.0" },
     { name = "sendgrid", specifier = ">=6.1.1,<6.12.5" },
+    { name = "setuptools", specifier = ">=80.9.0" },
     { name = "types-six", specifier = ">=1.16.10,<2.0.0" },
 ]
 provides-extras = ["gcp", "azure"]
