@@ -49,14 +49,14 @@ Global Services
   .. code-block:: yaml
 
      policies:
-      - name: iam-service-quotas
-        resource: aws.service-quota
-        conditions:
-          - region: us-east-1
-        query:
-          - include_service_codes:
-              - iam
-        filters:
-          - UsageMetric: present
-          - type: usage-metric
-            limit: 50
+       - name: iam-service-quotas
+         resource: aws.service-quota
+         conditions:
+           - region: us-east-1
+         query:
+           - include_service_codes:
+               - iam
+         filters:
+           - UsageMetric: present
+           - type: usage-metric
+             limit: 50
