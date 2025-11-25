@@ -1,0 +1,56 @@
+{
+    "status_code": 200, 
+    "data": {
+        "DhcpOptions": [
+            {
+                "Tags": [
+                    {
+                        "Value": "MixedListDhcp", 
+                        "Key": "Name"
+                    }
+                ], 
+                "DhcpConfigurations": [
+                    {
+                        "Values": [
+                            {
+                                "Value": "ec2.internal"
+                            }
+                        ], 
+                        "Key": "domain-name"
+                    }, 
+                    {
+                        "Values": [
+                            {
+                                "Value": "AmazonProvidedDNS"
+                            },
+                            {
+                                "Value": "169.254.169.253"
+                            },
+                            {
+                                "Value": "10.5.0.2"
+                            },
+                            {
+                                "Value": "1.1.1.1"
+                            }
+                        ], 
+                        "Key": "domain-name-servers"
+                    }
+                ], 
+                "DhcpOptionsId": "dopt-mixedlist001"
+            }
+        ], 
+        "ResponseMetadata": {
+            "RetryAttempts": 0, 
+            "HTTPStatusCode": 200, 
+            "RequestId": "test-mixedlist-dhcp-001", 
+            "HTTPHeaders": {
+                "transfer-encoding": "chunked", 
+                "vary": "Accept-Encoding", 
+                "server": "AmazonEC2", 
+                "content-type": "text/xml;charset=UTF-8", 
+                "date": "Mon, 25 Nov 2025 00:00:00 GMT"
+            }
+        }
+    }
+}
+

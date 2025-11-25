@@ -557,6 +557,48 @@ class VpcTest(BaseTest):
             )
             self.assertTrue(amazon_dns_found)
 
+    def test_dhcp_options_filter_amazon_invalid_cidr(self):
+        # Test that invalid CIDR blocks are handled gracefully
+        from c7n.resources.vpc import DhcpOptionsFilter
+        
+        # Create a mock filter instance
+        filter_instance = DhcpOptionsFilter({"domain-name-servers": "amazon"}, None)
+        
+        # Test with invalid CIDR - should return None
+        result = filter_instance._calculate_cidr_plus_2("invalid-cidr")
+        self.assertIsNone(result)
+        
+        # Test with empty string - should return None
+        result = filter_instance._calculate_cidr_plus_2("")
+        self.assertIsNone(result)
+
+    def test_dhcp_options_filter_amazon_mixed_list(self):
+        # Test mixed list with 'amazon' + specific DNS values
+        # This tests lines 650-653: expanding 'amazon' in a list
+        session_factory = self.replay_flight_data("test_vpc_dhcp_options_amazon_mixed_list")
+        p = self.load_policy(
+            {
+                "name": "c7n-dhcp-options-amazon-mixed-list",
+                "resource": "vpc",
+                "filters": [
+                    {
+                        "type": "dhcp-options",
+                        "domain-name-servers": ["amazon", "1.1.1.1"],
+                    }
+                ],
+            },
+            session_factory=session_factory,
+        )
+        resources = p.run()
+        # Should match VPCs where DNS has all Amazon servers + 1.1.1.1
+        self.assertEqual(len(resources), 1)
+        # Verify the DHCP config has all expected servers
+        dns_servers = resources[0]["c7n:DhcpConfiguration"]["domain-name-servers"]
+        self.assertIn("AmazonProvidedDNS", dns_servers)
+        self.assertIn("169.254.169.253", dns_servers)
+        self.assertIn("10.5.0.2", dns_servers)
+        self.assertIn("1.1.1.1", dns_servers)
+
     def test_vpc_endpoint_filter(self):
         factory = self.replay_flight_data("test_vpc_endpoint_filter")
         p = self.load_policy(
