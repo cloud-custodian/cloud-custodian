@@ -141,3 +141,36 @@ class TestQuicksight(BaseTest):
             Namespace='default'
         )["UserList"]
         self.assertEqual(len(users), 0)
+
+    def test_quicksight_dashboard_standard_edition(self):
+        factory = self.replay_flight_data("test_quicksight_dashboard_standard_edition")
+
+        policy = self.load_policy({
+            "name": "test-aws-quicksight-dashboard",
+            "resource": "aws.quicksight-dashboard",
+        }, session_factory=factory)
+
+        resources = policy.run()
+        self.assertEqual(resources, [])
+
+    def test_quicksight_datasource_standard_edition(self):
+        factory = self.replay_flight_data("test_quicksight_datasource_standard_edition")
+
+        policy = self.load_policy({
+            "name": "test-aws-quicksight-datasource",
+            "resource": "aws.quicksight-datasource",
+        }, session_factory=factory)
+
+        resources = policy.run()
+        self.assertEqual(resources, [])
+
+    def test_quicksight_group_standard_edition(self):
+        factory = self.replay_flight_data("test_quicksight_group_standard_edition")
+
+        policy = self.load_policy({
+            "name": "test-aws-quicksight-group",
+            "resource": "aws.quicksight-group",
+        }, session_factory=factory)
+
+        resources = policy.run()
+        self.assertEqual(resources, [])
