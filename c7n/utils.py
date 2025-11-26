@@ -742,64 +742,191 @@ class QueryParser:
 
     QuerySchema = {}
     type_name = ''
+    # Allow multiple values to be passed to a query param
     multi_value = True
-    value_key = 'Values'
+    # If using multi_value, specify scalar fields here
+    single_value_fields = ()
+
+    @classmethod
+    def is_implicit_query_filter(cls, data):
+        key = list(data[0].keys())[0]
+        if (key not in cls.QuerySchema and 'Filters' in cls.QuerySchema and
+                (key in cls.QuerySchema['Filters'] or key.startswith('tag:'))):
+            return True
+        return False
+
+    @classmethod
+    def implicit_qfilter_translate(cls, data):
+        filters = []
+        for d in data:
+            key = list(d.keys())[0]
+            values = list(d.values())[0]
+            if not isinstance(values, list):
+                values = [values]
+            filters.append({'Name': key, 'Values': values})
+        return [{'Filters': filters}]
 
     @classmethod
     def parse(cls, data):
-        filters = []
         if not isinstance(data, (tuple, list)):
             raise PolicyValidationError(
-                "%s Query invalid format, must be array of dicts %s" % (
-                    cls.type_name,
-                    data))
+                f"{cls.type_name} Query Invalid Format, must be array of dicts"
+            )
+
+        # Backwards compatibility
+        if data:
+            if not isinstance(data[0], dict):
+                raise PolicyValidationError(
+                    f"{cls.type_name} Query Invalid Format, must be array of dicts"
+                )
+            # Check for query filter key value pairs not listed under 'Filters' key
+            if cls.is_implicit_query_filter(data):
+                data = cls.implicit_qfilter_translate(data)
+
+            # Support iam-policy and elasticache 'Name', 'Value' queries without 'Filters' key
+            if (data[0].get('Value') and
+                (cls.type_name == 'IAM Policy' or cls.type_name == 'ElastiCache')):
+                try:
+                    data = [{d['Name']: d['Value']} for d in data]
+                except KeyError:
+                    raise PolicyValidationError(
+                        f"{cls.type_name} Query Invalid Format. "
+                        f"Query: {data} is not a list of key-value pairs "
+                        f"from {cls.QuerySchema}"
+                    )
+
+            # Support ebs-snapshot and volume 'Name', 'Values' queries without 'Filters' key
+            elif (data[0].get('Values') and
+                  (cls.type_name == 'EBS Snapshot' or
+                   cls.type_name == 'EBS Volume')):
+                data = [{"Filters": data}]
+
+        results = []
+        names = set()
         for d in data:
             if not isinstance(d, dict):
                 raise PolicyValidationError(
-                    "%s Query Filter Invalid %s" % (cls.type_name, data))
-            if "Name" not in d or cls.value_key not in d:
+                    f"Query Invalid Format. Must be a list of key-value pairs "
+                    f"from {cls.QuerySchema}"
+                )
+            if not len(list(d.keys())) == 1:
                 raise PolicyValidationError(
-                    "%s Query Filter Invalid: Missing Key or Values in %s" % (
-                        cls.type_name, data))
+                    f"Query Invalid Format. Must be a list of key-value pairs "
+                    f"from {cls.QuerySchema}"
+                )
 
-            key = d['Name']
-            values = d[cls.value_key]
+            if d.get("Filters"):
+                results.append({"Filters": cls.parse_qfilters(d["Filters"])})
+            else:
+                key, value = cls.parse_query(d)
 
-            if not cls.multi_value and isinstance(values, list):
+                # Allow for multiple queries with the same key
+                if key in names and (not cls.multi_value or key in cls.single_value_fields):
+                    raise PolicyValidationError(
+                        f"{cls.type_name} Query Invalid Key: {key} Must be unique")
+                elif key in names:
+                    for q in results:
+                        if list(q.keys())[0] == key:
+                            q[key].append(d[key])
+                else:
+                    names.add(key)
+                    results.append({key: value})
+
+        return results
+
+    @classmethod
+    def parse_qfilters(cls, data):
+        if not isinstance(data, (tuple, list)):
+            raise PolicyValidationError(
+                f"{cls.type_name} Query Filter Invalid Format, must be array of dicts"
+            )
+
+        results = []
+        names = set()
+        for f in data:
+            if not isinstance(f, dict):
                 raise PolicyValidationError(
-                    "%s Query Filter Invalid Key: Value:%s Must be single valued" % (
-                        cls.type_name, key))
-            elif not cls.multi_value:
-                values = [values]
-
-            if key not in cls.QuerySchema and not key.startswith('tag:'):
+                f"{cls.type_name} Query Filter Invalid Format, must be array of dicts"
+            )
+            if "Name" not in f or "Values" not in f:
                 raise PolicyValidationError(
-                    "%s Query Filter Invalid Key:%s Valid: %s" % (
-                        cls.type_name, key, ", ".join(cls.QuerySchema.keys())))
+                    f"{cls.type_name} Query Filter Invalid: Each filter must "
+                    "contain 'Name' and 'Values' keys."
+                )
 
-            vtype = cls.QuerySchema.get(key)
-            if vtype is None and key.startswith('tag'):
-                vtype = str
+            key = f['Name']
+            values = f['Values']
+
+            if key not in cls.QuerySchema.get("Filters", {}) and not key.startswith('tag:'):
+                raise PolicyValidationError(
+                    f"{cls.type_name} Query Filter Invalid Key: {key} "
+                    f"Valid: {', '.join(cls.QuerySchema.keys())}"
+                )
 
             if not isinstance(values, list):
                 raise PolicyValidationError(
-                    "%s Query Filter Invalid Values, must be array %s" % (
-                        cls.type_name, data,))
+                    f"{cls.type_name} Query Filter Invalid Value {f} for key {key}, must be array.")
+
+            vtype = cls.QuerySchema["Filters"].get(key)
+            if vtype is None and key.startswith('tag'):
+                vtype = str
 
             for v in values:
-                if isinstance(vtype, tuple):
-                    if v not in vtype:
-                        raise PolicyValidationError(
-                            "%s Query Filter Invalid Value: %s Valid: %s" % (
-                                cls.type_name, v, ", ".join(vtype)))
-                elif not isinstance(v, vtype):
-                    raise PolicyValidationError(
-                        "%s Query Filter Invalid Value Type %s" % (
-                            cls.type_name, data,))
+                cls.type_check(vtype, v)
 
-            filters.append(d)
+            # Allow for multiple queries with the same key
+            if key in names:
+                for qf in results:
+                    if qf['Name'] == key:
+                        qf['Values'].extend(values)
+            else:
+                names.add(key)
+                results.append({'Name': key, 'Values': values})
 
-        return filters
+        return results
+
+    @classmethod
+    def parse_query(cls, data):
+        key = list(data.keys())[0]
+        values = list(data.values())[0]
+
+        if (not cls.multi_value or key in cls.single_value_fields) and isinstance(values, list):
+            raise PolicyValidationError(
+                f"{cls.type_name} Query Invalid Value {values}: Value for {key} must be scalar"
+            )
+        elif (cls.multi_value and key not in cls.single_value_fields
+              and not isinstance(values, list)):
+            values = [values]
+
+        if key not in cls.QuerySchema:
+            raise PolicyValidationError(
+                f"{cls.type_name} Query Invalid Key: {key} "
+                f"Valid: {', '.join(cls.QuerySchema.keys())}"
+            )
+
+        vtype = cls.QuerySchema.get(key)
+        if isinstance(values, list):
+            for v in values:
+                cls.type_check(vtype, v)
+        else:
+            cls.type_check(vtype, values)
+
+        return key, values
+
+    @classmethod
+    def type_check(cls, vtype, value):
+        if isinstance(vtype, tuple):
+            if value not in vtype:
+                raise PolicyValidationError(
+                    f"{cls.type_name} Query Invalid Value: {value} Valid: {', '.join(vtype)}")
+        elif vtype == 'date':
+            if not parse_date(value):
+                raise PolicyValidationError(
+                    f"{cls.type_name} Query Invalid Date Value: {value}")
+        elif not isinstance(value, vtype):
+            raise PolicyValidationError(
+                f"{cls.type_name} Query Invalid Value Type {value}"
+            )
 
 
 def get_annotation_prefix(s):
