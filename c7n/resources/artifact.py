@@ -30,7 +30,7 @@ class CrossAccountDomain(CrossAccountAccessFilter):
         for r in resources:
             result = self.manager.retry(
                 client.get_domain_permissions_policy,
-                domain=r['domainName'],
+                domain=r['name'],
                 ignore_err_codes=('ResourceNotFoundException',))
             r[self.policy_attribute] = result['policy']['document']
         return super().process(resources)

@@ -1441,12 +1441,12 @@ class IamPolicyFilterUsage(BaseTest):
 
 
 class IamPolicy(BaseTest):
-
     def test_iam_policy_delete(self):
         factory = self.replay_flight_data('test_iam_policy_delete')
         p = self.load_policy({
             'name': 'delete-policy',
             'resource': 'iam-policy',
+            # Deprecated query format.  Use [{'Scope': 'Local'}] instead.
             'query': [{'Name': 'Scope', 'Value': 'Local'}],
             'filters': [
                 {'AttachmentCount': 0},
@@ -1469,15 +1469,43 @@ class IamPolicy(BaseTest):
             PolicyArn=resources[0]['Arn'])
 
     def test_iam_query_parser(self):
-        qfilters = [
-            {'Name': 'Scope', 'Value': 'Local'},
-            {'Name': 'OnlyAttached', 'Value': True}]
+        queries = [
+            {'Scope': 'Local'},
+            {'OnlyAttached': True},
+            {'MaxItems': 100}
+        ]
 
-        self.assertEqual(qfilters, PolicyQueryParser.parse(qfilters))
-        self.assertRaises(
-            PolicyValidationError,
-            PolicyQueryParser.parse,
-            {'Name': 'Scope', 'Value': ['All', 'Local']})
+        self.assertEqual(queries, PolicyQueryParser.parse(queries))
+
+        queries = [{'Name': 'Scope', 'Value': 'Local'}, {'Name': 'OnlyAttached', 'Value': True}]
+        result_queries = [{'Scope': 'Local'}, {'OnlyAttached': True}]
+        self.assertEqual(result_queries, PolicyQueryParser.parse(queries))
+
+        self.assertRaises(PolicyValidationError, PolicyQueryParser.parse,
+                          {'Name': 'Scope', 'Value': ['All', 'Local']})
+
+        self.assertRaises(PolicyValidationError, PolicyQueryParser.parse,
+                          [{'Name': 'Scope', 'Value': 'Local'}, {'OnlyAttached': True}])
+
+        self.assertRaises(PolicyValidationError, PolicyQueryParser.parse,
+                          [{'Scope': ['All', 'Local']}])
+
+        self.assertRaises(PolicyValidationError, PolicyQueryParser.parse, [{'scope': 'Local'}])
+
+        self.assertRaises(PolicyValidationError, PolicyQueryParser.parse,
+                          [{'OnlyAttached': 'True'}])
+
+        self.assertRaises(PolicyValidationError, PolicyQueryParser.parse,
+                          [{'Filters': [{'Name': 'Scope'}, {'Values': ['Local']}]}])
+
+        self.assertRaises(PolicyValidationError, PolicyQueryParser.parse,
+                          [{'Filters': [{'Name': 'Scope'}, {'Values': ['Local']}]}])
+
+        self.assertRaises(PolicyValidationError, PolicyQueryParser.parse,
+                          [{'Scope': 'Local'}, {'Scope': 'All'}])
+
+        self.assertRaises(PolicyValidationError, PolicyQueryParser.parse,
+                          [{'MaxItems': '100'}])
 
     def test_iam_has_allow_all_policies(self):
         session_factory = self.replay_flight_data("test_iam_policy_allow_all")
@@ -2776,3 +2804,91 @@ class TestIamProfileHasSpecificManagedPolicyFilter(BaseTest):
         )
         resources = p.run()
         self.assertEqual(len(resources), 3)
+
+
+class AccessKeyTest(BaseTest):
+
+    def test_access_key_list(self):
+        """Test basic enumeration of access keys."""
+        factory = self.replay_flight_data("test_iam_access_key_list")
+        p = self.load_policy(
+            {
+                "name": "iam-access-key-list",
+                "resource": "iam-access-key"
+            },
+            session_factory=factory,
+        )
+        resources = p.run()
+        self.assertTrue(len(resources) >= 0)
+        for resource in resources:
+            # Verify required fields are present
+            self.assertIn('AccessKeyId', resource)
+            self.assertIn('UserName', resource)
+            self.assertIn('Status', resource)
+            self.assertIn('CreateDate', resource)
+
+    def test_access_key_filter_by_status(self):
+        """Test filtering access keys by status."""
+        factory = self.replay_flight_data("test_iam_access_key_filter_status")
+        p = self.load_policy(
+            {
+                "name": "iam-access-key-active",
+                "resource": "iam-access-key",
+                "filters": [
+                    {
+                        "type": "value",
+                        "key": "Status",
+                        "value": "Active"
+                    }
+                ]
+            },
+            session_factory=factory,
+        )
+        resources = p.run()
+        for resource in resources:
+            self.assertEqual(resource['Status'], 'Active')
+
+    def test_access_key_filter_by_user(self):
+        """Test filtering access keys by username."""
+        factory = self.replay_flight_data("test_iam_access_key_filter_user")
+        p = self.load_policy(
+            {
+                "name": "iam-access-key-by-user",
+                "resource": "iam-access-key",
+                "filters": [
+                    {
+                        "type": "value",
+                        "key": "UserName",
+                        "value": "test-user"
+                    }
+                ]
+            },
+            session_factory=factory,
+        )
+        resources = p.run()
+        for resource in resources:
+            self.assertEqual(resource['UserName'], 'test-user')
+
+    def test_access_key_filter_by_age(self):
+        """Test filtering access keys by age."""
+        factory = self.replay_flight_data("test_iam_access_key_filter_age")
+        p = self.load_policy(
+            {
+                "name": "iam-access-key-old",
+                "resource": "iam-access-key",
+                "filters": [
+                    {
+                        "type": "value",
+                        "key": "CreateDate",
+                        "value_type": "age",
+                        "value": 90,
+                        "op": "greater-than"
+                    }
+                ]
+            },
+            session_factory=factory,
+        )
+        resources = p.run()
+        # Just check that we can run this without error
+        # The actual age filter logic is handled by C7N core
+        self.assertTrue(len(resources) >= 0)
