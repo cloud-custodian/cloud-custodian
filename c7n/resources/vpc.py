@@ -528,11 +528,12 @@ class DhcpOptionsFilter(Filter):
                resource: vpc
                filters:
                  - type: dhcp-options
-                   match-all: true
+                   match-operator: all
                    present: false
                    domain-name-servers: amazon
 
-    Use `match-all: true` to require ALL values match the criteria:
+    Use `match-operator: all` to require ALL values match the criteria,
+    or `match-operator: any` (default) to match if at least one value matches:
 
      :example:
 
@@ -543,7 +544,7 @@ class DhcpOptionsFilter(Filter):
                resource: vpc
                filters:
                  - type: dhcp-options
-                   match-all: true
+                   match-operator: all
                    present: false
                    domain-name-servers: amazon
 
@@ -556,7 +557,7 @@ class DhcpOptionsFilter(Filter):
             {'type': 'string'}]}
         for k in option_keys})
     schema['properties']['present'] = {'type': 'boolean'}
-    schema['properties']['match-all'] = {'type': 'boolean'}
+    schema['properties']['match-operator'] = {'enum': ['all', 'any']}
     permissions = ('ec2:DescribeDhcpOptions',)
 
     def validate(self):
@@ -620,7 +621,7 @@ class DhcpOptionsFilter(Filter):
     def process_vpc(self, vpc, dhcp):
         vpc['c7n:DhcpConfiguration'] = dhcp
         found = True
-        match_all = self.data.get('match-all', False)
+        match_operator = self.data.get('match-operator', 'any')
 
         for k in self.option_keys:
             if k not in self.data:
@@ -633,7 +634,7 @@ class DhcpOptionsFilter(Filter):
                 found = False
             elif expected_value == 'amazon':
                 # Synthetic value: check if DNS servers are Amazon-provided
-                if match_all:
+                if match_operator == 'all':
                     # All DNS servers must be Amazon DNS
                     found = all(
                         self._is_amazon_dns(v, vpc) for v in dhcp[k]

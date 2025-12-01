@@ -461,7 +461,7 @@ class VpcTest(BaseTest):
         self.assertTrue("c7n:DhcpConfiguration" in resources[0])
 
     def test_dhcp_options_filter_amazon_match_all(self):
-        # Test match-all: true with amazon to ensure all DNS servers are Amazon DNS
+        # Test match-operator: all with amazon to ensure all DNS servers are Amazon DNS
         session_factory = self.replay_flight_data("test_vpc_dhcp_options_amazon_all")
         p = self.load_policy(
             {
@@ -470,7 +470,7 @@ class VpcTest(BaseTest):
                 "filters": [
                     {
                         "type": "dhcp-options",
-                        "match-all": True,
+                        "match-operator": "all",
                         "domain-name-servers": "amazon",
                     }
                 ],
@@ -506,7 +506,7 @@ class VpcTest(BaseTest):
                 "filters": [
                     {
                         "type": "dhcp-options",
-                        "match-all": True,
+                        "match-operator": "all",
                         "present": False,
                         "domain-name-servers": "amazon",
                     }
@@ -526,7 +526,7 @@ class VpcTest(BaseTest):
             self.assertIn("8.8.8.8", dns_servers)
 
     def test_dhcp_options_filter_amazon_no_match_all(self):
-        # Test amazon without match-all (at least one must be Amazon DNS)
+        # Test amazon without match-operator (defaults to 'any' - at least one must be Amazon DNS)
         session_factory = self.replay_flight_data("test_vpc_dhcp_options_mixed")
         p = self.load_policy(
             {
