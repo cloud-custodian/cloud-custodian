@@ -21,6 +21,8 @@ class DescribeQuicksight(query.DescribeSource):
         except ClientError as e:
             if is_quicksight_account_missing(e):
                 return []
+            else:
+                raise
         return required_resources
 
 
@@ -114,7 +116,8 @@ class QuicksightAccount(ResourceManager):
         except ClientError as e:
             if is_quicksight_account_missing(e):
                 return []
-            raise
+            else:
+                raise
 
         account.pop('ResponseMetadata', None)
         account['account_id'] = 'quicksight-settings'
@@ -138,6 +141,8 @@ class DescribeQuicksightWithAccountId(query.DescribeSource):
         except ClientError as e:
             if is_quicksight_account_missing(e):
                 return []
+            else:
+                raise
         return required_resources
 
     def augment(self, resources):
