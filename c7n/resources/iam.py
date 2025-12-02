@@ -1951,7 +1951,7 @@ class CredentialReport(Filter):
                 k_matched.append(v)
 
         for k in k_matched:
-            k['c7n:match-type'] = 'credential'
+            k['c7n:matched-type'] = 'credential'
 
         self.merge_annotation(resource, self.matched_annotation_key, k_matched)
         return bool(k_matched)
@@ -2756,12 +2756,12 @@ class UserDeleteSSHKey(BaseAction):
 def resolve_credential_keys(m_keys, keys):
     res = []
     for k in m_keys:
-        if k['c7n:match-type'] == 'credential':
+        if k['c7n:matched-type'] == 'credential':
             c_date = parse_date(k['last_rotated'])
             for ak in keys:
                 if c_date == ak['CreateDate']:
                     ak = dict(ak)
-                    ak['c7n:match-type'] = 'access'
+                    ak['c7n:matched-type'] = 'access'
                     if ak not in res:
                         res.append(ak)
         elif k not in res:
