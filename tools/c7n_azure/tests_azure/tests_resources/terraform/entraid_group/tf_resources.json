@@ -1,0 +1,615 @@
+{
+    "pytest-terraform": 1,
+    "outputs": {
+        "test_admin_group": {
+            "value": {
+                "description": "Test admin group for Cloud Custodian EntraID group testing",
+                "display_name": "C7N Test Admin Group ro3w6ya8",
+                "group_types": null,
+                "id": "00000000-0000-0000-0000-000000000000",
+                "mail_enabled": false,
+                "object_id": "00000000-0000-0000-0000-000000000000",
+                "security_enabled": true
+            },
+            "type": [
+                "object",
+                {
+                    "description": "string",
+                    "display_name": "string",
+                    "group_types": [
+                        "set",
+                        "string"
+                    ],
+                    "id": "string",
+                    "mail_enabled": "bool",
+                    "object_id": "string",
+                    "security_enabled": "bool"
+                }
+            ]
+        },
+        "test_distribution_group": {
+            "value": {
+                "description": "Test second group for Cloud Custodian EntraID group testing",
+                "display_name": "C7N Test Second Group ro3w6ya8",
+                "group_types": null,
+                "id": "00000000-0000-0000-0000-000000000000",
+                "mail_enabled": false,
+                "object_id": "00000000-0000-0000-0000-000000000000",
+                "security_enabled": true
+            },
+            "type": [
+                "object",
+                {
+                    "description": "string",
+                    "display_name": "string",
+                    "group_types": [
+                        "set",
+                        "string"
+                    ],
+                    "id": "string",
+                    "mail_enabled": "bool",
+                    "object_id": "string",
+                    "security_enabled": "bool"
+                }
+            ]
+        },
+        "test_dynamic_group": {
+            "value": {
+                "description": "Test third group for Cloud Custodian EntraID group testing",
+                "display_name": "C7N Test Third Group ro3w6ya8",
+                "group_types": null,
+                "id": "00000000-0000-0000-0000-000000000000",
+                "mail_enabled": false,
+                "object_id": "00000000-0000-0000-0000-000000000000",
+                "security_enabled": true
+            },
+            "type": [
+                "object",
+                {
+                    "description": "string",
+                    "display_name": "string",
+                    "group_types": [
+                        "set",
+                        "string"
+                    ],
+                    "id": "string",
+                    "mail_enabled": "bool",
+                    "object_id": "string",
+                    "security_enabled": "bool"
+                }
+            ]
+        },
+        "test_empty_group": {
+            "value": {
+                "description": "Test empty group for Cloud Custodian EntraID group testing",
+                "display_name": "C7N Test Empty Group ro3w6ya8",
+                "group_types": null,
+                "id": "00000000-0000-0000-0000-000000000000",
+                "mail_enabled": false,
+                "object_id": "00000000-0000-0000-0000-000000000000",
+                "security_enabled": true
+            },
+            "type": [
+                "object",
+                {
+                    "description": "string",
+                    "display_name": "string",
+                    "group_types": [
+                        "set",
+                        "string"
+                    ],
+                    "id": "string",
+                    "mail_enabled": "bool",
+                    "object_id": "string",
+                    "security_enabled": "bool"
+                }
+            ]
+        },
+        "test_member1": {
+            "value": {
+                "display_name": "C7N Test Member 1",
+                "id": "00000000-0000-0000-0000-000000000000",
+                "object_id": "00000000-0000-0000-0000-000000000000",
+                "user_principal_name": "c7n-test-member1-ro3w6ya8@sfustackletdev2.onmicrosoft.com"
+            },
+            "type": [
+                "object",
+                {
+                    "display_name": "string",
+                    "id": "string",
+                    "object_id": "string",
+                    "user_principal_name": "string"
+                }
+            ]
+        },
+        "test_member2": {
+            "value": {
+                "display_name": "C7N Test Member 2",
+                "id": "00000000-0000-0000-0000-000000000000",
+                "object_id": "00000000-0000-0000-0000-000000000000",
+                "user_principal_name": "c7n-test-member2-ro3w6ya8@sfustackletdev2.onmicrosoft.com"
+            },
+            "type": [
+                "object",
+                {
+                    "display_name": "string",
+                    "id": "string",
+                    "object_id": "string",
+                    "user_principal_name": "string"
+                }
+            ]
+        },
+        "test_owner": {
+            "value": {
+                "display_name": "C7N Test Owner",
+                "id": "00000000-0000-0000-0000-000000000000",
+                "object_id": "00000000-0000-0000-0000-000000000000",
+                "user_principal_name": "c7n-test-owner-ro3w6ya8@sfustackletdev2.onmicrosoft.com"
+            },
+            "type": [
+                "object",
+                {
+                    "display_name": "string",
+                    "id": "string",
+                    "object_id": "string",
+                    "user_principal_name": "string"
+                }
+            ]
+        },
+        "test_security_group": {
+            "value": {
+                "description": "Test security group for Cloud Custodian EntraID group testing",
+                "display_name": "C7N Test Security Group ro3w6ya8",
+                "group_types": null,
+                "id": "00000000-0000-0000-0000-000000000000",
+                "mail_enabled": false,
+                "object_id": "00000000-0000-0000-0000-000000000000",
+                "security_enabled": true
+            },
+            "type": [
+                "object",
+                {
+                    "description": "string",
+                    "display_name": "string",
+                    "group_types": [
+                        "set",
+                        "string"
+                    ],
+                    "id": "string",
+                    "mail_enabled": "bool",
+                    "object_id": "string",
+                    "security_enabled": "bool"
+                }
+            ]
+        }
+    },
+    "resources": {
+        "azuread_client_config": {
+            "current": {
+                "client_id": "00000000-0000-0000-0000-000000000000",
+                "id": "00000000-0000-0000-0000-000000000000-00000000-0000-0000-0000-000000000000-00000000-0000-0000-0000-000000000000",
+                "object_id": "00000000-0000-0000-0000-000000000000",
+                "tenant_id": "00000000-0000-0000-0000-000000000000",
+                "timeouts": null
+            }
+        },
+        "azuread_domains": {
+            "current": {
+                "admin_managed": false,
+                "domains": [
+                    {
+                        "admin_managed": true,
+                        "authentication_type": "Managed",
+                        "default": true,
+                        "domain_name": "sfustackletdev2.onmicrosoft.com",
+                        "initial": true,
+                        "root": true,
+                        "supported_services": [
+                            "Email",
+                            "OfficeCommunicationsOnline"
+                        ],
+                        "verified": true
+                    }
+                ],
+                "id": "domains#00000000-0000-0000-0000-000000000000#iGEb3XbUjfETgVugAF2fBlinhYM=",
+                "include_unverified": false,
+                "only_default": false,
+                "only_initial": false,
+                "only_root": false,
+                "supports_services": [],
+                "timeouts": null
+            }
+        },
+        "azuread_group": {
+            "test_admin_group": {
+                "administrative_unit_ids": null,
+                "assignable_to_role": false,
+                "auto_subscribe_new_members": false,
+                "behaviors": null,
+                "description": "Test admin group for Cloud Custodian EntraID group testing",
+                "display_name": "C7N Test Admin Group ro3w6ya8",
+                "dynamic_membership": [],
+                "external_senders_allowed": false,
+                "hide_from_address_lists": false,
+                "hide_from_outlook_clients": false,
+                "id": "00000000-0000-0000-0000-000000000000",
+                "mail": "",
+                "mail_enabled": false,
+                "mail_nickname": "6a8f1fe3-3",
+                "members": [],
+                "object_id": "00000000-0000-0000-0000-000000000000",
+                "onpremises_domain_name": "",
+                "onpremises_group_type": "",
+                "onpremises_netbios_name": "",
+                "onpremises_sam_account_name": "",
+                "onpremises_security_identifier": "",
+                "onpremises_sync_enabled": false,
+                "owners": [
+                    "00000000-0000-0000-0000-000000000000",
+                    "00000000-0000-0000-0000-000000000000"
+                ],
+                "preferred_language": "",
+                "prevent_duplicate_names": false,
+                "provisioning_options": null,
+                "proxy_addresses": [],
+                "security_enabled": true,
+                "theme": "",
+                "timeouts": null,
+                "types": null,
+                "visibility": "Private",
+                "writeback_enabled": false
+            },
+            "test_distribution_group": {
+                "administrative_unit_ids": null,
+                "assignable_to_role": false,
+                "auto_subscribe_new_members": false,
+                "behaviors": null,
+                "description": "Test second group for Cloud Custodian EntraID group testing",
+                "display_name": "C7N Test Second Group ro3w6ya8",
+                "dynamic_membership": [],
+                "external_senders_allowed": false,
+                "hide_from_address_lists": false,
+                "hide_from_outlook_clients": false,
+                "id": "00000000-0000-0000-0000-000000000000",
+                "mail": "",
+                "mail_enabled": false,
+                "mail_nickname": "ce7b8347-f",
+                "members": [],
+                "object_id": "00000000-0000-0000-0000-000000000000",
+                "onpremises_domain_name": "",
+                "onpremises_group_type": "",
+                "onpremises_netbios_name": "",
+                "onpremises_sam_account_name": "",
+                "onpremises_security_identifier": "",
+                "onpremises_sync_enabled": false,
+                "owners": [
+                    "00000000-0000-0000-0000-000000000000"
+                ],
+                "preferred_language": "",
+                "prevent_duplicate_names": false,
+                "provisioning_options": null,
+                "proxy_addresses": [],
+                "security_enabled": true,
+                "theme": "",
+                "timeouts": null,
+                "types": null,
+                "visibility": "Private",
+                "writeback_enabled": false
+            },
+            "test_dynamic_group": {
+                "administrative_unit_ids": null,
+                "assignable_to_role": false,
+                "auto_subscribe_new_members": false,
+                "behaviors": null,
+                "description": "Test third group for Cloud Custodian EntraID group testing",
+                "display_name": "C7N Test Third Group ro3w6ya8",
+                "dynamic_membership": [],
+                "external_senders_allowed": false,
+                "hide_from_address_lists": false,
+                "hide_from_outlook_clients": false,
+                "id": "00000000-0000-0000-0000-000000000000",
+                "mail": "",
+                "mail_enabled": false,
+                "mail_nickname": "4d5c979b-2",
+                "members": [],
+                "object_id": "00000000-0000-0000-0000-000000000000",
+                "onpremises_domain_name": "",
+                "onpremises_group_type": "",
+                "onpremises_netbios_name": "",
+                "onpremises_sam_account_name": "",
+                "onpremises_security_identifier": "",
+                "onpremises_sync_enabled": false,
+                "owners": [
+                    "00000000-0000-0000-0000-000000000000"
+                ],
+                "preferred_language": "",
+                "prevent_duplicate_names": false,
+                "provisioning_options": null,
+                "proxy_addresses": [],
+                "security_enabled": true,
+                "theme": "",
+                "timeouts": null,
+                "types": null,
+                "visibility": "Private",
+                "writeback_enabled": false
+            },
+            "test_empty_group": {
+                "administrative_unit_ids": null,
+                "assignable_to_role": false,
+                "auto_subscribe_new_members": false,
+                "behaviors": null,
+                "description": "Test empty group for Cloud Custodian EntraID group testing",
+                "display_name": "C7N Test Empty Group ro3w6ya8",
+                "dynamic_membership": [],
+                "external_senders_allowed": false,
+                "hide_from_address_lists": false,
+                "hide_from_outlook_clients": false,
+                "id": "00000000-0000-0000-0000-000000000000",
+                "mail": "",
+                "mail_enabled": false,
+                "mail_nickname": "14ce9099-b",
+                "members": [],
+                "object_id": "00000000-0000-0000-0000-000000000000",
+                "onpremises_domain_name": "",
+                "onpremises_group_type": "",
+                "onpremises_netbios_name": "",
+                "onpremises_sam_account_name": "",
+                "onpremises_security_identifier": "",
+                "onpremises_sync_enabled": false,
+                "owners": [
+                    "00000000-0000-0000-0000-000000000000"
+                ],
+                "preferred_language": "",
+                "prevent_duplicate_names": false,
+                "provisioning_options": null,
+                "proxy_addresses": [],
+                "security_enabled": true,
+                "theme": "",
+                "timeouts": null,
+                "types": null,
+                "visibility": "Private",
+                "writeback_enabled": false
+            },
+            "test_security_group": {
+                "administrative_unit_ids": null,
+                "assignable_to_role": false,
+                "auto_subscribe_new_members": false,
+                "behaviors": null,
+                "description": "Test security group for Cloud Custodian EntraID group testing",
+                "display_name": "C7N Test Security Group ro3w6ya8",
+                "dynamic_membership": [],
+                "external_senders_allowed": false,
+                "hide_from_address_lists": false,
+                "hide_from_outlook_clients": false,
+                "id": "00000000-0000-0000-0000-000000000000",
+                "mail": "",
+                "mail_enabled": false,
+                "mail_nickname": "ea4c2d83-c",
+                "members": [],
+                "object_id": "00000000-0000-0000-0000-000000000000",
+                "onpremises_domain_name": "",
+                "onpremises_group_type": "",
+                "onpremises_netbios_name": "",
+                "onpremises_sam_account_name": "",
+                "onpremises_security_identifier": "",
+                "onpremises_sync_enabled": false,
+                "owners": [
+                    "00000000-0000-0000-0000-000000000000",
+                    "00000000-0000-0000-0000-000000000000"
+                ],
+                "preferred_language": "",
+                "prevent_duplicate_names": false,
+                "provisioning_options": null,
+                "proxy_addresses": [],
+                "security_enabled": true,
+                "theme": "",
+                "timeouts": null,
+                "types": null,
+                "visibility": "Private",
+                "writeback_enabled": false
+            }
+        },
+        "azuread_group_member": {
+            "admin_member1": {
+                "group_object_id": "00000000-0000-0000-0000-000000000000",
+                "id": "00000000-0000-0000-0000-000000000000/member/00000000-0000-0000-0000-000000000000",
+                "member_object_id": "00000000-0000-0000-0000-000000000000",
+                "timeouts": null
+            },
+            "dist_member1": {
+                "group_object_id": "00000000-0000-0000-0000-000000000000",
+                "id": "00000000-0000-0000-0000-000000000000/member/00000000-0000-0000-0000-000000000000",
+                "member_object_id": "00000000-0000-0000-0000-000000000000",
+                "timeouts": null
+            },
+            "security_member1": {
+                "group_object_id": "00000000-0000-0000-0000-000000000000",
+                "id": "00000000-0000-0000-0000-000000000000/member/00000000-0000-0000-0000-000000000000",
+                "member_object_id": "00000000-0000-0000-0000-000000000000",
+                "timeouts": null
+            },
+            "security_member2": {
+                "group_object_id": "00000000-0000-0000-0000-000000000000",
+                "id": "00000000-0000-0000-0000-000000000000/member/00000000-0000-0000-0000-000000000000",
+                "member_object_id": "00000000-0000-0000-0000-000000000000",
+                "timeouts": null
+            }
+        },
+        "azuread_user": {
+            "test_member1": {
+                "about_me": "",
+                "account_enabled": true,
+                "age_group": "",
+                "business_phones": [],
+                "city": "",
+                "company_name": "",
+                "consent_provided_for_minor": "",
+                "cost_center": "",
+                "country": "",
+                "creation_type": "",
+                "department": "",
+                "disable_password_expiration": false,
+                "disable_strong_password": false,
+                "display_name": "C7N Test Member 1",
+                "division": "",
+                "employee_id": "",
+                "employee_type": "",
+                "external_user_state": "",
+                "fax_number": "",
+                "force_password_change": false,
+                "given_name": "",
+                "id": "00000000-0000-0000-0000-000000000000",
+                "im_addresses": [],
+                "job_title": "",
+                "mail": "",
+                "mail_nickname": "c7n-test-member1-ro3w6ya8",
+                "manager_id": "",
+                "mobile_phone": "",
+                "object_id": "00000000-0000-0000-0000-000000000000",
+                "office_location": "",
+                "onpremises_distinguished_name": "",
+                "onpremises_domain_name": "",
+                "onpremises_immutable_id": "",
+                "onpremises_sam_account_name": "",
+                "onpremises_security_identifier": "",
+                "onpremises_sync_enabled": false,
+                "onpremises_user_principal_name": "",
+                "other_mails": null,
+                "password": "P@ssw0rd123!",
+                "postal_code": "",
+                "preferred_language": "",
+                "proxy_addresses": [],
+                "show_in_address_list": true,
+                "state": "",
+                "street_address": "",
+                "surname": "",
+                "timeouts": null,
+                "usage_location": "",
+                "user_principal_name": "c7n-test-member1-ro3w6ya8@sfustackletdev2.onmicrosoft.com",
+                "user_type": "Member"
+            },
+            "test_member2": {
+                "about_me": "",
+                "account_enabled": true,
+                "age_group": "",
+                "business_phones": [],
+                "city": "",
+                "company_name": "",
+                "consent_provided_for_minor": "",
+                "cost_center": "",
+                "country": "",
+                "creation_type": "",
+                "department": "",
+                "disable_password_expiration": false,
+                "disable_strong_password": false,
+                "display_name": "C7N Test Member 2",
+                "division": "",
+                "employee_id": "",
+                "employee_type": "",
+                "external_user_state": "",
+                "fax_number": "",
+                "force_password_change": false,
+                "given_name": "",
+                "id": "00000000-0000-0000-0000-000000000000",
+                "im_addresses": [],
+                "job_title": "",
+                "mail": "",
+                "mail_nickname": "c7n-test-member2-ro3w6ya8",
+                "manager_id": "",
+                "mobile_phone": "",
+                "object_id": "00000000-0000-0000-0000-000000000000",
+                "office_location": "",
+                "onpremises_distinguished_name": "",
+                "onpremises_domain_name": "",
+                "onpremises_immutable_id": "",
+                "onpremises_sam_account_name": "",
+                "onpremises_security_identifier": "",
+                "onpremises_sync_enabled": false,
+                "onpremises_user_principal_name": "",
+                "other_mails": null,
+                "password": "P@ssw0rd123!",
+                "postal_code": "",
+                "preferred_language": "",
+                "proxy_addresses": [],
+                "show_in_address_list": true,
+                "state": "",
+                "street_address": "",
+                "surname": "",
+                "timeouts": null,
+                "usage_location": "",
+                "user_principal_name": "c7n-test-member2-ro3w6ya8@sfustackletdev2.onmicrosoft.com",
+                "user_type": "Member"
+            },
+            "test_owner": {
+                "about_me": "",
+                "account_enabled": true,
+                "age_group": "",
+                "business_phones": [],
+                "city": "",
+                "company_name": "",
+                "consent_provided_for_minor": "",
+                "cost_center": "",
+                "country": "",
+                "creation_type": "",
+                "department": "",
+                "disable_password_expiration": false,
+                "disable_strong_password": false,
+                "display_name": "C7N Test Owner",
+                "division": "",
+                "employee_id": "",
+                "employee_type": "",
+                "external_user_state": "",
+                "fax_number": "",
+                "force_password_change": false,
+                "given_name": "",
+                "id": "00000000-0000-0000-0000-000000000000",
+                "im_addresses": [],
+                "job_title": "",
+                "mail": "",
+                "mail_nickname": "c7n-test-owner-ro3w6ya8",
+                "manager_id": "",
+                "mobile_phone": "",
+                "object_id": "00000000-0000-0000-0000-000000000000",
+                "office_location": "",
+                "onpremises_distinguished_name": "",
+                "onpremises_domain_name": "",
+                "onpremises_immutable_id": "",
+                "onpremises_sam_account_name": "",
+                "onpremises_security_identifier": "",
+                "onpremises_sync_enabled": false,
+                "onpremises_user_principal_name": "",
+                "other_mails": null,
+                "password": "P@ssw0rd123!",
+                "postal_code": "",
+                "preferred_language": "",
+                "proxy_addresses": [],
+                "show_in_address_list": true,
+                "state": "",
+                "street_address": "",
+                "surname": "",
+                "timeouts": null,
+                "usage_location": "",
+                "user_principal_name": "c7n-test-owner-ro3w6ya8@sfustackletdev2.onmicrosoft.com",
+                "user_type": "Member"
+            }
+        },
+        "random_string": {
+            "suffix": {
+                "id": "ro3w6ya8",
+                "keepers": null,
+                "length": 8,
+                "lower": true,
+                "min_lower": 0,
+                "min_numeric": 0,
+                "min_special": 0,
+                "min_upper": 0,
+                "number": true,
+                "numeric": true,
+                "override_special": null,
+                "result": "ro3w6ya8",
+                "special": false,
+                "upper": false
+            }
+        }
+    }
+}
