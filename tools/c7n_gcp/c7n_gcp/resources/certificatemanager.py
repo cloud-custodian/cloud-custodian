@@ -151,7 +151,7 @@ class CertificateManagerMap(QueryResourceManager):
         scope_key = 'parent'
         name = 'name'
         id = 'name'
-        labels = True
+        labels = False  # Disable automatic label registration
         labels_op = 'patch'
         default_report_fields = [
             'name', 'description', 'createTime', 'updateTime',
