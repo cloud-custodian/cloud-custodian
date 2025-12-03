@@ -166,3 +166,38 @@ class EntraIDDiagnosticSettingsFilterTest(BaseTest):
                 ]
             }, validate=False)
             self.assertTrue(p)
+
+    def test_entraid_group_diagnostic_settings_schema_validate(self):
+        """Test that EntraID group resources support diagnostic-settings filter."""
+
+        with self.sign_out_patch():
+            p = self.load_policy({
+                'name': 'test-entraid-group-diagnostic-settings',
+                'resource': 'azure.entraid-group',
+                'filters': [
+                    {
+                        'type': 'diagnostic-settings',
+                        'key': "logs[?category == 'SignInLogs'][].enabled",
+                        'value': 'present'
+                    }
+                ]
+            }, validate=False)
+            self.assertTrue(p)
+
+    def test_entraid_organization_diagnostic_settings_schema_validate(self):
+        """Test that EntraID organization resources support diagnostic-settings filter."""
+
+        with self.sign_out_patch():
+            p = self.load_policy({
+                'name': 'test-entraid-org-diagnostic-settings',
+                'resource': 'azure.entraid-organization',
+                'filters': [
+                    {
+                        'type': 'diagnostic-settings',
+                        'key': "logs[?category == 'ProvisioningLogs'][].enabled",
+                        'op': 'eq',
+                        'value': False
+                    }
+                ]
+            }, validate=False)
+            self.assertTrue(p)
