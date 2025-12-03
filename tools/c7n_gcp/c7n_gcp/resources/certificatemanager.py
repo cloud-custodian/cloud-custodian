@@ -161,9 +161,9 @@ class CertificateManagerMap(QueryResourceManager):
         urn_component = 'certificate-map'
         urn_id_segments = (-1,)  # Extract certificate map name from full path
         permissions = (
-            'certificatemanager.certs.list',
-            'certificatemanager.certs.get',
-            'certificatemanager.certs.update'
+            'certificatemanager.certmaps.list',
+            'certificatemanager.certmaps.get',
+            'certificatemanager.certmaps.update'
         )
 
         @staticmethod
@@ -207,7 +207,7 @@ class DeleteCertificateMap(MethodAction):
 
     schema = type_schema('delete')
     method_spec = {'op': 'delete'}
-    permissions = ('certificatemanager.certs.delete',)
+    permissions = ('certificatemanager.certmaps.delete',)
 
     def get_resource_params(self, model, resource):
         return {'name': resource['name']}
@@ -230,7 +230,7 @@ class CertificateMapSetLabelsAction(SetLabelsAction):
                   environment: production
     """
 
-    permissions = ('certificatemanager.certs.update',)
+    permissions = ('certificatemanager.certmaps.update',)
 
     def get_permissions(self):
         return self.permissions
@@ -253,7 +253,7 @@ class CertificateMapMarkForOpAction(LabelDelayedAction):
                 days: 7
     """
 
-    permissions = ('certificatemanager.certs.update',)
+    permissions = ('certificatemanager.certmaps.update',)
 
     def get_permissions(self):
         return self.permissions
