@@ -132,3 +132,128 @@ class CertificateMarkForOpAction(LabelDelayedAction):
 
     def get_permissions(self):
         return self.permissions
+
+
+@resources.register('certmanager-certificate-map')
+class CertificateManagerMap(QueryResourceManager):
+    """GCP Certificate Manager Certificate Map
+
+    https://cloud.google.com/certificate-manager/docs/reference/certificate-manager/rest/v1/projects.locations.certificateMaps
+    """
+
+    class resource_type(TypeInfo):
+        service = 'certificatemanager'
+        version = 'v1'
+        component = 'projects.locations.certificateMaps'
+        enum_spec = ('list', 'certificateMaps[]', None)
+        scope = 'project'
+        scope_template = 'projects/{}/locations/-'
+        scope_key = 'parent'
+        name = 'name'
+        id = 'name'
+        labels = True
+        labels_op = 'patch'
+        default_report_fields = [
+            'name', 'description', 'createTime', 'updateTime',
+            'labels', 'gclbTargets'
+        ]
+        asset_type = 'certificatemanager.googleapis.com/CertificateMap'
+        urn_component = 'certificate-map'
+        urn_id_segments = (-1,)  # Extract certificate map name from full path
+        permissions = (
+            'certificatemanager.certs.list',
+            'certificatemanager.certs.get',
+            'certificatemanager.certs.update'
+        )
+
+        @staticmethod
+        def get(client, resource_info):
+            return client.execute_command(
+                'get', {'name': resource_info['name']})
+
+        @staticmethod
+        def get_label_params(resource, all_labels):
+            return {
+                'name': resource['name'],
+                'body': {
+                    'labels': all_labels
+                },
+                'updateMask': 'labels'
+            }
+
+        @classmethod
+        def refresh(cls, client, resource):
+            return cls.get(client, {'name': resource['name']})
+
+
+@CertificateManagerMap.action_registry.register('delete')
+class DeleteCertificateMap(MethodAction):
+    """Delete Certificate Manager Certificate Map
+
+    :example:
+
+    .. code-block:: yaml
+
+        policies:
+          - name: delete-unused-certificate-maps
+            resource: gcp.certmanager-certificate-map
+            filters:
+              - type: value
+                key: labels.environment
+                value: staging
+            actions:
+              - type: delete
+    """
+
+    schema = type_schema('delete')
+    method_spec = {'op': 'delete'}
+    permissions = ('certificatemanager.certs.delete',)
+
+    def get_resource_params(self, model, resource):
+        return {'name': resource['name']}
+
+
+@CertificateManagerMap.action_registry.register('set-labels')
+class CertificateMapSetLabelsAction(SetLabelsAction):
+    """Set labels to Certificate Manager Certificate Map
+
+    :example:
+
+    .. code-block:: yaml
+
+        policies:
+          - name: label-certificate-maps
+            resource: gcp.certmanager-certificate-map
+            actions:
+              - type: set-labels
+                labels:
+                  environment: production
+    """
+
+    permissions = ('certificatemanager.certs.update',)
+
+    def get_permissions(self):
+        return self.permissions
+
+
+@CertificateManagerMap.action_registry.register('mark-for-op')
+class CertificateMapMarkForOpAction(LabelDelayedAction):
+    """Mark Certificate Manager Certificate Map for future action
+
+    :example:
+
+    .. code-block:: yaml
+
+        policies:
+          - name: mark-certificate-maps-for-deletion
+            resource: gcp.certmanager-certificate-map
+            actions:
+              - type: mark-for-op
+                op: delete
+                days: 7
+    """
+
+    permissions = ('certificatemanager.certs.update',)
+
+    def get_permissions(self):
+        return self.permissions
