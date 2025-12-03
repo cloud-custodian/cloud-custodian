@@ -939,6 +939,7 @@ class BucketActionBase(BaseAction):
                     errors += 1
                     continue
                 results += filter(None, [f.result()])
+            self.manager.reset_cache(buckets)
         if errors:
             self.log.error('encountered %d errors while processing %s', errors, self.name)
             raise PolicyExecutionError('%d resources failed', errors)
@@ -1416,6 +1417,8 @@ class SetPolicyStatement(BucketActionBase):
 
         s3 = bucket_client(local_session(self.manager.session_factory), bucket)
         s3.put_bucket_policy(Bucket=bucket['Name'], Policy=policy)
+
+        bucket['Policy'] = policy
         return {'Name': bucket['Name'], 'Policy': policy}
 
 
@@ -1454,6 +1457,8 @@ class RemovePolicyStatement(RemovePolicyBase):
                     self.log.error('error modifying bucket:%s\n%s',
                                    b['Name'], f.exception())
                 results += filter(None, [f.result()])
+
+            self.manager.reset_cache(buckets)
             return results
 
     def process_bucket(self, bucket):
@@ -1473,8 +1478,11 @@ class RemovePolicyStatement(RemovePolicyBase):
 
         if not statements:
             s3.delete_bucket_policy(Bucket=bucket['Name'])
+            bucket.pop('Policy', None)
         else:
-            s3.put_bucket_policy(Bucket=bucket['Name'], Policy=json.dumps(p))
+            new_policy_text = json.dumps(p)
+            s3.put_bucket_policy(Bucket=bucket['Name'], Policy=new_policy_text)
+            bucket['Policy'] = new_policy_text
         return {'Name': bucket['Name'], 'State': 'PolicyRemoved', 'Statements': found}
 
 
