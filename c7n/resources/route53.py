@@ -9,13 +9,22 @@ import os
 from botocore.paginate import Paginator
 
 from c7n.query import (
-    QueryResourceManager, ChildResourceManager, TypeInfo, RetryPageIterator)
+    DescribeSource,
+    ChildResourceManager,
+    QueryResourceManager,
+    RetryPageIterator,
+    TypeInfo,
+)
 from c7n.manager import resources
 from c7n.utils import chunks, get_retry, generate_arn, local_session, type_schema
 from c7n.actions import BaseAction
 from c7n.filters import Filter, ListItemFilter
 from c7n.resources.shield import IsShieldProtected, SetShieldProtection
-from c7n.tags import RemoveTag, Tag
+from c7n.tags import (
+    RemoveTag,
+    Tag,
+    universal_augment,
+)
 from c7n.filters.related import RelatedResourceFilter
 from c7n import tags, query
 from c7n.filters.iamaccess import CrossAccountAccessFilter
@@ -569,6 +578,42 @@ class IsQueryLoggingEnabled(Filter):
                 results.append(r)
 
         return results
+
+
+class ResolverRuleDescribeSource(DescribeSource):
+    def augment(self, resources):
+        owner_resource_map = dict(
+            (owner, list(group))
+            for owner, group in itertools.groupby(
+                resources,
+                key=lambda x: x.get('OwnerId') == self.manager.account_id and 'Local' or 'Shared',
+            )
+        )
+        return (
+            universal_augment(self.manager, owner_resource_map.get('Local', []))
+            + owner_resource_map.get('Shared', [])
+        )
+
+
+@resources.register('resolver-rule')
+class ResolverRule(QueryResourceManager):
+    # Resource for managing Route53 Resolver Rules
+    class resource_type(TypeInfo):
+        service = 'route53resolver'
+        arn_type = 'resolver-rule'
+        enum_spec = ('list_resolver_rules', 'ResolverRules', None)
+        id = 'Id'
+        name = 'Name'
+        config_id = 'c7n:ResolverRuleId'
+        universal_taggable = True
+        # Route53 Resolver is regional
+        global_resource = False
+        cfn_type = 'AWS::Route53Resolver::ResolverRule'
+        permissions_augment = ("route53resolver:ListTagsForResource",)
+
+    source_mapping = {
+        'describe': ResolverRuleDescribeSource,
+    }
 
 
 @resources.register('resolver-logs')
