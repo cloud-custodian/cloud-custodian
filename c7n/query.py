@@ -553,6 +553,11 @@ class QueryResourceManager(ResourceManager, metaclass=QueryMeta):
             self.check_resource_limit(len(resources), resource_count)
         return resources
 
+    def reset_cache(self, resources):
+        with self._cache:
+            cache_key = self.get_cache_key(None)
+            self._cache.save(cache_key, resources)
+
     def check_resource_limit(self, selection_count, population_count):
         """Check if policy's execution affects more resources then its limit.
 
