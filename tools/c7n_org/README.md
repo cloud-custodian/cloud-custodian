@@ -97,42 +97,38 @@ tenancies:
 
 ### Config File Generation
 
-We also distribute scripts to generate the necessary config file in the [`scripts` folder](https://github.com/cloud-custodian/cloud-custodian/tree/main/tools/c7n_org/scripts).
+We also distribute sub-commands to generate the necessary config file in the [`scripts` folder](https://github.com/cloud-custodian/cloud-custodian/tree/main/tools/c7n_org/c7n_org/scripts).
 
-**Note:** Currently these are distributed only via git. Per
-<https://github.com/cloud-custodian/cloud-custodian/issues/2420>, we'll
-be looking to incorporate them into a new c7n-org subcommand.
-
-- For **AWS**, the script `orgaccounts.py` generates a config file
-  from the AWS Organizations API.
+We'll be looking to incorporate them into a new c7n-org subcommand, but at the moment they are bespoke commands. See: <https://github.com/cloud-custodian/cloud-custodian/issues/2420>
+- For **AWS**, the command `c7n-org-orgaccounts` generates a config file from the AWS Organizations API.
 
 ```shell
-python orgaccounts.py -f accounts.yml
+c7n-org-orgaccounts -f accounts.yml
 ```
 
-- For **Azure**, the script `azuresubs.py` generates a config file
+- For **Azure**, the command `c7n-org-azuresubs` generates a config file
   from the Azure Resource Management API.
 
     - Please see the [Additional Azure Instructions](#additional-azure-instructions) for initial setup and other important info.
 
 ```shell
-python azuresubs.py -f subscriptions.yml
+c7n-org-azuresubs -f subscriptions.yml
 ```
 
-- For **GCP**, the script `gcpprojects.py` generates a config file from
+- For **GCP**, the command `c7n-org-gcpprojects` generates a config file from
   the GCP Resource Management API.
 
 ```shell
-python gcpprojects.py -f projects.yml
+c7n-org-gcpprojects -f projects.yml
 ```
 
-- For **OCI**, the script `ocitenancies.py` generates a config file
+- For **OCI**, the script `c7n-org-ocitenancies` generates a config file
   using OCI Configuration file and OCI Organizations API.
   
     - Please refer to the [Additional OCI Instructions](#additional-oci-instructions) for additional information.
 
 ```shell
-python ocitenancies.py -f tenancies.yml
+c7n-org-ocitenancies -f tenancies.yml
 ```
 
 ## Running a Policy with c7n-org
@@ -295,7 +291,4 @@ tenancies:
     environment: test
 
 ```
-
-
-
 
