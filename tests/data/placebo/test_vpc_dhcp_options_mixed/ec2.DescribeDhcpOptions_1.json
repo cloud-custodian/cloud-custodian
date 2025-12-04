@@ -1,0 +1,83 @@
+{
+    "status_code": 200, 
+    "data": {
+        "DhcpOptions": [
+            {
+                "Tags": [
+                    {
+                        "Value": "MatchAllValidDhcp", 
+                        "Key": "Name"
+                    }
+                ], 
+                "DhcpConfigurations": [
+                    {
+                        "Values": [
+                            {
+                                "Value": "ec2.internal"
+                            }
+                        ], 
+                        "Key": "domain-name"
+                    }, 
+                    {
+                        "Values": [
+                            {
+                                "Value": "AmazonProvidedDNS"
+                            },
+                            {
+                                "Value": "169.254.169.253"
+                            },
+                            {
+                                "Value": "10.0.20.2"
+                            }
+                        ], 
+                        "Key": "domain-name-servers"
+                    }
+                ], 
+                "DhcpOptionsId": "dopt-matchall001"
+            },
+            {
+                "Tags": [
+                    {
+                        "Value": "MatchAllInvalidDhcp", 
+                        "Key": "Name"
+                    }
+                ], 
+                "DhcpConfigurations": [
+                    {
+                        "Values": [
+                            {
+                                "Value": "ec2.internal"
+                            }
+                        ], 
+                        "Key": "domain-name"
+                    }, 
+                    {
+                        "Values": [
+                            {
+                                "Value": "AmazonProvidedDNS"
+                            },
+                            {
+                                "Value": "8.8.8.8"
+                            }
+                        ], 
+                        "Key": "domain-name-servers"
+                    }
+                ], 
+                "DhcpOptionsId": "dopt-matchall002"
+            }
+        ], 
+        "ResponseMetadata": {
+            "RetryAttempts": 0, 
+            "HTTPStatusCode": 200, 
+            "RequestId": "test-matchall-dhcp-001", 
+            "HTTPHeaders": {
+                "transfer-encoding": "chunked", 
+                "vary": "Accept-Encoding", 
+                "server": "AmazonEC2", 
+                "content-type": "text/xml;charset=UTF-8", 
+                "date": "Mon, 24 Nov 2025 00:00:00 GMT"
+            }
+        }
+    }
+}
+
