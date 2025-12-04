@@ -258,7 +258,7 @@ class CertificateManagerTest(BaseTest):
 
         client = MockClient()
         resource_info = {
-            'name': 'projects/test/locations/global/certificateMaps/map1/certificateMapEntries/entry1'
+            'name': 'projects/test/locations/global/certificateMaps/map1/certificateMapEntries/obj1'
         }
         result = CertificateMapEntry.resource_type.get(client, resource_info)
 
@@ -267,7 +267,7 @@ class CertificateManagerTest(BaseTest):
 
         # Test get_label_params method
         resource = {
-            'name': 'projects/test/locations/global/certificateMaps/map1/certificateMapEntries/entry1'
+            'name': 'projects/test/locations/global/certificateMaps/map1/certificateMapEntries/obj1'
         }
         all_labels = {'env': 'dev', 'owner': 'team-a'}
 
