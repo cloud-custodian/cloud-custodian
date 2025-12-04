@@ -90,7 +90,7 @@ class QueryResourceManager(ResourceManager, metaclass=QueryMeta):
         return {
             "resource": str(self.__class__.__name__),
             "source_type": self.source_type,
-            "query": query
+            "query": query,
         }
 
     @property
