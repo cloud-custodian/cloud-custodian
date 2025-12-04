@@ -139,8 +139,7 @@ class DescribeQuicksightWithAccountId(query.DescribeSource):
         except ClientError as e:
             if is_quicksight_account_missing(e):
                 return []
-            else:
-                raise
+            raise
         return required_resources
 
     def augment(self, resources):
