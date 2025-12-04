@@ -21,8 +21,7 @@ class DescribeQuicksight(query.DescribeSource):
         except ClientError as e:
             if is_quicksight_account_missing(e):
                 return []
-            else:
-                raise
+            raise
         return required_resources
 
 
@@ -113,11 +112,10 @@ class QuicksightAccount(ResourceManager):
             account = self.retry(client.describe_account_settings,
                 AwsAccountId=self.config.account_id
             )["AccountSettings"]
-        except ClientError as e:
+        except Exception as e:
             if is_quicksight_account_missing(e):
                 return []
-            else:
-                raise
+            raise
 
         account.pop('ResponseMetadata', None)
         account['account_id'] = 'quicksight-settings'

@@ -2,7 +2,7 @@
 # SPDX-License-Identifier: Apache-2.0
 
 from pytest_terraform import terraform
-
+from c7n.exceptions import ClientError
 from tests.zpill import ACCOUNT_ID
 
 from .common import BaseTest
@@ -110,6 +110,30 @@ class TestQuicksight(BaseTest):
         resources = policy.run()
         self.assertEqual(resources, [])
 
+    def test_quicksight_account_raise_client_error(self):
+        # Simulate a client error from the service and ensure it is raised
+        factory = self.replay_flight_data("test_quicksight_account_raise_client_error")
+
+        policy = self.load_policy({
+            "name": "test-aws-quicksight-account",
+            "resource": "aws.quicksight-account",
+        }, session_factory=factory)
+
+        with self.assertRaises(ClientError):
+            policy.run()
+
+    def test_quicksight_account_raise_server_error(self):
+        # Simulate a server error from the service and ensure it is raised
+        factory = self.replay_flight_data("test_quicksight_account_raise_server_error")
+
+        policy = self.load_policy({
+            "name": "test-aws-quicksight-account",
+            "resource": "aws.quicksight-account",
+        }, session_factory=factory)
+
+        with self.assertRaises(Exception):
+            policy.run()
+
     def test_quicksight_user_query(self):
         factory = self.replay_flight_data("test_quicksight_user_query")
 
@@ -153,6 +177,30 @@ class TestQuicksight(BaseTest):
         resources = policy.run()
         self.assertEqual(resources, [])
 
+    def test_quicksight_dashboard_raise_client_error(self):
+        # Simulate a client error from the service and ensure it is raised
+        factory = self.replay_flight_data("test_quicksight_dashboard_raise_client_error")
+
+        policy = self.load_policy({
+            "name": "test-aws-quicksight-dashboard",
+            "resource": "aws.quicksight-dashboard",
+        }, session_factory=factory)
+
+        with self.assertRaises(ClientError):
+            policy.run()
+
+    def test_quicksight_dashboard_raise_server_error(self):
+        # Simulate a server error from the service and ensure it is raised
+        factory = self.replay_flight_data("test_quicksight_dashboard_raise_server_error")
+
+        policy = self.load_policy({
+            "name": "test-aws-quicksight-dashboard",
+            "resource": "aws.quicksight-dashboard",
+        }, session_factory=factory)
+
+        with self.assertRaises(Exception):
+            policy.run()
+
     def test_quicksight_datasource_standard_edition(self):
         factory = self.replay_flight_data("test_quicksight_datasource_standard_edition")
 
@@ -174,3 +222,27 @@ class TestQuicksight(BaseTest):
 
         resources = policy.run()
         self.assertEqual(resources, [])
+
+    def test_quicksight_group_raise_client_error(self):
+        # Simulate a client error from the service and ensure it is raised
+        factory = self.replay_flight_data("test_quicksight_group_raise_client_error")
+
+        policy = self.load_policy({
+            "name": "test-aws-quicksight-group",
+            "resource": "aws.quicksight-group",
+        }, session_factory=factory)
+
+        with self.assertRaises(ClientError):
+            policy.run()
+
+    def test_quicksight_group_raise_server_error(self):
+        # Simulate a server error from the service and ensure it is raised
+        factory = self.replay_flight_data("test_quicksight_group_raise_server_error")
+
+        policy = self.load_policy({
+            "name": "test-aws-quicksight-group",
+            "resource": "aws.quicksight-group",
+        }, session_factory=factory)
+
+        with self.assertRaises(Exception):
+            policy.run()
