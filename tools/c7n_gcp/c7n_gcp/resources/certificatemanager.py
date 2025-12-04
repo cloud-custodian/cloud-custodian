@@ -257,3 +257,128 @@ class CertificateMapMarkForOpAction(LabelDelayedAction):
 
     def get_permissions(self):
         return self.permissions
+
+
+@resources.register('certmanager-certificate-map-entry')
+class CertificateMapEntry(QueryResourceManager):
+    """GCP Certificate Manager Certificate Map Entry
+
+    https://cloud.google.com/certificate-manager/docs/reference/certificate-manager/rest/v1/projects.locations.certificateMaps.certificateMapEntries
+    """
+
+    class resource_type(TypeInfo):
+        service = 'certificatemanager'
+        version = 'v1'
+        component = 'projects.locations.certificateMaps.certificateMapEntries'
+        enum_spec = ('list', 'certificateMapEntries[]', None)
+        scope = 'project'
+        scope_template = 'projects/{}/locations/-/certificateMaps/-'
+        scope_key = 'parent'
+        name = 'name'
+        id = 'name'
+        labels = False  # Disable automatic label registration
+        labels_op = 'patch'
+        default_report_fields = [
+            'name', 'description', 'createTime', 'updateTime',
+            'labels', 'hostname', 'matcher', 'certificates', 'state'
+        ]
+        asset_type = 'certificatemanager.googleapis.com/CertificateMapEntry'
+        urn_component = 'certificate-map-entry'
+        urn_id_segments = (-1,)  # Extract certificate map entry name from full path
+        permissions = (
+            'certificatemanager.certmapentries.list',
+            'certificatemanager.certmapentries.get',
+            'certificatemanager.certmapentries.update'
+        )
+
+        @staticmethod
+        def get(client, resource_info):
+            return client.execute_command(
+                'get', {'name': resource_info['name']})
+
+        @staticmethod
+        def get_label_params(resource, all_labels):
+            return {
+                'name': resource['name'],
+                'body': {
+                    'labels': all_labels
+                },
+                'updateMask': 'labels'
+            }
+
+        @classmethod
+        def refresh(cls, client, resource):
+            return cls.get(client, {'name': resource['name']})
+
+
+@CertificateMapEntry.action_registry.register('delete')
+class DeleteCertificateMapEntry(MethodAction):
+    """Delete Certificate Manager Certificate Map Entry
+
+    :example:
+
+    .. code-block:: yaml
+
+        policies:
+          - name: delete-unused-certificate-map-entries
+            resource: gcp.certmanager-certificate-map-entry
+            filters:
+              - type: value
+                key: state
+                value: PENDING
+            actions:
+              - type: delete
+    """
+
+    schema = type_schema('delete')
+    method_spec = {'op': 'delete'}
+    permissions = ('certificatemanager.certmapentries.delete',)
+
+    def get_resource_params(self, model, resource):
+        return {'name': resource['name']}
+
+
+@CertificateMapEntry.action_registry.register('set-labels')
+class CertificateMapEntrySetLabelsAction(SetLabelsAction):
+    """Set labels to Certificate Manager Certificate Map Entry
+
+    :example:
+
+    .. code-block:: yaml
+
+        policies:
+          - name: label-certificate-map-entries
+            resource: gcp.certmanager-certificate-map-entry
+            actions:
+              - type: set-labels
+                labels:
+                  environment: production
+    """
+
+    permissions = ('certificatemanager.certmapentries.update',)
+
+    def get_permissions(self):
+        return self.permissions
+
+
+@CertificateMapEntry.action_registry.register('mark-for-op')
+class CertificateMapEntryMarkForOpAction(LabelDelayedAction):
+    """Mark Certificate Manager Certificate Map Entry for future action
+
+    :example:
+
+    .. code-block:: yaml
+
+        policies:
+          - name: mark-certificate-map-entries-for-deletion
+            resource: gcp.certmanager-certificate-map-entry
+            actions:
+              - type: mark-for-op
+                op: delete
+                days: 7
+    """
+
+    permissions = ('certificatemanager.certmapentries.update',)
+
+    def get_permissions(self):
+        return self.permissions
