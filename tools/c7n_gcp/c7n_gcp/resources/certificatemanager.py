@@ -355,7 +355,10 @@ class CertificateMapEntrySetLabelsAction(SetLabelsAction):
                   environment: production
     """
 
-    permissions = ('certificatemanager.certmapentries.update',)
+    permissions = (
+      'certificatemanager.certmapentries.update',
+      'certificatemanager.certs.use' # Allow updating certificates associated with the map entry
+    )
 
     def get_permissions(self):
         return self.permissions
