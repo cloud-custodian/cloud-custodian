@@ -1,0 +1,159 @@
+{
+    "status_code": 200,
+    "data": {
+        "DBInstances": [
+            {
+                "DBInstanceIdentifier": "terraform-20251204185100057800000001",
+                "DBInstanceClass": "db.t3.micro",
+                "Engine": "mysql",
+                "DBInstanceStatus": "available",
+                "MasterUsername": "admin",
+                "DBName": "testdb",
+                "Endpoint": {
+                    "Address": "terraform-20251204185100057800000001.c1saggy6at26.us-east-1.rds.amazonaws.com",
+                    "Port": 3306,
+                    "HostedZoneId": "Z2R2ITUGPM61AM"
+                },
+                "AllocatedStorage": 20,
+                "InstanceCreateTime": {
+                    "__class__": "datetime",
+                    "year": 2025,
+                    "month": 12,
+                    "day": 4,
+                    "hour": 18,
+                    "minute": 54,
+                    "second": 37,
+                    "microsecond": 906000
+                },
+                "PreferredBackupWindow": "03:36-04:06",
+                "BackupRetentionPeriod": 0,
+                "DBSecurityGroups": [],
+                "VpcSecurityGroups": [
+                    {
+                        "VpcSecurityGroupId": "sg-00fa3b312b5d6c4cc",
+                        "Status": "active"
+                    }
+                ],
+                "DBParameterGroups": [
+                    {
+                        "DBParameterGroupName": "default.mysql8.0",
+                        "ParameterApplyStatus": "in-sync"
+                    }
+                ],
+                "AvailabilityZone": "us-east-1d",
+                "DBSubnetGroup": {
+                    "DBSubnetGroupName": "default",
+                    "DBSubnetGroupDescription": "default",
+                    "VpcId": "vpc-0e5ef750468976cb3",
+                    "SubnetGroupStatus": "Complete",
+                    "Subnets": [
+                        {
+                            "SubnetIdentifier": "subnet-0680826eb0b2f459a",
+                            "SubnetAvailabilityZone": {
+                                "Name": "us-east-1a"
+                            },
+                            "SubnetOutpost": {},
+                            "SubnetStatus": "Active"
+                        },
+                        {
+                            "SubnetIdentifier": "subnet-0b039e0dd0b96e735",
+                            "SubnetAvailabilityZone": {
+                                "Name": "us-east-1d"
+                            },
+                            "SubnetOutpost": {},
+                            "SubnetStatus": "Active"
+                        },
+                        {
+                            "SubnetIdentifier": "subnet-0e501bae3db5b1a23",
+                            "SubnetAvailabilityZone": {
+                                "Name": "us-east-1c"
+                            },
+                            "SubnetOutpost": {},
+                            "SubnetStatus": "Active"
+                        },
+                        {
+                            "SubnetIdentifier": "subnet-09181c6b3609603dd",
+                            "SubnetAvailabilityZone": {
+                                "Name": "us-east-1e"
+                            },
+                            "SubnetOutpost": {},
+                            "SubnetStatus": "Active"
+                        },
+                        {
+                            "SubnetIdentifier": "subnet-041411bf237a42ee0",
+                            "SubnetAvailabilityZone": {
+                                "Name": "us-east-1f"
+                            },
+                            "SubnetOutpost": {},
+                            "SubnetStatus": "Active"
+                        },
+                        {
+                            "SubnetIdentifier": "subnet-0fcef01ed364ca4a8",
+                            "SubnetAvailabilityZone": {
+                                "Name": "us-east-1b"
+                            },
+                            "SubnetOutpost": {},
+                            "SubnetStatus": "Active"
+                        }
+                    ]
+                },
+                "PreferredMaintenanceWindow": "wed:06:30-wed:07:00",
+                "PendingModifiedValues": {},
+                "MultiAZ": false,
+                "EngineVersion": "8.0.43",
+                "AutoMinorVersionUpgrade": true,
+                "ReadReplicaDBInstanceIdentifiers": [],
+                "LicenseModel": "general-public-license",
+                "StorageThroughput": 0,
+                "OptionGroupMemberships": [
+                    {
+                        "OptionGroupName": "default:mysql-8-0",
+                        "Status": "in-sync"
+                    }
+                ],
+                "PubliclyAccessible": false,
+                "StorageType": "gp2",
+                "DbInstancePort": 0,
+                "StorageEncrypted": false,
+                "DbiResourceId": "db-6L3XKPPF7R6BZFG7WA2GSSAW7U",
+                "CACertificateIdentifier": "rds-ca-rsa2048-g1",
+                "DomainMemberships": [],
+                "CopyTagsToSnapshot": false,
+                "MonitoringInterval": 0,
+                "DBInstanceArn": "arn:aws:rds:us-east-1:644160558196:db:terraform-20251204185100057800000001",
+                "IAMDatabaseAuthenticationEnabled": false,
+                "DatabaseInsightsMode": "standard",
+                "PerformanceInsightsEnabled": false,
+                "DeletionProtection": false,
+                "AssociatedRoles": [],
+                "TagList": [
+                    {
+                        "Key": "Name",
+                        "Value": "rds-test-instance"
+                    }
+                ],
+                "CustomerOwnedIpEnabled": false,
+                "NetworkType": "IPV4",
+                "ActivityStreamStatus": "stopped",
+                "BackupTarget": "region",
+                "CertificateDetails": {
+                    "CAIdentifier": "rds-ca-rsa2048-g1",
+                    "ValidTill": {
+                        "__class__": "datetime",
+                        "year": 2026,
+                        "month": 12,
+                        "day": 4,
+                        "hour": 18,
+                        "minute": 53,
+                        "second": 13,
+                        "microsecond": 0
+                    }
+                },
+                "DedicatedLogVolume": false,
+                "IsStorageConfigUpgradeAvailable": false,
+                "EngineLifecycleSupport": "open-source-rds-extended-support"
+            }
+        ],
+        "ResponseMetadata": {}
+    }
+}
