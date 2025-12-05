@@ -159,48 +159,58 @@ class NetworkSecurityGroupFilter(Filter):
     def process(self, network_security_groups, event=None):
         # List of NSG matching the policies, to return
         matched = []
+
+        # If no port or cider filters to apply, we don't match any groups.
+        filter_on_ports = PORTS in self.data
+        filter_on_cidr = CIDR in self.data
+        if not filter_on_ports and not filter_on_cidr:
+            return matched
+
         # Get variables
         self.ip_protocol = self.data.get(IP_PROTOCOL, '*')
         self.IsAllowed = StringUtils.equal(self.data.get(ACCESS), ALLOW_OPERATION)
         self.match = self.data.get(MATCH, 'all')
+        if filter_on_ports:
+            ports_set = PortsRangeHelper.get_ports_set_from_string(self.data[PORTS])
+            except_set = PortsRangeHelper.get_ports_set_from_string(self.data.get(EXCEPT_PORTS, ''))
+            self.ports = ports_set.difference(except_set)
 
-        # Calculate ports from the settings:
-        #   If ports not specified -- assuming the entire range
-        #   If except_ports not specifed -- nothing
-        ports_set = PortsRangeHelper.get_ports_set_from_string(self.data.get(PORTS, '0-65535'))
-        except_set = PortsRangeHelper.get_ports_set_from_string(self.data.get(EXCEPT_PORTS, ''))
-        self.ports = ports_set.difference(except_set)
-        self.source_address = self.data.get(SOURCE, None)
-        self.destination_address = self.data.get(DESTINATION, None)
+            self.source_address = self.data.get(SOURCE)
+            self.destination_address = self.data.get(DESTINATION)
 
         match_op = self.data.get('match-operator', 'and') == 'and' and all or any
-        matching_nsg = {}
         for nsg in network_security_groups:
-            matching_nsg['check_nsg'] = self._check_nsg(nsg)
-            if self.data.get(CIDR):
-                matching_nsg['check_cidr'] = False
+            matching_nsg_values = []  # Boolean port/cidr matches
+            matched_rule_ids = []  # Sets of rule IDs for positive matches
 
-                permissions_to_expand = []
+            if filter_on_ports:
+                ports_matched, port_matched_rule_ids = self._check_nsg(nsg)
+                matching_nsg_values.append(ports_matched)
+                matched_rule_ids.append(port_matched_rule_ids)
+
+            if self.data.get(CIDR):
+                cidr_matched = False
+                cidr_matched_rule_ids = set()
                 for security_rule in nsg['properties']['securityRules']:
                     if security_rule['properties']['direction'] == self.direction_key:
-                        permissions_to_expand.append(security_rule['properties'])
-                for perm in self.expand_permissions(permissions_to_expand):
-                    if self._process_cidrs(perm):
-                        matching_nsg['check_cidr'] = True
-            matching_nsg_values = list(filter(
-                    lambda x: x is not None, matching_nsg.values()))
+                        if self._process_cidrs(security_rule['properties']):
+                            cidr_matched = True
+                            cidr_matched_rule_ids.add(security_rule['id'])
+                matching_nsg_values.append(cidr_matched)
+                matched_rule_ids.append(cidr_matched_rule_ids)
 
-            if match_op == all and not matching_nsg_values:
-                continue
-
-            match = match_op(matching_nsg_values)
-            if match:
+            if match_op(matching_nsg_values):
+                if match_op == all:
+                    # If rules need to match port AND cidr, report rules that matched both.
+                    matched_rule_ids = set.intersection(*matched_rule_ids)
+                else:
+                    # If rules only need to match port OR cider, report rules that matched either.
+                    matched_rule_ids = set.union(*matched_rule_ids)
+                nsg[self.matched_annotation_key] = [
+                    r for r in nsg['properties']['securityRules'] if r['id'] in matched_rule_ids
+                ]
                 matched.append(nsg)
         return matched
-
-    def expand_permissions(self, permissions):
-        for p in permissions:
-            yield dict(p)
 
     def _process_cidr(self, cidr_key, cidr_type, range_type, perm):
         found = None
@@ -239,23 +249,22 @@ class NetworkSecurityGroupFilter(Filter):
         return found_v4
 
     def _check_nsg(self, nsg):
-        nsg_ports = PortsRangeHelper.build_ports_dict(nsg, self.direction_key, self.ip_protocol,
-                                                      self.source_address,
-                                                      self.destination_address)
+        nsg_ports = PortsRangeHelper.build_ports_rules_dict(
+            nsg, self.direction_key, self.ip_protocol, self.source_address, self.destination_address
+        )
 
-        num_allow_ports = len([p for p in self.ports if nsg_ports.get(p)])
-        num_deny_ports = len(self.ports) - num_allow_ports
+        matched_ports = 0  # Number ports on the filter that were matched to NSGs.
+        matched_rules = set()  # Set of rule IDs that caused those port matches.
+        for port in self.ports:
+            if info := nsg_ports.get(port):
+                if info['allowed'] is self.IsAllowed:
+                    matched_ports += 1
+                    matched_rules |= info['by_rules']
 
         if self.match == 'all':
-            if self.IsAllowed:
-                return num_deny_ports == 0
-            else:
-                return num_allow_ports == 0
+            return len(self.ports) == matched_ports, matched_rules
         if self.match == 'any':
-            if self.IsAllowed:
-                return num_allow_ports > 0
-            else:
-                return num_deny_ports > 0
+            return matched_ports > 0, matched_rules
 
 
 @NetworkSecurityGroup.filter_registry.register('ingress')
@@ -263,11 +272,15 @@ class IngressFilter(NetworkSecurityGroupFilter):
     direction_key = 'Inbound'
     schema = type_schema('ingress', rinherit=NetworkSecurityGroupFilter.schema)
 
+    matched_annotation_key = 'c7n:matched-ingress-security-rules'
+
 
 @NetworkSecurityGroup.filter_registry.register('egress')
 class EgressFilter(NetworkSecurityGroupFilter):
     direction_key = 'Outbound'
     schema = type_schema('egress', rinherit=NetworkSecurityGroupFilter.schema)
+
+    matched_annotation_key = 'c7n:matched-egress-security-rules'
 
 
 @NetworkSecurityGroup.filter_registry.register('flow-logs')

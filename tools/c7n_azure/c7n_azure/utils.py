@@ -384,8 +384,21 @@ class PortsRangeHelper:
     @staticmethod
     def build_ports_dict(nsg, direction_key, ip_protocol,
                          source_address=None, destination_address=None):
-        """ Build entire ports array filled with True (Allow), False (Deny) and None(default - Deny)
+        """ Build ports array filled with True (Allow), False (Deny)
             based on the provided Network Security Group object, direction and protocol.
+        """
+        ports_rules = PortsRangeHelper.build_ports_rules_dict(nsg, direction_key, ip_protocol,
+                                                              source_address, destination_address)
+        return {port: info['allowed'] for port, info in ports_rules.items()}
+
+    @staticmethod
+    def build_ports_rules_dict(nsg, direction_key, ip_protocol,
+                                   source_address=None, destination_address=None):
+        """ Build ports dictionary with all rule information that allows/denies them:
+        - allow_rules: set of rule IDs that allow access to the port
+        - deny_rules: set of rule IDs that deny access to the port
+        - min_deny_priority: minimum priority of deny rules
+        - min_allow_priority: minimum priority of allow rules
         """
         rules = nsg['properties']['securityRules']
         rules = sorted(rules, key=lambda k: k['properties']['priority'])
@@ -420,9 +433,13 @@ class PortsRangeHelper:
             ports_set = PortsRangeHelper.get_ports_set_from_rule(rule)
 
             for p in ports_set:
-                if p not in ports:
-                    ports[p] = IsAllowed
-
+                if p in ports:
+                    if IsAllowed != ports[p]['allowed']:
+                        # This rule doesn't apply because one of the previous rules overrides it.
+                        continue
+                    ports[p]['by_rules'].add(rule['id'])
+                else:
+                    ports[p] = {'allowed': IsAllowed, 'by_rules': {rule['id']}}
         return ports
 
 
