@@ -207,6 +207,54 @@ class TestCFN(BaseTest):
         ]
         self.assertEqual(len(tags), 0)
 
+    def test_cfn_mark_for_op(self):
+        session_factory = self.replay_flight_data("test_cfn_mark_for_op")
+        p = self.load_policy(
+            {
+                "name": "cfn-mark-for-op",
+                "resource": "cfn",
+                "filters": [{"StackName": "c7n-mark-stack"}],
+                "actions": [
+                    {
+                        "type": "mark-for-op",
+                        "tag": "custodian_cleanup",
+                        "op": "delete",
+                        "days": 1,
+                    }
+                ],
+            },
+            session_factory=session_factory,
+        )
+        resources = p.run()
+        self.assertEqual(len(resources), 1)
+        client = session_factory().client("cloudformation")
+        tags = client.describe_stacks(StackName=resources[0]["StackName"])["Stacks"][0][
+            "Tags"
+        ]
+        tag_map = {t["Key"]: t["Value"] for t in tags}
+        self.assertIn("custodian_cleanup", tag_map)
+        self.assertIn("delete", tag_map["custodian_cleanup"])
+
+    def test_cfn_marked_for_op(self):
+        session_factory = self.replay_flight_data("test_cfn_marked_for_op")
+        p = self.load_policy(
+            {
+                "name": "cfn-marked-for-delete",
+                "resource": "cfn",
+                "filters": [
+                    {
+                        "type": "marked-for-op",
+                        "op": "delete",
+                        "tag": "custodian_cleanup",
+                    }
+                ],
+            },
+            session_factory=session_factory,
+        )
+        resources = p.run()
+        self.assertEqual(len(resources), 1)
+        self.assertEqual(resources[0]["StackName"], "c7n-marked")
+
     def test_cfn_template_filter(self):
         session_factory = self.replay_flight_data("test_cfn_template_filter")
         client = session_factory().client("cloudformation")
