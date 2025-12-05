@@ -36,6 +36,7 @@ from c7n.utils import (
     CONN_CACHE, dumps, filter_empty, format_string_values, get_policy_provider, join_output_path)
 
 from c7n_org.utils import environ, account_tags
+from c7n_org import orgaccounts
 
 log = logging.getLogger('c7n_org')
 
@@ -802,6 +803,8 @@ def run(config, use, output_dir, accounts, not_accounts, tags, region,
     if not success:
         sys.exit(1)
 
+
+cli.add_command(orgaccounts.aws_accounts)
 
 if __name__ == "__main__":
     cli()
