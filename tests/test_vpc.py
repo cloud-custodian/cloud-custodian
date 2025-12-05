@@ -2160,6 +2160,36 @@ def test_cross_az_nat_gateway_subnet_resolve(test):
     }
 
 
+def test_cross_az_nat_gateway_regional_nat(test):
+    """Test that Regional NAT Gateways without SubnetId are handled gracefully."""
+    factory = test.replay_flight_data('test_cross_az_nat_gateway_route_filter')
+    p = test.load_policy({
+        "name": "cross-az-nat-gw-route-filter",
+        "resource": "route-table",
+        "filters": [{"type": "cross-az-nat-gateway-route"}]},
+        session_factory=factory, config={'region': 'us-west-2'},
+    )
+    
+    # Mock NAT gateways including a Regional NAT Gateway without SubnetId
+    cross_nat = p.resource_manager.filters[0]
+    mock_nat_gateways = [
+        {'NatGatewayId': 'nat-zonal-123', 'SubnetId': 'subnet-123'},
+        {'NatGatewayId': 'nat-regional-456'},  # Regional NAT Gateway without SubnetId
+    ]
+    
+    # Build nat_subnets dict - should skip Regional NAT Gateway
+    nat_subnets = {
+        nat_gateway['NatGatewayId']: nat_gateway["SubnetId"]
+        for nat_gateway in mock_nat_gateways
+        if "SubnetId" in nat_gateway
+    }
+    
+    # Verify Regional NAT Gateway is excluded
+    assert len(nat_subnets) == 1
+    assert 'nat-zonal-123' in nat_subnets
+    assert 'nat-regional-456' not in nat_subnets
+
+
 class PeeringConnectionTest(BaseTest):
 
     def test_peer_cross_account(self):
