@@ -1,0 +1,51 @@
+{
+  "status_code": 200,
+  "data": {
+    "ResponseMetadata": {
+      "RequestId": "34567890-3456-3456-3456-345678901234",
+      "HTTPStatusCode": 200,
+      "HTTPHeaders": {
+        "date": "Mon, 02 Dec 2024 09:59:16 GMT",
+        "content-type": "application/x-amz-json-1.0"
+      },
+      "RetryAttempts": 0
+    },
+    "SavingsPlans": [
+      {
+        "SavingsPlanId": "sp-98765432109876543",
+        "SavingsPlanArn": "arn:aws:savingsplans::123456789012:savingsplan/sp-98765432109876543",
+        "Description": "General purpose compute savings plan",
+        "Start": "2023-08-01T00:00:00.000Z",
+        "End": "2026-08-01T00:00:00.000Z",
+        "State": "active",
+        "Region": "us-east-1",
+        "SavingsPlanType": "Compute",
+        "PaymentOption": "Partial Upfront",
+        "ProductTypes": [
+          "EC2",
+          "Fargate",
+          "Lambda"
+        ],
+        "CurrencyCode": "USD",
+        "Commitment": "50.00",
+        "UpfrontPaymentAmount": "1314.00",
+        "RecurringPaymentAmount": "1.825",
+        "TermDurationInSeconds": 94608000,
+        "Tags": [
+          {
+            "Key": "Environment",
+            "Value": "production"
+          },
+          {
+            "Key": "Owner",
+            "Value": "platform-team"
+          },
+          {
+            "Key": "CostCenter",
+            "Value": "engineering"
+          }
+        ]
+      }
+    ]
+  }
+}
