@@ -1,12 +1,18 @@
 # Copyright The Cloud Custodian Authors.
 # SPDX-License-Identifier: Apache-2.0
-from azure.mgmt.sql.models import DatabaseUpdate, Sku, BackupShortTermRetentionPolicy
+from azure.mgmt.sql.models import (
+    DatabaseUpdate,
+    Sku,
+    BackupShortTermRetentionPolicy,
+)
 from ..azure_common import BaseTest, arm_template, cassette_name, requires_arm_polling
 from c7n_azure.resources.sqldatabase import (
-    BackupRetentionPolicyHelper, ShortTermBackupRetentionPolicyAction)
+    BackupRetentionPolicyHelper,
+    ShortTermBackupRetentionPolicyAction,
+)
 from c7n_azure.session import Session
 from c7n_azure.utils import ResourceIdParser
-from mock import patch
+from unittest.mock import patch
 
 from c7n.exceptions import PolicyValidationError
 from c7n.utils import local_session

@@ -4,7 +4,7 @@ from azure.mgmt.storage.models import StorageAccount
 from c7n_azure.constants import FUNCTION_EVENT_TRIGGER_MODE, FUNCTION_TIME_TRIGGER_MODE, \
     CONTAINER_EVENT_TRIGGER_MODE, CONTAINER_TIME_TRIGGER_MODE
 from c7n_azure.policy import AzureEventGridMode, AzureFunctionMode, AzureModeCommon
-from mock import mock, patch, Mock
+from unittest import mock
 
 from c7n.config import Bag
 from c7n.exceptions import PolicyValidationError, PolicyExecutionError
@@ -533,7 +533,7 @@ class AzurePolicyModeTest(BaseTest):
 
     @arm_template('emptyrg.json')
     @cassette_name('resourcegroup')
-    @patch('c7n_azure.actions.delete.DeleteAction._process_resource')
+    @mock.patch('c7n_azure.actions.delete.DeleteAction._process_resource')
     def test_empty_group_function_event(self, mock_delete):
         p = self.load_policy({
             'name': 'test-azure-resource-group',
@@ -564,7 +564,7 @@ class AzurePolicyModeTest(BaseTest):
 
     @arm_template('emptyrg.json')
     @cassette_name('resourcegroup')
-    @patch('c7n_azure.actions.delete.DeleteAction._process_resource')
+    @mock.patch('c7n_azure.actions.delete.DeleteAction._process_resource')
     def test_empty_group_container_event(self, mock_delete):
         p = self.load_policy({
             'name': 'test-azure-resource-group',
@@ -633,7 +633,7 @@ class AzurePolicyModeTest(BaseTest):
         sr_id = nsg_id + '/securityRules/test-rule'
         string_as_is = 'as-is-for-armresource'
         resource_type = ''
-        policy = Mock()
+        policy = mock.Mock()
         policy.resource_manager.resource_type.resource_type = resource_type
 
         event = {'subject': rg_id}
