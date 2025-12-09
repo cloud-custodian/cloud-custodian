@@ -6,11 +6,14 @@ Resource Filtering Logic
 import copy
 import datetime
 from datetime import timedelta
+import enum
+from functools import partial, reduce
 import fnmatch
 import ipaddress
 import logging
 import operator
 import re
+import sys
 
 from dateutil.tz import tzutc
 from dateutil.parser import parse
@@ -245,20 +248,25 @@ class BaseValueFilter(Filter):
     def get_resource_value(self, k, i, regex=None):
         r = None
         if k.startswith('tag:'):
+            normalize_if_needed = NormalizeFilterTagKeys.transform_func_if_needed(
+                self.data.get("tag_key_transforms")
+            )
             tk = k.split(':', 1)[1]
             if 'Tags' in i:
-                for t in i.get("Tags", []):
+                for t in _normalize_aws_tag_keys(i.get("Tags", []), normalize_if_needed):
                     if t.get('Key') == tk:
                         r = t.get('Value')
                         break
             # GCP schema: 'labels': {'key': 'value'}
             elif 'labels' in i:
-                r = i.get('labels', {}).get(tk, None)
+                r = _normalize_tag_dict_keys(i.get('labels', {}), normalize_if_needed).get(tk, None)
             # GCP has a secondary form of labels called tags
             # as labels without values.
             # Azure schema: 'tags': {'key': 'value'}
             elif 'tags' in i:
-                r = (i.get('tags', {}) or {}).get(tk, None)
+                r = _normalize_tag_dict_keys(i.get('tags', {}) or {}, normalize_if_needed).get(
+                    tk, None
+                )
         elif k in i:
             r = i.get(k)
         elif k not in self.expr:
@@ -290,6 +298,97 @@ class BaseValueFilter(Filter):
             raise PolicyValidationError(
                 "Invalid value_regex: %s %s" % (e, self.data))
         return self
+
+    def _validate_tag_key_transforms(self, transforms_list):
+        if not transforms_list:
+            return self
+        invalid_transforms = [
+            t for t in transforms_list if NormalizeFilterTagKeys.is_not_valid_transform(t)
+        ]
+        if invalid_transforms:
+            raise PolicyValidationError(
+                "Invalid tag_transforms: %s %s" % (", ".join(invalid_transforms), self.data)
+            )
+        return self
+
+
+# Setting a callable Enum value overrides Enum methods so we need to wrap in either:
+# functools.partial (3.10) or enum.member (3.11+).
+# functools.partial has changed behavior in 3.13 so we can't use it for all python versions
+# Once 3.10 is no longer supported, just use enum.member
+_member = enum.member if sys.version_info[0] >= 3 and sys.version_info[1] >= 11 else partial
+
+
+class NormalizeFilterTagKeys(enum.Enum):
+    noop = _member(lambda v: v)
+    capitalize = _member(lambda v: v.capitalize())
+    lower = _member(lambda v: v.lower())
+    strip = _member(lambda v: v.strip())
+    title = _member(lambda v: v.title())
+    upper = _member(lambda v: v.upper())
+    nospaces = _member(lambda v: v.replace(" ", ""))
+    nounderscores = _member(lambda v: v.replace("_", ""))
+    nodashes = _member(lambda v: v.replace("-", ""))
+
+    @classmethod
+    def is_not_valid_transform(cls, transform):
+        return transform not in cls.__members__
+
+    @classmethod
+    def transform_func_if_needed(cls, transforms: list[str]):
+        """Return a callable func to do the transformation of tag keys as specified in the tag
+         strategy. For example: this example would normalize all the tag keys to do the following
+         commands in order: strip(), title(), replace("_", "") and look for a normalized key of
+         FooBar to match spam
+        filters:
+          - type: value
+            key: tag:FooBar
+            tag_key_transforms:
+                - strip
+                - title
+                - nounderscores
+            op: eq
+            value: spam
+        ."""
+        if not transforms:
+            return None
+
+        return _combine(
+            cls[transform].value for transform in transforms if transform in cls.__members__
+        )
+
+
+def _combine(callables_list):
+    def compose_function(f, g):
+        return lambda x: g(f(x))
+
+    return reduce(compose_function, callables_list)
+
+
+def _normalize_aws_tag_keys(tags: list, normalize_func) -> list:
+    # schema: [{'Key': 'key1', 'Value': 'value1'}, {'Key': 'key2', 'Value': 'value2'}]
+    if not normalize_func:
+        return tags
+    normalized_tags = []
+    for t in tags:
+        try:
+            normalized_tags.append({"Key": normalize_func(t["Key"]), "Value": t["Value"]})
+        except (AttributeError, SyntaxError, KeyError):
+            pass
+    return normalized_tags
+
+
+def _normalize_tag_dict_keys(tags: dict, normalize_func) -> dict:
+    # schema: {'key1': 'value1', 'key2': 'value2'}
+    if not normalize_func:
+        return tags
+    normalized_tags = {}
+    for k, v in tags.items():
+        try:
+            normalized_tags[normalize_func(k)] = v
+        except (AttributeError, SyntaxError):
+            pass
+    return normalized_tags
 
 
 def intersect_list(a, b):
@@ -507,7 +606,8 @@ class ValueFilter(BaseValueFilter):
             'value_from': {'$ref': '#/definitions/filters_common/value_from'},
             'value': {'$ref': '#/definitions/filters_common/value'},
             'op': {'$ref': '#/definitions/filters_common/comparison_operators'},
-            'value_path': {'type': 'string'}
+            'value_path': {'type': 'string'},
+            'tag_key_transforms': {'type': 'array', 'items': {'type': 'string'}}
         }
     }
     schema_alias = True
@@ -575,6 +675,8 @@ class ValueFilter(BaseValueFilter):
                 except re.error as e:
                     raise PolicyValidationError(
                         "Invalid regex: %s %s" % (e, self.data))
+        if 'tag_key_transforms' in self.data:
+            self._validate_tag_key_transforms(self.data['tag_key_transforms'])
         if 'value_regex' in self.data:
             return self._validate_value_regex(self.data['value_regex'])
 
