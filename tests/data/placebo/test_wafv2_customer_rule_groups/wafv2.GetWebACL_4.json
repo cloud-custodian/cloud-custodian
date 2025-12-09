@@ -2,21 +2,21 @@
     "status_code": 200,
     "data": {
         "WebACL": {
-            "Name": "noncompliant-waf-1",
-            "Id": "dbf1bdc8-38ed-448c-ad81-24335a0d09a8",
-            "ARN": "arn:aws:wafv2:us-east-1:644160558196:regional/webacl/noncompliant-waf-1/dbf1bdc8-38ed-448c-ad81-24335a0d09a8",
+            "Name": "noncompliant-waf-2",
+            "Id": "c08b8eab-6bd8-4458-849b-5328308fb3fe",
+            "ARN": "arn:aws:wafv2:us-east-1:644160558196:regional/webacl/noncompliant-waf-2/c08b8eab-6bd8-4458-849b-5328308fb3fe",
             "DefaultAction": {
                 "Allow": {}
             },
-            "Description": "",
+            "Description": "Standalone Rule",
             "Rules": [
                 {
-                    "Name": "custom-rule",
+                    "Name": "test",
                     "Priority": 0,
                     "Statement": {
                         "GeoMatchStatement": {
                             "CountryCodes": [
-                                "AQ"
+                                "DZ"
                             ]
                         }
                     },
@@ -26,20 +26,24 @@
                     "VisibilityConfig": {
                         "SampledRequestsEnabled": true,
                         "CloudWatchMetricsEnabled": true,
-                        "MetricName": "custom-rule"
+                        "MetricName": "test"
                     }
                 }
             ],
             "VisibilityConfig": {
                 "SampledRequestsEnabled": true,
                 "CloudWatchMetricsEnabled": true,
-                "MetricName": "noncompliant-waf-1"
+                "MetricName": "noncompliant-waf-2"
             },
             "Capacity": 1,
             "ManagedByFirewallManager": false,
-            "LabelNamespace": "awswaf:644160558196:webacl:noncompliant-waf-1:"
+            "LabelNamespace": "awswaf:644160558196:webacl:noncompliant-waf-2:",
+            "RetrofittedByFirewallManager": false,
+            "OnSourceDDoSProtectionConfig": {
+                "ALBLowReputationMode": "ACTIVE_UNDER_DDOS"
+            }
         },
-        "LockToken": "6a65edef-e52e-409b-b724-0ab3909c62ca",
+        "LockToken": "556f91cb-f46c-430c-9be3-b5a62f99dba9",
         "ResponseMetadata": {}
     }
 }
