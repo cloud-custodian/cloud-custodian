@@ -16,7 +16,13 @@ class DescribeQuicksight(query.DescribeSource):
             "Namespace": "default",
             "AwsAccountId": self.manager.config.account_id
         }
-        return super().resources(required)
+        try:
+            required_resources = super().resources(required)
+        except ClientError as e:
+            if is_quicksight_account_missing(e):
+                return []
+            raise
+        return required_resources
 
 
 @resources.register("quicksight-user")
@@ -106,21 +112,8 @@ class QuicksightAccount(ResourceManager):
             account = self.retry(client.describe_account_settings,
                 AwsAccountId=self.config.account_id
             )["AccountSettings"]
-        except ClientError as e:
-            # Return no resources if no quicksight account has been created, the standard edition is
-            # being used, or if the policy is being run from a non-identity region. Otherwise, raise
-            # the exception. It's a bit brittle to depend on error messages, but unfortunately
-            # these all are lumped under AccessDenied, and we would like normal AccessDenied
-            # Exceptions caused by lack of IAM permissions to still be raised.
-            error_code = e.response['Error']['Code']
-            error_message = e.response['Error'].get('Message', '')
-
-            if error_code == 'ResourceNotFoundException' or (
-                error_code == 'AccessDeniedException' and (
-                    "disabled for STANDARD Edition" in error_message or
-                    "Operation is being called from endpoint" in error_message
-                )
-            ):
+        except Exception as e:
+            if is_quicksight_account_missing(e):
                 return []
             raise
 
@@ -141,7 +134,13 @@ class DescribeQuicksightWithAccountId(query.DescribeSource):
         required = {
             "AwsAccountId": self.manager.config.account_id
         }
-        return super().resources(required)
+        try:
+            required_resources = super().resources(required)
+        except ClientError as e:
+            if is_quicksight_account_missing(e):
+                return []
+            raise
+        return required_resources
 
     def augment(self, resources):
         client = local_session(self.manager.session_factory).client('quicksight')
@@ -183,3 +182,26 @@ class QuicksightDataSource(query.QueryResourceManager):
     source_mapping = {
         "describe": DescribeQuicksightWithAccountId,
     }
+
+
+def is_quicksight_account_missing(e):
+    """
+    Helper to ccheck if QuickSight account is missing or inaccessible.
+    This function checks if the error is due to a missing QuickSight account,
+    the standard edition being used, or the policy being run from a non-identity
+    region. It returns True if any of these conditions are met, allowing us to
+    gracefully handle the situation by returning an empty resource list.
+    Unfortunately some of these are lumped under AccessDenied, and we would like
+    normal AccessDenied Exceptions caused by lack of IAM permissions to still be
+    raised, so we check the error code and message.
+    """
+    error_code = e.response['Error']['Code']
+    error_message = e.response['Error'].get('Message', '')
+
+    if error_code == 'ResourceNotFoundException' or (
+        error_code == 'AccessDeniedException' and (
+            "disabled for STANDARD Edition" in error_message or
+            "Operation is being called from endpoint" in error_message
+        )) or error_code == 'UnsupportedUserEditionException':
+        return True
+    return False
