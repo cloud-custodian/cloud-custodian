@@ -1,7 +1,7 @@
 # Copyright The Cloud Custodian Authors.
 # SPDX-License-Identifier: Apache-2.0
 from ..azure_common import BaseTest, arm_template, cassette_name
-from mock import patch
+from unittest.mock import patch
 from c7n_azure.resources.generic_arm_resource import GenericArmResource
 from c7n_azure.resources.arm import arm_tags_unsupported
 from c7n.exceptions import PolicyValidationError

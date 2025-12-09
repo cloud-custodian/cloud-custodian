@@ -2,7 +2,7 @@
 # SPDX-License-Identifier: Apache-2.0
 from ..azure_common import BaseTest, arm_template
 from c7n_azure.resources.access_control import ScopeFilter
-from mock import patch, MagicMock
+from unittest.mock import patch, MagicMock
 
 
 class AccessControlTest(BaseTest):

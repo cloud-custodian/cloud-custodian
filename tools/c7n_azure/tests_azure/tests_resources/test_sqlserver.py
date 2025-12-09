@@ -7,7 +7,7 @@ from ..azure_common import BaseTest, cassette_name, arm_template
 from c7n.exceptions import PolicyValidationError
 from c7n_azure.resources.sqlserver import SqlServerFirewallRulesFilter, \
     SqlServerFirewallBypassFilter
-from mock import patch, Mock
+from unittest.mock import patch, Mock
 from netaddr import IPRange, IPSet
 from parameterized import parameterized
 
