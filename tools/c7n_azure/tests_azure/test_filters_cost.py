@@ -6,7 +6,7 @@ from .azure_common import BaseTest
 from c7n_azure.filters import CostFilter
 from c7n_azure.session import Session
 from c7n_azure.utils import utcnow
-from mock import Mock
+from unittest.mock import Mock
 import datetime
 
 Column = namedtuple('Column', 'name')
