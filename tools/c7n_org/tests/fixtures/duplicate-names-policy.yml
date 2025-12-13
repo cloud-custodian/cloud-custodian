@@ -1,0 +1,11 @@
+policies:
+  - name: duplicate-name
+    resource: aws.ec2
+    filters:
+      - tag:Name: present
+
+  - name: duplicate-name
+    resource: aws.s3
+    filters:
+      - type: bucket-encryption
+        state: false

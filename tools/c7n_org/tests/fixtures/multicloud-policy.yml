@@ -1,0 +1,65 @@
+policies:
+  - name: aws-ec2-tag-compliance
+    resource: aws.ec2
+    description: Ensure EC2 instances have required tags
+    filters:
+      - tag:Environment: absent
+    actions:
+      - type: tag
+        key: Environment
+        value: production
+
+  - name: azure-vm-tag-compliance
+    resource: azure.vm
+    description: Ensure Azure VMs have required tags
+    filters:
+      - type: value
+        key: tags.Environment
+        value: absent
+    actions:
+      - type: tag
+        tags:
+          Environment: production
+
+  - name: gcp-instance-tag-compliance
+    resource: gcp.instance
+    description: Ensure GCP instances have required labels
+    filters:
+      - type: value
+        key: labels.environment
+        value: absent
+    actions:
+      - type: set-labels
+        labels:
+          environment: production
+
+  - name: aws-s3-encryption
+    resource: aws.s3
+    description: Ensure S3 buckets have encryption enabled
+    filters:
+      - type: bucket-encryption
+        state: False
+    actions:
+      - type: set-bucket-encryption
+
+  - name: azure-storage-https
+    resource: azure.storage
+    description: Ensure Azure storage accounts require HTTPS
+    filters:
+      - type: value
+        key: properties.supportsHttpsTrafficOnly
+        value: false
+    actions:
+      - type: require-secure-transfer
+        value: true
+
+  - name: gcp-storage-uniform-access
+    resource: gcp.bucket
+    description: Ensure GCP storage buckets have uniform access control
+    filters:
+      - type: value
+        key: iamConfiguration.uniformBucketLevelAccess.enabled
+        value: false
+    actions:
+      - type: set-uniform-access
+        state: true

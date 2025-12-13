@@ -1,0 +1,9 @@
+policies:
+  - name: needs-undefined-var
+    resource: ec2
+    filters:
+      - tag:Owner: absent
+    actions:
+      - type: tag
+        key: Owner
+        value: "{undefined_variable}"
