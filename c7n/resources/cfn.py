@@ -13,7 +13,7 @@ from c7n.filters import Filter, ListItemFilter
 from c7n.manager import resources
 from c7n.query import QueryResourceManager, TypeInfo
 from c7n.utils import local_session, type_schema
-from c7n.tags import RemoveTag, Tag
+from c7n.tags import RemoveTag, Tag, TagActionFilter, TagDelayedAction
 
 log = logging.getLogger('custodian.cfn')
 
@@ -221,6 +221,29 @@ class CloudFormationRemoveTag(RemoveTag):
     def process_resource_set(self, client, stacks, keys):
         for s in stacks:
             _tag_stack(client, s, remove=keys)
+
+
+CloudFormation.filter_registry.register('marked-for-op', TagActionFilter)
+
+
+@CloudFormation.action_registry.register('mark-for-op')
+class CloudFormationMarkForOp(TagDelayedAction):
+    """Mark a CloudFormation stack for a future action
+
+    :example:
+
+    .. code-block:: yaml
+
+        policies:
+          - name: cfn-mark-for-delete
+            resource: cfn
+            filters:
+              - StackStatus: CREATE_COMPLETE
+            actions:
+              - type: mark-for-op
+                op: delete
+                days: 1
+    """
 
 
 @CloudFormation.filter_registry.register('template')
