@@ -60,11 +60,13 @@ sphinx:
 
 lint:
 	uv run --no-project ruff check c7n tests tools
-	uv run --no-project black --check $(FMT_SET)
+# See black config in pyproject.toml for included dirs
+	uv run --no-project black --check .
 	terraform fmt -check -recursive .
 
 format:
-	uv run black $(FMT_SET)
+# See black config in pyproject.toml for included dirs
+	uv run black .
 	uv run ruff check --fix c7n tests tools
 	terraform fmt -recursive .
 
