@@ -2364,6 +2364,66 @@ class UserMfaDevice(ValueFilter):
         return matched
 
 
+@User.filter_registry.register('service-specific-credentials')
+class UserServiceSpecificCredentials(ValueFilter):
+    """Filter iam-users based on service-specific-credentials status
+
+    :example:
+
+    .. code-block:: yaml
+
+        policies:
+          - name: old-codecommit-credentials-users
+            resource: iam-user
+            filters:
+              - type: service-specific-credentials
+                key: ServiceName
+                value: codecommit.amazonaws.com
+              - type: service-specific-credentials
+                key: Status
+                value: Active
+              - type: service-specific-credentials
+                key: CreateDate
+                value_type: age
+                value: 90
+
+    """
+
+    schema = type_schema(
+        'service-specific-credentials',
+        rinherit=ValueFilter.schema,
+    )
+    schema_alias = False
+    permissions = ('iam:ListServiceSpecificCredentials',)
+    annotation_key = 'c7n:ServiceSpecificCredentials'
+    matched_annotation_key = 'c7n:matched-service-specific-credentials'
+    annotate = False
+
+    def get_user_service_specific_credentials(self, client, user_set):
+        for u in user_set:
+            u[self.annotation_key] = self.manager.retry(
+                client.list_service_specific_credentials,
+                UserName=u['UserName'])['ServiceSpecificCredentials']
+
+    def process(self, resources, event=None):
+        client = local_session(self.manager.session_factory).client('iam')
+        with self.executor_factory(max_workers=2) as w:
+            augment_set = [r for r in resources if self.annotation_key not in r]
+            self.log.debug(
+                "Querying %d users' service specific credentials" % len(augment_set))
+            list(w.map(
+                functools.partial(self.get_user_service_specific_credentials, client),
+                chunks(augment_set, 50)))
+
+        matched = []
+        for r in resources:
+            matched_credentials = [k for k in r[self.annotation_key] if self.match(k)]
+            self.merge_annotation(r, self.matched_annotation_key, matched_credentials)
+            if matched_credentials:
+                matched.append(r)
+        return matched
+
+
 @User.action_registry.register('post-finding')
 class UserFinding(OtherResourcePostFinding):
 
@@ -2526,6 +2586,7 @@ class UserDelete(BaseAction):
         'iam:DeactivateMFADevice',
         'iam:DeleteAccessKey',
         'iam:DeleteLoginProfile',
+        'iam:DeleteServiceSpecificCredential',
         'iam:DeleteSigningCertificate',
         'iam:DeleteSSHPublicKey',
         'iam:DeleteUser',
