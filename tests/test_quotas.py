@@ -77,6 +77,122 @@ class TestQuotas(BaseTest):
         # In a real scenario, this would cap the requested value at the hard_limit
         self.assertEqual(len(resources), 1)
 
+    def test_services_list(self):
+        """Test listing all AWS services integrated with Service Quotas"""
+        session_factory = self.replay_flight_data('test_service_quota')
+
+        p = self.load_policy({
+            "name": "list-services",
+            "resource": "aws.service-quota-services"
+        }, session_factory=session_factory)
+
+        resources = p.run()
+        self.assertTrue(resources)
+        # Should have at least the services from our test data (ec2, firehose, logs)
+        self.assertGreaterEqual(len(resources), 3)
+
+        # Verify structure of returned resources
+        service = resources[0]
+        self.assertIn('ServiceCode', service)
+        self.assertIn('ServiceName', service)
+
+        # Check for expected services from test data
+        service_codes = [r['ServiceCode'] for r in resources]
+        self.assertIn('ec2', service_codes)
+        self.assertIn('firehose', service_codes)
+        self.assertIn('logs', service_codes)
+
+    def test_services_filter_by_service_code(self):
+        """Test filtering services by ServiceCode"""
+        session_factory = self.replay_flight_data('test_service_quota')
+
+        p = self.load_policy({
+            "name": "filter-services-by-code",
+            "resource": "aws.service-quota-services",
+            "filters": [
+                {
+                    "type": "value",
+                    "key": "ServiceCode",
+                    "value": "ec2"
+                }
+            ]
+        }, session_factory=session_factory)
+
+        resources = p.run()
+        self.assertEqual(len(resources), 1)
+        self.assertEqual(resources[0]['ServiceCode'], 'ec2')
+        self.assertEqual(resources[0]['ServiceName'], 'Amazon Elastic Compute Cloud (Amazon EC2)')
+
+    def test_default_service_quotas_list(self):
+        """Test listing default service quotas"""
+        session_factory = self.replay_flight_data('test_service_quota')
+
+        p = self.load_policy({
+            "name": "list-default-quotas",
+            "resource": "aws.default-service-quotas"
+        }, session_factory=session_factory)
+
+        resources = p.run()
+        self.assertTrue(resources)
+
+        # Verify structure of returned resources
+        quota = resources[0]
+        self.assertIn('QuotaCode', quota)
+        self.assertIn('QuotaName', quota)
+        self.assertIn('QuotaArn', quota)
+        self.assertIn('ServiceCode', quota)
+        self.assertIn('ServiceName', quota)
+        self.assertIn('Value', quota)
+        self.assertIn('Adjustable', quota)
+
+    def test_default_service_quotas_filter_by_service(self):
+        """Test filtering default quotas by ServiceCode"""
+        session_factory = self.replay_flight_data('test_service_quota')
+
+        p = self.load_policy({
+            "name": "filter-default-quotas-by-service",
+            "resource": "aws.default-service-quotas",
+            "filters": [
+                {
+                    "type": "value",
+                    "key": "ServiceCode",
+                    "value": "AWSCloudMap"
+                }
+            ]
+        }, session_factory=session_factory)
+
+        resources = p.run()
+        self.assertTrue(resources)
+        # All returned resources should be from AWSCloudMap service
+        for resource in resources:
+            self.assertEqual(resource['ServiceCode'], 'AWSCloudMap')
+
+    def test_default_service_quotas_filter_by_quota_code(self):
+        """Test filtering default quotas by QuotaCode"""
+        session_factory = self.replay_flight_data('test_service_quota')
+
+        p = self.load_policy({
+            "name": "filter-default-quotas-by-code",
+            "resource": "aws.default-service-quotas",
+            "filters": [
+                {
+                    "type": "value",
+                    "key": "QuotaCode",
+                    "value": "L-D589BB26"
+                }
+            ]
+        }, session_factory=session_factory)
+
+        resources = p.run()
+        # Should find quota(s) with this QuotaCode from the test data
+        # Due to test data structure, same quota might appear multiple times for different services
+        matching_resources = [r for r in resources if r['QuotaCode'] == 'L-D589BB26']
+        self.assertGreater(len(matching_resources), 0)
+        # Verify the quota details are correct
+        for resource in matching_resources:
+            self.assertEqual(resource['QuotaCode'], 'L-D589BB26')
+            self.assertEqual(resource['QuotaName'], 'Custom attributes per instance')
+
     def test_request_increase_hard_limit_skip_when_quota_equals_hard_limit(self):
         """Test that request-increase skips when quota equals hard_limit"""
         from c7n.resources.quotas import Increase

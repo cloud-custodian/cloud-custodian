@@ -408,3 +408,113 @@ class Increase(Action):
                 continue
         if error:
             raise PolicyExecutionError from error
+
+
+@resources.register('service-quota-services')
+class Services(QueryResourceManager):
+    """Lists all AWS services integrated with Service Quotas.
+
+    :example:
+
+    .. code-block:: yaml
+
+        policies:
+        - name: list-service-quota-services
+          resource: aws.service-quota-services
+          filters:
+            - type: value
+              key: ServiceCode
+              value: ec2
+
+    """
+
+    class resource_type(TypeInfo):
+        service = 'service-quotas'
+        permission_prefix = 'servicequotas'
+        enum_spec = ('list_services', 'Services', None)
+        id = 'ServiceCode'
+        name = 'ServiceName'
+        # Services don't have ARNs, but we need to set an arn_type for validation
+        arn_type = 'service'
+        # Service list is the same across all regions
+        global_resource = True
+        permissions_augment = ('servicequotas:ListServices',)
+
+
+@resources.register('default-service-quotas')
+class DefaultServiceQuotas(QueryResourceManager):
+    """Lists all the default service quotas for AWS services.
+
+    :example:
+
+    .. code-block:: yaml
+
+        policies:
+        - name: list-default-quotas-for-service
+          resource: aws.default-service-quotas
+          query:
+            - ServiceCode: ec2
+          filters:
+            - type: value
+              key: QuotaCode
+              value: L-1216C47A
+
+    """
+
+    class resource_type(TypeInfo):
+        service = 'service-quotas'
+        permission_prefix = 'servicequotas'
+        enum_spec = ('list_aws_default_service_quotas', 'Quotas', None)
+        id = 'QuotaCode'
+        arn = 'QuotaArn'
+        name = 'QuotaName'
+        # Default quotas are the same across all regions
+        global_resource = True
+        permissions_augment = ('servicequotas:ListAWSDefaultServiceQuotas',)
+
+    def get_resources(self, resource_ids, cache=True):
+        """Override to handle the ServiceCode requirement for list_aws_default_service_quotas"""
+        if not resource_ids:
+            return []
+
+        client = local_session(self.session_factory).client('service-quotas')
+        results = []
+
+        for service_code in resource_ids:
+            try:
+                paginator = client.get_paginator('list_aws_default_service_quotas')
+                for page in paginator.paginate(ServiceCode=service_code):
+                    results.extend(page.get('Quotas', []))
+            except client.exceptions.NoSuchResourceException:
+                continue
+
+        return results
+
+    def resources(self, query=None):
+        """Override resources method to handle ServiceCode requirement"""
+        q = query or {}
+
+        # Extract ServiceCode from different query formats
+        service_codes = []
+
+        # Check if ServiceCode is specified in query list format
+        if isinstance(q, list):
+            for item in q:
+                if 'ServiceCode' in item:
+                    service_codes.append(item['ServiceCode'])
+        elif isinstance(q, dict) and 'ServiceCode' in q:
+            # Single ServiceCode in query dict
+            if isinstance(q['ServiceCode'], str):
+                service_codes = [q['ServiceCode']]
+            else:
+                service_codes = q['ServiceCode']
+
+        # If no ServiceCode specified, we need to get all services first
+        # This could be expensive, but it's the expected behavior
+        if not service_codes:
+            services_client = local_session(self.session_factory).client('service-quotas')
+            paginator = services_client.get_paginator('list_services')
+            for page in paginator.paginate():
+                service_codes.extend([s['ServiceCode'] for s in page.get('Services', [])])
+
+        return self.get_resources(service_codes)
