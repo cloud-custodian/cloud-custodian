@@ -246,7 +246,8 @@ class CloudFrontWaf(BaseTest):
             # Should not raise - error should be caught and logged
             action.process([{
                 'Id': 'E1234567890ABC',
-                'WebACLId': 'arn:aws:wafv2:us-east-1:123456789012:global/webacl/CreatedByCloudFront-abc123/xyz'
+                'WebACLId': 'arn:aws:wafv2:us-east-1:123456789012:global/'
+                            'webacl/CreatedByCloudFront-abc123/xyz'
             }])
 
     def test_set_waf_pricing_plan_distribution(self):
@@ -290,7 +291,8 @@ class CloudFrontWaf(BaseTest):
             # Should not raise - error should be caught and logged
             action.process([{
                 'Id': 'E1234567890ABC',
-                'WebACLId': 'arn:aws:wafv2:us-east-1:123456789012:global/webacl/CreatedByCloudFront-abc123/xyz'
+                'WebACLId': 'arn:aws:wafv2:us-east-1:123456789012:global/'
+                            'webacl/CreatedByCloudFront-abc123/xyz'
             }])
 
 

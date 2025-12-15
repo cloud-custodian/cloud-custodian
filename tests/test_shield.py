@@ -141,4 +141,7 @@ class ShieldTest(BaseTest):
                 ) as mock_session:
                     mock_session.return_value.client.return_value = client
                     # Should not raise - error should be caught and logged
-                    set_shield.process([{"Id": "E1234567890ABC", "DomainName": "test.cloudfront.net"}])
+                    set_shield.process([{
+                        "Id": "E1234567890ABC",
+                        "DomainName": "test.cloudfront.net"
+                    }])
