@@ -37,7 +37,7 @@ def should_load_provider(name, provider_types, no_wild=False):
     return False
 
 
-PROVIDER_NAMES = ('aws', 'azure', 'gcp', 'k8s', 'openstack', 'awscc', 'tencentcloud', 'oci', 'terraform')
+PROVIDER_NAMES = ('aws', 'azure', 'gcp', 'k8s', 'openstack', 'awscc', 'tencentcloud', 'oci', 'terraform', 'snowflake')
 
 
 def load_available(resources=True):
@@ -100,6 +100,10 @@ def load_providers(provider_types):
     if should_load_provider('oci', provider_types):
         from c7n_oci.entry import initialize_oci
         initialize_oci()
+
+    if should_load_provider('snowflake', provider_types):
+        from c7n_snowflake.entry import initialize_snowflake
+        initialize_snowflake()
 
     if should_load_provider('c7n', provider_types):
         from c7n import data  # noqa
