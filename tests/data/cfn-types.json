@@ -1146,6 +1146,7 @@
   "AWS::S3Outposts::Endpoint",
   "AWS::S3Tables::TableBucket",
   "AWS::S3Tables::TableBucketPolicy",
+  "AWS::SavingsPlans::SavingsPlans",
   "AWS::SDB::Domain",
   "AWS::SES::ConfigurationSet",
   "AWS::SES::ConfigurationSetEventDestination",
