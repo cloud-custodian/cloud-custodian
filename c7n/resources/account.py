@@ -450,6 +450,7 @@ class GuardDutyEnabled(MultiAttrFilter):
             detector_id = detector_ids.pop()
 
         detector = client.get_detector(DetectorId=detector_id)
+        detector.pop('ResponseMetadata', None)
         admin = client.get_administrator_account(DetectorId=detector_id).get('Administrator')
         resource[self.annotation] = r = {'Detector': detector, 'Administrator': admin}
         return r
