@@ -1,0 +1,11 @@
+{
+    "status_code": 404,
+    "data": {
+        "Error": {
+            "Message": "Account 644160558196 is not signed up with QuickSight with namespace default. AWS account ID: 644160558196, Namespace: default.",
+            "Code": "ResourceNotFoundException"
+        },
+        "ResponseMetadata": {},
+        "Message": "Account 644160558196 is not signed up with QuickSight with namespace default. AWS account ID: 644160558196, Namespace: default."
+    }
+}
