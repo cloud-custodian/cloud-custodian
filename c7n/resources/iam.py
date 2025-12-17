@@ -997,6 +997,46 @@ class IamRoleInlinePolicy(Filter):
         return res
 
 
+@Role.filter_registry.register('has-managed-policy')
+class IamRoleManagedPolicy(Filter):
+    """Filter IAM roles that have a managed-policy attached
+    True: Filter roles that have a managed-policy
+    False: Filter roles that do not have a managed-policy
+
+    :example
+
+    .. code-block:: yaml
+
+        policies:
+            - name: iam-roles-with-no-managed-policies
+              resource: iam-role
+              filters:
+                - type: has-managed-policy
+                  value: False
+    """
+
+    schema = type_schema('has-managed-policy', value={'type': 'boolean'})
+    permissions = ('iam:ListAttachedRolePolicies',)
+
+    def _attached_policies(self, client, resource):
+        policies = client.list_attached_role_policies(
+            RoleName=resource['RoleName'])['AttachedPolicies']
+        resource['c7n:AttachedPolicies'] = policies
+        return resource
+
+    def process(self, resources, event=None):
+        client = local_session(self.manager.session_factory).client('iam')
+        res = []
+        value = self.data.get('value', True)
+        for r in resources:
+            r = self._attached_policies(client, r)
+            if len(r['c7n:AttachedPolicies']) > 0 and value:
+                res.append(r)
+            if len(r['c7n:AttachedPolicies']) == 0 and not value:
+                res.append(r)
+        return res
+
+
 @Role.filter_registry.register('has-specific-managed-policy')
 class SpecificIamRoleManagedPolicy(ValueFilter):
     """Find IAM roles that have a specific policy attached
