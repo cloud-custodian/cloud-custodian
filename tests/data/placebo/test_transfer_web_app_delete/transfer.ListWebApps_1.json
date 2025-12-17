@@ -1,0 +1,14 @@
+{
+    "status_code": 200,
+    "data": {
+        "WebApps": [
+            {
+                "Arn": "arn:aws:transfer:us-east-1:644160558196:webapp/webapp-b00464dc858f4eb5a",
+                "WebAppId": "webapp-b00464dc858f4eb5a",
+                "AccessEndpoint": "https://webapp-b00464dc858f4eb5a.transfer-webapp.us-east-1.on.aws",
+                "WebAppEndpoint": "https://webapp-b00464dc858f4eb5a.transfer-webapp.us-east-1.on.aws"
+            }
+        ],
+        "ResponseMetadata": {}
+    }
+}

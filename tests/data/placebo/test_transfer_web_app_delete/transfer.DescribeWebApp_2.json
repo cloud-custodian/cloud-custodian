@@ -1,0 +1,13 @@
+{
+    "status_code": 400,
+    "data": {
+        "Error": {
+            "Message": "Unknown WebApp",
+            "Code": "ResourceNotFoundException"
+        },
+        "ResponseMetadata": {},
+        "Message": "Unknown WebApp",
+        "Resource": "webapp-b00464dc858f4eb5a",
+        "ResourceType": "WebApp"
+    }
+}

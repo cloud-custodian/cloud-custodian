@@ -1,0 +1,58 @@
+{
+    "status_code": 200,
+    "data": {
+        "VpcEndpoints": [
+            {
+                "VpcEndpointId": "vpce-0b36452b351fd6285",
+                "VpcEndpointType": "Interface",
+                "VpcId": "vpc-0207cdabbb60970eb",
+                "ServiceName": "com.amazonaws.us-east-1.transfer.server.c-0026",
+                "State": "available",
+                "PolicyDocument": "{\n  \"Statement\": [\n    {\n      \"Action\": \"*\",\n      \"Effect\": \"Allow\",\n      \"Principal\": \"*\",\n      \"Resource\": \"*\"\n    }\n  ]\n}",
+                "RouteTableIds": [],
+                "SubnetIds": [
+                    "subnet-0a0cc24bfabbd5f02"
+                ],
+                "Groups": [
+                    {
+                        "GroupId": "sg-091e5c25316cfc6bc",
+                        "GroupName": "default"
+                    }
+                ],
+                "IpAddressType": "ipv4",
+                "DnsOptions": {
+                    "DnsRecordIpType": "ipv4"
+                },
+                "PrivateDnsEnabled": false,
+                "RequesterManaged": true,
+                "NetworkInterfaceIds": [
+                    "eni-059edae9c36873095"
+                ],
+                "DnsEntries": [
+                    {
+                        "DnsName": "vpce-0b36452b351fd6285-uy20s75o.vpce-svc-069ebe944af4830da.us-east-1.vpce.amazonaws.com",
+                        "HostedZoneId": "Z7HUB22UULQXV"
+                    },
+                    {
+                        "DnsName": "vpce-0b36452b351fd6285-uy20s75o-us-east-1a.vpce-svc-069ebe944af4830da.us-east-1.vpce.amazonaws.com",
+                        "HostedZoneId": "Z7HUB22UULQXV"
+                    }
+                ],
+                "CreationTimestamp": {
+                    "__class__": "datetime",
+                    "year": 2025,
+                    "month": 12,
+                    "day": 17,
+                    "hour": 15,
+                    "minute": 6,
+                    "second": 34,
+                    "microsecond": 843000
+                },
+                "Tags": [],
+                "OwnerId": "644160558196",
+                "ServiceRegion": "us-east-1"
+            }
+        ],
+        "ResponseMetadata": {}
+    }
+}

@@ -1,0 +1,29 @@
+{
+    "status_code": 200,
+    "data": {
+        "WebApp": {
+            "Arn": "arn:aws:transfer:us-east-1:644160558196:webapp/webapp-e2b3a9e37bc34ddf8",
+            "WebAppId": "webapp-e2b3a9e37bc34ddf8",
+            "DescribedIdentityProviderDetails": {
+                "IdentityCenterConfig": {
+                    "ApplicationArn": "arn:aws:sso::644160558196:application/ssoins-7223c7b34441e61a/apl-7223262b808b4874",
+                    "InstanceArn": "arn:aws:sso:::instance/ssoins-7223c7b34441e61a",
+                    "Role": "arn:aws:iam::644160558196:role/service-role/AWSTransferWebAppIdentityBearer-us-east-1"
+                }
+            },
+            "AccessEndpoint": "https://webapp-e2b3a9e37bc34ddf8.transfer-webapp.us-east-1.on.aws",
+            "WebAppEndpoint": "https://webapp-e2b3a9e37bc34ddf8.transfer-webapp.us-east-1.on.aws",
+            "WebAppUnits": {
+                "Provisioned": 1
+            },
+            "Tags": [
+                {
+                    "Key": "Environment",
+                    "Value": "Production"
+                }
+            ],
+            "WebAppEndpointPolicy": "STANDARD"
+        },
+        "ResponseMetadata": {}
+    }
+}
