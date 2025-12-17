@@ -1,0 +1,44 @@
+{
+    "status_code": 200,
+    "data": {
+        "ResponseMetadata": {},
+        "NodeInfoList": [
+            {
+                "AddedToClusterTime": "2025-12-17T14:40:07.292Z",
+                "BrokerNodeInfo": {
+                    "AttachedENIId": "eni-0270d8e74b03a8bac",
+                    "BrokerId": 2.0,
+                    "ClientSubnet": "subnet-0599c09bf908c27f0",
+                    "ClientVpcIpAddress": "10.0.1.95",
+                    "CurrentBrokerSoftwareInfo": {
+                        "KafkaVersion": "3.5.1"
+                    },
+                    "Endpoints": [
+                        "b-2.c7ntest48042afe.sidyyb.c18.kafka.us-east-1.amazonaws.com"
+                    ]
+                },
+                "InstanceType": "t3.small",
+                "NodeARN": "arn:aws:kafka:us-east-1:644160558196:broker/c7n-test-48042afe/7a89d361-f81d-4c9a-bf97-53518cfc715d-18/257c02b9-11ac-4f8e-b568-c84b38a6f241",
+                "NodeType": "BROKER"
+            },
+            {
+                "AddedToClusterTime": "2025-12-17T14:40:07.251Z",
+                "BrokerNodeInfo": {
+                    "AttachedENIId": "eni-0fc6fcc0c6d606b63",
+                    "BrokerId": 1.0,
+                    "ClientSubnet": "subnet-0b9fcdaeca4e2a0c3",
+                    "ClientVpcIpAddress": "10.0.0.240",
+                    "CurrentBrokerSoftwareInfo": {
+                        "KafkaVersion": "3.5.1"
+                    },
+                    "Endpoints": [
+                        "b-1.c7ntest48042afe.sidyyb.c18.kafka.us-east-1.amazonaws.com"
+                    ]
+                },
+                "InstanceType": "t3.small",
+                "NodeARN": "arn:aws:kafka:us-east-1:644160558196:broker/c7n-test-48042afe/7a89d361-f81d-4c9a-bf97-53518cfc715d-18/e0a96a8d-40ad-4c47-ad69-066ac790f6aa",
+                "NodeType": "BROKER"
+            }
+        ]
+    }
+}
