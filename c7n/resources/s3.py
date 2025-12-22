@@ -939,7 +939,6 @@ class BucketActionBase(BaseAction):
                     errors += 1
                     continue
                 results += filter(None, [f.result()])
-            self.manager.reset_cache(buckets)
         if errors:
             self.log.error('encountered %d errors while processing %s', errors, self.name)
             raise PolicyExecutionError('%d resources failed', errors)
@@ -1458,7 +1457,6 @@ class RemovePolicyStatement(RemovePolicyBase):
                                    b['Name'], f.exception())
                 results += filter(None, [f.result()])
 
-            self.manager.reset_cache(buckets)
             return results
 
     def process_bucket(self, bucket):
