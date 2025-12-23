@@ -2197,7 +2197,8 @@ def test_cross_az_nat_gateway_regional_nat(test, caplog):
 
     # Verify warning was logged about Regional NAT Gateway exclusion
     assert any(
-        'implicitly filtered 1 of 2 nat-gateways' in record.message
+        'excluding 1 Regional NAT Gateway(s) without SubnetId' in record.message
+        and 'nat-regional-456' in record.message
         for record in caplog.records
     )
 
