@@ -3465,10 +3465,15 @@ class CrossAZRouteTable(Filter):
         }
         # Filter out Regional NAT Gateways which don't have SubnetId field
         # Regional NAT Gateways span multiple AZs and cannot be evaluated for cross-AZ traffic
+        all_nat_gateways = self.manager.get_resource_manager('nat-gateway').resources()
+        zonal_nat_gateways = [n for n in all_nat_gateways if 'SubnetId' in n]
+        if len(zonal_nat_gateways) != len(all_nat_gateways):
+            self.log.warning(
+                "%s implicitly filtered %d of %d nat-gateways key:SubnetId on present",
+                self.type, len(zonal_nat_gateways), len(all_nat_gateways))
         nat_subnets = {
             nat_gateway['NatGatewayId']: nat_gateway["SubnetId"]
-            for nat_gateway in self.manager.get_resource_manager('nat-gateway').resources()
-            if "SubnetId" in nat_gateway}
+            for nat_gateway in zonal_nat_gateways}
 
         results = []
         self.annotate_subnets_table(resources, subnets)
