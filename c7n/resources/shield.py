@@ -155,6 +155,16 @@ class SetShieldProtection(BaseAction, ProtectedResource):
             except ClientError as e:
                 if e.response['Error']['Code'] == 'ResourceAlreadyExistsException':
                     continue
+                if e.response['Error']['Code'] == 'InvalidParameterException':
+                    # CloudFront distributions with pricing plans cannot have Shield Advanced
+                    # enabled. Skip these resources gracefully.
+                    # https://docs.aws.amazon.com/AmazonCloudFront/latest/DeveloperGuide/flat-rate-pricing-plan.html
+                    if 'CloudFront Pricing Plan' in str(e):
+                        self.log.warning(
+                            "Skipping Shield protection for %s: distribution has a "
+                            "CloudFront pricing plan subscription which does not support "
+                            "Shield Advanced", arn)
+                        continue
                 raise
 
     def clear_stale(self, client, protections):

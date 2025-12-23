@@ -18,7 +18,7 @@ from c7n_azure.session import Session
 
 from c7n_azure.output import MetricsOutput, AppInsightsLogOutput
 from c7n.output import log_outputs, metrics_outputs
-from mock import patch
+from unittest.mock import patch
 
 
 class OutputTest(BaseTest):
