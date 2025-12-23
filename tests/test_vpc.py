@@ -2163,7 +2163,7 @@ def test_cross_az_nat_gateway_subnet_resolve(test):
 def test_cross_az_nat_gateway_regional_nat(test, caplog):
     """Test that Regional NAT Gateways without SubnetId are handled gracefully and logged."""
     from c7n.resources.vpc import CrossAZRouteTable
-    from unittest.mock import MagicMock, patch
+    from unittest.mock import MagicMock
 
     # Mock NAT gateways including a Regional NAT Gateway without SubnetId
     mock_nat_gateways = [
