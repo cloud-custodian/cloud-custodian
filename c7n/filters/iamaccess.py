@@ -165,11 +165,54 @@ class PolicyChecker:
         if not conditions:
             return False
 
+        # Evaluate each condition
+        # handle_condition returns True if the condition whitelists (handler returned False)
+        # handle_condition returns False if the condition is a violation (handler returned True)
+        # handle_condition returns None if handler doesn't exist (unknown condition)
+        
         results = []
+        has_whitelisted_org = False
+        
         for c in conditions:
-            results.append(self.handle_condition(s, c))
-
-        return all(results)
+            result = self.handle_condition(s, c)
+            
+            # Unknown handler - be conservative and reject immediately
+            if result is None:
+                return False
+            
+            # Track if we have a whitelisted org condition
+            if result is True and c['key'] in ('aws:principalorgid', 'aws:resourceorgid'):
+                has_whitelisted_org = True
+            
+            results.append(result)
+        
+        # If all conditions whitelist, return True
+        if all(results):
+            return True
+        
+        # Special case: org ID whitelisted + only wildcard principal conditions fail
+        if has_whitelisted_org and not all(results):
+            principal_conditions = {
+                'aws:principalarn', 'aws:principalaccount', 
+                'aws:sourceaccount', 'aws:sourcearn', 
+                's3:dataaccesspointaccount'
+            }
+            
+            # Check which conditions failed
+            for i, c in enumerate(conditions):
+                if not results[i]:  # This condition failed (didn't whitelist)
+                    if c['key'] not in principal_conditions:
+                        # Non-principal condition failed, can't be saved by org ID
+                        return False
+                    # Check if it's a wildcard
+                    if not all('*' in str(v) for v in c['values']):
+                        # Not a wildcard, it's a real violation
+                        return False
+            # All failures are wildcard principals, org ID saves it
+            return True
+        
+        # Some conditions failed and not covered by special case
+        return False
 
     def handle_condition(self, s, c):
         if not c['op']:
@@ -247,7 +290,6 @@ class PolicyChecker:
 
     def handle_aws_principalarn(self, s, c):
         """Handle the aws:PrincipalArn condition key."""
-
         return bool(set(map(_account, c['values'])).difference(self.allowed_accounts))
 
     def handle_aws_resourceorgid(self, s, c):
