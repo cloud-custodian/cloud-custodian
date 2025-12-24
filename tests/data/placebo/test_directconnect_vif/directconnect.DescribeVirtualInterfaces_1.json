@@ -1,0 +1,67 @@
+{
+    "status_code": 200,
+    "data": {
+        "virtualInterfaces": [
+            {
+                "addressFamily": "ipv4",
+                "amazonAddress": "192.168.100.1/30",
+                "amazonSideAsn": 64512,
+                "asn": 65000,
+                "asnLong": 65000,
+                "authKey": "fakeAuthKey123",
+                "awsDeviceV2": "dxv-dkfj39",
+                "awsLogicalDeviceId": "dxld-abcdef",
+                "bgpPeers": [
+                    {
+                        "addressFamily": "ipv4",
+                        "amazonAddress": "192.168.100.1/30",
+                        "asn": 65000,
+                        "asnLong": 65000,
+                        "authKey": "fakePeerAuthKey456",
+                        "awsDeviceV2": "dxv-dkfj39",
+                        "awsLogicalDeviceId": "dxld-abcdef",
+                        "bgpPeerId": "bgp-123456",
+                        "bgpPeerState": "available",
+                        "bgpStatus": "up",
+                        "customerAddress": "192.168.100.2/30"
+                    }
+                ],
+                "connectionId": "dxcon-7890ab",
+                "customerAddress": "192.168.100.2/30",
+                "customerRouterConfig": "router bgp 65000\n neighbor 192.168.100.1 remote-as 64512",
+                "directConnectGatewayId": "dx-gateway-001",
+                "jumboFrameCapable": true,
+                "location": "EqSV5",
+                "mtu": 1500,
+                "ownerAccount": "123456789012",
+                "region": "us-east-1",
+                "routeFilterPrefixes": [
+                    {
+                        "cidr": "10.0.0.0/16"
+                    },
+                    {
+                        "cidr": "172.16.0.0/16"
+                    }
+                ],
+                "siteLinkEnabled": false,
+                "tags": [
+                    {
+                        "key": "Environment",
+                        "value": "Test"
+                    },
+                    {
+                        "key": "Project",
+                        "value": "IntegrationTest"
+                    }
+                ],
+                "virtualGatewayId": "vgw-0a1b2c3d",
+                "virtualInterfaceId": "dxvif-123abc",
+                "virtualInterfaceName": "Test-VIF",
+                "virtualInterfaceState": "available",
+                "virtualInterfaceType": "private",
+                "vlan": 101
+            }
+        ],
+        "ResponseMetadata": {}
+    }
+}
