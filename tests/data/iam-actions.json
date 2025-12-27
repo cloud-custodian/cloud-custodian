@@ -12751,7 +12751,8 @@
     "CancelDirectQuery",
     "GetDirectQuery",
     "GetDirectQueryResult",
-    "StartDirectQuery"
+    "StartDirectQuery",
+    "DescribeReservedInstances"
   ],
   "opsworks": [
     "AssignInstance",
