@@ -4,6 +4,7 @@ from .common import BaseTest, event_data
 from c7n.resources.aws import shape_validate
 from c7n.utils import local_session, jmespath_compile
 from unittest.mock import MagicMock, patch
+from botocore.exceptions import ClientError
 
 
 class CloudFrontWaf(BaseTest):
@@ -203,6 +204,96 @@ class CloudFrontWaf(BaseTest):
 
         resources = policy.push(event_data("event-cloud-trail-tag-distribution.json"))
         self.assertEqual(len(resources), 1)
+
+    def test_set_wafv2_pricing_plan_distribution(self):
+        """Test that WAFv2 action gracefully skips CloudFront distributions
+        with pricing plan subscriptions.
+        """
+        factory = self.replay_flight_data("test_distribution_wafv2")
+
+        mock_client = MagicMock()
+        mock_client.get_distribution_config.return_value = {
+            'DistributionConfig': {'WebACLId': ''},
+            'ETag': 'test-etag'
+        }
+        # Simulate the pricing plan error from AWS
+        mock_client.update_distribution.side_effect = ClientError(
+            {
+                'Error': {
+                    'Code': 'InvalidArgument',
+                    'Message': "You can't remove or replace the web ACL for your distribution. "
+                               "Distributions with a pricing plan subscription must have a "
+                               "web ACL resource."
+                }
+            },
+            'UpdateDistribution'
+        )
+
+        with patch("c7n.resources.cloudfront.local_session") as mock_session:
+            mock_session.return_value.client.return_value = mock_client
+
+            policy = self.load_policy(
+                {
+                    "name": "wafv2-pricing-plan-test",
+                    "resource": "distribution",
+                    "actions": [{"type": "set-wafv2", "state": True,
+                                 "force": True, "web-acl": "testv2"}],
+                },
+                session_factory=factory,
+            )
+
+            action = policy.resource_manager.actions[0]
+            # Should not raise - error should be caught and logged
+            action.process([{
+                'Id': 'E1234567890ABC',
+                'WebACLId': 'arn:aws:wafv2:us-east-1:123456789012:global/'
+                            'webacl/CreatedByCloudFront-abc123/xyz'
+            }])
+
+    def test_set_waf_pricing_plan_distribution(self):
+        """Test that WAF action gracefully skips CloudFront distributions
+        with pricing plan subscriptions.
+        """
+        factory = self.replay_flight_data("test_distribution_waf")
+
+        mock_client = MagicMock()
+        mock_client.get_distribution_config.return_value = {
+            'DistributionConfig': {'WebACLId': ''},
+            'ETag': 'test-etag'
+        }
+        # Simulate the pricing plan error from AWS
+        mock_client.update_distribution.side_effect = ClientError(
+            {
+                'Error': {
+                    'Code': 'InvalidArgument',
+                    'Message': "You can't remove or replace the web ACL for your distribution. "
+                               "Distributions with a pricing plan subscription must have a "
+                               "web ACL resource."
+                }
+            },
+            'UpdateDistribution'
+        )
+
+        with patch("c7n.resources.cloudfront.local_session") as mock_session:
+            mock_session.return_value.client.return_value = mock_client
+
+            policy = self.load_policy(
+                {
+                    "name": "waf-pricing-plan-test",
+                    "resource": "distribution",
+                    "actions": [{"type": "set-waf", "state": True,
+                                 "force": True, "web-acl": "test"}],
+                },
+                session_factory=factory,
+            )
+
+            action = policy.resource_manager.actions[0]
+            # Should not raise - error should be caught and logged
+            action.process([{
+                'Id': 'E1234567890ABC',
+                'WebACLId': 'arn:aws:wafv2:us-east-1:123456789012:global/'
+                            'webacl/CreatedByCloudFront-abc123/xyz'
+            }])
 
 
 class CloudFront(BaseTest):
