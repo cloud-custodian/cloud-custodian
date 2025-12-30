@@ -1,0 +1,89 @@
+{
+    "status_code": 200,
+    "data": {
+        "VpcEndpoints": [
+            {
+                "VpcEndpointId": "vpce-0dbb9dc9f68b6361a",
+                "VpcEndpointType": "Gateway",
+                "VpcId": "vpc-0895b892b11ca5906",
+                "ServiceName": "com.amazonaws.us-east-1.s3",
+                "State": "available",
+                "PolicyDocument": "{\"Version\":\"2008-10-17\",\"Statement\":[{\"Effect\":\"Allow\",\"Principal\":\"*\",\"Action\":\"*\",\"Resource\":\"*\"}]}",
+                "RouteTableIds": [
+                    "rtb-094896730ac4cce47"
+                ],
+                "SubnetIds": [],
+                "Groups": [],
+                "IpAddressType": "ipv4",
+                "DnsOptions": {
+                    "DnsRecordIpType": "service-defined"
+                },
+                "PrivateDnsEnabled": false,
+                "RequesterManaged": false,
+                "NetworkInterfaceIds": [],
+                "DnsEntries": [],
+                "CreationTimestamp": {
+                    "__class__": "datetime",
+                    "year": 2025,
+                    "month": 12,
+                    "day": 30,
+                    "hour": 13,
+                    "minute": 4,
+                    "second": 48,
+                    "microsecond": 0
+                },
+                "Tags": [
+                    {
+                        "Key": "Name",
+                        "Value": "test-endpoint-01"
+                    }
+                ],
+                "OwnerId": "644160558196",
+                "ServiceRegion": "us-east-1"
+            },
+            {
+                "VpcEndpointId": "vpce-0812f6b3fa651075f",
+                "VpcEndpointType": "Interface",
+                "VpcId": "vpc-0895b892b11ca5906",
+                "ServiceName": "com.amazonaws.us-east-1.apprunner.requests",
+                "State": "available",
+                "PolicyDocument": "{\n  \"Statement\": [\n    {\n      \"Action\": \"*\",\n      \"Effect\": \"Allow\",\n      \"Principal\": \"*\",\n      \"Resource\": \"*\"\n    }\n  ]\n}",
+                "RouteTableIds": [],
+                "SubnetIds": [],
+                "Groups": [
+                    {
+                        "GroupId": "sg-0c36d04a2f1133b8a",
+                        "GroupName": "default"
+                    }
+                ],
+                "IpAddressType": "ipv4",
+                "DnsOptions": {
+                    "DnsRecordIpType": "ipv4"
+                },
+                "PrivateDnsEnabled": false,
+                "RequesterManaged": false,
+                "NetworkInterfaceIds": [],
+                "DnsEntries": [],
+                "CreationTimestamp": {
+                    "__class__": "datetime",
+                    "year": 2025,
+                    "month": 12,
+                    "day": 30,
+                    "hour": 13,
+                    "minute": 20,
+                    "second": 2,
+                    "microsecond": 533000
+                },
+                "Tags": [
+                    {
+                        "Key": "Name",
+                        "Value": "my-apprunner-requests-endpoint"
+                    }
+                ],
+                "OwnerId": "644160558196",
+                "ServiceRegion": "us-east-1"
+            }
+        ],
+        "ResponseMetadata": {}
+    }
+}

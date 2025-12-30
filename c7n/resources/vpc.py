@@ -2886,6 +2886,63 @@ class EndpointVpcFilter(net_filters.VpcFilter):
 
     RelatedIdsExpression = "VpcId"
 
+@VpcEndpoint.filter_registry.register('policy-supported')
+class EndpointPolicySupportedFilter(Filter):
+    """Filter VPC Endpoints based on whether they support resource policies.
+
+    :example:
+
+    .. code-block:: yaml
+
+      policies:
+        - name: vpc-endpoints-has-policy-support
+          resource: aws.vpc-endpoint
+          filters:
+            - type: policy-supported
+              value: true
+        - name: vpc-endpoints-no-policy-support
+          resource: aws.vpc-endpoint
+          filters:
+            - type: policy-supported
+              value: false
+    """
+    schema = type_schema(
+        "policy-supported",
+        value={"type": "boolean"}
+    )
+
+    permissions = ("ec2:DescribeVpcEndpointServices",)
+
+    def process(self, resources, event=None):
+        client = self.manager.session_factory().client("ec2")
+        service_map = self._get_service_map(client)
+        match_value = self.data.get("value", True)
+
+        results = []
+        for resource in resources:
+            service_name = resource.get("ServiceName")
+            service_detail = service_map.get(service_name, {})
+            supported = service_detail.get("VpcEndpointPolicySupported", False)
+            resource["VpcEndpointPolicySupported"] = supported
+
+            if supported == match_value:
+                results.append(resource)
+        return results
+    
+    def _get_service_map(self, client):
+        if getattr(self, "_service_map", None) is not None:
+            return self._service_map
+
+        svc_map = {}
+        paginator = client.get_paginator("describe_vpc_endpoint_services")
+        for page in paginator.paginate():
+            for d in page.get("ServiceDetails", []):
+                name = d.get("ServiceName")
+                if name:
+                    svc_map[name] = d
+        self._service_map = svc_map
+        return svc_map
+    
 
 @Vpc.filter_registry.register("vpc-endpoint")
 class VPCEndpointFilter(RelatedResourceByIdFilter):

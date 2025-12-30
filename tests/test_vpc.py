@@ -1,5 +1,6 @@
 # Copyright The Cloud Custodian Authors.
 # SPDX-License-Identifier: Apache-2.0
+from importlib import resources
 import logging
 import time
 from .common import BaseTest, functional, event_data, load_data
@@ -4687,3 +4688,39 @@ class TestVPCEndpointServiceConfiguration(BaseTest):
         resources = p.run()
         self.assertEqual(len(resources), 1)
         self.assertEqual(resources[0]['ServiceId'], 'vpce-svc-042193297e333714e')
+
+
+class TestVpcEndpointPolicySupported(BaseTest):
+    def test_endpoint_policy_supported_filter(self):
+        session_factory = self.record_flight_data("test_vpc_endpoint_policy_supported_filter")
+        p = self.load_policy({
+            "name": "vpc-endpoint-services-no-policy-support",
+            "resource": "aws.vpc-endpoint",
+            "filters": [{
+                "type": "policy-supported",
+                "value": True
+            }],
+        }, session_factory=session_factory)
+        resources = p.run()
+
+        self.assertEqual(len(resources), 1)
+        self.assertEqual(resources[0]['ServiceName'], 'com.amazonaws.us-east-1.s3')
+        self.assertIn('VpcEndpointPolicySupported', resources[0])
+        self.assertTrue(resources[0]['VpcEndpointPolicySupported'])
+
+    def test_endpoint_policy_not_supported_filter(self):
+        session_factory = self.record_flight_data("test_vpc_endpoint_policy_supported_filter")
+        p = self.load_policy({
+            "name": "vpc-endpoint-services-no-policy-support",
+            "resource": "aws.vpc-endpoint",
+            "filters": [{
+                "type": "policy-supported",
+                "value": False
+            }],
+        }, session_factory=session_factory)
+        resources = p.run()
+
+        self.assertEqual(len(resources), 1)
+        self.assertEqual(resources[0]['ServiceName'], 'com.amazonaws.us-east-1.apprunner.requests')
+        self.assertIn('VpcEndpointPolicySupported', resources[0])
+        self.assertFalse(resources[0]['VpcEndpointPolicySupported'])
