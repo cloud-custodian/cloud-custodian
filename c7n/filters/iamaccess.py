@@ -169,35 +169,35 @@ class PolicyChecker:
         # handle_condition returns True if the condition whitelists (handler returned False)
         # handle_condition returns False if the condition is a violation (handler returned True)
         # handle_condition returns None if handler doesn't exist (unknown condition)
-        
+
         results = []
         has_whitelisted_org = False
-        
+
         for c in conditions:
             result = self.handle_condition(s, c)
-            
+
             # Unknown handler - be conservative and reject immediately
             if result is None:
                 return False
-            
+
             # Track if we have a whitelisted org condition
             if result is True and c['key'] in ('aws:principalorgid', 'aws:resourceorgid'):
                 has_whitelisted_org = True
-            
+
             results.append(result)
-        
+
         # If all conditions whitelist, return True
         if all(results):
             return True
-        
+
         # Special case: org ID whitelisted + only wildcard principal conditions fail
         if has_whitelisted_org and not all(results):
             principal_conditions = {
-                'aws:principalarn', 'aws:principalaccount', 
-                'aws:sourceaccount', 'aws:sourcearn', 
+                'aws:principalarn', 'aws:principalaccount',
+                'aws:sourceaccount', 'aws:sourcearn',
                 's3:dataaccesspointaccount'
             }
-            
+
             # Check which conditions failed
             for i, c in enumerate(conditions):
                 if not results[i]:  # This condition failed (didn't whitelist)
@@ -210,7 +210,7 @@ class PolicyChecker:
                         return False
             # All failures are wildcard principals, org ID saves it
             return True
-        
+
         # Some conditions failed and not covered by special case
         return False
 

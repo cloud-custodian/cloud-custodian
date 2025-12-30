@@ -2578,12 +2578,12 @@ class CrossAccountChecker(TestCase):
                 }
             }]
         }
-        
+
         # With allowed org ID, should pass (no violations)
         checker = PolicyChecker({"allowed_orgid": {"o-allowed"}})
         violations = checker.check(policy)
         self.assertEqual(len(violations), 0)
-        
+
         # Without allowed org ID, should fail (has violations)
         checker = PolicyChecker({"allowed_orgid": set()})
         violations = checker.check(policy)
@@ -2606,7 +2606,7 @@ class CrossAccountChecker(TestCase):
                 }
             }]
         }
-        
+
         # Even with allowed org ID, specific non-whitelisted account causes violation
         checker = PolicyChecker({
             "allowed_orgid": {"o-allowed"},
@@ -2632,7 +2632,7 @@ class CrossAccountChecker(TestCase):
                 }
             }]
         }
-        
+
         # Both org ID and account are whitelisted, should pass
         checker = PolicyChecker({
             "allowed_orgid": {"o-allowed"},
@@ -2651,12 +2651,14 @@ class CrossAccountChecker(TestCase):
                 "Action": "s3:GetObject",
                 "Resource": "*",
                 "Condition": {
-                    "StringEquals": {"aws:PrincipalOrgID": "o-allowed"},
-                    "StringEquals": {"aws:SourceVpc": "vpc-badbadbad"}
+                    "StringEquals": {
+                        "aws:PrincipalOrgID": "o-allowed",
+                        "aws:SourceVpc": "vpc-badbadbad"
+                    }
                 }
             }]
         }
-        
+
         # Org ID is allowed but VPC is not, should fail
         checker = PolicyChecker({
             "allowed_orgid": {"o-allowed"},
@@ -2680,7 +2682,7 @@ class CrossAccountChecker(TestCase):
                 }
             }]
         }
-        
+
         # With allowed resource org ID, should pass
         checker = PolicyChecker({"allowed_orgid": {"o-allowed"}})
         violations = checker.check(policy)
@@ -2700,7 +2702,7 @@ class CrossAccountChecker(TestCase):
                 }
             }]
         }
-        
+
         # Without org ID, wildcard in ARN should fail
         checker = PolicyChecker({"allowed_accounts": {"123456789012"}})
         violations = checker.check(policy)
@@ -2724,7 +2726,7 @@ class CrossAccountChecker(TestCase):
                 }
             }]
         }
-        
+
         # All wildcards should be allowed with org ID
         checker = PolicyChecker({"allowed_orgid": {"o-allowed"}})
         violations = checker.check(policy)
@@ -2746,7 +2748,7 @@ class CrossAccountChecker(TestCase):
                 }
             }]
         }
-        
+
         # Unknown condition should cause statement to be flagged as violation
         checker = PolicyChecker({"allowed_accounts": {"123456789012"}})
         violations = checker.check(policy)
@@ -2772,7 +2774,7 @@ class CrossAccountChecker(TestCase):
                 }
             }]
         }
-        
+
         # Even with org ID, unknown condition should cause conservative rejection
         checker = PolicyChecker({"allowed_orgid": {"o-allowed"}})
         violations = checker.check(policy)
@@ -2997,7 +2999,7 @@ class DeleteRoleAction(BaseTest):
         client = factory().client("iam")
         self.assertTrue(
             client.get_role(RoleName=resources[0]['RoleName']), 'AWSServiceRoleForSupport')
-        
+
 
 class TestIamProfileHasSpecificManagedPolicyFilter(BaseTest):
 
