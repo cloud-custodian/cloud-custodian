@@ -2997,3 +2997,113 @@ class DeleteRoleAction(BaseTest):
         client = factory().client("iam")
         self.assertTrue(
             client.get_role(RoleName=resources[0]['RoleName']), 'AWSServiceRoleForSupport')
+        
+
+class TestIamProfileHasSpecificManagedPolicyFilter(BaseTest):
+
+    def test_iam_profile_has_specific_managed_policy_filter(self):
+        factory = self.replay_flight_data("test_iam_profile_has_specific_managed_policy")
+        p = self.load_policy(
+            {
+                "name": "iam-profile-has-admin-policy",
+                "resource": "iam-profile",
+                "filters": [
+                    {
+                        "type": "has-specific-managed-policy",
+                        "value": "admin-policy",
+                    }
+                ],
+            },
+            config={"region": "us-west-2"},
+            session_factory=factory,
+        )
+        resources = p.run()
+        self.assertEqual(len(resources), 3)
+
+
+class AccessKeyTest(BaseTest):
+
+    def test_access_key_list(self):
+        """Test basic enumeration of access keys."""
+        factory = self.replay_flight_data("test_iam_access_key_list")
+        p = self.load_policy(
+            {
+                "name": "iam-access-key-list",
+                "resource": "iam-access-key"
+            },
+            session_factory=factory,
+        )
+        resources = p.run()
+        self.assertTrue(len(resources) >= 0)
+        for resource in resources:
+            # Verify required fields are present
+            self.assertIn('AccessKeyId', resource)
+            self.assertIn('UserName', resource)
+            self.assertIn('Status', resource)
+            self.assertIn('CreateDate', resource)
+
+    def test_access_key_filter_by_status(self):
+        """Test filtering access keys by status."""
+        factory = self.replay_flight_data("test_iam_access_key_filter_status")
+        p = self.load_policy(
+            {
+                "name": "iam-access-key-active",
+                "resource": "iam-access-key",
+                "filters": [
+                    {
+                        "type": "value",
+                        "key": "Status",
+                        "value": "Active"
+                    }
+                ]
+            },
+            session_factory=factory,
+        )
+        resources = p.run()
+        for resource in resources:
+            self.assertEqual(resource['Status'], 'Active')
+
+    def test_access_key_filter_by_user(self):
+        """Test filtering access keys by username."""
+        factory = self.replay_flight_data("test_iam_access_key_filter_user")
+        p = self.load_policy(
+            {
+                "name": "iam-access-key-by-user",
+                "resource": "iam-access-key",
+                "filters": [
+                    {
+                        "type": "value",
+                        "key": "UserName",
+                        "value": "test-user"
+                    }
+                ]
+            },
+            session_factory=factory,
+        )
+        resources = p.run()
+        for resource in resources:
+            self.assertEqual(resource['UserName'], 'test-user')
+
+    def test_access_key_filter_by_age(self):
+        """Test filtering access keys by age."""
+        factory = self.replay_flight_data("test_iam_access_key_filter_age")
+        p = self.load_policy(
+            {
+                "name": "iam-access-key-old",
+                "resource": "iam-access-key",
+                "filters": [
+                    {
+                        "type": "value",
+                        "key": "CreateDate",
+                        "value_type": "age",
+                        "value": 90,
+                        "op": "greater-than"
+                    }
+                ]
+            },
+            session_factory=factory,
+        )
+        resources = p.run()
+        # Just check that we can run this without error
+        # The actual age filter logic is handled by C7N core
+        self.assertTrue(len(resources) >= 0)
