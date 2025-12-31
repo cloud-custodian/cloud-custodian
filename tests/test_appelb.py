@@ -1,6 +1,7 @@
 # Copyright The Cloud Custodian Authors.
 # SPDX-License-Identifier: Apache-2.0
 
+from botocore.exceptions import ClientError
 from .common import BaseTest, event_data
 from c7n.exceptions import PolicyValidationError
 from c7n.executor import MainThreadExecutor
@@ -1530,7 +1531,15 @@ class TestTargetGroupAttributesFilter(BaseTest):
 
         def mock_retry(func, *args, **kwargs):
             if func.__name__ == 'describe_listeners':
-                raise Exception("Simulated DescribeListeners failure")
+                raise ClientError(
+                    {
+                        'Error': {
+                            'Code': 'SimulatedError',
+                            'Message': 'Simulated DescribeListeners failure',
+                        }
+                    },
+                    'describe_listeners',
+                )
             return original_retry(func, *args, **kwargs)
 
         with mock.patch.object(filter_instance.manager, 'retry', side_effect=mock_retry):
@@ -1562,7 +1571,15 @@ class TestTargetGroupAttributesFilter(BaseTest):
 
         def mock_retry(func, *args, **kwargs):
             if func.__name__ == 'describe_rules':
-                raise Exception("Simulated DescribeRules failure")
+                raise ClientError(
+                    {
+                        'Error': {
+                            'Code': 'SimulatedError',
+                            'Message': 'Simulated DescribeRules failure',
+                        }
+                    },
+                    'describe_rules',
+                )
             return original_retry(func, *args, **kwargs)
 
         with mock.patch.object(filter_instance.manager, 'retry', side_effect=mock_retry):
