@@ -7,6 +7,7 @@ import json
 import logging
 import re
 
+from botocore.exceptions import ClientError
 from collections import defaultdict
 from c7n.actions import ActionRegistry, BaseAction, ModifyVpcSecurityGroupsAction
 from c7n.exceptions import PolicyValidationError
@@ -1046,12 +1047,12 @@ class AppELBListenerRuleFilter(ListItemFilter):
                             r for r in rules if not r.get('IsDefault', False)
                         ]
                         rule_map[alb['LoadBalancerArn']].extend(non_default_rules)
-                    except Exception as e:
+                    except ClientError as e:
                         log.warning(
                             "Failed to fetch rules for listener %s: %s",
                             listener.get('ListenerArn'), e
                         )
-            except Exception as e:
+            except ClientError as e:
                 log.warning(
                     "Failed to fetch listeners for ALB %s: %s",
                     alb.get('LoadBalancerArn'), e
