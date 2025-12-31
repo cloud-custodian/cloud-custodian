@@ -8,6 +8,7 @@ from unittest.mock import Mock, patch
 
 try:
     from c7n_azure.resources.entraid_user import EntraIDUser
+    from c7n_azure.resources.entraid_group import EntraIDGroup
     from c7n.config import Config
     from c7n.policy import Policy
 except ImportError as e:
@@ -212,6 +213,82 @@ class EntraIDUserTest(unittest.TestCase):
         self.assertEqual(
             set(u['objectId'] for u in filtered), {'user1', 'user3'}
         )
+
+
+class EntraIDGroupTest(unittest.TestCase):
+    """Test EntraID Group resource functionality"""
+
+    def load_policy(self, policy_data, validate=False):
+        """Helper method to load a policy"""
+        config = Config.empty()
+        policy = Policy(policy_data, config, session_factory=None)
+        return policy
+
+    def test_entraid_group_schema_validate(self):
+        """Test that the EntraID group resource schema validates correctly"""
+        policy_data = {
+            'name': 'test-entraid-group',
+            'resource': 'azure.entraid-group',
+            'filters': [
+                {'type': 'value', 'key': 'securityEnabled', 'value': True}
+            ]
+        }
+        p = self.load_policy(policy_data, validate=True)
+        self.assertIsNotNone(p)
+
+    def test_entraid_group_resource_type(self):
+        """Test EntraID group resource type configuration"""
+        resource_type = EntraIDGroup.resource_type
+        self.assertEqual(resource_type.service, 'graph')
+        self.assertEqual(resource_type.id, 'id')
+        self.assertEqual(resource_type.name, 'displayName')
+        self.assertTrue(resource_type.global_resource)
+        self.assertIn('Group.Read.All', resource_type.permissions)
+
+    @patch('c7n_azure.graph_utils.local_session')
+    def test_entraid_group_augment(self, mock_session):
+        """Test group resource augmentation with computed fields"""
+        mock_session.return_value.get_session_for_resource.return_value = Mock()
+
+        # Sample group data
+        groups = [
+            {
+                'id': 'group1-id',
+                'displayName': 'Global Administrators',
+                'description': 'Admin group',
+                'securityEnabled': True,
+                'mailEnabled': False,
+                'groupTypes': []
+            },
+            {
+                'id': 'group2-id',
+                'displayName': 'All Users Distribution',
+                'description': 'Distribution list',
+                'securityEnabled': False,
+                'mailEnabled': True,
+                'groupTypes': ['Unified']
+            }
+        ]
+
+        policy_data = {
+            'name': 'test-augment',
+            'resource': 'azure.entraid-group'
+        }
+
+        policy = self.load_policy(policy_data)
+        resource_mgr = policy.resource_manager
+        augmented = resource_mgr.augment(groups)
+
+        # Check augmented fields
+        self.assertIn('c7n:IsSecurityGroup', augmented[0])
+        self.assertIn('c7n:IsDistributionGroup', augmented[0])
+        self.assertIn('c7n:IsDynamicGroup', augmented[0])
+        self.assertIn('c7n:IsAdminGroup', augmented[0])
+
+        # Admin group should be flagged correctly
+        self.assertTrue(augmented[0]['c7n:IsSecurityGroup'])
+        self.assertTrue(augmented[0]['c7n:IsAdminGroup'])
+        self.assertFalse(augmented[0]['c7n:IsDistributionGroup'])
 
 
 if __name__ == '__main__':

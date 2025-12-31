@@ -2,33 +2,36 @@
 # SPDX-License-Identifier: Apache-2.0
 import datetime
 import email.utils as eut
+from functools import wraps
 import json
 import logging
 import os
 import re
-from c7n.vendored.distutils.util import strtobool
-from functools import wraps
 from time import sleep
+from unittest.mock import patch
 
 import azure.core.polling
+from msrest.pipeline import ClientRawResponse
 import msrest.polling
+from msrest.serialization import Model
+from msrest.service_client import ServiceClient
+from vcr_unittest import VCRTestCase
+
 from c7n.config import Bag, Config
 from c7n.policy import ExecutionContext
 from c7n.schema import generate
 from c7n.testing import TestUtils
 from c7n.utils import local_session
+from c7n.vendored.distutils.util import strtobool
+
 # Ensure the azure provider is loaded.
 from c7n_azure import provider  # noqa
 from c7n_azure import constants, utils
 from c7n_azure.session import Session
 from c7n_azure.utils import ThreadHelper
-from mock import patch
-from msrest.pipeline import ClientRawResponse
-from msrest.serialization import Model
-from msrest.service_client import ServiceClient
-from vcr_unittest import VCRTestCase
 
 from .azure_serializer import AzureSerializer
+
 
 BASE_FOLDER = os.path.dirname(__file__)
 C7N_SCHEMA = generate()

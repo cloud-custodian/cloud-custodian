@@ -4,7 +4,7 @@ import pytest
 from azure.mgmt.storage.models import StorageAccountListKeysResult, StorageAccountKey
 from c7n_azure.session import Session
 from c7n_azure.storage_utils import StorageUtilities
-from mock import patch
+from unittest.mock import patch
 from msrestazure.azure_cloud import AZURE_CHINA_CLOUD
 from c7n.utils import local_session
 from .azure_common import BaseTest, arm_template, requires_arm_polling
@@ -115,7 +115,7 @@ class StorageUtilsTest(BaseTest):
         self.assertEqual(container_name, "testcontainer")
         self.assertEqual(key_prefix, "extrafolder")
         self.assertTrue(CHINA_STORAGE_ENDPOINT in blob_service.primary_endpoint)
-        self.assertTrue(mock_create.called_once())
+        mock_create.assert_called_once()
 
     @patch('azure.storage.queue.QueueClient.create_queue')
     def test_get_queue_client_by_uri_china_cloud(self, mock_create):
@@ -128,4 +128,4 @@ class StorageUtilsTest(BaseTest):
         self.assertIn(
             CHINA_STORAGE_ENDPOINT,
             queue_service._get_service(queue_name).primary_endpoint)
-        self.assertTrue(mock_create.called_once())
+        mock_create.assert_called_once()

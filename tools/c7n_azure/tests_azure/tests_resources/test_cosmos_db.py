@@ -6,7 +6,7 @@ from c7n_azure.resources.cosmos_db import (CosmosDBChildResource, CosmosDBFirewa
                                            CosmosFirewallBypassFilter,
                                            PORTAL_IPS, AZURE_CLOUD_IPS, THROUGHPUT_MULTIPLIER)
 from c7n_azure.session import Session
-from mock import patch, Mock
+from unittest.mock import patch, Mock
 from netaddr import IPSet
 from parameterized import parameterized
 

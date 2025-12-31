@@ -4,7 +4,7 @@ import datetime
 
 from c7n_azure import utils
 from c7n_azure.actions.tagging import TagDelayedAction
-from mock import patch, Mock
+from unittest.mock import patch, Mock
 
 from . import tools_tags as tools
 from .azure_common import BaseTest
