@@ -7,12 +7,14 @@ import json
 import logging
 import re
 
+from botocore.exceptions import ClientError
 from collections import defaultdict
 from c7n.actions import ActionRegistry, BaseAction, ModifyVpcSecurityGroupsAction
 from c7n.exceptions import PolicyValidationError
 from c7n.filters import (
     Filter,
     FilterRegistry,
+    ListItemFilter,
     MetricsFilter,
     ValueFilter,
     WafV2FilterBase,
@@ -947,6 +949,125 @@ class AppELBListenerFilter(ValueFilter, AppELBListenerFilterBase):
                 set_annotation(alb, 'c7n:MatchedListeners', listener)
                 found_listeners = True
         return found_listeners
+
+
+@AppELB.filter_registry.register('listener-rule')
+class AppELBListenerRuleFilter(ListItemFilter):
+    """Filter ALB based on listener rules (path-based, host-based routing, etc.)
+
+    This filter allows checking multiple attributes on listener rules,
+    enabling policies to inspect non-default routing configurations
+    for security and compliance.
+
+    :example:
+
+    Find ALBs with rules redirecting to HTTP (insecure):
+
+    .. code-block:: yaml
+
+            policies:
+              - name: alb-insecure-rule-redirects
+                resource: app-elb
+                filters:
+                  - type: listener-rule
+                    attrs:
+                      - type: value
+                        key: Actions[0].Type
+                        value: redirect
+                      - type: value
+                        key: Actions[0].RedirectConfig.Protocol
+                        value: HTTP
+
+    Find ALBs with rules forwarding to specific target groups:
+
+    .. code-block:: yaml
+
+            policies:
+              - name: alb-rules-to-old-target-group
+                resource: app-elb
+                filters:
+                  - type: listener-rule
+                    attrs:
+                      - type: value
+                        key: Actions[0].TargetGroupArn
+                        value: "arn:aws:elasticloadbalancing:*:*:targetgroup/old-*"
+                        op: glob
+
+    Count ALBs with more than 5 custom rules:
+
+    .. code-block:: yaml
+
+            policies:
+              - name: alb-many-rules
+                resource: app-elb
+                filters:
+                  - type: listener-rule
+                    count: 5
+                    count_op: gt
+    """
+    schema = type_schema(
+        'listener-rule',
+        attrs={'$ref': '#/definitions/filters_common/list_item_attrs'},
+        count={'type': 'number'},
+        count_op={'$ref': '#/definitions/filters_common/comparison_operators'}
+    )
+    permissions = (
+        'elasticloadbalancing:DescribeListeners',
+        'elasticloadbalancing:DescribeRules',
+    )
+    annotate_items = True
+    item_annotation_key = 'c7n:ListenerRules'
+
+    def process(self, resources, event=None):
+        client = local_session(self.manager.session_factory).client('elbv2')
+        rule_map = defaultdict(list)
+
+        # Fetch all listeners and their rules for the ALBs
+        for alb in resources:
+            try:
+                listeners_result = self.manager.retry(
+                    client.describe_listeners,
+                    LoadBalancerArn=alb['LoadBalancerArn'],
+                    ignore_err_codes=('LoadBalancerNotFoundException',)
+                )
+                listeners = listeners_result.get('Listeners', [])
+
+                # Fetch rules for each listener
+                for listener in listeners:
+                    try:
+                        rules_result = self.manager.retry(
+                            client.describe_rules,
+                            ListenerArn=listener['ListenerArn'],
+                            ignore_err_codes=('ListenerNotFoundException',)
+                        )
+                        rules = rules_result.get('Rules', [])
+                        # Filter out default rules (IsDefault=True)
+                        # as they're already covered by the listener filter
+                        non_default_rules = [
+                            r for r in rules if not r.get('IsDefault', False)
+                        ]
+                        rule_map[alb['LoadBalancerArn']].extend(non_default_rules)
+                    except ClientError as e:
+                        log.warning(
+                            "Failed to fetch rules for listener %s: %s",
+                            listener.get('ListenerArn'), e
+                        )
+            except ClientError as e:
+                log.warning(
+                    "Failed to fetch listeners for ALB %s: %s",
+                    alb.get('LoadBalancerArn'), e
+                )
+
+        # Store rules in the ALB resources
+        for alb in resources:
+            alb[self.item_annotation_key] = rule_map.get(
+                alb['LoadBalancerArn'], []
+            )
+
+        return super().process(resources, event)
+
+    def get_item_values(self, resource):
+        return resource.get(self.item_annotation_key, [])
 
 
 @AppELB.action_registry.register('modify-listener')
