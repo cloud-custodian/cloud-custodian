@@ -1,6 +1,5 @@
 # Copyright The Cloud Custodian Authors.
 # SPDX-License-Identifier: Apache-2.0
-from importlib import resources
 import logging
 import time
 from .common import BaseTest, functional, event_data, load_data
