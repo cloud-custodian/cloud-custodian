@@ -2886,6 +2886,7 @@ class EndpointVpcFilter(net_filters.VpcFilter):
 
     RelatedIdsExpression = "VpcId"
 
+
 @VpcEndpoint.filter_registry.register('policy-supported')
 class EndpointPolicySupportedFilter(Filter):
     """Filter VPC Endpoints based on whether they support resource policies.
@@ -2900,11 +2901,6 @@ class EndpointPolicySupportedFilter(Filter):
           filters:
             - type: policy-supported
               value: true
-        - name: vpc-endpoints-no-policy-support
-          resource: aws.vpc-endpoint
-          filters:
-            - type: policy-supported
-              value: false
     """
     schema = type_schema(
         "policy-supported",
@@ -2914,7 +2910,7 @@ class EndpointPolicySupportedFilter(Filter):
     permissions = ("ec2:DescribeVpcEndpointServices",)
 
     def process(self, resources, event=None):
-        client = self.manager.session_factory().client("ec2")
+        client = local_session(self.manager.session_factory).client("ec2")
         service_map = self._get_service_map(client)
         match_value = self.data.get("value", True)
 
@@ -2928,7 +2924,7 @@ class EndpointPolicySupportedFilter(Filter):
             if supported == match_value:
                 results.append(resource)
         return results
-    
+
     def _get_service_map(self, client):
         if getattr(self, "_service_map", None) is not None:
             return self._service_map
@@ -2942,7 +2938,7 @@ class EndpointPolicySupportedFilter(Filter):
                     svc_map[name] = d
         self._service_map = svc_map
         return svc_map
-    
+
 
 @Vpc.filter_registry.register("vpc-endpoint")
 class VPCEndpointFilter(RelatedResourceByIdFilter):
