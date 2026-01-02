@@ -523,26 +523,15 @@ class QueryResourceManager(ResourceManager, metaclass=QueryMeta):
 
     def resources(self, query=None, augment=True) -> List[dict]:
         query = self.source.get_query_params(query)
-        cache_key = self.get_cache_key(query)
         resources = None
 
-        with self._cache:
-            resources = self._cache.get(cache_key)
-            if resources is not None:
-                self.log.debug("Using cached %s: %d" % (
-                    "%s.%s" % (self.__class__.__module__, self.__class__.__name__),
-                    len(resources)))
-
-            if resources is None:
-                if query is None:
-                    query = {}
-                with self.ctx.tracer.subsegment('resource-fetch'):
-                    resources = self.source.resources(query)
-                if augment:
-                    with self.ctx.tracer.subsegment('resource-augment'):
-                        resources = self.augment(resources)
-                    # Don't pollute cache with unaugmented resources.
-                    self._cache.save(cache_key, resources)
+        if query is None:
+            query = {}
+        with self.ctx.tracer.subsegment('resource-fetch'):
+            resources = self.source.resources(query)
+        if augment:
+            with self.ctx.tracer.subsegment('resource-augment'):
+                resources = self.augment(resources)
 
         resource_count = len(resources)
         with self.ctx.tracer.subsegment('filter'):

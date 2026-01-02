@@ -2620,6 +2620,20 @@ class S3Test(BaseTest):
                                     ]
                                 }
                             },
+                        },
+                        {
+                            "Sid": "test",
+                            "Effect": "Deny",
+                            "Principal": "*",
+                            "Action": "s3:GetObject",
+                            "Resource": "arn:aws:s3:::%s/*" % bname,
+                            "Condition": {
+                                "StringNotEquals": {
+                                    "s3:x-amz-server-side-encryption": [
+                                        "AES256", "aws:kms"
+                                    ]
+                                }
+                            },
                         }
                     ],
                 }
