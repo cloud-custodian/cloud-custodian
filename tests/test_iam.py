@@ -2563,6 +2563,223 @@ class CrossAccountChecker(TestCase):
             violations = checker.check(p)
             self.assertEqual(bool(violations), expected)
 
+    def test_org_id_with_wildcard_principal_arn(self):
+        """Test that org ID condition allows wildcard principal ARNs."""
+        policy = {
+            "Version": "2012-10-17",
+            "Statement": [{
+                "Effect": "Allow",
+                "Principal": "*",
+                "Action": "s3:GetObject",
+                "Resource": "*",
+                "Condition": {
+                    "StringEquals": {"aws:PrincipalOrgID": "o-allowed"},
+                    "ArnLike": {"aws:PrincipalArn": "arn:aws:iam::*:role/MyRole"}
+                }
+            }]
+        }
+
+        # With allowed org ID, should pass (no violations)
+        checker = PolicyChecker({"allowed_orgid": {"o-allowed"}})
+        violations = checker.check(policy)
+        self.assertEqual(len(violations), 0)
+
+        # Without allowed org ID, should fail (has violations)
+        checker = PolicyChecker({"allowed_orgid": set()})
+        violations = checker.check(policy)
+        self.assertEqual(len(violations), 1)
+
+    def test_org_id_with_specific_non_whitelisted_account(self):
+        """Test that org ID doesn't save specific non-whitelisted account."""
+        policy = {
+            "Version": "2012-10-17",
+            "Statement": [{
+                "Effect": "Allow",
+                "Principal": "*",
+                "Action": "s3:GetObject",
+                "Resource": "*",
+                "Condition": {
+                    "StringEquals": {
+                        "aws:PrincipalOrgID": "o-allowed",
+                        "aws:PrincipalAccount": "999999999999"
+                    }
+                }
+            }]
+        }
+
+        # Even with allowed org ID, specific non-whitelisted account causes violation
+        checker = PolicyChecker({
+            "allowed_orgid": {"o-allowed"},
+            "allowed_accounts": {"123456789012"}
+        })
+        violations = checker.check(policy)
+        self.assertEqual(len(violations), 1)
+
+    def test_org_id_with_whitelisted_account(self):
+        """Test that org ID + whitelisted account passes."""
+        policy = {
+            "Version": "2012-10-17",
+            "Statement": [{
+                "Effect": "Allow",
+                "Principal": "*",
+                "Action": "s3:GetObject",
+                "Resource": "*",
+                "Condition": {
+                    "StringEquals": {
+                        "aws:PrincipalOrgID": "o-allowed",
+                        "aws:PrincipalAccount": "123456789012"
+                    }
+                }
+            }]
+        }
+
+        # Both org ID and account are whitelisted, should pass
+        checker = PolicyChecker({
+            "allowed_orgid": {"o-allowed"},
+            "allowed_accounts": {"123456789012"}
+        })
+        violations = checker.check(policy)
+        self.assertEqual(len(violations), 0)
+
+    def test_org_id_with_non_principal_condition_violation(self):
+        """Test that org ID doesn't save non-principal condition violations."""
+        policy = {
+            "Version": "2012-10-17",
+            "Statement": [{
+                "Effect": "Allow",
+                "Principal": "*",
+                "Action": "s3:GetObject",
+                "Resource": "*",
+                "Condition": {
+                    "StringEquals": {
+                        "aws:PrincipalOrgID": "o-allowed",
+                        "aws:SourceVpc": "vpc-badbadbad"
+                    }
+                }
+            }]
+        }
+
+        # Org ID is allowed but VPC is not, should fail
+        checker = PolicyChecker({
+            "allowed_orgid": {"o-allowed"},
+            "allowed_vpc": {"vpc-goodgood"}
+        })
+        violations = checker.check(policy)
+        self.assertEqual(len(violations), 1)
+
+    def test_resource_org_id_with_wildcard_principal(self):
+        """Test that aws:ResourceOrgID also acts as scoping condition."""
+        policy = {
+            "Version": "2012-10-17",
+            "Statement": [{
+                "Effect": "Allow",
+                "Principal": "*",
+                "Action": "s3:GetObject",
+                "Resource": "*",
+                "Condition": {
+                    "StringEquals": {"aws:ResourceOrgID": "o-allowed"},
+                    "ArnLike": {"aws:PrincipalArn": "arn:aws:iam::*:role/*"}
+                }
+            }]
+        }
+
+        # With allowed resource org ID, should pass
+        checker = PolicyChecker({"allowed_orgid": {"o-allowed"}})
+        violations = checker.check(policy)
+        self.assertEqual(len(violations), 0)
+
+    def test_no_org_id_with_wildcard_principal_arn(self):
+        """Test that without org ID, wildcard principal ARN fails."""
+        policy = {
+            "Version": "2012-10-17",
+            "Statement": [{
+                "Effect": "Allow",
+                "Principal": "*",
+                "Action": "s3:GetObject",
+                "Resource": "*",
+                "Condition": {
+                    "ArnLike": {"aws:PrincipalArn": "arn:aws:iam::*:role/MyRole"}
+                }
+            }]
+        }
+
+        # Without org ID, wildcard in ARN should fail
+        checker = PolicyChecker({"allowed_accounts": {"123456789012"}})
+        violations = checker.check(policy)
+        self.assertEqual(len(violations), 1)
+
+    def test_multiple_wildcard_conditions_with_org_id(self):
+        """Test multiple wildcard principal conditions with org ID."""
+        policy = {
+            "Version": "2012-10-17",
+            "Statement": [{
+                "Effect": "Allow",
+                "Principal": "*",
+                "Action": "s3:GetObject",
+                "Resource": "*",
+                "Condition": {
+                    "StringEquals": {"aws:PrincipalOrgID": "o-allowed"},
+                    "ArnLike": {
+                        "aws:PrincipalArn": "arn:aws:iam::*:role/*",
+                        "aws:SourceArn": "arn:aws:s3:::*"
+                    }
+                }
+            }]
+        }
+
+        # All wildcards should be allowed with org ID
+        checker = PolicyChecker({"allowed_orgid": {"o-allowed"}})
+        violations = checker.check(policy)
+        self.assertEqual(len(violations), 0)
+
+    def test_unknown_condition_handler_conservative(self):
+        """Test that unknown condition handlers are treated conservatively."""
+        policy = {
+            "Version": "2012-10-17",
+            "Statement": [{
+                "Effect": "Allow",
+                "Principal": "*",
+                "Action": "s3:GetObject",
+                "Resource": "*",
+                "Condition": {
+                    "StringEquals": {
+                        "aws:UnknownConditionKey": "some-value"
+                    }
+                }
+            }]
+        }
+
+        # Unknown condition should cause statement to be flagged as violation
+        checker = PolicyChecker({"allowed_accounts": {"123456789012"}})
+        violations = checker.check(policy)
+        self.assertEqual(len(violations), 1)
+
+    def test_unknown_condition_with_org_id(self):
+        """Test that unknown conditions prevent org ID special case."""
+        policy = {
+            "Version": "2012-10-17",
+            "Statement": [{
+                "Effect": "Allow",
+                "Principal": "*",
+                "Action": "s3:GetObject",
+                "Resource": "*",
+                "Condition": {
+                    "StringEquals": {
+                        "aws:PrincipalOrgID": "o-allowed",
+                        "aws:UnknownConditionKey": "some-value"
+                    },
+                    "ArnLike": {
+                        "aws:PrincipalArn": "arn:aws:iam::*:role/*"
+                    }
+                }
+            }]
+        }
+
+        # Even with org ID, unknown condition should cause conservative rejection
+        checker = PolicyChecker({"allowed_orgid": {"o-allowed"}})
+        violations = checker.check(policy)
+        self.assertEqual(len(violations), 1)
+
 
 class SetRolePolicyAction(BaseTest):
     def test_set_policy_attached(self):
