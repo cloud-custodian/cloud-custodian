@@ -1,0 +1,35 @@
+{
+  "headers": {
+    "content-type": "application/json; charset=UTF-8",
+    "vary": "Origin, X-Origin, Referer",
+    "date": "Wed, 23 Nov 2025 10:30:00 GMT",
+    "server": "ESF",
+    "cache-control": "private",
+    "x-xss-protection": "0",
+    "x-frame-options": "SAMEORIGIN",
+    "x-content-type-options": "nosniff",
+    "transfer-encoding": "chunked",
+    "status": "200",
+    "content-length": "850",
+    "-content-encoding": "gzip",
+    "content-location": "https://monitoring.googleapis.com/v3/projects/cloud-custodian/notificationChannels?alt=json"
+  },
+  "body": {
+    "notificationChannels": [
+      {
+        "name": "projects/cloud-custodian/notificationChannels/1234567890",
+        "type": "email",
+        "displayName": "Test Email Channel",
+        "description": "Test email notification channel for Cloud Custodian",
+        "labels": {
+          "email_address": "test@example.com"
+        },
+        "userLabels": {
+          "environment": "test",
+          "team": "cloud-custodian"
+        },
+        "enabled": true
+      }
+    ]
+  }
+}
