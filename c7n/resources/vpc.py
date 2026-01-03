@@ -3463,9 +3463,25 @@ class CrossAZRouteTable(Filter):
             s['SubnetId']: s for s in
             self.manager.get_resource_manager('aws.subnet').resources()
         }
+        # Filter out Regional NAT Gateways which don't have SubnetId field
+        # Regional NAT Gateways span multiple AZs and cannot be evaluated for cross-AZ traffic
+        all_nat_gateways = self.manager.get_resource_manager('nat-gateway').resources()
+        zonal_nat_gateways = [n for n in all_nat_gateways if 'SubnetId' in n]
+        regional_nat_gateways = [n for n in all_nat_gateways if 'SubnetId' not in n]
+        if regional_nat_gateways:
+            nat_ids = [n['NatGatewayId'] for n in regional_nat_gateways]
+            nat_ids_display = ', '.join(nat_ids[:5])
+            if len(nat_ids) > 5:
+                nat_ids_display += f' (and {len(nat_ids) - 5} more)'
+            self.log.warning(
+                "%s excluding %d Regional NAT Gateway(s) without SubnetId "
+                "(cannot evaluate cross-AZ traffic for regional NAT gateways): %s",
+                self.type,
+                len(regional_nat_gateways),
+                nat_ids_display)
         nat_subnets = {
             nat_gateway['NatGatewayId']: nat_gateway["SubnetId"]
-            for nat_gateway in self.manager.get_resource_manager('nat-gateway').resources()}
+            for nat_gateway in zonal_nat_gateways}
 
         results = []
         self.annotate_subnets_table(resources, subnets)
