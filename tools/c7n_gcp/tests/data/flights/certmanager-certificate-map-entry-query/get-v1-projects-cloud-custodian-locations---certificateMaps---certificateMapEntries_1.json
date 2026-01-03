@@ -1,0 +1,81 @@
+{
+  "headers": {
+    "etag": "cK3Fy7Kvgyw6OmDl8pGfhZWwORu=/X2PZS0Qs-l6wVasScosiFgpu0fi=",
+    "content-type": "application/json; charset=UTF-8",
+    "vary": "Origin, X-Origin, Referer",
+    "date": "Thu, 01 Apr 2021 18:36:49 GMT",
+    "server": "ESF",
+    "cache-control": "private",
+    "x-xss-protection": "0",
+    "x-frame-options": "SAMEORIGIN",
+    "x-content-type-options": "nosniff",
+    "alt-svc": "h3-29=\":443\"; ma=2592000,h3-T051=\":443\"; ma=2592000,h3-Q050=\":443\"; ma=2592000,h3-Q046=\":443\"; ma=2592000,h3-Q043=\":443\"; ma=2592000,quic=\":443\"; ma=2592000; v=\"46,43\"",
+    "transfer-encoding": "chunked",
+    "status": "200",
+    "content-length": "2148",
+    "-content-encoding": "gzip",
+    "content-location": "https://certificatemanager.googleapis.com/v1/projects/cloud-custodian/locations/-/certificateMaps/-/certificateMapEntries?alt=json"
+  },
+  "body": {
+    "certificateMapEntries": [
+      {
+        "name": "projects/cloud-custodian/locations/global/certificateMaps/test-map-1/certificateMapEntries/entry-1",
+        "description": "Primary entry for test map 1",
+        "createTime": "2023-01-15T10:30:00.000Z",
+        "updateTime": "2023-01-15T10:30:00.000Z",
+        "labels": {
+          "environment": "test",
+          "team": "cloud-custodian"
+        },
+        "matcher": "PRIMARY",
+        "certificates": [
+          "projects/cloud-custodian/locations/global/certificates/test-certificate-1"
+        ],
+        "state": "ACTIVE"
+      },
+      {
+        "name": "projects/cloud-custodian/locations/global/certificateMaps/test-map-1/certificateMapEntries/entry-2",
+        "description": "Hostname entry for example.com",
+        "createTime": "2023-01-15T11:00:00.000Z",
+        "updateTime": "2023-01-15T11:00:00.000Z",
+        "labels": {
+          "environment": "test",
+          "team": "cloud-custodian",
+          "domain": "example-com"
+        },
+        "hostname": "example.com",
+        "certificates": [
+          "projects/cloud-custodian/locations/global/certificates/test-certificate-1"
+        ],
+        "state": "ACTIVE"
+      },
+      {
+        "name": "projects/cloud-custodian/locations/global/certificateMaps/test-map-2/certificateMapEntries/wildcard-entry",
+        "description": "Wildcard entry for *.example.org",
+        "createTime": "2023-01-16T12:00:00.000Z",
+        "updateTime": "2023-01-16T12:00:00.000Z",
+        "labels": {
+          "environment": "prod",
+          "team": "platform"
+        },
+        "hostname": "*.example.org",
+        "certificates": [
+          "projects/cloud-custodian/locations/global/certificates/test-certificate-2",
+          "projects/cloud-custodian/locations/global/certificates/test-certificate-3"
+        ],
+        "state": "ACTIVE"
+      },
+      {
+        "name": "projects/cloud-custodian/locations/global/certificateMaps/test-map-3/certificateMapEntries/pending-entry",
+        "description": "Entry in pending state",
+        "createTime": "2023-01-17T13:00:00.000Z",
+        "updateTime": "2023-01-17T13:00:00.000Z",
+        "hostname": "pending.example.net",
+        "certificates": [
+          "projects/cloud-custodian/locations/global/certificates/test-certificate-4"
+        ],
+        "state": "PENDING"
+      }
+    ]
+  }
+}

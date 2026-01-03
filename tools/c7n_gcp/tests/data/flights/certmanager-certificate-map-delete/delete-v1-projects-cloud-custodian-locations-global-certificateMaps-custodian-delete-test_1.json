@@ -1,0 +1,10 @@
+{
+  "headers": {
+    "content-type": "application/json; charset=UTF-8",
+    "status": "200"
+  },
+  "body": {
+    "name": "projects/cloud-custodian/locations/global/operations/operation-1234567890",
+    "done": true
+  }
+}
