@@ -1,7 +1,7 @@
 # Copyright The Cloud Custodian Authors.
 # SPDX-License-Identifier: Apache-2.0
 from .azure_common import BaseTest
-from mock import patch, Mock
+from unittest.mock import patch, Mock
 
 from c7n_azure.tags import TagHelper
 from . import tools_tags as tools
