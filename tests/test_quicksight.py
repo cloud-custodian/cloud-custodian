@@ -7,7 +7,6 @@ from tests.zpill import ACCOUNT_ID
 
 from .common import BaseTest
 from c7n.utils import local_session
-from botocore.exceptions import ClientError
 
 
 @terraform("quicksight_group")
