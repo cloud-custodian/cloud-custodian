@@ -2,11 +2,12 @@
 # SPDX-License-Identifier: Apache-2.0
 
 from pytest_terraform import terraform
-from c7n.exceptions import ClientError
+
 from tests.zpill import ACCOUNT_ID
 
 from .common import BaseTest
 from c7n.utils import local_session
+from botocore.exceptions import ClientError
 
 
 @terraform("quicksight_group")
