@@ -7,6 +7,7 @@ from tests.zpill import ACCOUNT_ID
 
 from .common import BaseTest
 from c7n.utils import local_session
+from botocore.exceptions import ClientError
 
 
 @terraform("quicksight_group")
@@ -61,6 +62,40 @@ def test_quicksight_datasource(test, quicksight_datasource):
     arn = resources[0]['Arn']
     tags = client.list_tags_for_resource(ResourceArn=arn)["Tags"]
     test.assertEqual(tags, resources[0]['Tags'])
+
+
+@terraform("quicksight_dashboard")
+def test_quicksight_dashboard_resource_not_found(test, quicksight_dashboard):
+    """Test that ResourceNotFoundException during tag fetch is handled gracefully."""
+
+    session_factory = test.replay_flight_data("test_quicksight_dashboard")
+
+    policy = test.load_policy({
+        "name": "test-aws-quicksight-dashboard-not-found",
+        'resource': 'aws.quicksight-dashboard',
+        'source': 'describe',
+    }, session_factory=session_factory, config={'account_id': ACCOUNT_ID})
+
+    # Mock the list_tags_for_resource to raise ResourceNotFoundException
+    original_client = session_factory().client
+
+    def mock_client(service_name, *args, **kwargs):
+        client = original_client(service_name, *args, **kwargs)
+        if service_name == 'quicksight':
+
+            def mock_list_tags(*args, **kwargs):
+                error_response = {'Error': {'Code': 'ResourceNotFoundException'}}
+                raise ClientError(error_response, 'ListTagsForResource')
+
+            client.list_tags_for_resource = mock_list_tags
+        return client
+
+    session_factory().client = mock_client
+
+    resources = policy.run()
+    # Should not crash and should set Tags to empty list
+    test.assertGreater(len(resources), 0)
+    test.assertEqual(resources[0]['Tags'], [])
 
 
 class TestQuicksight(BaseTest):

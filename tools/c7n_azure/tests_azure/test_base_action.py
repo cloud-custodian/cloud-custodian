@@ -3,7 +3,7 @@
 from .azure_common import BaseTest
 from c7n_azure.actions.base import AzureBaseAction, AzureEventAction
 from c7n_azure.session import Session
-from mock import patch, MagicMock, ANY, call
+from unittest.mock import patch, MagicMock, ANY, call
 
 from c7n.utils import local_session
 

@@ -1136,6 +1136,101 @@ def test_cli_dump(policy_env, test, debug_cli_runner):
     }
 
 
+def test_cli_dump_bad_tf_silent(policy_env, test, debug_cli_runner):
+    (policy_env.policy_dir / "vars.tfvars").write_text('app = "riddle"')
+    (policy_env.policy_dir / "vars2.tfvars").write_text('env = "dev"')
+    test.change_environment(TF_VAR_REPO="cloud-custodian/cloud-custodian")
+
+    policy_env.write_tf(
+        """
+        # A wild Error appeared!
+        vriable "app" {
+          type = string
+        }
+        variable "env" {
+          type = string
+        }
+        variable "owner" {
+          type = string
+          default = "engineering"
+        }
+        resource "aws_cloudwatch_log_group" "yada" {
+          name = "${var.app}-${var.env}-logs"
+          tags = {
+            Owner = var.owner
+          }
+        }
+        """
+    )
+    runner = CliRunner()
+    result = runner.invoke(
+        cli.cli,
+        [
+            "dump",
+            "-d",
+            str(policy_env.policy_dir),
+            "--var-file",
+            policy_env.policy_dir / "vars.tfvars",
+            "--output-query",
+            "input_vars",
+            # "--var-file",
+            # policy_env.policy_dir / "vars2.tfvars",
+            "--output-file",
+            str(policy_env.policy_dir / "output.json"),
+        ],
+    )
+    # Ensure the existing "quietly pass on HCL errors" behavior is the default.
+    assert result.exit_code == 0
+
+
+def test_cli_dump_bad_tf_error(policy_env, test, debug_cli_runner):
+    (policy_env.policy_dir / "vars.tfvars").write_text('app = "riddle"')
+    (policy_env.policy_dir / "vars2.tfvars").write_text('env = "dev"')
+    test.change_environment(TF_VAR_REPO="cloud-custodian/cloud-custodian")
+
+    policy_env.write_tf(
+        """
+        # A wild Error appeared!
+        vriable "app" {
+          type = string
+        }
+        variable "env" {
+          type = string
+        }
+        variable "owner" {
+          type = string
+          default = "engineering"
+        }
+        resource "aws_cloudwatch_log_group" "yada" {
+          name = "${var.app}-${var.env}-logs"
+          tags = {
+            Owner = var.owner
+          }
+        }
+        """
+    )
+    runner = CliRunner()
+    result = runner.invoke(
+        cli.cli,
+        [
+            "dump",
+            "-d",
+            str(policy_env.policy_dir),
+            "--var-file",
+            policy_env.policy_dir / "vars.tfvars",
+            "--output-query",
+            "input_vars",
+            # "--var-file",
+            # policy_env.policy_dir / "vars2.tfvars",
+            "--output-file",
+            str(policy_env.policy_dir / "output.json"),
+            "--err-invalid",
+        ],
+    )
+    # We now strictly check for TF errors, & bomb out if they're present.
+    assert result.exit_code == 1
+
+
 def test_cli_var_file(tmp_path, var_tf_setup, debug_cli_runner):
     (tmp_path / "tf" / "vars.tfvars").write_text('balancer_type = "network"')
     (tmp_path / "policy.json").write_text(
