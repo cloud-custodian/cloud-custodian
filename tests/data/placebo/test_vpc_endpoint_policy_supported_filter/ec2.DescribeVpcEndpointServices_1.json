@@ -165,7 +165,6 @@
             "com.amazonaws.us-east-1.devops-guru",
             "com.amazonaws.us-east-1.devops-guru-fips",
             "com.amazonaws.us-east-1.dicom-medical-imaging",
-            "com.amazonaws.us-east-1.dilithium",
             "com.amazonaws.us-east-1.diode",
             "com.amazonaws.us-east-1.diode-fips",
             "com.amazonaws.us-east-1.directconnect",
@@ -520,6 +519,7 @@
             "com.amazonaws.us-east-1.transfer-fips",
             "com.amazonaws.us-east-1.transfer.server",
             "com.amazonaws.us-east-1.transform",
+            "com.amazonaws.us-east-1.transform-custom",
             "com.amazonaws.us-east-1.translate",
             "com.amazonaws.us-east-1.trustedadvisor",
             "com.amazonaws.us-east-1.uxc",
@@ -7766,8 +7766,8 @@
                 "Tags": [],
                 "PrivateDnsNameVerificationState": "verified",
                 "SupportedIpAddressTypes": [
-                    "ipv6",
-                    "ipv4"
+                    "ipv4",
+                    "ipv6"
                 ]
             },
             {
@@ -7814,8 +7814,8 @@
                 "Tags": [],
                 "PrivateDnsNameVerificationState": "verified",
                 "SupportedIpAddressTypes": [
-                    "ipv6",
-                    "ipv4"
+                    "ipv4",
+                    "ipv6"
                 ]
             },
             {
@@ -8086,54 +8086,6 @@
                 "SupportedIpAddressTypes": [
                     "ipv6",
                     "ipv4"
-                ]
-            },
-            {
-                "ServiceName": "com.amazonaws.us-east-1.dilithium",
-                "ServiceId": "vpce-svc-0fdeca9cdc627dad7",
-                "ServiceType": [
-                    {
-                        "ServiceType": "Interface"
-                    }
-                ],
-                "ServiceRegion": "us-east-1",
-                "AvailabilityZoneIds": [
-                    "use1-az4",
-                    "use1-az6",
-                    "use1-az1",
-                    "use1-az2",
-                    "use1-az3",
-                    "use1-az5"
-                ],
-                "AvailabilityZones": [
-                    "us-east-1a",
-                    "us-east-1b",
-                    "us-east-1c",
-                    "us-east-1d",
-                    "us-east-1e",
-                    "us-east-1f"
-                ],
-                "Owner": "amazon",
-                "BaseEndpointDnsNames": [
-                    "dilithium.us-east-1.vpce.amazonaws.com"
-                ],
-                "PrivateDnsName": "dilithium.us-east-1.amazonaws.com",
-                "PrivateDnsNames": [
-                    {
-                        "PrivateDnsName": "dilithium.us-east-1.amazonaws.com"
-                    },
-                    {
-                        "PrivateDnsName": "dilithium.us-east-1.api.aws"
-                    }
-                ],
-                "VpcEndpointPolicySupported": true,
-                "AcceptanceRequired": true,
-                "ManagesVpcEndpoints": false,
-                "Tags": [],
-                "PrivateDnsNameVerificationState": "verified",
-                "SupportedIpAddressTypes": [
-                    "ipv4",
-                    "ipv6"
                 ]
             },
             {
@@ -9950,8 +9902,8 @@
                 "Tags": [],
                 "PrivateDnsNameVerificationState": "verified",
                 "SupportedIpAddressTypes": [
-                    "ipv6",
-                    "ipv4"
+                    "ipv4",
+                    "ipv6"
                 ]
             },
             {
@@ -13435,8 +13387,8 @@
                 "Tags": [],
                 "PrivateDnsNameVerificationState": "verified",
                 "SupportedIpAddressTypes": [
-                    "ipv4",
-                    "ipv6"
+                    "ipv6",
+                    "ipv4"
                 ]
             },
             {
@@ -18349,8 +18301,8 @@
                 "Tags": [],
                 "PrivateDnsNameVerificationState": "verified",
                 "SupportedIpAddressTypes": [
-                    "ipv6",
-                    "ipv4"
+                    "ipv4",
+                    "ipv6"
                 ]
             },
             {
@@ -18771,8 +18723,8 @@
                 "Tags": [],
                 "PrivateDnsNameVerificationState": "verified",
                 "SupportedIpAddressTypes": [
-                    "ipv4",
-                    "ipv6"
+                    "ipv6",
+                    "ipv4"
                 ]
             },
             {
@@ -24352,6 +24304,51 @@
                 ]
             },
             {
+                "ServiceName": "com.amazonaws.us-east-1.transform-custom",
+                "ServiceId": "vpce-svc-00f5463b993c1435a",
+                "ServiceType": [
+                    {
+                        "ServiceType": "Interface"
+                    }
+                ],
+                "ServiceRegion": "us-east-1",
+                "AvailabilityZoneIds": [
+                    "use1-az4",
+                    "use1-az6",
+                    "use1-az1",
+                    "use1-az2",
+                    "use1-az3",
+                    "use1-az5"
+                ],
+                "AvailabilityZones": [
+                    "us-east-1a",
+                    "us-east-1b",
+                    "us-east-1c",
+                    "us-east-1d",
+                    "us-east-1e",
+                    "us-east-1f"
+                ],
+                "Owner": "amazon",
+                "BaseEndpointDnsNames": [
+                    "transform-custom.us-east-1.vpce.amazonaws.com"
+                ],
+                "PrivateDnsName": "transform-custom.us-east-1.api.aws",
+                "PrivateDnsNames": [
+                    {
+                        "PrivateDnsName": "transform-custom.us-east-1.api.aws"
+                    }
+                ],
+                "VpcEndpointPolicySupported": true,
+                "AcceptanceRequired": false,
+                "ManagesVpcEndpoints": false,
+                "Tags": [],
+                "PrivateDnsNameVerificationState": "verified",
+                "SupportedIpAddressTypes": [
+                    "ipv4",
+                    "ipv6"
+                ]
+            },
+            {
                 "ServiceName": "com.amazonaws.us-east-1.translate",
                 "ServiceId": "vpce-svc-031fd19d12dac26a5",
                 "ServiceType": [
@@ -24850,8 +24847,8 @@
                 "Tags": [],
                 "PrivateDnsNameVerificationState": "verified",
                 "SupportedIpAddressTypes": [
-                    "ipv6",
-                    "ipv4"
+                    "ipv4",
+                    "ipv6"
                 ]
             },
             {
