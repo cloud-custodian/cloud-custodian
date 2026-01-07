@@ -3,9 +3,51 @@
     "data": {
         "VpcEndpoints": [
             {
-                "VpcEndpointId": "vpce-0098f5577ef28f421",
+                "VpcEndpointId": "vpce-073a66d9be9394c68",
+                "VpcEndpointType": "Interface",
+                "VpcId": "vpc-069fa94b77662651d",
+                "ServiceName": "com.amazonaws.us-east-1.apprunner.requests",
+                "State": "available",
+                "PolicyDocument": "{\n  \"Statement\": [\n    {\n      \"Action\": \"*\",\n      \"Effect\": \"Allow\",\n      \"Principal\": \"*\",\n      \"Resource\": \"*\"\n    }\n  ]\n}",
+                "RouteTableIds": [],
+                "SubnetIds": [],
+                "Groups": [
+                    {
+                        "GroupId": "sg-0fc942d3835404a00",
+                        "GroupName": "default"
+                    }
+                ],
+                "IpAddressType": "ipv4",
+                "DnsOptions": {
+                    "DnsRecordIpType": "ipv4"
+                },
+                "PrivateDnsEnabled": false,
+                "RequesterManaged": false,
+                "NetworkInterfaceIds": [],
+                "DnsEntries": [],
+                "CreationTimestamp": {
+                    "__class__": "datetime",
+                    "year": 2026,
+                    "month": 1,
+                    "day": 7,
+                    "hour": 14,
+                    "minute": 56,
+                    "second": 38,
+                    "microsecond": 438000
+                },
+                "Tags": [
+                    {
+                        "Key": "Name",
+                        "Value": "custodian-test-apprunner-requests-endpoint"
+                    }
+                ],
+                "OwnerId": "644160558196",
+                "ServiceRegion": "us-east-1"
+            },
+            {
+                "VpcEndpointId": "vpce-07720462d13091c80",
                 "VpcEndpointType": "Gateway",
-                "VpcId": "vpc-05455cc3665e647f3",
+                "VpcId": "vpc-069fa94b77662651d",
                 "ServiceName": "com.amazonaws.us-east-1.s3",
                 "State": "available",
                 "PolicyDocument": "{\"Version\":\"2008-10-17\",\"Statement\":[{\"Effect\":\"Allow\",\"Principal\":\"*\",\"Action\":\"*\",\"Resource\":\"*\"}]}",
@@ -26,56 +68,14 @@
                     "month": 1,
                     "day": 7,
                     "hour": 14,
-                    "minute": 26,
-                    "second": 39,
+                    "minute": 57,
+                    "second": 6,
                     "microsecond": 0
                 },
                 "Tags": [
                     {
                         "Key": "Name",
-                        "Value": "custodian-tests-s3-endpoint"
-                    }
-                ],
-                "OwnerId": "644160558196",
-                "ServiceRegion": "us-east-1"
-            },
-            {
-                "VpcEndpointId": "vpce-064d03d74b816676a",
-                "VpcEndpointType": "Interface",
-                "VpcId": "vpc-05455cc3665e647f3",
-                "ServiceName": "com.amazonaws.us-east-1.apprunner.requests",
-                "State": "available",
-                "PolicyDocument": "{\n  \"Statement\": [\n    {\n      \"Action\": \"*\",\n      \"Effect\": \"Allow\",\n      \"Principal\": \"*\",\n      \"Resource\": \"*\"\n    }\n  ]\n}",
-                "RouteTableIds": [],
-                "SubnetIds": [],
-                "Groups": [
-                    {
-                        "GroupId": "sg-02d4ad64a2fceaf3d",
-                        "GroupName": "default"
-                    }
-                ],
-                "IpAddressType": "ipv4",
-                "DnsOptions": {
-                    "DnsRecordIpType": "ipv4"
-                },
-                "PrivateDnsEnabled": false,
-                "RequesterManaged": false,
-                "NetworkInterfaceIds": [],
-                "DnsEntries": [],
-                "CreationTimestamp": {
-                    "__class__": "datetime",
-                    "year": 2026,
-                    "month": 1,
-                    "day": 7,
-                    "hour": 14,
-                    "minute": 27,
-                    "second": 45,
-                    "microsecond": 885000
-                },
-                "Tags": [
-                    {
-                        "Key": "Name",
-                        "Value": "custodian-tests-apprunner-requests-endpoint"
+                        "Value": "custodian-test-vpc-endpoint"
                     }
                 ],
                 "OwnerId": "644160558196",

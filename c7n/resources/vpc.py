@@ -2911,13 +2911,14 @@ class EndpointPolicySupportedFilter(Filter):
 
     def process(self, resources, event=None):
         client = local_session(self.manager.session_factory).client("ec2")
-        service_map = self._get_service_map(client)
         match_value = self.data.get("value", True)
+        service_names = sorted({r["ServiceName"] for r in resources})
+
+        service_map = self._describe_services(client, service_names)
 
         results = []
         for resource in resources:
-            service_name = resource.get("ServiceName")
-            service_detail = service_map.get(service_name, {})
+            service_detail = service_map.get(resource["ServiceName"], {})
             supported = service_detail.get("VpcEndpointPolicySupported", False)
             resource["VpcEndpointPolicySupported"] = supported
 
@@ -2925,17 +2926,13 @@ class EndpointPolicySupportedFilter(Filter):
                 results.append(resource)
         return results
 
-    def _get_service_map(self, client):
+    def _describe_services(self, client, service_names):
         if getattr(self, "_service_map", None) is not None:
             return self._service_map
 
-        svc_map = {}
-        paginator = client.get_paginator("describe_vpc_endpoint_services")
-        for page in paginator.paginate():
-            for d in page.get("ServiceDetails", []):
-                name = d.get("ServiceName")
-                if name:
-                    svc_map[name] = d
+        resp = client.describe_vpc_endpoint_services(ServiceNames=service_names)
+        svc_map = {d["ServiceName"]: d for d in resp.get("ServiceDetails", [])}
+
         self._service_map = svc_map
         return svc_map
 
