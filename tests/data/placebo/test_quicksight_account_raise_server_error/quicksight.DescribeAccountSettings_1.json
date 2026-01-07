@@ -1,0 +1,11 @@
+{
+    "status_code": 500,
+    "data": {
+        "Error": {
+            "Message": "There was an internal error from the service.",
+            "Code": "InternalServiceError"
+        },
+        "ResponseMetadata": {},
+        "Message": "There was an internal error from the service."
+    }
+}
