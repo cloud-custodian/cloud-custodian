@@ -252,6 +252,10 @@ class PolicyMetaLint(BaseTest):
         for rtype in resource_cfn_types:
             if rtype not in cfn_types:
                 missing.add(rtype)
+
+        # Service no longer available but still present in c7n for policy compatibility
+        missing.remove("AWS::OpsWorksCM::Server")
+
         if missing:
             raise AssertionError("Bad cfn types:\n %s" % (
                 "\n".join(sorted(missing))))
