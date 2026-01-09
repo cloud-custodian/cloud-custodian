@@ -336,6 +336,7 @@ def _setup_logger(options):
     logging.getLogger('urllib3').setLevel(external_log_level)
     logging.getLogger('s3transfer').setLevel(external_log_level)
     logging.getLogger('urllib3').setLevel(logging.ERROR)
+    logging.getLogger('snowflake').setLevel(logging.ERROR)
 
 
 def main(args=None):
