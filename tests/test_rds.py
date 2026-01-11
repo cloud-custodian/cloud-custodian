@@ -567,6 +567,14 @@ class RDSTest(BaseTest):
         }
         self.assertFalse(rds._eligible_start_stop(resource))
 
+        resource = {
+            "DBInstanceIdentifier": "ABC",
+            "DBInstanceStatus": "available",
+            "Engine": "mysql",
+            "DBClusterIdentifier": "my-aurora-cluster",
+        }
+        self.assertFalse(rds._eligible_start_stop(resource))
+
     def test_rds_db_instance_eligible_for_backup(self):
         resource = {"DBInstanceIdentifier": "ABC"}
         self.assertFalse(rds._db_instance_eligible_for_backup(resource))
