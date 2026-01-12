@@ -2160,6 +2160,49 @@ def test_cross_az_nat_gateway_subnet_resolve(test):
     }
 
 
+def test_cross_az_nat_gateway_regional_nat(test, caplog):
+    """Test that Regional NAT Gateways without SubnetId are handled gracefully and logged."""
+    from c7n.resources.vpc import CrossAZRouteTable
+    from unittest.mock import MagicMock
+
+    # Mock NAT gateways including a Regional NAT Gateway without SubnetId
+    mock_nat_gateways = [
+        {'NatGatewayId': 'nat-zonal-123', 'SubnetId': 'subnet-123'},
+        {'NatGatewayId': 'nat-regional-456'},  # Regional NAT Gateway without SubnetId
+    ]
+
+    # Create a mock filter instance
+    mock_manager = MagicMock()
+    mock_nat_manager = MagicMock()
+    mock_nat_manager.resources.return_value = mock_nat_gateways
+    mock_subnet_manager = MagicMock()
+    mock_subnet_manager.resources.return_value = [
+        {'SubnetId': 'subnet-123', 'AvailabilityZone': 'us-east-1a'}
+    ]
+
+    def get_resource_manager(resource_type):
+        if resource_type == 'nat-gateway':
+            return mock_nat_manager
+        elif resource_type == 'aws.subnet':
+            return mock_subnet_manager
+        return MagicMock()
+
+    mock_manager.get_resource_manager = get_resource_manager
+
+    filter_instance = CrossAZRouteTable({'type': 'cross-az-nat-gateway-route'}, mock_manager)
+
+    # Process with empty route tables - we just want to verify logging
+    with caplog.at_level(logging.WARNING):
+        filter_instance.process([])
+
+    # Verify warning was logged about Regional NAT Gateway exclusion
+    assert any(
+        'excluding 1 Regional NAT Gateway(s) without SubnetId' in record.message
+        and 'nat-regional-456' in record.message
+        for record in caplog.records
+    )
+
+
 class PeeringConnectionTest(BaseTest):
 
     def test_peer_cross_account(self):
