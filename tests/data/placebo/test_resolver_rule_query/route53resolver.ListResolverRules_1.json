@@ -1,0 +1,52 @@
+{
+  "status_code": 200,
+  "data": {
+    "ResponseMetadata": {},
+    "NextToken": "",
+    "MaxResults": 10,
+    "ResolverRules": [
+      {
+        "Id": "rslvr-rr-5328a0899aexample",
+        "CreatorRequestId": "999",
+        "Arn": "arn:aws:route53resolver:us-east-2:123456789012:resolver-rule/rslvr-rr-5328a0899aexample",
+        "DomainName": "example.com",
+        "Status": "COMPLETE",
+        "StatusMessage": "Successfully created Resolver Rule.",
+        "RuleType": "FORWARD",
+        "Name": "a-test",
+        "TargetIps": [
+          {
+            "Ip": "192.168.0.3",
+            "Port": 80
+          }
+        ],
+        "ResolverEndpointId": "rslvr-out-fdc049932dexample",
+        "OwnerId": "123456789012",
+        "ShareStatus": "NOT_SHARED",
+        "CreationTime": "1762795423",
+        "ModificationTime": "1762795423"
+      },
+      {
+        "Id": "rslvr-rr-5328a0900aexample",
+        "CreatorRequestId": "999",
+        "Arn": "arn:aws:route53resolver:us-east-2:123456789012:resolver-rule/rslvr-rr-5328a0900aexample",
+        "DomainName": "example.com",
+        "Status": "UPDATING",
+        "StatusMessage": "Successfully created Resolver Rule.",
+        "RuleType": "SYSTEM",
+        "Name": "another-test",
+        "TargetIps": [
+          {
+            "Ip": "192.168.0.4",
+            "Port": 8080
+          }
+        ],
+        "ResolverEndpointId": "rslvr-out-fdc049932dexample",
+        "OwnerId": "123456789012",
+        "ShareStatus": "SHARED_BY_ME",
+        "CreationTime": "1762795423",
+        "ModificationTime": "1762795423"
+      }
+    ]
+  }
+}

@@ -8,7 +8,7 @@ from c7n_azure.resources.key_vault import (KeyVaultUpdateAccessPolicyAction, Whi
                                            KeyVaultFirewallBypassFilter)
 from c7n_azure.session import Session
 from c7n_azure.utils import GraphHelper
-from mock import patch, Mock
+from unittest.mock import patch, Mock
 from azure.core.exceptions import HttpResponseError
 from netaddr import IPSet
 from parameterized import parameterized

@@ -290,10 +290,8 @@ class DirectoryTests(BaseTest):
 class CloudDirectoryQueryParse(BaseTest):
 
     def test_query(self):
-        query_filters = [
-            {'Name': 'tag:Name', 'Values': ['Test']},
-            {'Name': 'state', 'Values': ['DISABLED']}]
-        self.assertEqual(query_filters, CloudDirectoryQueryParser.parse(query_filters))
+        query = [{'state': 'ENABLED'}, {'MaxResults': 10}]
+        self.assertEqual(query, CloudDirectoryQueryParser.parse(query))
 
     def test_invalid_query(self):
         self.assertRaises(
@@ -307,8 +305,16 @@ class CloudDirectoryQueryParse(BaseTest):
 
         self.assertRaises(
             PolicyValidationError, CloudDirectoryQueryParser.parse, [
-                {'name': 'state', 'Values': 'disabled'}])
+                {'Name': 'state', 'Values': 'disabled'}])
 
         self.assertRaises(
             PolicyValidationError, CloudDirectoryQueryParser.parse, [
                 {'name': 'state', 'Values': ['disabled']}])
+
+        self.assertRaises(
+            PolicyValidationError, CloudDirectoryQueryParser.parse, [
+                {'state', 'disabled'}])
+
+        self.assertRaises(
+            PolicyValidationError, CloudDirectoryQueryParser.parse, [
+                {'state': ['DISABLED', 'ENABLED']}])

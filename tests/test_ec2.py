@@ -12,7 +12,7 @@ from dateutil import tz
 from c7n.testing import mock_datetime_now
 from c7n.exceptions import PolicyValidationError, ClientError
 from c7n.resources import ec2
-from c7n.resources.ec2 import actions, QueryFilter
+from c7n.resources.ec2 import actions, EC2QueryParser
 from c7n import tags, utils
 
 from .common import BaseTest
@@ -1648,20 +1648,58 @@ class TestSetInstanceProfile(BaseTest):
             self.assertIn(a["State"], ("disassociating", "disassociated"))
 
 
-class TestEC2QueryFilter(unittest.TestCase):
+class TestEC2QueryParser(unittest.TestCase):
 
-    def test_parse(self):
-        self.assertEqual(QueryFilter.parse([]), [])
-        x = QueryFilter.parse([{"instance-state-name": "running"}])
+    def test_query(self):
+        self.assertEqual(EC2QueryParser.parse([]), [])
+        x = EC2QueryParser.parse([{"instance-state-name": "running"}])
         self.assertEqual(
-            x[0].query(), {"Name": "instance-state-name", "Values": ["running"]}
+            x[0]['Filters'][0], {"Name": "instance-state-name", "Values": ["running"]}
         )
+        query = [
+            {'Filters':
+                    [
+                        {'Name': 'tag:Name', 'Values': ['Instance1']},
+                        {'Name': 'instance-state-name', 'Values': ['running']}
+                    ]
+            },
+            {'InstanceIds': ['i-123abc', 'i-abc123']},
+            {'MaxResults': 1000},
+        ]
 
-        self.assertTrue(
-            isinstance(QueryFilter.parse([{"tag:ASV": "REALTIMEMSG"}])[0], QueryFilter)
-        )
+        self.assertEqual(EC2QueryParser.parse(query), query)
 
-        self.assertRaises(PolicyValidationError, QueryFilter.parse, [{"tag:ASV": None}])
+        self.assertEqual(
+            EC2QueryParser.parse([{"tag:ASV": "REALTIMEMSG"}]), [
+                {"Filters": [{"Name": "tag:ASV", "Values": ["REALTIMEMSG"]}]}])
+
+        self.assertEqual(
+            EC2QueryParser.parse([{"tag:Test": "Value1"}, {"tag:Test": "Value2"}]),
+                [{"Filters": [{"Name": "tag:Test", "Values": ["Value1", "Value2"]}]}])
+
+    def test_invalid_query(self):
+        self.assertRaises(PolicyValidationError, EC2QueryParser.parse, [{"tag:ASV": None}])
+
+        self.assertRaises(
+            PolicyValidationError, EC2QueryParser.parse, [
+                {'Filters': [{'instance-state-name': 'running'}]}])
+
+        self.assertRaises(PolicyValidationError, EC2QueryParser.parse, [{'InstanceIds': None}])
+
+        self.assertRaises(PolicyValidationError, EC2QueryParser.parse, [{'InstanceIds': [1]}])
+
+        self.assertRaises(PolicyValidationError, EC2QueryParser.parse,
+                          [{'Filters': [{'Name': 'architecture', 'Values': ['gothic']}]}])
+
+        self.assertRaises(PolicyValidationError, EC2QueryParser.parse, [{"tag:ASV": None}])
+
+        self.assertRaises(PolicyValidationError, EC2QueryParser.parse,
+                          [{'Filters': [{'Name': 'instance-group-name', 'Values': [False]}]}])
+
+        self.assertRaises(PolicyValidationError, EC2QueryParser.parse, [{'MaxResults': '1000'}])
+
+        self.assertRaises(PolicyValidationError, EC2QueryParser.parse,
+                          [{'Filters': {'Name': 'instance-group-name', 'Values': ["Value1"]}}])
 
 
 class TestTerminate(BaseTest):

@@ -440,6 +440,167 @@ class VpcTest(BaseTest):
         self.assertEqual([len(resources), resources[0]["VpcId"]], [1, "vpc-7af45101"])
         self.assertTrue("c7n:DhcpConfiguration" in resources[0])
 
+    def test_dhcp_options_filter_amazon(self):
+        # Test amazon synthetic value for Amazon-provided DNS
+        session_factory = self.replay_flight_data("test_vpc_dhcp_options_amazon")
+        p = self.load_policy(
+            {
+                "name": "c7n-dhcp-options-amazon",
+                "resource": "vpc",
+                "filters": [
+                    {
+                        "type": "dhcp-options",
+                        "domain-name-servers": "amazon",
+                    }
+                ],
+            },
+            session_factory=session_factory,
+        )
+        resources = p.run()
+        self.assertEqual(len(resources), 1)
+        self.assertTrue("c7n:DhcpConfiguration" in resources[0])
+
+    def test_dhcp_options_filter_amazon_match_all(self):
+        # Test match-operator: all with amazon to ensure all DNS servers are Amazon DNS
+        session_factory = self.replay_flight_data("test_vpc_dhcp_options_amazon_all")
+        p = self.load_policy(
+            {
+                "name": "c7n-dhcp-options-amazon-all",
+                "resource": "vpc",
+                "filters": [
+                    {
+                        "type": "dhcp-options",
+                        "match-operator": "all",
+                        "domain-name-servers": "amazon",
+                    }
+                ],
+            },
+            session_factory=session_factory,
+        )
+        resources = p.run()
+        # This should match VPCs where ALL DNS servers are Amazon DNS
+        self.assertEqual(len(resources), 1)
+        for resource in resources:
+            self.assertTrue("c7n:DhcpConfiguration" in resource)
+            dns_servers = resource["c7n:DhcpConfiguration"].get(
+                "domain-name-servers", []
+            )
+            # Verify all DNS servers are Amazon-provided
+            self.assertTrue(len(dns_servers) > 0)
+            # Should have only Amazon DNS servers
+            for dns in dns_servers:
+                self.assertIn(
+                    dns,
+                    ["AmazonProvidedDNS", "169.254.169.253", "10.0.20.2"],
+                    f"DNS {dns} should be Amazon-provided"
+                )
+
+    def test_dhcp_options_filter_amazon_present_false(self):
+        # Test amazon with present: false to catch non-Amazon DNS
+        # Using test data with mixed DNS (Amazon + external)
+        session_factory = self.replay_flight_data("test_vpc_dhcp_options_mixed")
+        p = self.load_policy(
+            {
+                "name": "c7n-dhcp-options-mixed",
+                "resource": "vpc",
+                "filters": [
+                    {
+                        "type": "dhcp-options",
+                        "match-operator": "all",
+                        "present": False,
+                        "domain-name-servers": "amazon",
+                    }
+                ],
+            },
+            session_factory=session_factory,
+        )
+        resources = p.run()
+        # Should match VPCs that have at least one non-Amazon DNS
+        self.assertEqual(len(resources), 1)
+        for resource in resources:
+            self.assertTrue("c7n:DhcpConfiguration" in resource)
+            dns_servers = resource["c7n:DhcpConfiguration"].get(
+                "domain-name-servers", []
+            )
+            # Should have at least one non-Amazon DNS
+            self.assertIn("8.8.8.8", dns_servers)
+
+    def test_dhcp_options_filter_amazon_no_match_all(self):
+        # Test amazon without match-operator (defaults to 'any' - at least one must be Amazon DNS)
+        session_factory = self.replay_flight_data("test_vpc_dhcp_options_mixed")
+        p = self.load_policy(
+            {
+                "name": "c7n-dhcp-options-amazon-any",
+                "resource": "vpc",
+                "filters": [
+                    {
+                        "type": "dhcp-options",
+                        "domain-name-servers": "amazon",
+                    }
+                ],
+            },
+            session_factory=session_factory,
+        )
+        resources = p.run()
+        # Should match VPCs that have at least one Amazon DNS (even if mixed)
+        # Test data has 2 VPCs, both with at least one Amazon DNS
+        self.assertEqual(len(resources), 2)
+        for resource in resources:
+            self.assertTrue("c7n:DhcpConfiguration" in resource)
+            dns_servers = resource["c7n:DhcpConfiguration"].get(
+                "domain-name-servers", []
+            )
+            # At least one DNS server should be Amazon-provided
+            amazon_dns_found = any(
+                dns in ["AmazonProvidedDNS", "169.254.169.253", "10.0.20.2", "10.0.30.2"]
+                for dns in dns_servers
+            )
+            self.assertTrue(amazon_dns_found)
+
+    def test_dhcp_options_filter_amazon_invalid_cidr(self):
+        # Test that invalid CIDR blocks are handled gracefully
+        from c7n.resources.vpc import DhcpOptionsFilter
+
+        # Create a mock filter instance
+        filter_instance = DhcpOptionsFilter({"domain-name-servers": "amazon"}, None)
+
+        # Test with invalid CIDR - should return None
+        result = filter_instance._calculate_cidr_plus_2("invalid-cidr")
+        self.assertIsNone(result)
+
+        # Test with empty string - should return None
+        result = filter_instance._calculate_cidr_plus_2("")
+        self.assertIsNone(result)
+
+    def test_dhcp_options_filter_amazon_with_secondary_cidr(self):
+        # Test that amazon value works with secondary CIDR blocks
+        # This ensures _get_amazon_dns_servers processes all CIDR blocks
+        from c7n.resources.vpc import DhcpOptionsFilter
+
+        filter_instance = DhcpOptionsFilter({"domain-name-servers": "amazon"}, None)
+
+        # Mock VPC with primary and secondary CIDR
+        vpc = {
+            "CidrBlock": "10.0.0.0/16",
+            "CidrBlockAssociationSet": [
+                {
+                    "CidrBlock": "10.0.0.0/16",
+                    "CidrBlockState": {"State": "associated"}
+                },
+                {
+                    "CidrBlock": "10.1.0.0/16",
+                    "CidrBlockState": {"State": "associated"}
+                }
+            ]
+        }
+
+        amazon_dns = filter_instance._get_amazon_dns_servers(vpc)
+        # Should have AmazonProvidedDNS, 169.254.169.253, and both CIDR base+2
+        self.assertIn("AmazonProvidedDNS", amazon_dns)
+        self.assertIn("169.254.169.253", amazon_dns)
+        self.assertIn("10.0.0.2", amazon_dns)
+        self.assertIn("10.1.0.2", amazon_dns)
+
     def test_vpc_endpoint_filter(self):
         factory = self.replay_flight_data("test_vpc_endpoint_filter")
         p = self.load_policy(
@@ -1997,6 +2158,49 @@ def test_cross_az_nat_gateway_subnet_resolve(test):
         'rtb-0e40b5294fd751b38': ['subnet-0845061a295aef2b6'],
         'rtb-0f13aebd1241f7141': ['subnet-0b8f90974afb1a016']
     }
+
+
+def test_cross_az_nat_gateway_regional_nat(test, caplog):
+    """Test that Regional NAT Gateways without SubnetId are handled gracefully and logged."""
+    from c7n.resources.vpc import CrossAZRouteTable
+    from unittest.mock import MagicMock
+
+    # Mock NAT gateways including a Regional NAT Gateway without SubnetId
+    mock_nat_gateways = [
+        {'NatGatewayId': 'nat-zonal-123', 'SubnetId': 'subnet-123'},
+        {'NatGatewayId': 'nat-regional-456'},  # Regional NAT Gateway without SubnetId
+    ]
+
+    # Create a mock filter instance
+    mock_manager = MagicMock()
+    mock_nat_manager = MagicMock()
+    mock_nat_manager.resources.return_value = mock_nat_gateways
+    mock_subnet_manager = MagicMock()
+    mock_subnet_manager.resources.return_value = [
+        {'SubnetId': 'subnet-123', 'AvailabilityZone': 'us-east-1a'}
+    ]
+
+    def get_resource_manager(resource_type):
+        if resource_type == 'nat-gateway':
+            return mock_nat_manager
+        elif resource_type == 'aws.subnet':
+            return mock_subnet_manager
+        return MagicMock()
+
+    mock_manager.get_resource_manager = get_resource_manager
+
+    filter_instance = CrossAZRouteTable({'type': 'cross-az-nat-gateway-route'}, mock_manager)
+
+    # Process with empty route tables - we just want to verify logging
+    with caplog.at_level(logging.WARNING):
+        filter_instance.process([])
+
+    # Verify warning was logged about Regional NAT Gateway exclusion
+    assert any(
+        'excluding 1 Regional NAT Gateway(s) without SubnetId' in record.message
+        and 'nat-regional-456' in record.message
+        for record in caplog.records
+    )
 
 
 class PeeringConnectionTest(BaseTest):

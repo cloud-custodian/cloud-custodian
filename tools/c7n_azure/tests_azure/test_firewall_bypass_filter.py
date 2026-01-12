@@ -2,7 +2,7 @@
 # SPDX-License-Identifier: Apache-2.0
 from .azure_common import BaseTest
 from c7n_azure.filters import FirewallBypassFilter
-from mock import Mock
+from unittest.mock import Mock
 
 
 class FirewallBypassFilterMock(FirewallBypassFilter):

@@ -1,0 +1,47 @@
+{
+    "status_code": 200, 
+    "data": {
+        "DhcpOptions": [
+            {
+                "Tags": [
+                    {
+                        "Value": "RegexTestDhcp", 
+                        "Key": "Name"
+                    }
+                ], 
+                "DhcpConfigurations": [
+                    {
+                        "Values": [
+                            {
+                                "Value": "ec2.internal"
+                            }
+                        ], 
+                        "Key": "domain-name"
+                    }, 
+                    {
+                        "Values": [
+                            {
+                                "Value": "10.0.16.2"
+                            }
+                        ], 
+                        "Key": "domain-name-servers"
+                    }
+                ], 
+                "DhcpOptionsId": "dopt-regex001"
+            }
+        ], 
+        "ResponseMetadata": {
+            "RetryAttempts": 0, 
+            "HTTPStatusCode": 200, 
+            "RequestId": "test-regex-dhcp-001", 
+            "HTTPHeaders": {
+                "transfer-encoding": "chunked", 
+                "vary": "Accept-Encoding", 
+                "server": "AmazonEC2", 
+                "content-type": "text/xml;charset=UTF-8", 
+                "date": "Mon, 24 Nov 2025 00:00:00 GMT"
+            }
+        }
+    }
+}
+

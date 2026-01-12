@@ -479,6 +479,18 @@ def _eligible_start_stop(db, state="available"):
     if db.get('ReadReplicaSourceDBInstanceIdentifier'):
         return False
 
+    # If the instance is part of an Aurora cluster, it can't be individually
+    # stopped.
+    if db.get('DBClusterIdentifier'):
+        log.warning(
+            (
+                "DB instance %s could not be started/stopped because it's part "
+                "of an Aurora cluster."
+            ),
+            db['DBInstanceIdentifier'],
+        )
+        return False
+
     # TODO is SQL Server mirror is detectable.
     return True
 

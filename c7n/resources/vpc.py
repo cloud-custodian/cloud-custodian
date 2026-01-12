@@ -516,6 +516,38 @@ class DhcpOptionsFilter(Filter):
     vpcs not matching a given option value can be found via specifying
     a `present: false` parameter.
 
+    Use the synthetic value `amazon` to validate Amazon-provided DNS servers.
+    This checks for AmazonProvidedDNS, 169.254.169.253, and VPC CIDR base + 2:
+
+     :example:
+
+     .. code-block:: yaml
+
+          policies:
+             - name: vpcs-with-only-amazon-dns
+               resource: vpc
+               filters:
+                 - type: dhcp-options
+                   match-operator: all
+                   present: false
+                   domain-name-servers: amazon
+
+    Use `match-operator: all` to require ALL values match the criteria,
+    or `match-operator: any` (default) to match if at least one value matches:
+
+     :example:
+
+     .. code-block:: yaml
+
+          policies:
+             - name: vpcs-without-amazon-dns
+               resource: vpc
+               filters:
+                 - type: dhcp-options
+                   match-operator: all
+                   present: false
+                   domain-name-servers: amazon
+
     """
 
     option_keys = ('domain-name', 'domain-name-servers', 'ntp-servers')
@@ -525,6 +557,7 @@ class DhcpOptionsFilter(Filter):
             {'type': 'string'}]}
         for k in option_keys})
     schema['properties']['present'] = {'type': 'boolean'}
+    schema['properties']['match-operator'] = {'enum': ['all', 'any']}
     permissions = ('ec2:DescribeDhcpOptions',)
 
     def validate(self):
@@ -550,19 +583,81 @@ class DhcpOptionsFilter(Filter):
                 results.append(vpc)
         return results
 
+    def _get_amazon_dns_servers(self, vpc):
+        """Get list of valid Amazon DNS server addresses for this VPC."""
+        amazon_dns = ['AmazonProvidedDNS', '169.254.169.253']
+
+        # Add CIDR base + 2 for primary CIDR block
+        if 'CidrBlock' in vpc:
+            cidr_base_plus_2 = self._calculate_cidr_plus_2(vpc['CidrBlock'])
+            if cidr_base_plus_2:
+                amazon_dns.append(cidr_base_plus_2)
+
+        # Add CIDR base + 2 for secondary CIDR blocks
+        for assoc in vpc.get('CidrBlockAssociationSet', []):
+            if assoc.get('CidrBlockState', {}).get('State') == 'associated':
+                cidr_base_plus_2 = self._calculate_cidr_plus_2(assoc['CidrBlock'])
+                if cidr_base_plus_2:
+                    amazon_dns.append(cidr_base_plus_2)
+
+        return amazon_dns
+
+    def _calculate_cidr_plus_2(self, cidr_block):
+        """Calculate the base + 2 IP address for a given CIDR block."""
+        try:
+            import ipaddress
+            network = ipaddress.ip_network(cidr_block, strict=False)
+            # Base + 2 is the third address in the network
+            base_plus_2 = network.network_address + 2
+            return str(base_plus_2)
+        except (ValueError, ImportError):
+            return None
+
+    def _is_amazon_dns(self, value, vpc):
+        """Check if a DNS server value is Amazon-provided DNS."""
+        amazon_dns_servers = self._get_amazon_dns_servers(vpc)
+        return value in amazon_dns_servers
+
     def process_vpc(self, vpc, dhcp):
         vpc['c7n:DhcpConfiguration'] = dhcp
         found = True
+        match_operator = self.data.get('match-operator', 'any')
+
         for k in self.option_keys:
             if k not in self.data:
                 continue
+
             is_list = isinstance(self.data[k], list)
+            expected_value = self.data[k]
+
             if k not in dhcp:
                 found = False
-            elif not is_list and self.data[k] not in dhcp[k]:
+            elif expected_value == 'amazon':
+                # Synthetic value: check if DNS servers are Amazon-provided
+                if match_operator == 'all':
+                    # All DNS servers must be Amazon DNS
+                    found = all(
+                        self._is_amazon_dns(v, vpc) for v in dhcp[k]
+                    )
+                else:
+                    # At least one DNS server must be Amazon DNS
+                    found = any(
+                        self._is_amazon_dns(v, vpc) for v in dhcp[k]
+                    )
+            elif is_list and isinstance(expected_value, list):
+                # Check if list contains 'amazon' synthetic value
+                if 'amazon' in expected_value:
+                    # Mixed list with amazon - check each value
+                    amazon_dns = self._get_amazon_dns_servers(vpc)
+                    non_amazon_values = [v for v in expected_value if v != 'amazon']
+                    expected_values = amazon_dns + non_amazon_values
+                    found = sorted(dhcp[k]) == sorted(expected_values)
+                else:
+                    # Regular list matching
+                    found = sorted(dhcp[k]) == sorted(expected_value)
+            elif not is_list and expected_value not in dhcp[k]:
                 found = False
-            elif is_list and sorted(self.data[k]) != sorted(dhcp[k]):
-                found = False
+
         if not self.data.get('present', True):
             found = not found
         return found
@@ -3372,9 +3467,25 @@ class CrossAZRouteTable(Filter):
             s['SubnetId']: s for s in
             self.manager.get_resource_manager('aws.subnet').resources()
         }
+        # Filter out Regional NAT Gateways which don't have SubnetId field
+        # Regional NAT Gateways span multiple AZs and cannot be evaluated for cross-AZ traffic
+        all_nat_gateways = self.manager.get_resource_manager('nat-gateway').resources()
+        zonal_nat_gateways = [n for n in all_nat_gateways if 'SubnetId' in n]
+        regional_nat_gateways = [n for n in all_nat_gateways if 'SubnetId' not in n]
+        if regional_nat_gateways:
+            nat_ids = [n['NatGatewayId'] for n in regional_nat_gateways]
+            nat_ids_display = ', '.join(nat_ids[:5])
+            if len(nat_ids) > 5:
+                nat_ids_display += f' (and {len(nat_ids) - 5} more)'
+            self.log.warning(
+                "%s excluding %d Regional NAT Gateway(s) without SubnetId "
+                "(cannot evaluate cross-AZ traffic for regional NAT gateways): %s",
+                self.type,
+                len(regional_nat_gateways),
+                nat_ids_display)
         nat_subnets = {
             nat_gateway['NatGatewayId']: nat_gateway["SubnetId"]
-            for nat_gateway in self.manager.get_resource_manager('nat-gateway').resources()}
+            for nat_gateway in zonal_nat_gateways}
 
         results = []
         self.annotate_subnets_table(resources, subnets)
