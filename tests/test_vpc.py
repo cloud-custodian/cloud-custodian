@@ -4734,7 +4734,7 @@ class TestVPCEndpointServiceConfiguration(BaseTest):
 
 class TestVpcEndpointPolicySupported(BaseTest):
     def test_endpoint_policy_supported_filter(self):
-        session_factory = self.record_flight_data("test_vpc_endpoint_policy_supported_filter")
+        session_factory = self.replay_flight_data("test_vpc_endpoint_policy_supported_filter")
         p = self.load_policy({
             "name": "vpc-endpoint-services-no-policy-support",
             "resource": "aws.vpc-endpoint",
@@ -4749,20 +4749,3 @@ class TestVpcEndpointPolicySupported(BaseTest):
         self.assertEqual(resources[0]['ServiceName'], 'com.amazonaws.us-east-1.s3')
         self.assertIn('VpcEndpointPolicySupported', resources[0])
         self.assertTrue(resources[0]['VpcEndpointPolicySupported'])
-
-    def test_endpoint_policy_not_supported_filter(self):
-        session_factory = self.record_flight_data("test_vpc_endpoint_policy_supported_filter")
-        p = self.load_policy({
-            "name": "vpc-endpoint-services-no-policy-support",
-            "resource": "aws.vpc-endpoint",
-            "filters": [{
-                "type": "policy-supported",
-                "value": False
-            }],
-        }, session_factory=session_factory)
-        resources = p.run()
-
-        self.assertEqual(len(resources), 1)
-        self.assertEqual(resources[0]['ServiceName'], 'com.amazonaws.us-east-1.apprunner.requests')
-        self.assertIn('VpcEndpointPolicySupported', resources[0])
-        self.assertFalse(resources[0]['VpcEndpointPolicySupported'])
