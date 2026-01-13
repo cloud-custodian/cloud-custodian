@@ -136,6 +136,7 @@ ResourceMap = {
   "aws.emr-security-configuration": "c7n.resources.emr.EMRSecurityConfiguration",
   "aws.emr-serverless-app": "c7n.resources.emr.EMRServerless",
   "aws.eni": "c7n.resources.vpc.NetworkInterface",
+  "aws.api-destination": "c7n.resources.eventbridge.ApiDestination",
   "aws.event-bus": "c7n.resources.eventbridge.EventBus",
   "aws.event-rule": "c7n.resources.eventbridge.EventRule",
   "aws.event-rule-target": "c7n.resources.eventbridge.EventRuleTarget",

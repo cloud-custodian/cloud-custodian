@@ -77,6 +77,38 @@ class EventBusDelete(BaseAction):
                     Name=r['Name'])
 
 
+@resources.register('api-destination')
+class ApiDestination(QueryResourceManager):
+    """EventBridge API Destination Resource
+
+    :example:
+
+    .. code-block:: yaml
+
+        policies:
+          - name: list-api-destinations
+            resource: aws.api-destination
+            filters:
+              - type: value
+                key: ApiDestinationState
+                value: ACTIVE
+    """
+
+    class resource_type(TypeInfo):
+        service = 'events'
+        arn_type = 'api-destination'
+        arn = 'ApiDestinationArn'
+        enum_spec = ('list_api_destinations', 'ApiDestinations', None)
+        detail_spec = ('describe_api_destination', 'Name', 'Name', None)
+        config_type = cfn_type = 'AWS::Events::ApiDestination'
+        id = name = 'Name'
+        universal_taggable = object()
+        permissions_augment = ("events:ListTagsForResource",)
+
+    source_mapping = {'describe': DescribeWithResourceTags,
+                      'config': ConfigSource}
+
+
 class EventRuleQuery(ChildResourceQuery):
 
     def get_parent_parameters(self, params, parent_id, parent_key):
