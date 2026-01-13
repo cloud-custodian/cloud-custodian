@@ -319,7 +319,7 @@ class ApiDestinationTest(BaseTest):
         p = self.load_policy(
             {
                 "name": "query-api-destinations",
-                "resource": "aws.api-destination",
+                "resource": "aws.event-api-destination",
                 "filters": [
                     {
                         "type": "value",

@@ -77,8 +77,8 @@ class EventBusDelete(BaseAction):
                     Name=r['Name'])
 
 
-@resources.register('api-destination')
-class ApiDestination(QueryResourceManager):
+@resources.register('event-api-destination')
+class EventApiDestination(QueryResourceManager):
     """EventBridge API Destination Resource
 
     :example:
@@ -87,7 +87,7 @@ class ApiDestination(QueryResourceManager):
 
         policies:
           - name: list-api-destinations
-            resource: aws.api-destination
+            resource: aws.event-api-destination
             filters:
               - type: value
                 key: ApiDestinationState
@@ -96,7 +96,7 @@ class ApiDestination(QueryResourceManager):
 
     class resource_type(TypeInfo):
         service = 'events'
-        arn_type = 'api-destination'
+        arn_type = 'event-api-destination'
         arn = 'ApiDestinationArn'
         enum_spec = ('list_api_destinations', 'ApiDestinations', None)
         detail_spec = ('describe_api_destination', 'Name', 'Name', None)
