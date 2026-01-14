@@ -96,7 +96,7 @@ class EventApiDestination(QueryResourceManager):
 
     class resource_type(TypeInfo):
         service = 'events'
-        arn_type = 'event-api-destination'
+        arn_type = 'api-destination'
         arn = 'ApiDestinationArn'
         enum_spec = ('list_api_destinations', 'ApiDestinations', None)
         detail_spec = ('describe_api_destination', 'Name', 'Name', None)
