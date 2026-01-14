@@ -2580,7 +2580,7 @@ class S3Test(BaseTest):
                 "resource": "s3",
                 "filters": [{"Name": bname}],
                 "actions": [
-                    {"type": "remove-statements", "statement_ids": ["Zebra", "Moon"]}
+                    {"type": "set-statements", "remove": ["Zebra", "Moon"]}
                 ],
             },
             session_factory=session_factory,
@@ -2632,7 +2632,7 @@ class S3Test(BaseTest):
                 "resource": "s3",
                 "filters": [{"Name": bname}],
                 "actions": [
-                    {"type": "remove-statements", "statement_ids": ["Zebra", "Moon"]}
+                    {"type": "set-statements", "remove": ["Zebra", "Moon"]}
                 ],
             },
             session_factory=session_factory,
@@ -2685,7 +2685,7 @@ class S3Test(BaseTest):
                 "name": "remove-policy",
                 "resource": "s3",
                 "filters": [{"Name": bname}],
-                "actions": [{"type": "remove-statements", "statement_ids": "matched"}],
+                "actions": [{"type": "set-statements", "remove": "matched"}],
             },
             session_factory=session_factory,
         )

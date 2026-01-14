@@ -1,0 +1,21 @@
+policies:
+  - name: s3-bucket-policy-replace
+    resource: aws.s3
+    filters:
+      - type: value
+        key: Name
+        value: challa-test
+    actions:
+      - type: remove-statements
+        statement_ids: '*'
+      - type: set-statements
+        statements:
+          - Sid: test3
+            Effect: Deny
+            Action: "s3:GetObject" 
+            Principal: "*"
+            Resource:
+              - arn:aws:s3:::challa-test/*
+            Condition:
+              Bool:
+                aws:SecureTransport: "false"

@@ -49,7 +49,7 @@ except ImportError:
 
 
 from c7n.actions import (
-    ActionRegistry, BaseAction, PutMetric, RemovePolicyBase)
+    ActionRegistry, BaseAction, PutMetric, RemovePolicyBase, remove_statements)
 from c7n.exceptions import PolicyValidationError, PolicyExecutionError
 from c7n.filters import (
     FilterRegistry, Filter, CrossAccountAccessFilter, MetricsFilter,
@@ -1355,11 +1355,14 @@ class SetPolicyStatement(BucketActionBase):
                             "aws:SecureTransport": false
     """
 
-    permissions = ('s3:PutBucketPolicy',)
+    permissions = ('s3:PutBucketPolicy',"s3:DeleteBucketPolicy")
 
     schema = type_schema(
         'set-statements',
         **{
+            'remove': {'oneOf': [
+            {'enum': ['matched', "*"]},
+            {'type': 'array', 'items': {'type': 'string'}}]},
             'statements': {
                 'type': 'array',
                 'items': {
@@ -1392,14 +1395,21 @@ class SetPolicyStatement(BucketActionBase):
         }
     )
 
-    def process_bucket(self, bucket):
-        policy = bucket.get('Policy') or '{}'
+    def process_bucket_remove(self, policy, bucket):
+        statements = policy.get('Statement', [])
+        resource_statements = bucket.get(CrossAccountAccessFilter.annotation_key, ())
 
+        statements, found = remove_statements(
+            self.data['remove'], statements, resource_statements)
+
+        return statements, found
+
+    
+    def process_bucket_add(self, policy, bucket):
         target_statements = format_string_values(
             copy.deepcopy({s['Sid']: s for s in self.data.get('statements', [])}),
             **self.get_std_format_args(bucket))
 
-        policy = json.loads(policy)
         bucket_statements = policy.setdefault('Statement', [])
 
         for s in bucket_statements:
@@ -1409,74 +1419,32 @@ class SetPolicyStatement(BucketActionBase):
                 target_statements.pop(s['Sid'])
 
         if not target_statements:
-            return
+            return False
 
         bucket_statements.extend(target_statements.values())
-        policy = json.dumps(policy)
-
-        s3 = bucket_client(local_session(self.manager.session_factory), bucket)
-        s3.put_bucket_policy(Bucket=bucket['Name'], Policy=policy)
-        return {'Name': bucket['Name'], 'Policy': policy}
-
-
-@actions.register('remove-statements')
-class RemovePolicyStatement(RemovePolicyBase):
-    """Action to remove policy statements from S3 buckets
-
-    :example:
-
-    .. code-block:: yaml
-
-            policies:
-              - name: s3-remove-encrypt-put
-                resource: s3
-                filters:
-                  - type: has-statement
-                    statement_ids:
-                      - RequireEncryptedPutObject
-                actions:
-                  - type: remove-statements
-                    statement_ids:
-                      - RequiredEncryptedPutObject
-    """
-
-    permissions = ("s3:PutBucketPolicy", "s3:DeleteBucketPolicy")
-
-    def process(self, buckets):
-        with self.executor_factory(max_workers=3) as w:
-            futures = {}
-            results = []
-            for b in buckets:
-                futures[w.submit(self.process_bucket, b)] = b
-            for f in as_completed(futures):
-                if f.exception():
-                    b = futures[f]
-                    self.log.error('error modifying bucket:%s\n%s',
-                                   b['Name'], f.exception())
-                results += filter(None, [f.result()])
-            return results
+        return True
+        
 
     def process_bucket(self, bucket):
-        p = bucket.get('Policy')
-        if p is None:
-            return
-
-        p = json.loads(p)
-
-        statements, found = self.process_policy(
-            p, bucket, CrossAccountAccessFilter.annotation_key)
-
-        if not found:
-            return
-
+        policy = bucket.get('Policy') or '{}'
+        policy = json.loads(policy)
+        
+        statements, found = self.process_bucket_remove(policy, bucket)
+        modified  = self.process_bucket_add(policy, bucket)
+        
         s3 = bucket_client(local_session(self.manager.session_factory), bucket)
 
-        if not statements:
-            s3.delete_bucket_policy(Bucket=bucket['Name'])
-        else:
-            s3.put_bucket_policy(Bucket=bucket['Name'], Policy=json.dumps(p))
-        return {'Name': bucket['Name'], 'State': 'PolicyRemoved', 'Statements': found}
+        if not modified and not found:
+            return
+        
+        policy = json.dumps(policy)
 
+        if not statements and found and not modified:
+            s3.delete_bucket_policy(Bucket=bucket['Name'])
+            return {'Name': bucket['Name'], 'Policy': policy}
+
+        s3.put_bucket_policy(Bucket=bucket['Name'], Policy=policy)
+        return {'Name': bucket['Name'], 'Policy': policy}
 
 @actions.register('set-replication')
 class SetBucketReplicationConfig(BucketActionBase):
