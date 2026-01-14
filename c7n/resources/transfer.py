@@ -17,7 +17,7 @@ class TransferServer(QueryResourceManager):
             'describe_server', 'ServerId', 'ServerId', 'Server')
         id = name = 'ServerId'
         arn_type = "server"
-        cfn_type = 'AWS::Transfer::Server'
+        cfn_type = config_type = 'AWS::Transfer::Server'
         permissions_augment = ("transfer:ListTagsForResource",)
 
 
