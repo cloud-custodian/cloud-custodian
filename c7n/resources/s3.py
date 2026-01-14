@@ -49,7 +49,7 @@ except ImportError:
 
 
 from c7n.actions import (
-    ActionRegistry, BaseAction, PutMetric, RemovePolicyBase, remove_statements)
+    ActionRegistry, BaseAction, PutMetric, remove_statements)
 from c7n.exceptions import PolicyValidationError, PolicyExecutionError
 from c7n.filters import (
     FilterRegistry, Filter, CrossAccountAccessFilter, MetricsFilter,
@@ -1355,7 +1355,7 @@ class SetPolicyStatement(BucketActionBase):
                             "aws:SecureTransport": false
     """
 
-    permissions = ('s3:PutBucketPolicy',"s3:DeleteBucketPolicy")
+    permissions = ('s3:PutBucketPolicy', 's3:DeleteBucketPolicy')
 
     schema = type_schema(
         'set-statements',
@@ -1404,7 +1404,6 @@ class SetPolicyStatement(BucketActionBase):
 
         return statements, found
 
-    
     def process_bucket_add(self, policy, bucket):
         target_statements = format_string_values(
             copy.deepcopy({s['Sid']: s for s in self.data.get('statements', [])}),
@@ -1423,20 +1422,19 @@ class SetPolicyStatement(BucketActionBase):
 
         bucket_statements.extend(target_statements.values())
         return True
-        
 
     def process_bucket(self, bucket):
         policy = bucket.get('Policy') or '{}'
         policy = json.loads(policy)
-        
+
         statements, found = self.process_bucket_remove(policy, bucket)
-        modified  = self.process_bucket_add(policy, bucket)
-        
+        modified = self.process_bucket_add(policy, bucket)
+
         s3 = bucket_client(local_session(self.manager.session_factory), bucket)
 
         if not modified and not found:
             return
-        
+
         policy = json.dumps(policy)
 
         if not statements and found and not modified:
@@ -1445,6 +1443,7 @@ class SetPolicyStatement(BucketActionBase):
 
         s3.put_bucket_policy(Bucket=bucket['Name'], Policy=policy)
         return {'Name': bucket['Name'], 'Policy': policy}
+
 
 @actions.register('set-replication')
 class SetBucketReplicationConfig(BucketActionBase):
