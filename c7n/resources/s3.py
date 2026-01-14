@@ -1400,7 +1400,7 @@ class SetPolicyStatement(BucketActionBase):
         resource_statements = bucket.get(CrossAccountAccessFilter.annotation_key, ())
 
         statements, found = remove_statements(
-            self.data['remove'], statements, resource_statements)
+            self.data.get('remove', []), statements, resource_statements)
 
         return statements, found
 

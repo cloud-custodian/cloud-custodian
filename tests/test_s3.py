@@ -2594,7 +2594,7 @@ class S3Test(BaseTest):
             s3, "S3_AUGMENT_TABLE", [("get_bucket_policy", "Policy", None, "Policy")]
         )
         self.patch(s3.S3, "executor_factory", MainThreadExecutor)
-        self.patch(s3.RemovePolicyStatement, "executor_factory", MainThreadExecutor)
+        self.patch(s3.SetPolicyStatement, "executor_factory", MainThreadExecutor)
 
         session_factory = self.replay_flight_data("test_s3_remove_policy")
         bname = "custodian-policy-test"
@@ -2646,7 +2646,7 @@ class S3Test(BaseTest):
             s3, "S3_AUGMENT_TABLE", [("get_bucket_policy", "Policy", None, "Policy")]
         )
         self.patch(s3.S3, "executor_factory", MainThreadExecutor)
-        self.patch(s3.RemovePolicyStatement, "executor_factory", MainThreadExecutor)
+        self.patch(s3.SetPolicyStatement, "executor_factory", MainThreadExecutor)
         self.patch(MainThreadExecutor, "c7n_async", False)
 
         bname = "custodian-policy-test"
@@ -2663,13 +2663,13 @@ class S3Test(BaseTest):
             },
         }
 
-        process_buckets = s3.RemovePolicyStatement.process
+        process_buckets = s3.SetPolicyStatement.process
 
         def enrich(self, buckets):
             buckets[0]["CrossAccountViolations"] = [statement]
             process_buckets(self, buckets)
 
-        self.patch(s3.RemovePolicyStatement, "process", enrich)
+        self.patch(s3.SetPolicyStatement, "process", enrich)
 
         session_factory = self.replay_flight_data("test_s3_remove_policy")
         session = session_factory()
