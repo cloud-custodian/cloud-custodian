@@ -1455,18 +1455,20 @@ class RemovePolicyStatement(RemovePolicyBase):
     with the 'remove' attribute to remove policy statements from S3 buckets.
 
     :example:
+
     .. code-block:: yaml
-            policies:
-              - name: s3-remove-encrypt-put
-                resource: s3
-                filters:
-                  - type: has-statement
-                    statement_ids:
-                      - RequireEncryptedPutObject
-                actions:
-                  - type: remove-statements
-                    statement_ids:
-                      - RequiredEncryptedPutObject
+
+        policies:
+          - name: s3-remove-encrypt-put
+            resource: s3
+            filters:
+              - type: has-statement
+                statement_ids:
+                  - RequireEncryptedPutObject
+            actions:
+              - type: remove-statements
+                statement_ids:
+                  - RequiredEncryptedPutObject
     """
 
     deprecations = (
