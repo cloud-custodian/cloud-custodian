@@ -48,8 +48,9 @@ except ImportError:
     from botocore.vendored.requests.packages.urllib3.exceptions import SSLError
 
 
+from c7n import deprecated
 from c7n.actions import (
-    ActionRegistry, BaseAction, PutMetric, remove_statements)
+    ActionRegistry, BaseAction, PutMetric, RemovePolicyBase, remove_statements)
 from c7n.exceptions import PolicyValidationError, PolicyExecutionError
 from c7n.filters import (
     FilterRegistry, Filter, CrossAccountAccessFilter, MetricsFilter,
@@ -1343,6 +1344,7 @@ class SetPolicyStatement(BucketActionBase):
                 resource: s3
                 actions:
                   - type: set-statements
+                    remove: "*"
                     statements:
                       - Sid: "DenyHttp"
                         Effect: "Deny"
@@ -1443,6 +1445,69 @@ class SetPolicyStatement(BucketActionBase):
 
         s3.put_bucket_policy(Bucket=bucket['Name'], Policy=policy)
         return {'Name': bucket['Name'], 'Policy': policy}
+
+@actions.register('remove-statements')
+class RemovePolicyStatement(RemovePolicyBase):
+    """Action to remove policy statements from S3 buckets
+
+    This action has been deprecated. Please use the 'set-statements' action
+    with the 'remove' attribute to remove policy statements from S3 buckets.
+
+    :example:
+    .. code-block:: yaml
+            policies:
+              - name: s3-remove-encrypt-put
+                resource: s3
+                filters:
+                  - type: has-statement
+                    statement_ids:
+                      - RequireEncryptedPutObject
+                actions:
+                  - type: remove-statements
+                    statement_ids:
+                      - RequiredEncryptedPutObject
+    """
+
+    deprecations = (
+        deprecated.filter("use the 'set-statements' action with 'remove' attribute"),
+    )
+
+    permissions = ("s3:PutBucketPolicy", "s3:DeleteBucketPolicy")
+
+    def process(self, buckets):
+        with self.executor_factory(max_workers=3) as w:
+            futures = {}
+            results = []
+            for b in buckets:
+                futures[w.submit(self.process_bucket, b)] = b
+            for f in as_completed(futures):
+                if f.exception():
+                    b = futures[f]
+                    self.log.error('error modifying bucket:%s\n%s',
+                                   b['Name'], f.exception())
+                results += filter(None, [f.result()])
+            return results
+
+    def process_bucket(self, bucket):
+        p = bucket.get('Policy')
+        if p is None:
+            return
+
+        p = json.loads(p)
+
+        statements, found = self.process_policy(
+            p, bucket, CrossAccountAccessFilter.annotation_key)
+
+        if not found:
+            return
+
+        s3 = bucket_client(local_session(self.manager.session_factory), bucket)
+
+        if not statements:
+            s3.delete_bucket_policy(Bucket=bucket['Name'])
+        else:
+            s3.put_bucket_policy(Bucket=bucket['Name'], Policy=json.dumps(p))
+        return {'Name': bucket['Name'], 'State': 'PolicyRemoved', 'Statements': found}
 
 
 @actions.register('set-replication')
