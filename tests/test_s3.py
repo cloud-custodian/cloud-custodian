@@ -2744,7 +2744,7 @@ class S3Test(BaseTest):
         resources = p.run()
         self.assertEqual(len(resources), 1)
         self.assertRaises(ClientError, client.get_bucket_policy, Bucket=bname)
-    
+
     def test_set_statements_remove_policy_matched(self):
         self.patch(
             s3, "S3_AUGMENT_TABLE", [("get_bucket_policy", "Policy", None, "Policy")]
@@ -2850,7 +2850,7 @@ class S3Test(BaseTest):
                                 "Resource": "arn:aws:s3:::{bucket_name}/*",
                                 "Condition": {"Bool": {"aws:SecureTransport": False}},
                             }
-                        ],}
+                        ], }
                 ],
             },
             session_factory=session_factory,

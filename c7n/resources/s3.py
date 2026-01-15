@@ -1446,6 +1446,7 @@ class SetPolicyStatement(BucketActionBase):
         s3.put_bucket_policy(Bucket=bucket['Name'], Policy=policy)
         return {'Name': bucket['Name'], 'Policy': policy}
 
+
 @actions.register('remove-statements')
 class RemovePolicyStatement(RemovePolicyBase):
     """Action to remove policy statements from S3 buckets
