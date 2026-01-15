@@ -4740,12 +4740,13 @@ class TestVpcEndpointPolicySupported(BaseTest):
             "resource": "aws.vpc-endpoint",
             "filters": [{
                 "type": "policy-supported",
+                "key": "VpcEndpointPolicySupported",
                 "value": True
             }],
         }, session_factory=session_factory)
         resources = p.run()
 
         self.assertEqual(len(resources), 1)
+        self.assertIn("c7n:ServiceDetails", resources[0])
         self.assertEqual(resources[0]['ServiceName'], 'com.amazonaws.us-east-1.s3')
-        self.assertIn('VpcEndpointPolicySupported', resources[0])
         self.assertTrue(resources[0]['VpcEndpointPolicySupported'])

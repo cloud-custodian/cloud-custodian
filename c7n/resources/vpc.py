@@ -2888,8 +2888,9 @@ class EndpointVpcFilter(net_filters.VpcFilter):
 
 
 @VpcEndpoint.filter_registry.register('policy-supported')
-class EndpointPolicySupportedFilter(Filter):
-    """Filter VPC Endpoints based on whether they support resource policies.
+class EndpointPolicySupportedFilter(ValueFilter):
+    """Filter VPC Endpoints based on whether their associated endpoint service
+    supports VPC endpoint resource policies.
 
     :example:
 
@@ -2902,16 +2903,15 @@ class EndpointPolicySupportedFilter(Filter):
             - type: policy-supported
               value: true
     """
+    annotation_key = "c7n:ServiceDetails"
     schema = type_schema(
         "policy-supported",
-        value={"type": "boolean"}
+        rinherit=ValueFilter.schema
     )
-
     permissions = ("ec2:DescribeVpcEndpointServices",)
 
     def process(self, resources, event=None):
         client = local_session(self.manager.session_factory).client("ec2")
-        match_value = self.data.get("value", True)
         service_names = sorted({r["ServiceName"] for r in resources})
 
         service_map = self._describe_services(client, service_names)
@@ -2919,22 +2919,33 @@ class EndpointPolicySupportedFilter(Filter):
         results = []
         for resource in resources:
             service_detail = service_map.get(resource["ServiceName"], {})
-            supported = service_detail.get("VpcEndpointPolicySupported", False)
+            resource[self.annotation_key] = service_detail or {}
+
+            supported = False
+            if service_detail:
+                supported = service_detail.get("VpcEndpointPolicySupported", False)
+
             resource["VpcEndpointPolicySupported"] = supported
 
-            if supported == match_value:
+            if self.match(resource):
                 results.append(resource)
+
         return results
 
     def _describe_services(self, client, service_names):
-        if getattr(self, "_service_map", None) is not None:
-            return self._service_map
+        cache = self.manager._cache
+        cache_key = {"ServiceNames": service_names}
 
-        resp = client.describe_vpc_endpoint_services(ServiceNames=service_names)
-        svc_map = {d["ServiceName"]: d for d in resp.get("ServiceDetails", [])}
+        with cache:
+            cached = cache.get(cache_key)
+            if cached is not None:
+                return cached
 
-        self._service_map = svc_map
-        return svc_map
+            resp = client.describe_vpc_endpoint_services(ServiceNames=service_names)
+            service_map = {d["ServiceName"]: d for d in resp.get("ServiceDetails", [])}
+
+            cache.save(cache_key, service_map)
+            return service_map
 
 
 @Vpc.filter_registry.register("vpc-endpoint")
