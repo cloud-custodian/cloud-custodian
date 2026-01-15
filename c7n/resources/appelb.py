@@ -1221,6 +1221,26 @@ class AppELBDefaultVpcFilter(net_filters.DefaultVpcBase):
         return alb.get('VpcId') and self.match(alb.get('VpcId')) or False
 
 
+class DescribeAppELBTargetGroup(DescribeSource):
+
+    def augment(self, target_groups):
+        client = local_session(self.manager.session_factory).client('elbv2')
+
+        def _describe_target_group_health(target_group):
+            result = self.manager.retry(client.describe_target_health,
+                TargetGroupArn=target_group['TargetGroupArn'])
+            target_group['TargetHealthDescriptions'] = result[
+                'TargetHealthDescriptions']
+
+        with self.manager.executor_factory(max_workers=2) as w:
+            list(w.map(_describe_target_group_health, target_groups))
+
+        _describe_target_group_tags(
+            target_groups, self.manager.session_factory,
+            self.manager.executor_factory, self.manager.retry)
+        return target_groups
+
+
 @resources.register('app-elb-target-group')
 class AppELBTargetGroup(QueryResourceManager):
     """Resource manager for v2 ELB target groups.
@@ -1233,7 +1253,12 @@ class AppELBTargetGroup(QueryResourceManager):
         name = 'TargetGroupName'
         id = 'TargetGroupArn'
         permission_prefix = 'elasticloadbalancing'
-        cfn_type = 'AWS::ElasticLoadBalancingV2::TargetGroup'
+        cfn_type = config_type = 'AWS::ElasticLoadBalancingV2::TargetGroup'
+
+    source_mapping = {
+        'describe': DescribeAppELBTargetGroup,
+        'config': ConfigSource,
+    }
 
     filter_registry = FilterRegistry('app-elb-target-group.filters')
     action_registry = ActionRegistry('app-elb-target-group.actions')
@@ -1247,23 +1272,6 @@ class AppELBTargetGroup(QueryResourceManager):
         # override as the service is not the iam prefix
         return ("elasticloadbalancing:DescribeTargetGroups",
                 "elasticloadbalancing:DescribeTags")
-
-    def augment(self, target_groups):
-        client = local_session(self.session_factory).client('elbv2')
-
-        def _describe_target_group_health(target_group):
-            result = self.retry(client.describe_target_health,
-                TargetGroupArn=target_group['TargetGroupArn'])
-            target_group['TargetHealthDescriptions'] = result[
-                'TargetHealthDescriptions']
-
-        with self.executor_factory(max_workers=2) as w:
-            list(w.map(_describe_target_group_health, target_groups))
-
-        _describe_target_group_tags(
-            target_groups, self.session_factory,
-            self.executor_factory, self.retry)
-        return target_groups
 
 
 def _describe_target_group_tags(target_groups, session_factory,

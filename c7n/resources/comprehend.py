@@ -71,6 +71,7 @@ class ComprehendFlywheel(QueryResourceManager):
         arn = id = 'FlywheelArn'
         name = 'FlywheelArn'
         date = 'LastModifiedTime'
+        cfn_type = config_type = 'AWS::Comprehend::Flywheel'
         universal_taggable = object()
 
     permissions = ('comprehend:ListFlywheels', 'comprehend:DescribeFlywheel')
