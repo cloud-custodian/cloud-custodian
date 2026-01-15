@@ -9,6 +9,7 @@ from unittest.mock import Mock, patch
 try:
     from c7n_azure.resources.entraid_user import EntraIDUser
     from c7n_azure.resources.entraid_group import EntraIDGroup
+    from c7n_azure.resources.entraid_organization import EntraIDOrganization
     from c7n.config import Config
     from c7n.policy import Policy
 except ImportError as e:
@@ -289,6 +290,50 @@ class EntraIDGroupTest(unittest.TestCase):
         self.assertTrue(augmented[0]['c7n:IsSecurityGroup'])
         self.assertTrue(augmented[0]['c7n:IsAdminGroup'])
         self.assertFalse(augmented[0]['c7n:IsDistributionGroup'])
+
+
+class EntraIDOrganizationTest(unittest.TestCase):
+    """Test EntraID Organization resource functionality"""
+
+    def load_policy(self, policy_data, validate=False):
+        """Helper method to load a policy"""
+        config = Config.empty()
+        policy = Policy(policy_data, config, session_factory=None)
+        return policy
+
+    def test_entraid_organization_schema_validate(self):
+        """Test organization resource schema validation"""
+        policy_data = {
+            'name': 'test-organization',
+            'resource': 'azure.entraid-organization',
+            'filters': [
+                {'type': 'security-defaults', 'enabled': True}
+            ]
+        }
+        p = self.load_policy(policy_data, validate=True)
+        self.assertIsNotNone(p)
+
+    def test_organization_resource_type(self):
+        """Test organization resource type configuration"""
+        resource_type = EntraIDOrganization.resource_type
+        self.assertEqual(resource_type.service, 'graph')
+        self.assertEqual(resource_type.id, 'id')
+        self.assertTrue(resource_type.global_resource)
+        self.assertIn('Organization.Read.All', resource_type.permissions)
+        self.assertIn('Directory.Read.All', resource_type.permissions)
+
+    def test_password_lockout_threshold_schema_validate(self):
+        """Test password lockout threshold filter schema validation"""
+        policy_data = {
+            'name': 'test-lockout-threshold',
+            'resource': 'azure.entraid-organization',
+            'filters': [
+                {'type': 'password-lockout-threshold', 'max_threshold': 10}
+            ]
+        }
+        p = self.load_policy(policy_data, validate=True)
+        self.assertIsNotNone(p)
+        self.assertEqual(p.name, 'test-lockout-threshold')
 
 
 if __name__ == '__main__':
