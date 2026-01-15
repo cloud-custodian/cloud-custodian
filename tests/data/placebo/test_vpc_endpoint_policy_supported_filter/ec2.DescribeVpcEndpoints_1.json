@@ -3,51 +3,9 @@
     "data": {
         "VpcEndpoints": [
             {
-                "VpcEndpointId": "vpce-073a66d9be9394c68",
-                "VpcEndpointType": "Interface",
-                "VpcId": "vpc-069fa94b77662651d",
-                "ServiceName": "com.amazonaws.us-east-1.apprunner.requests",
-                "State": "available",
-                "PolicyDocument": "{\n  \"Statement\": [\n    {\n      \"Action\": \"*\",\n      \"Effect\": \"Allow\",\n      \"Principal\": \"*\",\n      \"Resource\": \"*\"\n    }\n  ]\n}",
-                "RouteTableIds": [],
-                "SubnetIds": [],
-                "Groups": [
-                    {
-                        "GroupId": "sg-0fc942d3835404a00",
-                        "GroupName": "default"
-                    }
-                ],
-                "IpAddressType": "ipv4",
-                "DnsOptions": {
-                    "DnsRecordIpType": "ipv4"
-                },
-                "PrivateDnsEnabled": false,
-                "RequesterManaged": false,
-                "NetworkInterfaceIds": [],
-                "DnsEntries": [],
-                "CreationTimestamp": {
-                    "__class__": "datetime",
-                    "year": 2026,
-                    "month": 1,
-                    "day": 7,
-                    "hour": 14,
-                    "minute": 56,
-                    "second": 38,
-                    "microsecond": 438000
-                },
-                "Tags": [
-                    {
-                        "Key": "Name",
-                        "Value": "custodian-test-apprunner-requests-endpoint"
-                    }
-                ],
-                "OwnerId": "644160558196",
-                "ServiceRegion": "us-east-1"
-            },
-            {
-                "VpcEndpointId": "vpce-07720462d13091c80",
+                "VpcEndpointId": "vpce-00c3b46efd06ea821",
                 "VpcEndpointType": "Gateway",
-                "VpcId": "vpc-069fa94b77662651d",
+                "VpcId": "vpc-00965aece72d62387",
                 "ServiceName": "com.amazonaws.us-east-1.s3",
                 "State": "available",
                 "PolicyDocument": "{\"Version\":\"2008-10-17\",\"Statement\":[{\"Effect\":\"Allow\",\"Principal\":\"*\",\"Action\":\"*\",\"Resource\":\"*\"}]}",
@@ -66,16 +24,58 @@
                     "__class__": "datetime",
                     "year": 2026,
                     "month": 1,
-                    "day": 7,
-                    "hour": 14,
-                    "minute": 57,
-                    "second": 6,
+                    "day": 15,
+                    "hour": 20,
+                    "minute": 26,
+                    "second": 0,
                     "microsecond": 0
                 },
                 "Tags": [
                     {
                         "Key": "Name",
-                        "Value": "custodian-test-vpc-endpoint"
+                        "Value": "supports-policies "
+                    }
+                ],
+                "OwnerId": "644160558196",
+                "ServiceRegion": "us-east-1"
+            },
+            {
+                "VpcEndpointId": "vpce-0a74e8927865d0399",
+                "VpcEndpointType": "Interface",
+                "VpcId": "vpc-00965aece72d62387",
+                "ServiceName": "com.amazonaws.us-east-1.apprunner.requests",
+                "State": "available",
+                "PolicyDocument": "{\n  \"Statement\": [\n    {\n      \"Action\": \"*\",\n      \"Effect\": \"Allow\",\n      \"Principal\": \"*\",\n      \"Resource\": \"*\"\n    }\n  ]\n}",
+                "RouteTableIds": [],
+                "SubnetIds": [],
+                "Groups": [
+                    {
+                        "GroupId": "sg-0f32d5d8872e6f890",
+                        "GroupName": "default"
+                    }
+                ],
+                "IpAddressType": "ipv4",
+                "DnsOptions": {
+                    "DnsRecordIpType": "ipv4"
+                },
+                "PrivateDnsEnabled": false,
+                "RequesterManaged": false,
+                "NetworkInterfaceIds": [],
+                "DnsEntries": [],
+                "CreationTimestamp": {
+                    "__class__": "datetime",
+                    "year": 2026,
+                    "month": 1,
+                    "day": 15,
+                    "hour": 20,
+                    "minute": 26,
+                    "second": 36,
+                    "microsecond": 814000
+                },
+                "Tags": [
+                    {
+                        "Key": "Name",
+                        "Value": "not-supports-policies"
                     }
                 ],
                 "OwnerId": "644160558196",
