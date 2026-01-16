@@ -44,6 +44,7 @@ whitelist_packages = set(
         'docutils',  # docgen - couple of different licenses but bulk is public domain
         #
         # packages with bad metadata
+        'google-crc32c',  # Apache-2.0, see also https://github.com/googleapis/python-crc32c/issues/320
         'protobuf',  # BSD-3-Clause
         'uritemplate',  # Dual license BSD 3-Clause OR Apache-2.0
         # https://github.com/GrahamDumpleton/wrapt/issues/298
