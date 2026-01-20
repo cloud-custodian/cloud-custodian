@@ -20,6 +20,7 @@ from c7n.testing import mock_datetime_now
 from dateutil import parser
 from dateutil import tz as tzutil
 import c7n.filters.backup
+from pytest_terraform import terraform
 
 from .common import BaseTest, event_data
 
@@ -2259,3 +2260,50 @@ class RDSProxy(BaseTest):
         resources = p.run()
         self.assertEqual(len(resources), 1)
         self.assertEqual(resources[0]["DBProxyName"], "proxy-test-1")
+
+
+@terraform("rds_recommendations")
+def test_rds_recommendations(test, rds_recommendations):
+    """
+    There's no way to ensure that an RDS database has recommendations via terraform config.
+    For this test, the DB recommendation response structure was pulled directly from the CLI docs:
+    https://docs.aws.amazon.com/cli/latest/reference/rds/describe-db-recommendations.html#examples
+    Only the RecommendationId and Status fields were modified.
+
+    There are three recommendations in the response:
+    - One that does not match the database
+    - One that matches the database but is not active
+    - One that matches the database and is active
+    """
+
+    session_factory = test.replay_flight_data("test_rds_recommendations")
+    policy = test.load_policy(
+        {
+            "name": "rds-recommendations",
+            "resource": "rds",
+            "filters": [
+                {
+                    "type": "recommendations",
+                    "key": "Status",
+                    "value": "active",
+                }
+            ],
+        },
+        session_factory=session_factory,
+    )
+
+    resources = policy.run()
+    test.assertEqual(len(resources), 1)  # Sanity check
+
+    # Should be the two recommendations that match the database.
+    test.assertEqual(
+        {r["RecommendationId"] for r in resources[0]["c7n:db-recommendations"]},
+        {'matches-db-resolved', 'matches-db-active'}
+    )
+
+    # Should be the one recommendation that matches the db AND is active (matches the filters).
+    test.assertEqual(len(resources[0]["c7n:matched-db-recommendations"]), 1)
+    test.assertEqual(
+        resources[0]["c7n:matched-db-recommendations"][0]["RecommendationId"],
+        "matches-db-active",
+    )
