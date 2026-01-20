@@ -1,0 +1,19 @@
+{
+    "status_code": 200, 
+    "data": {
+    "AttachedPolicies": [
+    ],
+	"IsTruncated": false, 
+        "ResponseMetadata": {
+            "RetryAttempts": 0, 
+            "HTTPStatusCode": 200, 
+            "RequestId": "55555555-5555-5555-5555-555555555555", 
+            "HTTPHeaders": {
+                "x-amzn-requestid": "55555555-5555-5555-5555-555555555555", 
+                "date": "Fri, 19 Feb 2021 16:59:40 GMT", 
+                "content-length": "4194", 
+                "content-type": "text/xml"
+            }
+        }
+    }
+}

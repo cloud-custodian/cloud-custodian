@@ -37,6 +37,7 @@ from c7n.resources.iam import (
     IamUserInlinePolicy,
     IamRoleInlinePolicy,
     IamGroupInlinePolicy,
+    IamRoleManagedPolicy,
     SpecificIamRoleManagedPolicy,
     NoSpecificIamRoleManagedPolicy,
     PolicyQueryParser
@@ -1841,6 +1842,55 @@ class IamGroupTests(BaseTest):
 
         policies = client.list_attached_group_policies(GroupName="test")
         self.assertEqual(len(policies['AttachedPolicies']), 0)
+
+
+class IamRoleManagedPolicyTests(BaseTest):
+
+    @terraform('iam_role_managed_policies')
+    def test_iam_role_no_managed_policy(self):
+        session_factory = self.replay_flight_data("test_iam_role_managed_policy")
+        self.patch(IamRoleManagedPolicy, "executor_factory", MainThreadExecutor)
+        p = self.load_policy(
+            {
+                "name": "iam-role-no-managed-policies",
+                "resource": "iam-role",
+                "filters": [
+                    {
+                        "type": "has-managed-policy",
+                        "value": False
+                    }
+                ]
+            },
+            session_factory=session_factory,
+        )
+        resources = p.run()
+        self.assertEqual(len(resources), 1)
+        self.assertEqual(
+            p.resource_manager.get_arns(resources),
+            ['arn:aws:iam::555555555555:role/test_role_with_no_managed_policy'])
+
+    @terraform('iam_role_managed_policies')
+    def test_iam_role_managed_policy(self):
+        session_factory = self.replay_flight_data("test_iam_role_managed_policy")
+        self.patch(IamRoleManagedPolicy, "executor_factory", MainThreadExecutor)
+        p = self.load_policy(
+            {
+                "name": "iam-role-no-managed-policies",
+                "resource": "iam-role",
+                "filters": [
+                    {
+                        "type": "has-managed-policy",
+                        "value": True
+                    }
+                ]
+            },
+            session_factory=session_factory,
+        )
+        resources = p.run()
+        self.assertEqual(len(resources), 1)
+        self.assertEqual(
+            p.resource_manager.get_arns(resources),
+            ['arn:aws:iam::555555555555:role/test_role_with_managed_policy'])
 
 
 class IamManagedPolicyUsage(BaseTest):
