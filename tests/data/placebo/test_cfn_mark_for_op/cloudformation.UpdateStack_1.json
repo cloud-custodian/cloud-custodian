@@ -1,0 +1,17 @@
+{
+    "status_code": 200,
+    "data": {
+        "StackId": "arn:aws:cloudformation:us-east-1:123456789012:stack/c7n-mark-stack/11111111-2222-3333-4444-555555555555",
+        "ResponseMetadata": {
+            "RequestId": "bbbbbbbb-cccc-dddd-eeee-ffffffffffff",
+            "HTTPStatusCode": 200,
+            "HTTPHeaders": {
+                "content-length": "123",
+                "content-type": "text/xml",
+                "date": "Thu, 01 Feb 2024 12:01:00 GMT",
+                "x-amzn-requestid": "bbbbbbbb-cccc-dddd-eeee-ffffffffffff"
+            },
+            "RetryAttempts": 0
+        }
+    }
+}
