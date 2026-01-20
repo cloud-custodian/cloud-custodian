@@ -96,6 +96,10 @@ ResourceMap = {
   "aws.destination": "c7n.resources.cw.Destination",
   "aws.devicefarm-project": "c7n.resources.devicefarm.DevicefarmProject",
   "aws.directconnect": "c7n.resources.directconnect.DirectConnect",
+  "aws.directconnect-virtual-interface":
+    "c7n.resources.directconnect.DirectConnectVirtualInterface",
+  "aws.directconnect-gateway-association":
+    "c7n.resources.directconnect.DirectConnectGatewayAssociation",
   "aws.directory": "c7n.resources.directory.Directory",
   "aws.distribution": "c7n.resources.cloudfront.Distribution",
   "aws.dlm-policy": "c7n.resources.dlm.DLMPolicy",
