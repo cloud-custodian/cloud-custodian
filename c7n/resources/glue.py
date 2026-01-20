@@ -333,7 +333,7 @@ class GlueDatabase(QueryResourceManager):
         date = 'CreatedOn'
         arn_type = 'database'
         state_key = 'State'
-        cfn_type = 'AWS::Glue::Database'
+        cfn_type = config_type = 'AWS::Glue::Database'
 
 
 @GlueDatabase.action_registry.register('delete')
