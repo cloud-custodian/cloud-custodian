@@ -104,7 +104,7 @@ We also distribute subcommands and scripts to generate the necessary config file
 <https://github.com/cloud-custodian/cloud-custodian/issues/2420>, we'll
 be looking to incorporate them into a new c7n-org subcommand.
 
-- For **AWS**, the subcommand is `aws-accounts` generates a config file
+- For **AWS**, the subcommand `aws-accounts` generates a config file
   from the AWS Organizations API.
 
 ```shell
