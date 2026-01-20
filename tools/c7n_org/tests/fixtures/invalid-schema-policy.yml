@@ -1,0 +1,9 @@
+policies:
+  - name: invalid-schema-policy
+    resource: aws.ec2
+    filters:
+      - type: invalid-filter-type-that-does-not-exist
+        key: SomeKey
+        value: SomeValue
+    actions:
+      - type: invalid-action-type

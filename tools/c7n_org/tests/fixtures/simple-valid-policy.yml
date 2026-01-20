@@ -1,0 +1,6 @@
+policies:
+  - name: tag-compliance-simple
+    resource: ec2
+    description: Simple policy without actions for testing
+    filters:
+      - tag:Environment: absent
