@@ -1,0 +1,15 @@
+{
+    "status_code": 200,
+    "data": {
+        "QueryRuntimeStatistics": {
+            "Timeline": {
+                "QueryQueueTimeInMillis": 300,
+                "ServicePreProcessingTimeInMillis": 72,
+                "EngineExecutionTimeInMillis": 968,
+                "ServiceProcessingTimeInMillis": 1,
+                "TotalExecutionTimeInMillis": 1341
+            }
+        },
+        "ResponseMetadata": {}
+    }
+}
