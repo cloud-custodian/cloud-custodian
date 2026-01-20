@@ -5,9 +5,10 @@
             {
                 "Name": "test",
                 "State": "DISABLED",
-                "Schema": "CloudWatchLogRule/1"
+                "Schema": "{\"Rules\":[{\"RuleName\":\"test-rule\"}]}",
+                "Definition": "{\"aggregateOn\":\"count\"}",
+                "ManagedRule": false
             }
-        ],
-        "ResponseMetadata": {}
+        ]
     }
 }
