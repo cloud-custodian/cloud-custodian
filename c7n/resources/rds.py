@@ -1571,23 +1571,32 @@ class RDSSnapshotDelete(BaseAction):
         if not snapshots:
             return []
         log.info("Deleting %d rds snapshots", len(snapshots))
-        with self.executor_factory(max_workers=3) as w:
+        error = None
+        with self.executor_factory(max_workers=2) as w:
             futures = []
+            client = local_session(self.manager.session_factory).client('rds')
             for snapshot_set in chunks(reversed(snapshots), size=50):
                 futures.append(
-                    w.submit(self.process_snapshot_set, snapshot_set))
+                    w.submit(self.process_snapshot_set, client, snapshot_set))
             for f in as_completed(futures):
                 if f.exception():
                     self.log.error(
                         "Exception deleting snapshot set \n %s",
                         f.exception())
+                    error = f.exception()
+        if error:
+            raise error
         return snapshots
 
-    def process_snapshot_set(self, snapshots_set):
-        c = local_session(self.manager.session_factory).client('rds')
+    def process_snapshot_set(self, client, snapshots_set):
         for s in snapshots_set:
-            c.delete_db_snapshot(
-                DBSnapshotIdentifier=s['DBSnapshotIdentifier'])
+            try:
+                self.manager.retry(
+                    client.delete_db_snapshot,
+                    DBSnapshotIdentifier=s['DBSnapshotIdentifier'])
+            except (client.exceptions.DBSnapshotNotFoundFault,
+                    client.exceptions.InvalidDBSnapshotStateFault):
+                continue
 
 
 @actions.register('modify-security-groups')
