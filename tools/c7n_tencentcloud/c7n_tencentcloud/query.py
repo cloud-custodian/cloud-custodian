@@ -165,14 +165,10 @@ class DescribeSource:
             res = self.query_helper.filter(self.resource_manager.config.region,
                                            self.resource_manager.resource_type,
                                            params)
-        self.augment(res)
         return res
 
     def get_permissions(self):
         return []
-
-    def augment(self, resources):
-        return self.get_resource_tag(resources)
 
     def get_resource_tag(self, resources):
         """
@@ -311,7 +307,7 @@ class QueryResourceManager(ResourceManager, metaclass=QueryMeta):
         return resources
 
     def augment(self, resources):
-        return resources
+        return self.source.get_resource_tag(resources)
 
     # TODO
     # to support configs: max-resources, max-resources-percent
