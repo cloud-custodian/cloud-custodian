@@ -15,6 +15,7 @@ from c7n.tags import Tag, RemoveTag, TagActionFilter, TagDelayedAction
 from c7n.filters.kms import KmsRelatedFilter
 import c7n.filters.policystatement as polstmt_filter
 
+from .aws import shape_validate
 from .securityhub import PostFinding
 
 
@@ -26,7 +27,6 @@ class DescribeDomain(DescribeSource):
 
     def augment(self, domains):
         client = local_session(self.manager.session_factory).client('es')
-        model = self.manager.get_model()
         results = []
 
         def _augment(resource_set):
@@ -34,9 +34,8 @@ class DescribeDomain(DescribeSource):
                 client.describe_elasticsearch_domains,
                 DomainNames=resource_set)['DomainStatusList']
             for r in resources:
-                rarn = self.manager.generate_arn(r[model.id])
                 r['Tags'] = self.manager.retry(
-                    client.list_tags, ARN=rarn).get('TagList', [])
+                    client.list_tags, ARN=r['ARN']).get('TagList', [])
             return resources
 
         for resource_set in chunks(domains, 5):
@@ -585,6 +584,54 @@ class RemoveMatchedSourceIps(BaseAction):
             DomainName=domain_name,
             AccessPolicies=json.dumps(accpol))
         return json.loads(resp.get('DomainConfig', {}).get('AccessPolicies', {}).get('Options', ''))
+
+
+@ElasticSearchDomain.action_registry.register('update-domain-config')
+class UpdateDomainConfig(Action):
+    """A general-purpose action that forwards parameters to the AWS UpdateElasticsearchDomainConfig
+    API.
+
+    :example:
+
+    .. code-block:: yaml
+
+        policies:
+          - name: es-update-ebs-volume-type
+            resource: aws.elasticsearch
+            filters:
+              - type: value
+                key: EBSOptions.VolumeType
+                op: eq
+                value: gp2
+            actions:
+              - type: update-domain-config
+                parameters:
+                  EBSOptions:
+                    VolumeType: gp3
+
+    """
+
+    schema = type_schema(
+        'update-domain-config',
+        parameters={'type': 'object'},
+        required=['parameters'],
+    )
+    permissions = ('es:UpdateElasticsearchDomainConfig',)
+
+    def validate(self):
+        req = dict(self.data['parameters'])
+        # We'll add DomainName to the request in process(), so the policy doesn't need to supply it.
+        # Set it to something arbitrary here so the missing value doesn't fail validation.
+        req['DomainName'] = 'validate'
+        return shape_validate(req, 'UpdateElasticsearchDomainConfigRequest', 'es')
+
+    def process(self, resources):
+        client = local_session(self.manager.session_factory).client('es')
+        for r in resources:
+            client.update_elasticsearch_domain_config(
+                **self.data['parameters'],
+                DomainName=r['DomainName'],
+            )
 
 
 @resources.register('elasticsearch-reserved')
