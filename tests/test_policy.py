@@ -231,8 +231,9 @@ class PolicyMetaLint(BaseTest):
 
     def test_ec2_id_prefix(self):
         missing_prefix = []
+        skip_resource_types = {'key-pair'}
         for k, v in manager.resources.items():
-            if v.resource_type.service != 'ec2':
+            if v.resource_type.service != 'ec2' or k in skip_resource_types:
                 continue
             if v.resource_type.id_prefix is None:
                 missing_prefix.append(k)

@@ -2980,7 +2980,9 @@ class KeyPair(query.QueryResourceManager):
         enum_spec = ('describe_key_pairs', 'KeyPairs', None)
         name = 'KeyName'
         id = 'KeyPairId'
-        id_prefix = 'key-'
+        # Removing id_prefix "key-" here to address #7089 in the short
+        # term without breaking backward compatibility with existing
+        # cloudtrail mode policies based on key name.
         filter_name = 'KeyNames'
         filter_type = 'list'
 
