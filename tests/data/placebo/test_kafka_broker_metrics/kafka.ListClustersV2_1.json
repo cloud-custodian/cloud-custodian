@@ -1,0 +1,99 @@
+{
+    "status_code": 200,
+    "data": {
+        "ResponseMetadata": {},
+        "ClusterInfoList": [
+            {
+                "ClusterType": "PROVISIONED",
+                "ClusterArn": "arn:aws:kafka:us-east-1:644160558196:cluster/c7n-test-48042afe/7a89d361-f81d-4c9a-bf97-53518cfc715d-18",
+                "ClusterName": "c7n-test-48042afe",
+                "CreationTime": {
+                    "__class__": "datetime",
+                    "year": 2025,
+                    "month": 12,
+                    "day": 17,
+                    "hour": 14,
+                    "minute": 29,
+                    "second": 34,
+                    "microsecond": 109000
+                },
+                "CurrentVersion": "K3P5ROKL5A1OLE",
+                "State": "ACTIVE",
+                "Tags": {
+                    "Environment": "test",
+                    "Name": "c7n-test-msk-48042afe"
+                },
+                "Provisioned": {
+                    "BrokerNodeGroupInfo": {
+                        "BrokerAZDistribution": "DEFAULT",
+                        "ClientSubnets": [
+                            "subnet-0b9fcdaeca4e2a0c3",
+                            "subnet-0599c09bf908c27f0"
+                        ],
+                        "InstanceType": "kafka.t3.small",
+                        "SecurityGroups": [
+                            "sg-0a0a8ec3122a2e004"
+                        ],
+                        "StorageInfo": {
+                            "EbsStorageInfo": {
+                                "VolumeSize": 10
+                            }
+                        },
+                        "ConnectivityInfo": {
+                            "PublicAccess": {
+                                "Type": "DISABLED"
+                            },
+                            "VpcConnectivity": {
+                                "ClientAuthentication": {
+                                    "Sasl": {
+                                        "Scram": {
+                                            "Enabled": false
+                                        },
+                                        "Iam": {
+                                            "Enabled": false
+                                        }
+                                    },
+                                    "Tls": {
+                                        "Enabled": false
+                                    }
+                                }
+                            }
+                        },
+                        "ZoneIds": [
+                            "use1-az6",
+                            "use1-az1"
+                        ]
+                    },
+                    "CurrentBrokerSoftwareInfo": {
+                        "KafkaVersion": "3.5.1"
+                    },
+                    "EncryptionInfo": {
+                        "EncryptionAtRest": {
+                            "DataVolumeKMSKeyId": "arn:aws:kms:us-east-1:644160558196:key/8aa4e58d-6208-4292-a711-3c79f65d5d5e"
+                        },
+                        "EncryptionInTransit": {
+                            "ClientBroker": "TLS",
+                            "InCluster": true
+                        }
+                    },
+                    "EnhancedMonitoring": "PER_BROKER",
+                    "OpenMonitoring": {
+                        "Prometheus": {
+                            "JmxExporter": {
+                                "EnabledInBroker": false
+                            },
+                            "NodeExporter": {
+                                "EnabledInBroker": false
+                            }
+                        }
+                    },
+                    "NumberOfBrokerNodes": 2,
+                    "ZookeeperConnectString": "z-1.c7ntest48042afe.sidyyb.c18.kafka.us-east-1.amazonaws.com:2181,z-3.c7ntest48042afe.sidyyb.c18.kafka.us-east-1.amazonaws.com:2181,z-2.c7ntest48042afe.sidyyb.c18.kafka.us-east-1.amazonaws.com:2181",
+                    "ZookeeperConnectStringTls": "z-1.c7ntest48042afe.sidyyb.c18.kafka.us-east-1.amazonaws.com:2182,z-3.c7ntest48042afe.sidyyb.c18.kafka.us-east-1.amazonaws.com:2182,z-2.c7ntest48042afe.sidyyb.c18.kafka.us-east-1.amazonaws.com:2182",
+                    "StorageMode": "LOCAL",
+                    "CustomerActionStatus": "NONE"
+                }
+            }
+        ]
+    }
+}
