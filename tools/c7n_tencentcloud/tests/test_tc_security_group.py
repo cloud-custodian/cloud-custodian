@@ -297,3 +297,41 @@ class TestSecurityGroup(BaseTest):
         resources = policy.run()
         ok = [r for r in resources if r["SecurityGroupId"] == "sg-jep2pqxk"]
         assert len(ok) == 1
+
+    @pytest.mark.vcr
+    def test_ingress_action_protocol(self):
+        def run_policy(action, protocol):
+            policy = self.load_policy(
+                {
+                    "name": "test_ingress_action_protocol",
+                    "resource": "tencentcloud.security-group",
+                    "filters": [
+                        {
+                            "type": "ingress",
+                            "Cidr": "0.0.0.0/0",
+                            "Action": action,
+                            "Protocol": protocol,
+                        }
+                    ]
+                },
+                region='na-ashburn',
+            )
+            return policy.run()
+
+        resources = run_policy('ACCEPT', 'ALL')
+        assert len(resources) == 1
+        assert resources[0]['SecurityGroupName'] == 'sg-allow-all-ingress'
+
+        resources = run_policy('ACCEPT', 'TCP')
+        assert len(resources) == 2
+        assert {r['SecurityGroupName'] for r in resources} == {
+            'sg-allow-all-ingress', 'sg-allow-tcp-ingress'
+        }
+
+        resources = run_policy('ACCEPT', 'UDP')
+        assert len(resources) == 1
+        assert resources[0]['SecurityGroupName'] == 'sg-allow-all-ingress'
+
+        resources = run_policy('DROP', 'ALL')
+        assert len(resources) == 1
+        assert resources[0]['SecurityGroupName'] == 'sg-deny-all-ingress'
