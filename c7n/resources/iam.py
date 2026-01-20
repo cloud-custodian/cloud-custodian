@@ -18,6 +18,7 @@ from dateutil.tz import tzutc
 from dateutil.parser import parse as parse_date
 
 from botocore.exceptions import ClientError
+from botocore.config import Config
 
 from c7n import deprecated
 from c7n.actions import BaseAction
@@ -37,7 +38,8 @@ from c7n.resolver import ValuesFrom
 from c7n.tags import TagActionFilter, TagDelayedAction, Tag, RemoveTag, universal_augment
 from c7n.utils import (
     get_partition, local_session, type_schema, chunks, filter_empty, QueryParser,
-    select_keys
+    select_keys,
+    get_retry
 )
 
 from c7n.resources.aws import Arn
@@ -248,6 +250,78 @@ class DescribeUser(DescribeSource):
             except client.exceptions.NoSuchEntityException:
                 continue
         return results
+
+
+@Role.action_registry.register('replace-inline-policy-with-managed-policy')
+class ReplaceInlinePolicyWithManagedPolicy(BaseAction):
+    """
+    Replace IAM Role attached Inline policies with Managed policies
+    and delete existing inline policies
+    :example:
+    .. code-block:: yaml
+        policies:
+            - name: iam-role-with-inline-policy
+              resource: iam-role
+              filters:
+                - Name: role-name
+              actions:
+                - type: replace-inline-policy-with-managed-policy
+    """
+
+    schema = type_schema(
+        'replace-inline-policy-with-managed-policy'
+    )
+
+    permissions = (
+        'iam:ListRolePolicies',
+        'iam:GetRolePolicy',
+        'iam:CreatePolicy',
+        'iam:DeletePolicy',
+        'iam:AttachRolePolicy'
+    )
+
+    def process(self, roles):
+        config = Config(
+            retries={
+                'max_attempts': 8,
+                'mode': 'standard'
+            }
+        )
+        client = local_session(self.manager.session_factory).client('iam', config=config)
+        retry = get_retry(('TooManyRequestsException', 'ResourceConflictException'))
+        for role in roles:
+            try:
+                # Lists all the inline policies in an IAM Role
+                policy_list = retry(
+                    client.list_role_policies, RoleName=role['RoleName']
+                )
+                if policy_list['PolicyNames']:
+                    self.log.info("Inline policies for role %s are %s " % (
+                        role['RoleName'], policy_list['PolicyNames']))
+                for policy_name in policy_list['PolicyNames']:
+                    policy_name_converted = policy_name + "_converted"
+                    policy_details = retry(
+                        client.get_role_policy, RoleName=role['RoleName'], PolicyName=policy_name
+                    )
+                    policy_document = json.dumps(policy_details['PolicyDocument'])
+                    create_policy_Response = retry(
+                        client.create_policy, PolicyName=policy_name_converted,
+                        PolicyDocument=policy_document,
+                        Description="Converted inline policy to managed policy"
+                    )
+                    retry(
+                        client.attach_role_policy, RoleName=role['RoleName'],
+                        PolicyArn=create_policy_Response['Policy']['Arn']
+                    )
+                    retry(
+                        client.delete_role_policy, RoleName=role['RoleName'], PolicyName=policy_name
+                    )
+            except ClientError as error:
+                self.log.info(error.response["Error"]["Code"])
+                if error.response["Error"]["Code"] in ("LimitExceeded", "LimitExceededException"):
+                    continue
+                else:
+                    raise error
 
 
 @resources.register('iam-user')

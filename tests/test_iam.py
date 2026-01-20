@@ -668,6 +668,32 @@ class IamRoleTest(BaseTest):
         assert client.get_role(RoleName='accountmgr-dev')[
             'Role'].get('PermissionsBoundary', {}) == {}
 
+    def test_iam_role_attached_inline_policy_with_managed_policy(self):
+        factory = self.replay_flight_data('test_iam_role_replace-inline-policy-with-managed-policy')
+        p = self.load_policy(
+            {
+                'name': 'replace-inline-with-managed-policy',
+                'resource': 'iam-role',
+                'filters':
+                    [
+                        {
+                            'RoleName': 'us-east-1-LambdaExecutionRole'
+                        }
+                    ],
+                'actions':
+                    [
+                        {
+                            'type': 'replace-inline-policy-with-managed-policy'
+                        }
+                    ]
+            },
+            session_factory=factory
+        )
+        p.resource_manager.execution_factory = MainThreadExecutor
+        resources = p.run()
+        assert len(resources) == 1
+        assert resources[0]['RoleName'] == 'us-east-1-LambdaExecutionRole'
+
 
 class IamUserTest(BaseTest):
 

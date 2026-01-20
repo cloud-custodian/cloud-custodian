@@ -1,0 +1,10 @@
+{
+    "status_code": 200,
+    "data": {
+        "PolicyNames": [
+            "us-east-1-DynamoPolicy"
+        ],
+        "IsTruncated": false,
+        "ResponseMetadata": {}
+    }
+}
