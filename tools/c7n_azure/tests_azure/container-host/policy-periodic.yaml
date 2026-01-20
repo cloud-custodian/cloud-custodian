@@ -1,0 +1,17 @@
+policies:
+  - name: c7n-%HOST%-periodic
+    description: Tests periodic policies on %HOST%
+    resource: azure.resourcegroup
+    mode: 
+      type: container-periodic
+      schedule: "*/5 * * * *"
+    filters:
+      - type: value
+        key: name
+        op: eq
+        value: "%RG_NAME%"
+      - tag:c7n-%HOST%-periodic: absent
+    actions:
+      - type: tag
+        tag: c7n-%HOST%-periodic
+        value: passed
