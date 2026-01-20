@@ -916,6 +916,71 @@ class DeleteTaskDefinition(BaseAction):
             for chunk in chunks(task_definitions_arns, size=10):
                 retry(client.delete_task_definitions, taskDefinitions=chunk)
 
+@ECSCluster.action_registry.register('delete')
+class DeleteCluster(BaseAction):
+    """Delete/Terminate an ECS Cluster.
+
+    force is False by default. When given as True, the cluster will 
+    be permanently deleted. Otherwise it'll just be marked inactive.
+
+    .. code-block:: yaml
+
+       policies:
+         - name: delete-ecs-cluster
+           resource: aws.ecs
+           filters:
+             - clusterName: test-ecs-cluster
+           actions:
+             - type: delete
+    """
+
+    schema = type_schema('delete', force={'type': 'boolean'})
+    permissions = ('ecs:DeleteCluster',)
+    chunk_size = 10
+
+    def process(self, resources):
+        client = local_session(self.manager.session_factory).client('ecs')
+        retry = get_retry(('Throttling',))
+        force = self.data.get('force', False)
+
+        for r in resources:
+            # If its not `force` we just mark it inactive
+            if r['status'] == 'INACTIVE':
+                continue
+
+            cluster = r['clusterArn']
+            self.delete_associated(r, client, retry, force)
+            retry(client.delete_cluster, cluster=cluster)
+
+    def delete_associated(self, r, client, retry, force):
+        cluster = r['clusterArn']
+        container_instances = client.list_container_instances(
+            cluster=cluster
+        )['containerInstanceArns']
+        for instance in container_instances:
+            retry(
+                client.deregister_container_instance,
+                cluster=cluster,
+                containerInstance=instance,
+                force=force,
+            )
+        tasks = client.list_tasks(cluster=cluster)['taskArns']
+        for task in tasks:
+            retry(
+                client.stop_task,
+                cluster=cluster,
+                task=task,
+                reason='c7n deleting associated cluster',
+            )
+        services = client.list_services(cluster=cluster)['serviceArns']
+        for service in services:
+            retry(
+                client.delete_service,
+                cluster=cluster,
+                service=service,
+                force=force
+            )
+
 
 @resources.register('ecs-container-instance')
 class ContainerInstance(query.ChildResourceManager):
