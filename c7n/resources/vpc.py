@@ -2235,6 +2235,67 @@ class RouteTable(query.QueryResourceManager):
         cfn_type = config_type = "AWS::EC2::RouteTable"
 
 
+class RouteFilter(Filter):
+
+    schema_attr = {
+        'DestinationCidrBlock': {'$ref': '#/definitions/filters/value'},
+        'DestinationIpv6CidrBlock': {'$ref': '#/definitions/filters/value'},
+        'DestinationPrefixListId': {'$ref': '#/definitions/filters/value'},
+        'EgressOnlyInternetGatewayId': {'$ref': '#/definitions/filters/value'},
+        'GatewayId': {'$ref': '#/definitions/filters/value'},
+        'InstanceId': {'$ref': '#/definitions/filters/value'},
+        'InstanceOwnerId': {'$ref': '#/definitions/filters/value'},
+        'NatGatewayId': {'$ref': '#/definitions/filters/value'},
+        'TransitGatewayId': {'$ref': '#/definitions/filters/value'},
+        'LocalGatewayId': {'$ref': '#/definitions/filters/value'},
+        'CarrierGatewayId': {'$ref': '#/definitions/filters/value'},
+        'NetworkInterfaceId': {'$ref': '#/definitions/filters/value'},
+        'Origin': {'$ref': '#/definitions/filters/value'},
+        'State': {'$ref': '#/definitions/filters/value'},
+        'VpcPeeringConnectionId': {'$ref': '#/definitions/filters/value'},
+        'CoreNetworkArn': {'$ref': '#/definitions/filters/value'},
+    }
+
+    schema = {
+        'type': 'object',
+        'properties': {
+            'type': {'enum': ['ingress']},
+            'match-operator': {'enum': ['or', 'and']},
+        },
+        'required': ['type']
+    }
+    schema['properties'].update(schema_attr)
+    schema_alias = True
+    annotation_key = "c7n:matched-routes"
+
+    def process_route_set(self, routes):
+        matched = []
+        for r in routes:
+            if self.process_route(r):
+                matched.append(r)
+        return matched
+
+    def process_route(self, route):
+        route_matches = {}
+        for attr, f in self.get_attr_filters():
+            route_matches[attr] = bool(f(route))
+        match_op = self.data.get('match-operator', 'and') == 'and' and all or any
+        return match_op(route_matches)
+
+    def get_attr_filters(self):
+        for a in self.data:
+            if a not in self.schema_attr:
+                continue
+            af = self.data.get(a)
+            if isinstance(af, dict):
+                af['key'] = a
+            else:
+                af = {a: af}
+            vf = ValueFilter(af, self.manager)
+            vf.annotate = False
+            yield vf
+
+
 @RouteTable.filter_registry.register('vpc')
 class RouteTableVpcFilter(net_filters.VpcFilter):
 
