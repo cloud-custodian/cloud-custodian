@@ -790,8 +790,6 @@ class EBSSnapshotsFilter(ListItemFilter):
         return super().process(resources, event)
 
     def get_item_values(self, resource):
-        if self.annotate_items:
-            return resource[self.item_annotation_key]
         return resource.pop(self.item_annotation_key)
 
 
