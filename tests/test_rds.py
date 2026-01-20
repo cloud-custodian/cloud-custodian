@@ -22,6 +22,7 @@ from dateutil import tz as tzutil
 import c7n.filters.backup
 
 from .common import BaseTest, event_data
+from pytest_terraform import terraform
 
 logger = logging.getLogger(name="c7n.tests")
 
@@ -2259,3 +2260,32 @@ class RDSProxy(BaseTest):
         resources = p.run()
         self.assertEqual(len(resources), 1)
         self.assertEqual(resources[0]["DBProxyName"], "proxy-test-1")
+
+
+@terraform('rds_delete_aurora_filter')
+def test_rds_delete_logs_aurora_filter(test, rds_delete_aurora_filter):
+    session_factory = test.replay_flight_data('test_rds_delete_aurora_filter')
+
+    output = test.capture_logging('custodian.actions', level=logging.WARNING)
+
+    p = test.load_policy(
+        {
+            'name': 'rds-delete-aurora',
+            'resource': 'rds',
+            'filters': [
+                {'DBInstanceIdentifier': 'aurora-test-instance'}
+            ],
+            'actions': [
+                {'type': 'delete', 'skip-snapshot': True}
+            ],
+        },
+        session_factory=session_factory
+    )
+
+    p.run()
+
+    log_text = output.getvalue()
+    test.assertEqual(
+        log_text.strip(),
+        'delete implicitly filtered 0 of 1 resources key:DBClusterIdentifier on None',
+    )
