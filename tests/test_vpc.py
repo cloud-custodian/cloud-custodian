@@ -4771,3 +4771,39 @@ class TestVPCEndpointServiceConfiguration(BaseTest):
         resources = p.run()
         self.assertEqual(len(resources), 1)
         self.assertEqual(resources[0]['ServiceId'], 'vpce-svc-042193297e333714e')
+
+
+class TestGlueConnectionSubnetError(BaseTest):
+
+    def test_glue_connection_invalid_subnet_format(self):
+        factory = self.replay_flight_data("test_glue_connection_invalid_subnet")
+
+        p_basic = self.load_policy({
+            'name': 'glue-connection-basic',
+            'resource': 'glue-connection',
+            'filters': [
+                {'Name': 'test-connection-delete-me-jan-6'}
+            ]
+        }, session_factory=factory)
+
+        resources = p_basic.run()
+        self.assertEqual(len(resources), 1)
+        self.assertEqual(resources[0]['Name'], 'test-connection-delete-me-jan-6')
+
+        malformed_subnet_id = resources[0]['PhysicalConnectionRequirements']['SubnetId']
+        self.assertEqual(malformed_subnet_id, "['subnet-068dfbf3f275a6ae8','subnet-0472841b16adf7476']")
+
+        p_subnet = self.load_policy({
+            'name': 'get-subnets',
+            'resource': 'aws.subnet'
+        }, session_factory=factory)
+
+        with self.capture_logging('custodian.resources.subnet',
+                                   level=logging.WARNING) as log_output:
+            result = p_subnet.resource_manager.get_resources([malformed_subnet_id])
+
+            self.assertIsInstance(result, list)
+
+            log_output_str = log_output.getvalue()
+
+            self.assertIn("not found", log_output_str.lower())

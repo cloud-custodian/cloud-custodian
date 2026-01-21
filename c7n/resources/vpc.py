@@ -699,21 +699,32 @@ class DescribeSubnets(query.DescribeSource):
             except ClientError as e:
                 if e.response['Error']['Code'] != 'InvalidSubnetID.NotFound':
                     raise
+
+                original_count = len(resource_ids)
                 missing_subnet_ids = extract_subnet_ids(e)
-                if missing_subnet_ids:
-                    for sid in missing_subnet_ids:
-                        self.manager.log.warning(
-                            "Subnet ID '%s' not found, skipping", sid)
-                        if sid in resource_ids:
-                            resource_ids.remove(sid)
-                    if not resource_ids:
-                        return []
-                else:
+
+                for sid in missing_subnet_ids:
                     self.manager.log.warning(
-                        "InvalidSubnetID.NotFound error but \
-                         couldn't extract subnet IDs from the error: %s",
-                        str(e))
+                        "Subnet ID '%s' not found:", sid)
+
+                missing_set = set(missing_subnet_ids)
+                resource_ids = [rid for rid in resource_ids if rid not in missing_set]
+
+                if len(resource_ids) == original_count:
+                    error_str = str(e)
+                    for rid in list(resource_ids):
+                        if rid in error_str:
+                            self.manager.log.warning(
+                                "Malformed subnet ID '%s' not found:", rid)
+                            resource_ids.remove(rid)
+                            break
+
+                if len(resource_ids) == original_count:
+                    self.manager.log.warning(
+                        "InvalidSubnetID.NotFound error: unable to identify subnet ID from error: %s", str(e))
                     return []
+
+        return []
 
 
 def extract_subnet_ids(state_error):
