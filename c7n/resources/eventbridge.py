@@ -102,11 +102,6 @@ class EventApiDestination(QueryResourceManager):
         detail_spec = ('describe_api_destination', 'Name', 'Name', None)
         config_type = cfn_type = 'AWS::Events::ApiDestination'
         id = name = 'Name'
-        universal_taggable = object()
-        permissions_augment = ("events:ListTagsForResource",)
-
-    source_mapping = {'describe': DescribeWithResourceTags,
-                      'config': ConfigSource}
 
 
 class EventRuleQuery(ChildResourceQuery):
