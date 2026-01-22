@@ -266,14 +266,16 @@ class TagActionFilter(Filter):
         tz={'type': 'string'},
         skew={'type': 'number', 'minimum': 0},
         skew_hours={'type': 'number', 'minimum': 0},
-        op={'type': 'string'})
+        op={'type': 'string'},
+        custom={'type': 'boolean'})
     schema_alias = True
 
     def validate(self):
-        op = self.data.get('op')
-        if self.manager and op not in self.manager.action_registry.keys():
-            raise PolicyValidationError(
-                "Invalid marked-for-op op:%s in %s" % (op, self.manager.data))
+        if not self.data.get('custom'):
+            op = self.data.get('op')
+            if self.manager and op not in self.manager.action_registry.keys():
+                raise PolicyValidationError(
+                    "Invalid marked-for-op op:%s in %s" % (op, self.manager.data))
 
         tz = tzutil.gettz(Time.TZ_ALIASES.get(self.data.get('tz', 'utc')))
         if not tz:
@@ -610,7 +612,8 @@ class TagDelayedAction(Action):
         days={'type': 'number', 'minimum': 0},
         hours={'type': 'number', 'minimum': 0},
         tz={'type': 'string'},
-        op={'type': 'string'})
+        op={'type': 'string'},
+        custom={'type': 'boolean'})
     schema_alias = True
 
     batch_size = 200
@@ -622,11 +625,12 @@ class TagDelayedAction(Action):
         return self.manager.action_registry['tag'].permissions
 
     def validate(self):
-        op = self.data.get('op')
-        if self.manager and op not in self.manager.action_registry.keys():
-            raise PolicyValidationError(
-                "mark-for-op specifies invalid op:%s in %s" % (
-                    op, self.manager.data))
+        if not self.data.get('custom'):
+            op = self.data.get('op')
+            if self.manager and op not in self.manager.action_registry.keys():
+                raise PolicyValidationError(
+                    "mark-for-op specifies invalid op:%s in %s" % (
+                        op, self.manager.data))
 
         self.tz = tzutil.gettz(
             Time.TZ_ALIASES.get(self.data.get('tz', 'utc')))
