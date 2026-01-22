@@ -314,31 +314,30 @@ class ImageAncestryFilter(Filter):
         approved_owners = self.data['approved_owners']
         results = []
 
-        for r in resources:
-            # Check if the AMI itself is from an approved owner
-            ami_owner = r.get('ImageOwnerAlias') or r.get('OwnerId')
-            if ami_owner in approved_owners:
-                continue  # AMI is approved, skip ancestry check
-            
-            if 'c7n:image-ancestry' not in r:
-                try:
-                    ancestry = client.get_image_ancestry(ImageId=r['ImageId'])
-                    r['c7n:image-ancestry'] = ancestry.get('ImageAncestryEntries', [])
-                except ClientError as e:
-                    log.warning(f"Error getting ancestry for {r['ImageId']}: {e}")
-                    r['c7n:image-ancestry'] = []
-            
+        for r in resources:            
             if self._check_parent_owner(client, r):
                 results.append(r)
 
         return results
 
     def _check_parent_owner(self, client, resource):
+        approved_owners = self.data['approved_owners']
+        # Check if the AMI itself is from an approved owner
+        ami_owner = resource.get('ImageOwnerAlias') or resource.get('OwnerId')
+        if ami_owner in self.data['approved_owners']:
+            return False  # AMI is approved, skip ancestry check
+
+        if 'c7n:image-ancestry' not in resource:
+            try:
+                ancestry = client.get_image_ancestry(ImageId=resource['ImageId'])
+                resource['c7n:image-ancestry'] = ancestry.get('ImageAncestryEntries', [])
+            except ClientError as e:
+                log.warning(f"Error getting ancestry for {r['ImageId']}: {e}")
+                resource['c7n:image-ancestry'] = []
         ancestry = resource['c7n:image-ancestry']
         max_depth = self.data.get('max_depth', 1)
-        approved_owners = self.data['approved_owners']
         
-        # Check ancestors from depth 1 up to max_depth
+        # Check ancestors up to max_depth
         for depth in range(min(max_depth, len(ancestry))):
             parent_entry = ancestry[depth]
             parent_id = parent_entry.get('ImageId')
