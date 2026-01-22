@@ -472,6 +472,73 @@ class ImageAge(AgeFilter, InstanceImageBase):
             return parse("2000-01-01T01:01:01.000Z")
 
 
+@filters.register('image-ancestry')
+class ImageAncestry(Filter, InstanceImageBase):
+    """EC2 AMI ancestry filter
+
+    Filters EC2 instances based on their AMI's ancestry.
+    Flags instances whose AMI doesn't have an approved owner in the ancestry chain.
+    max_depth defaults to 1 (immediate parent). Set to 2 to include grandparent, etc.
+
+    :Example:
+
+    .. code-block:: yaml
+
+        policies:
+          - name: ec2-unapproved-ami-ancestry
+            resource: ec2
+            filters:
+              - type: image-ancestry
+                approved_owners:
+                  - '123456789012'
+                  - amazon
+                max_depth: 2
+    """
+
+    schema = type_schema(
+        'image-ancestry',
+        approved_owners={'type': 'array', 'items': {'type': 'string'}},
+        max_depth={'type': 'integer', 'minimum': 1},
+        required=['approved_owners'])
+
+    def get_permissions(self):
+        return ['ec2:GetImageAncestry', 'ec2:DescribeImages']
+
+    def process(self, resources, event=None):
+        self.prefetch_instance_images(resources)
+        client = utils.local_session(self.manager.session_factory).client('ec2')
+        ami_filter = self.manager.get_resource_manager('ami').filter_registry.get('image-ancestry')
+        approved_owners = self.data['approved_owners']
+        results = []
+
+        for instance in resources:
+            image = self.get_instance_image(instance)
+            if not image:
+                continue
+            
+
+            # Check if the AMI itself is from an approved owner
+            ami_owner = image.get('ImageOwnerAlias') or image.get('OwnerId')
+            if ami_owner in approved_owners:
+                continue  # AMI is approved, skip ancestry check
+
+            # Populate ancestry on the AMI if not already present
+            if 'c7n:image-ancestry' not in image:
+                try:
+                    ancestry = client.get_image_ancestry(ImageId=image['ImageId'])
+                    image['c7n:image-ancestry'] = ancestry.get('ImageAncestryEntries', [])
+                except ClientError as e:
+                    self.log.warning(f"Error getting ancestry for {image['ImageId']}: {e}")
+                    image['c7n:image-ancestry'] = []
+            
+            # Use the AMI filter's logic to check parent owner
+            filter_instance = ami_filter(self.data, self.manager.get_resource_manager('ami'))
+            if filter_instance._check_parent_owner(client, image):
+                results.append(instance)
+
+        return results
+
+
 @filters.register('image')
 class InstanceImage(ValueFilter, InstanceImageBase):
 
