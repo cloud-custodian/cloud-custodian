@@ -307,7 +307,7 @@ class ImageAncestryFilter(Filter):
         required=['approved_owners'])
 
     def get_permissions(self):
-        return ['ec2:GetImageAncestry', 'ec2:DescribeImages']
+        return ['ec2:DescribeImages', 'ec2:GetImageAncestry']
 
     def process(self, resources, event=None):
         client = local_session(self.manager.session_factory).client('ec2')

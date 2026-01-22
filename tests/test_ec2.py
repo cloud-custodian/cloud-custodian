@@ -701,6 +701,24 @@ class TestImageAgeFilter(BaseTest):
         self.assertEqual(len(resources), 1)
 
 
+class TestImageAncestryFilter(BaseTest):
+
+    def test_ec2_image_ancestry(self):
+        session_factory = self.replay_flight_data("test_ec2_image_ancestry")
+        policy = self.load_policy(
+            {
+                "name": "ec2-image-ancestry",
+                "resource": "ec2",
+                "filters": [
+                    {"type": "image-ancestry", "approved_owners": ["amazon"]}
+                ],
+            },
+            session_factory=session_factory,
+        )
+        resources = policy.run()
+        self.assertEqual(len(resources), 1)
+
+
 class TestImageFilter(BaseTest):
 
     def test_ec2_image(self):

@@ -193,3 +193,19 @@ class TestAMI(BaseTest):
         )
         resources = p.run()
         self.assertEqual(len(resources), 1)
+
+    def test_ami_image_ancestry(self):
+        session_factory = self.replay_flight_data("test_ami_image_ancestry")
+        p = self.load_policy(
+            {
+                "name": "ami-ancestry",
+                "resource": "ami",
+                "filters": [
+                    {"type": "image-ancestry", "approved_owners": ["amazon"]}
+                ],
+            },
+            session_factory=session_factory,
+        )
+        resources = p.run()
+        self.assertEqual(len(resources), 1)
+        self.assertIn('c7n:image-ancestry', resources[0])
