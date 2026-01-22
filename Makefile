@@ -140,8 +140,11 @@ data-update:
 ###
 # Static analyzers
 
+# For context around skipping the B105 (hardcoded password)
+# rule, see:
+# https://github.com/PyCQA/bandit/issues/1350
 analyzer-bandit:
-	uvx bandit -i -s B101,B311 \
+	uvx bandit -i -s B101,B105,B311 \
 	-r tools/c7n_azure/c7n_azure \
 	 tools/c7n_gcp/c7n_gcp \
 	 tools/c7n_oci/c7n_oci \
