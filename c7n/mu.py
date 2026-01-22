@@ -19,6 +19,7 @@ import tempfile
 import zipfile
 import platform
 import re
+from .utils import lambda_cwe_policy_delta
 
 
 # We use this for freezing dependencies for serverless environments
@@ -1215,15 +1216,26 @@ class CloudWatchEventSource(AWSEventBase):
             response = {'RuleArn': rule['Arn']}
 
         client = self.session.client('lambda')
+
         try:
-            client.add_permission(
-                FunctionName=func.name,
-                StatementId=func.event_name,
-                SourceArn=response['RuleArn'],
-                Action='lambda:InvokeFunction',
-                Principal='events.amazonaws.com')
-            log.debug('Added lambda invoke cwe rule permission')
-        except client.exceptions.ResourceConflictException:
+            current_policy_document = json.loads(client.get_policy(FunctionName=func.name)['Policy'])
+        except client.exceptions.ResourceNotFoundException:
+            pass
+        
+        #Improves runtime and prevents updates to lambda version timestamps
+        if lambda_cwe_policy_delta(current_policy_document['Statement'], func.name, response['Arn']):
+            try:
+                client.add_permission(
+                    FunctionName=func.name,
+                    StatementId=func.event_name,
+                    SourceArn=response['RuleArn'],
+                    Action='lambda:InvokeFunction',
+                    Principal='events.amazonaws.com')
+                log.debug('Added lambda invoke cwe rule permission')
+            except client.exceptions.ResourceConflictException:
+                pass
+        else:
+            log.error('Policy already exists for %s' % func.name)
             pass
 
         # Add Targets
