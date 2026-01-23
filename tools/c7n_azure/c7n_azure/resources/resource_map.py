@@ -95,6 +95,7 @@ ResourceMap = {
     "azure.spring-service-instance": "c7n_azure.resources.spring.SpringServiceInstance",
     "azure.sql-database": "c7n_azure.resources.sqldatabase.SqlDatabase",
     "azure.sqldatabase": "c7n_azure.resources.sqldatabase.SqlDatabase",
+    "azure.sql-managed-instance": "c7n_azure.resources.sqlmanagedinstance.SqlManagedInstance",
     "azure.sql-server": "c7n_azure.resources.sqlserver.SqlServer",
     "azure.sqlserver": "c7n_azure.resources.sqlserver.SqlServer",
     "azure.storage": "c7n_azure.resources.storage.Storage",
