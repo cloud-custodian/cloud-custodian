@@ -14,6 +14,7 @@ import sys
 import traceback
 from datetime import datetime
 from dateutil.parser import parse as date_parse
+from c7n.commands import LoadSessionPolicyJson
 
 try:
     from setproctitle import setproctitle
@@ -45,9 +46,9 @@ def _default_options(p, exclude=[]):
             help="AWS Region to target.  Can be used multiple times")
     provider.add_argument(
         "--profile",
-        help="AWS Account Config File Profile to utilize")
+        help="Account Config File Profile to utilize (AWS/TencentCloud)")
     provider.add_argument("--assume", default=None, dest="assume_role",
-                          help="Role to assume")
+                          help="Role or Service Account to assume")
     provider.add_argument("--external-id", default=None, dest="external_id",
                           help="External Id to provide when assuming a role")
 
@@ -98,6 +99,10 @@ def _default_options(p, exclude=[]):
             help="Cache validity in minutes (default %(default)i)")
     else:
         p.add_argument("--cache", default=None, help=argparse.SUPPRESS)
+    if 'session-policy' not in exclude:
+        p.add_argument("--session-policy", required=False, default=None,
+                       action=LoadSessionPolicyJson,
+                       help="[OPTIONAL] AWS IAM Policy Document to be used as a session policy")
 
 
 def _report_options(p):
@@ -333,10 +338,10 @@ def _setup_logger(options):
     logging.getLogger('urllib3').setLevel(logging.ERROR)
 
 
-def main():
+def main(args=None):
     parser = setup_parser()
     argcomplete.autocomplete(parser)
-    options = parser.parse_args()
+    options = parser.parse_args(args=args)
     if options.subparser is None:
         parser.print_help(file=sys.stderr)
         return sys.exit(2)

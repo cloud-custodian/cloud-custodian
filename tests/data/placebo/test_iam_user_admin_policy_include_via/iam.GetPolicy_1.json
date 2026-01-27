@@ -1,0 +1,46 @@
+{
+    "status_code": 200, 
+    "data": {
+        "Policy": {
+            "PolicyName": "AdministratorAccess", 
+            "Description": "Provides full access to AWS services and resources.", 
+            "CreateDate": {
+                "hour": 18, 
+                "__class__": "datetime", 
+                "month": 2, 
+                "second": 46, 
+                "microsecond": 0, 
+                "year": 2015, 
+                "day": 6, 
+                "minute": 39
+            }, 
+            "AttachmentCount": 2, 
+            "IsAttachable": true, 
+            "PolicyId": "ANPAIWMBCKSKIEE64ZLYK", 
+            "DefaultVersionId": "v1", 
+            "Path": "/", 
+            "Arn": "arn:aws:iam::aws:policy/AdministratorAccess", 
+            "UpdateDate": {
+                "hour": 18, 
+                "__class__": "datetime", 
+                "month": 2, 
+                "second": 46, 
+                "microsecond": 0, 
+                "year": 2015, 
+                "day": 6, 
+                "minute": 39
+            }
+        }, 
+        "ResponseMetadata": {
+            "RetryAttempts": 0, 
+            "HTTPStatusCode": 200, 
+            "RequestId": "138aff10-d69b-11e6-ba70-050a502ea605", 
+            "HTTPHeaders": {
+                "x-amzn-requestid": "138aff10-d69b-11e6-ba70-050a502ea605", 
+                "date": "Mon, 09 Jan 2017 18:40:21 GMT", 
+                "content-length": "766", 
+                "content-type": "text/xml"
+            }
+        }
+    }
+}

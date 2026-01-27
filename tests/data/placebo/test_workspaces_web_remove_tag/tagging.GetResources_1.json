@@ -1,0 +1,18 @@
+{
+    "status_code": 200,
+    "data": {
+        "PaginationToken": "",
+        "ResourceTagMappingList": [
+            {
+                "ResourceARN": "arn:aws:workspaces-web:us-east-1:644160558196:portal/86048a7f-ee77-4dff-99bb-145ba3d1ad45",
+                "Tags": [
+                    {
+                        "Key": "foo",
+                        "Value": "bar"
+                    }
+                ]
+            }
+        ],
+        "ResponseMetadata": {}
+    }
+}

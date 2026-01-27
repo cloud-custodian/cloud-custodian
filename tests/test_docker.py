@@ -139,6 +139,7 @@ def test_image_metadata(image_name):
         "org.opencontainers.image.description",
         "org.opencontainers.image.documentation",
         "org.opencontainers.image.licenses",
+        "org.opencontainers.image.ref.name",
         "org.opencontainers.image.title",
         "org.opencontainers.image.source",
         "org.opencontainers.image.revision",
@@ -153,7 +154,7 @@ def test_image_metadata(image_name):
 def test_cli_providers_available():
     providers = os.environ.get("CUSTODIAN_PROVIDERS", None)
     if providers is None:
-        providers = {"aws", "azure", "gcp", "k8s", "openstack", "tencentcloud"}
+        providers = {"aws", "azure", "gcp", "k8s", "openstack", "tencentcloud", "oci", "awscc"}
     elif providers == "":
         providers = {"aws"}
     else:
@@ -161,6 +162,7 @@ def test_cli_providers_available():
 
     client = docker.from_env()
     output = client.containers.run(CUSTODIAN_IMAGE, "schema", stderr=True)
+    print(output)
     resources = yaml.safe_load(output.strip())["resources"]
     found_providers = {r.split(".", 1)[0] for r in resources}
     assert providers == found_providers

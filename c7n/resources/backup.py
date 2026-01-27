@@ -51,6 +51,7 @@ class BackupPlan(QueryResourceManager):
         arn = 'BackupPlanArn'
         config_type = cfn_type = 'AWS::Backup::BackupPlan'
         universal_taggable = object()
+        permissions_augment = ("backup:ListTags",)
 
     source_mapping = {
         'describe': DescribeBackup,

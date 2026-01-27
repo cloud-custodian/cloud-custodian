@@ -1,13 +1,149 @@
 # Copyright The Cloud Custodian Authors.
 # SPDX-License-Identifier: Apache-2.0
+import logging
 import time
-from .common import BaseTest, functional, event_data
+from .common import BaseTest, functional, event_data, load_data
 from unittest.mock import MagicMock
 
 from botocore.exceptions import ClientError as BotoClientError
 from c7n.exceptions import PolicyValidationError
 from c7n.resources.aws import shape_validate
 from pytest_terraform import terraform
+
+import pytest
+import jmespath
+from .zpill import ACCOUNT_ID
+
+
+@pytest.mark.audited
+@terraform('sg_used_cross_ref')
+def test_sg_used_cross_ref(test, sg_used_cross_ref):
+    aws_region = 'us-west-2'
+    factory = test.replay_flight_data('sg_used_cross_ref', region=aws_region)
+    p = test.load_policy({
+        'name': 'sg_used_cross_ref',
+        'resource': 'security-group',
+        'filters': ['used']
+    }, session_factory=factory)
+    unused = p.resource_manager.filters[0]
+    test.patch(
+        unused,
+        'get_scanners',
+        lambda: (("sg-perm-refs", unused.get_sg_refs),)
+    )
+    resources = p.run()
+    assert len(resources) == 1
+    assert resources[0]['GroupName'] == sg_used_cross_ref[
+        'aws_security_group.n2.name']
+
+
+@terraform('ec2_igw_subnet')
+def test_ec2_igw_subnet(test, ec2_igw_subnet):
+    aws_region = 'us-east-1'
+    session_factory = test.replay_flight_data('ec2_igw_subnet', region=aws_region)
+
+    p = test.load_policy(
+        {
+            'name': 'ec2_igw_subnet',
+            'resource': 'ec2',
+            'filters': [
+                {
+                    'type': 'subnet',
+                    'igw': True,
+                    'key': 'SubnetId',
+                    'value': 'present',
+                },
+            ],
+        },
+        session_factory=session_factory,
+        config={'region': aws_region},
+    )
+
+    resources = p.run()
+
+    result_instance_ids = set(i['InstanceId'] for i in resources)
+    expected_instance_ids = {
+        ec2_igw_subnet['aws_instance.public_auto_assigned.id'],
+        ec2_igw_subnet['aws_instance.public_primary_interface.id'],
+        ec2_igw_subnet['aws_instance.public_secondary_interface.id'],
+    }
+    assert len(resources) == len(expected_instance_ids)
+    assert expected_instance_ids == result_instance_ids
+
+
+@terraform('ec2_security_group_filter_multi_enis')
+def test_ec2_security_group_filter_multi_enis(test, ec2_security_group_filter_multi_enis):
+    aws_region = 'us-east-1'
+    session_factory = test.replay_flight_data(
+        'ec2_security_group_filter_multi_enis', region=aws_region)
+
+    p = test.load_policy(
+        {
+            'name': 'ec2_security_group_filter_multi_enis',
+            'resource': 'ec2',
+            'filters': [
+                {
+                    'type': 'security-group',
+                    'key': 'length(IpPermissions[]|[?IpRanges[?CidrIp==`0.0.0.0/0`]])',
+                    'op': 'greater-than',
+                    'value': 0,
+                },
+            ],
+        },
+        session_factory=session_factory,
+        config={'region': aws_region},
+    )
+
+    resources = p.run()
+
+    result_instance_ids = set(i['InstanceId'] for i in resources)
+    expected_instance_ids = {
+        ec2_security_group_filter_multi_enis['aws_instance.primary_interface.id'],
+        ec2_security_group_filter_multi_enis['aws_instance.secondary_interface.id'],
+    }
+    assert len(resources) == len(expected_instance_ids)
+    assert expected_instance_ids == result_instance_ids
+
+
+def test_vpc_usage(test):
+    factory = test.replay_flight_data(
+        'test_vpc_usage_detect_set', region='us-west-1')
+    p = test.load_policy({
+        'name': 'vpc-usage',
+        'resource': 'aws.vpc',
+        'filters': [
+            {'type': 'vpc-attributes',
+             'addressusage': False}],
+        'actions': [
+            {'type': 'modify',
+             'addressusage': True}],
+        }, session_factory=factory)
+    resources = p.run()
+    assert len(resources) == 1
+    client = factory().client('ec2')
+    result = client.describe_vpc_attribute(
+        VpcId=resources[0]['VpcId'],
+        Attribute='enableNetworkAddressUsageMetrics')
+    assert result['EnableNetworkAddressUsageMetrics']['Value'] is True
+
+
+def test_vpc_usage_metric(test):
+    factory = test.replay_flight_data(
+        'test_vpc_usage_metrics', region='us-west-1')
+    p = test.load_policy({
+        'name': 'vpc-usage',
+        'resource': 'aws.vpc',
+        'filters': [
+            {'type': 'metrics',
+             'statistics': 'Maximum',
+             'value': 0,
+             'op': 'gte',
+             'missing-value': 0,
+             'days': 2,
+             'name': 'NetworkAddressUsage'}
+        ]}, session_factory=factory)
+    resources = p.run()
+    assert resources[0]['VpcId'] == 'vpc-6d20940b'
 
 
 def test_eni_igw_subnet(test):
@@ -24,6 +160,36 @@ def test_eni_igw_subnet(test):
     resources = p.run()
     assert len(resources) == 1
     assert resources[0]['NetworkInterfaceId'] == 'eni-0d47bf614f6182182'
+
+
+def test_eni_nat_subnet(test):
+    factory = test.replay_flight_data('test_eni_private_subnet')
+
+    p = test.load_policy({
+        'name': 'private-eni',
+        'resource': 'aws.eni',
+        'filters': [
+            {'type': 'subnet',
+             'key': 'SubnetId',
+             'value': 'present',
+             'nat': True}
+        ]}, session_factory=factory)
+    resources = p.run()
+    assert len(resources) == 2
+    assert resources[0]['NetworkInterfaceId'] == 'eni-054de8d628e757d05'
+
+    p = test.load_policy({
+        'name': 'egress-eni',
+        'resource': 'aws.eni',
+        'filters': [
+            {'type': 'subnet',
+             'key': 'SubnetId',
+             'value': 'present',
+             'nat': False}
+        ]}, session_factory=factory)
+    resources = p.run()
+    assert len(resources) == 1
+    assert resources[0]['NetworkInterfaceId'] == 'eni-02f9c1d34f40af967'
 
 
 @terraform('aws_code_build_vpc')
@@ -178,7 +344,6 @@ class VpcTest(BaseTest):
         factory = self.replay_flight_data("test_vpc_flow_logs_misconfigured")
 
         vpc_id1 = "vpc-4a9ff72e"
-
         traffic_type = "all"
         log_group = "/aws/lambda/myIOTFunction"
         status = "active"
@@ -207,7 +372,7 @@ class VpcTest(BaseTest):
         )
         resources = p.run()
         self.assertEqual(len(resources), 1)
-        self.assertEqual(resources[0]["VpcId"], vpc_id1)
+        self.assertEqual(resources[0]['VpcId'], vpc_id1)
 
     def test_eni_vpc_filter(self):
         self.session_factory = self.replay_flight_data("test_eni_vpc_filter")
@@ -230,7 +395,9 @@ class VpcTest(BaseTest):
                 "name": "dns-hostnames-and-support-enabled",
                 "resource": "vpc",
                 "filters": [
-                    {"type": "vpc-attributes", "dnshostnames": True, "dnssupport": True}
+                    {"type": "vpc-attributes",
+                     "dnshostnames": True,
+                     "dnssupport": True}
                 ],
             },
             session_factory=self.session_factory,
@@ -273,6 +440,167 @@ class VpcTest(BaseTest):
         self.assertEqual([len(resources), resources[0]["VpcId"]], [1, "vpc-7af45101"])
         self.assertTrue("c7n:DhcpConfiguration" in resources[0])
 
+    def test_dhcp_options_filter_amazon(self):
+        # Test amazon synthetic value for Amazon-provided DNS
+        session_factory = self.replay_flight_data("test_vpc_dhcp_options_amazon")
+        p = self.load_policy(
+            {
+                "name": "c7n-dhcp-options-amazon",
+                "resource": "vpc",
+                "filters": [
+                    {
+                        "type": "dhcp-options",
+                        "domain-name-servers": "amazon",
+                    }
+                ],
+            },
+            session_factory=session_factory,
+        )
+        resources = p.run()
+        self.assertEqual(len(resources), 1)
+        self.assertTrue("c7n:DhcpConfiguration" in resources[0])
+
+    def test_dhcp_options_filter_amazon_match_all(self):
+        # Test match-operator: all with amazon to ensure all DNS servers are Amazon DNS
+        session_factory = self.replay_flight_data("test_vpc_dhcp_options_amazon_all")
+        p = self.load_policy(
+            {
+                "name": "c7n-dhcp-options-amazon-all",
+                "resource": "vpc",
+                "filters": [
+                    {
+                        "type": "dhcp-options",
+                        "match-operator": "all",
+                        "domain-name-servers": "amazon",
+                    }
+                ],
+            },
+            session_factory=session_factory,
+        )
+        resources = p.run()
+        # This should match VPCs where ALL DNS servers are Amazon DNS
+        self.assertEqual(len(resources), 1)
+        for resource in resources:
+            self.assertTrue("c7n:DhcpConfiguration" in resource)
+            dns_servers = resource["c7n:DhcpConfiguration"].get(
+                "domain-name-servers", []
+            )
+            # Verify all DNS servers are Amazon-provided
+            self.assertTrue(len(dns_servers) > 0)
+            # Should have only Amazon DNS servers
+            for dns in dns_servers:
+                self.assertIn(
+                    dns,
+                    ["AmazonProvidedDNS", "169.254.169.253", "10.0.20.2"],
+                    f"DNS {dns} should be Amazon-provided"
+                )
+
+    def test_dhcp_options_filter_amazon_present_false(self):
+        # Test amazon with present: false to catch non-Amazon DNS
+        # Using test data with mixed DNS (Amazon + external)
+        session_factory = self.replay_flight_data("test_vpc_dhcp_options_mixed")
+        p = self.load_policy(
+            {
+                "name": "c7n-dhcp-options-mixed",
+                "resource": "vpc",
+                "filters": [
+                    {
+                        "type": "dhcp-options",
+                        "match-operator": "all",
+                        "present": False,
+                        "domain-name-servers": "amazon",
+                    }
+                ],
+            },
+            session_factory=session_factory,
+        )
+        resources = p.run()
+        # Should match VPCs that have at least one non-Amazon DNS
+        self.assertEqual(len(resources), 1)
+        for resource in resources:
+            self.assertTrue("c7n:DhcpConfiguration" in resource)
+            dns_servers = resource["c7n:DhcpConfiguration"].get(
+                "domain-name-servers", []
+            )
+            # Should have at least one non-Amazon DNS
+            self.assertIn("8.8.8.8", dns_servers)
+
+    def test_dhcp_options_filter_amazon_no_match_all(self):
+        # Test amazon without match-operator (defaults to 'any' - at least one must be Amazon DNS)
+        session_factory = self.replay_flight_data("test_vpc_dhcp_options_mixed")
+        p = self.load_policy(
+            {
+                "name": "c7n-dhcp-options-amazon-any",
+                "resource": "vpc",
+                "filters": [
+                    {
+                        "type": "dhcp-options",
+                        "domain-name-servers": "amazon",
+                    }
+                ],
+            },
+            session_factory=session_factory,
+        )
+        resources = p.run()
+        # Should match VPCs that have at least one Amazon DNS (even if mixed)
+        # Test data has 2 VPCs, both with at least one Amazon DNS
+        self.assertEqual(len(resources), 2)
+        for resource in resources:
+            self.assertTrue("c7n:DhcpConfiguration" in resource)
+            dns_servers = resource["c7n:DhcpConfiguration"].get(
+                "domain-name-servers", []
+            )
+            # At least one DNS server should be Amazon-provided
+            amazon_dns_found = any(
+                dns in ["AmazonProvidedDNS", "169.254.169.253", "10.0.20.2", "10.0.30.2"]
+                for dns in dns_servers
+            )
+            self.assertTrue(amazon_dns_found)
+
+    def test_dhcp_options_filter_amazon_invalid_cidr(self):
+        # Test that invalid CIDR blocks are handled gracefully
+        from c7n.resources.vpc import DhcpOptionsFilter
+
+        # Create a mock filter instance
+        filter_instance = DhcpOptionsFilter({"domain-name-servers": "amazon"}, None)
+
+        # Test with invalid CIDR - should return None
+        result = filter_instance._calculate_cidr_plus_2("invalid-cidr")
+        self.assertIsNone(result)
+
+        # Test with empty string - should return None
+        result = filter_instance._calculate_cidr_plus_2("")
+        self.assertIsNone(result)
+
+    def test_dhcp_options_filter_amazon_with_secondary_cidr(self):
+        # Test that amazon value works with secondary CIDR blocks
+        # This ensures _get_amazon_dns_servers processes all CIDR blocks
+        from c7n.resources.vpc import DhcpOptionsFilter
+
+        filter_instance = DhcpOptionsFilter({"domain-name-servers": "amazon"}, None)
+
+        # Mock VPC with primary and secondary CIDR
+        vpc = {
+            "CidrBlock": "10.0.0.0/16",
+            "CidrBlockAssociationSet": [
+                {
+                    "CidrBlock": "10.0.0.0/16",
+                    "CidrBlockState": {"State": "associated"}
+                },
+                {
+                    "CidrBlock": "10.1.0.0/16",
+                    "CidrBlockState": {"State": "associated"}
+                }
+            ]
+        }
+
+        amazon_dns = filter_instance._get_amazon_dns_servers(vpc)
+        # Should have AmazonProvidedDNS, 169.254.169.253, and both CIDR base+2
+        self.assertIn("AmazonProvidedDNS", amazon_dns)
+        self.assertIn("169.254.169.253", amazon_dns)
+        self.assertIn("10.0.0.2", amazon_dns)
+        self.assertIn("10.1.0.2", amazon_dns)
+
     def test_vpc_endpoint_filter(self):
         factory = self.replay_flight_data("test_vpc_endpoint_filter")
         p = self.load_policy(
@@ -312,6 +640,153 @@ class VpcTest(BaseTest):
         resources = p.run()
         self.assertEqual(len(resources), 2)
         self.assertTrue("subnet-068dfbf3f275a6ae8" in resources[0]["c7n:matched-vpc-endpoint"])
+
+    def test_subnet_ip_address_usage_filter(self):
+        factory = self.replay_flight_data("test_subnet_ip_address_usage_filter", region="us-east-2")
+        p = self.load_policy(
+            {
+                "name": "subnet-no-ips-used",
+                "resource": "aws.subnet",
+                "filters": [
+                    {
+                        "type": "ip-address-usage",
+                        "key": "NumberUsed",
+                        "value": 0,
+                    }
+                ],
+            },
+            session_factory=factory,
+            config={"region": "us-east-2"},
+        )
+        resources = p.run()
+        self.assertEqual(len(resources), 2)
+
+        p = self.load_policy(
+            {
+                "name": "subnet-almost-full",
+                "resource": "aws.subnet",
+                "filters": [
+                    {
+                        "type": "ip-address-usage",
+                        "key": "PercentUsed",
+                        "op": "greater-than",
+                        "value": 90,
+                    }
+                ],
+            },
+            session_factory=factory,
+            config={"region": "us-east-2"},
+        )
+        resources = p.run()
+        self.assertEqual(len(resources), 1)
+
+    @functional
+    def test_subnet_delete(self):
+        factory = self.replay_flight_data("test_subnet_delete")
+        client = factory().client("ec2")
+        vpc_id = client.create_vpc(CidrBlock="10.4.0.0/16")["Vpc"]["VpcId"]
+        self.addCleanup(client.delete_vpc, VpcId=vpc_id)
+        subnet_id = client.create_subnet(
+            VpcId=vpc_id, CidrBlock="10.4.1.0/24"
+        )["Subnet"]["SubnetId"]
+
+        def delete_subnet():
+            try:
+                client.delete_subnet(SubnetId=subnet_id)
+            except BotoClientError:
+                pass
+
+        self.addCleanup(delete_subnet)
+        p = self.load_policy(
+            {
+                "name": "subnet-delete",
+                "resource": "aws.subnet",
+                "filters": [
+                    {
+                        "type": "ip-address-usage",
+                        "key": "NumberUsed",
+                        "value": 0,
+                    },
+                    {"SubnetId": subnet_id}
+                ],
+                "actions": ["delete"],
+            },
+            session_factory=factory,
+        )
+        resources = p.run()
+        self.assertEqual(len(resources), 1)
+        self.assertEqual(resources[0]["SubnetId"], subnet_id)
+        self.assertRaisesRegex(
+            BotoClientError,
+            'InvalidSubnetID.NotFound',
+            client.describe_subnets,
+            SubnetIds=[subnet_id],
+        )
+
+    @functional
+    def test_subnet_delete_with_dependencies(self):
+        factory = self.replay_flight_data("test_subnet_delete_with_dependencies")
+        client = factory().client("ec2")
+        vpc_id = client.create_vpc(CidrBlock="10.4.0.0/16")["Vpc"]["VpcId"]
+        self.addCleanup(client.delete_vpc, VpcId=vpc_id)
+        subnet_id = client.create_subnet(
+            VpcId=vpc_id, CidrBlock="10.4.2.0/24"
+        )["Subnet"]["SubnetId"]
+
+        eni_id = client.create_network_interface(
+            SubnetId=subnet_id)["NetworkInterface"]["NetworkInterfaceId"]
+
+        def delete_subnet():
+            try:
+                client.delete_subnet(SubnetId=subnet_id)
+            except BotoClientError:
+                pass
+        self.addCleanup(delete_subnet)
+
+        def delete_network_interface():
+            try:
+                client.delete_network_interface(NetworkInterfaceId=eni_id)
+            except BotoClientError:
+                pass
+        self.addCleanup(delete_network_interface)
+
+        p = self.load_policy(
+            {
+                "name": "subnet-delete-with-dependencies",
+                "resource": "aws.subnet",
+                "filters": [{"SubnetId": subnet_id}],
+                "actions": ["delete"],
+            },
+            session_factory=factory,
+        )
+        resources = p.run()
+        self.assertEqual(len(resources), 1)
+        self.assertEqual(resources[0]["SubnetId"], subnet_id)
+
+        subnets = client.describe_subnets(SubnetIds=[subnet_id])["Subnets"]
+        self.assertEqual(len(subnets), 1)
+
+    def test_endpoint_policy_filter(self):
+        factory = self.replay_flight_data("test_endpoint_policy_filter")
+        p = self.load_policy(
+            {
+                "name": "endpoint-policy-filter",
+                "resource": "vpc-endpoint",
+                "filters": [
+                    {
+                        "type": "has-statement",
+                        "statements": [{
+                            "Effect": "Allow",
+                            "Action": "*"
+                        }],
+                    }
+                ],
+            },
+            session_factory=factory,
+        )
+        resources = p.run()
+        self.assertEqual(len(resources), 1)
+        self.assertTrue("vpce-011d813b183878b82" in resources[0]["VpcEndpointId"])
 
 
 class NetworkLocationTest(BaseTest):
@@ -659,6 +1134,279 @@ class NetworkLocationTest(BaseTest):
         resources = p.run()
         self.assertEqual(len(resources), 0)
 
+    @functional
+    def test_network_location_match_in_triple_intersect(self):
+        self.factory = self.replay_flight_data("test_network_location_match_in_triple_intersect")
+        client = self.factory().client("ec2")
+        vpc_id = client.create_vpc(CidrBlock="10.4.0.0/16")["Vpc"]["VpcId"]
+        self.addCleanup(client.delete_vpc, VpcId=vpc_id)
+
+        web_sub_id = client.create_subnet(VpcId=vpc_id, CidrBlock="10.4.9.0/24")[
+            "Subnet"
+        ][
+            "SubnetId"
+        ]
+        self.addCleanup(client.delete_subnet, SubnetId=web_sub_id)
+
+        web_sg_id = client.create_security_group(
+            GroupName="web-tier", VpcId=vpc_id, Description="for apps"
+        )[
+            "GroupId"
+        ]
+        self.addCleanup(client.delete_security_group, GroupId=web_sg_id)
+
+        nic = client.create_network_interface(SubnetId=web_sub_id, Groups=[web_sg_id])[
+            "NetworkInterface"
+        ][
+            "NetworkInterfaceId"
+        ]
+        self.addCleanup(client.delete_network_interface, NetworkInterfaceId=nic)
+
+        client.create_tags(
+            Resources=[web_sg_id],
+            Tags=[{"Key": "Location", "Value": "web1"}],
+        )
+        client.create_tags(
+            Resources=[web_sub_id],
+            Tags=[{"Key": "Location", "Value": "web2"}],
+        )
+        client.create_tags(
+            Resources=[nic],
+            Tags=[{"Key": "Location", "Value": "web3"}],
+        )
+        p = self.load_policy(
+            {
+                "name": "netloc",
+                "resource": "eni",
+                "filters": [
+                    {"NetworkInterfaceId": nic},
+                    {"type": "network-location",
+                     "key": "tag:Location",
+                     "match": "in",
+                     "value": ["web1", "web2", "web3"]},
+                ],
+            },
+            session_factory=self.factory,
+        )
+        resources = p.run()
+        self.assertEqual(len(resources), 1)
+
+    @functional
+    def test_network_location_match_in_mismatch(self):
+        self.factory = self.replay_flight_data("test_network_location_match_in_mismatch")
+        client = self.factory().client("ec2")
+        vpc_id = client.create_vpc(CidrBlock="10.4.0.0/16")["Vpc"]["VpcId"]
+        self.addCleanup(client.delete_vpc, VpcId=vpc_id)
+
+        web_sub_id = client.create_subnet(VpcId=vpc_id, CidrBlock="10.4.9.0/24")[
+            "Subnet"
+        ][
+            "SubnetId"
+        ]
+        self.addCleanup(client.delete_subnet, SubnetId=web_sub_id)
+
+        web_sg_id = client.create_security_group(
+            GroupName="web-tier", VpcId=vpc_id, Description="for apps"
+        )[
+            "GroupId"
+        ]
+        self.addCleanup(client.delete_security_group, GroupId=web_sg_id)
+
+        nic = client.create_network_interface(SubnetId=web_sub_id, Groups=[web_sg_id])[
+            "NetworkInterface"
+        ][
+            "NetworkInterfaceId"
+        ]
+        self.addCleanup(client.delete_network_interface, NetworkInterfaceId=nic)
+
+        client.create_tags(
+            Resources=[web_sg_id, web_sub_id],
+            Tags=[{"Key": "Location", "Value": "web"}],
+        )
+        client.create_tags(
+            Resources=[nic],
+            Tags=[{"Key": "Location", "Value": "invalid"}],
+        )
+        p = self.load_policy(
+            {
+                "name": "netloc",
+                "resource": "eni",
+                "filters": [
+                    {"NetworkInterfaceId": nic},
+                    {"type": "network-location",
+                     "key": "tag:Location",
+                     "match": "in",
+                     "value": ["web"]},
+                ],
+            },
+            session_factory=self.factory,
+        )
+        resources = p.run()
+        self.assertEqual(len(resources), 0)
+
+    @functional
+    def test_network_location_match_in_mismatch_subnet(self):
+        self.factory = self.replay_flight_data("test_network_location_match_in_mismatch_subnet")
+        client = self.factory().client("ec2")
+        vpc_id = client.create_vpc(CidrBlock="10.4.0.0/16")["Vpc"]["VpcId"]
+        self.addCleanup(client.delete_vpc, VpcId=vpc_id)
+
+        web_sub_id = client.create_subnet(VpcId=vpc_id, CidrBlock="10.4.9.0/24")[
+            "Subnet"
+        ][
+            "SubnetId"
+        ]
+        self.addCleanup(client.delete_subnet, SubnetId=web_sub_id)
+
+        web_sg_id = client.create_security_group(
+            GroupName="web-tier", VpcId=vpc_id, Description="for apps"
+        )[
+            "GroupId"
+        ]
+        self.addCleanup(client.delete_security_group, GroupId=web_sg_id)
+
+        nic = client.create_network_interface(SubnetId=web_sub_id, Groups=[web_sg_id])[
+            "NetworkInterface"
+        ][
+            "NetworkInterfaceId"
+        ]
+        self.addCleanup(client.delete_network_interface, NetworkInterfaceId=nic)
+
+        client.create_tags(
+            Resources=[web_sg_id],
+            Tags=[{"Key": "Location", "Value": "web1"}],
+        )
+        client.create_tags(
+            Resources=[nic],
+            Tags=[{"Key": "Location", "Value": "web2"}],
+        )
+        client.create_tags(
+            Resources=[web_sub_id],
+            Tags=[{"Key": "Location", "Value": "invalid"}],
+        )
+        p = self.load_policy(
+            {
+                "name": "netloc",
+                "resource": "eni",
+                "filters": [
+                    {"NetworkInterfaceId": nic},
+                    {"type": "network-location",
+                     "key": "tag:Location",
+                     "match": "in",
+                     "value": ["web1", "web2"]},
+                ],
+            },
+            session_factory=self.factory,
+        )
+        resources = p.run()
+        self.assertEqual(len(resources), 0)
+
+    @functional
+    def test_network_location_match_in_mismatch_sg(self):
+        self.factory = self.replay_flight_data("test_network_location_match_in_mismatch_sg")
+        client = self.factory().client("ec2")
+        vpc_id = client.create_vpc(CidrBlock="10.4.0.0/16")["Vpc"]["VpcId"]
+        self.addCleanup(client.delete_vpc, VpcId=vpc_id)
+
+        web_sub_id = client.create_subnet(VpcId=vpc_id, CidrBlock="10.4.9.0/24")[
+            "Subnet"
+        ][
+            "SubnetId"
+        ]
+        self.addCleanup(client.delete_subnet, SubnetId=web_sub_id)
+
+        web_sg_id = client.create_security_group(
+            GroupName="web-tier", VpcId=vpc_id, Description="for apps"
+        )[
+            "GroupId"
+        ]
+        self.addCleanup(client.delete_security_group, GroupId=web_sg_id)
+
+        nic = client.create_network_interface(SubnetId=web_sub_id, Groups=[web_sg_id])[
+            "NetworkInterface"
+        ][
+            "NetworkInterfaceId"
+        ]
+        self.addCleanup(client.delete_network_interface, NetworkInterfaceId=nic)
+
+        client.create_tags(
+            Resources=[web_sub_id],
+            Tags=[{"Key": "Location", "Value": "invalid"}],
+        )
+        client.create_tags(
+            Resources=[nic],
+            Tags=[{"Key": "Location", "Value": "web1"}],
+        )
+        client.create_tags(
+            Resources=[web_sg_id],
+            Tags=[{"Key": "Location", "Value": "web2"}],
+        )
+        p = self.load_policy(
+            {
+                "name": "netloc",
+                "resource": "eni",
+                "filters": [
+                    {"NetworkInterfaceId": nic},
+                    {"type": "network-location",
+                     "key": "tag:Location",
+                     "match": "in",
+                     "value": ["web1", "web2"]},
+                ],
+            },
+            session_factory=self.factory,
+        )
+        resources = p.run()
+        self.assertEqual(len(resources), 0)
+
+    @functional
+    def test_network_location_match_in_subnet_missing_ok(self):
+        self.factory = self.replay_flight_data("test_network_location_match_in_subnet_missing_ok")
+        client = self.factory().client("ec2")
+        vpc_id = client.create_vpc(CidrBlock="10.4.0.0/16")["Vpc"]["VpcId"]
+        self.addCleanup(client.delete_vpc, VpcId=vpc_id)
+
+        web_sub_id = client.create_subnet(VpcId=vpc_id, CidrBlock="10.4.9.0/24")[
+            "Subnet"
+        ][
+            "SubnetId"
+        ]
+        self.addCleanup(client.delete_subnet, SubnetId=web_sub_id)
+
+        web_sg_id = client.create_security_group(
+            GroupName="web-tier", VpcId=vpc_id, Description="for apps"
+        )[
+            "GroupId"
+        ]
+        self.addCleanup(client.delete_security_group, GroupId=web_sg_id)
+
+        nic = client.create_network_interface(SubnetId=web_sub_id, Groups=[web_sg_id])[
+            "NetworkInterface"
+        ][
+            "NetworkInterfaceId"
+        ]
+        self.addCleanup(client.delete_network_interface, NetworkInterfaceId=nic)
+
+        client.create_tags(
+            Resources=[nic],
+            Tags=[{"Key": "Location", "Value": "web"}],
+        )
+        p = self.load_policy(
+            {
+                "name": "netloc",
+                "resource": "eni",
+                "filters": [
+                    {"NetworkInterfaceId": nic},
+                    {"type": "network-location",
+                     "key": "tag:Location",
+                     "match": "in",
+                     "value": ["web"]},
+                ],
+            },
+            session_factory=self.factory,
+        )
+        resources = p.run()
+        self.assertEqual(len(resources), 0)
+
 
 class NetworkAclTest(BaseTest):
 
@@ -729,6 +1477,47 @@ class TransitGatewayTest(BaseTest):
         self.assertEqual(len(resources), 1)
         self.assertEqual(resources[0]['ResourceId'], 'vpc-f1516b97')
 
+    def test_tgw_attachment_cloudtrail(self):
+        factory = self.replay_flight_data('test_transit_gateway_attachment_query_cwe')
+        p = self.load_policy(
+            {
+                "name": "test-tgw-att-cwe",
+                "resource": "transit-attachment",
+                "mode": {
+                    "type": "cloudtrail",
+                    "events": [{
+                        "event": "DeleteTransitGatewayVpcAttachment",
+                        "ids": "requestParameters.DelTGwVpcAttachReq.TransitGatewayAttachmentId",
+                        "source": "ec2.amazonaws.com"
+                    }]},
+            },
+            config={'region': 'us-west-2'}, session_factory=factory)
+        resources = p.push(event_data("event-transit-gateway-delete-vpc-attachment.json"))
+        self.assertEqual(len(resources), 1)
+
+
+def test_tgw_attachment_metrics_filter(test):
+    factory = test.replay_flight_data("test_tgw_attachment_metrics_filter")
+    p = test.load_policy(
+        {
+            "name": "tgw_attachment-idle",
+            "resource": "aws.transit-attachment",
+            "filters": [
+                {
+                    "type": "metrics",
+                    "name": "BytesIn",
+                    "op": "le",
+                    "value": 0,
+                    "statistics": "Sum",
+                    "days": 1
+                }
+            ],
+        },
+        session_factory=factory,
+    )
+    resources = p.run()
+    test.assertEqual(len(resources), 1)
+
 
 class NetworkInterfaceTest(BaseTest):
 
@@ -768,6 +1557,135 @@ class NetworkInterfaceTest(BaseTest):
         self.assertEqual(
             [k for k in resources[0] if k.startswith("c7n")], ["c7n:MatchedFilters"]
         )
+
+    def test_interface_detach(self):
+        session_factory = self.replay_flight_data("test_network_interface_detach")
+        client = session_factory().client("ec2")
+        eni = "eni-0605e38e04785b878"
+        instance = "i-05fccf7da99ad47f7"
+
+        p = self.load_policy(
+            {
+                "name": "detach-enis",
+                "resource": "eni",
+                "filters": [
+                    {
+                        "type": "value",
+                        "key": "NetworkInterfaceId",
+                        "value": eni,
+                    },
+                    {
+                        "type": "value",
+                        "key": "Attachment.InstanceId",
+                        "value": "present",
+                    },
+                    {
+                        "type": "value",
+                        "key": "Association.PublicIp",
+                        "value": "present",
+                    },
+                ],
+                "actions": [
+                    {
+                        "type": "detach",
+                    }
+                ]
+            },
+            session_factory=session_factory,
+        )
+        response = client.describe_instances(InstanceIds=[instance])
+        self.assertEqual(len(response["Reservations"][0]["Instances"][0]["NetworkInterfaces"]), 2)
+        resources = p.run()
+        self.assertEqual(len(resources), 1)
+        if self.recording:
+            time.sleep(30)
+        response = client.describe_instances(InstanceIds=[instance])
+        self.assertEqual(len(response["Reservations"][0]["Instances"][0]["NetworkInterfaces"]), 1)
+
+    def test_interface_detach_primary_nic_1(self):
+        session_factory = self.replay_flight_data("test_interface_detach_primary_nic_1")
+        client = session_factory().client("ec2")
+        eni = "eni-007ebb46d3795b43b"
+        instance = "i-042c20d5454745bbe"
+
+        p = self.load_policy(
+            {
+                "name": "detach-enis",
+                "resource": "eni",
+                "filters": [
+                    {
+                        "type": "value",
+                        "key": "NetworkInterfaceId",
+                        "value": eni,
+                    },
+                    {
+                        "type": "value",
+                        "key": "Attachment.InstanceId",
+                        "value": "present",
+                    },
+                    {
+                        "type": "value",
+                        "key": "Association.PublicIp",
+                        "value": "present",
+                    },
+                ],
+                "actions": [
+                    {
+                        "type": "detach",
+                    }
+                ]
+            },
+            session_factory=session_factory,
+        )
+        response = client.describe_instances(InstanceIds=[instance])
+        self.assertEqual(len(response["Reservations"][0]["Instances"][0]["NetworkInterfaces"]), 1)
+        resources = p.run()
+        self.assertEqual(len(resources), 1)
+        response = client.describe_instances(InstanceIds=[instance])
+        self.assertEqual(len(response["Reservations"][0]["Instances"][0]["NetworkInterfaces"]), 1)
+
+    def test_interface_detach_primary_nic_2(self):
+        session_factory = self.replay_flight_data("test_interface_detach_primary_nic_2")
+        client = session_factory().client("ec2")
+
+        p = self.load_policy(
+            {
+                "name": "detach-enis",
+                "resource": "eni",
+                "filters": [
+                    {
+                        "type": "value",
+                        "key": "Attachment.InstanceId",
+                        "value": "present",
+                    },
+                    {
+                        "type": "value",
+                        "key": "Association.PublicIp",
+                        "value": "present",
+                    },
+                ],
+                "actions": [
+                    {
+                        "type": "detach",
+                    }
+                ]
+            },
+            session_factory=session_factory,
+        )
+        response = client.describe_instances()
+        self.assertEqual(
+            len(jmespath.search(
+                'Reservations[].Instances[].NetworkInterfaces[].NetworkInterfaceId',
+                response)), 3)
+        resources = p.run()
+        if self.recording:
+            time.sleep(30)
+        self.assertEqual(len(resources), 3)
+        response = client.describe_instances()
+        self.assertEqual(
+            len(jmespath.search(
+                'Reservations[].Instances[].NetworkInterfaces[].NetworkInterfaceId'
+                , response)), 2)
 
     def test_interface_delete(self):
         factory = self.replay_flight_data("test_network_interface_delete")
@@ -1025,6 +1943,104 @@ class NetworkAddrTest(BaseTest):
 
         self.assert_policy_release_failed(factory, ec2, network_addrs["Addresses"][0])
 
+    def test_eip_shield(self):
+        session_factory = self.replay_flight_data("test_eip_shield")
+        p = self.load_policy(
+            {
+                "name": "eip-shield",
+                "resource": "network-addr",
+                "filters": [
+                    {"type": "shield-enabled", "state": False},
+                ],
+                "actions": ["set-shield"],
+            },
+            session_factory=session_factory,
+        )
+        resources = p.run()
+        self.assertEqual(len(resources), 1)
+
+    def test_address_disassociate(self):
+        session_factory = self.replay_flight_data("test_address_disassociate")
+        client = session_factory().client("ec2")
+        allocation_id = "eipalloc-02b147389a1522f9d"
+
+        p = self.load_policy(
+            {
+                "name": "disassociate-network-addr",
+                "resource": "network-addr",
+                "filters": [
+                    {
+                        "AllocationId": allocation_id
+                    }
+                ],
+                "actions": [
+                    {
+                        "type": "disassociate"
+                    }
+                ]
+            },
+            session_factory=session_factory,
+        )
+        pre_response = client.describe_addresses(AllocationIds=[allocation_id])
+        self.assertIn("AssociationId", pre_response["Addresses"][0])
+        resources = p.run()
+        self.assertEqual(len(resources), 1)
+        if self.recording:
+            time.sleep(5)
+        post_response = client.describe_addresses(AllocationIds=[allocation_id])
+        self.assertNotIn("AssociationId", post_response["Addresses"][0])
+
+    def test_address_disassociate_exception(self):
+        session_factory = self.replay_flight_data("test_address_disassociate_exception")
+        client = session_factory().client("ec2")
+        allocation_id = "eipalloc-064c7be63c6334ade"
+        association_id = "eipassoc-0478441923b77b671"
+
+        p = self.load_policy(
+            {
+                "name": "disassociate-network-addr",
+                "resource": "network-addr",
+                "filters": [
+                    {
+                        "AllocationId": allocation_id
+                    }
+                ],
+                "actions": [
+                    {
+                        "type": "disassociate"
+                    }
+                ]
+            },
+            session_factory=session_factory,
+        )
+        pre_response = client.describe_addresses(AllocationIds=[allocation_id])
+        self.assertIn("AssociationId", pre_response["Addresses"][0])
+        client.disassociate_address(AssociationId=association_id)
+        if self.recording:
+            time.sleep(5)
+        resources = p.run()
+        self.assertEqual(len(resources), 1)
+        post_response = client.describe_addresses(AllocationIds=[allocation_id])
+        self.assertNotIn("AssociationId", post_response["Addresses"][0])
+
+    def test_eip_used_by(self):
+        factory = self.replay_flight_data("test_eip_used_by")
+        p = self.load_policy(
+            {
+                "name": "eip-used-by-ec2",
+                "resource": "network-addr",
+                "filters": [
+                    {
+                        "type": "used-by",
+                        "resource-type": "ec2"
+                    }
+                ]
+            },
+            session_factory=factory, config={'region': 'us-west-2'}
+        )
+        resources = p.run()
+        self.assertEqual(len(resources), 1)
+
 
 class RouteTableTest(BaseTest):
 
@@ -1142,6 +2158,49 @@ def test_cross_az_nat_gateway_subnet_resolve(test):
         'rtb-0e40b5294fd751b38': ['subnet-0845061a295aef2b6'],
         'rtb-0f13aebd1241f7141': ['subnet-0b8f90974afb1a016']
     }
+
+
+def test_cross_az_nat_gateway_regional_nat(test, caplog):
+    """Test that Regional NAT Gateways without SubnetId are handled gracefully and logged."""
+    from c7n.resources.vpc import CrossAZRouteTable
+    from unittest.mock import MagicMock
+
+    # Mock NAT gateways including a Regional NAT Gateway without SubnetId
+    mock_nat_gateways = [
+        {'NatGatewayId': 'nat-zonal-123', 'SubnetId': 'subnet-123'},
+        {'NatGatewayId': 'nat-regional-456'},  # Regional NAT Gateway without SubnetId
+    ]
+
+    # Create a mock filter instance
+    mock_manager = MagicMock()
+    mock_nat_manager = MagicMock()
+    mock_nat_manager.resources.return_value = mock_nat_gateways
+    mock_subnet_manager = MagicMock()
+    mock_subnet_manager.resources.return_value = [
+        {'SubnetId': 'subnet-123', 'AvailabilityZone': 'us-east-1a'}
+    ]
+
+    def get_resource_manager(resource_type):
+        if resource_type == 'nat-gateway':
+            return mock_nat_manager
+        elif resource_type == 'aws.subnet':
+            return mock_subnet_manager
+        return MagicMock()
+
+    mock_manager.get_resource_manager = get_resource_manager
+
+    filter_instance = CrossAZRouteTable({'type': 'cross-az-nat-gateway-route'}, mock_manager)
+
+    # Process with empty route tables - we just want to verify logging
+    with caplog.at_level(logging.WARNING):
+        filter_instance.process([])
+
+    # Verify warning was logged about Regional NAT Gateway exclusion
+    assert any(
+        'excluding 1 Regional NAT Gateway(s) without SubnetId' in record.message
+        and 'nat-regional-456' in record.message
+        for record in caplog.records
+    )
 
 
 class PeeringConnectionTest(BaseTest):
@@ -1290,6 +2349,16 @@ class SecurityGroupTest(BaseTest):
             ],
         )
 
+    def test_used_consumer_eni_in_producer(self):
+        p = self.load_policy(
+            {"name": "sg-used", "resource": "security-group", "filters": ["used"]},
+        )
+        used = p.resource_manager.filters[0]
+        used.nics = load_data('ram-producer-view-consumer-eni.json')['NetworkInterfaces']
+
+        group_enis = used._get_eni_attributes()
+        assert set(group_enis) == {'sg-123', 'sg-456', 'sg-789'}
+
     def test_used(self):
         factory = self.replay_flight_data("test_security_group_used")
         p = self.load_policy(
@@ -1297,11 +2366,14 @@ class SecurityGroupTest(BaseTest):
             session_factory=factory,
         )
         resources = p.run()
-        self.assertEqual(len(resources), 5)
+        self.assertEqual(len(resources), 3)
         self.assertEqual(
-            {"sg-f9cc4d9f", "sg-13de8f75", "sg-ce548cb7", "sg-0a2cb503a229c31c1", "sg-1c8a186c"},
+            {"sg-f9cc4d9f", "sg-0a2cb503a229c31c1", "sg-1c8a186c"},
             {r["GroupId"] for r in resources},
         )
+        self.assertIn("amazon-aws", resources[0]["c7n:InstanceOwnerIds"])
+        self.assertIn("vpc_endpoint", resources[0]["c7n:InterfaceTypes"])
+        self.assertIn("ec2", resources[0]["c7n:InterfaceResourceTypes"])
 
     def test_unused_ecs(self):
         factory = self.replay_flight_data("test_security_group_ecs_unused")
@@ -1321,6 +2393,26 @@ class SecurityGroupTest(BaseTest):
         resources = p.run()
         assert resources == []
 
+    def test_unused_batch(self):
+        factory = self.replay_flight_data("test_security_group_batch_unused")
+        # 2 security groups in this flight data:
+        # * sg-0f026884bba48e351 (used by the compute environment)
+        # * sg-e2842c8b (not used -> should be returned as such)
+        p = self.load_policy(
+            {'name': 'sg-xyz',
+             'resource': 'security-group',
+             'filters': ['unused']},
+            session_factory=factory)
+        unused = p.resource_manager.filters[0]
+        self.patch(
+            unused,
+            'get_scanners',
+            lambda: (('batch', unused.get_batch_sgs),))
+        resources = p.run()
+        self.assertEqual(len(resources), 1)
+        self.assertNotEqual(resources[0]["GroupId"], "sg-0f026884bba48e351")  # used
+        self.assertEqual(resources[0]["GroupId"], "sg-e2842c8b")             # not used
+
     def test_unused(self):
         factory = self.replay_flight_data("test_security_group_unused")
         p = self.load_policy(
@@ -1328,7 +2420,7 @@ class SecurityGroupTest(BaseTest):
             session_factory=factory,
         )
         resources = p.run()
-        self.assertEqual(len(resources), 1)
+        self.assertEqual(len(resources), 2)
 
     def test_match_resource_validator(self):
 
@@ -2491,6 +3583,10 @@ class SecurityGroupTest(BaseTest):
                         "Cidr": {
                             "value": "10.42.1.239", "op": "in", "value_type": "cidr"
                         },
+                    },
+                    {
+                        "type": "ingress",
+                        "SelfReference": False
                     }
                 ],
             },
@@ -2864,6 +3960,29 @@ class EndpointTest(BaseTest):
              'ec2:RevokeSecurityGroupEgress'))
 
 
+def test_endpoint_metrics_filter(test):
+    factory = test.replay_flight_data("test_vpc_endpoint_metrics_filter")
+    p = test.load_policy(
+        {
+            "name": "vpc_endpoint-idle",
+            "resource": "aws.vpc-endpoint",
+            "filters": [
+                {
+                    "type": "metrics",
+                    "name": "ActiveConnections",
+                    "op": "le",
+                    "value": 0,
+                    "statistics": "Sum",
+                    "days": 1
+                }
+            ],
+        },
+        session_factory=factory,
+    )
+    resources = p.run()
+    test.assertEqual(len(resources), 0)
+
+
 class InternetGatewayTest(BaseTest):
 
     def test_delete_internet_gateways(self):
@@ -2908,6 +4027,26 @@ class InternetGatewayTest(BaseTest):
         except BotoClientError:
             self.fail('should not raise')
         mock_factory().client('ec2').delete_internet_gateway.assert_called_once()
+
+    def test_delete_internet_gateway_with_dependencies(self):
+        factory = self.replay_flight_data(
+            "test_internet_gateway_delete_with_dependencies",
+            region="us-east-2"
+        )
+        p = self.load_policy(
+            {
+                "name": "delete-internet-gateway-with-dependencies",
+                "resource": "internet-gateway",
+                "filters": [{"tag:Name": "dev"}],
+                "actions": [{"type": "delete"}],
+            },
+            session_factory=factory,
+            config={"region": "us-east-2"},
+        )
+        with self.capture_logging("custodian.actions", level=logging.WARNING) as log_output:
+            resources = p.run()
+            self.assertEqual(len(resources), 1)
+            self.assertRegex(log_output.getvalue(), "DependencyViolation error")
 
 
 class NATGatewayTest(BaseTest):
@@ -3081,42 +4220,6 @@ class FlowLogsTest(BaseTest):
         self.assertEqual(resources[0]['c7n:flow-logs'][0]['LogDestination'],
                          'arn:aws:s3:::c7n-vpc-flow-logs')
 
-    def test_vpc_set_flow_logs_validation(self):
-        with self.assertRaises(PolicyValidationError) as e:
-            self.load_policy({
-                'name': 'flow-set-validate-1',
-                'resource': 'vpc',
-                'actions': [{
-                    'type': 'set-flow-log',
-                    'LogDestination': 'arn:aws:s3:::c7n-vpc-flow-logs/test/'
-                }]})
-        self.assertIn(
-            "DeliverLogsPermissionArn missing", str(e.exception))
-        with self.assertRaises(PolicyValidationError) as e:
-            self.load_policy({
-                'name': 'flow-set-validate-2',
-                'resource': 'vpc',
-                'actions': [{
-                    'type': 'set-flow-log',
-                    'DeliverLogsPermissionArn': 'arn:aws:iam',
-                    'LogGroupName': '/cloudwatch/logs',
-                    'LogDestination': 'arn:aws:s3:::c7n-vpc-flow-logs/test/'
-                }]})
-        self.assertIn("Exactly one of", str(e.exception))
-        with self.assertRaises(PolicyValidationError) as e:
-            self.load_policy({
-                'name': 'flow-set-validate-3',
-                'resource': 'vpc',
-                'actions': [{
-                    'type': 'set-flow-log',
-                    'LogDestinationType': 's3',
-                    'DeliverLogsPermissionArn': 'arn:aws:iam',
-                    'LogDestination': 'arn:aws:s3:::c7n-vpc-flow-logs/test/'
-                }]})
-        self.assertIn(
-            "DeliverLogsPermissionArn is prohibited for destination-type:s3",
-            str(e.exception))
-
     def test_vpc_set_flow_logs_s3(self):
         session_factory = self.replay_flight_data("test_vpc_set_flow_logs_s3")
         p = self.load_policy(
@@ -3146,6 +4249,44 @@ class FlowLogsTest(BaseTest):
             "FlowLogs"
         ]
         self.assertEqual(logs[0]["ResourceId"], resources[0]["VpcId"])
+
+    def test_vpc_set_flow_logs_legacy_schema_handling(self):
+        self.assertRaises(
+            PolicyValidationError,
+            self.load_policy,
+            {
+                "name": "c7n-vpc-flow-logs-legacy-schema",
+                "resource": "aws.vpc",
+                "filters": [
+                    {"tag:Name": "FlowLogTest"}, {"type": "flow-logs", "enabled": False}
+                ],
+                "actions": [
+                    {
+                        "type": "set-flow-log",
+                        "LogDestinationType": "s3",
+                        "LogDestination": "arn:aws:s3:::nonsense",
+                        "TrafficType": "ALL",
+                        "attrs": {
+                            "LogDestinationType": "s3",
+                            "LogDestination": "arn:aws:s3:::c7n-test/test.log.gz",
+                            "TrafficType": "ALL",
+                            "TagSpecifications": [
+                                {
+                                    "ResourceType": "vpc-flow-log",
+                                    "Tags": [
+                                        {
+                                            "Key": "Name",
+                                            "Value": "FlowLogTest"
+                                        },
+                                    ]
+                                }
+                            ]
+                        }
+                    }
+                ],
+            },
+            session_factory=None
+        )
 
     def test_vpc_delete_flow_logs(self):
         session_factory = self.replay_flight_data("test_vpc_delete_flow_logs")
@@ -3254,6 +4395,38 @@ class TestUnusedKeys(BaseTest):
         self.assertIn(resources[0]['KeyName'], unused_key)
         self.assertNotEqual(unused_key, keys)
         self.assertEqual(used_key, keys)
+
+    def test_unused_keypair_with_asg_launch_templates(self):
+        factory = self.replay_flight_data('test_unused_keypair_launch_template')
+        p = self.load_policy(
+            {"name": "test-unused-keypairs", "resource": "key-pair", "filters": ["unused"]},
+            session_factory=factory,
+        )
+        resources = p.run()
+        self.assertEqual(len(resources), 1)
+        self.assertEqual(resources[0]['KeyName'], 'delete')
+
+    def test_unused_keypair_true(self):
+        factory = self.replay_flight_data("test_unused_keypair")
+        p = self.load_policy(
+            {"name": "test-unused-keypairs", "resource": "key-pair", "filters": ["unused"]},
+            session_factory=factory,
+        )
+        resources = p.run()
+        self.assertEqual(len(resources), 1)
+
+    def test_unused_keypair_false(self):
+        factory = self.replay_flight_data("test_unused_keypair")
+        p = self.load_policy(
+            {
+                "name": "test-unused-keypairs",
+                "resource": "key-pair",
+                "filters": [{"type": "unused", "state": False}],
+            },
+            session_factory=factory,
+        )
+        resources = p.run()
+        self.assertEqual(len(resources), 1)
 
     def test_vpc_unused_key_not_filtered_error(self):
         with self.assertRaises(PolicyValidationError):
@@ -3390,3 +4563,170 @@ class TrafficMirror(BaseTest):
         self.assertEqual(len(resources), 1)
         self.assertEqual(resources[0]["TrafficMirrorTargetId"], "tmt-02cc3955d41358894")
         self.assertEqual(resources[0]['Tags'], [{"Key": "Owner", "Value": "pratyush"}])
+
+
+@terraform("vpc_delete")
+def test_vpc_delete(test, vpc_delete):
+    factory = test.replay_flight_data("test_vpc_delete")
+    p = test.load_policy(
+        {
+            "name": "delete-vpc",
+            "resource": "vpc",
+            "filters": [{"tag:Name": "c7n-test"}],
+            "actions": [{"type": "delete-empty"}],
+        },
+        session_factory=factory,
+    )
+    resources = p.run()
+    test.assertEqual(len(resources), 1)
+    client = factory(region="us-east-1").client("ec2")
+    vpcs = client.describe_vpcs(
+        Filters=[{"Name": "resource-id", "Values": [resources[0]["VpcId"]]}]
+    )[
+        "Vpcs"
+    ]
+    test.assertFalse(vpcs)
+
+
+@terraform("eip_shield_sync")
+def test_eip_shield_sync(test, eip_shield_sync):
+
+    session_factory = test.replay_flight_data("test_eip_shield_sync_1")
+
+    shield_client = session_factory().client("shield")
+
+    p = test.load_policy(
+        {
+            "name": "eip-shield-sync",
+            "resource": "network-addr",
+            "filters": [
+                {"type": "shield-enabled", "state": False},
+            ],
+            "actions": [{
+                "type": "set-shield",
+                "state": True,
+                "sync": True
+            }
+            ],
+        },
+        config={"account_id": ACCOUNT_ID},
+        session_factory=session_factory,
+    )
+
+    resources = p.run()
+
+    protections = shield_client.list_protections(
+        InclusionFilters={"ResourceTypes": ["ELASTIC_IP_ALLOCATION"]}
+    )
+    for p in protections["Protections"]:
+        if eip_shield_sync["aws_eip.unprotected.allocation_id"] in p["ResourceArn"]:
+            test.addCleanup(shield_client.delete_protection, ProtectionId=p["Id"])
+
+    test.assertEqual(len(resources), 1)
+    test.assertEqual(resources[0]["Tags"][0]["Value"], "unprotected")
+
+    # ensure that there are now 2 EIPs that are shield protected
+    protections = shield_client.list_protections(
+        InclusionFilters={"ResourceTypes": ["ELASTIC_IP_ALLOCATION"]}
+    )
+    test.assertEqual(len(protections["Protections"]), 2)
+
+
+@terraform("eip_shield_sync")
+def test_eip_shield_sync_deleted(test, eip_shield_sync):
+
+    session_factory = test.replay_flight_data("test_eip_shield_sync_2")
+
+    shield_client = session_factory().client("shield")
+    ec2_client = session_factory().client("ec2")
+
+    # delete the original protected resource
+    ec2_client.release_address(AllocationId=eip_shield_sync["aws_eip.protected.allocation_id"])
+
+    p = test.load_policy(
+        {
+            "name": "eip-shield-sync",
+            "resource": "network-addr",
+            "filters": [
+                {"type": "shield-enabled", "state": False},
+            ],
+            "actions": [{
+                "type": "set-shield",
+                "state": True,
+                "sync": True
+            }
+            ],
+        },
+        config={"account_id": ACCOUNT_ID},
+        session_factory=session_factory,
+    )
+
+    resources = p.run()
+
+    protections = shield_client.list_protections(
+        InclusionFilters={"ResourceTypes": ["ELASTIC_IP_ALLOCATION"]}
+    )
+    for p in protections["Protections"]:
+        if eip_shield_sync["aws_eip.unprotected.allocation_id"] in p["ResourceArn"]:
+            test.addCleanup(shield_client.delete_protection, ProtectionId=p["Id"])
+
+    test.assertEqual(len(resources), 1)
+    test.assertEqual(resources[0]["Tags"][0]["Value"], "unprotected")
+
+    # ensure that there is only 1 EIP that are shield protected after sync
+    protections = shield_client.list_protections(
+        InclusionFilters={"ResourceTypes": ["ELASTIC_IP_ALLOCATION"]}
+    )
+    test.assertEqual(len(protections["Protections"]), 1)
+
+
+class VpcResolverQueryLoggingTest(BaseTest):
+
+    def test_resolver_query_logging_filter(self):
+        factory = self.replay_flight_data("test_vpc_resolver_query_logging")
+
+        vpc_with_logging_id = "vpc-0503a8b9ddbb3a5c5"
+        vpc_without_logging_id = "vpc-029d7b65096a4717d"
+
+        p_enabled = self.load_policy({
+            "name": "find-vpcs-with-logging-enabled",
+            "resource": "vpc",
+            "filters": [
+                {"type": "resolver-query-logging", "state": True}
+            ]
+        }, session_factory=factory)
+
+        enabled_resources = p_enabled.run()
+
+        self.assertEqual(len(enabled_resources), 1)
+        self.assertEqual(enabled_resources[0]['VpcId'], vpc_with_logging_id)
+        self.assertIn('c7n:resolver-logging', enabled_resources[0])
+
+        p_without_logging = self.load_policy({
+            "name": "find-vpcs-without-logging",
+            "resource": "vpc",
+            "filters": [
+                {"type": "resolver-query-logging", "state": False}
+            ]
+        }, session_factory=factory)
+
+        resources_without_logging = p_without_logging.run()
+
+        self.assertEqual(len(resources_without_logging), 1)
+        self.assertEqual(resources_without_logging[0]['VpcId'], vpc_without_logging_id)
+        self.assertNotIn('c7n:resolver-logging', resources_without_logging[0])
+
+
+class TestVPCEndpointServiceConfiguration(BaseTest):
+    def test_query(self):
+        session_factory = self.replay_flight_data("test_vpc_endpoint_service_configuration_query")
+        p = self.load_policy({
+            "name": "vpc-endpoint-service-configuration-query",
+            "resource": "aws.vpc-endpoint-service-configuration",
+            "filters": [{
+                'RemoteAccessEnabled': False
+            }],
+        }, session_factory=session_factory)
+        resources = p.run()
+        self.assertEqual(len(resources), 1)
+        self.assertEqual(resources[0]['ServiceId'], 'vpce-svc-042193297e333714e')

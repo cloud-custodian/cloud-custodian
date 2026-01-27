@@ -32,6 +32,20 @@ class LifecycleRule(Filter):
     """
     Lifecycle rule filtering
     Multiple rules only need one match, and the match content needs to match all
+
+    :example:
+
+    .. code-block:: yaml
+
+        policies:
+          - name: tcr-no-lifecycle
+            resource: tencentcloud.tcr
+            filters:
+              - type: lifecycle-rule
+                state: true
+                match:
+                  - NamespaceName: custodian-test-namespace-2
+
     """
     schema = type_schema(
         'lifecycle-rule',

@@ -1,0 +1,252 @@
+{
+    "status_code": 200,
+    "data": {
+        "ConfigRules": [
+            {
+                "ConfigRuleName": "securityhub-s3-bucket-ssl-requests-only-5f634150",
+                "ConfigRuleArn": "arn:aws:config:us-east-1:644160558196:config-rule/aws-service-rule/securityhub.amazonaws.com/config-rule-dtnyre",
+                "ConfigRuleId": "config-rule-dtnyre",
+                "Description": "Checks whether S3 buckets have policies that require requests to use Secure Socket Layer (SSL).",
+                "Scope": {
+                    "ComplianceResourceTypes": [
+                        "AWS::S3::Bucket"
+                    ]
+                },
+                "Source": {
+                    "Owner": "AWS",
+                    "SourceIdentifier": "S3_BUCKET_SSL_REQUESTS_ONLY"
+                },
+                "InputParameters": "{}",
+                "ConfigRuleState": "ACTIVE",
+                "CreatedBy": "securityhub.amazonaws.com"
+            },
+            {
+                "ConfigRuleName": "securityhub-sagemaker-notebook-no-direct-internet-access-7c462347",
+                "ConfigRuleArn": "arn:aws:config:us-east-1:644160558196:config-rule/aws-service-rule/securityhub.amazonaws.com/config-rule-9r4usn",
+                "ConfigRuleId": "config-rule-9r4usn",
+                "Description": "Checks whether direct internet access is disabled for an Amazon SageMaker notebook instance. The rule is NON_COMPLIANT if Amazon SageMaker notebook instances are internet-enabled.",
+                "Scope": {
+                    "ComplianceResourceTypes": []
+                },
+                "Source": {
+                    "Owner": "AWS",
+                    "SourceIdentifier": "SAGEMAKER_NOTEBOOK_NO_DIRECT_INTERNET_ACCESS"
+                },
+                "InputParameters": "{}",
+                "MaximumExecutionFrequency": "Twelve_Hours",
+                "ConfigRuleState": "ACTIVE",
+                "CreatedBy": "securityhub.amazonaws.com"
+            },
+            {
+                "ConfigRuleName": "securityhub-secretsmanager-rotation-enabled-check-3bc21937",
+                "ConfigRuleArn": "arn:aws:config:us-east-1:644160558196:config-rule/aws-service-rule/securityhub.amazonaws.com/config-rule-ma7gvg",
+                "ConfigRuleId": "config-rule-ma7gvg",
+                "Description": "Checks whether AWS Secrets Manager secret has rotation enabled.",
+                "Scope": {},
+                "Source": {
+                    "Owner": "AWS",
+                    "SourceIdentifier": "SECRETSMANAGER_ROTATION_ENABLED_CHECK"
+                },
+                "InputParameters": "{}",
+                "ConfigRuleState": "ACTIVE",
+                "CreatedBy": "securityhub.amazonaws.com"
+            },
+            {
+                "ConfigRuleName": "securityhub-secretsmanager-scheduled-rotation-success-check-aec55511",
+                "ConfigRuleArn": "arn:aws:config:us-east-1:644160558196:config-rule/aws-service-rule/securityhub.amazonaws.com/config-rule-etnvto",
+                "ConfigRuleId": "config-rule-etnvto",
+                "Description": "Checks and verifies whether AWS Secrets Manager secret rotation has rotated successfully as per the rotation schedule. The rule is NON_COMPLIANT if RotationOccurringAsScheduled is false.",
+                "Scope": {},
+                "Source": {
+                    "Owner": "AWS",
+                    "SourceIdentifier": "SECRETSMANAGER_SCHEDULED_ROTATION_SUCCESS_CHECK"
+                },
+                "InputParameters": "{}",
+                "ConfigRuleState": "ACTIVE",
+                "CreatedBy": "securityhub.amazonaws.com"
+            },
+            {
+                "ConfigRuleName": "securityhub-secretsmanager-secret-periodic-rotation-9bdb5765",
+                "ConfigRuleArn": "arn:aws:config:us-east-1:644160558196:config-rule/aws-service-rule/securityhub.amazonaws.com/config-rule-rtrbnc",
+                "ConfigRuleId": "config-rule-rtrbnc",
+                "Description": "This control checks if your secrets have rotated at least once within 90 days. ",
+                "Scope": {},
+                "Source": {
+                    "Owner": "AWS",
+                    "SourceIdentifier": "SECRETSMANAGER_SECRET_PERIODIC_ROTATION"
+                },
+                "InputParameters": "{}",
+                "MaximumExecutionFrequency": "Twelve_Hours",
+                "ConfigRuleState": "ACTIVE",
+                "CreatedBy": "securityhub.amazonaws.com"
+            },
+            {
+                "ConfigRuleName": "securityhub-secretsmanager-secret-unused-49deb12a",
+                "ConfigRuleArn": "arn:aws:config:us-east-1:644160558196:config-rule/aws-service-rule/securityhub.amazonaws.com/config-rule-8s4uc8",
+                "ConfigRuleId": "config-rule-8s4uc8",
+                "Description": "This control checks whether your secrets have been accessed within a specified number of days. The default value is 90 days. Secrets that have not been accessed even once within the number days you define, fail this check.",
+                "Scope": {},
+                "Source": {
+                    "Owner": "AWS",
+                    "SourceIdentifier": "SECRETSMANAGER_SECRET_UNUSED"
+                },
+                "InputParameters": "{}",
+                "MaximumExecutionFrequency": "Twelve_Hours",
+                "ConfigRuleState": "ACTIVE",
+                "CreatedBy": "securityhub.amazonaws.com"
+            },
+            {
+                "ConfigRuleName": "securityhub-service-vpc-endpoint-enabled-bc5ce862",
+                "ConfigRuleArn": "arn:aws:config:us-east-1:644160558196:config-rule/aws-service-rule/securityhub.amazonaws.com/config-rule-xpmxgj",
+                "ConfigRuleId": "config-rule-xpmxgj",
+                "Description": "Checks whether Service Endpoint for the service provided in rule parameter is created for each Amazon VPC. The rule returns NON_COMPLIANT if an Amazon VPC doesn't have a VPC endpoint created for the service.",
+                "Scope": {},
+                "Source": {
+                    "Owner": "AWS",
+                    "SourceIdentifier": "SERVICE_VPC_ENDPOINT_ENABLED"
+                },
+                "InputParameters": "{\"serviceName\":\"ec2\"}",
+                "MaximumExecutionFrequency": "Twelve_Hours",
+                "ConfigRuleState": "ACTIVE",
+                "CreatedBy": "securityhub.amazonaws.com"
+            },
+            {
+                "ConfigRuleName": "securityhub-sns-encrypted-kms-b61211a8",
+                "ConfigRuleArn": "arn:aws:config:us-east-1:644160558196:config-rule/aws-service-rule/securityhub.amazonaws.com/config-rule-5tiku3",
+                "ConfigRuleId": "config-rule-5tiku3",
+                "Description": "Checks whether Amazon SNS topic is encrypted with AWS Key Management Service (AWS KMS). The rule is NON_COMPLIANT if the Amazon SNS topic is not encrypted with AWS KMS.",
+                "Scope": {},
+                "Source": {
+                    "Owner": "AWS",
+                    "SourceIdentifier": "SNS_ENCRYPTED_KMS"
+                },
+                "InputParameters": "{}",
+                "ConfigRuleState": "ACTIVE",
+                "CreatedBy": "securityhub.amazonaws.com"
+            },
+            {
+                "ConfigRuleName": "securityhub-sqs-queue-encrypted-40c64a85",
+                "ConfigRuleArn": "arn:aws:config:us-east-1:644160558196:config-rule/aws-service-rule/securityhub.amazonaws.com/config-rule-ngaq1t",
+                "ConfigRuleId": "config-rule-ngaq1t",
+                "Description": "This control checks whether Amazon SQS queues are encrypted at rest.",
+                "Scope": {
+                    "ComplianceResourceTypes": [
+                        "AWS::SQS::Queue"
+                    ]
+                },
+                "Source": {
+                    "Owner": "CUSTOM_LAMBDA",
+                    "SourceIdentifier": "arn:aws:lambda:us-east-1:644160558196:function:SecurityHubConfigRule",
+                    "SourceDetails": [
+                        {
+                            "EventSource": "aws.config",
+                            "MessageType": "ConfigurationItemChangeNotification"
+                        }
+                    ]
+                },
+                "InputParameters": "{\"version\":\"1.1\"}",
+                "ConfigRuleState": "ACTIVE",
+                "CreatedBy": "securityhub.amazonaws.com"
+            },
+            {
+                "ConfigRuleName": "securityhub-ssm-document-not-public-8a29b3bc",
+                "ConfigRuleArn": "arn:aws:config:us-east-1:644160558196:config-rule/aws-service-rule/securityhub.amazonaws.com/config-rule-lrurxf",
+                "ConfigRuleId": "config-rule-lrurxf",
+                "Description": "This control checks whether AWS Systems Manager documents that the account owns are public. This control fails if SSM documents that have \"Self\" as the owner are public.",
+                "Scope": {},
+                "Source": {
+                    "Owner": "AWS",
+                    "SourceIdentifier": "SSM_DOCUMENT_NOT_PUBLIC"
+                },
+                "InputParameters": "{}",
+                "ConfigRuleState": "ACTIVE",
+                "CreatedBy": "securityhub.amazonaws.com"
+            },
+            {
+                "ConfigRuleName": "securityhub-subnet-auto-assign-public-ip-disabled-baf86933",
+                "ConfigRuleArn": "arn:aws:config:us-east-1:644160558196:config-rule/aws-service-rule/securityhub.amazonaws.com/config-rule-oosmjz",
+                "ConfigRuleId": "config-rule-oosmjz",
+                "Description": "Checks if Amazon Virtual Private Cloud (Amazon VPC) subnets are assigned a public IP address. This rule is NON_COMPLIANT if Amazon VPC has subnets that are assigned a public IP address.",
+                "Scope": {},
+                "Source": {
+                    "Owner": "AWS",
+                    "SourceIdentifier": "SUBNET_AUTO_ASSIGN_PUBLIC_IP_DISABLED"
+                },
+                "InputParameters": "{}",
+                "ConfigRuleState": "ACTIVE",
+                "CreatedBy": "securityhub.amazonaws.com"
+            },
+            {
+                "ConfigRuleName": "securityhub-vpc-default-security-group-closed-3c5cc727",
+                "ConfigRuleArn": "arn:aws:config:us-east-1:644160558196:config-rule/aws-service-rule/securityhub.amazonaws.com/config-rule-qd71i2",
+                "ConfigRuleId": "config-rule-qd71i2",
+                "Description": "Checks whether the default security group for VPC is closed.",
+                "Scope": {
+                    "ComplianceResourceTypes": [
+                        "AWS::EC2::SecurityGroup"
+                    ]
+                },
+                "Source": {
+                    "Owner": "AWS",
+                    "SourceIdentifier": "VPC_DEFAULT_SECURITY_GROUP_CLOSED"
+                },
+                "InputParameters": "{}",
+                "ConfigRuleState": "ACTIVE",
+                "CreatedBy": "securityhub.amazonaws.com"
+            },
+            {
+                "ConfigRuleName": "securityhub-vpc-network-acl-unused-check-a666f9a0",
+                "ConfigRuleArn": "arn:aws:config:us-east-1:644160558196:config-rule/aws-service-rule/securityhub.amazonaws.com/config-rule-inqiv6",
+                "ConfigRuleId": "config-rule-inqiv6",
+                "Description": "Checks if there are unused Network Access Control Lists (NACLs). The rule is NON_COMPLIANT if an NACL is not associated with a subnet.",
+                "Scope": {},
+                "Source": {
+                    "Owner": "AWS",
+                    "SourceIdentifier": "VPC_NETWORK_ACL_UNUSED_CHECK"
+                },
+                "InputParameters": "{}",
+                "ConfigRuleState": "ACTIVE",
+                "CreatedBy": "securityhub.amazonaws.com"
+            },
+            {
+                "ConfigRuleName": "securityhub-vpc-sg-open-only-to-authorized-ports-c0907342",
+                "ConfigRuleArn": "arn:aws:config:us-east-1:644160558196:config-rule/aws-service-rule/securityhub.amazonaws.com/config-rule-c1wxqp",
+                "ConfigRuleId": "config-rule-c1wxqp",
+                "Description": "This control checks whether the security groups allow unrestricted incoming traffic. The control fails if ports allow unrestricted traffic on ports other than 80 and 443, which are default values for parameter authorizedTcpPorts.",
+                "Scope": {},
+                "Source": {
+                    "Owner": "AWS",
+                    "SourceIdentifier": "VPC_SG_OPEN_ONLY_TO_AUTHORIZED_PORTS"
+                },
+                "InputParameters": "{\"authorizedTcpPorts\":\"80,443\"}",
+                "ConfigRuleState": "ACTIVE",
+                "CreatedBy": "securityhub.amazonaws.com"
+            },
+            {
+                "ConfigRuleName": "securityhub-vpc-sg-restricted-common-ports-2aa66b72",
+                "ConfigRuleArn": "arn:aws:config:us-east-1:644160558196:config-rule/aws-service-rule/securityhub.amazonaws.com/config-rule-xilkxe",
+                "ConfigRuleId": "config-rule-xilkxe",
+                "Description": "This control checks whether unrestricted incoming traffic for the security groups is accessible to the specified ports that have the highest risk.",
+                "Scope": {
+                    "ComplianceResourceTypes": [
+                        "AWS::EC2::SecurityGroup"
+                    ]
+                },
+                "Source": {
+                    "Owner": "CUSTOM_LAMBDA",
+                    "SourceIdentifier": "arn:aws:lambda:us-east-1:644160558196:function:SecurityHubConfigRule",
+                    "SourceDetails": [
+                        {
+                            "EventSource": "aws.config",
+                            "MessageType": "ConfigurationItemChangeNotification"
+                        }
+                    ]
+                },
+                "InputParameters": "{\"version\":\"1.1\"}",
+                "ConfigRuleState": "ACTIVE",
+                "CreatedBy": "securityhub.amazonaws.com"
+            }
+        ],
+        "ResponseMetadata": {}
+    }
+}

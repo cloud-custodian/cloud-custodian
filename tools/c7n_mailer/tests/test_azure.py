@@ -47,7 +47,8 @@ class AzureTest(unittest.TestCase):
         # Run the process messages method
         azure_processor = MailerAzureQueueProcessor(MAILER_CONFIG_AZURE, logger)
         self.assertTrue(
-            azure_processor.process_azure_queue_message(self.compressed_message, "timestamp"))
+            azure_processor.process_azure_queue_message(self.compressed_message, "timestamp")
+        )
 
         # Verify mock calls were correct
         mock_get_addr.assert_called_with(self.loaded_message)
@@ -65,7 +66,8 @@ class AzureTest(unittest.TestCase):
         # Run the process messages method
         azure_processor = MailerAzureQueueProcessor(MAILER_CONFIG_AZURE, logger)
         self.assertFalse(
-            azure_processor.process_azure_queue_message(self.compressed_message, "timestamp"))
+            azure_processor.process_azure_queue_message(self.compressed_message, "timestamp")
+        )
 
         # Verify mock calls were correct
         mock_get_addr.assert_called_with(self.loaded_message)
@@ -262,7 +264,8 @@ class AzureTest(unittest.TestCase):
         ):
             azure_processor = MailerAzureQueueProcessor(smtp_mailer_config, logger)
             self.assertTrue(
-                azure_processor.process_azure_queue_message(self.compressed_message, "timestamp"))
+                azure_processor.process_azure_queue_message(self.compressed_message, "timestamp")
+            )
             mock_smtp.assert_has_calls(
                 [call().send_message(message=self.loaded_message, to_addrs=["mock@test.com"])]
             )
@@ -287,7 +290,8 @@ class AzureTest(unittest.TestCase):
         azure_processor = MailerAzureQueueProcessor(slack_mailer_config, logger)
 
         self.assertTrue(
-            azure_processor.process_azure_queue_message(slack_compressed_message, "timestamp"))
+            azure_processor.process_azure_queue_message(slack_compressed_message, "timestamp")
+        )
         mock_slack.assert_has_calls(
             [call().slack_handler(slack_loaded_message, "mock_slack_message_map")]
         )
@@ -313,7 +317,8 @@ class AzureTest(unittest.TestCase):
         azure_processor = MailerAzureQueueProcessor(datadog_mailer_config, logger)
 
         self.assertTrue(
-            azure_processor.process_azure_queue_message(datadog_compressed_message, "timestamp"))
+            azure_processor.process_azure_queue_message(datadog_compressed_message, "timestamp")
+        )
         mock_datadog.assert_has_calls(
             [call().deliver_datadog_messages("mock_datadog_message_map", datadog_loaded_message)]
         )

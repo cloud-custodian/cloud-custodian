@@ -1,0 +1,98 @@
+interactions:
+- request:
+    body: null
+    headers: {}
+    method: GET
+    uri: https://www-proxy.us.oracle.com:80/20160918/users/ocid1.user.oc1..<unique_ID>
+  response:
+    body:
+      data:
+        id: ocid1.user.oc1..<unique_ID>
+        name: user@example.com
+    headers:
+      content-type:
+      - application/json
+    status:
+      code: 200
+      message: OK
+- request:
+    body: null
+    headers: {}
+    method: GET
+    uri: https://www-proxy.us.oracle.com:80/20160918/groups?compartmentId=ocid1.tenancy.oc1..<unique_ID>
+  response:
+    body:
+      data:
+      - compartmentId: ocid1.tenancy.oc1..<unique_ID>
+        definedTags:
+          Oracle-Tags:
+            CreatedBy: user@example.com
+            CreatedOn: '2023-02-20T21:08:31.362Z'
+        description: Dev group for Cloud Custodian
+        freeformTags:
+          custodian_dev: 'true'
+          key_limit: '3'
+          test: 'true'
+        id: ocid1.group.oc1..<unique_ID>
+        lifecycleState: ACTIVE
+        name: cloud-custodian-group-dev
+        timeCreated: '2023-02-20T21:08:31.397Z'
+    headers:
+      content-type:
+      - application/json
+    status:
+      code: 200
+      message: OK
+- request:
+    body: mock_body
+    headers: {}
+    method: PUT
+    uri: https://www-proxy.us.oracle.com:80/20160918/groups/ocid1.group.oc1..<unique_ID>
+  response:
+    body:
+      data:
+        compartmentId: ocid1.tenancy.oc1..<unique_ID>
+        definedTags:
+          Oracle-Tags:
+            CreatedBy: user@example.com
+            CreatedOn: '2023-06-15T17:57:25.020Z'
+        description: Custodian Test
+        freeformTags:
+          Environment: Development
+        id: ocid1.group.oc1..<unique_ID>
+        lifecycleState: ACTIVE
+        name: Custodian-Dev-Group
+        timeCreated: '2023-06-15T17:57:25.052Z'
+    headers:
+      content-type:
+      - application/json
+    status:
+      code: 200
+      message: OK
+- request:
+    body: null
+    headers: {}
+    method: GET
+    uri: https://www-proxy.us.oracle.com:80/20160918/groups/ocid1.group.oc1..<unique_ID>
+  response:
+    body:
+      data:
+        compartmentId: ocid1.tenancy.oc1..<unique_ID>
+        definedTags:
+          Oracle-Tags:
+            CreatedBy: user@example.com
+            CreatedOn: '2023-06-15T17:57:25.020Z'
+        description: Custodian Test
+        freeformTags:
+          Environment: Development
+        id: ocid1.group.oc1..<unique_ID>
+        lifecycleState: ACTIVE
+        name: Custodian-Dev-Group
+        timeCreated: '2023-06-15T17:57:25.052Z'
+    headers:
+      content-type:
+      - application/json
+    status:
+      code: 200
+      message: OK
+version: 1

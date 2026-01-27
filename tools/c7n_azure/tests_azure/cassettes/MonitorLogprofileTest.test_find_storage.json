@@ -1,0 +1,176 @@
+{
+    "version": 1,
+    "interactions": [
+        {
+            "request": {
+                "method": "GET",
+                "uri": "https://management.azure.com/subscriptions/ea42f556-5106-4743-99b0-c129bfa71a47/providers/microsoft.insights/logprofiles?api-version=2016-03-01",
+                "body": null,
+                "headers": {}
+            },
+            "response": {
+                "status": {
+                    "code": 200,
+                    "message": "OK"
+                },
+                "headers": {
+                    "cache-control": [
+                        "no-cache"
+                    ],
+                    "content-type": [
+                        "application/json; charset=utf-8"
+                    ],
+                    "date": [
+                        "Tue, 22 Aug 2023 14:08:23 GMT"
+                    ],
+                    "content-length": [
+                        "758"
+                    ]
+                },
+                "body": {
+                    "data": {
+                        "value": [
+                            {
+                                "id": "/subscriptions/ea42f556-5106-4743-99b0-c129bfa71a47/providers/microsoft.insights/logprofiles/logprofile-cfb-njlrsptg-fail",
+                                "type": null,
+                                "name": "logprofile-cfb-njlrsptg-fail",
+                                "location": null,
+                                "kind": null,
+                                "tags": null,
+                                "properties": {
+                                    "storageAccountId": "/subscriptions/ea42f556-5106-4743-99b0-c129bfa71a47/resourceGroups/cfb-njlrsptg/providers/Microsoft.Storage/storageAccounts/storagecfb11success",
+                                    "serviceBusRuleId": "/subscriptions/ea42f556-5106-4743-99b0-c129bfa71a47/resourceGroups/cfb-njlrsptg/providers/Microsoft.EventHub/namespaces/eventhub-cfb-njlrsptg-Fail/authorizationrules/RootManageSharedAccessKey",
+                                    "locations": [
+                                        "global",
+                                        "eastus"
+                                    ],
+                                    "categories": [
+                                        "Delete",
+                                        "Action",
+                                        "Write"
+                                    ],
+                                    "retentionPolicy": {
+                                        "enabled": true,
+                                        "days": 7
+                                    }
+                                },
+                                "identity": null
+                            }
+                        ]
+                    }
+                }
+            }
+        },
+        {
+            "request": {
+                "method": "GET",
+                "uri": "https://management.azure.com/subscriptions/ea42f556-5106-4743-99b0-c129bfa71a47/resourceGroups/cfb-njlrsptg/providers/Microsoft.Storage/storageAccounts/storagecfb11success?api-version=2021-02-01",
+                "body": null,
+                "headers": {}
+            },
+            "response": {
+                "status": {
+                    "code": 200,
+                    "message": "OK"
+                },
+                "headers": {
+                    "cache-control": [
+                        "no-cache"
+                    ],
+                    "content-type": [
+                        "application/json"
+                    ],
+                    "date": [
+                        "Tue, 22 Aug 2023 14:08:28 GMT"
+                    ],
+                    "content-length": [
+                        "2245"
+                    ]
+                },
+                "body": {
+                    "data": {
+                        "identity": {
+                            "principalId": "f58f0e6b-70f2-4a09-84a8-5be4313d2fd9",
+                            "tenantId": "00000000-0000-0000-0000-000000000003",
+                            "type": "SystemAssigned"
+                        },
+                        "sku": {
+                            "name": "Standard_GRS",
+                            "tier": "Standard"
+                        },
+                        "kind": "StorageV2",
+                        "id": "/subscriptions/ea42f556-5106-4743-99b0-c129bfa71a47/resourceGroups/cfb-njlrsptg/providers/Microsoft.Storage/storageAccounts/storagecfb11success",
+                        "name": "storagecfb11success",
+                        "type": "Microsoft.Storage/storageAccounts",
+                        "location": "centralus",
+                        "tags": {
+                            "product_id": "13742"
+                        },
+                        "properties": {
+                            "keyCreationTime": {
+                                "key1": "2023-08-21T22:10:14.0633767Z",
+                                "key2": "2023-08-21T22:10:14.0633767Z"
+                            },
+                            "allowCrossTenantReplication": true,
+                            "privateEndpointConnections": [],
+                            "isNfsV3Enabled": false,
+                            "isSftpEnabled": false,
+                            "minimumTlsVersion": "TLS1_2",
+                            "allowBlobPublicAccess": true,
+                            "allowSharedKeyAccess": true,
+                            "isHnsEnabled": false,
+                            "networkAcls": {
+                                "bypass": "AzureServices",
+                                "virtualNetworkRules": [],
+                                "ipRules": [],
+                                "defaultAction": "Allow"
+                            },
+                            "supportsHttpsTrafficOnly": true,
+                            "encryption": {
+                                "identity": {
+                                    "userAssignedIdentity": ""
+                                },
+                                "keyvaultproperties": {
+                                    "currentVersionedKeyIdentifier": "https://keyvault-fail.vault.azure.net/keys/keyvaultkey-cfb-njlrsptg-Fail/7d708afaa3d04b97a51e369e4acaba09",
+                                    "lastKeyRotationTimestamp": "2023-08-21T22:19:53.8835170Z",
+                                    "currentVersionedKeyExpirationTimestamp": "1970-01-01T00:00:00.0000000Z",
+                                    "keyvaulturi": "https://keyvault-fail.vault.azure.net/",
+                                    "keyname": "keyvaultkey-cfb-njlrsptg-Fail",
+                                    "keyversion": ""
+                                },
+                                "services": {
+                                    "file": {
+                                        "keyType": "Account",
+                                        "enabled": true,
+                                        "lastEnabledTime": "2023-08-21T22:10:14.0790142Z"
+                                    },
+                                    "blob": {
+                                        "keyType": "Account",
+                                        "enabled": true,
+                                        "lastEnabledTime": "2023-08-21T22:10:14.0790142Z"
+                                    }
+                                },
+                                "keySource": "Microsoft.Keyvault"
+                            },
+                            "accessTier": "Hot",
+                            "provisioningState": "Succeeded",
+                            "creationTime": "2023-08-21T22:10:13.9383878Z",
+                            "primaryEndpoints": {
+                                "dfs": "https://storagecfb11success.dfs.core.windows.net/",
+                                "web": "https://storagecfb11success.z19.web.core.windows.net/",
+                                "blob": "https://storagecfb11success.blob.core.windows.net/",
+                                "queue": "https://storagecfb11success.queue.core.windows.net/",
+                                "table": "https://storagecfb11success.table.core.windows.net/",
+                                "file": "https://storagecfb11success.file.core.windows.net/"
+                            },
+                            "primaryLocation": "centralus",
+                            "statusOfPrimary": "available",
+                            "secondaryLocation": "eastus2",
+                            "statusOfSecondary": "available"
+                        }
+                    }
+                }
+            }
+        }
+    ]
+}

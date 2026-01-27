@@ -73,14 +73,22 @@ Navigate below to your cloud provider and get started with Cloud Custodian!
    gcp/contribute
    gcp/resources/index
 
+.. toctree::
+   :maxdepth: 1
+   :caption: Oracle Cloud Infrastructure (OCI)
+
+   oci/gettingstarted
+   oci/examples/index
+   oci/testing
+   oci/resources/index
+   oci/advanced/index
 
 .. toctree::
    :maxdepth: 1
-   :caption: AWS Cloud Control
+   :caption: Tencent Cloud
 
-   awscc/gettingstarted
-   awscc/resources/index
-
+   tencentcloud/gettingstarted
+   tencentcloud/resources/index
 
 .. toctree::
    :maxdepth: 1
@@ -95,12 +103,13 @@ Navigate below to your cloud provider and get started with Cloud Custodian!
    :caption: Tools
 
    tools/c7n-org
+   tools/c7n-mailer
+   tools/c7n-left
+   tools/c7n-kube
    tools/cask
-   tools/c7n-mailer   
    tools/c7n-logexporter
    tools/c7n-trailcreator
    tools/c7n-policystream   
-   tools/omnissm
    tools/c7n-guardian
    tools/c7n-salactus
 

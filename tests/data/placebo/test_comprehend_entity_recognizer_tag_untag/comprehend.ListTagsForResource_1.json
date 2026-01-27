@@ -1,0 +1,13 @@
+{
+    "status_code": 200,
+    "data": {
+        "ResourceArn": "arn:aws:comprehend:us-east-1:644160558196:entity-recognizer/TestVpcEntityRecognizer/version/3",
+        "Tags": [
+            {
+                "Key": "OwnerContact",
+                "Value": "test@c7n.com"
+            }
+        ],
+        "ResponseMetadata": {}
+    }
+}

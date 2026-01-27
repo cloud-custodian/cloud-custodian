@@ -2,13 +2,15 @@
 # SPDX-License-Identifier: Apache-2.0
 import re
 
+from botocore.exceptions import ClientError
+
 from c7n.actions import BaseAction
 from c7n.filters import MetricsFilter, ShieldMetrics, Filter
 from c7n.manager import resources
 from c7n.query import ConfigSource, QueryResourceManager, DescribeSource, TypeInfo
 from c7n.tags import universal_augment
 from c7n.utils import local_session, merge_dict, type_schema, get_retry
-from c7n.filters import ValueFilter
+from c7n.filters import ValueFilter, WafV2FilterBase
 from .aws import shape_validate
 from c7n.exceptions import PolicyValidationError
 
@@ -52,6 +54,7 @@ class Distribution(QueryResourceManager):
         cfn_type = config_type = "AWS::CloudFront::Distribution"
         # Denotes this resource type exists across regions
         global_resource = True
+        permission_augment = ("cloudfront:ListTagsForResource",)
 
     source_mapping = {
         'describe': DescribeDistribution,
@@ -86,6 +89,25 @@ class StreamingDistribution(QueryResourceManager):
         'describe': DescribeStreamingDistribution,
         'config': ConfigSource
     }
+
+
+@resources.register("origin-access-control")
+class OriginAccessControl(QueryResourceManager):
+    class resource_type(TypeInfo):
+        service = "cloudfront"
+        arn_type = "origin-access-control"
+        enum_spec = (
+            "list_origin_access_controls",
+            "OriginAccessControlList.Items",
+            None,
+        )
+        id = "Id"
+        description = "Description"
+        name = "Name"
+        signing_protocol = "SigningProtocol"
+        signing_behavior = "SigningBehavior"
+        origin_type = "OriginAccessControlOriginType"
+        cfn_type = "AWS::CloudFront::OriginAccessControl"
 
 
 Distribution.filter_registry.register('shield-metrics', ShieldMetrics)
@@ -167,7 +189,7 @@ class IsWafEnabled(Filter):
 
 
 @Distribution.filter_registry.register('wafv2-enabled')
-class IsWafV2Enabled(Filter):
+class IsWafV2Enabled(WafV2FilterBase):
     """Filter CloudFront distribution by wafv2 web-acl
 
     :example:
@@ -176,6 +198,16 @@ class IsWafV2Enabled(Filter):
 
             policies:
               - name: filter-distribution-wafv2
+                description: |
+                  match resources that are NOT associated with any wafV2 web-acls
+                resource: distribution
+                filters:
+                  - type: wafv2-enabled
+                    state: false
+
+              - name: filter-distribution-wafv2-specific-acl
+                description: |
+                  match resources that are NOT associated with wafV2's testv2 web-acl
                 resource: distribution
                 filters:
                   - type: wafv2-enabled
@@ -183,6 +215,9 @@ class IsWafV2Enabled(Filter):
                     web-acl: testv2
 
               - name: filter-distribution-wafv2-regex
+                description: |
+                  match resources that are NOT associated with specified
+                  wafV2 web-acl regex
                 resource: distribution
                 filters:
                   - type: wafv2-enabled
@@ -190,37 +225,9 @@ class IsWafV2Enabled(Filter):
                     web-acl: .*FMManagedWebACLV2-?FMS-.*
     """
 
-    schema = type_schema(
-        'wafv2-enabled', **{
-            'web-acl': {'type': 'string'},
-            'state': {'type': 'boolean'}})
-
-    permissions = ('wafv2:ListWebACLs',)
-
-    def process(self, resources, event=None):
-        query = {'Scope': 'CLOUDFRONT'}
-        wafs = self.manager.get_resource_manager('wafv2').resources(query, augment=False)
-        waf_name_id_map = {w['Name']: w['ARN'] for w in wafs}
-
-        target_acl = self.data.get('web-acl', '')
-        state = self.data.get('state', False)
-        target_acl_ids = [v for k, v in waf_name_id_map.items() if
-                          re.match(target_acl, k)]
-
-        results = []
-        for r in resources:
-            r_web_acl_id = r.get('WebACLId')
-            if state:
-                if not target_acl and r_web_acl_id:
-                    results.append(r)
-                elif target_acl and r_web_acl_id in target_acl_ids:
-                    results.append(r)
-            else:
-                if not target_acl and not r_web_acl_id:
-                    results.append(r)
-                elif target_acl and r_web_acl_id not in target_acl_ids:
-                    results.append(r)
-        return results
+    def get_associated_web_acl(self, resource):
+        # for WAFv2 Cloudfront stores the ARN of the WebACL even though the attribute is 'WebACLId'
+        return self.get_web_acl_by_arn(resource.get('WebACLId'), scope='CLOUDFRONT')
 
 
 class BaseDistributionConfig(ValueFilter):
@@ -326,8 +333,8 @@ class MismatchS3Origin(Filter):
                     check_custom_origins: true
    """
 
-    s3_prefix = re.compile(r'.*(?=\.s3(-.*)?\.amazonaws.com)')
-    s3_suffix = re.compile(r'^([^.]+\.)?s3(-.*)?\.amazonaws.com')
+    s3_prefix = re.compile(r'.*(?=\.s3(-.*)?(\..*-\d)?\.amazonaws.com)')
+    s3_suffix = re.compile(r'^([^.]+\.)?s3(-.*)?(\..*-\d)?\.amazonaws.com')
 
     schema = type_schema(
         'mismatch-s3-origin',
@@ -477,12 +484,25 @@ class SetWaf(BaseAction):
                 continue
             if r.get('WebACLId') == target_acl_id:
                 continue
-            result = client.get_distribution_config(Id=r['Id'])
-            config = result['DistributionConfig']
-            config['WebACLId'] = target_acl_id
-            self.retry(
-                client.update_distribution,
-                Id=r['Id'], DistributionConfig=config, IfMatch=result['ETag'])
+            try:
+                result = client.get_distribution_config(Id=r['Id'])
+                config = result['DistributionConfig']
+                config['WebACLId'] = target_acl_id
+                self.retry(
+                    client.update_distribution,
+                    Id=r['Id'], DistributionConfig=config, IfMatch=result['ETag'])
+            except ClientError as e:
+                if e.response['Error']['Code'] == 'InvalidArgument':
+                    # CloudFront distributions with pricing plans cannot have their
+                    # WAF changed. Skip these resources gracefully.
+                    # https://docs.aws.amazon.com/AmazonCloudFront/latest/DeveloperGuide/flat-rate-pricing-plan.html
+                    if 'pricing plan subscription' in str(e):
+                        self.log.warning(
+                            "Skipping WAF update for distribution %s: distribution has a "
+                            "CloudFront pricing plan subscription which requires a web ACL",
+                            r['Id'])
+                        continue
+                raise
 
 
 @Distribution.action_registry.register('set-wafv2')
@@ -562,12 +582,25 @@ class SetWafv2(BaseAction):
                 continue
             if r.get('WebACLId') == target_acl_id:
                 continue
-            result = client.get_distribution_config(Id=r['Id'])
-            config = result['DistributionConfig']
-            config['WebACLId'] = target_acl_id
-            self.retry(
-                client.update_distribution,
-                Id=r['Id'], DistributionConfig=config, IfMatch=result['ETag'])
+            try:
+                result = client.get_distribution_config(Id=r['Id'])
+                config = result['DistributionConfig']
+                config['WebACLId'] = target_acl_id
+                self.retry(
+                    client.update_distribution,
+                    Id=r['Id'], DistributionConfig=config, IfMatch=result['ETag'])
+            except ClientError as e:
+                if e.response['Error']['Code'] == 'InvalidArgument':
+                    # CloudFront distributions with pricing plans cannot have their
+                    # WAF changed. Skip these resources gracefully.
+                    # https://docs.aws.amazon.com/AmazonCloudFront/latest/DeveloperGuide/flat-rate-pricing-plan.html
+                    if 'pricing plan subscription' in str(e):
+                        self.log.warning(
+                            "Skipping WAFv2 update for distribution %s: distribution has a "
+                            "CloudFront pricing plan subscription which requires a web ACL",
+                            r['Id'])
+                        continue
+                raise
 
 
 @Distribution.action_registry.register('disable')

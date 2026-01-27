@@ -1,0 +1,23 @@
+{
+    "status_code": 200,
+    "data": {
+        "NextMarker": "noncompliant_waf",
+        "WebACLs": [
+            {
+                "Name": "compliant_waf",
+                "Id": "13c10003-88ca-44fa-8e45-21a6144a7a73",
+                "Description": "",
+                "LockToken": "ef95341f-4c73-45c8-b8ba-b5eb4ad6b03f",
+                "ARN": "arn:aws:wafv2:us-east-1:111111111111:regional/webacl/compliant_waf/13c10003-88ca-44fa-8e45-21a6144a7a73"
+            },
+            {
+                "Name": "noncompliant_waf",
+                "Id": "cbbd1718-2b80-4da9-9a95-31d4fe8e7283",
+                "Description": "",
+                "LockToken": "79b34c29-f709-4d76-9996-80ca349a21aa",
+                "ARN": "arn:aws:wafv2:us-east-1:111111111111:regional/webacl/noncompliant_waf/cbbd1718-2b80-4da9-9a95-31d4fe8e7283"
+            }
+        ],
+        "ResponseMetadata": {}
+    }
+}

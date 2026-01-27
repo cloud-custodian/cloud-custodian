@@ -32,6 +32,9 @@ coverage:
       shiftleft:
         paths: ["tools/c7n_left"]
         threshold: "3%"
+      policystream:
+        paths: ["tools/c7n_policystream"]
+        threshold: "3%"        
       # aws is weaved throughout core atm can't easily call it out separately
       custodian:
       # one of the tests is slightly variable coverage due to concurrency (0.01)

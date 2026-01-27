@@ -1,0 +1,32 @@
+{
+    "status_code": 200,
+    "data": {
+        "ResponseMetadata": {},
+        "items": [
+            {
+                "id": "jt2w8rh6ik",
+                "name": "c7n-test",
+                "createdDate": {
+                    "__class__": "datetime",
+                    "year": 2023,
+                    "month": 11,
+                    "day": 2,
+                    "hour": 20,
+                    "minute": 41,
+                    "second": 32,
+                    "microsecond": 0
+                },
+                "apiKeySource": "HEADER",
+                "endpointConfiguration": {
+                    "types": [
+                        "EDGE"
+                    ]
+                },
+                "policy": "{\\\"Version\\\":\\\"2012-10-17\\\",\\\"Statement\\\":[{\\\"Sid\\\":\\\"AllowDevEx\\\",\\\"Effect\\\":\\\"Allow\\\",\\\"Principal\\\":\\\"*\\\",\\\"Action\\\":\\\"execute-api:Invoke\\\",\\\"Resource\\\":\\\"arn:aws:execute-api:us-east-1:123456789012:*\\\",\\\"Condition\\\":{\\\"StringEquals\\\":{\\\"aws:SourceVpc\\\":[\\\"vpc-1a2b3c4d\\\",\\\"vpc-abc123\\\"]}}},{\\\"Sid\\\":\\\"AllowIntraAccount\\\",\\\"Effect\\\":\\\"Allow\\\",\\\"Principal\\\":{\\\"AWS\\\":\\\"arn:aws:iam::123456789012:root\\\"},\\\"Action\\\":\\\"execute-api:Invoke\\\",\\\"Resource\\\":\\\"arn:aws:execute-api:us-east-1:123456789012:*\\\"}]}",
+                "tags": {},
+                "disableExecuteApiEndpoint": false,
+                "rootResourceId": "snilzemip4"
+            }
+        ]
+    }
+}

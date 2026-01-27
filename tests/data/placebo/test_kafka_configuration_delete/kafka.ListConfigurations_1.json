@@ -1,0 +1,37 @@
+{
+    "status_code": 200,
+    "data": {
+        "ResponseMetadata": {},
+        "Configurations": [
+            {
+                "Arn": "arn:aws:kafka:us-east-1:644160558196:configuration/foo-config/72932df0-5080-40d1-b801-49fa8580952b-7",
+                "CreationTime": {
+                    "__class__": "datetime",
+                    "year": 2024,
+                    "month": 11,
+                    "day": 26,
+                    "hour": 21,
+                    "minute": 22,
+                    "second": 54,
+                    "microsecond": 890000
+                },
+                "KafkaVersions": [],
+                "LatestRevision": {
+                    "CreationTime": {
+                        "__class__": "datetime",
+                        "year": 2024,
+                        "month": 11,
+                        "day": 26,
+                        "hour": 21,
+                        "minute": 22,
+                        "second": 54,
+                        "microsecond": 890000
+                    },
+                    "Revision": 1
+                },
+                "Name": "foo-config",
+                "State": "ACTIVE"
+            }
+        ]
+    }
+}

@@ -3,7 +3,7 @@
 from datetime import datetime
 from dateutil import tz as tzutil
 
-import jmespath
+import pytest
 from pytest_terraform import terraform
 
 from .common import BaseTest
@@ -11,6 +11,7 @@ from .common import BaseTest
 from c7n.exceptions import PolicyValidationError
 from c7n.resources.asg import LaunchInfo
 from c7n.resources.aws import shape_validate
+from c7n.utils import jmespath_search
 
 
 class LaunchConfigTest(BaseTest):
@@ -106,6 +107,7 @@ class AutoScalingTemplateTest(BaseTest):
             LaunchInfo(p.resource_manager).get_launch_id(d), ("lt-0877401c93c294001", "4"))
 
 
+@pytest.mark.audited
 @terraform('aws_asg')
 def test_asg_propagate_tag_action(test, aws_asg):
 
@@ -124,7 +126,7 @@ def test_asg_propagate_tag_action(test, aws_asg):
     resources = p.run()
     test.assertEqual(len(resources), 1)
     client = factory().client('ec2')
-    itags = {t['Key']: t['Value'] for t in jmespath.search(
+    itags = {t['Key']: t['Value'] for t in jmespath_search(
         'Reservations[0].Instances[0].Tags',
         client.describe_instances(
             InstanceIds=[resources[0]['Instances'][0]['InstanceId']]))}
@@ -132,6 +134,7 @@ def test_asg_propagate_tag_action(test, aws_asg):
     assert itags['Owner'] == 'Kapil'
 
 
+@pytest.mark.audited
 @terraform("aws_asg_update")
 def test_aws_asg_update(test, aws_asg_update):
     factory = test.replay_flight_data("test_aws_asg_update")
@@ -832,6 +835,33 @@ class AutoScalingTest(BaseTest):
         resources = p.run()
         self.assertEqual(len(resources), 1)
 
+    def test_asg_invalid_filter_validation(self):
+        """Validate policy execution mode
+
+        The valid/invalid filters should cause Lambda mode policies to fail, but
+        pass for other execution modes whether specified explicitly or not.
+        """
+        base_policy = {
+            "name": "asg-invalid-filter",
+            "resource": "asg",
+            "filters": ["invalid"],
+        }
+
+        # Policy should validate cleanly for pull mode, whether it's the implicit
+        # default mode or specified explicitly.
+        p = self.load_policy(base_policy)
+        p.validate()
+        p = self.load_policy({**base_policy, "mode": {"type": "pull"}})
+        p.validate()
+
+        with self.assertRaisesRegex(
+            PolicyValidationError, "too many queries to be run in lambda"
+        ):
+            p = self.load_policy(
+                {**base_policy, "mode": {"type": "periodic", "schedule": "rate(1 day)"}}
+            )
+            p.validate()
+
     def test_asg_invalid_filter_good(self):
         factory = self.replay_flight_data("test_asg_invalid_filter_good")
         p = self.load_policy(
@@ -853,6 +883,23 @@ class AutoScalingTest(BaseTest):
         s = {x[0] for x in resources[0]["Invalid"]}
         self.assertTrue("invalid-subnet" in s)
         self.assertTrue("invalid-security-group" in s)
+
+    def test_asg_invalid_az(self):
+        factory = self.replay_flight_data("test_asg_invalid_az")
+        p = self.load_policy(
+            {
+                "name": "asg-invalid-az",
+                "resource": "asg",
+                "filters": [
+                    {"type": "invalid"}
+                ],
+            },
+            session_factory=factory
+        )
+        resources = p.run()
+        self.assertEqual(len(resources), 2)
+        for resource in resources:
+            self.assertIn("invalid-availability-zone", resource["Invalid"][0])
 
     def test_asg_subnet(self):
         factory = self.replay_flight_data("test_asg_subnet")

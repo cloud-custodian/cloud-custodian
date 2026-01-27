@@ -1,0 +1,58 @@
+{
+    "status_code": 200,
+    "data": {
+        "Services": [
+            {
+                "Id": "srv-3",
+                "Arn": "arn:aws:servicediscovery:us-east-1:644160558196:service/srv-3",
+                "Name": "sn.sr1",
+                "Type": "DNS_HTTP",
+                "DnsConfig": {
+                    "RoutingPolicy": "WEIGHTED",
+                    "DnsRecords": [
+                        {
+                            "Type": "CNAME",
+                            "TTL": 10
+                        }
+                    ]
+                },
+                "CreateDate": {
+                    "__class__": "datetime",
+                    "year": 2023,
+                    "month": 11,
+                    "day": 2,
+                    "hour": 21,
+                    "minute": 17,
+                    "second": 44,
+                    "microsecond": 484000
+                }
+            },
+            {
+                "Id": "srv-zzlumxsdrussh6in",
+                "Arn": "arn:aws:servicediscovery:us-east-1:644160558196:service/srv-4",
+                "Name": "sn.sr2",
+                "Type": "DNS_HTTP",
+                "DnsConfig": {
+                    "RoutingPolicy": "WEIGHTED",
+                    "DnsRecords": [
+                        {
+                            "Type": "CNAME",
+                            "TTL": 10
+                        }
+                    ]
+                },
+                "CreateDate": {
+                    "__class__": "datetime",
+                    "year": 2023,
+                    "month": 11,
+                    "day": 2,
+                    "hour": 21,
+                    "minute": 17,
+                    "second": 44,
+                    "microsecond": 287000
+                }
+            }
+        ],
+        "ResponseMetadata": {}
+    }
+}

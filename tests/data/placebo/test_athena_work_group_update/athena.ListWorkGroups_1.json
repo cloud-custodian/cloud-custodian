@@ -1,0 +1,27 @@
+{
+    "status_code": 200,
+    "data": {
+        "WorkGroups": [
+            {
+                "Name": "primary",
+                "State": "ENABLED",
+                "Description": "",
+                "CreationTime": {
+                    "__class__": "datetime",
+                    "year": 2022,
+                    "month": 1,
+                    "day": 12,
+                    "hour": 12,
+                    "minute": 26,
+                    "second": 32,
+                    "microsecond": 982000
+                },
+                "EngineVersion": {
+                    "SelectedEngineVersion": "AUTO",
+                    "EffectiveEngineVersion": "Athena engine version 3"
+                }
+            }
+        ],
+        "ResponseMetadata": {}
+    }
+}

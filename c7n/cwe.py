@@ -1,6 +1,6 @@
 # Copyright The Cloud Custodian Authors.
 # SPDX-License-Identifier: Apache-2.0
-import jmespath
+from c7n.utils import jmespath_search, jmespath_compile
 
 
 class CloudWatchEvents:
@@ -96,7 +96,7 @@ class CloudWatchEvents:
         if k in cls.trail_events:
             v = dict(cls.trail_events[k])
             if isinstance(v['ids'], str):
-                v['ids'] = e = jmespath.compile('detail.%s' % v['ids'])
+                v['ids'] = e = jmespath_compile('detail.%s' % v['ids'])
                 cls.trail_events[k]['ids'] = e
             return v
 
@@ -127,7 +127,7 @@ class CloudWatchEvents:
             # be forgiving for users specifying with details or without
             if not id_query.startswith('detail.'):
                 evt = event.get('detail', {})
-            resource_ids = jmespath.search(id_query, evt)
+            resource_ids = jmespath_search(id_query, evt)
             if resource_ids:
                 break
         return resource_ids

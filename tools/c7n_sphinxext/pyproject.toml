@@ -1,36 +1,37 @@
-[tool.poetry]
-name = "c7n_sphinxext"
-version = "1.1.19"
-description = "Cloud Custodian - Sphinx Extensions"
-authors = ["Cloud Custodian Project"]
+[project]
+authors = [
+    {name = "Cloud Custodian Project"},
+]
 license = "Apache-2.0"
-homepage = "https://cloudcustodian.io"
-documentation = "https://cloudcustodian.io/docs"
-repository = "https://github.com/cloud-custodian/cloud-custodian"
-classifiers=[
-   "License :: OSI Approved :: Apache Software License",
-   "Topic :: System :: Systems Administration",
-   "Topic :: System :: Distributed Computing"
+requires-python = "<4.0.0,>=3.9.2"
+dependencies = [
+    "Pygments>=2.10.0",
+    "Sphinx<8.0,>=7.0",
+    "c7n",
+    "click>=8.0",
+    "myst-parser>=0.18",
+    "recommonmark>=0.7.0",
+    "sphinx-markdown-tables>=0.0.12",
+    "sphinx-rtd-theme>=1.0.0",
+]
+name = "c7n_sphinxext"
+version = "1.1.48"
+description = "Cloud Custodian - Sphinx Extensions"
+classifiers = [
+    "License :: OSI Approved :: Apache Software License",
+    "Topic :: System :: Systems Administration",
+    "Topic :: System :: Distributed Computing",
 ]
 readme = "README.md"
 
-[tool.poetry.scripts]
-c7n-sphinxext = 'c7n_sphinxext.docgen:main'
+[project.urls]
+homepage = "https://cloudcustodian.io"
+repository = "https://github.com/cloud-custodian/cloud-custodian"
+documentation = "https://cloudcustodian.io/docs"
 
-[tool.poetry.dependencies]
-python = "^3.7"
-Sphinx = "^4.2.0"
-Pygments = "^2.10.0"
-sphinx-rtd-theme = "^1.0.0"
-recommonmark = "^0.6.0"
-sphinx_markdown_tables = "^0.0.12"
-myst-parser = "^0.18.0"
-click = "^8.0"
-docutils = ">=0.14,<0.18"
-
-[tool.poetry.dev-dependencies]
-c7n = {path = "../..", develop = true}
+[project.scripts]
+c7n-sphinxext = "c7n_sphinxext.docgen:main"
 
 [build-system]
-requires = ["poetry>=0.12", "setuptools"]
-build-backend = "poetry.masonry.api"
+requires = ["hatchling"]
+build-backend = "hatchling.build"

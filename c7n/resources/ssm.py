@@ -7,7 +7,7 @@ import operator
 from concurrent.futures import as_completed
 from c7n.actions import Action
 from c7n.exceptions import PolicyValidationError
-from c7n.filters import Filter, CrossAccountAccessFilter
+from c7n.filters import Filter, CrossAccountAccessFilter, ValueFilter
 from c7n.filters.kms import KmsRelatedFilter
 from c7n.query import QueryResourceManager, TypeInfo
 from c7n.manager import resources
@@ -530,7 +530,7 @@ class PostItem(Action):
                 remainder.append(a)
 
         for i in items:
-            if not i['OpsItemId'] in updated:
+            if i['OpsItemId'] not in updated:
                 continue
             i = dict(i)
             for k in ('CreatedBy', 'CreatedTime', 'Source', 'LastModifiedBy',
@@ -612,9 +612,50 @@ class SSMDocument(QueryResourceManager):
                 'Values': ['Self']}]})
         name = id = 'Name'
         date = 'RegistrationDate'
-        arn_type = 'Document'
+        arn_type = 'document'
+        cfn_type = config_type = "AWS::SSM::Document"
+        universal_taggable = object()
 
     permissions = ('ssm:ListDocuments',)
+
+
+@SSMDocument.filter_registry.register('content')
+class ContentFilter(ValueFilter):
+    """
+    Applies value type filter on the content of an SSM Document.
+    :example:
+
+    .. code-block:: yaml
+
+            policies:
+              - name: document-content
+                resource: ssm-document
+                filters:
+                  - type: content
+                    key: cloudWatchEncryptionEnabled
+                    op: eq
+                    value: false
+    """
+
+    schema = type_schema('content', rinherit=ValueFilter.schema)
+    schema_alias = False
+    permissions = ('ssm:GetDocument',)
+    policy_annotation = 'c7n:MatchedContent'
+    content_annotation = "c7n:Content"
+
+    def process(self, resources, event=None):
+        client = local_session(self.manager.session_factory).client('ssm')
+        results = []
+        for r in resources:
+            if self.content_annotation not in r:
+                doc = self.manager.retry(client.get_document, Name=r['Name'])
+                doc['Content'] = json.loads(doc['Content'])
+                doc.pop('ResponseMetadata', None)
+                r[self.content_annotation] = doc
+            if self.match(doc['Content']):
+                r[self.policy_annotation] = self.data.get('value')
+                results.append(r)
+        return results
 
 
 @SSMDocument.filter_registry.register('cross-account')
@@ -637,6 +678,7 @@ class SSMDocumentCrossAccount(CrossAccountAccessFilter):
 
     def process(self, resources, event=None):
         self.accounts = self.get_accounts()
+        self.everyone_only = self.data.get("everyone_only", False)
         results = []
         client = local_session(self.manager.session_factory).client('ssm')
         with self.executor_factory(max_workers=3) as w:
@@ -661,8 +703,9 @@ class SSMDocumentCrossAccount(CrossAccountAccessFilter):
                 Name=r['Name'],
                 PermissionType='Share',
                 ignore_err_codes=('InvalidDocument',))['AccountSharingInfoList']
-            shared_accounts = {
-                g.get('AccountId') for g in attrs}
+            shared_accounts = {g.get('AccountId') for g in attrs}
+            if self.everyone_only:
+                shared_accounts = {a for a in shared_accounts if a == 'all'}
             delta_accounts = shared_accounts.difference(self.accounts)
             if delta_accounts:
                 r['c7n:CrossAccountViolations'] = list(delta_accounts)
@@ -830,3 +873,62 @@ class DeleteDataSync(Action):
                 client.delete_resource_data_sync(SyncName=r['SyncName'])
             except client.exceptions.ResourceDataSyncNotFoundException:
                 continue
+
+
+@resources.register("ssm-patch-group")
+class SsmPatchGroup(QueryResourceManager):
+    class resource_type(TypeInfo):
+        service = "ssm"
+        enum_spec = ('describe_patch_groups', 'Mappings', None)
+        arn = False
+        id = "PatchGroup"
+        name = "PatchGroup"
+
+
+@resources.register('ssm-session-manager')
+class SSMSessionManager(QueryResourceManager):
+
+    class resource_type(TypeInfo):
+        service = 'ssm'
+        enum_spec = ('describe_sessions', 'Sessions', None)
+        name = "SessionId"
+        id = "SessionId"
+        arn_type = 'session'
+
+    retry = staticmethod(get_retry(('Throttled',)))
+    permissions = ('ssm:DescribeSessions',)
+
+    augment = universal_augment
+
+    def resources(self, query=None):
+        if query is None:
+            query = {}
+        if 'State' not in query:
+            # Default to Active if not given
+            query['State'] = 'Active'
+        return super(SSMSessionManager, self).resources(query=query)
+
+
+@SSMSessionManager.action_registry.register('terminate')
+class TerminateSession(Action):
+    """ Terminate a session.
+
+    This call will permanently end a session's connection to an instance.
+
+    :Example:
+
+    .. code-block:: yaml
+
+        policies:
+          - name: ssm-session-termination
+            resource: ssm-session-manager
+            actions:
+              - terminate
+    """
+    schema = type_schema('terminate')
+    permissions = ('ssm:TerminateSession',)
+
+    def process(self, resources):
+        client = local_session(self.manager.session_factory).client('ssm')
+        for r in resources:
+            client.terminate_session(SessionId=r['SessionId'])

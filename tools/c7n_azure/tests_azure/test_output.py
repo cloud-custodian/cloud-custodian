@@ -4,8 +4,8 @@ import logging
 import os
 import shutil
 from datetime import date
+from unittest import mock
 
-import mock
 from azure.common import AzureHttpError
 from .azure_common import BaseTest
 import re
@@ -18,7 +18,7 @@ from c7n_azure.session import Session
 
 from c7n_azure.output import MetricsOutput, AppInsightsLogOutput
 from c7n.output import log_outputs, metrics_outputs
-from mock import patch
+from unittest.mock import patch
 
 
 class OutputTest(BaseTest):

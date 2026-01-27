@@ -1,0 +1,90 @@
+{
+  "headers": {
+    "content-type": "application/json; charset=UTF-8",
+    "vary": "Origin, X-Origin, Referer",
+    "date": "Fri, 31 Mar 2023 11:31:40 GMT",
+    "server": "ESF",
+    "cache-control": "private",
+    "x-xss-protection": "0",
+    "x-frame-options": "SAMEORIGIN",
+    "x-content-type-options": "nosniff",
+    "alt-svc": "h3=\":443\"; ma=2592000,h3-29=\":443\"; ma=2592000",
+    "transfer-encoding": "chunked",
+    "status": "200",
+    "content-length": "2365",
+    "-content-encoding": "gzip",
+    "content-location": "https://run.googleapis.com/apis/run.googleapis.com/v1/namespaces/stacklet-kapilt/jobs?alt=json"
+  },
+  "body": {
+    "items": [
+      {
+        "apiVersion": "run.googleapis.com/v1",
+        "kind": "Job",
+        "metadata": {
+          "name": "job",
+          "namespace": "1098479648729",
+          "selfLink": "/apis/run.googleapis.com/v1/namespaces/1098479648729/jobs/job",
+          "uid": "97a91db4-0c34-46c1-95cf-10b5c122e04c",
+          "resourceVersion": "AAX4MGKYGq8",
+          "generation": 1,
+          "creationTimestamp": "2023-03-31T11:19:39.625429Z",
+          "labels": {
+            "cloud.googleapis.com/location": "us-central1",
+            "run.googleapis.com/lastUpdatedTime": "2023-03-31T11:19:39.625429Z"
+          },
+          "annotations": {
+            "run.googleapis.com/client-name": "cloud-console",
+            "run.googleapis.com/lastModifier": "kapil@stacklet.io",
+            "client.knative.dev/user-image": "us-docker.pkg.dev/cloudrun/container/job:latest",
+            "run.googleapis.com/creator": "kapil@stacklet.io",
+            "run.googleapis.com/operation-id": "0f8e2eb1-70b8-46de-8561-4e6e781700f6"
+          }
+        },
+        "spec": {
+          "template": {
+            "metadata": {
+              "annotations": {
+                "run.googleapis.com/client-name": "cloud-console",
+                "client.knative.dev/user-image": "us-docker.pkg.dev/cloudrun/container/job:latest",
+                "run.googleapis.com/execution-environment": "gen2"
+              }
+            },
+            "spec": {
+              "taskCount": 1,
+              "template": {
+                "spec": {
+                  "containers": [
+                    {
+                      "image": "us-docker.pkg.dev/cloudrun/container/job:latest",
+                      "resources": {
+                        "limits": {
+                          "cpu": "1000m",
+                          "memory": "512Mi"
+                        }
+                      }
+                    }
+                  ],
+                  "maxRetries": 3,
+                  "timeoutSeconds": "600",
+                  "serviceAccountName": "1098479648729-compute@developer.gserviceaccount.com"
+                }
+              }
+            }
+          }
+        },
+        "status": {
+          "observedGeneration": 1,
+          "conditions": [
+            {
+              "type": "Ready",
+              "status": "True",
+              "lastTransitionTime": "2023-03-31T11:19:39.807407Z"
+            }
+          ]
+        }
+      }
+    ],
+    "apiVersion": "run.googleapis.com/v1",
+    "kind": "JobList"
+  }
+}

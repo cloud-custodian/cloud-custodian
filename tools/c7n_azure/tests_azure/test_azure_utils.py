@@ -13,7 +13,7 @@ from c7n_azure.utils import (AppInsightsHelper, ManagedGroupHelper, Math,
                              get_keyvault_auth_endpoint, get_keyvault_secret,
                              get_service_tag_ip_space, is_resource_group,
                              is_resource_group_id)
-from mock import Mock, patch
+from unittest.mock import patch, Mock
 from msrestazure.azure_cloud import AZURE_CHINA_CLOUD, AZURE_PUBLIC_CLOUD
 
 from .azure_common import DEFAULT_SUBSCRIPTION_ID, BaseTest
@@ -115,6 +115,9 @@ class UtilsTest(BaseTest):
         rule = {'properties': {'destinationPortRange': '10-12'}}
         self.assertEqual(PortsRangeHelper.get_ports_set_from_rule(rule), {10, 11, 12})
         rule = {'properties': {'destinationPortRanges': ['80', '10-12']}}
+        self.assertEqual(PortsRangeHelper.get_ports_set_from_rule(rule), {10, 11, 12, 80})
+        rule = {'properties': {
+            'destinationPortRange': '', 'destinationPortRanges': ['80', '10-12']}}
         self.assertEqual(PortsRangeHelper.get_ports_set_from_rule(rule), {10, 11, 12, 80})
 
     def test_validate_ports_string(self):
@@ -230,9 +233,9 @@ class UtilsTest(BaseTest):
         mock.orig_send.return_value = type(str('response'), (), response_dict)
         mock.send('')
 
-        self.assertEqual(mock.orig_send.call_count, 3)
-        self.assertEqual(logger_debug.call_count, 3)
-        self.assertEqual(logger_warning.call_count, 3)
+        self.assertEqual(mock.orig_send.call_count, 8)
+        self.assertEqual(logger_debug.call_count, 8)
+        self.assertEqual(logger_warning.call_count, 8)
 
     @patch('c7n_azure.utils.send_logger.error')
     def test_custodian_azure_send_override_429_long_retry(self, logger):
@@ -264,9 +267,9 @@ class UtilsTest(BaseTest):
         with patch('time.sleep', new_callable=time.sleep(0)):
             mock.send('')
 
-        self.assertEqual(mock.orig_send.call_count, 3)
-        self.assertEqual(logger_debug.call_count, 3)
-        self.assertEqual(logger_warning.call_count, 3)
+        self.assertEqual(mock.orig_send.call_count, 8)
+        self.assertEqual(logger_debug.call_count, 8)
+        self.assertEqual(logger_warning.call_count, 8)
 
     managed_group_return_value = [
         _get_descendant_info(type='managementGroups/subscriptions', name=DEFAULT_SUBSCRIPTION_ID),

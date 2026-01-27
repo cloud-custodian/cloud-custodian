@@ -1,0 +1,19 @@
+{
+    "status_code": 200,
+    "data": {
+        "Gateways": [
+            {
+                "GatewayId": "sgw-EBA41682",
+                "GatewayARN": "arn:aws:storagegateway:us-east-1:644160558196:gateway/sgw-EBA41682",
+                "GatewayType": "FILE_S3",
+                "GatewayOperationalState": "ACTIVE",
+                "GatewayName": "c7n-test",
+                "Ec2InstanceId": "i-0c156e5af9675c6ab",
+                "Ec2InstanceRegion": "us-east-1",
+                "HostEnvironment": "EC2",
+                "SoftwareVersion": "1.26.1"
+            }
+        ],
+        "ResponseMetadata": {}
+    }
+}

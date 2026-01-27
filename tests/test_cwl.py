@@ -2,13 +2,71 @@
 # SPDX-License-Identifier: Apache-2.0
 import time
 
+from c7n.exceptions import PolicyValidationError
 from c7n.resources.cw import LogMetricAlarmFilter
+from c7n.utils import local_session
 from .common import BaseTest, functional
 from unittest.mock import MagicMock
 
+import pytest
 from pytest_terraform import terraform
 
 
+def test_log_group_rename_validation(test):
+    with pytest.raises(PolicyValidationError) as ecm:
+        test.load_policy({
+            'name': 'log-rename',
+            'resource': 'aws.log-group',
+            'filters': [{
+                'or': [
+                    {"tag:Application": "present"}, {"tag:Bap": "present"}
+                ],
+            }],
+            'actions': [{
+                'type': 'rename-tag',
+                'new_key': 'App'}],
+        }, validate=True)
+    assert "log-rename:rename-tag 'old_keys' or 'old_key' required" == str(ecm.value)
+
+
+@terraform('log_group_rename_tag')
+def test_log_group_rename_tag(test, log_group_rename_tag):
+    factory = test.replay_flight_data('test_log_group_rename_tag', region='us-west-2')
+    client = factory().client('logs')
+
+    p = test.load_policy({
+        'name': 'log-rename',
+        'resource': 'aws.log-group',
+        'filters': [{
+            'or': [
+                {"tag:Application": "present"}, {"tag:Bap": "present"}
+            ],
+        }],
+        'actions': [{
+            'type': 'rename-tag',
+            'old_keys': ['Application', 'Bap'],
+            'new_key': 'App'}],
+        },
+        session_factory=factory, config={'region': 'us-west-2'})
+    resources = p.run()
+    assert len(resources) == 4
+
+    def get_tags(resource):
+        return client.list_tags_for_resource(resourceArn=resource['arn'][:-2]).get('tags')
+
+    extant_tags = list(map(get_tags, resources))
+    extant_keys = set()
+    extant_values = set()
+    for t in extant_tags:
+        extant_keys.update(t)
+    for t in extant_tags:
+        extant_values.update(t.values())
+
+    assert extant_keys == {'App'}
+    assert extant_values == {'greeter', 'login', 'greep'}
+
+
+@pytest.mark.audited
 @terraform('log_delete', teardown=terraform.TEARDOWN_IGNORE)
 def test_tagged_log_group_delete(test, log_delete):
     factory = test.replay_flight_data(
@@ -87,6 +145,40 @@ class LogGroupTest(BaseTest):
 
     def test_put_subscription_filter(self):
         factory = self.replay_flight_data("test_log_group_put_subscription_filter")
+        log_group = "c7n-test-a"
+        filter_name = "log-susbscription-filter-a"
+        filter_pattern = "id"
+        destination_arn = "arn:aws:logs:us-east-1:644160558196:destination:lambda"
+        distribution = "ByLogStream"
+        role_arn = "arn:aws:iam::123456789012:role/testCrossAccountRole"
+        client = factory().client("logs")
+        p = self.load_policy(
+            {
+                "name": "put-subscription-filter",
+                "resource": "log-group",
+                "filters": [{"logGroupName": log_group}],
+                "actions": [{"type": "put-subscription-filter",
+                "filter_name": filter_name,
+                "filter_pattern": filter_pattern,
+                "destination_arn": destination_arn,
+                "distribution": distribution,
+                "role_arn": role_arn}],
+            },
+            session_factory=factory,
+        )
+        resources = p.run()
+        self.assertEqual(len(resources), 1)
+        subscription_filter = client.describe_subscription_filters(logGroupName=log_group,
+            filterNamePrefix=filter_name,
+            limit=1)["subscriptionFilters"][0]
+        self.assertEqual(subscription_filter["logGroupName"], log_group)
+        self.assertEqual(subscription_filter["filterName"], filter_name)
+        self.assertEqual(subscription_filter["destinationArn"], destination_arn)
+        self.assertEqual(subscription_filter["distribution"], distribution)
+        self.assertEqual(subscription_filter["roleArn"], role_arn)
+
+    def test_put_subscription_filter_without_role(self):
+        factory = self.replay_flight_data("test_log_group_put_subscription_filter_without_role")
         log_group = "c7n-test-a"
         filter_name = "log-susbscription-filter-a"
         filter_pattern = "id"
@@ -399,3 +491,184 @@ class LogGroupTest(BaseTest):
         resources = p.run()
         self.assertEqual(len(resources), 2)
         self.assertIn('c7n:MetricAlarms', resources[0])
+
+
+class DestinationTest(BaseTest):
+
+    def test_destination(self):
+        factory = self.replay_flight_data('test_destination')
+        client = local_session(factory).client('logs')
+        p = self.load_policy(
+            {
+                'name': 'destination-tag',
+                'resource': 'destination',
+                'filters': [{
+                    'type': 'value',
+                    'key': 'destinationName',
+                    'value': 'test-destination'
+                }],
+                'actions': [{
+                    'type': 'tag',
+                    'key': 'test-tag',
+                    'value': 'test-value'
+                }]
+            },
+        session_factory=factory)
+        resources = p.run()
+        self.assertEqual(len(resources), 1)
+        self.assertEqual(resources[0]['destinationName'], 'test-destination')
+        tags = client.list_tags_for_resource(resourceArn=resources[0]['arn'])['tags']
+        assert tags['test-tag'] == 'test-value'
+
+        p = self.load_policy(
+            {
+                'name': 'destination-untag',
+                'resource': 'destination',
+                'filters': [{
+                    'type': 'value',
+                    'key': 'destinationName',
+                    'value': 'test-destination'
+                }],
+                'actions': [{
+                    'type': 'remove-tag',
+                    'tags': ['test-tag']
+                }]
+            },
+        session_factory=factory)
+        resources = p.run()
+        self.assertEqual(len(resources), 1)
+        tags = client.list_tags_for_resource(resourceArn=resources[0]['arn'])['tags']
+        assert 'test-tag' not in tags
+
+    def test_log_destination_cross_account(self):
+        factory = self.replay_flight_data('test_destination_cross_account')
+        p = self.load_policy(
+            {
+                'name': 'cross-account-destination',
+                'resource': 'destination',
+                'filters': [{
+                    'type': 'cross-account'
+                }],
+            },
+        session_factory=factory)
+        resources = p.run()
+        self.assertEqual(len(resources), 1)
+
+    def test_log_destination_delete(self):
+        factory = self.replay_flight_data('test_destination_delete')
+        client = local_session(factory).client('logs')
+        p = self.load_policy(
+            {
+                'name': 'destination-delete',
+                'resource': 'destination',
+                'filters': [{
+                    'type': 'value',
+                    'key': 'destinationName',
+                    'value': 'test-destination'
+                }],
+                'actions': ['delete']
+            },
+        session_factory=factory)
+        resources = p.run()
+        self.assertEqual(len(resources), 1)
+        destinations = client.describe_destinations(
+            DestinationNamePrefix='test-destination')['destinations']
+        self.assertEqual(len(destinations), 0)
+
+
+class DeliveryDestinationTest(BaseTest):
+    def test_delivery_destination(self):
+        factory = self.replay_flight_data('test_delivery_destination')
+        client = local_session(factory).client('logs')
+        p = self.load_policy(
+            {
+                'name': 'delivery-destination-tag',
+                'resource': 'delivery-destination',
+                'filters': [{
+                    'type': 'value',
+                    'key': 'name',
+                    'value': 'test-destination'
+                }],
+                'actions': [{
+                    'type': 'tag',
+                    'key': 'test-tag',
+                    'value': 'test-value'
+                }]
+            },
+        session_factory=factory)
+        resources = p.run()
+        self.assertEqual(len(resources), 1)
+        self.assertEqual(resources[0]['name'], 'test-destination')
+        tags = client.list_tags_for_resource(resourceArn=resources[0]['arn'])['tags']
+        assert tags['test-tag'] == 'test-value'
+
+        p = self.load_policy(
+            {
+                'name': 'delivery-destination-untag',
+                'resource': 'delivery-destination',
+                'filters': [{
+                    'type': 'value',
+                    'key': 'name',
+                    'value': 'test-destination'
+                }],
+                'actions': [{
+                    'type': 'remove-tag',
+                    'tags': ['test-tag']
+                }]
+            },
+        session_factory=factory)
+        resources = p.run()
+        self.assertEqual(len(resources), 1)
+        tags = client.list_tags_for_resource(resourceArn=resources[0]['arn'])['tags']
+        assert 'test-tag' not in tags
+
+    def test_delivery_destination_cross_account(self):
+        factory = self.replay_flight_data('test_delivery_destination_cross_account')
+        p = self.load_policy(
+            {
+                'name': 'cross-account-delivery-destination',
+                'resource': 'delivery-destination',
+                'filters': [{
+                    'type': 'cross-account',
+                }],
+            },
+        session_factory=factory)
+        resources = p.run()
+        self.assertEqual(len(resources), 1)
+
+    def test_delivery_destination_cross_account_no_policy(self):
+        factory = self.replay_flight_data('test_delivery_destination_cross_account_no_policy')
+        p = self.load_policy(
+            {
+                'name': 'cross-account-delivery-destination-no-policy',
+                'resource': 'delivery-destination',
+                'filters': [{
+                    'type': 'cross-account',
+                }],
+            },
+        session_factory=factory)
+        resources = p.run()
+        self.assertEqual(len(resources), 0)
+
+    def test_delivery_destination_delete(self):
+        factory = self.replay_flight_data('test_delivery_destination_delete')
+        client = local_session(factory).client('logs')
+        p = self.load_policy(
+            {
+                'name': 'delivery-destination-delete',
+                'resource': 'delivery-destination',
+                'filters': [{
+                    'type': 'value',
+                    'key': 'name',
+                    'value': 'test-destination'
+                }],
+                'actions': ['delete']
+            },
+        session_factory=factory)
+        resources = p.run()
+        self.assertEqual(len(resources), 1)
+        self.assertRaises(
+            client.exceptions.ResourceNotFoundException,
+            client.get_delivery_destination,
+            name='test-destination'
+        )

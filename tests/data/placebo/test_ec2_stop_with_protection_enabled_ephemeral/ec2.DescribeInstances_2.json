@@ -1,0 +1,84 @@
+{
+    "status_code": 200, 
+    "data": {
+        "Reservations": [
+            {
+                "OwnerId": "644160558196", 
+                "ReservationId": "r-004a79105c91013c8", 
+                "Groups": [], 
+                "Instances": [
+                    {
+                        "Monitoring": {
+                            "State": "disabled"
+                        }, 
+                        "PublicDnsName": "", 
+                        "RootDeviceType": "instance-store",
+                        "State": {
+                            "Code": 48, 
+                            "Name": "terminated"
+                        }, 
+                        "EbsOptimized": false, 
+                        "LaunchTime": {
+                            "hour": 20, 
+                            "__class__": "datetime", 
+                            "month": 10, 
+                            "second": 59, 
+                            "microsecond": 0, 
+                            "year": 2016, 
+                            "day": 29, 
+                            "minute": 45
+                        }, 
+                        "ProductCodes": [], 
+                        "StateTransitionReason": "User initiated (2022-11-17 10:53:38 GMT)",
+                        "InstanceId": "i-0a3e363a5366795dd", 
+                        "EnaSupport": true, 
+                        "ImageId": "ami-0882319d1311c34f0", 
+                        "PrivateDnsName": "", 
+                        "KeyName": "m", 
+                        "SecurityGroups": [], 
+                        "ClientToken": "TXGvw1477773959019", 
+                        "InstanceType": "r3.xlarge", 
+                        "NetworkInterfaces": [], 
+                        "Placement": {
+                            "Tenancy": "default", 
+                            "GroupName": "", 
+                            "AvailabilityZone": "us-west-2a"
+                        }, 
+                        "Hypervisor": "xen", 
+                        "BlockDeviceMappings": [], 
+                        "Architecture": "x86_64", 
+                        "StateReason": {
+                            "Message": "Client.UserInitiatedShutdown: User initiated shutdown", 
+                            "Code": "Client.UserInitiatedShutdown"
+                        }, 
+                        "IamInstanceProfile": {
+                            "Id": "AIPAJO5EMJ3YEMNUF5ZWM", 
+                            "Arn": "arn:aws:iam::644160558196:instance-profile/CloudCustodianRole"
+                        }, 
+                        "RootDeviceName": "/dev/xvda", 
+                        "VirtualizationType": "hvm", 
+                        "Tags": [
+                            {
+                                "Value": "", 
+                                "Key": "Name"
+                            }
+                        ], 
+                        "AmiLaunchIndex": 0
+                    }
+                ]
+            }
+        ], 
+        "ResponseMetadata": {
+            "RetryAttempts": 0, 
+            "HTTPStatusCode": 200, 
+            "RequestId": "1b49d122-39e6-4c2f-8831-9ac43749b589", 
+            "HTTPHeaders": {
+                "transfer-encoding": "chunked", 
+                "vary": "Accept-Encoding", 
+                "server": "AmazonEC2", 
+                "content-type": "text/xml;charset=UTF-8", 
+                "date": "Thu, 17 Nov 2022 10:55:21 GMT"
+            }
+        }
+    }
+}

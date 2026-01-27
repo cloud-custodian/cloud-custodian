@@ -1,0 +1,74 @@
+{
+    "status_code": 200,
+    "data": {
+        "Subnets": [
+            {
+                "AvailabilityZone": "us-east-1a",
+                "AvailabilityZoneId": "use1-az4",
+                "AvailableIpAddressCount": 4090,
+                "CidrBlock": "10.0.0.0/20",
+                "DefaultForAz": false,
+                "MapPublicIpOnLaunch": true,
+                "MapCustomerOwnedIpOnLaunch": false,
+                "State": "available",
+                "SubnetId": "subnet-00e4b6ccbf5f49a9e",
+                "VpcId": "vpc-091903ea8ede06de5",
+                "OwnerId": "644160558196",
+                "AssignIpv6AddressOnCreation": false,
+                "Ipv6CidrBlockAssociationSet": [],
+                "Tags": [
+                    {
+                        "Key": "AZ",
+                        "Value": "us-east-1a"
+                    },
+                    {
+                        "Key": "Name",
+                        "Value": "dev Stacklet VPC Private Subnet us-east-1a"
+                    }
+                ],
+                "SubnetArn": "arn:aws:ec2:us-east-1:644160558196:subnet/subnet-00e4b6ccbf5f49a9e",
+                "EnableDns64": false,
+                "Ipv6Native": false,
+                "PrivateDnsNameOptionsOnLaunch": {
+                    "HostnameType": "ip-name",
+                    "EnableResourceNameDnsARecord": false,
+                    "EnableResourceNameDnsAAAARecord": false
+                }
+            },
+            {
+                "AvailabilityZone": "us-east-1b",
+                "AvailabilityZoneId": "use1-az6",
+                "AvailableIpAddressCount": 4090,
+                "CidrBlock": "10.0.16.0/20",
+                "DefaultForAz": false,
+                "MapPublicIpOnLaunch": true,
+                "MapCustomerOwnedIpOnLaunch": false,
+                "State": "available",
+                "SubnetId": "subnet-08f5a2e4c12adf737",
+                "VpcId": "vpc-091903ea8ede06de5",
+                "OwnerId": "644160558196",
+                "AssignIpv6AddressOnCreation": false,
+                "Ipv6CidrBlockAssociationSet": [],
+                "Tags": [
+                    {
+                        "Key": "AZ",
+                        "Value": "us-east-1b"
+                    },
+                    {
+                        "Key": "Name",
+                        "Value": "dev Stacklet VPC Private Subnet us-east-1b"
+                    }
+                ],
+                "SubnetArn": "arn:aws:ec2:us-east-1:644160558196:subnet/subnet-08f5a2e4c12adf737",
+                "EnableDns64": false,
+                "Ipv6Native": false,
+                "PrivateDnsNameOptionsOnLaunch": {
+                    "HostnameType": "ip-name",
+                    "EnableResourceNameDnsARecord": false,
+                    "EnableResourceNameDnsAAAARecord": false
+                }
+            }
+        ],
+        "ResponseMetadata": {}
+    }
+}

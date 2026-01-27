@@ -12,12 +12,6 @@ inputs:
     description: 'Push image: true/false'
     required: true
     default: false
-  poetry_version:
-    description: "Poetry Version to use"
-    default: "1.2.1"
-  trivy_version:
-    description: "Trivy version to use"
-    default: "0.5.4"
   platforms:
     description: "Platforms to build, e.g. linux/arm64,linux/amd64"
     default: "linux/amd64"
@@ -25,17 +19,17 @@ runs:
   using: "composite"
   steps:
     - name: Set up QEMU
-      uses: docker/setup-qemu-action@v2
+      uses: docker/setup-qemu-action@29109295f81e9208d7d86ff1c6c12d2833863392 # ratchet:docker/setup-qemu-action@v3
 
     - name: Set up Docker Buildx
       id: buildx
-      uses: docker/setup-buildx-action@v2
+      uses: docker/setup-buildx-action@e468171a9de216ec08956ac3ada2f0791b6bd435 # ratchet:docker/setup-buildx-action@v3
 
     # until we get read only credentials, we'll only login if we're pushing
     # note that we can hit rate limits on pulling though
     - name: Login to Docker Hub
       if: "${{ inputs.push == 'true' }}"
-      uses: docker/login-action@v2
+      uses: docker/login-action@5e57cd118135c172c3672efd75eb46360885c0ef # ratchet:docker/login-action@v3
       with:
         username: ${{ env.HUB_USER }}
         password: ${{ env.HUB_TOKEN }}
@@ -44,23 +38,27 @@ runs:
       id: get_tag
       shell: python
       run: |
-        if "${{ github.ref }}".startswith("refs/tags"):
-          print("::set-output name=tag::latest")
-        elif "${{ github.ref }}" == "refs/heads/master":
-          print("::set-output name=tag::dev")
-        # Pull requests dont get pushed so this should be fine
-        elif "${{ github.ref }}".startswith("refs/pull"):
-          # ref looks like: refs/pull/$pr_number/merge
-          id = "${{ github.ref }}".split("/")[-2]
-          print(f"::set-output name=tag::pr-{id}")
-        else:
-          # this should just be the branch
-          id = "${{ github.ref }}".split("/")[-1]
-          print(f"::set-output name=tag::{id}")
+        import os
+        with open(os.environ['GITHUB_OUTPUT'], 'a') as output:
+          # release tags are picked up by docker meta below
+          # we set the alias latest to point to the latest tag.
+          if "${{ github.ref }}".startswith("refs/tags"):
+            print("tag=latest", file=output)
+          elif "${{ github.ref }}" == "refs/heads/main":
+            print("tag=dev", file=output)
+          # Pull requests dont get pushed so this should be fine
+          elif "${{ github.ref }}".startswith("refs/pull"):
+            # ref looks like: refs/pull/$pr_number/merge
+            id = "${{ github.ref }}".split("/")[-2]
+            print(f"tag=pr-{id}", file=output)
+          else:
+            # this should just be the branch
+            id = "${{ github.ref }}".split("/")[-1]
+            print(f"tag={id}", file=output)
 
     - name: Docker meta
       id: meta
-      uses: docker/metadata-action@v4
+      uses: docker/metadata-action@318604b99e75e41977312d83839a89be02ca4893 # ratchet:docker/metadata-action@v5
       with:
         images: |
           ${{ inputs.repository }}/${{ inputs.name }}
@@ -69,89 +67,66 @@ runs:
           type=raw,value=${{ steps.get_tag.outputs.tag }}
         sep-tags: ','
 
+    - name: Install Custodian
+      id: install-custodian
+      uses: ./.github/composites/install
+      with:
+        python-version: "3.11"
+
     # build a single platform image first in order to actually load the image from buildx
     # manifests are not supported yet
     # https://github.com/docker/buildx/issues/166
     # https://github.com/docker/buildx/issues/59
     - name: Build
-      uses: docker/build-push-action@v3
+      uses: docker/build-push-action@263435318d21b8e681c14492fe198d362a7d2c83 # ratchet:docker/build-push-action@v5
       with:
         context: .
         build-args: |
-          POETRY_VERSION=${{ inputs.poetry_version }}
+          UV_VERSION=${{ steps.install-custodian.outputs.uv-version }}
         push: false
+        pull: true
         tags: ${{ steps.meta.outputs.tags }}
         labels: ${{ steps.meta.outputs.labels }}
-        # makes the image available in docker, e.g. docker images inspect
+        # load the image back into docker for tests.
         load: true
         file: "docker/${{ inputs.name }}"
-
-    - name: Scan
-      shell: bash
-      env:
-        tags: ${{ steps.meta.outputs.tags }}
-      run: |
-        mkdir -p bin
-        wget -q -O bin/trivy.tgz https://github.com/aquasecurity/trivy/releases/download/v${{ inputs.trivy_version }}/trivy_${{ inputs.trivy_version }}_Linux-64bit.tar.gz
-        cd bin && tar xzf trivy.tgz
-        ./trivy $(echo $tags | cut -d ',' -f 1)
-        cd ..
-
-    - name: Cache Poetry cache
-      uses: actions/cache@v2
-      with:
-        path: ~/.cache/pypoetry
-        key: poetry-cache-${{ runner.os }}-3.10-${{ inputs.poetry_version }}
-
-    - name: Cache Packages
-      uses: actions/cache@v2
-      with:
-        path: ~/.local
-        key: poetry-${{ runner.os }}-3.10-${{ hashFiles('**/poetry.lock') }}-${{ hashFiles('.github/workflows/*.yml') }}
-
-    - name: Set up Python 3.10
-      uses: actions/setup-python@v4
-      with:
-        # note the usage of qutoes here for 3.10, without quotes it's interrpeted as 3.1
-        python-version: "3.10"
+        cache-from: type=gha
+        cache-to: type=gha,mode=max
 
     - name: Test
       shell: bash
       env:
         tags: ${{ steps.meta.outputs.tags }}
-      run : |
-        curl -sL https://raw.githubusercontent.com/python-poetry/poetry/master/install-poetry.py | python - -y --version ${{ inputs.poetry_version }}
-
+      run: |
         image_var=${{inputs.name}}
         image_var=CUSTODIAN_${image_var//[-]/_}_IMAGE
         image_var=${image_var^^}
         export ${image_var}="$(echo $tags | cut -d ',' -f 1)"
-
-        python -m venv .
-        . bin/activate && poetry install
-        . bin/activate && pip install docker
-        . bin/activate && TEST_DOCKER=yes \
-                          pytest -p no:terraform -v tests/test_docker.py
+        TEST_DOCKER=yes uv run pytest -s -v -p no:terraform -v tests/test_docker.py
 
     # actually push the multi arch image
     - name: Push
+      id: "push"
       if: "${{ inputs.push == 'true' }}"
-      uses: docker/build-push-action@v3.1.1
+      uses: docker/build-push-action@263435318d21b8e681c14492fe198d362a7d2c83 # ratchet:docker/build-push-action@v5
       with:
         context: .
         build-args: |
-          POETRY_VERSION=${{ inputs.poetry_version }}
+          UV_VERSION=${{ steps.install-custodian.outputs.uv-version }}
         push: true
+        pull: true
         platforms: ${{ inputs.platforms }}
         tags: ${{ steps.meta.outputs.tags }}
         labels: ${{ steps.meta.outputs.labels }}
         file: "docker/${{ inputs.name }}"
+        cache-from: type=gha
+        cache-to: type=gha,mode=max
 
     - name: Install cosign
       if: "${{ inputs.push == 'true' }}"
-      uses: sigstore/cosign-installer@v2.8.0
+      uses: sigstore/cosign-installer@d7d6bc7722e3daa8354c50bcb52f4837da5e9b6a # ratchet:sigstore/cosign-installer@v3
       with:
-        cosign-release: 'v1.13.0'
+        cosign-release: 'v1.13.6'
 
     - name: Sign
       if: "${{ inputs.push == 'true' }}"
@@ -160,8 +135,9 @@ runs:
         COSIGN_EXPERIMENTAL: "true"
         TAGS: ${{ steps.meta.outputs.tags }}
       run: |
+        echo "${{ steps.push.outputs.digest }}"
         tags=(${TAGS//,/ })
         for i in "${tags[@]}"
         do
-          cosign sign $i
+          cosign sign ${{ inputs.repository }}/${{ inputs.name }}@${{ steps.push.outputs.digest }}
         done

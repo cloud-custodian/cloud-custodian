@@ -26,7 +26,7 @@ Option 1: Install released packages to local Python Environment
 .. code-block:: bash
 
     pip install c7n
-    pip install c7n_kube
+    pip install c7n-kube
 
 
 Option 2: Install latest from the repository
@@ -60,6 +60,9 @@ There are three main components to a policy:
 * Resource: the type of resource to run the policy against
 * Filters: criteria to produce a specific subset of resources
 * Actions: directives to take on the filtered set of resources
+
+In the example below, we will write a policy that filters for pods with a label "custodian"
+and deletes it:
 
 First, lets create a pod resource that we want to target with the policy:
 
@@ -220,4 +223,3 @@ attributes that way:
             "phase": "Available"
         }
     }
-

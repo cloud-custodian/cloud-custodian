@@ -1,0 +1,639 @@
+{
+    "version": 1,
+    "interactions": [
+        {
+            "request": {
+                "method": "GET",
+                "uri": "https://management.azure.com/subscriptions/ea42f556-5106-4743-99b0-c129bfa71a47/providers/Microsoft.KeyVault/vaults?api-version=2019-09-01",
+                "body": null,
+                "headers": {}
+            },
+            "response": {
+                "status": {
+                    "code": 200,
+                    "message": "OK"
+                },
+                "headers": {
+                    "Cache-Control": [
+                        "no-cache"
+                    ],
+                    "x-ms-keyvault-service-version": [
+                        "1.5.885.0"
+                    ],
+                    "X-Cache": [
+                        "CONFIG_NOCACHE"
+                    ],
+                    "Expires": [
+                        "-1"
+                    ],
+                    "Content-Type": [
+                        "application/json; charset=utf-8"
+                    ],
+                    "x-ms-request-id": [
+                        "f538a913-53fa-4ebe-aac3-4656315fc141"
+                    ],
+                    "X-AspNet-Version": [
+                        "4.0.30319"
+                    ],
+                    "Content-Length": [
+                        "216"
+                    ],
+                    "Pragma": [
+                        "no-cache"
+                    ],
+                    "x-ms-ratelimit-remaining-subscription-reads": [
+                        "11999"
+                    ],
+                    "X-MSEdge-Ref": [
+                        "Ref A: A6ED4CE74CE64B6399B877981C3E9C72 Ref B: SJC211051205021 Ref C: 2023-09-05T17:21:19Z"
+                    ],
+                    "Strict-Transport-Security": [
+                        "max-age=31536000; includeSubDomains"
+                    ],
+                    "x-ms-client-request-id": [
+                        "a0365e10-4c10-11ee-ab8d-aaf1f58405fb"
+                    ],
+                    "x-ms-correlation-request-id": [
+                        "6b81cfb4-8ec9-41c2-ab6c-1b53397179aa"
+                    ],
+                    "Date": [
+                        "Tue, 05 Sep 2023 17:21:18 GMT"
+                    ],
+                    "X-Content-Type-Options": [
+                        "nosniff"
+                    ],
+                    "x-ms-routing-request-id": [
+                        "WESTUS2:20230905T172119Z:6b81cfb4-8ec9-41c2-ab6c-1b53397179aa"
+                    ]
+                },
+                "body": {
+                    "string": "{\"value\":[],\"nextLink\":\"https://management.azure.com/subscriptions/2300cc55-8d79-47e6-99e2-027d7cf99299/providers/Microsoft.KeyVault/vaults?api-version=2019-09-01&$skiptoken=Y2ZiLW5qbHJzcHRnfGtleXZhdWx0LVN1Y2Nlc3M=\"}"
+                }
+            }
+        },
+        {
+            "request": {
+                "method": "GET",
+                "uri": "https://management.azure.com/subscriptions/ea42f556-5106-4743-99b0-c129bfa71a47/providers/Microsoft.KeyVault/vaults?api-version=2019-09-01&$skiptoken=Y2ZiLW5qbHJzcHRnfGtleXZhdWx0LVN1Y2Nlc3M=",
+                "body": null,
+                "headers": {}
+            },
+            "response": {
+                "status": {
+                    "code": 200,
+                    "message": "OK"
+                },
+                "headers": {
+                    "Cache-Control": [
+                        "no-cache"
+                    ],
+                    "x-ms-keyvault-service-version": [
+                        "1.5.885.0"
+                    ],
+                    "X-Cache": [
+                        "CONFIG_NOCACHE"
+                    ],
+                    "Expires": [
+                        "-1"
+                    ],
+                    "Content-Type": [
+                        "application/json; charset=utf-8"
+                    ],
+                    "x-ms-request-id": [
+                        "80599022-5cc8-40e6-9e24-c467d8a2bcd4"
+                    ],
+                    "X-AspNet-Version": [
+                        "4.0.30319"
+                    ],
+                    "Content-Length": [
+                        "2096"
+                    ],
+                    "Pragma": [
+                        "no-cache"
+                    ],
+                    "x-ms-ratelimit-remaining-subscription-reads": [
+                        "11999"
+                    ],
+                    "X-MSEdge-Ref": [
+                        "Ref A: BBD9480B76524DE9AFFA7CF4CB4AC823 Ref B: SJC211051205021 Ref C: 2023-09-05T17:21:19Z"
+                    ],
+                    "Strict-Transport-Security": [
+                        "max-age=31536000; includeSubDomains"
+                    ],
+                    "x-ms-client-request-id": [
+                        "a0e7f33c-4c10-11ee-ab8d-aaf1f58405fb"
+                    ],
+                    "x-ms-correlation-request-id": [
+                        "b27b6202-70c1-4933-ab90-563e53ba5055"
+                    ],
+                    "Date": [
+                        "Tue, 05 Sep 2023 17:21:19 GMT"
+                    ],
+                    "X-Content-Type-Options": [
+                        "nosniff"
+                    ],
+                    "x-ms-routing-request-id": [
+                        "WESTUS2:20230905T172119Z:b27b6202-70c1-4933-ab90-563e53ba5055"
+                    ]
+                },
+                "body": {
+                    "string": "{\"value\":[{\"id\":\"/subscriptions/2300cc55-8d79-47e6-99e2-027d7cf99299/resourceGroups/cfb-qmbknzbm/providers/Microsoft.KeyVault/vaults/cfb-qmbknzbm-keyvault\",\"name\":\"cfb-qmbknzbm-keyvault\",\"type\":\"Microsoft.KeyVault/vaults\",\"location\":\"centralus\",\"tags\":{\"product_id\":\"13742\"},\"properties\":{\"sku\":{\"family\":\"A\",\"name\":\"premium\"},\"tenantId\":\"b0257c14-cacc-44c6-8927-5b4ce5de0874\",\"accessPolicies\":[{\"tenantId\":\"b0257c14-cacc-44c6-8927-5b4ce5de0874\",\"objectId\":\"2cc7cbda-e89a-46a4-852b-b7dc94c32db0\",\"permissions\":{\"certificates\":[],\"keys\":[\"Create\",\"Delete\",\"Get\",\"Purge\",\"Recover\",\"Update\",\"GetRotationPolicy\",\"SetRotationPolicy\",\"List\"],\"secrets\":[\"set\"],\"storage\":[]}}],\"enabledForDeployment\":false,\"enabledForDiskEncryption\":false,\"enabledForTemplateDeployment\":false,\"enableSoftDelete\":true,\"softDeleteRetentionInDays\":7,\"enableRbacAuthorization\":false,\"vaultUri\":\"https://cfb-qmbknzbm-keyvault.vault.azure.net/\",\"provisioningState\":\"Succeeded\"}},{\"id\":\"/subscriptions/2300cc55-8d79-47e6-99e2-027d7cf99299/resourceGroups/cfb-vpbanzbk/providers/Microsoft.KeyVault/vaults/cfb-vpbanzbk-keyvault\",\"name\":\"cfb-vpbanzbk-keyvault\",\"type\":\"Microsoft.KeyVault/vaults\",\"location\":\"centralus\",\"tags\":{\"product_id\":\"13742\"},\"properties\":{\"sku\":{\"family\":\"A\",\"name\":\"premium\"},\"tenantId\":\"b0257c14-cacc-44c6-8927-5b4ce5de0874\",\"accessPolicies\":[{\"tenantId\":\"b0257c14-cacc-44c6-8927-5b4ce5de0874\",\"objectId\":\"2cc7cbda-e89a-46a4-852b-b7dc94c32db0\",\"permissions\":{\"certificates\":[],\"keys\":[\"Create\",\"Delete\",\"Get\",\"Purge\",\"Recover\",\"Update\",\"GetRotationPolicy\",\"SetRotationPolicy\",\"List\"],\"secrets\":[],\"storage\":[]}}],\"enabledForDeployment\":false,\"enabledForDiskEncryption\":false,\"enabledForTemplateDeployment\":false,\"enableSoftDelete\":true,\"softDeleteRetentionInDays\":7,\"enableRbacAuthorization\":false,\"vaultUri\":\"https://cfb-vpbanzbk-keyvault.vault.azure.net/\",\"provisioningState\":\"Succeeded\"}}],\"nextLink\":\"https://management.azure.com/subscriptions/2300cc55-8d79-47e6-99e2-027d7cf99299/providers/Microsoft.KeyVault/vaults?api-version=2019-09-01&$skiptoken=Y2ZiLXZwYmFuemJrfGNmYi12cGJhbnpiay1rZXl2YXVsdA==\"}"
+                }
+            }
+        },
+        {
+            "request": {
+                "method": "GET",
+                "uri": "https://management.azure.com/subscriptions/ea42f556-5106-4743-99b0-c129bfa71a47/providers/Microsoft.KeyVault/vaults?api-version=2019-09-01&$skiptoken=Y2ZiLXZwYmFuemJrfGNmYi12cGJhbnpiay1rZXl2YXVsdA==",
+                "body": null,
+                "headers": {}
+            },
+            "response": {
+                "status": {
+                    "code": 200,
+                    "message": "OK"
+                },
+                "headers": {
+                    "Cache-Control": [
+                        "no-cache"
+                    ],
+                    "x-ms-keyvault-service-version": [
+                        "1.5.885.0"
+                    ],
+                    "X-Cache": [
+                        "CONFIG_NOCACHE"
+                    ],
+                    "Expires": [
+                        "-1"
+                    ],
+                    "Content-Type": [
+                        "application/json; charset=utf-8"
+                    ],
+                    "x-ms-request-id": [
+                        "fa72fbc1-313f-4543-9c07-6368509cddd5"
+                    ],
+                    "X-AspNet-Version": [
+                        "4.0.30319"
+                    ],
+                    "Content-Length": [
+                        "228"
+                    ],
+                    "Pragma": [
+                        "no-cache"
+                    ],
+                    "x-ms-ratelimit-remaining-subscription-reads": [
+                        "11999"
+                    ],
+                    "X-MSEdge-Ref": [
+                        "Ref A: E35A1FF722A34AC7AC5A351C5815EAA2 Ref B: SJC211051205021 Ref C: 2023-09-05T17:21:20Z"
+                    ],
+                    "Strict-Transport-Security": [
+                        "max-age=31536000; includeSubDomains"
+                    ],
+                    "x-ms-client-request-id": [
+                        "a10b5c14-4c10-11ee-ab8d-aaf1f58405fb"
+                    ],
+                    "x-ms-correlation-request-id": [
+                        "2ba905bd-b5c5-4061-9245-176459cf4dda"
+                    ],
+                    "Date": [
+                        "Tue, 05 Sep 2023 17:21:19 GMT"
+                    ],
+                    "X-Content-Type-Options": [
+                        "nosniff"
+                    ],
+                    "x-ms-routing-request-id": [
+                        "SOUTHCENTRALUS:20230905T172120Z:2ba905bd-b5c5-4061-9245-176459cf4dda"
+                    ]
+                },
+                "body": {
+                    "string": "{\"value\":[],\"nextLink\":\"https://management.azure.com/subscriptions/2300cc55-8d79-47e6-99e2-027d7cf99299/providers/Microsoft.KeyVault/vaults?api-version=2019-09-01&$skiptoken=a2V5LXJCa0Z2T3JnLXJzZ3xrZXktckJrRnZPcmctblJCQUMta2V5\"}"
+                }
+            }
+        },
+        {
+            "request": {
+                "method": "GET",
+                "uri": "https://management.azure.com/subscriptions/ea42f556-5106-4743-99b0-c129bfa71a47/providers/Microsoft.KeyVault/vaults?api-version=2019-09-01&$skiptoken=a2V5LXJCa0Z2T3JnLXJzZ3xrZXktckJrRnZPcmctblJCQUMta2V5",
+                "body": null,
+                "headers": {}
+            },
+            "response": {
+                "status": {
+                    "code": 200,
+                    "message": "OK"
+                },
+                "headers": {
+                    "Cache-Control": [
+                        "no-cache"
+                    ],
+                    "x-ms-keyvault-service-version": [
+                        "1.5.885.0"
+                    ],
+                    "X-Cache": [
+                        "CONFIG_NOCACHE"
+                    ],
+                    "Expires": [
+                        "-1"
+                    ],
+                    "Content-Type": [
+                        "application/json; charset=utf-8"
+                    ],
+                    "x-ms-request-id": [
+                        "c19e45d2-d602-4ddc-8267-810c513fee55"
+                    ],
+                    "X-AspNet-Version": [
+                        "4.0.30319"
+                    ],
+                    "Content-Length": [
+                        "12"
+                    ],
+                    "Pragma": [
+                        "no-cache"
+                    ],
+                    "x-ms-ratelimit-remaining-subscription-reads": [
+                        "11999"
+                    ],
+                    "X-MSEdge-Ref": [
+                        "Ref A: AFF509BF6C1044ABBCC0E451FA153877 Ref B: SJC211051205021 Ref C: 2023-09-05T17:21:20Z"
+                    ],
+                    "Strict-Transport-Security": [
+                        "max-age=31536000; includeSubDomains"
+                    ],
+                    "x-ms-client-request-id": [
+                        "a13daa2a-4c10-11ee-ab8d-aaf1f58405fb"
+                    ],
+                    "x-ms-correlation-request-id": [
+                        "3c677c13-486d-45aa-bcf0-77b267ed42de"
+                    ],
+                    "Date": [
+                        "Tue, 05 Sep 2023 17:21:19 GMT"
+                    ],
+                    "X-Content-Type-Options": [
+                        "nosniff"
+                    ],
+                    "x-ms-routing-request-id": [
+                        "WESTUS2:20230905T172120Z:3c677c13-486d-45aa-bcf0-77b267ed42de"
+                    ]
+                },
+                "body": {
+                    "string": "{\"value\":[]}"
+                }
+            }
+        },
+        {
+            "request": {
+                "method": "GET",
+                "uri": "https://cfb-qmbknzbm-keyvault.vault.azure.net/keys?api-version=7.4",
+                "body": null,
+                "headers": {}
+            },
+            "response": {
+                "status": {
+                    "code": 401,
+                    "message": "Unauthorized"
+                },
+                "headers": {
+                    "Cache-Control": [
+                        "no-cache"
+                    ],
+                    "x-ms-keyvault-service-version": [
+                        "1.9.950.1"
+                    ],
+                    "Expires": [
+                        "-1"
+                    ],
+                    "Content-Type": [
+                        "application/json; charset=utf-8"
+                    ],
+                    "WWW-Authenticate": [
+                        "Bearer authorization=\"https://login.microsoftonline.com/b0257c14-cacc-44c6-8927-5b4ce5de0874\", resource=\"https://vault.azure.net\""
+                    ],
+                    "x-ms-request-id": [
+                        "67af2b52-dfb5-485b-83d4-61ac4a24f6c4"
+                    ],
+                    "x-ms-keyvault-region": [
+                        "centralus"
+                    ],
+                    "x-ms-keyvault-network-info": [
+                        "conn_type=Ipv4;addr=134.238.195.180;act_addr_fam=InterNetwork;"
+                    ],
+                    "Content-Length": [
+                        "97"
+                    ],
+                    "Pragma": [
+                        "no-cache"
+                    ],
+                    "Strict-Transport-Security": [
+                        "max-age=31536000;includeSubDomains"
+                    ],
+                    "x-ms-client-request-id": [
+                        "a1a14198-4c10-11ee-ab8d-aaf1f58405fb"
+                    ],
+                    "Date": [
+                        "Tue, 05 Sep 2023 17:21:21 GMT"
+                    ],
+                    "X-Content-Type-Options": [
+                        "nosniff"
+                    ]
+                },
+                "body": {
+                    "string": "{\"error\":{\"code\":\"Unauthorized\",\"message\":\"AKV10000: Request is missing a Bearer or PoP token.\"}}"
+                }
+            }
+        },
+        {
+            "request": {
+                "method": "GET",
+                "uri": "https://cfb-qmbknzbm-keyvault.vault.azure.net/keys?api-version=7.4",
+                "body": null,
+                "headers": {}
+            },
+            "response": {
+                "status": {
+                    "code": 200,
+                    "message": "OK"
+                },
+                "headers": {
+                    "Cache-Control": [
+                        "no-cache"
+                    ],
+                    "x-ms-keyvault-service-version": [
+                        "1.9.950.1"
+                    ],
+                    "Expires": [
+                        "-1"
+                    ],
+                    "Content-Type": [
+                        "application/json; charset=utf-8"
+                    ],
+                    "x-ms-request-id": [
+                        "0933dc63-4d39-4fff-9963-c1c4d1a83d1f"
+                    ],
+                    "x-ms-keyvault-region": [
+                        "centralus"
+                    ],
+                    "x-ms-keyvault-network-info": [
+                        "conn_type=Ipv4;addr=134.238.195.180;act_addr_fam=InterNetwork;"
+                    ],
+                    "Pragma": [
+                        "no-cache"
+                    ],
+                    "Content-Length": [
+                        "294"
+                    ],
+                    "Strict-Transport-Security": [
+                        "max-age=31536000;includeSubDomains"
+                    ],
+                    "x-ms-client-request-id": [
+                        "a1a14198-4c10-11ee-ab8d-aaf1f58405fb"
+                    ],
+                    "Date": [
+                        "Tue, 05 Sep 2023 17:21:21 GMT"
+                    ],
+                    "X-Content-Type-Options": [
+                        "nosniff"
+                    ]
+                },
+                "body": {
+                    "string": "{\"value\":[{\"kid\":\"https://cfb-qmbknzbm-keyvault.vault.azure.net/keys/cfb-qmbknzbm-generated-certificate\",\"attributes\":{\"enabled\":true,\"created\":1692896587,\"updated\":1692896587,\"recoveryLevel\":\"CustomizedRecoverable+Purgeable\",\"recoverableDays\":7,\"exportable\":false},\"tags\":{}}],\"nextLink\":null}"
+                }
+            }
+        },
+        {
+            "request": {
+                "method": "GET",
+                "uri": "https://cfb-vpbanzbk-keyvault.vault.azure.net/keys?api-version=7.4",
+                "body": null,
+                "headers": {}
+            },
+            "response": {
+                "status": {
+                    "code": 401,
+                    "message": "Unauthorized"
+                },
+                "headers": {
+                    "Cache-Control": [
+                        "no-cache"
+                    ],
+                    "x-ms-keyvault-service-version": [
+                        "1.9.950.1"
+                    ],
+                    "Expires": [
+                        "-1"
+                    ],
+                    "Content-Type": [
+                        "application/json; charset=utf-8"
+                    ],
+                    "WWW-Authenticate": [
+                        "Bearer authorization=\"https://login.microsoftonline.com/b0257c14-cacc-44c6-8927-5b4ce5de0874\", resource=\"https://vault.azure.net\""
+                    ],
+                    "x-ms-request-id": [
+                        "b2e59eb2-f76c-41a2-bfaa-1bea1df74485"
+                    ],
+                    "x-ms-keyvault-region": [
+                        "centralus"
+                    ],
+                    "x-ms-keyvault-network-info": [
+                        "conn_type=Ipv4;addr=134.238.195.180;act_addr_fam=InterNetwork;"
+                    ],
+                    "Content-Length": [
+                        "97"
+                    ],
+                    "Pragma": [
+                        "no-cache"
+                    ],
+                    "Strict-Transport-Security": [
+                        "max-age=31536000;includeSubDomains"
+                    ],
+                    "x-ms-client-request-id": [
+                        "a24c593e-4c10-11ee-ab8d-aaf1f58405fb"
+                    ],
+                    "Date": [
+                        "Tue, 05 Sep 2023 17:21:22 GMT"
+                    ],
+                    "X-Content-Type-Options": [
+                        "nosniff"
+                    ]
+                },
+                "body": {
+                    "string": "{\"error\":{\"code\":\"Unauthorized\",\"message\":\"AKV10000: Request is missing a Bearer or PoP token.\"}}"
+                }
+            }
+        },
+        {
+            "request": {
+                "method": "GET",
+                "uri": "https://cfb-vpbanzbk-keyvault.vault.azure.net/keys?api-version=7.4",
+                "body": null,
+                "headers": {}
+            },
+            "response": {
+                "status": {
+                    "code": 200,
+                    "message": "OK"
+                },
+                "headers": {
+                    "Cache-Control": [
+                        "no-cache"
+                    ],
+                    "x-ms-keyvault-service-version": [
+                        "1.9.950.1"
+                    ],
+                    "Expires": [
+                        "-1"
+                    ],
+                    "Content-Type": [
+                        "application/json; charset=utf-8"
+                    ],
+                    "x-ms-request-id": [
+                        "e475fab0-e9fe-4186-9072-273d9592c12a"
+                    ],
+                    "x-ms-keyvault-region": [
+                        "centralus"
+                    ],
+                    "x-ms-keyvault-network-info": [
+                        "conn_type=Ipv4;addr=134.238.195.180;act_addr_fam=InterNetwork;"
+                    ],
+                    "Pragma": [
+                        "no-cache"
+                    ],
+                    "Content-Length": [
+                        "294"
+                    ],
+                    "Strict-Transport-Security": [
+                        "max-age=31536000;includeSubDomains"
+                    ],
+                    "x-ms-client-request-id": [
+                        "a24c593e-4c10-11ee-ab8d-aaf1f58405fb"
+                    ],
+                    "Date": [
+                        "Tue, 05 Sep 2023 17:21:22 GMT"
+                    ],
+                    "X-Content-Type-Options": [
+                        "nosniff"
+                    ]
+                },
+                "body": {
+                    "string": "{\"value\":[{\"kid\":\"https://cfb-vpbanzbk-keyvault.vault.azure.net/keys/cfb-vpbanzbk-generated-certificate\",\"attributes\":{\"enabled\":true,\"created\":1693427167,\"updated\":1693427167,\"recoveryLevel\":\"CustomizedRecoverable+Purgeable\",\"recoverableDays\":7,\"exportable\":false},\"tags\":{}}],\"nextLink\":null}"
+                }
+            }
+        },
+        {
+            "request": {
+                "method": "GET",
+                "uri": "https://cfb-qmbknzbm-keyvault.vault.azure.net/keys/cfb-qmbknzbm-generated-certificate/rotationpolicy?api-version=7.4",
+                "body": null,
+                "headers": {}
+            },
+            "response": {
+                "status": {
+                    "code": 200,
+                    "message": "OK"
+                },
+                "headers": {
+                    "Cache-Control": [
+                        "no-cache"
+                    ],
+                    "x-ms-keyvault-service-version": [
+                        "1.9.950.1"
+                    ],
+                    "Expires": [
+                        "-1"
+                    ],
+                    "Content-Type": [
+                        "application/json; charset=utf-8"
+                    ],
+                    "x-ms-request-id": [
+                        "d496d60d-fe63-4c71-81a8-5974a6282a18"
+                    ],
+                    "x-ms-keyvault-region": [
+                        "centralus"
+                    ],
+                    "x-ms-keyvault-network-info": [
+                        "conn_type=Ipv4;addr=134.238.195.180;act_addr_fam=InterNetwork;"
+                    ],
+                    "Pragma": [
+                        "no-cache"
+                    ],
+                    "Content-Length": [
+                        "340"
+                    ],
+                    "Strict-Transport-Security": [
+                        "max-age=31536000;includeSubDomains"
+                    ],
+                    "x-ms-client-request-id": [
+                        "a2dcdeaa-4c10-11ee-ab8d-aaf1f58405fb"
+                    ],
+                    "Date": [
+                        "Tue, 05 Sep 2023 17:21:22 GMT"
+                    ],
+                    "X-Content-Type-Options": [
+                        "nosniff"
+                    ]
+                },
+                "body": {
+                    "string": "{\"id\":\"https://cfb-qmbknzbm-keyvault.vault.azure.net/keys/cfb-qmbknzbm-generated-certificate/rotationpolicy\",\"lifetimeActions\":[{\"trigger\":{\"timeBeforeExpiry\":\"P30D\"},\"action\":{\"type\":\"Rotate\"}},{\"trigger\":{\"timeBeforeExpiry\":\"P29D\"},\"action\":{\"type\":\"Notify\"}}],\"attributes\":{\"expiryTime\":\"P90D\",\"created\":1692896587,\"updated\":1692896587}}"
+                }
+            }
+        },
+        {
+            "request": {
+                "method": "GET",
+                "uri": "https://cfb-vpbanzbk-keyvault.vault.azure.net/keys/cfb-vpbanzbk-generated-certificate/rotationpolicy?api-version=7.4",
+                "body": null,
+                "headers": {}
+            },
+            "response": {
+                "status": {
+                    "code": 200,
+                    "message": "OK"
+                },
+                "headers": {
+                    "Cache-Control": [
+                        "no-cache"
+                    ],
+                    "x-ms-keyvault-service-version": [
+                        "1.9.950.1"
+                    ],
+                    "Expires": [
+                        "-1"
+                    ],
+                    "Content-Type": [
+                        "application/json; charset=utf-8"
+                    ],
+                    "x-ms-request-id": [
+                        "4d6fd41e-4cf4-4f17-ad2a-a45f53da4cc7"
+                    ],
+                    "x-ms-keyvault-region": [
+                        "centralus"
+                    ],
+                    "x-ms-keyvault-network-info": [
+                        "conn_type=Ipv4;addr=134.238.195.180;act_addr_fam=InterNetwork;"
+                    ],
+                    "Pragma": [
+                        "no-cache"
+                    ],
+                    "Content-Length": [
+                        "106"
+                    ],
+                    "Strict-Transport-Security": [
+                        "max-age=31536000;includeSubDomains"
+                    ],
+                    "x-ms-client-request-id": [
+                        "a2eb2ac8-4c10-11ee-ab8d-aaf1f58405fb"
+                    ],
+                    "Date": [
+                        "Tue, 05 Sep 2023 17:21:22 GMT"
+                    ],
+                    "X-Content-Type-Options": [
+                        "nosniff"
+                    ]
+                },
+                "body": {
+                    "string": "{\"lifetimeActions\":[{\"trigger\":{\"timeBeforeExpiry\":\"P30D\"},\"action\":{\"type\":\"Notify\"}}],\"attributes\":null}"
+                }
+            }
+        }
+    ]
+}

@@ -1,0 +1,22 @@
+{
+    "status_code": 200,
+    "data": {
+        "PaginationToken": "",
+        "ResourceTagMappingList": [
+            {
+                "ResourceARN": "arn:aws:events:us-west-1:644160558196:rule/rule-1",
+                "Tags": [
+                    {
+                        "Key": "App",
+                        "Value": "Custodian"
+                    },
+                    {
+                        "Key": "environment",
+                        "Value": "staging"
+                    }
+                ]
+            }
+        ],
+        "ResponseMetadata": {}
+    }
+}

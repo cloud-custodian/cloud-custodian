@@ -9,6 +9,11 @@ import fnmatch
 
 class TestIamGen(BaseTest):
 
+    # cloudhsm classic is gone from commercial regions, but appears to still be extant
+    # in govcloud regions per
+    # https://docs.aws.amazon.com/govcloud-us/latest/UserGuide/govcloud-cloudhsm-classic.html
+    IGNORE_SERVICES = ("cloudhsm",)
+
     def check_permissions(self, perm_db, perm_set, path):
         invalid = []
         for p in perm_set:
@@ -18,6 +23,8 @@ class TestIamGen(BaseTest):
             s, a = p.split(':', 1)
             if s not in perm_db:
                 invalid.append(p)
+                continue
+            elif s in self.IGNORE_SERVICES:
                 continue
             if '*' in a:
                 if not fnmatch.filter(perm_db[s], a):
@@ -37,6 +44,8 @@ class TestIamGen(BaseTest):
         perms = load_data('iam-actions.json')
         resources.load_available()
 
+        deprecated = set(('qldb', 'opswork-cm', 'opswork-stack',))
+
         for k, v in manager.resources.items():
             p = Bag({'name': 'permcheck', 'resource': k, 'provider_name': 'aws'})
             ctx = self.get_context(config=cfg, policy=p)
@@ -44,13 +53,18 @@ class TestIamGen(BaseTest):
             # if getattr(mgr, 'permissions', None):
             #    print(mgr)
 
+            if mgr.type in deprecated:
+                continue
+
             found = False
             for s in (mgr.resource_type.service,
                       getattr(mgr.resource_type, 'permission_prefix', None)):
                 if s in perms:
                     found = True
             if not found:
-                missing.add("%s->%s" % (k, mgr.resource_type.service))
+                missing.add("%s->%s|%s" % (
+                    k, mgr.resource_type.service,
+                    mgr.resource_type.permission_prefix))
                 continue
             invalid.extend(self.check_permissions(perms, mgr.get_permissions(), k))
 

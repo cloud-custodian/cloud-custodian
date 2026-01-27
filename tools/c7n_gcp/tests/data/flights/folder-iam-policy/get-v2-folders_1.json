@@ -1,0 +1,43 @@
+{
+  "headers": {
+    "content-type": "application/json; charset=UTF-8",
+    "vary": "Origin, X-Origin, Referer",
+    "date": "Mon, 02 Oct 2023 21:09:44 GMT",
+    "server": "ESF",
+    "cache-control": "private",
+    "x-xss-protection": "0",
+    "x-frame-options": "SAMEORIGIN",
+    "x-content-type-options": "nosniff",
+    "server-timing": "gfet4t7; dur=279",
+    "transfer-encoding": "chunked",
+    "status": "200",
+    "content-length": "1563",
+    "-content-encoding": "gzip",
+    "content-location": "https://cloudresourcemanager.googleapis.com/v2/folders?parent=organizations%2F111111111111&alt=json"
+  },
+  "body": {
+    "folders": [
+      {
+        "name": "folders/222222222222",
+        "parent": "organizations/870080179722",
+        "displayName": "Foo",
+        "lifecycleState": "ACTIVE",
+        "createTime": "2023-05-23T12:22:07.777Z"
+      },
+      {
+        "name": "folders/333333333333",
+        "parent": "organizations/870080179722",
+        "displayName": "Bar",
+        "lifecycleState": "ACTIVE",
+        "createTime": "2023-03-31T19:17:36.833Z"
+      },
+      {
+        "name": "folders/444444444444",
+        "parent": "organizations/870080179722",
+        "displayName": "Baz",
+        "lifecycleState": "ACTIVE",
+        "createTime": "2023-05-10T16:53:57.896Z"
+      }
+    ]
+  }
+}

@@ -1,0 +1,32 @@
+{
+    "headers": {
+      "content-type": "application/json; charset=UTF-8",
+      "vary": "Origin, X-Origin, Referer",
+      "date": "Tue, 16 May 2023 18:42:53 GMT",
+      "server": "ESF",
+      "cache-control": "private",
+      "x-xss-protection": "0",
+      "x-frame-options": "SAMEORIGIN",
+      "x-content-type-options": "nosniff",
+      "server-timing": "gfet4t7; dur=325",
+      "transfer-encoding": "chunked",
+      "status": "200",
+      "content-length": "314",
+      "-content-encoding": "gzip"
+    },
+    "body": {
+      "policies": [
+        {
+          "constraint": "constraints/iam.allowedPolicyMemberDomains",
+          "etag": "CPqZj6MGENDApK4C",
+          "updateTime": "2023-05-16T18:35:38.633938Z",
+          "listPolicy": {
+            "allowedValues": [
+              "is:C03xgje4y"
+            ],
+            "inheritFromParent": true
+          }
+        }
+      ]
+    }
+  }

@@ -1,12 +1,11 @@
 # Copyright The Cloud Custodian Authors.
 # SPDX-License-Identifier: Apache-2.0
 
-import jmespath
 from retrying import RetryError
 from tencentcloud.common.exception import TencentCloudSDKException
 
 from c7n.exceptions import PolicyExecutionError
-from c7n.utils import type_schema, chunks
+from c7n.utils import type_schema, chunks, jmespath_search
 from c7n_tencentcloud.actions import TencentCloudBaseAction
 from c7n_tencentcloud.provider import resources
 from c7n_tencentcloud.query import ResourceTypeInfo, QueryResourceManager, DescribeSource
@@ -21,7 +20,25 @@ class CVMDescribe(DescribeSource):
 
 @resources.register("cvm")
 class CVM(QueryResourceManager):
-    """CVM"""
+    """CVM Cloud Virtual Machine
+
+    Docs on CVM resource
+    https://www.tencentcloud.com/document/product/213
+
+    :example:
+
+    .. code-block:: yaml
+
+        policies:
+        - name: tencentcloud-cvm
+          resource: tencentcloud.cvm
+          filters:
+            - type: value
+              key: InstanceType
+              op: in
+              value:
+                - S1.SMALL1
+    """
 
     source_mapping = {'describe': CVMDescribe}
 
@@ -32,11 +49,14 @@ class CVM(QueryResourceManager):
         service = "cvm"
         version = "2017-03-12"
         enum_spec = ("DescribeInstances", "Response.InstanceSet[]", {})
-        metrics_instance_id_name = "InstanceId"
         paging_def = {"method": PageMethod.Offset, "limit": {"key": "Limit", "value": 20}}
         resource_prefix = "instance"
         taggable = True
         batch_size = 10
+        metrics_enabled = True
+        metrics_dimension_def = [("InstanceId", "InstanceId")]
+        metrics_instance_id_name = "InstanceId"
+        metrics_namespace = "QCE/CVM"
 
     def get_qcs_for_cbs(self, resources):
         """
@@ -71,7 +91,7 @@ class CvmAction(TencentCloudBaseAction):
         try:
             client = self.get_client()
             resp = client.execute_query(self.t_api_method_name, params)
-            failed_resources = jmespath.search("Response.Error", resp)
+            failed_resources = jmespath_search("Response.Error", resp)
             if failed_resources is not None:
                 raise PolicyExecutionError(f"{self.data.get('type')} error")
             self.log.debug("%s resources: %s, cvm: %s",
@@ -91,7 +111,22 @@ class CvmAction(TencentCloudBaseAction):
 
 @CVM.action_registry.register('stop')
 class CvmStopAction(CvmAction):
-    """stop_cvm"""
+    """Action to stop a running cvm instance
+
+    :example:
+
+    .. code-block:: yaml
+
+        policies:
+        - name: cvm-marked-for-op-stop
+          resource: tencentcloud.cvm
+          filters:
+            - type: marked-for-op
+              op: stop
+              skew: 14
+          actions:
+            - type: stop
+    """
     schema = type_schema("stop")
     t_api_method_name = "StopInstances"
 
@@ -111,13 +146,39 @@ class CvmStopAction(CvmAction):
 
 @CVM.action_registry.register('start')
 class CvmStartAction(CvmAction):
-    """start_cvm"""
+    """Action to stop a running cvm instance
+
+    :example:
+
+    .. code-block:: yaml
+
+        policies:
+        - name: cvm-start
+          resource: tencentcloud.cvm
+          actions:
+            - type: start
+    """
     schema = type_schema("start")
     t_api_method_name = "StartInstances"
 
 
 @CVM.action_registry.register('terminate')
 class CvmTerminateAction(CvmAction):
-    """terminate_cvm"""
+    """Action to stop a running cvm instance
+
+    :example:
+
+    .. code-block:: yaml
+
+        policies:
+        - name: cvm-marked-for-op-terminate
+          resource: tencentcloud.cvm
+          filters:
+            - type: marked-for-op
+              op: terminate
+              skew: 14
+          actions:
+            - type: terminate
+    """
     schema = type_schema("terminate")
     t_api_method_name = "TerminateInstances"

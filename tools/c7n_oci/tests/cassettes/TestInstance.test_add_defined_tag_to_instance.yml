@@ -1,0 +1,4551 @@
+interactions:
+- request:
+    body: null
+    headers: {}
+    method: GET
+    uri: https://identity.us-ashburn-1.oci.oraclecloud.com/20160918/users/ocid1.user.oc1..<unique_ID>
+  response:
+    body:
+      data:
+        capabilities:
+          canUseApiKeys: true
+          canUseAuthTokens: true
+          canUseConsolePassword: false
+          canUseCustomerSecretKeys: true
+          canUseDbCredentials: true
+          canUseOAuth2ClientCredentials: true
+          canUseSmtpCredentials: true
+        compartmentId: ocid1.tenancy.oc1..<unique_ID>
+        definedTags:
+          Oracle-Tags:
+            CreatedBy: scim-service
+            CreatedOn: '2023-04-25T16:55:50.497Z'
+        description: user@example.com
+        emailVerified: true
+        externalIdentifier: fcf75b1a99fd4dbe9c8f5a11dd69a50c
+        freeformTags:
+          TagName: TagValue
+          key_old: 'true'
+          mfa_activated: 'false'
+        id: ocid1.user.oc1..<unique_ID>
+        identityProviderId: ocid1.saml2idp.oc1..<unique_ID>
+        isMfaActivated: false
+        lifecycleState: ACTIVE
+        name: user@example.com
+        timeCreated: '2023-04-25T16:55:50.537Z'
+        timeModified: '2023-06-08T07:59:25.623Z'
+    headers:
+      cache-control:
+      - no-cache, no-store, must-revalidate
+      content-length:
+      - '990'
+      content-type:
+      - application/json
+      date:
+      - Thu, 15 Jun 2023 12:31:52 GMT
+      etag:
+      - e3d2cb864e2b0f74308b4ead60ac0e65f2b1d7e8
+      pragma:
+      - no-cache
+      x-content-type-options:
+      - nosniff
+    status:
+      code: 200
+      message: OK
+- request:
+    body: mock_body
+    headers: {}
+    method: POST
+    uri: https://query.us-ashburn-1.oci.oraclecloud.com/20180409/resources
+  response:
+    body:
+      data:
+        items:
+        - additionalDetails: {}
+          availabilityDomain: NQNU:US-ASHBURN-AD-1
+          compartmentId: ocid1.compartment.oc1..<unique_ID>
+          definedTags:
+            Oracle-Tags:
+              CreatedBy: user@example.com
+              CreatedOn: '2023-06-15T12:30:51.532Z'
+            cloud-custodian-test:
+              mark-for-resize: 'true'
+          displayName: instance20230615123052
+          freeformTags:
+            Project: CNCF
+          identifier: ocid1.instance.oc1..<unique_ID>
+          identityContext: {}
+          lifecycleState: RUNNING
+          resourceType: Instance
+          searchContext: null
+          systemTags: {}
+          timeCreated: '2023-06-15T12:30:52.090Z'
+        - additionalDetails: {}
+          availabilityDomain: NQNU:US-ASHBURN-AD-1
+          compartmentId: ocid1.compartment.oc1..<unique_ID>
+          definedTags:
+            Oracle-Tags:
+              CreatedBy: user@example.com
+              CreatedOn: '2023-06-15T10:17:00.587Z'
+          displayName: instance20230615101701
+          freeformTags:
+            Environment: Production
+          identifier: ocid1.instance.oc1..<unique_ID>
+          identityContext: {}
+          lifecycleState: TERMINATED
+          resourceType: Instance
+          searchContext: null
+          systemTags: {}
+          timeCreated: '2023-06-15T10:17:01.986Z'
+        - additionalDetails: {}
+          availabilityDomain: NQNU:US-ASHBURN-AD-1
+          compartmentId: ocid1.compartment.oc1..<unique_ID>
+          definedTags:
+            Oracle-Tags:
+              CreatedBy: user@example.com
+              CreatedOn: '2023-06-15T10:11:58.982Z'
+          displayName: instance20230615101159
+          freeformTags:
+            Environment: Production
+          identifier: ocid1.instance.oc1..<unique_ID>
+          identityContext: {}
+          lifecycleState: TERMINATED
+          resourceType: Instance
+          searchContext: null
+          systemTags: {}
+          timeCreated: '2023-06-15T10:11:59.457Z'
+        - additionalDetails: {}
+          availabilityDomain: NQNU:US-ASHBURN-AD-1
+          compartmentId: ocid1.compartment.oc1..<unique_ID>
+          definedTags:
+            Oracle-Tags:
+              CreatedBy: user@example.com
+              CreatedOn: '2023-06-15T10:04:13.967Z'
+          displayName: instance20230615100414
+          freeformTags:
+            Project: CNCF
+          identifier: ocid1.instance.oc1..<unique_ID>
+          identityContext: {}
+          lifecycleState: TERMINATED
+          resourceType: Instance
+          searchContext: null
+          systemTags: {}
+          timeCreated: '2023-06-15T10:04:14.543Z'
+        - additionalDetails: {}
+          availabilityDomain: NQNU:US-ASHBURN-AD-1
+          compartmentId: ocid1.compartment.oc1..<unique_ID>
+          definedTags:
+            Oracle-Tags:
+              CreatedBy: user@example.com
+              CreatedOn: '2023-06-15T09:55:35.970Z'
+          displayName: instance20230615095536
+          freeformTags:
+            Project: CNCF
+          identifier: ocid1.instance.oc1..<unique_ID>
+          identityContext: {}
+          lifecycleState: TERMINATED
+          resourceType: Instance
+          searchContext: null
+          systemTags: {}
+          timeCreated: '2023-06-15T09:55:36.465Z'
+        - additionalDetails: {}
+          availabilityDomain: NQNU:US-ASHBURN-AD-1
+          compartmentId: ocid1.compartment.oc1..<unique_ID>
+          definedTags:
+            Oracle-Tags:
+              CreatedBy: user@example.com
+              CreatedOn: '2023-06-15T09:52:16.999Z'
+          displayName: instance20230615095217
+          freeformTags:
+            Environment: Production
+          identifier: ocid1.instance.oc1..<unique_ID>
+          identityContext: {}
+          lifecycleState: TERMINATED
+          resourceType: Instance
+          searchContext: null
+          systemTags: {}
+          timeCreated: '2023-06-15T09:52:17.629Z'
+        - additionalDetails: {}
+          availabilityDomain: NQNU:US-ASHBURN-AD-1
+          compartmentId: ocid1.compartment.oc1..<unique_ID>
+          definedTags:
+            Oracle-Tags:
+              CreatedBy: user@example.com
+              CreatedOn: '2023-06-15T09:40:31.156Z'
+          displayName: instance20230615094031
+          freeformTags:
+            Environment: Production
+          identifier: ocid1.instance.oc1..<unique_ID>
+          identityContext: {}
+          lifecycleState: TERMINATED
+          resourceType: Instance
+          searchContext: null
+          systemTags: {}
+          timeCreated: '2023-06-15T09:40:31.774Z'
+        - additionalDetails: {}
+          availabilityDomain: NQNU:US-ASHBURN-AD-1
+          compartmentId: ocid1.compartment.oc1..<unique_ID>
+          definedTags:
+            Oracle-Tags:
+              CreatedBy: user@example.com
+              CreatedOn: '2023-06-15T09:34:40.265Z'
+          displayName: instance20230615093440
+          freeformTags:
+            Environment: Production
+          identifier: ocid1.instance.oc1..<unique_ID>
+          identityContext: {}
+          lifecycleState: TERMINATED
+          resourceType: Instance
+          searchContext: null
+          systemTags: {}
+          timeCreated: '2023-06-15T09:34:40.927Z'
+        - additionalDetails: {}
+          availabilityDomain: NQNU:US-ASHBURN-AD-1
+          compartmentId: ocid1.compartment.oc1..<unique_ID>
+          definedTags:
+            Oracle-Tags:
+              CreatedBy: user@example.com
+              CreatedOn: '2023-06-15T09:25:37.577Z'
+          displayName: instance20230615092538
+          freeformTags:
+            Project: CNCF
+          identifier: ocid1.instance.oc1..<unique_ID>
+          identityContext: {}
+          lifecycleState: TERMINATED
+          resourceType: Instance
+          searchContext: null
+          systemTags: {}
+          timeCreated: '2023-06-15T09:25:38.098Z'
+        - additionalDetails: {}
+          availabilityDomain: NQNU:US-ASHBURN-AD-1
+          compartmentId: ocid1.compartment.oc1..<unique_ID>
+          definedTags:
+            Oracle-Tags:
+              CreatedBy: user@example.com
+              CreatedOn: '2023-06-15T09:04:29.026Z'
+          displayName: instance20230615090429
+          freeformTags:
+            Project: CNCF
+          identifier: ocid1.instance.oc1..<unique_ID>
+          identityContext: {}
+          lifecycleState: TERMINATED
+          resourceType: Instance
+          searchContext: null
+          systemTags: {}
+          timeCreated: '2023-06-15T09:04:29.863Z'
+        - additionalDetails: {}
+          availabilityDomain: NQNU:US-ASHBURN-AD-1
+          compartmentId: ocid1.compartment.oc1..<unique_ID>
+          definedTags:
+            Oracle-Tags:
+              CreatedBy: user@example.com
+              CreatedOn: '2023-06-15T08:47:54.602Z'
+          displayName: instance20230615084755
+          freeformTags:
+            Project: CNCF
+          identifier: ocid1.instance.oc1..<unique_ID>
+          identityContext: {}
+          lifecycleState: TERMINATED
+          resourceType: Instance
+          searchContext: null
+          systemTags: {}
+          timeCreated: '2023-06-15T08:47:55.152Z'
+        - additionalDetails: {}
+          availabilityDomain: NQNU:US-ASHBURN-AD-1
+          compartmentId: ocid1.compartment.oc1..<unique_ID>
+          definedTags:
+            Oracle-Tags:
+              CreatedBy: user@example.com
+              CreatedOn: '2023-06-15T07:20:25.125Z'
+          displayName: instance20230615072025
+          freeformTags:
+            Project: CNCF
+          identifier: ocid1.instance.oc1..<unique_ID>
+          identityContext: {}
+          lifecycleState: TERMINATED
+          resourceType: Instance
+          searchContext: null
+          systemTags: {}
+          timeCreated: '2023-06-15T07:20:25.684Z'
+        - additionalDetails: {}
+          availabilityDomain: NQNU:US-ASHBURN-AD-1
+          compartmentId: ocid1.compartment.oc1..<unique_ID>
+          definedTags:
+            Oracle-Tags:
+              CreatedBy: user@example.com
+              CreatedOn: '2023-06-15T06:46:18.141Z'
+          displayName: cc_ins
+          freeformTags: {}
+          identifier: ocid1.instance.oc1..<unique_ID>
+          identityContext: {}
+          lifecycleState: TERMINATED
+          resourceType: Instance
+          searchContext: null
+          systemTags: {}
+          timeCreated: '2023-06-15T06:46:19.283Z'
+        - additionalDetails: {}
+          availabilityDomain: NQNU:US-ASHBURN-AD-1
+          compartmentId: ocid1.compartment.oc1..<unique_ID>
+          definedTags:
+            Oracle-Tags:
+              CreatedBy: user@example.com
+              CreatedOn: '2023-06-15T06:41:33.444Z'
+          displayName: cc_ag
+          freeformTags: {}
+          identifier: ocid1.instance.oc1..<unique_ID>
+          identityContext: {}
+          lifecycleState: TERMINATED
+          resourceType: Instance
+          searchContext: null
+          systemTags: {}
+          timeCreated: '2023-06-15T06:41:34.131Z'
+        - additionalDetails: {}
+          availabilityDomain: NQNU:US-ASHBURN-AD-1
+          compartmentId: ocid1.compartment.oc1..<unique_ID>
+          definedTags:
+            Oracle-Tags:
+              CreatedBy: user@example.com
+              CreatedOn: '2023-06-15T06:32:02.457Z'
+          displayName: instance20230615063202
+          freeformTags:
+            Project: CNCF
+          identifier: ocid1.instance.oc1..<unique_ID>
+          identityContext: {}
+          lifecycleState: TERMINATED
+          resourceType: Instance
+          searchContext: null
+          systemTags: {}
+          timeCreated: '2023-06-15T06:32:02.999Z'
+        - additionalDetails: {}
+          availabilityDomain: NQNU:US-ASHBURN-AD-1
+          compartmentId: ocid1.compartment.oc1..<unique_ID>
+          definedTags:
+            Oracle-Tags:
+              CreatedBy: user@example.com
+              CreatedOn: '2023-06-15T05:55:09.682Z'
+          displayName: instance20230615055510
+          freeformTags:
+            Project: CNCF
+          identifier: ocid1.instance.oc1..<unique_ID>
+          identityContext: {}
+          lifecycleState: TERMINATED
+          resourceType: Instance
+          searchContext: null
+          systemTags: {}
+          timeCreated: '2023-06-15T05:55:10.303Z'
+        - additionalDetails: {}
+          availabilityDomain: NQNU:US-ASHBURN-AD-1
+          compartmentId: ocid1.compartment.oc1..<unique_ID>
+          definedTags:
+            Oracle-Tags:
+              CreatedBy: user@example.com
+              CreatedOn: '2023-06-15T05:39:11.923Z'
+          displayName: instance20230615053912
+          freeformTags:
+            Project: CNCF
+          identifier: ocid1.instance.oc1..<unique_ID>
+          identityContext: {}
+          lifecycleState: TERMINATED
+          resourceType: Instance
+          searchContext: null
+          systemTags: {}
+          timeCreated: '2023-06-15T05:39:12.655Z'
+        - additionalDetails: {}
+          availabilityDomain: NQNU:US-ASHBURN-AD-1
+          compartmentId: ocid1.compartment.oc1..<unique_ID>
+          definedTags:
+            Oracle-Tags:
+              CreatedBy: user@example.com
+              CreatedOn: '2023-06-15T05:25:52.768Z'
+          displayName: instance20230615052553
+          freeformTags:
+            Project: CNCF
+          identifier: ocid1.instance.oc1..<unique_ID>
+          identityContext: {}
+          lifecycleState: TERMINATED
+          resourceType: Instance
+          searchContext: null
+          systemTags: {}
+          timeCreated: '2023-06-15T05:25:53.938Z'
+        - additionalDetails: {}
+          availabilityDomain: NQNU:US-ASHBURN-AD-1
+          compartmentId: ocid1.compartment.oc1..<unique_ID>
+          definedTags:
+            Oracle-Tags:
+              CreatedBy: user@example.com
+              CreatedOn: '2023-06-15T05:20:58.247Z'
+          displayName: instance20230615052058
+          freeformTags:
+            Project: CNCF
+          identifier: ocid1.instance.oc1..<unique_ID>
+          identityContext: {}
+          lifecycleState: TERMINATED
+          resourceType: Instance
+          searchContext: null
+          systemTags: {}
+          timeCreated: '2023-06-15T05:20:58.849Z'
+        - additionalDetails: {}
+          availabilityDomain: NQNU:US-ASHBURN-AD-1
+          compartmentId: ocid1.compartment.oc1..<unique_ID>
+          definedTags:
+            Oracle-Tags:
+              CreatedBy: user@example.com
+              CreatedOn: '2023-06-15T05:09:37.368Z'
+          displayName: instance20230615050937
+          freeformTags:
+            Project: CNCF
+          identifier: ocid1.instance.oc1..<unique_ID>
+          identityContext: {}
+          lifecycleState: TERMINATED
+          resourceType: Instance
+          searchContext: null
+          systemTags: {}
+          timeCreated: '2023-06-15T05:09:37.942Z'
+        - additionalDetails: {}
+          availabilityDomain: NQNU:US-ASHBURN-AD-1
+          compartmentId: ocid1.compartment.oc1..<unique_ID>
+          definedTags:
+            Oracle-Tags:
+              CreatedBy: user@example.com
+              CreatedOn: '2023-06-15T04:59:25.539Z'
+          displayName: instance20230615045926
+          freeformTags:
+            Project: CNCF
+          identifier: ocid1.instance.oc1..<unique_ID>
+          identityContext: {}
+          lifecycleState: TERMINATED
+          resourceType: Instance
+          searchContext: null
+          systemTags: {}
+          timeCreated: '2023-06-15T04:59:26.180Z'
+        - additionalDetails: {}
+          availabilityDomain: NQNU:US-ASHBURN-AD-1
+          compartmentId: ocid1.compartment.oc1..<unique_ID>
+          definedTags:
+            Oracle-Tags:
+              CreatedBy: user@example.com
+              CreatedOn: '2023-06-14T14:31:11.778Z'
+          displayName: CC_001
+          freeformTags: {}
+          identifier: ocid1.instance.oc1..<unique_ID>
+          identityContext: {}
+          lifecycleState: RUNNING
+          resourceType: Instance
+          searchContext: null
+          systemTags: {}
+          timeCreated: '2023-06-14T14:31:12.415Z'
+        - additionalDetails: {}
+          availabilityDomain: NQNU:US-ASHBURN-AD-1
+          compartmentId: ocid1.compartment.oc1..<unique_ID>
+          definedTags:
+            Oracle-Tags:
+              CreatedBy: user@example.com
+              CreatedOn: '2023-06-07T02:45:30.563Z'
+          displayName: instance-20230606-2144
+          freeformTags:
+            Environment: Development
+            eligible_for_resize_test: 'true'
+            eligible_for_resize_vv: 'true'
+            private-ip-exists: 'true'
+          identifier: ocid1.instance.oc1..<unique_ID>
+          identityContext: {}
+          lifecycleState: RUNNING
+          resourceType: Instance
+          searchContext: null
+          systemTags: {}
+          timeCreated: '2023-06-07T02:45:31.460Z'
+        - additionalDetails: {}
+          availabilityDomain: NQNU:US-ASHBURN-AD-1
+          compartmentId: ocid1.compartment.oc1..<unique_ID>
+          definedTags:
+            Oracle-Tags:
+              CreatedBy: user@example.com
+              CreatedOn: '2023-05-19T11:18:11.497Z'
+          displayName: Test1
+          freeformTags:
+            eligible_for_resize_test: 'true'
+            eligible_for_resize_vv: 'true'
+            mark-for-deletion: 'true'
+            private-ip-exists: 'true'
+          identifier: ocid1.instance.oc1..<unique_ID>
+          identityContext: {}
+          lifecycleState: RUNNING
+          resourceType: Instance
+          searchContext: null
+          systemTags: {}
+          timeCreated: '2023-05-19T11:18:12.035Z'
+        - additionalDetails: {}
+          availabilityDomain: NQNU:US-ASHBURN-AD-1
+          compartmentId: ocid1.compartment.oc1..<unique_ID>
+          definedTags:
+            Oracle-Tags:
+              CreatedBy: user@example.com
+              CreatedOn: '2023-05-04T05:01:26.494Z'
+          displayName: smp-test-instance
+          freeformTags:
+            eligible_for_resize_vv: 'true'
+            need_action: 'true'
+          identifier: ocid1.instance.oc1..<unique_ID>
+          identityContext: {}
+          lifecycleState: STOPPED
+          resourceType: Instance
+          searchContext: null
+          systemTags: {}
+          timeCreated: '2023-05-04T05:01:27.154Z'
+        - additionalDetails: {}
+          availabilityDomain: NQNU:US-ASHBURN-AD-1
+          compartmentId: ocid1.compartment.oc1..<unique_ID>
+          definedTags:
+            Oracle-Tags:
+              CreatedBy: user@example.com
+              CreatedOn: '2023-05-03T22:20:26.590Z'
+          displayName: SMP-TEST-001
+          freeformTags:
+            eligible_for_resize_vv: 'true'
+            need_action: 'true'
+          identifier: ocid1.instance.oc1..<unique_ID>
+          identityContext: {}
+          lifecycleState: STOPPED
+          resourceType: Instance
+          searchContext: null
+          systemTags: {}
+          timeCreated: '2023-05-03T22:20:27.358Z'
+        - additionalDetails: {}
+          availabilityDomain: NQNU:US-ASHBURN-AD-1
+          compartmentId: ocid1.compartment.oc1..<unique_ID>
+          definedTags:
+            Oracle-Tags:
+              CreatedBy: user@example.com
+              CreatedOn: '2023-03-26T06:57:24.867Z'
+          displayName: ohsmt0
+          freeformTags:
+            eligible_for_resize_vv: 'true'
+            private-ip-exists: 'true'
+          identifier: ocid1.instance.oc1..<unique_ID>
+          identityContext: {}
+          lifecycleState: RUNNING
+          resourceType: Instance
+          searchContext: null
+          systemTags: {}
+          timeCreated: '2023-03-26T06:57:25.897Z'
+        - additionalDetails: {}
+          availabilityDomain: NQNU:US-ASHBURN-AD-1
+          compartmentId: ocid1.compartment.oc1..<unique_ID>
+          definedTags:
+            Oracle-Tags:
+              CreatedBy: user@example.com
+              CreatedOn: '2023-03-26T06:57:25.267Z'
+          displayName: psmmt1
+          freeformTags:
+            eligible_for_resize_vv: 'true'
+          identifier: ocid1.instance.oc1..<unique_ID>
+          identityContext: {}
+          lifecycleState: STOPPED
+          resourceType: Instance
+          searchContext: null
+          systemTags: {}
+          timeCreated: '2023-03-26T06:57:25.864Z'
+        - additionalDetails: {}
+          availabilityDomain: NQNU:US-ASHBURN-AD-1
+          compartmentId: ocid1.compartment.oc1..<unique_ID>
+          definedTags:
+            Oracle-Tags:
+              CreatedBy: user@example.com
+              CreatedOn: '2023-03-26T06:57:25.120Z'
+          displayName: psmmt0
+          freeformTags:
+            eligible_for_resize_vv: 'true'
+          identifier: ocid1.instance.oc1..<unique_ID>
+          identityContext: {}
+          lifecycleState: STOPPED
+          resourceType: Instance
+          searchContext: null
+          systemTags: {}
+          timeCreated: '2023-03-26T06:57:25.607Z'
+        - additionalDetails: {}
+          availabilityDomain: NQNU:US-ASHBURN-AD-1
+          compartmentId: ocid1.compartment.oc1..<unique_ID>
+          definedTags:
+            Oracle-Tags:
+              CreatedBy: user@example.com
+              CreatedOn: '2023-03-26T06:57:23.245Z'
+          displayName: psmui1
+          freeformTags:
+            eligible_for_resize_vv: 'true'
+          identifier: ocid1.instance.oc1..<unique_ID>
+          identityContext: {}
+          lifecycleState: STOPPED
+          resourceType: Instance
+          searchContext: null
+          systemTags: {}
+          timeCreated: '2023-03-26T06:57:23.782Z'
+        - additionalDetails: {}
+          availabilityDomain: NQNU:US-ASHBURN-AD-1
+          compartmentId: ocid1.compartment.oc1..<unique_ID>
+          definedTags:
+            Oracle-Tags:
+              CreatedBy: user@example.com
+              CreatedOn: '2023-03-26T06:57:22.233Z'
+          displayName: psmui0
+          freeformTags:
+            eligible_for_resize_vv: 'true'
+          identifier: ocid1.instance.oc1..<unique_ID>
+          identityContext: {}
+          lifecycleState: STOPPED
+          resourceType: Instance
+          searchContext: null
+          systemTags: {}
+          timeCreated: '2023-03-26T06:57:22.867Z'
+        - additionalDetails: {}
+          availabilityDomain: NQNU:US-ASHBURN-AD-1
+          compartmentId: ocid1.compartment.oc1..<unique_ID>
+          definedTags:
+            Oracle-Tags:
+              CreatedBy: user@example.com
+              CreatedOn: '2023-03-26T06:57:21.995Z'
+          displayName: ohsui0
+          freeformTags:
+            eligible_for_resize_vv: 'true'
+            private-ip-exists: 'true'
+          identifier: ocid1.instance.oc1..<unique_ID>
+          identityContext: {}
+          lifecycleState: RUNNING
+          resourceType: Instance
+          searchContext: null
+          systemTags: {}
+          timeCreated: '2023-03-26T06:57:22.575Z'
+        - additionalDetails: {}
+          availabilityDomain: NQNU:US-ASHBURN-AD-1
+          compartmentId: ocid1.compartment.oc1..<unique_ID>
+          definedTags:
+            Oracle-Tags:
+              CreatedBy: user@example.com
+              CreatedOn: '2023-03-26T06:57:06.145Z'
+          displayName: jumperhost
+          freeformTags:
+            eligible_for_resize_vv: 'true'
+            need_action: 'true'
+          identifier: ocid1.instance.oc1..<unique_ID>
+          identityContext: {}
+          lifecycleState: STOPPED
+          resourceType: Instance
+          searchContext: null
+          systemTags: {}
+          timeCreated: '2023-03-26T06:57:06.678Z'
+        - additionalDetails: {}
+          availabilityDomain: NQNU:US-ASHBURN-AD-2
+          compartmentId: ocid1.compartment.oc1..<unique_ID>
+          definedTags:
+            Oracle-Tags:
+              CreatedBy: oke
+              CreatedOn: '2023-03-10T18:08:00.409Z'
+          displayName: oke-c3ejqah2yqq-nzhvaorxrma-stsybdx6llq-2
+          freeformTags:
+            eligible_for_resize_vv: 'true'
+            need_action: 'true'
+          identifier: ocid1.instance.oc1..<unique_ID>
+          identityContext: {}
+          lifecycleState: STOPPED
+          resourceType: Instance
+          searchContext: null
+          systemTags: {}
+          timeCreated: '2023-03-10T18:08:05.012Z'
+        - additionalDetails: {}
+          availabilityDomain: NQNU:US-ASHBURN-AD-2
+          compartmentId: ocid1.compartment.oc1..<unique_ID>
+          definedTags:
+            Oracle-Tags:
+              CreatedBy: oke
+              CreatedOn: '2023-03-10T18:08:02.002Z'
+          displayName: oke-c3ejqah2yqq-nzhvaorxrma-stsybdx6llq-1
+          freeformTags:
+            eligible_for_resize_vv: 'true'
+            need_action: 'true'
+          identifier: ocid1.instance.oc1..<unique_ID>
+          identityContext: {}
+          lifecycleState: STOPPED
+          resourceType: Instance
+          searchContext: null
+          systemTags: {}
+          timeCreated: '2023-03-10T18:08:02.955Z'
+        - additionalDetails: {}
+          availabilityDomain: NQNU:US-ASHBURN-AD-2
+          compartmentId: ocid1.compartment.oc1..<unique_ID>
+          definedTags:
+            Oracle-Tags:
+              CreatedBy: oke
+              CreatedOn: '2023-03-10T18:08:00.409Z'
+          displayName: oke-c3ejqah2yqq-nzhvaorxrma-stsybdx6llq-0
+          freeformTags:
+            eligible_for_resize_vv: 'true'
+            need_action: 'true'
+          identifier: ocid1.instance.oc1..<unique_ID>
+          identityContext: {}
+          lifecycleState: STOPPED
+          resourceType: Instance
+          searchContext: null
+          systemTags: {}
+          timeCreated: '2023-03-10T18:08:00.975Z'
+        - additionalDetails: {}
+          availabilityDomain: NQNU:US-ASHBURN-AD-1
+          compartmentId: ocid1.compartment.oc1..<unique_ID>
+          definedTags:
+            Oracle-Tags:
+              CreatedBy: user@example.com
+              CreatedOn: '2023-02-23T12:00:16.514Z'
+          displayName: StadVM
+          freeformTags:
+            Environment: Test
+            eligible_for_resize_vv: 'true'
+            group: CCTest
+            need_action: 'true'
+          identifier: ocid1.instance.oc1..<unique_ID>
+          identityContext: {}
+          lifecycleState: STOPPED
+          resourceType: Instance
+          searchContext: null
+          systemTags: {}
+          timeCreated: '2023-02-23T12:00:17.117Z'
+        - additionalDetails: {}
+          availabilityDomain: NQNU:US-ASHBURN-AD-1
+          compartmentId: ocid1.compartment.oc1..<unique_ID>
+          definedTags:
+            Oracle-Tags:
+              CreatedBy: user@example.com
+              CreatedOn: '2022-11-24T08:32:51.014Z'
+          displayName: TestInstanceWithDelete
+          freeformTags:
+            Environment: Test
+            eligible_for_resize_vv: 'true'
+            group: CCDev
+            need_action: 'true'
+          identifier: ocid1.instance.oc1..<unique_ID>
+          identityContext: {}
+          lifecycleState: STOPPED
+          resourceType: Instance
+          searchContext: null
+          systemTags: {}
+          timeCreated: '2022-11-24T08:32:51.866Z'
+        - additionalDetails: {}
+          availabilityDomain: NQNU:US-ASHBURN-AD-1
+          compartmentId: ocid1.compartment.oc1..<unique_ID>
+          definedTags:
+            Oracle-Tags:
+              CreatedBy: user@example.com
+              CreatedOn: '2022-11-16T06:45:24.964Z'
+          displayName: JMSDemoInstance
+          freeformTags:
+            Environment: Test
+            eligible_for_resize_vv: 'true'
+            group: CCDev
+            need_action: 'true'
+          identifier: ocid1.instance.oc1..<unique_ID>
+          identityContext: {}
+          lifecycleState: STOPPED
+          resourceType: Instance
+          searchContext: null
+          systemTags: {}
+          timeCreated: '2022-11-16T06:45:25.497Z'
+        - additionalDetails: {}
+          availabilityDomain: NQNU:US-ASHBURN-AD-1
+          compartmentId: ocid1.compartment.oc1..<unique_ID>
+          definedTags:
+            Oracle-Tags:
+              CreatedBy: user@example.com
+              CreatedOn: '2022-09-06T08:36:15.789Z'
+          displayName: jumperhost
+          freeformTags:
+            eligible_for_resize_vv: 'true'
+            need_action: 'true'
+          identifier: ocid1.instance.oc1..<unique_ID>
+          identityContext: {}
+          lifecycleState: STOPPED
+          resourceType: Instance
+          searchContext: null
+          systemTags: {}
+          timeCreated: '2022-09-06T08:36:16.460Z'
+        - additionalDetails: {}
+          availabilityDomain: NQNU:US-ASHBURN-AD-1
+          compartmentId: ocid1.tenancy.oc1..<unique_ID>
+          definedTags:
+            Oracle-Tags:
+              CreatedBy: user@example.com
+              CreatedOn: '2022-08-11T11:17:07.815Z'
+          displayName: psIDCSTorbTest
+          freeformTags:
+            eligible_for_resize_vv: 'true'
+          identifier: ocid1.instance.oc1..<unique_ID>
+          identityContext: {}
+          lifecycleState: STOPPED
+          resourceType: Instance
+          searchContext: null
+          systemTags: {}
+          timeCreated: '2022-08-11T11:17:08.829Z'
+        - additionalDetails: {}
+          availabilityDomain: NQNU:US-ASHBURN-AD-1
+          compartmentId: ocid1.compartment.oc1..<unique_ID>
+          definedTags:
+            Oracle-Tags:
+              CreatedBy: user@example.com
+              CreatedOn: '2021-06-28T23:35:10.664Z'
+          displayName: bastion1
+          freeformTags:
+            eligible_for_resize_vv: 'true'
+            need_action: 'true'
+          identifier: ocid1.instance.oc1..<unique_ID>
+          identityContext: {}
+          lifecycleState: STOPPED
+          resourceType: Instance
+          searchContext: null
+          systemTags: {}
+          timeCreated: '2021-06-28T23:35:11.469Z'
+        - additionalDetails: {}
+          availabilityDomain: NQNU:US-ASHBURN-AD-1
+          compartmentId: ocid1.compartment.oc1..<unique_ID>
+          definedTags:
+            Oracle-Tags:
+              CreatedBy: user@example.com
+              CreatedOn: '2021-06-16T22:42:18.784Z'
+          displayName: odo-cli-poc-vm-2
+          freeformTags:
+            eligible_for_resize_vv: 'true'
+            need_action: 'true'
+          identifier: ocid1.instance.oc1..<unique_ID>
+          identityContext: {}
+          lifecycleState: STOPPED
+          resourceType: Instance
+          searchContext: null
+          systemTags: {}
+          timeCreated: '2021-06-16T22:42:19.368Z'
+        - additionalDetails: {}
+          availabilityDomain: NQNU:US-ASHBURN-AD-1
+          compartmentId: ocid1.compartment.oc1..<unique_ID>
+          definedTags:
+            Oracle-Tags:
+              CreatedBy: user@example.com
+              CreatedOn: '2021-06-16T14:47:14.103Z'
+          displayName: odo-cli-poc-vm-1
+          freeformTags:
+            eligible_for_resize_vv: 'true'
+            need_action: 'true'
+          identifier: ocid1.instance.oc1..<unique_ID>
+          identityContext: {}
+          lifecycleState: STOPPED
+          resourceType: Instance
+          searchContext: null
+          systemTags: {}
+          timeCreated: '2021-06-16T14:47:14.712Z'
+        - additionalDetails: {}
+          availabilityDomain: NQNU:US-ASHBURN-AD-1
+          compartmentId: ocid1.tenancy.oc1..<unique_ID>
+          definedTags:
+            Oracle-Tags:
+              CreatedBy: user@example.com
+              CreatedOn: '2021-06-16T14:30:25.326Z'
+          displayName: odo-cli-poc-vm
+          freeformTags:
+            eligible_for_resize_vv: 'true'
+            mark-for-deletion: 'true'
+          identifier: ocid1.instance.oc1..<unique_ID>
+          identityContext: {}
+          lifecycleState: STOPPED
+          resourceType: Instance
+          searchContext: null
+          systemTags: {}
+          timeCreated: '2021-06-16T14:30:25.944Z'
+    headers:
+      content-type:
+      - application/json
+      date:
+      - Thu, 15 Jun 2023 12:31:54 GMT
+      transfer-encoding:
+      - chunked
+      x-content-type-options:
+      - nosniff
+    status:
+      code: 200
+      message: OK
+- request:
+    body: null
+    headers: {}
+    method: GET
+    uri: https://iaas.us-ashburn-1.oraclecloud.com/20160918/instances?compartmentId=ocid1.compartment.oc1..<unique_ID>
+  response:
+    body:
+      data:
+      - agentConfig:
+          areAllPluginsDisabled: false
+          isManagementDisabled: false
+          isMonitoringDisabled: false
+          pluginsConfig:
+          - desiredState: ENABLED
+            name: Management Agent
+        availabilityConfig:
+          isLiveMigrationPreferred: null
+          recoveryAction: RESTORE_INSTANCE
+        availabilityDomain: NQNU:US-ASHBURN-AD-1
+        capacityReservationId: null
+        compartmentId: ocid1.compartment.oc1..<unique_ID>
+        dedicatedVmHostId: null
+        definedTags:
+          Oracle-Tags:
+            CreatedBy: user@example.com
+            CreatedOn: '2023-03-26T06:57:06.145Z'
+        displayName: jumperhost
+        extendedMetadata: {}
+        faultDomain: FAULT-DOMAIN-3
+        freeformTags:
+          eligible_for_resize_vv: 'true'
+          need_action: 'true'
+        id: ocid1.instance.oc1..<unique_ID>
+        imageId: ocid1.image.oc1..<unique_ID>
+        instanceConfigurationId: null
+        instanceOptions:
+          areLegacyImdsEndpointsDisabled: false
+        ipxeScript: null
+        isCrossNumaNode: false
+        launchMode: PARAVIRTUALIZED
+        launchOptions:
+          bootVolumeType: PARAVIRTUALIZED
+          firmware: UEFI_64
+          isConsistentVolumeNamingEnabled: true
+          isPvEncryptionInTransitEnabled: false
+          networkType: PARAVIRTUALIZED
+          remoteDataVolumeType: PARAVIRTUALIZED
+        lifecycleState: STOPPED
+        platformConfig: null
+        preemptibleInstanceConfig: null
+        preferredMaintenanceAction: null
+        region: iad
+        shape: VM.Standard1.2
+        shapeConfig:
+          baselineOcpuUtilization: null
+          gpuDescription: null
+          gpus: 0
+          localDiskDescription: null
+          localDisks: 0
+          localDisksTotalSizeInGBs: null
+          maxVnicAttachments: 2
+          memoryInGBs: 14.0
+          networkingBandwidthInGbps: 1.2
+          ocpus: 2.0
+          processorDescription: "2.3 GHz Intel\xAE Xeon\xAE E5-2699 v3 (Haswell)"
+          vcpus: 4
+        sourceDetails:
+          bootVolumeSizeInGBs: null
+          bootVolumeVpusPerGB: null
+          imageId: ocid1.image.oc1..<unique_ID>
+          instanceSourceImageFilterDetails: null
+          kmsKeyId: null
+          sourceType: image
+        systemTags: {}
+        timeCreated: '2023-03-26T06:57:06.678Z'
+        timeMaintenanceRebootDue: null
+        timeStopScheduled: null
+      - agentConfig:
+          areAllPluginsDisabled: false
+          isManagementDisabled: false
+          isMonitoringDisabled: false
+          pluginsConfig:
+          - desiredState: ENABLED
+            name: Management Agent
+        availabilityConfig:
+          isLiveMigrationPreferred: null
+          recoveryAction: RESTORE_INSTANCE
+        availabilityDomain: NQNU:US-ASHBURN-AD-1
+        capacityReservationId: null
+        compartmentId: ocid1.compartment.oc1..<unique_ID>
+        dedicatedVmHostId: null
+        definedTags:
+          Oracle-Tags:
+            CreatedBy: user@example.com
+            CreatedOn: '2023-03-26T06:57:24.867Z'
+        displayName: ohsmt0
+        extendedMetadata: {}
+        faultDomain: FAULT-DOMAIN-3
+        freeformTags:
+          eligible_for_resize_vv: 'true'
+          private-ip-exists: 'true'
+        id: ocid1.instance.oc1..<unique_ID>
+        imageId: ocid1.image.oc1..<unique_ID>
+        instanceConfigurationId: null
+        instanceOptions:
+          areLegacyImdsEndpointsDisabled: false
+        ipxeScript: null
+        isCrossNumaNode: false
+        launchMode: PARAVIRTUALIZED
+        launchOptions:
+          bootVolumeType: PARAVIRTUALIZED
+          firmware: UEFI_64
+          isConsistentVolumeNamingEnabled: true
+          isPvEncryptionInTransitEnabled: false
+          networkType: PARAVIRTUALIZED
+          remoteDataVolumeType: PARAVIRTUALIZED
+        lifecycleState: RUNNING
+        platformConfig: null
+        preemptibleInstanceConfig: null
+        preferredMaintenanceAction: null
+        region: iad
+        shape: VM.Standard1.2
+        shapeConfig:
+          baselineOcpuUtilization: null
+          gpuDescription: null
+          gpus: 0
+          localDiskDescription: null
+          localDisks: 0
+          localDisksTotalSizeInGBs: null
+          maxVnicAttachments: 2
+          memoryInGBs: 14.0
+          networkingBandwidthInGbps: 1.2
+          ocpus: 2.0
+          processorDescription: "2.3 GHz Intel\xAE Xeon\xAE E5-2699 v3 (Haswell)"
+          vcpus: 4
+        sourceDetails:
+          bootVolumeSizeInGBs: null
+          bootVolumeVpusPerGB: null
+          imageId: ocid1.image.oc1..<unique_ID>
+          instanceSourceImageFilterDetails: null
+          kmsKeyId: null
+          sourceType: image
+        systemTags: {}
+        timeCreated: '2023-03-26T06:57:25.897Z'
+        timeMaintenanceRebootDue: null
+        timeStopScheduled: null
+      - agentConfig:
+          areAllPluginsDisabled: false
+          isManagementDisabled: false
+          isMonitoringDisabled: false
+          pluginsConfig:
+          - desiredState: ENABLED
+            name: Management Agent
+        availabilityConfig:
+          isLiveMigrationPreferred: null
+          recoveryAction: RESTORE_INSTANCE
+        availabilityDomain: NQNU:US-ASHBURN-AD-1
+        capacityReservationId: null
+        compartmentId: ocid1.compartment.oc1..<unique_ID>
+        dedicatedVmHostId: null
+        definedTags:
+          Oracle-Tags:
+            CreatedBy: user@example.com
+            CreatedOn: '2023-03-26T06:57:21.995Z'
+        displayName: ohsui0
+        extendedMetadata: {}
+        faultDomain: FAULT-DOMAIN-3
+        freeformTags:
+          eligible_for_resize_vv: 'true'
+          private-ip-exists: 'true'
+        id: ocid1.instance.oc1..<unique_ID>
+        imageId: ocid1.image.oc1..<unique_ID>
+        instanceConfigurationId: null
+        instanceOptions:
+          areLegacyImdsEndpointsDisabled: false
+        ipxeScript: null
+        isCrossNumaNode: false
+        launchMode: PARAVIRTUALIZED
+        launchOptions:
+          bootVolumeType: PARAVIRTUALIZED
+          firmware: UEFI_64
+          isConsistentVolumeNamingEnabled: true
+          isPvEncryptionInTransitEnabled: false
+          networkType: PARAVIRTUALIZED
+          remoteDataVolumeType: PARAVIRTUALIZED
+        lifecycleState: RUNNING
+        platformConfig: null
+        preemptibleInstanceConfig: null
+        preferredMaintenanceAction: null
+        region: iad
+        shape: VM.Standard1.2
+        shapeConfig:
+          baselineOcpuUtilization: null
+          gpuDescription: null
+          gpus: 0
+          localDiskDescription: null
+          localDisks: 0
+          localDisksTotalSizeInGBs: null
+          maxVnicAttachments: 2
+          memoryInGBs: 14.0
+          networkingBandwidthInGbps: 1.2
+          ocpus: 2.0
+          processorDescription: "2.3 GHz Intel\xAE Xeon\xAE E5-2699 v3 (Haswell)"
+          vcpus: 4
+        sourceDetails:
+          bootVolumeSizeInGBs: null
+          bootVolumeVpusPerGB: null
+          imageId: ocid1.image.oc1..<unique_ID>
+          instanceSourceImageFilterDetails: null
+          kmsKeyId: null
+          sourceType: image
+        systemTags: {}
+        timeCreated: '2023-03-26T06:57:22.575Z'
+        timeMaintenanceRebootDue: null
+        timeStopScheduled: null
+      - agentConfig:
+          areAllPluginsDisabled: false
+          isManagementDisabled: false
+          isMonitoringDisabled: false
+          pluginsConfig: null
+        availabilityConfig:
+          isLiveMigrationPreferred: null
+          recoveryAction: RESTORE_INSTANCE
+        availabilityDomain: NQNU:US-ASHBURN-AD-1
+        capacityReservationId: null
+        compartmentId: ocid1.compartment.oc1..<unique_ID>
+        dedicatedVmHostId: null
+        definedTags:
+          Oracle-Tags:
+            CreatedBy: user@example.com
+            CreatedOn: '2023-03-26T06:57:25.120Z'
+        displayName: psmmt0
+        extendedMetadata: {}
+        faultDomain: FAULT-DOMAIN-3
+        freeformTags:
+          eligible_for_resize_vv: 'true'
+        id: ocid1.instance.oc1..<unique_ID>
+        imageId: ocid1.image.oc1..<unique_ID>
+        instanceConfigurationId: null
+        instanceOptions:
+          areLegacyImdsEndpointsDisabled: false
+        ipxeScript: null
+        isCrossNumaNode: false
+        launchMode: PARAVIRTUALIZED
+        launchOptions:
+          bootVolumeType: PARAVIRTUALIZED
+          firmware: UEFI_64
+          isConsistentVolumeNamingEnabled: true
+          isPvEncryptionInTransitEnabled: false
+          networkType: PARAVIRTUALIZED
+          remoteDataVolumeType: PARAVIRTUALIZED
+        lifecycleState: STOPPED
+        platformConfig: null
+        preemptibleInstanceConfig: null
+        preferredMaintenanceAction: null
+        region: iad
+        shape: VM.Standard1.2
+        shapeConfig:
+          baselineOcpuUtilization: null
+          gpuDescription: null
+          gpus: 0
+          localDiskDescription: null
+          localDisks: 0
+          localDisksTotalSizeInGBs: null
+          maxVnicAttachments: 2
+          memoryInGBs: 14.0
+          networkingBandwidthInGbps: 1.2
+          ocpus: 2.0
+          processorDescription: "2.3 GHz Intel\xAE Xeon\xAE E5-2699 v3 (Haswell)"
+          vcpus: 4
+        sourceDetails:
+          bootVolumeSizeInGBs: null
+          bootVolumeVpusPerGB: null
+          imageId: ocid1.image.oc1..<unique_ID>
+          instanceSourceImageFilterDetails: null
+          kmsKeyId: null
+          sourceType: image
+        systemTags: {}
+        timeCreated: '2023-03-26T06:57:25.607Z'
+        timeMaintenanceRebootDue: null
+        timeStopScheduled: null
+      - agentConfig:
+          areAllPluginsDisabled: false
+          isManagementDisabled: false
+          isMonitoringDisabled: false
+          pluginsConfig: null
+        availabilityConfig:
+          isLiveMigrationPreferred: null
+          recoveryAction: RESTORE_INSTANCE
+        availabilityDomain: NQNU:US-ASHBURN-AD-1
+        capacityReservationId: null
+        compartmentId: ocid1.compartment.oc1..<unique_ID>
+        dedicatedVmHostId: null
+        definedTags:
+          Oracle-Tags:
+            CreatedBy: user@example.com
+            CreatedOn: '2023-03-26T06:57:25.267Z'
+        displayName: psmmt1
+        extendedMetadata: {}
+        faultDomain: FAULT-DOMAIN-3
+        freeformTags:
+          eligible_for_resize_vv: 'true'
+        id: ocid1.instance.oc1..<unique_ID>
+        imageId: ocid1.image.oc1..<unique_ID>
+        instanceConfigurationId: null
+        instanceOptions:
+          areLegacyImdsEndpointsDisabled: false
+        ipxeScript: null
+        isCrossNumaNode: false
+        launchMode: PARAVIRTUALIZED
+        launchOptions:
+          bootVolumeType: PARAVIRTUALIZED
+          firmware: UEFI_64
+          isConsistentVolumeNamingEnabled: true
+          isPvEncryptionInTransitEnabled: false
+          networkType: PARAVIRTUALIZED
+          remoteDataVolumeType: PARAVIRTUALIZED
+        lifecycleState: STOPPED
+        platformConfig: null
+        preemptibleInstanceConfig: null
+        preferredMaintenanceAction: null
+        region: iad
+        shape: VM.Standard1.2
+        shapeConfig:
+          baselineOcpuUtilization: null
+          gpuDescription: null
+          gpus: 0
+          localDiskDescription: null
+          localDisks: 0
+          localDisksTotalSizeInGBs: null
+          maxVnicAttachments: 2
+          memoryInGBs: 14.0
+          networkingBandwidthInGbps: 1.2
+          ocpus: 2.0
+          processorDescription: "2.3 GHz Intel\xAE Xeon\xAE E5-2699 v3 (Haswell)"
+          vcpus: 4
+        sourceDetails:
+          bootVolumeSizeInGBs: null
+          bootVolumeVpusPerGB: null
+          imageId: ocid1.image.oc1..<unique_ID>
+          instanceSourceImageFilterDetails: null
+          kmsKeyId: null
+          sourceType: image
+        systemTags: {}
+        timeCreated: '2023-03-26T06:57:25.864Z'
+        timeMaintenanceRebootDue: null
+        timeStopScheduled: null
+      - agentConfig:
+          areAllPluginsDisabled: false
+          isManagementDisabled: false
+          isMonitoringDisabled: false
+          pluginsConfig: null
+        availabilityConfig:
+          isLiveMigrationPreferred: null
+          recoveryAction: RESTORE_INSTANCE
+        availabilityDomain: NQNU:US-ASHBURN-AD-1
+        capacityReservationId: null
+        compartmentId: ocid1.compartment.oc1..<unique_ID>
+        dedicatedVmHostId: null
+        definedTags:
+          Oracle-Tags:
+            CreatedBy: user@example.com
+            CreatedOn: '2023-03-26T06:57:22.233Z'
+        displayName: psmui0
+        extendedMetadata: {}
+        faultDomain: FAULT-DOMAIN-3
+        freeformTags:
+          eligible_for_resize_vv: 'true'
+        id: ocid1.instance.oc1..<unique_ID>
+        imageId: ocid1.image.oc1..<unique_ID>
+        instanceConfigurationId: null
+        instanceOptions:
+          areLegacyImdsEndpointsDisabled: false
+        ipxeScript: null
+        isCrossNumaNode: false
+        launchMode: PARAVIRTUALIZED
+        launchOptions:
+          bootVolumeType: PARAVIRTUALIZED
+          firmware: UEFI_64
+          isConsistentVolumeNamingEnabled: true
+          isPvEncryptionInTransitEnabled: false
+          networkType: PARAVIRTUALIZED
+          remoteDataVolumeType: PARAVIRTUALIZED
+        lifecycleState: STOPPED
+        platformConfig: null
+        preemptibleInstanceConfig: null
+        preferredMaintenanceAction: null
+        region: iad
+        shape: VM.Standard1.2
+        shapeConfig:
+          baselineOcpuUtilization: null
+          gpuDescription: null
+          gpus: 0
+          localDiskDescription: null
+          localDisks: 0
+          localDisksTotalSizeInGBs: null
+          maxVnicAttachments: 2
+          memoryInGBs: 14.0
+          networkingBandwidthInGbps: 1.2
+          ocpus: 2.0
+          processorDescription: "2.3 GHz Intel\xAE Xeon\xAE E5-2699 v3 (Haswell)"
+          vcpus: 4
+        sourceDetails:
+          bootVolumeSizeInGBs: null
+          bootVolumeVpusPerGB: null
+          imageId: ocid1.image.oc1..<unique_ID>
+          instanceSourceImageFilterDetails: null
+          kmsKeyId: null
+          sourceType: image
+        systemTags: {}
+        timeCreated: '2023-03-26T06:57:22.867Z'
+        timeMaintenanceRebootDue: null
+        timeStopScheduled: null
+      - agentConfig:
+          areAllPluginsDisabled: false
+          isManagementDisabled: false
+          isMonitoringDisabled: false
+          pluginsConfig: null
+        availabilityConfig:
+          isLiveMigrationPreferred: null
+          recoveryAction: RESTORE_INSTANCE
+        availabilityDomain: NQNU:US-ASHBURN-AD-1
+        capacityReservationId: null
+        compartmentId: ocid1.compartment.oc1..<unique_ID>
+        dedicatedVmHostId: null
+        definedTags:
+          Oracle-Tags:
+            CreatedBy: user@example.com
+            CreatedOn: '2023-03-26T06:57:23.245Z'
+        displayName: psmui1
+        extendedMetadata: {}
+        faultDomain: FAULT-DOMAIN-3
+        freeformTags:
+          eligible_for_resize_vv: 'true'
+        id: ocid1.instance.oc1..<unique_ID>
+        imageId: ocid1.image.oc1..<unique_ID>
+        instanceConfigurationId: null
+        instanceOptions:
+          areLegacyImdsEndpointsDisabled: false
+        ipxeScript: null
+        isCrossNumaNode: false
+        launchMode: PARAVIRTUALIZED
+        launchOptions:
+          bootVolumeType: PARAVIRTUALIZED
+          firmware: UEFI_64
+          isConsistentVolumeNamingEnabled: true
+          isPvEncryptionInTransitEnabled: false
+          networkType: PARAVIRTUALIZED
+          remoteDataVolumeType: PARAVIRTUALIZED
+        lifecycleState: STOPPED
+        platformConfig: null
+        preemptibleInstanceConfig: null
+        preferredMaintenanceAction: null
+        region: iad
+        shape: VM.Standard1.2
+        shapeConfig:
+          baselineOcpuUtilization: null
+          gpuDescription: null
+          gpus: 0
+          localDiskDescription: null
+          localDisks: 0
+          localDisksTotalSizeInGBs: null
+          maxVnicAttachments: 2
+          memoryInGBs: 14.0
+          networkingBandwidthInGbps: 1.2
+          ocpus: 2.0
+          processorDescription: "2.3 GHz Intel\xAE Xeon\xAE E5-2699 v3 (Haswell)"
+          vcpus: 4
+        sourceDetails:
+          bootVolumeSizeInGBs: null
+          bootVolumeVpusPerGB: null
+          imageId: ocid1.image.oc1..<unique_ID>
+          instanceSourceImageFilterDetails: null
+          kmsKeyId: null
+          sourceType: image
+        systemTags: {}
+        timeCreated: '2023-03-26T06:57:23.782Z'
+        timeMaintenanceRebootDue: null
+        timeStopScheduled: null
+    headers:
+      content-encoding:
+      - gzip
+      content-length:
+      - '2470'
+      content-type:
+      - application/json
+      date:
+      - Thu, 15 Jun 2023 12:31:56 GMT
+      x-content-type-options:
+      - nosniff
+    status:
+      code: 200
+      message: OK
+- request:
+    body: null
+    headers: {}
+    method: GET
+    uri: https://iaas.us-ashburn-1.oraclecloud.com/20160918/instances?compartmentId=ocid1.compartment.oc1..<unique_ID>
+  response:
+    body:
+      data:
+      - agentConfig:
+          areAllPluginsDisabled: false
+          isManagementDisabled: false
+          isMonitoringDisabled: false
+          pluginsConfig:
+          - desiredState: DISABLED
+            name: Vulnerability Scanning
+          - desiredState: DISABLED
+            name: Oracle Java Management Service
+          - desiredState: ENABLED
+            name: OS Management Service Agent
+          - desiredState: DISABLED
+            name: Management Agent
+          - desiredState: ENABLED
+            name: Custom Logs Monitoring
+          - desiredState: ENABLED
+            name: Compute Instance Run Command
+          - desiredState: ENABLED
+            name: Compute Instance Monitoring
+          - desiredState: DISABLED
+            name: Block Volume Management
+          - desiredState: DISABLED
+            name: Bastion
+        availabilityConfig:
+          isLiveMigrationPreferred: null
+          recoveryAction: RESTORE_INSTANCE
+        availabilityDomain: NQNU:US-ASHBURN-AD-1
+        capacityReservationId: null
+        compartmentId: ocid1.compartment.oc1..<unique_ID>
+        dedicatedVmHostId: null
+        definedTags:
+          Oracle-Tags:
+            CreatedBy: user@example.com
+            CreatedOn: '2023-05-03T22:20:26.590Z'
+        displayName: SMP-TEST-001
+        extendedMetadata: {}
+        faultDomain: FAULT-DOMAIN-3
+        freeformTags:
+          eligible_for_resize_vv: 'true'
+          need_action: 'true'
+        id: ocid1.instance.oc1..<unique_ID>
+        imageId: ocid1.image.oc1..<unique_ID>
+        instanceConfigurationId: null
+        instanceOptions:
+          areLegacyImdsEndpointsDisabled: false
+        ipxeScript: null
+        isCrossNumaNode: false
+        launchMode: PARAVIRTUALIZED
+        launchOptions:
+          bootVolumeType: PARAVIRTUALIZED
+          firmware: UEFI_64
+          isConsistentVolumeNamingEnabled: true
+          isPvEncryptionInTransitEnabled: false
+          networkType: PARAVIRTUALIZED
+          remoteDataVolumeType: PARAVIRTUALIZED
+        lifecycleState: STOPPED
+        platformConfig: null
+        preemptibleInstanceConfig: null
+        preferredMaintenanceAction: null
+        region: iad
+        shape: VM.Standard.E2.1
+        shapeConfig:
+          baselineOcpuUtilization: null
+          gpuDescription: null
+          gpus: 0
+          localDiskDescription: null
+          localDisks: 0
+          localDisksTotalSizeInGBs: null
+          maxVnicAttachments: 2
+          memoryInGBs: 8.0
+          networkingBandwidthInGbps: 0.7
+          ocpus: 1.0
+          processorDescription: "2.0 GHz AMD EPYC\u2122 7551 (Naples)"
+          vcpus: 2
+        sourceDetails:
+          bootVolumeSizeInGBs: null
+          bootVolumeVpusPerGB: null
+          imageId: ocid1.image.oc1..<unique_ID>
+          instanceSourceImageFilterDetails: null
+          kmsKeyId: null
+          sourceType: image
+        systemTags: {}
+        timeCreated: '2023-05-03T22:20:27.358Z'
+        timeMaintenanceRebootDue: null
+        timeStopScheduled: null
+      - agentConfig:
+          areAllPluginsDisabled: false
+          isManagementDisabled: false
+          isMonitoringDisabled: false
+          pluginsConfig:
+          - desiredState: DISABLED
+            name: Vulnerability Scanning
+          - desiredState: DISABLED
+            name: Oracle Java Management Service
+          - desiredState: ENABLED
+            name: OS Management Service Agent
+          - desiredState: ENABLED
+            name: Custom Logs Monitoring
+          - desiredState: ENABLED
+            name: Compute Instance Run Command
+          - desiredState: ENABLED
+            name: Compute Instance Monitoring
+          - desiredState: DISABLED
+            name: Block Volume Management
+          - desiredState: DISABLED
+            name: Bastion
+          - desiredState: ENABLED
+            name: Management Agent
+        availabilityConfig:
+          isLiveMigrationPreferred: null
+          recoveryAction: RESTORE_INSTANCE
+        availabilityDomain: NQNU:US-ASHBURN-AD-1
+        capacityReservationId: null
+        compartmentId: ocid1.compartment.oc1..<unique_ID>
+        dedicatedVmHostId: null
+        definedTags:
+          Oracle-Tags:
+            CreatedBy: user@example.com
+            CreatedOn: '2023-05-04T05:01:26.494Z'
+        displayName: smp-test-instance
+        extendedMetadata: {}
+        faultDomain: FAULT-DOMAIN-3
+        freeformTags:
+          eligible_for_resize_vv: 'true'
+          need_action: 'true'
+        id: ocid1.instance.oc1..<unique_ID>
+        imageId: ocid1.image.oc1..<unique_ID>
+        instanceConfigurationId: null
+        instanceOptions:
+          areLegacyImdsEndpointsDisabled: false
+        ipxeScript: null
+        isCrossNumaNode: false
+        launchMode: PARAVIRTUALIZED
+        launchOptions:
+          bootVolumeType: PARAVIRTUALIZED
+          firmware: UEFI_64
+          isConsistentVolumeNamingEnabled: true
+          isPvEncryptionInTransitEnabled: false
+          networkType: PARAVIRTUALIZED
+          remoteDataVolumeType: PARAVIRTUALIZED
+        lifecycleState: STOPPED
+        platformConfig: null
+        preemptibleInstanceConfig: null
+        preferredMaintenanceAction: null
+        region: iad
+        shape: VM.Standard1.2
+        shapeConfig:
+          baselineOcpuUtilization: null
+          gpuDescription: null
+          gpus: 0
+          localDiskDescription: null
+          localDisks: 0
+          localDisksTotalSizeInGBs: null
+          maxVnicAttachments: 2
+          memoryInGBs: 14.0
+          networkingBandwidthInGbps: 1.2
+          ocpus: 2.0
+          processorDescription: "2.3 GHz Intel\xAE Xeon\xAE E5-2699 v3 (Haswell)"
+          vcpus: 4
+        sourceDetails:
+          bootVolumeSizeInGBs: null
+          bootVolumeVpusPerGB: null
+          imageId: ocid1.image.oc1..<unique_ID>
+          instanceSourceImageFilterDetails: null
+          kmsKeyId: null
+          sourceType: image
+        systemTags: {}
+        timeCreated: '2023-05-04T05:01:27.154Z'
+        timeMaintenanceRebootDue: null
+        timeStopScheduled: null
+    headers:
+      content-encoding:
+      - gzip
+      content-length:
+      - '2062'
+      content-type:
+      - application/json
+      date:
+      - Thu, 15 Jun 2023 12:31:57 GMT
+      x-content-type-options:
+      - nosniff
+    status:
+      code: 200
+      message: OK
+- request:
+    body: null
+    headers: {}
+    method: GET
+    uri: https://iaas.us-ashburn-1.oraclecloud.com/20160918/instances?compartmentId=ocid1.compartment.oc1..<unique_ID>
+  response:
+    body:
+      data:
+      - agentConfig:
+          areAllPluginsDisabled: false
+          isManagementDisabled: false
+          isMonitoringDisabled: false
+          pluginsConfig:
+          - desiredState: DISABLED
+            name: Vulnerability Scanning
+          - desiredState: ENABLED
+            name: OS Management Service Agent
+          - desiredState: ENABLED
+            name: Custom Logs Monitoring
+          - desiredState: ENABLED
+            name: Compute Instance Run Command
+          - desiredState: ENABLED
+            name: Compute Instance Monitoring
+          - desiredState: DISABLED
+            name: Block Volume Management
+          - desiredState: DISABLED
+            name: Bastion
+          - desiredState: ENABLED
+            name: Management Agent
+        availabilityConfig:
+          isLiveMigrationPreferred: null
+          recoveryAction: RESTORE_INSTANCE
+        availabilityDomain: NQNU:US-ASHBURN-AD-1
+        capacityReservationId: null
+        compartmentId: ocid1.compartment.oc1..<unique_ID>
+        dedicatedVmHostId: null
+        definedTags:
+          Oracle-Tags:
+            CreatedBy: user@example.com
+            CreatedOn: '2021-06-28T23:35:10.664Z'
+        displayName: bastion1
+        extendedMetadata: {}
+        faultDomain: FAULT-DOMAIN-1
+        freeformTags:
+          eligible_for_resize_vv: 'true'
+          need_action: 'true'
+        id: ocid1.instance.oc1..<unique_ID>
+        imageId: ocid1.image.oc1..<unique_ID>
+        instanceConfigurationId: null
+        instanceOptions:
+          areLegacyImdsEndpointsDisabled: false
+        ipxeScript: null
+        isCrossNumaNode: false
+        launchMode: PARAVIRTUALIZED
+        launchOptions:
+          bootVolumeType: PARAVIRTUALIZED
+          firmware: UEFI_64
+          isConsistentVolumeNamingEnabled: true
+          isPvEncryptionInTransitEnabled: true
+          networkType: PARAVIRTUALIZED
+          remoteDataVolumeType: PARAVIRTUALIZED
+        lifecycleState: STOPPED
+        platformConfig: null
+        preemptibleInstanceConfig: null
+        preferredMaintenanceAction: null
+        region: iad
+        shape: VM.Standard.E4.Flex
+        shapeConfig:
+          baselineOcpuUtilization: null
+          gpuDescription: null
+          gpus: 0
+          localDiskDescription: null
+          localDisks: 0
+          localDisksTotalSizeInGBs: null
+          maxVnicAttachments: 2
+          memoryInGBs: 16.0
+          networkingBandwidthInGbps: 1.0
+          ocpus: 1.0
+          processorDescription: "2.55 GHz AMD EPYC\u2122 7J13 (Milan)"
+          vcpus: 2
+        sourceDetails:
+          bootVolumeSizeInGBs: null
+          bootVolumeVpusPerGB: null
+          imageId: ocid1.image.oc1..<unique_ID>
+          instanceSourceImageFilterDetails: null
+          kmsKeyId: null
+          sourceType: image
+        systemTags: {}
+        timeCreated: '2021-06-28T23:35:11.469Z'
+        timeMaintenanceRebootDue: null
+        timeStopScheduled: null
+    headers:
+      content-encoding:
+      - gzip
+      content-length:
+      - '1558'
+      content-type:
+      - application/json
+      date:
+      - Thu, 15 Jun 2023 12:31:59 GMT
+      x-content-type-options:
+      - nosniff
+    status:
+      code: 200
+      message: OK
+- request:
+    body: null
+    headers: {}
+    method: GET
+    uri: https://iaas.us-ashburn-1.oraclecloud.com/20160918/instances?compartmentId=ocid1.compartment.oc1..<unique_ID>
+  response:
+    body:
+      data:
+      - agentConfig:
+          areAllPluginsDisabled: false
+          isManagementDisabled: false
+          isMonitoringDisabled: false
+          pluginsConfig:
+          - desiredState: DISABLED
+            name: Vulnerability Scanning
+          - desiredState: ENABLED
+            name: Oracle Java Management Service
+          - desiredState: ENABLED
+            name: OS Management Service Agent
+          - desiredState: ENABLED
+            name: Custom Logs Monitoring
+          - desiredState: ENABLED
+            name: Compute Instance Run Command
+          - desiredState: ENABLED
+            name: Compute Instance Monitoring
+          - desiredState: DISABLED
+            name: Block Volume Management
+          - desiredState: DISABLED
+            name: Bastion
+          - desiredState: ENABLED
+            name: Management Agent
+        availabilityConfig:
+          isLiveMigrationPreferred: null
+          recoveryAction: RESTORE_INSTANCE
+        availabilityDomain: NQNU:US-ASHBURN-AD-1
+        capacityReservationId: null
+        compartmentId: ocid1.compartment.oc1..<unique_ID>
+        dedicatedVmHostId: null
+        definedTags:
+          Oracle-Tags:
+            CreatedBy: user@example.com
+            CreatedOn: '2022-11-16T06:45:24.964Z'
+        displayName: JMSDemoInstance
+        extendedMetadata: {}
+        faultDomain: FAULT-DOMAIN-2
+        freeformTags:
+          Environment: Test
+          eligible_for_resize_vv: 'true'
+          group: CCDev
+          need_action: 'true'
+        id: ocid1.instance.oc1..<unique_ID>
+        imageId: ocid1.image.oc1..<unique_ID>
+        instanceConfigurationId: null
+        instanceOptions:
+          areLegacyImdsEndpointsDisabled: false
+        ipxeScript: null
+        isCrossNumaNode: false
+        launchMode: PARAVIRTUALIZED
+        launchOptions:
+          bootVolumeType: PARAVIRTUALIZED
+          firmware: UEFI_64
+          isConsistentVolumeNamingEnabled: true
+          isPvEncryptionInTransitEnabled: true
+          networkType: PARAVIRTUALIZED
+          remoteDataVolumeType: PARAVIRTUALIZED
+        lifecycleState: STOPPED
+        platformConfig: null
+        preemptibleInstanceConfig: null
+        preferredMaintenanceAction: null
+        region: iad
+        shape: VM.Standard.E3.Flex
+        shapeConfig:
+          baselineOcpuUtilization: BASELINE_1_1
+          gpuDescription: null
+          gpus: 0
+          localDiskDescription: null
+          localDisks: 0
+          localDisksTotalSizeInGBs: null
+          maxVnicAttachments: 2
+          memoryInGBs: 16.0
+          networkingBandwidthInGbps: 1.0
+          ocpus: 1.0
+          processorDescription: "2.25 GHz AMD EPYC\u2122 7742 (Rome)"
+          vcpus: 2
+        sourceDetails:
+          bootVolumeSizeInGBs: null
+          bootVolumeVpusPerGB: null
+          imageId: ocid1.image.oc1..<unique_ID>
+          instanceSourceImageFilterDetails: null
+          kmsKeyId: null
+          sourceType: image
+        systemTags: {}
+        timeCreated: '2022-11-16T06:45:25.497Z'
+        timeMaintenanceRebootDue: null
+        timeStopScheduled: null
+      - agentConfig:
+          areAllPluginsDisabled: false
+          isManagementDisabled: false
+          isMonitoringDisabled: false
+          pluginsConfig:
+          - desiredState: DISABLED
+            name: Vulnerability Scanning
+          - desiredState: DISABLED
+            name: Oracle Java Management Service
+          - desiredState: ENABLED
+            name: OS Management Service Agent
+          - desiredState: ENABLED
+            name: Custom Logs Monitoring
+          - desiredState: ENABLED
+            name: Compute Instance Run Command
+          - desiredState: ENABLED
+            name: Compute Instance Monitoring
+          - desiredState: DISABLED
+            name: Block Volume Management
+          - desiredState: DISABLED
+            name: Bastion
+          - desiredState: ENABLED
+            name: Management Agent
+        availabilityConfig:
+          isLiveMigrationPreferred: null
+          recoveryAction: RESTORE_INSTANCE
+        availabilityDomain: NQNU:US-ASHBURN-AD-1
+        capacityReservationId: null
+        compartmentId: ocid1.compartment.oc1..<unique_ID>
+        dedicatedVmHostId: null
+        definedTags:
+          Oracle-Tags:
+            CreatedBy: user@example.com
+            CreatedOn: '2023-02-23T12:00:16.514Z'
+        displayName: StadVM
+        extendedMetadata: {}
+        faultDomain: FAULT-DOMAIN-2
+        freeformTags:
+          Environment: Test
+          eligible_for_resize_vv: 'true'
+          group: CCTest
+          need_action: 'true'
+        id: ocid1.instance.oc1..<unique_ID>
+        imageId: ocid1.image.oc1..<unique_ID>
+        instanceConfigurationId: null
+        instanceOptions:
+          areLegacyImdsEndpointsDisabled: false
+        ipxeScript: null
+        isCrossNumaNode: false
+        launchMode: PARAVIRTUALIZED
+        launchOptions:
+          bootVolumeType: PARAVIRTUALIZED
+          firmware: UEFI_64
+          isConsistentVolumeNamingEnabled: true
+          isPvEncryptionInTransitEnabled: false
+          networkType: PARAVIRTUALIZED
+          remoteDataVolumeType: PARAVIRTUALIZED
+        lifecycleState: STOPPED
+        platformConfig: null
+        preemptibleInstanceConfig: null
+        preferredMaintenanceAction: null
+        region: iad
+        shape: VM.Standard.E3.Flex
+        shapeConfig:
+          baselineOcpuUtilization: null
+          gpuDescription: null
+          gpus: 0
+          localDiskDescription: null
+          localDisks: 0
+          localDisksTotalSizeInGBs: null
+          maxVnicAttachments: 2
+          memoryInGBs: 16.0
+          networkingBandwidthInGbps: 1.0
+          ocpus: 1.0
+          processorDescription: "2.25 GHz AMD EPYC\u2122 7742 (Rome)"
+          vcpus: 2
+        sourceDetails:
+          bootVolumeSizeInGBs: null
+          bootVolumeVpusPerGB: null
+          imageId: ocid1.image.oc1..<unique_ID>
+          instanceSourceImageFilterDetails: null
+          kmsKeyId: null
+          sourceType: image
+        systemTags: {}
+        timeCreated: '2023-02-23T12:00:17.117Z'
+        timeMaintenanceRebootDue: null
+        timeStopScheduled: null
+      - agentConfig:
+          areAllPluginsDisabled: false
+          isManagementDisabled: false
+          isMonitoringDisabled: false
+          pluginsConfig:
+          - desiredState: DISABLED
+            name: Vulnerability Scanning
+          - desiredState: DISABLED
+            name: Oracle Java Management Service
+          - desiredState: ENABLED
+            name: OS Management Service Agent
+          - desiredState: ENABLED
+            name: Custom Logs Monitoring
+          - desiredState: ENABLED
+            name: Compute Instance Run Command
+          - desiredState: ENABLED
+            name: Compute Instance Monitoring
+          - desiredState: DISABLED
+            name: Block Volume Management
+          - desiredState: DISABLED
+            name: Bastion
+          - desiredState: ENABLED
+            name: Management Agent
+        availabilityConfig:
+          isLiveMigrationPreferred: null
+          recoveryAction: RESTORE_INSTANCE
+        availabilityDomain: NQNU:US-ASHBURN-AD-1
+        capacityReservationId: null
+        compartmentId: ocid1.compartment.oc1..<unique_ID>
+        dedicatedVmHostId: null
+        definedTags:
+          Oracle-Tags:
+            CreatedBy: user@example.com
+            CreatedOn: '2022-11-24T08:32:51.014Z'
+        displayName: TestInstanceWithDelete
+        extendedMetadata: {}
+        faultDomain: FAULT-DOMAIN-2
+        freeformTags:
+          Environment: Test
+          eligible_for_resize_vv: 'true'
+          group: CCDev
+          need_action: 'true'
+        id: ocid1.instance.oc1..<unique_ID>
+        imageId: ocid1.image.oc1..<unique_ID>
+        instanceConfigurationId: null
+        instanceOptions:
+          areLegacyImdsEndpointsDisabled: false
+        ipxeScript: null
+        isCrossNumaNode: false
+        launchMode: PARAVIRTUALIZED
+        launchOptions:
+          bootVolumeType: PARAVIRTUALIZED
+          firmware: UEFI_64
+          isConsistentVolumeNamingEnabled: true
+          isPvEncryptionInTransitEnabled: true
+          networkType: PARAVIRTUALIZED
+          remoteDataVolumeType: PARAVIRTUALIZED
+        lifecycleState: STOPPED
+        platformConfig: null
+        preemptibleInstanceConfig: null
+        preferredMaintenanceAction: null
+        region: iad
+        shape: VM.Standard.E3.Flex
+        shapeConfig:
+          baselineOcpuUtilization: null
+          gpuDescription: null
+          gpus: 0
+          localDiskDescription: null
+          localDisks: 0
+          localDisksTotalSizeInGBs: null
+          maxVnicAttachments: 2
+          memoryInGBs: 16.0
+          networkingBandwidthInGbps: 1.0
+          ocpus: 1.0
+          processorDescription: "2.25 GHz AMD EPYC\u2122 7742 (Rome)"
+          vcpus: 2
+        sourceDetails:
+          bootVolumeSizeInGBs: null
+          bootVolumeVpusPerGB: null
+          imageId: ocid1.image.oc1..<unique_ID>
+          instanceSourceImageFilterDetails: null
+          kmsKeyId: null
+          sourceType: image
+        systemTags: {}
+        timeCreated: '2022-11-24T08:32:51.866Z'
+        timeMaintenanceRebootDue: null
+        timeStopScheduled: null
+    headers:
+      content-encoding:
+      - gzip
+      content-length:
+      - '2170'
+      content-type:
+      - application/json
+      date:
+      - Thu, 15 Jun 2023 12:32:00 GMT
+      x-content-type-options:
+      - nosniff
+    status:
+      code: 200
+      message: OK
+- request:
+    body: null
+    headers: {}
+    method: GET
+    uri: https://iaas.us-ashburn-1.oraclecloud.com/20160918/instances?compartmentId=ocid1.tenancy.oc1..<unique_ID>
+  response:
+    body:
+      data:
+      - agentConfig:
+          areAllPluginsDisabled: false
+          isManagementDisabled: false
+          isMonitoringDisabled: false
+          pluginsConfig:
+          - desiredState: DISABLED
+            name: Vulnerability Scanning
+          - desiredState: ENABLED
+            name: OS Management Service Agent
+          - desiredState: ENABLED
+            name: Custom Logs Monitoring
+          - desiredState: ENABLED
+            name: Compute Instance Run Command
+          - desiredState: ENABLED
+            name: Compute Instance Monitoring
+          - desiredState: DISABLED
+            name: Block Volume Management
+          - desiredState: DISABLED
+            name: Bastion
+        availabilityConfig:
+          isLiveMigrationPreferred: null
+          recoveryAction: RESTORE_INSTANCE
+        availabilityDomain: NQNU:US-ASHBURN-AD-1
+        capacityReservationId: null
+        compartmentId: ocid1.tenancy.oc1..<unique_ID>
+        dedicatedVmHostId: null
+        definedTags:
+          Oracle-Tags:
+            CreatedBy: user@example.com
+            CreatedOn: '2021-06-16T14:30:25.326Z'
+        displayName: odo-cli-poc-vm
+        extendedMetadata: {}
+        faultDomain: FAULT-DOMAIN-1
+        freeformTags:
+          eligible_for_resize_vv: 'true'
+          mark-for-deletion: 'true'
+        id: ocid1.instance.oc1..<unique_ID>
+        imageId: ocid1.image.oc1..<unique_ID>
+        instanceConfigurationId: null
+        instanceOptions:
+          areLegacyImdsEndpointsDisabled: false
+        ipxeScript: null
+        isCrossNumaNode: false
+        launchMode: PARAVIRTUALIZED
+        launchOptions:
+          bootVolumeType: PARAVIRTUALIZED
+          firmware: UEFI_64
+          isConsistentVolumeNamingEnabled: true
+          isPvEncryptionInTransitEnabled: true
+          networkType: PARAVIRTUALIZED
+          remoteDataVolumeType: PARAVIRTUALIZED
+        lifecycleState: STOPPED
+        platformConfig: null
+        preemptibleInstanceConfig: null
+        preferredMaintenanceAction: null
+        region: iad
+        shape: VM.Standard.E4.Flex
+        shapeConfig:
+          baselineOcpuUtilization: null
+          gpuDescription: null
+          gpus: 0
+          localDiskDescription: null
+          localDisks: 0
+          localDisksTotalSizeInGBs: null
+          maxVnicAttachments: 2
+          memoryInGBs: 16.0
+          networkingBandwidthInGbps: 1.0
+          ocpus: 1.0
+          processorDescription: "2.55 GHz AMD EPYC\u2122 7J13 (Milan)"
+          vcpus: 2
+        sourceDetails:
+          bootVolumeSizeInGBs: null
+          bootVolumeVpusPerGB: null
+          imageId: ocid1.image.oc1..<unique_ID>
+          instanceSourceImageFilterDetails: null
+          kmsKeyId: null
+          sourceType: image
+        systemTags: {}
+        timeCreated: '2021-06-16T14:30:25.944Z'
+        timeMaintenanceRebootDue: null
+        timeStopScheduled: null
+      - agentConfig:
+          areAllPluginsDisabled: false
+          isManagementDisabled: false
+          isMonitoringDisabled: false
+          pluginsConfig:
+          - desiredState: DISABLED
+            name: Vulnerability Scanning
+          - desiredState: DISABLED
+            name: Oracle Java Management Service
+          - desiredState: ENABLED
+            name: OS Management Service Agent
+          - desiredState: DISABLED
+            name: Management Agent
+          - desiredState: ENABLED
+            name: Custom Logs Monitoring
+          - desiredState: ENABLED
+            name: Compute Instance Run Command
+          - desiredState: ENABLED
+            name: Compute Instance Monitoring
+          - desiredState: DISABLED
+            name: Block Volume Management
+          - desiredState: DISABLED
+            name: Bastion
+        availabilityConfig:
+          isLiveMigrationPreferred: null
+          recoveryAction: RESTORE_INSTANCE
+        availabilityDomain: NQNU:US-ASHBURN-AD-1
+        capacityReservationId: null
+        compartmentId: ocid1.tenancy.oc1..<unique_ID>
+        dedicatedVmHostId: null
+        definedTags:
+          Oracle-Tags:
+            CreatedBy: user@example.com
+            CreatedOn: '2022-08-11T11:17:07.815Z'
+        displayName: psIDCSTorbTest
+        extendedMetadata: {}
+        faultDomain: FAULT-DOMAIN-2
+        freeformTags:
+          eligible_for_resize_vv: 'true'
+        id: ocid1.instance.oc1..<unique_ID>
+        imageId: ocid1.image.oc1..<unique_ID>
+        instanceConfigurationId: null
+        instanceOptions:
+          areLegacyImdsEndpointsDisabled: false
+        ipxeScript: null
+        isCrossNumaNode: false
+        launchMode: PARAVIRTUALIZED
+        launchOptions:
+          bootVolumeType: PARAVIRTUALIZED
+          firmware: UEFI_64
+          isConsistentVolumeNamingEnabled: true
+          isPvEncryptionInTransitEnabled: true
+          networkType: PARAVIRTUALIZED
+          remoteDataVolumeType: PARAVIRTUALIZED
+        lifecycleState: STOPPED
+        platformConfig: null
+        preemptibleInstanceConfig: null
+        preferredMaintenanceAction: null
+        region: iad
+        shape: VM.Standard.E4.Flex
+        shapeConfig:
+          baselineOcpuUtilization: BASELINE_1_1
+          gpuDescription: null
+          gpus: 0
+          localDiskDescription: null
+          localDisks: 0
+          localDisksTotalSizeInGBs: null
+          maxVnicAttachments: 2
+          memoryInGBs: 16.0
+          networkingBandwidthInGbps: 1.0
+          ocpus: 1.0
+          processorDescription: "2.55 GHz AMD EPYC\u2122 7J13 (Milan)"
+          vcpus: 2
+        sourceDetails:
+          bootVolumeSizeInGBs: null
+          bootVolumeVpusPerGB: null
+          imageId: ocid1.image.oc1..<unique_ID>
+          instanceSourceImageFilterDetails: null
+          kmsKeyId: null
+          sourceType: image
+        systemTags: {}
+        timeCreated: '2022-08-11T11:17:08.829Z'
+        timeMaintenanceRebootDue: null
+        timeStopScheduled: null
+    headers:
+      content-encoding:
+      - gzip
+      content-length:
+      - '2060'
+      content-type:
+      - application/json
+      date:
+      - Thu, 15 Jun 2023 12:32:02 GMT
+      x-content-type-options:
+      - nosniff
+    status:
+      code: 200
+      message: OK
+- request:
+    body: null
+    headers: {}
+    method: GET
+    uri: https://iaas.us-ashburn-1.oraclecloud.com/20160918/instances?compartmentId=ocid1.compartment.oc1..<unique_ID>
+  response:
+    body:
+      data:
+      - agentConfig:
+          areAllPluginsDisabled: false
+          isManagementDisabled: false
+          isMonitoringDisabled: false
+          pluginsConfig:
+          - desiredState: DISABLED
+            name: Vulnerability Scanning
+          - desiredState: DISABLED
+            name: Oracle Java Management Service
+          - desiredState: ENABLED
+            name: OS Management Service Agent
+          - desiredState: ENABLED
+            name: Custom Logs Monitoring
+          - desiredState: ENABLED
+            name: Compute Instance Run Command
+          - desiredState: ENABLED
+            name: Compute Instance Monitoring
+          - desiredState: DISABLED
+            name: Block Volume Management
+          - desiredState: DISABLED
+            name: Bastion
+          - desiredState: ENABLED
+            name: Management Agent
+        availabilityConfig:
+          isLiveMigrationPreferred: null
+          recoveryAction: RESTORE_INSTANCE
+        availabilityDomain: NQNU:US-ASHBURN-AD-1
+        capacityReservationId: null
+        compartmentId: ocid1.compartment.oc1..<unique_ID>
+        dedicatedVmHostId: null
+        definedTags:
+          Oracle-Tags:
+            CreatedBy: user@example.com
+            CreatedOn: '2023-06-15T06:41:33.444Z'
+        displayName: cc_ag
+        extendedMetadata: {}
+        faultDomain: FAULT-DOMAIN-3
+        freeformTags: {}
+        id: ocid1.instance.oc1..<unique_ID>
+        imageId: ocid1.image.oc1..<unique_ID>
+        instanceConfigurationId: null
+        instanceOptions:
+          areLegacyImdsEndpointsDisabled: false
+        ipxeScript: null
+        isCrossNumaNode: false
+        launchMode: PARAVIRTUALIZED
+        launchOptions:
+          bootVolumeType: PARAVIRTUALIZED
+          firmware: UEFI_64
+          isConsistentVolumeNamingEnabled: true
+          isPvEncryptionInTransitEnabled: true
+          networkType: PARAVIRTUALIZED
+          remoteDataVolumeType: PARAVIRTUALIZED
+        lifecycleState: TERMINATED
+        platformConfig: null
+        preemptibleInstanceConfig: null
+        preferredMaintenanceAction: null
+        region: iad
+        shape: VM.Standard.E4.Flex
+        shapeConfig:
+          baselineOcpuUtilization: null
+          gpuDescription: null
+          gpus: 0
+          localDiskDescription: null
+          localDisks: 0
+          localDisksTotalSizeInGBs: null
+          maxVnicAttachments: 2
+          memoryInGBs: 16.0
+          networkingBandwidthInGbps: 1.0
+          ocpus: 1.0
+          processorDescription: "2.55 GHz AMD EPYC\u2122 7J13 (Milan)"
+          vcpus: 2
+        sourceDetails:
+          bootVolumeSizeInGBs: null
+          bootVolumeVpusPerGB: null
+          imageId: ocid1.image.oc1..<unique_ID>
+          instanceSourceImageFilterDetails: null
+          kmsKeyId: null
+          sourceType: image
+        systemTags: {}
+        timeCreated: '2023-06-15T06:41:34.131Z'
+        timeMaintenanceRebootDue: null
+        timeStopScheduled: null
+      - agentConfig:
+          areAllPluginsDisabled: false
+          isManagementDisabled: false
+          isMonitoringDisabled: false
+          pluginsConfig:
+          - desiredState: DISABLED
+            name: Vulnerability Scanning
+          - desiredState: DISABLED
+            name: Oracle Java Management Service
+          - desiredState: ENABLED
+            name: OS Management Service Agent
+          - desiredState: ENABLED
+            name: Custom Logs Monitoring
+          - desiredState: ENABLED
+            name: Compute Instance Run Command
+          - desiredState: ENABLED
+            name: Compute Instance Monitoring
+          - desiredState: DISABLED
+            name: Block Volume Management
+          - desiredState: DISABLED
+            name: Bastion
+          - desiredState: ENABLED
+            name: Management Agent
+        availabilityConfig:
+          isLiveMigrationPreferred: null
+          recoveryAction: RESTORE_INSTANCE
+        availabilityDomain: NQNU:US-ASHBURN-AD-1
+        capacityReservationId: null
+        compartmentId: ocid1.compartment.oc1..<unique_ID>
+        dedicatedVmHostId: null
+        definedTags:
+          Oracle-Tags:
+            CreatedBy: user@example.com
+            CreatedOn: '2023-06-15T06:46:18.141Z'
+        displayName: cc_ins
+        extendedMetadata: {}
+        faultDomain: FAULT-DOMAIN-3
+        freeformTags: {}
+        id: ocid1.instance.oc1..<unique_ID>
+        imageId: ocid1.image.oc1..<unique_ID>
+        instanceConfigurationId: null
+        instanceOptions:
+          areLegacyImdsEndpointsDisabled: false
+        ipxeScript: null
+        isCrossNumaNode: false
+        launchMode: PARAVIRTUALIZED
+        launchOptions:
+          bootVolumeType: PARAVIRTUALIZED
+          firmware: UEFI_64
+          isConsistentVolumeNamingEnabled: true
+          isPvEncryptionInTransitEnabled: true
+          networkType: PARAVIRTUALIZED
+          remoteDataVolumeType: PARAVIRTUALIZED
+        lifecycleState: TERMINATED
+        platformConfig: null
+        preemptibleInstanceConfig: null
+        preferredMaintenanceAction: null
+        region: iad
+        shape: VM.Standard.E4.Flex
+        shapeConfig:
+          baselineOcpuUtilization: null
+          gpuDescription: null
+          gpus: 0
+          localDiskDescription: null
+          localDisks: 0
+          localDisksTotalSizeInGBs: null
+          maxVnicAttachments: 2
+          memoryInGBs: 16.0
+          networkingBandwidthInGbps: 1.0
+          ocpus: 1.0
+          processorDescription: "2.55 GHz AMD EPYC\u2122 7J13 (Milan)"
+          vcpus: 2
+        sourceDetails:
+          bootVolumeSizeInGBs: null
+          bootVolumeVpusPerGB: null
+          imageId: ocid1.image.oc1..<unique_ID>
+          instanceSourceImageFilterDetails: null
+          kmsKeyId: null
+          sourceType: image
+        systemTags: {}
+        timeCreated: '2023-06-15T06:46:19.283Z'
+        timeMaintenanceRebootDue: null
+        timeStopScheduled: null
+      - agentConfig:
+          areAllPluginsDisabled: false
+          isManagementDisabled: false
+          isMonitoringDisabled: false
+          pluginsConfig: null
+        availabilityConfig:
+          isLiveMigrationPreferred: null
+          recoveryAction: RESTORE_INSTANCE
+        availabilityDomain: NQNU:US-ASHBURN-AD-1
+        capacityReservationId: null
+        compartmentId: ocid1.compartment.oc1..<unique_ID>
+        dedicatedVmHostId: null
+        definedTags:
+          Oracle-Tags:
+            CreatedBy: user@example.com
+            CreatedOn: '2023-06-15T04:59:25.539Z'
+        displayName: instance20230615045926
+        extendedMetadata: {}
+        faultDomain: FAULT-DOMAIN-1
+        freeformTags:
+          Project: CNCF
+        id: ocid1.instance.oc1..<unique_ID>
+        imageId: ocid1.image.oc1..<unique_ID>
+        instanceConfigurationId: null
+        instanceOptions:
+          areLegacyImdsEndpointsDisabled: false
+        ipxeScript: null
+        isCrossNumaNode: false
+        launchMode: NATIVE
+        launchOptions:
+          bootVolumeType: PARAVIRTUALIZED
+          firmware: UEFI_64
+          isConsistentVolumeNamingEnabled: true
+          isPvEncryptionInTransitEnabled: false
+          networkType: PARAVIRTUALIZED
+          remoteDataVolumeType: PARAVIRTUALIZED
+        lifecycleState: TERMINATED
+        platformConfig: null
+        preemptibleInstanceConfig: null
+        preferredMaintenanceAction: null
+        region: iad
+        shape: VM.Standard.E3.Flex
+        shapeConfig:
+          baselineOcpuUtilization: null
+          gpuDescription: null
+          gpus: 0
+          localDiskDescription: null
+          localDisks: 0
+          localDisksTotalSizeInGBs: null
+          maxVnicAttachments: 2
+          memoryInGBs: 1.0
+          networkingBandwidthInGbps: 1.0
+          ocpus: 1.0
+          processorDescription: "2.25 GHz AMD EPYC\u2122 7742 (Rome)"
+          vcpus: 2
+        sourceDetails:
+          bootVolumeSizeInGBs: null
+          bootVolumeVpusPerGB: null
+          imageId: ocid1.image.oc1..<unique_ID>
+          instanceSourceImageFilterDetails: null
+          kmsKeyId: null
+          sourceType: image
+        systemTags: {}
+        timeCreated: '2023-06-15T04:59:26.180Z'
+        timeMaintenanceRebootDue: null
+        timeStopScheduled: null
+      - agentConfig:
+          areAllPluginsDisabled: false
+          isManagementDisabled: false
+          isMonitoringDisabled: false
+          pluginsConfig: null
+        availabilityConfig:
+          isLiveMigrationPreferred: null
+          recoveryAction: RESTORE_INSTANCE
+        availabilityDomain: NQNU:US-ASHBURN-AD-1
+        capacityReservationId: null
+        compartmentId: ocid1.compartment.oc1..<unique_ID>
+        dedicatedVmHostId: null
+        definedTags:
+          Oracle-Tags:
+            CreatedBy: user@example.com
+            CreatedOn: '2023-06-15T05:09:37.368Z'
+        displayName: instance20230615050937
+        extendedMetadata: {}
+        faultDomain: FAULT-DOMAIN-1
+        freeformTags:
+          Project: CNCF
+        id: ocid1.instance.oc1..<unique_ID>
+        imageId: ocid1.image.oc1..<unique_ID>
+        instanceConfigurationId: null
+        instanceOptions:
+          areLegacyImdsEndpointsDisabled: false
+        ipxeScript: null
+        isCrossNumaNode: false
+        launchMode: NATIVE
+        launchOptions:
+          bootVolumeType: PARAVIRTUALIZED
+          firmware: UEFI_64
+          isConsistentVolumeNamingEnabled: true
+          isPvEncryptionInTransitEnabled: false
+          networkType: PARAVIRTUALIZED
+          remoteDataVolumeType: PARAVIRTUALIZED
+        lifecycleState: TERMINATED
+        platformConfig: null
+        preemptibleInstanceConfig: null
+        preferredMaintenanceAction: null
+        region: iad
+        shape: VM.Standard.E3.Flex
+        shapeConfig:
+          baselineOcpuUtilization: null
+          gpuDescription: null
+          gpus: 0
+          localDiskDescription: null
+          localDisks: 0
+          localDisksTotalSizeInGBs: null
+          maxVnicAttachments: 2
+          memoryInGBs: 1.0
+          networkingBandwidthInGbps: 1.0
+          ocpus: 1.0
+          processorDescription: "2.25 GHz AMD EPYC\u2122 7742 (Rome)"
+          vcpus: 2
+        sourceDetails:
+          bootVolumeSizeInGBs: null
+          bootVolumeVpusPerGB: null
+          imageId: ocid1.image.oc1..<unique_ID>
+          instanceSourceImageFilterDetails: null
+          kmsKeyId: null
+          sourceType: image
+        systemTags: {}
+        timeCreated: '2023-06-15T05:09:37.942Z'
+        timeMaintenanceRebootDue: null
+        timeStopScheduled: null
+      - agentConfig:
+          areAllPluginsDisabled: false
+          isManagementDisabled: false
+          isMonitoringDisabled: false
+          pluginsConfig: null
+        availabilityConfig:
+          isLiveMigrationPreferred: null
+          recoveryAction: RESTORE_INSTANCE
+        availabilityDomain: NQNU:US-ASHBURN-AD-1
+        capacityReservationId: null
+        compartmentId: ocid1.compartment.oc1..<unique_ID>
+        dedicatedVmHostId: null
+        definedTags:
+          Oracle-Tags:
+            CreatedBy: user@example.com
+            CreatedOn: '2023-06-15T05:20:58.247Z'
+        displayName: instance20230615052058
+        extendedMetadata: {}
+        faultDomain: FAULT-DOMAIN-1
+        freeformTags:
+          Project: CNCF
+        id: ocid1.instance.oc1..<unique_ID>
+        imageId: ocid1.image.oc1..<unique_ID>
+        instanceConfigurationId: null
+        instanceOptions:
+          areLegacyImdsEndpointsDisabled: false
+        ipxeScript: null
+        isCrossNumaNode: false
+        launchMode: NATIVE
+        launchOptions:
+          bootVolumeType: PARAVIRTUALIZED
+          firmware: UEFI_64
+          isConsistentVolumeNamingEnabled: true
+          isPvEncryptionInTransitEnabled: false
+          networkType: PARAVIRTUALIZED
+          remoteDataVolumeType: PARAVIRTUALIZED
+        lifecycleState: TERMINATED
+        platformConfig: null
+        preemptibleInstanceConfig: null
+        preferredMaintenanceAction: null
+        region: iad
+        shape: VM.Standard.E3.Flex
+        shapeConfig:
+          baselineOcpuUtilization: null
+          gpuDescription: null
+          gpus: 0
+          localDiskDescription: null
+          localDisks: 0
+          localDisksTotalSizeInGBs: null
+          maxVnicAttachments: 2
+          memoryInGBs: 1.0
+          networkingBandwidthInGbps: 1.0
+          ocpus: 1.0
+          processorDescription: "2.25 GHz AMD EPYC\u2122 7742 (Rome)"
+          vcpus: 2
+        sourceDetails:
+          bootVolumeSizeInGBs: null
+          bootVolumeVpusPerGB: null
+          imageId: ocid1.image.oc1..<unique_ID>
+          instanceSourceImageFilterDetails: null
+          kmsKeyId: null
+          sourceType: image
+        systemTags: {}
+        timeCreated: '2023-06-15T05:20:58.849Z'
+        timeMaintenanceRebootDue: null
+        timeStopScheduled: null
+      - agentConfig:
+          areAllPluginsDisabled: false
+          isManagementDisabled: false
+          isMonitoringDisabled: false
+          pluginsConfig: null
+        availabilityConfig:
+          isLiveMigrationPreferred: null
+          recoveryAction: RESTORE_INSTANCE
+        availabilityDomain: NQNU:US-ASHBURN-AD-1
+        capacityReservationId: null
+        compartmentId: ocid1.compartment.oc1..<unique_ID>
+        dedicatedVmHostId: null
+        definedTags:
+          Oracle-Tags:
+            CreatedBy: user@example.com
+            CreatedOn: '2023-06-15T05:25:52.768Z'
+        displayName: instance20230615052553
+        extendedMetadata: {}
+        faultDomain: FAULT-DOMAIN-1
+        freeformTags:
+          Project: CNCF
+        id: ocid1.instance.oc1..<unique_ID>
+        imageId: ocid1.image.oc1..<unique_ID>
+        instanceConfigurationId: null
+        instanceOptions:
+          areLegacyImdsEndpointsDisabled: false
+        ipxeScript: null
+        isCrossNumaNode: false
+        launchMode: NATIVE
+        launchOptions:
+          bootVolumeType: PARAVIRTUALIZED
+          firmware: UEFI_64
+          isConsistentVolumeNamingEnabled: true
+          isPvEncryptionInTransitEnabled: false
+          networkType: PARAVIRTUALIZED
+          remoteDataVolumeType: PARAVIRTUALIZED
+        lifecycleState: TERMINATED
+        platformConfig: null
+        preemptibleInstanceConfig: null
+        preferredMaintenanceAction: null
+        region: iad
+        shape: VM.Standard.E3.Flex
+        shapeConfig:
+          baselineOcpuUtilization: null
+          gpuDescription: null
+          gpus: 0
+          localDiskDescription: null
+          localDisks: 0
+          localDisksTotalSizeInGBs: null
+          maxVnicAttachments: 2
+          memoryInGBs: 1.0
+          networkingBandwidthInGbps: 1.0
+          ocpus: 1.0
+          processorDescription: "2.25 GHz AMD EPYC\u2122 7742 (Rome)"
+          vcpus: 2
+        sourceDetails:
+          bootVolumeSizeInGBs: null
+          bootVolumeVpusPerGB: null
+          imageId: ocid1.image.oc1..<unique_ID>
+          instanceSourceImageFilterDetails: null
+          kmsKeyId: null
+          sourceType: image
+        systemTags: {}
+        timeCreated: '2023-06-15T05:25:53.938Z'
+        timeMaintenanceRebootDue: null
+        timeStopScheduled: null
+      - agentConfig:
+          areAllPluginsDisabled: false
+          isManagementDisabled: false
+          isMonitoringDisabled: false
+          pluginsConfig: null
+        availabilityConfig:
+          isLiveMigrationPreferred: null
+          recoveryAction: RESTORE_INSTANCE
+        availabilityDomain: NQNU:US-ASHBURN-AD-1
+        capacityReservationId: null
+        compartmentId: ocid1.compartment.oc1..<unique_ID>
+        dedicatedVmHostId: null
+        definedTags:
+          Oracle-Tags:
+            CreatedBy: user@example.com
+            CreatedOn: '2023-06-15T05:39:11.923Z'
+        displayName: instance20230615053912
+        extendedMetadata: {}
+        faultDomain: FAULT-DOMAIN-1
+        freeformTags:
+          Project: CNCF
+        id: ocid1.instance.oc1..<unique_ID>
+        imageId: ocid1.image.oc1..<unique_ID>
+        instanceConfigurationId: null
+        instanceOptions:
+          areLegacyImdsEndpointsDisabled: false
+        ipxeScript: null
+        isCrossNumaNode: false
+        launchMode: NATIVE
+        launchOptions:
+          bootVolumeType: PARAVIRTUALIZED
+          firmware: UEFI_64
+          isConsistentVolumeNamingEnabled: true
+          isPvEncryptionInTransitEnabled: false
+          networkType: PARAVIRTUALIZED
+          remoteDataVolumeType: PARAVIRTUALIZED
+        lifecycleState: TERMINATED
+        platformConfig: null
+        preemptibleInstanceConfig: null
+        preferredMaintenanceAction: null
+        region: iad
+        shape: VM.Standard.E3.Flex
+        shapeConfig:
+          baselineOcpuUtilization: null
+          gpuDescription: null
+          gpus: 0
+          localDiskDescription: null
+          localDisks: 0
+          localDisksTotalSizeInGBs: null
+          maxVnicAttachments: 2
+          memoryInGBs: 1.0
+          networkingBandwidthInGbps: 1.0
+          ocpus: 1.0
+          processorDescription: "2.25 GHz AMD EPYC\u2122 7742 (Rome)"
+          vcpus: 2
+        sourceDetails:
+          bootVolumeSizeInGBs: null
+          bootVolumeVpusPerGB: null
+          imageId: ocid1.image.oc1..<unique_ID>
+          instanceSourceImageFilterDetails: null
+          kmsKeyId: null
+          sourceType: image
+        systemTags: {}
+        timeCreated: '2023-06-15T05:39:12.655Z'
+        timeMaintenanceRebootDue: null
+        timeStopScheduled: null
+      - agentConfig:
+          areAllPluginsDisabled: false
+          isManagementDisabled: false
+          isMonitoringDisabled: false
+          pluginsConfig:
+          - desiredState: ENABLED
+            name: Management Agent
+        availabilityConfig:
+          isLiveMigrationPreferred: null
+          recoveryAction: RESTORE_INSTANCE
+        availabilityDomain: NQNU:US-ASHBURN-AD-1
+        capacityReservationId: null
+        compartmentId: ocid1.compartment.oc1..<unique_ID>
+        dedicatedVmHostId: null
+        definedTags:
+          Oracle-Tags:
+            CreatedBy: user@example.com
+            CreatedOn: '2023-06-15T05:55:09.682Z'
+        displayName: instance20230615055510
+        extendedMetadata: {}
+        faultDomain: FAULT-DOMAIN-1
+        freeformTags:
+          Project: CNCF
+        id: ocid1.instance.oc1..<unique_ID>
+        imageId: ocid1.image.oc1..<unique_ID>
+        instanceConfigurationId: null
+        instanceOptions:
+          areLegacyImdsEndpointsDisabled: false
+        ipxeScript: null
+        isCrossNumaNode: false
+        launchMode: NATIVE
+        launchOptions:
+          bootVolumeType: PARAVIRTUALIZED
+          firmware: UEFI_64
+          isConsistentVolumeNamingEnabled: true
+          isPvEncryptionInTransitEnabled: false
+          networkType: PARAVIRTUALIZED
+          remoteDataVolumeType: PARAVIRTUALIZED
+        lifecycleState: TERMINATED
+        platformConfig: null
+        preemptibleInstanceConfig: null
+        preferredMaintenanceAction: null
+        region: iad
+        shape: VM.Standard.E3.Flex
+        shapeConfig:
+          baselineOcpuUtilization: null
+          gpuDescription: null
+          gpus: 0
+          localDiskDescription: null
+          localDisks: 0
+          localDisksTotalSizeInGBs: null
+          maxVnicAttachments: 2
+          memoryInGBs: 1.0
+          networkingBandwidthInGbps: 1.0
+          ocpus: 1.0
+          processorDescription: "2.25 GHz AMD EPYC\u2122 7742 (Rome)"
+          vcpus: 2
+        sourceDetails:
+          bootVolumeSizeInGBs: null
+          bootVolumeVpusPerGB: null
+          imageId: ocid1.image.oc1..<unique_ID>
+          instanceSourceImageFilterDetails: null
+          kmsKeyId: null
+          sourceType: image
+        systemTags: {}
+        timeCreated: '2023-06-15T05:55:10.303Z'
+        timeMaintenanceRebootDue: null
+        timeStopScheduled: null
+      - agentConfig:
+          areAllPluginsDisabled: false
+          isManagementDisabled: false
+          isMonitoringDisabled: false
+          pluginsConfig: null
+        availabilityConfig:
+          isLiveMigrationPreferred: null
+          recoveryAction: RESTORE_INSTANCE
+        availabilityDomain: NQNU:US-ASHBURN-AD-1
+        capacityReservationId: null
+        compartmentId: ocid1.compartment.oc1..<unique_ID>
+        dedicatedVmHostId: null
+        definedTags:
+          Oracle-Tags:
+            CreatedBy: user@example.com
+            CreatedOn: '2023-06-15T06:32:02.457Z'
+        displayName: instance20230615063202
+        extendedMetadata: {}
+        faultDomain: FAULT-DOMAIN-1
+        freeformTags:
+          Project: CNCF
+        id: ocid1.instance.oc1..<unique_ID>
+        imageId: ocid1.image.oc1..<unique_ID>
+        instanceConfigurationId: null
+        instanceOptions:
+          areLegacyImdsEndpointsDisabled: false
+        ipxeScript: null
+        isCrossNumaNode: false
+        launchMode: PARAVIRTUALIZED
+        launchOptions:
+          bootVolumeType: PARAVIRTUALIZED
+          firmware: UEFI_64
+          isConsistentVolumeNamingEnabled: true
+          isPvEncryptionInTransitEnabled: false
+          networkType: PARAVIRTUALIZED
+          remoteDataVolumeType: PARAVIRTUALIZED
+        lifecycleState: TERMINATED
+        platformConfig: null
+        preemptibleInstanceConfig: null
+        preferredMaintenanceAction: null
+        region: iad
+        shape: VM.Standard.E3.Flex
+        shapeConfig:
+          baselineOcpuUtilization: null
+          gpuDescription: null
+          gpus: 0
+          localDiskDescription: null
+          localDisks: 0
+          localDisksTotalSizeInGBs: null
+          maxVnicAttachments: 2
+          memoryInGBs: 1.0
+          networkingBandwidthInGbps: 1.0
+          ocpus: 1.0
+          processorDescription: "2.25 GHz AMD EPYC\u2122 7742 (Rome)"
+          vcpus: 2
+        sourceDetails:
+          bootVolumeSizeInGBs: null
+          bootVolumeVpusPerGB: null
+          imageId: ocid1.image.oc1..<unique_ID>
+          instanceSourceImageFilterDetails: null
+          kmsKeyId: null
+          sourceType: image
+        systemTags: {}
+        timeCreated: '2023-06-15T06:32:02.999Z'
+        timeMaintenanceRebootDue: null
+        timeStopScheduled: null
+      - agentConfig:
+          areAllPluginsDisabled: false
+          isManagementDisabled: false
+          isMonitoringDisabled: false
+          pluginsConfig:
+          - desiredState: ENABLED
+            name: Management Agent
+        availabilityConfig:
+          isLiveMigrationPreferred: null
+          recoveryAction: RESTORE_INSTANCE
+        availabilityDomain: NQNU:US-ASHBURN-AD-1
+        capacityReservationId: null
+        compartmentId: ocid1.compartment.oc1..<unique_ID>
+        dedicatedVmHostId: null
+        definedTags:
+          Oracle-Tags:
+            CreatedBy: user@example.com
+            CreatedOn: '2023-06-15T07:20:25.125Z'
+        displayName: instance20230615072025
+        extendedMetadata: {}
+        faultDomain: FAULT-DOMAIN-1
+        freeformTags:
+          Project: CNCF
+        id: ocid1.instance.oc1..<unique_ID>
+        imageId: ocid1.image.oc1..<unique_ID>
+        instanceConfigurationId: null
+        instanceOptions:
+          areLegacyImdsEndpointsDisabled: false
+        ipxeScript: null
+        isCrossNumaNode: false
+        launchMode: PARAVIRTUALIZED
+        launchOptions:
+          bootVolumeType: PARAVIRTUALIZED
+          firmware: UEFI_64
+          isConsistentVolumeNamingEnabled: true
+          isPvEncryptionInTransitEnabled: false
+          networkType: PARAVIRTUALIZED
+          remoteDataVolumeType: PARAVIRTUALIZED
+        lifecycleState: TERMINATED
+        platformConfig: null
+        preemptibleInstanceConfig: null
+        preferredMaintenanceAction: null
+        region: iad
+        shape: VM.Standard.E3.Flex
+        shapeConfig:
+          baselineOcpuUtilization: null
+          gpuDescription: null
+          gpus: 0
+          localDiskDescription: null
+          localDisks: 0
+          localDisksTotalSizeInGBs: null
+          maxVnicAttachments: 2
+          memoryInGBs: 1.0
+          networkingBandwidthInGbps: 1.0
+          ocpus: 1.0
+          processorDescription: "2.25 GHz AMD EPYC\u2122 7742 (Rome)"
+          vcpus: 2
+        sourceDetails:
+          bootVolumeSizeInGBs: null
+          bootVolumeVpusPerGB: null
+          imageId: ocid1.image.oc1..<unique_ID>
+          instanceSourceImageFilterDetails: null
+          kmsKeyId: null
+          sourceType: image
+        systemTags: {}
+        timeCreated: '2023-06-15T07:20:25.684Z'
+        timeMaintenanceRebootDue: null
+        timeStopScheduled: null
+      - agentConfig:
+          areAllPluginsDisabled: false
+          isManagementDisabled: false
+          isMonitoringDisabled: false
+          pluginsConfig:
+          - desiredState: ENABLED
+            name: Management Agent
+        availabilityConfig:
+          isLiveMigrationPreferred: null
+          recoveryAction: RESTORE_INSTANCE
+        availabilityDomain: NQNU:US-ASHBURN-AD-1
+        capacityReservationId: null
+        compartmentId: ocid1.compartment.oc1..<unique_ID>
+        dedicatedVmHostId: null
+        definedTags:
+          Oracle-Tags:
+            CreatedBy: user@example.com
+            CreatedOn: '2023-06-15T08:47:54.602Z'
+        displayName: instance20230615084755
+        extendedMetadata: {}
+        faultDomain: FAULT-DOMAIN-1
+        freeformTags:
+          Project: CNCF
+        id: ocid1.instance.oc1..<unique_ID>
+        imageId: ocid1.image.oc1..<unique_ID>
+        instanceConfigurationId: null
+        instanceOptions:
+          areLegacyImdsEndpointsDisabled: false
+        ipxeScript: null
+        isCrossNumaNode: false
+        launchMode: PARAVIRTUALIZED
+        launchOptions:
+          bootVolumeType: PARAVIRTUALIZED
+          firmware: UEFI_64
+          isConsistentVolumeNamingEnabled: true
+          isPvEncryptionInTransitEnabled: false
+          networkType: PARAVIRTUALIZED
+          remoteDataVolumeType: PARAVIRTUALIZED
+        lifecycleState: TERMINATED
+        platformConfig: null
+        preemptibleInstanceConfig: null
+        preferredMaintenanceAction: null
+        region: iad
+        shape: VM.Standard.E3.Flex
+        shapeConfig:
+          baselineOcpuUtilization: null
+          gpuDescription: null
+          gpus: 0
+          localDiskDescription: null
+          localDisks: 0
+          localDisksTotalSizeInGBs: null
+          maxVnicAttachments: 2
+          memoryInGBs: 1.0
+          networkingBandwidthInGbps: 1.0
+          ocpus: 1.0
+          processorDescription: "2.25 GHz AMD EPYC\u2122 7742 (Rome)"
+          vcpus: 2
+        sourceDetails:
+          bootVolumeSizeInGBs: null
+          bootVolumeVpusPerGB: null
+          imageId: ocid1.image.oc1..<unique_ID>
+          instanceSourceImageFilterDetails: null
+          kmsKeyId: null
+          sourceType: image
+        systemTags: {}
+        timeCreated: '2023-06-15T08:47:55.152Z'
+        timeMaintenanceRebootDue: null
+        timeStopScheduled: null
+      - agentConfig:
+          areAllPluginsDisabled: false
+          isManagementDisabled: false
+          isMonitoringDisabled: false
+          pluginsConfig: null
+        availabilityConfig:
+          isLiveMigrationPreferred: null
+          recoveryAction: RESTORE_INSTANCE
+        availabilityDomain: NQNU:US-ASHBURN-AD-1
+        capacityReservationId: null
+        compartmentId: ocid1.compartment.oc1..<unique_ID>
+        dedicatedVmHostId: null
+        definedTags:
+          Oracle-Tags:
+            CreatedBy: user@example.com
+            CreatedOn: '2023-06-15T09:04:29.026Z'
+        displayName: instance20230615090429
+        extendedMetadata: {}
+        faultDomain: FAULT-DOMAIN-1
+        freeformTags:
+          Project: CNCF
+        id: ocid1.instance.oc1..<unique_ID>
+        imageId: ocid1.image.oc1..<unique_ID>
+        instanceConfigurationId: null
+        instanceOptions:
+          areLegacyImdsEndpointsDisabled: false
+        ipxeScript: null
+        isCrossNumaNode: false
+        launchMode: PARAVIRTUALIZED
+        launchOptions:
+          bootVolumeType: PARAVIRTUALIZED
+          firmware: UEFI_64
+          isConsistentVolumeNamingEnabled: true
+          isPvEncryptionInTransitEnabled: false
+          networkType: PARAVIRTUALIZED
+          remoteDataVolumeType: PARAVIRTUALIZED
+        lifecycleState: TERMINATED
+        platformConfig: null
+        preemptibleInstanceConfig: null
+        preferredMaintenanceAction: null
+        region: iad
+        shape: VM.Standard.E3.Flex
+        shapeConfig:
+          baselineOcpuUtilization: null
+          gpuDescription: null
+          gpus: 0
+          localDiskDescription: null
+          localDisks: 0
+          localDisksTotalSizeInGBs: null
+          maxVnicAttachments: 2
+          memoryInGBs: 1.0
+          networkingBandwidthInGbps: 1.0
+          ocpus: 1.0
+          processorDescription: "2.25 GHz AMD EPYC\u2122 7742 (Rome)"
+          vcpus: 2
+        sourceDetails:
+          bootVolumeSizeInGBs: null
+          bootVolumeVpusPerGB: null
+          imageId: ocid1.image.oc1..<unique_ID>
+          instanceSourceImageFilterDetails: null
+          kmsKeyId: null
+          sourceType: image
+        systemTags: {}
+        timeCreated: '2023-06-15T09:04:29.863Z'
+        timeMaintenanceRebootDue: null
+        timeStopScheduled: null
+      - agentConfig:
+          areAllPluginsDisabled: false
+          isManagementDisabled: false
+          isMonitoringDisabled: false
+          pluginsConfig: null
+        availabilityConfig:
+          isLiveMigrationPreferred: null
+          recoveryAction: RESTORE_INSTANCE
+        availabilityDomain: NQNU:US-ASHBURN-AD-1
+        capacityReservationId: null
+        compartmentId: ocid1.compartment.oc1..<unique_ID>
+        dedicatedVmHostId: null
+        definedTags:
+          Oracle-Tags:
+            CreatedBy: user@example.com
+            CreatedOn: '2023-06-15T09:25:37.577Z'
+        displayName: instance20230615092538
+        extendedMetadata: {}
+        faultDomain: FAULT-DOMAIN-1
+        freeformTags:
+          Project: CNCF
+        id: ocid1.instance.oc1..<unique_ID>
+        imageId: ocid1.image.oc1..<unique_ID>
+        instanceConfigurationId: null
+        instanceOptions:
+          areLegacyImdsEndpointsDisabled: false
+        ipxeScript: null
+        isCrossNumaNode: false
+        launchMode: PARAVIRTUALIZED
+        launchOptions:
+          bootVolumeType: PARAVIRTUALIZED
+          firmware: UEFI_64
+          isConsistentVolumeNamingEnabled: true
+          isPvEncryptionInTransitEnabled: false
+          networkType: PARAVIRTUALIZED
+          remoteDataVolumeType: PARAVIRTUALIZED
+        lifecycleState: TERMINATED
+        platformConfig: null
+        preemptibleInstanceConfig: null
+        preferredMaintenanceAction: null
+        region: iad
+        shape: VM.Standard.E3.Flex
+        shapeConfig:
+          baselineOcpuUtilization: null
+          gpuDescription: null
+          gpus: 0
+          localDiskDescription: null
+          localDisks: 0
+          localDisksTotalSizeInGBs: null
+          maxVnicAttachments: 2
+          memoryInGBs: 1.0
+          networkingBandwidthInGbps: 1.0
+          ocpus: 1.0
+          processorDescription: "2.25 GHz AMD EPYC\u2122 7742 (Rome)"
+          vcpus: 2
+        sourceDetails:
+          bootVolumeSizeInGBs: null
+          bootVolumeVpusPerGB: null
+          imageId: ocid1.image.oc1..<unique_ID>
+          instanceSourceImageFilterDetails: null
+          kmsKeyId: null
+          sourceType: image
+        systemTags: {}
+        timeCreated: '2023-06-15T09:25:38.098Z'
+        timeMaintenanceRebootDue: null
+        timeStopScheduled: null
+      - agentConfig:
+          areAllPluginsDisabled: false
+          isManagementDisabled: false
+          isMonitoringDisabled: false
+          pluginsConfig:
+          - desiredState: ENABLED
+            name: Management Agent
+        availabilityConfig:
+          isLiveMigrationPreferred: null
+          recoveryAction: RESTORE_INSTANCE
+        availabilityDomain: NQNU:US-ASHBURN-AD-1
+        capacityReservationId: null
+        compartmentId: ocid1.compartment.oc1..<unique_ID>
+        dedicatedVmHostId: null
+        definedTags:
+          Oracle-Tags:
+            CreatedBy: user@example.com
+            CreatedOn: '2023-06-15T09:34:40.265Z'
+        displayName: instance20230615093440
+        extendedMetadata: {}
+        faultDomain: FAULT-DOMAIN-1
+        freeformTags:
+          Environment: Production
+        id: ocid1.instance.oc1..<unique_ID>
+        imageId: ocid1.image.oc1..<unique_ID>
+        instanceConfigurationId: null
+        instanceOptions:
+          areLegacyImdsEndpointsDisabled: false
+        ipxeScript: null
+        isCrossNumaNode: false
+        launchMode: PARAVIRTUALIZED
+        launchOptions:
+          bootVolumeType: PARAVIRTUALIZED
+          firmware: UEFI_64
+          isConsistentVolumeNamingEnabled: true
+          isPvEncryptionInTransitEnabled: false
+          networkType: PARAVIRTUALIZED
+          remoteDataVolumeType: PARAVIRTUALIZED
+        lifecycleState: TERMINATED
+        platformConfig: null
+        preemptibleInstanceConfig: null
+        preferredMaintenanceAction: null
+        region: iad
+        shape: VM.Standard.E3.Flex
+        shapeConfig:
+          baselineOcpuUtilization: null
+          gpuDescription: null
+          gpus: 0
+          localDiskDescription: null
+          localDisks: 0
+          localDisksTotalSizeInGBs: null
+          maxVnicAttachments: 2
+          memoryInGBs: 1.0
+          networkingBandwidthInGbps: 1.0
+          ocpus: 1.0
+          processorDescription: "2.25 GHz AMD EPYC\u2122 7742 (Rome)"
+          vcpus: 2
+        sourceDetails:
+          bootVolumeSizeInGBs: null
+          bootVolumeVpusPerGB: null
+          imageId: ocid1.image.oc1..<unique_ID>
+          instanceSourceImageFilterDetails: null
+          kmsKeyId: null
+          sourceType: image
+        systemTags: {}
+        timeCreated: '2023-06-15T09:34:40.927Z'
+        timeMaintenanceRebootDue: null
+        timeStopScheduled: null
+      - agentConfig:
+          areAllPluginsDisabled: false
+          isManagementDisabled: false
+          isMonitoringDisabled: false
+          pluginsConfig: null
+        availabilityConfig:
+          isLiveMigrationPreferred: null
+          recoveryAction: RESTORE_INSTANCE
+        availabilityDomain: NQNU:US-ASHBURN-AD-1
+        capacityReservationId: null
+        compartmentId: ocid1.compartment.oc1..<unique_ID>
+        dedicatedVmHostId: null
+        definedTags:
+          Oracle-Tags:
+            CreatedBy: user@example.com
+            CreatedOn: '2023-06-15T09:40:31.156Z'
+        displayName: instance20230615094031
+        extendedMetadata: {}
+        faultDomain: FAULT-DOMAIN-1
+        freeformTags:
+          Environment: Production
+        id: ocid1.instance.oc1..<unique_ID>
+        imageId: ocid1.image.oc1..<unique_ID>
+        instanceConfigurationId: null
+        instanceOptions:
+          areLegacyImdsEndpointsDisabled: false
+        ipxeScript: null
+        isCrossNumaNode: false
+        launchMode: PARAVIRTUALIZED
+        launchOptions:
+          bootVolumeType: PARAVIRTUALIZED
+          firmware: UEFI_64
+          isConsistentVolumeNamingEnabled: true
+          isPvEncryptionInTransitEnabled: false
+          networkType: PARAVIRTUALIZED
+          remoteDataVolumeType: PARAVIRTUALIZED
+        lifecycleState: TERMINATED
+        platformConfig: null
+        preemptibleInstanceConfig: null
+        preferredMaintenanceAction: null
+        region: iad
+        shape: VM.Standard.E3.Flex
+        shapeConfig:
+          baselineOcpuUtilization: null
+          gpuDescription: null
+          gpus: 0
+          localDiskDescription: null
+          localDisks: 0
+          localDisksTotalSizeInGBs: null
+          maxVnicAttachments: 2
+          memoryInGBs: 1.0
+          networkingBandwidthInGbps: 1.0
+          ocpus: 1.0
+          processorDescription: "2.25 GHz AMD EPYC\u2122 7742 (Rome)"
+          vcpus: 2
+        sourceDetails:
+          bootVolumeSizeInGBs: null
+          bootVolumeVpusPerGB: null
+          imageId: ocid1.image.oc1..<unique_ID>
+          instanceSourceImageFilterDetails: null
+          kmsKeyId: null
+          sourceType: image
+        systemTags: {}
+        timeCreated: '2023-06-15T09:40:31.774Z'
+        timeMaintenanceRebootDue: null
+        timeStopScheduled: null
+      - agentConfig:
+          areAllPluginsDisabled: false
+          isManagementDisabled: false
+          isMonitoringDisabled: false
+          pluginsConfig: null
+        availabilityConfig:
+          isLiveMigrationPreferred: null
+          recoveryAction: RESTORE_INSTANCE
+        availabilityDomain: NQNU:US-ASHBURN-AD-1
+        capacityReservationId: null
+        compartmentId: ocid1.compartment.oc1..<unique_ID>
+        dedicatedVmHostId: null
+        definedTags:
+          Oracle-Tags:
+            CreatedBy: user@example.com
+            CreatedOn: '2023-06-15T09:52:16.999Z'
+        displayName: instance20230615095217
+        extendedMetadata: {}
+        faultDomain: FAULT-DOMAIN-1
+        freeformTags:
+          Environment: Production
+        id: ocid1.instance.oc1..<unique_ID>
+        imageId: ocid1.image.oc1..<unique_ID>
+        instanceConfigurationId: null
+        instanceOptions:
+          areLegacyImdsEndpointsDisabled: false
+        ipxeScript: null
+        isCrossNumaNode: false
+        launchMode: PARAVIRTUALIZED
+        launchOptions:
+          bootVolumeType: PARAVIRTUALIZED
+          firmware: UEFI_64
+          isConsistentVolumeNamingEnabled: true
+          isPvEncryptionInTransitEnabled: false
+          networkType: PARAVIRTUALIZED
+          remoteDataVolumeType: PARAVIRTUALIZED
+        lifecycleState: TERMINATED
+        platformConfig: null
+        preemptibleInstanceConfig: null
+        preferredMaintenanceAction: null
+        region: iad
+        shape: VM.Standard.E3.Flex
+        shapeConfig:
+          baselineOcpuUtilization: null
+          gpuDescription: null
+          gpus: 0
+          localDiskDescription: null
+          localDisks: 0
+          localDisksTotalSizeInGBs: null
+          maxVnicAttachments: 2
+          memoryInGBs: 1.0
+          networkingBandwidthInGbps: 1.0
+          ocpus: 1.0
+          processorDescription: "2.25 GHz AMD EPYC\u2122 7742 (Rome)"
+          vcpus: 2
+        sourceDetails:
+          bootVolumeSizeInGBs: null
+          bootVolumeVpusPerGB: null
+          imageId: ocid1.image.oc1..<unique_ID>
+          instanceSourceImageFilterDetails: null
+          kmsKeyId: null
+          sourceType: image
+        systemTags: {}
+        timeCreated: '2023-06-15T09:52:17.629Z'
+        timeMaintenanceRebootDue: null
+        timeStopScheduled: null
+      - agentConfig:
+          areAllPluginsDisabled: false
+          isManagementDisabled: false
+          isMonitoringDisabled: false
+          pluginsConfig: null
+        availabilityConfig:
+          isLiveMigrationPreferred: null
+          recoveryAction: RESTORE_INSTANCE
+        availabilityDomain: NQNU:US-ASHBURN-AD-1
+        capacityReservationId: null
+        compartmentId: ocid1.compartment.oc1..<unique_ID>
+        dedicatedVmHostId: null
+        definedTags:
+          Oracle-Tags:
+            CreatedBy: user@example.com
+            CreatedOn: '2023-06-15T09:55:35.970Z'
+        displayName: instance20230615095536
+        extendedMetadata: {}
+        faultDomain: FAULT-DOMAIN-1
+        freeformTags:
+          Project: CNCF
+        id: ocid1.instance.oc1..<unique_ID>
+        imageId: ocid1.image.oc1..<unique_ID>
+        instanceConfigurationId: null
+        instanceOptions:
+          areLegacyImdsEndpointsDisabled: false
+        ipxeScript: null
+        isCrossNumaNode: false
+        launchMode: PARAVIRTUALIZED
+        launchOptions:
+          bootVolumeType: PARAVIRTUALIZED
+          firmware: UEFI_64
+          isConsistentVolumeNamingEnabled: true
+          isPvEncryptionInTransitEnabled: false
+          networkType: PARAVIRTUALIZED
+          remoteDataVolumeType: PARAVIRTUALIZED
+        lifecycleState: TERMINATED
+        platformConfig: null
+        preemptibleInstanceConfig: null
+        preferredMaintenanceAction: null
+        region: iad
+        shape: VM.Standard.E3.Flex
+        shapeConfig:
+          baselineOcpuUtilization: null
+          gpuDescription: null
+          gpus: 0
+          localDiskDescription: null
+          localDisks: 0
+          localDisksTotalSizeInGBs: null
+          maxVnicAttachments: 2
+          memoryInGBs: 1.0
+          networkingBandwidthInGbps: 1.0
+          ocpus: 1.0
+          processorDescription: "2.25 GHz AMD EPYC\u2122 7742 (Rome)"
+          vcpus: 2
+        sourceDetails:
+          bootVolumeSizeInGBs: null
+          bootVolumeVpusPerGB: null
+          imageId: ocid1.image.oc1..<unique_ID>
+          instanceSourceImageFilterDetails: null
+          kmsKeyId: null
+          sourceType: image
+        systemTags: {}
+        timeCreated: '2023-06-15T09:55:36.465Z'
+        timeMaintenanceRebootDue: null
+        timeStopScheduled: null
+      - agentConfig:
+          areAllPluginsDisabled: false
+          isManagementDisabled: false
+          isMonitoringDisabled: false
+          pluginsConfig:
+          - desiredState: ENABLED
+            name: Management Agent
+        availabilityConfig:
+          isLiveMigrationPreferred: null
+          recoveryAction: RESTORE_INSTANCE
+        availabilityDomain: NQNU:US-ASHBURN-AD-1
+        capacityReservationId: null
+        compartmentId: ocid1.compartment.oc1..<unique_ID>
+        dedicatedVmHostId: null
+        definedTags:
+          Oracle-Tags:
+            CreatedBy: user@example.com
+            CreatedOn: '2023-06-15T10:04:13.967Z'
+        displayName: instance20230615100414
+        extendedMetadata: {}
+        faultDomain: FAULT-DOMAIN-1
+        freeformTags:
+          Project: CNCF
+        id: ocid1.instance.oc1..<unique_ID>
+        imageId: ocid1.image.oc1..<unique_ID>
+        instanceConfigurationId: null
+        instanceOptions:
+          areLegacyImdsEndpointsDisabled: false
+        ipxeScript: null
+        isCrossNumaNode: false
+        launchMode: PARAVIRTUALIZED
+        launchOptions:
+          bootVolumeType: PARAVIRTUALIZED
+          firmware: UEFI_64
+          isConsistentVolumeNamingEnabled: true
+          isPvEncryptionInTransitEnabled: false
+          networkType: PARAVIRTUALIZED
+          remoteDataVolumeType: PARAVIRTUALIZED
+        lifecycleState: TERMINATED
+        platformConfig: null
+        preemptibleInstanceConfig: null
+        preferredMaintenanceAction: null
+        region: iad
+        shape: VM.Standard.E3.Flex
+        shapeConfig:
+          baselineOcpuUtilization: null
+          gpuDescription: null
+          gpus: 0
+          localDiskDescription: null
+          localDisks: 0
+          localDisksTotalSizeInGBs: null
+          maxVnicAttachments: 2
+          memoryInGBs: 1.0
+          networkingBandwidthInGbps: 1.0
+          ocpus: 1.0
+          processorDescription: "2.25 GHz AMD EPYC\u2122 7742 (Rome)"
+          vcpus: 2
+        sourceDetails:
+          bootVolumeSizeInGBs: null
+          bootVolumeVpusPerGB: null
+          imageId: ocid1.image.oc1..<unique_ID>
+          instanceSourceImageFilterDetails: null
+          kmsKeyId: null
+          sourceType: image
+        systemTags: {}
+        timeCreated: '2023-06-15T10:04:14.543Z'
+        timeMaintenanceRebootDue: null
+        timeStopScheduled: null
+      - agentConfig:
+          areAllPluginsDisabled: false
+          isManagementDisabled: false
+          isMonitoringDisabled: false
+          pluginsConfig:
+          - desiredState: ENABLED
+            name: Management Agent
+        availabilityConfig:
+          isLiveMigrationPreferred: null
+          recoveryAction: RESTORE_INSTANCE
+        availabilityDomain: NQNU:US-ASHBURN-AD-1
+        capacityReservationId: null
+        compartmentId: ocid1.compartment.oc1..<unique_ID>
+        dedicatedVmHostId: null
+        definedTags:
+          Oracle-Tags:
+            CreatedBy: user@example.com
+            CreatedOn: '2023-06-15T10:11:58.982Z'
+        displayName: instance20230615101159
+        extendedMetadata: {}
+        faultDomain: FAULT-DOMAIN-1
+        freeformTags:
+          Environment: Production
+        id: ocid1.instance.oc1..<unique_ID>
+        imageId: ocid1.image.oc1..<unique_ID>
+        instanceConfigurationId: null
+        instanceOptions:
+          areLegacyImdsEndpointsDisabled: false
+        ipxeScript: null
+        isCrossNumaNode: false
+        launchMode: PARAVIRTUALIZED
+        launchOptions:
+          bootVolumeType: PARAVIRTUALIZED
+          firmware: UEFI_64
+          isConsistentVolumeNamingEnabled: true
+          isPvEncryptionInTransitEnabled: false
+          networkType: PARAVIRTUALIZED
+          remoteDataVolumeType: PARAVIRTUALIZED
+        lifecycleState: TERMINATED
+        platformConfig: null
+        preemptibleInstanceConfig: null
+        preferredMaintenanceAction: null
+        region: iad
+        shape: VM.Standard.E3.Flex
+        shapeConfig:
+          baselineOcpuUtilization: null
+          gpuDescription: null
+          gpus: 0
+          localDiskDescription: null
+          localDisks: 0
+          localDisksTotalSizeInGBs: null
+          maxVnicAttachments: 2
+          memoryInGBs: 1.0
+          networkingBandwidthInGbps: 1.0
+          ocpus: 1.0
+          processorDescription: "2.25 GHz AMD EPYC\u2122 7742 (Rome)"
+          vcpus: 2
+        sourceDetails:
+          bootVolumeSizeInGBs: null
+          bootVolumeVpusPerGB: null
+          imageId: ocid1.image.oc1..<unique_ID>
+          instanceSourceImageFilterDetails: null
+          kmsKeyId: null
+          sourceType: image
+        systemTags: {}
+        timeCreated: '2023-06-15T10:11:59.457Z'
+        timeMaintenanceRebootDue: null
+        timeStopScheduled: null
+      - agentConfig:
+          areAllPluginsDisabled: false
+          isManagementDisabled: false
+          isMonitoringDisabled: false
+          pluginsConfig:
+          - desiredState: ENABLED
+            name: Management Agent
+        availabilityConfig:
+          isLiveMigrationPreferred: null
+          recoveryAction: RESTORE_INSTANCE
+        availabilityDomain: NQNU:US-ASHBURN-AD-1
+        capacityReservationId: null
+        compartmentId: ocid1.compartment.oc1..<unique_ID>
+        dedicatedVmHostId: null
+        definedTags:
+          Oracle-Tags:
+            CreatedBy: user@example.com
+            CreatedOn: '2023-06-15T10:17:00.587Z'
+        displayName: instance20230615101701
+        extendedMetadata: {}
+        faultDomain: FAULT-DOMAIN-1
+        freeformTags:
+          Environment: Production
+        id: ocid1.instance.oc1..<unique_ID>
+        imageId: ocid1.image.oc1..<unique_ID>
+        instanceConfigurationId: null
+        instanceOptions:
+          areLegacyImdsEndpointsDisabled: false
+        ipxeScript: null
+        isCrossNumaNode: false
+        launchMode: PARAVIRTUALIZED
+        launchOptions:
+          bootVolumeType: PARAVIRTUALIZED
+          firmware: UEFI_64
+          isConsistentVolumeNamingEnabled: true
+          isPvEncryptionInTransitEnabled: false
+          networkType: PARAVIRTUALIZED
+          remoteDataVolumeType: PARAVIRTUALIZED
+        lifecycleState: TERMINATED
+        platformConfig: null
+        preemptibleInstanceConfig: null
+        preferredMaintenanceAction: null
+        region: iad
+        shape: VM.Standard.E3.Flex
+        shapeConfig:
+          baselineOcpuUtilization: null
+          gpuDescription: null
+          gpus: 0
+          localDiskDescription: null
+          localDisks: 0
+          localDisksTotalSizeInGBs: null
+          maxVnicAttachments: 2
+          memoryInGBs: 1.0
+          networkingBandwidthInGbps: 1.0
+          ocpus: 1.0
+          processorDescription: "2.25 GHz AMD EPYC\u2122 7742 (Rome)"
+          vcpus: 2
+        sourceDetails:
+          bootVolumeSizeInGBs: null
+          bootVolumeVpusPerGB: null
+          imageId: ocid1.image.oc1..<unique_ID>
+          instanceSourceImageFilterDetails: null
+          kmsKeyId: null
+          sourceType: image
+        systemTags: {}
+        timeCreated: '2023-06-15T10:17:01.986Z'
+        timeMaintenanceRebootDue: null
+        timeStopScheduled: null
+      - agentConfig:
+          areAllPluginsDisabled: false
+          isManagementDisabled: false
+          isMonitoringDisabled: false
+          pluginsConfig: null
+        availabilityConfig:
+          isLiveMigrationPreferred: null
+          recoveryAction: RESTORE_INSTANCE
+        availabilityDomain: NQNU:US-ASHBURN-AD-1
+        capacityReservationId: null
+        compartmentId: ocid1.compartment.oc1..<unique_ID>
+        dedicatedVmHostId: null
+        definedTags:
+          Oracle-Tags:
+            CreatedBy: user@example.com
+            CreatedOn: '2023-06-15T12:30:51.532Z'
+          cloud-custodian-test:
+            mark-for-resize: 'true'
+        displayName: instance20230615123052
+        extendedMetadata: {}
+        faultDomain: FAULT-DOMAIN-1
+        freeformTags:
+          Project: CNCF
+        id: ocid1.instance.oc1..<unique_ID>
+        imageId: ocid1.image.oc1..<unique_ID>
+        instanceConfigurationId: null
+        instanceOptions:
+          areLegacyImdsEndpointsDisabled: false
+        ipxeScript: null
+        isCrossNumaNode: false
+        launchMode: PARAVIRTUALIZED
+        launchOptions:
+          bootVolumeType: PARAVIRTUALIZED
+          firmware: UEFI_64
+          isConsistentVolumeNamingEnabled: true
+          isPvEncryptionInTransitEnabled: false
+          networkType: PARAVIRTUALIZED
+          remoteDataVolumeType: PARAVIRTUALIZED
+        lifecycleState: RUNNING
+        platformConfig: null
+        preemptibleInstanceConfig: null
+        preferredMaintenanceAction: null
+        region: iad
+        shape: VM.Standard.E3.Flex
+        shapeConfig:
+          baselineOcpuUtilization: null
+          gpuDescription: null
+          gpus: 0
+          localDiskDescription: null
+          localDisks: 0
+          localDisksTotalSizeInGBs: null
+          maxVnicAttachments: 2
+          memoryInGBs: 1.0
+          networkingBandwidthInGbps: 1.0
+          ocpus: 1.0
+          processorDescription: "2.25 GHz AMD EPYC\u2122 7742 (Rome)"
+          vcpus: 2
+        sourceDetails:
+          bootVolumeSizeInGBs: null
+          bootVolumeVpusPerGB: null
+          imageId: ocid1.image.oc1..<unique_ID>
+          instanceSourceImageFilterDetails: null
+          kmsKeyId: null
+          sourceType: image
+        systemTags: {}
+        timeCreated: '2023-06-15T12:30:52.090Z'
+        timeMaintenanceRebootDue: null
+        timeStopScheduled: null
+    headers:
+      content-encoding:
+      - gzip
+      content-length:
+      - '2937'
+      content-type:
+      - application/json
+      date:
+      - Thu, 15 Jun 2023 12:32:03 GMT
+      x-content-type-options:
+      - nosniff
+    status:
+      code: 200
+      message: OK
+- request:
+    body: null
+    headers: {}
+    method: GET
+    uri: https://iaas.us-ashburn-1.oraclecloud.com/20160918/instances?compartmentId=ocid1.compartment.oc1..<unique_ID>
+  response:
+    body:
+      data:
+      - agentConfig:
+          areAllPluginsDisabled: false
+          isManagementDisabled: false
+          isMonitoringDisabled: false
+          pluginsConfig:
+          - desiredState: DISABLED
+            name: Vulnerability Scanning
+          - desiredState: DISABLED
+            name: Oracle Java Management Service
+          - desiredState: ENABLED
+            name: OS Management Service Agent
+          - desiredState: ENABLED
+            name: Custom Logs Monitoring
+          - desiredState: ENABLED
+            name: Compute Instance Run Command
+          - desiredState: ENABLED
+            name: Compute Instance Monitoring
+          - desiredState: DISABLED
+            name: Block Volume Management
+          - desiredState: DISABLED
+            name: Bastion
+          - desiredState: ENABLED
+            name: Management Agent
+        availabilityConfig:
+          isLiveMigrationPreferred: null
+          recoveryAction: RESTORE_INSTANCE
+        availabilityDomain: NQNU:US-ASHBURN-AD-1
+        capacityReservationId: null
+        compartmentId: ocid1.compartment.oc1..<unique_ID>
+        dedicatedVmHostId: null
+        definedTags:
+          Oracle-Tags:
+            CreatedBy: user@example.com
+            CreatedOn: '2022-09-06T08:36:15.789Z'
+        displayName: jumperhost
+        extendedMetadata: {}
+        faultDomain: FAULT-DOMAIN-2
+        freeformTags:
+          eligible_for_resize_vv: 'true'
+          need_action: 'true'
+        id: ocid1.instance.oc1..<unique_ID>
+        imageId: ocid1.image.oc1..<unique_ID>
+        instanceConfigurationId: null
+        instanceOptions:
+          areLegacyImdsEndpointsDisabled: false
+        ipxeScript: null
+        isCrossNumaNode: false
+        launchMode: PARAVIRTUALIZED
+        launchOptions:
+          bootVolumeType: PARAVIRTUALIZED
+          firmware: UEFI_64
+          isConsistentVolumeNamingEnabled: true
+          isPvEncryptionInTransitEnabled: true
+          networkType: PARAVIRTUALIZED
+          remoteDataVolumeType: PARAVIRTUALIZED
+        lifecycleState: STOPPED
+        platformConfig: null
+        preemptibleInstanceConfig: null
+        preferredMaintenanceAction: null
+        region: iad
+        shape: VM.Standard.E4.Flex
+        shapeConfig:
+          baselineOcpuUtilization: null
+          gpuDescription: null
+          gpus: 0
+          localDiskDescription: null
+          localDisks: 0
+          localDisksTotalSizeInGBs: null
+          maxVnicAttachments: 2
+          memoryInGBs: 8.0
+          networkingBandwidthInGbps: 1.0
+          ocpus: 1.0
+          processorDescription: "2.55 GHz AMD EPYC\u2122 7J13 (Milan)"
+          vcpus: 2
+        sourceDetails:
+          bootVolumeSizeInGBs: null
+          bootVolumeVpusPerGB: null
+          imageId: ocid1.image.oc1..<unique_ID>
+          instanceSourceImageFilterDetails: null
+          kmsKeyId: null
+          sourceType: image
+        systemTags: {}
+        timeCreated: '2022-09-06T08:36:16.460Z'
+        timeMaintenanceRebootDue: null
+        timeStopScheduled: null
+      - agentConfig:
+          areAllPluginsDisabled: false
+          isManagementDisabled: false
+          isMonitoringDisabled: false
+          pluginsConfig:
+          - desiredState: ENABLED
+            name: Management Agent
+        availabilityConfig:
+          isLiveMigrationPreferred: null
+          recoveryAction: RESTORE_INSTANCE
+        availabilityDomain: NQNU:US-ASHBURN-AD-2
+        capacityReservationId: null
+        compartmentId: ocid1.compartment.oc1..<unique_ID>
+        dedicatedVmHostId: null
+        definedTags:
+          Oracle-Tags:
+            CreatedBy: oke
+            CreatedOn: '2023-03-10T18:08:00.409Z'
+        displayName: oke-c3ejqah2yqq-nzhvaorxrma-stsybdx6llq-0
+        extendedMetadata: {}
+        faultDomain: FAULT-DOMAIN-1
+        freeformTags:
+          eligible_for_resize_vv: 'true'
+          need_action: 'true'
+        id: ocid1.instance.oc1..<unique_ID>
+        imageId: ocid1.image.oc1..<unique_ID>
+        instanceConfigurationId: null
+        instanceOptions:
+          areLegacyImdsEndpointsDisabled: false
+        ipxeScript: null
+        isCrossNumaNode: false
+        launchMode: PARAVIRTUALIZED
+        launchOptions:
+          bootVolumeType: PARAVIRTUALIZED
+          firmware: UEFI_64
+          isConsistentVolumeNamingEnabled: true
+          isPvEncryptionInTransitEnabled: false
+          networkType: PARAVIRTUALIZED
+          remoteDataVolumeType: PARAVIRTUALIZED
+        lifecycleState: STOPPED
+        platformConfig: null
+        preemptibleInstanceConfig: null
+        preferredMaintenanceAction: null
+        region: iad
+        shape: VM.Standard.E3.Flex
+        shapeConfig:
+          baselineOcpuUtilization: null
+          gpuDescription: null
+          gpus: 0
+          localDiskDescription: null
+          localDisks: 0
+          localDisksTotalSizeInGBs: null
+          maxVnicAttachments: 2
+          memoryInGBs: 16.0
+          networkingBandwidthInGbps: 1.0
+          ocpus: 1.0
+          processorDescription: "2.25 GHz AMD EPYC\u2122 7742 (Rome)"
+          vcpus: 2
+        sourceDetails:
+          bootVolumeSizeInGBs: null
+          bootVolumeVpusPerGB: null
+          imageId: ocid1.image.oc1..<unique_ID>
+          instanceSourceImageFilterDetails: null
+          kmsKeyId: null
+          sourceType: image
+        systemTags: {}
+        timeCreated: '2023-03-10T18:08:00.975Z'
+        timeMaintenanceRebootDue: null
+        timeStopScheduled: null
+      - agentConfig:
+          areAllPluginsDisabled: false
+          isManagementDisabled: false
+          isMonitoringDisabled: false
+          pluginsConfig:
+          - desiredState: ENABLED
+            name: Management Agent
+        availabilityConfig:
+          isLiveMigrationPreferred: null
+          recoveryAction: RESTORE_INSTANCE
+        availabilityDomain: NQNU:US-ASHBURN-AD-2
+        capacityReservationId: null
+        compartmentId: ocid1.compartment.oc1..<unique_ID>
+        dedicatedVmHostId: null
+        definedTags:
+          Oracle-Tags:
+            CreatedBy: oke
+            CreatedOn: '2023-03-10T18:08:02.002Z'
+        displayName: oke-c3ejqah2yqq-nzhvaorxrma-stsybdx6llq-1
+        extendedMetadata: {}
+        faultDomain: FAULT-DOMAIN-2
+        freeformTags:
+          eligible_for_resize_vv: 'true'
+          need_action: 'true'
+        id: ocid1.instance.oc1..<unique_ID>
+        imageId: ocid1.image.oc1..<unique_ID>
+        instanceConfigurationId: null
+        instanceOptions:
+          areLegacyImdsEndpointsDisabled: false
+        ipxeScript: null
+        isCrossNumaNode: false
+        launchMode: PARAVIRTUALIZED
+        launchOptions:
+          bootVolumeType: PARAVIRTUALIZED
+          firmware: UEFI_64
+          isConsistentVolumeNamingEnabled: true
+          isPvEncryptionInTransitEnabled: false
+          networkType: PARAVIRTUALIZED
+          remoteDataVolumeType: PARAVIRTUALIZED
+        lifecycleState: STOPPED
+        platformConfig: null
+        preemptibleInstanceConfig: null
+        preferredMaintenanceAction: null
+        region: iad
+        shape: VM.Standard.E3.Flex
+        shapeConfig:
+          baselineOcpuUtilization: null
+          gpuDescription: null
+          gpus: 0
+          localDiskDescription: null
+          localDisks: 0
+          localDisksTotalSizeInGBs: null
+          maxVnicAttachments: 2
+          memoryInGBs: 16.0
+          networkingBandwidthInGbps: 1.0
+          ocpus: 1.0
+          processorDescription: "2.25 GHz AMD EPYC\u2122 7742 (Rome)"
+          vcpus: 2
+        sourceDetails:
+          bootVolumeSizeInGBs: null
+          bootVolumeVpusPerGB: null
+          imageId: ocid1.image.oc1..<unique_ID>
+          instanceSourceImageFilterDetails: null
+          kmsKeyId: null
+          sourceType: image
+        systemTags: {}
+        timeCreated: '2023-03-10T18:08:02.955Z'
+        timeMaintenanceRebootDue: null
+        timeStopScheduled: null
+      - agentConfig:
+          areAllPluginsDisabled: false
+          isManagementDisabled: false
+          isMonitoringDisabled: false
+          pluginsConfig:
+          - desiredState: ENABLED
+            name: Management Agent
+        availabilityConfig:
+          isLiveMigrationPreferred: null
+          recoveryAction: RESTORE_INSTANCE
+        availabilityDomain: NQNU:US-ASHBURN-AD-2
+        capacityReservationId: null
+        compartmentId: ocid1.compartment.oc1..<unique_ID>
+        dedicatedVmHostId: null
+        definedTags:
+          Oracle-Tags:
+            CreatedBy: oke
+            CreatedOn: '2023-03-10T18:08:00.409Z'
+        displayName: oke-c3ejqah2yqq-nzhvaorxrma-stsybdx6llq-2
+        extendedMetadata: {}
+        faultDomain: FAULT-DOMAIN-3
+        freeformTags:
+          eligible_for_resize_vv: 'true'
+          need_action: 'true'
+        id: ocid1.instance.oc1..<unique_ID>
+        imageId: ocid1.image.oc1..<unique_ID>
+        instanceConfigurationId: null
+        instanceOptions:
+          areLegacyImdsEndpointsDisabled: false
+        ipxeScript: null
+        isCrossNumaNode: false
+        launchMode: PARAVIRTUALIZED
+        launchOptions:
+          bootVolumeType: PARAVIRTUALIZED
+          firmware: UEFI_64
+          isConsistentVolumeNamingEnabled: true
+          isPvEncryptionInTransitEnabled: false
+          networkType: PARAVIRTUALIZED
+          remoteDataVolumeType: PARAVIRTUALIZED
+        lifecycleState: STOPPED
+        platformConfig: null
+        preemptibleInstanceConfig: null
+        preferredMaintenanceAction: null
+        region: iad
+        shape: VM.Standard.E3.Flex
+        shapeConfig:
+          baselineOcpuUtilization: null
+          gpuDescription: null
+          gpus: 0
+          localDiskDescription: null
+          localDisks: 0
+          localDisksTotalSizeInGBs: null
+          maxVnicAttachments: 2
+          memoryInGBs: 16.0
+          networkingBandwidthInGbps: 1.0
+          ocpus: 1.0
+          processorDescription: "2.25 GHz AMD EPYC\u2122 7742 (Rome)"
+          vcpus: 2
+        sourceDetails:
+          bootVolumeSizeInGBs: null
+          bootVolumeVpusPerGB: null
+          imageId: ocid1.image.oc1..<unique_ID>
+          instanceSourceImageFilterDetails: null
+          kmsKeyId: null
+          sourceType: image
+        systemTags: {}
+        timeCreated: '2023-03-10T18:08:05.012Z'
+        timeMaintenanceRebootDue: null
+        timeStopScheduled: null
+    headers:
+      content-encoding:
+      - gzip
+      content-length:
+      - '9729'
+      content-type:
+      - application/json
+      date:
+      - Thu, 15 Jun 2023 12:32:05 GMT
+      x-content-type-options:
+      - nosniff
+    status:
+      code: 200
+      message: OK
+- request:
+    body: null
+    headers: {}
+    method: GET
+    uri: https://iaas.us-ashburn-1.oraclecloud.com/20160918/instances?compartmentId=ocid1.compartment.oc1..<unique_ID>
+  response:
+    body:
+      data:
+      - agentConfig:
+          areAllPluginsDisabled: false
+          isManagementDisabled: false
+          isMonitoringDisabled: false
+          pluginsConfig:
+          - desiredState: DISABLED
+            name: Vulnerability Scanning
+          - desiredState: ENABLED
+            name: OS Management Service Agent
+          - desiredState: ENABLED
+            name: Custom Logs Monitoring
+          - desiredState: ENABLED
+            name: Compute Instance Run Command
+          - desiredState: ENABLED
+            name: Compute Instance Monitoring
+          - desiredState: DISABLED
+            name: Block Volume Management
+          - desiredState: DISABLED
+            name: Bastion
+          - desiredState: ENABLED
+            name: Management Agent
+        availabilityConfig:
+          isLiveMigrationPreferred: null
+          recoveryAction: RESTORE_INSTANCE
+        availabilityDomain: NQNU:US-ASHBURN-AD-1
+        capacityReservationId: null
+        compartmentId: ocid1.compartment.oc1..<unique_ID>
+        dedicatedVmHostId: null
+        definedTags:
+          Oracle-Tags:
+            CreatedBy: user@example.com
+            CreatedOn: '2021-06-16T14:47:14.103Z'
+        displayName: odo-cli-poc-vm-1
+        extendedMetadata: {}
+        faultDomain: FAULT-DOMAIN-1
+        freeformTags:
+          eligible_for_resize_vv: 'true'
+          need_action: 'true'
+        id: ocid1.instance.oc1..<unique_ID>
+        imageId: ocid1.image.oc1..<unique_ID>
+        instanceConfigurationId: null
+        instanceOptions:
+          areLegacyImdsEndpointsDisabled: false
+        ipxeScript: null
+        isCrossNumaNode: false
+        launchMode: PARAVIRTUALIZED
+        launchOptions:
+          bootVolumeType: PARAVIRTUALIZED
+          firmware: UEFI_64
+          isConsistentVolumeNamingEnabled: true
+          isPvEncryptionInTransitEnabled: true
+          networkType: PARAVIRTUALIZED
+          remoteDataVolumeType: PARAVIRTUALIZED
+        lifecycleState: STOPPED
+        platformConfig: null
+        preemptibleInstanceConfig: null
+        preferredMaintenanceAction: null
+        region: iad
+        shape: VM.Standard2.1
+        shapeConfig:
+          baselineOcpuUtilization: null
+          gpuDescription: null
+          gpus: 0
+          localDiskDescription: null
+          localDisks: 0
+          localDisksTotalSizeInGBs: null
+          maxVnicAttachments: 2
+          memoryInGBs: 15.0
+          networkingBandwidthInGbps: 1.0
+          ocpus: 1.0
+          processorDescription: "2.0 GHz Intel\xAE Xeon\xAE Platinum 8167M (Skylake)"
+          vcpus: 2
+        sourceDetails:
+          bootVolumeSizeInGBs: null
+          bootVolumeVpusPerGB: null
+          imageId: ocid1.image.oc1..<unique_ID>
+          instanceSourceImageFilterDetails: null
+          kmsKeyId: null
+          sourceType: image
+        systemTags: {}
+        timeCreated: '2021-06-16T14:47:14.712Z'
+        timeMaintenanceRebootDue: null
+        timeStopScheduled: null
+      - agentConfig:
+          areAllPluginsDisabled: false
+          isManagementDisabled: false
+          isMonitoringDisabled: false
+          pluginsConfig:
+          - desiredState: DISABLED
+            name: Vulnerability Scanning
+          - desiredState: ENABLED
+            name: OS Management Service Agent
+          - desiredState: ENABLED
+            name: Custom Logs Monitoring
+          - desiredState: ENABLED
+            name: Compute Instance Run Command
+          - desiredState: ENABLED
+            name: Compute Instance Monitoring
+          - desiredState: DISABLED
+            name: Block Volume Management
+          - desiredState: DISABLED
+            name: Bastion
+          - desiredState: ENABLED
+            name: Management Agent
+        availabilityConfig:
+          isLiveMigrationPreferred: null
+          recoveryAction: RESTORE_INSTANCE
+        availabilityDomain: NQNU:US-ASHBURN-AD-1
+        capacityReservationId: null
+        compartmentId: ocid1.compartment.oc1..<unique_ID>
+        dedicatedVmHostId: null
+        definedTags:
+          Oracle-Tags:
+            CreatedBy: user@example.com
+            CreatedOn: '2021-06-16T22:42:18.784Z'
+        displayName: odo-cli-poc-vm-2
+        extendedMetadata: {}
+        faultDomain: FAULT-DOMAIN-2
+        freeformTags:
+          eligible_for_resize_vv: 'true'
+          need_action: 'true'
+        id: ocid1.instance.oc1..<unique_ID>
+        imageId: ocid1.image.oc1..<unique_ID>
+        instanceConfigurationId: null
+        instanceOptions:
+          areLegacyImdsEndpointsDisabled: false
+        ipxeScript: null
+        isCrossNumaNode: false
+        launchMode: PARAVIRTUALIZED
+        launchOptions:
+          bootVolumeType: PARAVIRTUALIZED
+          firmware: UEFI_64
+          isConsistentVolumeNamingEnabled: true
+          isPvEncryptionInTransitEnabled: true
+          networkType: PARAVIRTUALIZED
+          remoteDataVolumeType: PARAVIRTUALIZED
+        lifecycleState: STOPPED
+        platformConfig: null
+        preemptibleInstanceConfig: null
+        preferredMaintenanceAction: null
+        region: iad
+        shape: VM.Standard2.1
+        shapeConfig:
+          baselineOcpuUtilization: null
+          gpuDescription: null
+          gpus: 0
+          localDiskDescription: null
+          localDisks: 0
+          localDisksTotalSizeInGBs: null
+          maxVnicAttachments: 2
+          memoryInGBs: 15.0
+          networkingBandwidthInGbps: 1.0
+          ocpus: 1.0
+          processorDescription: "2.0 GHz Intel\xAE Xeon\xAE Platinum 8167M (Skylake)"
+          vcpus: 2
+        sourceDetails:
+          bootVolumeSizeInGBs: null
+          bootVolumeVpusPerGB: null
+          imageId: ocid1.image.oc1..<unique_ID>
+          instanceSourceImageFilterDetails: null
+          kmsKeyId: null
+          sourceType: image
+        systemTags: {}
+        timeCreated: '2021-06-16T22:42:19.368Z'
+        timeMaintenanceRebootDue: null
+        timeStopScheduled: null
+    headers:
+      content-encoding:
+      - gzip
+      content-length:
+      - '1959'
+      content-type:
+      - application/json
+      date:
+      - Thu, 15 Jun 2023 12:32:05 GMT
+      x-content-type-options:
+      - nosniff
+    status:
+      code: 200
+      message: OK
+- request:
+    body: null
+    headers: {}
+    method: GET
+    uri: https://iaas.us-ashburn-1.oraclecloud.com/20160918/instances?compartmentId=ocid1.compartment.oc1..<unique_ID>
+  response:
+    body:
+      data:
+      - agentConfig:
+          areAllPluginsDisabled: false
+          isManagementDisabled: false
+          isMonitoringDisabled: false
+          pluginsConfig:
+          - desiredState: DISABLED
+            name: Vulnerability Scanning
+          - desiredState: DISABLED
+            name: Oracle Java Management Service
+          - desiredState: ENABLED
+            name: OS Management Service Agent
+          - desiredState: DISABLED
+            name: Management Agent
+          - desiredState: ENABLED
+            name: Custom Logs Monitoring
+          - desiredState: ENABLED
+            name: Compute Instance Run Command
+          - desiredState: ENABLED
+            name: Compute Instance Monitoring
+          - desiredState: DISABLED
+            name: Block Volume Management
+          - desiredState: DISABLED
+            name: Bastion
+        availabilityConfig:
+          isLiveMigrationPreferred: null
+          recoveryAction: RESTORE_INSTANCE
+        availabilityDomain: NQNU:US-ASHBURN-AD-1
+        capacityReservationId: null
+        compartmentId: ocid1.compartment.oc1..<unique_ID>
+        dedicatedVmHostId: null
+        definedTags:
+          Oracle-Tags:
+            CreatedBy: user@example.com
+            CreatedOn: '2023-06-14T14:31:11.778Z'
+        displayName: CC_001
+        extendedMetadata: {}
+        faultDomain: FAULT-DOMAIN-3
+        freeformTags: {}
+        id: ocid1.instance.oc1..<unique_ID>
+        imageId: ocid1.image.oc1..<unique_ID>
+        instanceConfigurationId: null
+        instanceOptions:
+          areLegacyImdsEndpointsDisabled: false
+        ipxeScript: null
+        isCrossNumaNode: false
+        launchMode: PARAVIRTUALIZED
+        launchOptions:
+          bootVolumeType: PARAVIRTUALIZED
+          firmware: UEFI_64
+          isConsistentVolumeNamingEnabled: true
+          isPvEncryptionInTransitEnabled: true
+          networkType: PARAVIRTUALIZED
+          remoteDataVolumeType: PARAVIRTUALIZED
+        lifecycleState: RUNNING
+        platformConfig: null
+        preemptibleInstanceConfig: null
+        preferredMaintenanceAction: null
+        region: iad
+        shape: VM.Standard.E4.Flex
+        shapeConfig:
+          baselineOcpuUtilization: null
+          gpuDescription: null
+          gpus: 0
+          localDiskDescription: null
+          localDisks: 0
+          localDisksTotalSizeInGBs: null
+          maxVnicAttachments: 2
+          memoryInGBs: 16.0
+          networkingBandwidthInGbps: 1.0
+          ocpus: 1.0
+          processorDescription: "2.55 GHz AMD EPYC\u2122 7J13 (Milan)"
+          vcpus: 2
+        sourceDetails:
+          bootVolumeSizeInGBs: null
+          bootVolumeVpusPerGB: null
+          imageId: ocid1.image.oc1..<unique_ID>
+          instanceSourceImageFilterDetails: null
+          kmsKeyId: null
+          sourceType: image
+        systemTags: {}
+        timeCreated: '2023-06-14T14:31:12.415Z'
+        timeMaintenanceRebootDue: null
+        timeStopScheduled: null
+      - agentConfig:
+          areAllPluginsDisabled: false
+          isManagementDisabled: false
+          isMonitoringDisabled: false
+          pluginsConfig:
+          - desiredState: DISABLED
+            name: Vulnerability Scanning
+          - desiredState: DISABLED
+            name: Oracle Java Management Service
+          - desiredState: ENABLED
+            name: OS Management Service Agent
+          - desiredState: DISABLED
+            name: Management Agent
+          - desiredState: ENABLED
+            name: Custom Logs Monitoring
+          - desiredState: ENABLED
+            name: Compute Instance Run Command
+          - desiredState: ENABLED
+            name: Compute Instance Monitoring
+          - desiredState: DISABLED
+            name: Block Volume Management
+          - desiredState: DISABLED
+            name: Bastion
+        availabilityConfig:
+          isLiveMigrationPreferred: null
+          recoveryAction: RESTORE_INSTANCE
+        availabilityDomain: NQNU:US-ASHBURN-AD-1
+        capacityReservationId: null
+        compartmentId: ocid1.compartment.oc1..<unique_ID>
+        dedicatedVmHostId: null
+        definedTags:
+          Oracle-Tags:
+            CreatedBy: user@example.com
+            CreatedOn: '2023-05-19T11:18:11.497Z'
+        displayName: Test1
+        extendedMetadata: {}
+        faultDomain: FAULT-DOMAIN-3
+        freeformTags:
+          eligible_for_resize_test: 'true'
+          eligible_for_resize_vv: 'true'
+          mark-for-deletion: 'true'
+          private-ip-exists: 'true'
+        id: ocid1.instance.oc1..<unique_ID>
+        imageId: ocid1.image.oc1..<unique_ID>
+        instanceConfigurationId: null
+        instanceOptions:
+          areLegacyImdsEndpointsDisabled: false
+        ipxeScript: null
+        isCrossNumaNode: false
+        launchMode: PARAVIRTUALIZED
+        launchOptions:
+          bootVolumeType: PARAVIRTUALIZED
+          firmware: UEFI_64
+          isConsistentVolumeNamingEnabled: true
+          isPvEncryptionInTransitEnabled: false
+          networkType: PARAVIRTUALIZED
+          remoteDataVolumeType: PARAVIRTUALIZED
+        lifecycleState: RUNNING
+        platformConfig: null
+        preemptibleInstanceConfig: null
+        preferredMaintenanceAction: null
+        region: iad
+        shape: VM.Standard2.4
+        shapeConfig:
+          baselineOcpuUtilization: null
+          gpuDescription: null
+          gpus: 0
+          localDiskDescription: null
+          localDisks: 0
+          localDisksTotalSizeInGBs: null
+          maxVnicAttachments: 4
+          memoryInGBs: 60.0
+          networkingBandwidthInGbps: 4.1
+          ocpus: 4.0
+          processorDescription: "2.0 GHz Intel\xAE Xeon\xAE Platinum 8167M (Skylake)"
+          vcpus: 8
+        sourceDetails:
+          bootVolumeSizeInGBs: null
+          bootVolumeVpusPerGB: null
+          imageId: ocid1.image.oc1..<unique_ID>
+          instanceSourceImageFilterDetails: null
+          kmsKeyId: null
+          sourceType: image
+        systemTags: {}
+        timeCreated: '2023-05-19T11:18:12.035Z'
+        timeMaintenanceRebootDue: null
+        timeStopScheduled: null
+      - agentConfig:
+          areAllPluginsDisabled: false
+          isManagementDisabled: false
+          isMonitoringDisabled: false
+          pluginsConfig:
+          - desiredState: DISABLED
+            name: Vulnerability Scanning
+          - desiredState: DISABLED
+            name: Oracle Java Management Service
+          - desiredState: ENABLED
+            name: OS Management Service Agent
+          - desiredState: DISABLED
+            name: Management Agent
+          - desiredState: ENABLED
+            name: Custom Logs Monitoring
+          - desiredState: ENABLED
+            name: Compute Instance Run Command
+          - desiredState: ENABLED
+            name: Compute Instance Monitoring
+          - desiredState: DISABLED
+            name: Block Volume Management
+          - desiredState: DISABLED
+            name: Bastion
+        availabilityConfig:
+          isLiveMigrationPreferred: null
+          recoveryAction: RESTORE_INSTANCE
+        availabilityDomain: NQNU:US-ASHBURN-AD-1
+        capacityReservationId: null
+        compartmentId: ocid1.compartment.oc1..<unique_ID>
+        dedicatedVmHostId: null
+        definedTags:
+          Oracle-Tags:
+            CreatedBy: user@example.com
+            CreatedOn: '2023-06-07T02:45:30.563Z'
+        displayName: instance-20230606-2144
+        extendedMetadata: {}
+        faultDomain: FAULT-DOMAIN-3
+        freeformTags:
+          Environment: Development
+          eligible_for_resize_test: 'true'
+          eligible_for_resize_vv: 'true'
+          private-ip-exists: 'true'
+        id: ocid1.instance.oc1..<unique_ID>
+        imageId: ocid1.image.oc1..<unique_ID>
+        instanceConfigurationId: null
+        instanceOptions:
+          areLegacyImdsEndpointsDisabled: false
+        ipxeScript: null
+        isCrossNumaNode: false
+        launchMode: PARAVIRTUALIZED
+        launchOptions:
+          bootVolumeType: PARAVIRTUALIZED
+          firmware: UEFI_64
+          isConsistentVolumeNamingEnabled: true
+          isPvEncryptionInTransitEnabled: true
+          networkType: PARAVIRTUALIZED
+          remoteDataVolumeType: PARAVIRTUALIZED
+        lifecycleState: RUNNING
+        platformConfig: null
+        preemptibleInstanceConfig: null
+        preferredMaintenanceAction: null
+        region: iad
+        shape: VM.Standard.E4.Flex
+        shapeConfig:
+          baselineOcpuUtilization: null
+          gpuDescription: null
+          gpus: 0
+          localDiskDescription: null
+          localDisks: 0
+          localDisksTotalSizeInGBs: null
+          maxVnicAttachments: 2
+          memoryInGBs: 16.0
+          networkingBandwidthInGbps: 1.0
+          ocpus: 1.0
+          processorDescription: "2.55 GHz AMD EPYC\u2122 7J13 (Milan)"
+          vcpus: 2
+        sourceDetails:
+          bootVolumeSizeInGBs: null
+          bootVolumeVpusPerGB: null
+          imageId: ocid1.image.oc1..<unique_ID>
+          instanceSourceImageFilterDetails: null
+          kmsKeyId: null
+          sourceType: image
+        systemTags: {}
+        timeCreated: '2023-06-07T02:45:31.460Z'
+        timeMaintenanceRebootDue: null
+        timeStopScheduled: null
+    headers:
+      content-encoding:
+      - gzip
+      content-length:
+      - '1948'
+      content-type:
+      - application/json
+      date:
+      - Thu, 15 Jun 2023 12:32:07 GMT
+      x-content-type-options:
+      - nosniff
+    status:
+      code: 200
+      message: OK
+- request:
+    body: mock_body
+    headers: {}
+    method: PUT
+    uri: https://iaas.us-ashburn-1.oraclecloud.com/20160918/instances/ocid1.instance.oc1..<unique_ID>
+  response:
+    body:
+      data:
+        agentConfig:
+          areAllPluginsDisabled: false
+          isManagementDisabled: false
+          isMonitoringDisabled: false
+          pluginsConfig: null
+        availabilityConfig:
+          isLiveMigrationPreferred: null
+          recoveryAction: RESTORE_INSTANCE
+        availabilityDomain: NQNU:US-ASHBURN-AD-1
+        capacityReservationId: null
+        compartmentId: ocid1.compartment.oc1..<unique_ID>
+        dedicatedVmHostId: null
+        definedTags:
+          Oracle-Tags:
+            CreatedBy: user@example.com
+            CreatedOn: '2023-06-15T12:30:51.532Z'
+          cloud-custodian-test:
+            mark-for-resize: 'true'
+        displayName: instance20230615123052
+        extendedMetadata: {}
+        faultDomain: FAULT-DOMAIN-1
+        freeformTags:
+          Project: CNCF
+        id: ocid1.instance.oc1..<unique_ID>
+        imageId: ocid1.image.oc1..<unique_ID>
+        instanceConfigurationId: null
+        instanceOptions:
+          areLegacyImdsEndpointsDisabled: false
+        ipxeScript: null
+        isCrossNumaNode: false
+        launchMode: PARAVIRTUALIZED
+        launchOptions:
+          bootVolumeType: PARAVIRTUALIZED
+          firmware: UEFI_64
+          isConsistentVolumeNamingEnabled: true
+          isPvEncryptionInTransitEnabled: false
+          networkType: PARAVIRTUALIZED
+          remoteDataVolumeType: PARAVIRTUALIZED
+        lifecycleState: RUNNING
+        metadata: {}
+        platformConfig: null
+        preemptibleInstanceConfig: null
+        preferredMaintenanceAction: null
+        region: iad
+        shape: VM.Standard.E3.Flex
+        shapeConfig:
+          baselineOcpuUtilization: null
+          gpuDescription: null
+          gpus: 0
+          localDiskDescription: null
+          localDisks: 0
+          localDisksTotalSizeInGBs: null
+          maxVnicAttachments: 2
+          memoryInGBs: 1.0
+          networkingBandwidthInGbps: 1.0
+          ocpus: 1.0
+          processorDescription: "2.25 GHz AMD EPYC\u2122 7742 (Rome)"
+          vcpus: 2
+        sourceDetails:
+          bootVolumeSizeInGBs: null
+          bootVolumeVpusPerGB: null
+          imageId: ocid1.image.oc1..<unique_ID>
+          instanceSourceImageFilterDetails: null
+          kmsKeyId: null
+          sourceType: image
+        systemTags: {}
+        timeCreated: '2023-06-15T12:30:52.090Z'
+        timeMaintenanceRebootDue: null
+        timeStopScheduled: null
+    headers:
+      content-length:
+      - '2601'
+      content-type:
+      - application/json
+      date:
+      - Thu, 15 Jun 2023 12:32:10 GMT
+      etag:
+      - 865e2be2bf88238afed802447455b2e29563c086024f6f3765deb20c8ebf4562
+      opc-work-request-id:
+      - ocid1.coreservicesworkrequest.oc1.iad.abuwcljrw6wxctc4gkuobfylyidr2du3nmfw3macixsl5pbxq44oc7y2nzpq
+      x-content-type-options:
+      - nosniff
+    status:
+      code: 200
+      message: OK
+- request:
+    body: null
+    headers: {}
+    method: GET
+    uri: https://iaas.us-ashburn-1.oraclecloud.com/20160918/instances/ocid1.instance.oc1..<unique_ID>
+  response:
+    body:
+      data:
+        agentConfig:
+          areAllPluginsDisabled: false
+          isManagementDisabled: false
+          isMonitoringDisabled: false
+          pluginsConfig: null
+        availabilityConfig:
+          isLiveMigrationPreferred: null
+          recoveryAction: RESTORE_INSTANCE
+        availabilityDomain: NQNU:US-ASHBURN-AD-1
+        capacityReservationId: null
+        compartmentId: ocid1.compartment.oc1..<unique_ID>
+        dedicatedVmHostId: null
+        definedTags:
+          Oracle-Tags:
+            CreatedBy: user@example.com
+            CreatedOn: '2023-06-15T12:30:51.532Z'
+          cloud-custodian-test:
+            mark-for-resize: 'true'
+        displayName: instance20230615123052
+        extendedMetadata: {}
+        faultDomain: FAULT-DOMAIN-1
+        freeformTags:
+          Project: CNCF
+        id: ocid1.instance.oc1..<unique_ID>
+        imageId: ocid1.image.oc1..<unique_ID>
+        instanceConfigurationId: null
+        instanceOptions:
+          areLegacyImdsEndpointsDisabled: false
+        ipxeScript: null
+        isCrossNumaNode: false
+        launchMode: PARAVIRTUALIZED
+        launchOptions:
+          bootVolumeType: PARAVIRTUALIZED
+          firmware: UEFI_64
+          isConsistentVolumeNamingEnabled: true
+          isPvEncryptionInTransitEnabled: false
+          networkType: PARAVIRTUALIZED
+          remoteDataVolumeType: PARAVIRTUALIZED
+        lifecycleState: RUNNING
+        metadata: {}
+        platformConfig: null
+        preemptibleInstanceConfig: null
+        preferredMaintenanceAction: null
+        region: iad
+        shape: VM.Standard.E3.Flex
+        shapeConfig:
+          baselineOcpuUtilization: null
+          gpuDescription: null
+          gpus: 0
+          localDiskDescription: null
+          localDisks: 0
+          localDisksTotalSizeInGBs: null
+          maxVnicAttachments: 2
+          memoryInGBs: 1.0
+          networkingBandwidthInGbps: 1.0
+          ocpus: 1.0
+          processorDescription: "2.25 GHz AMD EPYC\u2122 7742 (Rome)"
+          vcpus: 2
+        sourceDetails:
+          bootVolumeSizeInGBs: null
+          bootVolumeVpusPerGB: null
+          imageId: ocid1.image.oc1..<unique_ID>
+          instanceSourceImageFilterDetails: null
+          kmsKeyId: null
+          sourceType: image
+        systemTags: {}
+        timeCreated: '2023-06-15T12:30:52.090Z'
+        timeMaintenanceRebootDue: null
+        timeStopScheduled: null
+    headers:
+      content-length:
+      - '2138'
+      content-type:
+      - application/json
+      date:
+      - Thu, 15 Jun 2023 12:32:12 GMT
+      etag:
+      - 865e2be2bf88238afed802447455b2e29563c086024f6f3765deb20c8ebf4562
+      x-content-type-options:
+      - nosniff
+    status:
+      code: 200
+      message: OK
+version: 1

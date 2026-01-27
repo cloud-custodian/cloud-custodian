@@ -7,13 +7,12 @@ import random
 import re
 import zlib
 from typing import List
-from distutils.version import LooseVersion
+from c7n.vendored.distutils.version import LooseVersion
 
 import botocore
 from botocore.exceptions import ClientError
 from dateutil.parser import parse
 from concurrent.futures import as_completed
-import jmespath
 
 from c7n.actions import (
     ActionRegistry, BaseAction, ModifyVpcSecurityGroupsAction, AutoscalingBase
@@ -21,17 +20,18 @@ from c7n.actions import (
 
 from c7n.exceptions import PolicyValidationError
 from c7n.filters import (
-    FilterRegistry, AgeFilter, ValueFilter, Filter, DefaultVpcBase
+    FilterRegistry, AgeFilter, ValueFilter, Filter
 )
 from c7n.filters.offhours import OffHour, OnHour
+from c7n.filters.costhub import CostHubRecommendation
 import c7n.filters.vpc as net_filters
 
 from c7n.manager import resources
 from c7n import query, utils
 from c7n.tags import coalesce_copy_user_tags
-from c7n.utils import type_schema, filter_empty
+from c7n.utils import type_schema, filter_empty, jmespath_search, jmespath_compile, QueryParser
 
-from c7n.resources.iam import CheckPermissions
+from c7n.resources.iam import CheckPermissions, SpecificIamProfileManagedPolicy
 from c7n.resources.securityhub import PostFinding
 
 RE_ERROR_INSTANCE_ID = re.compile("'(?P<instance_id>i-.*?)'")
@@ -41,6 +41,13 @@ actions = ActionRegistry('ec2.actions')
 
 
 class DescribeEC2(query.DescribeSource):
+
+    def get_query_params(self, query_params):
+        query_params = query_params or {}
+        queries = EC2QueryParser.parse(self.manager.data.get('query', []))
+        for q in queries:
+            query_params.update(q)
+        return query_params
 
     def augment(self, resources):
         """EC2 API and AWOL Tags
@@ -91,7 +98,7 @@ class DescribeEC2(query.DescribeSource):
 
         m = self.manager.get_model()
         for r in resources:
-            r['Tags'] = resource_tags.get(r[m.id], ())
+            r['Tags'] = resource_tags.get(r[m.id], [])
         return resources
 
 
@@ -110,6 +117,7 @@ class EC2(query.QueryResourceManager):
         dimension = 'InstanceId'
         cfn_type = config_type = "AWS::EC2::Instance"
         id_prefix = 'i-'
+        permissions_augment = ('ec2:DescribeTags',)
 
         default_report_fields = (
             'CustodianDate',
@@ -131,44 +139,17 @@ class EC2(query.QueryResourceManager):
         'config': query.ConfigSource
     }
 
-    def __init__(self, ctx, data):
-        super(EC2, self).__init__(ctx, data)
-        self.queries = QueryFilter.parse(self.data.get('query', []))
-
-    def resources(self, query=None):
-        q = self.resource_query()
-        if q is not None:
-            query = query or {}
-            query['Filters'] = q
-        return super(EC2, self).resources(query=query)
-
-    def resource_query(self):
-        qf = []
-        qf_names = set()
-        # allow same name to be specified multiple times and append the queries
-        # under the same name
-        for q in self.queries:
-            qd = q.query()
-            if qd['Name'] in qf_names:
-                for qf in qf:
-                    if qd['Name'] == qf['Name']:
-                        qf['Values'].extend(qd['Values'])
-            else:
-                qf_names.add(qd['Name'])
-                qf.append(qd)
-        return qf
-
 
 @filters.register('security-group')
 class SecurityGroupFilter(net_filters.SecurityGroupFilter):
 
-    RelatedIdsExpression = "SecurityGroups[].GroupId"
+    RelatedIdsExpression = "NetworkInterfaces[].Groups[].GroupId"
 
 
 @filters.register('subnet')
 class SubnetFilter(net_filters.SubnetFilter):
 
-    RelatedIdsExpression = "SubnetId"
+    RelatedIdsExpression = "NetworkInterfaces[].SubnetId"
 
 
 @filters.register('vpc')
@@ -785,7 +766,7 @@ class InstanceAgeFilter(AgeFilter):
 
 
 @filters.register('default-vpc')
-class DefaultVpc(DefaultVpcBase):
+class DefaultVpc(net_filters.DefaultVpcBase):
     """ Matches if an ec2 database is in the default vpc
     """
 
@@ -990,6 +971,75 @@ class SsmStatus(ValueFilter):
                     'InstanceInformationList', [])}
         for r in resources:
             r[self.annotation] = info_map.get(r['InstanceId'], {})
+
+
+@EC2.filter_registry.register('ssm-inventory')
+class SsmInventory(Filter):
+    """Filter EC2 instances by their SSM software inventory.
+
+    :Example:
+
+    Find instances that have a specific package installed.
+
+    .. code-block:: yaml
+
+        policies:
+        - name: ec2-find-specific-package
+          resource: ec2
+          filters:
+          - type: ssm-inventory
+            query:
+            - Key: Name
+              Values:
+              - "docker"
+              Type: Equal
+
+        - name: ec2-get-all-packages
+          resource: ec2
+          filters:
+          - type: ssm-inventory
+    """
+    schema = type_schema(
+        'ssm-inventory',
+        **{'query': {'type': 'array', 'items': {
+            'type': 'object',
+            'properties': {
+                'Key': {'type': 'string'},
+                'Values': {'type': 'array', 'items': {'type': 'string'}},
+                'Type': {'enum': ['Equal', 'NotEqual', 'BeginWith', 'LessThan',
+                  'GreaterThan', 'Exists']}},
+            'required': ['Key', 'Values']}}})
+
+    permissions = ('ssm:ListInventoryEntries',)
+    annotation_key = 'c7n:SSM-Inventory'
+
+    def process(self, resources, event=None):
+        client = utils.local_session(self.manager.session_factory).client('ssm')
+        query = self.data.get("query")
+        found = []
+        for r in resources:
+            entries = []
+            next_token = None
+            while True:
+                params = {
+                    "InstanceId": r["InstanceId"],
+                    "TypeName": "AWS:Application"
+                }
+                if next_token:
+                    params['NextToken'] = next_token
+                if query:
+                    params['Filters'] = query
+                response = client.list_inventory_entries(**params)
+                all_entries = response["Entries"]
+                if all_entries:
+                    entries.extend(all_entries)
+                next_token = response.get('NextToken')
+                if not next_token:
+                    break
+            if entries:
+                r[self.annotation_key] = entries
+                found.append(r)
+        return found
 
 
 @EC2.filter_registry.register('ssm-compliance')
@@ -1255,7 +1305,7 @@ class InstanceFinding(PostFinding):
     resource_type = 'AwsEc2Instance'
 
     def format_resource(self, r):
-        ip_addresses = jmespath.search(
+        ip_addresses = jmespath_search(
             "NetworkInterfaces[].PrivateIpAddresses[].PrivateIpAddress", r)
 
         # limit to max 10 ip addresses, per security hub service limits
@@ -1382,7 +1432,7 @@ class Resize(BaseAction):
     """Change an instance's size.
 
     An instance can only be resized when its stopped, this action
-    can optionally restart an instance if needed to effect the instance
+    can optionally stop/start an instance if needed to effect the instance
     type change. Instances are always left in the run state they were
     found in.
 
@@ -1391,6 +1441,24 @@ class Resize(BaseAction):
     hvm/pv, and ebs optimization at minimum.
 
     http://docs.aws.amazon.com/AWSEC2/latest/UserGuide/ec2-instance-resize.html
+
+    This action also has specific support for enacting recommendations
+    from the AWS Cost Optimization Hub for resizing.
+
+    :example:
+
+      .. code-block:: yaml
+
+         policies:
+           - name: ec2-rightsize
+             resource: aws.ec2
+             filters:
+               - type: cost-optimization
+                 attrs:
+                  - actionType: Rightsize
+             actions:
+               - resize
+
     """
 
     schema = type_schema(
@@ -1424,27 +1492,26 @@ class Resize(BaseAction):
                 self.log.exception(
                     "Exception stopping instances for resize:\n %s" % e)
 
+        client = utils.local_session(self.manager.session_factory).client('ec2')
+
         for instance_set in utils.chunks(itertools.chain(
                 stopped_instances, running_instances), 20):
-            self.process_resource_set(instance_set)
+            self.process_resource_set(instance_set, client)
 
         if self.data.get('restart') and running_instances:
             client.start_instances(
                 InstanceIds=[i['InstanceId'] for i in running_instances])
         return list(itertools.chain(stopped_instances, running_instances))
 
-    def process_resource_set(self, instance_set):
-        type_map = self.data.get('type-map')
-        default_type = self.data.get('default')
-
-        client = utils.local_session(
-            self.manager.session_factory).client('ec2')
+    def process_resource_set(self, instance_set, client):
 
         for i in instance_set:
+            new_type = self.get_target_instance_type(i)
             self.log.debug(
-                "resizing %s %s" % (i['InstanceId'], i['InstanceType']))
-            new_type = type_map.get(i['InstanceType'], default_type)
-            if new_type == i['InstanceType']:
+                "resizing %s %s -> %s" % (i['InstanceId'], i['InstanceType'], new_type)
+            )
+
+            if not new_type or new_type == i['InstanceType']:
                 continue
             try:
                 client.modify_instance_attribute(
@@ -1454,6 +1521,14 @@ class Resize(BaseAction):
                 self.log.exception(
                     "Exception resizing instance:%s new:%s old:%s \n %s" % (
                         i['InstanceId'], new_type, i['InstanceType'], e))
+
+    def get_target_instance_type(self, i):
+        optimizer_recommend = i.get(CostHubRecommendation.annotation_key)
+        if optimizer_recommend and optimizer_recommend['actionType'] == 'Rightsize':
+            return optimizer_recommend['recommendedResourceSummary']
+        type_map = self.data.get('type-map', {})
+        default_type = self.data.get('default')
+        return type_map.get(i['InstanceType'], default_type)
 
 
 @actions.register('stop')
@@ -1488,15 +1563,21 @@ class Stop(BaseAction):
 
     schema = type_schema(
         'stop',
-        **{'terminate-ephemeral': {'type': 'boolean'},
-           'hibernate': {'type': 'boolean'}})
+        **{
+            "terminate-ephemeral": {"type": "boolean"},
+            "hibernate": {"type": "boolean"},
+            "force": {"type": "boolean"},
+        },
+    )
 
-    has_hibernate = jmespath.compile('[].HibernationOptions.Configured')
+    has_hibernate = jmespath_compile('[].HibernationOptions.Configured')
 
     def get_permissions(self):
         perms = ('ec2:StopInstances',)
         if self.data.get('terminate-ephemeral', False):
             perms += ('ec2:TerminateInstances',)
+        if self.data.get("force"):
+            perms += ("ec2:ModifyInstanceAttribute",)
         return perms
 
     def split_on_storage(self, instances):
@@ -1527,29 +1608,61 @@ class Stop(BaseAction):
         # Ephemeral instance can't be stopped.
         ephemeral, persistent = self.split_on_storage(instances)
         if self.data.get('terminate-ephemeral', False) and ephemeral:
-            self._run_instances_op(
-                client.terminate_instances,
-                [i['InstanceId'] for i in ephemeral])
+            self._run_instances_op(client, 'terminate', ephemeral)
         if persistent:
             if self.data.get('hibernate', False):
                 enabled, persistent = self.split_on_hibernate(persistent)
                 if enabled:
-                    self._run_instances_op(
-                        client.stop_instances,
-                        [i['InstanceId'] for i in enabled],
-                        Hibernate=True)
-            self._run_instances_op(
-                client.stop_instances,
-                [i['InstanceId'] for i in persistent])
+                    self._run_instances_op(client, 'stop', enabled, Hibernate=True)
+            self._run_instances_op(client, 'stop', persistent)
         return instances
 
-    def _run_instances_op(self, op, instance_ids, **kwargs):
-        while instance_ids:
+    def disable_protection(self, client, op, instances):
+        def modify_instance(i, attribute):
             try:
-                return self.manager.retry(op, InstanceIds=instance_ids, **kwargs)
+                self.manager.retry(
+                    client.modify_instance_attribute,
+                    InstanceId=i['InstanceId'],
+                    Attribute=attribute,
+                    Value='false',
+                )
+            except ClientError as e:
+                if e.response['Error']['Code'] == 'IncorrectInstanceState':
+                    return
+                raise
+
+        def process_instance(i, op):
+            modify_instance(i, 'disableApiStop')
+            if op == 'terminate':
+                modify_instance(i, 'disableApiTermination')
+
+        with self.executor_factory(max_workers=2) as w:
+            list(w.map(process_instance, instances, [op] * len(instances)))
+
+    def _run_instances_op(self, client, op, instances, **kwargs):
+        client_op = client.stop_instances
+        if op == 'terminate':
+            client_op = client.terminate_instances
+
+        instance_ids = [i['InstanceId'] for i in instances]
+
+        while instances:
+            try:
+                return self.manager.retry(client_op, InstanceIds=instance_ids, **kwargs)
             except ClientError as e:
                 if e.response['Error']['Code'] == 'IncorrectInstanceState':
                     instance_ids.remove(extract_instance_id(e))
+                if (
+                    e.response['Error']['Code'] == 'OperationNotPermitted' and
+                    self.data.get('force')
+                ):
+                    self.log.info("Disabling stop and termination protection on instances")
+                    self.disable_protection(
+                        client,
+                        op,
+                        [i for i in instances if i.get('InstanceLifecycle') != 'spot'],
+                    )
+                    continue
                 raise
 
 
@@ -1766,8 +1879,17 @@ class Snapshot(BaseAction):
         if err:
             raise err
 
+    def get_instance_name(self, resource):
+        tags = resource.get('Tags', [])
+        for tag in tags:
+            if tag['Key'] == 'Name':
+                return tag['Value']
+        return "-"
+
     def process_volume_set(self, client, resource):
+        i_name = self.get_instance_name(resource)
         params = dict(
+            Description=f"Snapshot Created for {resource['InstanceId']} ({i_name})",
             InstanceSpecification={
                 'ExcludeBootVolume': self.data.get('exclude-boot', False),
                 'InstanceId': resource['InstanceId']})
@@ -1804,7 +1926,7 @@ class EC2ModifyVpcSecurityGroups(ModifyVpcSecurityGroupsAction):
     """Modify security groups on an instance."""
 
     permissions = ("ec2:ModifyNetworkInterfaceAttribute",)
-    sg_expr = jmespath.compile("Groups[].GroupId")
+    sg_expr = jmespath_compile("Groups[].GroupId")
 
     def process(self, instances):
         if not len(instances):
@@ -2080,73 +2202,42 @@ class PropagateSpotTags(BaseAction):
         return update_instances
 
 
-# Valid EC2 Query Filters
-# http://docs.aws.amazon.com/AWSEC2/latest/CommandLineReference/ApiReference-cmd-DescribeInstances.html
-EC2_VALID_FILTERS = {
-    'architecture': ('i386', 'x86_64'),
-    'availability-zone': str,
-    'iam-instance-profile.arn': str,
-    'image-id': str,
-    'instance-id': str,
-    'instance-lifecycle': ('spot',),
-    'instance-state-name': (
-        'pending',
-        'terminated',
-        'running',
-        'shutting-down',
-        'stopping',
-        'stopped'),
-    'instance.group-id': str,
-    'instance.group-name': str,
-    'tag-key': str,
-    'tag-value': str,
-    'tag:': str,
-    'tenancy': ('dedicated', 'default', 'host'),
-    'vpc-id': str}
+class EC2QueryParser(QueryParser):
 
+    # Valid EC2 Query Filters
+    # https://boto3.amazonaws.com/v1/documentation/api/latest/reference/services/ec2/client/describe_instances.html
+    QuerySchema = {
+        'Filters': {
+            'architecture': ('i386', 'x86_64'),
+            'availability-zone': str,
+            'ebs-optimized': str,
+            'iam-instance-profile.arn': str,
+            'image-id': str,
+            'instance-id': str,
+            'instance-lifecycle': ('spot', 'scheduled', 'capacity-block'),
+            'instance-state-name': (
+                'pending',
+                'terminated',
+                'running',
+                'shutting-down',
+                'stopping',
+                'stopped'),
+            'instance-type': str,
+            'instance.group-id': str,
+            'instance.group-name': str,
+            'owner-id': str,
+            'platform': str,
+            'tag-key': str,
+            'tag-value': str,
+            'tenancy': ('dedicated', 'default', 'host'),
+            'vpc-id': str
+        },
+        'InstanceIds': str,
+        'MaxResults': int,
+    }
+    single_value_fields = ('MaxResults',)
 
-class QueryFilter:
-
-    @classmethod
-    def parse(cls, data):
-        results = []
-        for d in data:
-            if not isinstance(d, dict):
-                raise ValueError(
-                    "EC2 Query Filter Invalid structure %s" % d)
-            results.append(cls(d).validate())
-        return results
-
-    def __init__(self, data):
-        self.data = data
-        self.key = None
-        self.value = None
-
-    def validate(self):
-        if not len(list(self.data.keys())) == 1:
-            raise PolicyValidationError(
-                "EC2 Query Filter Invalid %s" % self.data)
-        self.key = list(self.data.keys())[0]
-        self.value = list(self.data.values())[0]
-
-        if self.key not in EC2_VALID_FILTERS and not self.key.startswith(
-                'tag:'):
-            raise PolicyValidationError(
-                "EC2 Query Filter invalid filter name %s" % (self.data))
-
-        if self.value is None:
-            raise PolicyValidationError(
-                "EC2 Query Filters must have a value, use tag-key"
-                " w/ tag name as value for tag present checks"
-                " %s" % self.data)
-        return self
-
-    def query(self):
-        value = self.value
-        if isinstance(self.value, str):
-            value = [self.value]
-
-        return {'Name': self.key, 'Values': value}
+    type_name = "EC2"
 
 
 @filters.register('instance-attribute')
@@ -2232,6 +2323,7 @@ class LaunchTemplate(query.QueryResourceManager):
         filter_name = 'LaunchTemplateIds'
         filter_type = 'list'
         arn_type = "launch-template"
+        cfn_type = "AWS::EC2::LaunchTemplate"
 
     def augment(self, resources):
         client = utils.local_session(
@@ -2243,6 +2335,12 @@ class LaunchTemplate(query.QueryResourceManager):
                     LaunchTemplateId=r['LaunchTemplateId']).get(
                         'LaunchTemplateVersions', ()))
         return template_versions
+
+    def get_arns(self, resources):
+        arns = []
+        for r in resources:
+            arns.append(self.generate_arn(f"{r['LaunchTemplateId']}/{r['VersionNumber']}"))
+        return arns
 
     def get_resources(self, rids, cache=True):
         # Launch template versions have a compound primary key
@@ -2359,7 +2457,7 @@ class SpotFleetRequest(query.QueryResourceManager):
         filter_type = 'list'
         date = 'CreateTime'
         arn_type = 'spot-fleet-request'
-        cfn_type = 'AWS::EC2::SpotFleet'
+        config_type = cfn_type = 'AWS::EC2::SpotFleet'
         permissions_enum = ('ec2:DescribeSpotFleetRequests',)
 
 
@@ -2396,3 +2494,118 @@ class AutoscalingSpotFleetRequest(AutoscalingBase):
             SpotFleetRequestId=resource['SpotFleetRequestId'],
             TargetCapacity=desired,
         )
+
+
+@EC2.filter_registry.register('has-specific-managed-policy')
+class HasSpecificManagedPolicy(SpecificIamProfileManagedPolicy):
+    """Filter an EC2 instance that has an IAM instance profile that contains an IAM role that has
+       a specific managed IAM policy. If an EC2 instance does not have a profile or the profile
+       does not contain an IAM role, then it will be treated as not having the policy.
+
+    :example:
+
+    .. code-block:: yaml
+
+        policies:
+          - name: ec2-instance-has-admin-policy
+            resource: aws.ec2
+            filters:
+              - type: has-specific-managed-policy
+                value: admin-policy
+
+    :example:
+
+    Check for EC2 instances with instance profile roles that have an
+    attached policy matching a given list:
+
+    .. code-block:: yaml
+
+        policies:
+          - name: ec2-instance-with-selected-policies
+            resource: aws.ec2
+            filters:
+              - type: has-specific-managed-policy
+                op: in
+                value:
+                  - AmazonS3FullAccess
+                  - AWSOrganizationsFullAccess
+
+    :example:
+
+    Check for EC2 instances with instance profile roles that have
+    attached policy names matching a pattern:
+
+    .. code-block:: yaml
+
+        policies:
+          - name: ec2-instance-with-full-access-policies
+            resource: aws.ec2
+            filters:
+              - type: has-specific-managed-policy
+                op: glob
+                value: "*FullAccess"
+
+    Check for EC2 instances with instance profile roles that have
+    attached policy ARNs matching a pattern:
+
+    .. code-block:: yaml
+
+        policies:
+          - name: ec2-instance-with-aws-full-access-policies
+            resource: aws.ec2
+            filters:
+              - type: has-specific-managed-policy
+                key: PolicyArn
+                op: regex
+                value: "arn:aws:iam::aws:policy/.*FullAccess"
+    """
+
+    permissions = (
+        'iam:GetInstanceProfile',
+        'iam:ListInstanceProfiles',
+        'iam:ListAttachedRolePolicies')
+
+    def process(self, resources, event=None):
+        client = utils.local_session(self.manager.session_factory).client('iam')
+        iam_profiles = self.manager.get_resource_manager('iam-profile').resources()
+        iam_profiles_mapping = {profile['Arn']: profile for profile in iam_profiles}
+
+        results = []
+        for r in resources:
+            if r['State']['Name'] == 'terminated':
+                continue
+            instance_profile_arn = r.get('IamInstanceProfile', {}).get('Arn')
+            if not instance_profile_arn:
+                continue
+
+            profile = iam_profiles_mapping.get(instance_profile_arn)
+            if not profile:
+                continue
+
+            self.get_managed_policies(client, [profile])
+
+            matched_keys = [k for k in profile[self.annotation_key] if self.match(k)]
+            self.merge_annotation(profile, self.matched_annotation_key, matched_keys)
+            if matched_keys:
+                results.append(r)
+
+        return results
+
+
+@resources.register('ec2-capacity-reservation')
+class CapacityReservation(query.QueryResourceManager):
+    """Custodian resource for managing EC2 Capacity Reservation.
+    """
+
+    class resource_type(query.TypeInfo):
+        name = id = 'CapacityReservationId'
+        service = 'ec2'
+        enum_spec = ('describe_capacity_reservations',
+                     'CapacityReservations', None)
+
+        id_prefix = 'cr-'
+        arn = "CapacityReservationArn"
+        filter_name = 'CapacityReservationIds'
+        filter_type = 'list'
+        cfn_type = 'AWS::EC2::CapacityReservation'
+        permissions_enum = ('ec2:DescribeCapacityReservations',)

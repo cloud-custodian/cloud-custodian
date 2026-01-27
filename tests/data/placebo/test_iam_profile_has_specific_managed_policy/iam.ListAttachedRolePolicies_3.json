@@ -1,0 +1,13 @@
+{
+    "status_code": 200,
+    "data": {
+        "AttachedPolicies": [
+            {
+                "PolicyName": "admin-policy",
+                "PolicyArn": "arn:aws:iam::123456789012:policy/admin-policy"
+            }
+        ],
+        "IsTruncated": false,
+        "ResponseMetadata": {}
+    }
+}

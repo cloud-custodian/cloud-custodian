@@ -1,0 +1,32 @@
+{
+  "headers": {
+    "content-type": "application/json; charset=UTF-8",
+    "vary": "Origin, X-Origin, Referer",
+    "date": "Thu, 14 Sep 2023 15:42:24 GMT",
+    "server": "ESF",
+    "cache-control": "private",
+    "x-xss-protection": "0",
+    "x-frame-options": "SAMEORIGIN",
+    "server-timing": "gfet4t7; dur=298",
+    "alt-svc": "h3=\":443\"; ma=2592000,h3-29=\":443\"; ma=2592000",
+    "transfer-encoding": "chunked",
+    "status": "200",
+    "content-length": "413",
+    "-content-encoding": "gzip",
+    "content-location": "https://spanner.googleapis.com/v1/projects/cloud-custodian/instances?alt=json"
+  },
+  "body": {
+    "instances": [
+      {
+        "name": "projects/cloud-custodian/instances/test-spanner",
+        "config": "projects/cloud-custodian/instanceConfigs/regional-us-west1",
+        "displayName": "test-spanner",
+        "state": "READY",
+        "processingUnits": 100,
+        "instanceType": "PROVISIONED",
+        "createTime": "2023-09-14T12:57:47.941483Z",
+        "updateTime": "2023-09-14T12:57:47.941483Z"
+      }
+    ]
+  }
+}

@@ -1,20 +1,51 @@
 # Copyright The Cloud Custodian Authors.
 # SPDX-License-Identifier: Apache-2.0
-import jmespath
+from collections import defaultdict
 import json
+import time
+from typing import TypedDict, Dict, List, Tuple
+
+from botocore.client import BaseClient
 
 from c7n.actions import Action, BaseAction, ModifyVpcSecurityGroupsAction, RemovePolicyBase
 from c7n.filters import MetricsFilter, CrossAccountAccessFilter, ValueFilter
+from c7n.filters.core import ComparableVersion
 from c7n.exceptions import PolicyValidationError
 from c7n.filters.vpc import SecurityGroupFilter, SubnetFilter, VpcFilter, Filter
 from c7n.manager import resources
 from c7n.query import ConfigSource, DescribeSource, QueryResourceManager, TypeInfo
-from c7n.utils import chunks, local_session, type_schema
+from c7n.utils import chunks, local_session, type_schema, merge_dict_list, jmespath_search
 from c7n.tags import Tag, RemoveTag, TagActionFilter, TagDelayedAction
 from c7n.filters.kms import KmsRelatedFilter
 import c7n.filters.policystatement as polstmt_filter
 
 from .securityhub import PostFinding
+
+
+def parse_es_version(version: str) -> Tuple[str, str]:
+    """
+    Parses a ElasticSearch/OpenSearch version string into a
+    `(engine_name, full_version_str)` tuple.
+
+    Examples:
+    - "Elasticsearch_7.4" -> ("Elasticsearch", "7.4")
+    - "OpenSearch_1.3" -> ("OpenSearch", "1.3")
+    """
+    # If it's empty, return all `None`s.
+    if not version:
+        return None, None
+
+    # If there's no `_` in the version string, check for a plain version.
+    if '_' not in version:
+        # If it doesn't start with a number, it's probably not a valid version
+        # string.
+        if not version[0].isnumeric():
+            return None, None
+
+        return "Elasticsearch", version
+
+    engine_name, version_str = version.split('_', 1)
+    return engine_name, version_str
 
 
 class DescribeDomain(DescribeSource):
@@ -57,6 +88,14 @@ class ElasticSearchDomain(QueryResourceManager):
         name = 'Name'
         dimension = "DomainName"
         cfn_type = config_type = 'AWS::Elasticsearch::Domain'
+        permissions_augment = ("es:ListTags",)
+
+    def resources(self, query=None):
+        if 'query' in self.data:
+            query = merge_dict_list(self.data['query'])
+        elif query is None:
+            query = {}
+        return super(ElasticSearchDomain, self).resources(query=query)
 
     source_mapping = {
         'describe': DescribeDomain,
@@ -128,9 +167,8 @@ class ElasticSearchCrossAccountAccessFilter(CrossAccountAccessFilter):
                     DomainName=r['DomainName'],
                     ignore_err_codes=('ResourceNotFoundException',))
                 if result:
-                    r[self.policy_attribute] = json.loads(
-                        result.get('DomainConfig').get('AccessPolicies').get('Options')
-                    )
+                    options = result.get('DomainConfig').get('AccessPolicies').get('Options')
+                    r[self.policy_attribute] = options and json.loads(options) or None
         return super().process(resources)
 
 
@@ -176,23 +214,20 @@ class ElasticSearchCrossClusterFilter(Filter):
         for r in resources:
             if self.annotation_key not in r:
                 r[self.annotation_key] = {}
-                try:
-                    if "inbound" in self.data:
-                        inbound = self.manager.retry(
-                            client.describe_inbound_cross_cluster_search_connections,
-                            Filters=[{'Name': 'destination-domain-info.domain-name',
-                                    'Values': [r['DomainName']]}])
-                        inbound.pop('ResponseMetadata')
-                        r[self.annotation_key]["inbound"] = inbound
-                    if "outbound" in self.data:
-                        outbound = self.manager.retry(
-                            client.describe_outbound_cross_cluster_search_connections,
-                            Filters=[{'Name': 'source-domain-info.domain-name',
-                                    'Values': [r['DomainName']]}])
-                        outbound.pop('ResponseMetadata')
-                        r[self.annotation_key]["outbound"] = outbound
-                except client.exceptions.ResourceNotFoundExecption:
-                    continue
+                if "inbound" in self.data:
+                    inbound = self.manager.retry(
+                        client.describe_inbound_cross_cluster_search_connections,
+                        Filters=[{'Name': 'destination-domain-info.domain-name',
+                                'Values': [r['DomainName']]}])
+                    inbound.pop('ResponseMetadata')
+                    r[self.annotation_key]["inbound"] = inbound
+                if "outbound" in self.data:
+                    outbound = self.manager.retry(
+                        client.describe_outbound_cross_cluster_search_connections,
+                        Filters=[{'Name': 'source-domain-info.domain-name',
+                                'Values': [r['DomainName']]}])
+                    outbound.pop('ResponseMetadata')
+                    r[self.annotation_key]["outbound"] = outbound
             matchFound = False
             r[self.matched_key] = {}
             for direction in r[self.annotation_key]:
@@ -231,8 +266,10 @@ class SourceIP(Filter):
     an ElasticSearch domain allows traffic from non approved IP addresses/CIDRs.
 
     :example:
+
     Find ElasticSearch domains that allow traffic from IP addresses
     not in the approved list (string matching)
+
     .. code-block: yaml
 
       - type: source-ip
@@ -240,11 +277,14 @@ class SourceIP(Filter):
         value: ["103.15.250.0/24", "173.240.160.0/21", "206.108.40.0/21"]
 
     Same  as above but using cidr matching instead of string matching
+
     .. code-block: yaml
+
       - type: source-ip
         op: not-in
         value_type: cidr
         value: ["103.15.250.0/24", "173.240.160.0/21", "206.108.40.0/21"]
+
     """
     schema = type_schema('source-ip', rinherit=ValueFilter.schema)
     permissions = ("es:DescribeElasticsearchDomainConfig",)
@@ -293,6 +333,180 @@ class SourceIP(Filter):
         return source_ips
 
 
+EngineUpgradesDict = Dict[
+    # Version string from the API as the key.
+    str, List[
+        # Each of the available upgrades.
+        TypedDict("TargetUpgradeOptions", {
+            "engine": str,
+            "version": str,
+            "original": str,
+        })
+    ]
+]
+# A type to make clear the expected structure for upgrade options.
+ESUpgradeOptionsDict = TypedDict("ESUpgradeOptionsDict", {
+    "elasticsearch": EngineUpgradesDict,
+    "opensearch": EngineUpgradesDict,
+})
+
+
+@ElasticSearchDomain.filter_registry.register('upgrade-available')
+class UpgradeAvailable(Filter):
+    """Scans for available upgrade-compatible ES versions
+
+    This will check all the ElasticSearch domains on the resources, and return
+    a list of viable upgrade options.
+
+    :example:
+
+    .. code-block:: yaml
+
+            policies:
+              - name: elasticsearch-upgrade-available
+                resource: elasticsearch
+                filters:
+                  - type: upgrade-available
+                    major: False
+
+    """
+
+    schema = type_schema(
+        'upgrade-available',
+        major={'type': 'boolean'},
+        value={'type': 'boolean'},
+    )
+    permissions = ('es:GetCompatibleVersions',)
+    annotation_key = "c7n:AvailableUpgrades"
+
+    def collect_available_upgrades(self, client: BaseClient) -> ESUpgradeOptionsDict:
+        """
+        Fetch all upgrades for all engines/versions.
+
+        We want a structure that will let us efficiently look up those values
+        per-resource, and return all the upgrade options in a single O(1)-ish
+        lookup.
+        """
+        all_upgrades = {
+            "elasticsearch": {},
+            "opensearch": {},
+        }
+
+        # We fetch them all at once & restructure.
+        response = self.manager.retry(
+            client.get_compatible_elasticsearch_versions,
+            ignore_err_codes=('ResourceNotFoundException',)
+        )
+        compatible_versions = response.get('CompatibleElasticsearchVersions', [])
+
+        for upgrade_options in compatible_versions:
+            source_version = upgrade_options.get('SourceVersion')
+            target_versions = upgrade_options.get('TargetVersions', [])
+
+            source_engine, sversion_str = parse_es_version(source_version)
+            source_engine = source_engine.lower()
+            all_upgrades.setdefault(source_engine, {})
+            all_upgrades[source_engine].setdefault(sversion_str, [])
+
+            for target_version in target_versions:
+                target_engine, tversion_str = parse_es_version(target_version)
+                all_upgrades[source_engine][sversion_str].append({
+                    "engine": target_engine,
+                    "version": tversion_str,
+                    "original": target_version,
+                })
+
+        return all_upgrades
+
+    def get_matches_for(
+        self,
+        current_engine: str,
+        cversion: ComparableVersion,
+        per_engine_options: EngineUpgradesDict,
+        check_major=False
+    ) -> List[str]:
+        matches = []
+
+        for sversion_str, targets in per_engine_options.items():
+            sversion = ComparableVersion(sversion_str)
+
+            # Compare major versions first, ...
+            if sversion.version[0] != cversion.version[0]:
+                continue
+
+            # ...then minor, to find a match.
+            if (
+                len(sversion.version) < 2
+                or len(cversion.version) < 2
+                or sversion.version[1] != cversion.version[1]
+            ):
+                continue
+
+            # If we're here, we have a "good-enough" engine/version match.
+            # Next, we'll build the list of matching upgrades.
+            for target_data in targets:
+                target_engine = target_data["engine"]
+                tversion = ComparableVersion(target_data["version"])
+
+                # If the engines don't match, it'd be considered a "major"
+                # upgrade.
+                if (
+                    target_engine.lower() != current_engine.lower()
+                    and not check_major
+                ):
+                    continue
+
+                # Only if the engines are the same, should we check the
+                # major versions.
+                if (
+                    target_engine.lower() == current_engine.lower()
+                    and tversion.version[0] > sversion.version[0]
+                    and not check_major
+                ):
+                    continue
+
+                matches.append(target_data["original"])
+
+        return matches
+
+    def process(self, resources, event=None):
+        client = local_session(self.manager.session_factory).client('es')
+        check_major = self.data.get('major', False)
+        check_upgrade_extant = self.data.get('value', True)
+        results = []
+
+        all_available_upgrades = self.collect_available_upgrades(client)
+
+        for r in resources:
+            current_raw_version = r.get('ElasticsearchVersion', '')
+            current_engine, cversion_str = parse_es_version(current_raw_version)
+            cversion = ComparableVersion(cversion_str)
+            per_engine_options = all_available_upgrades.get(current_engine.lower())
+            matches = self.get_matches_for(
+                current_engine,
+                cversion,
+                per_engine_options,
+                check_major=check_major
+            )
+
+            # Annotate on all the upgrades (in a stable ordering).
+            r[self.annotation_key] = list(sorted(matches))
+
+            # Lastly, depending on `value` (filter if upgrades exist or not):
+            if check_upgrade_extant:
+                if matches:
+                    # We want to filter to include only resources that have
+                    # upgrades.
+                    results.append(r)
+            else:
+                if not matches:
+                    # We want to filter to include only resources **without**
+                    # upgrades,
+                    results.append(r)
+
+        return results
+
+
 @ElasticSearchDomain.action_registry.register('remove-statements')
 class RemovePolicyStatement(RemovePolicyBase):
     """
@@ -336,7 +550,7 @@ class RemovePolicyStatement(RemovePolicyBase):
         if p is None:
             return
 
-        statements, found = self.process_policy(
+        _, found = self.process_policy(
             p, resource, CrossAccountAccessFilter.annotation_key)
 
         if found:
@@ -362,29 +576,29 @@ class ElasticSearchPostFinding(PostFinding):
             'Endpoint': r.get('Endpoint'),
             'Endpoints': r.get('Endpoints'),
             'DomainEndpointOptions': self.filter_empty({
-                'EnforceHTTPS': jmespath.search(
+                'EnforceHTTPS': jmespath_search(
                     'DomainEndpointOptions.EnforceHTTPS', r),
-                'TLSSecurityPolicy': jmespath.search(
+                'TLSSecurityPolicy': jmespath_search(
                     'DomainEndpointOptions.TLSSecurityPolicy', r)
             }),
             'ElasticsearchVersion': r['ElasticsearchVersion'],
             'EncryptionAtRestOptions': self.filter_empty({
-                'Enabled': jmespath.search(
+                'Enabled': jmespath_search(
                     'EncryptionAtRestOptions.Enabled', r),
-                'KmsKeyId': jmespath.search(
+                'KmsKeyId': jmespath_search(
                     'EncryptionAtRestOptions.KmsKeyId', r)
             }),
             'NodeToNodeEncryptionOptions': self.filter_empty({
-                'Enabled': jmespath.search(
+                'Enabled': jmespath_search(
                     'NodeToNodeEncryptionOptions.Enabled', r)
             }),
             'VPCOptions': self.filter_empty({
-                'AvailabilityZones': jmespath.search(
+                'AvailabilityZones': jmespath_search(
                     'VPCOptions.AvailabilityZones', r),
-                'SecurityGroupIds': jmespath.search(
+                'SecurityGroupIds': jmespath_search(
                     'VPCOptions.SecurityGroupIds', r),
-                'SubnetIds': jmespath.search('VPCOptions.SubnetIds', r),
-                'VPCId': jmespath.search('VPCOptions.VPCId', r)
+                'SubnetIds': jmespath_search('VPCOptions.SubnetIds', r),
+                'VPCId': jmespath_search('VPCOptions.VPCId', r)
             })
         }))
         return envelope
@@ -443,7 +657,7 @@ class ElasticSearchAddTag(Tag):
         for d in domains:
             try:
                 client.add_tags(ARN=d['ARN'], TagList=tags)
-            except client.exceptions.ResourceNotFoundExecption:
+            except client.exceptions.ValidationException:
                 continue
 
 
@@ -470,7 +684,7 @@ class ElasticSearchRemoveTag(RemoveTag):
         for d in domains:
             try:
                 client.remove_tags(ARN=d['ARN'], TagKeys=tags)
-            except client.exceptions.ResourceNotFoundExecption:
+            except client.exceptions.ValidationException:
                 continue
 
 
@@ -503,7 +717,9 @@ class RemoveMatchedSourceIps(BaseAction):
     ElasticSearch domain.
 
     :example:
+
     .. code-block:: yaml
+
             policies:
               - name: es-access-revoke
                 resource: elasticsearch
@@ -613,7 +829,8 @@ class UpdateTlsConfig(Action):
     """
 
     schema = type_schema('update-tls-config', value={'type': 'string',
-        'enum': ['Policy-Min-TLS-1-0-2019-07', 'Policy-Min-TLS-1-2-2019-07']}, required=['value'])
+        'enum': ['Policy-Min-TLS-1-0-2019-07', 'Policy-Min-TLS-1-2-2019-07',
+                 'Policy-Min-TLS-1-2-PFS-2023-10']}, required=['value'])
     permissions = ('es:UpdateElasticsearchDomainConfig', 'es:ListDomainNames')
 
     def process(self, resources):
@@ -622,3 +839,115 @@ class UpdateTlsConfig(Action):
         for r in resources:
             client.update_elasticsearch_domain_config(DomainName=r['DomainName'],
                 DomainEndpointOptions={'EnforceHTTPS': True, 'TLSSecurityPolicy': tls_value})
+
+
+@ElasticSearchDomain.action_registry.register('enable-auditlog')
+class EnableAuditLog(Action):
+
+    """Action to enable audit logs on a domain endpoint
+
+    :example:
+
+    .. code-block:: yaml
+
+            policies:
+              - name: enable-auditlog
+                resource: elasticsearch
+                filters:
+                  - type: value
+                    key: 'LogPublishingOptions.AUDIT_LOGS.Enabled'
+                    op: eq
+                    value: false
+                actions:
+                  - type: enable-auditlog
+                    state: True
+                    loggroup_prefix: "/aws/es/domains"
+
+    """
+
+    schema = type_schema(
+        'enable-auditlog',
+        state={'type': 'boolean'},
+        loggroup_prefix={'type': 'string'},
+        delay={'type': 'number'},
+        required=['state'])
+
+    statement = {
+        "Sid": "OpenSearchCloudWatchLogs",
+        "Effect": "Allow",
+        "Principal": {"Service": ["es.amazonaws.com"]},
+        "Action": ["logs:PutLogEvents", "logs:CreateLogStream"],
+        "Resource": None}
+
+    permissions = (
+        'es:UpdateElasticsearchDomainConfig',
+        'es:ListDomainNames',
+        'logs:DescribeLogGroups',
+        'logs:CreateLogGroup',
+        'logs:PutResourcePolicy')
+
+    def get_loggroup_arn(self, domain, log_prefix=None):
+        if log_prefix:
+            log_group_name = "%s/%s/audit-logs" % (log_prefix, domain)
+        else:
+            log_group_name = "/aws/OpenSearchService/domains/%s/audit-logs" % (domain)
+        log_group_arn = "arn:aws:logs:{}:{}:log-group:{}:*".format(
+            self.manager.region, self.manager.account_id, log_group_name)
+        return log_group_arn
+
+    def merge_dict(self, d1, d2):
+        merged_dict = defaultdict(list)
+
+        for d in (d1, d2):
+            for key, value in d.items():
+                if key == 'Resource':
+                    if isinstance(value, list):
+                        merged_dict[key].extend(value)
+                    else:
+                        merged_dict[key].append(value)
+                else:
+                    merged_dict[key] = value
+
+        return dict(merged_dict)
+
+    def set_permissions(self, log_group_arn):
+        statement = dict(self.statement)
+        statement['Resource'] = [log_group_arn]
+        client = local_session(
+            self.manager.session_factory).client('logs')
+
+        try:
+            client.create_log_group(logGroupName=log_group_arn.split(":")[-2])
+        except client.exceptions.ResourceAlreadyExistsException:
+            pass
+
+        for policy in client.describe_resource_policies().get('resourcePolicies'):
+            if policy['policyName'] == "OpenSearchCloudwatchLogPermissions":
+                policy_doc = json.loads(policy['policyDocument'])
+                if log_group_arn not in policy_doc['Statement'][0]['Resource']:
+                    merged_statement = self.merge_dict(statement, policy_doc['Statement'][0])
+                    statement = merged_statement
+                continue
+
+        response = client.put_resource_policy(
+            policyName='OpenSearchCloudwatchLogPermissions',
+            policyDocument=json.dumps(
+                {"Version": "2012-10-17", "Statement": statement}))
+
+        return response
+
+    def process(self, resources):
+        client = local_session(
+            self.manager.session_factory).client('es')
+        state = self.data.get('state')
+        log_prefix = self.data.get('loggroup_prefix')
+        log_group_arns = {
+            r['DomainName']: self.get_loggroup_arn(r["DomainName"], log_prefix) for r in resources}
+
+        for r in resources:
+            if state:
+                self.set_permissions(log_group_arns[r["DomainName"]])
+                time.sleep(self.data.get('delay', 15))
+            client.update_elasticsearch_domain_config(DomainName=r['DomainName'],
+                LogPublishingOptions={"AUDIT_LOGS":
+                {'CloudWatchLogsLogGroupArn': log_group_arns[r["DomainName"]], 'Enabled': state}})

@@ -3,10 +3,11 @@
 import re
 
 from c7n.utils import type_schema
-
+from c7n_gcp.filters.iampolicy import IamPolicyFilter
 from c7n_gcp.provider import resources
 from c7n_gcp.query import QueryResourceManager, TypeInfo, ChildResourceManager, ChildTypeInfo
 from c7n_gcp.actions import MethodAction
+from c7n_gcp.filters.timerange import TimeRangeFilter
 
 
 @resources.register('project-role')
@@ -25,6 +26,8 @@ class ProjectRole(QueryResourceManager):
         name = id = "name"
         default_report_fields = ['name', 'title', 'description', 'stage', 'deleted']
         asset_type = "iam.googleapis.com/Role"
+        urn_component = "project-role"
+        urn_id_segments = (-1,)  # Just use the last segment of the id in the URN
 
         @staticmethod
         def get(client, resource_info):
@@ -51,6 +54,8 @@ class ServiceAccount(QueryResourceManager):
         default_report_fields = ['name', 'displayName', 'email', 'description', 'disabled']
         asset_type = "iam.googleapis.com/ServiceAccount"
         metric_key = 'resource.labels.unique_id'
+        urn_component = 'service-account'
+        urn_id_path = 'email'
 
         @staticmethod
         def get(client, resource_info):
@@ -95,6 +100,14 @@ class DisableServiceAccount(MethodAction):
         return {'name': r['name']}
 
 
+@ServiceAccount.filter_registry.register('iam-policy')
+class ServiceAccountIamPolicyFilter(IamPolicyFilter):
+    """
+    Overrides the base implementation to process service account resources correctly.
+    """
+    permissions = ('resourcemanager.projects.getIamPolicy',)
+
+
 @resources.register('service-account-key')
 class ServiceAccountKey(ChildResourceManager):
     """GCP Resource
@@ -133,6 +146,8 @@ class ServiceAccountKey(ChildResourceManager):
         scc_type = "google.iam.ServiceAccountKey"
         permissions = ("iam.serviceAccounts.list",)
         metric_key = 'metric.labels.key_id'
+        urn_component = "service-account-key"
+        urn_id_segments = (3, 5)
 
         @staticmethod
         def get(client, resource_info):
@@ -174,6 +189,10 @@ class Role(QueryResourceManager):
         name = id = "name"
         default_report_fields = ['name', 'title', 'description', 'stage', 'deleted']
         asset_type = "iam.googleapis.com/Role"
+        urn_component = "role"
+        # Don't show the project ID in the URN.
+        urn_has_project = False
+        urn_id_segments = (-1,)  # Just use the last segment of the id in the URN
 
         @staticmethod
         def get(client, resource_info):
@@ -181,3 +200,40 @@ class Role(QueryResourceManager):
                 'get', {
                     'name': 'roles/{}'.format(
                         resource_info['name'])})
+
+
+@resources.register('api-key')
+class ApiKey(QueryResourceManager):
+    """GCP API Key
+    https://cloud.google.com/api-keys/docs/reference/rest/v2/projects.locations.keys#Key
+    """
+    class resource_type(TypeInfo):
+        service = 'apikeys'
+        version = 'v2'
+        component = 'projects.locations.keys'
+        enum_spec = ('list', 'keys[]', None)
+        scope = 'project'
+        scope_key = 'parent'
+        scope_template = 'projects/{}/locations/global'
+        name = id = "name"
+        default_report_fields = ['name', 'displayName', 'createTime', 'updateTime']
+        asset_type = "apikeys.googleapis.com/projects.locations.keys"
+
+
+@ApiKey.filter_registry.register('time-range')
+class ApiKeyTimeRangeFilter(TimeRangeFilter):
+    """Filters api keys that have been changed during a specific time range.
+
+    .. code-block:: yaml
+
+        policies:
+          - name: api_keys_not_rotated_more_than_90_days
+            resource: gcp.api-key
+            filters:
+              - not:
+                  - type: time-range
+                    value: 90
+    """
+    create_time_field_name = 'createTime'
+    expire_time_field_name = 'updateTime'
+    permissions = ('apikeys.keys.list', )

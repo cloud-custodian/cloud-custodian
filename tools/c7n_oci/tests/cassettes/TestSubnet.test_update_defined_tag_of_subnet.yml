@@ -1,0 +1,118 @@
+interactions:
+- request:
+    body: null
+    headers: {}
+    method: GET
+    uri: https://identity.us-ashburn-1.oci.oraclecloud.com/20160918/users/ocid1.user.oc1..<unique_ID>
+  response:
+    body:
+      data:
+        id: ocid1.user.oc1..<unique_ID>
+        name: user@example.com
+    headers:
+      content-type:
+      - application/json
+    status:
+      code: 200
+      message: OK
+- request:
+    body: null
+    headers: {}
+    method: GET
+    uri: https://iaas.us-ashburn-1.oraclecloud.com/20160918/subnets?compartmentId=ocid1.compartment.oc1..<unique_ID>
+  response:
+    body:
+      data:
+      - availabilityDomain: NQNU:US-ASHBURN-AD-1
+        cidrBlock: 10.1.20.0/24
+        compartmentId: ocid1.compartment.oc1..<unique_ID>
+        definedTags:
+          Oracle-Tags:
+            CreatedBy: user@example.com
+            CreatedOn: '2023-06-09T12:35:27.686Z'
+          cloud-custodian-test:
+            mark-for-resize: 'true'
+        dhcpOptionsId: ocid1.dhcpoptions.oc1..<unique_ID>
+        displayName: TestSubnet
+        dnsLabel: testsubnet
+        freeformTags:
+          Project: CNCF
+        id: ocid1.subnet.oc1..<unique_ID>
+        lifecycleState: AVAILABLE
+        prohibitInternetIngress: false
+        prohibitPublicIpOnVnic: false
+        routeTableId: ocid1.routetable.oc1..<unique_ID>
+        securityListIds:
+        - ocid1.securitylist.oc1..<unique_ID>
+        subnetDomainName: testsubnet.testvcn.oraclevcn.com
+        timeCreated: '2023-06-09T12:35:28.774Z'
+        vcnId: ocid1.vcn.oc1..<unique_ID>
+        virtualRouterIp: 10.1.20.1
+        virtualRouterMac: 00:00:17:74:81:F8
+    headers:
+      content-type:
+      - application/json
+    status:
+      code: 200
+      message: OK
+- request:
+    body: mock_body
+    headers: {}
+    method: PUT
+    uri: https://iaas.us-ashburn-1.oraclecloud.com/20160918/subnets/ocid1.subnet.oc1..<unique_ID>
+  response:
+    body:
+      data:
+        availabilityDomain: NQNU:US-ASHBURN-AD-1
+        cidrBlock: 10.1.20.0/24
+        compartmentId: ocid1.compartment.oc1..<unique_ID>
+        definedTags:
+          Oracle-Tags:
+            CreatedBy: user@example.com
+            CreatedOn: '2023-06-09T12:35:27.686Z'
+          cloud-custodian-test:
+            mark-for-resize: 'false'
+        dhcpOptionsId: ocid1.dhcpoptions.oc1..<unique_ID>
+        displayName: TestSubnet
+        dnsLabel: testsubnet
+        freeformTags:
+          Project: CNCF
+        id: ocid1.subnet.oc1..<unique_ID>
+        lifecycleState: AVAILABLE
+    headers:
+      content-type:
+      - application/json
+    status:
+      code: 200
+      message: OK
+- request:
+    body: null
+    headers: {}
+    method: GET
+    uri: https://iaas.us-ashburn-1.oraclecloud.com/20160918/subnets/ocid1.subnet.oc1..<unique_ID>
+  response:
+    body:
+      data:
+        availabilityDomain: NQNU:US-ASHBURN-AD-1
+        cidrBlock: 10.1.20.0/24
+        compartmentId: ocid1.compartment.oc1..<unique_ID>
+        definedTags:
+          Oracle-Tags:
+            CreatedBy: user@example.com
+            CreatedOn: '2023-06-09T12:35:27.686Z'
+          cloud-custodian-test:
+            mark-for-resize: 'false'
+        dhcpOptionsId: ocid1.dhcpoptions.oc1..<unique_ID>
+        displayName: TestSubnet
+        dnsLabel: testsubnet
+        freeformTags:
+          Project: CNCF
+        id: ocid1.subnet.oc1..<unique_ID>
+        lifecycleState: AVAILABLE
+    headers:
+      content-type:
+      - application/json
+    status:
+      code: 200
+      message: OK
+version: 1

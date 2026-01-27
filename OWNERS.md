@@ -5,6 +5,7 @@
 - Kapil Thangavelu (@kapilt)
   project lead (bdfl)
 - Darren Dao (@darrendao)
+- Pratyush Mishra (@PratMis)
 
 ## Aws Provider Maintainers
 
@@ -27,7 +28,7 @@
 ## Community Manager 
 
 Administrative duties on behalf of the maintainers,
-used for governance/CNCF contact, no code rights
+used for governance/CNCF contact, no code rights.
 
 - Jorge Castro (@castrojo)
 

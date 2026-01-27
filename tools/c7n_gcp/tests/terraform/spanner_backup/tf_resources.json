@@ -1,0 +1,70 @@
+{
+    "pytest-terraform": 1,
+    "outputs": {},
+    "resources": {
+        "google_service_account": {
+            "c7n": {
+                "account_id": "terrapin-sa",
+                "description": "",
+                "disabled": false,
+                "display_name": "terrapin-sa",
+                "email": "terrapin-sa@cloud-custodian.iam.gserviceaccount.com",
+                "id": "projects/cloud-custodian/serviceAccounts/terrapin-sa@cloud-custodian.iam.gserviceaccount.com",
+                "member": "serviceAccount:terrapin-sa@cloud-custodian.iam.gserviceaccount.com",
+                "name": "projects/cloud-custodian/serviceAccounts/terrapin-sa@cloud-custodian.iam.gserviceaccount.com",
+                "project": "cloud-custodian",
+                "timeouts": null,
+                "unique_id": "104270693486061536852"
+            }
+        },
+        "google_spanner_database": {
+            "c7n": {
+                "database_dialect": "GOOGLE_STANDARD_SQL",
+                "ddl": null,
+                "deletion_protection": false,
+                "enable_drop_protection": false,
+                "encryption_config": [],
+                "id": "terrapin-spanner-instance/terrapin-spanner-database",
+                "instance": "terrapin-spanner-instance",
+                "name": "terrapin-spanner-database",
+                "project": "cloud-custodian",
+                "state": "READY",
+                "timeouts": null,
+                "version_retention_period": "1h"
+            }
+        },
+        "google_spanner_instance": {
+            "c7n": {
+                "config": "projects/cloud-custodian/instanceConfigs/regional-us-central1",
+                "display_name": "terrapin-spanner-instance",
+                "force_destroy": false,
+                "id": "cloud-custodian/terrapin-spanner-instance",
+                "labels": null,
+                "name": "terrapin-spanner-instance",
+                "num_nodes": 1,
+                "processing_units": 1000,
+                "project": "cloud-custodian",
+                "state": "READY",
+                "timeouts": null
+            }
+        },
+        "null_resource": {
+            "c7n": {
+                "id": "7316843701815706600",
+                "triggers": {
+                    "backup": "terrapin-backup",
+                    "spanner_instance": "terrapin-spanner-instance"
+                }
+            }
+        },
+        "random_pet": {
+            "c7n": {
+                "id": "terrapin",
+                "keepers": null,
+                "length": 1,
+                "prefix": null,
+                "separator": "-"
+            }
+        }
+    }
+}

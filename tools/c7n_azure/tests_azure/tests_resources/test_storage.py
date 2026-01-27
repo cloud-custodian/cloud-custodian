@@ -7,7 +7,7 @@ from c7n_azure.resources.storage import StorageSettingsUtilities, StorageFirewal
     StorageFirewallBypassFilter
 from c7n_azure.session import Session
 from c7n_azure.storage_utils import StorageUtilities
-from mock import patch, MagicMock, Mock
+from unittest.mock import patch, MagicMock, Mock
 from netaddr import IPSet
 from parameterized import parameterized
 
@@ -645,10 +645,89 @@ class StorageTest(BaseTest):
             self.assertEqual(args[2],
                 StorageAccountUpdateParameters(enable_https_traffic_only=True))
 
+    @arm_template("storage.json")
+    def test_storage_settings_require_secure_transfer_min_tls_version(self):
+        p = self.load_policy(
+            {
+                'name': 'my-first-policy',
+                'resource': 'azure.storage',
+                'filters': [
+                    {
+                        'type': 'value',
+                        'key': 'name',
+                        'op': 'glob',
+                        'value_type': 'normalize',
+                        'value': 'cctstorage*'
+                    },
+                    {
+                        "properties.minimumTlsVersion": "TLS1_0"
+                    }
+                ],
+                'actions': [
+                    {
+                        'type': 'require-secure-transfer',
+                        'value': True,
+                        "minimum_tls_version": "TLS1_2",
+                    }
+                ]
+            }
+        )
+        resources = p.run()
+
+        assert len(resources) == 1
+
+        resource_before = resources[0]
+        assert resource_before
+
+        rg = resource_before["resourceGroup"]
+        name = resource_before["name"]
+
+        client = self.session.client("azure.mgmt.storage.StorageManagementClient")
+        account = client.storage_accounts.get_properties(resource_group_name=rg, account_name=name)
+        assert account.minimum_tls_version == "TLS1_2"
+
     def _get_storage_management_client_api_string(self):
         return local_session(Session)\
             .client('azure.mgmt.storage.StorageManagementClient')\
             .DEFAULT_API_VERSION.replace("-", "_")
+
+    def test_storage_blob_services(self):
+        p = self.load_policy({
+            'name': 'test-azure-blob-services',
+            'resource': 'azure.storage',
+            'filters': [
+                {'type': 'value',
+                'key': 'name',
+                'op': 'glob',
+                'value_type': 'normalize',
+                'value': 'cctstorage*'},
+                {'type': 'blob-services',
+                 'key': 'deleteRetentionPolicy.enabled',
+                 'value': True}],
+        }, validate=True)
+
+        resources = p.run()
+        self.assertEqual(1, len(resources))
+
+    def test_storage_management_policy_rules_filter(self):
+        p = self.load_policy({
+            'name': 'test-azure-mp-rules',
+            'resource': 'azure.storage',
+            'filters': [{
+                'type': 'management-policy-rules',
+                'attrs': [{
+                    'type': 'value',
+                    'key': 'definition.actions.baseBlob.delete.daysAfterModificationGreaterThan',
+                    'value': 3,
+                    'op': 'le'
+                }]
+            }]
+        }, validate=True)
+        resources = p.run()
+        self.assertEqual(1, len(resources))
+        self.assertEqual(resources[0]['name'], 'cloudcustodiantest')
+        self.assertEqual(len(resources[0]['c7n:management-policy-rules']), 1)
+        self.assertEqual(resources[0]['c7n:management-policy-rules'][0]['name'], 'test')
 
 
 class StorageFirewallFilterTest(BaseTest):
@@ -685,3 +764,23 @@ class StorageFirewallBypassFilterTest(BaseTest):
                                                    'bypass': bypass}}}
         f = StorageFirewallBypassFilter({'mode': 'equal', 'list': []})
         self.assertEqual(expected, f._query_bypass(resource))
+
+
+class StorageFileServicesFilterTest(BaseTest):
+    def test_filter_with_file_services_delete_policy(self):
+        p = self.load_policy({
+            'name': 'storage-with-file-services-delete-policy',
+            'resource': 'azure.storage',
+            'filters': [{
+                'type': 'file-services',
+                'attrs': [{
+                    'type': 'value',
+                    'key': 'properties.shareDeleteRetentionPolicy.enabled',
+                    'value': True,
+                }]
+            }]
+        })
+        resources = p.run()
+        self.assertEqual(len(resources), 1)
+        self.assertEqual(resources[0]['name'], 'storagefasdfhad2323')
+        self.assertEqual(len(resources[0]['c7n:FileServices']), 1)

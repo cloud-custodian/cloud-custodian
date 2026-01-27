@@ -1,0 +1,236 @@
+{
+  "version": 1,
+  "interactions": [
+    {
+      "request": {
+        "method": "GET",
+        "uri": "https://management.azure.com/subscriptions/ea42f556-5106-4743-99b0-c129bfa71a47/providers/Microsoft.Storage/storageAccounts?api-version=2019-04-01",
+        "body": null,
+        "headers": {}
+      },
+      "response": {
+        "status": {
+          "code": 200,
+          "message": "OK"
+        },
+        "headers": {
+          "content-type": [
+            "application/json; charset=utf-8"
+          ],
+          "date": [
+            "Thu, 02 May 2019 19:33:20 GMT"
+          ],
+          "content-length": [
+            "8686"
+          ],
+          "x-ms-original-request-ids": [
+            "069c8406-e846-4bae-9867-c39ac116c3dc",
+            "c9b4e59b-dec2-48ea-8a4f-11d3c58d2ccd"
+          ],
+          "cache-control": [
+            "no-cache"
+          ]
+        },
+        "body": {
+          "data": {
+            "value": [
+              {
+                "sku": {
+                  "name": "Standard_LRS",
+                  "tier": "Standard"
+                },
+                "kind": "Storage",
+                "id": "/subscriptions/ea42f556-5106-4743-99b0-c129bfa71a47/resourceGroups/test_containerservice/providers/Microsoft.Storage/storageAccounts/usm2nughsm6pomstr0",
+                "name": "usm2nughsm6pomstr0",
+                "type": "Microsoft.Storage/storageAccounts",
+                "location": "southcentralus",
+                "tags": {},
+                "properties": {
+                  "networkAcls": {
+                    "bypass": "AzureServices",
+                    "virtualNetworkRules": [],
+                    "ipRules": [],
+                    "defaultAction": "Allow"
+                  },
+                  "supportsHttpsTrafficOnly": false,
+                  "encryption": {
+                    "services": {
+                      "file": {
+                        "enabled": true,
+                        "lastEnabledTime": "2019-05-01T22:31:00.0178514Z"
+                      },
+                      "blob": {
+                        "enabled": true,
+                        "lastEnabledTime": "2019-05-01T22:31:00.0178514Z"
+                      }
+                    },
+                    "keySource": "Microsoft.Storage"
+                  },
+                  "provisioningState": "Succeeded",
+                  "creationTime": "2019-05-01T22:30:59.8772224Z",
+                  "primaryEndpoints": {
+                    "blob": "https://usm2nughsm6pomstr0.blob.core.windows.net/",
+                    "queue": "https://usm2nughsm6pomstr0.queue.core.windows.net/",
+                    "table": "https://usm2nughsm6pomstr0.table.core.windows.net/",
+                    "file": "https://usm2nughsm6pomstr0.file.core.windows.net/"
+                  },
+                  "primaryLocation": "southcentralus",
+                  "statusOfPrimary": "available"
+                }
+              },
+              {
+                "sku": {
+                  "name": "Standard_LRS",
+                  "tier": "Standard"
+                },
+                "kind": "Storage",
+                "id": "/subscriptions/ea42f556-5106-4743-99b0-c129bfa71a47/resourceGroups/test_functionapp-reqs/providers/Microsoft.Storage/storageAccounts/cloudcustodiantest",
+                "name": "cloudcustodiantest",
+                "type": "Microsoft.Storage/storageAccounts",
+                "location": "westus2",
+                "tags": {},
+                "properties": {
+                  "networkAcls": {
+                    "bypass": "AzureServices",
+                    "virtualNetworkRules": [],
+                    "ipRules": [],
+                    "defaultAction": "Allow"
+                  },
+                  "supportsHttpsTrafficOnly": false,
+                  "encryption": {
+                    "services": {
+                      "file": {
+                        "enabled": true,
+                        "lastEnabledTime": "2019-05-01T21:51:44.9504918Z"
+                      },
+                      "blob": {
+                        "enabled": true,
+                        "lastEnabledTime": "2019-05-01T21:51:44.9504918Z"
+                      }
+                    },
+                    "keySource": "Microsoft.Storage"
+                  },
+                  "provisioningState": "Succeeded",
+                  "creationTime": "2019-05-01T21:51:44.8567460Z",
+                  "primaryEndpoints": {
+                    "blob": "https://cloudcustodiantest.blob.core.windows.net/",
+                    "queue": "https://cloudcustodiantest.queue.core.windows.net/",
+                    "table": "https://cloudcustodiantest.table.core.windows.net/",
+                    "file": "https://cloudcustodiantest.file.core.windows.net/"
+                  },
+                  "primaryLocation": "westus2",
+                  "statusOfPrimary": "available"
+                }
+              }
+            ]
+          }
+        }
+      }
+    },
+    {
+      "request": {
+        "method": "GET",
+        "uri": "https://management.azure.com/subscriptions/ea42f556-5106-4743-99b0-c129bfa71a47/resourceGroups/test_containerservice/providers/Microsoft.Storage/storageAccounts/usm2nughsm6pomstr0/managementPolicies/default",
+        "body": null,
+        "headers": {}
+      },
+      "response": {
+        "status": {
+          "code": 404,
+          "message": "Not Found"
+        },
+        "headers": {
+          "content-type": [
+            "application/json; charset=utf-8"
+          ],
+          "date": [
+            "Thu, 02 May 2019 19:33:20 GMT"
+          ],
+          "content-length": [
+            "8686"
+          ],
+          "x-ms-original-request-ids": [
+            "069c8406-e846-4bae-9867-c39ac116c3dc",
+            "c9b4e59b-dec2-48ea-8a4f-11d3c58d2ccd"
+          ],
+          "cache-control": [
+            "no-cache"
+          ]
+        },
+        "body": {
+          "data": {
+            "error": {
+              "code": "ManagementPolicyNotFound",
+              "message": "No ManagementPolicy found for account usm2nughsm6pomstr0"
+            }
+          }
+        }
+      }
+    },
+    {
+      "request": {
+        "method": "GET",
+        "uri": "https://management.azure.com/subscriptions/ea42f556-5106-4743-99b0-c129bfa71a47/resourceGroups/test_functionapp-reqs/providers/Microsoft.Storage/storageAccounts/cloudcustodiantest/managementPolicies/default",
+        "body": null,
+        "headers": {}
+      },
+      "response": {
+        "status": {
+          "code": 200,
+          "message": "OK"
+        },
+        "headers": {
+          "content-type": [
+            "application/json; charset=utf-8"
+          ],
+          "date": [
+            "Thu, 02 May 2019 19:33:20 GMT"
+          ],
+          "content-length": [
+            "8686"
+          ],
+          "x-ms-original-request-ids": [
+            "069c8406-e846-4bae-9867-c39ac116c3dc",
+            "c9b4e59b-dec2-48ea-8a4f-11d3c58d2ccd"
+          ],
+          "cache-control": [
+            "no-cache"
+          ]
+        },
+        "body": {
+          "data": {
+            "id": "/subscriptions/dd3ce4b8-093a-40da-8369-d50149d0f84a/resourceGroups/369-rg-green/providers/Microsoft.Storage/storageAccounts/sa369green/managementPolicies/default",
+            "name": "DefaultManagementPolicy",
+            "type": "Microsoft.Storage/storageAccounts/managementPolicies",
+            "properties": {
+              "lastModifiedTime": "2024-11-19T10:48:33.515858Z",
+              "policy": {
+                "rules": [
+                  {
+                    "enabled": true,
+                    "name": "test",
+                    "type": "Lifecycle",
+                    "definition": {
+                      "actions": {
+                        "baseBlob": {
+                          "delete": {
+                            "daysAfterModificationGreaterThan": 3.0
+                          }
+                        }
+                      },
+                      "filters": {
+                        "blobTypes": [
+                          "blockBlob"
+                        ]
+                      }
+                    }
+                  }
+                ]
+              }
+            }
+          }
+        }
+      }
+    }
+  ]
+}

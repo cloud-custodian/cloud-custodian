@@ -1,0 +1,59 @@
+{
+    "status_code": 200,
+    "data": {
+        "Aliases": [
+            {
+                "AliasName": "alias/aws/sqs",
+                "AliasArn": "arn:aws:kms:us-east-1:644160558196:alias/aws/sqs",
+                "TargetKeyId": "5a4af27f-a9e6-40fb-a2ed-fc3fbfdb34a5",
+                "CreationDate": {
+                    "__class__": "datetime",
+                    "year": 2021,
+                    "month": 4,
+                    "day": 13,
+                    "hour": 5,
+                    "minute": 47,
+                    "second": 16,
+                    "microsecond": 8000
+                },
+                "LastUpdatedDate": {
+                    "__class__": "datetime",
+                    "year": 2021,
+                    "month": 4,
+                    "day": 13,
+                    "hour": 5,
+                    "minute": 47,
+                    "second": 16,
+                    "microsecond": 8000
+                }
+            },
+            {
+                "AliasName": "alias/kms-cache-check",
+                "AliasArn": "arn:aws:kms:us-east-1:644160558196:alias/kms-cache-check",
+                "TargetKeyId": "c928024b-2802-4bd7-bee1-d879c584a0ef",
+                "CreationDate": {
+                    "__class__": "datetime",
+                    "year": 2023,
+                    "month": 5,
+                    "day": 3,
+                    "hour": 13,
+                    "minute": 17,
+                    "second": 23,
+                    "microsecond": 922000
+                },
+                "LastUpdatedDate": {
+                    "__class__": "datetime",
+                    "year": 2023,
+                    "month": 5,
+                    "day": 3,
+                    "hour": 13,
+                    "minute": 17,
+                    "second": 23,
+                    "microsecond": 922000
+                }
+            }
+        ],
+        "Truncated": false,
+        "ResponseMetadata": {}
+    }
+}

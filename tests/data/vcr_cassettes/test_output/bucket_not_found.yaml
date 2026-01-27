@@ -1,0 +1,32 @@
+interactions:
+- request:
+    body: null
+    headers:
+      Connection:
+      - close
+      Host:
+      - s3.amazonaws.com
+      User-Agent:
+      - Python-urllib/3.10
+    method: HEAD
+    uri: https://s3.amazonaws.com/myfakebucketdoesnotexist
+  response:
+    body:
+      string: ''
+    headers:
+      Connection:
+      - close
+      Content-Type:
+      - application/xml
+      Date:
+      - Thu, 16 Feb 2023 19:57:29 GMT
+      Server:
+      - AmazonS3
+      x-amz-id-2:
+      - 4ol7/6QWURYnvhOGJkpDirDrY5P/WDIc+0WDEWkAJY+7cUzWsdU5wCM4L0/J6ZsE6boOnq8pB+U=
+      x-amz-request-id:
+      - E1PJ4QBA7P4JGVDD
+    status:
+      code: 404
+      message: Not Found
+version: 1

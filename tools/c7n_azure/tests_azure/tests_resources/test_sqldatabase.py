@@ -1,12 +1,18 @@
 # Copyright The Cloud Custodian Authors.
 # SPDX-License-Identifier: Apache-2.0
-from azure.mgmt.sql.models import DatabaseUpdate, Sku, BackupShortTermRetentionPolicy
-from ..azure_common import BaseTest, arm_template, requires_arm_polling
+from azure.mgmt.sql.models import (
+    DatabaseUpdate,
+    Sku,
+    BackupShortTermRetentionPolicy,
+)
+from ..azure_common import BaseTest, arm_template, cassette_name, requires_arm_polling
 from c7n_azure.resources.sqldatabase import (
-    BackupRetentionPolicyHelper, ShortTermBackupRetentionPolicyAction)
+    BackupRetentionPolicyHelper,
+    ShortTermBackupRetentionPolicyAction,
+)
 from c7n_azure.session import Session
 from c7n_azure.utils import ResourceIdParser
-from mock import patch
+from unittest.mock import patch
 
 from c7n.exceptions import PolicyValidationError
 from c7n.utils import local_session
@@ -96,7 +102,7 @@ class SqlDatabaseTest(BaseTest):
                                             max_size_bytes=21474836480)
 
         update_mock.assert_called_once()
-        name, args, kwargs = update_mock.mock_calls[0]
+        _, args, _ = update_mock.mock_calls[0]
         self.assertEqual('test_sqlserver', args[0])
         self.assertEqual(parent_id, args[1])
         self.assertEqual('cctestdb', args[2])
@@ -448,7 +454,7 @@ class LongTermBackupRetentionPolicyActionTest(BaseTest):
     def setUpClass(cls, *args, **kwargs):
         super(LongTermBackupRetentionPolicyActionTest, cls).setUpClass(*args, **kwargs)
         cls.client = local_session(Session).client('azure.mgmt.sql.SqlManagementClient') \
-            .backup_long_term_retention_policies
+            .long_term_retention_policies
 
     def tearDown(self, *args, **kwargs):
         default_long_term_policy = {
@@ -567,3 +573,21 @@ class LongTermBackupRetentionPolicyActionTest(BaseTest):
             *self.retention_policy_context
         )
         self.assertEqual(getattr(current_retention_period, retention_property), period)
+
+
+class SqlDatabaseDataEncryptionFilterTest(BaseTest):
+
+    @cassette_name('data_encryption_filter')
+    @arm_template('sqlserver.json')
+    def test_filter(self):
+        p = self.load_policy({
+            'name': 'test-azure-sql-data-encryption',
+            'resource': 'azure.sql-database',
+            'filters': [
+                {'type': 'data-encryption',
+                 'enabled': False}],
+        })
+        resources = p.run()
+        self.assertEqual(1, len(resources))
+        self.assertEqual('9958f24e-907d-4b98-8b89-a8ac1d748225',
+                         resources[0]['properties']['databaseId'])

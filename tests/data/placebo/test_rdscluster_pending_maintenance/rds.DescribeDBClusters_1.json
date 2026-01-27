@@ -1,0 +1,484 @@
+{
+    "status_code": 200,
+    "data": {
+        "DBClusters": [
+            {
+                "AllocatedStorage": 1,
+                "AvailabilityZones": [
+                    "us-west-2c",
+                    "us-west-2a",
+                    "us-west-2b"
+                ],
+                "BackupRetentionPeriod": 10,
+                "DBClusterIdentifier": "apip-prd-auroracluster-vtmn1quuo8mc",
+                "DBClusterParameterGroup": "apip-prd-rdsdbclusterparametergroup-17u0m4wkd7t5t",
+                "DBSubnetGroup": "apip-prd-mydbsubnetgroupname-ef8mev0hi3d7",
+                "Status": "available",
+                "EarliestRestorableTime": {
+                    "__class__": "datetime",
+                    "year": 2023,
+                    "month": 12,
+                    "day": 9,
+                    "hour": 12,
+                    "minute": 44,
+                    "second": 57,
+                    "microsecond": 959000
+                },
+                "Endpoint": "apip-prd-auroracluster-vtmn1quuo8mc.cluster-cz2dumebtpyc.us-west-2.rds.amazonaws.com",
+                "ReaderEndpoint": "apip-prd-auroracluster-vtmn1quuo8mc.cluster-ro-cz2dumebtpyc.us-west-2.rds.amazonaws.com",
+                "MultiAZ": true,
+                "Engine": "aurora-mysql",
+                "EngineVersion": "5.7.mysql_aurora.2.11.2",
+                "LatestRestorableTime": {
+                    "__class__": "datetime",
+                    "year": 2023,
+                    "month": 12,
+                    "day": 19,
+                    "hour": 14,
+                    "minute": 47,
+                    "second": 26,
+                    "microsecond": 411000
+                },
+                "Port": 3306,
+                "MasterUsername": "apip",
+                "PreferredBackupWindow": "12:36-13:06",
+                "PreferredMaintenanceWindow": "wed:07:10-wed:07:40",
+                "ReadReplicaIdentifiers": [
+                    "arn:aws:rds:us-east-2:644160558196:cluster:apip-prd-auroraclusterdr-1v5y6ofar9zry"
+                ],
+                "DBClusterMembers": [
+                    {
+                        "DBInstanceIdentifier": "apip-prdn2",
+                        "IsClusterWriter": false,
+                        "DBClusterParameterGroupStatus": "in-sync",
+                        "PromotionTier": 1
+                    },
+                    {
+                        "DBInstanceIdentifier": "apip-prdn0",
+                        "IsClusterWriter": true,
+                        "DBClusterParameterGroupStatus": "in-sync",
+                        "PromotionTier": 1
+                    },
+                    {
+                        "DBInstanceIdentifier": "apip-prdn1",
+                        "IsClusterWriter": false,
+                        "DBClusterParameterGroupStatus": "in-sync",
+                        "PromotionTier": 1
+                    }
+                ],
+                "VpcSecurityGroups": [
+                    {
+                        "VpcSecurityGroupId": "sg-000d26e2d3d6eb1af",
+                        "Status": "active"
+                    }
+                ],
+                "HostedZoneId": "Z1PVIF0B656C1W",
+                "StorageEncrypted": true,
+                "KmsKeyId": "arn:aws:kms:us-west-2:644160558196:key/f5481ebf-5e11-4773-962a-6697a9e6214b",
+                "DbClusterResourceId": "cluster-XP5VWPUF3MXW6MBFEXS7PDL4R4",
+                "DBClusterArn": "arn:aws:rds:us-west-2:644160558196:cluster:apip-prd-auroracluster-vtmn1quuo8mc",
+                "AssociatedRoles": [],
+                "IAMDatabaseAuthenticationEnabled": true,
+                "ClusterCreateTime": {
+                    "__class__": "datetime",
+                    "year": 2019,
+                    "month": 4,
+                    "day": 1,
+                    "hour": 16,
+                    "minute": 50,
+                    "second": 1,
+                    "microsecond": 661000
+                },
+                "EnabledCloudwatchLogsExports": [
+                    "audit",
+                    "error",
+                    "general",
+                    "slowquery"
+                ],
+                "EngineMode": "provisioned",
+                "DeletionProtection": true,
+                "HttpEndpointEnabled": false,
+                "ActivityStreamStatus": "stopped",
+                "CopyTagsToSnapshot": false,
+                "CrossAccountClone": false,
+                "DomainMemberships": [],
+                "TagList": [
+                    {
+                        "Key": "intuit:billing:fp",
+                        "Value": "b2755385dbd2985015f583964896191b"
+                    },
+                    {
+                        "Key": "intuit:billing:service_assetid",
+                        "Value": "6990730113779618065"
+                    },
+                    {
+                        "Key": "intuit:billing:appenv",
+                        "Value": "prod"
+                    },
+                    {
+                        "Key": "org_awsbackup_local_0700UTC",
+                        "Value": "7daily"
+                    }
+                ],
+                "AutoMinorVersionUpgrade": true,
+                "NetworkType": "IPV4"
+            },
+            {
+                "AllocatedStorage": 1,
+                "AvailabilityZones": [
+                    "us-west-2c",
+                    "us-west-2a",
+                    "us-west-2b"
+                ],
+                "BackupRetentionPeriod": 8,
+                "DBClusterIdentifier": "ibadges-prd-auroracluster-agib5v3rkebi",
+                "DBClusterParameterGroup": "ibadges-prd-rdsdbclusterparametergroup-ya16dn62rjzb",
+                "DBSubnetGroup": "ibadges-prd-mydbsubnetgroupname-hmvocxetdtgp",
+                "Status": "available",
+                "EarliestRestorableTime": {
+                    "__class__": "datetime",
+                    "year": 2023,
+                    "month": 12,
+                    "day": 11,
+                    "hour": 9,
+                    "minute": 38,
+                    "second": 35,
+                    "microsecond": 161000
+                },
+                "Endpoint": "ibadges-prd-auroracluster-agib5v3rkebi.cluster-cz2dumebtpyc.us-west-2.rds.amazonaws.com",
+                "ReaderEndpoint": "ibadges-prd-auroracluster-agib5v3rkebi.cluster-ro-cz2dumebtpyc.us-west-2.rds.amazonaws.com",
+                "MultiAZ": true,
+                "Engine": "aurora-mysql",
+                "EngineVersion": "5.7.mysql_aurora.2.11.2",
+                "LatestRestorableTime": {
+                    "__class__": "datetime",
+                    "year": 2023,
+                    "month": 12,
+                    "day": 19,
+                    "hour": 14,
+                    "minute": 45,
+                    "second": 54,
+                    "microsecond": 389000
+                },
+                "Port": 3306,
+                "MasterUsername": "ibadges",
+                "PreferredBackupWindow": "09:27-09:57",
+                "PreferredMaintenanceWindow": "wed:06:01-wed:06:31",
+                "ReadReplicaIdentifiers": [],
+                "DBClusterMembers": [
+                    {
+                        "DBInstanceIdentifier": "ibadges-prdn0",
+                        "IsClusterWriter": false,
+                        "DBClusterParameterGroupStatus": "in-sync",
+                        "PromotionTier": 1
+                    },
+                    {
+                        "DBInstanceIdentifier": "ibadges-prdn1",
+                        "IsClusterWriter": true,
+                        "DBClusterParameterGroupStatus": "in-sync",
+                        "PromotionTier": 1
+                    }
+                ],
+                "VpcSecurityGroups": [
+                    {
+                        "VpcSecurityGroupId": "sg-0711bc40410e83797",
+                        "Status": "active"
+                    }
+                ],
+                "HostedZoneId": "Z1PVIF0B656C1W",
+                "StorageEncrypted": true,
+                "KmsKeyId": "arn:aws:kms:us-west-2:644160558196:key/85a7c6ce-956b-4c30-9b6c-2cae29dba224",
+                "DbClusterResourceId": "cluster-RRIU4BSDMPJL7K2DRZGCI43BWA",
+                "DBClusterArn": "arn:aws:rds:us-west-2:644160558196:cluster:ibadges-prd-auroracluster-agib5v3rkebi",
+                "AssociatedRoles": [],
+                "IAMDatabaseAuthenticationEnabled": true,
+                "ClusterCreateTime": {
+                    "__class__": "datetime",
+                    "year": 2019,
+                    "month": 8,
+                    "day": 1,
+                    "hour": 18,
+                    "minute": 42,
+                    "second": 28,
+                    "microsecond": 70000
+                },
+                "EnabledCloudwatchLogsExports": [
+                    "audit",
+                    "error",
+                    "general",
+                    "slowquery"
+                ],
+                "EngineMode": "provisioned",
+                "DeletionProtection": true,
+                "HttpEndpointEnabled": false,
+                "ActivityStreamStatus": "stopped",
+                "CopyTagsToSnapshot": false,
+                "CrossAccountClone": false,
+                "DomainMemberships": [],
+                "TagList": [
+                    {
+                        "Key": "intuit:billing:fp",
+                        "Value": "b2755385dbd2985015f583964896191b"
+                    },
+                    {
+                        "Key": "intuit:billing:service_assetid",
+                        "Value": "8215709212537034187"
+                    },
+                    {
+                        "Key": "intuit:billing:appenv",
+                        "Value": "prod"
+                    },
+                    {
+                        "Key": "org_awsbackup_local_0700UTC",
+                        "Value": "7daily"
+                    }
+                ],
+                "AutoMinorVersionUpgrade": true,
+                "NetworkType": "IPV4"
+            },
+            {
+                "AllocatedStorage": 1,
+                "AvailabilityZones": [
+                    "us-west-2c",
+                    "us-west-2a",
+                    "us-west-2b"
+                ],
+                "BackupRetentionPeriod": 10,
+                "DBClusterIdentifier": "sreg-prd-primary-cluster",
+                "DBClusterParameterGroup": "sreg-prd-rdsdbclusterparametergroup-7kq5s6dcah6z-globaldb",
+                "DBSubnetGroup": "sreg-prd-mydbsubnetgroupname-1sefpmce0mrzy",
+                "Status": "available",
+                "EarliestRestorableTime": {
+                    "__class__": "datetime",
+                    "year": 2023,
+                    "month": 12,
+                    "day": 9,
+                    "hour": 8,
+                    "minute": 12,
+                    "second": 5,
+                    "microsecond": 403000
+                },
+                "Endpoint": "sreg-prd-primary-cluster.cluster-cz2dumebtpyc.us-west-2.rds.amazonaws.com",
+                "ReaderEndpoint": "sreg-prd-primary-cluster.cluster-ro-cz2dumebtpyc.us-west-2.rds.amazonaws.com",
+                "MultiAZ": true,
+                "Engine": "aurora-mysql",
+                "EngineVersion": "5.7.mysql_aurora.2.10.1",
+                "LatestRestorableTime": {
+                    "__class__": "datetime",
+                    "year": 2023,
+                    "month": 12,
+                    "day": 19,
+                    "hour": 14,
+                    "minute": 47,
+                    "second": 57,
+                    "microsecond": 349000
+                },
+                "Port": 3306,
+                "MasterUsername": "sreg",
+                "PreferredBackupWindow": "08:00-08:30",
+                "PreferredMaintenanceWindow": "fri:11:02-fri:11:32",
+                "ReadReplicaIdentifiers": [
+                    "arn:aws:rds:us-east-2:644160558196:cluster:sreg-prd-secondary"
+                ],
+                "DBClusterMembers": [
+                    {
+                        "DBInstanceIdentifier": "sreg-prd-primary-n2",
+                        "IsClusterWriter": false,
+                        "DBClusterParameterGroupStatus": "in-sync",
+                        "PromotionTier": 1
+                    },
+                    {
+                        "DBInstanceIdentifier": "sreg-prd-primary-cluster",
+                        "IsClusterWriter": true,
+                        "DBClusterParameterGroupStatus": "in-sync",
+                        "PromotionTier": 1
+                    },
+                    {
+                        "DBInstanceIdentifier": "sreg-prd-primary-n1",
+                        "IsClusterWriter": false,
+                        "DBClusterParameterGroupStatus": "in-sync",
+                        "PromotionTier": 1
+                    }
+                ],
+                "VpcSecurityGroups": [
+                    {
+                        "VpcSecurityGroupId": "sg-0d17adcad802b47d2",
+                        "Status": "active"
+                    }
+                ],
+                "HostedZoneId": "Z1PVIF0B656C1W",
+                "StorageEncrypted": true,
+                "KmsKeyId": "arn:aws:kms:us-west-2:644160558196:key/25e5ec4a-fb63-46b4-b849-a7ae32a924d6",
+                "DbClusterResourceId": "cluster-B3CBZDFGADCDK6CDA45P6FAKTA",
+                "DBClusterArn": "arn:aws:rds:us-west-2:644160558196:cluster:sreg-prd-primary-cluster",
+                "AssociatedRoles": [],
+                "IAMDatabaseAuthenticationEnabled": true,
+                "CloneGroupId": "2d447617-f977-4b94-9dba-06652fcd7e61",
+                "ClusterCreateTime": {
+                    "__class__": "datetime",
+                    "year": 2021,
+                    "month": 12,
+                    "day": 13,
+                    "hour": 4,
+                    "minute": 13,
+                    "second": 41,
+                    "microsecond": 231000
+                },
+                "EnabledCloudwatchLogsExports": [
+                    "audit",
+                    "error",
+                    "general",
+                    "slowquery"
+                ],
+                "EngineMode": "provisioned",
+                "DeletionProtection": true,
+                "HttpEndpointEnabled": false,
+                "ActivityStreamStatus": "stopped",
+                "CopyTagsToSnapshot": false,
+                "CrossAccountClone": false,
+                "DomainMemberships": [],
+                "TagList": [
+                    {
+                        "Key": "intuit:billing:fp",
+                        "Value": "2e359b45dbd2985015f5839648961976"
+                    },
+                    {
+                        "Key": "intuit:billing:service_assetid",
+                        "Value": "435740856843614515"
+                    },
+                    {
+                        "Key": "intuit:billing:appenv",
+                        "Value": "prod"
+                    },
+                    {
+                        "Key": "org_awsbackup_local_0700UTC",
+                        "Value": "7daily"
+                    }
+                ],
+                "GlobalWriteForwardingRequested": false,
+                "AutoMinorVersionUpgrade": false,
+                "NetworkType": "IPV4"
+            },
+            {
+                "AllocatedStorage": 1,
+                "AvailabilityZones": [
+                    "us-west-2c",
+                    "us-west-2a",
+                    "us-west-2b"
+                ],
+                "BackupRetentionPeriod": 10,
+                "DBClusterIdentifier": "tep-prd-auroracluster-wpbswbngjuo6",
+                "DBClusterParameterGroup": "tep-prd-rdsdbclusterparametergroup-1xt58egbzoeu4",
+                "DBSubnetGroup": "tep-prd-mydbsubnetgroupname-1su4wchm16szp",
+                "Status": "available",
+                "EarliestRestorableTime": {
+                    "__class__": "datetime",
+                    "year": 2023,
+                    "month": 12,
+                    "day": 9,
+                    "hour": 11,
+                    "minute": 38,
+                    "second": 45,
+                    "microsecond": 688000
+                },
+                "Endpoint": "tep-prd-auroracluster-wpbswbngjuo6.cluster-cz2dumebtpyc.us-west-2.rds.amazonaws.com",
+                "ReaderEndpoint": "tep-prd-auroracluster-wpbswbngjuo6.cluster-ro-cz2dumebtpyc.us-west-2.rds.amazonaws.com",
+                "MultiAZ": true,
+                "Engine": "aurora-mysql",
+                "EngineVersion": "5.7.mysql_aurora.2.11.2",
+                "LatestRestorableTime": {
+                    "__class__": "datetime",
+                    "year": 2023,
+                    "month": 12,
+                    "day": 19,
+                    "hour": 14,
+                    "minute": 47,
+                    "second": 47,
+                    "microsecond": 354000
+                },
+                "Port": 3306,
+                "MasterUsername": "tep",
+                "PreferredBackupWindow": "11:32-12:02",
+                "PreferredMaintenanceWindow": "thu:09:12-thu:09:42",
+                "ReadReplicaIdentifiers": [],
+                "DBClusterMembers": [
+                    {
+                        "DBInstanceIdentifier": "tep-prdn2",
+                        "IsClusterWriter": false,
+                        "DBClusterParameterGroupStatus": "pending-reboot",
+                        "PromotionTier": 2
+                    },
+                    {
+                        "DBInstanceIdentifier": "tep-prdn0",
+                        "IsClusterWriter": true,
+                        "DBClusterParameterGroupStatus": "pending-reboot",
+                        "PromotionTier": 1
+                    },
+                    {
+                        "DBInstanceIdentifier": "tep-prdn1",
+                        "IsClusterWriter": false,
+                        "DBClusterParameterGroupStatus": "pending-reboot",
+                        "PromotionTier": 1
+                    }
+                ],
+                "VpcSecurityGroups": [
+                    {
+                        "VpcSecurityGroupId": "sg-0a08507fd8000ba53",
+                        "Status": "active"
+                    }
+                ],
+                "HostedZoneId": "Z1PVIF0B656C1W",
+                "StorageEncrypted": true,
+                "KmsKeyId": "arn:aws:kms:us-west-2:644160558196:key/bd6d8184-a172-4b00-819e-55610378273a",
+                "DbClusterResourceId": "cluster-KGTPXDOK2WSRCJP2MUMPLILKCE",
+                "DBClusterArn": "arn:aws:rds:us-west-2:644160558196:cluster:tep-prd-auroracluster-wpbswbngjuo6",
+                "AssociatedRoles": [],
+                "IAMDatabaseAuthenticationEnabled": true,
+                "ClusterCreateTime": {
+                    "__class__": "datetime",
+                    "year": 2019,
+                    "month": 4,
+                    "day": 1,
+                    "hour": 16,
+                    "minute": 51,
+                    "second": 53,
+                    "microsecond": 902000
+                },
+                "EnabledCloudwatchLogsExports": [
+                    "audit",
+                    "error",
+                    "general",
+                    "slowquery"
+                ],
+                "EngineMode": "provisioned",
+                "DeletionProtection": true,
+                "HttpEndpointEnabled": false,
+                "ActivityStreamStatus": "stopped",
+                "CopyTagsToSnapshot": false,
+                "CrossAccountClone": false,
+                "DomainMemberships": [],
+                "TagList": [
+                    {
+                        "Key": "intuit:billing:service_assetid",
+                        "Value": "1946698531121345847"
+                    },
+                    {
+                        "Key": "dbapp",
+                        "Value": "tep"
+                    },
+                    {
+                        "Key": "intuit:billing:appenv",
+                        "Value": "prod"
+                    },
+                    {
+                        "Key": "org_awsbackup_local_0700UTC",
+                        "Value": "7daily"
+                    }
+                ],
+                "AutoMinorVersionUpgrade": true,
+                "NetworkType": "IPV4"
+            }
+        ],
+        "ResponseMetadata": {}
+    }
+}

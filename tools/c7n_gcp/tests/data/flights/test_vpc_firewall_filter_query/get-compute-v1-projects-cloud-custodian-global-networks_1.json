@@ -1,0 +1,138 @@
+{
+  "headers": {
+    "etag": "ZHQ9FjHz0ah9Vj6waD7AXSzsoDA=/MB36RqsTe5GEdJuHlCfkTrY54yk=",
+    "content-type": "application/json; charset=UTF-8",
+    "vary": "Origin, X-Origin, Referer",
+    "date": "Thu, 19 May 2022 10:54:36 GMT",
+    "server": "ESF",
+    "cache-control": "private",
+    "x-xss-protection": "0",
+    "x-frame-options": "SAMEORIGIN",
+    "x-content-type-options": "nosniff",
+    "alt-svc": "h3=\":443\"; ma=2592000,h3-29=\":443\"; ma=2592000,h3-Q050=\":443\"; ma=2592000,h3-Q046=\":443\"; ma=2592000,h3-Q043=\":443\"; ma=2592000,quic=\":443\"; ma=2592000; v=\"46,43\"",
+    "transfer-encoding": "chunked",
+    "status": "200",
+    "content-length": "7688",
+    "-content-encoding": "gzip",
+    "content-location": "https://compute.googleapis.com/compute/v1/projects/cloud-custodian/global/networks?alt=json"
+  },
+  "body": {
+    "kind": "compute#networkList",
+    "id": "projects/cloud-custodian/global/networks",
+    "items": [
+      {
+        "kind": "compute#network",
+        "id": "7187875227597763497",
+        "creationTimestamp": "2021-04-02T00:52:38.645-07:00",
+        "name": "custodian-test",
+        "description": "for test",
+        "selfLink": "https://www.googleapis.com/compute/v1/projects/cloud-custodian/global/networks/custodian-test",
+        "selfLinkWithId": "https://www.googleapis.com/compute/v1/projects/cloud-custodian/global/networks/7187875227597763497",
+        "autoCreateSubnetworks": false,
+        "subnetworks": [
+          "https://www.googleapis.com/compute/v1/projects/cloud-custodian/regions/us-central1/subnetworks/bla-sub",
+          "https://www.googleapis.com/compute/v1/projects/cloud-custodian/regions/us-east1/subnetworks/subnet"
+        ],
+        "routingConfig": {
+          "routingMode": "REGIONAL"
+        },
+        "mtu": 1460,
+        "networkFirewallPolicyEnforcementOrder": "AFTER_CLASSIC_FIREWALL"
+      },
+      {
+        "kind": "compute#network",
+        "id": "8029516034343075869",
+        "creationTimestamp": "2021-01-13T10:41:54.513-08:00",
+        "name": "default",
+        "description": "",
+        "selfLink": "https://www.googleapis.com/compute/v1/projects/cloud-custodian/global/networks/default",
+        "selfLinkWithId": "https://www.googleapis.com/compute/v1/projects/cloud-custodian/global/networks/8029516034343075869",
+        "autoCreateSubnetworks": true,
+        "subnetworks": [
+          "https://www.googleapis.com/compute/v1/projects/cloud-custodian/regions/asia-east2/subnetworks/default",
+          "https://www.googleapis.com/compute/v1/projects/cloud-custodian/regions/us-west4/subnetworks/default",
+          "https://www.googleapis.com/compute/v1/projects/cloud-custodian/regions/europe-west3/subnetworks/default",
+          "https://www.googleapis.com/compute/v1/projects/cloud-custodian/regions/europe-west6/subnetworks/default",
+          "https://www.googleapis.com/compute/v1/projects/cloud-custodian/regions/europe-west8/subnetworks/default",
+          "https://www.googleapis.com/compute/v1/projects/cloud-custodian/regions/us-west3/subnetworks/default",
+          "https://www.googleapis.com/compute/v1/projects/cloud-custodian/regions/europe-west1/subnetworks/default",
+          "https://www.googleapis.com/compute/v1/projects/cloud-custodian/regions/southamerica-west1/subnetworks/default",
+          "https://www.googleapis.com/compute/v1/projects/cloud-custodian/regions/asia-south2/subnetworks/default",
+          "https://www.googleapis.com/compute/v1/projects/cloud-custodian/regions/asia-south1/subnetworks/default",
+          "https://www.googleapis.com/compute/v1/projects/cloud-custodian/regions/asia-east1/subnetworks/default",
+          "https://www.googleapis.com/compute/v1/projects/cloud-custodian/regions/northamerica-northeast2/subnetworks/default",
+          "https://www.googleapis.com/compute/v1/projects/cloud-custodian/regions/us-south1/subnetworks/default",
+          "https://www.googleapis.com/compute/v1/projects/cloud-custodian/regions/southamerica-east1/subnetworks/default",
+          "https://www.googleapis.com/compute/v1/projects/cloud-custodian/regions/us-east7/subnetworks/default",
+          "https://www.googleapis.com/compute/v1/projects/cloud-custodian/regions/us-central1/subnetworks/default",
+          "https://www.googleapis.com/compute/v1/projects/cloud-custodian/regions/europe-southwest1/subnetworks/default",
+          "https://www.googleapis.com/compute/v1/projects/cloud-custodian/regions/us-east4/subnetworks/default",
+          "https://www.googleapis.com/compute/v1/projects/cloud-custodian/regions/northamerica-northeast1/subnetworks/default",
+          "https://www.googleapis.com/compute/v1/projects/cloud-custodian/regions/us-west1/subnetworks/default",
+          "https://www.googleapis.com/compute/v1/projects/cloud-custodian/regions/us-east1/subnetworks/default",
+          "https://www.googleapis.com/compute/v1/projects/cloud-custodian/regions/asia-southeast1/subnetworks/default",
+          "https://www.googleapis.com/compute/v1/projects/cloud-custodian/regions/europe-west9/subnetworks/default",
+          "https://www.googleapis.com/compute/v1/projects/cloud-custodian/regions/europe-west2/subnetworks/default",
+          "https://www.googleapis.com/compute/v1/projects/cloud-custodian/regions/asia-northeast1/subnetworks/default",
+          "https://www.googleapis.com/compute/v1/projects/cloud-custodian/regions/europe-central2/subnetworks/default",
+          "https://www.googleapis.com/compute/v1/projects/cloud-custodian/regions/us-west2/subnetworks/default",
+          "https://www.googleapis.com/compute/v1/projects/cloud-custodian/regions/europe-west4/subnetworks/default",
+          "https://www.googleapis.com/compute/v1/projects/cloud-custodian/regions/asia-northeast3/subnetworks/default",
+          "https://www.googleapis.com/compute/v1/projects/cloud-custodian/regions/europe-north1/subnetworks/default",
+          "https://www.googleapis.com/compute/v1/projects/cloud-custodian/regions/asia-northeast2/subnetworks/default",
+          "https://www.googleapis.com/compute/v1/projects/cloud-custodian/regions/australia-southeast2/subnetworks/default",
+          "https://www.googleapis.com/compute/v1/projects/cloud-custodian/regions/asia-southeast2/subnetworks/default",
+          "https://www.googleapis.com/compute/v1/projects/cloud-custodian/regions/us-east5/subnetworks/default",
+          "https://www.googleapis.com/compute/v1/projects/cloud-custodian/regions/australia-southeast1/subnetworks/default"
+        ],
+        "routingConfig": {
+          "routingMode": "REGIONAL"
+        },
+        "mtu": 1460,
+        "networkFirewallPolicyEnforcementOrder": "AFTER_CLASSIC_FIREWALL"
+      },
+      {
+        "kind": "compute#network",
+        "id": "393312286164262117",
+        "creationTimestamp": "2021-02-22T04:22:34.474-08:00",
+        "name": "kseoji",
+        "description": "",
+        "selfLink": "https://www.googleapis.com/compute/v1/projects/cloud-custodian/global/networks/kseoji",
+        "selfLinkWithId": "https://www.googleapis.com/compute/v1/projects/cloud-custodian/global/networks/393312286164262117",
+        "autoCreateSubnetworks": false,
+        "peerings": [
+          {
+            "name": "cloudsql-mysql-googleapis-com",
+            "network": "https://www.googleapis.com/compute/v1/projects/cloud-custodian/global/networks/cloud-sql-network-443732426401-98ee7ce8ca70cffa",
+            "state": "ACTIVE",
+            "stateDetails": "[2022-04-22T18:29:45.802-07:00]: Connected.",
+            "autoCreateRoutes": true,
+            "exportCustomRoutes": false,
+            "importCustomRoutes": false,
+            "exchangeSubnetRoutes": true,
+            "exportSubnetRoutesWithPublicIp": false,
+            "importSubnetRoutesWithPublicIp": false
+          },
+          {
+            "name": "servicenetworking-googleapis-com",
+            "network": "https://www.googleapis.com/compute/v1/projects/cloud-custodian/global/networks/servicenetworking",
+            "state": "ACTIVE",
+            "stateDetails": "[2022-04-22T05:15:50.248-07:00]: Connected.",
+            "autoCreateRoutes": true,
+            "exportCustomRoutes": false,
+            "importCustomRoutes": false,
+            "exchangeSubnetRoutes": true,
+            "exportSubnetRoutesWithPublicIp": false,
+            "importSubnetRoutesWithPublicIp": false
+          }
+        ],
+        "routingConfig": {
+          "routingMode": "REGIONAL"
+        },
+        "mtu": 1460,
+        "networkFirewallPolicyEnforcementOrder": "AFTER_CLASSIC_FIREWALL"
+      }
+    ],
+    "selfLink": "https://www.googleapis.com/compute/v1/projects/cloud-custodian/global/networks"
+  }
+}

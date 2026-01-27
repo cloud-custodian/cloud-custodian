@@ -64,6 +64,10 @@ def eperm(provider, el, r=None):
             r = Bag({'type': 'vm'})
         elif provider == 'awscc':
             r = Bag({'type': 'logs_loggroup'})
+        elif provider == 'tencentcloud':
+            r = Bag({'type': 'ami'})
+        elif provider == 'oci':
+            r = Bag({'type': 'instance'})
 
     # print(f'policy construction lookup {r.type}.{element_type}.{el.type}')
 
@@ -76,11 +80,15 @@ def eperm(provider, el, r=None):
 
     try:
         pset = loader.load_data({'policies': [pdata]}, ':mem:', validate=False)
-    except Exception as e:
-        print(f'error loading {el} as {element_type}:{el.type} error: {e} \n {pdata}')
+    except Exception:
+        eperm.errors.append(el)
+        # print(f'error loading {el} as {element_type}:{el.type} error: {e} \n {pdata}')
         return []
     el = get_policy_element(el, list(pset)[0])
     return el.get_permissions()
+
+
+eperm.errors = []
 
 
 def get_policy_element(el, p):
@@ -162,11 +170,12 @@ class CustodianResource(CustodianDirective):
     @classmethod
     def render_resource(cls, resource_path):
         resource_class = cls.resolve(resource_path)
-        provider_name, resource_name = resource_path.split('.', 1)
+        provider_type, _ = resource_path.split('.', 1)
         return cls._render('resource.rst',
             variables=dict(
-                provider_name=provider_name,
-                resource_name="%s.%s" % (provider_name, resource_class.type),
+                provider_name=clouds[provider_type].display_name,
+                provider_type=provider_type,
+                resource_name="%s.%s" % (provider_type, resource_class.type),
                 filters=ElementSchema.elements(resource_class.filter_registry),
                 actions=ElementSchema.elements(resource_class.action_registry),
                 resource=resource_class))
@@ -279,6 +288,7 @@ def write_modified_file(fpath, content, diff_changes=False):
                 fromfile='a/%s' % fpath, tofile='b/%s' % fpath)
         )
 
+    log.info(f'wrote {fpath}')
     with open(fpath, 'w') as fh:
         fh.write(content)
     return True
@@ -307,6 +317,10 @@ def _main(provider, output_dir, group_by):
 
     for r in provider_class.resources.values():
         group = group_by(r)
+
+        # deprecated / removed resources don't have a group by
+        if group is None:
+            continue
         if not isinstance(group, list):
             group = [group]
         for g in group:
@@ -323,11 +337,18 @@ def _main(provider, output_dir, group_by):
                 'amplifyuibuilder_component',
                 'amplifybuilder_component'):
             continue
+
+        # deprecated / removed resources don't have a group by
+        group = group_by(r)
+        if group is None:
+            continue
+
         rpath = resource_file_name(output_dir, r)
         t = env.get_template('provider-resource.rst')
         written += write_modified_file(
             rpath, t.render(
                 provider_name=provider,
+                provider_type=provider,
                 resource=r),
             diff_changes=not written)
 
@@ -341,6 +362,7 @@ def _main(provider, output_dir, group_by):
             rpath,
             t.render(
                 provider_name=provider,
+                provider_type=provider_class.type,
                 key=key,
                 resource_files=[os.path.basename(
                     resource_file_name(output_dir, r)) for r in group],
@@ -370,6 +392,7 @@ def _main(provider, output_dir, group_by):
         fpath,
         t.render(
             provider_name=provider_class.display_name,
+            provider_type=provider_class.type,
             element_type='filters',
             elements=[common_filters[k] for k in sorted(common_filters)]))
     files.insert(0, os.path.basename(fpath))
@@ -382,6 +405,7 @@ def _main(provider, output_dir, group_by):
         fpath,
         t.render(
             provider_name=provider_class.display_name,
+            provider_type=provider_class.type,
             element_type='actions',
             elements=[common_actions[k] for k in sorted(common_actions)]))
     files.insert(0, os.path.basename(fpath))
@@ -394,6 +418,7 @@ def _main(provider, output_dir, group_by):
         mode_path,
         t.render(
             provider_name=provider_class.display_name,
+            provider_type=provider_class.type,
             modes=modes))
     files.insert(0, os.path.basename(mode_path))
 
@@ -404,7 +429,10 @@ def _main(provider, output_dir, group_by):
         provider_path,
         t.render(
             provider_name=provider_class.display_name,
+            provider_type=provider_class.type,
             files=files))
 
+    if eperm.errors:
+        log.info("%s permission errors %d", provider.title(), len(eperm.errors))
     if written:
         log.info("%s Wrote %d files", provider.title(), written)

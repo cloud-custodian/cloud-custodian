@@ -1,0 +1,12 @@
+{
+    "status_code": 400,
+    "data": {
+        "Error": {
+            "Message": "The KeyArn in encryptionConfig provider arn:aws:kms:us-east-1:644160558196:key/123 is not found.",
+            "Code": "InvalidParameterException"
+        },
+        "ResponseMetadata": {},
+        "clusterName": "c7n-test-eks-cluster",
+        "message": "The KeyArn in encryptionConfig provider arn:aws:kms:us-east-1:644160558196:key/123 is not found."
+    }
+}

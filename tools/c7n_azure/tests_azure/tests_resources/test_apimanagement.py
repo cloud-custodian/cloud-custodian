@@ -1,7 +1,7 @@
 # Copyright The Cloud Custodian Authors.
 # SPDX-License-Identifier: Apache-2.0
 from c7n_azure.resources.apimanagement import Resize
-from mock import MagicMock
+from unittest.mock import MagicMock
 
 from ..azure_common import BaseTest, arm_template
 
@@ -59,3 +59,18 @@ class ApiManagementTest(BaseTest):
         self.assertEqual(len(update_by_id.call_args_list[0][0]), 3)
         self.assertEqual(update_by_id.call_args_list[0][0][2].serialize()['sku']['capacity'], 8)
         self.assertEqual(update_by_id.call_args_list[0][0][2].serialize()['sku']['tier'], 'Premium')
+
+    def test_certificates_filter(self):
+        p = self.load_policy({
+            'name': 'cert',
+            'resource': 'azure.api-management',
+            'filters': [{
+                'type': 'certificates',
+                'count': 1,
+                'count_op': 'gte'
+            }]
+        })
+        resources = p.run()
+
+        self.assertEqual(1, len(resources))
+        self.assertEqual('vvapimgmt1', resources[0]['name'])

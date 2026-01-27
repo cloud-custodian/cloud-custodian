@@ -1,0 +1,11 @@
+{
+    "status_code": 200,
+    "data": {
+        "OpenIDConnectProviderList": [
+            {
+                "Arn": "arn:aws:iam::644160558196:oidc-provider/accounts.google.com"
+            }
+        ],
+        "ResponseMetadata": {}
+    }
+}

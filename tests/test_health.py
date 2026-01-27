@@ -1,5 +1,9 @@
 # Copyright The Cloud Custodian Authors.
 # SPDX-License-Identifier: Apache-2.0
+from c7n.exceptions import PolicyValidationError
+from c7n.resources.health import HealthQueryParser
+
+
 from .common import BaseTest
 
 
@@ -44,3 +48,50 @@ class HealthResource(BaseTest):
             self.assertTrue(
                 (r["eventTypeCategory"] == "accountNotification") ^ ("AffectedEntities" in r)
             )
+
+
+class TestHealthQueryParser(BaseTest):
+    def test_query(self):
+        self.assertEqual(HealthQueryParser.parse([]), [])
+
+        query = [
+            {'availabilityZones': 'us-east-1a'},
+            {'availabilityZones': 'us-east-1b'},
+            {'services': 'EC2'},
+            {'maxResults': 10}
+        ]
+        result_query = [
+            {'availabilityZones': ['us-east-1a', 'us-east-1b']},
+            {'services': ['EC2']},
+            {'maxResults': 10}
+        ]
+        self.assertEqual(HealthQueryParser.parse(query), result_query)
+
+        query = [{'eventStatusCodes': ['open', 'upcoming']}]
+        self.assertEqual(HealthQueryParser.parse(query), query)
+
+        query = [{"eventTypeCategories": 'issue'}]
+        self.assertEqual(HealthQueryParser.parse(query), [{"eventTypeCategories": ['issue']}])
+
+    def test_invalid_query(self):
+        self.assertRaises(PolicyValidationError, HealthQueryParser.parse, [{"maxResults": [10]}])
+
+        self.assertRaises(PolicyValidationError, HealthQueryParser.parse, [
+            {"maxResults": 10}, {"maxResults": 20}])
+
+        self.assertRaises(PolicyValidationError, HealthQueryParser.parse, [{"tag:Test": "True"}])
+
+        self.assertRaises(PolicyValidationError, HealthQueryParser.parse, [{"regions": None}])
+
+        self.assertRaises(PolicyValidationError, HealthQueryParser.parse, [{"foo": "bar"}])
+
+        self.assertRaises(PolicyValidationError, HealthQueryParser.parse, [
+            {"too": "many", "keys": "error"}])
+
+        self.assertRaises(PolicyValidationError, HealthQueryParser.parse, ["Not a dictionary"])
+
+        self.assertRaises(PolicyValidationError, HealthQueryParser.parse, {
+            'event-status-codes': ['open', 'upcoming']})
+
+        self.assertRaises(PolicyValidationError, HealthQueryParser.parse, {
+            'eventStatusCodes': ['done']})

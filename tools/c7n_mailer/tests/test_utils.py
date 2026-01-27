@@ -49,7 +49,7 @@ def test_config_defaults():
         ses_region="us-east-1",
         memory=1024,
         timeout=300,
-        runtime="python3.7",
+        runtime="python3.11",
         contact_tags=[],
     )
 
@@ -99,6 +99,25 @@ class ResourceFormat(unittest.TestCase):
                 {"InternetGatewayId": "igw-x", "Attachments": []}, "aws.internet-gateway"
             ),
             "id: igw-x  attachments: 0",
+        )
+
+    def test_lambda(self):
+        image_func = {
+            "FunctionName": "my-image-based-function",
+            "PackageType": "Image",
+        }
+        zip_func = {
+            "FunctionName": "my-zip-based-function",
+            "Runtime": "python3.8",
+            "PackageType": "Zip",
+        }
+        self.assertEqual(
+            utils.resource_format(image_func, "aws.lambda").strip(),
+            "Name: my-image-based-function  Package Type: Image  Runtime: N/A",
+        )
+        self.assertEqual(
+            utils.resource_format(zip_func, "aws.lambda").strip(),
+            "Name: my-zip-based-function  Package Type: Zip  Runtime: python3.8",
         )
 
     def test_rds_cluster(self):
@@ -261,10 +280,7 @@ class ProviderSelector(unittest.TestCase):
             (self.gcp_config, MailerGcpQueueProcessor),
         ]
         for mailer_config, processor in params:
-            self.assertIsInstance(
-                utils.get_processor(mailer_config, logger),
-                processor
-            )
+            self.assertIsInstance(utils.get_processor(mailer_config, logger), processor)
 
     def test_missing_deps_guidance(self):
         """Make sure we catch failed imports and provide guidance around installing
@@ -272,14 +288,14 @@ class ProviderSelector(unittest.TestCase):
         _real_import = builtins.__import__
 
         def fake_import_missing_deps(name, *args, **kwargs):
-            if name.startswith('c7n_gcp') or name.startswith('c7n_azure'):
+            if name.startswith("c7n_gcp") or name.startswith("c7n_azure"):
                 raise ImportError()
             return _real_import(name, *args, **kwargs)
 
-        with patch.object(builtins, '__import__', side_effect=fake_import_missing_deps):
-            with self.assertRaisesRegex(ImportError, r'pip install c7n-mailer\[azure\]'):
+        with patch.object(builtins, "__import__", side_effect=fake_import_missing_deps):
+            with self.assertRaisesRegex(ImportError, r"pip install c7n-mailer\[azure\]"):
                 reload(c7n_mailer.azure_mailer.azure_queue_processor)
-            with self.assertRaisesRegex(ImportError, r'pip install c7n-mailer\[gcp\]'):
+            with self.assertRaisesRegex(ImportError, r"pip install c7n-mailer\[gcp\]"):
                 reload(c7n_mailer.gcp_mailer.gcp_queue_processor)
 
 
@@ -332,7 +348,7 @@ class OtherTests(unittest.TestCase):
                 "us-east-1",
                 config.get("region"),
                 1024,
-                "python3.7",
+                "python3.11",
                 300,
                 None,
                 None,

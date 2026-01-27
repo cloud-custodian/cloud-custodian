@@ -1,0 +1,11 @@
+{
+    "status_code": 200,
+    "data": {
+        "clusterArns": [
+            "arn:aws:ecs:us-east-1:644160558196:cluster/c7n-test-cluster",
+            "arn:aws:ecs:us-east-1:644160558196:cluster/timmy-test-cluster",
+            "arn:aws:ecs:us-east-1:644160558196:cluster/AWSBatch-test-fargate-92731dda-398a-370a-b7ed-a0e38eb854a3"
+        ],
+        "ResponseMetadata": {}
+    }
+}

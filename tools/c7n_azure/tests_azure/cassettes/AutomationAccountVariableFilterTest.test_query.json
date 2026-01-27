@@ -1,0 +1,189 @@
+{
+    "version": 1,
+    "interactions": [
+        {
+            "request": {
+                "method": "GET",
+                "uri": "https://management.azure.com/subscriptions/ea42f556-5106-4743-99b0-c129bfa71a47/providers/Microsoft.Automation/automationAccounts?api-version=2015-10-31",
+                "body": null,
+                "headers": {}
+            },
+            "response": {
+                "status": {
+                    "code": 200,
+                    "message": "OK"
+                },
+                "headers": {
+                    "content-type": [
+                        "application/json; charset=utf-8"
+                    ],
+                    "date": [
+                        "Thu, 18 Nov 2021 11:02:20 GMT"
+                    ],
+                    "cache-control": [
+                        "no-cache"
+                    ],
+                    "content-length": [
+                        "1252"
+                    ]
+                },
+                "body": {
+                    "data": {
+                        "value": [
+                            {
+                                "id": "/subscriptions/ea42f556-5106-4743-99b0-c129bfa71a47/resourceGroups/Test12CIS/providers/Microsoft.Automation/automationAccounts/AzAutomation",
+                                "location": "eastus",
+                                "name": "AzAutomation",
+                                "type": "Microsoft.Automation/AutomationAccounts",
+                                "tags": {},
+                                "properties": {
+                                    "creationTime": "2021-03-11T15:00:26.6433333+00:00",
+                                    "lastModifiedTime": "2021-10-20T11:16:20.1466667+00:00"
+                                }
+                            },
+                            {
+                                "id": "/subscriptions/ea42f556-5106-4743-99b0-c129bfa71a47/resourceGroups/Test12CIS/providers/Microsoft.Automation/automationAccounts/TestCISeventGRID",
+                                "location": "eastus",
+                                "name": "TestCISeventGRID",
+                                "type": "Microsoft.Automation/AutomationAccounts",
+                                "tags": {},
+                                "properties": {
+                                    "creationTime": "2021-02-26T08:29:04.33+00:00",
+                                    "lastModifiedTime": "2021-10-20T11:16:20.1466667+00:00"
+                                }
+                            },
+                            {
+                                "id": "/subscriptions/ea42f556-5106-4743-99b0-c129bfa71a47/resourceGroups/VV/providers/Microsoft.Automation/automationAccounts/vvtestac",
+                                "location": "eastus",
+                                "name": "vvtestac",
+                                "type": "Microsoft.Automation/AutomationAccounts",
+                                "tags": {},
+                                "properties": {
+                                    "creationTime": "2021-11-18T09:34:02.8933333+00:00",
+                                    "lastModifiedTime": "2021-11-18T09:34:02.8933333+00:00"
+                                },
+                                "identity": {
+                                    "type": "SystemAssigned",
+                                    "principalId": "c8a9a7b1-376f-4d5a-8c38-21334f0ed696",
+                                    "tenantId": "00000000-0000-0000-0000-000000000003"
+                                }
+                            }
+                        ]
+                    }
+                }
+            }
+        },
+        {
+            "request": {
+                "method": "GET",
+                "uri": "https://management.azure.com/subscriptions/ea42f556-5106-4743-99b0-c129bfa71a47/resourceGroups/Test12CIS/providers/Microsoft.Automation/automationAccounts/AzAutomation/variables?api-version=2015-10-31",
+                "body": null,
+                "headers": {}
+            },
+            "response": {
+                "status": {
+                    "code": 200,
+                    "message": "OK"
+                },
+                "headers": {
+                    "content-type": [
+                        "application/json; charset=utf-8"
+                    ],
+                    "date": [
+                        "Thu, 18 Nov 2021 11:02:21 GMT"
+                    ],
+                    "cache-control": [
+                        "no-cache"
+                    ],
+                    "content-length": [
+                        "12"
+                    ]
+                },
+                "body": {
+                    "data": {
+                        "value": []
+                    }
+                }
+            }
+        },
+        {
+            "request": {
+                "method": "GET",
+                "uri": "https://management.azure.com/subscriptions/ea42f556-5106-4743-99b0-c129bfa71a47/resourceGroups/Test12CIS/providers/Microsoft.Automation/automationAccounts/TestCISeventGRID/variables?api-version=2015-10-31",
+                "body": null,
+                "headers": {}
+            },
+            "response": {
+                "status": {
+                    "code": 200,
+                    "message": "OK"
+                },
+                "headers": {
+                    "content-type": [
+                        "application/json; charset=utf-8"
+                    ],
+                    "date": [
+                        "Thu, 18 Nov 2021 11:02:27 GMT"
+                    ],
+                    "cache-control": [
+                        "no-cache"
+                    ],
+                    "content-length": [
+                        "12"
+                    ]
+                },
+                "body": {
+                    "data": {
+                        "value": []
+                    }
+                }
+            }
+        },
+        {
+            "request": {
+                "method": "GET",
+                "uri": "https://management.azure.com/subscriptions/ea42f556-5106-4743-99b0-c129bfa71a47/resourceGroups/VV/providers/Microsoft.Automation/automationAccounts/vvtestac/variables?api-version=2015-10-31",
+                "body": null,
+                "headers": {}
+            },
+            "response": {
+                "status": {
+                    "code": 200,
+                    "message": "OK"
+                },
+                "headers": {
+                    "content-type": [
+                        "application/json; charset=utf-8"
+                    ],
+                    "date": [
+                        "Thu, 18 Nov 2021 11:02:27 GMT"
+                    ],
+                    "cache-control": [
+                        "no-cache"
+                    ],
+                    "content-length": [
+                        "424"
+                    ]
+                },
+                "body": {
+                    "data": {
+                        "value": [
+                            {
+                                "id": "/subscriptions/ea42f556-5106-4743-99b0-c129bfa71a47/resourceGroups/VV/providers/Microsoft.Automation/automationAccounts/vvtestac/variables/testvar",
+                                "name": "testvar",
+                                "type": "Microsoft.Automation/AutomationAccounts/Variables",
+                                "properties": {
+                                    "creationTime": "2021-11-18T09:34:55.1366667+00:00",
+                                    "lastModifiedTime": "2021-11-18T09:34:55.1366667+00:00",
+                                    "isEncrypted": false,
+                                    "value": "\"test\"",
+                                    "description": "test"
+                                }
+                            }
+                        ]
+                    }
+                }
+            }
+        }
+    ]
+}

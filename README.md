@@ -1,28 +1,31 @@
-Cloud Custodian
+Cloud Custodian (c7n)
 =================
 
 <p align="center"><img src="https://cloudcustodian.io/img/logo_capone_devex_cloud_custodian.svg" alt="Cloud Custodian Logo" width="200px" height="200px" /></p>
 
 ---
 
-[![](https://badges.gitter.im/cloud-custodian/cloud-custodian.svg)](https://gitter.im/cloud-custodian/cloud-custodian?utm_source=badge&utm_medium=badge&utm_campaign=pr-badge&utm_content=badge)
+[![slack](https://img.shields.io/badge/slack-chat-yellow)](https://communityinviter.com/apps/cloud-custodian/c7n-chat)
 [![CI](https://github.com/cloud-custodian/cloud-custodian/workflows/CI/badge.svg?event=push)](https://github.com/cloud-custodian/cloud-custodian/actions?query=workflow%3ACI+branch%3Amaster+event%3Apush)
-[![](https://dev.azure.com/cloud-custodian/cloud-custodian/_apis/build/status/Custodian%20-%20CI?branchName=master)](https://dev.azure.com/cloud-custodian/cloud-custodian/_build)
 [![](https://img.shields.io/badge/license-Apache%202-blue.svg)](https://www.apache.org/licenses/LICENSE-2.0)
 [![](https://codecov.io/gh/cloud-custodian/cloud-custodian/branch/master/graph/badge.svg)](https://codecov.io/gh/cloud-custodian/cloud-custodian)
 [![](https://requires.io/github/cloud-custodian/cloud-custodian/requirements.svg?branch=master)](https://requires.io/github/cloud-custodian/cloud-custodian/requirements/?branch=master)
 [![CII Best Practices](https://bestpractices.coreinfrastructure.org/projects/3402/badge)](https://bestpractices.coreinfrastructure.org/projects/3402)
 
-Cloud Custodian is a rules engine for managing public cloud accounts and
-resources. It allows users to define policies to enable a well managed
-cloud infrastructure, that\'s both secure and cost optimized. It
-consolidates many of the adhoc scripts organizations have into a
-lightweight and flexible tool, with unified metrics and reporting.
+Cloud Custodian, also known as c7n, is a rules engine for managing
+public cloud accounts and resources. It allows users to define
+policies to enable a well managed cloud infrastructure, that\'s both
+secure and cost optimized. It consolidates many of the adhoc scripts
+organizations have into a lightweight and flexible tool, with unified
+metrics and reporting.
 
 Custodian can be used to manage AWS, Azure, and GCP environments by
 ensuring real time compliance to security policies (like encryption and
 access requirements), tag policies, and cost management via garbage
 collection of unused resources and off-hours resource management.
+
+Custodian also supports running policies on infrastructure as code assets
+to provide feedback directly on developer workstations or within CI pipelines.
 
 Custodian policies are written in simple YAML configuration files that
 enable users to specify policies on a resource type (EC2, ASG, Redshift,
@@ -34,7 +37,7 @@ provider to provide for real time enforcement of policies with builtin
 provisioning. Or it can be run as a simple cron job on a server to
 execute against large existing fleets.
 
-Cloud Custodian is a CNCF Sandbox project, lead by a community of hundreds
+Cloud Custodian is a CNCF Incubating project, lead by a community of hundreds
 of contributors.
 
 Features
@@ -42,6 +45,7 @@ Features
 
 -   Comprehensive support for public cloud services and resources with a
     rich library of actions and filters to build policies with.
+-   Run policies on infrastructure as code (terraform, etc) assets.	
 -   Supports arbitrary filtering on resources with nested boolean
     conditions.
 -   Dry run any policy to see what it would do.
@@ -64,9 +68,13 @@ Links
 -   [Project Roadmap](https://github.com/orgs/cloud-custodian/projects/1)
 -   [Developer Install](https://cloudcustodian.io/docs/developer/installing.html)
 -   [Presentations](https://www.google.com/search?q=cloud+custodian&source=lnms&tbm=vid)
+-   [YouTube Channel](https://www.youtube.com/channel/UCdeXCdFLluylWnFfS0-jbDA)
 
 Quick Install
 -------------
+
+Custodian is published on pypi as a series of packages with the `c7n`
+prefix, its also available as a docker image.
 
 ```shell
 $ python3 -m venv custodian
@@ -78,7 +86,7 @@ $ source custodian/bin/activate
 Usage
 -----
 
-The first step to using Cloud Custodian is writing a YAML file
+The first step to using Cloud Custodian (c7n) is writing a YAML file
 containing the policies that you want to run. Each policy specifies
 the resource type that the policy will run on, a set of filters which
 control resources will be affected by this policy, actions which the policy
@@ -215,6 +223,7 @@ Get Involved
 -   [GitHub](https://github.com/cloud-custodian/cloud-custodian) - (This page)
 -   [Slack](https://communityinviter.com/apps/cloud-custodian/c7n-chat) - Real time chat if you're looking for help or interested in contributing to Custodian! 
     - [Gitter](https://gitter.im/cloud-custodian/cloud-custodian) - (Older real time chat, we're likely migrating away from this)
+-   [Linen.dev](https://www.linen.dev/s/cloud-custodian/c/general) - Follow our discussions on Linen
 -   [Mailing List](https://groups.google.com/forum/#!forum/cloud-custodian) - Our project mailing list, subscribe here for important project announcements, feel free to ask questions
 -   [Reddit](https://reddit.com/r/cloudcustodian) - Our subreddit
 -   [StackOverflow](https://stackoverflow.com/questions/tagged/cloudcustodian) - Q&A site for developers, we keep an eye on the `cloudcustodian` tag
@@ -231,6 +240,7 @@ See the notes below for more technical information on joining the meeting.
 - [Community Meeting Notes Archive](https://github.com/orgs/cloud-custodian/discussions/categories/announcements)
 - [Upcoming Community Events](https://cloudcustodian.io/events/)
 - [Cloud Custodian Annual Report 2021](https://github.com/cncf/toc/blob/main/reviews/2021-cloud-custodian-annual.md) - Annual health check provided to the CNCF outlining the health of the project
+- [Ada Logics Third Party Security Audit](https://ostif.org/cc-audit-complete/)
 
 
 Additional Tools
@@ -241,6 +251,8 @@ tools here
 <https://github.com/cloud-custodian/cloud-custodian/tree/master/tools>:
 
 - [**_Org_:**](https://cloudcustodian.io/docs/tools/c7n-org.html) Multi-account policy execution.
+
+- [**_ShiftLeft_:**](https://cloudcustodian.io/docs/tools/c7n-left.html) Shift Left ~ run policies against Infrastructure as Code assets like terraform.
 
 - [**_PolicyStream_:**](https://cloudcustodian.io/docs/tools/c7n-policystream.html) Git history as stream of logical policy changes.
 

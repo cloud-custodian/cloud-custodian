@@ -5,16 +5,19 @@ module to test some universal tagging infrastructure not directly exposed.
 """
 import time
 from freezegun import freeze_time
-from mock import MagicMock, call
+from unittest.mock import MagicMock, call
 
 from c7n.tags import universal_retry, coalesce_copy_user_tags
 from c7n.exceptions import PolicyExecutionError, PolicyValidationError
 from c7n.utils import yaml_load
 
 from .common import BaseTest
+
+import pytest
 from pytest_terraform import terraform
 
 
+@pytest.mark.audited
 @terraform('tag_action_filter_call')
 def test_tag_action_filter_call(test, tag_action_filter_call):
     aws_region = 'us-east-1'
@@ -44,6 +47,8 @@ def test_tag_action_filter_call(test, tag_action_filter_call):
     test.assertEqual(len(resources), 1)
 
     stopped_ec2_instance_id = tag_action_filter_call['aws_instance.past_stop.id']
+    if test.recording:
+        time.sleep(0.25)
     ec2 = session_factory().resource('ec2')
     instance = ec2.Instance(stopped_ec2_instance_id)
     test.assertEqual(instance.state['Name'], 'stopping')
@@ -77,6 +82,7 @@ class TagInterpolationTest(BaseTest):
             },
             session_factory=mock_factory,
         )
+        policy.expand_variables(policy.get_variables())
         policy.resource_manager.actions[0].process(resources)
 
         return (create_tags, tag_resources)
@@ -527,3 +533,73 @@ class CopyRelatedResourceTag(BaseTest):
 
         self.assertEqual(len(untagged_snaps), 1)
         self.assertTrue('Tags' not in untagged_snaps[0].keys())
+
+    def test_copy_related_tag_resourcegroupstaggingapi(self):
+        session_factory = self.replay_flight_data("test_copy_related_tag_resourcegroupstaggingapi")
+        ec2_client = session_factory().client("ec2")
+        policy = {
+            "name": "copy-tags-from-tags",
+            "resource": "aws.ec2",
+            "filters": [
+                {
+                    "type": "value",
+                    "key": "tag:test-tag",
+                    "value": "absent"
+                },
+            ],
+            "actions": [
+                {
+                    "type": "copy-related-tag",
+                    "resource": "resourcegroupstaggingapi",
+                    "key": "tag:Foo",
+                    "tags": "*"
+                }
+            ]
+        }
+        policy = self.load_policy(policy, session_factory=session_factory)
+        resources = policy.run()
+        self.assertEqual(len(resources), 1)
+        tags = ec2_client.describe_tags(
+            Filters=[
+                {
+                    "Name": "resource-id",
+                    "Values": [resources[0]['InstanceId']]
+                }
+            ]
+        )
+        found = False
+        for t in tags["Tags"]:
+            if t['Key'] == 'test-tag':
+                found = True
+        self.assertTrue(found)
+
+    def test_copy_related_tag_validate_aws_prefix(self):
+        policy = {
+            'name': 'copy-related-tag-aws-prefix',
+            'resource': 'ami',
+            'actions': [
+                {
+                    'type': 'copy-related-tag',
+                    'resource': 'aws.ebs-snapshot',
+                    'key': '',
+                    'tags': '*',
+                }
+            ]
+        }
+        # policy will validate on load
+        policy = self.load_policy(policy)
+
+    def test_copy_related_tag_validate_aws_prefix_fake_resource(self):
+        policy = {
+            'name': 'copy-related-tag-aws-prefix',
+            'resource': 'ami',
+            'actions': [
+                {
+                    'type': 'copy-related-tag',
+                    'resource': 'aws.not-real',
+                    'key': '',
+                    'tags': '*',
+                }
+            ]
+        }
+        self.assertRaises(PolicyValidationError, self.load_policy, policy)

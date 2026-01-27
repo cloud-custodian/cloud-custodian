@@ -4,11 +4,12 @@ import os
 import re
 import pytest
 
-from distutils.util import strtobool
-from .constants import ACCOUNT_ID
+from c7n.vendored.distutils.util import strtobool
+
+from vcr import stubs
 
 try:
-    from .zpill import PillTest
+    from .zpill import PillTest, ACCOUNT_ID, ORG_ID
     from c7n.testing import PyTestUtils, reset_session_cache
     from pytest_terraform.tf import LazyPluginCacheDir, LazyReplay
 except ImportError: # noqa
@@ -26,6 +27,13 @@ except ImportError: # noqa
         pass
 
 
+# python 3.12 compatiblity till vcrpy 6 released w/ https://github.com/kevin1024/vcrpy/pull/754
+for vcrstub, baseclass in ((stubs.VCRHTTPConnection, stubs.HTTPConnection),
+                           (stubs.VCRHTTPSConnection, stubs.HTTPSConnection)):
+    vcrstub.debuglevel = baseclass.debuglevel
+    vcrstub._http_vsn = baseclass._http_vsn
+
+
 pytest_plugins = ("pytest_recording",)
 
 # If we have C7N_FUNCTIONAL make sure Replay is False otherwise enable Replay
@@ -40,7 +48,12 @@ class TerraformAWSRewriteHooks:
     """
     def pytest_terraform_modify_state(self, tfstate):
         """ Sanitize functional testing account data """
-        tfstate.update(re.sub(r'\b\d{12}\b', ACCOUNT_ID, str(tfstate)))
+        tfstate.update(
+            re.sub(
+                r'^o-[a-z0-9]{10,32}$', ORG_ID,
+                re.sub(r'\b\d{12}\b', ACCOUNT_ID, str(tfstate))
+            )
+        )
 
 
 class CustodianAWSTesting(PyTestUtils, PillTest):

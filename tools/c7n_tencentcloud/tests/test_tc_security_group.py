@@ -278,3 +278,22 @@ class TestSecurityGroup(BaseTest):
         manager = policy.load_resource_manager()
         resources_ip_not_in_range = manager.filter_resources(resources)
         assert len(resources_ip_not_in_range) == 1
+
+    @pytest.mark.vcr
+    def test_security_group_used(self):
+        policy = self.load_policy(
+            {
+                "name": "test_security_group_used",
+                "resource": "tencentcloud.security-group",
+                "query": [{"SecurityGroupIds": ["sg-jep2pqxk"]}],
+                "filters": [{
+                    "type": "used",
+                    "key": "CVM",
+                    "value": 0,
+                    "op": "greater-than"
+                }]
+            }
+        )
+        resources = policy.run()
+        ok = [r for r in resources if r["SecurityGroupId"] == "sg-jep2pqxk"]
+        assert len(ok) == 1

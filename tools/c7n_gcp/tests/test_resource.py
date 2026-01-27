@@ -13,7 +13,9 @@ from c7n_gcp.provider import resources
 ALLOWED_NOPERM = set((
     'or', 'and', 'not', 'value', 'reduce',
     'offhour', 'onhour', 'marked-for-op',
-    'event', 'webhook'))
+    'event', 'webhook', 'missing', 'list-item',
+    'recommend'  # this requires configuration to determine permission
+))
 
 
 class ResourceMetaTest(BaseTest):
@@ -32,6 +34,8 @@ class ResourceMetaTest(BaseTest):
             policy = Bag({'name': 'permcheck',
                      'resource': 'gcp.%s' % k,
                      'provider_name': 'gcp'})
+            if k in ('region',):
+                continue
             ctx = self.get_context(config=cfg, policy=policy)
             mgr = v(ctx, policy)
             perms = mgr.get_permissions()

@@ -15,6 +15,7 @@ from c7n.exceptions import PolicyValidationError
 from c7n.filters import ValueFilter, AgeFilter, Filter
 from c7n.filters.offhours import OffHour, OnHour
 import c7n.filters.vpc as net_filters
+import c7n.policy
 
 from c7n.manager import resources
 from c7n import query
@@ -35,6 +36,7 @@ class ASG(query.QueryResourceManager):
         arn_type = 'autoScalingGroup'
         arn_separator = ":"
         id = name = 'AutoScalingGroupName'
+        config_id = 'AutoScalingGroupARN'
         date = 'CreatedTime'
         dimension = 'AutoScalingGroupName'
         enum_spec = ('describe_auto_scaling_groups', 'AutoScalingGroups', None)
@@ -42,6 +44,7 @@ class ASG(query.QueryResourceManager):
         filter_type = 'list'
         config_type = 'AWS::AutoScaling::AutoScalingGroup'
         cfn_type = 'AWS::AutoScaling::AutoScalingGroup'
+        permissions_augment = ("autoscaling:DescribeTags",)
 
         default_report_fields = (
             'AutoScalingGroupName',
@@ -244,7 +247,7 @@ class ConfigValidFilter(Filter):
                       'app-elb-target-group', 'ebs-snapshot', 'ami')]))
 
     def validate(self):
-        if self.manager.data.get('mode'):
+        if isinstance(self.manager.ctx.policy.get_execution_mode(), c7n.policy.LambdaMode):
             raise PolicyValidationError(
                 "invalid-config makes too many queries to be run in lambda")
         return self
@@ -252,7 +255,7 @@ class ConfigValidFilter(Filter):
     def initialize(self, asgs):
         self.launch_info = LaunchInfo(self.manager).initialize(asgs)
         # pylint: disable=attribute-defined-outside-init
-        self.subnets = self.get_subnets()
+        self.subnets, self.default_subnets = self.get_subnets()
         self.security_groups = self.get_security_groups()
         self.key_pairs = self.get_key_pairs()
         self.elbs = self.get_elbs()
@@ -262,7 +265,10 @@ class ConfigValidFilter(Filter):
 
     def get_subnets(self):
         manager = self.manager.get_resource_manager('subnet')
-        return {s['SubnetId'] for s in manager.resources()}
+        subnets = manager.resources()
+        default_subnets = {s['SubnetId']: s['AvailabilityZone']
+                           for s in subnets if s['DefaultForAz']}
+        return {s['SubnetId'] for s in subnets}, default_subnets
 
     def get_security_groups(self):
         manager = self.manager.get_resource_manager('security-group')
@@ -311,12 +317,21 @@ class ConfigValidFilter(Filter):
 
     def get_asg_errors(self, asg):
         errors = []
+        cfg_id = self.launch_info.get_launch_id(asg)
+        cfg = self.launch_info.get(asg)
+
         subnets = asg.get('VPCZoneIdentifier', '').split(',')
 
-        for subnet in subnets:
-            subnet = subnet.strip()
-            if subnet not in self.subnets:
-                errors.append(('invalid-subnet', subnet))
+        if subnets[0]:
+            for subnet in subnets:
+                subnet = subnet.strip()
+                if subnet not in self.subnets:
+                    errors.append(('invalid-subnet', subnet))
+        else:
+            if 'NetworkInterfaces' not in cfg:
+                for az in asg.get('AvailabilityZones', []):
+                    if az not in self.default_subnets.values():
+                        errors.append(('invalid-availability-zone', az))
 
         for elb in asg['LoadBalancerNames']:
             elb = elb.strip()
@@ -327,9 +342,6 @@ class ConfigValidFilter(Filter):
             appelb_target = appelb_target.strip()
             if appelb_target not in self.appelb_target_groups:
                 errors.append(('invalid-appelb-target-group', appelb_target))
-
-        cfg_id = self.launch_info.get_launch_id(asg)
-        cfg = self.launch_info.get(asg)
 
         if cfg is None:
             errors.append(('invalid-config', cfg_id))
@@ -602,12 +614,13 @@ class ImageFilter(ValueFilter):
         return super(ImageFilter, self).process(asgs, event)
 
     def __call__(self, i):
-        image = self.images.get(self.launch_info.get(i).get('ImageId', None))
+        image_id = self.launch_info.get(i).get('ImageId', None)
+        image = self.images.get(image_id)
         # Finally, if we have no image...
         if not image:
             self.log.warning(
-                "Could not locate image for instance:%s ami:%s" % (
-                    i['InstanceId'], i["ImageId"]))
+                "Could not locate image for asg:%s ami:%s" % (
+                    i['AutoScalingGroupName'], image_id))
             # Match instead on empty skeleton?
             return False
         return self.match(image)
@@ -994,7 +1007,7 @@ class Resize(Action):
                             # unless we were given a new value for min_size then
                             # ensure it is at least as low as current_size
                             update['MinSize'] = min(current_size, a['MinSize'])
-                    elif type(self.data['desired-size']) == int:
+                    elif isinstance(self.data['desired-size'], int):
                         update['DesiredCapacity'] = self.data['desired-size']
 
             if update:
@@ -1251,7 +1264,7 @@ class PropagateTags(Action):
                 k: v for k, v in tag_map.items()
                 if k in self.data['tags']}
 
-        if not tag_map and not self.get('trim', False):
+        if not tag_map and not self.data.get('trim', False):
             self.log.error(
                 'No tags found to propagate on asg:{} tags configured:{}'.format(
                     asg['AutoScalingGroupName'], self.data.get('tags')))
@@ -1401,7 +1414,7 @@ class RenameTag(Action):
              'PropagateAtLaunch': propagate,
              'Key': destination_tag,
              'Value': source['Value']}])
-        if propagate:
+        if propagate and asg['Instances']:
             self.propagate_instance_tag(source, destination_tag, asg)
 
     def propagate_instance_tag(self, source, destination_tag, asg):
@@ -1493,7 +1506,8 @@ class Suspend(Action):
         "AZRebalance",
         "AlarmNotification",
         "ScheduledActions",
-        "AddToLoadBalancer"]
+        "AddToLoadBalancer",
+        "InstanceRefresh"]
 
     schema = type_schema(
         'suspend',
@@ -1538,6 +1552,7 @@ class Suspend(Action):
             retry(ec2_client.stop_instances, InstanceIds=instance_ids)
         except ClientError as e:
             if e.response['Error']['Code'] in (
+                    'UnsupportedOperation',
                     'InvalidInstanceID.NotFound',
                     'IncorrectInstanceState'):
                 self.log.warning("Erroring stopping asg instances %s %s" % (
@@ -1569,7 +1584,15 @@ class Resume(Action):
                     delay: 300
 
     """
-    schema = type_schema('resume', delay={'type': 'number'})
+    ASG_PROCESSES = Suspend.ASG_PROCESSES
+    schema = type_schema(
+        'resume',
+        exclude={
+            'type': 'array',
+            'title': 'ASG Processes to not resume',
+            'items': {'enum': list(ASG_PROCESSES)}},
+        delay={'type': 'number'})
+
     permissions = ("autoscaling:ResumeProcesses", "ec2:StartInstances")
 
     def process(self, asgs):
@@ -1620,8 +1643,12 @@ class Resume(Action):
     def resume_asg(self, asg_client, asg):
         """Resume asg processes.
         """
+        processes = list(self.ASG_PROCESSES.difference(
+            self.data.get('exclude', ())))
+
         self.manager.retry(
             asg_client.resume_processes,
+            ScalingProcesses=processes,
             AutoScalingGroupName=asg['AutoScalingGroupName'])
 
 
@@ -1873,7 +1900,7 @@ class ScalingPolicy(query.QueryResourceManager):
         )
         filter_name = 'PolicyNames'
         filter_type = 'list'
-        cfn_type = 'AWS::AutoScaling::ScalingPolicy'
+        config_type = cfn_type = 'AWS::AutoScaling::ScalingPolicy'
 
 
 @ASG.filter_registry.register('scaling-policy')

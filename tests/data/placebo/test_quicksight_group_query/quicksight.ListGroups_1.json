@@ -1,0 +1,15 @@
+{
+    "status_code": 200,
+    "data": {
+        "ResponseMetadata": {},
+        "Status": 200,
+        "GroupList": [
+            {
+                "Arn": "arn:aws:quicksight:us-east-1:644160558196:group/default/tf-example",
+                "GroupName": "tf-example",
+                "PrincipalId": "group/d-90679e546c/98f93bc1-2e40-4e97-9a5b-ede047aa258b"
+            }
+        ],
+        "RequestId": "e53f8d89-d671-4352-acf9-e34a1ab756b2"
+    }
+}

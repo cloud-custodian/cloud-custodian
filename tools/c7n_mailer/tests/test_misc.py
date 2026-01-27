@@ -4,7 +4,10 @@
 import argparse
 import unittest
 import logging
+import os
+import tempfile
 import boto3
+from unittest.mock import patch
 
 from c7n_mailer import replay
 from c7n_mailer import handle
@@ -14,7 +17,7 @@ from c7n_mailer import deploy
 from c7n_mailer.azure_mailer import azure_queue_processor
 from c7n_mailer.gcp_mailer import gcp_queue_processor
 from c7n.mu import PythonPackageArchive
-from common import MAILER_CONFIG, MAILER_CONFIG_GCP, MAILER_CONFIG_AZURE
+from common import MAILER_CONFIG, MAILER_CONFIG_GCP, MAILER_CONFIG_AZURE, SQS_MESSAGE_1_ENCODED
 
 
 class AWSMailerTests(unittest.TestCase):
@@ -37,13 +40,18 @@ class AWSMailerTests(unittest.TestCase):
         MAILER_CONFIG["https_proxy"] = ""
         config = handle.config_setup(MAILER_CONFIG)
 
-    def test_sqs_queue_processor(self):
+    @patch("c7n_mailer.target.EmailDelivery")
+    @patch("c7n_mailer.sns_delivery.SnsDelivery")
+    def test_sqs_queue_processor(self, mock_sns_delivery, mock_email_delivery):
         mailer_sqs_queue_processor = sqs_queue_processor.MailerSqsQueueProcessor(
             MAILER_CONFIG, boto3.Session(), logging.getLogger("c7n_mailer")
         )
         self.assertIs(
             mailer_sqs_queue_processor.__class__, sqs_queue_processor.MailerSqsQueueProcessor
         )
+
+        mailer_sqs_queue_processor.process_sqs_message(SQS_MESSAGE_1_ENCODED)
+        assert mock_sns_delivery.called
 
     def test_azure_queue_processor(self):
         processor = azure_queue_processor.MailerAzureQueueProcessor(
@@ -74,3 +82,27 @@ class DeployTests(unittest.TestCase):
         # basic sanity checks using random, low values
         assert archive.size > 10000  # this should really be about 1.5 MB
         assert len(archive.get_filenames()) > 50  # should be > 500
+
+    def test_get_archive_with_templates(self):
+        with (
+            tempfile.TemporaryDirectory() as template_folder1,
+            tempfile.TemporaryDirectory() as template_folder2,
+            tempfile.TemporaryDirectory() as template_folder3,
+        ):
+
+            with open(os.path.join(template_folder1, "beta.j2"), "w") as f:
+                f.write("beta")
+            with open(os.path.join(template_folder2, "gamma.j2"), "w") as f:
+                f.write("gamma")
+            with open(os.path.join(template_folder3, "alpha.j2"), "w") as f:
+                f.write("alpha")
+            # Test with multiple template folders
+            config = {"templates_folders": [template_folder1, template_folder2, template_folder3]}
+            # Ensure checksum is the same with multiple calls
+            archive1 = deploy.get_archive(config)
+            checksum1 = archive1.get_checksum()
+            archive2 = deploy.get_archive(config)
+            checksum2 = archive2.get_checksum()
+            assert checksum1 == checksum2
+            archive1.remove()
+            archive2.remove()

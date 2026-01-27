@@ -1,0 +1,33 @@
+{
+  "headers": {
+    "content-type": "application/json; charset=UTF-8",
+    "vary": "Origin, X-Origin, Referer",
+    "date": "Mon, 14 Feb 2022 10:47:44 GMT",
+    "server": "ESF",
+    "cache-control": "private",
+    "x-xss-protection": "0",
+    "x-frame-options": "SAMEORIGIN",
+    "x-content-type-options": "nosniff",
+    "alt-svc": "h3=\":443\"; ma=2592000,h3-29=\":443\"; ma=2592000,h3-Q050=\":443\"; ma=2592000,h3-Q046=\":443\"; ma=2592000,h3-Q043=\":443\"; ma=2592000,quic=\":443\"; ma=2592000; v=\"46,43\"",
+    "transfer-encoding": "chunked",
+    "status": "200",
+    "content-length": "476",
+    "-content-encoding": "gzip",
+    "content-location": "https://bigtableadmin.googleapis.com/v2/projects/cloud-custodian/instances/inst258/clusters/inst258-c1/backups?alt=json"
+  },
+  "body": {
+    "backups": [
+      {
+        "name": "projects/cloud-custodian/instances/inst258/clusters/inst258-c1/backups/back258",
+        "sourceTable": "projects/cloud-custodian/instances/inst258/tables/table258",
+        "expireTime": "2022-02-21T09:55:02.319Z",
+        "startTime": "2022-02-14T09:55:03.085278Z",
+        "endTime": "2022-02-14T09:55:03.981710Z",
+        "state": "READY",
+        "encryptionInfo": {
+          "encryptionType": "GOOGLE_DEFAULT_ENCRYPTION"
+        }
+      }
+    ]
+  }
+}

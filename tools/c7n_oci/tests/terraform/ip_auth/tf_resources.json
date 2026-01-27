@@ -1,0 +1,46 @@
+{
+    "pytest-terraform": 1,
+    "outputs": {},
+    "resources": {
+        "oci_objectstorage_namespace": {
+            "ns": {
+                "compartment_id": "ocid1.compartment.oc1..<unique_ID>",
+                "id": "ObjectStorageNamespaceDataSource-1326089052",
+                "namespace": "<namespace>"
+            }
+        },
+        "oci_objectstorage_bucket": {
+            "ip_test_bucket": {
+                "access_type": "ObjectRead",
+                "approximate_count": "0",
+                "approximate_size": "0",
+                "auto_tiering": "Disabled",
+                "bucket_id": "ocid1.bucket.oc1..<unique_ID>",
+                "compartment_id": "ocid1.compartment.oc1..<unique_ID>",
+                "created_by": "ocid1.user.oc1..<unique_ID>",
+                "defined_tags": {
+                    "Oracle-Tags.CreatedBy": "user@example.com",
+                    "Oracle-Tags.CreatedOn": "2023-09-22T01:31:07.824Z"
+                },
+                "etag": "b7d4170c-7906-4ade-8a3f-461a799eee4d",
+                "freeform_tags": {
+                    "Project": "CNCF"
+                },
+                "id": "n/idpktreuauj2/b/ip_test_bucket",
+                "is_read_only": false,
+                "kms_key_id": null,
+                "metadata": null,
+                "name": "ip_test_bucket",
+                "namespace": "<namespace>",
+                "object_events_enabled": false,
+                "object_lifecycle_policy_etag": null,
+                "replication_enabled": false,
+                "retention_rules": [],
+                "storage_tier": "Standard",
+                "time_created": "2023-09-22 01:31:07.917 +0000 UTC",
+                "timeouts": null,
+                "versioning": "Disabled"
+            }
+        }
+    }
+}

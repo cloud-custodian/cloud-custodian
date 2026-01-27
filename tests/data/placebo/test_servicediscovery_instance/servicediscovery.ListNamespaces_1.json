@@ -1,0 +1,64 @@
+{
+    "status_code": 200,
+    "data": {
+        "Namespaces": [
+            {
+                "Id": "ns-1",
+                "Arn": "arn:aws:servicediscovery:us-east-1:644160558196:namespace/ns-1",
+                "Name": "testnik.local",
+                "Type": "DNS_PRIVATE",
+                "Description": "all services will be registered under this common namespace",
+                "Properties": {
+                    "DnsProperties": {
+                        "HostedZoneId": "Z03288441NHEED4TM6QWT",
+                        "SOA": {
+                            "TTL": 15
+                        }
+                    },
+                    "HttpProperties": {
+                        "HttpName": "testnik.local"
+                    }
+                },
+                "CreateDate": {
+                    "__class__": "datetime",
+                    "year": 2024,
+                    "month": 4,
+                    "day": 16,
+                    "hour": 15,
+                    "minute": 12,
+                    "second": 51,
+                    "microsecond": 33000
+                }
+            },
+            {
+                "Id": "ns-2",
+                "Arn": "arn:aws:servicediscovery:us-east-1:644160558196:namespace/ns-2",
+                "Name": "e1-test-public-ns.com",
+                "Type": "DNS_PUBLIC",
+                "Description": "testing public dbs",
+                "Properties": {
+                    "DnsProperties": {
+                        "HostedZoneId": "Z0772636XQG65X86O6B0",
+                        "SOA": {
+                            "TTL": 60
+                        }
+                    },
+                    "HttpProperties": {
+                        "HttpName": "e1-test-public-ns.com"
+                    }
+                },
+                "CreateDate": {
+                    "__class__": "datetime",
+                    "year": 2024,
+                    "month": 6,
+                    "day": 13,
+                    "hour": 12,
+                    "minute": 34,
+                    "second": 12,
+                    "microsecond": 275000
+                }
+            }
+        ],
+        "ResponseMetadata": {}
+    }
+}

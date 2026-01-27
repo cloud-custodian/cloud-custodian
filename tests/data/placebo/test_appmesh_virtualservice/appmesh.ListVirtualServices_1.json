@@ -1,0 +1,64 @@
+{
+    "status_code": 200,
+    "data": {
+        "ResponseMetadata": {},
+        "virtualServices": [
+            {
+                "arn": "arn:aws:appmesh:us-east-1:644160558196:mesh/m1/virtualService/vs1.m1.us-east-1.local",
+                "createdAt": {
+                    "__class__": "datetime",
+                    "year": 2024,
+                    "month": 4,
+                    "day": 17,
+                    "hour": 15,
+                    "minute": 53,
+                    "second": 36,
+                    "microsecond": 180000
+                },
+                "lastUpdatedAt": {
+                    "__class__": "datetime",
+                    "year": 2024,
+                    "month": 4,
+                    "day": 17,
+                    "hour": 15,
+                    "minute": 53,
+                    "second": 36,
+                    "microsecond": 180000
+                },
+                "meshName": "m1",
+                "meshOwner": "644160558196",
+                "resourceOwner": "644160558196",
+                "version": 1,
+                "virtualServiceName": "vs1.m1.us-east-1.local"
+            },
+            {
+                "arn": "arn:aws:appmesh:us-east-1:644160558196:mesh/m1/virtualService/vs2.m1.us-east-1.local",
+                "createdAt": {
+                    "__class__": "datetime",
+                    "year": 2024,
+                    "month": 4,
+                    "day": 17,
+                    "hour": 16,
+                    "minute": 58,
+                    "second": 55,
+                    "microsecond": 680000
+                },
+                "lastUpdatedAt": {
+                    "__class__": "datetime",
+                    "year": 2024,
+                    "month": 4,
+                    "day": 17,
+                    "hour": 16,
+                    "minute": 58,
+                    "second": 55,
+                    "microsecond": 680000
+                },
+                "meshName": "m1",
+                "meshOwner": "644160558196",
+                "resourceOwner": "644160558196",
+                "version": 1,
+                "virtualServiceName": "vs2.m1.us-east-1.local"
+            }
+        ]
+    }
+}

@@ -9,19 +9,64 @@ from dateutil.parser import parse
 
 from c7n.actions import (
     ActionRegistry, BaseAction, ModifyVpcSecurityGroupsAction)
-from c7n.filters import FilterRegistry, AgeFilter
+from c7n.filters import FilterRegistry, AgeFilter, Filter
+from c7n.filters.core import ComparableVersion
 import c7n.filters.vpc as net_filters
 from c7n.filters.kms import KmsRelatedFilter
 from c7n.manager import resources
-from c7n.query import QueryResourceManager, TypeInfo
+from c7n.query import QueryResourceManager, TypeInfo, DescribeSource, ConfigSource
 from c7n.tags import universal_augment
 from c7n.utils import (
-    local_session, chunks, snapshot_identifier, type_schema)
+    local_session, chunks, snapshot_identifier, type_schema, jmespath_search,
+    get_retry, QueryParser)
+
+from .aws import shape_validate
 
 filters = FilterRegistry('elasticache.filters')
 actions = ActionRegistry('elasticache.actions')
 
 TTYPE = re.compile('cache.t1')
+
+
+class ElastiCacheQueryParser(QueryParser):
+
+    QuerySchema = {
+        'ShowCacheNodeInfo': bool,
+        'ShowCacheClustersNotInReplicationGroups': bool,
+    }
+    type_name = "ElastiCache"
+    multi_value = False
+    value_key = 'Value'
+
+
+class DescribeElastiCache(DescribeSource):
+    """
+    Allows to use query to retrieve more information
+
+    :example
+
+    .. code-block:: yaml
+
+        policies:
+          - name: cache-node-with-default-port
+            resource: aws.cache-cluster
+            query:
+              - ShowCacheNodeInfo: true
+            filters:
+              - type: list-item
+                key: CacheNodes
+                attrs:
+                  - type: value
+                    key: Endpoint.Port
+                    value: 11211
+    """
+
+    def get_query_params(self, query_params):
+        query_params = query_params or {}
+        queries = ElastiCacheQueryParser.parse(self.manager.data.get('query', []))
+        for q in queries:
+            query_params.update(q)
+        return query_params
 
 
 @resources.register('cache-cluster')
@@ -40,11 +85,17 @@ class ElastiCacheCluster(QueryResourceManager):
         dimension = 'CacheClusterId'
         universal_taggable = True
         cfn_type = 'AWS::ElastiCache::CacheCluster'
+        permissions_augment = ("elasticache:ListTagsForResource",)
 
     filter_registry = filters
     action_registry = actions
     permissions = ('elasticache:ListTagsForResource',)
     augment = universal_augment
+
+    source_mapping = {
+        'describe': DescribeElastiCache,
+        'config': ConfigSource
+    }
 
 
 @filters.register('security-group')
@@ -88,7 +139,137 @@ class SubnetFilter(net_filters.SubnetFilter):
         return super(SubnetFilter, self).process(resources, event)
 
 
+@filters.register('vpc')
+class VpcFilter(net_filters.VpcFilter):
+    """Filters elasticache clusters based on their associated VPCs
+
+    :example:
+
+    .. code-block:: yaml
+
+        policies:
+          - name: cache-node-with-default-vpc
+            resource: aws.cache-cluster
+            filters:
+              - type: vpc
+                key: IsDefault
+                value: false
+    """
+
+    RelatedIdsExpression = ""
+
+    def get_related_ids(self, resources):
+        return {
+            self.groups[res['CacheSubnetGroupName']]['VpcId'] for res in resources
+        }
+
+    def process(self, resources, event=None):
+        self.groups = {
+            r['CacheSubnetGroupName']: r
+            for r in self.manager.get_resource_manager('cache-subnet-group').resources()
+        }
+        return super().process(resources, event)
+
+
 filters.register('network-location', net_filters.NetworkLocation)
+
+
+@filters.register('upgrade-available')
+class UpgradeAvailable(Filter):
+    """Scans for ElastiCache clusters available upgrade versions
+
+    This will check all the ElastiCache clusters on the resources, and return
+    a list of viable upgrade options.
+
+    :example:
+
+    .. code-block:: yaml
+
+            policies:
+              - name: elasticache-upgrade-available
+                resource: cache-cluster
+                filters:
+                  - type: upgrade-available
+                    major: False
+
+    """
+
+    schema = type_schema(
+        'upgrade-available',
+        major={'type': 'boolean'},
+        value={'type': 'boolean'},
+    )
+    permissions = ('elasticache:DescribeServiceUpdates',)
+
+    def process(self, resources, event=None):
+        client = local_session(self.manager.session_factory).client('elasticache')
+        # If `major` is `True`, we should include major version upgrades if found.
+        check_major = self.data.get('major', False)
+        # If `value` is `True`, we should include even matching upgrade versions.
+        check_upgrade_extant = self.data.get('value', True)
+        results = []
+
+        # Get all available service updates
+        paginator = client.get_paginator('describe_service_updates')
+        page_iterator = paginator.paginate(
+            ServiceUpdateStatus=['available']
+        )
+
+        # Build a mapping of available upgrades:
+        # {
+        #   engine: {
+        #     full_version: ComparableVersion,
+        #   }
+        # }
+        available_upgrades = {}
+
+        for page in page_iterator:
+            for service_update in page['ServiceUpdates']:
+                engine_name = service_update.get('Engine', '').lower()
+                engine_version = service_update.get('EngineVersion', '')
+                _, version = _parse_engine_version(engine_version)
+
+                if engine_name and version:
+                    available_upgrades.setdefault(engine_name, {})
+                    # Process the version information once, rather than N-times below.
+                    cversion = ComparableVersion(version)
+                    available_upgrades[engine_name].setdefault(version, cversion)
+
+        for resource in resources:
+            resource_engine = resource.get('Engine', '').lower()
+            resource_version = resource.get('EngineVersion', '')
+            resource_version_info = ComparableVersion(resource_version)
+
+            # Check if any available upgrades match this resource's engine
+            for engine_name, engine_versions in available_upgrades.items():
+                if engine_name != resource_engine:
+                    continue
+
+                # Check the major version.
+                for full_version, upgrade_version in engine_versions.items():
+                    if upgrade_version < resource_version_info:
+                        # The resource is newer that the upgrade. Skip.
+                        continue
+
+                    # The upgrade either matches or is higher. Check the filter
+                    # settings if we should include it.
+                    if upgrade_version == resource_version_info:
+                        if not check_upgrade_extant:
+                            continue
+
+                        results.append(resource)
+
+                    # The parsed upgrade version is greater than resource version.
+                    # Check the major version, as well as the filter settings, to
+                    # see if we should include it.
+                    if upgrade_version.version[0] == resource_version_info.version[0]:
+                        results.append(resource)
+                    elif check_major:
+                        # It's a larger major version, but we're supposed to
+                        # include it.
+                        results.append(resource)
+
+        return results
 
 
 @actions.register('delete')
@@ -129,6 +310,10 @@ class DeleteElastiCacheCluster(BaseAction):
         clusters_to_delete = []
         replication_groups_to_delete = set()
         for cluster in clusters:
+            if cluster.get('ReplicationGroupId') in self.fetch_global_ds_rpgs():
+                self.log.info(
+                  f"Skipping {cluster['CacheClusterId']}: associated with a global datastore")
+                continue
             if cluster.get('ReplicationGroupId', ''):
                 replication_groups_to_delete.add(cluster['ReplicationGroupId'])
             else:
@@ -149,7 +334,19 @@ class DeleteElastiCacheCluster(BaseAction):
                 'Deleted ElastiCache cluster: %s',
                 cluster['CacheClusterId'])
 
+        cacheClusterIds = set([c["CacheClusterId"] for c in clusters])
         for replication_group in replication_groups_to_delete:
+            # NOTE don't delete the group if it's not empty
+            rg = client.describe_replication_groups(
+                ReplicationGroupId=replication_group)["ReplicationGroups"][0]
+            if not all(cluster in cacheClusterIds for cluster in rg["MemberClusters"]):
+                # NOTE mark members for better presentation on notifications
+                for c in clusters:
+                    if c.get("ReplicationGroupId") == replication_group:
+                        c["MemberClusters"] = rg["MemberClusters"]
+                self.log.info(f'{replication_group} is not empty: {rg["MemberClusters"]}')
+                continue
+
             params = {'ReplicationGroupId': replication_group,
                       'RetainPrimaryCluster': False}
             if not skip:
@@ -160,6 +357,11 @@ class DeleteElastiCacheCluster(BaseAction):
             self.log.info(
                 'Deleted ElastiCache replication group: %s',
                 replication_group)
+
+    def fetch_global_ds_rpgs(self):
+        rpgs = self.manager.get_resource_manager('elasticache-group').resources(augment=False)
+        global_rpgs = get_global_datastore_association(rpgs)
+        return global_rpgs
 
 
 @actions.register('snapshot')
@@ -248,7 +450,7 @@ class ElastiCacheSubnetGroup(QueryResourceManager):
 
     class resource_type(TypeInfo):
         service = 'elasticache'
-        arn_type = 'subnet-group'
+        arn_type = 'subnetgroup'
         enum_spec = ('describe_cache_subnet_groups',
                      'CacheSubnetGroups', None)
         name = id = 'CacheSubnetGroupName'
@@ -442,6 +644,24 @@ class CopyClusterTags(BaseAction):
                 Tags=[{'Key': k, 'Value': v} for k, v in copy_tags.items()])
 
 
+def _parse_engine_version(engine_version):
+    """Parse EngineVersion string into (engine_name, version) tuple
+
+    Example inputs:
+    - "redis-7.0" -> ("redis", "7.0")
+    - "memcached-1.6.12" -> ("memcached", "1.6.12")
+    - "valkey-7.2" -> ("valkey", "7.2")
+    """
+    if not engine_version or '-' not in engine_version:
+        return None, None
+
+    # Handle the strange `and onwards` verbiage.
+    engine_version = engine_version.replace('and onwards', '').strip()
+
+    parts = engine_version.split('-', 1)
+    return parts[0].lower(), parts[1]
+
+
 def _cluster_eligible_for_snapshot(cluster):
     # added regex search to filter unsupported cachenode types
     return (
@@ -473,6 +693,16 @@ class KmsFilter(KmsRelatedFilter):
     RelatedIdsExpression = 'KmsKeyId'
 
 
+def get_global_datastore_association(resources):
+    global_ds_rpgs = set()
+    for r in resources:
+        global_ds_association = jmespath_search(
+            'GlobalReplicationGroupInfo.GlobalReplicationGroupId', r)
+        if global_ds_association:
+            global_ds_rpgs.add(r['ReplicationGroupId'])
+    return global_ds_rpgs
+
+
 @ElastiCacheReplicationGroup.action_registry.register('delete')
 class DeleteReplicationGroup(BaseAction):
     """Action to delete a cache replication group
@@ -502,9 +732,141 @@ class DeleteReplicationGroup(BaseAction):
     def process(self, resources):
         resources = self.filter_resources(resources, 'Status', self.valid_origin_states)
         client = local_session(self.manager.session_factory).client('elasticache')
+        global_datastore_association_map = get_global_datastore_association(resources)
         for r in resources:
+            if r['ReplicationGroupId'] in global_datastore_association_map:
+                self.log.info(
+                  f"Skipping {r['ReplicationGroupId']}: associated with a global datastore")
+                continue
             params = {'ReplicationGroupId': r['ReplicationGroupId']}
             if self.data.get('snapshot', False):
                 params.update({'FinalSnapshotIdentifier': r['ReplicationGroupId'] + '-snapshot'})
             self.manager.retry(client.delete_replication_group, **params, ignore_err_codes=(
                 'ReplicationGroupNotFoundFault',))
+
+
+@resources.register('elasticache-user')
+class ElastiCacheUser(QueryResourceManager):
+
+    class resource_type(TypeInfo):
+        service = 'elasticache'
+        enum_spec = ('describe_users', 'Users[]', None)
+        arn_separator = ":"
+        arn_type = 'user'
+        arn = 'ARN'
+        id = 'UserId'
+        name = 'UserName'
+        cfn_type = 'AWS::ElastiCache::User'
+        universal_taggable = object()
+
+    augment = universal_augment
+    permissions = ('elasticache:DescribeUsers',)
+
+
+@ElastiCacheUser.action_registry.register('delete')
+class DeleteUser(BaseAction):
+    """Action to delete a cache user
+
+    :example:
+
+    .. code-block:: yaml
+
+            policies:
+              - name: elasticache-delete-user
+                resource: aws.elasticache-user
+                filters:
+                  - type: value
+                    key: Authentication.Type
+                    value: no-password
+                actions:
+                  - delete
+
+    """
+    schema = type_schema('delete')
+
+    permissions = ('elasticache:DeleteUser',)
+
+    def process(self, resources):
+        client = local_session(self.manager.session_factory).client('elasticache')
+        retry = get_retry(('ThrottlingException', 'InvalidUserStateFault'))
+        for r in resources:
+            retry(client.delete_user, UserId=r['UserId'], ignore_err_codes=('UserNotFoundFault',))
+
+
+@ElastiCacheUser.action_registry.register('modify')
+class ModifyUser(BaseAction):
+    """Action to modify a cache user
+
+    :example:
+
+    .. code-block:: yaml
+
+            policies:
+              - name: elasticache-modify-user
+                resource: aws.elasticache-user
+                filters:
+                  - type: value
+                    key: Authentication.Type
+                    value: no-password
+                actions:
+                  - type: modify
+                    attributes:
+                      AuthenticationMode:
+                        Type: password
+                        Passwords:
+                          - "password"
+    """
+
+    permissions = ('elasticache:ModifyUser',)
+    schema = type_schema(
+        'modify',
+        attributes={'type:': 'object'},
+        required=('attributes',))
+    shape = 'ModifyUserMessage'
+
+    def validate(self):
+        req = dict(self.data["attributes"])
+        req["UserId"] = "validate"
+        return shape_validate(
+            req, self.shape, self.manager.resource_type.service
+        )
+
+    def process(self, resources):
+        client = local_session(self.manager.session_factory).client('elasticache')
+        retry = get_retry(('ThrottlingException', 'InvalidUserStateFault'))
+        for r in resources:
+            retry(client.modify_user, UserId=r['UserId'], **self.data["attributes"],
+                ignore_err_codes=('UserNotFoundFault',))
+
+
+@resources.register('elasticache-reserved')
+class ReservedCacheNodes(QueryResourceManager):
+    """Lists all the reserved cache nodes
+
+    :example:
+
+    .. code-block:: yaml
+
+        policies:
+          - name: reserved-cache-nodes-expiring
+            resource: aws.elasticache-reserved
+            filters:
+              - type: value
+                key: State
+                value: active
+
+    """
+
+    class resource_type(TypeInfo):
+        service = 'elasticache'
+        name = id = 'ReservedCacheNodeId'
+        date = 'StartTime'
+        enum_spec = (
+            'describe_reserved_cache_nodes',
+            'ReservedCacheNodes',
+            None,
+        )
+        filter_name = 'ReservedCacheNodeId'
+        filter_type = 'scalar'
+        arn_type = "reserved-instance"
+        permissions_enum = ('elasticache:DescribeReservedCacheNodes',)

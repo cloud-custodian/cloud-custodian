@@ -13,7 +13,7 @@ from c7n_azure.utils import ResourceIdParser, is_resource_group_id
 
 class GenericArmResourceQuery(ResourceQuery):
 
-    def filter(self, resource_manager, **params):
+    def filter(self, resource_manager, query=None, **params):
         client = resource_manager.get_client()
         results = [r.serialize(True) for r in client.resources.list()]
 

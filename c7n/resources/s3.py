@@ -29,11 +29,11 @@ Actions:
 import copy
 import functools
 import json
-import itertools
 import logging
 import math
 import os
 import time
+import threading
 import ssl
 
 from botocore.client import Config
@@ -53,8 +53,9 @@ from c7n.actions import (
 from c7n.exceptions import PolicyValidationError, PolicyExecutionError
 from c7n.filters import (
     FilterRegistry, Filter, CrossAccountAccessFilter, MetricsFilter,
-    ValueFilter)
-import c7n.filters.policystatement as polstmt_filter
+    ValueFilter, ListItemFilter)
+from .aws import shape_validate
+from c7n.filters.policystatement import HasStatementFilter
 from c7n.manager import resources
 from c7n.output import NullBlobOutput
 from c7n import query
@@ -63,6 +64,7 @@ from c7n.tags import RemoveTag, Tag, TagActionFilter, TagDelayedAction
 from c7n.utils import (
     chunks, local_session, set_annotation, type_schema, filter_empty,
     dumps, format_string_values, get_account_alias_from_sts)
+from c7n.resources.aws import inspect_bucket_region
 
 
 log = logging.getLogger('custodian.s3')
@@ -78,11 +80,12 @@ MAX_COPY_SIZE = 1024 * 1024 * 1024 * 2
 class DescribeS3(query.DescribeSource):
 
     def augment(self, buckets):
+        assembler = BucketAssembly(self.manager)
+        assembler.initialize()
+
         with self.manager.executor_factory(
                 max_workers=min((10, len(buckets) + 1))) as w:
-            results = w.map(
-                assemble_bucket,
-                zip(itertools.repeat(self.manager.session_factory), buckets))
+            results = w.map(assembler.assemble, buckets)
             results = list(filter(None, results))
             return results
 
@@ -357,6 +360,60 @@ class ConfigS3(query.ConfigSource):
 
 @resources.register('s3')
 class S3(query.QueryResourceManager):
+    """Amazon's Simple Storage Service Buckets.
+
+
+    By default and due to historical compatiblity cloud custodian will
+    fetch a number of subdocuments (Acl, Policy, Tagging, Versioning,
+    Website, Notification, Lifecycle, and Replication) for each bucket
+    to allow policies authors's to target common bucket
+    configurations.
+
+    This behavior can be customized to avoid extraneous api calls if a
+    particular sub document is not needed for a policy, by setting the
+    `augment-keys` parameter in a query block of the policy.
+
+    ie if we only care about bucket website and replication
+    configuration, we can minimize the api calls needed to fetch a
+    bucket by setting up augment-keys as follows.
+
+    :example:
+
+    .. code-block:: yaml
+
+       policies:
+         - name: check-website-replication
+           resource: s3
+           query:
+             - augment-keys: ['Website', 'Replication']
+           filters:
+             - Website.ErrorDocument: not-null
+             - Replication.ReplicationConfiguration.Rules: not-null
+
+    It also supports an automatic detection mode where the use of a subdocument
+    in a filter is automically with the augment-keys value of 'detect'.
+
+    :example:
+
+    .. code-block:: yaml
+
+       policies:
+         - name: check-website-replication
+           resource: s3
+           query:
+             - augment-keys: 'detect'
+           filters:
+             - Website.ErrorDocument: not-null
+             - Replication.ReplicationConfiguration.Rules: not-null
+
+    The default value for augment-keys is `all` to preserve historical
+    compatiblity. `augment-keys` also supports the value of 'none' to
+    disable all subdocument fetching except Location and Tags.
+
+    Note certain actions may implicitly depend on the corresponding
+    subdocument being present.
+
+    """
 
     class resource_type(query.TypeInfo):
         service = 's3'
@@ -364,6 +421,18 @@ class S3(query.QueryResourceManager):
         enum_spec = ('list_buckets', 'Buckets[]', None)
         # not used but we want some consistency on the metadata
         detail_spec = ('get_bucket_location', 'Bucket', 'Name', 'LocationConstraint')
+        permissions_augment = (
+            "s3:GetBucketAcl",
+            "s3:GetBucketLocation",
+            "s3:GetBucketPolicy",
+            "s3:GetBucketTagging",
+            "s3:GetBucketVersioning",
+            "s3:GetBucketLogging",
+            "s3:GetBucketNotification",
+            "s3:GetBucketWebsite",
+            "s3:GetLifecycleConfiguration",
+            "s3:GetReplicationConfiguration"
+        )
         name = id = 'Name'
         date = 'CreationDate'
         dimension = 'BucketName'
@@ -375,6 +444,10 @@ class S3(query.QueryResourceManager):
         'describe': DescribeS3,
         'config': ConfigS3
     }
+
+    def validate(self):
+        super().validate()
+        BucketAssembly(self).validate()
 
     def get_arns(self, resources):
         return ["arn:aws:s3:::{}".format(r["Name"]) for r in resources]
@@ -417,75 +490,165 @@ S3_AUGMENT_TABLE = (
 )
 
 
-def assemble_bucket(item):
-    """Assemble a document representing all the config state around a bucket.
+class BucketAssembly:
 
-    TODO: Refactor this, the logic here feels quite muddled.
-    """
-    factory, b = item
-    s = factory()
-    c = s.client('s3')
-    # Bucket Location, Current Client Location, Default Location
-    b_location = c_location = location = "us-east-1"
-    methods = list(S3_AUGMENT_TABLE)
-    for minfo in methods:
-        m, k, default, select = minfo[:4]
-        try:
-            method = getattr(c, m)
-            v = method(Bucket=b['Name'])
-            v.pop('ResponseMetadata')
-            if select is not None and select in v:
-                v = v[select]
-        except (ssl.SSLError, SSLError) as e:
-            # Proxy issues? i assume
-            log.warning("Bucket ssl error %s: %s %s",
-                        b['Name'], b.get('Location', 'unknown'),
-                        e)
-            continue
-        except ClientError as e:
-            code = e.response['Error']['Code']
-            if code.startswith("NoSuch") or "NotFound" in code:
-                v = default
-            elif code == 'PermanentRedirect':
-                s = factory()
-                c = bucket_client(s, b)
-                # Requeue with the correct region given location constraint
-                methods.append((m, k, default, select))
+    def __init__(self, manager):
+        self.manager = manager
+        self.default_region = None
+        self.region_clients = {}
+        self.session = None
+        self.session_lock = None
+        self.augment_fields = []
+
+    def initialize(self):
+        # construct a default boto3 client, using the current session region.
+        self.session = local_session(self.manager.session_factory)
+        self.session_lock = threading.RLock()
+        self.default_region = self.manager.config.region
+        self.region_clients[self.default_region] = self.session.client('s3')
+        self.augment_fields = set(self.detect_augment_fields())
+        # location is required for client construction
+        self.augment_fields.add('Location')
+        # custodian always returns tags
+        self.augment_fields.add('Tags')
+
+    def validate(self):
+        config = self.get_augment_config()
+        if isinstance(config, str) and config not in ('all', 'detect', 'none'):
+            raise PolicyValidationError(
+                "augment-keys supports 'all', 'detect', 'none' or list of keys found: %s" % config)
+        elif isinstance(config, list):
+            delta = set(config).difference([row[1] for row in S3_AUGMENT_TABLE])
+            if delta:
+                raise PolicyValidationError("augment-keys - found invalid keys: %s" % (list(delta)))
+        if not isinstance(config, (list, str)):
+            raise PolicyValidationError(
+                "augment-keys supports 'all', 'detect', 'none' or list of keys found: %s" % config)
+
+    def get_augment_config(self):
+        augment_config = None
+        for option in self.manager.data.get('query', []):
+            if option and option.get('augment-keys') is not None:
+                augment_config = option['augment-keys']
+        if augment_config is None:
+            augment_config = 'all'
+        return augment_config
+
+    def detect_augment_fields(self):
+        # try to detect augment fields required for the policy execution
+        # we want to avoid extraneous api calls unless they are being used by the policy.
+
+        detected_keys = []
+        augment_keys = [row[1] for row in S3_AUGMENT_TABLE]
+        augment_config = self.get_augment_config()
+
+        if augment_config == 'all':
+            return augment_keys
+        elif augment_config == 'none':
+            return []
+        elif isinstance(augment_config, list):
+            return augment_config
+
+        for f in self.manager.iter_filters():
+            fkey = None
+            if not isinstance(f, ValueFilter):
                 continue
-            else:
+
+            f = f.data
+            # type: value
+            if f.get('type', '') == 'value':
+                fkey = f.get('key')
+            # k: v dict
+            elif len(f) == 1:
+                fkey = list(f.keys())[0]
+            if fkey is None:  # pragma: no cover
+                continue
+
+            # remove any jmespath expressions
+            fkey = fkey.split('.', 1)[0]
+
+            # tags have explicit handling in value filters.
+            if fkey.startswith('tag:'):
+                fkey = 'Tags'
+
+            # denied methods checks get all keys
+            if fkey.startswith('c7n:DeniedMethods'):
+                return augment_keys
+
+            if fkey in augment_keys:
+                detected_keys.append(fkey)
+
+        return detected_keys
+
+    def get_client(self, region):
+        if region in self.region_clients:
+            return self.region_clients[region]
+        with self.session_lock:
+            self.region_clients[region] = self.session.client('s3', region_name=region)
+            return self.region_clients[region]
+
+    def assemble(self, bucket):
+
+        client = self.get_client(self.default_region)
+        augments = list(S3_AUGMENT_TABLE)
+
+        for info in augments:
+            # we use the offset, as tests manipulate the augments table
+            method_name, key, default, select = info[:4]
+            if key not in self.augment_fields:
+                continue
+
+            method = getattr(client, method_name)
+
+            try:
+                response = method(Bucket=bucket['Name'])
+                # This is here as exception handling will change to defaults if not present
+                response.pop('ResponseMetadata', None)
+                value = response
+                if select and select in value:
+                    value = value[select]
+            except (ssl.SSLError, SSLError) as e:
+                # Proxy issue most likely
                 log.warning(
-                    "Bucket:%s unable to invoke method:%s error:%s ",
-                    b['Name'], m, e.response['Error']['Message'])
-                # For auth failures, we don't bail out, continue processing if we can.
-                # Note this can lead to missing data, but in general is cleaner than
-                # failing hard, due to the common use of locked down s3 bucket policies
-                # that may cause issues fetching information across a fleet of buckets.
-
-                # This does mean s3 policies depending on augments should check denied
-                # methods annotation, generally though lacking get access to an augment means
-                # they won't have write access either.
-
-                # For other error types we raise and bail policy execution.
-                if e.response['Error']['Code'] == 'AccessDenied':
-                    b.setdefault('c7n:DeniedMethods', []).append(m)
+                    "Bucket ssl error %s: %s %s",
+                    bucket['Name'], bucket.get('Location', 'unknown'), e)
+                continue
+            except ClientError as e:
+                code = e.response['Error']['Code']
+                if code.startswith("NoSuch") or "NotFound" in code:
+                    value = default
+                elif code == 'PermanentRedirect':  # pragma: no cover
+                    # (09/2025)- its not clear how we get here given a client region switch post
+                    # location detection.
+                    #
+                    # change client region
+                    client = self.get_client(get_region(bucket))
+                    # requeue now that we have correct region
+                    augments.append((method_name, key, default, select))
                     continue
-                raise
-        # As soon as we learn location (which generally works)
-        if k == 'Location' and v is not None:
-            b_location = v.get('LocationConstraint')
-            # Location == region for all cases but EU
+                else:
+                    # for auth errors record as attribute and move on
+                    if e.response['Error']['Code'] == 'AccessDenied':
+                        bucket.setdefault('c7n:DeniedMethods', []).append(method_name)
+                        continue
+                    # else log and raise
+                    log.warning(
+                        "Bucket:%s unable to invoke method:%s error:%s ",
+                        bucket['Name'], method_name, e.response['Error']['Message'])
+                    raise
+
+            # for historical reasons we normalize EU to eu-west-1 on the bucket
             # https://docs.aws.amazon.com/AmazonS3/latest/API/RESTBucketGETlocation.html
-            if b_location is None:
-                b_location = "us-east-1"
-            elif b_location == 'EU':
-                b_location = "eu-west-1"
-                v['LocationConstraint'] = 'eu-west-1'
-            if v and v != c_location:
-                c = s.client('s3', region_name=b_location)
-            elif c_location != location:
-                c = s.client('s3', region_name=location)
-        b[k] = v
-    return b
+            if key == 'Location' and value and value.get('LocationConstraint', '') == 'EU':
+                value['LocationConstraint'] = 'eu-west-1'
+
+            bucket[key] = value
+
+            # For all subsequent attributes after location, use a client that is targeted to
+            # the bucket's regional s3 endpoint.
+            if key == 'Location' and get_region(bucket) != client.meta.region_name:
+                client = self.get_client(get_region(bucket))
+        return bucket
 
 
 def bucket_client(session, b, kms=False):
@@ -815,7 +978,7 @@ class BucketFinding(PostFinding):
 
 
 @S3.filter_registry.register('has-statement')
-class HasStatementFilter(polstmt_filter.HasStatementFilter):
+class S3HasStatementFilter(HasStatementFilter):
     def get_std_format_args(self, bucket):
         return {
             'account_id': self.manager.config.account_id,
@@ -823,6 +986,63 @@ class HasStatementFilter(polstmt_filter.HasStatementFilter):
             'bucket_name': bucket['Name'],
             'bucket_region': get_region(bucket)
         }
+
+
+@S3.filter_registry.register('lock-configuration')
+class S3LockConfigurationFilter(ValueFilter):
+    """
+    Filter S3 buckets based on their object lock configurations
+
+    :example:
+
+    Get all buckets where lock configuration mode is COMPLIANCE
+
+        .. code-block:: yaml
+
+                policies:
+                  - name: lock-configuration-compliance
+                    resource: aws.s3
+                    filters:
+                      - type: lock-configuration
+                        key: Rule.DefaultRetention.Mode
+                        value: COMPLIANCE
+
+    """
+    schema = type_schema('lock-configuration', rinherit=ValueFilter.schema)
+    permissions = ('s3:GetBucketObjectLockConfiguration',)
+    annotate = True
+    annotation_key = 'c7n:ObjectLockConfiguration'
+
+    def _process_resource(self, client, resource):
+        try:
+            config = client.get_object_lock_configuration(
+                Bucket=resource['Name']
+            )['ObjectLockConfiguration']
+        except ClientError as e:
+            if e.response['Error']['Code'] == 'ObjectLockConfigurationNotFoundError':
+                config = None
+            else:
+                raise
+        resource[self.annotation_key] = config
+
+    def process(self, resources, event=None):
+        client = local_session(self.manager.session_factory).client('s3')
+        with self.executor_factory(max_workers=3) as w:
+            futures = []
+            for res in resources:
+                if self.annotation_key in res:
+                    continue
+                futures.append(w.submit(self._process_resource, client, res))
+            for f in as_completed(futures):
+                exc = f.exception()
+                if exc:
+                    self.log.error(
+                        "Exception getting bucket lock configuration \n %s" % (
+                            exc))
+        return super().process(resources, event)
+
+    def __call__(self, r):
+        return super().__call__(r.setdefault(self.annotation_key, None))
 
 
 ENCRYPTION_STATEMENT_GLOB = {
@@ -1370,7 +1590,19 @@ class FilterPublicBlock(Filter):
                 config = s3.get_public_access_block(
                     Bucket=bucket['Name'])['PublicAccessBlockConfiguration']
             except ClientError as e:
-                if e.response['Error']['Code'] != 'NoSuchPublicAccessBlockConfiguration':
+                error_code = e.response['Error']['Code']
+                if error_code == 'NoSuchPublicAccessBlockConfiguration':
+                    pass
+                elif error_code == 'AccessDenied':
+                    # Follow the same logic as `assemble_bucket` - log and continue on access
+                    # denied errors rather than halting a policy altogether
+                    method = 'GetPublicAccessBlock'
+                    log.warning(
+                        "Bucket:%s unable to invoke method:%s error:%s ",
+                        bucket['Name'], method, e.response['Error']['Message']
+                    )
+                    bucket.setdefault('c7n:DeniedMethods', []).append(method)
+                else:
                     raise
             bucket[self.annotation_key] = config
         return self.matches_filter(config)
@@ -1724,7 +1956,7 @@ class AttachLambdaEncrypt(BucketActionBase):
         else:
             source = BucketLambdaNotification(
                 {'account_s3': account_id}, session_factory, bucket)
-        return source.add(func)
+        return source.add(func, None)
 
 
 @actions.register('encryption-policy')
@@ -2259,7 +2491,7 @@ class EncryptExtantKeys(ScanBucket):
 
 def restore_complete(restore):
     if ',' in restore:
-        ongoing, avail = restore.split(',', 1)
+        ongoing, _ = restore.split(',', 1)
     else:
         ongoing = restore
     return 'false' in ongoing
@@ -2550,6 +2782,11 @@ class RemoveBucketTag(RemoveTag):
 
 @filters.register('data-events')
 class DataEvents(Filter):
+    """Find buckets for which CloudTrail is logging data events.
+
+    Note that this filter only examines trails that are defined in the
+    current account.
+    """
 
     schema = type_schema('data-events', state={'enum': ['present', 'absent']})
     permissions = (
@@ -2581,8 +2818,12 @@ class DataEvents(Filter):
 
     def process(self, resources, event=None):
         trails = self.manager.get_resource_manager('cloudtrail').resources()
+        local_trails = self.filter_resources(
+            trails,
+            "split(':', TrailARN)[4]", (self.manager.account_id,)
+        )
         session = local_session(self.manager.session_factory)
-        event_buckets = self.get_event_buckets(session, trails)
+        event_buckets = self.get_event_buckets(session, local_trails)
         ops = {
             'present': lambda x: (
                 x['Name'] in event_buckets or '' in event_buckets),
@@ -2590,7 +2831,7 @@ class DataEvents(Filter):
                 lambda x: x['Name'] not in event_buckets and ''
                 not in event_buckets)}
 
-        op = ops[self.data['state']]
+        op = ops[self.data.get('state', 'present')]
         results = []
         for b in resources:
             if op(b):
@@ -2656,7 +2897,8 @@ class SetInventory(BucketActionBase):
             'Size', 'LastModifiedDate', 'StorageClass', 'ETag',
             'IsMultipartUploaded', 'ReplicationStatus', 'EncryptionStatus',
             'ObjectLockRetainUntilDate', 'ObjectLockMode', 'ObjectLockLegalHoldStatus',
-            'IntelligentTieringAccessTier', 'BucketKeyStatus', 'ChecksumAlgorithm']}})
+            'IntelligentTieringAccessTier', 'BucketKeyStatus', 'ChecksumAlgorithm',
+            'ObjectAccessControlList', 'ObjectOwner']}})
 
     permissions = ('s3:PutInventoryConfiguration', 's3:GetInventoryConfiguration')
 
@@ -2748,6 +2990,237 @@ class SetInventory(BucketActionBase):
                 if i[k] != v:
                     found = False
         return found
+
+
+@filters.register('intelligent-tiering')
+class IntelligentTiering(ListItemFilter):
+    """Filter for S3 buckets to look at intelligent tiering configurations
+
+    The schema to supply to the attrs follows the schema here:
+     https://botocore.amazonaws.com/v1/documentation/api/latest/reference/services/s3/client/list_bucket_intelligent_tiering_configurations.html
+
+    :example:
+
+    .. code-block:: yaml
+
+            policies:
+              - name: s3-intelligent-tiering-configuration
+                resource: s3
+                filters:
+                  - type: intelligent-tiering
+                    attrs:
+                      - Status: Enabled
+                      - Filter:
+                          And:
+                            Prefix: test
+                            Tags:
+                              - Key: Owner
+                                Value: c7n
+                      - Tierings:
+                          - Days: 100
+                          - AccessTier: ARCHIVE_ACCESS
+
+    """
+    schema = type_schema(
+        'intelligent-tiering',
+        attrs={'$ref': '#/definitions/filters_common/list_item_attrs'},
+        count={'type': 'number'},
+        count_op={'$ref': '#/definitions/filters_common/comparison_operators'}
+    )
+    permissions = ('s3:GetIntelligentTieringConfiguration',)
+    annotation_key = "c7n:IntelligentTiering"
+    annotate_items = True
+
+    def __init__(self, data, manager=None):
+        super().__init__(data, manager)
+        self.data['key'] = self.annotation_key
+
+    def process(self, buckets, event=None):
+        with self.executor_factory(max_workers=2) as w:
+            futures = {w.submit(self.get_item_values, b): b for b in buckets}
+            for future in as_completed(futures):
+                b = futures[future]
+                if future.exception():
+                    self.log.error("Message: %s Bucket: %s", future.exception(), b['Name'])
+                    continue
+        return super().process(buckets, event)
+
+    def get_item_values(self, b):
+        if self.annotation_key not in b:
+            client = bucket_client(local_session(self.manager.session_factory), b)
+            try:
+                int_tier_config = client.list_bucket_intelligent_tiering_configurations(
+                    Bucket=b['Name'])
+                b[self.annotation_key] = int_tier_config.get(
+                    'IntelligentTieringConfigurationList', [])
+            except ClientError as e:
+                if e.response['Error']['Code'] == 'AccessDenied':
+                    method = 'list_bucket_intelligent_tiering_configurations'
+                    log.warning(
+                        "Bucket:%s unable to invoke method:%s error:%s ",
+                          b['Name'], method, e.response['Error']['Message'])
+                    b.setdefault('c7n:DeniedMethods', []).append(method)
+        return b.get(self.annotation_key)
+
+
+@actions.register('set-intelligent-tiering')
+class ConfigureIntelligentTiering(BucketActionBase):
+    """Action applies an intelligent tiering configuration to a S3 bucket
+
+    The schema to supply to the configuration follows the schema here:
+     https://boto3.amazonaws.com/v1/documentation/api/latest/reference/services/s3/client/put_bucket_intelligent_tiering_configuration.html
+
+    To delete a configuration, supply Status=delete with the either the Id or Id: matched
+
+    :example:
+
+    .. code-block:: yaml
+
+            policies:
+              - name: s3-apply-intelligent-tiering-config
+                resource: aws.s3
+                filters:
+                  - not:
+                    - type: intelligent-tiering
+                      attrs:
+                        - Status: Enabled
+                        - Filter:
+                            And:
+                              Prefix: helloworld
+                              Tags:
+                                - Key: Hello
+                                  Value: World
+                        - Tierings:
+                          - Days: 123
+                            AccessTier: ARCHIVE_ACCESS
+                actions:
+                  - type: set-intelligent-tiering
+                    Id: c7n-default
+                    IntelligentTieringConfiguration:
+                      Id: c7n-default
+                      Status: Enabled
+                      Tierings:
+                        - Days: 149
+                          AccessTier: ARCHIVE_ACCESS
+
+              - name: s3-delete-intelligent-tiering-configuration
+                resource: aws.s3
+                filters:
+                  - type: intelligent-tiering
+                    attrs:
+                      - Status: Enabled
+                      - Id: test-config
+                actions:
+                  - type: set-intelligent-tiering
+                    Id: test-config
+                    State: delete
+
+              - name: s3-delete-intelligent-tiering-matched-configs
+                resource: aws.s3
+                filters:
+                  - type: intelligent-tiering
+                    attrs:
+                      - Status: Enabled
+                      - Id: test-config
+                actions:
+                  - type: set-intelligent-tiering
+                    Id: matched
+                    State: delete
+
+    """
+
+    annotation_key = 'c7n:ListItemMatches'
+    shape = 'PutBucketIntelligentTieringConfigurationRequest'
+    schema = {
+        'type': 'object',
+        'additionalProperties': False,
+        'oneOf': [
+            {'required': ['type', 'Id', 'IntelligentTieringConfiguration']},
+            {'required': ['type', 'Id', 'State']}],
+        'properties': {
+            'type': {'enum': ['set-intelligent-tiering']},
+            'Id': {'type': 'string'},
+            # delete intelligent tier configurations via state: delete
+            'State': {'type': 'string', 'enum': ['delete']},
+            'IntelligentTieringConfiguration': {'type': 'object'}
+        },
+    }
+
+    permissions = ('s3:PutIntelligentTieringConfiguration',)
+
+    def validate(self):
+        # You can have up to 1,000 S3 Intelligent-Tiering configurations per bucket.
+        # Hence, always use it with a filter
+        found = False
+        for f in self.manager.iter_filters():
+            if isinstance(f, IntelligentTiering):
+                found = True
+                break
+        if not found:
+            raise PolicyValidationError(
+                '`set-intelligent-tiering` may only be used in '
+                'conjunction with `intelligent-tiering` filter on %s' % (self.manager.data,))
+        cfg = dict(self.data)
+        if 'IntelligentTieringConfiguration' in cfg:
+            cfg['Bucket'] = 'bucket'
+            cfg.pop('type')
+            return shape_validate(
+                cfg, self.shape, self.manager.resource_type.service)
+
+    def process(self, buckets):
+        with self.executor_factory(max_workers=3) as w:
+            futures = {}
+
+            for b in buckets:
+                futures[w.submit(self.process_bucket, b)] = b
+
+            for future in as_completed(futures):
+                if future.exception():
+                    bucket = futures[future]
+                    self.log.error(
+                      'error modifying bucket intelligent tiering configuration: %s\n%s',
+                        bucket['Name'], future.exception())
+                    continue
+
+    def process_bucket(self, bucket):
+        s3 = bucket_client(local_session(self.manager.session_factory), bucket)
+
+        if 'list_bucket_intelligent_tiering_configurations' in bucket.get(
+            'c7n:DeniedMethods', []):
+            log.warning("Access Denied Bucket:%s while reading intelligent tiering configurations"
+                        % bucket['Name'])
+            return
+
+        if self.data.get('Id') and self.data.get('IntelligentTieringConfiguration'):
+            try:
+                s3.put_bucket_intelligent_tiering_configuration(
+                    Bucket=bucket['Name'], Id=self.data.get(
+                      'Id'), IntelligentTieringConfiguration=self.data.get(
+                        'IntelligentTieringConfiguration'))
+            except ClientError as e:
+                if e.response['Error']['Code'] == 'AccessDenied':
+                    log.warning(
+                        "Access Denied Bucket:%s while applying intelligent tiering configuration"
+                          % bucket['Name'])
+        if self.data.get('State'):
+            if self.data.get('Id') == 'matched':
+                for config in bucket.get(self.annotation_key):
+                    self.delete_intelligent_tiering_configurations(s3, config.get('Id'), bucket)
+            else:
+                self.delete_intelligent_tiering_configurations(s3, self.data.get('Id'), bucket)
+
+    def delete_intelligent_tiering_configurations(self, s3_client, id, bucket):
+        try:
+            s3_client.delete_bucket_intelligent_tiering_configuration(Bucket=bucket['Name'], Id=id)
+        except ClientError as e:
+            if e.response['Error']['Code'] == 'AccessDenied':
+                log.warning(
+                    "Access Denied Bucket:%s while deleting intelligent tiering configuration"
+                      % bucket['Name'])
+            elif e.response['Error']['Code'] == 'NoSuchConfiguration':
+                log.warning(
+                  "No such configuration found:%s while deleting intelligent tiering configuration"
+                    % bucket['Name'])
 
 
 @actions.register('delete')
@@ -2935,6 +3408,8 @@ class Lifecycle(BucketActionBase):
                             'additionalProperties': False,
                             'properties': {
                                 'Prefix': {'type': 'string'},
+                                'ObjectSizeGreaterThan': {'type': 'integer'},
+                                'ObjectSizeLessThan': {'type': 'integer'},
                                 'Tag': {
                                     'type': 'object',
                                     'required': ['Key', 'Value'],
@@ -2949,6 +3424,8 @@ class Lifecycle(BucketActionBase):
                                     'additionalProperties': False,
                                     'properties': {
                                         'Prefix': {'type': 'string'},
+                                        'ObjectSizeGreaterThan': {'type': 'integer'},
+                                        'ObjectSizeLessThan': {'type': 'integer'},
                                         'Tags': {
                                             'type': 'array',
                                             'items': {
@@ -2984,6 +3461,7 @@ class Lifecycle(BucketActionBase):
                                 'additionalProperties': False,
                                 'properties': {
                                     'NoncurrentDays': {'type': 'integer'},
+                                    'NewerNoncurrentVersions': {'type': 'integer'},
                                     'StorageClass': {'type': 'string'},
                                 },
                             },
@@ -2993,6 +3471,7 @@ class Lifecycle(BucketActionBase):
                             'additionalProperties': False,
                             'properties': {
                                 'NoncurrentDays': {'type': 'integer'},
+                                'NewerNoncurrentVersions': {'type': 'integer'}
                             },
                         },
                         'AbortIncompleteMultipartUpload': {
@@ -3151,14 +3630,27 @@ class BucketEncryption(KMSKeyResolverMixin, Filter):
                 filters:
                   - type: bucket-encryption
                     state: False
+              - name: s3-bucket-test-bucket-key-enabled
+                resource: s3
+                region: us-east-1
+                filters:
+                  - type: bucket-encryption
+                    bucket_key_enabled: True
     """
     schema = type_schema('bucket-encryption',
                          state={'type': 'boolean'},
                          crypto={'type': 'string', 'enum': ['AES256', 'aws:kms']},
-                         key={'type': 'string'})
+                         key={'type': 'string'},
+                         bucket_key_enabled={'type': 'boolean'})
 
     permissions = ('s3:GetEncryptionConfiguration', 'kms:DescribeKey', 'kms:ListAliases')
     annotation_key = 'c7n:bucket-encryption'
+
+    def validate(self):
+        if self.data.get('bucket_key_enabled') is not None and self.data.get('key') is not None:
+            raise PolicyValidationError(
+                f'key and bucket_key_enabled attributes cannot both be set: {self.data}'
+            )
 
     def process(self, buckets, event=None):
         self.resolve_keys(buckets)
@@ -3194,6 +3686,13 @@ class BucketEncryption(KMSKeyResolverMixin, Filter):
         rules = be.get('ServerSideEncryptionConfiguration', {}).get('Rules', [])
         # default `state` to True as previous impl assumed state == True
         # to preserve backwards compatibility
+        if self.data.get('bucket_key_enabled'):
+            for rule in rules:
+                return self.filter_bucket_key_enabled(rule)
+        elif self.data.get('bucket_key_enabled') is False:
+            for rule in rules:
+                return not self.filter_bucket_key_enabled(rule)
+
         if self.data.get('state', True):
             for sse in rules:
                 return self.filter_bucket(b, sse)
@@ -3238,6 +3737,11 @@ class BucketEncryption(KMSKeyResolverMixin, Filter):
             # implies the AWS-managed key.
             key_ids = {key.get('Arn'), key.get('KeyId'), *key['Aliases']}
             return rule.get('KMSMasterKeyID', 'alias/aws/s3') in key_ids
+
+    def filter_bucket_key_enabled(self, rule) -> bool:
+        if not rule:
+            return False
+        return rule.get('BucketKeyEnabled')
 
 
 @actions.register('set-bucket-encryption')
@@ -3457,3 +3961,87 @@ class BucketOwnershipControls(BucketFilterBase, ValueFilter):
                 raise
             controls = {}
         b[self.annotation_key] = controls.get('OwnershipControls')
+
+
+@filters.register('bucket-replication')
+class BucketReplication(ListItemFilter):
+    """Filter for S3 buckets to look at bucket replication configurations
+
+    The schema to supply to the attrs follows the schema here:
+     https://boto3.amazonaws.com/v1/documentation/api/latest/reference/services/s3/client/get_bucket_replication.html
+
+    :example:
+
+    .. code-block:: yaml
+
+            policies:
+              - name: s3-bucket-replication
+                resource: s3
+                filters:
+                  - type: bucket-replication
+                    attrs:
+                      - Status: Enabled
+                      - Filter:
+                          And:
+                            Prefix: test
+                            Tags:
+                              - Key: Owner
+                                Value: c7n
+                      - ExistingObjectReplication: Enabled
+
+    """
+    schema = type_schema(
+        'bucket-replication',
+        attrs={'$ref': '#/definitions/filters_common/list_item_attrs'},
+        count={'type': 'number'},
+        count_op={'$ref': '#/definitions/filters_common/comparison_operators'}
+    )
+
+    permissions = ("s3:GetReplicationConfiguration",)
+    annotation_key = 'Replication'
+    annotate_items = True
+
+    def __init__(self, data, manager=None):
+        super().__init__(data, manager)
+        self.data['key'] = self.annotation_key
+
+    def get_item_values(self, b):
+        client = bucket_client(local_session(self.manager.session_factory), b)
+        # replication configuration is called in S3_AUGMENT_TABLE:
+        bucket_replication = b.get(self.annotation_key)
+
+        rules = []
+        if bucket_replication is not None:
+            rules = bucket_replication.get('ReplicationConfiguration', {}).get('Rules', [])
+            for replication in rules:
+                self.augment_bucket_replication(b, replication, client)
+
+        return rules
+
+    def augment_bucket_replication(self, b, replication, client):
+        destination_bucket = replication.get('Destination').get('Bucket').split(':')[5]
+        try:
+            destination_region = inspect_bucket_region(destination_bucket, client.meta.endpoint_url)
+        except ValueError:
+            replication['DestinationBucketAvailable'] = False
+            return
+        source_region = get_region(b)
+        replication['DestinationBucketAvailable'] = True
+        replication['DestinationRegion'] = destination_region
+        replication['CrossRegion'] = destination_region != source_region
+
+
+@resources.register('s3-directory')
+class S3Directory(query.QueryResourceManager):
+
+    class resource_type(query.TypeInfo):
+        service = 's3'
+        permission_prefix = "s3express"
+        arn_service = "s3express"
+        arn_type = 'bucket'
+        enum_spec = ('list_directory_buckets', 'Buckets[]', None)
+        name = id = 'Name'
+        date = 'CreationDate'
+        dimension = 'BucketName'
+        cfn_type = 'AWS::S3Express::DirectoryBucket'
+        permissions_enum = ("s3express:ListAllMyDirectoryBuckets",)

@@ -1,0 +1,83 @@
+{
+    "status_code": 200,
+    "data": {
+        "SecurityGroups": [
+            {
+                "IpPermissionsEgress": [
+                    {
+                        "IpProtocol": "-1",
+                        "PrefixListIds": [],
+                        "IpRanges": [
+                            {
+                                "CidrIp": "0.0.0.0/0"
+                            }
+                        ],
+                        "UserIdGroupPairs": [],
+                        "Ipv6Ranges": []
+                    }
+                ],
+                "Description": "inbound access",
+                "IpPermissions": [
+                    {
+                        "PrefixListIds": [],
+                        "FromPort": 443,
+                        "IpRanges": [
+                            {
+                                "CidrIp": "10.42.1.0/24"
+                            },
+                            {
+                                "CidrIp": "10.42.2.0/24"
+                            }
+                        ],
+                        "ToPort": 443,
+                        "IpProtocol": "tcp",
+                        "UserIdGroupPairs": [
+                            {
+                                "UserId": "644160558196",
+                                "GroupId": "sg-e2842c8b"
+                            }
+                        ],
+                        "Ipv6Ranges": []
+                    }
+                ],
+                "GroupName": "allow-some-ingress",
+                "VpcId": "vpc-c25285ab",
+                "OwnerId": "644160558196",
+                "GroupId": "sg-0f026884bba48e351"
+            },
+            {
+                "IpPermissionsEgress": [
+                    {
+                        "IpProtocol": "-1",
+                        "PrefixListIds": [],
+                        "IpRanges": [
+                            {
+                                "CidrIp": "0.0.0.0/0"
+                            }
+                        ],
+                        "UserIdGroupPairs": [],
+                        "Ipv6Ranges": []
+                    }
+                ],
+                "Description": "inbound ref access",
+                "IpPermissions": [],
+                "GroupName": "allowed-reference",
+                "VpcId": "vpc-c25285ab",
+                "OwnerId": "644160558196",
+                "GroupId": "sg-e2842c8b"
+            }
+        ],
+        "ResponseMetadata": {
+            "RetryAttempts": 0,
+            "HTTPStatusCode": 200,
+            "RequestId": "353bba5f-d0ca-4610-82ff-3f374778e796",
+            "HTTPHeaders": {
+                "transfer-encoding": "chunked",
+                "vary": "Accept-Encoding",
+                "server": "AmazonEC2",
+                "content-type": "text/xml;charset=UTF-8",
+                "date": "Thu, 05 Jan 2017 02:25:39 GMT"
+            }
+        }
+    }
+}

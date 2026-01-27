@@ -1,0 +1,77 @@
+{
+    "pytest-terraform": 1,
+    "outputs": {},
+    "resources": {
+        "aws_dynamodb_table": {
+            "apps": {
+                "arn": "arn:aws:dynamodb:us-east-1:644160558196:table/resolver-test-normal-satyr",
+                "attribute": [
+                    {
+                        "name": "app_name",
+                        "type": "S"
+                    }
+                ],
+                "billing_mode": "PAY_PER_REQUEST",
+                "deletion_protection_enabled": false,
+                "global_secondary_index": [],
+                "hash_key": "app_name",
+                "id": "resolver-test-normal-satyr",
+                "import_table": [],
+                "local_secondary_index": [],
+                "name": "resolver-test-normal-satyr",
+                "point_in_time_recovery": [
+                    {
+                        "enabled": false
+                    }
+                ],
+                "range_key": null,
+                "read_capacity": 0,
+                "replica": [],
+                "restore_date_time": null,
+                "restore_source_name": null,
+                "restore_to_latest_time": null,
+                "server_side_encryption": [],
+                "stream_arn": "",
+                "stream_enabled": false,
+                "stream_label": "",
+                "stream_view_type": "",
+                "table_class": "STANDARD",
+                "tags": null,
+                "tags_all": {},
+                "timeouts": null,
+                "ttl": [
+                    {
+                        "attribute_name": "",
+                        "enabled": false
+                    }
+                ],
+                "write_capacity": 0
+            }
+        },
+        "aws_dynamodb_table_item": {
+            "app_app1": {
+                "hash_key": "app_name",
+                "id": "resolver-test-normal-satyr|app_name|app1",
+                "item": "{\n  \"app_name\": {\"S\": \"app1\"}\n}\n",
+                "range_key": null,
+                "table_name": "resolver-test-normal-satyr"
+            },
+            "app_cicd": {
+                "hash_key": "app_name",
+                "id": "resolver-test-normal-satyr|app_name|cicd",
+                "item": "{\n  \"app_name\": {\"S\": \"cicd\"}\n}\n",
+                "range_key": null,
+                "table_name": "resolver-test-normal-satyr"
+            }
+        },
+        "random_pet": {
+            "table": {
+                "id": "resolver-test-normal-satyr",
+                "keepers": null,
+                "length": 2,
+                "prefix": "resolver-test",
+                "separator": "-"
+            }
+        }
+    }
+}

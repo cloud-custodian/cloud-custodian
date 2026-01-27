@@ -1,0 +1,45 @@
+{
+    "headers": {
+    "x-guploader-uploadid": "ABg5-UwhjwACBDgtZP4a8yQ8C2vCm_77aJKR8JFArELolzngmz7pecz-e9n18vTWbACCNkvwPWCGFtZBcMFFnOgASQ",
+    "content-type": "application/json; charset=UTF-8",
+    "date": "Wed, 07 Apr 2021 14:23:12 GMT",
+    "vary": "Origin, X-Origin",
+    "cache-control": "private, max-age=0, must-revalidate, no-transform",
+    "expires": "Wed, 07 Apr 2021 14:23:12 GMT",
+    "content-length": "15985",
+    "server": "UploadServer",
+    "alt-svc": "h3-29=\":443\"; ma=2592000,h3-T051=\":443\"; ma=2592000,h3-Q050=\":443\"; ma=2592000,h3-Q046=\":443\"; ma=2592000,h3-Q043=\":443\"; ma=2592000,quic=\":443\"; ma=2592000; v=\"46,43\"",
+    "status": "200",
+    "content-location": "https://logging.googleapis.com/v2/projects/cloud-custodian/metrics?alt=json"
+  },
+  "body": {
+    "metrics": [
+      {
+        "name": "test-metric-1",
+        "filter": "(protoPayload.serviceName=\"cloudresourcemanager.googleapis.com\")\nAND (ProjectOwnership OR projectOwnerInvitee)\nOR (protoPayload.serviceData.policyDelta.bindingDeltas.action=\"REMOVE\"\nAND protoPayload.serviceData.policyDelta.bindingDeltas.role=\"roles/owner\")\nOR (protoPayload.serviceData.policyDelta.bindingDeltas.action=\"ADD\"\nAND protoPayload.serviceData.policyDelta.bindingDeltas.role=\"roles/owner\")",
+        "metricDescriptor": {
+          "name": "projects/cloud-custodian/metricDescriptors/logging.googleapis.com/user/test-metric-1",
+          "metricKind": "DELTA",
+          "valueType": "INT64",
+          "unit": "1",
+          "type": "logging.googleapis.com/user/test-metric-1"
+        },
+        "createTime": "2023-01-05T22:32:50.019727002Z",
+        "updateTime": "2023-01-05T22:32:50.019727002Z"
+      },
+      {
+        "name": "test-metric-2",
+        "filter": "(protoPayload.serviceName=\"cloudresourcemanager.googleapis.com\")\nAND (ProjectOwnership OR projectOwnerInvitee)\nOR (protoPayload.serviceData.policyDelta.bindingDeltas.action=\"REMOVE\"\nAND protoPayload.serviceData.policyDelta.bindingDeltas.role=\"roles/owner\")\nOR (protoPayload.serviceData.policyDelta.bindingDeltas.action=\"ADD\"\nAND protoPayload.serviceData.policyDelta.bindingDeltas.role=\"roles/owner\")",
+        "metricDescriptor": {
+          "name": "projects/cloud-custodian/metricDescriptors/logging.googleapis.com/user/test-metric-2",
+          "metricKind": "DELTA",
+          "valueType": "INT64",
+          "unit": "1",
+          "type": "logging.googleapis.com/user/test-metric-2"
+        },
+        "createTime": "2023-01-05T22:32:50.019727002Z",
+        "updateTime": "2023-01-05T22:32:50.019727002Z"
+      }
+    ]
+  }
+}

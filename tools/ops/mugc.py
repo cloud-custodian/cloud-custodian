@@ -25,7 +25,7 @@ log = logging.getLogger('mugc')
 def load_policies(options, config):
     policies = PolicyCollection([], config)
     for f in options.config_files:
-        policies += policy_load(config, f).filter(options.policy_filter)
+        policies += policy_load(config, f).filter(options.policy_filters)
     return policies
 
 
@@ -43,37 +43,51 @@ def region_gc(options, region, policy_config, policies):
     client = session_factory().client('lambda')
 
     remove = []
-    current_policies = [p.name for p in policies]
     pattern = re.compile(options.policy_regex)
     for f in funcs:
         if not pattern.match(f['FunctionName']):
             continue
         match = False
-        for pn in current_policies:
-            if f['FunctionName'].endswith(pn):
-                match = True
+        for p in policies:
+            if f['FunctionName'].endswith(p.name):
+                if 'region' not in p.data or p.data['region'] == region:
+                    match = True
         if options.present:
             if match:
                 remove.append(f)
         elif not match:
             remove.append(f)
 
+    schedule_pattern = re.compile('^name=(.*):group=(.*)$')
     for n in remove:
         events = []
         try:
             result = client.get_policy(FunctionName=n['FunctionName'])
         except ClientError as e:
             if e.response['Error']['Code'] == 'ResourceNotFoundException':
-                log.warning(
-                    "Region:%s Lambda Function or Access Policy Statement missing: %s",
-                    region, n['FunctionName'])
+                # Is it a schedule mode policy function due to empty resource policy?
+                fn = client.get_function(FunctionName=n['FunctionName'])
+                if 'custodian-schedule' in fn.get('Tags', {}).keys():
+                    tag_value = fn.get['Tags']['custodian-schedule']
+                    tag_result = schedule_pattern.search(tag_value)
+                    events.append(mu.EventBridgeScheduleSource({
+                        'group-name': tag_result.group(2)
+                    }, session_factory))
+                else:
+                    log.warning(
+                        "Region:%s Lambda Function or Access Policy Statement missing: %s",
+                        region, n['FunctionName'])
             else:
                 log.warning(
                     "Region:%s Unexpected error: %s for function %s",
                     region, e, n['FunctionName'])
 
             # Continue on with next function instead of raising an exception
-            continue
+            # if not using an EventBridge schedule
+            if len(events) == 0:
+                continue
+            else:
+                result = {}
 
         if 'Policy' not in result:
             pass
@@ -163,8 +177,8 @@ def setup_parser():
     parser.add_argument(
         "--policy-regex",
         help="The policy must match the regex")
-    parser.add_argument("-p", "--policies", default=None, dest='policy_filter',
-                        help="Only use named/matched policies")
+    parser.add_argument("-p", "--policies", default=[], dest='policy_filters',
+                        action='append', help="Only use named/matched policies")
     parser.add_argument(
         "--assume", default=None, dest="assume_role",
         help="Role to assume")

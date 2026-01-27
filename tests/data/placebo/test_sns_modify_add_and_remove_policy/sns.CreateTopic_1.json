@@ -1,17 +1,7 @@
 {
-    "status_code": 200, 
+    "status_code": 200,
     "data": {
-        "ResponseMetadata": {
-            "RetryAttempts": 0, 
-            "HTTPStatusCode": 200, 
-            "RequestId": "2972b19d-34d1-534f-b2fd-e29aeec15f36", 
-            "HTTPHeaders": {
-                "x-amzn-requestid": "2972b19d-34d1-534f-b2fd-e29aeec15f36", 
-                "date": "Wed, 21 Feb 2018 20:34:24 GMT", 
-                "content-length": "344", 
-                "content-type": "text/xml"
-            }
-        }, 
-        "TopicArn": "arn:aws:sns:us-west-1:644160558196:test_sns_modify_add_and_remove_policy"
+        "TopicArn": "arn:aws:sns:ap-northeast-2:644160558196:test_sns_modify_add_and_remove_policy",
+        "ResponseMetadata": {}
     }
 }

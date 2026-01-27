@@ -1,0 +1,49 @@
+{
+    "status_code": 200,
+    "data": {
+        "Volumes": [
+            {
+                "CreationTime": {
+                    "__class__": "datetime",
+                    "year": 2025,
+                    "month": 10,
+                    "day": 21,
+                    "hour": 15,
+                    "minute": 31,
+                    "second": 58,
+                    "microsecond": 0
+                },
+                "FileSystemId": "fs-0e3e2a9e1f5ff7a13",
+                "Lifecycle": "CREATED",
+                "Name": "example_svm_root",
+                "OntapConfiguration": {
+                    "FlexCacheEndpointType": "NONE",
+                    "JunctionPath": "/",
+                    "SecurityStyle": "UNIX",
+                    "SizeInMegabytes": 1024,
+                    "StorageEfficiencyEnabled": false,
+                    "StorageVirtualMachineId": "svm-01e63aa602659d739",
+                    "StorageVirtualMachineRoot": true,
+                    "TieringPolicy": {
+                        "Name": "NONE"
+                    },
+                    "UUID": "9bf1c8fd-aeb4-11f0-baee-29070c7c1363",
+                    "OntapVolumeType": "RW",
+                    "SnapshotPolicy": "default",
+                    "CopyTagsToBackups": false,
+                    "VolumeStyle": "FLEXVOL",
+                    "AggregateConfiguration": {
+                        "Aggregates": [
+                            "aggr1"
+                        ]
+                    },
+                    "SizeInBytes": 1073741824
+                },
+                "ResourceARN": "arn:aws:fsx:us-west-2:644160558196:volume/fs-0e3e2a9e1f5ff7a13/fsvol-0d49ff67f98edc9f4",
+                "VolumeId": "fsvol-0d49ff67f98edc9f4",
+                "VolumeType": "ONTAP"
+            }
+        ],
+        "ResponseMetadata": {}
+    }
+}

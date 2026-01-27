@@ -1,0 +1,40 @@
+{
+    "status_code": 200,
+    "data": {
+        "ResponseMetadata": {},
+        "modelArn": "arn:aws:bedrock:us-east-1:644160558196:custom-model/amazon.titan-text-express-v1:0:8k/w4vtut9aq95n",
+        "modelName": "c7n-test3",
+        "jobArn": "arn:aws:bedrock:us-east-1:644160558196:model-customization-job/amazon.titan-text-express-v1:0:8k/3m4q4ew79u8o",
+        "baseModelArn": "arn:aws:bedrock:us-east-1::foundation-model/amazon.titan-text-express-v1:0:8k",
+        "hyperParameters": {
+            "batchSize": "1",
+            "epochCount": "1",
+            "learningRate": "0.005",
+            "learningRateWarmupSteps": "0"
+        },
+        "trainingDataConfig": {
+            "s3Uri": "s3://bedrock-c7n/training.jsonl"
+        },
+        "outputDataConfig": {
+            "s3Uri": "s3://bedrock-c7n"
+        },
+        "trainingMetrics": {
+            "trainingLoss": 6.125
+        },
+        "validationMetrics": [
+            {
+                "validationLoss": 66.83333587646484
+            }
+        ],
+        "creationTime": {
+            "__class__": "datetime",
+            "year": 2023,
+            "month": 11,
+            "day": 17,
+            "hour": 17,
+            "minute": 36,
+            "second": 7,
+            "microsecond": 245000
+        }
+    }
+}

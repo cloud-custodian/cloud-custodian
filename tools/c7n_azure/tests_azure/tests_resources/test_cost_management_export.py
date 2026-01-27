@@ -4,7 +4,7 @@ import datetime
 from collections import namedtuple
 
 from ..azure_common import BaseTest, arm_template, cassette_name
-from mock import patch
+from unittest.mock import patch
 
 from c7n.exceptions import PolicyValidationError
 
@@ -83,7 +83,7 @@ class CostManagementExportTest(BaseTest):
         self.assertEqual(len(resources), 1)
 
         execute_mock.assert_called_once()
-        name, args, kwargs = execute_mock.mock_calls[0]
+        _, args, _ = execute_mock.mock_calls[0]
         self.assertTrue(args[0].startswith('subscriptions/'))
         self.assertEqual(args[1], 'cccostexport')
 

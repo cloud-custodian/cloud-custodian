@@ -3,11 +3,13 @@
 """
 Authentication utilities
 """
+import threading
 import os
 
 from botocore.credentials import RefreshableCredentials
 from botocore.session import get_session
 from boto3 import Session
+import json
 
 from c7n.version import version
 from c7n.utils import get_retry
@@ -19,22 +21,65 @@ USE_STS_REGIONAL = os.environ.get(
     'C7N_USE_STS_REGIONAL', '').lower() in ('yes', 'true')
 
 
+class CustodianSession(Session):
+
+    # track clients and return extant ones if present
+    _clients = {}
+    lock = threading.Lock()
+
+    def client(self, service_name, region_name=None, *args, **kw):
+        if kw.get('config'):
+            return super().client(service_name, region_name, *args, **kw)
+
+        key = self._cache_key(service_name, region_name)
+        client = self._clients.get(key)
+        if client is not None:
+            return client
+
+        with self.lock:
+            client = self._clients.get(key)
+            if client is not None:
+                return client
+
+            client = super().client(service_name, region_name, *args, **kw)
+            self._clients[key] = client
+            return client
+
+    def _cache_key(self, service_name, region_name):
+        region_name = region_name or self.region_name
+        return (
+            # namedtuple so stable comparison
+            hash(self.get_credentials().get_frozen_credentials()),
+            service_name,
+            region_name
+        )
+
+    @classmethod
+    def close(cls):
+        with cls.lock:
+            for c in cls._clients.values():
+                c.close()
+            cls._clients = {}
+
+
 class SessionFactory:
 
-    def __init__(self, region, profile=None, assume_role=None, external_id=None):
+    def __init__(
+            self, region, profile=None, assume_role=None, external_id=None, session_policy=None):
         self.region = region
         self.profile = profile
+        self.session_policy = session_policy
         self.assume_role = assume_role
         self.external_id = external_id
-        self.user_agent_name = "CloudCustodian"
         self.session_name = "CloudCustodian"
         if 'C7N_SESSION_SUFFIX' in os.environ:
             self.session_name = "%s@%s" % (
                 self.session_name, os.environ['C7N_SESSION_SUFFIX'])
         self._subscribers = []
+        self._policy_name = ""
 
     def _set_policy_name(self, name):
-        self.user_agent_name = ("CloudCustodian(%s)" % name).strip()
+        self._policy_name = name
 
     policy_name = property(None, _set_policy_name)
 
@@ -42,7 +87,7 @@ class SessionFactory:
         if self.assume_role and assume:
             session = Session(profile_name=self.profile)
             session = assumed_session(
-                self.assume_role, self.session_name, session,
+                self.assume_role, self.session_name, self.session_policy, session,
                 region or self.region, self.external_id)
         else:
             session = Session(
@@ -51,8 +96,10 @@ class SessionFactory:
         return self.update(session)
 
     def update(self, session):
-        session._session.user_agent_name = self.user_agent_name
+        session._session.user_agent_name = "c7n"
         session._session.user_agent_version = version
+        if self._policy_name:
+            session._session.user_agent_extra = f"c7n/policy#{self._policy_name}"
 
         for s in self._subscribers:
             s(session)
@@ -63,7 +110,8 @@ class SessionFactory:
         self._subscribers = subscribers
 
 
-def assumed_session(role_arn, session_name, session=None, region=None, external_id=None):
+def assumed_session(
+        role_arn, session_name, session_policy=None, session=None, region=None, external_id=None):
     """STS Role assume a boto3.Session
 
     With automatic credential renewal.
@@ -86,6 +134,8 @@ def assumed_session(role_arn, session_name, session=None, region=None, external_
     def refresh():
 
         parameters = {"RoleArn": role_arn, "RoleSessionName": session_name}
+        if session_policy is not None:
+            parameters['Policy'] = json.dumps(session_policy)
 
         if external_id is not None:
             parameters['ExternalId'] = external_id

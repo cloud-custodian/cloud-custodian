@@ -2,7 +2,6 @@
 # SPDX-License-Identifier: Apache-2.0
 import json
 import itertools
-import jmespath
 
 from botocore.exceptions import ClientError
 from concurrent.futures import as_completed
@@ -10,17 +9,19 @@ from concurrent.futures import as_completed
 from c7n.actions import BaseAction, ModifyVpcSecurityGroupsAction
 from c7n.exceptions import PolicyValidationError
 from c7n.filters import (
-    ValueFilter, DefaultVpcBase, AgeFilter, CrossAccountAccessFilter)
+    ValueFilter, AgeFilter, CrossAccountAccessFilter, Filter)
 import c7n.filters.vpc as net_filters
 from c7n.filters.kms import KmsRelatedFilter
 from c7n.filters.offhours import OffHour, OnHour
 from c7n.manager import resources
 from c7n.resolver import ValuesFrom
-from c7n.query import QueryResourceManager, TypeInfo
+from c7n.query import QueryResourceManager, TypeInfo, RetryPageIterator
 from c7n import tags
 from c7n.utils import (
-    type_schema, local_session, chunks, snapshot_identifier)
+    type_schema, local_session, chunks, snapshot_identifier, jmespath_search)
 from .aws import shape_validate
+from datetime import datetime, timedelta
+from c7n.filters.backup import ConsecutiveAwsBackupsFilter
 
 
 @resources.register('redshift')
@@ -43,10 +44,11 @@ Redshift.filter_registry.register('marked-for-op', tags.TagActionFilter)
 Redshift.filter_registry.register('network-location', net_filters.NetworkLocation)
 Redshift.filter_registry.register('offhour', OffHour)
 Redshift.filter_registry.register('onhour', OnHour)
+Redshift.filter_registry.register('consecutive-aws-backups', ConsecutiveAwsBackupsFilter)
 
 
 @Redshift.filter_registry.register('default-vpc')
-class DefaultVpc(DefaultVpcBase):
+class DefaultVpc(net_filters.DefaultVpcBase):
     """ Matches if an redshift database is in the default vpc
 
     :example:
@@ -622,7 +624,7 @@ class RedshiftSetAttributes(BaseAction):
             modify = {}
             for k, v in config.items():
                 if ((k in self.cluster_mapping and
-                v != jmespath.search(self.cluster_mapping[k], cluster)) or
+                v != jmespath_search(self.cluster_mapping[k], cluster)) or
                 v != cluster.get('PendingModifiedValues', {}).get(k, cluster.get(k))):
                     modify[k] = v
             if not modify:
@@ -804,7 +806,7 @@ class RedshiftSnapshot(QueryResourceManager):
         enum_spec = ('describe_cluster_snapshots', 'Snapshots', None)
         name = id = 'SnapshotIdentifier'
         date = 'SnapshotCreateTime'
-        config_type = cfn_type = "AWS::Redshift::ClusterSnapshot"
+        config_type = "AWS::Redshift::ClusterSnapshot"
         universal_taggable = True
 
     def get_arns(self, resources):
@@ -978,3 +980,76 @@ class ReservedNode(QueryResourceManager):
         filter_type = 'list'
         arn_type = "reserved-nodes"
         permissions_enum = ('redshift:DescribeReservedNodes',)
+
+
+@Redshift.filter_registry.register('consecutive-snapshots')
+class ClusterConsecutiveSnapshots(Filter):
+    """Returns Clusters where number of consective daily backups is
+    equal to/or greater than n days.
+
+    :example:
+
+    .. code-block:: yaml
+
+            policies:
+              - name: redshift-daily-snapshot-count
+                resource: redshift
+                filters:
+                  - type: consecutive-snapshots
+                    count: 7
+                    period: days
+                    status: available
+    """
+    schema = type_schema('consecutive-snapshots', count={'type': 'number', 'minimum': 1},
+        period={'enum': ['hours', 'days', 'weeks']},
+        status={'enum': ['available', 'creating', 'final snapshot', 'failed']},
+        required=['count', 'period', 'status'])
+    permissions = ('redshift:DescribeClusterSnapshots', 'redshift:DescribeClusters', )
+    annotation = 'c7n:RedshiftSnapshots'
+
+    def process_resource_set(self, client, resources, lbdate):
+        paginator = client.get_paginator('describe_cluster_snapshots')
+        paginator.PAGE_ITERATOR_CLS = RetryPageIterator
+        rs_snapshots = paginator.paginate(StartTime=lbdate).build_full_result().get(
+            'Snapshots', [])
+
+        cluster_map = {}
+        for snap in rs_snapshots:
+            cluster_map.setdefault(snap['ClusterIdentifier'], []).append(snap)
+        for r in resources:
+            r[self.annotation] = cluster_map.get(r['ClusterIdentifier'], [])
+
+    def get_date(self, time):
+        period = self.data.get('period')
+        if period == 'weeks':
+            date = (datetime.utcnow() - timedelta(weeks=time)).strftime('%Y-%m-%d')
+        elif period == 'hours':
+            date = (datetime.utcnow() - timedelta(hours=time)).strftime('%Y-%m-%d-%H')
+        else:
+            date = (datetime.utcnow() - timedelta(days=time)).strftime('%Y-%m-%d')
+        return date
+
+    def process(self, resources, event=None):
+        client = local_session(self.manager.session_factory).client('redshift')
+        results = []
+        retention = self.data.get('count')
+        lbdate = self.get_date(retention)
+        expected_dates = set()
+        for time in range(1, retention + 1):
+            expected_dates.add(self.get_date(time))
+
+        for resource_set in chunks(
+                [r for r in resources if self.annotation not in r], 50):
+            self.process_resource_set(client, resource_set, lbdate)
+
+        for r in resources:
+            snapshot_dates = set()
+            for snapshot in r[self.annotation]:
+                if snapshot['Status'] == self.data.get('status'):
+                    if self.data.get('period') == 'hours':
+                        snapshot_dates.add(snapshot['SnapshotCreateTime'].strftime('%Y-%m-%d-%H'))
+                    else:
+                        snapshot_dates.add(snapshot['SnapshotCreateTime'].strftime('%Y-%m-%d'))
+            if expected_dates.issubset(snapshot_dates):
+                results.append(r)
+        return results

@@ -1,7 +1,6 @@
 # Copyright The Cloud Custodian Authors.
 # SPDX-License-Identifier: Apache-2.0
 
-import jmespath
 from retrying import RetryError
 from tencentcloud.common.exception.tencent_cloud_sdk_exception import TencentCloudSDKException
 
@@ -11,7 +10,7 @@ from c7n.exceptions import PolicyExecutionError
 from c7n.filters import FilterRegistry
 from c7n.manager import ResourceManager
 from c7n.query import sources
-from c7n.utils import local_session, chunks
+from c7n.utils import local_session, chunks, jmespath_search
 from .actions.tags import register_tag_actions, register_tag_filters
 from .client import Session
 
@@ -39,9 +38,17 @@ class ResourceTypeInfo(metaclass=TypeMeta):
     batch_size: int = 10
 
     # used by metric filter
+    metrics_enabled: bool = False
     metrics_namespace: str = ""
     metrics_batch_size: int = 10
-    metrics_instance_id_name: str = ""  # the field name to set resource instance id
+
+    # metrics_dimension_def: [(target_key_name, original_key_name), ...]
+    # target_key_name: used for dimensions.[].name in metric API
+    # original_key_name: used to get value to set dimensions.[].value in metric API
+    metrics_dimension_def = []
+    # the field name for resource id
+    # it must be one of the target_key_name in metrics_dimension_def
+    metrics_instance_id_name: str = ""
 
     resource_prefix: str = ""
 
@@ -78,7 +85,7 @@ class ResourceQuery:
             params.update(extra_params)
         try:
             resp = cli.execute_query(action, params)
-            return jmespath.search(jsonpath, resp)
+            return jmespath_search(jsonpath, resp)
         except (RetryError, TencentCloudSDKException) as err:
             raise PolicyExecutionError(err) from err
 
@@ -127,9 +134,18 @@ class DescribeSource:
         self.resource_manager = resource_manager
         self.resource_type = resource_manager.resource_type
         self.region = resource_manager.config.region
-        self.query_helper = ResourceQuery(local_session(resource_manager.session_factory))
         self._session = None
         self.tag_batch_size: int = 9
+
+    _query_helper = None
+
+    @property
+    def query_helper(self):
+        if self._query_helper is None:
+            self._query_helper = ResourceQuery(
+                local_session(
+                    self.resource_manager.session_factory))
+        return self._query_helper
 
     def resources(self, params=None):
         """
@@ -301,3 +317,37 @@ class QueryResourceManager(ResourceManager, metaclass=QueryMeta):
     # to support configs: max-resources, max-resources-percent
     def check_resource_limit(self, resources):
         return resources
+
+    def get_metrics_req_params(self, resources):
+        """
+        return (namespace, instances)
+        namespace: something like QCE/CVM
+        instances: [
+            {"Dimensions": [{"Name": "xxx", "value": "yyy"}, ...]},
+            {"Dimensions": [{"Name": "xxx", "value": "yyy"}, ...]},
+            ...
+        ]
+        """
+        if not self.resource_type.metrics_dimension_def:
+            raise PolicyExecutionError("internal error: invalid metrics config")
+        instances = []
+        for s in resources:
+            dimensions = []
+            for item in self.resource_type.metrics_dimension_def:
+                dimensions.append({
+                    "Name": item[0],
+                    "Value": str(s[item[1]])  # force to string
+                })
+            instances.append({"Dimensions": dimensions})
+
+        return (self.resource_type.metrics_namespace, instances)
+
+    def get_resource_id_from_dimensions(self, dimensions):
+        """
+        return the resource id in dimension values in metrics data
+        dimensions: the Dimensions fields in Cloud Monitor response data
+        """
+        for item in dimensions:
+            if item["Name"] == self.resource_type.metrics_instance_id_name:
+                return item["Value"]
+        return None

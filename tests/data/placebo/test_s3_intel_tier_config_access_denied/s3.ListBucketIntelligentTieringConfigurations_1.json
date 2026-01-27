@@ -1,0 +1,29 @@
+{
+    "status_code": 200,
+    "data": {
+        "ResponseMetadata": {},
+        "IsTruncated": false,
+        "IntelligentTieringConfigurationList": [
+            {
+                "Id": "present",
+                "Status": "Enabled",
+                "Tierings": [
+                    {
+                        "Days": 99,
+                        "AccessTier": "ARCHIVE_ACCESS"
+                    }
+                ]
+            },
+            {
+                "Id": "test",
+                "Status": "Enabled",
+                "Tierings": [
+                    {
+                        "Days": 198,
+                        "AccessTier": "DEEP_ARCHIVE_ACCESS"
+                    }
+                ]
+            }
+        ]
+    }
+}

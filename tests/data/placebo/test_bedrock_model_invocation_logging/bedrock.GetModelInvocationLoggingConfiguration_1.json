@@ -1,0 +1,15 @@
+{
+    "status_code": 200,
+    "data": {
+        "ResponseMetadata": {},
+        "loggingConfig": {
+            "s3Config": {
+                "bucketName": "test-bedrock-1",
+                "keyPrefix": "logging/"
+            },
+            "textDataDeliveryEnabled": true,
+            "imageDataDeliveryEnabled": false,
+            "embeddingDataDeliveryEnabled": true
+        }
+    }
+}

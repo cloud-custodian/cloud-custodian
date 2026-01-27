@@ -1,8 +1,13 @@
 # Copyright The Cloud Custodian Authors.
 # SPDX-License-Identifier: Apache-2.0
+from typing import List
+
+import c7n.filters.vpc as net_filters
 from c7n.actions import Action
+from c7n.filters.core import ComparableVersion
 from c7n.filters.vpc import SecurityGroupFilter, SubnetFilter, VpcFilter
 from c7n.manager import resources
+from c7n.resources.aws import shape_schema
 from c7n import tags, query
 from c7n.query import QueryResourceManager, TypeInfo, DescribeSource, \
     ChildResourceManager, ChildDescribeSource
@@ -11,15 +16,14 @@ from botocore.waiter import WaiterModel, create_waiter_with_client
 from .aws import shape_validate
 from .ecs import ContainerConfigSource
 from c7n.filters.kms import KmsRelatedFilter
+from c7n.filters import Filter
 
 
 @query.sources.register('describe-eks-nodegroup')
 class NodeGroupDescribeSource(ChildDescribeSource):
 
     def get_query(self):
-        query = super(NodeGroupDescribeSource, self).get_query()
-        query.capture_parent_id = True
-        return query
+        return super().get_query(capture_parent_id=True)
 
     def augment(self, resources):
         results = []
@@ -120,6 +124,9 @@ class EKSSGFilter(SecurityGroupFilter):
     RelatedIdsExpression = "resourcesVpcConfig.securityGroupIds[]"
 
 
+EKS.filter_registry.register('network-location', net_filters.NetworkLocation)
+
+
 @EKS.filter_registry.register('vpc')
 class EKSVpcFilter(VpcFilter):
 
@@ -129,6 +136,130 @@ class EKSVpcFilter(VpcFilter):
 @EKS.filter_registry.register('kms-key')
 class KmsFilter(KmsRelatedFilter):
     RelatedIdsExpression = 'encryptionConfig[].provider.keyArn'
+
+
+@EKS.filter_registry.register('upgrade-available')
+class UpgradeAvailable(Filter):
+    """Scans for available upgrade-compatible EKS versions
+
+    This will check all the EKS clusters on the resources, and return
+    a list of viable upgrade options.
+
+    :example:
+
+    .. code-block:: yaml
+
+            policies:
+              - name: eks-upgrade-available
+                resource: aws.eks
+                filters:
+                  - type: upgrade-available
+                    major: False
+
+    """
+
+    schema = type_schema(
+        'upgrade-available',
+        major={'type': 'boolean'},
+        value={'type': 'boolean'},
+    )
+    permissions = ('eks:DescribeClusterVersions',)
+    annotation_key = "c7n:AvailableUpgrades"
+
+    def collect_available_upgrades(self, client):
+        all_upgrades = {}
+        all_versions = []
+
+        # Get paginator for DescribeClusterVersions
+        paginator = client.get_paginator('describe_cluster_versions')
+
+        # Request all available versions
+        page_iterator = paginator.paginate(
+            includeAll=True
+        )
+
+        for page in page_iterator:
+            for version_info in page.get('clusterVersions', []):
+                cluster_version = version_info['clusterVersion']
+                all_versions.append(cluster_version)
+
+        # Re-sort, now that we have a complete list of versions.
+        # This is just straight alphanumeric, but works within the existing
+        # versions/scheme.
+        all_versions = sorted(all_versions)
+
+        # Add to all the previous versions first.
+        for offset, version in enumerate(all_versions):
+            all_upgrades[version] = all_versions[offset + 1:]
+
+        return all_upgrades
+
+    def get_matches_for(
+        self,
+        cversion: ComparableVersion,
+        possible_upgrades: List[str],
+        check_major=False
+    ) -> List[str]:
+        matches = []
+
+        for tversion_str in possible_upgrades:
+            tversion = ComparableVersion(tversion_str)
+
+            # Check the major version, & skip if it doesn't match & not including
+            # major versions.
+            if (
+                tversion.version[0] > cversion.version[0]
+                and not check_major
+            ):
+                continue
+
+            if tversion.version[1] <= cversion.version[1]:
+                continue
+
+            matches.append(tversion_str)
+
+        return matches
+
+    def process(self, resources, event=None):
+        client = local_session(self.manager.session_factory).client('eks')
+        check_major = self.data.get('major', False)
+        check_upgrade_extant = self.data.get('value', True)
+        results = []
+
+        available_versions = self.collect_available_upgrades(client)
+
+        for r in resources:
+            raw_version = r.get('version')
+
+            if not raw_version:
+                continue
+
+            current_version = ComparableVersion(raw_version)
+            matches = []
+
+            if raw_version in available_versions:
+                matches = self.get_matches_for(
+                    current_version,
+                    available_versions[raw_version],
+                    check_major=check_major,
+                )
+
+                # Annotate on all the upgrades (in a stable ordering).
+                r[self.annotation_key] = list(sorted(matches))
+
+            # Lastly, depending on `value` (filter if upgrades exist or not):
+            if check_upgrade_extant:
+                if matches:
+                    # We want to filter to include only resources that have
+                    # upgrades.
+                    results.append(r)
+            else:
+                if not matches:
+                    # We want to filter to include only resources **without**
+                    # upgrades,
+                    results.append(r)
+
+        return results
 
 
 @EKS.action_registry.register('tag')
@@ -169,19 +300,10 @@ class EKSRemoveTag(tags.RemoveTag):
 @EKS.action_registry.register('update-config')
 class UpdateConfig(Action):
 
-    schema = {
-        'type': 'object',
-        'additionalProperties': False,
-        'oneOf': [
-            {'required': ['type', 'logging']},
-            {'required': ['type', 'resourcesVpcConfig']},
-            {'required': ['type', 'logging', 'resourcesVpcConfig']}],
-        'properties': {
-            'type': {'enum': ['update-config']},
-            'logging': {'type': 'object'},
-            'resourcesVpcConfig': {'type': 'object'}
-        }
-    }
+    schema = type_schema('update-config',
+                **shape_schema(
+                    'eks', 'UpdateClusterConfigRequest', drop_fields=('name'))
+            )
 
     permissions = ('eks:UpdateClusterConfig',)
     shape = 'UpdateClusterConfigRequest'
@@ -206,6 +328,99 @@ class UpdateConfig(Action):
         if state_filtered:
             self.log.warning(
                 "Filtered %d of %d clusters due to state", state_filtered, len(resources))
+
+
+@EKS.action_registry.register('associate-encryption-config')
+class AssociateEncryptionConfig(Action):
+    """
+    Action that adds an encryption configuration to an EKS cluster.
+
+    :example:
+
+    This policy will find all EKS clusters that do not have Secrets encryption set and
+    associate encryption config with the specified keyArn.
+
+    .. code-block:: yaml
+
+        policies:
+          - name: associate-encryption-config
+            resource: aws.eks
+            filters:
+              - type: value
+                key: encryptionConfig[].provider.keyArn
+                value: absent
+            actions:
+              - type: associate-encryption-config
+                encryptionConfig:
+                  - provider:
+                      keyArn: alias/eks
+                    resources:
+                      - secrets
+    """
+    schema = {
+        'type': 'object',
+        'additionalProperties': False,
+        'properties': {
+            'type': {'enum': ['associate-encryption-config']},
+            'encryptionConfig': {
+                'type': 'array',
+                'properties': {
+                    'type': 'object',
+                    'properties': {
+                        'provider': {
+                            'type': 'object',
+                            'properties': {
+                                'keyArn': {'type': 'string'}
+                            }
+                        },
+                        'resources': {
+                            'type': 'array',
+                            'properties': {
+                                'enum': 'secrets'
+                            }
+                        }
+                    }
+                }
+            }
+        }
+    }
+
+    permissions = ('eks:AssociateEncryptionConfig', 'kms:DescribeKey',)
+
+    def process(self, resources):
+        client = local_session(self.manager.session_factory).client('eks')
+        error = None
+        params = dict(self.data)
+        params.pop('type')
+        # associate_encryption_config does not accept kms key aliases, if provided
+        # with an alias find the key arn with kms:DescribeKey first.
+        key_arn = params['encryptionConfig'][0]['provider']['keyArn']
+        if 'alias' in key_arn:
+            try:
+                kms_client = local_session(self.manager.session_factory).client('kms')
+                _key_arn = kms_client.describe_key(KeyId=key_arn)['KeyMetadata']['Arn']
+                params['encryptionConfig'][0]['provider']['keyArn'] = _key_arn
+            except kms_client.exceptions.NotFoundException as e:
+                self.log.error(
+                    "The following error was received for kms:DescribeKey: "
+                    f"{e.response['Error']['Message']}"
+                )
+                raise e
+        for r in self.filter_resources(resources, 'status', ('ACTIVE',)):
+            try:
+                client.associate_encryption_config(
+                    clusterName=r['name'],
+                    encryptionConfig=params['encryptionConfig']
+                )
+            except client.exceptions.InvalidParameterException as e:
+                error = e
+                self.log.error(
+                    "The following error was received for cluster "
+                    f"{r['name']}: {e.response['Error']['Message']}"
+                )
+                continue
+        if error:
+            raise error
 
 
 @EKS.action_registry.register('delete')

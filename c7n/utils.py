@@ -1,6 +1,7 @@
 # Copyright The Cloud Custodian Authors.
 # SPDX-License-Identifier: Apache-2.0
 import copy
+from collections import UserString
 from datetime import datetime, timedelta
 from dateutil.tz import tzutc
 import json
@@ -16,8 +17,11 @@ import time
 from urllib import parse as urlparse
 from urllib.request import getproxies, proxy_bypass
 
-
 from dateutil.parser import ParserError, parse
+
+import jmespath
+from jmespath import functions
+from jmespath.parser import Parser, ParsedResult
 
 from c7n import config
 from c7n.exceptions import ClientError, PolicyValidationError
@@ -91,9 +95,9 @@ def loads(body):
 
 def dumps(data, fh=None, indent=0):
     if fh:
-        return json.dump(data, fh, cls=DateTimeEncoder, indent=indent)
+        return json.dump(data, fh, cls=JsonEncoder, indent=indent)
     else:
-        return json.dumps(data, cls=DateTimeEncoder, indent=indent)
+        return json.dumps(data, cls=JsonEncoder, indent=indent)
 
 
 def format_event(evt):
@@ -208,13 +212,15 @@ def type_schema(
     return s
 
 
-class DateTimeEncoder(json.JSONEncoder):
+class JsonEncoder(json.JSONEncoder):
 
     def default(self, obj):
         if isinstance(obj, datetime):
             return obj.isoformat()
         if isinstance(obj, FormatDate):
             return obj.datetime.isoformat()
+        if isinstance(obj, bytes):
+            return obj.decode('utf8', errors="ignore")
         return json.JSONEncoder.default(self, obj)
 
 
@@ -334,6 +340,9 @@ def local_session(factory, region=None):
 def reset_session_cache():
     for k in [k for k in dir(CONN_CACHE) if not k.startswith('_')]:
         setattr(CONN_CACHE, k, {})
+
+    from .credentials import CustodianSession
+    CustodianSession.close()
 
 
 def annotation(i, k):
@@ -468,7 +477,7 @@ def backoff_delays(start, stop, factor=2.0, jitter=False):
     cur = start
     while cur <= stop:
         if jitter:
-            yield cur - (cur * random.random())
+            yield cur - (cur * random.random() / 5)
         else:
             yield cur
         cur = cur * factor
@@ -622,6 +631,32 @@ def parse_url_config(url):
     return conf
 
 
+def join_output_path(output_path, *parts):
+    # allow users to specify interpolated output paths
+    if '{' in output_path:
+        return output_path
+
+    if "://" not in output_path:
+        return os.path.join(output_path, *parts)
+
+    # handle urls with query strings
+    parsed = urlparse.urlparse(output_path)
+    updated_path = "/".join((parsed.path, *parts))
+    parts = list(parsed)
+    parts[2] = updated_path
+    return urlparse.urlunparse(parts)
+
+
+def get_policy_provider(policy_data):
+    if isinstance(policy_data['resource'], list):
+        provider_name, _ = policy_data['resource'][0].split('.', 1)
+    elif '.' in policy_data['resource']:
+        provider_name, _ = policy_data['resource'].split('.', 1)
+    else:
+        provider_name = 'aws'
+    return provider_name
+
+
 def get_proxy_url(url):
     proxies = getproxies()
     parsed = urlparse.urlparse(url)
@@ -654,6 +689,16 @@ def get_proxy_url(url):
     return None
 
 
+class DeferredFormatString(UserString):
+    """A string that returns itself when formatted
+
+    Let any format spec pass through. This lets us selectively defer
+    expansion of runtime variables without losing format spec details.
+    """
+    def __format__(self, format_spec):
+        return "".join(("{", self.data, f":{format_spec}" if format_spec else "", "}"))
+
+
 class FormatDate:
     """a datetime wrapper with extended pyformat syntax"""
 
@@ -661,6 +706,9 @@ class FormatDate:
 
     def __init__(self, d=None):
         self._d = d
+
+    def __str__(self):
+        return str(self._d)
 
     @property
     def datetime(self):
@@ -694,64 +742,191 @@ class QueryParser:
 
     QuerySchema = {}
     type_name = ''
+    # Allow multiple values to be passed to a query param
     multi_value = True
-    value_key = 'Values'
+    # If using multi_value, specify scalar fields here
+    single_value_fields = ()
+
+    @classmethod
+    def is_implicit_query_filter(cls, data):
+        key = list(data[0].keys())[0]
+        if (key not in cls.QuerySchema and 'Filters' in cls.QuerySchema and
+                (key in cls.QuerySchema['Filters'] or key.startswith('tag:'))):
+            return True
+        return False
+
+    @classmethod
+    def implicit_qfilter_translate(cls, data):
+        filters = []
+        for d in data:
+            key = list(d.keys())[0]
+            values = list(d.values())[0]
+            if not isinstance(values, list):
+                values = [values]
+            filters.append({'Name': key, 'Values': values})
+        return [{'Filters': filters}]
 
     @classmethod
     def parse(cls, data):
-        filters = []
         if not isinstance(data, (tuple, list)):
             raise PolicyValidationError(
-                "%s Query invalid format, must be array of dicts %s" % (
-                    cls.type_name,
-                    data))
+                f"{cls.type_name} Query Invalid Format, must be array of dicts"
+            )
+
+        # Backwards compatibility
+        if data:
+            if not isinstance(data[0], dict):
+                raise PolicyValidationError(
+                    f"{cls.type_name} Query Invalid Format, must be array of dicts"
+                )
+            # Check for query filter key value pairs not listed under 'Filters' key
+            if cls.is_implicit_query_filter(data):
+                data = cls.implicit_qfilter_translate(data)
+
+            # Support iam-policy and elasticache 'Name', 'Value' queries without 'Filters' key
+            if (data[0].get('Value') and
+                (cls.type_name == 'IAM Policy' or cls.type_name == 'ElastiCache')):
+                try:
+                    data = [{d['Name']: d['Value']} for d in data]
+                except KeyError:
+                    raise PolicyValidationError(
+                        f"{cls.type_name} Query Invalid Format. "
+                        f"Query: {data} is not a list of key-value pairs "
+                        f"from {cls.QuerySchema}"
+                    )
+
+            # Support ebs-snapshot and volume 'Name', 'Values' queries without 'Filters' key
+            elif (data[0].get('Values') and
+                  (cls.type_name == 'EBS Snapshot' or
+                   cls.type_name == 'EBS Volume')):
+                data = [{"Filters": data}]
+
+        results = []
+        names = set()
         for d in data:
             if not isinstance(d, dict):
                 raise PolicyValidationError(
-                    "%s Query Filter Invalid %s" % (cls.type_name, data))
-            if "Name" not in d or cls.value_key not in d:
+                    f"Query Invalid Format. Must be a list of key-value pairs "
+                    f"from {cls.QuerySchema}"
+                )
+            if not len(list(d.keys())) == 1:
                 raise PolicyValidationError(
-                    "%s Query Filter Invalid: Missing Key or Values in %s" % (
-                        cls.type_name, data))
+                    f"Query Invalid Format. Must be a list of key-value pairs "
+                    f"from {cls.QuerySchema}"
+                )
 
-            key = d['Name']
-            values = d[cls.value_key]
+            if d.get("Filters"):
+                results.append({"Filters": cls.parse_qfilters(d["Filters"])})
+            else:
+                key, value = cls.parse_query(d)
 
-            if not cls.multi_value and isinstance(values, list):
+                # Allow for multiple queries with the same key
+                if key in names and (not cls.multi_value or key in cls.single_value_fields):
+                    raise PolicyValidationError(
+                        f"{cls.type_name} Query Invalid Key: {key} Must be unique")
+                elif key in names:
+                    for q in results:
+                        if list(q.keys())[0] == key:
+                            q[key].append(d[key])
+                else:
+                    names.add(key)
+                    results.append({key: value})
+
+        return results
+
+    @classmethod
+    def parse_qfilters(cls, data):
+        if not isinstance(data, (tuple, list)):
+            raise PolicyValidationError(
+                f"{cls.type_name} Query Filter Invalid Format, must be array of dicts"
+            )
+
+        results = []
+        names = set()
+        for f in data:
+            if not isinstance(f, dict):
                 raise PolicyValidationError(
-                    "%s Query Filter Invalid Key: Value:%s Must be single valued" % (
-                        cls.type_name, key))
-            elif not cls.multi_value:
-                values = [values]
-
-            if key not in cls.QuerySchema and not key.startswith('tag:'):
+                f"{cls.type_name} Query Filter Invalid Format, must be array of dicts"
+            )
+            if "Name" not in f or "Values" not in f:
                 raise PolicyValidationError(
-                    "%s Query Filter Invalid Key:%s Valid: %s" % (
-                        cls.type_name, key, ", ".join(cls.QuerySchema.keys())))
+                    f"{cls.type_name} Query Filter Invalid: Each filter must "
+                    "contain 'Name' and 'Values' keys."
+                )
 
-            vtype = cls.QuerySchema.get(key)
-            if vtype is None and key.startswith('tag'):
-                vtype = str
+            key = f['Name']
+            values = f['Values']
+
+            if key not in cls.QuerySchema.get("Filters", {}) and not key.startswith('tag:'):
+                raise PolicyValidationError(
+                    f"{cls.type_name} Query Filter Invalid Key: {key} "
+                    f"Valid: {', '.join(cls.QuerySchema.keys())}"
+                )
 
             if not isinstance(values, list):
                 raise PolicyValidationError(
-                    "%s Query Filter Invalid Values, must be array %s" % (
-                        cls.type_name, data,))
+                    f"{cls.type_name} Query Filter Invalid Value {f} for key {key}, must be array.")
+
+            vtype = cls.QuerySchema["Filters"].get(key)
+            if vtype is None and key.startswith('tag'):
+                vtype = str
 
             for v in values:
-                if isinstance(vtype, tuple):
-                    if v not in vtype:
-                        raise PolicyValidationError(
-                            "%s Query Filter Invalid Value: %s Valid: %s" % (
-                                cls.type_name, v, ", ".join(vtype)))
-                elif not isinstance(v, vtype):
-                    raise PolicyValidationError(
-                        "%s Query Filter Invalid Value Type %s" % (
-                            cls.type_name, data,))
+                cls.type_check(vtype, v)
 
-            filters.append(d)
+            # Allow for multiple queries with the same key
+            if key in names:
+                for qf in results:
+                    if qf['Name'] == key:
+                        qf['Values'].extend(values)
+            else:
+                names.add(key)
+                results.append({'Name': key, 'Values': values})
 
-        return filters
+        return results
+
+    @classmethod
+    def parse_query(cls, data):
+        key = list(data.keys())[0]
+        values = list(data.values())[0]
+
+        if (not cls.multi_value or key in cls.single_value_fields) and isinstance(values, list):
+            raise PolicyValidationError(
+                f"{cls.type_name} Query Invalid Value {values}: Value for {key} must be scalar"
+            )
+        elif (cls.multi_value and key not in cls.single_value_fields
+              and not isinstance(values, list)):
+            values = [values]
+
+        if key not in cls.QuerySchema:
+            raise PolicyValidationError(
+                f"{cls.type_name} Query Invalid Key: {key} "
+                f"Valid: {', '.join(cls.QuerySchema.keys())}"
+            )
+
+        vtype = cls.QuerySchema.get(key)
+        if isinstance(values, list):
+            for v in values:
+                cls.type_check(vtype, v)
+        else:
+            cls.type_check(vtype, values)
+
+        return key, values
+
+    @classmethod
+    def type_check(cls, vtype, value):
+        if isinstance(vtype, tuple):
+            if value not in vtype:
+                raise PolicyValidationError(
+                    f"{cls.type_name} Query Invalid Value: {value} Valid: {', '.join(vtype)}")
+        elif vtype == 'date':
+            if not parse_date(value):
+                raise PolicyValidationError(
+                    f"{cls.type_name} Query Invalid Date Value: {value}")
+        elif not isinstance(value, vtype):
+            raise PolicyValidationError(
+                f"{cls.type_name} Query Invalid Value Type {value}"
+            )
 
 
 def get_annotation_prefix(s):
@@ -770,21 +945,101 @@ def merge_dict_list(dict_iter):
 
 
 def merge_dict(a, b):
-    """Perform a merge of dictionaries a and b
+    """Perform a merge of dictionaries A and B
 
     Any subdictionaries will be recursively merged.
-    Any leaf elements in the form of a list or scalar will use the value from a
+    Any leaf elements in the form of scalar will use the value from B.
+    If A is a str and B is a list, A will be inserted into the front of the list.
+    If A is a list and B is a str, B will be appended to the list.
+    If there are two lists for the same key, the lists will be merged
+    deduplicated with values in A first, followed by any additional values from B.
     """
-    d = {}
-    for k, v in a.items():
-        if k not in b:
-            d[k] = v
-        elif isinstance(v, dict) and isinstance(b[k], dict):
-            d[k] = merge_dict(v, b[k])
+    d = copy.deepcopy(a)
     for k, v in b.items():
         if k not in d:
             d[k] = v
+        elif isinstance(d[k], dict) and isinstance(v, dict):
+            d[k] = merge_dict(d[k], v)
+        elif isinstance(d[k], list) and isinstance(v, list):
+            for val in v:
+                if val not in d[k]:
+                    d[k].append(val)
+        elif isinstance(v, str) and isinstance(d[k], list):
+            if v in d[k]:
+                continue
+            else:
+                d[k].append(v)
+        elif isinstance(v, list) and isinstance(d[k], str):
+            if d[k] in v:
+                d[k] = v
+            else:
+                d[k] = [d[k]]
+                d[k].extend(v)
+        elif k in d and isinstance(v, (int, str, float, bool)):
+            d[k] = v
+        else:
+            raise Exception(f"k={k}, {type(v)} and {type(d[k])} not conformable.")
     return d
+
+
+def compare_dicts_using_sets(a, b) -> bool:
+    """Compares two dicts and replaces any lists or strings with sets
+
+    Compares any lists in the dict as sets.
+    """
+
+    if a.keys() != b.keys():
+        return False
+
+    for k, v in b.items():
+        if isinstance(v, list):
+            v = format_to_set(v)
+            if isinstance(a[k], str):
+                a[k] = format_to_set(a[k])
+        if isinstance(a[k], list):
+            a[k] = format_to_set(a[k])
+            if isinstance(v, str):
+                v = format_to_set(v)
+        if isinstance(a[k], dict) and isinstance(v, dict):
+            if compare_dicts_using_sets(a[k], v):
+                continue
+        if v != a[k]:
+            return False
+    return True
+
+
+def format_to_set(x) -> set:
+    """Formats lists and strings to sets.
+
+    Strings return as a set with one string.
+    Lists return as a set.
+    Variables of other datatypes will return as the original datatype.
+    """
+    if isinstance(x, str):
+        return set([x])
+    if isinstance(x, list):
+        return set(x)
+    else:
+        return x
+
+
+def format_dict_with_sets(x: dict) -> dict:
+    """Formats string and list values in a dict to sets.
+
+    Any string value returns as a set with one string.
+    Any list values return as a set.
+    Returns a formatted dict.
+    """
+    if isinstance(x, dict):
+        format_dict = {}
+        for key, value in x.items():
+            if isinstance(value, dict):
+                format_dict[key] = format_dict_with_sets(value)
+            else:
+                format_dict[key] = format_to_set(value)
+        return format_dict
+    else:
+        return x
 
 
 def select_keys(d, keys):
@@ -824,3 +1079,141 @@ def get_support_region(manager):
     elif partition == "aws-cn":
         support_region = "cn-north-1"
     return support_region
+
+
+def get_resource_tagging_region(resource_type, region):
+    # For global resources, tags don't populate in the get_resources call
+    # unless the call is being made to us-east-1. For govcloud this is us-gov-west-1.
+
+    partition = get_partition(region)
+    if partition == "aws":
+        return getattr(resource_type, 'global_resource', None) and 'us-east-1' or region
+    elif partition == "aws-us-gov":
+        return getattr(resource_type, 'global_resource', None) and 'us-gov-west-1' or region
+    return region
+
+
+def get_eni_resource_type(eni):
+    if eni.get('Attachment'):
+        instance_id = eni['Attachment'].get('InstanceId')
+    else:
+        instance_id = None
+    description = eni.get('Description')
+    # EC2
+    if instance_id:
+        rtype = 'ec2'
+    # ELB/ELBv2
+    elif description.startswith('ELB app/'):
+        rtype = 'elb-app'
+    elif description.startswith('ELB net/'):
+        rtype = 'elb-net'
+    elif description.startswith('ELB gwy/'):
+        rtype = 'elb-gwy'
+    elif description.startswith('ELB'):
+        rtype = 'elb'
+    # Other Resources
+    elif description == 'ENI managed by APIGateway':
+        rtype = 'apigw'
+    elif description.startswith('AWS CodeStar Connections'):
+        rtype = 'codestar'
+    elif description.startswith('DAX'):
+        rtype = 'dax'
+    elif description.startswith('AWS created network interface for directory'):
+        rtype = 'dir'
+    elif description == 'DMSNetworkInterface':
+        rtype = 'dms'
+    elif description.startswith('arn:aws:ecs:'):
+        rtype = 'ecs'
+    elif description.startswith('EFS mount target for'):
+        rtype = 'fsmt'
+    elif description.startswith('ElastiCache'):
+        rtype = 'elasticache'
+    elif description.startswith('AWS ElasticMapReduce'):
+        rtype = 'emr'
+    elif description.startswith('CloudHSM Managed Interface'):
+        rtype = 'hsm'
+    elif description.startswith('CloudHsm ENI'):
+        rtype = 'hsmv2'
+    elif description.startswith('AWS Lambda VPC ENI'):
+        rtype = 'lambda'
+    elif description.startswith('AWS Lambda VPC'):
+        rtype = 'lambda'
+    elif description.startswith('Interface for NAT Gateway'):
+        rtype = 'nat'
+    elif (description == 'RDSNetworkInterface' or
+            description.startswith('Network interface for DBProxy')):
+        rtype = 'rds'
+    elif description == 'RedshiftNetworkInterface':
+        rtype = 'redshift'
+    elif description.startswith('Network Interface for Transit Gateway Attachment'):
+        rtype = 'tgw'
+    elif description.startswith('VPC Endpoint Interface'):
+        rtype = 'vpce'
+    elif description.startswith('aws-k8s-branch-eni'):
+        rtype = 'eks'
+    else:
+        rtype = 'unknown'
+    return rtype
+
+
+class C7NJmespathFunctions(functions.Functions):
+    @functions.signature(
+        {'types': ['string']}, {'types': ['string']}
+    )
+    def _func_split(self, sep, string):
+        return string.split(sep)
+
+    @functions.signature(
+        {'types': ['string']}
+    )
+    def _func_from_json(self, string):
+        try:
+            return json.loads(string)
+        except json.JSONDecodeError:
+            return None
+
+
+class C7NJMESPathParser(Parser):
+    def parse(self, expression):
+        result = super().parse(expression)
+        return ParsedResultWithOptions(
+            expression=result.expression,
+            parsed=result.parsed
+        )
+
+
+class ParsedResultWithOptions(ParsedResult):
+    def search(self, value, options=None):
+        # if options are explicitly passed in, we honor those
+        if not options:
+            options = jmespath.Options(custom_functions=C7NJmespathFunctions())
+        return super().search(value, options)
+
+
+def jmespath_search(*args, **kwargs):
+    return jmespath.search(
+        *args,
+        **kwargs,
+        options=jmespath.Options(custom_functions=C7NJmespathFunctions())
+    )
+
+
+def get_path(path: str, resource: dict):
+    """
+    This function provides a wrapper to obtain a value from a resource
+    in an efficient manner.
+    jmespath_search is expensive and it's rarely the case that
+    there is a path in the id field, therefore this wrapper is an optimisation.
+
+    :param path: the path or field name to fetch
+    :param resource: the resource instance description
+    :return: the field/path value
+    """
+    if '.' in path:
+        return jmespath_search(path, resource)
+    return resource[path]
+
+
+def jmespath_compile(expression):
+    parsed = C7NJMESPathParser().parse(expression)
+    return parsed

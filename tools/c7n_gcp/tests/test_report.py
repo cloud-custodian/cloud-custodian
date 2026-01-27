@@ -15,9 +15,11 @@ class ReportMetadataTests(BaseTest):
 
         missing = set()
         for k, v in GoogleCloud.resources.items():
-            if (not v.resource_type.id or
-                not v.resource_type.name or
-                    not v.resource_type.default_report_fields):
+            if not v.resource_type.id:
+                missing.add("%s~%s" % (k, v))
+            if not v.resource_type.name:
+                missing.add("%s~%s" % (k, v))
+            if not v.resource_type.default_report_fields:
                 missing.add("%s~%s" % (k, v))
 
         if missing:

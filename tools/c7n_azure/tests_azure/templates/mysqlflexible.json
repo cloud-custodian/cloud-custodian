@@ -1,0 +1,65 @@
+{
+    "$schema": "http://schema.management.azure.com/schemas/2019-04-01/deploymentTemplate.json#",
+    "contentVersion": "1.0.0.0",
+    "parameters": {
+        "serverName": {
+            "defaultValue": "[concat('cctestmyflexibleserver', uniqueString(resourceGroup().id))]",
+            "type": "string"
+        }
+    },
+    "variables": {},
+    "resources": [
+        {
+            "apiVersion": "2021-05-01",
+            "type": "Microsoft.DBforMySQL/flexibleServers",
+            "location": "eastus",
+            "name": "[parameters('serverName')]",
+            "properties": {
+                "version": "5.7",
+                "administratorLogin": "custodian",
+                "administratorLoginPassword": "Cust0dianPassw0rd",
+                "state": "Ready",
+                "fullyQualifiedDomainName": "mysql.database.azure.com",
+                "availabilityZone": "3",
+                "replicationRole": "None",
+                "replicaCapacity": 10,
+                "network": {
+                    "publicNetworkAccess": "Enabled"
+                },
+                "backup": {
+                    "backupRetentionDays": 7,
+                    "geoRedundantBackup": "Disabled"
+                },
+                "highAvailability": {
+                    "mode": "Disabled",
+                    "state": "NotEnabled"
+            },
+            "sku": {
+                "name": "Standard_B1ms",
+                "tier": "Burstable"
+            },
+            "resources": [
+                {
+                    "name": "[concat(parameters('serverName'), '/cctestfdb')]",
+                    "type": "Microsoft.DBforMySQL/flexibleServers/databases",
+                    "apiVersion": "2021-05-01",
+                    "properties": {},
+                    "dependsOn": [
+                        "[concat('Microsoft.DBforMySQL/flexibleservers/', parameters('serverName'))]"
+                    ]
+                },
+                {
+                    "name": "tls_version",
+                    "type": "configurations",
+                    "apiVersion": "2017-12-01",
+                    "properties": {
+                        "value": "TLSv1.2"
+                    },
+                    "dependsOn": [
+                        "[concat('Microsoft.DBforMySQL/flexibleservers/', parameters('serverName'))]"
+                    ]
+                }
+            ]
+        }
+    }]
+}

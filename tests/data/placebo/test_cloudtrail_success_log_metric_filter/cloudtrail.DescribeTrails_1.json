@@ -1,0 +1,23 @@
+{
+    "status_code": 200,
+    "data": {
+        "trailList": [
+            {
+                "Name": "tf-trail-40313",
+                "S3BucketName": "trail-test-bucket20221122165720942100000006",
+                "S3KeyPrefix": "prefix",
+                "IncludeGlobalServiceEvents": true,
+                "IsMultiRegionTrail": true,
+                "HomeRegion": "us-east-1",
+                "TrailARN": "arn:aws:cloudtrail:us-east-1:644160558196:trail/tf-trail-40313",
+                "LogFileValidationEnabled": false,
+                "CloudWatchLogsLogGroupArn": "arn:aws:logs:us-east-1:644160558196:log-group:cloudtrail-test-group20221122165720932700000003:*",
+                "CloudWatchLogsRoleArn": "arn:aws:iam::644160558196:role/testing-cloudtrail_cloudwatch_role20221122165721684900000008",
+                "HasCustomEventSelectors": true,
+                "HasInsightSelectors": false,
+                "IsOrganizationTrail": false
+            }
+        ],
+        "ResponseMetadata": {}
+    }
+}

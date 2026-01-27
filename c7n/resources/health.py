@@ -2,10 +2,9 @@
 # SPDX-License-Identifier: Apache-2.0
 import itertools
 
-from c7n.exceptions import PolicyValidationError
 from c7n.query import QueryResourceManager, TypeInfo
 from c7n.manager import resources
-from c7n.utils import local_session, chunks
+from c7n.utils import local_session, chunks, QueryParser
 
 
 @resources.register('health-event')
@@ -30,7 +29,7 @@ class HealthEvents(QueryResourceManager):
 
     def __init__(self, ctx, data):
         super(HealthEvents, self).__init__(ctx, data)
-        self.queries = QueryFilter.parse(
+        self.queries = HealthQueryParser.parse(
             self.data.get('query', [
                 {'eventStatusCodes': 'open'},
                 {'eventTypeCategories': ['issue', 'accountNotification']}]))
@@ -38,16 +37,9 @@ class HealthEvents(QueryResourceManager):
     def resource_query(self):
         qf = {}
         for q in self.queries:
-            qd = q.query()
-            if qd['Name'] in qf:
-                for qv in qf[qd['Name']]:
-                    if qv in qf[qd['Name']]:
-                        continue
-                    qf[qd['Name']].append(qv)
-            else:
-                qf[qd['Name']] = []
-                for qv in qd['Values']:
-                    qf[qd['Name']].append(qv)
+            key = list(q.keys())[0]
+            values = list(q.values())[0]
+            qf[key] = values
         return qf
 
     def resources(self, query=None):
@@ -84,53 +76,16 @@ class HealthEvents(QueryResourceManager):
         return resources
 
 
-HEALTH_VALID_FILTERS = {
-    'availability-zone': str,
-    'eventTypeCategories': {'issue', 'accountNotification', 'scheduledChange'},
-    'regions': str,
-    'services': str,
-    'eventStatusCodes': {'open', 'closed', 'upcoming'},
-    'eventTypeCodes': str
-}
+class HealthQueryParser(QueryParser):
+    QuerySchema = {
+        'availabilityZones': str,
+        'eventTypeCategories': ('issue', 'accountNotification', 'scheduledChange', 'investigation'),
+        'regions': str,
+        'services': str,
+        'eventStatusCodes': ('open', 'closed', 'upcoming'),
+        'eventTypeCodes': str,
+        'maxResults': int,
+    }
+    single_value_fields = ('maxResults')
 
-
-class QueryFilter:
-
-    @classmethod
-    def parse(cls, data):
-        results = []
-        for d in data:
-            if not isinstance(d, dict):
-                raise PolicyValidationError(
-                    "Health Query Filter Invalid structure %s" % d)
-            results.append(cls(d).validate())
-        return results
-
-    def __init__(self, data):
-        self.data = data
-        self.key = None
-        self.value = None
-
-    def validate(self):
-        if not len(list(self.data.keys())) == 1:
-            raise ValueError(
-                "Health Query Filter Invalid %s" % self.data)
-        self.key = list(self.data.keys())[0]
-        self.value = list(self.data.values())[0]
-
-        if self.key not in HEALTH_VALID_FILTERS:
-            raise PolicyValidationError(
-                "Health Query Filter invalid filter name %s" % (self.data))
-
-        if self.value is None:
-            raise PolicyValidationError(
-                "Health Query Filters must have a value, use tag-key"
-                " w/ tag name as value for tag present checks"
-                " %s" % self.data)
-        return self
-
-    def query(self):
-        value = self.value
-        if isinstance(self.value, str):
-            value = [self.value]
-        return {'Name': self.key, 'Values': value}
+    type_name = 'Health Event'

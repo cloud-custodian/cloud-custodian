@@ -1,0 +1,44 @@
+{
+    "status_code": 200,
+    "data": {
+        "ResponseMetadata": {},
+        "mesh": {
+            "meshName": "m2",
+            "metadata": {
+                "arn": "arn:aws:appmesh:us-east-1:644160558196:mesh/m2",
+                "createdAt": {
+                    "__class__": "datetime",
+                    "year": 2024,
+                    "month": 3,
+                    "day": 12,
+                    "hour": 18,
+                    "minute": 43,
+                    "second": 8,
+                    "microsecond": 267000
+                },
+                "lastUpdatedAt": {
+                    "__class__": "datetime",
+                    "year": 2024,
+                    "month": 3,
+                    "day": 12,
+                    "hour": 18,
+                    "minute": 43,
+                    "second": 8,
+                    "microsecond": 267000
+                },
+                "meshOwner": "644160558196",
+                "resourceOwner": "644160558196",
+                "uid": "07f7f7c9-79d0-40cd-a7b3-ded948d715e0",
+                "version": 1
+            },
+            "spec": {
+                "egressFilter": {
+                    "type": "ALLOW_ALL"
+                }
+            },
+            "status": {
+                "status": "ACTIVE"
+            }
+        }
+    }
+}

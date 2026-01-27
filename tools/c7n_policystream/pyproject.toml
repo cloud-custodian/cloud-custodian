@@ -1,36 +1,44 @@
-[tool.poetry]
+[project]
+authors = [
+    {name = "Cloud Custodian Project"},
+]
+license = "Apache-2.0"
+requires-python = "<4.0.0,>=3.9.2"
+dependencies = [
+    "boto3<2.0.0,>=1.12.0",
+    "c7n",
+    "click<9.0,>=8.0",
+    "pygit2>=1.11",
+    "pyyaml>=5.4.0",
+    "requests<3.0.0,>=2.22.0",
+]
 name = "c7n_policystream"
-version = "0.4.19"
+version = "0.4.48"
 description = "Cloud Custodian - Git Commits as Logical Policy Changes"
 readme = "README.md"
+classifiers = [
+    "License :: OSI Approved :: Apache Software License",
+    "Topic :: System :: Systems Administration",
+    "Topic :: System :: Distributed Computing",
+]
+
+[project.urls]
 homepage = "https://cloudcustodian.io"
 repository = "https://github.com/cloud-custodian/cloud-custodian"
 documentation = "https://cloudcustodian.io/docs/"
-authors = ["Cloud Custodian Project"]
-license = "Apache-2.0"
-classifiers = [
-   "License :: OSI Approved :: Apache Software License",
-   "Topic :: System :: Systems Administration",
-   "Topic :: System :: Distributed Computing"
+
+[project.scripts]
+c7n-policystream = "policystream:cli"
+
+[dependency-groups]
+dev = [
+    "mock<5.0.0,>=4.0.2",
+    "pytest<8.0",
 ]
-packages = [{"include" = "policystream.py"}]
 
-[tool.poetry.scripts]
-c7n-policystream = 'policystream:cli'
-
-[tool.poetry.dependencies]
-python = "^3.7"
-click = "^8.0"
-requests = "^2.22.0"
-pyyaml = ">=5.4.0"
-pygit2 = "~1.9"
-boto3 = "^1.12.0"
-
-[tool.poetry.dev-dependencies]
-pytest = "^7.1.2"
-c7n = {path = "../..", develop = true}
-mock = "^4.0.2"
+[tool.hatch.build.targets.wheel]
+only-include = ["policystream.py"]
 
 [build-system]
-requires = ["poetry>=0.12", "setuptools"]
-build-backend = "poetry.masonry.api"
+requires = ["hatchling"]
+build-backend = "hatchling.build"

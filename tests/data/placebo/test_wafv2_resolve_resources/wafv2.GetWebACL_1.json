@@ -1,0 +1,25 @@
+{
+    "status_code": 200,
+    "data": {
+        "WebACL": {
+            "Name": "match-me",
+            "Id": "ebf41215-9625-436d-938c-c2172c665718",
+            "ARN": "arn:aws:wafv2:us-east-1:123456789012:regional/webacl/match-me/ebf41215-9625-436d-938c-c2172c665718",
+            "DefaultAction": {
+                "Allow": {}
+            },
+            "Description": "",
+            "Rules": [],
+            "VisibilityConfig": {
+                "SampledRequestsEnabled": false,
+                "CloudWatchMetricsEnabled": false,
+                "MetricName": "match-me"
+            },
+            "Capacity": 3,
+            "ManagedByFirewallManager": false,
+            "LabelNamespace": "awswaf:123456789012:webacl:match-me:"
+        },
+        "LockToken": "61d49499-78ec-440b-ac8e-7b02fe637aff",
+        "ResponseMetadata": {}
+    }
+}

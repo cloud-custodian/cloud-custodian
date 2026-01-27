@@ -1,0 +1,193 @@
+name: "CI"
+on:
+  push:
+    branches:
+      - main
+  merge_group:
+  pull_request:
+    branches:
+      - main
+concurrency:
+  group: ${{ github.workflow }}-${{ github.event.pull_request.number || github.sha }}
+  cancel-in-progress: true
+env:
+  UV_VERSION: "0.7.12"
+  DEFAULT_PY_VERSION: "3.12"
+
+jobs:
+  Lint:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@08c6903cd8c0fde910a37f88322edcfb5dd907a8 # ratchet:actions/checkout@v4
+      - uses: actions/setup-python@e797f83bcb11b83ae66e0230d6156d7c80228e7c # ratchet:actions/setup-python@v5
+        with:
+          python-version: ${{ env.DEFAULT_PY_VERSION }}
+      - name: Install uv
+        id: setup-uv-lint
+        uses: astral-sh/setup-uv@85856786d1ce8acfbcc2f13a5f3fbd6b938f9f41 # ratchet:astral-sh/setup-uv@v6
+        with:
+          version: ${{ env.UV_VERSION }}
+          enable-cache: true
+          cache-suffix: "linter"
+      - name: Install Linters
+        run: |
+          uv sync --only-group lint --no-install-workspace
+      - name: Set up Terraform
+        uses: hashicorp/setup-terraform@b9cd54a3c349d3f38e8881555d616ced269862dd # ratchet:hashicorp/setup-terraform@v3
+        with:
+          terraform_wrapper: false
+          # last OSS version
+          terraform_version: "1.5.5"
+      - name: Lint Check
+        env:
+          RUFF_OUTPUT_FORMAT: github
+        run: |
+          make lint
+      - name: Check Workflows
+        run: |
+          bash <(curl https://raw.githubusercontent.com/rhysd/actionlint/main/scripts/download-actionlint.bash)
+          ./actionlint -color
+
+  Analyzer:
+    runs-on: ubuntu-latest
+    needs: Lint
+    steps:
+      - uses: actions/checkout@08c6903cd8c0fde910a37f88322edcfb5dd907a8 # ratchet:actions/checkout@v4
+      - uses: actions/setup-python@e797f83bcb11b83ae66e0230d6156d7c80228e7c # ratchet:actions/setup-python@v5
+        with:
+          python-version: ${{ env.DEFAULT_PY_VERSION }}
+        id: setup-uv-analyzer
+      - uses: astral-sh/setup-uv@85856786d1ce8acfbcc2f13a5f3fbd6b938f9f41 # ratchet:astral-sh/setup-uv@v6
+        with:
+          version: ${{ env.UV_VERSION }}
+          enable-cache: true
+          cache-suffix: "analyzer"
+      - name: Run Bandit
+        run: |
+          make analyzer-bandit
+      - name: Run Semgrep
+        run: |
+          make analyzer-semgrep
+
+  Docs:
+    runs-on: ubuntu-latest
+    needs: Lint
+    permissions:
+      id-token: write
+      contents: read
+    steps:
+      - uses: actions/checkout@08c6903cd8c0fde910a37f88322edcfb5dd907a8 # ratchet:actions/checkout@v4
+
+      - name: Install Custodian
+        uses: ./.github/composites/install
+        with:
+          python-version: ${{ env.DEFAULT_PY_VERSION }}
+          uv-version: ${{ env.UV_VERSION }}
+
+      - name: Set up doc cache
+        uses: actions/cache@5a3ec84eff668545956fd18022155c47e93e2684 # ratchet:actions/cache@v4
+        id: sphinx
+        with:
+          path: |
+            docs/build
+            docs/source/aws/resources
+            docs/source/gcp/resources
+            docs/source/azure/resources
+            docs/source/awscc/resources
+            docs/source/tencentcloud/resources
+          key: sphinx-docs-${{ runner.os }}-3.11-v3-${{ hashFiles('uv.lock') }}
+
+      - name: Build Docs
+        shell: bash
+        run: |
+          make sphinx
+
+      - name: Update Docs Cache
+        # basically to prevent the docs cache from going stale as we're not keying
+        # on its contents, on merges to main we update the cache to prevent
+        # staleness.
+        if: ${{ github.event_name == 'push' }}
+        uses: actions/cache/save@5a3ec84eff668545956fd18022155c47e93e2684 # ratchet:actions/cache/save@v4
+        with:
+          path: |
+            docs/build
+            docs/source/aws/resources
+            docs/source/gcp/resources
+            docs/source/azure/resources
+            docs/source/awscc/resources
+            docs/source/tencentcloud/resources
+          key: sphinx-docs-${{ runner.os }}-3.11-v3-${{ hashFiles('uv.lock') }}
+
+      - name: Deploy Docs
+        if: ${{ github.event_name == 'push' }}
+        uses: ./.github/composites/docs-publish
+        with:
+          aws-role: ${{ secrets.DOCS_PUBLISH_ROLE }}
+          docs-dir: docs/build/html
+          bucket-url: s3://cloudcustodian.io/docs
+
+  Docker:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@08c6903cd8c0fde910a37f88322edcfb5dd907a8 # ratchet:actions/checkout@v4
+      - name: c7n build and test
+        uses: ./.github/composites/docker-build-push
+        with:
+          name: c7n
+          push: false
+          platforms: linux/amd64
+
+  Tests:
+    runs-on: "${{ matrix.os }}"
+    needs: Lint
+    strategy:
+      matrix:
+        os: [ubuntu-latest, macos-latest, windows-latest]
+        python-version: ["3.12"]
+        include:
+          - os: ubuntu-latest
+            python-version: "3.13"
+          - os: ubuntu-latest
+            python-version: "3.11"
+          - os: ubuntu-latest
+            python-version: "3.10"
+    steps:
+      - uses: actions/checkout@08c6903cd8c0fde910a37f88322edcfb5dd907a8 # ratchet:actions/checkout@v4
+
+      - name: Set up Terraform
+        uses: hashicorp/setup-terraform@b9cd54a3c349d3f38e8881555d616ced269862dd # ratchet:hashicorp/setup-terraform@v3
+        with:
+          terraform_wrapper: false
+          # last OSS version
+          terraform_version: "1.5.5"
+
+      - name: Install Custodian
+        uses: ./.github/composites/install
+        with:
+          python-version: ${{ matrix.python-version }}
+          uv-version: ${{ env.UV_VERSION }}
+
+      - name: Test
+        shell: bash
+        env:
+          COV_RUN: ${{ contains(matrix.python-version, '3.11') && contains(matrix.os, 'ubuntu') }}
+        run: |
+          if [[ "$COV_RUN" == "true" ]]
+          then
+            make test-coverage COVERAGE_TYPE=term
+            uv run coverage xml
+          else
+            make test
+          fi
+
+      - name: Upload Code Coverage
+        uses: codecov/codecov-action@5a1091511ad55cbe89839c7260b706298ca349f7 # ratchet:codecov/codecov-action@v5
+        if: contains(matrix.python-version, '3.11') && contains(matrix.os, 'ubuntu')
+        with:
+          files: ./coverage.xml
+          name: codecov
+
+      - name: License Check
+        if: contains(matrix.python-version, '3.11') && contains(matrix.os, 'ubuntu')
+        run: |
+          uv run tools/dev/license-check.py

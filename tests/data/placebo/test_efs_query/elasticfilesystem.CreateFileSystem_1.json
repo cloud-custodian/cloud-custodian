@@ -28,7 +28,8 @@
             "minute": 4
         }, 
         "PerformanceMode": "generalPurpose", 
-        "FileSystemId": "fs-f2603dbb", 
+        "FileSystemId": "fs-f2603dbb",
+        "FileSystemArn": "arn:aws:elasticfilesystem:us-east-1:644160558196:file-system/fs-f2603dbb", 
         "NumberOfMountTargets": 0, 
         "LifeCycleState": "creating", 
         "OwnerId": "644160558196"

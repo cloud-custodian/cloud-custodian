@@ -1,6 +1,7 @@
 # Copyright The Cloud Custodian Authors.
 # SPDX-License-Identifier: Apache-2.0
 import pytest
+from freezegun import freeze_time
 from tc_common import BaseTest
 import time
 
@@ -101,3 +102,25 @@ class TestCbs(BaseTest):
                     new_tag_exist = True
                     break
             assert new_tag_exist
+
+    @pytest.mark.vcr
+    @freeze_time("2022-11-15 06:11:45+00:00")
+    def test_metrics(self):
+        policy = self.load_policy(
+            {
+                "name": "filter-metrics",
+                "resource": "tencentcloud.cbs",
+                "filters": [{
+                    "type": "metrics",
+                    "name": "DiskReadTraffic",
+                    "statistics": "Average",
+                    "days": 3,
+                    "op": "less-than",
+                    "value": 1,
+                    "missing-value": 0,
+                    "period": 3600
+                }]
+            }
+        )
+        resources = policy.run()
+        assert len(resources) == 14

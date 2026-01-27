@@ -9,6 +9,10 @@
         "networkSecurityGroups_c7n_nsg_name": {
             "defaultValue": "c7n-nsg",
             "type": "String"
+        },
+        "networkSecurityGroups_c7n_storageAccountName": {
+            "defaultValue": "b90898c96b6945298b451436",
+            "type": "String"
         }
     },
     "variables": {},
@@ -265,6 +269,46 @@
                 ]
             },
             "dependsOn": []
-        }
+        },
+        {
+            "type": "Microsoft.Storage/storageAccounts",
+            "apiVersion": "2021-09-01",
+            "name": "[parameters('networkSecurityGroups_c7n_storageAccountName')]",
+            "location": "eastus",
+            "sku": {
+              "name": "Standard_LRS"
+            },
+            "kind": "StorageV2",
+            "properties": {}
+          },
+          {
+            "type": "Microsoft.Network/networkWatchers",
+            "apiVersion": "2022-01-01",
+            "name": "[parameters('networkSecurityGroups_c7n_storageAccountName')]",
+            "location": "eastus",
+            "properties": {}
+          },
+          {
+            "type": "Microsoft.Network/networkWatchers/flowLogs",
+            "apiVersion": "2022-01-01",
+            "name": "[format('{0}/{0}', parameters('networkSecurityGroups_c7n_storageAccountName'))]",
+            "location": "eastus",
+            "properties": {
+              "targetResourceId": "[resourceId('Microsoft.Network/networkSecurityGroups', parameters('networkSecurityGroups_c7n_nsg_name'))]",
+              "storageId": "[resourceId('Microsoft.Storage/storageAccounts', parameters('networkSecurityGroups_c7n_storageAccountName'))]",
+              "enabled": true,
+              "retentionPolicy": {
+                "days": 90,
+                "enabled": true
+              },
+              "format": {
+                "type": "JSON",
+                "version": 2
+              }
+            },
+            "dependsOn": [
+              "[resourceId('Microsoft.Storage/storageAccounts', parameters('networkSecurityGroups_c7n_storageAccountName'))]"
+            ]
+          }
     ]
 }

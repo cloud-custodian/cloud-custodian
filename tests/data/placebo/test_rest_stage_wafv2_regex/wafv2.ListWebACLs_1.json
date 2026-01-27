@@ -1,0 +1,23 @@
+{
+    "status_code": 200,
+    "data": {
+        "NextMarker": "testwafuswest2",
+        "WebACLs": [
+            {
+                "Name": "FMManagedWebACLV2-FMS-TEST-1656966584517",
+                "Id": "421a319f-8bfc-497b-bdce-597ab3337bd2",
+                "Description": "",
+                "LockToken": "8429a0e0-1513-4c04-8c69-a5dfa98d245a",
+                "ARN": "arn:aws:wafv2:us-west-2:644160558196:regional/webacl/FMManagedWebACLV2-FMS-TEST-1656966584517/421a319f-8bfc-497b-bdce-597ab3337bd2"
+            },
+            {
+                "Name": "testwafuswest2",
+                "Id": "6e271ae9-0f7a-46e3-9d45-a31e99f485ab",
+                "Description": "",
+                "LockToken": "993539a6-fc3f-4d43-a34d-71eff729199b",
+                "ARN": "arn:aws:wafv2:us-west-2:644160558196:regional/webacl/testwafuswest2/6e271ae9-0f7a-46e3-9d45-a31e99f485ab"
+            }
+        ],
+        "ResponseMetadata": {}
+    }
+}

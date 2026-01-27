@@ -1,0 +1,23 @@
+{
+    "status_code": 200,
+    "data": {
+        "ResponseMetadata": {},
+        "jobQueues": [
+            {
+                "jobQueueName": "test-queue",
+                "jobQueueArn": "arn:aws:batch:us-east-1:644160558196:job-queue/test-queue",
+                "state": "DISABLED",
+                "status": "VALID",
+                "statusReason": "JobQueue Healthy",
+                "priority": 1,
+                "computeEnvironmentOrder": [
+                    {
+                        "order": 1,
+                        "computeEnvironment": "arn:aws:batch:us-east-1:644160558196:compute-environment/test-fargate"
+                    }
+                ],
+                "tags": {}
+            }
+        ]
+    }
+}

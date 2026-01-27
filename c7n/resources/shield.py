@@ -6,20 +6,40 @@ from botocore.paginate import Paginator
 from c7n.actions import BaseAction
 from c7n.filters import Filter
 from c7n.manager import resources
-from c7n.query import QueryResourceManager, RetryPageIterator, TypeInfo
+from c7n.query import (QueryResourceManager, RetryPageIterator, TypeInfo,
+    DescribeSource, ConfigSource)
+from c7n.tags import RemoveTag, Tag, TagDelayedAction, TagActionFilter
 from c7n.utils import local_session, type_schema, get_retry
+
+
+class DescribeShieldProtection(DescribeSource):
+    def augment(self, resources):
+        client = local_session(self.manager.session_factory).client('shield')
+
+        def _augment(r):
+            tags = self.manager.retry(client.list_tags_for_resource,
+                ResourceARN=r['ProtectionArn'])['Tags']
+            r['Tags'] = tags
+            return r
+        resources = super().augment(resources)
+        return list(map(_augment, resources))
 
 
 @resources.register('shield-protection')
 class ShieldProtection(QueryResourceManager):
-
     class resource_type(TypeInfo):
         service = 'shield'
         enum_spec = ('list_protections', 'Protections', None)
         id = 'Id'
         name = 'Name'
-        arn = False
+        arn = 'ProtectionArn'
         config_type = 'AWS::Shield::Protection'
+        global_resource = True
+
+    source_mapping = {
+            'describe': DescribeShieldProtection,
+            'config': ConfigSource
+        }
 
 
 @resources.register('shield-attack')
@@ -35,6 +55,7 @@ class ShieldAttack(QueryResourceManager):
         filter_name = 'ResourceArns'
         filter_type = 'list'
         arn = False
+        global_resource = True
 
 
 def get_protections_paginator(client):
@@ -44,7 +65,7 @@ def get_protections_paginator(client):
         client.meta.service_model.operation_model('ListProtections'))
 
 
-def get_type_protections(client, model):
+def get_type_protections(client, arn_type):
     pager = get_protections_paginator(client)
     pager.PAGE_ITERATOR_CLS = RetryPageIterator
     try:
@@ -52,13 +73,26 @@ def get_type_protections(client, model):
     except client.exceptions.ResourceNotFoundException:
         # shield is not enabled in the account, so all resources are not protected
         return []
-    return [p for p in protections if model.arn_type in p['ResourceArn']]
+    return [p for p in protections if arn_type in p['ResourceArn']]
 
 
 ShieldRetry = get_retry(('ThrottlingException',))
 
 
-class IsShieldProtected(Filter):
+class ProtectedResource:
+    """Base class with helper methods for dealing with
+    ARNs of resources protected by Shield
+    """
+
+    def get_arns(self, resources):
+        return self.manager.get_arns(resources)
+
+    @property
+    def arn_type(self):
+        return self.manager.get_model().arn_type
+
+
+class IsShieldProtected(Filter, ProtectedResource):
 
     permissions = ('shield:ListProtections',)
     schema = type_schema('shield-enabled', state={'type': 'boolean'})
@@ -67,22 +101,23 @@ class IsShieldProtected(Filter):
         client = local_session(self.manager.session_factory).client(
             'shield', region_name='us-east-1')
 
-        protections = get_type_protections(client, self.manager.get_model())
+        protections = get_type_protections(client, self.arn_type)
         protected_resources = {p['ResourceArn'] for p in protections}
 
         state = self.data.get('state', False)
         results = []
 
-        for arn, r in zip(self.manager.get_arns(resources), resources):
+        for arn, r in zip(self.get_arns(resources), resources):
             r['c7n:ShieldProtected'] = shielded = arn in protected_resources
             if shielded and state:
                 results.append(r)
             elif not shielded and not state:
                 results.append(r)
+
         return results
 
 
-class SetShieldProtection(BaseAction):
+class SetShieldProtection(BaseAction, ProtectedResource):
     """Enable shield protection on applicable resource.
 
     setting `sync` parameter will also clear out stale shield protections
@@ -98,14 +133,14 @@ class SetShieldProtection(BaseAction):
         client = local_session(self.manager.session_factory).client(
             'shield', region_name='us-east-1')
         model = self.manager.get_model()
-        protections = get_type_protections(client, self.manager.get_model())
+        protections = get_type_protections(client, self.arn_type)
         protected_resources = {p['ResourceArn']: p for p in protections}
         state = self.data.get('state', True)
 
         if self.data.get('sync', False):
             self.clear_stale(client, protections)
 
-        for arn, r in zip(self.manager.get_arns(resources), resources):
+        for arn, r in zip(self.get_arns(resources), resources):
             if state and arn in protected_resources:
                 continue
             if state is False and arn in protected_resources:
@@ -120,13 +155,23 @@ class SetShieldProtection(BaseAction):
             except ClientError as e:
                 if e.response['Error']['Code'] == 'ResourceAlreadyExistsException':
                     continue
+                if e.response['Error']['Code'] == 'InvalidParameterException':
+                    # CloudFront distributions with pricing plans cannot have Shield Advanced
+                    # enabled. Skip these resources gracefully.
+                    # https://docs.aws.amazon.com/AmazonCloudFront/latest/DeveloperGuide/flat-rate-pricing-plan.html
+                    if 'CloudFront Pricing Plan' in str(e):
+                        self.log.warning(
+                            "Skipping Shield protection for %s: distribution has a "
+                            "CloudFront pricing plan subscription which does not support "
+                            "Shield Advanced", arn)
+                        continue
                 raise
 
     def clear_stale(self, client, protections):
         # Get all resources unfiltered
         resources = self.manager.get_resource_manager(
             self.manager.type).resources()
-        resource_arns = set(self.manager.get_arns(resources))
+        resource_arns = set(self.get_arns(resources))
 
         pmap = {}
         # Only process stale resources in region for non global resources.
@@ -142,3 +187,85 @@ class SetShieldProtection(BaseAction):
         for s in stale:
             ShieldRetry(
                 client.delete_protection, ProtectionId=pmap[s]['Id'])
+
+
+class ProtectedEIP:
+    """Contains helper methods for dealing with Elastic IP within Shield API calls.
+    The Elastic IP resource type as described in IAM is "elastic-ip":
+    https://docs.aws.amazon.com/service-authorization/latest/reference/list_amazonec2.html#amazonec2-elastic-ip
+
+    But Shield requires the resource type to be "eip-allocation":
+    https://docs.aws.amazon.com/waf/latest/DDOSAPIReference/API_CreateProtection.html
+    """
+
+    def get_arns(self, resources):
+        arns = [
+            arn.replace(':elastic-ip', ':eip-allocation')
+            if ':elastic-ip' in arn else arn
+            for arn in
+            self.manager.get_arns(resources)
+        ]
+        return arns
+
+    @property
+    def arn_type(self):
+        return 'eip-allocation'
+
+
+class IsEIPShieldProtected(ProtectedEIP, IsShieldProtected):
+    pass
+
+
+class SetEIPShieldProtection(ProtectedEIP, SetShieldProtection):
+    pass
+
+
+@ShieldProtection.action_registry.register('tag')
+class TagResource(Tag):
+    """Action to tag a Shield resources
+    """
+    permissions = ('shield:TagResource',)
+
+    def process_resource_set(self, client, resource_set, tags):
+        mid = self.manager.resource_type.arn
+        for r in resource_set:
+            try:
+                client.tag_resource(ResourceARN=r[mid], Tags=tags)
+            except client.exceptions.ResourceNotFoundException:
+                continue
+
+
+@ShieldProtection.action_registry.register('remove-tag')
+class RemoveTag(RemoveTag):
+    """Action to remove tags from a Shield resource
+    """
+    permissions = ('shield:UntagResource',)
+
+    def process_resource_set(self, client, resource_set, tag_keys):
+        mid = self.manager.resource_type.arn
+        for r in resource_set:
+            try:
+                client.untag_resource(ResourceARN=r[mid], TagKeys=tag_keys)
+            except client.exceptions.ResourceNotFoundException:
+                continue
+
+
+@ShieldProtection.filter_registry.register('marked-for-op', TagActionFilter)
+@ShieldProtection.action_registry.register('mark-for-op')
+class MarkShieldProtectionForOp(TagDelayedAction):
+    """Mark Shield Protection for deferred action
+
+    :example:
+
+    .. code-block:: yaml
+
+        policies:
+          - name: shield-protection-invalid-tag-mark
+            resource: shield-protection
+            filters:
+              - "tag:InvalidTag": present
+            actions:
+              - type: mark-for-op
+                op: delete
+                days: 1
+    """

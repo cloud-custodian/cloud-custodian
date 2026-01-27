@@ -1,0 +1,71 @@
+{
+    "status_code": 200, 
+    "data": {
+        "Users": [
+            {
+                "UserName": "alphabet_soup_1", 
+                "PasswordLastUsed": {
+                    "hour": 15, 
+                    "__class__": "datetime", 
+                    "month": 1, 
+                    "second": 3, 
+                    "microsecond": 0, 
+                    "year": 2017, 
+                    "day": 5, 
+                    "minute": 4
+                }, 
+                "CreateDate": {
+                    "hour": 19, 
+                    "__class__": "datetime", 
+                    "month": 12, 
+                    "second": 32, 
+                    "microsecond": 0, 
+                    "year": 2016, 
+                    "day": 8, 
+                    "minute": 36
+                }, 
+                "UserId": "AIDAI4HREXSL6KOVVKGGU", 
+                "Path": "/", 
+                "Arn": "arn:aws:iam::185106417252:user/alphabet_soup_1"
+            },
+            {
+                "UserName": "alphabet_soup_2", 
+                "PasswordLastUsed": {
+                    "hour": 15, 
+                    "__class__": "datetime", 
+                    "month": 1, 
+                    "second": 3, 
+                    "microsecond": 0, 
+                    "year": 2017, 
+                    "day": 5, 
+                    "minute": 4
+                }, 
+                "CreateDate": {
+                    "hour": 19, 
+                    "__class__": "datetime", 
+                    "month": 12, 
+                    "second": 32, 
+                    "microsecond": 0, 
+                    "year": 2016, 
+                    "day": 8, 
+                    "minute": 36
+                }, 
+                "UserId": "AIDAI4HREXSL6KOVVKGGI", 
+                "Path": "/", 
+                "Arn": "arn:aws:iam::185106417252:user/alphabet_soup_2"
+            }
+        ], 
+        "ResponseMetadata": {
+            "RetryAttempts": 0, 
+            "HTTPStatusCode": 200, 
+            "RequestId": "132b529d-d69b-11e6-a2e1-0d01db4c604b", 
+            "HTTPHeaders": {
+                "x-amzn-requestid": "132b529d-d69b-11e6-a2e1-0d01db4c604b", 
+                "date": "Mon, 09 Jan 2017 18:40:20 GMT", 
+                "content-length": "939", 
+                "content-type": "text/xml"
+            }
+        }, 
+        "IsTruncated": false
+    }
+}

@@ -1,0 +1,37 @@
+{
+    "status_code": 200,
+    "data": {
+        "ResponseMetadata": {},
+        "item": [
+            {
+                "deploymentId": "62t45r",
+                "stageName": "FB7F548F-B1FD-44A3-AC43-BC09586A6591",
+                "cacheClusterEnabled": false,
+                "cacheClusterStatus": "NOT_AVAILABLE",
+                "methodSettings": {},
+                "tracingEnabled": false,
+                "webAclArn": "arn:aws:waf-regional:us-east-1:123456789012:webacl/7b90d59f-16c7-470d-a7a3-937bd061e5eb",
+                "createdDate": {
+                    "__class__": "datetime",
+                    "year": 2023,
+                    "month": 3,
+                    "day": 21,
+                    "hour": 11,
+                    "minute": 34,
+                    "second": 57,
+                    "microsecond": 0
+                },
+                "lastUpdatedDate": {
+                    "__class__": "datetime",
+                    "year": 2023,
+                    "month": 3,
+                    "day": 21,
+                    "hour": 11,
+                    "minute": 35,
+                    "second": 23,
+                    "microsecond": 0
+                }
+            }
+        ]
+    }
+}

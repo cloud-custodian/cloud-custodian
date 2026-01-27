@@ -3,14 +3,15 @@
 import json
 
 from c7n.actions import RemovePolicyBase, ModifyPolicyBase, BaseAction
-from c7n.filters import CrossAccountAccessFilter, PolicyChecker
+from c7n.filters import CrossAccountAccessFilter, PolicyChecker, ValueFilter, MetricsFilter
 from c7n.filters.kms import KmsRelatedFilter
 import c7n.filters.policystatement as polstmt_filter
 from c7n.manager import resources
 from c7n.query import ConfigSource, DescribeSource, QueryResourceManager, TypeInfo
 from c7n.resolver import ValuesFrom
 from c7n.utils import local_session, type_schema
-from c7n.tags import RemoveTag, Tag, TagDelayedAction, TagActionFilter
+from c7n.tags import RemoveTag, Tag, TagDelayedAction, TagActionFilter, universal_augment
+from c7n.filters.related import RelatedResourceFilter
 
 from c7n.resources.securityhub import PostFinding
 
@@ -18,17 +19,8 @@ from c7n.resources.securityhub import PostFinding
 class DescribeTopic(DescribeSource):
 
     def augment(self, resources):
-        client = local_session(self.manager.session_factory).client('sns')
-
-        def _augment(r):
-            tags = self.manager.retry(client.list_tags_for_resource,
-                ResourceArn=r['TopicArn'])['Tags']
-            r['Tags'] = tags
-            return r
-
         resources = super().augment(resources)
-        with self.manager.executor_factory(max_workers=3) as w:
-            return list(w.map(_augment, resources))
+        return universal_augment(self.manager, resources)
 
 
 @resources.register('sns')
@@ -52,6 +44,8 @@ class SNS(QueryResourceManager):
             'SubscriptionsPending',
             'SubscriptionsDeleted'
         )
+        universal_taggable = True
+        permissions_augment = ("sns:ListTagsForResource",)
 
     permissions = ('sns:ListTagsForResource',)
     source_mapping = {
@@ -306,7 +300,7 @@ class RemovePolicyStatement(RemovePolicyBase):
             return
 
         p = json.loads(resource['Policy'])
-        statements, found = self.process_policy(
+        _, found = self.process_policy(
             p, resource, CrossAccountAccessFilter.annotation_key)
 
         if not found:
@@ -455,6 +449,38 @@ class DeleteTopic(BaseAction):
                 continue
 
 
+@SNS.filter_registry.register('metrics')
+class Metrics(MetricsFilter):
+
+    def get_dimensions(self, resource):
+        return [{'Name': self.model.dimension,
+                 'Value': resource['TopicArn'].rsplit(':', 1)[-1]}]
+
+
+class DescribeSubscription(DescribeSource):
+
+    def get_resources(self, resource_ids):
+        """Get resource details one at a time rather than client filter of all.
+
+        The list_subscriptions call has no way to provide a server side filter,
+        so the default implementation will fetch all subscriptions and then filter
+        client side. This is a problem if there are millions of resources (which
+        we have seen).
+        """
+        client = local_session(self.manager.session_factory).client('sns')
+        resources = []
+        for r_id in resource_ids:
+            try:
+                result = self.manager.retry(
+                    client.get_subscription_attributes, SubscriptionArn=r_id
+                )
+            except client.exceptions.NotFoundException:
+                continue
+            attributes = result.pop('Attributes')
+            resources.append(attributes)
+        return resources
+
+
 @resources.register('sns-subscription')
 class SNSSubscription(QueryResourceManager):
 
@@ -471,6 +497,49 @@ class SNSSubscription(QueryResourceManager):
             'Endpoint',
             'TopicArn'
         )
+        permissions_augment = ("sns:GetSubscriptionAttributes",)
+
+    source_mapping = {
+        'describe': DescribeSubscription,
+        'config': ConfigSource,
+    }
+
+
+@SNSSubscription.filter_registry.register('topic')
+class SNSSubscriptionTopic(RelatedResourceFilter):
+
+    """
+    Filters subscriptons based on topic properties
+
+    :example:
+
+    Identify subscriptions pointing to a topic that no longer
+    exists. Note that this policy also ensures that the topic
+    is in the same account and region. For cross-account
+    subscriptions, Custodian can't see if the topics still
+    exist.
+
+    .. code-block:: yaml
+
+            policies:
+              - name: sns-subscription-topic
+                resource: sns-subscription
+                filters:
+                  - type: value
+                    key: TopicArn
+                    op: glob
+                    value: "arn:aws:sns:{region}:{account_id}:*"
+                  - type: topic
+                    key: TopicArn
+                    value: absent
+    """
+
+    RelatedResource = 'c7n.resources.sns.SNS'
+    RelatedIdsExpression = 'TopicArn'
+    AnnotationKey = 'Topic'
+
+    schema = type_schema(
+        'topic', rinherit=ValueFilter.schema)
 
 
 @SNSSubscription.action_registry.register('delete')

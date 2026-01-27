@@ -36,17 +36,21 @@ class MailerGcpQueueProcessor(MessageTargetMixin):
         # Get first set of messages to process
         messages = self.receive_messages()
 
-        while messages and len(messages['receivedMessages']) > 0:
-            # Discard_date is the timestamp of the last published message in the messages list
-            # and will be the date we need to seek to when we ack_messages
-            discard_date = messages["receivedMessages"][-1]["message"]["publishTime"]
-
-            # Process received messages
+        while messages and len(messages["receivedMessages"]) > 0:
+            # Process each message individually and ACK it immediately after processing
             for message in messages["receivedMessages"]:
-                self.process_message(message, discard_date)
+                try:
+                    self.process_message(message, message["message"]["publishTime"])
+                    # ACK this specific message after successful processing
+                    self.ack_message(message["ackId"])
+                except Exception as e:
+                    self.logger.error(
+                        f"Failed to process message {message.get('ackId', 'unknown')}: {e}"
+                    )
+                    # NACK the message so it can be retried
+                    self.nack_message(message["ackId"])
 
-            # Acknowledge and purge processed messages then get next set of messages
-            self.ack_messages(discard_date)
+            # Get next set of messages
             messages = self.receive_messages()
 
         self.logger.info("No messages left in the gcp topic subscription, now exiting c7n_mailer.")
@@ -65,6 +69,22 @@ class MailerGcpQueueProcessor(MessageTargetMixin):
             {
                 "subscription": self.subscription,
                 "body": {"returnImmediately": True, "max_messages": MAX_MESSAGES},
+            },
+        )
+
+    def ack_message(self, ack_id):
+        """Acknowledge a specific message by its ack_id"""
+        return self.client.execute_command(
+            "acknowledge", {"subscription": self.subscription, "body": {"ackIds": [ack_id]}}
+        )
+
+    def nack_message(self, ack_id):
+        """NACK a specific message by its ack_id (modifyAckDeadline with 0 seconds)"""
+        return self.client.execute_command(
+            "modifyAckDeadline",
+            {
+                "subscription": self.subscription,
+                "body": {"ackIds": [ack_id], "ackDeadlineSeconds": 0},
             },
         )
 

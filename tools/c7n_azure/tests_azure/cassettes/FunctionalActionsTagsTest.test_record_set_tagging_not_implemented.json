@@ -1,0 +1,180 @@
+{
+    "version": 1,
+    "interactions": [
+        {
+            "request": {
+                "method": "GET",
+                "uri": "https://management.azure.com/subscriptions/ea42f556-5106-4743-99b0-c129bfa71a47/providers/Microsoft.Network/dnszones?api-version=2018-05-01",
+                "body": null,
+                "headers": {}
+            },
+            "response": {
+                "status": {
+                    "code": 200,
+                    "message": "OK"
+                },
+                "headers": {
+                    "x-ms-ratelimit-remaining-subscription-resource-requests": [
+                        "499"
+                    ],
+                    "x-ms-ratelimit-remaining-subscription-resource-entities-read": [
+                        "59999"
+                    ],
+                    "date": [
+                        "Mon, 19 May 2025 04:58:22 GMT"
+                    ],
+                    "x-msedge-ref": [
+                        "Ref A: 694B996F24E544C2B762F99BBCABBAB3 Ref B: MNZ221060608009 Ref C: 2025-05-19T04:58:22Z"
+                    ],
+                    "content-length": [
+                        "535"
+                    ],
+                    "x-cache": [
+                        "CONFIG_NOCACHE"
+                    ],
+                    "cache-control": [
+                        "private"
+                    ],
+                    "content-type": [
+                        "application/json; charset=utf-8"
+                    ]
+                },
+                "body": {
+                    "data": {
+                        "value": [
+                            {
+                                "id": "/subscriptions/2f7aec6d-64d8-4e0a-9f9f-449fa76b3c32/resourceGroups/c7ntest/providers/Microsoft.Network/dnszones/test.c7ntest.org",
+                                "name": "test.c7ntest.org",
+                                "type": "Microsoft.Network/dnszones",
+                                "etag": "aaafb3f7-a3f8-444b-b5fe-acfcf166839b",
+                                "location": "global",
+                                "tags": {},
+                                "properties": {
+                                    "maxNumberOfRecordSets": 10000,
+                                    "maxNumberOfRecordsPerRecordSet": null,
+                                    "nameServers": [
+                                        "ns1-04.azure-dns.com.",
+                                        "ns2-04.azure-dns.net.",
+                                        "ns3-04.azure-dns.org.",
+                                        "ns4-04.azure-dns.info."
+                                    ],
+                                    "numberOfRecordSets": 3,
+                                    "zoneType": "Public"
+                                }
+                            }
+                        ]
+                    }
+                }
+            }
+        },
+        {
+            "request": {
+                "method": "GET",
+                "uri": "https://management.azure.com/subscriptions/ea42f556-5106-4743-99b0-c129bfa71a47/resourceGroups/c7ntest/providers/Microsoft.Network/dnsZones/test.c7ntest.org/recordsets?api-version=2018-05-01",
+                "body": null,
+                "headers": {}
+            },
+            "response": {
+                "status": {
+                    "code": 200,
+                    "message": "OK"
+                },
+                "headers": {
+                    "x-ms-ratelimit-remaining-subscription-resource-requests": [
+                        "499"
+                    ],
+                    "x-ms-ratelimit-remaining-subscription-resource-entities-read": [
+                        "59997"
+                    ],
+                    "date": [
+                        "Mon, 19 May 2025 04:58:22 GMT"
+                    ],
+                    "x-ms-operation-identifier": [
+                        "tenantId=e8a8a38e-cc42-4dac-b5d6-d01ca1e23173,objectId=792077c9-1885-45f2-ad89-a2f5b7768832/eastus/cf169b69-82f0-4fa1-975c-b1f6b04fbb30"
+                    ],
+                    "x-msedge-ref": [
+                        "Ref A: B44A92D096DF4378B53B4383CD320DCD Ref B: MNZ221060608009 Ref C: 2025-05-19T04:58:22Z"
+                    ],
+                    "content-length": [
+                        "1444"
+                    ],
+                    "x-cache": [
+                        "CONFIG_NOCACHE"
+                    ],
+                    "cache-control": [
+                        "private"
+                    ],
+                    "content-type": [
+                        "application/json; charset=utf-8"
+                    ]
+                },
+                "body": {
+                    "data": {
+                        "value": [
+                            {
+                                "id": "/subscriptions/2f7aec6d-64d8-4e0a-9f9f-449fa76b3c32/resourceGroups/c7ntest/providers/Microsoft.Network/dnszones/test.c7ntest.org/NS/@",
+                                "name": "@",
+                                "type": "Microsoft.Network/dnszones/NS",
+                                "etag": "30c726c3-07df-4719-86ec-41fdc22c1427",
+                                "properties": {
+                                    "fqdn": "test.c7ntest.org.",
+                                    "TTL": 172800,
+                                    "NSRecords": [
+                                        {
+                                            "nsdname": "ns1-04.azure-dns.com."
+                                        },
+                                        {
+                                            "nsdname": "ns2-04.azure-dns.net."
+                                        },
+                                        {
+                                            "nsdname": "ns3-04.azure-dns.org."
+                                        },
+                                        {
+                                            "nsdname": "ns4-04.azure-dns.info."
+                                        }
+                                    ],
+                                    "targetResource": {},
+                                    "provisioningState": "Succeeded"
+                                }
+                            },
+                            {
+                                "id": "/subscriptions/2f7aec6d-64d8-4e0a-9f9f-449fa76b3c32/resourceGroups/c7ntest/providers/Microsoft.Network/dnszones/test.c7ntest.org/SOA/@",
+                                "name": "@",
+                                "type": "Microsoft.Network/dnszones/SOA",
+                                "etag": "ebc35689-f12d-490e-8474-83aecc0fc3a9",
+                                "properties": {
+                                    "fqdn": "test.c7ntest.org.",
+                                    "TTL": 3600,
+                                    "SOARecord": {
+                                        "email": "azuredns-hostmaster.microsoft.com",
+                                        "expireTime": 2419200,
+                                        "host": "ns1-04.azure-dns.com.",
+                                        "minimumTTL": 300,
+                                        "refreshTime": 3600,
+                                        "retryTime": 300,
+                                        "serialNumber": 1
+                                    },
+                                    "targetResource": {},
+                                    "provisioningState": "Succeeded"
+                                }
+                            },
+                            {
+                                "id": "/subscriptions/2f7aec6d-64d8-4e0a-9f9f-449fa76b3c32/resourceGroups/c7ntest/providers/Microsoft.Network/dnszones/test.c7ntest.org/A/test",
+                                "name": "test",
+                                "type": "Microsoft.Network/dnszones/A",
+                                "etag": "a9c58b6b-29ff-491e-9ec3-8f77fc402d07",
+                                "properties": {
+                                    "fqdn": "test.test.c7ntest.org.",
+                                    "TTL": 3600,
+                                    "ARecords": [],
+                                    "targetResource": {},
+                                    "provisioningState": "Succeeded"
+                                }
+                            }
+                        ]
+                    }
+                }
+            }
+        }
+    ]
+}

@@ -1,0 +1,2090 @@
+{
+  "headers": {
+    "etag": "0FHNUpLGujt43ULJ67aDvKrHxZI=/nuzQaPyyg-ypSYYs_ahYxHG4wo8=",
+    "content-type": "application/json; charset=UTF-8",
+    "vary": "Origin, X-Origin, Referer",
+    "date": "Tue, 31 May 2022 13:23:26 GMT",
+    "server": "ESF",
+    "cache-control": "private",
+    "x-xss-protection": "0",
+    "x-frame-options": "SAMEORIGIN",
+    "x-content-type-options": "nosniff",
+    "alt-svc": "h3=\":443\"; ma=2592000,h3-29=\":443\"; ma=2592000,h3-Q050=\":443\"; ma=2592000,h3-Q046=\":443\"; ma=2592000,h3-Q043=\":443\"; ma=2592000,quic=\":443\"; ma=2592000; v=\"46,43\"",
+    "transfer-encoding": "chunked",
+    "status": "200",
+    "content-length": "70601",
+    "-content-encoding": "gzip",
+    "content-location": "https://compute.googleapis.com/compute/v1/projects/cloud-custodian/zones?alt=json"
+  },
+  "body": {
+    "kind": "compute#zoneList",
+    "id": "projects/cloud-custodian/zones",
+    "items": [
+      {
+        "kind": "compute#zone",
+        "id": "2231",
+        "creationTimestamp": "1969-12-31T16:00:00.000-08:00",
+        "name": "us-east1-b",
+        "description": "us-east1-b",
+        "status": "UP",
+        "region": "https://www.googleapis.com/compute/v1/projects/cloud-custodian/regions/us-east1",
+        "selfLink": "https://www.googleapis.com/compute/v1/projects/cloud-custodian/zones/us-east1-b",
+        "availableCpuPlatforms": [
+          "Intel Cascade Lake",
+          "Intel Skylake",
+          "Intel Broadwell",
+          "Intel Haswell",
+          "Intel Ivy Bridge",
+          "Intel Sandy Bridge",
+          "AMD Milan",
+          "AMD Rome"
+        ],
+        "supportsPzs": false
+      },
+      {
+        "kind": "compute#zone",
+        "id": "2233",
+        "creationTimestamp": "1969-12-31T16:00:00.000-08:00",
+        "name": "us-east1-c",
+        "description": "us-east1-c",
+        "status": "UP",
+        "region": "https://www.googleapis.com/compute/v1/projects/cloud-custodian/regions/us-east1",
+        "selfLink": "https://www.googleapis.com/compute/v1/projects/cloud-custodian/zones/us-east1-c",
+        "availableCpuPlatforms": [
+          "Intel Cascade Lake",
+          "Intel Skylake",
+          "Intel Broadwell",
+          "Intel Haswell",
+          "Intel Ivy Bridge",
+          "Intel Sandy Bridge",
+          "AMD Milan",
+          "AMD Rome"
+        ],
+        "supportsPzs": false
+      },
+      {
+        "kind": "compute#zone",
+        "id": "2234",
+        "creationTimestamp": "1969-12-31T16:00:00.000-08:00",
+        "name": "us-east1-d",
+        "description": "us-east1-d",
+        "status": "UP",
+        "region": "https://www.googleapis.com/compute/v1/projects/cloud-custodian/regions/us-east1",
+        "selfLink": "https://www.googleapis.com/compute/v1/projects/cloud-custodian/zones/us-east1-d",
+        "availableCpuPlatforms": [
+          "Intel Cascade Lake",
+          "Intel Skylake",
+          "Intel Broadwell",
+          "Intel Haswell",
+          "Intel Ivy Bridge",
+          "Intel Sandy Bridge",
+          "AMD Milan",
+          "AMD Rome"
+        ],
+        "supportsPzs": false
+      },
+      {
+        "kind": "compute#zone",
+        "id": "2272",
+        "creationTimestamp": "1969-12-31T16:00:00.000-08:00",
+        "name": "us-east4-c",
+        "description": "us-east4-c",
+        "status": "UP",
+        "region": "https://www.googleapis.com/compute/v1/projects/cloud-custodian/regions/us-east4",
+        "selfLink": "https://www.googleapis.com/compute/v1/projects/cloud-custodian/zones/us-east4-c",
+        "availableCpuPlatforms": [
+          "Intel Ice Lake",
+          "Intel Cascade Lake",
+          "Intel Skylake",
+          "Intel Broadwell",
+          "Intel Haswell",
+          "Intel Ivy Bridge",
+          "Intel Sandy Bridge",
+          "AMD Milan",
+          "AMD Rome"
+        ],
+        "supportsPzs": true
+      },
+      {
+        "kind": "compute#zone",
+        "id": "2271",
+        "creationTimestamp": "1969-12-31T16:00:00.000-08:00",
+        "name": "us-east4-b",
+        "description": "us-east4-b",
+        "status": "UP",
+        "region": "https://www.googleapis.com/compute/v1/projects/cloud-custodian/regions/us-east4",
+        "selfLink": "https://www.googleapis.com/compute/v1/projects/cloud-custodian/zones/us-east4-b",
+        "availableCpuPlatforms": [
+          "Intel Ice Lake",
+          "Intel Cascade Lake",
+          "Intel Skylake",
+          "Intel Broadwell",
+          "Intel Haswell",
+          "Intel Ivy Bridge",
+          "Intel Sandy Bridge",
+          "AMD Milan",
+          "AMD Rome"
+        ],
+        "supportsPzs": true
+      },
+      {
+        "kind": "compute#zone",
+        "id": "2270",
+        "creationTimestamp": "1969-12-31T16:00:00.000-08:00",
+        "name": "us-east4-a",
+        "description": "us-east4-a",
+        "status": "UP",
+        "region": "https://www.googleapis.com/compute/v1/projects/cloud-custodian/regions/us-east4",
+        "selfLink": "https://www.googleapis.com/compute/v1/projects/cloud-custodian/zones/us-east4-a",
+        "availableCpuPlatforms": [
+          "Intel Ice Lake",
+          "Intel Cascade Lake",
+          "Intel Skylake",
+          "Intel Broadwell",
+          "Intel Haswell",
+          "Intel Ivy Bridge",
+          "Intel Sandy Bridge",
+          "AMD Milan",
+          "AMD Rome"
+        ],
+        "supportsPzs": true
+      },
+      {
+        "kind": "compute#zone",
+        "id": "2002",
+        "creationTimestamp": "1969-12-31T16:00:00.000-08:00",
+        "name": "us-central1-c",
+        "description": "us-central1-c",
+        "status": "UP",
+        "region": "https://www.googleapis.com/compute/v1/projects/cloud-custodian/regions/us-central1",
+        "selfLink": "https://www.googleapis.com/compute/v1/projects/cloud-custodian/zones/us-central1-c",
+        "availableCpuPlatforms": [
+          "Intel Ice Lake",
+          "Intel Cascade Lake",
+          "Intel Skylake",
+          "Intel Broadwell",
+          "Intel Haswell",
+          "Intel Ivy Bridge",
+          "Intel Sandy Bridge",
+          "AMD Milan",
+          "AMD Rome"
+        ],
+        "supportsPzs": false
+      },
+      {
+        "kind": "compute#zone",
+        "id": "2000",
+        "creationTimestamp": "1969-12-31T16:00:00.000-08:00",
+        "name": "us-central1-a",
+        "description": "us-central1-a",
+        "status": "UP",
+        "region": "https://www.googleapis.com/compute/v1/projects/cloud-custodian/regions/us-central1",
+        "selfLink": "https://www.googleapis.com/compute/v1/projects/cloud-custodian/zones/us-central1-a",
+        "availableCpuPlatforms": [
+          "Intel Ice Lake",
+          "Intel Cascade Lake",
+          "Intel Skylake",
+          "Intel Broadwell",
+          "Intel Haswell",
+          "Intel Ivy Bridge",
+          "Intel Sandy Bridge",
+          "AMD Milan",
+          "AMD Rome"
+        ],
+        "supportsPzs": false
+      },
+      {
+        "kind": "compute#zone",
+        "id": "2004",
+        "creationTimestamp": "1969-12-31T16:00:00.000-08:00",
+        "name": "us-central1-f",
+        "description": "us-central1-f",
+        "status": "UP",
+        "region": "https://www.googleapis.com/compute/v1/projects/cloud-custodian/regions/us-central1",
+        "selfLink": "https://www.googleapis.com/compute/v1/projects/cloud-custodian/zones/us-central1-f",
+        "availableCpuPlatforms": [
+          "Intel Ice Lake",
+          "Intel Cascade Lake",
+          "Intel Skylake",
+          "Intel Broadwell",
+          "Intel Haswell",
+          "Intel Ivy Bridge",
+          "Intel Sandy Bridge",
+          "AMD Milan",
+          "AMD Rome"
+        ],
+        "supportsPzs": false
+      },
+      {
+        "kind": "compute#zone",
+        "id": "2001",
+        "creationTimestamp": "1969-12-31T16:00:00.000-08:00",
+        "name": "us-central1-b",
+        "description": "us-central1-b",
+        "status": "UP",
+        "region": "https://www.googleapis.com/compute/v1/projects/cloud-custodian/regions/us-central1",
+        "selfLink": "https://www.googleapis.com/compute/v1/projects/cloud-custodian/zones/us-central1-b",
+        "availableCpuPlatforms": [
+          "Intel Ice Lake",
+          "Intel Cascade Lake",
+          "Intel Skylake",
+          "Intel Broadwell",
+          "Intel Haswell",
+          "Intel Ivy Bridge",
+          "Intel Sandy Bridge",
+          "AMD Milan",
+          "AMD Rome"
+        ],
+        "supportsPzs": false
+      },
+      {
+        "kind": "compute#zone",
+        "id": "2211",
+        "creationTimestamp": "1969-12-31T16:00:00.000-08:00",
+        "name": "us-west1-b",
+        "description": "us-west1-b",
+        "status": "UP",
+        "region": "https://www.googleapis.com/compute/v1/projects/cloud-custodian/regions/us-west1",
+        "selfLink": "https://www.googleapis.com/compute/v1/projects/cloud-custodian/zones/us-west1-b",
+        "availableCpuPlatforms": [
+          "Intel Cascade Lake",
+          "Intel Skylake",
+          "Intel Broadwell",
+          "Intel Haswell",
+          "Intel Ivy Bridge",
+          "Intel Sandy Bridge",
+          "AMD Milan",
+          "AMD Rome"
+        ],
+        "supportsPzs": false
+      },
+      {
+        "kind": "compute#zone",
+        "id": "2212",
+        "creationTimestamp": "1969-12-31T16:00:00.000-08:00",
+        "name": "us-west1-c",
+        "description": "us-west1-c",
+        "status": "UP",
+        "region": "https://www.googleapis.com/compute/v1/projects/cloud-custodian/regions/us-west1",
+        "selfLink": "https://www.googleapis.com/compute/v1/projects/cloud-custodian/zones/us-west1-c",
+        "availableCpuPlatforms": [
+          "Intel Cascade Lake",
+          "Intel Skylake",
+          "Intel Broadwell",
+          "Intel Haswell",
+          "Intel Ivy Bridge",
+          "Intel Sandy Bridge",
+          "AMD Milan",
+          "AMD Rome"
+        ],
+        "supportsPzs": false
+      },
+      {
+        "kind": "compute#zone",
+        "id": "2210",
+        "creationTimestamp": "1969-12-31T16:00:00.000-08:00",
+        "name": "us-west1-a",
+        "description": "us-west1-a",
+        "status": "UP",
+        "region": "https://www.googleapis.com/compute/v1/projects/cloud-custodian/regions/us-west1",
+        "selfLink": "https://www.googleapis.com/compute/v1/projects/cloud-custodian/zones/us-west1-a",
+        "availableCpuPlatforms": [
+          "Intel Cascade Lake",
+          "Intel Skylake",
+          "Intel Broadwell",
+          "Intel Haswell",
+          "Intel Ivy Bridge",
+          "Intel Sandy Bridge",
+          "AMD Milan",
+          "AMD Rome"
+        ],
+        "supportsPzs": false
+      },
+      {
+        "kind": "compute#zone",
+        "id": "2342",
+        "creationTimestamp": "1969-12-31T16:00:00.000-08:00",
+        "name": "europe-west4-a",
+        "description": "europe-west4-a",
+        "status": "UP",
+        "region": "https://www.googleapis.com/compute/v1/projects/cloud-custodian/regions/europe-west4",
+        "selfLink": "https://www.googleapis.com/compute/v1/projects/cloud-custodian/zones/europe-west4-a",
+        "availableCpuPlatforms": [
+          "Intel Ice Lake",
+          "Intel Cascade Lake",
+          "Intel Skylake",
+          "Intel Broadwell",
+          "Intel Haswell",
+          "Intel Ivy Bridge",
+          "Intel Sandy Bridge",
+          "AMD Milan",
+          "AMD Rome"
+        ],
+        "supportsPzs": false
+      },
+      {
+        "kind": "compute#zone",
+        "id": "2341",
+        "creationTimestamp": "1969-12-31T16:00:00.000-08:00",
+        "name": "europe-west4-b",
+        "description": "europe-west4-b",
+        "status": "UP",
+        "region": "https://www.googleapis.com/compute/v1/projects/cloud-custodian/regions/europe-west4",
+        "selfLink": "https://www.googleapis.com/compute/v1/projects/cloud-custodian/zones/europe-west4-b",
+        "availableCpuPlatforms": [
+          "Intel Ice Lake",
+          "Intel Cascade Lake",
+          "Intel Skylake",
+          "Intel Broadwell",
+          "Intel Haswell",
+          "Intel Ivy Bridge",
+          "Intel Sandy Bridge",
+          "AMD Milan",
+          "AMD Rome"
+        ],
+        "supportsPzs": false
+      },
+      {
+        "kind": "compute#zone",
+        "id": "2340",
+        "creationTimestamp": "1969-12-31T16:00:00.000-08:00",
+        "name": "europe-west4-c",
+        "description": "europe-west4-c",
+        "status": "UP",
+        "region": "https://www.googleapis.com/compute/v1/projects/cloud-custodian/regions/europe-west4",
+        "selfLink": "https://www.googleapis.com/compute/v1/projects/cloud-custodian/zones/europe-west4-c",
+        "availableCpuPlatforms": [
+          "Intel Ice Lake",
+          "Intel Cascade Lake",
+          "Intel Skylake",
+          "Intel Broadwell",
+          "Intel Haswell",
+          "Intel Ivy Bridge",
+          "Intel Sandy Bridge",
+          "AMD Milan",
+          "AMD Rome"
+        ],
+        "supportsPzs": false
+      },
+      {
+        "kind": "compute#zone",
+        "id": "2101",
+        "creationTimestamp": "1969-12-31T16:00:00.000-08:00",
+        "name": "europe-west1-b",
+        "description": "europe-west1-b",
+        "status": "UP",
+        "region": "https://www.googleapis.com/compute/v1/projects/cloud-custodian/regions/europe-west1",
+        "selfLink": "https://www.googleapis.com/compute/v1/projects/cloud-custodian/zones/europe-west1-b",
+        "availableCpuPlatforms": [
+          "Intel Ice Lake",
+          "Intel Cascade Lake",
+          "Intel Skylake",
+          "Intel Broadwell",
+          "Intel Haswell",
+          "Intel Ivy Bridge",
+          "Intel Sandy Bridge",
+          "AMD Milan",
+          "AMD Rome"
+        ],
+        "supportsPzs": false
+      },
+      {
+        "kind": "compute#zone",
+        "id": "2104",
+        "creationTimestamp": "1969-12-31T16:00:00.000-08:00",
+        "name": "europe-west1-d",
+        "description": "europe-west1-d",
+        "status": "UP",
+        "region": "https://www.googleapis.com/compute/v1/projects/cloud-custodian/regions/europe-west1",
+        "selfLink": "https://www.googleapis.com/compute/v1/projects/cloud-custodian/zones/europe-west1-d",
+        "availableCpuPlatforms": [
+          "Intel Ice Lake",
+          "Intel Cascade Lake",
+          "Intel Skylake",
+          "Intel Broadwell",
+          "Intel Haswell",
+          "Intel Ivy Bridge",
+          "Intel Sandy Bridge",
+          "AMD Milan",
+          "AMD Rome"
+        ],
+        "supportsPzs": false
+      },
+      {
+        "kind": "compute#zone",
+        "id": "2103",
+        "creationTimestamp": "1969-12-31T16:00:00.000-08:00",
+        "name": "europe-west1-c",
+        "description": "europe-west1-c",
+        "status": "UP",
+        "region": "https://www.googleapis.com/compute/v1/projects/cloud-custodian/regions/europe-west1",
+        "selfLink": "https://www.googleapis.com/compute/v1/projects/cloud-custodian/zones/europe-west1-c",
+        "availableCpuPlatforms": [
+          "Intel Ice Lake",
+          "Intel Cascade Lake",
+          "Intel Skylake",
+          "Intel Broadwell",
+          "Intel Haswell",
+          "Intel Ivy Bridge",
+          "Intel Sandy Bridge",
+          "AMD Milan",
+          "AMD Rome"
+        ],
+        "supportsPzs": false
+      },
+      {
+        "kind": "compute#zone",
+        "id": "2300",
+        "creationTimestamp": "1969-12-31T16:00:00.000-08:00",
+        "name": "europe-west3-c",
+        "description": "europe-west3-c",
+        "status": "UP",
+        "region": "https://www.googleapis.com/compute/v1/projects/cloud-custodian/regions/europe-west3",
+        "selfLink": "https://www.googleapis.com/compute/v1/projects/cloud-custodian/zones/europe-west3-c",
+        "availableCpuPlatforms": [
+          "Intel Ice Lake",
+          "Intel Cascade Lake",
+          "Intel Skylake",
+          "Intel Broadwell",
+          "Intel Haswell",
+          "Intel Ivy Bridge",
+          "Intel Sandy Bridge",
+          "AMD Milan",
+          "AMD Rome"
+        ],
+        "supportsPzs": false
+      },
+      {
+        "kind": "compute#zone",
+        "id": "2301",
+        "creationTimestamp": "1969-12-31T16:00:00.000-08:00",
+        "name": "europe-west3-a",
+        "description": "europe-west3-a",
+        "status": "UP",
+        "region": "https://www.googleapis.com/compute/v1/projects/cloud-custodian/regions/europe-west3",
+        "selfLink": "https://www.googleapis.com/compute/v1/projects/cloud-custodian/zones/europe-west3-a",
+        "availableCpuPlatforms": [
+          "Intel Ice Lake",
+          "Intel Cascade Lake",
+          "Intel Skylake",
+          "Intel Broadwell",
+          "Intel Haswell",
+          "Intel Ivy Bridge",
+          "Intel Sandy Bridge",
+          "AMD Milan",
+          "AMD Rome"
+        ],
+        "supportsPzs": true
+      },
+      {
+        "kind": "compute#zone",
+        "id": "2302",
+        "creationTimestamp": "1969-12-31T16:00:00.000-08:00",
+        "name": "europe-west3-b",
+        "description": "europe-west3-b",
+        "status": "UP",
+        "region": "https://www.googleapis.com/compute/v1/projects/cloud-custodian/regions/europe-west3",
+        "selfLink": "https://www.googleapis.com/compute/v1/projects/cloud-custodian/zones/europe-west3-b",
+        "availableCpuPlatforms": [
+          "Intel Ice Lake",
+          "Intel Cascade Lake",
+          "Intel Skylake",
+          "Intel Broadwell",
+          "Intel Haswell",
+          "Intel Ivy Bridge",
+          "Intel Sandy Bridge",
+          "AMD Milan",
+          "AMD Rome"
+        ],
+        "supportsPzs": true
+      },
+      {
+        "kind": "compute#zone",
+        "id": "2292",
+        "creationTimestamp": "1969-12-31T16:00:00.000-08:00",
+        "name": "europe-west2-c",
+        "description": "europe-west2-c",
+        "status": "UP",
+        "region": "https://www.googleapis.com/compute/v1/projects/cloud-custodian/regions/europe-west2",
+        "selfLink": "https://www.googleapis.com/compute/v1/projects/cloud-custodian/zones/europe-west2-c",
+        "availableCpuPlatforms": [
+          "Intel Ice Lake",
+          "Intel Cascade Lake",
+          "Intel Skylake",
+          "Intel Broadwell",
+          "Intel Haswell",
+          "Intel Ivy Bridge",
+          "Intel Sandy Bridge",
+          "AMD Milan",
+          "AMD Rome"
+        ],
+        "supportsPzs": true
+      },
+      {
+        "kind": "compute#zone",
+        "id": "2291",
+        "creationTimestamp": "1969-12-31T16:00:00.000-08:00",
+        "name": "europe-west2-b",
+        "description": "europe-west2-b",
+        "status": "UP",
+        "region": "https://www.googleapis.com/compute/v1/projects/cloud-custodian/regions/europe-west2",
+        "selfLink": "https://www.googleapis.com/compute/v1/projects/cloud-custodian/zones/europe-west2-b",
+        "availableCpuPlatforms": [
+          "Intel Ice Lake",
+          "Intel Cascade Lake",
+          "Intel Skylake",
+          "Intel Broadwell",
+          "Intel Haswell",
+          "Intel Ivy Bridge",
+          "Intel Sandy Bridge",
+          "AMD Milan",
+          "AMD Rome"
+        ],
+        "supportsPzs": true
+      },
+      {
+        "kind": "compute#zone",
+        "id": "2290",
+        "creationTimestamp": "1969-12-31T16:00:00.000-08:00",
+        "name": "europe-west2-a",
+        "description": "europe-west2-a",
+        "status": "UP",
+        "region": "https://www.googleapis.com/compute/v1/projects/cloud-custodian/regions/europe-west2",
+        "selfLink": "https://www.googleapis.com/compute/v1/projects/cloud-custodian/zones/europe-west2-a",
+        "availableCpuPlatforms": [
+          "Intel Ice Lake",
+          "Intel Cascade Lake",
+          "Intel Skylake",
+          "Intel Broadwell",
+          "Intel Haswell",
+          "Intel Ivy Bridge",
+          "Intel Sandy Bridge",
+          "AMD Milan",
+          "AMD Rome"
+        ],
+        "supportsPzs": true
+      },
+      {
+        "kind": "compute#zone",
+        "id": "2221",
+        "creationTimestamp": "1969-12-31T16:00:00.000-08:00",
+        "name": "asia-east1-b",
+        "description": "asia-east1-b",
+        "status": "UP",
+        "region": "https://www.googleapis.com/compute/v1/projects/cloud-custodian/regions/asia-east1",
+        "selfLink": "https://www.googleapis.com/compute/v1/projects/cloud-custodian/zones/asia-east1-b",
+        "availableCpuPlatforms": [
+          "Intel Cascade Lake",
+          "Intel Skylake",
+          "Intel Broadwell",
+          "Intel Haswell",
+          "Intel Ivy Bridge",
+          "Intel Sandy Bridge",
+          "AMD Milan",
+          "AMD Rome"
+        ],
+        "supportsPzs": false
+      },
+      {
+        "kind": "compute#zone",
+        "id": "2220",
+        "creationTimestamp": "1969-12-31T16:00:00.000-08:00",
+        "name": "asia-east1-a",
+        "description": "asia-east1-a",
+        "status": "UP",
+        "region": "https://www.googleapis.com/compute/v1/projects/cloud-custodian/regions/asia-east1",
+        "selfLink": "https://www.googleapis.com/compute/v1/projects/cloud-custodian/zones/asia-east1-a",
+        "availableCpuPlatforms": [
+          "Intel Cascade Lake",
+          "Intel Skylake",
+          "Intel Broadwell",
+          "Intel Haswell",
+          "Intel Ivy Bridge",
+          "Intel Sandy Bridge",
+          "AMD Milan",
+          "AMD Rome"
+        ],
+        "supportsPzs": false
+      },
+      {
+        "kind": "compute#zone",
+        "id": "2222",
+        "creationTimestamp": "1969-12-31T16:00:00.000-08:00",
+        "name": "asia-east1-c",
+        "description": "asia-east1-c",
+        "status": "UP",
+        "region": "https://www.googleapis.com/compute/v1/projects/cloud-custodian/regions/asia-east1",
+        "selfLink": "https://www.googleapis.com/compute/v1/projects/cloud-custodian/zones/asia-east1-c",
+        "availableCpuPlatforms": [
+          "Intel Cascade Lake",
+          "Intel Skylake",
+          "Intel Broadwell",
+          "Intel Haswell",
+          "Intel Ivy Bridge",
+          "Intel Sandy Bridge",
+          "AMD Milan",
+          "AMD Rome"
+        ],
+        "supportsPzs": false
+      },
+      {
+        "kind": "compute#zone",
+        "id": "2261",
+        "creationTimestamp": "1969-12-31T16:00:00.000-08:00",
+        "name": "asia-southeast1-b",
+        "description": "asia-southeast1-b",
+        "status": "UP",
+        "region": "https://www.googleapis.com/compute/v1/projects/cloud-custodian/regions/asia-southeast1",
+        "selfLink": "https://www.googleapis.com/compute/v1/projects/cloud-custodian/zones/asia-southeast1-b",
+        "availableCpuPlatforms": [
+          "Intel Ice Lake",
+          "Intel Cascade Lake",
+          "Intel Skylake",
+          "Intel Broadwell",
+          "Intel Haswell",
+          "Intel Ivy Bridge",
+          "Intel Sandy Bridge",
+          "AMD Milan",
+          "AMD Rome"
+        ],
+        "supportsPzs": false
+      },
+      {
+        "kind": "compute#zone",
+        "id": "2260",
+        "creationTimestamp": "1969-12-31T16:00:00.000-08:00",
+        "name": "asia-southeast1-a",
+        "description": "asia-southeast1-a",
+        "status": "UP",
+        "region": "https://www.googleapis.com/compute/v1/projects/cloud-custodian/regions/asia-southeast1",
+        "selfLink": "https://www.googleapis.com/compute/v1/projects/cloud-custodian/zones/asia-southeast1-a",
+        "availableCpuPlatforms": [
+          "Intel Ice Lake",
+          "Intel Cascade Lake",
+          "Intel Skylake",
+          "Intel Broadwell",
+          "Intel Haswell",
+          "Intel Ivy Bridge",
+          "Intel Sandy Bridge",
+          "AMD Milan",
+          "AMD Rome"
+        ],
+        "supportsPzs": false
+      },
+      {
+        "kind": "compute#zone",
+        "id": "2262",
+        "creationTimestamp": "1969-12-31T16:00:00.000-08:00",
+        "name": "asia-southeast1-c",
+        "description": "asia-southeast1-c",
+        "status": "UP",
+        "region": "https://www.googleapis.com/compute/v1/projects/cloud-custodian/regions/asia-southeast1",
+        "selfLink": "https://www.googleapis.com/compute/v1/projects/cloud-custodian/zones/asia-southeast1-c",
+        "availableCpuPlatforms": [
+          "Intel Ice Lake",
+          "Intel Cascade Lake",
+          "Intel Skylake",
+          "Intel Broadwell",
+          "Intel Haswell",
+          "Intel Ivy Bridge",
+          "Intel Sandy Bridge",
+          "AMD Milan",
+          "AMD Rome"
+        ],
+        "supportsPzs": false
+      },
+      {
+        "kind": "compute#zone",
+        "id": "2251",
+        "creationTimestamp": "1969-12-31T16:00:00.000-08:00",
+        "name": "asia-northeast1-b",
+        "description": "asia-northeast1-b",
+        "status": "UP",
+        "region": "https://www.googleapis.com/compute/v1/projects/cloud-custodian/regions/asia-northeast1",
+        "selfLink": "https://www.googleapis.com/compute/v1/projects/cloud-custodian/zones/asia-northeast1-b",
+        "availableCpuPlatforms": [
+          "Intel Cascade Lake",
+          "Intel Skylake",
+          "Intel Broadwell",
+          "Intel Haswell",
+          "Intel Ivy Bridge",
+          "Intel Sandy Bridge",
+          "AMD Milan",
+          "AMD Rome"
+        ],
+        "supportsPzs": false
+      },
+      {
+        "kind": "compute#zone",
+        "id": "2252",
+        "creationTimestamp": "1969-12-31T16:00:00.000-08:00",
+        "name": "asia-northeast1-c",
+        "description": "asia-northeast1-c",
+        "status": "UP",
+        "region": "https://www.googleapis.com/compute/v1/projects/cloud-custodian/regions/asia-northeast1",
+        "selfLink": "https://www.googleapis.com/compute/v1/projects/cloud-custodian/zones/asia-northeast1-c",
+        "availableCpuPlatforms": [
+          "Intel Ice Lake",
+          "Intel Cascade Lake",
+          "Intel Skylake",
+          "Intel Broadwell",
+          "Intel Haswell",
+          "Intel Ivy Bridge",
+          "Intel Sandy Bridge",
+          "AMD Milan",
+          "AMD Rome"
+        ],
+        "supportsPzs": false
+      },
+      {
+        "kind": "compute#zone",
+        "id": "2250",
+        "creationTimestamp": "1969-12-31T16:00:00.000-08:00",
+        "name": "asia-northeast1-a",
+        "description": "asia-northeast1-a",
+        "status": "UP",
+        "region": "https://www.googleapis.com/compute/v1/projects/cloud-custodian/regions/asia-northeast1",
+        "selfLink": "https://www.googleapis.com/compute/v1/projects/cloud-custodian/zones/asia-northeast1-a",
+        "availableCpuPlatforms": [
+          "Intel Ice Lake",
+          "Intel Cascade Lake",
+          "Intel Skylake",
+          "Intel Broadwell",
+          "Intel Haswell",
+          "Intel Ivy Bridge",
+          "Intel Sandy Bridge",
+          "AMD Rome"
+        ],
+        "supportsPzs": false
+      },
+      {
+        "kind": "compute#zone",
+        "id": "2322",
+        "creationTimestamp": "1969-12-31T16:00:00.000-08:00",
+        "name": "asia-south1-c",
+        "description": "asia-south1-c",
+        "status": "UP",
+        "region": "https://www.googleapis.com/compute/v1/projects/cloud-custodian/regions/asia-south1",
+        "selfLink": "https://www.googleapis.com/compute/v1/projects/cloud-custodian/zones/asia-south1-c",
+        "availableCpuPlatforms": [
+          "Intel Cascade Lake",
+          "Intel Skylake",
+          "Intel Broadwell",
+          "Intel Haswell",
+          "Intel Ivy Bridge",
+          "Intel Sandy Bridge",
+          "AMD Milan",
+          "AMD Rome"
+        ],
+        "supportsPzs": false
+      },
+      {
+        "kind": "compute#zone",
+        "id": "2320",
+        "creationTimestamp": "1969-12-31T16:00:00.000-08:00",
+        "name": "asia-south1-b",
+        "description": "asia-south1-b",
+        "status": "UP",
+        "region": "https://www.googleapis.com/compute/v1/projects/cloud-custodian/regions/asia-south1",
+        "selfLink": "https://www.googleapis.com/compute/v1/projects/cloud-custodian/zones/asia-south1-b",
+        "availableCpuPlatforms": [
+          "Intel Cascade Lake",
+          "Intel Skylake",
+          "Intel Broadwell",
+          "Intel Haswell",
+          "Intel Ivy Bridge",
+          "Intel Sandy Bridge",
+          "AMD Milan",
+          "AMD Rome"
+        ],
+        "supportsPzs": false
+      },
+      {
+        "kind": "compute#zone",
+        "id": "2321",
+        "creationTimestamp": "1969-12-31T16:00:00.000-08:00",
+        "name": "asia-south1-a",
+        "description": "asia-south1-a",
+        "status": "UP",
+        "region": "https://www.googleapis.com/compute/v1/projects/cloud-custodian/regions/asia-south1",
+        "selfLink": "https://www.googleapis.com/compute/v1/projects/cloud-custodian/zones/asia-south1-a",
+        "availableCpuPlatforms": [
+          "Intel Cascade Lake",
+          "Intel Skylake",
+          "Intel Broadwell",
+          "Intel Haswell",
+          "Intel Ivy Bridge",
+          "Intel Sandy Bridge",
+          "AMD Milan",
+          "AMD Rome"
+        ],
+        "supportsPzs": false
+      },
+      {
+        "kind": "compute#zone",
+        "id": "2282",
+        "creationTimestamp": "1969-12-31T16:00:00.000-08:00",
+        "name": "australia-southeast1-b",
+        "description": "australia-southeast1-b",
+        "status": "UP",
+        "region": "https://www.googleapis.com/compute/v1/projects/cloud-custodian/regions/australia-southeast1",
+        "selfLink": "https://www.googleapis.com/compute/v1/projects/cloud-custodian/zones/australia-southeast1-b",
+        "availableCpuPlatforms": [
+          "Intel Cascade Lake",
+          "Intel Skylake",
+          "Intel Broadwell",
+          "Intel Haswell",
+          "Intel Ivy Bridge",
+          "Intel Sandy Bridge",
+          "AMD Milan",
+          "AMD Rome"
+        ],
+        "supportsPzs": true
+      },
+      {
+        "kind": "compute#zone",
+        "id": "2280",
+        "creationTimestamp": "1969-12-31T16:00:00.000-08:00",
+        "name": "australia-southeast1-c",
+        "description": "australia-southeast1-c",
+        "status": "UP",
+        "region": "https://www.googleapis.com/compute/v1/projects/cloud-custodian/regions/australia-southeast1",
+        "selfLink": "https://www.googleapis.com/compute/v1/projects/cloud-custodian/zones/australia-southeast1-c",
+        "availableCpuPlatforms": [
+          "Intel Cascade Lake",
+          "Intel Skylake",
+          "Intel Broadwell",
+          "Intel Haswell",
+          "Intel Ivy Bridge",
+          "Intel Sandy Bridge",
+          "AMD Milan",
+          "AMD Rome"
+        ],
+        "supportsPzs": true
+      },
+      {
+        "kind": "compute#zone",
+        "id": "2281",
+        "creationTimestamp": "1969-12-31T16:00:00.000-08:00",
+        "name": "australia-southeast1-a",
+        "description": "australia-southeast1-a",
+        "status": "UP",
+        "region": "https://www.googleapis.com/compute/v1/projects/cloud-custodian/regions/australia-southeast1",
+        "selfLink": "https://www.googleapis.com/compute/v1/projects/cloud-custodian/zones/australia-southeast1-a",
+        "availableCpuPlatforms": [
+          "Intel Cascade Lake",
+          "Intel Skylake",
+          "Intel Broadwell",
+          "Intel Haswell",
+          "Intel Ivy Bridge",
+          "Intel Sandy Bridge",
+          "AMD Milan",
+          "AMD Rome"
+        ],
+        "supportsPzs": true
+      },
+      {
+        "kind": "compute#zone",
+        "id": "2311",
+        "creationTimestamp": "1969-12-31T16:00:00.000-08:00",
+        "name": "southamerica-east1-b",
+        "description": "southamerica-east1-b",
+        "status": "UP",
+        "region": "https://www.googleapis.com/compute/v1/projects/cloud-custodian/regions/southamerica-east1",
+        "selfLink": "https://www.googleapis.com/compute/v1/projects/cloud-custodian/zones/southamerica-east1-b",
+        "availableCpuPlatforms": [
+          "Intel Cascade Lake",
+          "Intel Skylake",
+          "Intel Broadwell",
+          "Intel Haswell",
+          "Intel Ivy Bridge",
+          "Intel Sandy Bridge",
+          "AMD Milan",
+          "AMD Rome"
+        ],
+        "supportsPzs": false
+      },
+      {
+        "kind": "compute#zone",
+        "id": "2312",
+        "creationTimestamp": "1969-12-31T16:00:00.000-08:00",
+        "name": "southamerica-east1-c",
+        "description": "southamerica-east1-c",
+        "status": "UP",
+        "region": "https://www.googleapis.com/compute/v1/projects/cloud-custodian/regions/southamerica-east1",
+        "selfLink": "https://www.googleapis.com/compute/v1/projects/cloud-custodian/zones/southamerica-east1-c",
+        "availableCpuPlatforms": [
+          "Intel Cascade Lake",
+          "Intel Skylake",
+          "Intel Broadwell",
+          "Intel Haswell",
+          "Intel Ivy Bridge",
+          "Intel Sandy Bridge",
+          "AMD Milan",
+          "AMD Rome"
+        ],
+        "supportsPzs": false
+      },
+      {
+        "kind": "compute#zone",
+        "id": "2310",
+        "creationTimestamp": "1969-12-31T16:00:00.000-08:00",
+        "name": "southamerica-east1-a",
+        "description": "southamerica-east1-a",
+        "status": "UP",
+        "region": "https://www.googleapis.com/compute/v1/projects/cloud-custodian/regions/southamerica-east1",
+        "selfLink": "https://www.googleapis.com/compute/v1/projects/cloud-custodian/zones/southamerica-east1-a",
+        "availableCpuPlatforms": [
+          "Intel Cascade Lake",
+          "Intel Skylake",
+          "Intel Broadwell",
+          "Intel Haswell",
+          "Intel Ivy Bridge",
+          "Intel Sandy Bridge",
+          "AMD Milan",
+          "AMD Rome"
+        ],
+        "supportsPzs": false
+      },
+      {
+        "kind": "compute#zone",
+        "id": "2372",
+        "creationTimestamp": "1969-12-31T16:00:00.000-08:00",
+        "name": "asia-east2-a",
+        "description": "asia-east2-a",
+        "status": "UP",
+        "region": "https://www.googleapis.com/compute/v1/projects/cloud-custodian/regions/asia-east2",
+        "selfLink": "https://www.googleapis.com/compute/v1/projects/cloud-custodian/zones/asia-east2-a",
+        "availableCpuPlatforms": [
+          "Intel Cascade Lake",
+          "Intel Skylake",
+          "Intel Broadwell",
+          "Intel Haswell",
+          "Intel Ivy Bridge",
+          "Intel Sandy Bridge",
+          "AMD Rome"
+        ],
+        "supportsPzs": true
+      },
+      {
+        "kind": "compute#zone",
+        "id": "2371",
+        "creationTimestamp": "1969-12-31T16:00:00.000-08:00",
+        "name": "asia-east2-b",
+        "description": "asia-east2-b",
+        "status": "UP",
+        "region": "https://www.googleapis.com/compute/v1/projects/cloud-custodian/regions/asia-east2",
+        "selfLink": "https://www.googleapis.com/compute/v1/projects/cloud-custodian/zones/asia-east2-b",
+        "availableCpuPlatforms": [
+          "Intel Cascade Lake",
+          "Intel Skylake",
+          "Intel Broadwell",
+          "Intel Ivy Bridge",
+          "Intel Sandy Bridge",
+          "AMD Milan",
+          "AMD Rome"
+        ],
+        "supportsPzs": true
+      },
+      {
+        "kind": "compute#zone",
+        "id": "2370",
+        "creationTimestamp": "1969-12-31T16:00:00.000-08:00",
+        "name": "asia-east2-c",
+        "description": "asia-east2-c",
+        "status": "UP",
+        "region": "https://www.googleapis.com/compute/v1/projects/cloud-custodian/regions/asia-east2",
+        "selfLink": "https://www.googleapis.com/compute/v1/projects/cloud-custodian/zones/asia-east2-c",
+        "availableCpuPlatforms": [
+          "Intel Cascade Lake",
+          "Intel Skylake",
+          "Intel Broadwell",
+          "Intel Ivy Bridge",
+          "Intel Sandy Bridge",
+          "AMD Rome"
+        ],
+        "supportsPzs": true
+      },
+      {
+        "kind": "compute#zone",
+        "id": "2392",
+        "creationTimestamp": "1969-12-31T16:00:00.000-08:00",
+        "name": "asia-northeast2-a",
+        "description": "asia-northeast2-a",
+        "status": "UP",
+        "region": "https://www.googleapis.com/compute/v1/projects/cloud-custodian/regions/asia-northeast2",
+        "selfLink": "https://www.googleapis.com/compute/v1/projects/cloud-custodian/zones/asia-northeast2-a",
+        "availableCpuPlatforms": [
+          "Intel Cascade Lake",
+          "Intel Skylake",
+          "Intel Broadwell",
+          "Intel Ivy Bridge",
+          "Intel Sandy Bridge",
+          "AMD Rome"
+        ],
+        "supportsPzs": false
+      },
+      {
+        "kind": "compute#zone",
+        "id": "2390",
+        "creationTimestamp": "1969-12-31T16:00:00.000-08:00",
+        "name": "asia-northeast2-b",
+        "description": "asia-northeast2-b",
+        "status": "UP",
+        "region": "https://www.googleapis.com/compute/v1/projects/cloud-custodian/regions/asia-northeast2",
+        "selfLink": "https://www.googleapis.com/compute/v1/projects/cloud-custodian/zones/asia-northeast2-b",
+        "availableCpuPlatforms": [
+          "Intel Cascade Lake",
+          "Intel Skylake",
+          "Intel Broadwell",
+          "Intel Ivy Bridge",
+          "Intel Sandy Bridge",
+          "AMD Rome"
+        ],
+        "supportsPzs": false
+      },
+      {
+        "kind": "compute#zone",
+        "id": "2391",
+        "creationTimestamp": "1969-12-31T16:00:00.000-08:00",
+        "name": "asia-northeast2-c",
+        "description": "asia-northeast2-c",
+        "status": "UP",
+        "region": "https://www.googleapis.com/compute/v1/projects/cloud-custodian/regions/asia-northeast2",
+        "selfLink": "https://www.googleapis.com/compute/v1/projects/cloud-custodian/zones/asia-northeast2-c",
+        "availableCpuPlatforms": [
+          "Intel Cascade Lake",
+          "Intel Skylake",
+          "Intel Broadwell",
+          "Intel Ivy Bridge",
+          "Intel Sandy Bridge",
+          "AMD Rome"
+        ],
+        "supportsPzs": false
+      },
+      {
+        "kind": "compute#zone",
+        "id": "2410",
+        "creationTimestamp": "1969-12-31T16:00:00.000-08:00",
+        "name": "asia-northeast3-a",
+        "description": "asia-northeast3-a",
+        "status": "UP",
+        "region": "https://www.googleapis.com/compute/v1/projects/cloud-custodian/regions/asia-northeast3",
+        "selfLink": "https://www.googleapis.com/compute/v1/projects/cloud-custodian/zones/asia-northeast3-a",
+        "availableCpuPlatforms": [
+          "Intel Cascade Lake",
+          "Intel Skylake",
+          "Intel Broadwell",
+          "Intel Haswell",
+          "Intel Ivy Bridge",
+          "Intel Sandy Bridge"
+        ],
+        "supportsPzs": false
+      },
+      {
+        "kind": "compute#zone",
+        "id": "2412",
+        "creationTimestamp": "1969-12-31T16:00:00.000-08:00",
+        "name": "asia-northeast3-b",
+        "description": "asia-northeast3-b",
+        "status": "UP",
+        "region": "https://www.googleapis.com/compute/v1/projects/cloud-custodian/regions/asia-northeast3",
+        "selfLink": "https://www.googleapis.com/compute/v1/projects/cloud-custodian/zones/asia-northeast3-b",
+        "availableCpuPlatforms": [
+          "Intel Cascade Lake",
+          "Intel Skylake",
+          "Intel Broadwell",
+          "Intel Haswell",
+          "Intel Ivy Bridge",
+          "Intel Sandy Bridge"
+        ],
+        "supportsPzs": false
+      },
+      {
+        "kind": "compute#zone",
+        "id": "2411",
+        "creationTimestamp": "1969-12-31T16:00:00.000-08:00",
+        "name": "asia-northeast3-c",
+        "description": "asia-northeast3-c",
+        "status": "UP",
+        "region": "https://www.googleapis.com/compute/v1/projects/cloud-custodian/regions/asia-northeast3",
+        "selfLink": "https://www.googleapis.com/compute/v1/projects/cloud-custodian/zones/asia-northeast3-c",
+        "availableCpuPlatforms": [
+          "Intel Cascade Lake",
+          "Intel Skylake",
+          "Intel Broadwell",
+          "Intel Ivy Bridge",
+          "Intel Sandy Bridge"
+        ],
+        "supportsPzs": false
+      },
+      {
+        "kind": "compute#zone",
+        "id": "2470",
+        "creationTimestamp": "1969-12-31T16:00:00.000-08:00",
+        "name": "asia-south2-a",
+        "description": "asia-south2-a",
+        "status": "UP",
+        "region": "https://www.googleapis.com/compute/v1/projects/cloud-custodian/regions/asia-south2",
+        "selfLink": "https://www.googleapis.com/compute/v1/projects/cloud-custodian/zones/asia-south2-a",
+        "availableCpuPlatforms": [
+          "Intel Cascade Lake",
+          "Intel Skylake",
+          "Intel Broadwell",
+          "Intel Haswell",
+          "Intel Ivy Bridge"
+        ],
+        "supportsPzs": false
+      },
+      {
+        "kind": "compute#zone",
+        "id": "2472",
+        "creationTimestamp": "1969-12-31T16:00:00.000-08:00",
+        "name": "asia-south2-b",
+        "description": "asia-south2-b",
+        "status": "UP",
+        "region": "https://www.googleapis.com/compute/v1/projects/cloud-custodian/regions/asia-south2",
+        "selfLink": "https://www.googleapis.com/compute/v1/projects/cloud-custodian/zones/asia-south2-b",
+        "availableCpuPlatforms": [
+          "Intel Cascade Lake",
+          "Intel Skylake",
+          "Intel Broadwell",
+          "Intel Haswell",
+          "Intel Ivy Bridge"
+        ],
+        "supportsPzs": false
+      },
+      {
+        "kind": "compute#zone",
+        "id": "2471",
+        "creationTimestamp": "1969-12-31T16:00:00.000-08:00",
+        "name": "asia-south2-c",
+        "description": "asia-south2-c",
+        "status": "UP",
+        "region": "https://www.googleapis.com/compute/v1/projects/cloud-custodian/regions/asia-south2",
+        "selfLink": "https://www.googleapis.com/compute/v1/projects/cloud-custodian/zones/asia-south2-c",
+        "availableCpuPlatforms": [
+          "Intel Cascade Lake",
+          "Intel Skylake",
+          "Intel Broadwell",
+          "Intel Haswell",
+          "Intel Ivy Bridge"
+        ],
+        "supportsPzs": false
+      },
+      {
+        "kind": "compute#zone",
+        "id": "2440",
+        "creationTimestamp": "1969-12-31T16:00:00.000-08:00",
+        "name": "asia-southeast2-a",
+        "description": "asia-southeast2-a",
+        "status": "UP",
+        "region": "https://www.googleapis.com/compute/v1/projects/cloud-custodian/regions/asia-southeast2",
+        "selfLink": "https://www.googleapis.com/compute/v1/projects/cloud-custodian/zones/asia-southeast2-a",
+        "availableCpuPlatforms": [
+          "Intel Cascade Lake",
+          "Intel Skylake",
+          "Intel Broadwell",
+          "Intel Haswell",
+          "Intel Ivy Bridge"
+        ],
+        "supportsPzs": false
+      },
+      {
+        "kind": "compute#zone",
+        "id": "2442",
+        "creationTimestamp": "1969-12-31T16:00:00.000-08:00",
+        "name": "asia-southeast2-b",
+        "description": "asia-southeast2-b",
+        "status": "UP",
+        "region": "https://www.googleapis.com/compute/v1/projects/cloud-custodian/regions/asia-southeast2",
+        "selfLink": "https://www.googleapis.com/compute/v1/projects/cloud-custodian/zones/asia-southeast2-b",
+        "availableCpuPlatforms": [
+          "Intel Cascade Lake",
+          "Intel Skylake",
+          "Intel Broadwell",
+          "Intel Haswell",
+          "Intel Ivy Bridge"
+        ],
+        "supportsPzs": false
+      },
+      {
+        "kind": "compute#zone",
+        "id": "2441",
+        "creationTimestamp": "1969-12-31T16:00:00.000-08:00",
+        "name": "asia-southeast2-c",
+        "description": "asia-southeast2-c",
+        "status": "UP",
+        "region": "https://www.googleapis.com/compute/v1/projects/cloud-custodian/regions/asia-southeast2",
+        "selfLink": "https://www.googleapis.com/compute/v1/projects/cloud-custodian/zones/asia-southeast2-c",
+        "availableCpuPlatforms": [
+          "Intel Cascade Lake",
+          "Intel Skylake",
+          "Intel Broadwell",
+          "Intel Haswell",
+          "Intel Ivy Bridge"
+        ],
+        "supportsPzs": false
+      },
+      {
+        "kind": "compute#zone",
+        "id": "2480",
+        "creationTimestamp": "1969-12-31T16:00:00.000-08:00",
+        "name": "australia-southeast2-a",
+        "description": "australia-southeast2-a",
+        "status": "UP",
+        "region": "https://www.googleapis.com/compute/v1/projects/cloud-custodian/regions/australia-southeast2",
+        "selfLink": "https://www.googleapis.com/compute/v1/projects/cloud-custodian/zones/australia-southeast2-a",
+        "availableCpuPlatforms": [
+          "Intel Cascade Lake",
+          "Intel Skylake",
+          "Intel Broadwell",
+          "Intel Haswell",
+          "Intel Ivy Bridge"
+        ],
+        "supportsPzs": false
+      },
+      {
+        "kind": "compute#zone",
+        "id": "2482",
+        "creationTimestamp": "1969-12-31T16:00:00.000-08:00",
+        "name": "australia-southeast2-b",
+        "description": "australia-southeast2-b",
+        "status": "UP",
+        "region": "https://www.googleapis.com/compute/v1/projects/cloud-custodian/regions/australia-southeast2",
+        "selfLink": "https://www.googleapis.com/compute/v1/projects/cloud-custodian/zones/australia-southeast2-b",
+        "availableCpuPlatforms": [
+          "Intel Cascade Lake",
+          "Intel Skylake",
+          "Intel Broadwell",
+          "Intel Haswell",
+          "Intel Ivy Bridge"
+        ],
+        "supportsPzs": false
+      },
+      {
+        "kind": "compute#zone",
+        "id": "2481",
+        "creationTimestamp": "1969-12-31T16:00:00.000-08:00",
+        "name": "australia-southeast2-c",
+        "description": "australia-southeast2-c",
+        "status": "UP",
+        "region": "https://www.googleapis.com/compute/v1/projects/cloud-custodian/regions/australia-southeast2",
+        "selfLink": "https://www.googleapis.com/compute/v1/projects/cloud-custodian/zones/australia-southeast2-c",
+        "availableCpuPlatforms": [
+          "Intel Cascade Lake",
+          "Intel Skylake",
+          "Intel Broadwell",
+          "Intel Haswell",
+          "Intel Ivy Bridge"
+        ],
+        "supportsPzs": false
+      },
+      {
+        "kind": "compute#zone",
+        "id": "2452",
+        "creationTimestamp": "1969-12-31T16:00:00.000-08:00",
+        "name": "europe-central2-a",
+        "description": "europe-central2-a",
+        "status": "UP",
+        "region": "https://www.googleapis.com/compute/v1/projects/cloud-custodian/regions/europe-central2",
+        "selfLink": "https://www.googleapis.com/compute/v1/projects/cloud-custodian/zones/europe-central2-a",
+        "availableCpuPlatforms": [
+          "Intel Cascade Lake",
+          "Intel Skylake",
+          "Intel Broadwell",
+          "Intel Haswell",
+          "Intel Ivy Bridge"
+        ],
+        "supportsPzs": false
+      },
+      {
+        "kind": "compute#zone",
+        "id": "2450",
+        "creationTimestamp": "1969-12-31T16:00:00.000-08:00",
+        "name": "europe-central2-b",
+        "description": "europe-central2-b",
+        "status": "UP",
+        "region": "https://www.googleapis.com/compute/v1/projects/cloud-custodian/regions/europe-central2",
+        "selfLink": "https://www.googleapis.com/compute/v1/projects/cloud-custodian/zones/europe-central2-b",
+        "availableCpuPlatforms": [
+          "Intel Cascade Lake",
+          "Intel Skylake",
+          "Intel Broadwell",
+          "Intel Haswell",
+          "Intel Ivy Bridge"
+        ],
+        "supportsPzs": false
+      },
+      {
+        "kind": "compute#zone",
+        "id": "2451",
+        "creationTimestamp": "1969-12-31T16:00:00.000-08:00",
+        "name": "europe-central2-c",
+        "description": "europe-central2-c",
+        "status": "UP",
+        "region": "https://www.googleapis.com/compute/v1/projects/cloud-custodian/regions/europe-central2",
+        "selfLink": "https://www.googleapis.com/compute/v1/projects/cloud-custodian/zones/europe-central2-c",
+        "availableCpuPlatforms": [
+          "Intel Cascade Lake",
+          "Intel Skylake",
+          "Intel Broadwell",
+          "Intel Haswell",
+          "Intel Ivy Bridge"
+        ],
+        "supportsPzs": false
+      },
+      {
+        "kind": "compute#zone",
+        "id": "2352",
+        "creationTimestamp": "1969-12-31T16:00:00.000-08:00",
+        "name": "europe-north1-a",
+        "description": "europe-north1-a",
+        "status": "UP",
+        "region": "https://www.googleapis.com/compute/v1/projects/cloud-custodian/regions/europe-north1",
+        "selfLink": "https://www.googleapis.com/compute/v1/projects/cloud-custodian/zones/europe-north1-a",
+        "availableCpuPlatforms": [
+          "Intel Cascade Lake",
+          "Intel Skylake",
+          "Intel Broadwell",
+          "Intel Ivy Bridge",
+          "Intel Sandy Bridge",
+          "AMD Milan",
+          "AMD Rome"
+        ],
+        "supportsPzs": false
+      },
+      {
+        "kind": "compute#zone",
+        "id": "2350",
+        "creationTimestamp": "1969-12-31T16:00:00.000-08:00",
+        "name": "europe-north1-b",
+        "description": "europe-north1-b",
+        "status": "UP",
+        "region": "https://www.googleapis.com/compute/v1/projects/cloud-custodian/regions/europe-north1",
+        "selfLink": "https://www.googleapis.com/compute/v1/projects/cloud-custodian/zones/europe-north1-b",
+        "availableCpuPlatforms": [
+          "Intel Cascade Lake",
+          "Intel Skylake",
+          "Intel Broadwell",
+          "Intel Ivy Bridge",
+          "Intel Sandy Bridge",
+          "AMD Milan",
+          "AMD Rome"
+        ],
+        "supportsPzs": false
+      },
+      {
+        "kind": "compute#zone",
+        "id": "2351",
+        "creationTimestamp": "1969-12-31T16:00:00.000-08:00",
+        "name": "europe-north1-c",
+        "description": "europe-north1-c",
+        "status": "UP",
+        "region": "https://www.googleapis.com/compute/v1/projects/cloud-custodian/regions/europe-north1",
+        "selfLink": "https://www.googleapis.com/compute/v1/projects/cloud-custodian/zones/europe-north1-c",
+        "availableCpuPlatforms": [
+          "Intel Cascade Lake",
+          "Intel Skylake",
+          "Intel Broadwell",
+          "Intel Haswell",
+          "Intel Ivy Bridge",
+          "Intel Sandy Bridge",
+          "AMD Milan",
+          "AMD Rome"
+        ],
+        "supportsPzs": false
+      },
+      {
+        "kind": "compute#zone",
+        "id": "2541",
+        "creationTimestamp": "1969-12-31T16:00:00.000-08:00",
+        "name": "europe-southwest1-a",
+        "description": "europe-southwest1-a",
+        "status": "UP",
+        "region": "https://www.googleapis.com/compute/v1/projects/cloud-custodian/regions/europe-southwest1",
+        "selfLink": "https://www.googleapis.com/compute/v1/projects/cloud-custodian/zones/europe-southwest1-a",
+        "availableCpuPlatforms": [
+          "Intel Cascade Lake",
+          "Intel Skylake",
+          "Intel Broadwell",
+          "Intel Haswell",
+          "Intel Ivy Bridge"
+        ],
+        "supportsPzs": false
+      },
+      {
+        "kind": "compute#zone",
+        "id": "2540",
+        "creationTimestamp": "1969-12-31T16:00:00.000-08:00",
+        "name": "europe-southwest1-b",
+        "description": "europe-southwest1-b",
+        "status": "UP",
+        "region": "https://www.googleapis.com/compute/v1/projects/cloud-custodian/regions/europe-southwest1",
+        "selfLink": "https://www.googleapis.com/compute/v1/projects/cloud-custodian/zones/europe-southwest1-b",
+        "availableCpuPlatforms": [
+          "Intel Cascade Lake",
+          "Intel Skylake",
+          "Intel Broadwell",
+          "Intel Haswell",
+          "Intel Ivy Bridge"
+        ],
+        "supportsPzs": false
+      },
+      {
+        "kind": "compute#zone",
+        "id": "2542",
+        "creationTimestamp": "1969-12-31T16:00:00.000-08:00",
+        "name": "europe-southwest1-c",
+        "description": "europe-southwest1-c",
+        "status": "UP",
+        "region": "https://www.googleapis.com/compute/v1/projects/cloud-custodian/regions/europe-southwest1",
+        "selfLink": "https://www.googleapis.com/compute/v1/projects/cloud-custodian/zones/europe-southwest1-c",
+        "availableCpuPlatforms": [
+          "Intel Cascade Lake",
+          "Intel Skylake",
+          "Intel Broadwell",
+          "Intel Haswell",
+          "Intel Ivy Bridge"
+        ],
+        "supportsPzs": false
+      },
+      {
+        "kind": "compute#zone",
+        "id": "2382",
+        "creationTimestamp": "1969-12-31T16:00:00.000-08:00",
+        "name": "europe-west6-a",
+        "description": "europe-west6-a",
+        "status": "UP",
+        "region": "https://www.googleapis.com/compute/v1/projects/cloud-custodian/regions/europe-west6",
+        "selfLink": "https://www.googleapis.com/compute/v1/projects/cloud-custodian/zones/europe-west6-a",
+        "availableCpuPlatforms": [
+          "Intel Cascade Lake",
+          "Intel Skylake",
+          "Intel Broadwell",
+          "Intel Haswell",
+          "Intel Ivy Bridge",
+          "Intel Sandy Bridge"
+        ],
+        "supportsPzs": false
+      },
+      {
+        "kind": "compute#zone",
+        "id": "2380",
+        "creationTimestamp": "1969-12-31T16:00:00.000-08:00",
+        "name": "europe-west6-b",
+        "description": "europe-west6-b",
+        "status": "UP",
+        "region": "https://www.googleapis.com/compute/v1/projects/cloud-custodian/regions/europe-west6",
+        "selfLink": "https://www.googleapis.com/compute/v1/projects/cloud-custodian/zones/europe-west6-b",
+        "availableCpuPlatforms": [
+          "Intel Cascade Lake",
+          "Intel Skylake",
+          "Intel Broadwell",
+          "Intel Haswell",
+          "Intel Ivy Bridge",
+          "Intel Sandy Bridge"
+        ],
+        "supportsPzs": false
+      },
+      {
+        "kind": "compute#zone",
+        "id": "2381",
+        "creationTimestamp": "1969-12-31T16:00:00.000-08:00",
+        "name": "europe-west6-c",
+        "description": "europe-west6-c",
+        "status": "UP",
+        "region": "https://www.googleapis.com/compute/v1/projects/cloud-custodian/regions/europe-west6",
+        "selfLink": "https://www.googleapis.com/compute/v1/projects/cloud-custodian/zones/europe-west6-c",
+        "availableCpuPlatforms": [
+          "Intel Cascade Lake",
+          "Intel Skylake",
+          "Intel Broadwell",
+          "Intel Haswell",
+          "Intel Ivy Bridge",
+          "Intel Sandy Bridge"
+        ],
+        "supportsPzs": false
+      },
+      {
+        "kind": "compute#zone",
+        "id": "2510",
+        "creationTimestamp": "1969-12-31T16:00:00.000-08:00",
+        "name": "europe-west8-a",
+        "description": "europe-west8-a",
+        "status": "UP",
+        "region": "https://www.googleapis.com/compute/v1/projects/cloud-custodian/regions/europe-west8",
+        "selfLink": "https://www.googleapis.com/compute/v1/projects/cloud-custodian/zones/europe-west8-a",
+        "availableCpuPlatforms": [
+          "Intel Cascade Lake",
+          "Intel Skylake",
+          "Intel Broadwell",
+          "Intel Haswell",
+          "Intel Ivy Bridge",
+          "AMD Milan",
+          "AMD Rome"
+        ],
+        "supportsPzs": false
+      },
+      {
+        "kind": "compute#zone",
+        "id": "2511",
+        "creationTimestamp": "1969-12-31T16:00:00.000-08:00",
+        "name": "europe-west8-b",
+        "description": "europe-west8-b",
+        "status": "UP",
+        "region": "https://www.googleapis.com/compute/v1/projects/cloud-custodian/regions/europe-west8",
+        "selfLink": "https://www.googleapis.com/compute/v1/projects/cloud-custodian/zones/europe-west8-b",
+        "availableCpuPlatforms": [
+          "Intel Cascade Lake",
+          "Intel Skylake",
+          "Intel Broadwell",
+          "Intel Haswell",
+          "Intel Ivy Bridge",
+          "AMD Milan",
+          "AMD Rome"
+        ],
+        "supportsPzs": false
+      },
+      {
+        "kind": "compute#zone",
+        "id": "2512",
+        "creationTimestamp": "1969-12-31T16:00:00.000-08:00",
+        "name": "europe-west8-c",
+        "description": "europe-west8-c",
+        "status": "UP",
+        "region": "https://www.googleapis.com/compute/v1/projects/cloud-custodian/regions/europe-west8",
+        "selfLink": "https://www.googleapis.com/compute/v1/projects/cloud-custodian/zones/europe-west8-c",
+        "availableCpuPlatforms": [
+          "Intel Cascade Lake",
+          "Intel Skylake",
+          "Intel Broadwell",
+          "Intel Haswell",
+          "Intel Ivy Bridge",
+          "AMD Milan",
+          "AMD Rome"
+        ],
+        "supportsPzs": false
+      },
+      {
+        "kind": "compute#zone",
+        "id": "2521",
+        "creationTimestamp": "1969-12-31T16:00:00.000-08:00",
+        "name": "europe-west9-a",
+        "description": "europe-west9-a",
+        "status": "UP",
+        "region": "https://www.googleapis.com/compute/v1/projects/cloud-custodian/regions/europe-west9",
+        "selfLink": "https://www.googleapis.com/compute/v1/projects/cloud-custodian/zones/europe-west9-a",
+        "availableCpuPlatforms": [
+          "Intel Cascade Lake",
+          "Intel Skylake",
+          "Intel Broadwell",
+          "Intel Haswell",
+          "Intel Ivy Bridge",
+          "AMD Milan",
+          "AMD Rome"
+        ],
+        "supportsPzs": false
+      },
+      {
+        "kind": "compute#zone",
+        "id": "2520",
+        "creationTimestamp": "1969-12-31T16:00:00.000-08:00",
+        "name": "europe-west9-b",
+        "description": "europe-west9-b",
+        "status": "UP",
+        "region": "https://www.googleapis.com/compute/v1/projects/cloud-custodian/regions/europe-west9",
+        "selfLink": "https://www.googleapis.com/compute/v1/projects/cloud-custodian/zones/europe-west9-b",
+        "availableCpuPlatforms": [
+          "Intel Cascade Lake",
+          "Intel Skylake",
+          "Intel Broadwell",
+          "Intel Haswell",
+          "Intel Ivy Bridge",
+          "AMD Milan",
+          "AMD Rome"
+        ],
+        "supportsPzs": false
+      },
+      {
+        "kind": "compute#zone",
+        "id": "2522",
+        "creationTimestamp": "1969-12-31T16:00:00.000-08:00",
+        "name": "europe-west9-c",
+        "description": "europe-west9-c",
+        "status": "UP",
+        "region": "https://www.googleapis.com/compute/v1/projects/cloud-custodian/regions/europe-west9",
+        "selfLink": "https://www.googleapis.com/compute/v1/projects/cloud-custodian/zones/europe-west9-c",
+        "availableCpuPlatforms": [
+          "Intel Cascade Lake",
+          "Intel Skylake",
+          "Intel Broadwell",
+          "Intel Haswell",
+          "Intel Ivy Bridge",
+          "AMD Milan",
+          "AMD Rome"
+        ],
+        "supportsPzs": false
+      },
+      {
+        "kind": "compute#zone",
+        "id": "2330",
+        "creationTimestamp": "1969-12-31T16:00:00.000-08:00",
+        "name": "northamerica-northeast1-a",
+        "description": "northamerica-northeast1-a",
+        "status": "UP",
+        "region": "https://www.googleapis.com/compute/v1/projects/cloud-custodian/regions/northamerica-northeast1",
+        "selfLink": "https://www.googleapis.com/compute/v1/projects/cloud-custodian/zones/northamerica-northeast1-a",
+        "availableCpuPlatforms": [
+          "Intel Cascade Lake",
+          "Intel Skylake",
+          "Intel Broadwell",
+          "Intel Haswell",
+          "Intel Ivy Bridge",
+          "Intel Sandy Bridge",
+          "AMD Milan",
+          "AMD Rome"
+        ],
+        "supportsPzs": false
+      },
+      {
+        "kind": "compute#zone",
+        "id": "2331",
+        "creationTimestamp": "1969-12-31T16:00:00.000-08:00",
+        "name": "northamerica-northeast1-b",
+        "description": "northamerica-northeast1-b",
+        "status": "UP",
+        "region": "https://www.googleapis.com/compute/v1/projects/cloud-custodian/regions/northamerica-northeast1",
+        "selfLink": "https://www.googleapis.com/compute/v1/projects/cloud-custodian/zones/northamerica-northeast1-b",
+        "availableCpuPlatforms": [
+          "Intel Cascade Lake",
+          "Intel Skylake",
+          "Intel Broadwell",
+          "Intel Haswell",
+          "Intel Ivy Bridge",
+          "Intel Sandy Bridge",
+          "AMD Milan",
+          "AMD Rome"
+        ],
+        "supportsPzs": false
+      },
+      {
+        "kind": "compute#zone",
+        "id": "2332",
+        "creationTimestamp": "1969-12-31T16:00:00.000-08:00",
+        "name": "northamerica-northeast1-c",
+        "description": "northamerica-northeast1-c",
+        "status": "UP",
+        "region": "https://www.googleapis.com/compute/v1/projects/cloud-custodian/regions/northamerica-northeast1",
+        "selfLink": "https://www.googleapis.com/compute/v1/projects/cloud-custodian/zones/northamerica-northeast1-c",
+        "availableCpuPlatforms": [
+          "Intel Cascade Lake",
+          "Intel Skylake",
+          "Intel Broadwell",
+          "Intel Haswell",
+          "Intel Ivy Bridge",
+          "Intel Sandy Bridge",
+          "AMD Milan",
+          "AMD Rome"
+        ],
+        "supportsPzs": false
+      },
+      {
+        "kind": "compute#zone",
+        "id": "2461",
+        "creationTimestamp": "1969-12-31T16:00:00.000-08:00",
+        "name": "northamerica-northeast2-a",
+        "description": "northamerica-northeast2-a",
+        "status": "UP",
+        "region": "https://www.googleapis.com/compute/v1/projects/cloud-custodian/regions/northamerica-northeast2",
+        "selfLink": "https://www.googleapis.com/compute/v1/projects/cloud-custodian/zones/northamerica-northeast2-a",
+        "availableCpuPlatforms": [
+          "Intel Cascade Lake",
+          "Intel Skylake",
+          "Intel Broadwell",
+          "Intel Haswell",
+          "Intel Ivy Bridge"
+        ],
+        "supportsPzs": false
+      },
+      {
+        "kind": "compute#zone",
+        "id": "2460",
+        "creationTimestamp": "1969-12-31T16:00:00.000-08:00",
+        "name": "northamerica-northeast2-b",
+        "description": "northamerica-northeast2-b",
+        "status": "UP",
+        "region": "https://www.googleapis.com/compute/v1/projects/cloud-custodian/regions/northamerica-northeast2",
+        "selfLink": "https://www.googleapis.com/compute/v1/projects/cloud-custodian/zones/northamerica-northeast2-b",
+        "availableCpuPlatforms": [
+          "Intel Cascade Lake",
+          "Intel Skylake",
+          "Intel Broadwell",
+          "Intel Haswell",
+          "Intel Ivy Bridge"
+        ],
+        "supportsPzs": false
+      },
+      {
+        "kind": "compute#zone",
+        "id": "2462",
+        "creationTimestamp": "1969-12-31T16:00:00.000-08:00",
+        "name": "northamerica-northeast2-c",
+        "description": "northamerica-northeast2-c",
+        "status": "UP",
+        "region": "https://www.googleapis.com/compute/v1/projects/cloud-custodian/regions/northamerica-northeast2",
+        "selfLink": "https://www.googleapis.com/compute/v1/projects/cloud-custodian/zones/northamerica-northeast2-c",
+        "availableCpuPlatforms": [
+          "Intel Cascade Lake",
+          "Intel Skylake",
+          "Intel Broadwell",
+          "Intel Haswell",
+          "Intel Ivy Bridge"
+        ],
+        "supportsPzs": false
+      },
+      {
+        "kind": "compute#zone",
+        "id": "2490",
+        "creationTimestamp": "1969-12-31T16:00:00.000-08:00",
+        "name": "southamerica-west1-a",
+        "description": "southamerica-west1-a",
+        "status": "UP",
+        "region": "https://www.googleapis.com/compute/v1/projects/cloud-custodian/regions/southamerica-west1",
+        "selfLink": "https://www.googleapis.com/compute/v1/projects/cloud-custodian/zones/southamerica-west1-a",
+        "availableCpuPlatforms": [
+          "Intel Cascade Lake",
+          "Intel Skylake",
+          "Intel Broadwell",
+          "Intel Haswell",
+          "Intel Ivy Bridge"
+        ],
+        "supportsPzs": false
+      },
+      {
+        "kind": "compute#zone",
+        "id": "2491",
+        "creationTimestamp": "1969-12-31T16:00:00.000-08:00",
+        "name": "southamerica-west1-b",
+        "description": "southamerica-west1-b",
+        "status": "UP",
+        "region": "https://www.googleapis.com/compute/v1/projects/cloud-custodian/regions/southamerica-west1",
+        "selfLink": "https://www.googleapis.com/compute/v1/projects/cloud-custodian/zones/southamerica-west1-b",
+        "availableCpuPlatforms": [
+          "Intel Cascade Lake",
+          "Intel Skylake",
+          "Intel Broadwell",
+          "Intel Haswell",
+          "Intel Ivy Bridge"
+        ],
+        "supportsPzs": false
+      },
+      {
+        "kind": "compute#zone",
+        "id": "2492",
+        "creationTimestamp": "1969-12-31T16:00:00.000-08:00",
+        "name": "southamerica-west1-c",
+        "description": "southamerica-west1-c",
+        "status": "UP",
+        "region": "https://www.googleapis.com/compute/v1/projects/cloud-custodian/regions/southamerica-west1",
+        "selfLink": "https://www.googleapis.com/compute/v1/projects/cloud-custodian/zones/southamerica-west1-c",
+        "availableCpuPlatforms": [
+          "Intel Cascade Lake",
+          "Intel Skylake",
+          "Intel Broadwell",
+          "Intel Haswell",
+          "Intel Ivy Bridge"
+        ],
+        "supportsPzs": false
+      },
+      {
+        "kind": "compute#zone",
+        "id": "2532",
+        "creationTimestamp": "1969-12-31T16:00:00.000-08:00",
+        "name": "us-east5-a",
+        "description": "us-east5-a",
+        "status": "UP",
+        "region": "https://www.googleapis.com/compute/v1/projects/cloud-custodian/regions/us-east5",
+        "selfLink": "https://www.googleapis.com/compute/v1/projects/cloud-custodian/zones/us-east5-a",
+        "availableCpuPlatforms": [
+          "Intel Cascade Lake",
+          "Intel Skylake",
+          "Intel Broadwell",
+          "Intel Haswell",
+          "Intel Ivy Bridge",
+          "AMD Milan",
+          "AMD Rome"
+        ],
+        "supportsPzs": false
+      },
+      {
+        "kind": "compute#zone",
+        "id": "2531",
+        "creationTimestamp": "1969-12-31T16:00:00.000-08:00",
+        "name": "us-east5-b",
+        "description": "us-east5-b",
+        "status": "UP",
+        "region": "https://www.googleapis.com/compute/v1/projects/cloud-custodian/regions/us-east5",
+        "selfLink": "https://www.googleapis.com/compute/v1/projects/cloud-custodian/zones/us-east5-b",
+        "availableCpuPlatforms": [
+          "Intel Cascade Lake",
+          "Intel Skylake",
+          "Intel Broadwell",
+          "Intel Haswell",
+          "Intel Ivy Bridge",
+          "AMD Milan",
+          "AMD Rome"
+        ],
+        "supportsPzs": false
+      },
+      {
+        "kind": "compute#zone",
+        "id": "2530",
+        "creationTimestamp": "1969-12-31T16:00:00.000-08:00",
+        "name": "us-east5-c",
+        "description": "us-east5-c",
+        "status": "UP",
+        "region": "https://www.googleapis.com/compute/v1/projects/cloud-custodian/regions/us-east5",
+        "selfLink": "https://www.googleapis.com/compute/v1/projects/cloud-custodian/zones/us-east5-c",
+        "availableCpuPlatforms": [
+          "Intel Cascade Lake",
+          "Intel Skylake",
+          "Intel Broadwell",
+          "Intel Haswell",
+          "Intel Ivy Bridge",
+          "AMD Milan",
+          "AMD Rome"
+        ],
+        "supportsPzs": false
+      },
+      {
+        "kind": "compute#zone",
+        "id": "2551",
+        "creationTimestamp": "1969-12-31T16:00:00.000-08:00",
+        "name": "us-south1-a",
+        "description": "us-south1-a",
+        "status": "UP",
+        "region": "https://www.googleapis.com/compute/v1/projects/cloud-custodian/regions/us-south1",
+        "selfLink": "https://www.googleapis.com/compute/v1/projects/cloud-custodian/zones/us-south1-a",
+        "availableCpuPlatforms": [
+          "Intel Cascade Lake",
+          "Intel Skylake",
+          "Intel Broadwell",
+          "Intel Haswell",
+          "Intel Ivy Bridge"
+        ],
+        "supportsPzs": false
+      },
+      {
+        "kind": "compute#zone",
+        "id": "2552",
+        "creationTimestamp": "1969-12-31T16:00:00.000-08:00",
+        "name": "us-south1-b",
+        "description": "us-south1-b",
+        "status": "UP",
+        "region": "https://www.googleapis.com/compute/v1/projects/cloud-custodian/regions/us-south1",
+        "selfLink": "https://www.googleapis.com/compute/v1/projects/cloud-custodian/zones/us-south1-b",
+        "availableCpuPlatforms": [
+          "Intel Cascade Lake",
+          "Intel Skylake",
+          "Intel Broadwell",
+          "Intel Haswell",
+          "Intel Ivy Bridge"
+        ],
+        "supportsPzs": false
+      },
+      {
+        "kind": "compute#zone",
+        "id": "2550",
+        "creationTimestamp": "1969-12-31T16:00:00.000-08:00",
+        "name": "us-south1-c",
+        "description": "us-south1-c",
+        "status": "UP",
+        "region": "https://www.googleapis.com/compute/v1/projects/cloud-custodian/regions/us-south1",
+        "selfLink": "https://www.googleapis.com/compute/v1/projects/cloud-custodian/zones/us-south1-c",
+        "availableCpuPlatforms": [
+          "Intel Cascade Lake",
+          "Intel Skylake",
+          "Intel Broadwell",
+          "Intel Haswell",
+          "Intel Ivy Bridge"
+        ],
+        "supportsPzs": false
+      },
+      {
+        "kind": "compute#zone",
+        "id": "2362",
+        "creationTimestamp": "1969-12-31T16:00:00.000-08:00",
+        "name": "us-west2-a",
+        "description": "us-west2-a",
+        "status": "UP",
+        "region": "https://www.googleapis.com/compute/v1/projects/cloud-custodian/regions/us-west2",
+        "selfLink": "https://www.googleapis.com/compute/v1/projects/cloud-custodian/zones/us-west2-a",
+        "availableCpuPlatforms": [
+          "Intel Cascade Lake",
+          "Intel Skylake",
+          "Intel Broadwell",
+          "Intel Haswell",
+          "Intel Ivy Bridge",
+          "Intel Sandy Bridge",
+          "AMD Milan",
+          "AMD Rome"
+        ],
+        "supportsPzs": false
+      },
+      {
+        "kind": "compute#zone",
+        "id": "2361",
+        "creationTimestamp": "1969-12-31T16:00:00.000-08:00",
+        "name": "us-west2-b",
+        "description": "us-west2-b",
+        "status": "UP",
+        "region": "https://www.googleapis.com/compute/v1/projects/cloud-custodian/regions/us-west2",
+        "selfLink": "https://www.googleapis.com/compute/v1/projects/cloud-custodian/zones/us-west2-b",
+        "availableCpuPlatforms": [
+          "Intel Cascade Lake",
+          "Intel Skylake",
+          "Intel Broadwell",
+          "Intel Haswell",
+          "Intel Ivy Bridge",
+          "Intel Sandy Bridge",
+          "AMD Milan",
+          "AMD Rome"
+        ],
+        "supportsPzs": false
+      },
+      {
+        "kind": "compute#zone",
+        "id": "2360",
+        "creationTimestamp": "1969-12-31T16:00:00.000-08:00",
+        "name": "us-west2-c",
+        "description": "us-west2-c",
+        "status": "UP",
+        "region": "https://www.googleapis.com/compute/v1/projects/cloud-custodian/regions/us-west2",
+        "selfLink": "https://www.googleapis.com/compute/v1/projects/cloud-custodian/zones/us-west2-c",
+        "availableCpuPlatforms": [
+          "Intel Cascade Lake",
+          "Intel Skylake",
+          "Intel Broadwell",
+          "Intel Haswell",
+          "Intel Ivy Bridge",
+          "Intel Sandy Bridge"
+        ],
+        "supportsPzs": false
+      },
+      {
+        "kind": "compute#zone",
+        "id": "2420",
+        "creationTimestamp": "1969-12-31T16:00:00.000-08:00",
+        "name": "us-west3-a",
+        "description": "us-west3-a",
+        "status": "UP",
+        "region": "https://www.googleapis.com/compute/v1/projects/cloud-custodian/regions/us-west3",
+        "selfLink": "https://www.googleapis.com/compute/v1/projects/cloud-custodian/zones/us-west3-a",
+        "availableCpuPlatforms": [
+          "Intel Cascade Lake",
+          "Intel Skylake",
+          "Intel Broadwell",
+          "Intel Haswell",
+          "Intel Ivy Bridge",
+          "Intel Sandy Bridge"
+        ],
+        "supportsPzs": false
+      },
+      {
+        "kind": "compute#zone",
+        "id": "2421",
+        "creationTimestamp": "1969-12-31T16:00:00.000-08:00",
+        "name": "us-west3-b",
+        "description": "us-west3-b",
+        "status": "UP",
+        "region": "https://www.googleapis.com/compute/v1/projects/cloud-custodian/regions/us-west3",
+        "selfLink": "https://www.googleapis.com/compute/v1/projects/cloud-custodian/zones/us-west3-b",
+        "availableCpuPlatforms": [
+          "Intel Cascade Lake",
+          "Intel Skylake",
+          "Intel Broadwell",
+          "Intel Ivy Bridge",
+          "Intel Sandy Bridge"
+        ],
+        "supportsPzs": false
+      },
+      {
+        "kind": "compute#zone",
+        "id": "2422",
+        "creationTimestamp": "1969-12-31T16:00:00.000-08:00",
+        "name": "us-west3-c",
+        "description": "us-west3-c",
+        "status": "UP",
+        "region": "https://www.googleapis.com/compute/v1/projects/cloud-custodian/regions/us-west3",
+        "selfLink": "https://www.googleapis.com/compute/v1/projects/cloud-custodian/zones/us-west3-c",
+        "availableCpuPlatforms": [
+          "Intel Cascade Lake",
+          "Intel Skylake",
+          "Intel Broadwell",
+          "Intel Ivy Bridge",
+          "Intel Sandy Bridge"
+        ],
+        "supportsPzs": false
+      },
+      {
+        "kind": "compute#zone",
+        "id": "2431",
+        "creationTimestamp": "1969-12-31T16:00:00.000-08:00",
+        "name": "us-west4-a",
+        "description": "us-west4-a",
+        "status": "UP",
+        "region": "https://www.googleapis.com/compute/v1/projects/cloud-custodian/regions/us-west4",
+        "selfLink": "https://www.googleapis.com/compute/v1/projects/cloud-custodian/zones/us-west4-a",
+        "availableCpuPlatforms": [
+          "Intel Cascade Lake",
+          "Intel Skylake",
+          "Intel Broadwell",
+          "Intel Ivy Bridge",
+          "AMD Milan",
+          "AMD Rome"
+        ],
+        "supportsPzs": false
+      },
+      {
+        "kind": "compute#zone",
+        "id": "2432",
+        "creationTimestamp": "1969-12-31T16:00:00.000-08:00",
+        "name": "us-west4-b",
+        "description": "us-west4-b",
+        "status": "UP",
+        "region": "https://www.googleapis.com/compute/v1/projects/cloud-custodian/regions/us-west4",
+        "selfLink": "https://www.googleapis.com/compute/v1/projects/cloud-custodian/zones/us-west4-b",
+        "availableCpuPlatforms": [
+          "Intel Cascade Lake",
+          "Intel Skylake",
+          "Intel Broadwell",
+          "Intel Ivy Bridge",
+          "AMD Milan",
+          "AMD Rome"
+        ],
+        "supportsPzs": false
+      },
+      {
+        "kind": "compute#zone",
+        "id": "2430",
+        "creationTimestamp": "1969-12-31T16:00:00.000-08:00",
+        "name": "us-west4-c",
+        "description": "us-west4-c",
+        "status": "UP",
+        "region": "https://www.googleapis.com/compute/v1/projects/cloud-custodian/regions/us-west4",
+        "selfLink": "https://www.googleapis.com/compute/v1/projects/cloud-custodian/zones/us-west4-c",
+        "availableCpuPlatforms": [
+          "Intel Cascade Lake",
+          "Intel Skylake",
+          "Intel Broadwell",
+          "Intel Ivy Bridge",
+          "AMD Milan",
+          "AMD Rome"
+        ],
+        "supportsPzs": false
+      }
+    ],
+    "selfLink": "https://www.googleapis.com/compute/v1/projects/cloud-custodian/zones"
+  }
+}

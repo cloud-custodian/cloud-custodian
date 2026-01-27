@@ -5,6 +5,7 @@
             {
                 "stateMachineArn": "arn:aws:states:us-east-1:644160558196:stateMachine:Helloworld",
                 "name": "Helloworld",
+                "type": "STANDARD",
                 "creationDate": {
                     "__class__": "datetime",
                     "year": 2019,
@@ -15,17 +16,38 @@
                     "second": 30,
                     "microsecond": 570000
                 }
+            },
+            {
+                "stateMachineArn": "arn:aws:states:us-east-1:644160558196:stateMachine:MyStateMachine-fd0bt36ac",
+                "name": "MyStateMachine-fd0bt36ac",
+                "type": "STANDARD",
+                "creationDate": {
+                    "__class__": "datetime",
+                    "year": 2024,
+                    "month": 8,
+                    "day": 27,
+                    "hour": 20,
+                    "minute": 42,
+                    "second": 7,
+                    "microsecond": 111000
+                }
+            },
+            {
+                "stateMachineArn": "arn:aws:states:us-east-1:644160558196:stateMachine:Waitstate",
+                "name": "Waitstate",
+                "type": "STANDARD",
+                "creationDate": {
+                    "__class__": "datetime",
+                    "year": 2019,
+                    "month": 11,
+                    "day": 26,
+                    "hour": 23,
+                    "minute": 24,
+                    "second": 43,
+                    "microsecond": 885000
+                }
             }
         ],
-        "ResponseMetadata": {
-            "RequestId": "a6a1ddb2-9695-11e9-8ce2-15d1ff097ae1",
-            "HTTPStatusCode": 200,
-            "HTTPHeaders": {
-                "x-amzn-requestid": "a6a1ddb2-9695-11e9-8ce2-15d1ff097ae1",
-                "content-type": "application/x-amz-json-1.0",
-                "content-length": "154"
-            },
-            "RetryAttempts": 0
-        }
+        "ResponseMetadata": {}
     }
 }

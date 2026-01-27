@@ -10,7 +10,7 @@ Unit tests can be run with:
 
 .. code-block:: bash
 
-   $ tox
+   $ make test
 
 Linting can be run with:
 
@@ -18,18 +18,20 @@ Linting can be run with:
 
   $ make lint
 
-To run tests directly with pytest, or to integrate into your IDE, you can reference
-``tox.ini`` for the appropriate commands and environment variable configuration.
-Testing done without ``C7N_TEST_RUN`` and ``C7N_VALIDATE`` may not match ``tox`` results.
+Individual package tests can be targeted with pytest:
+
+.. code-block:: bash
+
+   $ uv run pytest -n auto -s tools/c7n_left
+
+Note we maintain a set of common environment variables used when running tests in `test.env`.
+Beyond dummy values for cloud providers, Of particular note is C7N_VALIDATE.
+
 
 Operating System Compatibility
 ------------------------------
 
-Tests are currently executed on both Ubuntu 1804 and Windows Server 2019
-and must pass on both operating systems.
-
-Both Windows and Linux sample dockerfiles are provided for running Tox which may help you.
-You can find these in `tools/dev`.
+Tests are currently executed on both Ubuntu 2204, Mac OS, and Windows Server and must pass across operating systems.
 
 In Docker for Windows you can run both of these containers,
 `even simultaneously <https://docs.microsoft.com/en-us/virtualization/windowscontainers/deploy-containers/linux-containers>`_.

@@ -1,0 +1,34 @@
+{
+    "status_code": 200,
+    "data": {
+        "Aliases": [
+            {
+                "AliasName": "alias/sagemaker",
+                "AliasArn": "arn:aws:kms:us-east-1:644160558196:alias/sagemaker",
+                "TargetKeyId": "75d1e7ba-f9c5-46b9-97bc-28e6c834aa49",
+                "CreationDate": {
+                    "__class__": "datetime",
+                    "year": 2018,
+                    "month": 1,
+                    "day": 18,
+                    "hour": 10,
+                    "minute": 59,
+                    "second": 7,
+                    "microsecond": 315000
+                },
+                "LastUpdatedDate": {
+                    "__class__": "datetime",
+                    "year": 2018,
+                    "month": 1,
+                    "day": 18,
+                    "hour": 10,
+                    "minute": 59,
+                    "second": 7,
+                    "microsecond": 315000
+                }
+            }
+        ],
+        "Truncated": false,
+        "ResponseMetadata": {}
+    }
+}

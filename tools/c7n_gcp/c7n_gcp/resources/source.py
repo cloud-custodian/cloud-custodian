@@ -21,3 +21,5 @@ class SourceRepository(QueryResourceManager):
         name = id = 'name'
         perm_service = 'source'
         default_report_fields = ["name", "size", "url"]
+        urn_component = "repo"
+        urn_id_segments = (-1,)  # Just use the last segment of the id in the URN

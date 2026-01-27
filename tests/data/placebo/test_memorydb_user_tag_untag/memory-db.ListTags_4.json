@@ -1,0 +1,16 @@
+{
+    "status_code": 200,
+    "data": {
+        "TagList": [
+            {
+                "Key": "owner",
+                "Value": "policy"
+            },
+            {
+                "Key": "env",
+                "Value": "dev"
+            }
+        ],
+        "ResponseMetadata": {}
+    }
+}

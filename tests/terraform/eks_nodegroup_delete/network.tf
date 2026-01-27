@@ -18,18 +18,18 @@ data "aws_availability_zones" "available" {
 resource "aws_subnet" "cluster_example" {
   count = 2
 
-  availability_zone = data.aws_availability_zones.available.names[count.index]
-  cidr_block        = cidrsubnet(aws_vpc.example.cidr_block, 8, count.index)
-  vpc_id            = aws_vpc.example.id
+  availability_zone       = data.aws_availability_zones.available.names[count.index]
+  cidr_block              = cidrsubnet(aws_vpc.example.cidr_block, 8, count.index)
+  vpc_id                  = aws_vpc.example.id
   map_public_ip_on_launch = true
 }
 
 resource "aws_subnet" "node_group_example" {
   count = 2
 
-  availability_zone = data.aws_availability_zones.available.names[count.index]
-  cidr_block        = cidrsubnet(aws_vpc.example.cidr_block, 8, count.index+2)
-  vpc_id            = aws_vpc.example.id
+  availability_zone       = data.aws_availability_zones.available.names[count.index]
+  cidr_block              = cidrsubnet(aws_vpc.example.cidr_block, 8, count.index + 2)
+  vpc_id                  = aws_vpc.example.id
   map_public_ip_on_launch = true
 
   tags = {

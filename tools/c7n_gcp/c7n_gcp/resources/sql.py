@@ -1,10 +1,9 @@
 # Copyright The Cloud Custodian Authors.
 # SPDX-License-Identifier: Apache-2.0
 
-import jmespath
 import re
 
-from c7n.utils import type_schema
+from c7n.utils import type_schema, jmespath_search
 from c7n.filters.offhours import OffHour, OnHour
 from c7n_gcp.actions import MethodAction
 from c7n_gcp.provider import resources
@@ -33,6 +32,7 @@ class SqlInstance(QueryResourceManager):
         scc_type = "google.cloud.sql.Instance"
         metric_key = 'resource.labels.database_id'
         perm_service = 'cloudsql'
+        urn_component = "instance"
 
         @staticmethod
         def get(client, resource_info):
@@ -80,10 +80,21 @@ class SqlInstanceAction(MethodAction):
 @SqlInstance.action_registry.register('delete')
 class SqlInstanceDelete(SqlInstanceAction):
 
-    schema = type_schema('delete')
+    schema = type_schema('delete', force={'type': 'boolean'})
     method_spec = {'op': 'delete'}
     path_param_re = re.compile(
         '.*?/projects/(.*?)/instances/(.*)')
+
+    def process(self, resources):
+        if self.data.get('force'):
+            self.disable_protection(resources)
+        super().process(resources)
+
+    def disable_protection(self, resources):
+        deletion_protected = [
+            r for r in resources if r['settings'].get('deletionProtectionEnabled')]
+        disable_protection = SqlInstanceEnableDeletion({}, self.manager)
+        disable_protection.process(deletion_protected)
 
 
 @SqlInstance.action_registry.register('stop')
@@ -118,23 +129,88 @@ class SqlInstanceStart(MethodAction):
                 'body': {'settings': {'activationPolicy': 'ALWAYS'}}}
 
 
+@SqlInstance.action_registry.register('set-deletion-protection')
+class SqlInstanceEnableDeletion(MethodAction):
+
+    schema = type_schema(
+        'set-deletion-protection',
+        value={'type': 'boolean'})
+    method_spec = {'op': 'patch'}
+    path_param_re = re.compile('.*?/projects/(.*?)/instances/(.*)')
+    method_perm = 'update'
+
+    def get_resource_params(self, model, resource):
+        project, instance = self.path_param_re.match(
+            resource['selfLink']).groups()
+        return {
+            'project': project,
+            'instance': instance,
+            'body': {
+                'settings': {
+                    'deletionProtectionEnabled': str(self.data.get('value', True)).lower()
+                }
+            }
+        }
+
+
+@SqlInstance.action_registry.register('set-high-availability')
+class SqlInstanceHighAvailability(MethodAction):
+
+    schema = type_schema(
+        'set-high-availability',
+        value={'type': 'boolean', 'required': True})
+    method_spec = {'op': 'patch'}
+    path_param_re = re.compile('.*?/projects/(.*?)/instances/(.*)')
+    method_perm = 'update'
+
+    def get_resource_params(self, model, resource):
+        if self.data['value'] is False:
+            availabilityType = 'ZONAL'
+        else:
+            availabilityType = 'REGIONAL'
+
+        project, instance = self.path_param_re.match(
+            resource['selfLink']).groups()
+        return {
+            'project': project,
+            'instance': instance,
+            'body': {
+                'settings': {
+                    'availabilityType': availabilityType
+                }
+            }
+        }
+
+
+class SQLInstanceChildTypeInfo(ChildTypeInfo):
+    service = 'sqladmin'
+    version = 'v1beta4'
+    parent_spec = {
+        'resource': 'sql-instance',
+        'child_enum_params': [
+            ('name', 'instance')
+        ]
+    }
+    perm_service = 'cloudsql'
+
+    @classmethod
+    def _get_location(cls, resource):
+        return super()._get_location(cls.get_parent(resource))
+
+    @classmethod
+    def _get_urn_id(cls, resource):
+        return f"{resource['instance']}/{resource[cls.id]}"
+
+
 @resources.register('sql-user')
 class SqlUser(ChildResourceManager):
 
-    class resource_type(ChildTypeInfo):
-        service = 'sqladmin'
-        version = 'v1beta4'
+    class resource_type(SQLInstanceChildTypeInfo):
         component = 'users'
         enum_spec = ('list', 'items[]', None)
         name = id = 'name'
-        parent_spec = {
-            'resource': 'sql-instance',
-            'child_enum_params': [
-                ('name', 'instance')
-            ]
-        }
         default_report_fields = ["name", "project", "instance"]
-        perm_service = 'cloudsql'
+        urn_component = "user"
 
 
 class SqlInstanceChildWithSelfLink(ChildResourceManager):
@@ -156,28 +232,20 @@ class SqlBackupRun(SqlInstanceChildWithSelfLink):
     """GCP Resource
     https://cloud.google.com/sql/docs/mysql/admin-api/rest/v1beta4/backupRuns
     """
-    class resource_type(ChildTypeInfo):
-        service = 'sqladmin'
-        version = 'v1beta4'
+    class resource_type(SQLInstanceChildTypeInfo):
         component = 'backupRuns'
         enum_spec = ('list', 'items[]', None)
         get_requires_event = True
         name = id = 'id'
         default_report_fields = [
             name, "status", "instance", "location", "enqueuedTime", "startTime", "endTime"]
-        parent_spec = {
-            'resource': 'sql-instance',
-            'child_enum_params': [
-                ('name', 'instance')
-            ]
-        }
-        perm_service = 'cloudsql'
+        urn_component = "backup-run"
 
         @staticmethod
         def get(client, event):
-            project = jmespath.search('protoPayload.response.targetProject', event)
-            instance = jmespath.search('protoPayload.response.targetId', event)
-            insert_time = jmespath.search('protoPayload.response.insertTime', event)
+            project = jmespath_search('protoPayload.response.targetProject', event)
+            instance = jmespath_search('protoPayload.response.targetId', event)
+            insert_time = jmespath_search('protoPayload.response.insertTime', event)
             parameters = {'project': project,
                           'instance': instance,
                           'id': SqlBackupRun.resource_type._from_insert_time_to_id(insert_time)}
@@ -202,9 +270,7 @@ class SqlSslCert(SqlInstanceChildWithSelfLink):
     """GCP Resource
     https://cloud.google.com/sql/docs/mysql/admin-api/rest/v1beta4/sslCerts
     """
-    class resource_type(ChildTypeInfo):
-        service = 'sqladmin'
-        version = 'v1beta4'
+    class resource_type(SQLInstanceChildTypeInfo):
         component = 'sslCerts'
         enum_spec = ('list', 'items[]', None)
         get_requires_event = True
@@ -212,17 +278,11 @@ class SqlSslCert(SqlInstanceChildWithSelfLink):
         name = "commonName"
         default_report_fields = [
             id, name, "instance", "expirationTime"]
-        parent_spec = {
-            'resource': 'sql-instance',
-            'child_enum_params': [
-                ('name', 'instance')
-            ]
-        }
-        perm_service = 'cloudsql'
+        urn_component = "ssl-cert"
 
         @staticmethod
         def get(client, event):
-            self_link = jmespath.search('protoPayload.response.clientCert.certInfo.selfLink', event)
+            self_link = jmespath_search('protoPayload.response.clientCert.certInfo.selfLink', event)
             self_link_re = '.*?/projects/(.*?)/instances/(.*?)/sslCerts/(.*)'
             project, instance, sha_1_fingerprint = re.match(self_link_re, self_link).groups()
             parameters = {'project': project,

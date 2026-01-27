@@ -26,28 +26,40 @@ interactions:
     uri: https://cdb.ap-singapore.tencentcloudapi.com/
   response:
     body:
-      string: '{"Response":{"Items":[{"AutoRenew":0,"CageId":"","CdbError":0,"Cpu":2,"CreateTime":"2022-10-17
-        17:04:48","DeadlineTime":"0000-00-00 00:00:00","DeployGroupId":"","DeployMode":0,"DeviceClass":"","DeviceType":"UNIVERSAL","DiskType":"","DrInfo":[],"EngineType":"RocksDB","EngineVersion":"8.0","ExClusterId":"","ExClusterName":"","HourFeeStatus":1,"InitFlag":1,"InstanceId":"cdb-lbxusyi7","InstanceName":"cdb81905","InstanceNodes":2,"InstanceType":1,"IsolateTime":"0000-00-00
-        00:00:00","MasterInfo":null,"MaxDelayTime":0,"Memory":4000,"OfflineTime":"","ParamVersionFlow":800030001,"PayType":1,"PhysicalId":"","ProjectId":0,"ProtectMode":0,"Qps":4400,"Region":"ap-singapore","RegionId":9,"ResourceId":"","RoGroups":[],"RoInstType":"","RoVipInfo":null,"SecurityGroupIds":[],"SlaveInfo":{"First":{"Region":"ap-singapore","Vip":"","VpcId":0,"Vport":0,"Zone":"ap-singapore-1"},"Second":null},"Status":1,"SubnetId":311924,"TagList":null,"TaskStatus":0,"UniqSubnetId":"subnet-1miim8ks","UniqVpcId":"vpc-3aajxqgr","Vip":"172.22.32.14","Volume":200,"VpcId":830620,"Vport":3306,"WanDomain":"","WanPort":0,"WanStatus":0,"Zone":"ap-singapore-1","ZoneId":900001,"ZoneName":""},{"AutoRenew":0,"CageId":"","CdbError":0,"Cpu":1,"CreateTime":"2022-10-17
-        16:43:16","DeadlineTime":"0000-00-00 00:00:00","DeployGroupId":"","DeployMode":0,"DeviceClass":"","DeviceType":"UNIVERSAL","DiskType":"","DrInfo":[],"EngineType":"InnoDB","EngineVersion":"5.7","ExClusterId":"","ExClusterName":"","HourFeeStatus":1,"InitFlag":1,"InstanceId":"cdb-pufymj1h","InstanceName":"cdb81904","InstanceNodes":2,"InstanceType":1,"IsolateTime":"0000-00-00
-        00:00:00","MasterInfo":null,"MaxDelayTime":0,"Memory":1000,"OfflineTime":"","ParamVersionFlow":570010001,"PayType":1,"PhysicalId":"","ProjectId":0,"ProtectMode":0,"Qps":1000,"Region":"ap-singapore","RegionId":9,"ResourceId":"","RoGroups":[],"RoInstType":"","RoVipInfo":null,"SecurityGroupIds":[],"SlaveInfo":{"First":{"Region":"ap-singapore","Vip":"","VpcId":0,"Vport":0,"Zone":"ap-singapore-1"},"Second":null},"Status":1,"SubnetId":311924,"TagList":null,"TaskStatus":0,"UniqSubnetId":"subnet-1miim8ks","UniqVpcId":"vpc-3aajxqgr","Vip":"172.22.32.4","Volume":200,"VpcId":830620,"Vport":3306,"WanDomain":"","WanPort":0,"WanStatus":0,"Zone":"ap-singapore-1","ZoneId":900001,"ZoneName":""}],"RequestId":"e9d6de7e-b5b4-4643-ba65-c3123ff36763","TotalCount":2}}'
+      string: '{"Response": {"Items": [{"AutoRenew": 0, "CageId": "", "CdbError":
+        0, "Cpu": 4, "CreateTime": "2022-11-14 14:29:31", "DeadlineTime": "0000-00-00
+        00:00:00", "DeployGroupId": "", "DeployMode": 0, "DeviceClass": "", "DeviceType":
+        "UNIVERSAL", "DiskType": "", "DrInfo": [], "EngineType": "InnoDB", "EngineVersion":
+        "8.0", "ExClusterId": "", "ExClusterName": "", "HourFeeStatus": 1, "InitFlag":
+        1, "InstanceId": "cdb-lzvnrseb", "InstanceName": "cdb82546", "InstanceNodes":
+        2, "InstanceType": 1, "IsolateTime": "0000-00-00 00:00:00", "MasterInfo":
+        null, "MaxDelayTime": 0, "Memory": 8000, "OfflineTime": "", "ParamVersionFlow":
+        800010001, "PayType": 1, "PhysicalId": "", "ProjectId": 0, "ProtectMode":
+        0, "Qps": 7200, "Region": "ap-singapore", "RegionId": 9, "ResourceId": "",
+        "RoGroups": [], "RoInstType": "", "RoVipInfo": null, "SecurityGroupIds": [],
+        "SlaveInfo": {"First": {"Region": "ap-singapore", "Vip": "", "VpcId": 0, "Vport":
+        0, "Zone": "ap-singapore-1"}, "Second": null}, "Status": 1, "SubnetId": 311924,
+        "TagList": null, "TaskStatus": 0, "UniqSubnetId": "subnet-1miim8ks", "UniqVpcId":
+        "vpc-3aajxqgr", "Vip": "172.22.32.2", "Volume": 25, "VpcId": 830620, "Vport":
+        3306, "WanDomain": "", "WanPort": 0, "WanStatus": 0, "Zone": "ap-singapore-1",
+        "ZoneId": 900001, "ZoneName": ""}], "RequestId": "8d41b7b5-8e69-4b2f-b02b-a4a874d7266c",
+        "TotalCount": 1}}'
     headers:
       Connection:
       - keep-alive
       Content-Length:
-      - '2362'
+      - '1224'
       Content-Type:
       - application/json
       Date:
-      - Tue, 18 Oct 2022 11:39:44 GMT
+      - Mon, 14 Nov 2022 08:49:59 GMT
       Server:
       - nginx
     status:
       code: 200
       message: OK
 - request:
-    body: '{"ResourceList": ["qcs::cdb:ap-singapore:uin/100000750436:instanceId/cdb-lbxusyi7",
-      "qcs::cdb:ap-singapore:uin/100000750436:instanceId/cdb-pufymj1h"]}'
+    body: '{"ResourceList": ["qcs::cdb:ap-singapore:uin/100000750436:instanceId/cdb-lzvnrseb"]}'
     headers:
       Accept:
       - '*/*'
@@ -56,7 +68,7 @@ interactions:
       Connection:
       - keep-alive
       Content-Length:
-      - '150'
+      - '84'
       Content-Type:
       - application/json
       Host:
@@ -73,7 +85,7 @@ interactions:
     uri: https://tag.ap-singapore.tencentcloudapi.com/
   response:
     body:
-      string: '{"Response":{"PaginationToken":"","ResourceTagMappingList":[],"RequestId":"5974f7d1-776d-4d5f-9892-a19f24d5c480"}}'
+      string: '{"Response":{"PaginationToken":"","ResourceTagMappingList":[],"RequestId":"4b4342a0-a7fa-4d69-8f4a-b9b5d51f4c67"}}'
     headers:
       Connection:
       - keep-alive
@@ -82,14 +94,14 @@ interactions:
       Content-Type:
       - application/json
       Date:
-      - Tue, 18 Oct 2022 11:39:45 GMT
+      - Mon, 14 Nov 2022 08:50:00 GMT
       Server:
       - nginx
     status:
       code: 200
       message: OK
 - request:
-    body: '{"InstanceId": "cdb-lbxusyi7"}'
+    body: '{"InstanceId": "cdb-lzvnrseb"}'
     headers:
       Accept:
       - '*/*'
@@ -115,66 +127,24 @@ interactions:
     uri: https://cdb.ap-singapore.tencentcloudapi.com/
   response:
     body:
-      string: '{"Response":{"TotalCount":2,"Items":[{"Name":"cdb81905_backup_20221018000041.xb","IntranetUrl":"https:\/\/mysql-lifecycle-backup-c5k5vcoj4rna8g19u56g-1256569818.cos.ap-singapore.myqcloud.com\/1253831162%2Fmysql%2Fc3b109b6-4dfa-11ed-a255-b8cef6b719e5%2Fdata%2Fautomatic-delete%2F2022-10-18%2Fautomatic%2Fxtrabackup%2Fbk_304_104771361%2Fcdb-lbxusyi7_backup_20221018000041.xb?q-sign-algorithm=sha1&q-ak=AKIDZaLp2ye3B2btue7KGwNYS5QcXBYdT2JJ&q-sign-time=1666093185%3B1666136385&q-key-time=1666093185%3B1666136385&q-header-list=host&q-url-param-list=&q-signature=5418b724eafbaf60c3c8d176ebb9c9b23f34d894&response-content-disposition=attachment%3Bfilename%3D%22cdb81905_backup_20221018000041.xb%22&response-content-type=application%2Foctet-stream","InternetUrl":"https:\/\/mysql-lifecycle-backup-c5k5vcoj4rna8g19u56g-1256569818.cos.ap-singapore.myqcloud.com\/1253831162%2Fmysql%2Fc3b109b6-4dfa-11ed-a255-b8cef6b719e5%2Fdata%2Fautomatic-delete%2F2022-10-18%2Fautomatic%2Fxtrabackup%2Fbk_304_104771361%2Fcdb-lbxusyi7_backup_20221018000041.xb?q-sign-algorithm=sha1&q-ak=AKIDZaLp2ye3B2btue7KGwNYS5QcXBYdT2JJ&q-sign-time=1666093185%3B1666136385&q-key-time=1666093185%3B1666136385&q-header-list=host&q-url-param-list=&q-signature=5418b724eafbaf60c3c8d176ebb9c9b23f34d894&response-content-disposition=attachment%3Bfilename%3D%22cdb81905_backup_20221018000041.xb%22&response-content-type=application%2Foctet-stream","Type":"physical","Size":3160294,"Date":"2022-10-18
-        00:00:43","StartTime":"2022-10-18 00:00:42","BackupId":104771361,"Status":"SUCCESS","FinishTime":"2022-10-18
-        00:00:47","Creator":"SYSTEM","Method":"full","Way":"automatic","ManualBackupName":"","SaveMode":"save_mode_regular","Region":"ap-singapore","RemoteInfo":[],"CosStorageType":0,"InstanceId":"cdb-lbxusyi7","Url":"https:\/\/mysql-lifecycle-backup-c5k5vcoj4rna8g19u56g-1256569818.cos.ap-singapore.myqcloud.com\/1253831162%2Fmysql%2Fc3b109b6-4dfa-11ed-a255-b8cef6b719e5%2Fdata%2Fautomatic-delete%2F2022-10-18%2Fautomatic%2Fxtrabackup%2Fbk_304_104771361%2Fcdb-lbxusyi7_backup_20221018000041.xb?q-sign-algorithm=sha1&q-ak=AKIDZaLp2ye3B2btue7KGwNYS5QcXBYdT2JJ&q-sign-time=1666093185%3B1666136385&q-key-time=1666093185%3B1666136385&q-header-list=host&q-url-param-list=&q-signature=5418b724eafbaf60c3c8d176ebb9c9b23f34d894&response-content-disposition=attachment%3Bfilename%3D%22cdb81905_backup_20221018000041.xb%22&response-content-type=application%2Foctet-stream","Progress":0,"Deleted":0},{"Name":"cdb81905_backup_20221017170903.xb","IntranetUrl":"https:\/\/mysql-lifecycle-backup-c5k5vcoj4rna8g19u56g-1256569818.cos.ap-singapore.myqcloud.com\/1253831162%2Fmysql%2Fc3b109b6-4dfa-11ed-a255-b8cef6b719e5%2Fdata%2Fautomatic-delete%2F2022-10-17%2Fautomatic%2Fxtrabackup%2Fbk_304_104771349%2Fcdb-lbxusyi7_backup_20221017170903.xb?q-sign-algorithm=sha1&q-ak=AKIDZaLp2ye3B2btue7KGwNYS5QcXBYdT2JJ&q-sign-time=1666093185%3B1666136385&q-key-time=1666093185%3B1666136385&q-header-list=host&q-url-param-list=&q-signature=3834f1e689b0948fc75e577327b958f6c0929612&response-content-disposition=attachment%3Bfilename%3D%22cdb81905_backup_20221017170903.xb%22&response-content-type=application%2Foctet-stream","InternetUrl":"https:\/\/mysql-lifecycle-backup-c5k5vcoj4rna8g19u56g-1256569818.cos.ap-singapore.myqcloud.com\/1253831162%2Fmysql%2Fc3b109b6-4dfa-11ed-a255-b8cef6b719e5%2Fdata%2Fautomatic-delete%2F2022-10-17%2Fautomatic%2Fxtrabackup%2Fbk_304_104771349%2Fcdb-lbxusyi7_backup_20221017170903.xb?q-sign-algorithm=sha1&q-ak=AKIDZaLp2ye3B2btue7KGwNYS5QcXBYdT2JJ&q-sign-time=1666093185%3B1666136385&q-key-time=1666093185%3B1666136385&q-header-list=host&q-url-param-list=&q-signature=3834f1e689b0948fc75e577327b958f6c0929612&response-content-disposition=attachment%3Bfilename%3D%22cdb81905_backup_20221017170903.xb%22&response-content-type=application%2Foctet-stream","Type":"physical","Size":3159583,"Date":"2022-10-17
-        17:09:08","StartTime":"2022-10-17 17:09:03","BackupId":104771349,"Status":"SUCCESS","FinishTime":"2022-10-17
-        17:09:13","Creator":"SYSTEM","Method":"full","Way":"automatic","ManualBackupName":"","SaveMode":"save_mode_regular","Region":"ap-singapore","RemoteInfo":[],"CosStorageType":0,"InstanceId":"cdb-lbxusyi7","Url":"https:\/\/mysql-lifecycle-backup-c5k5vcoj4rna8g19u56g-1256569818.cos.ap-singapore.myqcloud.com\/1253831162%2Fmysql%2Fc3b109b6-4dfa-11ed-a255-b8cef6b719e5%2Fdata%2Fautomatic-delete%2F2022-10-17%2Fautomatic%2Fxtrabackup%2Fbk_304_104771349%2Fcdb-lbxusyi7_backup_20221017170903.xb?q-sign-algorithm=sha1&q-ak=AKIDZaLp2ye3B2btue7KGwNYS5QcXBYdT2JJ&q-sign-time=1666093185%3B1666136385&q-key-time=1666093185%3B1666136385&q-header-list=host&q-url-param-list=&q-signature=3834f1e689b0948fc75e577327b958f6c0929612&response-content-disposition=attachment%3Bfilename%3D%22cdb81905_backup_20221017170903.xb%22&response-content-type=application%2Foctet-stream","Progress":0,"Deleted":0}],"RequestId":"c689da00-09d5-4a6e-8580-08917af9dd0c"}}'
+      string: '{"Response": {"Items": [{"BackupId": 104869326, "CosStorageType": 0,
+        "Creator": "SYSTEM", "Date": "2022-11-14 14:31:56", "Deleted": 0, "EncryptionFlag":
+        "off", "FinishTime": "2022-11-14 14:32:01", "InstanceId": "cdb-lzvnrseb",
+        "InternetUrl": "", "IntranetUrl": "", "ManualBackupName": "", "Method": "full",
+        "Name": "cdb82546_backup_20221114143151.xb", "Progress": 0, "Region": "ap-singapore",
+        "RemoteInfo": [], "SaveMode": "save_mode_regular", "Size": 3133712, "StartTime":
+        "2022-11-14 14:31:51", "Status": "SUCCESS", "Type": "physical", "Url": "",
+        "Way": "automatic"}], "RequestId": "d760ff4d-7206-468a-a221-9184eaeb9e91",
+        "TotalCount": 1}}'
     headers:
       Connection:
       - keep-alive
       Content-Length:
-      - '4902'
+      - '2519'
       Content-Type:
       - application/json
       Date:
-      - Tue, 18 Oct 2022 11:39:45 GMT
-      Server:
-      - nginx
-    status:
-      code: 200
-      message: OK
-- request:
-    body: '{"InstanceId": "cdb-pufymj1h"}'
-    headers:
-      Accept:
-      - '*/*'
-      Accept-Encoding:
-      - gzip, deflate
-      Connection:
-      - keep-alive
-      Content-Length:
-      - '30'
-      Content-Type:
-      - application/json
-      Host:
-      - cdb.ap-singapore.tencentcloudapi.com
-      User-Agent:
-      - python-requests/2.28.1
-      X-TC-Action:
-      - DescribeBackups
-      X-TC-Region:
-      - ap-singapore
-      X-TC-Version:
-      - '2017-03-20'
-    method: POST
-    uri: https://cdb.ap-singapore.tencentcloudapi.com/
-  response:
-    body:
-      string: '{"Response":{"TotalCount":2,"Items":[{"Name":"cdb81904_backup_20221018000042.xb","IntranetUrl":"https:\/\/mysql-lifecycle-backup-c5k5vcoj4rna8g19u56g-1256569818.cos.ap-singapore.myqcloud.com\/1253831162%2Fmysql%2Fc13367b4-4df7-11ed-a255-b8cef6b719e5%2Fdata%2Fautomatic-delete%2F2022-10-18%2Fautomatic%2Fxtrabackup%2Fbk_304_104771362%2Fcdb-pufymj1h_backup_20221018000042.xb?q-sign-algorithm=sha1&q-ak=AKIDZaLp2ye3B2btue7KGwNYS5QcXBYdT2JJ&q-sign-time=1666093186%3B1666136386&q-key-time=1666093186%3B1666136386&q-header-list=host&q-url-param-list=&q-signature=021c9c091293c00043b666e1d690d5288b71f3c7&response-content-disposition=attachment%3Bfilename%3D%22cdb81904_backup_20221018000042.xb%22&response-content-type=application%2Foctet-stream","InternetUrl":"https:\/\/mysql-lifecycle-backup-c5k5vcoj4rna8g19u56g-1256569818.cos.ap-singapore.myqcloud.com\/1253831162%2Fmysql%2Fc13367b4-4df7-11ed-a255-b8cef6b719e5%2Fdata%2Fautomatic-delete%2F2022-10-18%2Fautomatic%2Fxtrabackup%2Fbk_304_104771362%2Fcdb-pufymj1h_backup_20221018000042.xb?q-sign-algorithm=sha1&q-ak=AKIDZaLp2ye3B2btue7KGwNYS5QcXBYdT2JJ&q-sign-time=1666093186%3B1666136386&q-key-time=1666093186%3B1666136386&q-header-list=host&q-url-param-list=&q-signature=021c9c091293c00043b666e1d690d5288b71f3c7&response-content-disposition=attachment%3Bfilename%3D%22cdb81904_backup_20221018000042.xb%22&response-content-type=application%2Foctet-stream","Type":"physical","Size":932619,"Date":"2022-10-18
-        00:00:46","StartTime":"2022-10-18 00:00:42","BackupId":104771362,"Status":"SUCCESS","FinishTime":"2022-10-18
-        00:00:47","Creator":"SYSTEM","Method":"full","Way":"automatic","ManualBackupName":"","SaveMode":"save_mode_regular","Region":"ap-singapore","RemoteInfo":[],"CosStorageType":0,"InstanceId":"cdb-pufymj1h","Url":"https:\/\/mysql-lifecycle-backup-c5k5vcoj4rna8g19u56g-1256569818.cos.ap-singapore.myqcloud.com\/1253831162%2Fmysql%2Fc13367b4-4df7-11ed-a255-b8cef6b719e5%2Fdata%2Fautomatic-delete%2F2022-10-18%2Fautomatic%2Fxtrabackup%2Fbk_304_104771362%2Fcdb-pufymj1h_backup_20221018000042.xb?q-sign-algorithm=sha1&q-ak=AKIDZaLp2ye3B2btue7KGwNYS5QcXBYdT2JJ&q-sign-time=1666093186%3B1666136386&q-key-time=1666093186%3B1666136386&q-header-list=host&q-url-param-list=&q-signature=021c9c091293c00043b666e1d690d5288b71f3c7&response-content-disposition=attachment%3Bfilename%3D%22cdb81904_backup_20221018000042.xb%22&response-content-type=application%2Foctet-stream","Progress":0,"Deleted":0},{"Name":"cdb81904_backup_20221017164505.xb","IntranetUrl":"https:\/\/mysql-lifecycle-backup-c5k5vcoj4rna8g19u56g-1256569818.cos.ap-singapore.myqcloud.com\/1253831162%2Fmysql%2Fc13367b4-4df7-11ed-a255-b8cef6b719e5%2Fdata%2Fautomatic-delete%2F2022-10-17%2Fautomatic%2Fxtrabackup%2Fbk_304_104771348%2Fcdb-pufymj1h_backup_20221017164505.xb?q-sign-algorithm=sha1&q-ak=AKIDZaLp2ye3B2btue7KGwNYS5QcXBYdT2JJ&q-sign-time=1666093186%3B1666136386&q-key-time=1666093186%3B1666136386&q-header-list=host&q-url-param-list=&q-signature=b20bb75700b715764950733a679d513c06d529d2&response-content-disposition=attachment%3Bfilename%3D%22cdb81904_backup_20221017164505.xb%22&response-content-type=application%2Foctet-stream","InternetUrl":"https:\/\/mysql-lifecycle-backup-c5k5vcoj4rna8g19u56g-1256569818.cos.ap-singapore.myqcloud.com\/1253831162%2Fmysql%2Fc13367b4-4df7-11ed-a255-b8cef6b719e5%2Fdata%2Fautomatic-delete%2F2022-10-17%2Fautomatic%2Fxtrabackup%2Fbk_304_104771348%2Fcdb-pufymj1h_backup_20221017164505.xb?q-sign-algorithm=sha1&q-ak=AKIDZaLp2ye3B2btue7KGwNYS5QcXBYdT2JJ&q-sign-time=1666093186%3B1666136386&q-key-time=1666093186%3B1666136386&q-header-list=host&q-url-param-list=&q-signature=b20bb75700b715764950733a679d513c06d529d2&response-content-disposition=attachment%3Bfilename%3D%22cdb81904_backup_20221017164505.xb%22&response-content-type=application%2Foctet-stream","Type":"physical","Size":937535,"Date":"2022-10-17
-        16:45:15","StartTime":"2022-10-17 16:45:11","BackupId":104771348,"Status":"SUCCESS","FinishTime":"2022-10-17
-        16:45:16","Creator":"SYSTEM","Method":"full","Way":"automatic","ManualBackupName":"","SaveMode":"save_mode_regular","Region":"ap-singapore","RemoteInfo":[],"CosStorageType":0,"InstanceId":"cdb-pufymj1h","Url":"https:\/\/mysql-lifecycle-backup-c5k5vcoj4rna8g19u56g-1256569818.cos.ap-singapore.myqcloud.com\/1253831162%2Fmysql%2Fc13367b4-4df7-11ed-a255-b8cef6b719e5%2Fdata%2Fautomatic-delete%2F2022-10-17%2Fautomatic%2Fxtrabackup%2Fbk_304_104771348%2Fcdb-pufymj1h_backup_20221017164505.xb?q-sign-algorithm=sha1&q-ak=AKIDZaLp2ye3B2btue7KGwNYS5QcXBYdT2JJ&q-sign-time=1666093186%3B1666136386&q-key-time=1666093186%3B1666136386&q-header-list=host&q-url-param-list=&q-signature=b20bb75700b715764950733a679d513c06d529d2&response-content-disposition=attachment%3Bfilename%3D%22cdb81904_backup_20221017164505.xb%22&response-content-type=application%2Foctet-stream","Progress":0,"Deleted":0}],"RequestId":"eaea8618-33d4-461e-97f9-c6253992b743"}}'
-    headers:
-      Connection:
-      - keep-alive
-      Content-Length:
-      - '4900'
-      Content-Type:
-      - application/json
-      Date:
-      - Tue, 18 Oct 2022 11:39:46 GMT
+      - Mon, 14 Nov 2022 08:50:00 GMT
       Server:
       - nginx
     status:

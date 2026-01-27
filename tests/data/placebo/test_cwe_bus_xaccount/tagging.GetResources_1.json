@@ -4,7 +4,16 @@
         "PaginationToken": "",
         "ResourceTagMappingList": [
             {
-                "ResourceARN": "arn:aws:events:us-east-1:644160558196:event-bus/chat-messages",
+                "ResourceARN": "arn:aws:events:us-west-1:644160558196:event-bus/default",
+                "Tags": [
+                    {
+                        "Key": "environment",
+                        "Value": "staging"
+                    }
+                ]
+            },
+            {
+                "ResourceARN": "arn:aws:events:us-west-1:644160558196:event-bus/my-event-bus",
                 "Tags": [
                     {
                         "Key": "Env",

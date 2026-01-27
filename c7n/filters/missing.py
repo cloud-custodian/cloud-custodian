@@ -14,6 +14,24 @@ class Missing(Filter):
     Intended for use at a logical account/subscription/project level
 
     This works as an effectively an embedded policy thats evaluated.
+
+    :example:
+
+    Notify if an s3 bucket is missing
+
+    .. code-block:: yaml
+
+            policies:
+              - name: missing-s3-bucket
+                resource: account
+                filters:
+                  - type: missing
+                    policy:
+                      resource: s3
+                      filters:
+                        - Name: my-bucket
+                actions:
+                  - notify
     """
     schema = type_schema(
         'missing',

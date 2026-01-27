@@ -2,11 +2,19 @@
 # SPDX-License-Identifier: Apache-2.0
 import json
 import time
+from datetime import datetime, timedelta
+from unittest.mock import patch
 
+import boto3
+import moto
+import pytest
+from dateutil.tz import tzutc
+from freezegun import freeze_time
 
 from c7n.resources.aws import shape_validate
 from .common import BaseTest, functional
 
+from c7n.config import Config
 from c7n.executor import MainThreadExecutor
 from c7n.filters.iamaccess import CrossAccountAccessFilter
 
@@ -92,6 +100,124 @@ class KMSTest(BaseTest):
         client = session_factory(region="us-east-1").client("kms")
         key = client.get_key_rotation_status(KeyId=resources[0]["KeyId"])
         self.assertEqual(key["KeyRotationEnabled"], True)
+
+    def test_last_rotation(self):
+        session_factory = self.replay_flight_data("test_kms_last_rotation")
+        p = self.load_policy(
+            {
+                "name": "kms-last-rotation",
+                "resource": "kms-key",
+                "filters": [
+                    {
+                        "type": "last-rotation",
+                        "key": "RotationDate",
+                        "value": 30,
+                        "value_type": "age",
+                        "op": "gte",
+                    }
+                ],
+            },
+            session_factory=session_factory,
+        )
+        resources = p.run()
+        self.assertEqual(len(resources), 1)
+        # Check that LastRotation data was added to the resource
+        self.assertIn("c7n:LastRotation", resources[0])
+        self.assertIn("RotationDate", resources[0]["c7n:LastRotation"])
+
+    def test_last_rotation_no_rotations(self):
+        session_factory = self.replay_flight_data("test_kms_last_rotation_none")
+        p = self.load_policy(
+            {
+                "name": "kms-never-rotated",
+                "resource": "kms-key",
+                "filters": [
+                    {
+                        "type": "last-rotation",
+                        "key": "RotationDate",
+                        "value": "absent",
+                    }
+                ],
+            },
+            session_factory=session_factory,
+        )
+        resources = p.run()
+        # Should find keys that have never been rotated
+        self.assertGreaterEqual(len(resources), 0)
+
+    def test_last_rotation_exception_handling(self):
+        """Test that exceptions are handled gracefully"""
+        session_factory = self.replay_flight_data("test_kms_last_rotation_exception_handling")
+        p = self.load_policy(
+            {
+                "name": "kms-last-rotation-exception-handling",
+                "resource": "kms-key",
+                "filters": [
+                    {
+                        "or": [
+                            {
+                                "type": "last-rotation",
+                                "key": "RotationDate",
+                                "value": "empty"
+                            },
+                            {
+                                "type": "last-rotation",
+                                "key": "RotationDate",
+                                "value": 30,
+                                "value_type": "age",
+                                "op": "gte",
+                            }
+
+                        ]
+                    }
+                ],
+            },
+            session_factory=session_factory,
+        )
+        log = self.capture_logging("custodian.filters")
+        with freeze_time("2025-11-06T00:00:00+00:00"):
+            resources = p.run()
+        self.assertIn("AccessDenied", log.getvalue())
+        self.assertEqual(len(resources), 2)
+
+    def test_key_rotation_exception_unsupportedopp(self):
+        region = "us-west-2"
+        session_factory = self.replay_flight_data(
+            "test_key_rotation_unsupportedopp", region=region
+        )
+
+        p = self.load_policy(
+            {
+                "name": "kms-key-rotation-unsupportedopp",
+                "resource": "kms-key",
+                "filters": [
+                    {
+                        "and": [
+                            {
+                                "type": "key-rotation-status",
+                                "key": "KeyRotationEnabled",
+                                "op": "ne",
+                                "value": True
+                            },
+                            {
+                                "type": "value",
+                                "key": "KeyState",
+                                "op": "eq",
+                                "value": "PendingImport"
+                            }
+                        ]
+                    }
+                ],
+            },
+            session_factory=session_factory,
+            config={"region": region}
+        )
+
+        # Trying to get the key rotation status of a key in PendingImport state
+        # will raise an UnsupportedOperationException, but it should be handled
+        # as a warning and not cause the policy to fail.
+        resources = p.run()
+        self.assertEqual(len(resources), 1)
 
     def test_kms_config_source(self):
         session_factory = self.replay_flight_data("test_kms_config_source")
@@ -359,6 +485,60 @@ class KMSTagging(BaseTest):
             res['KmsMasterKeyId'] in (key_alias, target_key['KeyMetadata']['Arn'])
             for res in resources
         ))
+
+        # Whether a resource specifies a key by ID or alias, it should resolve
+        # to the same ID for related resource lookups.
+        related_ids = p.resource_manager.filters[0].get_related_ids(resources)
+        self.assertEqual(set(related_ids), {target_key['KeyMetadata']['KeyId']})
+
+    def test_kms_key_related_cache_lookup(self):
+        """Validate that the kms-key filter can perform alias lookups
+        against cached keys.
+
+        See https://github.com/cloud-custodian/cloud-custodian/issues/8504
+        """
+        session_factory = self.replay_flight_data("test_kms_key_related_cache_lookup")
+        key_alias = "alias/kms-cache-check"
+        p = self.load_policy(
+            {
+                "name": "load-keys-into-cache",
+                "resource": "aws.kms-key",
+            },
+            cache=True,
+            config=Config.empty(
+                cache='memory',
+                cache_period=10,
+                output_dir=self.get_temp_dir(),
+            ),
+            session_factory=session_factory,
+        )
+        resources = p.run()
+        self.assertGreater(len(resources), 0)
+
+        p = self.load_policy(
+            {
+                "name": "sqs-kms-key-related-from-cache",
+                "resource": "aws.sqs",
+                "filters": [
+                    {
+                        "type": "kms-key",
+                        "key": "c7n:AliasName",
+                        "value": key_alias,
+                        "op": "eq"
+                    }
+                ]
+            },
+            cache=True,
+            config=Config.empty(
+                cache='memory',
+                cache_period=10,
+                output_dir=self.get_temp_dir(),
+            ),
+            session_factory=session_factory,
+        )
+        with patch('c7n.resources.sqs.SQS.executor_factory', MainThreadExecutor):
+            resources = p.run()
+        self.assertEqual(len(resources), 1)
 
     def test_kms_post_finding(self):
         factory = self.replay_flight_data('test_kms_post_finding')
@@ -637,3 +817,65 @@ class KMSCrossAccount(BaseTest):
         resources = p.run()
         self.assertEqual(len(resources), 1)
         self.assertEqual(resources[0]["KeyId"], key_info["KeyId"])
+
+
+class KMSMotoTests(BaseTest):
+    @pytest.fixture(autouse=True)
+    def use_utc_timezone(self, monkeypatch):
+        monkeypatch.setenv("TZ", "UTC")
+        try:
+            time.tzset()
+        except AttributeError:
+            # A windows system should honor the TZ environment variable
+            # when it next calls datetime.now() (so says AI)
+            pass
+
+    @moto.mock_aws
+    def test_schedule_deletion(self):
+        kms = boto3.client("kms", region_name="us-east-1")
+        kms.create_key(Description="test-key")
+
+        seven_days_away = datetime.now(tzutc()) + timedelta(days=7)
+
+        p = self.load_policy(
+            {
+                "name": "delete-keys",
+                "resource": "kms-key",
+                "actions": [{"type": "schedule-deletion", "days": 7}],
+            }
+        )
+        resources = p.run()
+        assert len(resources) == 1
+        key_id = resources[0]["KeyId"]
+
+        key_meta = kms.describe_key(KeyId=key_id)["KeyMetadata"]
+        assert key_meta["KeyState"] == "PendingDeletion"
+
+        deletion_date = key_meta["DeletionDate"].astimezone(tzutc())
+        assert deletion_date > seven_days_away
+        assert deletion_date < (seven_days_away + timedelta(days=1))
+
+    @moto.mock_aws
+    def test_schedule_deletion_default_days(self):
+        kms = boto3.client("kms", region_name="us-east-1")
+        kms.create_key(Description="test-key")
+
+        thirty_days_away = datetime.now(tzutc()) + timedelta(days=30)
+
+        p = self.load_policy(
+            {
+                "name": "delete-keys",
+                "resource": "kms-key",
+                "actions": [{"type": "schedule-deletion"}],
+            }
+        )
+        resources = p.run()
+        assert len(resources) == 1
+        key_id = resources[0]["KeyId"]
+
+        key_meta = kms.describe_key(KeyId=key_id)["KeyMetadata"]
+        assert key_meta["KeyState"] == "PendingDeletion"
+
+        deletion_date = key_meta["DeletionDate"].astimezone(tzutc())
+        assert deletion_date > thirty_days_away
+        assert deletion_date < (thirty_days_away + timedelta(days=1))

@@ -5,13 +5,13 @@ from c7n_kube.query import QueryResourceManager, TypeInfo
 from c7n_kube.provider import resources
 
 
-@resources.register('deployment')
+@resources.register("deployment")
 class Deployment(QueryResourceManager):
-
     class resource_type(TypeInfo):
-        group = 'Apps'
-        version = 'V1'
-        patch = 'patch_namespaced_deployment'
-        delete = 'delete_namespaced_deployment'
-        enum_spec = ('list_deployment_for_all_namespaces', 'items', None)
-        plural = 'deployments'
+        group = "Apps"
+        canonical_group = "apps"
+        version = "V1"
+        patch = "patch_namespaced_deployment"
+        delete = "delete_namespaced_deployment"
+        enum_spec = ("list_deployment_for_all_namespaces", "items", None)
+        plural = "deployments"

@@ -2,17 +2,17 @@
 # SPDX-License-Identifier: Apache-2.0
 import logging
 import unittest
+from unittest import mock
 import time
 
 import datetime
 from dateutil import tz
-import jmespath
-from mock import mock
+
 
 from c7n.testing import mock_datetime_now
 from c7n.exceptions import PolicyValidationError, ClientError
 from c7n.resources import ec2
-from c7n.resources.ec2 import actions, QueryFilter
+from c7n.resources.ec2 import actions, EC2QueryParser
 from c7n import tags, utils
 
 from .common import BaseTest
@@ -21,6 +21,8 @@ import pytest
 from pytest_terraform import terraform
 
 
+# this one doesn't work as a functional test as it enables stop protection, which prevents
+# the terraform teardown, we would need to also remove the stop protection in the test.
 @terraform('ec2_stop_protection_enabled')
 def test_ec2_stop_protection_enabled(test, ec2_stop_protection_enabled):
     aws_region = 'us-east-1'
@@ -63,6 +65,7 @@ def test_ec2_stop_protection_enabled(test, ec2_stop_protection_enabled):
     )
 
 
+@pytest.mark.audited
 @terraform('ec2_stop_protection_disabled')
 def test_ec2_stop_protection_disabled(test, ec2_stop_protection_disabled):
     aws_region = 'us-east-1'
@@ -169,7 +172,7 @@ class TestEc2NetworkLocation(BaseTest):
         client = factory().client('ec2')
         resp = client.describe_instances()
 
-        self.assertTrue(len(resp['Reservations'][0]['Instances']), 1)
+        self.assertEqual(len(resp['Reservations'][0]['Instances']), 1)
         self.assertTrue(
             len(resp['Reservations'][0]['Instances'][0]['State']['Name']),
             'terminated'
@@ -290,6 +293,54 @@ class TestMetricFilter(BaseTest):
                         "name": "CPUUtilization",
                         "days": 3,
                         "value": 1.5,
+                    }
+                ],
+            },
+            session_factory=session_factory,
+        )
+        resources = policy.run()
+        self.assertEqual(len(resources), 1)
+
+    def test_metric_filter_extended_stats(self):
+        session_factory = self.replay_flight_data(
+            "test_ec2_metric_extended_stats",
+            region="us-east-2"
+        )
+        policy = self.load_policy(
+            {
+                "name": "ec2-utilization-p95",
+                "resource": "aws.ec2",
+                "filters": [
+                    {
+                        "type": "metrics",
+                        "name": "CPUUtilization",
+                        "days": 7,
+                        "value": 10,
+                        "op": "less-than",
+                        "statistics": "p95",
+                    }
+                ],
+            },
+            session_factory=session_factory,
+            config={"region": "us-east-2"},
+        )
+        resources = policy.run()
+        self.assertEqual(len(resources), 1)
+
+    def test_metric_filter_multiple_datapoints(self):
+        session_factory = self.replay_flight_data("test_metric_filter_multiple_datapoints")
+        policy = self.load_policy(
+            {
+                "name": "ec2-utilization-per-day",
+                "resource": "ec2",
+                "filters": [
+                    {
+                        "type": "metrics",
+                        "name": "CPUUtilization",
+                        "days": 3,
+                        "period": 86400,
+                        "value": 1,
+                        "op": "lte"
                     }
                 ],
             },
@@ -455,6 +506,34 @@ class TestSsm(BaseTest):
             [r['InstanceId'] for r in resources],
             ['i-0dea82d960d56dc1d', 'i-0ba3874e85bb97244'])
 
+    def test_ssm_inventory(self):
+        session_factory = self.replay_flight_data("test_ec2_ssm_inventory_filter")
+        p = self.load_policy(
+            {
+                "name": "ec2-find-specific-package",
+                "resource": "ec2",
+                "filters": [
+                    {
+                        "type": "ssm-inventory",
+                        "query": [
+                            {
+                                "Key": "Name",
+                                "Values": [
+                                    "docker"
+                                ],
+                                "Type": "Equal"
+                            }
+                        ]
+                    }
+                ]
+            },
+            session_factory=session_factory,
+        )
+        resources = p.run()
+        self.assertEqual(len(resources), 1)
+        self.assertTrue('c7n:SSM-Inventory' in resources[0])
+        self.assertEqual(resources[0]['InstanceId'], 'i-069d5df3524c95b06')
+
 
 class TestHealthEventsFilter(BaseTest):
 
@@ -562,6 +641,25 @@ class TestVolumeFilter(BaseTest):
 
 
 class TestResizeInstance(BaseTest):
+
+    def test_ec2_resize_cost_hub(self):
+        factory = self.replay_flight_data("test_ec2_costhub_resize", region="us-east-2")
+        policy = self.load_policy(
+            {"name": "ec2-hub-resize",
+             "resource": "ec2",
+             "filters": ["cost-optimization"],
+             "actions": ["resize"]},
+            config={"region": "us-east-2"},
+            session_factory=factory
+        )
+
+        client = factory().client('ec2', region_name='us-east-2')
+        resources = policy.run()
+        assert len(resources) == 1
+        instances = utils.query_instances(
+            None, client=client, InstanceIds=[r["InstanceId"] for r in resources]
+        )
+        assert resources[0]["InstanceType"] != instances[0]["InstanceType"]
 
     def test_ec2_resize(self):
         # preconditions - three instances (2 m4.4xlarge, 1 m4.1xlarge)
@@ -1043,6 +1141,25 @@ class TestTag(BaseTest):
         self.assertEqual(len(resources), 1)
         self.assertEqual(resources[0]["InstanceId"], "i-098dae2615acb5809")
 
+    def test_ec2_multiple_mark_for_op_tags(self):
+        session_factory = self.replay_flight_data("test_ec2_multiple_mark_for_op_tags")
+        policy = self.load_policy(
+            {
+                "name": "ec2-mark-for-op-tags",
+                "resource": "ec2",
+                "filters": [
+                    {
+                        "type": "marked-for-op",
+                        "tag": "c7n-tag-compliance",
+                        "op": "terminate"
+                    }
+                ],
+            },
+            session_factory=session_factory,
+        )
+        resources = policy.run()
+        self.assertEqual(len(resources), 3)
+
 
 class TestStop(BaseTest):
 
@@ -1095,6 +1212,91 @@ class TestStop(BaseTest):
 
         self.assertEqual(len(stopped), 1)
         self.assertEqual(len(hibernated), 1)
+
+    def test_ec2_stop_with_protection_enabled(self):
+        # Test conditions: single running instance, with stop protection
+        session_factory = self.replay_flight_data("test_ec2_stop_with_protection_enabled")
+        policy = self.load_policy(
+            {
+                "name": "ec2-test-stop-with-protection-enabled",
+                "resource": "ec2",
+                "filters": [{"InstanceId": "i-000b2f5125402eb55"}],
+                "actions": [{"type": "stop", "force": True}],
+            },
+            session_factory=session_factory,
+        )
+        resources = policy.run()
+        self.assertEqual(len(resources), 1)
+
+        perms = policy.get_permissions()
+        self.assertTrue("ec2:ModifyInstanceAttribute" in perms)
+
+        instances = utils.query_instances(
+            session_factory(), InstanceIds=["i-000b2f5125402eb55"]
+        )
+        self.assertEqual(instances[0]["State"]["Name"], "stopped")
+
+    def test_ec2_stop_with_protection_enabled_handle_error(self):
+        policy = self.load_policy(
+            {
+                "name": "ec2-test-stop-with-protection-enabled",
+                "resource": "ec2",
+                "filters": [{"InstanceId": "i-000b2f5125402eb55"}],
+                "actions": [{"type": "stop", "force": True}],
+            }
+        )
+
+        stop_action = policy.resource_manager.actions[0]
+
+        client = mock.MagicMock()
+        client.modify_instance_attribute.side_effect = ClientError(
+            {'Error': {
+                'Code': 'IncorrectInstanceState',
+                'Message': ("The instance 'i-000b2f5125402eb55' must be in a "
+                            "'running', 'pending', 'stopping' or "
+                            "'stopped' state for this operation")
+            }}, 'ModifyInstanceAttribute')
+
+        self.assertEqual(
+            None,
+            stop_action.disable_protection(client, 'stop', [{'InstanceId': 'i-foo'}]),
+        )
+
+        client2 = mock.MagicMock()
+        client2.modify_instance_attribute.side_effect = ClientError(
+            {'Error': {
+                'Code': 'UnauthorizedOperation',
+                'Message': "You are not authorized to perform this operation."
+            }}, 'ModifyInstanceAttribute')
+
+        self.assertRaises(
+            ClientError,
+            stop_action.disable_protection,
+            client2, 'stop', [{'InstanceId': 'i-foo'}],
+        )
+
+    def test_ec2_stop_with_protection_enabled_ephemeral(self):
+        # Test conditions: single running instance (ephemeral), with stop protection
+        session_factory = self.replay_flight_data("test_ec2_stop_with_protection_enabled_ephemeral")
+        policy = self.load_policy(
+            {
+                "name": "ec2-test-stop-with-protection-enabled-ephemeral",
+                "resource": "ec2",
+                "filters": [{"InstanceId": "i-0a3e363a5366795dd"}],
+                "actions": [{"type": "stop", "terminate-ephemeral": True, "force": True}],
+            },
+            session_factory=session_factory,
+        )
+        resources = policy.run()
+        self.assertEqual(len(resources), 1)
+
+        perms = policy.get_permissions()
+        self.assertTrue("ec2:ModifyInstanceAttribute" in perms)
+
+        instances = utils.query_instances(
+            session_factory(), InstanceIds=["i-0a3e363a5366795dd"]
+        )
+        self.assertEqual(instances[0]["State"]["Name"], "terminated")
 
 
 class TestReboot(BaseTest):
@@ -1355,6 +1557,7 @@ class TestSnapshot(BaseTest):
         rtags['test-tag'] = 'custodian'
         for s in snaps:
             self.assertEqual(rtags, {t['Key']: t['Value'] for t in s['Tags']})
+            self.assertEqual(s['Description'], "Snapshot Created for i-063c6794763254b51 (Foo)")
 
 
 class TestSetInstanceProfile(BaseTest):
@@ -1463,20 +1666,58 @@ class TestSetInstanceProfile(BaseTest):
             self.assertIn(a["State"], ("disassociating", "disassociated"))
 
 
-class TestEC2QueryFilter(unittest.TestCase):
+class TestEC2QueryParser(unittest.TestCase):
 
-    def test_parse(self):
-        self.assertEqual(QueryFilter.parse([]), [])
-        x = QueryFilter.parse([{"instance-state-name": "running"}])
+    def test_query(self):
+        self.assertEqual(EC2QueryParser.parse([]), [])
+        x = EC2QueryParser.parse([{"instance-state-name": "running"}])
         self.assertEqual(
-            x[0].query(), {"Name": "instance-state-name", "Values": ["running"]}
+            x[0]['Filters'][0], {"Name": "instance-state-name", "Values": ["running"]}
         )
+        query = [
+            {'Filters':
+                    [
+                        {'Name': 'tag:Name', 'Values': ['Instance1']},
+                        {'Name': 'instance-state-name', 'Values': ['running']}
+                    ]
+            },
+            {'InstanceIds': ['i-123abc', 'i-abc123']},
+            {'MaxResults': 1000},
+        ]
 
-        self.assertTrue(
-            isinstance(QueryFilter.parse([{"tag:ASV": "REALTIMEMSG"}])[0], QueryFilter)
-        )
+        self.assertEqual(EC2QueryParser.parse(query), query)
 
-        self.assertRaises(PolicyValidationError, QueryFilter.parse, [{"tag:ASV": None}])
+        self.assertEqual(
+            EC2QueryParser.parse([{"tag:ASV": "REALTIMEMSG"}]), [
+                {"Filters": [{"Name": "tag:ASV", "Values": ["REALTIMEMSG"]}]}])
+
+        self.assertEqual(
+            EC2QueryParser.parse([{"tag:Test": "Value1"}, {"tag:Test": "Value2"}]),
+                [{"Filters": [{"Name": "tag:Test", "Values": ["Value1", "Value2"]}]}])
+
+    def test_invalid_query(self):
+        self.assertRaises(PolicyValidationError, EC2QueryParser.parse, [{"tag:ASV": None}])
+
+        self.assertRaises(
+            PolicyValidationError, EC2QueryParser.parse, [
+                {'Filters': [{'instance-state-name': 'running'}]}])
+
+        self.assertRaises(PolicyValidationError, EC2QueryParser.parse, [{'InstanceIds': None}])
+
+        self.assertRaises(PolicyValidationError, EC2QueryParser.parse, [{'InstanceIds': [1]}])
+
+        self.assertRaises(PolicyValidationError, EC2QueryParser.parse,
+                          [{'Filters': [{'Name': 'architecture', 'Values': ['gothic']}]}])
+
+        self.assertRaises(PolicyValidationError, EC2QueryParser.parse, [{"tag:ASV": None}])
+
+        self.assertRaises(PolicyValidationError, EC2QueryParser.parse,
+                          [{'Filters': [{'Name': 'instance-group-name', 'Values': [False]}]}])
+
+        self.assertRaises(PolicyValidationError, EC2QueryParser.parse, [{'MaxResults': '1000'}])
+
+        self.assertRaises(PolicyValidationError, EC2QueryParser.parse,
+                          [{'Filters': {'Name': 'instance-group-name', 'Values': ["Value1"]}}])
 
 
 class TestTerminate(BaseTest):
@@ -1950,10 +2191,33 @@ class TestModifySecurityGroupAction(BaseTest):
         if self.recording:
             time.sleep(3)
         self.assertEqual(
-            jmespath.search(
+            utils.jmespath_search(
                 "Reservations[].Instances[].SecurityGroups[].GroupName",
                 client.describe_instances(InstanceIds=["i-094207d64930768dc"])),
             ["launch-wizard-2"])
+
+    def test_ec2_add_by_tag(self):
+        session_factory = self.replay_flight_data("test_ec2_add_by_tag")
+        policy = self.load_policy({
+            "name": "add-remove-sg-with-name",
+            "resource": "ec2",
+            "query": [
+                {'instance-id': "i-08797f38d2e80c9d0"}],
+            "actions": [
+                {"type": "modify-security-groups",
+                 "add-by-tag": {
+                      "key": "environment",
+                      "values": ["production"]}}]},
+            session_factory=session_factory, config={'region': 'us-west-2'}
+        )
+        resources = policy.run()
+        self.assertEqual(len(resources), 1)
+        client = session_factory().client('ec2')
+        self.assertEqual(
+            utils.jmespath_search(
+                "Reservations[].Instances[].SecurityGroups[].GroupId",
+                client.describe_instances(InstanceIds=["i-08797f38d2e80c9d0"])),
+            ['sg-0cba7a01d343d5c65', 'sg-02e14ba7dd2dbe44b', 'sg-0e630ac9094eff5c5'])
 
 
 class TestAutoRecoverAlarmAction(BaseTest):
@@ -2057,6 +2321,10 @@ class TestLaunchTemplate(BaseTest):
         resources = p.resource_manager.get_resources([
             'lt-00b3b2755218e3fdd'])
         self.assertEqual(len(resources), 4)
+        self.assertIn(
+            'arn:aws:ec2:us-east-1:644160558196:launch-template/lt-00b3b2755218e3fdd/4',
+            p.resource_manager.get_arns(resources)
+        )
 
     def test_launch_template_versions(self):
         factory = self.replay_flight_data('test_launch_template_query')
@@ -2223,3 +2491,41 @@ class TestSpotFleetRequest(BaseTest):
         sfrs = client.describe_spot_fleet_requests(
         )["SpotFleetRequestConfigs"]
         self.assertEqual(len(sfrs), 3)
+
+
+class TestEc2HasSpecificManagedPolicyFilter(BaseTest):
+
+    def test_ec2_has_specific_managed_policy_filter(self):
+        factory = self.replay_flight_data("test_ec2_has_specific_managed_policy")
+        p = self.load_policy(
+            {
+                "name": "ec2-instance-has-admin-policy",
+                "resource": "ec2",
+                "filters": [
+                    {
+                        "type": "has-specific-managed-policy",
+                        "value": "admin-policy",
+                    }
+                ],
+            },
+            config={"region": "us-west-2"},
+            session_factory=factory,
+        )
+        resources = p.run()
+        self.assertEqual(len(resources), 1)
+
+
+class TestCapacityReservation(BaseTest):
+
+    def test_capacity_reservation_query(self):
+        factory = self.replay_flight_data('test_ec2_capacity_reservation_query')
+        p = self.load_policy(
+                {
+                    'name': 'list-ec2-capacity-reservation',
+                    'resource': 'aws.ec2-capacity-reservation'
+                },
+                session_factory=factory,
+                config={'region': 'ap-southeast-1'}
+            )
+        resources = p.run()
+        self.assertEqual(len(resources), 2)

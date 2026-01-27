@@ -3,7 +3,6 @@
 from c7n.manager import resources
 from c7n.query import QueryResourceManager, TypeInfo
 from c7n.tags import Tag, RemoveTag
-from c7n.utils import get_partition
 
 
 @resources.register('dlm-policy')
@@ -17,7 +16,8 @@ class DLMPolicy(QueryResourceManager):
         detail_spec = ('get_lifecycle_policy', 'PolicyId', 'PolicyId', 'Policy')
         filter_name = 'PolicyIds'
         filter_type = 'list'
-        arn = True
+        arn = 'PolicyArn'
+        arn_type = 'policy'
         cfn_type = 'AWS::DLM::LifecyclePolicy'
         # arn:aws:dlm:us-east-1:532725030595:policy/policy-0e23a047d0fdb7761
 
@@ -26,13 +26,6 @@ class DLMPolicy(QueryResourceManager):
         for r in resources:
             r['Tags'] = [{'Key': k, 'Value': v} for k, v in r.get('Tags', {}).items()]
         return resources
-
-    def get_arns(self, resources):
-        partition = get_partition(self.region)
-        return [
-            f"arn:{partition}:dlm:{self.region}:{self.account_id}:policy/{r['PolicyId']}"
-            for r in resources
-        ]
 
 
 @DLMPolicy.action_registry.register('tag')

@@ -1,0 +1,172 @@
+{
+    "status_code": 200,
+    "data": {
+        "HyperParameterTuningJobName": "c7n-test",
+        "HyperParameterTuningJobArn": "arn:aws:sagemaker:us-east-1:644160558196:hyper-parameter-tuning-job/c7n-test",
+        "HyperParameterTuningJobConfig": {
+            "Strategy": "Bayesian",
+            "ResourceLimits": {
+                "MaxNumberOfTrainingJobs": 2,
+                "MaxParallelTrainingJobs": 2
+            }
+        },
+        "TrainingJobDefinitions": [
+            {
+                "DefinitionName": "c7n-test-definition",
+                "TuningObjective": {
+                    "Type": "Minimize",
+                    "MetricName": "test:msd"
+                },
+                "HyperParameterRanges": {
+                    "IntegerParameterRanges": [
+                        {
+                            "Name": "mini_batch_size",
+                            "MinValue": "2",
+                            "MaxValue": "3",
+                            "ScalingType": "Linear"
+                        }
+                    ],
+                    "ContinuousParameterRanges": [],
+                    "CategoricalParameterRanges": [
+                        {
+                            "Name": "init_method",
+                            "Values": [
+                                "random",
+                                "kmeans++"
+                            ]
+                        }
+                    ]
+                },
+                "StaticHyperParameters": {
+                    "_tuning_objective_metric": "test:msd",
+                    "eval_metrics": "[\"msd\"]",
+                    "feature_dim": "2",
+                    "half_life_time_size": "0",
+                    "k": "2",
+                    "local_lloyd_init_method": "kmeans++",
+                    "local_lloyd_max_iter": "300",
+                    "local_lloyd_num_trials": "auto",
+                    "local_lloyd_tol": "0.0001"
+                },
+                "AlgorithmSpecification": {
+                    "TrainingImage": "644160558196.dkr.ecr.us-east-1.amazonaws.com/kmeans:1",
+                    "TrainingInputMode": "File",
+                    "MetricDefinitions": [
+                        {
+                            "Name": "train:progress",
+                            "Regex": "#progress_metric: host=\\S+, completed (\\S+) %"
+                        },
+                        {
+                            "Name": "test:msd",
+                            "Regex": "#quality_metric: host=\\S+, test msd <loss>=(\\S+)"
+                        },
+                        {
+                            "Name": "train:msd",
+                            "Regex": "#quality_metric: host=\\S+, train msd <loss>=(\\S+)"
+                        },
+                        {
+                            "Name": "train:throughput",
+                            "Regex": "#throughput_metric: host=\\S+, train throughput=(\\S+) records/second"
+                        },
+                        {
+                            "Name": "test:ssd",
+                            "Regex": "#quality_metric: host=\\S+, test ssd <loss>=(\\S+)"
+                        },
+                        {
+                            "Name": "ObjectiveMetric",
+                            "Regex": "#quality_metric: host=\\S+, test msd <loss>=(\\S+)"
+                        }
+                    ]
+                },
+                "RoleArn": "arn:aws:iam::644160558196:role/service-role/AmazonSageMakerServiceCatalogProductsUseRole",
+                "InputDataConfig": [
+                    {
+                        "ChannelName": "train",
+                        "DataSource": {
+                            "S3DataSource": {
+                                "S3DataType": "S3Prefix",
+                                "S3Uri": "s3://c7n-test-s3-bucket/input",
+                                "S3DataDistributionType": "FullyReplicated"
+                            }
+                        },
+                        "CompressionType": "None",
+                        "RecordWrapperType": "None"
+                    }
+                ],
+                "VpcConfig": {
+                    "SecurityGroupIds": [
+                        "sg-03c0b84cdad91744f"
+                    ],
+                    "Subnets": [
+                        "subnet-0bd18cd4df2d0d3b9"
+                    ]
+                },
+                "OutputDataConfig": {
+                    "S3OutputPath": "s3://c7n-test-s3-bucket/output"
+                },
+                "ResourceConfig": {
+                    "InstanceType": "ml.m4.xlarge",
+                    "InstanceCount": 1,
+                    "VolumeSizeInGB": 1
+                },
+                "StoppingCondition": {
+                    "MaxRuntimeInSeconds": 86400
+                },
+                "EnableNetworkIsolation": false,
+                "EnableInterContainerTrafficEncryption": false,
+                "EnableManagedSpotTraining": false
+            }
+        ],
+        "HyperParameterTuningJobStatus": "Failed",
+        "CreationTime": {
+            "__class__": "datetime",
+            "year": 2024,
+            "month": 4,
+            "day": 6,
+            "hour": 14,
+            "minute": 22,
+            "second": 8,
+            "microsecond": 179000
+        },
+        "HyperParameterTuningEndTime": {
+            "__class__": "datetime",
+            "year": 2024,
+            "month": 4,
+            "day": 6,
+            "hour": 14,
+            "minute": 22,
+            "second": 22,
+            "microsecond": 341000
+        },
+        "LastModifiedTime": {
+            "__class__": "datetime",
+            "year": 2024,
+            "month": 4,
+            "day": 6,
+            "hour": 14,
+            "minute": 22,
+            "second": 22,
+            "microsecond": 341000
+        },
+        "TrainingJobStatusCounters": {
+            "Completed": 0,
+            "InProgress": 0,
+            "RetryableError": 0,
+            "NonRetryableError": 2,
+            "Stopped": 0
+        },
+        "ObjectiveStatusCounters": {
+            "Succeeded": 0,
+            "Pending": 0,
+            "Failed": 2
+        },
+        "FailureReason": "All training jobs failed. Please take a look at the training jobs failures to get more details.",
+        "TuningJobCompletionDetails": {
+            "NumberOfTrainingJobsObjectiveNotImproving": 0
+        },
+        "ConsumedResources": {
+            "RuntimeInSeconds": 11
+        },
+        "ResponseMetadata": {}
+    }
+}

@@ -23,6 +23,21 @@ class CodeArtifact(BaseTest):
             time.sleep(3)
         assert factory().client('codeartifact').list_domains().get('domains') == []
 
+    def test_artifact_domain_cross_account(self):
+        factory = self.replay_flight_data('test_artifact_domain_cross_account', region='us-east-2')
+        p = self.load_policy(
+            {
+                'name': 'artifact-domain-no-xaccount',
+                'resource': 'aws.artifact-domain',
+                'filters': ['cross-account'],
+            },
+            session_factory=factory,
+            config={'region': 'us-east-2'},
+        )
+        resources = p.run()
+        assert len(resources) == 1
+        assert resources[0]['name'] == 'c7n-test'
+
     def test_cross_account_and_delete_repo(self):
         factory = self.replay_flight_data('test_artifact_repo_cross_account')
         p = self.load_policy({
@@ -43,15 +58,19 @@ class CodeArtifact(BaseTest):
 class CodeCommit(BaseTest):
 
     def test_query_repos(self):
-        factory = self.replay_flight_data("test_codecommit")
+        factory = self.replay_flight_data("test_codecommit", region="us-east-2")
         p = self.load_policy(
-            {"name": "get-repos", "resource": "codecommit"}, session_factory=factory
+            {"name": "get-repos", "resource": "codecommit", "filters": [
+                {"type": "value", "key": "tag:Owner", "value": "aj@stacklet.io"},
+            ]},
+            session_factory=factory,
+            config={"region": "us-east-2"},
         )
         resources = p.run()
         self.assertEqual(len(resources), 1)
         self.assertEqual(
             resources[0]["cloneUrlSsh"],
-            "ssh://git-codecommit.us-east-2.amazonaws.com/v1/repos/custodian-config-repo",
+            "ssh://git-codecommit.us-east-2.amazonaws.com/v1/repos/demo-policies",
         )
 
     def test_get_repo_resources(self):
@@ -175,6 +194,32 @@ class CodeBuild(BaseTest):
             'securityhub')
 
 
+class CodeBuildSourceCredentials(BaseTest):
+    def test_get_source_credentials(self):
+        p = self.load_policy(
+            data={
+                "name": "test-get-source-credentials",
+                "resource": "aws.codebuild-credential",
+                "filters": [{
+                    "type": "value",
+                    "key": "serverType",
+                    "value": "GITHUB"
+                }, {
+                    "type": "value",
+                    "key": "authType",
+                    "value": "PERSONAL_ACCESS_TOKEN"
+                }]
+            },
+            session_factory=self.replay_flight_data('test_codebuild_get_source_credentials')
+        )
+        resources = p.run()
+        self.assertEqual(len(resources), 1)
+        self.assertEqual(
+            resources[0]['arn'],
+            'arn:aws:codebuild:eu-central-1:543742734891:token/github'
+        )
+
+
 class CodePipeline(BaseTest):
 
     def test_config_pipeline(self):
@@ -277,3 +322,39 @@ class CodeDeploy(BaseTest):
             deploymentGroupName=resources[0]['deploymentGroupName'])
         self.assertEqual(
             e.exception.response['Error']['Code'], 'DeploymentGroupDoesNotExistException')
+
+    def test_codedeploy_list_deployment_configs(self):
+        factory = self.replay_flight_data(
+            'test_codedeploy_list_deployment_configs'
+        )
+        p = self.load_policy({
+            "name": "codedeploy-list-deployment-configs",
+            "resource": "aws.codedeploy-config",
+            "filters": [{
+                "type": "value",
+                "key": "computePlatform",
+                "value": "Lambda"
+            }]
+        }, session_factory=factory)
+        resources = p.run()
+        self.assertEqual(len(resources), 1)
+        self.assertEqual(resources[0]['deploymentConfigId'], 'my-test-configuration')
+        self.assertEqual(resources[0]['deploymentConfigName'], 'my-test-configuration')
+
+    def test_codedeploy_group_config_filter(self):
+        factory = self.replay_flight_data(
+            'test_codedeploy_group_config_filter'
+        )
+        p = self.load_policy({
+            "name": "codedeploy-group-with-lambda-config",
+            "resource": "aws.codedeploy-group",
+            "filters": [{
+                "type": "config",
+                "key": "computePlatform",
+                "value": "Lambda"
+            }]
+        }, session_factory=factory)
+        resources = p.run()
+        self.assertEqual(len(resources), 1)
+        self.assertEqual(resources[0]['c7n:DeploymentConfig']['deploymentConfigId'],
+                         'my-test-configuration')

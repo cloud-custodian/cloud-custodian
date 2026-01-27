@@ -1,0 +1,11 @@
+{
+    "status_code": 404,
+    "data": {
+        "Error": {
+            "Type": "Sender",
+            "Code": "NoSuchEntity",
+            "Message": "Policy arn:aws:iam::aws:policy/AdministratorAccessDoesNotExist was not found."
+        },
+        "ResponseMetadata": {}
+    }
+}

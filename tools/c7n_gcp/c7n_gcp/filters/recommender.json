@@ -1,0 +1,182 @@
+{
+  "google.bigquery.capacityCommitments.Recommender": {
+    "name": "BigQuery slot recommender",
+    "resource": "gcp.project",
+    "id": "google.bigquery.capacityCommitments.Recommender",
+    "description": "Optimize BigQuery spend with slot reservations",
+    "category": "Cost",
+    "permission_prefix": "recommender.bigqueryCapacityCommitmentsRecommendations"
+  },
+  "google.run.service.CostRecommender": {
+    "name": "Cloud Run CPU allocation recommender",
+    "resource": "gcp.cloud-run-service",
+    "id": "google.run.service.CostRecommender",
+    "description": "Switch to CPU always allocated",
+    "category": "Cost",
+    "permission_prefix": "recommender.runServiceIdentityRecommendations"
+  },
+  "google.cloudsql.instance.IdleRecommender": {
+    "name": "Cloud SQL idle instance recommender",
+    "resource": "gcp.sql-instance",
+    "id": "google.cloudsql.instance.IdleRecommender",
+    "description": "Remove unused SQL instances",
+    "category": "Cost",
+    "permission_prefix": "recommender.cloudsqlIdleInstanceRecommendations"
+  },
+  "google.cloudsql.instance.OverprovisionedRecommender": {
+    "name": "Cloud SQL overprovisioned instance recommender",
+    "id": "google.cloudsql.instance.OverprovisionedRecommender",
+    "resource": "gcp.sql-instance",
+    "description": "Resize overprovisioned SQL instances",
+    "category": "Cost",
+    "permission_prefix": "recommender.cloudsqlOverprovisionedInstanceRecommendations"
+  },
+  "google.compute.commitment.UsageCommitmentRecommendergoogle.cloudbilling.commitment.SpendBasedCommitmentRecommender": {
+    "name": "Committed use discount recommender",
+    "resource": "gcp.compute-project",
+    "id": "google.compute.commitment.UsageCommitmentRecommendergoogle.cloudbilling.commitment.SpendBasedCommitmentRecommender",
+    "description": "Reduce costs thru commitments",
+    "category": "Cost",
+    "permission_prefix": "recommender.usageCommitmentRecommendations"
+  },
+  "google.compute.image.IdleResourceRecommender": {
+    "name": "Idle custom image recommender",
+    "id": "google.compute.image.IdleResourceRecommender",
+    "resource": "gcp.image",
+    "description": "Remove unused images",
+    "category": "Cost",
+    "permission_prefix": "recommender.computeImageIdleResourceRecommendations"
+  },
+  "google.compute.address.IdleResourceRecommender": {
+    "name": "Idle IP address recommender",
+    "id": "google.compute.address.IdleResourceRecommender",
+    "description": "Remove unused IPs",
+    "category": "Cost",
+    "permission_prefix": "recommender.computeAddressIdleResourceRecommendations"
+  },
+  "google.compute.disk.IdleResourceRecommender": {
+    "name": "Idle persistent disk recommender",
+    "resource": "gcp.disk",
+    "id": "google.compute.disk.IdleResourceRecommender",
+    "description": "Backup and remove unused disks",
+    "category": "Cost",
+    "permission_prefix": "recommender.computeDiskIdleResourceRecommendations"
+  },
+  "google.compute.instance.IdleResourceRecommender": {
+    "name": "Idle VM recommender",
+    "resource": "gcp.instance",
+    "id": "google.compute.instance.IdleResourceRecommender",
+    "description": "Remove unused VMs",
+    "category": "Cost",
+    "permission_prefix": "recommender.computeInstanceGroupManagerMachineTypeRecommendations"
+  },
+  "google.iam.policy.Recommender": {
+    "name": "IAM recommender",
+    "resource": "gcp.service-account",
+    "id": "google.iam.policy.Recommender",
+    "description": "Remove excess permissions",
+    "category": "Security",
+    "permission_prefix": "recommender.iamPolicyRecommendations"
+  },
+  "google.gmp.project.ManagementRecommender": {
+    "name": "Google Maps Platform project management recommender",
+    "resource": "gcp.project",
+    "id": "google.gmp.project.ManagementRecommender",
+    "description": "Restrict your API keys",
+    "category": "Security",
+    "permission_prefix": "recommender.gmpProjectManagementRecommendations"
+  },
+  "google.run.service.IdentityRecommendergoogle.run.service.SecurityRecommender": {
+    "name": "Cloud Run Service Security recommenders",
+    "resource": "gcp.cloud-run-service",
+    "id": "google.run.service.IdentityRecommendergoogle.run.service.SecurityRecommender",
+    "description": "Increase Cloud Run Service security",
+    "category": "Security",
+    "permission_prefix": "recommender.runServiceSecurityRecommendations"
+  },
+  "google.cloudsql.instance.OutOfDiskRecommender": {
+    "name": "Cloud SQL out-of-disk recommender",
+    "resource": "gcp.sql-instance",
+    "id": "google.cloudsql.instance.OutOfDiskRecommender",
+    "description": "Prevent CloudSQL out-of-disk outage",
+    "category": "Performance",
+    "permission_prefix": "recommender.cloudsqlInstanceOutOfDiskRecommendations"
+  },
+  "google.compute.instanceGroupManager.MachineTypeRecommender": {
+    "name": "Managed instance group machine type recommender",
+    "id": "google.compute.instanceGroupManager.MachineTypeRecommender",
+    "description": "Resize MIG machine types",
+    "category": "Performance",
+    "permission_prefix": "recommender.computeInstanceGroupManagerMachineTypeRecommendations"
+  },
+  "google.compute.instance.MachineTypeRecommender": {
+    "name": "VM machine type recommender",
+    "resource": "gcp.instance",
+    "id": "google.compute.instance.MachineTypeRecommender",
+    "description": "Resize VM machine types",
+    "category": "Performance",
+    "permission_prefix": "recommender.computeInstanceMachineTypeRecommendations"
+  },
+  "google.cloudfunctions.PerformanceRecommender": {
+    "name": "Cloud Functions minimum instances recommender",
+    "resource": "gcp.function",
+    "id": "google.cloudfunctions.PerformanceRecommender",
+    "description": "Prevent cold starts for deployed functions",
+    "category": "Performance"
+  },
+  "google.cloudsql.instance.PerformanceRecommender": {
+    "name": "Cloud SQL performance recommender",
+    "resource": "gcp.sql-instance",
+    "id": "google.cloudsql.instance.PerformanceRecommender",
+    "description": "Improve Cloud SQL instance performance\n      \nMySQL: increase the table open cache size\nMySQL: manage high number of tables\nPostgreSQL: prevent transaction ID wraparound",
+    "category": "Performance",
+    "permission_prefix": "recommender.cloudsqlInstancePerformanceRecommendations"
+  },
+  "google.cloudsql.instance.UnderprovisionedRecommender": {
+    "name": "Cloud SQL underprovisioned recommender",
+    "resource": "gcp.sql-instance",
+    "id": "google.cloudsql.instance.UnderprovisionedRecommender",
+    "description": "Optimize underprovisioned Cloud SQL instances",
+    "category": "Performance",
+    "permission_prefix": "recommender.cloudsqlUnderProvisionedInstanceRecommendations"
+  },
+  "google.container.DiagnosisRecommender": {
+    "name": "GKE diagnosis recommender",
+    "resource": "gcp.gke-cluster",
+    "id": "google.container.DiagnosisRecommender",
+    "description": "Mitigate exposure to upcoming Kubernetes deprecations",
+    "category": "Reliability",
+    "permission_prefix": "recommender.containerDiagnosisRecommendations"
+  },
+  "google.resourcemanager.serviceLimit.Recommender": {
+    "name": "Service limit (quota) recommender",
+    "resource": "gcp.project",
+    "id": "google.resourcemanager.serviceLimit.Recommender",
+    "description": "Manage service and quota usage to avoid hitting limits",
+    "category": "Reliability",
+    "permission_prefix": "recommender.resourcemanagerServiceLimitRecommendations"
+  },
+  "google.clouderrorreporting.Recommender": {
+    "name": "Error Reporting notification recommender",
+    "id": "google.clouderrorreporting.Recommender",
+    "resource": "gcp.project",
+    "description": "Receive notifications for errors in your project",
+    "category": "Manageability",
+    "permission_prefix": "recommender.errorReportingRecommendations"
+  },
+  "google.logging.productSuggestion.ContainerRecommender": {
+    "name": "Product suggestion recommender",
+    "id": "google.logging.productSuggestion.ContainerRecommender",
+    "description": "Explore more helpful products",
+    "category": "Manageability",
+    "permission_prefix": "recommender.loggingProductSuggestionContainerRecommendations"
+  },
+  "google.resourcemanager.projectUtilization.Recommender": {
+    "name": "Unattended project recommender",
+    "resource": "gcp.project",
+    "id": "google.resourcemanager.projectUtilization.Recommender",
+    "description": "Reclaim or remove unused projects",
+    "category": "Sustainability",
+    "permission_prefix": "recommender.resourcemanagerProjectUtilizationRecommendations"
+  }
+}

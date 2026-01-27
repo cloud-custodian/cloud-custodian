@@ -1,15 +1,11 @@
 name: "Functional"
 
-env:
-  terraform_version: "1.2.8"
-  C7N_FUNCTIONAL: true
-  C7N_TEST_RUN: true
-
 on:
   workflow_dispatch: {}
-  schedule:
-    # UTC 6 AM aka 11 PM PST, 2 AM EST, everyday
-    - cron: "0 6 * * *"
+
+env:
+  UV_VERSION: "0.7.12"
+  DEFAULT_PY_VERSION: "3.12"
 
 jobs:
   AWS:
@@ -19,31 +15,51 @@ jobs:
       contents: read
       checks: write
     steps:
-      - uses: actions/checkout@v3
-      - uses: actions/setup-python@v4.2.0
+      - uses: actions/checkout@v5
+      - uses: actions/setup-python@v6
         with:
-          python-version: "3.8"
+          python-version: ${{ env.DEFAULT_PY_VERSION }}
 
-      - uses: aws-actions/configure-aws-credentials@v1.7.0
+      - uses: aws-actions/configure-aws-credentials@v5
         with:
-          role-to-assume: ${{ secrets.AWS_ROLE_ARN }}
+          role-to-assume: ${{ secrets.AWS_FTEST_ROLE }}
           aws-region: us-east-1
 
-      - uses: hashicorp/setup-terraform@v2
+      - uses: hashicorp/setup-terraform@v3
         with:
-          terraform_version: "${{ env.terraform_version }}"
+          terraform_wrapper: false
+          # last OSS version
+          terraform_version: "1.5.5"
 
-      - name: Install Requirements
+      - name: Install Custodian
+        uses: ./.github/composites/install
+        with:
+          python-version: ${{ env.DEFAULT_PY_VERSION }}
+          uv-version: ${{ env.UV_VERSION }}
+
+      - name: Set up cache
+        uses: actions/cache@v4
+        id: tfcache
+        with:
+          path: .tfcache
+          key: tf-${{ runner.os }}-${{ hashFiles('**/*.tf') }}            
+
+      - name: Functional Tests
         run: |
           mkdir -p .tfcache
-          pip install --cache-dir=./.pip-cache -r requirements.txt
+          pytest -m "terraform and audited and not skiplive" -v tests
+        env:
+          C7N_FUNCTIONAL: "true"
+          C7N_TEST_RUN: "true"
 
-      - name: Test
-        run: |
-          pytest tests -m "not skiplive" -m terraform -n auto --junit-xml=report-aws.xml
-
-      - name: JUnit Report Action
-        uses: mikepenz/action-junit-report@v3.3.3
+      - name: Notify Slack
+        uses: ravsamhq/notify-slack-action@v2
         if: always()
+        env:
+          SLACK_WEBHOOK_URL: ${{ secrets.SLACK_CI_HOOK }}
         with:
-          report_paths: 'report-aws.xml'
+          status: ${{ job.status }}
+          notification_title: "{workflow}:{job} has {status_message}"
+          message_format: "{emoji} *{workflow}:{job}* {status_message} in <{repo_url}|{repo}>"
+          footer: "Logs <{run_url}|{job}>"
+          notify_when: "failure,success"

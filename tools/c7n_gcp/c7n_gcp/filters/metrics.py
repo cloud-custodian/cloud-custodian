@@ -5,10 +5,8 @@ Monitoring Metrics suppport for resources
 """
 from datetime import datetime, timedelta
 
-import jmespath
-
 from c7n.filters.core import Filter, OPERATORS, FilterValidationError
-from c7n.utils import local_session, type_schema
+from c7n.utils import local_session, type_schema, jmespath_search
 
 from c7n_gcp.provider import resources as gcp_resources
 
@@ -191,7 +189,7 @@ class GCPMetricsFilter(Filter):
 
     def split_by_resource(self, metric_list):
         for m in metric_list:
-            resource_name = jmespath.search(self.metric_key, m)
+            resource_name = jmespath_search(self.metric_key, m)
             self.resource_metric_dict[resource_name] = m
 
     def process_resource(self, resource):
@@ -212,7 +210,9 @@ class GCPMetricsFilter(Filter):
 
     @classmethod
     def register_resources(klass, registry, resource_class):
-        resource_class.filter_registry.register('metrics', klass)
+        if resource_class.filter_registry:
+            if resource_class.resource_type.allow_metrics_filters:
+                resource_class.filter_registry.register('metrics', klass)
 
 
 gcp_resources.subscribe(GCPMetricsFilter.register_resources)

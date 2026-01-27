@@ -1,0 +1,513 @@
+{
+    "version": 1,
+    "interactions": [
+        {
+            "request": {
+                "method": "GET",
+                "uri": "https://management.azure.com/subscriptions/ea42f556-5106-4743-99b0-c129bfa71a47/providers/microsoft.insights/activityLogAlerts?api-version=2017-04-01",
+                "body": null,
+                "headers": {}
+            },
+            "response": {
+                "status": {
+                    "code": 200,
+                    "message": "OK"
+                },
+                "headers": {
+                    "arr-disable-session-affinity": [
+                        "true"
+                    ],
+                    "date": [
+                        "Fri, 20 Jan 2023 17:36:41 GMT"
+                    ],
+                    "content-type": [
+                        "application/json; charset=utf-8"
+                    ],
+                    "cache-control": [
+                        "no-cache"
+                    ],
+                    "api-supported-versions": [
+                        "2017-03-01-preview, 2017-04-01, 2020-10-01, 2023-01-01-preview"
+                    ],
+                    "content-length": [
+                        "17499"
+                    ]
+                },
+                "body": {
+                    "data": {
+                        "value": [
+                            {
+                                "id": "/subscriptions/ea42f556-5106-4743-99b0-c129bfa71a47/resourceGroups/DefaultResourceGroup-CUS/providers/microsoft.insights/activityLogAlerts/dfh-nsg-alert",
+                                "name": "dfh-nsg-alert",
+                                "type": "Microsoft.Insights/ActivityLogAlerts",
+                                "location": "Global",
+                                "tags": {
+                                    "product_id": "13742"
+                                },
+                                "properties": {
+                                    "scopes": [
+                                        "/subscriptions/ea42f556-5106-4743-99b0-c129bfa71a47"
+                                    ],
+                                    "condition": {
+                                        "allOf": [
+                                            {
+                                                "field": "category",
+                                                "equals": "Administrative"
+                                            },
+                                            {
+                                                "field": "resourceType",
+                                                "equals": "microsoft.network/networksecuritygroups"
+                                            }
+                                        ]
+                                    },
+                                    "actions": {
+                                        "actionGroups": []
+                                    },
+                                    "enabled": true,
+                                    "description": ""
+                                }
+                            },
+                            {
+                                "id": "/subscriptions/ea42f556-5106-4743-99b0-c129bfa71a47/resourceGroups/DefaultResourceGroup-CUS/providers/microsoft.insights/activityLogAlerts/dfh-ss-alert",
+                                "name": "dfh-ss-alert",
+                                "type": "Microsoft.Insights/ActivityLogAlerts",
+                                "location": "Global",
+                                "tags": {
+                                    "product_id": "13742"
+                                },
+                                "properties": {
+                                    "scopes": [
+                                        "/subscriptions/ea42f556-5106-4743-99b0-c129bfa71a47"
+                                    ],
+                                    "condition": {
+                                        "allOf": [
+                                            {
+                                                "field": "category",
+                                                "equals": "Security"
+                                            },
+                                            {
+                                                "field": "resourceType",
+                                                "equals": "microsoft.security/securitysolutions"
+                                            },
+                                            {
+                                                "field": "operationName",
+                                                "equals": "Microsoft.Security/securitySolutions/write"
+                                            }
+                                        ]
+                                    },
+                                    "actions": {
+                                        "actionGroups": []
+                                    },
+                                    "enabled": true,
+                                    "description": ""
+                                }
+                            },
+                            {
+                                "id": "/subscriptions/ea42f556-5106-4743-99b0-c129bfa71a47/resourceGroups/dfh-test-group/providers/microsoft.insights/activityLogAlerts/dfh-sql-alert",
+                                "name": "dfh-sql-alert",
+                                "type": "Microsoft.Insights/ActivityLogAlerts",
+                                "location": "Global",
+                                "tags": {
+                                    "product_id": "13742"
+                                },
+                                "properties": {
+                                    "scopes": [
+                                        "/subscriptions/ea42f556-5106-4743-99b0-c129bfa71a47/resourceGroups/dfh-test-group/providers/Microsoft.Sql/servers/dfh-sql-server"
+                                    ],
+                                    "condition": {
+                                        "allOf": [
+                                            {
+                                                "field": "category",
+                                                "equals": "Administrative"
+                                            }
+                                        ]
+                                    },
+                                    "actions": {
+                                        "actionGroups": [
+                                            {
+                                                "actionGroupId": "/subscriptions/ea42f556-5106-4743-99b0-c129bfa71a47/resourceGroups/dfh-test-group/providers/microsoft.insights/actionGroups/dfh-test-action-group",
+                                                "webhookProperties": {}
+                                            }
+                                        ]
+                                    },
+                                    "enabled": true,
+                                    "description": ""
+                                }
+                            },
+                            {
+                                "id": "/subscriptions/ea42f556-5106-4743-99b0-c129bfa71a47/resourceGroups/dfh-test-group/providers/microsoft.insights/activityLogAlerts/dfh-test-rule-alert",
+                                "name": "dfh-test-rule-alert",
+                                "type": "Microsoft.Insights/ActivityLogAlerts",
+                                "location": "Global",
+                                "tags": {
+                                    "product_id": "13742"
+                                },
+                                "properties": {
+                                    "scopes": [
+                                        "/subscriptions/ea42f556-5106-4743-99b0-c129bfa71a47"
+                                    ],
+                                    "condition": {
+                                        "allOf": [
+                                            {
+                                                "field": "category",
+                                                "equals": "Administrative"
+                                            },
+                                            {
+                                                "field": "operationName",
+                                                "equals": "Microsoft.Insights/LogProfiles/Write"
+                                            }
+                                        ]
+                                    },
+                                    "actions": {
+                                        "actionGroups": []
+                                    },
+                                    "enabled": true,
+                                    "description": ""
+                                }
+                            },
+                            {
+                                "id": "/subscriptions/ea42f556-5106-4743-99b0-c129bfa71a47/resourceGroups/STACKLET-SECURITY-SERVICES-rg/providers/microsoft.insights/activityLogAlerts/Activity_Log_Alert_for_Create_or_Update_Security_Group",
+                                "name": "Activity_Log_Alert_for_Create_or_Update_Security_Group",
+                                "type": "Microsoft.Insights/ActivityLogAlerts",
+                                "location": "Global",
+                                "tags": {
+                                    "c7n": "true",
+                                    "product_id": "13742",
+                                    "created_by": "abc@xyz.com"
+                                },
+                                "properties": {
+                                    "scopes": [
+                                        "/subscriptions/ea42f556-5106-4743-99b0-c129bfa71a47"
+                                    ],
+                                    "condition": {
+                                        "allOf": [
+                                            {
+                                                "field": "category",
+                                                "equals": "Security"
+                                            },
+                                            {
+                                                "field": "operationName",
+                                                "equals": "Microsoft.Network/networkSecurityGroups/write"
+                                            }
+                                        ]
+                                    },
+                                    "actions": {
+                                        "actionGroups": [
+                                            {
+                                                "actionGroupId": "/subscriptions/ea42f556-5106-4743-99b0-c129bfa71a47/resourceGroups/STACKLET-SECURITY-SERVICES-rg/providers/Microsoft.Insights/actionGroups/example-actiongroup",
+                                                "webhookProperties": {}
+                                            }
+                                        ]
+                                    },
+                                    "enabled": true,
+                                    "description": "Monitoring for Create or Update Network Security Group events gives insight into network access changes and may reduce the time it takes to detect suspicious activity"
+                                }
+                            },
+                            {
+                                "id": "/subscriptions/ea42f556-5106-4743-99b0-c129bfa71a47/resourceGroups/STACKLET-SECURITY-SERVICES-rg/providers/microsoft.insights/activityLogAlerts/Activity Log Alert for Create or Update Network Security Group Rule",
+                                "name": "Activity Log Alert for Create or Update Network Security Group Rule",
+                                "type": "Microsoft.Insights/ActivityLogAlerts",
+                                "location": "Global",
+                                "tags": {
+                                    "c7n": "true",
+                                    "product_id": "13742",
+                                    "created_by": "abc@xyz.com"
+                                },
+                                "properties": {
+                                    "scopes": [
+                                        "/subscriptions/ea42f556-5106-4743-99b0-c129bfa71a47"
+                                    ],
+                                    "condition": {
+                                        "allOf": [
+                                            {
+                                                "field": "category",
+                                                "equals": "Security"
+                                            },
+                                            {
+                                                "field": "operationName",
+                                                "equals": "Microsoft.Network/networkSecurityGroups/securityRules/write"
+                                            }
+                                        ]
+                                    },
+                                    "actions": {
+                                        "actionGroups": [
+                                            {
+                                                "actionGroupId": "/subscriptions/ea42f556-5106-4743-99b0-c129bfa71a47/resourceGroups/STACKLET-SECURITY-SERVICES-rg/providers/Microsoft.Insights/actionGroups/example-actiongroup",
+                                                "webhookProperties": {}
+                                            }
+                                        ]
+                                    },
+                                    "enabled": true,
+                                    "description": "Monitoring for Create or Update Network Security Group Rule events gives insight into network access changes and may reduce the time it takes to detect suspicious activity"
+                                }
+                            },
+                            {
+                                "id": "/subscriptions/ea42f556-5106-4743-99b0-c129bfa71a47/resourceGroups/STACKLET-SECURITY-SERVICES-rg/providers/microsoft.insights/activityLogAlerts/Activity Log Alert for Create or Update Security Solution",
+                                "name": "Activity Log Alert for Create or Update Security Solution",
+                                "type": "Microsoft.Insights/ActivityLogAlerts",
+                                "location": "Global",
+                                "tags": {
+                                    "c7n": "true",
+                                    "product_id": "13742",
+                                    "created_by": "abc@xyz.com"
+                                },
+                                "properties": {
+                                    "scopes": [
+                                        "/subscriptions/ea42f556-5106-4743-99b0-c129bfa71a47"
+                                    ],
+                                    "condition": {
+                                        "allOf": [
+                                            {
+                                                "field": "category",
+                                                "equals": "Security"
+                                            },
+                                            {
+                                                "field": "operationName",
+                                                "equals": "Microsoft.Security/securitySolutions/write"
+                                            }
+                                        ]
+                                    },
+                                    "actions": {
+                                        "actionGroups": [
+                                            {
+                                                "actionGroupId": "/subscriptions/ea42f556-5106-4743-99b0-c129bfa71a47/resourceGroups/STACKLET-SECURITY-SERVICES-rg/providers/Microsoft.Insights/actionGroups/example-actiongroup",
+                                                "webhookProperties": {}
+                                            }
+                                        ]
+                                    },
+                                    "enabled": true,
+                                    "description": "Monitoring for Create or Update Security Solution events gives insight into changes to the active security solutions and may reduce the time it takes to detect suspicious activity"
+                                }
+                            },
+                            {
+                                "id": "/subscriptions/ea42f556-5106-4743-99b0-c129bfa71a47/resourceGroups/STACKLET-SECURITY-SERVICES-rg/providers/microsoft.insights/activityLogAlerts/Activity Log Alert for Create, Update or Delete SQL Server Firewall Rule",
+                                "name": "Activity Log Alert for Create, Update or Delete SQL Server Firewall Rule",
+                                "type": "Microsoft.Insights/ActivityLogAlerts",
+                                "location": "Global",
+                                "tags": {
+                                    "c7n": "true",
+                                    "product_id": "13742",
+                                    "created_by": "abc@xyz.com"
+                                },
+                                "properties": {
+                                    "scopes": [
+                                        "/subscriptions/ea42f556-5106-4743-99b0-c129bfa71a47"
+                                    ],
+                                    "condition": {
+                                        "allOf": [
+                                            {
+                                                "field": "category",
+                                                "equals": "Security"
+                                            },
+                                            {
+                                                "field": "operationName",
+                                                "equals": "Microsoft.Sql/servers/firewallRules/write"
+                                            }
+                                        ]
+                                    },
+                                    "actions": {
+                                        "actionGroups": [
+                                            {
+                                                "actionGroupId": "/subscriptions/ea42f556-5106-4743-99b0-c129bfa71a47/resourceGroups/STACKLET-SECURITY-SERVICES-rg/providers/Microsoft.Insights/actionGroups/example-actiongroup",
+                                                "webhookProperties": {}
+                                            }
+                                        ]
+                                    },
+                                    "enabled": true,
+                                    "description": "Monitoring for Create or Update or Delete SQL Server Firewall Rule events gives insight into network access changes and may reduce the time it takes to detect suspicious activity"
+                                }
+                            },
+                            {
+                                "id": "/subscriptions/ea42f556-5106-4743-99b0-c129bfa71a47/resourceGroups/STACKLET-SECURITY-SERVICES-rg/providers/microsoft.insights/activityLogAlerts/Activity Log Alert for Delete Security Solution",
+                                "name": "Activity Log Alert for Delete Security Solution",
+                                "type": "Microsoft.Insights/ActivityLogAlerts",
+                                "location": "Global",
+                                "tags": {
+                                    "c7n": "true",
+                                    "product_id": "13742",
+                                    "created_by": "abc@xyz.com"
+                                },
+                                "properties": {
+                                    "scopes": [
+                                        "/subscriptions/ea42f556-5106-4743-99b0-c129bfa71a47"
+                                    ],
+                                    "condition": {
+                                        "allOf": [
+                                            {
+                                                "field": "category",
+                                                "equals": "Security"
+                                            },
+                                            {
+                                                "field": "operationName",
+                                                "equals": "Microsoft.Security/securitySolutions/delete"
+                                            }
+                                        ]
+                                    },
+                                    "actions": {
+                                        "actionGroups": [
+                                            {
+                                                "actionGroupId": "/subscriptions/ea42f556-5106-4743-99b0-c129bfa71a47/resourceGroups/STACKLET-SECURITY-SERVICES-rg/providers/Microsoft.Insights/actionGroups/example-actiongroup",
+                                                "webhookProperties": {}
+                                            }
+                                        ]
+                                    },
+                                    "enabled": true,
+                                    "description": "Monitoring for Delete Security Solution events gives insight into changes to the active security solutions and may reduce the time it takes to detect suspicious activity"
+                                }
+                            },
+                            {
+                                "id": "/subscriptions/ea42f556-5106-4743-99b0-c129bfa71a47/resourceGroups/STACKLET-SECURITY-SERVICES-rg/providers/microsoft.insights/activityLogAlerts/Activity Log Alert for Delete Network Security Group",
+                                "name": "Activity Log Alert for Delete Network Security Group",
+                                "type": "Microsoft.Insights/ActivityLogAlerts",
+                                "location": "Global",
+                                "tags": {
+                                    "c7n": "true",
+                                    "product_id": "13742",
+                                    "created_by": "abc@xyz.com"
+                                },
+                                "properties": {
+                                    "scopes": [
+                                        "/subscriptions/ea42f556-5106-4743-99b0-c129bfa71a47"
+                                    ],
+                                    "condition": {
+                                        "allOf": [
+                                            {
+                                                "field": "category",
+                                                "equals": "Security"
+                                            },
+                                            {
+                                                "field": "operationName",
+                                                "equals": "Microsoft.Network/networkSecurityGroups/delete"
+                                            }
+                                        ]
+                                    },
+                                    "actions": {
+                                        "actionGroups": [
+                                            {
+                                                "actionGroupId": "/subscriptions/ea42f556-5106-4743-99b0-c129bfa71a47/resourceGroups/STACKLET-SECURITY-SERVICES-rg/providers/Microsoft.Insights/actionGroups/example-actiongroup",
+                                                "webhookProperties": {}
+                                            }
+                                        ]
+                                    },
+                                    "enabled": true,
+                                    "description": "Monitoring for Delete Network Security Group events gives insight into network access changes and may reduce the time it takes to detect suspicious activity"
+                                }
+                            },
+                            {
+                                "id": "/subscriptions/ea42f556-5106-4743-99b0-c129bfa71a47/resourceGroups/STACKLET-SECURITY-SERVICES-rg/providers/microsoft.insights/activityLogAlerts/Activity Log Alert for Create or Update Security Policy",
+                                "name": "Activity Log Alert for Create or Update Security Policy",
+                                "type": "Microsoft.Insights/ActivityLogAlerts",
+                                "location": "Global",
+                                "tags": {
+                                    "c7n": "true",
+                                    "product_id": "13742",
+                                    "created_by": "abc@xyz.com"
+                                },
+                                "properties": {
+                                    "scopes": [
+                                        "/subscriptions/ea42f556-5106-4743-99b0-c129bfa71a47"
+                                    ],
+                                    "condition": {
+                                        "allOf": [
+                                            {
+                                                "field": "category",
+                                                "equals": "Security"
+                                            },
+                                            {
+                                                "field": "operationName",
+                                                "equals": "Microsoft.Security/policies/write"
+                                            }
+                                        ]
+                                    },
+                                    "actions": {
+                                        "actionGroups": [
+                                            {
+                                                "actionGroupId": "/subscriptions/ea42f556-5106-4743-99b0-c129bfa71a47/resourceGroups/STACKLET-SECURITY-SERVICES-rg/providers/Microsoft.Insights/actionGroups/example-actiongroup",
+                                                "webhookProperties": {}
+                                            }
+                                        ]
+                                    },
+                                    "enabled": true,
+                                    "description": "Monitoring for Update Security Policy events gives insight into changes to security policy and may reduce the time it takes to detect suspicious activity"
+                                }
+                            },
+                            {
+                                "id": "/subscriptions/ea42f556-5106-4743-99b0-c129bfa71a47/resourceGroups/STACKLET-SECURITY-SERVICES-rg/providers/microsoft.insights/activityLogAlerts/Activity Log Alert for Delete Network Security Group Rule",
+                                "name": "Activity Log Alert for Delete Network Security Group Rule",
+                                "type": "Microsoft.Insights/ActivityLogAlerts",
+                                "location": "Global",
+                                "tags": {
+                                    "c7n": "true",
+                                    "product_id": "13742",
+                                    "created_by": "abc@xyz.com"
+                                },
+                                "properties": {
+                                    "scopes": [
+                                        "/subscriptions/ea42f556-5106-4743-99b0-c129bfa71a47"
+                                    ],
+                                    "condition": {
+                                        "allOf": [
+                                            {
+                                                "field": "category",
+                                                "equals": "Security"
+                                            },
+                                            {
+                                                "field": "operationName",
+                                                "equals": "Microsoft.Network/networkSecurityGroups/securityRules/delete"
+                                            }
+                                        ]
+                                    },
+                                    "actions": {
+                                        "actionGroups": [
+                                            {
+                                                "actionGroupId": "/subscriptions/ea42f556-5106-4743-99b0-c129bfa71a47/resourceGroups/STACKLET-SECURITY-SERVICES-rg/providers/Microsoft.Insights/actionGroups/example-actiongroup",
+                                                "webhookProperties": {}
+                                            }
+                                        ]
+                                    },
+                                    "enabled": true,
+                                    "description": "Monitoring for Delete Network Security Group Rule events gives insight into network access changes and may reduce the time it takes to detect suspicious activity"
+                                }
+                            },
+                            {
+                                "id": "/subscriptions/ea42f556-5106-4743-99b0-c129bfa71a47/resourceGroups/test_alert-logs/providers/microsoft.insights/activityLogAlerts/ServiceHealthActivityLogAlert",
+                                "name": "ServiceHealthActivityLogAlert",
+                                "type": "Microsoft.Insights/ActivityLogAlerts",
+                                "location": "Global",
+                                "tags": {
+                                    "product_id": "13742"
+                                },
+                                "properties": {
+                                    "scopes": [
+                                        "/subscriptions/ea42f556-5106-4743-99b0-c129bfa71a47"
+                                    ],
+                                    "condition": {
+                                        "allOf": [
+                                            {
+                                                "field": "category",
+                                                "equals": "ServiceHealth"
+                                            },
+                                            {
+                                                "field": "properties.incidentType",
+                                                "equals": "Incident"
+                                            }
+                                        ]
+                                    },
+                                    "actions": {
+                                        "actionGroups": [
+                                            {
+                                                "actionGroupId": "/subscriptions/ea42f556-5106-4743-99b0-c129bfa71a47/resourceGroups/test_alert-logs/providers/microsoft.insights/actionGroups/SubHealth",
+                                                "webhookProperties": {}
+                                            }
+                                        ]
+                                    },
+                                    "enabled": true
+                                }
+                            }
+                        ]
+                    }
+                }
+            }
+        }
+    ]
+}

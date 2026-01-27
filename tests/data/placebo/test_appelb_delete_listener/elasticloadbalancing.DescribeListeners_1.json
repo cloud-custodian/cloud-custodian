@@ -1,0 +1,56 @@
+{
+    "status_code": 200,
+    "data": {
+        "Listeners": [
+            {
+                "ListenerArn": "arn:aws:elasticloadbalancing:us-east-1:644160558196:listener/app/alb-policy-foundry/aab640cf88a8c3c4/461e78452ce1a438",
+                "LoadBalancerArn": "arn:aws:elasticloadbalancing:us-east-1:644160558196:loadbalancer/app/alb-policy-foundry/aab640cf88a8c3c4",
+                "Port": 443,
+                "Protocol": "HTTP",
+                "DefaultActions": [
+                    {
+                        "Type": "forward",
+                        "TargetGroupArn": "arn:aws:elasticloadbalancing:us-east-1:644160558196:targetgroup/alb-lambda/2c1de5e470189e33",
+                        "Order": 1,
+                        "ForwardConfig": {
+                            "TargetGroups": [
+                                {
+                                    "TargetGroupArn": "arn:aws:elasticloadbalancing:us-east-1:644160558196:targetgroup/alb-lambda/2c1de5e470189e33",
+                                    "Weight": 1
+                                }
+                            ],
+                            "TargetGroupStickinessConfig": {
+                                "Enabled": false,
+                                "DurationSeconds": 3600
+                            }
+                        }
+                    }
+                ]
+            },
+            {
+                "ListenerArn": "arn:aws:elasticloadbalancing:us-east-1:644160558196:listener/app/alb-policy-foundry/aab640cf88a8c3c4/fabf19f821f5642a",
+                "LoadBalancerArn": "arn:aws:elasticloadbalancing:us-east-1:644160558196:loadbalancer/app/alb-policy-foundry/aab640cf88a8c3c4",
+                "Port": 80,
+                "Protocol": "HTTP",
+                "DefaultActions": [
+                    {
+                        "Type": "forward",
+                        "TargetGroupArn": "arn:aws:elasticloadbalancing:us-east-1:644160558196:targetgroup/alb-lambda/2c1de5e470189e33",
+                        "ForwardConfig": {
+                            "TargetGroups": [
+                                {
+                                    "TargetGroupArn": "arn:aws:elasticloadbalancing:us-east-1:644160558196:targetgroup/alb-lambda/2c1de5e470189e33",
+                                    "Weight": 1
+                                }
+                            ],
+                            "TargetGroupStickinessConfig": {
+                                "Enabled": false
+                            }
+                        }
+                    }
+                ]
+            }
+        ],
+        "ResponseMetadata": {}
+    }
+}

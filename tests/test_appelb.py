@@ -1,10 +1,15 @@
 # Copyright The Cloud Custodian Authors.
 # SPDX-License-Identifier: Apache-2.0
 
+from botocore.exceptions import ClientError
 from .common import BaseTest, event_data
 from c7n.exceptions import PolicyValidationError
 from c7n.executor import MainThreadExecutor
-from c7n.resources.appelb import AppELB, AppELBTargetGroup, serialize_attribute_value
+from c7n.resources.appelb import (
+    AppELB, AppELBTargetGroup, AppELBDeleteListenerAction, serialize_attribute_value,
+)
+from unittest.mock import patch
+import logging
 
 
 def test_serialize():
@@ -433,6 +438,7 @@ class AppELBTest(BaseTest):
         )
         resources = p.run()
         self.assertEqual(len(resources), 1)
+
         p = self.load_policy(
             {
                 "name": "appelb-waf",
@@ -447,6 +453,37 @@ class AppELBTest(BaseTest):
         self.assertEqual(
             resources[0]["LoadBalancerArn"], post_resources[0]["LoadBalancerArn"]
         )
+
+    def test_appelb_waf_value(self):
+        factory = self.replay_flight_data("test_appelb_waf_value")
+
+        p = self.load_policy(
+            {
+                "name": "appelb-waf",
+                "resource": "app-elb",
+                "filters": [
+                    {"type": "waf-enabled", "key": "Rules", "value": "empty"}
+                ]
+            },
+            session_factory=factory,
+        )
+        resources = p.run()
+        # mock data contains one rule and will not match
+        self.assertEqual(len(resources), 0)
+
+        p = self.load_policy(
+            {
+                "name": "appelb-waf",
+                "resource": "app-elb",
+                "filters": [
+                    {"type": "waf-enabled", "key": "length(Rules[?Type == 'REGULAR'])", "value": 1}
+                ]
+            },
+            session_factory=factory,
+        )
+        resources = p.run()
+        # mock data contains one "REGULAR" rule
+        self.assertEqual(len(resources), 1)
 
     def test_appelb_wafv2_any(self):
         factory = self.replay_flight_data("test_appelb_wafv2")
@@ -507,6 +544,38 @@ class AppELBTest(BaseTest):
             session_factory=factory,
         )
         resources = p.run()
+        self.assertEqual(len(resources), 1)
+
+    def test_appelb_wafv2_value(self):
+        factory = self.replay_flight_data("test_appelb_wafv2_value")
+
+        p = self.load_policy(
+            {
+                "name": "appelb-waf",
+                "resource": "app-elb",
+                "filters": [{"type": "wafv2-enabled", "key": "Rules", "value": "empty"}]
+            },
+            session_factory=factory,
+        )
+        resources = p.run()
+        # mock data contains one rule and will not match
+        self.assertEqual(len(resources), 0)
+
+        p = self.load_policy(
+            {
+                "name": "appelb-waf",
+                "resource": "app-elb",
+                "filters": [{
+                    "type": "wafv2-enabled",
+                    "key": "length(Rules[?contains(keys(Statement), 'RateBasedStatement')])",
+                    "op": "gte",
+                    "value": 1
+                }]
+            },
+            session_factory=factory,
+        )
+        resources = p.run()
+        # mock WAF rule has single RateBasedStatement
         self.assertEqual(len(resources), 1)
 
     def test_appelb_waf_to_wafv2(self):
@@ -672,6 +741,86 @@ class AppELBTest(BaseTest):
             'AWS/NetworkELB.TCP_ELB_Reset_Count.Sum.0.25' in resources[
                 0]['c7n.metrics'])
 
+    def test_appelb_delete_listener(self):
+        self.patch(AppELB, "executor_factory", MainThreadExecutor)
+        session_factory = self.replay_flight_data("test_appelb_delete_listener")
+        client = session_factory().client("elbv2")
+        # Create a policy that deletes listeners on a specific port
+        p = self.load_policy(
+            {
+                "name": "appelb-delete-listener",
+                "resource": "app-elb",
+                "filters": [
+                    {"type": "listener", "key": "[Protocol, Port]", "value": ["HTTP", 5432]}
+                ],
+                "actions": [{"type": "delete-listener"}],
+            },
+            session_factory=session_factory,
+        )
+        resources = p.run()
+        arn = resources[0]["LoadBalancerArn"]
+        listeners = client.describe_listeners(LoadBalancerArn=arn)["Listeners"]
+        # Assert that no listeners remain on the specified port
+        for l in listeners:
+            assert not (l["Protocol"] == "HTTP" and l["Port"] == 5432)
+
+    def test_appelb_delete_listener_not_found_exception(self):
+        self.patch(AppELB, "executor_factory", MainThreadExecutor)
+        session_factory = self.replay_flight_data("test_appelb_delete_listener_not_found_exception")
+        client = session_factory().client("elbv2")
+
+        class ListenerNotFound(Exception):
+            pass
+        client.exceptions.ListenerNotFoundException = ListenerNotFound
+
+        called = []
+
+        def fake_delete_listener(**kwargs):
+            called.append(True)
+            raise ListenerNotFound("Listener not found")
+        client.delete_listener = fake_delete_listener
+        dummy_listener_arn = (
+            "arn:aws:elasticloadbalancing:us-east-1:123456789012:listener/app/alb-testing-2/95e544fad78114e5/1234567890abcdef"
+    )
+        load_balancer_arn = (
+            "arn:aws:elasticloadbalancing:us-east-1:123456789012:loadbalancer/app/alb-testing-2/95e544fad78114e5")
+        alb = {
+            "LoadBalancerArn": load_balancer_arn,
+            "c7n:MatchedListeners": [
+                {
+                    "ListenerArn": dummy_listener_arn
+                }
+            ],
+        }
+
+        logger = logging.getLogger("test")
+
+        # Patch local_session only within this block
+        with patch("c7n.resources.appelb.local_session",
+                   return_value=type("Session", (), {"client": lambda self, service: client})()
+                   ):
+            action = AppELBDeleteListenerAction(
+                data={"type": "delete-listener"},
+                manager=type(
+                    "mgr", (), {
+                        "session_factory": session_factory, "log": logger, "data": {}
+                        }
+                    )()
+            )
+            action.process([alb])
+        self.assertTrue(called, "delete_listener is called")
+
+    def test_appelb_delete_listener_validation_failure(self):
+        # Loading a policy without a listener filter should fail validation
+        with self.assertRaises(PolicyValidationError):
+            self.load_policy(
+                {
+                    "name": "delete-listener-no-filter",
+                    "resource": "app-elb",
+                    "actions": [{"type": "delete-listener"}],
+                }
+            )
+
 
 class AppELBHealthcheckProtocolMismatchTest(BaseTest):
 
@@ -766,6 +915,41 @@ class AppELBTargetGroupTest(BaseTest):
         resources = policy.run()
 
         self.assertGreater(len(resources), 0, "Test should delete app elb target group")
+
+    def test_target_group_modify_attributes(self):
+        session_factory = self.replay_flight_data(
+            "test_target_group_attributes_filter_action")
+        client = session_factory().client("elbv2")
+        p = self.load_policy(
+            {
+                "name": "target-group-enable-preserve-client-ip",
+                "resource": "app-elb-target-group",
+                "filters": [
+                    {
+                        "type": "attributes",
+                        "key": "preserve_client_ip.enabled",
+                        "value": False,
+                    },
+                ],
+                "actions": [
+                    {
+                        "type": "modify-attributes",
+                        "attributes": {
+                            "preserve_client_ip.enabled": "true",
+                        },
+                    },
+                ],
+            },
+            config={'region': 'us-west-2'},
+            session_factory=session_factory,
+        )
+        resources = p.run()
+        self.assertEqual(len(resources), 1)
+        arn = resources[0]["TargetGroupArn"]
+        attrs = client.describe_target_group_attributes(
+            TargetGroupArn=arn)["Attributes"]
+        attrs = {obj['Key']: obj['Value'] for obj in attrs}
+        assert attrs['preserve_client_ip.enabled'] == 'true'
 
 
 class TestAppElbLogging(BaseTest):
@@ -867,6 +1051,49 @@ class TestAppElbIsLoggingFilter(BaseTest):
 
         self.assertGreater(
             len(resources), 0, "Test should find appelbs logging " "to elbv2logtest"
+        )
+
+
+class TestHealthEventsFilter(BaseTest):
+
+    def test_rds_health_events_filter(self):
+        session_factory = self.replay_flight_data("test_appelb_health_events_filter")
+        policy = self.load_policy(
+            {
+                "name": "appelb-health-events-filter",
+                "resource": "app-elb",
+                "filters": [{"type": "health-event", "statuses": ["open", "upcoming", "closed"]}],
+            },
+            session_factory=session_factory,
+        )
+        resources = policy.run()
+        self.assertEqual(len(resources), 1)
+
+
+class TestAppElbIsNotLoggingFilter(BaseTest):
+    """ replicate
+        - name: appelb-is-not-logging-to-bucket-test
+          resource: app-elb
+          filters:
+            - type: is-not-logging
+            bucket: elbv2logtest
+    """
+
+    def test_is_logging_to_bucket(self):
+        session_factory = self.replay_flight_data("test_appelb_is_logging_filter")
+        policy = self.load_policy(
+            {
+                "name": "appelb-is-logging-to-bucket-test",
+                "resource": "app-elb",
+                "filters": [{"type": "is-not-logging", "bucket": "otherbucket"}],
+            },
+            session_factory=session_factory,
+        )
+
+        resources = policy.run()
+
+        self.assertGreater(
+            len(resources), 0, "Test should find appelbs not" "logging to otherbucket"
         )
 
 
@@ -1005,49 +1232,6 @@ class TestAppElbAttributesFilter(BaseTest):
         )
 
 
-class TestAppElbIsNotLoggingFilter(BaseTest):
-    """ replicate
-        - name: appelb-is-not-logging-to-bucket-test
-          resource: app-elb
-          filters:
-            - type: is-not-logging
-            bucket: elbv2logtest
-    """
-
-    def test_is_logging_to_bucket(self):
-        session_factory = self.replay_flight_data("test_appelb_is_logging_filter")
-        policy = self.load_policy(
-            {
-                "name": "appelb-is-logging-to-bucket-test",
-                "resource": "app-elb",
-                "filters": [{"type": "is-not-logging", "bucket": "otherbucket"}],
-            },
-            session_factory=session_factory,
-        )
-
-        resources = policy.run()
-
-        self.assertGreater(
-            len(resources), 0, "Test should find appelbs not" "logging to otherbucket"
-        )
-
-
-class TestHealthEventsFilter(BaseTest):
-
-    def test_rds_health_events_filter(self):
-        session_factory = self.replay_flight_data("test_appelb_health_events_filter")
-        policy = self.load_policy(
-            {
-                "name": "appelb-health-events-filter",
-                "resource": "app-elb",
-                "filters": [{"type": "health-event", "statuses": ["open", "upcoming", "closed"]}],
-            },
-            session_factory=session_factory,
-        )
-        resources = policy.run()
-        self.assertEqual(len(resources), 1)
-
-
 class TestModifyVpcSecurityGroupsAction(BaseTest):
 
     def test_appelb_remove_matched_security_groups(self):
@@ -1143,3 +1327,264 @@ class TestModifyVpcSecurityGroupsAction(BaseTest):
         # check SG was added
         self.assertEqual(len(clean_resources[0]["SecurityGroups"]), 2)
         self.assertIn("sg-c573e6b3", clean_resources[0]["SecurityGroups"])
+
+
+class TestTargetGroupAttributesFilter(BaseTest):
+    def test_is_not_preserve_client_ip_target_group(self):
+        session_factory = self.replay_flight_data("test_target_group_attributes_filter_action")
+        policy = self.load_policy(
+            {
+                "name": "target-group-is-not-preserve-client-ip",
+                "resource": "app-elb-target-group",
+                "filters": [
+                        {
+                            "type": "attributes",
+                            "key": "preserve_client_ip.enabled",
+                            "value": False,
+                            "op": "eq",
+                        }
+                ],
+            },
+            config={'region': 'us-west-2'},
+            session_factory=session_factory,
+        )
+
+        resources = policy.run()
+        self.assertEqual(len(resources), 1)
+
+    def test_is_preserve_client_ip_target_group(self):
+        session_factory = self.replay_flight_data("test_target_group_attributes_filter_action")
+        policy = self.load_policy(
+            {
+                "name": "target-group-is-preserve-client-ip",
+                "resource": "app-elb-target-group",
+                "filters": [
+                        {
+                            "type": "attributes",
+                            "key": "preserve_client_ip.enabled",
+                            "value": True,
+                            "op": "eq",
+                        }
+                ],
+            },
+            config={'region': 'us-west-2'},
+            session_factory=session_factory,
+        )
+
+        resources = policy.run()
+        self.assertEqual(len(resources), 0)
+
+    def test_target_group_stickiness_type_check(self):
+        session_factory = self.replay_flight_data("test_target_group_attributes_filter_action")
+        policy = self.load_policy(
+            {
+                "name": "target-group-stickiness-is-source_ip",
+                "resource": "app-elb-target-group",
+                "filters": [
+                        {
+                            "type": "attributes",
+                            "key": "stickiness.type",
+                            "value": "source_ip",
+                            "op": "eq"
+                        }
+                ],
+            },
+            session_factory=session_factory,
+        )
+
+        resources = policy.run()
+
+        self.assertEqual(
+            len(resources), 1,
+            "Test should find 1 target group with stickiness with source_ip enabled"
+        )
+
+        self.assertEqual(
+            resources[0]['c7n:TargetGroupAttributes']['stickiness.type'], "source_ip"
+        )
+
+    def test_tg_deregistration_delay_timeout_equal_300(self):
+        session_factory = self.replay_flight_data("test_target_group_attributes_filter_action")
+        policy = self.load_policy(
+            {
+                "name": "target-group-idle-timeout-is-equal-300",
+                "resource": "app-elb-target-group",
+                "filters": [
+                        {
+                            "type": "attributes",
+                            "key": "deregistration_delay.timeout_seconds",
+                            "value": 300,
+                            "op": "eq"
+                        }
+                ],
+            },
+            session_factory=session_factory,
+        )
+
+        resources = policy.run()
+
+        self.assertEqual(
+            len(resources), 1, "Test should find 1 target group with idle timeout == 300s"
+        )
+
+        self.assertEqual(
+            resources[0]['c7n:TargetGroupAttributes']['deregistration_delay.timeout_seconds'], 300
+        )
+
+    def test_appelb_listener_rules_fetched(self):
+        """Test that listener rules are fetched and available for filtering"""
+        self.patch(AppELB, "executor_factory", MainThreadExecutor)
+        session_factory = self.replay_flight_data("test_appelb_listener_rules")
+        p = self.load_policy(
+            {
+                "name": "appelb-with-rules",
+                "resource": "app-elb",
+                "filters": [
+                    {
+                        "type": "listener-rule",
+                        "count": 0,
+                        "count_op": "gt"
+                    }
+                ],
+            },
+            session_factory=session_factory,
+        )
+        resources = p.run()
+        self.assertGreater(len(resources), 0)
+
+        # Verify that Rules are attached to ALBs
+        listener_rules = resources[0].get('c7n:ListenerRules', [])
+        self.assertGreater(len(listener_rules), 0)
+
+        # Verify rule structure
+        rule = listener_rules[0]
+        self.assertIn('Actions', rule)
+        self.assertIsInstance(rule['Actions'], list)
+
+    def test_appelb_filter_by_listener_rules(self):
+        """Test filtering ALBs based on listener rule actions"""
+        self.patch(AppELB, "executor_factory", MainThreadExecutor)
+        session_factory = self.replay_flight_data("test_appelb_listener_rules_filter")
+        p = self.load_policy(
+            {
+                "name": "appelb-insecure-rules",
+                "resource": "app-elb",
+                "filters": [
+                    {
+                        "type": "listener-rule",
+                        "attrs": [
+                            {
+                                "type": "value",
+                                "key": "Actions[0].Type",
+                                "value": "redirect"
+                            },
+                            {
+                                "type": "value",
+                                "key": "Actions[0].RedirectConfig.Protocol",
+                                "value": "HTTP"
+                            }
+                        ]
+                    }
+                ],
+            },
+            session_factory=session_factory,
+        )
+        resources = p.run()
+
+        # Should catch ALBs with listener rules redirecting to HTTP
+        self.assertGreater(len(resources), 0)
+
+        # Verify the ALB has listener rules attached
+        listener_rules = resources[0].get('c7n:ListenerRules', [])
+        self.assertGreater(len(listener_rules), 0)
+
+        # Check that at least one rule has redirect to HTTP
+        has_insecure_redirect = False
+        for rule in listener_rules:
+            for action in rule.get('Actions', []):
+                if (action.get('Type') == 'redirect' and
+                    action.get('RedirectConfig', {}).get('Protocol') == 'HTTP'):
+                    has_insecure_redirect = True
+                    break
+
+        self.assertTrue(has_insecure_redirect)
+
+    def test_appelb_listener_rules_fetch_error_listeners(self):
+        # Test exception handling when DescribeListeners fails
+        from unittest import mock
+        session_factory = self.replay_flight_data('test_appelb_listener_rules')
+
+        p = self.load_policy(
+            {
+                'name': 'appelb-listener-rules-error',
+                'resource': 'app-elb',
+                'filters': [
+                    {'type': 'listener-rule', 'count': 0, 'count_op': 'gte'}
+                ]
+            },
+            session_factory=session_factory,
+        )
+
+        # Get the filter and mock its manager's retry method for describe_listeners
+        filter_instance = p.resource_manager.filters[0]
+        original_retry = filter_instance.manager.retry
+
+        def mock_retry(func, *args, **kwargs):
+            if func.__name__ == 'describe_listeners':
+                raise ClientError(
+                    {
+                        'Error': {
+                            'Code': 'SimulatedError',
+                            'Message': 'Simulated DescribeListeners failure',
+                        }
+                    },
+                    'describe_listeners',
+                )
+            return original_retry(func, *args, **kwargs)
+
+        with mock.patch.object(filter_instance.manager, 'retry', side_effect=mock_retry):
+            # Should not raise exception, just log warning and return resources with empty rules
+            resources = p.run()
+            self.assertGreater(len(resources), 0)
+            for alb in resources:
+                self.assertEqual(len(alb.get('c7n:ListenerRules', [])), 0)
+
+    def test_appelb_listener_rules_fetch_error_rules(self):
+        # Test exception handling when DescribeRules fails
+        from unittest import mock
+        session_factory = self.replay_flight_data('test_appelb_listener_rules')
+
+        p = self.load_policy(
+            {
+                'name': 'appelb-listener-rules-error',
+                'resource': 'app-elb',
+                'filters': [
+                    {'type': 'listener-rule', 'count': 0, 'count_op': 'gte'}
+                ]
+            },
+            session_factory=session_factory,
+        )
+
+        # Get the filter and mock its manager's retry method for describe_rules
+        filter_instance = p.resource_manager.filters[0]
+        original_retry = filter_instance.manager.retry
+
+        def mock_retry(func, *args, **kwargs):
+            if func.__name__ == 'describe_rules':
+                raise ClientError(
+                    {
+                        'Error': {
+                            'Code': 'SimulatedError',
+                            'Message': 'Simulated DescribeRules failure',
+                        }
+                    },
+                    'describe_rules',
+                )
+            return original_retry(func, *args, **kwargs)
+
+        with mock.patch.object(filter_instance.manager, 'retry', side_effect=mock_retry):
+            # Should not raise exception, just log warning and return resources with empty rules
+            resources = p.run()
+            self.assertGreater(len(resources), 0)
+            for alb in resources:
+                self.assertEqual(len(alb.get('c7n:ListenerRules', [])), 0)

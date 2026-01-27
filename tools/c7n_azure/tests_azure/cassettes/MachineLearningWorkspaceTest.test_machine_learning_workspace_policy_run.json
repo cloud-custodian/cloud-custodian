@@ -1,0 +1,119 @@
+{
+    "version": 1,
+    "interactions": [
+        {
+            "request": {
+                "method": "GET",
+                "uri": "https://management.azure.com/subscriptions/ea42f556-5106-4743-99b0-c129bfa71a47/providers/Microsoft.MachineLearningServices/workspaces?api-version=2020-08-01",
+                "body": null,
+                "headers": {}
+            },
+            "response": {
+                "status": {
+                    "code": 200,
+                    "message": "OK"
+                },
+                "headers": {
+                    "x-ms-response-type": [
+                        "standard"
+                    ],
+                    "x-request-time": [
+                        "0.023"
+                    ],
+                    "date": [
+                        "Wed, 24 Nov 2021 21:04:22 GMT"
+                    ],
+                    "content-type": [
+                        "application/json; charset=utf-8"
+                    ],
+                    "request-context": [
+                        "appId=cid-v1:2d2e8e63-272e-4b3c-8598-4ee570a0e70d"
+                    ],
+                    "cache-control": [
+                        "no-cache"
+                    ],
+                    "content-length": [
+                        "3794"
+                    ]
+                },
+                "body": {
+                    "data": {
+                        "value": [
+                            {
+                                "id": "/subscriptions/ea42f556-5106-4743-99b0-c129bfa71a47/resourceGroups/VV/providers/Microsoft.MachineLearningServices/workspaces/mlvvtest",
+                                "name": "mlvvtest",
+                                "type": "Microsoft.MachineLearningServices/workspaces",
+                                "location": "eastus",
+                                "tags": {},
+                                "etag": null,
+                                "properties": {
+                                    "friendlyName": "mlvvtest",
+                                    "description": "",
+                                    "storageAccount": "/subscriptions/ea42f556-5106-4743-99b0-c129bfa71a47/resourcegroups/vv/providers/microsoft.storage/storageaccounts/mlvvtest7678628190",
+                                    "keyVault": "/subscriptions/ea42f556-5106-4743-99b0-c129bfa71a47/resourcegroups/vv/providers/microsoft.keyvault/vaults/mlvvtest9461884432",
+                                    "applicationInsights": "/subscriptions/ea42f556-5106-4743-99b0-c129bfa71a47/resourcegroups/vv/providers/microsoft.insights/components/mlvvtest5784258697",
+                                    "hbiWorkspace": false,
+                                    "tenantId": "00000000-0000-0000-0000-000000000003",
+                                    "imageBuildCompute": null,
+                                    "provisioningState": "Succeeded",
+                                    "containerRegistry": null,
+                                    "creationTime": "2021-11-24T20:58:48.6304168+00:00",
+                                    "notebookInfo": {
+                                        "resourceId": "5300b2418b9d44a0b7b47bf105843659",
+                                        "fqdn": "ml-mlvvtest-eastus-8f502f02-8843-4d46-ad76-9828b6f18fc4.eastus.notebooks.azure.net",
+                                        "isPrivateLinkEnabled": true,
+                                        "notebookPreparationError": null
+                                    },
+                                    "storageHnsEnabled": false,
+                                    "workspaceId": "8f502f02-8843-4d46-ad76-9828b6f18fc4",
+                                    "linkedModelInventoryArmId": null,
+                                    "privateLinkCount": 1,
+                                    "privateEndpointConnections": [
+                                        {
+                                            "id": "/subscriptions/ea42f556-5106-4743-99b0-c129bfa71a47/resourceGroups/VV/providers/Microsoft.MachineLearningServices/workspaces/mlvvtest/privateEndpointConnections/mlvvtest.a2bd612e-245a-49fc-8dd8-06fa09941648",
+                                            "location": "eastus",
+                                            "properties": {
+                                                "provisioningState": "Succeeded",
+                                                "privateEndpoint": {
+                                                    "id": "/subscriptions/ea42f556-5106-4743-99b0-c129bfa71a47/resourceGroups/VV/providers/Microsoft.Network/privateEndpoints/testmlendp",
+                                                    "subnetArmId": "/subscriptions/ea42f556-5106-4743-99b0-c129bfa71a47/resourceGroups/VV/providers/Microsoft.Network/virtualNetworks/vvvnetendp/subnets/ml_workspaces"
+                                                },
+                                                "privateLinkServiceConnectionState": {
+                                                    "status": "Approved",
+                                                    "description": "Auto-Approved",
+                                                    "actionsRequired": "None"
+                                                }
+                                            }
+                                        }
+                                    ],
+                                    "allowPublicAccessWhenBehindVnet": false,
+                                    "publicNetworkAccess": "Disabled",
+                                    "discoveryUrl": "https://8f502f02-8843-4d46-ad76-9828b6f18fc4.workspace.eastus.api.azureml.ms/discovery/workspaces/8f502f02-8843-4d46-ad76-9828b6f18fc4",
+                                    "mlFlowTrackingUri": "azureml://8f502f02-8843-4d46-ad76-9828b6f18fc4.workspace.eastus.api.azureml.ms/mlflow/v1.0/subscriptions/ea42f556-5106-4743-99b0-c129bfa71a47/resourceGroups/VV/providers/Microsoft.MachineLearningServices/workspaces/mlvvtest",
+                                    "sdkTelemetryAppInsightsKey": "f5784ccd-178d-4ecc-9998-b05841b44ae9"
+                                },
+                                "identity": {
+                                    "type": "SystemAssigned",
+                                    "principalId": "1df70458-0182-4191-9983-12f22d5bf7a1",
+                                    "tenantId": "00000000-0000-0000-0000-000000000003"
+                                },
+                                "sku": {
+                                    "name": "Basic",
+                                    "tier": "Basic"
+                                },
+                                "systemData": {
+                                    "createdAt": "2021-11-24T20:58:47.4883547Z",
+                                    "createdBy": "Volodymyr_Vrydnyk@epam.com",
+                                    "createdByType": "User",
+                                    "lastModifiedAt": "2021-11-24T20:58:47.4883547Z",
+                                    "lastModifiedBy": "Volodymyr_Vrydnyk@epam.com",
+                                    "lastModifiedByType": "User"
+                                }
+                            }
+                        ]
+                    }
+                }
+            }
+        }
+    ]
+}

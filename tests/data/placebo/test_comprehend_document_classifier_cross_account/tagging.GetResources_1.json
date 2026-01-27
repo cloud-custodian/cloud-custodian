@@ -1,0 +1,36 @@
+{
+    "status_code": 200,
+    "data": {
+        "PaginationToken": "",
+        "ResourceTagMappingList": [
+            {
+                "ResourceARN": "arn:aws:comprehend:us-east-1:644160558196:document-classifier/TestModelVPC/version/7",
+                "Tags": [
+                    {
+                        "Key": "ASV",
+                        "Value": "PolicyTestASV"
+                    }
+                ]
+            },
+            {
+                "ResourceARN": "arn:aws:comprehend:us-east-1:644160558196:document-classifier/TestModelVPC/version/KMS",
+                "Tags": [
+                    {
+                        "Key": "ASV",
+                        "Value": "PolicyTestASV"
+                    }
+                ]
+            },
+            {
+                "ResourceARN": "arn:aws:comprehend:us-east-1:644160558196:document-classifier/TestModelVPC/version/KMS-3",
+                "Tags": [
+                    {
+                        "Key": "ASV",
+                        "Value": "PolicyTestASV"
+                    }
+                ]
+            }
+        ],
+        "ResponseMetadata": {}
+    }
+}

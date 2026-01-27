@@ -1,73 +1,93 @@
 {
-    "status_code": 200, 
+    "status_code": 200,
     "data": {
+        "ResponseMetadata": {},
         "Findings": [
             {
-                "GeneratorId": "rds-finding", 
-                "Severity": {
-                    "Product": 10, 
-                    "Normalized": 10
-                }, 
-                "Title": "rds-finding", 
-                "Resources": [
-                    {
-                        "Details": {
-                            "Other": {
-                                "Engine": "mariadb", 
-                                "VpcId": "vpc-d6fe6cb1", 
-                                "PubliclyAccessible": "False", 
-                                "DBName": "testme", 
-                                "AvailabilityZone": "us-east-1a", 
-                                "InstanceCreateTime": "2018-11-05T03:25:12.384000+00:00", 
-                                "StorageEncrypted": "False", 
-                                "AllocatedStorage": "20", 
-                                "EngineVersion": "10.3.8", 
-                                "DBInstanceClass": "db.t2.micro", 
-                                "DBSubnetGroupName": "default"
-                            }
-                        }, 
-                        "Region": "us-east-1", 
-                        "Type": "Other", 
-                        "Id": "arn:aws:rds:us-east-1:101010101111:db:testme", 
-                        "Tags": {
-                            "workload-type": "other"
-                        }
-                    }
-                ], 
-                "ProductArn": "arn:aws:securityhub:us-east-1:101010101111:product/101010101111/default", 
-                "ProductFields": {
-                    "aws/securityhub/SeverityLabel": "LOW", 
-                    "resource": "rds", 
-                    "ProviderName": "CloudCustodian", 
-                    "ProviderVersion": "0.8.32.1", 
-                    "aws/securityhub/ProductName": "Default", 
-                    "aws/securityhub/FindingId": "arn:aws:securityhub:us-east-1:101010101111:product/101010101111/default/us-east-1/101010101111/abdd674a66f46edf33193a20feb7753d/715936d037ae32530ce08602967a9bfd", 
-                    "aws/securityhub/CompanyName": "Personal"
-                }, 
-                "CreatedAt": "2018-12-03T06:01:08.468701+00:00", 
-                "UpdatedAt": "2018-12-03T06:01:08.468701+00:00", 
-                "RecordState": "ACTIVE", 
-                "SchemaVersion": "2018-10-08", 
-                "Id": "us-east-1/101010101111/abdd674a66f46edf33193a20feb7753d/715936d037ae32530ce08602967a9bfd", 
+                "SchemaVersion": "2018-10-08",
+                "Id": "us-west-2/644160558196/31fd4463a46f8c8ab907befaf652cc86/58bb07b7c746e8a8cb4004b6c3e832d7",
+                "ProductArn": "arn:aws:securityhub:us-west-2::product/cloud-custodian/cloud-custodian",
+                "ProductName": "Cloud Custodian",
+                "CompanyName": "Cloud Custodian",
+                "Region": "us-west-2",
+                "GeneratorId": "rds-finding",
+                "AwsAccountId": "644160558196",
                 "Types": [
                     "Software and Configuration Checks/AWS Security Best Practices"
-                ], 
-                "AwsAccountId": "101010101111"
+                ],
+                "CreatedAt": "2023-01-25T22:16:08.677783+00:00",
+                "UpdatedAt": "2023-01-25T22:16:08.677783+00:00",
+                "Severity": {
+                    "Product": 10,
+                    "Label": "INFORMATIONAL",
+                    "Normalized": 10
+                },
+                "Title": "rds-finding",
+                "Description": "rds-finding",
+                "ProductFields": {
+                    "resource": "rds",
+                    "ProviderName": "CloudCustodian",
+                    "ProviderVersion": "0.9.22",
+                    "aws/securityhub/FindingId": "arn:aws:securityhub:us-west-2::product/cloud-custodian/cloud-custodian/us-west-2/644160558196/31fd4463a46f8c8ab907befaf652cc86/58bb07b7c746e8a8cb4004b6c3e832d7",
+                    "aws/securityhub/ProductName": "Cloud Custodian",
+                    "aws/securityhub/CompanyName": "Cloud Custodian"
+                },
+                "Resources": [
+                    {
+                        "Type": "AwsRdsDbInstance",
+                        "Id": "arn:aws:rds:us-west-2:644160558196:db:test-instance-3",
+                        "Region": "us-west-2",
+                        "Details": {
+                            "AwsRdsDbInstance": {
+                                "CACertificateIdentifier": "rds-ca-2019",
+                                "DBClusterIdentifier": "test",
+                                "DBInstanceIdentifier": "test-instance-3",
+                                "DBInstanceClass": "db.m5d.xlarge",
+                                "DbiResourceId": "db-EH6SVXMILRMDTBVY4GNOOI3OL4",
+                                "Engine": "postgres",
+                                "EngineVersion": "13.7",
+                                "KmsKeyId": "arn:aws:kms:us-west-2:644160558196:key/31e94e00-358a-4f53-8a0c-48ae90c8cc23",
+                                "StorageEncrypted": true,
+                                "VpcSecurityGroups": [
+                                    {
+                                        "VpcSecurityGroupId": "sg-0e255aed9188d1fba",
+                                        "Status": "active"
+                                    }
+                                ],
+                                "MasterUsername": "postgres",
+                                "AllocatedStorage": 400,
+                                "PreferredBackupWindow": "11:55-12:25",
+                                "BackupRetentionPeriod": 7,
+                                "AvailabilityZone": "us-west-2b",
+                                "PreferredMaintenanceWindow": "tue:07:49-tue:08:19",
+                                "LicenseModel": "postgresql-license",
+                                "Iops": 3000,
+                                "OptionGroupMemberships": [
+                                    {
+                                        "OptionGroupName": "default:postgres-13",
+                                        "Status": "in-sync"
+                                    }
+                                ],
+                                "StorageType": "io1",
+                                "PromotionTier": 1
+                            }
+                        }
+                    }
+                ],
+                "WorkflowState": "NEW",
+                "Workflow": {
+                    "Status": "NEW"
+                },
+                "RecordState": "ACTIVE",
+                "FindingProviderFields": {
+                    "Severity": {
+                        "Label": "INFORMATIONAL"
+                    },
+                    "Types": [
+                        "Software and Configuration Checks/AWS Security Best Practices"
+                    ]
+                }
             }
-        ], 
-        "ResponseMetadata": {
-            "RetryAttempts": 0, 
-            "HTTPStatusCode": 200, 
-            "RequestId": "7b9874c0-f6c1-11e8-b750-83c302355dca", 
-            "HTTPHeaders": {
-                "x-amzn-requestid": "7b9874c0-f6c1-11e8-b750-83c302355dca", 
-                "content-length": "3684", 
-                "x-amz-apigw-id": "RUQlpGHFIAMFehg=", 
-                "x-amzn-trace-id": "Root=1-5c04c7bd-7735f7cc6767c02ab3d2cbae;Sampled=0", 
-                "connection": "keep-alive", 
-                "date": "Mon, 03 Dec 2018 06:05:49 GMT", 
-                "content-type": "application/json"
-            }
-        }
+        ]
     }
 }

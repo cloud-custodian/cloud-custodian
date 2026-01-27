@@ -38,6 +38,11 @@ class FunctionTest(BaseTest):
         archive.close()
         return mu.CloudFunction(config, archive)
 
+    def test_archive_files(self):
+        archive = mu.custodian_archive()
+        archive.close()
+        assert "c7n_gcp/filters/recommender.json" in archive.get_filenames()
+
     def test_deploy_function(self):
         factory = self.replay_flight_data('mu-deploy')
         manager = mu.CloudFunctionManager(factory, 'us-central1')
@@ -89,7 +94,7 @@ class FunctionTest(BaseTest):
             'name': 'instance', 'resource': 'gcp.instance'},
             session_factory=factory)
         exec_mode = policy.FunctionMode(p)
-        self.assertRaises(NotImplementedError, exec_mode.run)
+        self.assertRaises(NotImplementedError, exec_mode.run, {}, None)
         self.assertRaises(NotImplementedError, exec_mode.provision)
         self.assertEqual(None, exec_mode.validate())
 
@@ -191,6 +196,7 @@ class FunctionTest(BaseTest):
             'resource': 'gcp.instance',
             'mode': {
                 'type': 'gcp-periodic',
+                'environment': {'Env': 'Dev'},
                 'schedule': 'every 2 hours',
                 'service-account': 'foo'}},
             session_factory=factory)

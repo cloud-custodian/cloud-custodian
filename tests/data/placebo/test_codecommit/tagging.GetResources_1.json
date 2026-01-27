@@ -1,0 +1,18 @@
+{
+    "status_code": 200,
+    "data": {
+        "PaginationToken": "",
+        "ResourceTagMappingList": [
+            {
+                "ResourceARN": "arn:aws:codecommit:us-east-2:644160558196:demo-policies",
+                "Tags": [
+                    {
+                        "Key": "Owner",
+                        "Value": "aj@stacklet.io"
+                    }
+                ]
+            }
+        ],
+        "ResponseMetadata": {}
+    }
+}

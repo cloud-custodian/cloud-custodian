@@ -1,0 +1,16 @@
+{
+    "status_code": 200,
+    "data": {
+        "subscriptionFilters": [
+            {
+                "filterName": "log-susbscription-filter-a",
+                "logGroupName": "c7n-test-a",
+                "filterPattern": "id",
+                "destinationArn": "arn:aws:logs:us-east-1:644160558196:destination:lambda",
+                "distribution": "ByLogStream",
+                "creationTime": 1664486090871
+            }
+        ],
+        "ResponseMetadata": {}
+    }
+}

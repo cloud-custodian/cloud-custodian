@@ -79,7 +79,8 @@ class SecurityComandCenterFindingsFilter(ValueFilter):
 
     @classmethod
     def register_resources(klass, registry, resource_class):
-        resource_class.filter_registry.register('scc-findings', klass)
+        if resource_class.filter_registry:
+            resource_class.filter_registry.register('scc-findings', klass)
 
 
 gcp_resources.subscribe(SecurityComandCenterFindingsFilter.register_resources)

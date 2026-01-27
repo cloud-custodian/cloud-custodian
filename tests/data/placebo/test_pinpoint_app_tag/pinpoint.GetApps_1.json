@@ -1,0 +1,17 @@
+{
+    "status_code": 200,
+    "data": {
+        "ResponseMetadata": {},
+        "ApplicationsResponse": {
+            "Item": [
+                {
+                    "Arn": "arn:aws:mobiletargeting:us-east-1:644160558196:apps/4bf4814446ed468aa80dce914c61a180",
+                    "Id": "4bf4814446ed468aa80dce914c61a180",
+                    "Name": "test_project",
+                    "tags": {},
+                    "CreationDate": "2023-04-14T14:11:48.738Z"
+                }
+            ]
+        }
+    }
+}

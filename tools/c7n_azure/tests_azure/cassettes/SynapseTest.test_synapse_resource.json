@@ -1,0 +1,121 @@
+{
+    "version": 1,
+    "interactions": [
+        {
+            "request": {
+                "method": "GET",
+                "uri": "https://management.azure.com/subscriptions/ea42f556-5106-4743-99b0-c129bfa71a47/providers/Microsoft.Synapse/workspaces?api-version=2019-06-01-preview",
+                "body": null,
+                "headers": {}
+            },
+            "response": {
+                "status": {
+                    "code": 200,
+                    "message": "OK"
+                },
+                "headers": {
+                    "cache-control": [
+                        "no-cache"
+                    ],
+                    "content-type": [
+                        "application/json; charset=utf-8"
+                    ],
+                    "date": [
+                        "Mon, 29 Aug 2022 08:03:13 GMT"
+                    ],
+                    "content-length": [
+                        "2798"
+                    ]
+                },
+                "body": {
+                    "data": {
+                        "value": [
+                            {
+                                "type": "Microsoft.Synapse/workspaces",
+                                "properties": {
+                                    "encryption": {
+                                        "doubleEncryptionEnabled": false
+                                    },
+                                    "defaultDataLakeStorage": {
+                                        "accountUrl": "https://sa358green.dfs.core.windows.net",
+                                        "filesystem": "dlg2358-red"
+                                    },
+                                    "provisioningState": "Succeeded",
+                                    "managedVirtualNetwork": "default",
+                                    "connectivityEndpoints": {
+                                        "web": "https://web.azuresynapse.net?workspace=%2fsubscriptions%2fea42f556-5106-4743-99b0-c129bfa71a47%2fresourceGroups%2f358-rg-green%2fproviders%2fMicrosoft.Synapse%2fworkspaces%2fworkspace358-green",
+                                        "dev": "https://workspace358-green.dev.azuresynapse.net",
+                                        "sqlOnDemand": "workspace358-green-ondemand.sql.azuresynapse.net",
+                                        "sql": "workspace358-green.sql.azuresynapse.net"
+                                    },
+                                    "managedResourceGroupName": "synapseworkspace-managedrg-d443942c-969a-4dd5-9773-35d06dc71382",
+                                    "sqlAdministratorLogin": "QNZqPbaW",
+                                    "privateEndpointConnections": [],
+                                    "workspaceUID": "b7b5d129-8051-477c-9853-fee81cc46e11",
+                                    "extraProperties": {
+                                        "WorkspaceType": "Normal",
+                                        "IsScopeEnabled": false
+                                    },
+                                    "managedVirtualNetworkSettings": {
+                                        "preventDataExfiltration": true
+                                    }
+                                },
+                                "id": "/subscriptions/ea42f556-5106-4743-99b0-c129bfa71a47/resourceGroups/358-rg-green/providers/Microsoft.Synapse/workspaces/workspace358-green",
+                                "location": "eastus",
+                                "name": "workspace358-green",
+                                "identity": {
+                                    "type": "SystemAssigned",
+                                    "tenantId": "00000000-0000-0000-0000-000000000003",
+                                    "principalId": "0ac7d737-f600-4c2a-88f1-8899c87bb2d9"
+                                },
+                                "tags": {
+                                    "ComplianceStatus": "Green",
+                                    "CustodianRule": "epam-azure-358-synapse_workspace_managed_vnet"
+                                }
+                            },
+                            {
+                                "type": "Microsoft.Synapse/workspaces",
+                                "properties": {
+                                    "encryption": {
+                                        "doubleEncryptionEnabled": false
+                                    },
+                                    "defaultDataLakeStorage": {
+                                        "accountUrl": "https://sa358red.dfs.core.windows.net",
+                                        "filesystem": "dlg2358-red"
+                                    },
+                                    "provisioningState": "Succeeded",
+                                    "connectivityEndpoints": {
+                                        "web": "https://web.azuresynapse.net?workspace=%2fsubscriptions%2fea42f556-5106-4743-99b0-c129bfa71a47%2fresourceGroups%2f358-rg-red%2fproviders%2fMicrosoft.Synapse%2fworkspaces%2fworkspace358-red",
+                                        "dev": "https://workspace358-red.dev.azuresynapse.net",
+                                        "sqlOnDemand": "workspace358-red-ondemand.sql.azuresynapse.net",
+                                        "sql": "workspace358-red.sql.azuresynapse.net"
+                                    },
+                                    "managedResourceGroupName": "synapseworkspace-managedrg-e9493724-0dcd-40bf-9a66-3711cf0692ba",
+                                    "sqlAdministratorLogin": "QkmRkQen",
+                                    "privateEndpointConnections": [],
+                                    "workspaceUID": "58c43642-2a50-4338-9109-98c54e974a68",
+                                    "extraProperties": {
+                                        "WorkspaceType": "Normal",
+                                        "IsScopeEnabled": false
+                                    }
+                                },
+                                "id": "/subscriptions/ea42f556-5106-4743-99b0-c129bfa71a47/resourceGroups/358-rg-red/providers/Microsoft.Synapse/workspaces/workspace358-red",
+                                "location": "eastus",
+                                "name": "workspace358-red",
+                                "identity": {
+                                    "type": "SystemAssigned",
+                                    "tenantId": "00000000-0000-0000-0000-000000000003",
+                                    "principalId": "5983936c-410d-42d3-8bdc-1ce23eb820ef"
+                                },
+                                "tags": {
+                                    "ComplianceStatus": "Red",
+                                    "CustodianRule": "epam-azure-358-synapse_workspace_managed_vnet"
+                                }
+                            }
+                        ]
+                    }
+                }
+            }
+        }
+    ]
+}

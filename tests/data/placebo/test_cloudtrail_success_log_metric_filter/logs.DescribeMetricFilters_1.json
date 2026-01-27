@@ -1,0 +1,22 @@
+{
+    "status_code": 200,
+    "data": {
+        "metricFilters": [
+            {
+                "filterName": "test-filter-name-40313",
+                "filterPattern": "{ ($.eventName = ConsoleLogin) && ($.additionalEventData.MFAUsed != Yes) }",
+                "metricTransformations": [
+                    {
+                        "metricName": "no_mfa_console_signin_metric_1",
+                        "metricNamespace": "ImportantMetrics",
+                        "metricValue": "1",
+                        "unit": "None"
+                    }
+                ],
+                "creationTime": 1669136241675,
+                "logGroupName": "cloudtrail-test-group20221122165720932700000003"
+            }
+        ],
+        "ResponseMetadata": {}
+    }
+}

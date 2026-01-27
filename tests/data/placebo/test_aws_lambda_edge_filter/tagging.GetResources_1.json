@@ -1,0 +1,57 @@
+{
+    "status_code": 200,
+    "data": {
+        "PaginationToken": "",
+        "ResourceTagMappingList": [
+            {
+                "ResourceARN": "arn:aws:lambda:us-east-1:644160558196:function:test-pratyush",
+                "Tags": [
+                    {
+                        "Key": "7ps:signature",
+                        "Value": "xyz"
+                    },
+                    {
+                        "Key": "bogie:gears:signature",
+                        "Value": "abc"
+                    },
+                    {
+                        "Key": "c7n-timestamp",
+                        "Value": "2022-11-22 19:10:34.442479"
+                    }
+                ]
+            },
+            {
+                "ResourceARN": "arn:aws:lambda:us-east-1:644160558196:function:c7n-lambda-edge-new",
+                "Tags": [
+                    {
+                        "Key": "lambda-console:blueprint",
+                        "Value": "cloudfront-http-redirect"
+                    }
+                ]
+            },
+            {
+                "ResourceARN": "arn:aws:lambda:us-east-1:644160558196:function:test-python",
+                "Tags": [
+                    {
+                        "Key": "c7n:FindingId:lambda-force-vulnerabilities",
+                        "Value": "us-east-1/644160558196/a045b52dbdf3f1601befc59dd0c8526f/a317aa172505e9805fb207a8b22c1e72:2022-04-12T14:37:06.132664+00:00"
+                    },
+                    {
+                        "Key": "c7n-timestamp",
+                        "Value": "2022-11-22 19:10:34.442479"
+                    }
+                ]
+            },
+            {
+                "ResourceARN": "arn:aws:lambda:us-east-1:644160558196:function:test-lambda-edge",
+                "Tags": [
+                    {
+                        "Key": "lambda-console:blueprint",
+                        "Value": "cloudfront-modify-response-header"
+                    }
+                ]
+            }
+        ],
+        "ResponseMetadata": {}
+    }
+}

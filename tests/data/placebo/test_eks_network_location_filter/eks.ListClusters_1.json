@@ -1,0 +1,9 @@
+{
+    "status_code": 200,
+    "data": {
+        "ResponseMetadata": {},
+        "clusters": [
+            "c7n-test-eks-cluster"
+        ]
+    }
+}

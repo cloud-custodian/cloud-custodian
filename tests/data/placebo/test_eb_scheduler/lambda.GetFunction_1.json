@@ -1,0 +1,12 @@
+{
+    "status_code": 404,
+    "data": {
+        "Error": {
+            "Message": "Function not found: arn:aws:lambda:us-east-1:644160558196:function:custodian-schedule-ec2-checker:Dev",
+            "Code": "ResourceNotFoundException"
+        },
+        "ResponseMetadata": {},
+        "Type": "User",
+        "Message": "Function not found: arn:aws:lambda:us-east-1:644160558196:function:custodian-schedule-ec2-checker:Dev"
+    }
+}

@@ -1,0 +1,22 @@
+{
+    "status_code": 200,
+    "data": {
+        "Name": "Test-Document-1",
+        "CreatedDate": {
+            "__class__": "datetime",
+            "year": 2024,
+            "month": 6,
+            "day": 13,
+            "hour": 15,
+            "minute": 2,
+            "second": 57,
+            "microsecond": 27000
+        },
+        "DocumentVersion": "1",
+        "Status": "Active",
+        "Content": "{\n  \"schemaVersion\": \"2.2\",\n  \"description\": \"Command Document Example JSON Template\",\n  \"parameters\": {\n    \"Message\": {\n      \"type\": \"String\",\n      \"description\": \"Example\",\n      \"default\": \"Hello World\"\n    }\n  },\n  \"mainSteps\": [\n    {\n      \"action\": \"aws:runPowerShellScript\",\n      \"name\": \"example\",\n      \"inputs\": {\n        \"runCommand\": [ \"Write-Output {{Message}}\" ]\n      }\n    }\n  ]\n}",
+        "DocumentType": "Command",
+        "DocumentFormat": "JSON",
+        "ResponseMetadata": {}
+    }
+}

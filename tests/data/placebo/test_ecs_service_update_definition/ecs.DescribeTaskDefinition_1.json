@@ -1,0 +1,217 @@
+{
+    "status_code": 200,
+    "data": {
+        "taskDefinition": {
+            "taskDefinitionArn": "arn:aws:ecs:us-east-2:644160558196:task-definition/dev-redash-server:75",
+            "containerDefinitions": [
+                {
+                    "name": "server",
+                    "image": "644160558196.dkr.ecr.us-east-1.amazonaws.com/stacklet-redash:842a0206d43c0eb4a69cb31d6debdb52a46cb9e7-9d442028dba0f2e9f6a1bc17aba20c73591810a4",
+                    "cpu": 1024,
+                    "memory": 2048,
+                    "links": [],
+                    "portMappings": [
+                        {
+                            "containerPort": 5000,
+                            "hostPort": 5000,
+                            "protocol": "tcp"
+                        }
+                    ],
+                    "essential": true,
+                    "entryPoint": [],
+                    "command": [
+                        "server"
+                    ],
+                    "environment": [
+                        {
+                            "name": "REDASH_RATELIMIT_ENABLED",
+                            "value": "false"
+                        },
+                        {
+                            "name": "REDASH_WEB_WORKERS",
+                            "value": "2"
+                        },
+                        {
+                            "name": "REDASH_LOG_LEVEL",
+                            "value": "DEBUG"
+                        },
+                        {
+                            "name": "REDASH_REDIS_URI",
+                            "value": ""
+                        },
+                        {
+                            "name": "REDASH_MAIL_SERVER",
+                            "value": "localhost"
+                        },
+                        {
+                            "name": "REDASH_MAIL_USE_SSL",
+                            "value": "false"
+                        },
+                        {
+                            "name": "REDASH_JWT_LOGIN_ENABLED",
+                            "value": "true"
+                        },
+                        {
+                            "name": "ASSETDB_DATABASE_URI",
+                            "value": ""
+                        },
+                        {
+                            "name": "REDASH_CORS_ACCESS_CONTROL_ALLOW_ORIGIN",
+                            "value": ""
+                        },
+                        {
+                            "name": "REDASH_DISABLE_PUBLIC_URLS",
+                            "value": "false"
+                        },
+                        {
+                            "name": "REDASH_JWT_AUTH_ISSUER",
+                            "value": ""
+                        },
+                        {
+                            "name": "PYTHONUNBUFFERED",
+                            "value": "0"
+                        },
+                        {
+                            "name": "AWS_PARTITION",
+                            "value": "aws"
+                        },
+                        {
+                            "name": "REDASH_MAIL_USERNAME",
+                            "value": ""
+                        },
+                        {
+                            "name": "REDASH_JWT_AUTH_PUBLIC_CERTS_URL",
+                            "value": ""
+                        },
+                        {
+                            "name": "SQLALCHEMY_DB_SCHEMA",
+                            "value": "redash"
+                        },
+                        {
+                            "name": "REDASH_MAIL_PASSWORD",
+                            "value": ""
+                        },
+                        {
+                            "name": "REDASH_MAIL_USE_TLS",
+                            "value": "false"
+                        },
+                        {
+                            "name": "REDASH_JWT_AUTH_COOKIE_NAME",
+                            "value": "stacklet-auth"
+                        },
+                        {
+                            "name": "REDASH_MAIL_PORT",
+                            "value": "25"
+                        },
+                        {
+                            "name": "REDASH_MAIL_DEFAULT_SENDER",
+                            "value": ""
+                        }
+                    ],
+                    "mountPoints": [],
+                    "volumesFrom": [],
+                    "linuxParameters": {
+                        "capabilities": {},
+                        "devices": []
+                    },
+                    "secrets": [
+                        {
+                            "name": "REDASH_COOKIE_SECRET",
+                            "valueFrom": "arn:aws:ssm:us-east-2:644160558196:parameter/dev/redash/cookie_secret"
+                        },
+                        {
+                            "name": "REDASH_SECRET_KEY",
+                            "valueFrom": "arn:aws:ssm:us-east-2:644160558196:parameter/dev/redash/secret"
+                        }
+                    ],
+                    "privileged": false,
+                    "readonlyRootFilesystem": false,
+                    "dnsServers": [],
+                    "dnsSearchDomains": [],
+                    "extraHosts": [],
+                    "dockerSecurityOptions": [],
+                    "pseudoTerminal": false,
+                    "logConfiguration": {
+                        "logDriver": "awslogs",
+                        "options": {
+                            "awslogs-group": "/fargate/tasks/dev-redash-server",
+                            "awslogs-region": "us-east-2",
+                            "awslogs-stream-prefix": "fargate"
+                        }
+                    }
+                }
+            ],
+            "family": "dev-redash-server",
+            "taskRoleArn": "arn:aws:iam::644160558196:role/dev-redash",
+            "executionRoleArn": "arn:aws:iam::644160558196:role/dev-redash",
+            "networkMode": "awsvpc",
+            "revision": 75,
+            "volumes": [],
+            "status": "ACTIVE",
+            "requiresAttributes": [
+                {
+                    "name": "com.amazonaws.ecs.capability.logging-driver.awslogs"
+                },
+                {
+                    "name": "ecs.capability.execution-role-awslogs"
+                },
+                {
+                    "name": "com.amazonaws.ecs.capability.ecr-auth"
+                },
+                {
+                    "name": "com.amazonaws.ecs.capability.docker-remote-api.1.19"
+                },
+                {
+                    "name": "com.amazonaws.ecs.capability.docker-remote-api.1.17"
+                },
+                {
+                    "name": "com.amazonaws.ecs.capability.task-iam-role"
+                },
+                {
+                    "name": "ecs.capability.execution-role-ecr-pull"
+                },
+                {
+                    "name": "ecs.capability.secrets.ssm.environment-variables"
+                },
+                {
+                    "name": "com.amazonaws.ecs.capability.docker-remote-api.1.18"
+                },
+                {
+                    "name": "ecs.capability.task-eni"
+                }
+            ],
+            "placementConstraints": [],
+            "compatibilities": [
+                "EC2",
+                "FARGATE"
+            ],
+            "requiresCompatibilities": [
+                "FARGATE"
+            ],
+            "cpu": "1024",
+            "memory": "2048",
+            "registeredAt": {
+                "__class__": "datetime",
+                "year": 2024,
+                "month": 1,
+                "day": 26,
+                "hour": 15,
+                "minute": 17,
+                "second": 13,
+                "microsecond": 7000
+            },
+            "registeredBy": "arn:aws:sts::644160558196:assumed-role/stacklet-deployer/atlantis-terraform"
+        },
+        "tags": [
+            {
+                "key": "App",
+                "value": "Redash"
+            },
+            {
+                "key": "stacklet:app",
+                "value": "redash"
+            }
+        ],
+        "ResponseMetadata": {}
+    }
+}

@@ -1,0 +1,90 @@
+{
+    "eventVersion": "1.08",
+    "userIdentity": {
+        "type": "IAMUser",
+        "principalId": "0000",
+        "arn": "arn:aws:iam::0000:robot",
+        "accountId": "0000",
+        "accessKeyId": "xxxxxxxxxxx",
+        "sessionContext": {
+            "sessionIssuer": {},
+            "webIdFederationData": {},
+            "attributes": {
+                "creationDate": "2023-11-02T23:42:36Z",
+                "mfaAuthenticated": "true"
+            }
+        }
+    },
+    "eventTime": "2023-11-03T03:05:26Z",
+    "eventSource": "appmesh.amazonaws.com",
+    "eventName": "CreateVirtualGateway",
+    "awsRegion": "eu-west-2",
+    "sourceIPAddress": "81.101.58.184",
+    "userAgent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/119.0.0.0 Safari/537.36",
+    "requestParameters": {
+        "clientToken": "cba1e876-f430-450a-0000-7bc9b8f7223b",
+        "meshName": "m1",
+        "meshOwner": "0000",
+        "spec": {
+            "backendDefaults": {
+                "clientPolicy": {}
+            },
+            "listeners": [
+                {
+                    "portMapping": {
+                        "port": 1,
+                        "protocol": "http"
+                    }
+                }
+            ],
+            "logging": {}
+        },
+        "virtualGatewayName": "g1"
+    },
+    "responseElements": {
+        "virtualGateway": {
+            "meshName": "m1",
+            "metadata": {
+                "arn": "arn:aws:appmesh:eu-west-2:0000:mesh/m1/virtualGateway/g1",
+                "createdAt": "Nov 3, 2023, 3:05:26 AM",
+                "lastUpdatedAt": "Nov 3, 2023, 3:05:26 AM",
+                "meshOwner": "123456789012",
+                "resourceOwner": "123456789012",
+                "uid": "80ee4027-c8e1-49e8-99ba-cace20a57f0b",
+                "version": 1
+            },
+            "spec": {
+                "backendDefaults": {
+                    "clientPolicy": {}
+                },
+                "listeners": [
+                    {
+                        "portMapping": {
+                            "port": 1,
+                            "protocol": "http"
+                        }
+                    }
+                ],
+                "logging": {}
+            },
+            "status": {
+                "status": "ACTIVE"
+            },
+            "virtualGatewayName": "g1"
+        }
+    },
+    "requestID": "a1304097-353a-4ac3-ab1f-f0dce184d956",
+    "eventID": "2d10d78e-05c4-4069-8d7b-dec836faf67d",
+    "readOnly": false,
+    "eventType": "AwsApiCall",
+    "apiVersion": "2019-01-25",
+    "managementEvent": true,
+    "recipientAccountId": "0000",
+    "eventCategory": "Management",
+    "tlsDetails": {
+        "tlsVersion": "TLSv1.3",
+        "cipherSuite": "TLS_AES_128_GCM_SHA256",
+        "clientProvidedHostHeader": "appmesh.eu-west-2.amazonaws.com"
+    },
+    "sessionCredentialFromConsole": "true"
+}

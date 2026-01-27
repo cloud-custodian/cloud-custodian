@@ -1,0 +1,18 @@
+{
+    "status_code": 200,
+    "data": {
+        "PaginationToken": "",
+        "ResourceTagMappingList": [
+            {
+                "ResourceARN": "arn:aws:emr-serverless:us-east-1:644160558196:/applications/00f7bp174ejqb109",
+                "Tags": [
+                    {
+                        "Key": "foo",
+                        "Value": "Resource does not meet policy: notify@2023/01/26"
+                    }
+                ]
+            }
+        ],
+        "ResponseMetadata": {}
+    }
+}

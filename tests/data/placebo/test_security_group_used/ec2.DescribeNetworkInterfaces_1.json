@@ -142,6 +142,54 @@
                 "SubnetId": "subnet-193bdf43",
                 "TagSet": [],
                 "VpcId": "vpc-0e03e277"
+            },            
+            {
+                "AvailabilityZone": "us-west-2c",
+                "Description": "aws-k8s-branch-eni",
+                "Groups": [
+                    {
+                        "GroupName": "default",
+                        "GroupId": "sg-f9cc4d9f"
+                    },
+                    {
+                        "GroupName": "InstanceSecurityGroup-1A6Y8I3R4AP02",
+                        "GroupId": "sg-0a2cb503a229c31c1"
+                    }
+                ],
+                "InterfaceType": "branch",
+                "Ipv6Addresses": [],
+                "MacAddress": "0a:e1:96:2a:14:03",
+                "NetworkInterfaceId": "eni-05f8e0f783bfe84f0",
+                "OwnerId": "01234567890",
+                "PrivateDnsName": "ip-100-71-36-229.us-west-2.compute.internal",
+                "PrivateIpAddress": "100.71.36.229",
+                "PrivateIpAddresses": [
+                    {
+                        "Primary": true,
+                        "PrivateDnsName": "ip-100-71-36-229.us-west-2.compute.internal",
+                        "PrivateIpAddress": "100.71.36.229"
+                    }
+                ],
+                "RequesterId": "01234567890",
+                "RequesterManaged": false,
+                "SourceDestCheck": true,
+                "Status": "in-use",
+                "SubnetId": "subnet-193bdf43",
+                "TagSet": [
+                    {
+                        "Key": "vpcresources.k8s.aws/vlan-id",
+                        "Value": "1"
+                    },
+                    {
+                        "Key": "eks:eni:owner",
+                        "Value": "eks-vpc-resource-controller"
+                    },
+                    {
+                        "Key": "vpcresources.k8s.aws/trunk-eni-id",
+                        "Value": "eni-0e769e3bf64c37e57"
+                    }
+                ],
+                "VpcId": "vpc-0e03e277"
             }
         ]
     }

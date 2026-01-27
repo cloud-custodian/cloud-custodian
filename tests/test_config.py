@@ -131,3 +131,90 @@ class ConfigRuleTest(BaseTest):
             "ConfigRules", []
         )
         self.assertEqual(rules[0]["ConfigRuleState"], "DELETING")
+
+    def test_remediation(self):
+        session_factory = self.replay_flight_data("test_config_rule_remediation")
+        p = self.load_policy(
+            {
+                "name": "rule",
+                "resource": "config-rule",
+                "filters": [
+                    {
+                        "type": "remediation",
+                        "rule_name": "config-managed-s3-bucket-public-write-remediate-event",
+                        "remediation": {
+                            "TargetId": "AWS-DisableS3BucketPublicReadWrite",
+                            "Automatic": True,
+                            "MaximumAutomaticAttempts": 5,
+                            "RetryAttemptSeconds": 211,
+                            "Parameters": {
+                                "AutomationAssumeRole": {
+                                    "StaticValue": {
+                                        "Values": [
+                                            "arn:aws:iam::{account_id}:role/myrole"
+                                        ]
+                                    }
+                                },
+                                "S3BucketName": {
+                                    "ResourceValue": {
+                                        "Value": "RESOURCE_ID"
+                                    }
+                                }
+                            }
+                        }
+                    }
+                ],
+            },
+            session_factory=session_factory,
+        )
+        p.expand_variables(p.get_variables())
+        resources = p.run()
+        self.assertEqual(len(resources), 1)
+        self.assertEqual(
+            resources[0]['ConfigRuleName'],
+            'custodian-config-managed-s3-bucket-public-write-remediate-event'
+        )
+
+    def test_remediation_no_results(self):
+        session_factory = self.replay_flight_data("test_config_rule_remediation")
+        policy = {
+            "name": "rule",
+            "resource": "config-rule",
+            "filters": [
+                {
+                    "type": "remediation",
+                    "rule_name": "i-dont-exist",
+                }
+            ]
+        }
+        p = self.load_policy(policy, session_factory=session_factory)
+        resources = p.run()
+        self.assertEqual(len(resources), 0)
+
+        # Provide a valid rule name match but non-matching remediation config
+        policy['filters'][0]['rule_name'] = 'config-managed-s3-bucket-public-write-remediate-event'
+        policy['filters'][0]['remediation'] = {
+            "TargetId": "intentionally-incorrect-target",
+        }
+        p = self.load_policy(policy, session_factory=session_factory)
+        p.expand_variables(p.get_variables())
+        resources = p.run()
+        self.assertEqual(len(resources), 0)
+
+    def test_retention_filter(self):
+        factory = self.replay_flight_data('test_configrecord_retention')
+
+        p = self.load_policy({
+            'name': 'recorder',
+            'resource': 'aws.config-recorder',
+            'filters': [
+                {
+                    'type': 'retention',
+                    'key': 'RetentionPeriodInDays',
+                    'op': 'gte',
+                    'value': 120
+                    }
+            ]},
+            session_factory=factory)
+        resources = p.run()
+        assert len(resources) == 1

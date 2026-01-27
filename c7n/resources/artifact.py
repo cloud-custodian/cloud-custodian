@@ -13,9 +13,10 @@ class ArtifactDomain(QueryResourceManager):
         service = 'codeartifact'
         enum_spec = ('list_domains', 'domains', None)
         detail_spec = ('describe_domain', 'domain', 'name', 'domain')
-        cfn_type = 'AWS::CodeArtifact::Domain'
+        cfn_type = config_type = 'AWS::CodeArtifact::Domain'
         id = name = 'name'
         arn = 'arn'
+        permissions_augment = ("codeartifact:ListTagsForResource",)
 
 
 @ArtifactDomain.filter_registry.register('cross-account')
@@ -29,7 +30,7 @@ class CrossAccountDomain(CrossAccountAccessFilter):
         for r in resources:
             result = self.manager.retry(
                 client.get_domain_permissions_policy,
-                domain=r['domainName'],
+                domain=r['name'],
                 ignore_err_codes=('ResourceNotFoundException',))
             r[self.policy_attribute] = result['policy']['document']
         return super().process(resources)
@@ -114,7 +115,7 @@ class ArtifactRepo(QueryResourceManager):
     class resource_type(TypeInfo):
         service = 'codeartifact'
         enum_spec = ('list_repositories', 'repositories', None)
-        cfn_type = 'AWS::CodeArtifact::Repository'
+        config_type = cfn_type = 'AWS::CodeArtifact::Repository'
         id = name = 'name'
         arn = 'arn'
 

@@ -1,8 +1,35 @@
 # Copyright The Cloud Custodian Authors.
 # SPDX-License-Identifier: Apache-2.0
+import time
 from botocore.exceptions import ClientError
+from unittest.mock import patch
 
 from .common import BaseTest, event_data
+from c7n.exceptions import PolicyValidationError
+
+from pytest_terraform import terraform
+
+
+@terraform("apigatewayv2_stage")
+def test_apigwv2_stage_query(test, apigatewayv2_stage):
+    factory = test.replay_flight_data("test_apigwv2_stage_query")
+
+    policy = test.load_policy({
+      "name": "test-aws-apigwv2-stage",
+      "resource": "aws.apigwv2-stage"
+    }, session_factory=factory)
+
+    resources = policy.run()
+
+    assert len(resources) > 0
+    assert resources[1]['StageName'] == apigatewayv2_stage[
+        'aws_apigatewayv2_stage.example.name']
+    assert resources[1]['Tags'] == [{'Key': 'Env', 'Value': 'Dev'}]
+
+    assert policy.resource_manager.get_arns(resources) == [
+        'arn:aws:apigateway:us-east-1::/apis/0mt9yx690a/stages/production',
+        'arn:aws:apigateway:us-east-1::/apis/zzc87ypck1/stages/example-api-allowed-sheepdog'
+    ]
 
 
 class TestRestAccount(BaseTest):
@@ -49,6 +76,29 @@ class TestRestAccount(BaseTest):
 
         after_account, = p.resource_manager._get_account()
         self.assertEqual(after_account["cloudwatchRoleArn"], log_role)
+
+    def test_rest_account_exception(self):
+        session_factory = self.replay_flight_data('test_rest_account_exception')
+        p = self.load_policy(
+            {'name': 'rest-account-exception',
+             'resource': 'aws.rest-account'},
+            session_factory=session_factory
+        )
+        with self.assertRaises(ClientError) as e:
+            p.run()
+        self.assertEqual(e.exception.response['Error']['Code'], 'AccessDeniedException')
+
+    def test_rest_account_rate_limit(self):
+        session_factory = self.replay_flight_data('test_rest_account_rate_limit')
+        p = self.load_policy(
+            {'name': 'rest-account-rate-limit',
+             'resource': 'aws.rest-account'},
+            session_factory=session_factory
+        )
+        with patch('c7n.utils.time.sleep', new_callable=time.sleep(0)) as func:
+            resources = p.run()
+        self.assertTrue(func.called)
+        self.assertEqual(len(resources), 1)
 
 
 class TestRestApi(BaseTest):
@@ -168,6 +218,75 @@ class TestRestApi(BaseTest):
                 {"Name": "ApiName", "Value": "c7n-test-2"}
             ],
         )
+
+    def test_rest_api_has_statement(self):
+        session_factory = self.replay_flight_data('test_rest_api_has_statement')
+        p = self.load_policy(
+            {'name': 'api-has-statement',
+             'resource': 'rest-api',
+             'filters': [
+                    {
+                        "type": "has-statement",
+                        "statements": [
+                            {
+                                "Effect": "Allow",
+                                "Action": "execute-api:Invoke",
+                                "Principal": {
+                                    "AWS": "arn:aws:iam::123456789012:root",
+                                },
+                            },
+                            {
+                                "Effect": "Allow",
+                                "Action": "execute-api:Invoke",
+                                "Condition": {
+                                    "StringEquals": {
+                                        "aws:SourceVpc": ["vpc-1a2b3c4d", "vpc-abc123"]
+                                    }
+                                }
+                            }
+                        ]
+                    },
+                ],
+            },
+            session_factory=session_factory
+        )
+        resources = p.run()
+        self.assertEqual(len(resources), 1)
+        self.assertEqual(resources[0]['name'], 'c7n-test')
+
+        p = self.load_policy(
+            {'name': 'api-has-statement',
+             'resource': 'rest-api',
+             'filters': [
+                    {
+                        "type": "has-statement",
+                        "statements": [
+                            {
+                                "Effect": "Allow",
+                                "Action": "execute-api:Invoke",
+                                "Principal": {
+                                    "AWS": "arn:aws:iam::123456789012:root",
+                                },
+                                "PartialMatch": ["Action"],
+                            },
+                            {
+                                "Effect": "Allow",
+                                "Action": "execute-api:Invoke",
+                                "Condition": {
+                                    "StringEquals": {
+                                        "aws:SourceVpc": ["vpc-1a2b3c4d", "vpc-abc123"]
+                                    }
+                                }
+                            }
+                        ]
+                    },
+                ],
+            },
+            session_factory=session_factory
+        )
+        resources = p.run()
+        self.assertEqual(len(resources), 1)
+        self.assertEqual(resources[0]['name'], 'c7n-test')
 
 
 class TestRestResource(BaseTest):
@@ -475,6 +594,46 @@ class TestRestStage(BaseTest):
         )
         self.assertEqual(len(resources), 2)
 
+    def test_reststage_wafv2_filter_regex(self):
+        factory = self.replay_flight_data("test_rest_stage_wafv2_regex")
+
+        p = self.load_policy(
+            {
+                "name": "wafv2-apigw",
+                "resource": "rest-stage",
+                "filters": [{"type": "wafv2-enabled", "state": False}],
+            },
+            session_factory=factory,
+        )
+        resources = p.run()
+        self.assertEqual(len(resources), 0)
+
+        p = self.load_policy(
+            {
+                "name": "wafv2-apigw",
+                "resource": "rest-stage",
+                "filters": [{"type": "wafv2-enabled",
+                             "web-acl": "FMManagedWebACLV2-FMS-T.*",
+                             "state": True}],
+            },
+            session_factory=factory,
+            config={'region': 'us-west-2'})
+        resources = p.run()
+        self.assertEqual(len(resources), 1)
+
+        p = self.load_policy(
+            {
+                "name": "wafv2-apigw",
+                "resource": "rest-stage",
+                "filters": [{"type": "wafv2-enabled",
+                             "web-acl": "testv2",
+                             "state": False}],
+            },
+            session_factory=factory,
+        )
+        resources = p.run()
+        self.assertEqual(len(resources), 1)
+
     def test_waf(self):
         factory = self.replay_flight_data("test_rest_stage_waf")
         p = self.load_policy(
@@ -532,8 +691,39 @@ class TestRestStage(BaseTest):
         resources = p.run()
         self.assertEqual(len(resources), 1)
 
+    def test_wafregional_value_no_rules(self):
+        factory = self.replay_flight_data("test_rest_stage_waf_value")
+        p = self.load_policy(
+            {
+                "name": "waf-apigw",
+                "resource": "rest-stage",
+                "filters": [{"type": "waf-enabled", "key": "Rules", "value": "empty"}]
+            },
+            session_factory=factory,
+        )
+        resources = p.run()
+        self.assertEqual(len(resources), 0)
+
+    def test_wafregional_value_at_least_1_rule(self):
+        factory = self.replay_flight_data("test_rest_stage_waf_value")
+        p = self.load_policy(
+            {
+                "name": "waf-apigw",
+                "resource": "rest-stage",
+                "filters": [{
+                    "type": "waf-enabled",
+                    "key": "length(Rules)",
+                    "op": "gte",
+                    "value": 1
+                }]
+            },
+            session_factory=factory,
+        )
+        resources = p.run()
+        self.assertEqual(len(resources), 1)
+
     def test_wafv2_to_wafregional(self):
-        factory = self.replay_flight_data("test_rest_stage_waf")
+        factory = self.replay_flight_data("test_rest_stage_wafv2")
         p = self.load_policy(
             {
                 "name": "waf-apigw",
@@ -544,7 +734,133 @@ class TestRestStage(BaseTest):
             session_factory=factory,
         )
         resources = p.run()
-        self.assertEqual(len(resources), 3)
+        self.assertEqual(len(resources), 2)
+
+    def test_wafv2_value_no_rules(self):
+        factory = self.replay_flight_data("test_rest_stage_wafv2_value")
+        p = self.load_policy(
+            {
+                "name": "waf-apigw",
+                "resource": "rest-stage",
+                "filters": [{"type": "wafv2-enabled", "key": "Rules", "value": "empty"}]
+            },
+            session_factory=factory,
+        )
+        resources = p.run()
+        self.assertEqual(len(resources), 1)
+
+    def test_wafv2_value_at_least_1_rule(self):
+        factory = self.replay_flight_data("test_rest_stage_wafv2_value")
+        p = self.load_policy(
+            {
+                "name": "waf-apigw",
+                "resource": "rest-stage",
+                "filters": [{
+                    "type": "wafv2-enabled",
+                    "key": "length(Rules)",
+                    "op": "gte",
+                    "value": 1
+                }]
+            },
+            session_factory=factory,
+        )
+        resources = p.run()
+        self.assertEqual(len(resources), 0)
+
+    def test_reststage_action_wafv2_not_found(self):
+        self.assertRaises(
+            PolicyValidationError,
+            self.load_policy,
+            {
+                "name": "wafv2-apigw-set",
+                "resource": "rest-stage",
+                "filters": [
+                    {"state": False}
+                ],
+                "actions": [
+                    {"type": "set-wafv2", "web-acl": "FMManagedWebACLV2-FMS-T.*"}
+                ],
+            },
+        )
+
+    def test_reststage_action_wafv2_state_true(self):
+        self.assertRaises(
+            PolicyValidationError,
+            self.load_policy,
+            {
+                "name": "wafv2-apigw-set",
+                "resource": "rest-stage",
+                "filters": [
+                    {"type": "wafv2-enabled",
+                     "state": True,
+                     "web-acl": "FMManagedWebACLV2-FMS.*"}
+                ],
+                "actions": [
+                    {"type": "set-wafv2", "state": True}
+                ],
+            },
+        )
+
+    def test_reststage_action_wafv2_multiple_match(self):
+        factory = self.replay_flight_data(
+            "test_rest_stage_wafv2_set_action_regex_match")
+
+        p = self.load_policy(
+            {
+                "name": "wafv2-apigw-set",
+                "resource": "rest-stage",
+                "filters": [{"type": "wafv2-enabled",
+                             "state": True}],
+                "actions": [{"type": "set-wafv2",
+                             "web-acl": "FMManagedWebACLV2-FMS-A.*"}],
+            },
+            session_factory=factory,
+            config={'region': 'us-west-2'})
+
+        with self.assertRaises(ValueError) as ctx:
+            p.run()
+            self.assertTrue(
+                'matching to none or the multiple webacls'
+                in str(ctx.exception))
+
+    def test_reststage_action_wafv2_regex_disassociate_webacl(self):
+        factory = self.replay_flight_data(
+            "test_rest_stage_wafv2_ds_action_regex")
+
+        policy = self.load_policy(
+            {
+                "name": "wafv2-apigw-set",
+                "resource": "rest-stage",
+                "filters": [{"type": "wafv2-enabled",
+                             "web-acl": "FMManagedWebACLV2-FMS-T.*",
+                             "state": True}],
+                "actions": [
+                    {"type": "set-wafv2", "state": False}
+                ],
+            },
+            session_factory=factory,
+            config={'region': 'us-west-2'})
+        response = policy.run()
+        self.assertEqual(response[0]['stageName'], 'test1')
+
+    def test_rest_stage_get_restapi_type(self):
+        factory = self.replay_flight_data("test_rest_stage_get_restapi_type")
+
+        policy = self.load_policy(
+            {
+                "name": "wafv2-apigw-get-restapi",
+                "resource": "rest-stage",
+                "filters": [{"type": "wafv2-enabled",
+                             "web-acl": "FMManagedWebACLV2-FMS-T.*",
+                             "state": True}],
+                "actions": [
+                    {"type": "set-wafv2", "state": False}
+                ],
+            },
+            session_factory=factory,
+            config={'region': 'us-west-2'})
+        response = policy.run()
+        self.assertEqual(response[0]['restApiType'], ['REGIONAL'])
 
     def test_wafv2_to_wafregional_with_acl(self):
         factory = self.replay_flight_data("test_rest_stage_waf")
@@ -769,6 +1085,33 @@ class TestCustomDomainName(BaseTest):
         result = client.get_domain_name(domainName="bad.example.com")
         self.assertEqual(result['securityPolicy'], 'TLS_1_2')
 
+    def test_arn_format(self):
+        factory = self.replay_flight_data("test_apigw_domain_name_filter_check_tls")
+        p = self.load_policy(
+            {
+                "name": "apigw-domain-name-check-tls",
+                "resource": "apigw-domain-name",
+                "filters": [
+                    {
+                        "not": [
+                            {
+                                "type": "value",
+                                "key": "securityPolicy",
+                                "value": "TLS_1_2"
+                            }
+                        ]
+                    }
+                ]
+            },
+            session_factory=factory,
+        )
+        resources = p.run()
+        self.assertEqual(len(resources), 1)
+        self.assertEqual(
+            p.resource_manager.get_arns(resources)[0],
+            "arn:aws:apigateway:us-east-1::/domainnames/bad.example.com"
+        )
+
 
 class TestResourcePolicy(BaseTest):
     def test_rest_api_default_resource_policy(self):
@@ -846,3 +1189,125 @@ class TestApiGatewayV2Api(BaseTest):
         self.assertEqual(len(resources), 1)
         tags = client.get_tags(ResourceArn=p.resource_manager.get_arns(resources)[0])
         assert 'custodian_cleanup' in tags['Tags']
+
+    def test_apigwv2_update(self):
+        session_factory = self.replay_flight_data('test_apigwv2_api_update')
+        client = session_factory().client("apigatewayv2")
+        p = self.load_policy(
+            {
+                'name': 'update-http-api',
+                'resource': 'apigwv2',
+                'filters': [
+                    {'Name': 'c7n-test'}
+                ],
+                "actions": [
+                    {
+                        'type': 'update',
+                        'CorsConfiguration': {
+                            'AllowCredentials': False,
+                            'MaxAge': 60,
+                        },
+                        'Description': 'updated description',
+                        "DisableExecuteApiEndpoint": False,
+                    }
+                ]
+            },
+            session_factory=session_factory)
+        resources = p.run()
+        self.assertEqual(len(resources), 1)
+        self.assertEqual(resources[0]['Name'], 'c7n-test')
+
+        api = client.get_api(ApiId=resources[0]['ApiId'])
+        self.assertEqual(api['CorsConfiguration'], {
+            'AllowCredentials': False,
+            'MaxAge': 60,
+        })
+        self.assertEqual(api['Description'], 'updated description')
+        self.assertFalse(api['DisableExecuteApiEndpoint'])
+
+    def test_apigwv2_delete(self):
+        session_factory = self.replay_flight_data('test_apigwv2_api_delete')
+        client = session_factory().client("apigatewayv2")
+        p = self.load_policy(
+            {
+                'name': 'delete-http-api',
+                'resource': 'apigwv2',
+                'filters': [
+                    {'Name': 'c7n-test'}
+                ],
+                "actions": [
+                    {
+                        'type': 'delete',
+                    }
+                ]
+            },
+            session_factory=session_factory)
+        resources = p.run()
+        self.assertEqual(len(resources), 1)
+        with self.assertRaises(ClientError) as e:
+            client.get_api(ApiId=resources[0]['ApiId'])
+        self.assertEqual(e.exception.response['Error']['Code'], 'NotFoundException')
+
+
+class TestApiGatewayV2Stage(BaseTest):
+    def test_apigwv2_stage_update(self):
+        session_factory = self.replay_flight_data('test_apigwv2_stage_update')
+        client = session_factory().client("apigatewayv2")
+        p = self.load_policy(
+            {
+                'name': 'update-api-stage',
+                'resource': 'apigwv2-stage',
+                "actions": [
+                    {
+                        'type': 'update',
+                        "AutoDeploy": False,
+                        "Description": "new description",
+                        'DefaultRouteSettings': {
+                            'DetailedMetricsEnabled': False,
+                        },
+                    }
+                ]
+            },
+            session_factory=session_factory)
+        resources = p.run()
+        self.assertEqual(len(resources), 1)
+
+        stage = client.get_stage(
+            ApiId=resources[0]['c7n:parent-id'],
+            StageName=resources[0]['StageName']
+        )
+        self.assertEqual(stage['DefaultRouteSettings'], {
+            'DetailedMetricsEnabled': False,
+        })
+        self.assertEqual(stage['Description'], 'new description')
+        self.assertFalse(stage['AutoDeploy'])
+
+    def test_apigwv2_stage_delete(self):
+        session_factory = self.replay_flight_data('test_apigwv2_stage_delete')
+        client = session_factory().client("apigatewayv2")
+        p = self.load_policy(
+            {
+                'name': 'delete-api-stage',
+                'resource': 'apigwv2-stage',
+                'filters': [
+                    {
+                        'type': 'value',
+                        'key': 'StageName',
+                        'value': 'c7n-test'
+                    }
+                ],
+                "actions": [
+                    {
+                        'type': 'delete',
+                    }
+                ]
+            },
+            session_factory=session_factory)
+        resources = p.run()
+        self.assertEqual(len(resources), 1)
+        with self.assertRaises(ClientError) as e:
+            client.get_stage(
+                ApiId=resources[0]['c7n:parent-id'],
+                StageName=resources[0]['StageName']
+            )
+        self.assertEqual(e.exception.response['Error']['Code'], 'NotFoundException')

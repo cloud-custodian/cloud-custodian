@@ -99,7 +99,7 @@ class LabelActionFilter(Filter):
         if '-' not in v or '_' not in v:
             return False
 
-        msg, action, action_date_str = self.parse(v)
+        _, action, action_date_str = self.parse(v)
 
         if action != self.op or not action:
             return False

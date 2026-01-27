@@ -1,0 +1,38 @@
+{
+    "status_code": 200,
+    "data": {
+        "ResponseMetadata": {},
+        "applications": [
+            {
+                "id": "00f7bp174ejqb109",
+                "name": "test-emr-serverless",
+                "arn": "arn:aws:emr-serverless:us-east-1:644160558196:/applications/00f7bp174ejqb109",
+                "releaseLabel": "emr-6.9.0",
+                "type": "Spark",
+                "state": "CREATED",
+                "stateDetails": "Application created by user.",
+                "createdAt": {
+                    "__class__": "datetime",
+                    "year": 2023,
+                    "month": 1,
+                    "day": 24,
+                    "hour": 13,
+                    "minute": 19,
+                    "second": 48,
+                    "microsecond": 859000
+                },
+                "updatedAt": {
+                    "__class__": "datetime",
+                    "year": 2023,
+                    "month": 1,
+                    "day": 24,
+                    "hour": 13,
+                    "minute": 19,
+                    "second": 48,
+                    "microsecond": 859000
+                },
+                "architecture": "X86_64"
+            }
+        ]
+    }
+}

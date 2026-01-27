@@ -1,0 +1,42 @@
+{
+  "status_code": 200,
+  "data": {
+    "SummaryMap": {
+      "GroupPolicySizeQuota": 5120,
+      "InstanceProfilesQuota": 1000,
+      "Policies": 144,
+      "GroupsPerUserQuota": 10,
+      "InstanceProfiles": 17,
+      "AttachedPoliciesPerUserQuota": 10,
+      "Users": 20,
+      "PoliciesQuota": 1500,
+      "Providers": 0,
+      "AccountMFAEnabled": 1,
+      "AccessKeysPerUserQuota": 2,
+      "AssumeRolePolicySizeQuota": 2048,
+      "PolicyVersionsInUseQuota": 10000,
+      "GlobalEndpointTokenVersion": 2,
+      "VersionsPerPolicyQuota": 5,
+      "AttachedPoliciesPerGroupQuota": 10,
+      "PolicySizeQuota": 6144,
+      "Groups": 4,
+      "AccountSigningCertificatesPresent": 0,
+      "UsersQuota": 5000,
+      "ServerCertificatesQuota": 20,
+      "MFADevices": 5,
+      "UserPolicySizeQuota": 2048,
+      "PolicyVersionsInUse": 268,
+      "ServerCertificates": 0,
+      "Roles": 284,
+      "RolesQuota": 1000,
+      "SigningCertificatesPerUserQuota": 2,
+      "MFADevicesInUse": 4,
+      "RolePolicySizeQuota": 10240,
+      "AttachedPoliciesPerRoleQuota": 10,
+      "AccountAccessKeysPresent": 0,
+      "AccountPasswordPresent": 1,
+      "GroupsQuota": 300
+    },
+    "ResponseMetadata": {}
+  }
+}

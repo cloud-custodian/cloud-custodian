@@ -1,0 +1,76 @@
+{
+    "status_code": 200,
+    "data": {
+        "Clusters": [
+            {
+                "Id": "j-1OBEPJWLJBMDO",
+                "Name": "Test cluster1",
+                "Status": {
+                    "State": "WAITING",
+                    "StateChangeReason": {
+                        "Message": "Cluster ready to run steps."
+                    },
+                    "Timeline": {
+                        "CreationDateTime": {
+                            "__class__": "datetime",
+                            "year": 2023,
+                            "month": 1,
+                            "day": 18,
+                            "hour": 21,
+                            "minute": 7,
+                            "second": 52,
+                            "microsecond": 540000
+                        },
+                        "ReadyDateTime": {
+                            "__class__": "datetime",
+                            "year": 2023,
+                            "month": 1,
+                            "day": 18,
+                            "hour": 21,
+                            "minute": 13,
+                            "second": 18,
+                            "microsecond": 256000
+                        }
+                    }
+                },
+                "NormalizedInstanceHours": 0,
+                "ClusterArn": "arn:aws:elasticmapreduce:us-west-2:644160558196:cluster/j-1OBEPJWLJBMDO"
+            },
+            {
+                "Id": "j-1QXCH9K3E0NMM",
+                "Name": "Test cluster2",
+                "Status": {
+                    "State": "WAITING",
+                    "StateChangeReason": {
+                        "Message": "Cluster ready to run steps."
+                    },
+                    "Timeline": {
+                        "CreationDateTime": {
+                            "__class__": "datetime",
+                            "year": 2023,
+                            "month": 1,
+                            "day": 13,
+                            "hour": 17,
+                            "minute": 13,
+                            "second": 1,
+                            "microsecond": 542000
+                        },
+                        "ReadyDateTime": {
+                            "__class__": "datetime",
+                            "year": 2023,
+                            "month": 1,
+                            "day": 13,
+                            "hour": 17,
+                            "minute": 18,
+                            "second": 31,
+                            "microsecond": 240000
+                        }
+                    }
+                },
+                "NormalizedInstanceHours": 5952,
+                "ClusterArn": "arn:aws:elasticmapreduce:us-west-2:644160558196:cluster/j-1QXCH9K3E0NMM"
+            }
+        ],
+        "ResponseMetadata": {}
+    }
+}

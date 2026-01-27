@@ -4,7 +4,6 @@
 """
 Monitoring Metrics filters suppport for resources
 """
-import jmespath
 import logging
 import math
 from statistics import mean
@@ -12,7 +11,7 @@ from datetime import datetime, timedelta, timezone
 from c7n.exceptions import PolicyValidationError, PolicyExecutionError
 from c7n.manager import ResourceManager
 from c7n.filters.core import Filter, OPERATORS
-from c7n.utils import type_schema, chunks, local_session
+from c7n.utils import type_schema, chunks, local_session, jmespath_search
 from c7n_tencentcloud.provider import resources as provider_resources
 from c7n_tencentcloud.query import ResourceTypeInfo
 
@@ -29,13 +28,43 @@ STATISTICS_OPERATORS = {
 
 
 class MetricsFilter(Filter):
-    """MetricsFilter"""
+    """Supports metrics filters on resources.
+
+    Docs on cloud monitor metrics
+    https://www.tencentcloud.com/document/product/248
+
+    :example:
+
+    .. code-block:: yaml
+
+        policies:
+          - name: cvm-underutilized
+            resource: tencentcloud.cvm
+            filters:
+              - type: metrics
+                name: CPUUsage
+                days: 3
+                period: 3600
+                value: 1.5
+                statistics: Average
+                op: less-than
+          - name: clb_metrics_filter
+            resource: tencentcloud.clb
+            filters:
+              - type: metrics
+                name: TotalReq
+                statistics: Sum
+                period: 3600
+                days: 30
+                value: 0
+                missing-value: 0
+                op: eq
+    """
     name = "metrics"
     schema = type_schema(
         name,
         **{
             "name": {"type": "string"},
-            "namespace": {"type": "string"},
             "statistics": {"type": "string", "enum": list(STATISTICS_OPERATORS.keys())},
             "days": {"type": "number"},
             "op": {"type": "string", "enum": list(OPERATORS.keys())},  # TODO, remove unsupported op
@@ -47,11 +76,6 @@ class MetricsFilter(Filter):
     )
     schema_alias = True
     permissions = ()
-
-    DEFAULT_NAMESPACE = {
-        "cvm:instance": "QCE/CVM",
-        "vpc:nat": "QCE/NAT_GATEWAY",
-    }
 
     def __init__(self, data, manager=None):
         super().__init__(data, manager)
@@ -65,13 +89,6 @@ class MetricsFilter(Filter):
         self.missing_value = self.data.get("missing-value")
         self.value = self.data["value"]
         self.resource_metadata: ResourceTypeInfo = self.manager.get_model()
-        ns = self.data.get("namespace")
-        if not ns:
-            ns = self.resource_metadata.metrics_namespace
-            if not ns:
-                key = f"{self.resource_metadata.service}:{self.resource_metadata.resource_prefix}"
-                ns = self.DEFAULT_NAMESPACE[key]
-        self.namespace = ns
 
     def get_metric_window(self):
         """get_metric_window"""
@@ -84,29 +101,27 @@ class MetricsFilter(Filter):
     def get_batch_size(self):
         """get_batch_size
         refer doc: https://www.tencentcloud.com/document/product/248/33881
-        one request only support 1440 data points
-        so it need to calc the batch size
+        A single request can get the data of up to 10 instances
+        for up to 1,440 data points total across instances.
+        So batch size must satisfy both constraints.
         """
+        if self.days <= 0 or self.period <= 0:
+            return 0
         data_points_per_resource = math.ceil(self.days * 86400 / self.period)
-        return math.floor(1440 / data_points_per_resource)
+        # limit by total data points across instances
+        max_instances_by_points = math.floor(1440 / data_points_per_resource)
+        # limit by max instances per request (10)
+        return min(10, max_instances_by_points)
 
     def _get_request_params(self, resources):
-        ids = [res[self.resource_metadata.id] for res in resources]
-        dimensions = []
-        for iter_id in ids:
-            dimensions.append({
-                "Dimensions": [{
-                    "Name": self.resource_metadata.metrics_instance_id_name,
-                    "Value": iter_id
-                }]
-            })
+        namespace, instances = self.manager.get_metrics_req_params(resources)
         return {
-            "Namespace": self.namespace,
+            "Namespace": namespace,
             "MetricName": self.metric_name,
             "Period": self.period,
             "StartTime": self.start_time,
             "EndTime": self.end_time,
-            "Instances": dimensions
+            "Instances": instances
         }
 
     def validate(self):
@@ -126,7 +141,7 @@ class MetricsFilter(Filter):
     def get_client(self):
         """get_client"""
         return local_session(self.manager.session_factory).client("monitor.tencentcloudapi.com",
-                                                                  "service",
+                                                                  "monitor",
                                                                   "2018-07-24",
                                                                   self.manager.config.region)
 
@@ -134,12 +149,57 @@ class MetricsFilter(Filter):
         """process"""
         log.debug("[metrics filter]start_time=%s, end_time=%s", self.start_time, self.end_time)
 
+        # Create a map from resource_id to resource for quick lookup
+        resource_map = {res[self.resource_metadata.id]: res for res in resources}
+
         matched_resource_ids = []
         for data_point in self.get_metrics_data_point(resources):
+            resource_id = self.manager.get_resource_id_from_dimensions(data_point["Dimensions"])
+            if resource_id is None:
+                raise PolicyExecutionError("get resource id from metrics response data error")
+
+            # Attach metrics data to the resource (similar to AWS implementation)
+            if resource_id in resource_map:
+                resource = resource_map[resource_id]
+                collected_metrics = resource.setdefault('c7n.metrics', {})
+                # Create cache key similar to AWS pattern
+                key = ".".join(
+                    [
+                        self.resource_metadata.metrics_namespace,
+                        self.metric_name,
+                        self.statistics,
+                        str(self.days),
+                    ]
+                )
+
+                # Store the raw data point and computed metric value
+                collected_metrics[key] = {
+                    'Timestamps': data_point.get('Timestamps', []),
+                    'Values': data_point.get('Values', []),
+                    'Dimensions': data_point.get('Dimensions', []),
+                    'Statistic': self.statistics,
+                    'MetricName': self.metric_name,
+                    'Namespace': self.resource_metadata.metrics_namespace,
+                    'Period': self.period,
+                    'Days': self.days
+                }
+
+                # Compute aggregated value for filtering
+                values = data_point.get("Values", [])
+                if not values and self.missing_value is None:
+                    raise PolicyExecutionError("there is no metrics, but not set missing-value")
+                if not values:
+                    metric_value = self.missing_value
+                else:
+                    metric_value = self.statistics_op(values)
+
+                # Store the computed metric value for easy access
+                collected_metrics[key]['AggregatedValue'] = metric_value
+
             if self.match(data_point):
-                matched_resource_ids.append(data_point["Dimensions"][0]["Value"])
+                matched_resource_ids.append(resource_id)
             else:
-                log.debug("[metrics filter]drop resource=%s", data_point["Dimensions"][0]["Value"])
+                log.debug(f"[metrics filter]drop resource={resource_id}")
 
         matched_resources = []
         if len(matched_resource_ids) > 0:
@@ -165,7 +225,7 @@ class MetricsFilter(Filter):
         for batch in chunks(resources, self.batch_size):
             params = self._get_request_params(batch)
             resp = cli.execute_query("GetMonitorData", params)
-            data_points = jmespath.search("Response.DataPoints[]", resp)
+            data_points = jmespath_search("Response.DataPoints[]", resp)
             for point in data_points:
                 yield point
 
@@ -188,7 +248,9 @@ class MetricsFilter(Filter):
         if cls.name in resource_class.filter_registry:
             # to support resource to define its own metrics filter
             return
-        resource_class.filter_registry.register(cls.name, cls)
+        if resource_class.resource_type.metrics_enabled:
+            # register metrics filter only for those supported by cloud
+            resource_class.filter_registry.register(cls.name, cls)
 
 
 # finish to register metrics filter to resources

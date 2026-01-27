@@ -1,0 +1,55 @@
+{
+    "status_code": 200,
+    "data": {
+        "DBProxies": [
+            {
+                "DBProxyName": "proxy-test-1",
+                "DBProxyArn": "arn:aws:rds:us-east-1:644160558196:db-proxy:prx-02a89ad163ca36403",
+                "Status": "deleting",
+                "EngineFamily": "POSTGRESQL",
+                "VpcId": "vpc-0d4f819d13b730139",
+                "VpcSecurityGroupIds": [
+                    "sg-03c0b84cdad91744f"
+                ],
+                "VpcSubnetIds": [
+                    "subnet-0472841b16adf7476",
+                    "subnet-0707ce1b2a6305995"
+                ],
+                "Auth": [
+                    {
+                        "AuthScheme": "SECRETS",
+                        "SecretArn": "arn:aws:secretsmanager:us-east-1:644160558196:secret:test1-KGqqf5",
+                        "IAMAuth": "DISABLED",
+                        "ClientPasswordAuthType": "POSTGRES_SCRAM_SHA_256"
+                    }
+                ],
+                "RoleArn": "arn:aws:iam::644160558196:role/jerry-test-role",
+                "Endpoint": "proxy-test-1.proxy-cz6wy8cci3uf.us-east-1.rds.amazonaws.com",
+                "RequireTLS": false,
+                "IdleClientTimeout": 5400,
+                "DebugLogging": false,
+                "CreatedDate": {
+                    "__class__": "datetime",
+                    "year": 2023,
+                    "month": 7,
+                    "day": 16,
+                    "hour": 19,
+                    "minute": 58,
+                    "second": 52,
+                    "microsecond": 266000
+                },
+                "UpdatedDate": {
+                    "__class__": "datetime",
+                    "year": 2023,
+                    "month": 7,
+                    "day": 16,
+                    "hour": 20,
+                    "minute": 40,
+                    "second": 17,
+                    "microsecond": 868000
+                }
+            }
+        ],
+        "ResponseMetadata": {}
+    }
+}

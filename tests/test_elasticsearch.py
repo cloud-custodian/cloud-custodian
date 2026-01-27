@@ -1,11 +1,14 @@
 # Copyright The Cloud Custodian Authors.
 # SPDX-License-Identifier: Apache-2.0
 import json
+from unittest.mock import patch
+
+import pytest
+from pytest_terraform import terraform
 
 from c7n.exceptions import PolicyValidationError
 from c7n.resources.aws import shape_validate
-import pytest
-from pytest_terraform import terraform
+from c7n.resources.elasticsearch import parse_es_version
 
 from .common import BaseTest
 
@@ -56,6 +59,20 @@ class ElasticSearch(BaseTest):
             )
         )
 
+    def test_elasticsearch_with_prequery_filter(self):
+        factory = self.replay_flight_data("test_elasticsearch_with_prequery_filter")
+        p = self.load_policy(
+            {
+                "name": "es-query-2",
+                "resource": "elasticsearch",
+                "query": [{"EngineType": "OpenSearch"}],
+            },
+            session_factory=factory,
+        )
+        resources = p.run()
+        self.assertEqual(len(resources), 1)
+        self.assertEqual(resources[0]["DomainName"], "c7n-test-opensearch")
+
     def test_metrics_domain(self):
         factory = self.replay_flight_data("test_elasticsearch_delete")
         p = self.load_policy(
@@ -82,6 +99,102 @@ class ElasticSearch(BaseTest):
                 {"Name": "DomainName", "Value": "foo"},
             ],
         )
+
+    def test_parse_es_version(self):
+        # Test the version parsing function
+        self.assertEqual(
+            parse_es_version("Elasticsearch_7.4"),
+            ("Elasticsearch", "7.4"),
+        )
+        self.assertEqual(
+            parse_es_version("OpenSearch_1.3"),
+            ("OpenSearch", "1.3"),
+        )
+        self.assertEqual(
+            parse_es_version("invalid"),
+            (None, None),
+        )
+        self.assertEqual(
+            parse_es_version("7.2"),
+            ("Elasticsearch", "7.2"),
+        )
+
+    def test_upgrade_available_filter_with_upgrades(self):
+        factory = self.replay_flight_data("test_elasticsearch_upgrade_available")
+        p = self.load_policy(
+            {
+                "name": "es-upgrade-available",
+                "resource": "elasticsearch",
+                "filters": [
+                    {
+                        "type": "upgrade-available",
+                        "value": True,  # Only domains with upgrades available
+                        "major": False  # Only minor version upgrades
+                    }
+                ],
+            },
+            session_factory=factory,
+        )
+        resources = p.run()
+        self.assertEqual(len(resources), 1)
+
+        # If resources were found, they should have the upgrade annotation
+        self.assertIn('c7n:AvailableUpgrades', resources[0])
+        self.assertEqual(
+            sorted(resources[0]['c7n:AvailableUpgrades']),
+            sorted(['ElasticSearch_7.7']),
+        )
+
+    def test_upgrade_available_filter_with_major_upgrades(self):
+        factory = self.replay_flight_data("test_elasticsearch_upgrade_available_major")
+        p = self.load_policy(
+            {
+                "name": "es-upgrade-available",
+                "resource": "elasticsearch",
+                "filters": [
+                    {
+                        "type": "upgrade-available",
+                        "value": True,  # Only domains with upgrades available
+                        "major": True  # Major version upgrades allowed
+                    }
+                ],
+            },
+            session_factory=factory,
+        )
+        resources = p.run()
+        self.assertEqual(len(resources), 1)
+
+        # If resources were found, they should have the upgrade annotation
+        self.assertIn('c7n:AvailableUpgrades', resources[0])
+        self.assertEqual(
+            sorted(resources[0]['c7n:AvailableUpgrades']),
+            sorted([
+                'ElasticSearch_6.0',
+                'ElasticSearch_7.6',
+                'ElasticSearch_7.7',
+                'OpenSearch_1.0',
+            ]),
+        )
+
+    def test_upgrade_available_filter_no_upgrades(self):
+        factory = self.replay_flight_data("test_elasticsearch_upgrade_available_none")
+        p = self.load_policy(
+            {
+                "name": "es-no-upgrade-available",
+                "resource": "elasticsearch",
+                "filters": [
+                    {
+                        "type": "upgrade-available",
+                        "value": False  # Only domains without upgrades available
+                    }
+                ],
+            },
+            session_factory=factory,
+        )
+        resources = p.run()
+        self.assertEqual(len(resources), 1)
+        self.assertIn('c7n:AvailableUpgrades', resources[0])
+        self.assertEqual(len(resources[0]['c7n:AvailableUpgrades']), 0)
 
     def test_delete_search(self):
         factory = self.replay_flight_data("test_elasticsearch_delete")
@@ -179,6 +292,31 @@ class ElasticSearch(BaseTest):
         self.assertEqual(resources[0]["DomainName"], "c7n-test")
         tags = client.list_tags(ARN=resources[0]["ARN"])["TagList"]
         self.assertEqual(len(tags), 0)
+
+    def test_deleted_domain_tag_operations(self):
+        """Expect an uninterrupted policy run, though there's nothing to do."""
+
+        session_factory = self.replay_flight_data("test_elasticsearch_deleted_domain_tag_ops")
+        p = self.load_policy(
+            {
+                "name": "manage-tags-for-deleted-es-domain",
+                "resource": "aws.elasticsearch",
+                "actions": [
+                    {"type": "tag", "key": "environment", "value": "test"},
+                    {"type": "remove-tag", "tags": ["owner"]}
+                ],
+            },
+            session_factory=session_factory,
+        )
+
+        with patch("c7n.resources.elasticsearch.ElasticSearchDomain.resources", return_value=[
+            {
+                "DomainName": "non-existent-domain",
+                "ARN": "arn:aws:es:us-east-1:644160558196:domain/non-existent-domain",
+                "Tags": {"owner": "me"}
+            },
+        ]):
+            p.run()
 
     def test_domain_mark_for_op(self):
         session_factory = self.replay_flight_data("test_elasticsearch_markforop")
@@ -610,6 +748,27 @@ class ElasticSearch(BaseTest):
             'DomainEndpointOptions']
         self.assertEqual(state['EnforceHTTPS'], True)
         self.assertEqual(state['TLSSecurityPolicy'], "Policy-Min-TLS-1-2-2019-07")
+
+    def test_elasticsearch_enable_auditlog(self):
+        factory = self.replay_flight_data("test_elasticsearch_enable_auditlog")
+        p = self.load_policy(
+            {
+                "name": "test_elasticsearch_enable_auditlog",
+                "resource": "elasticsearch",
+                "filters": [{"DomainName": "test-es-dom"}],
+                "actions": [{"type": "enable-auditlog", "state": True, "delay": 1}],
+            },
+            session_factory=factory,
+        )
+        resources = p.run()
+        self.assertEqual(len(resources), 1)
+        self.assertEqual(resources[0]["DomainName"], "test-es-dom")
+        client = factory().client("es")
+        state = client.describe_elasticsearch_domain(DomainName="test-es-dom")['DomainStatus'][
+            'LogPublishingOptions']
+        self.assertEqual(state['AUDIT_LOGS']['Enabled'], True)
+        self.assertEqual(state['AUDIT_LOGS']['CloudWatchLogsLogGroupArn'],
+            "arn:aws:logs:us-east-1:123456789012:log-group:/aws/domains/test-es-dom/audit-logs:*")
 
 
 class TestReservedInstances(BaseTest):

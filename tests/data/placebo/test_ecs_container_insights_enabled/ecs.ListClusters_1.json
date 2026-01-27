@@ -1,0 +1,10 @@
+{
+    "status_code": 200,
+    "data": {
+        "clusterArns": [
+            "arn:aws:ecs:us-east-1:123456789012:cluster/white-hart",
+            "arn:aws:ecs:us-east-1:123456789012:cluster/Devtest"
+        ],
+        "ResponseMetadata": {}
+    }
+}

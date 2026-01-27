@@ -7,6 +7,6 @@ resource "aws_cloudwatch_log_group" "test_group" {
 
   tags = {
     Environment = "production"
-    App = "Foie"
+    App         = "Foie"
   }
 }

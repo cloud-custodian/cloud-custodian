@@ -1,0 +1,13 @@
+{
+    "status_code": 200,
+    "data": {
+        "PaginationToken": "",
+        "ResourceTagMappingList": [
+            {
+                "ResourceARN": "arn:aws:sagemaker:us-east-1:644160558196:hyper-parameter-tuning-job/c7n-test-4",
+                "Tags": []
+            }
+        ],
+        "ResponseMetadata": {}
+    }
+}

@@ -1,0 +1,35 @@
+{
+    "status_code": 200,
+    "data": {
+        "Domains": [
+            {
+                "DomainArn": "arn:aws:sagemaker:us-east-1:644160558196:domain/d-nzuqvexepjbz",
+                "DomainId": "d-nzuqvexepjbz",
+                "DomainName": "example-domain",
+                "Status": "InService",
+                "CreationTime": {
+                    "__class__": "datetime",
+                    "year": 2024,
+                    "month": 3,
+                    "day": 19,
+                    "hour": 15,
+                    "minute": 24,
+                    "second": 35,
+                    "microsecond": 63000
+                },
+                "LastModifiedTime": {
+                    "__class__": "datetime",
+                    "year": 2024,
+                    "month": 3,
+                    "day": 20,
+                    "hour": 0,
+                    "minute": 9,
+                    "second": 28,
+                    "microsecond": 743000
+                },
+                "Url": "https://d-nzuqvexepjbz.studio.us-east-1.sagemaker.aws"
+            }
+        ],
+        "ResponseMetadata": {}
+    }
+}

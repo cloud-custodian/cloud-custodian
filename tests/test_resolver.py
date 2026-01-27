@@ -15,6 +15,8 @@ from c7n.cache import SqlKvCache
 from c7n.config import Config
 from c7n.resolver import ValuesFrom, URIResolver
 
+from pytest_terraform import terraform
+
 
 class FakeCache:
 
@@ -51,8 +53,39 @@ class FakeResolver:
             contents = contents.decode("utf8")
         self.contents = contents
 
-    def resolve(self, uri):
+    def resolve(self, uri, headers):
         return self.contents
+
+
+@terraform('dynamodb_resolver')
+def test_dynamodb_resolver(test, dynamodb_resolver):
+    factory = test.replay_flight_data("test_dynamodb_resolver")
+    manager = Bag(session_factory=factory, _cache=None,
+                  config=Bag(account_id="123", region="us-east-1"))
+    resolver = ValuesFrom({
+        "url": "dynamodb",
+        "query": f'select app_name from "{dynamodb_resolver["aws_dynamodb_table.apps.name"]}"',
+    }, manager)
+
+    values = resolver.get_values()
+    assert values == ["cicd", "app1"]
+
+
+@terraform('dynamodb_resolver_multi')
+def test_dynamodb_resolver_multi(test, dynamodb_resolver_multi):
+    factory = test.replay_flight_data("test_dynamodb_resolver_multi")
+    manager = Bag(session_factory=factory, _cache=None,
+                  config=Bag(account_id="123", region="us-east-1"))
+    resolver = ValuesFrom({
+        "url": "dynamodb",
+        "query": (
+            f'select app_name, env from "{dynamodb_resolver_multi["aws_dynamodb_table.apps.name"]}"'
+        ),
+        "expr": "[].env"
+    }, manager)
+
+    values = resolver.get_values()
+    assert set(values) == {"shared", "prod"}
 
 
 class ResolverTest(BaseTest):
@@ -76,7 +109,7 @@ class ResolverTest(BaseTest):
         cache = FakeCache()
         resolver = URIResolver(session_factory, cache)
         uri = "s3://%s/resource.json?RequestPayer=requestor" % bname
-        data = resolver.resolve(uri)
+        data = resolver.resolve(uri, {})
         self.assertEqual(content, data)
         self.assertEqual(list(cache.state.keys()), [pickle.dumps(("uri-resolver", uri))])
 
@@ -100,7 +133,7 @@ class ResolverTest(BaseTest):
             self.addCleanup(os.unlink, fh.name)
             fh.write(content)
             fh.flush()
-            self.assertEqual(resolver.resolve("file:%s" % fh.name), content)
+            self.assertEqual(resolver.resolve("file:%s" % fh.name, {'auth': 'token'}), content)
 
 
 def test_value_from_sqlkv(tmp_path):

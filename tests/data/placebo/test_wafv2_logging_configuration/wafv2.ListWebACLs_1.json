@@ -1,0 +1,16 @@
+{
+    "status_code": 200,
+    "data": {
+        "NextMarker": "WVvF5qejaoARvhMU",
+        "WebACLs": [
+            {
+                "Name": "WVvF5qejaoARvhMU",
+                "Id": "ebf41215-9625-436d-938c-c2172c665718",
+                "Description": "Example of a managed rule.",
+                "LockToken": "237b131c-16e7-4e3c-9017-6f352f654823",
+                "ARN": "arn:aws:wafv2:us-east-1:123456789012:regional/webacl/WVvF5qejaoARvhMU/ebf41215-9625-436d-938c-c2172c665718"
+            }
+        ],
+        "ResponseMetadata": {}
+    }
+}

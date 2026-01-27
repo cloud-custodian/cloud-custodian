@@ -1,0 +1,55 @@
+{
+    "status_code": 200,
+    "data": {
+        "ResponseMetadata": {},
+        "FileSystems": [
+            {
+                "OwnerId": "123456789012",
+                "CreationTime": "2023-04-13T09:50:09.998000-07:00",
+                "FileSystemId": "fs-0123fa8a4567ac2eb",
+                "FileSystemType": "LUSTRE",
+                "Lifecycle": "AVAILABLE",
+                "StorageCapacity": 1200,
+                "StorageType": "SSD",
+                "VpcId": "vpc-0c77dff256ea3253",
+                "SubnetIds": [
+                    "subnet-08b2a97a1234567"
+                ],
+                "NetworkInterfaceIds": [
+                    "eni-07c1eefd22a562034",
+                    "eni-0c13defd22a562034"
+                ],
+                "DNSName": "fs-0123fa8a4567ac2eb.fsx.us-west-2.amazonaws.com",
+                "KmsKeyId": "arn:aws:kms:us-west-2:123456789012:key/758f08a1-cd22-4d21-b000-412334ad23cfab81",
+                "ResourceARN": "arn:aws:fsx:us-west-2:123456789012:file-system/fs-0123fa8a4567ac2eb",
+                "Tags": [
+                    {
+                        "Key": "Name",
+                        "Value": "test-backup"
+                    },
+                    {
+                        "Key": "backup_enabled",
+                        "Value": "True"
+                    }
+                ],
+                "LustreConfiguration": {
+                    "WeeklyMaintenanceStartTime": "2:08:30",
+                    "DeploymentType": "PERSISTENT_2",
+                    "PerUnitStorageThroughput": 125,
+                    "MountName": "swaa5bev",
+                    "CopyTagsToBackups": false,
+                    "DataCompressionType": "NONE",
+                    "LogConfiguration": {
+                        "Level": "WARN_ERROR",
+                        "Destination": "arn:aws:logs:us-west-2:123456789012:log-group:/aws/fsx/lustre:log-stream:datarepo_fs-0123fa8a4567ac2eb"
+                    },
+                    "RootSquashConfiguration": {
+                        "RootSquash": "0:0",
+                        "NoSquashNids": []
+                    }
+                },
+                "FileSystemTypeVersion": "2.12"
+            }
+        ]
+    }
+}

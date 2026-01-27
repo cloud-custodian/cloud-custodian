@@ -3,18 +3,16 @@
 import datetime
 import gzip
 import logging
-import mock
 import shutil
+from unittest import mock
 import os
 
-from contextlib import nullcontext as no_exception
 from dateutil.parser import parse as date_parse
 
 from c7n.ctx import ExecutionContext
 from c7n.config import Config
-from c7n.exceptions import InvalidOutputConfig
 from c7n.output import DirectoryOutput, BlobOutput, LogFile, metrics_outputs
-from c7n.resources.aws import S3Output, MetricsOutput, get_bucket_region_clientless
+from c7n.resources.aws import S3Output, MetricsOutput, inspect_bucket_region
 from c7n.testing import mock_datetime_now, TestUtils
 
 from .common import Bag, BaseTest
@@ -43,7 +41,7 @@ class DirOutputTest(BaseTest):
         )
 
     def test_dir_output(self):
-        work_dir, output = self.get_dir_output("file://myoutput")
+        work_dir, _ = self.get_dir_output("file://myoutput")
         self.assertEqual(os.listdir(work_dir), ["myoutput"])
         self.assertTrue(os.path.isdir(os.path.join(work_dir, "myoutput")))
 
@@ -53,7 +51,7 @@ class S3OutputTest(TestUtils):
     def get_s3_output(self, output_url=None, cleanup=True, klass=S3Output):
         if output_url is None:
             output_url = "s3://cloud-custodian/policies"
-        with mock.patch('c7n.resources.aws.get_bucket_region_clientless', return_value='us-east-1'):
+        with mock.patch('c7n.resources.aws.inspect_bucket_region', return_value='us-east-1'):
             output = klass(
                 ExecutionContext(
                     lambda assume=False, region="us-east-1": mock.MagicMock(),
@@ -150,8 +148,8 @@ class S3OutputTest(TestUtils):
         with open(os.path.join(output.root_dir, "foo.txt"), "w") as fh:
             fh.write("abc")
 
-        output.transfer = mock.MagicMock()
-        output.transfer.upload_file = m = mock.MagicMock()
+        output._transfer = mock.MagicMock()
+        output._transfer.upload_file = m = mock.MagicMock()
 
         output.upload()
 
@@ -168,8 +166,8 @@ class S3OutputTest(TestUtils):
         with open(os.path.join(output.root_dir, "foo.txt"), "w") as fh:
             fh.write("abc")
 
-        output.transfer = mock.MagicMock()
-        output.transfer.upload_file = m = mock.MagicMock()
+        output._transfer = mock.MagicMock()
+        output._transfer.upload_file = m = mock.MagicMock()
 
         output.upload()
 
@@ -217,40 +215,5 @@ def test_get_bucket_region_http(bucket, endpoint, expected_region, request):
         f'tests/data/vcr_cassettes/test_output/{request.node.name}.yaml',
         record_mode='none'
     ):
-        region = get_bucket_region_clientless(bucket, endpoint)
+        region = inspect_bucket_region(bucket, endpoint)
         assert region == expected_region
-
-
-@pytest.mark.parametrize(
-    'output_url, expected_region, expected_flow',
-    [
-        pytest.param(
-            's3://c7n-test-us-west-2/out',
-            'us-west-2',
-            no_exception(),
-            id='success',
-        ),
-        pytest.param(
-            's3://nonexistentbucket/out',
-            None,
-            pytest.raises(InvalidOutputConfig),
-            id='error',
-        ),
-    ]
-)
-def test_get_bucket_location_api(test, request, output_url, expected_region, expected_flow):
-    """Test finding the output bucket region via API calls"""
-
-    factory = test.replay_flight_data(request.node.name)
-
-    with expected_flow, mock.patch(
-        # simulate a failure checking the bucket region via HTTP requests
-        'c7n.resources.aws.get_bucket_region_clientless', return_value=None
-    ):
-        ctx = ExecutionContext(
-            factory,
-            Bag(name="test", provider_name="aws"),
-            Config.empty(output_dir=output_url, account_id='123456789012')
-        )
-        output = S3Output(ctx, {'url': output_url, 'test': True})
-        assert output.bucket_region == expected_region

@@ -1,0 +1,141 @@
+{
+  "headers": {
+    "content-type": "application/json; charset=UTF-8",
+    "vary": "Origin, X-Origin, Referer",
+    "date": "Thu, 11 May 2023 11:39:45 GMT",
+    "server": "ESF",
+    "cache-control": "private",
+    "x-xss-protection": "0",
+    "x-frame-options": "SAMEORIGIN",
+    "x-content-type-options": "nosniff",
+    "alt-svc": "h3=\":443\"; ma=2592000,h3-29=\":443\"; ma=2592000",
+    "transfer-encoding": "chunked",
+    "status": "200",
+    "content-length": "4475",
+    "-content-encoding": "gzip",
+    "content-location": "https://recommender.googleapis.com/v1/projects/cloud-custodian/locations/us-central1-a/recommenders/google.compute.disk.IdleResourceRecommender/recommendations?alt=json"
+  },
+  "body": {
+    "recommendations": [
+      {
+        "name": "projects/cloud-custodian/locations/us-central1-a/recommenders/google.compute.disk.IdleResourceRecommender/recommendations/89739555-2602-4b66-ac17-dc2eade50271",
+        "description": "Save cost by snapshotting and then deleting idle persistent disk 'disk-1'.",
+        "lastRefreshTime": "2023-05-10T07:00:00Z",
+        "primaryImpact": {
+          "category": "COST",
+          "costProjection": {
+            "cost": {
+              "currencyCode": "USD",
+              "units": "-1",
+              "nanos": -548387097
+            },
+            "duration": "2592000s"
+          }
+        },
+        "content": {
+          "operationGroups": [
+            {
+              "operations": [
+                {
+                  "action": "add",
+                  "resourceType": "compute.googleapis.com/Snapshot",
+                  "resource": "//compute.googleapis.com/projects/cloud-custodian/global/snapshots/$snapshot-name",
+                  "path": "/",
+                  "value": {
+                    "storage_locations": [
+                      "us-central1-a"
+                    ],
+                    "name": "$snapshot-name",
+                    "source_disk": "projects/cloud-custodian/zones/us-central1-a/disks/disk-1"
+                  }
+                },
+                {
+                  "action": "remove",
+                  "resourceType": "compute.googleapis.com/Disk",
+                  "resource": "//compute.googleapis.com/projects/cloud-custodian/zones/us-central1-a/disks/disk-1",
+                  "path": "/"
+                }
+              ]
+            }
+          ],
+          "overview": {
+            "resourceName": "disk-1",
+            "resource": "//compute.googleapis.com/projects/cloud-custodian/zones/us-central1-a/disks/disk-1",
+            "location": "us-central1-a",
+            "recommendedAction": "Snapshot and delete"
+          }
+        },
+        "stateInfo": {
+          "state": "ACTIVE"
+        },
+        "etag": "\"cc07262fd671022f\"",
+        "recommenderSubtype": "SNAPSHOT_AND_DELETE_DISK",
+        "associatedInsights": [
+          {
+            "insight": "projects/cloud-custodian/locations/us-central1-a/insightTypes/google.compute.disk.IdleResourceInsight/insights/c7dea250-759d-462d-9573-81da69f25a5f"
+          }
+        ],
+        "priority": "P4"
+      },
+      {
+        "name": "projects/cloud-custodian/locations/us-central1-a/recommenders/google.compute.disk.IdleResourceRecommender/recommendations/97414a11-bf67-4136-919c-0e03c05361b6",
+        "description": "Save cost by snapshotting and then deleting idle persistent disk 'instance-1'.",
+        "lastRefreshTime": "2023-05-10T07:00:00Z",
+        "primaryImpact": {
+          "category": "COST",
+          "costProjection": {
+            "cost": {
+              "currencyCode": "USD",
+              "nanos": -483870968
+            },
+            "duration": "2592000s"
+          }
+        },
+        "content": {
+          "operationGroups": [
+            {
+              "operations": [
+                {
+                  "action": "add",
+                  "resourceType": "compute.googleapis.com/Snapshot",
+                  "resource": "//compute.googleapis.com/projects/cloud-custodian/global/snapshots/$snapshot-name",
+                  "path": "/",
+                  "value": {
+                    "name": "$snapshot-name",
+                    "storage_locations": [
+                      "us-central1-a"
+                    ],
+                    "source_disk": "projects/cloud-custodian/zones/us-central1-a/disks/instance-1"
+                  }
+                },
+                {
+                  "action": "remove",
+                  "resourceType": "compute.googleapis.com/Disk",
+                  "resource": "//compute.googleapis.com/projects/cloud-custodian/zones/us-central1-a/disks/instance-1",
+                  "path": "/"
+                }
+              ]
+            }
+          ],
+          "overview": {
+            "location": "us-central1-a",
+            "resourceName": "instance-1",
+            "recommendedAction": "Snapshot and delete",
+            "resource": "//compute.googleapis.com/projects/cloud-custodian/zones/us-central1-a/disks/instance-1"
+          }
+        },
+        "stateInfo": {
+          "state": "ACTIVE"
+        },
+        "etag": "\"335405629d5a4c97\"",
+        "recommenderSubtype": "SNAPSHOT_AND_DELETE_DISK",
+        "associatedInsights": [
+          {
+            "insight": "projects/cloud-custodian/locations/us-central1-a/insightTypes/google.compute.disk.IdleResourceInsight/insights/6c1cb04e-0a0c-42eb-ace5-e9ee9497242b"
+          }
+        ],
+        "priority": "P4"
+      }
+    ]
+  }
+}

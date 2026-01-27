@@ -100,7 +100,8 @@ class Notify(BaseNotify):
 
     @classmethod
     def register_resource(cls, registry, resource_class):
-        resource_class.action_registry.register('notify', Notify)
+        if resource_class.action_registry:
+            resource_class.action_registry.register('notify', Notify)
 
 
 gcp_resources.subscribe(Notify.register_resource)

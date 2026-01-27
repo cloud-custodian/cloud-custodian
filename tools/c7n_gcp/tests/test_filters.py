@@ -2,6 +2,7 @@
 # SPDX-License-Identifier: Apache-2.0
 from gcp_common import BaseTest
 from c7n_gcp.filters.metrics import GCPMetricsFilter
+from c7n.exceptions import PolicyValidationError
 
 
 class TestGCPMetricsFilter(BaseTest):
@@ -105,6 +106,32 @@ class TestGCPMetricsFilter(BaseTest):
         self.assertIn('resource.labels.zone = "us-east4-d"', batch[1])
         self.assertIn('metric.type = "compute.googleapis.com/instance/cpu/utilization"', batch[1])
 
+    def test_get_metric_resource_name_spanner_instance(self):
+        # The `GCPMetricsFilter` made some assumptions about a method that
+        # wasn't previously universally present: `get_metric_resource_name`.
+        session_factory = self.replay_flight_data("filter-metrics-resource-name")
+        p = self.load_policy(
+            {
+                "name": "test-metrics-resource-name",
+                "resource": "gcp.spanner-instance",
+                "filters": [
+                    {
+                        "type": "metrics",
+                        "name": "spanner.googleapis.com/instance/cpu/utilization",
+                        "days": 14,
+                        "op": "lte",
+                        "value": 0.05,
+                        "aligner": "ALIGN_MEAN",
+                    },
+                ],
+            },
+            session_factory=session_factory,
+        )
+
+        resources = p.run()
+        # This should be filtering out the resource, & not erroring..
+        self.assertEqual(len(resources), 0)
+
 
 class TestSecurityComandCenterFindingsFilter(BaseTest):
 
@@ -145,3 +172,58 @@ class TestSecurityComandCenterFindingsFilter(BaseTest):
         )
         resources = p.run()
         self.assertEqual(len(resources), 1)
+
+
+class TestAlertsFilter(BaseTest):
+
+    def test_metric_has_alert(self):
+
+        session_factory = self.replay_flight_data("filter-alerts")
+
+        p = self.load_policy(
+            {
+                "name": "test-alerts",
+                "resource": "gcp.log-project-metric",
+                "filters": [{
+                    'type': 'value',
+                    'key': 'name',
+                    'value': 'test-metric-1'},
+                    {'type': 'alerts'}],
+            },
+            session_factory=session_factory,
+        )
+        resources = p.run()
+        self.assertEqual(len(resources), 1)
+
+    def test_metric_has_no_alert(self):
+
+        session_factory = self.replay_flight_data("filter-alerts")
+
+        p = self.load_policy(
+            {
+                "name": "test-alerts",
+                "resource": "gcp.log-project-metric",
+                "filters": [{
+                    'type': 'value',
+                    'key': 'name',
+                    'value': 'test-metric-2'},
+                    {'type': 'alerts'}],
+            },
+            session_factory=session_factory,
+        )
+        resources = p.run()
+        self.assertEqual(len(resources), 0)
+
+    def test_alert_on_invalid_resource(self):
+
+        with self.assertRaises(PolicyValidationError):
+            self.load_policy(
+                {
+                    "name": "test-alerts",
+                    "resource": "gcp.bucket",
+                    "filters": [{
+                        'type': 'value',
+                        'key': 'name',
+                        'value': 'some-bucket'},
+                        {'type': 'alerts'}],
+                })

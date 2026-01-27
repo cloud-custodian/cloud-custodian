@@ -1,65 +1,123 @@
-[tool.poetry]
-name = "c7n"
-version = "0.9.20"
-description = "Cloud Custodian - Policy Rules Engine"
-authors = ["Cloud Custodian Project"]
-readme = "README.md"
-homepage = "https://cloudcustodian.io"
-documentation = "https://cloudcustodian.io/docs"
-repository = "https://github.com/cloud-custodian/cloud-custodian"
+[project]
+authors = [
+    {name = "Cloud Custodian Project"},
+]
 license = "Apache-2.0"
-packages = [
-    { include = "c7n" }]
-classifiers=[
-   "License :: OSI Approved :: Apache Software License",
-   "Topic :: System :: Systems Administration",
-   "Topic :: System :: Distributed Computing"]
+requires-python = "<4.0.0,>=3.10.2"
+dependencies = [
+    "argcomplete>=1.12.3",
+    "boto3<2.0.0,>=1.12.31",
+    "cryptography>=44",
+    "jsonschema>=4.18",
+    "python-dateutil<3.0.0,>=2.8.2",
+    "pyyaml>=5.4.0",
+    "tabulate<1.0.0,>=0.9.0",
+    # uv hint: to get latest urllib3
+    "urllib3>2",
+]
+name = "c7n"
+version = "0.9.49"
+description = "Cloud Custodian - Policy Rules Engine"
+readme = "README.md"
+classifiers = [
+    "License :: OSI Approved :: Apache Software License",
+    "Topic :: System :: Systems Administration",
+    "Topic :: System :: Distributed Computing",
+]
 
-[tool.poetry.urls]
+[project.urls]
 "Bug Tracker" = "https://github.com/cloud-custodian/cloud-custodian/issues"
+homepage = "https://cloudcustodian.io"
+repository = "https://github.com/cloud-custodian/cloud-custodian"
+documentation = "https://cloudcustodian.io/docs"
 
-[tool.poetry.scripts]
-custodian = 'c7n.cli:main'
+[project.scripts]
+custodian = "c7n.cli:main"
 
-[tool.poetry.dependencies]
-python = "^3.7"
-boto3 = "^1.12.31"
-jsonschema = ">=3.0.0"
-argcomplete = ">=1.12.3"
-python-dateutil = "^2.8.2"
-pyyaml = ">=5.4.0"
-tabulate = "^0.8.6"
-importlib-metadata = ">=4.11.1"
-docutils = ">=0.14,<0.18"
+[dependency-groups]
+dev = [
+    "click<9.0,>=8.0",
+    "coverage<8,>=7",
+    "docker[websockets]<8.0.0,>=7.1.0",
+    "freezegun<2.0.0,>=1.2.2",
+    "moto<6.0,>=5.0",
+    "openapi-spec-validator<1.0.0,>=0.7.1",
+    "placebo<1,>=0",
+    "pytest<8",
+    "pytest-cov<6,>=3",
+    "pytest-recording<0.14.0,>=0.12.1",
+    "pytest-sugar<1.1.0,>=0.9.2",
+    "pytest-terraform<0.8,>=0.6",
+    "pytest-xdist<4.0,>=3.0",
+    "tomli>=2.2",
+    "twine>=6.0.0",
+    "vcrpy>=4.0.2",
+]
+lint = [
+    "black<25.0, >=23.1",
+    "ruff~=0.11",
+]
+addons = [
+    "aws-xray-sdk<3.0,>=2.14",
+    "bs4>=0.0.2",
+    "jsonpatch<2.0,>=1.25",
+    "psutil>=5.7",
+]
 
-[tool.poetry.dev-dependencies]
-pytest = "^7.1.2"
-coverage = "^6.4.4"
-placebo = "^0.9.0"
-pytest-xdist = "^2.0"
-pytest-cov = "^3.0.0"
-pytest-terraform = "^0.6.0"
-mock = "^4.0.1"
-vcrpy = "^4.0.2"
-aws-xray-sdk = "^2.5.0"
-flake8 = "<4"
-# tox = "^3.14.5"
-jsonpatch = "^1.25"
-psutil = "^5.7.0"
-# wheel = "==0.30.0"
-twine = "^3.1.1"
-pytest-sugar = "^0.9.2"
-click = "^8.0"
-freezegun = "^1.2.2"
-pytest-recording = "^0.12.1"
+[tool.uv.sources]
+c7n = { workspace = true }
+
+[tool.uv.workspace]
+members = [
+  "tools/c7n_awscc",
+  "tools/c7n_azure",
+  "tools/c7n_gcp",
+  "tools/c7n_kube",
+  "tools/c7n_left",
+  "tools/c7n_mailer",
+  "tools/c7n_oci",
+  "tools/c7n_openstack",
+  "tools/c7n_org",
+  "tools/c7n_policystream",
+  "tools/c7n_sphinxext",
+  "tools/c7n_tencentcloud",
+]
+
+[build-system]
+requires = ["hatchling"]
+build-backend = "hatchling.build"
 
 [tool.black]
 skip-string-normalization = true
+line-length = 100
 
+[tool.ruff]
+line-length = 100
+exclude = ["__init__.py"]
+
+[tool.ruff.format]
+quote-style = "preserve"
+
+[tool.ruff.lint]
+preview = true
+select = ["E", "F", "W"]
+# E741 - single char variables
+# E401 - multiple imports in a single line
+ignore = ["E741", "E401"]
 
 [tool.pytest.ini_options]
 junit_family = "xunit2"
 addopts = "--tb=native"
-markers = ["functional", "skiplive"]
+markers = ["functional", "skiplive", "audited"]
 python_files = "test_*.py"
 norecursedirs = ["data", "cassettes", "templates", "terraform"]
+filterwarnings = [
+    "ignore::DeprecationWarning",
+    "ignore::PendingDeprecationWarning"
+]
+
+
+[tool.coverage.report]
+# services removed upstream, we have some minimal fake implementations for
+# temporary compatiblity for existing policies.
+omit = ["c7n/resources/opsworks.py", "c7n/resources/qldb.py"]

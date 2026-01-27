@@ -15,7 +15,7 @@ pb = "%s.SplunkHecDelivery" % pbm
 
 
 class DeliveryTester:
-    def setup(self):
+    def setup_method(self, test_method):
         self.mock_sess = Mock()
         self.mock_logger = Mock(spec_set=Logger)
         self.config = {

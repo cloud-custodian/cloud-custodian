@@ -36,7 +36,8 @@ extensions = [
     'sphinx.ext.viewcode',
     'c7n_sphinxext.docgen',
     'myst_parser',
-    'sphinx_markdown_tables'
+    'sphinx_markdown_tables',
+    'sphinxcontrib.jquery',
 ]
 
 # Extract only a classes docstrings
@@ -64,6 +65,9 @@ source_suffix = ['.rst', '.md']
 # The master toctree document.
 master_doc = 'index'
 
+# Generate Markdown header links anchors
+myst_heading_anchors = 3
+
 # General information about the project.
 project = u'Cloud Custodian'
 author = u'Kapil Thangavelu'
@@ -82,7 +86,7 @@ author = u'Kapil Thangavelu'
 #
 # This is also used if you do content translation via gettext catalogs.
 # Usually you set "language" from the command line for these cases.
-language = None
+language = "en"
 
 # There are two options for replacing |today|: either, you set today to some
 # non-false value, then it is used:
@@ -141,10 +145,6 @@ html_theme_options = {
   'includehidden': True,
   'titles_only': False
 }
-
-# Add any paths that contain custom themes here, relative to this directory.
-#html_theme_path = sphinx_bootstrap_theme.get_html_theme_path()
-html_theme_path = [sphinx_rtd_theme.get_html_theme_path()]
 
 # The name for this set of Sphinx documents.  If None, it defaults to
 # "<project> v<release> documentation".

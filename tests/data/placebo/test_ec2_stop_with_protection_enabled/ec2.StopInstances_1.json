@@ -1,0 +1,25 @@
+{
+    "status_code": 400,
+    "data": {
+      "Error": {
+        "Code": "OperationNotPermitted",
+        "Message": "The instance 'i-000b2f5125402eb55' may not be stopped. Modify its 'disableApiStop' instance attribute and try again."
+      },
+      "ResponseMetadata": {
+        "RequestId": "52a34c4e-5ee2-41c7-b3e7-9010f8eb3dc4",
+        "HTTPStatusCode": 400,
+        "HTTPHeaders": {
+          "x-amzn-requestid": "52a34c4e-5ee2-41c7-b3e7-9010f8eb3dc4",
+          "cache-control": "no-cache, no-store",
+          "strict-transport-security": "max-age=31536000; includeSubDomains",
+          "vary": "accept-encoding",
+          "content-type": "text/xml;charset=UTF-8",
+          "transfer-encoding": "chunked",
+          "date": "Thu, 17 Nov 2022 10:49:24 GMT",
+          "connection": "close",
+          "server": "AmazonEC2"
+        },
+        "RetryAttempts": 0
+      }
+    }
+  }

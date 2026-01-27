@@ -5,8 +5,9 @@ from c7n_azure.actions.base import AzureBaseAction
 from c7n_azure.provider import resources
 from c7n_azure.resources.arm import ArmResourceManager
 
-from c7n.filters.core import ValueFilter, type_schema
+from c7n.filters.core import ValueFilter, type_schema, ListItemFilter
 from c7n.filters.related import RelatedResourceFilter
+from c7n.utils import local_session
 
 
 @resources.register('vm')
@@ -268,6 +269,78 @@ class NetworkInterfaceFilter(RelatedResourceFilter):
 
     RelatedResource = "c7n_azure.resources.network_interface.NetworkInterface"
     RelatedIdsExpression = "properties.networkProfile.networkInterfaces[0].id"
+
+
+@VirtualMachine.filter_registry.register('backup-status')
+class BackupStatusFilter(ValueFilter):
+    """Filters Virtual Machines by their backup protection status.
+
+    :example:
+
+    This policy will get Virtual Machine resources that Protected backup protection status.
+
+    .. code-block:: yaml
+
+        policies:
+          - name: vm-backup-status-protected
+            resource: azure.vm
+            filters:
+              - type: backup-status
+                key: protectionStatus
+                value: Protected
+    """
+    schema = type_schema(
+        'backup-status',
+        rinherit=ValueFilter.schema
+    )
+
+    backup_annotation_key = "c7n:BackupStatus"
+    annotate = False
+
+    def process(self, resources, event=None):
+        s = local_session(self.manager.session_factory)
+        client = s.client('azure.mgmt.recoveryservicesbackup.RecoveryServicesBackupClient')
+
+        for resource in resources:
+            if self.backup_annotation_key in resource:
+                continue
+            resource[self.backup_annotation_key] = client.backup_status.get(
+                azure_region=resource['location'],
+                parameters=dict(resourceId=resource['id'], resourceType='VM')
+            ).serialize(True)
+        return super().process(resources, event)
+
+    def __call__(self, r):
+        return super().__call__(r[self.backup_annotation_key])
+
+
+@VirtualMachine.filter_registry.register('jit-policy-port')
+class VirtualMachineJitPortsFilter(ListItemFilter):
+    schema = type_schema(
+        'jit-policy-port',
+        attrs={"$ref": "#/definitions/filters_common/list_item_attrs"},
+        count={"type": "number"},
+        count_op={"$ref": "#/definitions/filters_common/comparison_operators"}
+    )
+    annotation_key = 'c7n:JitPolicyPorts'
+
+    def __init__(self, data, manager=None):
+        data['key'] = f'"{self.annotation_key}"'
+        super().__init__(data, manager)
+
+    def process(self, resources, event=None):
+        policies = self.manager.get_resource_manager('azure.defender-jit-policy').resources()
+        vm_id_to_ports = {}
+        for p in policies:
+            for machine in p['properties'].get('virtualMachines', []):
+                for port in machine.get('ports', []):
+                    port['c7n:JitPolicyName'] = p['name']
+                vm_id_to_ports.setdefault(machine['id'].lower(), []).extend(
+                    machine.get('ports', [])
+                )
+        for r in resources:
+            r[self.annotation_key] = vm_id_to_ports.get(r['id'].lower(), [])
+        return super().process(resources, event)
 
 
 @VirtualMachine.action_registry.register('poweroff')

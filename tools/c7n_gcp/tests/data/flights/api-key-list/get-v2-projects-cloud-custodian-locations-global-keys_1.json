@@ -1,0 +1,42 @@
+{
+  "headers": {
+    "content-type": "application/json; charset=UTF-8",
+    "vary": "Origin, X-Origin, Referer",
+    "date": "Wed, 02 Dec 2022 14:53:55 GMT",
+    "server": "ESF",
+    "cache-control": "private",
+    "x-xss-protection": "0",
+    "x-frame-options": "SAMEORIGIN",
+    "x-content-type-options": "nosniff",
+    "alt-svc": "h3-29=\":443\"; ma=2592000,h3-T051=\":443\"; ma=2592000,h3-Q050=\":443\"; ma=2592000,h3-Q046=\":443\"; ma=2592000,h3-Q043=\":443\"; ma=2592000,quic=\":443\"; ma=2592000; v=\"46,43\"",
+    "transfer-encoding": "chunked",
+    "status": "200",
+    "content-length": "44195",
+    "-content-encoding": "gzip"
+  },
+  "body": {
+    "keys": [
+      {
+        "name": "projects/cloud-custodian/locations/global/keys/xxxx-xxxx",
+        "displayName": "API key 1",
+        "createTime": "2022-12-20T17:57:31.089857Z",
+        "uid": "4ce127b8-5e6f-47ec-ba20-2e48254c88a9",
+        "updateTime": "2022-12-20T19:23:47.355797Z",
+        "restrictions": {
+          "browserKeyRestrictions": {
+            "allowedReferrers": [
+              "*.example.com"
+            ]
+          },
+          "apiTargets": [
+            {
+              "service": "bigquery"
+            }
+          ]
+        },
+        "etag": "W/\"Snm98/jPA0qRHwkuy5prLw==\""
+      }
+    ]
+  }
+  
+}

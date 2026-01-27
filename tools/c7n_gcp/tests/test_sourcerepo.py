@@ -19,3 +19,9 @@ class SourceRepoTest(BaseTest):
 
         resources = policy.run()
         self.assertEqual(resources[0]['name'], repo_name)
+        self.assertEqual(
+            policy.resource_manager.get_urns(resources),
+            [
+                "gcp:sourcerepo::cloud-custodian:repo/test-repo",
+            ],
+        )
