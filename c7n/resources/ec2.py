@@ -495,7 +495,7 @@ class ImageAncestry(Filter, InstanceImageBase):
             image = self.get_instance_image(instance)
             if not image:
                 continue
-            
+
             # Use the AMI filter's logic to check parent owner
             filter_instance = ami_filter(self.data, self.manager.get_resource_manager('ami'))
             if filter_instance._check_parent_owner(client, image):

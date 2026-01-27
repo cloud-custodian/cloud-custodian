@@ -598,10 +598,9 @@ class ImageAncestryFilter(Filter):
 
     def process(self, resources, event=None):
         client = local_session(self.manager.session_factory).client('ec2')
-        approved_owners = self.data['approved_owners']
         results = []
 
-        for r in resources:            
+        for r in resources:
             if self._check_parent_owner(client, r):
                 results.append(r)
 
@@ -619,26 +618,26 @@ class ImageAncestryFilter(Filter):
                 ancestry = client.get_image_ancestry(ImageId=resource['ImageId'])
                 resource['c7n:image-ancestry'] = ancestry.get('ImageAncestryEntries', [])
             except ClientError as e:
-                log.warning(f"Error getting ancestry for {r['ImageId']}: {e}")
+                log.warning(f"Error getting ancestry for {resource['ImageId']}: {e}")
                 resource['c7n:image-ancestry'] = []
         ancestry = resource['c7n:image-ancestry']
         max_depth = self.data.get('max_depth', 1)
-        
+
         # Check ancestors up to max_depth
         for depth in range(min(max_depth, len(ancestry))):
             parent_entry = ancestry[depth]
             parent_id = parent_entry.get('ImageId')
-            
+
             if not parent_id:
                 continue
-            
+
             # Skip if we already looked up the owner
             if 'OwnerId' in parent_entry or 'ImageOwnerAlias' in parent_entry:
                 owner = parent_entry.get('ImageOwnerAlias') or parent_entry.get('OwnerId')
                 if owner in approved_owners:
                     return False
                 continue
-            
+
             try:
                 resp = client.describe_images(
                     ImageIds=[parent_id],
@@ -647,22 +646,22 @@ class ImageAncestryFilter(Filter):
                 )
                 if not resp.get('Images'):
                     continue
-                
+
                 parent_image = resp['Images'][0]
                 owner = parent_image.get('ImageOwnerAlias') or parent_image.get('OwnerId')
-                
+
                 # Cache the owner info in the ancestry entry
                 parent_entry['OwnerId'] = parent_image.get('OwnerId')
                 if parent_image.get('ImageOwnerAlias'):
                     parent_entry['ImageOwnerAlias'] = parent_image['ImageOwnerAlias']
-                
+
                 if owner in approved_owners:
                     return False
             except ClientError as e:
                 if e.response['Error']['Code'] != 'InvalidAMIID.NotFound':
                     log.warning(f"Error describing parent image {parent_id}: {e}")
                 continue
-        
+
         # No approved ancestor found, flag this AMI
         return True
 
