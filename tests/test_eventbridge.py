@@ -8,7 +8,7 @@ from c7n.resources import eventbridge
 @pytest.mark.audited
 @terraform('event_bridge_bus')
 def test_event_bus_describe(test, event_bridge_bus):
-    factory = test.replay_flight_data('test_cwe_bus_xaccount', region='us-west-1')
+    factory = test.replay_flight_data('test_cwe_bus_xaccount')
     p = test.load_policy({
         'name': 'bus-xaccount',
         'resource': 'aws.event-bus',
@@ -16,7 +16,7 @@ def test_event_bus_describe(test, event_bridge_bus):
             {'tag:Env': 'Sandbox'},
             'cross-account'
         ],
-    }, session_factory=factory, config={'region': 'us-west-1'})
+    }, session_factory=factory)
     resources = p.run()
     assert len(resources) == 1
     resources[0]['Name'] == event_bridge_bus[
