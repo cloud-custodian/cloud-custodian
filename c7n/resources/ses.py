@@ -374,7 +374,7 @@ class SESDedicatedIpPool(QueryResourceManager):
         arn_service = 'ses'
         arn_type = 'dedicated-ip-pool'
         universal_taggable = object()
-        config_type = None
+        cfn_type = config_type = 'AWS::SES::DedicatedIpPool'
         permission_prefix = 'ses'
         permissions_augment = ("ses:ListTagsForResource",)
 

@@ -13,7 +13,7 @@ dependencies = [
     "pyopenssl>=24"
 ]
 name = "c7n_oci"
-version = "0.1.22"
+version = "0.1.23"
 description = "Cloud Custodian - OCI Support"
 readme = "readme.md"
 classifiers = [
