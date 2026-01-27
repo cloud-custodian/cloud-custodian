@@ -19,6 +19,64 @@ class TestTransferServer(BaseTest):
         self.assertEqual(resources[0]["State"], "ONLINE")
         self.assertEqual(resources[0]["SecurityPolicyName"], "TransferSecurityPolicy-2020-06")
 
+    def test_security_group_filter(self):
+        session_factory = self.replay_flight_data("test_transfer_server_sg_filter")
+        p = self.load_policy(
+            {
+                "name": "transfer-server-test-sg-filter",
+                "resource": "transfer-server",
+                "filters": [
+                    {
+                        "type": "security-group",
+                        "key": "GroupName",
+                        "value": "default",
+                    }
+                ],
+            },
+            session_factory=session_factory,
+        )
+        resources = p.run()
+        self.assertEqual(len(resources), 1)
+
+    def test_subnet_filter(self):
+        session_factory = self.replay_flight_data("test_transfer_server_subnet_filter")
+        p = self.load_policy(
+            {
+                "name": "transfer-server-test-subnet-filter",
+                "resource": "transfer-server",
+                "filters": [
+                    {
+                        "type": "subnet",
+                        "key": "OwnerId",
+                        "value": "644160558196",
+                    }
+                ],
+            },
+            session_factory=session_factory,
+        )
+        resources = p.run()
+        self.assertEqual(len(resources), 1)
+
+    def test_network_location_filter(self):
+        session_factory = self.replay_flight_data("test_transfer_server_network_location_filter")
+        p = self.load_policy(
+            {
+                "name": "transfer-server-test-network-location-filter",
+                "resource": "transfer-server",
+                "filters": [
+                    {
+                        "type": "network-location",
+                        "compare": ["resource", "security-group"],
+                        "key": "tag:Application",
+                        "match": "equal",
+                    }
+                ],
+            },
+            session_factory=session_factory,
+        )
+        resources = p.run()
+        self.assertEqual(len(resources), 1)
+
     def test_stop_server(self):
         session_factory = self.replay_flight_data("test_transfer_server_stop")
         p = self.load_policy(
