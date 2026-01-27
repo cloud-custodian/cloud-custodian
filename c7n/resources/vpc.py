@@ -2887,6 +2887,94 @@ class EndpointVpcFilter(net_filters.VpcFilter):
     RelatedIdsExpression = "VpcId"
 
 
+@VpcEndpoint.filter_registry.register('unused')
+class UnusedVpcEndpoint(Filter):
+    """Filter to find VPC endpoints that are unused.
+
+    For Gateway endpoints, checks if they have no route table associations.
+    For Interface endpoints, checks if they have no subnet associations.
+    Both types must be in 'Available' state to be considered for filtering.
+
+    :example:
+
+    .. code-block:: yaml
+
+            policies:
+              - name: vpc-endpoints-unused
+                resource: vpc-endpoint
+                filters:
+                  - unused
+
+    """
+    schema = type_schema('unused')
+    permissions = ('ec2:DescribeVpcEndpoints',)
+
+    def process(self, resources, event=None):
+        results = []
+        for r in resources:
+            # Only consider endpoints in Available state
+            if r.get('State') != 'Available':
+                continue
+
+            is_unused = False
+
+            if r.get('VpcEndpointType') == 'Gateway':
+                # Gateway endpoints are unused if they have no route table associations
+                route_tables = r.get('RouteTableIds', [])
+                if not route_tables:
+                    is_unused = True
+            elif r.get('VpcEndpointType') == 'Interface':
+                # Interface endpoints are unused if they have no subnet associations
+                subnets = r.get('SubnetIds', [])
+                if not subnets:
+                    is_unused = True
+
+            if is_unused:
+                results.append(r)
+
+        return results
+
+
+@VpcEndpoint.action_registry.register('delete')
+class DeleteVpcEndpoint(BaseAction):
+    """Delete VPC endpoint(s)
+
+    :example:
+
+    .. code-block:: yaml
+
+            policies:
+              - name: delete-unused-vpc-endpoints
+                resource: vpc-endpoint
+                filters:
+                  - type: unused
+                actions:
+                  - delete
+    """
+
+    schema = type_schema('delete')
+    permissions = ('ec2:DeleteVpcEndpoints',)
+
+    def process(self, resources):
+        client = local_session(self.manager.session_factory).client('ec2')
+        for r in resources:
+            try:
+                self.manager.retry(
+                    client.delete_vpc_endpoints,
+                    VpcEndpointIds=[r['VpcEndpointId']],
+                    ignore_err_codes=(
+                        'InvalidVpcEndpointId.NotFound',
+                    ),
+                )
+            except ClientError as e:
+                if e.response['Error']['Code'] not in ('InvalidVpcEndpointId.NotFound',):
+                    self.log.exception(
+                        "Exception deleting VPC endpoint %s: %s",
+                        r['VpcEndpointId'],
+                        e.response['Error']['Message']
+                    )
+
+
 @Vpc.filter_registry.register("vpc-endpoint")
 class VPCEndpointFilter(RelatedResourceByIdFilter):
     """Filters vpcs based on their vpc-endpoints
@@ -2969,6 +3057,47 @@ class VPCEndpointServiceConfiguration(query.QueryResourceManager):
             'ServiceId',
             'ServiceState'
         )
+
+
+@VPCEndpointServiceConfiguration.action_registry.register('delete')
+class DeleteVpcEndpointServiceConfiguration(BaseAction):
+    """Delete VPC endpoint service configuration(s)
+
+    :example:
+
+    .. code-block:: yaml
+
+            policies:
+              - name: delete-unused-endpoint-services
+                resource: vpc-endpoint-service-configuration
+                filters:
+                  - ServiceState: Available
+                  - AcceptanceRequired: false
+                actions:
+                  - delete
+    """
+
+    schema = type_schema('delete')
+    permissions = ('ec2:DeleteVpcEndpointServiceConfigurations',)
+
+    def process(self, resources):
+        client = local_session(self.manager.session_factory).client('ec2')
+        for r in resources:
+            try:
+                self.manager.retry(
+                    client.delete_vpc_endpoint_service_configurations,
+                    ServiceIds=[r['ServiceId']],
+                    ignore_err_codes=(
+                        'InvalidVpcEndpointServiceId.NotFound',
+                    ),
+                )
+            except ClientError as e:
+                if e.response['Error']['Code'] not in ('InvalidVpcEndpointServiceId.NotFound',):
+                    self.log.exception(
+                        "Exception deleting VPC endpoint service configuration %s: %s",
+                        r['ServiceId'],
+                        e.response['Error']['Message']
+                    )
 
 
 @resources.register('key-pair')

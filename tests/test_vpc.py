@@ -3834,6 +3834,179 @@ class SecurityGroupTest(BaseTest):
 
 class EndpointTest(BaseTest):
 
+    def test_vpc_endpoint_unused_filter(self):
+        factory = self.replay_flight_data("test_vpc_endpoint_unused_filter")
+        p = self.load_policy(
+            {
+                "name": "unused-vpc-endpoints",
+                "resource": "vpc-endpoint",
+                "filters": [
+                    {"type": "unused"}
+                ],
+            },
+            session_factory=factory,
+        )
+        resources = p.run()
+        self.assertEqual(len(resources), 2)
+
+        # Check that we found the expected unused endpoints
+        endpoint_ids = {r['VpcEndpointId'] for r in resources}
+        self.assertIn('vpce-unused-gateway', endpoint_ids)
+        self.assertIn('vpce-unused-interface', endpoint_ids)
+
+    def test_vpc_endpoint_unused_filter_edge_cases(self):
+        """Test UnusedVpcEndpoint filter with malformed/edge case data"""
+        p = self.load_policy({
+            "name": "unused-vpc-endpoints-edge-cases",
+            "resource": "vpc-endpoint",
+            "filters": [{"type": "unused"}]
+        })
+
+        unused_filter = p.resource_manager.filters[0]
+
+        # Test with malformed resources missing properties
+        malformed_resources = [
+            # Missing State - should be skipped
+            {
+                "VpcEndpointId": "vpce-missing-state",
+                "VpcEndpointType": "Gateway",
+                "VpcId": "vpc-12345678"
+                # Missing State, RouteTableIds
+            },
+            # Missing VpcEndpointType - should be skipped
+            {
+                "VpcEndpointId": "vpce-missing-type",
+                "State": "Available",
+                "VpcId": "vpc-12345678"
+                # Missing VpcEndpointType
+            },
+            # Gateway with None RouteTableIds - should be flagged as unused
+            {
+                "VpcEndpointId": "vpce-gateway-none-routes",
+                "VpcEndpointType": "Gateway",
+                "State": "Available",
+                "VpcId": "vpc-12345678",
+                "RouteTableIds": None
+            },
+            # Interface with None SubnetIds - should be flagged as unused
+            {
+                "VpcEndpointId": "vpce-interface-none-subnets",
+                "VpcEndpointType": "Interface",
+                "State": "Available",
+                "VpcId": "vpc-12345678",
+                "SubnetIds": None
+            },
+            # Unknown endpoint type - should be skipped
+            {
+                "VpcEndpointId": "vpce-unknown-type",
+                "VpcEndpointType": "Unknown",
+                "State": "Available",
+                "VpcId": "vpc-12345678"
+            }
+        ]
+
+        results = unused_filter.process(malformed_resources)
+
+        # Should find 2 unused endpoints (the ones with None values for associations)
+        self.assertEqual(len(results), 2)
+        endpoint_ids = {r['VpcEndpointId'] for r in results}
+        self.assertIn('vpce-gateway-none-routes', endpoint_ids)
+        self.assertIn('vpce-interface-none-subnets', endpoint_ids)
+
+    def test_vpc_endpoint_unused_filter_empty_data(self):
+        """Test UnusedVpcEndpoint filter with empty data scenarios"""
+        p = self.load_policy({
+            "name": "unused-vpc-endpoints-empty",
+            "resource": "vpc-endpoint",
+            "filters": [{"type": "unused"}]
+        })
+
+        unused_filter = p.resource_manager.filters[0]
+
+        # Test with empty resource list
+        results = unused_filter.process([])
+        self.assertEqual(len(results), 0)
+
+        # Test with resources that have all expected properties but are not Available
+        non_available_resources = [
+            {
+                "VpcEndpointId": "vpce-pending",
+                "VpcEndpointType": "Gateway",
+                "State": "Pending",
+                "VpcId": "vpc-12345678",
+                "RouteTableIds": []
+            },
+            {
+                "VpcEndpointId": "vpce-failed",
+                "VpcEndpointType": "Interface",
+                "State": "Failed",
+                "VpcId": "vpc-12345678",
+                "SubnetIds": []
+            }
+        ]
+
+        results = unused_filter.process(non_available_resources)
+        # Should return empty since only Available endpoints are considered
+        self.assertEqual(len(results), 0)
+
+    def test_vpc_endpoint_unused_filter_resource_manager_error(self):
+        """Test that resource manager raises ClientError for invalid endpoints"""
+        factory = self.replay_flight_data("test_vpc_endpoint_unused_filter_error")
+
+        # This tests that the resource manager properly propagates ClientError
+        # when trying to describe non-existent VPC endpoints
+        p = self.load_policy({
+            "name": "unused-vpc-endpoints-error",
+            "resource": "vpc-endpoint",
+            "filters": [{"type": "unused"}]
+        }, session_factory=factory)
+
+        # The resource manager should raise ClientError for invalid endpoint IDs
+        with self.assertRaises(BotoClientError) as e:
+            p.run()
+        self.assertEqual(e.exception.response['Error']['Code'], 'InvalidVpcEndpointId.NotFound')
+
+    def test_vpc_endpoint_delete(self):
+        factory = self.replay_flight_data("test_vpc_endpoint_delete")
+        p = self.load_policy(
+            {
+                "name": "delete-vpc-endpoints",
+                "resource": "vpc-endpoint",
+                "filters": [{"tag:Name": "c7n-test-endpoint"}],
+                "actions": [{"type": "delete"}],
+            },
+            session_factory=factory,
+        )
+        resources = p.run()
+        self.assertEqual(len(resources), 1)
+
+        # Verify deletion
+        client = factory().client("ec2")
+        with self.assertRaises(BotoClientError) as e:
+            client.describe_vpc_endpoints(
+                VpcEndpointIds=[resources[0]['VpcEndpointId']]
+            )
+        self.assertEqual(
+            e.exception.response['Error']['Code'],
+            'InvalidVpcEndpointId.NotFound'
+        )
+
+    def test_vpc_endpoint_delete_not_found_ignored(self):
+        """Test that delete gracefully handles already-deleted endpoints"""
+        factory = self.replay_flight_data("test_vpc_endpoint_delete_not_found")
+        p = self.load_policy(
+            {
+                "name": "delete-vpc-endpoints",
+                "resource": "vpc-endpoint",
+                "filters": [{"VpcEndpointId": "vpce-nonexistent"}],
+                "actions": [{"type": "delete"}],
+            },
+            session_factory=factory,
+        )
+        # Should not raise an exception
+        resources = p.run()
+        self.assertEqual(len(resources), 1)
+
     def test_endpoint_subnet(self):
         factory = self.replay_flight_data("test_vpce_subnet_filter")
         p = self.load_policy(
@@ -4730,3 +4903,46 @@ class TestVPCEndpointServiceConfiguration(BaseTest):
         resources = p.run()
         self.assertEqual(len(resources), 1)
         self.assertEqual(resources[0]['ServiceId'], 'vpce-svc-042193297e333714e')
+
+    def test_vpc_endpoint_service_configuration_delete(self):
+        factory = self.replay_flight_data("test_vpc_endpoint_service_configuration_delete")
+        p = self.load_policy(
+            {
+                "name": "delete-endpoint-service-configs",
+                "resource": "vpc-endpoint-service-configuration",
+                "filters": [{"tag:Name": "c7n-test-service"}],
+                "actions": [{"type": "delete"}],
+            },
+            session_factory=factory,
+        )
+        resources = p.run()
+        self.assertEqual(len(resources), 1)
+
+        # Verify deletion
+        client = factory().client("ec2")
+        with self.assertRaises(BotoClientError) as e:
+            client.describe_vpc_endpoint_service_configurations(
+                ServiceIds=[resources[0]['ServiceId']]
+            )
+        self.assertEqual(
+            e.exception.response['Error']['Code'],
+            'InvalidVpcEndpointServiceId.NotFound'
+        )
+
+    def test_vpc_endpoint_service_configuration_delete_not_found_ignored(self):
+        """Test that delete gracefully handles already-deleted service configurations"""
+        factory = self.replay_flight_data(
+            "test_vpc_endpoint_service_configuration_delete_not_found"
+        )
+        p = self.load_policy(
+            {
+                "name": "delete-endpoint-service-configs",
+                "resource": "vpc-endpoint-service-configuration",
+                "filters": [{"ServiceId": "vpce-svc-nonexistent"}],
+                "actions": [{"type": "delete"}],
+            },
+            session_factory=factory,
+        )
+        # Should not raise an exception
+        resources = p.run()
+        self.assertEqual(len(resources), 1)
