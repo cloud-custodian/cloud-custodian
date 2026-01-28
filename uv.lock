@@ -438,6 +438,20 @@ wheels = [
 ]
 
 [[package]]
+name = "azure-mgmt-consumption"
+version = "10.0.0"
+source = { registry = "https://pypi.org/simple" }
+dependencies = [
+    { name = "azure-common" },
+    { name = "azure-mgmt-core" },
+    { name = "msrest" },
+]
+sdist = { url = "https://files.pythonhosted.org/packages/4c/a9/f8c817e67a9005752b0c11cc289fd2334c4f1c9287b0cc8b4abd220e4101/azure-mgmt-consumption-10.0.0.zip", hash = "sha256:06a086436c1737f77ab86894d51f5973b6e0fa5edf56558e4c296589ebab9130", size = 157978, upload-time = "2022-06-21T02:17:29.927Z" }
+wheels = [
+    { url = "https://files.pythonhosted.org/packages/84/99/75a22c84941348dc9d0cbb95fe63c2adb8545543236c207817a439027648/azure_mgmt_consumption-10.0.0-py3-none-any.whl", hash = "sha256:507059238cba2dcafc19866c24c53c5e145cafd721a39ab8c605590a3f169e81", size = 138711, upload-time = "2022-06-21T02:17:27.597Z" },
+]
+
+[[package]]
 name = "azure-mgmt-containerinstance"
 version = "7.0.0"
 source = { registry = "https://pypi.org/simple" }
@@ -1441,6 +1455,7 @@ dependencies = [
     { name = "azure-mgmt-cdn" },
     { name = "azure-mgmt-cognitiveservices" },
     { name = "azure-mgmt-compute" },
+    { name = "azure-mgmt-consumption" },
     { name = "azure-mgmt-containerinstance" },
     { name = "azure-mgmt-containerregistry" },
     { name = "azure-mgmt-containerservice" },
@@ -1531,6 +1546,7 @@ requires-dist = [
     { name = "azure-mgmt-cdn", specifier = ">=12.0.0,<13.0.0" },
     { name = "azure-mgmt-cognitiveservices", specifier = ">=11.0.0,<12.0.0" },
     { name = "azure-mgmt-compute", specifier = ">=34.1.0,<35.0.0" },
+    { name = "azure-mgmt-consumption", specifier = ">=10.0.0,<11.0.0" },
     { name = "azure-mgmt-containerinstance", specifier = ">=7.0.0,<8.0.0" },
     { name = "azure-mgmt-containerregistry", specifier = ">=14.0.0,<15.0.0" },
     { name = "azure-mgmt-containerservice", specifier = ">=15.0.0,<16.0.0" },
