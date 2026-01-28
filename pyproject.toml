@@ -90,6 +90,15 @@ build-backend = "hatchling.build"
 [tool.black]
 skip-string-normalization = true
 line-length = 100
+include = '''
+(
+    tools/c7n_left/.*\.py$
+    | tools/c7n_mailer/.*\.py$
+    | tools/c7n_oci/.*\.py$
+    | tools/c7n_kube/.*\.py$
+    | tools/c7n_awscc/.*\.py$
+)
+'''
 
 [tool.ruff]
 line-length = 100
