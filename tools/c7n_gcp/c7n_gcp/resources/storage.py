@@ -9,7 +9,6 @@ from c7n_gcp.filters import IamPolicyFilter
 
 @resources.register('bucket')
 class Bucket(QueryResourceManager):
-
     class resource_type(TypeInfo):
         service = 'storage'
         version = 'v1'
@@ -17,8 +16,7 @@ class Bucket(QueryResourceManager):
         scope = 'project'
         enum_spec = ('list', 'items[]', {'projection': 'full'})
         name = id = 'name'
-        default_report_fields = [
-            "name", "timeCreated", "location", "storageClass"]
+        default_report_fields = ["name", "timeCreated", "location", "storageClass"]
         asset_type = "storage.googleapis.com/Bucket"
         scc_type = "google.cloud.storage.Bucket"
         metric_key = 'resource.labels.bucket_name'
@@ -42,6 +40,7 @@ class BucketIamPolicyFilter(IamPolicyFilter):
     """
     Overrides the base implementation to process bucket resources correctly.
     """
+
     permissions = ('storage.buckets.getIamPolicy',)
 
     def _verb_arguments(self, resource):
@@ -86,7 +85,39 @@ class BucketLevelAccess(MethodAction):
     #
     def get_resource_params(self, model, resource):
         enabled = self.data.get('state', True)
-        return {'bucket': resource['name'],
-                'fields': 'iamConfiguration',
-                'projection': 'noAcl',  # not documented but
-                'body': {'iamConfiguration': {'uniformBucketLevelAccess': {'enabled': enabled}}}}
+        return {
+            'bucket': resource['name'],
+            'fields': 'iamConfiguration',
+            'projection': 'noAcl',  # not documented but
+            'body': {'iamConfiguration': {'uniformBucketLevelAccess': {'enabled': enabled}}},
+        }
+
+
+@Bucket.action_registry.register('delete')
+class BucketDeleteAction(MethodAction):
+    """Action to delete GCS buckets
+
+    It is recommended to use a filter to avoid unwanted deletion of GCS buckets
+
+    :example:
+
+    .. code-block:: yaml
+
+            policies:
+              - name: gcp-delete-testing-gcs-buckets
+                resource: gcp.bucket
+                filters:
+                  - type: value
+                    key: name
+                    op: regex
+                    value: '^(test-|demo-)*'
+                actions:
+                  - type: delete
+    """
+
+    schema = type_schema('delete')
+    method_spec = {'op': 'delete'}
+    permissions = ('storage.buckets.delete',)
+
+    def get_resource_params(self, model, resource):
+        return {'bucket': resource['name']}

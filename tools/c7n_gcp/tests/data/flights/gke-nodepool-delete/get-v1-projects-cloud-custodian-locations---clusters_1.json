@@ -1,0 +1,160 @@
+{
+  "body": {
+    "clusters": [
+      {
+        "nodeIpv4CidrSize": 24,
+        "networkPolicy": {},
+        "masterAuthorizedNetworksConfig": {},
+        "addonsConfig": {
+          "httpLoadBalancing": {},
+          "horizontalPodAutoscaling": {},
+          "kubernetesDashboard": {
+            "disabled": true
+          },
+          "dnsCacheConfig": {},
+          "gcePersistentDiskCsiDriverConfig": {
+            "enabled": true
+          }
+        },
+        "locations": [
+          "us-central1-a"
+        ],
+        "legacyAbac": {},
+        "defaultMaxPodsConstraint": {
+          "maxPodsPerNode": "110"
+        },
+        "network": "default",
+        "loggingService": "logging.googleapis.com/kubernetes",
+        "instanceGroupUrls": [
+          "https://www.googleapis.com/compute/v1/projects/cloud-custodian/zones/us-central1-a/instanceGroups/gke-custodian-test-cluster-custodian-nodepool-delete-test-12345678-grp"
+        ],
+        "networkConfig": {
+          "network": "projects/cloud-custodian/global/networks/default",
+          "subnetwork": "projects/cloud-custodian/regions/us-central1/subnetworks/default"
+        },
+        "ipAllocationPolicy": {
+          "useIpAliases": true,
+          "clusterSecondaryRangeName": "gke-custodian-test-cluster-pods-12345678",
+          "servicesSecondaryRangeName": "gke-custodian-test-cluster-services-12345678",
+          "clusterIpv4CidrBlock": "10.8.0.0/14",
+          "servicesIpv4CidrBlock": "10.12.0.0/20"
+        },
+        "zone": "us-central1-a",
+        "servicesIpv4Cidr": "10.12.0.0/20",
+        "status": "RUNNING",
+        "currentNodeVersion": "1.28.3-gke.1286000",
+        "labelFingerprint": "a9dc16a7",
+        "currentMasterVersion": "1.28.3-gke.1286000",
+        "masterAuth": {
+          "clusterCaCertificate": "LS0tLS1CRUdJTiBDRVJUSUZJQ0FURS0tLS0tCk1JSURLekNDQWhPZ0F3SUJBZ0lSQU1Qa1RTbWFleXJFZnBrMjZuN2xJQXd3RFFZSktvWklodmNOQVFFTEJRQXcKTHpFdE1Dc0dBMVVFQXhNa1lqWTROakppWkdNdFl6RTNZUzAwTkRnNExUZzRNemN0TURKak5ERTJZakUwTlRWaApNQjRYRFRJek1EWXhOREV6TlRFeE5Wb1hEVEk0TURZeE16RTBOVEV4TlZvd0x6RXRNQ3NHQTFVRUF4TWtZalk0Ck5qSmlaR010WXpFM1lTMDBORGc0TFRnNE16Y3RNREpqTkRFMllqRTBOVFZoTUlJQklqQU5CZ2txaGtpRzl3MEIKQVFFR..."
+        },
+        "nodePools": [
+          {
+            "status": "RUNNING",
+            "management": {
+              "autoUpgrade": true,
+              "autoRepair": true
+            },
+            "name": "custodian-nodepool-delete-test",
+            "instanceGroupUrls": [
+              "https://www.googleapis.com/compute/v1/projects/cloud-custodian/zones/us-central1-a/instanceGroups/gke-custodian-test-cluster-custodian-nodepool-delete-test-12345678-grp"
+            ],
+            "autoscaling": {},
+            "version": "1.28.3-gke.1286000",
+            "initialNodeCount": 1,
+            "config": {
+              "machineType": "e2-medium",
+              "diskSizeGb": 100,
+              "oauthScopes": [
+                "https://www.googleapis.com/auth/devstorage.read_only",
+                "https://www.googleapis.com/auth/logging.write",
+                "https://www.googleapis.com/auth/monitoring",
+                "https://www.googleapis.com/auth/servicecontrol",
+                "https://www.googleapis.com/auth/service.management.readonly",
+                "https://www.googleapis.com/auth/trace.append"
+              ],
+              "imageType": "COS_CONTAINERD",
+              "diskType": "pd-balanced",
+              "shieldedInstanceConfig": {
+                "enableIntegrityMonitoring": true
+              }
+            },
+            "selfLink": "https://container.googleapis.com/v1/projects/cloud-custodian/zones/us-central1-a/clusters/custodian-test-cluster/nodePools/custodian-nodepool-delete-test"
+          },
+          {
+            "status": "RUNNING",
+            "management": {
+              "autoUpgrade": true,
+              "autoRepair": true
+            },
+            "name": "default-pool",
+            "instanceGroupUrls": [
+              "https://www.googleapis.com/compute/v1/projects/cloud-custodian/zones/us-central1-a/instanceGroups/gke-custodian-test-cluster-default-pool-87654321-grp"
+            ],
+            "autoscaling": {},
+            "version": "1.28.3-gke.1286000",
+            "initialNodeCount": 3,
+            "config": {
+              "machineType": "e2-medium",
+              "diskSizeGb": 100,
+              "oauthScopes": [
+                "https://www.googleapis.com/auth/devstorage.read_only",
+                "https://www.googleapis.com/auth/logging.write",
+                "https://www.googleapis.com/auth/monitoring",
+                "https://www.googleapis.com/auth/servicecontrol",
+                "https://www.googleapis.com/auth/service.management.readonly",
+                "https://www.googleapis.com/auth/trace.append"
+              ],
+              "imageType": "COS_CONTAINERD",
+              "diskType": "pd-balanced",
+              "shieldedInstanceConfig": {
+                "enableIntegrityMonitoring": true
+              }
+            },
+            "selfLink": "https://container.googleapis.com/v1/projects/cloud-custodian/zones/us-central1-a/clusters/custodian-test-cluster/nodePools/default-pool"
+          }
+        ],
+        "monitoringService": "monitoring.googleapis.com/kubernetes",
+        "createTime": "2026-01-10T15:00:00+00:00",
+        "endpoint": "35.222.80.222",
+        "currentNodeCount": 4,
+        "name": "custodian-test-cluster",
+        "location": "us-central1-a",
+        "initialClusterVersion": "1.28.3-gke.1286000",
+        "nodeConfig": {
+          "machineType": "e2-medium",
+          "diskSizeGb": 100,
+          "oauthScopes": [
+            "https://www.googleapis.com/auth/devstorage.read_only",
+            "https://www.googleapis.com/auth/logging.write",
+            "https://www.googleapis.com/auth/monitoring",
+            "https://www.googleapis.com/auth/servicecontrol",
+            "https://www.googleapis.com/auth/service.management.readonly",
+            "https://www.googleapis.com/auth/trace.append"
+          ],
+          "imageType": "COS_CONTAINERD",
+          "diskType": "pd-balanced"
+        },
+        "clusterIpv4Cidr": "10.8.0.0/14",
+        "subnetwork": "default",
+        "selfLink": "https://container.googleapis.com/v1/projects/cloud-custodian/zones/us-central1-a/clusters/custodian-test-cluster"
+      }
+    ]
+  },
+  "headers": {
+    "status": "200",
+    "content-length": "12543",
+    "x-xss-protection": "0",
+    "content-location": "https://container.googleapis.com/v1/projects/cloud-custodian/locations/-/clusters?alt=json",
+    "x-content-type-options": "nosniff",
+    "transfer-encoding": "chunked",
+    "vary": "Origin, X-Origin, Referer",
+    "server": "ESF",
+    "-content-encoding": "gzip",
+    "cache-control": "private",
+    "date": "Mon, 12 Jan 2026 23:20:00 GMT",
+    "x-frame-options": "SAMEORIGIN",
+    "alt-svc": "h3=\":443\"; ma=2592000,h3-29=\":443\"; ma=2592000",
+    "content-type": "application/json; charset=UTF-8"
+  }
+}

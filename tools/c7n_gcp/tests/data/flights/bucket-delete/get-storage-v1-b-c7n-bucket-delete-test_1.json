@@ -1,0 +1,30 @@
+{
+  "headers": {
+    "www-authenticate": "Bearer realm=\"https://accounts.google.com/\"",
+    "vary": "Origin, X-Origin, Referer",
+    "content-type": "application/json; charset=UTF-8",
+    "date": "Mon, 12 Jan 2026 23:20:02 GMT",
+    "server": "UploadServer",
+    "x-xss-protection": "0",
+    "x-frame-options": "SAMEORIGIN",
+    "x-content-type-options": "nosniff",
+    "alt-svc": "h3=\":443\"; ma=2592000,h3-29=\":443\"; ma=2592000",
+    "transfer-encoding": "chunked",
+    "status": "404",
+    "content-length": "258",
+    "-content-encoding": "gzip"
+  },
+  "body": {
+    "error": {
+      "code": 404,
+      "message": "Not Found",
+      "errors": [
+        {
+          "message": "Not Found",
+          "domain": "global",
+          "reason": "notFound"
+        }
+      ]
+    }
+  }
+}
