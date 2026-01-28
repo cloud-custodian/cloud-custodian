@@ -48,8 +48,9 @@ except ImportError:
     from botocore.vendored.requests.packages.urllib3.exceptions import SSLError
 
 
+from c7n import deprecated
 from c7n.actions import (
-    ActionRegistry, BaseAction, PutMetric, RemovePolicyBase)
+    ActionRegistry, BaseAction, PutMetric, RemovePolicyBase, remove_statements)
 from c7n.exceptions import PolicyValidationError, PolicyExecutionError
 from c7n.filters import (
     FilterRegistry, Filter, CrossAccountAccessFilter, MetricsFilter,
@@ -1343,6 +1344,7 @@ class SetPolicyStatement(BucketActionBase):
                 resource: s3
                 actions:
                   - type: set-statements
+                    remove: "*"
                     statements:
                       - Sid: "DenyHttp"
                         Effect: "Deny"
@@ -1355,11 +1357,14 @@ class SetPolicyStatement(BucketActionBase):
                             "aws:SecureTransport": false
     """
 
-    permissions = ('s3:PutBucketPolicy',)
+    permissions = ('s3:PutBucketPolicy', 's3:DeleteBucketPolicy')
 
     schema = type_schema(
         'set-statements',
         **{
+            'remove': {'oneOf': [
+            {'enum': ['matched', "*"]},
+            {'type': 'array', 'items': {'type': 'string'}}]},
             'statements': {
                 'type': 'array',
                 'items': {
@@ -1392,14 +1397,20 @@ class SetPolicyStatement(BucketActionBase):
         }
     )
 
-    def process_bucket(self, bucket):
-        policy = bucket.get('Policy') or '{}'
+    def process_bucket_remove(self, policy, bucket):
+        statements = policy.get('Statement', [])
+        resource_statements = bucket.get(CrossAccountAccessFilter.annotation_key, ())
 
+        statements, found = remove_statements(
+            self.data.get('remove', []), statements, resource_statements)
+
+        return statements, found
+
+    def process_bucket_add(self, policy, bucket):
         target_statements = format_string_values(
             copy.deepcopy({s['Sid']: s for s in self.data.get('statements', [])}),
             **self.get_std_format_args(bucket))
 
-        policy = json.loads(policy)
         bucket_statements = policy.setdefault('Statement', [])
 
         for s in bucket_statements:
@@ -1409,12 +1420,29 @@ class SetPolicyStatement(BucketActionBase):
                 target_statements.pop(s['Sid'])
 
         if not target_statements:
-            return
+            return False
 
         bucket_statements.extend(target_statements.values())
-        policy = json.dumps(policy)
+        return True
+
+    def process_bucket(self, bucket):
+        policy = bucket.get('Policy') or '{}'
+        policy = json.loads(policy)
+
+        statements, found = self.process_bucket_remove(policy, bucket)
+        modified = self.process_bucket_add(policy, bucket)
 
         s3 = bucket_client(local_session(self.manager.session_factory), bucket)
+
+        if not modified and not found:
+            return
+
+        policy = json.dumps(policy)
+
+        if not statements and found and not modified:
+            s3.delete_bucket_policy(Bucket=bucket['Name'])
+            return {'Name': bucket['Name'], 'Policy': policy}
+
         s3.put_bucket_policy(Bucket=bucket['Name'], Policy=policy)
         return {'Name': bucket['Name'], 'Policy': policy}
 
@@ -1423,22 +1451,29 @@ class SetPolicyStatement(BucketActionBase):
 class RemovePolicyStatement(RemovePolicyBase):
     """Action to remove policy statements from S3 buckets
 
+    This action has been deprecated. Please use the 'set-statements' action
+    with the 'remove' attribute to remove policy statements from S3 buckets.
+
     :example:
 
     .. code-block:: yaml
 
-            policies:
-              - name: s3-remove-encrypt-put
-                resource: s3
-                filters:
-                  - type: has-statement
-                    statement_ids:
-                      - RequireEncryptedPutObject
-                actions:
-                  - type: remove-statements
-                    statement_ids:
-                      - RequiredEncryptedPutObject
+        policies:
+          - name: s3-remove-encrypt-put
+            resource: s3
+            filters:
+              - type: has-statement
+                statement_ids:
+                  - RequireEncryptedPutObject
+            actions:
+              - type: remove-statements
+                statement_ids:
+                  - RequiredEncryptedPutObject
     """
+
+    deprecations = (
+        deprecated.filter("use the 'set-statements' action with 'remove' attribute"),
+    )
 
     permissions = ("s3:PutBucketPolicy", "s3:DeleteBucketPolicy")
 
