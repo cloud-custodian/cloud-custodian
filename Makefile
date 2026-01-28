@@ -53,7 +53,7 @@ test-functional:
 
 test-functional-azure:
 # note this will provision real resources in Azure's public cloud environment
-	C7N_FUNCTIONAL=yes uv run pytest tools/c7n_azure/tests_azure/tests_resources/test_entraid.py -k terraform -m functional $(ARGS)
+	C7N_FUNCTIONAL=yes uv run pytest tools/c7n_azure/tests_azure -k terraform -m functional $(ARGS)
 
 sphinx:
 	make -f docs/Makefile.sphinx html
