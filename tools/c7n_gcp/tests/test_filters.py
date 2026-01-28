@@ -33,6 +33,32 @@ class TestGCPMetricsFilter(BaseTest):
         metric = resources[0]['c7n.metrics'][metric_name]
         self.assertGreater(.1, metric['points'][0]['value']['doubleValue'])
 
+    def test_metrics_with_metric_key_as_instance_id(self):
+
+        session_factory = self.replay_flight_data("filter-metrics-with-metric-key-as-instance-id")
+
+        p = self.load_policy(
+            {
+                "name": "test-metrics",
+                "resource": "gcp.instance",
+                "filters": [
+                    {'type': 'metrics',
+                    'name': 'compute.googleapis.com/instance/cpu/utilization',
+                    'metric-key': 'resource.labels.instance_id',
+                    'aligner': 'ALIGN_MEAN',
+                    'days': 14,
+                    'value': .1,
+                    'filter': ' resource.labels.zone = "us-east4-c"',
+                    'op': 'less-than'}],
+            },
+            session_factory=session_factory,
+        )
+        resources = p.run()
+        self.assertEqual(len(resources), 1)
+        metric_name = 'compute.googleapis.com/instance/cpu/utilization.ALIGN_MEAN.REDUCE_NONE'
+        metric = resources[0]['c7n.metrics'][metric_name]
+        self.assertGreater(.1, metric['points'][0]['value']['doubleValue'])
+
     def test_metrics_resource_regex(self):
 
         session_factory = self.replay_flight_data("filter-metrics")
