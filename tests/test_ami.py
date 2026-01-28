@@ -466,6 +466,82 @@ class TestAMI(BaseTest):
         self.assertEqual(len(resources), 1)
         self.assertIn('c7n:image-ancestry', resources[0])
 
+    def test_ami_image_ancestry_self_approved(self):
+        session_factory = self.replay_flight_data('test_ec2_image_ancestry')
+        p = self.load_policy(
+            {
+                'name': 'ami-self-approved',
+                'resource': 'ami',
+                'filters': [
+                    {
+                        'type': 'image-ancestry',
+                        'approved_owners': ['amazon'],
+                        'max_depth': 1
+                    }
+                ]
+            },
+            session_factory=session_factory
+        )
+        resources = p.run()
+        self.assertGreaterEqual(len(resources), 1)
+
+    def test_ami_image_ancestry_parent_approved(self):
+        session_factory = self.replay_flight_data('test_ec2_image_ancestry')
+        p = self.load_policy(
+            {
+                'name': 'ami-parent-approved',
+                'resource': 'ami',
+                'filters': [
+                    {
+                        'type': 'image-ancestry',
+                        'approved_owners': ['123456789012'],
+                        'max_depth': 1
+                    }
+                ]
+            },
+            session_factory=session_factory
+        )
+        resources = p.run()
+        self.assertEqual(len(resources), 0)
+
+    def test_ami_image_ancestry_depth_traversal(self):
+        session_factory = self.replay_flight_data('test_ec2_image_ancestry')
+        p = self.load_policy(
+            {
+                'name': 'ami-grandparent-approved',
+                'resource': 'ami',
+                'filters': [
+                    {
+                        'type': 'image-ancestry',
+                        'approved_owners': ['amazon'],
+                        'max_depth': 2
+                    }
+                ]
+            },
+            session_factory=session_factory
+        )
+        resources = p.run()
+        self.assertGreaterEqual(len(resources), 1)
+
+    def test_ami_image_ancestry_unapproved(self):
+        session_factory = self.replay_flight_data('test_ec2_image_ancestry')
+        p = self.load_policy(
+            {
+                'name': 'ami-unapproved-ancestry',
+                'resource': 'ami',
+                'filters': [
+                    {
+                        'type': 'image-ancestry',
+                        'approved_owners': ['000000000000'],
+                        'max_depth': 2
+                    }
+                ]
+            },
+            session_factory=session_factory
+        )
+        resources = p.run()
+        self.assertEqual(len(resources), 1)
+
     def test_ami_set_permissions_remove_matched_no_add(self):
         factory = self.replay_flight_data('test_ami_set_permissions_remove_matched_no_add')
         p = self.load_policy({
