@@ -1337,24 +1337,53 @@ class SetPolicyStatement(BucketActionBase):
 
     :example:
 
+    Remove all existing policies, and block insecure HTTP requests.
+
     .. code-block:: yaml
 
-            policies:
-              - name: force-s3-https
-                resource: s3
-                actions:
-                  - type: set-statements
-                    remove: "*"
-                    statements:
-                      - Sid: "DenyHttp"
-                        Effect: "Deny"
-                        Action: "s3:GetObject"
-                        Principal:
-                          AWS: "*"
-                        Resource: "arn:aws:s3:::{bucket_name}/*"
-                        Condition:
-                          Bool:
-                            "aws:SecureTransport": false
+        policies:
+          - name: force-s3-https
+            resource: s3
+            actions:
+              - type: set-statements
+                remove: "*"
+                statements:
+                  - Sid: "DenyHttp"
+                    Effect: "Deny"
+                    Action: "s3:GetObject"
+                    Principal:
+                      AWS: "*"
+                    Resource: "arn:aws:s3:::{bucket_name}/*"
+                    Condition:
+                      Bool:
+                        "aws:SecureTransport": false
+
+    :example:
+
+    Remove existing statements that grant cross-account access, and
+    block insecure HTTP requests.
+
+    .. code-block:: yaml
+
+        policies:
+          - name: s3-tighten-bucket-policy
+            resource: aws.s3
+            filters:
+              - type: cross-account
+            actions:
+              - type: set-statements
+                remove: "matched"
+                statements:
+                  - Sid: "DenyHttp"
+                    Effect: "Deny"
+                    Action: "s3:GetObject"
+                    Principal:
+                      AWS: "*"
+                    Resource: "arn:aws:s3:::{bucket_name}/*"
+                    Condition:
+                      Bool:
+                        "aws:SecureTransport": false
+
     """
 
     permissions = ('s3:PutBucketPolicy', 's3:DeleteBucketPolicy')
