@@ -10,6 +10,7 @@ from c7n.query import QueryResourceManager, TypeInfo
 from c7n.resolver import ValuesFrom
 from c7n.tags import RemoveTag, Tag, TagActionFilter, TagDelayedAction
 from c7n.utils import local_session, type_schema, yaml_load
+from fnmatch import fnmatch
 import json
 
 
@@ -61,17 +62,95 @@ class OpensearchServerlessCrossAccountFilter(CrossAccountAccessFilter):
               - type: cross-account
     """
     policy_attribute = 'c7n:Policy'
-    permissions = ('aoss:GetAccessPolicy',)
-    schema = type_schema(
-        'cross-account',
-        whitelist_from=ValuesFrom.schema,
-        whitelist={'type': 'array', 'items': {'type': 'string'}})
+    permissions = ('aoss:GetAccessPolicy', 'aoss:ListAccessPolicies')
 
     def process(self, resources, event=None):
         client = local_session(self.manager.session_factory).client('opensearchserverless')
-        # TODO: implement cross-account access filter
-        # Wondering if this is possible with the current API. I will ask at office hours.
+        self.get_resource_policies(client, resources) 
         return super().process(resources, event)
+
+    def get_resource_policies(self, client, resources): 
+        # Cache 'em policies for the session to avoid repeated scans
+        cache_key = 'aoss-data-policies'
+        all_policies = self.manager._cache.get(cache_key)
+        
+        if not all_policies:
+            policies = []
+            next_token = None
+            while True:
+                params = {'type': 'data'}
+                if next_token:
+                    params['nextToken'] = next_token
+                
+                response = client.list_access_policies(**params)
+                
+                for p in response.get('accessPolicySummaries', []):
+                    detail = self.manager.retry(
+                        client.get_access_policy,
+                        type='data',
+                        name=p['name']
+                    )
+                    if detail:
+                        policies.append(json.loads(detail['accessPolicyDetail']['policy']))
+                
+                next_token = response.get('nextToken')
+                if not next_token:
+                    break
+            
+            all_policies = policies
+            try:
+                self.manager._cache[cache_key] = all_policies
+            except Exception:
+                pass
+        
+        for r in resources:
+            if self.policy_attribute in r:
+                continue
+
+            matching_rules = []
+            for policy in all_policies:
+                if isinstance(policy, list):
+                    for rule in policy:
+                        # Check if this rule applies to the current collection
+                        matches_resource = False
+                        for pattern in rule.get('Rules', []):
+                            for res in pattern.get('Resource', []):
+                                if res.startswith('collection/'):
+                                    coll_pattern = res.split('/', 1)[1]
+                                    if fnmatch(r['name'], coll_pattern):
+                                        matches_resource = True
+                                        break
+                            if matches_resource:
+                                break
+                        
+                        if matches_resource:
+                            matching_rules.append(rule)
+            
+            if matching_rules:
+                r[self.policy_attribute] = self.marshal_policy(matching_rules, r['arn'])
+            else:
+                r[self.policy_attribute] = None
+
+    def marshal_policy(self, rules, resource_arn):
+        # Convert AOSS rules list to logical IAM Policy
+        iam_policy = {
+            "Version": "2012-10-17",
+            "Statement": []
+        }
+        
+        for rule in rules:
+            statement = {
+                "Effect": "Allow",
+                "Principal": {"AWS": rule.get('Principal', [])},
+                "Action": [],
+                "Resource": [resource_arn]
+            }
+            # handle permissions
+            for sub_rule in rule.get('Rules', []):
+                statement['Action'].extend(sub_rule.get('Permission', []))
+            iam_policy['Statement'].append(statement)
+            
+        return iam_policy
 
 @OpensearchServerless.action_registry.register('tag')
 class TagOpensearchServerlessResource(Tag):
@@ -274,7 +353,7 @@ class CrossAccountFilter(CrossAccountAccessFilter):
                     ResourceArn=r['PipelineArn'],
                     ignore_err_codes=('ResourceNotFoundException',))
                 if result:
-                    r[self.policy_attribute] = json.loads(result['Policy'])
+                    r[self.policy_attribute] = result['Policy']
             except client.exceptions.ResourceNotFoundException:
                 r[self.policy_attribute] = None
         return super().process(resources, event)

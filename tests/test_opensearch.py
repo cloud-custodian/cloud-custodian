@@ -16,8 +16,7 @@ def test_opensearch_ingestion_cross_account(test, opensearch_ingestion_cross_acc
             'resource': 'opensearch-ingestion',
             'filters': [    
                 {
-                    'type': 'cross-account',
-                    'whitelist': ['123456789012']
+                    'type': 'cross-account'
                 }
             ],
             'actions': [{'type': 'delete'}]
@@ -27,17 +26,16 @@ def test_opensearch_ingestion_cross_account(test, opensearch_ingestion_cross_acc
     resources = p.run()
     assert len(resources) == 1
 
-@terraform('opensearch_serverless_cross_account', replay=True)
+@terraform('opensearch_serverless_cross_account', replay=False)
 def test_opensearch_serverless_cross_account(test, opensearch_serverless_cross_account):
-    session_factory = test.replay_flight_data('test_opensearch_serverless_cross_account')
+    session_factory = test.record_flight_data('test_opensearch_serverless_cross_account')
     p = test.load_policy(
         {
             'name': 'test-opensearch-serverless-cross-account',
             'resource': 'opensearch-serverless',
             'filters': [    
                 {
-                    'type': 'cross-account',
-                    'whitelist': ['123456789012']
+                    'type': 'cross-account'
                 }
             ],
             'actions': [{'type': 'delete'}]
