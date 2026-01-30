@@ -1,0 +1,25 @@
+{
+    "status_code": 200,
+    "data": {
+        "Reservations": [
+            {
+                "Instances": [
+                    {
+                        "InstanceId": "i-test123",
+                        "ImageId": "ami-test123",
+                        "State": {
+                            "Name": "running"
+                        },
+                        "InstanceType": "t2.micro",
+                        "LaunchTime": "2025-01-01T00:00:00.000Z",
+                        "Tags": []
+                    }
+                ]
+            }
+        ],
+        "ResponseMetadata": {
+            "HTTPStatusCode": 200,
+            "RequestId": "test-request-1"
+        }
+    }
+}
