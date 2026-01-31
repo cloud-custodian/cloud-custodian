@@ -1,0 +1,857 @@
+{
+    "version": 1,
+    "interactions": [
+        {
+            "request": {
+                "method": "POST",
+                "uri": "https://oauth2.googleapis.com/token",
+                "body": "grant_type=refresh_token&client_id=fake-client-id&client_secret=fake-client-secret&refresh_token=fake-refresh-token",
+                "headers": {
+                    "content-type": [
+                        "application/x-www-form-urlencoded"
+                    ],
+                    "x-goog-api-client": [
+                        "gl-python/3.10.10 auth/2.48.0 cred-type/u"
+                    ],
+                    "user-agent": [
+                        "Python-httplib2/0.31.2 (gzip)"
+                    ],
+                    "accept-encoding": [
+                        "gzip, deflate"
+                    ]
+                }
+            },
+            "response": {
+                "status": {
+                    "code": 200,
+                    "message": "OK"
+                },
+                "headers": {
+                    "Vary": [
+                        "Origin",
+                        "X-Origin",
+                        "Referer"
+                    ],
+                    "Expires": [
+                        "Mon, 01 Jan 1990 00:00:00 GMT"
+                    ],
+                    "X-Frame-Options": [
+                        "SAMEORIGIN"
+                    ],
+                    "Transfer-Encoding": [
+                        "chunked"
+                    ],
+                    "Server": [
+                        "scaffolding on HTTPServer2"
+                    ],
+                    "Cache-Control": [
+                        "no-cache, no-store, max-age=0, must-revalidate"
+                    ],
+                    "Pragma": [
+                        "no-cache"
+                    ],
+                    "Date": [
+                        "Fri, 30 Jan 2026 22:42:30 GMT"
+                    ],
+                    "X-XSS-Protection": [
+                        "0"
+                    ],
+                    "X-Content-Type-Options": [
+                        "nosniff"
+                    ],
+                    "Content-Type": [
+                        "application/json; charset=utf-8"
+                    ],
+                    "content-length": [
+                        "1439"
+                    ]
+                },
+                "body": {
+                    "string": "{\n  \"access_token\": \"fake-access-token\",\n  \"expires_in\": 3599,\n  \"scope\": \"https://www.googleapis.com/auth/cloud-platform https://www.googleapis.com/auth/sqlservice.login https://www.googleapis.com/auth/userinfo.email openid\",\n  \"token_type\": \"Bearer\",\n  \"id_token\": \"fake-jwt-token\"\n}"
+                }
+            }
+        },
+        {
+            "request": {
+                "method": "GET",
+                "uri": "https://aiplatform.googleapis.com/v1/projects/cloud-custodian/locations?alt=json",
+                "body": null,
+                "headers": {
+                    "accept": [
+                        "application/json"
+                    ],
+                    "accept-encoding": [
+                        "gzip, deflate"
+                    ],
+                    "user-agent": [
+                        "(gzip)"
+                    ],
+                    "x-goog-api-client": [
+                        "gdcl/2.188.0 gl-python/3.10.10 cred-type/u"
+                    ],
+                    "content-length": [
+                        "0"
+                    ],
+                    "authorization": ["Bearer fake-auth-token"],
+                    "x-goog-user-project": [
+                        "cloud-custodian"
+                    ]
+                }
+            },
+            "response": {
+                "status": {
+                    "code": 200,
+                    "message": "OK"
+                },
+                "headers": {
+                    "Vary": [
+                        "Origin",
+                        "X-Origin",
+                        "Referer"
+                    ],
+                    "Transfer-Encoding": [
+                        "chunked"
+                    ],
+                    "X-Frame-Options": [
+                        "SAMEORIGIN"
+                    ],
+                    "Server": [
+                        "ESF"
+                    ],
+                    "Date": [
+                        "Fri, 30 Jan 2026 22:42:31 GMT"
+                    ],
+                    "X-XSS-Protection": [
+                        "0"
+                    ],
+                    "X-Content-Type-Options": [
+                        "nosniff"
+                    ],
+                    "Content-Type": [
+                        "application/json; charset=UTF-8"
+                    ],
+                    "content-length": [
+                        "6120"
+                    ]
+                },
+                "body": {
+                    "string": "{\n  \"locations\": [\n    {\n      \"name\": \"projects/cloud-custodian/locations/asia-south2\",\n      \"locationId\": \"asia-south2\"\n    },\n    {\n      \"name\": \"projects/cloud-custodian/locations/europe-north2\",\n      \"locationId\": \"europe-north2\"\n    },\n    {\n      \"name\": \"projects/cloud-custodian/locations/europe-west10\",\n      \"locationId\": \"europe-west10\"\n    },\n    {\n      \"name\": \"projects/cloud-custodian/locations/europe-west15\",\n      \"locationId\": \"europe-west15\"\n    },\n    {\n      \"name\": \"projects/cloud-custodian/locations/us-central1\",\n      \"locationId\": \"us-central1\"\n    },\n    {\n      \"name\": \"projects/cloud-custodian/locations/us-central2\",\n      \"locationId\": \"us-central2\"\n    },\n    {\n      \"name\": \"projects/cloud-custodian/locations/asia-east1\",\n      \"locationId\": \"asia-east1\"\n    },\n    {\n      \"name\": \"projects/cloud-custodian/locations/asia-east2\",\n      \"locationId\": \"asia-east2\"\n    },\n    {\n      \"name\": \"projects/cloud-custodian/locations/asia-northeast1\",\n      \"locationId\": \"asia-northeast1\"\n    },\n    {\n      \"name\": \"projects/cloud-custodian/locations/asia-northeast2\",\n      \"locationId\": \"asia-northeast2\"\n    },\n    {\n      \"name\": \"projects/cloud-custodian/locations/asia-northeast3\",\n      \"locationId\": \"asia-northeast3\"\n    },\n    {\n      \"name\": \"projects/cloud-custodian/locations/asia-south1\",\n      \"locationId\": \"asia-south1\"\n    },\n    {\n      \"name\": \"projects/cloud-custodian/locations/asia-southeast1\",\n      \"locationId\": \"asia-southeast1\"\n    },\n    {\n      \"name\": \"projects/cloud-custodian/locations/asia-southeast2\",\n      \"locationId\": \"asia-southeast2\"\n    },\n    {\n      \"name\": \"projects/cloud-custodian/locations/australia-southeast1\",\n      \"locationId\": \"australia-southeast1\"\n    },\n    {\n      \"name\": \"projects/cloud-custodian/locations/australia-southeast2\",\n      \"locationId\": \"australia-southeast2\"\n    },\n    {\n      \"name\": \"projects/cloud-custodian/locations/europe-central2\",\n      \"locationId\": \"europe-central2\"\n    },\n    {\n      \"name\": \"projects/cloud-custodian/locations/europe-north1\",\n      \"locationId\": \"europe-north1\"\n    },\n    {\n      \"name\": \"projects/cloud-custodian/locations/europe-southwest1\",\n      \"locationId\": \"europe-southwest1\"\n    },\n    {\n      \"name\": \"projects/cloud-custodian/locations/europe-west1\",\n      \"locationId\": \"europe-west1\"\n    },\n    {\n      \"name\": \"projects/cloud-custodian/locations/europe-west2\",\n      \"locationId\": \"europe-west2\"\n    },\n    {\n      \"name\": \"projects/cloud-custodian/locations/europe-west3\",\n      \"locationId\": \"europe-west3\"\n    },\n    {\n      \"name\": \"projects/cloud-custodian/locations/europe-west4\",\n      \"locationId\": \"europe-west4\"\n    },\n    {\n      \"name\": \"projects/cloud-custodian/locations/europe-west6\",\n      \"locationId\": \"europe-west6\"\n    },\n    {\n      \"name\": \"projects/cloud-custodian/locations/europe-west8\",\n      \"locationId\": \"europe-west8\"\n    },\n    {\n      \"name\": \"projects/cloud-custodian/locations/europe-west9\",\n      \"locationId\": \"europe-west9\"\n    },\n    {\n      \"name\": \"projects/cloud-custodian/locations/europe-west12\",\n      \"locationId\": \"europe-west12\"\n    },\n    {\n      \"name\": \"projects/cloud-custodian/locations/me-west1\",\n      \"locationId\": \"me-west1\"\n    },\n    {\n      \"name\": \"projects/cloud-custodian/locations/me-central1\",\n      \"locationId\": \"me-central1\"\n    },\n    {\n      \"name\": \"projects/cloud-custodian/locations/me-central2\",\n      \"locationId\": \"me-central2\"\n    },\n    {\n      \"name\": \"projects/cloud-custodian/locations/northamerica-northeast1\",\n      \"locationId\": \"northamerica-northeast1\"\n    },\n    {\n      \"name\": \"projects/cloud-custodian/locations/northamerica-northeast2\",\n      \"locationId\": \"northamerica-northeast2\"\n    },\n    {\n      \"name\": \"projects/cloud-custodian/locations/southamerica-east1\",\n      \"locationId\": \"southamerica-east1\"\n    },\n    {\n      \"name\": \"projects/cloud-custodian/locations/southamerica-west1\",\n      \"locationId\": \"southamerica-west1\"\n    },\n    {\n      \"name\": \"projects/cloud-custodian/locations/us-east1\",\n      \"locationId\": \"us-east1\"\n    },\n    {\n      \"name\": \"projects/cloud-custodian/locations/us-east4\",\n      \"locationId\": \"us-east4\"\n    },\n    {\n      \"name\": \"projects/cloud-custodian/locations/us-east5\",\n      \"locationId\": \"us-east5\"\n    },\n    {\n      \"name\": \"projects/cloud-custodian/locations/us-east7\",\n      \"locationId\": \"us-east7\"\n    },\n    {\n      \"name\": \"projects/cloud-custodian/locations/us-south1\",\n      \"locationId\": \"us-south1\"\n    },\n    {\n      \"name\": \"projects/cloud-custodian/locations/us-west1\",\n      \"locationId\": \"us-west1\"\n    },\n    {\n      \"name\": \"projects/cloud-custodian/locations/us-west2\",\n      \"locationId\": \"us-west2\"\n    },\n    {\n      \"name\": \"projects/cloud-custodian/locations/us-west3\",\n      \"locationId\": \"us-west3\"\n    },\n    {\n      \"name\": \"projects/cloud-custodian/locations/us-west4\",\n      \"locationId\": \"us-west4\"\n    },\n    {\n      \"name\": \"projects/cloud-custodian/locations/africa-south1\",\n      \"locationId\": \"africa-south1\"\n    },\n    {\n      \"name\": \"projects/cloud-custodian/locations/us-west8\",\n      \"locationId\": \"us-west8\"\n    },\n    {\n      \"name\": \"projects/cloud-custodian/locations/us\",\n      \"locationId\": \"us\"\n    },\n    {\n      \"name\": \"projects/cloud-custodian/locations/eu\",\n      \"locationId\": \"eu\"\n    },\n    {\n      \"name\": \"projects/cloud-custodian/locations/global\",\n      \"locationId\": \"global\"\n    }\n  ]\n}\n"
+                }
+            }
+        },
+        {
+            "request": {
+                "method": "GET",
+                "uri": "https://europe-west10-aiplatform.googleapis.com/v1/projects/cloud-custodian/locations/europe-west10/endpoints?alt=json",
+                "body": null,
+                "headers": {
+                    "accept": [
+                        "application/json"
+                    ],
+                    "accept-encoding": [
+                        "gzip, deflate"
+                    ],
+                    "user-agent": [
+                        "(gzip)"
+                    ],
+                    "x-goog-api-client": [
+                        "gdcl/2.188.0 gl-python/3.10.10 cred-type/u"
+                    ],
+                    "content-length": [
+                        "0"
+                    ],
+                    "authorization": ["Bearer fake-auth-token"],
+                    "x-goog-user-project": [
+                        "cloud-custodian"
+                    ]
+                }
+            },
+            "response": {
+                "status": {
+                    "code": 404,
+                    "message": "Not Found"
+                },
+                "headers": {
+                    "Content-Length": [
+                        "1636"
+                    ],
+                    "Referrer-Policy": [
+                        "no-referrer"
+                    ],
+                    "Date": [
+                        "Fri, 30 Jan 2026 22:42:31 GMT"
+                    ],
+                    "Content-Type": [
+                        "text/html; charset=UTF-8"
+                    ]
+                },
+                "body": {
+                    "string": "<!DOCTYPE html>\n<html lang=en>\n  <meta charset=utf-8>\n  <meta name=viewport content=\"initial-scale=1, minimum-scale=1, width=device-width\">\n  <title>Error 404 (Not Found)!!1</title>\n  <style>\n    *{margin:0;padding:0}html,code{font:15px/22px arial,sans-serif}html{background:#fff;color:#222;padding:15px}body{margin:7% auto 0;max-width:390px;min-height:180px;padding:30px 0 15px}* > body{background:url(//www.google.com/images/errors/robot.png) 100% 5px no-repeat;padding-right:205px}p{margin:11px 0 22px;overflow:hidden}ins{color:#777;text-decoration:none}a img{border:0}@media screen and (max-width:772px){body{background:none;margin-top:0;max-width:none;padding-right:0}}#logo{background:url(//www.google.com/images/branding/googlelogo/1x/googlelogo_color_150x54dp.png) no-repeat;margin-left:-5px}@media only screen and (min-resolution:192dpi){#logo{background:url(//www.google.com/images/branding/googlelogo/2x/googlelogo_color_150x54dp.png) no-repeat 0% 0%/100% 100%;-moz-border-image:url(//www.google.com/images/branding/googlelogo/2x/googlelogo_color_150x54dp.png) 0}}@media only screen and (-webkit-min-device-pixel-ratio:2){#logo{background:url(//www.google.com/images/branding/googlelogo/2x/googlelogo_color_150x54dp.png) no-repeat;-webkit-background-size:100% 100%}}#logo{display:inline-block;height:54px;width:150px}\n  </style>\n  <a href=//www.google.com/><span id=logo aria-label=Google></span></a>\n  <p><b>404.</b> <ins>That\u2019s an error.</ins>\n  <p>The requested URL <code>/v1/projects/cloud-custodian/locations/europe-west10/endpoints</code> was not found on this server.  <ins>That\u2019s all we know.</ins>\n"
+                }
+            }
+        },
+        {
+            "request": {
+                "method": "GET",
+                "uri": "https://asia-northeast3-aiplatform.googleapis.com/v1/projects/cloud-custodian/locations/asia-northeast3/endpoints?alt=json",
+                "body": null,
+                "headers": {
+                    "accept": [
+                        "application/json"
+                    ],
+                    "accept-encoding": [
+                        "gzip, deflate"
+                    ],
+                    "user-agent": [
+                        "(gzip)"
+                    ],
+                    "x-goog-api-client": [
+                        "gdcl/2.188.0 gl-python/3.10.10 cred-type/u"
+                    ],
+                    "content-length": [
+                        "0"
+                    ],
+                    "authorization": ["Bearer fake-auth-token"],
+                    "x-goog-user-project": [
+                        "cloud-custodian"
+                    ]
+                }
+            },
+            "response": {
+                "status": {
+                    "code": 200,
+                    "message": "OK"
+                },
+                "headers": {
+                    "Vary": [
+                        "Origin",
+                        "X-Origin",
+                        "Referer"
+                    ],
+                    "Transfer-Encoding": [
+                        "chunked"
+                    ],
+                    "X-Frame-Options": [
+                        "SAMEORIGIN"
+                    ],
+                    "Server": [
+                        "ESF"
+                    ],
+                    "Date": [
+                        "Fri, 30 Jan 2026 22:42:33 GMT"
+                    ],
+                    "X-XSS-Protection": [
+                        "0"
+                    ],
+                    "X-Content-Type-Options": [
+                        "nosniff"
+                    ],
+                    "Content-Type": [
+                        "application/json; charset=UTF-8"
+                    ],
+                    "content-length": [
+                        "3"
+                    ]
+                },
+                "body": {
+                    "string": "{}\n"
+                }
+            }
+        },
+        {
+            "request": {
+                "method": "GET",
+                "uri": "https://europe-central2-aiplatform.googleapis.com/v1/projects/cloud-custodian/locations/europe-central2/endpoints?alt=json",
+                "body": null,
+                "headers": {
+                    "accept": [
+                        "application/json"
+                    ],
+                    "accept-encoding": [
+                        "gzip, deflate"
+                    ],
+                    "user-agent": [
+                        "(gzip)"
+                    ],
+                    "x-goog-api-client": [
+                        "gdcl/2.188.0 gl-python/3.10.10 cred-type/u"
+                    ],
+                    "content-length": [
+                        "0"
+                    ],
+                    "authorization": ["Bearer fake-auth-token"],
+                    "x-goog-user-project": [
+                        "cloud-custodian"
+                    ]
+                }
+            },
+            "response": {
+                "status": {
+                    "code": 200,
+                    "message": "OK"
+                },
+                "headers": {
+                    "Vary": [
+                        "Origin",
+                        "X-Origin",
+                        "Referer"
+                    ],
+                    "Transfer-Encoding": [
+                        "chunked"
+                    ],
+                    "X-Frame-Options": [
+                        "SAMEORIGIN"
+                    ],
+                    "Server": [
+                        "ESF"
+                    ],
+                    "Date": [
+                        "Fri, 30 Jan 2026 22:42:33 GMT"
+                    ],
+                    "X-XSS-Protection": [
+                        "0"
+                    ],
+                    "X-Content-Type-Options": [
+                        "nosniff"
+                    ],
+                    "Content-Type": [
+                        "application/json; charset=UTF-8"
+                    ],
+                    "content-length": [
+                        "3"
+                    ]
+                },
+                "body": {
+                    "string": "{}\n"
+                }
+            }
+        },
+        {
+            "request": {
+                "method": "GET",
+                "uri": "https://europe-west1-aiplatform.googleapis.com/v1/projects/cloud-custodian/locations/europe-west1/endpoints?alt=json",
+                "body": null,
+                "headers": {
+                    "accept": [
+                        "application/json"
+                    ],
+                    "accept-encoding": [
+                        "gzip, deflate"
+                    ],
+                    "user-agent": [
+                        "(gzip)"
+                    ],
+                    "x-goog-api-client": [
+                        "gdcl/2.188.0 gl-python/3.10.10 cred-type/u"
+                    ],
+                    "content-length": [
+                        "0"
+                    ],
+                    "authorization": ["Bearer fake-auth-token"],
+                    "x-goog-user-project": [
+                        "cloud-custodian"
+                    ]
+                }
+            },
+            "response": {
+                "status": {
+                    "code": 200,
+                    "message": "OK"
+                },
+                "headers": {
+                    "Vary": [
+                        "Origin",
+                        "X-Origin",
+                        "Referer"
+                    ],
+                    "Transfer-Encoding": [
+                        "chunked"
+                    ],
+                    "X-Frame-Options": [
+                        "SAMEORIGIN"
+                    ],
+                    "Server": [
+                        "ESF"
+                    ],
+                    "Date": [
+                        "Fri, 30 Jan 2026 22:42:33 GMT"
+                    ],
+                    "X-XSS-Protection": [
+                        "0"
+                    ],
+                    "X-Content-Type-Options": [
+                        "nosniff"
+                    ],
+                    "Content-Type": [
+                        "application/json; charset=UTF-8"
+                    ],
+                    "content-length": [
+                        "3"
+                    ]
+                },
+                "body": {
+                    "string": "{}\n"
+                }
+            }
+        },
+        {
+            "request": {
+                "method": "GET",
+                "uri": "https://europe-west2-aiplatform.googleapis.com/v1/projects/cloud-custodian/locations/europe-west2/endpoints?alt=json",
+                "body": null,
+                "headers": {
+                    "accept": [
+                        "application/json"
+                    ],
+                    "accept-encoding": [
+                        "gzip, deflate"
+                    ],
+                    "user-agent": [
+                        "(gzip)"
+                    ],
+                    "x-goog-api-client": [
+                        "gdcl/2.188.0 gl-python/3.10.10 cred-type/u"
+                    ],
+                    "content-length": [
+                        "0"
+                    ],
+                    "authorization": ["Bearer fake-auth-token"],
+                    "x-goog-user-project": [
+                        "cloud-custodian"
+                    ]
+                }
+            },
+            "response": {
+                "status": {
+                    "code": 200,
+                    "message": "OK"
+                },
+                "headers": {
+                    "Vary": [
+                        "Origin",
+                        "X-Origin",
+                        "Referer"
+                    ],
+                    "Transfer-Encoding": [
+                        "chunked"
+                    ],
+                    "X-Frame-Options": [
+                        "SAMEORIGIN"
+                    ],
+                    "Server": [
+                        "ESF"
+                    ],
+                    "Date": [
+                        "Fri, 30 Jan 2026 22:42:34 GMT"
+                    ],
+                    "X-XSS-Protection": [
+                        "0"
+                    ],
+                    "X-Content-Type-Options": [
+                        "nosniff"
+                    ],
+                    "Content-Type": [
+                        "application/json; charset=UTF-8"
+                    ],
+                    "content-length": [
+                        "3"
+                    ]
+                },
+                "body": {
+                    "string": "{}\n"
+                }
+            }
+        },
+        {
+            "request": {
+                "method": "GET",
+                "uri": "https://europe-west8-aiplatform.googleapis.com/v1/projects/cloud-custodian/locations/europe-west8/endpoints?alt=json",
+                "body": null,
+                "headers": {
+                    "accept": [
+                        "application/json"
+                    ],
+                    "accept-encoding": [
+                        "gzip, deflate"
+                    ],
+                    "user-agent": [
+                        "(gzip)"
+                    ],
+                    "x-goog-api-client": [
+                        "gdcl/2.188.0 gl-python/3.10.10 cred-type/u"
+                    ],
+                    "content-length": [
+                        "0"
+                    ],
+                    "authorization": ["Bearer fake-auth-token"],
+                    "x-goog-user-project": [
+                        "cloud-custodian"
+                    ]
+                }
+            },
+            "response": {
+                "status": {
+                    "code": 200,
+                    "message": "OK"
+                },
+                "headers": {
+                    "Vary": [
+                        "Origin",
+                        "X-Origin",
+                        "Referer"
+                    ],
+                    "Transfer-Encoding": [
+                        "chunked"
+                    ],
+                    "X-Frame-Options": [
+                        "SAMEORIGIN"
+                    ],
+                    "Server": [
+                        "ESF"
+                    ],
+                    "Date": [
+                        "Fri, 30 Jan 2026 22:42:34 GMT"
+                    ],
+                    "X-XSS-Protection": [
+                        "0"
+                    ],
+                    "X-Content-Type-Options": [
+                        "nosniff"
+                    ],
+                    "Content-Type": [
+                        "application/json; charset=UTF-8"
+                    ],
+                    "content-length": [
+                        "3"
+                    ]
+                },
+                "body": {
+                    "string": "{}\n"
+                }
+            }
+        },
+        {
+            "request": {
+                "method": "GET",
+                "uri": "https://us-south1-aiplatform.googleapis.com/v1/projects/cloud-custodian/locations/us-south1/endpoints?alt=json",
+                "body": null,
+                "headers": {
+                    "accept": [
+                        "application/json"
+                    ],
+                    "accept-encoding": [
+                        "gzip, deflate"
+                    ],
+                    "user-agent": [
+                        "(gzip)"
+                    ],
+                    "x-goog-api-client": [
+                        "gdcl/2.188.0 gl-python/3.10.10 cred-type/u"
+                    ],
+                    "content-length": [
+                        "0"
+                    ],
+                    "authorization": ["Bearer fake-auth-token"],
+                    "x-goog-user-project": [
+                        "cloud-custodian"
+                    ]
+                }
+            },
+            "response": {
+                "status": {
+                    "code": 200,
+                    "message": "OK"
+                },
+                "headers": {
+                    "Vary": [
+                        "Origin",
+                        "X-Origin",
+                        "Referer"
+                    ],
+                    "Transfer-Encoding": [
+                        "chunked"
+                    ],
+                    "X-Frame-Options": [
+                        "SAMEORIGIN"
+                    ],
+                    "Server": [
+                        "ESF"
+                    ],
+                    "Date": [
+                        "Fri, 30 Jan 2026 22:42:35 GMT"
+                    ],
+                    "X-XSS-Protection": [
+                        "0"
+                    ],
+                    "X-Content-Type-Options": [
+                        "nosniff"
+                    ],
+                    "Content-Type": [
+                        "application/json; charset=UTF-8"
+                    ],
+                    "content-length": [
+                        "3"
+                    ]
+                },
+                "body": {
+                    "string": "{}\n"
+                }
+            }
+        },
+        {
+            "request": {
+                "method": "GET",
+                "uri": "https://me-west1-aiplatform.googleapis.com/v1/projects/cloud-custodian/locations/me-west1/endpoints?alt=json",
+                "body": null,
+                "headers": {
+                    "accept": [
+                        "application/json"
+                    ],
+                    "accept-encoding": [
+                        "gzip, deflate"
+                    ],
+                    "user-agent": [
+                        "(gzip)"
+                    ],
+                    "x-goog-api-client": [
+                        "gdcl/2.188.0 gl-python/3.10.10 cred-type/u"
+                    ],
+                    "content-length": [
+                        "0"
+                    ],
+                    "authorization": ["Bearer fake-auth-token"],
+                    "x-goog-user-project": [
+                        "cloud-custodian"
+                    ]
+                }
+            },
+            "response": {
+                "status": {
+                    "code": 200,
+                    "message": "OK"
+                },
+                "headers": {
+                    "Vary": [
+                        "Origin",
+                        "X-Origin",
+                        "Referer"
+                    ],
+                    "Transfer-Encoding": [
+                        "chunked"
+                    ],
+                    "X-Frame-Options": [
+                        "SAMEORIGIN"
+                    ],
+                    "Server": [
+                        "ESF"
+                    ],
+                    "Date": [
+                        "Fri, 30 Jan 2026 22:42:35 GMT"
+                    ],
+                    "X-XSS-Protection": [
+                        "0"
+                    ],
+                    "X-Content-Type-Options": [
+                        "nosniff"
+                    ],
+                    "Content-Type": [
+                        "application/json; charset=UTF-8"
+                    ],
+                    "content-length": [
+                        "3"
+                    ]
+                },
+                "body": {
+                    "string": "{}\n"
+                }
+            }
+        },
+        {
+            "request": {
+                "method": "GET",
+                "uri": "https://southamerica-east1-aiplatform.googleapis.com/v1/projects/cloud-custodian/locations/southamerica-east1/endpoints?alt=json",
+                "body": null,
+                "headers": {
+                    "accept": [
+                        "application/json"
+                    ],
+                    "accept-encoding": [
+                        "gzip, deflate"
+                    ],
+                    "user-agent": [
+                        "(gzip)"
+                    ],
+                    "x-goog-api-client": [
+                        "gdcl/2.188.0 gl-python/3.10.10 cred-type/u"
+                    ],
+                    "content-length": [
+                        "0"
+                    ],
+                    "authorization": ["Bearer fake-auth-token"],
+                    "x-goog-user-project": [
+                        "cloud-custodian"
+                    ]
+                }
+            },
+            "response": {
+                "status": {
+                    "code": 200,
+                    "message": "OK"
+                },
+                "headers": {
+                    "Vary": [
+                        "Origin",
+                        "X-Origin",
+                        "Referer"
+                    ],
+                    "Transfer-Encoding": [
+                        "chunked"
+                    ],
+                    "X-Frame-Options": [
+                        "SAMEORIGIN"
+                    ],
+                    "Server": [
+                        "ESF"
+                    ],
+                    "Date": [
+                        "Fri, 30 Jan 2026 22:42:35 GMT"
+                    ],
+                    "X-XSS-Protection": [
+                        "0"
+                    ],
+                    "X-Content-Type-Options": [
+                        "nosniff"
+                    ],
+                    "Content-Type": [
+                        "application/json; charset=UTF-8"
+                    ],
+                    "content-length": [
+                        "3"
+                    ]
+                },
+                "body": {
+                    "string": "{}\n"
+                }
+            }
+        },
+        {
+            "request": {
+                "method": "GET",
+                "uri": "https://us-west2-aiplatform.googleapis.com/v1/projects/cloud-custodian/locations/us-west2/endpoints?alt=json",
+                "body": null,
+                "headers": {
+                    "accept": [
+                        "application/json"
+                    ],
+                    "accept-encoding": [
+                        "gzip, deflate"
+                    ],
+                    "user-agent": [
+                        "(gzip)"
+                    ],
+                    "x-goog-api-client": [
+                        "gdcl/2.188.0 gl-python/3.10.10 cred-type/u"
+                    ],
+                    "content-length": [
+                        "0"
+                    ],
+                    "authorization": ["Bearer fake-auth-token"],
+                    "x-goog-user-project": [
+                        "cloud-custodian"
+                    ]
+                }
+            },
+            "response": {
+                "status": {
+                    "code": 200,
+                    "message": "OK"
+                },
+                "headers": {
+                    "Vary": [
+                        "Origin",
+                        "X-Origin",
+                        "Referer"
+                    ],
+                    "Transfer-Encoding": [
+                        "chunked"
+                    ],
+                    "X-Frame-Options": [
+                        "SAMEORIGIN"
+                    ],
+                    "Server": [
+                        "ESF"
+                    ],
+                    "Date": [
+                        "Fri, 30 Jan 2026 22:42:35 GMT"
+                    ],
+                    "X-XSS-Protection": [
+                        "0"
+                    ],
+                    "X-Content-Type-Options": [
+                        "nosniff"
+                    ],
+                    "Content-Type": [
+                        "application/json; charset=UTF-8"
+                    ],
+                    "content-length": [
+                        "3"
+                    ]
+                },
+                "body": {
+                    "string": "{}\n"
+                }
+            }
+        },
+        {
+            "request": {
+                "method": "GET",
+                "uri": "https://eu-aiplatform.googleapis.com/v1/projects/cloud-custodian/locations/eu/endpoints?alt=json",
+                "body": null,
+                "headers": {
+                    "accept": [
+                        "application/json"
+                    ],
+                    "accept-encoding": [
+                        "gzip, deflate"
+                    ],
+                    "user-agent": [
+                        "(gzip)"
+                    ],
+                    "x-goog-api-client": [
+                        "gdcl/2.188.0 gl-python/3.10.10 cred-type/u"
+                    ],
+                    "content-length": [
+                        "0"
+                    ],
+                    "authorization": ["Bearer fake-auth-token"],
+                    "x-goog-user-project": [
+                        "cloud-custodian"
+                    ]
+                }
+            },
+            "response": {
+                "status": {
+                    "code": 404,
+                    "message": "Not Found"
+                },
+                "headers": {
+                    "Content-Length": [
+                        "1625"
+                    ],
+                    "Referrer-Policy": [
+                        "no-referrer"
+                    ],
+                    "Date": [
+                        "Fri, 30 Jan 2026 22:42:35 GMT"
+                    ],
+                    "Content-Type": [
+                        "text/html; charset=UTF-8"
+                    ]
+                },
+                "body": {
+                    "string": "<!DOCTYPE html>\n<html lang=en>\n  <meta charset=utf-8>\n  <meta name=viewport content=\"initial-scale=1, minimum-scale=1, width=device-width\">\n  <title>Error 404 (Not Found)!!1</title>\n  <style>\n    *{margin:0;padding:0}html,code{font:15px/22px arial,sans-serif}html{background:#fff;color:#222;padding:15px}body{margin:7% auto 0;max-width:390px;min-height:180px;padding:30px 0 15px}* > body{background:url(//www.google.com/images/errors/robot.png) 100% 5px no-repeat;padding-right:205px}p{margin:11px 0 22px;overflow:hidden}ins{color:#777;text-decoration:none}a img{border:0}@media screen and (max-width:772px){body{background:none;margin-top:0;max-width:none;padding-right:0}}#logo{background:url(//www.google.com/images/branding/googlelogo/1x/googlelogo_color_150x54dp.png) no-repeat;margin-left:-5px}@media only screen and (min-resolution:192dpi){#logo{background:url(//www.google.com/images/branding/googlelogo/2x/googlelogo_color_150x54dp.png) no-repeat 0% 0%/100% 100%;-moz-border-image:url(//www.google.com/images/branding/googlelogo/2x/googlelogo_color_150x54dp.png) 0}}@media only screen and (-webkit-min-device-pixel-ratio:2){#logo{background:url(//www.google.com/images/branding/googlelogo/2x/googlelogo_color_150x54dp.png) no-repeat;-webkit-background-size:100% 100%}}#logo{display:inline-block;height:54px;width:150px}\n  </style>\n  <a href=//www.google.com/><span id=logo aria-label=Google></span></a>\n  <p><b>404.</b> <ins>That\u2019s an error.</ins>\n  <p>The requested URL <code>/v1/projects/cloud-custodian/locations/eu/endpoints</code> was not found on this server.  <ins>That\u2019s all we know.</ins>\n"
+                }
+            }
+        }
+    ]
+}
