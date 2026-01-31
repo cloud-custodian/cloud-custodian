@@ -132,8 +132,12 @@ class VertexEndpoint(QueryResourceManager):
                             previous_response=response,
                         )
                     )
-            except Exception:
-                pass
+            except Exception as e:
+                log.warning(
+                    'Error listing Vertex AI endpoints in region %s: %s',
+                    loc,
+                    e,
+                )
             return region_results
 
         # 3. Parallel Scan
@@ -146,7 +150,11 @@ class VertexEndpoint(QueryResourceManager):
                 try:
                     data = future.result()
                     results.extend(data)
-                except Exception:
+                except Exception as e:
+                    log.warning(
+                        'Error capturing VertexAI endpoints for region %s: %s',
+                        e,
+                    )
                     pass
 
         return self.filter_resources(results)
@@ -156,6 +164,7 @@ class VertexEndpoint(QueryResourceManager):
 class EmptyEndpointFilter(Filter):
     """Filter to identify endpoints with no deployed models."""
 
+    permissions = ("aiplatform.endpoints.list",)
     schema = type_schema('empty-endpoint', value={'type': 'boolean'})
 
     def process(self, resources, event=None):

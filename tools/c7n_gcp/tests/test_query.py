@@ -41,7 +41,8 @@ def test_gcp_resource_metadata_asset_type():
         'sql-ssl-cert',
         'sql-user',
         'pubsub-snapshot',
-        'region'
+        'region',
+        'vertex-endpoint'
     ))
     missing = set()
     for k, v in GoogleCloud.resources.items():
