@@ -1,0 +1,15 @@
+{
+    "status_code": 200,
+    "data": {
+        "WebApps": [
+            {
+                "Arn": "arn:aws:transfer:us-east-1:644160558196:webapp/webapp-51c7877b183149d3b",
+                "WebAppId": "webapp-51c7877b183149d3b",
+                "AccessEndpoint": "https://webapp-51c7877b183149d3b.transfer-webapp.us-east-1.on.aws",
+                "WebAppEndpoint": "https://webapp-51c7877b183149d3b.transfer-webapp.us-east-1.on.aws",
+                "EndpointType": "PUBLIC"
+            }
+        ],
+        "ResponseMetadata": {}
+    }
+}
