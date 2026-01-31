@@ -1,0 +1,77 @@
+{
+  "version": 1,
+  "interactions": [
+    {
+      "request": {
+        "method": "POST",
+        "uri": "https://oauth2.googleapis.com/token",
+        "body": "grant_type=refresh_token&client_id=fake-client-id&client_secret=fake-client-secret&refresh_token=fake-refresh-token",
+        "headers": {
+          "content-type": ["application/x-www-form-urlencoded"],
+          "x-goog-api-client": ["gl-python/3.10.10 auth/2.48.0 cred-type/u"],
+          "user-agent": ["Python-httplib2/0.31.2 (gzip)"],
+          "accept-encoding": ["gzip, deflate"]
+        }
+      },
+      "response": {
+        "status": { "code": 200, "message": "OK" },
+        "headers": {
+          "Content-Type": ["application/json; charset=utf-8"]
+        },
+        "body": {
+          "string": "{\"access_token\": \"fake-access-token\", \"expires_in\": 3599, \"scope\": \"https://www.googleapis.com/auth/cloud-platform\", \"token_type\": \"Bearer\", \"id_token\": \"fake-jwt-token\"}"
+        }
+      }
+    },
+    {
+      "request": {
+        "method": "GET",
+        "uri": "https://aiplatform.googleapis.com/v1/projects/custodian-1291/locations?alt=json",
+        "body": null,
+        "headers": {
+          "accept": ["application/json"],
+          "accept-encoding": ["gzip, deflate"],
+          "user-agent": ["(gzip)"],
+          "x-goog-api-client": ["gdcl/2.188.0 gl-python/3.10.10 cred-type/u"],
+          "content-length": ["0"],
+          "authorization": ["Bearer fake-auth-token"],
+          "x-goog-user-project": ["custodian-1291"]
+        }
+      },
+      "response": {
+        "status": { "code": 200, "message": "OK" },
+        "headers": {
+          "Content-Type": ["application/json; charset=UTF-8"]
+        },
+        "body": {
+          "string": "{\"locations\": [{\"name\": \"projects/custodian-1291/locations/us-east-1\", \"locationId\": \"us-east-1\"}]}"
+        }
+      }
+    },
+    {
+      "request": {
+        "method": "GET",
+        "uri": "https://us-east1-aiplatform.googleapis.com/v1/projects/custodian-1291/locations/us-east-1/endpoints?alt=json",
+        "body": null,
+        "headers": {
+          "accept": ["application/json"],
+          "accept-encoding": ["gzip, deflate"],
+          "user-agent": ["(gzip)"],
+          "x-goog-api-client": ["gdcl/2.188.0 gl-python/3.10.10 cred-type/u"],
+          "content-length": ["0"],
+          "authorization": ["Bearer fake-auth-token"],
+          "x-goog-user-project": ["custodian-1291"]
+        }
+      },
+      "response": {
+        "status": { "code": 200, "message": "OK" },
+        "headers": {
+          "Content-Type": ["application/json; charset=UTF-8"]
+        },
+        "body": {
+          "string": "{\"endpoints\": [{\"name\": \"projects/custodian-1291/locations/us-east-1/endpoints/12345\", \"displayName\": \"fake-endpoint\", \"createTime\": \"2023-01-01T00:00:00Z\"}]}"
+        }
+      }
+    }
+  ]
+}
