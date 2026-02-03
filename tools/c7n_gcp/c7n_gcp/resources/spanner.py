@@ -45,7 +45,7 @@ class SpannerInstance(QueryResourceManager):
                         'field_mask': ', '.join(['labels'])}}
 
         @staticmethod
-        def get_metric_resource_name(resource):
+        def get_metric_resource_name(resource, metric_key=None):
             # Extract instance name from the full resource name
             return resource["name"].split("/")[-1]
 
