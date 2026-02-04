@@ -1,10 +1,18 @@
 # Copyright The Cloud Custodian Authors.
 # SPDX-License-Identifier: Apache-2.0
 
+import json
 import time
+from unittest import mock
+
+import pytest
+from pytest_terraform import terraform
 
 from gcp_common import BaseTest, event_data
 from googleapiclient.errors import HttpError
+
+from c7n.utils import local_session
+from c7n_gcp.resources.iam import RoleDeleteAction
 
 
 class ProjectRoleTest(BaseTest):
@@ -233,6 +241,247 @@ class ServiceAccountKeyTest(BaseTest):
             self.assertTrue("does not exist" in str(e))
 
 
+class RoleDeleteActionTest(BaseTest):
+    # Unittests for RoleDeleteAction
+    def setUp(self):
+        super().setUp()
+        self.rda = RoleDeleteAction()
+        self.full_org_role = "organizations/111111111111/roles/customRole1"
+        self.full_proj_role = "projects/123123123123/roles/customRole2"
+
+    def test_is_organizational_role_success(self):
+        self.assertTrue(self.rda.is_organizational_role(self.full_org_role))
+
+    def test_is_organizational_role_fail(self):
+        self.assertFalse(self.rda.is_organizational_role(self.full_proj_role))
+
+    def test_get_organizational_role_name_success(self):
+        self.assertEqual(
+            self.rda.get_organizational_role_name(self.full_org_role),
+            "customRole1",
+        )
+
+    def test_get_organizational_role_name_fail(self):
+        self.assertEqual(
+            self.rda.get_organizational_role_name(self.full_proj_role),
+            None,
+        )
+
+    def test_is_project_role_success(self):
+        self.assertTrue(self.rda.is_project_role(self.full_proj_role))
+
+    def test_is_project_role_fail(self):
+        self.assertFalse(self.rda.is_project_role(self.full_org_role))
+
+    def test_get_project_role_name_success(self):
+        self.assertEqual(
+            self.rda.get_project_role_name(self.full_proj_role),
+            "customRole2",
+        )
+
+    def test_get_project_role_name_fail(self):
+        self.assertEqual(
+            self.rda.get_project_role_name(self.full_org_role),
+            None,
+        )
+
+    @mock.patch(
+        "c7n_gcp.resources.iam.RoleDeleteAction.handle_resource_error",
+    )
+    @mock.patch(
+        "c7n_gcp.resources.iam.RoleDeleteAction.invoke_api",
+    )
+    @mock.patch(
+        "c7n_gcp.resources.iam.RoleDeleteAction.get_resource_params",
+        return_value={
+            "name": "organizations/111111111111/roles/customRole1",
+        },
+    )
+    @mock.patch(
+        "c7n_gcp.resources.iam.RoleDeleteAction.get_operation_name",
+        return_value="iam.organizations.roles.delete",
+    )
+    def test_handle_role_delete_org(
+        self,
+        mock_get_op,
+        mock_get_params,
+        mock_invoke,
+        mock_error,
+    ):
+        override_client = mock.MagicMock()
+        model = mock.MagicMock()
+        resource = {
+            "name": "organizations/111111111111/roles/customRole1",
+            "title": "Custom Role",
+            "description": "Custom role for testing",
+            "includedPermissions": [],
+            "stage": "GA",
+            "etag": "BwYGhFMnKpQ=",
+            "deleted": False,
+        }
+
+        # Nothing should get raised, & no return value.
+        self.rda.handle_role_delete(
+            override_client,
+            model,
+            resource,
+            "customRole1",
+        )
+
+        # And verify the mocks for correct-looking calls.
+        mock_get_op.assert_called_once_with(
+            model,
+            resource,
+        )
+        mock_get_params.assert_called_once_with(
+            model,
+            resource,
+        )
+        mock_invoke.assert_called_once_with(
+            override_client,
+            "iam.organizations.roles.delete",
+            {
+                "name": "organizations/111111111111/roles/customRole1",
+            },
+        )
+        mock_error.assert_not_called()
+
+    @mock.patch(
+        "c7n_gcp.resources.iam.RoleDeleteAction.handle_resource_error",
+    )
+    @mock.patch(
+        "c7n_gcp.resources.iam.RoleDeleteAction.invoke_api",
+    )
+    @mock.patch(
+        "c7n_gcp.resources.iam.RoleDeleteAction.get_resource_params",
+        return_value={
+            "name": "projects/123123123123/roles/customRole2",
+        },
+    )
+    @mock.patch(
+        "c7n_gcp.resources.iam.RoleDeleteAction.get_operation_name",
+        return_value="iam.projects.roles.delete",
+    )
+    def test_handle_role_delete_proj(
+        self,
+        mock_get_op,
+        mock_get_params,
+        mock_invoke,
+        mock_error,
+    ):
+        override_client = mock.MagicMock()
+        model = mock.MagicMock()
+        resource = {
+            "name": "projects/123123123123/roles/customRole2",
+            "title": "Custom Role",
+            "description": "Custom role for testing",
+            "includedPermissions": [],
+            "stage": "GA",
+            "etag": "AwYGhFMnKpQ=",
+            "deleted": False,
+        }
+
+        # Nothing should get raised, & no return value.
+        self.rda.handle_role_delete(
+            override_client,
+            model,
+            resource,
+            "customRole2",
+        )
+
+        # And verify the mocks for correct-looking calls.
+        mock_get_op.assert_called_once_with(
+            model,
+            resource,
+        )
+        mock_get_params.assert_called_once_with(
+            model,
+            resource,
+        )
+        mock_invoke.assert_called_once_with(
+            override_client,
+            "iam.projects.roles.delete",
+            {
+                "name": "projects/123123123123/roles/customRole2",
+            },
+        )
+        mock_error.assert_not_called()
+
+    @mock.patch(
+        "c7n_gcp.resources.iam.RoleDeleteAction.handle_resource_error",
+    )
+    @mock.patch(
+        "c7n_gcp.resources.iam.RoleDeleteAction.invoke_api",
+    )
+    @mock.patch(
+        "c7n_gcp.resources.iam.RoleDeleteAction.get_resource_params",
+        return_value={
+            "name": "projects/123123123123/roles/customRole2",
+        },
+    )
+    @mock.patch(
+        "c7n_gcp.resources.iam.RoleDeleteAction.get_operation_name",
+        return_value="iam.projects.roles.delete",
+    )
+    def test_handle_role_delete_error(
+        self,
+        mock_get_op,
+        mock_get_params,
+        mock_invoke,
+        mock_error,
+    ):
+        override_client = mock.MagicMock()
+        model = mock.MagicMock()
+        # Assume this resource already went away elsewhere, causing the `HttpError`.
+        resource = {
+            "name": "projects/123123123123/roles/customRole3",
+            "title": "Custom Role",
+            "description": "Custom role for testing",
+            "includedPermissions": [],
+            "stage": "GA",
+            "etag": "AwYGhFMnKpQ=",
+            "deleted": False,
+        }
+
+        # Setup the error to occur.
+        mock_resp = {
+            "error": {
+                "message": "Whoops, it failed.",
+            },
+        }
+        mock_invoke.side_effect = HttpError(
+            resp=mock.MagicMock(),
+            content=json.dumps(mock_resp).encode("utf-8"),
+        )
+
+        # Even with an error, nothing should get raised, & no return value.
+        self.rda.handle_role_delete(
+            override_client,
+            model,
+            resource,
+            "customRole3",
+        )
+
+        # And verify the mocks for correct-looking calls.
+        mock_get_op.assert_called_once_with(
+            model,
+            resource,
+        )
+        mock_get_params.assert_called_once_with(
+            model,
+            resource,
+        )
+        mock_invoke.assert_called_once_with(
+            override_client,
+            "iam.projects.roles.delete",
+            {
+                "name": "projects/123123123123/roles/customRole2",
+            },
+        )
+        # Making sure the error was hit, & handling was attempted!
+        mock_error.assert_called_once()
+
+
 class IAMRoleTest(BaseTest):
     def test_iam_role_query(self):
         project_id = "cloud-custodian"
@@ -278,6 +527,94 @@ class IAMRoleTest(BaseTest):
             ],
         )
 
+    @terraform('iam_organization_role')
+    def test_iam_role_delete(self):
+        org_id = "111111111111"
+        role_name = "customAccessContextManagerAdmin"
+        full_role_name = f"organizations/{org_id}/roles/{role_name}"
+
+        factory = self.replay_flight_data("iam-role-delete", org_id)
+
+        p = self.load_policy(
+            {
+                "name": "role-delete",
+                "resource": "gcp.iam-role",
+                "filters": [{"name": full_role_name}],
+                "actions": ["delete"],
+            },
+            session_factory=factory,
+        )
+        resources = p.run()
+        self.assertEqual(len(resources), 1)
+
+        if self.recording:
+            time.sleep(1)
+
+        # Get client for organizations.roles to verify deletion
+        session = local_session(factory)
+        client = session.client('iam', 'v1', 'organizations.roles')
+
+        with pytest.raises(HttpError):
+            result = client.execute_query("get", {"name": full_role_name})
+            # If role still exists, it should be marked as deleted
+            self.assertTrue(result.get("deleted", False), "Role should be marked as deleted")
+            # If we're still here, the delete worked.
+            # For the sake of a single path of handling, simulate an Http 404
+            # error as well, as this is also an acceptable case.
+            mock_resp = {
+                "error": {
+                    "message": "Role not found.",
+                },
+            }
+            raise HttpError(
+                resp=mock.MagicMock(status=404),
+                content=json.dumps(mock_resp).encode("utf-8"),
+            )
+
+    @terraform('iam_project_role')
+    def test_iam_role_project_delete(self):
+        project_id = "cloud-custodian"
+        role_name = "customAccessContextManagerAdmin"
+        full_role_name = f"projects/{project_id}/roles/{role_name}"
+
+        factory = self.replay_flight_data("iam-role-delete-proj", project_id)
+
+        p = self.load_policy(
+            {
+                "name": "role-delete",
+                "resource": "gcp.iam-role",
+                "filters": [{"name": full_role_name}],
+                "actions": ["delete"],
+            },
+            session_factory=factory,
+        )
+        resources = p.run()
+        self.assertEqual(len(resources), 1)
+
+        if self.recording:
+            time.sleep(1)
+
+        # Get client for projects.roles to verify deletion
+        session = local_session(factory)
+        client = session.client('iam', 'v1', 'projects.roles')
+
+        with pytest.raises(HttpError):
+            result = client.execute_query("get", {"name": full_role_name})
+            # If role still exists, it should be marked as deleted
+            self.assertTrue(result.get("deleted", False), "Role should be marked as deleted")
+            # If we're still here, the delete worked.
+            # For the sake of a single path of handling, simulate an Http 404
+            # error as well, as this is also an acceptable case.
+            mock_resp = {
+                "error": {
+                    "message": "Role not found.",
+                },
+            }
+            raise HttpError(
+                resp=mock.MagicMock(status=404),
+                content=json.dumps(mock_resp).encode("utf-8"),
+            )
+
 
 class ApiKeyTest(BaseTest):
     def test_api_key_query(self):
@@ -301,10 +638,7 @@ class ApiKeyTest(BaseTest):
             {
                 "name": "gcp-api-key-list",
                 "resource": "gcp.api-key",
-                "filters": [{
-                    "type": "time-range",
-                    "value": 30
-                }],
+                "filters": [{"type": "time-range", "value": 30}],
             },
             session_factory=factory,
         )
@@ -312,5 +646,5 @@ class ApiKeyTest(BaseTest):
         self.assertEqual(len(resources), 1)
         self.assertEqual(
             resources[0]["name"],
-            "projects/cloud-custodian/locations/global/keys/03b651c2-718a-4702-b5d7-9946987cc4da"
+            "projects/cloud-custodian/locations/global/keys/03b651c2-718a-4702-b5d7-9946987cc4da",
         )
