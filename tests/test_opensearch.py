@@ -25,6 +25,9 @@ def test_opensearch_ingestion_cross_account(test, opensearch_ingestion_cross_acc
     )
     resources = p.run()
     assert len(resources) == 1
+    assert resources[0]['PipelineName'] == 'c7n-test-d0c207aff6bcf63a'
+    assert resources[0]['Status'] == 'ACTIVE'
+    
 
 @terraform('opensearch_serverless_cross_account')
 def test_opensearch_serverless_cross_account(test, opensearch_serverless_cross_account):

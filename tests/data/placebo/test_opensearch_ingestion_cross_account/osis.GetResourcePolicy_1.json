@@ -1,10 +1,8 @@
 {
     "status_code": 200,
     "data": {
-        "ResponseMetadata": {
-            "HTTPStatusCode": 200
-        },
-        "ResourceArn": "arn:aws:osis:us-east-1:123456789012:pipeline/test-pipeline",
-        "Policy": "{\"Version\":\"2012-10-17\",\"Statement\":[{\"Effect\":\"Allow\",\"Principal\":{\"AWS\":\"arn:aws:iam::444444444444:root\"},\"Action\":\"osis:Ingest\",\"Resource\":\"arn:aws:osis:us-east-1:123456789012:pipeline/test-pipeline\"}]}"
+        "ResponseMetadata": {},
+        "ResourceArn": "arn:aws:osis:us-east-1:644160558196:pipeline/c7n-test-d0c207aff6bcf63a",
+        "Policy": "{}"
     }
 }

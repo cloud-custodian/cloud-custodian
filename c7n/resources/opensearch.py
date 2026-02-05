@@ -340,27 +340,64 @@ class CrossAccountFilter(CrossAccountAccessFilter):
     """
     policy_attribute = 'c7n:Policy'
     permissions = ('osis:ListPipelines',)
-    schema = type_schema(
-        'cross-account',
-        whitelist_from=ValuesFrom.schema,
-        whitelist={'type': 'array', 'items': {'type': 'string'}})
     
     def process(self, resources, event=None):
         client = local_session(self.manager.session_factory).client('osis')
         iam_client = local_session(self.manager.session_factory).client('iam')
+        
         for r in resources:
             if self.policy_attribute in r:
                 continue
+            
+            statements = []
+            
+            # Pipeline Resource Policy cross account check
             try:
-                role_name = r['PipelineRoleArn'].split('/')[-1]
-                result = iam_client.get_role_policy(
-                    RoleName=role_name,
-                    PolicyName='osis-pipeline-policy-{}'.format(r['PipelineName']))
-                if result:
-                    r[self.policy_attribute] = result['PolicyDocument']
-            except iam_client.exceptions.NoSuchEntityException:
+                res_policy = self.manager.retry(
+                    client.get_resource_policy,
+                    ResourceArn=r['PipelineArn'],
+                    ignore_err_codes=('ResourceNotFoundException',))
+                if res_policy and res_policy.get('Policy'):
+                    p = json.loads(res_policy['Policy'])
+                    statements.extend(p.get('Statement', []))
+            except Exception:
+                pass
+                
+            # Role Trust Policy cross account check
+            role_arn = r.get('PipelineRoleArn')
+            if role_arn:
+                cache_key = 'iam-role-{}'.format(role_arn)
+                role = self.manager._cache.get(cache_key)
+                if not role:
+                    try:
+                        role_name = role_arn.split('/')[-1]
+                        role = iam_client.get_role(RoleName=role_name)['Role']
+                        try:
+                            self.manager._cache[cache_key] = role
+                        except Exception:
+                            pass
+                    except Exception:
+                        pass
+                
+                if role and role.get('AssumeRolePolicyDocument'):
+                    trust_policy = role['AssumeRolePolicyDocument']
+                    if isinstance(trust_policy, str):
+                        if trust_policy.startswith('%'):
+                            from urllib.parse import unquote
+                            trust_policy = unquote(trust_policy)
+                        trust_policy = json.loads(trust_policy)
+                    statements.extend(trust_policy.get('Statement', []))
+            
+            if statements:
+                r[self.policy_attribute] = {
+                    "Version": "2012-10-17",
+                    "Statement": statements
+                }
+            else:
                 r[self.policy_attribute] = None
+                
         return super().process(resources, event)
+
 
 
 @OpensearchIngestion.action_registry.register('tag')
