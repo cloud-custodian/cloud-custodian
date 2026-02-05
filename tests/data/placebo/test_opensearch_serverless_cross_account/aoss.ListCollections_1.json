@@ -9,7 +9,7 @@
                 "id": "test-collection-id",
                 "name": "test-collection",
                 "status": "ACTIVE",
-                "arn": "arn:aws:aoss:us-east-1:123456789012:collection/test-collection-id"
+                "arn": "arn:aws:aoss:us-east-1:644160558196:collection/test-collection-id"
             }
         ]
     }

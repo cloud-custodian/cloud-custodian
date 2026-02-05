@@ -22,7 +22,7 @@ resource "aws_iam_role" "pipeline_role" {
         Action = "sts:AssumeRole"
         Effect = "Allow"
         Principal = {
-          AWS = "arn:aws:iam::444444444444:root"
+          AWS = "arn:aws:iam::794038253860:root"
         }
       }
     ]

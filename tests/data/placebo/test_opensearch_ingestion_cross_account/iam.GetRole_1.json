@@ -8,7 +8,7 @@
             "Path": "/",
             "RoleName": "osis-pipeline-role",
             "RoleId": "AROAJ52K74XU7EXAMPLE",
-            "Arn": "arn:aws:iam::123456789012:role/osis-pipeline-role",
+            "Arn": "arn:aws:iam::644160558196:role/osis-pipeline-role",
             "CreateDate": "2023-01-01T00:00:00+00:00",
             "AssumeRolePolicyDocument": {
                 "Version": "2012-10-17",

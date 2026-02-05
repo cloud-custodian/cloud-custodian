@@ -26,9 +26,9 @@ def test_opensearch_ingestion_cross_account(test, opensearch_ingestion_cross_acc
     resources = p.run()
     assert len(resources) == 1
 
-@terraform('opensearch_serverless_cross_account', replay=False)
+@terraform('opensearch_serverless_cross_account')
 def test_opensearch_serverless_cross_account(test, opensearch_serverless_cross_account):
-    session_factory = test.record_flight_data('test_opensearch_serverless_cross_account')
+    session_factory = test.replay_flight_data('test_opensearch_serverless_cross_account')
     p = test.load_policy(
         {
             'name': 'test-opensearch-serverless-cross-account',
@@ -44,6 +44,9 @@ def test_opensearch_serverless_cross_account(test, opensearch_serverless_cross_a
     )
     resources = p.run()
     assert len(resources) == 1
+    assert resources[0]['name'] == 'test-collection'
+    assert resources[0]['encryptionPolicy'] == 'test-collection'
+    assert resources[0]['arn'] == 'arn:aws:aoss:us-east-1:123456789012:collection/test-collection-id'
 
 class OpensearchServerless(BaseTest):
 

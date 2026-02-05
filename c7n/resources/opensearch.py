@@ -91,7 +91,10 @@ class OpensearchServerlessCrossAccountFilter(CrossAccountAccessFilter):
                         name=p['name']
                     )
                     if detail:
-                        policies.append(json.loads(detail['accessPolicyDetail']['policy']))
+                        if isinstance(detail['accessPolicyDetail']['policy'], str):
+                            policies.append(json.loads(detail['accessPolicyDetail']['policy']))
+                        else:
+                            policies.append(detail['accessPolicyDetail']['policy'])
                 
                 next_token = response.get('nextToken')
                 if not next_token:
@@ -344,17 +347,18 @@ class CrossAccountFilter(CrossAccountAccessFilter):
     
     def process(self, resources, event=None):
         client = local_session(self.manager.session_factory).client('osis')
+        iam_client = local_session(self.manager.session_factory).client('iam')
         for r in resources:
             if self.policy_attribute in r:
                 continue
             try:
-                result = self.manager.retry(
-                    client.get_resource_policy,
-                    ResourceArn=r['PipelineArn'],
-                    ignore_err_codes=('ResourceNotFoundException',))
+                role_name = r['PipelineRoleArn'].split('/')[-1]
+                result = iam_client.get_role_policy(
+                    RoleName=role_name,
+                    PolicyName='osis-pipeline-policy-{}'.format(r['PipelineName']))
                 if result:
-                    r[self.policy_attribute] = result['Policy']
-            except client.exceptions.ResourceNotFoundException:
+                    r[self.policy_attribute] = result['PolicyDocument']
+            except iam_client.exceptions.NoSuchEntityException:
                 r[self.policy_attribute] = None
         return super().process(resources, event)
 

@@ -1,0 +1,11 @@
+{
+    "status_code": 200,
+    "data": {
+        "ResponseMetadata": {
+            "HTTPStatusCode": 200
+        },
+        "RoleName": "osis-pipeline-role",
+        "PolicyName": "osis-pipeline-policy-test-pipeline",
+        "PolicyDocument": "{\"Version\": \"2012-10-17\", \"Statement\": [{\"Effect\": \"Allow\", \"Principal\": {\"AWS\": \"arn:aws:iam::644160558196:root\"}, \"Action\": \"osis:Ingest\", \"Resource\": \"*\"}]}"
+    }
+}

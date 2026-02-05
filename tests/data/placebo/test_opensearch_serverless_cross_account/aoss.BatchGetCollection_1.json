@@ -10,6 +10,7 @@
                 "name": "test-collection",
                 "status": "ACTIVE",
                 "type": "SEARCH",
+                "encryptionPolicy": "test-collection",
                 "arn": "arn:aws:aoss:us-east-1:123456789012:collection/test-collection-id",
                 "createdDate": 1672531200000,
                 "lastModifiedDate": 1672531200000

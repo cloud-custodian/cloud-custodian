@@ -57,7 +57,7 @@ resource "aws_opensearchserverless_access_policy" "test-data-policy" {
         }
       ],
       Principal = [
-        "arn:aws:iam::444444444444:root"
+        "arn:aws:iam::794038253860:root"
       ]
     }
   ])
