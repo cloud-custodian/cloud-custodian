@@ -45,6 +45,35 @@ class BigQueryDataSetTest(BaseTest):
             time.sleep(1)
         self.assertEqual(len(resources), 1)
 
+    def test_dataset_label(self):
+        # Set the "env" label to not the default
+        factory = self.replay_flight_data('bq-dataset-label')
+        p = self.load_policy(
+            {
+                'name': 'bq-dataset-label',
+                'resource': 'gcp.bq-dataset',
+                'filters': [{
+                    'type': 'value',
+                    'key': 'id',
+                    'op': 'contains',
+                    'value': 'c7n_bq_dataset',
+                }],
+                'actions': [
+                    {'type': 'set-labels',
+                     'labels': {'env': 'not-the-default'}}
+                ]
+            },
+            session_factory=factory,
+        )
+        resources = p.run()
+        self.assertEqual(len(resources), 1)
+        self.assertEqual(resources[0]['labels']['env'], 'default')
+
+        # Fetch the dataset manually to confirm the label was changed
+        client = p.resource_manager.get_client()
+        result = client.execute_query('get', resources[0]['datasetReference'])
+        self.assertEqual(result['labels']['env'], 'not-the-default')
+
 
 class BigQueryJobTest(BaseTest):
 
@@ -149,3 +178,32 @@ class BigQueryTableTest(BaseTest):
         if self.recording:
             time.sleep(1)
         self.assertEqual(len(resources), 1)
+
+    def test_table_label(self):
+        # Set the "env" label to not the default
+        factory = self.replay_flight_data('bq-table-label')
+        p = self.load_policy(
+            {
+                'name': 'bq-table-label',
+                'resource': 'gcp.bq-table',
+                'filters': [{
+                    'type': 'value',
+                    'key': 'id',
+                    'op': 'contains',
+                    'value': 'c7n_bq_table',
+                }],
+                'actions': [
+                    {'type': 'set-labels',
+                     'labels': {'env': 'not-the-default'}}
+                ]
+            },
+            session_factory=factory,
+        )
+        resources = p.run()
+        self.assertEqual(len(resources), 1)
+        self.assertEqual(resources[0]['labels']['env'], 'default')
+
+        # Fetch the table manually to confirm the label was changed
+        client = p.resource_manager.get_client()
+        result = client.execute_query('get', resources[0]['tableReference'])
+        self.assertEqual(result['labels']['env'], 'not-the-default')
