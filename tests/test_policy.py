@@ -652,7 +652,6 @@ class PolicyMetaLint(BaseTest):
             'AWS::EventSchemas::Registry',
             'AWS::EventSchemas::RegistryPolicy',
             'AWS::EventSchemas::Schema',
-            'AWS::Events::ApiDestination',
             'AWS::Events::Archive',
             'AWS::Events::Connection',
             'AWS::Events::Endpoint',
