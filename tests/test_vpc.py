@@ -4729,3 +4729,73 @@ class TestVPCEndpointServiceConfiguration(BaseTest):
         resources = p.run()
         self.assertEqual(len(resources), 1)
         self.assertEqual(resources[0]['ServiceId'], 'vpce-svc-042193297e333714e')
+
+
+@terraform("transit_gateway_route_table")
+def test_transit_gateway_route_table(test, transit_gateway_route_table):
+    session_factory = test.replay_flight_data("test_transit_gateway_route_table")
+
+    # Get the default route table with attachment.
+    policy = test.load_policy(
+        {
+            "name": "transit-gateway-route-table",
+            "resource": "transit-gateway-route-table",
+            "filters": [
+                {
+                    "type": "value",
+                    "key": "TransitGatewayId",
+                    "value": transit_gateway_route_table['aws_ec2_transit_gateway.example.id']
+                },
+                {"type": "value", "key": "DefaultAssociationRouteTable", "value": True},
+                {"type": "value", "key": "DefaultPropagationRouteTable", "value": True},
+            ],
+        },
+        session_factory=session_factory,
+    )
+
+    resources = policy.run()
+
+    test.assertEqual(len(resources), 1)
+    test.assertEqual(
+        resources[0]['TransitGatewayRouteTableId'],
+        transit_gateway_route_table[
+            'aws_ec2_transit_gateway.example.association_default_route_table_id'
+        ]
+    )
+
+    test.assertEqual(len(resources[0]['Associations']), 1)
+    test.assertEqual(resources[0]['Associations'][0]['TransitGatewayAttachmentId'],
+        transit_gateway_route_table['aws_ec2_transit_gateway_vpc_attachment.test.id'])
+
+    test.assertEqual(len(resources[0]['Propagations']), 1)
+    test.assertEqual(resources[0]['Propagations'][0]['TransitGatewayAttachmentId'],
+        transit_gateway_route_table['aws_ec2_transit_gateway_vpc_attachment.test.id'])
+
+    # Get the custom route table without attachments.
+    policy = test.load_policy(
+        {
+            "name": "transit-gateway-route-table",
+            "resource": "transit-gateway-route-table",
+            "filters": [
+                {
+                    "type": "value",
+                    "key": "TransitGatewayId",
+                    "value": transit_gateway_route_table['aws_ec2_transit_gateway.example.id']
+                },
+                {"type": "value", "key": "DefaultAssociationRouteTable", "value": False},
+                {"type": "value", "key": "DefaultPropagationRouteTable", "value": False},
+            ],
+        },
+        session_factory=session_factory,
+    )
+
+    resources = policy.run()
+
+    test.assertEqual(len(resources), 1)
+    test.assertEqual(
+        resources[0]['TransitGatewayRouteTableId'],
+        transit_gateway_route_table['aws_ec2_transit_gateway_route_table.available.id']
+    )
+
+    test.assertEqual(len(resources[0]['Associations']), 0)
+    test.assertEqual(len(resources[0]['Propagations']), 0)

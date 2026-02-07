@@ -3608,3 +3608,38 @@ class ResolverQueryLoggingFilter(Filter):
                 results.append(r)
 
         return results
+
+
+class DescribeTransitGatewayRouteTable(query.DescribeSource):
+    def augment(self, resources):
+        client = local_session(self.manager.session_factory).client('ec2')
+        for r in resources:
+            r['Associations'] = client.get_transit_gateway_route_table_associations(
+                TransitGatewayRouteTableId=r['TransitGatewayRouteTableId'])['Associations']
+            r['Propagations'] = client.get_transit_gateway_route_table_propagations(
+                TransitGatewayRouteTableId=r['TransitGatewayRouteTableId'])['TransitGatewayRouteTablePropagations']
+        return resources
+
+
+@resources.register('transit-gateway-route-table')
+class TransitGatewayRouteTable(query.QueryResourceManager):
+    """
+    Resource manager for Transit Gateway Route Tables. Propogations and Associations are available
+    for filtering but are retrieved via additional API calls, so policies may be slow.
+
+    TODO: what's a good example of how this would actually be used?
+    """
+
+    class resource_type(query.TypeInfo):
+        id = name = 'TransitGatewayRouteTableId'
+        service = 'ec2'
+        enum_spec = ('describe_transit_gateway_route_tables', 'TransitGatewayRouteTables', None)
+
+        arn_type = 'transit-gateway-route-table'
+        date = 'CreationTime'
+        cfn_type = config_type = 'AWS::EC2::TransitGatewayRouteTable'
+        id_prefix = 'tgw-rtb-'
+
+    source_mapping = {
+        'describe': DescribeTransitGatewayRouteTable
+    }
