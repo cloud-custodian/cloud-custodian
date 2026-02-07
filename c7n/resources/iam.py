@@ -1785,6 +1785,54 @@ class CredentialReport(Filter):
            value: 30
            op: less-than
 
+    The key field supports both simple string keys (like enum values)
+    and JMESPath expressions for more complex queries.
+
+    Simple keys (discoverable, recommended for most cases):
+    - Direct fields: user, arn, mfa_active, password_enabled, etc.
+    - Nested fields: access_keys.active, access_keys.last_used_date, etc.
+
+    JMESPath expressions (for advanced queries):
+    - Count active keys: key: 'access_keys[?active]' with op: gt, value: 1
+    - Filter by multiple conditions: key: 'access_keys[?active && age(last_rotated) > `90`]'
+
+    Alternative approaches using simple keys:
+    
+    Find users with 2+ active keys:
+    
+    .. code-block:: yaml
+
+     - name: users-2-active-keys
+       resource: aws.iam-user
+       filters:
+         - type: credential
+           key: access_keys
+           value_type: size
+           op: gt
+           value: 1
+         - not:
+           - type: credential
+             key: access_keys.active
+             op: eq
+             value: false
+    
+    Or using matched-keys annotation:
+    
+    .. code-block:: yaml
+
+     - name: users-2-active-keys
+       resource: aws.iam-user
+       filters:
+         - type: credential
+           key: access_keys.active
+           op: eq
+           value: true
+         - type: value
+           key: "c7n:matched-keys"
+           value_type: size
+           op: gt
+           value: 1
+
     Credential Report Transforms
 
     We perform some default transformations from the raw
@@ -1794,31 +1842,17 @@ class CredentialReport(Filter):
     N/A values are turned into None, TRUE/FALSE are turned
     into boolean values.
 
+    The normalized structure enables JMESPath queries:
+    - Raw AWS: access_key_1_active, access_key_2_active
+    - Normalized: access_keys: [{active: true, last_used_date: ...}, ...]
+    - Query: access_keys[?active] filters to active keys only
+
     """
     schema = type_schema(
         'credential',
         value_type={'$ref': '#/definitions/filters_common/value_types'},
         key={'type': 'string',
-             'title': 'report key to search',
-             'enum': [
-                 'user',
-                 'arn',
-                 'user_creation_time',
-                 'password_enabled',
-                 'password_last_used',
-                 'password_last_changed',
-                 'password_next_rotation',
-                 'mfa_active',
-                 'access_keys',
-                 'access_keys.active',
-                 'access_keys.last_used_date',
-                 'access_keys.last_used_region',
-                 'access_keys.last_used_service',
-                 'access_keys.last_rotated',
-                 'certs',
-                 'certs.active',
-                 'certs.last_rotated',
-             ]},
+             'title': 'report key to search'},
         value={'$ref': '#/definitions/filters_common/value'},
         op={'$ref': '#/definitions/filters_common/comparison_operators'},
         report_generate={
