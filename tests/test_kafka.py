@@ -280,3 +280,45 @@ class TestKafkaClusterConfiguration(BaseTest):
                             "configuration/foo-config"
                             "72932df0-5080-40d1-b801-49fa8580952b-7"
                             in cluster_configurations.get('Configurations'))
+
+
+class TestKafkaBroker(BaseTest):
+    """Tests for kafka-broker resource using recorded placebo fixtures."""
+
+    def test_kafka_broker_query(self):
+        """Test basic broker enumeration from provisioned cluster."""
+        factory = self.replay_flight_data('test_kafka_broker_query')
+
+        p = self.load_policy({
+            'name': 'kafka-brokers',
+            'resource': 'aws.kafka-broker',
+        }, session_factory=factory)
+
+        resources = p.run()
+        self.assertGreaterEqual(len(resources), 2)
+
+        for r in resources:
+            self.assertIn('BrokerId', r)
+            self.assertIn('c7n:parent-id', r)
+            self.assertIn('ClusterName', r)
+            self.assertIn('ClusterArn', r)
+
+    def test_kafka_broker_metrics(self):
+        """Test metrics filter on kafka brokers."""
+        factory = self.replay_flight_data('test_kafka_broker_metrics')
+
+        p = self.load_policy({
+            'name': 'underutilized-kafka-brokers',
+            'resource': 'aws.kafka-broker',
+            'filters': [
+                {'type': 'metrics',
+                 'name': 'CpuUser',
+                 'days': 14,
+                 'value': 10,
+                 'op': 'less-than'}
+            ]
+        }, session_factory=factory)
+
+        resources = p.run()
+        self.assertEqual(len(resources), 2)
+        self.assertIn('c7n.metrics', resources[0])
