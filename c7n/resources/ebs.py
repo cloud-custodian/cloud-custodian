@@ -1760,10 +1760,15 @@ class ModifyVolume(BaseAction):
 
         for r in resource_set:
             params = {'VolumeId': r['VolumeId']}
-            if piops and ('io1' in (vtype, r['VolumeType']) or
-                          'io2' in (vtype, r['VolumeType'])):
-                # default here if we're changing to io1
-                params['Iops'] = max(int(r.get('Iops', 10) * piops / 100.0), 100)
+            target_type = vtype or r['VolumeType']
+            if piops and target_type in ('io1', 'io2', 'gp3'):
+                if target_type in ('io1', 'io2'):
+                    base_iops = int(r.get('Iops', 10))
+                    min_iops = 100
+                else:  # gp3
+                    base_iops = int(r.get('Iops', 3000))
+                    min_iops = 3000
+                params['Iops'] = max(int(base_iops * piops / 100.0), min_iops)
             if psize:
                 params['Size'] = max(int(r['Size'] * psize / 100.0), 1)
             if vtype:
