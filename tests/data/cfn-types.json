@@ -1260,6 +1260,7 @@
   "AWS::S3Tables::Table",
   "AWS::S3Tables::TableBucket",
   "AWS::S3Tables::TableBucketPolicy",
+  "AWS::SavingsPlans::SavingsPlans",
   "AWS::S3Tables::TablePolicy",
   "AWS::S3Vectors::Index",
   "AWS::S3Vectors::VectorBucket",
