@@ -347,6 +347,7 @@ ResourceMap = {
   "aws.timestream-influxdb-cluster": "c7n.resources.timestream.TimestreamInfluxDBCluster",
   "aws.transfer-server": "c7n.resources.transfer.TransferServer",
   "aws.transfer-user": "c7n.resources.transfer.TransferUser",
+  "aws.transfer-web-app": "c7n.resources.transfer.TransferWebApp",
   "aws.transit-attachment": "c7n.resources.vpc.TransitGatewayAttachment",
   "aws.transit-gateway": "c7n.resources.vpc.TransitGateway",
   "aws.user-pool": "c7n.resources.cognito.CognitoUserPool",
