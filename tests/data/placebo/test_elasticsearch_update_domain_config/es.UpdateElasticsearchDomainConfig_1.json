@@ -1,0 +1,471 @@
+{
+    "status_code": 200,
+    "data": {
+        "ResponseMetadata": {},
+        "DomainConfig": {
+            "ElasticsearchVersion": {
+                "Options": "7.10",
+                "Status": {
+                    "CreationDate": {
+                        "__class__": "datetime",
+                        "year": 2025,
+                        "month": 12,
+                        "day": 31,
+                        "hour": 10,
+                        "minute": 5,
+                        "second": 13,
+                        "microsecond": 99000
+                    },
+                    "UpdateDate": {
+                        "__class__": "datetime",
+                        "year": 2025,
+                        "month": 12,
+                        "day": 31,
+                        "hour": 10,
+                        "minute": 16,
+                        "second": 38,
+                        "microsecond": 893000
+                    },
+                    "UpdateVersion": 9,
+                    "State": "Active",
+                    "PendingDeletion": false
+                }
+            },
+            "ElasticsearchClusterConfig": {
+                "Options": {
+                    "InstanceType": "t3.small.elasticsearch",
+                    "InstanceCount": 1,
+                    "DedicatedMasterEnabled": false,
+                    "ZoneAwarenessEnabled": false,
+                    "WarmEnabled": false,
+                    "ColdStorageOptions": {
+                        "Enabled": false
+                    }
+                },
+                "Status": {
+                    "CreationDate": {
+                        "__class__": "datetime",
+                        "year": 2025,
+                        "month": 12,
+                        "day": 31,
+                        "hour": 10,
+                        "minute": 5,
+                        "second": 13,
+                        "microsecond": 102000
+                    },
+                    "UpdateDate": {
+                        "__class__": "datetime",
+                        "year": 2025,
+                        "month": 12,
+                        "day": 31,
+                        "hour": 10,
+                        "minute": 16,
+                        "second": 38,
+                        "microsecond": 894000
+                    },
+                    "UpdateVersion": 9,
+                    "State": "Active",
+                    "PendingDeletion": false
+                }
+            },
+            "EBSOptions": {
+                "Options": {
+                    "EBSEnabled": true,
+                    "VolumeType": "gp3",
+                    "VolumeSize": 10,
+                    "Iops": 3000,
+                    "Throughput": 125
+                },
+                "Status": {
+                    "CreationDate": {
+                        "__class__": "datetime",
+                        "year": 2025,
+                        "month": 12,
+                        "day": 31,
+                        "hour": 10,
+                        "minute": 5,
+                        "second": 13,
+                        "microsecond": 100000
+                    },
+                    "UpdateDate": {
+                        "__class__": "datetime",
+                        "year": 2025,
+                        "month": 12,
+                        "day": 31,
+                        "hour": 10,
+                        "minute": 16,
+                        "second": 47,
+                        "microsecond": 988000
+                    },
+                    "UpdateVersion": 10,
+                    "State": "Processing",
+                    "PendingDeletion": false
+                }
+            },
+            "AccessPolicies": {
+                "Options": "",
+                "Status": {
+                    "CreationDate": {
+                        "__class__": "datetime",
+                        "year": 2025,
+                        "month": 12,
+                        "day": 31,
+                        "hour": 10,
+                        "minute": 16,
+                        "second": 48,
+                        "microsecond": 231000
+                    },
+                    "UpdateDate": {
+                        "__class__": "datetime",
+                        "year": 2025,
+                        "month": 12,
+                        "day": 31,
+                        "hour": 10,
+                        "minute": 16,
+                        "second": 48,
+                        "microsecond": 231000
+                    },
+                    "UpdateVersion": 10,
+                    "State": "Active",
+                    "PendingDeletion": false
+                }
+            },
+            "SnapshotOptions": {
+                "Options": {
+                    "AutomatedSnapshotStartHour": 0
+                },
+                "Status": {
+                    "CreationDate": {
+                        "__class__": "datetime",
+                        "year": 2025,
+                        "month": 12,
+                        "day": 31,
+                        "hour": 10,
+                        "minute": 5,
+                        "second": 13,
+                        "microsecond": 100000
+                    },
+                    "UpdateDate": {
+                        "__class__": "datetime",
+                        "year": 2025,
+                        "month": 12,
+                        "day": 31,
+                        "hour": 10,
+                        "minute": 16,
+                        "second": 38,
+                        "microsecond": 893000
+                    },
+                    "UpdateVersion": 9,
+                    "State": "Active",
+                    "PendingDeletion": false
+                }
+            },
+            "VPCOptions": {
+                "Options": {},
+                "Status": {
+                    "CreationDate": {
+                        "__class__": "datetime",
+                        "year": 2025,
+                        "month": 12,
+                        "day": 31,
+                        "hour": 10,
+                        "minute": 16,
+                        "second": 48,
+                        "microsecond": 232000
+                    },
+                    "UpdateDate": {
+                        "__class__": "datetime",
+                        "year": 2025,
+                        "month": 12,
+                        "day": 31,
+                        "hour": 10,
+                        "minute": 16,
+                        "second": 48,
+                        "microsecond": 232000
+                    },
+                    "UpdateVersion": 10,
+                    "State": "Active",
+                    "PendingDeletion": false
+                }
+            },
+            "CognitoOptions": {
+                "Options": {
+                    "Enabled": false
+                },
+                "Status": {
+                    "CreationDate": {
+                        "__class__": "datetime",
+                        "year": 2025,
+                        "month": 12,
+                        "day": 31,
+                        "hour": 10,
+                        "minute": 16,
+                        "second": 48,
+                        "microsecond": 232000
+                    },
+                    "UpdateDate": {
+                        "__class__": "datetime",
+                        "year": 2025,
+                        "month": 12,
+                        "day": 31,
+                        "hour": 10,
+                        "minute": 16,
+                        "second": 48,
+                        "microsecond": 232000
+                    },
+                    "UpdateVersion": 10,
+                    "State": "Active",
+                    "PendingDeletion": false
+                }
+            },
+            "EncryptionAtRestOptions": {
+                "Options": {
+                    "Enabled": false
+                },
+                "Status": {
+                    "CreationDate": {
+                        "__class__": "datetime",
+                        "year": 2025,
+                        "month": 12,
+                        "day": 31,
+                        "hour": 10,
+                        "minute": 5,
+                        "second": 13,
+                        "microsecond": 100000
+                    },
+                    "UpdateDate": {
+                        "__class__": "datetime",
+                        "year": 2025,
+                        "month": 12,
+                        "day": 31,
+                        "hour": 10,
+                        "minute": 16,
+                        "second": 38,
+                        "microsecond": 893000
+                    },
+                    "UpdateVersion": 9,
+                    "State": "Active",
+                    "PendingDeletion": false
+                }
+            },
+            "NodeToNodeEncryptionOptions": {
+                "Options": {
+                    "Enabled": false
+                },
+                "Status": {
+                    "CreationDate": {
+                        "__class__": "datetime",
+                        "year": 2025,
+                        "month": 12,
+                        "day": 31,
+                        "hour": 10,
+                        "minute": 5,
+                        "second": 13,
+                        "microsecond": 102000
+                    },
+                    "UpdateDate": {
+                        "__class__": "datetime",
+                        "year": 2025,
+                        "month": 12,
+                        "day": 31,
+                        "hour": 10,
+                        "minute": 16,
+                        "second": 38,
+                        "microsecond": 894000
+                    },
+                    "UpdateVersion": 9,
+                    "State": "Active",
+                    "PendingDeletion": false
+                }
+            },
+            "AdvancedOptions": {
+                "Options": {
+                    "override_main_response_version": "false",
+                    "rest.action.multi.allow_explicit_index": "true"
+                },
+                "Status": {
+                    "CreationDate": {
+                        "__class__": "datetime",
+                        "year": 2025,
+                        "month": 12,
+                        "day": 31,
+                        "hour": 10,
+                        "minute": 5,
+                        "second": 13,
+                        "microsecond": 99000
+                    },
+                    "UpdateDate": {
+                        "__class__": "datetime",
+                        "year": 2025,
+                        "month": 12,
+                        "day": 31,
+                        "hour": 10,
+                        "minute": 16,
+                        "second": 38,
+                        "microsecond": 892000
+                    },
+                    "UpdateVersion": 9,
+                    "State": "Active",
+                    "PendingDeletion": false
+                }
+            },
+            "LogPublishingOptions": {
+                "Options": {},
+                "Status": {
+                    "CreationDate": {
+                        "__class__": "datetime",
+                        "year": 2025,
+                        "month": 12,
+                        "day": 31,
+                        "hour": 10,
+                        "minute": 16,
+                        "second": 48,
+                        "microsecond": 233000
+                    },
+                    "UpdateDate": {
+                        "__class__": "datetime",
+                        "year": 2025,
+                        "month": 12,
+                        "day": 31,
+                        "hour": 10,
+                        "minute": 16,
+                        "second": 48,
+                        "microsecond": 233000
+                    },
+                    "UpdateVersion": 10,
+                    "State": "Active",
+                    "PendingDeletion": false
+                }
+            },
+            "DomainEndpointOptions": {
+                "Options": {
+                    "EnforceHTTPS": false,
+                    "TLSSecurityPolicy": "Policy-Min-TLS-1-2-2019-07",
+                    "CustomEndpointEnabled": false
+                },
+                "Status": {
+                    "CreationDate": {
+                        "__class__": "datetime",
+                        "year": 2025,
+                        "month": 12,
+                        "day": 31,
+                        "hour": 10,
+                        "minute": 5,
+                        "second": 13,
+                        "microsecond": 100000
+                    },
+                    "UpdateDate": {
+                        "__class__": "datetime",
+                        "year": 2025,
+                        "month": 12,
+                        "day": 31,
+                        "hour": 10,
+                        "minute": 16,
+                        "second": 38,
+                        "microsecond": 893000
+                    },
+                    "UpdateVersion": 9,
+                    "State": "Active",
+                    "PendingDeletion": false
+                }
+            },
+            "AdvancedSecurityOptions": {
+                "Options": {
+                    "Enabled": false,
+                    "InternalUserDatabaseEnabled": false,
+                    "AnonymousAuthEnabled": false
+                },
+                "Status": {
+                    "CreationDate": {
+                        "__class__": "datetime",
+                        "year": 2025,
+                        "month": 12,
+                        "day": 31,
+                        "hour": 10,
+                        "minute": 5,
+                        "second": 13,
+                        "microsecond": 99000
+                    },
+                    "UpdateDate": {
+                        "__class__": "datetime",
+                        "year": 2025,
+                        "month": 12,
+                        "day": 31,
+                        "hour": 10,
+                        "minute": 16,
+                        "second": 38,
+                        "microsecond": 893000
+                    },
+                    "UpdateVersion": 9,
+                    "State": "Active",
+                    "PendingDeletion": false
+                }
+            },
+            "AutoTuneOptions": {
+                "Options": {
+                    "DesiredState": "DISABLED",
+                    "RollbackOnDisable": "NO_ROLLBACK",
+                    "MaintenanceSchedules": []
+                },
+                "Status": {
+                    "CreationDate": {
+                        "__class__": "datetime",
+                        "year": 2025,
+                        "month": 12,
+                        "day": 31,
+                        "hour": 10,
+                        "minute": 16,
+                        "second": 48,
+                        "microsecond": 234000
+                    },
+                    "UpdateDate": {
+                        "__class__": "datetime",
+                        "year": 2025,
+                        "month": 12,
+                        "day": 31,
+                        "hour": 10,
+                        "minute": 16,
+                        "second": 48,
+                        "microsecond": 234000
+                    },
+                    "UpdateVersion": 10,
+                    "State": "DISABLED",
+                    "PendingDeletion": false
+                }
+            },
+            "ChangeProgressDetails": {
+                "ChangeId": "56cb5ef2-1a2d-45b0-bd31-40d6b725c6b9",
+                "ConfigChangeStatus": "Pending",
+                "StartTime": {
+                    "__class__": "datetime",
+                    "year": 2025,
+                    "month": 12,
+                    "day": 31,
+                    "hour": 10,
+                    "minute": 16,
+                    "second": 48,
+                    "microsecond": 66000
+                },
+                "LastUpdatedTime": {
+                    "__class__": "datetime",
+                    "year": 2025,
+                    "month": 12,
+                    "day": 31,
+                    "hour": 10,
+                    "minute": 16,
+                    "second": 48,
+                    "microsecond": 66000
+                },
+                "InitiatedBy": "CUSTOMER"
+            },
+            "ModifyingProperties": [
+                {
+                    "Name": "EBSOptions",
+                    "ActiveValue": "{\"EBSEnabled\":true,\"VolumeSize\":10,\"VolumeType\":\"gp2\"}",
+                    "PendingValue": "{\"EBSEnabled\":true,\"Iops\":3000,\"Throughput\":125,\"VolumeSize\":10,\"VolumeType\":\"gp3\"}",
+                    "ValueType": "STRINGIFIED_JSON"
+                }
+            ]
+        }
+    }
+}
