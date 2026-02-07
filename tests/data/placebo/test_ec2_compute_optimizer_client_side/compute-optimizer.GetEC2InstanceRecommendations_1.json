@@ -1,0 +1,17 @@
+{
+    "status_code": 200,
+    "data": {
+        "instanceRecommendations": [
+            {
+                "instanceArn": "arn:aws:ec2:us-east-1:644160558196:instance/i-039b21b80b9602a24",
+                "finding": "UNDER_PROVISIONED"
+            },
+            {
+                "instanceArn": "arn:aws:ec2:us-east-1:644160558196:instance/i-0fd1ec3ac02aa378c",
+                "finding": "OPTIMIZED"
+            }
+        ],
+        "errors": [],
+        "ResponseMetadata": {}
+    }
+}
