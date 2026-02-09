@@ -2887,10 +2887,9 @@ class EndpointVpcFilter(net_filters.VpcFilter):
     RelatedIdsExpression = "VpcId"
 
 
-@VpcEndpoint.filter_registry.register('policy-supported')
-class EndpointPolicySupportedFilter(ValueFilter):
-    """Filter VPC Endpoints based on whether their associated endpoint service
-    supports VPC endpoint resource policies.
+@VpcEndpoint.filter_registry.register('service-details')
+class EndpointServiceDetailsFilter(ValueFilter):
+    """Filter VPC Endpoints based on their associated endpoint service details.
 
     :example:
 
@@ -2900,12 +2899,14 @@ class EndpointPolicySupportedFilter(ValueFilter):
         - name: vpc-endpoints-has-policy-support
           resource: aws.vpc-endpoint
           filters:
-            - type: policy-supported
+            - type: service-details
+              key: VpcEndpointPolicySupported
               value: true
     """
+
     annotation_key = "c7n:ServiceDetails"
     schema = type_schema(
-        "policy-supported",
+        "service-details",
         rinherit=ValueFilter.schema
     )
     permissions = ("ec2:DescribeVpcEndpointServices",)
@@ -2921,13 +2922,7 @@ class EndpointPolicySupportedFilter(ValueFilter):
             service_detail = service_map.get(resource["ServiceName"], {})
             resource[self.annotation_key] = service_detail or {}
 
-            supported = False
-            if service_detail:
-                supported = service_detail.get("VpcEndpointPolicySupported", False)
-
-            resource["VpcEndpointPolicySupported"] = supported
-
-            if self.match(resource):
+            if self.match(resource[self.annotation_key]):
                 results.append(resource)
 
         return results
