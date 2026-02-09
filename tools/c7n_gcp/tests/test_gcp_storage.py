@@ -121,3 +121,31 @@ class BucketTest(BaseTest):
         assert p.resource_manager.get_urns([bucket]) == [
             "gcp:storage::cloud-custodian:bucket/staging.cloud-custodian.appspot.com",
         ]
+
+    def test_bucket_label(self):
+        # Set the "env" label to not the default
+        factory = self.replay_flight_data('bucket-label')
+        p = self.load_policy(
+            {
+                'name': 'bucket-label',
+                'resource': 'gcp.bucket',
+                'filters': [{
+                    'type': 'value',
+                    'key': 'name',
+                    'value': 'c7n-bucket',
+                }],
+                'actions': [
+                    {'type': 'set-labels',
+                     'labels': {'env': 'not-the-default'}}
+                ]
+            },
+            session_factory=factory,
+        )
+        resources = p.run()
+        self.assertEqual(len(resources), 1)
+        self.assertEqual(resources[0]['labels']['env'], 'default')
+
+        # Fetch the dataset manually to confirm the label was changed
+        client = p.resource_manager.get_client()
+        result = client.execute_query('get', {'bucket': 'c7n-bucket'})
+        self.assertEqual(result['labels']['env'], 'not-the-default')

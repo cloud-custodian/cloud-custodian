@@ -41,7 +41,7 @@ class SqlInstance(QueryResourceManager):
                         'instance': resource_info['database_id'].rsplit(':', 1)[-1]})
 
         @staticmethod
-        def get_metric_resource_name(resource):
+        def get_metric_resource_name(resource, metric_key=None):
             return "{}:{}".format(resource["project"], resource["name"])
 
         @staticmethod

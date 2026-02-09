@@ -23,6 +23,8 @@ class Bucket(QueryResourceManager):
         scc_type = "google.cloud.storage.Bucket"
         metric_key = 'resource.labels.bucket_name'
         urn_component = "bucket"
+        labels = True
+        labels_op = 'patch'
 
         @staticmethod
         def get(client, resource_info):
@@ -35,6 +37,10 @@ class Bucket(QueryResourceManager):
                 bucket_name = resource_info["resourceName"].removeprefix(prefix)
 
             return client.execute_command("get", {"bucket": bucket_name})
+
+        @staticmethod
+        def get_label_params(resource, all_labels):
+            return {'bucket': resource['name'], 'body': {'labels': all_labels}}
 
 
 @Bucket.filter_registry.register('iam-policy')
