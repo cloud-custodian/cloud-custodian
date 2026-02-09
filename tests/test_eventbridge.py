@@ -310,3 +310,27 @@ class PipesTest(BaseTest):
         client = factory().client("pipes")
         pipes = client.list_pipes()["Pipes"]
         self.assertEqual(pipes[0]["CurrentState"], "DELETING")
+
+
+class ApiDestinationTest(BaseTest):
+
+    def test_api_destination_query(self):
+        factory = self.replay_flight_data("test_api_destination_query")
+        p = self.load_policy(
+            {
+                "name": "query-api-destinations",
+                "resource": "aws.event-api-destination",
+                "filters": [
+                    {
+                        "type": "value",
+                        "key": "ApiDestinationState",
+                        "value": "ACTIVE"
+                    }
+                ],
+            },
+            session_factory=factory,
+        )
+        resources = p.run()
+        self.assertEqual(len(resources), 1)
+        self.assertEqual(resources[0]["Name"], "test-delete-me")
+        self.assertEqual(resources[0]["ApiDestinationState"], "ACTIVE")
