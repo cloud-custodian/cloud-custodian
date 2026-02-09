@@ -1,0 +1,34 @@
+{
+    "pytest-terraform": 1,
+    "outputs": {},
+    "resources": {
+        "aws_vpc_lattice_service": {
+            "test_service": {
+                "arn": "arn:aws:vpc-lattice:us-east-1:644160558196:service/svc-0123456789abcdef0",
+                "auth_type": "NONE",
+                "id": "svc-0123456789abcdef0",
+                "name": "test-service"
+            }
+        },
+        "aws_vpc_lattice_listener": {
+            "test_listener": {
+                "arn": "arn:aws:vpc-lattice:us-east-1:644160558196:service/svc-0123456789abcdef0/listener/listener-0123456789abcdef0",
+                "id": "listener-0123456789abcdef0",
+                "name": "test-listener",
+                "port": 80,
+                "protocol": "HTTP",
+                "service_identifier": "svc-0123456789abcdef0"
+            }
+        },
+        "aws_vpc_lattice_rule": {
+            "test_rule": {
+                "arn": "arn:aws:vpc-lattice:us-east-1:644160558196:service/svc-0123456789abcdef0/listener/listener-0123456789abcdef0/rule/rule-0123456789abcdef0",
+                "id": "rule-0123456789abcdef0",
+                "listener_identifier": "listener-0123456789abcdef0",
+                "name": "test-rule",
+                "priority": 10,
+                "service_identifier": "svc-0123456789abcdef0"
+            }
+        }
+    }
+}

@@ -3,13 +3,14 @@
 from c7n.filters import ValueFilter
 from c7n.filters.iamaccess import CrossAccountAccessFilter
 from c7n.manager import resources
-from c7n.query import QueryResourceManager, TypeInfo, DescribeWithResourceTags
+from c7n.query import QueryResourceManager, TypeInfo, DescribeWithResourceTags, ResourceQuery
 from c7n.utils import local_session, type_schema
 
 
 @resources.register('vpc-lattice-service-network')
 class VPCLatticeServiceNetwork(QueryResourceManager):
     """VPC Lattice Service Network Resource"""
+
     source_mapping = {
         'describe': DescribeWithResourceTags,
     }
@@ -28,6 +29,7 @@ class VPCLatticeServiceNetwork(QueryResourceManager):
 @resources.register('vpc-lattice-service')
 class VPCLatticeService(QueryResourceManager):
     """VPC Lattice Service Resource"""
+
     source_mapping = {
         'describe': DescribeWithResourceTags,
     }
@@ -43,13 +45,14 @@ class VPCLatticeService(QueryResourceManager):
         permissions_enum = ('vpc-lattice:ListServices',)
         permissions_augment = (
             'vpc-lattice:GetService',
-            'vpc-lattice:ListTagsForResource'
+            'vpc-lattice:ListTagsForResource',
         )
 
 
 @resources.register('vpc-lattice-target-group')
 class VPCLatticeTargetGroup(QueryResourceManager):
     """VPC Lattice Target Group Resource"""
+
     source_mapping = {
         'describe': DescribeWithResourceTags,
     }
@@ -65,8 +68,117 @@ class VPCLatticeTargetGroup(QueryResourceManager):
         permissions_enum = ('vpc-lattice:ListTargetGroups',)
         permissions_augment = (
             'vpc-lattice:GetTargetGroup',
-            'vpc-lattice:ListTagsForResource'
+            'vpc-lattice:ListTagsForResource',
         )
+
+
+class VPCLatticeRuleQuery(ResourceQuery):
+    def filter(self, resource_manager, **params):
+        m = self.resolve(resource_manager.resource_type)
+        if resource_manager.get_client:
+            client = resource_manager.get_client()
+        else:
+            client = local_session(self.session_factory).client(
+                m.service, resource_manager.config.region
+            )
+
+        service_id = params.get('serviceIdentifier')
+        listener_id = params.get('listenerIdentifier')
+
+        if service_id and listener_id:
+            rules = (
+                self._invoke_client_enum(
+                    client,
+                    'list_rules',
+                    {'serviceIdentifier': service_id, 'listenerIdentifier': listener_id},
+                    'items',
+                    retry=getattr(resource_manager, 'retry', None),
+                )
+                or []
+            )
+            for rule in rules:
+                rule['serviceIdentifier'] = service_id
+                rule['listenerIdentifier'] = listener_id
+            return rules
+
+        if service_id:
+            services = [{'id': service_id}]
+        else:
+            services = (
+                self._invoke_client_enum(
+                    client,
+                    'list_services',
+                    {},
+                    'items',
+                    retry=getattr(resource_manager, 'retry', None),
+                )
+                or []
+            )
+
+        results = []
+        for service in services:
+            current_service_id = service.get('id') or service.get('arn')
+            if not current_service_id:
+                continue
+            listeners = (
+                self._invoke_client_enum(
+                    client,
+                    'list_listeners',
+                    {'serviceIdentifier': current_service_id},
+                    'items',
+                    retry=getattr(resource_manager, 'retry', None),
+                )
+                or []
+            )
+            for listener in listeners:
+                current_listener_id = listener.get('id') or listener.get('arn')
+                if not current_listener_id:
+                    continue
+                rules = (
+                    self._invoke_client_enum(
+                        client,
+                        'list_rules',
+                        {
+                            'serviceIdentifier': current_service_id,
+                            'listenerIdentifier': current_listener_id,
+                        },
+                        'items',
+                        retry=getattr(resource_manager, 'retry', None),
+                    )
+                    or []
+                )
+                for rule in rules:
+                    rule['serviceIdentifier'] = current_service_id
+                    rule['listenerIdentifier'] = current_listener_id
+                results.extend(rules)
+        return results
+
+
+class VPCLatticeRuleSource(DescribeWithResourceTags):
+    resource_query_factory = VPCLatticeRuleQuery
+
+
+@resources.register('vpc-lattice-rule')
+class VPCLatticeRule(QueryResourceManager):
+    """VPC Lattice Rule Resource"""
+
+    source_mapping = {
+        'describe': VPCLatticeRuleSource,
+    }
+
+    class resource_type(TypeInfo):
+        service = 'vpc-lattice'
+        enum_spec = ('list_rules', 'items', None)
+        arn = 'arn'
+        id = 'id'
+        name = 'name'
+        universal_taggable = object()
+        permissions_enum = (
+            'vpc-lattice:ListRules',
+            'vpc-lattice:ListListeners',
+            'vpc-lattice:ListServices',
+        )
+        permissions_augment = ('vpc-lattice:ListTagsForResource',)
 
 
 @VPCLatticeServiceNetwork.filter_registry.register('access-logs')
@@ -84,7 +196,7 @@ class AccessLogsFilter(ValueFilter):
                 log_subs = self.manager.retry(
                     client.list_access_log_subscriptions,
                     resourceIdentifier=r['arn'],
-                    ignore_err_codes=('ResourceNotFoundException',)
+                    ignore_err_codes=('ResourceNotFoundException',),
                 )
                 r['AccessLogSubscriptions'] = log_subs.get('items', []) if log_subs else []
 
@@ -108,7 +220,7 @@ class LatticeAuthPolicyFilter(CrossAccountAccessFilter):
         result = self.manager.retry(
             client.get_auth_policy,
             resourceIdentifier=r['arn'],
-            ignore_err_codes=('ResourceNotFoundException',)
+            ignore_err_codes=('ResourceNotFoundException',),
         )
 
         if result and result.get('policy'):

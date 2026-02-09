@@ -1,10 +1,13 @@
 # Copyright The Cloud Custodian Authors.
 # SPDX-License-Identifier: Apache-2.0
+import time
+
+from pytest_terraform import terraform
+
 from .common import BaseTest
 
 
 class VPCLatticeServiceNetworkTests(BaseTest):
-
     def test_service_network_cross_account(self):
         """Test cross-account access via auth policy."""
         session_factory = self.replay_flight_data("test_lattice_network_cross_account")
@@ -196,3 +199,29 @@ class VPCLatticeTargetGroupTests(BaseTest):
         )
         resources = p.run()
         self.assertEqual(len(resources), 1)
+
+
+@terraform('vpc_lattice_rule')
+def test_lattice_rule_query(test, vpc_lattice_rule):
+    session_factory = test.replay_flight_data("test_lattice_rule_query")
+    rule_arn = vpc_lattice_rule["aws_vpc_lattice_rule.test_rule.arn"]
+    service_id = vpc_lattice_rule["aws_vpc_lattice_service.test_service.id"]
+    listener_id = vpc_lattice_rule["aws_vpc_lattice_listener.test_listener.id"]
+
+    p = test.load_policy(
+        {
+            "name": "lattice-rule-query",
+            "resource": "aws.vpc-lattice-rule",
+            "filters": [{"name": "test-rule"}],
+        },
+        session_factory=session_factory,
+    )
+
+    if test.recording:
+        time.sleep(10)
+
+    resources = p.run()
+    assert len(resources) == 1
+    assert resources[0]["arn"] == rule_arn
+    assert resources[0]["serviceIdentifier"] == service_id
+    assert resources[0]["listenerIdentifier"] == listener_id
