@@ -1,0 +1,174 @@
+{
+    "status_code": 200,
+    "data": {
+        "ResponseMetadata": {},
+        "modelSummaries": [
+            {
+                "modelArn": "arn:aws:bedrock:us-east-1::foundation-model/amazon.nova-2-lite-v1:0:256k",
+                "modelId": "amazon.nova-2-lite-v1:0:256k",
+                "modelName": "Nova 2 Lite",
+                "providerName": "Amazon",
+                "inputModalities": [
+                    "TEXT",
+                    "IMAGE",
+                    "VIDEO"
+                ],
+                "outputModalities": [
+                    "TEXT"
+                ],
+                "responseStreamingSupported": true,
+                "customizationsSupported": [
+                    "FINE_TUNING"
+                ],
+                "inferenceTypesSupported": [
+                    "PROVISIONED"
+                ],
+                "modelLifecycle": {
+                    "status": "ACTIVE"
+                }
+            },
+            {
+                "modelArn": "arn:aws:bedrock:us-east-1::foundation-model/amazon.titan-image-generator-v2:0",
+                "modelId": "amazon.titan-image-generator-v2:0",
+                "modelName": "Titan Image Generator G1 v2",
+                "providerName": "Amazon",
+                "inputModalities": [
+                    "TEXT",
+                    "IMAGE"
+                ],
+                "outputModalities": [
+                    "IMAGE"
+                ],
+                "customizationsSupported": [
+                    "FINE_TUNING"
+                ],
+                "inferenceTypesSupported": [
+                    "PROVISIONED",
+                    "ON_DEMAND"
+                ],
+                "modelLifecycle": {
+                    "status": "ACTIVE"
+                }
+            },
+            {
+                "modelArn": "arn:aws:bedrock:us-east-1::foundation-model/amazon.nova-pro-v1:0:300k",
+                "modelId": "amazon.nova-pro-v1:0:300k",
+                "modelName": "Nova Pro",
+                "providerName": "Amazon",
+                "inputModalities": [
+                    "TEXT",
+                    "IMAGE",
+                    "VIDEO"
+                ],
+                "outputModalities": [
+                    "TEXT"
+                ],
+                "responseStreamingSupported": true,
+                "customizationsSupported": [
+                    "FINE_TUNING",
+                    "DISTILLATION"
+                ],
+                "inferenceTypesSupported": [
+                    "PROVISIONED"
+                ],
+                "modelLifecycle": {
+                    "status": "ACTIVE"
+                }
+            },
+            {
+                "modelArn": "arn:aws:bedrock:us-east-1::foundation-model/amazon.nova-lite-v1:0:300k",
+                "modelId": "amazon.nova-lite-v1:0:300k",
+                "modelName": "Nova Lite",
+                "providerName": "Amazon",
+                "inputModalities": [
+                    "TEXT",
+                    "IMAGE",
+                    "VIDEO"
+                ],
+                "outputModalities": [
+                    "TEXT"
+                ],
+                "responseStreamingSupported": true,
+                "customizationsSupported": [
+                    "FINE_TUNING",
+                    "DISTILLATION"
+                ],
+                "inferenceTypesSupported": [
+                    "PROVISIONED"
+                ],
+                "modelLifecycle": {
+                    "status": "ACTIVE"
+                }
+            },
+            {
+                "modelArn": "arn:aws:bedrock:us-east-1::foundation-model/amazon.nova-canvas-v1:0",
+                "modelId": "amazon.nova-canvas-v1:0",
+                "modelName": "Nova Canvas",
+                "providerName": "Amazon",
+                "inputModalities": [
+                    "TEXT",
+                    "IMAGE"
+                ],
+                "outputModalities": [
+                    "IMAGE"
+                ],
+                "responseStreamingSupported": false,
+                "customizationsSupported": [
+                    "FINE_TUNING"
+                ],
+                "inferenceTypesSupported": [
+                    "ON_DEMAND",
+                    "PROVISIONED"
+                ],
+                "modelLifecycle": {
+                    "status": "ACTIVE"
+                }
+            },
+            {
+                "modelArn": "arn:aws:bedrock:us-east-1::foundation-model/amazon.nova-micro-v1:0:128k",
+                "modelId": "amazon.nova-micro-v1:0:128k",
+                "modelName": "Nova Micro",
+                "providerName": "Amazon",
+                "inputModalities": [
+                    "TEXT"
+                ],
+                "outputModalities": [
+                    "TEXT"
+                ],
+                "responseStreamingSupported": true,
+                "customizationsSupported": [
+                    "FINE_TUNING",
+                    "DISTILLATION"
+                ],
+                "inferenceTypesSupported": [
+                    "PROVISIONED"
+                ],
+                "modelLifecycle": {
+                    "status": "ACTIVE"
+                }
+            },
+            {
+                "modelArn": "arn:aws:bedrock:us-east-1::foundation-model/amazon.titan-embed-image-v1:0",
+                "modelId": "amazon.titan-embed-image-v1:0",
+                "modelName": "Titan Multimodal Embeddings G1",
+                "providerName": "Amazon",
+                "inputModalities": [
+                    "TEXT",
+                    "IMAGE"
+                ],
+                "outputModalities": [
+                    "EMBEDDING"
+                ],
+                "customizationsSupported": [
+                    "FINE_TUNING"
+                ],
+                "inferenceTypesSupported": [
+                    "PROVISIONED"
+                ],
+                "modelLifecycle": {
+                    "status": "ACTIVE"
+                }
+            }
+        ]
+    }
+}
