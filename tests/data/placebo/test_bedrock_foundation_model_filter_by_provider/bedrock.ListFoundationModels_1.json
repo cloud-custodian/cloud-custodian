@@ -1,0 +1,673 @@
+{
+    "status_code": 200,
+    "data": {
+        "ResponseMetadata": {},
+        "modelSummaries": [
+            {
+                "modelArn": "arn:aws:bedrock:us-east-1::foundation-model/amazon.nova-2-multimodal-embeddings-v1:0",
+                "modelId": "amazon.nova-2-multimodal-embeddings-v1:0",
+                "modelName": "Amazon Nova Multimodal Embeddings",
+                "providerName": "Amazon",
+                "inputModalities": [
+                    "TEXT",
+                    "IMAGE",
+                    "AUDIO",
+                    "VIDEO"
+                ],
+                "outputModalities": [
+                    "EMBEDDING"
+                ],
+                "responseStreamingSupported": false,
+                "customizationsSupported": [],
+                "inferenceTypesSupported": [
+                    "ON_DEMAND"
+                ],
+                "modelLifecycle": {
+                    "status": "ACTIVE"
+                }
+            },
+            {
+                "modelArn": "arn:aws:bedrock:us-east-1::foundation-model/amazon.nova-pro-v1:0",
+                "modelId": "amazon.nova-pro-v1:0",
+                "modelName": "Nova Pro",
+                "providerName": "Amazon",
+                "inputModalities": [
+                    "TEXT",
+                    "IMAGE",
+                    "VIDEO"
+                ],
+                "outputModalities": [
+                    "TEXT"
+                ],
+                "responseStreamingSupported": true,
+                "customizationsSupported": [],
+                "inferenceTypesSupported": [
+                    "ON_DEMAND",
+                    "INFERENCE_PROFILE"
+                ],
+                "modelLifecycle": {
+                    "status": "ACTIVE"
+                }
+            },
+            {
+                "modelArn": "arn:aws:bedrock:us-east-1::foundation-model/amazon.nova-2-lite-v1:0",
+                "modelId": "amazon.nova-2-lite-v1:0",
+                "modelName": "Nova 2 Lite",
+                "providerName": "Amazon",
+                "inputModalities": [
+                    "TEXT",
+                    "IMAGE",
+                    "VIDEO"
+                ],
+                "outputModalities": [
+                    "TEXT"
+                ],
+                "responseStreamingSupported": true,
+                "customizationsSupported": [],
+                "inferenceTypesSupported": [
+                    "INFERENCE_PROFILE"
+                ],
+                "modelLifecycle": {
+                    "status": "ACTIVE"
+                }
+            },
+            {
+                "modelArn": "arn:aws:bedrock:us-east-1::foundation-model/amazon.nova-2-lite-v1:0:256k",
+                "modelId": "amazon.nova-2-lite-v1:0:256k",
+                "modelName": "Nova 2 Lite",
+                "providerName": "Amazon",
+                "inputModalities": [
+                    "TEXT",
+                    "IMAGE",
+                    "VIDEO"
+                ],
+                "outputModalities": [
+                    "TEXT"
+                ],
+                "responseStreamingSupported": true,
+                "customizationsSupported": [
+                    "FINE_TUNING"
+                ],
+                "inferenceTypesSupported": [
+                    "PROVISIONED"
+                ],
+                "modelLifecycle": {
+                    "status": "ACTIVE"
+                }
+            },
+            {
+                "modelArn": "arn:aws:bedrock:us-east-1::foundation-model/amazon.nova-2-sonic-v1:0",
+                "modelId": "amazon.nova-2-sonic-v1:0",
+                "modelName": "Nova 2 Sonic",
+                "providerName": "Amazon",
+                "inputModalities": [
+                    "SPEECH"
+                ],
+                "outputModalities": [
+                    "SPEECH",
+                    "TEXT"
+                ],
+                "responseStreamingSupported": true,
+                "customizationsSupported": [],
+                "inferenceTypesSupported": [
+                    "ON_DEMAND"
+                ],
+                "modelLifecycle": {
+                    "status": "ACTIVE"
+                }
+            },
+            {
+                "modelArn": "arn:aws:bedrock:us-east-1::foundation-model/amazon.titan-tg1-large",
+                "modelId": "amazon.titan-tg1-large",
+                "modelName": "Titan Text Large",
+                "providerName": "Amazon",
+                "inputModalities": [
+                    "TEXT"
+                ],
+                "outputModalities": [
+                    "TEXT"
+                ],
+                "responseStreamingSupported": true,
+                "customizationsSupported": [],
+                "inferenceTypesSupported": [
+                    "ON_DEMAND"
+                ],
+                "modelLifecycle": {
+                    "status": "ACTIVE"
+                }
+            },
+            {
+                "modelArn": "arn:aws:bedrock:us-east-1::foundation-model/amazon.titan-image-generator-v2:0",
+                "modelId": "amazon.titan-image-generator-v2:0",
+                "modelName": "Titan Image Generator G1 v2",
+                "providerName": "Amazon",
+                "inputModalities": [
+                    "TEXT",
+                    "IMAGE"
+                ],
+                "outputModalities": [
+                    "IMAGE"
+                ],
+                "customizationsSupported": [
+                    "FINE_TUNING"
+                ],
+                "inferenceTypesSupported": [
+                    "PROVISIONED",
+                    "ON_DEMAND"
+                ],
+                "modelLifecycle": {
+                    "status": "ACTIVE"
+                }
+            },
+            {
+                "modelArn": "arn:aws:bedrock:us-east-1::foundation-model/amazon.nova-premier-v1:0:8k",
+                "modelId": "amazon.nova-premier-v1:0:8k",
+                "modelName": "Nova Premier",
+                "providerName": "Amazon",
+                "inputModalities": [
+                    "TEXT",
+                    "IMAGE",
+                    "VIDEO"
+                ],
+                "outputModalities": [
+                    "TEXT"
+                ],
+                "responseStreamingSupported": true,
+                "customizationsSupported": [],
+                "inferenceTypesSupported": [],
+                "modelLifecycle": {
+                    "status": "ACTIVE"
+                }
+            },
+            {
+                "modelArn": "arn:aws:bedrock:us-east-1::foundation-model/amazon.nova-premier-v1:0:20k",
+                "modelId": "amazon.nova-premier-v1:0:20k",
+                "modelName": "Nova Premier",
+                "providerName": "Amazon",
+                "inputModalities": [
+                    "TEXT",
+                    "IMAGE",
+                    "VIDEO"
+                ],
+                "outputModalities": [
+                    "TEXT"
+                ],
+                "responseStreamingSupported": true,
+                "customizationsSupported": [],
+                "inferenceTypesSupported": [],
+                "modelLifecycle": {
+                    "status": "ACTIVE"
+                }
+            },
+            {
+                "modelArn": "arn:aws:bedrock:us-east-1::foundation-model/amazon.nova-premier-v1:0:1000k",
+                "modelId": "amazon.nova-premier-v1:0:1000k",
+                "modelName": "Nova Premier",
+                "providerName": "Amazon",
+                "inputModalities": [
+                    "TEXT",
+                    "IMAGE",
+                    "VIDEO"
+                ],
+                "outputModalities": [
+                    "TEXT"
+                ],
+                "responseStreamingSupported": true,
+                "customizationsSupported": [],
+                "inferenceTypesSupported": [],
+                "modelLifecycle": {
+                    "status": "ACTIVE"
+                }
+            },
+            {
+                "modelArn": "arn:aws:bedrock:us-east-1::foundation-model/amazon.nova-premier-v1:0:mm",
+                "modelId": "amazon.nova-premier-v1:0:mm",
+                "modelName": "Nova Premier",
+                "providerName": "Amazon",
+                "inputModalities": [
+                    "TEXT",
+                    "IMAGE",
+                    "VIDEO"
+                ],
+                "outputModalities": [
+                    "TEXT"
+                ],
+                "responseStreamingSupported": true,
+                "customizationsSupported": [],
+                "inferenceTypesSupported": [],
+                "modelLifecycle": {
+                    "status": "ACTIVE"
+                }
+            },
+            {
+                "modelArn": "arn:aws:bedrock:us-east-1::foundation-model/amazon.nova-premier-v1:0",
+                "modelId": "amazon.nova-premier-v1:0",
+                "modelName": "Nova Premier",
+                "providerName": "Amazon",
+                "inputModalities": [
+                    "TEXT",
+                    "IMAGE",
+                    "VIDEO"
+                ],
+                "outputModalities": [
+                    "TEXT"
+                ],
+                "responseStreamingSupported": true,
+                "customizationsSupported": [],
+                "inferenceTypesSupported": [
+                    "INFERENCE_PROFILE"
+                ],
+                "modelLifecycle": {
+                    "status": "ACTIVE"
+                }
+            },
+            {
+                "modelArn": "arn:aws:bedrock:us-east-1::foundation-model/amazon.nova-pro-v1:0:24k",
+                "modelId": "amazon.nova-pro-v1:0:24k",
+                "modelName": "Nova Pro",
+                "providerName": "Amazon",
+                "inputModalities": [
+                    "TEXT",
+                    "IMAGE",
+                    "VIDEO"
+                ],
+                "outputModalities": [
+                    "TEXT"
+                ],
+                "responseStreamingSupported": true,
+                "customizationsSupported": [],
+                "inferenceTypesSupported": [
+                    "PROVISIONED"
+                ],
+                "modelLifecycle": {
+                    "status": "ACTIVE"
+                }
+            },
+            {
+                "modelArn": "arn:aws:bedrock:us-east-1::foundation-model/amazon.nova-pro-v1:0:300k",
+                "modelId": "amazon.nova-pro-v1:0:300k",
+                "modelName": "Nova Pro",
+                "providerName": "Amazon",
+                "inputModalities": [
+                    "TEXT",
+                    "IMAGE",
+                    "VIDEO"
+                ],
+                "outputModalities": [
+                    "TEXT"
+                ],
+                "responseStreamingSupported": true,
+                "customizationsSupported": [
+                    "FINE_TUNING",
+                    "DISTILLATION"
+                ],
+                "inferenceTypesSupported": [
+                    "PROVISIONED"
+                ],
+                "modelLifecycle": {
+                    "status": "ACTIVE"
+                }
+            },
+            {
+                "modelArn": "arn:aws:bedrock:us-east-1::foundation-model/amazon.nova-lite-v1:0:24k",
+                "modelId": "amazon.nova-lite-v1:0:24k",
+                "modelName": "Nova Lite",
+                "providerName": "Amazon",
+                "inputModalities": [
+                    "TEXT",
+                    "IMAGE",
+                    "VIDEO"
+                ],
+                "outputModalities": [
+                    "TEXT"
+                ],
+                "responseStreamingSupported": true,
+                "customizationsSupported": [],
+                "inferenceTypesSupported": [
+                    "PROVISIONED"
+                ],
+                "modelLifecycle": {
+                    "status": "ACTIVE"
+                }
+            },
+            {
+                "modelArn": "arn:aws:bedrock:us-east-1::foundation-model/amazon.nova-lite-v1:0:300k",
+                "modelId": "amazon.nova-lite-v1:0:300k",
+                "modelName": "Nova Lite",
+                "providerName": "Amazon",
+                "inputModalities": [
+                    "TEXT",
+                    "IMAGE",
+                    "VIDEO"
+                ],
+                "outputModalities": [
+                    "TEXT"
+                ],
+                "responseStreamingSupported": true,
+                "customizationsSupported": [
+                    "FINE_TUNING",
+                    "DISTILLATION"
+                ],
+                "inferenceTypesSupported": [
+                    "PROVISIONED"
+                ],
+                "modelLifecycle": {
+                    "status": "ACTIVE"
+                }
+            },
+            {
+                "modelArn": "arn:aws:bedrock:us-east-1::foundation-model/amazon.nova-lite-v1:0",
+                "modelId": "amazon.nova-lite-v1:0",
+                "modelName": "Nova Lite",
+                "providerName": "Amazon",
+                "inputModalities": [
+                    "TEXT",
+                    "IMAGE",
+                    "VIDEO"
+                ],
+                "outputModalities": [
+                    "TEXT"
+                ],
+                "responseStreamingSupported": true,
+                "customizationsSupported": [],
+                "inferenceTypesSupported": [
+                    "ON_DEMAND",
+                    "INFERENCE_PROFILE"
+                ],
+                "modelLifecycle": {
+                    "status": "ACTIVE"
+                }
+            },
+            {
+                "modelArn": "arn:aws:bedrock:us-east-1::foundation-model/amazon.nova-canvas-v1:0",
+                "modelId": "amazon.nova-canvas-v1:0",
+                "modelName": "Nova Canvas",
+                "providerName": "Amazon",
+                "inputModalities": [
+                    "TEXT",
+                    "IMAGE"
+                ],
+                "outputModalities": [
+                    "IMAGE"
+                ],
+                "responseStreamingSupported": false,
+                "customizationsSupported": [
+                    "FINE_TUNING"
+                ],
+                "inferenceTypesSupported": [
+                    "ON_DEMAND",
+                    "PROVISIONED"
+                ],
+                "modelLifecycle": {
+                    "status": "ACTIVE"
+                }
+            },
+            {
+                "modelArn": "arn:aws:bedrock:us-east-1::foundation-model/amazon.nova-reel-v1:0",
+                "modelId": "amazon.nova-reel-v1:0",
+                "modelName": "Nova Reel",
+                "providerName": "Amazon",
+                "inputModalities": [
+                    "TEXT",
+                    "IMAGE"
+                ],
+                "outputModalities": [
+                    "VIDEO"
+                ],
+                "responseStreamingSupported": false,
+                "customizationsSupported": [],
+                "inferenceTypesSupported": [
+                    "ON_DEMAND"
+                ],
+                "modelLifecycle": {
+                    "status": "ACTIVE"
+                }
+            },
+            {
+                "modelArn": "arn:aws:bedrock:us-east-1::foundation-model/amazon.nova-reel-v1:1",
+                "modelId": "amazon.nova-reel-v1:1",
+                "modelName": "Nova Reel",
+                "providerName": "Amazon",
+                "inputModalities": [
+                    "TEXT",
+                    "IMAGE"
+                ],
+                "outputModalities": [
+                    "VIDEO"
+                ],
+                "responseStreamingSupported": false,
+                "customizationsSupported": [],
+                "inferenceTypesSupported": [
+                    "ON_DEMAND"
+                ],
+                "modelLifecycle": {
+                    "status": "ACTIVE"
+                }
+            },
+            {
+                "modelArn": "arn:aws:bedrock:us-east-1::foundation-model/amazon.nova-micro-v1:0:24k",
+                "modelId": "amazon.nova-micro-v1:0:24k",
+                "modelName": "Nova Micro",
+                "providerName": "Amazon",
+                "inputModalities": [
+                    "TEXT"
+                ],
+                "outputModalities": [
+                    "TEXT"
+                ],
+                "responseStreamingSupported": true,
+                "customizationsSupported": [],
+                "inferenceTypesSupported": [
+                    "PROVISIONED"
+                ],
+                "modelLifecycle": {
+                    "status": "ACTIVE"
+                }
+            },
+            {
+                "modelArn": "arn:aws:bedrock:us-east-1::foundation-model/amazon.nova-micro-v1:0:128k",
+                "modelId": "amazon.nova-micro-v1:0:128k",
+                "modelName": "Nova Micro",
+                "providerName": "Amazon",
+                "inputModalities": [
+                    "TEXT"
+                ],
+                "outputModalities": [
+                    "TEXT"
+                ],
+                "responseStreamingSupported": true,
+                "customizationsSupported": [
+                    "FINE_TUNING",
+                    "DISTILLATION"
+                ],
+                "inferenceTypesSupported": [
+                    "PROVISIONED"
+                ],
+                "modelLifecycle": {
+                    "status": "ACTIVE"
+                }
+            },
+            {
+                "modelArn": "arn:aws:bedrock:us-east-1::foundation-model/amazon.nova-micro-v1:0",
+                "modelId": "amazon.nova-micro-v1:0",
+                "modelName": "Nova Micro",
+                "providerName": "Amazon",
+                "inputModalities": [
+                    "TEXT"
+                ],
+                "outputModalities": [
+                    "TEXT"
+                ],
+                "responseStreamingSupported": true,
+                "customizationsSupported": [],
+                "inferenceTypesSupported": [
+                    "ON_DEMAND",
+                    "INFERENCE_PROFILE"
+                ],
+                "modelLifecycle": {
+                    "status": "ACTIVE"
+                }
+            },
+            {
+                "modelArn": "arn:aws:bedrock:us-east-1::foundation-model/amazon.nova-sonic-v1:0",
+                "modelId": "amazon.nova-sonic-v1:0",
+                "modelName": "Nova Sonic",
+                "providerName": "Amazon",
+                "inputModalities": [
+                    "SPEECH"
+                ],
+                "outputModalities": [
+                    "SPEECH",
+                    "TEXT"
+                ],
+                "responseStreamingSupported": true,
+                "customizationsSupported": [],
+                "inferenceTypesSupported": [
+                    "ON_DEMAND"
+                ],
+                "modelLifecycle": {
+                    "status": "ACTIVE"
+                }
+            },
+            {
+                "modelArn": "arn:aws:bedrock:us-east-1::foundation-model/amazon.titan-embed-g1-text-02",
+                "modelId": "amazon.titan-embed-g1-text-02",
+                "modelName": "Titan Text Embeddings v2",
+                "providerName": "Amazon",
+                "inputModalities": [
+                    "TEXT"
+                ],
+                "outputModalities": [
+                    "EMBEDDING"
+                ],
+                "customizationsSupported": [],
+                "inferenceTypesSupported": [
+                    "ON_DEMAND"
+                ],
+                "modelLifecycle": {
+                    "status": "ACTIVE"
+                }
+            },
+            {
+                "modelArn": "arn:aws:bedrock:us-east-1::foundation-model/amazon.titan-embed-text-v1:2:8k",
+                "modelId": "amazon.titan-embed-text-v1:2:8k",
+                "modelName": "Titan Embeddings G1 - Text",
+                "providerName": "Amazon",
+                "inputModalities": [
+                    "TEXT"
+                ],
+                "outputModalities": [
+                    "EMBEDDING"
+                ],
+                "responseStreamingSupported": false,
+                "customizationsSupported": [],
+                "inferenceTypesSupported": [
+                    "PROVISIONED"
+                ],
+                "modelLifecycle": {
+                    "status": "ACTIVE"
+                }
+            },
+            {
+                "modelArn": "arn:aws:bedrock:us-east-1::foundation-model/amazon.titan-embed-text-v1",
+                "modelId": "amazon.titan-embed-text-v1",
+                "modelName": "Titan Embeddings G1 - Text",
+                "providerName": "Amazon",
+                "inputModalities": [
+                    "TEXT"
+                ],
+                "outputModalities": [
+                    "EMBEDDING"
+                ],
+                "responseStreamingSupported": false,
+                "customizationsSupported": [],
+                "inferenceTypesSupported": [
+                    "ON_DEMAND"
+                ],
+                "modelLifecycle": {
+                    "status": "ACTIVE"
+                }
+            },
+            {
+                "modelArn": "arn:aws:bedrock:us-east-1::foundation-model/amazon.titan-embed-text-v2:0:8k",
+                "modelId": "amazon.titan-embed-text-v2:0:8k",
+                "modelName": "Titan Text Embeddings V2",
+                "providerName": "Amazon",
+                "inputModalities": [
+                    "TEXT"
+                ],
+                "outputModalities": [
+                    "EMBEDDING"
+                ],
+                "responseStreamingSupported": false,
+                "customizationsSupported": [],
+                "inferenceTypesSupported": [],
+                "modelLifecycle": {
+                    "status": "ACTIVE"
+                }
+            },
+            {
+                "modelArn": "arn:aws:bedrock:us-east-1::foundation-model/amazon.titan-embed-text-v2:0",
+                "modelId": "amazon.titan-embed-text-v2:0",
+                "modelName": "Titan Text Embeddings V2",
+                "providerName": "Amazon",
+                "inputModalities": [
+                    "TEXT"
+                ],
+                "outputModalities": [
+                    "EMBEDDING"
+                ],
+                "responseStreamingSupported": false,
+                "customizationsSupported": [],
+                "inferenceTypesSupported": [
+                    "ON_DEMAND"
+                ],
+                "modelLifecycle": {
+                    "status": "ACTIVE"
+                }
+            },
+            {
+                "modelArn": "arn:aws:bedrock:us-east-1::foundation-model/amazon.titan-embed-image-v1:0",
+                "modelId": "amazon.titan-embed-image-v1:0",
+                "modelName": "Titan Multimodal Embeddings G1",
+                "providerName": "Amazon",
+                "inputModalities": [
+                    "TEXT",
+                    "IMAGE"
+                ],
+                "outputModalities": [
+                    "EMBEDDING"
+                ],
+                "customizationsSupported": [
+                    "FINE_TUNING"
+                ],
+                "inferenceTypesSupported": [
+                    "PROVISIONED"
+                ],
+                "modelLifecycle": {
+                    "status": "ACTIVE"
+                }
+            },
+            {
+                "modelArn": "arn:aws:bedrock:us-east-1::foundation-model/amazon.titan-embed-image-v1",
+                "modelId": "amazon.titan-embed-image-v1",
+                "modelName": "Titan Multimodal Embeddings G1",
+                "providerName": "Amazon",
+                "inputModalities": [
+                    "TEXT",
+                    "IMAGE"
+                ],
+                "outputModalities": [
+                    "EMBEDDING"
+                ],
+                "customizationsSupported": [],
+                "inferenceTypesSupported": [
+                    "ON_DEMAND"
+                ],
+                "modelLifecycle": {
+                    "status": "ACTIVE"
+                }
+            }
+        ]
+    }
+}

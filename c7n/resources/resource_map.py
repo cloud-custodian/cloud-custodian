@@ -36,6 +36,7 @@ ResourceMap = {
   "aws.batch-queue": "c7n.resources.batch.BatchJobQueue",
   "aws.bedrock-agent": "c7n.resources.bedrock.BedrockAgent",
   "aws.bedrock-custom-model": "c7n.resources.bedrock.BedrockCustomModel",
+  "aws.bedrock-foundation-model": "c7n.resources.bedrock.BedrockFoundationModel",
   "aws.bedrock-knowledge-base": "c7n.resources.bedrock.BedrockKnowledgeBase",
   "aws.budget": "c7n.resources.budgets.Budget",
   "aws.cache-cluster": "c7n.resources.elasticache.ElastiCacheCluster",

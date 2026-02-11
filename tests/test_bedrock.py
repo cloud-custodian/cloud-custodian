@@ -4,6 +4,132 @@ from .common import BaseTest, event_data
 from botocore.exceptions import ClientError
 
 
+class BedrockFoundationModel(BaseTest):
+
+    def test_bedrock_foundation_model_query(self):
+        session_factory = self.replay_flight_data('test_bedrock_foundation_model_query')
+        p = self.load_policy(
+            {
+                'name': 'bedrock-foundation-model-query',
+                'resource': 'bedrock-foundation-model',
+            },
+            session_factory=session_factory
+        )
+        resources = p.run()
+        self.assertGreater(len(resources), 0)
+        # Verify expected fields are present
+        model = resources[0]
+        self.assertIn('modelId', model)
+        self.assertIn('modelArn', model)
+        self.assertIn('modelName', model)
+        self.assertIn('providerName', model)
+        self.assertIn('inputModalities', model)
+        self.assertIn('outputModalities', model)
+        self.assertIn('inferenceTypesSupported', model)
+        self.assertIn('modelLifecycle', model)
+
+    def test_bedrock_foundation_model_filter_by_provider(self):
+        session_factory = self.replay_flight_data(
+            'test_bedrock_foundation_model_filter_by_provider')
+        p = self.load_policy(
+            {
+                'name': 'bedrock-foundation-model-by-provider',
+                'resource': 'bedrock-foundation-model',
+                'query': [
+                    {'byProvider': 'Amazon'},
+                ],
+            },
+            session_factory=session_factory
+        )
+        resources = p.run()
+        self.assertGreater(len(resources), 0)
+        for model in resources:
+            self.assertEqual(model['providerName'], 'Amazon')
+
+    def test_bedrock_foundation_model_filter_by_customization_type(self):
+        session_factory = self.replay_flight_data(
+            'test_bedrock_foundation_model_filter_by_customization_type')
+        p = self.load_policy(
+            {
+                'name': 'bedrock-foundation-model-by-customization',
+                'resource': 'bedrock-foundation-model',
+                'query': [
+                    {'byCustomizationType': 'FINE_TUNING'},
+                ],
+            },
+            session_factory=session_factory
+        )
+        resources = p.run()
+        self.assertGreater(len(resources), 0)
+        for model in resources:
+            self.assertIn('FINE_TUNING', model['customizationsSupported'])
+
+    def test_bedrock_foundation_model_filter_by_output_modality(self):
+        session_factory = self.replay_flight_data(
+            'test_bedrock_foundation_model_filter_by_output_modality')
+        p = self.load_policy(
+            {
+                'name': 'bedrock-foundation-model-by-output-modality',
+                'resource': 'bedrock-foundation-model',
+                'query': [
+                    {'byOutputModality': 'TEXT'},
+                ],
+            },
+            session_factory=session_factory
+        )
+        resources = p.run()
+        self.assertGreater(len(resources), 0)
+        for model in resources:
+            self.assertIn('TEXT', model['outputModalities'])
+
+    def test_bedrock_foundation_model_filter_by_inference_type(self):
+        session_factory = self.replay_flight_data(
+            'test_bedrock_foundation_model_filter_by_inference_type')
+        p = self.load_policy(
+            {
+                'name': 'bedrock-foundation-model-by-inference-type',
+                'resource': 'bedrock-foundation-model',
+                'query': [
+                    {'byInferenceType': 'ON_DEMAND'},
+                ],
+            },
+            session_factory=session_factory
+        )
+        resources = p.run()
+        self.assertGreater(len(resources), 0)
+        for model in resources:
+            self.assertIn('ON_DEMAND', model['inferenceTypesSupported'])
+
+    def test_bedrock_foundation_model_value_filter(self):
+        session_factory = self.replay_flight_data(
+            'test_bedrock_foundation_model_value_filter')
+        p = self.load_policy(
+            {
+                'name': 'bedrock-foundation-model-value-filter',
+                'resource': 'bedrock-foundation-model',
+                'filters': [
+                    {
+                        'type': 'value',
+                        'key': 'modelLifecycle.status',
+                        'value': 'ACTIVE',
+                    },
+                    {
+                        'type': 'value',
+                        'key': 'outputModalities',
+                        'value': 'TEXT',
+                        'op': 'contains',
+                    },
+                ],
+            },
+            session_factory=session_factory
+        )
+        resources = p.run()
+        self.assertGreater(len(resources), 0)
+        for model in resources:
+            self.assertEqual(model['modelLifecycle']['status'], 'ACTIVE')
+            self.assertIn('TEXT', model['outputModalities'])
+
+
 class BedrockCustomModel(BaseTest):
 
     def test_bedrock_custom_model(self):

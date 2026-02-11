@@ -1,0 +1,1336 @@
+{
+    "status_code": 200,
+    "data": {
+        "ResponseMetadata": {},
+        "modelSummaries": [
+            {
+                "modelArn": "arn:aws:bedrock:us-east-1::foundation-model/nvidia.nemotron-nano-12b-v2",
+                "modelId": "nvidia.nemotron-nano-12b-v2",
+                "modelName": "NVIDIA Nemotron Nano 12B v2 VL BF16",
+                "providerName": "NVIDIA",
+                "inputModalities": [
+                    "TEXT",
+                    "IMAGE"
+                ],
+                "outputModalities": [
+                    "TEXT"
+                ],
+                "responseStreamingSupported": true,
+                "customizationsSupported": [],
+                "inferenceTypesSupported": [
+                    "ON_DEMAND"
+                ],
+                "modelLifecycle": {
+                    "status": "ACTIVE"
+                }
+            },
+            {
+                "modelArn": "arn:aws:bedrock:us-east-1::foundation-model/qwen.qwen3-coder-next",
+                "modelId": "qwen.qwen3-coder-next",
+                "modelName": "Qwen3 Coder Next",
+                "providerName": "Qwen",
+                "inputModalities": [
+                    "TEXT"
+                ],
+                "outputModalities": [
+                    "TEXT"
+                ],
+                "responseStreamingSupported": true,
+                "customizationsSupported": [],
+                "inferenceTypesSupported": [
+                    "ON_DEMAND"
+                ],
+                "modelLifecycle": {
+                    "status": "ACTIVE"
+                }
+            },
+            {
+                "modelArn": "arn:aws:bedrock:us-east-1::foundation-model/moonshotai.kimi-k2.5",
+                "modelId": "moonshotai.kimi-k2.5",
+                "modelName": "Kimi K2.5",
+                "providerName": "Moonshot AI",
+                "inputModalities": [
+                    "TEXT",
+                    "IMAGE"
+                ],
+                "outputModalities": [
+                    "TEXT"
+                ],
+                "responseStreamingSupported": true,
+                "customizationsSupported": [],
+                "inferenceTypesSupported": [
+                    "ON_DEMAND"
+                ],
+                "modelLifecycle": {
+                    "status": "ACTIVE"
+                }
+            },
+            {
+                "modelArn": "arn:aws:bedrock:us-east-1::foundation-model/openai.gpt-oss-120b-1:0",
+                "modelId": "openai.gpt-oss-120b-1:0",
+                "modelName": "gpt-oss-120b",
+                "providerName": "OpenAI",
+                "inputModalities": [
+                    "TEXT"
+                ],
+                "outputModalities": [
+                    "TEXT"
+                ],
+                "responseStreamingSupported": true,
+                "customizationsSupported": [],
+                "inferenceTypesSupported": [
+                    "ON_DEMAND"
+                ],
+                "modelLifecycle": {
+                    "status": "ACTIVE"
+                }
+            },
+            {
+                "modelArn": "arn:aws:bedrock:us-east-1::foundation-model/qwen.qwen3-next-80b-a3b",
+                "modelId": "qwen.qwen3-next-80b-a3b",
+                "modelName": "Qwen3 Next 80B A3B",
+                "providerName": "Qwen",
+                "inputModalities": [
+                    "TEXT"
+                ],
+                "outputModalities": [
+                    "TEXT"
+                ],
+                "responseStreamingSupported": true,
+                "customizationsSupported": [],
+                "inferenceTypesSupported": [
+                    "ON_DEMAND"
+                ],
+                "modelLifecycle": {
+                    "status": "ACTIVE"
+                }
+            },
+            {
+                "modelArn": "arn:aws:bedrock:us-east-1::foundation-model/deepseek.v3.2",
+                "modelId": "deepseek.v3.2",
+                "modelName": "DeepSeek V3.2",
+                "providerName": "DeepSeek",
+                "inputModalities": [
+                    "TEXT"
+                ],
+                "outputModalities": [
+                    "TEXT"
+                ],
+                "responseStreamingSupported": true,
+                "customizationsSupported": [],
+                "inferenceTypesSupported": [
+                    "ON_DEMAND"
+                ],
+                "modelLifecycle": {
+                    "status": "ACTIVE"
+                }
+            },
+            {
+                "modelArn": "arn:aws:bedrock:us-east-1::foundation-model/amazon.nova-2-multimodal-embeddings-v1:0",
+                "modelId": "amazon.nova-2-multimodal-embeddings-v1:0",
+                "modelName": "Amazon Nova Multimodal Embeddings",
+                "providerName": "Amazon",
+                "inputModalities": [
+                    "TEXT",
+                    "IMAGE",
+                    "AUDIO",
+                    "VIDEO"
+                ],
+                "outputModalities": [
+                    "EMBEDDING"
+                ],
+                "responseStreamingSupported": false,
+                "customizationsSupported": [],
+                "inferenceTypesSupported": [
+                    "ON_DEMAND"
+                ],
+                "modelLifecycle": {
+                    "status": "ACTIVE"
+                }
+            },
+            {
+                "modelArn": "arn:aws:bedrock:us-east-1::foundation-model/nvidia.nemotron-nano-3-30b",
+                "modelId": "nvidia.nemotron-nano-3-30b",
+                "modelName": "Nemotron Nano 3 30B",
+                "providerName": "NVIDIA",
+                "inputModalities": [
+                    "TEXT"
+                ],
+                "outputModalities": [
+                    "TEXT"
+                ],
+                "responseStreamingSupported": true,
+                "customizationsSupported": [],
+                "inferenceTypesSupported": [
+                    "ON_DEMAND"
+                ],
+                "modelLifecycle": {
+                    "status": "ACTIVE"
+                }
+            },
+            {
+                "modelArn": "arn:aws:bedrock:us-east-1::foundation-model/minimax.minimax-m2",
+                "modelId": "minimax.minimax-m2",
+                "modelName": "MiniMax M2",
+                "providerName": "MiniMax",
+                "inputModalities": [
+                    "TEXT"
+                ],
+                "outputModalities": [
+                    "TEXT"
+                ],
+                "responseStreamingSupported": true,
+                "customizationsSupported": [],
+                "inferenceTypesSupported": [
+                    "ON_DEMAND"
+                ],
+                "modelLifecycle": {
+                    "status": "ACTIVE"
+                }
+            },
+            {
+                "modelArn": "arn:aws:bedrock:us-east-1::foundation-model/zai.glm-4.7-flash",
+                "modelId": "zai.glm-4.7-flash",
+                "modelName": "GLM 4.7 Flash",
+                "providerName": "Z.AI",
+                "inputModalities": [
+                    "TEXT"
+                ],
+                "outputModalities": [
+                    "TEXT"
+                ],
+                "responseStreamingSupported": true,
+                "customizationsSupported": [],
+                "inferenceTypesSupported": [
+                    "ON_DEMAND"
+                ],
+                "modelLifecycle": {
+                    "status": "ACTIVE"
+                }
+            },
+            {
+                "modelArn": "arn:aws:bedrock:us-east-1::foundation-model/mistral.voxtral-mini-3b-2507",
+                "modelId": "mistral.voxtral-mini-3b-2507",
+                "modelName": "Voxtral Mini 3B 2507",
+                "providerName": "Mistral AI",
+                "inputModalities": [
+                    "SPEECH",
+                    "TEXT"
+                ],
+                "outputModalities": [
+                    "TEXT"
+                ],
+                "responseStreamingSupported": true,
+                "customizationsSupported": [],
+                "inferenceTypesSupported": [
+                    "ON_DEMAND"
+                ],
+                "modelLifecycle": {
+                    "status": "ACTIVE"
+                }
+            },
+            {
+                "modelArn": "arn:aws:bedrock:us-east-1::foundation-model/amazon.nova-pro-v1:0",
+                "modelId": "amazon.nova-pro-v1:0",
+                "modelName": "Nova Pro",
+                "providerName": "Amazon",
+                "inputModalities": [
+                    "TEXT",
+                    "IMAGE",
+                    "VIDEO"
+                ],
+                "outputModalities": [
+                    "TEXT"
+                ],
+                "responseStreamingSupported": true,
+                "customizationsSupported": [],
+                "inferenceTypesSupported": [
+                    "ON_DEMAND",
+                    "INFERENCE_PROFILE"
+                ],
+                "modelLifecycle": {
+                    "status": "ACTIVE"
+                }
+            },
+            {
+                "modelArn": "arn:aws:bedrock:us-east-1::foundation-model/google.gemma-3-12b-it",
+                "modelId": "google.gemma-3-12b-it",
+                "modelName": "Gemma 3 12B IT",
+                "providerName": "Google",
+                "inputModalities": [
+                    "TEXT",
+                    "IMAGE"
+                ],
+                "outputModalities": [
+                    "TEXT"
+                ],
+                "responseStreamingSupported": true,
+                "customizationsSupported": [],
+                "inferenceTypesSupported": [
+                    "ON_DEMAND"
+                ],
+                "modelLifecycle": {
+                    "status": "ACTIVE"
+                }
+            },
+            {
+                "modelArn": "arn:aws:bedrock:us-east-1::foundation-model/moonshot.kimi-k2-thinking",
+                "modelId": "moonshot.kimi-k2-thinking",
+                "modelName": "Kimi K2 Thinking",
+                "providerName": "Moonshot AI",
+                "inputModalities": [
+                    "TEXT"
+                ],
+                "outputModalities": [
+                    "TEXT"
+                ],
+                "responseStreamingSupported": true,
+                "customizationsSupported": [],
+                "inferenceTypesSupported": [
+                    "ON_DEMAND"
+                ],
+                "modelLifecycle": {
+                    "status": "ACTIVE"
+                }
+            },
+            {
+                "modelArn": "arn:aws:bedrock:us-east-1::foundation-model/mistral.mistral-large-3-675b-instruct",
+                "modelId": "mistral.mistral-large-3-675b-instruct",
+                "modelName": "Mistral Large 3",
+                "providerName": "Mistral AI",
+                "inputModalities": [
+                    "TEXT",
+                    "IMAGE"
+                ],
+                "outputModalities": [
+                    "TEXT"
+                ],
+                "responseStreamingSupported": true,
+                "customizationsSupported": [],
+                "inferenceTypesSupported": [
+                    "ON_DEMAND"
+                ],
+                "modelLifecycle": {
+                    "status": "ACTIVE"
+                }
+            },
+            {
+                "modelArn": "arn:aws:bedrock:us-east-1::foundation-model/twelvelabs.pegasus-1-2-v1:0",
+                "modelId": "twelvelabs.pegasus-1-2-v1:0",
+                "modelName": "Pegasus v1.2",
+                "providerName": "TwelveLabs",
+                "inputModalities": [
+                    "TEXT",
+                    "VIDEO"
+                ],
+                "outputModalities": [
+                    "TEXT"
+                ],
+                "responseStreamingSupported": true,
+                "customizationsSupported": [],
+                "inferenceTypesSupported": [
+                    "INFERENCE_PROFILE",
+                    "ON_DEMAND"
+                ],
+                "modelLifecycle": {
+                    "status": "ACTIVE"
+                }
+            },
+            {
+                "modelArn": "arn:aws:bedrock:us-east-1::foundation-model/amazon.nova-2-sonic-v1:0",
+                "modelId": "amazon.nova-2-sonic-v1:0",
+                "modelName": "Nova 2 Sonic",
+                "providerName": "Amazon",
+                "inputModalities": [
+                    "SPEECH"
+                ],
+                "outputModalities": [
+                    "SPEECH",
+                    "TEXT"
+                ],
+                "responseStreamingSupported": true,
+                "customizationsSupported": [],
+                "inferenceTypesSupported": [
+                    "ON_DEMAND"
+                ],
+                "modelLifecycle": {
+                    "status": "ACTIVE"
+                }
+            },
+            {
+                "modelArn": "arn:aws:bedrock:us-east-1::foundation-model/minimax.minimax-m2.1",
+                "modelId": "minimax.minimax-m2.1",
+                "modelName": "MiniMax M2.1",
+                "providerName": "MiniMax",
+                "inputModalities": [
+                    "TEXT"
+                ],
+                "outputModalities": [
+                    "TEXT"
+                ],
+                "responseStreamingSupported": true,
+                "customizationsSupported": [],
+                "inferenceTypesSupported": [
+                    "ON_DEMAND"
+                ],
+                "modelLifecycle": {
+                    "status": "ACTIVE"
+                }
+            },
+            {
+                "modelArn": "arn:aws:bedrock:us-east-1::foundation-model/qwen.qwen3-32b-v1:0",
+                "modelId": "qwen.qwen3-32b-v1:0",
+                "modelName": "Qwen3 32B (dense)",
+                "providerName": "Qwen",
+                "inputModalities": [
+                    "TEXT"
+                ],
+                "outputModalities": [
+                    "TEXT"
+                ],
+                "responseStreamingSupported": true,
+                "customizationsSupported": [],
+                "inferenceTypesSupported": [
+                    "ON_DEMAND"
+                ],
+                "modelLifecycle": {
+                    "status": "ACTIVE"
+                }
+            },
+            {
+                "modelArn": "arn:aws:bedrock:us-east-1::foundation-model/mistral.ministral-3-14b-instruct",
+                "modelId": "mistral.ministral-3-14b-instruct",
+                "modelName": "Ministral 14B 3.0",
+                "providerName": "Mistral AI",
+                "inputModalities": [
+                    "TEXT",
+                    "IMAGE"
+                ],
+                "outputModalities": [
+                    "TEXT"
+                ],
+                "responseStreamingSupported": true,
+                "customizationsSupported": [],
+                "inferenceTypesSupported": [
+                    "ON_DEMAND"
+                ],
+                "modelLifecycle": {
+                    "status": "ACTIVE"
+                }
+            },
+            {
+                "modelArn": "arn:aws:bedrock:us-east-1::foundation-model/nvidia.nemotron-nano-9b-v2",
+                "modelId": "nvidia.nemotron-nano-9b-v2",
+                "modelName": "NVIDIA Nemotron Nano 9B v2",
+                "providerName": "NVIDIA",
+                "inputModalities": [
+                    "TEXT"
+                ],
+                "outputModalities": [
+                    "TEXT"
+                ],
+                "responseStreamingSupported": true,
+                "customizationsSupported": [],
+                "inferenceTypesSupported": [
+                    "ON_DEMAND"
+                ],
+                "modelLifecycle": {
+                    "status": "ACTIVE"
+                }
+            },
+            {
+                "modelArn": "arn:aws:bedrock:us-east-1::foundation-model/mistral.ministral-3-8b-instruct",
+                "modelId": "mistral.ministral-3-8b-instruct",
+                "modelName": "Ministral 3 8B",
+                "providerName": "Mistral AI",
+                "inputModalities": [
+                    "TEXT",
+                    "IMAGE"
+                ],
+                "outputModalities": [
+                    "TEXT"
+                ],
+                "responseStreamingSupported": true,
+                "customizationsSupported": [],
+                "inferenceTypesSupported": [
+                    "ON_DEMAND"
+                ],
+                "modelLifecycle": {
+                    "status": "ACTIVE"
+                }
+            },
+            {
+                "modelArn": "arn:aws:bedrock:us-east-1::foundation-model/mistral.voxtral-small-24b-2507",
+                "modelId": "mistral.voxtral-small-24b-2507",
+                "modelName": "Voxtral Small 24B 2507",
+                "providerName": "Mistral AI",
+                "inputModalities": [
+                    "SPEECH",
+                    "TEXT"
+                ],
+                "outputModalities": [
+                    "TEXT"
+                ],
+                "responseStreamingSupported": true,
+                "customizationsSupported": [],
+                "inferenceTypesSupported": [
+                    "ON_DEMAND"
+                ],
+                "modelLifecycle": {
+                    "status": "ACTIVE"
+                }
+            },
+            {
+                "modelArn": "arn:aws:bedrock:us-east-1::foundation-model/openai.gpt-oss-20b-1:0",
+                "modelId": "openai.gpt-oss-20b-1:0",
+                "modelName": "gpt-oss-20b",
+                "providerName": "OpenAI",
+                "inputModalities": [
+                    "TEXT"
+                ],
+                "outputModalities": [
+                    "TEXT"
+                ],
+                "responseStreamingSupported": true,
+                "customizationsSupported": [],
+                "inferenceTypesSupported": [
+                    "ON_DEMAND"
+                ],
+                "modelLifecycle": {
+                    "status": "ACTIVE"
+                }
+            },
+            {
+                "modelArn": "arn:aws:bedrock:us-east-1::foundation-model/google.gemma-3-4b-it",
+                "modelId": "google.gemma-3-4b-it",
+                "modelName": "Gemma 3 4B IT",
+                "providerName": "Google",
+                "inputModalities": [
+                    "TEXT",
+                    "IMAGE"
+                ],
+                "outputModalities": [
+                    "TEXT"
+                ],
+                "responseStreamingSupported": true,
+                "customizationsSupported": [],
+                "inferenceTypesSupported": [
+                    "ON_DEMAND"
+                ],
+                "modelLifecycle": {
+                    "status": "ACTIVE"
+                }
+            },
+            {
+                "modelArn": "arn:aws:bedrock:us-east-1::foundation-model/openai.gpt-oss-safeguard-120b",
+                "modelId": "openai.gpt-oss-safeguard-120b",
+                "modelName": "GPT OSS Safeguard 120B",
+                "providerName": "OpenAI",
+                "inputModalities": [
+                    "TEXT"
+                ],
+                "outputModalities": [
+                    "TEXT"
+                ],
+                "responseStreamingSupported": true,
+                "customizationsSupported": [],
+                "inferenceTypesSupported": [
+                    "ON_DEMAND"
+                ],
+                "modelLifecycle": {
+                    "status": "ACTIVE"
+                }
+            },
+            {
+                "modelArn": "arn:aws:bedrock:us-east-1::foundation-model/google.gemma-3-27b-it",
+                "modelId": "google.gemma-3-27b-it",
+                "modelName": "Gemma 3 27B PT",
+                "providerName": "Google",
+                "inputModalities": [
+                    "TEXT",
+                    "IMAGE"
+                ],
+                "outputModalities": [
+                    "TEXT"
+                ],
+                "responseStreamingSupported": true,
+                "customizationsSupported": [],
+                "inferenceTypesSupported": [
+                    "ON_DEMAND"
+                ],
+                "modelLifecycle": {
+                    "status": "ACTIVE"
+                }
+            },
+            {
+                "modelArn": "arn:aws:bedrock:us-east-1::foundation-model/twelvelabs.marengo-embed-3-0-v1:0",
+                "modelId": "twelvelabs.marengo-embed-3-0-v1:0",
+                "modelName": "Marengo Embed 3.0",
+                "providerName": "TwelveLabs",
+                "inputModalities": [
+                    "TEXT",
+                    "IMAGE",
+                    "SPEECH",
+                    "VIDEO"
+                ],
+                "outputModalities": [
+                    "EMBEDDING"
+                ],
+                "responseStreamingSupported": false,
+                "customizationsSupported": [],
+                "inferenceTypesSupported": [
+                    "INFERENCE_PROFILE",
+                    "ON_DEMAND"
+                ],
+                "modelLifecycle": {
+                    "status": "ACTIVE"
+                }
+            },
+            {
+                "modelArn": "arn:aws:bedrock:us-east-1::foundation-model/qwen.qwen3-vl-235b-a22b",
+                "modelId": "qwen.qwen3-vl-235b-a22b",
+                "modelName": "Qwen3 VL 235B A22B",
+                "providerName": "Qwen",
+                "inputModalities": [
+                    "TEXT",
+                    "IMAGE"
+                ],
+                "outputModalities": [
+                    "TEXT"
+                ],
+                "responseStreamingSupported": true,
+                "customizationsSupported": [],
+                "inferenceTypesSupported": [
+                    "ON_DEMAND"
+                ],
+                "modelLifecycle": {
+                    "status": "ACTIVE"
+                }
+            },
+            {
+                "modelArn": "arn:aws:bedrock:us-east-1::foundation-model/zai.glm-4.7",
+                "modelId": "zai.glm-4.7",
+                "modelName": "GLM 4.7",
+                "providerName": "Z.AI",
+                "inputModalities": [
+                    "TEXT"
+                ],
+                "outputModalities": [
+                    "TEXT"
+                ],
+                "responseStreamingSupported": true,
+                "customizationsSupported": [],
+                "inferenceTypesSupported": [
+                    "ON_DEMAND"
+                ],
+                "modelLifecycle": {
+                    "status": "ACTIVE"
+                }
+            },
+            {
+                "modelArn": "arn:aws:bedrock:us-east-1::foundation-model/mistral.magistral-small-2509",
+                "modelId": "mistral.magistral-small-2509",
+                "modelName": "Magistral Small 2509",
+                "providerName": "Mistral AI",
+                "inputModalities": [
+                    "TEXT",
+                    "IMAGE"
+                ],
+                "outputModalities": [
+                    "TEXT"
+                ],
+                "responseStreamingSupported": true,
+                "customizationsSupported": [],
+                "inferenceTypesSupported": [
+                    "ON_DEMAND"
+                ],
+                "modelLifecycle": {
+                    "status": "ACTIVE"
+                }
+            },
+            {
+                "modelArn": "arn:aws:bedrock:us-east-1::foundation-model/cohere.embed-v4:0",
+                "modelId": "cohere.embed-v4:0",
+                "modelName": "Embed v4",
+                "providerName": "Cohere",
+                "inputModalities": [
+                    "TEXT",
+                    "IMAGE"
+                ],
+                "outputModalities": [
+                    "EMBEDDING"
+                ],
+                "responseStreamingSupported": false,
+                "customizationsSupported": [],
+                "inferenceTypesSupported": [
+                    "ON_DEMAND",
+                    "INFERENCE_PROFILE"
+                ],
+                "modelLifecycle": {
+                    "status": "ACTIVE"
+                }
+            },
+            {
+                "modelArn": "arn:aws:bedrock:us-east-1::foundation-model/mistral.ministral-3-3b-instruct",
+                "modelId": "mistral.ministral-3-3b-instruct",
+                "modelName": "Ministral 3B",
+                "providerName": "Mistral AI",
+                "inputModalities": [
+                    "TEXT",
+                    "IMAGE"
+                ],
+                "outputModalities": [
+                    "TEXT"
+                ],
+                "responseStreamingSupported": true,
+                "customizationsSupported": [],
+                "inferenceTypesSupported": [
+                    "ON_DEMAND"
+                ],
+                "modelLifecycle": {
+                    "status": "ACTIVE"
+                }
+            },
+            {
+                "modelArn": "arn:aws:bedrock:us-east-1::foundation-model/qwen.qwen3-coder-30b-a3b-v1:0",
+                "modelId": "qwen.qwen3-coder-30b-a3b-v1:0",
+                "modelName": "Qwen3-Coder-30B-A3B-Instruct",
+                "providerName": "Qwen",
+                "inputModalities": [
+                    "TEXT"
+                ],
+                "outputModalities": [
+                    "TEXT"
+                ],
+                "responseStreamingSupported": true,
+                "customizationsSupported": [],
+                "inferenceTypesSupported": [
+                    "ON_DEMAND"
+                ],
+                "modelLifecycle": {
+                    "status": "ACTIVE"
+                }
+            },
+            {
+                "modelArn": "arn:aws:bedrock:us-east-1::foundation-model/openai.gpt-oss-safeguard-20b",
+                "modelId": "openai.gpt-oss-safeguard-20b",
+                "modelName": "GPT OSS Safeguard 20B",
+                "providerName": "OpenAI",
+                "inputModalities": [
+                    "TEXT"
+                ],
+                "outputModalities": [
+                    "TEXT"
+                ],
+                "responseStreamingSupported": true,
+                "customizationsSupported": [],
+                "inferenceTypesSupported": [
+                    "ON_DEMAND"
+                ],
+                "modelLifecycle": {
+                    "status": "ACTIVE"
+                }
+            },
+            {
+                "modelArn": "arn:aws:bedrock:us-east-1::foundation-model/amazon.titan-tg1-large",
+                "modelId": "amazon.titan-tg1-large",
+                "modelName": "Titan Text Large",
+                "providerName": "Amazon",
+                "inputModalities": [
+                    "TEXT"
+                ],
+                "outputModalities": [
+                    "TEXT"
+                ],
+                "responseStreamingSupported": true,
+                "customizationsSupported": [],
+                "inferenceTypesSupported": [
+                    "ON_DEMAND"
+                ],
+                "modelLifecycle": {
+                    "status": "ACTIVE"
+                }
+            },
+            {
+                "modelArn": "arn:aws:bedrock:us-east-1::foundation-model/amazon.titan-image-generator-v2:0",
+                "modelId": "amazon.titan-image-generator-v2:0",
+                "modelName": "Titan Image Generator G1 v2",
+                "providerName": "Amazon",
+                "inputModalities": [
+                    "TEXT",
+                    "IMAGE"
+                ],
+                "outputModalities": [
+                    "IMAGE"
+                ],
+                "customizationsSupported": [
+                    "FINE_TUNING"
+                ],
+                "inferenceTypesSupported": [
+                    "PROVISIONED",
+                    "ON_DEMAND"
+                ],
+                "modelLifecycle": {
+                    "status": "ACTIVE"
+                }
+            },
+            {
+                "modelArn": "arn:aws:bedrock:us-east-1::foundation-model/amazon.nova-lite-v1:0",
+                "modelId": "amazon.nova-lite-v1:0",
+                "modelName": "Nova Lite",
+                "providerName": "Amazon",
+                "inputModalities": [
+                    "TEXT",
+                    "IMAGE",
+                    "VIDEO"
+                ],
+                "outputModalities": [
+                    "TEXT"
+                ],
+                "responseStreamingSupported": true,
+                "customizationsSupported": [],
+                "inferenceTypesSupported": [
+                    "ON_DEMAND",
+                    "INFERENCE_PROFILE"
+                ],
+                "modelLifecycle": {
+                    "status": "ACTIVE"
+                }
+            },
+            {
+                "modelArn": "arn:aws:bedrock:us-east-1::foundation-model/amazon.nova-canvas-v1:0",
+                "modelId": "amazon.nova-canvas-v1:0",
+                "modelName": "Nova Canvas",
+                "providerName": "Amazon",
+                "inputModalities": [
+                    "TEXT",
+                    "IMAGE"
+                ],
+                "outputModalities": [
+                    "IMAGE"
+                ],
+                "responseStreamingSupported": false,
+                "customizationsSupported": [
+                    "FINE_TUNING"
+                ],
+                "inferenceTypesSupported": [
+                    "ON_DEMAND",
+                    "PROVISIONED"
+                ],
+                "modelLifecycle": {
+                    "status": "ACTIVE"
+                }
+            },
+            {
+                "modelArn": "arn:aws:bedrock:us-east-1::foundation-model/amazon.nova-reel-v1:0",
+                "modelId": "amazon.nova-reel-v1:0",
+                "modelName": "Nova Reel",
+                "providerName": "Amazon",
+                "inputModalities": [
+                    "TEXT",
+                    "IMAGE"
+                ],
+                "outputModalities": [
+                    "VIDEO"
+                ],
+                "responseStreamingSupported": false,
+                "customizationsSupported": [],
+                "inferenceTypesSupported": [
+                    "ON_DEMAND"
+                ],
+                "modelLifecycle": {
+                    "status": "ACTIVE"
+                }
+            },
+            {
+                "modelArn": "arn:aws:bedrock:us-east-1::foundation-model/amazon.nova-reel-v1:1",
+                "modelId": "amazon.nova-reel-v1:1",
+                "modelName": "Nova Reel",
+                "providerName": "Amazon",
+                "inputModalities": [
+                    "TEXT",
+                    "IMAGE"
+                ],
+                "outputModalities": [
+                    "VIDEO"
+                ],
+                "responseStreamingSupported": false,
+                "customizationsSupported": [],
+                "inferenceTypesSupported": [
+                    "ON_DEMAND"
+                ],
+                "modelLifecycle": {
+                    "status": "ACTIVE"
+                }
+            },
+            {
+                "modelArn": "arn:aws:bedrock:us-east-1::foundation-model/amazon.nova-micro-v1:0",
+                "modelId": "amazon.nova-micro-v1:0",
+                "modelName": "Nova Micro",
+                "providerName": "Amazon",
+                "inputModalities": [
+                    "TEXT"
+                ],
+                "outputModalities": [
+                    "TEXT"
+                ],
+                "responseStreamingSupported": true,
+                "customizationsSupported": [],
+                "inferenceTypesSupported": [
+                    "ON_DEMAND",
+                    "INFERENCE_PROFILE"
+                ],
+                "modelLifecycle": {
+                    "status": "ACTIVE"
+                }
+            },
+            {
+                "modelArn": "arn:aws:bedrock:us-east-1::foundation-model/amazon.nova-sonic-v1:0",
+                "modelId": "amazon.nova-sonic-v1:0",
+                "modelName": "Nova Sonic",
+                "providerName": "Amazon",
+                "inputModalities": [
+                    "SPEECH"
+                ],
+                "outputModalities": [
+                    "SPEECH",
+                    "TEXT"
+                ],
+                "responseStreamingSupported": true,
+                "customizationsSupported": [],
+                "inferenceTypesSupported": [
+                    "ON_DEMAND"
+                ],
+                "modelLifecycle": {
+                    "status": "ACTIVE"
+                }
+            },
+            {
+                "modelArn": "arn:aws:bedrock:us-east-1::foundation-model/amazon.titan-embed-g1-text-02",
+                "modelId": "amazon.titan-embed-g1-text-02",
+                "modelName": "Titan Text Embeddings v2",
+                "providerName": "Amazon",
+                "inputModalities": [
+                    "TEXT"
+                ],
+                "outputModalities": [
+                    "EMBEDDING"
+                ],
+                "customizationsSupported": [],
+                "inferenceTypesSupported": [
+                    "ON_DEMAND"
+                ],
+                "modelLifecycle": {
+                    "status": "ACTIVE"
+                }
+            },
+            {
+                "modelArn": "arn:aws:bedrock:us-east-1::foundation-model/amazon.titan-embed-text-v1",
+                "modelId": "amazon.titan-embed-text-v1",
+                "modelName": "Titan Embeddings G1 - Text",
+                "providerName": "Amazon",
+                "inputModalities": [
+                    "TEXT"
+                ],
+                "outputModalities": [
+                    "EMBEDDING"
+                ],
+                "responseStreamingSupported": false,
+                "customizationsSupported": [],
+                "inferenceTypesSupported": [
+                    "ON_DEMAND"
+                ],
+                "modelLifecycle": {
+                    "status": "ACTIVE"
+                }
+            },
+            {
+                "modelArn": "arn:aws:bedrock:us-east-1::foundation-model/amazon.titan-embed-text-v2:0",
+                "modelId": "amazon.titan-embed-text-v2:0",
+                "modelName": "Titan Text Embeddings V2",
+                "providerName": "Amazon",
+                "inputModalities": [
+                    "TEXT"
+                ],
+                "outputModalities": [
+                    "EMBEDDING"
+                ],
+                "responseStreamingSupported": false,
+                "customizationsSupported": [],
+                "inferenceTypesSupported": [
+                    "ON_DEMAND"
+                ],
+                "modelLifecycle": {
+                    "status": "ACTIVE"
+                }
+            },
+            {
+                "modelArn": "arn:aws:bedrock:us-east-1::foundation-model/amazon.titan-embed-image-v1",
+                "modelId": "amazon.titan-embed-image-v1",
+                "modelName": "Titan Multimodal Embeddings G1",
+                "providerName": "Amazon",
+                "inputModalities": [
+                    "TEXT",
+                    "IMAGE"
+                ],
+                "outputModalities": [
+                    "EMBEDDING"
+                ],
+                "customizationsSupported": [],
+                "inferenceTypesSupported": [
+                    "ON_DEMAND"
+                ],
+                "modelLifecycle": {
+                    "status": "ACTIVE"
+                }
+            },
+            {
+                "modelArn": "arn:aws:bedrock:us-east-1::foundation-model/ai21.jamba-1-5-large-v1:0",
+                "modelId": "ai21.jamba-1-5-large-v1:0",
+                "modelName": "Jamba 1.5 Large",
+                "providerName": "AI21 Labs",
+                "inputModalities": [
+                    "TEXT"
+                ],
+                "outputModalities": [
+                    "TEXT"
+                ],
+                "responseStreamingSupported": true,
+                "customizationsSupported": [],
+                "inferenceTypesSupported": [
+                    "ON_DEMAND"
+                ],
+                "modelLifecycle": {
+                    "status": "ACTIVE"
+                }
+            },
+            {
+                "modelArn": "arn:aws:bedrock:us-east-1::foundation-model/ai21.jamba-1-5-mini-v1:0",
+                "modelId": "ai21.jamba-1-5-mini-v1:0",
+                "modelName": "Jamba 1.5 Mini",
+                "providerName": "AI21 Labs",
+                "inputModalities": [
+                    "TEXT"
+                ],
+                "outputModalities": [
+                    "TEXT"
+                ],
+                "responseStreamingSupported": true,
+                "customizationsSupported": [],
+                "inferenceTypesSupported": [
+                    "ON_DEMAND"
+                ],
+                "modelLifecycle": {
+                    "status": "ACTIVE"
+                }
+            },
+            {
+                "modelArn": "arn:aws:bedrock:us-east-1::foundation-model/anthropic.claude-3-sonnet-20240229-v1:0",
+                "modelId": "anthropic.claude-3-sonnet-20240229-v1:0",
+                "modelName": "Claude 3 Sonnet",
+                "providerName": "Anthropic",
+                "inputModalities": [
+                    "TEXT",
+                    "IMAGE"
+                ],
+                "outputModalities": [
+                    "TEXT"
+                ],
+                "responseStreamingSupported": true,
+                "customizationsSupported": [],
+                "inferenceTypesSupported": [
+                    "ON_DEMAND"
+                ],
+                "modelLifecycle": {
+                    "status": "LEGACY"
+                }
+            },
+            {
+                "modelArn": "arn:aws:bedrock:us-east-1::foundation-model/anthropic.claude-3-haiku-20240307-v1:0",
+                "modelId": "anthropic.claude-3-haiku-20240307-v1:0",
+                "modelName": "Claude 3 Haiku",
+                "providerName": "Anthropic",
+                "inputModalities": [
+                    "TEXT",
+                    "IMAGE"
+                ],
+                "outputModalities": [
+                    "TEXT"
+                ],
+                "responseStreamingSupported": true,
+                "customizationsSupported": [],
+                "inferenceTypesSupported": [
+                    "ON_DEMAND"
+                ],
+                "modelLifecycle": {
+                    "status": "ACTIVE"
+                }
+            },
+            {
+                "modelArn": "arn:aws:bedrock:us-east-1::foundation-model/anthropic.claude-3-5-sonnet-20240620-v1:0",
+                "modelId": "anthropic.claude-3-5-sonnet-20240620-v1:0",
+                "modelName": "Claude 3.5 Sonnet",
+                "providerName": "Anthropic",
+                "inputModalities": [
+                    "TEXT",
+                    "IMAGE"
+                ],
+                "outputModalities": [
+                    "TEXT"
+                ],
+                "responseStreamingSupported": true,
+                "customizationsSupported": [],
+                "inferenceTypesSupported": [
+                    "ON_DEMAND",
+                    "INFERENCE_PROFILE"
+                ],
+                "modelLifecycle": {
+                    "status": "LEGACY"
+                }
+            },
+            {
+                "modelArn": "arn:aws:bedrock:us-east-1::foundation-model/cohere.command-r-v1:0",
+                "modelId": "cohere.command-r-v1:0",
+                "modelName": "Command R",
+                "providerName": "Cohere",
+                "inputModalities": [
+                    "TEXT"
+                ],
+                "outputModalities": [
+                    "TEXT"
+                ],
+                "responseStreamingSupported": true,
+                "customizationsSupported": [],
+                "inferenceTypesSupported": [
+                    "ON_DEMAND"
+                ],
+                "modelLifecycle": {
+                    "status": "ACTIVE"
+                }
+            },
+            {
+                "modelArn": "arn:aws:bedrock:us-east-1::foundation-model/cohere.command-r-plus-v1:0",
+                "modelId": "cohere.command-r-plus-v1:0",
+                "modelName": "Command R+",
+                "providerName": "Cohere",
+                "inputModalities": [
+                    "TEXT"
+                ],
+                "outputModalities": [
+                    "TEXT"
+                ],
+                "responseStreamingSupported": true,
+                "customizationsSupported": [],
+                "inferenceTypesSupported": [
+                    "ON_DEMAND"
+                ],
+                "modelLifecycle": {
+                    "status": "ACTIVE"
+                }
+            },
+            {
+                "modelArn": "arn:aws:bedrock:us-east-1::foundation-model/cohere.embed-english-v3",
+                "modelId": "cohere.embed-english-v3",
+                "modelName": "Embed English",
+                "providerName": "Cohere",
+                "inputModalities": [
+                    "TEXT"
+                ],
+                "outputModalities": [
+                    "EMBEDDING"
+                ],
+                "responseStreamingSupported": false,
+                "customizationsSupported": [],
+                "inferenceTypesSupported": [
+                    "ON_DEMAND"
+                ],
+                "modelLifecycle": {
+                    "status": "ACTIVE"
+                }
+            },
+            {
+                "modelArn": "arn:aws:bedrock:us-east-1::foundation-model/cohere.embed-multilingual-v3",
+                "modelId": "cohere.embed-multilingual-v3",
+                "modelName": "Embed Multilingual",
+                "providerName": "Cohere",
+                "inputModalities": [
+                    "TEXT"
+                ],
+                "outputModalities": [
+                    "EMBEDDING"
+                ],
+                "responseStreamingSupported": false,
+                "customizationsSupported": [],
+                "inferenceTypesSupported": [
+                    "ON_DEMAND"
+                ],
+                "modelLifecycle": {
+                    "status": "ACTIVE"
+                }
+            },
+            {
+                "modelArn": "arn:aws:bedrock:us-east-1::foundation-model/cohere.rerank-v3-5:0",
+                "modelId": "cohere.rerank-v3-5:0",
+                "modelName": "Rerank 3.5",
+                "providerName": "Cohere",
+                "inputModalities": [
+                    "TEXT"
+                ],
+                "outputModalities": [
+                    "TEXT"
+                ],
+                "responseStreamingSupported": false,
+                "customizationsSupported": [],
+                "inferenceTypesSupported": [
+                    "ON_DEMAND"
+                ],
+                "modelLifecycle": {
+                    "status": "ACTIVE"
+                }
+            },
+            {
+                "modelArn": "arn:aws:bedrock:us-east-1::foundation-model/meta.llama3-8b-instruct-v1:0",
+                "modelId": "meta.llama3-8b-instruct-v1:0",
+                "modelName": "Llama 3 8B Instruct",
+                "providerName": "Meta",
+                "inputModalities": [
+                    "TEXT"
+                ],
+                "outputModalities": [
+                    "TEXT"
+                ],
+                "responseStreamingSupported": true,
+                "customizationsSupported": [],
+                "inferenceTypesSupported": [
+                    "ON_DEMAND"
+                ],
+                "modelLifecycle": {
+                    "status": "ACTIVE"
+                }
+            },
+            {
+                "modelArn": "arn:aws:bedrock:us-east-1::foundation-model/meta.llama3-70b-instruct-v1:0",
+                "modelId": "meta.llama3-70b-instruct-v1:0",
+                "modelName": "Llama 3 70B Instruct",
+                "providerName": "Meta",
+                "inputModalities": [
+                    "TEXT"
+                ],
+                "outputModalities": [
+                    "TEXT"
+                ],
+                "responseStreamingSupported": true,
+                "customizationsSupported": [],
+                "inferenceTypesSupported": [
+                    "ON_DEMAND"
+                ],
+                "modelLifecycle": {
+                    "status": "ACTIVE"
+                }
+            },
+            {
+                "modelArn": "arn:aws:bedrock:us-east-1::foundation-model/mistral.mistral-7b-instruct-v0:2",
+                "modelId": "mistral.mistral-7b-instruct-v0:2",
+                "modelName": "Mistral 7B Instruct",
+                "providerName": "Mistral AI",
+                "inputModalities": [
+                    "TEXT"
+                ],
+                "outputModalities": [
+                    "TEXT"
+                ],
+                "responseStreamingSupported": true,
+                "customizationsSupported": [],
+                "inferenceTypesSupported": [
+                    "ON_DEMAND"
+                ],
+                "modelLifecycle": {
+                    "status": "ACTIVE"
+                }
+            },
+            {
+                "modelArn": "arn:aws:bedrock:us-east-1::foundation-model/mistral.mixtral-8x7b-instruct-v0:1",
+                "modelId": "mistral.mixtral-8x7b-instruct-v0:1",
+                "modelName": "Mixtral 8x7B Instruct",
+                "providerName": "Mistral AI",
+                "inputModalities": [
+                    "TEXT"
+                ],
+                "outputModalities": [
+                    "TEXT"
+                ],
+                "responseStreamingSupported": true,
+                "customizationsSupported": [],
+                "inferenceTypesSupported": [
+                    "ON_DEMAND"
+                ],
+                "modelLifecycle": {
+                    "status": "ACTIVE"
+                }
+            },
+            {
+                "modelArn": "arn:aws:bedrock:us-east-1::foundation-model/mistral.mistral-large-2402-v1:0",
+                "modelId": "mistral.mistral-large-2402-v1:0",
+                "modelName": "Mistral Large (24.02)",
+                "providerName": "Mistral AI",
+                "inputModalities": [
+                    "TEXT"
+                ],
+                "outputModalities": [
+                    "TEXT"
+                ],
+                "responseStreamingSupported": true,
+                "customizationsSupported": [],
+                "inferenceTypesSupported": [
+                    "ON_DEMAND"
+                ],
+                "modelLifecycle": {
+                    "status": "ACTIVE"
+                }
+            },
+            {
+                "modelArn": "arn:aws:bedrock:us-east-1::foundation-model/mistral.mistral-small-2402-v1:0",
+                "modelId": "mistral.mistral-small-2402-v1:0",
+                "modelName": "Mistral Small (24.02)",
+                "providerName": "Mistral AI",
+                "inputModalities": [
+                    "TEXT"
+                ],
+                "outputModalities": [
+                    "TEXT"
+                ],
+                "responseStreamingSupported": true,
+                "customizationsSupported": [],
+                "inferenceTypesSupported": [
+                    "ON_DEMAND"
+                ],
+                "modelLifecycle": {
+                    "status": "ACTIVE"
+                }
+            },
+            {
+                "modelArn": "arn:aws:bedrock:us-east-1::foundation-model/twelvelabs.marengo-embed-2-7-v1:0",
+                "modelId": "twelvelabs.marengo-embed-2-7-v1:0",
+                "modelName": "Marengo Embed v2.7",
+                "providerName": "TwelveLabs",
+                "inputModalities": [
+                    "TEXT",
+                    "IMAGE",
+                    "SPEECH",
+                    "VIDEO"
+                ],
+                "outputModalities": [
+                    "EMBEDDING"
+                ],
+                "responseStreamingSupported": false,
+                "customizationsSupported": [],
+                "inferenceTypesSupported": [
+                    "ON_DEMAND"
+                ],
+                "modelLifecycle": {
+                    "status": "ACTIVE"
+                }
+            }
+        ]
+    }
+}

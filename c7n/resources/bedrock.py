@@ -4,9 +4,77 @@
 from c7n.manager import resources
 from c7n.query import QueryResourceManager, TypeInfo, DescribeSource
 from c7n.tags import RemoveTag, Tag, TagActionFilter, TagDelayedAction
-from c7n.utils import local_session, type_schema
+from c7n.utils import local_session, type_schema, QueryParser
 from c7n.actions import BaseAction
 from c7n.filters.kms import KmsRelatedFilter
+
+
+class FoundationModelQueryParser(QueryParser):
+    QuerySchema = {
+        'byProvider': str,
+        'byCustomizationType': ('FINE_TUNING', 'CONTINUED_PRE_TRAINING'),
+        'byOutputModality': ('TEXT', 'IMAGE', 'EMBEDDING'),
+        'byInferenceType': ('ON_DEMAND', 'PROVISIONED'),
+    }
+    multi_value = False
+    type_name = 'Bedrock Foundation Model'
+
+
+@resources.register('bedrock-foundation-model')
+class BedrockFoundationModel(QueryResourceManager):
+    """AWS Bedrock Foundation Model
+
+    Foundation models are AWS-managed base models available through Bedrock.
+    This resource is read-only (no delete/tag actions) as these are catalog
+    items managed by AWS.
+
+    Use the ``query`` parameter for server-side filtering to reduce API response size.
+
+    :example:
+
+    Find all Anthropic models using server-side filtering:
+
+    .. code-block:: yaml
+
+        policies:
+          - name: anthropic-models
+            resource: aws.bedrock-foundation-model
+            query:
+              - byProvider: Anthropic
+              - byInferenceType: ON_DEMAND
+
+    :example:
+
+    Find active models with client-side filtering:
+
+    .. code-block:: yaml
+
+        policies:
+          - name: active-text-models
+            resource: aws.bedrock-foundation-model
+            filters:
+              - type: value
+                key: modelLifecycle.status
+                value: ACTIVE
+              - type: value
+                key: outputModalities
+                value: TEXT
+                op: contains
+    """
+    class resource_type(TypeInfo):
+        service = 'bedrock'
+        enum_spec = ('list_foundation_models', 'modelSummaries', None)
+        id = 'modelId'
+        arn = 'modelArn'
+        name = 'modelName'
+        permission_prefix = 'bedrock'
+
+    def resources(self, query=None):
+        query = query or {}
+        queries = FoundationModelQueryParser.parse(self.data.get('query', []))
+        for q in queries:
+            query.update(q)
+        return super().resources(query=query)
 
 
 @resources.register('bedrock-custom-model')
