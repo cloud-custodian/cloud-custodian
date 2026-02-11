@@ -1,0 +1,40 @@
+{
+    "status_code": 200,
+    "data": {
+        "ResponseMetadata": {},
+        "items": [
+            {
+                "id": "snva-0cf489028d6aa3a58",
+                "arn": "arn:aws:vpc-lattice:us-east-1:644160558196:servicenetworkvpcassociation/snva-0cf489028d6aa3a58",
+                "status": "ACTIVE",
+                "createdBy": "644160558196",
+                "createdAt": {
+                    "__class__": "datetime",
+                    "year": 2026,
+                    "month": 2,
+                    "day": 9,
+                    "hour": 23,
+                    "minute": 43,
+                    "second": 17,
+                    "microsecond": 757000
+                },
+                "serviceNetworkId": "sn-00e9da1537717561b",
+                "serviceNetworkName": "c7n-test-network-rich-crane",
+                "serviceNetworkArn": "arn:aws:vpc-lattice:us-east-1:644160558196:servicenetwork/sn-00e9da1537717561b",
+                "privateDnsEnabled": false,
+                "dnsOptions": {},
+                "vpcId": "vpc-0e5ef750468976cb3",
+                "lastUpdatedAt": {
+                    "__class__": "datetime",
+                    "year": 2026,
+                    "month": 2,
+                    "day": 9,
+                    "hour": 23,
+                    "minute": 44,
+                    "second": 55,
+                    "microsecond": 395000
+                }
+            }
+        ]
+    }
+}

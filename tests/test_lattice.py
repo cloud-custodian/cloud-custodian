@@ -2,9 +2,10 @@
 # SPDX-License-Identifier: Apache-2.0
 from .common import BaseTest
 
+from pytest_terraform import terraform
+
 
 class VPCLatticeServiceNetworkTests(BaseTest):
-
     def test_service_network_cross_account(self):
         """Test cross-account access via auth policy."""
         session_factory = self.replay_flight_data("test_lattice_network_cross_account")
@@ -196,3 +197,38 @@ class VPCLatticeTargetGroupTests(BaseTest):
         )
         resources = p.run()
         self.assertEqual(len(resources), 1)
+
+
+@terraform('lattice_service_network_association')
+def test_lattice_service_network_association_list(test, lattice_service_network_association):
+    factory = test.replay_flight_data("test_lattice_service_network_association_list")
+
+    p = test.load_policy(
+        {
+            "name": "lattice-service-network-association-list",
+            "resource": "aws.vpc-lattice-service-network-association",
+        },
+        session_factory=factory,
+    )
+    resources = p.run()
+    assert len(resources) > 0
+
+
+@terraform('lattice_service_network_association')
+def test_lattice_service_network_association_filter_by_status(
+    test, lattice_service_network_association
+):
+    factory = test.replay_flight_data("test_lattice_service_network_association_filter_status")
+
+    p = test.load_policy(
+        {
+            "name": "lattice-service-network-association-active",
+            "resource": "aws.vpc-lattice-service-network-association",
+            "filters": [{"type": "value", "key": "status", "value": "ACTIVE"}],
+        },
+        session_factory=factory,
+    )
+    resources = p.run()
+    assert len(resources) > 0
+    for r in resources:
+        assert r["status"] == "ACTIVE"

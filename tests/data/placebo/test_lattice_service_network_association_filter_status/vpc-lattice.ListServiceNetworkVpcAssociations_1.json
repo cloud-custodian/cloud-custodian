@@ -1,0 +1,40 @@
+{
+    "status_code": 200,
+    "data": {
+        "ResponseMetadata": {},
+        "items": [
+            {
+                "id": "snva-0ffb1fcf0dfbbf68e",
+                "arn": "arn:aws:vpc-lattice:us-east-1:644160558196:servicenetworkvpcassociation/snva-0ffb1fcf0dfbbf68e",
+                "status": "ACTIVE",
+                "createdBy": "644160558196",
+                "createdAt": {
+                    "__class__": "datetime",
+                    "year": 2026,
+                    "month": 2,
+                    "day": 9,
+                    "hour": 23,
+                    "minute": 46,
+                    "second": 28,
+                    "microsecond": 904000
+                },
+                "serviceNetworkId": "sn-06c0b9919c1ed90d5",
+                "serviceNetworkName": "c7n-test-network-ace-primate",
+                "serviceNetworkArn": "arn:aws:vpc-lattice:us-east-1:644160558196:servicenetwork/sn-06c0b9919c1ed90d5",
+                "privateDnsEnabled": false,
+                "dnsOptions": {},
+                "vpcId": "vpc-0e5ef750468976cb3",
+                "lastUpdatedAt": {
+                    "__class__": "datetime",
+                    "year": 2026,
+                    "month": 2,
+                    "day": 9,
+                    "hour": 23,
+                    "minute": 47,
+                    "second": 31,
+                    "microsecond": 504000
+                }
+            }
+        ]
+    }
+}

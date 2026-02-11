@@ -1,0 +1,36 @@
+{
+    "status_code": 200,
+    "data": {
+        "ResponseMetadata": {},
+        "items": [
+            {
+                "id": "sn-06c0b9919c1ed90d5",
+                "name": "c7n-test-network-ace-primate",
+                "arn": "arn:aws:vpc-lattice:us-east-1:644160558196:servicenetwork/sn-06c0b9919c1ed90d5",
+                "createdAt": {
+                    "__class__": "datetime",
+                    "year": 2026,
+                    "month": 2,
+                    "day": 9,
+                    "hour": 23,
+                    "minute": 46,
+                    "second": 28,
+                    "microsecond": 29000
+                },
+                "lastUpdatedAt": {
+                    "__class__": "datetime",
+                    "year": 2026,
+                    "month": 2,
+                    "day": 9,
+                    "hour": 23,
+                    "minute": 46,
+                    "second": 28,
+                    "microsecond": 29000
+                },
+                "numberOfAssociatedVPCs": 1,
+                "numberOfAssociatedServices": 0,
+                "numberOfAssociatedResourceConfigurations": 0
+            }
+        ]
+    }
+}

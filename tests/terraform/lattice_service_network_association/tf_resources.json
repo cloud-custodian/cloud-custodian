@@ -1,0 +1,84 @@
+{
+    "pytest-terraform": 1,
+    "outputs": {},
+    "resources": {
+        "aws_vpc": {
+            "default": {
+                "arn": "arn:aws:ec2:us-east-1:644160558196:vpc/vpc-0e5ef750468976cb3",
+                "cidr_block": "172.31.0.0/16",
+                "cidr_block_associations": [
+                    {
+                        "association_id": "vpc-cidr-assoc-06cd93fcb3814e1ce",
+                        "cidr_block": "172.31.0.0/16",
+                        "state": "associated"
+                    }
+                ],
+                "default": true,
+                "dhcp_options_id": "dopt-07e1525ba99f7a7ee",
+                "enable_dns_hostnames": true,
+                "enable_dns_support": true,
+                "enable_network_address_usage_metrics": false,
+                "filter": null,
+                "id": "vpc-0e5ef750468976cb3",
+                "instance_tenancy": "default",
+                "ipv6_association_id": "",
+                "ipv6_cidr_block": "",
+                "main_route_table_id": "rtb-09f2ec08954b0dc6e",
+                "owner_id": "644160558196",
+                "region": "us-east-1",
+                "state": null,
+                "tags": {},
+                "timeouts": null
+            }
+        },
+        "aws_vpclattice_service_network": {
+            "test": {
+                "arn": "arn:aws:vpc-lattice:us-east-1:644160558196:servicenetwork/sn-06c0b9919c1ed90d5",
+                "auth_type": "NONE",
+                "id": "sn-06c0b9919c1ed90d5",
+                "name": "c7n-test-network-ace-primate",
+                "region": "us-east-1",
+                "tags": {
+                    "ASV": "PolicyTestASV",
+                    "Environment": "Test"
+                },
+                "tags_all": {
+                    "ASV": "PolicyTestASV",
+                    "Environment": "Test"
+                }
+            }
+        },
+        "aws_vpclattice_service_network_vpc_association": {
+            "test": {
+                "arn": "arn:aws:vpc-lattice:us-east-1:644160558196:servicenetworkvpcassociation/snva-0ffb1fcf0dfbbf68e",
+                "created_by": "644160558196",
+                "dns_options": [],
+                "id": "snva-0ffb1fcf0dfbbf68e",
+                "private_dns_enabled": false,
+                "region": "us-east-1",
+                "security_group_ids": null,
+                "service_network_identifier": "sn-06c0b9919c1ed90d5",
+                "status": "ACTIVE",
+                "tags": {
+                    "ASV": "PolicyTestASV",
+                    "Environment": "Test"
+                },
+                "tags_all": {
+                    "ASV": "PolicyTestASV",
+                    "Environment": "Test"
+                },
+                "timeouts": null,
+                "vpc_identifier": "vpc-0e5ef750468976cb3"
+            }
+        },
+        "random_pet": {
+            "network": {
+                "id": "c7n-test-network-ace-primate",
+                "keepers": null,
+                "length": 2,
+                "prefix": "c7n-test-network",
+                "separator": "-"
+            }
+        }
+    }
+}
