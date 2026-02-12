@@ -10,6 +10,16 @@ from c7n_gcp.query import QueryResourceManager, TypeInfo
 class LoadBalancingAddress(QueryResourceManager):
     """GCP resource: https://cloud.google.com/compute/docs/reference/rest/v1/addresses
     """
+
+    def augment(self, resources):
+        filtered = []
+        for r in resources:
+            link = r.get('selfLink', '')
+            if '/global/addresses/' in link:
+                continue
+            filtered.append(r)
+        return filtered
+
     class resource_type(TypeInfo):
         service = 'compute'
         version = 'v1'
