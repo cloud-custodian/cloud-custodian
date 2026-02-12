@@ -1,12 +1,12 @@
+# Cross Account Ingestion Pipeline
+# Make sure aws cli version is >= 2.21.0
+
 data "aws_caller_identity" "current" {}
 data "aws_region" "current" {}
 
-resource "random_id" "suffix" {
-  byte_length = 8
-}
 
 resource "aws_iam_role" "pipeline_role" {
-  name = "osis-pipeline-role-${random_id.suffix.hex}"
+  name = "osis-pipeline-role"
 
   assume_role_policy = jsonencode({
     Version = "2012-10-17"
@@ -30,7 +30,7 @@ resource "aws_iam_role" "pipeline_role" {
 }
 
 resource "aws_iam_role_policy" "pipeline_policy" {
-  name = "osis-pipeline-policy-${random_id.suffix.hex}"
+  name = "osis-pipeline-policy"
   role = aws_iam_role.pipeline_role.id
 
   policy = jsonencode({
@@ -64,16 +64,16 @@ resource "aws_iam_role_policy" "pipeline_policy" {
 }
 
 resource "aws_s3_bucket" "sink" {
-  bucket        = "c7n-osis-sink-${random_id.suffix.hex}"
+  bucket        = "c7n-osis-sink"
   force_destroy = true
 }
 
 resource "aws_cloudwatch_log_group" "pipeline_logs" {
-  name = "/aws/vendedlogs/osis/c7n-pipeline-logs-${random_id.suffix.hex}"
+  name = "/aws/vendedlogs/osis/c7n-pipeline-logs"
 }
 
 resource "aws_osis_pipeline" "test" {
-  pipeline_name = "c7n-test-${random_id.suffix.hex}"
+  pipeline_name = "c7n-test"
   min_units     = 1
   max_units     = 1
 
@@ -101,4 +101,14 @@ opensearch-pipeline:
         codec:
           ndjson:
 EOF
+}
+
+resource "null_resource" "pipeline_policy" {
+  provisioner "local-exec" {
+    command = <<EOT
+      aws osis put-resource-policy \
+        --resource-arn "${aws_osis_pipeline.test.pipeline_arn}" \
+        --policy "{\"Version\":\"2012-10-17\",\"Statement\":[{\"Sid\":\"AllowCrossAccountIngestion\",\"Effect\":\"Allow\",\"Principal\":{\"AWS\":[\"794038253860\"]},\"Action\":\"osis:*\",\"Resource\":\"${aws_osis_pipeline.test.pipeline_arn}\"}]}"
+    EOT
+  }
 }

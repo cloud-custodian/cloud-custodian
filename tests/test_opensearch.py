@@ -1,12 +1,9 @@
 # Copyright The Cloud Custodian Authors.
 # SPDX-License-Identifier: Apache-2.0
 from .common import BaseTest
-from  pytest_terraform import terraform
-import json
+from pytest_terraform import terraform
 
 
-
-# Placing my tests with pytest-terraform fixture here, since they do not work inside unit test classes.
 @terraform('opensearch_ingestion_cross_account')
 def test_opensearch_ingestion_cross_account(test, opensearch_ingestion_cross_account):
     session_factory = test.replay_flight_data('test_opensearch_ingestion_cross_account')
@@ -14,7 +11,7 @@ def test_opensearch_ingestion_cross_account(test, opensearch_ingestion_cross_acc
         {
             'name': 'test-opensearch-ingestion-cross-account',
             'resource': 'opensearch-ingestion',
-            'filters': [    
+            'filters': [
                 {
                     'type': 'cross-account'
                 }
@@ -25,31 +22,11 @@ def test_opensearch_ingestion_cross_account(test, opensearch_ingestion_cross_acc
     )
     resources = p.run()
     assert len(resources) == 1
-    assert resources[0]['PipelineName'] == 'c7n-test-d0c207aff6bcf63a'
+    assert resources[0]['PipelineArn'] == 'arn:aws:osis:us-east-1:644160558196:pipeline/c7n-test'
     assert resources[0]['Status'] == 'ACTIVE'
-    
+    assert 'CrossAccountViolations' in resources[0]
+    assert resources[0]['CrossAccountViolations'][0]['Sid'] == 'AllowCrossAccountIngestion'
 
-@terraform('opensearch_serverless_cross_account')
-def test_opensearch_serverless_cross_account(test, opensearch_serverless_cross_account):
-    session_factory = test.replay_flight_data('test_opensearch_serverless_cross_account')
-    p = test.load_policy(
-        {
-            'name': 'test-opensearch-serverless-cross-account',
-            'resource': 'opensearch-serverless',
-            'filters': [    
-                {
-                    'type': 'cross-account'
-                }
-            ],
-            'actions': [{'type': 'delete'}]
-        },
-        session_factory=session_factory
-    )
-    resources = p.run()
-    assert len(resources) == 1
-    assert resources[0]['name'] == 'test-collection'
-    assert resources[0]['encryptionPolicy'] == 'test-collection'
-    assert resources[0]['arn'] == 'arn:aws:aoss:us-east-1:123456789012:collection/test-collection-id'
 
 class OpensearchServerless(BaseTest):
 

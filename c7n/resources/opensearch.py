@@ -7,11 +7,8 @@ from c7n.filters.kms import KmsRelatedFilter
 from c7n.filters.iamaccess import CrossAccountAccessFilter
 from c7n.manager import resources
 from c7n.query import QueryResourceManager, TypeInfo
-from c7n.resolver import ValuesFrom
 from c7n.tags import RemoveTag, Tag, TagActionFilter, TagDelayedAction
 from c7n.utils import local_session, type_schema, yaml_load
-from fnmatch import fnmatch
-import json
 
 
 @resources.register('opensearch-serverless')
@@ -46,114 +43,6 @@ class OpensearchServerless(QueryResourceManager):
 class OpensearchServerlessKmsFilter(KmsRelatedFilter):
     RelatedIdsExpression = 'kmsKeyArn'
 
-@OpensearchServerless.filter_registry.register('cross-account')
-class OpensearchServerlessCrossAccountFilter(CrossAccountAccessFilter):
-    """
-    Filter OpenSearch Ingestion Pipelines by cross-account access
-    
-    :example:
-
-    .. code-block:: yaml
-
-        policies:
-          - name: aoss-cross-account
-            resource: opensearch-serverless
-            filters:
-              - type: cross-account
-    """
-    policy_attribute = 'c7n:Policy'
-    permissions = ('aoss:GetAccessPolicy', 'aoss:ListAccessPolicies')
-
-    def process(self, resources, event=None):
-        client = local_session(self.manager.session_factory).client('opensearchserverless')
-        self.get_resource_policies(client, resources) 
-        return super().process(resources, event)
-
-    def get_resource_policies(self, client, resources): 
-        # Cache 'em policies for the session to avoid repeated scans
-        cache_key = 'aoss-data-policies'
-        all_policies = self.manager._cache.get(cache_key)
-        
-        if not all_policies:
-            policies = []
-            next_token = None
-            while True:
-                params = {'type': 'data'}
-                if next_token:
-                    params['nextToken'] = next_token
-                
-                response = client.list_access_policies(**params)
-                
-                for p in response.get('accessPolicySummaries', []):
-                    detail = self.manager.retry(
-                        client.get_access_policy,
-                        type='data',
-                        name=p['name']
-                    )
-                    if detail:
-                        if isinstance(detail['accessPolicyDetail']['policy'], str):
-                            policies.append(json.loads(detail['accessPolicyDetail']['policy']))
-                        else:
-                            policies.append(detail['accessPolicyDetail']['policy'])
-                
-                next_token = response.get('nextToken')
-                if not next_token:
-                    break
-            
-            all_policies = policies
-            try:
-                self.manager._cache[cache_key] = all_policies
-            except Exception:
-                pass
-        
-        for r in resources:
-            if self.policy_attribute in r:
-                continue
-
-            matching_rules = []
-            for policy in all_policies:
-                if isinstance(policy, list):
-                    for rule in policy:
-                        # Check if this rule applies to the current collection
-                        matches_resource = False
-                        for pattern in rule.get('Rules', []):
-                            for res in pattern.get('Resource', []):
-                                if res.startswith('collection/'):
-                                    coll_pattern = res.split('/', 1)[1]
-                                    if fnmatch(r['name'], coll_pattern):
-                                        matches_resource = True
-                                        break
-                            if matches_resource:
-                                break
-                        
-                        if matches_resource:
-                            matching_rules.append(rule)
-            
-            if matching_rules:
-                r[self.policy_attribute] = self.marshal_policy(matching_rules, r['arn'])
-            else:
-                r[self.policy_attribute] = None
-
-    def marshal_policy(self, rules, resource_arn):
-        # Convert AOSS rules list to logical IAM Policy
-        iam_policy = {
-            "Version": "2012-10-17",
-            "Statement": []
-        }
-        
-        for rule in rules:
-            statement = {
-                "Effect": "Allow",
-                "Principal": {"AWS": rule.get('Principal', [])},
-                "Action": [],
-                "Resource": [resource_arn]
-            }
-            # handle permissions
-            for sub_rule in rule.get('Rules', []):
-                statement['Action'].extend(sub_rule.get('Permission', []))
-            iam_policy['Statement'].append(statement)
-            
-        return iam_policy
 
 @OpensearchServerless.action_registry.register('tag')
 class TagOpensearchServerlessResource(Tag):
@@ -323,11 +212,11 @@ class OpensearchIngestionPipelineConfigFilter(ValueFilter):
                 matched.append(r)
         return matched
 
+
 @OpensearchIngestion.filter_registry.register('cross-account')
 class CrossAccountFilter(CrossAccountAccessFilter):
-    """
-    Filter OpenSearch Ingestion Pipelines by cross-account access
-    
+    """Filter OpenSearch Ingestion Pipelines by cross-account access
+
     :example:
 
     .. code-block:: yaml
@@ -339,65 +228,25 @@ class CrossAccountFilter(CrossAccountAccessFilter):
               - type: cross-account
     """
     policy_attribute = 'c7n:Policy'
-    permissions = ('osis:ListPipelines',)
-    
+    permissions = ('osis:GetResourcePolicy')
+
     def process(self, resources, event=None):
         client = local_session(self.manager.session_factory).client('osis')
-        iam_client = local_session(self.manager.session_factory).client('iam')
-        
+
         for r in resources:
             if self.policy_attribute in r:
                 continue
-            
-            statements = []
-            
+
             # Pipeline Resource Policy cross account check
-            try:
-                res_policy = self.manager.retry(
-                    client.get_resource_policy,
-                    ResourceArn=r['PipelineArn'],
-                    ignore_err_codes=('ResourceNotFoundException',))
-                if res_policy and res_policy.get('Policy'):
-                    p = json.loads(res_policy['Policy'])
-                    statements.extend(p.get('Statement', []))
-            except Exception:
-                pass
-                
-            # Role Trust Policy cross account check
-            role_arn = r.get('PipelineRoleArn')
-            if role_arn:
-                cache_key = 'iam-role-{}'.format(role_arn)
-                role = self.manager._cache.get(cache_key)
-                if not role:
-                    try:
-                        role_name = role_arn.split('/')[-1]
-                        role = iam_client.get_role(RoleName=role_name)['Role']
-                        try:
-                            self.manager._cache[cache_key] = role
-                        except Exception:
-                            pass
-                    except Exception:
-                        pass
-                
-                if role and role.get('AssumeRolePolicyDocument'):
-                    trust_policy = role['AssumeRolePolicyDocument']
-                    if isinstance(trust_policy, str):
-                        if trust_policy.startswith('%'):
-                            from urllib.parse import unquote
-                            trust_policy = unquote(trust_policy)
-                        trust_policy = json.loads(trust_policy)
-                    statements.extend(trust_policy.get('Statement', []))
-            
-            if statements:
-                r[self.policy_attribute] = {
-                    "Version": "2012-10-17",
-                    "Statement": statements
-                }
+            res_policy = self.manager.retry(
+                client.get_resource_policy,
+                ResourceArn=r['PipelineArn'],
+                ignore_err_codes=('ResourceNotFoundException',))
+            if res_policy and res_policy.get('Policy'):
+                r[self.policy_attribute] = res_policy['Policy']
             else:
                 r[self.policy_attribute] = None
-                
         return super().process(resources, event)
-
 
 
 @OpensearchIngestion.action_registry.register('tag')

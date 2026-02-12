@@ -2,7 +2,7 @@
     "status_code": 200,
     "data": {
         "ResponseMetadata": {},
-        "ResourceArn": "arn:aws:osis:us-east-1:644160558196:pipeline/c7n-test-d0c207aff6bcf63a",
-        "Policy": "{}"
+        "ResourceArn": "arn:aws:osis:us-east-1:644160558196:pipeline/c7n-test",
+        "Policy": "{\"Version\":\"2012-10-17\",\"Statement\":[{\"Sid\":\"AllowCrossAccountIngestion\",\"Effect\":\"Allow\",\"Principal\":{\"AWS\":[\"644160558196\"]},\"Action\":\"osis:*\",\"Resource\":\"arn:aws:osis:us-east-1:644160558196:pipeline/c7n-test\"}]}"
     }
 }
