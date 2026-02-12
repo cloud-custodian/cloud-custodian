@@ -1218,6 +1218,67 @@ class TestMetricsFilter(BaseTest):
             })
         self.assertIn('cannot exceed 455', str(err.exception))
 
+    def test_metric_start_of_day_multiple_days(self):
+        """
+        Test that the CloudWatch metric window correctly aligns to full UTC
+        calendar days when `start-of-day` is True and multiple days are specified.
+
+        This ensures that:
+
+        1. The start of the metric window aligns to 00:00:00 UTC
+        N days ago (where N is the number of days specified).
+        2. The end of the metric window aligns to the end of the last
+        completed UTC day (23:59:59 UTC), calculated as:
+            midnight UTC today - 1 second.
+        3. The window spans exactly N full UTC calendar days.
+        4. Backward compatibility is preserved when `start-of-day`
+        is not specified.
+
+        Example:
+            days = 3
+            current time = 2020-12-03 04:47:15 UTC
+
+            Expected window:
+                start = 2020-11-30 00:00:00 UTC
+                end   = 2020-12-02 23:59:59 UTC
+
+            Covered days:
+                2020-11-30
+                2020-12-01
+                2020-12-02
+        """
+
+        with mock_datetime_now(parse_date("2020-12-03T04:47:15+00:00"), base_filters.metrics):
+            p = self.load_policy(
+                {
+                    "name": "sqs-start-of-day-multi",
+                    "resource": "sqs",
+                    "filters": [
+                        {
+                            "type": "metrics",
+                            "name": "NumberOfMessagesSent",
+                            "statistics": "Sum",
+                            "days": 3,
+                            "start-of-day": True,
+                            "value": 0,
+                            "op": "eq"
+                        }
+                    ]
+                }
+            )
+
+            metrics_filter = p.resource_manager.filters[0]
+            window = metrics_filter.get_metric_window()
+
+            self.assertEqual(
+                parse_date("2020-11-30T00:00:00+00:00"),
+                window.start
+            )
+            self.assertEqual(
+                parse_date("2020-12-02T23:59:59+00:00"),
+                window.end
+            )
+
 
 class TestReduceFilter(BaseFilterTest):
 

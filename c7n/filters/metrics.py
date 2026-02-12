@@ -80,6 +80,7 @@ class MetricsFilter(Filter):
            # Type choices
            'statistics': {'type': 'string'},
            'days': {'type': 'number'},
+           'start-of-day': {'type': 'boolean'},
            'op': {'type': 'string', 'enum': list(OPERATORS.keys())},
            'value': {'type': 'number'},
            'period': {'type': 'number'},
@@ -133,6 +134,7 @@ class MetricsFilter(Filter):
     def __init__(self, data, manager=None):
         super(MetricsFilter, self).__init__(data, manager)
         self.days = self.data.get('days', 14)
+        self.start_of_day = self.data.get('start-of-day', False)
 
     def validate(self):
         stats = self.data.get('statistics', 'Average')
@@ -175,7 +177,13 @@ class MetricsFilter(Filter):
             # CloudWatch retention: 455 days
             end = now.replace(minute=0, second=0, microsecond=0) + timedelta(hours=1)
 
-        return MetricWindow((end - duration), end)
+        start = end - duration
+
+        if self.start_of_day:
+            start = start.replace(hour=0, minute=0, second=0, microsecond=0)
+            end = end.replace(hour=0, minute=0, second=0, microsecond=0) - timedelta(seconds=1)
+
+        return MetricWindow(start, end)
 
     def process(self, resources, event=None):
         self.start, self.end = self.get_metric_window()

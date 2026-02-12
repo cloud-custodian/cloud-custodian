@@ -83,6 +83,7 @@ class GCPMetricsFilter(Filter):
           'metric-key': {'type': 'string'},
           'group-by-fields': {'type': 'array', 'items': {'type': 'string'}},
           'days': {'type': 'number'},
+          'start-of-day': {'type': 'boolean'},
           'op': {'type': 'string', 'enum': list(OPERATORS.keys())},
           'reducer': {'type': 'string', 'enum': REDUCERS},
           'aligner': {'type': 'string', 'enum': ALIGNERS},
@@ -111,6 +112,16 @@ class GCPMetricsFilter(Filter):
         self.missing_value = self.data.get('missing-value')
         self.end = datetime.utcnow().replace(microsecond=0)
         self.start = self.end - duration
+        self.start_of_day = self.data.get('start-of-day', False)
+
+        if self.start_of_day:
+            self.start = self.start.replace(
+                hour=0, minute=0, second=0, microsecond=0
+            )
+            self.end = self.end.replace(
+                hour=0, minute=0, second=0, microsecond=0
+            ) - timedelta(seconds=1)
+
         self.period = str((self.end - self.start).total_seconds()) + 's'
         self.resource_metric_dict = {}
         self.op = OPERATORS[self.data.get('op', 'less-than')]

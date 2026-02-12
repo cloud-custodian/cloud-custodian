@@ -148,6 +148,7 @@ class MetricFilter(Filter):
             'threshold': {'type': 'number'},
             'metric_namespace': {'type': 'string'},
             'timeframe': {'type': 'number'},
+            'start-of-day': {'type': 'boolean'},
             'interval': {'enum': [
                 'PT1M', 'PT5M', 'PT15M', 'PT30M', 'PT1H', 'PT6H', 'PT12H', 'P1D']},
             'aggregation': {'enum': ['total', 'average', 'count', 'minimum', 'maximum']},
@@ -179,6 +180,8 @@ class MetricFilter(Filter):
         self.no_data_action = self.data.get('no_data_action', 'exclude')
         # default to no namespace if not passed in
         self.metricnamespace = self.data.get("metric_namespace", None)
+        # default to false if not passed in
+        self.start_of_day = self.data.get('start-of-day', False)
 
     def process(self, resources, event=None):
         # Import utcnow function as it may have been overridden for testing purposes
@@ -187,6 +190,15 @@ class MetricFilter(Filter):
         # Get timespan
         end_time = utcnow()
         start_time = end_time - timedelta(hours=self.timeframe)
+
+        if self.start_of_day:
+            start_time = start_time.replace(
+                hour=0, minute=0, second=0, microsecond=0
+            )
+            end_time = end_time.replace(
+                hour=0, minute=0, second=0, microsecond=0
+            ) - timedelta(seconds=1)
+
         self.timespan = "{}/{}".format(start_time, end_time)
 
         # Create Azure Monitor client

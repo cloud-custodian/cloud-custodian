@@ -158,6 +158,57 @@ class TestGCPMetricsFilter(BaseTest):
         # This should be filtering out the resource, & not erroring..
         self.assertEqual(len(resources), 0)
 
+    def test_metrics_start_of_day(self):
+        """
+        Ensure GCPMetricsFilter correctly snaps the metric window to full UTC
+        calendar days when 'start-of-day' is True.
+
+        This verifies:
+        - start aligns to 00:00:00 UTC N days ago
+        - end aligns to 23:59:59 UTC of the last completed day
+        - period equals the exact difference between start and end
+        """
+        policy = self.load_policy(
+            {
+                "name": "gcp-start-of-day-test",
+                "resource": "gcp.instance",
+                "filters": [
+                    {
+                        "type": "metrics",
+                        "name": "compute.googleapis.com/instance/cpu/utilization",
+                        "metric-key": "metric.labels.instance_name",
+                        "aligner": "ALIGN_MEAN",
+                        "days": 2,
+                        "start-of-day": True,
+                        "value": 0.1,
+                        "filter": 'resource.labels.zone = "us-east4-c"',
+                        "op": "less-than",
+                    }
+                ],
+            },
+        )
+
+        metrics_filter = policy.resource_manager.filters[0]
+
+        metrics_filter.process([])
+
+        # Start should be midnight UTC
+        self.assertEqual(metrics_filter.start.hour, 0)
+        self.assertEqual(metrics_filter.start.minute, 0)
+        self.assertEqual(metrics_filter.start.second, 0)
+        self.assertEqual(metrics_filter.start.microsecond, 0)
+
+        # End should be 23:59:59 UTC (midnight - 1 second)
+        self.assertEqual(metrics_filter.end.hour, 23)
+        self.assertEqual(metrics_filter.end.minute, 59)
+        self.assertEqual(metrics_filter.end.second, 59)
+        self.assertEqual(metrics_filter.end.microsecond, 0)
+
+        # Period should match the difference in seconds
+        expected_period = (metrics_filter.end - metrics_filter.start).total_seconds()
+        actual_period = float(metrics_filter.period.rstrip("s"))
+        self.assertEqual(actual_period, expected_period)
+
 
 class TestSecurityComandCenterFindingsFilter(BaseTest):
 

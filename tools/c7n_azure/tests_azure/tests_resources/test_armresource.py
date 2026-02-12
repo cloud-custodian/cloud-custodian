@@ -45,6 +45,27 @@ class ArmResourceTest(BaseTest):
         self.assertEqual(len(resources), 1)
 
     @arm_template('vm.json')
+    def test_metric_filter_start_of_day(self):
+        p = self.load_policy({
+            'name': 'test-azure-metric-sod',
+            'resource': 'azure.vm',
+            'filters': [
+                {'type': 'value',
+                 'key': 'name',
+                 'op': 'eq',
+                 'value_type': 'normalize',
+                 'value': 'cctestvm'},
+                {'type': 'metric',
+                 'metric': 'Percentage CPU',
+                 'aggregation': 'average',
+                 'op': 'gt',
+                 'threshold': 0,
+                 'start-of-day': True}],
+        })
+        resources = p.run()
+        self.assertEqual(len(resources), 1)
+
+    @arm_template('vm.json')
     def test_metric_filter_find(self):
         p = self.load_policy({
             'name': 'test-azure-metric',
