@@ -24,6 +24,7 @@ def test_opensearch_ingestion_cross_account(test, opensearch_ingestion_cross_acc
     assert len(resources) == 1
     assert resources[0]['PipelineArn'] == 'arn:aws:osis:us-east-1:644160558196:pipeline/c7n-test'
     assert resources[0]['Status'] == 'ACTIVE'
+    assert 'c7n:Policy' in resources[0]
     assert 'CrossAccountViolations' in resources[0]
     assert resources[0]['CrossAccountViolations'][0]['Sid'] == 'AllowCrossAccountIngestion'
 
