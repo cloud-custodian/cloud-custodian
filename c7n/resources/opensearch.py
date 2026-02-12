@@ -228,7 +228,7 @@ class CrossAccountFilter(CrossAccountAccessFilter):
               - type: cross-account
     """
     policy_attribute = 'c7n:Policy'
-    permissions = ('osis:GetResourcePolicy')
+    permissions = ('osis:GetResourcePolicy',)
 
     def process(self, resources, event=None):
         client = local_session(self.manager.session_factory).client('osis')
