@@ -1,0 +1,37 @@
+{
+    "status_code": 200,
+    "data": {
+        "ApiDestinations": [
+            {
+                "ApiDestinationArn": "arn:aws:events:us-east-1:644160558196:api-destination/test-delete-me/56df9548-96e3-4ef7-9a4a-eab64eb1fbad",
+                "Name": "test-delete-me",
+                "ApiDestinationState": "ACTIVE",
+                "ConnectionArn": "arn:aws:events:us-east-1:644160558196:connection/first-connection/baca7cae-7d9d-49f6-a09a-a0e517be5894",
+                "InvocationEndpoint": "https://example.com",
+                "HttpMethod": "GET",
+                "InvocationRateLimitPerSecond": 300,
+                "CreationTime": {
+                    "__class__": "datetime",
+                    "year": 2026,
+                    "month": 1,
+                    "day": 13,
+                    "hour": 14,
+                    "minute": 24,
+                    "second": 34,
+                    "microsecond": 0
+                },
+                "LastModifiedTime": {
+                    "__class__": "datetime",
+                    "year": 2026,
+                    "month": 1,
+                    "day": 13,
+                    "hour": 14,
+                    "minute": 24,
+                    "second": 34,
+                    "microsecond": 0
+                }
+            }
+        ],
+        "ResponseMetadata": {}
+    }
+}
