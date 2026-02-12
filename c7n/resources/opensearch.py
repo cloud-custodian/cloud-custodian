@@ -242,8 +242,8 @@ class CrossAccountFilter(CrossAccountAccessFilter):
                 client.get_resource_policy,
                 ResourceArn=r['PipelineArn'],
                 ignore_err_codes=('ResourceNotFoundException',))
-            if res_policy and res_policy.get('Policy'):
-                r[self.policy_attribute] = res_policy['Policy']
+            if res_policy:
+                r[self.policy_attribute] = res_policy.get('Policy')
             else:
                 r[self.policy_attribute] = None
         return super().process(resources, event)
