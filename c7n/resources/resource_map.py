@@ -35,6 +35,8 @@ ResourceMap = {
   "aws.batch-definition": "c7n.resources.batch.JobDefinition",
   "aws.batch-queue": "c7n.resources.batch.BatchJobQueue",
   "aws.bedrock-agent": "c7n.resources.bedrock.BedrockAgent",
+  "aws.bedrock-inference-profile":
+    "c7n.resources.bedrock.BedrockApplicationInferenceProfile",
   "aws.bedrock-custom-model": "c7n.resources.bedrock.BedrockCustomModel",
   "aws.bedrock-knowledge-base": "c7n.resources.bedrock.BedrockKnowledgeBase",
   "aws.budget": "c7n.resources.budgets.Budget",
@@ -136,6 +138,7 @@ ResourceMap = {
   "aws.emr-security-configuration": "c7n.resources.emr.EMRSecurityConfiguration",
   "aws.emr-serverless-app": "c7n.resources.emr.EMRServerless",
   "aws.eni": "c7n.resources.vpc.NetworkInterface",
+  "aws.event-api-destination": "c7n.resources.eventbridge.EventApiDestination",
   "aws.event-bus": "c7n.resources.eventbridge.EventBus",
   "aws.event-rule": "c7n.resources.eventbridge.EventRule",
   "aws.event-rule-target": "c7n.resources.eventbridge.EventRuleTarget",

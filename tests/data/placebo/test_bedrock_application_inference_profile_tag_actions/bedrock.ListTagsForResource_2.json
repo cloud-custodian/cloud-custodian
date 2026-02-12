@@ -1,0 +1,16 @@
+{
+    "status_code": 200,
+    "data": {
+        "ResponseMetadata": {},
+        "tags": [
+            {
+                "key": "Environment",
+                "value": "test"
+            },
+            {
+                "key": "NewTag",
+                "value": "NewValue"
+            }
+        ]
+    }
+}

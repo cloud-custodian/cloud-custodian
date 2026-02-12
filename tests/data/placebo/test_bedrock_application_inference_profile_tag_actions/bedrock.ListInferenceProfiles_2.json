@@ -1,0 +1,44 @@
+{
+    "status_code": 200,
+    "data": {
+        "ResponseMetadata": {},
+        "inferenceProfileSummaries": [
+            {
+                "inferenceProfileName": "c7n-test-profile-eb4473e0",
+                "description": "Test profile for C7N",
+                "createdAt": {
+                    "__class__": "datetime",
+                    "year": 2026,
+                    "month": 2,
+                    "day": 9,
+                    "hour": 20,
+                    "minute": 16,
+                    "second": 10,
+                    "microsecond": 753440
+                },
+                "updatedAt": {
+                    "__class__": "datetime",
+                    "year": 2026,
+                    "month": 2,
+                    "day": 9,
+                    "hour": 20,
+                    "minute": 16,
+                    "second": 10,
+                    "microsecond": 753440
+                },
+                "inferenceProfileArn": "arn:aws:bedrock:us-east-1:644160558196:application-inference-profile/2gik196ltpaz",
+                "models": [
+                    {
+                        "modelArn": "arn:aws:bedrock:::foundation-model/amazon.nova-2-lite-v1:0"
+                    },
+                    {
+                        "modelArn": "arn:aws:bedrock:us-east-1::foundation-model/amazon.nova-2-lite-v1:0"
+                    }
+                ],
+                "inferenceProfileId": "2gik196ltpaz",
+                "status": "ACTIVE",
+                "type": "APPLICATION"
+            }
+        ]
+    }
+}
