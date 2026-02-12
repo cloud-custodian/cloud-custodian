@@ -82,7 +82,6 @@ class LoadBalancingAddressTest(BaseTest):
         self.assertEqual(len(resources), 1)
 
 
-
 class LoadBalancingUrlMapTest(BaseTest):
 
     def test_loadbalancer_url_map_query(self):
