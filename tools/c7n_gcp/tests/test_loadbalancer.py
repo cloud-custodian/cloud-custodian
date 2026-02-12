@@ -68,6 +68,20 @@ class LoadBalancingAddressTest(BaseTest):
 
         self.assertEqual(len(result['items']["regions/{}".format(region)]['addresses']), 0)
 
+    def test_loadbalancer_address_filter_global_addresses(self):
+        project_id = 'cloud-custodian'
+        factory = self.replay_flight_data('lb-addresses-global-addresses',
+                                          project_id=project_id)
+        policy = self.load_policy(
+        {
+            'name': 'delete-unused-gcp-ip-addresses',
+            'resource': 'gcp.loadbalancer-address',
+        },
+        session_factory=factory)
+        resources = policy.run()
+        self.assertEqual(len(resources), 1)
+
+
 
 class LoadBalancingUrlMapTest(BaseTest):
 
