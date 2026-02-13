@@ -4,6 +4,7 @@
 from c7n.actions import BaseAction
 from c7n.filters import ValueFilter
 from c7n.filters.kms import KmsRelatedFilter
+from c7n.filters.iamaccess import CrossAccountAccessFilter
 from c7n.manager import resources
 from c7n.query import QueryResourceManager, TypeInfo
 from c7n.tags import RemoveTag, Tag, TagActionFilter, TagDelayedAction
@@ -210,6 +211,40 @@ class OpensearchIngestionPipelineConfigFilter(ValueFilter):
             if self.match(r[self.annotation_key]):
                 matched.append(r)
         return matched
+
+
+@OpensearchIngestion.filter_registry.register('cross-account')
+class CrossAccountFilter(CrossAccountAccessFilter):
+    """Filter OpenSearch Ingestion Pipelines by cross-account access
+
+    :example:
+
+    .. code-block:: yaml
+
+        policies:
+          - name: osis-cross-account
+            resource: opensearch-ingestion
+            filters:
+              - type: cross-account
+    """
+    policy_attribute = 'c7n:Policy'
+    permissions = ('osis:GetResourcePolicy',)
+
+    def process(self, resources, event=None):
+        client = local_session(self.manager.session_factory).client('osis')
+
+        for r in resources:
+            if self.policy_attribute in r:
+                continue
+
+            # Pipeline Resource Policy cross account check
+            res_policy = self.manager.retry(
+                client.get_resource_policy,
+                ResourceArn=r['PipelineArn'],
+                ignore_err_codes=('ResourceNotFoundException',))
+            if res_policy:
+                r[self.policy_attribute] = res_policy.get('Policy')
+        return super().process(resources, event)
 
 
 @OpensearchIngestion.action_registry.register('tag')

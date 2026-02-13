@@ -13,6 +13,10 @@ from c7n.exceptions import PolicyValidationError
 from c7n.filters.core import Filter, OPERATORS
 from c7n.utils import local_session, type_schema, chunks
 
+METRIC_WINDOW_ALIGNMENT = [
+    'auto',
+    'start-of-day',
+]
 
 class MetricsFilter(Filter):
     """Supports cloud watch metrics filters on resources.
@@ -80,7 +84,7 @@ class MetricsFilter(Filter):
            # Type choices
            'statistics': {'type': 'string'},
            'days': {'type': 'number'},
-           'start-of-day': {'type': 'boolean'},
+           'period-start': {'type': 'string', 'enum': METRIC_WINDOW_ALIGNMENT},
            'op': {'type': 'string', 'enum': list(OPERATORS.keys())},
            'value': {'type': 'number'},
            'period': {'type': 'number'},
@@ -134,7 +138,7 @@ class MetricsFilter(Filter):
     def __init__(self, data, manager=None):
         super(MetricsFilter, self).__init__(data, manager)
         self.days = self.data.get('days', 14)
-        self.start_of_day = self.data.get('start-of-day', False)
+        self.period_start = self.data.get('period-start', 'auto')
 
     def validate(self):
         stats = self.data.get('statistics', 'Average')
@@ -179,7 +183,7 @@ class MetricsFilter(Filter):
 
         start = end - duration
 
-        if self.start_of_day:
+        if self.period_start == 'start-of-day':
             start = start.replace(hour=0, minute=0, second=0, microsecond=0)
             end = end.replace(hour=0, minute=0, second=0, microsecond=0) - timedelta(seconds=1)
 

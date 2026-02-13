@@ -1218,10 +1218,11 @@ class TestMetricsFilter(BaseTest):
             })
         self.assertIn('cannot exceed 455', str(err.exception))
 
-    def test_metric_start_of_day_multiple_days(self):
+    def test_metric_period_start_start_of_day_multiple_days(self):
         """
         Test that the CloudWatch metric window correctly aligns to full UTC
-        calendar days when `start-of-day` is True and multiple days are specified.
+        calendar days when `period-start` is set to "start-of-day"
+        and multiple days are specified.
 
         This ensures that:
 
@@ -1231,8 +1232,8 @@ class TestMetricsFilter(BaseTest):
         completed UTC day (23:59:59 UTC), calculated as:
             midnight UTC today - 1 second.
         3. The window spans exactly N full UTC calendar days.
-        4. Backward compatibility is preserved when `start-of-day`
-        is not specified.
+        4. Backward compatibility is preserved when `period-start`
+        is not specified (defaults to "auto").
 
         Example:
             days = 3
@@ -1248,10 +1249,13 @@ class TestMetricsFilter(BaseTest):
                 2020-12-02
         """
 
-        with mock_datetime_now(parse_date("2020-12-03T04:47:15+00:00"), base_filters.metrics):
+        with mock_datetime_now(
+            parse_date("2020-12-03T04:47:15+00:00"),
+            base_filters.metrics
+        ):
             p = self.load_policy(
                 {
-                    "name": "sqs-start-of-day-multi",
+                    "name": "sqs-period-start-multi",
                     "resource": "sqs",
                     "filters": [
                         {
@@ -1259,7 +1263,7 @@ class TestMetricsFilter(BaseTest):
                             "name": "NumberOfMessagesSent",
                             "statistics": "Sum",
                             "days": 3,
-                            "start-of-day": True,
+                            "period-start": "start-of-day",
                             "value": 0,
                             "op": "eq"
                         }
