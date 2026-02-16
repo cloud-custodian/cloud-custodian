@@ -8,7 +8,7 @@ from c7n.resources import eventbridge
 @pytest.mark.audited
 @terraform('event_bridge_bus')
 def test_event_bus_describe(test, event_bridge_bus):
-    factory = test.replay_flight_data('test_cwe_bus_xaccount', region='us-west-1')
+    factory = test.replay_flight_data('test_cwe_bus_xaccount')
     p = test.load_policy({
         'name': 'bus-xaccount',
         'resource': 'aws.event-bus',
@@ -16,7 +16,7 @@ def test_event_bus_describe(test, event_bridge_bus):
             {'tag:Env': 'Sandbox'},
             'cross-account'
         ],
-    }, session_factory=factory, config={'region': 'us-west-1'})
+    }, session_factory=factory)
     resources = p.run()
     assert len(resources) == 1
     resources[0]['Name'] == event_bridge_bus[
@@ -310,3 +310,27 @@ class PipesTest(BaseTest):
         client = factory().client("pipes")
         pipes = client.list_pipes()["Pipes"]
         self.assertEqual(pipes[0]["CurrentState"], "DELETING")
+
+
+class ApiDestinationTest(BaseTest):
+
+    def test_api_destination_query(self):
+        factory = self.replay_flight_data("test_api_destination_query")
+        p = self.load_policy(
+            {
+                "name": "query-api-destinations",
+                "resource": "aws.event-api-destination",
+                "filters": [
+                    {
+                        "type": "value",
+                        "key": "ApiDestinationState",
+                        "value": "ACTIVE"
+                    }
+                ],
+            },
+            session_factory=factory,
+        )
+        resources = p.run()
+        self.assertEqual(len(resources), 1)
+        self.assertEqual(resources[0]["Name"], "test-delete-me")
+        self.assertEqual(resources[0]["ApiDestinationState"], "ACTIVE")

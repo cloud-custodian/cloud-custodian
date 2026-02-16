@@ -1,0 +1,47 @@
+{
+  "headers": {
+    "content-type": "application/json; charset=UTF-8",
+    "vary": "Origin, X-Origin, Referer",
+    "date": "Thu, 05 Feb 2026 20:48:29 GMT",
+    "server": "ESF",
+    "x-xss-protection": "0",
+    "x-frame-options": "SAMEORIGIN",
+    "x-content-type-options": "nosniff",
+    "alt-svc": "h3=\":443\"; ma=2592000,h3-29=\":443\"; ma=2592000",
+    "transfer-encoding": "chunked",
+    "status": "200",
+    "content-length": "1067",
+    "-content-encoding": "gzip"
+  },
+  "body": {
+    "name": "operations/projects/cloud-custodian/instances/c7n-bigtable-instance/locations/us-central1-a/operations/9099284083680298882",
+    "metadata": {
+      "@type": "type.googleapis.com/google.bigtable.admin.v2.UpdateInstanceMetadata",
+      "originalRequest": {
+        "instance": {
+          "name": "projects/cloud-custodian/instances/c7n-bigtable-instance",
+          "type": "PRODUCTION",
+          "labels": {
+            "env": "not-the-default",
+            "goog-terraform-provisioned": "true"
+          }
+        },
+        "updateMask": "labels"
+      },
+      "requestTime": "2026-02-05T20:48:28.886782Z",
+      "finishTime": "2026-02-05T20:48:28.886782Z"
+    },
+    "done": true,
+    "response": {
+      "@type": "type.googleapis.com/google.bigtable.admin.v2.Instance",
+      "name": "projects/cloud-custodian/instances/c7n-bigtable-instance",
+      "displayName": "c7n-bigtable-instance",
+      "type": "PRODUCTION",
+      "labels": {
+        "env": "not-the-default",
+        "goog-terraform-provisioned": "true"
+      },
+      "createTime": "2026-02-05T20:36:16.382739Z"
+    }
+  }
+}

@@ -29,6 +29,8 @@ class DataSet(QueryResourceManager):
         permissions = ('bigquery.datasets.get',)
         urn_component = "dataset"
         urn_id_path = "datasetReference.datasetId"
+        labels = True
+        labels_op = 'patch'
 
         @staticmethod
         def get(client, event):
@@ -43,6 +45,10 @@ class DataSet(QueryResourceManager):
             else:
                 ref = event
             return client.execute_query('get', verb_arguments=ref)
+
+        @staticmethod
+        def get_label_params(resource, all_labels):
+            return {**resource['datasetReference'], 'body': {'labels': all_labels}}
 
     def augment(self, resources):
         client = self.get_client()
@@ -71,6 +77,7 @@ class BigQueryJob(QueryResourceManager):
         name = id = 'id'
         default_report_fields = ["id", "user_email", "status.state"]
         urn_component = "job"
+        # Jobs have labels but no update method, so no labels action
 
         @staticmethod
         def get(client, event):
@@ -115,6 +122,8 @@ class BigQueryTable(ChildResourceManager):
         asset_type = "bigquery.googleapis.com/Table"
         urn_component = "table"
         urn_id_path = "tableReference.tableId"
+        labels = True
+        labels_op = 'patch'
 
         @classmethod
         def _get_urn_id(cls, resource):
@@ -128,6 +137,10 @@ class BigQueryTable(ChildResourceManager):
                 'datasetId': event['dataset_id'],
                 'tableId': event['resourceName'].rsplit('/', 1)[-1]
             })
+
+        @staticmethod
+        def get_label_params(resource, all_labels):
+            return {**resource['tableReference'], 'body': {'labels': all_labels}}
 
     def augment(self, resources):
         client = self.get_client()
