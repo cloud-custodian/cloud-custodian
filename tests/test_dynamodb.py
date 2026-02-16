@@ -444,6 +444,38 @@ class DynamodbTest(BaseTest):
         self.assertEqual("NEW_IMAGE", stream_type)
 
 
+
+    def test_export_description_filter(self):
+        session_factory = self.replay_flight_data("test_dynamodb_export_description_filter")
+        p = self.load_policy(
+            {
+                "name": "dynamodb-exports-s3-owner",
+                "resource": "dynamodb-table",
+                "filters": [
+                    {
+                        "type": "export-description",
+                        "key": "S3BucketOwner",
+                        "value": "408502716114"
+                    },
+                    {
+                        "type": "export-description",
+                        "key": "ExportStatus",
+                        "op": "in",
+                        "value": ["COMPLETED"]
+                    }
+                ]
+            },
+            session_factory=session_factory,
+        )
+        resources = p.run()
+        self.assertEqual(len(resources), 1)
+        self.assertTrue("c7n:ExportDescription" in resources[0])
+
+        exports = resources[0]["c7n:ExportDescription"]
+        self.assertEqual(len(exports), 1)
+        self.assertEqual(exports[0]["S3BucketOwner"], "408502716114")
+
+
 class DynamoDbAccelerator(BaseTest):
 
     def test_resources(self):

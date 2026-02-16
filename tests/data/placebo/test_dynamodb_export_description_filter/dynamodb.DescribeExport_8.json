@@ -1,0 +1,39 @@
+{
+    "status_code": 200,
+    "data": {
+        "ExportDescription": {
+            "ExportArn": "arn:aws:dynamodb:us-east-1:644160558196:table/test-export-description-filter/export/01771252297665-4e02453a",
+            "ExportStatus": "FAILED",
+            "StartTime": {
+                "__class__": "datetime",
+                "year": 2026,
+                "month": 2,
+                "day": 16,
+                "hour": 9,
+                "minute": 31,
+                "second": 37,
+                "microsecond": 665000
+            },
+            "TableArn": "arn:aws:dynamodb:us-east-1:644160558196:table/test-export-description-filter",
+            "TableId": "b9edda4f-dec1-46b2-8dab-b232db7cd965",
+            "ExportTime": {
+                "__class__": "datetime",
+                "year": 2026,
+                "month": 2,
+                "day": 16,
+                "hour": 9,
+                "minute": 31,
+                "second": 37,
+                "microsecond": 665000
+            },
+            "ClientToken": "070c2be5-8aec-4578-99bb-c2bafe19e5f7",
+            "S3Bucket": "apogeeac-custodian-test-bucket",
+            "S3BucketOwner": "644160558196",
+            "S3SseAlgorithm": "AES256",
+            "FailureCode": "S3AccessDenied",
+            "FailureMessage": "User: arn:aws:iam::644160558196:root is not authorized to perform: s3:PutObject on resource: \"arn:aws:s3:::apogeeac-custodian-test-bucket/AWSDynamoDB/01771252297665-4e02453a/_started\" because no resource-based policy allows the s3:PutObject action (Service: Amazon S3; Status Code: 403; Error Code: AccessDenied; Request ID: AZ0CHJS3KHV1ECVE; S3 Extended Request ID: P7/BQW6Eunqz6P5F7PZLYQTA4l8BgMR8zTGCp0gxtOAGB5mpbcmdfgbPNdQmyWX6JXBP9vHq3cxFFtQN97ZusmuceT4w+JYy; Proxy: null)",
+            "ExportFormat": "DYNAMODB_JSON"
+        },
+        "ResponseMetadata": {}
+    }
+}

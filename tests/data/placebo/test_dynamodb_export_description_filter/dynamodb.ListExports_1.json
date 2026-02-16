@@ -1,0 +1,53 @@
+{
+    "status_code": 200,
+    "data": {
+        "ExportSummaries": [
+            {
+                "ExportArn": "arn:aws:dynamodb:us-east-1:644160558196:table/test-export-description-filter/export/01771261966793-39cb1837",
+                "ExportStatus": "COMPLETED",
+                "ExportType": "FULL_EXPORT"
+            },
+            {
+                "ExportArn": "arn:aws:dynamodb:us-east-1:644160558196:table/test-export-description-filter/export/01771261885495-c7ead50c",
+                "ExportStatus": "FAILED",
+                "ExportType": "FULL_EXPORT"
+            },
+            {
+                "ExportArn": "arn:aws:dynamodb:us-east-1:644160558196:table/test-export-description-filter/export/01771260969420-1a5aad9e",
+                "ExportStatus": "FAILED",
+                "ExportType": "FULL_EXPORT"
+            },
+            {
+                "ExportArn": "arn:aws:dynamodb:us-east-1:644160558196:table/test-export-description-filter/export/01771259432731-94449f58",
+                "ExportStatus": "FAILED",
+                "ExportType": "FULL_EXPORT"
+            },
+            {
+                "ExportArn": "arn:aws:dynamodb:us-east-1:644160558196:table/test-export-description-filter/export/01771257223880-77913593",
+                "ExportStatus": "FAILED",
+                "ExportType": "FULL_EXPORT"
+            },
+            {
+                "ExportArn": "arn:aws:dynamodb:us-east-1:644160558196:table/test-export-description-filter/export/01771256872309-9686eb4c",
+                "ExportStatus": "FAILED",
+                "ExportType": "FULL_EXPORT"
+            },
+            {
+                "ExportArn": "arn:aws:dynamodb:us-east-1:644160558196:table/test-export-description-filter/export/01771256261618-2808544a",
+                "ExportStatus": "FAILED",
+                "ExportType": "FULL_EXPORT"
+            },
+            {
+                "ExportArn": "arn:aws:dynamodb:us-east-1:644160558196:table/test-export-description-filter/export/01771252297665-4e02453a",
+                "ExportStatus": "FAILED",
+                "ExportType": "FULL_EXPORT"
+            },
+            {
+                "ExportArn": "arn:aws:dynamodb:us-east-1:644160558196:table/test-export-description-filter/export/01771006983119-96b7127b",
+                "ExportStatus": "COMPLETED",
+                "ExportType": "FULL_EXPORT"
+            }
+        ],
+        "ResponseMetadata": {}
+    }
+}

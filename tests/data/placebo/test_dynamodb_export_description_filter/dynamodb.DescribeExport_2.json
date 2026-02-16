@@ -1,0 +1,39 @@
+{
+    "status_code": 200,
+    "data": {
+        "ExportDescription": {
+            "ExportArn": "arn:aws:dynamodb:us-east-1:644160558196:table/test-export-description-filter/export/01771261885495-c7ead50c",
+            "ExportStatus": "FAILED",
+            "StartTime": {
+                "__class__": "datetime",
+                "year": 2026,
+                "month": 2,
+                "day": 16,
+                "hour": 12,
+                "minute": 11,
+                "second": 25,
+                "microsecond": 495000
+            },
+            "TableArn": "arn:aws:dynamodb:us-east-1:644160558196:table/test-export-description-filter",
+            "TableId": "b9edda4f-dec1-46b2-8dab-b232db7cd965",
+            "ExportTime": {
+                "__class__": "datetime",
+                "year": 2026,
+                "month": 2,
+                "day": 16,
+                "hour": 12,
+                "minute": 11,
+                "second": 25,
+                "microsecond": 495000
+            },
+            "ClientToken": "9b180479-32b4-4b29-93f6-bae7ff43eb1b",
+            "S3Bucket": "apogeeac-test-bucket",
+            "S3Prefix": "AWSDynamoDB/",
+            "S3SseAlgorithm": "AES256",
+            "FailureCode": "S3AccessDenied",
+            "FailureMessage": "Access Denied (Service: Amazon S3; Status Code: 403; Error Code: AccessDenied; Request ID: 7A7DRGHKBHPHYP7Q; S3 Extended Request ID: aeRO63HOfUtSANE3a9alObu2GCJT401yQPtargkyFoHrfhtscN6W1aSycQmwBCZWu27v5Zw8GhiI9lICZAMCuf51UTLchqUz; Proxy: null)",
+            "ExportFormat": "DYNAMODB_JSON"
+        },
+        "ResponseMetadata": {}
+    }
+}
