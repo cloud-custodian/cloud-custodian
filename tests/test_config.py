@@ -109,9 +109,9 @@ class ConfigComplianceTest(BaseTest):
                         'type': 'config-compliance',
                         'eval_filters': [
                             {
-                                'EvaluationResultIdentifier.EvaluationResultQualifier.ResourceType': 'AWS::EC2::Volume'
+                                'EvaluationResultIdentifier.EvaluationResultQualifier.ResourceType': 'AWS::EC2::Volume'  # noqa: E501
                             }
-                        ],  # noqa
+                        ],
                         'rules': ['custodian-good-vol'],
                     }
                 ],
