@@ -10,16 +10,6 @@ from c7n_gcp.query import QueryResourceManager, TypeInfo
 class LoadBalancingAddress(QueryResourceManager):
     """GCP resource: https://cloud.google.com/compute/docs/reference/rest/v1/addresses
     """
-
-    def augment(self, resources):
-        filtered = []
-        for r in resources:
-            link = r.get('selfLink', '')
-            if '/global/addresses/' in link:
-                continue
-            filtered.append(r)
-        return filtered
-
     class resource_type(TypeInfo):
         service = 'compute'
         version = 'v1'
@@ -54,6 +44,22 @@ class LoadBalancingAddressDelete(MethodAction):
             'project': project,
             'region': resource['region'].rsplit('/', 1)[-1],
             'address': resource['name']}
+
+    def filter_resources(self, resources):
+        resources = super().filter_resources(resources)
+        missing_region = [r for r in resources if 'region' not in r]
+        if missing_region:
+            removed = ', '.join([r.get('name', '<unknown>') for r in missing_region])
+            self.log.warning(
+                "policy:%s action:%s filtered out %d resources without region: %s",
+                self.manager.ctx.policy.name,
+                self.type,
+                len(missing_region),
+                removed,
+            )
+            resources = [r for r in resources if 'region' in r]
+
+        return resources
 
 
 @resources.register('loadbalancer-url-map')

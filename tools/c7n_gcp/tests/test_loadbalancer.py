@@ -76,10 +76,13 @@ class LoadBalancingAddressTest(BaseTest):
         {
             'name': 'delete-unused-gcp-ip-addresses',
             'resource': 'gcp.loadbalancer-address',
+            'actions': ['delete']
         },
         session_factory=factory)
         resources = policy.run()
-        self.assertEqual(len(resources), 1)
+        self.assertEqual(len(resources), 2)
+
+        self.assertEqual(len([r for r in resources if 'region' not in r]), 1)
 
 
 class LoadBalancingUrlMapTest(BaseTest):
