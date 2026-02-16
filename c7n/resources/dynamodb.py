@@ -255,6 +255,7 @@ class ExportDescriptionFilter(ValueFilter):
         r[self.annotation_key] = matched
         return True
 
+
 @Table.action_registry.register('set-continuous-backup')
 class TableContinuousBackupAction(BaseAction):
     """Set continuous backups and point in time recovery (PITR) on a dynamodb table.

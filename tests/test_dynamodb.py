@@ -444,7 +444,6 @@ class DynamodbTest(BaseTest):
         self.assertEqual("NEW_IMAGE", stream_type)
 
 
-
     def test_export_description_filter(self):
         session_factory = self.replay_flight_data("test_dynamodb_export_description_filter")
         p = self.load_policy(
