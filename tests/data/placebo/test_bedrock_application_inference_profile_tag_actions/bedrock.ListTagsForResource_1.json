@@ -1,0 +1,24 @@
+{
+    "status_code": 200,
+    "data": {
+        "ResponseMetadata": {},
+        "tags": [
+            {
+                "key": "AnotherTag",
+                "value": "AnotherValue"
+            },
+            {
+                "key": "Environment",
+                "value": "test"
+            },
+            {
+                "key": "Owner",
+                "value": "c7n"
+            },
+            {
+                "key": "NewTag",
+                "value": "NewValue"
+            }
+        ]
+    }
+}

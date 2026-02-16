@@ -3,13 +3,21 @@
 from c7n.filters import ValueFilter
 from c7n.filters.iamaccess import CrossAccountAccessFilter
 from c7n.manager import resources
-from c7n.query import QueryResourceManager, TypeInfo, DescribeWithResourceTags
+from c7n.query import (
+    ChildDescribeSource,
+    ChildResourceManager,
+    DescribeWithResourceTags,
+    QueryResourceManager,
+    TypeInfo,
+)
+from c7n.tags import universal_augment
 from c7n.utils import local_session, type_schema
 
 
 @resources.register('vpc-lattice-service-network')
 class VPCLatticeServiceNetwork(QueryResourceManager):
     """VPC Lattice Service Network Resource"""
+
     source_mapping = {
         'describe': DescribeWithResourceTags,
     }
@@ -28,6 +36,7 @@ class VPCLatticeServiceNetwork(QueryResourceManager):
 @resources.register('vpc-lattice-service')
 class VPCLatticeService(QueryResourceManager):
     """VPC Lattice Service Resource"""
+
     source_mapping = {
         'describe': DescribeWithResourceTags,
     }
@@ -43,13 +52,14 @@ class VPCLatticeService(QueryResourceManager):
         permissions_enum = ('vpc-lattice:ListServices',)
         permissions_augment = (
             'vpc-lattice:GetService',
-            'vpc-lattice:ListTagsForResource'
+            'vpc-lattice:ListTagsForResource',
         )
 
 
 @resources.register('vpc-lattice-target-group')
 class VPCLatticeTargetGroup(QueryResourceManager):
     """VPC Lattice Target Group Resource"""
+
     source_mapping = {
         'describe': DescribeWithResourceTags,
     }
@@ -65,8 +75,45 @@ class VPCLatticeTargetGroup(QueryResourceManager):
         permissions_enum = ('vpc-lattice:ListTargetGroups',)
         permissions_augment = (
             'vpc-lattice:GetTargetGroup',
-            'vpc-lattice:ListTagsForResource'
+            'vpc-lattice:ListTagsForResource',
         )
+
+
+class DescribeVPCLatticeListener(ChildDescribeSource):
+    def augment(self, resources):
+        return universal_augment(self.manager, resources)
+
+
+@resources.register('vpc-lattice-listener')
+class VPCLatticeListener(ChildResourceManager):
+    """VPC Lattice listener resource.
+
+    :example:
+
+    .. code-block:: yaml
+
+        policies:
+          - name: lattice-listener-http
+            resource: aws.vpc-lattice-listener
+            filters:
+              - type: value
+                key: protocol
+                value: HTTP
+    """
+
+    source_mapping = {
+        'describe-child': DescribeVPCLatticeListener,
+    }
+
+    class resource_type(TypeInfo):
+        service = 'vpc-lattice'
+        enum_spec = ('list_listeners', 'items', None)
+        parent_spec = ('vpc-lattice-service', 'serviceIdentifier', True)
+        arn = 'arn'
+        id = 'id'
+        name = 'name'
+        universal_taggable = object()
+        permissions_enum = ('vpc-lattice:ListListeners',)
 
 
 @VPCLatticeServiceNetwork.filter_registry.register('access-logs')
@@ -84,7 +131,7 @@ class AccessLogsFilter(ValueFilter):
                 log_subs = self.manager.retry(
                     client.list_access_log_subscriptions,
                     resourceIdentifier=r['arn'],
-                    ignore_err_codes=('ResourceNotFoundException',)
+                    ignore_err_codes=('ResourceNotFoundException',),
                 )
                 r['AccessLogSubscriptions'] = log_subs.get('items', []) if log_subs else []
 
@@ -108,7 +155,7 @@ class LatticeAuthPolicyFilter(CrossAccountAccessFilter):
         result = self.manager.retry(
             client.get_auth_policy,
             resourceIdentifier=r['arn'],
-            ignore_err_codes=('ResourceNotFoundException',)
+            ignore_err_codes=('ResourceNotFoundException',),
         )
 
         if result and result.get('policy'):
