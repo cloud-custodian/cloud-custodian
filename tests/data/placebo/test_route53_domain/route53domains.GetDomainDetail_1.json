@@ -1,0 +1,126 @@
+{
+    "status_code": 200,
+    "data": {
+        "DomainName": "c7n-test.com",
+        "Nameservers": [
+            {
+                "Name": "ns-59.awsdns-07.com",
+                "GlueIps": []
+            },
+            {
+                "Name": "ns-814.awsdns-37.net",
+                "GlueIps": []
+            },
+            {
+                "Name": "ns-1574.awsdns-04.co.uk",
+                "GlueIps": []
+            },
+            {
+                "Name": "ns-1256.awsdns-29.org",
+                "GlueIps": []
+            }
+        ],
+        "AutoRenew": true,
+        "AdminContact": {
+            "FirstName": "Custodian",
+            "LastName": "User",
+            "ContactType": "PERSON",
+            "AddressLine1": "1234 Compliance Circle",
+            "AddressLine2": "",
+            "City": "Governance",
+            "State": "VA",
+            "CountryCode": "US",
+            "ZipCode": "123456",
+            "PhoneNumber": "+1.1234567890",
+            "Email": "finops@gmail.com",
+            "ExtraParams": []
+        },
+        "RegistrantContact": {
+            "FirstName": "Custodian",
+            "LastName": "User",
+            "ContactType": "PERSON",
+            "AddressLine1": "1234 Compliance Circle",
+            "AddressLine2": "",
+            "City": "Governance",
+            "State": "VA",
+            "CountryCode": "US",
+            "ZipCode": "123456",
+            "PhoneNumber": "+1.1234567890",
+            "Email": "finops@gmail.com",
+            "ExtraParams": []
+        },
+        "TechContact": {
+            "FirstName": "Custodian",
+            "LastName": "User",
+            "ContactType": "PERSON",
+            "AddressLine1": "1234 Compliance Circle",
+            "AddressLine2": "",
+            "City": "Governance",
+            "State": "VA",
+            "CountryCode": "US",
+            "ZipCode": "123456",
+            "PhoneNumber": "+1.1234567890",
+            "Email": "finops@gmail.com",
+            "ExtraParams": []
+        },
+        "AdminPrivacy": true,
+        "RegistrantPrivacy": true,
+        "TechPrivacy": true,
+        "RegistrarName": "Amazon Registrar, Inc.",
+        "WhoIsServer": "whois.registrar.amazon",
+        "RegistrarUrl": "http://registrar.amazon.com",
+        "AbuseContactEmail": "trustandsafety@support.aws.com",
+        "AbuseContactPhone": "+1.2024422253",
+        "CreationDate": {
+            "__class__": "datetime",
+            "year": 2025,
+            "month": 10,
+            "day": 27,
+            "hour": 14,
+            "minute": 55,
+            "second": 6,
+            "microsecond": 0
+        },
+        "UpdatedDate": {
+            "__class__": "datetime",
+            "year": 2025,
+            "month": 10,
+            "day": 27,
+            "hour": 15,
+            "minute": 6,
+            "second": 24,
+            "microsecond": 140000
+        },
+        "ExpirationDate": {
+            "__class__": "datetime",
+            "year": 2026,
+            "month": 10,
+            "day": 27,
+            "hour": 14,
+            "minute": 55,
+            "second": 6,
+            "microsecond": 0
+        },
+        "StatusList": [
+            "addPeriod",
+            "ok"
+        ],
+        "DnssecKeys": [],
+        "BillingContact": {
+            "FirstName": "Matthew",
+            "LastName": "Heidelbaugh",
+            "ContactType": "PERSON",
+            "AddressLine1": "1536 Lincoln Way",
+            "AddressLine2": "Apt 201",
+            "City": "McLean",
+            "State": "VA",
+            "CountryCode": "US",
+            "ZipCode": "22102",
+            "PhoneNumber": "+1.7176145804",
+            "Email": "matt9hsix@gmail.com",
+            "ExtraParams": []
+        },
+        "BillingPrivacy": true,
+        "ResponseMetadata": {}
+    }
+}

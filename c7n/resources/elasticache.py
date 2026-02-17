@@ -9,7 +9,8 @@ from dateutil.parser import parse
 
 from c7n.actions import (
     ActionRegistry, BaseAction, ModifyVpcSecurityGroupsAction)
-from c7n.filters import FilterRegistry, AgeFilter
+from c7n.filters import FilterRegistry, AgeFilter, Filter
+from c7n.filters.core import ComparableVersion
 import c7n.filters.vpc as net_filters
 from c7n.filters.kms import KmsRelatedFilter
 from c7n.manager import resources
@@ -33,6 +34,7 @@ class ElastiCacheQueryParser(QueryParser):
         'ShowCacheNodeInfo': bool,
         'ShowCacheClustersNotInReplicationGroups': bool,
     }
+    type_name = "ElastiCache"
     multi_value = False
     value_key = 'Value'
 
@@ -49,8 +51,7 @@ class DescribeElastiCache(DescribeSource):
           - name: cache-node-with-default-port
             resource: aws.cache-cluster
             query:
-              - Name: ShowCacheNodeInfo
-                Value: true
+              - ShowCacheNodeInfo: true
             filters:
               - type: list-item
                 key: CacheNodes
@@ -62,8 +63,9 @@ class DescribeElastiCache(DescribeSource):
 
     def get_query_params(self, query_params):
         query_params = query_params or {}
-        for q in ElastiCacheQueryParser.parse(self.manager.data.get('query', [])):
-            query_params[q['Name']] = q['Value']
+        queries = ElastiCacheQueryParser.parse(self.manager.data.get('query', []))
+        for q in queries:
+            query_params.update(q)
         return query_params
 
 
@@ -170,6 +172,104 @@ class VpcFilter(net_filters.VpcFilter):
 
 
 filters.register('network-location', net_filters.NetworkLocation)
+
+
+@filters.register('upgrade-available')
+class UpgradeAvailable(Filter):
+    """Scans for ElastiCache clusters available upgrade versions
+
+    This will check all the ElastiCache clusters on the resources, and return
+    a list of viable upgrade options.
+
+    :example:
+
+    .. code-block:: yaml
+
+            policies:
+              - name: elasticache-upgrade-available
+                resource: cache-cluster
+                filters:
+                  - type: upgrade-available
+                    major: False
+
+    """
+
+    schema = type_schema(
+        'upgrade-available',
+        major={'type': 'boolean'},
+        value={'type': 'boolean'},
+    )
+    permissions = ('elasticache:DescribeServiceUpdates',)
+
+    def process(self, resources, event=None):
+        client = local_session(self.manager.session_factory).client('elasticache')
+        # If `major` is `True`, we should include major version upgrades if found.
+        check_major = self.data.get('major', False)
+        # If `value` is `True`, we should include even matching upgrade versions.
+        check_upgrade_extant = self.data.get('value', True)
+        results = []
+
+        # Get all available service updates
+        paginator = client.get_paginator('describe_service_updates')
+        page_iterator = paginator.paginate(
+            ServiceUpdateStatus=['available']
+        )
+
+        # Build a mapping of available upgrades:
+        # {
+        #   engine: {
+        #     full_version: ComparableVersion,
+        #   }
+        # }
+        available_upgrades = {}
+
+        for page in page_iterator:
+            for service_update in page['ServiceUpdates']:
+                engine_name = service_update.get('Engine', '').lower()
+                engine_version = service_update.get('EngineVersion', '')
+                _, version = _parse_engine_version(engine_version)
+
+                if engine_name and version:
+                    available_upgrades.setdefault(engine_name, {})
+                    # Process the version information once, rather than N-times below.
+                    cversion = ComparableVersion(version)
+                    available_upgrades[engine_name].setdefault(version, cversion)
+
+        for resource in resources:
+            resource_engine = resource.get('Engine', '').lower()
+            resource_version = resource.get('EngineVersion', '')
+            resource_version_info = ComparableVersion(resource_version)
+
+            # Check if any available upgrades match this resource's engine
+            for engine_name, engine_versions in available_upgrades.items():
+                if engine_name != resource_engine:
+                    continue
+
+                # Check the major version.
+                for full_version, upgrade_version in engine_versions.items():
+                    if upgrade_version < resource_version_info:
+                        # The resource is newer that the upgrade. Skip.
+                        continue
+
+                    # The upgrade either matches or is higher. Check the filter
+                    # settings if we should include it.
+                    if upgrade_version == resource_version_info:
+                        if not check_upgrade_extant:
+                            continue
+
+                        results.append(resource)
+
+                    # The parsed upgrade version is greater than resource version.
+                    # Check the major version, as well as the filter settings, to
+                    # see if we should include it.
+                    if upgrade_version.version[0] == resource_version_info.version[0]:
+                        results.append(resource)
+                    elif check_major:
+                        # It's a larger major version, but we're supposed to
+                        # include it.
+                        results.append(resource)
+
+        return results
 
 
 @actions.register('delete')
@@ -544,6 +644,24 @@ class CopyClusterTags(BaseAction):
                 Tags=[{'Key': k, 'Value': v} for k, v in copy_tags.items()])
 
 
+def _parse_engine_version(engine_version):
+    """Parse EngineVersion string into (engine_name, version) tuple
+
+    Example inputs:
+    - "redis-7.0" -> ("redis", "7.0")
+    - "memcached-1.6.12" -> ("memcached", "1.6.12")
+    - "valkey-7.2" -> ("valkey", "7.2")
+    """
+    if not engine_version or '-' not in engine_version:
+        return None, None
+
+    # Handle the strange `and onwards` verbiage.
+    engine_version = engine_version.replace('and onwards', '').strip()
+
+    parts = engine_version.split('-', 1)
+    return parts[0].lower(), parts[1]
+
+
 def _cluster_eligible_for_snapshot(cluster):
     # added regex search to filter unsupported cachenode types
     return (
@@ -719,3 +837,36 @@ class ModifyUser(BaseAction):
         for r in resources:
             retry(client.modify_user, UserId=r['UserId'], **self.data["attributes"],
                 ignore_err_codes=('UserNotFoundFault',))
+
+
+@resources.register('elasticache-reserved')
+class ReservedCacheNodes(QueryResourceManager):
+    """Lists all the reserved cache nodes
+
+    :example:
+
+    .. code-block:: yaml
+
+        policies:
+          - name: reserved-cache-nodes-expiring
+            resource: aws.elasticache-reserved
+            filters:
+              - type: value
+                key: State
+                value: active
+
+    """
+
+    class resource_type(TypeInfo):
+        service = 'elasticache'
+        name = id = 'ReservedCacheNodeId'
+        date = 'StartTime'
+        enum_spec = (
+            'describe_reserved_cache_nodes',
+            'ReservedCacheNodes',
+            None,
+        )
+        filter_name = 'ReservedCacheNodeId'
+        filter_type = 'scalar'
+        arn_type = "reserved-instance"
+        permissions_enum = ('elasticache:DescribeReservedCacheNodes',)

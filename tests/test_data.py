@@ -68,13 +68,13 @@ def test_load_array_expression(test):
         "EnableRegion",
         "GetAccountInformation",
         "GetAlternateContact",
-        "GetChallengeQuestions",
         "GetContactInformation",
+        "GetGovCloudAccountInformation",
         "GetPrimaryEmail",
         "GetRegionOptStatus",
         "ListRegions",
+        "PutAccountName",
         "PutAlternateContact",
-        "PutChallengeQuestions",
         "PutContactInformation",
         "StartPrimaryEmailUpdate"
     ]

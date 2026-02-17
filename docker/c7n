@@ -1,98 +1,77 @@
 # Dockerfiles are generated from tools/dev/dockerpkg.py
-FROM ubuntu:24.04 as build-env
+FROM ubuntu:24.04 AS build-env
 
-ARG POETRY_VERSION="1.8.3"
 SHELL ["/bin/bash", "-c"]
 
 # pre-requisite distro deps, and build env setup
 RUN apt-get --yes update
-RUN apt-get --yes install --no-install-recommends build-essential curl python3-venv python3-dev adduser
-# todo: 24.04 is trying to standardize on ubuntu as builtin non root.
+RUN apt-get --yes install --no-install-recommends build-essential     curl python3-venv python3-dev adduser
 RUN adduser --disabled-login --gecos "" custodian
-RUN python3 -m venv /usr/local
-RUN /usr/local/bin/pip install -U pip setuptools &&     /usr/local/bin/pip install "poetry==${POETRY_VERSION}"
+# wheel installation cache
+RUN --mount=type=cache,target=/root/.cache/uv
+COPY --from=ghcr.io/astral-sh/uv:0.7.6 /uv /uvx /bin/
 ARG PATH="/root/.local/bin:$PATH"
 
 WORKDIR /src
 # Add core & aws packages
-ADD pyproject.toml poetry.lock README.md /src/
-RUN . /usr/local/bin/activate && pip install -qU pip wheel aws-xray-sdk psutil jsonpatch
-
-# Ignore root first pass so if source changes we don't have to invalidate
-# dependency install
-RUN . /usr/local/bin/activate && poetry install --without dev --no-root
-
-# Now install the root package, we used to do this after dependencies of other providers
-# but since moving c7n to a main dependency in pyproject toml we have to do this one first.
-ADD c7n /src/c7n/
-RUN . /usr/local/bin/activate && poetry install --only-root
-
 ARG providers="gcp azure kube openstack tencentcloud oci awscc"
-# Add provider packages
-# We include `pyproject.toml` and `poetry.lock` first to allow
+
+# copy pyproject.tomls for all packages
+ADD pyproject.toml uv.lock README.md /src/
+RUN uv sync --frozen --inexact --no-install-workspace
+
+# We include `pyproject.toml` and `uv.lock` first to allow
 # cache of dependency installs.
 
-ADD tools/c7n_gcp/pyproject.toml tools/c7n_gcp/poetry.lock /src/tools/c7n_gcp/
-RUN if [[ " ${providers[*]} " =~ "gcp" ]]; then     . /usr/local/bin/activate &&     cd tools/c7n_gcp &&     poetry install --without dev --no-root; fi
+ADD tools/c7n_gcp/pyproject.toml /src/tools/c7n_gcp/
+RUN if [[ " ${providers[*]} " =~ "gcp" ]]; then    uv sync --package c7n_gcp --frozen --inexact --no-install-workspace; fi
+
+ADD tools/c7n_azure/pyproject.toml /src/tools/c7n_azure/
+RUN if [[ " ${providers[*]} " =~ "azure" ]]; then    uv sync --package c7n_azure --frozen --inexact --no-install-workspace; fi
+
+ADD tools/c7n_kube/pyproject.toml /src/tools/c7n_kube/
+RUN if [[ " ${providers[*]} " =~ "kube" ]]; then    uv sync --package c7n_kube --frozen --inexact --no-install-workspace; fi
+
+ADD tools/c7n_openstack/pyproject.toml /src/tools/c7n_openstack/
+RUN if [[ " ${providers[*]} " =~ "openstack" ]]; then    uv sync --package c7n_openstack --frozen --inexact --no-install-workspace; fi
+
+ADD tools/c7n_tencentcloud/pyproject.toml /src/tools/c7n_tencentcloud/
+RUN if [[ " ${providers[*]} " =~ "tencentcloud" ]]; then    uv sync --package c7n_tencentcloud --frozen --inexact --no-install-workspace; fi
+
+ADD tools/c7n_oci/pyproject.toml /src/tools/c7n_oci/
+RUN if [[ " ${providers[*]} " =~ "oci" ]]; then    uv sync --package c7n_oci --frozen --inexact --no-install-workspace; fi
+
+ADD tools/c7n_awscc/pyproject.toml /src/tools/c7n_awscc/
+RUN if [[ " ${providers[*]} " =~ "awscc" ]]; then    uv sync --package c7n_awscc --frozen --inexact --no-install-workspace; fi
 
 
-ADD tools/c7n_azure/pyproject.toml tools/c7n_azure/poetry.lock /src/tools/c7n_azure/
-RUN if [[ " ${providers[*]} " =~ "azure" ]]; then     . /usr/local/bin/activate &&     cd tools/c7n_azure &&     poetry install --without dev --no-root; fi
-
-
-ADD tools/c7n_kube/pyproject.toml tools/c7n_kube/poetry.lock /src/tools/c7n_kube/
-RUN if [[ " ${providers[*]} " =~ "kube" ]]; then     . /usr/local/bin/activate &&     cd tools/c7n_kube &&     poetry install --without dev --no-root; fi
-
-
-ADD tools/c7n_openstack/pyproject.toml tools/c7n_openstack/poetry.lock /src/tools/c7n_openstack/
-RUN if [[ " ${providers[*]} " =~ "openstack" ]]; then     . /usr/local/bin/activate &&     cd tools/c7n_openstack &&     poetry install --without dev --no-root; fi
-
-
-ADD tools/c7n_tencentcloud/pyproject.toml tools/c7n_tencentcloud/poetry.lock /src/tools/c7n_tencentcloud/
-RUN if [[ " ${providers[*]} " =~ "tencentcloud" ]]; then     . /usr/local/bin/activate &&     cd tools/c7n_tencentcloud &&     poetry install --without dev --no-root; fi
-
-
-ADD tools/c7n_oci/pyproject.toml tools/c7n_oci/poetry.lock /src/tools/c7n_oci/
-RUN if [[ " ${providers[*]} " =~ "oci" ]]; then     . /usr/local/bin/activate &&     cd tools/c7n_oci &&     poetry install --without dev --no-root; fi
-
-
-ADD tools/c7n_awscc/pyproject.toml tools/c7n_awscc/poetry.lock /src/tools/c7n_awscc/
-RUN if [[ " ${providers[*]} " =~ "awscc" ]]; then     . /usr/local/bin/activate &&     cd tools/c7n_awscc &&     poetry install --without dev --no-root; fi
-
+# copy packages
+ADD c7n /src/c7n/
+RUN uv sync --frozen --inexact
 
 # Now install the root of each provider
 
 ADD tools/c7n_gcp /src/tools/c7n_gcp
-RUN if [[ " ${providers[*]} " =~ "gcp" ]]; then     . /usr/local/bin/activate &&     cd tools/c7n_gcp &&     poetry install --only-root; fi
-
+RUN if [[ " ${providers[*]} " =~ "gcp" ]]; then    uv sync --package c7n_gcp --frozen --inexact; fi
 
 ADD tools/c7n_azure /src/tools/c7n_azure
-RUN if [[ " ${providers[*]} " =~ "azure" ]]; then     . /usr/local/bin/activate &&     cd tools/c7n_azure &&     poetry install --only-root; fi
-
+RUN if [[ " ${providers[*]} " =~ "azure" ]]; then    uv sync --package c7n_azure --frozen --inexact; fi
 
 ADD tools/c7n_kube /src/tools/c7n_kube
-RUN if [[ " ${providers[*]} " =~ "kube" ]]; then     . /usr/local/bin/activate &&     cd tools/c7n_kube &&     poetry install --only-root; fi
-
+RUN if [[ " ${providers[*]} " =~ "kube" ]]; then    uv sync --package c7n_kube --frozen --inexact; fi
 
 ADD tools/c7n_openstack /src/tools/c7n_openstack
-RUN if [[ " ${providers[*]} " =~ "openstack" ]]; then     . /usr/local/bin/activate &&     cd tools/c7n_openstack &&     poetry install --only-root; fi
-
+RUN if [[ " ${providers[*]} " =~ "openstack" ]]; then    uv sync --package c7n_openstack --frozen --inexact; fi
 
 ADD tools/c7n_tencentcloud /src/tools/c7n_tencentcloud
-RUN if [[ " ${providers[*]} " =~ "tencentcloud" ]]; then     . /usr/local/bin/activate &&     cd tools/c7n_tencentcloud &&     poetry install --only-root; fi
-
+RUN if [[ " ${providers[*]} " =~ "tencentcloud" ]]; then    uv sync --package c7n_tencentcloud --frozen --inexact; fi
 
 ADD tools/c7n_oci /src/tools/c7n_oci
-RUN if [[ " ${providers[*]} " =~ "oci" ]]; then     . /usr/local/bin/activate &&     cd tools/c7n_oci &&     poetry install --only-root; fi
-
+RUN if [[ " ${providers[*]} " =~ "oci" ]]; then    uv sync --package c7n_oci --frozen --inexact; fi
 
 ADD tools/c7n_awscc /src/tools/c7n_awscc
-RUN if [[ " ${providers[*]} " =~ "awscc" ]]; then     . /usr/local/bin/activate &&     cd tools/c7n_awscc &&     poetry install --only-root; fi
+RUN if [[ " ${providers[*]} " =~ "awscc" ]]; then    uv sync --package c7n_awscc --frozen --inexact; fi
 
-
-# Install c7n_awscc
-ADD tools/c7n_awscc /src/tools/c7n_awscc
-RUN . /usr/local/bin/activate && cd tools/c7n_awscc && poetry install
 
 RUN mkdir /output
 
@@ -104,10 +83,10 @@ LABEL name="cli" \
 ENV DEBIAN_FRONTEND=noninteractive
 
 RUN apt-get --yes update \
-        && apt-get --yes install python3 python3-venv adduser  --no-install-recommends \
-        && rm -Rf /var/cache/apt \
-        && rm -Rf /var/lib/apt/lists/* \
-        && rm -Rf /var/log/*
+      && apt-get --yes install python3 python3-venv adduser  --no-install-recommends \
+      && rm -Rf /var/cache/apt \
+      && rm -Rf /var/lib/apt/lists/* \
+      && rm -Rf /var/log/*
 
 # These should remain below any other commands because they will invalidate
 # the layer cache
@@ -117,6 +96,7 @@ COPY --from=build-env /output /output
 
 
 RUN adduser --disabled-login --gecos "" custodian
+RUN ln -s /src/.venv/bin/custodian /usr/local/bin/custodian
 USER custodian
 WORKDIR /home/custodian
 ENV LC_ALL="C.UTF-8" LANG="C.UTF-8"

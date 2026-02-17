@@ -181,20 +181,239 @@ class UtilTest(BaseTest):
                 'a': 1, 'b': 2, 'c': 3, 'x': 1}
 
     def test_merge_dict(self):
-        a = {'detail': {'eventName': ['CreateSubnet'],
-                        'eventSource': ['ec2.amazonaws.com']},
-             'detail-type': ['AWS API Call via CloudTrail']}
-        b = {'detail': {'userIdentity': {
-            'userName': [{'anything-but': 'deputy'}]}}}
+        a = {
+                'detail': {
+                    'eventName': 'CreateSubnet',
+                    'eventSource': ['ec2.amazonaws.com'],
+                    'resources': [{'id': 1}],
+                    'statusCode': 'Pending'
+                },
+                'detail-type': ['AWS API Call via CloudTrail']
+            }
+        b = {
+                'awsregion': 'us-east-1',
+                'detail': {
+                    'eventName': 'UpdateSubnet',
+                    'resources': [{'id': 2}],
+                    'eventSource': 's3.amazonaws.com',
+                    'statusCode': ['Success', 'Failure'],
+                    'userIdentity': {
+                        'userName': [{'anything-but': 'deputy'}]
+                    }
+                }
+            }
+
         self.assertEqual(
             utils.merge_dict(a, b),
-            {'detail-type': ['AWS API Call via CloudTrail'],
-             'detail': {
-                 'eventName': ['CreateSubnet'],
-                 'eventSource': ['ec2.amazonaws.com'],
-                 'userIdentity': {
-                     'userName': [
-                         {'anything-but': 'deputy'}]}}})
+            {
+                'awsregion': 'us-east-1',
+                'detail-type': ['AWS API Call via CloudTrail'],
+                'detail': {
+                    'eventName': 'UpdateSubnet',
+                    'eventSource': ['ec2.amazonaws.com', 's3.amazonaws.com'],
+                    'resources': [{'id': 1}, {'id': 2}],
+                    'statusCode': ['Pending', 'Success', 'Failure'],
+                    'userIdentity': {
+                        'userName': [{'anything-but': 'deputy'}]
+                    }
+                }
+            }
+        )
+
+    def test_merge_dict_iam_condition(self):
+        a = {
+            "Bool": {
+                "aws:SecureTransport": "true",
+            },
+            "StringNotLike": {
+                "aws": "abc"
+            },
+            "StringEquals": {
+                "aws:PrincipalType": "AssumedRole"
+            },
+            "StringLike": {
+                "aws": ["def", "ghi"]
+            },
+            "StringNotLikeIfExists": {
+                "aws": "tsr"
+            }
+            }
+        b = {
+            "StringNotLike": {
+                "aws": "def"
+            },
+            "Bool": {
+                "elasticfilesystem:AccessedViaMountTarget": "true",
+                "aws:SecureTransport": "false"
+            },
+            "StringEquals": {
+                "aws:PrincipalType": [
+                    "AssumedRole",
+                    "User",
+                    "Account"
+                ]
+            },
+            "StringLike": {
+                "aws": "abc"
+            },
+            "StringNotLikeIfExists": {
+                "aws": ["zyx", "wvu"]
+            }
+            }
+
+        self.assertEqual(
+            utils.merge_dict(a, b),
+            {
+                "Bool": {
+                    "aws:SecureTransport": "false",
+                    "elasticfilesystem:AccessedViaMountTarget": "true",
+                },
+                "StringNotLike": {
+                    "aws": "def"
+                },
+                "StringEquals": {
+                    "aws:PrincipalType": [
+                        "AssumedRole",
+                        "User",
+                        "Account"
+                    ]
+                },
+                "StringLike": {
+                    "aws": ["def", "ghi", "abc"]
+                },
+                "StringNotLikeIfExists": {
+                    "aws": ["tsr", "zyx", "wvu"]
+                }
+            }
+        )
+
+    def test_merge_dict_exception(self):
+
+        a = {
+            "a": ["bcd"]
+        }
+        b = {
+            "a": {"abc": 123}
+        }
+        with self.assertRaises(Exception):
+            utils.merge_dict(a, b)
+
+    def test_compare_dicts_using_sets(self):
+        a = {
+                "Bool": {
+                    "aws:SecureTransport": "true",
+                    "elasticfilesystem:AccessedViaMountTarget": "true",
+                },
+                "StringNotLike": {
+                    "aws": "abc"
+                },
+                "StringEquals": {
+                    "aws:PrincipalType": [
+                        "AssumedRole",
+                        "User",
+                        "Account"
+                    ]
+                },
+                "StringNotEquals": {
+                    "aws:PrincipalType": [
+                        "Anonymous",
+                        "User"
+                    ]
+                },
+                "StringNotLikeIfExists": {
+                    "aws": ["zyx"]
+                }
+            }
+        b = {
+            "StringNotLike": {
+                "aws": ["abc"]
+            },
+            "Bool": {
+                "elasticfilesystem:AccessedViaMountTarget": "true",
+                "aws:SecureTransport": "true"
+            },
+            "StringEquals": {
+                "aws:PrincipalType": [
+                    "User",
+                    "AssumedRole",
+                    "Account"
+                ]
+            },
+            "StringNotEquals": {
+                "aws:PrincipalType": [
+                    "Anonymous",
+                    "User"
+                ]
+            },
+            "StringNotLikeIfExists": {
+                "aws": "zyx"
+            }
+            }
+        self.assertTrue(utils.compare_dicts_using_sets(a, b))
+
+    def test_compare_dicts_using_sets_false(self):
+        a = {"a": "abc"}
+        b = {"b": "cde"}
+        self.assertFalse(utils.compare_dicts_using_sets(a, b))
+
+        c = {"a": "bcd"}
+        self.assertFalse(utils.compare_dicts_using_sets(a, c))
+
+    def test_format_to_set(self):
+        self.assertEqual(utils.format_to_set("abcd"), {"abcd"})
+        self.assertEqual(utils.format_to_set(["abc", "def"]), {"abc", "def"})
+        self.assertEqual(utils.format_to_set(123), 123)
+        self.assertEqual(utils.format_to_set(True), True)
+        self.assertEqual(utils.format_to_set(False), False)
+
+    def test_format_dict_with_sets(self):
+        a = {
+                "Bool": {
+                    "aws:SecureTransport": "true",
+                    "elasticfilesystem:AccessedViaMountTarget": "true",
+                },
+                "StringNotLike": {
+                    "aws": "abc"
+                },
+                "StringEquals": {
+                    "aws:PrincipalType": [
+                        "AssumedRole",
+                        "User",
+                        "Account"
+                    ]
+                },
+                "StringNotEquals": {
+                    "aws:PrincipalType": [
+                        "Anonymous",
+                        "User"
+                    ]
+                }
+            }
+        self.assertEqual(utils.format_dict_with_sets(a),
+            {
+                "Bool": {
+                    "aws:SecureTransport": {"true"},
+                    "elasticfilesystem:AccessedViaMountTarget": {"true"},
+                },
+                "StringNotLike": {
+                    "aws": {"abc"}
+                },
+                "StringEquals": {
+                    "aws:PrincipalType": {
+                        "AssumedRole",
+                        "User",
+                        "Account"
+                    }
+                },
+                "StringNotEquals": {
+                    "aws:PrincipalType": {
+                        "Anonymous",
+                        "User"
+                    }
+                }
+            }
+            )
+        self.assertEqual(utils.format_dict_with_sets("abc"), "abc")
 
     def test_local_session_region(self):
         policies = [

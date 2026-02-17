@@ -5,6 +5,8 @@ from .common import BaseTest
 from c7n.exceptions import PolicyValidationError
 from c7n.executor import MainThreadExecutor
 from c7n.resources.secretsmanager import SecretsManager
+from unittest.mock import patch, MagicMock
+from botocore.exceptions import ClientError
 
 
 class TestSecretsManager(BaseTest):
@@ -124,14 +126,14 @@ class TestSecretsManager(BaseTest):
         client = session_factory(region="us-east-1").client("secretsmanager")
         p = self.load_policy(
             {
-                'name': 'secrets-manager-unencrypted-delete',
+                'name': 'secrets-manager-delete',
                 'resource': 'secrets-manager',
                 'filters': [
                     {
                         'type': 'value',
                         'key': 'Name',
-                        'value': 'test'
-                    }
+                        'value': 'test1'
+                    },
                 ],
                 'actions': [
                     {
@@ -144,8 +146,7 @@ class TestSecretsManager(BaseTest):
         )
         resources = p.run()
         self.assertEqual(len(resources), 1)
-        self.assertEqual(resources[0]['Name'], 'test')
-        self.assertEqual(len(resources[0].get('ReplicationStatus')), 2)
+        self.assertEqual(resources[0]['Name'], 'test1')
         secret_for_del = client.describe_secret(SecretId=resources[0]['ARN'])
         self.assertTrue('DeletedDate' in secret_for_del)
 
@@ -269,3 +270,117 @@ class TestSecretsManager(BaseTest):
         self.assertIsInstance(resources[0].get('VersionIdsToStages'), dict)
         self.assertEqual(resources[1].get('VersionIdsToStages'), None)
         self.assertEqual(resources[1]['c7n:DeniedMethods'], ['describe_secret'])
+
+    def test_secrets_manager_replica_access_denied(self):
+        self.patch(SecretsManager, 'executor_factory', MainThreadExecutor)
+        session_factory = self.replay_flight_data('test_secrets_manager_replica_access_denied')
+
+        # Use MagicMock to simulate region-specific behavior and exception
+        mock_factory = MagicMock()
+        mock_factory.region = 'us-east-1'
+        # Setup the client for the primary region
+        real_client = session_factory(region="us-east-1").client("secretsmanager")
+        # Setup the client for the replica region
+        replica_client = MagicMock()
+        # Simulate AccessDeniedException for describe_secret in replica region
+        replica_client.describe_secret.side_effect = ClientError(
+            {
+                "Error": {
+                    "Code": "AccessDeniedException",
+                    "Message": "User is not authorized"
+                }
+            },
+            "DescribeSecret"
+        )
+        # When .client('secretsmanager', region_name='us-west-2') is called, return replica_client
+
+        def client_side_effect(service_name, region_name=None):
+            if region_name == "eu-west-1":
+                return replica_client
+            return real_client
+        mock_factory().client.side_effect = client_side_effect
+
+        p = self.load_policy(
+            {
+                'name': 'secrets-manager-replica-access-denied',
+                'resource': 'secrets-manager',
+                'filters': [
+                    {
+                        'type': 'value',
+                        'key': 'Name',
+                        'value': 'c7n'
+                    },
+                    {
+                        'type': 'replica-attribute',
+                        'key': 'LastAccessedDate',
+                        'op': 'ge',
+                        'value': '2023-01-01',
+                        'value_type': 'date'
+                    },
+                ]
+            },
+            session_factory=mock_factory
+        )
+
+        with patch.object(
+            p.resource_manager.source.manager, 'log'
+        ) as mock_log:
+            p.run()
+            # Assert that the warning log was called for the replica ClientError
+            self.assertTrue(mock_log.warning.called)
+
+    def test_secrets_manager_replica_attribute(self):
+        self.patch(SecretsManager, 'executor_factory', MainThreadExecutor)
+        session_factory = self.replay_flight_data('test_secrets_manager_replica_attribute')
+        p = self.load_policy(
+            {
+                'name': 'secrets-manager-unencrypted-delete',
+                'resource': 'secrets-manager',
+                'filters': [
+                    {
+                        'type': 'value',
+                        'key': 'Name',
+                        'value': 'c7n'
+                    },
+                                        {
+                        'type': 'replica-attribute',
+                        'key': 'LastAccessedDate',
+                        'op': 'ge',
+                        'value': '2023-01-01',
+                        'value_type': 'date'
+                    },
+                ],
+            },
+            session_factory=session_factory
+        )
+        resources = p.run()
+        self.assertEqual(len(resources), 1)
+        self.assertEqual(resources[0]['Name'], 'c7n')
+        self.assertEqual(len(resources[0].get('ReplicationStatus')), 1)
+        self.assertIn('c7n:Replicas', resources[0])
+        self.assertTrue(isinstance(resources[0]['c7n:Replicas'], list))
+        self.assertEqual(len(resources[0]['c7n:Replicas']), 1)
+        self.assertEqual(resources[0]['c7n:Replicas'][0]['Name'], 'c7n')
+
+    def test_secrets_manager_version_age(self):
+        session_factory = self.replay_flight_data('test_secrets_manager_version_age')
+        p = self.load_policy(
+            {
+                'name': 'secrets-version-and-age-filter',
+                'resource': 'secrets-manager',
+                'filters': [
+                    {
+                        'type': 'current-version',
+                        'key': 'CreatedDate',
+                        'op': 'lt',
+                        'value': 90,
+                        'value_type': 'age'
+                    }
+                ]
+            },
+            session_factory=session_factory
+        )
+        resources = p.run()
+        self.assertEqual(len(resources), 1)
+        self.assertEqual(resources[0]['Name'], 'test_lambda_secret')
+        self.assertIn('c7n:CurrentSecretVersion', resources[0])

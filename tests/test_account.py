@@ -297,6 +297,48 @@ class AccountTests(BaseTest):
              'IgnorePublicAcls': False,
              'RestrictPublicBuckets': False})
 
+    def test_ami_block_public_access_enabled(self):
+        factory = self.replay_flight_data('test_ami_block_public_access_enabled')
+        p = self.load_policy({
+            'name': 'ami-check-block-enabled',
+            'resource': 'aws.account',
+            'filters': [{
+                'type': 'ami-block-public-access',
+                'value': True
+            }]},
+            session_factory=factory)
+        resources = p.run()
+        # Should return the active account when blocking is enabled
+        self.assertEqual(len(resources), 1)
+
+    def test_ami_block_public_access_disabled(self):
+        factory = self.replay_flight_data('test_ami_block_public_access_disabled')
+        p = self.load_policy({
+            'name': 'ami-check-block-disabled',
+            'resource': 'aws.account',
+            'filters': [{
+                'type': 'ami-block-public-access',
+                'value': False
+            }]},
+            session_factory=factory)
+        resources = p.run()
+        # Should return the active account when blocking is disabled
+        self.assertEqual(len(resources), 1)
+
+    def test_ami_block_public_access_mismatch(self):
+        factory = self.replay_flight_data('test_ami_block_public_access_enabled')
+        p = self.load_policy({
+            'name': 'ami-check-block-mismatch',
+            'resource': 'aws.account',
+            'filters': [{
+                'type': 'ami-block-public-access',
+                'value': False  # Looking for disabled, but account has it enabled
+            }]},
+            session_factory=factory)
+        resources = p.run()
+        # Shouldn't match when account state doesn't match filter
+        self.assertEqual(len(resources), 0)
+
     def test_cloudtrail_enabled(self):
         session_factory = self.replay_flight_data("test_account_trail")
         p = self.load_policy(
@@ -1400,6 +1442,7 @@ class AccountTests(BaseTest):
         )
 
     def test_ec2_metadata_defaults(self):
+
         factory = self.replay_flight_data("test_ec2_metadata_defaults")
         p = self.load_policy(
             {
@@ -1439,6 +1482,34 @@ class AccountTests(BaseTest):
                 "enabled",
             ]
         )
+
+    def test_set_security_token_service_preferences(self):
+
+        factory = self.replay_flight_data("test_set_security_token_service_preferences")
+        p = self.load_policy(
+            {
+                "name": "set-sts-preferences",
+                "resource": "account",
+                "actions": [
+                    {
+                        "type": "set-security-token-service-preferences",
+                        "token_version": "v2Token",
+                    }
+                ],
+            },
+            session_factory=factory,
+        )
+        resources = p.run()
+        self.assertEqual(len(resources), 1)
+
+        client = local_session(factory).client("iam")
+        response = client.get_account_summary()
+        # self.assertIn("SummaryMap", response['SummaryMap'])
+        self.assertIn("SummaryMap", response)
+
+        # Verify that the token version was set correctly
+
+        self.assertEqual(2, response['SummaryMap']['GlobalEndpointTokenVersion'])
 
 
 class AccountDataEvents(BaseTest):

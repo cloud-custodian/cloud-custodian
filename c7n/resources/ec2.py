@@ -29,7 +29,7 @@ import c7n.filters.vpc as net_filters
 from c7n.manager import resources
 from c7n import query, utils
 from c7n.tags import coalesce_copy_user_tags
-from c7n.utils import type_schema, filter_empty, jmespath_search, jmespath_compile
+from c7n.utils import type_schema, filter_empty, jmespath_search, jmespath_compile, QueryParser
 
 from c7n.resources.iam import CheckPermissions, SpecificIamProfileManagedPolicy
 from c7n.resources.securityhub import PostFinding
@@ -43,19 +43,10 @@ actions = ActionRegistry('ec2.actions')
 class DescribeEC2(query.DescribeSource):
 
     def get_query_params(self, query_params):
-        queries = QueryFilter.parse(self.manager.data.get('query', []))
-        qf = []
-        for q in queries:
-            qd = q.query()
-            found = False
-            for f in qf:
-                if qd['Name'] == f['Name']:
-                    f['Values'].extend(qd['Values'])
-                    found = True
-            if not found:
-                qf.append(qd)
         query_params = query_params or {}
-        query_params['Filters'] = qf
+        queries = EC2QueryParser.parse(self.manager.data.get('query', []))
+        for q in queries:
+            query_params.update(q)
         return query_params
 
     def augment(self, resources):
@@ -2160,73 +2151,42 @@ class PropagateSpotTags(BaseAction):
         return update_instances
 
 
-# Valid EC2 Query Filters
-# http://docs.aws.amazon.com/AWSEC2/latest/CommandLineReference/ApiReference-cmd-DescribeInstances.html
-EC2_VALID_FILTERS = {
-    'architecture': ('i386', 'x86_64'),
-    'availability-zone': str,
-    'iam-instance-profile.arn': str,
-    'image-id': str,
-    'instance-id': str,
-    'instance-lifecycle': ('spot',),
-    'instance-state-name': (
-        'pending',
-        'terminated',
-        'running',
-        'shutting-down',
-        'stopping',
-        'stopped'),
-    'instance.group-id': str,
-    'instance.group-name': str,
-    'tag-key': str,
-    'tag-value': str,
-    'tag:': str,
-    'tenancy': ('dedicated', 'default', 'host'),
-    'vpc-id': str}
+class EC2QueryParser(QueryParser):
 
+    # Valid EC2 Query Filters
+    # https://boto3.amazonaws.com/v1/documentation/api/latest/reference/services/ec2/client/describe_instances.html
+    QuerySchema = {
+        'Filters': {
+            'architecture': ('i386', 'x86_64'),
+            'availability-zone': str,
+            'ebs-optimized': str,
+            'iam-instance-profile.arn': str,
+            'image-id': str,
+            'instance-id': str,
+            'instance-lifecycle': ('spot', 'scheduled', 'capacity-block'),
+            'instance-state-name': (
+                'pending',
+                'terminated',
+                'running',
+                'shutting-down',
+                'stopping',
+                'stopped'),
+            'instance-type': str,
+            'instance.group-id': str,
+            'instance.group-name': str,
+            'owner-id': str,
+            'platform': str,
+            'tag-key': str,
+            'tag-value': str,
+            'tenancy': ('dedicated', 'default', 'host'),
+            'vpc-id': str
+        },
+        'InstanceIds': str,
+        'MaxResults': int,
+    }
+    single_value_fields = ('MaxResults',)
 
-class QueryFilter:
-
-    @classmethod
-    def parse(cls, data):
-        results = []
-        for d in data:
-            if not isinstance(d, dict):
-                raise ValueError(
-                    "EC2 Query Filter Invalid structure %s" % d)
-            results.append(cls(d).validate())
-        return results
-
-    def __init__(self, data):
-        self.data = data
-        self.key = None
-        self.value = None
-
-    def validate(self):
-        if not len(list(self.data.keys())) == 1:
-            raise PolicyValidationError(
-                "EC2 Query Filter Invalid %s" % self.data)
-        self.key = list(self.data.keys())[0]
-        self.value = list(self.data.values())[0]
-
-        if self.key not in EC2_VALID_FILTERS and not self.key.startswith(
-                'tag:'):
-            raise PolicyValidationError(
-                "EC2 Query Filter invalid filter name %s" % (self.data))
-
-        if self.value is None:
-            raise PolicyValidationError(
-                "EC2 Query Filters must have a value, use tag-key"
-                " w/ tag name as value for tag present checks"
-                " %s" % self.data)
-        return self
-
-    def query(self):
-        value = self.value
-        if isinstance(self.value, str):
-            value = [self.value]
-
-        return {'Name': self.key, 'Values': value}
+    type_name = "EC2"
 
 
 @filters.register('instance-attribute')

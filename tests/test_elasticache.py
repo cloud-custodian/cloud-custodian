@@ -1,6 +1,6 @@
 # Copyright The Cloud Custodian Authors.
 # SPDX-License-Identifier: Apache-2.0
-from c7n.resources.elasticache import _cluster_eligible_for_snapshot
+from c7n.resources.elasticache import _cluster_eligible_for_snapshot, _parse_engine_version
 
 from .common import BaseTest
 
@@ -19,6 +19,19 @@ class TestElastiCacheCluster(BaseTest):
         self.assertFalse(
             _cluster_eligible_for_snapshot(
                 {'Engine': 'memcached', 'CacheNodeType': 'cache.t2.medium'}))
+
+    def test_parse_engine_version(self):
+        # Test the version parsing function
+        self.assertEqual(_parse_engine_version("redis-7.0"), ("redis", "7.0"))
+        self.assertEqual(_parse_engine_version("memcached-1.6.12"), ("memcached", "1.6.12"))
+        self.assertEqual(_parse_engine_version("valkey-7.2"), ("valkey", "7.2"))
+
+        # Test edge cases
+        self.assertEqual(_parse_engine_version(""), (None, None))
+        self.assertEqual(_parse_engine_version("invalid"), (None, None))
+        self.assertEqual(_parse_engine_version("redis"), (None, None))
+        self.assertEqual(_parse_engine_version(None), (None, None))
+        self.assertEqual(_parse_engine_version("redis-7.0 and onwards"), ("redis", "7.0"))
 
     def test_elasticache_security_group(self):
         session_factory = self.replay_flight_data("test_elasticache_security_group")
@@ -99,6 +112,72 @@ class TestElastiCacheCluster(BaseTest):
         )
         resources = p.run()
         self.assertEqual(len(resources), 3)
+
+    def test_elasticache_upgrade_available_filter(self):
+        session_factory = self.replay_flight_data("test_elasticache_upgrade_available")
+        p = self.load_policy(
+            {
+                "name": "elasticache-upgrade-available-filter",
+                "resource": "cache-cluster",
+                "filters": [
+                    {
+                        "type": "upgrade-available",
+                        # Do NOT include major releases.
+                        "major": False,
+                        # Do NOT include matching minor releases.
+                        "value": False,
+                    }
+                ],
+            },
+            session_factory=session_factory,
+        )
+        resources = p.run()
+        # Of the three resources, only one should come back here.
+        # One resource should be excluded, due to being behind in major versions.
+        # One resource should be excluded, due to being the latest release.
+        self.assertEqual(len(resources), 1)
+
+    def test_elasticache_upgrade_available_filter_include_major(self):
+        session_factory = self.replay_flight_data("test_elasticache_upgrade_available")
+        p = self.load_policy(
+            {
+                "name": "elasticache-upgrade-available-filter",
+                "resource": "cache-cluster",
+                "filters": [
+                    {
+                        "type": "upgrade-available",
+                        "major": True,
+                        # Do NOT include matching minor releases.
+                        "value": False,
+                    }
+                ],
+            },
+            session_factory=session_factory,
+        )
+        resources = p.run()
+        self.assertEqual(len(resources), 2)
+
+    def test_elasticache_upgrade_available_filter_none(self):
+        session_factory = self.replay_flight_data(
+            "test_elasticache_upgrade_available_none"
+        )
+        p = self.load_policy(
+            {
+                "name": "elasticache-upgrade-available-filter",
+                "resource": "cache-cluster",
+                "filters": [
+                    {
+                        "type": "upgrade-available",
+                        "major": False,
+                        # Don't include extant either.
+                        "value": False,
+                    }
+                ],
+            },
+            session_factory=session_factory,
+        )
+        resources = p.run()
+        self.assertEqual(len(resources), 0)
 
     def test_elasticache_sharded_snapshot_copy_tags(self):
         factory = self.replay_flight_data("test_elasticache_sharded_copy_cluster_tags")
@@ -683,3 +762,34 @@ class TestElastiCacheUser(BaseTest):
         )
         resources = p.run()
         self.assertEqual(len(resources), 1)
+
+
+class TestReservedCacheNodes(BaseTest):
+
+    def test_reserved_cache_nodes(self):
+        session_factory = self.replay_flight_data("test_reserved_cache_nodes")
+        p = self.load_policy(
+            {
+                "name": "reserved-cache-nodes",
+                "resource": "aws.elasticache-reserved",
+            },
+            session_factory=session_factory,
+        )
+        resources = p.run()
+        self.assertEqual(len(resources), 1)
+        self.assertEqual(resources[0]['ReservedCacheNodeId'], 'test-reservation')
+        self.assertEqual(resources[0]['State'], 'active')
+
+    def test_reserved_cache_nodes_filter(self):
+        session_factory = self.replay_flight_data("test_reserved_cache_nodes_filtered")
+        p = self.load_policy(
+            {
+                "name": "reserved-cache-nodes-active",
+                "resource": "aws.elasticache-reserved",
+                "filters": [{"type": "value", "key": "State", "value": "active"}],
+            },
+            session_factory=session_factory,
+        )
+        resources = p.run()
+        self.assertEqual(len(resources), 1)
+        self.assertEqual(resources[0]['State'], 'active')

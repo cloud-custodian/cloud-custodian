@@ -7,7 +7,7 @@ from c7n_azure.resources.storage import StorageSettingsUtilities, StorageFirewal
     StorageFirewallBypassFilter
 from c7n_azure.session import Session
 from c7n_azure.storage_utils import StorageUtilities
-from mock import patch, MagicMock, Mock
+from unittest.mock import patch, MagicMock, Mock
 from netaddr import IPSet
 from parameterized import parameterized
 
@@ -764,3 +764,23 @@ class StorageFirewallBypassFilterTest(BaseTest):
                                                    'bypass': bypass}}}
         f = StorageFirewallBypassFilter({'mode': 'equal', 'list': []})
         self.assertEqual(expected, f._query_bypass(resource))
+
+
+class StorageFileServicesFilterTest(BaseTest):
+    def test_filter_with_file_services_delete_policy(self):
+        p = self.load_policy({
+            'name': 'storage-with-file-services-delete-policy',
+            'resource': 'azure.storage',
+            'filters': [{
+                'type': 'file-services',
+                'attrs': [{
+                    'type': 'value',
+                    'key': 'properties.shareDeleteRetentionPolicy.enabled',
+                    'value': True,
+                }]
+            }]
+        })
+        resources = p.run()
+        self.assertEqual(len(resources), 1)
+        self.assertEqual(resources[0]['name'], 'storagefasdfhad2323')
+        self.assertEqual(len(resources[0]['c7n:FileServices']), 1)

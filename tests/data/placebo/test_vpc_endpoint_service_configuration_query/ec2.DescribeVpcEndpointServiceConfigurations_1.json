@@ -1,0 +1,47 @@
+{
+    "status_code": 200,
+    "data": {
+        "ServiceConfigurations": [
+          {
+            "ServiceType": [
+              {
+                "ServiceType": "Interface"
+              }
+            ],
+            "ServiceId": "vpce-svc-042193297e333714e",
+            "ServiceName": "com.amazonaws.vpce.eu-west-1.vpce-svc-042193297e333714e",
+            "ServiceState": "Available",
+            "AvailabilityZones": [
+              "eu-west-1a",
+              "eu-west-1b"
+            ],
+            "AcceptanceRequired": true,
+            "ManagesVpcEndpoints": false,
+            "NetworkLoadBalancerArns": [
+              "arn:aws:elasticloadbalancing:eu-west-1:644160558196:loadbalancer/net/example-load-balancer/ab73c69c7aadf845"
+            ],
+            "SupportedIpAddressTypes": [
+              "ipv4"
+            ],
+            "BaseEndpointDnsNames": [
+              "vpce-svc-042193297e333714e.eu-west-1.vpce.amazonaws.com"
+            ],
+            "PrivateDnsNameConfiguration": {},
+            "Tags": [
+              {
+                "Key": "Name",
+                "Value": "example-endpoint-service"
+              }
+            ],
+            "SupportedRegions": [
+              {
+                "Region": "eu-west-1",
+                "ServiceState": "Available"
+              }
+            ],
+            "RemoteAccessEnabled": false
+          }
+        ],
+        "ResponseMetadata": {}
+    }
+}

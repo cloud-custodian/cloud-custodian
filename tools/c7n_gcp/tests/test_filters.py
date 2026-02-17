@@ -33,6 +33,32 @@ class TestGCPMetricsFilter(BaseTest):
         metric = resources[0]['c7n.metrics'][metric_name]
         self.assertGreater(.1, metric['points'][0]['value']['doubleValue'])
 
+    def test_metrics_with_metric_key_as_instance_id(self):
+
+        session_factory = self.replay_flight_data("filter-metrics-with-metric-key-as-instance-id")
+
+        p = self.load_policy(
+            {
+                "name": "test-metrics",
+                "resource": "gcp.instance",
+                "filters": [
+                    {'type': 'metrics',
+                    'name': 'compute.googleapis.com/instance/cpu/utilization',
+                    'metric-key': 'resource.labels.instance_id',
+                    'aligner': 'ALIGN_MEAN',
+                    'days': 14,
+                    'value': .1,
+                    'filter': ' resource.labels.zone = "us-east4-c"',
+                    'op': 'less-than'}],
+            },
+            session_factory=session_factory,
+        )
+        resources = p.run()
+        self.assertEqual(len(resources), 1)
+        metric_name = 'compute.googleapis.com/instance/cpu/utilization.ALIGN_MEAN.REDUCE_NONE'
+        metric = resources[0]['c7n.metrics'][metric_name]
+        self.assertGreater(.1, metric['points'][0]['value']['doubleValue'])
+
     def test_metrics_resource_regex(self):
 
         session_factory = self.replay_flight_data("filter-metrics")
@@ -105,6 +131,32 @@ class TestGCPMetricsFilter(BaseTest):
         self.assertIn('metric.type = "compute.googleapis.com/instance/cpu/utilization"', batch[0])
         self.assertIn('resource.labels.zone = "us-east4-d"', batch[1])
         self.assertIn('metric.type = "compute.googleapis.com/instance/cpu/utilization"', batch[1])
+
+    def test_get_metric_resource_name_spanner_instance(self):
+        # The `GCPMetricsFilter` made some assumptions about a method that
+        # wasn't previously universally present: `get_metric_resource_name`.
+        session_factory = self.replay_flight_data("filter-metrics-resource-name")
+        p = self.load_policy(
+            {
+                "name": "test-metrics-resource-name",
+                "resource": "gcp.spanner-instance",
+                "filters": [
+                    {
+                        "type": "metrics",
+                        "name": "spanner.googleapis.com/instance/cpu/utilization",
+                        "days": 14,
+                        "op": "lte",
+                        "value": 0.05,
+                        "aligner": "ALIGN_MEAN",
+                    },
+                ],
+            },
+            session_factory=session_factory,
+        )
+
+        resources = p.run()
+        # This should be filtering out the resource, & not erroring..
+        self.assertEqual(len(resources), 0)
 
 
 class TestSecurityComandCenterFindingsFilter(BaseTest):

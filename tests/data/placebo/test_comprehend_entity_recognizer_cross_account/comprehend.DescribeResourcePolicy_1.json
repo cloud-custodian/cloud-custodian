@@ -1,28 +1,28 @@
 {
     "status_code": 200,
     "data": {
-        "ResourcePolicy": "{\"Version\":\"2012-10-17\",\"Statement\":[{\"Sid\":\"TestPolicy\",\"Effect\":\"Allow\",\"Principal\":{\"AWS\":\"arn:aws:iam::644160558199:root\"},\"Action\":\"comprehend:ImportModel\",\"Resource\":\"arn:aws:comprehend:us-east-1:644160558196:entity-recognizer/TestVpcEntityRecognizer/version/12\"}]}",
+        "ResourcePolicy": "{\"Version\":\"2012-10-17\",\"Statement\":[{\"Sid\":\"TestPolicy\",\"Effect\":\"Allow\",\"Principal\":{\"AWS\":[\"arn:aws:iam::644160558196:root\",\"arn:aws:iam::644160558197:user/omar\"]},\"Action\":\"comprehend:ImportModel\",\"Resource\":\"arn:aws:comprehend:us-east-1:644160558196:entity-recognizer/TestVpcEntityRecognizer/version/RBP\"}]}",
         "CreationTime": {
             "__class__": "datetime",
             "year": 2025,
-            "month": 4,
-            "day": 15,
-            "hour": 11,
-            "minute": 45,
-            "second": 19,
-            "microsecond": 46000
+            "month": 7,
+            "day": 9,
+            "hour": 12,
+            "minute": 36,
+            "second": 17,
+            "microsecond": 730000
         },
         "LastModifiedTime": {
             "__class__": "datetime",
             "year": 2025,
-            "month": 4,
-            "day": 15,
-            "hour": 11,
-            "minute": 45,
-            "second": 19,
-            "microsecond": 46000
+            "month": 7,
+            "day": 9,
+            "hour": 12,
+            "minute": 43,
+            "second": 25,
+            "microsecond": 505000
         },
-        "PolicyRevisionId": "8b4144e9f18b2a9bbf372cb9897adfad",
+        "PolicyRevisionId": "c5851de1dc43a1e724af0a5bc0fd30ce",
         "ResponseMetadata": {}
     }
 }

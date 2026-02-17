@@ -1,7 +1,7 @@
 # Copyright The Cloud Custodian Authors.
 # SPDX-License-Identifier: Apache-2.0
 from c7n_azure.resources.apimanagement import Resize
-from mock import MagicMock
+from unittest.mock import MagicMock
 
 from ..azure_common import BaseTest, arm_template
 

@@ -5,7 +5,7 @@ from botocore.exceptions import ClientError
 from concurrent.futures import as_completed
 from c7n.manager import resources, ResourceManager
 from c7n.query import QueryResourceManager, TypeInfo
-from c7n.utils import local_session, chunks, type_schema
+from c7n.utils import local_session, chunks, type_schema, generate_arn
 from c7n.actions import BaseAction, ActionRegistry, RemovePolicyBase
 from c7n.exceptions import PolicyValidationError
 from c7n.filters.vpc import SubnetFilter, SecurityGroupFilter
@@ -333,7 +333,7 @@ class GlueDatabase(QueryResourceManager):
         date = 'CreatedOn'
         arn_type = 'database'
         state_key = 'State'
-        cfn_type = 'AWS::Glue::Database'
+        cfn_type = config_type = 'AWS::Glue::Database'
 
 
 @GlueDatabase.action_registry.register('delete')
@@ -599,6 +599,21 @@ class GlueDataCatalog(ResourceManager):
     @classmethod
     def has_arn(cls):
         return True
+
+    def get_arns(self, resources):
+        return [self.generate_arn(res) for res in resources]
+
+    def generate_arn(self, res):
+        """
+        https://docs.aws.amazon.com/service-authorization/latest/reference/list_awsglue.html
+        One resource per region and one arn per region
+        """
+        return generate_arn(
+            service=self.resource_type.service,
+            resource=self.resource_type.arn_type,
+            region=self.config.region,
+            account_id=self.config.account_id
+        )
 
     def get_model(self):
         return self.resource_type

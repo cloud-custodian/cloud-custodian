@@ -1,0 +1,28 @@
+{
+    "status_code": 200,
+    "data": {
+        "ResponseMetadata": {},
+        "Items": [
+            {
+                "ApiEndpoint": "https://jp020k3s47.execute-api.us-east-1.amazonaws.com",
+                "ApiId": "jp020k3s47",
+                "ApiKeySelectionExpression": "$request.header.x-api-key",
+                "CreatedDate": {
+                    "__class__": "datetime",
+                    "year": 2025,
+                    "month": 1,
+                    "day": 26,
+                    "hour": 21,
+                    "minute": 16,
+                    "second": 26,
+                    "microsecond": 0
+                },
+                "DisableExecuteApiEndpoint": false,
+                "Name": "c7n-test",
+                "ProtocolType": "HTTP",
+                "RouteSelectionExpression": "$request.method $request.path",
+                "Tags": {}
+            }
+        ]
+    }
+}

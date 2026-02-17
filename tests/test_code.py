@@ -23,6 +23,21 @@ class CodeArtifact(BaseTest):
             time.sleep(3)
         assert factory().client('codeartifact').list_domains().get('domains') == []
 
+    def test_artifact_domain_cross_account(self):
+        factory = self.replay_flight_data('test_artifact_domain_cross_account', region='us-east-2')
+        p = self.load_policy(
+            {
+                'name': 'artifact-domain-no-xaccount',
+                'resource': 'aws.artifact-domain',
+                'filters': ['cross-account'],
+            },
+            session_factory=factory,
+            config={'region': 'us-east-2'},
+        )
+        resources = p.run()
+        assert len(resources) == 1
+        assert resources[0]['name'] == 'c7n-test'
+
     def test_cross_account_and_delete_repo(self):
         factory = self.replay_flight_data('test_artifact_repo_cross_account')
         p = self.load_policy({

@@ -206,7 +206,7 @@ class PolicyMetaLint(BaseTest):
             {'account', 's3', 'hostedzone', 'log-group', 'rest-api', 'redshift-snapshot',
              'rest-stage', 'codedeploy-app', 'codedeploy-group', 'fis-template', 'dlm-policy',
              'apigwv2', 'apigwv2-stage', 'lexv2-bot-alias', 'apigw-domain-name', 'fis-experiment',
-             'launch-template-version', 'glue-table'})
+             'launch-template-version', 'glue-table', 'glue-catalog', 'cloudwatch-synthetics'})
         if overrides:
             raise ValueError("unknown arn overrides in %s" % (", ".join(overrides)))
 
@@ -252,6 +252,10 @@ class PolicyMetaLint(BaseTest):
         for rtype in resource_cfn_types:
             if rtype not in cfn_types:
                 missing.add(rtype)
+
+        # Service no longer available but still present in c7n for policy compatibility
+        missing.remove("AWS::OpsWorksCM::Server")
+
         if missing:
             raise AssertionError("Bad cfn types:\n %s" % (
                 "\n".join(sorted(missing))))
@@ -265,6 +269,8 @@ class PolicyMetaLint(BaseTest):
 
         whitelist = set(('AwsS3Object', 'Container'))
         todo = set((
+            # q2 2025
+            'CodeRepository',
             # q4 2023,
             'AwsEc2ClientVpnEndpoint',
             'AwsS3AccessPoint',
@@ -377,6 +383,120 @@ class PolicyMetaLint(BaseTest):
         # of a resource.
 
         whitelist = {
+            # q1 2026
+            "AWS::ApiGateway::Method",
+            "AWS::ApiGateway::UsagePlan",
+            "AWS::ApiGatewayV2::Integration",
+            "AWS::AppConfig::Extension",
+            "AWS::AppStream::AppBlockBuilder",
+            "AWS::B2BI::Capability",
+            "AWS::BCMDataExports::Export",
+            "AWS::Backup::RestoreTestingPlan",
+            "AWS::BackupGateway::Hypervisor",
+            "AWS::Bedrock::ApplicationInferenceProfile",
+            "AWS::Bedrock::Prompt",
+            "AWS::BedrockAgentCore::BrowserCustom",
+            "AWS::BedrockAgentCore::Runtime",
+            "AWS::CleanRoomsML::TrainingDataset",
+            "AWS::CloudFormation::GuardHook",
+            "AWS::CloudFormation::LambdaHook",
+            "AWS::CloudFormation::StackSet",
+            "AWS::CloudFront::KeyValueStore",
+            "AWS::CloudFront::PublicKey",
+            "AWS::CloudFront::RealtimeLogConfig",
+            "AWS::CloudTrail::EventDataStore",
+            "AWS::Config::AggregationAuthorization",
+            "AWS::Config::ConformancePack",
+            "AWS::Config::StoredQuery",
+            "AWS::Connect::SecurityProfile",
+            "AWS::Deadline::Fleet",
+            "AWS::Deadline::Monitor",
+            "AWS::Deadline::QueueFleetAssociation",
+            "AWS::EC2::IPAMPoolCidr",
+            "AWS::EC2::SecurityGroupVpcAssociation",
+            "AWS::EC2::SubnetCidrBlock",
+            "AWS::EC2::SubnetNetworkAclAssociation",
+            "AWS::EC2::VPCGatewayAttachment",
+            "AWS::EC2::VerifiedAccessInstance",
+            "AWS::ECR::ReplicationConfiguration",
+            "AWS::ECR::RepositoryCreationTemplate",
+            "AWS::EMR::Studio",
+            "AWS::EMRContainers::VirtualCluster",
+            "AWS::EMRServerless::Application",
+            "AWS::EntityResolution::IdMappingWorkflow",
+            "AWS::EntityResolution::MatchingWorkflow",
+            "AWS::EntityResolution::SchemaMapping",
+            "AWS::GameLift::Build",
+            "AWS::GuardDuty::MalwareProtectionPlan",
+            "AWS::ImageBuilder::LifecyclePolicy",
+            "AWS::IoT::DomainConfiguration",
+            "AWS::IoT::ThingGroup",
+            "AWS::IoTCoreDeviceAdvisor::SuiteDefinition",
+            "AWS::IoTSiteWise::Asset",
+            "AWS::KafkaConnect::CustomPlugin",
+            "AWS::Location::APIKey",
+            "AWS::MSK::ServerlessCluster",
+            "AWS::MediaPackageV2::Channel",
+            "AWS::MediaPackageV2::OriginEndpoint",
+            "AWS::MediaTailor::LiveSource",
+            "AWS::NetworkManager::TransitGatewayPeering",
+            "AWS::OpenSearchServerless::SecurityConfig",
+            "AWS::Organizations::OrganizationalUnit",
+            "AWS::PCAConnectorAD::Connector",
+            "AWS::PCAConnectorAD::DirectoryRegistration",
+            "AWS::RDS::Integration",
+            "AWS::Redshift::Integration",
+            "AWS::RolesAnywhere::Profile",
+            "AWS::RolesAnywhere::TrustAnchor",
+            "AWS::Route53::DNSSEC",
+            "AWS::Route53Profiles::ProfileAssociation",
+            "AWS::S3::AccessGrant",
+            "AWS::S3::AccessGrantsInstance",
+            "AWS::S3::AccessGrantsLocation",
+            "AWS::S3Tables::TableBucket",
+            "AWS::S3Tables::TableBucketPolicy",
+            "AWS::SES::MailManagerTrafficPolicy",
+            "AWS::SSM::ResourceDataSync",
+            "AWS::SSMContacts::Contact",
+            "AWS::SSMIncidents::ResponsePlan",
+            "AWS::SageMaker::MlflowTrackingServer",
+            "AWS::SageMaker::StudioLifecycleConfig",
+            "AWS::SageMaker::UserProfile",
+            "AWS::SecretsManager::ResourcePolicy",
+            "AWS::SecretsManager::RotationSchedule",
+            # q2 2025
+            "AWS::AppConfig::ExtensionAssociation",
+            "AWS::AppIntegrations::Application",
+            "AWS::AppSync::ApiCache",
+            "AWS::Bedrock::Guardrail",
+            "AWS::Bedrock::KnowledgeBase",
+            "AWS::Connect::Rule",
+            "AWS::Connect::User",
+            "AWS::EC2::ClientVpnTargetNetworkAssociation",
+            "AWS::EC2::EIPAssociation",
+            "AWS::EC2::InstanceConnectEndpoint",
+            "AWS::EC2::IPAMResourceDiscovery",
+            "AWS::EC2::IPAMResourceDiscoveryAssociation",
+            "AWS::EC2::SnapshotBlockPublicAccess",
+            "AWS::EC2::VPCBlockPublicAccessExclusion",
+            "AWS::EC2::VPCBlockPublicAccessOptions",
+            "AWS::EC2::VPCEndpointConnectionNotification",
+            "AWS::EC2::VPNConnectionRoute",
+            "AWS::Evidently::Segment",
+            "AWS::InspectorV2::Activation",
+            "AWS::MediaConnect::Gateway",
+            "AWS::MSK::ClusterPolicy",
+            "AWS::MSK::VpcConnection",
+            "AWS::OpenSearchServerless::Collection",
+            "AWS::OpenSearchServerless::VpcEndpoint",
+            "AWS::Redshift::EndpointAuthorization",
+            "AWS::Route53Profiles::Profile",
+            "AWS::S3::StorageLensGroup",
+            "AWS::S3Express::BucketPolicy",
+            "AWS::S3Express::DirectoryBucket",
+            "AWS::SageMaker::InferenceExperiment",
+            "AWS::SecurityHub::Standard",
+            "AWS::Transfer::Profile",
             # q1 2024
             "AWS::Cognito::UserPoolClient",
             "AWS::Cognito::UserPoolGroup",
@@ -439,7 +559,6 @@ class PolicyMetaLint(BaseTest):
             "AWS::Athena::PreparedStatement",
             "AWS::CustomerProfiles::ObjectType",
             "AWS::EC2::CapacityReservation",
-            "AWS::EC2::ClientVpnEndpoint",
             "AWS::EC2::IPAMScope",
             "AWS::Evidently::Launch",
             "AWS::Forecast::DatasetGroup",
@@ -533,7 +652,6 @@ class PolicyMetaLint(BaseTest):
             'AWS::EventSchemas::Registry',
             'AWS::EventSchemas::RegistryPolicy',
             'AWS::EventSchemas::Schema',
-            'AWS::Events::ApiDestination',
             'AWS::Events::Archive',
             'AWS::Events::Connection',
             'AWS::Events::Endpoint',
@@ -607,7 +725,6 @@ class PolicyMetaLint(BaseTest):
             'AWS::EC2::RegisteredHAInstance',
             'AWS::EC2::TransitGatewayAttachment',
             'AWS::EC2::TransitGatewayRouteTable',
-            'AWS::EC2::VPCEndpointService',
             'AWS::ECR::PublicRepository',
             'AWS::EFS::AccessPoint',
             'AWS::EMR::SecurityConfiguration',
@@ -702,6 +819,7 @@ class PolicyMetaLint(BaseTest):
                 "Missing config types \n %s" % ('\n'.join(sorted(missing))))
 
         # config service can't be bothered to update their sdk correctly
+        # See: https://docs.aws.amazon.com/config/latest/APIReference/API_ListDiscoveredResources.html
         invalid_ignore = {
             'AWS::Config::ConfigurationRecorder',
             'AWS::SageMaker::NotebookInstance',
@@ -709,6 +827,7 @@ class PolicyMetaLint(BaseTest):
             'AWS::DMS::ReplicationInstance',
             'AWS::DMS::ReplicationTask',
             'AWS::SES::MailManagerIngressPoint',
+            'AWS::IAM::AccessKey',
         }
         bad_types = resource_config_types.difference(config_types)
         bad_types = bad_types.difference(invalid_ignore)
@@ -767,7 +886,8 @@ class PolicyMetaLint(BaseTest):
             'rrset',
             'redshift-reserved',
             'elasticsearch-reserved',
-            'ses-receipt-rule-set'
+            'ses-receipt-rule-set',
+            'iam-access-key',
         ))
 
         for k, v in manager.resources.items():
@@ -907,6 +1027,20 @@ class PolicyMetaLint(BaseTest):
                     len(explicit), ", ".join(explicit)))
 
     def test_resource_permissions(self):
+
+        ignore_elements = set((
+            # this service has been fully removed, we're keeping compatiblity
+            # support for the moment to avoid breaking policies targeting.
+            #
+            "qldb",
+            "opswork-cm",
+            "opswork-cm.actions.delete",
+            "opswork-stack",
+            "opswork-stack.actions.delete",
+            "opswork-stack.actions.stop",
+            "route-table.filters.route",
+        ))
+
         self.capture_logging("c7n.cache")
         missing = []
         cfg = Config.empty()
@@ -914,11 +1048,11 @@ class PolicyMetaLint(BaseTest):
         for k, v in list(manager.resources.items()):
             p = Bag({"name": "permcheck", "resource": k, 'provider_name': 'aws'})
             ctx = self.get_context(config=cfg, policy=p)
-
             mgr = v(ctx, p)
             perms = mgr.get_permissions()
             if not perms:
-                missing.append(k)
+                if k not in ignore_elements:
+                    missing.append(k)
 
             for n, a in list(v.action_registry.items()):
                 p["actions"] = [n]
@@ -929,7 +1063,9 @@ class PolicyMetaLint(BaseTest):
                 if "webhook" == n:
                     continue
                 if not found:
-                    missing.append("%s.actions.%s" % (k, n))
+                    qk = "%s.actions.%s" % (k, n)
+                    if qk not in ignore_elements:
+                        missing.append(qk)
 
             for n, f in list(v.filter_registry.items()):
                 if n in ("and", "or", "not", "missing", "reduce"):
@@ -969,7 +1105,7 @@ class PolicyMetaLint(BaseTest):
                 ):
                     continue
                 qk = "%s.filters.%s" % (k, n)
-                if qk in ("route-table.filters.route",):
+                if qk in ignore_elements:
                     continue
                 if not perms:
                     missing.append(qk)

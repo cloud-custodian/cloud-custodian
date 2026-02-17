@@ -6,7 +6,7 @@ from azure.mgmt.compute.models import HardwareProfile, VirtualMachineUpdate
 from ..azure_common import BaseTest, arm_template, cassette_name
 from c7n_azure.session import Session
 from dateutil import tz as tzutils
-from mock import patch
+from unittest.mock import patch
 
 from c7n.testing import mock_datetime_now
 from c7n.utils import local_session
@@ -372,7 +372,7 @@ class VMTest(BaseTest):
         resources = p.run()
 
         self.assertEqual(len(resources), 1)
-        self.assertEqual('vm1226', resources[0]['name'])
+        self.assertEqual('c7n-test-vm', resources[0]['name'])
 
     def test_vm_jit_policy_port_filter(self):
         p = self.load_policy({

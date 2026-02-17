@@ -34,7 +34,7 @@ class IACSourceProvider(Provider):
     def initialize_policies(self, policies, options):
         return policies
 
-    def parse(self, source_dir, var_files):
+    def parse(self, source_dir, var_files, **kwargs):
         """Return the resource graph for the provider"""
 
 

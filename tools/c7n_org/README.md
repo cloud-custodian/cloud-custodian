@@ -24,9 +24,10 @@ Options:
   --help  Show this message and exit.
 
 Commands:
-  report      report on an AWS cross account policy execution
-  run         run a custodian policy across accounts (AWS, Azure, GCP, OCI)
-  run-script  run a script across AWS accounts
+  aws-accounts  generate c7n-org aws accounts config file
+  report        report on an AWS cross account policy execution
+  run           run a custodian policy across accounts (AWS, Azure, GCP, OCI)
+  run-script    run a script across AWS accounts
 ```
 
 In order to run c7n-org against multiple accounts, a config file must
@@ -97,17 +98,17 @@ tenancies:
 
 ### Config File Generation
 
-We also distribute scripts to generate the necessary config file in the [`scripts` folder](https://github.com/cloud-custodian/cloud-custodian/tree/main/tools/c7n_org/scripts).
+We also distribute subcommands and scripts to generate the necessary config file in the [`scripts` folder](https://github.com/cloud-custodian/cloud-custodian/tree/main/tools/c7n_org/scripts).
 
-**Note:** Currently these are distributed only via git. Per
+**Note:** Besides AWS, these are distributed only via git. Per
 <https://github.com/cloud-custodian/cloud-custodian/issues/2420>, we'll
 be looking to incorporate them into a new c7n-org subcommand.
 
-- For **AWS**, the script `orgaccounts.py` generates a config file
+- For **AWS**, the subcommand `aws-accounts` generates a config file
   from the AWS Organizations API.
 
 ```shell
-python orgaccounts.py -f accounts.yml
+c7n-org aws-accounts -f accounts.yml
 ```
 
 - For **Azure**, the script `azuresubs.py` generates a config file
@@ -295,7 +296,3 @@ tenancies:
     environment: test
 
 ```
-
-
-
-

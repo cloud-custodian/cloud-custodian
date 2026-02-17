@@ -65,11 +65,11 @@ class Snapshot(QueryResourceManager):
         )
 
     def resources(self, query=None):
-        qfilters = SnapshotQueryParser.parse(self.data.get('query', []))
         query = query or {}
-        if qfilters:
-            query['Filters'] = qfilters
-        if query.get('OwnerIds') is None:
+        queries = SnapshotQueryParser.parse(self.data.get('query', []))
+        for q in queries:
+            query.update(q)
+        if 'OwnerIds' not in query:
             query['OwnerIds'] = ['self']
         if 'MaxResults' not in query:
             query['MaxResults'] = 1000
@@ -136,20 +136,58 @@ class ErrorHandler:
 class SnapshotQueryParser(QueryParser):
 
     QuerySchema = {
-        'description': str,
-        'owner-alias': ('amazon', 'amazon-marketplace', 'microsoft'),
-        'owner-id': str,
-        'progress': str,
-        'snapshot-id': str,
-        'start-time': str,
-        'status': ('pending', 'completed', 'error'),
-        'tag': str,
-        'tag-key': str,
-        'volume-id': str,
-        'volume-size': str,
+        'Filters': {
+            'description': str,
+            'owner-alias': ('amazon', 'amazon-marketplace', 'microsoft'),
+            'owner-id': str,
+            'progress': str,
+            'snapshot-id': str,
+            'start-time': str,
+            'status': ('pending', 'completed', 'error'),
+            'tag': str,
+            'tag-key': str,
+            'volume-id': str,
+            'volume-size': str,
+        },
+        'OwnerIds': str,
+        'RestorableByUserIds': str,
+        'SnapshotIds': str,
+        'MaxResults': int,
     }
+    single_value_fields = ('MaxResults',)
 
-    type_name = 'EBS'
+    type_name = 'EBS Snapshot'
+
+
+class VolumeQueryParser(QueryParser):
+
+    # Valid EBS Volume Query Filters
+    # https://docs.aws.amazon.com/AWSEC2/latest/APIReference/API_DescribeVolumes.html
+    # https://boto3.amazonaws.com/v1/documentation/api/latest/reference/services/ec2/client/describe_volumes.html
+    QuerySchema = {
+        'Filters': {
+            'attachment.attach-time': str,
+            'attachment.delete-on-termination': ('true', 'false'),
+            'attachment.device': str,
+            'attachment.instance-id': str,
+            'attachment.status': ('attaching', 'attached', 'detaching'),
+            'availability-zone': str,
+            'create-time': str,
+            'encrypted': ('true', 'false'),
+            'multi-attach-enabled': ('true', 'false'),
+            'size': int,
+            'snapshot-id': str,
+            'status': ('creating', 'available', 'in-use', 'deleting', 'deleted', 'error'),
+            'tag': str,
+            'tag-key': str,
+            'volume-id': str,
+            'volume-type': ('standard', 'io1', 'io2', 'gp2', 'gp3', 'sc1', 'st1'),
+        },
+        'MaxResults': int,
+    }
+    single_value_fields = ('MaxResults',)
+
+    type_name = 'EBS Volume'
 
 
 @Snapshot.action_registry.register('tag')
@@ -664,6 +702,15 @@ class EBS(QueryResourceManager):
             'VolumeType',
             'KmsKeyId'
         )
+
+    def resources(self, query=None):
+        query = query or {}
+        queries = VolumeQueryParser.parse(self.data.get('query', []))
+        for q in queries:
+            query.update(q)
+        if 'MaxResults' not in query:
+            query['MaxResults'] = 1000
+        return super(EBS, self).resources(query=query)
 
     def get_resources(self, ids, cache=True, augment=True):
         if cache:

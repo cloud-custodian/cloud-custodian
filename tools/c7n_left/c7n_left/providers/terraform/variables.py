@@ -52,12 +52,13 @@ class VariableResolver:
         "object": {},
     }
 
-    def __init__(self, source_dir, var_files, reporter=None):
+    def __init__(self, source_dir, var_files, reporter=None, stop_on_hcl_errors=False):
         self.source_dir = source_dir
         self.var_files = var_files
         self.resolved_files = {}
         self.temp_files = []
         self.reporter = reporter
+        self.stop_on_hcl_errors = stop_on_hcl_errors
 
     def _write_file_content(self, content, suffix=".tfvars"):
         fh = tempfile.NamedTemporaryFile(
@@ -120,7 +121,11 @@ class VariableResolver:
                 var_map.update(f_vars)
 
         uninitialized_vars = {}
-        graph_data = tfparse.load_from_path(self.source_dir, allow_downloads=False)
+        graph_data = tfparse.load_from_path(
+            self.source_dir,
+            allow_downloads=False,
+            stop_on_hcl_error=self.stop_on_hcl_errors,
+        )
         for _, variables in TerraformGraph(graph_data, self.source_dir).get_resources_by_type(
             "variable"
         ):

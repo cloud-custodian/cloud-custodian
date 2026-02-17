@@ -3,14 +3,21 @@
 import json
 
 from .core import Filter
-from c7n.utils import type_schema, format_string_values
+from c7n.utils import (
+    type_schema,
+    format_string_values,
+    merge_dict,
+    compare_dicts_using_sets,
+    format_to_set,
+    format_dict_with_sets
+)
 
 
 class HasStatementFilter(Filter):
     """Find resources with matching access policy statements.
 
-    If you want to return resource statements that include the listed Action or
-    NotAction, you can use PartialMatch instead of an exact match.
+    If you want to return resource statements that include the listed key,
+    e.g. Action, you can use PartialMatch instead of an exact match.
 
     :example:
 
@@ -37,7 +44,14 @@ class HasStatementFilter(Filter):
                                 "aws:SecureTransport": "false"
                         PartialMatch: 'Action'
     """
-    PARTIAL_MATCH_ELEMENTS = ['Action', 'NotAction']
+    PARTIAL_MATCH_ELEMENTS = ['Action',
+                              'NotAction',
+                              'Principal',
+                              'NotPrincipal',
+                              'Resource',
+                              'NotResource',
+                              'Condition'
+                            ]
     schema = type_schema(
         'has-statement',
         statement_ids={'type': 'array', 'items': {'type': 'string'}},
@@ -109,6 +123,7 @@ class HasStatementFilter(Filter):
             return resource
         return None
 
+    # Use set data type for comparing lists with different order of items
     def action_resource_case_insensitive(self, actions):
         if isinstance(actions, str):
             actionsFormatted = [actions.lower()]
@@ -143,10 +158,27 @@ class HasStatementFilter(Filter):
                                                         resource_statement):
                             found += 1
 
-                    # If req_key is not a partial_match element,
-                    # do a regular full value match for a given req_key
-                    elif req_value == resource_statement.get(req_key):
-                        found += 1
+                    else:
+                        if req_key in resource_statement:
+                            if isinstance(req_value, dict):
+                                req_value = format_dict_with_sets(req_value)
+                            else:
+                                req_value = format_to_set(req_value)
+
+                            if isinstance(resource_statement[req_key], dict):
+                                resource_statement[req_key] = format_dict_with_sets(
+                                    resource_statement[req_key]
+                                    )
+                            else:
+                                resource_statement[req_key] = format_to_set(
+                                    resource_statement[req_key]
+                                )
+
+                        # If req_key is not a partial_match element,
+                        # do a regular full value match for a given req_value
+                        # and the value in the resource_statement
+                        if req_value == resource_statement.get(req_key):
+                            found += 1
 
                 if found and found == len(required_statement):
                     matched_statements.append(required_statement)
@@ -157,14 +189,27 @@ class HasStatementFilter(Filter):
     def __match_partial_statement(self, partial_match_key,
                                 partial_match_value, resource_stmt):
 
-        # TO-DO: Add support for Condition json subset match.
         if partial_match_key in resource_stmt:
+            resource_stmt_value = resource_stmt.get(partial_match_key)
+
+            # set as a list in case partial_match_value is a list with len of 1
+            if (isinstance(resource_stmt_value, str) or
+                isinstance(resource_stmt_value, list)
+            ):
+                resource_stmt_value = format_to_set(resource_stmt_value)
+
             if isinstance(partial_match_value, list):
-                return set(partial_match_value).issubset(
-                    resource_stmt[partial_match_key])
+                return format_to_set(partial_match_value).issubset(resource_stmt_value)
             elif isinstance(partial_match_value, set):
-                return partial_match_value.issubset(resource_stmt[partial_match_key])
+                return partial_match_value.issubset(resource_stmt_value)
+            elif isinstance(partial_match_value, dict):
+                merged_stmts = merge_dict(
+                    resource_stmt_value, partial_match_value
+                )
+                return compare_dicts_using_sets(
+                    merged_stmts, resource_stmt_value
+                )
             else:
-                return partial_match_value in resource_stmt[partial_match_key]
+                return partial_match_value in resource_stmt_value
         else:
             return False

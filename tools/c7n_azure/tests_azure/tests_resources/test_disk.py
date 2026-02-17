@@ -4,7 +4,7 @@ import logging
 from c7n.utils import local_session
 from c7n_azure.session import Session
 from c7n_azure.utils import ResourceIdParser, ThreadHelper
-from mock import patch, MagicMock
+from unittest.mock import patch, MagicMock
 import pytest
 from ..azure_common import BaseTest, arm_template, cassette_name
 from azure.core.exceptions import AzureError
@@ -154,6 +154,7 @@ class ModifyDiskTypeTests(BaseTest):
         for resource in resources:
             disk = self._fetch_disk(resource['id'])
             self.assertEqual(disk.sku.name, 'Standard_LRS')
+            self.assertIsNotNone(disk.last_ownership_update_time)
 
     @pytest.mark.vcr(record_mode='ALL')
     @arm_template('disk_type_modify.json')

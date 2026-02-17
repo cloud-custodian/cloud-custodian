@@ -36,6 +36,94 @@ from .common import (
 )
 
 
+def test_s3_assembly_validate(test):
+
+    for tcase in ('all', 'none', 'detect', ['Website', 'Replication']):
+        policy = test.load_policy(
+            {'name': 's3-attrs',
+             'resource': 's3',
+             'query': [{'augment-keys': tcase}]
+             }
+        )
+        policy.validate()
+
+    for tcase in ('random', ['Garbage'], {}):
+        with pytest.raises(PolicyValidationError):
+            policy = test.load_policy(
+                {'name': 's3-attrs',
+                 'resource': 's3',
+                 'query': [{'augment-keys': tcase}],
+                 'filters': [{'tag:Owner': 'xyz'}],
+                 },
+                validate=True
+            )
+
+
+def test_s3_assembly_none(test):
+    # noting even with none we will still get location and tags to
+    # ensure other s3 filters/actions work.
+    policy = test.load_policy(
+        {'name': 's3-attrs',
+         'resource': 's3',
+         'query': [{'augment-keys': 'none'}],
+         'filters': [
+             {'tag:Owner': 'xyz'},
+         ]
+         }
+    )
+    assembly = s3.BucketAssembly(policy.resource_manager)
+    assert assembly.detect_augment_fields() == []
+
+
+def test_s3_assembly_website(test):
+    policy = test.load_policy(
+        {'name': 's3-attrs',
+         'resource': 's3',
+         'query': [{'augment-keys': ['Website', 'Replication']}],
+         'filters': [
+             {'tag:Owner': 'xyz'},
+         ]
+         }
+    )
+    assembly = s3.BucketAssembly(policy.resource_manager)
+    assert assembly.detect_augment_fields() == ['Website', 'Replication']
+
+
+def test_s3_assembly_detect(test):
+
+    policy = test.load_policy(
+        {'name': 's3-attrs',
+         'resource': 's3',
+         'query': [{'augment-keys': 'detect'}],
+         'filters': [
+             {'tag:Owner': 'xyz'},
+             {'type': 'cross-account'},
+             {'SomethingRandom': 'xyz'},
+             {'Replication.ReplicationConfiguation.Rules[].Destination.StorageClass': 'Standard'},
+             {'type': 'value',
+              'value': 'not-null',
+              'key': 'Website.ErrorDocument'}]
+         }
+    )
+    assembly = s3.BucketAssembly(policy.resource_manager)
+    assert assembly.detect_augment_fields() == ['Tags', 'Replication', 'Website']
+
+
+def test_s3_assembly_detect_denied(test):
+    policy = test.load_policy(
+        {'name': 's3-attrs',
+         'resource': 's3',
+         'query': [{'augment-keys': 'detect'}],
+         'filters': [
+             {'c7n:DeniedMethods': 'not-null'},
+         ]}
+    )
+    assembly = s3.BucketAssembly(policy.resource_manager)
+    assert assembly.detect_augment_fields() == [
+        'Location', 'Tags', 'Policy', 'Acl', 'Replication', 'Versioning', 'Website',
+        'Logging', 'Notification', 'Lifecycle']
+
+
 def test_s3_express(test):
     session_factory = test.replay_flight_data('test_s3_express')
     p = test.load_policy(
@@ -44,7 +132,7 @@ def test_s3_express(test):
         config={'account_id': '644160558196', 'region': 'us-east-1'},
         session_factory=session_factory)
     resources = p.run()
-    assert len(resources) ==  1
+    assert len(resources) == 1
     assert p.resource_manager.get_arns(resources) == [
         'arn:aws:s3express:us-east-1:644160558196:bucket/test-zone--use1-az4--x-s3'
     ]
@@ -176,6 +264,7 @@ class BucketMetrics(BaseTest):
         resources = p.run()
         self.assertEqual(len(resources), 1)
         self.assertIn('c7n.metrics', resources[0])
+        assert p.resource_manager.get_arns(resources) == ['arn:aws:s3:::c7n-ssm-build']
 
     def test_metrics(self):
         self.patch(s3.S3, "executor_factory", MainThreadExecutor)
@@ -2604,6 +2693,181 @@ class S3Test(BaseTest):
         self.assertEqual(len(resources), 1)
         self.assertRaises(ClientError, client.get_bucket_policy, Bucket=bname)
 
+    def test_set_statements_remove_policy(self):
+        self.patch(
+            s3, "S3_AUGMENT_TABLE", [("get_bucket_policy", "Policy", None, "Policy")]
+        )
+        self.patch(s3.S3, "executor_factory", MainThreadExecutor)
+        self.patch(s3.SetPolicyStatement, "executor_factory", MainThreadExecutor)
+
+        session_factory = self.replay_flight_data("test_s3_remove_policy")
+        bname = "custodian-policy-test"
+        session = session_factory()
+        client = session.client("s3")
+        client.create_bucket(Bucket=bname)
+        client.put_bucket_policy(
+            Bucket=bname,
+            Policy=json.dumps(
+                {
+                    "Version": "2012-10-17",
+                    "Statement": [
+                        {
+                            "Sid": "Zebra",
+                            "Effect": "Deny",
+                            "Principal": "*",
+                            "Action": "s3:PutObject",
+                            "Resource": "arn:aws:s3:::%s/*" % bname,
+                            "Condition": {
+                                "StringNotEquals": {
+                                    "s3:x-amz-server-side-encryption": [
+                                        "AES256", "aws:kms"
+                                    ]
+                                }
+                            },
+                        }
+                    ],
+                }
+            ),
+        )
+        self.addCleanup(destroyBucket, client, bname)
+        p = self.load_policy(
+            {
+                "name": "remove-policy",
+                "resource": "s3",
+                "filters": [{"Name": bname}],
+                "actions": [
+                    {"type": "set-statements", "remove": ["Zebra", "Moon"]}
+                ],
+            },
+            session_factory=session_factory,
+        )
+        resources = p.run()
+        self.assertEqual(len(resources), 1)
+        self.assertRaises(ClientError, client.get_bucket_policy, Bucket=bname)
+
+    def test_set_statements_remove_policy_matched(self):
+        self.patch(
+            s3, "S3_AUGMENT_TABLE", [("get_bucket_policy", "Policy", None, "Policy")]
+        )
+        self.patch(s3.S3, "executor_factory", MainThreadExecutor)
+        self.patch(s3.SetPolicyStatement, "executor_factory", MainThreadExecutor)
+        self.patch(MainThreadExecutor, "c7n_async", False)
+
+        bname = "custodian-policy-test"
+        statement = {
+            "Sid": "Zebra",
+            "Effect": "Deny",
+            "Principal": "*",
+            "Action": "s3:PutObject",
+            "Resource": "arn:aws:s3:::%s/*" % bname,
+            "Condition": {
+                "StringNotEquals": {
+                    "s3:x-amz-server-side-encryption": ["AES256", "aws:kms"]
+                }
+            },
+        }
+
+        process_buckets = s3.SetPolicyStatement.process
+
+        def enrich(self, buckets):
+            buckets[0]["CrossAccountViolations"] = [statement]
+            process_buckets(self, buckets)
+
+        self.patch(s3.SetPolicyStatement, "process", enrich)
+
+        session_factory = self.replay_flight_data("test_s3_remove_policy")
+        session = session_factory()
+        client = session.client("s3")
+        client.create_bucket(Bucket=bname)
+        client.put_bucket_policy(
+            Bucket=bname,
+            Policy=json.dumps({"Version": "2012-10-17", "Statement": [statement]}),
+        )
+        self.addCleanup(destroyBucket, client, bname)
+        p = self.load_policy(
+            {
+                "name": "remove-policy",
+                "resource": "s3",
+                "filters": [{"Name": bname}],
+                "actions": [{"type": "set-statements", "remove": "matched"}],
+            },
+            session_factory=session_factory,
+        )
+        resources = p.run()
+        self.assertEqual(len(resources), 1)
+        self.assertRaises(ClientError, client.get_bucket_policy, Bucket=bname)
+
+    def test_set_statements_add_remove_policy(self):
+        sid = "CustodianTest"
+        self.patch(
+            s3, "S3_AUGMENT_TABLE", [("get_bucket_policy", "Policy", None, "Policy")]
+        )
+        self.patch(s3.S3, "executor_factory", MainThreadExecutor)
+        self.patch(s3.SetPolicyStatement, "executor_factory", MainThreadExecutor)
+
+        session_factory = self.replay_flight_data("test_s3_set_statements_add_remove")
+        bname = "custodian-policy-test"
+        session = session_factory()
+        client = session.client("s3")
+        client.create_bucket(Bucket=bname)
+        client.put_bucket_policy(
+            Bucket=bname,
+            Policy=json.dumps(
+                {
+                    "Version": "2012-10-17",
+                    "Statement": [
+                        {
+                            "Sid": "Zebra",
+                            "Effect": "Deny",
+                            "Principal": "*",
+                            "Action": "s3:PutObject",
+                            "Resource": "arn:aws:s3:::%s/*" % bname,
+                            "Condition": {
+                                "StringNotEquals": {
+                                    "s3:x-amz-server-side-encryption": [
+                                        "AES256", "aws:kms"
+                                    ]
+                                }
+                            },
+                        }
+                    ],
+                }
+            ),
+        )
+        self.addCleanup(destroyBucket, client, bname)
+        p = self.load_policy(
+            {
+                "name": "remove-policy",
+                "resource": "s3",
+                "filters": [{"Name": bname}],
+                "actions": [
+                    {"type": "set-statements", "remove": ["Zebra", "Moon"], "statements": [
+                            {
+                                "Sid": sid,
+                                "Effect": "Deny",
+                                "Action": "s3:GetObject",
+                                "Principal": {"AWS": "*"},
+                                "Resource": "arn:aws:s3:::{bucket_name}/*",
+                                "Condition": {"Bool": {"aws:SecureTransport": False}},
+                            }
+                        ], }
+                ],
+            },
+            session_factory=session_factory,
+        )
+        resources = p.run()
+        self.assertEqual(len(resources), 1)
+        # self.assertRaises(ClientError, client.get_bucket_policy, Bucket=bname)
+
+        policy = client.get_bucket_policy(Bucket=bname).get("Policy")
+        policy = json.loads(policy)
+
+        self.assertTrue(len(policy["Statement"]) == 1)
+        self.assertTrue(
+            len([s for s in policy["Statement"] if s["Sid"] == sid and
+                s["Resource"] == "arn:aws:s3:::%s/*" % (bname)]) == 1
+        )
+
     def test_attach_encrypt_requires_role(self):
         self.assertRaises(
             PolicyValidationError,
@@ -3802,6 +4066,21 @@ class S3Test(BaseTest):
 
         resources = p.run()
         assert {bucket["Name"] for bucket in resources} == {"bucket-with-data-events"}
+
+    def test_s3_dataaccesspointaccount_cross_account(self):
+        self.patch(s3.S3, "executor_factory", MainThreadExecutor)
+        session_factory = self.replay_flight_data("test_s3_dataaccesspointaccount_cross_account")
+
+        p = self.load_policy(
+            {
+                "name": "s3-data-access-point-account-cross-account",
+                "resource": "s3",
+                "filters": [{"type": "cross-account"}],
+            },
+            session_factory=session_factory,
+        )
+        resources = p.run()
+        self.assertEqual(len(resources), 1)
 
 
 class S3LifecycleTest(BaseTest):

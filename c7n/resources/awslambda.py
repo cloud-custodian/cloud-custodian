@@ -988,3 +988,35 @@ class LambdaEdgeFilter(Filter):
             elif (r['FunctionArn'] not in lambda_edge_cf_map and not self.data.get('state')):
                 results.append(r)
         return results
+
+
+class DescribeEventSourceMappings(query.DescribeSource):
+
+    def augment(self, resources):
+        return universal_augment(
+            self.manager,
+            super(DescribeEventSourceMappings, self).augment(resources))
+
+
+@resources.register('lambda-event-source-mapping')
+class LambdaEventSourceMapping(query.QueryResourceManager):
+
+    class resource_type(query.TypeInfo):
+        service = 'lambda'
+        enum_spec = ('list_event_source_mappings', 'EventSourceMappings', None)
+        detail_spec = ('get_event_source_mapping', 'UUID', 'UUID', None)
+        name = id = 'UUID'
+        arn = "EventSourceMappingArn"
+        cfn_type = 'AWS::Lambda::EventSourceMapping'
+        permissions_augment = ("lambda:ListEventSourceMappings", "lambda:GetEventSourceMapping",
+                                 "lambda:ListTags")
+        universal_taggable = object
+
+    source_mapping = {
+        'describe': DescribeEventSourceMappings,
+    }
+
+
+@LambdaEventSourceMapping.filter_registry.register('kms-key')
+class KmsEventSourceMappingFilter(KmsRelatedFilter):
+    RelatedIdsExpression = 'KMSKeyArn'

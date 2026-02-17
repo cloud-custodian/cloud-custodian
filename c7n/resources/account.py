@@ -407,8 +407,8 @@ class GuardDutyEnabled(MultiAttrFilter):
                 filters:
                   - type: guard-duty
                     Detector.Status: ENABLED
-                    Master.AccountId: "00011001"
-                    Master.RelationshipStatus: "Enabled"
+                    Administrator.AccountId: "00011001"
+                    Administrator.RelationshipStatus: "Enabled"
     """
 
     schema = {
@@ -419,7 +419,7 @@ class GuardDutyEnabled(MultiAttrFilter):
             'match-operator': {'enum': ['or', 'and']}},
         'patternProperties': {
             '^Detector': {'oneOf': [{'type': 'object'}, {'type': 'string'}]},
-            '^Master': {'oneOf': [{'type': 'object'}, {'type': 'string'}]}},
+            '^Administrator': {'oneOf': [{'type': 'object'}, {'type': 'string'}]}},
     }
 
     annotation = "c7n:guard-duty"
@@ -451,8 +451,8 @@ class GuardDutyEnabled(MultiAttrFilter):
 
         detector = client.get_detector(DetectorId=detector_id)
         detector.pop('ResponseMetadata', None)
-        master = client.get_administrator_account(DetectorId=detector_id).get('Master')
-        resource[self.annotation] = r = {'Detector': detector, 'Master': master}
+        admin = client.get_administrator_account(DetectorId=detector_id).get('Administrator')
+        resource[self.annotation] = r = {'Detector': detector, 'Administrator': admin}
         return r
 
 
@@ -1798,6 +1798,48 @@ class SetS3PublicBlock(BaseAction):
                 PublicAccessBlockConfiguration=config)
 
 
+@filters.register('ami-block-public-access')
+class AmiBlockPublicAccess(Filter):
+    """Scans for AWS accounts that have/do not have Block Public Access set for
+    their AMIs.
+
+    :example:
+
+    .. code-block:: yaml
+
+            policies:
+              - name: unblocked-ami-block-public-access
+                resource: aws.account
+                filters:
+                  - type: ami-block-public-access
+                    value: false
+
+    """
+
+    annotation_key = 'c7n:ami-block-public-access'
+    schema = type_schema('ami-block-public-access', value={'type': 'boolean'})
+    permissions = ('ec2:GetImageBlockPublicAccessState',)
+
+    def process(self, resources, event=None):
+        client = local_session(self.manager.session_factory).client('ec2')
+        is_blocked = self.data.get('value', False)
+        results = []
+
+        # Get account-wide block public access state
+        response = client.get_image_block_public_access_state()
+        account_state = response.get('ImageBlockPublicAccessState', 'unblocked')
+        account_blocked = account_state == 'block-new-sharing'
+
+        for r in resources:
+            r[self.annotation_key] = account_blocked
+
+            # Filter resources based on whether the account state matches the desired value
+            if account_blocked == is_blocked:
+                results.append(r)
+
+        return results
+
+
 class GlueCatalogEncryptionEnabled(MultiAttrFilter):
     """ Filter glue catalog by its glue encryption status and KMS key
 
@@ -2590,3 +2632,51 @@ class SetEC2MetadataDefaults(BaseAction):
         client = local_session(self.manager.session_factory).client(self.service)
         self.data.pop('type')
         client.modify_instance_metadata_defaults(**self.data)
+
+
+@actions.register('set-security-token-service-preferences')
+class SetSecurityTokenServicePreferences(BaseAction):
+    """Action to set STS preferences."""
+
+    """Action to set STS preferences.
+
+    :example:
+
+    .. code-block:: yaml
+
+            policies:
+              - name: set-sts-preferences
+                resource: account
+                filters:
+                  - or:
+                    - type: iam-summary
+                      key: GlobalEndpointTokenVersion
+                      value: absent
+                      value: optional
+                    - type: iam-summary
+                      key: GlobalEndpointTokenVersion
+                      op: ne
+                      value: 2
+                actions:
+                  - type: set-security-token-service-preferences
+                    token_version: v2Token
+
+    """
+
+    schema = type_schema(
+        'set-security-token-service-preferences',
+        token_version={'type': 'string', 'enum': ['v1Token', 'v2Token']}
+    )
+
+    permissions = ('iam:SetSecurityTokenServicePreferences',)
+
+    def process(self, resources):
+        client = local_session(self.manager.session_factory).client('iam')
+        token_version = self.data.get('token_version', 'v2Token')
+        for resource in resources:
+            self.set_sts_preferences(client, token_version)
+
+    def set_sts_preferences(self, client, token_version):
+        client.set_security_token_service_preferences(
+            GlobalEndpointTokenVersion=token_version
+        )

@@ -1,0 +1,15 @@
+{
+  "status_code": 200,
+  "data": {
+    "ResponseMetadata": {},
+    "CompatibleKafkaVersions": [
+      {
+        "SourceVersion": "2.8.1",
+        "TargetVersions": [
+            "2.8.2",
+            "3.1.1"
+        ]
+      }
+    ]
+  }
+}

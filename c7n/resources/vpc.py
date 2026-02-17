@@ -516,6 +516,38 @@ class DhcpOptionsFilter(Filter):
     vpcs not matching a given option value can be found via specifying
     a `present: false` parameter.
 
+    Use the synthetic value `amazon` to validate Amazon-provided DNS servers.
+    This checks for AmazonProvidedDNS, 169.254.169.253, and VPC CIDR base + 2:
+
+     :example:
+
+     .. code-block:: yaml
+
+          policies:
+             - name: vpcs-with-only-amazon-dns
+               resource: vpc
+               filters:
+                 - type: dhcp-options
+                   match-operator: all
+                   present: false
+                   domain-name-servers: amazon
+
+    Use `match-operator: all` to require ALL values match the criteria,
+    or `match-operator: any` (default) to match if at least one value matches:
+
+     :example:
+
+     .. code-block:: yaml
+
+          policies:
+             - name: vpcs-without-amazon-dns
+               resource: vpc
+               filters:
+                 - type: dhcp-options
+                   match-operator: all
+                   present: false
+                   domain-name-servers: amazon
+
     """
 
     option_keys = ('domain-name', 'domain-name-servers', 'ntp-servers')
@@ -525,6 +557,7 @@ class DhcpOptionsFilter(Filter):
             {'type': 'string'}]}
         for k in option_keys})
     schema['properties']['present'] = {'type': 'boolean'}
+    schema['properties']['match-operator'] = {'enum': ['all', 'any']}
     permissions = ('ec2:DescribeDhcpOptions',)
 
     def validate(self):
@@ -550,19 +583,81 @@ class DhcpOptionsFilter(Filter):
                 results.append(vpc)
         return results
 
+    def _get_amazon_dns_servers(self, vpc):
+        """Get list of valid Amazon DNS server addresses for this VPC."""
+        amazon_dns = ['AmazonProvidedDNS', '169.254.169.253']
+
+        # Add CIDR base + 2 for primary CIDR block
+        if 'CidrBlock' in vpc:
+            cidr_base_plus_2 = self._calculate_cidr_plus_2(vpc['CidrBlock'])
+            if cidr_base_plus_2:
+                amazon_dns.append(cidr_base_plus_2)
+
+        # Add CIDR base + 2 for secondary CIDR blocks
+        for assoc in vpc.get('CidrBlockAssociationSet', []):
+            if assoc.get('CidrBlockState', {}).get('State') == 'associated':
+                cidr_base_plus_2 = self._calculate_cidr_plus_2(assoc['CidrBlock'])
+                if cidr_base_plus_2:
+                    amazon_dns.append(cidr_base_plus_2)
+
+        return amazon_dns
+
+    def _calculate_cidr_plus_2(self, cidr_block):
+        """Calculate the base + 2 IP address for a given CIDR block."""
+        try:
+            import ipaddress
+            network = ipaddress.ip_network(cidr_block, strict=False)
+            # Base + 2 is the third address in the network
+            base_plus_2 = network.network_address + 2
+            return str(base_plus_2)
+        except (ValueError, ImportError):
+            return None
+
+    def _is_amazon_dns(self, value, vpc):
+        """Check if a DNS server value is Amazon-provided DNS."""
+        amazon_dns_servers = self._get_amazon_dns_servers(vpc)
+        return value in amazon_dns_servers
+
     def process_vpc(self, vpc, dhcp):
         vpc['c7n:DhcpConfiguration'] = dhcp
         found = True
+        match_operator = self.data.get('match-operator', 'any')
+
         for k in self.option_keys:
             if k not in self.data:
                 continue
+
             is_list = isinstance(self.data[k], list)
+            expected_value = self.data[k]
+
             if k not in dhcp:
                 found = False
-            elif not is_list and self.data[k] not in dhcp[k]:
+            elif expected_value == 'amazon':
+                # Synthetic value: check if DNS servers are Amazon-provided
+                if match_operator == 'all':
+                    # All DNS servers must be Amazon DNS
+                    found = all(
+                        self._is_amazon_dns(v, vpc) for v in dhcp[k]
+                    )
+                else:
+                    # At least one DNS server must be Amazon DNS
+                    found = any(
+                        self._is_amazon_dns(v, vpc) for v in dhcp[k]
+                    )
+            elif is_list and isinstance(expected_value, list):
+                # Check if list contains 'amazon' synthetic value
+                if 'amazon' in expected_value:
+                    # Mixed list with amazon - check each value
+                    amazon_dns = self._get_amazon_dns_servers(vpc)
+                    non_amazon_values = [v for v in expected_value if v != 'amazon']
+                    expected_values = amazon_dns + non_amazon_values
+                    found = sorted(dhcp[k]) == sorted(expected_values)
+                else:
+                    # Regular list matching
+                    found = sorted(dhcp[k]) == sorted(expected_value)
+            elif not is_list and expected_value not in dhcp[k]:
                 found = False
-            elif is_list and sorted(self.data[k]) != sorted(dhcp[k]):
-                found = False
+
         if not self.data.get('present', True):
             found = not found
         return found
@@ -720,6 +815,49 @@ class SubnetIpAddressUsageFilter(ValueFilter):
             if self.match(r[self.annotation_key]):
                 results.append(r)
         return results
+
+
+@Subnet.action_registry.register('delete')
+class DeleteSubnet(BaseAction):
+    """Action to delete a Subnet.
+
+    :example:
+
+    Delete empty development subnets
+
+    .. code-block:: yaml
+
+        policies:
+          - name: delete-subnet
+            resource: aws.subnet
+            filters:
+              - tag:Environment: dev
+              - type: ip-address-usage
+                key: NumberUsed
+                value: 0
+            actions:
+              - type: delete
+    """
+
+    schema = type_schema('delete')
+    permissions = ("ec2:DeleteSubnet",)
+
+    def process(self, subnets):
+        client = local_session(self.manager.session_factory).client('ec2')
+        for subnet in subnets:
+            self.process_subnet(client, subnet)
+
+    def process_subnet(self, client, subnet):
+        try:
+            self.manager.retry(
+                client.delete_subnet,
+                SubnetId=subnet['SubnetId']
+            )
+        except ClientError as e:
+            if e.response['Error']['Code'] == 'DependencyViolation':
+                self.log.warning(f"Cannot delete subnet {subnet['SubnetId']} due to dependencies")
+                return
+            raise
 
 
 class ConfigSG(query.ConfigSource):
@@ -2649,6 +2787,22 @@ class VPNGateway(query.QueryResourceManager):
         id_prefix = "vgw-"
 
 
+@resources.register('client-vpn-endpoint')
+class ClientVpnEndpoint(query.QueryResourceManager):
+
+    class resource_type(query.TypeInfo):
+        service = 'ec2'
+        arn_type = 'client-vpn-endpoint'
+        enum_spec = ('describe_client_vpn_endpoints', 'ClientVpnEndpoints', None)
+        name = id = 'ClientVpnEndpointId'
+        filter_name = 'ClientVpnEndpointIds'
+        filter_type = 'list'
+        cfn_type = config_type = 'AWS::EC2::ClientVpnEndpoint'
+        id_prefix = 'cvpn-endpoint-'
+        metrics_namespace = 'AWS/ClientVPN'
+        dimension = 'ClientVpnEndpointId'
+
+
 @resources.register('vpc-endpoint')
 class VpcEndpoint(query.QueryResourceManager):
 
@@ -2733,6 +2887,62 @@ class EndpointVpcFilter(net_filters.VpcFilter):
     RelatedIdsExpression = "VpcId"
 
 
+@VpcEndpoint.filter_registry.register('service-details')
+class EndpointServiceDetailsFilter(ValueFilter):
+    """Filter VPC Endpoints based on their associated endpoint service details.
+
+    :example:
+
+    .. code-block:: yaml
+
+      policies:
+        - name: vpc-endpoints-has-policy-support
+          resource: aws.vpc-endpoint
+          filters:
+            - type: service-details
+              key: VpcEndpointPolicySupported
+              value: true
+    """
+
+    annotation_key = "c7n:ServiceDetails"
+    schema = type_schema(
+        "service-details",
+        rinherit=ValueFilter.schema
+    )
+    permissions = ("ec2:DescribeVpcEndpointServices",)
+
+    def process(self, resources, event=None):
+        client = local_session(self.manager.session_factory).client("ec2")
+        service_names = sorted({r["ServiceName"] for r in resources})
+
+        service_map = self._describe_services(client, service_names)
+
+        results = []
+        for resource in resources:
+            service_detail = service_map.get(resource["ServiceName"], {})
+            resource[self.annotation_key] = service_detail or {}
+
+            if self.match(resource[self.annotation_key]):
+                results.append(resource)
+
+        return results
+
+    def _describe_services(self, client, service_names):
+        cache = self.manager._cache
+        cache_key = {"ServiceNames": service_names}
+
+        with cache:
+            cached = cache.get(cache_key)
+            if cached is not None:
+                return cached
+
+            resp = client.describe_vpc_endpoint_services(ServiceNames=service_names)
+            service_map = {d["ServiceName"]: d for d in resp.get("ServiceDetails", [])}
+
+            cache.save(cache_key, service_map)
+            return service_map
+
+
 @Vpc.filter_registry.register("vpc-endpoint")
 class VPCEndpointFilter(RelatedResourceByIdFilter):
     """Filters vpcs based on their vpc-endpoints
@@ -2782,6 +2992,39 @@ class SubnetEndpointFilter(RelatedResourceByIdFilter):
     schema = type_schema(
         'vpc-endpoint',
         rinherit=ValueFilter.schema)
+
+
+@resources.register('vpc-endpoint-service-configuration')
+class VPCEndpointServiceConfiguration(query.QueryResourceManager):
+    """
+    Resource manager for VPC Endpoint Service Configurations.
+
+    :example:
+
+    .. code-block:: yaml
+
+        policies:
+          - name: acceptance-not-enabled
+            resource: aws.vpc-endpoint-service-configuration
+            filters:
+              - AcceptanceRequired: false
+
+    """
+    class resource_type(query.TypeInfo):
+        service = 'ec2'
+        enum_spec = ('describe_vpc_endpoint_service_configurations',
+                     'ServiceConfigurations', None)
+        name = id = 'ServiceId'  # ServiceName contains DNS
+        id_prefix = 'vpce-svc-'
+        filter_name = 'ServiceIds'
+        filter_type = 'list'
+        cfn_type = config_type = 'AWS::EC2::VPCEndpointService'
+        arn_type = 'vpc-endpoint-service'
+        arn_separator = '/'
+        default_report_fields = (
+            'ServiceId',
+            'ServiceState'
+        )
 
 
 @resources.register('key-pair')
@@ -3276,9 +3519,25 @@ class CrossAZRouteTable(Filter):
             s['SubnetId']: s for s in
             self.manager.get_resource_manager('aws.subnet').resources()
         }
+        # Filter out Regional NAT Gateways which don't have SubnetId field
+        # Regional NAT Gateways span multiple AZs and cannot be evaluated for cross-AZ traffic
+        all_nat_gateways = self.manager.get_resource_manager('nat-gateway').resources()
+        zonal_nat_gateways = [n for n in all_nat_gateways if 'SubnetId' in n]
+        regional_nat_gateways = [n for n in all_nat_gateways if 'SubnetId' not in n]
+        if regional_nat_gateways:
+            nat_ids = [n['NatGatewayId'] for n in regional_nat_gateways]
+            nat_ids_display = ', '.join(nat_ids[:5])
+            if len(nat_ids) > 5:
+                nat_ids_display += f' (and {len(nat_ids) - 5} more)'
+            self.log.warning(
+                "%s excluding %d Regional NAT Gateway(s) without SubnetId "
+                "(cannot evaluate cross-AZ traffic for regional NAT gateways): %s",
+                self.type,
+                len(regional_nat_gateways),
+                nat_ids_display)
         nat_subnets = {
             nat_gateway['NatGatewayId']: nat_gateway["SubnetId"]
-            for nat_gateway in self.manager.get_resource_manager('nat-gateway').resources()}
+            for nat_gateway in zonal_nat_gateways}
 
         results = []
         self.annotate_subnets_table(resources, subnets)
@@ -3332,4 +3591,76 @@ class UsedByNetworkAddress(Filter):
                     rtype = get_eni_resource_type(eni)
                     if rtype == self.data.get('resource-type'):
                         results.append(r)
+        return results
+
+
+@Vpc.filter_registry.register('resolver-query-logging')
+class ResolverQueryLoggingFilter(Filter):
+    """Filter VPCs based on Route 53 Resolver query logging configuration.
+
+    This filter checks if VPCs have Route 53 Resolver query logging
+    enabled by checking for an association to a query logging config.
+
+    It annotates the VPC with the full config details, allowing for
+    additional filtering with a `value` filter.
+
+    :example:
+
+    .. code-block:: yaml
+
+            policies:
+              - name: vpc-missing-resolver-query-logs
+                resource: vpc
+                filters:
+                  - type: resolver-query-logging
+                    state: false
+    """
+    schema = type_schema(
+        'resolver-query-logging',
+        state={'type': 'boolean', 'default': True}
+    )
+
+    permissions = (
+        'route53resolver:ListResolverQueryLogConfigs',
+        'route53resolver:ListResolverQueryLogConfigAssociations'
+    )
+
+    annotation_key = 'c7n:resolver-logging'
+
+    def process(self, resources, event=None):
+        client = local_session(self.manager.session_factory).client('route53resolver')
+        target_state = self.data.get('state', True)
+
+        vpc_ids = [r['VpcId'] for r in resources]
+        associations = {}
+        paginator = client.get_paginator('list_resolver_query_log_config_associations')
+        for page in paginator.paginate(
+            Filters=[
+                {'Name': 'ResourceId', 'Values': vpc_ids},
+                {'Name': 'Status', 'Values': ['ACTIVE', 'CREATING']}
+            ]
+        ):
+            for assoc in page.get('ResolverQueryLogConfigAssociations', []):
+                associations[assoc['ResourceId']] = assoc
+
+        log_configs = {}
+        if associations:
+            config_ids = list({a['ResolverQueryLogConfigId'] for a in associations.values()})
+            paginator = client.get_paginator('list_resolver_query_log_configs')
+            for page in paginator.paginate(
+                Filters=[{'Name': 'Id', 'Values': config_ids}]
+            ):
+                for config in page.get('ResolverQueryLogConfigs', []):
+                    log_configs[config['Id']] = config
+
+        results = []
+        for r in resources:
+            association = associations.get(r['VpcId'])
+            if association:
+                r[self.annotation_key] = log_configs.get(
+                    association['ResolverQueryLogConfigId'], {}
+                )
+            if (self.annotation_key in r) == target_state:
+                results.append(r)
+
         return results

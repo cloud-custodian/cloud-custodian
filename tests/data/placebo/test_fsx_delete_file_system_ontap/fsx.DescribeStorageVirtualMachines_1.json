@@ -1,0 +1,48 @@
+{
+    "status_code": 200,
+    "data": {
+        "StorageVirtualMachines": [
+            {
+                "CreationTime": {
+                    "__class__": "datetime",
+                    "year": 2025,
+                    "month": 10,
+                    "day": 21,
+                    "hour": 15,
+                    "minute": 31,
+                    "second": 41,
+                    "microsecond": 146000
+                },
+                "Endpoints": {
+                    "Iscsi": {
+                        "DNSName": "iscsi.svm-01e63aa602659d739.fs-0e3e2a9e1f5ff7a13.fsx.us-west-2.amazonaws.com",
+                        "IpAddresses": [
+                            "172.31.0.8",
+                            "172.31.0.16"
+                        ]
+                    },
+                    "Management": {
+                        "DNSName": "svm-01e63aa602659d739.fs-0e3e2a9e1f5ff7a13.fsx.us-west-2.amazonaws.com",
+                        "IpAddresses": [
+                            "172.31.7.194"
+                        ]
+                    },
+                    "Nfs": {
+                        "DNSName": "svm-01e63aa602659d739.fs-0e3e2a9e1f5ff7a13.fsx.us-west-2.amazonaws.com",
+                        "IpAddresses": [
+                            "172.31.7.194"
+                        ]
+                    }
+                },
+                "FileSystemId": "fs-0e3e2a9e1f5ff7a13",
+                "Lifecycle": "CREATED",
+                "Name": "example-svm",
+                "ResourceARN": "arn:aws:fsx:us-west-2:644160558196:storage-virtual-machine/fs-0e3e2a9e1f5ff7a13/svm-01e63aa602659d739",
+                "StorageVirtualMachineId": "svm-01e63aa602659d739",
+                "Subtype": "DEFAULT",
+                "UUID": "9ba974ed-aeb4-11f0-b911-e9d7b3674b44"
+            }
+        ],
+        "ResponseMetadata": {}
+    }
+}

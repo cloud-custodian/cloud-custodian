@@ -39,7 +39,7 @@ def test_data_proc_query(test):
     )
     resources = p.run()
 
-    assert len(resources) ==  1
+    assert len(resources) == 1
     assert resources[0]['clusterName'] == 'cluster-test'
     assert p.resource_manager.get_urns(resources) == [
         'gcp:dataproc:us-central1:cloud-custodian:dataproc/cluster-test'

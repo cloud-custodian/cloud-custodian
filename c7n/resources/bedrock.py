@@ -3,7 +3,7 @@
 
 from c7n.manager import resources
 from c7n.query import QueryResourceManager, TypeInfo, DescribeSource
-from c7n.tags import RemoveTag, Tag, TagActionFilter, TagDelayedAction
+from c7n.tags import RemoveTag, Tag, TagActionFilter, TagDelayedAction, universal_augment
 from c7n.utils import local_session, type_schema
 from c7n.actions import BaseAction
 from c7n.filters.kms import KmsRelatedFilter
@@ -550,3 +550,19 @@ class DeleteBedrockKnowledgeBase(BaseAction):
                 client.delete_knowledge_base(knowledgeBaseId=r['knowledgeBaseId'])
             except client.exceptions.ResourceNotFoundException:
                 continue
+
+
+@resources.register('bedrock-inference-profile')
+class BedrockApplicationInferenceProfile(QueryResourceManager):
+    class resource_type(TypeInfo):
+        service = 'bedrock'
+        enum_spec = ('list_inference_profiles', 'inferenceProfileSummaries[]', {
+            'typeEquals': 'APPLICATION'})
+        name = "inferenceProfileName"
+        id = arn = "inferenceProfileArn"
+        arn_type = "inference-profile"
+        permission_prefix = 'bedrock'
+        universal_taggable = object()
+        permissions_augment = ("bedrock:ListTagsForResource",)
+
+    augment = universal_augment

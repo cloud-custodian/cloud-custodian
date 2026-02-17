@@ -1,10 +1,15 @@
 # Copyright The Cloud Custodian Authors.
 # SPDX-License-Identifier: Apache-2.0
 
+from botocore.exceptions import ClientError
 from .common import BaseTest, event_data
 from c7n.exceptions import PolicyValidationError
 from c7n.executor import MainThreadExecutor
-from c7n.resources.appelb import AppELB, AppELBTargetGroup, serialize_attribute_value
+from c7n.resources.appelb import (
+    AppELB, AppELBTargetGroup, AppELBDeleteListenerAction, serialize_attribute_value,
+)
+from unittest.mock import patch
+import logging
 
 
 def test_serialize():
@@ -736,6 +741,86 @@ class AppELBTest(BaseTest):
             'AWS/NetworkELB.TCP_ELB_Reset_Count.Sum.0.25' in resources[
                 0]['c7n.metrics'])
 
+    def test_appelb_delete_listener(self):
+        self.patch(AppELB, "executor_factory", MainThreadExecutor)
+        session_factory = self.replay_flight_data("test_appelb_delete_listener")
+        client = session_factory().client("elbv2")
+        # Create a policy that deletes listeners on a specific port
+        p = self.load_policy(
+            {
+                "name": "appelb-delete-listener",
+                "resource": "app-elb",
+                "filters": [
+                    {"type": "listener", "key": "[Protocol, Port]", "value": ["HTTP", 5432]}
+                ],
+                "actions": [{"type": "delete-listener"}],
+            },
+            session_factory=session_factory,
+        )
+        resources = p.run()
+        arn = resources[0]["LoadBalancerArn"]
+        listeners = client.describe_listeners(LoadBalancerArn=arn)["Listeners"]
+        # Assert that no listeners remain on the specified port
+        for l in listeners:
+            assert not (l["Protocol"] == "HTTP" and l["Port"] == 5432)
+
+    def test_appelb_delete_listener_not_found_exception(self):
+        self.patch(AppELB, "executor_factory", MainThreadExecutor)
+        session_factory = self.replay_flight_data("test_appelb_delete_listener_not_found_exception")
+        client = session_factory().client("elbv2")
+
+        class ListenerNotFound(Exception):
+            pass
+        client.exceptions.ListenerNotFoundException = ListenerNotFound
+
+        called = []
+
+        def fake_delete_listener(**kwargs):
+            called.append(True)
+            raise ListenerNotFound("Listener not found")
+        client.delete_listener = fake_delete_listener
+        dummy_listener_arn = (
+            "arn:aws:elasticloadbalancing:us-east-1:123456789012:listener/app/alb-testing-2/95e544fad78114e5/1234567890abcdef"
+    )
+        load_balancer_arn = (
+            "arn:aws:elasticloadbalancing:us-east-1:123456789012:loadbalancer/app/alb-testing-2/95e544fad78114e5")
+        alb = {
+            "LoadBalancerArn": load_balancer_arn,
+            "c7n:MatchedListeners": [
+                {
+                    "ListenerArn": dummy_listener_arn
+                }
+            ],
+        }
+
+        logger = logging.getLogger("test")
+
+        # Patch local_session only within this block
+        with patch("c7n.resources.appelb.local_session",
+                   return_value=type("Session", (), {"client": lambda self, service: client})()
+                   ):
+            action = AppELBDeleteListenerAction(
+                data={"type": "delete-listener"},
+                manager=type(
+                    "mgr", (), {
+                        "session_factory": session_factory, "log": logger, "data": {}
+                        }
+                    )()
+            )
+            action.process([alb])
+        self.assertTrue(called, "delete_listener is called")
+
+    def test_appelb_delete_listener_validation_failure(self):
+        # Loading a policy without a listener filter should fail validation
+        with self.assertRaises(PolicyValidationError):
+            self.load_policy(
+                {
+                    "name": "delete-listener-no-filter",
+                    "resource": "app-elb",
+                    "actions": [{"type": "delete-listener"}],
+                }
+            )
+
 
 class AppELBHealthcheckProtocolMismatchTest(BaseTest):
 
@@ -1345,3 +1430,161 @@ class TestTargetGroupAttributesFilter(BaseTest):
         self.assertEqual(
             resources[0]['c7n:TargetGroupAttributes']['deregistration_delay.timeout_seconds'], 300
         )
+
+    def test_appelb_listener_rules_fetched(self):
+        """Test that listener rules are fetched and available for filtering"""
+        self.patch(AppELB, "executor_factory", MainThreadExecutor)
+        session_factory = self.replay_flight_data("test_appelb_listener_rules")
+        p = self.load_policy(
+            {
+                "name": "appelb-with-rules",
+                "resource": "app-elb",
+                "filters": [
+                    {
+                        "type": "listener-rule",
+                        "count": 0,
+                        "count_op": "gt"
+                    }
+                ],
+            },
+            session_factory=session_factory,
+        )
+        resources = p.run()
+        self.assertGreater(len(resources), 0)
+
+        # Verify that Rules are attached to ALBs
+        listener_rules = resources[0].get('c7n:ListenerRules', [])
+        self.assertGreater(len(listener_rules), 0)
+
+        # Verify rule structure
+        rule = listener_rules[0]
+        self.assertIn('Actions', rule)
+        self.assertIsInstance(rule['Actions'], list)
+
+    def test_appelb_filter_by_listener_rules(self):
+        """Test filtering ALBs based on listener rule actions"""
+        self.patch(AppELB, "executor_factory", MainThreadExecutor)
+        session_factory = self.replay_flight_data("test_appelb_listener_rules_filter")
+        p = self.load_policy(
+            {
+                "name": "appelb-insecure-rules",
+                "resource": "app-elb",
+                "filters": [
+                    {
+                        "type": "listener-rule",
+                        "attrs": [
+                            {
+                                "type": "value",
+                                "key": "Actions[0].Type",
+                                "value": "redirect"
+                            },
+                            {
+                                "type": "value",
+                                "key": "Actions[0].RedirectConfig.Protocol",
+                                "value": "HTTP"
+                            }
+                        ]
+                    }
+                ],
+            },
+            session_factory=session_factory,
+        )
+        resources = p.run()
+
+        # Should catch ALBs with listener rules redirecting to HTTP
+        self.assertGreater(len(resources), 0)
+
+        # Verify the ALB has listener rules attached
+        listener_rules = resources[0].get('c7n:ListenerRules', [])
+        self.assertGreater(len(listener_rules), 0)
+
+        # Check that at least one rule has redirect to HTTP
+        has_insecure_redirect = False
+        for rule in listener_rules:
+            for action in rule.get('Actions', []):
+                if (action.get('Type') == 'redirect' and
+                    action.get('RedirectConfig', {}).get('Protocol') == 'HTTP'):
+                    has_insecure_redirect = True
+                    break
+
+        self.assertTrue(has_insecure_redirect)
+
+    def test_appelb_listener_rules_fetch_error_listeners(self):
+        # Test exception handling when DescribeListeners fails
+        from unittest import mock
+        session_factory = self.replay_flight_data('test_appelb_listener_rules')
+
+        p = self.load_policy(
+            {
+                'name': 'appelb-listener-rules-error',
+                'resource': 'app-elb',
+                'filters': [
+                    {'type': 'listener-rule', 'count': 0, 'count_op': 'gte'}
+                ]
+            },
+            session_factory=session_factory,
+        )
+
+        # Get the filter and mock its manager's retry method for describe_listeners
+        filter_instance = p.resource_manager.filters[0]
+        original_retry = filter_instance.manager.retry
+
+        def mock_retry(func, *args, **kwargs):
+            if func.__name__ == 'describe_listeners':
+                raise ClientError(
+                    {
+                        'Error': {
+                            'Code': 'SimulatedError',
+                            'Message': 'Simulated DescribeListeners failure',
+                        }
+                    },
+                    'describe_listeners',
+                )
+            return original_retry(func, *args, **kwargs)
+
+        with mock.patch.object(filter_instance.manager, 'retry', side_effect=mock_retry):
+            # Should not raise exception, just log warning and return resources with empty rules
+            resources = p.run()
+            self.assertGreater(len(resources), 0)
+            for alb in resources:
+                self.assertEqual(len(alb.get('c7n:ListenerRules', [])), 0)
+
+    def test_appelb_listener_rules_fetch_error_rules(self):
+        # Test exception handling when DescribeRules fails
+        from unittest import mock
+        session_factory = self.replay_flight_data('test_appelb_listener_rules')
+
+        p = self.load_policy(
+            {
+                'name': 'appelb-listener-rules-error',
+                'resource': 'app-elb',
+                'filters': [
+                    {'type': 'listener-rule', 'count': 0, 'count_op': 'gte'}
+                ]
+            },
+            session_factory=session_factory,
+        )
+
+        # Get the filter and mock its manager's retry method for describe_rules
+        filter_instance = p.resource_manager.filters[0]
+        original_retry = filter_instance.manager.retry
+
+        def mock_retry(func, *args, **kwargs):
+            if func.__name__ == 'describe_rules':
+                raise ClientError(
+                    {
+                        'Error': {
+                            'Code': 'SimulatedError',
+                            'Message': 'Simulated DescribeRules failure',
+                        }
+                    },
+                    'describe_rules',
+                )
+            return original_retry(func, *args, **kwargs)
+
+        with mock.patch.object(filter_instance.manager, 'retry', side_effect=mock_retry):
+            # Should not raise exception, just log warning and return resources with empty rules
+            resources = p.run()
+            self.assertGreater(len(resources), 0)
+            for alb in resources:
+                self.assertEqual(len(alb.get('c7n:ListenerRules', [])), 0)

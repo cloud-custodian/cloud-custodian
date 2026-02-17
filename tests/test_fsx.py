@@ -8,6 +8,7 @@ import c7n.resources.fsx
 from c7n.testing import mock_datetime_now
 from .common import BaseTest
 import c7n.filters.backup
+from unittest.mock import MagicMock, patch
 
 
 class TestFSx(BaseTest):
@@ -291,7 +292,7 @@ class TestFSx(BaseTest):
         expected_tags = [{'Key': 'test-tag', 'Value': 'backup-tag'}]
         self.assertEqual(expected_tags, backups['Backups'][0]['Tags'])
 
-    def test_fsx_delete_file_system_skip_snapshot(self):
+    def test_fsx_delete_file_system_skip_snapshot_windows(self):
         session_factory = self.replay_flight_data('test_fsx_delete_file_system_skip_snapshot')
         p = self.load_policy(
             {
@@ -334,7 +335,7 @@ class TestFSx(BaseTest):
         )['Backups']
         self.assertEqual(len(backups), 0)
 
-    def test_fsx_delete_file_system(self):
+    def test_fsx_delete_file_system_windows(self):
         session_factory = self.replay_flight_data('test_fsx_delete_file_system')
         p = self.load_policy(
             {
@@ -345,6 +346,11 @@ class TestFSx(BaseTest):
                         'type': 'value',
                         'key': 'Lifecycle',
                         'value': 'AVAILABLE'
+                    },
+                    {
+                        'type': 'value',
+                        'key': 'FileSystemType',
+                        'value': 'WINDOWS'
                     }
                 ],
                 'actions': [
@@ -380,6 +386,584 @@ class TestFSx(BaseTest):
         )['Backups']
         self.assertEqual(len(backups), 1)
 
+    def test_fsx_delete_file_system_ontap(self):
+        # Delete fsx resource with volumes and svms.
+        # Ontap does not create snapshot backups on deletion even if
+        # skip-snapshot is set to False.
+        session_factory = self.replay_flight_data(
+            'test_fsx_delete_file_system_ontap', region="us-west-2")
+        #  Adjust retry settings for recording playback speed.
+        if not self.recording:
+            retry_delay = 1
+            retry_max_attempts = 2
+        p = self.load_policy(
+            {
+                'name': 'fsx-delete-file-system',
+                'resource': 'fsx',
+                'filters': [
+                    {
+                        'type': 'value',
+                        'key': 'Lifecycle',
+                        'value': 'AVAILABLE'
+                    },
+                    {
+                        'type': 'value',
+                        'key': 'FileSystemType',
+                        'value': 'ONTAP'
+                    }
+                ],
+                'actions': [
+                    {
+                        'type': 'delete',
+                        'force': True,
+                        'retry-delay': retry_delay,
+                        'retry-max-attempts': retry_max_attempts,
+                        'skip-snapshot': True
+                    }
+                ]
+            },
+            session_factory=session_factory,
+            config={'region': 'us-west-2'},
+        )
+        resources = p.run()
+        self.assertEqual(len(resources), 1)
+        client = session_factory().client('fsx')
+        fs = client.describe_file_systems(
+            FileSystemIds=[resources[0]['FileSystemId']])['FileSystems']
+        self.assertEqual(len(fs), 1)
+        self.assertEqual(fs[0]['Lifecycle'], 'DELETING')
+
+    def test_fsx_delete_file_system_ontap_mock_skip_dependencies(self):
+        #  Skip over dependencies that are already pending deletion.
+        factory = self.replay_flight_data("test_fsx_delete_file_system_ontap")
+
+        with patch("c7n.resources.fsx.local_session", autospec=True) as mock_local_session:
+            mock_client = MagicMock()
+            mock_local_session.return_value.client.return_value = mock_client
+
+            # Mock describe_file_systems to return AVAILABLE ONTAP fs
+            mock_client.describe_file_systems.return_value = {
+                "FileSystems": [
+                    {
+                        "FileSystemId": "fs-12345678",
+                        "Lifecycle": "AVAILABLE",
+                        "FileSystemType": "ONTAP",
+                    }
+                ]
+            }
+
+            # Mock describe_volumes to return volumes in DELETING state
+            mock_client.describe_volumes.return_value = {
+                "Volumes": [
+                    {
+                        "VolumeId": "vol-12345678",
+                        "Lifecycle": "DELETING",
+                    }
+                ]
+            }
+
+            # Mock describe_storage_virtual_machines to return in DELETING state
+            mock_client.describe_storage_virtual_machines.return_value = {
+                "StorageVirtualMachines": [
+                    {
+                        "StorageVirtualMachineId": "svm-12345678",
+                        "Lifecycle": "DELETING",
+                    }
+                ]
+            }
+
+            p = self.load_policy(
+                {
+                    "name": "fsx-delete-file-system",
+                    "resource": "fsx",
+                    "filters": [
+                        {
+                            "type": "value",
+                            "key": "Lifecycle",
+                            "value": "AVAILABLE",
+                        },
+                        {
+                            "type": "value",
+                            "key": "FileSystemType",
+                            "value": "ONTAP",
+                        },
+                    ],
+                    "actions": [
+                        {
+                            "type": "delete",
+                            "force": True,
+                            "skip-snapshot": True,
+                        }
+                    ],
+                },
+                session_factory=factory
+            )
+            resources = p.run()
+            self.assertEqual(len(resources), 1)
+            mock_client.describe_storage_virtual_machines.assert_called_once()
+            mock_client.describe_volumes.assert_called_once()
+            mock_client.delete_storage_virtual_machine.assert_not_called()
+            mock_client.delete_volume.assert_not_called()
+
+    def test_fsx_delete_file_system_ontap_mock_actions_called(self):
+        factory = self.replay_flight_data("test_fsx_delete_file_system_ontap")
+        with patch("c7n.resources.fsx.local_session", autospec=True) as mock_local_session:
+            mock_client = MagicMock()
+            mock_local_session.return_value.client.return_value = mock_client
+
+            # Mock describe_file_systems to return AVAILABLE ONTAP fs
+            mock_client.describe_file_systems.return_value = {
+                "FileSystems": [
+                    {
+                        "FileSystemId": "fs-12345678",
+                        "Lifecycle": "AVAILABLE",
+                        "FileSystemType": "ONTAP",
+                    }
+                ]
+            }
+
+            # Mock describe_volumes to return volumes in AVAILABLE state
+            mock_client.describe_volumes.return_value = {
+                "Volumes": [
+                    {
+                        "VolumeId": "vol-12345678",
+                        "Lifecycle": "AVAILABLE",
+                    }
+                ]
+            }
+
+            # Mock describe_storage_virtual_machines to return in AVAILABLE state
+            mock_client.describe_storage_virtual_machines.return_value = {
+                "StorageVirtualMachines": [
+                    {
+                        "StorageVirtualMachineId": "svm-12345678",
+                        "Lifecycle": "AVAILABLE",
+                    }
+                ]
+            }
+
+            p = self.load_policy(
+                {
+                    "name": "fsx-delete-file-system",
+                    "resource": "fsx",
+                    "filters": [
+                        {
+                            "type": "value",
+                            "key": "Lifecycle",
+                            "value": "AVAILABLE",
+                        },
+                        {
+                            "type": "value",
+                            "key": "FileSystemType",
+                            "value": "ONTAP",
+                        },
+                    ],
+                    "actions": [
+                        {
+                            "type": "delete",
+                            "force": True,
+                            "skip-snapshot": True,
+                        }
+                    ],
+                },
+                session_factory=factory
+            )
+            resources = p.run()
+            self.assertEqual(len(resources), 1)
+            mock_client.describe_storage_virtual_machines.assert_called_once()
+            mock_client.describe_volumes.assert_called_once()
+            mock_client.delete_storage_virtual_machine.assert_called_once()
+            mock_client.delete_volume.assert_called_once()
+            mock_client.delete_file_system.assert_called_once()
+
+    def test_fsx_delete_file_system_ontap_mock_exception_svm_error(self):
+        # Example of InternalServerError handling during dependency deletion.
+        factory = self.replay_flight_data("test_fsx_delete_file_system_ontap")
+        with patch("c7n.resources.fsx.local_session", autospec=True) as mock_local_session:
+            mock_client = MagicMock()
+            mock_local_session.return_value.client.return_value = mock_client
+
+            # Mock describe_file_systems to return AVAILABLE ONTAP fs
+            mock_client.describe_file_systems.return_value = {
+                "FileSystems": [
+                    {
+                        "FileSystemId": "fs-12345678",
+                        "Lifecycle": "AVAILABLE",
+                        "FileSystemType": "ONTAP",
+                    }
+                ]
+            }
+
+            # Mock describe_storage_virtual_machines to return in AVAILABLE state
+            mock_client.describe_storage_virtual_machines.return_value = {
+                "StorageVirtualMachines": [
+                    {
+                        "StorageVirtualMachineId": "svm-12345678",
+                        "Lifecycle": "AVAILABLE",
+                    }
+                ]
+            }
+
+            # Mock delete_storage_virtual_machine to raise InternalServerError
+            mock_client.delete_storage_virtual_machine.side_effect = (
+                mock_client.exceptions.InternalServerError(
+                    {"Error": {"Code": "InternalServerError"}},
+                    "DeleteStorageVirtualMachine")
+            )
+
+            p = self.load_policy(
+                {
+                    "name": "fsx-delete-file-system",
+                    "resource": "fsx",
+                    "filters": [
+                        {
+                            "type": "value",
+                            "key": "Lifecycle",
+                            "value": "AVAILABLE",
+                        },
+                        {
+                            "type": "value",
+                            "key": "FileSystemType",
+                            "value": "ONTAP",
+                        },
+                    ],
+                    "actions": [
+                        {
+                            "type": "delete",
+                            "force": True,
+                            "skip-snapshot": True,
+                        }
+                    ],
+                },
+                session_factory=factory
+            )
+            resources = p.run()
+            self.assertEqual(len(resources), 1)
+            mock_client.delete_storage_virtual_machine.assert_called_once()
+            assert mock_client.delete_storage_virtual_machine.side_effect
+
+    def test_fsx_delete_file_system_ontap_mock_exception_volume_error(self):
+        # Example of InternalServerError handling during volume deletion.
+        factory = self.replay_flight_data("test_fsx_delete_file_system_ontap")
+        with patch("c7n.resources.fsx.local_session", autospec=True) as mock_local_session:
+            mock_client = MagicMock()
+            mock_local_session.return_value.client.return_value = mock_client
+
+            # Mock describe_file_systems to return AVAILABLE ONTAP fs
+            mock_client.describe_file_systems.return_value = {
+                "FileSystems": [
+                    {
+                        "FileSystemId": "fs-12345678",
+                        "Lifecycle": "AVAILABLE",
+                        "FileSystemType": "ONTAP",
+                    }
+                ]
+            }
+
+            # Mock describe_volumes to return volumes in AVAILABLE state
+            mock_client.describe_volumes.return_value = {
+                "Volumes": [
+                    {
+                        "VolumeId": "vol-12345678",
+                        "Lifecycle": "AVAILABLE",
+                    }
+                ]
+            }
+
+            # Mock delete_volume to raise InternalServerError
+            mock_client.delete_volume.side_effect = (
+                mock_client.exceptions.InternalServerError(
+                    {"Error": {"Code": "InternalServerError"}},
+                    "DeleteVolume")
+            )
+
+            p = self.load_policy(
+                {
+                    "name": "fsx-delete-file-system",
+                    "resource": "fsx",
+                    "filters": [
+                        {
+                            "type": "value",
+                            "key": "Lifecycle",
+                            "value": "AVAILABLE",
+                        },
+                        {
+                            "type": "value",
+                            "key": "FileSystemType",
+                            "value": "ONTAP",
+                        },
+                    ],
+                    "actions": [
+                        {
+                            "type": "delete",
+                            "force": True,
+                            "skip-snapshot": True,
+                        }
+                    ],
+                },
+                session_factory=factory
+            )
+            resources = p.run()
+            self.assertEqual(len(resources), 1)
+            mock_client.delete_volume.assert_called_once()
+            assert mock_client.delete_volume.side_effect
+
+    def test_fsx_delete_file_system_openzfs(self):
+        session_factory = self.replay_flight_data(
+            'test_fsx_delete_file_system_openzfs',
+            region="us-west-2")
+        p = self.load_policy(
+            {
+                'name': 'fsx-delete-file-system',
+                'resource': 'fsx',
+                'filters': [
+                    {
+                        'type': 'value',
+                        'key': 'Lifecycle',
+                        'value': 'AVAILABLE'
+                    },
+                    {
+                        'type': 'value',
+                        'key': 'FileSystemType',
+                        'value': 'OPENZFS'
+                    }
+                ],
+                'actions': [
+                    {
+                        'type': 'delete',
+                        'skip-snapshot': True
+                    }
+                ]
+            },
+            session_factory=session_factory,
+            config={'region': 'us-west-2'},
+        )
+        resources = p.run()
+        self.assertEqual(len(resources), 1)
+        client = session_factory().client('fsx')
+        fs = client.describe_file_systems(
+            FileSystemIds=[resources[0]['FileSystemId']])['FileSystems']
+        self.assertEqual(len(fs), 1)
+        self.assertEqual(fs[0]['Lifecycle'], 'DELETING')
+
+    def test_fsx_delete_file_system_openzfs_mock_skip(self):
+        # Skip over s3 access point already pending deletion.
+        factory = self.replay_flight_data("test_fsx_delete_file_system_openzfs")
+        with patch("c7n.resources.fsx.local_session", autospec=True) as mock_local_session:
+            mock_client = MagicMock()
+            mock_local_session.return_value.client.return_value = mock_client
+
+            # Mock describe_file_systems to return AVAILABLE OPENZFS fs
+            mock_client.describe_file_systems.return_value = {
+                "FileSystems": [
+                    {
+                        "FileSystemId": "fs-12345678",
+                        "Lifecycle": "AVAILABLE",
+                        "FileSystemType": "OPENZFS",
+                    }
+                ]
+            }
+
+            # Mock describe_s3_access_point_attachments to return in DELETING state
+            mock_client.describe_s3_access_point_attachments.return_value = {
+                "S3AccessPointAttachments": [
+                    {
+                        "S3AccessPoint": {
+                            "ResourceARN": "arn:aws:s3:accesspoint:example"
+                        },
+                        "Lifecycle": "DELETING",
+                        "Name": "example-access-point",
+                    }
+                ]
+            }
+
+            p = self.load_policy(
+                {
+                    "name": "fsx-delete-file-system",
+                    "resource": "fsx",
+                    "filters": [
+                        {
+                            "type": "value",
+                            "key": "Lifecycle",
+                            "value": "AVAILABLE",
+                        },
+                        {
+                            "type": "value",
+                            "key": "FileSystemType",
+                            "value": "OPENZFS",
+                        },
+                    ],
+                    "actions": [
+                        {
+                            "type": "delete",
+                            "force": True,
+                            "skip-snapshot": True,
+                        }
+                    ],
+                },
+                session_factory=factory
+            )
+            resources = p.run()
+            self.assertEqual(len(resources), 1)
+            mock_client.describe_s3_access_point_attachments.assert_called_once()
+            mock_client.detach_and_delete_s3_access_point.assert_not_called()
+
+    def test_fsx_delete_file_system_openzfs_mock(self):
+        # Make sure s3 access point and file system deletion methods are called.
+        factory = self.replay_flight_data("test_fsx_delete_file_system_openzfs")
+        with patch("c7n.resources.fsx.local_session", autospec=True) as mock_local_session:
+            mock_client = MagicMock()
+            mock_local_session.return_value.client.return_value = mock_client
+
+            mock_client.describe_file_systems.return_value = {
+                "FileSystems": [
+                    {
+                        "FileSystemId": "fs-12345678",
+                        "Lifecycle": "AVAILABLE",
+                        "FileSystemType": "OPENZFS",
+                    }
+                ]
+            }
+
+            mock_client.describe_s3_access_point_attachments.return_value = {
+                "S3AccessPointAttachments": [
+                    {
+                        "S3AccessPoint": {
+                            "ResourceARN": "arn:aws:s3:accesspoint:example"
+                        },
+                        "Lifecycle": "AVAILABLE",
+                        "Name": "example-access-point",
+                    }
+                ]
+            }
+
+            p = self.load_policy(
+                {
+                    "name": "fsx-delete-file-system",
+                    "resource": "fsx",
+                    "filters": [
+                        {
+                            "type": "value",
+                            "key": "Lifecycle",
+                            "value": "AVAILABLE",
+                        },
+                        {
+                            "type": "value",
+                            "key": "FileSystemType",
+                            "value": "OPENZFS",
+                        },
+                    ],
+                    "actions": [
+                        {
+                            "type": "delete",
+                            "force": True,
+                            "skip-snapshot": True,
+                        }
+                    ],
+                },
+                session_factory=factory
+            )
+            resources = p.run()
+            self.assertEqual(len(resources), 1)
+            mock_client.describe_s3_access_point_attachments.assert_called_once()
+            mock_client.detach_and_delete_s3_access_point.assert_called_once()
+            mock_client.delete_file_system.assert_called_once()
+
+    def test_fsx_delete_file_system_openzfs_force(self):
+        # Against a resource with child volumes and s3 access point.
+        session_factory = self.replay_flight_data(
+            'test_fsx_delete_file_system_openzfs_force',
+            region="us-west-2")
+
+        # Adjust retry settings for recording playback speed.
+        if not self.recording:
+            retry_delay = 1
+            retry_max_attempts = 5
+        p = self.load_policy(
+            {
+                'name': 'fsx-delete-file-system',
+                'resource': 'fsx',
+                'filters': [
+                    {
+                        'type': 'value',
+                        'key': 'Lifecycle',
+                        'value': 'AVAILABLE'
+                    },
+                    {
+                        'type': 'value',
+                        'key': 'FileSystemType',
+                        'value': 'OPENZFS'
+                    }
+                ],
+                'actions': [
+                    {
+                        'type': 'delete',
+                        'force': True,
+                        'retry-delay': retry_delay,
+                        'retry-max-attempts': retry_max_attempts,
+                        'skip-snapshot': True
+                    }
+                ]
+            },
+            session_factory=session_factory,
+            config={'region': 'us-west-2'},
+        )
+        resources = p.run()
+        self.assertEqual(len(resources), 1)
+        client = session_factory().client('fsx')
+        fs = client.describe_file_systems(
+            FileSystemIds=[resources[0]['FileSystemId']])['FileSystems']
+        self.assertEqual(len(fs), 1)
+        self.assertEqual(fs[0]['Lifecycle'], 'DELETING')
+
+    def test_fsx_delete_file_system_lustre(self):
+        session_factory = self.replay_flight_data(
+            'test_fsx_delete_file_system_lustre', region="us-west-2")
+
+        if not self.recording:
+            retry_delay = 1
+            retry_max_attempts = 2
+
+        # Even if skip-snapshot is False, resources with Scratch deployments
+        # do not support final backups on deletion. The force parameter will
+        # attempt to delete even though a final backup cannot be created.
+        p = self.load_policy(
+            {
+                'name': 'fsx-delete-file-system',
+                'resource': 'fsx',
+                'filters': [
+                    {
+                        'type': 'value',
+                        'key': 'Lifecycle',
+                        'value': 'AVAILABLE'
+                    },
+                    {
+                        'type': 'value',
+                        'key': 'FileSystemType',
+                        'value': 'LUSTRE'
+                    }
+                ],
+                'actions': [
+                    {
+                        'type': 'delete',
+                        'force': True,
+                        'retry-delay': retry_delay,
+                        'retry-max-attempts': retry_max_attempts,
+                        'skip-snapshot': False
+                    }
+                ]
+            },
+            session_factory=session_factory,
+            config={'region': 'us-west-2'},
+        )
+        resources = p.run()
+        self.assertEqual(len(resources), 1)
+        client = session_factory().client('fsx')
+        fs = client.describe_file_systems(
+            FileSystemIds=[resources[0]['FileSystemId']])['FileSystems']
+        self.assertEqual(len(fs), 1)
+        self.assertEqual(fs[0]['Lifecycle'], 'DELETING')
+
     def test_fsx_delete_file_system_with_error(self):
         session_factory = self.replay_flight_data('test_fsx_delete_file_system_with_error')
         p = self.load_policy(
@@ -399,13 +983,82 @@ class TestFSx(BaseTest):
             },
             session_factory=session_factory
         )
-        resources = p.run()
-        self.assertEqual(len(resources), 1)
-        client = session_factory().client('fsx')
-        fs = client.describe_file_systems(
-            FileSystemIds=[resources[0]['FileSystemId']])['FileSystems']
-        self.assertEqual(len(fs), 1)
-        self.assertNotEqual(fs[0]['Lifecycle'], 'DELETING')
+        # error because you cannot delete a creating fsx resource.
+        with self.assertRaises(Exception):
+            p.run()
+
+    def test_fsx_delete_file_system_ontap_error(self):
+        # Delete fsx resource with volumes and svms without force flag
+        session_factory = self.replay_flight_data(
+            'test_fsx_delete_file_system_ontap_error', region="us-west-2")
+        p = self.load_policy(
+            {
+                'name': 'fsx-delete-file-system',
+                'resource': 'fsx',
+                'filters': [
+                    {
+                        'type': 'value',
+                        'key': 'Lifecycle',
+                        'value': 'AVAILABLE'
+                    },
+                    {
+                        'type': 'value',
+                        'key': 'FileSystemType',
+                        'value': 'ONTAP'
+                    }
+                ],
+                'actions': [
+                    {
+                        'type': 'delete',
+                        'retry-delay': 1,
+                        'retry-max-attempts': 3,
+                        'skip-snapshot': True
+                    }
+                ]
+            },
+            session_factory=session_factory,
+            config={'region': 'us-west-2'},
+        )
+        with self.assertRaises(Exception):
+            p.run()
+
+    def test_fsx_delete_file_system_openzfs_error(self):
+        # Against a resource with child volumes and s3 access point.
+        # No force flag set should raise error.
+        session_factory = self.replay_flight_data(
+            'test_fsx_delete_file_system_openzfs_error',
+            region="us-west-2")
+        p = self.load_policy(
+            {
+                'name': 'fsx-delete-file-system',
+                'resource': 'fsx',
+                'filters': [
+                    {
+                        'type': 'value',
+                        'key': 'Lifecycle',
+                        'value': 'AVAILABLE'
+                    },
+                    {
+                        'type': 'value',
+                        'key': 'FileSystemType',
+                        'value': 'OPENZFS'
+                    }
+                ],
+                'actions': [
+                    {
+                        'type': 'delete',
+                        'force': True,
+                        'retry-delay': 1,
+                        'retry-max-attempts': 3,
+                        'skip-snapshot': True
+                    }
+                ]
+            },
+            session_factory=session_factory,
+            config={'region': 'us-west-2'},
+        )
+        with self.assertRaises(Exception):
+            p.run()
 
     def test_fsx_arn_in_event(self):
         session_factory = self.replay_flight_data('test_fsx_resource')
@@ -493,6 +1146,28 @@ class TestFSx(BaseTest):
         resources = p.run()
         self.assertEqual(len(resources), 1)
         self.assertEqual(len(resources[0]['c7n:matched-vpcs']), 1)
+
+    def test_fsx_metrics_filter(self):
+        session_factory = self.replay_flight_data('test_fsx_metrics_filter')
+        p = self.load_policy(
+            {
+                'name': 'test-fsx-metrics',
+                'resource': 'fsx',
+                'filters': [
+                    {
+                        'type': 'metrics',
+                        'name': 'CPUUtilization',
+                        'value': 0,
+                        'op': 'gt',
+                        'days': 7,
+                        'statistics': 'Average'
+                    }
+                ]
+            },
+            session_factory=session_factory
+        )
+        resources = p.run()
+        self.assertEqual(len(resources), 2)
 
 
 class TestFSxVolume(BaseTest):

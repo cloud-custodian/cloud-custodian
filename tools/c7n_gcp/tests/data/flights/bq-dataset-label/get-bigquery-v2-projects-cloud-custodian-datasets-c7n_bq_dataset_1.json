@@ -1,0 +1,56 @@
+{
+  "headers": {
+    "etag": "BcSPpcmHZ6gearVKuw3cyQ==",
+    "content-type": "application/json; charset=UTF-8",
+    "vary": "Origin, X-Origin, Referer",
+    "date": "Thu, 05 Feb 2026 19:50:31 GMT",
+    "server": "ESF",
+    "x-xss-protection": "0",
+    "x-frame-options": "SAMEORIGIN",
+    "x-content-type-options": "nosniff",
+    "alt-svc": "h3=\":443\"; ma=2592000,h3-29=\":443\"; ma=2592000",
+    "transfer-encoding": "chunked",
+    "status": "200",
+    "content-length": "922",
+    "-content-encoding": "gzip",
+    "content-location": "https://bigquery.googleapis.com/bigquery/v2/projects/cloud-custodian/datasets/c7n_bq_dataset?alt=json"
+  },
+  "body": {
+    "kind": "bigquery#dataset",
+    "etag": "BcSPpcmHZ6gearVKuw3cyQ==",
+    "id": "cloud-custodian:c7n_bq_dataset",
+    "selfLink": "https://bigquery.googleapis.com/bigquery/v2/projects/cloud-custodian/datasets/c7n_bq_dataset",
+    "datasetReference": {
+      "datasetId": "c7n_bq_dataset",
+      "projectId": "cloud-custodian"
+    },
+    "description": "",
+    "labels": {
+      "env": "default",
+      "goog-terraform-provisioned": "true"
+    },
+    "access": [
+      {
+        "role": "WRITER",
+        "specialGroup": "projectWriters"
+      },
+      {
+        "role": "OWNER",
+        "specialGroup": "projectOwners"
+      },
+      {
+        "role": "OWNER",
+        "userByEmail": "caleb.syring@sixfeetup.com"
+      },
+      {
+        "role": "READER",
+        "specialGroup": "projectReaders"
+      }
+    ],
+    "creationTime": "1770318608386",
+    "lastModifiedTime": "1770321024616",
+    "location": "US",
+    "type": "DEFAULT",
+    "maxTimeTravelHours": "168"
+  }
+}

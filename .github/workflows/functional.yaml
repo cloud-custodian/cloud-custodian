@@ -2,6 +2,11 @@ name: "Functional"
 
 on:
   workflow_dispatch: {}
+
+env:
+  UV_VERSION: "0.7.12"
+  DEFAULT_PY_VERSION: "3.12"
+
 jobs:
   AWS:
     runs-on: ubuntu-latest
@@ -10,12 +15,12 @@ jobs:
       contents: read
       checks: write
     steps:
-      - uses: actions/checkout@v4
-      - uses: actions/setup-python@v5
+      - uses: actions/checkout@v5
+      - uses: actions/setup-python@v6
         with:
-          python-version: "3.11"
+          python-version: ${{ env.DEFAULT_PY_VERSION }}
 
-      - uses: aws-actions/configure-aws-credentials@v4
+      - uses: aws-actions/configure-aws-credentials@v5
         with:
           role-to-assume: ${{ secrets.AWS_FTEST_ROLE }}
           aws-region: us-east-1
@@ -29,7 +34,8 @@ jobs:
       - name: Install Custodian
         uses: ./.github/composites/install
         with:
-          python-version: "3.11"
+          python-version: ${{ env.DEFAULT_PY_VERSION }}
+          uv-version: ${{ env.UV_VERSION }}
 
       - name: Set up cache
         uses: actions/cache@v4

@@ -1,0 +1,26 @@
+{
+    "status_code": 200,
+    "data": {
+        "ResponseMetadata": {},
+        "domain": {
+            "name": "c7n-test",
+            "owner": "644160558196",
+            "arn": "arn:aws:codeartifact:us-east-2:644160558196:domain/c7n-test",
+            "status": "Active",
+            "createdTime": {
+                "__class__": "datetime",
+                "year": 2025,
+                "month": 11,
+                "day": 24,
+                "hour": 10,
+                "minute": 38,
+                "second": 11,
+                "microsecond": 494000
+            },
+            "encryptionKey": "arn:aws:kms:us-east-2:644160558196:key/da619881-9cb1-42ce-9c6a-9bc6d87cdf8e",
+            "repositoryCount": 0,
+            "assetSizeBytes": 0,
+            "s3BucketArn": "arn:aws:s3:::assets-644160558196-us-east-2"
+        }
+    }
+}
