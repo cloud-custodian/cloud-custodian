@@ -1,0 +1,49 @@
+{
+    "status_code": 200,
+    "data": {
+        "SecurityGroups": [
+            {
+                "GroupId": "sg-091e5c25316cfc6bc",
+                "IpPermissionsEgress": [
+                    {
+                        "IpProtocol": "-1",
+                        "UserIdGroupPairs": [],
+                        "IpRanges": [
+                            {
+                                "CidrIp": "0.0.0.0/0"
+                            }
+                        ],
+                        "Ipv6Ranges": [],
+                        "PrefixListIds": []
+                    }
+                ],
+                "Tags": [
+                    {
+                        "Key": "Application",
+                        "Value": "Test"
+                    }
+                ],
+                "VpcId": "vpc-0207cdabbb60970eb",
+                "SecurityGroupArn": "arn:aws:ec2:us-east-1:644160558196:security-group/sg-091e5c25316cfc6bc",
+                "OwnerId": "644160558196",
+                "GroupName": "default",
+                "Description": "default VPC security group",
+                "IpPermissions": [
+                    {
+                        "IpProtocol": "-1",
+                        "UserIdGroupPairs": [
+                            {
+                                "UserId": "644160558196",
+                                "GroupId": "sg-091e5c25316cfc6bc"
+                            }
+                        ],
+                        "IpRanges": [],
+                        "Ipv6Ranges": [],
+                        "PrefixListIds": []
+                    }
+                ]
+            }
+        ],
+        "ResponseMetadata": {}
+    }
+}
