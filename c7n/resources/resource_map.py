@@ -359,6 +359,7 @@ ResourceMap = {
   "aws.vpc-lattice-service": "c7n.resources.lattice.VPCLatticeService",
   "aws.vpc-lattice-service-network": "c7n.resources.lattice.VPCLatticeServiceNetwork",
   "aws.vpc-lattice-target-group": "c7n.resources.lattice.VPCLatticeTargetGroup",
+  "aws.vpc-lattice-listener": "c7n.resources.lattice.VPCLatticeListener",
   "aws.client-vpn-endpoint": "c7n.resources.vpc.ClientVpnEndpoint",
   "aws.vpn-connection": "c7n.resources.vpc.VPNConnection",
   "aws.vpn-gateway": "c7n.resources.vpc.VPNGateway",

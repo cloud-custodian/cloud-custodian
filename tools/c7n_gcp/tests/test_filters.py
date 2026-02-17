@@ -158,19 +158,20 @@ class TestGCPMetricsFilter(BaseTest):
         # This should be filtering out the resource, & not erroring..
         self.assertEqual(len(resources), 0)
 
-    def test_metrics_start_of_day(self):
+    def test_metrics_period_start_start_of_day(self):
         """
         Ensure GCPMetricsFilter correctly snaps the metric window to full UTC
-        calendar days when 'start-of-day' is True.
+        calendar days when 'period-start' is set to "start-of-day".
 
         This verifies:
         - start aligns to 00:00:00 UTC N days ago
         - end aligns to 23:59:59 UTC of the last completed day
         - period equals the exact difference between start and end
         """
+
         policy = self.load_policy(
             {
-                "name": "gcp-start-of-day-test",
+                "name": "gcp-period-start-test",
                 "resource": "gcp.instance",
                 "filters": [
                     {
@@ -179,7 +180,7 @@ class TestGCPMetricsFilter(BaseTest):
                         "metric-key": "metric.labels.instance_name",
                         "aligner": "ALIGN_MEAN",
                         "days": 2,
-                        "start-of-day": True,
+                        "period-start": "start-of-day",
                         "value": 0.1,
                         "filter": 'resource.labels.zone = "us-east4-c"',
                         "op": "less-than",

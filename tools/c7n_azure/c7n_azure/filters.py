@@ -21,9 +21,10 @@ from azure.core.exceptions import HttpResponseError
 from c7n_azure.provider import resources
 from c7n.filters import Filter, FilterValidationError, ValueFilter
 from c7n.filters.core import PolicyValidationError
+from c7n.filters.metrics import METRIC_WINDOW_ALIGNMENT
 from c7n.filters.related import RelatedResourceFilter
 from c7n.filters.offhours import OffHour, OnHour, Time
-from c7n.utils import chunks, get_annotation_prefix, type_schema
+from c7n.utils import chunks, get_annotation_prefix, type_schema, snap_to_period_start
 
 scalar_ops = {
     'eq': operator.eq,
@@ -123,6 +124,29 @@ class MetricFilter(Filter):
                 timeframe: 24
                 filter:  "DatabaseResourceId eq '*'"
 
+    The ``period_start`` key allows you to align the metric window in two ways.
+    By default, using ``auto``, the window is computed relative to the current time.
+    Alternatively, setting it to ``start-of-day`` aligns the window to full UTC calendar days,
+    beginning at 00:00:00 UTC and ending at 23:59:59 UTC.
+
+    :example:
+
+    Find VMs with average CPU below 20% for the last full UTC day
+
+    .. code-block:: yaml
+
+        policies:
+          - name: vm-low-cpu-last-full-day
+            resource: azure.vm
+            filters:
+              - type: metric
+                metric: Percentage CPU
+                aggregation: average
+                op: lt
+                threshold: 20
+                timeframe: 24
+                period_start: start-of-day
+
     """
 
     DEFAULT_TIMEFRAME = 24
@@ -148,7 +172,7 @@ class MetricFilter(Filter):
             'threshold': {'type': 'number'},
             'metric_namespace': {'type': 'string'},
             'timeframe': {'type': 'number'},
-            'start-of-day': {'type': 'boolean'},
+            'period_start': {'type': 'string', 'enum': METRIC_WINDOW_ALIGNMENT},
             'interval': {'enum': [
                 'PT1M', 'PT5M', 'PT15M', 'PT30M', 'PT1H', 'PT6H', 'PT12H', 'P1D']},
             'aggregation': {'enum': ['total', 'average', 'count', 'minimum', 'maximum']},
@@ -181,7 +205,7 @@ class MetricFilter(Filter):
         # default to no namespace if not passed in
         self.metricnamespace = self.data.get("metric_namespace", None)
         # default to false if not passed in
-        self.start_of_day = self.data.get('start-of-day', False)
+        self.period_start = self.data.get('period_start', 'auto')
 
     def process(self, resources, event=None):
         # Import utcnow function as it may have been overridden for testing purposes
@@ -191,13 +215,7 @@ class MetricFilter(Filter):
         end_time = utcnow()
         start_time = end_time - timedelta(hours=self.timeframe)
 
-        if self.start_of_day:
-            start_time = start_time.replace(
-                hour=0, minute=0, second=0, microsecond=0
-            )
-            end_time = end_time.replace(
-                hour=0, minute=0, second=0, microsecond=0
-            ) - timedelta(seconds=1)
+        start_time, end_time = snap_to_period_start(start_time, end_time, self.period_start)
 
         self.timespan = "{}/{}".format(start_time, end_time)
 

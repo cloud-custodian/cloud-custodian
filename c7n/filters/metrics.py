@@ -11,12 +11,12 @@ from datetime import datetime, timedelta
 
 from c7n.exceptions import PolicyValidationError
 from c7n.filters.core import Filter, OPERATORS
-from c7n.utils import local_session, type_schema, chunks
+from c7n.utils import local_session, type_schema, chunks, snap_to_period_start
 
 METRIC_WINDOW_ALIGNMENT = [
     'auto',
-    'start-of-day',
-]
+    'start-of-day']
+
 
 class MetricsFilter(Filter):
     """Supports cloud watch metrics filters on resources.
@@ -71,6 +71,24 @@ class MetricsFilter(Filter):
     policy to treat their request counts as 0.
 
     Note the default statistic for metrics is Average.
+
+    The ``period-start`` key allows you to align the metric window in two ways.
+    By default, using ``auto``, the window is computed relative to the current time.
+    Alternatively, setting it to ``start-of-day`` aligns the window to full UTC calendar days,
+    beginning at 00:00:00 UTC and ending at 23:59:59 UTC.
+
+    .. code-block:: yaml
+
+      - name: ec2-low-cpu-last-full-day
+        resource: ec2
+        filters:
+          - type: metrics
+            name: CPUUtilization
+            days: 1
+            period: 86400
+            value: 30
+            op: less-than
+            period-start: start-of-day
     """
 
     schema = type_schema(
@@ -183,9 +201,7 @@ class MetricsFilter(Filter):
 
         start = end - duration
 
-        if self.period_start == 'start-of-day':
-            start = start.replace(hour=0, minute=0, second=0, microsecond=0)
-            end = end.replace(hour=0, minute=0, second=0, microsecond=0) - timedelta(seconds=1)
+        start, end = snap_to_period_start(start, end, self.period_start)
 
         return MetricWindow(start, end)
 

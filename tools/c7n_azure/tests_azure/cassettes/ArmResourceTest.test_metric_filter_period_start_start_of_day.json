@@ -43,7 +43,7 @@
     {
       "request": {
         "method": "GET",
-        "uri": "https://management.azure.com/subscriptions/ea42f556-5106-4743-99b0-c129bfa71a47/resourceGroups/TEST_VM/providers/Microsoft.Compute/virtualMachines/cctestvm/providers/microsoft.insights/metrics?timespan=2026-02-12%2000%3A00%3A00%2F2026-02-12%2023%3A59%3A59&interval=P1D&metricnames=Percentage%20CPU&aggregation=average&api-version=2018-01-01",
+        "uri": "https://management.azure.com/subscriptions/ea42f556-5106-4743-99b0-c129bfa71a47/resourceGroups/TEST_VM/providers/Microsoft.Compute/virtualMachines/cctestvm/providers/microsoft.insights/metrics?timespan=2026-02-17%2000%3A00%3A00%2F2026-02-17%2023%3A59%3A59&interval=P1D&metricnames=Percentage%20CPU&aggregation=average&api-version=2018-01-01",
         "body": null,
         "headers": {}
       },
@@ -51,14 +51,14 @@
         "status": { "code": 200, "message": "OK" },
         "headers": {
           "cache-control": ["no-cache"],
-          "date": ["Thu, 12 Feb 2026 12:00:00 GMT"],
+          "date": ["Thu, 17 Feb 2026 12:00:00 GMT"],
           "content-type": ["application/json"],
           "content-length": ["512"]
         },
         "body": {
           "data": {
             "cost": 0,
-            "timespan": "2026-02-12T00:00:00Z/2026-02-12T23:59:59Z",
+            "timespan": "2026-02-17T00:00:00Z/2026-02-17T23:59:59Z",
             "interval": "P1D",
             "value": [
               {
@@ -67,7 +67,7 @@
                 "name": { "value": "Percentage CPU", "localizedValue": "Percentage CPU" },
                 "unit": "Percent",
                 "timeseries": [
-                  { "metadatavalues": [], "data": [{ "timeStamp": "2026-02-12T00:00:00Z", "average": 12.5 }] }
+                  { "metadatavalues": [], "data": [{ "timeStamp": "2026-02-17T00:00:00Z", "average": 12.5 }] }
                 ]
               }
             ],

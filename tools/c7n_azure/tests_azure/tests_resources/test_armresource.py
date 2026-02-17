@@ -45,9 +45,9 @@ class ArmResourceTest(BaseTest):
         self.assertEqual(len(resources), 1)
 
     @arm_template('vm.json')
-    def test_metric_filter_start_of_day(self):
+    def test_metric_filter_period_start_start_of_day(self):
         p = self.load_policy({
-            'name': 'test-azure-metric-sod',
+            'name': 'test-azure-metric-period-start',
             'resource': 'azure.vm',
             'filters': [
                 {'type': 'value',
@@ -60,7 +60,7 @@ class ArmResourceTest(BaseTest):
                  'aggregation': 'average',
                  'op': 'gt',
                  'threshold': 0,
-                 'start-of-day': True}],
+                 'period_start': 'start-of-day'}],
         })
         resources = p.run()
         self.assertEqual(len(resources), 1)
