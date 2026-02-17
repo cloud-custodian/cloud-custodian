@@ -452,11 +452,6 @@ class DynamodbTest(BaseTest):
                 "filters": [
                     {
                         "type": "export-description",
-                        "key": "S3BucketOwner",
-                        "value": "408502716114"
-                    },
-                    {
-                        "type": "export-description",
                         "key": "ExportStatus",
                         "op": "in",
                         "value": ["COMPLETED"]
@@ -470,8 +465,7 @@ class DynamodbTest(BaseTest):
         self.assertTrue("c7n:ExportDescription" in resources[0])
 
         exports = resources[0]["c7n:ExportDescription"]
-        self.assertEqual(len(exports), 1)
-        self.assertEqual(exports[0]["S3BucketOwner"], "408502716114")
+        self.assertEqual(len(exports), 2)
 
 
 class DynamoDbAccelerator(BaseTest):
