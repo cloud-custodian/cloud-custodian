@@ -1,0 +1,22 @@
+{
+    "pytest-terraform": 1,
+    "outputs": {},
+    "resources": {
+        "aws_dx_gateway": {
+            "test_gateway": {
+                "amazon_side_asn": "64512",
+                "arn": "arn:aws:directconnect::644160558196:dx-gateway/e72d611c-aa39-4fd2-a1d7-da0484ad38fe",
+                "id": "e72d611c-aa39-4fd2-a1d7-da0484ad38fe",
+                "name": "c7n-test-directconnect-tagging",
+                "owner_account_id": "644160558196",
+                "tags": {
+                    "existing": "existing"
+                },
+                "tags_all": {
+                    "existing": "existing"
+                },
+                "timeouts": null
+            }
+        }
+    }
+}
