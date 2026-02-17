@@ -70,6 +70,7 @@ class LoadBalancingAddressTest(BaseTest):
 
     def test_loadbalancer_address_filter_global_addresses(self):
         project_id = 'cloud-custodian'
+        region = 'us-central1'
         factory = self.replay_flight_data('lb-addresses-global-addresses',
                                           project_id=project_id)
         policy = self.load_policy(
@@ -82,7 +83,12 @@ class LoadBalancingAddressTest(BaseTest):
         resources = policy.run()
         self.assertEqual(len(resources), 2)
 
-        self.assertEqual(len([r for r in resources if 'region' not in r]), 1)
+        client = policy.resource_manager.get_client()
+        result = client.execute_query(
+            'list', {'project': project_id,
+                     'region': region})
+
+        self.assertEqual(len(result['items']["regions/{}".format(region)]['addresses']), 0)
 
 
 class LoadBalancingUrlMapTest(BaseTest):

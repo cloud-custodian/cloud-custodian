@@ -47,7 +47,7 @@
             "name": "a5a3fzbrafckaoaf03ac394",
             "description": "{\"kubernetes.io/service-name\":\"monitoring/grafana\"}",
             "address": "45.205.100.15",
-            "status": "IN_USE",
+            "status": "RESERVED",
             "region": "https://www.googleapis.com/compute/v1/projects/cloud-custodian/regions/us-central1",
             "selfLink": "https://www.googleapis.com/compute/v1/projects/cloud-custodian/regions/us-central1/addresses/a5a3fzbrafckaoaf03ac394",
             "users": [
