@@ -2887,6 +2887,62 @@ class EndpointVpcFilter(net_filters.VpcFilter):
     RelatedIdsExpression = "VpcId"
 
 
+@VpcEndpoint.filter_registry.register('service-details')
+class EndpointServiceDetailsFilter(ValueFilter):
+    """Filter VPC Endpoints based on their associated endpoint service details.
+
+    :example:
+
+    .. code-block:: yaml
+
+      policies:
+        - name: vpc-endpoints-has-policy-support
+          resource: aws.vpc-endpoint
+          filters:
+            - type: service-details
+              key: VpcEndpointPolicySupported
+              value: true
+    """
+
+    annotation_key = "c7n:ServiceDetails"
+    schema = type_schema(
+        "service-details",
+        rinherit=ValueFilter.schema
+    )
+    permissions = ("ec2:DescribeVpcEndpointServices",)
+
+    def process(self, resources, event=None):
+        client = local_session(self.manager.session_factory).client("ec2")
+        service_names = sorted({r["ServiceName"] for r in resources})
+
+        service_map = self._describe_services(client, service_names)
+
+        results = []
+        for resource in resources:
+            service_detail = service_map.get(resource["ServiceName"], {})
+            resource[self.annotation_key] = service_detail or {}
+
+            if self.match(resource[self.annotation_key]):
+                results.append(resource)
+
+        return results
+
+    def _describe_services(self, client, service_names):
+        cache = self.manager._cache
+        cache_key = {"ServiceNames": service_names}
+
+        with cache:
+            cached = cache.get(cache_key)
+            if cached is not None:
+                return cached
+
+            resp = client.describe_vpc_endpoint_services(ServiceNames=service_names)
+            service_map = {d["ServiceName"]: d for d in resp.get("ServiceDetails", [])}
+
+            cache.save(cache_key, service_map)
+            return service_map
+
+
 @Vpc.filter_registry.register("vpc-endpoint")
 class VPCEndpointFilter(RelatedResourceByIdFilter):
     """Filters vpcs based on their vpc-endpoints
@@ -3463,9 +3519,25 @@ class CrossAZRouteTable(Filter):
             s['SubnetId']: s for s in
             self.manager.get_resource_manager('aws.subnet').resources()
         }
+        # Filter out Regional NAT Gateways which don't have SubnetId field
+        # Regional NAT Gateways span multiple AZs and cannot be evaluated for cross-AZ traffic
+        all_nat_gateways = self.manager.get_resource_manager('nat-gateway').resources()
+        zonal_nat_gateways = [n for n in all_nat_gateways if 'SubnetId' in n]
+        regional_nat_gateways = [n for n in all_nat_gateways if 'SubnetId' not in n]
+        if regional_nat_gateways:
+            nat_ids = [n['NatGatewayId'] for n in regional_nat_gateways]
+            nat_ids_display = ', '.join(nat_ids[:5])
+            if len(nat_ids) > 5:
+                nat_ids_display += f' (and {len(nat_ids) - 5} more)'
+            self.log.warning(
+                "%s excluding %d Regional NAT Gateway(s) without SubnetId "
+                "(cannot evaluate cross-AZ traffic for regional NAT gateways): %s",
+                self.type,
+                len(regional_nat_gateways),
+                nat_ids_display)
         nat_subnets = {
             nat_gateway['NatGatewayId']: nat_gateway["SubnetId"]
-            for nat_gateway in self.manager.get_resource_manager('nat-gateway').resources()}
+            for nat_gateway in zonal_nat_gateways}
 
         results = []
         self.annotate_subnets_table(resources, subnets)

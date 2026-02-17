@@ -1,0 +1,46 @@
+{
+    "status_code": 200,
+    "data": {
+        "Server": {
+            "Arn": "arn:aws:transfer:us-east-1:644160558196:server/s-926661bac6f64218a",
+            "ProtocolDetails": {
+                "PassiveIp": "AUTO",
+                "TlsSessionResumptionMode": "ENFORCED",
+                "SetStatOption": "DEFAULT"
+            },
+            "Domain": "S3",
+            "EndpointDetails": {
+                "AddressAllocationIds": [],
+                "SubnetIds": [
+                    "subnet-0a0cc24bfabbd5f02"
+                ],
+                "VpcEndpointId": "vpce-0b36452b351fd6285",
+                "VpcId": "vpc-0207cdabbb60970eb"
+            },
+            "EndpointType": "VPC",
+            "HostKeyFingerprint": "SHA256:kWuZTNJaKU/I9sR0PfjVfssTsZPqrqbq+K5byocbD9o=",
+            "IdentityProviderType": "SERVICE_MANAGED",
+            "Protocols": [
+                "SFTP"
+            ],
+            "SecurityPolicyName": "TransferSecurityPolicy-2024-01",
+            "ServerId": "s-926661bac6f64218a",
+            "State": "ONLINE",
+            "Tags": [
+                {
+                    "Key": "Application",
+                    "Value": "Test"
+                }
+            ],
+            "UserCount": 0,
+            "StructuredLogDestinations": [
+                "arn:aws:logs:us-east-1:644160558196:log-group:test:*"
+            ],
+            "S3StorageOptions": {
+                "DirectoryListingOptimization": "ENABLED"
+            },
+            "IpAddressType": "IPV4"
+        },
+        "ResponseMetadata": {}
+    }
+}

@@ -18,8 +18,7 @@ from .zpill import ACCOUNT_ID
 @pytest.mark.audited
 @terraform('sg_used_cross_ref')
 def test_sg_used_cross_ref(test, sg_used_cross_ref):
-    aws_region = 'us-west-2'
-    factory = test.replay_flight_data('sg_used_cross_ref', region=aws_region)
+    factory = test.replay_flight_data('sg_used_cross_ref')
     p = test.load_policy({
         'name': 'sg_used_cross_ref',
         'resource': 'security-group',
@@ -2158,6 +2157,49 @@ def test_cross_az_nat_gateway_subnet_resolve(test):
         'rtb-0e40b5294fd751b38': ['subnet-0845061a295aef2b6'],
         'rtb-0f13aebd1241f7141': ['subnet-0b8f90974afb1a016']
     }
+
+
+def test_cross_az_nat_gateway_regional_nat(test, caplog):
+    """Test that Regional NAT Gateways without SubnetId are handled gracefully and logged."""
+    from c7n.resources.vpc import CrossAZRouteTable
+    from unittest.mock import MagicMock
+
+    # Mock NAT gateways including a Regional NAT Gateway without SubnetId
+    mock_nat_gateways = [
+        {'NatGatewayId': 'nat-zonal-123', 'SubnetId': 'subnet-123'},
+        {'NatGatewayId': 'nat-regional-456'},  # Regional NAT Gateway without SubnetId
+    ]
+
+    # Create a mock filter instance
+    mock_manager = MagicMock()
+    mock_nat_manager = MagicMock()
+    mock_nat_manager.resources.return_value = mock_nat_gateways
+    mock_subnet_manager = MagicMock()
+    mock_subnet_manager.resources.return_value = [
+        {'SubnetId': 'subnet-123', 'AvailabilityZone': 'us-east-1a'}
+    ]
+
+    def get_resource_manager(resource_type):
+        if resource_type == 'nat-gateway':
+            return mock_nat_manager
+        elif resource_type == 'aws.subnet':
+            return mock_subnet_manager
+        return MagicMock()
+
+    mock_manager.get_resource_manager = get_resource_manager
+
+    filter_instance = CrossAZRouteTable({'type': 'cross-az-nat-gateway-route'}, mock_manager)
+
+    # Process with empty route tables - we just want to verify logging
+    with caplog.at_level(logging.WARNING):
+        filter_instance.process([])
+
+    # Verify warning was logged about Regional NAT Gateway exclusion
+    assert any(
+        'excluding 1 Regional NAT Gateway(s) without SubnetId' in record.message
+        and 'nat-regional-456' in record.message
+        for record in caplog.records
+    )
 
 
 class PeeringConnectionTest(BaseTest):
@@ -4687,3 +4729,36 @@ class TestVPCEndpointServiceConfiguration(BaseTest):
         resources = p.run()
         self.assertEqual(len(resources), 1)
         self.assertEqual(resources[0]['ServiceId'], 'vpce-svc-042193297e333714e')
+
+
+class TestVpcEndpointServiceDetails(BaseTest):
+    def test_endpoint_service_details_policy_supported(self):
+        session_factory = self.replay_flight_data(
+            "test_vpc_endpoint_service_details_filter"
+        )
+
+        p = self.load_policy(
+            {
+                "name": "vpc-endpoint-services-with-policy-support",
+                "resource": "aws.vpc-endpoint",
+                "filters": [
+                    {
+                        "type": "service-details",
+                        "key": "VpcEndpointPolicySupported",
+                        "value": True,
+                    }
+                ],
+            },
+            session_factory=session_factory,
+        )
+
+        resources = p.run()
+        service_details = resources[0]["c7n:ServiceDetails"]
+
+        self.assertEqual(len(resources), 1)
+        self.assertIn("c7n:ServiceDetails", resources[0])
+        self.assertEqual(
+            resources[0]["ServiceName"],
+            "com.amazonaws.us-east-1.s3",
+        )
+        self.assertTrue(service_details["VpcEndpointPolicySupported"])
