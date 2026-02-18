@@ -1,0 +1,60 @@
+{
+  "eventVersion": "1.08",
+  "userIdentity": {
+    "type": "AssumedRole",
+    "principalId": "XXXXXXXX:id",
+    "arn": "arn:aws:sts::1234567890:assumed-role/role/id",
+    "accountId": "1234567890",
+    "accessKeyId": "XXXXXXXXXXX",
+    "sessionContext": {
+      "sessionIssuer": {
+        "type": "Role",
+        "principalId": "XXXXXXXXXXX",
+        "arn": "arn:aws:iam::1234567890:role/role",
+        "accountId": "1234567890",
+        "userName": "role"
+      },
+      "webIdFederationData": {},
+      "attributes": {
+        "creationDate": "2024-04-02T12:48:14Z",
+        "mfaAuthenticated": "false"
+      }
+    }
+  },
+  "eventTime": "2024-04-02T13:04:22Z",
+  "eventSource": "chime-sdk-voice.amazonaws.com",
+  "eventName": "CreateVoiceConnector",
+  "awsRegion": "us-east-1",
+  "sourceIPAddress": "170.148.215.157",
+  "userAgent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/120.0.0.0 Safari/537.36",
+  "requestParameters": {
+    "name": "vc-encryption-off",
+    "awsRegion": "us-east-1",
+    "requireEncryption": false
+  },
+  "responseElements": {
+    "voiceConnector": {
+      "voiceConnectorId": "gp9yxbfhynquklulp0dyi4",
+      "awsRegion": "us-east-1",
+      "name": "vc-encryption-off",
+      "outboundHostName": "gp9yxbfhynquklulp0dyi4.voiceconnector.chime.aws",
+      "requireEncryption": false,
+      "createdTimestamp": "2024-04-02T13:04:22.308Z",
+      "updatedTimestamp": "2024-04-02T13:04:22.308Z",
+      "voiceConnectorArn": "arn:aws:chime:us-east-1:1234567890:vc/gp9yxbfhynquklulp0dyi4"
+    }
+  },
+  "requestID": "0be5b93b-f61b-47b8-9018-87185ea15c62",
+  "eventID": "aa2677ec-6b8c-4c84-9fa2-11dc91691fdc",
+  "readOnly": false,
+  "eventType": "AwsApiCall",
+  "managementEvent": true,
+  "recipientAccountId": "1234567890",
+  "eventCategory": "Management",
+  "tlsDetails": {
+    "tlsVersion": "TLSv1.2",
+    "cipherSuite": "ECDHE-RSA-AES128-GCM-SHA256",
+    "clientProvidedHostHeader": "voice-chime.us-east-1.amazonaws.com"
+  },
+  "sessionCredentialFromConsole": "true"
+}

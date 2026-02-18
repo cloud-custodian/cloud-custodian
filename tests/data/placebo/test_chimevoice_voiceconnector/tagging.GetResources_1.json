@@ -1,0 +1,27 @@
+{
+    "status_code": 200,
+    "data": {
+        "PaginationToken": "",
+        "ResourceTagMappingList": [
+            {
+                "ResourceARN": "arn:aws:chime:us-east-1:644160558196:vc/ddvk97wedue2gzbz8eeeri",
+                "Tags": [
+                    {
+                        "Key": "my-key-on",
+                        "Value": "my-value-on"
+                    }
+                ]
+            },
+            {
+                "ResourceARN": "arn:aws:chime:us-east-1:644160558196:vc/gp9yxbfhynquklulp0dyi4",
+                "Tags": [
+                    {
+                        "Key": "my-key",
+                        "Value": "my-value"
+                    }
+                ]
+            }
+        ],
+        "ResponseMetadata": {}
+    }
+}

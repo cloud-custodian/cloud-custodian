@@ -46,6 +46,7 @@ ResourceMap = {
   "aws.catalog-portfolio": "c7n.resources.servicecatalog.CatalogPortfolio",
   "aws.catalog-product": "c7n.resources.servicecatalog.CatalogProduct",
   "aws.cfn": "c7n.resources.cfn.CloudFormation",
+  "aws.chime-voice-voiceconnector": "c7n.resources.chimevoice.VoiceConnector",
   "aws.cloud-directory": "c7n.resources.directory.CloudDirectory",
   "aws.cloudhsm-cluster": "c7n.resources.hsm.CloudHSMCluster",
   "aws.cloudhsm-backup": "c7n.resources.hsm.CloudHSMBackup",
