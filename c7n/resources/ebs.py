@@ -208,6 +208,30 @@ class SnapshotTag(Tag):
                 raise
 
 
+@Snapshot.filter_registry.register('locked')
+class SnapshotLocked(ValueFilter):
+
+    schema = type_schema('locked', rinherit=ValueFilter.schema)
+
+    lock_annotation = 'c7n:LockStatus'
+    batch_size = 100
+
+    def annotate_lock(self, client, resources):
+        for resource_set in chunks(resources, self.batch_size):
+            lock_status = {
+                l['SnapshotId']: l for l in
+                client.describe_locked_snapshots(resource_set)['Snapshots']}
+            for r in resource_set:
+                r[self.lock_annotation] = lock_status.get(r['SnapshotId'], {})
+
+    def process(self, resources):
+        self.annotate_lock(local_session(self.manager.session_factory).client('ec2'), resources)
+        super().process(resources)
+
+    def __call__(self, r):
+        return super()(r[self.lock_annotation])
+
+
 @Snapshot.filter_registry.register('age')
 class SnapshotAge(AgeFilter):
     """EBS Snapshot Age Filter
