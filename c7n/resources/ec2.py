@@ -1,6 +1,7 @@
 # Copyright The Cloud Custodian Authors.
 # SPDX-License-Identifier: Apache-2.0
 import base64
+from collections import defaultdict
 import itertools
 import operator
 import random
@@ -31,6 +32,7 @@ from c7n import query, utils
 from c7n.tags import coalesce_copy_user_tags
 from c7n.utils import type_schema, filter_empty, jmespath_search, jmespath_compile, QueryParser
 
+from c7n.resources.aws import shape_validate
 from c7n.resources.iam import CheckPermissions, SpecificIamProfileManagedPolicy
 from c7n.resources.securityhub import PostFinding
 
@@ -2558,3 +2560,79 @@ class CapacityReservation(query.QueryResourceManager):
         filter_type = 'list'
         cfn_type = 'AWS::EC2::CapacityReservation'
         permissions_enum = ('ec2:DescribeCapacityReservations',)
+
+
+@filters.register('compute-optimizer')
+class ComputeOptimizer(ValueFilter):
+    """Filter EC2 instances based on Compute Optimizer recommendations."""
+    schema = type_schema(
+        'compute-optimizer',
+        filters={'type': 'object'},
+        **{'recommendation-preferences': {'type': 'object'}},
+        rinherit=ValueFilter.schema,
+    )
+    permissions = ('compute-optimizer:GetEC2InstanceRecommendations',)
+    required_keys = ()
+
+    @property
+    def base_req(self) -> dict:
+        """Returns the base request parameters for the API call."""
+        req = {}
+        if 'filters' in self.data:
+            req['filters'] = []
+            for k, v in self.data['filters'].items():
+                req['filters'].append({'name': k, 'values': v})
+        if 'recommendation-preferences' in self.data:
+            req['recommendationPreferences'] = self.data['recommendation-preferences']
+        return req
+
+    @property
+    def is_server_side(self) -> bool:
+        """Returns whether or not the filter is being applied server-side."""
+        return 'filters' in self.data or 'recommendation-preferences' in self.data
+
+    @property
+    def is_client_side(self) -> bool:
+        """Returns whether or not the filter is being applied client-side."""
+        return 'key' in self.data
+
+    def validate(self):
+        return shape_validate(
+            # instanceArns is added in process
+            {**self.base_req, 'instanceArns': []},
+            'GetEC2InstanceRecommendationsRequest',
+            'compute-optimizer',
+        )
+
+    def process(self, resources, event=None):
+        # Get recommendations for all resources, map to arn
+        recommendations = utils.local_session(
+            self.manager.session_factory
+        ).client(
+            'compute-optimizer'
+        ).get_ec2_instance_recommendations(
+            **self.base_req,
+            instanceArns=self.manager.get_arns(resources),
+        )['instanceRecommendations']
+        recs_by_arn = defaultdict(list)
+        for r in recommendations:
+            recs_by_arn[r['instanceArn']].append(r)
+
+        results = []
+        for r in resources:
+            recs = recs_by_arn.get(self.manager.generate_arn(r['InstanceId']), [])
+
+            # If we're filtering server-side, exclude resources that don't have any returned
+            # recommendations.
+            if self.is_server_side and not recs:
+                continue
+
+            # If we're filtering client-side, exclude resources whose recommendations don't match
+            # the filter.
+            if self.is_client_side and not any(self.match(r) for r in recs):
+                continue
+
+            r['c7n:ComputeOptimizerRecommendations'] = recs
+            results.append(r)
+
+        return results

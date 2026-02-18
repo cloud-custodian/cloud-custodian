@@ -2511,3 +2511,86 @@ class TestCapacityReservation(BaseTest):
             )
         resources = p.run()
         self.assertEqual(len(resources), 2)
+
+
+def test_ec2_compute_optimizer_no_params(test):
+    session_factory = test.replay_flight_data("test_ec2_compute_optimizer_no_params")
+    policy = test.load_policy(
+        {
+            "name": "ec2-optimizations",
+            "resource": "aws.ec2",
+            "filters": [{"type": "compute-optimizer"}],
+        },
+        session_factory=session_factory,
+        config={"account_id": "644160558196"}
+    )
+
+    resources = policy.run()
+
+    # All instances are returned with recommendations annotated.
+    test.assertEqual(len(resources), 2)
+    test.assertEqual(len(resources[0]['c7n:ComputeOptimizerRecommendations']), 2)
+    test.assertEqual(len(resources[1]['c7n:ComputeOptimizerRecommendations']), 0)
+
+
+def test_ec2_compute_optimizer_client_side(test):
+    session_factory = test.replay_flight_data("test_ec2_compute_optimizer_client_side")
+    policy = test.load_policy(
+        {
+            "name": "ec2-non-optimized-instances-client-side-filter",
+            "resource": "aws.ec2",
+            "filters": [
+                {
+                    "type": "compute-optimizer",
+                    "key": "finding",
+                    "op": "not-equal",
+                    "value": "OPTIMIZED",
+                },
+            ],
+        },
+        session_factory=session_factory,
+        config={"account_id": "644160558196"}
+    )
+
+    resources = policy.run()
+
+    test.assertEqual(len(resources), 1)
+    test.assertEqual(resources[0]['InstanceId'], "i-039b21b80b9602a24")
+
+
+def test_ec2_compute_optimizer_server_side_valid(test):
+    session_factory = test.replay_flight_data("test_ec2_compute_optimizer_server_side_valid")
+    policy = test.load_policy(
+        {
+            "name": "ec2-non-optimized-instances-server-side-filter",
+            "resource": "aws.ec2",
+            "filters": [
+                {
+                    "type": "compute-optimizer",
+                    "filters": {"Finding": ["Underprovisioned", "Overprovisioned"]},
+                    "recommendation-preferences": {"cpuVendorArchitectures": ["AWS_ARM64"]},
+                }
+            ],
+        },
+        session_factory=session_factory,
+        config={"account_id": "644160558196"}
+    )
+    policy = policy.run()
+    # What's returned doesn't actually matter, just that our filters passed validation.
+
+
+def test_ec2_compute_optimizer_server_side_invalid(test):
+    with pytest.raises(PolicyValidationError):
+        test.load_policy(
+            {
+                "name": "ec2-graviton-recommendations",
+                "resource": "aws.ec2",
+                "filters": [
+                    {
+                        "type": "compute-optimizer",
+                        "filters": {"invalid-key": ["invalid-value"]},
+                        "recommendation-preferences": {"invalid-key": "invalid-value"},
+                    }
+                ],
+            },
+        )
