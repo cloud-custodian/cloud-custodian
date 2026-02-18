@@ -196,6 +196,20 @@ class InstanceTest(BaseTest):
         resources = p.run()
         self.assertEqual(len(resources), 1)
 
+    def test_filter_boot_disk_source_image(self):
+        project_id = 'custodian-testing-439216'
+        factory = self.record_flight_data('boot-disk-source-image', project_id=project_id)
+        p = self.load_policy(
+            {'name': 'boot-disk-source-image',
+             'resource': 'gcp.instance',
+             'filters': [
+                 {'type': 'boot-disk-source-image',
+                 'key': 'name',
+                 'value': 'ubuntu-minimal-2204-jammy-v20240926'}]},
+            session_factory=factory)
+        resources = p.run()
+        self.assertEqual(len(resources), 1)
+
     def test_image_filter_iam_query(self):
         project_id = 'cloud-custodian'
         factory = self.replay_flight_data('image-filter-iam', project_id=project_id)
