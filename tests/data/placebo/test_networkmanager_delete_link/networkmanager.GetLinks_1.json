@@ -1,0 +1,39 @@
+{
+    "status_code": 200,
+    "data": {
+        "ResponseMetadata": {},
+        "Links": [
+            {
+                "LinkId": "link-01e6c31eefc56e5fe",
+                "LinkArn": "arn:aws:networkmanager::644160558196:link/global-network-077b7e4d1b5d9989c/link-01e6c31eefc56e5fe",
+                "GlobalNetworkId": "global-network-077b7e4d1b5d9989c",
+                "SiteId": "site-0a54703922a2056d3",
+                "Bandwidth": {
+                    "UploadSpeed": 100,
+                    "DownloadSpeed": 100
+                },
+                "CreatedAt": {
+                    "__class__": "datetime",
+                    "year": 2024,
+                    "month": 9,
+                    "day": 3,
+                    "hour": 20,
+                    "minute": 55,
+                    "second": 45,
+                    "microsecond": 0
+                },
+                "State": "AVAILABLE",
+                "Tags": [
+                    {
+                        "Key": "deleteme",
+                        "Value": "delete"
+                    },
+                    {
+                        "Key": "Name",
+                        "Value": "c7n-test"
+                    }
+                ]
+            }
+        ]
+    }
+}

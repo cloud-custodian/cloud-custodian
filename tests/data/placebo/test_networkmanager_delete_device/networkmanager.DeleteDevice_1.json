@@ -1,0 +1,23 @@
+{
+    "status_code": 200,
+    "data": {
+        "ResponseMetadata": {},
+        "Device": {
+            "DeviceId": "device-0607eb98024796400",
+            "DeviceArn": "arn:aws:networkmanager::644160558196:device/global-network-077b7e4d1b5d9989c/device-0607eb98024796400",
+            "GlobalNetworkId": "global-network-077b7e4d1b5d9989c",
+            "Model": "Model-T",
+            "CreatedAt": {
+                "__class__": "datetime",
+                "year": 2024,
+                "month": 9,
+                "day": 3,
+                "hour": 21,
+                "minute": 23,
+                "second": 9,
+                "microsecond": 0
+            },
+            "State": "DELETING"
+        }
+    }
+}
