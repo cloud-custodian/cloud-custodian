@@ -346,6 +346,13 @@ class TestRegexValue(unittest.TestCase):
 
         self.assertEqual(f(instance(Architecture="x86_64")), False)
 
+    def test_regex_match_list(self):
+        f = filters.factory({
+            "type": "value", "key": "Color", "value": ".*green.*", "op": "regex"
+        })
+        self.assertEqual(f(instance(Architecture="x86_64", Color=["blue", "green"])), True)
+        self.assertEqual(f(instance(Architecture="x86_64", Color=["blue", "red"])), False)
+
 
 class TestRegexCaseSensitiveValue(unittest.TestCase):
 
