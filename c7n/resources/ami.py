@@ -10,6 +10,8 @@ import logging
 
 from concurrent.futures import as_completed
 
+import botocore
+
 from c7n.actions import BaseAction
 from c7n.exceptions import ClientError, PolicyValidationError
 from c7n.filters import (
@@ -25,6 +27,7 @@ from c7n.utils import (
     parse_date,
     jmespath_compile
 )
+from c7n.vendored.distutils.version import LooseVersion
 from c7n import deprecated
 
 
@@ -219,6 +222,78 @@ class SetDeprecation(BaseAction):
                         odate, i['ImageId'], date)
                 self.manager.retry(client.enable_image_deprecation,
                     ImageId=i['ImageId'], DeprecateAt=date)
+
+
+@AMI.action_registry.register('set-disabled')
+class SetDisabled(BaseAction):
+    """Action to enable or disable an AMI's disabled state.
+
+    Note that disabled AMIs are not returned by default in DescribeImages. To
+    enable disabled AMIs, you must include `IncludeDisabled: true` in the query
+    block.
+
+    Requires botocore>=1.31.63 (boto3>=1.28.63).
+
+    :example:
+
+    Disable an AMI (set disabled state to true)
+
+    .. code-block:: yaml
+
+            policies:
+              - name: ami-disable
+                resource: aws.ami
+                filters:
+                  - Name: LambdaCompiler
+                actions:
+                  - type: set-disabled
+                    state: true
+
+    :example:
+
+    Enable a disabled AMI (set disabled state to false)
+
+    .. code-block:: yaml
+
+            policies:
+              - name: ami-enable
+                resource: aws.ami
+                query:
+                  - IncludeDisabled: true
+                filters:
+                  - Name: LambdaCompiler
+                actions:
+                  - type: set-disabled
+                    state: false
+    """
+
+    schema = type_schema('set-disabled', state={'type': 'boolean'}, required=('state',))
+    permissions = ('ec2:DisableImage', 'ec2:EnableImage')
+
+    def validate(self):
+        botocore_min_version = '1.31.63'
+        if LooseVersion(botocore.__version__) < LooseVersion(botocore_min_version):
+            raise PolicyValidationError(
+                "'set-disabled' action requires botocore version "
+                f'{botocore_min_version} or above. '
+                f'Installed version is {botocore.__version__}.'
+            )
+
+    def process(self, images):
+        client = local_session(self.manager.session_factory).client('ec2')
+        image_count = len(images)
+        images = self.filter_resources(images, 'OwnerId', self.manager.ctx.options.account_id)
+        if len(images) != image_count:
+            self.log.info("Implicitly filtered %d non owned images", image_count - len(images))
+
+        disable = self.data.get('state', False)
+        op = client.disable_image if disable else client.enable_image
+
+        for i in images:
+            self.manager.retry(
+                op,
+                ignore_err_codes=('InvalidAMIID.NotFound',),
+                ImageId=i['ImageId'])
 
 
 @AMI.action_registry.register('remove-launch-permissions')
