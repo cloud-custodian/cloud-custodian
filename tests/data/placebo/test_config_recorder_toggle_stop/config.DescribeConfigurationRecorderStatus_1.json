@@ -1,0 +1,18 @@
+{
+    "status_code": 200,
+    "data": {
+        "ConfigurationRecordersStatus": [
+            {
+                "name": "default",
+                "recording": true,
+                "lastStatus": "SUCCESS"
+            }
+        ],
+        "ResponseMetadata": {
+            "RequestId": "a1b2c3d4-0001-0001-0001-000000000002",
+            "HTTPStatusCode": 200,
+            "HTTPHeaders": {},
+            "RetryAttempts": 0
+        }
+    }
+}
