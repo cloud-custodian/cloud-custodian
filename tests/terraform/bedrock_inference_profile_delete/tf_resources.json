@@ -1,0 +1,35 @@
+{
+    "pytest-terraform": 1,
+    "outputs": {},
+    "resources": {
+        "aws_bedrock_inference_profile": {
+            "test_profile": {
+                "arn": "arn:aws:bedrock:us-east-1:644160558196:application-inference-profile/1jxlkskto2ug",
+                "created_at": "2026-02-12T15:04:44Z",
+                "description": "Test profile for C7N delete action",
+                "id": "1jxlkskto2ug",
+                "model_source": [
+                    {
+                        "copy_from": "arn:aws:bedrock:us-east-1::inference-profile/global.amazon.nova-2-lite-v1:0"
+                    }
+                ],
+                "models": [
+                    {
+                        "model_arn": "arn:aws:bedrock:::foundation-model/amazon.nova-2-lite-v1:0"
+                    },
+                    {
+                        "model_arn": "arn:aws:bedrock:us-east-1::foundation-model/amazon.nova-2-lite-v1:0"
+                    }
+                ],
+                "name": "c7n-delete-test-50a38c5c",
+                "region": "us-east-1",
+                "status": "ACTIVE",
+                "tags": null,
+                "tags_all": {},
+                "timeouts": null,
+                "type": "APPLICATION",
+                "updated_at": "2026-02-12T15:04:44Z"
+            }
+        }
+    }
+}

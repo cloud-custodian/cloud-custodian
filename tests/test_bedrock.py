@@ -1,5 +1,7 @@
 # Copyright The Cloud Custodian Authors.
 # SPDX-License-Identifier: Apache-2.0
+import logging
+
 from .common import BaseTest, event_data
 from botocore.exceptions import ClientError
 from pytest_terraform import terraform
@@ -341,3 +343,98 @@ def test_bedrock_application_inference_profile_tag_actions(
     test.assertNotIn('Owner', tag_dict)
     test.assertEqual(tag_dict['NewTag'], 'NewValue')  # Still there
     test.assertEqual(tag_dict['Environment'], 'test')  # Still there
+
+
+@terraform('bedrock_inference_profile_delete')
+def test_bedrock_inference_profile_delete(test, bedrock_inference_profile_delete):
+    session_factory = test.replay_flight_data('test_bedrock_inference_profile_delete')
+    client = session_factory().client('bedrock')
+
+    profile_arn = bedrock_inference_profile_delete[
+        'aws_bedrock_inference_profile.test_profile.arn']
+
+    # Verify the profile exists before deletion
+    profiles = client.list_inference_profiles(typeEquals='APPLICATION')['inferenceProfileSummaries']
+    test.assertEqual(len(profiles), 1)
+    test.assertEqual(profiles[0]['inferenceProfileArn'], profile_arn)
+
+    # Run delete policy
+    p = test.load_policy(
+        {
+            'name': 'bedrock-inference-profile-delete',
+            'resource': 'bedrock-inference-profile',
+            'filters': [
+                {'inferenceProfileArn': profile_arn},
+            ],
+            'actions': [
+                {'type': 'delete'}
+            ]
+        }, session_factory=session_factory
+    )
+    resources = p.run()
+    test.assertEqual(len(resources), 1)
+    test.assertEqual(resources[0]['inferenceProfileArn'], profile_arn)
+
+    # Verify the profile was deleted
+    profiles = client.list_inference_profiles(typeEquals='APPLICATION')['inferenceProfileSummaries']
+    test.assertEqual(len(profiles), 0)
+
+
+def test_bedrock_inference_profile_delete_not_found(test):
+    session_factory = test.replay_flight_data('test_bedrock_inference_profile_delete_not_found')
+
+    # Run delete policy
+    p = test.load_policy(
+        {
+            'name': 'bedrock-inference-profile-delete',
+            'resource': 'bedrock-inference-profile',
+            'filters': [
+                {
+                    'type': 'value',
+                    'key': 'inferenceProfileName',
+                    'op': 'contains',
+                    'value': 'c7n-delete-test'
+                },
+            ],
+            'actions': [
+                {'type': 'delete'}
+            ]
+        }, session_factory=session_factory
+    )
+    resources = p.run()
+    test.assertEqual(len(resources), 1)
+
+    # There's nothing to test here. The error was suppressed if we've gotten to this point
+
+
+def test_bedrock_inference_profile_delete_conflict(test, caplog):
+    session_factory = test.replay_flight_data('test_bedrock_inference_profile_delete_conflict')
+
+    # Run delete policy
+    p = test.load_policy(
+        {
+            'name': 'bedrock-inference-profile-delete',
+            'resource': 'bedrock-inference-profile',
+            'filters': [
+                {
+                    'type': 'value',
+                    'key': 'inferenceProfileName',
+                    'op': 'contains',
+                    'value': 'c7n-delete-test'
+                },
+            ],
+            'actions': [
+                {'type': 'delete'}
+            ]
+        }, session_factory=session_factory
+    )
+
+    with caplog.at_level(logging.WARNING):
+        resources = p.run()
+
+    test.assertEqual(len(resources), 1)
+
+    test.assertIn(
+        'Unable to delete inference profile arn:aws:bedrock:us-east-1:644160558196:application-inference-profile/1jxlkskto2ug',  # noqa
+        caplog.text
+    )

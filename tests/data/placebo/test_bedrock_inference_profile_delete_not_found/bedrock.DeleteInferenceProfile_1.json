@@ -1,0 +1,10 @@
+{
+    "status_code": 404,
+    "data": {
+        "ResponseMetadata": {},
+        "Error": {
+            "Message": "The specified resource Amazon Resource Name (ARN) was not found. Check the Amazon Resource Name (ARN) and try your request again.",
+            "Code": "ResourceNotFoundException"
+        }
+    }
+}
