@@ -11,7 +11,7 @@ from concurrent.futures import as_completed
 from c7n.actions import BaseAction
 from c7n.filters import Filter, ListItemFilter
 from c7n.manager import resources
-from c7n.query import QueryResourceManager, TypeInfo
+from c7n.query import ChildResourceManager, QueryResourceManager, TypeInfo
 from c7n.utils import local_session, type_schema
 from c7n.tags import RemoveTag, Tag
 
@@ -31,6 +31,18 @@ class CloudFormation(QueryResourceManager):
         name = 'StackName'
         date = 'CreationTime'
         cfn_type = config_type = 'AWS::CloudFormation::Stack'
+
+
+@resources.register('cfn-stack-resource')
+class CloudFormationStackResource(ChildResourceManager):
+    permissions = ('cloudformation:DescribeStackResources',)
+
+    class resource_type(TypeInfo):
+        service = 'cloudformation'
+        parent_spec = ('cfn', 'StackName', None)
+        enum_spec = ('describe_stack_resources', 'StackResources', None)
+        name = id = 'PhysicalResourceId'
+        arn = False
 
 
 @CloudFormation.action_registry.register('delete')
