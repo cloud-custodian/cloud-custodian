@@ -203,6 +203,36 @@ def test_sqs_remove_matched(test, sqs_remove_matched):
     test.assertEqual([s["Sid"] for s in data.get("Statement", ())], ["SpecificAllow"])
 
 
+@terraform('sqs_remove_matched_empty_sid')
+def test_sqs_remove_matched_empty_sid(test, sqs_remove_matched_empty_sid):
+    session_factory = test.replay_flight_data("test_sqs_remove_matched_empty_sid")
+    queue_arn = sqs_remove_matched_empty_sid['aws_sqs_queue.test_sqs.arn']
+    client = session_factory().client("sqs")
+
+    p = test.load_policy(
+        {
+            "name": "sqs-rm-matched-empty-sid",
+            "resource": "sqs",
+            "filters": [
+                {"QueueArn": queue_arn},
+                {"type": "cross-account", "everyone_only": True},
+            ],
+            "actions": [{"type": "remove-statements", "statement_ids": "matched"}],
+        },
+        session_factory=session_factory,
+    )
+    resources = p.run()
+
+    queue_url = resources[0]["QueueUrl"]
+    queue_attributes = client.get_queue_attributes(
+        QueueUrl=queue_url,
+        AttributeNames=["Policy"]
+    )
+    data = json.loads(queue_attributes["Attributes"]["Policy"])
+    # both cross-account statements (with and without sid) are deleted
+    test.assertEqual([s["Sid"] for s in data["Statement"]], ["SameAccount"])
+
+
 def test_sqs_get_resources_augment(test):
     session_factory = test.replay_flight_data("test_sqs_get_augment")
     p = test.load_policy(

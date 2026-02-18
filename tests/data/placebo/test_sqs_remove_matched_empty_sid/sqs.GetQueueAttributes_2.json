@@ -1,0 +1,9 @@
+{
+    "status_code": 200,
+    "data": {
+        "Attributes": {
+            "Policy": "{\"Version\":\"2012-10-17\",\"Statement\":[{\"Sid\":\"SameAccount\",\"Effect\":\"Allow\",\"Principal\":{\"AWS\":\"arn:aws:iam::644160558196:root\"},\"Action\":\"sqs:DeleteMessage\",\"Resource\":\"arn:aws:sqs:us-east-1:644160558196:test-sqs-remove-matched-empty-sid\"}]}"
+        },
+        "ResponseMetadata": {}
+    }
+}

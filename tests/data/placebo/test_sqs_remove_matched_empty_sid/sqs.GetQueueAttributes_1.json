@@ -1,0 +1,21 @@
+{
+    "status_code": 200,
+    "data": {
+        "Attributes": {
+            "QueueArn": "arn:aws:sqs:us-east-1:644160558196:test-sqs-remove-matched-empty-sid",
+            "ApproximateNumberOfMessages": "0",
+            "ApproximateNumberOfMessagesNotVisible": "0",
+            "ApproximateNumberOfMessagesDelayed": "0",
+            "CreatedTimestamp": "1766514077",
+            "LastModifiedTimestamp": "1766514102",
+            "VisibilityTimeout": "30",
+            "MaximumMessageSize": "262144",
+            "MessageRetentionPeriod": "345600",
+            "DelaySeconds": "0",
+            "Policy": "{\"Version\":\"2012-10-17\",\"Statement\":[{\"Sid\":\"WithSid\",\"Effect\":\"Allow\",\"Principal\":\"*\",\"Action\":\"sqs:SendMessage\",\"Resource\":\"arn:aws:sqs:us-east-1:644160558196:test-sqs-remove-matched-empty-sid\"},{\"Sid\":\"\",\"Effect\":\"Allow\",\"Principal\":\"*\",\"Action\":\"sqs:ReceiveMessage\",\"Resource\":\"arn:aws:sqs:us-east-1:644160558196:test-sqs-remove-matched-empty-sid\"},{\"Sid\":\"SameAccount\",\"Effect\":\"Allow\",\"Principal\":{\"AWS\":\"arn:aws:iam::644160558196:root\"},\"Action\":\"sqs:DeleteMessage\",\"Resource\":\"arn:aws:sqs:us-east-1:644160558196:test-sqs-remove-matched-empty-sid\"}]}",
+            "ReceiveMessageWaitTimeSeconds": "0",
+            "SqsManagedSseEnabled": "true"
+        },
+        "ResponseMetadata": {}
+    }
+}
