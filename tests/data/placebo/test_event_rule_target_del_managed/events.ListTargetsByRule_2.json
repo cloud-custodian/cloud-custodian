@@ -1,0 +1,12 @@
+{
+    "status_code": 200,
+    "data": {
+        "Targets": [
+            {
+                "Id": "EKSComputeManagedRule",
+                "Arn": "arn:aws:eks-compute:us-east-1:::"
+            }
+        ],
+        "ResponseMetadata": {}
+    }
+}
