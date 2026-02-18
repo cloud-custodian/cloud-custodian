@@ -1,0 +1,49 @@
+{
+    "status_code": 200,
+    "data": {
+        "Table": {
+            "AttributeDefinitions": [
+                {
+                    "AttributeName": "status",
+                    "AttributeType": "S"
+                },
+                {
+                    "AttributeName": "target",
+                    "AttributeType": "S"
+                }
+            ],
+            "TableName": "swarm_table",
+            "KeySchema": [
+                {
+                    "AttributeName": "target",
+                    "KeyType": "HASH"
+                },
+                {
+                    "AttributeName": "status",
+                    "KeyType": "RANGE"
+                }
+            ],
+            "TableStatus": "ACTIVE",
+            "CreationDateTime": {
+                "__class__": "datetime",
+                "year": 2022,
+                "month": 4,
+                "day": 8,
+                "hour": 11,
+                "minute": 53,
+                "second": 19,
+                "microsecond": 415000
+            },
+            "ProvisionedThroughput": {
+                "NumberOfDecreasesToday": 0,
+                "ReadCapacityUnits": 20,
+                "WriteCapacityUnits": 20
+            },
+            "TableSizeBytes": 37,
+            "ItemCount": 1,
+            "TableArn": "arn:aws:dynamodb:us-east-1:644160558196:table/swarm_table",
+            "TableId": "a2951ab2-1c7d-4a49-91be-be75cc619135"
+        },
+        "ResponseMetadata": {}
+    }
+}

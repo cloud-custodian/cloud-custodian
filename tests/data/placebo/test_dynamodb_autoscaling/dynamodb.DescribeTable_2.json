@@ -1,0 +1,54 @@
+{
+    "status_code": 200,
+    "data": {
+        "Table": {
+            "AttributeDefinitions": [
+                {
+                    "AttributeName": "GreenTableHashKey",
+                    "AttributeType": "S"
+                }
+            ],
+            "TableName": "328_dynamodb_table_red",
+            "KeySchema": [
+                {
+                    "AttributeName": "GreenTableHashKey",
+                    "KeyType": "HASH"
+                }
+            ],
+            "TableStatus": "ACTIVE",
+            "CreationDateTime": {
+                "__class__": "datetime",
+                "year": 2022,
+                "month": 8,
+                "day": 3,
+                "hour": 10,
+                "minute": 0,
+                "second": 7,
+                "microsecond": 657000
+            },
+            "ProvisionedThroughput": {
+                "NumberOfDecreasesToday": 0,
+                "ReadCapacityUnits": 0,
+                "WriteCapacityUnits": 0
+            },
+            "TableSizeBytes": 0,
+            "ItemCount": 0,
+            "TableArn": "arn:aws:dynamodb:us-east-1:644160558196:table/328_dynamodb_table_red",
+            "TableId": "0f13ac14-75e1-484b-b105-0dfc9622ea69",
+            "BillingModeSummary": {
+                "BillingMode": "PAY_PER_REQUEST",
+                "LastUpdateToPayPerRequestDateTime": {
+                    "__class__": "datetime",
+                    "year": 2022,
+                    "month": 8,
+                    "day": 3,
+                    "hour": 10,
+                    "minute": 0,
+                    "second": 7,
+                    "microsecond": 657000
+                }
+            }
+        },
+        "ResponseMetadata": {}
+    }
+}
