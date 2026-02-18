@@ -74,7 +74,7 @@ class SnsDelivery:
         return sns_addrs_to_resources_map
 
     def target_is_sns(self, target):
-        if target.startswith("arn:aws:sns"):
+        if target.startswith(("arn:aws:sns", "arn:aws-cn:sns", "arn:aws-us-gov:sns")):
             return True
         return False
 
