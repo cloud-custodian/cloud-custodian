@@ -1,8 +1,13 @@
 # Copyright The Cloud Custodian Authors.
 # SPDX-License-Identifier: Apache-2.0
+import inspect
+
+from typing import get_args
 
 from c7n_azure.provider import resources
 from c7n_azure.resources.arm import ArmResourceManager
+from c7n_azure.actions.base import AzureBaseAction
+from c7n_azure.utils import type_to_jsonschema, ResourceIdParser
 
 from c7n.filters.core import ValueFilter, type_schema
 
@@ -129,3 +134,65 @@ class AuthenticationFilter(ValueFilter):
             i['c7n:authentication'] = instance.serialize(keep_readonly=True)['properties']
 
         return super().__call__(i['c7n:authentication'])
+
+
+@WebApp.action_registry.register("update-configuration")
+class UpdateWebAppActionConfiguration(AzureBaseAction):
+    """
+    Updates a web app configuration
+    """
+
+    @staticmethod
+    def generate_schema():
+        from azure.identity import DefaultAzureCredential
+        from azure.mgmt.web import WebSiteManagementClient
+
+        sub_id = "00000000-0000-0000-0000-000000000000"
+        client = WebSiteManagementClient(credential=DefaultAzureCredential(), subscription_id=sub_id)
+        site_config_model = client.models().SiteConfigResource
+        model_signature = inspect.signature(site_config_model)
+
+        schema_dict = {}
+        required = []
+
+        for name, v in model_signature.parameters.items():
+
+            if name == "kwargs":
+                continue
+
+            schema_dict.setdefault(name, {})
+
+            if hasattr(v, "annotation"):
+                args = get_args(v.annotation)
+
+                if type(None) not in args:
+                    required.append(name)
+                else:
+                    args = list(args)
+                    args.remove(type(None))
+
+                if len(args) == 1:
+                    schema_dict[name]['type'] = args[0]
+
+                schema_dict[name] = type_to_jsonschema(args[0])
+
+        return type_schema(
+            "update-configuration",
+            required=required,
+            **{"configuration": {"type": "object", "properties": schema_dict}}
+        )
+
+    schema = generate_schema()
+
+    def _process_resource(self, resource, event=None):
+
+        client = self.manager.get_client().web_apps
+
+        group_name = ResourceIdParser().get_resource_group(resource["id"])
+        name = ResourceIdParser().get_resource_name(resource["id"])
+
+        client.create_or_update_configuration(
+            resource_group_name=group_name,
+            name=name,
+            site_config=self.data.get("configuration")
+        )

@@ -10,8 +10,10 @@ import random
 import re
 import time
 import uuid
+
 from concurrent.futures import as_completed
 from functools import lru_cache
+from typing import Union, ForwardRef, get_args
 
 from azure.core.pipeline.policies import RetryMode, RetryPolicy
 from azure.graphrbac.models import DirectoryObject, GetObjectsParameters
@@ -647,3 +649,37 @@ def cost_query_override_api_version(request):
     request.http_request.url = request.http_request.url.replace(
         'query?api-version=2020-06-01',
         'query?api-version=2019-11-01')
+
+
+def type_to_jsonschema(input_type):
+    """
+    Takes a python type hint and turns into jsonschema
+    """
+
+    if input_type == str or input_type == datetime.datetime:
+        return {"type": "string"}
+    elif input_type == int:
+        return {"type": "number"}
+    elif input_type == bool:
+        return {"type": "boolean"}
+    elif isinstance(input_type, ForwardRef):
+        return {"type": "object"}
+    elif input_type == Union:
+        return {
+            "anyOf": [
+                type_to_jsonschema(x) for x in get_args(input_type)
+            ]
+        }
+    elif hasattr(input_type, "_name") and input_type._name == "List":
+        return {
+            "type": "array",
+            "items": type_to_jsonschema(get_args(input_type)[0]),
+        }
+    elif hasattr(input_type, "_name") and input_type._name == "Dict":
+        return {
+            "anyOf": [
+                type_to_jsonschema(x) for x in get_args(input_type)
+            ]
+        }
+    else:
+        return {"type": "object"}
