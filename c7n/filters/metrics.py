@@ -73,6 +73,7 @@ class MetricsFilter(Filter):
         'metrics',
         **{'namespace': {'type': 'string'},
            'name': {'type': 'string'},
+           'retrieve-all-dimensions': {'type': 'boolean', 'default': False},
            'dimensions': {
                'type': 'object',
                'patternProperties': {
@@ -255,8 +256,95 @@ class MetricsFilter(Filter):
             params[stats_key] = [self.statistics]
 
             if key not in collected_metrics:
-                collected_metrics[key] = client.get_metric_statistics(
-                    **params)['Datapoints']
+
+                # If the user set parameter `retrieve-all-dimensions` to True,
+                # we will be using another set of APIs:
+                # * `list_metrics()` to retrieve all existing metrics variations (dimension)
+                #   that have data
+                # * `get_metric_data()` to fetch all these metrics + compute the sum()
+                #
+                # We could use `get_metric_statistics()` in a loop but it could be
+                # slower and costlier.
+                if self.data.get('retrieve-all-dimensions'):
+
+                    # First, let's retrieve *all* dimensions for this bucket and
+                    # metric name.
+                    # This way the user does not have to hard-code all metrics
+                    # dimension, esp. when it's involving the StorageType.
+                    params = dict(
+                        Namespace=self.namespace,
+                        MetricName=self.metric,
+                        Dimensions=dimensions
+                    )
+                    metrics = client.list_metrics(**params)['Metrics']
+
+                    # Based on this result, we build the query for `get_metric_data()`:
+                    # * fetch all variations of this metric (Dimensions)
+                    m_index = 0
+                    mdqs = []
+                    id_metric_name = {}
+                    initial_dimensions_names = [d['Name'] for d in dimensions]
+                    for m in metrics:
+                        id = "m%d" % (m_index)
+                        metric_dimensions = m['Dimensions']
+                        metric_name_list = []
+                        for d in metric_dimensions:
+                            if d['Name'] not in initial_dimensions_names:
+                                metric_name_list.append(d['Value'])
+                        # if len(metric_name_list) > 0:
+                        id_metric_name[id] = '_'.join(sorted(metric_name_list))
+                        mdq = dict(
+                            Id=id,
+                            MetricStat={
+                                'Metric': m,
+                                'Stat': self.statistics,
+                                'Period': self.period,
+                            },
+                        )
+                        mdqs.append(mdq)
+                        m_index += 1
+
+                    # * compute the `SUM()`
+                    mdqs.append(dict(
+                        Id='total',
+                        Expression='SUM(METRICS())',
+                    ))
+
+                    params = dict(
+                        MetricDataQueries=mdqs,
+                        StartTime=self.start,
+                        EndTime=self.end,
+                    )
+
+                    metric_data = client.get_metric_data(
+                        **params)
+
+                    # Now we will tweak the results to put them in the expected
+                    # format, and store them:
+                    # - The `SUM()` will be stored in `collected_metrics[key]`
+                    # - The individual dimensions/variations are stored in (a new)
+                    #   `collected_metrics[key2]` where key2 = key + '.' + DimensionName
+                    for mdr in metric_data['MetricDataResults']:
+                        id = mdr['Id']
+                        metric_name = id_metric_name.get(id, 'total')
+                        results = []
+                        for item in zip(mdr['Timestamps'], mdr['Values']):
+                            individual_result = {
+                                'Timestamp': item[0],
+                                self.statistics: item[1],
+                            }
+                            results.append(individual_result)
+
+                        if len(metric_name) > 0:
+                            if metric_name == 'total':
+                                m_key = key
+                            else:
+                                m_key = "%s.%s" % (key, metric_name)
+
+                            collected_metrics[m_key] = results
+                else:
+                    collected_metrics[key] = client.get_metric_statistics(
+                        **params)['Datapoints']
 
             # In certain cases CloudWatch reports no data for a metric.
             # If the policy specifies a fill value for missing data, add
