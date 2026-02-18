@@ -11,7 +11,7 @@ from c7n_gcp.provider import resources
 
 
 ALLOWED_NOPERM = set((
-    'or', 'and', 'not', 'value', 'reduce',
+    'or', 'and', 'not', 'value', 'reduce', 'related',
     'offhour', 'onhour', 'marked-for-op',
     'event', 'webhook', 'missing', 'list-item',
     'recommend'  # this requires configuration to determine permission
