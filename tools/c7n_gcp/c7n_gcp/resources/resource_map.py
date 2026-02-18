@@ -75,12 +75,14 @@ ResourceMap = {
     "gcp.loadbalancer-target-http-proxy": (
         "c7n_gcp.resources.loadbalancer.LoadBalancingTargetHttpProxy"),
     "gcp.loadbalancer-target-https-proxy": (
-        "c7n_gcp.resources.loadbalancer.LoadBalancingTargetHttpsProxy"),
+        "c7n_gcp.resources.loadbalancer.LoadBalancerTargetHttpsProxy"),
+    "gcp.loadbalancer-backend-ssl-policy": (
+        "c7n_gcp.resources.loadbalancer.LoadBalancerBackendSslPolicy"),
     "gcp.loadbalancer-target-instance": (
         "c7n_gcp.resources.loadbalancer.LoadBalancingTargetInstance"),
     "gcp.loadbalancer-target-pool": "c7n_gcp.resources.loadbalancer.LoadBalancingTargetPool",
     "gcp.loadbalancer-target-ssl-proxy": (
-        "c7n_gcp.resources.loadbalancer.LoadBalancingTargetSslProxy"),
+        "c7n_gcp.resources.loadbalancer.LoadBalancerSslPolicy"),
     "gcp.loadbalancer-target-tcp-proxy": (
         "c7n_gcp.resources.loadbalancer.LoadBalancingTargetTcpProxy"),
     "gcp.loadbalancer-url-map": "c7n_gcp.resources.loadbalancer.LoadBalancingUrlMap",

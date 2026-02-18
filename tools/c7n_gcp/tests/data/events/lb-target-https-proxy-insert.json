@@ -1,0 +1,106 @@
+{
+  "protoPayload": {
+    "@type": "type.googleapis.com/google.cloud.audit.AuditLog",
+    "authenticationInfo": {
+      "principalEmail": "admin@custodianorg.net"
+    },
+    "requestMetadata": {
+      "callerIp": "37.214.45.22",
+      "callerSuppliedUserAgent": "Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_6) AppleWebKit/605.1.15 (KHTML, like Gecko) Version/14.0.3 Safari/605.1.15,gzip(gfe),gzip(gfe)",
+      "requestAttributes": {
+        "time": "2021-03-09T08:44:29.757497Z",
+        "reason": "8uSywAYQGg5Db2xpc2V1bSBGbG93cw",
+        "auth": {}
+      },
+      "destinationAttributes": {}
+    },
+    "serviceName": "compute.googleapis.com",
+    "methodName": "v1.compute.targetHttpsProxies.insert",
+    "authorizationInfo": [
+      {
+        "permission": "compute.targetHttpsProxies.create",
+        "granted": true,
+        "resourceAttributes": {
+          "service": "compute",
+          "name": "projects/cloud-custodian/global/targetHttpsProxies/lb-target-proxy",
+          "type": "compute.targetHttpsProxies"
+        }
+      },
+      {
+        "permission": "compute.urlMaps.use",
+        "granted": true,
+        "resourceAttributes": {
+          "service": "compute",
+          "name": "projects/cloud-custodian/global/urlMaps/lb",
+          "type": "compute.urlMaps"
+        }
+      },
+      {
+        "permission": "compute.sslCertificates.get",
+        "granted": true,
+        "resourceAttributes": {
+          "service": "compute",
+          "name": "projects/cloud-custodian/global/sslCertificates/cert-non-lb",
+          "type": "compute.sslCertificates"
+        }
+      },
+      {
+        "permission": "compute.sslPolicies.use",
+        "granted": true,
+        "resourceAttributes": {
+          "service": "compute",
+          "name": "projects/cloud-custodian/global/sslPolicies/valid-security-policy",
+          "type": "compute.sslPolicies"
+        }
+      }
+    ],
+    "resourceName": "projects/cloud-custodian/global/targetHttpsProxies/lb-target-proxy",
+    "request": {
+      "name": "lb-target-proxy",
+      "sslCertificates": [
+        "projects/cloud-custodian/global/sslCertificates/cert-non-lb"
+      ],
+      "@type": "type.googleapis.com/compute.targetHttpsProxies.insert",
+      "urlMap": "projects/cloud-custodian/global/urlMaps/lb",
+      "quicOverride": "NONE",
+      "sslPolicy": "projects/cloud-custodian/global/sslPolicies/valid-security-policy"
+    },
+    "response": {
+      "name": "operation-1615279469087-5bd168ef7ccd6-9f996aca-e55a1e46",
+      "selfLink": "https://www.googleapis.com/compute/v1/projects/cloud-custodian/global/operations/operation-1615279469087-5bd168ef7ccd6-9f996aca-e55a1e46",
+      "status": "RUNNING",
+      "@type": "type.googleapis.com/operation",
+      "operationType": "insert",
+      "selfLinkWithId": "https://www.googleapis.com/compute/v1/projects/cloud-custodian/global/operations/6053391510788541314",
+      "startTime": "2021-03-09T00:44:29.453-08:00",
+      "user": "admin@custodianorg.net",
+      "progress": "0",
+      "id": "6053391510788541314",
+      "insertTime": "2021-03-09T00:44:29.438-08:00",
+      "targetId": "6610027127845325698",
+      "targetLink": "https://www.googleapis.com/compute/v1/projects/cloud-custodian/global/targetHttpsProxies/lb-target-proxy"
+    },
+    "resourceLocation": {
+      "currentLocations": [
+        "global"
+      ]
+    }
+  },
+  "insertId": "-9fkf9wdnm1y",
+  "resource": {
+    "type": "gce_target_https_proxy",
+    "labels": {
+      "project_id": "cloud-custodian",
+      "target_https_proxy_id": "6610027127845325698"
+    }
+  },
+  "timestamp": "2021-03-09T08:44:29.126208Z",
+  "severity": "NOTICE",
+  "logName": "projects/cloud-custodian/logs/cloudaudit.googleapis.com%2Factivity",
+  "operation": {
+    "id": "operation-1615279469087-5bd168ef7ccd6-9f996aca-e55a1e46",
+    "producer": "compute.googleapis.com",
+    "first": true
+  },
+  "receiveTimestamp": "2021-03-09T08:44:30.561390056Z"
+}
