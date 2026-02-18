@@ -936,6 +936,8 @@ class Resize(Action):
                 actions:
                   - type: resize
                     restore-options-tag: OffHoursPrevious
+                    # optionally set a max-count to limit the # of instances increased or decreased
+                    max-count: 10
 
     """
 
@@ -944,6 +946,7 @@ class Resize(Action):
         **{
             'min-size': {'type': 'integer', 'minimum': 0},
             'max-size': {'type': 'integer', 'minimum': 0},
+            'max-count': {'type': 'integer', 'minimum': 0},
             'desired-size': {
                 "anyOf": [
                     {'enum': ["current"]},
@@ -981,6 +984,7 @@ class Resize(Action):
             update = {}
             current_size = len(a['Instances'])
 
+            max_count = int(self.data.get('max-count', 0))
             if 'restore-options-tag' in self.data:
                 # we want to restore all ASG size params from saved data
                 self.log.debug(
@@ -990,7 +994,11 @@ class Resize(Action):
                     for field in tag_map[self.data['restore-options-tag']].split(';'):
                         (param, value) = field.split('=')
                         if param in asg_params:
-                            update[param] = int(value)
+                            if param == 'DesiredCapacity':
+                                update[param] = self.process_desired_capacity(
+                                    current_size, value, max_count)
+                            else:
+                                update[param] = int(value)
 
             else:
                 # we want to resize, parse provided params
@@ -1008,7 +1016,8 @@ class Resize(Action):
                             # ensure it is at least as low as current_size
                             update['MinSize'] = min(current_size, a['MinSize'])
                     elif isinstance(self.data['desired-size'], int):
-                        update['DesiredCapacity'] = self.data['desired-size']
+                        update['DesiredCapacity'] = self.process_desired_capacity(
+                            current_size, self.data['desired-size'], max_count)
 
             if update:
                 self.log.debug('ASG %s size: current=%d, min=%d, max=%d, desired=%d'
@@ -1036,6 +1045,21 @@ class Resize(Action):
                     **update)
             else:
                 self.log.debug('nothing to resize')
+
+    def process_desired_capacity(self, current_capacity, desired_capacity, max_count):
+        # if max count is set
+        if max_count > 0:
+            # calculate the difference between the desired capacity and the current size
+            diff = int(desired_capacity) - int(current_capacity)
+            # update count is the min of the difference and max count
+            update_count = min(abs(diff), max_count)
+            # if the difference is negative, we need to subtract the count
+            if diff < 0:
+                update_count *= -1
+            return int(current_capacity) + update_count
+        else:
+            # if the max count is unset, use the desired_capacity from the tag
+            return int(desired_capacity)
 
 
 @ASG.action_registry.register('remove-tag')
