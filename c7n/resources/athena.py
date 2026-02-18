@@ -4,8 +4,10 @@ from c7n.actions import Action
 from c7n.manager import resources
 from c7n import query
 from c7n.utils import type_schema, local_session
+from c7n.filters.core import ValueFilter
 
 from .aws import shape_validate
+from botocore.exceptions import ClientError
 
 
 @resources.register("athena-named-query")
@@ -104,3 +106,50 @@ class DeleteReservation(Action):
         client = local_session(self.manager.session_factory).client("athena")
         for r in self.filter_resources(resources, "Status", ("ACTIVE", "PENDING")):
             client.cancel_capacity_reservation(Name=r["Name"])
+
+
+@resources.register("athena-query-execution")
+class AthenaQueryExecution(query.QueryResourceManager):
+    class resource_type(query.TypeInfo):
+        service = "athena"
+        enum_spec = ("list_query_executions", "QueryExecutionIds", None)
+        detail_spec = ("get_query_execution", "QueryExecutionId", None, "QueryExecution")
+        batch_detail_spec = (
+            "batch_get_query_execution",
+            "QueryExecutionIds",
+            None,
+            "QueryExecutions",
+            None,
+        )
+        arn = False
+        id = "QueryExecutionId"
+        name = "QueryExecutionId"
+
+
+@AthenaQueryExecution.filter_registry.register("runtime-statistics")
+class RuntimeStatisticsFilter(ValueFilter):
+    schema = type_schema("runtime-statistics", rinherit=ValueFilter.schema)
+    permissions = ("athena:GetQueryRuntimeStatistics",)
+
+    def process(self, resources, event=None):
+        client = local_session(self.manager.session_factory).client("athena")
+        for r in resources:
+            if "QueryExecutionId" not in r:
+                # Ensure we have full detail loaded via batch detail
+                continue
+            # Fetch on-demand and attach for filtering
+            try:
+                resp = client.get_query_runtime_statistics(
+                    QueryExecutionId=r["QueryExecutionId"]
+                )
+                stats = resp.get("QueryRuntimeStatistics")
+                if stats is not None:
+                    r["QueryRuntimeStatistics"] = stats
+            except ClientError as e:
+                error = e.response.get("Error", {})
+                code = error.get("Code")
+                if code == "InvalidRequestException":
+                    # Query is gone or never existed (stale execution ids). Skip silently.
+                    continue
+                raise
+        return super(RuntimeStatisticsFilter, self).process(resources, event)

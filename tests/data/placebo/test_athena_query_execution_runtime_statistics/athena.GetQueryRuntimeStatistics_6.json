@@ -1,0 +1,43 @@
+{
+    "status_code": 200,
+    "data": {
+        "QueryRuntimeStatistics": {
+            "Timeline": {
+                "QueryQueueTimeInMillis": 111,
+                "ServicePreProcessingTimeInMillis": 63,
+                "QueryPlanningTimeInMillis": 445,
+                "EngineExecutionTimeInMillis": 976,
+                "ServiceProcessingTimeInMillis": 23,
+                "TotalExecutionTimeInMillis": 1173
+            },
+            "Rows": {
+                "InputRows": 0,
+                "InputBytes": 0,
+                "OutputBytes": 0,
+                "OutputRows": 0
+            },
+            "OutputStage": {
+                "StageId": 0,
+                "State": "FINISHED",
+                "OutputBytes": 0,
+                "OutputRows": 0,
+                "InputBytes": 0,
+                "InputRows": 0,
+                "ExecutionTime": 0,
+                "QueryStagePlan": {
+                    "Name": "Output",
+                    "Identifier": "{\"columnNames\":\"[sku, offertermcode, ratecode, termtype, pricedescription, effectivedate, startingrange, endingrange, unit, priceperunit, currency, leasecontractlength, purchaseoption, offeringclass, product family, servicecode, location, location type, instance type, current generation, instance family, vcpu, physical processor, clock speed, memory, storage, network performance, processor architecture, storage media, volume type, max volume size, max iops/volume, max iops burst performance, max throughput/volume, provisioned, tenancy, ebs optimized, operating system, license model, group, group description, transfer type, from location, from location type, to location, to location type, usagetype, operation, availabilityzone, capacitystatus, classicnetworkingsupport, dedicated ebs throughput, ecu, elastic graphics type, enhanced networking supported, from region code, gpu, gpu memory, instance, instance capacity - 10xlarge, instance capacity - 12xlarge, instance capacity - 16xlarge, instance capacity - 18xlarge, instance capacity - 24xlarge, instance capacity - 2xlarge, instance capacity - 32xlarge, instance capacity - 4xlarge, instance capacity - 8xlarge, instance capacity - 9xlarge, instance capacity - large, instance capacity - medium, instance capacity - metal, instance capacity - xlarge, instancesku, intel avx available, intel avx2 available, intel turbo available, marketoption, normalization size factor, physical cores, pre installed s/w, processor features, product type, region code, resource type, servicename, snapshotarchivefeetype, to region code, volume api name, vpcnetworkingsupport, partition_0]\"}",
+                    "Children": [
+                        {
+                            "Name": "TableScan",
+                            "Identifier": "{\"table\":\"awsdatacatalog:aws_pricing:amazonec2\"}",
+                            "Children": []
+                        }
+                    ]
+                },
+                "SubStages": []
+            }
+        },
+        "ResponseMetadata": {}
+    }
+}
