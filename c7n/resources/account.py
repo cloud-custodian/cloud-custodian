@@ -431,7 +431,7 @@ class GuardDutyEnabled(MultiAttrFilter):
     def validate(self):
         attrs = set()
         for k in self.data:
-            if k.startswith('Detector') or k.startswith('Master'):
+            if k.startswith('Detector') or k.startswith('Administrator'):
                 attrs.add(k)
         self.multi_attrs = attrs
         return super(GuardDutyEnabled, self).validate()
