@@ -1211,3 +1211,16 @@ def get_path(path: str, resource: dict):
 def jmespath_compile(expression):
     parsed = C7NJMESPathParser().parse(expression)
     return parsed
+
+    
+def lambda_cwe_policy_delta(json_array, func_name, source_arn):
+    """ Given a json array of lambda resource policy, check if the policy already exists
+    
+    """
+    if not json_array:
+        return True
+    for item in json_array:
+        if item['Sid'] == func_name:
+            if item['Condition']['ArnLike']['AWS:SourceArn'] == source_arn:
+                return False
+    return True
