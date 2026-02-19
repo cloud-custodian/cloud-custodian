@@ -7,6 +7,7 @@ from c7n.executor import MainThreadExecutor
 from c7n.resources.secretsmanager import SecretsManager
 from unittest.mock import patch, MagicMock
 from botocore.exceptions import ClientError
+from freezegun import freeze_time
 
 
 class TestSecretsManager(BaseTest):
@@ -361,7 +362,7 @@ class TestSecretsManager(BaseTest):
         self.assertTrue(isinstance(resources[0]['c7n:Replicas'], list))
         self.assertEqual(len(resources[0]['c7n:Replicas']), 1)
         self.assertEqual(resources[0]['c7n:Replicas'][0]['Name'], 'c7n')
-
+    @freeze_time("2025-12-01")
     def test_secrets_manager_version_age(self):
         session_factory = self.replay_flight_data('test_secrets_manager_version_age')
         p = self.load_policy(
