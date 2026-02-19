@@ -1291,6 +1291,7 @@ class Policy:
             'op': '{op}',
             'action_date': '{action_date}',
             # tag action pyformat-date handling
+            'resource': utils.DeferredFormatString('resource'),
             # defer expansion until runtime for serverless modes
             'now': (
                 utils.DeferredFormatString('now')
