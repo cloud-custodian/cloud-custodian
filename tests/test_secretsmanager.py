@@ -7,6 +7,7 @@ from c7n.executor import MainThreadExecutor
 from c7n.resources.secretsmanager import SecretsManager
 from unittest.mock import patch, MagicMock
 from botocore.exceptions import ClientError
+from freezegun import freeze_time
 
 
 class TestSecretsManager(BaseTest):
@@ -56,10 +57,12 @@ class TestSecretsManager(BaseTest):
     def test_secrets_manager_has_statement_filter(self):
         self.patch(SecretsManager, 'executor_factory', MainThreadExecutor)
         factory = self.replay_flight_data('test_secrets_manager_has_statement_filter')
-        p = self.load_policy({
-            'name': 'secrets-manager-has-statement',
-            'resource': 'secrets-manager',
-            'filters': [{
+        p = self.load_policy(
+            {
+                'name': 'secrets-manager-has-statement',
+                'resource': 'secrets-manager',
+                'filters': [
+                    {
                         "type": "has-statement",
                         "statements": [
                             {
@@ -67,11 +70,12 @@ class TestSecretsManager(BaseTest):
                                 "Action": "secretsmanager:GetSecretValue"
                             }
                         ]
-                        }]
-        },
-            session_factory=factory)
+                    }
+                ]
+            },
+            session_factory=factory
+        )
         resources = p.run()
-
         self.assertEqual(len(resources), 1)
 
     def test_secrets_manager_tag_resource(self):
@@ -158,15 +162,15 @@ class TestSecretsManager(BaseTest):
             {
                 'name': 'secrets-manager-set-key',
                 'resource': 'aws.secrets-manager',
-                'filters': [{'Name': 'ewerwrwe'}],
-                'actions': [{'type': 'set-encryption', 'key': 'alias/qewrqwer'}]
+                'filters': [{'Name': 'cloud-custodion-test'}],
+                'actions': [{'type': 'set-encryption', 'key': 'alias/cloud-custodion-test'}]
             },
             session_factory=session_factory
         )
         resources = p.run()
         self.assertEqual(len(resources), 1)
         response = client.describe_secret(SecretId=resources[0]['Name'])
-        self.assertEqual(response['KmsKeyId'], 'alias/qewrqwer')
+        self.assertEqual(response['KmsKeyId'], 'alias/cloud-custodion-test')
 
     def test_secretsmanager_remove_matched(self):
         self.patch(SecretsManager, 'executor_factory', MainThreadExecutor)
@@ -266,7 +270,7 @@ class TestSecretsManager(BaseTest):
             "resource": "aws.secrets-manager",
         }, session_factory=session_factory)
         resources = p.run()
-        self.assertEqual(len(resources), 2)
+        self.assertEqual(len(resources), 2 ,resources)
         self.assertIsInstance(resources[0].get('VersionIdsToStages'), dict)
         self.assertEqual(resources[1].get('VersionIdsToStages'), None)
         self.assertEqual(resources[1]['c7n:DeniedMethods'], ['describe_secret'])
@@ -292,7 +296,7 @@ class TestSecretsManager(BaseTest):
             },
             "DescribeSecret"
         )
-        # When .client('secretsmanager', region_name='us-west-2') is called, return replica_client
+        # When .client('secretsmanager', region_name='us-west-1') is called, return replica_client
 
         def client_side_effect(service_name, region_name=None):
             if region_name == "eu-west-1":
@@ -342,7 +346,7 @@ class TestSecretsManager(BaseTest):
                         'key': 'Name',
                         'value': 'c7n'
                     },
-                                        {
+                    {
                         'type': 'replica-attribute',
                         'key': 'LastAccessedDate',
                         'op': 'ge',
@@ -362,6 +366,7 @@ class TestSecretsManager(BaseTest):
         self.assertEqual(len(resources[0]['c7n:Replicas']), 1)
         self.assertEqual(resources[0]['c7n:Replicas'][0]['Name'], 'c7n')
 
+    @freeze_time("2025-12-01")
     def test_secrets_manager_version_age(self):
         session_factory = self.replay_flight_data('test_secrets_manager_version_age')
         p = self.load_policy(
