@@ -1,0 +1,30 @@
+{
+    "status_code": 200,
+    "data": {
+        "PaginationToken": "",
+        "ResourceTagMappingList": [
+            {
+                "ResourceARN": "arn:aws:bedrock:us-east-1:644160558196:application-inference-profile/2gik196ltpaz",
+                "Tags": [
+                    {
+                        "Key": "Owner",
+                        "Value": "c7n"
+                    },
+                    {
+                        "Key": "AnotherTag",
+                        "Value": "AnotherValue"
+                    },
+                    {
+                        "Key": "Environment",
+                        "Value": "test"
+                    },
+                    {
+                        "Key": "NewTag",
+                        "Value": "NewValue"
+                    }
+                ]
+            }
+        ],
+        "ResponseMetadata": {}
+    }
+}

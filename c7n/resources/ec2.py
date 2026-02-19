@@ -1278,7 +1278,7 @@ class InstanceFinding(PostFinding):
         instance = {
             "Type": self.resource_type,
             "Id": "arn:{}:ec2:{}:{}:instance/{}".format(
-                utils.REGION_PARTITION_MAP.get(self.manager.config.region, 'aws'),
+                utils.get_partition(self.manager.config.region),
                 self.manager.config.region,
                 self.manager.config.account_id,
                 r["InstanceId"]),
@@ -1946,8 +1946,8 @@ class AutorecoverAlarm(BaseAction):
                 ActionsEnabled=True,
                 AlarmActions=[
                     'arn:{}:automate:{}:ec2:recover'.format(
-                        utils.REGION_PARTITION_MAP.get(
-                            self.manager.config.region, 'aws'),
+                        utils.get_partition(
+                            self.manager.config.region),
                         i['Placement']['AvailabilityZone'][:-1])
                 ],
                 MetricName='StatusCheckFailed_System',

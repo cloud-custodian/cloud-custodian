@@ -1,0 +1,13 @@
+{
+    "pytest-terraform": 1,
+    "outputs": {},
+    "resources": {
+        "aws_bedrock_model_invocation_job": {
+            "test_job": {
+                "arn": "arn:aws:bedrock:us-east-1:644160558196:model-invocation-job/abc123def456",
+                "id": "abc123def456",
+                "job_name": "c7n-batch-invocation"
+            }
+        }
+    }
+}

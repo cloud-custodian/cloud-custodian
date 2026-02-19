@@ -1,0 +1,781 @@
+{
+    "pytest-terraform": 1,
+    "outputs": {
+        "organization_basic_info": {
+            "value": {
+                "client_id": "00000000-0000-0000-0000-000000000000",
+                "country_letter_code": "US",
+                "display_name": "Test Organization",
+                "id": "00000000-0000-0000-0000-000000000000",
+                "marketing_contacts": [],
+                "object_id": "00000000-0000-0000-0000-000000000000",
+                "preferred_language": "en",
+                "privacy_profile": [],
+                "technical_contacts": [],
+                "tenant_id": "00000000-0000-0000-0000-000000000000"
+            },
+            "type": [
+                "object",
+                {
+                    "client_id": "string",
+                    "country_letter_code": "string",
+                    "display_name": "string",
+                    "id": "string",
+                    "marketing_contacts": [
+                        "tuple",
+                        []
+                    ],
+                    "object_id": "string",
+                    "preferred_language": "string",
+                    "privacy_profile": [
+                        "tuple",
+                        []
+                    ],
+                    "technical_contacts": [
+                        "tuple",
+                        []
+                    ],
+                    "tenant_id": "string"
+                }
+            ]
+        },
+        "organization_compliance": {
+            "value": {
+                "cis_compliance": {
+                    "controls": {
+                        "1.1": {
+                            "status": "compliant",
+                            "title": "Ensure that multi-factor authentication is enabled for all privileged users"
+                        },
+                        "1.2": {
+                            "status": "non_compliant",
+                            "title": "Ensure that there are no guest users"
+                        },
+                        "1.22": {
+                            "status": "compliant",
+                            "title": "Ensure that 'Security defaults' is 'Enabled'"
+                        },
+                        "1.3": {
+                            "status": "non_compliant",
+                            "title": "Ensure that there are no users with admin roles"
+                        },
+                        "1.4": {
+                            "status": "compliant",
+                            "title": "Ensure guest users are reviewed on a monthly basis"
+                        },
+                        "1.5": {
+                            "status": "compliant",
+                            "title": "Ensure that there are no users with permanent roles assigned"
+                        }
+                    },
+                    "version": "1.5.0"
+                },
+                "nist_compliance": {
+                    "controls": {
+                        "AC-2": {
+                            "status": "compliant",
+                            "title": "Account Management"
+                        },
+                        "AC-3": {
+                            "status": "compliant",
+                            "title": "Access Enforcement"
+                        },
+                        "AC-6": {
+                            "status": "partially_compliant",
+                            "title": "Least Privilege"
+                        },
+                        "IA-2": {
+                            "status": "compliant",
+                            "title": "Identification and Authentication"
+                        },
+                        "IA-5": {
+                            "status": "compliant",
+                            "title": "Authenticator Management"
+                        }
+                    },
+                    "framework": "NIST 800-53 Rev 5"
+                }
+            },
+            "type": [
+                "object",
+                {
+                    "cis_compliance": [
+                        "object",
+                        {
+                            "controls": [
+                                "object",
+                                {
+                                    "1.1": [
+                                        "object",
+                                        {
+                                            "status": "string",
+                                            "title": "string"
+                                        }
+                                    ],
+                                    "1.2": [
+                                        "object",
+                                        {
+                                            "status": "string",
+                                            "title": "string"
+                                        }
+                                    ],
+                                    "1.22": [
+                                        "object",
+                                        {
+                                            "status": "string",
+                                            "title": "string"
+                                        }
+                                    ],
+                                    "1.3": [
+                                        "object",
+                                        {
+                                            "status": "string",
+                                            "title": "string"
+                                        }
+                                    ],
+                                    "1.4": [
+                                        "object",
+                                        {
+                                            "status": "string",
+                                            "title": "string"
+                                        }
+                                    ],
+                                    "1.5": [
+                                        "object",
+                                        {
+                                            "status": "string",
+                                            "title": "string"
+                                        }
+                                    ]
+                                }
+                            ],
+                            "version": "string"
+                        }
+                    ],
+                    "nist_compliance": [
+                        "object",
+                        {
+                            "controls": [
+                                "object",
+                                {
+                                    "AC-2": [
+                                        "object",
+                                        {
+                                            "status": "string",
+                                            "title": "string"
+                                        }
+                                    ],
+                                    "AC-3": [
+                                        "object",
+                                        {
+                                            "status": "string",
+                                            "title": "string"
+                                        }
+                                    ],
+                                    "AC-6": [
+                                        "object",
+                                        {
+                                            "status": "string",
+                                            "title": "string"
+                                        }
+                                    ],
+                                    "IA-2": [
+                                        "object",
+                                        {
+                                            "status": "string",
+                                            "title": "string"
+                                        }
+                                    ],
+                                    "IA-5": [
+                                        "object",
+                                        {
+                                            "status": "string",
+                                            "title": "string"
+                                        }
+                                    ]
+                                }
+                            ],
+                            "framework": "string"
+                        }
+                    ]
+                }
+            ]
+        },
+        "organization_domains": {
+            "value": {
+                "domains": [
+                    {
+                        "authentication_type": "Managed",
+                        "domain_name": "mockdomain.com",
+                        "is_default": true,
+                        "is_initial": true,
+                        "is_verified": true
+                    },
+                    {
+                        "authentication_type": "Managed",
+                        "domain_name": "mockconf.com",
+                        "is_default": false,
+                        "is_initial": false,
+                        "is_verified": true
+                    },
+                    {
+                        "authentication_type": "Managed",
+                        "domain_name": "mockswarm.com",
+                        "is_default": false,
+                        "is_initial": false,
+                        "is_verified": true
+                    },
+                    {
+                        "authentication_type": "Managed",
+                        "domain_name": "mockpal.org",
+                        "is_default": false,
+                        "is_initial": false,
+                        "is_verified": true
+                    },
+                    {
+                        "authentication_type": "Managed",
+                        "domain_name": "mockaws.com",
+                        "is_default": false,
+                        "is_initial": false,
+                        "is_verified": true
+                    },
+                    {
+                        "authentication_type": "Managed",
+                        "domain_name": "mockaws.org",
+                        "is_default": false,
+                        "is_initial": false,
+                        "is_verified": true
+                    },
+                    {
+                        "authentication_type": "Managed",
+                        "domain_name": "mockpy.org",
+                        "is_default": false,
+                        "is_initial": false,
+                        "is_verified": true
+                    },
+                    {
+                        "authentication_type": "Managed",
+                        "domain_name": "mockpy.com",
+                        "is_default": false,
+                        "is_initial": false,
+                        "is_verified": true
+                    },
+                    {
+                        "authentication_type": "Managed",
+                        "domain_name": "mockcompany.onmicrosoft.com",
+                        "is_default": false,
+                        "is_initial": false,
+                        "is_verified": true
+                    },
+                    {
+                        "authentication_type": "Managed",
+                        "domain_name": "mockcompany.com",
+                        "is_default": false,
+                        "is_initial": false,
+                        "is_verified": true
+                    },
+                    {
+                        "authentication_type": "Managed",
+                        "domain_name": "mockwebconf.com",
+                        "is_default": false,
+                        "is_initial": false,
+                        "is_verified": true
+                    },
+                    {
+                        "authentication_type": "Managed",
+                        "domain_name": "MOCK1234567890ABCDEF.mockcloud.example",
+                        "is_default": false,
+                        "is_initial": false,
+                        "is_verified": true
+                    },
+                    {
+                        "authentication_type": "Managed",
+                        "domain_name": "mockshort.com",
+                        "is_default": false,
+                        "is_initial": false,
+                        "is_verified": true
+                    }
+                ]
+            },
+            "type": [
+                "object",
+                {
+                    "domains": [
+                        "tuple",
+                        [
+                            [
+                                "object",
+                                {
+                                    "authentication_type": "string",
+                                    "domain_name": "string",
+                                    "is_default": "bool",
+                                    "is_initial": "bool",
+                                    "is_verified": "bool"
+                                }
+                            ],
+                            [
+                                "object",
+                                {
+                                    "authentication_type": "string",
+                                    "domain_name": "string",
+                                    "is_default": "bool",
+                                    "is_initial": "bool",
+                                    "is_verified": "bool"
+                                }
+                            ],
+                            [
+                                "object",
+                                {
+                                    "authentication_type": "string",
+                                    "domain_name": "string",
+                                    "is_default": "bool",
+                                    "is_initial": "bool",
+                                    "is_verified": "bool"
+                                }
+                            ],
+                            [
+                                "object",
+                                {
+                                    "authentication_type": "string",
+                                    "domain_name": "string",
+                                    "is_default": "bool",
+                                    "is_initial": "bool",
+                                    "is_verified": "bool"
+                                }
+                            ],
+                            [
+                                "object",
+                                {
+                                    "authentication_type": "string",
+                                    "domain_name": "string",
+                                    "is_default": "bool",
+                                    "is_initial": "bool",
+                                    "is_verified": "bool"
+                                }
+                            ],
+                            [
+                                "object",
+                                {
+                                    "authentication_type": "string",
+                                    "domain_name": "string",
+                                    "is_default": "bool",
+                                    "is_initial": "bool",
+                                    "is_verified": "bool"
+                                }
+                            ],
+                            [
+                                "object",
+                                {
+                                    "authentication_type": "string",
+                                    "domain_name": "string",
+                                    "is_default": "bool",
+                                    "is_initial": "bool",
+                                    "is_verified": "bool"
+                                }
+                            ],
+                            [
+                                "object",
+                                {
+                                    "authentication_type": "string",
+                                    "domain_name": "string",
+                                    "is_default": "bool",
+                                    "is_initial": "bool",
+                                    "is_verified": "bool"
+                                }
+                            ],
+                            [
+                                "object",
+                                {
+                                    "authentication_type": "string",
+                                    "domain_name": "string",
+                                    "is_default": "bool",
+                                    "is_initial": "bool",
+                                    "is_verified": "bool"
+                                }
+                            ],
+                            [
+                                "object",
+                                {
+                                    "authentication_type": "string",
+                                    "domain_name": "string",
+                                    "is_default": "bool",
+                                    "is_initial": "bool",
+                                    "is_verified": "bool"
+                                }
+                            ],
+                            [
+                                "object",
+                                {
+                                    "authentication_type": "string",
+                                    "domain_name": "string",
+                                    "is_default": "bool",
+                                    "is_initial": "bool",
+                                    "is_verified": "bool"
+                                }
+                            ],
+                            [
+                                "object",
+                                {
+                                    "authentication_type": "string",
+                                    "domain_name": "string",
+                                    "is_default": "bool",
+                                    "is_initial": "bool",
+                                    "is_verified": "bool"
+                                }
+                            ],
+                            [
+                                "object",
+                                {
+                                    "authentication_type": "string",
+                                    "domain_name": "string",
+                                    "is_default": "bool",
+                                    "is_initial": "bool",
+                                    "is_verified": "bool"
+                                }
+                            ]
+                        ]
+                    ]
+                }
+            ]
+        },
+        "organization_security_settings": {
+            "value": {
+                "conditional_access": {
+                    "baseline_policies_enabled": true,
+                    "block_legacy_authentication": true,
+                    "require_compliant_devices": false,
+                    "require_mfa_for_admins": true
+                },
+                "directory_settings": {
+                    "restrict_directory_access": true,
+                    "users_can_add_guests": false,
+                    "users_can_create_groups": true,
+                    "users_can_register_apps": false
+                },
+                "guest_access": {
+                    "guest_users_can_invite": false,
+                    "guests_can_access_groups": true,
+                    "restrict_guest_access": "restrictive"
+                },
+                "password_policy": {
+                    "lockout_duration_minutes": 30,
+                    "lockout_threshold": 5,
+                    "max_password_age_days": 90,
+                    "min_password_age_days": 1,
+                    "minimum_length": 8,
+                    "password_history_count": 24,
+                    "require_lowercase": true,
+                    "require_numbers": true,
+                    "require_special_characters": true,
+                    "require_uppercase": true
+                },
+                "security_defaults_enabled": true
+            },
+            "type": [
+                "object",
+                {
+                    "conditional_access": [
+                        "object",
+                        {
+                            "baseline_policies_enabled": "bool",
+                            "block_legacy_authentication": "bool",
+                            "require_compliant_devices": "bool",
+                            "require_mfa_for_admins": "bool"
+                        }
+                    ],
+                    "directory_settings": [
+                        "object",
+                        {
+                            "restrict_directory_access": "bool",
+                            "users_can_add_guests": "bool",
+                            "users_can_create_groups": "bool",
+                            "users_can_register_apps": "bool"
+                        }
+                    ],
+                    "guest_access": [
+                        "object",
+                        {
+                            "guest_users_can_invite": "bool",
+                            "guests_can_access_groups": "bool",
+                            "restrict_guest_access": "string"
+                        }
+                    ],
+                    "password_policy": [
+                        "object",
+                        {
+                            "lockout_duration_minutes": "number",
+                            "lockout_threshold": "number",
+                            "max_password_age_days": "number",
+                            "min_password_age_days": "number",
+                            "minimum_length": "number",
+                            "password_history_count": "number",
+                            "require_lowercase": "bool",
+                            "require_numbers": "bool",
+                            "require_special_characters": "bool",
+                            "require_uppercase": "bool"
+                        }
+                    ],
+                    "security_defaults_enabled": "bool"
+                }
+            ]
+        },
+        "test_tenant_scenarios": {
+            "value": {
+                "large_org": {
+                    "admin_count": 25,
+                    "app_count": 500,
+                    "conditional_access_policies": 50,
+                    "group_count": 300,
+                    "guest_count": 100,
+                    "has_premium_licenses": true,
+                    "has_security_defaults": false,
+                    "user_count": 5000
+                },
+                "medium_org": {
+                    "admin_count": 8,
+                    "app_count": 100,
+                    "conditional_access_policies": 12,
+                    "group_count": 75,
+                    "guest_count": 25,
+                    "has_premium_licenses": true,
+                    "has_security_defaults": false,
+                    "user_count": 500
+                },
+                "small_org": {
+                    "admin_count": 2,
+                    "app_count": 15,
+                    "conditional_access_policies": 3,
+                    "group_count": 10,
+                    "guest_count": 5,
+                    "has_premium_licenses": false,
+                    "has_security_defaults": true,
+                    "user_count": 50
+                }
+            },
+            "type": [
+                "object",
+                {
+                    "large_org": [
+                        "object",
+                        {
+                            "admin_count": "number",
+                            "app_count": "number",
+                            "conditional_access_policies": "number",
+                            "group_count": "number",
+                            "guest_count": "number",
+                            "has_premium_licenses": "bool",
+                            "has_security_defaults": "bool",
+                            "user_count": "number"
+                        }
+                    ],
+                    "medium_org": [
+                        "object",
+                        {
+                            "admin_count": "number",
+                            "app_count": "number",
+                            "conditional_access_policies": "number",
+                            "group_count": "number",
+                            "guest_count": "number",
+                            "has_premium_licenses": "bool",
+                            "has_security_defaults": "bool",
+                            "user_count": "number"
+                        }
+                    ],
+                    "small_org": [
+                        "object",
+                        {
+                            "admin_count": "number",
+                            "app_count": "number",
+                            "conditional_access_policies": "number",
+                            "group_count": "number",
+                            "guest_count": "number",
+                            "has_premium_licenses": "bool",
+                            "has_security_defaults": "bool",
+                            "user_count": "number"
+                        }
+                    ]
+                }
+            ]
+        }
+    },
+    "resources": {
+        "azuread_client_config": {
+            "current": {
+                "client_id": "00000000-0000-0000-0000-000000000000",
+                "id": "00000000-0000-0000-0000-000000000000-00000000-0000-0000-0000-000000000000-00000000-0000-0000-0000-000000000000",
+                "object_id": "00000000-0000-0000-0000-000000000000",
+                "tenant_id": "00000000-0000-0000-0000-000000000000",
+                "timeouts": null
+            }
+        },
+        "azuread_domains": {
+            "current": {
+                "admin_managed": false,
+                "domains": [
+                    {
+                        "admin_managed": true,
+                        "authentication_type": "Managed",
+                        "default": false,
+                        "domain_name": "mockdomain.com",
+                        "initial": false,
+                        "root": true,
+                        "supported_services": [
+                            "Email"
+                        ],
+                        "verified": true
+                    },
+                    {
+                        "admin_managed": true,
+                        "authentication_type": "Managed",
+                        "default": false,
+                        "domain_name": "mockconf.com",
+                        "initial": false,
+                        "root": true,
+                        "supported_services": [
+                            "Email"
+                        ],
+                        "verified": true
+                    },
+                    {
+                        "admin_managed": true,
+                        "authentication_type": "Managed",
+                        "default": false,
+                        "domain_name": "mockswarm.com",
+                        "initial": false,
+                        "root": true,
+                        "supported_services": [
+                            "Email"
+                        ],
+                        "verified": true
+                    },
+                    {
+                        "admin_managed": true,
+                        "authentication_type": "Managed",
+                        "default": false,
+                        "domain_name": "mockpal.org",
+                        "initial": false,
+                        "root": true,
+                        "supported_services": [
+                            "Email"
+                        ],
+                        "verified": true
+                    },
+                    {
+                        "admin_managed": true,
+                        "authentication_type": "Managed",
+                        "default": false,
+                        "domain_name": "mockaws.com",
+                        "initial": false,
+                        "root": true,
+                        "supported_services": [
+                            "Email"
+                        ],
+                        "verified": true
+                    },
+                    {
+                        "admin_managed": true,
+                        "authentication_type": "Managed",
+                        "default": false,
+                        "domain_name": "mockaws.org",
+                        "initial": false,
+                        "root": true,
+                        "supported_services": [
+                            "Email"
+                        ],
+                        "verified": true
+                    },
+                    {
+                        "admin_managed": true,
+                        "authentication_type": "Managed",
+                        "default": false,
+                        "domain_name": "mockpy.org",
+                        "initial": false,
+                        "root": true,
+                        "supported_services": [
+                            "Email"
+                        ],
+                        "verified": true
+                    },
+                    {
+                        "admin_managed": true,
+                        "authentication_type": "Managed",
+                        "default": false,
+                        "domain_name": "mockpy.com",
+                        "initial": false,
+                        "root": true,
+                        "supported_services": [
+                            "Email"
+                        ],
+                        "verified": true
+                    },
+                    {
+                        "admin_managed": true,
+                        "authentication_type": "Managed",
+                        "default": false,
+                        "domain_name": "mockcompany.onmicrosoft.com",
+                        "initial": true,
+                        "root": true,
+                        "supported_services": [
+                            "Email",
+                            "OfficeCommunicationsOnline"
+                        ],
+                        "verified": true
+                    },
+                    {
+                        "admin_managed": true,
+                        "authentication_type": "Managed",
+                        "default": true,
+                        "domain_name": "mockcompany.com",
+                        "initial": false,
+                        "root": true,
+                        "supported_services": [
+                            "Email"
+                        ],
+                        "verified": true
+                    },
+                    {
+                        "admin_managed": true,
+                        "authentication_type": "Managed",
+                        "default": false,
+                        "domain_name": "mockwebconf.com",
+                        "initial": false,
+                        "root": true,
+                        "supported_services": [
+                            "Email"
+                        ],
+                        "verified": true
+                    },
+                    {
+                        "admin_managed": true,
+                        "authentication_type": "Managed",
+                        "default": false,
+                        "domain_name": "MOCK1234567890ABCDEF.mockcloud.example",
+                        "initial": false,
+                        "root": true,
+                        "supported_services": [],
+                        "verified": true
+                    },
+                    {
+                        "admin_managed": true,
+                        "authentication_type": "Managed",
+                        "default": false,
+                        "domain_name": "mockshort.com",
+                        "initial": false,
+                        "root": true,
+                        "supported_services": [
+                            "Email"
+                        ],
+                        "verified": true
+                    }
+                ],
+                "id": "domains#00000000-0000-0000-0000-000000000000#jZTANwdPww5erGMrCZ6phM-vfeg=",
+                "include_unverified": false,
+                "only_default": false,
+                "only_initial": false,
+                "only_root": false,
+                "supports_services": [],
+                "timeouts": null
+            }
+        }
+    }
+}

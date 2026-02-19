@@ -21,6 +21,35 @@ class BigtableInstanceTest(BaseTest):
                                                '/test-260/clusters/test-260-c1/'
                                                'backups/test-backup-258')
 
+    def test_bigtable_instance_label(self):
+        # Set the "env" label to not the default
+        factory = self.replay_flight_data('bigtable-instance-label')
+        p = self.load_policy(
+            {
+                'name': 'bigtable-instance-labels',
+                'resource': 'gcp.bigtable-instance',
+                'filters': [{
+                    'type': 'value',
+                    'key': 'name',
+                    'op': 'contains',
+                    'value': 'c7n-bigtable-instance',
+                }],
+                'actions': [
+                    {'type': 'set-labels',
+                     'labels': {'env': 'not-the-default'}}
+                ]
+            },
+            session_factory=factory,
+        )
+        resources = p.run()
+        self.assertEqual(len(resources), 1)
+        self.assertEqual(resources[0]['labels']['env'], 'default')
+
+        # Fetch the instance manually to confirm the label was changed
+        client = p.resource_manager.get_client()
+        result = client.execute_query('get', {'name': resources[0]['name']})
+        self.assertEqual(result['labels']['env'], 'not-the-default')
+
 
 class BigtableTimeRangeFilterTest(BaseTest):
 

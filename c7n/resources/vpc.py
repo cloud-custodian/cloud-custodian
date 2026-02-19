@@ -2903,6 +2903,62 @@ class EndpointVpcFilter(net_filters.VpcFilter):
     RelatedIdsExpression = "VpcId"
 
 
+@VpcEndpoint.filter_registry.register('service-details')
+class EndpointServiceDetailsFilter(ValueFilter):
+    """Filter VPC Endpoints based on their associated endpoint service details.
+
+    :example:
+
+    .. code-block:: yaml
+
+      policies:
+        - name: vpc-endpoints-has-policy-support
+          resource: aws.vpc-endpoint
+          filters:
+            - type: service-details
+              key: VpcEndpointPolicySupported
+              value: true
+    """
+
+    annotation_key = "c7n:ServiceDetails"
+    schema = type_schema(
+        "service-details",
+        rinherit=ValueFilter.schema
+    )
+    permissions = ("ec2:DescribeVpcEndpointServices",)
+
+    def process(self, resources, event=None):
+        client = local_session(self.manager.session_factory).client("ec2")
+        service_names = sorted({r["ServiceName"] for r in resources})
+
+        service_map = self._describe_services(client, service_names)
+
+        results = []
+        for resource in resources:
+            service_detail = service_map.get(resource["ServiceName"], {})
+            resource[self.annotation_key] = service_detail or {}
+
+            if self.match(resource[self.annotation_key]):
+                results.append(resource)
+
+        return results
+
+    def _describe_services(self, client, service_names):
+        cache = self.manager._cache
+        cache_key = {"ServiceNames": service_names}
+
+        with cache:
+            cached = cache.get(cache_key)
+            if cached is not None:
+                return cached
+
+            resp = client.describe_vpc_endpoint_services(ServiceNames=service_names)
+            service_map = {d["ServiceName"]: d for d in resp.get("ServiceDetails", [])}
+
+            cache.save(cache_key, service_map)
+            return service_map
+
+
 @Vpc.filter_registry.register("vpc-endpoint")
 class VPCEndpointFilter(RelatedResourceByIdFilter):
     """Filters vpcs based on their vpc-endpoints

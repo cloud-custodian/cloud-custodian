@@ -18,8 +18,7 @@ from .zpill import ACCOUNT_ID
 @pytest.mark.audited
 @terraform('sg_used_cross_ref')
 def test_sg_used_cross_ref(test, sg_used_cross_ref):
-    aws_region = 'us-west-2'
-    factory = test.replay_flight_data('sg_used_cross_ref', region=aws_region)
+    factory = test.replay_flight_data('sg_used_cross_ref')
     p = test.load_policy({
         'name': 'sg_used_cross_ref',
         'resource': 'security-group',
@@ -4808,3 +4807,34 @@ class TestGlueConnectionSubnetError(BaseTest):
             log_output_str = log_output.getvalue()
 
             self.assertIn("not found", log_output_str.lower())
+class TestVpcEndpointServiceDetails(BaseTest):
+    def test_endpoint_service_details_policy_supported(self):
+        session_factory = self.replay_flight_data(
+            "test_vpc_endpoint_service_details_filter"
+        )
+
+        p = self.load_policy(
+            {
+                "name": "vpc-endpoint-services-with-policy-support",
+                "resource": "aws.vpc-endpoint",
+                "filters": [
+                    {
+                        "type": "service-details",
+                        "key": "VpcEndpointPolicySupported",
+                        "value": True,
+                    }
+                ],
+            },
+            session_factory=session_factory,
+        )
+
+        resources = p.run()
+        service_details = resources[0]["c7n:ServiceDetails"]
+
+        self.assertEqual(len(resources), 1)
+        self.assertIn("c7n:ServiceDetails", resources[0])
+        self.assertEqual(
+            resources[0]["ServiceName"],
+            "com.amazonaws.us-east-1.s3",
+        )
+        self.assertTrue(service_details["VpcEndpointPolicySupported"])
