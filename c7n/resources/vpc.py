@@ -705,7 +705,7 @@ class DescribeSubnets(query.DescribeSource):
 
                 for sid in missing_subnet_ids:
                     self.manager.log.warning(
-                        "Subnet ID '%s' not found:", sid)
+                        "Subnet ID '%s' not found, skipping", sid)
 
                 missing_set = set(missing_subnet_ids)
                 resource_ids = [rid for rid in resource_ids if rid not in missing_set]
@@ -715,13 +715,14 @@ class DescribeSubnets(query.DescribeSource):
                     for rid in list(resource_ids):
                         if rid in error_str:
                             self.manager.log.warning(
-                                "Malformed subnet ID '%s' not found:", rid)
+                                "Malformed subnet ID '%s' not found, skipping", rid)
                             resource_ids.remove(rid)
                             break
 
                 if len(resource_ids) == original_count:
                     self.manager.log.warning(
-                        "InvalidSubnetID.NotFound error: unable to identify subnet ID from error: %s", str(e))
+                        "InvalidSubnetID.NotFound error: unable to \
+                         identify subnet ID from error: %s", str(e))
                     return []
 
         return []

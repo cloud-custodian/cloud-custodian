@@ -4791,7 +4791,8 @@ class TestGlueConnectionSubnetError(BaseTest):
         self.assertEqual(resources[0]['Name'], 'test-connection-delete-me-jan-6')
 
         malformed_subnet_id = resources[0]['PhysicalConnectionRequirements']['SubnetId']
-        self.assertEqual(malformed_subnet_id, "['subnet-068dfbf3f275a6ae8','subnet-0472841b16adf7476']")
+        self.assertEqual(malformed_subnet_id,
+         "['subnet-068dfbf3f275a6ae8','subnet-0472841b16adf7476']")
 
         p_subnet = self.load_policy({
             'name': 'get-subnets',
