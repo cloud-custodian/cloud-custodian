@@ -1035,7 +1035,8 @@ class CopyInstanceTags(BaseAction):
 
     schema = type_schema(
         'copy-instance-tags',
-        tags={'type': 'array', 'items': {'type': 'string'}})
+        tags={'type': 'array', 'items': {'type': 'string'}},
+        replace={'type': 'boolean'})
 
     def get_permissions(self):
         perms = self.manager.get_resource_manager('ec2').get_permissions()
@@ -1115,6 +1116,7 @@ class CopyInstanceTags(BaseAction):
     def get_volume_tags(self, volume, instance, attachment):
         only_tags = self.data.get('tags', [])  # specify which tags to copy
         copy_tags = []
+        replace = self.data.get('replace', True)
         extant_tags = dict([
             (t['Key'], t['Value']) for t in volume.get('Tags', [])])
 
@@ -1122,6 +1124,8 @@ class CopyInstanceTags(BaseAction):
             if only_tags and t['Key'] not in only_tags:
                 continue
             if t['Key'] in extant_tags and t['Value'] == extant_tags[t['Key']]:
+                continue
+            if t['Key'] in extant_tags and not replace:
                 continue
             if t['Key'].startswith('aws:'):
                 continue

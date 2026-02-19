@@ -719,6 +719,76 @@ class CopyInstanceTagsTest(BaseTest):
         tags = {t["Key"]: t["Value"] for t in results}
         self.assertEqual(tags["Name"], "CompileLambda")
 
+    def test_copy_instance_tags_replace_false(self):
+        # More a functional/coverage test then a unit test.
+        self.patch(CopyInstanceTags, "executor_factory", MainThreadExecutor)
+        factory = self.replay_flight_data("test_ebs_copy_instance_tags")
+
+        volume_id = "vol-2b047792"
+
+        results = factory().client("ec2").describe_tags(
+            Filters=[{"Name": "resource-id", "Values": [volume_id]}]
+        )[
+            "Tags"
+        ]
+        tags = {t["Key"]: t["Value"] for t in results}
+        self.assertEqual(tags, {})
+
+        policy = self.load_policy(
+            {
+                "name": "test-copy-instance-tags",
+                "resource": "ebs",
+                "actions": [{"type": "copy-instance-tags", "replace" : False,  "tags": ["Name"]}],
+            },
+            config={"region": "us-west-2"},
+            session_factory=factory,
+        )
+
+        policy.run()
+        results = factory().client("ec2").describe_tags(
+            Filters=[{"Name": "resource-id", "Values": [volume_id]}]
+        )[
+            "Tags"
+        ]
+
+        tags = {t["Key"]: t["Value"] for t in results}
+        self.assertEqual(tags["Name"], "CompileLambda")
+
+    def test_copy_instance_tags_replace_true(self):
+        # More a functional/coverage test then a unit test.
+        self.patch(CopyInstanceTags, "executor_factory", MainThreadExecutor)
+        factory = self.replay_flight_data("test_ebs_copy_instance_tags")
+
+        volume_id = "vol-2b047792"
+
+        results = factory().client("ec2").describe_tags(
+            Filters=[{"Name": "resource-id", "Values": [volume_id]}]
+        )[
+            "Tags"
+        ]
+        tags = {t["Key"]: t["Value"] for t in results}
+        self.assertEqual(tags, {})
+
+        policy = self.load_policy(
+            {
+                "name": "test-copy-instance-tags",
+                "resource": "ebs",
+                "actions": [{"type": "copy-instance-tags", "replace" : True,  "tags": ["Name"]}],
+            },
+            config={"region": "us-west-2"},
+            session_factory=factory,
+        )
+
+        policy.run()
+        results = factory().client("ec2").describe_tags(
+            Filters=[{"Name": "resource-id", "Values": [volume_id]}]
+        )[
+            "Tags"
+        ]
+
+        tags = {t["Key"]: t["Value"] for t in results}
+        self.assertEqual(tags["Name"], "CompileLambda")
+
 
 class VolumePostFindingTest(BaseTest):
 
