@@ -19,13 +19,12 @@ from c7n.filters import ValueFilter
 from c7n.filters.metrics import MetricsFilter
 from c7n.filters.related import RelatedResourceFilter
 from c7n.manager import resources
-from c7n.query import QueryResourceManager, TypeInfo
+from c7n.query import QueryResourceManager, TypeInfo, ChildResourceManager
 from c7n.utils import local_session, type_schema, get_retry
 
 
 @resources.register('service-quota-request')
 class ServiceQuotaRequest(QueryResourceManager):
-
     class resource_type(TypeInfo):
         service = 'service-quotas'
         permission_prefix = 'servicequotas'
@@ -38,7 +37,6 @@ class ServiceQuotaRequest(QueryResourceManager):
 
 @resources.register('service-quota')
 class ServiceQuota(QueryResourceManager):
-
     batch_size = 100
 
     class resource_type(TypeInfo):
@@ -67,7 +65,7 @@ class ServiceQuota(QueryResourceManager):
                 token = None
                 kwargs = {
                     'ServiceCode': s['ServiceCode'],
-                    'MaxResults': self.batch_size
+                    'MaxResults': self.batch_size,
                 }
 
                 while True:
@@ -75,7 +73,7 @@ class ServiceQuota(QueryResourceManager):
                         kwargs['NextToken'] = token
                     response = retry(
                         getattr(client, attr),
-                        **kwargs
+                        **kwargs,
                     )
                     rquotas = {q['QuotaCode']: q for q in response['Quotas']}
                     token = response.get('NextToken')
@@ -94,13 +92,9 @@ class ServiceQuota(QueryResourceManager):
                 return quotas.values()
 
             dquotas = {
-                q['QuotaCode']: q
-                for q in _get_quotas(client, s, 'list_aws_default_service_quotas')
+                q['QuotaCode']: q for q in _get_quotas(client, s, 'list_aws_default_service_quotas')
             }
-            quotas = {
-                q['QuotaCode']: q
-                for q in _get_quotas(client, s, 'list_service_quotas')
-            }
+            quotas = {q['QuotaCode']: q for q in _get_quotas(client, s, 'list_service_quotas')}
             dquotas.update(quotas)
             return dquotas.values()
 
@@ -168,7 +162,7 @@ class UsageFilter(MetricsFilter):
         'usage-metric',
         limit={'type': 'integer'},
         min_period={'type': 'integer'},
-        hard_limit={'type': 'integer'}
+        hard_limit={'type': 'integer'},
     )
 
     cloudwatch_max_datapoints = 1440
@@ -199,7 +193,7 @@ class UsageFilter(MetricsFilter):
         'Minimum': min,
         'Average': mean,
         'Sum': sum,
-        'SampleCount': len
+        'SampleCount': len,
     }
 
     percentile_regex = re.compile('p\\d{0,2}\\.{0,1}\\d{0,2}')
@@ -268,7 +262,8 @@ class UsageFilter(MetricsFilter):
                 raise Exception(
                     f'failed to collect metric {metric["MetricName"]}'
                     f' namespace {metric["MetricNamespace"]}'
-                    f' for service {r.get("ServiceCode")}') from e
+                    f' for service {r.get("ServiceCode")}'
+                ) from e
 
             if res['Datapoints']:
                 if self.percentile_regex.match(stat):
@@ -324,9 +319,7 @@ class RequestHistoryFilter(RelatedResourceFilter):
     RelatedIdsExpression = 'QuotaCode'
     AnnotationKey = 'ServiceQuotaChangeHistory'
 
-    schema = type_schema(
-        'request-history', rinherit=ValueFilter.schema
-    )
+    schema = type_schema('request-history', rinherit=ValueFilter.schema)
 
     permissions = ('servicequotas:ListRequestedServiceQuotaChangeHistory',)
 
@@ -379,32 +372,126 @@ class Increase(Action):
             if not r['Adjustable']:
                 continue
             # Skip if quota equals hard_limit
-            if ('c7n:UsageMetric' in r and
-                    'hard_limit' in r['c7n:UsageMetric'] and
-                    r['c7n:UsageMetric']['quota'] == r['c7n:UsageMetric']['hard_limit']):
+            if (
+                'c7n:UsageMetric' in r
+                and 'hard_limit' in r['c7n:UsageMetric']
+                and r['c7n:UsageMetric']['quota'] == r['c7n:UsageMetric']['hard_limit']
+            ):
                 continue
             # Cap count at hard_limit if it exceeds it
-            if ('c7n:UsageMetric' in r and
-                    'hard_limit' in r['c7n:UsageMetric'] and
-                    count > r['c7n:UsageMetric']['hard_limit']):
+            if (
+                'c7n:UsageMetric' in r
+                and 'hard_limit' in r['c7n:UsageMetric']
+                and count > r['c7n:UsageMetric']['hard_limit']
+            ):
                 count = int(r['c7n:UsageMetric']['hard_limit'])
             try:
                 client.request_service_quota_increase(
                     ServiceCode=r['ServiceCode'],
                     QuotaCode=r['QuotaCode'],
-                    DesiredValue=count
+                    DesiredValue=count,
                 )
             except client.exceptions.QuotaExceededException as e:
                 error = e
                 self.log.error('Requested:%s exceeds quota limit for %s' % (count, r['QuotaCode']))
                 continue
-            except (client.exceptions.AccessDeniedException,
-                    client.exceptions.DependencyAccessDeniedException,):
+            except (
+                client.exceptions.AccessDeniedException,
+                client.exceptions.DependencyAccessDeniedException,
+            ):
                 raise PolicyExecutionError('Access Denied to increase quota: %s' % r['QuotaCode'])
-            except (client.exceptions.NoSuchResourceException,
-                    client.exceptions.InvalidResourceStateException,
-                    client.exceptions.ResourceAlreadyExistsException,) as e:
+            except (
+                client.exceptions.NoSuchResourceException,
+                client.exceptions.InvalidResourceStateException,
+                client.exceptions.ResourceAlreadyExistsException,
+            ) as e:
                 error = e
                 continue
         if error:
             raise PolicyExecutionError from error
+
+
+@resources.register('service-quota-services')
+class Services(QueryResourceManager):
+    """Lists all AWS services integrated with Service Quotas.
+
+    :example:
+
+    .. code-block:: yaml
+
+        policies:
+        - name: list-service-quota-services
+          resource: aws.service-quota-services
+          filters:
+            - type: value
+              key: ServiceCode
+              value: ec2
+
+    """
+
+    class resource_type(TypeInfo):
+        service = 'service-quotas'
+        permission_prefix = 'servicequotas'
+        enum_spec = ('list_services', 'Services', None)
+        id = 'ServiceCode'
+        name = 'ServiceName'
+        # Services don't have ARNs, but we need to set an arn_type for validation
+        arn_type = 'service'
+        # Service list is the same across all regions
+        global_resource = True
+        permissions_augment = ('servicequotas:ListServices',)
+
+
+@resources.register('default-service-quotas')
+class DefaultServiceQuotas(ChildResourceManager):
+    """Lists default service quotas for AWS services.
+
+    This is a child resource of service-quota-services. The list_aws_default_service_quotas
+    API requires a ServiceCode parameter, so this resource enumerates quotas by iterating
+    over parent services.
+
+    :example:
+
+    .. code-block:: yaml
+
+        # Get all default quotas for all services
+        policies:
+        - name: list-all-default-quotas
+          resource: aws.default-service-quotas
+
+        policies:
+        - name: list-default-quotas-for-all-services
+          resource: aws.default-service-quotas
+          filters:
+            - type: value
+              key: QuotaCode
+              value: L-1216C47A
+
+        # Get default quotas only for EC2
+        policies:
+        - name: list-default-quotas-for-ec2
+          resource: aws.default-service-quotas
+          query:
+            - ServiceCode: ec2
+          filters:
+            - type: value
+              key: Value
+              op: gte
+              value: 100
+
+    """
+
+    class resource_type(TypeInfo):
+        service = 'service-quotas'
+        permission_prefix = 'servicequotas'
+        enum_spec = ('list_aws_default_service_quotas', 'Quotas', None)
+        parent_spec = ('service-quota-services', 'ServiceCode', None)
+        id = 'QuotaCode'
+        arn = 'QuotaArn'
+        name = 'QuotaName'
+        # Default quotas are the same across all regions
+        global_resource = True
+        # Do NOT remove `permissions_enum` or swap to `permissions_augment` here.
+        # The automatic permission-generation does incorrect CamelCasing vs.
+        # the correct permission below.
+        permissions_enum = ('servicequotas:ListAWSDefaultServiceQuotas',)

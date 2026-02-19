@@ -320,6 +320,8 @@ ResourceMap = {
   "aws.servicediscovery-namespace": "c7n.resources.servicediscovery.ServiceDiscoveryNamespace",
   "aws.service-quota": "c7n.resources.quotas.ServiceQuota",
   "aws.service-quota-request": "c7n.resources.quotas.ServiceQuotaRequest",
+  "aws.service-quota-services": "c7n.resources.quotas.Services",
+  "aws.default-service-quotas": "c7n.resources.quotas.DefaultServiceQuotas",
   "aws.ses-configuration-set": "c7n.resources.ses.SESConfigurationSet",
   "aws.ses-configuration-set-v2": "c7n.resources.ses.SESConfigurationSetV2",
   "aws.ses-dedicated-ip-pool": "c7n.resources.ses.SESDedicatedIpPool",
