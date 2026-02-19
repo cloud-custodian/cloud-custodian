@@ -1,0 +1,93 @@
+{
+  "status_code": 200,
+  "data": {
+    "ResponseMetadata": {
+      "RequestId": "23456789-2345-2345-2345-234567890123",
+      "HTTPStatusCode": 200,
+      "HTTPHeaders": {
+        "date": "Mon, 02 Dec 2024 09:57:47 GMT",
+        "content-type": "application/x-amz-json-1.0"
+      },
+      "RetryAttempts": 0
+    },
+    "SavingsPlans": [
+      {
+        "SavingsPlanId": "sp-23456789012345678",
+        "SavingsPlanArn": "arn:aws:savingsplans::123456789012:savingsplan/sp-23456789012345678",
+        "Description": "Compute Savings Plan for cross-region flexibility",
+        "Start": "2023-06-15T00:00:00.000Z",
+        "End": "2026-06-15T00:00:00.000Z",
+        "State": "active",
+        "Region": "us-east-1",
+        "SavingsPlanType": "Compute",
+        "PaymentOption": "No Upfront",
+        "ProductTypes": [
+          "EC2",
+          "Fargate",
+          "Lambda"
+        ],
+        "CurrencyCode": "USD",
+        "Commitment": "25.00",
+        "UpfrontPaymentAmount": "0.00",
+        "RecurringPaymentAmount": "2.08",
+        "TermDurationInSeconds": 94608000,
+        "Tags": [
+          {
+            "Key": "Team",
+            "Value": "DevOps"
+          },
+          {
+            "Key": "Purpose", 
+            "Value": "cost-optimization"
+          }
+        ]
+      },
+      {
+        "SavingsPlanId": "sp-34567890123456789",
+        "SavingsPlanArn": "arn:aws:savingsplans::123456789012:savingsplan/sp-34567890123456789",
+        "Description": "EC2 Instance Savings Plan for m5.large instances",
+        "Start": "2023-03-01T00:00:00.000Z",
+        "End": "2024-03-01T00:00:00.000Z",
+        "State": "active",
+        "Region": "us-west-2",
+        "EC2InstanceFamily": "m5",
+        "SavingsPlanType": "EC2Instance",
+        "PaymentOption": "Partial Upfront",
+        "ProductTypes": [
+          "EC2"
+        ],
+        "CurrencyCode": "USD",
+        "Commitment": "15.00",
+        "UpfrontPaymentAmount": "657.00",
+        "RecurringPaymentAmount": "0.625",
+        "TermDurationInSeconds": 31536000,
+        "Tags": [
+          {
+            "Key": "Team",
+            "Value": "Backend"
+          }
+        ]
+      },
+      {
+        "SavingsPlanId": "sp-45678901234567890",
+        "SavingsPlanArn": "arn:aws:savingsplans::123456789012:savingsplan/sp-45678901234567890",
+        "Description": "SageMaker Savings Plan",
+        "Start": "2023-09-01T00:00:00.000Z",
+        "End": "2024-09-01T00:00:00.000Z",
+        "State": "active",
+        "Region": "eu-west-1",
+        "SavingsPlanType": "SageMaker",
+        "PaymentOption": "All Upfront",
+        "ProductTypes": [
+          "SageMaker"
+        ],
+        "CurrencyCode": "USD",
+        "Commitment": "8.50",
+        "UpfrontPaymentAmount": "744.00",
+        "RecurringPaymentAmount": "0.00",
+        "TermDurationInSeconds": 31536000,
+        "Tags": []
+      }
+    ]
+  }
+}
