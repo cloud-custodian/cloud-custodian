@@ -4807,6 +4807,8 @@ class TestGlueConnectionSubnetError(BaseTest):
             log_output_str = log_output.getvalue()
 
             self.assertIn("not found", log_output_str.lower())
+
+
 class TestVpcEndpointServiceDetails(BaseTest):
     def test_endpoint_service_details_policy_supported(self):
         session_factory = self.replay_flight_data(
