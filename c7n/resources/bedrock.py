@@ -283,6 +283,33 @@ class StopCustomizationJob(BaseAction):
             client.stop_model_customization_job(jobIdentifier=r['jobArn'])
 
 
+@resources.register('bedrock-model-invocation-job')
+class BedrockModelInvocationJob(QueryResourceManager):
+    """
+    Resource to list batch model invocation jobs.
+
+    :example:
+
+    .. code-block:: yaml
+
+        policies:
+          - name: bedrock-model-invocation-job-inprogress
+            resource: aws.bedrock-model-invocation-job
+            filters:
+              - type: value
+                key: status
+                value: InProgress
+    """
+
+    class resource_type(TypeInfo):
+        service = 'bedrock'
+        enum_spec = ('list_model_invocation_jobs', 'invocationJobSummaries[]', None)
+        detail_spec = ('get_model_invocation_job', 'jobIdentifier', 'jobArn', None)
+        name = 'jobName'
+        id = arn = 'jobArn'
+        permission_prefix = 'bedrock'
+
+
 @resources.register('bedrock-agent')
 class BedrockAgent(QueryResourceManager):
     class resource_type(TypeInfo):

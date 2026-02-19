@@ -1,12 +1,41 @@
 # Copyright The Cloud Custodian Authors.
 # SPDX-License-Identifier: Apache-2.0
+import time
+
 from .common import BaseTest, event_data
 from botocore.exceptions import ClientError
 from pytest_terraform import terraform
 
 
-class BedrockCustomModel(BaseTest):
+@terraform('bedrock_model_invocation_job')
+def test_bedrock_model_invocation_job(test, bedrock_model_invocation_job):
+    session_factory = test.replay_flight_data(
+        'test_bedrock_model_invocation_job', region='us-east-1'
+    )
+    job_arn = bedrock_model_invocation_job['aws_bedrock_model_invocation_job.test_job.arn']
+    job_name = bedrock_model_invocation_job['aws_bedrock_model_invocation_job.test_job.job_name']
+    p = test.load_policy(
+        {
+            'name': 'bedrock-model-invocation-job',
+            'resource': 'bedrock-model-invocation-job',
+            'filters': [
+                {'jobArn': job_arn},
+            ],
+        },
+        session_factory=session_factory,
+        config={'region': 'us-east-1'},
+    )
 
+    if test.recording:
+        time.sleep(10)
+
+    resources = p.run()
+    test.assertEqual(len(resources), 1)
+    test.assertEqual(resources[0]['jobArn'], job_arn)
+    test.assertEqual(resources[0]['jobName'], job_name)
+
+
+class BedrockCustomModel(BaseTest):
     def test_bedrock_custom_model(self):
         session_factory = self.replay_flight_data('test_bedrock_custom_model')
         p = self.load_policy(
