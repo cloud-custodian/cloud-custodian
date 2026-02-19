@@ -39,7 +39,8 @@ from c7n.resources.iam import (
     IamGroupInlinePolicy,
     SpecificIamRoleManagedPolicy,
     NoSpecificIamRoleManagedPolicy,
-    PolicyQueryParser
+    PolicyQueryParser,
+    UserServiceSpecificCredentials,
 )
 
 
@@ -1084,6 +1085,110 @@ class IamUserTest(BaseTest):
         resources = p.run()
         self.assertEqual(len(resources), 1)
         self.assertEqual(resources[0]["UserName"], "test-user-console-access")
+
+    def test_iam_user_service_specific_credentials_filter(self):
+        session_factory = self.replay_flight_data(
+            "test_iam_user_service_specific_credentials_filter"
+        )
+        self.patch(UserServiceSpecificCredentials, "executor_factory", MainThreadExecutor)
+        p = self.load_policy(
+            {
+                "name": "iam-user-with-service-specific-credentials",
+                "resource": "iam-user",
+                "filters": [
+                    {
+                        "type": "service-specific-credentials",
+                        "key": "Status",
+                        "value": "Active",
+                    },
+                ],
+            },
+            session_factory=session_factory,
+        )
+        resources = p.run()
+        self.assertEqual(len(resources), 1)
+        self.assertEqual(resources[0]["UserName"], "testuser-8aa8c470")
+        self.assertTrue("c7n:ServiceSpecificCredentials" in resources[0])
+        self.assertTrue("c7n:matched-service-specific-credentials" in resources[0])
+
+    def test_iam_user_service_specific_credentials_filter_by_service(self):
+        session_factory = self.replay_flight_data(
+            "test_iam_user_service_specific_credentials_service"
+        )
+        self.patch(UserServiceSpecificCredentials, "executor_factory", MainThreadExecutor)
+        p = self.load_policy(
+            {
+                "name": "iam-user-with-codecommit-credentials",
+                "resource": "iam-user",
+                "filters": [
+                    {
+                        "type": "service-specific-credentials",
+                        "key": "ServiceName",
+                        "value": "codecommit.amazonaws.com",
+                    },
+                ],
+            },
+            session_factory=session_factory,
+        )
+        resources = p.run()
+        self.assertEqual(len(resources), 1)
+        self.assertEqual(resources[0]["UserName"], "testuser-8aa8c470")
+        self.assertEqual(len(resources[0]["c7n:matched-service-specific-credentials"]), 1)
+        self.assertEqual(
+            resources[0]["c7n:matched-service-specific-credentials"][0]["ServiceName"],
+            "codecommit.amazonaws.com"
+        )
+
+    def test_iam_user_service_specific_credentials_filter_by_age(self):
+        session_factory = self.replay_flight_data(
+            "test_iam_user_service_specific_credentials_age"
+        )
+        self.patch(UserServiceSpecificCredentials, "executor_factory", MainThreadExecutor)
+        with freezegun.freeze_time("2021-01-15"):
+            p = self.load_policy(
+                {
+                    "name": "iam-user-with-old-service-credentials",
+                    "resource": "iam-user",
+                    "filters": [
+                        {
+                            "type": "service-specific-credentials",
+                            "key": "CreateDate",
+                            "value_type": "age",
+                            "value": 90,
+                            "op": "greater-than",
+                        },
+                    ],
+                },
+                session_factory=session_factory,
+            )
+            resources = p.run()
+            self.assertEqual(len(resources), 1)
+            self.assertEqual(resources[0]["UserName"], "testuser-8aa8c470")
+
+    def test_iam_user_delete_service_specific_credentials(self):
+        session_factory = self.replay_flight_data(
+            "test_iam_user_delete_service_specific_credentials"
+        )
+        p = self.load_policy(
+            {
+                "name": "iam-user-delete-service-credentials",
+                "resource": "iam-user",
+                "filters": [
+                    {
+                        "UserName": "testuser-8aa8c470",
+                    },
+                ],
+                "actions": [
+                    {
+                        "type": "delete",
+                        "options": ["service-specific-credentials"],
+                    }
+                ],
+            },
+            session_factory=session_factory,
+        )
+        resources = p.run()
+        self.assertEqual(len(resources), 1)
 
 
 @terraform('iam_user', teardown=terraform.TEARDOWN_IGNORE)

@@ -432,3 +432,36 @@ class UpdateOpenSearchIngestion(BaseAction):
                 client.update_pipeline(PipelineName=r['PipelineName'], **params)
             except client.exceptions.ResourceNotFoundException:
                 continue
+
+
+@resources.register('opensearch-reserved')
+class OpensearchReservedInstance(QueryResourceManager):
+    """Lists all the reserved OpenSearch instances
+
+    :example:
+
+    .. code-block:: yaml
+
+        policies:
+          - name: opensearch-reserved-instances-policy
+            resource: aws.opensearch-reserved
+            filters:
+              - type: value
+                key: State
+                value: active
+
+    """
+
+    class resource_type(TypeInfo):
+        service = 'opensearch'
+        name = id = 'ReservedInstanceId'
+        date = 'StartTime'
+        enum_spec = (
+            'describe_reserved_instances',
+            'ReservedInstances',
+            None,
+        )
+        filter_name = 'ReservedInstanceId'
+        filter_type = 'scalar'
+        arn_type = "reserved-instances"
+        permissions_enum = ('opensearch:DescribeReservedInstances',)
