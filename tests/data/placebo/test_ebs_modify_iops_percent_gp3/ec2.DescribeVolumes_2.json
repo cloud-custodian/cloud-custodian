@@ -1,0 +1,41 @@
+{
+    "status_code": 200,
+    "data": {
+        "Volumes": [
+            {
+                "AvailabilityZoneId": "use1-az2",
+                "Iops": 3900,
+                "Tags": [
+                    {
+                        "Key": "Name",
+                        "Value": "modify_iops_percent_test_volume"
+                    }
+                ],
+                "VolumeType": "gp3",
+                "MultiAttachEnabled": false,
+                "Throughput": 125,
+                "Operator": {
+                    "Managed": false
+                },
+                "VolumeId": "vol-0b0d1b4c01088ed2c",
+                "Size": 8,
+                "SnapshotId": "",
+                "AvailabilityZone": "us-east-1a",
+                "State": "available",
+                "CreateTime": {
+                    "__class__": "datetime",
+                    "year": 2025,
+                    "month": 12,
+                    "day": 16,
+                    "hour": 19,
+                    "minute": 32,
+                    "second": 15,
+                    "microsecond": 447000
+                },
+                "Attachments": [],
+                "Encrypted": false
+            }
+        ],
+        "ResponseMetadata": {}
+    }
+}
