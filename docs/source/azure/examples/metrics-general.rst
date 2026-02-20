@@ -65,3 +65,67 @@ Find SQL servers with less than 10% average DTU consumption over last 24 hours
             threshold: 10
             timeframe: 24
             filter:  "DatabaseResourceId eq '*'"
+
+Find storage accounts with low blob count
+
+.. code-block:: yaml
+
+    policies:
+      - name: low-blob-count
+        resource: azure.storage
+        filters:
+          - type: storage-metrics
+            storage-type: blob
+            metric: BlobCount
+            aggregation: average
+            op: lt
+            threshold: 10
+            timeframe: 168
+
+Find storage accounts with high queue message count
+
+.. code-block:: yaml
+
+    policies:
+      - name: high-queue-messages
+        resource: azure.storage
+        filters:
+          - type: storage-metrics
+            storage-type: queue
+            metric: QueueMessageCount
+            aggregation: average
+            op: gt
+            threshold: 10000
+            timeframe: 24
+
+Find storage accounts with table capacity over threshold
+
+.. code-block:: yaml
+
+    policies:
+      - name: high-table-capacity
+        resource: azure.storage
+        filters:
+          - type: storage-metrics
+            storage-type: table
+            metric: TableCapacity
+            aggregation: average
+            op: gt
+            threshold: 5000000000
+            timeframe: 24
+
+Find storage accounts with file share capacity over threshold
+
+.. code-block:: yaml
+
+    policies:
+      - name: high-file-capacity
+        resource: azure.storage
+        filters:
+          - type: storage-metrics
+            storage-type: file
+            metric: FileCapacity
+            aggregation: average
+            op: gt
+            threshold: 10000000000
+            timeframe: 24

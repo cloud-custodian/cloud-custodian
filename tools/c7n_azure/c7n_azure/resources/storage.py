@@ -17,7 +17,12 @@ from c7n.utils import get_annotation_prefix, local_session
 from c7n_azure.actions.base import AzureBaseAction
 from c7n_azure.actions.firewall import SetFirewallAction
 from c7n_azure.constants import BLOB_TYPE, FILE_TYPE, QUEUE_TYPE, TABLE_TYPE
-from c7n_azure.filters import (FirewallBypassFilter, FirewallRulesFilter, ValueFilter)
+from c7n_azure.filters import (
+    FirewallBypassFilter,
+    FirewallRulesFilter,
+    MetricFilter,
+    ValueFilter,
+)
 from c7n_azure.provider import resources
 from c7n_azure.resources.arm import ArmResourceManager
 from c7n_azure.storage_utils import StorageUtilities
@@ -463,6 +468,97 @@ class StorageDiagnosticSettingsFilter(ValueFilter):
             storage_account[storage_prefix_property] = serialize(settings)
 
         return storage_account[storage_prefix_property]
+
+
+@Storage.filter_registry.register('storage-metrics')
+class StorageMetricsFilter(MetricFilter):
+    """Filters storage accounts based on service-specific metrics.
+
+    Azure Storage Accounts expose service-specific metrics for blob, queue, table,
+    and file services that require different resource IDs than account-level metrics.
+    This filter enables filtering based on those service-specific metrics.
+
+    Supports: blob, queue, table, file
+
+    Additional examples can be found at: docs/source/azure/examples/metrics-general.rst
+
+    :example:
+
+    Find storage accounts with high blob capacity (over 1GB)
+
+    .. code-block:: yaml
+
+        policies:
+          - name: high-blob-capacity-storage
+            resource: azure.storage
+            filters:
+              - type: storage-metrics
+                storage-type: blob
+                metric: BlobCapacity
+                aggregation: average
+                op: gt
+                threshold: 1000000000
+                timeframe: 24
+
+    """
+
+    # Service-specific path suffixes for resource IDs
+    STORAGE_TYPE_PATHS = {
+        BLOB_TYPE: '/blobServices/default',
+        QUEUE_TYPE: '/queueServices/default',
+        TABLE_TYPE: '/tableServices/default',
+        FILE_TYPE: '/fileServices/default',
+    }
+
+    # Service-specific metric namespaces
+    STORAGE_TYPE_NAMESPACES = {
+        BLOB_TYPE: 'Microsoft.Storage/storageAccounts/blobServices',
+        QUEUE_TYPE: 'Microsoft.Storage/storageAccounts/queueServices',
+        TABLE_TYPE: 'Microsoft.Storage/storageAccounts/tableServices',
+        FILE_TYPE: 'Microsoft.Storage/storageAccounts/fileServices',
+    }
+
+    schema = {
+        'type': 'object',
+        'required': ['type', 'storage-type', 'metric', 'op', 'threshold'],
+        'additionalProperties': False,
+        'properties': {
+            'type': {'enum': ['storage-metrics']},
+            'storage-type': {
+                'type': 'string',
+                'enum': [BLOB_TYPE, QUEUE_TYPE, TABLE_TYPE, FILE_TYPE]
+            },
+            'metric': {'type': 'string'},
+            'op': {'enum': ['eq', 'equal', 'ne', 'not-equal', 'gt', 'greater-than',
+                           'ge', 'gte', 'le', 'lte', 'lt', 'less-than']},
+            'threshold': {'type': 'number'},
+            'metric_namespace': {'type': 'string'},
+            'timeframe': {'type': 'number'},
+            'interval': {'enum': [
+                'PT1M', 'PT5M', 'PT15M', 'PT30M', 'PT1H', 'PT6H', 'PT12H', 'P1D']},
+            'aggregation': {'enum': ['total', 'average', 'count', 'minimum', 'maximum']},
+            'no_data_action': {'enum': ['include', 'exclude', 'to_zero']},
+            'filter': {'type': 'string'}
+        }
+    }
+
+    def __init__(self, data, manager=None):
+        # Auto-set metric namespace if not provided
+        if 'metric_namespace' not in data:
+            storage_type = data.get('storage-type')
+            if storage_type and storage_type in self.STORAGE_TYPE_NAMESPACES:
+                data = data.copy()
+                data['metric_namespace'] = self.STORAGE_TYPE_NAMESPACES[storage_type]
+
+        super(StorageMetricsFilter, self).__init__(data, manager)
+        self.storage_type = data.get('storage-type')
+
+    def get_resource_id(self, resource):
+        """Override to append storage service path to resource ID."""
+        base_id = super(StorageMetricsFilter, self).get_resource_id(resource)
+        if self.storage_type in self.STORAGE_TYPE_PATHS:
+            return base_id + self.STORAGE_TYPE_PATHS[self.storage_type]
+        return base_id
 
 
 @Storage.action_registry.register('set-log-settings')
