@@ -226,6 +226,41 @@ class KmsCryptoKeyTest(BaseTest):
                     members.add(member)
             self.assertTrue('allUsers' in members or 'allAuthenticatedUsers' in members)
 
+    def test_kms_cryptokey_label(test):
+        # Set the 'env' label to not the default
+        factory = test.replay_flight_data('kms-cryptokey-label')
+        key_name = (
+            'projects/cloud-custodian/locations/us-central1/keyRings/c7n-test-keyring-bunny/cryptoKeys/c7n-test-cryptokey'
+        )
+        p = test.load_policy(
+            {
+                'name': 'kms-cryptokey-label',
+                'resource': 'gcp.kms-cryptokey',
+                'query': [{'location': 'us-central1'}],
+                'filters': [{
+                    'type': 'value',
+                    'key': 'name',
+                    'value': key_name,
+                }],
+                'actions': [
+                    {'type': 'set-labels',
+                     'labels': {'env': 'production'}}
+                ]
+            },
+            session_factory=factory,
+        )
+        resources = p.run()
+        test.assertEqual(len(resources), 1)
+        test.assertEqual(resources[0]['labels']['env'], 'default')
+
+        # Fetch the key manually to confirm the label was changed
+        client = p.resource_manager.get_client()
+        result = client.execute_query(
+            'get',
+            {'name': key_name}
+        )
+        test.assertEqual(result['labels']['env'], 'production')
+
 
 class KmsCryptoKeyVersionTest(BaseTest):
     def test_kms_cryptokey_version_query(self):

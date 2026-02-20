@@ -103,7 +103,7 @@ class MethodAction(Action):
             return ()
         if not method:
             method = self.method_spec['op']
-        component = m.component
+        component = getattr(m, 'perm_component', m.component)
         if '.' in component:
             component = component.split('.')[-1]
         return ("{}.{}.{}".format(

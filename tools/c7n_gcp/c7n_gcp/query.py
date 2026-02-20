@@ -82,7 +82,7 @@ class DescribeSource:
         method = m.enum_spec[0]
         if method == 'aggregatedList':
             method = 'list'
-        component = m.component
+        component = getattr(m, 'perm_component', m.component)
         if '.' in component:
             component = component.split('.')[-1]
         return ("%s.%s.%s" % (

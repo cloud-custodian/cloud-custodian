@@ -1,0 +1,37 @@
+{
+  "headers": {
+    "content-type": "application/json; charset=UTF-8",
+    "vary": "Origin, X-Origin, Referer",
+    "date": "Wed, 18 Feb 2026 21:35:20 GMT",
+    "server": "ESF",
+    "x-xss-protection": "0",
+    "x-frame-options": "SAMEORIGIN",
+    "x-content-type-options": "nosniff",
+    "alt-svc": "h3=\":443\"; ma=2592000,h3-29=\":443\"; ma=2592000",
+    "transfer-encoding": "chunked",
+    "status": "200",
+    "content-length": "1823",
+    "-content-encoding": "gzip",
+    "content-location": "https://certificatemanager.googleapis.com/v1/projects/cloud-custodian/locations/-/certificates?alt=json"
+  },
+  "body": {
+    "certificates": [
+      {
+        "name": "projects/cloud-custodian/locations/global/certificates/c7n-test-certificate",
+        "createTime": "2026-02-18T21:35:09.158067570Z",
+        "updateTime": "2026-02-18T21:35:09.531273437Z",
+        "labels": {
+          "env": "default",
+          "goog-terraform-provisioned": "true"
+        },
+        "selfManaged": {},
+        "sanDnsnames": [
+          "foo.com"
+        ],
+        "expireTime": "2299-12-31T21:17:09Z",
+        "description": "Cloud Custodian test certificate",
+        "pemCertificate": "-----BEGIN CERTIFICATE-----\nMIIDcTCCAlmgAwIBAgIUdyLoXxEg6f1q3xJTqhCFLFAjSFkwDQYJKoZIhvcNAQEL\nBQAwRzELMAkGA1UEBhMCREUxDzANBgNVBAcMBkJlcmxpbjEVMBMGA1UECgwMVGVz\ndCBDb21wYW55MRAwDgYDVQQDDAdmb28uY29tMCAXDTIwMTExODIxMTcwOVoYDzIy\nOTkxMjMxMjExNzA5WjBHMQswCQYDVQQGEwJERTEPMA0GA1UEBwwGQmVybGluMRUw\nEwYDVQQKDAxUZXN0IENvbXBhbnkxEDAOBgNVBAMMB2Zvby5jb20wggEiMA0GCSqG\nSIb3DQEBAQUAA4IBDwAwggEKAoIBAQDVDdEpgcXd2IflHcOx6lbQXpsNs4NH8LY8\nu0d7g8glWiyErHPz0DgiLEvy74h4pp1w5LAodpCnNflEqCky0QkWhYasc3F0xLbs\nAqNC6FFC/UtBkf6h5b08XxwJ2Iyg0wgWkKO9qEZCbX5iaKizimTs0fffRIN5FQXV\nAduk8/Nc9OYA2At4i3n+vd8tXDBLeeFUH8qA983Qjf2NnW1174cN8IXzY7bE46ax\nMZOpbhm3zvnqCKDrRQ12VblMH9gZZSc8dBs5eXaZ/L/I8bdL++SYX86jOiQoK6Gd\n0smwjbo5mpxDmMG8iBNC6GgSwLcbBXJrsHKb1eOjXPT9n7Odwu/lAgMBAAGjUzBR\nMB0GA1UdDgQWBBQTiVisMqW/SqBHDmADqp2FqqIuxjAfBgNVHSMEGDAWgBQTiVis\nMqW/SqBHDmADqp2FqqIuxjAPBgNVHRMBAf8EBTADAQH/MA0GCSqGSIb3DQEBCwUA\nA4IBAQB3bCghuy0a8BI+sObx3DhXDOeBpE4IZxOkJALu8/Z3Pnq7N6uC+LElzcu2\nNi4YU71w60gNQM8lFemIZlFeWnMPQYFx5OS+vxo2xiIXYxQhyOm1F4RnWyol3oYW\nqxyfrnwkOIfQ5kAg6EyxcV2Fyt2qzioafprpGUO5OPFcgspMrTnxSMWyz7ppXZ13\nO2r8eXjgVSggNk8P78j4JnrgJhJAm6879eA32Y2q994wmT9KUNhUbQrFgNPib8W2\nq1Fe/c7vH6Khp47X/tsmFGZpEVFhuRSi+YwApYO/s53TVu145N+WS/rBUxDsvUyD\nHGTJ6VP83qwWSWmnAIxfVpD67pO3\n-----END CERTIFICATE-----\n"
+      }
+    ]
+  }
+}

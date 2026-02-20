@@ -1,0 +1,54 @@
+{
+  "headers": {
+    "content-type": "application/json; charset=UTF-8",
+    "vary": "Origin, X-Origin, Referer",
+    "date": "Wed, 18 Feb 2026 22:00:21 GMT",
+    "server": "ESF",
+    "x-xss-protection": "0",
+    "x-frame-options": "SAMEORIGIN",
+    "x-content-type-options": "nosniff",
+    "alt-svc": "h3=\":443\"; ma=2592000,h3-29=\":443\"; ma=2592000",
+    "transfer-encoding": "chunked",
+    "status": "200",
+    "content-length": "1386",
+    "-content-encoding": "gzip",
+    "content-location": "https://cloudkms.googleapis.com/v1/projects/cloud-custodian/locations/us-central1/keyRings?alt=json"
+  },
+  "body": {
+    "keyRings": [
+      {
+        "name": "projects/cloud-custodian/locations/us-central1/keyRings/c7n-dataproc-kr-8f5962e0",
+        "createTime": "2026-02-05T16:10:14.900501759Z"
+      },
+      {
+        "name": "projects/cloud-custodian/locations/us-central1/keyRings/c7n-dataproc-kr-ea33b5a9",
+        "createTime": "2026-02-05T16:12:35.734409834Z"
+      },
+      {
+        "name": "projects/cloud-custodian/locations/us-central1/keyRings/c7n-dp-kr-442b",
+        "createTime": "2026-02-04T19:43:34.403709385Z"
+      },
+      {
+        "name": "projects/cloud-custodian/locations/us-central1/keyRings/c7n-kr-002c1dda",
+        "createTime": "2026-01-19T21:33:26.505895499Z"
+      },
+      {
+        "name": "projects/cloud-custodian/locations/us-central1/keyRings/c7n-test-keyring-bunny",
+        "createTime": "2026-02-18T22:00:20.577263882Z"
+      },
+      {
+        "name": "projects/cloud-custodian/locations/us-central1/keyRings/c7n-test-keyring-firefly",
+        "createTime": "2026-02-18T21:58:08.686384584Z"
+      },
+      {
+        "name": "projects/cloud-custodian/locations/us-central1/keyRings/c7n-test-keyring-hyena",
+        "createTime": "2026-02-18T21:59:00.482630090Z"
+      },
+      {
+        "name": "projects/cloud-custodian/locations/us-central1/keyRings/c7n-test-keyring-katydid",
+        "createTime": "2026-02-18T21:54:52.187411717Z"
+      }
+    ],
+    "totalSize": 8
+  }
+}
