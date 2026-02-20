@@ -68,6 +68,9 @@ class NetworkSecurityGroupTest(BaseTest):
 
         resources = p.run()
         self.assertEqual(len(resources), 1)
+        self.assertEqual(
+            {r["name"] for r in resources[0]['c7n:matched-ingress-security-rules']}, {'test1'}
+        )
 
     @arm_template('networksecuritygroup.json')
     def test_allow_multiple_ports(self):
@@ -88,6 +91,10 @@ class NetworkSecurityGroupTest(BaseTest):
 
         resources = p.run()
         self.assertEqual(len(resources), 1)
+        self.assertEqual(
+            {r["name"] for r in resources[0]['c7n:matched-ingress-security-rules']},
+            {'test1', 'test2', 'test6'}
+        )
 
     @arm_template('networksecuritygroup.json')
     def test_allow_ports_range_any(self):
@@ -108,6 +115,10 @@ class NetworkSecurityGroupTest(BaseTest):
 
         resources = p.run()
         self.assertEqual(len(resources), 1)
+        self.assertEqual(
+            {r["name"] for r in resources[0]['c7n:matched-ingress-security-rules']},
+            {'test1', 'test6'}
+        )
 
     @arm_template('networksecuritygroup.json')
     def test_deny_port(self):
@@ -127,6 +138,9 @@ class NetworkSecurityGroupTest(BaseTest):
 
         resources = p.run()
         self.assertEqual(len(resources), 1)
+        self.assertEqual(
+            {r["name"] for r in resources[0]['c7n:matched-ingress-security-rules']}, {'test3'}
+        )
 
     @arm_template('networksecuritygroup.json')
     def test_egress_policy_protocols(self):
@@ -148,6 +162,9 @@ class NetworkSecurityGroupTest(BaseTest):
 
         resources = p.run()
         self.assertEqual(len(resources), 1)
+        self.assertEqual(
+            {r["name"] for r in resources[0]['c7n:matched-egress-security-rules']}, {'test5'}
+        )
 
         p = self.load_policy({
             'name': 'test-azure-nsg',
@@ -229,6 +246,9 @@ class NetworkSecurityGroupTest(BaseTest):
 
         resources = p.run()
         self.assertEqual(len(resources), 1)
+        self.assertEqual(
+            {r["name"] for r in resources[0]['c7n:matched-ingress-security-rules']}, {'test1'}
+        )
 
     @arm_template('networksecuritygroup.json')
     def test_cidr_only_match(self):
@@ -249,6 +269,9 @@ class NetworkSecurityGroupTest(BaseTest):
 
         resources = p.run()
         self.assertEqual(len(resources), 1)
+        self.assertEqual(
+            {r["name"] for r in resources[0]['c7n:matched-ingress-security-rules']}, {'test4'}
+        )
 
     @arm_template('networksecuritygroup.json')
     def test_cidr_only_no_match(self):
@@ -292,6 +315,9 @@ class NetworkSecurityGroupTest(BaseTest):
 
         resources = p.run()
         self.assertEqual(len(resources), 1)
+        self.assertEqual(
+            {r["name"] for r in resources[0]['c7n:matched-ingress-security-rules']}, {'test4'}
+        )
 
     @arm_template('networksecuritygroup.json')
     def test_cidr_and_ingress_no_match(self):
@@ -314,6 +340,24 @@ class NetworkSecurityGroupTest(BaseTest):
         })
 
         resources = p.run()
+        self.assertEqual(len(resources), 0)
+
+    @arm_template('networksecuritygroup.json')
+    def test_no_cidr_no_ports(self):
+        # TODO: this test is insufficient, because the cassette loaded here only contains an empty
+        # response. Also, this is not the behavior on master. On master, this filter would match
+        # any NSG for which *every port* was open. We should add a test that confirms this and then
+        # duplicate the behavior here.
+        p = self.load_policy({
+            'name': 'test-azure-nsg',
+            'resource': 'azure.networksecuritygroup',
+            'filters': [
+                {'type': 'ingress',
+                'access': 'Allow'}]
+        })
+
+        resources = p.run()
+        # Do we really want this behavior?
         self.assertEqual(len(resources), 0)
 
 
