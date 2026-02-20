@@ -14,18 +14,18 @@ runs:
   using: "composite"
   steps:
     - name: Install uv
-      uses: astral-sh/setup-uv@85856786d1ce8acfbcc2f13a5f3fbd6b938f9f41 # ratchet:astral-sh/setup-uv@v5
+      uses: astral-sh/setup-uv@eac588ad8def6316056a12d4907a9d4d84ff7a3b # ratchet:astral-sh/setup-uv@v5
       with:
         version: ${{ inputs.uv-version }}
         enable-cache: true
 
     - name: Set up Python ${{ inputs.python-version }}
-      uses: actions/setup-python@e797f83bcb11b83ae66e0230d6156d7c80228e7c # ratchet:actions/setup-python@v5
+      uses: actions/setup-python@a309ff8b426b58ec0e2a45f0f869d46889d02405 # ratchet:actions/setup-python@v5
       with:
         python-version: ${{ inputs.python-version }}
 
     - name: Set up cache
-      uses: actions/cache@0057852bfaa89a56745cba8c7296529d2fc39830 # ratchet:actions/cache@v4
+      uses: actions/cache@cdf6c1fa76f9f475f3d7449005a359c84ca0f306 # ratchet:actions/cache@v5.0.3
       id: cache
       with:
         path: .venv
@@ -83,7 +83,7 @@ runs:
 
     - name: Save cache
       if: steps.cache.outputs.cache-hit == 'true' && steps.cache_check.outputs.venv == 'recreate'
-      uses: actions/cache/save@0057852bfaa89a56745cba8c7296529d2fc39830 # ratchet:actions/cache@v4
+      uses: actions/cache/save@cdf6c1fa76f9f475f3d7449005a359c84ca0f306 # ratchet:actions/cache@v5.0.3
       with:
         path: .venv
         key: venv-${{ runner.os }}-${{ inputs.python-version }}-${{ hashFiles('uv.lock') }}

@@ -15,12 +15,12 @@ jobs:
       contents: read
       checks: write
     steps:
-      - uses: actions/checkout@v5
-      - uses: actions/setup-python@v6
+      - uses: actions/checkout@v6.0.2
+      - uses: actions/setup-python@v6.2.0
         with:
           python-version: ${{ env.DEFAULT_PY_VERSION }}
 
-      - uses: aws-actions/configure-aws-credentials@v5
+      - uses: aws-actions/configure-aws-credentials@v6
         with:
           role-to-assume: ${{ secrets.AWS_FTEST_ROLE }}
           aws-region: us-east-1
@@ -38,7 +38,7 @@ jobs:
           uv-version: ${{ env.UV_VERSION }}
 
       - name: Set up cache
-        uses: actions/cache@v4
+        uses: actions/cache@v5
         id: tfcache
         with:
           path: .tfcache
