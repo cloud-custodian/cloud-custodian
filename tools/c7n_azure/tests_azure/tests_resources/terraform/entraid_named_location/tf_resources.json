@@ -1,0 +1,394 @@
+{
+    "pytest-terraform": 1,
+    "outputs": {
+        "all_named_locations": {
+            "value": {
+                "blocked_countries": "00000000-0000-0000-0000-000000000000",
+                "corporate_ips": "00000000-0000-0000-0000-000000000000",
+                "country_with_unknown": "00000000-0000-0000-0000-000000000000",
+                "external_ips": "00000000-0000-0000-0000-000000000000",
+                "mixed_ranges": "00000000-0000-0000-0000-000000000000",
+                "single_ip": "00000000-0000-0000-0000-000000000000",
+                "trusted_countries": "00000000-0000-0000-0000-000000000000"
+            },
+            "type": [
+                "object",
+                {
+                    "blocked_countries": "string",
+                    "corporate_ips": "string",
+                    "country_with_unknown": "string",
+                    "external_ips": "string",
+                    "mixed_ranges": "string",
+                    "single_ip": "string",
+                    "trusted_countries": "string"
+                }
+            ]
+        },
+        "test_blocked_countries": {
+            "value": {
+                "country": {
+                    "countries_and_regions": [
+                        "CN",
+                        "RU",
+                        "KP"
+                    ],
+                    "include_unknown_countries_and_regions": false
+                },
+                "display_name": "C7N Test - Blocked Countries 6m3g18kl",
+                "id": "00000000-0000-0000-0000-000000000000",
+                "object_id": "00000000-0000-0000-0000-000000000000"
+            },
+            "type": [
+                "object",
+                {
+                    "country": [
+                        "object",
+                        {
+                            "countries_and_regions": [
+                                "list",
+                                "string"
+                            ],
+                            "include_unknown_countries_and_regions": "bool"
+                        }
+                    ],
+                    "display_name": "string",
+                    "id": "string",
+                    "object_id": "string"
+                }
+            ]
+        },
+        "test_corporate_ips": {
+            "value": {
+                "display_name": "C7N Test - Corporate IP Ranges 6m3g18kl",
+                "id": "00000000-0000-0000-0000-000000000000",
+                "ip": {
+                    "ip_ranges_or_fqdns": [
+                        "192.168.1.0/24",
+                        "10.0.0.0/16",
+                        "172.16.0.0/12"
+                    ],
+                    "trusted": false
+                },
+                "object_id": "00000000-0000-0000-0000-000000000000"
+            },
+            "type": [
+                "object",
+                {
+                    "display_name": "string",
+                    "id": "string",
+                    "ip": [
+                        "object",
+                        {
+                            "ip_ranges_or_fqdns": [
+                                "list",
+                                "string"
+                            ],
+                            "trusted": "bool"
+                        }
+                    ],
+                    "object_id": "string"
+                }
+            ]
+        },
+        "test_country_with_unknown": {
+            "value": {
+                "country": {
+                    "countries_and_regions": [
+                        "US"
+                    ],
+                    "include_unknown_countries_and_regions": true
+                },
+                "display_name": "C7N Test - Country with Unknown Regions 6m3g18kl",
+                "id": "00000000-0000-0000-0000-000000000000",
+                "object_id": "00000000-0000-0000-0000-000000000000"
+            },
+            "type": [
+                "object",
+                {
+                    "country": [
+                        "object",
+                        {
+                            "countries_and_regions": [
+                                "list",
+                                "string"
+                            ],
+                            "include_unknown_countries_and_regions": "bool"
+                        }
+                    ],
+                    "display_name": "string",
+                    "id": "string",
+                    "object_id": "string"
+                }
+            ]
+        },
+        "test_external_ips": {
+            "value": {
+                "display_name": "C7N Test - External IP Ranges 6m3g18kl",
+                "id": "00000000-0000-0000-0000-000000000000",
+                "ip": {
+                    "ip_ranges_or_fqdns": [
+                        "203.0.113.0/24",
+                        "198.51.100.0/24"
+                    ],
+                    "trusted": false
+                },
+                "object_id": "00000000-0000-0000-0000-000000000000"
+            },
+            "type": [
+                "object",
+                {
+                    "display_name": "string",
+                    "id": "string",
+                    "ip": [
+                        "object",
+                        {
+                            "ip_ranges_or_fqdns": [
+                                "list",
+                                "string"
+                            ],
+                            "trusted": "bool"
+                        }
+                    ],
+                    "object_id": "string"
+                }
+            ]
+        },
+        "test_mixed_ranges": {
+            "value": {
+                "display_name": "C7N Test - Multiple IP Ranges 6m3g18kl",
+                "id": "00000000-0000-0000-0000-000000000000",
+                "ip": {
+                    "ip_ranges_or_fqdns": [
+                        "192.168.10.0/24",
+                        "172.20.0.0/16",
+                        "203.0.114.0/24"
+                    ],
+                    "trusted": false
+                },
+                "object_id": "00000000-0000-0000-0000-000000000000"
+            },
+            "type": [
+                "object",
+                {
+                    "display_name": "string",
+                    "id": "string",
+                    "ip": [
+                        "object",
+                        {
+                            "ip_ranges_or_fqdns": [
+                                "list",
+                                "string"
+                            ],
+                            "trusted": "bool"
+                        }
+                    ],
+                    "object_id": "string"
+                }
+            ]
+        },
+        "test_single_ip": {
+            "value": {
+                "display_name": "C7N Test - Single IP 6m3g18kl",
+                "id": "00000000-0000-0000-0000-000000000000",
+                "ip": {
+                    "ip_ranges_or_fqdns": [
+                        "192.168.1.100/32"
+                    ],
+                    "trusted": false
+                },
+                "object_id": "00000000-0000-0000-0000-000000000000"
+            },
+            "type": [
+                "object",
+                {
+                    "display_name": "string",
+                    "id": "string",
+                    "ip": [
+                        "object",
+                        {
+                            "ip_ranges_or_fqdns": [
+                                "list",
+                                "string"
+                            ],
+                            "trusted": "bool"
+                        }
+                    ],
+                    "object_id": "string"
+                }
+            ]
+        },
+        "test_trusted_countries": {
+            "value": {
+                "country": {
+                    "countries_and_regions": [
+                        "US",
+                        "CA",
+                        "GB",
+                        "AU"
+                    ],
+                    "include_unknown_countries_and_regions": false
+                },
+                "display_name": "C7N Test - Trusted Countries 6m3g18kl",
+                "id": "00000000-0000-0000-0000-000000000000",
+                "object_id": "00000000-0000-0000-0000-000000000000"
+            },
+            "type": [
+                "object",
+                {
+                    "country": [
+                        "object",
+                        {
+                            "countries_and_regions": [
+                                "list",
+                                "string"
+                            ],
+                            "include_unknown_countries_and_regions": "bool"
+                        }
+                    ],
+                    "display_name": "string",
+                    "id": "string",
+                    "object_id": "string"
+                }
+            ]
+        }
+    },
+    "resources": {
+        "azuread_client_config": {
+            "current": {
+                "client_id": "00000000-0000-0000-0000-000000000000",
+                "id": "00000000-0000-0000-0000-000000000000-00000000-0000-0000-0000-000000000000-00000000-0000-0000-0000-000000000000",
+                "object_id": "00000000-0000-0000-0000-000000000000",
+                "tenant_id": "00000000-0000-0000-0000-000000000000",
+                "timeouts": null
+            }
+        },
+        "azuread_named_location": {
+            "test_blocked_countries": {
+                "country": [
+                    {
+                        "countries_and_regions": [
+                            "CN",
+                            "RU",
+                            "KP"
+                        ],
+                        "include_unknown_countries_and_regions": false
+                    }
+                ],
+                "display_name": "C7N Test - Blocked Countries 6m3g18kl",
+                "id": "00000000-0000-0000-0000-000000000000",
+                "ip": [],
+                "timeouts": null
+            },
+            "test_corporate_ips": {
+                "country": [],
+                "display_name": "C7N Test - Corporate IP Ranges 6m3g18kl",
+                "id": "00000000-0000-0000-0000-000000000000",
+                "ip": [
+                    {
+                        "ip_ranges": [
+                            "192.168.1.0/24",
+                            "10.0.0.0/16",
+                            "172.16.0.0/12"
+                        ],
+                        "trusted": false
+                    }
+                ],
+                "timeouts": null
+            },
+            "test_country_with_unknown": {
+                "country": [
+                    {
+                        "countries_and_regions": [
+                            "US"
+                        ],
+                        "include_unknown_countries_and_regions": true
+                    }
+                ],
+                "display_name": "C7N Test - Country with Unknown Regions 6m3g18kl",
+                "id": "00000000-0000-0000-0000-000000000000",
+                "ip": [],
+                "timeouts": null
+            },
+            "test_external_ips": {
+                "country": [],
+                "display_name": "C7N Test - External IP Ranges 6m3g18kl",
+                "id": "00000000-0000-0000-0000-000000000000",
+                "ip": [
+                    {
+                        "ip_ranges": [
+                            "203.0.113.0/24",
+                            "198.51.100.0/24"
+                        ],
+                        "trusted": false
+                    }
+                ],
+                "timeouts": null
+            },
+            "test_mixed_ranges": {
+                "country": [],
+                "display_name": "C7N Test - Multiple IP Ranges 6m3g18kl",
+                "id": "00000000-0000-0000-0000-000000000000",
+                "ip": [
+                    {
+                        "ip_ranges": [
+                            "192.168.10.0/24",
+                            "172.20.0.0/16",
+                            "203.0.114.0/24"
+                        ],
+                        "trusted": false
+                    }
+                ],
+                "timeouts": null
+            },
+            "test_single_ip": {
+                "country": [],
+                "display_name": "C7N Test - Single IP 6m3g18kl",
+                "id": "00000000-0000-0000-0000-000000000000",
+                "ip": [
+                    {
+                        "ip_ranges": [
+                            "192.168.1.100/32"
+                        ],
+                        "trusted": false
+                    }
+                ],
+                "timeouts": null
+            },
+            "test_trusted_countries": {
+                "country": [
+                    {
+                        "countries_and_regions": [
+                            "US",
+                            "CA",
+                            "GB",
+                            "AU"
+                        ],
+                        "include_unknown_countries_and_regions": false
+                    }
+                ],
+                "display_name": "C7N Test - Trusted Countries 6m3g18kl",
+                "id": "00000000-0000-0000-0000-000000000000",
+                "ip": [],
+                "timeouts": null
+            }
+        },
+        "random_string": {
+            "suffix": {
+                "id": "6m3g18kl",
+                "keepers": null,
+                "length": 8,
+                "lower": true,
+                "min_lower": 0,
+                "min_numeric": 0,
+                "min_special": 0,
+                "min_upper": 0,
+                "number": true,
+                "numeric": true,
+                "override_special": null,
+                "result": "6m3g18kl",
+                "special": false,
+                "upper": false
+            }
+        }
+    }
+}

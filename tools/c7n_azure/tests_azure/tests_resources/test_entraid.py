@@ -12,6 +12,10 @@ from c7n_azure.resources.entraid_user import (
 )
 from c7n_azure.resources.entraid_group import EntraIDGroup
 from c7n_azure.resources.entraid_organization import EntraIDOrganization
+from c7n_azure.resources.entraid_conditional_access import EntraIDConditionalAccessPolicy
+from c7n_azure.resources.entraid_security_defaults import EntraIDSecurityDefaults
+from c7n_azure.resources.entraid_authorization_policy import EntraIDAuthorizationPolicy
+from c7n_azure.resources.entraid_named_locations import EntraIDNamedLocation
 from tests_azure.azure_common import BaseTest
 
 
@@ -2413,6 +2417,1422 @@ class EntraIDOrganizationTest(BaseTest):
         self.assertEqual(len(filtered), 0)
 
 
+class EntraIDConditionalAccessTest(BaseTest):
+    """Test EntraID Conditional Access Policy resource functionality"""
+
+    def test_conditional_access_schema_validate(self):
+        """Test conditional access policy schema validation"""
+        with self.sign_out_patch():
+            p = self.load_policy({
+                'name': 'test-conditional-access',
+                'resource': 'azure.entraid-conditional-access-policy',
+                'filters': [
+                    {'type': 'value', 'key': 'state', 'value': 'enabled'}
+                ]
+            }, validate=True)
+            self.assertTrue(p)
+
+    def test_conditional_access_resource_type(self):
+        """Test conditional access resource type configuration"""
+        resource_type = EntraIDConditionalAccessPolicy.resource_type
+        self.assertEqual(resource_type.service, 'graph')
+        self.assertEqual(resource_type.id, 'id')
+        self.assertTrue(resource_type.global_resource)
+        self.assertIn('Policy.Read.All', resource_type.permissions)
+
+    def test_admin_mfa_required_filter(self):
+        """Test admin MFA required filter"""
+        policies = [
+            {
+                'id': 'policy1',
+                'displayName': 'Admin MFA Policy',
+                'state': 'enabled',
+                'conditions': {
+                    'users': {
+                        'includeRoles': ['Global Administrator']
+                    }
+                },
+                'grantControls': {
+                    'builtInControls': ['mfa']
+                }
+            },
+            {
+                'id': 'policy2',
+                'displayName': 'Admin No MFA Policy',
+                'state': 'enabled',
+                'conditions': {
+                    'users': {
+                        'includeRoles': ['Global Administrator']
+                    }
+                },
+                'grantControls': {
+                    'builtInControls': ['block']
+                }
+            },
+            {
+                'id': 'policy3',
+                'displayName': 'User Policy',
+                'state': 'enabled',
+                'conditions': {
+                    'users': {
+                        'includeRoles': ['User']
+                    }
+                },
+                'grantControls': {
+                    'builtInControls': ['mfa']
+                }
+            }
+        ]
+
+        policy = self.load_policy({
+            'name': 'test-admin-mfa',
+            'resource': 'azure.entraid-conditional-access-policy',
+            'filters': [
+                {'type': 'admin-mfa-required', 'value': True}
+            ]
+        })
+
+        resource_mgr = policy.resource_manager
+        filtered = resource_mgr.filter_resources(policies)
+
+        # Only policy1 requires MFA for admins
+        self.assertEqual(len(filtered), 1)
+        self.assertEqual(filtered[0]['id'], 'policy1')
+
+    def test_admin_mfa_required_filter_false(self):
+        """Test admin MFA required filter with value=False (find policies NOT requiring MFA)"""
+        policies = [
+            {
+                'id': 'policy1',
+                'displayName': 'Admin MFA Policy',
+                'state': 'enabled',
+                'conditions': {
+                    'users': {
+                        'includeRoles': ['Global Administrator']
+                    }
+                },
+                'grantControls': {
+                    'builtInControls': ['mfa']
+                }
+            },
+            {
+                'id': 'policy2',
+                'displayName': 'Admin No MFA Policy',
+                'state': 'enabled',
+                'conditions': {
+                    'users': {
+                        'includeRoles': ['Global Administrator']
+                    }
+                },
+                'grantControls': {
+                    'builtInControls': ['block']
+                }
+            }
+        ]
+
+        policy = self.load_policy({
+            'name': 'test-admin-no-mfa',
+            'resource': 'azure.entraid-conditional-access-policy',
+            'filters': [
+                {'type': 'admin-mfa-required', 'value': False}
+            ]
+        })
+
+        resource_mgr = policy.resource_manager
+        filtered = resource_mgr.filter_resources(policies)
+
+        # Only policy2 doesn't require MFA for admins
+        self.assertEqual(len(filtered), 1)
+        self.assertEqual(filtered[0]['id'], 'policy2')
+
+    def test_admin_mfa_required_filter_multiple_admin_roles(self):
+        """Test filter with multiple admin role types"""
+        policies = [
+            {
+                'id': 'policy1',
+                'displayName': 'Privileged Role Admin MFA',
+                'conditions': {
+                    'users': {
+                        'includeRoles': ['Privileged Role Administrator']
+                    }
+                },
+                'grantControls': {
+                    'builtInControls': ['mfa']
+                }
+            },
+            {
+                'id': 'policy2',
+                'displayName': 'User Admin MFA',
+                'conditions': {
+                    'users': {
+                        'includeRoles': ['User Administrator']
+                    }
+                },
+                'grantControls': {
+                    'builtInControls': ['MFA']  # Test case insensitive
+                }
+            }
+        ]
+
+        policy = self.load_policy({
+            'name': 'test-admin-roles',
+            'resource': 'azure.entraid-conditional-access-policy',
+            'filters': [
+                {'type': 'admin-mfa-required', 'value': True}
+            ]
+        })
+
+        filtered = policy.resource_manager.filter_resources(policies)
+        self.assertEqual(len(filtered), 2)
+
+    def test_admin_mfa_required_filter_missing_conditions(self):
+        """Test filter with policies missing conditions or grant controls"""
+        policies = [
+            {
+                'id': 'policy1',
+                'displayName': 'No conditions',
+                # No conditions key
+            },
+            {
+                'id': 'policy2',
+                'displayName': 'Empty conditions',
+                'conditions': {}
+            },
+            {
+                'id': 'policy3',
+                'displayName': 'No users',
+                'conditions': {
+                    'users': {}
+                }
+            },
+            {
+                'id': 'policy4',
+                'displayName': 'No grant controls',
+                'conditions': {
+                    'users': {
+                        'includeRoles': ['Global Administrator']
+                    }
+                }
+            },
+            {
+                'id': 'policy5',
+                'displayName': 'Empty grant controls',
+                'conditions': {
+                    'users': {
+                        'includeRoles': ['Global Administrator']
+                    }
+                },
+                'grantControls': {}
+            }
+        ]
+
+        policy = self.load_policy({
+            'name': 'test-missing-data',
+            'resource': 'azure.entraid-conditional-access-policy',
+            'filters': [
+                {'type': 'admin-mfa-required', 'value': True}
+            ]
+        })
+
+        filtered = policy.resource_manager.filter_resources(policies)
+        # None of these should match since they don't have admin roles with MFA
+        self.assertEqual(len(filtered), 0)
+
+    def test_admin_mfa_required_filter_non_admin_roles(self):
+        """Test that non-admin roles are filtered out"""
+        policies = [
+            {
+                'id': 'policy1',
+                'displayName': 'Regular User with MFA',
+                'conditions': {
+                    'users': {
+                        'includeRoles': ['Regular User', 'Guest']
+                    }
+                },
+                'grantControls': {
+                    'builtInControls': ['mfa']
+                }
+            }
+        ]
+
+        policy = self.load_policy({
+            'name': 'test-non-admin',
+            'resource': 'azure.entraid-conditional-access-policy',
+            'filters': [
+                {'type': 'admin-mfa-required', 'value': True}
+            ]
+        })
+
+        filtered = policy.resource_manager.filter_resources(policies)
+        # Should not match since no admin roles
+        self.assertEqual(len(filtered), 0)
+
+    @patch('c7n_azure.resources.entraid_conditional_access.requests.get')
+    @patch('c7n_azure.resources.entraid_conditional_access.get_required_permissions_for_endpoint')
+    def test_make_graph_request_success(self, mock_get_permissions, mock_requests_get):
+        """Test successful Graph API request"""
+        # Setup mocks
+        mock_get_permissions.return_value = ['Policy.Read.All']
+
+        mock_response = Mock()
+        mock_response.json.return_value = {'value': [{'id': 'test'}]}
+        mock_response.raise_for_status = Mock()
+        mock_requests_get.return_value = mock_response
+
+        mock_token = Mock()
+        mock_token.token = 'test-token'
+
+        mock_session = Mock()
+        mock_session._initialize_session = Mock()
+        mock_session.credentials.get_token.return_value = mock_token
+
+        # Create instance and test
+        policy = self.load_policy({
+            'name': 'test-graph-request',
+            'resource': 'azure.entraid-conditional-access-policy'
+        })
+
+        resource_mgr = policy.resource_manager
+        resource_mgr.get_client = Mock(return_value=mock_session)
+
+        result = resource_mgr.make_graph_request('test/endpoint')
+
+        self.assertEqual(result, {'value': [{'id': 'test'}]})
+        mock_requests_get.assert_called_once()
+        call_args = mock_requests_get.call_args
+        self.assertIn('https://graph.microsoft.com/beta/test/endpoint', call_args[0])
+
+    @patch('c7n_azure.resources.entraid_conditional_access.get_required_permissions_for_endpoint')
+    def test_make_graph_request_unmapped_endpoint(self, mock_get_permissions):
+        """Test Graph API request with unmapped endpoint raises ValueError"""
+        mock_get_permissions.side_effect = ValueError("Unmapped endpoint")
+
+        mock_session = Mock()
+        mock_session._initialize_session = Mock()
+
+        policy = self.load_policy({
+            'name': 'test-unmapped-endpoint',
+            'resource': 'azure.entraid-conditional-access-policy'
+        })
+
+        resource_mgr = policy.resource_manager
+        resource_mgr.get_client = Mock(return_value=mock_session)
+
+        with self.assertRaises(ValueError):
+            resource_mgr.make_graph_request('unmapped/endpoint')
+
+    @patch('c7n_azure.resources.entraid_conditional_access.requests.get')
+    @patch('c7n_azure.resources.entraid_conditional_access.get_required_permissions_for_endpoint')
+    def test_make_graph_request_api_error(self, mock_get_permissions, mock_requests_get):
+        """Test Graph API request handling of request exceptions"""
+        mock_get_permissions.return_value = ['Policy.Read.All']
+        mock_requests_get.side_effect = requests.exceptions.RequestException("API Error")
+
+        mock_token = Mock()
+        mock_token.token = 'test-token'
+
+        mock_session = Mock()
+        mock_session._initialize_session = Mock()
+        mock_session.credentials.get_token.return_value = mock_token
+
+        policy = self.load_policy({
+            'name': 'test-api-error',
+            'resource': 'azure.entraid-conditional-access-policy'
+        })
+
+        resource_mgr = policy.resource_manager
+        resource_mgr.get_client = Mock(return_value=mock_session)
+
+        with self.assertRaises(requests.exceptions.RequestException):
+            resource_mgr.make_graph_request('test/endpoint')
+
+    @patch('c7n_azure.resources.entraid_conditional_access.EntraIDConditionalAccessPolicy.make_graph_request')
+    def test_get_graph_resources_success(self, mock_make_request):
+        """Test successful retrieval of conditional access policies"""
+        mock_make_request.return_value = {
+            'value': [
+                {'id': 'policy1', 'displayName': 'Test Policy 1'},
+                {'id': 'policy2', 'displayName': 'Test Policy 2'}
+            ]
+        }
+
+        policy = self.load_policy({
+            'name': 'test-get-resources',
+            'resource': 'azure.entraid-conditional-access-policy'
+        })
+
+        resource_mgr = policy.resource_manager
+        resources = resource_mgr.get_graph_resources()
+
+        self.assertEqual(len(resources), 2)
+        self.assertEqual(resources[0]['id'], 'policy1')
+        self.assertEqual(resources[1]['id'], 'policy2')
+        mock_make_request.assert_called_once_with('identity/conditionalAccess/policies')
+
+    @patch('c7n_azure.resources.entraid_conditional_access.EntraIDConditionalAccessPolicy.make_graph_request')
+    def test_get_graph_resources_error(self, mock_make_request):
+        """Test get_graph_resources returns empty list on exception"""
+        mock_make_request.side_effect = Exception("API Error")
+
+        policy = self.load_policy({
+            'name': 'test-get-resources-error',
+            'resource': 'azure.entraid-conditional-access-policy'
+        })
+
+        resource_mgr = policy.resource_manager
+        resources = resource_mgr.get_graph_resources()
+
+        # Should return empty list on error
+        self.assertEqual(resources, [])
+
+
+class EntraIDSecurityDefaultsTest(BaseTest):
+    """Test EntraID Security Defaults resource functionality"""
+
+    def setUp(self):
+        super().setUp()
+        self.policy = self.load_policy({
+            'name': 'test-entraid-security-defaults',
+            'resource': 'azure.entraid-security-defaults'
+        })
+        self.manager = self.policy.resource_manager
+
+    def test_security_defaults_schema_validate(self):
+        """Test security defaults schema validation"""
+        with self.sign_out_patch():
+            p = self.load_policy({
+                'name': 'test-security-defaults',
+                'resource': 'azure.entraid-security-defaults',
+                'filters': [
+                    {'type': 'value', 'key': 'isEnabled', 'value': True}
+                ]
+            }, validate=True)
+            self.assertTrue(p)
+
+    def test_security_defaults_resource_type(self):
+        """Test security defaults resource type configuration"""
+        resource_type = EntraIDSecurityDefaults.resource_type
+        self.assertEqual(resource_type.service, 'graph')
+        self.assertEqual(resource_type.id, 'id')
+        self.assertTrue(resource_type.global_resource)
+        self.assertIn('Policy.Read.All', resource_type.permissions)
+
+    def test_security_defaults_init(self):
+        """Test security defaults initialization with GraphSource"""
+        from c7n_azure.graph_utils import GraphSource
+        # Verify GraphSource is set in __init__
+        self.assertIsInstance(self.manager.source, GraphSource)
+
+    def test_get_graph_resources_success(self):
+        """Test get_graph_resources successful API call"""
+        mock_policy = {
+            'id': 'security-defaults-id',
+            'displayName': 'Security Defaults',
+            'description': 'Security defaults policy',
+            'isEnabled': True
+        }
+
+        with patch.object(self.manager, 'make_graph_request', return_value=mock_policy):
+            with patch('c7n_azure.resources.entraid_security_defaults.log') as mock_log:
+                resources = self.manager.get_graph_resources()
+
+                # Verify API was called with correct endpoint
+                self.manager.make_graph_request.assert_called_once_with(
+                    'policies/identitySecurityDefaultsEnforcementPolicy'
+                )
+
+                # Verify returned list contains the policy
+                self.assertEqual(len(resources), 1)
+                self.assertEqual(resources[0]['id'], 'security-defaults-id')
+                self.assertEqual(resources[0]['isEnabled'], True)
+
+                # Verify debug logging was called
+                mock_log.debug.assert_called_once_with(
+                    "Retrieved security defaults policy from Graph API"
+                )
+
+    def test_get_graph_resources_error_handling(self):
+        """Test get_graph_resources error handling"""
+        with patch.object(self.manager, 'make_graph_request',
+                         side_effect=Exception("API Error")):
+            with patch('c7n_azure.resources.entraid_security_defaults.log') as mock_log:
+                resources = self.manager.get_graph_resources()
+
+                # Should return empty list on error
+                self.assertEqual(resources, [])
+
+                # Verify warning log was called with error message
+                mock_log.warning.assert_called_once()
+                call_args = mock_log.warning.call_args[0][0]
+                self.assertIn("Could not retrieve Security Defaults policy", call_args)
+                self.assertIn("API Error", call_args)
+
+    def test_get_graph_resources_permission_error(self):
+        """Test get_graph_resources with insufficient privileges"""
+        http_error = requests.exceptions.HTTPError("403 Insufficient privileges")
+
+        with patch.object(self.manager, 'make_graph_request',
+                         side_effect=http_error):
+            with patch('c7n_azure.resources.entraid_security_defaults.log') as mock_log:
+                resources = self.manager.get_graph_resources()
+
+                # Should return empty list on permission error
+                self.assertEqual(resources, [])
+
+                # Verify warning log includes exception details
+                mock_log.warning.assert_called_once()
+                call_args = mock_log.warning.call_args[0][0]
+                self.assertIn("Could not retrieve Security Defaults policy", call_args)
+                self.assertIn("403 Insufficient privileges", call_args)
+
+    def test_get_graph_resources_network_error(self):
+        """Test get_graph_resources with network error"""
+        network_error = requests.exceptions.ConnectionError("Network unreachable")
+
+        with patch.object(self.manager, 'make_graph_request',
+                         side_effect=network_error):
+            with patch('c7n_azure.resources.entraid_security_defaults.log') as mock_log:
+                resources = self.manager.get_graph_resources()
+
+                # Should return empty list on network error
+                self.assertEqual(resources, [])
+
+                # Verify warning log includes exception details
+                mock_log.warning.assert_called_once()
+                call_args = mock_log.warning.call_args[0][0]
+                self.assertIn("Could not retrieve Security Defaults policy", call_args)
+                self.assertIn("Network unreachable", call_args)
+
+    def test_security_defaults_with_filter(self):
+        """Test security defaults resource with enabled filter"""
+        mock_policy = {
+            'id': 'security-defaults-id',
+            'displayName': 'Security Defaults',
+            'description': 'Security defaults policy',
+            'isEnabled': True
+        }
+
+        policy = self.load_policy({
+            'name': 'test-enabled-security-defaults',
+            'resource': 'azure.entraid-security-defaults',
+            'filters': [
+                {'type': 'value', 'key': 'isEnabled', 'value': True}
+            ]
+        })
+
+        resource_mgr = policy.resource_manager
+        with patch.object(resource_mgr, 'make_graph_request', return_value=mock_policy):
+            resources = resource_mgr.get_graph_resources()
+            filtered = resource_mgr.filter_resources(resources)
+
+            # Should return the policy since it's enabled
+            self.assertEqual(len(filtered), 1)
+            self.assertEqual(filtered[0]['isEnabled'], True)
+
+    def test_security_defaults_disabled_filter(self):
+        """Test security defaults resource with disabled filter"""
+        mock_policy = {
+            'id': 'security-defaults-id',
+            'displayName': 'Security Defaults',
+            'description': 'Security defaults policy',
+            'isEnabled': False
+        }
+
+        policy = self.load_policy({
+            'name': 'test-disabled-security-defaults',
+            'resource': 'azure.entraid-security-defaults',
+            'filters': [
+                {'type': 'value', 'key': 'isEnabled', 'value': False}
+            ]
+        })
+
+        resource_mgr = policy.resource_manager
+        with patch.object(resource_mgr, 'make_graph_request', return_value=mock_policy):
+            resources = resource_mgr.get_graph_resources()
+            filtered = resource_mgr.filter_resources(resources)
+
+            # Should return the policy since it's disabled
+            self.assertEqual(len(filtered), 1)
+            self.assertEqual(filtered[0]['isEnabled'], False)
+
+
+class EntraIDNamedLocationTest(BaseTest):
+    """Test EntraID Named Location resource functionality"""
+
+    def test_entraid_named_location_schema_validate(self):
+        """Test that the EntraID named location resource schema validates correctly"""
+        with self.sign_out_patch():
+            p = self.load_policy({
+                'name': 'test-entraid-named-location',
+                'resource': 'azure.entraid-named-location',
+                'filters': [
+                    {'type': 'value', 'key': 'displayName', 'value': 'Test Location'}
+                ]
+            }, validate=True)
+            self.assertTrue(p)
+
+    def test_entraid_named_location_resource_type(self):
+        """Test EntraID named location resource type configuration"""
+        resource_type = EntraIDNamedLocation.resource_type
+        self.assertEqual(resource_type.service, 'graph')
+        self.assertEqual(resource_type.id, 'id')
+        self.assertEqual(resource_type.name, 'displayName')
+        self.assertEqual(resource_type.date, 'createdDateTime')
+        self.assertTrue(resource_type.global_resource)
+        self.assertIn('Policy.Read.All', resource_type.permissions)
+
+    @patch('c7n_azure.resources.entraid_named_locations.EntraIDNamedLocation.make_graph_request')
+    def test_entraid_named_location_get_resources(self, mock_graph_request):
+        """Test named location resource enumeration"""
+        # Mock Graph API response
+        mock_graph_request.return_value = {
+            'value': [
+                {
+                    'id': 'ip-location-1',
+                    'displayName': 'Corporate IP Ranges',
+                    'createdDateTime': '2023-01-01T00:00:00Z',
+                    'modifiedDateTime': '2023-01-01T00:00:00Z',
+                    '@odata.type': '#microsoft.graph.ipNamedLocation',
+                    'isTrusted': True,
+                    'ipRanges': [
+                        {
+                            '@odata.type': '#microsoft.graph.iPv4CidrRange',
+                            'cidrAddress': '192.168.1.0/24'
+                        },
+                        {
+                            '@odata.type': '#microsoft.graph.iPv4CidrRange',
+                            'cidrAddress': '10.0.0.0/16'
+                        }
+                    ]
+                },
+                {
+                    'id': 'country-location-1',
+                    'displayName': 'US Locations',
+                    'createdDateTime': '2023-01-02T00:00:00Z',
+                    'modifiedDateTime': '2023-01-02T00:00:00Z',
+                    '@odata.type': '#microsoft.graph.countryNamedLocation',
+                    'countriesAndRegions': ['US', 'CA'],
+                    'includeUnknownCountriesAndRegions': False
+                }
+            ]
+        }
+
+        policy_data = {
+            'name': 'test-get-resources',
+            'resource': 'azure.entraid-named-location'
+        }
+        policy = self.load_policy(policy_data)
+        resource_mgr = policy.resource_manager
+
+        resources = resource_mgr.get_graph_resources()
+
+        # Verify API was called correctly
+        mock_graph_request.assert_called_with('identity/conditionalAccess/namedLocations')
+
+        # Verify resources returned
+        self.assertEqual(len(resources), 2)
+        self.assertEqual(resources[0]['id'], 'ip-location-1')
+        self.assertEqual(resources[1]['id'], 'country-location-1')
+
+    @patch('c7n_azure.resources.entraid_named_locations.EntraIDNamedLocation.make_graph_request')
+    def test_entraid_named_location_augment(self, mock_graph_request):
+        """Test named location resource augmentation with computed fields"""
+        # Sample named location data
+        locations = [
+            {
+                'id': 'ip-location-1',
+                'displayName': 'Corporate IP Ranges',
+                '@odata.type': '#microsoft.graph.ipNamedLocation',
+                'ipRanges': [
+                    {
+                        '@odata.type': '#microsoft.graph.iPv4CidrRange',
+                        'cidrAddress': '192.168.1.0/24'
+                    },
+                    {
+                        '@odata.type': '#microsoft.graph.iPv4CidrRange',
+                        'cidrAddress': '10.0.0.0/16'
+                    },
+                    {
+                        '@odata.type': '#microsoft.graph.iPv4CidrRange',
+                        'cidrAddress': '172.16.0.0/12'
+                    }
+                ]
+            },
+            {
+                'id': 'country-location-1',
+                'displayName': 'US Locations',
+                '@odata.type': '#microsoft.graph.countryNamedLocation',
+                'countriesAndRegions': ['US', 'CA', 'MX']
+            },
+            {
+                'id': 'unknown-location',
+                'displayName': 'Unknown Type Location',
+                '@odata.type': '#microsoft.graph.unknownLocation'
+            }
+        ]
+
+        policy_data = {
+            'name': 'test-augment',
+            'resource': 'azure.entraid-named-location'
+        }
+        policy = self.load_policy(policy_data)
+        resource_mgr = policy.resource_manager
+
+        augmented = resource_mgr.augment(locations)
+
+        # Check computed fields for IP location
+        self.assertTrue(augmented[0]['c7n:IsIPLocation'])
+        self.assertFalse(augmented[0]['c7n:IsCountryLocation'])
+        self.assertEqual(augmented[0]['c7n:IPRangesCount'], 3)
+
+        # Check computed fields for country location
+        self.assertFalse(augmented[1]['c7n:IsIPLocation'])
+        self.assertTrue(augmented[1]['c7n:IsCountryLocation'])
+        self.assertEqual(augmented[1]['c7n:CountriesCount'], 3)
+
+        # Check computed fields for unknown type
+        self.assertFalse(augmented[2]['c7n:IsIPLocation'])
+        self.assertFalse(augmented[2]['c7n:IsCountryLocation'])
+
+    def test_location_type_filter_ip(self):
+        """Test location-type filter for IP-based locations"""
+        locations = [
+            {
+                'id': 'ip-location-1',
+                'displayName': 'IP Location',
+                '@odata.type': '#microsoft.graph.ipNamedLocation',
+                'c7n:IsIPLocation': True,
+                'c7n:IsCountryLocation': False
+            },
+            {
+                'id': 'country-location-1',
+                'displayName': 'Country Location',
+                '@odata.type': '#microsoft.graph.countryNamedLocation',
+                'c7n:IsIPLocation': False,
+                'c7n:IsCountryLocation': True
+            }
+        ]
+
+        policy_data = {
+            'name': 'test-ip-filter',
+            'resource': 'azure.entraid-named-location',
+            'filters': [
+                {'type': 'location-type', 'location-type': 'ipNamedLocation'}
+            ]
+        }
+        policy = self.load_policy(policy_data)
+        resource_mgr = policy.resource_manager
+
+        filtered = resource_mgr.filter_resources(locations)
+
+        # Should only return IP-based location
+        self.assertEqual(len(filtered), 1)
+        self.assertEqual(filtered[0]['id'], 'ip-location-1')
+
+    def test_location_type_filter_country(self):
+        """Test location-type filter for country-based locations"""
+        locations = [
+            {
+                'id': 'ip-location-1',
+                'displayName': 'IP Location',
+                '@odata.type': '#microsoft.graph.ipNamedLocation',
+                'c7n:IsIPLocation': True,
+                'c7n:IsCountryLocation': False
+            },
+            {
+                'id': 'country-location-1',
+                'displayName': 'Country Location',
+                '@odata.type': '#microsoft.graph.countryNamedLocation',
+                'c7n:IsIPLocation': False,
+                'c7n:IsCountryLocation': True
+            }
+        ]
+
+        policy_data = {
+            'name': 'test-country-filter',
+            'resource': 'azure.entraid-named-location',
+            'filters': [
+                {'type': 'location-type', 'location-type': 'countryNamedLocation'}
+            ]
+        }
+        policy = self.load_policy(policy_data)
+        resource_mgr = policy.resource_manager
+
+        filtered = resource_mgr.filter_resources(locations)
+
+        # Should only return country-based location
+        self.assertEqual(len(filtered), 1)
+        self.assertEqual(filtered[0]['id'], 'country-location-1')
+
+    def test_ip_range_count_filter_greater_than(self):
+        """Test ip-range-count filter with greater-than operator"""
+        locations = [
+            {
+                'id': 'small-ip-location',
+                'displayName': 'Small IP Location',
+                'c7n:IsIPLocation': True,
+                'c7n:IPRangesCount': 2
+            },
+            {
+                'id': 'large-ip-location',
+                'displayName': 'Large IP Location',
+                'c7n:IsIPLocation': True,
+                'c7n:IPRangesCount': 10
+            },
+            {
+                'id': 'country-location',
+                'displayName': 'Country Location',
+                'c7n:IsIPLocation': False,
+                'c7n:IsCountryLocation': True
+            }
+        ]
+
+        policy_data = {
+            'name': 'test-ip-count-filter',
+            'resource': 'azure.entraid-named-location',
+            'filters': [
+                {'type': 'ip-range-count', 'count': 5, 'op': 'greater-than'}
+            ]
+        }
+        policy = self.load_policy(policy_data)
+        resource_mgr = policy.resource_manager
+
+        filtered = resource_mgr.filter_resources(locations)
+
+        # Should only return location with >5 IP ranges
+        self.assertEqual(len(filtered), 1)
+        self.assertEqual(filtered[0]['id'], 'large-ip-location')
+
+    def test_ip_range_count_filter_equal(self):
+        """Test ip-range-count filter with equal operator"""
+        locations = [
+            {
+                'id': 'exact-ip-location',
+                'displayName': 'Exact IP Location',
+                'c7n:IsIPLocation': True,
+                'c7n:IPRangesCount': 5
+            },
+            {
+                'id': 'different-ip-location',
+                'displayName': 'Different IP Location',
+                'c7n:IsIPLocation': True,
+                'c7n:IPRangesCount': 3
+            }
+        ]
+
+        policy_data = {
+            'name': 'test-ip-count-equal',
+            'resource': 'azure.entraid-named-location',
+            'filters': [
+                {'type': 'ip-range-count', 'count': 5, 'op': 'equal'}
+            ]
+        }
+        policy = self.load_policy(policy_data)
+        resource_mgr = policy.resource_manager
+
+        filtered = resource_mgr.filter_resources(locations)
+
+        # Should only return location with exactly 5 IP ranges
+        self.assertEqual(len(filtered), 1)
+        self.assertEqual(filtered[0]['id'], 'exact-ip-location')
+
+    def test_countries_count_filter_greater_than(self):
+        """Test countries-count filter with greater-than operator"""
+        locations = [
+            {
+                'id': 'small-country-location',
+                'displayName': 'Small Country Location',
+                'c7n:IsCountryLocation': True,
+                'c7n:CountriesCount': 2
+            },
+            {
+                'id': 'large-country-location',
+                'displayName': 'Large Country Location',
+                'c7n:IsCountryLocation': True,
+                'c7n:CountriesCount': 10
+            },
+            {
+                'id': 'ip-location',
+                'displayName': 'IP Location',
+                'c7n:IsIPLocation': True,
+                'c7n:IsCountryLocation': False
+            }
+        ]
+
+        policy_data = {
+            'name': 'test-countries-count-filter',
+            'resource': 'azure.entraid-named-location',
+            'filters': [
+                {'type': 'countries-count', 'count': 5, 'op': 'greater-than'}
+            ]
+        }
+        policy = self.load_policy(policy_data)
+        resource_mgr = policy.resource_manager
+
+        filtered = resource_mgr.filter_resources(locations)
+
+        # Should only return location with >5 countries
+        self.assertEqual(len(filtered), 1)
+        self.assertEqual(filtered[0]['id'], 'large-country-location')
+
+    def test_countries_count_filter_less_than(self):
+        """Test countries-count filter with less-than operator"""
+        locations = [
+            {
+                'id': 'single-country-location',
+                'displayName': 'Single Country Location',
+                'c7n:IsCountryLocation': True,
+                'c7n:CountriesCount': 1
+            },
+            {
+                'id': 'multi-country-location',
+                'displayName': 'Multi Country Location',
+                'c7n:IsCountryLocation': True,
+                'c7n:CountriesCount': 5
+            }
+        ]
+
+        policy_data = {
+            'name': 'test-countries-count-less-than',
+            'resource': 'azure.entraid-named-location',
+            'filters': [
+                {'type': 'countries-count', 'count': 3, 'op': 'less-than'}
+            ]
+        }
+        policy = self.load_policy(policy_data)
+        resource_mgr = policy.resource_manager
+
+        filtered = resource_mgr.filter_resources(locations)
+
+        # Should only return location with <3 countries
+        self.assertEqual(len(filtered), 1)
+        self.assertEqual(filtered[0]['id'], 'single-country-location')
+
+    @patch('c7n_azure.resources.entraid_named_locations.EntraIDNamedLocation.make_graph_request')
+    def test_get_resources_error_handling(self, mock_graph_request):
+        """Test error handling in get_graph_resources"""
+        # Mock API error
+        mock_graph_request.side_effect = Exception(
+            "Insufficient privileges to complete the operation"
+        )
+
+        policy_data = {
+            'name': 'test-error-handling',
+            'resource': 'azure.entraid-named-location'
+        }
+        policy = self.load_policy(policy_data)
+        resource_mgr = policy.resource_manager
+
+        resources = resource_mgr.get_graph_resources()
+
+        # Should return empty list on error
+        self.assertEqual(resources, [])
+
+    @patch('c7n_azure.resources.entraid_named_locations.EntraIDNamedLocation.make_graph_request')
+    def test_get_resources_empty_response(self, mock_graph_request):
+        """Test handling of empty API response"""
+        # Mock empty API response
+        mock_graph_request.return_value = {'value': []}
+
+        policy_data = {
+            'name': 'test-empty-response',
+            'resource': 'azure.entraid-named-location'
+        }
+        policy = self.load_policy(policy_data)
+        resource_mgr = policy.resource_manager
+
+        resources = resource_mgr.get_graph_resources()
+
+        # Should return empty list
+        self.assertEqual(len(resources), 0)
+
+    def test_filter_validation(self):
+        """Test that filters validate schema correctly"""
+        # Test location-type filter with valid values
+        policy_data = {
+            'name': 'test-location-type-validation',
+            'resource': 'azure.entraid-named-location',
+            'filters': [
+                {'type': 'location-type', 'location-type': 'ipNamedLocation'}
+            ]
+        }
+        policy = self.load_policy(policy_data, validate=True)
+        self.assertIsNotNone(policy)
+
+        # Test ip-range-count filter validation
+        policy_data = {
+            'name': 'test-ip-range-count-validation',
+            'resource': 'azure.entraid-named-location',
+            'filters': [
+                {'type': 'ip-range-count', 'count': 5, 'op': 'greater-than'}
+            ]
+        }
+        policy = self.load_policy(policy_data, validate=True)
+        self.assertIsNotNone(policy)
+
+        # Test countries-count filter validation
+        policy_data = {
+            'name': 'test-countries-count-validation',
+            'resource': 'azure.entraid-named-location',
+            'filters': [
+                {'type': 'countries-count', 'count': 3, 'op': 'less-than'}
+            ]
+        }
+        policy = self.load_policy(policy_data, validate=True)
+        self.assertIsNotNone(policy)
+
+    @patch('c7n_azure.resources.entraid_named_locations.EntraIDNamedLocation.make_graph_request')
+    def test_combined_filters_integration(self, mock_graph_request):
+        """Test integration of multiple filters working together"""
+        # Mock comprehensive response with mixed location types
+        mock_graph_request.return_value = {
+            'value': [
+                {
+                    'id': 'small-ip-location',
+                    'displayName': 'Small Corporate IP',
+                    '@odata.type': '#microsoft.graph.ipNamedLocation',
+                    'ipRanges': [
+                        {
+                            '@odata.type': '#microsoft.graph.iPv4CidrRange',
+                            'cidrAddress': '192.168.1.0/24'
+                        }
+                    ]
+                },
+                {
+                    'id': 'large-ip-location',
+                    'displayName': 'Large Corporate IP',
+                    '@odata.type': '#microsoft.graph.ipNamedLocation',
+                    'ipRanges': [
+                        {
+                            '@odata.type': '#microsoft.graph.iPv4CidrRange',
+                            'cidrAddress': '10.0.0.0/8'
+                        },
+                        {
+                            '@odata.type': '#microsoft.graph.iPv4CidrRange',
+                            'cidrAddress': '172.16.0.0/12'
+                        },
+                        {
+                            '@odata.type': '#microsoft.graph.iPv4CidrRange',
+                            'cidrAddress': '192.168.0.0/16'
+                        },
+                        {
+                            '@odata.type': '#microsoft.graph.iPv4CidrRange',
+                            'cidrAddress': '203.0.113.0/24'
+                        },
+                        {
+                            '@odata.type': '#microsoft.graph.iPv4CidrRange',
+                            'cidrAddress': '198.51.100.0/24'
+                        },
+                        {
+                            '@odata.type': '#microsoft.graph.iPv4CidrRange',
+                            'cidrAddress': '198.18.0.0/15'
+                        }
+                    ]
+                },
+                {
+                    'id': 'small-country-location',
+                    'displayName': 'North America',
+                    '@odata.type': '#microsoft.graph.countryNamedLocation',
+                    'countriesAndRegions': ['US', 'CA']
+                },
+                {
+                    'id': 'large-country-location',
+                    'displayName': 'Global Offices',
+                    '@odata.type': '#microsoft.graph.countryNamedLocation',
+                    'countriesAndRegions': ['US', 'CA', 'GB', 'DE', 'FR', 'JP', 'AU', 'IN']
+                }
+            ]
+        }
+
+        # Test policy that finds IP locations with more than 5 ranges
+        policy_data = {
+            'name': 'test-combined-filters',
+            'resource': 'azure.entraid-named-location',
+            'filters': [
+                {'type': 'location-type', 'location-type': 'ipNamedLocation'},
+                {'type': 'ip-range-count', 'count': 5, 'op': 'greater-than'}
+            ]
+        }
+        policy = self.load_policy(policy_data)
+        resources = policy.run()
+
+        # Should only return the large IP location
+        self.assertEqual(len(resources), 1)
+        self.assertEqual(resources[0]['id'], 'large-ip-location')
+
+        # Verify augmentation fields are present
+        self.assertTrue(resources[0]['c7n:IsIPLocation'])
+        self.assertEqual(resources[0]['c7n:IPRangesCount'], 6)
+
+    @patch('c7n_azure.resources.entraid_named_locations.EntraIDNamedLocation.make_graph_request')
+    def test_policy_execution_workflow(self, mock_graph_request):
+        """Test complete policy execution workflow from definition to results"""
+        # Mock API response
+        mock_graph_request.return_value = {
+            'value': [
+                {
+                    'id': 'trusted-office-ips',
+                    'displayName': 'Trusted Office IPs',
+                    'createdDateTime': '2023-01-01T00:00:00Z',
+                    'modifiedDateTime': '2023-06-01T00:00:00Z',
+                    '@odata.type': '#microsoft.graph.ipNamedLocation',
+                    'isTrusted': True,
+                    'ipRanges': [
+                        {
+                            '@odata.type': '#microsoft.graph.iPv4CidrRange',
+                            'cidrAddress': '203.0.113.0/24'
+                        },
+                        {
+                            '@odata.type': '#microsoft.graph.iPv4CidrRange',
+                            'cidrAddress': '198.51.100.0/24'
+                        }
+                    ]
+                },
+                {
+                    'id': 'allowed-countries',
+                    'displayName': 'Allowed Countries',
+                    'createdDateTime': '2023-02-01T00:00:00Z',
+                    'modifiedDateTime': '2023-07-01T00:00:00Z',
+                    '@odata.type': '#microsoft.graph.countryNamedLocation',
+                    'countriesAndRegions': ['US', 'CA', 'GB'],
+                    'includeUnknownCountriesAndRegions': False
+                }
+            ]
+        }
+
+        # Define comprehensive policy
+        policy_data = {
+            'name': 'audit-named-locations',
+            'resource': 'azure.entraid-named-location',
+            'filters': [
+                {
+                    'type': 'value',
+                    'key': 'displayName',
+                    'op': 'regex',
+                    'value': '.*Office.*|.*Countries.*'
+                }
+            ]
+        }
+
+        # Execute policy
+        policy = self.load_policy(policy_data)
+        resources = policy.run()
+
+        # Validate results
+        self.assertEqual(len(resources), 2)
+
+        # Verify resource properties
+        resource_ids = [r['id'] for r in resources]
+        self.assertIn('trusted-office-ips', resource_ids)
+        self.assertIn('allowed-countries', resource_ids)
+
+        # Verify computed fields are present
+        for resource in resources:
+            self.assertIn('c7n:IsIPLocation', resource)
+            self.assertIn('c7n:IsCountryLocation', resource)
+
+        # Verify specific augmentation
+        ip_resource = next(r for r in resources if r['id'] == 'trusted-office-ips')
+        country_resource = next(r for r in resources if r['id'] == 'allowed-countries')
+
+        self.assertTrue(ip_resource['c7n:IsIPLocation'])
+        self.assertFalse(ip_resource['c7n:IsCountryLocation'])
+        self.assertEqual(ip_resource['c7n:IPRangesCount'], 2)
+
+        self.assertFalse(country_resource['c7n:IsIPLocation'])
+        self.assertTrue(country_resource['c7n:IsCountryLocation'])
+        self.assertEqual(country_resource['c7n:CountriesCount'], 3)
+
+    def test_resource_manager_properties(self):
+        """Test resource manager configuration and properties"""
+        policy_data = {
+            'name': 'test-resource-manager',
+            'resource': 'azure.entraid-named-location'
+        }
+        policy = self.load_policy(policy_data)
+        resource_mgr = policy.resource_manager
+
+        # Validate resource manager type
+        self.assertEqual(resource_mgr.type, 'entraid-named-location')
+
+        # Validate resource type properties
+        self.assertEqual(resource_mgr.resource_type.service, 'graph')
+        self.assertEqual(
+            resource_mgr.resource_type.enum_spec[0],
+            'identity/conditionalAccess/namedLocations'
+        )
+        self.assertEqual(resource_mgr.resource_type.enum_spec[1], 'list')
+        self.assertEqual(
+            resource_mgr.resource_type.detail_spec[0],
+            'identity/conditionalAccess/namedLocations'
+        )
+        self.assertEqual(resource_mgr.resource_type.detail_spec[1], 'get')
+        self.assertEqual(resource_mgr.resource_type.id, 'id')
+        self.assertEqual(resource_mgr.resource_type.name, 'displayName')
+        self.assertEqual(resource_mgr.resource_type.date, 'createdDateTime')
+
+        # Validate permissions
+        self.assertIn('Policy.Read.All', resource_mgr.resource_type.permissions)
+
+    @patch('c7n_azure.resources.entraid_named_locations.EntraIDNamedLocation.make_graph_request')
+    def test_pagination_handling(self, mock_graph_request):
+        """Test handling of paginated responses (future enhancement validation)"""
+        # Mock response with @odata.nextLink (simulating pagination)
+        mock_graph_request.return_value = {
+            'value': [
+                {
+                    'id': 'location-1',
+                    'displayName': 'Location 1',
+                    '@odata.type': '#microsoft.graph.ipNamedLocation',
+                    'ipRanges': [
+                        {
+                            '@odata.type': '#microsoft.graph.iPv4CidrRange',
+                            'cidrAddress': '10.0.0.0/16'
+                        }
+                    ]
+                }
+            ],
+            '@odata.nextLink': 'https://graph.microsoft.com/v1.0/identity/conditionalAccess/namedLocations?$skip=100'
+        }
+
+        policy_data = {
+            'name': 'test-pagination',
+            'resource': 'azure.entraid-named-location'
+        }
+        policy = self.load_policy(policy_data)
+
+        # This tests the current implementation - pagination would
+        # need to be added to the resource later
+        resources = policy.run()
+
+        # Current implementation returns first page only
+        self.assertEqual(len(resources), 1)
+        self.assertEqual(resources[0]['id'], 'location-1')
+
+
+class EntraIDAuthorizationPolicyTest(BaseTest):
+    """Test EntraID Authorization Policy resource functionality"""
+
+    def test_authorization_policy_schema_validate(self):
+        """Test authorization policy schema validation"""
+        with self.sign_out_patch():
+            p = self.load_policy({
+                'name': 'test-authorization-policy',
+                'resource': 'azure.entraid-authorization-policy',
+                'filters': [
+                    {'type': 'value',
+                     'key': 'defaultUserRolePermissions.allowedToCreateApps',
+                     'value': False}
+                ]
+            }, validate=True)
+            self.assertTrue(p)
+
+    def test_authorization_policy_resource_type(self):
+        """Test authorization policy resource type configuration"""
+        resource_type = EntraIDAuthorizationPolicy.resource_type
+        self.assertEqual(resource_type.service, 'graph')
+        self.assertEqual(resource_type.id, 'id')
+        self.assertTrue(resource_type.global_resource)
+        self.assertIn('Policy.Read.All', resource_type.permissions)
+
+    @patch('c7n_azure.resources.entraid_authorization_policy.EntraIDAuthorizationPolicy.make_graph_request')
+    def test_authorization_policy_get_resources(self, mock_graph_request):
+        """Test authorization policy resource retrieval"""
+        # Mock the Graph API response
+        mock_graph_request.return_value = {
+            'id': 'authorizationPolicy',
+            'displayName': 'Authorization Policy',
+            'description': 'Used to manage authorization related settings across the company.',
+            'defaultUserRolePermissions': {
+                'allowedToCreateApps': True,
+                'allowedToCreateSecurityGroups': True,
+                'allowedToReadOtherUsers': True,
+                'allowedToCreateTenants': False
+            }
+        }
+
+        policy = self.load_policy({
+            'name': 'test-auth-policy-retrieval',
+            'resource': 'azure.entraid-authorization-policy'
+        })
+
+        resource_mgr = policy.resource_manager
+        resources = resource_mgr.get_graph_resources()
+
+        # Should return authorization policy wrapped in a list
+        self.assertEqual(len(resources), 1)
+        self.assertEqual(resources[0]['id'], 'authorizationPolicy')
+        self.assertIn('defaultUserRolePermissions', resources[0])
+
+    def test_cis_compliance_scenario(self):
+        """Test CIS-B-MAF-4.0.0-6.14 compliance scenario"""
+        # Test the specific CIS control: 'Users can register applications' is set to 'No'
+
+        # Compliant scenario - users cannot create apps
+        compliant_policy = {
+            'id': 'authorizationPolicy',
+            'displayName': 'Authorization Policy',
+            'description': 'Used to manage authorization related settings across the company.',
+            'defaultUserRolePermissions': {
+                'allowedToCreateApps': False,  # CIS compliant
+                'allowedToCreateSecurityGroups': False,
+                'allowedToReadOtherUsers': True,
+                'allowedToCreateTenants': False
+            }
+        }
+
+        # Non-compliant scenario - users can create apps
+        non_compliant_policy = {
+            'id': 'authorizationPolicy',
+            'displayName': 'Authorization Policy',
+            'description': 'Used to manage authorization related settings across the company.',
+            'defaultUserRolePermissions': {
+                'allowedToCreateApps': True,  # CIS non-compliant
+                'allowedToCreateSecurityGroups': True,
+                'allowedToReadOtherUsers': True,
+                'allowedToCreateTenants': True
+            }
+        }
+
+        # Policy to check for CIS compliance
+        cis_policy = self.load_policy({
+            'name': 'cis-b-maf-4-0-0-6-14-users-register-applications',
+            'resource': 'azure.entraid-authorization-policy',
+            'filters': [
+                {'type': 'value',
+                 'key': 'defaultUserRolePermissions.allowedToCreateApps',
+                 'value': False}
+            ]
+        })
+
+        resource_mgr = cis_policy.resource_manager
+
+        # Test compliant scenario
+        compliant_filtered = resource_mgr.filter_resources([compliant_policy])
+        self.assertEqual(len(compliant_filtered), 1)
+        self.assertFalse(compliant_filtered[0]['defaultUserRolePermissions']['allowedToCreateApps'])
+
+        # Test non-compliant scenario
+        non_compliant_filtered = resource_mgr.filter_resources([non_compliant_policy])
+        self.assertEqual(len(non_compliant_filtered), 0)  # Should not match
+
+        # Policy to find violations (non-compliant)
+        violation_policy = self.load_policy({
+            'name': 'cis-violation-users-can-register-apps',
+            'resource': 'azure.entraid-authorization-policy',
+            'filters': [
+                {'type': 'value',
+                 'key': 'defaultUserRolePermissions.allowedToCreateApps',
+                 'value': True}
+            ]
+        })
+
+        violation_mgr = violation_policy.resource_manager
+        violation_filtered = violation_mgr.filter_resources([non_compliant_policy])
+        self.assertEqual(len(violation_filtered), 1)
+        self.assertTrue(violation_filtered[0]['defaultUserRolePermissions']['allowedToCreateApps'])
+
+    @patch('c7n_azure.resources.entraid_authorization_policy.EntraIDAuthorizationPolicy.make_graph_request')
+    def test_authorization_policy_empty_response(self, mock_graph_request):
+        """Test authorization policy when API returns None/empty response"""
+        # Mock the Graph API to return None
+        mock_graph_request.return_value = None
+
+        policy = self.load_policy({
+            'name': 'test-auth-policy-empty-response',
+            'resource': 'azure.entraid-authorization-policy'
+        })
+
+        resource_mgr = policy.resource_manager
+        resources = resource_mgr.get_graph_resources()
+
+        # Should return empty list when response is None
+        self.assertEqual(len(resources), 0)
+        self.assertEqual(resources, [])
+
+    @patch('c7n_azure.resources.entraid_authorization_policy.EntraIDAuthorizationPolicy.make_graph_request')
+    def test_authorization_policy_general_exception(self, mock_graph_request):
+        """Test authorization policy handles general exceptions"""
+        # Mock the Graph API to raise a general exception
+        mock_graph_request.side_effect = Exception("Network error")
+
+        policy = self.load_policy({
+            'name': 'test-auth-policy-exception',
+            'resource': 'azure.entraid-authorization-policy'
+        })
+
+        resource_mgr = policy.resource_manager
+        resources = resource_mgr.get_graph_resources()
+
+        # Should return empty list on exception
+        self.assertEqual(len(resources), 0)
+        self.assertEqual(resources, [])
+
+    @patch('c7n_azure.resources.entraid_authorization_policy.EntraIDAuthorizationPolicy.make_graph_request')
+    def test_authorization_policy_insufficient_privileges_exception(self, mock_graph_request):
+        """Test authorization policy handles insufficient privileges error"""
+        # Mock the Graph API to raise an insufficient privileges exception
+        mock_graph_request.side_effect = Exception(
+            "Insufficient privileges to complete the operation"
+        )
+
+        policy = self.load_policy({
+            'name': 'test-auth-policy-insufficient-privileges',
+            'resource': 'azure.entraid-authorization-policy'
+        })
+
+        resource_mgr = policy.resource_manager
+        resources = resource_mgr.get_graph_resources()
+
+        # Should return empty list on permission error
+        self.assertEqual(len(resources), 0)
+        self.assertEqual(resources, [])
+
+    @patch('c7n_azure.resources.entraid_authorization_policy.EntraIDAuthorizationPolicy.make_graph_request')
+    def test_authorization_policy_403_exception(self, mock_graph_request):
+        """Test authorization policy handles 403 forbidden error"""
+        # Mock the Graph API to raise a 403 exception
+        mock_graph_request.side_effect = requests.exceptions.RequestException("403 Forbidden")
+
+        policy = self.load_policy({
+            'name': 'test-auth-policy-403-error',
+            'resource': 'azure.entraid-authorization-policy'
+        })
+
+        resource_mgr = policy.resource_manager
+        resources = resource_mgr.get_graph_resources()
+
+        # Should return empty list on 403 error
+        self.assertEqual(len(resources), 0)
+        self.assertEqual(resources, [])
+
+    def test_authorization_policy_diagnostic_settings_filter_registered(self):
+        """Test that diagnostic-settings filter is properly registered"""
+        # Check that the diagnostic-settings filter is registered
+        from c7n_azure.graph_utils import EntraIDDiagnosticSettingsFilter
+
+        filter_registry = EntraIDAuthorizationPolicy.filter_registry
+        self.assertIn('diagnostic-settings', filter_registry.keys())
+
+        # Verify it's the correct filter class
+        registered_filter = filter_registry.get('diagnostic-settings')
+        self.assertEqual(registered_filter, EntraIDDiagnosticSettingsFilter)
+
+    def test_authorization_policy_source_initialization(self):
+        """Test that authorization policy initializes with GraphSource"""
+        from c7n_azure.graph_utils import GraphSource
+
+        policy = self.load_policy({
+            'name': 'test-auth-policy-source',
+            'resource': 'azure.entraid-authorization-policy'
+        })
+
+        resource_mgr = policy.resource_manager
+
+        # Verify that the source is a GraphSource instance
+        self.assertIsInstance(resource_mgr.source, GraphSource)
+
+
 # Terraform-based integration tests
 # These tests use real Azure EntraID resources provisioned via Terraform
 # Following the same pattern as AWS tests
@@ -2794,3 +4214,431 @@ def test_entraid_organization_compliance_terraform(test, entraid_organization):
     assert 'controls' in nist_compliance
 
     assert policy is not None
+
+
+@terraform('entraid_security_defaults')
+@pytest.mark.functional
+def test_entraid_security_defaults_discovery_terraform(test, entraid_security_defaults):
+    """Test that Cloud Custodian can discover security defaults provisioned by Terraform"""
+    enabled_defaults = entraid_security_defaults.outputs['security_defaults_enabled']['value']
+    disabled_defaults = entraid_security_defaults.outputs['security_defaults_disabled']['value']
+
+    # Test basic security defaults discovery
+    policy = test.load_policy({
+        'name': 'terraform-security-defaults-discovery',
+        'resource': 'azure.entraid-security-defaults'
+    })
+
+    # Verify policy loads correctly
+    assert policy.resource_manager.type == 'entraid-security-defaults'
+
+    # Verify test data integrity
+    assert enabled_defaults['is_enabled'] is True
+    assert disabled_defaults['is_enabled'] is False
+
+    assert enabled_defaults['display_name'] == 'Security Defaults'
+
+
+@terraform('entraid_security_defaults')
+@pytest.mark.functional
+def test_entraid_security_defaults_features_terraform(test, entraid_security_defaults):
+    """Test security defaults features against Terraform-provisioned data"""
+    features = entraid_security_defaults.outputs['security_defaults_features']['value']
+
+    # Test security defaults feature analysis
+    policy = test.load_policy({
+        'name': 'terraform-security-defaults-features',
+        'resource': 'azure.entraid-security-defaults',
+        'filters': [
+            {'type': 'value', 'key': 'isEnabled', 'value': True}
+        ]
+    })
+
+    # Verify features structure
+    assert 'enabled_features' in features
+    enabled_features = features['enabled_features']
+
+    # Verify key security features
+    expected_features = [
+        'require_mfa_for_admins',
+        'require_mfa_for_users',
+        'block_legacy_authentication',
+        'protect_privileged_activities'
+    ]
+
+    for feature in expected_features:
+        assert feature in enabled_features
+        assert 'enabled' in enabled_features[feature]
+        assert 'description' in enabled_features[feature]
+
+    # Verify admin MFA feature details
+    mfa_admin_feature = enabled_features['require_mfa_for_admins']
+    assert 'affected_roles' in mfa_admin_feature
+    assert 'Global Administrator' in mfa_admin_feature['affected_roles']
+
+    assert policy is not None
+
+
+@terraform('entraid_security_defaults')
+@pytest.mark.functional
+def test_entraid_security_defaults_compliance_terraform(test, entraid_security_defaults):
+    """Test security defaults compliance against Terraform-provisioned data"""
+    compliance = entraid_security_defaults.outputs['security_defaults_compliance']['value']
+
+    # Test compliance analysis
+    policy = test.load_policy({
+        'name': 'terraform-security-defaults-compliance',
+        'resource': 'azure.entraid-security-defaults'
+    })
+
+    # Verify compliance structure
+    required_sections = [
+        'cis_compliant_controls',
+        'security_improvements',
+        'limitations',
+        'recommendations'
+    ]
+    for section in required_sections:
+        assert section in compliance
+
+    # Verify CIS compliance controls
+    cis_controls = compliance['cis_compliant_controls']
+    assert len(cis_controls) > 0
+
+    for control in cis_controls:
+        assert 'control' in control
+        assert 'title' in control
+        assert 'status' in control
+
+    # Verify security improvements
+    improvements = compliance['security_improvements']
+    assert len(improvements) > 0
+
+    for improvement in improvements:
+        assert 'area' in improvement
+        assert 'improvement' in improvement
+        assert 'risk_reduction' in improvement
+
+    assert policy is not None
+
+
+@terraform('entraid_security_defaults')
+@pytest.mark.functional
+def test_entraid_security_defaults_scenarios_terraform(test, entraid_security_defaults):
+    """Test tenant scenarios against Terraform-provisioned data"""
+    scenarios = entraid_security_defaults.outputs['test_scenarios']['value']
+
+    # Test scenario-based analysis
+    policy = test.load_policy({
+        'name': 'terraform-tenant-scenarios',
+        'resource': 'azure.entraid-security-defaults'
+    })
+
+    # Verify all expected scenarios
+    expected_scenarios = ['new_tenant_secure', 'disabled_no_ca', 'disabled_with_ca']
+    for scenario_name in expected_scenarios:
+        assert scenario_name in scenarios
+
+        scenario = scenarios[scenario_name]
+        required_fields = [
+            'security_defaults_enabled',
+            'conditional_access_policies',
+            'mfa_enforced_users',
+            'legacy_auth_blocked',
+            'compliance_score',
+            'risk_level'
+        ]
+
+        for field in required_fields:
+            assert field in scenario
+
+    # Verify scenario logic
+    secure_scenario = scenarios['new_tenant_secure']
+    risky_scenario = scenarios['disabled_no_ca']
+    optimal_scenario = scenarios['disabled_with_ca']
+
+    assert secure_scenario['security_defaults_enabled'] is True
+    assert risky_scenario['security_defaults_enabled'] is False
+    assert optimal_scenario['security_defaults_enabled'] is False
+
+    assert optimal_scenario['compliance_score'] > secure_scenario['compliance_score']
+    assert secure_scenario['compliance_score'] > risky_scenario['compliance_score']
+
+    assert policy is not None
+
+
+# EntraID Named Location Terraform Tests
+@terraform('entraid_named_location')
+@pytest.mark.functional
+def test_entraid_named_location_discovery_terraform(test, entraid_named_location):
+    """Test that Cloud Custodian can discover named locations provisioned by Terraform"""
+    # Verify terraform fixtures loaded successfully
+    expected_outputs = [
+        'test_corporate_ips', 'test_external_ips', 'test_single_ip',
+        'test_trusted_countries', 'test_country_with_unknown',
+        'test_blocked_countries', 'test_mixed_ranges', 'all_named_locations'
+    ]
+    assert len(entraid_named_location.outputs) == len(expected_outputs), (
+        f"Expected {len(expected_outputs)} outputs, got {len(entraid_named_location.outputs)}"
+    )
+
+    # Get terraform-provisioned named location data
+    corporate_ips = entraid_named_location.outputs['test_corporate_ips']['value']
+    external_ips = entraid_named_location.outputs['test_external_ips']['value']
+    single_ip = entraid_named_location.outputs['test_single_ip']['value']
+    trusted_countries = entraid_named_location.outputs['test_trusted_countries']['value']
+
+    # Verify IP-based named locations (updated for Azure AD deletion restrictions)
+    assert 'C7N Test - Corporate IP Ranges' in corporate_ips['display_name']
+    # Changed to false to avoid Azure AD deletion restrictions
+    assert corporate_ips['ip']['trusted'] is False
+    assert len(corporate_ips['ip']['ip_ranges_or_fqdns']) == 3
+    assert '192.168.1.0/24' in corporate_ips['ip']['ip_ranges_or_fqdns']
+
+    assert 'C7N Test - External IP Ranges' in external_ips['display_name']
+    assert external_ips['ip']['trusted'] is False
+    assert len(external_ips['ip']['ip_ranges_or_fqdns']) == 2
+
+    assert 'C7N Test - Single IP' in single_ip['display_name']  # Display name also changed
+    # Changed to false to avoid Azure AD deletion restrictions
+    assert single_ip['ip']['trusted'] is False
+    assert '192.168.1.100/32' in single_ip['ip']['ip_ranges_or_fqdns']
+
+    # Verify country-based named locations
+    assert 'C7N Test - Trusted Countries' in trusted_countries['display_name']
+    assert len(trusted_countries['country']['countries_and_regions']) == 4
+    assert 'US' in trusted_countries['country']['countries_and_regions']
+    assert trusted_countries['country']['include_unknown_countries_and_regions'] is False
+
+    # Test Cloud Custodian policy creation and validation
+    policy = test.load_policy({
+        'name': 'terraform-named-locations-discovery',
+        'resource': 'azure.entraid-named-location'
+    })
+
+    # Verify policy loads correctly
+    assert policy.resource_manager.type == 'entraid-named-location'
+    print(f"SUCCESS: Terraform fixtures loaded {len(entraid_named_location.outputs)} "
+          f"named locations successfully")
+
+
+@terraform('entraid_named_location')
+@pytest.mark.functional
+def test_entraid_named_location_type_filter_terraform(test, entraid_named_location):
+    """Test location type filter against Terraform-provisioned named locations"""
+    # Test IP-based location filter
+    ip_policy = test.load_policy({
+        'name': 'terraform-ip-named-locations',
+        'resource': 'azure.entraid-named-location',
+        'filters': [
+            {'type': 'location-type', 'location-type': 'ipNamedLocation'}
+        ]
+    })
+
+    # Test country-based location filter
+    country_policy = test.load_policy({
+        'name': 'terraform-country-named-locations',
+        'resource': 'azure.entraid-named-location',
+        'filters': [
+            {'type': 'location-type', 'location-type': 'countryNamedLocation'}
+        ]
+    })
+
+    # Verify policy structures
+    assert ip_policy.resource_manager.type == 'entraid-named-location'
+    assert country_policy.resource_manager.type == 'entraid-named-location'
+    print("SUCCESS: Location type filters configured successfully")
+
+
+@terraform('entraid_named_location')
+@pytest.mark.functional
+def test_entraid_named_location_value_filter_terraform(test, entraid_named_location):
+    """Test value-based filtering against Terraform-provisioned named locations"""
+    corporate_ips = entraid_named_location.outputs['test_corporate_ips']['value']
+    external_ips = entraid_named_location.outputs['test_external_ips']['value']
+
+    # Verify test data integrity for trust settings
+    assert corporate_ips['ip']['trusted'] is False  # Changed from True since we made it untrusted
+    assert external_ips['ip']['trusted'] is False
+
+    # Test filtering by display name pattern (corporate locations)
+    corporate_policy = test.load_policy({
+        'name': 'terraform-corporate-ip-locations',
+        'resource': 'azure.entraid-named-location',
+        'filters': [
+            {'type': 'location-type', 'location-type': 'ipNamedLocation'},
+            {'type': 'value', 'key': 'displayName', 'op': 'glob', 'value': '*Corporate*'}
+        ]
+    })
+
+    # Test filtering by display name pattern (external locations)
+    external_policy = test.load_policy({
+        'name': 'terraform-external-ip-locations',
+        'resource': 'azure.entraid-named-location',
+        'filters': [
+            {'type': 'location-type', 'location-type': 'ipNamedLocation'},
+            {'type': 'value', 'key': 'displayName', 'op': 'glob', 'value': '*External*'}
+        ]
+    })
+
+    # Verify policy structures
+    assert corporate_policy.resource_manager.type == 'entraid-named-location'
+    assert external_policy.resource_manager.type == 'entraid-named-location'
+    print("SUCCESS: Value filters configured successfully")
+
+
+@terraform('entraid_named_location')
+@pytest.mark.functional
+def test_entraid_named_location_ip_range_filter_terraform(test, entraid_named_location):
+    """Test IP range count filter against Terraform-provisioned named locations"""
+    corporate_ips = entraid_named_location.outputs['test_corporate_ips']['value']
+    single_ip = entraid_named_location.outputs['test_single_ip']['value']
+
+    # Verify test data integrity for trust settings (all changed to untrusted for Azure limitations)
+    assert corporate_ips['ip']['trusted'] is False  # All IP locations now untrusted
+    assert single_ip['ip']['trusted'] is False  # All IP locations now untrusted
+
+    # Verify test data contains expected IP ranges counts
+    assert len(corporate_ips['ip']['ip_ranges_or_fqdns']) == 3
+    assert len(single_ip['ip']['ip_ranges_or_fqdns']) == 1
+
+    # Test IP range count filter - locations with more than 1 range
+    multiple_ranges_policy = test.load_policy({
+        'name': 'terraform-multiple-ip-ranges',
+        'resource': 'azure.entraid-named-location',
+        'filters': [
+            {'type': 'location-type', 'location-type': 'ipNamedLocation'},
+            {'type': 'ip-range-count', 'count': 1, 'op': 'greater-than'}
+        ]
+    })
+
+    # Test IP range count filter - locations with exactly 1 range
+    single_range_policy = test.load_policy({
+        'name': 'terraform-single-ip-range',
+        'resource': 'azure.entraid-named-location',
+        'filters': [
+            {'type': 'location-type', 'location-type': 'ipNamedLocation'},
+            {'type': 'ip-range-count', 'count': 1, 'op': 'equal'}
+        ]
+    })
+
+    # Verify policy structures
+    assert multiple_ranges_policy.resource_manager.type == 'entraid-named-location'
+    assert single_range_policy.resource_manager.type == 'entraid-named-location'
+    print("SUCCESS: IP range count filters configured successfully")
+
+
+@terraform('entraid_named_location')
+@pytest.mark.functional
+def test_entraid_named_location_countries_count_filter_terraform(test, entraid_named_location):
+    """Test countries count filter against Terraform-provisioned named locations"""
+    trusted_countries = entraid_named_location.outputs['test_trusted_countries']['value']
+    country_with_unknown = entraid_named_location.outputs['test_country_with_unknown']['value']
+
+    # Verify test data contains expected countries counts
+    assert len(trusted_countries['country']['countries_and_regions']) == 4
+    assert len(country_with_unknown['country']['countries_and_regions']) == 1
+
+    # Test countries count filter - locations with more than 1 country
+    multiple_countries_policy = test.load_policy({
+        'name': 'terraform-multiple-countries',
+        'resource': 'azure.entraid-named-location',
+        'filters': [
+            {'type': 'location-type', 'location-type': 'countryNamedLocation'},
+            {'type': 'countries-count', 'count': 1, 'op': 'greater-than'}
+        ]
+    })
+
+    # Test countries count filter - locations with exactly 1 country
+    single_country_policy = test.load_policy({
+        'name': 'terraform-single-country',
+        'resource': 'azure.entraid-named-location',
+        'filters': [
+            {'type': 'location-type', 'location-type': 'countryNamedLocation'},
+            {'type': 'countries-count', 'count': 1, 'op': 'equal'}
+        ]
+    })
+
+    # Verify policy structures
+    assert multiple_countries_policy.resource_manager.type == 'entraid-named-location'
+    assert single_country_policy.resource_manager.type == 'entraid-named-location'
+    print("SUCCESS: Countries count filters configured successfully")
+
+
+@terraform('entraid_named_location')
+@pytest.mark.functional
+def test_entraid_named_location_display_name_filter_terraform(test, entraid_named_location):
+    """Test display name pattern matching against Terraform-provisioned named locations"""
+    corporate_ips = entraid_named_location.outputs['test_corporate_ips']['value']
+
+    # Verify test data has expected display names
+    assert 'C7N Test - Corporate IP Ranges' in corporate_ips['display_name']
+
+    # Test display name pattern filter
+    corporate_policy = test.load_policy({
+        'name': 'terraform-corporate-locations',
+        'resource': 'azure.entraid-named-location',
+        'filters': [
+            {'type': 'value', 'key': 'displayName', 'op': 'glob', 'value': '*Corporate*'}
+        ]
+    })
+
+    # Test C7N test locations filter
+    test_locations_policy = test.load_policy({
+        'name': 'terraform-test-locations',
+        'resource': 'azure.entraid-named-location',
+        'filters': [
+            {'type': 'value', 'key': 'displayName', 'op': 'glob', 'value': 'C7N Test*'}
+        ]
+    })
+
+    # Verify policy structures
+    assert corporate_policy.resource_manager.type == 'entraid-named-location'
+    assert test_locations_policy.resource_manager.type == 'entraid-named-location'
+    print("SUCCESS: Display name pattern filters configured successfully")
+
+
+@terraform('entraid_named_location')
+@pytest.mark.functional
+def test_entraid_named_location_comprehensive_terraform(test, entraid_named_location):
+    """Test comprehensive named location policies combining multiple filters"""
+    # Test policy combining location type and value filters
+    comprehensive_policy = test.load_policy({
+        'name': 'terraform-comprehensive-location-audit',
+        'resource': 'azure.entraid-named-location',
+        'filters': [
+            {'or': [
+                {'and': [
+                    {'type': 'location-type', 'location-type': 'ipNamedLocation'},
+                    {'type': 'value', 'key': 'displayName', 'op': 'glob', 'value': '*External*'}
+                ]},
+                {'and': [
+                    {'type': 'location-type', 'location-type': 'countryNamedLocation'},
+                    {'type': 'value', 'key': 'displayName', 'op': 'glob', 'value': '*Blocked*'}
+                ]}
+            ]}
+        ]
+    })
+
+    # Test policy combining count-based filters
+    count_based_policy = test.load_policy({
+        'name': 'terraform-count-based-locations',
+        'resource': 'azure.entraid-named-location',
+        'filters': [
+            {'or': [
+                {'and': [
+                    {'type': 'location-type', 'location-type': 'ipNamedLocation'},
+                    {'type': 'ip-range-count', 'count': 1, 'op': 'greater-than'}
+                ]},
+                {'and': [
+                    {'type': 'location-type', 'location-type': 'countryNamedLocation'},
+                    {'type': 'countries-count', 'count': 1, 'op': 'greater-than'}
+                ]}
+            ]}
+        ]
+    })
+
+    # Verify policy structures
+    assert comprehensive_policy.resource_manager.type == 'entraid-named-location'
+    assert count_based_policy.resource_manager.type == 'entraid-named-location'
+    print("SUCCESS: Comprehensive named location policies configured successfully")
