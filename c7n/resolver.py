@@ -20,23 +20,59 @@ ZIP_OR_GZIP_HEADER_DETECT = zlib.MAX_WBITS | 32
 
 
 class URIResolver:
+    # Class-level registry for URI scheme providers
+    _uri_providers = {}
 
     def __init__(self, session_factory, cache):
         self.session_factory = session_factory
         self.cache = cache
+
+    @classmethod
+    def register_provider(cls, scheme, handler):
+        """Register a URI scheme handler.
+
+        Args:
+            scheme: The URI scheme (e.g., 'azure', 's3') without '://'
+            handler: A callable that accepts (uri, session_factory, cache) and returns content
+        """
+        cls._uri_providers[scheme] = handler
 
     def resolve(self, uri, headers):
         contents = self.cache.get(("uri-resolver", uri))
         if contents is not None:
             return contents
 
+        # Parse URI once for all handlers
+        parsed = urlparse(uri)
+        scheme = parsed.scheme
+
+        # Built-in handlers take priority over provider-registered handlers.
+        # This prioritization exists for security and stability reasons - the built-in
+        # handlers are part of the core codebase with established security review.
+        # Provider-registered handlers are extensibility points for custom schemes.
+        # Long-term, built-in handlers may migrate to the registry once the registry
+        # is proven stable and a clear trust model is established.
+
         if uri.startswith('s3://'):
+            # S3 handler (predates the registry)
             contents = self.get_s3_uri(uri)
-        else:
+        elif scheme in ('http', 'https', 'file'):
+            # Standard URL schemes handled by urllib
             headers.update({"Accept-Encoding": "gzip"})
             req = Request(uri, headers=headers)
             with closing(urlopen(req)) as response:  # nosec nosemgrep
                 contents = self.handle_response_encoding(response)
+        elif scheme in self._uri_providers:
+            # Delegate to registered provider for custom schemes
+            contents = self._uri_providers[scheme](uri, self.session_factory, self.cache)
+        else:
+            # Unknown scheme
+            provider_schemes = ', '.join(sorted(self._uri_providers.keys())) or 'none'
+            raise ValueError(
+                f"Unsupported URI scheme '{scheme}' for URI: {uri}. "
+                f"Supported built-in schemes: s3, http, https, file. "
+                f"Registered provider schemes: {provider_schemes}"
+            )
 
         self.cache.save(("uri-resolver", uri), contents)
         return contents
@@ -100,6 +136,12 @@ class ValuesFrom:
          url: s3://bucket/abc/foo.csv
          format: csv2dict
          expr: key[1]
+
+      # Azure Blob Storage (requires c7n_azure)
+      value_from:
+         url: azure://storageaccount.blob.core.windows.net/container/data.json
+         format: json
+         expr: [].resourceId
 
       # using cql against dynamodb
       value_from:
