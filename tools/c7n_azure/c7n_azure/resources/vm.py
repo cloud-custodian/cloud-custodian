@@ -167,6 +167,7 @@ class VirtualMachine(ArmResourceManager):
 @VirtualMachine.filter_registry.register('instance-view')
 class InstanceViewFilter(ValueFilter):
     schema = type_schema('instance-view', rinherit=ValueFilter.schema)
+    annotation_key = 'instanceView'
 
     def __call__(self, i):
         if 'instanceView' not in i:
@@ -176,7 +177,7 @@ class InstanceViewFilter(ValueFilter):
                 .get(i['resourceGroup'], i['name'], expand='instanceview')
                 .instance_view
             )
-            i['instanceView'] = instance.serialize()
+            i[self.annotation_key] = instance.serialize()
 
         return super(InstanceViewFilter, self).__call__(i['instanceView'])
 
@@ -248,6 +249,7 @@ class VMExtensionsFilter(ValueFilter):
 
         """
     schema = type_schema('vm-extensions', rinherit=ValueFilter.schema)
+    annotation_key = 'c7n:vm-extensions'
     annotate = False  # cannot annotate arrays
 
     def __call__(self, i):
@@ -257,9 +259,9 @@ class VMExtensionsFilter(ValueFilter):
                 client.virtual_machine_extensions
                 .list(i['resourceGroup'], i['name'])
             )
-            i['c7n:vm-extensions'] = [e.serialize(True) for e in extensions.value]
+            i[self.annotation_key] = [e.serialize(True) for e in extensions.value]
 
-        return super(VMExtensionsFilter, self).__call__(i['c7n:vm-extensions'])
+        return super(VMExtensionsFilter, self).__call__(i[self.annotation_key])
 
 
 @VirtualMachine.filter_registry.register('network-interface')
@@ -294,7 +296,7 @@ class BackupStatusFilter(ValueFilter):
         rinherit=ValueFilter.schema
     )
 
-    backup_annotation_key = "c7n:BackupStatus"
+    annotation_key = "c7n:BackupStatus"
     annotate = False
 
     def process(self, resources, event=None):
@@ -302,16 +304,16 @@ class BackupStatusFilter(ValueFilter):
         client = s.client('azure.mgmt.recoveryservicesbackup.RecoveryServicesBackupClient')
 
         for resource in resources:
-            if self.backup_annotation_key in resource:
+            if self.annotation_key in resource:
                 continue
-            resource[self.backup_annotation_key] = client.backup_status.get(
+            resource[self.annotation_key] = client.backup_status.get(
                 azure_region=resource['location'],
                 parameters=dict(resourceId=resource['id'], resourceType='VM')
             ).serialize(True)
         return super().process(resources, event)
 
     def __call__(self, r):
-        return super().__call__(r[self.backup_annotation_key])
+        return super().__call__(r[self.annotation_key])
 
 
 @VirtualMachine.filter_registry.register('jit-policy-port')
