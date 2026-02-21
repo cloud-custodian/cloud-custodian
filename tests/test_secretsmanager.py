@@ -373,7 +373,7 @@ class TestSecretsManager(BaseTest):
                         'type': 'current-version',
                         'key': 'CreatedDate',
                         'op': 'lt',
-                        'value': 9000,
+                        'value': 180,
                         'value_type': 'age'
                     }
                 ]
