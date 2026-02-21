@@ -1,0 +1,81 @@
+{
+  "version": 1,
+  "interactions": [
+    {
+      "request": {
+        "method": "GET",
+        "uri": "https://management.azure.com/subscriptions/ea42f556-5106-4743-99b0-c129bfa71a47/providers/Microsoft.Compute/virtualMachines?api-version=2019-03-01",
+        "body": null,
+        "headers": {}
+      },
+      "response": {
+        "status": { "code": 200, "message": "OK" },
+        "headers": {
+          "cache-control": ["no-cache"],
+          "content-type": ["application/json; charset=utf-8"]
+        },
+        "body": {
+          "data": {
+            "value": [
+              {
+                "properties": {
+                  "vmId": "c030580e-cd45-4663-8379-850852e307ff",
+                  "hardwareProfile": { "vmSize": "Standard_D2_v2" },
+                  "storageProfile": {
+                    "osDisk": { "osType": "Linux", "name": "cctestvm_OsDisk" },
+                    "dataDisks": []
+                  },
+                  "osProfile": { "computerName": "cctestvm", "adminUsername": "azureuser" },
+                  "networkProfile": { "networkInterfaces": [{ "id": "/subscriptions/ea42f556-5106-4743-99b0-c129bfa71a47/resourceGroups/test_vm/providers/Microsoft.Network/networkInterfaces/myVMNic" }] },
+                  "provisioningState": "Succeeded"
+                },
+                "type": "Microsoft.Compute/virtualMachines",
+                "location": "southcentralus",
+                "tags": { "testtag": "testvalue" },
+                "id": "/subscriptions/ea42f556-5106-4743-99b0-c129bfa71a47/resourceGroups/TEST_VM/providers/Microsoft.Compute/virtualMachines/cctestvm",
+                "name": "cctestvm"
+              }
+            ]
+          }
+        }
+      }
+    },
+    {
+      "request": {
+        "method": "GET",
+        "uri": "https://management.azure.com/subscriptions/ea42f556-5106-4743-99b0-c129bfa71a47/resourceGroups/TEST_VM/providers/Microsoft.Compute/virtualMachines/cctestvm/providers/microsoft.insights/metrics?timespan=2026-02-20%2000%3A00%3A00%2F2026-02-21%2000%3A00%3A00&interval=P1D&metricnames=Percentage%20CPU&aggregation=average&api-version=2018-01-01",
+        "body": null,
+        "headers": {}
+      },
+      "response": {
+        "status": { "code": 200, "message": "OK" },
+        "headers": {
+          "cache-control": ["no-cache"],
+          "date": ["Thu, 20 Feb 2026 12:00:00 GMT"],
+          "content-type": ["application/json"],
+          "content-length": ["512"]
+        },
+        "body": {
+          "data": {
+            "cost": 0,
+            "timespan": "2026-02-20T00:00:00Z/2026-02-21T00:00:00Z",
+            "interval": "P1D",
+            "value": [
+              {
+                "id": "/subscriptions/ea42f556-5106-4743-99b0-c129bfa71a47/resourceGroups/TEST_VM/providers/Microsoft.Compute/virtualMachines/cctestvm/providers/Microsoft.Insights/metrics/Percentage CPU",
+                "type": "Microsoft.Insights/metrics",
+                "name": { "value": "Percentage CPU", "localizedValue": "Percentage CPU" },
+                "unit": "Percent",
+                "timeseries": [
+                  { "metadatavalues": [], "data": [{ "timeStamp": "2026-02-20T00:00:00Z", "average": 12.5 }] }
+                ]
+              }
+            ],
+            "namespace": "Microsoft.Compute/virtualMachines",
+            "resourceregion": "southcentralus"
+          }
+        }
+      }
+    }
+  ]
+}

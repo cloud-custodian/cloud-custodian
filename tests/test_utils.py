@@ -14,6 +14,7 @@ from c7n import query
 from c7n import utils
 from c7n.config import Config
 from .common import BaseTest
+from datetime import datetime
 
 
 class TestTesting(BaseTest):
@@ -925,6 +926,34 @@ class UtilTest(BaseTest):
             utils.get_eni_resource_type(
                 {"Description": ""}),
             'unknown')
+
+    def test_start_of_day(self):
+        """
+        Verify that 'start-of-day' correctly snaps start and end to UTC day boundaries.
+        """
+        # Example times
+        start = datetime(2026, 2, 17, 14, 30, 45)
+        end = datetime(2026, 2, 18, 14, 30, 45)
+
+        new_start, new_end = utils.snap_to_period_start(start, end, "start-of-day")
+
+        self.assertEqual(new_start, datetime(2026, 2, 17, 0, 0, 0))
+        self.assertEqual(new_end, datetime(2026, 2, 18, 0, 0, 0))
+
+        # This now spans 1 day (midnight-to-midnight)
+        self.assertEqual((new_end - new_start).days, 1)
+
+    def test_auto(self):
+        """
+        Verify that 'auto' leaves start and end unchanged.
+        """
+        start = datetime(2026, 2, 17, 10, 15, 30)
+        end = datetime(2026, 2, 17, 12, 45, 50)
+
+        new_start, new_end = utils.snap_to_period_start(start, end, "auto")
+
+        self.assertEqual(new_start, start)
+        self.assertEqual(new_end, end)
 
 
 def test_parse_date_floor():
