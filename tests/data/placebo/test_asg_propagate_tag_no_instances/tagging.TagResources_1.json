@@ -1,0 +1,22 @@
+{
+  "status_code": 400,
+  "data": {
+    "Error": {
+      "Code": "MissingParameter",
+      "Message": "The request must contain the parameter resourceIdSet"
+    },
+    "ResponseMetadata": {
+      "RequestId": "f229a23a-def5-4288-8ee0-f754ea63eda2",
+      "HTTPStatusCode": 400,
+      "HTTPHeaders": {
+        "date": "Thu, 21 Nov 2019 18:49:02 GMT",
+        "connection": "close",
+        "server": "AmazonEC2",
+        "content-type": "application/x-amz-json-1.1",
+        "content-length": "25",
+        "x-amzn-requestid": "f229a23a-def5-4288-8ee0-f754ea63eda2"
+      },
+      "RetryAttempts": 0
+    }
+  }
+}
