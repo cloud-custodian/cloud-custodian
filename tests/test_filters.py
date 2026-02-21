@@ -1269,9 +1269,8 @@ class TestMetricsFilter(BaseTest):
 
         1. The start of the metric window aligns to 00:00:00 UTC
         N days ago (where N is the number of days specified).
-        2. The end of the metric window aligns to the end of the last
-        completed UTC day (23:59:59 UTC), calculated as:
-            midnight UTC today - 1 second.
+        2. The end of the metric window aligns to midnight UTC
+        of the current day (00:00:00 UTC).
         3. The window spans exactly N full UTC calendar days.
         4. Backward compatibility is preserved when `period-start`
         is not specified (defaults to "auto").
@@ -1282,7 +1281,7 @@ class TestMetricsFilter(BaseTest):
 
             Expected window:
                 start = 2020-11-30 00:00:00 UTC
-                end   = 2020-12-02 23:59:59 UTC
+                end   = 2020-12-03 00:00:00 UTC
 
             Covered days:
                 2020-11-30
@@ -1319,9 +1318,15 @@ class TestMetricsFilter(BaseTest):
                 parse_date("2020-11-30T00:00:00+00:00"),
                 window.start
             )
+
             self.assertEqual(
-                parse_date("2020-12-02T23:59:59+00:00"),
+                parse_date("2020-12-03T00:00:00+00:00"),
                 window.end
+            )
+
+            self.assertEqual(
+                3,
+                (window.end - window.start).days
             )
 
 

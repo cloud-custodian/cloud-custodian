@@ -1227,6 +1227,6 @@ def snap_to_period_start(start: datetime, end: datetime, period_start: str):
     """
     if period_start == "start-of-day":
         start = start.replace(hour=0, minute=0, second=0, microsecond=0)
-        end = end.replace(hour=0, minute=0, second=0, microsecond=0) - timedelta(seconds=1)
+        end = end.replace(hour=0, minute=0, second=0, microsecond=0)
     # 'auto' does nothing
     return start, end

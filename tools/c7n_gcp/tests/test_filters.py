@@ -165,7 +165,7 @@ class TestGCPMetricsFilter(BaseTest):
 
         This verifies:
         - start aligns to 00:00:00 UTC N days ago
-        - end aligns to 23:59:59 UTC of the last completed day
+        - end aligns to 00:00:00 UTC of the current day
         - period equals the exact difference between start and end
         """
 
@@ -199,10 +199,10 @@ class TestGCPMetricsFilter(BaseTest):
         self.assertEqual(metrics_filter.start.second, 0)
         self.assertEqual(metrics_filter.start.microsecond, 0)
 
-        # End should be 23:59:59 UTC (midnight - 1 second)
-        self.assertEqual(metrics_filter.end.hour, 23)
-        self.assertEqual(metrics_filter.end.minute, 59)
-        self.assertEqual(metrics_filter.end.second, 59)
+        # End should now be midnight UTC
+        self.assertEqual(metrics_filter.end.hour, 0)
+        self.assertEqual(metrics_filter.end.minute, 0)
+        self.assertEqual(metrics_filter.end.second, 0)
         self.assertEqual(metrics_filter.end.microsecond, 0)
 
         # Period should match the difference in seconds

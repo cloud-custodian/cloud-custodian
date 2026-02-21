@@ -127,7 +127,7 @@ class MetricFilter(Filter):
     The ``period_start`` key allows you to align the metric window in two ways.
     By default, using ``auto``, the window is computed relative to the current time.
     Alternatively, setting it to ``start-of-day`` aligns the window to full UTC calendar days,
-    beginning at 00:00:00 UTC and ending at 23:59:59 UTC.
+    beginning at 00:00:00 UTC and ending at current day 00:00:00 UTC.
 
     :example:
 
