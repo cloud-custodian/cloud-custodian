@@ -626,3 +626,203 @@ class DeleteBedrockInferenceProfile(BaseAction):
                     f"Unable to delete inference profile {r['inferenceProfileArn']}: {e}",
                 )
                 continue
+
+
+@resources.register('bedrock-guardrail')
+class BedrockGuardrail(QueryResourceManager):
+    class resource_type(TypeInfo):
+        service = 'bedrock'
+        enum_spec = ('list_guardrails', 'guardrails[]', {})
+        detail_spec = ('get_guardrail', 'guardrailIdentifier', 'id', None)
+        name = "name"
+        id = "id"
+        arn = "arn"
+        permission_prefix = 'bedrock'
+        universal_taggable = object()
+        permissions_augment = ("bedrock:ListTagsForResource",)
+
+    def augment(self, resources):
+        resources = super().augment(resources)
+        return universal_augment(self, resources)
+
+
+@BedrockGuardrail.action_registry.register('update')
+class UpdateGuardrail(BaseAction):
+    """Update a Bedrock Guardrail using the `update_guardrail` API.
+
+    The action accepts top-level keys (for example `wordPolicyConfig`) which
+    will be merged into the update payload.
+
+    Example policy:
+
+    .. code-block:: yaml
+
+        policies:
+          - name: update-guardrail-example
+            resource: bedrock-guardrail
+            filters:
+              - type: value
+                key: wordPolicy
+                value: absent
+            actions:
+              - type: update
+                wordPolicyConfig:
+                  wordsConfig:
+                    - text: HATE
+                      inputAction: BLOCK
+                      outputAction: NONE
+                      inputEnabled: true
+                      outputEnabled: false
+                  managedWordListsConfig:
+                    - type: PROFANITY
+                      inputAction: BLOCK
+                      outputAction: NONE
+                      inputEnabled: true
+                      outputEnabled: false
+    """
+
+    schema = type_schema(
+        'update',
+        name={'type': 'string'},
+        description={'type': 'string'},
+        topicPolicyConfig={'type': 'object'},
+        contentPolicyConfig={'type': 'object'},
+        wordPolicyConfig={'type': 'object'},
+        sensitiveInformationPolicyConfig={'type': 'object'},
+        contextualGroundingPolicyConfig={'type': 'object'},
+        automatedReasoningPolicyConfig={'type': 'object'},
+        crossRegionConfig={'type': 'object'},
+        blockedInputMessaging={'type': 'string'},
+        blockedOutputsMessaging={'type': 'string'},
+        kmsKeyId={'type': 'string'},
+    )
+    permissions = ('bedrock:UpdateGuardrail',)
+
+    def process(self, resources):
+        client = local_session(self.manager.session_factory).client('bedrock')
+
+        # Build update payload from action data (exclude 'type')
+        action_data = dict(self.data or {})
+        patch = {}
+        for k, v in list(action_data.items()):
+            if k != 'type':
+                patch[k] = v
+
+        for r in resources:
+            guardrail_id = r.get('arn')
+
+            params = {'guardrailIdentifier': guardrail_id}
+
+            # API requires certain fields; if they are not provided in the
+            # patch, fetch the current guardrail and reuse its values to
+            # avoid ParamValidationError (e.g. name, messaging fields).
+            required_fallbacks = ('name', 'blockedInputMessaging', 'blockedOutputsMessaging')
+            missing = [k for k in required_fallbacks if k not in patch]
+            if missing:
+                try:
+                    current = (
+                        client.get_guardrail(
+                            guardrailIdentifier=guardrail_id
+                        )
+                        .get('guardrail', {})
+                    )
+                except client.exceptions.ResourceNotFoundException:
+                    continue
+                # populate missing keys from current guardrail
+                for k in missing:
+                    # Prefer current server value, then resource value.
+                    val = None
+                    if current.get(k):
+                        val = current.get(k)
+                    elif r.get(k):
+                        val = r.get(k)
+                    if val:
+                        patch[k] = val
+                    else:
+                        # We cannot supply an empty value because botocore
+                        # will reject it. Surface a clear error to the
+                        # user instead of sending an invalid payload.
+                        raise ValueError(
+                            (
+                                "Unable to determine required field '%s' for guardrail %s; "
+                                "please include it in the action payload or ensure the resource "
+                                "has it."
+                            )
+                            % (k, guardrail_id)
+                        )
+
+            params.update(patch)
+
+            try:
+                client.update_guardrail(**params)
+            except client.exceptions.ResourceNotFoundException:
+                continue
+
+
+BedrockGuardrail.filter_registry.register('marked-for-op', TagActionFilter)
+
+
+@BedrockGuardrail.action_registry.register('mark-for-op')
+class MarkBedrockGuardrailForOp(TagDelayedAction):
+    """Mark guardrail for future actions
+
+    :example:
+
+    .. code-block:: yaml
+
+        policies:
+          - name: guardrail-tag-mark
+            resource: bedrock-guardrail
+            filters:
+              - "tag:update": present
+            actions:
+              - type: mark-for-op
+                op: update
+                days: 1
+    """
+
+
+@BedrockGuardrail.action_registry.register('tag')
+class TagBedrockGuardrail(Tag):
+    """Create tags on Bedrock guardrails
+
+    :example:
+
+    .. code-block:: yaml
+
+        policies:
+          - name: bedrock-guardrail-tag
+            resource: bedrock-guardrail
+            actions:
+              - type: tag
+                key: NewTag
+                value: NewValue
+    """
+    permissions = ('bedrock:TagResource',)
+
+    def process_resource_set(self, client, resources, new_tags):
+        tags = [{'key': item['Key'], 'value': item['Value']} for item in new_tags]
+        for r in resources:
+            client.tag_resource(resourceARN=r['arn'], tags=tags)
+
+
+@BedrockGuardrail.action_registry.register('remove-tag')
+class RemoveTagBedrockGuardrail(RemoveTag):
+    """Remove tags from a bedrock guardrail
+
+    :example:
+
+    .. code-block:: yaml
+
+        policies:
+          - name: bedrock-guardrail-untag
+            resource: bedrock-guardrail
+            actions:
+              - type: remove-tag
+                tags: ["tag-key"]
+    """
+    permissions = ('bedrock:UntagResource',)
+
+    def process_resource_set(self, client, resources, tags):
+        for r in resources:
+            client.untag_resource(resourceARN=r['arn'], tagKeys=tags)
