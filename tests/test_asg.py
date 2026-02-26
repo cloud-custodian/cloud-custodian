@@ -661,6 +661,25 @@ class AutoScalingTest(BaseTest):
         ].pop()
         self.assertTrue(result["SuspendedProcesses"])
 
+    def test_asg_suspend_force(self):
+        factory = self.replay_flight_data("test_asg_suspend_force")
+        p = self.load_policy(
+            {
+                "name": "asg-suspend-force",
+                "resource": "asg",
+                "filters": [{"tag:SuspendTag": "present"}],
+                "actions": [{"type": "suspend", "force": True}],
+            },
+            session_factory=factory,
+        )
+        resources = p.run()
+        self.assertEqual(len(resources), 1)
+        client = factory().client("autoscaling")
+        result = client.describe_auto_scaling_groups(
+            AutoScalingGroupNames=[resources[0]["AutoScalingGroupName"]]
+        )["AutoScalingGroups"].pop()
+        self.assertTrue(result["SuspendedProcesses"])
+
     def test_asg_suspend_when_no_instances(self):
         factory = self.replay_flight_data("test_asg_suspend_when_no_instances")
         client = factory().client("autoscaling")

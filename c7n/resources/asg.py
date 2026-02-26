@@ -1495,8 +1495,16 @@ class Suspend(Action):
                   - "tag:SuspendTag": present
                 actions:
                   - type: suspend
+
+            policies:
+              - name: asg-suspend-force
+                resource: asg
+                filters:
+                  - "tag:SuspendTag": present
+                actions:
+                  - type: suspend
+                    force: true
     """
-    permissions = ("autoscaling:SuspendProcesses", "ec2:StopInstances")
 
     ASG_PROCESSES = [
         "Launch",
@@ -1514,13 +1522,33 @@ class Suspend(Action):
         exclude={
             'type': 'array',
             'title': 'ASG Processes to not suspend',
-            'items': {'enum': ASG_PROCESSES}})
+            'items': {'enum': ASG_PROCESSES}},
+        force={'type': 'boolean'})
 
     ASG_PROCESSES = set(ASG_PROCESSES)
+
+    def get_permissions(self):
+        perms = ("autoscaling:SuspendProcesses", "ec2:StopInstances")
+        if self.data.get('force'):
+            perms += ("ec2:ModifyInstanceAttribute",)
+        return perms
 
     def process(self, asgs):
         with self.executor_factory(max_workers=3) as w:
             list(w.map(self.process_asg, asgs))
+
+    def disable_api_stop(self, client, instances):
+        for i in instances:
+            try:
+                client.modify_instance_attribute(
+                    InstanceId=i['InstanceId'],
+                    Attribute='disableApiStop',
+                    Value='false',
+                )
+            except ClientError as e:
+                if e.response['Error']['Code'] == 'IncorrectInstanceState':
+                    continue
+                raise
 
     def process_asg(self, asg):
         """Multistep process to stop an asg aprori of setup
@@ -1543,12 +1571,17 @@ class Suspend(Action):
                 return
             raise
         ec2_client = session.client('ec2')
+        instance_ids = [i['InstanceId'] for i in asg['Instances']]
+        if not instance_ids:
+            return
+        retry = get_retry((
+            'RequestLimitExceeded', 'Client.RequestLimitExceeded'))
+        if self.data.get('force'):
+            self.log.info(
+                "Disabling DisableApiStop on instances in asg:%s before stopping" %
+                asg['AutoScalingGroupName'])
+            self.disable_api_stop(ec2_client, asg['Instances'])
         try:
-            instance_ids = [i['InstanceId'] for i in asg['Instances']]
-            if not instance_ids:
-                return
-            retry = get_retry((
-                'RequestLimitExceeded', 'Client.RequestLimitExceeded'))
             retry(ec2_client.stop_instances, InstanceIds=instance_ids)
         except ClientError as e:
             if e.response['Error']['Code'] in (
