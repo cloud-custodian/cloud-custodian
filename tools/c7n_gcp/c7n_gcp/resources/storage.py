@@ -2,6 +2,7 @@
 # SPDX-License-Identifier: Apache-2.0
 from c7n.utils import type_schema
 from c7n_gcp.actions import MethodAction
+from c7n_gcp.actions.iampolicy import SetIamPolicy
 from c7n_gcp.provider import resources
 from c7n_gcp.query import QueryResourceManager, TypeInfo
 from c7n_gcp.filters import IamPolicyFilter
@@ -96,3 +97,79 @@ class BucketLevelAccess(MethodAction):
                 'fields': 'iamConfiguration',
                 'projection': 'noAcl',  # not documented but
                 'body': {'iamConfiguration': {'uniformBucketLevelAccess': {'enabled': enabled}}}}
+
+
+@Bucket.action_registry.register('set-iam-policy')
+class BucketSetIamPolicy(SetIamPolicy):
+    """Manage GCP bucket IAM policy bindings.
+
+    This action supports ``add-bindings`` and ``remove-bindings`` to manage
+    bucket-level IAM policies. A common use case is removing ``allUsers`` and
+    ``allAuthenticatedUsers`` from buckets that have been misconfigured with
+    public access.
+
+    The ``remove-bindings`` list specifies which members to remove from which
+    roles. If removing a member leaves a role binding with no members, that
+    binding is dropped entirely. Use ``members: '*'`` as a wildcard to remove
+    all members from a role.
+
+    Example policy to detect and remediate publicly accessible buckets.
+    To fully remove anonymous and public access, all predefined storage roles
+    must be covered:
+
+    .. code-block:: yaml
+
+      policies:
+        - name: gcp-bucket-remove-public-access
+          resource: gcp.bucket
+          filters:
+            - type: iam-policy
+              doc:
+                key: 'bindings[*].members[]'
+                op: intersect
+                value:
+                  - allUsers
+                  - allAuthenticatedUsers
+          actions:
+            - type: set-iam-policy
+              remove-bindings:
+                - members: [allUsers, allAuthenticatedUsers]
+                  role: roles/storage.admin
+                - members: [allUsers, allAuthenticatedUsers]
+                  role: roles/storage.objectAdmin
+                - members: [allUsers, allAuthenticatedUsers]
+                  role: roles/storage.objectCreator
+                - members: [allUsers, allAuthenticatedUsers]
+                  role: roles/storage.objectUser
+                - members: [allUsers, allAuthenticatedUsers]
+                  role: roles/storage.objectViewer
+                - members: [allUsers, allAuthenticatedUsers]
+                  role: roles/storage.bucketViewer
+                - members: [allUsers, allAuthenticatedUsers]
+                  role: roles/storage.folderAdmin
+                - members: [allUsers, allAuthenticatedUsers]
+                  role: roles/storage.legacyBucketOwner
+                - members: [allUsers, allAuthenticatedUsers]
+                  role: roles/storage.legacyBucketReader
+                - members: [allUsers, allAuthenticatedUsers]
+                  role: roles/storage.legacyBucketWriter
+                - members: [allUsers, allAuthenticatedUsers]
+                  role: roles/storage.legacyObjectOwner
+                - members: [allUsers, allAuthenticatedUsers]
+                  role: roles/storage.legacyObjectReader
+    """
+
+    permissions = ('storage.buckets.getIamPolicy', 'storage.buckets.setIamPolicy')
+
+    def _verb_arguments(self, resource):
+        return {'bucket': resource['name']}
+
+    def get_resource_params(self, model, resource):
+        params = self._verb_arguments(resource)
+        existing_bindings = self._get_existing_bindings(model, resource)
+        add_bindings = self.data.get('add-bindings', [])
+        remove_bindings = self.data.get('remove-bindings', [])
+        bindings_to_set = self._add_bindings(existing_bindings, add_bindings)
+        bindings_to_set = self._remove_bindings(bindings_to_set, remove_bindings)
+        params['body'] = {'bindings': bindings_to_set} if bindings_to_set else {}
+        return params

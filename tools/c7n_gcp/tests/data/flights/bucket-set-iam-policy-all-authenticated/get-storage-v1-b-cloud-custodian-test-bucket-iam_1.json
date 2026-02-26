@@ -1,0 +1,30 @@
+{
+  "headers": {
+    "etag": "CAE=",
+    "content-type": "application/json; charset=UTF-8",
+    "date": "Wed, 01 Jan 2025 12:00:01 GMT",
+    "cache-control": "private, max-age=0, must-revalidate, no-transform",
+    "status": "200"
+  },
+  "body": {
+    "kind": "storage#policy",
+    "version": 1,
+    "etag": "CAE=",
+    "bindings": [
+      {
+        "role": "roles/storage.objectViewer",
+        "members": [
+          "allAuthenticatedUsers",
+          "user:alice@example.com"
+        ]
+      },
+      {
+        "role": "roles/storage.legacyBucketOwner",
+        "members": [
+          "projectEditor:cloud-custodian",
+          "projectOwner:cloud-custodian"
+        ]
+      }
+    ]
+  }
+}
