@@ -468,7 +468,6 @@ class PolicyMetaLint(BaseTest):
             "AWS::AppConfig::ExtensionAssociation",
             "AWS::AppIntegrations::Application",
             "AWS::AppSync::ApiCache",
-            "AWS::Bedrock::Guardrail",
             "AWS::Bedrock::KnowledgeBase",
             "AWS::Connect::Rule",
             "AWS::Connect::User",
