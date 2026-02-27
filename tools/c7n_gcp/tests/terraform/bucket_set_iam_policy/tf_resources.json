@@ -15,7 +15,7 @@
                 "name": "projects/cloud-custodian/serviceAccounts/iam-test-sa-wuc48fhtok@stacklet-test-policies.iam.gserviceaccount.com",
                 "project": "stacklet-test-policies",
                 "timeouts": null,
-                "unique_id": "109491364653989228658"
+                "unique_id": "100187559211596008082"
             }
         },
         "google_storage_bucket": {
@@ -54,7 +54,7 @@
                 "self_link": "https://www.googleapis.com/storage/v1/b/iam-test-bucket-wuc48fhtok",
                 "soft_delete_policy": [
                     {
-                        "effective_time": "2026-02-27T12:44:52.273Z",
+                        "effective_time": "2026-02-27T13:26:16.587Z",
                         "retention_duration_seconds": 604800
                     }
                 ],
@@ -63,10 +63,10 @@
                     "env": "default",
                     "goog-terraform-provisioned": "true"
                 },
-                "time_created": "2026-02-27T12:44:52.273Z",
+                "time_created": "2026-02-27T13:26:16.587Z",
                 "timeouts": null,
                 "uniform_bucket_level_access": false,
-                "updated": "2026-02-27T12:44:52.273Z",
+                "updated": "2026-02-27T13:26:16.587Z",
                 "url": "gs://iam-test-bucket-wuc48fhtok",
                 "versioning": [],
                 "website": []
@@ -76,7 +76,7 @@
             "authenticated_legacy_reader": {
                 "bucket": "b/iam-test-bucket-wuc48fhtok",
                 "condition": [],
-                "etag": "CAQ=",
+                "etag": "CAM=",
                 "id": "b/iam-test-bucket-wuc48fhtok/roles/storage.legacyBucketReader/allAuthenticatedUsers",
                 "member": "allAuthenticatedUsers",
                 "role": "roles/storage.legacyBucketReader",
@@ -85,7 +85,7 @@
             "public_viewer": {
                 "bucket": "b/iam-test-bucket-wuc48fhtok",
                 "condition": [],
-                "etag": "CAI=",
+                "etag": "CAM=",
                 "id": "b/iam-test-bucket-wuc48fhtok/roles/storage.objectViewer/allUsers",
                 "member": "allUsers",
                 "role": "roles/storage.objectViewer",

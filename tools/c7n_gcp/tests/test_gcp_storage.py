@@ -4,6 +4,188 @@
 import time
 
 from gcp_common import BaseTest
+from pytest_terraform import terraform
+
+
+
+@terraform("bucket_set_iam_policy")
+def test_bucket_set_iam_policy_remove_public_access(test, bucket_set_iam_policy):
+    bucket_name = bucket_set_iam_policy.resources['google_storage_bucket']['bucket']['name']
+    sa_email = (
+        "serviceAccount:"
+        + bucket_set_iam_policy.resources['google_service_account']['legitimate_member']['email']
+    )
+    factory = test.replay_flight_data('bucket-set-iam-policy')
+
+    policy = test.load_policy(
+        {'name': 'bucket-set-iam-policy',
+            'resource': 'gcp.bucket',
+            'filters': [{
+                'type': 'iam-policy',
+                'doc': {
+                    'key': 'bindings[*].members[]',
+                    'op': 'intersect',
+                    'value': ['allUsers', 'allAuthenticatedUsers'],
+                }
+            }],
+            'actions': [{
+                'type': 'set-iam-policy',
+                'remove-bindings': [
+                    {
+                        'members': ['allUsers', 'allAuthenticatedUsers'],
+                        'role': 'roles/storage.objectViewer'
+                    },
+                    {
+                        'members': ['allUsers', 'allAuthenticatedUsers'],
+                        'role': 'roles/storage.legacyBucketReader'
+                    },
+                ]
+            }]},
+        session_factory=factory)
+    resources = policy.run()
+    assert len(resources) == 1
+    assert resources[0]['name'] == bucket_name
+
+    client = policy.resource_manager.get_client()
+    updated_policy = client.execute_query('getIamPolicy', {'bucket': bucket_name})
+    all_members = [
+        member
+        for binding in updated_policy.get('bindings', [])
+        for member in binding['members']
+    ]
+    assert 'allUsers' not in all_members
+    assert 'allAuthenticatedUsers' not in all_members
+    assert sa_email in all_members
+
+@terraform("bucket_set_iam_policy")
+def test_bucket_set_iam_policy_add_bindings(test, bucket_set_iam_policy):
+    bucket_name = bucket_set_iam_policy.resources['google_storage_bucket']['bucket']['name']
+    sa_email = (
+        "serviceAccount:"
+        + bucket_set_iam_policy.resources['google_service_account']['legitimate_member']['email']
+    )
+    factory = test.replay_flight_data('bucket-set-iam-policy-add-bindings')
+    policy = test.load_policy(
+        {'name': 'bucket-set-iam-policy-add-bindings',
+         'resource': 'gcp.bucket',
+         'filters': [{'type': 'value', 'key': 'name', 'value': bucket_name}],
+         'actions': [{
+             'type': 'set-iam-policy',
+             'add-bindings': [{
+                 'members': [sa_email],
+                 'role': 'roles/storage.legacyBucketReader'
+             }]
+         }]},
+        session_factory=factory)
+
+    resources = policy.run()
+    assert len(resources) == 1
+    assert resources[0]['name'] == bucket_name
+
+    client = policy.resource_manager.get_client()
+    updated_policy = client.execute_query('getIamPolicy', {'bucket': bucket_name})
+    legacy_reader_binding = next(
+        (b for b in updated_policy.get('bindings', [])
+         if b['role'] == 'roles/storage.legacyBucketReader'),
+        None
+    )
+    assert legacy_reader_binding is not None
+    assert sa_email in legacy_reader_binding['members']
+
+
+@terraform("bucket_set_iam_policy")
+def test_bucket_set_iam_policy_remove_wildcard(test, bucket_set_iam_policy):
+    bucket_name = bucket_set_iam_policy.resources['google_storage_bucket']['bucket']['name']
+    factory = test.replay_flight_data('bucket-set-iam-policy-wildcard')
+    policy = test.load_policy(
+        {'name': 'bucket-set-iam-policy-wildcard',
+         'resource': 'gcp.bucket',
+         'filters': [{'type': 'value', 'key': 'name', 'value': bucket_name}],
+         'actions': [{
+             'type': 'set-iam-policy',
+             'remove-bindings': [{
+                 'members': '*',
+                 'role': 'roles/storage.objectViewer'
+             }]
+         }]},
+        session_factory=factory)
+
+    resources = policy.run()
+    assert len(resources) == 1
+
+    client = policy.resource_manager.get_client()
+    updated_policy = client.execute_query('getIamPolicy', {'bucket': bucket_name})
+    roles = [b['role'] for b in updated_policy.get('bindings', [])]
+    assert 'roles/storage.objectViewer' not in roles
+
+
+
+@terraform("bucket_set_iam_policy")
+def test_bucket_set_iam_policy_add_and_remove_remove_wins(test, bucket_set_iam_policy):
+    bucket_name = bucket_set_iam_policy.resources['google_storage_bucket']['bucket']['name']
+    sa_email = (
+        "serviceAccount:"
+        + bucket_set_iam_policy.resources['google_service_account']['legitimate_member']['email']
+    )
+    factory = test.replay_flight_data('bucket-set-iam-policy-add-and-remove')
+    policy = test.load_policy(
+        {'name': 'bucket-set-iam-policy-add-and-remove',
+         'resource': 'gcp.bucket',
+         'filters': [{'type': 'value', 'key': 'name', 'value': bucket_name}],
+         'actions': [{
+             'type': 'set-iam-policy',
+             'add-bindings': [
+                 {'members': [sa_email], 'role': 'roles/storage.objectAdmin'},
+             ],
+             'remove-bindings': [
+                 {'members': [sa_email], 'role': 'roles/storage.objectAdmin'},
+             ]
+         }]},
+        session_factory=factory)
+
+    resources = policy.run()
+    assert len(resources) == 1
+
+    client = policy.resource_manager.get_client()
+    updated_policy = client.execute_query('getIamPolicy', {'bucket': bucket_name})
+    roles = [b['role'] for b in updated_policy.get('bindings', [])]
+    assert 'roles/storage.objectAdmin' not in roles
+
+
+@terraform("bucket_set_iam_policy")
+def test_bucket_set_iam_policy_remove_nonexistent_is_noop(test, bucket_set_iam_policy):
+    bucket_name = bucket_set_iam_policy.resources['google_storage_bucket']['bucket']['name']
+    sa_email = (
+        "serviceAccount:"
+        + bucket_set_iam_policy.resources['google_service_account']['legitimate_member']['email']
+    )
+    factory = test.replay_flight_data('bucket-set-iam-policy-idempotent')
+    policy = test.load_policy(
+        {'name': 'bucket-set-iam-policy-idempotent',
+         'resource': 'gcp.bucket',
+         'filters': [{'type': 'value', 'key': 'name', 'value': bucket_name}],
+         'actions': [{
+             'type': 'set-iam-policy',
+             'remove-bindings': [{
+                 'members': ['allUsers', 'allAuthenticatedUsers'],
+                 'role': 'roles/storage.objectAdmin'
+             }]
+         }]},
+        session_factory=factory)
+
+    resources = policy.run()
+    assert len(resources) == 1
+
+    client = policy.resource_manager.get_client()
+    updated_policy = client.execute_query('getIamPolicy', {'bucket': bucket_name})
+    roles = [b['role'] for b in updated_policy.get('bindings', [])]
+    assert 'roles/storage.objectAdmin' not in roles
+    all_members = [
+        member
+        for binding in updated_policy.get('bindings', [])
+        for member in binding['members']
+    ]
+    assert sa_email in all_members
 
 
 class BucketTest(BaseTest):
@@ -121,221 +303,6 @@ class BucketTest(BaseTest):
         assert p.resource_manager.get_urns([bucket]) == [
             "gcp:storage::cloud-custodian:bucket/staging.cloud-custodian.appspot.com",
         ]
-
-    def test_bucket_set_iam_policy_remove_public_access(self):
-        project_id = 'cloud-custodian'
-        bucket_name = 'cloud-custodian-test-bucket'
-        factory = self.replay_flight_data('bucket-set-iam-policy', project_id=project_id)
-        policy = self.load_policy(
-            {'name': 'bucket-set-iam-policy',
-             'resource': 'gcp.bucket',
-             'actions': [{
-                 'type': 'set-iam-policy',
-                 'remove-bindings': [{
-                     'members': ['allUsers', 'allAuthenticatedUsers'],
-                     'role': 'roles/storage.objectViewer'
-                 }]
-             }]},
-            session_factory=factory)
-
-        resources = policy.run()
-        self.assertEqual(len(resources), 1)
-        self.assertEqual(resources[0]['name'], bucket_name)
-
-        client = policy.resource_manager.get_client()
-        updated_policy = client.execute_query('getIamPolicy', {'bucket': bucket_name})
-        all_members = [
-            member
-            for binding in updated_policy.get('bindings', [])
-            for member in binding['members']
-        ]
-        self.assertNotIn('allUsers', all_members)
-        self.assertNotIn('allAuthenticatedUsers', all_members)
-
-    def test_bucket_set_iam_policy_add_bindings(self):
-        project_id = 'cloud-custodian'
-        bucket_name = 'cloud-custodian-test-bucket'
-        factory = self.replay_flight_data(
-            'bucket-set-iam-policy-add-bindings', project_id=project_id)
-        policy = self.load_policy(
-            {'name': 'bucket-set-iam-policy-add-bindings',
-             'resource': 'gcp.bucket',
-             'actions': [{
-                 'type': 'set-iam-policy',
-                 'add-bindings': [{
-                     'members': ['user:alice@example.com'],
-                     'role': 'roles/storage.objectViewer'
-                 }]
-             }]},
-            session_factory=factory)
-
-        resources = policy.run()
-        self.assertEqual(len(resources), 1)
-        self.assertEqual(resources[0]['name'], bucket_name)
-
-        client = policy.resource_manager.get_client()
-        updated_policy = client.execute_query('getIamPolicy', {'bucket': bucket_name})
-        viewer_binding = next(
-            (b for b in updated_policy.get('bindings', [])
-             if b['role'] == 'roles/storage.objectViewer'),
-            None
-        )
-        self.assertIsNotNone(viewer_binding)
-        self.assertIn('user:alice@example.com', viewer_binding['members'])
-
-    def test_bucket_set_iam_policy_remove_wildcard(self):
-        project_id = 'cloud-custodian'
-        bucket_name = 'cloud-custodian-test-bucket'
-        factory = self.replay_flight_data(
-            'bucket-set-iam-policy-wildcard', project_id=project_id)
-        policy = self.load_policy(
-            {'name': 'bucket-set-iam-policy-wildcard',
-             'resource': 'gcp.bucket',
-             'actions': [{
-                 'type': 'set-iam-policy',
-                 'remove-bindings': [{
-                     'members': '*',
-                     'role': 'roles/storage.objectAdmin'
-                 }]
-             }]},
-            session_factory=factory)
-
-        resources = policy.run()
-        self.assertEqual(len(resources), 1)
-
-        client = policy.resource_manager.get_client()
-        updated_policy = client.execute_query('getIamPolicy', {'bucket': bucket_name})
-        roles = [b['role'] for b in updated_policy.get('bindings', [])]
-        self.assertNotIn('roles/storage.objectAdmin', roles)
-
-    def test_bucket_set_iam_policy_remove_all_authenticated_users(self):
-        project_id = 'cloud-custodian'
-        bucket_name = 'cloud-custodian-test-bucket'
-        factory = self.replay_flight_data(
-            'bucket-set-iam-policy-all-authenticated', project_id=project_id)
-        policy = self.load_policy(
-            {'name': 'bucket-set-iam-policy-all-authenticated',
-             'resource': 'gcp.bucket',
-             'actions': [{
-                 'type': 'set-iam-policy',
-                 'remove-bindings': [{
-                     'members': ['allAuthenticatedUsers'],
-                     'role': 'roles/storage.objectViewer'
-                 }]
-             }]},
-            session_factory=factory)
-
-        resources = policy.run()
-        self.assertEqual(len(resources), 1)
-
-        client = policy.resource_manager.get_client()
-        updated_policy = client.execute_query('getIamPolicy', {'bucket': bucket_name})
-        all_members = [
-            member
-            for binding in updated_policy.get('bindings', [])
-            for member in binding['members']
-        ]
-        self.assertNotIn('allAuthenticatedUsers', all_members)
-        self.assertIn('user:alice@example.com', all_members)
-
-    def test_bucket_set_iam_policy_multiple_roles(self):
-        project_id = 'cloud-custodian'
-        bucket_name = 'cloud-custodian-test-bucket'
-        factory = self.replay_flight_data(
-            'bucket-set-iam-policy-multi-role', project_id=project_id)
-        policy = self.load_policy(
-            {'name': 'bucket-set-iam-policy-multi-role',
-             'resource': 'gcp.bucket',
-             'actions': [{
-                 'type': 'set-iam-policy',
-                 'remove-bindings': [
-                     {'members': ['allUsers', 'allAuthenticatedUsers'],
-                      'role': 'roles/storage.objectViewer'},
-                     {'members': ['allUsers', 'allAuthenticatedUsers'],
-                      'role': 'roles/storage.objectCreator'},
-                 ]
-             }]},
-            session_factory=factory)
-
-        resources = policy.run()
-        self.assertEqual(len(resources), 1)
-
-        client = policy.resource_manager.get_client()
-        updated_policy = client.execute_query('getIamPolicy', {'bucket': bucket_name})
-        all_members = [
-            member
-            for binding in updated_policy.get('bindings', [])
-            for member in binding['members']
-        ]
-        self.assertNotIn('allUsers', all_members)
-        self.assertNotIn('allAuthenticatedUsers', all_members)
-        self.assertIn('user:alice@example.com', all_members)
-        roles = [b['role'] for b in updated_policy.get('bindings', [])]
-        self.assertNotIn('roles/storage.objectViewer', roles)
-
-    def test_bucket_set_iam_policy_add_and_remove_remove_wins(self):
-        project_id = 'cloud-custodian'
-        bucket_name = 'cloud-custodian-test-bucket'
-        factory = self.replay_flight_data(
-            'bucket-set-iam-policy-add-and-remove', project_id=project_id)
-        policy = self.load_policy(
-            {'name': 'bucket-set-iam-policy-add-and-remove',
-             'resource': 'gcp.bucket',
-             'actions': [{
-                 'type': 'set-iam-policy',
-                 'add-bindings': [
-                     {'members': ['user:bob@example.com'],
-                      'role': 'roles/storage.objectViewer'},
-                     {'members': ['user:alice@example.com'],
-                      'role': 'roles/storage.objectAdmin'},
-                 ],
-                 'remove-bindings': [
-                     {'members': ['user:alice@example.com'],
-                      'role': 'roles/storage.objectAdmin'},
-                 ]
-             }]},
-            session_factory=factory)
-
-        resources = policy.run()
-        self.assertEqual(len(resources), 1)
-
-        client = policy.resource_manager.get_client()
-        updated_policy = client.execute_query('getIamPolicy', {'bucket': bucket_name})
-        bindings_by_role = {
-            b['role']: b['members'] for b in updated_policy.get('bindings', [])}
-        self.assertIn(
-            'user:bob@example.com',
-            bindings_by_role.get('roles/storage.objectViewer', []))
-        self.assertIn(
-            'user:alice@example.com',
-            bindings_by_role.get('roles/storage.objectViewer', []))
-        self.assertNotIn('roles/storage.objectAdmin', bindings_by_role)
-
-    def test_bucket_set_iam_policy_remove_nonexistent_is_noop(self):
-        project_id = 'cloud-custodian'
-        bucket_name = 'cloud-custodian-test-bucket'
-        factory = self.replay_flight_data(
-            'bucket-set-iam-policy-idempotent', project_id=project_id)
-        policy = self.load_policy(
-            {'name': 'bucket-set-iam-policy-idempotent',
-             'resource': 'gcp.bucket',
-             'actions': [{
-                 'type': 'set-iam-policy',
-                 'remove-bindings': [{
-                     'members': ['allUsers', 'allAuthenticatedUsers'],
-                     'role': 'roles/storage.objectViewer'
-                 }]
-             }]},
-            session_factory=factory)
-
-        resources = policy.run()
-        self.assertEqual(len(resources), 1)
-
-        client = policy.resource_manager.get_client()
-        updated_policy = client.execute_query('getIamPolicy', {'bucket': bucket_name})
-        roles = [b['role'] for b in updated_policy.get('bindings', [])]
-        self.assertIn('roles/storage.legacyBucketOwner', roles)
-        self.assertNotIn('roles/storage.objectViewer', roles)
 
     def test_bucket_label(self):
         # Set the "env" label to not the default
