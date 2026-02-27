@@ -1,14 +1,14 @@
 {
   "headers": {
     "content-type": "application/json; charset=UTF-8",
-    "x-guploader-uploadid": "AGQBYWwZVg8cMzmyuef7V7owCevkcR_WewpeOgv0DSChALHyk5fduF24HzCuWMZSk1VQPVbh",
-    "etag": "CAI=",
-    "date": "Thu, 26 Feb 2026 18:01:05 GMT",
+    "x-guploader-uploadid": "AGQBYWxdSvO8Fk4UP14NH77Qih5x7nLHVn-XWdWM9-NW16MagWqMLRqtnx1PlWjM1RNCICTT",
+    "etag": "CAU=",
+    "date": "Fri, 27 Feb 2026 12:48:04 GMT",
     "vary": "Origin, X-Origin",
     "cache-control": "no-cache, no-store, max-age=0, must-revalidate",
     "expires": "Mon, 01 Jan 1990 00:00:00 GMT",
     "pragma": "no-cache",
-    "content-length": "470",
+    "content-length": "649",
     "server": "UploadServer",
     "alt-svc": "h3=\":443\"; ma=2592000,h3-29=\":443\"; ma=2592000",
     "status": "200"
@@ -17,7 +17,7 @@
     "kind": "storage#policy",
     "resourceId": "projects/cloud-custodian/buckets/iam-test-bucket-wuc48fhtok",
     "version": 1,
-    "etag": "CAI=",
+    "etag": "CAU=",
     "bindings": [
       {
         "role": "roles/storage.legacyBucketOwner",
@@ -30,6 +30,12 @@
         "role": "roles/storage.legacyBucketReader",
         "members": [
           "projectViewer:stacklet-test-policies"
+        ]
+      },
+      {
+        "role": "roles/storage.objectViewer",
+        "members": [
+          "serviceAccount:iam-test-sa-wuc48fhtok@stacklet-test-policies.iam.gserviceaccount.com"
         ]
       }
     ]
