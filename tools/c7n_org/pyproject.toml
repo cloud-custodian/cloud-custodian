@@ -28,7 +28,7 @@ c7n-org = "c7n_org.cli:cli"
 
 [dependency-groups]
 dev = [
-    "pytest<8.0",
+    "pytest<10.0",
 ]
 
 [build-system]

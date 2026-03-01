@@ -32,7 +32,7 @@ documentation = "https://cloudcustodian.io/docs/"
 [dependency-groups]
 dev = [
     "freezegun<2.0.0,>=1.2.2",
-    "pytest<8.0",
+    "pytest<10.0",
     "pytest-terraform<1.0.0,>=0.7.0",
 ]
 

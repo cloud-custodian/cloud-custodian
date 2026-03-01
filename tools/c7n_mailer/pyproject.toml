@@ -56,7 +56,7 @@ dev = [
     "black<25.0,>=23.1",
     "fakeredis<3.0,>=2.0",
     "mypy<1.0,>=0.931",
-    "pytest<8.0",
+    "pytest<10.0",
 ]
 
 [build-system]

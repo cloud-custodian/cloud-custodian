@@ -31,7 +31,7 @@ c7n-left = "c7n_left.cli:cli"
 
 [dependency-groups]
 dev = [
-    "pytest<8.0",
+    "pytest<10.0",
     "pytest-terraform<1.0.0,>=0.7.0",
 ]
 

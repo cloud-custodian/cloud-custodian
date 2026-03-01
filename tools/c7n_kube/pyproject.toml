@@ -29,7 +29,7 @@ c7n-kube = "c7n_kube.cli:cli"
 
 [dependency-groups]
 dev = [
-    "pytest<8.0",
+    "pytest<10.0",
     "vcrpy>=4.0.2",
 ]
 

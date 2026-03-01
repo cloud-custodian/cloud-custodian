@@ -25,7 +25,7 @@ documentation = "https://cloudcustodian.io/docs/"
 
 [dependency-groups]
 dev = [
-    "pytest<8.0",
+    "pytest<10.0",
     "vcrpy>=4.0.2",
 ]
 
