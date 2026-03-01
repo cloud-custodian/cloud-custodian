@@ -1,19 +1,33 @@
 # Copyright The Cloud Custodian Authors.
 # SPDX-License-Identifier: Apache-2.0
 import os
-from c7n.vendored.distutils.util import strtobool
+from pathlib import Path
 
 import pytest
+from c7n_oci.provider import OCI
 from oci_common import replace_email, replace_namespace, replace_ocid
 from pytest_terraform import tf
 
 from c7n.config import Config
 from c7n.testing import PyTestUtils, reset_session_cache
-from c7n_oci.provider import OCI
+from c7n.vendored.distutils.util import strtobool
 from tools.c7n_oci.tests.oci_flight_recorder import OCIFlightRecorder
 
 tf.LazyReplay.value = not strtobool(os.environ.get("C7N_FUNCTIONAL", "no"))
 tf.LazyPluginCacheDir.value = "../.tfcache"
+
+
+@pytest.fixture(autouse=True, scope="session")
+def set_working_directory():
+    original_cwd = os.getcwd()
+    # The OCI_KEY_FILE environment variable has a path relative to
+    # the root of the repository. Tests _usually_ run with that as
+    # the cwd, but force that here to avoid failures when pytest
+    # runs from elsewhere.
+    os.chdir(Path(__file__).parent.parent.parent.parent)
+    print(f"Changed working directory to {os.getcwd()} for tests")
+    yield
+    os.chdir(original_cwd)
 
 
 class CustodianOCITesting(PyTestUtils, OCIFlightRecorder):
