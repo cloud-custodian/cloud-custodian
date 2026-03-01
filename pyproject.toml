@@ -125,3 +125,4 @@ omit = ["c7n/resources/opsworks.py", "c7n/resources/qldb.py"]
 
 [tool.pytest_env]
 env_files = [".env", "test.env"]
+AWS_PROFILE = { unset = true }
