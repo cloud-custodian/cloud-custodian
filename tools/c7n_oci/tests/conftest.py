@@ -9,7 +9,7 @@ from pytest_terraform import tf
 
 from c7n.config import Config
 from c7n.testing import PyTestUtils, reset_session_cache
-from tools.c7n_oci.c7n_oci.provider import OCI
+from c7n_oci.provider import OCI
 from tools.c7n_oci.tests.oci_flight_recorder import OCIFlightRecorder
 
 tf.LazyReplay.value = not strtobool(os.environ.get("C7N_FUNCTIONAL", "no"))
