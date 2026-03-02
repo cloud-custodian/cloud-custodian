@@ -1,0 +1,71 @@
+{
+    "pytest-terraform": 1,
+    "outputs": {},
+    "resources": {
+        "google_project": {
+            "project": {
+                "auto_create_network": null,
+                "billing_account": "0189B3-1C2257-05D123",
+                "deletion_policy": "PREVENT",
+                "effective_labels": {
+                    "generative-language": "enabled"
+                },
+                "folder_id": "",
+                "id": "projects/stacklet-test-policies",
+                "labels": {
+                    "generative-language": "enabled"
+                },
+                "name": "stacklet-test-policies",
+                "number": "859150599087",
+                "org_id": "728386023487",
+                "project_id": "stacklet-test-policies",
+                "tags": null,
+                "terraform_labels": {
+                    "generative-language": "enabled"
+                }
+            }
+        },
+        "google_project_iam_member": {
+            "sa_editor": {
+                "condition": [],
+                "etag": "BwZMSXO+aBg=",
+                "id": "stacklet-test-policies/roles/editor/serviceAccount:c7n-iam-chained-x7r2k@stacklet-test-policies.iam.gserviceaccount.com",
+                "member": "serviceAccount:c7n-iam-chained-x7r2k@stacklet-test-policies.iam.gserviceaccount.com",
+                "project": "stacklet-test-policies",
+                "role": "roles/editor"
+            },
+            "sa_owner": {
+                "condition": [],
+                "etag": "BwZMSXO+aBg=",
+                "id": "stacklet-test-policies/roles/owner/serviceAccount:c7n-iam-chained-x7r2k@stacklet-test-policies.iam.gserviceaccount.com",
+                "member": "serviceAccount:c7n-iam-chained-x7r2k@stacklet-test-policies.iam.gserviceaccount.com",
+                "project": "stacklet-test-policies",
+                "role": "roles/owner"
+            },
+            "sa_viewer": {
+                "condition": [],
+                "etag": "BwZMSXO+aBg=",
+                "id": "stacklet-test-policies/roles/viewer/serviceAccount:c7n-iam-chained-x7r2k@stacklet-test-policies.iam.gserviceaccount.com",
+                "member": "serviceAccount:c7n-iam-chained-x7r2k@stacklet-test-policies.iam.gserviceaccount.com",
+                "project": "stacklet-test-policies",
+                "role": "roles/viewer"
+            }
+        },
+        "google_service_account": {
+            "sa": {
+                "account_id": "c7n-iam-chained-x7r2k",
+                "create_ignore_already_exists": null,
+                "description": "",
+                "disabled": false,
+                "display_name": "C7N IAM Chained Filters Test SA",
+                "email": "c7n-iam-chained-x7r2k@stacklet-test-policies.iam.gserviceaccount.com",
+                "id": "projects/cloud-custodian/serviceAccounts/c7n-iam-chained-x7r2k@stacklet-test-policies.iam.gserviceaccount.com",
+                "member": "serviceAccount:c7n-iam-chained-x7r2k@stacklet-test-policies.iam.gserviceaccount.com",
+                "name": "projects/cloud-custodian/serviceAccounts/c7n-iam-chained-x7r2k@stacklet-test-policies.iam.gserviceaccount.com",
+                "project": "stacklet-test-policies",
+                "timeouts": null,
+                "unique_id": "102203245154946241563"
+            }
+        }
+    }
+}
