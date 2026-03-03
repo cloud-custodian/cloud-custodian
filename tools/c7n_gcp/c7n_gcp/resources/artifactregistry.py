@@ -24,6 +24,16 @@ class ArtifactRegistryRepository(RegionalResourceManager):
         }
         permissions = ('artifactregistry.repositories.list',)
         default_report_fields = ['name', 'description', 'updateTime', 'sizeBytes']
+        labels = True
+        labels_op = 'patch'
+
+        @staticmethod
+        def get_label_params(resource, all_labels):
+            return {
+                'name': resource['name'],
+                'body': {'labels': all_labels},
+                'updateMask': 'labels'
+            }
 
     def _get_child_enum_args(self, parent_instance):
         return {

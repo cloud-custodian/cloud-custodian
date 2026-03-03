@@ -1,0 +1,28 @@
+{
+  "headers": {
+    "content-type": "application/json; charset=UTF-8",
+    "vary": "Origin, X-Origin, Referer",
+    "date": "Wed, 18 Feb 2026 21:35:20 GMT",
+    "server": "ESF",
+    "x-xss-protection": "0",
+    "x-frame-options": "SAMEORIGIN",
+    "x-content-type-options": "nosniff",
+    "alt-svc": "h3=\":443\"; ma=2592000,h3-29=\":443\"; ma=2592000",
+    "transfer-encoding": "chunked",
+    "status": "200",
+    "content-length": "492",
+    "-content-encoding": "gzip"
+  },
+  "body": {
+    "name": "projects/cloud-custodian/locations/global/operations/operation-1771450520850-64b1ff7084fbb-8c83d6fe-886fe813",
+    "metadata": {
+      "@type": "type.googleapis.com/google.cloud.certificatemanager.v1.OperationMetadata",
+      "createTime": "2026-02-18T21:35:20.898976799Z",
+      "target": "projects/cloud-custodian/locations/global/certificates/c7n-test-certificate",
+      "verb": "update",
+      "requestedCancellation": false,
+      "apiVersion": "v1"
+    },
+    "done": false
+  }
+}
