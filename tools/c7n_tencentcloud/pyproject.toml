@@ -24,7 +24,7 @@ documentation = "https://cloudcustodian.io/docs"
 [dependency-groups]
 dev = [
     "freezegun<2.0.0,>=1.5.1",
-    "pytest<10.0",
+    "pytest",
 ]
 
 [build-system]

@@ -33,7 +33,7 @@ c7n-policystream = "policystream:cli"
 [dependency-groups]
 dev = [
     "mock<5.0.0,>=4.0.2",
-    "pytest<10.0",
+    "pytest",
 ]
 
 [tool.hatch.build.targets.wheel]
