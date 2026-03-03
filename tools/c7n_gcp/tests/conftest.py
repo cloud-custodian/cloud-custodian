@@ -21,10 +21,9 @@ LazyPluginCacheDir.value = '../.tfcache'
 @pytest.fixture(autouse=True, scope="session")
 def set_working_directory():
     original_cwd = os.getcwd()
-    # The OCI_KEY_FILE environment variable has a path relative to
-    # the root of the repository. Tests _usually_ run with that as
-    # the cwd, but force that here to avoid failures when pytest
-    # runs from elsewhere.
+    # The GOOGLE_APPLICATION_CREDENTIALS environment variable has a path
+    # relative to the root of the repository. Tests _usually_ run with that as
+    # the cwd, but force that here to avoid failures when pytest runs from elsewhere.
     os.chdir(Path(__file__).parent.parent.parent.parent)
     print(f"Changed working directory to {os.getcwd()} for tests")
     yield
