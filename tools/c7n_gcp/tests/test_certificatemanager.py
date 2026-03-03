@@ -51,3 +51,36 @@ class CertificateManagerTest(BaseTest):
             'updateMask': 'labels'
         }
         self.assertEqual(params, expected_params)
+
+    def test_certificate_label(self):
+        # Set the 'env' label to not the default
+        factory = self.replay_flight_data('certmanager-certificate-label')
+        cert_name = ('projects/cloud-custodian/locations/global/'
+                     'certificates/c7n-test-certificate')
+        p = self.load_policy(
+            {
+                'name': 'certmanager-certificate-label',
+                'resource': 'gcp.certmanager-certificate',
+                'filters': [{
+                    'type': 'value',
+                    'key': 'name',
+                    'value': cert_name,
+                }],
+                'actions': [
+                    {'type': 'set-labels',
+                     'labels': {'env': 'production'}}
+                ]
+            },
+            session_factory=factory,
+        )
+        resources = p.run()
+        self.assertEqual(len(resources), 1)
+        self.assertEqual(resources[0]['labels']['env'], 'default')
+
+        # Fetch the certificate manually to confirm the label was changed
+        client = p.resource_manager.get_client()
+        result = client.execute_query(
+            'get',
+            {'name': cert_name}
+        )
+        self.assertEqual(result['labels']['env'], 'production')

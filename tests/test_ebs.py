@@ -4,6 +4,7 @@ import logging
 from unittest import mock
 import datetime
 from dateutil import parser
+import time
 
 from botocore.exceptions import ClientError
 
@@ -20,6 +21,7 @@ from c7n.resources.ebs import (
     VolumeQueryParser
 )
 from .common import BaseTest
+from pytest_terraform import terraform
 from c7n.testing import mock_datetime_now
 
 
@@ -1185,3 +1187,36 @@ class EbsSnapshotsFilterTest(BaseTest):
             resources = p.run()
         self.assertEqual(len(resources), 1)
         self.assertEqual(resources[0]["VolumeId"], "vol-0c7930681fe5a17db")
+
+
+@terraform("ebs_modify_iops_percent")
+def test_ebs_modify_iops_percent_gp3(test, ebs_modify_iops_percent):
+    session_factory = test.replay_flight_data("test_ebs_modify_iops_percent_gp3")
+    vol_id = ebs_modify_iops_percent["aws_ebs_volume.test_volume.id"]
+
+    policy = test.load_policy(
+        {
+            "name": "ebs-modify-iops-gp3",
+            "resource": "aws.ebs",
+            "filters": ["modifyable", {"VolumeType": "gp3"}],
+            "actions": [
+                {
+                    "type": "modify",
+                    # Increase IOPS by 30% using only iops-percent
+                    "iops-percent": 130,
+                }
+            ],
+        },
+        session_factory=session_factory,
+    )
+
+    resources = policy.run()
+    assert len(resources) == 1
+    assert resources[0]["VolumeId"] == vol_id
+
+    if test.recording:
+        time.sleep(10)
+
+    client = session_factory().client("ec2")
+    # 130% of previous value (3000) is 3900
+    assert client.describe_volumes(VolumeIds=[vol_id])["Volumes"][0]["Iops"] == 3900
