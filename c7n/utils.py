@@ -1211,3 +1211,22 @@ def get_path(path: str, resource: dict):
 def jmespath_compile(expression):
     parsed = C7NJMESPathParser().parse(expression)
     return parsed
+
+
+def snap_to_period_start(start: datetime, end: datetime, period_start: str):
+    """
+    Adjust the start and end timestamps according to `period_start`.
+
+    Args:
+        start (datetime): The original start datetime.
+        end (datetime): The original end datetime.
+        period_start (str): One of 'auto', 'start-of-day'.
+
+    Returns:
+        Tuple[datetime, datetime]: Adjusted (start, end)
+    """
+    if period_start == "start-of-day":
+        start = start.replace(hour=0, minute=0, second=0, microsecond=0)
+        end = end.replace(hour=0, minute=0, second=0, microsecond=0)
+    # 'auto' does nothing
+    return start, end
