@@ -816,6 +816,67 @@ class TestImageFilter(BaseTest):
         self.assertEqual(resources[0]["InstanceId"], "i-039628786cabe8c16")
 
 
+@terraform('ec2_image_metadata')
+def test_ec2_image_metadata_filter(test, ec2_image_metadata):
+    """Filter aws.ec2 by image-metadata — covers Amazon-owned, local, and deregistered AMIs."""
+    aws_region = 'us-east-1'
+    session_factory = test.replay_flight_data('ec2_image_metadata', region=aws_region)
+
+    all_instance_ids = [
+        ec2_image_metadata['aws_instance.amazon_ami.id'],
+        ec2_image_metadata['aws_instance.local_ami.id'],
+        ec2_image_metadata['aws_instance.deregistered_ami.id'],
+    ]
+
+    p = test.load_policy({
+        'name': 'ec2-deregistered-image',
+        'resource': 'aws.ec2',
+        'filters': [
+            {'type': 'value', 'op': 'in', 'key': 'InstanceId', 'value': all_instance_ids},
+            {'State.Name': 'running'},
+            {'type': 'image-metadata', 'key': 'State', 'value': 'deregistered'},
+        ],
+    }, session_factory=session_factory, config={'region': aws_region})
+
+    resources = p.run()
+    test.assertEqual(len(resources), 1)
+    test.assertEqual(
+        resources[0]['InstanceId'],
+        ec2_image_metadata['aws_instance.deregistered_ami.id'])
+    test.assertIn('c7n:image-metadata', resources[0])
+    test.assertEqual(resources[0]['c7n:image-metadata']['State'], 'deregistered')
+
+
+@terraform('ec2_image_metadata')
+def test_ec2_image_metadata_resource(test, ec2_image_metadata):
+    """Query aws.ec2-image-metadata resource directly — verifies all 3 AMI ownership scenarios."""
+    aws_region = 'us-east-1'
+    session_factory = test.replay_flight_data('ec2_image_metadata_resource', region=aws_region)
+
+    all_instance_ids = [
+        ec2_image_metadata['aws_instance.amazon_ami.id'],
+        ec2_image_metadata['aws_instance.local_ami.id'],
+        ec2_image_metadata['aws_instance.deregistered_ami.id'],
+    ]
+
+    p = test.load_policy({
+        'name': 'ec2-image-metadata-all',
+        'resource': 'aws.ec2-image-metadata',
+        'filters': [
+            {'type': 'value', 'op': 'in', 'key': 'InstanceId', 'value': all_instance_ids},
+        ],
+    }, session_factory=session_factory, config={'region': aws_region})
+
+    resources = p.run()
+    test.assertEqual(len(resources), 3)
+    test.assertIn('ImageMetadata', resources[0])
+
+    states = {r['InstanceId']: r['ImageMetadata']['State'] for r in resources}
+    test.assertEqual(
+        states[ec2_image_metadata['aws_instance.deregistered_ami.id']],
+        'deregistered')
+
+
 class TestInstanceAge(BaseTest):
 
     # placebo doesn't record tz information

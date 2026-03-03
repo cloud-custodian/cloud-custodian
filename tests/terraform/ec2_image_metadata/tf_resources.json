@@ -1,0 +1,105 @@
+{
+    "pytest-terraform": 1,
+    "outputs": {},
+    "resources": {
+        "aws_ami": {
+            "amazon_linux": {
+                "architecture": "x86_64",
+                "arn": "arn:aws:ec2:us-east-1::image/ami-0abcdef1234567890",
+                "creation_date": "2024-01-01T00:00:00.000Z",
+                "deprecation_time": "2026-01-01T00:00:00.000Z",
+                "description": "Amazon Linux 2 AMI 2.0.20240101.0 x86_64 HVM gp2",
+                "filter": [
+                    {
+                        "name": "name",
+                        "values": [
+                            "amzn2-ami-hvm-*-x86_64-gp2"
+                        ]
+                    }
+                ],
+                "hypervisor": "xen",
+                "id": "ami-0abcdef1234567890",
+                "image_id": "ami-0abcdef1234567890",
+                "image_location": "amazon/amzn2-ami-hvm-2.0.20240101.0-x86_64-gp2",
+                "image_owner_alias": "amazon",
+                "image_type": "machine",
+                "most_recent": true,
+                "name": "amzn2-ami-hvm-2.0.20240101.0-x86_64-gp2",
+                "owner_id": "137112412989",
+                "owners": [
+                    "amazon"
+                ],
+                "public": true,
+                "root_device_name": "/dev/xvda",
+                "root_device_type": "ebs",
+                "state": "available",
+                "virtualization_type": "hvm"
+            }
+        },
+        "aws_ami_copy": {
+            "local_ami": {
+                "id": "ami-0local000000000001",
+                "name": "test-local-ami",
+                "source_ami_id": "ami-0abcdef1234567890",
+                "source_ami_region": "us-east-1",
+                "state": "available"
+            },
+            "deregistered_ami_source": {
+                "id": "ami-0local000000000002",
+                "name": "test-deregistered-ami",
+                "source_ami_id": "ami-0abcdef1234567890",
+                "source_ami_region": "us-east-1",
+                "state": "available"
+            }
+        },
+        "aws_instance": {
+            "amazon_ami": {
+                "ami": "ami-0abcdef1234567890",
+                "arn": "arn:aws:ec2:us-east-1:123456789012:instance/i-0aaaaaaaaaaaaaaaa",
+                "id": "i-0aaaaaaaaaaaaaaaa",
+                "instance_state": "running",
+                "instance_type": "t2.micro",
+                "subnet_id": "subnet-0abc123",
+                "vpc_security_group_ids": []
+            },
+            "local_ami": {
+                "ami": "ami-0local000000000001",
+                "arn": "arn:aws:ec2:us-east-1:123456789012:instance/i-0bbbbbbbbbbbbbbb",
+                "id": "i-0bbbbbbbbbbbbbbb",
+                "instance_state": "running",
+                "instance_type": "t2.micro",
+                "subnet_id": "subnet-0abc123",
+                "vpc_security_group_ids": []
+            },
+            "deregistered_ami": {
+                "ami": "ami-0local000000000002",
+                "arn": "arn:aws:ec2:us-east-1:123456789012:instance/i-0ccccccccccccccc",
+                "id": "i-0ccccccccccccccc",
+                "instance_state": "running",
+                "instance_type": "t2.micro",
+                "subnet_id": "subnet-0abc123",
+                "vpc_security_group_ids": []
+            }
+        },
+        "aws_subnet": {
+            "example": {
+                "arn": "arn:aws:ec2:us-east-1:123456789012:subnet/subnet-0abc123",
+                "cidr_block": "10.0.1.0/24",
+                "id": "subnet-0abc123",
+                "vpc_id": "vpc-0abc123"
+            }
+        },
+        "aws_vpc": {
+            "example": {
+                "arn": "arn:aws:ec2:us-east-1:123456789012:vpc/vpc-0abc123",
+                "cidr_block": "10.0.0.0/16",
+                "id": "vpc-0abc123"
+            }
+        },
+        "null_resource": {
+            "deregister_ami": {
+                "id": "1234567890123456789"
+            }
+        }
+    }
+}
