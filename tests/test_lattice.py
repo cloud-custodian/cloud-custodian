@@ -220,3 +220,28 @@ def test_lattice_listener_query(test, vpc_lattice_listener):
     resources = p.run()
     assert len(resources) == 1
     assert resources[0]["name"] == listener_name
+
+
+@terraform('lattice_service_network_detailspec',)
+def test_lattice_service_network_detailspec(test, lattice_service_network_detailspec):
+    session_factory = test.replay_flight_data("test_lattice_service_network_detailspec")
+    p = test.load_policy(
+        {
+            "name": "lattice-find-auth-policy-wildcard",
+            "resource": "aws.vpc-lattice-service-network",
+            "filters": [
+                {
+                    "type": "value",
+                    "key": "authType",
+                    "value": "AWS_IAM",
+                },
+            ],
+        },
+        session_factory=session_factory,
+    )
+    resources = p.run()
+    assert len(resources) > 0
+    assert resources[0]['name'] == 'test-lattice-network'
+    assert resources[0]['authType'] == 'AWS_IAM'
+    assert resources[0]['Tags'][0]['Key'] == 'TestServiceNetwork'
+    assert resources[0]['Tags'][0]['Value'] == 'TestServiceNetworkValue'

@@ -1,0 +1,35 @@
+{
+    "status_code": 200,
+    "data": {
+        "ResponseMetadata": {},
+        "id": "sn-0641bb2a478d9d77b",
+        "name": "network-partial-logs",
+        "arn": "arn:aws:vpc-lattice:us-east-1:644160558196:servicenetwork/sn-0641bb2a478d9d77b",
+        "createdAt": {
+            "__class__": "datetime",
+            "year": 2025,
+            "month": 9,
+            "day": 16,
+            "hour": 20,
+            "minute": 17,
+            "second": 9,
+            "microsecond": 375000
+        },
+        "lastUpdatedAt": {
+            "__class__": "datetime",
+            "year": 2025,
+            "month": 9,
+            "day": 16,
+            "hour": 20,
+            "minute": 17,
+            "second": 9,
+            "microsecond": 375000
+        },
+        "authType": "AWS_IAM",
+        "sharingConfig": {
+            "enabled": false
+        },
+        "numberOfAssociatedVPCs": 0,
+        "numberOfAssociatedServices": 0
+    }
+}
