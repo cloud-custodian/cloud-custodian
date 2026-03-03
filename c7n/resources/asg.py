@@ -1571,17 +1571,18 @@ class Suspend(Action):
                 return
             raise
         ec2_client = session.client('ec2')
-        instance_ids = [i['InstanceId'] for i in asg['Instances']]
-        if not instance_ids:
-            return
-        retry = get_retry((
-            'RequestLimitExceeded', 'Client.RequestLimitExceeded'))
-        if self.data.get('force'):
-            self.log.info(
-                "Disabling DisableApiStop on instances in asg:%s before stopping" %
-                asg['AutoScalingGroupName'])
-            self.disable_api_stop(ec2_client, asg['Instances'])
+
         try:
+            instance_ids = [i['InstanceId'] for i in asg['Instances']]
+            if not instance_ids:
+                return
+            retry = get_retry((
+                'RequestLimitExceeded', 'Client.RequestLimitExceeded'))
+            if self.data.get('force'):
+                self.log.info(
+                    "Disabling DisableApiStop on instances in asg:%s before stopping" %
+                    asg['AutoScalingGroupName'])
+                self.disable_api_stop(ec2_client, asg['Instances'])
             retry(ec2_client.stop_instances, InstanceIds=instance_ids)
         except ClientError as e:
             if e.response['Error']['Code'] in (
