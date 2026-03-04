@@ -312,6 +312,7 @@ ResourceMap = {
     "c7n.resources.sagemaker.SagemakerHyperParameterTuningJob",
   "aws.sagemaker-model-bias-job-definition":
     "c7n.resources.sagemaker.SagemakerModelBiasJobDefinition",
+  "aws.savings-plan": "c7n.resources.savingsplan.SavingsPlan",
   "aws.scaling-policy": "c7n.resources.asg.ScalingPolicy",
   "aws.secrets-manager": "c7n.resources.secretsmanager.SecretsManager",
   "aws.security-group": "c7n.resources.vpc.SecurityGroup",
