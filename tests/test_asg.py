@@ -711,7 +711,8 @@ class AutoScalingTest(BaseTest):
             "ModifyInstanceAttribute",
         )
 
-        suspend_action.disable_api_stop(client, [{"InstanceId": "i-1234"}])
+        with self.assertRaises(ClientError):
+            suspend_action.disable_api_stop(client, [{"InstanceId": "i-1234"}])
 
     def test_asg_suspend_when_no_instances(self):
         factory = self.replay_flight_data("test_asg_suspend_when_no_instances")

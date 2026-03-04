@@ -1538,17 +1538,14 @@ class Suspend(Action):
             list(w.map(self.process_asg, asgs))
 
     def disable_api_stop(self, client, instances):
+        retry = get_retry((
+            'RequestLimitExceeded', 'Client.RequestLimitExceeded'))
         for i in instances:
-            try:
-                client.modify_instance_attribute(
-                    InstanceId=i['InstanceId'],
-                    Attribute='disableApiStop',
-                    Value='false',
-                )
-            except ClientError as e:
-                if e.response['Error']['Code'] == 'IncorrectInstanceState':
-                    continue
-                raise
+            retry(
+                client.modify_instance_attribute,
+                InstanceId=i['InstanceId'],
+                Attribute='disableApiStop',
+                Value='false')
 
     def process_asg(self, asg):
         """Multistep process to stop an asg aprori of setup
