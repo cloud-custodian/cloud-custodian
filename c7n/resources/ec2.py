@@ -2605,7 +2605,7 @@ class CapacityReservation(query.QueryResourceManager):
         permissions_enum = ('ec2:DescribeCapacityReservations',)
 
 
-@resources.register('ec2-image-metadata')
+@resources.register('ec2-instance-ami')
 class EC2ImageMetadata(query.QueryResourceManager):
     """Resource for EC2 instance image metadata.
 
@@ -2619,7 +2619,7 @@ class EC2ImageMetadata(query.QueryResourceManager):
 
         policies:
           - name: find-instances-with-deregistered-ami
-            resource: aws.ec2-image-metadata
+            resource: aws.ec2-instance-ami
             filters:
               - type: value
                 key: ImageMetadata.State

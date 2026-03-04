@@ -849,7 +849,7 @@ def test_ec2_image_metadata_filter(test, ec2_image_metadata):
 
 @terraform('ec2_image_metadata')
 def test_ec2_image_metadata_resource(test, ec2_image_metadata):
-    """Query aws.ec2-image-metadata resource directly — verifies all 3 AMI ownership scenarios."""
+    """Query aws.ec2-instance-ami resource directly — verifies all 3 AMI ownership scenarios."""
     aws_region = 'us-east-1'
     session_factory = test.replay_flight_data('ec2_image_metadata_resource', region=aws_region)
 
@@ -860,8 +860,8 @@ def test_ec2_image_metadata_resource(test, ec2_image_metadata):
     ]
 
     p = test.load_policy({
-        'name': 'ec2-image-metadata-all',
-        'resource': 'aws.ec2-image-metadata',
+        'name': 'ec2-instance-ami-all',
+        'resource': 'aws.ec2-instance-ami',
         'filters': [
             {'type': 'value', 'op': 'in', 'key': 'InstanceId', 'value': all_instance_ids},
         ],
