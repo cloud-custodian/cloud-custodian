@@ -820,7 +820,7 @@ class TestImageFilter(BaseTest):
 def test_ec2_image_metadata_filter(test, ec2_image_metadata):
     """Filter aws.ec2 by image-metadata — covers Amazon-owned, local, and deregistered AMIs."""
     aws_region = 'us-east-1'
-    session_factory = test.replay_flight_data('ec2_image_metadata', region=aws_region)
+    session_factory = test.replay_flight_data('ec2_image_metadata_filter', region=aws_region)
 
     all_instance_ids = [
         ec2_image_metadata['aws_instance.amazon_ami.id'],
