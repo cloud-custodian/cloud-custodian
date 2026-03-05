@@ -1,0 +1,21 @@
+{
+    "status_code": 200,
+    "data": {
+        "Keys": [
+            {
+                "KeyId": "04fa09fb-afe3-46c8-ad3c-410b8047f7b9",
+                "KeyArn": "arn:aws:kms:us-east-1:644160558196:key/04fa09fb-afe3-46c8-ad3c-410b8047f7b9"
+            },
+            {
+                "KeyId": "1cb2e4df-6f82-4fd1-a12a-c9c3cb83c9cb",
+                "KeyArn": "arn:aws:kms:us-east-1:644160558196:key/1cb2e4df-6f82-4fd1-a12a-c9c3cb83c9cb"
+            },
+            {
+                "KeyId": "e95331d7-c3c3-403c-bad5-917d6ab53d5d",
+                "KeyArn": "arn:aws:kms:us-east-1:644160558196:key/e95331d7-c3c3-403c-bad5-917d6ab53d5d"
+            }
+        ],
+        "Truncated": false,
+        "ResponseMetadata": {}
+    }
+}

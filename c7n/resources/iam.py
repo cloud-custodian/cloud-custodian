@@ -26,7 +26,13 @@ from c7n.filters import ValueFilter, Filter
 from c7n.filters.multiattr import MultiAttrFilter
 from c7n.filters.iamaccess import CrossAccountAccessFilter
 from c7n.manager import resources
-from c7n.query import ConfigSource, QueryResourceManager, DescribeSource, TypeInfo
+from c7n.query import (
+    ChildResourceManager,
+    ConfigSource,
+    DescribeSource,
+    QueryResourceManager,
+    TypeInfo,
+)
 from c7n.resolver import ValuesFrom
 from c7n.tags import TagActionFilter, TagDelayedAction, Tag, RemoveTag, universal_augment
 from c7n.utils import (
@@ -374,10 +380,12 @@ class UserSetBoundary(SetBoundary):
 class DescribePolicy(DescribeSource):
 
     def resources(self, query=None):
-        qfilters = PolicyQueryParser.parse(self.manager.data.get('query', []))
+        queries = PolicyQueryParser.parse(self.manager.data.get('query', []))
         query = query or {}
-        if qfilters:
-            query = {t['Name']: t['Value'] for t in qfilters}
+        for q in queries:
+            query.update(q)
+        if 'Scope' not in query:
+            query['Scope'] = 'Local'
         return super(DescribePolicy, self).resources(query=query)
 
     def get_resources(self, resource_ids, cache=True):
@@ -402,7 +410,7 @@ class Policy(QueryResourceManager):
     class resource_type(TypeInfo):
         service = 'iam'
         arn_type = 'policy'
-        enum_spec = ('list_policies', 'Policies', {'Scope': 'Local'})
+        enum_spec = ('list_policies', 'Policies', None)
         id = 'PolicyId'
         name = 'PolicyName'
         date = 'CreateDate'
@@ -424,10 +432,11 @@ class PolicyQueryParser(QueryParser):
         'Scope': ('All', 'AWS', 'Local'),
         'PolicyUsageFilter': ('PermissionsPolicy', 'PermissionsBoundary'),
         'PathPrefix': str,
-        'OnlyAttached': bool
+        'OnlyAttached': bool,
+        'MaxItems': int,
     }
     multi_value = False
-    value_key = 'Value'
+    type_name = 'IAM Policy'
 
 
 @resources.register('iam-profile')
@@ -3219,3 +3228,31 @@ class SpecificIamProfileManagedPolicy(ValueFilter):
             if matched_keys:
                 matched.append(r)
         return matched
+
+
+#########################
+#    IAM Access Keys    #
+#########################
+
+
+@resources.register('iam-access-key')
+class AccessKey(ChildResourceManager):
+
+    class resource_type(TypeInfo):
+        service = 'iam'
+        # Access keys don't have ARNs - they use AccessKeyId as identifier
+        # Using 'access-key' as arn_type for consistency but ARN construction will not be used
+        arn_type = 'access-key'
+        id = name = 'AccessKeyId'
+        date = 'CreateDate'
+        # Denotes this resource type exists across regions
+        global_resource = True
+        enum_spec = ('list_access_keys', 'AccessKeys', None)
+        parent_spec = ('iam-user', 'UserName', None)
+        # No detail spec needed as list_access_keys returns full metadata
+        cfn_type = config_type = "AWS::IAM::AccessKey"
+        # config_id = 'AccessKeyId'
+
+    source_mapping = {
+        'config': ConfigSource
+    }

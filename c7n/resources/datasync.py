@@ -14,7 +14,7 @@ class DataSyncAgent(query.QueryResourceManager):
         arn = "AgentArn"
         id = "AgentArn"
         name = "Name"
-        cfn_type = "AWS::DataSync::Agent"
+        cfn_type = config_type = "AWS::DataSync::Agent"
         universal_taggable = object()
         permissions_augment = ("datasync:ListTagsForResource",)
 

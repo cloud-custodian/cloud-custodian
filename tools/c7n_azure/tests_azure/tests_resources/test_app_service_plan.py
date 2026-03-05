@@ -2,7 +2,7 @@
 # SPDX-License-Identifier: Apache-2.0
 from ..azure_common import BaseTest, arm_template, cassette_name
 from c7n_azure.session import Session
-from mock import patch
+from unittest.mock import patch
 
 from c7n.exceptions import PolicyValidationError
 from c7n.utils import local_session

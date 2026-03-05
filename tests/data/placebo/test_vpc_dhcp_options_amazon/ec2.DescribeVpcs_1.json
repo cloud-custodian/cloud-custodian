@@ -1,0 +1,43 @@
+{
+    "status_code": 200, 
+    "data": {
+        "Vpcs": [
+            {
+                "VpcId": "vpc-regex001", 
+                "InstanceTenancy": "default", 
+                "Tags": [
+                    {
+                        "Value": "RegexTestVPC", 
+                        "Key": "Name"
+                    }
+                ], 
+                "CidrBlockAssociationSet": [
+                    {
+                        "AssociationId": "vpc-cidr-assoc-regex01", 
+                        "CidrBlock": "10.0.16.0/24", 
+                        "CidrBlockState": {
+                            "State": "associated"
+                        }
+                    }
+                ], 
+                "State": "available", 
+                "DhcpOptionsId": "dopt-regex001", 
+                "CidrBlock": "10.0.16.0/24", 
+                "IsDefault": false
+            }
+        ], 
+        "ResponseMetadata": {
+            "RetryAttempts": 0, 
+            "HTTPStatusCode": 200, 
+            "RequestId": "test-regex-001", 
+            "HTTPHeaders": {
+                "transfer-encoding": "chunked", 
+                "vary": "Accept-Encoding", 
+                "server": "AmazonEC2", 
+                "content-type": "text/xml;charset=UTF-8", 
+                "date": "Mon, 24 Nov 2025 00:00:00 GMT"
+            }
+        }
+    }
+}
+

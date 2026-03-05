@@ -103,8 +103,8 @@ class MethodAction(Action):
             return ()
         if not method:
             method = self.method_spec['op']
-        component = m.component
-        if '.' in component:
+        component = m.perm_component or m.component
+        if component and '.' in component:
             component = component.split('.')[-1]
         return ("{}.{}.{}".format(
             m.perm_service or m.service, component, method),)

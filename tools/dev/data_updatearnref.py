@@ -34,6 +34,7 @@
 # POSSIBILITY OF SUCH DAMAGE.
 
 
+from collections import defaultdict
 from os import listdir
 from os.path import isfile, join
 import re
@@ -337,10 +338,10 @@ for filename in [f for f in listdir(mypath) if isfile(join(mypath, f))]:
 
 schema.sort(key=lambda x: x["prefix"])
 
-arn_ref = {}
+arn_ref = defaultdict(dict)
 for s in schema:
     if not s.get('resources'):
         continue
-    arn_ref[s['prefix']] = {r['resource']: r['arn'] for r in s['resources']}
+    arn_ref[s['prefix']].update({r['resource']: r['arn'] for r in s['resources']})
 
 print(json.dumps(arn_ref, indent=2, sort_keys=True))

@@ -4,6 +4,7 @@ import logging
 from unittest import mock
 import datetime
 from dateutil import parser
+import time
 
 from botocore.exceptions import ClientError
 
@@ -16,41 +17,143 @@ from c7n.resources.ebs import (
     CopySnapshot,
     Delete,
     ErrorHandler,
-    SnapshotQueryParser as QueryParser
+    SnapshotQueryParser as QueryParser,
+    VolumeQueryParser
 )
 from .common import BaseTest
+from pytest_terraform import terraform
 from c7n.testing import mock_datetime_now
 
 
 class SnapshotQueryParse(BaseTest):
 
     def test_query(self):
-        qfilters = [
+        query = [
+            {
+                "Filters": [
+                    {'Name': 'tag:Name', 'Values': ['Snapshot1']},
+                    {'Name': 'status', 'Values': ['completed']},
+                    {'Name': 'tag:Name', 'Values': ['Snapshot2']}
+                ]
+            },
+            {'OwnerIds': ['self', '123456789012']},
+            {'SnapshotIds': 'snap-123abc'},
+            {'MaxResults': 1000},
+        ]
+
+        result_query = [
+            {
+                "Filters": [
+                        {'Name': 'tag:Name', 'Values': ['Snapshot1', 'Snapshot2']},
+                        {'Name': 'status', 'Values': ['completed']},
+                ]
+            },
+            {'OwnerIds': ['self', '123456789012']},
+            {'SnapshotIds': ['snap-123abc']},
+            {'MaxResults': 1000},
+        ]
+        self.assertEqual(QueryParser.parse(query), result_query)
+
+        query = [
             {'Name': 'tag:Name', 'Values': ['Snapshot1']},
-            {'Name': 'status', 'Values': ['completed']}]
-        self.assertEqual(qfilters, QueryParser.parse(qfilters))
+            {'Name': 'status', 'Values': ['completed']},
+            {'Name': 'tag:Name', 'Values': ['Snapshot2']},
+        ]
+
+        result_query = [
+            {
+                "Filters": [
+                    {'Name': 'tag:Name', 'Values': ['Snapshot1', 'Snapshot2']},
+                    {'Name': 'status', 'Values': ['completed']},
+                ]
+            },
+        ]
+        self.assertEqual(QueryParser.parse(query), result_query)
+
+    def test_invalid_query(self):
+        self.assertRaises(PolicyValidationError, QueryParser.parse, {})
+
+        self.assertRaises(PolicyValidationError, QueryParser.parse, [None])
+
+        self.assertRaises(PolicyValidationError, QueryParser.parse, [{'X': 1}])
+
+        self.assertRaises(PolicyValidationError, QueryParser.parse, [
+            {'Name': 'status', 'Values': 'completed'}])
+
+        self.assertRaises(PolicyValidationError, QueryParser.parse, [
+            {'Name': 'status', 'Values': 'completed'}])
+
+        self.assertRaises(PolicyValidationError, QueryParser.parse, [
+            {'Name': 'status', 'Values': ['Completed']}])
+
+        self.assertRaises(PolicyValidationError, QueryParser.parse, [
+            {'Filters': [{'Name': 'status', 'Values': 'completed'}]}])
+
+        self.assertRaises(PolicyValidationError, QueryParser.parse, [
+            {'Name': 'snapshot-id', 'Values': [1]}])
+
+        self.assertRaises(PolicyValidationError, QueryParser.parse, [
+            {'Filters': [{'Name': 'status', 'Values': ['Completed']}]}])
+
+        self.assertRaises(PolicyValidationError, QueryParser.parse, [
+            {'Filters': [{'Name': 'snapshot-id', 'Values': [1]}]}])
+
+        self.assertRaises(PolicyValidationError, QueryParser.parse, [{'Owner': 'self'}])
+
+        self.assertRaises(PolicyValidationError, QueryParser.parse, [{'MaxResults': [1000]}])
+
+        self.assertRaises(PolicyValidationError, QueryParser.parse, [
+            {'MaxResults': 1000}, {'MaxResults': 5000}])
+
+        self.assertRaises(PolicyValidationError, QueryParser.parse, [
+            {'Name': 'status', 'Values': ['completed']}, {'snapshot-id': ['snap-123abc']}])
+
+
+class VolumeQueryParse(BaseTest):
+
+    def test_query(self):
+        qfilters = [
+            {'Name': 'tag:Name', 'Values': ['Volume1']},
+            {'Name': 'status', 'Values': ['available']}]
+        self.assertEqual([{'Filters': qfilters}], VolumeQueryParser.parse(qfilters))
+
+    def test_query_encrypted(self):
+        qfilters = [
+            {'Name': 'encrypted', 'Values': ['true']},
+            {'Name': 'volume-type', 'Values': ['gp3']}]
+        self.assertEqual([{'Filters': qfilters}], VolumeQueryParser.parse(qfilters))
+
+    def test_query_attachment(self):
+        qfilters = [
+            {'Name': 'attachment.status', 'Values': ['attached']},
+            {'Name': 'attachment.instance-id', 'Values': ['i-1234567890abcdef0']}]
+        self.assertEqual([{'Filters': qfilters}], VolumeQueryParser.parse(qfilters))
 
     def test_invalid_query(self):
         self.assertRaises(
-            PolicyValidationError, QueryParser.parse, {})
+            PolicyValidationError, VolumeQueryParser.parse, {})
 
         self.assertRaises(
-            PolicyValidationError, QueryParser.parse, [None])
+            PolicyValidationError, VolumeQueryParser.parse, [None])
 
         self.assertRaises(
-            PolicyValidationError, QueryParser.parse, [{'X': 1}])
+            PolicyValidationError, VolumeQueryParser.parse, [{'X': 1}])
 
         self.assertRaises(
-            PolicyValidationError, QueryParser.parse, [
-                {'Name': 'status', 'Values': 'completed'}])
+            PolicyValidationError, VolumeQueryParser.parse, [
+                {'Name': 'status', 'Values': 'available'}])
 
         self.assertRaises(
-            PolicyValidationError, QueryParser.parse, [
-                {'Name': 'status', 'Values': ['Completed']}])
+            PolicyValidationError, VolumeQueryParser.parse, [
+                {'Name': 'status', 'Values': ['Available']}])
 
         self.assertRaises(
-            PolicyValidationError, QueryParser.parse, [
-                {'Name': 'snapshot-id', 'Values': [1]}])
+            PolicyValidationError, VolumeQueryParser.parse, [
+                {'Name': 'volume-id', 'Values': [1]}])
+
+        self.assertRaises(
+            PolicyValidationError, VolumeQueryParser.parse, [
+                {'Name': 'volume-type', 'Values': ['invalid-type']}])
 
 
 class SnapshotErrorHandler(BaseTest):
@@ -960,6 +1063,85 @@ class PiopsMetricsFilterTest(BaseTest):
         self.assertEqual(len(resources), 0)
 
 
+class VolumeQueryFilterTest(BaseTest):
+
+    def test_volume_query_parser_integration(self):
+        policy = self.load_policy({
+            "name": "ebs-query-test",
+            "resource": "ebs",
+            "query": [
+                {"Name": "encrypted", "Values": ['true']},
+                {"Name": "volume-type", "Values": ["gp3"]}
+            ]
+        })
+        self.assertIsNotNone(policy)
+        self.assertEqual(
+            policy.resource_manager.data.get('query'),
+            [
+                {"Name": "encrypted", "Values": ['true']},
+                {"Name": "volume-type", "Values": ["gp3"]}
+            ]
+        )
+
+    def test_volume_query_api_call(self):
+        policy = self.load_policy({
+            "name": "ebs-query-test",
+            "resource": "ebs",
+            "query": [
+                {"Name": "encrypted", "Values": ['true']},
+                {"Name": "volume-type", "Values": ["gp3"]},
+                {"Name": "status", "Values": ["available"]}
+            ]
+        })
+
+        with mock.patch.object(
+            policy.resource_manager.source,
+            'resources',
+            return_value=[]
+        ) as mock_resources:
+            policy.run()
+
+            mock_resources.assert_called_once()
+
+    def test_volume_query_filter(self):
+        factory = self.replay_flight_data("test_ebs_volume_query")
+        policy = self.load_policy(
+            {
+                "name": "ebs-encrypted-volumes",
+                "resource": "ebs",
+                "query": [
+                    {"Name": "encrypted", "Values": ['true']},
+                    {"Name": "volume-type", "Values": ["gp3"]}
+                ]
+            },
+            session_factory=factory,
+        )
+        resources = policy.run()
+        for r in resources:
+            self.assertTrue(r.get('Encrypted'))
+            self.assertEqual(r.get('VolumeType'), 'gp3')
+
+    def test_volume_query_combined_filters(self):
+        factory = self.replay_flight_data("test_ebs_volume_query_combined")
+        policy = self.load_policy(
+            {
+                "name": "ebs-unencrypted-gp3",
+                "resource": "ebs",
+                "query": [
+                    {"Name": "volume-type", "Values": ["gp3"]}
+                ],
+                "filters": [
+                    {"Encrypted": False}
+                ]
+            },
+            session_factory=factory,
+        )
+        resources = policy.run()
+        for r in resources:
+            self.assertEqual(r.get('VolumeType'), 'gp3')
+            self.assertFalse(r.get('Encrypted'))
+
+
 class HealthEventsFilterTest(BaseTest):
 
     def test_ebs_health_events_filter(self):
@@ -1005,3 +1187,36 @@ class EbsSnapshotsFilterTest(BaseTest):
             resources = p.run()
         self.assertEqual(len(resources), 1)
         self.assertEqual(resources[0]["VolumeId"], "vol-0c7930681fe5a17db")
+
+
+@terraform("ebs_modify_iops_percent")
+def test_ebs_modify_iops_percent_gp3(test, ebs_modify_iops_percent):
+    session_factory = test.replay_flight_data("test_ebs_modify_iops_percent_gp3")
+    vol_id = ebs_modify_iops_percent["aws_ebs_volume.test_volume.id"]
+
+    policy = test.load_policy(
+        {
+            "name": "ebs-modify-iops-gp3",
+            "resource": "aws.ebs",
+            "filters": ["modifyable", {"VolumeType": "gp3"}],
+            "actions": [
+                {
+                    "type": "modify",
+                    # Increase IOPS by 30% using only iops-percent
+                    "iops-percent": 130,
+                }
+            ],
+        },
+        session_factory=session_factory,
+    )
+
+    resources = policy.run()
+    assert len(resources) == 1
+    assert resources[0]["VolumeId"] == vol_id
+
+    if test.recording:
+        time.sleep(10)
+
+    client = session_factory().client("ec2")
+    # 130% of previous value (3000) is 3900
+    assert client.describe_volumes(VolumeIds=[vol_id])["Volumes"][0]["Iops"] == 3900

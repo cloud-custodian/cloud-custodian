@@ -2,6 +2,8 @@
 # SPDX-License-Identifier: Apache-2.0
 import re
 
+from botocore.exceptions import ClientError
+
 from c7n.actions import BaseAction
 from c7n.filters import MetricsFilter, ShieldMetrics, Filter
 from c7n.manager import resources
@@ -482,12 +484,25 @@ class SetWaf(BaseAction):
                 continue
             if r.get('WebACLId') == target_acl_id:
                 continue
-            result = client.get_distribution_config(Id=r['Id'])
-            config = result['DistributionConfig']
-            config['WebACLId'] = target_acl_id
-            self.retry(
-                client.update_distribution,
-                Id=r['Id'], DistributionConfig=config, IfMatch=result['ETag'])
+            try:
+                result = client.get_distribution_config(Id=r['Id'])
+                config = result['DistributionConfig']
+                config['WebACLId'] = target_acl_id
+                self.retry(
+                    client.update_distribution,
+                    Id=r['Id'], DistributionConfig=config, IfMatch=result['ETag'])
+            except ClientError as e:
+                if e.response['Error']['Code'] == 'InvalidArgument':
+                    # CloudFront distributions with pricing plans cannot have their
+                    # WAF changed. Skip these resources gracefully.
+                    # https://docs.aws.amazon.com/AmazonCloudFront/latest/DeveloperGuide/flat-rate-pricing-plan.html
+                    if 'pricing plan subscription' in str(e):
+                        self.log.warning(
+                            "Skipping WAF update for distribution %s: distribution has a "
+                            "CloudFront pricing plan subscription which requires a web ACL",
+                            r['Id'])
+                        continue
+                raise
 
 
 @Distribution.action_registry.register('set-wafv2')
@@ -567,12 +582,25 @@ class SetWafv2(BaseAction):
                 continue
             if r.get('WebACLId') == target_acl_id:
                 continue
-            result = client.get_distribution_config(Id=r['Id'])
-            config = result['DistributionConfig']
-            config['WebACLId'] = target_acl_id
-            self.retry(
-                client.update_distribution,
-                Id=r['Id'], DistributionConfig=config, IfMatch=result['ETag'])
+            try:
+                result = client.get_distribution_config(Id=r['Id'])
+                config = result['DistributionConfig']
+                config['WebACLId'] = target_acl_id
+                self.retry(
+                    client.update_distribution,
+                    Id=r['Id'], DistributionConfig=config, IfMatch=result['ETag'])
+            except ClientError as e:
+                if e.response['Error']['Code'] == 'InvalidArgument':
+                    # CloudFront distributions with pricing plans cannot have their
+                    # WAF changed. Skip these resources gracefully.
+                    # https://docs.aws.amazon.com/AmazonCloudFront/latest/DeveloperGuide/flat-rate-pricing-plan.html
+                    if 'pricing plan subscription' in str(e):
+                        self.log.warning(
+                            "Skipping WAFv2 update for distribution %s: distribution has a "
+                            "CloudFront pricing plan subscription which requires a web ACL",
+                            r['Id'])
+                        continue
+                raise
 
 
 @Distribution.action_registry.register('disable')

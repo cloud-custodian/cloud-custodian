@@ -1,11 +1,41 @@
 # Copyright The Cloud Custodian Authors.
 # SPDX-License-Identifier: Apache-2.0
+import time
+
 from .common import BaseTest, event_data
 from botocore.exceptions import ClientError
+from pytest_terraform import terraform
+
+
+@terraform('bedrock_model_invocation_job')
+def test_bedrock_model_invocation_job(test, bedrock_model_invocation_job):
+    session_factory = test.replay_flight_data(
+        'test_bedrock_model_invocation_job', region='us-east-1'
+    )
+    job_arn = bedrock_model_invocation_job['aws_bedrock_model_invocation_job.test_job.arn']
+    job_name = bedrock_model_invocation_job['aws_bedrock_model_invocation_job.test_job.job_name']
+    p = test.load_policy(
+        {
+            'name': 'bedrock-model-invocation-job',
+            'resource': 'bedrock-model-invocation-job',
+            'filters': [
+                {'jobArn': job_arn},
+            ],
+        },
+        session_factory=session_factory,
+        config={'region': 'us-east-1'},
+    )
+
+    if test.recording:
+        time.sleep(10)
+
+    resources = p.run()
+    test.assertEqual(len(resources), 1)
+    test.assertEqual(resources[0]['jobArn'], job_arn)
+    test.assertEqual(resources[0]['jobName'], job_name)
 
 
 class BedrockCustomModel(BaseTest):
-
     def test_bedrock_custom_model(self):
         session_factory = self.replay_flight_data('test_bedrock_custom_model')
         p = self.load_policy(
@@ -246,3 +276,97 @@ class BedrockKnowledgeBase(BaseTest):
         client = session_factory().client('bedrock-agent')
         knowledgebases = client.list_knowledge_bases().get('knowledgeBaseSummaries')
         self.assertEqual(len(knowledgebases), 0)
+
+
+@terraform('bedrock_application_inference_profile')
+def test_bedrock_application_inference_profile(test, bedrock_application_inference_profile):
+    session_factory = test.replay_flight_data('test_bedrock_application_inference_profile')
+
+    profile_arn = bedrock_application_inference_profile[
+        'aws_bedrock_inference_profile.test_profile.arn']
+    profile_name = bedrock_application_inference_profile[
+        'aws_bedrock_inference_profile.test_profile.name']
+
+    p = test.load_policy(
+        {
+            'name': 'bedrock-app-inference-profile-test',
+            'resource': 'bedrock-inference-profile',
+            # We don't filter on exact arn or name here because we want to test that only
+            # *application* inference profiles are returned by default.
+        }, session_factory=session_factory
+    )
+    resources = p.run()
+    test.assertEqual(len(resources), 1)
+    test.assertIn('Tags', resources[0])
+    test.assertEqual(resources[0]['inferenceProfileName'], profile_name)
+    test.assertEqual(resources[0]['inferenceProfileArn'], profile_arn)
+
+    # Verify tags are in correct format from universal_taggable
+    tags = {t['Key']: t['Value'] for t in resources[0]['Tags']}
+    test.assertEqual(tags['Environment'], 'test')
+    test.assertEqual(tags['Owner'], 'c7n')
+
+
+@terraform('bedrock_application_inference_profile_tag_actions')
+def test_bedrock_application_inference_profile_tag_actions(
+        test, bedrock_application_inference_profile_tag_actions):
+    session_factory = test.replay_flight_data(
+        'test_bedrock_application_inference_profile_tag_actions')
+    client = session_factory().client('bedrock')
+
+    profile_arn = bedrock_application_inference_profile_tag_actions[
+        'aws_bedrock_inference_profile.test_profile.arn']
+
+    # Test adding tags
+    p = test.load_policy(
+        {
+            'name': 'bedrock-app-inference-profile-tag',
+            'resource': 'bedrock-inference-profile',
+            'filters': [
+                {'inferenceProfileArn': profile_arn},
+                {'tag:NewTag': 'absent'},
+            ],
+            'actions': [
+                {
+                    'type': 'tag',
+                    'tags': {'NewTag': 'NewValue', 'AnotherTag': 'AnotherValue'}
+                }
+            ]
+        }, session_factory=session_factory
+    )
+    resources = p.run()
+    test.assertEqual(len(resources), 1)
+
+    # Verify tags were added
+    tags = client.list_tags_for_resource(resourceARN=profile_arn)['tags']
+    tag_dict = {t['key']: t['value'] for t in tags}
+    test.assertEqual(tag_dict['NewTag'], 'NewValue')
+    test.assertEqual(tag_dict['AnotherTag'], 'AnotherValue')
+    test.assertEqual(tag_dict['Environment'], 'test')  # Original tag still there
+
+    # Test removing tags
+    p = test.load_policy(
+        {
+            'name': 'bedrock-app-inference-profile-untag',
+            'resource': 'bedrock-inference-profile',
+            'filters': [
+                {'inferenceProfileArn': profile_arn},
+            ],
+            'actions': [
+                {
+                    'type': 'remove-tag',
+                    'tags': ['AnotherTag', 'Owner']
+                }
+            ]
+        }, session_factory=session_factory
+    )
+    resources = p.run()
+    test.assertEqual(len(resources), 1)
+
+    # Verify tags were removed
+    tags = client.list_tags_for_resource(resourceARN=profile_arn)['tags']
+    tag_dict = {t['key']: t['value'] for t in tags}
+    test.assertNotIn('AnotherTag', tag_dict)
+    test.assertNotIn('Owner', tag_dict)
+    test.assertEqual(tag_dict['NewTag'], 'NewValue')  # Still there
+    test.assertEqual(tag_dict['Environment'], 'test')  # Still there

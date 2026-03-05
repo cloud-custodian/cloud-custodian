@@ -1,0 +1,35 @@
+{
+    "status_code": 200,
+    "data": {
+        "ResponseMetadata": {},
+        "arn": "arn:aws:vpc-lattice:us-east-1:644160558196:service/svc-0ad9b5f9c31b8419f",
+        "authType": "NONE",
+        "createdAt": {
+            "__class__": "datetime",
+            "year": 2025,
+            "month": 9,
+            "day": 16,
+            "hour": 20,
+            "minute": 55,
+            "second": 39,
+            "microsecond": 644000
+        },
+        "dnsEntry": {
+            "domainName": "service-no-logs-0ad9b5f9c31b8419f.7d67968.vpc-lattice-svcs.us-east-1.on.aws",
+            "hostedZoneId": "Z0681547Z82L3THDFSCZ"
+        },
+        "id": "svc-0ad9b5f9c31b8419f",
+        "lastUpdatedAt": {
+            "__class__": "datetime",
+            "year": 2025,
+            "month": 9,
+            "day": 16,
+            "hour": 20,
+            "minute": 55,
+            "second": 39,
+            "microsecond": 644000
+        },
+        "name": "service-no-logs",
+        "status": "ACTIVE"
+    }
+}

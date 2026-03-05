@@ -1,0 +1,70 @@
+{
+    "status_code": 200,
+    "data": {
+        "S3AccessPointAttachments": [
+            {
+                "Lifecycle": "AVAILABLE",
+                "CreationTime": {
+                    "__class__": "datetime",
+                    "year": 2025,
+                    "month": 10,
+                    "day": 23,
+                    "hour": 9,
+                    "minute": 40,
+                    "second": 14,
+                    "microsecond": 510000
+                },
+                "Name": "dev-openzfs-ap-attachment",
+                "Type": "OPENZFS",
+                "OpenZFSConfiguration": {
+                    "VolumeId": "fsvol-05aa90c397bd1fec6",
+                    "FileSystemIdentity": {
+                        "Type": "POSIX",
+                        "PosixUser": {
+                            "Uid": 1001,
+                            "Gid": 1001,
+                            "SecondaryGids": [
+                                1002,
+                                1003
+                            ]
+                        }
+                    }
+                },
+                "S3AccessPoint": {
+                    "ResourceARN": "arn:aws:s3:us-west-2:644160558196:accesspoint/dev-openzfs-ap-attachment",
+                    "Alias": "dev-openzfs-ap-a-ppunxa9iziirfhdkuydbe5xbm7ihkusw2b-ext-s3alias"
+                }
+            },
+            {
+                "Lifecycle": "AVAILABLE",
+                "CreationTime": {
+                    "__class__": "datetime",
+                    "year": 2025,
+                    "month": 10,
+                    "day": 23,
+                    "hour": 10,
+                    "minute": 23,
+                    "second": 24,
+                    "microsecond": 414000
+                },
+                "Name": "openzsh-accesspoint",
+                "Type": "OPENZFS",
+                "OpenZFSConfiguration": {
+                    "VolumeId": "fsvol-0b84bc5b9cab9d727",
+                    "FileSystemIdentity": {
+                        "Type": "POSIX",
+                        "PosixUser": {
+                            "Uid": 12345,
+                            "Gid": 12345
+                        }
+                    }
+                },
+                "S3AccessPoint": {
+                    "ResourceARN": "arn:aws:s3:us-west-2:644160558196:accesspoint/openzsh-accesspoint",
+                    "Alias": "openzsh-accesspo-3nqwao8fjkii5ywhp7issswdj5qhkusw2b-ext-s3alias"
+                }
+            }
+        ],
+        "ResponseMetadata": {}
+    }
+}

@@ -71,6 +71,7 @@ class ComprehendFlywheel(QueryResourceManager):
         arn = id = 'FlywheelArn'
         name = 'FlywheelArn'
         date = 'LastModifiedTime'
+        cfn_type = config_type = 'AWS::Comprehend::Flywheel'
         universal_taggable = object()
 
     permissions = ('comprehend:ListFlywheels', 'comprehend:DescribeFlywheel')
@@ -313,7 +314,7 @@ class ComprehendModelCrossAccountAccessFilter(CrossAccountAccessFilter):
             ),
         )
 
-        if result is not None:
+        if 'ResourcePolicy' in result:
             r[self.policy_annotation] = result['ResourcePolicy']
             return result['ResourcePolicy']
 

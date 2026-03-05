@@ -1,0 +1,49 @@
+{
+    "pytest-terraform": 1,
+    "outputs": {},
+    "resources": {
+        "aws_vpclattice_service": {
+            "example": {
+                "arn": "arn:aws:vpc-lattice:us-east-1:644160558196:service/svc-0abc1234def567890",
+                "auth_type": "NONE",
+                "certificate_arn": null,
+                "custom_domain_name": null,
+                "dns_entry": {
+                    "domain_name": "c7n-lattice-service-0abc1234def567890.7d67968.vpc-lattice-svcs.us-east-1.on.aws",
+                    "hosted_zone_id": "Z0681547Z82L3THDFSCZ"
+                },
+                "id": "svc-0abc1234def567890",
+                "name": "c7n-lattice-service",
+                "region": "us-east-1",
+                "status": "ACTIVE",
+                "tags": null,
+                "tags_all": {}
+            }
+        },
+        "aws_vpclattice_listener": {
+            "example": {
+                "arn": "arn:aws:vpc-lattice:us-east-1:644160558196:listener/svc-0abc1234def567890/listener-0abc1234def567890",
+                "default_action": {
+                    "fixed_response": {
+                        "status_code": 404
+                    },
+                    "forward": []
+                },
+                "id": "listener-0abc1234def567890",
+                "listener_id": "listener-0abc1234def567890",
+                "name": "c7n-lattice-listener",
+                "port": 80,
+                "protocol": "HTTP",
+                "region": "us-east-1",
+                "service_arn": "arn:aws:vpc-lattice:us-east-1:644160558196:service/svc-0abc1234def567890",
+                "service_identifier": "svc-0abc1234def567890",
+                "tags": {
+                    "Env": "Dev"
+                },
+                "tags_all": {
+                    "Env": "Dev"
+                }
+            }
+        }
+    }
+}

@@ -1,0 +1,41 @@
+{
+    "pytest-terraform": 1,
+    "outputs": {},
+    "resources": {
+        "aws_bedrock_inference_profile": {
+            "test_profile": {
+                "arn": "arn:aws:bedrock:us-east-1:644160558196:application-inference-profile/i3knduhg5lgg",
+                "created_at": "2026-02-09T19:32:18Z",
+                "description": "Test profile for C7N",
+                "id": "i3knduhg5lgg",
+                "model_source": [
+                    {
+                        "copy_from": "arn:aws:bedrock:us-east-1::inference-profile/global.amazon.nova-2-lite-v1:0"
+                    }
+                ],
+                "models": [
+                    {
+                        "model_arn": "arn:aws:bedrock:::foundation-model/amazon.nova-2-lite-v1:0"
+                    },
+                    {
+                        "model_arn": "arn:aws:bedrock:us-east-1::foundation-model/amazon.nova-2-lite-v1:0"
+                    }
+                ],
+                "name": "c7n-test-profile-50bfc0e6",
+                "region": "us-east-1",
+                "status": "ACTIVE",
+                "tags": {
+                    "Environment": "test",
+                    "Owner": "c7n"
+                },
+                "tags_all": {
+                    "Environment": "test",
+                    "Owner": "c7n"
+                },
+                "timeouts": null,
+                "type": "APPLICATION",
+                "updated_at": "2026-02-09T19:32:18Z"
+            }
+        }
+    }
+}

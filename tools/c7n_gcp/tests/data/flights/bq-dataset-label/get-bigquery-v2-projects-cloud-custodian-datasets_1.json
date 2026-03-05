@@ -1,0 +1,37 @@
+{
+  "headers": {
+    "etag": "xEqm9agvhG/BGgg+W9ijRA==",
+    "content-type": "application/json; charset=UTF-8",
+    "vary": "Origin, X-Origin, Referer",
+    "date": "Thu, 05 Feb 2026 19:50:31 GMT",
+    "server": "ESF",
+    "x-xss-protection": "0",
+    "x-frame-options": "SAMEORIGIN",
+    "x-content-type-options": "nosniff",
+    "alt-svc": "h3=\":443\"; ma=2592000,h3-29=\":443\"; ma=2592000",
+    "transfer-encoding": "chunked",
+    "status": "200",
+    "content-length": "438",
+    "-content-encoding": "gzip",
+    "content-location": "https://bigquery.googleapis.com/bigquery/v2/projects/cloud-custodian/datasets?alt=json"
+  },
+  "body": {
+    "kind": "bigquery#datasetList",
+    "etag": "xEqm9agvhG/BGgg+W9ijRA==",
+    "datasets": [
+      {
+        "kind": "bigquery#dataset",
+        "id": "cloud-custodian:c7n_bq_dataset",
+        "datasetReference": {
+          "datasetId": "c7n_bq_dataset",
+          "projectId": "cloud-custodian"
+        },
+        "labels": {
+          "env": "default",
+          "goog-terraform-provisioned": "true"
+        },
+        "location": "US"
+      }
+    ]
+  }
+}

@@ -1,0 +1,34 @@
+{
+    "status_code": 200,
+    "data": {
+        "KeyMetadata": {
+            "AWSAccountId": "644160558196",
+            "KeyId": "04fa09fb-afe3-46c8-ad3c-410b8047f7b9",
+            "Arn": "arn:aws:kms:us-east-1:644160558196:key/04fa09fb-afe3-46c8-ad3c-410b8047f7b9",
+            "CreationDate": {
+                "__class__": "datetime",
+                "year": 2023,
+                "month": 8,
+                "day": 29,
+                "hour": 16,
+                "minute": 6,
+                "second": 54,
+                "microsecond": 267000
+            },
+            "Enabled": true,
+            "Description": "Default key that protects my EBS volumes when no other key is defined",
+            "KeyUsage": "ENCRYPT_DECRYPT",
+            "KeyState": "Enabled",
+            "Origin": "AWS_KMS",
+            "KeyManager": "AWS",
+            "CustomerMasterKeySpec": "SYMMETRIC_DEFAULT",
+            "KeySpec": "SYMMETRIC_DEFAULT",
+            "EncryptionAlgorithms": [
+                "SYMMETRIC_DEFAULT"
+            ],
+            "MultiRegion": false,
+            "CurrentKeyMaterialId": "5a34bc0a3cbf2662932fb6b0fc1ee5e86b20308c726b1520952f3b29fd6372d2"
+        },
+        "ResponseMetadata": {}
+    }
+}

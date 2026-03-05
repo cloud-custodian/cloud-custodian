@@ -1,0 +1,35 @@
+{
+    "status_code": 200,
+    "data": {
+        "ResponseMetadata": {},
+        "arn": "arn:aws:vpc-lattice:us-east-1:644160558196:service/svc-0f2d07e52ca06d8a8",
+        "authType": "AWS_IAM",
+        "createdAt": {
+            "__class__": "datetime",
+            "year": 2025,
+            "month": 9,
+            "day": 16,
+            "hour": 20,
+            "minute": 54,
+            "second": 54,
+            "microsecond": 76000
+        },
+        "dnsEntry": {
+            "domainName": "service-with-external-access-0f2d07e52ca06d8a8.7d67968.vpc-lattice-svcs.us-east-1.on.aws",
+            "hostedZoneId": "Z0681547Z82L3THDFSCZ"
+        },
+        "id": "svc-0f2d07e52ca06d8a8",
+        "lastUpdatedAt": {
+            "__class__": "datetime",
+            "year": 2025,
+            "month": 9,
+            "day": 16,
+            "hour": 20,
+            "minute": 54,
+            "second": 54,
+            "microsecond": 76000
+        },
+        "name": "service-with-external-access",
+        "status": "ACTIVE"
+    }
+}

@@ -4,7 +4,7 @@ import logging
 from c7n.utils import local_session
 from c7n_azure.session import Session
 from c7n_azure.utils import ResourceIdParser, ThreadHelper
-from mock import patch, MagicMock
+from unittest.mock import patch, MagicMock
 import pytest
 from ..azure_common import BaseTest, arm_template, cassette_name
 from azure.core.exceptions import AzureError

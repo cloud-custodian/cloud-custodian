@@ -3,10 +3,12 @@
 import json
 from unittest.mock import patch
 
-from c7n.exceptions import PolicyValidationError
-from c7n.resources.aws import shape_validate
 import pytest
 from pytest_terraform import terraform
+
+from c7n.exceptions import PolicyValidationError
+from c7n.resources.aws import shape_validate
+from c7n.resources.elasticsearch import parse_es_version
 
 from .common import BaseTest
 
@@ -97,6 +99,102 @@ class ElasticSearch(BaseTest):
                 {"Name": "DomainName", "Value": "foo"},
             ],
         )
+
+    def test_parse_es_version(self):
+        # Test the version parsing function
+        self.assertEqual(
+            parse_es_version("Elasticsearch_7.4"),
+            ("Elasticsearch", "7.4"),
+        )
+        self.assertEqual(
+            parse_es_version("OpenSearch_1.3"),
+            ("OpenSearch", "1.3"),
+        )
+        self.assertEqual(
+            parse_es_version("invalid"),
+            (None, None),
+        )
+        self.assertEqual(
+            parse_es_version("7.2"),
+            ("Elasticsearch", "7.2"),
+        )
+
+    def test_upgrade_available_filter_with_upgrades(self):
+        factory = self.replay_flight_data("test_elasticsearch_upgrade_available")
+        p = self.load_policy(
+            {
+                "name": "es-upgrade-available",
+                "resource": "elasticsearch",
+                "filters": [
+                    {
+                        "type": "upgrade-available",
+                        "value": True,  # Only domains with upgrades available
+                        "major": False  # Only minor version upgrades
+                    }
+                ],
+            },
+            session_factory=factory,
+        )
+        resources = p.run()
+        self.assertEqual(len(resources), 1)
+
+        # If resources were found, they should have the upgrade annotation
+        self.assertIn('c7n:AvailableUpgrades', resources[0])
+        self.assertEqual(
+            sorted(resources[0]['c7n:AvailableUpgrades']),
+            sorted(['ElasticSearch_7.7']),
+        )
+
+    def test_upgrade_available_filter_with_major_upgrades(self):
+        factory = self.replay_flight_data("test_elasticsearch_upgrade_available_major")
+        p = self.load_policy(
+            {
+                "name": "es-upgrade-available",
+                "resource": "elasticsearch",
+                "filters": [
+                    {
+                        "type": "upgrade-available",
+                        "value": True,  # Only domains with upgrades available
+                        "major": True  # Major version upgrades allowed
+                    }
+                ],
+            },
+            session_factory=factory,
+        )
+        resources = p.run()
+        self.assertEqual(len(resources), 1)
+
+        # If resources were found, they should have the upgrade annotation
+        self.assertIn('c7n:AvailableUpgrades', resources[0])
+        self.assertEqual(
+            sorted(resources[0]['c7n:AvailableUpgrades']),
+            sorted([
+                'ElasticSearch_6.0',
+                'ElasticSearch_7.6',
+                'ElasticSearch_7.7',
+                'OpenSearch_1.0',
+            ]),
+        )
+
+    def test_upgrade_available_filter_no_upgrades(self):
+        factory = self.replay_flight_data("test_elasticsearch_upgrade_available_none")
+        p = self.load_policy(
+            {
+                "name": "es-no-upgrade-available",
+                "resource": "elasticsearch",
+                "filters": [
+                    {
+                        "type": "upgrade-available",
+                        "value": False  # Only domains without upgrades available
+                    }
+                ],
+            },
+            session_factory=factory,
+        )
+        resources = p.run()
+        self.assertEqual(len(resources), 1)
+        self.assertIn('c7n:AvailableUpgrades', resources[0])
+        self.assertEqual(len(resources[0]['c7n:AvailableUpgrades']), 0)
 
     def test_delete_search(self):
         factory = self.replay_flight_data("test_elasticsearch_delete")

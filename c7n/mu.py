@@ -278,6 +278,16 @@ def get_exec_options(options):
     return d
 
 
+def normalize_arn(func_arn):
+    """Strip version or alias qualifiers from a Lambda function ARN.
+    """
+    if not isinstance(func_arn, str):
+        return func_arn
+    if func_arn.count(':') > 6:
+        func_arn, _ = func_arn.rsplit(':', 1)
+    return func_arn
+
+
 def checksum(fh, hasher, blocksize=65536):
     buf = fh.read(blocksize)
     while len(buf) > 0:
@@ -554,9 +564,7 @@ class LambdaManager:
 
     def _update_tags(self, existing, new_tags):
         # tag dance
-        base_arn = existing['Configuration']['FunctionArn']
-        if base_arn.count(':') > 6:  # trim version/alias
-            base_arn = base_arn.rsplit(':', 1)[0]
+        base_arn = normalize_arn(existing['Configuration']['FunctionArn'])
 
         tags_to_add, tags_to_remove = self.diff_tags(
             existing.get('Tags', {}), new_tags)
@@ -1222,10 +1230,7 @@ class CloudWatchEventSource(AWSEventBase):
         found = False
         response = RuleRetry(self.client.list_targets_by_rule, Rule=func.event_name)
         # CloudWatchE seems to be quite picky about function arns (no aliases/versions)
-        func_arn = func.arn
-
-        if func_arn.count(':') > 6:
-            func_arn, _ = func_arn.rsplit(':', 1)
+        func_arn = normalize_arn(func.arn)
         for t in response['Targets']:
             if func_arn == t['Arn']:
                 found = True
@@ -1310,6 +1315,8 @@ class EventBridgeScheduleSource(AWSEventBase):
                 f'{", ".join(map(str, self.data.get("events", [])))}>')
 
     def add(self, func, existing):
+        func_arn = normalize_arn(func.arn)
+
         params = dict(
             Name=func.event_name,
             Description=func.description,
@@ -1319,7 +1326,7 @@ class EventBridgeScheduleSource(AWSEventBase):
             ScheduleExpressionTimezone=self.data.get('timezone', 'Etc/UTC'),
             GroupName=self.data.get('group-name', 'default'),
             Target={
-                'Arn': func.arn,
+                'Arn': func_arn,
                 'RoleArn': self.data.get('scheduler-role')
             }
         )
@@ -1493,9 +1500,7 @@ class BucketLambdaNotification:
         s3 = self.session.client('s3')
         notifies, found = self._get_notifies(s3, func)
         notifies.pop('ResponseMetadata', None)
-        func_arn = func.arn
-        if func_arn.rsplit(':', 1)[-1].isdigit():
-            func_arn = func_arn.rsplit(':', 1)[0]
+        func_arn = normalize_arn(func.arn)
         n_params = {
             'Id': func.name,
             'LambdaFunctionArn': func_arn,
@@ -1820,9 +1825,7 @@ class ConfigRule(AWSEventBase):
 
     def get_rule_params(self, func):
         # config does not support versions/aliases on lambda funcs
-        func_arn = func.arn
-        if isinstance(func_arn, str) and func_arn.count(':') > 6:
-            func_arn, _ = func_arn.rsplit(':', 1)
+        func_arn = normalize_arn(func.arn)
 
         params = dict(
             ConfigRuleName=func.name,

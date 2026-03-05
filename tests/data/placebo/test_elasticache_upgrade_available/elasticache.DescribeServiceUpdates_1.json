@@ -1,0 +1,23 @@
+{
+  "status_code": 200,
+  "data": {
+    "ResponseMetadata": {},
+    "ServiceUpdates": [
+        {
+            "ServiceUpdateName": "Redis 7.1 Minor Update",
+            "ServiceUpdateReleaseDate": "2025-09-30T15:06:14+0000",
+            "ServiceUpdateEndDate": "2025-09-30T15:06:14+0000",
+            "ServiceUpdateSeverity": "medium",
+            "ServiceUpdateRecommendedApplyByDate": "2025-09-30T15:06:14+0000",
+            "ServiceUpdateStatus": "available",
+            "ServiceUpdateDescription": "A description would go here.",
+            "ServiceUpdateType": "security-update",
+            "Engine": "redis",
+            "EngineVersion": "redis-7.1",
+            "AutoUpdateAfterRecommendedApplyByDate": false,
+            "EstimatedUpdateTime": "00:00:15"
+        }
+    ],
+    "NextToken": ""
+  }
+}

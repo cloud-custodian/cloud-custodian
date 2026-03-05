@@ -82,8 +82,8 @@ class DescribeSource:
         method = m.enum_spec[0]
         if method == 'aggregatedList':
             method = 'list'
-        component = m.component
-        if '.' in component:
+        component = m.perm_component or m.component
+        if component and '.' in component:
             component = component.split('.')[-1]
         return ("%s.%s.%s" % (
             m.perm_service or m.service, component, method),)
@@ -378,6 +378,7 @@ class TypeInfo(metaclass=TypeMeta):
     # for get methods that require the full event payload
     get_requires_event = False
     perm_service = None
+    perm_component = None
     permissions = ()
 
     labels = False
@@ -411,8 +412,12 @@ class TypeInfo(metaclass=TypeMeta):
     # If the type supports refreshing an individual resource
     refresh = None
 
+    # Some resources don't support monitoring (and hence, no filtering).
+    # Assume they generally can, and flip this to `False` for those that don't.
+    allow_metrics_filters = True
+
     @classmethod
-    def get_metric_resource_name(cls, resource):
+    def get_metric_resource_name(cls, resource, metric_key=None):
         return resource.get(cls.name)
 
     @classmethod

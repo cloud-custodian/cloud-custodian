@@ -1,7 +1,10 @@
 # Copyright The Cloud Custodian Authors.
 # SPDX-License-Identifier: Apache-2.0
+from typing import List
+
 import c7n.filters.vpc as net_filters
 from c7n.actions import Action
+from c7n.filters.core import ComparableVersion
 from c7n.filters.vpc import SecurityGroupFilter, SubnetFilter, VpcFilter
 from c7n.manager import resources
 from c7n.resources.aws import shape_schema
@@ -13,6 +16,7 @@ from botocore.waiter import WaiterModel, create_waiter_with_client
 from .aws import shape_validate
 from .ecs import ContainerConfigSource
 from c7n.filters.kms import KmsRelatedFilter
+from c7n.filters import Filter
 
 
 @query.sources.register('describe-eks-nodegroup')
@@ -132,6 +136,130 @@ class EKSVpcFilter(VpcFilter):
 @EKS.filter_registry.register('kms-key')
 class KmsFilter(KmsRelatedFilter):
     RelatedIdsExpression = 'encryptionConfig[].provider.keyArn'
+
+
+@EKS.filter_registry.register('upgrade-available')
+class UpgradeAvailable(Filter):
+    """Scans for available upgrade-compatible EKS versions
+
+    This will check all the EKS clusters on the resources, and return
+    a list of viable upgrade options.
+
+    :example:
+
+    .. code-block:: yaml
+
+            policies:
+              - name: eks-upgrade-available
+                resource: aws.eks
+                filters:
+                  - type: upgrade-available
+                    major: False
+
+    """
+
+    schema = type_schema(
+        'upgrade-available',
+        major={'type': 'boolean'},
+        value={'type': 'boolean'},
+    )
+    permissions = ('eks:DescribeClusterVersions',)
+    annotation_key = "c7n:AvailableUpgrades"
+
+    def collect_available_upgrades(self, client):
+        all_upgrades = {}
+        all_versions = []
+
+        # Get paginator for DescribeClusterVersions
+        paginator = client.get_paginator('describe_cluster_versions')
+
+        # Request all available versions
+        page_iterator = paginator.paginate(
+            includeAll=True
+        )
+
+        for page in page_iterator:
+            for version_info in page.get('clusterVersions', []):
+                cluster_version = version_info['clusterVersion']
+                all_versions.append(cluster_version)
+
+        # Re-sort, now that we have a complete list of versions.
+        # This is just straight alphanumeric, but works within the existing
+        # versions/scheme.
+        all_versions = sorted(all_versions)
+
+        # Add to all the previous versions first.
+        for offset, version in enumerate(all_versions):
+            all_upgrades[version] = all_versions[offset + 1:]
+
+        return all_upgrades
+
+    def get_matches_for(
+        self,
+        cversion: ComparableVersion,
+        possible_upgrades: List[str],
+        check_major=False
+    ) -> List[str]:
+        matches = []
+
+        for tversion_str in possible_upgrades:
+            tversion = ComparableVersion(tversion_str)
+
+            # Check the major version, & skip if it doesn't match & not including
+            # major versions.
+            if (
+                tversion.version[0] > cversion.version[0]
+                and not check_major
+            ):
+                continue
+
+            if tversion.version[1] <= cversion.version[1]:
+                continue
+
+            matches.append(tversion_str)
+
+        return matches
+
+    def process(self, resources, event=None):
+        client = local_session(self.manager.session_factory).client('eks')
+        check_major = self.data.get('major', False)
+        check_upgrade_extant = self.data.get('value', True)
+        results = []
+
+        available_versions = self.collect_available_upgrades(client)
+
+        for r in resources:
+            raw_version = r.get('version')
+
+            if not raw_version:
+                continue
+
+            current_version = ComparableVersion(raw_version)
+            matches = []
+
+            if raw_version in available_versions:
+                matches = self.get_matches_for(
+                    current_version,
+                    available_versions[raw_version],
+                    check_major=check_major,
+                )
+
+                # Annotate on all the upgrades (in a stable ordering).
+                r[self.annotation_key] = list(sorted(matches))
+
+            # Lastly, depending on `value` (filter if upgrades exist or not):
+            if check_upgrade_extant:
+                if matches:
+                    # We want to filter to include only resources that have
+                    # upgrades.
+                    results.append(r)
+            else:
+                if not matches:
+                    # We want to filter to include only resources **without**
+                    # upgrades,
+                    results.append(r)
+
+        return results
 
 
 @EKS.action_registry.register('tag')

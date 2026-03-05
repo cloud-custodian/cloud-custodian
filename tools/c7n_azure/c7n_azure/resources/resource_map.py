@@ -108,4 +108,7 @@ ResourceMap = {
     "azure.waf": "c7n_azure.resources.waf.WAF",
     "azure.webapp": "c7n_azure.resources.web_app.WebApp",
     "azure.alert-logs": "c7n_azure.resources.alertlogs.AlertLogs",
+    "azure.entraid-user": "c7n_azure.resources.entraid_user.EntraIDUser",
+    "azure.entraid-group": "c7n_azure.resources.entraid_group.EntraIDGroup",
+    "azure.entraid-organization": "c7n_azure.resources.entraid_organization.EntraIDOrganization",
 }

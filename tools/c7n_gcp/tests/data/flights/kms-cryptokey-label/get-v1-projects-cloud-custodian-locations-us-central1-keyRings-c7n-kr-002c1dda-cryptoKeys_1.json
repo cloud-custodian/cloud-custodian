@@ -1,0 +1,112 @@
+{
+  "headers": {
+    "content-type": "application/json; charset=UTF-8",
+    "vary": "Origin, X-Origin, Referer",
+    "date": "Wed, 18 Feb 2026 22:00:21 GMT",
+    "server": "ESF",
+    "x-xss-protection": "0",
+    "x-frame-options": "SAMEORIGIN",
+    "x-content-type-options": "nosniff",
+    "alt-svc": "h3=\":443\"; ma=2592000,h3-29=\":443\"; ma=2592000",
+    "transfer-encoding": "chunked",
+    "status": "200",
+    "content-length": "3901",
+    "-content-encoding": "gzip",
+    "content-location": "https://cloudkms.googleapis.com/v1/projects/cloud-custodian/locations/us-central1/keyRings/c7n-kr-002c1dda/cryptoKeys?alt=json"
+  },
+  "body": {
+    "cryptoKeys": [
+      {
+        "name": "projects/cloud-custodian/locations/us-central1/keyRings/c7n-kr-002c1dda/cryptoKeys/c7n-key-bad-365d-002c1dda",
+        "primary": {
+          "name": "projects/cloud-custodian/locations/us-central1/keyRings/c7n-kr-002c1dda/cryptoKeys/c7n-key-bad-365d-002c1dda/cryptoKeyVersions/1",
+          "state": "ENABLED",
+          "createTime": "2026-01-19T21:33:26.772547372Z",
+          "protectionLevel": "SOFTWARE",
+          "algorithm": "GOOGLE_SYMMETRIC_ENCRYPTION",
+          "generateTime": "2026-01-19T21:33:26.772547372Z"
+        },
+        "purpose": "ENCRYPT_DECRYPT",
+        "createTime": "2026-01-19T21:33:26.772547372Z",
+        "nextRotationTime": "2027-01-19T21:33:26.648322Z",
+        "rotationPeriod": "31536000s",
+        "labels": {
+          "goog-terraform-provisioned": "true"
+        },
+        "versionTemplate": {
+          "protectionLevel": "SOFTWARE",
+          "algorithm": "GOOGLE_SYMMETRIC_ENCRYPTION"
+        },
+        "destroyScheduledDuration": "2592000s"
+      },
+      {
+        "name": "projects/cloud-custodian/locations/us-central1/keyRings/c7n-kr-002c1dda/cryptoKeys/c7n-key-bad-norot-002c1dda",
+        "primary": {
+          "name": "projects/cloud-custodian/locations/us-central1/keyRings/c7n-kr-002c1dda/cryptoKeys/c7n-key-bad-norot-002c1dda/cryptoKeyVersions/1",
+          "state": "ENABLED",
+          "createTime": "2026-01-19T21:33:26.771892502Z",
+          "protectionLevel": "SOFTWARE",
+          "algorithm": "GOOGLE_SYMMETRIC_ENCRYPTION",
+          "generateTime": "2026-01-19T21:33:26.771892502Z"
+        },
+        "purpose": "ENCRYPT_DECRYPT",
+        "createTime": "2026-01-19T21:33:26.771892502Z",
+        "labels": {
+          "goog-terraform-provisioned": "true"
+        },
+        "versionTemplate": {
+          "protectionLevel": "SOFTWARE",
+          "algorithm": "GOOGLE_SYMMETRIC_ENCRYPTION"
+        },
+        "destroyScheduledDuration": "2592000s"
+      },
+      {
+        "name": "projects/cloud-custodian/locations/us-central1/keyRings/c7n-kr-002c1dda/cryptoKeys/c7n-key-good-30d-002c1dda",
+        "primary": {
+          "name": "projects/cloud-custodian/locations/us-central1/keyRings/c7n-kr-002c1dda/cryptoKeys/c7n-key-good-30d-002c1dda/cryptoKeyVersions/2",
+          "state": "ENABLED",
+          "createTime": "2026-02-18T21:33:26.751242954Z",
+          "protectionLevel": "SOFTWARE",
+          "algorithm": "GOOGLE_SYMMETRIC_ENCRYPTION",
+          "generateTime": "2026-02-18T21:33:26.751242954Z"
+        },
+        "purpose": "ENCRYPT_DECRYPT",
+        "createTime": "2026-01-19T21:33:26.776168956Z",
+        "nextRotationTime": "2026-03-20T21:33:26.751242Z",
+        "rotationPeriod": "2592000s",
+        "labels": {
+          "goog-terraform-provisioned": "true"
+        },
+        "versionTemplate": {
+          "protectionLevel": "SOFTWARE",
+          "algorithm": "GOOGLE_SYMMETRIC_ENCRYPTION"
+        },
+        "destroyScheduledDuration": "2592000s"
+      },
+      {
+        "name": "projects/cloud-custodian/locations/us-central1/keyRings/c7n-kr-002c1dda/cryptoKeys/c7n-key-good-90d-002c1dda",
+        "primary": {
+          "name": "projects/cloud-custodian/locations/us-central1/keyRings/c7n-kr-002c1dda/cryptoKeys/c7n-key-good-90d-002c1dda/cryptoKeyVersions/1",
+          "state": "ENABLED",
+          "createTime": "2026-01-19T21:33:26.717394858Z",
+          "protectionLevel": "SOFTWARE",
+          "algorithm": "GOOGLE_SYMMETRIC_ENCRYPTION",
+          "generateTime": "2026-01-19T21:33:26.717394858Z"
+        },
+        "purpose": "ENCRYPT_DECRYPT",
+        "createTime": "2026-01-19T21:33:26.717394858Z",
+        "nextRotationTime": "2026-04-19T21:33:26.642768Z",
+        "rotationPeriod": "7776000s",
+        "labels": {
+          "goog-terraform-provisioned": "true"
+        },
+        "versionTemplate": {
+          "protectionLevel": "SOFTWARE",
+          "algorithm": "GOOGLE_SYMMETRIC_ENCRYPTION"
+        },
+        "destroyScheduledDuration": "2592000s"
+      }
+    ],
+    "totalSize": 4
+  }
+}

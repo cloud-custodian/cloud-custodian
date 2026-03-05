@@ -12,7 +12,7 @@ dependencies = [
     "tfparse<1.0,>=0.6",
 ]
 name = "c7n_left"
-version = "0.3.33"
+version = "0.3.36"
 description = "Custodian policies for IAAC definitions"
 readme = "README.md"
 classifiers = [
@@ -31,7 +31,7 @@ c7n-left = "c7n_left.cli:cli"
 
 [dependency-groups]
 dev = [
-    "pytest<8.0",
+    "pytest",
     "pytest-terraform<1.0.0,>=0.7.0",
 ]
 
