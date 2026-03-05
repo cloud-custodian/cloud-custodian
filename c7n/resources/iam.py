@@ -233,7 +233,7 @@ class DescribeUser(DescribeSource):
         for r in resources:
             ru = self.manager.retry(
                 client.get_user, UserName=r['UserName'],
-                ignore_err_codes=client.exceptions.NoSuchEntityException)
+                ignore_err_codes=('NoSuchEntity',))
             if ru:
                 results.append(ru['User'])
         return list(filter(None, results))

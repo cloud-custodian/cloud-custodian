@@ -793,6 +793,25 @@ class IamUserTest(BaseTest):
             [{'UserName': 'Kapil', 'Arn': 'arn:x'}])
         self.assertEqual(resources, [])
 
+    def test_iam_user_augment_access_denied(self):
+        p = self.load_policy({
+            'name': 'iam-user-augment-access-denied',
+            'resource': 'iam-user'})
+
+        p.resource_manager.session_factory = sf = mock.MagicMock()
+        sf.region = 'issue-10291'
+        sf.return_value = f = mock.MagicMock()
+        f.client.return_value = c = mock.MagicMock()
+        c.get_user.side_effect = ClientError(
+            {'Error': {'Code': 'AccessDenied',
+                       'Message': 'MonkeyWrench'}},
+            'get_user')
+        c.exceptions.NoSuchEntityException = ClientError
+
+        with self.assertRaises(ClientError) as ctx:
+            p.resource_manager.source.augment([{'UserName': 'Kapil'}])
+        self.assertEqual(ctx.exception.response['Error']['Code'], 'AccessDenied')
+
     def test_iam_user_usage(self):
         factory = self.replay_flight_data('test_iam_user_usage')
         p = self.load_policy({
