@@ -93,3 +93,46 @@ class TestTransferUser(BaseTest):
         )
         resources = p.run()
         self.assertEqual(len(resources), 2)
+
+
+class TestTransferConnector(BaseTest):
+
+    def test_sftp_resources(self):
+        session_factory = self.replay_flight_data("test_transfer_sftp_connector")
+        p = self.load_policy(
+            {"name": "sftp-connector-describe", "resource": "transfer-connector"},
+            session_factory=session_factory,
+        )
+        resources = p.run()
+        self.assertEqual(len(resources), 1)
+
+        self.assertEqual(resources[0]["ConnectorId"], "c-fb309b9e41e34d43a")
+        self.assertEqual(resources[0]["Tags"],
+            [{'Key': 'Name', 'Value': 'c7n-test-sftp-connector'}])
+        self.assertIn("SftpConfig", resources[0])
+        self.assertIn("C7N-Transfer-Connector-Logging-Role", resources[0]["LoggingRole"])
+
+    def test_logging_role(self):
+        session_factory = self.replay_flight_data("test_transfer_connector_logging")
+        p = self.load_policy(
+            {
+                "name": "sftp-connector-logging",
+                "resource": "transfer-connector",
+                "filters": [
+                    {
+                        "type": "value",
+                        "key": "LoggingRole",
+                        "value": "absent",
+                    }
+                ]
+            },
+            session_factory=session_factory,
+        )
+        resources = p.run()
+        self.assertEqual(len(resources), 1)
+
+        self.assertEqual(resources[0]["ConnectorId"], "c-3d06182674db43f68")
+        self.assertEqual(resources[0]["Tags"],
+            [{'Key': 'Name', 'Value': 'c7n-test-nologging'}])
+        self.assertIn("SftpConfig", resources[0])
+        self.assertNotIn("LoggingRole", resources[0])

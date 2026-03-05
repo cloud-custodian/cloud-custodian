@@ -21,6 +21,19 @@ class TransferServer(QueryResourceManager):
         permissions_augment = ("transfer:ListTagsForResource",)
 
 
+@resources.register('transfer-connector')
+class TransferConnector(QueryResourceManager):
+
+    class resource_type(TypeInfo):
+        service = 'transfer'
+        enum_spec = ('list_connectors', 'Connectors', {'MaxResults': 60})
+        detail_spec = (
+            'describe_connector', 'ConnectorId', 'ConnectorId', 'Connector')
+        id = name = 'ConnectorId'
+        arn_type = "connector"
+        cfn_type = 'AWS::Transfer::Connector'
+
+
 @TransferServer.action_registry.register('stop')
 class StopServer(BaseAction):
     """Action to stop a Transfer Server

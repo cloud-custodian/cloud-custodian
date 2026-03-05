@@ -342,6 +342,7 @@ ResourceMap = {
   "aws.timestream-table": "c7n.resources.timestream.TimestreamTable",
   "aws.timestream-influxdb": "c7n.resources.timestream.TimestreamInfluxDB",
   "aws.timestream-influxdb-cluster": "c7n.resources.timestream.TimestreamInfluxDBCluster",
+  "aws.transfer-connector": "c7n.resources.transfer.TransferConnector",
   "aws.transfer-server": "c7n.resources.transfer.TransferServer",
   "aws.transfer-user": "c7n.resources.transfer.TransferUser",
   "aws.transit-attachment": "c7n.resources.vpc.TransitGatewayAttachment",
