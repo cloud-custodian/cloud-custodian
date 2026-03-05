@@ -27,7 +27,7 @@ class TransferConnector(QueryResourceManager):
 
     class resource_type(TypeInfo):
         service = 'transfer'
-        enum_spec = ('list_connectors', 'Connectors', {'MaxResults': 60})
+        enum_spec = ('list_connectors', 'Connectors', None)
         detail_spec = (
             'describe_connector', 'ConnectorId', 'ConnectorId', 'Connector')
         id = name = 'ConnectorId'
