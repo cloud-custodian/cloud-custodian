@@ -1,0 +1,70 @@
+{
+    "status_code": 200,
+    "data": {
+        "WebACL": {
+            "Name": "tester",
+            "Id": "05a86beb-0518-4d89-88a5-e95eb4449218",
+            "ARN": "arn:aws:wafv2:us-east-1:111111111111:regional/webacl/tester/05a86beb-0518-4d89-88a5-e95eb4449218",
+            "DefaultAction": {
+                "Allow": {}
+            },
+            "Description": "",
+            "Rules": [
+                {
+                    "Name": "bee",
+                    "Priority": 0,
+                    "Statement": {
+                        "IPSetReferenceStatement": {
+                            "ARN": "arn:aws:wafv2:us-east-1:111111111111:regional/ipset/NewResource_bee_IPV4/dc3df0a7-b9df-437b-8264-3ca9c3d86108"
+                        }
+                    },
+                    "Action": {
+                        "Captcha": {}
+                    },
+                    "VisibilityConfig": {
+                        "SampledRequestsEnabled": true,
+                        "CloudWatchMetricsEnabled": true,
+                        "MetricName": "bee"
+                    }
+                }
+            ],
+            "VisibilityConfig": {
+                "SampledRequestsEnabled": true,
+                "CloudWatchMetricsEnabled": true,
+                "MetricName": "tester"
+            },
+            "Capacity": 1,
+            "ManagedByFirewallManager": false,
+            "LabelNamespace": "awswaf:111111111111:webacl:tester:",
+            "RetrofittedByFirewallManager": false,
+            "OnSourceDDoSProtectionConfig": {
+                "ALBLowReputationMode": "ACTIVE_UNDER_DDOS"
+            },
+            "ApplicationConfig": {
+                "Attributes": [
+                    {
+                        "Name": "ApplicationCategory",
+                        "Values": [
+                            "eCommerceAndTransaction"
+                        ]
+                    },
+                    {
+                        "Name": "TrafficSource",
+                        "Values": [
+                            "api",
+                            "web"
+                        ]
+                    },
+                    {
+                        "Name": "ProtectionsName",
+                        "Values": [
+                            "BYO"
+                        ]
+                    }
+                ]
+            }
+        },
+        "LockToken": "6f8b3afc-f0dc-4485-a1ed-0a9eabd14ca7",
+        "ResponseMetadata": {}
+    }
+}

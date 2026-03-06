@@ -131,6 +131,29 @@ class WAFTest(BaseTest):
         resources = p.run()
         self.assertEqual(len(resources), 1, f"Expected 1 resource, got {len(resources)}")
 
+    def test_wafv2_set_logging_with_redacted_fields(self):
+        session_factory = self.replay_flight_data("test_wafv2_set_logging_with_redacted_fields")
+        policy = {
+            "name": "enable-wafv2-logging-redacted",
+            "resource": "aws.wafv2",
+            "filters": [{"Name": "tester"}],
+            "actions": [{
+                "type": "set-logging",
+                "destination": "arn:aws:s3:::aws-waf-logs-test-custodian-creation",
+                "redacted_fields": [
+                    {"single_header": {"name": "cookie"}},
+                    {"query_string": {}},
+                    {"uri_path": {}},
+                    {"method": {}}
+                ]
+            }],
+        }
+        p = self.load_policy(policy,
+                             session_factory=session_factory,
+                             config={"region": "us-east-1"})
+        resources = p.run()
+        self.assertEqual(len(resources), 1)
+
     def test_wafv2_rule_groups(self):
         session_factory = self.replay_flight_data("test_wafv2_rule_groups")
 
