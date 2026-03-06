@@ -33,8 +33,6 @@ CORE_DEPS = [
     "pyasn1",
     "redis",
     "jmespath",
-    # for other dependencies
-    "pkg_resources",
     # transport datadog - recursive deps
     "datadog",
     "decorator",

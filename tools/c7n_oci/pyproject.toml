@@ -13,7 +13,7 @@ dependencies = [
     "pyopenssl>=24"
 ]
 name = "c7n_oci"
-version = "0.1.23"
+version = "0.1.24"
 description = "Cloud Custodian - OCI Support"
 readme = "readme.md"
 classifiers = [
@@ -30,7 +30,7 @@ documentation = "https://cloudcustodian.io/docs/"
 
 [dependency-groups]
 dev = [
-    "pytest<8.0",
+    "pytest",
 ]
 
 [build-system]
