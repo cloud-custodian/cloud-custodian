@@ -243,7 +243,12 @@ class WAFV2SetLogging(BaseAction):
                 - method: {}
     """
 
-    schema = type_schema('set-logging', required=['destination'], destination={'type': 'string'}, redacted_fields={'type': 'array'})
+    schema = type_schema(
+        'set-logging',
+        required=['destination'],
+        destination={'type': 'string'},
+        redacted_fields={'type': 'array'}
+    )
 
     permissions = ('wafv2:PutLoggingConfiguration',)
 
@@ -308,7 +313,9 @@ class WAFV2SetLogging(BaseAction):
             if aws_redacted_fields:
                 field_names = [list(f.keys())[0] for f in aws_redacted_fields]
                 redaction_info = f" with redacted fields {', '.join(field_names)}"
-            self.log.info(f"Enabled logging for WAFv2 WebACL {r['Name']} to {destination}{redaction_info}")
+            self.log.info(
+                f"Enabled logging for WAFv2 WebACL {r['Name']} to {destination}{redaction_info}"
+            )
 
 
 @WAFV2.filter_registry.register('web-acl-rules')
