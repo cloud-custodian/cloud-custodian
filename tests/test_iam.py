@@ -2780,6 +2780,64 @@ class CrossAccountChecker(TestCase):
         violations = checker.check(policy)
         self.assertEqual(len(violations), 1)
 
+    def test_whitelist_patterns_deleted_principals(self):
+        """Test that whitelist_patterns skips principals matching IAM unique ID patterns."""
+        # Simulates what AWS does when a principal is deleted: the ARN is replaced
+        # with the unique identifier (e.g. AROA*, AIDA*, etc.)
+        policy = {
+            "Version": "2012-10-17",
+            "Statement": [{
+                "Effect": "Allow",
+                "Principal": {
+                    "AWS": [
+                        "arn:aws:iam::111122223333:role/role-name",
+                        "AIDACKCEVSQ6C2EXAMPLE",
+                        "AROADBQP57FF2AEXAMPLE",
+                    ]
+                },
+                "Action": "s3:GetObject",
+                "Resource": "*",
+            }]
+        }
+
+        # Without whitelist_patterns, deleted principal unique IDs trigger a violation
+        checker = PolicyChecker({"allowed_accounts": {"111122223333"}})
+        violations = checker.check(policy)
+        self.assertEqual(len(violations), 1)
+
+        # With whitelist_patterns matching IAM unique IDs, no violation
+        checker = PolicyChecker({
+            "allowed_accounts": {"111122223333"},
+            "whitelist_patterns": ["AIDA*", "AROA*"],
+        })
+        violations = checker.check(policy)
+        self.assertEqual(len(violations), 0)
+
+    def test_whitelist_patterns_only_matching_skipped(self):
+        """Test that whitelist_patterns only skips principals that match the pattern."""
+        policy = {
+            "Version": "2012-10-17",
+            "Statement": [{
+                "Effect": "Allow",
+                "Principal": {
+                    "AWS": [
+                        "arn:aws:iam::999999999999:role/external-role",
+                        "AIDACKCEVSQ6C2EXAMPLE",
+                    ]
+                },
+                "Action": "s3:GetObject",
+                "Resource": "*",
+            }]
+        }
+
+        # Whitelisting the deleted-principal pattern still flags the cross-account role
+        checker = PolicyChecker({
+            "allowed_accounts": {"111122223333"},
+            "whitelist_patterns": ["AIDA*"],
+        })
+        violations = checker.check(policy)
+        self.assertEqual(len(violations), 1)
+
 
 class SetRolePolicyAction(BaseTest):
     def test_set_policy_attached(self):

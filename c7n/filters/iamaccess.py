@@ -91,6 +91,10 @@ class PolicyChecker:
     def allowed_orgid(self):
         return self.checker_config.get('allowed_orgid', ())
 
+    @property
+    def whitelist_patterns(self):
+        return self.checker_config.get('whitelist_patterns', ())
+
     # Policy statement handling
     def check(self, policy_text):
         if isinstance(policy_text, str):
@@ -153,6 +157,9 @@ class PolicyChecker:
             elif self.everyone_only:
                 continue
             elif pid.startswith('arn:aws:iam::cloudfront:user'):
+                continue
+            elif self.whitelist_patterns and any(
+                    fnmatch.fnmatch(pid, pattern) for pattern in self.whitelist_patterns):
                 continue
             else:
                 account_id = _account(pid)
@@ -310,6 +317,23 @@ class PolicyChecker:
 
 class CrossAccountAccessFilter(Filter):
     """Check a resource's embedded iam policy for cross account access.
+
+    Supports a ``whitelist_patterns`` option to skip principals whose identifier
+    matches any of the provided `fnmatch
+    <https://docs.python.org/3/library/fnmatch.html>`_ patterns.  This is
+    useful for ignoring unique identifiers left behind by deleted IAM principals
+    (e.g. ``AIDA*`` for deleted IAM users, ``AROA*`` for deleted IAM roles)
+    which AWS substitutes into resource policies when the original principal is
+    removed.  See `IAM unique identifiers
+    <https://docs.aws.amazon.com/IAM/latest/UserGuide/reference_identifiers.html#identifiers-unique-ids>`_
+    for the full list of prefixes.
+
+    .. code-block:: yaml
+
+      - type: cross-account
+        whitelist_patterns:
+          - "AIDA*"
+          - "AROA*"
     """
 
     schema = type_schema(
@@ -330,7 +354,10 @@ class CrossAccountAccessFilter(Filter):
         whitelist_vpce_from={'$ref': '#/definitions/filters_common/value_from'},
         whitelist_vpce={'type': 'array', 'items': {'type': 'string'}},
         whitelist_vpc_from={'$ref': '#/definitions/filters_common/value_from'},
-        whitelist_vpc={'type': 'array', 'items': {'type': 'string'}})
+        whitelist_vpc={'type': 'array', 'items': {'type': 'string'}},
+        # fnmatch patterns for principals to ignore (e.g. deleted IAM unique IDs)
+        whitelist_patterns_from={'$ref': '#/definitions/filters_common/value_from'},
+        whitelist_patterns={'type': 'array', 'items': {'type': 'string'}})
 
     policy_attribute = 'Policy'
     annotation_key = 'CrossAccountViolations'
@@ -349,6 +376,7 @@ class CrossAccountAccessFilter(Filter):
         self.vpcs = self.get_vpcs()
         self.vpces = self.get_vpces()
         self.orgid = self.get_orgids()
+        self.patterns = self.get_whitelist_patterns()
         self.checker_config = getattr(self, 'checker_config', None) or {}
         self.checker_config.update(
             {'allowed_accounts': self.accounts,
@@ -358,6 +386,7 @@ class CrossAccountAccessFilter(Filter):
              'check_actions': self.actions,
              'everyone_only': self.everyone_only,
              'whitelist_conditions': self.conditions,
+             'whitelist_patterns': self.patterns,
              'return_allowed': self.return_allowed})
         self.checker = self.checker_factory(self.checker_config)
         return super(CrossAccountAccessFilter, self).process(resources, event)
@@ -391,6 +420,13 @@ class CrossAccountAccessFilter(Filter):
             values = ValuesFrom(self.data['whitelist_orgids_from'], self.manager)
             org_ids = org_ids.union(values.get_values())
         return org_ids
+
+    def get_whitelist_patterns(self):
+        patterns = list(self.data.get('whitelist_patterns', ()))
+        if 'whitelist_patterns_from' in self.data:
+            values = ValuesFrom(self.data['whitelist_patterns_from'], self.manager)
+            patterns = patterns + list(values.get_values())
+        return patterns
 
     def get_resource_policy(self, r):
         return r.get(self.policy_attribute, None)
