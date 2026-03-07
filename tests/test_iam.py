@@ -3033,7 +3033,10 @@ class CrossAccountChecker(TestCase):
             "Statement": [{
                 "Effect": "Allow",
                 "Principal": {
-                    "AWS": "arn:aws:iam::cloudfront:user/CloudFront Origin Access Identity EXH52BD8319I2"
+                    "AWS": (
+                        "arn:aws:iam::cloudfront:user/"
+                        "CloudFront Origin Access Identity EXH52BD8319I2"
+                    )
                 },
                 "Action": "s3:GetObject",
                 "Resource": "*",
