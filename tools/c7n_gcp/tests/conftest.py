@@ -1,20 +1,33 @@
 # Copyright The Cloud Custodian Authors.
 # SPDX-License-Identifier: Apache-2.0
 
+import os
+from pathlib import Path
+
 import pytest
-
-from pytest_terraform.tf import LazyPluginCacheDir, LazyReplay
-
-from c7n.testing import PyTestUtils, reset_session_cache, C7N_FUNCTIONAL
-from c7n.utils import jmespath_search
 from c7n_gcp.client import get_default_project
 from c7n_gcp.region import Region
-
-from gcp_common import GoogleFlightRecorder, PROJECT_ID
+from gcp_common import PROJECT_ID, GoogleFlightRecorder
+from pytest_terraform.tf import LazyPluginCacheDir, LazyReplay
 from recorder import sanitize_project_name
+
+from c7n.testing import C7N_FUNCTIONAL, PyTestUtils, reset_session_cache
+from c7n.utils import jmespath_search
 
 LazyReplay.value = not C7N_FUNCTIONAL
 LazyPluginCacheDir.value = '../.tfcache'
+
+
+@pytest.fixture(autouse=True, scope="session")
+def set_working_directory():
+    original_cwd = os.getcwd()
+    # The GOOGLE_APPLICATION_CREDENTIALS environment variable has a path
+    # relative to the root of the repository. Tests _usually_ run with that as
+    # the cwd, but force that here to avoid failures when pytest runs from elsewhere.
+    os.chdir(Path(__file__).parent.parent.parent.parent)
+    print(f"Changed working directory to {os.getcwd()} for tests")
+    yield
+    os.chdir(original_cwd)
 
 
 class CustodianGCPTesting(PyTestUtils, GoogleFlightRecorder):
