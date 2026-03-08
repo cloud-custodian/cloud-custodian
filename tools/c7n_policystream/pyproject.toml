@@ -13,7 +13,7 @@ dependencies = [
     "requests<3.0.0,>=2.22.0",
 ]
 name = "c7n_policystream"
-version = "0.4.48"
+version = "0.4.49"
 description = "Cloud Custodian - Git Commits as Logical Policy Changes"
 readme = "README.md"
 classifiers = [
@@ -33,7 +33,7 @@ c7n-policystream = "policystream:cli"
 [dependency-groups]
 dev = [
     "mock<5.0.0,>=4.0.2",
-    "pytest<8.0",
+    "pytest",
 ]
 
 [tool.hatch.build.targets.wheel]

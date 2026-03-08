@@ -381,6 +381,42 @@ class SpannerDatabaseInstanceTest(BaseTest):
 
         self.assertEqual(test_method(existing_bindings, bindings_to_remove), expected_bindings)
 
+    def test_set_iam_policy_remove_bindings_preserves_condition(self):
+        """
+        Tests that a binding's ``condition`` field is preserved when only some members are
+        removed and the binding survives. Previously, ``_remove_bindings`` constructed a fresh
+        ``{'role': ..., 'members': ...}`` dict, silently dropping any extra fields such as
+        ``condition``. The fix uses ``{**existing_binding, 'members': updated_members}`` so
+        that all original fields are retained.
+        """
+        policy = self.load_policy(
+            {'name': 'spanner-database-instance-set-iam-policy-condition',
+             'resource': 'gcp.spanner-database-instance',
+             'actions': [{'type': 'set-iam-policy'}]})
+        test_method = policy.resource_manager.actions[0]._remove_bindings
+
+        condition = {
+            'title': 'Expires 2025',
+            'expression': "request.time < timestamp('2025-01-01T00:00:00Z')",
+        }
+        existing_bindings = [
+            {'role': 'roles/owner',
+             'members': ['serviceAccount:sa@project.iam.gserviceaccount.com',
+                         'user:alice@example.com'],
+             'condition': condition},
+        ]
+        bindings_to_remove = [
+            {'role': 'roles/owner',
+             'members': ['serviceAccount:sa@project.iam.gserviceaccount.com']},
+        ]
+        expected_bindings = [
+            {'role': 'roles/owner',
+             'members': ['user:alice@example.com'],
+             'condition': condition},
+        ]
+
+        self.assertEqual(test_method(existing_bindings, bindings_to_remove), expected_bindings)
+
 
 class TestSpannerInstanceBackup(BaseTest):
 
