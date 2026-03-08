@@ -1,0 +1,10 @@
+{
+    "status_code": 400,
+    "data": {
+        "ResponseMetadata": {},
+        "Error": {
+            "Message": "Error occurred because of a conflict while performing an operation.",
+            "Code": "ConflictException"
+        }
+    }
+}

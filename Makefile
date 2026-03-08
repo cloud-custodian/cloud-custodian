@@ -30,10 +30,10 @@ install:
 .PHONY: test
 
 test:
-	. $(PWD)/test.env && uv run pytest -n auto $(ARGS) tests tools
+	uv run pytest -n auto $(ARGS) tests tools
 
 test-coverage:
-	. $(PWD)/test.env && uv run pytest -n auto \
+	uv run pytest -n auto \
             --cov-config .coveragerc \
             --cov-report $(COVERAGE_TYPE) \
             --cov c7n \
