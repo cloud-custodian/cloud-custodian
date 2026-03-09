@@ -271,24 +271,20 @@ class WAFV2SetLogging(BaseAction):
     def convert_redacted_fields(self, redacted_fields_config):
         if not redacted_fields_config:
             return []
-        aws_redacted_fields = []
+        result = []
         for field in redacted_fields_config:
-            aws_field = {}
-            if 'single_header' in field or 'singleHeader' in field:
-                header = field.get('single_header') or field.get('singleHeader')
-                header_name = header.get('name') or header.get('Name')
-                if header_name:
-                    aws_field['SingleHeader'] = {'Name': header_name}
-            elif 'method' in field or 'Method' in field:
-                aws_field['Method'] = {}
-            elif 'query_string' in field or 'queryString' in field or 'QueryString' in field:
-                aws_field['QueryString'] = {}
-            elif 'uri_path' in field or 'uriPath' in field or 'UriPath' in field:
-                aws_field['UriPath'] = {}
-
-            if aws_field:
-                aws_redacted_fields.append(aws_field)
-        return aws_redacted_fields
+            key = next(iter(field))
+            pascal_key = ''.join(w.capitalize() for w in key.split('_'))
+            value = field[key]
+            if isinstance(value, dict) and value:
+                pascal_value = {
+                    ''.join(w.capitalize() for w in k.split('_')): v
+                    for k, v in value.items()
+                }
+                result.append({pascal_key: pascal_value})
+            else:
+                result.append({pascal_key: {}})
+        return result
 
     def process(self, resources):
         client = local_session(self.manager.session_factory).client(
@@ -299,22 +295,33 @@ class WAFV2SetLogging(BaseAction):
         aws_redacted_fields = self.convert_redacted_fields(redacted_fields_config)
 
         for r in resources:
-            resource_arn = r['ARN']
-            logging_config = {'ResourceArn': resource_arn, 'LogDestinationConfigs': [destination]}
+            logging_config = {
+                'ResourceArn': r['ARN'],
+                'LogDestinationConfigs': [destination]
+            }
             if aws_redacted_fields:
                 logging_config['RedactedFields'] = aws_redacted_fields
 
-            self.manager.retry(
-                client.put_logging_configuration,
-                LoggingConfiguration=logging_config,
-                ignore_err_codes=('WAFNonexistentItemException',),
-            )
+            try:
+                self.manager.retry(
+                    client.put_logging_configuration,
+                    LoggingConfiguration=logging_config,
+                    ignore_err_codes=('WAFNonexistentItemException',),
+                )
+            except client.exceptions.WAFInvalidParameterException as e:
+                self.log.error(
+                    f"Invalid parameter for WAFv2 WebACL {r['Name']}: {e}. "
+                    f"Check redacted_fields values are valid AWS field names."
+                )
+                continue
+
             redaction_info = ""
             if aws_redacted_fields:
                 field_names = [list(f.keys())[0] for f in aws_redacted_fields]
                 redaction_info = f" with redacted fields {', '.join(field_names)}"
             self.log.info(
-                f"Enabled logging for WAFv2 WebACL {r['Name']} to {destination}{redaction_info}"
+                f"Enabled logging for WAFv2 WebACL {r['Name']} "
+                f"to {destination}{redaction_info}"
             )
 
 
