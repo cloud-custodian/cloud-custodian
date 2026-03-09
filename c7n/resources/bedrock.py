@@ -587,9 +587,42 @@ class BedrockApplicationInferenceProfile(QueryResourceManager):
             'typeEquals': 'APPLICATION'})
         name = "inferenceProfileName"
         id = arn = "inferenceProfileArn"
-        arn_type = "inference-profile"
+        arn_type = "application-inference-profile"
         permission_prefix = 'bedrock'
         universal_taggable = object()
         permissions_augment = ("bedrock:ListTagsForResource",)
 
     augment = universal_augment
+
+
+@BedrockApplicationInferenceProfile.action_registry.register('delete')
+class DeleteBedrockInferenceProfile(BaseAction):
+    """Delete an application inference profile
+
+    :example:
+
+    .. code-block:: yaml
+
+        policies:
+          - name: delete-inference-profile
+            resource: aws.bedrock-inference-profile
+            actions:
+              - type: delete
+    """
+    schema = type_schema('delete')
+    permissions = ('bedrock:DeleteInferenceProfile',)
+
+    def process(self, resources):
+        client = local_session(self.manager.session_factory).client('bedrock')
+        for r in resources:
+            try:
+                client.delete_inference_profile(
+                    inferenceProfileIdentifier=r['inferenceProfileArn']
+                )
+            except client.exceptions.ResourceNotFoundException:
+                continue
+            except client.exceptions.ConflictException as e:
+                self.log.warning(
+                    f"Unable to delete inference profile {r['inferenceProfileArn']}: {e}",
+                )
+                continue

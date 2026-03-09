@@ -235,6 +235,60 @@ class SnapshotErrorHandler(BaseTest):
         vol = ErrorHandler.extract_bad_volume(e)
         self.assertEqual(vol, "vol-notfound")
 
+    def test_remove_volume(self):
+        vols = [{'VolumeId': 'a'}, {'VolumeId': 'b'}, {'VolumeId': 'c'}]
+
+        t1 = list(vols)
+        ErrorHandler.remove_volume('c', t1)
+        self.assertEqual([t['VolumeId'] for t in t1], ['a', 'b'])
+
+        ErrorHandler.remove_volume('d', vols)
+        self.assertEqual(len(vols), 3)
+
+    def test_volume_tag_error(self):
+        vols = [{'VolumeId': 'vol-aa'}]
+        error_response = {
+            "Error": {
+                "Message": "The volume 'vol-aa' does not exist.",
+                "Code": "InvalidVolume.NotFound",
+            }
+        }
+        client = mock.MagicMock()
+        client.create_tags.side_effect = ClientError(error_response, 'CreateTags')
+
+        p = self.load_policy({
+            "name": "ebs-tag",
+            "resource": "ebs",
+            'actions': [{'type': 'tag', 'tags': {'bar': 'foo'}}]})
+        tagger = p.resource_manager.actions[0]
+        tagger.process_resource_set(client, vols, [{'Key': 'bar', 'Value': 'foo'}])
+        client.create_tags.assert_called_once()
+
+    def test_volume_tag_error_remaining_resources_tagged(self):
+        vols = [{'VolumeId': 'vol-missing'}, {'VolumeId': 'vol-exists'}]
+        error_response = {
+            "Error": {
+                "Message": "The volume 'vol-missing' does not exist.",
+                "Code": "InvalidVolume.NotFound",
+            }
+        }
+        client = mock.MagicMock()
+        client.create_tags.side_effect = [
+            ClientError(error_response, 'CreateTags'),
+            None,
+        ]
+
+        p = self.load_policy({
+            "name": "ebs-tag",
+            "resource": "ebs",
+            'actions': [{'type': 'tag', 'tags': {'bar': 'foo'}}]})
+        tagger = p.resource_manager.actions[0]
+        tagger.process_resource_set(client, vols, [{'Key': 'bar', 'Value': 'foo'}])
+        self.assertEqual(client.create_tags.call_count, 2)
+        # second call should only contain the existing volume
+        _, second_call_kwargs = client.create_tags.call_args_list[1]
+        self.assertEqual(second_call_kwargs['Resources'], ['vol-exists'])
+
     def test_snapshot_copy_related_tags_missing_volumes(self):
         factory = self.replay_flight_data(
             "test_ebs_snapshot_copy_related_tags_missing_volumes")
