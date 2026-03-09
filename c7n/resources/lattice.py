@@ -25,12 +25,13 @@ class VPCLatticeServiceNetwork(QueryResourceManager):
     class resource_type(TypeInfo):
         service = 'vpc-lattice'
         enum_spec = ('list_service_networks', 'items', None)
+        detail_spec = ('get_service_network', 'serviceNetworkIdentifier', 'id', None)
         arn = 'arn'
         id = 'id'
         name = 'name'
         universal_taggable = object()
         permissions_enum = ('vpc-lattice:ListServiceNetworks',)
-        permissions_augment = ('vpc-lattice:ListTagsForResource',)
+        permissions_augment = ('vpc-lattice:GetServiceNetwork', 'vpc-lattice:ListTagsForResource',)
 
 
 @resources.register('vpc-lattice-service')
