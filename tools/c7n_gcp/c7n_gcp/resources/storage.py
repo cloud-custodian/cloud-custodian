@@ -52,8 +52,7 @@ class BucketIamPolicyFilter(IamPolicyFilter):
     permissions = ('storage.buckets.getIamPolicy',)
 
     def _verb_arguments(self, resource):
-        verb_arguments = {{"bucket": resource["name"]}}
-        return verb_arguments
+        return {"bucket": resource["name"]}
 
 
 @Bucket.action_registry.register('set-uniform-access')
@@ -170,6 +169,10 @@ class BucketSetIamPolicy(SetIamPolicy):
         add_bindings = self.data.get('add-bindings', [])
         remove_bindings = self.data.get('remove-bindings', [])
         bindings_to_set = self._add_bindings(existing_bindings, add_bindings)
-        bindings_to_set = self._remove_bindings(bindings_to_set, remove_bindings)
+        if remove_bindings == 'matched':
+            matched_pairs = resource.get(IamPolicyFilter.annotation_key, [])
+            bindings_to_set = self._remove_matched_bindings(bindings_to_set, matched_pairs)
+        else:
+            bindings_to_set = self._remove_bindings(bindings_to_set, remove_bindings)
         params['body'] = {'bindings': bindings_to_set} if bindings_to_set else {}
         return params
