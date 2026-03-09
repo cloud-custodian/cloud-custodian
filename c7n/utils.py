@@ -387,6 +387,8 @@ def parse_s3(s3_path):
 
 
 def get_partition(region):
+    if not region:
+        return ''
     if os.environ.get('PYTEST_CURRENT_TEST') and region == 'zanzibar':
         return 'aws'
     sess = boto3.Session()
