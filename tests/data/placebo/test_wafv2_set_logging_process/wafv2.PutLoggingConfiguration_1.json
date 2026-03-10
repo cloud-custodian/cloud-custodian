@@ -1,0 +1,25 @@
+{
+    "status_code": 200,
+    "data": {
+        "LoggingConfiguration": {
+            "ResourceArn": "arn:aws:wafv2:us-east-1:111111111111:regional/webacl/tester/05a86beb-0518-4d89-88a5-e95eb4449218",
+            "LogDestinationConfigs": [
+                "arn:aws:s3:::aws-waf-logs-test-custodian-creation"
+            ],
+            "RedactedFields": [
+                {
+                    "SingleHeader": {
+                        "Name": "cookie"
+                    }
+                },
+                {
+                    "Method": {}
+                }
+            ],
+            "ManagedByFirewallManager": false,
+            "LogType": "WAF_LOGS",
+            "LogScope": "CUSTOMER"
+        },
+        "ResponseMetadata": {}
+    }
+}
