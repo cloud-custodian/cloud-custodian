@@ -111,25 +111,39 @@ class WAFTest(BaseTest):
         resources = p.run()
         self.assertEqual(len(resources), 1, f"Expected 1 resource, got {len(resources)}")
 
-    def test_wafv2_set_logging_invalid_destination(self):
-        session_factory = self.replay_flight_data("test_wafv2_set_logging_invalid_destination")
-
+    def test_wafv2_set_logging_process(self):
+        session_factory = self.replay_flight_data("test_wafv2_set_logging_process")
         policy = {
-                "name": "enable-wafv2-logging-invalid-destination",
-                "resource": "aws.wafv2",
-                "filters": [{"Name": "compliant_waf"}],
-                "actions": [
-                    {
-                        "type": "set-logging",
-                        "destination": "arn:aws:s3:::aws-waf-logs-invalid-destination-for-logging",
-                    }
-                ],
-            }
-        p = self.load_policy(policy,
-                             session_factory=session_factory,
-                             config={"region": "us-east-1"})
+            "name": "test-wafv2-set-logging-process",
+            "resource": "aws.wafv2",
+            "filters": [{"Name": "tester"}],
+            "actions": [{
+                "type": "set-logging",
+                "destination": "arn:aws:s3:::aws-waf-logs-test-custodian-creation",
+                "redacted_fields": [
+                    {"single_header": {"name": "cookie"}},
+                    {"method": {}}
+                ]
+            }],
+        }
+        p = self.load_policy(
+            policy,
+            session_factory=session_factory,
+            config={'region': 'us-east-1'})
+
         resources = p.run()
-        self.assertEqual(len(resources), 1, f"Expected 1 resource, got {len(resources)}")
+        self.assertEqual(len(resources), 1)
+        action = p.resource_manager.actions[0]
+        self.assertEqual(action.convert_redacted_fields([]), [])
+        self.assertEqual(action.convert_redacted_fields(None), [])
+        result = action.convert_redacted_fields([{"single_header": {"name": "cookie"}}])
+        self.assertEqual(result, [{"SingleHeader": {"Name": "cookie"}}])
+        result = action.convert_redacted_fields([
+            {"method": {}},
+            {"query_string": {}},
+            {"uri_path": {}}
+        ])
+        self.assertEqual(result, [{"Method": {}}, {"QueryString": {}}, {"UriPath": {}}])
 
     def test_wafv2_customer_rule_groups(self):
         session_factory = self.replay_flight_data("test_wafv2_customer_rule_groups")
