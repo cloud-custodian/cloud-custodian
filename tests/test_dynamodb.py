@@ -508,10 +508,16 @@ class DynamodbTest(BaseTest):
         mock_cache.save.assert_not_called()
 
         # Covering __call__
-        r_no_exports = {"TableArn": "arn:aws:dynamodb:us-east-1:123:table/A", "c7n:ExportDescription": []}
+        r_no_exports = {
+            "TableArn": "arn:aws:dynamodb:us-east-1:123:table/A",
+            "c7n:ExportDescription": []
+        }
         self.assertFalse(filter(r_no_exports))
 
-        r_no_match = {"TableArn": "arn:aws:dynamodb:us-east-1:123:table/B", "c7n:ExportDescription": [{"ExportStatus": "IN_PROGRESS"}]}
+        r_no_match = {
+            "TableArn": "arn:aws:dynamodb:us-east-1:123:table/B",
+            "c7n:ExportDescription": [{"ExportStatus": "IN_PROGRESS"}]
+        }
         self.assertFalse(filter(r_no_match))
 
 
