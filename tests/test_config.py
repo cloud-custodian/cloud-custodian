@@ -127,8 +127,6 @@ class ConfigComplianceTest(BaseTest):
             'Resource is not compliant with policy:good-vol',
         )
 
-
-
     def test_compliance_config_id(self):
         """Test config-compliance matches resources using config_id (e.g. RoleId)."""
         factory = self.replay_flight_data('test_config_compliance_iam_role')
