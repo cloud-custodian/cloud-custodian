@@ -1,0 +1,29 @@
+{
+    "status_code": 200,
+    "data": {
+        "Role": {
+            "Path": "/",
+            "RoleName": "test-role",
+            "RoleId": "AROAEXAMPLEROLEID1",
+            "Arn": "arn:aws:iam::123456789012:role/test-role",
+            "CreateDate": {
+                "hour": 12,
+                "__class__": "datetime",
+                "month": 1,
+                "second": 0,
+                "microsecond": 0,
+                "year": 2024,
+                "day": 1,
+                "minute": 0
+            },
+            "AssumeRolePolicyDocument": "%7B%22Version%22%3A%222012-10-17%22%7D",
+            "MaxSessionDuration": 3600
+        },
+        "ResponseMetadata": {
+            "RetryAttempts": 0,
+            "HTTPStatusCode": 200,
+            "RequestId": "test-request-id-get-1",
+            "HTTPHeaders": {}
+        }
+    }
+}

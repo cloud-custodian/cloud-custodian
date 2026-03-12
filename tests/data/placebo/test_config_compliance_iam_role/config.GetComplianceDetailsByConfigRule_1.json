@@ -1,0 +1,54 @@
+{
+    "status_code": 200,
+    "data": {
+        "EvaluationResults": [
+            {
+                "Annotation": "Role is not compliant with policy:iam-role-check",
+                "EvaluationResultIdentifier": {
+                    "OrderingTimestamp": {
+                        "hour": 8,
+                        "__class__": "datetime",
+                        "month": 1,
+                        "second": 0,
+                        "microsecond": 0,
+                        "year": 2024,
+                        "day": 15,
+                        "minute": 0
+                    },
+                    "EvaluationResultQualifier": {
+                        "ResourceType": "AWS::IAM::Role",
+                        "ResourceId": "AROAEXAMPLEROLEID1",
+                        "ConfigRuleName": "custodian-iam-role-check"
+                    }
+                },
+                "ResultRecordedTime": {
+                    "hour": 8,
+                    "__class__": "datetime",
+                    "month": 1,
+                    "second": 30,
+                    "microsecond": 0,
+                    "year": 2024,
+                    "day": 15,
+                    "minute": 0
+                },
+                "ConfigRuleInvokedTime": {
+                    "hour": 8,
+                    "__class__": "datetime",
+                    "month": 1,
+                    "second": 28,
+                    "microsecond": 0,
+                    "year": 2024,
+                    "day": 15,
+                    "minute": 0
+                },
+                "ComplianceType": "NON_COMPLIANT"
+            }
+        ],
+        "ResponseMetadata": {
+            "RetryAttempts": 0,
+            "HTTPStatusCode": 200,
+            "RequestId": "test-request-id-2",
+            "HTTPHeaders": {}
+        }
+    }
+}

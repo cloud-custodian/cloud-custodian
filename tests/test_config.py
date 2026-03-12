@@ -128,6 +128,33 @@ class ConfigComplianceTest(BaseTest):
         )
 
 
+
+    def test_compliance_config_id(self):
+        """Test config-compliance matches resources using config_id (e.g. RoleId)."""
+        factory = self.replay_flight_data('test_config_compliance_iam_role')
+        p = self.load_policy(
+            {
+                'name': 'compliance-iam-role',
+                'resource': 'aws.iam-role',
+                'filters': [
+                    {
+                        'type': 'config-compliance',
+                        'rules': ['custodian-iam-role-check'],
+                    }
+                ],
+            },
+            session_factory=factory,
+        )
+        resources = p.run()
+        self.assertEqual(len(resources), 1)
+        self.assertEqual(resources[0]['RoleName'], 'test-role')
+        self.assertEqual(resources[0]['RoleId'], 'AROAEXAMPLEROLEID1')
+        self.assertEqual(
+            resources[0]['c7n:config-compliance'][0]['Annotation'],
+            'Role is not compliant with policy:iam-role-check',
+        )
+
+
 class ConfigRuleTest(BaseTest):
 
     def test_validate(self):
