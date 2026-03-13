@@ -1,0 +1,68 @@
+{
+    "status_code": 200,
+    "data": {
+        "ResponseMetadata": {},
+        "items": [
+            {
+                "id": "svc-04986b6c73adff27a",
+                "name": "test-service2",
+                "arn": "arn:aws:vpc-lattice:us-east-1:644160558196:service/svc-04986b6c73adff27a",
+                "createdAt": {
+                    "__class__": "datetime",
+                    "year": 2026,
+                    "month": 3,
+                    "day": 13,
+                    "hour": 14,
+                    "minute": 33,
+                    "second": 24,
+                    "microsecond": 546000
+                },
+                "lastUpdatedAt": {
+                    "__class__": "datetime",
+                    "year": 2026,
+                    "month": 3,
+                    "day": 13,
+                    "hour": 14,
+                    "minute": 33,
+                    "second": 24,
+                    "microsecond": 546000
+                },
+                "dnsEntry": {
+                    "domainName": "test-service2-04986b6c73adff27a.7d67968.vpc-lattice-svcs.us-east-1.on.aws",
+                    "hostedZoneId": "Z0681547Z82L3THDFSCZ"
+                },
+                "status": "ACTIVE"
+            },
+            {
+                "id": "svc-06088dbd0fa664482",
+                "name": "test-service",
+                "arn": "arn:aws:vpc-lattice:us-east-1:644160558196:service/svc-06088dbd0fa664482",
+                "createdAt": {
+                    "__class__": "datetime",
+                    "year": 2026,
+                    "month": 3,
+                    "day": 13,
+                    "hour": 14,
+                    "minute": 33,
+                    "second": 24,
+                    "microsecond": 351000
+                },
+                "lastUpdatedAt": {
+                    "__class__": "datetime",
+                    "year": 2026,
+                    "month": 3,
+                    "day": 13,
+                    "hour": 14,
+                    "minute": 33,
+                    "second": 24,
+                    "microsecond": 351000
+                },
+                "dnsEntry": {
+                    "domainName": "test-service-06088dbd0fa664482.7d67968.vpc-lattice-svcs.us-east-1.on.aws",
+                    "hostedZoneId": "Z0681547Z82L3THDFSCZ"
+                },
+                "status": "ACTIVE"
+            }
+        ]
+    }
+}

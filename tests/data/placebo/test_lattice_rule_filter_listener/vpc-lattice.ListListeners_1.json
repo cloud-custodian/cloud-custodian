@@ -1,0 +1,35 @@
+{
+    "status_code": 200,
+    "data": {
+        "ResponseMetadata": {},
+        "items": [
+            {
+                "arn": "arn:aws:vpc-lattice:us-east-1:644160558196:service/svc-0a1e45b6464d1be4d/listener/listener-0bab637e7fe24d8f1",
+                "id": "listener-0bab637e7fe24d8f1",
+                "name": "test-listener2",
+                "protocol": "HTTP",
+                "port": 80,
+                "createdAt": {
+                    "__class__": "datetime",
+                    "year": 2026,
+                    "month": 3,
+                    "day": 13,
+                    "hour": 15,
+                    "minute": 44,
+                    "second": 36,
+                    "microsecond": 542000
+                },
+                "lastUpdatedAt": {
+                    "__class__": "datetime",
+                    "year": 2026,
+                    "month": 3,
+                    "day": 13,
+                    "hour": 15,
+                    "minute": 44,
+                    "second": 36,
+                    "microsecond": 542000
+                }
+            }
+        ]
+    }
+}
