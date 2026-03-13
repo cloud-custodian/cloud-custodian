@@ -969,10 +969,8 @@ def merge_dict(a, b):
             else:
                 d[k] = [d[k]]
                 d[k].extend(v)
-        elif k in d and isinstance(v, (int, str, float, bool)):
-            d[k] = v
         else:
-            raise Exception(f"k={k}, {type(v)} and {type(d[k])} not conformable.")
+            d[k] = v
     return d
 
 

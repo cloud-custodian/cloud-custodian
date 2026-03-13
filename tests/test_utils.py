@@ -288,7 +288,7 @@ class UtilTest(BaseTest):
             }
         )
 
-    def test_merge_dict_exception(self):
+    def test_merge_dict_list_and_dict(self):
 
         a = {
             "a": ["bcd"]
@@ -296,8 +296,17 @@ class UtilTest(BaseTest):
         b = {
             "a": {"abc": 123}
         }
-        with self.assertRaises(Exception):
-            utils.merge_dict(a, b)
+        assert utils.merge_dict(a, b) == {"a": {"abc": 123}}
+
+    def test_merge_dict_tuple(self):
+
+        a = {
+            "a": ("bcd", "efg")
+        }
+        b = {
+            "a": ("abc", "def")
+        }
+        assert utils.merge_dict(a, b) == {"a": ("abc", "def")}
 
     def test_compare_dicts_using_sets(self):
         a = {
