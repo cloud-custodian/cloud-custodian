@@ -4521,6 +4521,47 @@ class TestModifySubnet(BaseTest):
         MapPublicIpOnLaunch = ModifiedSubnet["Subnets"][0]["MapPublicIpOnLaunch"]
         self.assertEqual(MapPublicIpOnLaunch, False)
 
+    def test_subnet_get_resources_missing_subnet_ids(self):
+        """Test that get_resources gracefully handles InvalidSubnetID.NotFound errors"""
+        factory = self.replay_flight_data("test_subnet_get_resources_missing")
+        p = self.load_policy({
+            'name': 'get-subnets',
+            'resource': 'aws.subnet'},
+            session_factory=factory)
+
+        missing_subnet_ids = ['subnet-123456', 'subnet-9876543']
+        valid_subnet_id = 'subnet-023db907202d61c00'
+        all_subnet_ids = missing_subnet_ids + [valid_subnet_id]
+
+        with self.capture_logging('custodian.resources.subnet',
+         level=logging.WARNING) as log_output:
+            resources = p.resource_manager.get_resources(all_subnet_ids)
+            # Graceful error handling
+            self.assertIsInstance(resources, list)
+
+            log_output_str = log_output.getvalue()
+            for sid in missing_subnet_ids:
+                self.assertIn(f"Subnet ID '{sid}' not found, skipping", log_output_str)
+
+    def test_subnet_get_resources_all_missing(self):
+        """Test that get_resources returns empty list when all subnet IDs are missing"""
+        factory = self.replay_flight_data("test_subnet_get_resources_all_missing")
+        p = self.load_policy({
+            'name': 'get-subnets',
+            'resource': 'aws.subnet'},
+            session_factory=factory)
+
+        missing_subnet_ids = ['subnet-123456', 'subnet-00000000']
+
+        with self.capture_logging('custodian.resources.subnet',
+         level=logging.WARNING) as log_output:
+            resources = p.resource_manager.get_resources(missing_subnet_ids)
+            self.assertEqual(resources, [])
+
+            log_output_str = log_output.getvalue()
+            for sid in missing_subnet_ids:
+                self.assertIn(f"Subnet ID '{sid}' not found, skipping", log_output_str)
+
 
 class TrafficMirror(BaseTest):
 
@@ -4729,6 +4770,43 @@ class TestVPCEndpointServiceConfiguration(BaseTest):
         resources = p.run()
         self.assertEqual(len(resources), 1)
         self.assertEqual(resources[0]['ServiceId'], 'vpce-svc-042193297e333714e')
+
+
+class TestGlueConnectionSubnetError(BaseTest):
+
+    def test_glue_connection_invalid_subnet_format(self):
+        factory = self.replay_flight_data("test_glue_connection_invalid_subnet")
+
+        p_basic = self.load_policy({
+            'name': 'glue-connection-basic',
+            'resource': 'glue-connection',
+            'filters': [
+                {'Name': 'test-connection-delete-me-jan-6'}
+            ]
+        }, session_factory=factory)
+
+        resources = p_basic.run()
+        self.assertEqual(len(resources), 1)
+        self.assertEqual(resources[0]['Name'], 'test-connection-delete-me-jan-6')
+
+        malformed_subnet_id = resources[0]['PhysicalConnectionRequirements']['SubnetId']
+        self.assertEqual(malformed_subnet_id,
+         "['subnet-068dfbf3f275a6ae8','subnet-0472841b16adf7476']")
+
+        p_subnet = self.load_policy({
+            'name': 'get-subnets',
+            'resource': 'aws.subnet'
+        }, session_factory=factory)
+
+        with self.capture_logging('custodian.resources.subnet',
+                                   level=logging.WARNING) as log_output:
+            result = p_subnet.resource_manager.get_resources([malformed_subnet_id])
+
+            self.assertIsInstance(result, list)
+
+            log_output_str = log_output.getvalue()
+
+            self.assertIn("not found", log_output_str.lower())
 
 
 class TestVpcEndpointServiceDetails(BaseTest):
