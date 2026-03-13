@@ -105,3 +105,152 @@ class Delete(MethodAction):
         return {
             'project': project,
             'managedZone': resource['name']}
+
+
+@DnsManagedZone.action_registry.register('enable-dnssec')
+class EnableDnssec(MethodAction):
+    """Enable DNSSEC on a public DNS managed zone.
+
+    Only applies to zones with ``visibility: public``. Zones that already have
+    DNSSEC enabled (``dnssecConfig.state == 'on'``) are skipped automatically.
+
+    :example:
+
+    .. code-block:: yaml
+
+            policies:
+              - name: gcp-dns-enable-dnssec
+                resource: gcp.dns-managed-zone
+                filters:
+                  - type: value
+                    key: visibility
+                    op: eq
+                    value: public
+                  - type: value
+                    key: dnssecConfig.state
+                    op: ne
+                    value: 'on'
+                actions:
+                  - type: enable-dnssec
+    """
+
+    schema = type_schema('enable-dnssec')
+    method_spec = {'op': 'patch'}
+    method_perm = 'update'
+    attr_filter = ('visibility', ('public',))
+
+    def get_resource_params(self, model, resource):
+        project = local_session(self.manager.session_factory).get_default_project()
+        return {
+            'project': project,
+            'managedZone': resource['name'],
+            'body': {
+                'dnssecConfig': {
+                    'state': 'on'
+                }
+            }
+        }
+
+
+@DnsManagedZone.action_registry.register('set-dnssec-key-specs')
+class SetDnssecKeySpecs(MethodAction):
+    """Set the DNSSEC default key specifications on a public DNS managed zone.
+
+    Configures the ``defaultKeySpecs`` (KSK and ZSK) used when DNSSEC is
+    enabled. This action must be applied while DNSSEC is still ``off`` —
+    key specs become immutable once DNSSEC is turned on. Use the
+    ``enable-dnssec`` action afterwards to activate DNSSEC.
+
+    Valid ``keyType`` values: ``keySigning``, ``zoneSigning``
+
+    Valid ``algorithm`` values: ``rsasha1``, ``rsasha256``, ``rsasha512``,
+    ``ecdsap256sha256``, ``ecdsap384sha384``
+
+    :example:
+
+    .. code-block:: yaml
+
+            policies:
+              - name: gcp-dns-set-dnssec-key-specs
+                resource: gcp.dns-managed-zone
+                filters:
+                  - type: value
+                    key: visibility
+                    op: eq
+                    value: public
+                  - type: value
+                    key: dnssecConfig.state
+                    op: ne
+                    value: 'on'
+                actions:
+                  - type: set-dnssec-key-specs
+                    defaultKeySpecs:
+                      - keyType: keySigning
+                        algorithm: rsasha256
+                        keyLength: 2048
+                      - keyType: zoneSigning
+                        algorithm: rsasha256
+                        keyLength: 1024
+    """
+
+    schema = type_schema(
+        'set-dnssec-key-specs',
+        required=['defaultKeySpecs'],
+        **{
+            'defaultKeySpecs': {
+                'type': 'array',
+                'minItems': 1,
+                'items': {
+                    'type': 'object',
+                    'additionalProperties': False,
+                    'required': ['keyType', 'algorithm', 'keyLength'],
+                    'properties': {
+                        'keyType': {
+                            'type': 'string',
+                            'enum': ['keySigning', 'zoneSigning'],
+                        },
+                        'algorithm': {
+                            'type': 'string',
+                            'enum': [
+                                'rsasha1',
+                                'rsasha256',
+                                'rsasha512',
+                                'ecdsap256sha256',
+                                'ecdsap384sha384',
+                            ],
+                        },
+                        'keyLength': {
+                            'type': 'integer',
+                        },
+                    },
+                },
+            }
+        }
+    )
+    method_spec = {'op': 'patch'}
+    method_perm = 'update'
+    attr_filter = ('visibility', ('public',))
+
+    def get_resource_params(self, model, resource):
+        project = local_session(self.manager.session_factory).get_default_project()
+        return {
+            'project': project,
+            'managedZone': resource['name'],
+            'body': {
+                'dnssecConfig': {
+                    'defaultKeySpecs': self.data['defaultKeySpecs'],
+                }
+            }
+        }
+
+    def handle_resource_error(self, client, model, resource, op_name, params, error):
+        if error.resp.status == 400 and b'immutableField' in error.content:
+            self.log.warning(
+                'policy:%s action:%s skipping zone %s - '
+                'defaultKeySpecs cannot be modified while DNSSEC is enabled',
+                self.manager.ctx.policy.name,
+                self.type,
+                resource['name'],
+            )
+            return error
+        raise error
