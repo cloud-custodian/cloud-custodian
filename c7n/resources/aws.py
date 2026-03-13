@@ -733,6 +733,17 @@ class S3Output(BlobOutput):
                 'ServerSideEncryption': 'AES256'})
 
 
+class AwsValuesFrom(ValueFrom):
+    """Support provider specific data sources.
+    """
+
+
+class AwsValueFilter(Value):
+
+    value_resolver_class = AwsValuesFrom
+
+
+
 @clouds.register('aws')
 class AWS(Provider):
 
@@ -761,6 +772,11 @@ class AWS(Provider):
             options.assume_role,
             options.external_id,
             options.session_policy)
+
+    @staticmethod
+    def initialize_resource(resource_class):
+        """static method to initialize provider specific filter/actions"""
+        resource_class.filter_registry.register('value', AwsValueFilter)
 
     def initialize_policies(self, policy_collection, options):
         """Return a set of policies targetted to the given regions.
