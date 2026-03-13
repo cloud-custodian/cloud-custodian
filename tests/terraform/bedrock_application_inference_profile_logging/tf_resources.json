@@ -1,0 +1,117 @@
+{
+    "pytest-terraform": 1,
+    "outputs": {},
+    "resources": {
+        "aws_bedrock_inference_profile": {
+            "test_profile": {
+                "arn": "arn:aws:bedrock:us-east-1:644160558196:application-inference-profile/g9h5yub6xmxo",
+                "created_at": "2026-03-10T20:28:26Z",
+                "description": null,
+                "id": "g9h5yub6xmxo",
+                "model_source": [
+                    {
+                        "copy_from": "arn:aws:bedrock:us-east-1::inference-profile/global.amazon.nova-2-lite-v1:0"
+                    }
+                ],
+                "models": [
+                    {
+                        "model_arn": "arn:aws:bedrock:::foundation-model/amazon.nova-2-lite-v1:0"
+                    },
+                    {
+                        "model_arn": "arn:aws:bedrock:us-east-1::foundation-model/amazon.nova-2-lite-v1:0"
+                    }
+                ],
+                "name": "c7n-test-profile-default",
+                "region": "us-east-1",
+                "status": "ACTIVE",
+                "tags": null,
+                "tags_all": {},
+                "timeouts": null,
+                "type": "APPLICATION",
+                "updated_at": "2026-03-10T20:28:26Z"
+            }
+        },
+        "aws_bedrock_model_invocation_logging_configuration": {
+            "enabled": {
+                "id": "us-east-1",
+                "logging_config": [
+                    {
+                        "cloudwatch_config": [],
+                        "embedding_data_delivery_enabled": false,
+                        "image_data_delivery_enabled": false,
+                        "s3_config": [
+                            {
+                                "bucket_name": "c7n-bedrock-model-invocation-logging-default",
+                                "key_prefix": "bedrock/model-invocation-logging/"
+                            }
+                        ],
+                        "text_data_delivery_enabled": true,
+                        "video_data_delivery_enabled": true
+                    }
+                ],
+                "region": "us-east-1"
+            }
+        },
+        "aws_s3_bucket": {
+            "logging": {
+                "acceleration_status": "",
+                "acl": null,
+                "arn": "arn:aws:s3:::c7n-bedrock-model-invocation-logging-default",
+                "bucket": "c7n-bedrock-model-invocation-logging-default",
+                "bucket_domain_name": "c7n-bedrock-model-invocation-logging-default.s3.amazonaws.com",
+                "bucket_prefix": "",
+                "bucket_region": "us-east-1",
+                "bucket_regional_domain_name": "c7n-bedrock-model-invocation-logging-default.s3.us-east-1.amazonaws.com",
+                "cors_rule": [],
+                "force_destroy": true,
+                "grant": [
+                    {
+                        "id": "36b28bc69a41a1f44ff15f3d6bbcf2f5fd96d6cd49206458604c15ad38ebdf65",
+                        "permissions": [
+                            "FULL_CONTROL"
+                        ],
+                        "type": "CanonicalUser",
+                        "uri": ""
+                    }
+                ],
+                "hosted_zone_id": "Z3AQBSTGFYJSTF",
+                "id": "c7n-bedrock-model-invocation-logging-default",
+                "lifecycle_rule": [],
+                "logging": [],
+                "object_lock_configuration": [],
+                "object_lock_enabled": false,
+                "policy": "",
+                "region": "us-east-1",
+                "replication_configuration": [],
+                "request_payer": "BucketOwner",
+                "server_side_encryption_configuration": [
+                    {
+                        "rule": [
+                            {
+                                "apply_server_side_encryption_by_default": [
+                                    {
+                                        "kms_master_key_id": "",
+                                        "sse_algorithm": "AES256"
+                                    }
+                                ],
+                                "bucket_key_enabled": false
+                            }
+                        ]
+                    }
+                ],
+                "tags": null,
+                "tags_all": {},
+                "timeouts": null,
+                "versioning": [
+                    {
+                        "enabled": false,
+                        "mfa_delete": false
+                    }
+                ],
+                "website": [],
+                "website_domain": null,
+                "website_endpoint": null
+            }
+        }
+    }
+}
