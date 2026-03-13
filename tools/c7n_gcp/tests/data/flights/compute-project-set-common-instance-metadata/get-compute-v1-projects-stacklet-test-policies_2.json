@@ -1,0 +1,285 @@
+{
+  "headers": {
+    "content-type": "application/json; charset=UTF-8",
+    "vary": "Origin, X-Origin, Referer",
+    "date": "Thu, 12 Mar 2026 12:09:56 GMT",
+    "server": "ESF",
+    "x-xss-protection": "0",
+    "x-frame-options": "SAMEORIGIN",
+    "x-content-type-options": "nosniff",
+    "alt-svc": "h3=\":443\"; ma=2592000,h3-29=\":443\"; ma=2592000",
+    "transfer-encoding": "chunked",
+    "status": "200",
+    "content-length": "5021",
+    "-content-encoding": "gzip",
+    "content-location": "https://compute.googleapis.com/compute/v1/projects/stacklet-test-policies?alt=json"
+  },
+  "body": {
+    "kind": "compute#project",
+    "id": "3099843102246789847",
+    "creationTimestamp": "2024-06-17T18:00:40.463-07:00",
+    "name": "stacklet-test-policies",
+    "commonInstanceMetadata": {
+      "kind": "compute#metadata",
+      "fingerprint": "uIRm46oOI3I=",
+      "items": [
+        {
+          "key": "enable-oslogin",
+          "value": "true"
+        },
+        {
+          "key": "c7n-test-key",
+          "value": "initial-value"
+        }
+      ]
+    },
+    "quotas": [
+      {
+        "metric": "SNAPSHOTS",
+        "limit": 1000,
+        "usage": 1
+      },
+      {
+        "metric": "NETWORKS",
+        "limit": 5,
+        "usage": 1
+      },
+      {
+        "metric": "FIREWALLS",
+        "limit": 100,
+        "usage": 4
+      },
+      {
+        "metric": "IMAGES",
+        "limit": 100,
+        "usage": 0
+      },
+      {
+        "metric": "STATIC_ADDRESSES",
+        "limit": 8,
+        "usage": 0
+      },
+      {
+        "metric": "ROUTES",
+        "limit": 200,
+        "usage": 0
+      },
+      {
+        "metric": "FORWARDING_RULES",
+        "limit": 15,
+        "usage": 0
+      },
+      {
+        "metric": "TARGET_POOLS",
+        "limit": 50,
+        "usage": 0
+      },
+      {
+        "metric": "HEALTH_CHECKS",
+        "limit": 75,
+        "usage": 0
+      },
+      {
+        "metric": "IN_USE_ADDRESSES",
+        "limit": 8,
+        "usage": 0
+      },
+      {
+        "metric": "TARGET_INSTANCES",
+        "limit": 50,
+        "usage": 0
+      },
+      {
+        "metric": "TARGET_HTTP_PROXIES",
+        "limit": 10,
+        "usage": 0
+      },
+      {
+        "metric": "URL_MAPS",
+        "limit": 10,
+        "usage": 0
+      },
+      {
+        "metric": "BACKEND_SERVICES",
+        "limit": 50,
+        "usage": 0
+      },
+      {
+        "metric": "INSTANCE_TEMPLATES",
+        "limit": 100,
+        "usage": 0
+      },
+      {
+        "metric": "TARGET_VPN_GATEWAYS",
+        "limit": 5,
+        "usage": 0
+      },
+      {
+        "metric": "VPN_TUNNELS",
+        "limit": 10,
+        "usage": 0
+      },
+      {
+        "metric": "BACKEND_BUCKETS",
+        "limit": 3,
+        "usage": 0
+      },
+      {
+        "metric": "ROUTERS",
+        "limit": 10,
+        "usage": 0
+      },
+      {
+        "metric": "TARGET_SSL_PROXIES",
+        "limit": 10,
+        "usage": 0
+      },
+      {
+        "metric": "TARGET_HTTPS_PROXIES",
+        "limit": 10,
+        "usage": 0
+      },
+      {
+        "metric": "SSL_CERTIFICATES",
+        "limit": 10,
+        "usage": 1
+      },
+      {
+        "metric": "SUBNETWORKS",
+        "limit": 100,
+        "usage": 0
+      },
+      {
+        "metric": "TARGET_TCP_PROXIES",
+        "limit": 10,
+        "usage": 0
+      },
+      {
+        "metric": "CPUS_ALL_REGIONS",
+        "limit": 32,
+        "usage": 1
+      },
+      {
+        "metric": "SECURITY_POLICIES",
+        "limit": 10,
+        "usage": 0
+      },
+      {
+        "metric": "SECURITY_POLICY_RULES",
+        "limit": 100,
+        "usage": 0
+      },
+      {
+        "metric": "XPN_SERVICE_PROJECTS",
+        "limit": 1000,
+        "usage": 0
+      },
+      {
+        "metric": "PACKET_MIRRORINGS",
+        "limit": 20,
+        "usage": 0
+      },
+      {
+        "metric": "NETWORK_ENDPOINT_GROUPS",
+        "limit": 100,
+        "usage": 0
+      },
+      {
+        "metric": "INTERCONNECTS",
+        "limit": 6,
+        "usage": 0
+      },
+      {
+        "metric": "SSL_POLICIES",
+        "limit": 10,
+        "usage": 1
+      },
+      {
+        "metric": "GLOBAL_INTERNAL_ADDRESSES",
+        "limit": 5000,
+        "usage": 1
+      },
+      {
+        "metric": "VPN_GATEWAYS",
+        "limit": 5,
+        "usage": 0
+      },
+      {
+        "metric": "MACHINE_IMAGES",
+        "limit": 100,
+        "usage": 0
+      },
+      {
+        "metric": "SECURITY_POLICY_CEVAL_RULES",
+        "limit": 20,
+        "usage": 0
+      },
+      {
+        "metric": "GPUS_ALL_REGIONS",
+        "limit": 0,
+        "usage": 0
+      },
+      {
+        "metric": "EXTERNAL_VPN_GATEWAYS",
+        "limit": 5,
+        "usage": 0
+      },
+      {
+        "metric": "PUBLIC_ADVERTISED_PREFIXES",
+        "limit": 1,
+        "usage": 0
+      },
+      {
+        "metric": "PUBLIC_DELEGATED_PREFIXES",
+        "limit": 10,
+        "usage": 0
+      },
+      {
+        "metric": "STATIC_BYOIP_ADDRESSES",
+        "limit": 128,
+        "usage": 0
+      },
+      {
+        "metric": "NETWORK_FIREWALL_POLICIES",
+        "limit": 10,
+        "usage": 0
+      },
+      {
+        "metric": "INTERNAL_TRAFFIC_DIRECTOR_FORWARDING_RULES",
+        "limit": 15,
+        "usage": 0
+      },
+      {
+        "metric": "GLOBAL_EXTERNAL_MANAGED_FORWARDING_RULES",
+        "limit": 15,
+        "usage": 0
+      },
+      {
+        "metric": "GLOBAL_INTERNAL_MANAGED_BACKEND_SERVICES",
+        "limit": 50,
+        "usage": 0
+      },
+      {
+        "metric": "GLOBAL_EXTERNAL_MANAGED_BACKEND_SERVICES",
+        "limit": 50,
+        "usage": 0
+      },
+      {
+        "metric": "GLOBAL_EXTERNAL_PROXY_LB_BACKEND_SERVICES",
+        "limit": 50,
+        "usage": 0
+      },
+      {
+        "metric": "GLOBAL_INTERNAL_TRAFFIC_DIRECTOR_BACKEND_SERVICES",
+        "limit": 250,
+        "usage": 0
+      }
+    ],
+    "selfLink": "https://www.googleapis.com/compute/v1/projects/stacklet-test-policies",
+    "defaultServiceAccount": "859150599087-compute@developer.gserviceaccount.com",
+    "xpnProjectStatus": "UNSPECIFIED_XPN_PROJECT_STATUS",
+    "defaultNetworkTier": "PREMIUM",
+    "vmDnsSetting": "ZONAL_ONLY",
+    "cloudArmorTier": "CA_STANDARD"
+  }
+}

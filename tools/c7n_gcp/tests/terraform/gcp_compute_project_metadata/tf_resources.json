@@ -1,0 +1,10 @@
+{
+    "pytest-terraform": 1,
+    "outputs": {
+        "project_id": {
+            "value": "stacklet-test-policies",
+            "type": "string"
+        }
+    },
+    "resources": {}
+}

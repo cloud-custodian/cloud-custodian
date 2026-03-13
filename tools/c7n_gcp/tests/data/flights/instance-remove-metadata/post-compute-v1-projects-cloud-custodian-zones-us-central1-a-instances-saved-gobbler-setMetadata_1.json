@@ -1,0 +1,31 @@
+{
+  "headers": {
+    "content-type": "application/json; charset=UTF-8",
+    "vary": "Origin, X-Origin, Referer",
+    "date": "Thu, 12 Mar 2026 13:43:26 GMT",
+    "server": "ESF",
+    "x-xss-protection": "0",
+    "x-frame-options": "SAMEORIGIN",
+    "x-content-type-options": "nosniff",
+    "alt-svc": "h3=\":443\"; ma=2592000,h3-29=\":443\"; ma=2592000",
+    "transfer-encoding": "chunked",
+    "status": "200",
+    "content-length": "786",
+    "-content-encoding": "gzip"
+  },
+  "body": {
+    "kind": "compute#operation",
+    "id": "3017645489825741841",
+    "name": "operation-1773323006197-64cd3efdb3eb9-07310245-47aa10f8",
+    "zone": "https://www.googleapis.com/compute/v1/projects/cloud-custodian/zones/us-central1-a",
+    "operationType": "setMetadata",
+    "targetLink": "https://www.googleapis.com/compute/v1/projects/cloud-custodian/zones/us-central1-a/instances/saved-gobbler",
+    "targetId": "3926313570108668980",
+    "status": "RUNNING",
+    "user": "markos@sixfeetup.com",
+    "progress": 0,
+    "insertTime": "2026-03-12T06:43:26.432-07:00",
+    "startTime": "2026-03-12T06:43:26.442-07:00",
+    "selfLink": "https://www.googleapis.com/compute/v1/projects/cloud-custodian/zones/us-central1-a/operations/operation-1773323006197-64cd3efdb3eb9-07310245-47aa10f8"
+  }
+}
