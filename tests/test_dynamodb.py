@@ -443,6 +443,83 @@ class DynamodbTest(BaseTest):
         self.assertTrue(stream_field)
         self.assertEqual("NEW_IMAGE", stream_type)
 
+    def test_export_description_filter(self):
+        session_factory = self.replay_flight_data("test_dynamodb_export_description_filter")
+        p = self.load_policy(
+            {
+                "name": "dynamodb-exports-s3-owner",
+                "resource": "dynamodb-table",
+                "filters": [
+                    {
+                        "type": "export-description",
+                        "key": "ExportStatus",
+                        "op": "in",
+                        "value": ["COMPLETED"]
+                    }
+                ]
+            },
+            session_factory=session_factory,
+        )
+        resources = p.run()
+        self.assertEqual(len(resources), 1)
+        self.assertTrue("c7n:ExportDescription" in resources[0])
+
+        exports = resources[0]["c7n:ExportDescription"]
+        self.assertEqual(len(exports), 2)
+
+    def test_export_description_augment_skip_and_filter(self):
+        # Mock-based tests for code coverage
+        session_factory = self.replay_flight_data("test_dynamodb_export_description_filter")
+        p = self.load_policy(
+            {
+                "name": "dynamodb-exports-augment-branches",
+                "resource": "dynamodb-table",
+                "filters": [
+                    {
+                        "type": "export-description",
+                        "key": "ExportStatus",
+                        "op": "in",
+                        "value": ["COMPLETED"]
+                    }
+                ]
+            },
+            session_factory=session_factory,
+        )
+
+        filter = p.resource_manager.filters[0]
+
+        # Already annotated - skip augment
+        original = [{"ExportStatus": "COMPLETED"}]
+        annotated = [
+            {"TableArn": "arn:aws:dynamodb:us-east-1:123:table/A",
+            "c7n:ExportDescription": original}
+        ]
+        filter.augment(annotated)
+        self.assertIs(annotated[0]["c7n:ExportDescription"], original)
+
+        # Cache hit
+        mock_cache = MagicMock()
+        mock_cache.get.return_value = [{"ExportStatus": "COMPLETED"}]
+        filter.manager._cache = mock_cache
+        cached = [{"TableArn": "arn:aws:dynamodb:us-east-1:123:table/B"}]
+        filter.augment(cached)
+        self.assertEqual(cached[0]["c7n:ExportDescription"], [{"ExportStatus": "COMPLETED"}])
+        mock_cache.get.assert_called_once()
+        mock_cache.save.assert_not_called()
+
+        # Covering __call__
+        r_no_exports = {
+            "TableArn": "arn:aws:dynamodb:us-east-1:123:table/A",
+            "c7n:ExportDescription": []
+        }
+        self.assertFalse(filter(r_no_exports))
+
+        r_no_match = {
+            "TableArn": "arn:aws:dynamodb:us-east-1:123:table/B",
+            "c7n:ExportDescription": [{"ExportStatus": "IN_PROGRESS"}]
+        }
+        self.assertFalse(filter(r_no_match))
+
 
 class DynamoDbAccelerator(BaseTest):
 
