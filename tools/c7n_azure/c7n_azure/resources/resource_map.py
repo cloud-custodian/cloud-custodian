@@ -17,6 +17,7 @@ ResourceMap = {
     "azure.backup-vault": "c7n_azure.resources.backup_vault.BackupVault",
     "azure.bastion-host": "c7n_azure.resources.bastion_host.AzureBastionHost",
     "azure.batch": "c7n_azure.resources.batch.Batch",
+    "azure.budget": "c7n_azure.resources.budget.Budget",
     "azure.cdn-custom-domain": "c7n_azure.resources.cdn_custom_domain.CdnCustomDomain",
     "azure.cdn-endpoint": "c7n_azure.resources.cdn_endpoint.CdnEndpoint",
     "azure.cdnprofile": "c7n_azure.resources.cdn.CdnProfile",
