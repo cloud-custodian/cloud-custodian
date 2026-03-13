@@ -167,6 +167,84 @@ class AccountOrganization(ValueFilter):
         return []
 
 
+@filters.register('alternate-contact')
+class AccountAlternateContact(ValueFilter):
+    """Check AWS account alternate contact configuration.
+
+    :example:
+
+    Determine if a security alternate contact is not configured.
+
+    .. code-block:: yaml
+
+      policies:
+        - name: audit-security-contact
+          resource: aws.account
+          filters:
+            - type: alternate-contact
+              contact-type: SECURITY
+              state: missing
+    """
+
+    schema = type_schema(
+        'alternate-contact',
+        rinherit=ValueFilter.schema,
+        required=['contact-type'],
+        **{
+            'contact-type': {
+                'type': 'string',
+                'enum': ['BILLING', 'OPERATIONS', 'SECURITY']},
+            'state': {
+                'type': 'string',
+                'enum': ['present', 'missing']}})
+    schema_alias = False
+    permissions = ('account:GetAlternateContact',)
+    annotation_key = 'c7n:alternate-contact'
+    annotate = False
+    required_keys = set()
+
+    def process(self, resources, event=None):
+        account = resources[0]
+        contact_type = self.data['contact-type']
+        state = self.data.get('state', 'present')
+
+        contacts = account.setdefault(self.annotation_key, {})
+        if contact_type not in contacts:
+            contacts[contact_type] = self.get_contact(contact_type)
+        contact = contacts[contact_type]
+
+        if contact is False:
+            return []
+        if contact is None:
+            return resources if state == 'missing' else []
+        if state == 'missing':
+            return []
+
+        # If no value filter keys are specified, treat any configured contact as a match.
+        value_match = {'key', 'value'}.difference(self.data) or self.match(contact)
+        if value_match:
+            return resources
+        return []
+
+    def get_contact(self, contact_type):
+        client = local_session(self.manager.session_factory).client('account')
+        try:
+            response = client.get_alternate_contact(
+                AlternateContactType=contact_type)
+            return response.get('AlternateContact')
+        except client.exceptions.ResourceNotFoundException:
+            return None
+        except client.exceptions.AccessDeniedException as e:
+            self.log.warning(
+                'alternate-contact filter cannot query %s contact: %s',
+                contact_type, e)
+        except ClientError as e:
+            self.log.warning(
+                'alternate-contact filter error querying %s contact: %s',
+                contact_type, e)
+        return False
+
+
 @filters.register('check-macie')
 class MacieEnabled(ValueFilter):
     """Check status of macie v2 in the account.
