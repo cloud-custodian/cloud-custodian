@@ -219,6 +219,11 @@ class ApiKey(QueryResourceManager):
         default_report_fields = ['name', 'displayName', 'createTime', 'updateTime']
         asset_type = "apikeys.googleapis.com/projects.locations.keys"
 
+        @staticmethod
+        def get(client, resource_info):
+            return client.execute_query(
+                'get', {'name': resource_info['resourceName']})
+
 
 @ApiKey.filter_registry.register('time-range')
 class ApiKeyTimeRangeFilter(TimeRangeFilter):
