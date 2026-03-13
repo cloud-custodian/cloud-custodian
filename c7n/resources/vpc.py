@@ -2087,6 +2087,88 @@ class InterfaceVpcFilter(net_filters.VpcFilter):
     RelatedIdsExpression = "VpcId"
 
 
+@NetworkInterface.filter_registry.register('traffic-mirror')
+class NetworkTrafficMirror(ValueFilter):
+    """Filter network interfaces for traffic mirror session"""
+    schema = type_schema(
+        'traffic-mirror', state={'type': 'boolean'}, rinherit=ValueFilter.schema)
+    annotation_key = 'c7n:traffic-mirrors'
+    permissions = ('ec2:DescribeTrafficMirrorSessions',)
+
+    def process(self, resources):
+        state = self.data.get('state', True)
+        client = local_session(self.manager.session_factory).client('ec2')
+        results = []
+        for resource_set in chunks(resources, 50):
+            resource_map = {r['NetworkInterfaceId']: r for r in resource_set}
+            for session in self.manager.retry(
+                    client.describe_traffic_mirror_sessions,
+                    Filters=[{
+                        'Name': 'network-interface-id',
+                        'Values': list(resource_map)}]).get(
+                            'TrafficMirrorSessions', ()):
+                resource_map[session['NetworkInterfaceId']].setdefault(
+                    self.annotation_key).append(session)
+
+            if state:
+                vf = ValueFilter(self.data)
+                results.extend([
+                    r for r in resource_map.values() if self.annotation_key in r and
+                    vf.process([r[self.annotation_key]])])
+            else:
+                results.extend([
+                    r for r in resource_map.values() if self.annotation_key not in r])
+        return results
+
+
+@NetworkInterface.action_registry.register('set-traffic-mirror')
+class SetTrafficMirror(BaseAction):
+    """
+    Create/Disable a traffic mirror session
+    """
+    schema = type_schema(
+        'set-traffic-mirror',
+        state={'enum': ['enabled', 'absent']},
+        target={'type': 'string', 'pattern': '^tmt-$'},
+        filter={'type': 'string', 'pattern': '^tmf-$'},
+        tags={'type': 'object'},
+    )
+
+    permissions = (
+        'ec2:CreateTrafficMirrorSession',
+        'ec2:DeleteTrafficMirrorSession')
+
+    def process(self, resources):
+        client = local_session(self.manager.session_factory).client('ec2')
+        state = self.data.get('state', 'enabled') == 'enabled' and True or False
+
+        if state is False:
+            return self.disable_traffic_mirror(client, resources)
+
+        for r in resources:
+            params = dict(
+                NetworkInterfaceId=r['NetworkInterfaceId'],
+                TrafficMirrorTargetId=self.data['target'],
+                TrafficMirrorFilterId=self.data['filter'])
+            params['Description'] = self.manager.data.get(
+                'title', self.manager.get('name'))
+            params['TagSpecifications'] = [
+                {'Key': 'Name', 'Value': self.manager.data['name']},
+                {'Key': 'Creator', 'Value': 'CloudCustodian'}
+            ]
+            self.manager.retry(
+                client.create_traffic_mirror_session, **params)
+
+    def disable_traffic_mirror(self, client, resources):
+        ntm = NetworkTrafficMirror({}, self.manager)
+        resources = ntm.process(resources)
+        for r in resources:
+            for session in r[ntm.annotation_key]:
+                self.manager.retry(
+                    client.delete_traffic_mirror_session,
+                    TrafficMirrorSessionId=session['TrafficMirrorSessionId'])
+
+
 @NetworkInterface.action_registry.register('modify-security-groups')
 class InterfaceModifyVpcSecurityGroups(ModifyVpcSecurityGroupsAction):
     """Remove security groups from an interface.
