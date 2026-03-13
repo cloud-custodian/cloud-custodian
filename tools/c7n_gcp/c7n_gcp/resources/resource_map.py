@@ -89,6 +89,8 @@ ResourceMap = {
     "gcp.log-project-sink": "c7n_gcp.resources.logging.LogProjectSink",
     "gcp.ml-job": "c7n_gcp.resources.mlengine.MLJob",
     "gcp.ml-model": "c7n_gcp.resources.mlengine.MLModel",
+    "gcp.monitoring-notification-channel": (
+        "c7n_gcp.resources.monitoring.MonitoringNotificationChannel"),
     "gcp.notebook": "c7n_gcp.resources.notebook.NotebookInstance",
     "gcp.organization": "c7n_gcp.resources.resourcemanager.Organization",
     "gcp.patch-deployment": "c7n_gcp.resources.osconfig.PatchDeployment",
