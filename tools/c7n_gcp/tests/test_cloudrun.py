@@ -2,6 +2,7 @@
 # SPDX-License-Identifier: Apache-2.0
 
 from gcp_common import BaseTest
+from testing import effective_project_id
 from c7n.utils import yaml_load
 
 
@@ -34,7 +35,7 @@ class RunServiceTest(BaseTest):
         assert len(resources) == 1
 
     def test_cloudrun_filter_iam_query(self):
-        project_id = 'cloud-custodian'
+        project_id = effective_project_id()
         factory = self.replay_flight_data('gcp-cloud-run-service-filter-iam', project_id=project_id)
         p = self.load_policy({
             'name': 'gcp-cloud-run-service-filter-iam',

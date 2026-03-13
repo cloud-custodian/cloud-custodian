@@ -7,6 +7,7 @@ from gcp_common import BaseTest, event_data
 from googleapiclient.errors import HttpError
 from dateutil import parser
 from freezegun import freeze_time
+from testing import effective_project_id
 
 
 class SqlInstanceTest(BaseTest):
@@ -29,7 +30,7 @@ class SqlInstanceTest(BaseTest):
         }
 
     def test_sqlinstance_query(self):
-        project_id = 'cloud-custodian'
+        project_id = effective_project_id()
         factory = self.replay_flight_data('sqlinstance-query', project_id=project_id)
         p = self.load_policy(
             {'name': 'all-sqlinstances',
@@ -40,7 +41,7 @@ class SqlInstanceTest(BaseTest):
         self.assertEqual(
             p.resource_manager.get_urns(resources),
             [
-                "gcp:sqladmin:us-central1:cloud-custodian:instance/brenttest-6",
+                f"gcp:sqladmin:us-central1:{project_id}:instance/brenttest-6",
             ],
         )
 
@@ -84,7 +85,7 @@ class SqlInstanceTest(BaseTest):
             self.assertEqual(len(resources), 1)
 
     def test_stop_instance(self):
-        project_id = 'cloud-custodian'
+        project_id = effective_project_id()
         instance_name = 'custodiansqltest'
         factory = self.replay_flight_data('sqlinstance-stop', project_id=project_id)
         p = self.load_policy(
@@ -104,7 +105,7 @@ class SqlInstanceTest(BaseTest):
         self.assertEqual(result['settings']['activationPolicy'], 'NEVER')
 
     def test_start_instance(self):
-        project_id = 'cloud-custodian'
+        project_id = effective_project_id()
         instance_name = 'custodiantestsql'
         factory = self.replay_flight_data('sqlinstance-start', project_id=project_id)
         p = self.load_policy(
@@ -142,7 +143,7 @@ class SqlInstanceTest(BaseTest):
         self.assertEqual(result['settings']['activationPolicy'], 'ALWAYS')
 
     def test_delete_instance(self):
-        project_id = 'cloud-custodian'
+        project_id = effective_project_id()
         instance_name = 'brenttest-5'
         factory = self.replay_flight_data('sqlinstance-terminate', project_id=project_id)
 
@@ -166,7 +167,7 @@ class SqlInstanceTest(BaseTest):
             self.assertTrue("does not exist" in str(e))
 
     def test_enable_deletion_instance(self):
-        project_id = 'cloud-custodian'
+        project_id = effective_project_id()
         instance_name = 'custodiantestsql'
         factory = self.replay_flight_data('sqlinstance-enable-deletion', project_id=project_id)
         p = self.load_policy(
@@ -218,7 +219,7 @@ class SqlInstanceTest(BaseTest):
         self.assertEqual(len(resources), 1)
 
     def test_set_high_availability(self):
-        project_id = 'cloud-custodian'
+        project_id = effective_project_id()
         instance_name = 'custodiantestsql'
         factory = self.replay_flight_data('sqlinstance-high-availability', project_id=project_id)
         p = self.load_policy(
@@ -253,7 +254,7 @@ class SqlInstanceTest(BaseTest):
 class SqlUserTest(BaseTest):
 
     def test_sqluser_query(self):
-        project_id = 'cloud-custodian'
+        project_id = effective_project_id()
         session_factory = self.replay_flight_data(
             'sqluser-query', project_id=project_id)
 
@@ -283,7 +284,7 @@ class SqlUserTest(BaseTest):
         self.assertEqual(
             policy.resource_manager.get_urns(users),
             [
-                "gcp:sqladmin:us-central1:cloud-custodian:user/custodian-postgres/postgres",
+                f"gcp:sqladmin:us-central1:{project_id}:user/custodian-postgres/postgres",
             ],
         )
 
@@ -293,7 +294,7 @@ class SqlBackupRunTest(BaseTest):
     def test_sqlbackuprun_query(self):
         backup_run_id = '1555592400197'
         instance_name = 'custodian-postgres'
-        project_id = 'cloud-custodian'
+        project_id = effective_project_id()
         session_factory = self.replay_flight_data('sqlbackuprun-query', project_id=project_id)
 
         policy = self.load_policy(
@@ -309,14 +310,14 @@ class SqlBackupRunTest(BaseTest):
         self.assertEqual(
             policy.resource_manager.get_urns(resources),
             [
-                "gcp:sqladmin:us-central1:cloud-custodian:backup-run/custodian-postgres/1555592400197",  # noqa: E501
+                f"gcp:sqladmin:us-central1:{project_id}:backup-run/custodian-postgres/1555592400197",  # noqa: E501
             ],
         )
 
     def test_sqlbackuprun_get(self):
         backup_run_id = '1557489381417'
         instance_name = 'custodian-postgres'
-        project_id = 'cloud-custodian'
+        project_id = effective_project_id()
         session_factory = self.replay_flight_data('sqlbackuprun-get', project_id=project_id)
 
         policy = self.load_policy(
@@ -338,7 +339,7 @@ class SqlBackupRunTest(BaseTest):
         self.assertEqual(
             policy.resource_manager.get_urns(resources),
             [
-                "gcp:sqladmin:us-central1:cloud-custodian:backup-run/custodian-postgres/1557489381417",  # noqa: E501
+                f"gcp:sqladmin:us-central1:{project_id}:backup-run/custodian-postgres/1557489381417",  # noqa: E501
             ],
         )
 
@@ -362,7 +363,7 @@ class SqlSslCertTest(BaseTest):
     def test_sqlsslcet_query(self):
         ssl_cert_sha = '62a43e710693b34d5fdb34911a656fd7a3b76cc7'
         instance_name = 'custodian-postgres'
-        project_id = 'cloud-custodian'
+        project_id = effective_project_id()
         session_factory = self.replay_flight_data('sqlsslcert-query', project_id=project_id)
 
         policy = self.load_policy(
@@ -378,14 +379,14 @@ class SqlSslCertTest(BaseTest):
         self.assertEqual(
             policy.resource_manager.get_urns(resources),
             [
-                "gcp:sqladmin:us-central1:cloud-custodian:ssl-cert/custodian-postgres/62a43e710693b34d5fdb34911a656fd7a3b76cc7",  # noqa: E501
+                f"gcp:sqladmin:us-central1:{project_id}:ssl-cert/custodian-postgres/62a43e710693b34d5fdb34911a656fd7a3b76cc7",  # noqa: E501
             ],
         )
 
     def test_sqlsslcet_get(self):
         ssl_cert_sha = '49a10ed7135e3171ce5e448cc785bc63b5b81e6c'
         instance_name = 'custodian-postgres'
-        project_id = 'cloud-custodian'
+        project_id = effective_project_id()
         session_factory = self.replay_flight_data('sqlsslcert-get', project_id=project_id)
 
         policy = self.load_policy(
@@ -407,6 +408,6 @@ class SqlSslCertTest(BaseTest):
         self.assertEqual(
             policy.resource_manager.get_urns(resources),
             [
-                "gcp:sqladmin:us-central1:cloud-custodian:ssl-cert/custodian-postgres/49a10ed7135e3171ce5e448cc785bc63b5b81e6c",  # noqa: E501
+                f"gcp:sqladmin:us-central1:{project_id}:ssl-cert/custodian-postgres/49a10ed7135e3171ce5e448cc785bc63b5b81e6c",  # noqa: E501
             ],
         )

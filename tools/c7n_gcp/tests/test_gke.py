@@ -5,6 +5,7 @@ import pytest
 import logging
 
 from gcp_common import BaseTest, event_data
+from testing import effective_project_id
 from c7n.config import Config
 
 
@@ -76,7 +77,7 @@ class KubernetesClusterTest(BaseTest):
         )
 
     def test_gke_cluster_filter_server_config(self):
-        project_id = 'cloud-custodian'
+        project_id = effective_project_id()
         factory = self.replay_flight_data('gke-cluster-filter-server-config', project_id=project_id)
         p = self.load_policy({
             'name': 'gke-cluster-filter-server-config',
@@ -94,7 +95,7 @@ class KubernetesClusterTest(BaseTest):
                          resources[0]['name'])
 
     def test_gke_cluster_filter_effective_firewall(self):
-        project_id = 'cloud-custodian'
+        project_id = effective_project_id()
         factory = self.replay_flight_data('gke-cluster-filter-effective-firewall',
                                             project_id=project_id)
         p = self.load_policy({
@@ -114,7 +115,7 @@ class KubernetesClusterTest(BaseTest):
                          resources[0]['name'])
 
     def test_cluster_set_labels(self):
-        project_id = 'cloud-custodian'
+        project_id = effective_project_id()
         name = "standard-cluster-1"
         factory = self.replay_flight_data('gke-cluster-set-label', project_id)
         p = self.load_policy(
@@ -164,7 +165,7 @@ class KubernetesClusterTest(BaseTest):
 
     @pytest.mark.skip("Works on record but not replay")
     def test_cluster_zonal_set_labels(self):
-        project_id = 'cloud-custodian'
+        project_id = effective_project_id()
         name = "zonal-cluster-1"
         factory = self.replay_flight_data('gke-cluster-zonal-set-label', project_id)
         p = self.load_policy(
@@ -213,7 +214,7 @@ class KubernetesClusterTest(BaseTest):
         self.assertEqual(result[0]['clusters'][0]['resourceLabels']['test_label'], 'test_value')
 
     def test_cluster_remove_labels(self):
-        project_id = 'cloud-custodian'
+        project_id = effective_project_id()
         name = "standard-cluster-1"
         factory = self.replay_flight_data('gke-cluster-remove-label', project_id)
         p = self.load_policy(
@@ -239,7 +240,7 @@ class KubernetesClusterTest(BaseTest):
         self.assertEqual(result['clusters'][0]['resourceLabels'].get('test_label'), None)
 
     def test_cluster_zonal_remove_labels(self):
-        project_id = 'cloud-custodian'
+        project_id = effective_project_id()
         name = "zonal-cluster-1"
         factory = self.replay_flight_data('gke-cluster-zonal-remove-label', project_id)
         p = self.load_policy(
@@ -346,7 +347,7 @@ class KubernetesClusterNodePoolTest(BaseTest):
         )
 
     def test_gke_cluster_nodepool_filter_server_config(self):
-        project_id = 'cloud-custodian'
+        project_id = effective_project_id()
         factory = self.replay_flight_data('gke-cluster-nodepool-filter-server-config',
                                           project_id=project_id)
         p = self.load_policy({

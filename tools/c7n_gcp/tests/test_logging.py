@@ -4,12 +4,13 @@
 from googleapiclient.errors import HttpError
 
 from gcp_common import BaseTest, event_data
+from testing import effective_project_id
 
 
 class LogProjectSinkTest(BaseTest):
 
     def test_query(self):
-        project_id = 'cloud-custodian'
+        project_id = effective_project_id()
         factory = self.replay_flight_data('log-project-sink-query', project_id)
         p = self.load_policy({
             'name': 'log-project-sink',
@@ -20,12 +21,12 @@ class LogProjectSinkTest(BaseTest):
         self.assertEqual(
             p.resource_manager.get_urns(resource),
             [
-                'gcp:logging::cloud-custodian:project-sink/storage',
+                f'gcp:logging::{project_id}:project-sink/storage',
             ],
         )
 
     def test_get_project_sink(self):
-        project_id = 'cloud-custodian'
+        project_id = effective_project_id()
         sink_name = "testqqqqqqqqqqqqqqqqq"
         factory = self.replay_flight_data(
             'log-project-sink-resource', project_id)
@@ -44,12 +45,12 @@ class LogProjectSinkTest(BaseTest):
         self.assertEqual(
             p.resource_manager.get_urns(resource),
             [
-                'gcp:logging::cloud-custodian:project-sink/testqqqqqqqqqqqqqqqqq',
+                f'gcp:logging::{project_id}:project-sink/testqqqqqqqqqqqqqqqqq',
             ],
         )
 
     def test_delete_project_sink(self):
-        project_id = 'custodian-tests'
+        project_id = effective_project_id()
         resource_name = "test-sink"
         factory = self.replay_flight_data(
             'log-project-sink-delete', project_id)
@@ -96,7 +97,7 @@ class LogProjectSinkTest(BaseTest):
 class LogProjectMetricTest(BaseTest):
 
     def test_query(self):
-        project_id = 'cloud-custodian'
+        project_id = effective_project_id()
         factory = self.replay_flight_data('log-project-metric-get', project_id)
         p = self.load_policy({
             'name': 'log-project-metric',
@@ -107,12 +108,12 @@ class LogProjectMetricTest(BaseTest):
         self.assertEqual(
             p.resource_manager.get_urns(resource),
             [
-                'gcp:logging::cloud-custodian:project-metric/test',
+                f'gcp:logging::{project_id}:project-metric/test',
             ],
         )
 
     def test_get_project_metric(self):
-        project_id = 'cloud-custodian'
+        project_id = effective_project_id()
         metric_name = "test_name"
         factory = self.replay_flight_data(
             'log-project-metric-query', project_id)
@@ -131,7 +132,7 @@ class LogProjectMetricTest(BaseTest):
         self.assertEqual(
             p.resource_manager.get_urns(resource),
             [
-                'gcp:logging::cloud-custodian:project-metric/test_name',
+                f'gcp:logging::{project_id}:project-metric/test_name',
             ],
         )
 
@@ -139,7 +140,7 @@ class LogProjectMetricTest(BaseTest):
 class LogExclusionTest(BaseTest):
 
     def test_query(self):
-        project_id = 'cloud-custodian'
+        project_id = effective_project_id()
         factory = self.replay_flight_data('log-exclusion', project_id)
         p = self.load_policy({
             'name': 'log-exclusion',
@@ -150,12 +151,12 @@ class LogExclusionTest(BaseTest):
         self.assertEqual(
             p.resource_manager.get_urns(resource),
             [
-                'gcp:logging::cloud-custodian:exclusion/exclusions',
+                f'gcp:logging::{project_id}:exclusion/exclusions',
             ],
         )
 
     def test_get_project_exclusion(self):
-        project_id = 'cloud-custodian'
+        project_id = effective_project_id()
         exclusion_name = "qwerty"
         factory = self.replay_flight_data(
             'log-exclusion-get', project_id)
@@ -175,6 +176,6 @@ class LogExclusionTest(BaseTest):
         self.assertEqual(
             p.resource_manager.get_urns(resource),
             [
-                'gcp:logging::cloud-custodian:exclusion/qwerty',
+                f'gcp:logging::{project_id}:exclusion/qwerty',
             ],
         )

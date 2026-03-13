@@ -2,6 +2,7 @@
 # SPDX-License-Identifier: Apache-2.0
 
 from gcp_common import BaseTest, event_data
+from testing import effective_project_id
 
 
 class MLModelTest(BaseTest):
@@ -29,7 +30,7 @@ class MLModelTest(BaseTest):
         )
 
     def test_models_get(self):
-        project_id = 'cloud-custodian'
+        project_id = effective_project_id()
         name = "test_model"
 
         factory = self.replay_flight_data('ml-model-get', project_id=project_id)
@@ -48,7 +49,7 @@ class MLModelTest(BaseTest):
         self.assertEqual(
             p.resource_manager.get_urns(models),
             [
-                'gcp:ml::cloud-custodian:model/test_model',
+                f'gcp:ml::{project_id}:model/test_model',
             ],
         )
 
@@ -56,7 +57,7 @@ class MLModelTest(BaseTest):
 class MLJobTest(BaseTest):
 
     def test_jobs_query(self):
-        project_id = 'cloud-custodian'
+        project_id = effective_project_id()
 
         session_factory = self.replay_flight_data(
             'ml-jobs-query', project_id)
@@ -73,12 +74,12 @@ class MLJobTest(BaseTest):
         self.assertEqual(
             policy.resource_manager.get_urns(resources),
             [
-                'gcp:ml::cloud-custodian:job/test_job',
+                f'gcp:ml::{project_id}:job/test_job',
             ],
         )
 
     def test_jobs_get(self):
-        project_id = 'cloud-custodian'
+        project_id = effective_project_id()
         name = "test_job"
 
         factory = self.replay_flight_data('ml-job-get', project_id=project_id)
@@ -97,6 +98,6 @@ class MLJobTest(BaseTest):
         self.assertEqual(
             p.resource_manager.get_urns(jobs),
             [
-                'gcp:ml::cloud-custodian:job/test_job',
+                f'gcp:ml::{project_id}:job/test_job',
             ],
         )

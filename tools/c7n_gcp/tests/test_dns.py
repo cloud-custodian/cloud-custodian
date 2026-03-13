@@ -2,12 +2,13 @@
 # SPDX-License-Identifier: Apache-2.0
 
 from gcp_common import BaseTest, event_data
+from testing import effective_project_id
 
 
 class DnsManagedZoneTest(BaseTest):
 
     def test_managed_zone_query(self):
-        project_id = 'cloud-custodian'
+        project_id = effective_project_id()
         managed_zone_name = 'custodian'
         session_factory = self.replay_flight_data(
             'dns-managed-zone-query', project_id=project_id)
@@ -22,12 +23,12 @@ class DnsManagedZoneTest(BaseTest):
         self.assertEqual(
             policy.resource_manager.get_urns(managed_zone_resources),
             [
-                'gcp:dns::cloud-custodian:managed-zone/custodian'
+                f'gcp:dns::{project_id}:managed-zone/custodian'
             ],
         )
 
     def test_managed_zone_get(self):
-        project_id = 'cloud-custodian'
+        project_id = effective_project_id()
         resource_name = 'custodian'
         session_factory = self.replay_flight_data(
             'dns-managed-zone-get', project_id=project_id)
@@ -48,12 +49,12 @@ class DnsManagedZoneTest(BaseTest):
         self.assertEqual(
             policy.resource_manager.get_urns(resources),
             [
-                'gcp:dns::cloud-custodian:managed-zone/custodian'
+                f'gcp:dns::{project_id}:managed-zone/custodian'
             ],
         )
 
     def test_managed_zone_delete(self):
-        project_id = "cloud-custodian"
+        project_id = effective_project_id()
         resource_name = "custodian-delete-test"
 
         factory = self.replay_flight_data('dns-managed-zone-delete')
@@ -75,7 +76,7 @@ class DnsManagedZoneTest(BaseTest):
 class DnsPolicyTest(BaseTest):
 
     def test_policy_query(self):
-        project_id = 'cloud-custodian'
+        project_id = effective_project_id()
         policy_name = 'custodian'
         session_factory = self.replay_flight_data(
             'dns-policy-query', project_id=project_id)
@@ -90,12 +91,12 @@ class DnsPolicyTest(BaseTest):
         self.assertEqual(
             policy.resource_manager.get_urns(policy_resources),
             [
-                'gcp:dns::cloud-custodian:policy/custodian'
+                f'gcp:dns::{project_id}:policy/custodian'
             ],
         )
 
     def test_policy_get(self):
-        project_id = 'cloud-custodian'
+        project_id = effective_project_id()
         policy_name = 'custodian'
         session_factory = self.replay_flight_data(
             'dns-policy-get', project_id=project_id)
@@ -116,7 +117,7 @@ class DnsPolicyTest(BaseTest):
         self.assertEqual(
             policy.resource_manager.get_urns(resources),
             [
-                'gcp:dns::cloud-custodian:policy/custodian'
+                f'gcp:dns::{project_id}:policy/custodian'
             ],
         )
 
@@ -124,7 +125,7 @@ class DnsPolicyTest(BaseTest):
 class TestDnsResourceRecordsFilter(BaseTest):
 
     def test_query(self):
-        project_id = 'cloud-custodian'
+        project_id = effective_project_id()
         session_factory = self.replay_flight_data(
             'test-dns-resource-records-filter-query', project_id=project_id)
 

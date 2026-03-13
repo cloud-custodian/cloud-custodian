@@ -10,6 +10,7 @@ import sys
 
 from c7n.exceptions import PolicyValidationError
 from c7n.testing import functional
+from testing import effective_project_id
 
 from c7n_gcp import handler, mu, policy
 
@@ -162,7 +163,7 @@ class FunctionTest(BaseTest):
     def test_periodic_update_schedule(self):
         factory = self.replay_flight_data('mu-perodic-update-schedule')
         session = factory()
-        project_id = 'cloud-custodian'
+        project_id = effective_project_id()
         region = 'us-central1'
 
         sched_client = session.client('cloudscheduler', 'v1beta1', 'projects.locations.jobs')
@@ -204,7 +205,7 @@ class FunctionTest(BaseTest):
         p.provision()
 
         session = factory()
-        project_id = 'cloud-custodian'
+        project_id = effective_project_id()
         region = 'us-central1'
 
         func_client = session.client('cloudfunctions', 'v1', 'projects.locations.functions')
@@ -263,7 +264,7 @@ class FunctionTest(BaseTest):
         p.provision()
 
         session = factory()
-        project_id = 'cloud-custodian'
+        project_id = effective_project_id()
         region = 'us-central1'
         func_client = session.client('cloudfunctions', 'v1', 'projects.locations.functions')
         pubsub_client = session.client('pubsub', 'v1', 'projects.topics')
@@ -312,7 +313,7 @@ class FunctionTest(BaseTest):
     @functional
     def test_scc_subscriber(self):
 
-        project_id = 'cloud-custodian'
+        project_id = effective_project_id()
         org = 111111111111
         factory = self.replay_flight_data('mu-scc-subscriber', project_id=project_id)
         p = self.load_policy(

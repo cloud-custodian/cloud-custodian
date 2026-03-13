@@ -17,6 +17,7 @@ from c7n_gcp.output import (
     GCPStorageOutput, StackDriverLogging, StackDriverMetrics)
 
 from gcp_common import BaseTest
+from testing import effective_project_id
 
 
 class MetricsOutputTest(BaseTest):
@@ -27,7 +28,7 @@ class MetricsOutputTest(BaseTest):
             StackDriverMetrics)
 
     def test_metrics_output(self):
-        project_id = 'cloud-custodian'
+        project_id = effective_project_id()
         factory = self.replay_flight_data('output-metrics', project_id=project_id)
         ctx = Bag(session_factory=factory,
                   policy=Bag(name='custodian-works', resource_type='gcp.function'))
@@ -70,8 +71,8 @@ class MetricsOutputTest(BaseTest):
               u'valueType': u'INT64'}])
 
     def test_metrics_output_set_write_project_id(self):
-        project_id = 'cloud-custodian-sub'
-        write_project_id = 'cloud-custodian'
+        project_id = effective_project_id()
+        write_project_id = effective_project_id()
         factory = self.replay_flight_data('output-metrics', project_id=project_id)
         ctx = Bag(session_factory=factory,
                   policy=Bag(name='custodian-works', resource_type='gcp.function'))
