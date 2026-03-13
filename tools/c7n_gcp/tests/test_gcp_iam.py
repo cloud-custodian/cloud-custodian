@@ -33,6 +33,42 @@ class ProjectRoleTest(BaseTest):
         )
 
 
+class OrganizationRoleTest(BaseTest):
+    def test_organization_role_query(self):
+        session_factory = self.replay_flight_data("iam-organization-role-query", "cloud-custodian")
+
+        policy = self.load_policy(
+            {"name": "organization-role-query", "resource": "gcp.organization-role"},
+            session_factory=session_factory,
+        )
+
+        resources = policy.run()
+        self.assertEqual(len(resources), 1)
+        self.assertEqual(resources[0]["name"], "organizations/851339424791/roles/OrgCustomRole")
+        self.assertEqual(resources[0]["c7n:organization"]["name"], "organizations/851339424791")
+        self.assertEqual(
+            policy.resource_manager.get_urns(resources),
+            ["gcp:iam:::organization-role/OrgCustomRole"],
+        )
+
+    def test_organization_role_get(self):
+        factory = self.replay_flight_data("iam-organization-role-get", "cloud-custodian")
+        policy = self.load_policy(
+            {"name": "organization-role-get", "resource": "gcp.organization-role"},
+            session_factory=factory,
+        )
+
+        role = policy.resource_manager.get_resource(
+            {"organization_id": "851339424791", "role_name": "OrgCustomRole"}
+        )
+        self.assertEqual(role["name"], "organizations/851339424791/roles/OrgCustomRole")
+        self.assertEqual(role["c7n:organization"]["name"], "organizations/851339424791")
+        self.assertEqual(
+            policy.resource_manager.get_urns([role]),
+            ["gcp:iam:::organization-role/OrgCustomRole"],
+        )
+
+
 class ServiceAccountTest(BaseTest):
     def test_get(self):
         factory = self.replay_flight_data("iam-service-account")
