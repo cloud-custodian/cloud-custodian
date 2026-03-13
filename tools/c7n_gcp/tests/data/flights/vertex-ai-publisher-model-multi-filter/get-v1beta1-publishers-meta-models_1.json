@@ -1,0 +1,18 @@
+{
+  "headers": {
+    "content-type": "application/json; charset=UTF-8",
+    "vary": "Origin, X-Origin, Referer",
+    "date": "Mon, 02 Mar 2026 20:38:51 GMT",
+    "server": "ESF",
+    "x-xss-protection": "0",
+    "x-frame-options": "SAMEORIGIN",
+    "x-content-type-options": "nosniff",
+    "alt-svc": "h3=\":443\"; ma=2592000,h3-29=\":443\"; ma=2592000",
+    "transfer-encoding": "chunked",
+    "status": "200",
+    "content-length": "3",
+    "-content-encoding": "gzip",
+    "content-location": "https://aiplatform.googleapis.com/v1beta1/publishers/meta/models?alt=json"
+  },
+  "body": {}
+}
