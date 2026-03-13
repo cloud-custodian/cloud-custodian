@@ -1,0 +1,474 @@
+{
+    "version": 1,
+    "interactions": [
+        {
+            "request": {
+                "method": "GET",
+                "uri": "https://management.azure.com/subscriptions/ea42f556-5106-4743-99b0-c129bfa71a47/providers/Microsoft.CognitiveServices/accounts?api-version=2017-04-18",
+                "body": null,
+                "headers": {}
+            },
+            "response": {
+                "status": {
+                    "code": 200,
+                    "message": "OK"
+                },
+                "headers": {
+                    "x-ms-original-request-ids": [
+                        "32ddab53-2ed1-46ad-8a8f-43442c7653d3"
+                    ],
+                    "cache-control": [
+                        "no-cache"
+                    ],
+                    "content-length": [
+                        "1568"
+                    ],
+                    "x-ms-ratelimit-remaining-subscription-global-reads": [
+                        "3749"
+                    ],
+                    "content-type": [
+                        "application/json; charset=utf-8"
+                    ],
+                    "x-msedge-ref": [
+                        "Ref A: 25DB00833A4E4356B83E3941069034DA Ref B: CHI261140509036 Ref C: 2026-03-13T22:26:57Z"
+                    ],
+                    "x-cache": [
+                        "CONFIG_NOCACHE"
+                    ],
+                    "date": [
+                        "Fri, 13 Mar 2026 22:26:57 GMT"
+                    ],
+                    "x-envoy-upstream-service-time": [
+                        "16"
+                    ]
+                },
+                "body": {
+                    "data": {
+                        "value": [
+                            {
+                                "id": "/subscriptions/ea42f556-5106-4743-99b0-c129bfa71a47/resourceGroups/test_cognitive-service-deployment/providers/Microsoft.CognitiveServices/accounts/cctestcogdeploy",
+                                "name": "cctestcogdeploy",
+                                "type": "Microsoft.CognitiveServices/accounts",
+                                "etag": "\"fa00f989-0000-0100-0000-69b48b0e0000\"",
+                                "location": "eastus",
+                                "sku": {
+                                    "name": "S0"
+                                },
+                                "kind": "OpenAI",
+                                "properties": {
+                                    "endpoint": "https://cctestcogdeploy.openai.azure.com/",
+                                    "provisioningState": "Succeeded",
+                                    "internalId": "937f1597512245be9a064ba62dbb9588",
+                                    "dateCreated": "2026-03-11T00:45:33.8130057Z",
+                                    "apiProperties": {},
+                                    "isMigrated": false,
+                                    "customSubDomainName": "cctestcogdeploy",
+                                    "privateEndpointConnections": [],
+                                    "publicNetworkAccess": "Enabled",
+                                    "capabilities": [
+                                        {
+                                            "name": "VirtualNetworks"
+                                        },
+                                        {
+                                            "name": "CustomerManagedKey"
+                                        },
+                                        {
+                                            "name": "EnabledApimVnet",
+                                            "value": "true"
+                                        },
+                                        {
+                                            "name": "useEndpointRateLimiter",
+                                            "value": "Enabled"
+                                        },
+                                        {
+                                            "name": "MaxFineTuneCount",
+                                            "value": "500"
+                                        },
+                                        {
+                                            "name": "MaxRunningFineTuneCount",
+                                            "value": "3"
+                                        },
+                                        {
+                                            "name": "MaxUserFileCount",
+                                            "value": "100"
+                                        },
+                                        {
+                                            "name": "MaxTrainingFileSize",
+                                            "value": "512000000"
+                                        },
+                                        {
+                                            "name": "MaxUserFileImportDurationInHours",
+                                            "value": "1"
+                                        },
+                                        {
+                                            "name": "MaxFineTuneJobDurationInHours",
+                                            "value": "720"
+                                        },
+                                        {
+                                            "name": "MaxEvaluationRunDurationInHours",
+                                            "value": "5"
+                                        },
+                                        {
+                                            "name": "MaxRunningEvaluationCount",
+                                            "value": "5"
+                                        },
+                                        {
+                                            "name": "MaxRunningGlobalStandardFineTuneCount",
+                                            "value": "3"
+                                        },
+                                        {
+                                            "name": "TrustedServices",
+                                            "value": "Microsoft.CognitiveServices,Microsoft.MachineLearningServices,Microsoft.Search,Microsoft.VideoIndexer"
+                                        },
+                                        {
+                                            "name": "NetworkSecurityPerimeter"
+                                        },
+                                        {
+                                            "name": "RaiMonitor"
+                                        },
+                                        {
+                                            "name": "quotaRefundsEnabled",
+                                            "value": "false"
+                                        }
+                                    ]
+                                }
+                            }
+                        ]
+                    }
+                }
+            }
+        },
+        {
+            "request": {
+                "method": "GET",
+                "uri": "https://management.azure.com/subscriptions/ea42f556-5106-4743-99b0-c129bfa71a47/resourceGroups/test_cognitive-service-deployment/providers/Microsoft.CognitiveServices/accounts/cctestcogdeploy/deployments?api-version=2025-06-01",
+                "body": null,
+                "headers": {}
+            },
+            "response": {
+                "status": {
+                    "code": 200,
+                    "message": "OK"
+                },
+                "headers": {
+                    "x-ms-operation-identifier": [
+                        "tenantId=d0353a14-7287-437b-a609-2ae66308ff96,objectId=55930176-0a87-4f7a-a039-6825cd33ab38/southcentralus/60ef1c46-8aa6-4640-9118-82ac91bbbe09"
+                    ],
+                    "cache-control": [
+                        "no-cache"
+                    ],
+                    "content-length": [
+                        "1214"
+                    ],
+                    "x-ms-ratelimit-remaining-subscription-global-reads": [
+                        "3749"
+                    ],
+                    "content-type": [
+                        "application/json; charset=utf-8"
+                    ],
+                    "x-msedge-ref": [
+                        "Ref A: A913D6E3D4D8415B9D7FEFD883349F3A Ref B: CHI261140502042 Ref C: 2026-03-13T22:26:58Z"
+                    ],
+                    "x-cache": [
+                        "CONFIG_NOCACHE"
+                    ],
+                    "date": [
+                        "Fri, 13 Mar 2026 22:26:58 GMT"
+                    ],
+                    "x-envoy-upstream-service-time": [
+                        "18"
+                    ]
+                },
+                "body": {
+                    "data": {
+                        "value": [
+                            {
+                                "id": "/subscriptions/ea42f556-5106-4743-99b0-c129bfa71a47/resourceGroups/test_cognitive-service-deployment/providers/Microsoft.CognitiveServices/accounts/cctestcogdeploy/deployments/cctest-gpt4o-mini",
+                                "type": "Microsoft.CognitiveServices/accounts/deployments",
+                                "name": "cctest-gpt4o-mini",
+                                "sku": {
+                                    "name": "Standard",
+                                    "capacity": 1
+                                },
+                                "properties": {
+                                    "model": {
+                                        "format": "OpenAI",
+                                        "name": "gpt-4o-mini",
+                                        "version": "2024-07-18"
+                                    },
+                                    "versionUpgradeOption": "OnceNewDefaultVersionAvailable",
+                                    "currentCapacity": 1,
+                                    "capabilities": {
+                                        "area": "US",
+                                        "chatCompletion": "true",
+                                        "jsonObjectResponse": "true",
+                                        "maxContextToken": "128000",
+                                        "maxOutputToken": "16384",
+                                        "assistants": "true",
+                                        "responses": "true",
+                                        "agentsV2": "true",
+                                        "_H_azureml-throttling-key": "oai-f83d7a65f8ac4456841aa75689df806f"
+                                    },
+                                    "raiPolicyName": "Microsoft.DefaultV2",
+                                    "provisioningState": "Succeeded",
+                                    "rateLimits": [
+                                        {
+                                            "key": "request",
+                                            "renewalPeriod": 60,
+                                            "count": 10
+                                        },
+                                        {
+                                            "key": "token",
+                                            "renewalPeriod": 60,
+                                            "count": 1000
+                                        }
+                                    ]
+                                },
+                                "systemData": {
+                                    "createdBy": "kcm0790@gmail.com",
+                                    "createdByType": "User",
+                                    "createdAt": "2026-03-11T13:40:03.740352Z",
+                                    "lastModifiedBy": "kcm0790@gmail.com",
+                                    "lastModifiedByType": "User",
+                                    "lastModifiedAt": "2026-03-13T22:09:18.0747086Z"
+                                },
+                                "etag": "\"33c4d9ef-9cf1-46ab-aa6c-a627e5ba5ee3\""
+                            }
+                        ]
+                    }
+                }
+            }
+        },
+        {
+            "request": {
+                "method": "DELETE",
+                "uri": "https://management.azure.com/subscriptions/ea42f556-5106-4743-99b0-c129bfa71a47/resourceGroups/test_cognitive-service-deployment/providers/Microsoft.CognitiveServices/accounts/cctestcogdeploy/deployments/cctest-gpt4o-mini?api-version=2025-06-01",
+                "body": null,
+                "headers": {}
+            },
+            "response": {
+                "status": {
+                    "code": 200,
+                    "message": "OK"
+                },
+                "headers": {
+                    "x-ms-operation-identifier": [
+                        "tenantId=d0353a14-7287-437b-a609-2ae66308ff96,objectId=55930176-0a87-4f7a-a039-6825cd33ab38/southcentralus/15ca0418-0a3f-4a58-bccd-d85b4a660ed4"
+                    ],
+                    "cache-control": [
+                        "no-cache"
+                    ],
+                    "content-length": [
+                        "0"
+                    ],
+                    "x-ms-ratelimit-remaining-subscription-global-deletes": [
+                        "2999"
+                    ],
+                    "x-msedge-ref": [
+                        "Ref A: DC06A27735C047A79EEC22890B517DC5 Ref B: CH1AA2020603047 Ref C: 2026-03-13T22:26:59Z"
+                    ],
+                    "x-cache": [
+                        "CONFIG_NOCACHE"
+                    ],
+                    "date": [
+                        "Fri, 13 Mar 2026 22:26:59 GMT"
+                    ],
+                    "x-envoy-upstream-service-time": [
+                        "651"
+                    ],
+                    "x-ms-ratelimit-remaining-subscription-deletes": [
+                        "199"
+                    ]
+                },
+                "body": {
+                    "string": ""
+                }
+            }
+        },
+        {
+            "request": {
+                "method": "GET",
+                "uri": "https://management.azure.com/subscriptions/ea42f556-5106-4743-99b0-c129bfa71a47/providers/Microsoft.CognitiveServices/accounts?api-version=2017-04-18",
+                "body": null,
+                "headers": {}
+            },
+            "response": {
+                "status": {
+                    "code": 200,
+                    "message": "OK"
+                },
+                "headers": {
+                    "x-ms-original-request-ids": [
+                        "2517046d-6a21-43a2-9471-d30e2b75a860"
+                    ],
+                    "cache-control": [
+                        "no-cache"
+                    ],
+                    "content-length": [
+                        "1568"
+                    ],
+                    "x-ms-ratelimit-remaining-subscription-global-reads": [
+                        "3749"
+                    ],
+                    "content-type": [
+                        "application/json; charset=utf-8"
+                    ],
+                    "x-msedge-ref": [
+                        "Ref A: 79466A7659704E7F8719109A20F97792 Ref B: CHI261140508023 Ref C: 2026-03-13T22:27:11Z"
+                    ],
+                    "x-cache": [
+                        "CONFIG_NOCACHE"
+                    ],
+                    "date": [
+                        "Fri, 13 Mar 2026 22:27:11 GMT"
+                    ],
+                    "x-envoy-upstream-service-time": [
+                        "14"
+                    ]
+                },
+                "body": {
+                    "data": {
+                        "value": [
+                            {
+                                "id": "/subscriptions/ea42f556-5106-4743-99b0-c129bfa71a47/resourceGroups/test_cognitive-service-deployment/providers/Microsoft.CognitiveServices/accounts/cctestcogdeploy",
+                                "name": "cctestcogdeploy",
+                                "type": "Microsoft.CognitiveServices/accounts",
+                                "etag": "\"fa0040bf-0000-0100-0000-69b48f340000\"",
+                                "location": "eastus",
+                                "sku": {
+                                    "name": "S0"
+                                },
+                                "kind": "OpenAI",
+                                "properties": {
+                                    "endpoint": "https://cctestcogdeploy.openai.azure.com/",
+                                    "provisioningState": "Succeeded",
+                                    "internalId": "937f1597512245be9a064ba62dbb9588",
+                                    "dateCreated": "2026-03-11T00:45:33.8130057Z",
+                                    "apiProperties": {},
+                                    "isMigrated": false,
+                                    "customSubDomainName": "cctestcogdeploy",
+                                    "privateEndpointConnections": [],
+                                    "publicNetworkAccess": "Enabled",
+                                    "capabilities": [
+                                        {
+                                            "name": "VirtualNetworks"
+                                        },
+                                        {
+                                            "name": "CustomerManagedKey"
+                                        },
+                                        {
+                                            "name": "EnabledApimVnet",
+                                            "value": "true"
+                                        },
+                                        {
+                                            "name": "useEndpointRateLimiter",
+                                            "value": "Enabled"
+                                        },
+                                        {
+                                            "name": "MaxFineTuneCount",
+                                            "value": "500"
+                                        },
+                                        {
+                                            "name": "MaxRunningFineTuneCount",
+                                            "value": "3"
+                                        },
+                                        {
+                                            "name": "MaxUserFileCount",
+                                            "value": "100"
+                                        },
+                                        {
+                                            "name": "MaxTrainingFileSize",
+                                            "value": "512000000"
+                                        },
+                                        {
+                                            "name": "MaxUserFileImportDurationInHours",
+                                            "value": "1"
+                                        },
+                                        {
+                                            "name": "MaxFineTuneJobDurationInHours",
+                                            "value": "720"
+                                        },
+                                        {
+                                            "name": "MaxEvaluationRunDurationInHours",
+                                            "value": "5"
+                                        },
+                                        {
+                                            "name": "MaxRunningEvaluationCount",
+                                            "value": "5"
+                                        },
+                                        {
+                                            "name": "MaxRunningGlobalStandardFineTuneCount",
+                                            "value": "3"
+                                        },
+                                        {
+                                            "name": "TrustedServices",
+                                            "value": "Microsoft.CognitiveServices,Microsoft.MachineLearningServices,Microsoft.Search,Microsoft.VideoIndexer"
+                                        },
+                                        {
+                                            "name": "NetworkSecurityPerimeter"
+                                        },
+                                        {
+                                            "name": "RaiMonitor"
+                                        },
+                                        {
+                                            "name": "quotaRefundsEnabled",
+                                            "value": "false"
+                                        }
+                                    ]
+                                }
+                            }
+                        ]
+                    }
+                }
+            }
+        },
+        {
+            "request": {
+                "method": "GET",
+                "uri": "https://management.azure.com/subscriptions/ea42f556-5106-4743-99b0-c129bfa71a47/resourceGroups/test_cognitive-service-deployment/providers/Microsoft.CognitiveServices/accounts/cctestcogdeploy/deployments?api-version=2025-06-01",
+                "body": null,
+                "headers": {}
+            },
+            "response": {
+                "status": {
+                    "code": 200,
+                    "message": "OK"
+                },
+                "headers": {
+                    "x-ms-operation-identifier": [
+                        "tenantId=d0353a14-7287-437b-a609-2ae66308ff96,objectId=55930176-0a87-4f7a-a039-6825cd33ab38/southcentralus/719400c4-1429-4aed-b0b7-248a63801856"
+                    ],
+                    "cache-control": [
+                        "no-cache"
+                    ],
+                    "content-length": [
+                        "12"
+                    ],
+                    "x-ms-ratelimit-remaining-subscription-global-reads": [
+                        "3749"
+                    ],
+                    "content-type": [
+                        "application/json; charset=utf-8"
+                    ],
+                    "x-msedge-ref": [
+                        "Ref A: 570712EFB02A4E28BC202A53DBC8A5ED Ref B: CHI261140504023 Ref C: 2026-03-13T22:27:12Z"
+                    ],
+                    "x-cache": [
+                        "CONFIG_NOCACHE"
+                    ],
+                    "date": [
+                        "Fri, 13 Mar 2026 22:27:11 GMT"
+                    ],
+                    "x-envoy-upstream-service-time": [
+                        "20"
+                    ]
+                },
+                "body": {
+                    "data": {
+                        "value": []
+                    }
+                }
+            }
+        }
+    ]
+}

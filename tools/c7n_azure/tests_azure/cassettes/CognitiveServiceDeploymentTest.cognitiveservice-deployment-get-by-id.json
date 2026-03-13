@@ -1,0 +1,105 @@
+{
+    "version": 1,
+    "interactions": [
+        {
+            "request": {
+                "method": "GET",
+                "uri": "https://management.azure.com/subscriptions/ea42f556-5106-4743-99b0-c129bfa71a47/resourceGroups/test_cognitive-service-deployment/providers/Microsoft.CognitiveServices/accounts/cctestcogdeploy/deployments/cctest-gpt4o-mini?api-version=2024-10-01",
+                "body": null,
+                "headers": {}
+            },
+            "response": {
+                "status": {
+                    "code": 200,
+                    "message": "OK"
+                },
+                "headers": {
+                    "x-msedge-ref": [
+                        "Ref A: BC45A05BD3864CF5B08D0E14ED1A6B50 Ref B: CH1AA2020620021 Ref C: 2026-03-11T00:46:50Z"
+                    ],
+                    "etag": [
+                        "\"62ade2fb-c815-4e0c-b18d-ac141be86d0e\""
+                    ],
+                    "cache-control": [
+                        "no-cache"
+                    ],
+                    "x-ms-operation-identifier": [
+                        "tenantId=d0353a14-7287-437b-a609-2ae66308ff96,objectId=55930176-0a87-4f7a-a039-6825cd33ab38/southcentralus/cc9bfecc-4602-4592-93bc-c0d1d40f8d83"
+                    ],
+                    "x-envoy-upstream-service-time": [
+                        "20"
+                    ],
+                    "x-ms-ratelimit-remaining-subscription-global-reads": [
+                        "3749"
+                    ],
+                    "content-length": [
+                        "1203"
+                    ],
+                    "content-type": [
+                        "application/json; charset=utf-8"
+                    ],
+                    "date": [
+                        "Wed, 11 Mar 2026 00:46:50 GMT"
+                    ],
+                    "x-cache": [
+                        "CONFIG_NOCACHE"
+                    ]
+                },
+                "body": {
+                    "data": {
+                        "id": "/subscriptions/ea42f556-5106-4743-99b0-c129bfa71a47/resourceGroups/test_cognitive-service-deployment/providers/Microsoft.CognitiveServices/accounts/cctestcogdeploy/deployments/cctest-gpt4o-mini",
+                        "type": "Microsoft.CognitiveServices/accounts/deployments",
+                        "name": "cctest-gpt4o-mini",
+                        "sku": {
+                            "name": "Standard",
+                            "capacity": 1
+                        },
+                        "properties": {
+                            "model": {
+                                "format": "OpenAI",
+                                "name": "gpt-4o-mini",
+                                "version": "2024-07-18"
+                            },
+                            "versionUpgradeOption": "OnceNewDefaultVersionAvailable",
+                            "currentCapacity": 1,
+                            "capabilities": {
+                                "area": "US",
+                                "chatCompletion": "true",
+                                "jsonObjectResponse": "true",
+                                "maxContextToken": "128000",
+                                "maxOutputToken": "16384",
+                                "assistants": "true",
+                                "responses": "true",
+                                "agentsV2": "true",
+                                "_H_azureml-throttling-key": "oai-491843dbae454765a5dee162828ea09c"
+                            },
+                            "raiPolicyName": "Microsoft.DefaultV2",
+                            "provisioningState": "Succeeded",
+                            "rateLimits": [
+                                {
+                                    "key": "request",
+                                    "renewalPeriod": 60,
+                                    "count": 10
+                                },
+                                {
+                                    "key": "token",
+                                    "renewalPeriod": 60,
+                                    "count": 1000
+                                }
+                            ]
+                        },
+                        "systemData": {
+                            "createdBy": "kcm0790@gmail.com",
+                            "createdByType": "User",
+                            "createdAt": "2026-03-11T00:46:05.6058459Z",
+                            "lastModifiedBy": "kcm0790@gmail.com",
+                            "lastModifiedByType": "User",
+                            "lastModifiedAt": "2026-03-11T00:46:05.6058459Z"
+                        },
+                        "etag": "\"62ade2fb-c815-4e0c-b18d-ac141be86d0e\""
+                    }
+                }
+            }
+        }
+    ]
+}
