@@ -771,6 +771,35 @@ class ElasticSearch(BaseTest):
             "arn:aws:logs:us-east-1:123456789012:log-group:/aws/domains/test-es-dom/audit-logs:*")
 
 
+@terraform('elasticsearch_update_domain_config')
+def test_elasticsearch_update_domain_config(test, elasticsearch_update_domain_config):
+    factory = test.replay_flight_data("test_elasticsearch_update_domain_config")
+    p = test.load_policy(
+        {
+            "name": "es-update-domain-config",
+            "resource": "elasticsearch",
+            "actions": [
+                {
+                    "type": "update-domain-config",
+                    "EBSOptions": {
+                        "VolumeType": "gp3"
+                    }
+                }
+            ]
+        },
+        session_factory=factory,
+    )
+
+    resources = p.run()
+    test.assertEqual(len(resources), 2)
+
+    client = factory().client("es")
+    es_resp = client.describe_elasticsearch_domain_config(DomainName='c7n-test-es-update-config')
+    assert es_resp['DomainConfig']['EBSOptions']['Options']['VolumeType'] == 'gp3'
+    os_resp = client.describe_elasticsearch_domain_config(DomainName='c7n-test-os-update-config')
+    assert os_resp['DomainConfig']['EBSOptions']['Options']['VolumeType'] == 'gp3'
+
+
 class TestReservedInstances(BaseTest):
 
     def test_elasticsearch_reserved_node_query(self):
