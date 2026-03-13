@@ -1,0 +1,31 @@
+{
+  "headers": {
+    "content-type": "application/json; charset=UTF-8",
+    "vary": "Origin, X-Origin, Referer",
+    "date": "Fri, 13 Mar 2026 15:36:42 GMT",
+    "server": "ESF",
+    "x-xss-protection": "0",
+    "x-frame-options": "SAMEORIGIN",
+    "x-content-type-options": "nosniff",
+    "alt-svc": "h3=\":443\"; ma=2592000,h3-29=\":443\"; ma=2592000",
+    "transfer-encoding": "chunked",
+    "status": "200",
+    "content-length": "781",
+    "-content-encoding": "gzip"
+  },
+  "body": {
+    "kind": "compute#operation",
+    "id": "5733706902858732005",
+    "name": "operation-1773416201811-64ce9a2bf7715-16ec3769-ace3a7e0",
+    "zone": "https://www.googleapis.com/compute/v1/projects/cloud-custodian/zones/us-central1-a",
+    "operationType": "update",
+    "targetLink": "https://www.googleapis.com/compute/v1/projects/cloud-custodian/zones/us-central1-a/instances/sacred-dassie",
+    "targetId": "7368592281459855388",
+    "status": "RUNNING",
+    "user": "markos@sixfeetup.com",
+    "progress": 0,
+    "insertTime": "2026-03-13T08:36:42.598-07:00",
+    "startTime": "2026-03-13T08:36:42.623-07:00",
+    "selfLink": "https://www.googleapis.com/compute/v1/projects/cloud-custodian/zones/us-central1-a/operations/operation-1773416201811-64ce9a2bf7715-16ec3769-ace3a7e0"
+  }
+}
