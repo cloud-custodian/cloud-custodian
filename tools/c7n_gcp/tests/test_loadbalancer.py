@@ -884,3 +884,40 @@ class LoadBalancingGlobalAddressTest(BaseTest):
                 'gcp:compute::cloud-custodian:global-address/custodian-global-address-0',
             ],
         )
+
+
+class LoadBalancingTargetHttpsProxySslPolicyTest(BaseTest):
+
+    def test_loadbalancer_target_https_proxy_ssl_policy_query(self):
+        resource_name = 'valid-security-policy'
+        parent_resource_name = 'lb-target-proxy'
+        factory = self.replay_flight_data('lb-target-https-proxy-ssl-policy-query')
+        p = self.load_policy(
+            {'name': 'gcp-loadbalancer-target-https-proxy-ssl-policy-query',
+             'resource': 'gcp.loadbalancer-target-https-proxy-ssl-policy'},
+            session_factory=factory)
+        parent_annotation_key = p.resource_manager.resource_type.get_parent_annotation_key()
+        resources = p.run()
+        self.assertEqual(len(resources), 1)
+        self.assertEqual(resources[0]['name'], resource_name)
+        self.assertEqual(resources[0][parent_annotation_key]['name'], parent_resource_name)
+
+    def test_loadbalancer_global_address_get(self):
+        resource_name = 'valid-security-policy'
+        parent_resource_name = 'lb-target-proxy'
+        factory = self.replay_flight_data('lb-target-https-proxy-ssl-policy-get')
+        p = self.load_policy(
+            {'name': 'gcp-loadbalancer-target-https-proxy-ssl-policy-get',
+             'resource': 'gcp.loadbalancer-target-https-proxy-ssl-policy',
+             'mode': {
+                 'type': 'gcp-audit',
+                 'methods': ['v1.compute.targetHttpsProxies.insert']
+             }},
+            session_factory=factory)
+        exec_mode = p.get_execution_mode()
+        parent_annotation_key = p.resource_manager.resource_type.get_parent_annotation_key()
+        event = event_data('lb-target-https-proxy-insert.json')
+        resources = exec_mode.run(event, None)
+        self.assertEqual(len(resources), 1)
+        self.assertEqual(resources[0]['name'], resource_name)
+        self.assertEqual(resources[0][parent_annotation_key]['name'], parent_resource_name)
