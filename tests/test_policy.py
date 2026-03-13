@@ -394,6 +394,7 @@ class PolicyMetaLint(BaseTest):
             "AWS::Backup::RestoreTestingPlan",
             "AWS::BackupGateway::Hypervisor",
             "AWS::Bedrock::ApplicationInferenceProfile",
+            "AWS::Bedrock::Guardrail",
             "AWS::Bedrock::Prompt",
             "AWS::BedrockAgentCore::BrowserCustom",
             "AWS::BedrockAgentCore::Runtime",
