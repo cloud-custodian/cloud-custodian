@@ -358,6 +358,7 @@ ResourceMap = {
   "aws.transfer-web-app": "c7n.resources.transfer.TransferWebApp",
   "aws.transit-attachment": "c7n.resources.vpc.TransitGatewayAttachment",
   "aws.transit-gateway": "c7n.resources.vpc.TransitGateway",
+  "aws.transit-gateway-route-table": "c7n.resources.vpc.TransitGatewayRouteTable",
   "aws.user-pool": "c7n.resources.cognito.CognitoUserPool",
   "aws.vpc": "c7n.resources.vpc.Vpc",
   "aws.vpc-endpoint": "c7n.resources.vpc.VpcEndpoint",
