@@ -5,6 +5,7 @@ import json
 import os
 
 from gcp_common import BaseTest
+from c7n.commands import policy_command
 from c7n.config import Bag, Config
 from c7n.resources import load_resources
 from c7n_gcp.provider import resources
@@ -97,3 +98,34 @@ class ResourceMetaTest(BaseTest):
         if missing:
             raise KeyError(
                 "Following resources are missing id metadata %s" % " ".join(missing))
+
+
+def test_load_gcp_policies(tmp_path):
+    policy_file = tmp_path / 'policy.json'
+    policy_file.write_text(
+        json.dumps(
+            {
+                'policies': [
+                    {
+                        'name': 'test-gcp-instance',
+                        'resource': 'gcp.instance',
+                    }
+                ]
+            }
+        )
+    )
+
+    options = Config.empty(
+        configs=[str(policy_file)],
+        output_dir=str(tmp_path / 'output'),
+        vars=None,
+    )
+
+    @policy_command
+    def load_policies(options, policies=None):
+        return policies or []
+
+    loaded = load_policies(options)
+
+    assert len(loaded) == 1
+    assert loaded[0].resource_type == 'gcp.instance'
