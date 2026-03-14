@@ -235,9 +235,20 @@ class WAFV2SetLogging(BaseAction):
             actions:
               - type: set-logging
                 destination: "arn:aws:s3:::aws-waf-logs-bucket"
+                redacted_fields:
+                - single_header:
+                    name: text
+                - query_string: {}
+                - uri_path: {}
+                - method: {}
     """
 
-    schema = type_schema('set-logging', required=['destination'], destination={'type': 'string'})
+    schema = type_schema(
+        'set-logging',
+        required=['destination'],
+        destination={'type': 'string'},
+        redacted_fields={'type': 'array'}
+    )
 
     permissions = ('wafv2:PutLoggingConfiguration',)
 
@@ -257,23 +268,61 @@ class WAFV2SetLogging(BaseAction):
                     )
         return self
 
+    def convert_redacted_fields(self, redacted_fields_config):
+        if not redacted_fields_config:
+            return []
+        result = []
+        for field in redacted_fields_config:
+            key = next(iter(field))
+            pascal_key = ''.join(w.capitalize() for w in key.split('_'))
+            value = field[key]
+            if isinstance(value, dict) and value:
+                pascal_value = {
+                    ''.join(w.capitalize() for w in k.split('_')): v
+                    for k, v in value.items()
+                }
+                result.append({pascal_key: pascal_value})
+            else:
+                result.append({pascal_key: {}})
+        return result
+
     def process(self, resources):
         client = local_session(self.manager.session_factory).client(
             'wafv2', region_name=self.manager.region
         )
         destination = self.data['destination']
+        redacted_fields_config = self.data.get('redacted_fields', [])
+        aws_redacted_fields = self.convert_redacted_fields(redacted_fields_config)
 
         for r in resources:
-            resource_arn = r['ARN']
-            logging_config = {'ResourceArn': resource_arn, 'LogDestinationConfigs': [destination]}
+            logging_config = {
+                'ResourceArn': r['ARN'],
+                'LogDestinationConfigs': [destination]
+            }
+            if aws_redacted_fields:
+                logging_config['RedactedFields'] = aws_redacted_fields
 
-            self.manager.retry(
-                client.put_logging_configuration,
-                LoggingConfiguration=logging_config,
-                ignore_err_codes=('WAFNonexistentItemException',),
+            try:
+                self.manager.retry(
+                    client.put_logging_configuration,
+                    LoggingConfiguration=logging_config,
+                    ignore_err_codes=('WAFNonexistentItemException',),
+                )
+            except client.exceptions.WAFInvalidParameterException as e:
+                self.log.error(
+                    f"Invalid parameter for WAFv2 WebACL {r['Name']}: {e}. "
+                    f"Check redacted_fields values are valid AWS field names."
+                )
+                continue
+
+            redaction_info = ""
+            if aws_redacted_fields:
+                field_names = [list(f.keys())[0] for f in aws_redacted_fields]
+                redaction_info = f" with redacted fields {', '.join(field_names)}"
+            self.log.info(
+                f"Enabled logging for WAFv2 WebACL {r['Name']} "
+                f"to {destination}{redaction_info}"
             )
-
-            self.log.info(f"Enabled logging for WAFv2 WebACL {r['Name']} to {destination}")
 
 
 @WAFV2.filter_registry.register('web-acl-rules')
