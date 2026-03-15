@@ -2,8 +2,11 @@
 # SPDX-License-Identifier: Apache-2.0
 import time
 
+from c7n.testing import C7N_FUNCTIONAL
 from gcp_common import BaseTest, event_data
 from googleapiclient.errors import HttpError
+
+from pytest_terraform import terraform
 
 
 class FirewallTest(BaseTest):
@@ -152,6 +155,107 @@ class SubnetTest(BaseTest):
                     'region': 'us-central1',
                     'subnetwork': subnet['name']})
         self.assertEqual(result['privateIpGoogleAccess'], True)
+
+
+@terraform('gcp_subnet_set_flow_log')
+def test_subnet_set_flow_log(test, gcp_subnet_set_flow_log):
+    project_id = gcp_subnet_set_flow_log['google_compute_subnetwork.default.project']
+    if C7N_FUNCTIONAL:
+        factory = test.record_flight_data(
+            'subnet-set-flow-log', project_id=project_id)
+    else:
+        factory = test.replay_flight_data(
+            'subnet-set-flow-log', project_id=project_id)
+
+    subnet_name = gcp_subnet_set_flow_log['google_compute_subnetwork.default.name']
+    region = gcp_subnet_set_flow_log['google_compute_subnetwork.default.region']
+    policy = test.load_policy(
+        {
+            'name': 'gcp-subnet-set-flow-log',
+            'resource': 'gcp.subnet',
+            'filters': [
+                {'name': subnet_name},
+                {'enableFlowLogs': 'empty'},
+            ],
+            'actions': [
+                {
+                    'type': 'set-flow-log',
+                    'state': True,
+                    'aggregationInterval': 'INTERVAL_5_SEC',
+                    'flowSampling': 0.5,
+                    'metadata': 'INCLUDE_ALL_METADATA',
+                }
+            ],
+        },
+        session_factory=factory,
+    )
+
+    resources = policy.run()
+    assert len(resources) == 1
+    assert resources[0]['name'] == subnet_name
+
+    if test.recording:
+        time.sleep(2)
+
+    client = policy.resource_manager.get_client()
+    subnet = client.execute_query(
+        'get', {'project': project_id, 'region': region, 'subnetwork': subnet_name}
+    )
+    assert subnet['logConfig']['enable'] is True
+    assert subnet['logConfig']['aggregationInterval'] == 'INTERVAL_5_SEC'
+    assert subnet['logConfig']['flowSampling'] == 0.5
+    assert subnet['logConfig']['metadata'] == 'INCLUDE_ALL_METADATA'
+
+
+@terraform('gcp_subnet_set_flow_log_custom_metadata')
+def test_subnet_set_flow_log_custom_metadata(test, gcp_subnet_set_flow_log_custom_metadata):
+    fixture = gcp_subnet_set_flow_log_custom_metadata
+    project_id = fixture['google_compute_subnetwork.default.project']
+    if C7N_FUNCTIONAL:
+        factory = test.record_flight_data(
+            'subnet-set-flow-log-custom-metadata', project_id=project_id)
+    else:
+        factory = test.replay_flight_data(
+            'subnet-set-flow-log-custom-metadata', project_id=project_id)
+
+    subnet_name = fixture['google_compute_subnetwork.default.name']
+    region = fixture['google_compute_subnetwork.default.region']
+    policy = test.load_policy(
+        {
+            'name': 'gcp-subnet-set-flow-log-custom-metadata',
+            'resource': 'gcp.subnet',
+            'filters': [
+                {'name': subnet_name},
+            ],
+            'actions': [
+                {
+                    'type': 'set-flow-log',
+                    'state': True,
+                    'metadata': 'CUSTOM_METADATA',
+                    'metadataFields': ['src_instance', 'dest_instance', 'src_vpc', 'dest_vpc'],
+                    'filterExpr': 'true',
+                }
+            ],
+        },
+        session_factory=factory,
+    )
+
+    resources = policy.run()
+    assert len(resources) == 1
+    assert resources[0]['name'] == subnet_name
+
+    if test.recording:
+        time.sleep(2)
+
+    client = policy.resource_manager.get_client()
+    subnet = client.execute_query(
+        'get', {'project': project_id, 'region': region, 'subnetwork': subnet_name}
+    )
+    assert subnet['logConfig']['enable'] is True
+    assert subnet['logConfig']['metadata'] == 'CUSTOM_METADATA'
+    assert set(subnet['logConfig']['metadataFields']) == {
+        'src_instance', 'dest_instance', 'src_vpc', 'dest_vpc'}
+    assert subnet['logConfig']['filterExpr'] == 'true'
 
 
 class RouterTest(BaseTest):

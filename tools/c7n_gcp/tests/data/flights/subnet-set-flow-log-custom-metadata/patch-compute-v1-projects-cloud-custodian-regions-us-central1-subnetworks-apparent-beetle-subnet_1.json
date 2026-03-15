@@ -1,0 +1,32 @@
+{
+  "headers": {
+    "content-type": "application/json; charset=UTF-8",
+    "vary": "Origin, X-Origin, Referer",
+    "date": "Sun, 15 Mar 2026 19:22:41 GMT",
+    "server": "ESF",
+    "x-xss-protection": "0",
+    "x-frame-options": "SAMEORIGIN",
+    "x-content-type-options": "nosniff",
+    "alt-svc": "h3=\":443\"; ma=2592000,h3-29=\":443\"; ma=2592000",
+    "transfer-encoding": "chunked",
+    "status": "200",
+    "content-length": "858",
+    "-content-encoding": "gzip"
+  },
+  "body": {
+    "kind": "compute#operation",
+    "id": "6102401416831875566",
+    "name": "operation-1773602561173-64d1506a1a92a-da0da7bd-96a7f4c0",
+    "operationType": "compute.subnetworks.patch",
+    "targetLink": "https://www.googleapis.com/compute/v1/projects/cloud-custodian/regions/us-central1/subnetworks/apparent-beetle-subnet",
+    "targetId": "8594914635421497354",
+    "status": "DONE",
+    "user": "markos@sixfeetup.com",
+    "progress": 100,
+    "insertTime": "2026-03-15T12:22:41.354-07:00",
+    "startTime": "2026-03-15T12:22:41.355-07:00",
+    "endTime": "2026-03-15T12:22:41.355-07:00",
+    "selfLink": "https://www.googleapis.com/compute/v1/projects/cloud-custodian/regions/us-central1/operations/operation-1773602561173-64d1506a1a92a-da0da7bd-96a7f4c0",
+    "region": "https://www.googleapis.com/compute/v1/projects/cloud-custodian/regions/us-central1"
+  }
+}
