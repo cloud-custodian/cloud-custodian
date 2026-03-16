@@ -34,7 +34,8 @@ class ResourceMetaTest(BaseTest):
             policy = Bag({'name': 'permcheck',
                      'resource': 'gcp.%s' % k,
                      'provider_name': 'gcp'})
-            if k in ('region',):
+            # Skip pseudo-resources that don't make API calls
+            if k in ('region', 'vertex-ai-location'):
                 continue
             ctx = self.get_context(config=cfg, policy=policy)
             mgr = v(ctx, policy)

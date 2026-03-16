@@ -245,3 +245,25 @@ def test_lattice_service_network_detailspec(test, lattice_service_network_detail
     assert resources[0]['authType'] == 'AWS_IAM'
     assert resources[0]['Tags'][0]['Key'] == 'TestServiceNetwork'
     assert resources[0]['Tags'][0]['Value'] == 'TestServiceNetworkValue'
+
+
+@terraform('lattice_service_network_association')
+def test_lattice_service_network_association_list(test, lattice_service_network_association):
+    factory = test.replay_flight_data("test_lattice_service_network_association_list")
+
+    p = test.load_policy(
+        {
+            "name": "lattice-service-network-association-list",
+            "resource": "aws.vpc-lattice-service-network-association",
+            "filters": [{"type": "value", "key": "status", "value": "ACTIVE"}],
+        },
+        session_factory=factory,
+    )
+    resources = p.run()
+    assert len(resources) == 1
+    assert resources[0]["status"] == "ACTIVE"
+    assert resources[0]["c7n:parent-id"] == resources[0]["serviceNetworkId"]
+    assert {t["Key"]: t["Value"] for t in resources[0]["Tags"]} == {
+        "ASV": "PolicyTestASV",
+        "Environment": "Test",
+    }

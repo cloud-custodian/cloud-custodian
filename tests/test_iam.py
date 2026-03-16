@@ -2927,6 +2927,393 @@ class CrossAccountChecker(TestCase):
         violations = checker.check(policy)
         self.assertEqual(len(violations), 1)
 
+    def test_whitelist_patterns_deleted_principals(self):
+        """Test that whitelist_patterns skips principals matching IAM unique ID patterns."""
+        # Simulates what AWS does when a principal is deleted: the ARN is replaced
+        # with the unique identifier (e.g. AROA*, AIDA*, etc.)
+        policy = {
+            "Version": "2012-10-17",
+            "Statement": [{
+                "Effect": "Allow",
+                "Principal": {
+                    "AWS": [
+                        "arn:aws:iam::111122223333:role/role-name",
+                        "AIDACKCEVSQ6C2EXAMPLE",
+                        "AROADBQP57FF2AEXAMPLE",
+                    ]
+                },
+                "Action": "s3:GetObject",
+                "Resource": "*",
+            }]
+        }
+
+        # Without whitelist_patterns, deleted principal unique IDs trigger a violation
+        checker = PolicyChecker({"allowed_accounts": {"111122223333"}})
+        violations = checker.check(policy)
+        self.assertEqual(len(violations), 1)
+
+        # With whitelist_patterns matching IAM unique IDs, no violation
+        checker = PolicyChecker({
+            "allowed_accounts": {"111122223333"},
+            "whitelist_patterns": ["AIDA*", "AROA*"],
+        })
+        violations = checker.check(policy)
+        self.assertEqual(len(violations), 0)
+
+    def test_whitelist_patterns_only_matching_skipped(self):
+        """Test that whitelist_patterns only skips principals that match the pattern."""
+        policy = {
+            "Version": "2012-10-17",
+            "Statement": [{
+                "Effect": "Allow",
+                "Principal": {
+                    "AWS": [
+                        "arn:aws:iam::999999999999:role/external-role",
+                        "AIDACKCEVSQ6C2EXAMPLE",
+                    ]
+                },
+                "Action": "s3:GetObject",
+                "Resource": "*",
+            }]
+        }
+
+        # Whitelisting the deleted-principal pattern still flags the cross-account role
+        checker = PolicyChecker({
+            "allowed_accounts": {"111122223333"},
+            "whitelist_patterns": ["AIDA*"],
+        })
+        violations = checker.check(policy)
+        self.assertEqual(len(violations), 1)
+
+    def test_check_with_string_policy(self):
+        """Test that check() accepts a JSON string as input."""
+        policy = {
+            "Version": "2012-10-17",
+            "Statement": [{
+                "Effect": "Allow",
+                "Principal": {"AWS": "arn:aws:iam::999999999999:root"},
+                "Action": "*",
+                "Resource": "*",
+            }]
+        }
+        checker = PolicyChecker({"allowed_accounts": {"123456789012"}})
+        violations = checker.check(json.dumps(policy))
+        self.assertEqual(len(violations), 1)
+
+    def test_handle_action_check_actions(self):
+        """Test handle_action() when check_actions is configured."""
+        checker = PolicyChecker({"check_actions": ["s3:GetObject", "s3:PutObject"]})
+
+        # Action matches check_actions → should be considered
+        s_match = {"Action": "s3:GetObject", "Effect": "Allow", "Principal": "*"}
+        self.assertTrue(checker.handle_action(s_match))
+
+        # Action list with one match → True
+        s_list_match = {"Action": ["s3:DeleteObject", "s3:PutObject"],
+                        "Effect": "Allow", "Principal": "*"}
+        self.assertTrue(checker.handle_action(s_list_match))
+
+        # Action does not match check_actions → skip
+        s_no_match = {"Action": "iam:ListUsers", "Effect": "Allow", "Principal": "*"}
+        self.assertFalse(checker.handle_action(s_no_match))
+
+    def test_handle_principal_empty(self):
+        """Test handle_principal() with an empty/None Principal value."""
+        checker = PolicyChecker({"allowed_accounts": {"123456789012"}})
+
+        # None principal is treated as a potential violation (conservative)
+        s = {"Effect": "Allow", "Action": "*", "Principal": None}
+        self.assertTrue(checker.handle_principal(s))
+
+    def test_handle_principal_cloudfront(self):
+        """Test that CloudFront Origin Access Identity principals are skipped."""
+        checker = PolicyChecker({"allowed_accounts": {"123456789012"}})
+        policy = {
+            "Version": "2012-10-17",
+            "Statement": [{
+                "Effect": "Allow",
+                "Principal": {
+                    "AWS": (
+                        "arn:aws:iam::cloudfront:user/"
+                        "CloudFront Origin Access Identity EXH52BD8319I2"
+                    )
+                },
+                "Action": "s3:GetObject",
+                "Resource": "*",
+            }]
+        }
+        # CloudFront principal should be ignored – no violation
+        violations = checker.check(policy)
+        self.assertEqual(len(violations), 0)
+
+    def test_handle_condition_no_op(self):
+        """Test handle_condition() returns False when the condition has no op."""
+        checker = PolicyChecker({"allowed_accounts": {"123456789012"}})
+        condition = {"op": None, "key": "aws:sourceaccount", "values": ["999999999999"]}
+        result = checker.handle_condition({}, condition)
+        self.assertFalse(result)
+
+    def test_handle_condition_whitelist_conditions_match(self):
+        """Test handle_condition() returns True when key is in whitelist_conditions."""
+        checker = PolicyChecker({
+            "allowed_accounts": {"123456789012"},
+            "whitelist_conditions": ["aws:userid"],
+        })
+        condition = {"op": "StringEquals", "key": "aws:userid", "values": ["AIDAUSER123"]}
+        result = checker.handle_condition({}, condition)
+        self.assertTrue(result)
+
+    def test_handle_aws_sourceowner(self):
+        """Test handle_aws_sourceowner() condition handler."""
+        policy = {
+            "Version": "2012-10-17",
+            "Statement": [{
+                "Effect": "Allow",
+                "Principal": "*",
+                "Action": "sns:Publish",
+                "Resource": "*",
+                "Condition": {
+                    "StringEquals": {"aws:SourceOwner": "999999999999"}
+                }
+            }]
+        }
+        # Source owner in allowed accounts → no violation
+        checker = PolicyChecker({"allowed_accounts": {"999999999999"}})
+        self.assertEqual(len(checker.check(policy)), 0)
+
+        # Source owner NOT in allowed accounts → violation
+        checker2 = PolicyChecker({"allowed_accounts": {"123456789012"}})
+        self.assertEqual(len(checker2.check(policy)), 1)
+
+    def test_handle_aws_sourceip(self):
+        """Test handle_aws_sourceip() always allows (returns False = no violation)."""
+        policy = {
+            "Version": "2012-10-17",
+            "Statement": [{
+                "Effect": "Allow",
+                "Principal": "*",
+                "Action": "s3:GetObject",
+                "Resource": "*",
+                "Condition": {
+                    "IpAddress": {"aws:SourceIp": "10.0.0.0/8"}
+                }
+            }]
+        }
+        checker = PolicyChecker({})
+        # IP condition whitelists the statement → no violation
+        self.assertEqual(len(checker.check(policy)), 0)
+
+    def test_handle_s3_dataaccesspointaccount(self):
+        """Test handle_s3_dataaccesspointaccount() condition handler."""
+        policy = {
+            "Version": "2012-10-17",
+            "Statement": [{
+                "Effect": "Allow",
+                "Principal": "*",
+                "Action": "s3:GetObject",
+                "Resource": "*",
+                "Condition": {
+                    "StringEquals": {"s3:DataAccessPointAccount": "123456789012"}
+                }
+            }]
+        }
+        # Matching account → no violation
+        checker = PolicyChecker({"allowed_accounts": {"123456789012"}})
+        self.assertEqual(len(checker.check(policy)), 0)
+
+        # Non-matching account → violation
+        checker2 = PolicyChecker({"allowed_accounts": {"111111111111"}})
+        self.assertEqual(len(checker2.check(policy)), 1)
+
+    def test_get_whitelist_patterns(self):
+        """Test CrossAccountAccessFilter.get_whitelist_patterns() without _from."""
+        f = CrossAccountAccessFilter.__new__(CrossAccountAccessFilter)
+        f.data = {'whitelist_patterns': ['AIDA*', 'AROA*']}
+        f.manager = None
+
+        patterns = f.get_whitelist_patterns()
+        self.assertEqual(patterns, ['AIDA*', 'AROA*'])
+
+    def test_get_whitelist_patterns_from(self):
+        """Test CrossAccountAccessFilter.get_whitelist_patterns() with whitelist_patterns_from."""
+        f = CrossAccountAccessFilter.__new__(CrossAccountAccessFilter)
+        f.data = {
+            'whitelist_patterns': ['AIDA*'],
+            'whitelist_patterns_from': {
+                'url': 's3://bucket/patterns.txt', 'format': 'txt'
+            }
+        }
+        mock_manager = mock.MagicMock()
+        f.manager = mock_manager
+
+        with mock.patch('c7n.filters.iamaccess.ValuesFrom') as mock_vf_cls:
+            mock_vf_instance = mock.MagicMock()
+            mock_vf_instance.get_values.return_value = ['AROA*', 'AGPA*']
+            mock_vf_cls.return_value = mock_vf_instance
+
+            patterns = f.get_whitelist_patterns()
+
+        self.assertEqual(patterns, ['AIDA*', 'AROA*', 'AGPA*'])
+        mock_vf_cls.assert_called_once_with(f.data['whitelist_patterns_from'], mock_manager)
+
+    def _make_filter(self, filter_data):
+        """Helper to build a CrossAccountAccessFilter with a mock manager."""
+        mock_manager = mock.MagicMock()
+        mock_manager.config.account_id = '123456789012'
+        return CrossAccountAccessFilter(filter_data, mock_manager)
+
+    def test_cross_account_filter_process_violation(self):
+        """CrossAccountAccessFilter.process() flags cross-account violation."""
+        f = self._make_filter({'type': 'cross-account'})
+
+        cross_acct_policy = json.dumps({
+            "Version": "2012-10-17",
+            "Statement": [{
+                "Effect": "Allow",
+                "Principal": {"AWS": "arn:aws:iam::999999999999:root"},
+                "Action": "*",
+                "Resource": "*",
+            }]
+        })
+        allowed_policy = json.dumps({
+            "Version": "2012-10-17",
+            "Statement": [{
+                "Effect": "Allow",
+                "Principal": {"AWS": "arn:aws:iam::123456789012:root"},
+                "Action": "*",
+                "Resource": "*",
+            }]
+        })
+        # Resource with no Policy attribute → should be excluded
+        resources = [
+            {'Policy': cross_acct_policy},
+            {'Policy': allowed_policy},
+            {},  # no policy → __call__ returns False
+        ]
+        results = f.process(resources)
+        self.assertEqual(len(results), 1)
+        self.assertIn('CrossAccountViolations', results[0])
+
+    def test_cross_account_filter_return_allowed(self):
+        """CrossAccountAccessFilter.__call__() with return_allowed=True."""
+        f = self._make_filter({'type': 'cross-account', 'return_allowed': True})
+
+        allowed_policy = json.dumps({
+            "Version": "2012-10-17",
+            "Statement": [{
+                "Effect": "Allow",
+                "Principal": {"AWS": "arn:aws:iam::123456789012:root"},
+                "Action": "*",
+                "Resource": "*",
+            }]
+        })
+        results = f.process([{'Policy': allowed_policy}])
+        self.assertEqual(len(results), 1)
+        self.assertIn('CrossAccountAllowlists', results[0])
+
+    def test_cross_account_filter_whitelist_account(self):
+        """CrossAccountAccessFilter.get_accounts() respects whitelist."""
+        f = self._make_filter({
+            'type': 'cross-account',
+            'whitelist': ['999999999999'],
+        })
+        cross_acct_policy = json.dumps({
+            "Version": "2012-10-17",
+            "Statement": [{
+                "Effect": "Allow",
+                "Principal": {"AWS": "arn:aws:iam::999999999999:root"},
+                "Action": "*",
+                "Resource": "*",
+            }]
+        })
+        # whitelisted account → no violation
+        self.assertEqual(len(f.process([{'Policy': cross_acct_policy}])), 0)
+
+    def test_cross_account_filter_whitelist_from(self):
+        """CrossAccountAccessFilter.get_accounts() with whitelist_from branch."""
+        f = self._make_filter({
+            'type': 'cross-account',
+            'whitelist_from': {'url': 's3://b/accounts.txt', 'format': 'txt'},
+        })
+        cross_acct_policy = json.dumps({
+            "Version": "2012-10-17",
+            "Statement": [{
+                "Effect": "Allow",
+                "Principal": {"AWS": "arn:aws:iam::999999999999:root"},
+                "Action": "*",
+                "Resource": "*",
+            }]
+        })
+        with mock.patch('c7n.filters.iamaccess.ValuesFrom') as mock_vf_cls:
+            mock_vf_cls.return_value.get_values.return_value = ['999999999999']
+            results = f.process([{'Policy': cross_acct_policy}])
+        self.assertEqual(len(results), 0)
+
+    def test_cross_account_filter_whitelist_vpc_from(self):
+        """CrossAccountAccessFilter.get_vpcs() with whitelist_vpc_from branch."""
+        f = self._make_filter({
+            'type': 'cross-account',
+            'whitelist_vpc_from': {'url': 's3://b/vpcs.txt', 'format': 'txt'},
+        })
+        vpc_policy = json.dumps({
+            "Version": "2012-10-17",
+            "Statement": [{
+                "Effect": "Allow",
+                "Principal": "*",
+                "Action": "*",
+                "Resource": "*",
+                "Condition": {"StringEquals": {"aws:SourceVpc": "vpc-aabbccdd"}}
+            }]
+        })
+        with mock.patch('c7n.filters.iamaccess.ValuesFrom') as mock_vf_cls:
+            mock_vf_cls.return_value.get_values.return_value = ['vpc-aabbccdd']
+            results = f.process([{'Policy': vpc_policy}])
+        self.assertEqual(len(results), 0)
+
+    def test_cross_account_filter_whitelist_vpce_from(self):
+        """CrossAccountAccessFilter.get_vpces() with whitelist_vpce_from branch."""
+        f = self._make_filter({
+            'type': 'cross-account',
+            'whitelist_vpce_from': {'url': 's3://b/vpces.txt', 'format': 'txt'},
+        })
+        vpce_policy = json.dumps({
+            "Version": "2012-10-17",
+            "Statement": [{
+                "Effect": "Allow",
+                "Principal": "*",
+                "Action": "*",
+                "Resource": "*",
+                "Condition": {"StringEquals": {"aws:SourceVpce": "vpce-11223344"}}
+            }]
+        })
+        with mock.patch('c7n.filters.iamaccess.ValuesFrom') as mock_vf_cls:
+            mock_vf_cls.return_value.get_values.return_value = ['vpce-11223344']
+            results = f.process([{'Policy': vpce_policy}])
+        self.assertEqual(len(results), 0)
+
+    def test_cross_account_filter_whitelist_orgids_from(self):
+        """CrossAccountAccessFilter.get_orgids() with whitelist_orgids_from branch."""
+        f = self._make_filter({
+            'type': 'cross-account',
+            'whitelist_orgids_from': {'url': 's3://b/orgids.txt', 'format': 'txt'},
+        })
+        orgid_policy = json.dumps({
+            "Version": "2012-10-17",
+            "Statement": [{
+                "Effect": "Allow",
+                "Principal": "*",
+                "Action": "*",
+                "Resource": "*",
+                "Condition": {
+                    "StringEquals": {"aws:PrincipalOrgID": "o-example123"}
+                }
+            }]
+        })
+        with mock.patch('c7n.filters.iamaccess.ValuesFrom') as mock_vf_cls:
+            mock_vf_cls.return_value.get_values.return_value = ['o-example123']
+            results = f.process([{'Policy': orgid_policy}])
+        self.assertEqual(len(results), 0)
+
 
 class SetRolePolicyAction(BaseTest):
     def test_set_policy_attached(self):
