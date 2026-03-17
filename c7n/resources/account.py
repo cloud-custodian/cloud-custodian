@@ -200,7 +200,6 @@ class AccountAlternateContact(ValueFilter):
     schema_alias = False
     permissions = ('account:GetAlternateContact',)
     annotation_key = 'c7n:alternate-contact'
-    annotate = False
     required_keys = set()
 
     def process(self, resources, event=None):
