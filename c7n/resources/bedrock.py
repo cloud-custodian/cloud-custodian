@@ -304,10 +304,47 @@ class BedrockModelInvocationJob(QueryResourceManager):
     class resource_type(TypeInfo):
         service = 'bedrock'
         enum_spec = ('list_model_invocation_jobs', 'invocationJobSummaries[]', None)
-        detail_spec = ('get_model_invocation_job', 'jobIdentifier', 'jobArn', None)
         name = 'jobName'
         id = arn = 'jobArn'
+        arn_type = 'model-invocation-job'
         permission_prefix = 'bedrock'
+        universal_taggable = object()
+        permissions_augment = ("bedrock:ListTagsForResource",)
+
+    augment = universal_augment
+
+
+@BedrockModelInvocationJob.action_registry.register('stop')
+class StopModelInvocationJob(BaseAction):
+    """Stop Bedrock model invocation job
+
+    :example:
+
+    .. code-block:: yaml
+
+        policies:
+            - name: bedrock-stop-untagged-jobs
+              resource: aws.bedrock-model-invocation-job
+              filters:
+                - 'tag:Owner': absent
+                - type: value
+                  key: status
+                  op: in
+                  value: [Submitted, Validating, Scheduled, InProgress]
+              actions:
+                - type: stop
+    """
+    schema = type_schema('stop')
+    permissions = ('bedrock:StopModelInvocationJob',)
+
+    def process(self, resources):
+        client = local_session(self.manager.session_factory).client('bedrock')
+        for r in resources:
+            try:
+                client.stop_model_invocation_job(jobIdentifier=r['jobArn'])
+            except (client.exceptions.ResourceNotFoundException,
+                    client.exceptions.ConflictException) as e:
+                self.log.warning('%s', e)
 
 
 @resources.register('bedrock-agent')

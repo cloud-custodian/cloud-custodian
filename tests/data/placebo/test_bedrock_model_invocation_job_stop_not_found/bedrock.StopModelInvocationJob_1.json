@@ -1,0 +1,11 @@
+{
+    "status_code": 404,
+    "data": {
+        "Error": {
+            "Message": "The provided batch inference job was not found.",
+            "Code": "ResourceNotFoundException"
+        },
+        "ResponseMetadata": {},
+        "message": "The provided batch inference job was not found."
+    }
+}

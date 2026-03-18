@@ -1,0 +1,55 @@
+{
+    "status_code": 200,
+    "data": {
+        "ResponseMetadata": {},
+        "jobArn": "arn:aws:bedrock:us-east-1:644160558196:model-invocation-job/grq19g0dxhjt",
+        "jobName": "c7n-batch-invocation-crisp-impala",
+        "modelId": "arn:aws:bedrock:us-east-1::foundation-model/amazon.nova-micro-v1:0",
+        "clientRequestToken": "b2b0e0d5-e40c-4b12-9921-1a612bb034d8",
+        "roleArn": "arn:aws:iam::644160558196:role/c7n-bedrock-batch-crisp-impala",
+        "status": "Stopping",
+        "submitTime": {
+            "__class__": "datetime",
+            "year": 2026,
+            "month": 3,
+            "day": 4,
+            "hour": 20,
+            "minute": 41,
+            "second": 24,
+            "microsecond": 380000
+        },
+        "lastModifiedTime": {
+            "__class__": "datetime",
+            "year": 2026,
+            "month": 3,
+            "day": 4,
+            "hour": 20,
+            "minute": 41,
+            "second": 25,
+            "microsecond": 289000
+        },
+        "inputDataConfig": {
+            "s3InputDataConfig": {
+                "s3Uri": "s3://c7n-bedrock-input-crisp-impala/input.jsonl",
+                "s3BucketOwner": "644160558196"
+            }
+        },
+        "outputDataConfig": {
+            "s3OutputDataConfig": {
+                "s3Uri": "s3://c7n-bedrock-output-crisp-impala/",
+                "s3BucketOwner": "644160558196"
+            }
+        },
+        "timeoutDurationInHours": 24,
+        "jobExpirationTime": {
+            "__class__": "datetime",
+            "year": 2026,
+            "month": 3,
+            "day": 5,
+            "hour": 20,
+            "minute": 41,
+            "second": 24,
+            "microsecond": 380000
+        }
+    }
+}
