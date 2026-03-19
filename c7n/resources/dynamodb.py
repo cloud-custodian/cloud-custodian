@@ -206,7 +206,7 @@ class ExportDescriptionFilter(ValueFilter):
                 self.augment([r])
 
             exports = r.get(self.annotation_key, [])
-            matched = [export for export in exports if super().__call__(export)]
+            matched = [export for export in exports if self.match(export)]
             if matched:
                 r[self.annotation_key] = matched
                 results.append(r)
