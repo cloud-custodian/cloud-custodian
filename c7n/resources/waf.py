@@ -310,6 +310,7 @@ class WAFV2SetLogging(BaseAction):
                 LoggingConfiguration=logging_config,
                 ignore_err_codes=('WAFNonexistentItemException',),
             )
+
             self.log.info(f"Enabled logging for WAFv2 WebACL {r['Name']} to {destination}")
 
 
