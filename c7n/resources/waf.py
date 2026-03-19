@@ -7,6 +7,7 @@ from c7n.filters import ValueFilter, ListItemFilter
 from c7n.utils import type_schema, local_session
 from c7n.actions import BaseAction
 from c7n.exceptions import PolicyValidationError
+from c7n.resources.aws import shape_validate
 
 
 class DescribeRegionalWaf(DescribeSource):
@@ -219,7 +220,7 @@ class WAFV2LoggingFilter(ValueFilter):
 @WAFV2.action_registry.register('set-logging')
 class WAFV2SetLogging(BaseAction):
     """
-    Action to enable logging for a WAFv2 Web ACL.
+    Action to enable logging for a WAFv2 Web ACL with optional attributes.
 
     :example:
 
@@ -235,9 +236,28 @@ class WAFV2SetLogging(BaseAction):
             actions:
               - type: set-logging
                 destination: "arn:aws:s3:::aws-waf-logs-bucket"
+
+          - name: enable-wafv2-logging-with-redacted-fields
+            resource: aws.wafv2
+            filters:
+              - type: value
+                key: Name
+                value: my-web-acl
+            actions:
+              - type: set-logging
+                destination: "arn:aws:s3:::aws-waf-logs-bucket"
+                attributes:
+                  RedactedFields:
+                    - SingleHeader:
+                        Name: user-agent
+                    - Method: {}
     """
 
-    schema = type_schema('set-logging', required=['destination'], destination={'type': 'string'})
+    schema = type_schema(
+        'set-logging',
+        required=['destination'],
+        destination={'type': 'string'},
+        attributes={'type': 'object'})
 
     permissions = ('wafv2:PutLoggingConfiguration',)
 
@@ -255,6 +275,19 @@ class WAFV2SetLogging(BaseAction):
                     raise PolicyValidationError(
                         f"Destination resource must start with aws-waf-logs, got {resource_name}"
                     )
+
+        # Validate attributes against AWS API schema
+        if 'attributes' in self.data:
+            cfg = {
+                'LoggingConfiguration': {
+                    'ResourceArn': 'arn:aws:wafv2:us-east-1:644160558196:regional/webacl/tester/1',
+                    'LogDestinationConfigs': [destination]
+                }
+            }
+            cfg['LoggingConfiguration'].update(self.data['attributes'])
+            shape_validate(
+                cfg, 'PutLoggingConfigurationRequest', 'wafv2'
+            )
         return self
 
     def process(self, resources):
@@ -262,18 +295,24 @@ class WAFV2SetLogging(BaseAction):
             'wafv2', region_name=self.manager.region
         )
         destination = self.data['destination']
+        attributes = self.data.get('attributes', {})
 
         for r in resources:
             resource_arn = r['ARN']
-            logging_config = {'ResourceArn': resource_arn, 'LogDestinationConfigs': [destination]}
+            logging_config = {
+                'ResourceArn': resource_arn,
+                'LogDestinationConfigs': [destination]
+            }
+            logging_config.update(attributes)
 
             self.manager.retry(
                 client.put_logging_configuration,
                 LoggingConfiguration=logging_config,
                 ignore_err_codes=('WAFNonexistentItemException',),
             )
-
-            self.log.info(f"Enabled logging for WAFv2 WebACL {r['Name']} to {destination}")
+            attrs_info = f" with attributes: {list(attributes.keys())}" if attributes else ""
+            self.log.info(
+                f"Enabled logging for WAFv2 WebACL {r['Name']} to {destination}{attrs_info}")
 
 
 @WAFV2.filter_registry.register('web-acl-rules')
