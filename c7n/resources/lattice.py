@@ -117,6 +117,49 @@ class VPCLatticeListener(ChildResourceManager):
         permissions_enum = ('vpc-lattice:ListListeners',)
 
 
+class DescribeServiceNetworkAssociation(ChildDescribeSource):
+    def augment(self, resources):
+        return universal_augment(self.manager, resources)
+
+
+@resources.register('vpc-lattice-service-network-association')
+class VPCLatticeServiceNetworkAssociation(ChildResourceManager):
+    """VPC Lattice Service Network VPC Association Resource
+
+    Resource to list the lattice service network to VPC associations
+
+    :example:
+
+    .. code-block:: yaml
+
+        policies:
+          - name: find-active-associations
+            resource: aws.vpc-lattice-service-network-association
+            filters:
+              - type: value
+                key: status
+                value: ACTIVE
+    """
+
+    source_mapping = {
+        'describe-child': DescribeServiceNetworkAssociation,
+    }
+
+    class resource_type(TypeInfo):
+        service = 'vpc-lattice'
+        enum_spec = ('list_service_network_vpc_associations', 'items', None)
+        parent_spec = ('vpc-lattice-service-network', 'serviceNetworkIdentifier', True)
+        arn = 'arn'
+        id = 'id'
+        name = 'id'
+        universal_taggable = object()
+        permissions_enum = (
+            'vpc-lattice:ListServiceNetworks',
+            'vpc-lattice:ListServiceNetworkVpcAssociations',
+        )
+        permissions_augment = ('vpc-lattice:ListTagsForResource',)
+
+
 @VPCLatticeServiceNetwork.filter_registry.register('access-logs')
 @VPCLatticeService.filter_registry.register('access-logs')
 class AccessLogsFilter(ValueFilter):

@@ -12,6 +12,8 @@ from c7n.filters.core import ValueFilter
 from c7n.manager import ResourceManager
 from c7n.utils import local_session, type_schema
 
+from c7n_azure.actions.tagging import Tag, RemoveTag, TagTrim, TagDelayedAction
+from c7n_azure.filters import TagActionFilter
 from c7n_azure.provider import resources
 from c7n_azure.query import QueryMeta, TypeInfo
 
@@ -58,6 +60,10 @@ class Subscription(ResourceManager, metaclass=QueryMeta):
     def get_model(self):
         return self.resource_type
 
+    def get_session(self):
+        """Get the session for this resource manager."""
+        return local_session(self.session_factory)
+
     def resources(self):
         return self.filter_resources([self._get_subscription(self.session_factory, self.config)])
 
@@ -70,8 +76,19 @@ class Subscription(ResourceManager, metaclass=QueryMeta):
         details = client.subscriptions.get(subscription_id=session.get_subscription_id())
         return details.serialize(True)
 
+    def tag_operation_enabled(self, resource_type):
+        """Subscriptions support tagging operations."""
+        return True
+
 
 Subscription.filter_registry.register('missing', Missing)
+
+# Register tagging actions for subscriptions
+Subscription.action_registry.register('tag', Tag)
+Subscription.action_registry.register('untag', RemoveTag)
+Subscription.action_registry.register('tag-trim', TagTrim)
+Subscription.action_registry.register('mark-for-op', TagDelayedAction)
+Subscription.filter_registry.register('marked-for-op', TagActionFilter)
 
 
 @Subscription.filter_registry.register('diagnostic-settings')
