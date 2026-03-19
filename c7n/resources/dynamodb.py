@@ -200,8 +200,17 @@ class ExportDescriptionFilter(ValueFilter):
     permissions = ('dynamodb:ListExports', 'dynamodb:DescribeExport',)
 
     def process(self, resources, event=None):
-        self.augment([r for r in resources if self.annotation_key not in r])
-        results = [r for r in resources if self(r)]
+        results = []
+        for r in resources:
+            if self.annotation_key not in r:
+                self.augment([r])
+            
+            exports = r.get(self.annotation_key, [])
+            matched = [export for export in exports if super().__call__(export)]
+            if matched:
+                r[self.annotation_key] = matched
+                results.append(r)
+        
         return results
 
     def augment(self, resources):
@@ -238,22 +247,6 @@ class ExportDescriptionFilter(ValueFilter):
 
             table[self.annotation_key] = exports
             cache.save(table_cache_key, exports)
-
-    def __call__(self, r):
-        exports = r.get(self.annotation_key)
-        if not exports:
-            return False
-
-        matched = []
-        for export in exports:
-            if super().__call__(export):
-                matched.append(export)
-
-        if not matched:
-            return False
-
-        r[self.annotation_key] = matched
-        return True
 
 
 @Table.action_registry.register('set-continuous-backup')

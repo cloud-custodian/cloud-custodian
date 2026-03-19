@@ -488,15 +488,6 @@ class DynamodbTest(BaseTest):
 
         filter = p.resource_manager.filters[0]
 
-        # Already annotated - skip augment
-        original = [{"ExportStatus": "COMPLETED"}]
-        annotated = [
-            {"TableArn": "arn:aws:dynamodb:us-east-1:123:table/A",
-            "c7n:ExportDescription": original}
-        ]
-        filter.augment(annotated)
-        self.assertIs(annotated[0]["c7n:ExportDescription"], original)
-
         # Cache hit
         mock_cache = MagicMock()
         mock_cache.get.return_value = [{"ExportStatus": "COMPLETED"}]
@@ -506,19 +497,6 @@ class DynamodbTest(BaseTest):
         self.assertEqual(cached[0]["c7n:ExportDescription"], [{"ExportStatus": "COMPLETED"}])
         mock_cache.get.assert_called_once()
         mock_cache.save.assert_not_called()
-
-        # Covering __call__
-        r_no_exports = {
-            "TableArn": "arn:aws:dynamodb:us-east-1:123:table/A",
-            "c7n:ExportDescription": []
-        }
-        self.assertFalse(filter(r_no_exports))
-
-        r_no_match = {
-            "TableArn": "arn:aws:dynamodb:us-east-1:123:table/B",
-            "c7n:ExportDescription": [{"ExportStatus": "IN_PROGRESS"}]
-        }
-        self.assertFalse(filter(r_no_match))
 
 
 class DynamoDbAccelerator(BaseTest):
