@@ -1,6 +1,7 @@
 # Copyright The Cloud Custodian Authors.
 # SPDX-License-Identifier: Apache-2.0
 import json
+import pytest
 import ipaddress
 import os
 import tempfile
@@ -1009,3 +1010,16 @@ def test_jmespath_parse_to_json():
         {'foo': '{"]}'}
     )
     assert result is None
+
+
+@pytest.mark.parametrize("region,expected", [
+    ('us-east-1', 'aws'),
+    ('us-gov-west-1', 'aws-us-gov'),
+    ('cn-north-1', 'aws-cn'),
+    ('us-iso-east-1', 'aws-iso'),
+    ('unknown-region', 'aws'),
+    ('', ''),
+    (None, ''),
+])
+def test_get_partition(region, expected):
+    assert utils.get_partition(region) == expected
