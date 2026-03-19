@@ -310,9 +310,7 @@ class WAFV2SetLogging(BaseAction):
                 LoggingConfiguration=logging_config,
                 ignore_err_codes=('WAFNonexistentItemException',),
             )
-            attrs_info = f" with attributes: {list(attributes.keys())}" if attributes else ""
-            self.log.info(
-                f"Enabled logging for WAFv2 WebACL {r['Name']} to {destination}{attrs_info}")
+            self.log.info(f"Enabled logging for WAFv2 WebACL {r['Name']} to {destination}")
 
 
 @WAFV2.filter_registry.register('web-acl-rules')
