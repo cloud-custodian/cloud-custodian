@@ -204,13 +204,13 @@ class ExportDescriptionFilter(ValueFilter):
         for r in resources:
             if self.annotation_key not in r:
                 self.augment([r])
-            
+
             exports = r.get(self.annotation_key, [])
             matched = [export for export in exports if super().__call__(export)]
             if matched:
                 r[self.annotation_key] = matched
                 results.append(r)
-        
+
         return results
 
     def augment(self, resources):
