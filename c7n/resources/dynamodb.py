@@ -209,9 +209,6 @@ class ExportDescriptionFilter(ValueFilter):
         cache = self.manager._cache
 
         for table in resources:
-            if self.annotation_key in table:
-                continue
-
             table_cache_key = f"dynamodb_exports:{table['TableArn']}"
             cached_exports = cache.get(table_cache_key)
 
