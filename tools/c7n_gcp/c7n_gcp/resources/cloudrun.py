@@ -1,5 +1,7 @@
 # Copyright The Cloud Custodian Authors.
 # SPDX-License-Identifier: Apache-2.0
+import copy
+
 from c7n_gcp.provider import resources
 from c7n_gcp.query import QueryResourceManager, TypeInfo
 from c7n_gcp.filters import IamPolicyFilter
@@ -23,6 +25,28 @@ class CloudRunService(QueryResourceManager):
         id = "metadata.selfLink"
         default_report_fields = ["metadata.name", "metadata.creationTimestamp"]
         asset_type = "run.googleapis.com/Service"
+        labels = True
+        labels_op = 'replaceService'
+
+        @staticmethod
+        def get_label_params(resource, all_labels):
+            metadata = resource['metadata']
+            location = metadata['labels']['cloud.googleapis.com/location']
+            namespace = metadata['namespace']
+            svc_name = metadata['name']
+            body = copy.deepcopy(resource)
+            body['metadata']['labels'] = all_labels
+            return {
+                'name': 'projects/{}/locations/{}/services/{}'.format(
+                    namespace, location, svc_name),
+                'body': body
+            }
+
+    def augment(self, resources):
+        for r in resources:
+            if r.get('metadata', {}).get('labels'):
+                r['labels'] = dict(r['metadata']['labels'])
+        return resources
 
 
 @CloudRunService.filter_registry.register("iam-policy")
@@ -64,6 +88,26 @@ class CloudRunJob(QueryResourceManager):
         id = "metadata.selfLink"
         default_report_fields = ["metadata.name", "metadata.creationTimestamp"]
         asset_type = "run.googleapis.com/Job"
+        labels = True
+        labels_op = 'replaceJob'
+
+        @staticmethod
+        def get_label_params(resource, all_labels):
+            metadata = resource['metadata']
+            namespace = metadata['namespace']
+            job_name = metadata['name']
+            body = copy.deepcopy(resource)
+            body['metadata']['labels'] = all_labels
+            return {
+                'name': 'namespaces/{}/jobs/{}'.format(namespace, job_name),
+                'body': body
+            }
+
+    def augment(self, resources):
+        for r in resources:
+            if r.get('metadata', {}).get('labels'):
+                r['labels'] = dict(r['metadata']['labels'])
+        return resources
 
 
 @resources.register("cloud-run-revision")
