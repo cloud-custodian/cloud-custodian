@@ -74,6 +74,86 @@ class KmsFilter(KmsRelatedFilter):
     RelatedIdsExpression = 'SSEDescription.KMSMasterKeyArn'
 
 
+@Table.filter_registry.register('import-description')
+class ImportDescriptionFilter(ValueFilter):
+    """Filter for DynamoDB table imports.
+
+    Fetches import descriptions for each table and allows filtering
+    on the import table description details.
+
+    :example:
+
+    .. code-block:: yaml
+
+        policies:
+          - name: dynamodb-imports-in-progress
+            resource: aws.dynamodb-table
+            filters:
+              - type: import-description
+                key: ImportStatus
+                value: IN_PROGRESS
+          - name: dynamodb-imports-failed
+            resource: aws.dynamodb-table
+            filters:
+              - type: import-description
+                key: ImportStatus
+                value: FAILED
+    """
+
+    annotation_key = 'c7n:ImportTableDescription'
+    schema = type_schema('import-description', rinherit=ValueFilter.schema)
+    permissions = ('dynamodb:ListImports', 'dynamodb:DescribeImport',)
+
+    def process(self, resources, event=None):
+        results = []
+        for r in resources:
+            if self.annotation_key not in r:
+                self.augment([r])
+
+            imports = r.get(self.annotation_key, [])
+            matched = [import_ for import_ in imports if self.match(import_)]
+            if matched:
+                r[self.annotation_key] = matched
+                results.append(r)
+
+        return results
+
+    def augment(self, resources):
+        client = local_session(self.manager.session_factory).client('dynamodb')
+        cache = self.manager._cache
+
+        for table in resources:
+            table_cache_key = f"dynamodb_imports:{table['TableArn']}"
+            cached_imports = cache.get(table_cache_key)
+
+            if cached_imports:
+                table[self.annotation_key] = cached_imports
+                continue
+
+            imports = []
+            next_token = None
+
+            while True:
+                params = {'TableArn': table['TableArn']}
+                if next_token:
+                    params['NextToken'] = next_token
+
+                response = client.list_imports(**params)
+
+                for import_summary in response.get('ImportSummaryList', []):
+                    import_details = client.describe_import(
+                        ImportArn=import_summary['ImportArn'])
+                    imports.append(import_details.get('ImportTableDescription', {}))
+
+                next_token = response.get('NextToken')
+
+                if not next_token:
+                    break
+
+            table[self.annotation_key] = imports
+            cache.save(table_cache_key, imports)
+
+
 @Table.filter_registry.register('continuous-backup')
 class TableContinuousBackupFilter(ValueFilter):
     """Check for continuous backups and point in time recovery (PITR) on a dynamodb table.
