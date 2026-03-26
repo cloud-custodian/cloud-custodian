@@ -1,0 +1,61 @@
+{
+    "status_code": 200,
+    "data": {
+        "ImportTableDescription": {
+            "ImportArn": "arn:aws:dynamodb:us-east-1:644160558196:table/test-import-description-filter-fullpath/import/01774467713552-101ba9b5",
+            "ImportStatus": "COMPLETED",
+            "TableArn": "arn:aws:dynamodb:us-east-1:644160558196:table/test-import-description-filter-fullpath",
+            "TableId": "377e728d-6da3-4d2a-b704-1598c8dc8209",
+            "ClientToken": "d7398a1d-5af7-4e8d-8d26-f06be9427fb3",
+            "S3BucketSource": {
+                "S3BucketOwner": "644160558196",
+                "S3Bucket": "apogeeac-test-bucket",
+                "S3KeyPrefix": "AWSDynamoDB/01771261966793-39cb1837/data/3zual7h5ke2glamerusypwm26i.json.gz"
+            },
+            "ErrorCount": 0,
+            "CloudWatchLogGroupArn": "arn:aws:logs:us-east-1:644160558196:log-group:/aws-dynamodb/imports:*",
+            "InputFormat": "DYNAMODB_JSON",
+            "InputCompressionType": "GZIP",
+            "TableCreationParameters": {
+                "TableName": "test-import-description-filter-fullpath",
+                "AttributeDefinitions": [
+                    {
+                        "AttributeName": "id",
+                        "AttributeType": "S"
+                    }
+                ],
+                "KeySchema": [
+                    {
+                        "AttributeName": "id",
+                        "KeyType": "HASH"
+                    }
+                ],
+                "BillingMode": "PAY_PER_REQUEST"
+            },
+            "StartTime": {
+                "__class__": "datetime",
+                "year": 2026,
+                "month": 3,
+                "day": 25,
+                "hour": 15,
+                "minute": 41,
+                "second": 53,
+                "microsecond": 552000
+            },
+            "EndTime": {
+                "__class__": "datetime",
+                "year": 2026,
+                "month": 3,
+                "day": 25,
+                "hour": 15,
+                "minute": 46,
+                "second": 22,
+                "microsecond": 360000
+            },
+            "ProcessedSizeBytes": 0,
+            "ProcessedItemCount": 0,
+            "ImportedItemCount": 0
+        },
+        "ResponseMetadata": {}
+    }
+}

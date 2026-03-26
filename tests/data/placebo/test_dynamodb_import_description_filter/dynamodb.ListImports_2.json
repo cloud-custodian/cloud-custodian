@@ -1,0 +1,68 @@
+{
+    "status_code": 200,
+    "data": {
+        "ImportSummaryList": [
+            {
+                "ImportArn": "arn:aws:dynamodb:us-east-1:644160558196:table/test-import-description-filter/import/01774466606554-da7c69ab",
+                "ImportStatus": "FAILED",
+                "TableArn": "arn:aws:dynamodb:us-east-1:644160558196:table/test-import-description-filter",
+                "S3BucketSource": {
+                    "S3Bucket": "apogeeac-test-bucket"
+                },
+                "CloudWatchLogGroupArn": "arn:aws:logs:us-east-1:644160558196:log-group:/aws-dynamodb/imports:*",
+                "InputFormat": "DYNAMODB_JSON",
+                "StartTime": {
+                    "__class__": "datetime",
+                    "year": 2026,
+                    "month": 3,
+                    "day": 25,
+                    "hour": 15,
+                    "minute": 23,
+                    "second": 26,
+                    "microsecond": 554000
+                },
+                "EndTime": {
+                    "__class__": "datetime",
+                    "year": 2026,
+                    "month": 3,
+                    "day": 25,
+                    "hour": 15,
+                    "minute": 25,
+                    "second": 8,
+                    "microsecond": 206000
+                }
+            },
+            {
+                "ImportArn": "arn:aws:dynamodb:us-east-1:644160558196:table/test-import-description-filter/import/01774460350893-ca092ea3",
+                "ImportStatus": "FAILED",
+                "TableArn": "arn:aws:dynamodb:us-east-1:644160558196:table/test-import-description-filter",
+                "S3BucketSource": {
+                    "S3Bucket": "apogeeac-test-bucket"
+                },
+                "CloudWatchLogGroupArn": "arn:aws:logs:us-east-1:644160558196:log-group:/aws-dynamodb/imports:*",
+                "InputFormat": "DYNAMODB_JSON",
+                "StartTime": {
+                    "__class__": "datetime",
+                    "year": 2026,
+                    "month": 3,
+                    "day": 25,
+                    "hour": 13,
+                    "minute": 39,
+                    "second": 10,
+                    "microsecond": 893000
+                },
+                "EndTime": {
+                    "__class__": "datetime",
+                    "year": 2026,
+                    "month": 3,
+                    "day": 25,
+                    "hour": 13,
+                    "minute": 39,
+                    "second": 19,
+                    "microsecond": 342000
+                }
+            }
+        ],
+        "ResponseMetadata": {}
+    }
+}

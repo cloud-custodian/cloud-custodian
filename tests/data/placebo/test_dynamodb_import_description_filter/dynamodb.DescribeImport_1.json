@@ -1,0 +1,62 @@
+{
+    "status_code": 200,
+    "data": {
+        "ImportTableDescription": {
+            "ImportArn": "arn:aws:dynamodb:us-east-1:644160558196:table/test-import-description-filter/import/01774466606554-da7c69ab",
+            "ImportStatus": "FAILED",
+            "TableArn": "arn:aws:dynamodb:us-east-1:644160558196:table/test-import-description-filter",
+            "TableId": "af953fbd-d3a5-44ae-af4d-4344a75e54c9",
+            "ClientToken": "aabe23a1-9339-4177-8152-a09021ee8360",
+            "S3BucketSource": {
+                "S3BucketOwner": "644160558196",
+                "S3Bucket": "apogeeac-test-bucket"
+            },
+            "ErrorCount": 8,
+            "CloudWatchLogGroupArn": "arn:aws:logs:us-east-1:644160558196:log-group:/aws-dynamodb/imports:*",
+            "InputFormat": "DYNAMODB_JSON",
+            "InputCompressionType": "NONE",
+            "TableCreationParameters": {
+                "TableName": "test-import-description-filter",
+                "AttributeDefinitions": [
+                    {
+                        "AttributeName": "id",
+                        "AttributeType": "S"
+                    }
+                ],
+                "KeySchema": [
+                    {
+                        "AttributeName": "id",
+                        "KeyType": "HASH"
+                    }
+                ],
+                "BillingMode": "PAY_PER_REQUEST"
+            },
+            "StartTime": {
+                "__class__": "datetime",
+                "year": 2026,
+                "month": 3,
+                "day": 25,
+                "hour": 15,
+                "minute": 23,
+                "second": 26,
+                "microsecond": 554000
+            },
+            "EndTime": {
+                "__class__": "datetime",
+                "year": 2026,
+                "month": 3,
+                "day": 25,
+                "hour": 15,
+                "minute": 25,
+                "second": 8,
+                "microsecond": 206000
+            },
+            "ProcessedSizeBytes": 1550,
+            "ProcessedItemCount": 8,
+            "ImportedItemCount": 0,
+            "FailureCode": "ItemValidationError",
+            "FailureMessage": "Some of the items failed validation checks and were not imported. Please check CloudWatch error logs for more details."
+        },
+        "ResponseMetadata": {}
+    }
+}
