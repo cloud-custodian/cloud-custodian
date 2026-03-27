@@ -502,7 +502,7 @@ class DynamodbTest(BaseTest):
 class DynamoDbAccelerator(BaseTest):
 
     def test_resources(self):
-        session_factory = self.record_flight_data("test_dax_resources")
+        session_factory = self.replay_flight_data("test_dax_resources")
         p = self.load_policy(
             {"name": "dax-resources", "resource": "dax"},
             session_factory=session_factory,
