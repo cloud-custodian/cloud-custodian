@@ -74,12 +74,12 @@ class KmsFilter(KmsRelatedFilter):
     RelatedIdsExpression = 'SSEDescription.KMSMasterKeyArn'
 
 
-@Table.filter_registry.register('import-description')
-class ImportDescriptionFilter(ValueFilter):
+@Table.filter_registry.register('import-summary')
+class ImportSummaryFilter(ValueFilter):
     """Filter for DynamoDB table imports.
 
-    Fetches import descriptions for each table and allows filtering
-    on the import table description details.
+    Fetches import summaries for each table and allows filtering
+    on the import summary details.
 
     :example:
 
@@ -89,20 +89,20 @@ class ImportDescriptionFilter(ValueFilter):
           - name: dynamodb-imports-in-progress
             resource: aws.dynamodb-table
             filters:
-              - type: import-description
+              - type: import-summary
                 key: ImportStatus
                 value: IN_PROGRESS
           - name: dynamodb-imports-failed
             resource: aws.dynamodb-table
             filters:
-              - type: import-description
+              - type: import-summary
                 key: ImportStatus
                 value: FAILED
     """
 
-    annotation_key = 'c7n:ImportTableDescription'
-    schema = type_schema('import-description', rinherit=ValueFilter.schema)
-    permissions = ('dynamodb:ListImports', 'dynamodb:DescribeImport',)
+    annotation_key = 'c7n:ImportSummary'
+    schema = type_schema('import-summary', rinherit=ValueFilter.schema)
+    permissions = ('dynamodb:ListImports',)
 
     def process(self, resources, event=None):
         results = []
@@ -110,8 +110,8 @@ class ImportDescriptionFilter(ValueFilter):
             if self.annotation_key not in r:
                 self.augment([r])
 
-            imports = r.get(self.annotation_key, [])
-            matched = [import_ for import_ in imports if self.match(import_)]
+            summaries = r.get(self.annotation_key, [])
+            matched = [summary for summary in summaries if self.match(summary)]
             if matched:
                 r[self.annotation_key] = matched
                 results.append(r)
@@ -123,14 +123,14 @@ class ImportDescriptionFilter(ValueFilter):
         cache = self.manager._cache
 
         for table in resources:
-            table_cache_key = f"dynamodb_imports:{table['TableArn']}"
-            cached_imports = cache.get(table_cache_key)
+            table_cache_key = f"dynamodb_import_summaries:{table['TableArn']}"
+            cached_summaries = cache.get(table_cache_key)
 
-            if cached_imports:
-                table[self.annotation_key] = cached_imports
+            if cached_summaries:
+                table[self.annotation_key] = cached_summaries
                 continue
 
-            imports = []
+            summaries = []
             next_token = None
 
             while True:
@@ -139,19 +139,14 @@ class ImportDescriptionFilter(ValueFilter):
                     params['NextToken'] = next_token
 
                 response = client.list_imports(**params)
-
-                for import_summary in response.get('ImportSummaryList', []):
-                    import_details = client.describe_import(
-                        ImportArn=import_summary['ImportArn'])
-                    imports.append(import_details.get('ImportTableDescription', {}))
-
+                summaries.extend(response.get('ImportSummaryList', []))
                 next_token = response.get('NextToken')
 
                 if not next_token:
                     break
 
-            table[self.annotation_key] = imports
-            cache.save(table_cache_key, imports)
+            table[self.annotation_key] = summaries
+            cache.save(table_cache_key, summaries)
 
 
 @Table.filter_registry.register('continuous-backup')
