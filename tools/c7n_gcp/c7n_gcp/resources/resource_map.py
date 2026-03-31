@@ -23,6 +23,8 @@ ResourceMap = {
     "gcp.bq-table": "c7n_gcp.resources.bigquery.BigQueryTable",
     "gcp.bucket": "c7n_gcp.resources.storage.Bucket",
     "gcp.build": "c7n_gcp.resources.build.CloudBuild",
+    "gcp.certmanager-certificate": (
+        "c7n_gcp.resources.certificatemanager.CertificateManagerCertificate"),
     "gcp.cloudbilling-account": "c7n_gcp.resources.cloudbilling.CloudBillingAccount",
     "gcp.cloud-run-service": "c7n_gcp.resources.cloudrun.CloudRunService",
     "gcp.cloud-run-job": "c7n_gcp.resources.cloudrun.CloudRunJob",
@@ -112,6 +114,9 @@ ResourceMap = {
     "gcp.sql-ssl-cert": "c7n_gcp.resources.sql.SqlSslCert",
     "gcp.sql-user": "c7n_gcp.resources.sql.SqlUser",
     "gcp.subnet": "c7n_gcp.resources.network.Subnet",
+    "gcp.vertex-ai-batch-prediction-job": "c7n_gcp.resources.vertexai.VertexAIBatchPredictionJob",
+    "gcp.vertex-ai-endpoint": "c7n_gcp.resources.vertexai.VertexAIEndpoint",
+    "gcp.vertex-ai-location": "c7n_gcp.resources.vertexai.VertexAILocation",
     "gcp.vpc": "c7n_gcp.resources.network.Network",
     "gcp.zone": "c7n_gcp.resources.compute.Zone",
 }

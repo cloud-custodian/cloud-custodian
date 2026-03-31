@@ -1,0 +1,10 @@
+{
+    "status_code": 400,
+    "data": {
+        "Error": {
+            "Message": "User: arn:aws:sts::644160558196:assumed-role/AWSReservedSSO_AWSAdministratorAccess_39201616215f5da0/aj@stacklet.io is not authorized to perform: kms:ListKeyRotations on resource: arn:aws:kms:us-east-1:644160558196:key/e95331d7-c3c3-403c-bad5-917d6ab53d5d because no resource-based policy allows the kms:ListKeyRotations action",
+            "Code": "AccessDeniedException"
+        },
+        "ResponseMetadata": {}
+    }
+}

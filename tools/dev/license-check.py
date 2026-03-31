@@ -9,10 +9,13 @@ accept = (
     'Apache License 2.0',
     'Apache License, Version 2.0',
     'Apache 2.0',
+    'Apache-2.0 OR BSD-2-Clause',
+    'Apache-2.0 OR BSD-3-Clause',
     'MIT License',
     'Apache 2',
     'BSD License',
     'MPL 2.0',
+    'BSD-2-Clause',
     'BSD-3-Clause',
     'Apache-2.0',
     'Apache-2',
@@ -42,8 +45,11 @@ whitelist_packages = set(
         'docutils',  # docgen - couple of different licenses but bulk is public domain
         #
         # packages with bad metadata
+        'google-crc32c',  # Apache-2.0, see also https://github.com/googleapis/python-crc32c/issues/320
         'protobuf',  # BSD-3-Clause
-        'uritemplate'  # Dual license BSD 3-Clause OR Apache-2.0
+        'uritemplate',  # Dual license BSD 3-Clause OR Apache-2.0
+        # https://github.com/GrahamDumpleton/wrapt/issues/298
+        'wrapt',  # BSD-2-Clause .. packaging update is missing license spdx header
     )
 )
 

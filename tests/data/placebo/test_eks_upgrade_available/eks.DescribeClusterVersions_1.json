@@ -1,0 +1,152 @@
+{
+  "status_code": 200,
+  "data": {
+    "ResponseMetadata": {},
+    "clusterVersions": [
+      {
+        "clusterVersion": "1.34",
+        "clusterType": "eks",
+        "defaultPlatformVersion": "eks.10",
+        "defaultVersion": true,
+        "releaseDate": "2025-10-01T19:00:00-05:00",
+        "endOfStandardSupportDate": "2026-12-01T18:00:00-06:00",
+        "endOfExtendedSupportDate": "2027-12-01T18:00:00-06:00",
+        "status": "STANDARD_SUPPORT",
+        "versionStatus": "STANDARD_SUPPORT",
+        "kubernetesPatchVersion": "1.34.2"
+      },
+      {
+        "clusterVersion": "1.33",
+        "clusterType": "eks",
+        "defaultPlatformVersion": "eks.24",
+        "defaultVersion": false,
+        "releaseDate": "2025-05-28T19:00:00-05:00",
+        "endOfStandardSupportDate": "2026-07-28T19:00:00-05:00",
+        "endOfExtendedSupportDate": "2027-07-28T19:00:00-05:00",
+        "status": "STANDARD_SUPPORT",
+        "versionStatus": "STANDARD_SUPPORT",
+        "kubernetesPatchVersion": "1.33.6"
+      },
+      {
+        "clusterVersion": "1.32",
+        "clusterType": "eks",
+        "defaultPlatformVersion": "eks.31",
+        "defaultVersion": false,
+        "releaseDate": "2025-01-22T18:00:00-06:00",
+        "endOfStandardSupportDate": "2026-03-22T19:00:00-05:00",
+        "endOfExtendedSupportDate": "2027-03-22T19:00:00-05:00",
+        "status": "STANDARD_SUPPORT",
+        "versionStatus": "STANDARD_SUPPORT",
+        "kubernetesPatchVersion": "1.32.10"
+      },
+      {
+        "clusterVersion": "1.31",
+        "clusterType": "eks",
+        "defaultPlatformVersion": "eks.47",
+        "defaultVersion": false,
+        "releaseDate": "2024-09-25T19:00:00-05:00",
+        "endOfStandardSupportDate": "2025-11-25T18:00:00-06:00",
+        "endOfExtendedSupportDate": "2026-11-25T18:00:00-06:00",
+        "status": "EXTENDED_SUPPORT",
+        "versionStatus": "EXTENDED_SUPPORT",
+        "kubernetesPatchVersion": "1.31.14"
+      },
+      {
+        "clusterVersion": "1.30",
+        "clusterType": "eks",
+        "defaultPlatformVersion": "eks.55",
+        "defaultVersion": false,
+        "releaseDate": "2024-05-22T19:00:00-05:00",
+        "endOfStandardSupportDate": "2025-07-22T19:00:00-05:00",
+        "endOfExtendedSupportDate": "2026-07-22T19:00:00-05:00",
+        "status": "EXTENDED_SUPPORT",
+        "versionStatus": "EXTENDED_SUPPORT",
+        "kubernetesPatchVersion": "1.30.14"
+      },
+      {
+        "clusterVersion": "1.29",
+        "clusterType": "eks",
+        "defaultPlatformVersion": "eks.58",
+        "defaultVersion": false,
+        "releaseDate": "2024-01-22T18:00:00-06:00",
+        "endOfStandardSupportDate": "2025-03-22T19:00:00-05:00",
+        "endOfExtendedSupportDate": "2026-03-22T19:00:00-05:00",
+        "status": "EXTENDED_SUPPORT",
+        "versionStatus": "EXTENDED_SUPPORT",
+        "kubernetesPatchVersion": "1.29.15"
+      },
+      {
+        "clusterVersion": "1.28",
+        "clusterType": "eks",
+        "defaultPlatformVersion": "eks.64",
+        "defaultVersion": false,
+        "releaseDate": "2023-09-25T19:00:00-05:00",
+        "endOfStandardSupportDate": "2024-11-25T18:00:00-06:00",
+        "endOfExtendedSupportDate": "2025-11-25T18:00:00-06:00",
+        "status": "UNSUPPORTED",
+        "versionStatus": "UNSUPPORTED",
+        "kubernetesPatchVersion": "1.28.15"
+      },
+      {
+        "clusterVersion": "1.27",
+        "clusterType": "eks",
+        "defaultPlatformVersion": "eks.67",
+        "defaultVersion": false,
+        "releaseDate": "2023-05-23T19:00:00-05:00",
+        "endOfStandardSupportDate": "2024-07-23T19:00:00-05:00",
+        "endOfExtendedSupportDate": "2025-07-23T19:00:00-05:00",
+        "status": "UNSUPPORTED",
+        "versionStatus": "UNSUPPORTED",
+        "kubernetesPatchVersion": "1.27.16"
+      },
+      {
+        "clusterVersion": "1.26",
+        "clusterType": "eks",
+        "defaultPlatformVersion": "eks.51",
+        "defaultVersion": false,
+        "releaseDate": "2023-04-10T19:00:00-05:00",
+        "endOfStandardSupportDate": "2024-06-10T19:00:00-05:00",
+        "endOfExtendedSupportDate": "2025-06-10T19:00:00-05:00",
+        "status": "UNSUPPORTED",
+        "versionStatus": "UNSUPPORTED",
+        "kubernetesPatchVersion": "1.26.15"
+      },
+      {
+        "clusterVersion": "1.25",
+        "clusterType": "eks",
+        "defaultPlatformVersion": "eks.48",
+        "defaultVersion": false,
+        "releaseDate": "2023-02-21T18:00:00-06:00",
+        "endOfStandardSupportDate": "2024-04-30T19:00:00-05:00",
+        "endOfExtendedSupportDate": "2025-04-30T19:00:00-05:00",
+        "status": "UNSUPPORTED",
+        "versionStatus": "UNSUPPORTED",
+        "kubernetesPatchVersion": "1.25.16"
+      },
+      {
+        "clusterVersion": "1.24",
+        "clusterType": "eks",
+        "defaultPlatformVersion": "eks.45",
+        "defaultVersion": false,
+        "releaseDate": "2022-11-09T18:00:00-06:00",
+        "endOfStandardSupportDate": "2024-01-30T18:00:00-06:00",
+        "endOfExtendedSupportDate": "2025-01-30T18:00:00-06:00",
+        "status": "UNSUPPORTED",
+        "versionStatus": "UNSUPPORTED",
+        "kubernetesPatchVersion": "1.24.17"
+      },
+      {
+        "clusterVersion": "1.23",
+        "clusterType": "eks",
+        "defaultPlatformVersion": "eks.32",
+        "defaultVersion": false,
+        "releaseDate": "2022-08-10T19:00:00-05:00",
+        "endOfStandardSupportDate": "2023-10-10T19:00:00-05:00",
+        "endOfExtendedSupportDate": "2024-10-10T19:00:00-05:00",
+        "status": "UNSUPPORTED",
+        "versionStatus": "UNSUPPORTED",
+        "kubernetesPatchVersion": "1.23.17"
+      }
+    ]
+  }
+}

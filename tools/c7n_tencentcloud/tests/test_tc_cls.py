@@ -1,6 +1,7 @@
 # Copyright The Cloud Custodian Authors.
 # SPDX-License-Identifier: Apache-2.0
 import pytest
+from freezegun import freeze_time
 from tc_common import BaseTest
 
 
@@ -20,6 +21,7 @@ class TestLogGroup(BaseTest):
         assert len(ok) > 0
 
     @pytest.mark.vcr
+    @freeze_time("2022-11-15 06:12:12+00:00")
     def test_metrics(self):
         policy = self.load_policy(
             {

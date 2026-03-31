@@ -1,0 +1,87 @@
+{
+    "status_code": 200,
+    "data": {
+        "VpcEndpoints": [
+            {
+                "VpcEndpointId": "vpce-045a0b2c32ef0a9d9",
+                "VpcEndpointType": "Gateway",
+                "VpcId": "vpc-0d8da8b602b46113c",
+                "ServiceName": "com.amazonaws.us-east-1.s3",
+                "State": "available",
+                "PolicyDocument": "{\"Version\":\"2008-10-17\",\"Statement\":[{\"Effect\":\"Allow\",\"Principal\":\"*\",\"Action\":\"*\",\"Resource\":\"*\"}]}",
+                "RouteTableIds": [],
+                "SubnetIds": [],
+                "Groups": [],
+                "IpAddressType": "ipv4",
+                "DnsOptions": {
+                    "DnsRecordIpType": "service-defined"
+                },
+                "PrivateDnsEnabled": false,
+                "RequesterManaged": false,
+                "NetworkInterfaceIds": [],
+                "DnsEntries": [],
+                "CreationTimestamp": {
+                    "__class__": "datetime",
+                    "year": 2026,
+                    "month": 2,
+                    "day": 9,
+                    "hour": 13,
+                    "minute": 10,
+                    "second": 35,
+                    "microsecond": 0
+                },
+                "Tags": [
+                    {
+                        "Key": "Name",
+                        "Value": "policy-supported-endpoint"
+                    }
+                ],
+                "OwnerId": "644160558196",
+                "ServiceRegion": "us-east-1"
+            },
+            {
+                "VpcEndpointId": "vpce-069029b2cca82609b",
+                "VpcEndpointType": "Interface",
+                "VpcId": "vpc-0d8da8b602b46113c",
+                "ServiceName": "com.amazonaws.us-east-1.apprunner.requests",
+                "State": "available",
+                "PolicyDocument": "{\n  \"Statement\": [\n    {\n      \"Action\": \"*\",\n      \"Effect\": \"Allow\",\n      \"Principal\": \"*\",\n      \"Resource\": \"*\"\n    }\n  ]\n}",
+                "RouteTableIds": [],
+                "SubnetIds": [],
+                "Groups": [
+                    {
+                        "GroupId": "sg-0ff72fefad33b3355",
+                        "GroupName": "default"
+                    }
+                ],
+                "IpAddressType": "ipv4",
+                "DnsOptions": {
+                    "DnsRecordIpType": "ipv4"
+                },
+                "PrivateDnsEnabled": false,
+                "RequesterManaged": false,
+                "NetworkInterfaceIds": [],
+                "DnsEntries": [],
+                "CreationTimestamp": {
+                    "__class__": "datetime",
+                    "year": 2026,
+                    "month": 2,
+                    "day": 9,
+                    "hour": 13,
+                    "minute": 11,
+                    "second": 5,
+                    "microsecond": 890000
+                },
+                "Tags": [
+                    {
+                        "Key": "Name",
+                        "Value": "policy-not-supported-endpoint"
+                    }
+                ],
+                "OwnerId": "644160558196",
+                "ServiceRegion": "us-east-1"
+            }
+        ],
+        "ResponseMetadata": {}
+    }
+}

@@ -1,0 +1,12 @@
+{
+    "status_code": 200,
+    "data": {
+        "ResponseMetadata": {},
+        "IsTruncated": false,
+        "Marker": "",
+        "Name": "custodian-policy-test",
+        "Prefix": "",
+        "MaxKeys": 1000,
+        "EncodingType": "url"
+    }
+}

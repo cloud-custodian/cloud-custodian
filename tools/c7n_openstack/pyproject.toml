@@ -9,7 +9,7 @@ dependencies = [
     "openstacksdk==0.52.0",
 ]
 name = "c7n_openstack"
-version = "0.1.37"
+version = "0.1.40"
 description = "Cloud Custodian - OpenStack Provider"
 readme = "readme.md"
 classifiers = [
@@ -25,7 +25,7 @@ documentation = "https://cloudcustodian.io/docs/"
 
 [dependency-groups]
 dev = [
-    "pytest<8.0",
+    "pytest",
     "vcrpy>=4.0.2",
 ]
 

@@ -1,0 +1,35 @@
+{
+    "status_code": 200,
+    "data": {
+        "ResponseMetadata": {},
+        "id": "sn-0a92692360c7945f3",
+        "name": "network-no-logs",
+        "arn": "arn:aws:vpc-lattice:us-east-1:644160558196:servicenetwork/sn-0a92692360c7945f3",
+        "createdAt": {
+            "__class__": "datetime",
+            "year": 2025,
+            "month": 9,
+            "day": 16,
+            "hour": 20,
+            "minute": 16,
+            "second": 42,
+            "microsecond": 466000
+        },
+        "lastUpdatedAt": {
+            "__class__": "datetime",
+            "year": 2025,
+            "month": 9,
+            "day": 16,
+            "hour": 20,
+            "minute": 16,
+            "second": 42,
+            "microsecond": 466000
+        },
+        "authType": "AWS_IAM",
+        "sharingConfig": {
+            "enabled": false
+        },
+        "numberOfAssociatedVPCs": 0,
+        "numberOfAssociatedServices": 0
+    }
+}

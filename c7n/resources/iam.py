@@ -26,7 +26,13 @@ from c7n.filters import ValueFilter, Filter
 from c7n.filters.multiattr import MultiAttrFilter
 from c7n.filters.iamaccess import CrossAccountAccessFilter
 from c7n.manager import resources
-from c7n.query import ConfigSource, QueryResourceManager, DescribeSource, TypeInfo
+from c7n.query import (
+    ChildResourceManager,
+    ConfigSource,
+    DescribeSource,
+    QueryResourceManager,
+    TypeInfo,
+)
 from c7n.resolver import ValuesFrom
 from c7n.tags import TagActionFilter, TagDelayedAction, Tag, RemoveTag, universal_augment
 from c7n.utils import (
@@ -227,7 +233,7 @@ class DescribeUser(DescribeSource):
         for r in resources:
             ru = self.manager.retry(
                 client.get_user, UserName=r['UserName'],
-                ignore_err_codes=client.exceptions.NoSuchEntityException)
+                ignore_err_codes=('NoSuchEntity',))
             if ru:
                 results.append(ru['User'])
         return list(filter(None, results))
@@ -374,10 +380,12 @@ class UserSetBoundary(SetBoundary):
 class DescribePolicy(DescribeSource):
 
     def resources(self, query=None):
-        qfilters = PolicyQueryParser.parse(self.manager.data.get('query', []))
+        queries = PolicyQueryParser.parse(self.manager.data.get('query', []))
         query = query or {}
-        if qfilters:
-            query = {t['Name']: t['Value'] for t in qfilters}
+        for q in queries:
+            query.update(q)
+        if 'Scope' not in query:
+            query['Scope'] = 'Local'
         return super(DescribePolicy, self).resources(query=query)
 
     def get_resources(self, resource_ids, cache=True):
@@ -402,7 +410,7 @@ class Policy(QueryResourceManager):
     class resource_type(TypeInfo):
         service = 'iam'
         arn_type = 'policy'
-        enum_spec = ('list_policies', 'Policies', {'Scope': 'Local'})
+        enum_spec = ('list_policies', 'Policies', None)
         id = 'PolicyId'
         name = 'PolicyName'
         date = 'CreateDate'
@@ -424,10 +432,11 @@ class PolicyQueryParser(QueryParser):
         'Scope': ('All', 'AWS', 'Local'),
         'PolicyUsageFilter': ('PermissionsPolicy', 'PermissionsBoundary'),
         'PathPrefix': str,
-        'OnlyAttached': bool
+        'OnlyAttached': bool,
+        'MaxItems': int,
     }
     multi_value = False
-    value_key = 'Value'
+    type_name = 'IAM Policy'
 
 
 @resources.register('iam-profile')
@@ -2355,6 +2364,94 @@ class UserMfaDevice(ValueFilter):
         return matched
 
 
+@User.filter_registry.register('service-specific-credentials')
+class UserServiceSpecificCredentials(ValueFilter):
+    """Filter iam-users based on service-specific-credentials status
+
+    :example:
+
+    .. code-block:: yaml
+
+        policies:
+          - name: old-codecommit-credentials-users
+            resource: iam-user
+            filters:
+              - type: service-specific-credentials
+                key: ServiceName
+                value: codecommit.amazonaws.com
+              - type: service-specific-credentials
+                key: Status
+                value: Active
+              - type: service-specific-credentials
+                key: CreateDate
+                value_type: age
+                value: 90
+
+    """
+
+    schema = type_schema(
+        'service-specific-credentials',
+        rinherit=ValueFilter.schema,
+    )
+    schema_alias = False
+    permissions = ('iam:ListServiceSpecificCredentials',)
+    annotation_key = 'c7n:ServiceSpecificCredentials'
+    matched_annotation_key = 'c7n:matched-service-specific-credentials'
+    annotate = False
+
+    def get_all_service_specific_credentials(self, client):
+        all_credentials = {}
+        # Pagination is different, so we need to look for the lack of truncation.
+        is_truncated = True
+        marker = None
+        # Implement a numeric cap, to prevent infinite loops.
+        # This allows for up to 5000 items to be returned.
+        max_requests = 50
+        num_requests = 0
+
+        while is_truncated is True and num_requests < max_requests:
+            kwargs = {
+                "AllUsers": True,
+                # This needs to be present for paingation to be active.
+                "MaxItems": 100,
+            }
+
+            if marker is not None:
+                kwargs["Marker"] = marker
+
+            resp = client.list_service_specific_credentials(**kwargs)
+            credentials = resp.get("ServiceSpecificCredentials", [])
+
+            for cred_detail in credentials:
+                all_credentials.setdefault(cred_detail["UserName"], [])
+                all_credentials[cred_detail["UserName"]].append(cred_detail)
+
+            # Bookkeeping.
+            num_requests += 1
+            is_truncated = resp.get("IsTruncated", False)
+            marker = resp.get("Marker", None)
+
+        return all_credentials
+
+    def process(self, resources, event=None):
+        client = local_session(self.manager.session_factory).client('iam')
+        all_credentials = self.get_all_service_specific_credentials(client)
+        matched = []
+
+        for r in resources:
+            if r["UserName"] not in all_credentials:
+                continue
+
+            r[self.annotation_key] = all_credentials[r["UserName"]]
+            matched_credentials = [k for k in r[self.annotation_key] if self.match(k)]
+            self.merge_annotation(r, self.matched_annotation_key, matched_credentials)
+
+            if matched_credentials:
+                matched.append(r)
+
+        return matched
+
+
 @User.action_registry.register('post-finding')
 class UserFinding(OtherResourcePostFinding):
 
@@ -2517,6 +2614,7 @@ class UserDelete(BaseAction):
         'iam:DeactivateMFADevice',
         'iam:DeleteAccessKey',
         'iam:DeleteLoginProfile',
+        'iam:DeleteServiceSpecificCredential',
         'iam:DeleteSigningCertificate',
         'iam:DeleteSSHPublicKey',
         'iam:DeleteUser',
@@ -3219,3 +3317,31 @@ class SpecificIamProfileManagedPolicy(ValueFilter):
             if matched_keys:
                 matched.append(r)
         return matched
+
+
+#########################
+#    IAM Access Keys    #
+#########################
+
+
+@resources.register('iam-access-key')
+class AccessKey(ChildResourceManager):
+
+    class resource_type(TypeInfo):
+        service = 'iam'
+        # Access keys don't have ARNs - they use AccessKeyId as identifier
+        # Using 'access-key' as arn_type for consistency but ARN construction will not be used
+        arn_type = 'access-key'
+        id = name = 'AccessKeyId'
+        date = 'CreateDate'
+        # Denotes this resource type exists across regions
+        global_resource = True
+        enum_spec = ('list_access_keys', 'AccessKeys', None)
+        parent_spec = ('iam-user', 'UserName', None)
+        # No detail spec needed as list_access_keys returns full metadata
+        cfn_type = config_type = "AWS::IAM::AccessKey"
+        # config_id = 'AccessKeyId'
+
+    source_mapping = {
+        'config': ConfigSource
+    }

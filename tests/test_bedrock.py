@@ -1,11 +1,42 @@
 # Copyright The Cloud Custodian Authors.
 # SPDX-License-Identifier: Apache-2.0
+import logging
+import time
+
 from .common import BaseTest, event_data
 from botocore.exceptions import ClientError
+from pytest_terraform import terraform
+
+
+@terraform('bedrock_model_invocation_job')
+def test_bedrock_model_invocation_job(test, bedrock_model_invocation_job):
+    session_factory = test.replay_flight_data(
+        'test_bedrock_model_invocation_job', region='us-east-1'
+    )
+    job_arn = bedrock_model_invocation_job['aws_bedrock_model_invocation_job.test_job.arn']
+    job_name = bedrock_model_invocation_job['aws_bedrock_model_invocation_job.test_job.job_name']
+    p = test.load_policy(
+        {
+            'name': 'bedrock-model-invocation-job',
+            'resource': 'bedrock-model-invocation-job',
+            'filters': [
+                {'jobArn': job_arn},
+            ],
+        },
+        session_factory=session_factory,
+        config={'region': 'us-east-1'},
+    )
+
+    if test.recording:
+        time.sleep(10)
+
+    resources = p.run()
+    test.assertEqual(len(resources), 1)
+    test.assertEqual(resources[0]['jobArn'], job_arn)
+    test.assertEqual(resources[0]['jobName'], job_name)
 
 
 class BedrockCustomModel(BaseTest):
-
     def test_bedrock_custom_model(self):
         session_factory = self.replay_flight_data('test_bedrock_custom_model')
         p = self.load_policy(
@@ -246,3 +277,385 @@ class BedrockKnowledgeBase(BaseTest):
         client = session_factory().client('bedrock-agent')
         knowledgebases = client.list_knowledge_bases().get('knowledgeBaseSummaries')
         self.assertEqual(len(knowledgebases), 0)
+
+
+@terraform('bedrock_application_inference_profile')
+def test_bedrock_application_inference_profile(test, bedrock_application_inference_profile):
+    session_factory = test.replay_flight_data('test_bedrock_application_inference_profile')
+
+    profile_arn = bedrock_application_inference_profile[
+        'aws_bedrock_inference_profile.test_profile.arn']
+    profile_name = bedrock_application_inference_profile[
+        'aws_bedrock_inference_profile.test_profile.name']
+
+    p = test.load_policy(
+        {
+            'name': 'bedrock-app-inference-profile-test',
+            'resource': 'bedrock-inference-profile',
+            # We don't filter on exact arn or name here because we want to test that only
+            # *application* inference profiles are returned by default.
+        }, session_factory=session_factory
+    )
+    resources = p.run()
+    test.assertEqual(len(resources), 1)
+    test.assertIn('Tags', resources[0])
+    test.assertEqual(resources[0]['inferenceProfileName'], profile_name)
+    test.assertEqual(resources[0]['inferenceProfileArn'], profile_arn)
+
+    # Verify tags are in correct format from universal_taggable
+    tags = {t['Key']: t['Value'] for t in resources[0]['Tags']}
+    test.assertEqual(tags['Environment'], 'test')
+    test.assertEqual(tags['Owner'], 'c7n')
+
+
+@terraform('bedrock_application_inference_profile_tag_actions')
+def test_bedrock_application_inference_profile_tag_actions(
+        test, bedrock_application_inference_profile_tag_actions):
+    session_factory = test.replay_flight_data(
+        'test_bedrock_application_inference_profile_tag_actions')
+    client = session_factory().client('bedrock')
+
+    profile_arn = bedrock_application_inference_profile_tag_actions[
+        'aws_bedrock_inference_profile.test_profile.arn']
+
+    # Test adding tags
+    p = test.load_policy(
+        {
+            'name': 'bedrock-app-inference-profile-tag',
+            'resource': 'bedrock-inference-profile',
+            'filters': [
+                {'inferenceProfileArn': profile_arn},
+                {'tag:NewTag': 'absent'},
+            ],
+            'actions': [
+                {
+                    'type': 'tag',
+                    'tags': {'NewTag': 'NewValue', 'AnotherTag': 'AnotherValue'}
+                }
+            ]
+        }, session_factory=session_factory
+    )
+    resources = p.run()
+    test.assertEqual(len(resources), 1)
+
+    # Verify tags were added
+    tags = client.list_tags_for_resource(resourceARN=profile_arn)['tags']
+    tag_dict = {t['key']: t['value'] for t in tags}
+    test.assertEqual(tag_dict['NewTag'], 'NewValue')
+    test.assertEqual(tag_dict['AnotherTag'], 'AnotherValue')
+    test.assertEqual(tag_dict['Environment'], 'test')  # Original tag still there
+
+    # Test removing tags
+    p = test.load_policy(
+        {
+            'name': 'bedrock-app-inference-profile-untag',
+            'resource': 'bedrock-inference-profile',
+            'filters': [
+                {'inferenceProfileArn': profile_arn},
+            ],
+            'actions': [
+                {
+                    'type': 'remove-tag',
+                    'tags': ['AnotherTag', 'Owner']
+                }
+            ]
+        }, session_factory=session_factory
+    )
+    resources = p.run()
+    test.assertEqual(len(resources), 1)
+
+    # Verify tags were removed
+    tags = client.list_tags_for_resource(resourceARN=profile_arn)['tags']
+    tag_dict = {t['key']: t['value'] for t in tags}
+    test.assertNotIn('AnotherTag', tag_dict)
+    test.assertNotIn('Owner', tag_dict)
+    test.assertEqual(tag_dict['NewTag'], 'NewValue')  # Still there
+    test.assertEqual(tag_dict['Environment'], 'test')  # Still there
+
+
+@terraform('bedrock_inference_profile_delete')
+def test_bedrock_inference_profile_delete(test, bedrock_inference_profile_delete):
+    session_factory = test.replay_flight_data('test_bedrock_inference_profile_delete')
+    client = session_factory().client('bedrock')
+
+    profile_arn = bedrock_inference_profile_delete[
+        'aws_bedrock_inference_profile.test_profile.arn']
+
+    # Verify the profile exists before deletion
+    profiles = client.list_inference_profiles(typeEquals='APPLICATION')['inferenceProfileSummaries']
+    test.assertEqual(len(profiles), 1)
+    test.assertEqual(profiles[0]['inferenceProfileArn'], profile_arn)
+
+    # Run delete policy
+    p = test.load_policy(
+        {
+            'name': 'bedrock-inference-profile-delete',
+            'resource': 'bedrock-inference-profile',
+            'filters': [
+                {'inferenceProfileArn': profile_arn},
+            ],
+            'actions': [
+                {'type': 'delete'}
+            ]
+        }, session_factory=session_factory
+    )
+    resources = p.run()
+    test.assertEqual(len(resources), 1)
+    test.assertEqual(resources[0]['inferenceProfileArn'], profile_arn)
+
+    # Verify the profile was deleted
+    profiles = client.list_inference_profiles(typeEquals='APPLICATION')['inferenceProfileSummaries']
+    test.assertEqual(len(profiles), 0)
+
+
+def test_bedrock_inference_profile_delete_not_found(test):
+    session_factory = test.replay_flight_data('test_bedrock_inference_profile_delete_not_found')
+
+    # Run delete policy
+    p = test.load_policy(
+        {
+            'name': 'bedrock-inference-profile-delete',
+            'resource': 'bedrock-inference-profile',
+            'filters': [
+                {
+                    'type': 'value',
+                    'key': 'inferenceProfileName',
+                    'op': 'contains',
+                    'value': 'c7n-delete-test'
+                },
+            ],
+            'actions': [
+                {'type': 'delete'}
+            ]
+        }, session_factory=session_factory
+    )
+    resources = p.run()
+    test.assertEqual(len(resources), 1)
+
+    # There's nothing to test here. The error was suppressed if we've gotten to this point
+
+
+def test_bedrock_inference_profile_delete_conflict(test, caplog):
+    session_factory = test.replay_flight_data('test_bedrock_inference_profile_delete_conflict')
+
+    # Run delete policy
+    p = test.load_policy(
+        {
+            'name': 'bedrock-inference-profile-delete',
+            'resource': 'bedrock-inference-profile',
+            'filters': [
+                {
+                    'type': 'value',
+                    'key': 'inferenceProfileName',
+                    'op': 'contains',
+                    'value': 'c7n-delete-test'
+                },
+            ],
+            'actions': [
+                {'type': 'delete'}
+            ]
+        }, session_factory=session_factory
+    )
+
+    with caplog.at_level(logging.WARNING):
+        resources = p.run()
+
+    test.assertEqual(len(resources), 1)
+
+    test.assertIn(
+        'Unable to delete inference profile arn:aws:bedrock:us-east-1:644160558196:application-inference-profile/1jxlkskto2ug',  # noqa
+        caplog.text
+    )
+
+
+@terraform('bedrock_guardrail')
+def test_bedrock_guardrail(test, bedrock_guardrail):
+    session_factory = test.replay_flight_data('test_bedrock_guardrail')
+    test.assertNotEqual(
+        bedrock_guardrail[
+            'aws_bedrock_guardrail.test_guardrail.guardrail_arn'
+        ],
+        None,
+    )
+    p = test.load_policy(
+        {
+            'name': 'bedrock-guardrail-test',
+            'resource': 'bedrock-guardrail',
+        }, session_factory=session_factory
+    )
+    resources = p.run()
+    test.assertEqual(len(resources), 1)
+    test.assertIn('Tags', resources[0])
+    test.assertEqual(
+        resources[0]['arn'],
+        bedrock_guardrail[
+            'aws_bedrock_guardrail.test_guardrail.guardrail_arn'
+        ],
+    )
+
+
+@terraform('bedrock_guardrail')
+def test_bedrock_guardrail_absent_policy(test, bedrock_guardrail):
+    session_factory = test.replay_flight_data('test_bedrock_guardrail_absent_policy')
+    test.assertNotEqual(
+        bedrock_guardrail[
+            'aws_bedrock_guardrail.test_guardrail.guardrail_arn'
+        ],
+        None,
+    )
+
+    content_policy = test.load_policy(
+        {
+            'name': 'bedrock-guardrail-missing-content-policy',
+            'resource': 'bedrock-guardrail',
+            'filters': [
+                {'type': 'value', 'key': 'contentPolicy', 'value': 'absent'},
+            ],
+        }, session_factory=session_factory
+    )
+    resources_missing_content_policy = content_policy.run()
+    test.assertEqual(len(resources_missing_content_policy), 0)
+
+    word_policy = test.load_policy(
+        {
+            'name': 'bedrock-guardrail-missing-word-policy',
+            'resource': 'bedrock-guardrail',
+            'filters': [
+                {'type': 'value', 'key': 'wordPolicy', 'value': 'absent'},
+            ],
+        }, session_factory=session_factory
+    )
+    resource_missing_word_policy = word_policy.run()
+    test.assertEqual(len(resource_missing_word_policy), 1)
+
+
+@terraform('bedrock_guardrail_tag_actions')
+def test_bedrock_guardrail_tag_actions(test, bedrock_guardrail_tag_actions):
+    session_factory = test.replay_flight_data('test_bedrock_guardrail_tag_actions')
+    client = session_factory().client('bedrock')
+    test.assertNotEqual(
+        bedrock_guardrail_tag_actions[
+            'aws_bedrock_guardrail.test_guardrail.guardrail_arn'
+        ],
+        None,
+    )
+
+    guardrail_arn = (
+        bedrock_guardrail_tag_actions[
+            'aws_bedrock_guardrail.test_guardrail.guardrail_arn'
+        ]
+    )
+
+    # Test adding tags
+    p = test.load_policy(
+        {
+            'name': 'bedrock-app-guardrail-tag',
+            'resource': 'bedrock-guardrail',
+            'filters': [
+                {'tag:NewTag': 'absent'},
+            ],
+            'actions': [
+                {
+                    'type': 'tag',
+                    'tags': {'NewTag': 'NewValue', 'AnotherTag': 'AnotherValue'}
+                }
+            ]
+        }, session_factory=session_factory
+    )
+    resources = p.run()
+    test.assertEqual(len(resources), 1)
+
+    # Verify tags were added
+    tags = client.list_tags_for_resource(resourceARN=guardrail_arn)['tags']
+    tag_dict = {t['key']: t['value'] for t in tags}
+    test.assertEqual(tag_dict['NewTag'], 'NewValue')
+    test.assertEqual(tag_dict['AnotherTag'], 'AnotherValue')
+    test.assertEqual(tag_dict['Environment'], 'test')  # Original tag still there
+
+    # Test removing tags
+    p = test.load_policy(
+        {
+            'name': 'bedrock-app-guardrail-untag',
+            'resource': 'bedrock-guardrail',
+            'filters': [
+                {'guardrailArn': guardrail_arn},
+            ],
+            'actions': [
+                {
+                    'type': 'remove-tag',
+                    'tags': ['AnotherTag', 'Owner']
+                }
+            ]
+        }, session_factory=session_factory
+    )
+    resources = p.run()
+    test.assertEqual(len(resources), 1)
+
+    # Verify tags were removed
+    tags = client.list_tags_for_resource(resourceARN=guardrail_arn)['tags']
+    tag_dict = {t['key']: t['value'] for t in tags}
+    test.assertNotIn('AnotherTag', tag_dict)
+    test.assertNotIn('Owner', tag_dict)
+    test.assertEqual(tag_dict['NewTag'], 'NewValue')  # Still there
+    test.assertEqual(tag_dict['Environment'], 'test')  # Still there
+
+
+@terraform('bedrock_guardrail_update')
+def test_bedrock_guardrail_update(test, bedrock_guardrail_update):
+    session_factory = test.replay_flight_data('test_bedrock_guardrail_update')
+    client = session_factory().client('bedrock')
+    test.assertNotEqual(
+        bedrock_guardrail_update[
+            'aws_bedrock_guardrail.test_guardrail.guardrail_arn'
+        ],
+        None,
+    )
+
+    guardrail_arn = (
+        bedrock_guardrail_update[
+            'aws_bedrock_guardrail.test_guardrail.guardrail_arn'
+        ]
+    )
+
+    p = test.load_policy(
+        {
+            'name': 'bedrock-app-guardrail-tag',
+            'resource': 'bedrock-guardrail',
+            'filters': [
+                {'type': 'value', 'key': 'wordPolicy', 'value': 'absent'},
+            ],
+            'actions': [
+                {
+                    'type': 'update',
+                    'wordPolicyConfig': {
+                        'wordsConfig': [
+                            {
+                                'text': 'HATE',
+                                'inputAction': 'BLOCK',
+                                'outputAction': 'NONE',
+                                'inputEnabled': True,
+                                'outputEnabled': False,
+                            }
+                        ],
+                        'managedWordListsConfig': [
+                            {
+                                'type': 'PROFANITY',
+                                'inputAction': 'BLOCK',
+                                'outputAction': 'NONE',
+                                'inputEnabled': True,
+                                'outputEnabled': False,
+                            }
+                        ],
+                    },
+                }
+            ],
+        },
+        session_factory=session_factory,
+    )
+    resources = p.run()
+    test.assertEqual(len(resources), 1)
+
+    # Verify policy was added
+    word_policy = client.get_guardrail(guardrailIdentifier=guardrail_arn)['wordPolicy']
+    test.assertEqual(word_policy['words'][0]['text'], 'HATE')
+    test.assertEqual(word_policy['managedWordLists'][0]['type'], 'PROFANITY')

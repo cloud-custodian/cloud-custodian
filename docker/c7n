@@ -83,10 +83,10 @@ LABEL name="cli" \
 ENV DEBIAN_FRONTEND=noninteractive
 
 RUN apt-get --yes update \
-        && apt-get --yes install python3 python3-venv adduser  --no-install-recommends \
-        && rm -Rf /var/cache/apt \
-        && rm -Rf /var/lib/apt/lists/* \
-        && rm -Rf /var/log/*
+      && apt-get --yes install python3 python3-venv adduser  --no-install-recommends \
+      && rm -Rf /var/cache/apt \
+      && rm -Rf /var/lib/apt/lists/* \
+      && rm -Rf /var/log/*
 
 # These should remain below any other commands because they will invalidate
 # the layer cache

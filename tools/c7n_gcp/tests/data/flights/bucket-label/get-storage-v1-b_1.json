@@ -1,0 +1,977 @@
+{
+  "headers": {
+    "content-type": "application/json; charset=UTF-8",
+    "x-guploader-uploadid": "AJRbA5WyHpciuq-u-8aPRh27m8ndIS72ax4PPGiONxaiQXy70IqM6RSuDCr3nKeUzEgh1o_WJGB3aKSS4dMczg",
+    "date": "Fri, 06 Feb 2026 15:15:47 GMT",
+    "vary": "Origin, X-Origin",
+    "cache-control": "private, max-age=0, must-revalidate, no-transform",
+    "expires": "Fri, 06 Feb 2026 15:15:47 GMT",
+    "content-length": "32437",
+    "server": "UploadServer",
+    "alt-svc": "h3=\":443\"; ma=2592000,h3-29=\":443\"; ma=2592000",
+    "status": "200",
+    "content-location": "https://storage.googleapis.com/storage/v1/b?project=cloud-custodian&projection=full&alt=json"
+  },
+  "body": {
+    "kind": "storage#buckets",
+    "items": [
+      {
+        "kind": "storage#bucket",
+        "selfLink": "https://www.googleapis.com/storage/v1/b/c7n-app-engine-cloud-custodian-5e62",
+        "id": "c7n-app-engine-cloud-custodian-5e62",
+        "name": "c7n-app-engine-cloud-custodian-5e62",
+        "projectNumber": "000000000000",
+        "generation": "1769716798429742303",
+        "metageneration": "1",
+        "location": "US",
+        "storageClass": "STANDARD",
+        "etag": "CAE=",
+        "timeCreated": "2026-01-29T19:59:58.666Z",
+        "updated": "2026-01-29T19:59:58.666Z",
+        "labels": {
+          "goog-terraform-provisioned": "true"
+        },
+        "softDeletePolicy": {
+          "retentionDurationSeconds": "604800",
+          "effectiveTime": "2026-01-29T19:59:58.666Z"
+        },
+        "iamConfiguration": {
+          "bucketPolicyOnly": {
+            "enabled": true,
+            "lockedTime": "2026-04-29T19:59:58.666Z"
+          },
+          "uniformBucketLevelAccess": {
+            "enabled": true,
+            "lockedTime": "2026-04-29T19:59:58.666Z"
+          },
+          "publicAccessPrevention": "inherited"
+        },
+        "locationType": "multi-region",
+        "rpo": "DEFAULT"
+      },
+      {
+        "kind": "storage#bucket",
+        "selfLink": "https://www.googleapis.com/storage/v1/b/c7n-bucket",
+        "id": "c7n-bucket",
+        "name": "c7n-bucket",
+        "projectNumber": "000000000000",
+        "generation": "1770390779058662020",
+        "metageneration": "2",
+        "location": "US",
+        "storageClass": "STANDARD",
+        "etag": "CAI=",
+        "timeCreated": "2026-02-06T15:12:59.596Z",
+        "updated": "2026-02-06T15:13:26.266Z",
+        "acl": [
+          {
+            "kind": "storage#bucketAccessControl",
+            "id": "c7n-bucket/project-owners-000000000000",
+            "selfLink": "https://www.googleapis.com/storage/v1/b/c7n-bucket/acl/project-owners-000000000000",
+            "bucket": "c7n-bucket",
+            "entity": "project-owners-000000000000",
+            "role": "OWNER",
+            "etag": "CAI=",
+            "projectTeam": {
+              "projectNumber": "000000000000",
+              "team": "owners"
+            }
+          },
+          {
+            "kind": "storage#bucketAccessControl",
+            "id": "c7n-bucket/project-editors-000000000000",
+            "selfLink": "https://www.googleapis.com/storage/v1/b/c7n-bucket/acl/project-editors-000000000000",
+            "bucket": "c7n-bucket",
+            "entity": "project-editors-000000000000",
+            "role": "OWNER",
+            "etag": "CAI=",
+            "projectTeam": {
+              "projectNumber": "000000000000",
+              "team": "editors"
+            }
+          },
+          {
+            "kind": "storage#bucketAccessControl",
+            "id": "c7n-bucket/project-viewers-000000000000",
+            "selfLink": "https://www.googleapis.com/storage/v1/b/c7n-bucket/acl/project-viewers-000000000000",
+            "bucket": "c7n-bucket",
+            "entity": "project-viewers-000000000000",
+            "role": "READER",
+            "etag": "CAI=",
+            "projectTeam": {
+              "projectNumber": "000000000000",
+              "team": "viewers"
+            }
+          }
+        ],
+        "defaultObjectAcl": [
+          {
+            "kind": "storage#objectAccessControl",
+            "entity": "project-owners-000000000000",
+            "role": "OWNER",
+            "etag": "CAI=",
+            "projectTeam": {
+              "projectNumber": "000000000000",
+              "team": "owners"
+            }
+          },
+          {
+            "kind": "storage#objectAccessControl",
+            "entity": "project-editors-000000000000",
+            "role": "OWNER",
+            "etag": "CAI=",
+            "projectTeam": {
+              "projectNumber": "000000000000",
+              "team": "editors"
+            }
+          },
+          {
+            "kind": "storage#objectAccessControl",
+            "entity": "project-viewers-000000000000",
+            "role": "READER",
+            "etag": "CAI=",
+            "projectTeam": {
+              "projectNumber": "000000000000",
+              "team": "viewers"
+            }
+          }
+        ],
+        "owner": {
+          "entity": "project-owners-000000000000"
+        },
+        "labels": {
+          "goog-terraform-provisioned": "true",
+          "env": "default"
+        },
+        "softDeletePolicy": {
+          "retentionDurationSeconds": "604800",
+          "effectiveTime": "2026-02-06T15:12:59.596Z"
+        },
+        "iamConfiguration": {
+          "bucketPolicyOnly": {
+            "enabled": false
+          },
+          "uniformBucketLevelAccess": {
+            "enabled": false
+          },
+          "publicAccessPrevention": "inherited"
+        },
+        "locationType": "multi-region",
+        "rpo": "DEFAULT"
+      },
+      {
+        "kind": "storage#bucket",
+        "selfLink": "https://www.googleapis.com/storage/v1/b/c7n-dp-bkt-442b",
+        "id": "c7n-dp-bkt-442b",
+        "name": "c7n-dp-bkt-442b",
+        "projectNumber": "000000000000",
+        "generation": "1770234214588252618",
+        "metageneration": "1",
+        "location": "US",
+        "storageClass": "STANDARD",
+        "etag": "CAE=",
+        "timeCreated": "2026-02-04T19:43:34.841Z",
+        "updated": "2026-02-04T19:43:34.841Z",
+        "labels": {
+          "goog-terraform-provisioned": "true"
+        },
+        "softDeletePolicy": {
+          "retentionDurationSeconds": "604800",
+          "effectiveTime": "2026-02-04T19:43:34.841Z"
+        },
+        "iamConfiguration": {
+          "bucketPolicyOnly": {
+            "enabled": true,
+            "lockedTime": "2026-05-05T19:43:34.841Z"
+          },
+          "uniformBucketLevelAccess": {
+            "enabled": true,
+            "lockedTime": "2026-05-05T19:43:34.841Z"
+          },
+          "publicAccessPrevention": "inherited"
+        },
+        "locationType": "multi-region",
+        "rpo": "DEFAULT"
+      },
+      {
+        "kind": "storage#bucket",
+        "selfLink": "https://www.googleapis.com/storage/v1/b/c7n-log-bucket-noret-ba05d7b2",
+        "id": "c7n-log-bucket-noret-ba05d7b2",
+        "name": "c7n-log-bucket-noret-ba05d7b2",
+        "projectNumber": "000000000000",
+        "generation": "1769450629814695505",
+        "metageneration": "3",
+        "location": "US",
+        "storageClass": "STANDARD",
+        "etag": "CAM=",
+        "timeCreated": "2026-01-26T18:03:50.136Z",
+        "updated": "2026-02-02T16:30:33.939Z",
+        "acl": [
+          {
+            "kind": "storage#bucketAccessControl",
+            "id": "c7n-log-bucket-noret-ba05d7b2/project-editors-000000000000",
+            "selfLink": "https://www.googleapis.com/storage/v1/b/c7n-log-bucket-noret-ba05d7b2/acl/project-editors-000000000000",
+            "bucket": "c7n-log-bucket-noret-ba05d7b2",
+            "entity": "project-editors-000000000000",
+            "role": "OWNER",
+            "etag": "CAM=",
+            "projectTeam": {
+              "projectNumber": "000000000000",
+              "team": "editors"
+            }
+          },
+          {
+            "kind": "storage#bucketAccessControl",
+            "id": "c7n-log-bucket-noret-ba05d7b2/project-owners-000000000000",
+            "selfLink": "https://www.googleapis.com/storage/v1/b/c7n-log-bucket-noret-ba05d7b2/acl/project-owners-000000000000",
+            "bucket": "c7n-log-bucket-noret-ba05d7b2",
+            "entity": "project-owners-000000000000",
+            "role": "OWNER",
+            "etag": "CAM=",
+            "projectTeam": {
+              "projectNumber": "000000000000",
+              "team": "owners"
+            }
+          },
+          {
+            "kind": "storage#bucketAccessControl",
+            "id": "c7n-log-bucket-noret-ba05d7b2/project-viewers-000000000000",
+            "selfLink": "https://www.googleapis.com/storage/v1/b/c7n-log-bucket-noret-ba05d7b2/acl/project-viewers-000000000000",
+            "bucket": "c7n-log-bucket-noret-ba05d7b2",
+            "entity": "project-viewers-000000000000",
+            "role": "READER",
+            "etag": "CAM=",
+            "projectTeam": {
+              "projectNumber": "000000000000",
+              "team": "viewers"
+            }
+          }
+        ],
+        "defaultObjectAcl": [
+          {
+            "kind": "storage#objectAccessControl",
+            "entity": "project-owners-000000000000",
+            "role": "OWNER",
+            "etag": "CAM=",
+            "projectTeam": {
+              "projectNumber": "000000000000",
+              "team": "owners"
+            }
+          },
+          {
+            "kind": "storage#objectAccessControl",
+            "entity": "project-editors-000000000000",
+            "role": "OWNER",
+            "etag": "CAM=",
+            "projectTeam": {
+              "projectNumber": "000000000000",
+              "team": "editors"
+            }
+          },
+          {
+            "kind": "storage#objectAccessControl",
+            "entity": "project-viewers-000000000000",
+            "role": "READER",
+            "etag": "CAM=",
+            "projectTeam": {
+              "projectNumber": "000000000000",
+              "team": "viewers"
+            }
+          }
+        ],
+        "owner": {
+          "entity": "project-owners-000000000000"
+        },
+        "labels": {
+          "goog-terraform-provisioned": "true"
+        },
+        "softDeletePolicy": {
+          "retentionDurationSeconds": "604800",
+          "effectiveTime": "2026-01-26T18:03:50.136Z"
+        },
+        "iamConfiguration": {
+          "bucketPolicyOnly": {
+            "enabled": false
+          },
+          "uniformBucketLevelAccess": {
+            "enabled": false
+          },
+          "publicAccessPrevention": "inherited"
+        },
+        "locationType": "multi-region",
+        "rpo": "DEFAULT"
+      },
+      {
+        "kind": "storage#bucket",
+        "selfLink": "https://www.googleapis.com/storage/v1/b/c7n-log-bucket-ret30d-ba05d7b2",
+        "id": "c7n-log-bucket-ret30d-ba05d7b2",
+        "name": "c7n-log-bucket-ret30d-ba05d7b2",
+        "projectNumber": "000000000000",
+        "generation": "1769450628831826366",
+        "metageneration": "3",
+        "location": "US",
+        "storageClass": "STANDARD",
+        "etag": "CAM=",
+        "timeCreated": "2026-01-26T18:03:49.867Z",
+        "updated": "2026-02-02T16:30:33.954Z",
+        "acl": [
+          {
+            "kind": "storage#bucketAccessControl",
+            "id": "c7n-log-bucket-ret30d-ba05d7b2/project-editors-000000000000",
+            "selfLink": "https://www.googleapis.com/storage/v1/b/c7n-log-bucket-ret30d-ba05d7b2/acl/project-editors-000000000000",
+            "bucket": "c7n-log-bucket-ret30d-ba05d7b2",
+            "entity": "project-editors-000000000000",
+            "role": "OWNER",
+            "etag": "CAM=",
+            "projectTeam": {
+              "projectNumber": "000000000000",
+              "team": "editors"
+            }
+          },
+          {
+            "kind": "storage#bucketAccessControl",
+            "id": "c7n-log-bucket-ret30d-ba05d7b2/project-owners-000000000000",
+            "selfLink": "https://www.googleapis.com/storage/v1/b/c7n-log-bucket-ret30d-ba05d7b2/acl/project-owners-000000000000",
+            "bucket": "c7n-log-bucket-ret30d-ba05d7b2",
+            "entity": "project-owners-000000000000",
+            "role": "OWNER",
+            "etag": "CAM=",
+            "projectTeam": {
+              "projectNumber": "000000000000",
+              "team": "owners"
+            }
+          },
+          {
+            "kind": "storage#bucketAccessControl",
+            "id": "c7n-log-bucket-ret30d-ba05d7b2/project-viewers-000000000000",
+            "selfLink": "https://www.googleapis.com/storage/v1/b/c7n-log-bucket-ret30d-ba05d7b2/acl/project-viewers-000000000000",
+            "bucket": "c7n-log-bucket-ret30d-ba05d7b2",
+            "entity": "project-viewers-000000000000",
+            "role": "READER",
+            "etag": "CAM=",
+            "projectTeam": {
+              "projectNumber": "000000000000",
+              "team": "viewers"
+            }
+          }
+        ],
+        "defaultObjectAcl": [
+          {
+            "kind": "storage#objectAccessControl",
+            "entity": "project-owners-000000000000",
+            "role": "OWNER",
+            "etag": "CAM=",
+            "projectTeam": {
+              "projectNumber": "000000000000",
+              "team": "owners"
+            }
+          },
+          {
+            "kind": "storage#objectAccessControl",
+            "entity": "project-editors-000000000000",
+            "role": "OWNER",
+            "etag": "CAM=",
+            "projectTeam": {
+              "projectNumber": "000000000000",
+              "team": "editors"
+            }
+          },
+          {
+            "kind": "storage#objectAccessControl",
+            "entity": "project-viewers-000000000000",
+            "role": "READER",
+            "etag": "CAM=",
+            "projectTeam": {
+              "projectNumber": "000000000000",
+              "team": "viewers"
+            }
+          }
+        ],
+        "owner": {
+          "entity": "project-owners-000000000000"
+        },
+        "labels": {
+          "goog-terraform-provisioned": "true"
+        },
+        "retentionPolicy": {
+          "retentionPeriod": "2592000",
+          "effectiveTime": "2026-01-26T18:03:49.867Z"
+        },
+        "softDeletePolicy": {
+          "retentionDurationSeconds": "604800",
+          "effectiveTime": "2026-01-26T18:03:49.867Z"
+        },
+        "iamConfiguration": {
+          "bucketPolicyOnly": {
+            "enabled": false
+          },
+          "uniformBucketLevelAccess": {
+            "enabled": false
+          },
+          "publicAccessPrevention": "inherited"
+        },
+        "locationType": "multi-region",
+        "rpo": "DEFAULT"
+      },
+      {
+        "kind": "storage#bucket",
+        "selfLink": "https://www.googleapis.com/storage/v1/b/c7n-log-bucket-retention-ba05d7b2",
+        "id": "c7n-log-bucket-retention-ba05d7b2",
+        "name": "c7n-log-bucket-retention-ba05d7b2",
+        "projectNumber": "000000000000",
+        "generation": "1769450628403317476",
+        "metageneration": "3",
+        "location": "US",
+        "storageClass": "STANDARD",
+        "etag": "CAM=",
+        "timeCreated": "2026-01-26T18:03:48.862Z",
+        "updated": "2026-02-02T16:30:33.939Z",
+        "acl": [
+          {
+            "kind": "storage#bucketAccessControl",
+            "id": "c7n-log-bucket-retention-ba05d7b2/project-editors-000000000000",
+            "selfLink": "https://www.googleapis.com/storage/v1/b/c7n-log-bucket-retention-ba05d7b2/acl/project-editors-000000000000",
+            "bucket": "c7n-log-bucket-retention-ba05d7b2",
+            "entity": "project-editors-000000000000",
+            "role": "OWNER",
+            "etag": "CAM=",
+            "projectTeam": {
+              "projectNumber": "000000000000",
+              "team": "editors"
+            }
+          },
+          {
+            "kind": "storage#bucketAccessControl",
+            "id": "c7n-log-bucket-retention-ba05d7b2/project-owners-000000000000",
+            "selfLink": "https://www.googleapis.com/storage/v1/b/c7n-log-bucket-retention-ba05d7b2/acl/project-owners-000000000000",
+            "bucket": "c7n-log-bucket-retention-ba05d7b2",
+            "entity": "project-owners-000000000000",
+            "role": "OWNER",
+            "etag": "CAM=",
+            "projectTeam": {
+              "projectNumber": "000000000000",
+              "team": "owners"
+            }
+          },
+          {
+            "kind": "storage#bucketAccessControl",
+            "id": "c7n-log-bucket-retention-ba05d7b2/project-viewers-000000000000",
+            "selfLink": "https://www.googleapis.com/storage/v1/b/c7n-log-bucket-retention-ba05d7b2/acl/project-viewers-000000000000",
+            "bucket": "c7n-log-bucket-retention-ba05d7b2",
+            "entity": "project-viewers-000000000000",
+            "role": "READER",
+            "etag": "CAM=",
+            "projectTeam": {
+              "projectNumber": "000000000000",
+              "team": "viewers"
+            }
+          }
+        ],
+        "defaultObjectAcl": [
+          {
+            "kind": "storage#objectAccessControl",
+            "entity": "project-owners-000000000000",
+            "role": "OWNER",
+            "etag": "CAM=",
+            "projectTeam": {
+              "projectNumber": "000000000000",
+              "team": "owners"
+            }
+          },
+          {
+            "kind": "storage#objectAccessControl",
+            "entity": "project-editors-000000000000",
+            "role": "OWNER",
+            "etag": "CAM=",
+            "projectTeam": {
+              "projectNumber": "000000000000",
+              "team": "editors"
+            }
+          },
+          {
+            "kind": "storage#objectAccessControl",
+            "entity": "project-viewers-000000000000",
+            "role": "READER",
+            "etag": "CAM=",
+            "projectTeam": {
+              "projectNumber": "000000000000",
+              "team": "viewers"
+            }
+          }
+        ],
+        "owner": {
+          "entity": "project-owners-000000000000"
+        },
+        "labels": {
+          "goog-terraform-provisioned": "true"
+        },
+        "retentionPolicy": {
+          "retentionPeriod": "604800",
+          "effectiveTime": "2026-01-26T18:03:48.862Z"
+        },
+        "softDeletePolicy": {
+          "retentionDurationSeconds": "604800",
+          "effectiveTime": "2026-01-26T18:03:48.862Z"
+        },
+        "iamConfiguration": {
+          "bucketPolicyOnly": {
+            "enabled": false
+          },
+          "uniformBucketLevelAccess": {
+            "enabled": false
+          },
+          "publicAccessPrevention": "inherited"
+        },
+        "locationType": "multi-region",
+        "rpo": "DEFAULT"
+      },
+      {
+        "kind": "storage#bucket",
+        "selfLink": "https://www.googleapis.com/storage/v1/b/dataproc-staging-us-central1-000000000000-knhtjgwy",
+        "id": "dataproc-staging-us-central1-000000000000-knhtjgwy",
+        "name": "dataproc-staging-us-central1-000000000000-knhtjgwy",
+        "projectNumber": "000000000000",
+        "generation": "1770308739325798610",
+        "metageneration": "1",
+        "location": "US-CENTRAL1",
+        "storageClass": "STANDARD",
+        "etag": "CAE=",
+        "timeCreated": "2026-02-05T16:25:39.495Z",
+        "updated": "2026-02-05T16:25:39.495Z",
+        "acl": [
+          {
+            "kind": "storage#bucketAccessControl",
+            "id": "dataproc-staging-us-central1-000000000000-knhtjgwy/project-owners-000000000000",
+            "selfLink": "https://www.googleapis.com/storage/v1/b/dataproc-staging-us-central1-000000000000-knhtjgwy/acl/project-owners-000000000000",
+            "bucket": "dataproc-staging-us-central1-000000000000-knhtjgwy",
+            "entity": "project-owners-000000000000",
+            "role": "OWNER",
+            "etag": "CAE=",
+            "projectTeam": {
+              "projectNumber": "000000000000",
+              "team": "owners"
+            }
+          },
+          {
+            "kind": "storage#bucketAccessControl",
+            "id": "dataproc-staging-us-central1-000000000000-knhtjgwy/project-editors-000000000000",
+            "selfLink": "https://www.googleapis.com/storage/v1/b/dataproc-staging-us-central1-000000000000-knhtjgwy/acl/project-editors-000000000000",
+            "bucket": "dataproc-staging-us-central1-000000000000-knhtjgwy",
+            "entity": "project-editors-000000000000",
+            "role": "OWNER",
+            "etag": "CAE=",
+            "projectTeam": {
+              "projectNumber": "000000000000",
+              "team": "editors"
+            }
+          },
+          {
+            "kind": "storage#bucketAccessControl",
+            "id": "dataproc-staging-us-central1-000000000000-knhtjgwy/project-viewers-000000000000",
+            "selfLink": "https://www.googleapis.com/storage/v1/b/dataproc-staging-us-central1-000000000000-knhtjgwy/acl/project-viewers-000000000000",
+            "bucket": "dataproc-staging-us-central1-000000000000-knhtjgwy",
+            "entity": "project-viewers-000000000000",
+            "role": "READER",
+            "etag": "CAE=",
+            "projectTeam": {
+              "projectNumber": "000000000000",
+              "team": "viewers"
+            }
+          }
+        ],
+        "defaultObjectAcl": [
+          {
+            "kind": "storage#objectAccessControl",
+            "entity": "project-owners-000000000000",
+            "role": "OWNER",
+            "etag": "CAE=",
+            "projectTeam": {
+              "projectNumber": "000000000000",
+              "team": "owners"
+            }
+          },
+          {
+            "kind": "storage#objectAccessControl",
+            "entity": "project-editors-000000000000",
+            "role": "OWNER",
+            "etag": "CAE=",
+            "projectTeam": {
+              "projectNumber": "000000000000",
+              "team": "editors"
+            }
+          },
+          {
+            "kind": "storage#objectAccessControl",
+            "entity": "project-viewers-000000000000",
+            "role": "READER",
+            "etag": "CAE=",
+            "projectTeam": {
+              "projectNumber": "000000000000",
+              "team": "viewers"
+            }
+          }
+        ],
+        "owner": {
+          "entity": "project-owners-000000000000"
+        },
+        "labels": {
+          "goog-dataproc-location": "us-central1"
+        },
+        "softDeletePolicy": {
+          "retentionDurationSeconds": "0"
+        },
+        "iamConfiguration": {
+          "bucketPolicyOnly": {
+            "enabled": false
+          },
+          "uniformBucketLevelAccess": {
+            "enabled": false
+          },
+          "publicAccessPrevention": "inherited"
+        },
+        "locationType": "region",
+        "satisfiesPZI": true
+      },
+      {
+        "kind": "storage#bucket",
+        "selfLink": "https://www.googleapis.com/storage/v1/b/dataproc-temp-us-central1-000000000000-suxw3i44",
+        "id": "dataproc-temp-us-central1-000000000000-suxw3i44",
+        "name": "dataproc-temp-us-central1-000000000000-suxw3i44",
+        "projectNumber": "000000000000",
+        "generation": "1770234406361245037",
+        "metageneration": "1",
+        "location": "US-CENTRAL1",
+        "storageClass": "STANDARD",
+        "etag": "CAE=",
+        "timeCreated": "2026-02-04T19:46:46.601Z",
+        "updated": "2026-02-04T19:46:46.601Z",
+        "acl": [
+          {
+            "kind": "storage#bucketAccessControl",
+            "id": "dataproc-temp-us-central1-000000000000-suxw3i44/project-owners-000000000000",
+            "selfLink": "https://www.googleapis.com/storage/v1/b/dataproc-temp-us-central1-000000000000-suxw3i44/acl/project-owners-000000000000",
+            "bucket": "dataproc-temp-us-central1-000000000000-suxw3i44",
+            "entity": "project-owners-000000000000",
+            "role": "OWNER",
+            "etag": "CAE=",
+            "projectTeam": {
+              "projectNumber": "000000000000",
+              "team": "owners"
+            }
+          },
+          {
+            "kind": "storage#bucketAccessControl",
+            "id": "dataproc-temp-us-central1-000000000000-suxw3i44/project-editors-000000000000",
+            "selfLink": "https://www.googleapis.com/storage/v1/b/dataproc-temp-us-central1-000000000000-suxw3i44/acl/project-editors-000000000000",
+            "bucket": "dataproc-temp-us-central1-000000000000-suxw3i44",
+            "entity": "project-editors-000000000000",
+            "role": "OWNER",
+            "etag": "CAE=",
+            "projectTeam": {
+              "projectNumber": "000000000000",
+              "team": "editors"
+            }
+          },
+          {
+            "kind": "storage#bucketAccessControl",
+            "id": "dataproc-temp-us-central1-000000000000-suxw3i44/project-viewers-000000000000",
+            "selfLink": "https://www.googleapis.com/storage/v1/b/dataproc-temp-us-central1-000000000000-suxw3i44/acl/project-viewers-000000000000",
+            "bucket": "dataproc-temp-us-central1-000000000000-suxw3i44",
+            "entity": "project-viewers-000000000000",
+            "role": "READER",
+            "etag": "CAE=",
+            "projectTeam": {
+              "projectNumber": "000000000000",
+              "team": "viewers"
+            }
+          }
+        ],
+        "defaultObjectAcl": [
+          {
+            "kind": "storage#objectAccessControl",
+            "entity": "project-owners-000000000000",
+            "role": "OWNER",
+            "etag": "CAE=",
+            "projectTeam": {
+              "projectNumber": "000000000000",
+              "team": "owners"
+            }
+          },
+          {
+            "kind": "storage#objectAccessControl",
+            "entity": "project-editors-000000000000",
+            "role": "OWNER",
+            "etag": "CAE=",
+            "projectTeam": {
+              "projectNumber": "000000000000",
+              "team": "editors"
+            }
+          },
+          {
+            "kind": "storage#objectAccessControl",
+            "entity": "project-viewers-000000000000",
+            "role": "READER",
+            "etag": "CAE=",
+            "projectTeam": {
+              "projectNumber": "000000000000",
+              "team": "viewers"
+            }
+          }
+        ],
+        "owner": {
+          "entity": "project-owners-000000000000"
+        },
+        "lifecycle": {
+          "rule": [
+            {
+              "action": {
+                "type": "Delete"
+              },
+              "condition": {
+                "age": 90
+              }
+            }
+          ]
+        },
+        "labels": {
+          "goog-dataproc-location": "us-central1"
+        },
+        "softDeletePolicy": {
+          "retentionDurationSeconds": "0"
+        },
+        "iamConfiguration": {
+          "bucketPolicyOnly": {
+            "enabled": false
+          },
+          "uniformBucketLevelAccess": {
+            "enabled": false
+          },
+          "publicAccessPrevention": "inherited"
+        },
+        "locationType": "region",
+        "satisfiesPZI": true
+      },
+      {
+        "kind": "storage#bucket",
+        "selfLink": "https://www.googleapis.com/storage/v1/b/cloud-custodian.appspot.com",
+        "id": "cloud-custodian.appspot.com",
+        "name": "cloud-custodian.appspot.com",
+        "projectNumber": "000000000000",
+        "generation": "1769716805674636917",
+        "metageneration": "1",
+        "location": "US",
+        "storageClass": "STANDARD",
+        "etag": "CAE=",
+        "timeCreated": "2026-01-29T20:00:06.077Z",
+        "updated": "2026-01-29T20:00:06.077Z",
+        "acl": [
+          {
+            "kind": "storage#bucketAccessControl",
+            "id": "cloud-custodian.appspot.com/project-owners-000000000000",
+            "selfLink": "https://www.googleapis.com/storage/v1/b/cloud-custodian.appspot.com/acl/project-owners-000000000000",
+            "bucket": "cloud-custodian.appspot.com",
+            "entity": "project-owners-000000000000",
+            "role": "OWNER",
+            "etag": "CAE=",
+            "projectTeam": {
+              "projectNumber": "000000000000",
+              "team": "owners"
+            }
+          },
+          {
+            "kind": "storage#bucketAccessControl",
+            "id": "cloud-custodian.appspot.com/project-editors-000000000000",
+            "selfLink": "https://www.googleapis.com/storage/v1/b/cloud-custodian.appspot.com/acl/project-editors-000000000000",
+            "bucket": "cloud-custodian.appspot.com",
+            "entity": "project-editors-000000000000",
+            "role": "OWNER",
+            "etag": "CAE=",
+            "projectTeam": {
+              "projectNumber": "000000000000",
+              "team": "editors"
+            }
+          },
+          {
+            "kind": "storage#bucketAccessControl",
+            "id": "cloud-custodian.appspot.com/project-viewers-000000000000",
+            "selfLink": "https://www.googleapis.com/storage/v1/b/cloud-custodian.appspot.com/acl/project-viewers-000000000000",
+            "bucket": "cloud-custodian.appspot.com",
+            "entity": "project-viewers-000000000000",
+            "role": "READER",
+            "etag": "CAE=",
+            "projectTeam": {
+              "projectNumber": "000000000000",
+              "team": "viewers"
+            }
+          }
+        ],
+        "defaultObjectAcl": [
+          {
+            "kind": "storage#objectAccessControl",
+            "entity": "project-owners-000000000000",
+            "role": "OWNER",
+            "etag": "CAE=",
+            "projectTeam": {
+              "projectNumber": "000000000000",
+              "team": "owners"
+            }
+          },
+          {
+            "kind": "storage#objectAccessControl",
+            "entity": "project-editors-000000000000",
+            "role": "OWNER",
+            "etag": "CAE=",
+            "projectTeam": {
+              "projectNumber": "000000000000",
+              "team": "editors"
+            }
+          },
+          {
+            "kind": "storage#objectAccessControl",
+            "entity": "project-viewers-000000000000",
+            "role": "READER",
+            "etag": "CAE=",
+            "projectTeam": {
+              "projectNumber": "000000000000",
+              "team": "viewers"
+            }
+          }
+        ],
+        "owner": {
+          "entity": "project-owners-000000000000"
+        },
+        "softDeletePolicy": {
+          "retentionDurationSeconds": "604800",
+          "effectiveTime": "2026-01-29T20:00:06.077Z"
+        },
+        "iamConfiguration": {
+          "bucketPolicyOnly": {
+            "enabled": false
+          },
+          "uniformBucketLevelAccess": {
+            "enabled": false
+          },
+          "publicAccessPrevention": "inherited"
+        },
+        "locationType": "multi-region",
+        "rpo": "DEFAULT"
+      },
+      {
+        "kind": "storage#bucket",
+        "selfLink": "https://www.googleapis.com/storage/v1/b/staging.cloud-custodian.appspot.com",
+        "id": "staging.cloud-custodian.appspot.com",
+        "name": "staging.cloud-custodian.appspot.com",
+        "projectNumber": "000000000000",
+        "generation": "1769716806658517085",
+        "metageneration": "1",
+        "location": "US",
+        "storageClass": "STANDARD",
+        "etag": "CAE=",
+        "timeCreated": "2026-01-29T20:00:07.032Z",
+        "updated": "2026-01-29T20:00:07.032Z",
+        "acl": [
+          {
+            "kind": "storage#bucketAccessControl",
+            "id": "staging.cloud-custodian.appspot.com/project-owners-000000000000",
+            "selfLink": "https://www.googleapis.com/storage/v1/b/staging.cloud-custodian.appspot.com/acl/project-owners-000000000000",
+            "bucket": "staging.cloud-custodian.appspot.com",
+            "entity": "project-owners-000000000000",
+            "role": "OWNER",
+            "etag": "CAE=",
+            "projectTeam": {
+              "projectNumber": "000000000000",
+              "team": "owners"
+            }
+          },
+          {
+            "kind": "storage#bucketAccessControl",
+            "id": "staging.cloud-custodian.appspot.com/project-editors-000000000000",
+            "selfLink": "https://www.googleapis.com/storage/v1/b/staging.cloud-custodian.appspot.com/acl/project-editors-000000000000",
+            "bucket": "staging.cloud-custodian.appspot.com",
+            "entity": "project-editors-000000000000",
+            "role": "OWNER",
+            "etag": "CAE=",
+            "projectTeam": {
+              "projectNumber": "000000000000",
+              "team": "editors"
+            }
+          },
+          {
+            "kind": "storage#bucketAccessControl",
+            "id": "staging.cloud-custodian.appspot.com/project-viewers-000000000000",
+            "selfLink": "https://www.googleapis.com/storage/v1/b/staging.cloud-custodian.appspot.com/acl/project-viewers-000000000000",
+            "bucket": "staging.cloud-custodian.appspot.com",
+            "entity": "project-viewers-000000000000",
+            "role": "READER",
+            "etag": "CAE=",
+            "projectTeam": {
+              "projectNumber": "000000000000",
+              "team": "viewers"
+            }
+          }
+        ],
+        "defaultObjectAcl": [
+          {
+            "kind": "storage#objectAccessControl",
+            "entity": "project-owners-000000000000",
+            "role": "OWNER",
+            "etag": "CAE=",
+            "projectTeam": {
+              "projectNumber": "000000000000",
+              "team": "owners"
+            }
+          },
+          {
+            "kind": "storage#objectAccessControl",
+            "entity": "project-editors-000000000000",
+            "role": "OWNER",
+            "etag": "CAE=",
+            "projectTeam": {
+              "projectNumber": "000000000000",
+              "team": "editors"
+            }
+          },
+          {
+            "kind": "storage#objectAccessControl",
+            "entity": "project-viewers-000000000000",
+            "role": "READER",
+            "etag": "CAE=",
+            "projectTeam": {
+              "projectNumber": "000000000000",
+              "team": "viewers"
+            }
+          }
+        ],
+        "owner": {
+          "entity": "project-owners-000000000000"
+        },
+        "lifecycle": {
+          "rule": [
+            {
+              "action": {
+                "type": "Delete"
+              },
+              "condition": {
+                "age": 15
+              }
+            }
+          ]
+        },
+        "softDeletePolicy": {
+          "retentionDurationSeconds": "604800",
+          "effectiveTime": "2026-01-29T20:00:07.032Z"
+        },
+        "iamConfiguration": {
+          "bucketPolicyOnly": {
+            "enabled": false
+          },
+          "uniformBucketLevelAccess": {
+            "enabled": false
+          },
+          "publicAccessPrevention": "inherited"
+        },
+        "locationType": "multi-region",
+        "rpo": "DEFAULT"
+      }
+    ]
+  }
+}

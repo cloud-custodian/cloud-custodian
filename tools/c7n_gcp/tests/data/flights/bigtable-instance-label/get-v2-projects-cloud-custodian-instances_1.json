@@ -1,0 +1,32 @@
+{
+  "headers": {
+    "content-type": "application/json; charset=UTF-8",
+    "vary": "Origin, X-Origin, Referer",
+    "date": "Thu, 05 Feb 2026 20:48:28 GMT",
+    "server": "ESF",
+    "x-xss-protection": "0",
+    "x-frame-options": "SAMEORIGIN",
+    "x-content-type-options": "nosniff",
+    "alt-svc": "h3=\":443\"; ma=2592000,h3-29=\":443\"; ma=2592000",
+    "transfer-encoding": "chunked",
+    "status": "200",
+    "content-length": "364",
+    "-content-encoding": "gzip",
+    "content-location": "https://bigtableadmin.googleapis.com/v2/projects/cloud-custodian/instances?alt=json"
+  },
+  "body": {
+    "instances": [
+      {
+        "name": "projects/cloud-custodian/instances/c7n-bigtable-instance",
+        "displayName": "c7n-bigtable-instance",
+        "state": "READY",
+        "type": "PRODUCTION",
+        "labels": {
+          "env": "default",
+          "goog-terraform-provisioned": "true"
+        },
+        "createTime": "2026-02-05T20:36:16.382739Z"
+      }
+    ]
+  }
+}

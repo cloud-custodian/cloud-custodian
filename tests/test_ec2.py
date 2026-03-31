@@ -12,7 +12,7 @@ from dateutil import tz
 from c7n.testing import mock_datetime_now
 from c7n.exceptions import PolicyValidationError, ClientError
 from c7n.resources import ec2
-from c7n.resources.ec2 import actions, QueryFilter
+from c7n.resources.ec2 import actions, EC2QueryParser
 from c7n import tags, utils
 
 from .common import BaseTest
@@ -814,6 +814,67 @@ class TestImageFilter(BaseTest):
         resources = policy.run()
         self.assertEqual(len(resources), 1)
         self.assertEqual(resources[0]["InstanceId"], "i-039628786cabe8c16")
+
+
+@terraform('ec2_image_metadata')
+def test_ec2_image_metadata_filter(test, ec2_image_metadata):
+    """Filter aws.ec2 by image-metadata — covers Amazon-owned, local, and deregistered AMIs."""
+    aws_region = 'us-east-1'
+    session_factory = test.replay_flight_data('ec2_image_metadata_filter', region=aws_region)
+
+    all_instance_ids = [
+        ec2_image_metadata['aws_instance.amazon_ami.id'],
+        ec2_image_metadata['aws_instance.local_ami.id'],
+        ec2_image_metadata['aws_instance.deregistered_ami.id'],
+    ]
+
+    p = test.load_policy({
+        'name': 'ec2-deregistered-image',
+        'resource': 'aws.ec2',
+        'filters': [
+            {'type': 'value', 'op': 'in', 'key': 'InstanceId', 'value': all_instance_ids},
+            {'State.Name': 'running'},
+            {'type': 'image-metadata', 'key': 'State', 'value': 'deregistered'},
+        ],
+    }, session_factory=session_factory, config={'region': aws_region})
+
+    resources = p.run()
+    test.assertEqual(len(resources), 1)
+    test.assertEqual(
+        resources[0]['InstanceId'],
+        ec2_image_metadata['aws_instance.deregistered_ami.id'])
+    test.assertIn('c7n:image-metadata', resources[0])
+    test.assertEqual(resources[0]['c7n:image-metadata']['State'], 'deregistered')
+
+
+@terraform('ec2_image_metadata')
+def test_ec2_image_metadata_resource(test, ec2_image_metadata):
+    """Query aws.ec2-instance-ami resource directly — verifies all 3 AMI ownership scenarios."""
+    aws_region = 'us-east-1'
+    session_factory = test.replay_flight_data('ec2_image_metadata_resource', region=aws_region)
+
+    all_instance_ids = [
+        ec2_image_metadata['aws_instance.amazon_ami.id'],
+        ec2_image_metadata['aws_instance.local_ami.id'],
+        ec2_image_metadata['aws_instance.deregistered_ami.id'],
+    ]
+
+    p = test.load_policy({
+        'name': 'ec2-instance-ami-all',
+        'resource': 'aws.ec2-instance-ami',
+        'filters': [
+            {'type': 'value', 'op': 'in', 'key': 'InstanceId', 'value': all_instance_ids},
+        ],
+    }, session_factory=session_factory, config={'region': aws_region})
+
+    resources = p.run()
+    test.assertEqual(len(resources), 3)
+    test.assertIn('ImageMetadata', resources[0])
+
+    states = {r['InstanceId']: r['ImageMetadata']['State'] for r in resources}
+    test.assertEqual(
+        states[ec2_image_metadata['aws_instance.deregistered_ami.id']],
+        'deregistered')
 
 
 class TestInstanceAge(BaseTest):
@@ -1648,20 +1709,58 @@ class TestSetInstanceProfile(BaseTest):
             self.assertIn(a["State"], ("disassociating", "disassociated"))
 
 
-class TestEC2QueryFilter(unittest.TestCase):
+class TestEC2QueryParser(unittest.TestCase):
 
-    def test_parse(self):
-        self.assertEqual(QueryFilter.parse([]), [])
-        x = QueryFilter.parse([{"instance-state-name": "running"}])
+    def test_query(self):
+        self.assertEqual(EC2QueryParser.parse([]), [])
+        x = EC2QueryParser.parse([{"instance-state-name": "running"}])
         self.assertEqual(
-            x[0].query(), {"Name": "instance-state-name", "Values": ["running"]}
+            x[0]['Filters'][0], {"Name": "instance-state-name", "Values": ["running"]}
         )
+        query = [
+            {'Filters':
+                    [
+                        {'Name': 'tag:Name', 'Values': ['Instance1']},
+                        {'Name': 'instance-state-name', 'Values': ['running']}
+                    ]
+            },
+            {'InstanceIds': ['i-123abc', 'i-abc123']},
+            {'MaxResults': 1000},
+        ]
 
-        self.assertTrue(
-            isinstance(QueryFilter.parse([{"tag:ASV": "REALTIMEMSG"}])[0], QueryFilter)
-        )
+        self.assertEqual(EC2QueryParser.parse(query), query)
 
-        self.assertRaises(PolicyValidationError, QueryFilter.parse, [{"tag:ASV": None}])
+        self.assertEqual(
+            EC2QueryParser.parse([{"tag:ASV": "REALTIMEMSG"}]), [
+                {"Filters": [{"Name": "tag:ASV", "Values": ["REALTIMEMSG"]}]}])
+
+        self.assertEqual(
+            EC2QueryParser.parse([{"tag:Test": "Value1"}, {"tag:Test": "Value2"}]),
+                [{"Filters": [{"Name": "tag:Test", "Values": ["Value1", "Value2"]}]}])
+
+    def test_invalid_query(self):
+        self.assertRaises(PolicyValidationError, EC2QueryParser.parse, [{"tag:ASV": None}])
+
+        self.assertRaises(
+            PolicyValidationError, EC2QueryParser.parse, [
+                {'Filters': [{'instance-state-name': 'running'}]}])
+
+        self.assertRaises(PolicyValidationError, EC2QueryParser.parse, [{'InstanceIds': None}])
+
+        self.assertRaises(PolicyValidationError, EC2QueryParser.parse, [{'InstanceIds': [1]}])
+
+        self.assertRaises(PolicyValidationError, EC2QueryParser.parse,
+                          [{'Filters': [{'Name': 'architecture', 'Values': ['gothic']}]}])
+
+        self.assertRaises(PolicyValidationError, EC2QueryParser.parse, [{"tag:ASV": None}])
+
+        self.assertRaises(PolicyValidationError, EC2QueryParser.parse,
+                          [{'Filters': [{'Name': 'instance-group-name', 'Values': [False]}]}])
+
+        self.assertRaises(PolicyValidationError, EC2QueryParser.parse, [{'MaxResults': '1000'}])
+
+        self.assertRaises(PolicyValidationError, EC2QueryParser.parse,
+                          [{'Filters': {'Name': 'instance-group-name', 'Values': ["Value1"]}}])
 
 
 class TestTerminate(BaseTest):

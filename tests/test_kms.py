@@ -9,6 +9,7 @@ import boto3
 import moto
 import pytest
 from dateutil.tz import tzutc
+from freezegun import freeze_time
 
 from c7n.resources.aws import shape_validate
 from .common import BaseTest, functional
@@ -99,6 +100,85 @@ class KMSTest(BaseTest):
         client = session_factory(region="us-east-1").client("kms")
         key = client.get_key_rotation_status(KeyId=resources[0]["KeyId"])
         self.assertEqual(key["KeyRotationEnabled"], True)
+
+    def test_last_rotation(self):
+        session_factory = self.replay_flight_data("test_kms_last_rotation")
+        p = self.load_policy(
+            {
+                "name": "kms-last-rotation",
+                "resource": "kms-key",
+                "filters": [
+                    {
+                        "type": "last-rotation",
+                        "key": "RotationDate",
+                        "value": 30,
+                        "value_type": "age",
+                        "op": "gte",
+                    }
+                ],
+            },
+            session_factory=session_factory,
+        )
+        resources = p.run()
+        self.assertEqual(len(resources), 1)
+        # Check that LastRotation data was added to the resource
+        self.assertIn("c7n:LastRotation", resources[0])
+        self.assertIn("RotationDate", resources[0]["c7n:LastRotation"])
+
+    def test_last_rotation_no_rotations(self):
+        session_factory = self.replay_flight_data("test_kms_last_rotation_none")
+        p = self.load_policy(
+            {
+                "name": "kms-never-rotated",
+                "resource": "kms-key",
+                "filters": [
+                    {
+                        "type": "last-rotation",
+                        "key": "RotationDate",
+                        "value": "absent",
+                    }
+                ],
+            },
+            session_factory=session_factory,
+        )
+        resources = p.run()
+        # Should find keys that have never been rotated
+        self.assertGreaterEqual(len(resources), 0)
+
+    def test_last_rotation_exception_handling(self):
+        """Test that exceptions are handled gracefully"""
+        session_factory = self.replay_flight_data("test_kms_last_rotation_exception_handling")
+        p = self.load_policy(
+            {
+                "name": "kms-last-rotation-exception-handling",
+                "resource": "kms-key",
+                "filters": [
+                    {
+                        "or": [
+                            {
+                                "type": "last-rotation",
+                                "key": "RotationDate",
+                                "value": "empty"
+                            },
+                            {
+                                "type": "last-rotation",
+                                "key": "RotationDate",
+                                "value": 30,
+                                "value_type": "age",
+                                "op": "gte",
+                            }
+
+                        ]
+                    }
+                ],
+            },
+            session_factory=session_factory,
+        )
+        log = self.capture_logging("custodian.filters")
+        with freeze_time("2025-11-06T00:00:00+00:00"):
+            resources = p.run()
+        self.assertIn("AccessDenied", log.getvalue())
+        self.assertEqual(len(resources), 2)
 
     def test_key_rotation_exception_unsupportedopp(self):
         region = "us-west-2"

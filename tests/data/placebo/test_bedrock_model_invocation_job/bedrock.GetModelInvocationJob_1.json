@@ -1,0 +1,31 @@
+{
+    "status_code": 200,
+    "data": {
+        "ResponseMetadata": {},
+        "jobArn": "arn:aws:bedrock:us-east-1:644160558196:model-invocation-job/abc123def456",
+        "jobName": "c7n-batch-invocation",
+        "status": "InProgress",
+        "modelId": "amazon.titan-text-express-v1",
+        "submitTime": {
+            "__class__": "datetime",
+            "year": 2024,
+            "month": 11,
+            "day": 7,
+            "hour": 14,
+            "minute": 12,
+            "second": 3,
+            "microsecond": 0
+        },
+        "inputDataConfig": {
+            "s3InputDataConfig": {
+                "s3Uri": "s3://c7n-bedrock-input-abc/input.jsonl"
+            }
+        },
+        "outputDataConfig": {
+            "s3OutputDataConfig": {
+                "s3Uri": "s3://c7n-bedrock-output-abc/"
+            }
+        },
+        "roleArn": "arn:aws:iam::644160558196:role/c7n-bedrock-batch-role"
+    }
+}

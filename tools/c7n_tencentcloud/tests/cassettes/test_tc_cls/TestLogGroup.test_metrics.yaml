@@ -58,31 +58,7 @@ interactions:
       code: 200
       message: OK
 - request:
-    body: '{"Namespace": "QCE/CLS", "MetricName": "TrafficWrite", "Period": 3600,
-      "StartTime": "2022-11-12T06:12:11+00:00", "EndTime": "2022-11-15T06:12:11+00:00",
-      "Instances": [{"Dimensions": [{"Name": "uin", "Value": "100000750436"}, {"Name":
-      "TopicId", "Value": "0880c72f-1d0a-4535-af99-786482e7e69d"}]}, {"Dimensions":
-      [{"Name": "uin", "Value": "100000750436"}, {"Name": "TopicId", "Value": "e0696e8e-a134-42a9-bc18-4491f22eef00"}]},
-      {"Dimensions": [{"Name": "uin", "Value": "100000750436"}, {"Name": "TopicId",
-      "Value": "684a37bc-6cf2-43c2-8312-18ddc65bba0e"}]}, {"Dimensions": [{"Name":
-      "uin", "Value": "100000750436"}, {"Name": "TopicId", "Value": "9798eba9-36e5-46de-a677-9fd5ae61f62d"}]},
-      {"Dimensions": [{"Name": "uin", "Value": "100000750436"}, {"Name": "TopicId",
-      "Value": "50b08674-a5ef-474f-a0ac-c949f003bcfa"}]}, {"Dimensions": [{"Name":
-      "uin", "Value": "100000750436"}, {"Name": "TopicId", "Value": "ed7d67be-e949-4454-aee0-f707da0903be"}]},
-      {"Dimensions": [{"Name": "uin", "Value": "100000750436"}, {"Name": "TopicId",
-      "Value": "c467767b-bb87-4208-94a1-29fc0b76f982"}]}, {"Dimensions": [{"Name":
-      "uin", "Value": "100000750436"}, {"Name": "TopicId", "Value": "8b36a984-754f-4f26-8563-09180de98432"}]},
-      {"Dimensions": [{"Name": "uin", "Value": "100000750436"}, {"Name": "TopicId",
-      "Value": "8c583602-7d5a-402f-9038-0d55cccf8ce6"}]}, {"Dimensions": [{"Name":
-      "uin", "Value": "100000750436"}, {"Name": "TopicId", "Value": "e43c0db9-5e0d-42ac-a654-acf6d2ee69d6"}]},
-      {"Dimensions": [{"Name": "uin", "Value": "100000750436"}, {"Name": "TopicId",
-      "Value": "17d8c3c9-c736-4117-b0e9-96995568b573"}]}, {"Dimensions": [{"Name":
-      "uin", "Value": "100000750436"}, {"Name": "TopicId", "Value": "3cbe0793-0817-4674-a70c-77948ef4e2ca"}]},
-      {"Dimensions": [{"Name": "uin", "Value": "100000750436"}, {"Name": "TopicId",
-      "Value": "95583241-1165-4338-b72d-d68b97b97f95"}]}, {"Dimensions": [{"Name":
-      "uin", "Value": "100000750436"}, {"Name": "TopicId", "Value": "f01467ef-a621-4eb2-8be2-9481422b7b30"}]},
-      {"Dimensions": [{"Name": "uin", "Value": "100000750436"}, {"Name": "TopicId",
-      "Value": "58c8c2f1-2e46-4236-99e4-c44c82b8142d"}]}]}'
+    body: '{"Namespace":"QCE/CLS","MetricName":"TrafficWrite","Period":3600,"StartTime":"2022-11-12T06:12:11+00:00","EndTime":"2022-11-15T06:12:11+00:00","Instances":[{"Dimensions":[{"Name":"uin","Value":"100000750436"},{"Name":"TopicId","Value":"0880c72f-1d0a-4535-af99-786482e7e69d"}]},{"Dimensions":[{"Name":"uin","Value":"100000750436"},{"Name":"TopicId","Value":"e0696e8e-a134-42a9-bc18-4491f22eef00"}]},{"Dimensions":[{"Name":"uin","Value":"100000750436"},{"Name":"TopicId","Value":"684a37bc-6cf2-43c2-8312-18ddc65bba0e"}]},{"Dimensions":[{"Name":"uin","Value":"100000750436"},{"Name":"TopicId","Value":"9798eba9-36e5-46de-a677-9fd5ae61f62d"}]},{"Dimensions":[{"Name":"uin","Value":"100000750436"},{"Name":"TopicId","Value":"50b08674-a5ef-474f-a0ac-c949f003bcfa"}]},{"Dimensions":[{"Name":"uin","Value":"100000750436"},{"Name":"TopicId","Value":"ed7d67be-e949-4454-aee0-f707da0903be"}]},{"Dimensions":[{"Name":"uin","Value":"100000750436"},{"Name":"TopicId","Value":"c467767b-bb87-4208-94a1-29fc0b76f982"}]},{"Dimensions":[{"Name":"uin","Value":"100000750436"},{"Name":"TopicId","Value":"8b36a984-754f-4f26-8563-09180de98432"}]},{"Dimensions":[{"Name":"uin","Value":"100000750436"},{"Name":"TopicId","Value":"8c583602-7d5a-402f-9038-0d55cccf8ce6"}]},{"Dimensions":[{"Name":"uin","Value":"100000750436"},{"Name":"TopicId","Value":"e43c0db9-5e0d-42ac-a654-acf6d2ee69d6"}]}]}'
     headers:
       Accept:
       - '*/*'
@@ -108,7 +84,52 @@ interactions:
     uri: https://monitor.ap-singapore.tencentcloudapi.com/
   response:
     body:
-      string: '{"Response":{"StartTime":"2022-11-12T06:00:00+00:00","EndTime":"2022-11-15T06:00:00+00:00","Period":3600,"MetricName":"TrafficWrite","DataPoints":[{"Dimensions":[{"Name":"TopicId","Value":"0880c72f-1d0a-4535-af99-786482e7e69d"},{"Name":"uin","Value":"100000750436"}],"Timestamps":[],"Values":[]},{"Dimensions":[{"Name":"TopicId","Value":"e0696e8e-a134-42a9-bc18-4491f22eef00"},{"Name":"uin","Value":"100000750436"}],"Timestamps":[],"Values":[]},{"Dimensions":[{"Name":"TopicId","Value":"684a37bc-6cf2-43c2-8312-18ddc65bba0e"},{"Name":"uin","Value":"100000750436"}],"Timestamps":[],"Values":[]},{"Dimensions":[{"Name":"TopicId","Value":"9798eba9-36e5-46de-a677-9fd5ae61f62d"},{"Name":"uin","Value":"100000750436"}],"Timestamps":[],"Values":[]},{"Dimensions":[{"Name":"TopicId","Value":"50b08674-a5ef-474f-a0ac-c949f003bcfa"},{"Name":"uin","Value":"100000750436"}],"Timestamps":[],"Values":[]},{"Dimensions":[{"Name":"TopicId","Value":"ed7d67be-e949-4454-aee0-f707da0903be"},{"Name":"uin","Value":"100000750436"}],"Timestamps":[],"Values":[]},{"Dimensions":[{"Name":"TopicId","Value":"c467767b-bb87-4208-94a1-29fc0b76f982"},{"Name":"uin","Value":"100000750436"}],"Timestamps":[],"Values":[]},{"Dimensions":[{"Name":"TopicId","Value":"8b36a984-754f-4f26-8563-09180de98432"},{"Name":"uin","Value":"100000750436"}],"Timestamps":[],"Values":[]},{"Dimensions":[{"Name":"TopicId","Value":"8c583602-7d5a-402f-9038-0d55cccf8ce6"},{"Name":"uin","Value":"100000750436"}],"Timestamps":[],"Values":[]},{"Dimensions":[{"Name":"TopicId","Value":"e43c0db9-5e0d-42ac-a654-acf6d2ee69d6"},{"Name":"uin","Value":"100000750436"}],"Timestamps":[],"Values":[]},{"Dimensions":[{"Name":"TopicId","Value":"17d8c3c9-c736-4117-b0e9-96995568b573"},{"Name":"uin","Value":"100000750436"}],"Timestamps":[],"Values":[]},{"Dimensions":[{"Name":"TopicId","Value":"3cbe0793-0817-4674-a70c-77948ef4e2ca"},{"Name":"uin","Value":"100000750436"}],"Timestamps":[],"Values":[]},{"Dimensions":[{"Name":"TopicId","Value":"95583241-1165-4338-b72d-d68b97b97f95"},{"Name":"uin","Value":"100000750436"}],"Timestamps":[1668232800,1668236400,1668240000,1668243600,1668247200,1668250800,1668254400,1668258000,1668261600,1668265200,1668268800,1668272400,1668276000,1668279600,1668283200,1668286800,1668290400,1668294000,1668297600,1668301200,1668304800,1668308400,1668312000,1668315600,1668319200,1668322800,1668326400,1668330000,1668333600,1668337200,1668340800,1668344400,1668348000,1668351600,1668355200,1668358800,1668362400,1668366000,1668369600,1668373200,1668376800,1668380400,1668384000,1668387600,1668391200,1668394800,1668398400,1668402000,1668405600,1668409200,1668412800,1668416400,1668420000,1668423600,1668427200,1668430800,1668434400,1668438000,1668441600,1668445200,1668448800,1668452400,1668456000,1668459600,1668463200,1668466800,1668470400,1668474000,1668477600,1668481200,1668484800,1668488400],"Values":[14.858,14.892,15.099,15.091,14.791,14.666,14.77,14.784,14.886,14.9,14.93,15.079,15.068,14.547,14.591,14.549,14.728,14.856,14.879,14.85,14.703,14.976,14.883,14.825,14.795,14.836,15.053,14.921,14.776,14.844,14.875,14.984,15.014,14.926,14.828,14.956,14.974,15.025,15.14,14.859,14.872,14.979,14.983,14.974,15.132,14.887,15.013,15.002,14.841,14.841,14.813,15.033,14.973,15.047,14.85,14.686,14.682,6.291,15.023,15.07,15.044,14.966,14.992,14.839,14.777,14.759,14.764,14.925,14.901,14.899,14.826,14.823]},{"Dimensions":[{"Name":"TopicId","Value":"f01467ef-a621-4eb2-8be2-9481422b7b30"},{"Name":"uin","Value":"100000750436"}],"Timestamps":[],"Values":[]},{"Dimensions":[{"Name":"TopicId","Value":"58c8c2f1-2e46-4236-99e4-c44c82b8142d"},{"Name":"uin","Value":"100000750436"}],"Timestamps":[],"Values":[]}],"RequestId":"49411a4f-a9f4-4c05-88b0-a10fca8630a5","Msg":"The
+      string: '{"Response":{"StartTime":"2022-11-12T06:00:00+00:00","EndTime":"2022-11-15T06:00:00+00:00","Period":3600,"MetricName":"TrafficWrite","DataPoints":[{"Dimensions":[{"Name":"TopicId","Value":"0880c72f-1d0a-4535-af99-786482e7e69d"},{"Name":"uin","Value":"100000750436"}],"Timestamps":[],"Values":[]},{"Dimensions":[{"Name":"TopicId","Value":"e0696e8e-a134-42a9-bc18-4491f22eef00"},{"Name":"uin","Value":"100000750436"}],"Timestamps":[],"Values":[]},{"Dimensions":[{"Name":"TopicId","Value":"684a37bc-6cf2-43c2-8312-18ddc65bba0e"},{"Name":"uin","Value":"100000750436"}],"Timestamps":[],"Values":[]},{"Dimensions":[{"Name":"TopicId","Value":"9798eba9-36e5-46de-a677-9fd5ae61f62d"},{"Name":"uin","Value":"100000750436"}],"Timestamps":[],"Values":[]},{"Dimensions":[{"Name":"TopicId","Value":"50b08674-a5ef-474f-a0ac-c949f003bcfa"},{"Name":"uin","Value":"100000750436"}],"Timestamps":[],"Values":[]},{"Dimensions":[{"Name":"TopicId","Value":"ed7d67be-e949-4454-aee0-f707da0903be"},{"Name":"uin","Value":"100000750436"}],"Timestamps":[],"Values":[]},{"Dimensions":[{"Name":"TopicId","Value":"c467767b-bb87-4208-94a1-29fc0b76f982"},{"Name":"uin","Value":"100000750436"}],"Timestamps":[],"Values":[]},{"Dimensions":[{"Name":"TopicId","Value":"8b36a984-754f-4f26-8563-09180de98432"},{"Name":"uin","Value":"100000750436"}],"Timestamps":[],"Values":[]},{"Dimensions":[{"Name":"TopicId","Value":"8c583602-7d5a-402f-9038-0d55cccf8ce6"},{"Name":"uin","Value":"100000750436"}],"Timestamps":[],"Values":[]},{"Dimensions":[{"Name":"TopicId","Value":"e43c0db9-5e0d-42ac-a654-acf6d2ee69d6"},{"Name":"uin","Value":"100000750436"}],"Timestamps":[],"Values":[]}],"RequestId":"49411a4f-a9f4-4c05-88b0-a10fca8630a5-0","Msg":"The
+        request may time out as the API call limit has been exceeded (a single call
+        can query up to 10 instances and 1,440 data points). Please adjust the call
+        method timely."}}'
+    headers:
+      Connection:
+      - keep-alive
+      Content-Length:
+      - '3899'
+      Content-Type:
+      - application/json
+      Date:
+      - Tue, 15 Nov 2022 06:12:12 GMT
+      Server:
+      - nginx
+    status:
+      code: 200
+      message: OK
+- request:
+    body: '{"Namespace":"QCE/CLS","MetricName":"TrafficWrite","Period":3600,"StartTime":"2022-11-12T06:12:11+00:00","EndTime":"2022-11-15T06:12:11+00:00","Instances":[{"Dimensions":[{"Name":"uin","Value":"100000750436"},{"Name":"TopicId","Value":"17d8c3c9-c736-4117-b0e9-96995568b573"}]},{"Dimensions":[{"Name":"uin","Value":"100000750436"},{"Name":"TopicId","Value":"3cbe0793-0817-4674-a70c-77948ef4e2ca"}]},{"Dimensions":[{"Name":"uin","Value":"100000750436"},{"Name":"TopicId","Value":"95583241-1165-4338-b72d-d68b97b97f95"}]},{"Dimensions":[{"Name":"uin","Value":"100000750436"},{"Name":"TopicId","Value":"f01467ef-a621-4eb2-8be2-9481422b7b30"}]},{"Dimensions":[{"Name":"uin","Value":"100000750436"},{"Name":"TopicId","Value":"58c8c2f1-2e46-4236-99e4-c44c82b8142d"}]}]}'
+    headers:
+      Accept:
+      - '*/*'
+      Accept-Encoding:
+      - gzip, deflate
+      Connection:
+      - keep-alive
+      Content-Length:
+      - '2117'
+      Content-Type:
+      - application/json
+      Host:
+      - monitor.ap-singapore.tencentcloudapi.com
+      User-Agent:
+      - python-requests/2.28.1
+      X-TC-Action:
+      - GetMonitorData
+      X-TC-Region:
+      - ap-singapore
+      X-TC-Version:
+      - '2018-07-24'
+    method: POST
+    uri: https://monitor.ap-singapore.tencentcloudapi.com/
+  response:
+    body:
+      string: '{"Response":{"StartTime":"2022-11-12T06:00:00+00:00","EndTime":"2022-11-15T06:00:00+00:00","Period":3600,"MetricName":"TrafficWrite","DataPoints":[{"Dimensions":[{"Name":"TopicId","Value":"17d8c3c9-c736-4117-b0e9-96995568b573"},{"Name":"uin","Value":"100000750436"}],"Timestamps":[],"Values":[]},{"Dimensions":[{"Name":"TopicId","Value":"3cbe0793-0817-4674-a70c-77948ef4e2ca"},{"Name":"uin","Value":"100000750436"}],"Timestamps":[],"Values":[]},{"Dimensions":[{"Name":"TopicId","Value":"95583241-1165-4338-b72d-d68b97b97f95"},{"Name":"uin","Value":"100000750436"}],"Timestamps":[1668232800,1668236400,1668240000,1668243600,1668247200,1668250800,1668254400,1668258000,1668261600,1668265200,1668268800,1668272400,1668276000,1668279600,1668283200,1668286800,1668290400,1668294000,1668297600,1668301200,1668304800,1668308400,1668312000,1668315600,1668319200,1668322800,1668326400,1668330000,1668333600,1668337200,1668340800,1668344400,1668348000,1668351600,1668355200,1668358800,1668362400,1668366000,1668369600,1668373200,1668376800,1668380400,1668384000,1668387600,1668391200,1668394800,1668398400,1668402000,1668405600,1668409200,1668412800,1668416400,1668420000,1668423600,1668427200,1668430800,1668434400,1668438000,1668441600,1668445200,1668448800,1668452400,1668456000,1668459600,1668463200,1668466800,1668470400,1668474000,1668477600,1668481200,1668484800,1668488400],"Values":[14.858,14.892,15.099,15.091,14.791,14.666,14.77,14.784,14.886,14.9,14.93,15.079,15.068,14.547,14.591,14.549,14.728,14.856,14.879,14.85,14.703,14.976,14.883,14.825,14.795,14.836,15.053,14.921,14.776,14.844,14.875,14.984,15.014,14.926,14.828,14.956,14.974,15.025,15.14,14.859,14.872,14.979,14.983,14.974,15.132,14.887,15.013,15.002,14.841,14.841,14.813,15.033,14.973,15.047,14.85,14.686,14.682,6.291,15.023,15.07,15.044,14.966,14.992,14.839,14.777,14.759,14.764,14.925,14.901,14.899,14.826,14.823]},{"Dimensions":[{"Name":"TopicId","Value":"f01467ef-a621-4eb2-8be2-9481422b7b30"},{"Name":"uin","Value":"100000750436"}],"Timestamps":[],"Values":[]},{"Dimensions":[{"Name":"TopicId","Value":"58c8c2f1-2e46-4236-99e4-c44c82b8142d"},{"Name":"uin","Value":"100000750436"}],"Timestamps":[],"Values":[]}],"RequestId":"49411a4f-a9f4-4c05-88b0-a10fca8630a5-1","Msg":"The
         request may time out as the API call limit has been exceeded (a single call
         can query up to 10 instances and 1,440 data points). Please adjust the call
         method timely."}}'

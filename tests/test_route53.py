@@ -674,3 +674,27 @@ class TestControlPanel(BaseTest):
         self.assertEqual(len(resources), 1)
         self.assertEqual(resources[0]['ControlPanelArn'],
             'arn:aws:route53-recovery-control::644160558196:controlpanel/fd5a6bfc73364a0dbd48d3915867a306')
+
+
+class ResolverRuleTest(BaseTest):
+
+    def test_resolver_rule_query(self):
+        session_factory = self.replay_flight_data("test_resolver_rule_query")
+        p = self.load_policy(
+            {
+                "name": "resolver-rule-list",
+                "resource": "resolver-rule",
+                "filters": [
+                    {
+                        "type": "value",
+                        "key": "Status",
+                        "op": "eq",
+                        "value": "COMPLETE",
+                    }
+                ],
+            },
+            session_factory=session_factory,
+        )
+        resources = p.run()
+        self.assertEqual(len(resources), 1)
+        self.assertEqual(resources[0]["RuleType"], "FORWARD")

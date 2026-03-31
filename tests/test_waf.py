@@ -90,24 +90,106 @@ class WAFTest(BaseTest):
         self.assertEqual(len(resources), 1)
         self.assertTrue('c7n:WafV2LoggingConfiguration' not in resources[0])
 
-    def test_wafv2_rule_groups(self):
-        session_factory = self.replay_flight_data("test_wafv2_rule_groups")
+    def test_wafv2_set_logging_enabled(self):
+        session_factory = self.replay_flight_data("test_wafv2_set_logging_enabled")
+
+        policy = {
+                "name": "enable-wafv2-logging",
+                "resource": "aws.wafv2",
+                "filters": [{"Name": "noncompliant_waf"}],
+                "actions": [
+                    {
+                        "type": "set-logging",
+                        "destination": "arn:aws:s3:::aws-waf-logs-test-custodian-creation",
+                    }
+                ],
+            }
+        p = self.load_policy(policy,
+                             session_factory=session_factory,
+                             config={"region": "us-east-1"})
+
+        resources = p.run()
+        self.assertEqual(len(resources), 1, f"Expected 1 resource, got {len(resources)}")
+
+    def test_wafv2_set_logging_invalid_destination(self):
+        session_factory = self.replay_flight_data("test_wafv2_set_logging_invalid_destination")
+
+        policy = {
+                "name": "enable-wafv2-logging-invalid-destination",
+                "resource": "aws.wafv2",
+                "filters": [{"Name": "compliant_waf"}],
+                "actions": [
+                    {
+                        "type": "set-logging",
+                        "destination": "arn:aws:s3:::aws-waf-logs-invalid-destination-for-logging",
+                    }
+                ],
+            }
+        p = self.load_policy(policy,
+                             session_factory=session_factory,
+                             config={"region": "us-east-1"})
+        resources = p.run()
+        self.assertEqual(len(resources), 1, f"Expected 1 resource, got {len(resources)}")
+
+    def test_wafv2_set_logging_with_redacted_fields(self):
+        session_factory = self.replay_flight_data("test_wafv2_set_logging_with_redacted_fields")
+
+        policy = {
+            "name": "enable-wafv2-logging-with-redacted-fields",
+            "resource": "aws.wafv2",
+            "filters": [{"Name": "tester"}],
+            "actions": [
+                {
+                    "type": "set-logging",
+                    "destination": "arn:aws:s3:::aws-waf-logs-test-custodian-creation",
+                    "attributes": {
+                        "RedactedFields": [
+                            {
+                                "SingleHeader": {
+                                    "Name": "cookie"
+                                }
+                            }
+                        ]
+                    }
+                }
+            ],
+        }
+
+        p = self.load_policy(
+            policy,
+            session_factory=session_factory,
+            config={'region': 'us-east-1'})
+
+        resources = p.run()
+        self.assertEqual(len(resources), 1)
+
+        # Verify the logging configuration was set correctly
+        client = session_factory().client('wafv2', region_name='us-east-1')
+        logging_configs = client.list_logging_configurations(Scope='REGIONAL')
+
+        resource_arn = resources[0]['ARN']
+        logging_config = None
+        for config in logging_configs['LoggingConfigurations']:
+            if config['ResourceArn'] == resource_arn:
+                logging_config = config
+                break
+
+        self.assertEqual(
+            logging_config['LogDestinationConfigs'],
+            ['arn:aws:s3:::aws-waf-logs-test-custodian-creation']
+        )
+        self.assertEqual(
+            logging_config['RedactedFields'],
+            [{'SingleHeader': {'Name': 'cookie'}}]
+        )
+
+    def test_wafv2_customer_rule_groups(self):
+        session_factory = self.replay_flight_data("test_wafv2_customer_rule_groups")
 
         policy = {
             "name": "test_wafv2_rule_groups",
             "resource": "aws.wafv2",
             "filters": [
-                {
-                    "type": "web-acl-rules",
-                    "attrs": [
-                        {
-                            "type": "value",
-                            "key": "Type",
-                            "value": "RuleGroup",
-                            "op": "eq"
-                        }
-                    ]
-                },
                 {
                     "not": [{
                         "type": "web-acl-rules",
@@ -120,6 +202,37 @@ class WAFTest(BaseTest):
                             }
                         ]
                     }]
+                },
+                {
+                    "not": [{
+                        "type": "web-acl-rules",
+                        "attrs": [
+                            {
+                                "type": "value",
+                                "key": "Type",
+                                "value": "ManagedRuleGroup",
+                                "op": "eq"
+                            }
+                        ]
+                    }]
+                },
+                {
+                    "type": "web-acl-rules",
+                    "attrs": [
+                        {
+                            "type": "value",
+                            "key": "Type",
+                            "value": "CustomerRuleGroup",
+                            "op": "eq"
+                        },
+                        {
+                            "type": "value",
+                            "key": "Rules",
+                            "value_type": "size",
+                            "value": 0,
+                            "op": "gt"
+                        }
+                    ]
                 }
             ],
         }
@@ -156,7 +269,20 @@ class WAFTest(BaseTest):
                             {
                                 "type": "value",
                                 "key": "Type",
-                                "value": "RuleGroup",
+                                "value": "CustomerRuleGroup",
+                                "op": "eq"
+                            }
+                        ]
+                    }]
+                },
+                {
+                    "not": [{
+                        "type": "web-acl-rules",
+                        "attrs": [
+                            {
+                                "type": "value",
+                                "key": "Type",
+                                "value": "ManagedRuleGroup",
                                 "op": "eq"
                             }
                         ]
@@ -199,3 +325,36 @@ class WAFTest(BaseTest):
 
         resources = p.run()
         self.assertEqual(len(resources), 2, f"Expected 2 resources, got {len(resources)}")
+
+    def test_wafv2_managed_rule_groups(self):
+        session_factory = self.replay_flight_data("test_wafv2_managed_rule_groups")
+
+        policy = {
+            "name": "test_wafv2_managed_rule_groups",
+            "resource": "aws.wafv2",
+            "filters": [
+                {
+                    "type": "web-acl-rules",
+                    "attrs": [
+                        {
+                            "type": "value",
+                            "key": "Type",
+                            "value": "ManagedRuleGroup",
+                            "op": "eq"
+                        }
+                    ]
+                }
+            ]
+        }
+
+        p = self.load_policy(policy,
+                             session_factory=session_factory,
+                             config={"region": "us-east-1"})
+
+        resources = p.run()
+        self.assertEqual(len(resources), 1, f"Expected 1 resource, got {len(resources)}")
+
+        resource = resources[0]
+        managed_rules = [rule for rule in resource['c7n:WebACLAllRules']
+                        if rule['Type'] == 'ManagedRuleGroup']
+        self.assertEqual(len(managed_rules), 2, "Expected 2 managed rule group")

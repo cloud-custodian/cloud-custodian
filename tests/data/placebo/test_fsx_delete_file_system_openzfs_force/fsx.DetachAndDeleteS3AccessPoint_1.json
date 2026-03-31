@@ -1,0 +1,8 @@
+{
+    "status_code": 200,
+    "data": {
+        "Lifecycle": "DELETING",
+        "Name": "dev-openzfs-ap-attachment",
+        "ResponseMetadata": {}
+    }
+}

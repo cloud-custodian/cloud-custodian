@@ -45,6 +45,22 @@ class LoadBalancingAddressDelete(MethodAction):
             'region': resource['region'].rsplit('/', 1)[-1],
             'address': resource['name']}
 
+    def filter_resources(self, resources):
+        resources = super().filter_resources(resources)
+        missing_region = [r for r in resources if 'region' not in r]
+        if missing_region:
+            removed = ', '.join([r.get('name', '<unknown>') for r in missing_region])
+            self.log.warning(
+                "policy:%s action:%s filtered out %d resources without region: %s",
+                self.manager.ctx.policy.name,
+                self.type,
+                len(missing_region),
+                removed,
+            )
+            resources = [r for r in resources if 'region' in r]
+
+        return resources
+
 
 @resources.register('loadbalancer-url-map')
 class LoadBalancingUrlMap(QueryResourceManager):

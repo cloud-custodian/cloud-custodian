@@ -22,8 +22,19 @@ class BigTableInstance(QueryResourceManager):
         name = id = 'id'
         scope_template = "projects/{}"
         permissions = ('bigtable.instances.list',)
+        perm_service = 'bigtable'
         asset_type = "bigtableadmin.googleapis.com/Instance"
         default_report_fields = ['displayName', 'expireTime']
+        labels = True
+        labels_op = 'partialUpdateInstance'
+
+        @staticmethod
+        def get_label_params(resource, all_labels):
+            return {
+                'name': resource['name'],
+                'updateMask': 'labels',
+                'body': {'labels': all_labels},
+            }
 
 
 @resources.register('bigtable-instance-cluster')

@@ -59,6 +59,7 @@ ENV_CLIENT_CERTIFICATE_PASSWORD = 'AZURE_CLIENT_CERTIFICATE_PASSWORD'  # nosec
 ENV_ACCESS_TOKEN = 'AZURE_ACCESS_TOKEN'  # nosec
 
 ENV_USE_MSI = 'AZURE_USE_MSI'
+ENV_FEDERATED_TOKEN_FILE = 'AZURE_FEDERATED_TOKEN_FILE'  # nosec
 
 ENV_FUNCTION_TENANT_ID = 'AZURE_FUNCTION_TENANT_ID'
 ENV_FUNCTION_CLIENT_ID = 'AZURE_FUNCTION_CLIENT_ID'
@@ -77,7 +78,8 @@ STORAGE_AUTH_ENDPOINT = 'https://storage.azure.com/'
 VAULT_AUTH_ENDPOINT = 'vault'
 DEFAULT_RESOURCE_AUTH_ENDPOINT = 'resource_manager'
 DEFAULT_AUTH_ENDPOINT = 'active_directory_resource_id'
-GRAPH_AUTH_ENDPOINT = 'active_directory_graph_resource_id'
+GRAPH_AUTH_ENDPOINT = 'active_directory_graph_resource_id'  # Legacy Azure AD Graph
+MSGRAPH_RESOURCE_ID = 'https://graph.microsoft.com/'        # Microsoft Graph resource identifier
 RESOURCE_GLOBAL_MGMT = 'https://management.azure.com/'
 
 """

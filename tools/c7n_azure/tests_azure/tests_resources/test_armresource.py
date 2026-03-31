@@ -1,10 +1,14 @@
 # Copyright The Cloud Custodian Authors.
 # SPDX-License-Identifier: Apache-2.0
+import datetime
+
 from ..azure_common import BaseTest, arm_template, cassette_name
-from mock import patch
+from unittest.mock import patch
 from c7n_azure.resources.generic_arm_resource import GenericArmResource
 from c7n_azure.resources.arm import arm_tags_unsupported
 from c7n.exceptions import PolicyValidationError
+from c7n.testing import mock_datetime_now
+from dateutil.parser import parse as date_parse
 
 
 class ArmResourceTest(BaseTest):
@@ -42,6 +46,29 @@ class ArmResourceTest(BaseTest):
                  'value': 'cctestvm'}],
         })
         resources = p.run()
+        self.assertEqual(len(resources), 1)
+
+    @arm_template('vm.json')
+    def test_metric_filter_period_start_start_of_day(self):
+        p = self.load_policy({
+            'name': 'test-azure-metric-period-start',
+            'resource': 'azure.vm',
+            'filters': [
+                {'type': 'value',
+                 'key': 'name',
+                 'op': 'eq',
+                 'value_type': 'normalize',
+                 'value': 'cctestvm'},
+                {'type': 'metric',
+                 'metric': 'Percentage CPU',
+                 'aggregation': 'average',
+                 'op': 'gt',
+                 'threshold': 0,
+                 'period_start': 'start-of-day'}],
+        })
+
+        with mock_datetime_now(date_parse("2026-02-21T12:00:00+00:00"), datetime):
+            resources = p.run()
         self.assertEqual(len(resources), 1)
 
     @arm_template('vm.json')

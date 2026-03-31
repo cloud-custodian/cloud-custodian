@@ -2,10 +2,9 @@
 # SPDX-License-Identifier: Apache-2.0
 
 from c7n.actions import BaseAction
-from c7n.exceptions import PolicyValidationError
 from c7n.manager import resources
 from c7n.query import QueryResourceManager, TypeInfo, DescribeSource, ConfigSource
-from c7n.utils import local_session, type_schema
+from c7n.utils import local_session, type_schema, QueryParser
 from c7n.tags import RemoveTag, Tag, TagActionFilter, TagDelayedAction, universal_augment
 from c7n.filters.vpc import SubnetFilter, SecurityGroupFilter, NetworkLocation
 from c7n.filters.kms import KmsRelatedFilter
@@ -68,17 +67,14 @@ class SagemakerJob(QueryResourceManager):
 
     def __init__(self, ctx, data):
         super(SagemakerJob, self).__init__(ctx, data)
-        self.queries = QueryFilter.parse(
+        self.queries = SagemakerJobQueryParser.parse(
             self.data.get('query', [
                 {'StatusEquals': 'InProgress'}]))
 
     def resources(self, query=None):
+        query = query or {}
         for q in self.queries:
-            if q is None:
-                continue
-            query = query or {}
-            for k, v in q.items():
-                query[k] = v
+            query.update(q)
         return super(SagemakerJob, self).resources(query=query)
 
     def augment(self, jobs):
@@ -112,17 +108,14 @@ class SagemakerTransformJob(QueryResourceManager):
 
     def __init__(self, ctx, data):
         super(SagemakerTransformJob, self).__init__(ctx, data)
-        self.queries = QueryFilter.parse(
+        self.queries = SagemakerJobQueryParser.parse(
             self.data.get('query', [
                 {'StatusEquals': 'InProgress'}]))
 
     def resources(self, query=None):
+        query = query or {}
         for q in self.queries:
-            if q is None:
-                continue
-            query = query or {}
-            for k, v in q.items():
-                query[k] = v
+            query.update(q)
         return super(SagemakerTransformJob, self).resources(query=query)
 
     def augment(self, jobs):
@@ -161,17 +154,14 @@ class SagemakerHyperParameterTuningJob(QueryResourceManager):
 
     def __init__(self, ctx, data):
         super(SagemakerHyperParameterTuningJob, self).__init__(ctx, data)
-        self.queries = QueryFilter.parse(
+        self.queries = SagemakerJobQueryParser.parse(
             self.data.get('query', [
                 {'StatusEquals': 'InProgress'}]))
 
     def resources(self, query=None):
+        query = query or {}
         for q in self.queries:
-            if q is None:
-                continue
-            query = query or {}
-            for k, v in q.items():
-                query[k] = v
+            query.update(q)
         return super(SagemakerHyperParameterTuningJob, self).resources(query=query)
 
 
@@ -206,17 +196,14 @@ class SagemakerAutoMLJob(QueryResourceManager):
 
     def __init__(self, ctx, data):
         super(SagemakerAutoMLJob, self).__init__(ctx, data)
-        self.queries = QueryFilter.parse(
+        self.queries = SagemakerJobQueryParser.parse(
             self.data.get('query', [
                 {'StatusEquals': 'InProgress'}]))
 
     def resources(self, query=None):
+        query = query or {}
         for q in self.queries:
-            if q is None:
-                continue
-            query = query or {}
-            for k, v in q.items():
-                query[k] = v
+            query.update(q)
         return super(SagemakerAutoMLJob, self).resources(query=query)
 
 
@@ -244,17 +231,14 @@ class SagemakerCompilationJob(QueryResourceManager):
 
     def __init__(self, ctx, data):
         super(SagemakerCompilationJob, self).__init__(ctx, data)
-        self.queries = QueryFilter.parse(
+        self.queries = CompilationJobQueryParser.parse(
             self.data.get('query', [
                 {'StatusEquals': 'INPROGRESS'}]))
 
     def resources(self, query=None):
+        query = query or {}
         for q in self.queries:
-            if q is None:
-                continue
-            query = query or {}
-            for k, v in q.items():
-                query[k] = v
+            query.update(q)
         return super(SagemakerCompilationJob, self).resources(query=query)
 
 
@@ -282,17 +266,14 @@ class SagemakerProcessingJob(QueryResourceManager):
 
     def __init__(self, ctx, data):
         super(SagemakerProcessingJob, self).__init__(ctx, data)
-        self.queries = QueryFilter.parse(
+        self.queries = SagemakerJobQueryParser.parse(
             self.data.get('query', [
                 {'StatusEquals': 'InProgress'}]))
 
     def resources(self, query=None):
+        query = query or {}
         for q in self.queries:
-            if q is None:
-                continue
-            query = query or {}
-            for k, v in q.items():
-                query[k] = v
+            query.update(q)
         return super(SagemakerProcessingJob, self).resources(query=query)
 
 
@@ -314,71 +295,39 @@ class SagemakerModelBiasJobDefinition(QueryResourceManager):
         arn = id = 'JobDefinitionArn'
         name = 'JobDefinitionName'
         date = 'CreationTime'
+        cfn_type = config_type = 'AWS::SageMaker::ModelBiasJobDefinition'
         permissions_prefix = 'sagemaker'
         universal_taggable = object()
 
     source_mapping = {'describe': SagemakerModelBiasJobDefinitionDescribe}
 
 
-class QueryFilter:
+class SagemakerJobQueryParser(QueryParser):
 
-    JOB_FILTERS = ('StatusEquals', 'NameContains',)
+    QuerySchema = {
+        'NameContains': str,
+        'StatusEquals': ('InProgress', 'Completed', 'Failed', 'Stopping', 'Stopped'),
+        'CreationTimeAfter': 'date',
+        'CreationTimeBefore': 'date',
+        'LastModifiedTimeAfter': 'date',
+        'LastModifiedTimeBefore': 'date',
+        'MaxResults': int,
+    }
+    multi_value = False
+    type_name = 'Sagemaker Job'
 
-    @classmethod
-    def parse(cls, data):
-        results = []
-        names = set()
-        for d in data:
-            if not isinstance(d, dict):
-                raise PolicyValidationError(
-                    "Job Query Filter Invalid structure %s" % d)
-            for k, v in d.items():
-                if isinstance(v, list):
-                    raise ValueError(
-                        'Job query filter invalid structure %s' % v)
-            query = cls(d).validate().query()
-            if query['Name'] in names:
-                # Cannot filter multiple times on the same key
-                continue
-            names.add(query['Name'])
-            if isinstance(query['Value'], list):
-                results.append({query['Name']: query['Value'][0]})
-                continue
-            results.append({query['Name']: query['Value']})
-        if 'StatusEquals' not in names:
-            # add default StatusEquals if not included
-            results.append({'Name': 'StatusEquals', 'Value': 'InProgress'})
-        return results
 
-    def __init__(self, data):
-        self.data = data
-        self.key = None
-        self.value = None
+class CompilationJobQueryParser(SagemakerJobQueryParser):
 
-    def validate(self):
-        if not len(list(self.data.keys())) == 1:
-            raise PolicyValidationError(
-                "Job Query Filter Invalid %s" % self.data)
-        self.key = list(self.data.keys())[0]
-        self.value = list(self.data.values())[0]
-
-        if self.key not in self.JOB_FILTERS and not self.key.startswith('tag:'):
-            raise PolicyValidationError(
-                "Job Query Filter invalid filter name %s" % (
-                    self.data))
-
-        if self.value is None:
-            raise PolicyValidationError(
-                "Job Query Filters must have a value, use tag-key"
-                " w/ tag name as value for tag present checks"
-                " %s" % self.data)
-        return self
-
-    def query(self):
-        value = self.value
-        if isinstance(self.value, str):
-            value = [self.value]
-        return {'Name': self.key, 'Value': value}
+    QuerySchema = {
+        'NameContains': str,
+        'StatusEquals': ('INPROGRESS', 'COMPLETED', 'FAILED', 'STARTING', 'STOPPING', 'STOPPED'),
+        'CreationTimeAfter': 'date',
+        'CreationTimeBefore': 'date',
+        'LastModifiedTimeAfter': 'date',
+        'LastModifiedTimeBefore': 'date',
+        'MaxResults': int,
+    }
 
 
 class EndpointDescribe(DescribeSource):
@@ -536,7 +485,7 @@ class SagemakerDataQualityJobDefinition(QueryResourceManager):
         arn = id = 'JobDefinitionArn'
         name = 'JobDefinitionName'
         date = 'CreationTime'
-        cfn_type = 'AWS::SageMaker::DataQualityJobDefinition'
+        cfn_type = config_type = 'AWS::SageMaker::DataQualityJobDefinition'
         permission_prefix = 'sagemaker'
         filter_name = 'EndpointName'
         filter_type = 'scalar'
@@ -561,7 +510,7 @@ class SagemakerModelExplainabilityJobDefinition(QueryResourceManager):
         arn = id = 'JobDefinitionArn'
         name = 'JobDefinitionName'
         date = 'CreationTime'
-        cfn_type = 'AWS::SageMaker::ModelExplainabilityJobDefinition'
+        cfn_type = config_type = 'AWS::SageMaker::ModelExplainabilityJobDefinition'
         permission_prefix = 'sagemaker'
         filter_name = 'EndpointName'
         filter_type = 'scalar'
@@ -586,7 +535,7 @@ class SagemakerModelQualityJobDefinition(QueryResourceManager):
         arn = id = 'JobDefinitionArn'
         name = 'JobDefinitionName'
         date = 'CreationTime'
-        cfn_type = 'AWS::SageMaker::ModelQualityJobDefinition'
+        cfn_type = config_type = 'AWS::SageMaker::ModelQualityJobDefinition'
         permission_prefix = 'sagemaker'
         filter_name = 'EndpointName'
         filter_type = 'scalar'

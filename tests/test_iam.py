@@ -39,7 +39,8 @@ from c7n.resources.iam import (
     IamGroupInlinePolicy,
     SpecificIamRoleManagedPolicy,
     NoSpecificIamRoleManagedPolicy,
-    PolicyQueryParser
+    PolicyQueryParser,
+    UserServiceSpecificCredentials,
 )
 
 
@@ -793,6 +794,25 @@ class IamUserTest(BaseTest):
             [{'UserName': 'Kapil', 'Arn': 'arn:x'}])
         self.assertEqual(resources, [])
 
+    def test_iam_user_augment_access_denied(self):
+        p = self.load_policy({
+            'name': 'iam-user-augment-access-denied',
+            'resource': 'iam-user'})
+
+        p.resource_manager.session_factory = sf = mock.MagicMock()
+        sf.region = 'issue-10291'
+        sf.return_value = f = mock.MagicMock()
+        f.client.return_value = c = mock.MagicMock()
+        c.get_user.side_effect = ClientError(
+            {'Error': {'Code': 'AccessDenied',
+                       'Message': 'MonkeyWrench'}},
+            'get_user')
+        c.exceptions.NoSuchEntityException = ClientError
+
+        with self.assertRaises(ClientError) as ctx:
+            p.resource_manager.source.augment([{'UserName': 'Kapil'}])
+        self.assertEqual(ctx.exception.response['Error']['Code'], 'AccessDenied')
+
     def test_iam_user_usage(self):
         factory = self.replay_flight_data('test_iam_user_usage')
         p = self.load_policy({
@@ -1084,6 +1104,133 @@ class IamUserTest(BaseTest):
         resources = p.run()
         self.assertEqual(len(resources), 1)
         self.assertEqual(resources[0]["UserName"], "test-user-console-access")
+
+    def test_iam_user_service_specific_credentials_filter(self):
+        session_factory = self.replay_flight_data(
+            "test_iam_user_service_specific_credentials_filter"
+        )
+        self.patch(UserServiceSpecificCredentials, "executor_factory", MainThreadExecutor)
+        p = self.load_policy(
+            {
+                "name": "iam-user-with-service-specific-credentials",
+                "resource": "iam-user",
+                "filters": [
+                    {
+                        "type": "service-specific-credentials",
+                        "key": "Status",
+                        "value": "Active",
+                    },
+                ],
+            },
+            session_factory=session_factory,
+        )
+        resources = p.run()
+        self.assertEqual(len(resources), 1)
+        self.assertEqual(resources[0]["UserName"], "testuser-8aa8c470")
+        self.assertTrue("c7n:ServiceSpecificCredentials" in resources[0])
+        self.assertTrue("c7n:matched-service-specific-credentials" in resources[0])
+
+    def test_iam_user_service_specific_credentials_filter_by_service(self):
+        session_factory = self.replay_flight_data(
+            "test_iam_user_service_specific_credentials_service"
+        )
+        self.patch(UserServiceSpecificCredentials, "executor_factory", MainThreadExecutor)
+        p = self.load_policy(
+            {
+                "name": "iam-user-with-codecommit-credentials",
+                "resource": "iam-user",
+                "filters": [
+                    {
+                        "type": "service-specific-credentials",
+                        "key": "ServiceName",
+                        "value": "codecommit.amazonaws.com",
+                    },
+                ],
+            },
+            session_factory=session_factory,
+        )
+        resources = p.run()
+        self.assertEqual(len(resources), 1)
+        self.assertEqual(resources[0]["UserName"], "testuser-8aa8c470")
+        self.assertEqual(len(resources[0]["c7n:matched-service-specific-credentials"]), 3)
+        self.assertEqual(
+            resources[0]["c7n:matched-service-specific-credentials"][0]["ServiceName"],
+            "codecommit.amazonaws.com"
+        )
+        # Active, page 1.
+        self.assertEqual(
+            resources[0]["c7n:matched-service-specific-credentials"][0]["ServiceSpecificCredentialId"],
+            "ACCACKCEVSQ6C2EXAMPLE"
+        )
+        self.assertEqual(
+            resources[0]["c7n:matched-service-specific-credentials"][1]["ServiceName"],
+            "codecommit.amazonaws.com"
+        )
+        # Inactive, page 1.
+        self.assertEqual(
+            resources[0]["c7n:matched-service-specific-credentials"][1]["ServiceSpecificCredentialId"],
+            "ACCACKCEVSQ6A1EX4MPLE"
+        )
+        # Active, page 2.
+        self.assertEqual(
+            resources[0]["c7n:matched-service-specific-credentials"][2]["ServiceName"],
+            "codecommit.amazonaws.com"
+        )
+        self.assertEqual(
+            resources[0]["c7n:matched-service-specific-credentials"][2]["ServiceSpecificCredentialId"],
+            "ACCACKCEVSQ6F7EXAMPLE"
+        )
+
+    def test_iam_user_service_specific_credentials_filter_by_age(self):
+        session_factory = self.replay_flight_data(
+            "test_iam_user_service_specific_credentials_age"
+        )
+        self.patch(UserServiceSpecificCredentials, "executor_factory", MainThreadExecutor)
+        with freezegun.freeze_time("2021-01-15"):
+            p = self.load_policy(
+                {
+                    "name": "iam-user-with-old-service-credentials",
+                    "resource": "iam-user",
+                    "filters": [
+                        {
+                            "type": "service-specific-credentials",
+                            "key": "CreateDate",
+                            "value_type": "age",
+                            "value": 90,
+                            "op": "greater-than",
+                        },
+                    ],
+                },
+                session_factory=session_factory,
+            )
+            resources = p.run()
+            self.assertEqual(len(resources), 1)
+            self.assertEqual(resources[0]["UserName"], "testuser-8aa8c470")
+
+    def test_iam_user_delete_service_specific_credentials(self):
+        session_factory = self.replay_flight_data(
+            "test_iam_user_delete_service_specific_credentials"
+        )
+        p = self.load_policy(
+            {
+                "name": "iam-user-delete-service-credentials",
+                "resource": "iam-user",
+                "filters": [
+                    {
+                        "UserName": "testuser-8aa8c470",
+                    },
+                ],
+                "actions": [
+                    {
+                        "type": "delete",
+                        "options": ["service-specific-credentials"],
+                    }
+                ],
+            },
+            session_factory=session_factory,
+        )
+        resources = p.run()
+        self.assertEqual(len(resources), 1)
 
 
 @terraform('iam_user', teardown=terraform.TEARDOWN_IGNORE)
@@ -1441,12 +1588,12 @@ class IamPolicyFilterUsage(BaseTest):
 
 
 class IamPolicy(BaseTest):
-
     def test_iam_policy_delete(self):
         factory = self.replay_flight_data('test_iam_policy_delete')
         p = self.load_policy({
             'name': 'delete-policy',
             'resource': 'iam-policy',
+            # Deprecated query format.  Use [{'Scope': 'Local'}] instead.
             'query': [{'Name': 'Scope', 'Value': 'Local'}],
             'filters': [
                 {'AttachmentCount': 0},
@@ -1469,15 +1616,43 @@ class IamPolicy(BaseTest):
             PolicyArn=resources[0]['Arn'])
 
     def test_iam_query_parser(self):
-        qfilters = [
-            {'Name': 'Scope', 'Value': 'Local'},
-            {'Name': 'OnlyAttached', 'Value': True}]
+        queries = [
+            {'Scope': 'Local'},
+            {'OnlyAttached': True},
+            {'MaxItems': 100}
+        ]
 
-        self.assertEqual(qfilters, PolicyQueryParser.parse(qfilters))
-        self.assertRaises(
-            PolicyValidationError,
-            PolicyQueryParser.parse,
-            {'Name': 'Scope', 'Value': ['All', 'Local']})
+        self.assertEqual(queries, PolicyQueryParser.parse(queries))
+
+        queries = [{'Name': 'Scope', 'Value': 'Local'}, {'Name': 'OnlyAttached', 'Value': True}]
+        result_queries = [{'Scope': 'Local'}, {'OnlyAttached': True}]
+        self.assertEqual(result_queries, PolicyQueryParser.parse(queries))
+
+        self.assertRaises(PolicyValidationError, PolicyQueryParser.parse,
+                          {'Name': 'Scope', 'Value': ['All', 'Local']})
+
+        self.assertRaises(PolicyValidationError, PolicyQueryParser.parse,
+                          [{'Name': 'Scope', 'Value': 'Local'}, {'OnlyAttached': True}])
+
+        self.assertRaises(PolicyValidationError, PolicyQueryParser.parse,
+                          [{'Scope': ['All', 'Local']}])
+
+        self.assertRaises(PolicyValidationError, PolicyQueryParser.parse, [{'scope': 'Local'}])
+
+        self.assertRaises(PolicyValidationError, PolicyQueryParser.parse,
+                          [{'OnlyAttached': 'True'}])
+
+        self.assertRaises(PolicyValidationError, PolicyQueryParser.parse,
+                          [{'Filters': [{'Name': 'Scope'}, {'Values': ['Local']}]}])
+
+        self.assertRaises(PolicyValidationError, PolicyQueryParser.parse,
+                          [{'Filters': [{'Name': 'Scope'}, {'Values': ['Local']}]}])
+
+        self.assertRaises(PolicyValidationError, PolicyQueryParser.parse,
+                          [{'Scope': 'Local'}, {'Scope': 'All'}])
+
+        self.assertRaises(PolicyValidationError, PolicyQueryParser.parse,
+                          [{'MaxItems': '100'}])
 
     def test_iam_has_allow_all_policies(self):
         session_factory = self.replay_flight_data("test_iam_policy_allow_all")
@@ -2535,6 +2710,610 @@ class CrossAccountChecker(TestCase):
             violations = checker.check(p)
             self.assertEqual(bool(violations), expected)
 
+    def test_org_id_with_wildcard_principal_arn(self):
+        """Test that org ID condition allows wildcard principal ARNs."""
+        policy = {
+            "Version": "2012-10-17",
+            "Statement": [{
+                "Effect": "Allow",
+                "Principal": "*",
+                "Action": "s3:GetObject",
+                "Resource": "*",
+                "Condition": {
+                    "StringEquals": {"aws:PrincipalOrgID": "o-allowed"},
+                    "ArnLike": {"aws:PrincipalArn": "arn:aws:iam::*:role/MyRole"}
+                }
+            }]
+        }
+
+        # With allowed org ID, should pass (no violations)
+        checker = PolicyChecker({"allowed_orgid": {"o-allowed"}})
+        violations = checker.check(policy)
+        self.assertEqual(len(violations), 0)
+
+        # Without allowed org ID, should fail (has violations)
+        checker = PolicyChecker({"allowed_orgid": set()})
+        violations = checker.check(policy)
+        self.assertEqual(len(violations), 1)
+
+    def test_org_id_with_specific_non_whitelisted_account(self):
+        """Test that org ID doesn't save specific non-whitelisted account."""
+        policy = {
+            "Version": "2012-10-17",
+            "Statement": [{
+                "Effect": "Allow",
+                "Principal": "*",
+                "Action": "s3:GetObject",
+                "Resource": "*",
+                "Condition": {
+                    "StringEquals": {
+                        "aws:PrincipalOrgID": "o-allowed",
+                        "aws:PrincipalAccount": "999999999999"
+                    }
+                }
+            }]
+        }
+
+        # Even with allowed org ID, specific non-whitelisted account causes violation
+        checker = PolicyChecker({
+            "allowed_orgid": {"o-allowed"},
+            "allowed_accounts": {"123456789012"}
+        })
+        violations = checker.check(policy)
+        self.assertEqual(len(violations), 1)
+
+    def test_org_id_with_whitelisted_account(self):
+        """Test that org ID + whitelisted account passes."""
+        policy = {
+            "Version": "2012-10-17",
+            "Statement": [{
+                "Effect": "Allow",
+                "Principal": "*",
+                "Action": "s3:GetObject",
+                "Resource": "*",
+                "Condition": {
+                    "StringEquals": {
+                        "aws:PrincipalOrgID": "o-allowed",
+                        "aws:PrincipalAccount": "123456789012"
+                    }
+                }
+            }]
+        }
+
+        # Both org ID and account are whitelisted, should pass
+        checker = PolicyChecker({
+            "allowed_orgid": {"o-allowed"},
+            "allowed_accounts": {"123456789012"}
+        })
+        violations = checker.check(policy)
+        self.assertEqual(len(violations), 0)
+
+    def test_org_id_with_non_principal_condition_violation(self):
+        """Test that org ID doesn't save non-principal condition violations."""
+        policy = {
+            "Version": "2012-10-17",
+            "Statement": [{
+                "Effect": "Allow",
+                "Principal": "*",
+                "Action": "s3:GetObject",
+                "Resource": "*",
+                "Condition": {
+                    "StringEquals": {
+                        "aws:PrincipalOrgID": "o-allowed",
+                        "aws:SourceVpc": "vpc-badbadbad"
+                    }
+                }
+            }]
+        }
+
+        # Org ID is allowed but VPC is not, should fail
+        checker = PolicyChecker({
+            "allowed_orgid": {"o-allowed"},
+            "allowed_vpc": {"vpc-goodgood"}
+        })
+        violations = checker.check(policy)
+        self.assertEqual(len(violations), 1)
+
+    def test_resource_org_id_with_wildcard_principal(self):
+        """Test that aws:ResourceOrgID also acts as scoping condition."""
+        policy = {
+            "Version": "2012-10-17",
+            "Statement": [{
+                "Effect": "Allow",
+                "Principal": "*",
+                "Action": "s3:GetObject",
+                "Resource": "*",
+                "Condition": {
+                    "StringEquals": {"aws:ResourceOrgID": "o-allowed"},
+                    "ArnLike": {"aws:PrincipalArn": "arn:aws:iam::*:role/*"}
+                }
+            }]
+        }
+
+        # With allowed resource org ID, should pass
+        checker = PolicyChecker({"allowed_orgid": {"o-allowed"}})
+        violations = checker.check(policy)
+        self.assertEqual(len(violations), 0)
+
+    def test_no_org_id_with_wildcard_principal_arn(self):
+        """Test that without org ID, wildcard principal ARN fails."""
+        policy = {
+            "Version": "2012-10-17",
+            "Statement": [{
+                "Effect": "Allow",
+                "Principal": "*",
+                "Action": "s3:GetObject",
+                "Resource": "*",
+                "Condition": {
+                    "ArnLike": {"aws:PrincipalArn": "arn:aws:iam::*:role/MyRole"}
+                }
+            }]
+        }
+
+        # Without org ID, wildcard in ARN should fail
+        checker = PolicyChecker({"allowed_accounts": {"123456789012"}})
+        violations = checker.check(policy)
+        self.assertEqual(len(violations), 1)
+
+    def test_multiple_wildcard_conditions_with_org_id(self):
+        """Test multiple wildcard principal conditions with org ID."""
+        policy = {
+            "Version": "2012-10-17",
+            "Statement": [{
+                "Effect": "Allow",
+                "Principal": "*",
+                "Action": "s3:GetObject",
+                "Resource": "*",
+                "Condition": {
+                    "StringEquals": {"aws:PrincipalOrgID": "o-allowed"},
+                    "ArnLike": {
+                        "aws:PrincipalArn": "arn:aws:iam::*:role/*",
+                        "aws:SourceArn": "arn:aws:s3:::*"
+                    }
+                }
+            }]
+        }
+
+        # All wildcards should be allowed with org ID
+        checker = PolicyChecker({"allowed_orgid": {"o-allowed"}})
+        violations = checker.check(policy)
+        self.assertEqual(len(violations), 0)
+
+    def test_unknown_condition_handler_conservative(self):
+        """Test that unknown condition handlers are treated conservatively."""
+        policy = {
+            "Version": "2012-10-17",
+            "Statement": [{
+                "Effect": "Allow",
+                "Principal": "*",
+                "Action": "s3:GetObject",
+                "Resource": "*",
+                "Condition": {
+                    "StringEquals": {
+                        "aws:UnknownConditionKey": "some-value"
+                    }
+                }
+            }]
+        }
+
+        # Unknown condition should cause statement to be flagged as violation
+        checker = PolicyChecker({"allowed_accounts": {"123456789012"}})
+        violations = checker.check(policy)
+        self.assertEqual(len(violations), 1)
+
+    def test_unknown_condition_with_org_id(self):
+        """Test that unknown conditions prevent org ID special case."""
+        policy = {
+            "Version": "2012-10-17",
+            "Statement": [{
+                "Effect": "Allow",
+                "Principal": "*",
+                "Action": "s3:GetObject",
+                "Resource": "*",
+                "Condition": {
+                    "StringEquals": {
+                        "aws:PrincipalOrgID": "o-allowed",
+                        "aws:UnknownConditionKey": "some-value"
+                    },
+                    "ArnLike": {
+                        "aws:PrincipalArn": "arn:aws:iam::*:role/*"
+                    }
+                }
+            }]
+        }
+
+        # Even with org ID, unknown condition should cause conservative rejection
+        checker = PolicyChecker({"allowed_orgid": {"o-allowed"}})
+        violations = checker.check(policy)
+        self.assertEqual(len(violations), 1)
+
+    def test_whitelist_patterns_deleted_principals(self):
+        """Test that whitelist_patterns skips principals matching IAM unique ID patterns."""
+        # Simulates what AWS does when a principal is deleted: the ARN is replaced
+        # with the unique identifier (e.g. AROA*, AIDA*, etc.)
+        policy = {
+            "Version": "2012-10-17",
+            "Statement": [{
+                "Effect": "Allow",
+                "Principal": {
+                    "AWS": [
+                        "arn:aws:iam::111122223333:role/role-name",
+                        "AIDACKCEVSQ6C2EXAMPLE",
+                        "AROADBQP57FF2AEXAMPLE",
+                    ]
+                },
+                "Action": "s3:GetObject",
+                "Resource": "*",
+            }]
+        }
+
+        # Without whitelist_patterns, deleted principal unique IDs trigger a violation
+        checker = PolicyChecker({"allowed_accounts": {"111122223333"}})
+        violations = checker.check(policy)
+        self.assertEqual(len(violations), 1)
+
+        # With whitelist_patterns matching IAM unique IDs, no violation
+        checker = PolicyChecker({
+            "allowed_accounts": {"111122223333"},
+            "whitelist_patterns": ["AIDA*", "AROA*"],
+        })
+        violations = checker.check(policy)
+        self.assertEqual(len(violations), 0)
+
+    def test_whitelist_patterns_only_matching_skipped(self):
+        """Test that whitelist_patterns only skips principals that match the pattern."""
+        policy = {
+            "Version": "2012-10-17",
+            "Statement": [{
+                "Effect": "Allow",
+                "Principal": {
+                    "AWS": [
+                        "arn:aws:iam::999999999999:role/external-role",
+                        "AIDACKCEVSQ6C2EXAMPLE",
+                    ]
+                },
+                "Action": "s3:GetObject",
+                "Resource": "*",
+            }]
+        }
+
+        # Whitelisting the deleted-principal pattern still flags the cross-account role
+        checker = PolicyChecker({
+            "allowed_accounts": {"111122223333"},
+            "whitelist_patterns": ["AIDA*"],
+        })
+        violations = checker.check(policy)
+        self.assertEqual(len(violations), 1)
+
+    def test_check_with_string_policy(self):
+        """Test that check() accepts a JSON string as input."""
+        policy = {
+            "Version": "2012-10-17",
+            "Statement": [{
+                "Effect": "Allow",
+                "Principal": {"AWS": "arn:aws:iam::999999999999:root"},
+                "Action": "*",
+                "Resource": "*",
+            }]
+        }
+        checker = PolicyChecker({"allowed_accounts": {"123456789012"}})
+        violations = checker.check(json.dumps(policy))
+        self.assertEqual(len(violations), 1)
+
+    def test_handle_action_check_actions(self):
+        """Test handle_action() when check_actions is configured."""
+        checker = PolicyChecker({"check_actions": ["s3:GetObject", "s3:PutObject"]})
+
+        # Action matches check_actions → should be considered
+        s_match = {"Action": "s3:GetObject", "Effect": "Allow", "Principal": "*"}
+        self.assertTrue(checker.handle_action(s_match))
+
+        # Action list with one match → True
+        s_list_match = {"Action": ["s3:DeleteObject", "s3:PutObject"],
+                        "Effect": "Allow", "Principal": "*"}
+        self.assertTrue(checker.handle_action(s_list_match))
+
+        # Action does not match check_actions → skip
+        s_no_match = {"Action": "iam:ListUsers", "Effect": "Allow", "Principal": "*"}
+        self.assertFalse(checker.handle_action(s_no_match))
+
+    def test_handle_principal_empty(self):
+        """Test handle_principal() with an empty/None Principal value."""
+        checker = PolicyChecker({"allowed_accounts": {"123456789012"}})
+
+        # None principal is treated as a potential violation (conservative)
+        s = {"Effect": "Allow", "Action": "*", "Principal": None}
+        self.assertTrue(checker.handle_principal(s))
+
+    def test_handle_principal_cloudfront(self):
+        """Test that CloudFront Origin Access Identity principals are skipped."""
+        checker = PolicyChecker({"allowed_accounts": {"123456789012"}})
+        policy = {
+            "Version": "2012-10-17",
+            "Statement": [{
+                "Effect": "Allow",
+                "Principal": {
+                    "AWS": (
+                        "arn:aws:iam::cloudfront:user/"
+                        "CloudFront Origin Access Identity EXH52BD8319I2"
+                    )
+                },
+                "Action": "s3:GetObject",
+                "Resource": "*",
+            }]
+        }
+        # CloudFront principal should be ignored – no violation
+        violations = checker.check(policy)
+        self.assertEqual(len(violations), 0)
+
+    def test_handle_condition_no_op(self):
+        """Test handle_condition() returns False when the condition has no op."""
+        checker = PolicyChecker({"allowed_accounts": {"123456789012"}})
+        condition = {"op": None, "key": "aws:sourceaccount", "values": ["999999999999"]}
+        result = checker.handle_condition({}, condition)
+        self.assertFalse(result)
+
+    def test_handle_condition_whitelist_conditions_match(self):
+        """Test handle_condition() returns True when key is in whitelist_conditions."""
+        checker = PolicyChecker({
+            "allowed_accounts": {"123456789012"},
+            "whitelist_conditions": ["aws:userid"],
+        })
+        condition = {"op": "StringEquals", "key": "aws:userid", "values": ["AIDAUSER123"]}
+        result = checker.handle_condition({}, condition)
+        self.assertTrue(result)
+
+    def test_handle_aws_sourceowner(self):
+        """Test handle_aws_sourceowner() condition handler."""
+        policy = {
+            "Version": "2012-10-17",
+            "Statement": [{
+                "Effect": "Allow",
+                "Principal": "*",
+                "Action": "sns:Publish",
+                "Resource": "*",
+                "Condition": {
+                    "StringEquals": {"aws:SourceOwner": "999999999999"}
+                }
+            }]
+        }
+        # Source owner in allowed accounts → no violation
+        checker = PolicyChecker({"allowed_accounts": {"999999999999"}})
+        self.assertEqual(len(checker.check(policy)), 0)
+
+        # Source owner NOT in allowed accounts → violation
+        checker2 = PolicyChecker({"allowed_accounts": {"123456789012"}})
+        self.assertEqual(len(checker2.check(policy)), 1)
+
+    def test_handle_aws_sourceip(self):
+        """Test handle_aws_sourceip() always allows (returns False = no violation)."""
+        policy = {
+            "Version": "2012-10-17",
+            "Statement": [{
+                "Effect": "Allow",
+                "Principal": "*",
+                "Action": "s3:GetObject",
+                "Resource": "*",
+                "Condition": {
+                    "IpAddress": {"aws:SourceIp": "10.0.0.0/8"}
+                }
+            }]
+        }
+        checker = PolicyChecker({})
+        # IP condition whitelists the statement → no violation
+        self.assertEqual(len(checker.check(policy)), 0)
+
+    def test_handle_s3_dataaccesspointaccount(self):
+        """Test handle_s3_dataaccesspointaccount() condition handler."""
+        policy = {
+            "Version": "2012-10-17",
+            "Statement": [{
+                "Effect": "Allow",
+                "Principal": "*",
+                "Action": "s3:GetObject",
+                "Resource": "*",
+                "Condition": {
+                    "StringEquals": {"s3:DataAccessPointAccount": "123456789012"}
+                }
+            }]
+        }
+        # Matching account → no violation
+        checker = PolicyChecker({"allowed_accounts": {"123456789012"}})
+        self.assertEqual(len(checker.check(policy)), 0)
+
+        # Non-matching account → violation
+        checker2 = PolicyChecker({"allowed_accounts": {"111111111111"}})
+        self.assertEqual(len(checker2.check(policy)), 1)
+
+    def test_get_whitelist_patterns(self):
+        """Test CrossAccountAccessFilter.get_whitelist_patterns() without _from."""
+        f = CrossAccountAccessFilter.__new__(CrossAccountAccessFilter)
+        f.data = {'whitelist_patterns': ['AIDA*', 'AROA*']}
+        f.manager = None
+
+        patterns = f.get_whitelist_patterns()
+        self.assertEqual(patterns, ['AIDA*', 'AROA*'])
+
+    def test_get_whitelist_patterns_from(self):
+        """Test CrossAccountAccessFilter.get_whitelist_patterns() with whitelist_patterns_from."""
+        f = CrossAccountAccessFilter.__new__(CrossAccountAccessFilter)
+        f.data = {
+            'whitelist_patterns': ['AIDA*'],
+            'whitelist_patterns_from': {
+                'url': 's3://bucket/patterns.txt', 'format': 'txt'
+            }
+        }
+        mock_manager = mock.MagicMock()
+        f.manager = mock_manager
+
+        with mock.patch('c7n.filters.iamaccess.ValuesFrom') as mock_vf_cls:
+            mock_vf_instance = mock.MagicMock()
+            mock_vf_instance.get_values.return_value = ['AROA*', 'AGPA*']
+            mock_vf_cls.return_value = mock_vf_instance
+
+            patterns = f.get_whitelist_patterns()
+
+        self.assertEqual(patterns, ['AIDA*', 'AROA*', 'AGPA*'])
+        mock_vf_cls.assert_called_once_with(f.data['whitelist_patterns_from'], mock_manager)
+
+    def _make_filter(self, filter_data):
+        """Helper to build a CrossAccountAccessFilter with a mock manager."""
+        mock_manager = mock.MagicMock()
+        mock_manager.config.account_id = '123456789012'
+        return CrossAccountAccessFilter(filter_data, mock_manager)
+
+    def test_cross_account_filter_process_violation(self):
+        """CrossAccountAccessFilter.process() flags cross-account violation."""
+        f = self._make_filter({'type': 'cross-account'})
+
+        cross_acct_policy = json.dumps({
+            "Version": "2012-10-17",
+            "Statement": [{
+                "Effect": "Allow",
+                "Principal": {"AWS": "arn:aws:iam::999999999999:root"},
+                "Action": "*",
+                "Resource": "*",
+            }]
+        })
+        allowed_policy = json.dumps({
+            "Version": "2012-10-17",
+            "Statement": [{
+                "Effect": "Allow",
+                "Principal": {"AWS": "arn:aws:iam::123456789012:root"},
+                "Action": "*",
+                "Resource": "*",
+            }]
+        })
+        # Resource with no Policy attribute → should be excluded
+        resources = [
+            {'Policy': cross_acct_policy},
+            {'Policy': allowed_policy},
+            {},  # no policy → __call__ returns False
+        ]
+        results = f.process(resources)
+        self.assertEqual(len(results), 1)
+        self.assertIn('CrossAccountViolations', results[0])
+
+    def test_cross_account_filter_return_allowed(self):
+        """CrossAccountAccessFilter.__call__() with return_allowed=True."""
+        f = self._make_filter({'type': 'cross-account', 'return_allowed': True})
+
+        allowed_policy = json.dumps({
+            "Version": "2012-10-17",
+            "Statement": [{
+                "Effect": "Allow",
+                "Principal": {"AWS": "arn:aws:iam::123456789012:root"},
+                "Action": "*",
+                "Resource": "*",
+            }]
+        })
+        results = f.process([{'Policy': allowed_policy}])
+        self.assertEqual(len(results), 1)
+        self.assertIn('CrossAccountAllowlists', results[0])
+
+    def test_cross_account_filter_whitelist_account(self):
+        """CrossAccountAccessFilter.get_accounts() respects whitelist."""
+        f = self._make_filter({
+            'type': 'cross-account',
+            'whitelist': ['999999999999'],
+        })
+        cross_acct_policy = json.dumps({
+            "Version": "2012-10-17",
+            "Statement": [{
+                "Effect": "Allow",
+                "Principal": {"AWS": "arn:aws:iam::999999999999:root"},
+                "Action": "*",
+                "Resource": "*",
+            }]
+        })
+        # whitelisted account → no violation
+        self.assertEqual(len(f.process([{'Policy': cross_acct_policy}])), 0)
+
+    def test_cross_account_filter_whitelist_from(self):
+        """CrossAccountAccessFilter.get_accounts() with whitelist_from branch."""
+        f = self._make_filter({
+            'type': 'cross-account',
+            'whitelist_from': {'url': 's3://b/accounts.txt', 'format': 'txt'},
+        })
+        cross_acct_policy = json.dumps({
+            "Version": "2012-10-17",
+            "Statement": [{
+                "Effect": "Allow",
+                "Principal": {"AWS": "arn:aws:iam::999999999999:root"},
+                "Action": "*",
+                "Resource": "*",
+            }]
+        })
+        with mock.patch('c7n.filters.iamaccess.ValuesFrom') as mock_vf_cls:
+            mock_vf_cls.return_value.get_values.return_value = ['999999999999']
+            results = f.process([{'Policy': cross_acct_policy}])
+        self.assertEqual(len(results), 0)
+
+    def test_cross_account_filter_whitelist_vpc_from(self):
+        """CrossAccountAccessFilter.get_vpcs() with whitelist_vpc_from branch."""
+        f = self._make_filter({
+            'type': 'cross-account',
+            'whitelist_vpc_from': {'url': 's3://b/vpcs.txt', 'format': 'txt'},
+        })
+        vpc_policy = json.dumps({
+            "Version": "2012-10-17",
+            "Statement": [{
+                "Effect": "Allow",
+                "Principal": "*",
+                "Action": "*",
+                "Resource": "*",
+                "Condition": {"StringEquals": {"aws:SourceVpc": "vpc-aabbccdd"}}
+            }]
+        })
+        with mock.patch('c7n.filters.iamaccess.ValuesFrom') as mock_vf_cls:
+            mock_vf_cls.return_value.get_values.return_value = ['vpc-aabbccdd']
+            results = f.process([{'Policy': vpc_policy}])
+        self.assertEqual(len(results), 0)
+
+    def test_cross_account_filter_whitelist_vpce_from(self):
+        """CrossAccountAccessFilter.get_vpces() with whitelist_vpce_from branch."""
+        f = self._make_filter({
+            'type': 'cross-account',
+            'whitelist_vpce_from': {'url': 's3://b/vpces.txt', 'format': 'txt'},
+        })
+        vpce_policy = json.dumps({
+            "Version": "2012-10-17",
+            "Statement": [{
+                "Effect": "Allow",
+                "Principal": "*",
+                "Action": "*",
+                "Resource": "*",
+                "Condition": {"StringEquals": {"aws:SourceVpce": "vpce-11223344"}}
+            }]
+        })
+        with mock.patch('c7n.filters.iamaccess.ValuesFrom') as mock_vf_cls:
+            mock_vf_cls.return_value.get_values.return_value = ['vpce-11223344']
+            results = f.process([{'Policy': vpce_policy}])
+        self.assertEqual(len(results), 0)
+
+    def test_cross_account_filter_whitelist_orgids_from(self):
+        """CrossAccountAccessFilter.get_orgids() with whitelist_orgids_from branch."""
+        f = self._make_filter({
+            'type': 'cross-account',
+            'whitelist_orgids_from': {'url': 's3://b/orgids.txt', 'format': 'txt'},
+        })
+        orgid_policy = json.dumps({
+            "Version": "2012-10-17",
+            "Statement": [{
+                "Effect": "Allow",
+                "Principal": "*",
+                "Action": "*",
+                "Resource": "*",
+                "Condition": {
+                    "StringEquals": {"aws:PrincipalOrgID": "o-example123"}
+                }
+            }]
+        })
+        with mock.patch('c7n.filters.iamaccess.ValuesFrom') as mock_vf_cls:
+            mock_vf_cls.return_value.get_values.return_value = ['o-example123']
+            results = f.process([{'Policy': orgid_policy}])
+        self.assertEqual(len(results), 0)
+
 
 class SetRolePolicyAction(BaseTest):
     def test_set_policy_attached(self):
@@ -2776,3 +3555,91 @@ class TestIamProfileHasSpecificManagedPolicyFilter(BaseTest):
         )
         resources = p.run()
         self.assertEqual(len(resources), 3)
+
+
+class AccessKeyTest(BaseTest):
+
+    def test_access_key_list(self):
+        """Test basic enumeration of access keys."""
+        factory = self.replay_flight_data("test_iam_access_key_list")
+        p = self.load_policy(
+            {
+                "name": "iam-access-key-list",
+                "resource": "iam-access-key"
+            },
+            session_factory=factory,
+        )
+        resources = p.run()
+        self.assertTrue(len(resources) >= 0)
+        for resource in resources:
+            # Verify required fields are present
+            self.assertIn('AccessKeyId', resource)
+            self.assertIn('UserName', resource)
+            self.assertIn('Status', resource)
+            self.assertIn('CreateDate', resource)
+
+    def test_access_key_filter_by_status(self):
+        """Test filtering access keys by status."""
+        factory = self.replay_flight_data("test_iam_access_key_filter_status")
+        p = self.load_policy(
+            {
+                "name": "iam-access-key-active",
+                "resource": "iam-access-key",
+                "filters": [
+                    {
+                        "type": "value",
+                        "key": "Status",
+                        "value": "Active"
+                    }
+                ]
+            },
+            session_factory=factory,
+        )
+        resources = p.run()
+        for resource in resources:
+            self.assertEqual(resource['Status'], 'Active')
+
+    def test_access_key_filter_by_user(self):
+        """Test filtering access keys by username."""
+        factory = self.replay_flight_data("test_iam_access_key_filter_user")
+        p = self.load_policy(
+            {
+                "name": "iam-access-key-by-user",
+                "resource": "iam-access-key",
+                "filters": [
+                    {
+                        "type": "value",
+                        "key": "UserName",
+                        "value": "test-user"
+                    }
+                ]
+            },
+            session_factory=factory,
+        )
+        resources = p.run()
+        for resource in resources:
+            self.assertEqual(resource['UserName'], 'test-user')
+
+    def test_access_key_filter_by_age(self):
+        """Test filtering access keys by age."""
+        factory = self.replay_flight_data("test_iam_access_key_filter_age")
+        p = self.load_policy(
+            {
+                "name": "iam-access-key-old",
+                "resource": "iam-access-key",
+                "filters": [
+                    {
+                        "type": "value",
+                        "key": "CreateDate",
+                        "value_type": "age",
+                        "value": 90,
+                        "op": "greater-than"
+                    }
+                ]
+            },
+            session_factory=factory,
+        )
+        resources = p.run()
+        # Just check that we can run this without error
+        # The actual age filter logic is handled by C7N core
+        self.assertTrue(len(resources) >= 0)

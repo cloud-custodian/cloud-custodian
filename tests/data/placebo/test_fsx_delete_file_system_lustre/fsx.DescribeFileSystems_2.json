@@ -1,0 +1,57 @@
+{
+    "status_code": 200,
+    "data": {
+        "FileSystems": [
+            {
+                "OwnerId": "644160558196",
+                "CreationTime": {
+                    "__class__": "datetime",
+                    "year": 2025,
+                    "month": 10,
+                    "day": 27,
+                    "hour": 13,
+                    "minute": 51,
+                    "second": 39,
+                    "microsecond": 441000
+                },
+                "FileSystemId": "fs-0c594a7c4072e287b",
+                "FileSystemType": "LUSTRE",
+                "Lifecycle": "DELETING",
+                "StorageCapacity": 1200,
+                "StorageType": "SSD",
+                "VpcId": "vpc-4a9ff72e",
+                "SubnetIds": [
+                    "subnet-5fb47507"
+                ],
+                "NetworkInterfaceIds": [
+                    "eni-00f192c294a13e3b1",
+                    "eni-077bcef78e0131ecf"
+                ],
+                "DNSName": "fs-0c594a7c4072e287b.fsx.us-west-2.amazonaws.com",
+                "ResourceARN": "arn:aws:fsx:us-west-2:644160558196:file-system/fs-0c594a7c4072e287b",
+                "Tags": [
+                    {
+                        "Key": "Environment",
+                        "Value": "dev"
+                    },
+                    {
+                        "Key": "Name",
+                        "Value": "example-fsx-lustre"
+                    }
+                ],
+                "LustreConfiguration": {
+                    "WeeklyMaintenanceStartTime": "3:06:00",
+                    "DeploymentType": "SCRATCH_1",
+                    "MountName": "fsx",
+                    "CopyTagsToBackups": false,
+                    "DataCompressionType": "NONE",
+                    "LogConfiguration": {
+                        "Level": "DISABLED"
+                    }
+                },
+                "FileSystemTypeVersion": "2.10"
+            }
+        ],
+        "ResponseMetadata": {}
+    }
+}

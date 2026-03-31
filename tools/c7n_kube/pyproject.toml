@@ -10,7 +10,7 @@ dependencies = [
     "kubernetes>=10.0.1",
 ]
 name = "c7n_kube"
-version = "0.2.46"
+version = "0.2.49"
 description = "Cloud Custodian - Kubernetes Provider"
 readme = "readme.md"
 classifiers = [
@@ -29,7 +29,7 @@ c7n-kube = "c7n_kube.cli:cli"
 
 [dependency-groups]
 dev = [
-    "pytest<8.0",
+    "pytest",
     "vcrpy>=4.0.2",
 ]
 

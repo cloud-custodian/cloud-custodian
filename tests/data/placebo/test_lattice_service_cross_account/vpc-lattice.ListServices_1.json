@@ -1,0 +1,158 @@
+{
+    "status_code": 200,
+    "data": {
+        "ResponseMetadata": {},
+        "items": [
+            {
+                "id": "svc-03df66cf575b63796",
+                "name": "compliant-service",
+                "arn": "arn:aws:vpc-lattice:us-east-1:644160558196:service/svc-03df66cf575b63796",
+                "createdAt": {
+                    "__class__": "datetime",
+                    "year": 2025,
+                    "month": 9,
+                    "day": 16,
+                    "hour": 20,
+                    "minute": 56,
+                    "second": 19,
+                    "microsecond": 716000
+                },
+                "lastUpdatedAt": {
+                    "__class__": "datetime",
+                    "year": 2025,
+                    "month": 9,
+                    "day": 16,
+                    "hour": 20,
+                    "minute": 56,
+                    "second": 19,
+                    "microsecond": 716000
+                },
+                "dnsEntry": {
+                    "domainName": "compliant-service-03df66cf575b63796.7d67968.vpc-lattice-svcs.us-east-1.on.aws",
+                    "hostedZoneId": "Z0681547Z82L3THDFSCZ"
+                },
+                "status": "ACTIVE"
+            },
+            {
+                "id": "svc-03e0899cd551e863e",
+                "name": "service-no-auth",
+                "arn": "arn:aws:vpc-lattice:us-east-1:644160558196:service/svc-03e0899cd551e863e",
+                "createdAt": {
+                    "__class__": "datetime",
+                    "year": 2025,
+                    "month": 9,
+                    "day": 16,
+                    "hour": 20,
+                    "minute": 55,
+                    "second": 53,
+                    "microsecond": 603000
+                },
+                "lastUpdatedAt": {
+                    "__class__": "datetime",
+                    "year": 2025,
+                    "month": 9,
+                    "day": 16,
+                    "hour": 20,
+                    "minute": 55,
+                    "second": 53,
+                    "microsecond": 603000
+                },
+                "dnsEntry": {
+                    "domainName": "service-no-auth-03e0899cd551e863e.7d67968.vpc-lattice-svcs.us-east-1.on.aws",
+                    "hostedZoneId": "Z0681547Z82L3THDFSCZ"
+                },
+                "status": "ACTIVE"
+            },
+            {
+                "id": "svc-06ce5ea9404c8f15b",
+                "name": "service-with-logs",
+                "arn": "arn:aws:vpc-lattice:us-east-1:644160558196:service/svc-06ce5ea9404c8f15b",
+                "createdAt": {
+                    "__class__": "datetime",
+                    "year": 2025,
+                    "month": 9,
+                    "day": 16,
+                    "hour": 20,
+                    "minute": 53,
+                    "second": 12,
+                    "microsecond": 291000
+                },
+                "lastUpdatedAt": {
+                    "__class__": "datetime",
+                    "year": 2025,
+                    "month": 9,
+                    "day": 16,
+                    "hour": 20,
+                    "minute": 53,
+                    "second": 12,
+                    "microsecond": 291000
+                },
+                "dnsEntry": {
+                    "domainName": "service-with-logs-06ce5ea9404c8f15b.7d67968.vpc-lattice-svcs.us-east-1.on.aws",
+                    "hostedZoneId": "Z0681547Z82L3THDFSCZ"
+                },
+                "status": "ACTIVE"
+            },
+            {
+                "id": "svc-0ad9b5f9c31b8419f",
+                "name": "service-no-logs",
+                "arn": "arn:aws:vpc-lattice:us-east-1:644160558196:service/svc-0ad9b5f9c31b8419f",
+                "createdAt": {
+                    "__class__": "datetime",
+                    "year": 2025,
+                    "month": 9,
+                    "day": 16,
+                    "hour": 20,
+                    "minute": 55,
+                    "second": 39,
+                    "microsecond": 644000
+                },
+                "lastUpdatedAt": {
+                    "__class__": "datetime",
+                    "year": 2025,
+                    "month": 9,
+                    "day": 16,
+                    "hour": 20,
+                    "minute": 55,
+                    "second": 39,
+                    "microsecond": 644000
+                },
+                "dnsEntry": {
+                    "domainName": "service-no-logs-0ad9b5f9c31b8419f.7d67968.vpc-lattice-svcs.us-east-1.on.aws",
+                    "hostedZoneId": "Z0681547Z82L3THDFSCZ"
+                },
+                "status": "ACTIVE"
+            },
+            {
+                "id": "svc-0f2d07e52ca06d8a8",
+                "name": "service-with-external-access",
+                "arn": "arn:aws:vpc-lattice:us-east-1:644160558196:service/svc-0f2d07e52ca06d8a8",
+                "createdAt": {
+                    "__class__": "datetime",
+                    "year": 2025,
+                    "month": 9,
+                    "day": 16,
+                    "hour": 20,
+                    "minute": 54,
+                    "second": 54,
+                    "microsecond": 76000
+                },
+                "lastUpdatedAt": {
+                    "__class__": "datetime",
+                    "year": 2025,
+                    "month": 9,
+                    "day": 16,
+                    "hour": 20,
+                    "minute": 54,
+                    "second": 54,
+                    "microsecond": 76000
+                },
+                "dnsEntry": {
+                    "domainName": "service-with-external-access-0f2d07e52ca06d8a8.7d67968.vpc-lattice-svcs.us-east-1.on.aws",
+                    "hostedZoneId": "Z0681547Z82L3THDFSCZ"
+                },
+                "status": "ACTIVE"
+            }
+        ]
+    }
+}

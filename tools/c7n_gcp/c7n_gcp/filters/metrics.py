@@ -6,7 +6,8 @@ Monitoring Metrics suppport for resources
 from datetime import datetime, timedelta
 
 from c7n.filters.core import Filter, OPERATORS, FilterValidationError
-from c7n.utils import local_session, type_schema, jmespath_search
+from c7n.filters.metrics import METRIC_WINDOW_ALIGNMENT
+from c7n.utils import local_session, type_schema, jmespath_search, snap_to_period_start
 
 from c7n_gcp.provider import resources as gcp_resources
 
@@ -69,12 +70,30 @@ class GCPMetricsFilter(Filter):
       - name: firewall-hit-count
         resource: gcp.firewall
         filters:
-        - type: metrics
-          name: firewallinsights.googleapis.com/subnet/firewall_hit_count
-          aligner: ALIGN_COUNT
-          days: 14
-          value: 1
-          op: greater-than
+          - type: metrics
+            name: firewallinsights.googleapis.com/subnet/firewall_hit_count
+            aligner: ALIGN_COUNT
+            days: 14
+            value: 1
+            op: greater-than
+
+    The ``period-start`` key allows you to align the metric window in two ways.
+    By default, using ``auto``, the window is computed relative to the current time.
+    Alternatively, setting it to ``start-of-day`` aligns the window to full UTC calendar days,
+    beginning at 00:00:00 UTC and ending at current day 00:00:00 UTC.
+
+    .. code-block:: yaml
+
+      - name: instance-low-cpu-last-full-day
+        resource: gcp.instance
+        filters:
+          - type: metrics
+            name: compute.googleapis.com/instance/cpu/utilization
+            aligner: ALIGN_MEAN
+            days: 1
+            value: 0.05
+            op: less-than
+            period-start: start-of-day
     """
 
     schema = type_schema(
@@ -83,6 +102,7 @@ class GCPMetricsFilter(Filter):
           'metric-key': {'type': 'string'},
           'group-by-fields': {'type': 'array', 'items': {'type': 'string'}},
           'days': {'type': 'number'},
+          'period-start': {'type': 'string', 'enum': METRIC_WINDOW_ALIGNMENT},
           'op': {'type': 'string', 'enum': list(OPERATORS.keys())},
           'reducer': {'type': 'string', 'enum': REDUCERS},
           'aligner': {'type': 'string', 'enum': ALIGNERS},
@@ -109,8 +129,12 @@ class GCPMetricsFilter(Filter):
         self.reducer = self.data.get('reducer', 'REDUCE_NONE')
         self.group_by_fields = self.data.get('group-by-fields', [])
         self.missing_value = self.data.get('missing-value')
+
         self.end = datetime.utcnow().replace(microsecond=0)
         self.start = self.end - duration
+        self.period_start = self.data.get('period-start', 'auto')
+        self.start, self.end = snap_to_period_start(self.start, self.end, self.period_start)
+
         self.period = str((self.end - self.start).total_seconds()) + 's'
         self.resource_metric_dict = {}
         self.op = OPERATORS[self.data.get('op', 'less-than')]
@@ -156,7 +180,8 @@ class GCPMetricsFilter(Filter):
         resource_filter = []
         batch_size = len(self.filter)
         for r in resources:
-            resource_name = self.manager.resource_type.get_metric_resource_name(r)
+            resource_name = self.manager.resource_type.get_metric_resource_name(
+                r, metric_key=self.metric_key)
             resource_filter_item = '{} = "{}"'.format(self.metric_key, resource_name)
             resource_filter.append(resource_filter_item)
             resource_filter.append(' OR ')
@@ -194,7 +219,8 @@ class GCPMetricsFilter(Filter):
 
     def process_resource(self, resource):
         resource_metric = resource.setdefault('c7n.metrics', {})
-        resource_name = self.manager.resource_type.get_metric_resource_name(resource)
+        resource_name = self.manager.resource_type.get_metric_resource_name(
+            resource, metric_key=self.metric_key)
         metric = self.resource_metric_dict.get(resource_name)
         if not metric and not self.missing_value:
             return False
@@ -211,7 +237,8 @@ class GCPMetricsFilter(Filter):
     @classmethod
     def register_resources(klass, registry, resource_class):
         if resource_class.filter_registry:
-            resource_class.filter_registry.register('metrics', klass)
+            if resource_class.resource_type.allow_metrics_filters:
+                resource_class.filter_registry.register('metrics', klass)
 
 
 gcp_resources.subscribe(GCPMetricsFilter.register_resources)

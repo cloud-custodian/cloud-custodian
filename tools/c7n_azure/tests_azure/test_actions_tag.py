@@ -3,7 +3,7 @@
 from . import tools_tags as tools
 from .azure_common import BaseTest
 from c7n_azure.actions.tagging import Tag
-from mock import patch, Mock
+from unittest.mock import patch, Mock
 
 from c7n.filters import FilterValidationError
 

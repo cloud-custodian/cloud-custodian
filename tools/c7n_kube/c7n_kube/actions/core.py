@@ -2,6 +2,7 @@
 # SPDX-License-Identifier: Apache-2.0
 
 import logging
+import copy
 
 from c7n.actions import Action as BaseAction
 from c7n.utils import local_session, chunks, type_schema
@@ -66,38 +67,152 @@ class PatchAction(MethodAction):
         return "".join([a.capitalize() for a in patch.split("_")])
 
     def patch_resources(self, client, resources, **patch_args):
+        from kubernetes.client.exceptions import ApiException
+
         op = getattr(client, self.manager.get_model().patch)
         namespaced = self.manager.get_model().namespaced
         for r in resources:
             patch_args["name"] = r["metadata"]["name"]
             if namespaced:
                 patch_args["namespace"] = r["metadata"]["namespace"]
-            op(**patch_args)
+            try:
+                op(**patch_args)
+            except ApiException as e:
+                if e.status == 404:
+                    log.warning(
+                        f"Resource {r['metadata']['name']} not found - "
+                        "it was likely deleted during execution"
+                    )
+                else:
+                    raise
+
+    def patch_resources_replicas(self, client, resources, patch):
+        from kubernetes.client.exceptions import ApiException
+
+        op = getattr(client, self.manager.get_model().patch)
+        namespaced = self.manager.get_model().namespaced
+        for r in resources:
+            patch_args = patch[r['metadata']['name']]
+            patch_args['name'] = r['metadata']['name']
+            if namespaced:
+                patch_args['namespace'] = r['metadata']['namespace']
+            try:
+                op(**patch_args)
+            except ApiException as e:
+                if e.status == 404:
+                    log.warning(
+                        f"Resource {r['metadata']['name']} not found - "
+                        "it was likely deleted during execution"
+                    )
+                else:
+                    raise
 
 
 class PatchResource(PatchAction):
     """
-    Patches a resource
+    Patches a Kubernetes resource with enhanced capabilities
+
+    Supports save/restore functionality for off-hours resource management
+    and improved error handling for production environments.
 
     .. code-block:: yaml
 
       policies:
-        - name: scale-resource
-          resource: k8s.deployment # k8s.{resource}
+        # Basic patching - scale deployment to 0 replicas
+        - name: scale-down-deployment
+          resource: k8s.deployment
           filters:
-            - 'metadata.name': 'test-{resource}'
+            - 'metadata.name': 'my-app'
           actions:
             - type: patch
               options:
                 spec:
                   replicas: 0
+
+        # Save current replica count before scaling down (off-hours scaling)
+        - name: offhours-scale-down
+          resource: k8s.deployment
+          filters:
+            - 'metadata.name': 'my-app'
+            - type: value
+              key: 'spec.replicas'
+              op: gt
+              value: 0
+          actions:
+            - type: patch
+              save-options-tag: "custodian-original-replicas"
+              options:
+                spec:
+                  replicas: 0
+
+        # Restore original replica count (business hours scaling)
+        - name: business-hours-scale-up
+          resource: k8s.deployment
+          filters:
+            - 'metadata.name': 'my-app'
+            - 'metadata.labels.custodian-original-replicas': present
+          actions:
+            - type: patch
+              restore-options-tag: "custodian-original-replicas"
+
+        # Complex patching with multiple changes
+        - name: update-deployment-config
+          resource: k8s.deployment
+          filters:
+            - 'metadata.name': 'my-app'
+          actions:
+            - type: patch
+              options:
+                spec:
+                  replicas: 3
+                  template:
+                    metadata:
+                      labels:
+                        version: "v2.1"
+                    spec:
+                      containers:
+                        - name: app
+                          resources:
+                            requests:
+                              memory: "256Mi"
+                              cpu: "100m"
     """
 
-    schema = type_schema("patch", **{"options": {"type": "object"}})
+    schema = type_schema(
+        'patch',
+        **{
+            'options': {'type': 'object'},
+            'save-options-tag': {'type': 'string'},
+            'restore-options-tag': {'type': 'string'},
+        },
+    )
 
     def process_resource_set(self, client, resources):
-        patch_args = {"body": self.data.get("options", {})}
-        self.patch_resources(client, resources, **patch_args)
+
+        patch = {}
+
+        for r in resources:
+            patch_args = copy.deepcopy({'body': self.data.get('options', {})})
+
+            if 'save-options-tag' in self.data:
+                save_tag = self.data.get('save-options-tag', {})
+                replicas = r['spec']['replicas']
+                if not r['metadata']['labels']:
+                    r['metadata']['labels'] = {}
+                r['metadata']['labels'][save_tag] = f'replicas-{replicas}'
+                patch_args['body']['metadata'] = {}
+                patch_args['body']['metadata']['labels'] = r['metadata']['labels']
+                patch[r['metadata']['name']] = patch_args
+            elif 'restore-options-tag' in self.data:
+                restore_tag = self.data.get('restore-options-tag', {})
+
+                if restore_tag in r['metadata']['labels']:
+                    replicas = r['metadata']['labels'][restore_tag].split('-')[1]
+                    patch_args['body']['spec'] = {'replicas': int(replicas)}
+
+            patch[r['metadata']['name']] = patch_args
+
+        self.patch_resources_replicas(client, resources, patch)
 
     @classmethod
     def register_resources(klass, registry, resource_class):

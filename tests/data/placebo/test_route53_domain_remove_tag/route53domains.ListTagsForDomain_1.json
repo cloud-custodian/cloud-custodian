@@ -1,22 +1,12 @@
 {
-    "status_code": 200, 
+    "status_code": 200,
     "data": {
-        "ResponseMetadata": {
-            "RetryAttempts": 0, 
-            "HTTPStatusCode": 200, 
-            "RequestId": "cec422a4-1bde-11e8-abc0-69c02ad78dc6", 
-            "HTTPHeaders": {
-                "x-amzn-requestid": "cec422a4-1bde-11e8-abc0-69c02ad78dc6", 
-                "date": "Tue, 27 Feb 2018 16:53:59 GMT", 
-                "content-length": "51", 
-                "content-type": "application/x-amz-json-1.1"
-            }
-        }, 
         "TagList": [
             {
-                "Value": "TestValue", 
-                "Key": "TestTag"
+                "Key": "TestTag",
+                "Value": "TestValue"
             }
-        ]
+        ],
+        "ResponseMetadata": {}
     }
 }

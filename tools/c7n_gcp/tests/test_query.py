@@ -41,7 +41,8 @@ def test_gcp_resource_metadata_asset_type():
         'sql-ssl-cert',
         'sql-user',
         'pubsub-snapshot',
-        'region'
+        'region',
+        'vertex-ai-location'
     ))
     missing = set()
     for k, v in GoogleCloud.resources.items():
@@ -122,3 +123,31 @@ class GcpLocationTest(BaseTest):
         actual_locations_set = set(GcpLocation.get_service_locations(service_name))
         self.assertTrue(locations_set.issubset(actual_locations_set))
         self.assertTrue(actual_locations_set.issubset(locations_set))
+
+
+class GcpMetricsFilterTest(BaseTest):
+    def setUp(self):
+        # Ensure everything has been populated/loaded.
+        load_resources(('gcp.*',))
+        return super().setUp()
+
+    def get_resource_by_name(self, name):
+        for k, v in GoogleCloud.resources.items():
+            if k == name:
+                return v
+
+        raise ValueError(f"No resource found for name: {name}")
+
+    def test_metrics_autoregistered(self):
+        SpannerInstance = self.get_resource_by_name("spanner-instance")
+        # Sanity check to ensure it is auto-registering metrics filters.
+        self.assertTrue(SpannerInstance.resource_type.allow_metrics_filters)
+        # Ensure the metrics got registered correctly.
+        self.assertTrue("metrics" in SpannerInstance.filter_registry)
+
+    def test_metrics_not_registered(self):
+        SpannerDatabaseInstance = self.get_resource_by_name("spanner-database-instance")
+        # Sanity check to ensure it is NOT auto-registering metrics filters.
+        self.assertFalse(SpannerDatabaseInstance.resource_type.allow_metrics_filters)
+        # Ensure the metrics were NOT registered.
+        self.assertFalse("metrics" in SpannerDatabaseInstance.filter_registry)

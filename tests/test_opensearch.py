@@ -1,6 +1,32 @@
 # Copyright The Cloud Custodian Authors.
 # SPDX-License-Identifier: Apache-2.0
 from .common import BaseTest
+from pytest_terraform import terraform
+
+
+@terraform('opensearch_ingestion_cross_account')
+def test_opensearch_ingestion_cross_account(test, opensearch_ingestion_cross_account):
+    session_factory = test.replay_flight_data('test_opensearch_ingestion_cross_account')
+    p = test.load_policy(
+        {
+            'name': 'test-opensearch-ingestion-cross-account',
+            'resource': 'opensearch-ingestion',
+            'filters': [
+                {
+                    'type': 'cross-account'
+                }
+            ],
+            'actions': [{'type': 'delete'}]
+        },
+        session_factory=session_factory
+    )
+    resources = p.run()
+    assert len(resources) == 1
+    assert resources[0]['PipelineArn'] == 'arn:aws:osis:us-east-1:644160558196:pipeline/c7n-test'
+    assert resources[0]['Status'] == 'ACTIVE'
+    assert 'c7n:Policy' in resources[0]
+    assert 'CrossAccountViolations' in resources[0]
+    assert resources[0]['CrossAccountViolations'][0]['Sid'] == 'AllowCrossAccountIngestion'
 
 
 class OpensearchServerless(BaseTest):
@@ -255,3 +281,22 @@ class OpensearchIngestion(BaseTest):
         client = session_factory().client('osis')
         pipeline = client.list_pipelines()['Pipelines'][0]
         self.assertEqual(pipeline["Status"], "DELETING")
+
+
+class OpensearchReservedInstances(BaseTest):
+
+    def test_opensearch_reserved_instances_query(self):
+        session_factory = self.replay_flight_data("test_opensearch_reserved_instances_query")
+        p = self.load_policy(
+            {
+                "name": "opensearch-reserved-instances",
+                "resource": "aws.opensearch-reserved"
+            },
+            session_factory=session_factory,
+        )
+        resources = p.run()
+        self.assertEqual(len(resources), 1)
+        self.assertEqual(
+            resources[0]["ReservedInstanceId"],
+            "1234567890abcdef-1234-1234-1234-123456789012"
+        )

@@ -44,6 +44,12 @@ Each resource also contains an internal class called `resource_type`, which cont
     It's a field name of the response field that have to be used as resource identifier. The `id` value is used for filtering.
 - ``scope`` is optional field, default is None,
     The scope of the Custodian resource. There are available 2 options: `project` or `None`. If the `scope` has a value `project` the GOOGLE_CLOUD_PROJECT variable will be used for building request to GCP resource. If the scope is `None` the request to GCP is built ignoring the GOOGLE_CLOUD_PROJECT variable.
+- ``perm_service`` is optional field, default is None,
+    The permission service name used for IAM permission checks. This should be set when the GCP IAM permission service differs from the API service name. For example, the Project resource uses `cloudresourcemanager` as the API service but `resourcemanager` for permissions. If not specified, the `service` value will be used for permission checks.
+- ``perm_component`` is optional field, default is None,
+    The permission component name used for IAM permission checks. This should be set when the GCP IAM permission component differs from the API component name. For example, Certificate Manager uses `projects.locations.certificates` as the API component but `certs` for permissions. If not specified, the `component` value will be used for permission checks. This field follows the same pattern as `perm_service`.
+- ``urn_component`` is optional field, default is None,
+    The component name used for URN (Uniform Resource Name) generation. This should be set when the URN component differs from the API component name. URNs follow the pattern `gcp:<service>:<location>:<project>:<resource-type>/<resource-id>`. For example, GKE Cluster uses `projects.locations.clusters` as the API component but `cluster` for the URN. If not specified, the `component` value will be used for URN generation. This field follows the same pattern as `perm_service` and `perm_component`.
 - ``parent_spec`` is an optional field that allows to build additional requests to parent resources, default is None.
     The field is used when the request to GCP resource should be created with extra parameters that can be loaded from parent resources.
     The resource should extend ChildResourceManager instead of QueryResourceManager and use ChildTypeInfo instead of TypeInfo to use the field.
@@ -144,6 +150,62 @@ then import the new service module in entry.py:
     import c7n_gcp.resources.<name of a file with created resources>
 
 Each resource has to have test cases. There are implemented test cases for resources list methods and get methods.
+
+Adding Set-Labels Support
+--------------------------
+
+Many GCP resources support labels, and you can add the ``set-labels`` action to enable label management for a resource.
+To add set-labels support to a resource:
+
+1. Register the ``SetLabels`` action for your resource using the ``@<ResourceClass>.action_registry.register('set-labels')`` decorator.
+
+2. Create a class that extends ``SetLabelsAction`` (from ``c7n_gcp.actions.labels``).
+
+3. Define the ``method_spec`` attribute with the appropriate update method and parameters for your resource's API.
+
+4. If the permission component differs from the API component, set the ``perm_component`` attribute in the resource's ``resource_type`` class (see the ``perm_component`` field description above).
+
+Here's an example based on the Artifact Registry resource:
+
+.. code-block:: python
+
+    from c7n_gcp.actions.labels import SetLabelsAction
+
+    @ArtifactRegistry.action_registry.register('set-labels')
+    class ArtifactRegistrySetLabels(SetLabelsAction):
+        """
+        Action to set labels on Artifact Registry repositories
+
+        :example:
+
+        .. code-block:: yaml
+
+            policies:
+              - name: artifact-registry-set-labels
+                resource: gcp.artifact-registry
+                filters:
+                  - type: value
+                    key: name
+                    value: my-repository
+                actions:
+                  - type: set-labels
+                    labels:
+                      environment: production
+        """
+
+        permissions = ('artifactregistry.repositories.update',)
+
+        method_spec = {
+            'op': 'patch',
+            'path_param': 'name',
+            'update_mask': 'labels'
+        }
+
+When implementing set-labels for a new resource, refer to existing implementations such as:
+
+- ``c7n_gcp/resources/artifactregistry.py`` - Artifact Registry
+- ``c7n_gcp/resources/kms.py`` - KMS CryptoKey
+- ``c7n_gcp/resources/certificatemanager.py`` - Certificate Manager Certificate
 
 Testing
 =========

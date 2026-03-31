@@ -36,7 +36,7 @@ from googleapiclient import discovery, errors  # NOQA
 from googleapiclient.http import set_user_agent
 from google.auth.credentials import with_scopes_if_required
 import google.auth.impersonated_credentials
-import google.oauth2.credentials
+# import google.oauth2.credentials
 import google_auth_httplib2
 
 import httplib2
@@ -99,7 +99,7 @@ def is_retryable_exception(e):
        wait_exponential_max=10000,
        stop_max_attempt_number=5)
 def _create_service_api(credentials, service_name, version, developer_key=None,
-                        cache_discovery=False, http=None):
+                        cache_discovery=False, http=None, client_options=None):
     """Builds and returns a cloud API service object.
 
     Args:
@@ -111,6 +111,10 @@ def _create_service_api(credentials, service_name, version, developer_key=None,
             associated with the API call, most API services do not require
             this to be set.
         cache_discovery (bool): Whether or not to cache the discovery doc.
+        http (httplib2.Http): Optional http instance to use for requests.
+        client_options (google.api_core.client_options.ClientOptions): Optional
+            client options to configure the API endpoint. Used for services that
+            require location-specific hostnames (e.g., Vertex AI).
 
     Returns:
         object: A Resource object with methods for interacting with the service.
@@ -132,6 +136,9 @@ def _create_service_api(credentials, service_name, version, developer_key=None,
         discovery_kwargs['http'] = http
     else:
         discovery_kwargs['credentials'] = credentials
+
+    if client_options:
+        discovery_kwargs['client_options'] = client_options
 
     return discovery.build(**discovery_kwargs)
 
@@ -242,6 +249,11 @@ class Session:
         Args:
             repository_class (class): The class to initialize.
             version (str): The gcp service version for the repository.
+            **kw: Additional keyword arguments:
+                - developer_key (str): API key for the service
+                - cache_discovery (bool): Whether to cache discovery docs
+                - client_options (ClientOptions): Custom client options for
+                  location-specific endpoints
 
         Returns:
             object: An instance of repository_class.
@@ -252,7 +264,8 @@ class Session:
             version,
             kw.get('developer_key'),
             kw.get('cache_discovery', False),
-            self._http or _build_http())
+            self._http or _build_http(),
+            kw.get('client_options'))
 
         return ServiceClient(
             gcp_service=service,

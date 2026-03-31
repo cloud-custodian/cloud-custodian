@@ -39,7 +39,7 @@ def get_mailer_requirements():
         "pyyaml",
     ] + list(CORE_DEPS)
     requirements = generate_requirements(
-        deps, ignore=["boto3", "botocore", "pywin32"], exclude=["pkg_resources"], include_self=True
+        deps, ignore=["boto3", "botocore", "pywin32"], include_self=True
     )
     return requirements
 
