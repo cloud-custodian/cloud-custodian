@@ -200,11 +200,12 @@ class ExportDescriptionFilter(ValueFilter):
     permissions = ('dynamodb:ListExports', 'dynamodb:DescribeExport',)
 
     def process(self, resources, event=None):
+        unannotated = [r for r in resources if self.annotation_key not in r]
+        if unannotated:
+            self.augment(unannotated)
+    
         results = []
         for r in resources:
-            if self.annotation_key not in r:
-                self.augment([r])
-
             exports = r.get(self.annotation_key, [])
             matched = [export for export in exports if self.match(export)]
             if matched:
