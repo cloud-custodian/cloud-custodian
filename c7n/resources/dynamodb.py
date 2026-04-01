@@ -203,7 +203,7 @@ class ExportDescriptionFilter(ValueFilter):
         unannotated = [r for r in resources if self.annotation_key not in r]
         if unannotated:
             self.augment(unannotated)
-    
+
         results = []
         for r in resources:
             exports = r.get(self.annotation_key, [])
