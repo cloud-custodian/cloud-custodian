@@ -1,0 +1,36 @@
+{
+    "status_code": 200,
+    "data": {
+        "ResponseMetadata": {},
+        "guardrails": [
+            {
+                "id": "ehydk89jufww",
+                "arn": "arn:aws:bedrock:us-east-1:644160558196:guardrail/ehydk89jufww",
+                "status": "READY",
+                "name": "c7n-test-guardrail-b2f6e604",
+                "description": "Test guardrail for C7N",
+                "version": "DRAFT",
+                "createdAt": {
+                    "__class__": "datetime",
+                    "year": 2026,
+                    "month": 3,
+                    "day": 23,
+                    "hour": 3,
+                    "minute": 52,
+                    "second": 38,
+                    "microsecond": 821526
+                },
+                "updatedAt": {
+                    "__class__": "datetime",
+                    "year": 2026,
+                    "month": 3,
+                    "day": 23,
+                    "hour": 3,
+                    "minute": 52,
+                    "second": 38,
+                    "microsecond": 890282
+                }
+            }
+        ]
+    }
+}
