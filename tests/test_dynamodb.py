@@ -467,37 +467,6 @@ class DynamodbTest(BaseTest):
         imports = resources[0]["c7n:ImportSummary"]
         self.assertEqual(len(imports), 1)
 
-    def test_import_summary_augment_skip_and_filter(self):
-        # Mock-based tests for code coverage
-        session_factory = self.replay_flight_data("test_dynamodb_import_summary_filter")
-        p = self.load_policy(
-            {
-                "name": "dynamodb-imports-augment-branches",
-                "resource": "dynamodb-table",
-                "filters": [
-                    {
-                        "type": "import-summary",
-                        "key": "ImportStatus",
-                        "op": "in",
-                        "value": ["COMPLETED"]
-                    }
-                ]
-            },
-            session_factory=session_factory,
-        )
-
-        filter = p.resource_manager.filters[0]
-
-        # Cache hit
-        mock_cache = MagicMock()
-        mock_cache.get.return_value = [{"ImportStatus": "COMPLETED"}]
-        filter.manager._cache = mock_cache
-        cached = [{"TableArn": "arn:aws:dynamodb:us-east-1:123:table/B"}]
-        filter.augment(cached)
-        self.assertEqual(cached[0]["c7n:ImportSummary"], [{"ImportStatus": "COMPLETED"}])
-        mock_cache.get.assert_called_once()
-        mock_cache.save.assert_not_called()
-
 
 class DynamoDbAccelerator(BaseTest):
 

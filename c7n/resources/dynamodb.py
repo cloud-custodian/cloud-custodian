@@ -120,16 +120,8 @@ class ImportSummaryFilter(ValueFilter):
 
     def augment(self, resources):
         client = local_session(self.manager.session_factory).client('dynamodb')
-        cache = self.manager._cache
 
         for table in resources:
-            table_cache_key = f"dynamodb_import_summaries:{table['TableArn']}"
-            cached_summaries = cache.get(table_cache_key)
-
-            if cached_summaries:
-                table[self.annotation_key] = cached_summaries
-                continue
-
             summaries = []
             next_token = None
 
@@ -146,7 +138,6 @@ class ImportSummaryFilter(ValueFilter):
                     break
 
             table[self.annotation_key] = summaries
-            cache.save(table_cache_key, summaries)
 
 
 @Table.filter_registry.register('continuous-backup')
