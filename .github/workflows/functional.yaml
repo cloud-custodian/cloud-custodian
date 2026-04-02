@@ -42,12 +42,12 @@ jobs:
         id: tfcache
         with:
           path: .tfcache
-          key: tf-${{ runner.os }}-${{ hashFiles('**/*.tf') }}            
+          key: tf-${{ runner.os }}-${{ hashFiles('**/*.tf') }}
 
       - name: Functional Tests
         run: |
           mkdir -p .tfcache
-          pytest -m "terraform and audited and not skiplive" -v tests
+          pytest -m "terraform and audited and not skiplive" -p no:env -v tests
         env:
           C7N_FUNCTIONAL: "true"
           C7N_TEST_RUN: "true"
