@@ -105,11 +105,12 @@ class ImportSummaryFilter(ValueFilter):
     permissions = ('dynamodb:ListImports',)
 
     def process(self, resources, event=None):
+        unannotated = [r for r in resources if self.annotation_key not in r]
+        if unannotated:
+            self.augment(unannotated)
+
         results = []
         for r in resources:
-            if self.annotation_key not in r:
-                self.augment([r])
-
             summaries = r.get(self.annotation_key, [])
             matched = [summary for summary in summaries if self.match(summary)]
             if matched:
