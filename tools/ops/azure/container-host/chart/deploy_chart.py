@@ -45,7 +45,7 @@ class Deployment:
         self.prepare_subscription_hosts()
 
         with open(self.helm_values_file, 'r') as values_file:
-            values = yaml.load(values_file)
+            values = yaml.load(values_file, Loader=yaml.SafeLoader)
         sub_hosts = values.setdefault('subscriptionHosts', [])
         sub_hosts += self.subscription_hosts
         values_file_path = Deployment.write_values_to_file(values)
