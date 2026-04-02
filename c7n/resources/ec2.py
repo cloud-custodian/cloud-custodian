@@ -2324,10 +2324,18 @@ class LaunchTemplate(query.QueryResourceManager):
             self.session_factory).client('ec2')
         template_versions = []
         for r in resources:
-            template_versions.extend(
-                client.describe_launch_template_versions(
-                    LaunchTemplateId=r['LaunchTemplateId']).get(
-                        'LaunchTemplateVersions', ()))
+            try:
+                template_versions.extend(
+                    client.describe_launch_template_versions(
+                        LaunchTemplateId=r['LaunchTemplateId']).get(
+                            'LaunchTemplateVersions', ()))
+            except ClientError as e:
+                if e.response['Error']['Code'] in (
+                    "InvalidLaunchTemplateId.NotFound",
+                    "InvalidLaunchTemplateId.VersionNotFound",
+                ):
+                    continue
+                raise
         return template_versions
 
     def get_arns(self, resources):
