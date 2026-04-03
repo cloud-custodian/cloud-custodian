@@ -719,6 +719,25 @@ class CopyInstanceTagsTest(BaseTest):
         tags = {t["Key"]: t["Value"] for t in results}
         self.assertEqual(tags["Name"], "CompileLambda")
 
+    def test_copy_instance_tags_unattached(self):
+        factory = self.replay_flight_data("test_ebs_copy_instance_tags")
+        policy = self.load_policy(
+            {
+                "name": "test-copy-instance-tags-unattached",
+                "resource": "ebs",
+                "actions": [{"type": "copy-instance-tags"}],
+            },
+            config={"region": "us-west-2"},
+            session_factory=factory,
+        )
+        action = policy.resource_manager.actions[0]
+        try:
+            action.initialize([{'VolumeId': 'vol-unattached', 'Attachments': [{}]}])
+            action.initialize([{'VolumeId': 'vol-unattached-2'}])
+            action.initialize([{'VolumeId': 'vol-unattached-3', 'Attachments': []}])
+        except (KeyError, IndexError) as e:
+            self.fail("initialize raised exception unexpectedly on unattached volume: {}".format(e))
+
 
 class VolumePostFindingTest(BaseTest):
 
