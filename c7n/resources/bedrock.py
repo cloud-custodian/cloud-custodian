@@ -2,11 +2,12 @@
 # SPDX-License-Identifier: Apache-2.0
 
 from c7n.manager import resources
-from c7n.query import QueryResourceManager, TypeInfo, DescribeSource
+from c7n.query import QueryResourceManager, TypeInfo, DescribeSource, DescribeWithResourceTags
 from c7n.tags import RemoveTag, Tag, TagActionFilter, TagDelayedAction, universal_augment
 from c7n.utils import local_session, type_schema
 from c7n.actions import BaseAction
 from c7n.filters.kms import KmsRelatedFilter
+from c7n.resources.aws import shape_schema, shape_validate
 
 
 @resources.register('bedrock-custom-model')
@@ -587,9 +588,131 @@ class BedrockApplicationInferenceProfile(QueryResourceManager):
             'typeEquals': 'APPLICATION'})
         name = "inferenceProfileName"
         id = arn = "inferenceProfileArn"
-        arn_type = "inference-profile"
+        arn_type = "application-inference-profile"
         permission_prefix = 'bedrock'
         universal_taggable = object()
         permissions_augment = ("bedrock:ListTagsForResource",)
 
     augment = universal_augment
+
+
+@BedrockApplicationInferenceProfile.action_registry.register('delete')
+class DeleteBedrockInferenceProfile(BaseAction):
+    """Delete an application inference profile
+
+    :example:
+
+    .. code-block:: yaml
+
+        policies:
+          - name: delete-inference-profile
+            resource: aws.bedrock-inference-profile
+            actions:
+              - type: delete
+    """
+    schema = type_schema('delete')
+    permissions = ('bedrock:DeleteInferenceProfile',)
+
+    def process(self, resources):
+        client = local_session(self.manager.session_factory).client('bedrock')
+        for r in resources:
+            try:
+                client.delete_inference_profile(
+                    inferenceProfileIdentifier=r['inferenceProfileArn']
+                )
+            except client.exceptions.ResourceNotFoundException:
+                continue
+            except client.exceptions.ConflictException as e:
+                self.log.warning(
+                    f"Unable to delete inference profile {r['inferenceProfileArn']}: {e}",
+                )
+                continue
+
+
+@resources.register('bedrock-guardrail')
+class BedrockGuardrail(QueryResourceManager):
+    class resource_type(TypeInfo):
+        service = 'bedrock'
+        enum_spec = ('list_guardrails', 'guardrails[]', {})
+        detail_spec = ('get_guardrail', 'guardrailIdentifier', 'id', None)
+        name = "name"
+        id = "id"
+        arn = "arn"
+        permission_prefix = 'bedrock'
+        universal_taggable = object()
+        permissions_augment = ("bedrock:ListTagsForResource",)
+        config_type = cfn_type = 'AWS::Bedrock::Guardrail'
+
+    source_mapping = {'describe': DescribeWithResourceTags}
+
+
+@BedrockGuardrail.action_registry.register('update')
+class UpdateGuardrail(BaseAction):
+    """Update a Bedrock Guardrail using the `update_guardrail` API.
+
+    The action accepts top-level keys (for example `wordPolicyConfig`) which
+    will be merged into the update payload.
+
+    Example policy:
+
+    .. code-block:: yaml
+
+        policies:
+          - name: update-guardrail-example
+            resource: bedrock-guardrail
+            filters:
+              - type: value
+                key: wordPolicy
+                value: absent
+            actions:
+              - type: update
+                wordPolicyConfig:
+                  wordsConfig:
+                    - text: HATE
+                      inputAction: BLOCK
+                      outputAction: NONE
+                      inputEnabled: true
+                      outputEnabled: false
+                  managedWordListsConfig:
+                    - type: PROFANITY
+                      inputAction: BLOCK
+                      outputAction: NONE
+                      inputEnabled: true
+                      outputEnabled: false
+    """
+    shape = 'UpdateGuardrailRequest'
+    schema = type_schema(
+        'update',
+        **shape_schema('bedrock', 'UpdateGuardrailRequest'),
+    )
+    permissions = ('bedrock:UpdateGuardrail',)
+    # Keys required by the API, but can default to existing resource values
+    required_keys = {
+        'name',
+        'guardrailIdentifier',
+        'blockedInputMessaging',
+        'blockedOutputsMessaging',
+    }
+
+    def validate(self):
+        attrs = {k: 'validate' for k in self.required_keys}
+        attrs.update({k: v for k, v in self.data.items() if k != 'type'})
+        return shape_validate(attrs, self.shape, self.manager.resource_type.service)
+
+    def process(self, resources):
+        client = local_session(self.manager.session_factory).client('bedrock')
+
+        # Build update payload from action data (exclude 'type')
+        patch = {k: v for k, v in self.data.items() if k != 'type'}
+
+        for r in resources:
+            params = {'guardrailIdentifier': r.get('arn'), **patch}
+
+            # API requires certain fields; if they are not provided in the
+            # patch, reuse existing values from the resource
+            params.update({k: r.get(k) for k in self.required_keys if k not in params})
+
+            try:
+                client.update_guardrail(**params)
+            except client.exceptions.ResourceNotFoundException:
+                continue

@@ -1,0 +1,7 @@
+# Ignore Terraform state files and local outputs
+.terraform/
+terraform.tfstate
+terraform.tfstate.backup
+
+# model file 
+model.pkl

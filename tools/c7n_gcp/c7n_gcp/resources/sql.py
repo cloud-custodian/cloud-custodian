@@ -265,6 +265,46 @@ class SqlBackupRun(SqlInstanceChildWithSelfLink):
             return int(delta.total_seconds()) * 1000 + int(delta.microseconds / 1000)
 
 
+@SqlBackupRun.action_registry.register('delete')
+class SqlBackupRunDelete(MethodAction):
+    """Delete a Cloud SQL backup run.
+
+    https://cloud.google.com/sql/docs/mysql/admin-api/rest/v1/backupRuns/delete
+
+    :example:
+
+    Delete all successful backup runs older than 30 days:
+
+    .. code-block:: yaml
+
+        policies:
+          - name: gcp-sql-backup-run-delete-old
+            resource: gcp.sql-backup-run
+            filters:
+              - type: value
+                key: status
+                op: eq
+                value: SUCCESSFUL
+              - type: value
+                key: endTime
+                op: greater-than
+                value_type: age
+                value: 30
+            actions:
+              - type: delete
+
+    """
+
+    schema = type_schema('delete')
+    method_spec = {'op': 'delete'}
+    permissions = ('cloudsql.backupRuns.delete',)
+
+    def get_resource_params(self, model, resource):
+        parent = self.manager._get_parent_resource_info(resource)
+        return {'project': parent['project_id'], 'instance': resource['instance'],
+                'id': resource['id']}
+
+
 @resources.register('sql-ssl-cert')
 class SqlSslCert(SqlInstanceChildWithSelfLink):
     """GCP Resource

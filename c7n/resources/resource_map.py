@@ -35,6 +35,7 @@ ResourceMap = {
   "aws.batch-definition": "c7n.resources.batch.JobDefinition",
   "aws.batch-queue": "c7n.resources.batch.BatchJobQueue",
   "aws.bedrock-agent": "c7n.resources.bedrock.BedrockAgent",
+  "aws.bedrock-guardrail": "c7n.resources.bedrock.BedrockGuardrail",
   "aws.bedrock-inference-profile":
     "c7n.resources.bedrock.BedrockApplicationInferenceProfile",
   "aws.bedrock-custom-model": "c7n.resources.bedrock.BedrockCustomModel",
@@ -117,6 +118,7 @@ ResourceMap = {
   "aws.ec2-reserved": "c7n.resources.ec2.ReservedInstance",
   "aws.ec2-spot-fleet-request": "c7n.resources.ec2.SpotFleetRequest",
   "aws.ec2-capacity-reservation": "c7n.resources.ec2.CapacityReservation",
+  "aws.ec2-instance-ami": "c7n.resources.ec2.EC2ImageMetadata",
   "aws.ecr": "c7n.resources.ecr.ECR",
   "aws.ecr-image": "c7n.resources.ecr.RepositoryImage",
   "aws.ecs": "c7n.resources.ecs.ECSCluster",
@@ -237,6 +239,7 @@ ResourceMap = {
   "aws.networkmanager-link": "c7n.resources.networkmanager.Link",
   "aws.networkmanager-site": "c7n.resources.networkmanager.Site",
   "aws.opensearch-ingestion": "c7n.resources.opensearch.OpensearchIngestion",
+  "aws.opensearch-reserved": "c7n.resources.opensearch.OpensearchReservedInstance",
   "aws.opensearch-serverless": "c7n.resources.opensearch.OpensearchServerless",
   "aws.ops-item": "c7n.resources.ssm.OpsItem",
   "aws.opswork-cm": "c7n.resources.opsworks.OpsworksCM",
@@ -312,6 +315,7 @@ ResourceMap = {
     "c7n.resources.sagemaker.SagemakerHyperParameterTuningJob",
   "aws.sagemaker-model-bias-job-definition":
     "c7n.resources.sagemaker.SagemakerModelBiasJobDefinition",
+  "aws.savings-plan": "c7n.resources.savingsplan.SavingsPlan",
   "aws.scaling-policy": "c7n.resources.asg.ScalingPolicy",
   "aws.secrets-manager": "c7n.resources.secretsmanager.SecretsManager",
   "aws.security-group": "c7n.resources.vpc.SecurityGroup",
@@ -351,6 +355,7 @@ ResourceMap = {
   "aws.timestream-table": "c7n.resources.timestream.TimestreamTable",
   "aws.timestream-influxdb": "c7n.resources.timestream.TimestreamInfluxDB",
   "aws.timestream-influxdb-cluster": "c7n.resources.timestream.TimestreamInfluxDBCluster",
+  "aws.transfer-connector": "c7n.resources.transfer.TransferConnector",
   "aws.transfer-server": "c7n.resources.transfer.TransferServer",
   "aws.transfer-user": "c7n.resources.transfer.TransferUser",
   "aws.transfer-web-app": "c7n.resources.transfer.TransferWebApp",
@@ -362,6 +367,8 @@ ResourceMap = {
   "aws.vpc-endpoint-service-configuration": "c7n.resources.vpc.VPCEndpointServiceConfiguration",
   "aws.vpc-lattice-service": "c7n.resources.lattice.VPCLatticeService",
   "aws.vpc-lattice-service-network": "c7n.resources.lattice.VPCLatticeServiceNetwork",
+  "aws.vpc-lattice-service-network-association":
+      "c7n.resources.lattice.VPCLatticeServiceNetworkAssociation",
   "aws.vpc-lattice-target-group": "c7n.resources.lattice.VPCLatticeTargetGroup",
   "aws.vpc-lattice-listener": "c7n.resources.lattice.VPCLatticeListener",
   "aws.client-vpn-endpoint": "c7n.resources.vpc.ClientVpnEndpoint",

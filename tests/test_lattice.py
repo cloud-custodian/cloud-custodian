@@ -220,3 +220,50 @@ def test_lattice_listener_query(test, vpc_lattice_listener):
     resources = p.run()
     assert len(resources) == 1
     assert resources[0]["name"] == listener_name
+
+
+@terraform('lattice_service_network_detailspec',)
+def test_lattice_service_network_detailspec(test, lattice_service_network_detailspec):
+    session_factory = test.replay_flight_data("test_lattice_service_network_detailspec")
+    p = test.load_policy(
+        {
+            "name": "lattice-find-auth-policy-wildcard",
+            "resource": "aws.vpc-lattice-service-network",
+            "filters": [
+                {
+                    "type": "value",
+                    "key": "authType",
+                    "value": "AWS_IAM",
+                },
+            ],
+        },
+        session_factory=session_factory,
+    )
+    resources = p.run()
+    assert len(resources) > 0
+    assert resources[0]['name'] == 'test-lattice-network'
+    assert resources[0]['authType'] == 'AWS_IAM'
+    assert resources[0]['Tags'][0]['Key'] == 'TestServiceNetwork'
+    assert resources[0]['Tags'][0]['Value'] == 'TestServiceNetworkValue'
+
+
+@terraform('lattice_service_network_association')
+def test_lattice_service_network_association_list(test, lattice_service_network_association):
+    factory = test.replay_flight_data("test_lattice_service_network_association_list")
+
+    p = test.load_policy(
+        {
+            "name": "lattice-service-network-association-list",
+            "resource": "aws.vpc-lattice-service-network-association",
+            "filters": [{"type": "value", "key": "status", "value": "ACTIVE"}],
+        },
+        session_factory=factory,
+    )
+    resources = p.run()
+    assert len(resources) == 1
+    assert resources[0]["status"] == "ACTIVE"
+    assert resources[0]["c7n:parent-id"] == resources[0]["serviceNetworkId"]
+    assert {t["Key"]: t["Value"] for t in resources[0]["Tags"]} == {
+        "ASV": "PolicyTestASV",
+        "Environment": "Test",
+    }

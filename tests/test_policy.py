@@ -468,7 +468,6 @@ class PolicyMetaLint(BaseTest):
             "AWS::AppConfig::ExtensionAssociation",
             "AWS::AppIntegrations::Application",
             "AWS::AppSync::ApiCache",
-            "AWS::Bedrock::Guardrail",
             "AWS::Bedrock::KnowledgeBase",
             "AWS::Connect::Rule",
             "AWS::Connect::User",
@@ -886,6 +885,7 @@ class PolicyMetaLint(BaseTest):
             'rrset',
             'redshift-reserved',
             'elasticsearch-reserved',
+            'opensearch-reserved',
             'ses-receipt-rule-set',
             'iam-access-key',
         ))

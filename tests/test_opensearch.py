@@ -281,3 +281,22 @@ class OpensearchIngestion(BaseTest):
         client = session_factory().client('osis')
         pipeline = client.list_pipelines()['Pipelines'][0]
         self.assertEqual(pipeline["Status"], "DELETING")
+
+
+class OpensearchReservedInstances(BaseTest):
+
+    def test_opensearch_reserved_instances_query(self):
+        session_factory = self.replay_flight_data("test_opensearch_reserved_instances_query")
+        p = self.load_policy(
+            {
+                "name": "opensearch-reserved-instances",
+                "resource": "aws.opensearch-reserved"
+            },
+            session_factory=session_factory,
+        )
+        resources = p.run()
+        self.assertEqual(len(resources), 1)
+        self.assertEqual(
+            resources[0]["ReservedInstanceId"],
+            "1234567890abcdef-1234-1234-1234-123456789012"
+        )

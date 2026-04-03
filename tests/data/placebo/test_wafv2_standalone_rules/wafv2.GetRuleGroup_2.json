@@ -2,19 +2,19 @@
     "status_code": 200,
     "data": {
         "RuleGroup": {
-            "Name": "test-rule-group",
-            "Id": "039e783d-9783-43c2-b21f-e08821ab670d",
+            "Name": "with-rules",
+            "Id": "60616042-d427-4c17-991c-ee3a39012c31",
             "Capacity": 1,
-            "ARN": "arn:aws:wafv2:us-east-1:644160558196:regional/rulegroup/test-rule-group/039e783d-9783-43c2-b21f-e08821ab670d",
-            "Description": "delete-me",
+            "ARN": "arn:aws:wafv2:us-east-1:644160558196:regional/rulegroup/with-rules/60616042-d427-4c17-991c-ee3a39012c31",
+            "Description": "",
             "Rules": [
                 {
-                    "Name": "test-rule",
+                    "Name": "first",
                     "Priority": 0,
                     "Statement": {
                         "GeoMatchStatement": {
                             "CountryCodes": [
-                                "AX"
+                                "AF"
                             ]
                         }
                     },
@@ -24,18 +24,18 @@
                     "VisibilityConfig": {
                         "SampledRequestsEnabled": true,
                         "CloudWatchMetricsEnabled": true,
-                        "MetricName": "test-rule"
+                        "MetricName": "first"
                     }
                 }
             ],
             "VisibilityConfig": {
                 "SampledRequestsEnabled": true,
                 "CloudWatchMetricsEnabled": true,
-                "MetricName": "test-rule-group"
+                "MetricName": "with-rules"
             },
-            "LabelNamespace": "awswaf:644160558196:rulegroup:test-rule-group:"
+            "LabelNamespace": "awswaf:644160558196:rulegroup:with-rules:"
         },
-        "LockToken": "6972e6be-c492-4b00-adb6-b70ed814f416",
+        "LockToken": "64092b47-597c-40a9-8a96-a05f88bbbe3b",
         "ResponseMetadata": {}
     }
 }

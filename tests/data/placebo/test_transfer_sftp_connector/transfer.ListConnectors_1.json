@@ -1,0 +1,13 @@
+{
+    "status_code": 200,
+    "data": {
+        "Connectors": [
+            {
+                "Arn": "arn:aws:transfer:us-east-1:644160558196:connector/c-fb309b9e41e34d43a",
+                "ConnectorId": "c-fb309b9e41e34d43a",
+                "Url": "sftp://s-0c148654812543d5b.server.transfer.us-east-1.amazonaws.com"
+            }
+        ],
+        "ResponseMetadata": {}
+    }
+}

@@ -1,0 +1,46 @@
+{
+  "headers": {
+    "content-type": "application/json; charset=UTF-8",
+    "vary": "Origin, X-Origin, Referer",
+    "date": "Thu, 26 Feb 2026 18:41:30 GMT",
+    "server": "ESF",
+    "x-xss-protection": "0",
+    "x-frame-options": "SAMEORIGIN",
+    "x-content-type-options": "nosniff",
+    "alt-svc": "h3=\":443\"; ma=2592000,h3-29=\":443\"; ma=2592000",
+    "transfer-encoding": "chunked",
+    "status": "200",
+    "content-length": "903",
+    "-content-encoding": "gzip"
+  },
+  "body": {
+    "name": "projects/cloud-custodian/locations/us-central1/batchPredictionJobs/4110518636983091200",
+    "displayName": "c7n-test-batch-job-central",
+    "model": "projects/cloud-custodian/locations/us-central1/models/4049913641959424000",
+    "inputConfig": {
+      "instancesFormat": "jsonl",
+      "gcsSource": {
+        "uris": [
+          "gs://c7n-vertex-batch-test-c34c9a39/input/us-central1/test_data.jsonl"
+        ]
+      }
+    },
+    "outputConfig": {
+      "predictionsFormat": "jsonl",
+      "gcsDestination": {
+        "outputUriPrefix": "gs://c7n-vertex-batch-test-c34c9a39/output/us-central1/"
+      }
+    },
+    "dedicatedResources": {
+      "machineSpec": {
+        "machineType": "n1-standard-2"
+      },
+      "startingReplicaCount": 1
+    },
+    "manualBatchTuningParameters": {},
+    "state": "JOB_STATE_PENDING",
+    "createTime": "2026-02-26T18:41:30.698033Z",
+    "updateTime": "2026-02-26T18:41:30.698033Z",
+    "modelVersionId": "1"
+  }
+}

@@ -4,6 +4,7 @@ import logging
 from unittest import mock
 import datetime
 from dateutil import parser
+import time
 
 from botocore.exceptions import ClientError
 
@@ -20,6 +21,7 @@ from c7n.resources.ebs import (
     VolumeQueryParser
 )
 from .common import BaseTest
+from pytest_terraform import terraform
 from c7n.testing import mock_datetime_now
 
 
@@ -232,6 +234,60 @@ class SnapshotErrorHandler(BaseTest):
         e = ClientError(error_response, operation_name)
         vol = ErrorHandler.extract_bad_volume(e)
         self.assertEqual(vol, "vol-notfound")
+
+    def test_remove_volume(self):
+        vols = [{'VolumeId': 'a'}, {'VolumeId': 'b'}, {'VolumeId': 'c'}]
+
+        t1 = list(vols)
+        ErrorHandler.remove_volume('c', t1)
+        self.assertEqual([t['VolumeId'] for t in t1], ['a', 'b'])
+
+        ErrorHandler.remove_volume('d', vols)
+        self.assertEqual(len(vols), 3)
+
+    def test_volume_tag_error(self):
+        vols = [{'VolumeId': 'vol-aa'}]
+        error_response = {
+            "Error": {
+                "Message": "The volume 'vol-aa' does not exist.",
+                "Code": "InvalidVolume.NotFound",
+            }
+        }
+        client = mock.MagicMock()
+        client.create_tags.side_effect = ClientError(error_response, 'CreateTags')
+
+        p = self.load_policy({
+            "name": "ebs-tag",
+            "resource": "ebs",
+            'actions': [{'type': 'tag', 'tags': {'bar': 'foo'}}]})
+        tagger = p.resource_manager.actions[0]
+        tagger.process_resource_set(client, vols, [{'Key': 'bar', 'Value': 'foo'}])
+        client.create_tags.assert_called_once()
+
+    def test_volume_tag_error_remaining_resources_tagged(self):
+        vols = [{'VolumeId': 'vol-missing'}, {'VolumeId': 'vol-exists'}]
+        error_response = {
+            "Error": {
+                "Message": "The volume 'vol-missing' does not exist.",
+                "Code": "InvalidVolume.NotFound",
+            }
+        }
+        client = mock.MagicMock()
+        client.create_tags.side_effect = [
+            ClientError(error_response, 'CreateTags'),
+            None,
+        ]
+
+        p = self.load_policy({
+            "name": "ebs-tag",
+            "resource": "ebs",
+            'actions': [{'type': 'tag', 'tags': {'bar': 'foo'}}]})
+        tagger = p.resource_manager.actions[0]
+        tagger.process_resource_set(client, vols, [{'Key': 'bar', 'Value': 'foo'}])
+        self.assertEqual(client.create_tags.call_count, 2)
+        # second call should only contain the existing volume
+        _, second_call_kwargs = client.create_tags.call_args_list[1]
+        self.assertEqual(second_call_kwargs['Resources'], ['vol-exists'])
 
     def test_snapshot_copy_related_tags_missing_volumes(self):
         factory = self.replay_flight_data(
@@ -1204,3 +1260,36 @@ class EbsSnapshotsFilterTest(BaseTest):
             resources = p.run()
         self.assertEqual(len(resources), 1)
         self.assertEqual(resources[0]["VolumeId"], "vol-0c7930681fe5a17db")
+
+
+@terraform("ebs_modify_iops_percent")
+def test_ebs_modify_iops_percent_gp3(test, ebs_modify_iops_percent):
+    session_factory = test.replay_flight_data("test_ebs_modify_iops_percent_gp3")
+    vol_id = ebs_modify_iops_percent["aws_ebs_volume.test_volume.id"]
+
+    policy = test.load_policy(
+        {
+            "name": "ebs-modify-iops-gp3",
+            "resource": "aws.ebs",
+            "filters": ["modifyable", {"VolumeType": "gp3"}],
+            "actions": [
+                {
+                    "type": "modify",
+                    # Increase IOPS by 30% using only iops-percent
+                    "iops-percent": 130,
+                }
+            ],
+        },
+        session_factory=session_factory,
+    )
+
+    resources = policy.run()
+    assert len(resources) == 1
+    assert resources[0]["VolumeId"] == vol_id
+
+    if test.recording:
+        time.sleep(10)
+
+    client = session_factory().client("ec2")
+    # 130% of previous value (3000) is 3900
+    assert client.describe_volumes(VolumeIds=[vol_id])["Volumes"][0]["Iops"] == 3900

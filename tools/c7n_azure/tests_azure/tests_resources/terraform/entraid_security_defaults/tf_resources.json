@@ -1,0 +1,452 @@
+{
+    "pytest-terraform": 1,
+    "outputs": {
+        "security_defaults_compliance": {
+            "value": {
+                "cis_compliant_controls": [
+                    {
+                        "control": "1.1",
+                        "remediated_by_security_defaults": true,
+                        "status": "compliant",
+                        "title": "Ensure that multi-factor authentication is enabled for all privileged users"
+                    },
+                    {
+                        "control": "1.22",
+                        "directly_addressed": true,
+                        "status": "compliant",
+                        "title": "Ensure that 'Security defaults' is 'Enabled'"
+                    }
+                ],
+                "limitations": [
+                    "Cannot be customized per user or group",
+                    "Cannot exclude specific applications",
+                    "Cannot be combined with conditional access policies",
+                    "Limited granular control over MFA triggers"
+                ],
+                "recommendations": [
+                    {
+                        "reason": "Provides baseline security with minimal configuration",
+                        "recommendation": "Keep security defaults enabled",
+                        "scenario": "Small organizations (< 50 users)"
+                    },
+                    {
+                        "reason": "More granular control and customization options",
+                        "recommendation": "Consider upgrading to conditional access",
+                        "scenario": "Medium organizations (50-300 users)"
+                    },
+                    {
+                        "reason": "Full customization and integration with other security tools",
+                        "recommendation": "Use conditional access policies",
+                        "scenario": "Large organizations (300+ users)"
+                    }
+                ],
+                "security_improvements": [
+                    {
+                        "area": "Authentication",
+                        "improvement": "MFA enforced for administrators",
+                        "risk_reduction": "High"
+                    },
+                    {
+                        "area": "Legacy Protocols",
+                        "improvement": "Legacy authentication blocked",
+                        "risk_reduction": "High"
+                    },
+                    {
+                        "area": "Risk Detection",
+                        "improvement": "User MFA required on risky sign-ins",
+                        "risk_reduction": "Medium"
+                    },
+                    {
+                        "area": "Privileged Access",
+                        "improvement": "MFA required for Azure management",
+                        "risk_reduction": "High"
+                    }
+                ]
+            },
+            "type": [
+                "object",
+                {
+                    "cis_compliant_controls": [
+                        "tuple",
+                        [
+                            [
+                                "object",
+                                {
+                                    "control": "string",
+                                    "remediated_by_security_defaults": "bool",
+                                    "status": "string",
+                                    "title": "string"
+                                }
+                            ],
+                            [
+                                "object",
+                                {
+                                    "control": "string",
+                                    "directly_addressed": "bool",
+                                    "status": "string",
+                                    "title": "string"
+                                }
+                            ]
+                        ]
+                    ],
+                    "limitations": [
+                        "tuple",
+                        [
+                            "string",
+                            "string",
+                            "string",
+                            "string"
+                        ]
+                    ],
+                    "recommendations": [
+                        "tuple",
+                        [
+                            [
+                                "object",
+                                {
+                                    "reason": "string",
+                                    "recommendation": "string",
+                                    "scenario": "string"
+                                }
+                            ],
+                            [
+                                "object",
+                                {
+                                    "reason": "string",
+                                    "recommendation": "string",
+                                    "scenario": "string"
+                                }
+                            ],
+                            [
+                                "object",
+                                {
+                                    "reason": "string",
+                                    "recommendation": "string",
+                                    "scenario": "string"
+                                }
+                            ]
+                        ]
+                    ],
+                    "security_improvements": [
+                        "tuple",
+                        [
+                            [
+                                "object",
+                                {
+                                    "area": "string",
+                                    "improvement": "string",
+                                    "risk_reduction": "string"
+                                }
+                            ],
+                            [
+                                "object",
+                                {
+                                    "area": "string",
+                                    "improvement": "string",
+                                    "risk_reduction": "string"
+                                }
+                            ],
+                            [
+                                "object",
+                                {
+                                    "area": "string",
+                                    "improvement": "string",
+                                    "risk_reduction": "string"
+                                }
+                            ],
+                            [
+                                "object",
+                                {
+                                    "area": "string",
+                                    "improvement": "string",
+                                    "risk_reduction": "string"
+                                }
+                            ]
+                        ]
+                    ]
+                }
+            ]
+        },
+        "security_defaults_disabled": {
+            "value": {
+                "created_date_time": "2021-01-01T00:00:00Z",
+                "description": "Security defaults provide a set of basic security configurations that help protect your organization",
+                "display_name": "Security Defaults",
+                "id": "00000000-0000-0000-0000-000000000000",
+                "is_enabled": false,
+                "modified_date_time": "2023-01-01T00:00:00Z",
+                "template_id": "00000000-0000-0000-0000-000000000000"
+            },
+            "type": [
+                "object",
+                {
+                    "created_date_time": "string",
+                    "description": "string",
+                    "display_name": "string",
+                    "id": "string",
+                    "is_enabled": "bool",
+                    "modified_date_time": "string",
+                    "template_id": "string"
+                }
+            ]
+        },
+        "security_defaults_enabled": {
+            "value": {
+                "created_date_time": "2021-01-01T00:00:00Z",
+                "description": "Security defaults provide a set of basic security configurations that help protect your organization",
+                "display_name": "Security Defaults",
+                "id": "00000000-0000-0000-0000-000000000000",
+                "is_enabled": true,
+                "modified_date_time": "2023-01-01T00:00:00Z",
+                "template_id": "00000000-0000-0000-0000-000000000000"
+            },
+            "type": [
+                "object",
+                {
+                    "created_date_time": "string",
+                    "description": "string",
+                    "display_name": "string",
+                    "id": "string",
+                    "is_enabled": "bool",
+                    "modified_date_time": "string",
+                    "template_id": "string"
+                }
+            ]
+        },
+        "security_defaults_features": {
+            "value": {
+                "enabled_features": {
+                    "block_legacy_authentication": {
+                        "blocked_protocols": [
+                            "IMAP",
+                            "MAPI",
+                            "POP",
+                            "SMTP",
+                            "Exchange ActiveSync"
+                        ],
+                        "description": "Blocks legacy authentication protocols that don't support MFA",
+                        "enabled": true
+                    },
+                    "defender_for_identity": {
+                        "description": "Enables Microsoft Defender for Identity protection",
+                        "enabled": true,
+                        "features": [
+                            "Identity threat detection",
+                            "Suspicious activity monitoring",
+                            "Lateral movement detection"
+                        ]
+                    },
+                    "protect_privileged_activities": {
+                        "description": "Requires MFA for privileged activities like accessing Azure portal",
+                        "enabled": true,
+                        "protected_activities": [
+                            "Azure portal access",
+                            "Azure PowerShell",
+                            "Azure CLI",
+                            "Microsoft Graph PowerShell"
+                        ]
+                    },
+                    "require_mfa_for_admins": {
+                        "affected_roles": [
+                            "Global Administrator",
+                            "Security Administrator",
+                            "Conditional Access Administrator",
+                            "Exchange Administrator",
+                            "Helpdesk Administrator",
+                            "Password Administrator",
+                            "Privileged Authentication Administrator",
+                            "Privileged Role Administrator",
+                            "SharePoint Administrator",
+                            "User Administrator"
+                        ],
+                        "description": "Requires multi-factor authentication for all administrator accounts",
+                        "enabled": true
+                    },
+                    "require_mfa_for_users": {
+                        "description": "Requires multi-factor authentication for users when risk is detected",
+                        "enabled": true,
+                        "trigger_conditions": [
+                            "Risky sign-in",
+                            "Unfamiliar location",
+                            "Anonymous IP address",
+                            "Malware-linked IP address"
+                        ]
+                    }
+                }
+            },
+            "type": [
+                "object",
+                {
+                    "enabled_features": [
+                        "object",
+                        {
+                            "block_legacy_authentication": [
+                                "object",
+                                {
+                                    "blocked_protocols": [
+                                        "tuple",
+                                        [
+                                            "string",
+                                            "string",
+                                            "string",
+                                            "string",
+                                            "string"
+                                        ]
+                                    ],
+                                    "description": "string",
+                                    "enabled": "bool"
+                                }
+                            ],
+                            "defender_for_identity": [
+                                "object",
+                                {
+                                    "description": "string",
+                                    "enabled": "bool",
+                                    "features": [
+                                        "tuple",
+                                        [
+                                            "string",
+                                            "string",
+                                            "string"
+                                        ]
+                                    ]
+                                }
+                            ],
+                            "protect_privileged_activities": [
+                                "object",
+                                {
+                                    "description": "string",
+                                    "enabled": "bool",
+                                    "protected_activities": [
+                                        "tuple",
+                                        [
+                                            "string",
+                                            "string",
+                                            "string",
+                                            "string"
+                                        ]
+                                    ]
+                                }
+                            ],
+                            "require_mfa_for_admins": [
+                                "object",
+                                {
+                                    "affected_roles": [
+                                        "tuple",
+                                        [
+                                            "string",
+                                            "string",
+                                            "string",
+                                            "string",
+                                            "string",
+                                            "string",
+                                            "string",
+                                            "string",
+                                            "string",
+                                            "string"
+                                        ]
+                                    ],
+                                    "description": "string",
+                                    "enabled": "bool"
+                                }
+                            ],
+                            "require_mfa_for_users": [
+                                "object",
+                                {
+                                    "description": "string",
+                                    "enabled": "bool",
+                                    "trigger_conditions": [
+                                        "tuple",
+                                        [
+                                            "string",
+                                            "string",
+                                            "string",
+                                            "string"
+                                        ]
+                                    ]
+                                }
+                            ]
+                        }
+                    ]
+                }
+            ]
+        },
+        "test_scenarios": {
+            "value": {
+                "disabled_no_ca": {
+                    "compliance_score": 25,
+                    "conditional_access_policies": 0,
+                    "legacy_auth_blocked": false,
+                    "mfa_enforced_users": "none",
+                    "risk_level": "high",
+                    "security_defaults_enabled": false
+                },
+                "disabled_with_ca": {
+                    "compliance_score": 95,
+                    "conditional_access_policies": 15,
+                    "legacy_auth_blocked": true,
+                    "mfa_enforced_users": "all_with_exceptions",
+                    "risk_level": "very_low",
+                    "security_defaults_enabled": false
+                },
+                "new_tenant_secure": {
+                    "compliance_score": 85,
+                    "conditional_access_policies": 0,
+                    "legacy_auth_blocked": true,
+                    "mfa_enforced_users": "administrators_only",
+                    "risk_level": "low",
+                    "security_defaults_enabled": true
+                }
+            },
+            "type": [
+                "object",
+                {
+                    "disabled_no_ca": [
+                        "object",
+                        {
+                            "compliance_score": "number",
+                            "conditional_access_policies": "number",
+                            "legacy_auth_blocked": "bool",
+                            "mfa_enforced_users": "string",
+                            "risk_level": "string",
+                            "security_defaults_enabled": "bool"
+                        }
+                    ],
+                    "disabled_with_ca": [
+                        "object",
+                        {
+                            "compliance_score": "number",
+                            "conditional_access_policies": "number",
+                            "legacy_auth_blocked": "bool",
+                            "mfa_enforced_users": "string",
+                            "risk_level": "string",
+                            "security_defaults_enabled": "bool"
+                        }
+                    ],
+                    "new_tenant_secure": [
+                        "object",
+                        {
+                            "compliance_score": "number",
+                            "conditional_access_policies": "number",
+                            "legacy_auth_blocked": "bool",
+                            "mfa_enforced_users": "string",
+                            "risk_level": "string",
+                            "security_defaults_enabled": "bool"
+                        }
+                    ]
+                }
+            ]
+        }
+    },
+    "resources": {
+        "azuread_client_config": {
+            "current": {
+                "client_id": "00000000-0000-0000-0000-000000000000",
+                "id": "00000000-0000-0000-0000-000000000000-00000000-0000-0000-0000-000000000000-00000000-0000-0000-0000-000000000000",
+                "object_id": "00000000-0000-0000-0000-000000000000",
+                "tenant_id": "00000000-0000-0000-0000-000000000000",
+                "timeouts": null
+            }
+        }
+    }
+}

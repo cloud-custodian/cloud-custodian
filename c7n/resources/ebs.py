@@ -132,6 +132,16 @@ class ErrorHandler:
             log.warning("Volume id malformed %s" % e_vol_id)
         return e_vol_id
 
+    @staticmethod
+    def remove_volume(rid, resource_set):
+        found = None
+        for r in resource_set:
+            if r['VolumeId'] == rid:
+                found = r
+                break
+        if found:
+            resource_set.remove(found)
+
 
 class SnapshotQueryParser(QueryParser):
 
@@ -727,6 +737,24 @@ class EBS(QueryResourceManager):
                     continue
                 raise
         return []
+
+
+@EBS.action_registry.register('tag')
+class VolumeTag(Tag):
+
+    permissions = ('ec2:CreateTags',)
+
+    def process_resource_set(self, client, resource_set, tags):
+        while resource_set:
+            try:
+                return super(VolumeTag, self).process_resource_set(
+                    client, resource_set, tags)
+            except ClientError as e:
+                bad_vol = ErrorHandler.extract_bad_volume(e)
+                if bad_vol:
+                    ErrorHandler.remove_volume(bad_vol, resource_set)
+                    continue
+                raise
 
 
 @EBS.filter_registry.register('snapshots')
@@ -1761,10 +1789,15 @@ class ModifyVolume(BaseAction):
 
         for r in resource_set:
             params = {'VolumeId': r['VolumeId']}
-            if piops and ('io1' in (vtype, r['VolumeType']) or
-                          'io2' in (vtype, r['VolumeType'])):
-                # default here if we're changing to io1
-                params['Iops'] = max(int(r.get('Iops', 10) * piops / 100.0), 100)
+            target_type = vtype or r['VolumeType']
+            if piops and target_type in ('io1', 'io2', 'gp3'):
+                if target_type in ('io1', 'io2'):
+                    base_iops = int(r.get('Iops', 10))
+                    min_iops = 100
+                else:  # gp3
+                    base_iops = int(r.get('Iops', 3000))
+                    min_iops = 3000
+                params['Iops'] = max(int(base_iops * piops / 100.0), min_iops)
             if psize:
                 params['Size'] = max(int(r['Size'] * psize / 100.0), 1)
             if vtype:
