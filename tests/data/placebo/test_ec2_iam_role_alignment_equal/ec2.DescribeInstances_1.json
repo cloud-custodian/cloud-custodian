@@ -36,6 +36,16 @@
                         },
                         "InstanceId": "i-051d5a5a07a40d2a3",
                         "ImageId": "ami-01b14b7ad41e17ba4",
+                        "Tags": [
+                            {
+                                "Key": "Name",
+                                "Value": "test-role-1"
+                            },
+                            {
+                                "Key": "Environment",
+                                "Value": "Development"
+                            }
+                        ],
                         "State": {
                             "Code": 16,
                             "Name": "running"
