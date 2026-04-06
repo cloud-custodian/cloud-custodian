@@ -110,8 +110,7 @@ class IamRoleAlignment(Filter):
         rfilters = self.manager.filter_registry.keys()
         if 'iam-role' not in rfilters:
             raise PolicyValidationError(
-                f"iam-role-alignment requires resource iam-role filter availability on {
-                    self.manager.data}")
+                f"iam-role-alignment requires iam-role filter on {self.manager.data}")
         return self
 
     def process(self, resources, event=None):
