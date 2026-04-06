@@ -316,7 +316,11 @@
                             },
                             {
                                 "Key": "Environment",
-                                "Value": "Production"
+                                "Value": "Development"
+                            },
+                            {
+                                "Key": "CostCenter",
+                                "Value": "TeamB"
                             }
                         ],
                         "VirtualizationType": "hvm",

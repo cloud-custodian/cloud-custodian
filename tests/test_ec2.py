@@ -2621,7 +2621,7 @@ class TestEC2IamRoleAlignment(BaseTest):
 
     def test_ec2_iam_role_alignment_equal(self):
         """Test iam-role-alignment with match: equal"""
-        factory = self.record_flight_data('test_ec2_iam_role_alignment_equal')
+        factory = self.replay_flight_data('test_ec2_iam_role_alignment_equal')
         policy = self.load_policy(
             {
                 'name': 'ec2-role-alignment-equal',
@@ -2641,7 +2641,7 @@ class TestEC2IamRoleAlignment(BaseTest):
         # No annotation when tags match
         self.assertNotIn('c7n:IamRoleAlignment', resources[0])
         self.assertEqual(
-            resources[0].get('InstanceId'), 'i-0087ce11c395e5703')
+            resources[0].get('InstanceId'), 'i-051d5a5a07a40d2a3')
 
     def test_ec2_iam_role_alignment_ne(self):
         factory = self.replay_flight_data('test_ec2_iam_role_alignment_ne')
