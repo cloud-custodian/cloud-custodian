@@ -71,7 +71,7 @@ class IamRoleAlignment(Filter):
             - type: iam-role-alignment
               key: "tag:Environment"
               ignore:
-                - "tag:Owner": "shared"
+                - "tag:Owner": "Shared"
 
     Find lambda functions with mismatched cost center tags:
 
