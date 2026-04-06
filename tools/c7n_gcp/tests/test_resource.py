@@ -18,6 +18,13 @@ ALLOWED_NOPERM = set((
     'recommend'  # this requires configuration to determine permission
 ))
 
+RESOURCE_PERM_WHITELIST = set((
+    'region',  # regions.list is not a documented permission, but is required to query regions
+    'vertex-ai-publisher',  # synthetic resource with no permissions
+    'vertex-ai-publisher-model',  # catalog resource with no permissions
+    'vertex-ai-location',  # metadata resource with no permissions
+))
+
 
 class ResourceMetaTest(BaseTest):
 
@@ -35,8 +42,7 @@ class ResourceMetaTest(BaseTest):
             policy = Bag({'name': 'permcheck',
                      'resource': 'gcp.%s' % k,
                      'provider_name': 'gcp'})
-            # Skip pseudo-resources that don't make API calls
-            if k in ('region', 'vertex-ai-location'):
+            if k in RESOURCE_PERM_WHITELIST:
                 continue
             ctx = self.get_context(config=cfg, policy=policy)
             mgr = v(ctx, policy)
