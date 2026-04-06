@@ -33,7 +33,7 @@ class IamRoleFilter(RelatedResourceFilter):
 
     policies:
         - name: ec2-with-admin-role
-          resources: aws.ec2
+          resource: aws.ec2
           filters:
             - type: iam-role
               key: RoleName
