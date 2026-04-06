@@ -19,26 +19,26 @@ class IamRoleFilter(RelatedResourceFilter):
 
     .. code-block:: yaml
 
-    policies:
-      - name: lambda-with-tagged-role
-        resource: aws.lambda
-        filters:
-          - type: iam-role
-            key: tag:Environment
-            value: Production
+        policies:
+          - name: lambda-with-tagged-role
+            resource: aws.lambda
+            filters:
+              - type: iam-role
+                key: tag:Environment
+                value: Production
 
     Find EC2 instances with roles that have specific permissions
 
     .. code-block:: yaml
 
-    policies:
-      - name: ec2-with-admin-role
-        resource: aws.ec2
-        filters:
-          - type: iam-role
-            key: RoleName
-            value: .*Admin.*
-            op: regex
+        policies:
+          - name: ec2-with-admin-role
+            resource: aws.ec2
+            filters:
+              - type: iam-role
+                key: RoleName
+                value: .*Admin.*
+                op: regex
     """
 
     schema = type_schema(
