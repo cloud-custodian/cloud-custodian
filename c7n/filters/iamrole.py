@@ -58,7 +58,7 @@ class IamRoleAlignment(Filter):
     This filter allows you to verify that a resource and its IAM role have
     matching attributes (like tags). Similar to network-location but for IAM roles.
 
-    :Example:
+    :example:
 
     Find EC2 instances where the instance tag doesn't match the role tag
 
