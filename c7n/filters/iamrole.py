@@ -15,7 +15,7 @@ class IamRoleFilter(RelatedResourceFilter):
 
     :example:
 
-    Find lambda functions using roles with specific tag:
+    Find lambda functions using roles with specific tag
 
     .. code-block:: yaml
 
@@ -60,30 +60,30 @@ class IamRoleAlignment(Filter):
 
     :Example:
 
-    Find EC2 instances where the instance tag doesn't match the role tag:
+    Find EC2 instances where the instance tag doesn't match the role tag
 
     .. code-block:: yaml
 
-      policies:
-        - name: ec2-mismatched-role-tags
-          resource: aws.ec2
-          filters:
-            - type: iam-role-alignment
-              key: tag:Environment
-              ignore:
-                - tag:Owner: Shared
+        policies:
+          - name: ec2-mismatched-role-tags
+            resource: aws.ec2
+            filters:
+              - type: iam-role-alignment
+                key: tag:Environment
+                ignore:
+                  - tag:Owner: Shared
 
-    Find lambda functions with mismatched cost center tags:
+    Find lambda functions with mismatched cost center tags
 
     .. code-block:: yaml
 
-      policies:
-        - name: lambda-role-mismatch
-          resource: aws.lambda
-          filters:
-            - type: iam-role-alignment
-              key: tag:CostCenter
-              match: not-equal
+        policies:
+          - name: lambda-role-mismatch
+            resource: aws.lambda
+            filters:
+              - type: iam-role-alignment
+                key: tag:CostCenter
+                match: not-equal
       """
 
     schema = type_schema(
@@ -93,7 +93,7 @@ class IamRoleAlignment(Filter):
             'type': 'boolean',
             'default': False,
             'description': (
-                "How to handle missing keys on elements, by default this causes"
+                "How to handle missing keys on elements, by default this causes "
                 "resources to be considered not-equal")},
           'match': {'type': 'string', 'enum': ['equal', 'not-equal', 'in'],
                     'default': 'not-equal'},
