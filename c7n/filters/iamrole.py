@@ -69,9 +69,9 @@ class IamRoleAlignment(Filter):
           resource: aws.ec2
           filters:
             - type: iam-role-alignment
-              key: "tag:Environment"
+              key: tag:Environment
               ignore:
-                - "tag:Owner": "Shared"
+                - tag:Owner: Shared
 
     Find lambda functions with mismatched cost center tags:
 
@@ -82,7 +82,7 @@ class IamRoleAlignment(Filter):
           resource: aws.lambda
           filters:
             - type: iam-role-alignment
-              key: "tag:CostCenter"
+              key: tag:CostCenter
               match: not-equal
       """
 
