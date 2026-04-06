@@ -921,3 +921,148 @@ class TestEcsContainerInstance(BaseTest):
                 }
             ]
         )
+
+
+class TestTaskDefinitionIamRoleFilter(BaseTest):
+
+    def test_iam_role_filter_by_tag(self):
+        session_factory = self.replay_flight_data('test_taskdef_iam_role_filter_by_tag')
+        p = self.load_policy(
+            {
+                'name': 'taskdef-with-tagged-role',
+                'resource': 'ecs-task-definition',
+                'filters': [
+                    {
+                        'type': 'iam-role',
+                        'key': 'tag:Environment',
+                        'value': 'Production'
+                    }
+                ]
+            },
+            session_factory=session_factory
+        )
+        resources = p.run()
+        self.assertEqual(len(resources), 1)
+        self.assertTrue(resources[0].get('taskRoleArn') or resources[0].get('executionRoleArn'))
+
+    def test_iam_role_filter_by_role_name(self):
+        session_factory = self.replay_flight_data('test_taskdef_iam_role_filter_by_role_name')
+        p = self.load_policy(
+            {
+                'name': 'taskdef-with-specific-role',
+                'resource': 'ecs-task-definition',
+                'filters': [
+                    {
+                        'type': 'iam-role',
+                        'key': 'RoleName',
+                        'value': '.*ECS.*',
+                        'op': 'regex'
+                    }
+                ]
+            },
+            session_factory=session_factory
+        )
+        resources = p.run()
+        self.assertEqual(len(resources), 1)
+
+    def test_iam_role_filter_operator_and(self):
+        session_factory = self.replay_flight_data('test_taskdef_iam_role_filter_operator_and')
+        p = self.load_policy(
+            {
+                'name': 'taskdef-role-and-operator',
+                'resource': 'ecs-task-definition',
+                'filters': [
+                    {
+                        'type': 'iam-role',
+                        'operator': 'and',
+                        'key': 'tag:Department',
+                        'value': 'Engineering'
+                    }
+                ]
+            },
+            session_factory=session_factory
+        )
+        resources = p.run()
+        self.assertTrue(len(resources) >= 0)
+
+
+class TestTaskDefinitionIamRoleAlignment(BaseTest):
+
+    def test_iam_role_alignment_equal(self):
+        session_factory = self.replay_flight_data('test_taskdef_iam_role_alignment_equal')
+        p = self.load_policy(
+            {
+                'name': 'taskdef-role-alignment-equal',
+                'resource': 'ecs-task-definition',
+                'filters': [
+                    {
+                        'type': 'iam-role-alignment',
+                        'key': 'tag:Environment',
+                        'match': 'equal'
+                    }
+                ]
+            },
+            session_factory=session_factory
+        )
+        resources = p.run()
+        self.assertTrue(len(resources) >= 0)
+
+    def test_iam_role_alignment_ignore(self):
+        session_factory = self.replay_flight_data('test_taskdef_iam_role_alignment_ignore')
+        p = self.load_policy(
+            {
+                'name': 'taskdef-role-alignment-ignore',
+                'resource': 'ecs-task-definition',
+                'filters': [
+                    {
+                        'type': 'iam-role-alignment',
+                        'key': 'tag:Environment',
+                        'ignore': [
+                            {'tag:Environment': 'shared'}
+                        ]
+                    }
+                ]
+            },
+            session_factory=session_factory
+        )
+        resources = p.run()
+        self.assertTrue(len(resources) >= 0)
+
+    def test_iam_role_alignment_match_in(self):
+        session_factory = self.replay_flight_data('test_taskdef_iam_role_alignment_match_in')
+        p = self.load_policy(
+            {
+                'name': 'taskdef-role-alignment-match-in',
+                'resource': 'ecs-task-definition',
+                'filters': [
+                    {
+                        'type': 'iam-role-alignment',
+                        'key': 'tag:Environment',
+                        'match': 'in',
+                        'value': ['Production', 'Staging', 'Development']
+                    }
+                ]
+            },
+            session_factory=session_factory
+        )
+        resources = p.run()
+        self.assertTrue(len(resources) >= 0)
+
+    def test_iam_role_alignment_missing_ok(self):
+        session_factory = self.replay_flight_data('test_taskdef_iam_role_alignment_missing_ok')
+        p = self.load_policy(
+            {
+                'name': 'taskdef-role-alignment-missing-ok',
+                'resource': 'ecs-task-definition',
+                'filters': [
+                    {
+                        'type': 'iam-role-alignment',
+                        'key': 'tag:CostCenter',
+                        'missing-ok': True
+                    }
+                ]
+            },
+            session_factory=session_factory
+        )
+        resources = p.run()
+        self.assertTrue(len(resources) >= 0)

@@ -2565,3 +2565,190 @@ class TestCapacityReservation(BaseTest):
             )
         resources = p.run()
         self.assertEqual(len(resources), 2)
+
+
+class TestEC2IamRoleFilter(BaseTest):
+    """Tests for EC2 iam-role filter"""
+
+    def test_ec2_iam_role_filter_by_tag(self):
+        """Test filtering EC2 instances by IAM role tag"""
+        session_factory = self.replay_flight_data('test_ec2_iam_role_filter_by_tag')
+        policy = self.load_policy(
+            {
+                'name': 'ec2-iam-role-filter',
+                'resource': 'ec2',
+                'filters': [
+                    {
+                        'type': 'iam-role',
+                        'key': 'tag:Environment',
+                        'value': 'Production'
+                    }
+                ]
+            },
+            session_factory=session_factory
+        )
+        resources = policy.run()
+        self.assertEqual(len(resources), 1)
+        self.assertIn('c7n:matched-iam-role', resources[0])
+        self.assertEqual(resources[0]['c7n:matched-iam-role'], ['c7n-pratyush-test'])
+
+    def test_ec2_iam_role_filter_by_role_name(self):
+        """Test filtering EC2 instances by IAM role name"""
+        factory = self.replay_flight_data('test_ec2_iam_role_filter_by_role_name')
+        policy = self.load_policy(
+            {
+                'name': 'ec2-iam-role-name',
+                'resource': 'ec2',
+                'filters': [
+                    {
+                        'type': 'iam-role',
+                        'key': 'RoleName',
+                        'value': 'c7n-pratyush-test',
+                        'op': 'eq'
+                    }
+                ]
+            },
+            session_factory=factory
+        )
+        resources = policy.run()
+        self.assertEqual(len(resources), 1)
+        self.assertEqual(
+            resources[0].get('InstanceId'), 'i-0087ce11c395e5703')
+
+
+class TestEC2IamRoleAlignment(BaseTest):
+    """Tests for EC2 iam-role-alignment filter"""
+
+    def test_ec2_iam_role_alignment_equal(self):
+        """Test iam-role-alignment with match: equal"""
+        factory = self.record_flight_data('test_ec2_iam_role_alignment_equal')
+        policy = self.load_policy(
+            {
+                'name': 'ec2-role-alignment-equal',
+                'resource': 'ec2',
+                'filters': [
+                    {
+                        'type': 'iam-role-alignment',
+                        'key': 'tag:Environment',
+                        'match': 'equal'
+                    }
+                ]
+            },
+            session_factory=factory
+        )
+        resources = policy.run()
+        self.assertEqual(len(resources), 1)
+        # No annotation when tags match
+        self.assertNotIn('c7n:IamRoleAlignment', resources[0])
+        self.assertEqual(
+            resources[0].get('InstanceId'), 'i-0087ce11c395e5703')
+
+    def test_ec2_iam_role_alignment_ne(self):
+        factory = self.replay_flight_data('test_ec2_iam_role_alignment_ne')
+        policy = self.load_policy(
+            {
+                'name': 'ec2-role-alignment-ignore',
+                'resource': 'ec2',
+                'filters': [
+                    {
+                        'type': 'iam-role-alignment',
+                        'key': 'tag:Environment',
+                        'match': 'not-equal'
+                    }
+                ]
+            },
+            session_factory=factory
+        )
+        resources = policy.run()
+        self.assertEqual(len(resources), 1)
+        self.assertIn('c7n:IamRoleAlignment', resources[0])
+        self.assertEqual(
+            resources[0].get('InstanceId'), 'i-051d5a5a07a40d2a3')
+        self.assertEqual(
+            resources[0]['c7n:IamRoleAlignment'][0],
+             {'reason': 'AttributeMismatch',
+              'key': 'tag:Environment',
+              'resource': 'Development',
+              'iam-roles': {'CloudCustodianRole': 'Production'}})
+
+    def test_ec2_iam_role_alignment_ignore(self):
+        """Test iam-role-alignment with ignore parameter"""
+        factory = self.replay_flight_data('test_ec2_iam_role_alignment_ignore')
+        policy = self.load_policy(
+            {
+                'name': 'ec2-role-alignment-ignore',
+                'resource': 'ec2',
+                'filters': [
+                    {
+                        'type': 'iam-role-alignment',
+                        'key': 'tag:Environment',
+                        'match': 'not-equal',
+                        'ignore': [
+                            {'tag:Owner': 'SharedServices'}
+                        ]
+                    }
+                ]
+            },
+            session_factory=factory
+        )
+        resources = policy.run()
+        self.assertEqual(len(resources), 1)
+        self.assertIn('c7n:IamRoleAlignment', resources[0])
+        self.assertEqual(
+            resources[0].get('InstanceId'), 'i-0087ce11c395e5703')
+        self.assertEqual(
+            resources[0]['c7n:IamRoleAlignment'][0],
+             {'reason': 'AttributeMismatch',
+              'key': 'tag:Environment',
+              'resource': 'Development',
+              'iam-roles': {'c7n-pratyush-test': 'Production'}})
+
+    def test_ec2_iam_role_alignment_match_in(self):
+        """Test iam-role-alignment with match: in"""
+        factory = self.replay_flight_data('test_ec2_iam_role_alignment_match_in')
+        policy = self.load_policy(
+            {
+                'name': 'ec2-role-alignment-in',
+                'resource': 'ec2',
+                'filters': [
+                    {
+                        'type': 'iam-role-alignment',
+                        'key': 'tag:Environment',
+                        'match': 'in',
+                        'value': ['Production', 'Staging', 'Development']
+                    }
+                ]
+            },
+            session_factory=factory
+        )
+        resources = policy.run()
+        import pdb; pdb.set_trace()
+        self.assertEqual(len(resources), 1)
+        self.assertEqual(
+            resources[0].get('InstanceId'), 'i-051d5a5a07a40d2a3')
+
+    def test_ec2_iam_role_alignment_missing_ok(self):
+        """Test iam-role-alignment with missing-ok: true"""
+        factory = self.replay_flight_data('test_ec2_iam_role_alignment_missing_ok')
+        policy = self.load_policy(
+            {
+                'name': 'ec2-role-alignment-missing-ok',
+                'resource': 'ec2',
+                'filters': [
+                    {
+                        'type': 'iam-role-alignment',
+                        'key': 'tag:CostCenter',
+                        'match': 'not-equal',
+                        'missing-ok': True
+                    }
+                ]
+            },
+            session_factory=factory
+        )
+        resources = policy.run()
+        # Should only flag actual mismatches, not missing tags
+        self.assertEqual(len(resources), 1)
+        evaluation = resources[0]['c7n:IamRoleAlignment'][0]
+        self.assertEqual(evaluation['reason'], 'AttributeMismatch')
+        self.assertEqual(
+            resources[0].get('InstanceId'), 'i-0087ce11c395e5703')
