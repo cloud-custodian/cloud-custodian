@@ -37,7 +37,7 @@ class IamRoleFilter(RelatedResourceFilter):
           filters:
             - type: iam-role
               key: RoleName
-              value: ".*Admin.*"
+              value: .*Admin.*
               op: regex
     """
 
