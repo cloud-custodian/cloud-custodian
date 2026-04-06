@@ -9,7 +9,6 @@ from c7n.filters import MetricsFilter, ValueFilter, Filter
 from c7n.filters.costhub import CostHubRecommendation
 from c7n.filters.offhours import OffHour, OnHour
 import c7n.filters.vpc as net_filters
-import c7n.filters.iamrole as iam_filters
 from c7n.manager import resources
 from c7n.utils import local_session, chunks, get_retry, type_schema, group_by, jmespath_compile
 from c7n import query, utils
@@ -858,46 +857,6 @@ class TaskDefinition(query.QueryResourceManager):
 
     def get_resources(self, ids, cache=True, augment=True):
         return super(TaskDefinition, self).get_resources(ids, cache, augment=False)
-
-
-@TaskDefinition.filter_registry.register('iam-role')
-class TaskDefinitionIamRoleFilter(iam_filters.IamRoleFilter):
-    """Filter ECS task definitions by IAM Role attributes.
-
-    Task definition can have two roles:
-    - taskRoleArn: The role used by containers in the task
-    - executionRoleArn: The role used by ECS agent to pull images and write logs
-
-    :example:
-
-    Find task definitions using roles with a specific tag:
-
-    .. code-block:: yaml
-
-    policies:
-        - name: task-definition-with-tagged-roles
-          resource: aws.ecs-task-definition
-          filters:
-            - type: iam-role
-              key: tag:Environment
-              value: Production
-    """
-
-    # Set to bypass validation, not actually used (overriden in get_related_ids)
-    RelatedIdsExpression = ""
-
-    def get_related_ids(self, resources):
-        """Override to extract role names from both task and execution role ARNs."""
-        role_names = set()
-        for r in resources:
-            if r.get('taskRoleArn'):
-                role_names.add(r['taskRoleArn'].split('/', 1)[-1])
-            if r.get('executionRoleArn'):
-                role_names.add(r['executionRoleArn'].split('/', 1)[-1])
-        return role_names
-
-
-@TaskDefinition.filter_registry.register('iam-role-alignment', iam_filters.IamRoleAlignment)
 
 
 @TaskDefinition.action_registry.register('delete')
