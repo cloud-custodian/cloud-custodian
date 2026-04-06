@@ -2722,7 +2722,6 @@ class TestEC2IamRoleAlignment(BaseTest):
             session_factory=factory
         )
         resources = policy.run()
-        import pdb; pdb.set_trace()
         self.assertEqual(len(resources), 1)
         self.assertEqual(
             resources[0].get('InstanceId'), 'i-051d5a5a07a40d2a3')

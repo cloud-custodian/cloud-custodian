@@ -140,7 +140,6 @@ class IamRoleAlignment(Filter):
 
         return results
 
-
     def filter_ignored(self, resources):
         """Filter out roles that match ignore conditions."""
         ignores = self.data.get('ignore', ())
@@ -224,7 +223,7 @@ class IamRoleAlignment(Filter):
         if not self.missing_ok and None in role_values.values():
             return
 
-        # Check if all non-None role values are in the allowed list        
+        # Check if all non-None role values are in the allowed list
         role_space = set(filter(None, role_values.values()))
         if role_space and not role_space.issubset(allowed_values):
             return
@@ -236,4 +235,4 @@ class IamRoleAlignment(Filter):
 
         if r_value is not None and r_value not in allowed_values:
             return
-        return r      
+        return r

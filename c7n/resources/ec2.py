@@ -25,7 +25,7 @@ from c7n.filters import (
 from c7n.filters.offhours import OffHour, OnHour
 from c7n.filters.costhub import CostHubRecommendation
 import c7n.filters.vpc as net_filters
-import c7n.filters.iamrole as iam_filters 
+import c7n.filters.iamrole as iam_filters
 
 from c7n.manager import resources
 from c7n import query, utils
@@ -219,8 +219,6 @@ class EC2IamRoleFilter(iam_filters.IamRoleFilter):
 
 
 @filters.register('iam-role-alignment', iam_filters.IamRoleAlignment)
-
-
 @filters.register('check-permissions')
 class ComputePermissions(CheckPermissions):
 
