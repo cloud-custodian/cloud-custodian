@@ -88,6 +88,7 @@ class IamRoleAlignment(Filter):
 
     schema = type_schema(
         'iam-role-alignment',
+        'required': ['key'],
         **{'missing-ok': {
             'type': 'boolean',
             'default': False,
@@ -100,7 +101,6 @@ class IamRoleAlignment(Filter):
               'type': 'string',
               'description': 'The attribute expression that should be matched on'},
           'ignore': {'type': 'array', 'items': {'type': 'object'}},
-          'required': ['key'],
           'value': {'type': 'array', 'items': {'type': 'string'}}
         })
     schema_alias = True
