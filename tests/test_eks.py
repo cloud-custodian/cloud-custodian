@@ -484,7 +484,7 @@ class EKS(BaseTest):
 
 
     def test_eks_metrics_filter(self):
-        factory = self.record_flight_data("test_eks_metrics")
+        factory = self.replay_flight_data("test_eks_metrics")
         p = self.load_policy(
             {'name': 'test-eks-metrics',
              'resource': 'aws.eks',
@@ -503,12 +503,13 @@ class EKS(BaseTest):
         self.assertEqual(len(resources), 1)
 
     def test_eks_addons_filter(self):
-        factory = self.record_flight_data("test_eks_addon_health")
+        factory = self.replay_flight_data("test_eks_addon_health")
         p = self.load_policy(
             {
                 'name': 'test-eks-addons',
                 'resource': 'aws.eks',
                 'filters': [
+                    {'name': 'serious-bluegrass-ladybug'},                    
                     {'type': 'addon',
                      'attrs': [
                          {'addonName': 'amazon-cloudwatch-observability'},
