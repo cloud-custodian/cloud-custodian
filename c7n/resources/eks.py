@@ -102,6 +102,7 @@ class EKS(QueryResourceManager):
         enum_spec = ('list_clusters', 'clusters', None)
         arn = 'arn'
         arn_type = 'cluster'
+        metrics_namespace = 'ContainerInsights'
         dimension = 'ClusterName'
         detail_spec = ('describe_cluster', 'name', None, 'cluster')
         id = name = 'name'
