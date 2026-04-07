@@ -1,0 +1,18 @@
+{
+    "status_code": 200,
+    "data": {
+        "ResponseMetadata": {},
+        "addons": [
+            "amazon-cloudwatch-observability",
+            "aws-ebs-csi-driver",
+            "aws-network-flow-monitoring-agent",
+            "coredns",
+            "eks-node-monitoring-agent",
+            "eks-pod-identity-agent",
+            "external-dns",
+            "kube-proxy",
+            "metrics-server",
+            "vpc-cni"
+        ]
+    }
+}

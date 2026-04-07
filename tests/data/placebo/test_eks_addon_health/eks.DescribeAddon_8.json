@@ -1,0 +1,40 @@
+{
+    "status_code": 200,
+    "data": {
+        "ResponseMetadata": {},
+        "addon": {
+            "addonName": "eks-pod-identity-agent",
+            "clusterName": "seriously-dangerous-rabbit",
+            "status": "ACTIVE",
+            "addonVersion": "v1.3.10-eksbuild.2",
+            "health": {
+                "issues": []
+            },
+            "addonArn": "arn:aws:eks:us-east-1:644160558196:addon/seriously-dangerous-rabbit/eks-pod-identity-agent/40ce9fc3-48b1-bd86-d1d2-d485c804d127",
+            "createdAt": {
+                "__class__": "datetime",
+                "year": 2026,
+                "month": 3,
+                "day": 30,
+                "hour": 12,
+                "minute": 14,
+                "second": 37,
+                "microsecond": 143000
+            },
+            "modifiedAt": {
+                "__class__": "datetime",
+                "year": 2026,
+                "month": 3,
+                "day": 30,
+                "hour": 12,
+                "minute": 27,
+                "second": 43,
+                "microsecond": 580000
+            },
+            "tags": {},
+            "namespaceConfig": {
+                "namespace": "kube-system"
+            }
+        }
+    }
+}

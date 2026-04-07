@@ -1,0 +1,45 @@
+{
+    "status_code": 200,
+    "data": {
+        "ResponseMetadata": {},
+        "addon": {
+            "addonName": "coredns",
+            "clusterName": "seriously-dangerous-rabbit",
+            "status": "DEGRADED",
+            "addonVersion": "v1.13.2-eksbuild.3",
+            "health": {
+                "issues": [
+                    {
+                        "code": "InsufficientNumberOfReplicas",
+                        "message": "The add-on is unhealthy because all deployments have all pods unscheduled no nodes available to schedule pods"
+                    }
+                ]
+            },
+            "addonArn": "arn:aws:eks:us-east-1:644160558196:addon/seriously-dangerous-rabbit/coredns/06ce9fc3-48b1-32dd-1ecd-5a05583e1b8c",
+            "createdAt": {
+                "__class__": "datetime",
+                "year": 2026,
+                "month": 3,
+                "day": 30,
+                "hour": 12,
+                "minute": 14,
+                "second": 37,
+                "microsecond": 37000
+            },
+            "modifiedAt": {
+                "__class__": "datetime",
+                "year": 2026,
+                "month": 3,
+                "day": 30,
+                "hour": 12,
+                "minute": 28,
+                "second": 14,
+                "microsecond": 675000
+            },
+            "tags": {},
+            "namespaceConfig": {
+                "namespace": "kube-system"
+            }
+        }
+    }
+}

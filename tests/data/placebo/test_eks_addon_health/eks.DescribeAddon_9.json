@@ -1,0 +1,48 @@
+{
+    "status_code": 200,
+    "data": {
+        "ResponseMetadata": {},
+        "addon": {
+            "addonName": "external-dns",
+            "clusterName": "seriously-dangerous-rabbit",
+            "status": "DEGRADED",
+            "addonVersion": "v0.20.0-eksbuild.4",
+            "health": {
+                "issues": [
+                    {
+                        "code": "InsufficientNumberOfReplicas",
+                        "message": "The add-on is unhealthy because all deployments have all pods unscheduled no nodes available to schedule pods"
+                    }
+                ]
+            },
+            "addonArn": "arn:aws:eks:us-east-1:644160558196:addon/seriously-dangerous-rabbit/external-dns/f4ce9fc3-48b0-222a-d31b-28d15079371a",
+            "createdAt": {
+                "__class__": "datetime",
+                "year": 2026,
+                "month": 3,
+                "day": 30,
+                "hour": 12,
+                "minute": 14,
+                "second": 37,
+                "microsecond": 526000
+            },
+            "modifiedAt": {
+                "__class__": "datetime",
+                "year": 2026,
+                "month": 3,
+                "day": 30,
+                "hour": 12,
+                "minute": 30,
+                "second": 21,
+                "microsecond": 912000
+            },
+            "tags": {},
+            "podIdentityAssociations": [
+                "arn:aws:eks:us-east-1:644160558196:podidentityassociation/seriously-dangerous-rabbit/a-t6xx8cjzzvwrgfsdq"
+            ],
+            "namespaceConfig": {
+                "namespace": "external-dns"
+            }
+        }
+    }
+}

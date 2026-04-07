@@ -1,0 +1,48 @@
+{
+    "status_code": 200,
+    "data": {
+        "ResponseMetadata": {},
+        "addon": {
+            "addonName": "aws-ebs-csi-driver",
+            "clusterName": "seriously-dangerous-rabbit",
+            "status": "DEGRADED",
+            "addonVersion": "v1.57.1-eksbuild.1",
+            "health": {
+                "issues": [
+                    {
+                        "code": "InsufficientNumberOfReplicas",
+                        "message": "The add-on is unhealthy because all deployments have all pods unscheduled no nodes available to schedule pods"
+                    }
+                ]
+            },
+            "addonArn": "arn:aws:eks:us-east-1:644160558196:addon/seriously-dangerous-rabbit/aws-ebs-csi-driver/84ce9fc3-48b1-f026-f874-e0db718e26bb",
+            "createdAt": {
+                "__class__": "datetime",
+                "year": 2026,
+                "month": 3,
+                "day": 30,
+                "hour": 12,
+                "minute": 14,
+                "second": 37,
+                "microsecond": 505000
+            },
+            "modifiedAt": {
+                "__class__": "datetime",
+                "year": 2026,
+                "month": 3,
+                "day": 30,
+                "hour": 12,
+                "minute": 30,
+                "second": 26,
+                "microsecond": 857000
+            },
+            "tags": {},
+            "podIdentityAssociations": [
+                "arn:aws:eks:us-east-1:644160558196:podidentityassociation/seriously-dangerous-rabbit/a-sn00w5qmgtazwoco5"
+            ],
+            "namespaceConfig": {
+                "namespace": "kube-system"
+            }
+        }
+    }
+}

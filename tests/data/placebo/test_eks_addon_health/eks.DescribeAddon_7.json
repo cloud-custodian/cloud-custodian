@@ -1,0 +1,40 @@
+{
+    "status_code": 200,
+    "data": {
+        "ResponseMetadata": {},
+        "addon": {
+            "addonName": "eks-node-monitoring-agent",
+            "clusterName": "seriously-dangerous-rabbit",
+            "status": "ACTIVE",
+            "addonVersion": "v1.6.2-eksbuild.1",
+            "health": {
+                "issues": []
+            },
+            "addonArn": "arn:aws:eks:us-east-1:644160558196:addon/seriously-dangerous-rabbit/eks-node-monitoring-agent/84ce9fc3-48b2-82df-2385-03efc6df0ccf",
+            "createdAt": {
+                "__class__": "datetime",
+                "year": 2026,
+                "month": 3,
+                "day": 30,
+                "hour": 12,
+                "minute": 14,
+                "second": 37,
+                "microsecond": 86000
+            },
+            "modifiedAt": {
+                "__class__": "datetime",
+                "year": 2026,
+                "month": 3,
+                "day": 30,
+                "hour": 12,
+                "minute": 30,
+                "second": 24,
+                "microsecond": 411000
+            },
+            "tags": {},
+            "namespaceConfig": {
+                "namespace": "kube-system"
+            }
+        }
+    }
+}
