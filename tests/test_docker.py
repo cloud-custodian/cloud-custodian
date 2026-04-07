@@ -134,7 +134,7 @@ def test_image_metadata(image_name):
     image = client.images.get(image_name)
     labels = set(image.labels)
     labels.discard("org.opencontainers.image.ref.name")
-    assert set(image.labels) == {
+    assert labels == {
         "name",
         "repository",
         "org.opencontainers.image.created",
