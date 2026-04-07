@@ -84,7 +84,7 @@ class IamRoleAlignment(Filter):
               - type: iam-role-alignment
                 key: tag:CostCenter
                 match: not-equal
-      """
+    """
 
     schema = type_schema(
         'iam-role-alignment',
@@ -170,7 +170,7 @@ class IamRoleAlignment(Filter):
         # Check for missing role attributes
         if not self.missing_ok and None in role_values.values():
             evaluation.append({
-                'resson': 'RoleMissingAttribute',
+                'reason': 'RoleMissingAttribute',
                 'key': key,
                 'iam-role': role_values})
 
