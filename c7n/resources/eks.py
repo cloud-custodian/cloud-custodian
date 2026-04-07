@@ -4,7 +4,8 @@ from typing import List
 
 import c7n.filters.vpc as net_filters
 from c7n.actions import Action
-from c7n.filters.core import ComparableVersion
+from c7n.filters.core import ComparableVersion, ListItemFilter
+from c7n.filters.metrics import MetricsFilter
 from c7n.filters.vpc import SecurityGroupFilter, SubnetFilter, VpcFilter
 from c7n.manager import resources
 from c7n.resources.aws import shape_schema
@@ -101,6 +102,7 @@ class EKS(QueryResourceManager):
         enum_spec = ('list_clusters', 'clusters', None)
         arn = 'arn'
         arn_type = 'cluster'
+        dimension = 'ClusterName'
         detail_spec = ('describe_cluster', 'name', None, 'cluster')
         id = name = 'name'
         date = 'createdAt'
@@ -110,6 +112,9 @@ class EKS(QueryResourceManager):
         'config': EKSConfigSource,
         'describe': EKSDescribeSource
     }
+
+    def get_client(self):
+        return local_session(self.session_factory).client('eks')
 
 
 @EKS.filter_registry.register('subnet')
@@ -136,6 +141,64 @@ class EKSVpcFilter(VpcFilter):
 @EKS.filter_registry.register('kms-key')
 class KmsFilter(KmsRelatedFilter):
     RelatedIdsExpression = 'encryptionConfig[].provider.keyArn'
+
+
+@EKS.filter_registry.register('addon')
+class Addon(ListItemFilter):
+    """Filter EKS Clusters by addon attributes
+
+    attrs are matched against "addon" keys per output of
+    https://docs.aws.amazon.com/eks/latest/APIReference/API_DescribeAddon.html
+
+
+    ie find clusters with container insights addon but with health issues on the addon
+
+    :example:
+
+    .. code-block:: yaml
+
+            policies:
+              - name: eks-container-metrics-unhealthy
+                resource: aws.eks
+                filters:
+                  - type: addon
+                    attrs:
+                     - addonName: amazon-cloudwatch-observability
+                     - health.issues: not-null
+
+
+    """
+    schema = type_schema(
+        'addon',
+        attrs={"$ref": "#/definitions/filters_common/list_item_attrs"},
+        count={"type": "number"},
+        count_op={"$ref": "#/definitions/filters_common/comparison_operators"}
+    )
+    annotate_items = True
+
+    def get_item_values(self, resource):
+        client = self.manager.get_client()
+        addons = []
+        addon_names = client.list_addons(clusterName=resource['name']).get('addons', ())
+        for aname in addon_names:
+            addons.append(
+                client.describe_addon(clusterName=resource['name'], addonName=aname).get('addon')
+            )
+        return list(filter(None, addons))
+
+
+@EKS.filter_registry.register('metrics')
+class EKSMetricsFilter(MetricsFilter):
+    """ EKS Cluster level metrics filter
+
+    For available cluster wide metrics see
+
+    https://docs.aws.amazon.com/AmazonCloudWatch/latest/monitoring/Container-Insights-metrics-EKS.html
+    """
+
+    def get_dimensions(self, resource):
+        return [{'Name': self.model.dimension,
+                 'Value': resource['name']}]
 
 
 @EKS.filter_registry.register('upgrade-available')
