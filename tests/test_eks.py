@@ -482,7 +482,6 @@ class EKS(BaseTest):
             self.assertEqual(len(resources), 1)
         self.assertEqual(error.exception.response['Error']['Code'], 'InvalidParameterException')
 
-
     def test_eks_metrics_filter(self):
         factory = self.replay_flight_data("test_eks_metrics")
         p = self.load_policy(
@@ -496,7 +495,7 @@ class EKS(BaseTest):
                   'op': 'less-than',
                   'value': 10}
              ]},
-            session_factory = factory
+            session_factory=factory
         )
 
         resources = p.run()
@@ -509,7 +508,7 @@ class EKS(BaseTest):
                 'name': 'test-eks-addons',
                 'resource': 'aws.eks',
                 'filters': [
-                    {'name': 'serious-bluegrass-ladybug'},                    
+                    {'name': 'serious-bluegrass-ladybug'},
                     {'type': 'addon',
                      'attrs': [
                          {'addonName': 'amazon-cloudwatch-observability'},
@@ -518,7 +517,7 @@ class EKS(BaseTest):
                      }
                 ]
             },
-            session_factory = factory
+            session_factory=factory
         )
 
         resources = p.run()
