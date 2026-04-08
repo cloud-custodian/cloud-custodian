@@ -349,8 +349,12 @@ class ServiceClient:
         Returns:
             httplib2.Http: An Http instance authorized by the credentials.
         """
-        if self._use_cached_http and hasattr(self._local, 'http'):
-            return self._local.http
+        if self._use_cached_http:
+            # Cleanup code may clear thread-local state; only reuse a non-null
+            # cached handle so we don't pass None as the request transport.
+            cached_http = getattr(self._local, 'http', None)
+            if cached_http is not None:
+                return cached_http
         if self._http_replay is not None:
             # httplib2 instance is not thread safe
             http = self._http_replay

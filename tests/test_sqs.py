@@ -80,7 +80,7 @@ def test_sqs_delete(test, sqs_delete):
     )
 
     if test.recording:
-        time.sleep(60)
+        time.sleep(5)
 
     resources = p.run()
     test.assertEqual(len(resources), 1)
@@ -174,9 +174,6 @@ def test_sqs_remove_matched(test, sqs_remove_matched):
     session_factory = test.replay_flight_data("test_sqs_remove_matched", region="us-east-2")
     queue_arn = sqs_remove_matched['aws_sqs_queue.test_sqs.arn']
     client = session_factory().client("sqs")
-
-    if test.recording:
-        time.sleep(60)
 
     p = test.load_policy(
         {
