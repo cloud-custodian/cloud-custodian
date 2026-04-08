@@ -1094,8 +1094,9 @@ class CopyInstanceTags(BaseAction):
     def initialize(self, volumes):
         instance_vol_map = {}
         for v in volumes:
-            instance_vol_map.setdefault(
-                v['Attachments'][0]['InstanceId'], []).append(v)
+            if v.get('Attachments') and 'InstanceId' in v['Attachments'][0]:
+                instance_vol_map.setdefault(
+                    v['Attachments'][0]['InstanceId'], []).append(v)
         instance_map = {
             i['InstanceId']: i for i in
             self.manager.get_resource_manager('ec2').get_resources(
