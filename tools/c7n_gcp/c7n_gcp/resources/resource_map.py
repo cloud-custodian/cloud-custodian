@@ -114,6 +114,8 @@ ResourceMap = {
     "gcp.sql-ssl-cert": "c7n_gcp.resources.sql.SqlSslCert",
     "gcp.sql-user": "c7n_gcp.resources.sql.SqlUser",
     "gcp.subnet": "c7n_gcp.resources.network.Subnet",
+    "gcp.vertex-ai-publisher": "c7n_gcp.resources.vertexai.VertexAIPublisher",
+    "gcp.vertex-ai-publisher-model": "c7n_gcp.resources.vertexai.VertexAIPublisherModel",
     "gcp.vertex-ai-batch-prediction-job": "c7n_gcp.resources.vertexai.VertexAIBatchPredictionJob",
     "gcp.vertex-ai-endpoint": "c7n_gcp.resources.vertexai.VertexAIEndpoint",
     "gcp.vertex-ai-location": "c7n_gcp.resources.vertexai.VertexAILocation",
