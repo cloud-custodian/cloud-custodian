@@ -1,5 +1,6 @@
 # Copyright The Cloud Custodian Authors.
 # SPDX-License-Identifier: Apache-2.0
+import copy
 import json
 import time
 from unittest.mock import patch
@@ -310,6 +311,30 @@ class LambdaTest(BaseTest):
              'Region': 'us-west-2',
              'Tags': {'custodian-info': 'mode=config-rule:version=0.8.44.2'},
              'Type': 'AwsLambdaFunction'})
+        shape_validate(
+            rfinding['Details']['AwsLambdaFunction'],
+            'AwsLambdaFunctionDetails', 'securityhub')
+
+    def test_post_finding_vpcconfig_strips_ipv6_dual_stack(self):
+        factory = self.replay_flight_data('test_lambda_post_finding')
+        p = self.load_policy({
+            'name': 'lambda',
+            'resource': 'aws.lambda',
+            'actions': [
+                {'type': 'post-finding',
+                 'types': [
+                     'Software and Configuration Checks/OrgStandard/abc-123']}]},
+            session_factory=factory, config={'region': 'us-west-2'})
+        functions = p.resource_manager.get_resources(['custodian-ec2-ssm-query'])
+        function = copy.deepcopy(functions[0])
+        function.setdefault('VpcConfig', {})
+        function['VpcConfig']['Ipv6AllowedForDualStack'] = True
+
+        rfinding = p.resource_manager.actions[0].format_resource(function)
+        self.assertEqual(
+            rfinding['Details']['AwsLambdaFunction']['VpcConfig'],
+            {'SecurityGroupIds': [], 'SubnetIds': []}
+        )
         shape_validate(
             rfinding['Details']['AwsLambdaFunction'],
             'AwsLambdaFunctionDetails', 'securityhub')

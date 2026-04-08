@@ -1,0 +1,121 @@
+{
+  "headers": {
+    "content-type": "application/json; charset=UTF-8",
+    "vary": "Origin, X-Origin, Referer",
+    "date": "Mon, 02 Mar 2026 20:38:51 GMT",
+    "server": "ESF",
+    "x-xss-protection": "0",
+    "x-frame-options": "SAMEORIGIN",
+    "x-content-type-options": "nosniff",
+    "alt-svc": "h3=\":443\"; ma=2592000,h3-29=\":443\"; ma=2592000",
+    "transfer-encoding": "chunked",
+    "status": "200",
+    "content-length": "3856",
+    "-content-encoding": "gzip",
+    "content-location": "https://aiplatform.googleapis.com/v1beta1/publishers/mistralai/models?alt=json"
+  },
+  "body": {
+    "publisherModels": [
+      {
+        "name": "publishers/mistralai/models/mistral-small-2503",
+        "versionId": "001",
+        "openSourceCategory": "THIRD_PARTY_OWNED_OSS",
+        "supportedActions": {
+          "requestAccess": {
+            "references": {
+              "global": {
+                "uri": "https://console.cloud.google.com/vertex-ai/model-garden/questionnaire?model=publishers/mistralai/models/mistral-small-2503&mp=mistralai/mistral-small-2503.cloudpartnerservices.goog&service=mistral-small-2503.cloudpartnerservices.goog&skip_questionnaire=true"
+              }
+            }
+          }
+        },
+        "launchStage": "GA"
+      },
+      {
+        "name": "publishers/mistralai/models/mistral-ocr-2505",
+        "versionId": "001",
+        "openSourceCategory": "PROPRIETARY",
+        "supportedActions": {
+          "requestAccess": {
+            "references": {
+              "global": {
+                "uri": "https://console.cloud.google.com/vertex-ai/model-garden/questionnaire?model=publishers/mistralai/models/mistral-ocr-2505&mp=mistralai/mistral-ocr-2505.cloudpartnerservices.goog&service=mistral-ocr-2505.cloudpartnerservices.goog&skip_questionnaire=true"
+              }
+            }
+          }
+        },
+        "launchStage": "GA"
+      },
+      {
+        "name": "publishers/mistralai/models/mistral-medium-3",
+        "versionId": "001",
+        "openSourceCategory": "PROPRIETARY",
+        "supportedActions": {
+          "openNotebook": {
+            "references": {
+              "global": {
+                "uri": "https://colab.research.google.com/github/GoogleCloudPlatform/vertex-ai-samples/blob/main/notebooks/official/generative_ai/mistralai_intro.ipynb"
+              }
+            },
+            "title": "Open Notebook"
+          },
+          "requestAccess": {
+            "references": {
+              "global": {
+                "uri": "https://console.cloud.google.com/vertex-ai/model-garden/questionnaire?model=publishers/mistralai/models/mistral-medium-3&mp=mistralai/mistral-medium-3.cloudpartnerservices.goog&service=mistral-medium-3.cloudpartnerservices.goog&skip_questionnaire=true"
+              }
+            }
+          },
+          "openNotebooks": {
+            "notebooks": [
+              {
+                "references": {
+                  "global": {
+                    "uri": "https://colab.research.google.com/github/GoogleCloudPlatform/vertex-ai-samples/blob/main/notebooks/official/generative_ai/mistralai_intro.ipynb"
+                  }
+                },
+                "title": "Open Notebook"
+              }
+            ]
+          }
+        },
+        "launchStage": "GA"
+      },
+      {
+        "name": "publishers/mistralai/models/codestral-2",
+        "versionId": "001",
+        "openSourceCategory": "PROPRIETARY",
+        "supportedActions": {
+          "openNotebook": {
+            "references": {
+              "global": {
+                "uri": "https://colab.research.google.com/github/GoogleCloudPlatform/vertex-ai-samples/blob/main/notebooks/official/generative_ai/mistralai_intro.ipynb"
+              }
+            },
+            "title": "Open Notebook"
+          },
+          "requestAccess": {
+            "references": {
+              "global": {
+                "uri": "https://console.cloud.google.com/vertex-ai/model-garden/questionnaire?model=publishers/mistralai/models/codestral-2&mp=mistralai/mistralai-869.cloudpartnerservices.goog&service=mistralai-869.cloudpartnerservices.goog&skip_questionnaire=true"
+              }
+            }
+          },
+          "openNotebooks": {
+            "notebooks": [
+              {
+                "references": {
+                  "global": {
+                    "uri": "https://colab.research.google.com/github/GoogleCloudPlatform/vertex-ai-samples/blob/main/notebooks/official/generative_ai/mistralai_intro.ipynb"
+                  }
+                },
+                "title": "Open Notebook"
+              }
+            ]
+          }
+        },
+        "launchStage": "GA"
+      }
+    ]
+  }
+}
