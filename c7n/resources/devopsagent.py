@@ -10,7 +10,6 @@ class DescribeDevOpsAgentSpace(query.DescribeSource):
     def augment(self, resources):
         client = local_session(self.manager.session_factory).client('devops-agent')
 
-        # Arn isnt natively avaliable
         def _augment(r):
             r['agentSpaceArn'] = self.manager.generate_arn('agentspace/' + r['agentSpaceId'])
             import pudb
@@ -41,8 +40,3 @@ class DevOpsAgentSpace(query.QueryResourceManager):
 
     source_mapping = {'describe': DescribeDevOpsAgentSpace, 'config': query.ConfigSource}
 
-
-DevOpsAgentSpace.filter_registry.register('marked-for-op', TagActionFilter)
-DevOpsAgentSpace.action_registry.register('mark-for-op', TagDelayedAction)
-DevOpsAgentSpace.action_registry.register('tag', Tag)
-DevOpsAgentSpace.action_registry.register('remove-tag', RemoveTag)
