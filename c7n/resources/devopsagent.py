@@ -1,22 +1,20 @@
 # Copyright The Cloud Custodian Authors.
 # SPDX-License-Identifier: Apache-2.0
-import re
 from c7n.manager import resources
 from c7n import query
-from c7n.filters.core import Filter, OPERATORS
 from c7n.tags import TagActionFilter, TagDelayedAction, Tag, RemoveTag
-from c7n.utils import local_session, type_schema
-from c7n import actions as base_actions
+from c7n.utils import local_session
 
 
 class DescribeDevOpsAgentSpace(query.DescribeSource):
-
     def augment(self, resources):
         client = local_session(self.manager.session_factory).client('devops-agent')
 
         # Arn isnt natively avaliable
         def _augment(r):
+            r['agentSpaceArn'] = self.manager.generate_arn('agentspace/' + r['agentSpaceId'])
             import pudb
+
             pudb.set_trace()
             tags = self.manager.retry(
                 client.list_tags_for_resource,
@@ -28,25 +26,20 @@ class DescribeDevOpsAgentSpace(query.DescribeSource):
         resources = super().augment(resources)
         return list(map(_augment, resources))
 
+
 @resources.register('devops-agent-space')
 class DevOpsAgentSpace(query.QueryResourceManager):
-
     class resource_type(query.TypeInfo):
         service = 'devops-agent'
+        arn_service = 'aidevops'
         enum_spec = ('list_agent_spaces', 'agentSpaces[]', None)
         id = 'agentSpaceId'
         name = 'name'
         arn = 'agentSpaceArn'
         cfn_type = 'AWS::DevOpsAgent::AgentSpace'
-        permissions = ('devops-agent:ListAgentSpaces')
+        permissions = 'devops-agent:ListAgentSpaces'
 
     source_mapping = {'describe': DescribeDevOpsAgentSpace, 'config': query.ConfigSource}
-
-    def get_arns(self, resources):
-        arns = []
-        for r in resources:
-            arns.append(self.generate_arn('agent-space/' + r['agentSpaceId']))
-        return arns
 
 
 DevOpsAgentSpace.filter_registry.register('marked-for-op', TagActionFilter)

@@ -1,0 +1,15 @@
+{
+    "status_code": 200,
+    "data": {
+        "agentSpaces": [
+            {
+                "name": "Testing Devops",
+                "description": "This is used for testing custodian.",
+                "locale": "en-US",
+                "createdAt": "2026-04-08T12:49:18.198000+00:00",
+                "updatedAt": "2026-04-08T12:49:18.198000+00:00",
+                "agentSpaceId": "2cb618c1-4241-4ae5-a696-e69490fbbb4b"
+            }
+        ]
+    }
+}
