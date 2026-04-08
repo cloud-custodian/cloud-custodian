@@ -2,47 +2,54 @@
 # SPDX-License-Identifier: Apache-2.0
 import re
 from c7n.manager import resources
-from c7n.query import QueryResourceManager, TypeInfo, DescribeSource
+from c7n import query
 from c7n.filters.core import Filter, OPERATORS
 from c7n.tags import TagActionFilter, TagDelayedAction, Tag, RemoveTag
 from c7n.utils import local_session, type_schema
 from c7n import actions as base_actions
 
 
-# ---------------------------------------------------------------------------
-# Describe source with tag augmentation
-# ---------------------------------------------------------------------------
-
-class DevOpsAgentSpaceDescribe(DescribeSource):
+class DescribeDevOpsAgentSpace(query.DescribeSource):
 
     def augment(self, resources):
-        client = local_session(self.manager.session_factory).client("devops-agent")
+        client = local_session(self.manager.session_factory).client('devops-agent')
 
+        # Arn isnt natively avaliable
         def _augment(r):
+            import pudb
+            pudb.set_trace()
             tags = self.manager.retry(
                 client.list_tags_for_resource,
-                resourceArn=r["agentSpaceArn"],
-            ).get("tags", {})
-            r["Tags"] = [{"Key": k, "Value": v} for k, v in tags.items()]
+                resourceArn=r['agentSpaceArn'],
+            ).get('tags', {})
+            r['Tags'] = [{'Key': k, 'Value': v} for k, v in tags.items()]
             return r
 
+        resources = super().augment(resources)
         return list(map(_augment, resources))
 
+@resources.register('devops-agent-space')
+class DevOpsAgentSpace(query.QueryResourceManager):
 
-# ---------------------------------------------------------------------------
-# Resource manager
-# ---------------------------------------------------------------------------
+    class resource_type(query.TypeInfo):
+        service = 'devops-agent'
+        enum_spec = ('list_agent_spaces', 'agentSpaces[]', None)
+        id = 'agentSpaceId'
+        name = 'name'
+        arn = 'agentSpaceArn'
+        cfn_type = 'AWS::DevOpsAgent::AgentSpace'
+        permissions = ('devops-agent:ListAgentSpaces')
 
-@resources.register("devops-agent-space")
-class DevOpsAgentSpace(QueryResourceManager):
+    source_mapping = {'describe': DescribeDevOpsAgentSpace, 'config': query.ConfigSource}
 
-    class resource_type(TypeInfo):
-        service = "devops-agent"
-        enum_spec = ("list_agent_spaces", "agentSpaces[]", None)
-        id = #Need to figure out
-        name = #Need to figure out
-        arn = #Need to figure out
-        cfn_type = #Need to figure out
+    def get_arns(self, resources):
+        arns = []
+        for r in resources:
+            arns.append(self.generate_arn('agent-space/' + r['agentSpaceId']))
+        return arns
 
-    source_mapping = {"describe": DevOpsAgentSpaceDescribe}
 
+DevOpsAgentSpace.filter_registry.register('marked-for-op', TagActionFilter)
+DevOpsAgentSpace.action_registry.register('mark-for-op', TagDelayedAction)
+DevOpsAgentSpace.action_registry.register('tag', Tag)
+DevOpsAgentSpace.action_registry.register('remove-tag', RemoveTag)
