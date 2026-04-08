@@ -176,6 +176,7 @@ class Addon(ListItemFilter):
         count_op={"$ref": "#/definitions/filters_common/comparison_operators"}
     )
     annotate_items = True
+    permissions = ("eks:DescribeAddon", "eks:ListAddons")
 
     def get_item_values(self, resource):
         client = self.manager.get_client()

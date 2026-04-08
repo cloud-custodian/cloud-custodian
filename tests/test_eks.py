@@ -489,7 +489,7 @@ class EKS(BaseTest):
              'resource': 'aws.eks',
              'filters': [
                  {'name': 'serious-bluegrass-ladybug'},
-                 {'type': 'addon',
+                 {'type': 'metrics',
                   'name': 'node_cpu_utilization',
                   'days': 1,
                   'op': 'less-than',
