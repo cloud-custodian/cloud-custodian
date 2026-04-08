@@ -443,7 +443,6 @@ class DynamodbTest(BaseTest):
         self.assertTrue(stream_field)
         self.assertEqual("NEW_IMAGE", stream_type)
 
-<<<<<<< dynamodb-imports
     def test_import_summary_filter(self):
         session_factory = self.replay_flight_data("test_dynamodb_import_summary_filter")
         p = self.load_policy(
@@ -454,7 +453,20 @@ class DynamodbTest(BaseTest):
                     {
                         "type": "import-summary",
                         "key": "ImportStatus",
-=======
+                        "op": "in",
+                        "value": ["COMPLETED"]
+                    }
+                ]
+            },
+            session_factory=session_factory,
+        )
+        resources = p.run()
+        self.assertEqual(len(resources), 1)
+        self.assertTrue("c7n:ImportSummary" in resources[0])
+
+        imports = resources[0]["c7n:ImportSummary"]
+        self.assertEqual(len(imports), 1)
+
     def test_export_description_filter(self):
         session_factory = self.replay_flight_data("test_dynamodb_export_description_filter")
         p = self.load_policy(
@@ -465,7 +477,6 @@ class DynamodbTest(BaseTest):
                     {
                         "type": "export-description",
                         "key": "ExportStatus",
->>>>>>> main
                         "op": "in",
                         "value": ["COMPLETED"]
                     }
@@ -475,17 +486,10 @@ class DynamodbTest(BaseTest):
         )
         resources = p.run()
         self.assertEqual(len(resources), 1)
-<<<<<<< dynamodb-imports
-        self.assertTrue("c7n:ImportSummary" in resources[0])
-
-        imports = resources[0]["c7n:ImportSummary"]
-        self.assertEqual(len(imports), 1)
-=======
         self.assertTrue("c7n:ExportDescription" in resources[0])
 
         exports = resources[0]["c7n:ExportDescription"]
         self.assertEqual(len(exports), 2)
->>>>>>> main
 
 
 class DynamoDbAccelerator(BaseTest):
