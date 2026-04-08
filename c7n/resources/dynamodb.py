@@ -216,16 +216,8 @@ class ExportDescriptionFilter(ValueFilter):
 
     def augment(self, resources):
         client = local_session(self.manager.session_factory).client('dynamodb')
-        # cache = self.manager._cache
 
         for table in resources:
-            # table_cache_key = f"dynamodb_exports:{table['TableArn']}"
-            # cached_exports = cache.get(table_cache_key)
-
-            # if cached_exports:
-            #     table[self.annotation_key] = cached_exports
-            #     continue
-
             exports = []
             next_token = None
 
@@ -247,7 +239,6 @@ class ExportDescriptionFilter(ValueFilter):
                     break
 
             table[self.annotation_key] = exports
-            # cache.save(table_cache_key, exports)
 
 
 @Table.action_registry.register('set-continuous-backup')
