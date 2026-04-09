@@ -16,6 +16,31 @@ class RunServiceTest(BaseTest):
         assert len(resources) == 1
         assert resources[0]["metadata"]["name"] == "hello"
 
+    def test_set_labels(self):
+        project_id = 'cloud-custodian'
+        factory = self.replay_flight_data(
+            "gcp-cloud-run-service-set-labels", project_id=project_id
+        )
+        p = self.load_policy(
+            {
+                'name': 'cloud-run-svc-set-labels',
+                'resource': 'gcp.cloud-run-service',
+                'filters': [
+                    {'type': 'value',
+                     'key': 'metadata.name',
+                     'value': 'hello'}
+                ],
+                'actions': [
+                    {'type': 'set-labels',
+                     'labels': {'environment': 'test'}}
+                ]
+            },
+            session_factory=factory,
+        )
+        resources = p.run()
+        assert len(resources) == 1
+        assert resources[0]['metadata']['name'] == 'hello'
+
     def test_filter(self):
 
         factory = self.replay_flight_data("gcp-cloud-run-service")
@@ -65,6 +90,31 @@ class JobServiceTest(BaseTest):
         resources = p.run()
         assert len(resources) == 1
         assert resources[0]["metadata"]["name"] == "job"
+
+    def test_set_labels(self):
+        project_id = 'cloud-custodian'
+        factory = self.replay_flight_data(
+            "gcp-cloud-run-job-set-labels", project_id=project_id
+        )
+        p = self.load_policy(
+            {
+                'name': 'cloud-run-job-set-labels',
+                'resource': 'gcp.cloud-run-job',
+                'filters': [
+                    {'type': 'value',
+                     'key': 'metadata.name',
+                     'value': 'job'}
+                ],
+                'actions': [
+                    {'type': 'set-labels',
+                     'labels': {'environment': 'test'}}
+                ]
+            },
+            session_factory=factory,
+        )
+        resources = p.run()
+        assert len(resources) == 1
+        assert resources[0]['metadata']['name'] == 'job'
 
 
 class RevisionServiceTest(BaseTest):
