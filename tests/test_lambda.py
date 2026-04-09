@@ -945,4 +945,4 @@ class TestLambdaIamRoleTagMirror(BaseTest):
         self.assertEqual(resources[0].get('FunctionName'), 'test-kms')
         self.assertIn('c7n:IamRoleTagMirror', resources[0])
         evaluation = resources[0]['c7n:IamRoleTagMirror'][0]
-        self.assertEqual(evaluation['reason'], 'AttributeMismatch')
+        self.assertEqual(evaluation['reason'], 'TagMismatch')
