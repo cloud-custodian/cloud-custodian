@@ -2666,7 +2666,7 @@ class TestEC2IamRoleTagMirro(BaseTest):
             resources[0].get('InstanceId'), 'i-051d5a5a07a40d2a3')
         self.assertEqual(
             resources[0]['c7n:IamRoleTagMirror'][0],
-             {'reason': 'AttributeMismatch',
+             {'reason': 'TagMismatch',
               'key': 'tag:Environment',
               'resource': 'Development',
               'iam-roles': {'CloudCustodianRole': 'Production'}})
@@ -2698,7 +2698,7 @@ class TestEC2IamRoleTagMirro(BaseTest):
             resources[0].get('InstanceId'), 'i-0087ce11c395e5703')
         self.assertEqual(
             resources[0]['c7n:IamRoleTagMirror'][0],
-             {'reason': 'AttributeMismatch',
+             {'reason': 'TagMismatch',
               'key': 'tag:Environment',
               'resource': 'Development',
               'iam-roles': {'c7n-pratyush-test': 'Production'}})
@@ -2748,6 +2748,6 @@ class TestEC2IamRoleTagMirro(BaseTest):
         # Should only flag actual mismatches, not missing tags
         self.assertEqual(len(resources), 1)
         evaluation = resources[0]['c7n:IamRoleTagMirror'][0]
-        self.assertEqual(evaluation['reason'], 'AttributeMismatch')
+        self.assertEqual(evaluation['reason'], 'TagMismatch')
         self.assertEqual(
             resources[0].get('InstanceId'), 'i-0087ce11c395e5703')
