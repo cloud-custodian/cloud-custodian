@@ -99,7 +99,7 @@ class IamRoleTagMirror(Filter):
                     'default': 'not-equal'},
           'key': {
               'type': 'string',
-              'description': 'The attribute expression that should be matched on'},
+              'description': 'The tag key that should be matched between resource and role'},
           'ignore': {'type': 'array', 'items': {'type': 'object'}},
           'value': {'type': 'array', 'items': {'type': 'string'}}
         })
@@ -162,31 +162,31 @@ class IamRoleTagMirror(Filter):
 
         evaluation = []
 
-        # Check IAM role attributes
+        # Check IAM role tag values
         role_values = {
             rrole[self.role_model.id]: self.iam_role_filter.get_resource_value(key, rrole)
             for rrole in resource_roles}
 
-        # Check for missing role attributes
+        # Check for missing role tags
         if not self.missing_ok and None in role_values.values():
             evaluation.append({
-                'reason': 'RoleMissingAttribute',
+                'reason': 'RoleMissingTag',
                 'key': key,
                 'iam-role': role_values})
 
         role_space = set(filter(None, role_values.values()))
 
-        # Check resource attributes
+        # Check resource tag values
         r_value = self.vf.get_resource_value(key, r)
 
-        # Check for missing resource attributes
+        # Check for missing resource tag
         if not self.missing_ok and r_value is None:
             evaluation.append({
-                'reason': 'ResourceMissingAttribute',
+                'reason': 'ResourceMissingTag',
                 'key': key,
                 'resource': r_value})
 
-        # Check for value mismatch (only if both resource and roles have values)
+        # Check for tag value mismatch (only if both resource and roles have values)
         if resource_roles and r_value is not None and role_space:
             mismatched_roles = {
                 role_id: role_value
@@ -195,7 +195,7 @@ class IamRoleTagMirror(Filter):
             }
             if mismatched_roles:
                 evaluation.append({
-                    'reason': 'AttributeMismatch',
+                    'reason': 'TagMismatch',
                     'key': key,
                     'resource': r_value,
                     'iam-roles': mismatched_roles})
