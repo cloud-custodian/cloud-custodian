@@ -169,6 +169,78 @@ class HasStatementTable(HasStatementFilter):
         return super().process(resources)
 
 
+@Table.filter_registry.register('export-description')
+class ExportDescriptionFilter(ValueFilter):
+    """Filter for DynamoDB table exports.
+
+    Fetches export descriptions for each table and allows filtering
+    on the export description details.
+
+    :example:
+
+    .. code-block:: yaml
+
+        policies:
+          - name: dynamodb-exports-in-progress
+            resource: aws.dynamodb-table
+            filters:
+              - type: export-description
+                key: ExportStatus
+                value: IN_PROGRESS
+          - name: dynamodb-exports-failed
+            resource: aws.dynamodb-table
+            filters:
+              - type: export-description
+                key: ExportStatus
+                value: FAILED
+    """
+
+    annotation_key = 'c7n:ExportDescription'
+    schema = type_schema('export-description', rinherit=ValueFilter.schema)
+    permissions = ('dynamodb:ListExports', 'dynamodb:DescribeExport',)
+
+    def process(self, resources, event=None):
+        unannotated = [r for r in resources if self.annotation_key not in r]
+        if unannotated:
+            self.augment(unannotated)
+
+        results = []
+        for r in resources:
+            exports = r.get(self.annotation_key, [])
+            matched = [export for export in exports if self.match(export)]
+            if matched:
+                r[self.annotation_key] = matched
+                results.append(r)
+
+        return results
+
+    def augment(self, resources):
+        client = local_session(self.manager.session_factory).client('dynamodb')
+
+        for table in resources:
+            exports = []
+            next_token = None
+
+            while True:
+                params = {'TableArn': table['TableArn']}
+                if next_token:
+                    params['NextToken'] = next_token
+
+                response = client.list_exports(**params)
+
+                for export_summary in response.get('ExportSummaries', []):
+                    export_details = client.describe_export(
+                        ExportArn=export_summary['ExportArn'])
+                    exports.append(export_details.get('ExportDescription', {}))
+
+                next_token = response.get('NextToken')
+
+                if not next_token:
+                    break
+
+            table[self.annotation_key] = exports
+
+
 @Table.action_registry.register('set-continuous-backup')
 class TableContinuousBackupAction(BaseAction):
     """Set continuous backups and point in time recovery (PITR) on a dynamodb table.
