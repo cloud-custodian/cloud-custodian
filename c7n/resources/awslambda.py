@@ -127,7 +127,7 @@ class LambdaIamRoleFilter(iam_filters.IamRoleFilter):
         return {arn.rsplit('/', 1)[-1] for arn in role_arns if arn}
 
 
-AWSLambda.filter_registry.register('iam-role-alignment', iam_filters.IamRoleAlignment)
+AWSLambda.filter_registry.register('iam-role-tag-mirror', iam_filters.IamRoleTagMirror)
 
 
 @AWSLambda.filter_registry.register('check-permissions')

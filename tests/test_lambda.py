@@ -919,19 +919,19 @@ class TestLambdaIamRoleFilter(BaseTest):
         self.assertEqual(resources[0].get('FunctionName'), 'hello_world')
 
 
-class TestLambdaIamRoleAlignment(BaseTest):
-    """Tests for Lambda iam-role-alignment filter"""
+class TestLambdaIamRoleTagMirror(BaseTest):
+    """Tests for Lambda iam-role-tag-mirror filter"""
 
-    def test_lambda_iam_role_alignment_ne(self):
-        """Test iam-role-alignment with missing-ok: true"""
-        factory = self.replay_flight_data('test_lambda_iam_role_alignment_ne')
+    def test_lambda_iam_role_tag_mirror_ne(self):
+        """Test iam-role-tag-mirror with missing-ok: true"""
+        factory = self.replay_flight_data('test_lambda_iam_role_tag_mirror_ne')
         policy = self.load_policy(
             {
-                'name': 'lambda-role-alignment-not-equal',
+                'name': 'lambda-role-tag-mirror-not-equal',
                 'resource': 'lambda',
                 'filters': [
                     {
-                        'type': 'iam-role-alignment',
+                        'type': 'iam-role-tag-mirror',
                         'key': 'tag:Compliance',
                         'match': 'not-equal'
                     }
@@ -943,6 +943,6 @@ class TestLambdaIamRoleAlignment(BaseTest):
         resources = policy.run()
         self.assertEqual(len(resources), 1)
         self.assertEqual(resources[0].get('FunctionName'), 'test-kms')
-        self.assertIn('c7n:IamRoleAlignment', resources[0])
-        evaluation = resources[0]['c7n:IamRoleAlignment'][0]
+        self.assertIn('c7n:IamRoleTagMirror', resources[0])
+        evaluation = resources[0]['c7n:IamRoleTagMirror'][0]
         self.assertEqual(evaluation['reason'], 'AttributeMismatch')

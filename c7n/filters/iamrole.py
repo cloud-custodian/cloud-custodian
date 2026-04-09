@@ -52,15 +52,15 @@ class IamRoleFilter(RelatedResourceFilter):
     AnnotationKey = "matched-iam-role"
 
 
-class IamRoleAlignment(Filter):
-    """Determine alignment of IAM role attributes and resource attributes.
+class IamRoleTagMirror(Filter):
+    """Verify that resource tags mirror their IAM role tags.
 
-    This filter allows you to verify that a resource and its IAM role have
-    matching attributes (like tags). Similar to network-location but for IAM roles.
+    This filter checks that a resource and its IAM role have matching tag values.
+    Useful for enforcing tag consistency between resources and their roles.
 
     :example:
 
-    Find EC2 instances where the instance tag doesn't match the role tag
+    Find EC2 instances where the instance Environment tag doesn't match the role tag
 
     .. code-block:: yaml
 
@@ -68,7 +68,7 @@ class IamRoleAlignment(Filter):
           - name: ec2-mismatched-role-tags
             resource: aws.ec2
             filters:
-              - type: iam-role-alignment
+              - type: iam-role-tag-mirror
                 key: tag:Environment
                 ignore:
                   - tag:Owner: Shared
@@ -78,16 +78,16 @@ class IamRoleAlignment(Filter):
     .. code-block:: yaml
 
         policies:
-          - name: lambda-role-mismatch
+          - name: lambda-role-tag-mismatch
             resource: aws.lambda
             filters:
-              - type: iam-role-alignment
+              - type: iam-role-tag-mirror
                 key: tag:CostCenter
                 match: not-equal
     """
 
     schema = type_schema(
-        'iam-role-alignment',
+        'iam-role-tag-mirror',
         required=['key'],
         **{'missing-ok': {
             'type': 'boolean',
@@ -110,7 +110,7 @@ class IamRoleAlignment(Filter):
         rfilters = self.manager.filter_registry.keys()
         if 'iam-role' not in rfilters:
             raise PolicyValidationError(
-                f"iam-role-alignment requires iam-role filter on {self.manager.data}")
+                f"iam-role-tag-mirror requires iam-role filter on {self.manager.data}")
         return self
 
     def process(self, resources, event=None):
@@ -202,7 +202,7 @@ class IamRoleAlignment(Filter):
 
         # Return resources based on match type
         if self.match == 'not-equal' and evaluation:
-            r['c7n:IamRoleAlignment'] = evaluation
+            r['c7n:IamRoleTagMirror'] = evaluation
             return r
         elif self.match == 'equal' and not evaluation:
             return r

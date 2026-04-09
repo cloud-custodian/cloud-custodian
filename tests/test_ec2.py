@@ -2616,19 +2616,19 @@ class TestEC2IamRoleFilter(BaseTest):
             resources[0].get('InstanceId'), 'i-0087ce11c395e5703')
 
 
-class TestEC2IamRoleAlignment(BaseTest):
-    """Tests for EC2 iam-role-alignment filter"""
+class TestEC2IamRoleTagMirro(BaseTest):
+    """Tests for EC2 iam-role-tag-mirror filter"""
 
-    def test_ec2_iam_role_alignment_equal(self):
-        """Test iam-role-alignment with match: equal"""
-        factory = self.replay_flight_data('test_ec2_iam_role_alignment_equal')
+    def test_ec2_iam_role_tag_mirror_equal(self):
+        """Test iam-role-tag-mirror with match: equal"""
+        factory = self.replay_flight_data('test_ec2_iam_role_tag_mirror_equal')
         policy = self.load_policy(
             {
-                'name': 'ec2-role-alignment-equal',
+                'name': 'ec2-role-tag-mirror-equal',
                 'resource': 'ec2',
                 'filters': [
                     {
-                        'type': 'iam-role-alignment',
+                        'type': 'iam-role-tag-mirror',
                         'key': 'tag:Environment',
                         'match': 'equal'
                     }
@@ -2639,19 +2639,19 @@ class TestEC2IamRoleAlignment(BaseTest):
         resources = policy.run()
         self.assertEqual(len(resources), 1)
         # No annotation when tags match
-        self.assertNotIn('c7n:IamRoleAlignment', resources[0])
+        self.assertNotIn('c7n:IamRoleTagMirror', resources[0])
         self.assertEqual(
             resources[0].get('InstanceId'), 'i-051d5a5a07a40d2a3')
 
-    def test_ec2_iam_role_alignment_ne(self):
-        factory = self.replay_flight_data('test_ec2_iam_role_alignment_ne')
+    def test_ec2_iam_role_tag_mirror_ne(self):
+        factory = self.replay_flight_data('test_ec2_iam_role_tag_mirror_ne')
         policy = self.load_policy(
             {
-                'name': 'ec2-role-alignment-ignore',
+                'name': 'ec2-role-tag-mirror-ignore',
                 'resource': 'ec2',
                 'filters': [
                     {
-                        'type': 'iam-role-alignment',
+                        'type': 'iam-role-tag-mirror',
                         'key': 'tag:Environment',
                         'match': 'not-equal'
                     }
@@ -2661,26 +2661,26 @@ class TestEC2IamRoleAlignment(BaseTest):
         )
         resources = policy.run()
         self.assertEqual(len(resources), 1)
-        self.assertIn('c7n:IamRoleAlignment', resources[0])
+        self.assertIn('c7n:IamRoleTagMirror', resources[0])
         self.assertEqual(
             resources[0].get('InstanceId'), 'i-051d5a5a07a40d2a3')
         self.assertEqual(
-            resources[0]['c7n:IamRoleAlignment'][0],
+            resources[0]['c7n:IamRoleTagMirror'][0],
              {'reason': 'AttributeMismatch',
               'key': 'tag:Environment',
               'resource': 'Development',
               'iam-roles': {'CloudCustodianRole': 'Production'}})
 
-    def test_ec2_iam_role_alignment_ignore(self):
-        """Test iam-role-alignment with ignore parameter"""
-        factory = self.replay_flight_data('test_ec2_iam_role_alignment_ignore')
+    def test_ec2_iam_role_tag_mirror_ignore(self):
+        """Test iam-role-tag-mirror with ignore parameter"""
+        factory = self.replay_flight_data('test_ec2_iam_role_tag_mirror_ignore')
         policy = self.load_policy(
             {
-                'name': 'ec2-role-alignment-ignore',
+                'name': 'ec2-role-tag-mirror-ignore',
                 'resource': 'ec2',
                 'filters': [
                     {
-                        'type': 'iam-role-alignment',
+                        'type': 'iam-role-tag-mirror',
                         'key': 'tag:Environment',
                         'match': 'not-equal',
                         'ignore': [
@@ -2693,26 +2693,26 @@ class TestEC2IamRoleAlignment(BaseTest):
         )
         resources = policy.run()
         self.assertEqual(len(resources), 1)
-        self.assertIn('c7n:IamRoleAlignment', resources[0])
+        self.assertIn('c7n:IamRoleTagMirror', resources[0])
         self.assertEqual(
             resources[0].get('InstanceId'), 'i-0087ce11c395e5703')
         self.assertEqual(
-            resources[0]['c7n:IamRoleAlignment'][0],
+            resources[0]['c7n:IamRoleTagMirror'][0],
              {'reason': 'AttributeMismatch',
               'key': 'tag:Environment',
               'resource': 'Development',
               'iam-roles': {'c7n-pratyush-test': 'Production'}})
 
-    def test_ec2_iam_role_alignment_match_in(self):
-        """Test iam-role-alignment with match: in"""
-        factory = self.replay_flight_data('test_ec2_iam_role_alignment_match_in')
+    def test_ec2_iam_role_tag_mirror_match_in(self):
+        """Test iam-role-tag-mirror with match: in"""
+        factory = self.replay_flight_data('test_ec2_iam_role_tag_mirror_match_in')
         policy = self.load_policy(
             {
-                'name': 'ec2-role-alignment-in',
+                'name': 'ec2-role-tag-mirror-in',
                 'resource': 'ec2',
                 'filters': [
                     {
-                        'type': 'iam-role-alignment',
+                        'type': 'iam-role-tag-mirror',
                         'key': 'tag:Environment',
                         'match': 'in',
                         'value': ['Production', 'Staging', 'Development']
@@ -2726,16 +2726,16 @@ class TestEC2IamRoleAlignment(BaseTest):
         self.assertEqual(
             resources[0].get('InstanceId'), 'i-051d5a5a07a40d2a3')
 
-    def test_ec2_iam_role_alignment_missing_ok(self):
-        """Test iam-role-alignment with missing-ok: true"""
-        factory = self.replay_flight_data('test_ec2_iam_role_alignment_missing_ok')
+    def test_ec2_iam_role_tag_mirror_missing_ok(self):
+        """Test iam-role-tag-mirror with missing-ok: true"""
+        factory = self.replay_flight_data('test_ec2_iam_role_tag_mirror_missing_ok')
         policy = self.load_policy(
             {
-                'name': 'ec2-role-alignment-missing-ok',
+                'name': 'ec2-role-tag-mirror-missing-ok',
                 'resource': 'ec2',
                 'filters': [
                     {
-                        'type': 'iam-role-alignment',
+                        'type': 'iam-role-tag-mirror',
                         'key': 'tag:CostCenter',
                         'match': 'not-equal',
                         'missing-ok': True
@@ -2747,7 +2747,7 @@ class TestEC2IamRoleAlignment(BaseTest):
         resources = policy.run()
         # Should only flag actual mismatches, not missing tags
         self.assertEqual(len(resources), 1)
-        evaluation = resources[0]['c7n:IamRoleAlignment'][0]
+        evaluation = resources[0]['c7n:IamRoleTagMirror'][0]
         self.assertEqual(evaluation['reason'], 'AttributeMismatch')
         self.assertEqual(
             resources[0].get('InstanceId'), 'i-0087ce11c395e5703')
