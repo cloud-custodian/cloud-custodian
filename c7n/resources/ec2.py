@@ -218,7 +218,8 @@ class EC2IamRoleFilter(iam_filters.IamRoleFilter):
         return role_names
 
 
-@filters.register('iam-role-tag-mirror', iam_filters.IamRoleTagMirror)
+filters.register('iam-role-tag-mirror', iam_filters.IamRoleTagMirror)
+
 
 @filters.register('check-permissions')
 class ComputePermissions(CheckPermissions):
