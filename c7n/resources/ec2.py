@@ -49,6 +49,44 @@ class DescribeEC2(query.DescribeSource):
             query_params.update(q)
         return query_params
 
+    @staticmethod
+    def _flatten_reservations(reservations):
+        instances = []
+        for r in (reservations or []):
+            rid = r.get('ReservationId')
+            for i in r.get('Instances', []):
+                i['ReservationId'] = rid
+                instances.append(i)
+        return instances
+
+    def _get_client(self):
+        m = self.query.resolve(self.manager.resource_type)
+        if self.manager.get_client:
+            return self.manager.get_client()
+        return utils.local_session(
+            self.manager.session_factory).client(m.service, self.manager.config.region)
+
+    def resources(self, query):
+        m = self.query.resolve(self.manager.resource_type)
+        client = self._get_client()
+        enum_op, _path, extra_args = m.enum_spec
+        params = dict(query)
+        if extra_args:
+            params = {**extra_args, **params}
+        reservations = self.query._invoke_client_enum(
+            client, enum_op, params, 'Reservations[]',
+            getattr(self.manager, 'retry', None)) or []
+        return self._flatten_reservations(reservations)
+
+    def get_resources(self, ids, cache=True):
+        m = self.query.resolve(self.manager.resource_type)
+        client = self._get_client()
+        params = {m.filter_name: ids}
+        reservations = self.query._invoke_client_enum(
+            client, m.enum_spec[0], params, 'Reservations[]',
+            getattr(self.manager, 'retry', None)) or []
+        return self._flatten_reservations(reservations)
+
     def augment(self, resources):
         """EC2 API and AWOL Tags
 
