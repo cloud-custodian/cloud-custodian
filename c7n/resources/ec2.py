@@ -101,9 +101,27 @@ class DescribeEC2(query.DescribeSource):
         name), so there isn't a good default to ensure that we will
         always get tags from describe_x calls.
         """
+        if not resources:
+            return resources
+
+        # Inject ReservationId from reservation data
+        client = utils.local_session(self.manager.session_factory).client('ec2')
+        instance_ids = [r['InstanceId'] for r in resources]
+        reservation_map = {}
+        for id_chunk in utils.chunks(instance_ids, 500):
+            resp = self.manager.retry(
+                client.describe_instances,
+                InstanceIds=list(id_chunk))
+            for reservation in resp.get('Reservations', []):
+                rid = reservation.get('ReservationId')
+                for inst in reservation.get('Instances', []):
+                    reservation_map[inst['InstanceId']] = rid
+        for r in resources:
+            r['ReservationId'] = reservation_map.get(r['InstanceId'])
+
         # First if we're in event based lambda go ahead and skip this,
         # tags can't be trusted in ec2 instances immediately post creation.
-        if not resources or self.manager.data.get(
+        if self.manager.data.get(
                 'mode', {}).get('type', '') in (
                     'cloudtrail', 'ec2-instance-state'):
             return resources
