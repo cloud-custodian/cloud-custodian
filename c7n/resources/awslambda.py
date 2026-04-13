@@ -486,7 +486,9 @@ class LambdaPostFinding(PostFinding):
             r['Layers'] = {
                 'Arn': r['Layers'][0]['Arn'],
                 'CodeSize': r['Layers'][0]['CodeSize']}
-        details.get('VpcConfig', {}).pop('VpcId', None)
+        if 'VpcConfig' in details:
+            details['VpcConfig'] = select_keys(
+                details['VpcConfig'], ['SecurityGroupIds', 'SubnetIds'])
 
         if 'Code' in r and r['Code'].get('RepositoryType') == "S3":
             parsed = urlparse(r['Code']['Location'])

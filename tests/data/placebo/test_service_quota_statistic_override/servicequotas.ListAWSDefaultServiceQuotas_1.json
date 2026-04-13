@@ -1,0 +1,39 @@
+{
+    "status_code": 200,
+    "data": {
+        "Quotas": [
+            {
+                "ServiceCode": "emr-serverless",
+                "ServiceName": "Amazon EMR Serverless",
+                "QuotaArn": "arn:aws:servicequotas:us-east-1:123456789012:emr-serverless/L-D05C8A75",
+                "QuotaCode": "L-D05C8A75",
+                "QuotaName": "Max concurrent vCPUs per account",
+                "Value": 4000.0,
+                "Unit": "None",
+                "Adjustable": true,
+                "GlobalQuota": false,
+                "UsageMetric": {
+                    "MetricNamespace": "AWS/Usage",
+                    "MetricName": "ResourceCount",
+                    "MetricDimensions": {
+                        "Class": "None",
+                        "Resource": "vCPU",
+                        "Service": "EMR Serverless",
+                        "Type": "Resource"
+                    },
+                    "MetricStatisticRecommendation": "Sum"
+                },
+                "Period": {
+                    "PeriodValue": 1,
+                    "PeriodUnit": "MINUTE"
+                }
+            }
+        ],
+        "ResponseMetadata": {
+            "RequestId": "b2c3d4e5-f6a7-8901-bcde-f12345678901",
+            "HTTPStatusCode": 200,
+            "HTTPHeaders": {},
+            "RetryAttempts": 0
+        }
+    }
+}

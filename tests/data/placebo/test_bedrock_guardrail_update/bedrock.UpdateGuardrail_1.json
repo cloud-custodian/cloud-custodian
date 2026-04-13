@@ -1,0 +1,19 @@
+{
+    "status_code": 202,
+    "data": {
+        "ResponseMetadata": {},
+        "guardrailId": "bskwryvo9mu5",
+        "guardrailArn": "arn:aws:bedrock:us-east-1:644160558196:guardrail/bskwryvo9mu5",
+        "version": "DRAFT",
+        "updatedAt": {
+            "__class__": "datetime",
+            "year": 2026,
+            "month": 3,
+            "day": 2,
+            "hour": 9,
+            "minute": 29,
+            "second": 59,
+            "microsecond": 917218
+        }
+    }
+}

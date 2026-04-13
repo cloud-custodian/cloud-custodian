@@ -466,3 +466,196 @@ def test_bedrock_inference_profile_delete_conflict(test, caplog):
         'Unable to delete inference profile arn:aws:bedrock:us-east-1:644160558196:application-inference-profile/1jxlkskto2ug',  # noqa
         caplog.text
     )
+
+
+@terraform('bedrock_guardrail')
+def test_bedrock_guardrail(test, bedrock_guardrail):
+    session_factory = test.replay_flight_data('test_bedrock_guardrail')
+    test.assertNotEqual(
+        bedrock_guardrail[
+            'aws_bedrock_guardrail.test_guardrail.guardrail_arn'
+        ],
+        None,
+    )
+    p = test.load_policy(
+        {
+            'name': 'bedrock-guardrail-test',
+            'resource': 'bedrock-guardrail',
+        }, session_factory=session_factory
+    )
+    resources = p.run()
+    test.assertEqual(len(resources), 1)
+    test.assertIn('Tags', resources[0])
+    test.assertEqual(
+        resources[0]['arn'],
+        bedrock_guardrail[
+            'aws_bedrock_guardrail.test_guardrail.guardrail_arn'
+        ],
+    )
+
+
+@terraform('bedrock_guardrail')
+def test_bedrock_guardrail_absent_policy(test, bedrock_guardrail):
+    session_factory = test.replay_flight_data('test_bedrock_guardrail_absent_policy')
+    test.assertNotEqual(
+        bedrock_guardrail[
+            'aws_bedrock_guardrail.test_guardrail.guardrail_arn'
+        ],
+        None,
+    )
+
+    content_policy = test.load_policy(
+        {
+            'name': 'bedrock-guardrail-missing-content-policy',
+            'resource': 'bedrock-guardrail',
+            'filters': [
+                {'type': 'value', 'key': 'contentPolicy', 'value': 'absent'},
+            ],
+        }, session_factory=session_factory
+    )
+    resources_missing_content_policy = content_policy.run()
+    test.assertEqual(len(resources_missing_content_policy), 0)
+
+    word_policy = test.load_policy(
+        {
+            'name': 'bedrock-guardrail-missing-word-policy',
+            'resource': 'bedrock-guardrail',
+            'filters': [
+                {'type': 'value', 'key': 'wordPolicy', 'value': 'absent'},
+            ],
+        }, session_factory=session_factory
+    )
+    resource_missing_word_policy = word_policy.run()
+    test.assertEqual(len(resource_missing_word_policy), 1)
+
+
+@terraform('bedrock_guardrail_tag_actions')
+def test_bedrock_guardrail_tag_actions(test, bedrock_guardrail_tag_actions):
+    session_factory = test.replay_flight_data('test_bedrock_guardrail_tag_actions')
+    client = session_factory().client('bedrock')
+    test.assertNotEqual(
+        bedrock_guardrail_tag_actions[
+            'aws_bedrock_guardrail.test_guardrail.guardrail_arn'
+        ],
+        None,
+    )
+
+    guardrail_arn = (
+        bedrock_guardrail_tag_actions[
+            'aws_bedrock_guardrail.test_guardrail.guardrail_arn'
+        ]
+    )
+
+    # Test adding tags
+    p = test.load_policy(
+        {
+            'name': 'bedrock-app-guardrail-tag',
+            'resource': 'bedrock-guardrail',
+            'filters': [
+                {'tag:NewTag': 'absent'},
+            ],
+            'actions': [
+                {
+                    'type': 'tag',
+                    'tags': {'NewTag': 'NewValue', 'AnotherTag': 'AnotherValue'}
+                }
+            ]
+        }, session_factory=session_factory
+    )
+    resources = p.run()
+    test.assertEqual(len(resources), 1)
+
+    # Verify tags were added
+    tags = client.list_tags_for_resource(resourceARN=guardrail_arn)['tags']
+    tag_dict = {t['key']: t['value'] for t in tags}
+    test.assertEqual(tag_dict['NewTag'], 'NewValue')
+    test.assertEqual(tag_dict['AnotherTag'], 'AnotherValue')
+    test.assertEqual(tag_dict['Environment'], 'test')  # Original tag still there
+
+    # Test removing tags
+    p = test.load_policy(
+        {
+            'name': 'bedrock-app-guardrail-untag',
+            'resource': 'bedrock-guardrail',
+            'filters': [
+                {'guardrailArn': guardrail_arn},
+            ],
+            'actions': [
+                {
+                    'type': 'remove-tag',
+                    'tags': ['AnotherTag', 'Owner']
+                }
+            ]
+        }, session_factory=session_factory
+    )
+    resources = p.run()
+    test.assertEqual(len(resources), 1)
+
+    # Verify tags were removed
+    tags = client.list_tags_for_resource(resourceARN=guardrail_arn)['tags']
+    tag_dict = {t['key']: t['value'] for t in tags}
+    test.assertNotIn('AnotherTag', tag_dict)
+    test.assertNotIn('Owner', tag_dict)
+    test.assertEqual(tag_dict['NewTag'], 'NewValue')  # Still there
+    test.assertEqual(tag_dict['Environment'], 'test')  # Still there
+
+
+@terraform('bedrock_guardrail_update')
+def test_bedrock_guardrail_update(test, bedrock_guardrail_update):
+    session_factory = test.replay_flight_data('test_bedrock_guardrail_update')
+    client = session_factory().client('bedrock')
+    test.assertNotEqual(
+        bedrock_guardrail_update[
+            'aws_bedrock_guardrail.test_guardrail.guardrail_arn'
+        ],
+        None,
+    )
+
+    guardrail_arn = (
+        bedrock_guardrail_update[
+            'aws_bedrock_guardrail.test_guardrail.guardrail_arn'
+        ]
+    )
+
+    p = test.load_policy(
+        {
+            'name': 'bedrock-app-guardrail-tag',
+            'resource': 'bedrock-guardrail',
+            'filters': [
+                {'type': 'value', 'key': 'wordPolicy', 'value': 'absent'},
+            ],
+            'actions': [
+                {
+                    'type': 'update',
+                    'wordPolicyConfig': {
+                        'wordsConfig': [
+                            {
+                                'text': 'HATE',
+                                'inputAction': 'BLOCK',
+                                'outputAction': 'NONE',
+                                'inputEnabled': True,
+                                'outputEnabled': False,
+                            }
+                        ],
+                        'managedWordListsConfig': [
+                            {
+                                'type': 'PROFANITY',
+                                'inputAction': 'BLOCK',
+                                'outputAction': 'NONE',
+                                'inputEnabled': True,
+                                'outputEnabled': False,
+                            }
+                        ],
+                    },
+                }
+            ],
+        },
+        session_factory=session_factory,
+    )
+    resources = p.run()
+    test.assertEqual(len(resources), 1)
+
+    # Verify policy was added
+    word_policy = client.get_guardrail(guardrailIdentifier=guardrail_arn)['wordPolicy']
+    test.assertEqual(word_policy['words'][0]['text'], 'HATE')
+    test.assertEqual(word_policy['managedWordLists'][0]['type'], 'PROFANITY')

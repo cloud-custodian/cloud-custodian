@@ -1,0 +1,17 @@
+{
+    "status_code": 200,
+    "data": {
+        "Services": [
+            {
+                "ServiceCode": "emr-serverless",
+                "ServiceName": "Amazon EMR Serverless"
+            }
+        ],
+        "ResponseMetadata": {
+            "RequestId": "a1b2c3d4-e5f6-7890-abcd-ef1234567890",
+            "HTTPStatusCode": 200,
+            "HTTPHeaders": {},
+            "RetryAttempts": 0
+        }
+    }
+}

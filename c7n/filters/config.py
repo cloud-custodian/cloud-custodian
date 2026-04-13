@@ -111,6 +111,8 @@ class ConfigCompliance(Filter):
                 rid = arn
             elif r[resource_model.id] in resource_map:
                 rid = r[resource_model.id]
+            elif resource_model.config_id and r.get(resource_model.config_id) in resource_map:
+                rid = r[resource_model.config_id]
             if arn == r[resource_model.id] and not rid:
                 rid = Arn.parse(arn).resource
                 if rid not in resource_map:
