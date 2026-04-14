@@ -11,7 +11,6 @@ from google.api_core.client_options import ClientOptions
 from c7n.testing import C7N_FUNCTIONAL
 from c7n_gcp.client import get_default_project
 from c7n.config import Config
-from gcp_common import BaseTest
 
 
 def get_test_model_id(project_id, location):
@@ -946,6 +945,8 @@ class VertexAIUndeployTest(BaseTest):
 
         # Verify it actually tried to call the API
         self.assertTrue(mock_undeploy.called)
+
+
 class VertexAIPublisherModelTest(BaseTest):
     """Test Vertex AI Publisher Models resource
 

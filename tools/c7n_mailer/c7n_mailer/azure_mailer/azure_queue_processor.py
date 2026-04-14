@@ -5,6 +5,7 @@ Azure Queue Message Processing
 ==============================
 
 """
+
 import base64
 import json
 import zlib
