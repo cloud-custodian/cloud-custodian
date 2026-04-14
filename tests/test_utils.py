@@ -678,6 +678,15 @@ class UtilTest(BaseTest):
     def test_parse_s3(self):
         self.assertRaises(ValueError, utils.parse_s3, "bogus")
         self.assertEqual(utils.parse_s3("s3://things"), ("s3://things", "things", ""))
+        self.assertEqual(
+            utils.parse_s3("s3://bucket/key"),
+            ("s3://bucket/key", "bucket", "/key"))
+        self.assertEqual(
+            utils.parse_s3("s3://bucket/path/to/key"),
+            ("s3://bucket/path/to/key", "bucket", "/path/to/key"))
+        self.assertEqual(
+            utils.parse_s3("s3://bucket/key/"),
+            ("s3://bucket/key", "bucket", "/key"))
 
     def test_reformat_schema(self):
         # Not a real schema, just doing a smoke test of the function

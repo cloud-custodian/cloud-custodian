@@ -453,12 +453,29 @@ class SetS3Logging(BaseAction):
                     bucket: elbv2logtest
                     prefix: dahlogs
                     state: enabled
+
+              - name: enable-alb-connection-logs
+                resource: app-elb
+                filters:
+                  - type: is-not-logging
+                    log-type: connection
+                actions:
+                  - type: set-s3-logging
+                    log-type: connection
+                    bucket: elbv2-connection-logs
+                    prefix: connection-logs/
+                    state: enabled
     """
     schema = type_schema(
         'set-s3-logging',
-        state={'enum': ['enabled', 'disabled']},
-        bucket={'type': 'string'},
-        prefix={'type': 'string'},
+        **{'log-type': {
+            'type': 'string',
+            'enum': ['access', 'connection'],
+            'default': 'access',
+            'description': 'Type of S3 logging to configure (access or connection logs)'},
+           'state': {'enum': ['enabled', 'disabled']},
+           'bucket': {'type': 'string'},
+           'prefix': {'type': 'string'}},
         required=('state',))
 
     permissions = ("elasticloadbalancing:ModifyLoadBalancerAttributes",)
@@ -473,16 +490,19 @@ class SetS3Logging(BaseAction):
 
     def process(self, resources):
         client = local_session(self.manager.session_factory).client('elbv2')
+        log_type = self.data.get('log-type', 'access')
+        log_prefix = 'connection_logs' if log_type == 'connection' else 'access_logs'
+
         for elb in resources:
             elb_arn = elb['LoadBalancerArn']
             attributes = [{
-                'Key': 'access_logs.s3.enabled',
+                'Key': f'{log_prefix}.s3.enabled',
                 'Value': (
-                    self.data.get('state') == 'enabled' and 'true' or 'value')}]
+                    self.data.get('state') == 'enabled' and 'true' or 'false')}]
 
             if self.data.get('state') == 'enabled':
                 attributes.append({
-                    'Key': 'access_logs.s3.bucket',
+                    'Key': f'{log_prefix}.s3.bucket',
                     'Value': self.data['bucket']})
 
                 prefix_template = self.data['prefix']
@@ -492,7 +512,7 @@ class SetS3Logging(BaseAction):
                 info['LoadBalancerName'] = elb['LoadBalancerName']
 
                 attributes.append({
-                    'Key': 'access_logs.s3.prefix',
+                    'Key': f'{log_prefix}.s3.prefix',
                     'Value': prefix_template.format(**info)})
 
             self.manager.retry(
@@ -778,25 +798,39 @@ class IsLoggingFilter(Filter, AppELBAttributeFilterBase):
                       bucket: prodlogs
                       prefix: alblogs
 
+                - name: alb-connection-logging-test
+                  resource: app-elb
+                  filters:
+                    - type: is-logging
+                      log-type: connection
+
     """
     permissions = ("elasticloadbalancing:DescribeLoadBalancerAttributes",)
     schema = type_schema('is-logging',
-                         bucket={'type': 'string'},
-                         prefix={'type': 'string'}
-                         )
+                         **{'log-type': {
+                             'type': 'string',
+                             'enum': ['access', 'connection'],
+                             'default': 'access',
+                             'description': 'Type of logging to check (access or connection logs)'},
+                            'bucket': {'type': 'string'},
+                            'prefix': {'type': 'string'}
+                         })
 
     def process(self, resources, event=None):
         self.initialize(resources)
+        log_type = self.data.get('log-type', 'access')
         bucket_name = self.data.get('bucket', None)
         bucket_prefix = self.data.get('prefix', None)
 
+        # Determine attribute key prefix based on log type
+        log_prefix = 'connection_logs' if log_type == 'connection' else 'access_logs'
+
         return [alb for alb in resources
-                if alb['Attributes']['access_logs.s3.enabled'] and
+                if alb['Attributes'].get(f'{log_prefix}.s3.enabled') and
                 (not bucket_name or bucket_name == alb['Attributes'].get(
-                    'access_logs.s3.bucket', None)) and
+                    f'{log_prefix}.s3.bucket', None)) and
                 (not bucket_prefix or bucket_prefix == alb['Attributes'].get(
-                    'access_logs.s3.prefix', None))
-                ]
+                    f'{log_prefix}.s3.prefix', None))]
 
 
 @AppELB.filter_registry.register('is-not-logging')
@@ -821,24 +855,39 @@ class IsNotLoggingFilter(Filter, AppELBAttributeFilterBase):
                       bucket: prodlogs
                       prefix: alblogs
 
+                - name: alb-no-connection-logging-test
+                  resource: app-elb
+                  filters:
+                    - type: is-not-logging
+                      log-type: connection
+
     """
     permissions = ("elasticloadbalancing:DescribeLoadBalancerAttributes",)
     schema = type_schema('is-not-logging',
-                         bucket={'type': 'string'},
-                         prefix={'type': 'string'}
-                         )
+                         **{'log-type': {
+                             'type': 'string',
+                             'enum': ['access', 'connection'],
+                             'default': 'access',
+                             'description': 'Type of logging to check (access or connection logs)'},
+                            'bucket': {'type': 'string'},
+                            'prefix': {'type': 'string'}
+                         })
 
     def process(self, resources, event=None):
         self.initialize(resources)
+        log_type = self.data.get('log-type', 'access')
         bucket_name = self.data.get('bucket', None)
         bucket_prefix = self.data.get('prefix', None)
 
+        # Determine attribute key prefix based on log type
+        log_prefix = 'connection_logs' if log_type == 'connection' else 'access_logs'
+
         return [alb for alb in resources
-                if not alb['Attributes']['access_logs.s3.enabled'] or
+                if not alb['Attributes'].get(f'{log_prefix}.s3.enabled') or
                 (bucket_name and bucket_name != alb['Attributes'].get(
-                    'access_logs.s3.bucket', None)) or
+                    f'{log_prefix}.s3.bucket', None)) or
                 (bucket_prefix and bucket_prefix != alb['Attributes'].get(
-                    'access_logs.s3.prefix', None))]
+                    f'{log_prefix}.s3.prefix', None))]
 
 
 @AppELB.filter_registry.register('attributes')
