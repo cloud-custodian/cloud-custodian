@@ -25,6 +25,7 @@ from c7n.filters import (
 from c7n.filters.offhours import OffHour, OnHour
 from c7n.filters.costhub import CostHubRecommendation
 import c7n.filters.vpc as net_filters
+import c7n.filters.iamrole as iam_filters
 
 from c7n.manager import resources
 from c7n import query, utils
@@ -59,32 +60,12 @@ class DescribeEC2(query.DescribeSource):
                 instances.append(i)
         return instances
 
-    def _get_client(self):
-        m = self.query.resolve(self.manager.resource_type)
-        if self.manager.get_client:
-            return self.manager.get_client()
-        return utils.local_session(
-            self.manager.session_factory).client(m.service, self.manager.config.region)
-
     def resources(self, query):
-        m = self.query.resolve(self.manager.resource_type)
-        client = self._get_client()
-        enum_op, _path, extra_args = m.enum_spec
-        params = dict(query)
-        if extra_args:
-            params = {**extra_args, **params}
-        reservations = self.query._invoke_client_enum(
-            client, enum_op, params, 'Reservations[]',
-            getattr(self.manager, 'retry', None)) or []
+        reservations = self.query.filter(self.manager, **query)
         return self._flatten_reservations(reservations)
 
     def get_resources(self, ids, cache=True):
-        m = self.query.resolve(self.manager.resource_type)
-        client = self._get_client()
-        params = {m.filter_name: ids}
-        reservations = self.query._invoke_client_enum(
-            client, m.enum_spec[0], params, 'Reservations[]',
-            getattr(self.manager, 'retry', None)) or []
+        reservations = self.query.get(self.manager, ids)
         return self._flatten_reservations(reservations)
 
     def augment(self, resources):
@@ -101,27 +82,7 @@ class DescribeEC2(query.DescribeSource):
         name), so there isn't a good default to ensure that we will
         always get tags from describe_x calls.
         """
-        if not resources:
-            return resources
-
-        # Inject ReservationId from reservation data
-        client = utils.local_session(self.manager.session_factory).client('ec2')
-        instance_ids = [r['InstanceId'] for r in resources]
-        reservation_map = {}
-        for id_chunk in utils.chunks(instance_ids, 500):
-            resp = self.manager.retry(
-                client.describe_instances,
-                InstanceIds=list(id_chunk))
-            for reservation in resp.get('Reservations', []):
-                rid = reservation.get('ReservationId')
-                for inst in reservation.get('Instances', []):
-                    reservation_map[inst['InstanceId']] = rid
-        for r in resources:
-            r['ReservationId'] = reservation_map.get(r['InstanceId'])
-
-        # First if we're in event based lambda go ahead and skip this,
-        # tags can't be trusted in ec2 instances immediately post creation.
-        if self.manager.data.get(
+        if not resources or self.manager.data.get(
                 'mode', {}).get('type', '') in (
                     'cloudtrail', 'ec2-instance-state'):
             return resources
@@ -164,7 +125,7 @@ class EC2(query.QueryResourceManager):
     class resource_type(query.TypeInfo):
         service = 'ec2'
         arn_type = 'instance'
-        enum_spec = ('describe_instances', 'Reservations[].Instances[]', None)
+        enum_spec = ('describe_instances', 'Reservations[]', None)
         id = 'InstanceId'
         filter_name = 'InstanceIds'
         filter_type = 'list'
@@ -212,6 +173,68 @@ class SubnetFilter(net_filters.SubnetFilter):
 class VpcFilter(net_filters.VpcFilter):
 
     RelatedIdsExpression = "VpcId"
+
+
+@filters.register('iam-role')
+class EC2IamRoleFilter(iam_filters.IamRoleFilter):
+    """Filter EC2 instances by their IAM role attribution.
+
+    EC2 instances use IAM instance profiles which contain roles. This filter
+    resolves the role from the instance profile and allows filtering on role attributes.
+
+    :example:
+
+    Find EC2 instances with roles tagged as Production:
+
+    .. code-block:: yaml
+
+    policies:
+        - name: ec2-prod-roles
+          resource: aws.ec2
+          filters:
+            - type: iam-role
+              key: tag:Environment
+              value: Production
+    """
+
+    # Set to bypass validation, not actually used (overriden in get_related_ids)
+    RelatedIdsExpression = ""
+
+    def get_related_ids(self, resources):
+        """Override to get role names (not ARNs) from instance profiles"""
+        profile_arns = [
+            r['IamInstanceProfile']['Arn']
+            for r in resources if 'IamInstanceProfile' in r
+        ]
+        if not profile_arns:
+            return set()
+
+        # Extract profile name (last part after last /) from ARN
+        # ARN format: arn:aws:iam::123456789012:instance-profile/path/ProfileName
+        profile_names = [p.rsplit('/', 1)[-1] for p in profile_arns]
+        profiles = self.manager.get_resource_manager('iam-profile').get_resources(profile_names)
+
+        role_names = set()
+        for arn, profile in zip(profile_arns, profiles):
+            if not profile:
+                self.log.warning(f"Instance profile not found: {arn}")
+                continue
+
+            roles = profile.get('Roles', [])
+            if not roles:
+                self.log.warning(f"Instance profile has no roles: {arn}")
+                continue
+
+            # AWS enforces: Instance profile can only have 1 role
+            # Extract role name from ARN
+            role_arn = roles[0]['Arn']
+            role_name = role_arn.rsplit('/', 1)[-1]
+            role_names.add(role_name)
+
+        return role_names
+
+
+filters.register('iam-role-tag-mirror', iam_filters.IamRoleTagMirror)
 
 
 @filters.register('check-permissions')
