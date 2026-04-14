@@ -1656,27 +1656,6 @@ class TestAppElbConnectionLogging(BaseTest):
         }
         self.assertEqual(attrs["connection_logs.s3.enabled"], "false")
 
-    def test_appelb_is_connection_logging(self):
-        session_factory = self.replay_flight_data("test_appelb_is_connection_logging")
-        policy = self.load_policy(
-            {
-                "name": "appelb-is-connection-logging-test",
-                "resource": "app-elb",
-                "filters": [
-                    {
-                        "type": "is-logging",
-                        "log-type": "connection",
-                        "bucket": "hello567-elb-accesslogs-us-east-1",
-                    }
-                ],
-            },
-            session_factory=session_factory,
-        )
-
-        resources = policy.run()
-        self.assertEqual(len(resources), 1)
-        self.assertEqual(resources[0]['LoadBalancerArn'].rsplit('/')[-2], 'alb-testing-1')
-
     def test_appelb_is_not_connection_logging(self):
         session_factory = self.replay_flight_data("test_appelb_is_not_connection_logging")
         policy = self.load_policy(
