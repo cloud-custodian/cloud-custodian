@@ -1588,3 +1588,105 @@ class TestTargetGroupAttributesFilter(BaseTest):
             self.assertGreater(len(resources), 0)
             for alb in resources:
                 self.assertEqual(len(alb.get('c7n:ListenerRules', [])), 0)
+
+
+class TestAppElbConnectionLogging(BaseTest):
+    """Tests for connection logging functionality"""
+
+    def test_appelb_enable_connection_logging(self):
+        session_factory = self.replay_flight_data("test_appelb_enable_connection_logging")
+        policy = self.load_policy(
+            {
+                "name": "test-enable-connection-logging",
+                "resource": "app-elb",
+                "filters": [{"LoadBalancerName": "alb-testing-1"}],
+                "actions": [
+                    {
+                        "type": "set-s3-logging",
+                        "log-type": "connection",
+                        "state": "enabled",
+                        "bucket": "hello567-elb-accesslogs-us-east-1",
+                        "prefix": "elbv2",
+                    }
+                ],
+            },
+            session_factory=session_factory,
+        )
+        resources = policy.run()
+        self.assertEqual(len(resources), 1)
+
+        client = session_factory().client("elbv2")
+        attrs = {
+            t["Key"]: t["Value"]
+            for t in client.describe_load_balancer_attributes(
+                LoadBalancerArn=resources[0]["LoadBalancerArn"]
+            ).get("Attributes")
+        }
+        self.assertEqual(attrs["connection_logs.s3.enabled"], "true")
+        self.assertEqual(attrs["connection_logs.s3.bucket"], "hello567-elb-accesslogs-us-east-1")
+        self.assertIn("elbv2", attrs["connection_logs.s3.prefix"])
+
+    def test_appelb_disable_connection_logging(self):
+        session_factory = self.replay_flight_data("test_appelb_disable_connection_logging")
+        policy = self.load_policy(
+            {
+                "name": "test-disable-connection-logging",
+                "resource": "app-elb",
+                "filters": [{"LoadBalancerName": "alb-testing-1"}],
+                "actions": [
+                    {
+                        "type": "set-s3-logging",
+                        "log-type": "connection",
+                        "state": "disabled",
+                    }
+                ],
+            },
+            session_factory=session_factory,
+        )
+
+        resources = policy.run()
+        self.assertEqual(len(resources), 1)
+
+        client = session_factory().client("elbv2")
+        attrs = {
+            t["Key"]: t["Value"]
+            for t in client.describe_load_balancer_attributes(
+                LoadBalancerArn=resources[0]["LoadBalancerArn"]
+            ).get("Attributes")
+        }
+        self.assertEqual(attrs["connection_logs.s3.enabled"], "false")
+
+    def test_appelb_is_connection_logging(self):
+        session_factory = self.replay_flight_data("test_appelb_is_connection_logging")
+        policy = self.load_policy(
+            {
+                "name": "appelb-is-connection-logging-test",
+                "resource": "app-elb",
+                "filters": [
+                    {
+                        "type": "is-logging",
+                        "log-type": "connection",
+                        "bucket": "hello567-elb-accesslogs-us-east-1",
+                    }
+                ],
+            },
+            session_factory=session_factory,
+        )
+
+        resources = policy.run()
+        self.assertEqual(len(resources), 1)
+        self.assertEqual(resources[0]['LoadBalancerArn'].rsplit('/')[-2], 'alb-testing-1')
+
+    def test_appelb_is_not_connection_logging(self):
+        session_factory = self.replay_flight_data("test_appelb_is_not_connection_logging")
+        policy = self.load_policy(
+            {
+                "name": "appelb-is-not-connection-logging-test",
+                "resource": "app-elb",
+                "filters": [{"type": "is-not-logging", "log-type": "connection"}],
+            },
+            session_factory=session_factory,
+        )
+
+        resources = policy.run()
+        self.assertEqual(len(resources), 2)
