@@ -1,0 +1,357 @@
+{
+  "headers": {
+    "content-type": "application/json; charset=UTF-8",
+    "vary": "Origin, X-Origin, Referer",
+    "date": "Mon, 02 Mar 2026 20:39:01 GMT",
+    "server": "ESF",
+    "x-xss-protection": "0",
+    "x-frame-options": "SAMEORIGIN",
+    "x-content-type-options": "nosniff",
+    "alt-svc": "h3=\":443\"; ma=2592000,h3-29=\":443\"; ma=2592000",
+    "transfer-encoding": "chunked",
+    "status": "200",
+    "content-length": "12909",
+    "-content-encoding": "gzip",
+    "content-location": "https://aiplatform.googleapis.com/v1beta1/publishers/anthropic/models?alt=json"
+  },
+  "body": {
+    "publisherModels": [
+      {
+        "name": "publishers/anthropic/models/claude-opus-4",
+        "versionId": "20250514",
+        "openSourceCategory": "PROPRIETARY",
+        "supportedActions": {
+          "openNotebook": {
+            "references": {
+              "global": {
+                "uri": "https://colab.research.google.com/github/GoogleCloudPlatform/vertex-ai-samples/blob/main/notebooks/official/generative_ai/anthropic_claude_intro.ipynb"
+              }
+            },
+            "title": "Open Notebook"
+          },
+          "openGenerationAiStudio": {
+            "references": {
+              "global": {
+                "uri": "https://console.cloud.google.com/vertex-ai/generative/multimodal/create/text?model=claude-opus-4"
+              }
+            }
+          },
+          "requestAccess": {
+            "references": {
+              "global": {
+                "uri": "https://console.cloud.google.com/vertex-ai/model-garden/questionnaire?model=publishers/anthropic/models/claude-opus-4&mp=anthropic/anthropic-847.cloudpartnerservices.goog&service=anthropic-847.cloudpartnerservices.goog&enableLoggingDisclaimer=true&enableWebsearchDisclaimer=true"
+              }
+            }
+          },
+          "openNotebooks": {
+            "notebooks": [
+              {
+                "references": {
+                  "global": {
+                    "uri": "https://colab.research.google.com/github/GoogleCloudPlatform/vertex-ai-samples/blob/main/notebooks/official/generative_ai/anthropic_claude_intro.ipynb"
+                  }
+                },
+                "title": "Open Notebook"
+              }
+            ]
+          }
+        },
+        "launchStage": "GA"
+      },
+      {
+        "name": "publishers/anthropic/models/claude-sonnet-4",
+        "versionId": "20250514",
+        "openSourceCategory": "PROPRIETARY",
+        "supportedActions": {
+          "openNotebook": {
+            "references": {
+              "global": {
+                "uri": "https://colab.research.google.com/github/GoogleCloudPlatform/vertex-ai-samples/blob/main/notebooks/official/generative_ai/anthropic_claude_intro.ipynb"
+              }
+            },
+            "title": "Open Notebook"
+          },
+          "openGenerationAiStudio": {
+            "references": {
+              "global": {
+                "uri": "https://console.cloud.google.com/vertex-ai/generative/multimodal/create/text?model=claude-sonnet-4"
+              }
+            }
+          },
+          "requestAccess": {
+            "references": {
+              "global": {
+                "uri": "https://console.cloud.google.com/vertex-ai/model-garden/questionnaire?model=publishers/anthropic/models/claude-sonnet-4&mp=anthropic/anthropic-848.cloudpartnerservices.goog&service=anthropic-848.cloudpartnerservices.goog&enableLoggingDisclaimer=true&enableWebsearchDisclaimer=true"
+              }
+            }
+          },
+          "openNotebooks": {
+            "notebooks": [
+              {
+                "references": {
+                  "global": {
+                    "uri": "https://colab.research.google.com/github/GoogleCloudPlatform/vertex-ai-samples/blob/main/notebooks/official/generative_ai/anthropic_claude_intro.ipynb"
+                  }
+                },
+                "title": "Open Notebook"
+              }
+            ]
+          }
+        },
+        "launchStage": "GA"
+      },
+      {
+        "name": "publishers/anthropic/models/claude-opus-4-1",
+        "versionId": "20250805",
+        "openSourceCategory": "PROPRIETARY",
+        "supportedActions": {
+          "openNotebook": {
+            "references": {
+              "global": {
+                "uri": "https://colab.research.google.com/github/GoogleCloudPlatform/vertex-ai-samples/blob/main/notebooks/official/generative_ai/anthropic_claude_intro.ipynb"
+              }
+            },
+            "title": "Open Notebook"
+          },
+          "openGenerationAiStudio": {
+            "references": {
+              "global": {
+                "uri": "https://console.cloud.google.com/vertex-ai/generative/multimodal/create/text?model=claude-opus-4-1"
+              }
+            }
+          },
+          "requestAccess": {
+            "references": {
+              "global": {
+                "uri": "https://console.cloud.google.com/vertex-ai/model-garden/questionnaire?model=publishers/anthropic/models/claude-opus-4-1&mp=anthropic/anthropic-857.cloudpartnerservices.goog&service=anthropic-857.cloudpartnerservices.goog&enableLoggingDisclaimer=true&enableWebsearchDisclaimer=true"
+              }
+            }
+          },
+          "openNotebooks": {
+            "notebooks": [
+              {
+                "references": {
+                  "global": {
+                    "uri": "https://colab.research.google.com/github/GoogleCloudPlatform/vertex-ai-samples/blob/main/notebooks/official/generative_ai/anthropic_claude_intro.ipynb"
+                  }
+                },
+                "title": "Open Notebook"
+              }
+            ]
+          }
+        },
+        "launchStage": "GA"
+      },
+      {
+        "name": "publishers/anthropic/models/claude-sonnet-4-5",
+        "versionId": "20250929",
+        "openSourceCategory": "PROPRIETARY",
+        "supportedActions": {
+          "openNotebook": {
+            "references": {
+              "global": {
+                "uri": "https://colab.research.google.com/github/GoogleCloudPlatform/vertex-ai-samples/blob/main/notebooks/official/generative_ai/anthropic_claude_intro.ipynb"
+              }
+            },
+            "title": "Open Notebook"
+          },
+          "openGenerationAiStudio": {
+            "references": {
+              "global": {
+                "uri": "https://console.cloud.google.com/vertex-ai/generative/multimodal/create/text?model=claude-sonnet-4-5"
+              }
+            }
+          },
+          "requestAccess": {
+            "references": {
+              "global": {
+                "uri": "https://console.cloud.google.com/vertex-ai/model-garden/questionnaire?model=publishers/anthropic/models/claude-sonnet-4-5&mp=anthropic/anthropic-865.cloudpartnerservices.goog&service=anthropic-865.cloudpartnerservices.goog&enableLoggingDisclaimer=true&enableWebsearchDisclaimer=true"
+              }
+            }
+          },
+          "openNotebooks": {
+            "notebooks": [
+              {
+                "references": {
+                  "global": {
+                    "uri": "https://colab.research.google.com/github/GoogleCloudPlatform/vertex-ai-samples/blob/main/notebooks/official/generative_ai/anthropic_claude_intro.ipynb"
+                  }
+                },
+                "title": "Open Notebook"
+              }
+            ]
+          }
+        },
+        "launchStage": "GA"
+      },
+      {
+        "name": "publishers/anthropic/models/claude-haiku-4-5",
+        "versionId": "20251001",
+        "openSourceCategory": "PROPRIETARY",
+        "supportedActions": {
+          "openNotebook": {
+            "references": {
+              "global": {
+                "uri": "https://colab.research.google.com/github/GoogleCloudPlatform/vertex-ai-samples/blob/main/notebooks/official/generative_ai/anthropic_claude_intro.ipynb"
+              }
+            },
+            "title": "Open Notebook"
+          },
+          "openGenerationAiStudio": {
+            "references": {
+              "global": {
+                "uri": "https://console.cloud.google.com/vertex-ai/generative/multimodal/create/text?model=claude-haiku-4-5"
+              }
+            }
+          },
+          "requestAccess": {
+            "references": {
+              "global": {
+                "uri": "https://console.cloud.google.com/vertex-ai/model-garden/questionnaire?model=publishers/anthropic/models/claude-haiku-4-5&mp=anthropic/anthropic-867.cloudpartnerservices.goog&service=anthropic-867.cloudpartnerservices.goog&enableLoggingDisclaimer=true&enableWebsearchDisclaimer=true"
+              }
+            }
+          },
+          "openNotebooks": {
+            "notebooks": [
+              {
+                "references": {
+                  "global": {
+                    "uri": "https://colab.research.google.com/github/GoogleCloudPlatform/vertex-ai-samples/blob/main/notebooks/official/generative_ai/anthropic_claude_intro.ipynb"
+                  }
+                },
+                "title": "Open Notebook"
+              }
+            ]
+          }
+        },
+        "launchStage": "GA"
+      },
+      {
+        "name": "publishers/anthropic/models/claude-opus-4-5",
+        "versionId": "20251101",
+        "openSourceCategory": "PROPRIETARY",
+        "supportedActions": {
+          "openNotebook": {
+            "references": {
+              "global": {
+                "uri": "https://colab.research.google.com/github/GoogleCloudPlatform/vertex-ai-samples/blob/main/notebooks/official/generative_ai/anthropic_claude_intro.ipynb"
+              }
+            },
+            "title": "Open Notebook"
+          },
+          "openGenerationAiStudio": {
+            "references": {
+              "global": {
+                "uri": "https://console.cloud.google.com/vertex-ai/generative/multimodal/create/text?model=claude-opus-4-5"
+              }
+            }
+          },
+          "requestAccess": {
+            "references": {
+              "global": {
+                "uri": "https://console.cloud.google.com/vertex-ai/model-garden/questionnaire?model=publishers/anthropic/models/claude-opus-4-5&mp=anthropic/anthropic-874.cloudpartnerservices.goog&service=anthropic-874.cloudpartnerservices.goog&enableLoggingDisclaimer=true&enableWebsearchDisclaimer=true"
+              }
+            }
+          },
+          "openNotebooks": {
+            "notebooks": [
+              {
+                "references": {
+                  "global": {
+                    "uri": "https://colab.research.google.com/github/GoogleCloudPlatform/vertex-ai-samples/blob/main/notebooks/official/generative_ai/anthropic_claude_intro.ipynb"
+                  }
+                },
+                "title": "Open Notebook"
+              }
+            ]
+          }
+        },
+        "launchStage": "GA"
+      },
+      {
+        "name": "publishers/anthropic/models/claude-opus-4-6",
+        "versionId": "default",
+        "openSourceCategory": "PROPRIETARY",
+        "supportedActions": {
+          "openNotebook": {
+            "references": {
+              "global": {
+                "uri": "https://colab.research.google.com/github/GoogleCloudPlatform/vertex-ai-samples/blob/main/notebooks/official/generative_ai/anthropic_claude_intro.ipynb"
+              }
+            },
+            "title": "Open Notebook"
+          },
+          "openGenerationAiStudio": {
+            "references": {
+              "global": {
+                "uri": "https://console.cloud.google.com/vertex-ai/generative/multimodal/create/text?model=claude-opus-4-6"
+              }
+            }
+          },
+          "requestAccess": {
+            "references": {
+              "global": {
+                "uri": "https://console.cloud.google.com/vertex-ai/model-garden/questionnaire?model=publishers/anthropic/models/claude-opus-4-6&mp=anthropic/anthropic-882.cloudpartnerservices.goog&service=anthropic-882.cloudpartnerservices.goog&enableLoggingDisclaimer=true&enableWebsearchDisclaimer=true"
+              }
+            }
+          },
+          "openNotebooks": {
+            "notebooks": [
+              {
+                "references": {
+                  "global": {
+                    "uri": "https://colab.research.google.com/github/GoogleCloudPlatform/vertex-ai-samples/blob/main/notebooks/official/generative_ai/anthropic_claude_intro.ipynb"
+                  }
+                },
+                "title": "Open Notebook"
+              }
+            ]
+          }
+        },
+        "launchStage": "GA"
+      },
+      {
+        "name": "publishers/anthropic/models/claude-sonnet-4-6",
+        "versionId": "default",
+        "openSourceCategory": "PROPRIETARY",
+        "supportedActions": {
+          "openNotebook": {
+            "references": {
+              "global": {
+                "uri": "https://colab.research.google.com/github/GoogleCloudPlatform/vertex-ai-samples/blob/main/notebooks/official/generative_ai/anthropic_claude_intro.ipynb"
+              }
+            },
+            "title": "Open Notebook"
+          },
+          "openGenerationAiStudio": {
+            "references": {
+              "global": {
+                "uri": "https://console.cloud.google.com/vertex-ai/generative/multimodal/create/text?model=claude-sonnet-4-6"
+              }
+            }
+          },
+          "requestAccess": {
+            "references": {
+              "global": {
+                "uri": "https://console.cloud.google.com/vertex-ai/model-garden/questionnaire?model=publishers/anthropic/models/claude-sonnet-4-6&mp=anthropic/anthropic-884.cloudpartnerservices.goog&service=anthropic-884.cloudpartnerservices.goog&enableLoggingDisclaimer=true&enableWebsearchDisclaimer=true"
+              }
+            }
+          },
+          "openNotebooks": {
+            "notebooks": [
+              {
+                "references": {
+                  "global": {
+                    "uri": "https://colab.research.google.com/github/GoogleCloudPlatform/vertex-ai-samples/blob/main/notebooks/official/generative_ai/anthropic_claude_intro.ipynb"
+                  }
+                },
+                "title": "Open Notebook"
+              }
+            ]
+          }
+        },
+        "launchStage": "GA"
+      }
+    ]
+  }
+}
