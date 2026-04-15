@@ -13,6 +13,7 @@ from c7n.filters import CrossAccountAccessFilter, ValueFilter, Filter
 from c7n.filters.costhub import CostHubRecommendation
 from c7n.filters.kms import KmsRelatedFilter
 import c7n.filters.vpc as net_filters
+import c7n.filters.iamrole as iam_filters
 from c7n.manager import resources
 from c7n import query, utils
 from c7n.resources.aws import shape_validate
@@ -111,6 +112,22 @@ class VpcFilter(net_filters.VpcFilter):
 
 
 AWSLambda.filter_registry.register('network-location', net_filters.NetworkLocation)
+
+
+@AWSLambda.filter_registry.register('iam-role')
+class LambdaIamRoleFilter(iam_filters.IamRoleFilter):
+
+    RelatedIdsExpression = "Role"
+
+    def get_related_ids(self, resources):
+        """Override to extract role names from role ARNs."""
+        role_arns = super().get_related_ids(resources)
+        # Extract role name (last part after last /) from ARN
+        # ARN format: arn:aws:iam::123456789012:role/path/RoleName
+        return {arn.rsplit('/', 1)[-1] for arn in role_arns if arn}
+
+
+AWSLambda.filter_registry.register('iam-role-tag-mirror', iam_filters.IamRoleTagMirror)
 
 
 @AWSLambda.filter_registry.register('check-permissions')
@@ -486,7 +503,9 @@ class LambdaPostFinding(PostFinding):
             r['Layers'] = {
                 'Arn': r['Layers'][0]['Arn'],
                 'CodeSize': r['Layers'][0]['CodeSize']}
-        details.get('VpcConfig', {}).pop('VpcId', None)
+        if 'VpcConfig' in details:
+            details['VpcConfig'] = select_keys(
+                details['VpcConfig'], ['SecurityGroupIds', 'SubnetIds'])
 
         if 'Code' in r and r['Code'].get('RepositoryType') == "S3":
             parsed = urlparse(r['Code']['Location'])

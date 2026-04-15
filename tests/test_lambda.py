@@ -1,5 +1,6 @@
 # Copyright The Cloud Custodian Authors.
 # SPDX-License-Identifier: Apache-2.0
+import copy
 import json
 import time
 from unittest.mock import patch
@@ -310,6 +311,30 @@ class LambdaTest(BaseTest):
              'Region': 'us-west-2',
              'Tags': {'custodian-info': 'mode=config-rule:version=0.8.44.2'},
              'Type': 'AwsLambdaFunction'})
+        shape_validate(
+            rfinding['Details']['AwsLambdaFunction'],
+            'AwsLambdaFunctionDetails', 'securityhub')
+
+    def test_post_finding_vpcconfig_strips_ipv6_dual_stack(self):
+        factory = self.replay_flight_data('test_lambda_post_finding')
+        p = self.load_policy({
+            'name': 'lambda',
+            'resource': 'aws.lambda',
+            'actions': [
+                {'type': 'post-finding',
+                 'types': [
+                     'Software and Configuration Checks/OrgStandard/abc-123']}]},
+            session_factory=factory, config={'region': 'us-west-2'})
+        functions = p.resource_manager.get_resources(['custodian-ec2-ssm-query'])
+        function = copy.deepcopy(functions[0])
+        function.setdefault('VpcConfig', {})
+        function['VpcConfig']['Ipv6AllowedForDualStack'] = True
+
+        rfinding = p.resource_manager.actions[0].format_resource(function)
+        self.assertEqual(
+            rfinding['Details']['AwsLambdaFunction']['VpcConfig'],
+            {'SecurityGroupIds': [], 'SubnetIds': []}
+        )
         shape_validate(
             rfinding['Details']['AwsLambdaFunction'],
             'AwsLambdaFunctionDetails', 'securityhub')
@@ -841,3 +866,83 @@ def test_lambda_check_permission_deleted_role(test, aws_lambda_check_permissions
 
     resources = p.run()
     test.assertEqual(len(resources), 0)
+
+
+class TestLambdaIamRoleFilter(BaseTest):
+    """Tests for Lambda iam-role filter"""
+
+    def test_lambda_iam_role_filter_by_tag(self):
+        """Test filtering Lambda functions by IAM role tag"""
+        factory = self.replay_flight_data('test_lambda_iam_role_filter_by_tag')
+        policy = self.load_policy(
+            {
+                'name': 'lambda-iam-role-filter',
+                'resource': 'lambda',
+                'filters': [
+                    {
+                        'type': 'iam-role',
+                        'key': 'tag:Environment',
+                        'value': 'Production'
+                    }
+                ]
+            },
+            config={'region': 'us-west-2'},
+            session_factory=factory
+        )
+        resources = policy.run()
+        self.assertEqual(len(resources), 1)
+        self.assertIn('c7n:matched-iam-role', resources[0])
+        self.assertEqual(resources[0].get('FunctionName'), 'hello_world')
+
+    def test_lambda_iam_role_filter_by_role_name(self):
+        """Test filtering Lambda functions by IAM role name pattern"""
+        factory = self.replay_flight_data('test_lambda_iam_role_filter_by_role_name')
+        policy = self.load_policy(
+            {
+                'name': 'lambda-iam-role-name',
+                'resource': 'lambda',
+                'filters': [
+                    {
+                        'type': 'iam-role',
+                        'key': 'RoleName',
+                        'value': '.*world-role.*',
+                        'op': 'regex'
+                    }
+                ]
+            },
+            config={'region': 'us-west-2'},
+            session_factory=factory
+        )
+        resources = policy.run()
+        self.assertEqual(len(resources), 1)
+        self.assertIn('c7n:matched-iam-role', resources[0])
+        self.assertEqual(resources[0].get('FunctionName'), 'hello_world')
+
+
+class TestLambdaIamRoleTagMirror(BaseTest):
+    """Tests for Lambda iam-role-tag-mirror filter"""
+
+    def test_lambda_iam_role_tag_mirror_ne(self):
+        """Test iam-role-tag-mirror with missing-ok: true"""
+        factory = self.replay_flight_data('test_lambda_iam_role_tag_mirror_ne')
+        policy = self.load_policy(
+            {
+                'name': 'lambda-role-tag-mirror-not-equal',
+                'resource': 'lambda',
+                'filters': [
+                    {
+                        'type': 'iam-role-tag-mirror',
+                        'key': 'tag:Compliance',
+                        'match': 'not-equal'
+                    }
+                ]
+            },
+            config={'region': 'us-west-2'},
+            session_factory=factory
+        )
+        resources = policy.run()
+        self.assertEqual(len(resources), 1)
+        self.assertEqual(resources[0].get('FunctionName'), 'test-kms')
+        self.assertIn('c7n:IamRoleTagMirror', resources[0])
+        evaluation = resources[0]['c7n:IamRoleTagMirror'][0]
+        self.assertEqual(evaluation['reason'], 'TagMismatch')

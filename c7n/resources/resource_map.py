@@ -35,6 +35,7 @@ ResourceMap = {
   "aws.batch-definition": "c7n.resources.batch.JobDefinition",
   "aws.batch-queue": "c7n.resources.batch.BatchJobQueue",
   "aws.bedrock-agent": "c7n.resources.bedrock.BedrockAgent",
+  "aws.bedrock-guardrail": "c7n.resources.bedrock.BedrockGuardrail",
   "aws.bedrock-inference-profile":
     "c7n.resources.bedrock.BedrockApplicationInferenceProfile",
   "aws.bedrock-custom-model": "c7n.resources.bedrock.BedrockCustomModel",
@@ -354,6 +355,7 @@ ResourceMap = {
   "aws.timestream-table": "c7n.resources.timestream.TimestreamTable",
   "aws.timestream-influxdb": "c7n.resources.timestream.TimestreamInfluxDB",
   "aws.timestream-influxdb-cluster": "c7n.resources.timestream.TimestreamInfluxDBCluster",
+  "aws.transfer-connector": "c7n.resources.transfer.TransferConnector",
   "aws.transfer-server": "c7n.resources.transfer.TransferServer",
   "aws.transfer-user": "c7n.resources.transfer.TransferUser",
   "aws.transfer-web-app": "c7n.resources.transfer.TransferWebApp",

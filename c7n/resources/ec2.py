@@ -25,6 +25,7 @@ from c7n.filters import (
 from c7n.filters.offhours import OffHour, OnHour
 from c7n.filters.costhub import CostHubRecommendation
 import c7n.filters.vpc as net_filters
+import c7n.filters.iamrole as iam_filters
 
 from c7n.manager import resources
 from c7n import query, utils
@@ -156,6 +157,68 @@ class SubnetFilter(net_filters.SubnetFilter):
 class VpcFilter(net_filters.VpcFilter):
 
     RelatedIdsExpression = "VpcId"
+
+
+@filters.register('iam-role')
+class EC2IamRoleFilter(iam_filters.IamRoleFilter):
+    """Filter EC2 instances by their IAM role attribution.
+
+    EC2 instances use IAM instance profiles which contain roles. This filter
+    resolves the role from the instance profile and allows filtering on role attributes.
+
+    :example:
+
+    Find EC2 instances with roles tagged as Production:
+
+    .. code-block:: yaml
+
+    policies:
+        - name: ec2-prod-roles
+          resource: aws.ec2
+          filters:
+            - type: iam-role
+              key: tag:Environment
+              value: Production
+    """
+
+    # Set to bypass validation, not actually used (overriden in get_related_ids)
+    RelatedIdsExpression = ""
+
+    def get_related_ids(self, resources):
+        """Override to get role names (not ARNs) from instance profiles"""
+        profile_arns = [
+            r['IamInstanceProfile']['Arn']
+            for r in resources if 'IamInstanceProfile' in r
+        ]
+        if not profile_arns:
+            return set()
+
+        # Extract profile name (last part after last /) from ARN
+        # ARN format: arn:aws:iam::123456789012:instance-profile/path/ProfileName
+        profile_names = [p.rsplit('/', 1)[-1] for p in profile_arns]
+        profiles = self.manager.get_resource_manager('iam-profile').get_resources(profile_names)
+
+        role_names = set()
+        for arn, profile in zip(profile_arns, profiles):
+            if not profile:
+                self.log.warning(f"Instance profile not found: {arn}")
+                continue
+
+            roles = profile.get('Roles', [])
+            if not roles:
+                self.log.warning(f"Instance profile has no roles: {arn}")
+                continue
+
+            # AWS enforces: Instance profile can only have 1 role
+            # Extract role name from ARN
+            role_arn = roles[0]['Arn']
+            role_name = role_arn.rsplit('/', 1)[-1]
+            role_names.add(role_name)
+
+        return role_names
+
+
+filters.register('iam-role-tag-mirror', iam_filters.IamRoleTagMirror)
 
 
 @filters.register('check-permissions')

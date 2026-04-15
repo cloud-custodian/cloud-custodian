@@ -1,0 +1,37 @@
+{
+  "headers": {
+    "content-type": "application/json; charset=UTF-8",
+    "vary": "Origin, X-Origin, Referer",
+    "date": "Thu, 26 Mar 2026 15:43:51 GMT",
+    "server": "ESF",
+    "x-xss-protection": "0",
+    "x-frame-options": "SAMEORIGIN",
+    "x-content-type-options": "nosniff",
+    "alt-svc": "h3=\":443\"; ma=2592000,h3-29=\":443\"; ma=2592000",
+    "transfer-encoding": "chunked",
+    "status": "200",
+    "content-length": "643",
+    "-content-encoding": "gzip",
+    "content-location": "https://sqladmin.googleapis.com/sql/v1beta4/projects/cloud-custodian/instances/star-buck/backupRuns?alt=json"
+  },
+  "body": {
+    "kind": "sql#backupRunsList",
+    "items": [
+      {
+        "kind": "sql#backupRun",
+        "status": "SUCCESSFUL",
+        "enqueuedTime": "2026-03-26T15:38:10.139Z",
+        "id": "1774539490139",
+        "startTime": "2026-03-26T15:38:10.150Z",
+        "endTime": "2026-03-26T15:39:31.286Z",
+        "type": "ON_DEMAND",
+        "windowStartTime": "2026-03-26T15:38:10.139Z",
+        "instance": "star-buck",
+        "selfLink": "https://sqladmin.googleapis.com/sql/v1beta4/projects/cloud-custodian/instances/star-buck/backupRuns/1774539490139",
+        "location": "us",
+        "databaseVersion": "MYSQL_8_0",
+        "backupKind": "SNAPSHOT"
+      }
+    ]
+  }
+}

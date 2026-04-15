@@ -34,4 +34,5 @@ resource "azurerm_private_endpoint" "single_reference" {
 resource "azurerm_storage_account" "no_references" {
   name                          = "private"
   public_network_access_enabled = "false"
+  this_is_not_a_reference       = "9fe8886e-f58d-49a4-afbc-ad62c4ec3b6a"
 }

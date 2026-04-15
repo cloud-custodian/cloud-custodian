@@ -22,6 +22,19 @@ class TransferServer(QueryResourceManager):
         permissions_augment = ("transfer:ListTagsForResource",)
 
 
+@resources.register('transfer-connector')
+class TransferConnector(QueryResourceManager):
+
+    class resource_type(TypeInfo):
+        service = 'transfer'
+        enum_spec = ('list_connectors', 'Connectors', None)
+        detail_spec = (
+            'describe_connector', 'ConnectorId', 'ConnectorId', 'Connector')
+        id = name = 'ConnectorId'
+        arn_type = "connector"
+        cfn_type = 'AWS::Transfer::Connector'
+
+
 @TransferServer.filter_registry.register('security-group')
 class TransferServerSecurityGroupFilter(SecurityGroupFilter):
     """

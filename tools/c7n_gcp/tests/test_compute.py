@@ -384,6 +384,30 @@ class DiskTest(BaseTest):
         assert len(resources) == 2
         assert resources[0]['c7n:recommend'][0]['recommenderSubtype'] == 'SNAPSHOT_AND_DELETE_DISK'
 
+    def test_recommend_disk_none_operations(self):
+        """Recommendations missing operationGroups should be skipped, not raise TypeError."""
+        project_id = 'cloud-custodian'
+        factory = self.replay_flight_data('disk-recommend', project_id=project_id)
+        p = self.load_policy({
+            'name': 'disk-recommend-none',
+            'resource': 'gcp.disk',
+            'filters': [{'type': 'recommend',
+                         'id': 'google.compute.disk.IdleResourceRecommender'}]},
+            session_factory=factory)
+        rec_filter = p.resource_manager.filters[0]
+        rec_filter.rec_info = {'id': 'google.compute.disk.IdleResourceRecommender'}
+
+        # A recommendation with no content/operationGroups causes the JMESPath
+        # query to return None.  Before the fix this raised TypeError.
+        recommends_with_none = [
+            {"name": "empty-rec", "stateInfo": {"state": "ACTIVE"}},
+        ]
+        resources = [
+            {"name": "disk-1", "selfLink": "https://example.com/disk-1"},
+        ]
+        result = rec_filter.match_resources(recommends_with_none, resources)
+        assert result == []
+
 
 class SnapshotTest(BaseTest):
 

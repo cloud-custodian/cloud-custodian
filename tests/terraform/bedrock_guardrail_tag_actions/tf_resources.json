@@ -1,0 +1,74 @@
+{
+    "pytest-terraform": 1,
+    "outputs": {},
+    "resources": {
+        "aws_caller_identity": {
+            "current": {
+                "account_id": "644160558196",
+                "arn": "arn:aws:iam::644160558196:user/charlotte-console",
+                "id": "644160558196",
+                "user_id": "AIDAQ6LH3QHSELW5OOG3O"
+            }
+        },
+        "aws_region": {
+            "current": {
+                "description": "US East (N. Virginia)",
+                "endpoint": "ec2.us-east-1.amazonaws.com",
+                "id": "us-east-1",
+                "name": "us-east-1",
+                "region": "us-east-1"
+            }
+        },
+        "aws_bedrock_guardrail": {
+            "test_guardrail": {
+                "blocked_input_messaging": "example",
+                "blocked_outputs_messaging": "example",
+                "content_policy_config": [
+                    {
+                        "filters_config": [
+                            {
+                                "input_action": null,
+                                "input_enabled": null,
+                                "input_modalities": null,
+                                "input_strength": "MEDIUM",
+                                "output_action": null,
+                                "output_enabled": null,
+                                "output_modalities": null,
+                                "output_strength": "MEDIUM",
+                                "type": "HATE"
+                            }
+                        ],
+                        "tier_config": [
+                            {
+                                "tier_name": "CLASSIC"
+                            }
+                        ]
+                    }
+                ],
+                "contextual_grounding_policy_config": [],
+                "created_at": "2026-03-23T03:52:38Z",
+                "cross_region_config": [],
+                "description": "Test guardrail for C7N",
+                "guardrail_arn": "arn:aws:bedrock:us-east-1:644160558196:guardrail/ehydk89jufww",
+                "guardrail_id": "ehydk89jufww",
+                "kms_key_arn": null,
+                "name": "c7n-test-guardrail-b2f6e604",
+                "region": "us-east-1",
+                "sensitive_information_policy_config": [],
+                "status": "READY",
+                "tags": {
+                    "Environment": "test",
+                    "Owner": "c7n"
+                },
+                "tags_all": {
+                    "Environment": "test",
+                    "Owner": "c7n"
+                },
+                "timeouts": null,
+                "topic_policy_config": [],
+                "version": "DRAFT",
+                "word_policy_config": []
+            }
+        }
+    }
+}
