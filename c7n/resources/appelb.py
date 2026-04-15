@@ -463,7 +463,7 @@ class SetS3Logging(BaseAction):
                   - type: set-s3-logging
                     log-type: connection
                     bucket: elbv2-connection-logs
-                    prefix: connection-logs/
+                    prefix: connection-logs
                     state: enabled
     """
     schema = type_schema(
