@@ -6,7 +6,8 @@ from .common import BaseTest, event_data
 from c7n.exceptions import PolicyValidationError
 from c7n.executor import MainThreadExecutor
 from c7n.resources.appelb import (
-    AppELB, AppELBTargetGroup, AppELBDeleteListenerAction, serialize_attribute_value,
+    AppELB, AppELBTargetGroup, AppELBDeleteListenerAction,
+    parse_attribute_value, serialize_attribute_value,
 )
 from unittest.mock import patch
 import logging
@@ -17,6 +18,13 @@ def test_serialize():
     assert serialize_attribute_value(False) == 'false'
     assert serialize_attribute_value(60) == '60'
     assert serialize_attribute_value('abc') == 'abc'
+
+
+def test_parse_attribute_value():
+    assert parse_attribute_value('60') == 60
+    assert parse_attribute_value('true') is True
+    assert parse_attribute_value('false') is False
+    assert parse_attribute_value('abc') == 'abc'
 
 
 class AppELBTest(BaseTest):
