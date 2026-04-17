@@ -52,7 +52,7 @@ def test_directconnect_tag_filter(test):
             ],
         },
         session_factory=factory,
-        config={'account_id': '872622437842'},
+        config={'account_id': '644160558196'},
     )
     resources = p.run()
     test.assertEqual(len(resources), 1)
