@@ -98,37 +98,97 @@ class SubnetAction(MethodAction):
 
 @Subnet.action_registry.register('set-flow-log')
 class SetFlowLog(SubnetAction):
-    """Enable vpc flow logs on a subnet.
+    """Enable or configure VPC flow logs on a subnet.
 
-    :example: Enable flow logs on all subnets
+    The ``state`` parameter controls whether flow logging is enabled or disabled.
+    Additional ``logConfig`` parameters map directly to the GCP subnetworks API:
+    https://cloud.google.com/compute/docs/reference/rest/v1/subnetworks/patch
 
-    .. yaml:
+    :example: Enable flow logs on all subnets that have them disabled
 
-     policies:
-       - name: flow-active
-         resource: gcp.subnet
-         filters:
-          - enableFlowLogs: empty
-         actions:
-          - set-flow-log
+    .. code-block:: yaml
+
+        policies:
+          - name: flow-active
+            resource: gcp.subnet
+            filters:
+              - enableFlowLogs: empty
+            actions:
+              - set-flow-log
+
+    :example: Enable flow logs with custom logConfig parameters
+
+    .. code-block:: yaml
+
+        policies:
+          - name: flow-log-configure
+            resource: gcp.subnet
+            filters:
+              - enableFlowLogs: empty
+            actions:
+              - type: set-flow-log
+                state: true
+                aggregationInterval: INTERVAL_5_SEC
+                flowSampling: 0.5
+                metadata: INCLUDE_ALL_METADATA
+                filterExpr: "true"
+
+    :example: Enable flow logs with custom metadata fields
+
+    .. code-block:: yaml
+
+        policies:
+          - name: flow-log-custom-metadata
+            resource: gcp.subnet
+            filters:
+              - enableFlowLogs: empty
+            actions:
+              - type: set-flow-log
+                state: true
+                metadata: CUSTOM_METADATA
+                metadataFields:
+                  - src_instance
+                  - dest_instance
+                  - src_vpc
 
     """
 
     schema = type_schema(
         'set-flow-log',
-        state={'type': 'boolean', 'default': True})
+        state={'type': 'boolean', 'default': True},
+        aggregationInterval={
+            'type': 'string',
+            'enum': [
+                'INTERVAL_5_SEC', 'INTERVAL_30_SEC', 'INTERVAL_1_MIN',
+                'INTERVAL_5_MIN', 'INTERVAL_10_MIN', 'INTERVAL_15_MIN',
+            ],
+        },
+        flowSampling={'type': 'number', 'minimum': 0.0, 'maximum': 1.0},
+        metadata={
+            'type': 'string',
+            'enum': ['EXCLUDE_ALL_METADATA', 'INCLUDE_ALL_METADATA', 'CUSTOM_METADATA'],
+        },
+        metadataFields={'type': 'array', 'items': {'type': 'string'}},
+        filterExpr={'type': 'string'},
+    )
     method_spec = {'op': 'patch'}
     method_perm = 'update'
 
     def get_resource_params(self, m, r):
         params = super(SetFlowLog, self).get_resource_params(m, r)
+        log_config = {'enable': self.data.get('state', True)}
+        for field in ('aggregationInterval', 'flowSampling', 'metadata',
+                      'metadataFields', 'filterExpr'):
+            if field in self.data:
+                log_config[field] = self.data[field]
         return {
             'project': params['project'],
             'region': params['region'],
             'subnetwork': params['subnetwork'],
             'body': {
                 'fingerprint': r['fingerprint'],
-                'enableFlowLogs': self.data.get('state', True)}
+                'logConfig': log_config,
+            }
         }
 
 
