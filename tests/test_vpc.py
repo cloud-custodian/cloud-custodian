@@ -4763,7 +4763,6 @@ class TestVpcEndpointServiceDetails(BaseTest):
         )
         self.assertTrue(service_details["VpcEndpointPolicySupported"])
 
-
     def test_endpoint_service_details_invalid_service(self):
         # Covers endpoints whose service no longer exists — both deprecated service
         # names and cross-account PrivateLink (vpce-svc-*) services that the calling
@@ -4798,10 +4797,19 @@ class TestVpcEndpointServiceDetails(BaseTest):
             operation_name="DescribeVpcEndpointServices",
         )
         valid_service_response = {
-            "ServiceDetails": [{
-                "ServiceName": "com.amazonaws.us-east-1.s3",
-                "VpcEndpointPolicySupported": True,
-            }],
+            "ServiceNames": ["com.amazonaws.us-east-1.s3"],
+            "ServiceDetails": [
+                {
+                    "ServiceName": "com.amazonaws.us-east-1.s3",
+                    "ServiceId": "vpce-svc-0aa7c06513d4872d5",
+                    "ServiceType": [{"ServiceType": "Gateway"}],
+                    "Owner": "amazon",
+                    "VpcEndpointPolicySupported": True,
+                    "AcceptanceRequired": False,
+                    "ManagesVpcEndpoints": False,
+                    "Tags": [],
+                }
+            ],
             "ResponseMetadata": {},
         }
 
@@ -4842,4 +4850,3 @@ class TestVpcEndpointServiceDetails(BaseTest):
         self.assertEqual(len(result), 1)
         self.assertEqual(result[0]["ServiceName"], "com.amazonaws.us-east-1.s3")
         self.assertTrue(result[0]["c7n:ServiceDetails"]["VpcEndpointPolicySupported"])
-
