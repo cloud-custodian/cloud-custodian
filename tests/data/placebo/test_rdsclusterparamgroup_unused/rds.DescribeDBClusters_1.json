@@ -1,0 +1,18 @@
+{
+    "status_code": 200,
+    "data": {
+        "DBClusters": [
+            {
+                "DBClusterIdentifier": "mycluster",
+                "DBClusterParameterGroup": "custom-cluster-pg-used",
+                "DBSubnetGroup": "default",
+                "Status": "available",
+                "Engine": "aurora-mysql",
+                "EngineVersion": "8.0.mysql_aurora.3.04.0",
+                "Port": 3306,
+                "DBClusterArn": "arn:aws:rds:us-east-1:644160558196:cluster:mycluster"
+            }
+        ],
+        "ResponseMetadata": {}
+    }
+}
