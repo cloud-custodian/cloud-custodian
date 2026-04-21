@@ -4793,4 +4793,5 @@ class TestVpcEndpointServiceDetails(BaseTest):
         filtered_names = {r["ServiceName"] for r in filtered_resources}
 
         self.assertLess(len(filtered_resources), len(all_resources))
+        self.assertIn("com.amazonaws.us-east-1.s3", filtered_names)
         self.assertNotIn("com.amazonaws.us-west-2.s3", filtered_names)
