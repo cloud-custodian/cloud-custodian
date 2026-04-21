@@ -2,9 +2,10 @@
 # SPDX-License-Identifier: Apache-2.0
 import time
 
-from c7n_gcp.resources.network import Interconnect
+from c7n_gcp.resources.network import Interconnect, InterconnectAttachment
 from gcp_common import BaseTest, event_data
 from googleapiclient.errors import HttpError
+from pytest_terraform import terraform
 
 
 class FirewallTest(BaseTest):
@@ -318,3 +319,37 @@ def test_interconnect_labels(test):
     resource = Interconnect.resource_type.refresh(client, resources[0])
     assert resource["labels"]["env"] == "not-the-default"
     assert resource["labelFingerprint"] != resources[0]["labelFingerprint"]
+
+
+@terraform('interconnect_attachment_labels')
+def test_interconnect_attachment_labels(test, interconnect_attachment_labels):
+    attachment = interconnect_attachment_labels.resources[
+        'google_compute_interconnect_attachment']['c7n_test_attachment']
+    project_id = attachment['project']
+    name = attachment['name']
+    label_fingerprint = attachment['label_fingerprint']
+    labels = attachment['labels']
+
+    # Confirm start label
+    assert labels['env'] == 'default'
+
+    # Update the label
+    factory = test.replay_flight_data(
+        'interconnect-attachment-set-labels', project_id=project_id)
+    policy = test.load_policy(
+        {
+            'name': 'interconnect-attachment-set-labels',
+            'resource': 'gcp.interconnect-attachment',
+            'filters': [{'name': name}],
+            'actions': [{'type': 'set-labels', 'labels': {'env': 'not-the-default'}}],
+        },
+        session_factory=factory,
+    )
+    resources = policy.run()
+    assert len(resources) == 1
+
+    # Refresh the resource, confirm label and fingerprint changed
+    client = policy.resource_manager.get_client()
+    resource = InterconnectAttachment.resource_type.refresh(client, resources[0])
+    assert resource["labels"]["env"] == "not-the-default"
+    assert resource["labelFingerprint"] != label_fingerprint
