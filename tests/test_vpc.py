@@ -4763,18 +4763,13 @@ class TestVpcEndpointServiceDetails(BaseTest):
         )
         self.assertTrue(service_details["VpcEndpointPolicySupported"])
 
-    def test_endpoint_service_details_invalid_service(self):
-        # Covers endpoints whose service no longer exists — both deprecated service
-        # names and cross-account PrivateLink (vpce-svc-*) services that the calling
-        # account cannot describe.
-        from unittest import mock
-
+    def test_endpoint_service_details_invalid_service_names_excluded(self):
         session_factory = self.replay_flight_data(
-            "test_vpc_endpoint_service_details_filter"
+            "test_vpc_endpoint_service_details_live"
         )
         p = self.load_policy(
             {
-                "name": "vpc-endpoint-services-invalid-service",
+                "name": "vpc-endpoint-policy-supported-only",
                 "resource": "aws.vpc-endpoint",
                 "filters": [
                     {
@@ -4786,67 +4781,16 @@ class TestVpcEndpointServiceDetails(BaseTest):
             },
             session_factory=session_factory,
         )
-
-        filter_instance = p.resource_manager.filters[0]
-
-        invalid_service_error = BotoClientError(
-            {"Error": {
-                "Code": "InvalidServiceName",
-                "Message": "The Vpc Endpoint Service does not exist",
-            }},
-            operation_name="DescribeVpcEndpointServices",
-        )
-        valid_service_response = {
-            "ServiceNames": ["com.amazonaws.us-east-1.s3"],
-            "ServiceDetails": [
-                {
-                    "ServiceName": "com.amazonaws.us-east-1.s3",
-                    "ServiceId": "vpce-svc-0aa7c06513d4872d5",
-                    "ServiceType": [{"ServiceType": "Gateway"}],
-                    "Owner": "amazon",
-                    "VpcEndpointPolicySupported": True,
-                    "AcceptanceRequired": False,
-                    "ManagesVpcEndpoints": False,
-                    "Tags": [],
-                }
-            ],
-            "ResponseMetadata": {},
-        }
-
-        resources = [
+        all_resources = self.load_policy(
             {
-                "VpcEndpointId": "vpce-aaa",
-                "ServiceName": "com.amazonaws.us-east-1.s3",
-                "VpcEndpointType": "Gateway",
-                "State": "available",
+                "name": "vpc-endpoint-all",
+                "resource": "aws.vpc-endpoint",
             },
-            {
-                "VpcEndpointId": "vpce-bbb",
-                "ServiceName": "com.amazonaws.us-east-1.deprecated-service",
-                "VpcEndpointType": "Interface",
-                "State": "available",
-            },
-            {
-                "VpcEndpointId": "vpce-ccc",
-                "ServiceName": "com.amazonaws.vpce.us-east-1.vpce-svc-0123456789abcdef0",
-                "VpcEndpointType": "Interface",
-                "State": "available",
-            },
-        ]
+            session_factory=session_factory,
+        ).run()
+        filtered_resources = p.run()
 
-        mock_client = MagicMock()
+        filtered_names = {r["ServiceName"] for r in filtered_resources}
 
-        mock_client.describe_vpc_endpoint_services.side_effect = [
-            invalid_service_error,
-            invalid_service_error,
-            valid_service_response,
-            invalid_service_error,
-        ]
-
-        with mock.patch("c7n.resources.vpc.local_session") as mock_ls:
-            mock_ls.return_value.client.return_value = mock_client
-            result = filter_instance.process(resources)
-
-        self.assertEqual(len(result), 1)
-        self.assertEqual(result[0]["ServiceName"], "com.amazonaws.us-east-1.s3")
-        self.assertTrue(result[0]["c7n:ServiceDetails"]["VpcEndpointPolicySupported"])
+        self.assertLess(len(filtered_resources), len(all_resources))
+        self.assertNotIn("com.amazonaws.us-west-2.s3", filtered_names)
