@@ -9,8 +9,7 @@ on:
       # todo: update for 1.0
       - 0.*
 
-permissions:
-  contents: read
+permissions: {}
 
 jobs:
   Publish:
