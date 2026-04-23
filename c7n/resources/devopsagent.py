@@ -31,7 +31,8 @@ class DevOpsAgentSpace(query.QueryResourceManager):
         id = 'agentSpaceId'
         name = 'name'
         arn = 'agentSpaceArn'
+        permission_prefix = 'aidevops'
         cfn_type = 'AWS::DevOpsAgent::AgentSpace'
-        permissions = 'devops-agent:ListAgentSpaces'
+        permissions = 'aidevops:ListAgentSpaces'
 
     source_mapping = {'describe': DescribeDevOpsAgentSpace, 'config': query.ConfigSource}
