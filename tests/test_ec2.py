@@ -2565,3 +2565,189 @@ class TestCapacityReservation(BaseTest):
             )
         resources = p.run()
         self.assertEqual(len(resources), 2)
+
+
+class TestEC2IamRoleFilter(BaseTest):
+    """Tests for EC2 iam-role filter"""
+
+    def test_ec2_iam_role_filter_by_tag(self):
+        """Test filtering EC2 instances by IAM role tag"""
+        session_factory = self.replay_flight_data('test_ec2_iam_role_filter_by_tag')
+        policy = self.load_policy(
+            {
+                'name': 'ec2-iam-role-filter',
+                'resource': 'ec2',
+                'filters': [
+                    {
+                        'type': 'iam-role',
+                        'key': 'tag:Environment',
+                        'value': 'Production'
+                    }
+                ]
+            },
+            session_factory=session_factory
+        )
+        resources = policy.run()
+        self.assertEqual(len(resources), 1)
+        self.assertIn('c7n:matched-iam-role', resources[0])
+        self.assertEqual(resources[0]['c7n:matched-iam-role'], ['c7n-pratyush-test'])
+
+    def test_ec2_iam_role_filter_by_role_name(self):
+        """Test filtering EC2 instances by IAM role name"""
+        factory = self.replay_flight_data('test_ec2_iam_role_filter_by_role_name')
+        policy = self.load_policy(
+            {
+                'name': 'ec2-iam-role-name',
+                'resource': 'ec2',
+                'filters': [
+                    {
+                        'type': 'iam-role',
+                        'key': 'RoleName',
+                        'value': 'c7n-pratyush-test',
+                        'op': 'eq'
+                    }
+                ]
+            },
+            session_factory=factory
+        )
+        resources = policy.run()
+        self.assertEqual(len(resources), 1)
+        self.assertEqual(
+            resources[0].get('InstanceId'), 'i-0087ce11c395e5703')
+
+
+class TestEC2IamRoleTagMirro(BaseTest):
+    """Tests for EC2 iam-role-tag-mirror filter"""
+
+    def test_ec2_iam_role_tag_mirror_equal(self):
+        """Test iam-role-tag-mirror with match: equal"""
+        factory = self.replay_flight_data('test_ec2_iam_role_tag_mirror_equal')
+        policy = self.load_policy(
+            {
+                'name': 'ec2-role-tag-mirror-equal',
+                'resource': 'ec2',
+                'filters': [
+                    {
+                        'type': 'iam-role-tag-mirror',
+                        'key': 'tag:Environment',
+                        'match': 'equal'
+                    }
+                ]
+            },
+            session_factory=factory
+        )
+        resources = policy.run()
+        self.assertEqual(len(resources), 1)
+        # No annotation when tags match
+        self.assertNotIn('c7n:IamRoleTagMirror', resources[0])
+        self.assertEqual(
+            resources[0].get('InstanceId'), 'i-051d5a5a07a40d2a3')
+
+    def test_ec2_iam_role_tag_mirror_ne(self):
+        factory = self.replay_flight_data('test_ec2_iam_role_tag_mirror_ne')
+        policy = self.load_policy(
+            {
+                'name': 'ec2-role-tag-mirror-ignore',
+                'resource': 'ec2',
+                'filters': [
+                    {
+                        'type': 'iam-role-tag-mirror',
+                        'key': 'tag:Environment',
+                        'match': 'not-equal'
+                    }
+                ]
+            },
+            session_factory=factory
+        )
+        resources = policy.run()
+        self.assertEqual(len(resources), 1)
+        self.assertIn('c7n:IamRoleTagMirror', resources[0])
+        self.assertEqual(
+            resources[0].get('InstanceId'), 'i-051d5a5a07a40d2a3')
+        self.assertEqual(
+            resources[0]['c7n:IamRoleTagMirror'][0],
+             {'reason': 'TagMismatch',
+              'key': 'tag:Environment',
+              'resource': 'Development',
+              'iam-roles': {'CloudCustodianRole': 'Production'}})
+
+    def test_ec2_iam_role_tag_mirror_ignore(self):
+        """Test iam-role-tag-mirror with ignore parameter"""
+        factory = self.replay_flight_data('test_ec2_iam_role_tag_mirror_ignore')
+        policy = self.load_policy(
+            {
+                'name': 'ec2-role-tag-mirror-ignore',
+                'resource': 'ec2',
+                'filters': [
+                    {
+                        'type': 'iam-role-tag-mirror',
+                        'key': 'tag:Environment',
+                        'match': 'not-equal',
+                        'ignore': [
+                            {'tag:Owner': 'SharedServices'}
+                        ]
+                    }
+                ]
+            },
+            session_factory=factory
+        )
+        resources = policy.run()
+        self.assertEqual(len(resources), 1)
+        self.assertIn('c7n:IamRoleTagMirror', resources[0])
+        self.assertEqual(
+            resources[0].get('InstanceId'), 'i-0087ce11c395e5703')
+        self.assertEqual(
+            resources[0]['c7n:IamRoleTagMirror'][0],
+             {'reason': 'TagMismatch',
+              'key': 'tag:Environment',
+              'resource': 'Development',
+              'iam-roles': {'c7n-pratyush-test': 'Production'}})
+
+    def test_ec2_iam_role_tag_mirror_match_in(self):
+        """Test iam-role-tag-mirror with match: in"""
+        factory = self.replay_flight_data('test_ec2_iam_role_tag_mirror_match_in')
+        policy = self.load_policy(
+            {
+                'name': 'ec2-role-tag-mirror-in',
+                'resource': 'ec2',
+                'filters': [
+                    {
+                        'type': 'iam-role-tag-mirror',
+                        'key': 'tag:Environment',
+                        'match': 'in',
+                        'value': ['Production', 'Staging', 'Development']
+                    }
+                ]
+            },
+            session_factory=factory
+        )
+        resources = policy.run()
+        self.assertEqual(len(resources), 1)
+        self.assertEqual(
+            resources[0].get('InstanceId'), 'i-051d5a5a07a40d2a3')
+
+    def test_ec2_iam_role_tag_mirror_missing_ok(self):
+        """Test iam-role-tag-mirror with missing-ok: true"""
+        factory = self.replay_flight_data('test_ec2_iam_role_tag_mirror_missing_ok')
+        policy = self.load_policy(
+            {
+                'name': 'ec2-role-tag-mirror-missing-ok',
+                'resource': 'ec2',
+                'filters': [
+                    {
+                        'type': 'iam-role-tag-mirror',
+                        'key': 'tag:CostCenter',
+                        'match': 'not-equal',
+                        'missing-ok': True
+                    }
+                ]
+            },
+            session_factory=factory
+        )
+        resources = policy.run()
+        # Should only flag actual mismatches, not missing tags
+        self.assertEqual(len(resources), 1)
+        evaluation = resources[0]['c7n:IamRoleTagMirror'][0]
+        self.assertEqual(evaluation['reason'], 'TagMismatch')
+        self.assertEqual(
+            resources[0].get('InstanceId'), 'i-0087ce11c395e5703')
