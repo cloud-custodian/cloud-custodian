@@ -50,6 +50,24 @@ class DescribeEC2(query.DescribeSource):
             query_params.update(q)
         return query_params
 
+    @staticmethod
+    def _flatten_reservations(reservations):
+        instances = []
+        for r in (reservations or []):
+            rid = r.get('ReservationId')
+            for i in r.get('Instances', []):
+                i['ReservationId'] = rid
+                instances.append(i)
+        return instances
+
+    def resources(self, query):
+        reservations = self.query.filter(self.manager, **query)
+        return self._flatten_reservations(reservations)
+
+    def get_resources(self, ids, cache=True):
+        reservations = self.query.get(self.manager, ids)
+        return self._flatten_reservations(reservations)
+
     def augment(self, resources):
         """EC2 API and AWOL Tags
 
@@ -64,8 +82,6 @@ class DescribeEC2(query.DescribeSource):
         name), so there isn't a good default to ensure that we will
         always get tags from describe_x calls.
         """
-        # First if we're in event based lambda go ahead and skip this,
-        # tags can't be trusted in ec2 instances immediately post creation.
         if not resources or self.manager.data.get(
                 'mode', {}).get('type', '') in (
                     'cloudtrail', 'ec2-instance-state'):
@@ -109,7 +125,7 @@ class EC2(query.QueryResourceManager):
     class resource_type(query.TypeInfo):
         service = 'ec2'
         arn_type = 'instance'
-        enum_spec = ('describe_instances', 'Reservations[].Instances[]', None)
+        enum_spec = ('describe_instances', 'Reservations[]', None)
         id = 'InstanceId'
         filter_name = 'InstanceIds'
         filter_type = 'list'
