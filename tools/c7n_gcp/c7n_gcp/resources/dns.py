@@ -5,6 +5,7 @@ from c7n_gcp.query import QueryResourceManager, TypeInfo
 from c7n_gcp.actions import MethodAction
 from c7n.utils import type_schema, local_session
 from c7n.filters.core import ListItemFilter
+from c7n.exceptions import PolicyValidationError
 
 
 @resources.register('dns-managed-zone')
@@ -54,6 +55,67 @@ class DnsPolicy(QueryResourceManager):
             return client.execute_query(
                 'get', {'project': resource_info['project_id'],
                         'policy': resource_info['policy_name']})
+
+
+@DnsPolicy.action_registry.register('update')
+class UpdatePolicy(MethodAction):
+    """Update DNS policy settings.
+
+    :example:
+
+    .. code-block:: yaml
+
+            policies:
+              - name: gcp-dns-policy-enable-logging
+                resource: gcp.dns-policy
+                filters:
+                  - type: value
+                    key: enableLogging
+                    value: false
+                actions:
+                  - type: update
+                    enableLogging: true
+    """
+
+    schema = type_schema(
+        'update',
+        **{
+            'description': {'type': 'string'},
+            'enableInboundForwarding': {'type': 'boolean'},
+            'enableLogging': {'type': 'boolean'},
+            'alternativeNameServerConfig': {'type': 'object'},
+            'networks': {'type': 'array', 'items': {'type': 'object'}}
+        }
+    )
+    method_spec = {'op': 'patch'}
+    # `update` is the permission name; there is no `dns.policies.patch` IAM permission.
+    method_perm = 'update'
+    update_fields = (
+        'description',
+        'enableInboundForwarding',
+        'enableLogging',
+        'alternativeNameServerConfig',
+        'networks',
+    )
+
+    def get_resource_params(self, model, resource):
+        project = local_session(self.manager.source.query.session_factory).get_default_project()
+        body = {}
+        for field in self.update_fields:
+            if field in self.data:
+                body[field] = self.data[field]
+
+        return {'project': project, 'policy': resource['name'], 'body': body}
+
+    def validate(self):
+        super().validate()
+        if not any(field in self.data for field in self.update_fields):
+            raise PolicyValidationError(
+                "policy:{} action:{} requires at least one mutable policy field".format(
+                    self.manager.ctx.policy.name, self.type
+                )
+            )
+        return self
 
 
 @DnsManagedZone.filter_registry.register('records-sets')

@@ -1,0 +1,39 @@
+{
+  "headers": {
+    "etag": "718b1d27e7bba81f0000019d313d1a99",
+    "content-type": "application/json; charset=UTF-8",
+    "vary": "Origin, X-Origin, Referer",
+    "date": "Fri, 27 Mar 2026 21:39:41 GMT",
+    "server": "ESF",
+    "x-xss-protection": "0",
+    "x-frame-options": "SAMEORIGIN",
+    "x-content-type-options": "nosniff",
+    "alt-svc": "h3=\":443\"; ma=2592000,h3-29=\":443\"; ma=2592000",
+    "transfer-encoding": "chunked",
+    "status": "200",
+    "content-length": "552",
+    "-content-encoding": "gzip",
+    "content-location": "https://dns.googleapis.com/dns/v1beta2/projects/cloud-custodian/policies/c7n-dns-policy-update-test?alt=json"
+  },
+  "body": {
+    "id": "8181665205277403167",
+    "name": "c7n-dns-policy-update-test",
+    "enableInboundForwarding": false,
+    "description": "Managed by Terraform",
+    "networks": [
+      {
+        "networkUrl": "https://compute.googleapis.com/compute/v1/projects/cloud-custodian/global/networks/c7n-dns-policy-network",
+        "kind": "dns#policyNetwork"
+      }
+    ],
+    "enableLogging": true,
+    "dns64Config": {
+      "scope": {
+        "allQueries": false,
+        "kind": "dns#policyDns64ConfigScope"
+      },
+      "kind": "dns#policyDns64Config"
+    },
+    "kind": "dns#policy"
+  }
+}
