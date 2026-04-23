@@ -1,14 +1,33 @@
 {
     "status_code": 200,
     "data": {
+        "ResponseMetadata": {},
         "agentSpaces": [
             {
-                "name": "Testing Devops",
-                "description": "This is used for testing custodian.",
+                "name": "custodian-test-agent",
+                "description": "This resource is setup to test cloud custodian resources.",
                 "locale": "en-US",
-                "createdAt": "2026-04-08T12:49:18.198000+00:00",
-                "updatedAt": "2026-04-08T12:49:18.198000+00:00",
-                "agentSpaceId": "2cb618c1-4241-4ae5-a696-e69490fbbb4b"
+                "createdAt": {
+                    "__class__": "datetime",
+                    "year": 2026,
+                    "month": 4,
+                    "day": 23,
+                    "hour": 16,
+                    "minute": 21,
+                    "second": 59,
+                    "microsecond": 921000
+                },
+                "updatedAt": {
+                    "__class__": "datetime",
+                    "year": 2026,
+                    "month": 4,
+                    "day": 23,
+                    "hour": 16,
+                    "minute": 21,
+                    "second": 59,
+                    "microsecond": 921000
+                },
+                "agentSpaceId": "681ce319-0dbe-4bbf-b50c-9ddc3ff2e05f"
             }
         ]
     }

@@ -1,9 +1,10 @@
 {
     "status_code": 200,
     "data": {
+        "ResponseMetadata": {},
         "tags": {
-            "customTag": "1",
-            "randomTag": "True"
+            "agentName": "testAgent",
+            "agentAssociation": "pretendService"
         }
     }
 }

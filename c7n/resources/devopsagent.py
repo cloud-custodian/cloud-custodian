@@ -2,7 +2,6 @@
 # SPDX-License-Identifier: Apache-2.0
 from c7n.manager import resources
 from c7n import query
-from c7n.tags import TagActionFilter, TagDelayedAction, Tag, RemoveTag
 from c7n.utils import local_session
 
 
@@ -12,9 +11,6 @@ class DescribeDevOpsAgentSpace(query.DescribeSource):
 
         def _augment(r):
             r['agentSpaceArn'] = self.manager.generate_arn('agentspace/' + r['agentSpaceId'])
-            import pudb
-
-            pudb.set_trace()
             tags = self.manager.retry(
                 client.list_tags_for_resource,
                 resourceArn=r['agentSpaceArn'],
@@ -39,4 +35,3 @@ class DevOpsAgentSpace(query.QueryResourceManager):
         permissions = 'devops-agent:ListAgentSpaces'
 
     source_mapping = {'describe': DescribeDevOpsAgentSpace, 'config': query.ConfigSource}
-
