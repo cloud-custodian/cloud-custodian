@@ -2,6 +2,7 @@
 # SPDX-License-Identifier: Apache-2.0
 import time
 
+from c7n_gcp.resources.network import Interconnect
 from gcp_common import BaseTest, event_data
 from googleapiclient.errors import HttpError
 
@@ -292,3 +293,28 @@ class TestVPCFirewallFilter(BaseTest):
 
         self.assertEqual(len(resources), 1)
         self.assertEqual(resources[0]['kind'], 'compute#network')
+
+
+def test_interconnect_labels(test):
+    # Provisioning real interconnect resources requires a physical connection, so minimal
+    # mock responses have been written manually to the recording directory.
+    factory = test.replay_flight_data("interconnect-labels")
+
+    policy = test.load_policy(
+        {
+            "name": "interconnect-labels",
+            "resource": "gcp.interconnect",
+            "filters": [{"name": "my-interconnect"}],
+            "actions": [{"type": "set-labels", "labels": {"env": "not-the-default"}}],
+        },
+        session_factory=factory,
+    )
+
+    resources = policy.run()
+    assert len(resources) == 1
+    assert resources[0]["labels"]["env"] == "default"
+
+    client = policy.resource_manager.get_client()
+    resource = Interconnect.resource_type.refresh(client, resources[0])
+    assert resource["labels"]["env"] == "not-the-default"
+    assert resource["labelFingerprint"] != resources[0]["labelFingerprint"]
