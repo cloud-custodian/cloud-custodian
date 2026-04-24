@@ -19,6 +19,8 @@ class DnsManagedZone(QueryResourceManager):
         scope = 'project'
         id = 'id'
         name = 'name'
+        labels = True
+        labels_op = 'patch'
         default_report_fields = ['id', 'name', 'dnsName', 'creationTime', 'visibility']
         asset_type = "dns.googleapis.com/ManagedZone"
         scc_type = "google.cloud.dns.ManagedZone"
@@ -30,6 +32,21 @@ class DnsManagedZone(QueryResourceManager):
             return client.execute_query(
                 'get', {'project': resource_info['project_id'],
                         'managedZone': resource_info['zone_name']})
+
+        @staticmethod
+        def get_label_params(resource, all_labels):
+            return {
+                'project': resource['project_id'],
+                'managedZone': resource['name'],
+                'body': {'labels': all_labels}
+            }
+
+    def augment(self, resources):
+        project = local_session(self.session_factory).get_default_project()
+        for resource in resources:
+            # Make the project id accessible for `get_label_params`
+            resource.setdefault('project_id', project)
+        return resources
 
 
 @resources.register('dns-policy')
