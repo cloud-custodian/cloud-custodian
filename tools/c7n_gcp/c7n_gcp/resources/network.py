@@ -390,14 +390,40 @@ class InterconnectAttachment(QueryResourceManager):
             "name", "description", "creationTimestamp", "interconnect",
             "router", "region", "operationalStatus"]
         asset_type = "compute.googleapis.com/InterconnectAttachment"
+        labels = True
+        labels_op = 'setLabels'
 
         @staticmethod
-        def get(client, resource_info):
-            project, region, name = re.match(
-                'projects/(.*?)/regions/(.*?)/interconnectAttachments/(.*?)',
-                resource_info['resourceName']).groups()
+        def parse_params(resc_name):
+            """Takes resourceName (from a log) or selfLink (from a resource) and parses from it the
+            parameters needed to make a request (project, region, and name)"""
+            exp = r".*projects\/(.*)\/regions\/(.*)\/interconnectAttachments\/(.*)"
+            return re.match(exp, resc_name).groups()
+
+        @classmethod
+        def get(cls, client, resource_info):
+            project, region, name = cls.parse_params(resource_info['resourceName'])
 
             return client.execute_command(
                 'get', {'project': project,
                         'interconnectAttachment': name,
                         'region': region})
+
+        @classmethod
+        def get_label_params(cls, resource, all_labels):
+            project, region, name = cls.parse_params(resource['selfLink'])
+            return {
+                'project': project,
+                'region': region,
+                'resource': name,
+                'body': {
+                    'labels': all_labels,
+                    'labelFingerprint': resource['labelFingerprint']
+                }
+            }
+
+        @classmethod
+        def refresh(cls, client, resource):
+            """This method is used to refresh labelFingerprint when a label action fails because the
+            fingerprint was stale."""
+            return cls.get(client, {'resourceName': resource['selfLink']})
