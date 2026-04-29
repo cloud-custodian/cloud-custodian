@@ -494,12 +494,36 @@ class Snapshot(QueryResourceManager):
         default_report_fields = ["name", "status", "diskSizeGb", "creationTimestamp"]
         asset_type = "compute.googleapis.com/Snapshot"
         urn_component = "snapshot"
+        labels = True
+        labels_op = 'setLabels'
+
+        @staticmethod
+        def parse_params(resc_name):
+            """Takes resourceName (from a log) or selfLink (from a resource) and parses from it the
+            parameters needed to make a request (project and snapshot)"""
+            return re.match('.*?/projects/(.*?)/global/snapshots/(.*)', resc_name).groups()
 
         @staticmethod
         def get(client, resource_info):
             return client.execute_command(
                 'get', {'project': resource_info['project_id'],
                         'snapshot': resource_info['snapshot_id']})
+
+        @classmethod
+        def get_label_params(cls, resource, all_labels):
+            project, snapshot = cls.parse_params(resource['selfLink'])
+            return {'project': project, 'resource': snapshot,
+                    'body': {
+                        'labels': all_labels,
+                        'labelFingerprint': resource['labelFingerprint']
+                    }}
+
+        @classmethod
+        def refresh(cls, client, resource):
+            """This method is used to refresh labelFingerprint when a label action fails because the
+            fingerprint was stale."""
+            project, snapshot = cls.parse_params(resource['selfLink'])
+            return cls.get(client, {'project_id': project, 'snapshot_id': snapshot})
 
 
 @Snapshot.action_registry.register('delete')
