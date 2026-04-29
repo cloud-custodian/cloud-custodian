@@ -31,11 +31,27 @@ class PubSubTopic(QueryResourceManager):
         asset_type = "pubsub.googleapis.com/Topic"
         metric_key = "resource.labels.topic_id"
         urn_component = "topic"
+        labels = True
+        labels_op = 'patch'
+        labels_perm = 'update'
 
         @staticmethod
         def get(client, resource_info):
             return client.execute_command(
                 'get', {'topic': resource_info['topic_id']})
+
+        @staticmethod
+        def get_label_params(resource, all_labels):
+            return {
+                'name': resource['name'],
+                'body': {
+                    'topic': {
+                        'name': resource['name'],
+                        'labels': all_labels,
+                    },
+                    'updateMask': 'labels',
+                },
+            }
 
 
 @PubSubTopic.filter_registry.register('iam-policy')
