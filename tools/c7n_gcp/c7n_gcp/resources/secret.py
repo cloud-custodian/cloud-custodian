@@ -19,6 +19,7 @@ class Secret(QueryResourceManager):
         name = id = "name"
         labels = True
         labels_op = 'patch'
+        labels_perm = 'update'
         asset_type = "secretmanager.googleapis.com/Secret"
         default_report_fields = ['name', 'createTime', 'expireTime', 'ttl']
 
