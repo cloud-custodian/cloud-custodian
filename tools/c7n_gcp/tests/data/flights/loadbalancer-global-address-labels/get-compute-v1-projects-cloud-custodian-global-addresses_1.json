@@ -1,0 +1,61 @@
+{
+  "headers": {
+    "etag": "3fzjVuMGlhwtuJJJ9j-XvRscJf8=/o9CYy2Mwg07y8vIEAuEHlCCavhU=",
+    "content-type": "application/json; charset=UTF-8",
+    "vary": "Origin, X-Origin, Referer",
+    "date": "Tue, 21 Apr 2026 20:41:00 GMT",
+    "server": "ESF",
+    "x-xss-protection": "0",
+    "x-frame-options": "SAMEORIGIN",
+    "x-content-type-options": "nosniff",
+    "alt-svc": "h3=\":443\"; ma=2592000,h3-29=\":443\"; ma=2592000",
+    "transfer-encoding": "chunked",
+    "status": "200",
+    "content-length": "1568",
+    "-content-encoding": "gzip",
+    "content-location": "https://compute.googleapis.com/compute/v1/projects/cloud-custodian/global/addresses?alt=json"
+  },
+  "body": {
+    "kind": "compute#addressList",
+    "id": "projects/cloud-custodian/global/addresses",
+    "items": [
+      {
+        "kind": "compute#address",
+        "id": "1846832603165515296",
+        "creationTimestamp": "2026-04-21T13:40:47.496-07:00",
+        "name": "c7n-global-address-default-abf3",
+        "description": "",
+        "address": "34.102.242.222",
+        "status": "RESERVED",
+        "selfLink": "https://www.googleapis.com/compute/v1/projects/cloud-custodian/global/addresses/c7n-global-address-default-abf3",
+        "networkTier": "PREMIUM",
+        "labels": {
+          "goog-terraform-provisioned": "true",
+          "env": "default"
+        },
+        "labelFingerprint": "oWv7t93mrS4=",
+        "addressType": "EXTERNAL"
+      },
+      {
+        "kind": "compute#address",
+        "id": "4733793131429703510",
+        "creationTimestamp": "2026-02-26T10:32:25.293-08:00",
+        "name": "redis-ip-range",
+        "description": "",
+        "address": "10.96.0.0",
+        "prefixLength": 16,
+        "status": "RESERVED",
+        "selfLink": "https://www.googleapis.com/compute/v1/projects/cloud-custodian/global/addresses/redis-ip-range",
+        "networkTier": "PREMIUM",
+        "labels": {
+          "goog-terraform-provisioned": "true"
+        },
+        "labelFingerprint": "vezUS-42LLM=",
+        "addressType": "INTERNAL",
+        "purpose": "VPC_PEERING",
+        "network": "https://www.googleapis.com/compute/v1/projects/cloud-custodian/global/networks/default"
+      }
+    ],
+    "selfLink": "https://www.googleapis.com/compute/v1/projects/cloud-custodian/global/addresses"
+  }
+}
