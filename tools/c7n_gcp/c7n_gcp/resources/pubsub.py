@@ -85,11 +85,27 @@ class PubSubSubscription(QueryResourceManager):
         asset_type = "pubsub.googleapis.com/Subscription"
         metric_key = 'resource.labels.subscription_id'
         urn_component = "subscription"
+        labels = True
+        labels_op = 'patch'
+        labels_perm = 'update'
 
         @staticmethod
         def get(client, resource_info):
             return client.execute_command(
                 'get', {'subscription': resource_info['subscription_id']})
+
+        @staticmethod
+        def get_label_params(resource, all_labels):
+            return {
+                'name': resource['name'],
+                'body': {
+                    'subscription': {
+                        'name': resource['name'],
+                        'labels': all_labels,
+                    },
+                    'updateMask': 'labels',
+                },
+            }
 
 
 @PubSubSubscription.action_registry.register('delete')

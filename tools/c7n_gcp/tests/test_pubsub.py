@@ -76,6 +76,30 @@ def test_pubsub_subscription_query(test, pubsub_subscription):
     )
 
 
+@terraform('pubsub_subscription_labels')
+def test_pubsub_subscription_labels(test, pubsub_subscription_labels):
+    subscription_name = pubsub_subscription_labels['google_pubsub_subscription.default.id']
+
+    session_factory = test.replay_flight_data('pubsub-subscription-labels')
+    policy = test.load_policy(
+        {
+            'name': 'gcp-pubsub-subscription-labels',
+            'resource': 'gcp.pubsub-subscription',
+            'filters': [{'name': subscription_name}],
+            'actions': [{'type': 'set-labels', 'labels': {'env': 'not-the-default'}}],
+        },
+        session_factory=session_factory,
+    )
+
+    resources = policy.run()
+    assert len(resources) == 1
+    assert resources[0]['labels']['env'] == 'default'
+
+    client = policy.resource_manager.get_client()
+    result = client.execute_query('get', {'subscription': subscription_name})
+    assert result['labels']['env'] == 'not-the-default'
+
+
 class PubSubSubscriptionTest(BaseTest):
     def test_pubsub_subscription_get(self):
         project_id = 'cloud-custodian'
