@@ -27,6 +27,7 @@ class CloudRunService(QueryResourceManager):
         asset_type = "run.googleapis.com/Service"
         labels = True
         labels_op = 'replaceService'
+        labels_perm = 'update'
 
         @staticmethod
         def get_label_params(resource, all_labels):
@@ -90,6 +91,7 @@ class CloudRunJob(QueryResourceManager):
         asset_type = "run.googleapis.com/Job"
         labels = True
         labels_op = 'replaceJob'
+        labels_perm = 'update'
 
         @staticmethod
         def get_label_params(resource, all_labels):

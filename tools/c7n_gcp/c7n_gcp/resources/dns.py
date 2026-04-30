@@ -21,6 +21,7 @@ class DnsManagedZone(QueryResourceManager):
         name = 'name'
         labels = True
         labels_op = 'patch'
+        labels_perm = 'update'
         default_report_fields = ['id', 'name', 'dnsName', 'creationTime', 'visibility']
         asset_type = "dns.googleapis.com/ManagedZone"
         scc_type = "google.cloud.dns.ManagedZone"
