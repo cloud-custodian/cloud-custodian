@@ -19,7 +19,17 @@ from c7n_gcp.provider import resources as gcp_resources
 class BaseLabelAction(MethodAction):
 
     method_spec = {}
-    method_perm = 'update'
+
+    @property
+    def method_perm(self):
+        model = self.manager.get_model()
+
+        # Allow overriding via labels_perm
+        if override := getattr(model, 'labels_perm', None):
+            return override
+
+        # Default the permission name to the operation name
+        return model.labels_op
 
     def get_labels_to_add(self, resource):
         return None

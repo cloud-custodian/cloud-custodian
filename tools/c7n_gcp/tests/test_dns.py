@@ -2,6 +2,7 @@
 # SPDX-License-Identifier: Apache-2.0
 
 from gcp_common import BaseTest, event_data
+from pytest_terraform import terraform
 
 
 class DnsManagedZoneTest(BaseTest):
@@ -145,3 +146,28 @@ class TestDnsResourceRecordsFilter(BaseTest):
 
         self.assertEqual(len(policy_resources), 1)
         self.assertEqual(policy_resources[0]['name'], 'zone-277-red')
+
+
+@terraform('dns_managed_zone_set_labels')
+def test_managed_zone_set_labels(test, dns_managed_zone_set_labels):
+    project_id = dns_managed_zone_set_labels['google_dns_managed_zone.default.project']
+    zone_name = dns_managed_zone_set_labels['google_dns_managed_zone.default.name']
+
+    factory = test.replay_flight_data('dns-managed-zone-set-label')
+    policy = test.load_policy(
+        {
+            'name': 'gcp-dns-managed-zone-set-label',
+            'resource': 'gcp.dns-managed-zone',
+            'filters': [{'name': zone_name}],
+            'actions': [{'type': 'set-labels', 'labels': {'env': 'not-the-default'}}]
+        },
+        session_factory=factory
+    )
+
+    resources = policy.run()
+    assert len(resources) == 1
+    assert resources[0]['labels']['env'] == 'default'
+
+    client = policy.resource_manager.get_client()
+    result = client.execute_query('get', {'project': project_id, 'managedZone': zone_name})
+    assert result['labels']['env'] == 'not-the-default'
