@@ -19,6 +19,8 @@ class LoadBalancingAddress(QueryResourceManager):
         enum_spec = ('aggregatedList', 'items.*.addresses[]', None)
         scope = 'project'
         name = id = 'name'
+        labels = True
+        labels_op = 'setLabels'
         default_report_fields = [
             name, "description", "address", "status", "region", "addressType"
         ]
@@ -26,12 +28,39 @@ class LoadBalancingAddress(QueryResourceManager):
         urn_component = "address"
 
         @staticmethod
-        def get(client, resource_info):
+        def parse_params(resc_name):
+            """Takes resourceName (from a log) or selfLink (from a resource) and parses from it the
+            parameters needed to make a request (project, region, and address)"""
+            exp = r".*projects/(.*)/regions/(.*)/addresses/(.*)"
+            return re.match(exp, resc_name).groups()
+
+        @classmethod
+        def get(cls, client, resource_info):
+            project, region, address = cls.parse_params(resource_info['resourceName'])
+
             return client.execute_command('get', {
-                'project': resource_info['project_id'],
-                'region': resource_info['location'],
-                'address': resource_info[
-                    'resourceName'].rsplit('/', 1)[-1]})
+                'project': project,
+                'region': region,
+                'address': address})
+
+        @classmethod
+        def get_label_params(cls, resource, all_labels):
+            project, region, address = cls.parse_params(resource['selfLink'])
+            return {
+                'project': project,
+                'region': region,
+                'resource': address,
+                'body': {
+                    'labels': all_labels,
+                    'labelFingerprint': resource['labelFingerprint']
+                }
+            }
+
+        @classmethod
+        def refresh(cls, client, resource):
+            """This method is used to refresh labelFingerprint when a label action fails because the
+            fingerprint was stale."""
+            return cls.get(client, {'resourceName': resource['selfLink']})
 
 
 @LoadBalancingAddress.action_registry.register('delete')
