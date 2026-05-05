@@ -5,6 +5,7 @@ import re
 
 from datetime import datetime
 
+from c7n.exceptions import PolicyValidationError
 from c7n.utils import local_session, type_schema
 
 from c7n_gcp.actions import MethodAction
@@ -297,6 +298,77 @@ class CreateMachineImage(MethodAction):
 
     def get_client(self, session, model):
         return session.client(model.service, "beta", "machineImages")
+
+
+@Instance.action_registry.register('set-metadata')
+class InstanceSetMetadata(InstanceAction):
+    """Set or remove metadata key/value pairs on a Compute Engine instance.
+
+    Existing metadata keys not specified in the action are preserved.
+    The fingerprint of the current metadata is used to prevent concurrent
+    update conflicts.
+
+    Both ``metadata`` and ``remove`` are optional and can be used independently
+    or together in the same action.
+
+    :example:
+
+    Set a metadata key:
+
+    .. code-block:: yaml
+
+        policies:
+          - name: gcp-instance-oslogin-remediate
+            resource: gcp.instance
+            filters:
+              - type: value
+                key: "metadata.items[?key=='enable-oslogin'].value | [0]"
+                op: ne
+                value_type: normalize
+                value: "true"
+            actions:
+              - type: set-metadata
+                metadata:
+                  enable-oslogin: "true"
+
+    Remove metadata keys without setting any new ones:
+
+    .. code-block:: yaml
+
+        policies:
+          - name: gcp-instance-remove-metadata
+            resource: gcp.instance
+            actions:
+              - type: set-metadata
+                remove:
+                  - key-one
+                  - key-two
+
+    """
+    schema = type_schema(
+        'set-metadata',
+        metadata={'type': 'object', 'additionalProperties': {'type': 'string'}},
+        remove={'type': 'array', 'items': {'type': 'string'}})
+    method_spec = {'op': 'setMetadata'}
+    permissions = ('compute.instances.setMetadata',)
+
+    def validate(self):
+        if not self.data.get('metadata') and not self.data.get('remove'):
+            raise PolicyValidationError("Must specify one of metadata or remove")
+        return self
+
+    def get_resource_params(self, model, resource):
+        params = super().get_resource_params(model, resource)
+        existing = resource.get('metadata', {})
+        items_map = {i['key']: i['value'] for i in existing.get('items', [])}
+        items_map.update(self.data.get('metadata', {}))
+        for key in self.data.get('remove', []):
+            items_map.pop(key, None)
+        params['body'] = {
+            'fingerprint': existing.get('fingerprint', ''),
+            'items': [{'key': k, 'value': v} for k, v in items_map.items()]
+        }
+        return params
 
 
 @resources.register('image')
@@ -741,6 +813,79 @@ class Project(QueryResourceManager):
         def get(client, resource_info):
             return client.execute_command(
                 'get', {'project': resource_info['project_id']})
+
+
+@Project.action_registry.register('set-common-instance-metadata')
+class ProjectSetCommonInstanceMetadata(MethodAction):
+    """Set or remove common instance metadata key/value pairs on a Compute Engine project.
+
+    Common instance metadata is inherited by all instances in the project.
+    Existing metadata keys not specified in the action are preserved.
+    The fingerprint of the current metadata is used to prevent concurrent
+    update conflicts.
+
+    Both ``metadata`` and ``remove`` are optional and can be used independently
+    or together in the same action.
+
+    :example:
+
+    Set a common instance metadata key:
+
+    .. code-block:: yaml
+
+        policies:
+          - name: gcp-project-oslogin-remediate
+            resource: gcp.compute-project
+            filters:
+              - type: value
+                key: "commonInstanceMetadata.items[?key=='enable-oslogin'].value | [0]"
+                op: ne
+                value_type: normalize
+                value: "true"
+            actions:
+              - type: set-common-instance-metadata
+                metadata:
+                  enable-oslogin: "true"
+
+    Remove common instance metadata keys without setting any new ones:
+
+    .. code-block:: yaml
+
+        policies:
+          - name: gcp-project-remove-common-instance-metadata
+            resource: gcp.compute-project
+            actions:
+              - type: set-common-instance-metadata
+                remove:
+                  - key-one
+                  - key-two
+
+    """
+    schema = type_schema(
+        'set-common-instance-metadata',
+        metadata={'type': 'object', 'additionalProperties': {'type': 'string'}},
+        remove={'type': 'array', 'items': {'type': 'string'}})
+    method_spec = {'op': 'setCommonInstanceMetadata'}
+    permissions = ('compute.projects.setCommonInstanceMetadata',)
+
+    def validate(self):
+        if not self.data.get('metadata') and not self.data.get('remove'):
+            raise PolicyValidationError("Must specify one of metadata or remove")
+        return self
+
+    def get_resource_params(self, model, resource):
+        existing = resource.get('commonInstanceMetadata', {})
+        items_map = {i['key']: i['value'] for i in existing.get('items', [])}
+        items_map.update(self.data.get('metadata', {}))
+        for key in self.data.get('remove', []):
+            items_map.pop(key, None)
+        return {
+            'project': resource['name'],
+            'body': {
+                'fingerprint': existing.get('fingerprint', ''),
+                'items': [{'key': k, 'value': v} for k, v in items_map.items()]
+            }
+        }
 
 
 @resources.register('instance-group-manager')

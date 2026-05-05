@@ -1,0 +1,32 @@
+{
+  "headers": {
+    "content-type": "application/json; charset=UTF-8",
+    "vary": "Origin, X-Origin, Referer",
+    "date": "Mon, 16 Mar 2026 17:39:37 GMT",
+    "server": "ESF",
+    "x-xss-protection": "0",
+    "x-frame-options": "SAMEORIGIN",
+    "x-content-type-options": "nosniff",
+    "alt-svc": "h3=\":443\"; ma=2592000,h3-29=\":443\"; ma=2592000",
+    "transfer-encoding": "chunked",
+    "status": "200",
+    "content-length": "740",
+    "-content-encoding": "gzip"
+  },
+  "body": {
+    "setCommonInstanceMetadataOperationMetadata": {
+      "clientOperationId": "operation-1773682776910-64d27b3dcac2a-3412132b-349ae847"
+    },
+    "kind": "compute#operation",
+    "id": "1831909992695201462",
+    "name": "operation-1773682776910-64d27b3dcac2a-3412132b-349ae847",
+    "operationType": "compute.projects.setCommonInstanceMetadata",
+    "targetLink": "https://www.googleapis.com/compute/v1/projects/stacklet-test-policies",
+    "targetId": "859150599087",
+    "status": "PENDING",
+    "user": "markos@sixfeetup.com",
+    "progress": 0,
+    "insertTime": "2026-03-16T10:39:37.335-07:00",
+    "selfLink": "https://www.googleapis.com/compute/v1/projects/cloud-custodian/global/operations/operation-1773682776910-64d27b3dcac2a-3412132b-349ae847"
+  }
+}
