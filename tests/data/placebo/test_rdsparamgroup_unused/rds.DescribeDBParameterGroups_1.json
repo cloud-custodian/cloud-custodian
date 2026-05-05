@@ -1,0 +1,26 @@
+{
+    "status_code": 200,
+    "data": {
+        "DBParameterGroups": [
+            {
+                "DBParameterGroupName": "default.mysql8.0",
+                "DBParameterGroupFamily": "mysql8.0",
+                "Description": "Default parameter group for mysql8.0",
+                "DBParameterGroupArn": "arn:aws:rds:us-east-1:644160558196:pg:default.mysql8.0"
+            },
+            {
+                "DBParameterGroupName": "custom-pg-used",
+                "DBParameterGroupFamily": "mysql8.0",
+                "Description": "Custom parameter group in use",
+                "DBParameterGroupArn": "arn:aws:rds:us-east-1:644160558196:pg:custom-pg-used"
+            },
+            {
+                "DBParameterGroupName": "custom-pg-orphan",
+                "DBParameterGroupFamily": "mysql8.0",
+                "Description": "Custom parameter group not in use",
+                "DBParameterGroupArn": "arn:aws:rds:us-east-1:644160558196:pg:custom-pg-orphan"
+            }
+        ],
+        "ResponseMetadata": {}
+    }
+}

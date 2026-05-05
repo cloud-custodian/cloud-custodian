@@ -1,0 +1,32 @@
+{
+    "status_code": 200,
+    "data": {
+        "Attributes": [
+            {
+                "Key": "access_logs.s3.enabled",
+                "Value": "false"
+            },
+            {
+                "Key": "access_logs.s3.bucket",
+                "Value": "hello567-elb-accesslogs-us-east-1"
+            },
+            {
+                "Key": "access_logs.s3.prefix",
+                "Value": "elbv2"
+            },
+            {
+                "Key": "connection_logs.s3.enabled",
+                "Value": "true"
+            },
+            {
+                "Key": "connection_logs.s3.bucket",
+                "Value": "hello567-elb-accesslogs-us-east-1"
+            },
+            {
+                "Key": "connection_logs.s3.prefix",
+                "Value": "elbv2"
+            }
+        ],
+        "ResponseMetadata": {}
+    }
+}

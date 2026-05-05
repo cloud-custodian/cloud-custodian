@@ -4762,3 +4762,36 @@ class TestVpcEndpointServiceDetails(BaseTest):
             "com.amazonaws.us-east-1.s3",
         )
         self.assertTrue(service_details["VpcEndpointPolicySupported"])
+
+    def test_endpoint_service_details_invalid_service_names_excluded(self):
+        session_factory = self.replay_flight_data(
+            "test_vpc_endpoint_service_details_live"
+        )
+        p = self.load_policy(
+            {
+                "name": "vpc-endpoint-policy-supported-only",
+                "resource": "aws.vpc-endpoint",
+                "filters": [
+                    {
+                        "type": "service-details",
+                        "key": "VpcEndpointPolicySupported",
+                        "value": True,
+                    }
+                ],
+            },
+            session_factory=session_factory,
+        )
+        all_resources = self.load_policy(
+            {
+                "name": "vpc-endpoint-all",
+                "resource": "aws.vpc-endpoint",
+            },
+            session_factory=session_factory,
+        ).run()
+        filtered_resources = p.run()
+
+        filtered_names = {r["ServiceName"] for r in filtered_resources}
+
+        self.assertLess(len(filtered_resources), len(all_resources))
+        self.assertIn("com.amazonaws.us-east-1.s3", filtered_names)
+        self.assertNotIn("com.amazonaws.us-west-2.s3", filtered_names)

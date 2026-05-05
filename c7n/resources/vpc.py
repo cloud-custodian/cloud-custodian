@@ -2936,8 +2936,21 @@ class EndpointServiceDetailsFilter(ValueFilter):
             if cached is not None:
                 return cached
 
-            resp = client.describe_vpc_endpoint_services(ServiceNames=service_names)
-            service_map = {d["ServiceName"]: d for d in resp.get("ServiceDetails", [])}
+            try:
+                resp = client.describe_vpc_endpoint_services(ServiceNames=service_names)
+                service_map = {d["ServiceName"]: d for d in resp.get("ServiceDetails", [])}
+            except ClientError:
+                service_map = {}
+                for name in service_names:
+                    try:
+                        resp = client.describe_vpc_endpoint_services(ServiceNames=[name])
+                        for d in resp.get("ServiceDetails", []):
+                            service_map[d["ServiceName"]] = d
+                    except ClientError as e:
+                        self.log.warning(
+                            "Error describing VPC endpoint service %s: %s",
+                            name, e
+                        )
 
             cache.save(cache_key, service_map)
             return service_map

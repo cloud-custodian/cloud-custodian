@@ -1,0 +1,89 @@
+{
+    "status_code": 200,
+    "data": {
+        "WebACL": {
+            "Name": "global",
+            "Id": "42c63f12-89cb-436d-b705-0455935cbaf8",
+            "ARN": "arn:aws:wafv2:us-east-1:644160558196:global/webacl/global/42c63f12-89cb-436d-b705-0455935cbaf8",
+            "DefaultAction": {
+                "Allow": {}
+            },
+            "Description": "",
+            "Rules": [
+                {
+                    "Name": "AWS-AWSManagedRulesAntiDDoSRuleSet",
+                    "Priority": 0,
+                    "Statement": {
+                        "ManagedRuleGroupStatement": {
+                            "VendorName": "AWS",
+                            "Name": "AWSManagedRulesAntiDDoSRuleSet",
+                            "ManagedRuleGroupConfigs": [
+                                {
+                                    "AWSManagedRulesAntiDDoSRuleSet": {
+                                        "ClientSideActionConfig": {
+                                            "Challenge": {
+                                                "UsageOfAction": "ENABLED",
+                                                "Sensitivity": "HIGH",
+                                                "ExemptUriRegularExpressions": [
+                                                    {
+                                                        "RegexString": "\\/api\\/|\\.(acc|avi|css|gif|ico|jpe?g|js|json|mp[34]|ogg|otf|pdf|png|tiff?|ttf|webm|webp|woff2?|xml)$"
+                                                    }
+                                                ]
+                                            }
+                                        },
+                                        "SensitivityToBlock": "LOW"
+                                    }
+                                }
+                            ]
+                        }
+                    },
+                    "OverrideAction": {
+                        "Count": {}
+                    },
+                    "VisibilityConfig": {
+                        "SampledRequestsEnabled": true,
+                        "CloudWatchMetricsEnabled": true,
+                        "MetricName": "AWS-AWSManagedRulesAntiDDoSRuleSet"
+                    }
+                }
+            ],
+            "VisibilityConfig": {
+                "SampledRequestsEnabled": true,
+                "CloudWatchMetricsEnabled": true,
+                "MetricName": "global"
+            },
+            "Capacity": 1498,
+            "ManagedByFirewallManager": false,
+            "LabelNamespace": "awswaf:644160558196:webacl:global:",
+            "RetrofittedByFirewallManager": false,
+            "OnSourceDDoSProtectionConfig": {
+                "ALBLowReputationMode": "ACTIVE_UNDER_DDOS"
+            },
+            "ApplicationConfig": {
+                "Attributes": [
+                    {
+                        "Name": "ApplicationCategory",
+                        "Values": [
+                            "eCommerceAndTransaction"
+                        ]
+                    },
+                    {
+                        "Name": "TrafficSource",
+                        "Values": [
+                            "web",
+                            "api"
+                        ]
+                    },
+                    {
+                        "Name": "ProtectionsName",
+                        "Values": [
+                            "Recommended"
+                        ]
+                    }
+                ]
+            }
+        },
+        "LockToken": "a6d952da-d12d-49b7-8ace-001c89ba4f16",
+        "ResponseMetadata": {}
+    }
+}

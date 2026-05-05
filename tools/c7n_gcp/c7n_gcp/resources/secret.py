@@ -17,5 +17,16 @@ class Secret(QueryResourceManager):
         scope_key = 'parent'
         scope_template = "projects/{}"
         name = id = "name"
+        labels = True
+        labels_op = 'patch'
+        labels_perm = 'update'
         asset_type = "secretmanager.googleapis.com/Secret"
         default_report_fields = ['name', 'createTime', 'expireTime', 'ttl']
+
+        @staticmethod
+        def get_label_params(resource, all_labels):
+            return {
+                'name': resource['name'],
+                'body': {'labels': all_labels},
+                'updateMask': 'labels'
+            }

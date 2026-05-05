@@ -41,3 +41,39 @@ class RedisInstance(QueryResourceManager):
         @classmethod
         def _get_location(cls, resource):
             return resource["name"].split("/")[3]
+
+
+@resources.register("redis-cluster")
+class RedisCluster(QueryResourceManager):
+    """GCP resource:
+    https://cloud.google.com/memorystore/docs/cluster/reference/rest/v1/projects.locations.clusters
+
+    :example:
+
+    .. code-block:: yaml
+
+            policies:
+              - name: gcp-memorystore-redis-cluster-auth-mode
+                description: |
+                  Find Redis clusters not using IAM auth
+                resource: gcp.redis-cluster
+                filters:
+                  - type: value
+                    key: authorizationMode
+                    op: ne
+                    value: AUTH_MODE_IAM_AUTH
+    """
+
+    class resource_type(TypeInfo):
+        service = "redis"
+        version = "v1"
+        component = "projects.locations.clusters"
+        enum_spec = ("list", "clusters[]", None)
+        scope_key = "parent"
+        scope_template = "projects/{}/locations/-"
+        name = id = "name"
+        permissions = ("redis.clusters.list",)
+        default_report_fields = ["name", "state", "createTime"]
+        asset_type = "redis.googleapis.com/Cluster"
+        urn_component = "cluster"
+        urn_id_segments = (-1,)

@@ -1,0 +1,71 @@
+{
+    "pytest-terraform": 1,
+    "outputs": {},
+    "resources": {
+        "google_compute_security_policy": {
+            "default": {
+                "adaptive_protection_config": [],
+                "advanced_options_config": [],
+                "description": "",
+                "effective_labels": {
+                    "env": "default",
+                    "goog-terraform-provisioned": "true"
+                },
+                "fingerprint": "2m3UXDAtEd4=",
+                "id": "projects/cloud-custodian/global/securityPolicies/c7n-armor-default-8fa0",
+                "label_fingerprint": "oWv7t93mrS4=",
+                "labels": {
+                    "env": "default"
+                },
+                "name": "c7n-armor-default-8fa0",
+                "project": "stacklet-test-policies",
+                "recaptcha_options_config": [],
+                "rule": [
+                    {
+                        "action": "allow",
+                        "description": "",
+                        "header_action": [],
+                        "match": [
+                            {
+                                "config": [
+                                    {
+                                        "src_ip_ranges": [
+                                            "*"
+                                        ]
+                                    }
+                                ],
+                                "expr": [],
+                                "expr_options": [],
+                                "versioned_expr": "SRC_IPS_V1"
+                            }
+                        ],
+                        "preconfigured_waf_config": [],
+                        "preview": false,
+                        "priority": 2147483647,
+                        "rate_limit_options": [],
+                        "redirect_options": []
+                    }
+                ],
+                "self_link": "https://www.googleapis.com/compute/v1/projects/cloud-custodian/global/securityPolicies/c7n-armor-default-8fa0",
+                "terraform_labels": {
+                    "env": "default",
+                    "goog-terraform-provisioned": "true"
+                },
+                "timeouts": null,
+                "type": "CLOUD_ARMOR"
+            }
+        },
+        "random_id": {
+            "suffix": {
+                "b64_std": "j6A=",
+                "b64_url": "j6A",
+                "byte_length": 2,
+                "dec": "36768",
+                "hex": "8fa0",
+                "id": "j6A",
+                "keepers": null,
+                "prefix": null
+            }
+        }
+    }
+}

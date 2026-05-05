@@ -2,6 +2,10 @@
 # SPDX-License-Identifier: Apache-2.0
 from time import sleep
 from gcp_common import BaseTest, event_data
+from pytest_terraform import terraform
+from c7n_gcp.resources.loadbalancer import LoadBalancingGlobalAddress
+from c7n_gcp.resources.loadbalancer import LoadBalancingGlobalForwardingRule
+from c7n_gcp.resources.loadbalancer import LoadBalancingForwardingRule
 
 
 class LoadBalancingAddressTest(BaseTest):
@@ -884,3 +888,115 @@ class LoadBalancingGlobalAddressTest(BaseTest):
                 'gcp:compute::cloud-custodian:global-address/custodian-global-address-0',
             ],
         )
+
+
+@terraform('loadbalancer_forwarding_rule_labels')
+def test_loadbalancer_forwarding_rule_labels(test, loadbalancer_forwarding_rule_labels):
+    forwarding_rule = loadbalancer_forwarding_rule_labels.resources[
+        'google_compute_forwarding_rule']['default']
+    project_id = forwarding_rule['project']
+    name = forwarding_rule['name']
+    label_fingerprint = forwarding_rule['label_fingerprint']
+    labels = forwarding_rule['labels']
+
+    # Confirm the starting label
+    assert labels['env'] == 'default'
+
+    # Update the label using the action
+    factory = test.replay_flight_data('loadbalancer-forwarding-rule-labels', project_id=project_id)
+    policy = test.load_policy(
+        {
+            'name': 'loadbalancer-forwarding-rule-labels',
+            'resource': 'gcp.loadbalancer-forwarding-rule',
+            'filters': [{'name': name}],
+            'actions': [
+                {'type': 'set-labels',
+                 'labels': {'env': 'not-the-default'}}
+            ],
+        },
+        session_factory=factory,
+    )
+    resources = policy.run()
+    assert len(resources) == 1
+
+    # Refresh and confirm that the label and fingerprint updated
+    client = policy.resource_manager.get_client()
+    resource = LoadBalancingForwardingRule.resource_type.refresh(client, resources[0])
+    assert resource['labels']['env'] == 'not-the-default'
+    assert resource['labelFingerprint'] != label_fingerprint
+
+
+@terraform('loadbalancer_global_address_labels')
+def test_loadbalancer_global_address_labels(test, loadbalancer_global_address_labels):
+    global_address = loadbalancer_global_address_labels.resources[
+        'google_compute_global_address']['default']
+    project_id = global_address['project']
+    name = global_address['name']
+    label_fingerprint = global_address['label_fingerprint']
+    labels = global_address['labels']
+
+    # Confirm the starting label
+    assert labels['env'] == 'default'
+
+    # Update the label using the action
+    factory = test.replay_flight_data('loadbalancer-global-address-labels', project_id=project_id)
+    policy = test.load_policy(
+        {
+            'name': 'loadbalancer-global-address-labels',
+            'resource': 'gcp.loadbalancer-global-address',
+            'filters': [{'name': name}],
+            'actions': [
+                {'type': 'set-labels',
+                 'labels': {'env': 'not-the-default'}}
+            ],
+        },
+        session_factory=factory,
+    )
+    resources = policy.run()
+    assert len(resources) == 1
+
+    # Refresh and confirm that the label and fingerprint updated
+    client = policy.resource_manager.get_client()
+    resource = LoadBalancingGlobalAddress.resource_type.refresh(client, resources[0])
+    assert resource['labels']['env'] == 'not-the-default'
+    assert resource['labelFingerprint'] != label_fingerprint
+
+
+@terraform('loadbalancer_global_forwarding_rule_labels')
+def test_loadbalancer_global_forwarding_rule_labels(
+        test, loadbalancer_global_forwarding_rule_labels):
+    global_forwarding_rule = loadbalancer_global_forwarding_rule_labels.resources[
+        'google_compute_global_forwarding_rule']['default']
+    project_id = global_forwarding_rule['project']
+    name = global_forwarding_rule['name']
+    label_fingerprint = global_forwarding_rule['label_fingerprint']
+    labels = global_forwarding_rule['labels']
+
+    # Confirm the starting label
+    assert labels['env'] == 'default'
+
+    # Update the label using an action
+    factory = test.replay_flight_data(
+        'loadbalancer-global-forwarding-rule-labels',
+        project_id=project_id,
+    )
+    policy = test.load_policy(
+        {
+            'name': 'loadbalancer-global-forwarding-rule-labels',
+            'resource': 'gcp.loadbalancer-global-forwarding-rule',
+            'filters': [{'name': name}],
+            'actions': [
+                {'type': 'set-labels',
+                 'labels': {'env': 'not-the-default'}}
+            ],
+        },
+        session_factory=factory,
+    )
+    resources = policy.run()
+    assert len(resources) == 1
+
+    # Refresh and confirm that the label and fingerprint updated
+    client = policy.resource_manager.get_client()
+    resource = LoadBalancingGlobalForwardingRule.resource_type.refresh(client, resources[0])
+    assert resource['labels']['env'] == 'not-the-default'
+    assert resource['labelFingerprint'] != label_fingerprint
