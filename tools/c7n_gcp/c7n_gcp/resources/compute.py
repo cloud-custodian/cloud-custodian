@@ -84,6 +84,66 @@ Instance.filter_registry.register('offhour', OffHour)
 Instance.filter_registry.register('onhour', OnHour)
 
 
+@Instance.filter_registry.register('boot-disk-source-image')
+class BootDiskSourceImage(ValueFilter):
+    """Filters instances by their boot disk's source image
+    See https://cloud.google.com/compute/docs/reference/rest/v1/images/get for valid fields.
+
+    :example:
+
+    Filter all instances that have a source boot disk image older than 1 year
+
+    .. code-block:: yaml
+
+        policies:
+          - name: find-instances-with-old-boot-images
+            resource: gcp.instance
+            filters:
+              - type: boot-disk-source-image
+                key: creationTimestamp
+                op: greater-than
+                value_type: age
+                value: 365
+    """
+
+    schema = type_schema('boot-disk-source-image', rinherit=ValueFilter.schema)
+    permissions = ('compute.images.get',)
+
+    def get_resource_params(self, resource):
+        path_param_re = re.compile('.*?/projects/(.*?)/zones/(.*?)/instances/.*')
+        project, zone = path_param_re.match(resource['selfLink']).groups()
+        return {'project': project, 'zone': zone, 'instance': resource["name"]}
+
+    def process_resource(self, resource, event=None):
+        session = local_session(self.manager.session_factory)
+        model = self.manager.get_model()
+        boot_disk_images = []
+        disk_param_re = re.compile('.*?/projects/(.*?)/zones/(.*?)/disks/(.*?)$')
+        image_param_re = re.compile('.*?/projects/(.*?)/global/images/(.*?)$')
+        for disk in resource["disks"]:
+            if disk["boot"]:
+                boot_disk_project, \
+                boot_disk_zone, \
+                boot_disk_name = disk_param_re.match(disk["source"]).groups()
+                boot_disk = Disk.resource_type.get(
+                    session.client(model.service, model.version, "disks"),
+                    {'project_id': boot_disk_project,
+                    'zone': boot_disk_zone, 'disk_id': boot_disk_name})
+                image_project, image_name = image_param_re.match(boot_disk["sourceImage"]).groups()
+                boot_disk_image = Image.resource_type.get(
+                    session.client(model.service, model.version, "images"),
+                    {'project_id': image_project, 'image_id': image_name})
+                boot_disk_images.append(boot_disk_image)
+        return super(BootDiskSourceImage, self).process(boot_disk_images, None)
+
+    def get_client(self, session, model):
+        return session.client(
+            model.service, model.version, model.component)
+
+    def process(self, resources, event=None):
+        return [r for r in resources if self.process_resource(r)]
+
+
 @Instance.filter_registry.register('effective-firewall')
 class EffectiveFirewall(ValueFilter):
     """Filters instances by their effective firewall rules.
