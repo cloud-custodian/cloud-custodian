@@ -5,12 +5,16 @@ from c7n.filters import Filter
 from c7n.filters.vpc import SecurityGroupFilter, SubnetFilter
 from c7n.manager import resources
 from c7n.filters.kms import KmsRelatedFilter
-from c7n.query import QueryResourceManager, TypeInfo, DescribeSource, ConfigSource
+from c7n.query import (
+    QueryResourceManager, TypeInfo, DescribeSource, ConfigSource,
+    ChildResourceManager, ChildDescribeSource
+)
 from c7n.utils import local_session, type_schema
 from c7n.vendored.distutils.version import LooseVersion
 
 from .aws import shape_validate
 from c7n.filters import CrossAccountAccessFilter
+from c7n.filters.metrics import MetricsFilter
 
 
 class DescribeKafka(DescribeSource):
@@ -52,6 +56,84 @@ class Kafka(QueryResourceManager):
         'describe': DescribeKafka,
         'config': ConfigSource
     }
+
+
+class DescribeKafkaBroker(ChildDescribeSource):
+    """Source for enumerating Kafka broker nodes."""
+
+    def get_query(self):
+        return super().get_query(capture_parent_id=True)
+
+    def augment(self, resources):
+        """Augment broker resources with cluster info for metrics dimensions."""
+        results = []
+        for cluster_arn, node_info in resources:
+            node_info['ClusterArn'] = cluster_arn
+            parts = cluster_arn.split('/')
+            if len(parts) >= 2:
+                node_info['ClusterName'] = parts[1]
+            if 'BrokerNodeInfo' in node_info:
+                node_info['BrokerId'] = node_info['BrokerNodeInfo'].get('BrokerId')
+            results.append(node_info)
+        return results
+
+
+@resources.register('kafka-broker')
+class KafkaBroker(ChildResourceManager):
+    """Resource manager for MSK Kafka broker nodes.
+
+    Broker nodes are only available for provisioned clusters.
+    Serverless clusters do not have enumerable broker nodes.
+    """
+
+    class resource_type(TypeInfo):
+        service = 'kafka'
+        parent_spec = ('kafka', 'ClusterArn', True)
+        enum_spec = ('list_nodes', 'NodeInfoList', None)
+        name = id = 'BrokerId'
+        arn = False
+        dimension = 'Broker ID'
+        metrics_namespace = 'AWS/Kafka'
+
+    source_mapping = {
+        'describe-child': DescribeKafkaBroker,
+        'describe': DescribeKafkaBroker,
+    }
+
+
+@KafkaBroker.filter_registry.register('metrics')
+class KafkaBrokerMetrics(MetricsFilter):
+    """CloudWatch metrics filter for Kafka broker nodes.
+
+    Supports broker-level metrics like CpuUser, CpuSystem, KafkaDataLogsDiskUsed, etc.
+
+    :example:
+
+    Find brokers with low CPU utilization over 14 days:
+
+    .. code-block:: yaml
+
+        policies:
+          - name: underutilized-kafka-brokers
+            resource: aws.kafka-broker
+            filters:
+              - type: metrics
+                name: CpuUser
+                days: 14
+                value: 10
+                op: less-than
+    """
+
+    def get_dimensions(self, resource):
+        """Return CloudWatch dimensions for MSK broker metrics.
+
+        MSK broker-level metrics require both 'Cluster Name' and 'Broker ID' dimensions.
+        Note: BrokerId comes from AWS as a float (e.g., 1.0), but CloudWatch expects "1".
+        """
+        return [
+            {'Name': 'Cluster Name', 'Value': resource.get('ClusterName', '')},
+            {'Name': 'Broker ID', 'Value': str(int(resource.get('BrokerId', 0)))}
+        ]
 
 
 @Kafka.filter_registry.register('security-group')
