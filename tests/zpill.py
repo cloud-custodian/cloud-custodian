@@ -1,10 +1,12 @@
 # Copyright The Cloud Custodian Authors.
 # SPDX-License-Identifier: Apache-2.0
 import base64
+from collections import Counter
 import fnmatch
 from io import BytesIO
 import json
 import os
+import traceback
 import shutil
 import zipfile
 import re
@@ -276,8 +278,15 @@ class PillTest(CustodianTestCore):
 
     recording = False
 
-    def cleanUp(self):
+    _session_count = None
+    _client_stats = None
+
+    def pillCleanUp(self):
         self.pill = None
+        if self._session_count and self._session_count > 2:
+            raise RuntimeError("test created too many sessions %d" % self._session_count)
+        if self._client_stats and sum(self._client_stats.values()) > 2:
+            raise RuntimeError("test created too many clients %s" % self._client_stats)
 
     def record_flight_data(self, test_case, zdata=False, augment=False, region=None):
         self.recording = True
@@ -347,7 +356,12 @@ class PillTest(CustodianTestCore):
             if not os.path.exists(test_dir):
                 raise RuntimeError("Invalid Test Dir for flight data %s" % test_dir)
 
-        session = boto3.Session(region_name=region)
+        if strtobool(os.environ.get('C7N_TRACK_CLIENT', 'no')):
+            session = TrackingSession(region_name=region)
+            session._client_stats = self._client_stats = Counter()
+        else:
+            session = boto3.Session(region_name=region)
+
         if not zdata:
             pill = placebo.attach(session, test_dir)
             # pill = BluePill()
@@ -355,7 +369,34 @@ class PillTest(CustodianTestCore):
         else:
             pill = attach(session, self.archive_path, test_case, False)
 
+        self.addCleanup(self.pillCleanUp)
         pill.playback()
         self.addCleanup(pill.stop)
-        self.addCleanup(self.cleanUp)
-        return lambda region=None, assume=None: session
+
+        self._session_count = 0
+
+        if not strtobool(os.environ.get('C7N_TRACK_CLIENT', 'no')):
+            return lambda region=None, assume=None: session
+
+        class TrackingFactory:
+
+            __name__ = '<lambda>'
+
+            def __call__(instance, *args, **kw):
+                self._session_count += 1
+                if strtobool(os.environ.get('C7N_STACK_SESSION', 'no')):
+                    traceback.print_stack()
+                    print('--')
+                return session
+
+        return TrackingFactory()
+
+
+class TrackingSession(boto3.Session):
+
+    def client(self, *args, **kw):
+        self._client_stats[(args[0], kw.get('region_name'))] += 1
+        if strtobool(os.environ.get('C7N_STACK_CLIENT', 'no')):
+            traceback.print_stack()
+            print('--')
+        return super().client(*args, **kw)
