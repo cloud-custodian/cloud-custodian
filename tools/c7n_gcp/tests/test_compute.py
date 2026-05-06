@@ -4,6 +4,7 @@
 import re
 import time
 
+from c7n.testing import C7N_FUNCTIONAL
 from gcp_common import BaseTest, event_data
 from googleapiclient.errors import HttpError
 
@@ -273,6 +274,55 @@ def test_instance_refresh(test):
     )
     assert resource['labels'] == {'env': 'dev'}
     assert resource['labelFingerprint'] == "GHZ1Un204L0="
+
+
+@terraform('gcp_instance_set_can_ip_forward')
+def test_instance_set_can_ip_forward(test, gcp_instance_set_can_ip_forward):
+    project_id = gcp_instance_set_can_ip_forward['google_compute_instance.default.project']
+    if C7N_FUNCTIONAL:
+        factory = test.record_flight_data(
+            'instance-set-can-ip-forward', project_id=project_id)
+    else:
+        factory = test.replay_flight_data(
+            'instance-set-can-ip-forward', project_id=project_id)
+
+    instance_name = gcp_instance_set_can_ip_forward['google_compute_instance.default.name']
+    policy = test.load_policy(
+        {
+            'name': 'gcp-instance-set-can-ip-forward',
+            'resource': 'gcp.instance',
+            'filters': [
+                {'name': instance_name},
+                {
+                    'type': 'value',
+                    'key': 'canIpForward',
+                    'op': 'eq',
+                    'value': False,
+                },
+            ],
+            'actions': [
+                {
+                    'type': 'set-can-ip-forward',
+                    'enabled': True,
+                }
+            ],
+        },
+        session_factory=factory,
+    )
+
+    resources = policy.run()
+    assert len(resources) == 1
+    assert resources[0]['name'] == instance_name
+
+    if test.recording:
+        time.sleep(2)
+
+    instance = policy.resource_manager.get_resource({
+        'project_id': project_id,
+        'resourceName': gcp_instance_set_can_ip_forward['google_compute_instance.default.id'],
+        'zone': gcp_instance_set_can_ip_forward['google_compute_instance.default.zone'],
+    })
+    assert instance['canIpForward'] is True
 
 
 class DiskTest(BaseTest):
