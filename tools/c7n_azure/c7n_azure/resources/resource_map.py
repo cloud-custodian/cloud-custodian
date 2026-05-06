@@ -2,6 +2,10 @@
 # SPDX-License-Identifier: Apache-2.0
 ResourceMap = {
     "azure.advisor-recommendation": "c7n_azure.resources.advisor.AdvisorRecommendation",
+    "azure.ai-foundry-project": "c7n_azure.resources.ai_foundry.AIFoundryProject",
+    "azure.ai-foundry-connection": "c7n_azure.resources.ai_foundry.AIFoundryConnection",
+    "azure.ai-foundry-application": "c7n_azure.resources.ai_foundry.AIFoundryApplication",
+    "azure.ai-foundry-agent": "c7n_azure.resources.ai_foundry.AIFoundryAgent",
     "azure.afd-endpoint": "c7n_azure.resources.afd_endpoint.AfdEndpoint",
     "azure.afd-custom-domain": "c7n_azure.resources.afd_custom_domain.AfdCustomDomain",
     "azure.aks": "c7n_azure.resources.k8s_service.KubernetesService",

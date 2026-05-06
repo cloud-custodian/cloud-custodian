@@ -1,6 +1,11 @@
 # Copyright The Cloud Custodian Authors.
 # SPDX-License-Identifier: Apache-2.0
 
+import time
+
+import requests
+
+from c7n_azure import constants
 from c7n_azure.actions.delete import DeleteAction
 from c7n_azure.actions.lock import LockAction
 from c7n_azure.actions.tagging import (AutoTagDate)
@@ -17,7 +22,9 @@ from c7n_azure.utils import ResourceIdParser
 # for database it is a C7N known issue (#4543)
 arm_tags_unsupported = ['microsoft.network/dnszones/',
                         'microsoft.sql/servers/databases',
-                        'microsoft.storage/storageaccounts/blobservices/containers']
+                        'microsoft.storage/storageaccounts/blobservices/containers',
+                        'microsoft.cognitiveservices/accounts/deployments',
+                        'microsoft.cognitiveservices/accounts/projects/connections']
 
 
 class ArmTypeInfo(TypeInfo, metaclass=TypeMeta):
@@ -52,6 +59,55 @@ class ArmResourceManager(QueryResourceManager, metaclass=QueryMeta):
             for rid in resource_ids
         ]
         return self.augment([r.serialize(True) for r in data])
+
+    def _arm_rest_get(self, url, params=None, timeout=30, max_retries=3):
+        """Issue ARM REST GET requests with paging and basic retry behavior.
+
+        Retries up to ``max_retries`` times for throttling/service-unavailable
+        responses (429/503), matching the expected ARM manager retry posture.
+        """
+        session = self.get_session()
+        session._initialize_session()
+        token_scope = session.cloud_endpoints.endpoints.resource_manager + '.default'
+        token = session.credentials.get_token(token_scope)
+        headers = {
+            'Authorization': f'Bearer {token.token}',
+            'Content-Type': 'application/json'
+        }
+
+        values = []
+        next_url = url
+        next_params = dict(params or {})
+
+        while next_url:
+            attempt = 0
+            while True:
+                response = requests.get(
+                    next_url,
+                    headers=headers,
+                    params=next_params if next_params else None,
+                    timeout=timeout
+                )
+
+                if response.status_code in (429, 503) and attempt < max_retries:
+                    retry_after = response.headers.get('retry-after')
+                    if retry_after and retry_after.isdigit():
+                        sleep_seconds = int(retry_after)
+                    else:
+                        sleep_seconds = constants.DEFAULT_RETRY_AFTER
+                    time.sleep(sleep_seconds)
+                    attempt += 1
+                    continue
+
+                response.raise_for_status()
+                break
+
+            payload = response.json()
+            values.extend(payload.get('value', []))
+            next_url = payload.get('nextLink')
+            next_params = None
+
+        return values
 
     def tag_operation_enabled(self, resource_type):
         return ArmResourceManager.generic_resource_supports_tagging(resource_type)

@@ -1,0 +1,65 @@
+{
+    "$schema": "https://schema.management.azure.com/schemas/2015-01-01/deploymentTemplate.json#",
+    "contentVersion": "1.0.0.0",
+    "parameters": {
+        "uniqueId": {
+            "type": "string"
+        }
+    },
+    "variables": {
+        "accountName": "[concat('cctestaifoundry', parameters('uniqueId'))]",
+        "projectName": "cctest-aifoundry-project",
+        "connectionName": "cctest-aifoundry-connection"
+    },
+    "resources": [
+        {
+            "type": "Microsoft.CognitiveServices/accounts",
+            "apiVersion": "2025-06-01",
+            "name": "[variables('accountName')]",
+            "location": "eastus",
+            "kind": "AIServices",
+            "identity": {
+                "type": "SystemAssigned"
+            },
+            "sku": {
+                "name": "S0"
+            },
+            "properties": {
+                "allowProjectManagement": true,
+                "customSubDomainName": "[variables('accountName')]"
+            },
+            "dependsOn": []
+        },
+        {
+            "type": "Microsoft.CognitiveServices/accounts/projects",
+            "apiVersion": "2025-06-01",
+            "name": "[format('{0}/{1}', variables('accountName'), variables('projectName'))]",
+            "location": "eastus",
+            "identity": {
+                "type": "SystemAssigned"
+            },
+            "properties": {},
+            "dependsOn": [
+                "[resourceId('Microsoft.CognitiveServices/accounts', variables('accountName'))]"
+            ]
+        },
+        {
+            "type": "Microsoft.CognitiveServices/accounts/projects/connections",
+            "apiVersion": "2025-06-01",
+            "name": "[format('{0}/{1}/{2}', variables('accountName'), variables('projectName'), variables('connectionName'))]",
+            "location": "eastus",
+            "properties": {
+                "category": "AzureOpenAI",
+                "authType": "AAD",
+                "target": "[reference(resourceId('Microsoft.CognitiveServices/accounts', variables('accountName')), '2025-06-01').endpoint]",
+                "metadata": {
+                    "ApiType": "AzureOpenAI"
+                },
+                "isSharedToAll": false
+            },
+            "dependsOn": [
+                "[resourceId('Microsoft.CognitiveServices/accounts/projects', variables('accountName'), variables('projectName'))]"
+            ]
+        }
+    ]
+}
