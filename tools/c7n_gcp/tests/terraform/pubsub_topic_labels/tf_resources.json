@@ -1,0 +1,44 @@
+{
+    "pytest-terraform": 1,
+    "outputs": {},
+    "resources": {
+        "google_pubsub_topic": {
+            "default": {
+                "effective_labels": {
+                    "env": "default",
+                    "goog-terraform-provisioned": "true"
+                },
+                "id": "projects/cloud-custodian/topics/c7n-topic-default-a2f8",
+                "ingestion_data_source_settings": [],
+                "kms_key_name": "",
+                "labels": {
+                    "env": "default"
+                },
+                "message_retention_duration": "",
+                "message_storage_policy": [],
+                "message_transforms": [],
+                "name": "c7n-topic-default-a2f8",
+                "project": "stacklet-test-policies",
+                "schema_settings": [],
+                "tags": null,
+                "terraform_labels": {
+                    "env": "default",
+                    "goog-terraform-provisioned": "true"
+                },
+                "timeouts": null
+            }
+        },
+        "random_id": {
+            "suffix": {
+                "b64_std": "ovg=",
+                "b64_url": "ovg",
+                "byte_length": 2,
+                "dec": "41720",
+                "hex": "a2f8",
+                "id": "ovg",
+                "keepers": null,
+                "prefix": null
+            }
+        }
+    }
+}
