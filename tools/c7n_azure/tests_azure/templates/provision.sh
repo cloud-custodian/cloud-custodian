@@ -13,6 +13,33 @@ IFS=$'\n\t'
 resourceLocation="South Central US"
 templateDirectory="$( cd "$( dirname "$0" )" && pwd )"
 
+print_failed_group_deployment() {
+    rgName="$1"
+    latest_deployment=$(az deployment group list \
+        --resource-group "$rgName" \
+        --query "[0].name" \
+        --output tsv 2>/dev/null)
+    if [[ -n "$latest_deployment" ]]; then
+        echo "Last deployment '$latest_deployment' operations for resource group '$rgName':"
+        az deployment group operation list \
+            --resource-group "$rgName" \
+            --name "$latest_deployment" \
+            --query "[].{state:properties.provisioningState,status:properties.statusMessage}" \
+            --output jsonc \
+            || az group deployment operation list \
+                --resource-group "$rgName" \
+                --name "$latest_deployment" \
+                --query "[].{state:properties.provisioningState,status:properties.statusMessage}" \
+                --output jsonc \
+            || az deployment group show \
+                --resource-group "$rgName" \
+                --name "$latest_deployment" \
+                --query "{state:properties.provisioningState,error:properties.error}" \
+                --output jsonc \
+            || true
+    fi
+}
+
 if [[ $(az account show --query user.type --out tsv) == "user" ]]; then
     is_user=1
 else
@@ -33,6 +60,19 @@ else
         deploy_list="${@:1}"
     fi
 fi
+
+# Append uniqueId parameter if template has "uniqueId" parameter defined to avoid conflicts with already 
+# existing resources in case of multiple deployments
+append_generated_unique_id_parameter() {
+    local template_file="$1"
+    local -n params_ref="$2"
+
+    if grep -q '"uniqueId"[[:space:]]*:' "$template_file"; then
+        local unique_suffix
+        unique_suffix="$(date +%s%N | tail -c 13)"
+        params_ref+=("uniqueId=${unique_suffix}")
+    fi
+}
 
 deploy_resource() {
     echo "Deployment for ${filenameNoExtension} started"
@@ -94,7 +134,19 @@ deploy_resource() {
         rm -f cost-management.body
 
     else
-        az deployment group create --resource-group $rgName --template-file $file --mode Complete --output None
+        template_parameters=()
+        append_generated_unique_id_parameter "$file" template_parameters
+
+        if [[ ${#template_parameters[@]} -gt 0 ]]; then
+            az deployment group create \
+                --resource-group "$rgName" \
+                --template-file "$file" \
+                --parameters "${template_parameters[@]}" \
+                --mode Complete \
+                --output None
+        else
+            az deployment group create --resource-group $rgName --template-file $file --mode Complete --output None
+        fi
     fi
 
     if [[ "$fileName" == "cosmosdb.json" ]]; then
