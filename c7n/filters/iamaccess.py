@@ -188,7 +188,9 @@ class PolicyChecker:
                 return False
 
             # Track if we have a whitelisted org condition
-            if result is True and c['key'] in ('aws:principalorgid', 'aws:resourceorgid'):
+            if result is True and c['key'] in (
+                    'aws:principalorgid', 'aws:resourceorgid',
+                    'aws:principalorgpaths'):
                 has_whitelisted_org = True
 
             results.append(result)
@@ -211,9 +213,12 @@ class PolicyChecker:
                     if c['key'] not in principal_conditions:
                         # Non-principal condition failed, can't be saved by org ID
                         return False
-                    # Check if it's a wildcard
-                    if not all('*' in str(v) for v in c['values']):
-                        # Not a wildcard, it's a real violation
+                    # Check if it's a wildcard or already whitelisted account
+                    if not all(
+                        '*' in str(v) or _account(str(v)) in self.allowed_accounts
+                        for v in c['values']
+                    ):
+                        # Not a wildcard and not a whitelisted account, it's a real violation
                         return False
             # All failures are wildcard principals, org ID saves it
             return True
@@ -294,6 +299,12 @@ class PolicyChecker:
         if not self.allowed_orgid:
             return True
         return bool(set(map(_account, c['values'])).difference(self.allowed_orgid))
+
+    def handle_aws_principalorgpaths(self, s, c):
+        if not self.allowed_orgid:
+            return True
+        org_ids = {str(v).split('/')[0] for v in c['values']}
+        return bool(org_ids.difference(self.allowed_orgid))
 
     def handle_aws_principalarn(self, s, c):
         """Handle the aws:PrincipalArn condition key."""
