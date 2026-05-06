@@ -11,7 +11,7 @@ from c7n.config import Config
 class KubernetesClusterTest(BaseTest):
 
     def test_cluster_query(self):
-        project_id = "cloud-custodian"
+        project_id = self.project_id
 
         factory = self.replay_flight_data('gke-cluster-query', project_id)
         p = self.load_policy(
@@ -32,7 +32,7 @@ class KubernetesClusterTest(BaseTest):
         )
 
     def test_gke_cluster_tags(self):
-        project_id = "cloud-custodian"
+        project_id = self.project_id
         factory = self.replay_flight_data("gke-cluster-query-resourceLabels", project_id)
         p = self.load_policy(
             {
@@ -47,7 +47,7 @@ class KubernetesClusterTest(BaseTest):
         self.assertEqual(resources[0]['resourceLabels']['foo'], 'bar')
 
     def test_cluster_get(self):
-        project_id = "cloud-custodian"
+        project_id = self.project_id
         name = "standard-cluster-1"
 
         factory = self.replay_flight_data('gke-cluster-get', project_id)
@@ -76,7 +76,7 @@ class KubernetesClusterTest(BaseTest):
         )
 
     def test_gke_cluster_filter_server_config(self):
-        project_id = 'cloud-custodian'
+        project_id = self.project_id
         factory = self.replay_flight_data('gke-cluster-filter-server-config', project_id=project_id)
         p = self.load_policy({
             'name': 'gke-cluster-filter-server-config',
@@ -94,7 +94,7 @@ class KubernetesClusterTest(BaseTest):
                          resources[0]['name'])
 
     def test_gke_cluster_filter_effective_firewall(self):
-        project_id = 'cloud-custodian'
+        project_id = self.project_id
         factory = self.replay_flight_data('gke-cluster-filter-effective-firewall',
                                             project_id=project_id)
         p = self.load_policy({
@@ -114,7 +114,7 @@ class KubernetesClusterTest(BaseTest):
                          resources[0]['name'])
 
     def test_cluster_set_labels(self):
-        project_id = 'cloud-custodian'
+        project_id = self.project_id
         name = "standard-cluster-1"
         factory = self.replay_flight_data('gke-cluster-set-label', project_id)
         p = self.load_policy(
@@ -164,7 +164,7 @@ class KubernetesClusterTest(BaseTest):
 
     @pytest.mark.skip("Works on record but not replay")
     def test_cluster_zonal_set_labels(self):
-        project_id = 'cloud-custodian'
+        project_id = self.project_id
         name = "zonal-cluster-1"
         factory = self.replay_flight_data('gke-cluster-zonal-set-label', project_id)
         p = self.load_policy(
@@ -213,7 +213,7 @@ class KubernetesClusterTest(BaseTest):
         self.assertEqual(result[0]['clusters'][0]['resourceLabels']['test_label'], 'test_value')
 
     def test_cluster_remove_labels(self):
-        project_id = 'cloud-custodian'
+        project_id = self.project_id
         name = "standard-cluster-1"
         factory = self.replay_flight_data('gke-cluster-remove-label', project_id)
         p = self.load_policy(
@@ -239,7 +239,7 @@ class KubernetesClusterTest(BaseTest):
         self.assertEqual(result['clusters'][0]['resourceLabels'].get('test_label'), None)
 
     def test_cluster_zonal_remove_labels(self):
-        project_id = 'cloud-custodian'
+        project_id = self.project_id
         name = "zonal-cluster-1"
         factory = self.replay_flight_data('gke-cluster-zonal-remove-label', project_id)
         p = self.load_policy(
@@ -265,7 +265,7 @@ class KubernetesClusterTest(BaseTest):
         self.assertEqual(result['clusters'][0]['resourceLabels'].get('test_label'), None)
 
     def test_cluster_delete(self):
-        project_id = "cloud-custodian"
+        project_id = self.project_id
         resource_name = "custodian-cluster-delete-test"
 
         factory = self.replay_flight_data('gke-cluster-delete', project_id)
@@ -296,7 +296,7 @@ class KubernetesClusterTest(BaseTest):
 class KubernetesClusterNodePoolTest(BaseTest):
 
     def test_cluster_node_pools_query(self):
-        project_id = "cloud-custodian"
+        project_id = self.project_id
 
         factory = self.replay_flight_data('gke-cluster-nodepool-query', project_id)
 
@@ -318,7 +318,7 @@ class KubernetesClusterNodePoolTest(BaseTest):
 
     def test_cluster_node_pools_get(self):
 
-        project_id = "cloud-custodian"
+        project_id = self.project_id
         name = "pool-1"
 
         factory = self.replay_flight_data('gke-cluster-nodepool-get', project_id)
@@ -346,7 +346,7 @@ class KubernetesClusterNodePoolTest(BaseTest):
         )
 
     def test_gke_cluster_nodepool_filter_server_config(self):
-        project_id = 'cloud-custodian'
+        project_id = self.project_id
         factory = self.replay_flight_data('gke-cluster-nodepool-filter-server-config',
                                           project_id=project_id)
         p = self.load_policy({

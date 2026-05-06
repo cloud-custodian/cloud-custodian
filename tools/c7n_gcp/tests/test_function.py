@@ -7,7 +7,7 @@ from gcp_common import BaseTest
 class FunctionTest(BaseTest):
 
     def test_function_filter_iam_query(self):
-        project_id = 'cloud-custodian'
+        project_id = self.project_id
         factory = self.replay_flight_data('function-filter-iam', project_id=project_id)
         p = self.load_policy({
             'name': 'function-filter-iam',

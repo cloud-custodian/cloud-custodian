@@ -2,7 +2,6 @@
 # SPDX-License-Identifier: Apache-2.0
 
 from gcp_common import BaseTest, event_data
-
 from pytest_terraform import terraform
 
 
@@ -54,7 +53,7 @@ def test_pubsub_subscription_query(test, pubsub_subscription):
 
 class PubSubSubscriptionTest(BaseTest):
     def test_pubsub_subscription_get(self):
-        project_id = 'cloud-custodian'
+        project_id = self.project_id
         subscription_name = 'custodian'
         resource_name = 'projects/{}/subscriptions/{}'.format(project_id, subscription_name)
         session_factory = self.replay_flight_data(
@@ -75,14 +74,14 @@ class PubSubSubscriptionTest(BaseTest):
         self.assertEqual(resources[0]['name'], resource_name)
         self.assertEqual(
             policy.resource_manager.get_urns(resources),
-            ["gcp:pubsub::cloud-custodian:subscription/custodian"],
+            [f"gcp:pubsub::{project_id}:subscription/custodian"],
         )
 
 
 class PubSubSnapshotTest(BaseTest):
 
     def test_pubsub_snapshot_query(self):
-        project_id = 'cloud-custodian'
+        project_id = self.project_id
         pubsub_snapshot_name = 'projects/cloud-custodian/snapshots/custodian'
         session_factory = self.replay_flight_data(
             'pubsub-snapshot-query', project_id=project_id)
@@ -96,14 +95,14 @@ class PubSubSnapshotTest(BaseTest):
         self.assertEqual(pubsub_snapshot_resources[0]['name'], pubsub_snapshot_name)
         self.assertEqual(
             policy.resource_manager.get_urns(pubsub_snapshot_resources),
-            ["gcp:pubsub::cloud-custodian:snapshot/custodian"],
+            [f"gcp:pubsub::{project_id}:snapshot/custodian"],
         )
 
 
 class PubSubTopicTest(BaseTest):
 
     def test_pubsub_topic_filter_iam_query(self):
-        project_id = 'cloud-custodian'
+        project_id = self.project_id
         factory = self.replay_flight_data('pubsub-topic-filter-iam', project_id=project_id)
         p = self.load_policy({
             'name': 'pubsub-topic-filter-iam',
@@ -118,5 +117,5 @@ class PubSubTopicTest(BaseTest):
         resources = p.run()
 
         self.assertEqual(1, len(resources))
-        self.assertEqual('projects/cloud-custodian/topics/custodian-test-iam-topic',
+        self.assertEqual(f'projects/{project_id}/topics/custodian-test-iam-topic',
                          resources[0]['name'])

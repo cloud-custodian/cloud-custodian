@@ -27,7 +27,7 @@ class MetricsOutputTest(BaseTest):
             StackDriverMetrics)
 
     def test_metrics_output(self):
-        project_id = 'cloud-custodian'
+        project_id = self.project_id
         factory = self.replay_flight_data('output-metrics', project_id=project_id)
         ctx = Bag(session_factory=factory,
                   policy=Bag(name='custodian-works', resource_type='gcp.function'))
@@ -70,8 +70,8 @@ class MetricsOutputTest(BaseTest):
               u'valueType': u'INT64'}])
 
     def test_metrics_output_set_write_project_id(self):
-        project_id = 'cloud-custodian-sub'
-        write_project_id = 'cloud-custodian'
+        project_id = self.project_id
+        write_project_id = f"{project_id}-metrics"
         factory = self.replay_flight_data('output-metrics', project_id=project_id)
         ctx = Bag(session_factory=factory,
                   policy=Bag(name='custodian-works', resource_type='gcp.function'))
@@ -79,6 +79,10 @@ class MetricsOutputTest(BaseTest):
         metrics = StackDriverMetrics(ctx, conf)
         metrics.put_metric('ResourceCount', 43, 'Count', Scope='Policy')
         metrics.flush()
+
+        self.assertNotEqual(metrics.project_id, metrics.write_metrics_project_id)
+        self.assertEqual(metrics.project_id, project_id)
+        self.assertEqual(metrics.write_metrics_project_id, write_project_id)
 
 
 def get_log_output(request, output_url):

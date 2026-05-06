@@ -5,9 +5,8 @@ from gcp_common import BaseTest, event_data
 
 
 class DataflowJobTest(BaseTest):
-
     def test_query(self):
-        project_id = 'cloud-custodian'
+        project_id = self.project_id
         factory = self.replay_flight_data('dataflow-job', project_id)
         p = self.load_policy({
             'name': 'dataflow-job',
@@ -22,12 +21,12 @@ class DataflowJobTest(BaseTest):
         self.assertEqual(
             p.resource_manager.get_urns(resource),
             [
-                'gcp:dataflow:us-central1:cloud-custodian:job/test'
+                f'gcp:dataflow:us-central1:{project_id}:job/test'
             ],
         )
 
     def test_job_get(self):
-        project_id = 'cloud-custodian'
+        project_id = self.project_id
         jod_id = "2019-05-16_04_24_18-6110555549864901093"
         factory = self.replay_flight_data(
             'dataflow-get-resource', project_id)
@@ -48,6 +47,6 @@ class DataflowJobTest(BaseTest):
         self.assertEqual(
             p.resource_manager.get_urns(resource),
             [
-                'gcp:dataflow:us-central1:cloud-custodian:job/test1'
+                f'gcp:dataflow:us-central1:{project_id}:job/test1'
             ],
         )
