@@ -776,6 +776,9 @@ class DistributionSSLAction(BaseAction):
                 IfMatch=etag,
                 DistributionConfig=dc
             )
+        except client.exceptions.PreconditionFailed as e:
+            self.log.info('PreconditionFailed, retrying')
+            self.process_distribution(client, distribution)
         except Exception as e:
             self.log.warning(
                 "Exception trying to force ssl on Distribution: %s error: %s",
