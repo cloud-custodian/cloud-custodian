@@ -1,0 +1,52 @@
+{
+  "headers": {
+    "content-type": "application/json; charset=UTF-8",
+    "vary": "Origin, X-Origin, Referer",
+    "date": "Mon, 27 Apr 2026 18:11:57 GMT",
+    "server": "ESF",
+    "x-xss-protection": "0",
+    "x-frame-options": "SAMEORIGIN",
+    "x-content-type-options": "nosniff",
+    "alt-svc": "h3=\":443\"; ma=2592000,h3-29=\":443\"; ma=2592000",
+    "transfer-encoding": "chunked",
+    "status": "200",
+    "content-length": "1051",
+    "-content-encoding": "gzip",
+    "content-location": "https://redis.googleapis.com/v1/projects/cloud-custodian/locations/us-central1/instances/c7n-redis-default-5b53?alt=json"
+  },
+  "body": {
+    "name": "projects/cloud-custodian/locations/us-central1/instances/c7n-redis-default-5b53",
+    "labels": {
+      "goog-terraform-provisioned": "true",
+      "env": "not-the-default"
+    },
+    "locationId": "us-central1-c",
+    "redisVersion": "REDIS_7_0",
+    "reservedIpRange": "10.18.222.168/29",
+    "host": "10.18.222.171",
+    "port": 6379,
+    "currentLocationId": "us-central1-c",
+    "createTime": "2026-04-27T18:06:30.253765021Z",
+    "state": "UPDATING",
+    "tier": "BASIC",
+    "memorySizeGb": 1,
+    "authorizedNetwork": "projects/cloud-custodian/global/networks/default",
+    "persistenceIamIdentity": "serviceAccount:service-859150599087@cloud-redis.iam.gserviceaccount.com",
+    "connectMode": "DIRECT_PEERING",
+    "transitEncryptionMode": "DISABLED",
+    "nodes": [
+      {
+        "id": "node-0",
+        "zone": "us-central1-c"
+      }
+    ],
+    "readReplicasMode": "READ_REPLICAS_DISABLED",
+    "persistenceConfig": {
+      "persistenceMode": "DISABLED"
+    },
+    "maintenanceVersion": "20251007_00_00",
+    "availableMaintenanceVersions": [
+      "20260220_00_01"
+    ]
+  }
+}
