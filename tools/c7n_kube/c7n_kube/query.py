@@ -87,7 +87,11 @@ class QueryResourceManager(ResourceManager, metaclass=QueryMeta):
         return self.resource_type
 
     def get_cache_key(self, query):
-        return {"source_type": self.source_type, "query": query}
+        return {
+            "resource": str(self.__class__.__name__),
+            "source_type": self.source_type,
+            "query": query,
+        }
 
     @property
     def source_type(self):
