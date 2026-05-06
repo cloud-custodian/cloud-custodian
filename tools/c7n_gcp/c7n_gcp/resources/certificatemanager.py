@@ -28,6 +28,7 @@ class CertificateManagerCertificate(QueryResourceManager):
         id = 'name'
         labels = True
         labels_op = 'patch'
+        labels_perm = 'update'
         default_report_fields = [
             'name', 'description', 'createTime', 'expireTime',
             'updateTime', 'labels', 'sanDnsnames', 'usedBy'

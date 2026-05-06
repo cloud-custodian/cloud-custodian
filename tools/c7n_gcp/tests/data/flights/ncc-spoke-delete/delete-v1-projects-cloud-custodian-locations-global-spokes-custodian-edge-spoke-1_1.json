@@ -1,0 +1,27 @@
+{
+  "headers": {
+    "content-type": "application/json; charset=UTF-8",
+    "vary": "Origin, X-Origin, Referer",
+    "date": "Mon, 01 Jan 2024 00:00:00 GMT",
+    "server": "ESF",
+    "x-xss-protection": "0",
+    "x-frame-options": "SAMEORIGIN",
+    "x-content-type-options": "nosniff",
+    "transfer-encoding": "chunked",
+    "status": "200",
+    "content-length": "466",
+    "-content-encoding": "gzip"
+  },
+  "body": {
+    "name": "projects/cloud-custodian/locations/global/operations/operation-0000000000000-00000000000000-00000000-00000000",
+    "metadata": {
+      "@type": "type.googleapis.com/google.cloud.networkconnectivity.v1.OperationMetadata",
+      "createTime": "2024-01-01T00:00:00.000000000Z",
+      "target": "projects/cloud-custodian/locations/global/spokes/custodian-edge-spoke-1",
+      "verb": "delete",
+      "requestedCancellation": false,
+      "apiVersion": "v1"
+    },
+    "done": false
+  }
+}

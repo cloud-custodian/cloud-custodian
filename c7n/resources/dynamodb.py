@@ -74,6 +74,73 @@ class KmsFilter(KmsRelatedFilter):
     RelatedIdsExpression = 'SSEDescription.KMSMasterKeyArn'
 
 
+@Table.filter_registry.register('import-summary')
+class ImportSummaryFilter(ValueFilter):
+    """Filter for DynamoDB table imports.
+
+    Fetches import summaries for each table and allows filtering
+    on the import summary details.
+
+    :example:
+
+    .. code-block:: yaml
+
+        policies:
+          - name: dynamodb-imports-in-progress
+            resource: aws.dynamodb-table
+            filters:
+              - type: import-summary
+                key: ImportStatus
+                value: IN_PROGRESS
+          - name: dynamodb-imports-failed
+            resource: aws.dynamodb-table
+            filters:
+              - type: import-summary
+                key: ImportStatus
+                value: FAILED
+    """
+
+    annotation_key = 'c7n:ImportSummary'
+    schema = type_schema('import-summary', rinherit=ValueFilter.schema)
+    permissions = ('dynamodb:ListImports',)
+
+    def process(self, resources, event=None):
+        unannotated = [r for r in resources if self.annotation_key not in r]
+        if unannotated:
+            self.augment(unannotated)
+
+        results = []
+        for r in resources:
+            summaries = r.get(self.annotation_key, [])
+            matched = [summary for summary in summaries if self.match(summary)]
+            if matched:
+                r[self.annotation_key] = matched
+                results.append(r)
+
+        return results
+
+    def augment(self, resources):
+        client = local_session(self.manager.session_factory).client('dynamodb')
+
+        for table in resources:
+            summaries = []
+            next_token = None
+
+            while True:
+                params = {'TableArn': table['TableArn']}
+                if next_token:
+                    params['NextToken'] = next_token
+
+                response = client.list_imports(**params)
+                summaries.extend(response.get('ImportSummaryList', []))
+                next_token = response.get('NextToken')
+
+                if not next_token:
+                    break
+
+            table[self.annotation_key] = summaries
+
+
 @Table.filter_registry.register('continuous-backup')
 class TableContinuousBackupFilter(ValueFilter):
     """Check for continuous backups and point in time recovery (PITR) on a dynamodb table.

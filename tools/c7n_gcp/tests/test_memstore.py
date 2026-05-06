@@ -1,6 +1,8 @@
 # Copyright The Cloud Custodian Authors.
 # SPDX-License-Identifier: Apache-2.0
+
 from gcp_common import BaseTest
+from pytest_terraform import terraform
 
 
 class RedisInstanceTest(BaseTest):
@@ -21,3 +23,74 @@ class RedisInstanceTest(BaseTest):
         assert p.resource_manager.get_urns(resources) == [
             "gcp:redis:us-central1:gcp-lab-custodian:instance/instance-test"
         ]
+
+
+@terraform('redis_instance_labels')
+def test_redis_instance_labels(test, redis_instance_labels):
+    instance_name = redis_instance_labels["google_redis_instance.default.id"]
+    factory = test.replay_flight_data("redis-instance-labels")
+    policy = test.load_policy(
+        {
+            "name": "redis-instance-labels",
+            "resource": "gcp.redis",
+            "filters": [
+                {
+                    "type": "value",
+                    "key": "name",
+                    "value": instance_name,
+                }
+            ],
+            "actions": [
+                {
+                    "type": "set-labels",
+                    "labels": {"env": "not-the-default"},
+                }
+            ],
+        },
+        session_factory=factory,
+    )
+
+    resources = policy.run()
+    assert len(resources) == 1
+    assert resources[0]["labels"]["env"] == "default"
+
+    client = policy.resource_manager.get_client()
+    result = client.execute_query("get", {"name": instance_name})
+    assert result["labels"]["env"] == "not-the-default"
+
+
+@terraform('redis_cluster')
+def test_redis_cluster_query(test, redis_cluster):
+    session_factory = test.replay_flight_data("redis-cluster-query")
+    policy = test.load_policy(
+        {"name": "redis-cluster-query", "resource": "gcp.redis-cluster"},
+        session_factory=session_factory,
+    )
+    resources = policy.run()
+    test.assertEqual(len(resources), 2)
+
+
+@terraform('redis_cluster')
+def test_redis_cluster_filter(test, redis_cluster):
+    primary_cluster_name = redis_cluster["google_redis_cluster.c7n_redis_cluster_primary.id"]
+    session_factory = test.replay_flight_data("redis-cluster-filter")
+    policy = test.load_policy(
+        {
+            "name": "redis-cluster-filter-auth-mode",
+            "resource": "gcp.redis-cluster",
+            "filters": [
+                {
+                    "type": "value",
+                    "key": "authorizationMode",
+                    "value": "AUTH_MODE_IAM_AUTH",
+                }
+            ],
+        },
+        session_factory=session_factory,
+    )
+    resources = policy.run()
+    test.assertEqual(len(resources), 1)
+    test.assertEqual(
+        resources[0]["name"],
+        primary_cluster_name,
+    )

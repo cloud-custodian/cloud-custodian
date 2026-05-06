@@ -4,9 +4,10 @@
 import re
 import time
 
+from c7n_gcp.resources.compute import Snapshot
 from gcp_common import BaseTest, event_data
-from googleapiclient.errors import HttpError
 
+from googleapiclient.errors import HttpError
 from pytest_terraform import terraform
 
 
@@ -384,6 +385,30 @@ class DiskTest(BaseTest):
         assert len(resources) == 2
         assert resources[0]['c7n:recommend'][0]['recommenderSubtype'] == 'SNAPSHOT_AND_DELETE_DISK'
 
+    def test_recommend_disk_none_operations(self):
+        """Recommendations missing operationGroups should be skipped, not raise TypeError."""
+        project_id = 'cloud-custodian'
+        factory = self.replay_flight_data('disk-recommend', project_id=project_id)
+        p = self.load_policy({
+            'name': 'disk-recommend-none',
+            'resource': 'gcp.disk',
+            'filters': [{'type': 'recommend',
+                         'id': 'google.compute.disk.IdleResourceRecommender'}]},
+            session_factory=factory)
+        rec_filter = p.resource_manager.filters[0]
+        rec_filter.rec_info = {'id': 'google.compute.disk.IdleResourceRecommender'}
+
+        # A recommendation with no content/operationGroups causes the JMESPath
+        # query to return None.  Before the fix this raised TypeError.
+        recommends_with_none = [
+            {"name": "empty-rec", "stateInfo": {"state": "ACTIVE"}},
+        ]
+        resources = [
+            {"name": "disk-1", "selfLink": "https://example.com/disk-1"},
+        ]
+        result = rec_filter.match_resources(recommends_with_none, resources)
+        assert result == []
+
 
 class SnapshotTest(BaseTest):
 
@@ -422,6 +447,41 @@ class SnapshotTest(BaseTest):
                 'gcp:compute::cloud-custodian:snapshot/snapshot-1'
             ],
         )
+
+
+@terraform('snapshot_labels')
+def test_snapshot_labels(test, snapshot_labels):
+    snapshot = snapshot_labels['google_compute_snapshot.default']
+    project_id = snapshot['project']
+    name = snapshot['name']
+    label_fingerprint = snapshot['label_fingerprint']
+    labels = snapshot['labels']
+
+    # Confirm the starting label
+    assert labels['env'] == 'default'
+
+    # Update the label using the action
+    factory = test.replay_flight_data('snapshot-labels', project_id=project_id)
+    policy = test.load_policy(
+        {
+            'name': 'snapshot-labels',
+            'resource': 'gcp.snapshot',
+            'filters': [{'name': name}],
+            'actions': [
+                {'type': 'set-labels',
+                 'labels': {'env': 'not-the-default'}}
+            ],
+        },
+        session_factory=factory,
+    )
+    resources = policy.run()
+    assert len(resources) == 1
+
+    # Refresh and confirm that the label and fingerprint updated
+    client = policy.resource_manager.get_client()
+    resource = Snapshot.resource_type.refresh(client, resources[0])
+    assert resource['labels']['env'] == 'not-the-default'
+    assert resource['labelFingerprint'] != label_fingerprint
 
 
 def test_image_refresh(test):
