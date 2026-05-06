@@ -710,6 +710,33 @@ class AutoscalerSet(MethodAction):
         return result
 
 
+@resources.register('region-commitment')
+class RegionCommitment(QueryResourceManager):
+    """GCP resource: https://cloud.google.com/compute/docs/reference/rest/v1/regionCommitments"""
+
+    class resource_type(TypeInfo):
+        service = 'compute'
+        version = 'v1'
+        component = 'regionCommitments'
+        enum_spec = ('aggregatedList', 'items.*.commitments[]', None)
+        permissions = ('compute.commitments.list',)
+        name = id = 'name'
+        default_report_fields = [
+            "name", "status", "type", "plan", "category", "region", "endTimestamp"]
+        asset_type = "compute.googleapis.com/Commitment"
+        urn_component = "region-commitment"
+
+        @staticmethod
+        def get(client, resource_info):
+            project, region, commitment = re.search(
+                r'projects/(.*?)/regions/(.*?)/commitments/(.*)',
+                resource_info['resourceName']).groups()
+
+            return client.execute_command(
+                'get',
+                {'project': project, 'region': region, 'commitment': commitment})
+
+
 @resources.register('zone')
 class Zone(QueryResourceManager):
     """GC resource: https://cloud.google.com/compute/docs/reference/rest/v1/zones"""

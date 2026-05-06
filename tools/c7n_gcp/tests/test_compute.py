@@ -7,6 +7,8 @@ import time
 from gcp_common import BaseTest, event_data
 from googleapiclient.errors import HttpError
 
+from c7n_gcp.client import get_default_project
+
 from pytest_terraform import terraform
 
 
@@ -748,3 +750,54 @@ class TestInstanceGroupManager(BaseTest):
 
         self.assertEqual(1, len(resources))
         self.assertEqual('instance-group-2', resources[0]['name'])
+
+
+# NOTE: Flight data for Region Commitment tests was manually modified because
+# we cannot reliably test against actual commitments in the test project. Since the
+# minimum is a 12 month commitment
+class RegionCommitmentTest(BaseTest):
+
+    def test_region_commitment_query(self):
+        project_id = get_default_project()
+        session_factory = self.replay_flight_data(
+            'region-commitment-query', project_id=project_id)
+        policy = self.load_policy(
+            {
+                'name': 'region-commitment-query',
+                'resource': 'gcp.region-commitment'
+            },
+            session_factory=session_factory
+        )
+
+        resources = policy.run()
+
+        self.assertEqual(len(resources), 1)
+        self.assertEqual(resources[0]['name'], 'c7n-test')
+        urns = policy.resource_manager.get_urns(resources)
+        self.assertEqual(
+            urns,
+            [f'gcp:compute:us-central1:{project_id}:region-commitment/c7n-test']
+        )
+
+    def test_region_commitment_get(self):
+        project_id = get_default_project()
+        session_factory = self.replay_flight_data(
+            'region-commitment-get', project_id=project_id)
+        policy = self.load_policy(
+            {
+                'name': 'region-commitment-get',
+                'resource': 'gcp.region-commitment'
+            },
+            session_factory=session_factory
+        )
+        client = policy.resource_manager.get_client()
+        resource = policy.resource_manager.resource_type.get(
+            client,
+            {
+                'resourceName':
+                    f'projects/{project_id}/regions/us-central1/commitments/c7n-test'
+            }
+        )
+
+        self.assertEqual(resource['name'], 'c7n-test')
+        self.assertEqual(resource['status'], 'ACTIVE')
