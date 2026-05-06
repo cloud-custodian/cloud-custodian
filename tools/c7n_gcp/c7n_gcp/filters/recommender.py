@@ -136,6 +136,9 @@ class RecommenderFilter(Filter):
         rtype = "gcp.%s" % resource_class.type
         for rec in data.values():
             if rec.get("resource") == rtype:
+                existing = resource_class.filter_registry.get("recommend")
+                if existing and existing is not klass:
+                    continue
                 resource_class.filter_registry.register("recommend", klass)
 
 

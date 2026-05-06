@@ -7,6 +7,14 @@
     "category": "Cost",
     "permission_prefix": "recommender.bigqueryCapacityCommitmentsRecommendations"
   },
+  "google.bigquery.table.PartitionClusterRecommender": {
+    "name": "BigQuery partition and clustering recommender",
+    "resource": "gcp.bq-table",
+    "id": "google.bigquery.table.PartitionClusterRecommender",
+    "description": "Optimize BigQuery table partitioning and clustering",
+    "category": "Cost",
+    "permission_prefix": "recommender.bigqueryPartitionClusterRecommendations"
+  },
   "google.run.service.CostRecommender": {
     "name": "Cloud Run CPU allocation recommender",
     "resource": "gcp.cloud-run-service",

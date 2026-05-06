@@ -1,0 +1,40 @@
+{
+  "headers": {
+    "etag": "j+gRYLy4FTrJBTREzJa6UQ==",
+    "content-type": "application/json; charset=UTF-8",
+    "vary": "Origin, X-Origin, Referer",
+    "date": "Wed, 01 Apr 2026 04:22:58 GMT",
+    "server": "ESF",
+    "x-xss-protection": "0",
+    "x-frame-options": "SAMEORIGIN",
+    "x-content-type-options": "nosniff",
+    "alt-svc": "h3=\":443\"; ma=2592000,h3-29=\":443\"; ma=2592000",
+    "transfer-encoding": "chunked",
+    "status": "200",
+    "content-length": "529",
+    "-content-encoding": "gzip",
+    "content-location": "https://bigquery.googleapis.com/bigquery/v2/projects/cloud-custodian/datasets/c7n_bq_dataset/tables?alt=json"
+  },
+  "body": {
+    "kind": "bigquery#tableList",
+    "etag": "j+gRYLy4FTrJBTREzJa6UQ==",
+    "tables": [
+      {
+        "kind": "bigquery#table",
+        "id": "stacklet-personal-2:c7n_bq_dataset.c7n_bq_table",
+        "tableReference": {
+          "projectId": "stacklet-personal-2",
+          "datasetId": "c7n_bq_dataset",
+          "tableId": "c7n_bq_table"
+        },
+        "type": "TABLE",
+        "labels": {
+          "goog-terraform-provisioned": "true",
+          "env": "default"
+        },
+        "creationTime": "1775017375848"
+      }
+    ],
+    "totalItems": 1
+  }
+}

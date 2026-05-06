@@ -1,0 +1,148 @@
+{
+    "pytest-terraform": 1,
+    "outputs": {},
+    "resources": {
+        "google_bigquery_dataset": {
+            "dataset": {
+                "access": [
+                    {
+                        "condition": [],
+                        "dataset": [],
+                        "domain": "",
+                        "group_by_email": "",
+                        "iam_member": "",
+                        "role": "OWNER",
+                        "routine": [],
+                        "special_group": "",
+                        "user_by_email": "kcm0790@gmail.com",
+                        "view": []
+                    },
+                    {
+                        "condition": [],
+                        "dataset": [],
+                        "domain": "",
+                        "group_by_email": "",
+                        "iam_member": "",
+                        "role": "OWNER",
+                        "routine": [],
+                        "special_group": "projectOwners",
+                        "user_by_email": "",
+                        "view": []
+                    },
+                    {
+                        "condition": [],
+                        "dataset": [],
+                        "domain": "",
+                        "group_by_email": "",
+                        "iam_member": "",
+                        "role": "READER",
+                        "routine": [],
+                        "special_group": "projectReaders",
+                        "user_by_email": "",
+                        "view": []
+                    },
+                    {
+                        "condition": [],
+                        "dataset": [],
+                        "domain": "",
+                        "group_by_email": "",
+                        "iam_member": "",
+                        "role": "WRITER",
+                        "routine": [],
+                        "special_group": "projectWriters",
+                        "user_by_email": "",
+                        "view": []
+                    }
+                ],
+                "creation_time": 1775017375484,
+                "dataset_id": "c7n_bq_dataset",
+                "default_collation": "",
+                "default_encryption_configuration": [],
+                "default_partition_expiration_ms": 0,
+                "default_table_expiration_ms": 0,
+                "delete_contents_on_destroy": false,
+                "description": "",
+                "effective_labels": {
+                    "c7n_test": "bq_table_recommend_partition_cluster",
+                    "env": "default",
+                    "goog-terraform-provisioned": "true"
+                },
+                "etag": "AzCihPuSDIxIjcOo3x/LSg==",
+                "external_catalog_dataset_options": [],
+                "external_dataset_reference": [],
+                "friendly_name": "",
+                "id": "projects/cloud-custodian/datasets/c7n_bq_dataset",
+                "is_case_insensitive": false,
+                "labels": {
+                    "c7n_test": "bq_table_recommend_partition_cluster",
+                    "env": "default"
+                },
+                "last_modified_time": 1775017375484,
+                "location": "US",
+                "max_time_travel_hours": "168",
+                "project": "stacklet-personal-2",
+                "resource_tags": null,
+                "self_link": "https://bigquery.googleapis.com/bigquery/v2/projects/cloud-custodian/datasets/c7n_bq_dataset",
+                "storage_billing_model": "",
+                "terraform_labels": {
+                    "c7n_test": "bq_table_recommend_partition_cluster",
+                    "env": "default",
+                    "goog-terraform-provisioned": "true"
+                },
+                "timeouts": null
+            }
+        },
+        "google_bigquery_table": {
+            "table": {
+                "biglake_configuration": [],
+                "clustering": null,
+                "creation_time": 1775017375848,
+                "dataset_id": "c7n_bq_dataset",
+                "deletion_protection": false,
+                "description": "",
+                "effective_labels": {
+                    "env": "default",
+                    "goog-terraform-provisioned": "true"
+                },
+                "encryption_configuration": [],
+                "etag": "c4tZRHFeYNdRCQucBdKjAA==",
+                "expiration_time": 0,
+                "external_catalog_table_options": [],
+                "external_data_configuration": [],
+                "friendly_name": "",
+                "generated_schema_columns": "",
+                "id": "projects/cloud-custodian/datasets/c7n_bq_dataset/tables/c7n_bq_table",
+                "ignore_auto_generated_schema": false,
+                "ignore_schema_changes": null,
+                "labels": {
+                    "env": "default"
+                },
+                "last_modified_time": 1775017375942,
+                "location": "US",
+                "materialized_view": [],
+                "max_staleness": "",
+                "num_bytes": 0,
+                "num_long_term_bytes": 0,
+                "num_rows": 0,
+                "project": "stacklet-personal-2",
+                "range_partitioning": [],
+                "require_partition_filter": false,
+                "resource_tags": null,
+                "schema": "[{\"mode\":\"REQUIRED\",\"name\":\"id\",\"type\":\"INTEGER\"}]",
+                "schema_foreign_type_info": [],
+                "self_link": "https://bigquery.googleapis.com/bigquery/v2/projects/cloud-custodian/datasets/c7n_bq_dataset/tables/c7n_bq_table",
+                "table_constraints": [],
+                "table_id": "c7n_bq_table",
+                "table_metadata_view": null,
+                "table_replication_info": [],
+                "terraform_labels": {
+                    "env": "default",
+                    "goog-terraform-provisioned": "true"
+                },
+                "time_partitioning": [],
+                "type": "TABLE",
+                "view": []
+            }
+        }
+    }
+}
