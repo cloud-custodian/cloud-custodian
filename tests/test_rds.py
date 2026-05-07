@@ -2273,7 +2273,7 @@ def test_rds_delete_logs_aurora_filter(test, rds_delete_aurora_filter):
             'name': 'rds-delete-aurora',
             'resource': 'rds',
             'filters': [
-                {'DBInstanceIdentifier': 'aurora-test-instance'}
+                {'tag:Test': 'implicit-rds-cluster-filter'}
             ],
             'actions': [
                 {'type': 'delete', 'skip-snapshot': True}
@@ -2281,11 +2281,9 @@ def test_rds_delete_logs_aurora_filter(test, rds_delete_aurora_filter):
         },
         session_factory=session_factory
     )
+    resources = p.run()
 
-    p.run()
-
-    log_text = output.getvalue()
-    test.assertEqual(
-        log_text.strip(),
-        'delete implicitly filtered 0 of 1 resources key:DBClusterIdentifier on None',
+    assert len(resources) == 2
+    assert (
+        'delete implicitly filtered 1 of 2 resources' in output.getvalue()
     )
