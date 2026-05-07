@@ -419,16 +419,17 @@ wheels = [
 
 [[package]]
 name = "azure-mgmt-cognitiveservices"
-version = "11.0.0"
+version = "13.7.0"
 source = { registry = "https://pypi.org/simple" }
 dependencies = [
     { name = "azure-common" },
     { name = "azure-mgmt-core" },
-    { name = "msrest" },
+    { name = "isodate" },
+    { name = "typing-extensions" },
 ]
-sdist = { url = "https://files.pythonhosted.org/packages/91/81/6cbfa6edc42d7fcb3a6302c318a1755b8d572bb80f0b4533fc85396a069a/azure-mgmt-cognitiveservices-11.0.0.zip", hash = "sha256:71414e3cd7445e44fc18f217f2d22df05c36877e1233328b2297d07ddf27e82a", size = 78921, upload-time = "2021-01-04T06:15:32.862Z" }
+sdist = { url = "https://files.pythonhosted.org/packages/f7/4b/428c41c3aacad9506e65bd67055cc8ea950857ce4161b6bd895ed44e37f2/azure_mgmt_cognitiveservices-13.7.0.tar.gz", hash = "sha256:48a5a44c15c6768bad238011aaac83a806ceb8ace1b51b8043e35b39a9167a19", size = 174735, upload-time = "2025-07-21T06:24:49.537Z" }
 wheels = [
-    { url = "https://files.pythonhosted.org/packages/a3/c2/ff075dfa19ac20403f404952d27aa2d137be173f86da51fd010ea8ffef32/azure_mgmt_cognitiveservices-11.0.0-py2.py3-none-any.whl", hash = "sha256:1d20fa9021f94a1bd8de641f92821de922574963e296fcd408b341a28fe9b0ad", size = 60595, upload-time = "2021-01-04T06:15:31.248Z" },
+    { url = "https://files.pythonhosted.org/packages/d3/72/0bccfe59ac552ff2434d2e69ea595d69b47bda81b507cbde2372363dc8a4/azure_mgmt_cognitiveservices-13.7.0-py3-none-any.whl", hash = "sha256:9683c436781b8294fe85410da4d22323128c3d68bc141196addbdf07b048dfb4", size = 271603, upload-time = "2025-07-21T06:24:50.951Z" },
 ]
 
 [[package]]
@@ -1540,7 +1541,7 @@ requires-dist = [
     { name = "azure-mgmt-automation", specifier = "==0.1.1" },
     { name = "azure-mgmt-batch", specifier = ">=15.0.0,<16.0.0" },
     { name = "azure-mgmt-cdn", specifier = ">=12.0.0,<13.0.0" },
-    { name = "azure-mgmt-cognitiveservices", specifier = ">=11.0.0,<12.0.0" },
+    { name = "azure-mgmt-cognitiveservices", specifier = ">=13.4.0,<14.0.0" },
     { name = "azure-mgmt-compute", specifier = ">=34.1.0,<35.0.0" },
     { name = "azure-mgmt-containerinstance", specifier = ">=7.0.0,<8.0.0" },
     { name = "azure-mgmt-containerregistry", specifier = ">=14.0.0,<15.0.0" },
