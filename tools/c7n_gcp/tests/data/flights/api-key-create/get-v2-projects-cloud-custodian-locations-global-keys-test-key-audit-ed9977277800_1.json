@@ -1,0 +1,37 @@
+{
+  "headers": {
+    "content-type": "application/json; charset=UTF-8",
+    "vary": "Origin, X-Origin, Referer",
+    "date": "Mon, 09 Mar 2026 12:23:37 GMT",
+    "server": "ESF",
+    "x-xss-protection": "0",
+    "x-frame-options": "SAMEORIGIN",
+    "x-content-type-options": "nosniff",
+    "alt-svc": "h3=\":443\"; ma=2592000,h3-29=\":443\"; ma=2592000",
+    "transfer-encoding": "chunked",
+    "status": "200",
+    "content-length": "527",
+    "-content-encoding": "gzip",
+    "content-location": "https://apikeys.googleapis.com/v2/projects/cloud-custodian/locations/global/keys/test-key-audit-ed9977277800?alt=json"
+  },
+  "body": {
+    "name": "projects/cloud-custodian/locations/global/keys/test-key-audit-ed9977277800",
+    "displayName": "Test API Key for Audit Mode",
+    "createTime": "2026-03-09T12:23:30.364834Z",
+    "uid": "71a9769b-3c85-4372-bf1f-c71ed595e430",
+    "updateTime": "2026-03-09T12:23:30.418496Z",
+    "restrictions": {
+      "serverKeyRestrictions": {
+        "allowedIps": [
+          "192.0.2.0/24"
+        ]
+      },
+      "apiTargets": [
+        {
+          "service": "translate.googleapis.com"
+        }
+      ]
+    },
+    "etag": "W/\"Dws66M0SWcZLruFeBKf8mg==\""
+  }
+}

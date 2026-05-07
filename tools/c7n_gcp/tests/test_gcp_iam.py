@@ -280,6 +280,39 @@ class IAMRoleTest(BaseTest):
         )
 
 
+@terraform("api_key_audit")
+def test_api_key_get_audit_mode(test, api_key_audit):
+    # export TF_VAR_GCP_PROJECT_ID variable prior to running functional test
+    api_key = api_key_audit.resources['google_apikeys_key']['api_key']
+    short_key_name = api_key['name']
+    project_id = api_key['project']
+    factory = test.replay_flight_data('api-key-create')
+    p = test.load_policy(
+        {
+            'name': 'api-key-get',
+            'resource': 'gcp.api-key',
+            'mode': {
+                'type': 'gcp-audit',
+                'methods': ['google.api.apikeys.v2.ApiKeys.CreateKey'],
+            },
+        },
+        session_factory=factory,
+    )
+    exec_mode = p.get_execution_mode()
+    event = {
+        'protoPayload': {
+            'resourceName': f'projects/{project_id}/locations/global/keys/{short_key_name}',
+        },
+        'resource': {
+            'labels': {},
+        },
+    }
+    keys = exec_mode.run(event, None)
+    assert len(keys) == 1
+    assert keys[0]['name'].endswith(f'/keys/{short_key_name}')
+    assert 'restrictions' in keys[0]
+
+
 class ApiKeyTest(BaseTest):
     def test_api_key_query(self):
         project_id = "cloud-custodian"
