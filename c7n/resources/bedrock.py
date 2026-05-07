@@ -3,6 +3,7 @@
 
 from c7n.manager import resources
 from c7n.query import QueryResourceManager, TypeInfo, DescribeSource, DescribeWithResourceTags
+from c7n.filters.bedrock import BedrockModelInvocationLoggingFilter
 from c7n.tags import RemoveTag, Tag, TagActionFilter, TagDelayedAction, universal_augment
 from c7n.utils import local_session, type_schema
 from c7n.actions import BaseAction
@@ -311,6 +312,11 @@ class BedrockModelInvocationJob(QueryResourceManager):
         permission_prefix = 'bedrock'
 
 
+BedrockModelInvocationJob.filter_registry.register(
+    "bedrock-model-invocation-logging", BedrockModelInvocationLoggingFilter
+)
+
+
 @resources.register('bedrock-agent')
 class BedrockAgent(QueryResourceManager):
     class resource_type(TypeInfo):
@@ -594,6 +600,11 @@ class BedrockApplicationInferenceProfile(QueryResourceManager):
         permissions_augment = ("bedrock:ListTagsForResource",)
 
     augment = universal_augment
+
+
+BedrockApplicationInferenceProfile.filter_registry.register(
+    "bedrock-model-invocation-logging", BedrockModelInvocationLoggingFilter
+)
 
 
 @BedrockApplicationInferenceProfile.action_registry.register('delete')

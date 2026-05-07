@@ -2,6 +2,7 @@
 # SPDX-License-Identifier: Apache-2.0
 import logging
 import time
+import uuid
 
 from .common import BaseTest, event_data
 from botocore.exceptions import ClientError
@@ -34,6 +35,51 @@ def test_bedrock_model_invocation_job(test, bedrock_model_invocation_job):
     test.assertEqual(len(resources), 1)
     test.assertEqual(resources[0]['jobArn'], job_arn)
     test.assertEqual(resources[0]['jobName'], job_name)
+
+
+@terraform("bedrock_model_invocation_job_logging")
+def test_bedrock_model_invocation_job_model_invocation_logging(
+    test, bedrock_model_invocation_job_logging
+):
+    session_factory = test.replay_flight_data(
+        "test_bedrock_model_invocation_job_model_invocation_logging"
+    )
+
+    # Create a new job manually since terraform can't do it
+    client = session_factory().client("bedrock")
+    tf = bedrock_model_invocation_job_logging
+    job = client.create_model_invocation_job(
+        jobName=str(uuid.uuid4()),     # Prevent conflicts
+        modelId='amazon.nova-micro-v1:0',  # Cheap
+        # From terraform resources
+        roleArn=tf["aws_iam_role.bedrock_batch.arn"],
+        inputDataConfig={"s3InputDataConfig": {"s3Uri": f"s3://{tf['aws_s3_bucket.input.bucket']}/{tf['aws_s3_object.input.key']}"}},
+        outputDataConfig={"s3OutputDataConfig": {"s3Uri": f"s3://{tf['aws_s3_bucket.output.bucket']}/"}},
+    )
+
+    p = test.load_policy(
+        {
+            "name": "bedrock-model-invocation-job-logging-enabled",
+            "resource": "bedrock-model-invocation-job",
+            "filters": [
+                {"jobArn": job["jobArn"]},
+                {
+                    "type": "bedrock-model-invocation-logging",
+                    # Configured in terraform
+                    "attrs": [
+                        {"textDataDeliveryEnabled": True},
+                        {"s3Config.bucketName": "present"},
+                    ],
+                },
+            ],
+        },
+        session_factory=session_factory,
+    )
+    # Pass the job through to the filters directly instead of running the policy, which will spit
+    # out a get query for every job in the account.
+    resources = p.resource_manager.filter_resources([job])
+    test.assertEqual(len(resources), 1)
+    test.assertTrue("c7n:BedrockModelInvocationLogging" in resources[0])
 
 
 class BedrockCustomModel(BaseTest):
@@ -306,6 +352,38 @@ def test_bedrock_application_inference_profile(test, bedrock_application_inferen
     tags = {t['Key']: t['Value'] for t in resources[0]['Tags']}
     test.assertEqual(tags['Environment'], 'test')
     test.assertEqual(tags['Owner'], 'c7n')
+
+
+@terraform("bedrock_application_inference_profile_logging")
+def test_bedrock_application_inference_profile_model_invocation_logging(
+    test, bedrock_application_inference_profile_logging
+):
+    session_factory = test.replay_flight_data(
+        "test_bedrock_application_inference_profile_model_invocation_logging"
+    )
+    profile_arn = bedrock_application_inference_profile_logging[
+        "aws_bedrock_inference_profile.test_profile.arn"
+    ]
+    p = test.load_policy(
+        {
+            "name": "bedrock-app-inference-profile-logging-enabled",
+            "resource": "bedrock-inference-profile",
+            "filters": [
+                {"inferenceProfileArn": profile_arn},
+                {
+                    "type": "bedrock-model-invocation-logging",
+                    "attrs": [
+                        {"textDataDeliveryEnabled": True},
+                        {"s3Config.bucketName": "present"},
+                    ],
+                },
+            ],
+        },
+        session_factory=session_factory,
+    )
+    resources = p.run()
+    test.assertEqual(len(resources), 1)
+    test.assertTrue("c7n:BedrockModelInvocationLogging" in resources[0])
 
 
 @terraform('bedrock_application_inference_profile_tag_actions')

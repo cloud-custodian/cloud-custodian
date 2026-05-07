@@ -1,0 +1,43 @@
+{
+    "status_code": 200,
+    "data": {
+        "ResponseMetadata": {},
+        "inferenceProfileSummaries": [
+            {
+                "inferenceProfileName": "c7n-test-profile-default",
+                "createdAt": {
+                    "__class__": "datetime",
+                    "year": 2026,
+                    "month": 3,
+                    "day": 10,
+                    "hour": 20,
+                    "minute": 28,
+                    "second": 26,
+                    "microsecond": 671294
+                },
+                "updatedAt": {
+                    "__class__": "datetime",
+                    "year": 2026,
+                    "month": 3,
+                    "day": 10,
+                    "hour": 20,
+                    "minute": 28,
+                    "second": 26,
+                    "microsecond": 671294
+                },
+                "inferenceProfileArn": "arn:aws:bedrock:us-east-1:644160558196:application-inference-profile/g9h5yub6xmxo",
+                "models": [
+                    {
+                        "modelArn": "arn:aws:bedrock:::foundation-model/amazon.nova-2-lite-v1:0"
+                    },
+                    {
+                        "modelArn": "arn:aws:bedrock:us-east-1::foundation-model/amazon.nova-2-lite-v1:0"
+                    }
+                ],
+                "inferenceProfileId": "g9h5yub6xmxo",
+                "status": "ACTIVE",
+                "type": "APPLICATION"
+            }
+        ]
+    }
+}
