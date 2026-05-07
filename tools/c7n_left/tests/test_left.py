@@ -2026,7 +2026,7 @@ def test_selection_parse(policy_env):
 def test_selection_resource_filter(policy_env):
     selection = policy_env.get_selection("type=aws_vpc id=example")
     graph = policy_env.get_graph(terraform_dir / "vpc_flow_logs")
-    (rtype, resources) = list(graph.get_resources_by_type("aws_flow_log"))[0]
+    rtype, resources = list(graph.get_resources_by_type("aws_flow_log"))[0]
     assert selection.filter_resources(rtype, resources) == []
 
     for rtype, resources in graph.get_resources_by_type():

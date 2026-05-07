@@ -3,7 +3,6 @@
 
 from google.cloud import secretmanager
 
-
 CACHE = {}
 
 

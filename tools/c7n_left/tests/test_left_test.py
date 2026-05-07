@@ -12,7 +12,6 @@ import pytest
 
 from c7n.config import Bag
 
-
 try:
     from c7n_left import cli
     from c7n_left import test as left_test

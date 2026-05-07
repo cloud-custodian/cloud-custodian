@@ -6,7 +6,6 @@ import unittest
 from common import get_ldap_lookup, PETER, BILL
 from c7n_mailer.ldap_lookup import have_sqlite
 
-
 SKIP_REASON = "Azure Pipelines still broken"
 
 

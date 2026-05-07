@@ -11,7 +11,6 @@ from .provider import resources
 
 from c7n.query import TypeInfo, QueryResourceManager
 
-
 _IndexData = None
 
 

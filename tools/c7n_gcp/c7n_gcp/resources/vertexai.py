@@ -598,6 +598,86 @@ class VertexAIBatchPredictionJobStop(MethodAction):
             self.process_resource_set(location_client, model, location_resources)
 
 
+@VertexAIEndpoint.action_registry.register('undeploy-all')
+class UndeployAllModels(MethodAction):
+    """Undeploys all models from a Vertex AI Endpoint.
+
+    This stops the compute billing for the models but keeps the endpoint
+    configuration active. This is a key cost-optimization action.
+
+    :example:
+
+    Undeploy models from unused endpoints:
+
+    .. code-block:: yaml
+
+        policies:
+          - name: vertex-undeploy-unused
+            resource: gcp.vertex-ai-endpoint
+            filters:
+              - type: metrics
+                name: aiplatform.googleapis.com/endpoint/prediction_count
+                days: 7
+                op: eq
+                value: 0
+            actions:
+              - type: undeploy-all
+    """
+
+    schema = type_schema('undeploy-all')
+    method_spec = {'op': 'undeployModel'}
+    permissions = ('aiplatform.endpoints.undeploy',)
+
+    def process(self, resources):
+        # Group resources by location
+        resources_by_location = defaultdict(list)
+        for resource in resources:
+            # Format: projects/{project}/locations/{location}/endpoints/{endpoint}
+            parts = resource['name'].split('/')
+            if len(parts) > 3:
+                location = parts[3]
+                resources_by_location[location].append(resource)
+
+        session = local_session(self.manager.session_factory)
+        model = self.manager.resource_type
+
+        for location, location_resources in resources_by_location.items():
+            try:
+                api_endpoint = f'https://{location}-aiplatform.googleapis.com'
+                client_options = ClientOptions(api_endpoint=api_endpoint)
+                client = session.client(
+                    model.service, model.version, model.component,
+                    client_options=client_options
+                )
+
+                for r in location_resources:
+                    self.process_resource(client, r)
+            except Exception as e:
+                self.log.warning(f"Error processing location {location}: {e}")
+
+    def process_resource(self, client, resource):
+        deployed_models = resource.get('deployedModels', [])
+        if not deployed_models:
+            return
+
+        for dm in deployed_models:
+            try:
+                # undeployModel is an LRO (Long Running Operation)
+                # We map trafficSplit to empty to ensure clean removal
+                client.projects().locations().endpoints().undeployModel(
+                    endpoint=resource['name'],
+                    body={
+                        'deployedModelId': dm['id'],
+                        'trafficSplit': {}
+                    }
+                ).execute()
+            except Exception as e:
+                self.log.warning(
+                    "Failed to undeploy model %s from %s: %s",
+                    dm['id'], resource['displayName'], e
+                )
+
+
 def get_vertex_ai_publishers():
     """Load Vertex AI Model Garden publishers from generated JSON data."""
     with open(VERTEXAI_PUBLISHER_DATA_PATH) as fh:
