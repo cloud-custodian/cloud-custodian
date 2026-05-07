@@ -1,10 +1,12 @@
 # Copyright The Cloud Custodian Authors.
 # SPDX-License-Identifier: Apache-2.0
 from c7n.utils import type_schema, local_session
+from c7n.filters.core import ListItemFilter
 from c7n_gcp.actions import MethodAction, SetIamPolicy
 from c7n_gcp.filters import IamPolicyFilter, TimeRangeFilter
 from c7n_gcp.provider import resources
 from c7n_gcp.query import QueryResourceManager, TypeInfo, ChildTypeInfo, ChildResourceManager
+from c7n_gcp.utils import parse_protobuf_duration_to_seconds
 
 
 @resources.register('spanner-instance')
@@ -226,6 +228,57 @@ class SpannerDatabaseInstance(ChildResourceManager):
                 'get', {
                     'name': resource_info['resourceName']}
             )
+
+
+@SpannerDatabaseInstance.filter_registry.register('backup-schedule')
+class SpannerDatabaseBackupScheduleFilter(ListItemFilter):
+    """Filter Spanner database instances by their backup schedules.
+
+    Fetches all backup schedules for each database and matches them against
+    the given ``attrs``.  The ``retentionDuration`` field is normalized
+    from a protobuf duration string (for example ``"2592000s"``) to integer
+    seconds so that numeric operators (``gt``, ``lt``, etc.) work correctly.
+
+    :example:
+
+    .. code-block:: yaml
+
+        policies:
+          - name: spanner-database-excessive-backup-retention
+            resource: gcp.spanner-database-instance
+            filters:
+              - type: backup-schedule
+                attrs:
+                  - type: value
+                    key: retentionDuration
+                    op: gt
+                    value: 2592000
+    """
+
+    schema = type_schema(
+        'backup-schedule',
+        attrs={'$ref': '#/definitions/filters_common/list_item_attrs'}
+    )
+    annotate_items = True
+    permissions = ('spanner.backupSchedules.list',)
+
+    def get_item_values(self, resource):
+        session = local_session(self.manager.session_factory)
+        client = session.client(
+            service_name='spanner',
+            version='v1',
+            component='projects.instances.databases.backupSchedules'
+        )
+        schedules = client.execute_command(
+            'list', {'parent': resource['name']}
+        ).get('backupSchedules', [])
+
+        for schedule in schedules:
+            schedule['retentionDuration'] = parse_protobuf_duration_to_seconds(
+                schedule.get('retentionDuration')
+            )
+
+        return schedules
 
 
 @SpannerDatabaseInstance.filter_registry.register('iam-policy')

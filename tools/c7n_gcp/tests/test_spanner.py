@@ -1,9 +1,11 @@
 # Copyright The Cloud Custodian Authors.
 # SPDX-License-Identifier: Apache-2.0
 
-from gcp_common import BaseTest, event_data
 import time
 
+from c7n.testing import C7N_FUNCTIONAL
+from c7n_gcp.client import get_default_project
+from gcp_common import BaseTest, event_data
 from pytest_terraform import terraform
 
 
@@ -478,3 +480,75 @@ def test_spanner_backup_iam(test):
     resources = policy.run()
     assert len(resources) == 1
     assert resources[0]['c7n:iamPolicy']['bindings'][0]['role'] == 'roles/editor'
+
+
+@terraform('spanner_backup_schedule')
+def test_spanner_backup_schedule_query(test, spanner_backup_schedule):
+    flight_name = 'sbs-qry'
+
+    if C7N_FUNCTIONAL:
+        project_id = get_default_project()
+        session_factory = test.record_flight_data(flight_name, project_id=project_id)
+    else:
+        session_factory = test.replay_flight_data(flight_name)
+
+    policy = test.load_policy(
+        {
+            'name': 'spanner-backup-schedule-query',
+            'resource': 'gcp.spanner-database-instance',
+            'filters': [
+                {'type': 'backup-schedule'}
+            ],
+        },
+        session_factory=session_factory
+    )
+
+    resources = policy.run()
+    # The one database (sbsd) has backup schedules so it should be returned.
+    test.assertEqual(len(resources), 1)
+    matched_schedules = resources[0]['c7n:ListItemMatches']
+    schedule_names = {s['name'].rsplit('/', 1)[-1] for s in matched_schedules}
+    # Spanner also exposes a default full backup schedule for the database.
+    test.assertIn('default_daily_full_backup_schedule', schedule_names)
+    test.assertIn('sbsl', schedule_names)
+
+
+@terraform('spanner_backup_schedule')
+def test_spanner_backup_schedule_filter_retention_exceeds_limit(test, spanner_backup_schedule):
+    flight_name = 'sbs-ret-gt'
+
+    if C7N_FUNCTIONAL:
+        project_id = get_default_project()
+        session_factory = test.record_flight_data(flight_name, project_id=project_id)
+    else:
+        session_factory = test.replay_flight_data(flight_name)
+
+    policy = test.load_policy(
+        {
+            'name': 'gcp-spanner-backup-schedule-retention-exceeds-limit',
+            'resource': 'gcp.spanner-database-instance',
+            'filters': [
+                {
+                    'type': 'backup-schedule',
+                    'attrs': [
+                        {
+                            'type': 'value',
+                            'key': 'retentionDuration',
+                            'op': 'gt',
+                            'value': 2592000,
+                        }
+                    ],
+                }
+            ],
+        },
+        session_factory=session_factory
+    )
+
+    resources = policy.run()
+    # sbsl has retentionDuration 2678400s (> 2592000); default_daily has 604800s (< 2592000).
+    # Only the database containing sbsl should match.
+    test.assertEqual(len(resources), 1)
+    matched_schedules = resources[0]['c7n:ListItemMatches']
+    matched_names = {s['name'].rsplit('/', 1)[-1] for s in matched_schedules}
+    test.assertIn('sbsl', matched_names)
+    test.assertNotIn('default_daily_full_backup_schedule', matched_names)
