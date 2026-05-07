@@ -17,6 +17,8 @@ class StructureParser:
     allowed_policy_keys = {'name', 'resource', 'title', 'description', 'mode',
          'tags', 'max-resources', 'metadata', 'query',
          'filters', 'actions', 'source', 'conditions',
+         # boto-resource PoC keys
+         'service', 'method', 'params', 'result_key', 'id-field',
          # legacy keys subject to deprecation.
          'region', 'start', 'end', 'tz', 'max-resources-percent',
          'comments', 'comment'}
