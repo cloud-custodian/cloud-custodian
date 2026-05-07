@@ -1,0 +1,108 @@
+{
+    "pytest-terraform": 1,
+    "outputs": {},
+    "resources": {
+        "google_bigtable_gc_policy": {
+            "gc_rule_table_policy": {
+                "column_family": "cf_with_gc",
+                "deletion_policy": "ABANDON",
+                "gc_rules": null,
+                "id": "age() > 1d",
+                "ignore_warnings": false,
+                "instance_name": "c7n-gc-rule-602ee4da",
+                "max_age": [
+                    {
+                        "days": 0,
+                        "duration": "86400s"
+                    }
+                ],
+                "max_version": [],
+                "mode": null,
+                "project": "stacklet-personal-2",
+                "table": "c7n-gc-table",
+                "timeouts": null
+            }
+        },
+        "google_bigtable_instance": {
+            "instance": {
+                "cluster": [
+                    {
+                        "autoscaling_config": [],
+                        "cluster_id": "c7n-gc-cluster",
+                        "kms_key_name": "",
+                        "node_scaling_factor": "NodeScalingFactor1X",
+                        "num_nodes": 1,
+                        "state": "READY",
+                        "storage_type": "HDD",
+                        "zone": "us-central1-a"
+                    }
+                ],
+                "deletion_protection": false,
+                "display_name": "c7n-gc-rule-602ee4da",
+                "effective_labels": {
+                    "goog-terraform-provisioned": "true"
+                },
+                "force_destroy": false,
+                "id": "projects/cloud-custodian/instances/c7n-gc-rule-602ee4da",
+                "instance_type": "PRODUCTION",
+                "labels": null,
+                "name": "c7n-gc-rule-602ee4da",
+                "project": "stacklet-personal-2",
+                "terraform_labels": {
+                    "goog-terraform-provisioned": "true"
+                },
+                "timeouts": null
+            }
+        },
+        "google_bigtable_table": {
+            "gc_rule_table": {
+                "automated_backup_policy": [],
+                "change_stream_retention": null,
+                "column_family": [
+                    {
+                        "family": "cf_with_gc",
+                        "type": ""
+                    }
+                ],
+                "deletion_protection": "UNPROTECTED",
+                "id": "projects/cloud-custodian/instances/c7n-gc-rule-602ee4da/tables/c7n-gc-table",
+                "instance_name": "c7n-gc-rule-602ee4da",
+                "name": "c7n-gc-table",
+                "project": "stacklet-personal-2",
+                "row_key_schema": "",
+                "split_keys": null,
+                "timeouts": null
+            },
+            "no_gc_rule_table": {
+                "automated_backup_policy": [],
+                "change_stream_retention": null,
+                "column_family": [
+                    {
+                        "family": "cf_no_gc",
+                        "type": ""
+                    }
+                ],
+                "deletion_protection": "UNPROTECTED",
+                "id": "projects/cloud-custodian/instances/c7n-gc-rule-602ee4da/tables/c7n-no-gc-table",
+                "instance_name": "c7n-gc-rule-602ee4da",
+                "name": "c7n-no-gc-table",
+                "project": "stacklet-personal-2",
+                "row_key_schema": "",
+                "split_keys": null,
+                "timeouts": null
+            }
+        },
+        "random_id": {
+            "suffix": {
+                "b64_std": "YC7k2g==",
+                "b64_url": "YC7k2g",
+                "byte_length": 4,
+                "dec": "1613685978",
+                "hex": "602ee4da",
+                "id": "YC7k2g",
+                "keepers": null,
+                "prefix": null
+            }
+        }
+    }
+}
