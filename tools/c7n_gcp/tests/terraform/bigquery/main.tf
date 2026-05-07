@@ -1,5 +1,7 @@
 variable "google_project_id" {
   description = "GCP project ID"
+  type        = string
+  nullable    = false
 }
 
 provider "google" {
@@ -8,16 +10,20 @@ provider "google" {
 
 resource "google_bigquery_dataset" "dataset" {
   dataset_id = "c7n_bq_dataset"
+  project    = var.google_project_id
 
   labels = {
-    env = "default"
+    env      = "default"
+    c7n_test = "bq_dataset_update"
   }
 }
 
 resource "google_bigquery_table" "table" {
-  dataset_id = google_bigquery_dataset.dataset.dataset_id
-  table_id   = "c7n_bq_table"
-  schema     = <<SCHEMA
+  project             = var.google_project_id
+  dataset_id          = google_bigquery_dataset.dataset.dataset_id
+  table_id            = "c7n_bq_table"
+  deletion_protection = false
+  schema              = <<SCHEMA
   [
     {
       "name": "id",

@@ -2,6 +2,9 @@
 # SPDX-License-Identifier: Apache-2.0
 
 from gcp_common import BaseTest, event_data
+from c7n.exceptions import PolicyValidationError
+from c7n.testing import C7N_FUNCTIONAL
+from c7n_gcp.client import get_default_project
 import time
 
 
@@ -207,3 +210,71 @@ class BigQueryTableTest(BaseTest):
         client = p.resource_manager.get_client()
         result = client.execute_query('get', resources[0]['tableReference'])
         self.assertEqual(result['labels']['env'], 'not-the-default')
+
+    def test_dataset_update_validation_error(test):
+        with test.assertRaisesRegex(
+            PolicyValidationError,
+            "policy:bq-dataset-update-invalid action:update "
+            "requires at least one mutable dataset field"
+        ):
+            test.load_policy(
+                {
+                    'name': 'bq-dataset-update-invalid',
+                    'resource': 'gcp.bq-dataset',
+                    'actions': [{'type': 'update'}]
+                }
+            )
+
+    def test_dataset_update(self):
+        project_id = get_default_project()
+        dataset_id = 'c7n_bq_dataset'
+
+        if C7N_FUNCTIONAL:
+            session_factory = self.record_flight_data('bq-dataset-update', project_id=project_id)
+        else:
+            session_factory = self.replay_flight_data('bq-dataset-update', project_id=project_id)
+
+        policy = self.load_policy(
+            {
+                'name': 'bq-dataset-update-access',
+                'resource': 'gcp.bq-dataset',
+                # Use BigQuery server-side dataset filter to avoid listing/augmenting
+                # unrelated monitoring datasets in recordings.
+                'query': [{'filter': 'labels.c7n_test:bq_dataset_update'}],
+                'filters': [{
+                    'type': 'value',
+                    'key': 'datasetReference.datasetId',
+                    'value': dataset_id
+                }],
+                'actions': [{
+                    'type': 'update',
+                    'access': [
+                        {'role': 'READER', 'specialGroup': 'projectReaders'},
+                        {'role': 'WRITER', 'specialGroup': 'projectWriters'},
+                        {'role': 'OWNER', 'specialGroup': 'projectOwners'}
+                    ]
+                }]
+            },
+            session_factory=session_factory
+        )
+
+        resources = policy.run()
+        self.assertEqual(len(resources), 1)
+
+        client = policy.resource_manager.get_client()
+        result = client.execute_query(
+            'get',
+            {'projectId': project_id, 'datasetId': dataset_id}
+        )
+        self.assertEqual(result['datasetReference']['datasetId'], dataset_id)
+        expected_access = {
+            ('READER', 'projectReaders'),
+            ('WRITER', 'projectWriters'),
+            ('OWNER', 'projectOwners'),
+        }
+        actual_access = {
+            (entry.get('role'), entry.get('specialGroup'))
+            for entry in result.get('access', [])
+            if 'specialGroup' in entry
+        }
+        self.assertEqual(actual_access, expected_access)
