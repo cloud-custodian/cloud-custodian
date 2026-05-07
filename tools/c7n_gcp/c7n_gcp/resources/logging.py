@@ -97,6 +97,76 @@ class DeletePubSubTopic(MethodAction):
         return {'sinkName': 'projects/{}/sinks/{}'.format(project, r['name'])}
 
 
+@resources.register('log-bucket')
+class LogBucket(QueryResourceManager):
+    """
+    https://cloud.google.com/logging/docs/reference/v2/rest/v2/projects.locations.buckets
+    """
+
+    class resource_type(TypeInfo):
+        service = 'logging'
+        version = 'v2'
+        component = 'projects.locations.buckets'
+        enum_spec = ('list', 'buckets[]', None)
+        scope_key = 'parent'
+        scope_template = 'projects/{}/locations/-'
+        name = id = 'resourceName'
+        default_report_fields = [
+            "name", "description", "retentionDays", "createTime", "locked"]
+        asset_type = "logging.googleapis.com/LogBucket"
+        permissions = ('logging.buckets.list',)
+        urn_component = "bucket"
+
+        @staticmethod
+        def get(client, resource_info):
+            name = resource_info['resourceName']
+            return client.execute_query('get', {'name': name})
+
+
+@LogBucket.action_registry.register('set-retention')
+class SetLogBucketRetention(MethodAction):
+    """Set retention for a Cloud Logging bucket.
+
+    :example:
+
+    .. code-block:: yaml
+
+        policies:
+          - name: gcp-log-bucket-set-retention
+            resource: gcp.log-bucket
+            filters:
+              - type: value
+                key: retentionDays
+                op: gt
+                value: 30
+              - type: value
+                key: lifecycleState
+                op: ne
+                value: DELETE_REQUESTED
+              - type: value
+                key: locked
+                value: false
+            actions:
+              - type: set-retention
+                retentionDays: 30
+    """
+
+    schema = type_schema(
+        'set-retention',
+        required=['retentionDays'],
+        retentionDays={'type': 'integer', 'minimum': 1}
+    )
+    method_spec = {'op': 'patch'}
+    method_perm = 'update'
+
+    def get_resource_params(self, model, resource):
+        return {
+            'name': resource['name'],
+            'updateMask': 'retentionDays',
+            'body': {'retentionDays': self.data['retentionDays']},
+        }
+
+
 @resources.register('log-project-metric')
 class LogProjectMetric(QueryResourceManager):
     """

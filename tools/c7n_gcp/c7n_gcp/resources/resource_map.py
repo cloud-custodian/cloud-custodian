@@ -85,6 +85,7 @@ ResourceMap = {
         "c7n_gcp.resources.loadbalancer.LoadBalancingTargetTcpProxy"),
     "gcp.loadbalancer-url-map": "c7n_gcp.resources.loadbalancer.LoadBalancingUrlMap",
     "gcp.log-exclusion": "c7n_gcp.resources.logging.LogExclusion",
+    "gcp.log-bucket": "c7n_gcp.resources.logging.LogBucket",
     "gcp.log-project-metric": "c7n_gcp.resources.logging.LogProjectMetric",
     "gcp.log-project-sink": "c7n_gcp.resources.logging.LogProjectSink",
     "gcp.ml-job": "c7n_gcp.resources.mlengine.MLJob",
