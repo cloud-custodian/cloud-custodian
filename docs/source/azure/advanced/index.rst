@@ -10,4 +10,5 @@ Topics for advanced usage of the Azure provider
 
   multiplesubs
   azurepolicy
+  blobstorage
   contribute
