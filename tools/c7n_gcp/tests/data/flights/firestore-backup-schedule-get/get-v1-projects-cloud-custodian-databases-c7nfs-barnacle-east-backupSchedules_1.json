@@ -1,0 +1,29 @@
+{
+  "headers": {
+    "x-debug-tracking-id": "15084615722822630859;o=0",
+    "content-type": "application/json; charset=UTF-8",
+    "vary": "Origin, X-Origin, Referer",
+    "date": "Thu, 02 Apr 2026 01:57:30 GMT",
+    "server": "ESF",
+    "x-xss-protection": "0",
+    "x-frame-options": "SAMEORIGIN",
+    "x-content-type-options": "nosniff",
+    "alt-svc": "h3=\":443\"; ma=2592000,h3-29=\":443\"; ma=2592000",
+    "transfer-encoding": "chunked",
+    "status": "200",
+    "content-length": "332",
+    "-content-encoding": "gzip",
+    "content-location": "https://firestore.googleapis.com/v1/projects/cloud-custodian/databases/c7nfs-barnacle-east/backupSchedules?alt=json"
+  },
+  "body": {
+    "backupSchedules": [
+      {
+        "name": "projects/cloud-custodian/databases/c7nfs-barnacle-east/backupSchedules/897f834d-9902-41ba-a943-6699716e745e",
+        "createTime": "2026-04-02T01:57:28.204720Z",
+        "retention": "604800s",
+        "dailyRecurrence": {},
+        "updateTime": "2026-04-02T01:57:28.204720Z"
+      }
+    ]
+  }
+}

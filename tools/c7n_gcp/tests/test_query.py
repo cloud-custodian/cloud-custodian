@@ -40,6 +40,9 @@ def test_gcp_resource_metadata_asset_type():
         'sql-backup-run',
         'sql-ssl-cert',
         'sql-user',
+        'firestore-backup-schedule',
+        'firestore-field',
+        'firestore-index',
         'pubsub-snapshot',
         'region',
         'vertex-ai-publisher',  # Synthetic resource (no asset inventory type)

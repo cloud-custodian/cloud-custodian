@@ -1,0 +1,42 @@
+{
+  "headers": {
+    "x-debug-tracking-id": "16239191620574825724;o=0",
+    "content-type": "application/json; charset=UTF-8",
+    "vary": "Origin, X-Origin, Referer",
+    "date": "Thu, 02 Apr 2026 01:53:49 GMT",
+    "server": "ESF",
+    "x-xss-protection": "0",
+    "x-frame-options": "SAMEORIGIN",
+    "x-content-type-options": "nosniff",
+    "alt-svc": "h3=\":443\"; ma=2592000,h3-29=\":443\"; ma=2592000",
+    "transfer-encoding": "chunked",
+    "status": "200",
+    "content-length": "527",
+    "-content-encoding": "gzip",
+    "content-location": "https://firestore.googleapis.com/v1/projects/cloud-custodian/databases/c7nidx-unicorn/collectionGroups/orders/indexes?alt=json"
+  },
+  "body": {
+    "indexes": [
+      {
+        "name": "projects/cloud-custodian/databases/c7nidx-unicorn/collectionGroups/orders/indexes/CICAgOjXh4EK",
+        "queryScope": "COLLECTION",
+        "fields": [
+          {
+            "fieldPath": "status",
+            "order": "ASCENDING"
+          },
+          {
+            "fieldPath": "createdAt",
+            "order": "DESCENDING"
+          },
+          {
+            "fieldPath": "__name__",
+            "order": "DESCENDING"
+          }
+        ],
+        "state": "READY",
+        "density": "SPARSE_ALL"
+      }
+    ]
+  }
+}

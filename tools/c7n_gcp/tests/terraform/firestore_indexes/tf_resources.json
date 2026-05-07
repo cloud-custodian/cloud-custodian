@@ -1,0 +1,141 @@
+{
+    "pytest-terraform": 1,
+    "outputs": {},
+    "resources": {
+        "google_firestore_database": {
+            "c7n": {
+                "app_engine_integration_mode": "DISABLED",
+                "cmek_config": [],
+                "concurrency_mode": "PESSIMISTIC",
+                "create_time": "2026-04-02T01:47:41.165987Z",
+                "database_edition": "STANDARD",
+                "delete_protection_state": "DELETE_PROTECTION_DISABLED",
+                "deletion_policy": "DELETE",
+                "earliest_version_time": "2026-04-02T01:47:41.165987Z",
+                "etag": "IKm4vpaGzpMDMKPjs5aGzpMD",
+                "firestore_data_access_mode": "",
+                "id": "projects/cloud-custodian/databases/c7nidx-unicorn",
+                "key_prefix": "",
+                "location_id": "us-central1",
+                "mongodb_compatible_data_access_mode": "",
+                "name": "c7nidx-unicorn",
+                "point_in_time_recovery_enablement": "POINT_IN_TIME_RECOVERY_DISABLED",
+                "project": "stacklet-personal-2",
+                "realtime_updates_mode": "REALTIME_UPDATES_MODE_ENABLED",
+                "tags": null,
+                "timeouts": null,
+                "type": "FIRESTORE_NATIVE",
+                "uid": "ab38ea6d-a956-46d6-ab40-b0dbb4fb275b",
+                "update_time": "2026-04-02T01:47:41.165987Z",
+                "version_retention_period": "3600s"
+            },
+            "c7n_east": {
+                "app_engine_integration_mode": "DISABLED",
+                "cmek_config": [],
+                "concurrency_mode": "PESSIMISTIC",
+                "create_time": "2026-04-02T01:47:42.708054Z",
+                "database_edition": "STANDARD",
+                "delete_protection_state": "DELETE_PROTECTION_DISABLED",
+                "deletion_policy": "DELETE",
+                "earliest_version_time": "2026-04-02T01:47:42.708054Z",
+                "etag": "IInbo5eGzpMDMNbykZeGzpMD",
+                "firestore_data_access_mode": "",
+                "id": "projects/cloud-custodian/databases/c7nidx-unicorn-east",
+                "key_prefix": "",
+                "location_id": "us-east1",
+                "mongodb_compatible_data_access_mode": "",
+                "name": "c7nidx-unicorn-east",
+                "point_in_time_recovery_enablement": "POINT_IN_TIME_RECOVERY_DISABLED",
+                "project": "stacklet-personal-2",
+                "realtime_updates_mode": "REALTIME_UPDATES_MODE_ENABLED",
+                "tags": null,
+                "timeouts": null,
+                "type": "FIRESTORE_NATIVE",
+                "uid": "94b52eba-fb4b-475b-9e7e-3b5c3575115e",
+                "update_time": "2026-04-02T01:47:42.708054Z",
+                "version_retention_period": "3600s"
+            }
+        },
+        "google_firestore_index": {
+            "c7n": {
+                "api_scope": "ANY_API",
+                "collection": "orders",
+                "database": "c7nidx-unicorn",
+                "deletion_policy": "DELETE",
+                "density": "SPARSE_ALL",
+                "fields": [
+                    {
+                        "array_config": "",
+                        "field_path": "status",
+                        "order": "ASCENDING",
+                        "vector_config": []
+                    },
+                    {
+                        "array_config": "",
+                        "field_path": "createdAt",
+                        "order": "DESCENDING",
+                        "vector_config": []
+                    },
+                    {
+                        "array_config": "",
+                        "field_path": "__name__",
+                        "order": "DESCENDING",
+                        "vector_config": []
+                    }
+                ],
+                "id": "projects/cloud-custodian/databases/c7nidx-unicorn/collectionGroups/orders/indexes/CICAgOjXh4EK",
+                "multikey": false,
+                "name": "projects/cloud-custodian/databases/c7nidx-unicorn/collectionGroups/orders/indexes/CICAgOjXh4EK",
+                "project": "stacklet-personal-2",
+                "query_scope": "COLLECTION",
+                "skip_wait": false,
+                "timeouts": null,
+                "unique": false
+            },
+            "c7n_east": {
+                "api_scope": "ANY_API",
+                "collection": "orders",
+                "database": "c7nidx-unicorn-east",
+                "deletion_policy": "DELETE",
+                "density": "SPARSE_ALL",
+                "fields": [
+                    {
+                        "array_config": "",
+                        "field_path": "status",
+                        "order": "ASCENDING",
+                        "vector_config": []
+                    },
+                    {
+                        "array_config": "",
+                        "field_path": "createdAt",
+                        "order": "DESCENDING",
+                        "vector_config": []
+                    },
+                    {
+                        "array_config": "",
+                        "field_path": "__name__",
+                        "order": "DESCENDING",
+                        "vector_config": []
+                    }
+                ],
+                "id": "projects/cloud-custodian/databases/c7nidx-unicorn-east/collectionGroups/orders/indexes/CICAgOjXh4EK",
+                "multikey": false,
+                "name": "projects/cloud-custodian/databases/c7nidx-unicorn-east/collectionGroups/orders/indexes/CICAgOjXh4EK",
+                "project": "stacklet-personal-2",
+                "query_scope": "COLLECTION_GROUP",
+                "skip_wait": false,
+                "timeouts": null,
+                "unique": false
+            }
+        },
+        "random_pet": {
+            "db": {
+                "id": "c7nidx-unicorn",
+                "keepers": null,
+                "length": 1,
+                "prefix": "c7nidx",
+                "separator": "-"
+            }
+        }
+    }
+}
