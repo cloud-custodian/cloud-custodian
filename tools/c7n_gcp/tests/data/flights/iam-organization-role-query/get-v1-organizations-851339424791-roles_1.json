@@ -1,0 +1,18 @@
+{
+  "body": {
+    "roles": [
+      {
+        "name": "organizations/851339424791/roles/OrgCustomRole",
+        "title": "Organization Custom Role",
+        "description": "Organization level custom role",
+        "stage": "GA",
+        "etag": "BwYxM2Y1N2VhNQ=="
+      }
+    ]
+  },
+  "headers": {
+    "status": "200",
+    "content-length": "252",
+    "content-type": "application/json; charset=UTF-8"
+  }
+}
