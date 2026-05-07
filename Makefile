@@ -47,6 +47,49 @@ test-coverage:
             --cov tools/c7n_oci/c7n_oci \
             tests tools $(ARGS)
 
+diff-coverage:
+	@echo "Running tests with coverage for changed files..."
+	@CHANGED_TEST_FILES=$$(git diff --name-only origin/main | grep -E "test_.*\.py$$" || true); \
+	if [ -z "$$CHANGED_TEST_FILES" ]; then \
+		echo "Error: No test files changed compared to origin/main"; \
+		echo "Use 'make diff-coverage-full' to run all tests for a provider, or specify TEST_PATH=<path>"; \
+		exit 1; \
+	fi; \
+	echo "Running changed test files:"; \
+	echo "$$CHANGED_TEST_FILES" | sed 's/^/  - /'; \
+	uv run pytest $$CHANGED_TEST_FILES -n auto \
+		--cov-config .coveragerc \
+		--cov-report xml \
+		--cov .
+	@echo ""
+	@echo "Generating diff coverage report..."
+	@uv tool run diff-cover coverage.xml \
+		--compare-branch=origin/main \
+		--src-roots . \
+		--exclude "tests/**" \
+		--exclude "tools/**/tests/**" \
+		--exclude "**/test_*.py" \
+		--html-report htmlcov/diff-coverage.html
+	@echo ""
+	@echo "HTML report generated: htmlcov/diff-coverage.html"
+	@echo "Run 'make view-diff-coverage-linux' to open the report in your browser"
+
+view-coverage-linux:
+	@if [ ! -f htmlcov/index.html ]; then \
+		echo "Error: htmlcov/index.html not found"; \
+		echo "Run 'make test-coverage' first to generate the full coverage report"; \
+		exit 1; \
+	fi
+	@xdg-open htmlcov/index.html 2>/dev/null || open htmlcov/index.html 2>/dev/null || echo "Please open htmlcov/index.html manually"
+
+view-diff-coverage-linux:
+	@if [ ! -f htmlcov/diff-coverage.html ]; then \
+		echo "Error: htmlcov/diff-coverage.html not found"; \
+		echo "Run 'make diff-coverage' first to generate the diff coverage report"; \
+		exit 1; \
+	fi
+	@xdg-open htmlcov/diff-coverage.html 2>/dev/null || open htmlcov/diff-coverage.html 2>/dev/null || echo "Please open htmlcov/diff-coverage.html manually"
+
 test-functional:
 # note this will provision real resources in a cloud environment
 	C7N_FUNCTIONAL=yes AWS_DEFAULT_REGION=us-east-2 pytest tests -m functional $(ARGS)
