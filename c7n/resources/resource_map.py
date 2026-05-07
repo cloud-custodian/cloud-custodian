@@ -99,6 +99,7 @@ ResourceMap = {
   "aws.delivery-destination": "c7n.resources.cw.DeliveryDestination",
   "aws.destination": "c7n.resources.cw.Destination",
   "aws.devicefarm-project": "c7n.resources.devicefarm.DevicefarmProject",
+  "aws.devops-agent-space": "c7n.resources.devopsagent.DevOpsAgentSpace",
   "aws.directconnect": "c7n.resources.directconnect.DirectConnect",
   "aws.directconnect-gateway": "c7n.resources.directconnect.DirectConnectGateway",
   "aws.directconnect-virtual-interface": "c7n.resources.directconnect.VirtualInterface",
