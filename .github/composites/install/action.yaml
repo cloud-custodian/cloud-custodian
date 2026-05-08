@@ -78,7 +78,7 @@ runs:
 
     - name: Build awscc data files
       shell: bash
-      run: cd tools/c7n_awscc && python build.py
+      run: cd tools/c7n_awscc && uv run python build.py
 
 
     - name: Save cache
