@@ -4,7 +4,6 @@ from .common import BaseTest
 
 
 class DevOpsAgentSpaceTest(BaseTest):
-
     def test_devops_agent_space_augment(self):
         session_factory = self.replay_flight_data('test_devops_agent_space_augment')
 
