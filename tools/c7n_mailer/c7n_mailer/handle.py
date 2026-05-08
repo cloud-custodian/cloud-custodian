@@ -3,6 +3,7 @@
 """
 Lambda entry point
 """
+
 import boto3
 import json
 import os
