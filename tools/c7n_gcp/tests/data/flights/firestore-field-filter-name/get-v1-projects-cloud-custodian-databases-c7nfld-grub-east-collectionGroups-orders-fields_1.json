@@ -1,0 +1,64 @@
+{
+  "headers": {
+    "x-debug-tracking-id": "13153605820424179880;o=0",
+    "content-type": "application/json; charset=UTF-8",
+    "vary": "Origin, X-Origin, Referer",
+    "date": "Thu, 02 Apr 2026 00:53:44 GMT",
+    "server": "ESF",
+    "x-xss-protection": "0",
+    "x-frame-options": "SAMEORIGIN",
+    "x-content-type-options": "nosniff",
+    "alt-svc": "h3=\":443\"; ma=2592000,h3-29=\":443\"; ma=2592000",
+    "transfer-encoding": "chunked",
+    "status": "200",
+    "content-length": "1157",
+    "-content-encoding": "gzip",
+    "content-location": "https://firestore.googleapis.com/v1/projects/cloud-custodian/databases/c7nfld-grub-east/collectionGroups/orders/fields?filter=ttlConfig%3A%2A&alt=json"
+  },
+  "body": {
+    "fields": [
+      {
+        "name": "projects/cloud-custodian/databases/c7nfld-grub-east/collectionGroups/orders/fields/expireAt",
+        "indexConfig": {
+          "indexes": [
+            {
+              "queryScope": "COLLECTION",
+              "fields": [
+                {
+                  "fieldPath": "expireAt",
+                  "order": "ASCENDING"
+                }
+              ],
+              "state": "READY"
+            },
+            {
+              "queryScope": "COLLECTION",
+              "fields": [
+                {
+                  "fieldPath": "expireAt",
+                  "order": "DESCENDING"
+                }
+              ],
+              "state": "READY"
+            },
+            {
+              "queryScope": "COLLECTION",
+              "fields": [
+                {
+                  "fieldPath": "expireAt",
+                  "arrayConfig": "CONTAINS"
+                }
+              ],
+              "state": "READY"
+            }
+          ],
+          "usesAncestorConfig": true,
+          "ancestorField": "projects/cloud-custodian/databases/c7nfld-grub-east/collectionGroups/__default__/fields/*"
+        },
+        "ttlConfig": {
+          "state": "ACTIVE"
+        }
+      }
+    ]
+  }
+}
