@@ -12,17 +12,16 @@ class DevOpsAgentSpaceTest(BaseTest):
             {
                 'name': 'devops-agent-space-augment',
                 'resource': 'devops-agent-space',
-                'filters': [{'tag:agentName': 'testAgent'}],
+                'filters': [{'tag:testAgentSpaceKey': 'testAgentSpaceValue'}],
             },
             session_factory=session_factory,
         )
         resources = p.run()
-
         self.assertEqual(len(resources), 1)
         self.assertEqual(
             resources[0]['Tags'],
             [
-                {'Key': 'agentName', 'Value': 'testAgent'},
                 {'Key': 'agentAssociation', 'Value': 'pretendService'},
+                {'Key': 'testAgentSpaceKey', 'Value': 'testAgentSpaceValue'},
             ],
         )

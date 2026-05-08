@@ -4,30 +4,30 @@
         "ResponseMetadata": {},
         "agentSpaces": [
             {
-                "name": "custodian-test-agent",
-                "description": "This resource is setup to test cloud custodian resources.",
-                "locale": "en-US",
+                "name": "c7nDevopsAgent",
+                "description": "Testing Custodian",
+                "locale": "en-UK",
                 "createdAt": {
                     "__class__": "datetime",
                     "year": 2026,
-                    "month": 4,
-                    "day": 23,
+                    "month": 5,
+                    "day": 8,
                     "hour": 16,
-                    "minute": 21,
-                    "second": 59,
-                    "microsecond": 921000
+                    "minute": 52,
+                    "second": 1,
+                    "microsecond": 773000
                 },
                 "updatedAt": {
                     "__class__": "datetime",
                     "year": 2026,
-                    "month": 4,
-                    "day": 23,
+                    "month": 5,
+                    "day": 8,
                     "hour": 16,
-                    "minute": 21,
-                    "second": 59,
-                    "microsecond": 921000
+                    "minute": 52,
+                    "second": 1,
+                    "microsecond": 773000
                 },
-                "agentSpaceId": "681ce319-0dbe-4bbf-b50c-9ddc3ff2e05f"
+                "agentSpaceId": "f68f623c-bb40-4d21-a53c-b36eb3d5a3bc"
             }
         ]
     }
