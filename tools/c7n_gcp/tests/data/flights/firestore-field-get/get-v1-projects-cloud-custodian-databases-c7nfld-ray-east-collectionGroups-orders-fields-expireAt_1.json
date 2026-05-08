@@ -1,0 +1,60 @@
+{
+  "headers": {
+    "x-debug-tracking-id": "7755336244928929416;o=0",
+    "content-type": "application/json; charset=UTF-8",
+    "vary": "Origin, X-Origin, Referer",
+    "date": "Thu, 02 Apr 2026 01:39:09 GMT",
+    "server": "ESF",
+    "x-xss-protection": "0",
+    "x-frame-options": "SAMEORIGIN",
+    "x-content-type-options": "nosniff",
+    "alt-svc": "h3=\":443\"; ma=2592000,h3-29=\":443\"; ma=2592000",
+    "transfer-encoding": "chunked",
+    "status": "200",
+    "content-length": "965",
+    "-content-encoding": "gzip",
+    "content-location": "https://firestore.googleapis.com/v1/projects/cloud-custodian/databases/c7nfld-ray-east/collectionGroups/orders/fields/expireAt?alt=json"
+  },
+  "body": {
+    "name": "projects/cloud-custodian/databases/c7nfld-ray-east/collectionGroups/orders/fields/expireAt",
+    "indexConfig": {
+      "indexes": [
+        {
+          "queryScope": "COLLECTION",
+          "fields": [
+            {
+              "fieldPath": "expireAt",
+              "order": "ASCENDING"
+            }
+          ],
+          "state": "READY"
+        },
+        {
+          "queryScope": "COLLECTION",
+          "fields": [
+            {
+              "fieldPath": "expireAt",
+              "order": "DESCENDING"
+            }
+          ],
+          "state": "READY"
+        },
+        {
+          "queryScope": "COLLECTION",
+          "fields": [
+            {
+              "fieldPath": "expireAt",
+              "arrayConfig": "CONTAINS"
+            }
+          ],
+          "state": "READY"
+        }
+      ],
+      "usesAncestorConfig": true,
+      "ancestorField": "projects/cloud-custodian/databases/c7nfld-ray-east/collectionGroups/__default__/fields/*"
+    },
+    "ttlConfig": {
+      "state": "ACTIVE"
+    }
+  }
+}

@@ -25,6 +25,40 @@ class RedisInstanceTest(BaseTest):
         ]
 
 
+@terraform('redis_instance_labels')
+def test_redis_instance_labels(test, redis_instance_labels):
+    instance_name = redis_instance_labels["google_redis_instance.default.id"]
+    factory = test.replay_flight_data("redis-instance-labels")
+    policy = test.load_policy(
+        {
+            "name": "redis-instance-labels",
+            "resource": "gcp.redis",
+            "filters": [
+                {
+                    "type": "value",
+                    "key": "name",
+                    "value": instance_name,
+                }
+            ],
+            "actions": [
+                {
+                    "type": "set-labels",
+                    "labels": {"env": "not-the-default"},
+                }
+            ],
+        },
+        session_factory=factory,
+    )
+
+    resources = policy.run()
+    assert len(resources) == 1
+    assert resources[0]["labels"]["env"] == "default"
+
+    client = policy.resource_manager.get_client()
+    result = client.execute_query("get", {"name": instance_name})
+    assert result["labels"]["env"] == "not-the-default"
+
+
 @terraform('redis_cluster')
 def test_redis_cluster_query(test, redis_cluster):
     session_factory = test.replay_flight_data("redis-cluster-query")

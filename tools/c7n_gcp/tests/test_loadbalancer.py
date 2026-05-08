@@ -3,6 +3,7 @@
 from time import sleep
 from gcp_common import BaseTest, event_data
 from pytest_terraform import terraform
+from c7n_gcp.resources.loadbalancer import LoadBalancingAddress
 from c7n_gcp.resources.loadbalancer import LoadBalancingGlobalAddress
 from c7n_gcp.resources.loadbalancer import LoadBalancingGlobalForwardingRule
 from c7n_gcp.resources.loadbalancer import LoadBalancingForwardingRule
@@ -888,6 +889,41 @@ class LoadBalancingGlobalAddressTest(BaseTest):
                 'gcp:compute::cloud-custodian:global-address/custodian-global-address-0',
             ],
         )
+
+
+@terraform('loadbalancer_address_labels')
+def test_loadbalancer_address_labels(test, loadbalancer_address_labels):
+    address = loadbalancer_address_labels.resources['google_compute_address']['default']
+    project_id = address['project']
+    name = address['name']
+    label_fingerprint = address['label_fingerprint']
+    labels = address['labels']
+
+    # Confirm the starting label
+    assert labels['env'] == 'default'
+
+    # Update the label using the action
+    factory = test.replay_flight_data('loadbalancer-address-labels', project_id=project_id)
+    policy = test.load_policy(
+        {
+            'name': 'loadbalancer-address-labels',
+            'resource': 'gcp.loadbalancer-address',
+            'filters': [{'name': name}],
+            'actions': [
+                {'type': 'set-labels',
+                 'labels': {'env': 'not-the-default'}}
+            ],
+        },
+        session_factory=factory,
+    )
+    resources = policy.run()
+    assert len(resources) == 1
+
+    # Refresh and confirm that the label and fingerprint updated
+    client = policy.resource_manager.get_client()
+    resource = LoadBalancingAddress.resource_type.refresh(client, resources[0])
+    assert resource['labels']['env'] == 'not-the-default'
+    assert resource['labelFingerprint'] != label_fingerprint
 
 
 @terraform('loadbalancer_forwarding_rule_labels')

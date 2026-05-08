@@ -1,0 +1,101 @@
+{
+    "pytest-terraform": 1,
+    "outputs": {},
+    "resources": {
+        "google_firestore_database": {
+            "c7n": {
+                "app_engine_integration_mode": "DISABLED",
+                "cmek_config": [],
+                "concurrency_mode": "PESSIMISTIC",
+                "create_time": "2026-04-02T01:33:03.648502Z",
+                "database_edition": "STANDARD",
+                "delete_protection_state": "DELETE_PROTECTION_DISABLED",
+                "deletion_policy": "DELETE",
+                "earliest_version_time": "2026-04-02T01:33:03.648502Z",
+                "etag": "IMvXhvSCzpMDMPat/POCzpMD",
+                "firestore_data_access_mode": "",
+                "id": "projects/cloud-custodian/databases/c7nfld-ray",
+                "key_prefix": "",
+                "location_id": "us-central1",
+                "mongodb_compatible_data_access_mode": "",
+                "name": "c7nfld-ray",
+                "point_in_time_recovery_enablement": "POINT_IN_TIME_RECOVERY_DISABLED",
+                "project": "stacklet-personal-2",
+                "realtime_updates_mode": "REALTIME_UPDATES_MODE_ENABLED",
+                "tags": null,
+                "timeouts": null,
+                "type": "FIRESTORE_NATIVE",
+                "uid": "9be9e222-47ec-476f-9c70-16f9aa9bcedb",
+                "update_time": "2026-04-02T01:33:03.648502Z",
+                "version_retention_period": "3600s"
+            },
+            "c7n_east": {
+                "app_engine_integration_mode": "DISABLED",
+                "cmek_config": [],
+                "concurrency_mode": "PESSIMISTIC",
+                "create_time": "2026-04-02T01:33:03.037160Z",
+                "database_edition": "STANDARD",
+                "delete_protection_state": "DELETE_PROTECTION_DISABLED",
+                "deletion_policy": "DELETE",
+                "earliest_version_time": "2026-04-02T01:33:03.037160Z",
+                "etag": "IOr75/OCzpMDMOiF1/OCzpMD",
+                "firestore_data_access_mode": "",
+                "id": "projects/cloud-custodian/databases/c7nfld-ray-east",
+                "key_prefix": "",
+                "location_id": "us-east1",
+                "mongodb_compatible_data_access_mode": "",
+                "name": "c7nfld-ray-east",
+                "point_in_time_recovery_enablement": "POINT_IN_TIME_RECOVERY_DISABLED",
+                "project": "stacklet-personal-2",
+                "realtime_updates_mode": "REALTIME_UPDATES_MODE_ENABLED",
+                "tags": null,
+                "timeouts": null,
+                "type": "FIRESTORE_NATIVE",
+                "uid": "40a9b75a-d7fe-416f-9aad-44c125df591e",
+                "update_time": "2026-04-02T01:33:03.037160Z",
+                "version_retention_period": "3600s"
+            }
+        },
+        "google_firestore_field": {
+            "c7n_east_ttl": {
+                "collection": "orders",
+                "database": "c7nfld-ray-east",
+                "field": "expireAt",
+                "id": "projects/cloud-custodian/databases/c7nfld-ray-east/collectionGroups/orders/fields/expireAt",
+                "index_config": [],
+                "name": "projects/cloud-custodian/databases/c7nfld-ray-east/collectionGroups/orders/fields/expireAt",
+                "project": "stacklet-personal-2",
+                "timeouts": null,
+                "ttl_config": [
+                    {
+                        "state": "ACTIVE"
+                    }
+                ]
+            },
+            "c7n_ttl": {
+                "collection": "orders",
+                "database": "c7nfld-ray",
+                "field": "expireAt",
+                "id": "projects/cloud-custodian/databases/c7nfld-ray/collectionGroups/orders/fields/expireAt",
+                "index_config": [],
+                "name": "projects/cloud-custodian/databases/c7nfld-ray/collectionGroups/orders/fields/expireAt",
+                "project": "stacklet-personal-2",
+                "timeouts": null,
+                "ttl_config": [
+                    {
+                        "state": "ACTIVE"
+                    }
+                ]
+            }
+        },
+        "random_pet": {
+            "db": {
+                "id": "c7nfld-ray",
+                "keepers": null,
+                "length": 1,
+                "prefix": "c7nfld",
+                "separator": "-"
+            }
+        }
+    }
+}
