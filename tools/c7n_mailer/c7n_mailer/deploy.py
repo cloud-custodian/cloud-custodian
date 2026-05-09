@@ -7,7 +7,6 @@ import os
 
 from c7n.mu import CloudWatchEventSource, LambdaFunction, LambdaManager, PythonPackageArchive
 
-
 log = logging.getLogger("custodian-mailer")
 
 entry_source = """\
