@@ -2736,6 +2736,43 @@ class CrossAccountChecker(TestCase):
         violations = checker.check(policy)
         self.assertEqual(len(violations), 1)
 
+    def test_principal_org_paths_allowed(self):
+        """Test that aws:PrincipalOrgPaths is treated as org-scoping condition."""
+        policy = {
+            "Version": "2012-10-17",
+            "Statement": [{
+                "Effect": "Allow",
+                "Principal": "*",
+                "Action": "s3:GetObject",
+                "Resource": "*",
+                "Condition": {
+                    "ForAnyValuesStringLike": {
+                        "aws:PrincipalOrgPaths": [
+                            "o-allowed/r-ab12/ou-ab12-aaaabbbb/*"
+                        ]
+                    },
+                    "ArnLike": {
+                        "aws:PrincipalArn": "arn:aws:iam::*:role/MyRole"
+                    }
+                }
+            }]
+        }
+
+        # Allowed org ID extracted from path → no violation
+        checker = PolicyChecker({"allowed_orgid": {"o-allowed"}})
+        violations = checker.check(policy)
+        self.assertEqual(len(violations), 0)
+
+        # No allowed org ID → violation
+        checker = PolicyChecker({"allowed_orgid": set()})
+        violations = checker.check(policy)
+        self.assertEqual(len(violations), 1)
+
+        # Wrong org ID → violation
+        checker = PolicyChecker({"allowed_orgid": {"o-other"}})
+        violations = checker.check(policy)
+        self.assertEqual(len(violations), 1)
+
     def test_org_id_with_specific_non_whitelisted_account(self):
         """Test that org ID doesn't save specific non-whitelisted account."""
         policy = {
@@ -2876,6 +2913,34 @@ class CrossAccountChecker(TestCase):
 
         # All wildcards should be allowed with org ID
         checker = PolicyChecker({"allowed_orgid": {"o-allowed"}})
+        violations = checker.check(policy)
+        self.assertEqual(len(violations), 0)
+
+    def test_org_id_with_mixed_principal_arns_and_whitelisted_account(self):
+        """Test org ID with mixed wildcard and already-whitelisted PrincipalArn values."""
+        policy = {
+            "Version": "2012-10-17",
+            "Statement": [{
+                "Effect": "Allow",
+                "Principal": "*",
+                "Action": "s3:GetObject",
+                "Resource": "*",
+                "Condition": {
+                    "StringEquals": {"aws:PrincipalOrgID": "o-allowed"},
+                    "ArnLike": {
+                        "aws:PrincipalArn": [
+                            "arn:aws:iam::123456789012:role/AllowedRole",
+                            "arn:aws:iam::*:role/*"
+                        ]
+                    }
+                }
+            }]
+        }
+
+        checker = PolicyChecker({
+            "allowed_orgid": {"o-allowed"},
+            "allowed_accounts": {"123456789012"}
+        })
         violations = checker.check(policy)
         self.assertEqual(len(violations), 0)
 
