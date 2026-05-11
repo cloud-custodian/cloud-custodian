@@ -314,5 +314,6 @@ texinfo_documents = [
 # This adds in our expand/collapse JS/CSS
 def setup(app):
     app.add_js_file('js/expand.js')
+    app.add_js_file('js/reo.js', loading_method='defer')
     app.add_css_file('css/expand.css')
     app.add_autodocumenter(DocsonlyMethodDocumenter)

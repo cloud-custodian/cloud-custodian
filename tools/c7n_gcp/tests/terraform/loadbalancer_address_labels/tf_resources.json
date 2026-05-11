@@ -1,0 +1,53 @@
+{
+    "pytest-terraform": 1,
+    "outputs": {},
+    "resources": {
+        "google_compute_address": {
+            "default": {
+                "address": "34.10.205.126",
+                "address_type": "EXTERNAL",
+                "creation_timestamp": "2026-05-04T07:44:45.936-07:00",
+                "description": "",
+                "effective_labels": {
+                    "env": "default",
+                    "goog-terraform-provisioned": "true"
+                },
+                "id": "projects/cloud-custodian/regions/us-central1/addresses/c7n-address-default-59ea",
+                "ip_collection": "",
+                "ip_version": "",
+                "ipv6_endpoint_type": "",
+                "label_fingerprint": "oWv7t93mrS4=",
+                "labels": {
+                    "env": "default"
+                },
+                "name": "c7n-address-default-59ea",
+                "network": "",
+                "network_tier": "PREMIUM",
+                "prefix_length": 0,
+                "project": "stacklet-test-policies",
+                "purpose": "",
+                "region": "us-central1",
+                "self_link": "https://www.googleapis.com/compute/v1/projects/cloud-custodian/regions/us-central1/addresses/c7n-address-default-59ea",
+                "subnetwork": "",
+                "terraform_labels": {
+                    "env": "default",
+                    "goog-terraform-provisioned": "true"
+                },
+                "timeouts": null,
+                "users": []
+            }
+        },
+        "random_id": {
+            "suffix": {
+                "b64_std": "Weo=",
+                "b64_url": "Weo",
+                "byte_length": 2,
+                "dec": "23018",
+                "hex": "59ea",
+                "id": "Weo",
+                "keepers": null,
+                "prefix": null
+            }
+        }
+    }
+}

@@ -1,0 +1,9 @@
+{
+    "headers": {},
+    "body": {
+        "name": "my-interconnect",
+        "selfLink": "https://compute.googleapis.com/compute/v1/projects/cloud-custodian/global/interconnects/my-interconnect",
+        "labelFingerprint": "new",
+        "labels": {"env": "not-the-default"}
+    }
+}

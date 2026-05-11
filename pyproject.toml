@@ -16,7 +16,7 @@ dependencies = [
     "urllib3>2",
 ]
 name = "c7n"
-version = "0.9.50"
+version = "0.9.51"
 description = "Cloud Custodian - Policy Rules Engine"
 readme = "README.md"
 classifiers = [
@@ -55,7 +55,7 @@ dev = [
     "vcrpy>=4.0.2",
 ]
 lint = [
-    "black<25.0, >=23.1",
+    "black>=23.1,<27.0",
     "ruff~=0.11",
 ]
 addons = [

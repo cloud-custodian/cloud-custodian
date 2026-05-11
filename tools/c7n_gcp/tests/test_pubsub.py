@@ -32,6 +32,30 @@ def test_pubsub_topic_query(test, pubsub_topic):
     )
 
 
+@terraform('pubsub_topic_labels')
+def test_pubsub_topic_labels(test, pubsub_topic_labels):
+    topic_name = pubsub_topic_labels['google_pubsub_topic.default.id']
+
+    session_factory = test.replay_flight_data('pubsub-topic-labels')
+    policy = test.load_policy(
+        {
+            'name': 'gcp-pubsub-topic-labels',
+            'resource': 'gcp.pubsub-topic',
+            'filters': [{'name': topic_name}],
+            'actions': [{'type': 'set-labels', 'labels': {'env': 'not-the-default'}}],
+        },
+        session_factory=session_factory,
+    )
+
+    resources = policy.run()
+    assert len(resources) == 1
+    assert resources[0]['labels']['env'] == 'default'
+
+    client = policy.resource_manager.get_client()
+    result = client.execute_query('get', {'topic': topic_name})
+    assert result['labels']['env'] == 'not-the-default'
+
+
 @terraform('pubsub_subscription')
 def test_pubsub_subscription_query(test, pubsub_subscription):
     subscription_name = pubsub_subscription['google_pubsub_subscription.c7n.id']
@@ -50,6 +74,30 @@ def test_pubsub_subscription_query(test, pubsub_subscription):
         policy.resource_manager.get_urns(resources),
         ["gcp:pubsub::cloud-custodian:subscription/c7n-subscription"],
     )
+
+
+@terraform('pubsub_subscription_labels')
+def test_pubsub_subscription_labels(test, pubsub_subscription_labels):
+    subscription_name = pubsub_subscription_labels['google_pubsub_subscription.default.id']
+
+    session_factory = test.replay_flight_data('pubsub-subscription-labels')
+    policy = test.load_policy(
+        {
+            'name': 'gcp-pubsub-subscription-labels',
+            'resource': 'gcp.pubsub-subscription',
+            'filters': [{'name': subscription_name}],
+            'actions': [{'type': 'set-labels', 'labels': {'env': 'not-the-default'}}],
+        },
+        session_factory=session_factory,
+    )
+
+    resources = policy.run()
+    assert len(resources) == 1
+    assert resources[0]['labels']['env'] == 'default'
+
+    client = policy.resource_manager.get_client()
+    result = client.execute_query('get', {'subscription': subscription_name})
+    assert result['labels']['env'] == 'not-the-default'
 
 
 class PubSubSubscriptionTest(BaseTest):

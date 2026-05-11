@@ -1,5 +1,7 @@
 # Copyright The Cloud Custodian Authors.
 # SPDX-License-Identifier: Apache-2.0
+import re
+
 from c7n.utils import type_schema, local_session
 from c7n_gcp.actions import MethodAction
 from c7n_gcp.provider import resources
@@ -17,6 +19,8 @@ class LoadBalancingAddress(QueryResourceManager):
         enum_spec = ('aggregatedList', 'items.*.addresses[]', None)
         scope = 'project'
         name = id = 'name'
+        labels = True
+        labels_op = 'setLabels'
         default_report_fields = [
             name, "description", "address", "status", "region", "addressType"
         ]
@@ -24,12 +28,39 @@ class LoadBalancingAddress(QueryResourceManager):
         urn_component = "address"
 
         @staticmethod
-        def get(client, resource_info):
+        def parse_params(resc_name):
+            """Takes resourceName (from a log) or selfLink (from a resource) and parses from it the
+            parameters needed to make a request (project, region, and address)"""
+            exp = r".*projects/(.*)/regions/(.*)/addresses/(.*)"
+            return re.match(exp, resc_name).groups()
+
+        @classmethod
+        def get(cls, client, resource_info):
+            project, region, address = cls.parse_params(resource_info['resourceName'])
+
             return client.execute_command('get', {
-                'project': resource_info['project_id'],
-                'region': resource_info['location'],
-                'address': resource_info[
-                    'resourceName'].rsplit('/', 1)[-1]})
+                'project': project,
+                'region': region,
+                'address': address})
+
+        @classmethod
+        def get_label_params(cls, resource, all_labels):
+            project, region, address = cls.parse_params(resource['selfLink'])
+            return {
+                'project': project,
+                'region': region,
+                'resource': address,
+                'body': {
+                    'labels': all_labels,
+                    'labelFingerprint': resource['labelFingerprint']
+                }
+            }
+
+        @classmethod
+        def refresh(cls, client, resource):
+            """This method is used to refresh labelFingerprint when a label action fails because the
+            fingerprint was stale."""
+            return cls.get(client, {'resourceName': resource['selfLink']})
 
 
 @LoadBalancingAddress.action_registry.register('delete')
@@ -473,7 +504,7 @@ class LoadBalancingTargetPool(QueryResourceManager):
 
 @resources.register('loadbalancer-forwarding-rule')
 class LoadBalancingForwardingRule(QueryResourceManager):
-    """GCP resource: https://cloud.google.com/compute/docs/reference/rest/v1/addresses
+    """GCP resource: https://cloud.google.com/compute/docs/reference/rest/v1/forwardingRules
     """
     class resource_type(TypeInfo):
         service = 'compute'
@@ -482,6 +513,8 @@ class LoadBalancingForwardingRule(QueryResourceManager):
         enum_spec = ('aggregatedList', 'items.*.forwardingRules[]', None)
         scope = 'project'
         name = id = 'name'
+        labels = True
+        labels_op = 'setLabels'
         default_report_fields = [
             "name", "description", "region", "IPAddress", "IPProtocol", "target",
             "loadBalancingScheme", "serviceName", "network"
@@ -490,11 +523,38 @@ class LoadBalancingForwardingRule(QueryResourceManager):
         urn_component = "forwarding-rule"
 
         @staticmethod
-        def get(client, resource_info):
+        def parse_params(resc_name):
+            """Takes resourceName (from a log) or selfLink (from a resource) and parses from it the
+            parameters needed to make a request (project, region, and rule)"""
+            exp = r".*projects/(.*)/regions/(.*)/forwardingRules/(.*)"
+            return re.match(exp, resc_name).groups()
+
+        @classmethod
+        def get(cls, client, resource_info):
+            project, region, rule = cls.parse_params(resource_info['resourceName'])
             return client.execute_command('get', {
-                'project': resource_info['project_id'],
-                'region': resource_info['region'],
-                'forwardingRule': resource_info['resourceName'].rsplit('/', 1)[-1]})
+                'project': project,
+                'region': region,
+                'forwardingRule': rule})
+
+        @classmethod
+        def get_label_params(cls, resource, all_labels):
+            project, region, rule = cls.parse_params(resource['selfLink'])
+            return {
+                'project': project,
+                'region': region,
+                'resource': rule,
+                'body': {
+                    'labels': all_labels,
+                    'labelFingerprint': resource['labelFingerprint']
+                }
+            }
+
+        @classmethod
+        def refresh(cls, client, resource):
+            """This method is used to refresh labelFingerprint when a label action fails because the
+            fingerprint was stale."""
+            return cls.get(client, {'resourceName': resource['selfLink']})
 
 
 @resources.register('loadbalancer-global-forwarding-rule')
@@ -508,6 +568,8 @@ class LoadBalancingGlobalForwardingRule(QueryResourceManager):
         enum_spec = ('list', 'items[]', None)
         scope = 'project'
         name = id = 'name'
+        labels = True
+        labels_op = 'setLabels'
         default_report_fields = [
             "name", "description", "creationTimestamp", "network",
             "networkTier", "loadBalancingScheme", "subnetwork", "allowGlobalAccess"
@@ -516,10 +578,34 @@ class LoadBalancingGlobalForwardingRule(QueryResourceManager):
         urn_component = "global-forwarding-rule"
 
         @staticmethod
-        def get(client, resource_info):
-            return client.execute_command('get', {
-                'project': resource_info['project_id'],
-                'forwardingRule': resource_info['resourceName'].rsplit('/', 1)[-1]})
+        def parse_params(resc_name):
+            """Takes resourceName (from a log) or selfLink (from a resource) and parses from it the
+            parameters needed to make a request (project and rule)"""
+            exp = r".*projects/(.*)/global/forwardingRules/(.*)"
+            return re.match(exp, resc_name).groups()
+
+        @classmethod
+        def get(cls, client, resource_info):
+            project, rule = cls.parse_params(resource_info['resourceName'])
+            return client.execute_command('get', {'project': project, 'forwardingRule': rule})
+
+        @classmethod
+        def get_label_params(cls, resource, all_labels):
+            project, rule = cls.parse_params(resource['selfLink'])
+            return {
+                'project': project,
+                'resource': rule,
+                'body': {
+                    'labels': all_labels,
+                    'labelFingerprint': resource['labelFingerprint']
+                }
+            }
+
+        @classmethod
+        def refresh(cls, client, resource):
+            """This method is used to refresh labelFingerprint when a label action fails because the
+            fingerprint was stale."""
+            return cls.get(client, {'resourceName': resource['selfLink']})
 
 
 @resources.register('loadbalancer-global-address')
@@ -533,6 +619,8 @@ class LoadBalancingGlobalAddress(QueryResourceManager):
         enum_spec = ('list', 'items[]', None)
         scope = 'project'
         name = id = 'name'
+        labels = True
+        labels_op = 'setLabels'
         default_report_fields = [
             "name", "description", "status", "creationTimestamp", "address", "region"
         ]
@@ -540,7 +628,31 @@ class LoadBalancingGlobalAddress(QueryResourceManager):
         urn_component = "global-address"
 
         @staticmethod
-        def get(client, resource_info):
-            return client.execute_command('get', {
-                'project': resource_info['project_id'],
-                'address': resource_info['resourceName'].rsplit('/', 1)[-1]})
+        def parse_params(resc_name):
+            """Takes resourceName (from a log) or selfLink (from a resource) and parses from it the
+            parameters needed to make a request (project and address)"""
+            exp = r".*projects/(.*)/global/addresses/(.*)"
+            return re.match(exp, resc_name).groups()
+
+        @classmethod
+        def get(cls, client, resource_info):
+            project_id, address = cls.parse_params(resource_info['resourceName'])
+            return client.execute_command('get', {'project': project_id, 'address': address})
+
+        @classmethod
+        def get_label_params(cls, resource, all_labels):
+            project_id, address = cls.parse_params(resource['selfLink'])
+            return {
+                'project': project_id,
+                'resource': address,
+                'body': {
+                    'labels': all_labels,
+                    'labelFingerprint': resource['labelFingerprint']
+                }
+            }
+
+        @classmethod
+        def refresh(cls, client, resource):
+            """This method is used to refresh labelFingerprint when a label action fails because the
+            fingerprint was stale."""
+            return cls.get(client, {'resourceName': resource['selfLink']})

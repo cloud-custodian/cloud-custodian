@@ -1,0 +1,19 @@
+{
+  "headers": {
+    "content-type": "application/json; charset=UTF-8",
+    "vary": "Origin, X-Origin, Referer",
+    "date": "Wed, 11 Mar 2026 07:51:40 GMT",
+    "server": "ESF",
+    "x-xss-protection": "0",
+    "x-frame-options": "SAMEORIGIN",
+    "x-content-type-options": "nosniff",
+    "alt-svc": "h3=\":443\"; ma=2592000,h3-29=\":443\"; ma=2592000",
+    "transfer-encoding": "chunked",
+    "status": "200",
+    "content-length": "86",
+    "-content-encoding": "gzip"
+  },
+  "body": {
+    "name": "operations/akmf.p12-859150599087-9d60e693-dad6-4d77-9321-74a1231e07d4"
+  }
+}

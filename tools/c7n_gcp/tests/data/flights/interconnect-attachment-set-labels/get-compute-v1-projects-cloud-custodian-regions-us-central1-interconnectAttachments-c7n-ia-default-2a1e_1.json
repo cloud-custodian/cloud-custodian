@@ -1,0 +1,38 @@
+{
+  "headers": {
+    "content-type": "application/json; charset=UTF-8",
+    "vary": "Origin, X-Origin, Referer",
+    "date": "Tue, 21 Apr 2026 19:16:35 GMT",
+    "server": "ESF",
+    "x-xss-protection": "0",
+    "x-frame-options": "SAMEORIGIN",
+    "x-content-type-options": "nosniff",
+    "alt-svc": "h3=\":443\"; ma=2592000,h3-29=\":443\"; ma=2592000",
+    "transfer-encoding": "chunked",
+    "status": "200",
+    "content-length": "941",
+    "-content-encoding": "gzip",
+    "content-location": "https://compute.googleapis.com/compute/v1/projects/cloud-custodian/regions/us-central1/interconnectAttachments/c7n-ia-default-2a1e?alt=json"
+  },
+  "body": {
+    "kind": "compute#interconnectAttachment",
+    "selfLink": "https://www.googleapis.com/compute/v1/projects/cloud-custodian/regions/us-central1/interconnectAttachments/c7n-ia-default-2a1e",
+    "id": "5351256313014416362",
+    "creationTimestamp": "2026-04-21T12:16:21.850-07:00",
+    "name": "c7n-ia-default-2a1e",
+    "router": "https://www.googleapis.com/compute/v1/projects/cloud-custodian/regions/us-central1/routers/c7n-ia-router-default-2a1e",
+    "region": "https://www.googleapis.com/compute/v1/projects/cloud-custodian/regions/us-central1",
+    "type": "PARTNER",
+    "pairingKey": "bc6a7ed0-8c17-4c76-aac1-54b752250750/us-central1/1",
+    "adminEnabled": true,
+    "edgeAvailabilityDomain": "AVAILABILITY_DOMAIN_1",
+    "labels": {
+      "goog-terraform-provisioned": "true",
+      "env": "not-the-default"
+    },
+    "labelFingerprint": "XzoNciJNMTE=",
+    "state": "PENDING_PARTNER",
+    "encryption": "NONE",
+    "stackType": "IPV4_ONLY"
+  }
+}
