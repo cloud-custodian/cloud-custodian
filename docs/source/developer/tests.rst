@@ -33,7 +33,8 @@ To override those default testing environment variables, either define overrides
 .. note::
 
    **Running tests manually against a live cloud account** (e.g. ``pytest tests/test_myresource.py``):
-   you must update ``test.env`` with your real credentials and comment out any variables that do not
+   *The following example uses AWS — adjust the variable names for your provider.*
+   You must update ``test.env`` with your real credentials and comment out any variables that do not
    apply to your session.  For example, if you are authenticating with a long-term IAM key pair you
    should set ``AWS_ACCESS_KEY_ID`` and ``AWS_SECRET_ACCESS_KEY`` to your actual values and comment
    out ``AWS_SESSION_TOKEN`` — leaving a placeholder value for ``AWS_SESSION_TOKEN`` will cause
