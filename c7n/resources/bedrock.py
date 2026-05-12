@@ -585,7 +585,8 @@ class DeleteBedrockKnowledgeBase(BaseAction):
 class BedrockApplicationInferenceProfile(QueryResourceManager):
     class resource_type(TypeInfo):
         service = 'bedrock'
-        enum_spec = ('list_inference_profiles', 'inferenceProfileSummaries[]', {'typeEquals': 'APPLICATION'})
+        enum_spec = ('list_inference_profiles', 'inferenceProfileSummaries[]',
+            {'typeEquals': 'APPLICATION'})
         name = "inferenceProfileName"
         id = arn = "inferenceProfileArn"
         arn_type = "application-inference-profile"

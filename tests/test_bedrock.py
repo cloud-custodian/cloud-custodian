@@ -662,12 +662,15 @@ def test_bedrock_guardrail_update(test, bedrock_guardrail_update):
 
 
 def test_bedrock_inference_profile_metrics(test):
-    session_factory = test.replay_flight_data('test_bedrock_inference_profile_metrics_filter', region='us-east-2')
+    session_factory = test.replay_flight_data(
+        'test_bedrock_inference_profile_metrics_filter',
+        region='us-east-2'
+    )
     p = test.load_policy(
         {
             'name': 'bedrock-inference-profile-metrics-filter',
             'resource': 'aws.bedrock-inference-profile',
-            'filters':[
+            'filters': [
                 {
                     'type': 'metrics',
                     'name': 'InputTokenCount',
