@@ -53,7 +53,7 @@ c7n-mailer-replay = "c7n_mailer.replay:main"
 
 [dependency-groups]
 dev = [
-    "black<25.0,>=23.1",
+    "black>=23.1,<27.0",
     "fakeredis<3.0,>=2.0",
     "mypy<1.0,>=0.931",
     "pytest",
