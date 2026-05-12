@@ -30,6 +30,23 @@ Beyond dummy values for cloud providers, Of particular note is C7N_VALIDATE.
 To override those default testing environment variables, either define overrides in a local
 ``.env`` file or run pytest with the ``-p no:env`` option.
 
+.. note::
+
+   **Running tests manually against a live cloud account** (e.g. ``pytest tests/test_myresource.py``):
+   you must update ``test.env`` with your real credentials and comment out any variables that do not
+   apply to your session.  For example, if you are authenticating with a long-term IAM key pair you
+   should set ``AWS_ACCESS_KEY_ID`` and ``AWS_SECRET_ACCESS_KEY`` to your actual values and comment
+   out ``AWS_SESSION_TOKEN`` — leaving a placeholder value for ``AWS_SESSION_TOKEN`` will cause
+   authentication to fail even when the variable is not needed:
+
+   .. code-block:: bash
+
+      export AWS_ACCESS_KEY_ID=AKIA...your-real-key...
+      export AWS_SECRET_ACCESS_KEY=your-real-secret...
+      # export AWS_SESSION_TOKEN=fake   ← comment this out if you are not using temporary credentials
+
+   Only uncomment and populate the variables relevant to the provider(s) you are testing.
+
 
 Operating System Compatibility
 ------------------------------
