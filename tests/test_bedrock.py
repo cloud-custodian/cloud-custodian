@@ -659,3 +659,28 @@ def test_bedrock_guardrail_update(test, bedrock_guardrail_update):
     word_policy = client.get_guardrail(guardrailIdentifier=guardrail_arn)['wordPolicy']
     test.assertEqual(word_policy['words'][0]['text'], 'HATE')
     test.assertEqual(word_policy['managedWordLists'][0]['type'], 'PROFANITY')
+
+
+def test_bedrock_inference_profile_metrics(test):
+    session_factory = test.replay_flight_data('test_bedrock_inference_profile_metrics_filter', region='us-east-2')
+    p = test.load_policy(
+        {
+            'name': 'bedrock-inference-profile-metrics-filter',
+            'resource': 'aws.bedrock-inference-profile',
+            'filters':[
+                {
+                    'type': 'metrics',
+                    'name': 'InputTokenCount',
+                    'statistics': 'Sum',
+                    'days': 1,
+                    'value': 10000,
+                    'op': 'greater-than',
+                }
+            ]
+        },
+        session_factory=session_factory,
+    )
+    resources = p.run()
+    test.assertEqual(len(resources), 1)
+    test.assertTrue('c7n.metrics' in resources[0])
+    test.assertTrue('AWS/Bedrock.InputTokenCount.Sum.1' in resources[0]['c7n.metrics'])
