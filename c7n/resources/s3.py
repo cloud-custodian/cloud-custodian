@@ -3948,7 +3948,7 @@ class SetBucketEncryption(KMSKeyResolverMixin, BucketActionBase):
 
         if algo == 'aws:kms':
             if self.data.get('use-existing-key'):
-                kms_key_id = self.get_existing_key(s3, bucket)
+                kms_key_id = self.get_existing_key(bucket)
                 if not kms_key_id:
                     if 'key' in self.data:
                         key = self.get_key(bucket)
@@ -3978,7 +3978,7 @@ class SetBucketEncryption(KMSKeyResolverMixin, BucketActionBase):
             ServerSideEncryptionConfiguration=config
         )
 
-    def get_existing_key(self, s3, bucket):
+    def get_existing_key(self, bucket):
         """Retrieve the KMS key currently configured on the bucket."""
         be = bucket.get('c7n:bucket-encryption', {})
         rules = be.get('ServerSideEncryptionConfiguration', {}).get('Rules', [])
