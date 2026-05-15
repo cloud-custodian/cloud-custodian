@@ -3950,14 +3950,22 @@ class SetBucketEncryption(KMSKeyResolverMixin, BucketActionBase):
             if self.data.get('use-existing-key'):
                 kms_key_id = self.get_existing_key(s3, bucket)
                 if not kms_key_id:
-                    # Fall back to specified key if no existing key found
-                    key = self.get_key(bucket) if 'key' in self.data else None
-                    if not key:
+                    if 'key' in self.data:
+                        key = self.get_key(bucket)
+                        if not key:
+                            raise Exception(
+                                'Fallback KMS key %s could not be resolved' %
+                                self.data['key'])
                         self.log.warning(
-                            "Bucket:%s has no existing KMS key configured, skipping",
+                            "Bucket:%s has no existing KMS key, "
+                            "using fallback key %s",
+                            bucket['Name'], self.data['key'])
+                        kms_key_id = key['Arn']
+                    else:
+                        raise Exception(
+                            "Bucket:%s has no existing KMS key and no "
+                            "fallback key specified, add a 'key' parameter" %
                             bucket['Name'])
-                        return
-                    kms_key_id = key['Arn']
             else:
                 key = self.get_key(bucket)
                 if not key:

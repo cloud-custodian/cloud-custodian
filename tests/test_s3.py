@@ -4104,17 +4104,18 @@ class S3Test(BaseTest):
             "arn:aws:kms:us-east-1:644160558196:key/abcd1234-ef56-7890-abcd-ef1234567890",
         )
 
-    def test_enable_bucket_encryption_use_existing_key_skip(self):
+    def test_enable_bucket_encryption_use_existing_key_no_fallback(self):
         self.patch(s3.S3, "executor_factory", MainThreadExecutor)
         self.patch(s3, "S3_AUGMENT_TABLE", [])
         session_factory = self.replay_flight_data(
-            "test_s3_enable_bucket_encryption_use_existing_key_skip"
+            "test_s3_enable_bucket_encryption_use_existing_key_no_fallback"
         )
         bname = "custodian-test-use-existing-key-skip"
 
+        log_output = self.capture_logging('custodian.actions', level=logging.ERROR)
         p = self.load_policy(
             {
-                "name": "s3-use-existing-key-skip",
+                "name": "s3-use-existing-key-no-fallback",
                 "resource": "s3",
                 "filters": [{"Name": bname}],
                 "actions": [
@@ -4130,8 +4131,11 @@ class S3Test(BaseTest):
         )
 
         resources = p.run()
-        # Resource is found but action skips it (no existing KMS key, no fallback)
         self.assertEqual(len(resources), 1)
+        self.assertIn(
+            "has no existing KMS key",
+            log_output.getvalue()
+        )
 
     @mock.patch('c7n.actions.invoke.assumed_session')
     def test_s3_invoke_lambda_assume_role_action(self, mock_assumed_session):
