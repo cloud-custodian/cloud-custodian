@@ -4027,6 +4027,112 @@ class S3Test(BaseTest):
         with self.assertRaises(Exception):
             client.get_bucket_encryption(Bucket=bname)
 
+    def test_enable_bucket_encryption_use_existing_key(self):
+        self.patch(s3.S3, "executor_factory", MainThreadExecutor)
+        self.patch(s3, "S3_AUGMENT_TABLE", [])
+        session_factory = self.replay_flight_data(
+            "test_s3_enable_bucket_encryption_use_existing_key"
+        )
+        bname = "custodian-test-use-existing-key"
+
+        p = self.load_policy(
+            {
+                "name": "s3-use-existing-key",
+                "resource": "s3",
+                "filters": [
+                    {"Name": bname},
+                    {"type": "bucket-encryption", "state": True, "crypto": "aws:kms"},
+                    {"type": "bucket-encryption", "bucket_key_enabled": False},
+                ],
+                "actions": [
+                    {
+                        "type": "set-bucket-encryption",
+                        "crypto": "aws:kms",
+                        "use-existing-key": True,
+                        "bucket-key": True,
+                    }
+                ],
+            },
+            session_factory=session_factory,
+        )
+
+        resources = p.run()
+        self.assertEqual(len(resources), 1)
+        client = session_factory().client("s3")
+        response = client.get_bucket_encryption(Bucket=bname)
+        rules = response["ServerSideEncryptionConfiguration"]["Rules"][0]
+        self.assertTrue(rules["BucketKeyEnabled"])
+        self.assertEqual(
+            rules["ApplyServerSideEncryptionByDefault"]["KMSMasterKeyID"],
+            "arn:aws:kms:us-east-1:644160558196:key/abcd1234-ef56-7890-abcd-ef1234567890",
+        )
+
+    def test_enable_bucket_encryption_use_existing_key_fallback(self):
+        self.patch(s3.S3, "executor_factory", MainThreadExecutor)
+        self.patch(s3, "S3_AUGMENT_TABLE", [])
+        session_factory = self.replay_flight_data(
+            "test_s3_enable_bucket_encryption_use_existing_key_fallback"
+        )
+        bname = "custodian-test-use-existing-key-fallback"
+
+        p = self.load_policy(
+            {
+                "name": "s3-use-existing-key-fallback",
+                "resource": "s3",
+                "filters": [{"Name": bname}],
+                "actions": [
+                    {
+                        "type": "set-bucket-encryption",
+                        "crypto": "aws:kms",
+                        "use-existing-key": True,
+                        "key": "alias/my-fallback-key",
+                        "bucket-key": True,
+                    }
+                ],
+            },
+            session_factory=session_factory,
+        )
+
+        resources = p.run()
+        self.assertEqual(len(resources), 1)
+        client = session_factory().client("s3")
+        response = client.get_bucket_encryption(Bucket=bname)
+        rules = response["ServerSideEncryptionConfiguration"]["Rules"][0]
+        self.assertTrue(rules["BucketKeyEnabled"])
+        self.assertEqual(
+            rules["ApplyServerSideEncryptionByDefault"]["KMSMasterKeyID"],
+            "arn:aws:kms:us-east-1:644160558196:key/abcd1234-ef56-7890-abcd-ef1234567890",
+        )
+
+    def test_enable_bucket_encryption_use_existing_key_skip(self):
+        self.patch(s3.S3, "executor_factory", MainThreadExecutor)
+        self.patch(s3, "S3_AUGMENT_TABLE", [])
+        session_factory = self.replay_flight_data(
+            "test_s3_enable_bucket_encryption_use_existing_key_skip"
+        )
+        bname = "custodian-test-use-existing-key-skip"
+
+        p = self.load_policy(
+            {
+                "name": "s3-use-existing-key-skip",
+                "resource": "s3",
+                "filters": [{"Name": bname}],
+                "actions": [
+                    {
+                        "type": "set-bucket-encryption",
+                        "crypto": "aws:kms",
+                        "use-existing-key": True,
+                        "bucket-key": True,
+                    }
+                ],
+            },
+            session_factory=session_factory,
+        )
+
+        resources = p.run()
+        # Resource is found but action skips it (no existing KMS key, no fallback)
+        self.assertEqual(len(resources), 1)
+
     @mock.patch('c7n.actions.invoke.assumed_session')
     def test_s3_invoke_lambda_assume_role_action(self, mock_assumed_session):
 
