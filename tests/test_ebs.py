@@ -753,13 +753,19 @@ class CopyInstanceTagsTest(BaseTest):
             "Tags"
         ]
         tags = {t["Key"]: t["Value"] for t in results}
-        self.assertEqual(tags, {})
+        self.assertEqual(tags, {"Testing": "Original Value"})
 
         policy = self.load_policy(
             {
                 "name": "test-copy-instance-tags",
                 "resource": "ebs",
-                "actions": [{"type": "copy-instance-tags", "tags": ["Name"]}],
+                "actions": [
+                    {
+                        "type": "copy-instance-tags",
+                        "tags": ["Name", "Testing"],
+                        "overwrite": False
+                    }
+                ],
             },
             config={"region": "us-west-2"},
             session_factory=factory,
@@ -774,6 +780,34 @@ class CopyInstanceTagsTest(BaseTest):
 
         tags = {t["Key"]: t["Value"] for t in results}
         self.assertEqual(tags["Name"], "CompileLambda")
+        self.assertEqual(tags["Testing"], "Original Value")
+
+        policy = self.load_policy(
+            {
+                "name": "test-copy-instance-tags",
+                "resource": "ebs",
+                "actions": [
+                    {
+                        "type": "copy-instance-tags",
+                        "tags": ["Name", "Testing"],
+                        "overwrite": False
+                    }
+                ],
+            },
+            config={"region": "us-west-2"},
+            session_factory=factory,
+        )
+
+        policy.run()
+        results = factory().client("ec2").describe_tags(
+            Filters=[{"Name": "resource-id", "Values": [volume_id]}]
+        )[
+            "Tags"
+        ]
+
+        tags = {t["Key"]: t["Value"] for t in results}
+        self.assertEqual(tags["Name"], "CompileLambda")
+        self.assertEqual(tags["Testing"], "Original Value")
 
     def test_copy_instance_tags_unattached(self):
         factory = self.replay_flight_data("test_ebs_copy_instance_tags")
