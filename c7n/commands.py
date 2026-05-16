@@ -571,7 +571,7 @@ def version_cmd(options):
     print("Docker: %s" % str(bool(in_container)))
     print("Installed: \n")
 
-    packages = ['c7n']
+    packages = ['c7n', 'aws_xray_sdk']
     found = load_available(resources=False)
     if 'gcp' in found:
         packages.append('c7n_gcp')
