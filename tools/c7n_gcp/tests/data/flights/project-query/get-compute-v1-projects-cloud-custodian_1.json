@@ -14,13 +14,13 @@
     "status": "200",
     "content-length": "8814",
     "-content-encoding": "gzip",
-    "content-location": "https://compute.googleapis.com/compute/v1/projects/gcp-lab-custodian?alt=json"
+    "content-location": "https://compute.googleapis.com/compute/v1/projects/cloud-custodian?alt=json"
   },
   "body": {
     "kind": "compute#project",
     "id": "879501200065641786",
     "creationTimestamp": "2020-12-18T02:26:29.288-08:00",
-    "name": "gcp-lab-custodian",
+    "name": "cloud-custodian",
     "commonInstanceMetadata": {
       "kind": "compute#metadata",
       "fingerprint": "YDbAMA2kmr0=",
@@ -265,7 +265,7 @@
         "usage": 0
       }
     ],
-    "selfLink": "https://www.googleapis.com/compute/v1/projects/gcp-lab-custodian",
+    "selfLink": "https://www.googleapis.com/compute/v1/projects/cloud-custodian",
     "defaultServiceAccount": "443732426401-compute@developer.gserviceaccount.com",
     "xpnProjectStatus": "UNSPECIFIED_XPN_PROJECT_STATUS",
     "defaultNetworkTier": "PREMIUM",

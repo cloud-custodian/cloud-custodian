@@ -5,10 +5,12 @@ from functools import partial
 
 from c7n.provider import Provider, clouds
 from c7n.registry import PluginRegistry
+from c7n.resolver import URIResolver
 from c7n.utils import local_session
 from .session import Session
 
 from c7n_azure.resources.resource_map import ResourceMap
+from c7n_azure.resolver import resolve_azure_blob
 from msrestazure.azure_cloud import (AZURE_CHINA_CLOUD, AZURE_GERMAN_CLOUD, AZURE_PUBLIC_CLOUD,
                                      AZURE_US_GOV_CLOUD)
 import logging
@@ -80,3 +82,6 @@ class Azure(Provider):
 
 
 resources = Azure.resources
+
+# Register the azure:// URI scheme handler with the core resolver
+URIResolver.register_provider('azure', resolve_azure_blob)
