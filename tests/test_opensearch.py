@@ -119,6 +119,134 @@ class OpensearchServerless(BaseTest):
             'arn:aws:kms:us-east-1:644160558196:key/082cd05f-96d1-49f6-a5ac-32093d2cfe38')
 
 
+class OpensearchServerlessNetworkPolicyTest(BaseTest):
+
+    def test_opensearch_serverless_network_policy_delete(self):
+        session_factory = self.replay_flight_data(
+            'test_opensearch_serverless_network_policy_delete')
+        p = self.load_policy(
+            {
+                'name': 'test-aoss-network-policy-delete',
+                'resource': 'opensearch-serverless-network-policy',
+                'filters': [{'name': 'test-network-policy'}],
+                'actions': [{'type': 'delete'}]
+            },
+            session_factory=session_factory
+        )
+        resources = p.run()
+        self.assertEqual(len(resources), 1)
+        self.assertEqual(resources[0]['name'], 'test-network-policy')
+        self.assertEqual(resources[0]['type'], 'network')
+        self.assertIn('policy', resources[0])
+
+    def test_opensearch_serverless_network_policy_get_resources(self):
+        session_factory = self.replay_flight_data(
+            'test_opensearch_serverless_network_policy_get_resources')
+        p = self.load_policy(
+            {
+                'name': 'test-aoss-network-policy-get',
+                'resource': 'opensearch-serverless-network-policy',
+            },
+            session_factory=session_factory
+        )
+        resources = p.resource_manager.get_resources(['test-network-policy'])
+        self.assertEqual(len(resources), 1)
+        self.assertEqual(resources[0]['name'], 'test-network-policy')
+        self.assertEqual(resources[0]['type'], 'network')
+        self.assertIn('policy', resources[0])
+
+    def test_opensearch_serverless_network_policy_not_found(self):
+        session_factory = self.replay_flight_data(
+            'test_opensearch_serverless_network_policy_not_found')
+        p = self.load_policy(
+            {
+                'name': 'test-aoss-network-policy-not-found',
+                'resource': 'opensearch-serverless-network-policy',
+            },
+            session_factory=session_factory
+        )
+        resources = p.run()
+        self.assertEqual(len(resources), 1)
+        self.assertEqual(resources[0]['name'], 'existing-policy')
+
+    def test_opensearch_serverless_network_policy_get_resources_not_found(self):
+        session_factory = self.replay_flight_data(
+            'test_opensearch_serverless_network_policy_get_resources_not_found')
+        p = self.load_policy(
+            {
+                'name': 'test-aoss-network-policy-get-nf',
+                'resource': 'opensearch-serverless-network-policy',
+            },
+            session_factory=session_factory
+        )
+        resources = p.resource_manager.get_resources(['nonexistent-policy'])
+        self.assertEqual(len(resources), 0)
+
+
+class OpensearchServerlessAccessPolicyTest(BaseTest):
+
+    def test_opensearch_serverless_access_policy_delete(self):
+        session_factory = self.replay_flight_data(
+            'test_opensearch_serverless_access_policy_delete')
+        p = self.load_policy(
+            {
+                'name': 'test-aoss-access-policy-delete',
+                'resource': 'opensearch-serverless-access-policy',
+                'filters': [{'name': 'test-access-policy'}],
+                'actions': [{'type': 'delete'}]
+            },
+            session_factory=session_factory
+        )
+        resources = p.run()
+        self.assertEqual(len(resources), 1)
+        self.assertEqual(resources[0]['name'], 'test-access-policy')
+        self.assertEqual(resources[0]['type'], 'data')
+        self.assertIn('policy', resources[0])
+
+    def test_opensearch_serverless_access_policy_get_resources(self):
+        session_factory = self.replay_flight_data(
+            'test_opensearch_serverless_access_policy_get_resources')
+        p = self.load_policy(
+            {
+                'name': 'test-aoss-access-policy-get',
+                'resource': 'opensearch-serverless-access-policy',
+            },
+            session_factory=session_factory
+        )
+        resources = p.resource_manager.get_resources(['test-access-policy'])
+        self.assertEqual(len(resources), 1)
+        self.assertEqual(resources[0]['name'], 'test-access-policy')
+        self.assertEqual(resources[0]['type'], 'data')
+        self.assertIn('policy', resources[0])
+
+    def test_opensearch_serverless_access_policy_not_found(self):
+        session_factory = self.replay_flight_data(
+            'test_opensearch_serverless_access_policy_not_found')
+        p = self.load_policy(
+            {
+                'name': 'test-aoss-access-policy-not-found',
+                'resource': 'opensearch-serverless-access-policy',
+            },
+            session_factory=session_factory
+        )
+        resources = p.run()
+        self.assertEqual(len(resources), 1)
+        self.assertEqual(resources[0]['name'], 'existing-policy')
+
+    def test_opensearch_serverless_access_policy_get_resources_not_found(self):
+        session_factory = self.replay_flight_data(
+            'test_opensearch_serverless_access_policy_get_resources_not_found')
+        p = self.load_policy(
+            {
+                'name': 'test-aoss-access-policy-get-nf',
+                'resource': 'opensearch-serverless-access-policy',
+            },
+            session_factory=session_factory
+        )
+        resources = p.resource_manager.get_resources(['nonexistent-policy'])
+        self.assertEqual(len(resources), 0)
+
+
 class OpensearchIngestion(BaseTest):
 
     def test_opensearch_ingestion_tag(self):
