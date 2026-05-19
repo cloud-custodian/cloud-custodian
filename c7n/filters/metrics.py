@@ -148,6 +148,7 @@ class MetricsFilter(Filter):
         'sns': 'AWS/SNS',
         'sqs': 'AWS/SQS',
         'workspaces': 'AWS/WorkSpaces',
+        'bedrock': 'AWS/Bedrock',
     }
 
     standard_stats = {'Average', 'Sum', 'Maximum', 'Minimum', 'SampleCount'}
