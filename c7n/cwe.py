@@ -72,7 +72,11 @@ class CloudWatchEvents:
 
         'RunInstances': {
             'ids': 'responseElements.instancesSet.items[].instanceId',
-            'source': 'ec2.amazonaws.com'}}
+            'source': 'ec2.amazonaws.com'},
+
+        'CreateNotebookInstance': {
+            'ids': 'requestParameters.notebookInstanceName',
+            'source': 'sagemaker.amazonaws.com'}}
 
     @classmethod
     def get(cls, event_name):
