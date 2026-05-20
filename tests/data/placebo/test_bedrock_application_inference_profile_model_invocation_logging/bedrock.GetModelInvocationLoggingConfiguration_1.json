@@ -1,0 +1,16 @@
+{
+    "status_code": 200,
+    "data": {
+        "ResponseMetadata": {},
+        "loggingConfig": {
+            "s3Config": {
+                "bucketName": "c7n-bedrock-model-invocation-logging-default",
+                "keyPrefix": "bedrock/model-invocation-logging/"
+            },
+            "textDataDeliveryEnabled": true,
+            "imageDataDeliveryEnabled": false,
+            "embeddingDataDeliveryEnabled": false,
+            "videoDataDeliveryEnabled": true
+        }
+    }
+}

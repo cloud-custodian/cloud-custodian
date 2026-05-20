@@ -14,13 +14,13 @@ from dateutil.tz import tzutc
 from c7n.actions import ActionRegistry, BaseAction
 from c7n.exceptions import PolicyValidationError
 from c7n.filters import Filter, FilterRegistry, ValueFilter
+from c7n.filters.bedrock import BedrockModelInvocationLoggingFilter
 from c7n.filters.kms import KmsRelatedFilter
 from c7n.filters.multiattr import MultiAttrFilter
 from c7n.filters.missing import Missing
 from c7n.manager import resources
 from c7n.utils import local_session, type_schema, generate_arn, get_support_region, jmespath_search
 from c7n.query import QueryResourceManager, TypeInfo, DescribeSource
-from c7n.filters import ListItemFilter
 
 from c7n.resources.iam import CredentialReport
 from c7n.resources.securityhub import OtherResourcePostFinding
@@ -2437,44 +2437,7 @@ class SesConsecutiveStats(Filter):
         return resources
 
 
-@filters.register('bedrock-model-invocation-logging')
-class BedrockModelInvocationLogging(ListItemFilter):
-    """Filter for account to look at bedrock model invocation logging configuration
-
-    The schema to supply to the attrs follows the schema here:
-     https://boto3.amazonaws.com/v1/documentation/api/latest/reference/services/bedrock/client/get_model_invocation_logging_configuration.html
-
-    :example:
-
-    .. code-block:: yaml
-
-            policies:
-              - name: bedrock-model-invocation-logging-configuration
-                resource: account
-                filters:
-                  - type: bedrock-model-invocation-logging
-                    attrs:
-                      - imageDataDeliveryEnabled: True
-
-    """
-    schema = type_schema(
-        'bedrock-model-invocation-logging',
-        attrs={'$ref': '#/definitions/filters_common/list_item_attrs'},
-        count={'type': 'number'},
-        count_op={'$ref': '#/definitions/filters_common/comparison_operators'}
-    )
-    permissions = ('bedrock:GetModelInvocationLoggingConfiguration',)
-    annotation_key = 'c7n:BedrockModelInvocationLogging'
-
-    def get_item_values(self, resource):
-        item_values = []
-        client = local_session(self.manager.session_factory).client('bedrock')
-        invocation_logging_config = client \
-                .get_model_invocation_logging_configuration().get('loggingConfig')
-        if invocation_logging_config is not None:
-            item_values.append(invocation_logging_config)
-            resource[self.annotation_key] = invocation_logging_config
-        return item_values
+filters.register('bedrock-model-invocation-logging', BedrockModelInvocationLoggingFilter)
 
 
 @actions.register('set-bedrock-model-invocation-logging')
