@@ -1,6 +1,7 @@
 # Copyright The Cloud Custodian Authors.
 # SPDX-License-Identifier: Apache-2.0
 from c7n.utils import type_schema, jmespath_search
+from c7n.exceptions import PolicyValidationError
 from c7n_gcp.query import QueryResourceManager, TypeInfo, ChildTypeInfo, ChildResourceManager
 from c7n_gcp.provider import resources
 from c7n_gcp.actions import MethodAction
@@ -60,6 +61,12 @@ class DataSet(QueryResourceManager):
                 client.execute_query(
                     'get', verb_arguments=ref))
         return results
+
+    def get_resource_query(self):
+        if 'query' in self.data:
+            for child in self.data.get('query'):
+                if 'filter' in child:
+                    return {'filter': child['filter']}
 
 
 @resources.register('bq-job')
@@ -181,4 +188,77 @@ class DeleteDataSet(MethodAction):
         return {
             'projectId': r['datasetReference']['projectId'],
             'datasetId': r['datasetReference']['datasetId']
+        }
+
+
+@DataSet.action_registry.register('update')
+class UpdateDataSet(MethodAction):
+    """Update BigQuery dataset attributes.
+
+    This action supports partial updates via the BigQuery datasets.patch API.
+
+    :example:
+
+    .. code-block:: yaml
+
+        policies:
+          - name: bq-dataset-update-access
+            resource: gcp.bq-dataset
+            filters:
+              - type: value
+                key: id
+                op: contains
+                value: c7n_bq_dataset
+            actions:
+              - type: update
+                access:
+                  - role: READER
+                    userByEmail: analyst@example.com
+    """
+
+    schema = type_schema(
+        'update',
+        **{
+            'access': {'type': 'array', 'items': {'type': 'object'}},
+            'description': {'type': 'string'},
+            'friendlyName': {'type': 'string'},
+            'defaultTableExpirationMs': {'type': 'string'},
+            'defaultPartitionExpirationMs': {'type': 'string'},
+            'maxTimeTravelHours': {'type': 'string'},
+            'storageBillingModel': {'type': 'string'},
+        }
+    )
+    method_spec = {'op': 'patch'}
+    method_perm = 'update'
+    permissions = ('bigquery.datasets.get', 'bigquery.datasets.update')
+    update_fields = (
+        'access',
+        'description',
+        'friendlyName',
+        'defaultTableExpirationMs',
+        'defaultPartitionExpirationMs',
+        'maxTimeTravelHours',
+        'storageBillingModel',
+    )
+
+    def validate(self):
+        super().validate()
+        if not any(field in self.data for field in self.update_fields):
+            raise PolicyValidationError(
+                "policy:{} action:{} requires at least one mutable dataset field".format(
+                    self.manager.ctx.policy.name, self.type
+                )
+            )
+        return self
+
+    def get_resource_params(self, model, r):
+        body = {}
+        for field in UpdateDataSet.update_fields:
+            if field in self.data:
+                body[field] = self.data[field]
+
+        return {
+            'projectId': r['datasetReference']['projectId'],
+            'datasetId': r['datasetReference']['datasetId'],
+            'body': body
         }
