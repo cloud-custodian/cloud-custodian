@@ -17,7 +17,8 @@ from c7n_azure.utils import ResourceIdParser
 # for database it is a C7N known issue (#4543)
 arm_tags_unsupported = ['microsoft.network/dnszones/',
                         'microsoft.sql/servers/databases',
-                        'microsoft.storage/storageaccounts/blobservices/containers']
+                        'microsoft.storage/storageaccounts/blobservices/containers',
+                        'microsoft.cognitiveservices/accounts/deployments']
 
 
 class ArmTypeInfo(TypeInfo, metaclass=TypeMeta):
