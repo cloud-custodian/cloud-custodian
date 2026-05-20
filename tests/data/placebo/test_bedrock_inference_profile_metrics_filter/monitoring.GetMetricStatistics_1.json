@@ -1,0 +1,23 @@
+{
+    "status_code": 200,
+    "data": {
+        "Label": "InputTokenCount",
+        "Datapoints": [
+            {
+                "Timestamp": {
+                    "__class__": "datetime",
+                    "year": 2026,
+                    "month": 5,
+                    "day": 11,
+                    "hour": 13,
+                    "minute": 7,
+                    "second": 0,
+                    "microsecond": 0
+                },
+                "Sum": 58747.0,
+                "Unit": "Count"
+            }
+        ],
+        "ResponseMetadata": {}
+    }
+}

@@ -512,7 +512,7 @@ class SSLPolicyFilter(Filter):
     blacklist: filter all policies containing forbidden protocols
 
     Cannot specify both whitelist & blacklist in the same policy. These must
-    be done seperately (seperate policy statements).
+    be done separately (separate policy statements).
 
     Likewise, if you want to reduce the consideration set such that we only
     compare certain keys (e.g. you only want to compare the `Protocol-` keys),

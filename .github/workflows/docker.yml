@@ -8,6 +8,9 @@ on:
     tags:
       # todo: update for 1.0
       - 0.*
+
+permissions: {}
+
 jobs:
   Publish:
     permissions:

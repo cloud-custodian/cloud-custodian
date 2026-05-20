@@ -475,7 +475,7 @@ class ServiceClient:
             dict: Service Response.
         """
         # Implementation of search does not follow the standard API pattern.
-        # Fields need to be in the body rather than sent seperately.
+        # Fields need to be in the body rather than sent separately.
         next_page_token = None
         number_of_pages_processed = 0
         while True:

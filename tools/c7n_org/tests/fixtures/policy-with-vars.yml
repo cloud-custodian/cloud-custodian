@@ -1,0 +1,27 @@
+policies:
+  - name: tag-enforcement
+    resource: ec2
+    description: Enforce {environment} tagging
+    filters:
+      - tag:Environment: absent
+    actions:
+      - type: tag
+        key: Environment
+        value: "{environment}"
+      
+  - name: cost-tracking
+    resource: ec2
+    description: Tag with cost center
+    filters:
+      - tag:CostCenter: absent
+    actions:
+      - type: tag
+        key: CostCenter
+        value: "{cost_center}"
+
+  - name: no-variables-policy
+    resource: s3
+    description: Policy without variables
+    filters:
+      - type: bucket-encryption
+        state: false
