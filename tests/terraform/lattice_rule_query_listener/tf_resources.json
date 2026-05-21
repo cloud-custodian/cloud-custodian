@@ -1,0 +1,194 @@
+{
+    "pytest-terraform": 1,
+    "outputs": {},
+    "resources": {
+        "aws_vpclattice_listener": {
+            "test_listener": {
+                "arn": "arn:aws:vpc-lattice:us-east-1:644160558196:service/svc-030ab283855fcf4c2/listener/listener-0c714b70206e5aef8",
+                "created_at": "2026-03-13 15:44:58.785 +0000 UTC",
+                "default_action": [
+                    {
+                        "fixed_response": [
+                            {
+                                "status_code": 404
+                            }
+                        ],
+                        "forward": []
+                    }
+                ],
+                "id": "svc-030ab283855fcf4c2/listener-0c714b70206e5aef8",
+                "last_updated_at": "2026-03-13 15:44:58.785 +0000 UTC",
+                "listener_id": "listener-0c714b70206e5aef8",
+                "name": "test-listener",
+                "port": 80,
+                "protocol": "HTTP",
+                "region": "us-east-1",
+                "service_arn": "arn:aws:vpc-lattice:us-east-1:644160558196:service/svc-030ab283855fcf4c2",
+                "service_identifier": "svc-030ab283855fcf4c2",
+                "tags": null,
+                "tags_all": {},
+                "timeouts": null
+            },
+            "test_listener2": {
+                "arn": "arn:aws:vpc-lattice:us-east-1:644160558196:service/svc-0d1ea894ca7ba9bf8/listener/listener-00d375a6df37459f3",
+                "created_at": "2026-03-13 15:44:59.049 +0000 UTC",
+                "default_action": [
+                    {
+                        "fixed_response": [
+                            {
+                                "status_code": 404
+                            }
+                        ],
+                        "forward": []
+                    }
+                ],
+                "id": "svc-0d1ea894ca7ba9bf8/listener-00d375a6df37459f3",
+                "last_updated_at": "2026-03-13 15:44:59.049 +0000 UTC",
+                "listener_id": "listener-00d375a6df37459f3",
+                "name": "test-listener2",
+                "port": 80,
+                "protocol": "HTTP",
+                "region": "us-east-1",
+                "service_arn": "arn:aws:vpc-lattice:us-east-1:644160558196:service/svc-0d1ea894ca7ba9bf8",
+                "service_identifier": "svc-0d1ea894ca7ba9bf8",
+                "tags": null,
+                "tags_all": {},
+                "timeouts": null
+            }
+        },
+        "aws_vpclattice_listener_rule": {
+            "test_rule": {
+                "action": [
+                    {
+                        "fixed_response": [
+                            {
+                                "status_code": 404
+                            }
+                        ],
+                        "forward": []
+                    }
+                ],
+                "arn": "arn:aws:vpc-lattice:us-east-1:644160558196:service/svc-030ab283855fcf4c2/listener/listener-0c714b70206e5aef8/rule/rule-073ef7848bfdf7b87",
+                "id": "svc-030ab283855fcf4c2/listener-0c714b70206e5aef8/rule-073ef7848bfdf7b87",
+                "listener_identifier": "listener-0c714b70206e5aef8",
+                "match": [
+                    {
+                        "http_match": [
+                            {
+                                "header_matches": [],
+                                "method": "",
+                                "path_match": [
+                                    {
+                                        "case_sensitive": false,
+                                        "match": [
+                                            {
+                                                "exact": "",
+                                                "prefix": "/"
+                                            }
+                                        ]
+                                    }
+                                ]
+                            }
+                        ]
+                    }
+                ],
+                "name": "test-rule",
+                "priority": 10,
+                "region": "us-east-1",
+                "rule_id": "rule-073ef7848bfdf7b87",
+                "service_identifier": "svc-030ab283855fcf4c2",
+                "tags": {
+                    "ExistingKey": "ExistingValue"
+                },
+                "tags_all": {
+                    "ExistingKey": "ExistingValue"
+                },
+                "timeouts": null
+            },
+            "test_rule2": {
+                "action": [
+                    {
+                        "fixed_response": [
+                            {
+                                "status_code": 404
+                            }
+                        ],
+                        "forward": []
+                    }
+                ],
+                "arn": "arn:aws:vpc-lattice:us-east-1:644160558196:service/svc-0d1ea894ca7ba9bf8/listener/listener-00d375a6df37459f3/rule/rule-0b053660a8f9217dc",
+                "id": "svc-0d1ea894ca7ba9bf8/listener-00d375a6df37459f3/rule-0b053660a8f9217dc",
+                "listener_identifier": "listener-00d375a6df37459f3",
+                "match": [
+                    {
+                        "http_match": [
+                            {
+                                "header_matches": [],
+                                "method": "",
+                                "path_match": [
+                                    {
+                                        "case_sensitive": false,
+                                        "match": [
+                                            {
+                                                "exact": "",
+                                                "prefix": "/"
+                                            }
+                                        ]
+                                    }
+                                ]
+                            }
+                        ]
+                    }
+                ],
+                "name": "test-rule2",
+                "priority": 10,
+                "region": "us-east-1",
+                "rule_id": "rule-0b053660a8f9217dc",
+                "service_identifier": "svc-0d1ea894ca7ba9bf8",
+                "tags": null,
+                "tags_all": {},
+                "timeouts": null
+            }
+        },
+        "aws_vpclattice_service": {
+            "test_service": {
+                "arn": "arn:aws:vpc-lattice:us-east-1:644160558196:service/svc-030ab283855fcf4c2",
+                "auth_type": "NONE",
+                "certificate_arn": "",
+                "custom_domain_name": "",
+                "dns_entry": [
+                    {
+                        "domain_name": "test-service-030ab283855fcf4c2.7d67968.vpc-lattice-svcs.us-east-1.on.aws",
+                        "hosted_zone_id": "Z0681547Z82L3THDFSCZ"
+                    }
+                ],
+                "id": "svc-030ab283855fcf4c2",
+                "name": "test-service",
+                "region": "us-east-1",
+                "status": "ACTIVE",
+                "tags": null,
+                "tags_all": {},
+                "timeouts": null
+            },
+            "test_service2": {
+                "arn": "arn:aws:vpc-lattice:us-east-1:644160558196:service/svc-0d1ea894ca7ba9bf8",
+                "auth_type": "NONE",
+                "certificate_arn": "",
+                "custom_domain_name": "",
+                "dns_entry": [
+                    {
+                        "domain_name": "test-service2-0d1ea894ca7ba9bf8.7d67968.vpc-lattice-svcs.us-east-1.on.aws",
+                        "hosted_zone_id": "Z0681547Z82L3THDFSCZ"
+                    }
+                ],
+                "id": "svc-0d1ea894ca7ba9bf8",
+                "name": "test-service2",
+                "region": "us-east-1",
+                "status": "ACTIVE",
+                "tags": null,
+                "tags_all": {},
+                "timeouts": null
+            }
+        }
+    }
+}
