@@ -1,10 +1,14 @@
 # Copyright The Cloud Custodian Authors.
 # SPDX-License-Identifier: Apache-2.0
+from unittest import mock
+
 from c7n.exceptions import ClientError, PolicyValidationError
 from c7n.resources.ami import ErrorHandler
 from c7n.query import DescribeSource
 from c7n.utils import jmespath_search
 from .common import BaseTest
+
+import pytest
 
 
 class TestAMI(BaseTest):
@@ -472,3 +476,89 @@ class TestAMI(BaseTest):
             ImageId=resources[0]['ImageId'],
             Attribute='launchPermission')['LaunchPermissions']
         assert perms == []
+
+    def test_ami_set_disabled_disable(self):
+        factory = self.replay_flight_data('test_ami_set_disabled_disable')
+        image_ids = ['ami-06902a5fc08ba032e', 'ami-00415e659887728c0']
+
+        p = self.load_policy(
+            {
+                'name': 'ami-set-disabled-disable',
+                'resource': 'aws.ami',
+                'query': [{'ImageIds': image_ids}],
+                'actions': [{'type': 'set-disabled', 'state': True}],
+            },
+            session_factory=factory,
+        )
+        p.validate()
+        resources = p.run()
+        self.assertEqual(len(resources), 2)
+
+    def test_ami_set_disabled_enable(self):
+        factory = self.replay_flight_data('test_ami_set_disabled_enable')
+        image_ids = ['ami-06902a5fc08ba032e', 'ami-00415e659887728c0']
+
+        p = self.load_policy(
+            {
+                'name': 'ami-set-disabled-enable',
+                'resource': 'aws.ami',
+                'query': [{'IncludeDisabled': True}, {'ImageIds': image_ids}],
+                'actions': [{'type': 'set-disabled', 'state': False}],
+            },
+            session_factory=factory,
+        )
+        p.validate()
+        resources = p.run()
+        self.assertEqual(len(resources), 2)
+
+    def test_ami_set_disabled_ignores_not_found(self):
+        p = self.load_policy(
+            {
+                'name': 'ami-set-disabled-notfound',
+                'resource': 'aws.ami',
+                'actions': [{'type': 'set-disabled', 'state': True}],
+            }
+        )
+        action = p.resource_manager.actions[0]
+
+        error_response = {'Error': {'Code': 'InvalidAMIID.NotFound', 'Message': 'not found'}}
+        client = mock.MagicMock()
+        client.disable_image.side_effect = ClientError(error_response, 'DisableImage')
+
+        session = mock.MagicMock()
+        session.client.return_value = client
+
+        # Prefer TestUtils.patch helper (used elsewhere in the suite) over a one-off mock.patch
+        import c7n.resources.ami as ami
+
+        self.patch(ami, 'local_session', lambda _: session)
+        action.process([{'ImageId': 'ami-11111111', 'OwnerId': self.account_id}])
+        client.disable_image.assert_called_once()
+
+
+@pytest.mark.parametrize('botocore_version', ['1.31.62', '1.30.99', '0.99.0'])
+def test_ami_set_disabled_lower_botocore_version_validation(test, botocore_version):
+    with mock.patch('botocore.__version__', botocore_version):
+        with test.assertRaises(PolicyValidationError) as cm:
+            policy = test.load_policy(
+                {
+                    'name': 'ami-set-disabled',
+                    'resource': 'aws.ami',
+                    'actions': [{'type': 'set-disabled', 'state': True}],
+                }
+            )
+            policy.validate()
+        test.assertIn('requires botocore version 1.31.63 or above', str(cm.exception))
+
+
+@pytest.mark.parametrize('botocore_version', ['1.31.63', '1.31.64', '1.32.0', '2.0.0'])
+def test_ami_set_disabled_above_botocore_version_validation(test, botocore_version):
+    with mock.patch('botocore.__version__', botocore_version):
+        policy = test.load_policy(
+            {
+                'name': 'ami-set-disabled',
+                'resource': 'aws.ami',
+                'actions': [{'type': 'set-disabled', 'state': True}],
+            }
+        )
+        policy.validate()
