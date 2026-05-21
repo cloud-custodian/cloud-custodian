@@ -1,0 +1,44 @@
+{
+    "status_code": 200,
+    "data": {
+        "Stacks": [
+            {
+                "StackId": "arn:aws:cloudformation:us-east-1:123456789012:stack/c7n-marked/aaaaaaaa-bbbb-cccc-dddd-eeeeeeeeeeee",
+                "StackName": "c7n-marked",
+                "Description": "Custodian marked stack",
+                "CreationTime": {
+                    "__class__": "datetime",
+                    "year": 2023,
+                    "month": 12,
+                    "day": 15,
+                    "hour": 8,
+                    "minute": 0,
+                    "second": 0,
+                    "microsecond": 0
+                },
+                "StackStatus": "CREATE_COMPLETE",
+                "DisableRollback": false,
+                "NotificationARNs": [],
+                "Capabilities": ["CAPABILITY_IAM"],
+                "Parameters": [],
+                "Tags": [
+                    {
+                        "Key": "custodian_cleanup",
+                        "Value": "Resource does not meet policy: delete@2024/01/01"
+                    }
+                ]
+            }
+        ],
+        "ResponseMetadata": {
+            "RequestId": "dddddddd-eeee-ffff-0000-111111111111",
+            "HTTPStatusCode": 200,
+            "HTTPHeaders": {
+                "content-length": "123",
+                "content-type": "text/xml",
+                "date": "Thu, 01 Feb 2024 12:05:00 GMT",
+                "x-amzn-requestid": "dddddddd-eeee-ffff-0000-111111111111"
+            },
+            "RetryAttempts": 0
+        }
+    }
+}
