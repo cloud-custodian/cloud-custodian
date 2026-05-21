@@ -93,6 +93,11 @@ deploy_resource() {
 
         rm -f cost-management.body
 
+    elif [[ "$fileName" == "budget.json" ]]; then
+
+        az deployment sub create --location $resourceLocation --name cctest-budget \
+            --template-file $file --output None
+
     else
         az deployment group create --resource-group $rgName --template-file $file --mode Complete --output None
     fi
