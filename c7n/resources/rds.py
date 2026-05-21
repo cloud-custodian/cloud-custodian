@@ -2240,6 +2240,69 @@ class DeleteRDSProxy(BaseAction):
                 'InvalidDBProxyStateFault'))
 
 
+@RDSProxy.action_registry.register('modify-db-proxy')
+class ModifyDBProxy(BaseAction):
+    """Modify an RDS Proxy.
+
+    :example:
+
+    .. code-block:: yaml
+
+        policies:
+          - name: rds-proxy-enforce-tls
+            resource: aws.rds-proxy
+            filters:
+              - type: value
+                key: RequireTLS
+                value: false
+            actions:
+              - type: modify-db-proxy
+                update:
+                  - property: RequireTLS
+                    value: true
+    """
+
+    schema = type_schema(
+        'modify-db-proxy',
+        update={
+            'type': 'array',
+            'items': {
+                'type': 'object',
+                'properties': {
+                    'property': {'type': 'string', 'enum': [
+                        'Auth',
+                        'DebugLogging',
+                        'DefaultAuthScheme',
+                        'IdleClientTimeout',
+                        'NewDBProxyName',
+                        'RequireTLS',
+                        'RoleArn',
+                        'SecurityGroups',
+                    ]},
+                    'value': {}
+                },
+            },
+        },
+        required=('update',))
+
+    permissions = ('rds:ModifyDBProxy',)
+
+    def process(self, resources):
+        client = local_session(self.manager.session_factory).client('rds')
+        params = {u['property']: u['value'] for u in self.data['update']}
+        for r in resources:
+            resource_params = {
+                k: v for k, v in params.items() if r.get(k) != v
+            }
+            if not resource_params:
+                continue
+            resource_params['DBProxyName'] = r['DBProxyName']
+            self.manager.retry(
+                client.modify_db_proxy, **resource_params,
+                ignore_err_codes=('DBProxyNotFoundFault',
+                                  'InvalidDBProxyStateFault'))
+
+
 @RDSProxy.filter_registry.register('subnet')
 class RDSProxySubnetFilter(net_filters.SubnetFilter):
 
