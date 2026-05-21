@@ -1,0 +1,16 @@
+{
+    "status_code": 200,
+    "data": {
+        "securityPolicySummaries": [
+            {
+                "type": "network",
+                "name": "test-network-policy",
+                "policyVersion": "MTY4MzY0NTI4NjI4N18x",
+                "description": "Test network policy",
+                "createdDate": 1683645286287,
+                "lastModifiedDate": 1683645286287
+            }
+        ],
+        "ResponseMetadata": {}
+    }
+}

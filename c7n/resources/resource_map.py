@@ -242,6 +242,8 @@ ResourceMap = {
   "aws.opensearch-ingestion": "c7n.resources.opensearch.OpensearchIngestion",
   "aws.opensearch-reserved": "c7n.resources.opensearch.OpensearchReservedInstance",
   "aws.opensearch-serverless": "c7n.resources.opensearch.OpensearchServerless",
+  "aws.opensearch-serverless-access-policy": "c7n.resources.opensearch.AossAccessPolicy",
+  "aws.opensearch-serverless-network-policy": "c7n.resources.opensearch.AossNetworkPolicy",
   "aws.ops-item": "c7n.resources.ssm.OpsItem",
   "aws.opswork-cm": "c7n.resources.opsworks.OpsworksCM",
   "aws.opswork-stack": "c7n.resources.opsworks.OpsworkStack",

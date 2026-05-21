@@ -1,0 +1,32 @@
+{
+    "status_code": 200,
+    "data": {
+        "accessPolicyDetail": {
+            "type": "data",
+            "name": "test-access-policy",
+            "policyVersion": "MTY4MzY0NTI4NjI4N18x",
+            "description": "Test access policy",
+            "policy": [
+                {
+                    "Rules": [
+                        {
+                            "ResourceType": "collection",
+                            "Resource": [
+                                "collection/test-collection"
+                            ],
+                            "Permission": [
+                                "aoss:*"
+                            ]
+                        }
+                    ],
+                    "Principal": [
+                        "arn:aws:iam::123456789012:user/testuser"
+                    ]
+                }
+            ],
+            "createdDate": 1683645286287,
+            "lastModifiedDate": 1683645286287
+        },
+        "ResponseMetadata": {}
+    }
+}
