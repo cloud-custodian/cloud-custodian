@@ -4,8 +4,9 @@
 import os
 import json
 import time
+import logging
+from unittest.mock import Mock, patch
 from google.api_core.client_options import ClientOptions
-
 from c7n.testing import C7N_FUNCTIONAL
 from c7n_gcp.client import get_default_project
 from c7n.config import Config
@@ -274,6 +275,146 @@ def test_vertexai_endpoint_delete(test):
 
     # Verify that the endpoint no longer exists
     assert len(remaining_resources) == 0
+
+
+def test_vertexai_endpoint_monitor(test):
+    """Test creating Model Deployment Monitoring Jobs for Vertex AI Endpoints.
+
+    This test verifies that the monitor action can successfully create
+    monitoring jobs for endpoints with deployed models across multiple regions.
+    It also tests that running the action again does not fail.
+    """
+    if C7N_FUNCTIONAL:
+        session_factory = test.record_flight_data('vertexai-endpoint-monitor')
+        # In functional mode, use the actual GCS bucket
+        session = session_factory()
+        project_id = session.get_default_project()
+        schema_uri = f'gs://{project_id}-vertex-test-models/schema/instance_schema.yaml'
+    else:
+        session_factory = test.replay_flight_data('vertexai-endpoint-monitor')
+        # In replay mode, use a placeholder schema URI (won't actually be accessed)
+        schema_uri = 'gs://cloud-custodian-vertex-test-models/schema/instance_schema.yaml'
+
+    policy = test.load_policy(
+        {'name': 'monitor-endpoints',
+         'resource': 'gcp.vertex-ai-endpoint',
+         'query': [
+             {'location': 'us-central1'},
+             {'location': 'us-east1'}
+         ],
+         'filters': [
+             {'type': 'value',
+              'key': 'deployedModels',
+              'value': 'present'}
+         ],
+         'actions': [
+             {'type': 'monitor',
+              'analysis_instance_schema_uri': schema_uri}
+         ]},
+        session_factory=session_factory)
+
+    resources = policy.run()
+
+    # Verify that resources were found in both regions
+    assert len(resources) >= 2
+
+    # Verify all resources have deployed models
+    assert all(r.get('deployedModels') for r in resources)
+
+    locations = {r['name'].split('/')[3] for r in resources}
+    assert 'us-central1' in locations
+    assert 'us-east1' in locations
+
+    session = session_factory()
+    project_id = session.get_default_project()
+
+    # Check both regions
+    regions = ['us-central1', 'us-east1']
+    total_c7n_jobs = 0
+
+    for region in regions:
+        # Query for the monitoring job we just created
+        client_options = ClientOptions(
+            api_endpoint=f'https://{region}-aiplatform.googleapis.com'
+        )
+        monitoring_client = session.client(
+            'aiplatform', 'v1',
+            'projects.locations.modelDeploymentMonitoringJobs',
+            client_options=client_options
+        )
+
+        # List monitoring jobs
+        response = monitoring_client.execute_command(
+            'list',
+            {'parent': f'projects/{project_id}/locations/{region}'}
+        )
+
+        monitoring_jobs = response.get('modelDeploymentMonitoringJobs', [])
+
+        # Count monitoring jobs with c7n naming pattern
+        c7n_jobs = [
+            job for job in monitoring_jobs
+            if job.get('displayName', '').startswith('c7n-monitor-')
+        ]
+        total_c7n_jobs += len(c7n_jobs)
+
+        # Verify at least one monitoring job exists in this region
+        assert len(c7n_jobs) >= 1, f'No monitoring jobs found in {region}'
+
+    # Verify we have monitoring jobs in both regions
+    assert total_c7n_jobs >= 2
+
+    # Test idempotency: Run the monitor action again
+    # wait 30 seconds to allow the monitoring job to enter running state
+    if C7N_FUNCTIONAL:
+        time.sleep(30)
+    log_output = test.capture_logging('custodian.actions', level=logging.WARNING)
+    resources_retry = policy.run()
+    assert len(resources_retry) >= 2
+
+    # Verify we emit the expected warning when monitoring jobs already exist.
+    logs = log_output.getvalue()
+    assert 'Monitoring job already exists for endpoint' in logs
+
+
+def test_vertexai_endpoint_monitor_no_schema(test):
+    """Test creating Model Deployment Monitoring Jobs without schema URI.
+
+    This test verifies that the monitor action works when no schema URI is provided.
+    The monitoring job will be created but will remain in PENDING state until
+    ~1000 prediction requests are received.
+    """
+    # Reuse the existing cassette since the API calls are the same
+    session_factory = test.replay_flight_data('vertexai-endpoint-monitor')
+
+    policy = test.load_policy(
+        {'name': 'monitor-endpoints-no-schema',
+         'resource': 'gcp.vertex-ai-endpoint',
+         'query': [
+             {'location': 'us-central1'}
+         ],
+         'filters': [
+             {'type': 'value',
+              'key': 'deployedModels',
+              'value': 'present'}
+         ],
+         'actions': [
+             {'type': 'monitor'}
+         ]},
+        session_factory=session_factory
+    )
+
+    log_output = test.capture_logging('custodian.actions', level=logging.WARNING)
+    resources = policy.run()
+
+    # Should still find endpoints and process the action without schema.
+    assert len(resources) >= 1
+    assert all(r.get('deployedModels') for r in resources)
+
+    # Verify we emit the expected warning about missing schema.
+    logs = log_output.getvalue()
+    assert 'No analysis_instance_schema_uri provided.' in logs
+    assert 'will remain in PENDING state' in logs
 
 
 # Batch Prediction Job Tests
@@ -914,6 +1055,103 @@ def test_vertexai_endpoint_location_default_all_regions(test):
     # Just verify that if we have resources, they have the location annotation
     if resources:
         assert all('c7n:location' in r for r in resources)
+
+
+def test_vertexai_endpoint_monitor_invalid_schema_uri(test):
+    """Test monitor action with invalid GCS schema URI validation"""
+    policy = test.load_policy({
+        'name': 'test-invalid-schema-uri-format',
+        'resource': 'gcp.vertex-ai-endpoint',
+        'filters': [{'displayName': 'test-endpoint'}],
+        'actions': [{
+            'type': 'monitor',
+            'analysis_instance_schema_uri': 'gs://test-bucket/schema.yaml'
+        }]
+    })
+
+    action = policy.resource_manager.actions[0]
+
+    # Test 1: Invalid GCS URI format (not starting with gs://)
+    try:
+        action.validate_schema('https://invalid-url/schema.yaml')
+        assert False, 'Should have raised ValueError for non-GCS URI'
+    except ValueError as e:
+        assert 'must be a GCS path' in str(e)
+
+    # Test 2: Invalid file extension (not .yaml or .yml)
+    try:
+        action.validate_schema('gs://bucket/schema.json')
+        assert False, 'Should have raised ValueError for non-YAML file'
+    except ValueError as e:
+        assert 'must be YAML format' in str(e)
+
+
+def test_vertexai_endpoint_monitor_schema_yaml_validation(test):
+    """Test monitor action schema YAML parsing and validation
+
+    This test validates the schema validation logic by mocking GCS blob downloads
+    to test various invalid schema formats without requiring actual GCS files.
+    """
+    session_factory = test.replay_flight_data('vertexai-endpoint-monitor')
+    bucket_name = 'test-bucket'
+
+    policy = test.load_policy({
+        'name': 'test-schema-yaml-validation',
+        'resource': 'gcp.vertex-ai-endpoint',
+        'filters': [{'displayName': 'test-endpoint'}],
+        'actions': [{
+            'type': 'monitor',
+            'analysis_instance_schema_uri': f'gs://{bucket_name}/schema/instance_schema.yaml'
+        }]
+    }, session_factory=session_factory)
+
+    action = policy.resource_manager.actions[0]
+
+    # Mock the GCS storage client to return test data
+    with patch('c7n_gcp.resources.vertexai.storage.Client') as mock_storage_client:
+        mock_client = Mock()
+        mock_storage_client.return_value = mock_client
+        mock_bucket = Mock()
+        mock_blob = Mock()
+        mock_bucket.blob.return_value = mock_blob
+        mock_client.bucket.return_value = mock_bucket
+
+        # Test 0: Valid schema (success case)
+        mock_blob.download_as_text.return_value = (
+            'type: object\nproperties:\n  field1:\n    type: string'
+        )
+        result = action.validate_schema(
+            f'gs://{bucket_name}/schema/instance_schema.yaml'
+        )
+        assert result is True
+
+        # Test 1: Invalid YAML content
+        mock_blob.download_as_text.return_value = 'invalid: yaml: content: ['
+        try:
+            action.validate_schema(f'gs://{bucket_name}/schema/invalid.yaml')
+            assert False, 'Should have raised ValueError for invalid YAML'
+        except ValueError as e:
+            assert 'is not valid YAML' in str(e)
+
+        # Test 2: Schema is not a dict (e.g., a list)
+        mock_blob.download_as_text.return_value = '- item1\n- item2'
+        try:
+            action.validate_schema(f'gs://{bucket_name}/schema/list.yaml')
+            assert False, 'Should have raised ValueError for non-dict schema'
+        except ValueError as e:
+            assert 'Schema must be a YAML object (dict)' in str(e)
+
+        # Test 3: Schema dict missing 'type' field
+        mock_blob.download_as_text.return_value = 'properties:\n  field1:\n    type: string'
+        try:
+            action.validate_schema(f'gs://{bucket_name}/schema/no-type.yaml')
+            assert False, 'Should have raised ValueError for missing type field'
+        except ValueError as e:
+            assert 'Schema must have a "type" field' in str(e)
+
+    # Test 4: No schema URI provided (should return True)
+    result = action.validate_schema(None)
+    assert result is True
 
 
 class VertexAIPublisherModelTest(BaseTest):
