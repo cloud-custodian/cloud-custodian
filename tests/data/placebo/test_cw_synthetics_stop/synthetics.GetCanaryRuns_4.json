@@ -1,0 +1,42 @@
+{
+    "status_code": 200,
+    "data": {
+        "ResponseMetadata": {},
+        "CanaryRuns": [
+            {
+                "Id": "89de744d-4be5-45be-80f7-afb2eaff9506",
+                "Name": "test_canary_stop",
+                "Status": {
+                    "State": "PASSED",
+                    "StateReason": "",
+                    "StateReasonCode": "",
+                    "TestResult": "PASSED"
+                },
+                "Timeline": {
+                    "Started": {
+                        "__class__": "datetime",
+                        "year": 2025,
+                        "month": 10,
+                        "day": 5,
+                        "hour": 14,
+                        "minute": 14,
+                        "second": 55,
+                        "microsecond": 446000
+                    },
+                    "Completed": {
+                        "__class__": "datetime",
+                        "year": 2025,
+                        "month": 10,
+                        "day": 5,
+                        "hour": 14,
+                        "minute": 15,
+                        "second": 12,
+                        "microsecond": 864000
+                    }
+                },
+                "ArtifactS3Location": "cw-syn-results-644160558196-us-east-1/canary/us-east-1/test_canary_stop-2d6-cd7378dbea0b/2025/10/05/18/14-51-194/FIREFOX"
+            }
+        ],
+        "NextToken": "2025-10-05T18:14:51.194Z*FIREFOX"
+    }
+}
