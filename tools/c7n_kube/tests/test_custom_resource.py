@@ -94,6 +94,48 @@ class TestCustomResource(KubeTest):
         self.assertEqual(len(resources), 1)
         self.assertEqual(resources[0]["metadata"]["name"], "my-new-cron-object")
 
+    def test_custom_cluster_resource_label(self):
+        factory = self.replay_flight_data()
+        policy = self.load_policy(
+            {
+                "name": "custom-resources",
+                "resource": "k8s.custom-cluster-resource",
+                "query": [
+                    {
+                        "group": "stable.example.com",
+                        "version": "v1",
+                        "plural": "crontabscluster",
+                    }
+                ],
+                "actions": [{"type": "label", "labels": {"custodian-test": "value"}}],
+            },
+            session_factory=factory,
+        )
+        resources = policy.run()
+        self.assertEqual(len(resources), 1)
+        self.assertEqual(resources[0]["metadata"]["name"], "my-new-cron-object")
+
+    def test_custom_namespaced_resource_label(self):
+        factory = self.replay_flight_data()
+        policy = self.load_policy(
+            {
+                "name": "custom-resources",
+                "resource": "k8s.custom-namespaced-resource",
+                "query": [
+                    {
+                        "group": "stable.example.com",
+                        "version": "v1",
+                        "plural": "crontabs",
+                    }
+                ],
+                "actions": [{"type": "label", "labels": {"custodian-test": "value"}}],
+            },
+            session_factory=factory,
+        )
+        resources = policy.run()
+        self.assertEqual(len(resources), 1)
+        self.assertEqual(resources[0]["metadata"]["name"], "my-new-cron-object")
+
     def test_custom_resource_validation(self):
         self.assertRaises(
             PolicyValidationError,
