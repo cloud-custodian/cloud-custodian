@@ -408,6 +408,52 @@ class DiskTest(BaseTest):
         result = rec_filter.match_resources(recommends_with_none, resources)
         assert result == []
 
+    def test_disk_snapshots_filter(self):
+        factory = self.replay_flight_data('disk-snapshots-filter', project_id='cloud-custodian')
+        p = self.load_policy(
+            {'name': 'disks-with-snapshots',
+             'resource': 'gcp.disk',
+             'filters': [
+                 {'type': 'snapshots',
+                  'count': 1,
+                  'count_op': 'gte'}]},
+            session_factory=factory)
+        resources = p.run()
+        self.assertEqual(len(resources), 2)
+        names = {r['name'] for r in resources}
+        self.assertEqual(names, {'c7n-jenkins', 'drone'})
+
+    def test_disk_snapshots_filter_attrs(self):
+        factory = self.replay_flight_data('disk-snapshots-filter', project_id='cloud-custodian')
+        p = self.load_policy(
+            {'name': 'disks-with-ready-snapshots',
+             'resource': 'gcp.disk',
+             'filters': [
+                 {'type': 'snapshots',
+                  'attrs': [
+                      {'type': 'value',
+                       'key': 'status',
+                       'value': 'READY'}]}]},
+            session_factory=factory)
+        resources = p.run()
+        self.assertEqual(len(resources), 2)
+        for r in resources:
+            self.assertIn('c7n:Snapshots', r)
+
+    def test_disk_no_snapshots_filter(self):
+        factory = self.replay_flight_data('disk-snapshots-filter', project_id='cloud-custodian')
+        p = self.load_policy(
+            {'name': 'disks-without-snapshots',
+             'resource': 'gcp.disk',
+             'filters': [
+                 {'type': 'snapshots',
+                  'count': 0,
+                  'count_op': 'eq'}]},
+            session_factory=factory)
+        resources = p.run()
+        self.assertEqual(len(resources), 1)
+        self.assertEqual(resources[0]['name'], 'custodian-dev')
+
 
 class SnapshotTest(BaseTest):
 

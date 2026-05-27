@@ -5,7 +5,7 @@ import re
 
 from datetime import datetime
 
-from c7n.utils import local_session, type_schema
+from c7n.utils import local_session, type_schema, group_by
 
 from c7n_gcp.actions import MethodAction
 from c7n_gcp.filters import IamPolicyFilter
@@ -13,7 +13,7 @@ from c7n_gcp.filters.iampolicy import IamPolicyValueFilter
 from c7n_gcp.provider import resources
 from c7n_gcp.query import QueryResourceManager, TypeInfo, ChildResourceManager, ChildTypeInfo
 
-from c7n.filters.core import ValueFilter
+from c7n.filters.core import ListItemFilter, ValueFilter
 from c7n.filters.offhours import OffHour, OnHour
 
 
@@ -411,6 +411,60 @@ class Disk(QueryResourceManager):
                         'labels': all_labels,
                         'labelFingerprint': resource['labelFingerprint']
                     }}
+
+
+@Disk.filter_registry.register('snapshots')
+class DiskSnapshotsFilter(ListItemFilter):
+    """
+    Filter GCP disks by their snapshots.
+
+    :example:
+
+    .. code-block:: yaml
+
+        policies:
+          - name: disk-without-recent-snapshot
+            resource: gcp.disk
+            filters:
+              - not:
+                - type: snapshots
+                  attrs:
+                    - type: value
+                      key: creationTimestamp
+                      value_type: age
+                      value: 7
+                      op: less-than
+    """
+    schema = type_schema(
+        'snapshots',
+        attrs={'$ref': '#/definitions/filters_common/list_item_attrs'},
+        count={'type': 'number'},
+        count_op={'$ref': '#/definitions/filters_common/comparison_operators'}
+    )
+    permissions = ('compute.snapshots.list',)
+    item_annotation_key = 'c7n:Snapshots'
+    annotate_items = True
+
+    def process(self, resources, event=None):
+        session = local_session(self.manager.session_factory)
+        client = session.client('compute', 'v1', 'snapshots')
+        project = session.get_default_project()
+
+        all_snapshots = []
+        for page in client.execute_paged_query('list', {'project': project}):
+            page_items = page.get('items', [])
+            if page_items:
+                all_snapshots.extend(page_items)
+
+        grouped = group_by(all_snapshots, 'sourceDisk')
+        for resource in resources:
+            resource[self.item_annotation_key] = grouped.get(
+                resource['selfLink'], [])
+
+        return super().process(resources, event)
+
+    def get_item_values(self, resource):
+        return resource.get(self.item_annotation_key, [])
 
 
 @Disk.action_registry.register('snapshot')
