@@ -442,29 +442,22 @@ class DiskSnapshotsFilter(ListItemFilter):
         count_op={'$ref': '#/definitions/filters_common/comparison_operators'}
     )
     permissions = ('compute.snapshots.list',)
-    item_annotation_key = 'c7n:Snapshots'
+    annotation_key = 'c7n:Snapshots'
+    item_annotation_key = 'c7n:MatchedSnapshots'
     annotate_items = True
 
     def process(self, resources, event=None):
-        session = local_session(self.manager.session_factory)
-        client = session.client('compute', 'v1', 'snapshots')
-        project = session.get_default_project()
-
-        all_snapshots = []
-        for page in client.execute_paged_query('list', {'project': project}):
-            page_items = page.get('items', [])
-            if page_items:
-                all_snapshots.extend(page_items)
+        all_snapshots = self.manager.get_resource_manager('gcp.snapshot').resources()
 
         grouped = group_by(all_snapshots, 'sourceDisk')
         for resource in resources:
-            resource[self.item_annotation_key] = grouped.get(
+            resource[self.annotation_key] = grouped.get(
                 resource['selfLink'], [])
 
         return super().process(resources, event)
 
     def get_item_values(self, resource):
-        return resource.get(self.item_annotation_key, [])
+        return resource.get(self.annotation_key, [])
 
 
 @Disk.action_registry.register('snapshot')
