@@ -125,7 +125,7 @@ class OCIFlightRecorder(CustodianTestCore):
 
     def _get_mock_triples(self):
         import oci.base_client as ocibase
-        import oci._vendor.urllib3.connectionpool as conn
+        import urllib3.connectionpool as conn
 
         mock_triples = (
             (ocibase, "OCIConnectionPool", requests_stubs.VCROCIConnectionPool),
@@ -134,8 +134,8 @@ class OCIFlightRecorder(CustodianTestCore):
                 "ConnectionCls",
                 requests_stubs.VCROCIConnection,
             ),
-            (conn.HTTPConnectionPool, "ConnectionCls", requests_stubs.VCRHTTPConnection),
-            (conn.HTTPSConnectionPool, "ConnectionCls", requests_stubs.VCRHTTPSConnection),
+            (conn.HTTPConnectionPool, "ConnectionCls", requests_stubs.VCRRequestsHTTPConnection),
+            (conn.HTTPSConnectionPool, "ConnectionCls", requests_stubs.VCRRequestsHTTPSConnection),
         )
         return mock_triples
 
@@ -168,12 +168,9 @@ class OCIFlightRecorder(CustodianTestCore):
         if not C7N_FUNCTIONAL:
             if "data" in response["body"]:
                 body = json.dumps(response["body"]["data"])
-                if response["headers"].get("content-encoding", (None,))[0] == "gzip":
-                    response["body"]["string"] = gzip.compress(body.encode("utf-8"))
-                    response["headers"]["content-length"] = [str(len(response["body"]["string"]))]
-                else:
-                    response["body"]["string"] = body.encode("utf-8")
-                    response["headers"]["content-length"] = [str(len(body))]
+                response["body"]["string"] = body.encode("utf-8")
+                response["headers"]["content-length"] = [str(len(body))]
+                response["headers"].pop("content-encoding", None)
 
             return response
 
