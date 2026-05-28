@@ -1804,7 +1804,7 @@ dev = [
 [package.metadata]
 requires-dist = [
     { name = "c7n", editable = "." },
-    { name = "oci", specifier = "==2.168.0" },
+    { name = "oci", specifier = ">=2.106,<3.0" },
     { name = "pyopenssl", specifier = ">=24" },
 ]
 
@@ -3544,7 +3544,7 @@ wheels = [
 
 [[package]]
 name = "oci"
-version = "2.169.0"
+version = "2.176.0"
 source = { registry = "https://pypi.org/simple" }
 dependencies = [
     { name = "certifi" },
@@ -3555,9 +3555,9 @@ dependencies = [
     { name = "pytz" },
     { name = "urllib3" },
 ]
-sdist = { url = "https://files.pythonhosted.org/packages/11/f4/3c2eddccc75dd06a692dbb3290f20f4bc733d99dc60de21f22d65efdeae4/oci-2.169.0.tar.gz", hash = "sha256:f3c5fff00b01783b5325ea7b13bf140053ec1e9f41da20bfb9c8a349ee7662fa", size = 16885837, upload-time = "2026-03-31T06:14:58.981Z" }
+sdist = { url = "https://files.pythonhosted.org/packages/b8/0f/0b2e3ad8d5d460422348eac1f20f1f5ed161812fe16cd17e42ba232939f0/oci-2.176.0.tar.gz", hash = "sha256:ddf7d5734209e32c7a260e7f93e1e73d13409b8d2cf33d66392348a385714eb6", size = 17431386, upload-time = "2026-05-26T10:19:01.875Z" }
 wheels = [
-    { url = "https://files.pythonhosted.org/packages/e4/bf/19643bd939ab595193779ee25c2c12aef8e9a54e0a68de5ed79f209702e3/oci-2.169.0-py3-none-any.whl", hash = "sha256:c71bb5143f307791082b3e33cc1545c2490a518cfed85ab1948ef5107c36d30b", size = 34460447, upload-time = "2026-03-31T06:14:51.373Z" },
+    { url = "https://files.pythonhosted.org/packages/e9/f2/1b91ba211004a3a1b85086c9ac55caf129a323dea644070fe570307a6016/oci-2.176.0-py3-none-any.whl", hash = "sha256:242144cda6f938af431f5a462299e2073100d6f293b02b31466245d47cb4ae76", size = 35609360, upload-time = "2026-05-26T10:18:49.64Z" },
 ]
 
 [[package]]

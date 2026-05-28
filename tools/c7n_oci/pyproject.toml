@@ -6,8 +6,7 @@ license = {text = "Apache-2.0"}
 requires-python = "<4.0.0,>=3.9.2"
 dependencies = [
     "c7n",
-#    "oci<3.0,>=2.106",
-    "oci==2.168.0",
+    "oci<3.0,>=2.106",
     # uv hint: else it will for some reason downgrade pyopenssl for
     # reasons not apparent, without an dependency spec precluding
     # older versions.

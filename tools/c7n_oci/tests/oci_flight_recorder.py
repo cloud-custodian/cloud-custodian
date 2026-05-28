@@ -125,7 +125,6 @@ class OCIFlightRecorder(CustodianTestCore):
 
     def _get_mock_triples(self):
         import oci.base_client as ocibase
-        import urllib3.connectionpool as conn
 
         mock_triples = (
             (ocibase, "OCIConnectionPool", requests_stubs.VCROCIConnectionPool),
@@ -134,8 +133,6 @@ class OCIFlightRecorder(CustodianTestCore):
                 "ConnectionCls",
                 requests_stubs.VCROCIConnection,
             ),
-            (conn.HTTPConnectionPool, "ConnectionCls", requests_stubs.VCRRequestsHTTPConnection),
-            (conn.HTTPSConnectionPool, "ConnectionCls", requests_stubs.VCRRequestsHTTPSConnection),
         )
         return mock_triples
 
