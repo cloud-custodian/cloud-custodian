@@ -11,7 +11,7 @@ from dateutil.parser import parse as date_parse
 
 from c7n.ctx import ExecutionContext
 from c7n.config import Config
-from c7n.output import DirectoryOutput, BlobOutput, LogFile, metrics_outputs
+from c7n.output import DirectoryOutput, BlobOutput, LogFile, Metrics, metrics_outputs
 from c7n.resources.aws import S3Output, MetricsOutput, inspect_bucket_region
 from c7n.testing import mock_datetime_now, TestUtils
 
@@ -22,6 +22,25 @@ import vcr
 
 
 class MetricsTest(BaseTest):
+    def test_metrics_abstract_methods(self):
+        conf = Bag({'region': 'us-east-2', 'scheme': 'aws', 'netloc': 'master'})
+        ctx = Bag(
+            session_factory=None,
+            options=Bag(account_id='001100', region='us-east-1'),
+            policy=Bag(name='test', resource_type='ec2'),
+        )
+        moutput = Metrics(ctx, conf)
+
+        datapoint = {'MetricName': 'Calories', 'Value': 400, 'Unit': 'Count'}
+
+        self.assertRaisesRegex(
+            NotImplementedError,
+            "subclass responsibility",
+            moutput.put_metric,
+            *datapoint.values()
+        )
+        moutput.buf = [datapoint]
+        self.assertRaisesRegex(NotImplementedError, "subclass responsibility", moutput.flush)
 
     def test_boolean_config_compatibility(self):
         self.assertTrue(

@@ -1,0 +1,70 @@
+{
+  "headers": {
+    "content-type": "application/json; charset=UTF-8",
+    "vary": "Origin, X-Origin, Referer",
+    "date": "Mon, 20 Apr 2026 20:00:56 GMT",
+    "server": "ESF",
+    "x-xss-protection": "0",
+    "x-frame-options": "SAMEORIGIN",
+    "x-content-type-options": "nosniff",
+    "alt-svc": "h3=\":443\"; ma=2592000,h3-29=\":443\"; ma=2592000",
+    "transfer-encoding": "chunked",
+    "status": "200",
+    "content-length": "1658",
+    "-content-encoding": "gzip"
+  },
+  "body": {
+    "id": "a0091466-1ae7-4038-9fd7-de447928e29c",
+    "startTime": "2026-04-20T20:00:56.942Z",
+    "status": "done",
+    "user": "caleb.syring@sixfeetup.com",
+    "type": "UPDATE",
+    "zoneContext": {
+      "oldValue": {
+        "name": "c7n-zone-default-1586",
+        "dnsName": "c7n-default-1586.example.com.",
+        "description": "Cloud Custodian managed zone label test",
+        "id": "2660237873472593803",
+        "nameServers": [
+          "ns-cloud-e1.googledomains.com.",
+          "ns-cloud-e2.googledomains.com.",
+          "ns-cloud-e3.googledomains.com.",
+          "ns-cloud-e4.googledomains.com."
+        ],
+        "creationTime": "2026-04-20T20:00:55.358Z",
+        "visibility": "public",
+        "labels": {
+          "env": "default",
+          "goog-terraform-provisioned": "true"
+        },
+        "cloudLoggingConfig": {
+          "kind": "dns#managedZoneCloudLoggingConfig"
+        },
+        "kind": "dns#managedZone"
+      },
+      "newValue": {
+        "name": "c7n-zone-default-1586",
+        "dnsName": "c7n-default-1586.example.com.",
+        "description": "Cloud Custodian managed zone label test",
+        "id": "2660237873472593803",
+        "nameServers": [
+          "ns-cloud-e1.googledomains.com.",
+          "ns-cloud-e2.googledomains.com.",
+          "ns-cloud-e3.googledomains.com.",
+          "ns-cloud-e4.googledomains.com."
+        ],
+        "creationTime": "2026-04-20T20:00:55.358Z",
+        "visibility": "public",
+        "labels": {
+          "goog-terraform-provisioned": "true",
+          "env": "not-the-default"
+        },
+        "cloudLoggingConfig": {
+          "kind": "dns#managedZoneCloudLoggingConfig"
+        },
+        "kind": "dns#managedZone"
+      }
+    },
+    "kind": "dns#operation"
+  }
+}

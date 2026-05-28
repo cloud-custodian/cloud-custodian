@@ -5,6 +5,7 @@ import time
 
 from gcp_common import BaseTest, event_data
 from googleapiclient.errors import HttpError
+from pytest_terraform import terraform
 
 
 class ProjectRoleTest(BaseTest):
@@ -171,7 +172,7 @@ class ServiceAccountTest(BaseTest):
 
 class ServiceAccountKeyTest(BaseTest):
     def test_service_account_key_query(self):
-        project_id = "cloud-custodian"
+        project_id = self.project_id
 
         session_factory = self.replay_flight_data("iam-service-account-key-query", project_id)
 
@@ -235,7 +236,7 @@ class ServiceAccountKeyTest(BaseTest):
 
 class IAMRoleTest(BaseTest):
     def test_iam_role_query(self):
-        project_id = "cloud-custodian"
+        project_id = self.project_id
 
         session_factory = self.replay_flight_data("ami-role-query", project_id)
 
@@ -254,7 +255,7 @@ class IAMRoleTest(BaseTest):
         )
 
     def test_iam_role_get(self):
-        project_id = "cloud-custodian"
+        project_id = self.project_id
         name = "accesscontextmanager.policyAdmin"
 
         session_factory = self.replay_flight_data("ami-role-query-get", project_id)
@@ -281,7 +282,7 @@ class IAMRoleTest(BaseTest):
 
 class ApiKeyTest(BaseTest):
     def test_api_key_query(self):
-        project_id = "cloud-custodian"
+        project_id = self.project_id
         factory = self.replay_flight_data("api-key-list", project_id)
         p = self.load_policy(
             {
@@ -295,7 +296,7 @@ class ApiKeyTest(BaseTest):
         self.assertEqual(len(resources), 1)
 
     def test_api_key_time_range(self):
-        project_id = "cloud-custodian"
+        project_id = self.project_id
         factory = self.replay_flight_data("gcp-apikeys-time-range", project_id)
         p = self.load_policy(
             {
@@ -314,3 +315,85 @@ class ApiKeyTest(BaseTest):
             resources[0]["name"],
             "projects/cloud-custodian/locations/global/keys/03b651c2-718a-4702-b5d7-9946987cc4da"
         )
+
+
+@terraform("api_key_patch")
+def test_api_key_patch_restrictions_and_annotations(test, api_key_patch):
+    short_key_name = api_key_patch.resources['google_apikeys_key']['api_key']['name']
+    factory = test.replay_flight_data('api-key-patch')
+    policy = test.load_policy(
+        {
+            'name': 'api-key-patch',
+            'resource': 'gcp.api-key',
+            'filters': [
+                {
+                    'type': 'value',
+                    'key': 'name',
+                    'op': 'glob',
+                    'value': f'*/{short_key_name}',
+                }
+            ],
+            'actions': [
+                {
+                    'type': 'patch',
+                    'restrictions': {
+                        'serverKeyRestrictions': {
+                            'allowedIps': ['192.0.2.0/24'],
+                        },
+                        'apiTargets': [
+                            {'service': 'translate.googleapis.com'},
+                        ],
+                    },
+                    'annotations': {
+                        'custodian-remediated': 'true',
+                    },
+                }
+            ],
+        },
+        session_factory=factory,
+    )
+
+    resources = policy.run()
+    assert len(resources) == 1
+    actual_key_name = resources[0]['name']
+
+    client = policy.resource_manager.get_client()
+    for _ in range(10):
+        updated_key = client.execute_query('get', {'name': actual_key_name})
+        if 'restrictions' in updated_key:
+            break
+        time.sleep(3)
+
+    assert 'restrictions' in updated_key
+    assert 'serverKeyRestrictions' in updated_key['restrictions']
+    assert '192.0.2.0/24' in updated_key['restrictions']['serverKeyRestrictions']['allowedIps']
+    assert {'service': 'translate.googleapis.com'} in updated_key['restrictions']['apiTargets']
+    assert updated_key.get('annotations', {}).get('custodian-remediated') == 'true'
+
+
+@terraform("api_key_delete")
+def test_api_key_delete(test, api_key_delete):
+    short_key_name = api_key_delete.resources['google_apikeys_key']['api_key']['name']
+    factory = test.replay_flight_data('api-key-delete')
+
+    policy = test.load_policy(
+        {
+            'name': 'api-key-delete',
+            'resource': 'gcp.api-key',
+            'filters': [
+                {'type': 'value', 'key': 'name', 'op': 'glob',
+                 'value': f'*/{short_key_name}'},
+            ],
+            'actions': ['delete'],
+        },
+        session_factory=factory,
+    )
+
+    resources = policy.run()
+    assert len(resources) == 1
+    actual_key_name = resources[0]['name']
+
+    client = policy.resource_manager.get_client()
+    parent = actual_key_name.rsplit('/keys/', 1)[0]
+    remaining = client.execute_query('list', {'parent': parent})
+    assert actual_key_name not in [k['name'] for k in remaining.get('keys', [])]

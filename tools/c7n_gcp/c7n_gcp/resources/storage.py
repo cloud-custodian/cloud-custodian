@@ -26,6 +26,7 @@ class Bucket(QueryResourceManager):
         urn_component = "bucket"
         labels = True
         labels_op = 'patch'
+        labels_perm = 'update'
 
         @staticmethod
         def get(client, resource_info):

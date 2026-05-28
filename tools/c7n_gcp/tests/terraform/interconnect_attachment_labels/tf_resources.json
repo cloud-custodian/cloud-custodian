@@ -1,0 +1,123 @@
+{
+    "pytest-terraform": 1,
+    "outputs": {},
+    "resources": {
+        "google_compute_interconnect_attachment": {
+            "c7n_test_attachment": {
+                "admin_enabled": true,
+                "attachment_group": "",
+                "bandwidth": "",
+                "candidate_cloud_router_ip_address": "",
+                "candidate_cloud_router_ipv6_address": "",
+                "candidate_customer_router_ip_address": "",
+                "candidate_customer_router_ipv6_address": "",
+                "candidate_subnets": null,
+                "cloud_router_ip_address": "",
+                "cloud_router_ipv6_address": "",
+                "creation_timestamp": "2026-04-21T12:16:21.850-07:00",
+                "customer_router_ip_address": "",
+                "customer_router_ipv6_address": "",
+                "description": "",
+                "edge_availability_domain": "AVAILABILITY_DOMAIN_1",
+                "effective_labels": {
+                    "env": "default",
+                    "goog-terraform-provisioned": "true"
+                },
+                "encryption": "NONE",
+                "google_reference_id": "",
+                "id": "projects/cloud-custodian/regions/us-central1/interconnectAttachments/c7n-ia-default-2a1e",
+                "interconnect": "",
+                "ipsec_internal_addresses": null,
+                "l2_forwarding": [],
+                "label_fingerprint": "oWv7t93mrS4=",
+                "labels": {
+                    "env": "default"
+                },
+                "mtu": "",
+                "name": "c7n-ia-default-2a1e",
+                "pairing_key": "bc6a7ed0-8c17-4c76-aac1-54b752250750/us-central1/1",
+                "params": [],
+                "partner_asn": "",
+                "private_interconnect_info": [],
+                "project": "stacklet-test-policies",
+                "region": "https://www.googleapis.com/compute/v1/projects/cloud-custodian/regions/us-central1",
+                "router": "https://www.googleapis.com/compute/v1/projects/cloud-custodian/regions/us-central1/routers/c7n-ia-router-default-2a1e",
+                "self_link": "https://www.googleapis.com/compute/v1/projects/cloud-custodian/regions/us-central1/interconnectAttachments/c7n-ia-default-2a1e",
+                "stack_type": "IPV4_ONLY",
+                "state": "PENDING_PARTNER",
+                "subnet_length": null,
+                "terraform_labels": {
+                    "env": "default",
+                    "goog-terraform-provisioned": "true"
+                },
+                "timeouts": null,
+                "type": "PARTNER",
+                "vlan_tag8021q": 0
+            }
+        },
+        "google_compute_network": {
+            "c7n_test_network": {
+                "auto_create_subnetworks": false,
+                "bgp_always_compare_med": false,
+                "bgp_best_path_selection_mode": "LEGACY",
+                "bgp_inter_region_cost": "",
+                "delete_bgp_always_compare_med": false,
+                "delete_default_routes_on_create": false,
+                "description": "",
+                "enable_ula_internal_ipv6": false,
+                "gateway_ipv4": "",
+                "id": "projects/cloud-custodian/global/networks/c7n-ia-net-default-2a1e",
+                "internal_ipv6_range": "",
+                "mtu": 0,
+                "name": "c7n-ia-net-default-2a1e",
+                "network_firewall_policy_enforcement_order": "AFTER_CLASSIC_FIREWALL",
+                "network_id": "207080897769009717",
+                "network_profile": "",
+                "numeric_id": "207080897769009717",
+                "params": [],
+                "project": "stacklet-test-policies",
+                "routing_mode": "REGIONAL",
+                "self_link": "https://www.googleapis.com/compute/v1/projects/cloud-custodian/global/networks/c7n-ia-net-default-2a1e",
+                "timeouts": null
+            }
+        },
+        "google_compute_router": {
+            "c7n_test_router": {
+                "bgp": [
+                    {
+                        "advertise_mode": "DEFAULT",
+                        "advertised_groups": null,
+                        "advertised_ip_ranges": [],
+                        "asn": 16550,
+                        "identifier_range": "",
+                        "keepalive_interval": 20
+                    }
+                ],
+                "creation_timestamp": "2026-04-21T12:16:00.385-07:00",
+                "description": "",
+                "encrypted_interconnect_router": false,
+                "id": "projects/cloud-custodian/regions/us-central1/routers/c7n-ia-router-default-2a1e",
+                "md5_authentication_keys": [],
+                "name": "c7n-ia-router-default-2a1e",
+                "network": "https://www.googleapis.com/compute/v1/projects/cloud-custodian/global/networks/c7n-ia-net-default-2a1e",
+                "params": [],
+                "project": "stacklet-test-policies",
+                "region": "us-central1",
+                "self_link": "https://www.googleapis.com/compute/v1/projects/cloud-custodian/regions/us-central1/routers/c7n-ia-router-default-2a1e",
+                "timeouts": null
+            }
+        },
+        "random_id": {
+            "suffix": {
+                "b64_std": "Kh4=",
+                "b64_url": "Kh4",
+                "byte_length": 2,
+                "dec": "10782",
+                "hex": "2a1e",
+                "id": "Kh4",
+                "keepers": null,
+                "prefix": null
+            }
+        }
+    }
+}

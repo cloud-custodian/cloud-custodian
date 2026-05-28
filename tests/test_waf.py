@@ -358,3 +358,44 @@ class WAFTest(BaseTest):
         managed_rules = [rule for rule in resource['c7n:WebACLAllRules']
                         if rule['Type'] == 'ManagedRuleGroup']
         self.assertEqual(len(managed_rules), 2, "Expected 2 managed rule group")
+
+    def test_wafv2_query_cloudfront_scope(self):
+        session_factory = self.replay_flight_data(
+            "test_wafv2_query_cloudfront_scope",
+            region="us-east-1"
+        )
+        policy = {
+            "name": "wafv2-cloudfront-scope",
+            "resource": "aws.wafv2",
+            "query": [
+                {"Scope": "CLOUDFRONT"}
+            ]
+        }
+        p = self.load_policy(
+            policy,
+            session_factory=session_factory,
+            config={"region": "us-east-1"}
+        )
+        resources = p.run()
+        # Verify that all returned resources have CLOUDFRONT scope
+        for resource in resources:
+            self.assertEqual(resource['Scope'], 'CLOUDFRONT')
+
+    def test_wafv2_query_default_regional_scope(self):
+        session_factory = self.replay_flight_data(
+            "test_wafv2_query_default_regional_scope",
+            region="us-east-1"
+        )
+        policy = {
+            "name": "wafv2-default-scope",
+            "resource": "aws.wafv2"
+        }
+        p = self.load_policy(
+            policy,
+            session_factory=session_factory,
+            config={"region": "us-east-1"}
+        )
+        resources = p.run()
+        # Verify that all returned resources have REGIONAL scope (default)
+        for resource in resources:
+            self.assertEqual(resource['Scope'], 'REGIONAL')

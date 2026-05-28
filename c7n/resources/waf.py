@@ -78,14 +78,15 @@ class DescribeWafV2(DescribeSource):
         return list(map(_detail, with_tags))
 
     # set REGIONAL for Scope as default
-    def get_query_params(self, query):
-        q = super(DescribeWafV2, self).get_query_params(query)
-        if q:
-            if 'Scope' not in q:
-                q['Scope'] = 'REGIONAL'
-        else:
-            q = {'Scope': 'REGIONAL'}
-        return q
+    def get_query_params(self, query_params):
+        query_params = query_params or {}
+        # Parse query from policy data
+        queries = self.manager.data.get('query', [])
+        for q in queries:
+            query_params.update(q)
+        if 'Scope' not in query_params:
+            query_params['Scope'] = 'REGIONAL'
+        return query_params
 
     def resources(self, query):
         scope = (query or {}).get('Scope', 'REGIONAL')

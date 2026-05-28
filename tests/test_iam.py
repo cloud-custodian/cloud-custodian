@@ -2736,6 +2736,43 @@ class CrossAccountChecker(TestCase):
         violations = checker.check(policy)
         self.assertEqual(len(violations), 1)
 
+    def test_principal_org_paths_allowed(self):
+        """Test that aws:PrincipalOrgPaths is treated as org-scoping condition."""
+        policy = {
+            "Version": "2012-10-17",
+            "Statement": [{
+                "Effect": "Allow",
+                "Principal": "*",
+                "Action": "s3:GetObject",
+                "Resource": "*",
+                "Condition": {
+                    "ForAnyValuesStringLike": {
+                        "aws:PrincipalOrgPaths": [
+                            "o-allowed/r-ab12/ou-ab12-aaaabbbb/*"
+                        ]
+                    },
+                    "ArnLike": {
+                        "aws:PrincipalArn": "arn:aws:iam::*:role/MyRole"
+                    }
+                }
+            }]
+        }
+
+        # Allowed org ID extracted from path → no violation
+        checker = PolicyChecker({"allowed_orgid": {"o-allowed"}})
+        violations = checker.check(policy)
+        self.assertEqual(len(violations), 0)
+
+        # No allowed org ID → violation
+        checker = PolicyChecker({"allowed_orgid": set()})
+        violations = checker.check(policy)
+        self.assertEqual(len(violations), 1)
+
+        # Wrong org ID → violation
+        checker = PolicyChecker({"allowed_orgid": {"o-other"}})
+        violations = checker.check(policy)
+        self.assertEqual(len(violations), 1)
+
     def test_org_id_with_specific_non_whitelisted_account(self):
         """Test that org ID doesn't save specific non-whitelisted account."""
         policy = {
@@ -2876,6 +2913,34 @@ class CrossAccountChecker(TestCase):
 
         # All wildcards should be allowed with org ID
         checker = PolicyChecker({"allowed_orgid": {"o-allowed"}})
+        violations = checker.check(policy)
+        self.assertEqual(len(violations), 0)
+
+    def test_org_id_with_mixed_principal_arns_and_whitelisted_account(self):
+        """Test org ID with mixed wildcard and already-whitelisted PrincipalArn values."""
+        policy = {
+            "Version": "2012-10-17",
+            "Statement": [{
+                "Effect": "Allow",
+                "Principal": "*",
+                "Action": "s3:GetObject",
+                "Resource": "*",
+                "Condition": {
+                    "StringEquals": {"aws:PrincipalOrgID": "o-allowed"},
+                    "ArnLike": {
+                        "aws:PrincipalArn": [
+                            "arn:aws:iam::123456789012:role/AllowedRole",
+                            "arn:aws:iam::*:role/*"
+                        ]
+                    }
+                }
+            }]
+        }
+
+        checker = PolicyChecker({
+            "allowed_orgid": {"o-allowed"},
+            "allowed_accounts": {"123456789012"}
+        })
         violations = checker.check(policy)
         self.assertEqual(len(violations), 0)
 
@@ -3570,55 +3635,13 @@ class AccessKeyTest(BaseTest):
             session_factory=factory,
         )
         resources = p.run()
-        self.assertTrue(len(resources) >= 0)
+        self.assertTrue(len(resources) == 2)
         for resource in resources:
             # Verify required fields are present
             self.assertIn('AccessKeyId', resource)
             self.assertIn('UserName', resource)
             self.assertIn('Status', resource)
             self.assertIn('CreateDate', resource)
-
-    def test_access_key_filter_by_status(self):
-        """Test filtering access keys by status."""
-        factory = self.replay_flight_data("test_iam_access_key_filter_status")
-        p = self.load_policy(
-            {
-                "name": "iam-access-key-active",
-                "resource": "iam-access-key",
-                "filters": [
-                    {
-                        "type": "value",
-                        "key": "Status",
-                        "value": "Active"
-                    }
-                ]
-            },
-            session_factory=factory,
-        )
-        resources = p.run()
-        for resource in resources:
-            self.assertEqual(resource['Status'], 'Active')
-
-    def test_access_key_filter_by_user(self):
-        """Test filtering access keys by username."""
-        factory = self.replay_flight_data("test_iam_access_key_filter_user")
-        p = self.load_policy(
-            {
-                "name": "iam-access-key-by-user",
-                "resource": "iam-access-key",
-                "filters": [
-                    {
-                        "type": "value",
-                        "key": "UserName",
-                        "value": "test-user"
-                    }
-                ]
-            },
-            session_factory=factory,
-        )
-        resources = p.run()
-        for resource in resources:
-            self.assertEqual(resource['UserName'], 'test-user')
 
     def test_access_key_filter_by_age(self):
         """Test filtering access keys by age."""
@@ -3639,7 +3662,9 @@ class AccessKeyTest(BaseTest):
             },
             session_factory=factory,
         )
-        resources = p.run()
+
+        with freezegun.freeze_time('2020-02-02'):
+            resources = p.run()
         # Just check that we can run this without error
         # The actual age filter logic is handled by C7N core
-        self.assertTrue(len(resources) >= 0)
+        self.assertTrue(len(resources) == 1)

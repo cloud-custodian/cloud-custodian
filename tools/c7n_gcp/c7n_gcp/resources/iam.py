@@ -220,6 +220,94 @@ class ApiKey(QueryResourceManager):
         asset_type = "apikeys.googleapis.com/projects.locations.keys"
 
 
+@ApiKey.action_registry.register('delete')
+class ApiKeyDelete(MethodAction):
+    """Delete a GCP API key.
+
+    .. code-block:: yaml
+
+        policies:
+          - name: delete-unused-api-keys
+            resource: gcp.api-key
+            filters:
+              - type: time-range
+                value: 90
+            actions:
+              - delete
+    """
+
+    schema = type_schema('delete')
+    method_spec = {'op': 'delete'}
+    permissions = ('apikeys.keys.delete',)
+
+    def get_resource_params(self, m, r):
+        return {'name': r['name']}
+
+
+@ApiKey.action_registry.register('patch')
+class ApiKeyPatch(MethodAction):
+    """Patch mutable fields on a GCP API key.
+
+    Supports updating any combination of ``displayName``, ``restrictions``,
+    and ``annotations``.  At least one field must be provided.
+
+    The ``restrictions`` object accepts an optional ``apiTargets`` list and
+    exactly one of the following client restriction types:
+
+    - ``browserKeyRestrictions`` – ``allowedReferrers[]``
+    - ``serverKeyRestrictions`` – ``allowedIps[]``
+    - ``androidKeyRestrictions`` – ``allowedApplications[]``
+    - ``iosKeyRestrictions`` – ``allowedBundleIds[]``
+
+    .. code-block:: yaml
+
+        policies:
+          - name: restrict-unrestricted-api-keys
+            resource: gcp.api-key
+            filters:
+              - type: value
+                key: restrictions
+                value: absent
+            actions:
+              - type: patch
+                restrictions:
+                  serverKeyRestrictions:
+                    allowedIps:
+                      - 192.0.2.0/24
+                  apiTargets:
+                    - service: translate.googleapis.com
+                annotations:
+                  custodian-remediated: "true"
+    """
+
+    MUTABLE_FIELDS = ('displayName', 'restrictions', 'annotations')
+
+    schema = type_schema(
+        'patch',
+        displayName={'type': 'string'},
+        restrictions={'type': 'object'},
+        annotations={'type': 'object'},
+    )
+    method_spec = {'op': 'patch'}
+    method_perm = 'update'
+    permissions = ('apikeys.keys.update',)
+
+    def validate(self):
+        if not set(self.MUTABLE_FIELDS).intersection(self.data):
+            raise ValueError(
+                "patch action requires at least one of: {}".format(
+                    ', '.join(self.MUTABLE_FIELDS)))
+        return super().validate()
+
+    def get_resource_params(self, m, r):
+        body = {f: self.data[f] for f in self.MUTABLE_FIELDS if f in self.data}
+        return {
+            'name': r['name'],
+            'updateMask': ','.join(body.keys()),
+            'body': body,
+        }
+
+
 @ApiKey.filter_registry.register('time-range')
 class ApiKeyTimeRangeFilter(TimeRangeFilter):
     """Filters api keys that have been changed during a specific time range.

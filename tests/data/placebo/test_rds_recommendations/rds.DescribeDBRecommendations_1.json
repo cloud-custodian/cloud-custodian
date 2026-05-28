@@ -1,0 +1,197 @@
+{
+    "status_code": 200,
+    "data": {
+        "DBRecommendations": [
+            {
+                "RecommendationId": "matches-db-active",
+                "TypeId": "config_recommendation::old_minor_version",
+                "Severity": "informational",
+                "ResourceArn": "arn:aws:rds:us-east-1:644160558196:db:terraform-20251204185100057800000001",
+                "Status": "active",
+                "CreatedTime": "2024-02-21T23:14:19.292000+00:00",
+                "UpdatedTime": "2024-02-21T23:14:19+00:00",
+                "Detection": "**[resource-name]** is not running the latest minor DB engine version",
+                "Recommendation": "Upgrade to latest engine version",
+                "Description": "Your database resources aren't running the latest minor DB engine version. The latest minor version contains the latest security fixes and other improvements.",
+                "RecommendedActions": [
+                    {
+                        "ActionId": "12ab34c5de6fg7h89i0jk1lm234n5678",
+                        "Operation": "modifyDbInstance",
+                        "Parameters": [
+                            {
+                                "Key": "EngineVersion",
+                                "Value": "5.7.44"
+                            },
+                            {
+                                "Key": "DBInstanceIdentifier",
+                                "Value": "database-1"
+                            }
+                        ],
+                        "ApplyModes": [
+                            "immediately",
+                            "next-maintenance-window"
+                        ],
+                        "Status": "ready",
+                        "ContextAttributes": [
+                            {
+                                "Key": "Recommended value",
+                                "Value": "5.7.44"
+                            },
+                            {
+                                "Key": "Current engine version",
+                                "Value": "5.7.42"
+                            }
+                        ]
+                    }
+                ],
+                "Category": "security",
+                "Source": "RDS",
+                "TypeDetection": "**[resource-count] resources** are not running the latest minor DB engine version",
+                "TypeRecommendation": "Upgrade to latest engine version",
+                "Impact": "Reduced database performance and data security at risk",
+                "AdditionalInfo": "We recommend that you maintain your database with the latest DB engine minor version as this version includes the latest security and functionality fixes. The DB engine minor version upgrades contain only the changes which are backward-compatible with earlier minor versions of the same major version of the DB engine.",
+                "Links": [
+                    {
+                        "Text": "Upgrading an RDS DB instance engine version",
+                        "Url": "https://docs.aws.amazon.com/AmazonRDS/latest/UserGuide/USER_UpgradeDBInstance.Upgrading.html"
+                    },
+                    {
+                        "Text": "Using Amazon RDS Blue/Green Deployments for database updates for Amazon Aurora",
+                        "Url": "https://docs.aws.amazon.com/AmazonRDS/latest/AuroraUserGuide/blue-green-deployments.html"
+                    },
+                    {
+                        "Text": "Using Amazon RDS Blue/Green Deployments for database updates for Amazon RDS",
+                        "Url": "https://docs.aws.amazon.com/AmazonRDS/latest/UserGuide/blue-green-deployments.html"
+                    }
+                ]
+            },
+            {
+                "RecommendationId": "does-not-match-db",
+                "TypeId": "config_recommendation::old_minor_version",
+                "Severity": "informational",
+                "ResourceArn": "arn:aws:rds:us-west-2:111122223333:db:database-1",
+                "Status": "active",
+                "CreatedTime": "2024-02-21T23:14:19.292000+00:00",
+                "UpdatedTime": "2024-02-21T23:14:19+00:00",
+                "Detection": "**[resource-name]** is not running the latest minor DB engine version",
+                "Recommendation": "Upgrade to latest engine version",
+                "Description": "Your database resources aren't running the latest minor DB engine version. The latest minor version contains the latest security fixes and other improvements.",
+                "RecommendedActions": [
+                    {
+                        "ActionId": "12ab34c5de6fg7h89i0jk1lm234n5678",
+                        "Operation": "modifyDbInstance",
+                        "Parameters": [
+                            {
+                                "Key": "EngineVersion",
+                                "Value": "5.7.44"
+                            },
+                            {
+                                "Key": "DBInstanceIdentifier",
+                                "Value": "database-1"
+                            }
+                        ],
+                        "ApplyModes": [
+                            "immediately",
+                            "next-maintenance-window"
+                        ],
+                        "Status": "ready",
+                        "ContextAttributes": [
+                            {
+                                "Key": "Recommended value",
+                                "Value": "5.7.44"
+                            },
+                            {
+                                "Key": "Current engine version",
+                                "Value": "5.7.42"
+                            }
+                        ]
+                    }
+                ],
+                "Category": "security",
+                "Source": "RDS",
+                "TypeDetection": "**[resource-count] resources** are not running the latest minor DB engine version",
+                "TypeRecommendation": "Upgrade to latest engine version",
+                "Impact": "Reduced database performance and data security at risk",
+                "AdditionalInfo": "We recommend that you maintain your database with the latest DB engine minor version as this version includes the latest security and functionality fixes. The DB engine minor version upgrades contain only the changes which are backward-compatible with earlier minor versions of the same major version of the DB engine.",
+                "Links": [
+                    {
+                        "Text": "Upgrading an RDS DB instance engine version",
+                        "Url": "https://docs.aws.amazon.com/AmazonRDS/latest/UserGuide/USER_UpgradeDBInstance.Upgrading.html"
+                    },
+                    {
+                        "Text": "Using Amazon RDS Blue/Green Deployments for database updates for Amazon Aurora",
+                        "Url": "https://docs.aws.amazon.com/AmazonRDS/latest/AuroraUserGuide/blue-green-deployments.html"
+                    },
+                    {
+                        "Text": "Using Amazon RDS Blue/Green Deployments for database updates for Amazon RDS",
+                        "Url": "https://docs.aws.amazon.com/AmazonRDS/latest/UserGuide/blue-green-deployments.html"
+                    }
+                ]
+            },
+            {
+                "RecommendationId": "matches-db-resolved",
+                "TypeId": "config_recommendation::old_minor_version",
+                "Severity": "informational",
+                "ResourceArn": "arn:aws:rds:us-east-1:644160558196:db:terraform-20251204185100057800000001",
+                "Status": "resolved",
+                "CreatedTime": "2024-02-21T23:14:19.292000+00:00",
+                "UpdatedTime": "2024-02-21T23:14:19+00:00",
+                "Detection": "**[resource-name]** is not running the latest minor DB engine version",
+                "Recommendation": "Upgrade to latest engine version",
+                "Description": "Your database resources aren't running the latest minor DB engine version. The latest minor version contains the latest security fixes and other improvements.",
+                "RecommendedActions": [
+                    {
+                        "ActionId": "12ab34c5de6fg7h89i0jk1lm234n5678",
+                        "Operation": "modifyDbInstance",
+                        "Parameters": [
+                            {
+                                "Key": "EngineVersion",
+                                "Value": "5.7.44"
+                            },
+                            {
+                                "Key": "DBInstanceIdentifier",
+                                "Value": "database-1"
+                            }
+                        ],
+                        "ApplyModes": [
+                            "immediately",
+                            "next-maintenance-window"
+                        ],
+                        "Status": "ready",
+                        "ContextAttributes": [
+                            {
+                                "Key": "Recommended value",
+                                "Value": "5.7.44"
+                            },
+                            {
+                                "Key": "Current engine version",
+                                "Value": "5.7.42"
+                            }
+                        ]
+                    }
+                ],
+                "Category": "security",
+                "Source": "RDS",
+                "TypeDetection": "**[resource-count] resources** are not running the latest minor DB engine version",
+                "TypeRecommendation": "Upgrade to latest engine version",
+                "Impact": "Reduced database performance and data security at risk",
+                "AdditionalInfo": "We recommend that you maintain your database with the latest DB engine minor version as this version includes the latest security and functionality fixes. The DB engine minor version upgrades contain only the changes which are backward-compatible with earlier minor versions of the same major version of the DB engine.",
+                "Links": [
+                    {
+                        "Text": "Upgrading an RDS DB instance engine version",
+                        "Url": "https://docs.aws.amazon.com/AmazonRDS/latest/UserGuide/USER_UpgradeDBInstance.Upgrading.html"
+                    },
+                    {
+                        "Text": "Using Amazon RDS Blue/Green Deployments for database updates for Amazon Aurora",
+                        "Url": "https://docs.aws.amazon.com/AmazonRDS/latest/AuroraUserGuide/blue-green-deployments.html"
+                    },
+                    {
+                        "Text": "Using Amazon RDS Blue/Green Deployments for database updates for Amazon RDS",
+                        "Url": "https://docs.aws.amazon.com/AmazonRDS/latest/UserGuide/blue-green-deployments.html"
+                    }
+                ]
+            }
+        ],
+        "ResponseMetadata": {}
+    }
+}

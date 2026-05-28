@@ -1,0 +1,10 @@
+{
+    "status_code": 400,
+    "data": {
+        "Error": {
+            "Code": "InvalidServiceName",
+            "Message": "The Vpc Endpoint Service 'com.amazonaws.us-west-2.s3' does not exist"
+        },
+        "ResponseMetadata": {}
+    }
+}

@@ -7,6 +7,7 @@ from c7n.tags import RemoveTag, Tag, TagActionFilter, TagDelayedAction, universa
 from c7n.utils import local_session, type_schema
 from c7n.actions import BaseAction
 from c7n.filters.kms import KmsRelatedFilter
+from c7n.filters import MetricsFilter
 from c7n.resources.aws import shape_schema, shape_validate
 
 
@@ -584,8 +585,8 @@ class DeleteBedrockKnowledgeBase(BaseAction):
 class BedrockApplicationInferenceProfile(QueryResourceManager):
     class resource_type(TypeInfo):
         service = 'bedrock'
-        enum_spec = ('list_inference_profiles', 'inferenceProfileSummaries[]', {
-            'typeEquals': 'APPLICATION'})
+        enum_spec = ('list_inference_profiles', 'inferenceProfileSummaries[]',
+            {'typeEquals': 'APPLICATION'})
         name = "inferenceProfileName"
         id = arn = "inferenceProfileArn"
         arn_type = "application-inference-profile"
@@ -627,6 +628,12 @@ class DeleteBedrockInferenceProfile(BaseAction):
                     f"Unable to delete inference profile {r['inferenceProfileArn']}: {e}",
                 )
                 continue
+
+
+@BedrockApplicationInferenceProfile.filter_registry.register('metrics')
+class InferenceProfileMetrics(MetricsFilter):
+    def get_dimensions(self, resource):
+        return [{'Name': 'ModelId', 'Value': resource['inferenceProfileId']}]
 
 
 @resources.register('bedrock-guardrail')
