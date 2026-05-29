@@ -706,6 +706,54 @@ class AccountTests(BaseTest):
         }
         self.assertRaises(PolicyValidationError, self.load_policy, policy)
 
+    def test_service_limit_govcloud_validate(self):
+        # GovCloud policies targeting IAM must use us-gov-west-1, not us-east-1
+        valid_policy = {
+            "name": "service-limit",
+            "resource": "account",
+            "region": "us-gov-west-1",
+            "filters": [{"type": "service-limit", "services": ["IAM"]}],
+        }
+        p = self.load_policy(valid_policy, config={"region": "us-gov-west-1"})
+        self.assertIsNotNone(p)
+
+        # A GovCloud policy targeting IAM but set to us-east-1 must fail
+        invalid_policy = {
+            "name": "service-limit",
+            "resource": "account",
+            "filters": [{"type": "service-limit", "services": ["IAM"]}],
+        }
+        self.assertRaises(
+            PolicyValidationError,
+            self.load_policy,
+            invalid_policy,
+            config={"region": "us-gov-west-1"},
+        )
+
+    def test_service_limit_govcloud_process_check(self):
+        # Global services (metadata region '-') must be included when running in GovCloud
+        session_factory = self.replay_flight_data("test_account_service_limit_govcloud")
+        p = self.load_policy(
+            {
+                "name": "service-limit",
+                "resource": "account",
+                "region": "us-gov-west-1",
+                "filters": [
+                    {"type": "service-limit", "services": ["IAM"], "threshold": 0.1}
+                ],
+            },
+            config={"region": "us-gov-west-1"},
+            session_factory=session_factory,
+        )
+        with mock_datetime_now(parser.parse("2017-02-23T00:40:00+00:00"), datetime):
+            resources = p.run()
+        self.assertEqual(len(resources), 1)
+        self.assertEqual(
+            {l["service"] for l in resources[0]["c7n:ServiceLimitsExceeded"]},
+            {"IAM"},
+        )
+        self.assertEqual(len(resources[0]["c7n:ServiceLimitsExceeded"]), 2)
+
     def test_service_limit_no_threshold(self):
         # only warns when the default threshold goes to warning or above
         session_factory = self.replay_flight_data("test_account_service_limit")

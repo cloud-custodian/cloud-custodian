@@ -1,0 +1,10 @@
+{
+  "status_code": 200,
+  "data": {
+    "AccountAliases": [
+      "custodian-govcloud-test"
+    ],
+    "IsTruncated": false,
+    "ResponseMetadata": {}
+  }
+}
