@@ -813,6 +813,41 @@ class IamUserTest(BaseTest):
             p.resource_manager.source.augment([{'UserName': 'Kapil'}])
         self.assertEqual(ctx.exception.response['Error']['Code'], 'AccessDenied')
 
+    def test_iam_role_augment_not_found(self):
+        p = self.load_policy({
+            'name': 'iam-role-augment-not-found',
+            'resource': 'iam-role'})
+
+        p.resource_manager.session_factory = sf = mock.MagicMock()
+        sf.region = 'us-east-1'
+        sf.return_value = f = mock.MagicMock()
+        f.client.return_value = c = mock.MagicMock()
+        c.get_role.side_effect = ClientError(
+            {'Error': {'Code': 'NoSuchEntity',
+                       'Message': 'The role with name test-role cannot be found.'}},
+            'get_role')
+
+        with self.assertRaises(ClientError) as ctx:
+            p.resource_manager.source.augment([{'RoleName': 'test-role'}])
+        self.assertEqual(ctx.exception.response['Error']['Code'], 'NoSuchEntity')
+
+    def test_iam_role_augment_resource_not_found_ignored(self):
+        p = self.load_policy({
+            'name': 'iam-role-augment-resource-not-found',
+            'resource': 'iam-role'})
+
+        p.resource_manager.session_factory = sf = mock.MagicMock()
+        sf.region = 'us-east-1'
+        sf.return_value = f = mock.MagicMock()
+        f.client.return_value = c = mock.MagicMock()
+        c.get_role.side_effect = ClientError(
+            {'Error': {'Code': 'ResourceNotFoundException',
+                       'Message': 'The role with name test-role cannot be found.'}},
+            'get_role')
+
+        results = p.resource_manager.source.augment([{'RoleName': 'test-role'}])
+        self.assertEqual(results, [])
+
     def test_iam_user_usage(self):
         factory = self.replay_flight_data('test_iam_user_usage')
         p = self.load_policy({
