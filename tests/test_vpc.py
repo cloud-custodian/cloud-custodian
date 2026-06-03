@@ -3871,6 +3871,32 @@ class EndpointTest(BaseTest):
         self.assertEqual(len(resources), 1)
         self.assertEqual(resources[0]["c7n:matched-security-groups"], ["sg-6c7fa917"])
 
+    def test_endpoint_delete_action(self):
+        factory = self.replay_flight_data("test_vpc_endpoint_delete")
+        p = self.load_policy(
+            {
+                "name": "endpoint-delete",
+                "resource": "vpc-endpoint",
+                "filters": [{"tag:Name": "c7n-test"}],
+                "actions": ["delete"],
+            },
+            session_factory=factory,
+        )
+        self.assertEqual(
+            p.resource_manager.actions[0].get_permissions(),
+            ("ec2:DeleteVpcEndpoints",))
+        resources = p.run()
+        self.assertEqual(len(resources), 1)
+        self.assertEqual(resources[0]["VpcEndpointId"], "vpce-0f0a1d8b9f7c1a2b3")
+
+        client = factory(region="us-east-1").client("ec2")
+        endpoints = client.describe_vpc_endpoints(
+            Filters=[{"Name": "vpc-endpoint-id", "Values": [resources[0]["VpcEndpointId"]]}]
+        )[
+            "VpcEndpoints"
+        ]
+        self.assertFalse(endpoints)
+
     def test_endpoint_cross_account(self):
         session_factory = self.replay_flight_data('test_vpce_cross_account')
         p = self.load_policy(
