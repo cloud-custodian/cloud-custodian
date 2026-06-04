@@ -59,8 +59,8 @@ def deserialize(obj):
     class_name = None
     if "__class__" in target:
         class_name = target.pop("__class__")
-    if "__module__" in obj:
-        obj.pop("__module__")
+    if "__module__" in target:
+        target.pop("__module__")
     # Use getattr(module, class_name) for custom types if needed
     if class_name == "datetime":
         return datetime(tzinfo=utc, **target)
