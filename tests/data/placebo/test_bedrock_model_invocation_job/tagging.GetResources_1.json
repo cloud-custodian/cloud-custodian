@@ -1,0 +1,294 @@
+{
+    "status_code": 200,
+    "data": {
+        "PaginationToken": "",
+        "ResourceTagMappingList": [
+            {
+                "ResourceARN": "arn:aws:bedrock:us-east-1:644160558196:model-invocation-job/h8kk04a1u8t3",
+                "Tags": [
+                    {
+                        "Key": "TestRunId",
+                        "Value": "allowed-ocelot"
+                    },
+                    {
+                        "Key": "Owner",
+                        "Value": "c7n"
+                    },
+                    {
+                        "Key": "Environment",
+                        "Value": "test"
+                    }
+                ]
+            },
+            {
+                "ResourceARN": "arn:aws:bedrock:us-east-1:644160558196:model-invocation-job/9t46ttth7wrt",
+                "Tags": [
+                    {
+                        "Key": "TestRunId",
+                        "Value": "nice-bat"
+                    },
+                    {
+                        "Key": "foo",
+                        "Value": "bar"
+                    },
+                    {
+                        "Key": "Environment",
+                        "Value": "test"
+                    }
+                ]
+            },
+            {
+                "ResourceARN": "arn:aws:bedrock:us-east-1:644160558196:model-invocation-job/sk9cvf2uct7r",
+                "Tags": [
+                    {
+                        "Key": "TestRunId",
+                        "Value": "suited-raccoon"
+                    },
+                    {
+                        "Key": "foo",
+                        "Value": "bar"
+                    },
+                    {
+                        "Key": "Environment",
+                        "Value": "test"
+                    }
+                ]
+            },
+            {
+                "ResourceARN": "arn:aws:bedrock:us-east-1:644160558196:model-invocation-job/rlqq0ku5zald",
+                "Tags": [
+                    {
+                        "Key": "TestRunId",
+                        "Value": "moral-bengal"
+                    },
+                    {
+                        "Key": "Owner",
+                        "Value": "c7n"
+                    },
+                    {
+                        "Key": "Environment",
+                        "Value": "test"
+                    }
+                ]
+            },
+            {
+                "ResourceARN": "arn:aws:bedrock:us-east-1:644160558196:model-invocation-job/csq1l2pgsqff",
+                "Tags": [
+                    {
+                        "Key": "foo",
+                        "Value": "bar"
+                    },
+                    {
+                        "Key": "Environment",
+                        "Value": "test"
+                    }
+                ]
+            },
+            {
+                "ResourceARN": "arn:aws:bedrock:us-east-1:644160558196:model-invocation-job/mfvpdnuboes7",
+                "Tags": [
+                    {
+                        "Key": "foo",
+                        "Value": "bar"
+                    },
+                    {
+                        "Key": "Environment",
+                        "Value": "test"
+                    }
+                ]
+            },
+            {
+                "ResourceARN": "arn:aws:bedrock:us-east-1:644160558196:model-invocation-job/d6faxhbbz7yr",
+                "Tags": [
+                    {
+                        "Key": "foo",
+                        "Value": "bar"
+                    },
+                    {
+                        "Key": "Environment",
+                        "Value": "test"
+                    }
+                ]
+            },
+            {
+                "ResourceARN": "arn:aws:bedrock:us-east-1:644160558196:model-invocation-job/402l3shfpbar",
+                "Tags": [
+                    {
+                        "Key": "Owner",
+                        "Value": "c7n"
+                    },
+                    {
+                        "Key": "Environment",
+                        "Value": "test"
+                    }
+                ]
+            },
+            {
+                "ResourceARN": "arn:aws:bedrock:us-east-1:644160558196:model-invocation-job/0codoxejriwr",
+                "Tags": [
+                    {
+                        "Key": "foo",
+                        "Value": "bar"
+                    },
+                    {
+                        "Key": "Environment",
+                        "Value": "test"
+                    }
+                ]
+            },
+            {
+                "ResourceARN": "arn:aws:bedrock:us-east-1:644160558196:model-invocation-job/09bixzvlv6ty",
+                "Tags": [
+                    {
+                        "Key": "foo",
+                        "Value": "bar"
+                    },
+                    {
+                        "Key": "Environment",
+                        "Value": "test"
+                    }
+                ]
+            },
+            {
+                "ResourceARN": "arn:aws:bedrock:us-east-1:644160558196:model-invocation-job/4nf7mygtvxj6",
+                "Tags": [
+                    {
+                        "Key": "foo",
+                        "Value": "bar"
+                    },
+                    {
+                        "Key": "Environment",
+                        "Value": "test"
+                    }
+                ]
+            },
+            {
+                "ResourceARN": "arn:aws:bedrock:us-east-1:644160558196:model-invocation-job/sedudps5us43",
+                "Tags": [
+                    {
+                        "Key": "Owner",
+                        "Value": "c7n"
+                    },
+                    {
+                        "Key": "Environment",
+                        "Value": "test"
+                    }
+                ]
+            },
+            {
+                "ResourceARN": "arn:aws:bedrock:us-east-1:644160558196:model-invocation-job/3lhq9z299uik",
+                "Tags": [
+                    {
+                        "Key": "Owner",
+                        "Value": "c7n"
+                    },
+                    {
+                        "Key": "Environment",
+                        "Value": "test"
+                    }
+                ]
+            },
+            {
+                "ResourceARN": "arn:aws:bedrock:us-east-1:644160558196:model-invocation-job/ij5q3s8iyru7",
+                "Tags": [
+                    {
+                        "Key": "foo",
+                        "Value": "bar"
+                    },
+                    {
+                        "Key": "Environment",
+                        "Value": "test"
+                    }
+                ]
+            },
+            {
+                "ResourceARN": "arn:aws:bedrock:us-east-1:644160558196:model-invocation-job/j8s6cwoy6fi4",
+                "Tags": [
+                    {
+                        "Key": "foo",
+                        "Value": "bar"
+                    },
+                    {
+                        "Key": "Environment",
+                        "Value": "test"
+                    }
+                ]
+            },
+            {
+                "ResourceARN": "arn:aws:bedrock:us-east-1:644160558196:model-invocation-job/7w6f11rp8akg",
+                "Tags": [
+                    {
+                        "Key": "Owner",
+                        "Value": "c7n"
+                    }
+                ]
+            },
+            {
+                "ResourceARN": "arn:aws:bedrock:us-east-1:644160558196:model-invocation-job/uv8isv2atywu",
+                "Tags": [
+                    {
+                        "Key": "foo",
+                        "Value": "bar"
+                    },
+                    {
+                        "Key": "Environment",
+                        "Value": "test"
+                    }
+                ]
+            },
+            {
+                "ResourceARN": "arn:aws:bedrock:us-east-1:644160558196:model-invocation-job/bwrbi68u2bex",
+                "Tags": [
+                    {
+                        "Key": "Owner",
+                        "Value": "c7n"
+                    },
+                    {
+                        "Key": "Environment",
+                        "Value": "test"
+                    }
+                ]
+            },
+            {
+                "ResourceARN": "arn:aws:bedrock:us-east-1:644160558196:model-invocation-job/dae0t2ovqqio",
+                "Tags": [
+                    {
+                        "Key": "Owner",
+                        "Value": "c7n"
+                    },
+                    {
+                        "Key": "Environment",
+                        "Value": "test"
+                    }
+                ]
+            },
+            {
+                "ResourceARN": "arn:aws:bedrock:us-east-1:644160558196:model-invocation-job/te1jr3zv0wv8",
+                "Tags": [
+                    {
+                        "Key": "Owner",
+                        "Value": "c7n"
+                    },
+                    {
+                        "Key": "Environment",
+                        "Value": "test"
+                    }
+                ]
+            },
+            {
+                "ResourceARN": "arn:aws:bedrock:us-east-1:644160558196:model-invocation-job/5mo84ucf08p0",
+                "Tags": [
+                    {
+                        "Key": "foo",
+                        "Value": "bar"
+                    },
+                    {
+                        "Key": "Environment",
+                        "Value": "test"
+                    }
+                ]
+            }
+        ],
+        "ResponseMetadata": {}
+    }
+}
