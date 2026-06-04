@@ -111,6 +111,51 @@ class WAFTest(BaseTest):
         resources = p.run()
         self.assertEqual(len(resources), 1, f"Expected 1 resource, got {len(resources)}")
 
+    def test_wafv2_set_logging_cloudfront(self):
+        session_factory = self.replay_flight_data("test_wafv2_set_logging_enabled")
+
+        wafv2_regions = []
+
+        def spy_factory(*args, **kw):
+            session = session_factory(*args, **kw)
+            real_client = session.client
+
+            def client(*cargs, **ckw):
+                if cargs and cargs[0] == 'wafv2':
+                    region = ckw.get('region_name')
+                    if region is None and len(cargs) > 1:
+                        region = cargs[1]
+                    wafv2_regions.append(region)
+                return real_client(*cargs, **ckw)
+
+            session.client = client
+            return session
+
+        if hasattr(session_factory, 'region'):
+            spy_factory.region = session_factory.region
+
+        policy = {
+                "name": "enable-wafv2-cloudfront-logging",
+                "resource": "aws.wafv2",
+                "query": [{"Scope": "CLOUDFRONT"}],
+                "filters": [{"Name": "noncompliant_waf"}],
+                "actions": [
+                    {
+                        "type": "set-logging",
+                        "destination": "arn:aws:s3:::aws-waf-logs-test-custodian-creation",
+                    }
+                ],
+            }
+        p = self.load_policy(policy,
+                             session_factory=spy_factory,
+                             config={"region": "us-west-2"})
+
+        resources = p.run()
+        self.assertEqual(len(resources), 1, f"Expected 1 resource, got {len(resources)}")
+        self.assertEqual(resources[0]["Scope"], "CLOUDFRONT")
+        self.assertIn("us-east-1", wafv2_regions)
+        self.assertNotIn("us-west-2", wafv2_regions)
+
     def test_wafv2_set_logging_invalid_destination(self):
         session_factory = self.replay_flight_data("test_wafv2_set_logging_invalid_destination")
 

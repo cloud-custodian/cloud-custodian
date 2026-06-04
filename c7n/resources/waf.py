@@ -10,6 +10,15 @@ from c7n.exceptions import PolicyValidationError
 from c7n.resources.aws import shape_validate
 
 
+def wafv2_scope_region(scope, default_region):
+    """Region to use for wafv2 API calls given a WebACL's Scope.
+
+    CLOUDFRONT WebACLs are global resources addressed via us-east-1; all other
+    (REGIONAL) WebACLs use the policy's region.
+    """
+    return 'us-east-1' if scope == 'CLOUDFRONT' else default_region
+
+
 class DescribeRegionalWaf(DescribeSource):
     def get_permissions(self):
         perms = super().get_permissions()
@@ -202,16 +211,21 @@ class WAFV2LoggingFilter(ValueFilter):
     annotation_key = 'c7n:WafV2LoggingConfiguration'
 
     def process(self, resources, event=None):
-        client = local_session(self.manager.session_factory).client(
-            'wafv2', region_name=self.manager.region
-        )
-        logging_confs = client.list_logging_configurations(Scope='REGIONAL')[
-            'LoggingConfigurations'
-        ]
         resource_map = {r['ARN']: r for r in resources}
-        for lc in logging_confs:
-            if lc['ResourceArn'] in resource_map:
-                resource_map[lc['ResourceArn']][self.annotation_key] = lc
+        # CLOUDFRONT logging configs are only listable from us-east-1 with the
+        # CLOUDFRONT scope; query each scope present against its matching region.
+        scopes = {r.get('Scope') or 'REGIONAL' for r in resources}
+        for scope in scopes:
+            region = wafv2_scope_region(scope, self.manager.region)
+            client = local_session(self.manager.session_factory).client(
+                'wafv2', region_name=region
+            )
+            logging_confs = client.list_logging_configurations(Scope=scope)[
+                'LoggingConfigurations'
+            ]
+            for lc in logging_confs:
+                if lc['ResourceArn'] in resource_map:
+                    resource_map[lc['ResourceArn']][self.annotation_key] = lc
 
         resources = list(resource_map.values())
 
@@ -292,13 +306,21 @@ class WAFV2SetLogging(BaseAction):
         return self
 
     def process(self, resources):
-        client = local_session(self.manager.session_factory).client(
-            'wafv2', region_name=self.manager.region
-        )
         destination = self.data['destination']
         attributes = self.data.get('attributes', {})
+        # CLOUDFRONT WebACLs are global resources whose ARNs live in us-east-1;
+        # PutLoggingConfiguration must target that region regardless of the policy
+        # region.
+        clients = {}
 
         for r in resources:
+            region = wafv2_scope_region(r.get('Scope'), self.manager.region)
+            if region not in clients:
+                clients[region] = local_session(
+                    self.manager.session_factory
+                ).client('wafv2', region_name=region)
+            client = clients[region]
+
             resource_arn = r['ARN']
             logging_config = {
                 'ResourceArn': resource_arn,
