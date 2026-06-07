@@ -494,6 +494,142 @@ class LastRotation(ValueFilter):
         return results
 
 
+@Key.filter_registry.register('last-usage')
+class LastUsage(ValueFilter):
+    """Filters KMS keys by their last usage information.
+
+    Uses the ``GetKeyLastUsage`` API to determine when a key was last used
+    for a cryptographic operation, enabling identification of stale or
+    unused keys.
+
+    The ``KeyLastUsage`` response contains the last tracked cryptographic
+    operation, its timestamp, and the associated CloudTrail event ID.
+    If the key has never been used since tracking began, ``KeyLastUsage``
+    will be empty.
+
+    Only successful cryptographic operations are tracked. Non-cryptographic
+    operations (e.g., ``DescribeKey``, ``ListKeys``) are not recorded.
+
+    For more details, see:
+    https://docs.aws.amazon.com/kms/latest/developerguide/monitoring-keys-determining-usage.html
+
+    .. warning::
+
+       Do not use ``GetKeyLastUsage`` as the sole indicator when scheduling
+       a key for deletion. Instead, first disable the key and monitor
+       CloudTrail for ``DisabledException`` entries, as there could be
+       infrequent workflows that depend on the key.
+
+    :example:
+
+    Find keys not used in the last 30 days:
+
+    .. code-block:: yaml
+
+            policies:
+              - name: kms-unused-keys-30-days
+                resource: kms-key
+                filters:
+                  - type: last-usage
+                    key: Timestamp
+                    value: 30
+                    value_type: age
+                    op: gte
+
+    Find keys that have never been used since tracking began:
+
+    .. code-block:: yaml
+
+              - name: kms-never-used-keys
+                resource: kms-key
+                filters:
+                  - type: last-usage
+                    key: Timestamp
+                    value: absent
+
+    Find keys last used for a specific operation:
+
+    .. code-block:: yaml
+
+              - name: kms-keys-used-for-decrypt
+                resource: kms-key
+                filters:
+                  - type: last-usage
+                    key: Operation
+                    value: Decrypt
+
+    """
+
+    # Tracked cryptographic operations returned by GetKeyLastUsage.
+    # Reference: https://docs.aws.amazon.com/kms/latest/developerguide/
+    #   monitoring-keys-determining-usage.html#determining-usage-key-last-usage-tracking
+    TRACKED_OPERATIONS = [
+        'Decrypt',
+        'DeriveSharedSecret',
+        'Encrypt',
+        'GenerateDataKey',
+        'GenerateDataKeyPair',
+        'GenerateDataKeyPairWithoutPlaintext',
+        'GenerateDataKeyWithoutPlaintext',
+        'GenerateMac',
+        'ReEncrypt',
+        'Sign',
+        'Verify',
+        'VerifyMac',
+    ]
+
+    schema = type_schema('last-usage', rinherit=ValueFilter.schema)
+    schema_alias = False
+    permissions = ('kms:GetKeyLastUsage',)
+    annotation_key = 'c7n:LastUsage'
+
+    def validate(self):
+        """Validate filter configuration.
+
+        If filtering by Operation, ensure the value is a recognized
+        tracked cryptographic operation.
+        """
+        attrs = dict(self.data)
+        attrs.pop('type', None)
+        if attrs.get('key') == 'Operation' and attrs.get('op', 'eq') == 'eq':
+            op_value = attrs.get('value')
+            if op_value and op_value not in self.TRACKED_OPERATIONS:
+                raise ValueError(
+                    f"Invalid Operation value '{op_value}'. "
+                    f"Valid operations: {', '.join(self.TRACKED_OPERATIONS)}"
+                )
+        return self
+
+    def get_last_usage(self, client, key_id):
+        """Retrieve last usage info for a KMS key.
+
+        Returns the ``KeyLastUsage`` dict from the API response,
+        or an empty dict if the key has never been used, or None
+        if an error occurred.
+        """
+        last_usage = None
+        try:
+            result = client.get_key_last_usage(KeyId=key_id)
+            # Empty dict means key has not been used since tracking began
+            last_usage = result.get('KeyLastUsage') or {}
+        except ClientError as err:
+            self.log.warning(err)
+        return last_usage
+
+    def process(self, resources, event=None):
+        client = local_session(self.manager.session_factory).client('kms')
+        results = []
+
+        for r in resources:
+            if self.annotation_key not in r:
+                r[self.annotation_key] = self.get_last_usage(client, r['KeyId'])
+
+            if self.match(r[self.annotation_key]):
+                results.append(r)
+
+        return results
+
+
 @Key.action_registry.register("schedule-deletion")
 class KmsKeyScheduleDeletion(BaseAction):
     """Schedule KMS key deletion

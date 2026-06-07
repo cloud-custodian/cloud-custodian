@@ -180,6 +180,68 @@ class KMSTest(BaseTest):
         self.assertIn("AccessDenied", log.getvalue())
         self.assertEqual(len(resources), 2)
 
+    def test_last_usage(self):
+        session_factory = self.replay_flight_data("test_kms_last_usage")
+        p = self.load_policy(
+            {
+                "name": "kms-last-usage",
+                "resource": "kms-key",
+                "filters": [
+                    {
+                        "type": "last-usage",
+                        "key": "Timestamp",
+                        "value": 30,
+                        "value_type": "age",
+                        "op": "gte",
+                    }
+                ],
+            },
+            session_factory=session_factory,
+        )
+        with freeze_time("2026-06-07T00:00:00+00:00"):
+            resources = p.run()
+        self.assertEqual(len(resources), 1)
+        self.assertIn("c7n:LastUsage", resources[0])
+        self.assertIn("Timestamp", resources[0]["c7n:LastUsage"])
+        self.assertEqual(resources[0]["c7n:LastUsage"]["Operation"], "Decrypt")
+
+    def test_last_usage_never_used(self):
+        session_factory = self.replay_flight_data("test_kms_last_usage_never_used")
+        p = self.load_policy(
+            {
+                "name": "kms-never-used",
+                "resource": "kms-key",
+                "filters": [
+                    {
+                        "type": "last-usage",
+                        "key": "Timestamp",
+                        "value": "absent",
+                    }
+                ],
+            },
+            session_factory=session_factory,
+        )
+        resources = p.run()
+        self.assertEqual(len(resources), 1)
+        self.assertEqual(resources[0]["c7n:LastUsage"], {})
+
+    def test_last_usage_invalid_operation(self):
+        self.assertRaises(
+            ValueError,
+            self.load_policy,
+            {
+                "name": "kms-invalid-operation",
+                "resource": "kms-key",
+                "filters": [
+                    {
+                        "type": "last-usage",
+                        "key": "Operation",
+                        "value": "InvalidOp",
+                    }
+                ],
+            },
+        )
+
     def test_key_rotation_exception_unsupportedopp(self):
         region = "us-west-2"
         session_factory = self.replay_flight_data(
