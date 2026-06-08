@@ -20,7 +20,9 @@ from c7n.manager import ResourceManager
 from c7n.registry import PluginRegistry
 from c7n.tags import register_ec2_tags, register_universal_tags, universal_augment
 from c7n.utils import (
-    local_session, generate_arn, get_retry, chunks, camelResource, jmespath_compile, get_path)
+    local_session, generate_arn, get_retry,
+    chunks, camelResource, jmespath_compile, get_path, is_not_found
+)
 
 try:
     from botocore.paginate import PageIterator, Paginator
@@ -748,7 +750,7 @@ def _scalar_augment(manager, model, detail_spec, client, resource_set):
         try:
             response = op(*args, **kw)
         except ClientError as e:
-            if e.response['Error']['Code'] != 'ResourceNotFoundException':
+            if not is_not_found(e):
                 raise
             manager.log.warning("Resource not found: %s using %s" % (detail_op, kw))
             continue
