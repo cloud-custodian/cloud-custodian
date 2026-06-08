@@ -513,7 +513,9 @@ class AgentMetrics(MetricsFilter):
         matched_parents = set()
         for c in matched_children:
             p = parents[c['parent']['agentId']]
-            p.setdefault('c7n:matchedAliases', []).append(c['agentAliasId'])
+            p.setdefault('c7n:matchedAliases', []).append(
+                {'id': c['agentAliasId'], 'name': c['agentAliasName']}
+            )
             matched_parents.add(p['agentId'])
         return [parents[pid] for pid in matched_parents]
 
