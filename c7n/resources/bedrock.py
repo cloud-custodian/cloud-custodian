@@ -8,7 +8,7 @@ from c7n.utils import local_session, type_schema, QueryParser
 from c7n.actions import BaseAction
 from c7n.filters.kms import KmsRelatedFilter
 from c7n.filters import MetricsFilter
-from c7n.resources.aws import shape_schema, shape_validate
+from c7n.resources.aws import shape_schema, shape_validate, Arn
 
 
 class FoundationModelQueryParser(QueryParser):
@@ -428,6 +428,7 @@ class BedrockAgent(QueryResourceManager):
         id = "agentId"
         arn = "agentArn"
         permission_prefix = 'bedrock'
+        metrics_namespace = "AWS/Bedrock/Agents"
 
     def augment(self, resources):
         client = local_session(self.session_factory).client('bedrock-agent')
@@ -440,6 +441,81 @@ class BedrockAgent(QueryResourceManager):
             return r
         resources = super().augment(resources)
         return list(map(_augment, resources))
+
+
+@BedrockAgent.filter_registry.register('metrics')
+class AgentMetrics(MetricsFilter):
+    """Cloudwatch metrics for Bedrock Agents.
+
+    Dataplane metrics for a Bedrock Agent, have a number of caveats.
+
+    They are only defined against a tuple of (OperationId, ModelId, AliasId).
+
+    As such to filter them against an Agent, we query metrics against every
+    Alias for each agent.
+
+    Note an OperationId must be supplied via dimension parameter, or a default
+    of InvokeAgent will be used.
+    """
+
+    def validate(self):
+        # operationid must be supplied, of utility with metrics are InvokeAgent
+        # and InvokeInlineAgent.
+        if not self.data.get('dimensions', {}).get("OperationId"):
+            self.data.setdefault('dimensions', {})['OperationId'] = "InvokeAgent"
+
+    def get_dimensions(self, r):
+        # Operation is injected by validate as a user dim, if not user supplied.
+        return [
+            {'Name': 'AgentAliasArn',
+             'Value': f"{r['parent']['arnAliasBase']}/{r['agentAliasId']}"
+             },
+            {'Name': 'ModelId',
+             'Value': r['parent']['modelId']}
+        ]
+
+    def process(self, resources, event=None):
+        client = local_session(self.manager.session_factory).client('bedrock-agent')
+
+        # we do some fancy footwork :-) for the rest of this metrics filter.
+        #
+        # we switch resources from agents to their set of aliases, if any alias matches
+        # we return back the agent with annotations of the matched alias ids.
+        # Effectively we create a child resource set and return back the parent on any
+        # child matching.
+
+        parents = {r['agentId']: r for r in resources}
+        children = []
+
+        for p in parents.values():
+            p_arn = Arn.parse(p['agentArn'])
+            parent_info = {
+                'agentId': p['agentId'],
+                'arnAliasBase': (f"arn:{p_arn.partition}:bedrock:"
+                                 f"{p_arn.region}:{p_arn.account_id}"
+                                 f":agent-alias/{p_arn.resource}"),
+                'modelId': p['foundationModel']
+            }
+            child_count = 0
+            paginator = client.get_paginator('list_agent_aliases')
+            results = paginator.paginate(agentId=p['agentId'])
+
+            for alias in results.build_full_result().get('agentAliasSummaries', []):
+                alias['parent'] = parent_info
+                children.append(alias)
+                child_count += 1
+            # seems the only way to determine at a parent level
+            # if metrics filer holds true across all children.
+            p['c7n:aliasCount'] = child_count
+
+        matched_children = super().process(children)
+
+        matched_parents = set()
+        for c in matched_children:
+            p = parents[c['parent']['agentId']]
+            p.setdefault('c7n:matchedAliases', []).append(c['agentAliasId'])
+            matched_parents.add(p['agentId'])
+        return [parents[pid] for pid in matched_parents]
 
 
 @BedrockAgent.filter_registry.register('kms-key')

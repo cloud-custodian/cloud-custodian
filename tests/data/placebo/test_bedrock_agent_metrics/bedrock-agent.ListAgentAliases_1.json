@@ -1,0 +1,71 @@
+{
+    "status_code": 200,
+    "data": {
+        "ResponseMetadata": {},
+        "agentAliasSummaries": [
+            {
+                "agentAliasId": "9BURUS1YWF",
+                "agentAliasName": "TSTALIASID",
+                "routingConfiguration": [
+                    {
+                        "agentVersion": "1"
+                    }
+                ],
+                "agentAliasStatus": "PREPARED",
+                "createdAt": {
+                    "__class__": "datetime",
+                    "year": 2026,
+                    "month": 6,
+                    "day": 7,
+                    "hour": 11,
+                    "minute": 55,
+                    "second": 35,
+                    "microsecond": 136508
+                },
+                "updatedAt": {
+                    "__class__": "datetime",
+                    "year": 2026,
+                    "month": 6,
+                    "day": 7,
+                    "hour": 11,
+                    "minute": 55,
+                    "second": 35,
+                    "microsecond": 136508
+                },
+                "aliasInvocationState": "ACCEPT_INVOCATIONS"
+            },
+            {
+                "agentAliasId": "TSTALIASID",
+                "agentAliasName": "AgentTestAlias",
+                "description": "Test Alias for Agent",
+                "routingConfiguration": [
+                    {
+                        "agentVersion": "DRAFT"
+                    }
+                ],
+                "agentAliasStatus": "PREPARED",
+                "createdAt": {
+                    "__class__": "datetime",
+                    "year": 2024,
+                    "month": 6,
+                    "day": 26,
+                    "hour": 17,
+                    "minute": 23,
+                    "second": 11,
+                    "microsecond": 457889
+                },
+                "updatedAt": {
+                    "__class__": "datetime",
+                    "year": 2024,
+                    "month": 6,
+                    "day": 26,
+                    "hour": 17,
+                    "minute": 23,
+                    "second": 11,
+                    "microsecond": 457889
+                },
+                "aliasInvocationState": "ACCEPT_INVOCATIONS"
+            }
+        ]
+    }
+}

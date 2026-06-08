@@ -1,0 +1,25 @@
+{
+    "status_code": 200,
+    "data": {
+        "ResponseMetadata": {},
+        "agentSummaries": [
+            {
+                "agentId": "5FFBRI3MYM",
+                "agentName": "booking-agent",
+                "agentStatus": "PREPARED",
+                "description": "Agent in charge of a restaurants table bookings",
+                "updatedAt": {
+                    "__class__": "datetime",
+                    "year": 2026,
+                    "month": 6,
+                    "day": 7,
+                    "hour": 11,
+                    "minute": 56,
+                    "second": 20,
+                    "microsecond": 813984
+                },
+                "latestAgentVersion": "1"
+            }
+        ]
+    }
+}
