@@ -823,13 +823,13 @@ class IamUserTest(BaseTest):
         sf.return_value = f = mock.MagicMock()
         f.client.return_value = c = mock.MagicMock()
         c.get_role.side_effect = ClientError(
-            {'Error': {'Code': 'NoSuchEntity',
+            {'Error': {'Code': 'AccessDenied',
                        'Message': 'The role with name test-role cannot be found.'}},
             'get_role')
 
         with self.assertRaises(ClientError) as ctx:
             p.resource_manager.source.augment([{'RoleName': 'test-role'}])
-        self.assertEqual(ctx.exception.response['Error']['Code'], 'NoSuchEntity')
+        self.assertEqual(ctx.exception.response['Error']['Code'], 'AccessDenied')
 
     def test_iam_role_augment_resource_not_found_ignored(self):
         p = self.load_policy({
