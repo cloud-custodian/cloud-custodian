@@ -461,8 +461,8 @@ class AgentMetrics(MetricsFilter):
     def validate(self):
         # operationid must be supplied, of utility with metrics are InvokeAgent
         # and InvokeInlineAgent.
-        if not self.data.get('dimensions', {}).get("OperationId"):
-            self.data.setdefault('dimensions', {})['OperationId'] = "InvokeAgent"
+        if not self.data.get('dimensions', {}).get("Operation"):
+            self.data.setdefault('dimensions', {})['Operation'] = "InvokeAgent"
 
     def get_dimensions(self, r):
         # Operation is injected by validate as a user dim, if not user supplied.
