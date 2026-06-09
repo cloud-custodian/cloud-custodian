@@ -947,6 +947,20 @@ class CloudFront(BaseTest):
             'securityhub',
         )
 
+    def test_cloudfront_function_tag(self):
+        factory = self.record_flight_data("test_cloudfront_function_tag", region="us-east-1")
+
+        p = self.load_policy(
+            {
+                "name": "cloudfront-function-tag",
+                "resource": "cloudfront-function",
+                "filters": [{"tag:env": "test"}],
+            },
+            session_factory=factory,
+        )
+        resources = p.run()
+        self.assertEqual(len(resources), 1)
+
     def test_origin_access_control(self):
         factory = self.replay_flight_data("test_origin_access_control")
 

@@ -50,6 +50,7 @@ ResourceMap = {
   "aws.catalog-product": "c7n.resources.servicecatalog.CatalogProduct",
   "aws.cfn": "c7n.resources.cfn.CloudFormation",
   "aws.cloud-directory": "c7n.resources.directory.CloudDirectory",
+  "aws.cloudfront-function": "c7n.resources.cloudfront.Function",
   "aws.cloudhsm-cluster": "c7n.resources.hsm.CloudHSMCluster",
   "aws.cloudhsm-backup": "c7n.resources.hsm.CloudHSMBackup",
   "aws.cloudsearch": "c7n.resources.cloudsearch.CloudSearch",

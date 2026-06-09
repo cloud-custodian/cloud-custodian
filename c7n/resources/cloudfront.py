@@ -90,6 +90,40 @@ class StreamingDistribution(QueryResourceManager):
         'config': ConfigSource
     }
 
+class DescribeFunction(DescribeSource):
+    def augment(self, resources):
+        return universal_augment(self.manager, resources)
+
+    def get_resources(self, ids, cache=True):
+        results = []
+        function_names = []
+        for i in ids:
+            # if we get cloudfront function arn, we pick function name
+            if i.startswith('arn:'):
+                function_names.append(Arn.parse(i).resource)
+            else:
+                function_names.append(i)
+        if function_names:
+            results = super().get_resources(function_names, cache)
+        return results
+
+@resources.register('cloudfront-function')
+class Function(QueryResourceManager):
+    class resource_type(TypeInfo):
+        service = "cloudfront"
+        arn_type = "function"
+        enum_spec = ("list_functions", "FunctionList.Items", None)
+        id = "Name"
+        arn = "FunctionMetadata.FunctionARN"
+        name = "Name"
+        date = "FunctionMetadata.LastModifiedTime"
+        cfn_type = "AWS::CloudFront::Function"
+        permission_augment = ("cloudfront:ListTagsForResource",)
+
+    source_mapping = {
+        'describe': DescribeFunction,
+        'config': ConfigSource
+    }
 
 @resources.register("origin-access-control")
 class OriginAccessControl(QueryResourceManager):
