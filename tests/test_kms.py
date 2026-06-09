@@ -189,10 +189,15 @@ class KMSTest(BaseTest):
                 "filters": [
                     {
                         "type": "last-usage",
-                        "key": "Timestamp",
-                        "value": 30,
-                        "value_type": "age",
-                        "op": "gte",
+                        "attrs": [
+                            {
+                                "type": "value",
+                                "key": "KeyLastUsage.Timestamp",
+                                "value": 30,
+                                "value_type": "age",
+                                "op": "gte",
+                            }
+                        ],
                     }
                 ],
             },
@@ -202,8 +207,11 @@ class KMSTest(BaseTest):
             resources = p.run()
         self.assertEqual(len(resources), 1)
         self.assertIn("c7n:LastUsage", resources[0])
-        self.assertIn("Timestamp", resources[0]["c7n:LastUsage"])
-        self.assertEqual(resources[0]["c7n:LastUsage"]["Operation"], "Decrypt")
+        self.assertEqual(len(resources[0]["c7n:LastUsage"]), 1)
+        self.assertIn("KeyLastUsage", resources[0]["c7n:LastUsage"][0])
+        self.assertEqual(
+            resources[0]["c7n:LastUsage"][0]["KeyLastUsage"]["Operation"], "Decrypt"
+        )
 
     def test_last_usage_never_used(self):
         session_factory = self.replay_flight_data("test_kms_last_usage_never_used")
@@ -214,8 +222,13 @@ class KMSTest(BaseTest):
                 "filters": [
                     {
                         "type": "last-usage",
-                        "key": "Timestamp",
-                        "value": "absent",
+                        "attrs": [
+                            {
+                                "type": "value",
+                                "key": "KeyLastUsage.Timestamp",
+                                "value": "absent",
+                            }
+                        ],
                     }
                 ],
             },
@@ -223,7 +236,46 @@ class KMSTest(BaseTest):
         )
         resources = p.run()
         self.assertEqual(len(resources), 1)
-        self.assertEqual(resources[0]["c7n:LastUsage"], {})
+        self.assertEqual(len(resources[0]["c7n:LastUsage"]), 1)
+        self.assertEqual(resources[0]["c7n:LastUsage"][0]["KeyLastUsage"], {})
+        self.assertIn("TrackingStartDate", resources[0]["c7n:LastUsage"][0])
+
+    def test_last_usage_multi_attr(self):
+        session_factory = self.replay_flight_data("test_kms_last_usage")
+        p = self.load_policy(
+            {
+                "name": "kms-last-usage-multi",
+                "resource": "kms-key",
+                "filters": [
+                    {
+                        "type": "last-usage",
+                        "attrs": [
+                            {
+                                "type": "value",
+                                "key": "KeyLastUsage.Operation",
+                                "value": "Decrypt",
+                            },
+                            {
+                                "type": "value",
+                                "key": "KeyLastUsage.Timestamp",
+                                "value": 30,
+                                "value_type": "age",
+                                "op": "gte",
+                            },
+                        ],
+                    }
+                ],
+            },
+            session_factory=session_factory,
+        )
+        with freeze_time("2026-06-07T00:00:00+00:00"):
+            resources = p.run()
+        self.assertEqual(len(resources), 1)
+        self.assertEqual(
+            resources[0]["c7n:LastUsage"][0]["KeyLastUsage"]["Operation"], "Decrypt"
+        )
+        self.assertIn("TrackingStartDate", resources[0]["c7n:LastUsage"][0])
+        self.assertIn("KeyCreationDate", resources[0]["c7n:LastUsage"][0])
 
     def test_last_usage_invalid_operation(self):
         self.assertRaises(
@@ -235,8 +287,35 @@ class KMSTest(BaseTest):
                 "filters": [
                     {
                         "type": "last-usage",
-                        "key": "Operation",
-                        "value": "InvalidOp",
+                        "attrs": [
+                            {
+                                "type": "value",
+                                "key": "KeyLastUsage.Operation",
+                                "value": "InvalidOp",
+                            }
+                        ],
+                    }
+                ],
+            },
+        )
+
+    def test_last_usage_invalid_operation_short_key(self):
+        self.assertRaises(
+            ValueError,
+            self.load_policy,
+            {
+                "name": "kms-invalid-operation-short-key",
+                "resource": "kms-key",
+                "filters": [
+                    {
+                        "type": "last-usage",
+                        "attrs": [
+                            {
+                                "type": "value",
+                                "key": "Operation",
+                                "value": "BadOp",
+                            }
+                        ],
                     }
                 ],
             },
