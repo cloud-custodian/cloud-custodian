@@ -11,7 +11,7 @@ import sys
 
 from c7n import deprecated, query
 from c7n.actions import Action
-from c7n.filters import Filter
+from c7n.filters import Filter, ValueFilter
 from c7n.manager import resources
 from c7n.query import DescribeSource
 from c7n.exceptions import PolicyValidationError, PolicyExecutionError
@@ -719,6 +719,82 @@ class DescribeSecurityhubFinding(DescribeSource):
         )
 
         return super().resources(query=query)
+
+
+class DescribeSecurityHub(DescribeSource):
+    def get_hub(self):
+        client = local_session(self.manager.session_factory).client('securityhub')
+        try:
+            hub = client.describe_hub()
+        except client.exceptions.InvalidAccessException:
+            return None
+        hub.pop('ResponseMetadata', None)
+        return hub
+
+    def resources(self, query=None):
+        hub = self.get_hub()
+        return [hub] if hub else []
+
+
+@resources.register("security-hub")
+class SecurityHub(query.QueryResourceManager):
+    """AWS Security Hub configuration for the current account and region.
+
+    :example:
+
+    .. code-block:: yaml
+
+        policies:
+          - name: securityhub-auto-enable-controls-disabled
+            resource: aws.security-hub
+            filters:
+              - AutoEnableControls: false
+    """
+
+    class resource_type(query.TypeInfo):
+        service = "securityhub"
+        arn = id = "HubArn"
+        name = "HubArn"
+        arn_type = "hub"
+        cfn_type = config_type = "AWS::SecurityHub::Hub"
+        permissions_enum = ("securityhub:DescribeHub",)
+
+    source_mapping = {"describe": DescribeSecurityHub}
+
+
+@SecurityHub.filter_registry.register('master')
+class HubMasterFilter(ValueFilter):
+    """Filter Security Hub by master account details.
+
+    :example:
+
+    .. code-block:: yaml
+
+        policies:
+          - name: securityhub-master-account
+            resource: aws.security-hub
+            filters:
+              - type: master
+                key: AccountId
+                value: '111111111111'
+    """
+
+    schema = type_schema('master', rinherit=ValueFilter.schema)
+    permissions = ('securityhub:GetMasterAccount',)
+    annotation_key = 'c7n:Master'
+
+    def process(self, resources, event=None):
+        client = local_session(self.manager.session_factory).client('securityhub')
+        results = []
+        for r in resources:
+            if self.annotation_key not in r:
+                try:
+                    r[self.annotation_key] = client.get_master_account().get('Master', {})
+                except client.exceptions.ResourceNotFoundException:
+                    r[self.annotation_key] = {}
+            if self.match(r[self.annotation_key]):
+                results.append(r)
+        return results
 
 
 @resources.register("securityhub-finding")
