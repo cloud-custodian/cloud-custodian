@@ -321,6 +321,62 @@ class KMSTest(BaseTest):
             },
         )
 
+    def test_last_usage_error(self):
+        session_factory = self.replay_flight_data("test_kms_last_usage_error")
+        p = self.load_policy(
+            {
+                "name": "kms-last-usage-error",
+                "resource": "kms-key",
+                "filters": [
+                    {
+                        "type": "last-usage",
+                        "attrs": [
+                            {
+                                "type": "value",
+                                "key": "KeyLastUsage.Timestamp",
+                                "value": "absent",
+                            }
+                        ],
+                    }
+                ],
+            },
+            session_factory=session_factory,
+        )
+        resources = p.run()
+        self.assertEqual(len(resources), 0)
+
+    def test_last_usage_cached_annotation(self):
+        session_factory = self.replay_flight_data("test_kms_last_usage")
+        p = self.load_policy(
+            {
+                "name": "kms-last-usage-cached",
+                "resource": "kms-key",
+                "filters": [
+                    {
+                        "type": "last-usage",
+                        "attrs": [
+                            {
+                                "type": "value",
+                                "key": "KeyLastUsage.Timestamp",
+                                "value": 30,
+                                "value_type": "age",
+                                "op": "gte",
+                            }
+                        ],
+                    }
+                ],
+            },
+            session_factory=session_factory,
+        )
+        with freeze_time("2026-06-07T00:00:00+00:00"):
+            resources = p.run()
+        self.assertEqual(len(resources), 1)
+        # Run again - should use cached annotation
+        with freeze_time("2026-06-07T00:00:00+00:00"):
+            resources = p.resource_manager.filter_resources(resources, None)
+        self.assertEqual(len(resources), 1)
+        self.assertIn("c7n:LastUsage", resources[0])
+
     def test_key_rotation_exception_unsupportedopp(self):
         region = "us-west-2"
         session_factory = self.replay_flight_data(
