@@ -90,6 +90,7 @@ class StreamingDistribution(QueryResourceManager):
         'config': ConfigSource
     }
 
+
 class DescribeFunction(DescribeSource):
     def augment(self, resources):
         return universal_augment(self.manager, resources)
@@ -107,6 +108,7 @@ class DescribeFunction(DescribeSource):
             results = super().get_resources(function_names, cache)
         return results
 
+
 @resources.register('cloudfront-function')
 class Function(QueryResourceManager):
     class resource_type(TypeInfo):
@@ -118,12 +120,14 @@ class Function(QueryResourceManager):
         name = "Name"
         date = "FunctionMetadata.LastModifiedTime"
         cfn_type = "AWS::CloudFront::Function"
+        universal_taggable = True
         permission_augment = ("cloudfront:ListTagsForResource",)
 
     source_mapping = {
         'describe': DescribeFunction,
         'config': ConfigSource
     }
+
 
 @resources.register("origin-access-control")
 class OriginAccessControl(QueryResourceManager):

@@ -1,11 +1,42 @@
 {
-    "status_code": 403,
+    "status_code": 200,
     "data": {
-        "Error": {
-            "Message": "The security token included in the request is invalid.",
-            "Code": "InvalidClientTokenId",
-            "Type": "Sender"
-        },
-        "ResponseMetadata": {}
+        "ResponseMetadata": {},
+        "FunctionList": {
+            "MaxItems": 100,
+            "Quantity": 1,
+            "Items": [
+                {
+                    "Name": "barbara-test",
+                    "FunctionConfig": {
+                        "Runtime": "cloudfront-js-2.0"
+                    },
+                    "FunctionMetadata": {
+                        "FunctionARN": "arn:aws:cloudfront::644160558196:function/barbara-test",
+                        "Stage": "DEVELOPMENT",
+                        "CreatedTime": {
+                            "__class__": "datetime",
+                            "year": 2026,
+                            "month": 6,
+                            "day": 3,
+                            "hour": 19,
+                            "minute": 23,
+                            "second": 51,
+                            "microsecond": 330000
+                        },
+                        "LastModifiedTime": {
+                            "__class__": "datetime",
+                            "year": 2026,
+                            "month": 6,
+                            "day": 3,
+                            "hour": 19,
+                            "minute": 23,
+                            "second": 51,
+                            "microsecond": 360000
+                        }
+                    }
+                }
+            ]
+        }
     }
 }
