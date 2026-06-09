@@ -4,8 +4,8 @@
         "ResponseMetadata": {},
         "agentAliasSummaries": [
             {
-                "agentAliasId": "9BURUS1YWF",
-                "agentAliasName": "TSTALIASID",
+                "agentAliasId": "DPKND2PF9A",
+                "agentAliasName": "c7ntest",
                 "routingConfiguration": [
                     {
                         "agentVersion": "1"
@@ -16,21 +16,21 @@
                     "__class__": "datetime",
                     "year": 2026,
                     "month": 6,
-                    "day": 7,
-                    "hour": 11,
-                    "minute": 55,
-                    "second": 35,
-                    "microsecond": 136508
+                    "day": 8,
+                    "hour": 14,
+                    "minute": 54,
+                    "second": 50,
+                    "microsecond": 755993
                 },
                 "updatedAt": {
                     "__class__": "datetime",
                     "year": 2026,
                     "month": 6,
-                    "day": 7,
-                    "hour": 11,
-                    "minute": 55,
-                    "second": 35,
-                    "microsecond": 136508
+                    "day": 8,
+                    "hour": 14,
+                    "minute": 54,
+                    "second": 50,
+                    "microsecond": 755993
                 },
                 "aliasInvocationState": "ACCEPT_INVOCATIONS"
             },
@@ -46,23 +46,23 @@
                 "agentAliasStatus": "PREPARED",
                 "createdAt": {
                     "__class__": "datetime",
-                    "year": 2024,
+                    "year": 2026,
                     "month": 6,
-                    "day": 26,
-                    "hour": 17,
-                    "minute": 23,
-                    "second": 11,
-                    "microsecond": 457889
+                    "day": 8,
+                    "hour": 14,
+                    "minute": 29,
+                    "second": 25,
+                    "microsecond": 284118
                 },
                 "updatedAt": {
                     "__class__": "datetime",
-                    "year": 2024,
+                    "year": 2026,
                     "month": 6,
-                    "day": 26,
-                    "hour": 17,
-                    "minute": 23,
-                    "second": 11,
-                    "microsecond": 457889
+                    "day": 8,
+                    "hour": 14,
+                    "minute": 29,
+                    "second": 25,
+                    "microsecond": 284118
                 },
                 "aliasInvocationState": "ACCEPT_INVOCATIONS"
             }

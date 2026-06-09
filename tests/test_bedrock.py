@@ -560,7 +560,7 @@ class BedrockAgent(BaseTest):
         self.assertEqual(e.exception.response['Error']['Code'], 'ResourceNotFoundException')
 
     def test_bedrock_agent_metrics(self):
-        session_factory = self.replay_flight_data('test_bedrock_agent_metrics')
+        session_factory = self.replay_flight_data('test_bedrock_agent_metrics', region='us-east-2')
         p = self.load_policy(
             {"name": "bedrock-agent-metrics",
              "resource": "bedrock-agent",
@@ -570,9 +570,9 @@ class BedrockAgent(BaseTest):
                  "statistics": "Sum",
                  "days": 30,
                  "value": 0,
-                 "op": "eq",
+                 "op": "gt",
                  "missing-value": 0}
-             ]},
+             ]}, config={"region": "us-east-2"},
             session_factory=session_factory
         )
 

@@ -489,6 +489,10 @@ class AgentMetrics(MetricsFilter):
 
         for p in parents.values():
             p_arn = Arn.parse(p['agentArn'])
+            if 'foundationModel' not in p:
+                # We can't build a valid set of dimensions for agent metrics
+                # without a model ID.
+                continue
             parent_info = {
                 'agentId': p['agentId'],
                 'arnAliasBase': (f"arn:{p_arn.partition}:bedrock:"
