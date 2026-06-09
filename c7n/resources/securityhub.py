@@ -756,7 +756,7 @@ class SecurityHub(query.QueryResourceManager):
         arn = id = "HubArn"
         name = "HubArn"
         arn_type = "hub"
-        cfn_type = config_type = "AWS::SecurityHub::Hub"
+        cfn_type = "AWS::SecurityHub::Hub"
         permissions_enum = ("securityhub:DescribeHub",)
 
     source_mapping = {"describe": DescribeSecurityHub}
