@@ -65,9 +65,7 @@ class GoogleFlightRecorder(CustodianTestCore):
 
         if C7N_FUNCTIONAL:
             self.recording = True
-            if not project_id:
-                return Session
-            return functools.partial(Session, project_id=project_id)
+            return functools.partial(Session, project_id=self.project_id)
 
         if project_id is None:
             project_id = PROJECT_ID
