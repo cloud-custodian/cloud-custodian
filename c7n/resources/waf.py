@@ -159,9 +159,9 @@ class WAFV2(QueryResourceManager):
         universal_taggable = object()
     source_mapping = {'describe': DescribeWafV2, 'config': ConfigSource}
 
-    # global_resource is required for universal tagging api calls. In order to have scope-aware
-    # global_resource behavior, we need to create a new resource_type instance for each manager
-    # to avoid modifying the shared class-level resource_type
+    # global_resource is required for universal tagging api calls to use the correct region. In
+    # order to have scope-aware global_resource behavior, we need to create a new resource_type
+    # instance for each manager to avoid modifying the shared class-level resource_type
     def __init__(self, ctx, data):
         super().__init__(ctx, data)
         self.resource_type = type(
