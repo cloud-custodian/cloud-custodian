@@ -126,6 +126,22 @@ class DescribeWafV2(DescribeSource):
 
 @resources.register('wafv2')
 class WAFV2(QueryResourceManager):
+    """WAFv2 Web ACLs.
+
+    By default, queries REGIONAL scope Web ACLs. To query CloudFront (global)
+    Web ACLs, set the scope in the query block:
+
+    .. code-block:: yaml
+
+        policies:
+          - name: cloudfront-webacls
+            resource: aws.wafv2
+            query:
+              - Scope: CLOUDFRONT
+
+    CLOUDFRONT-scoped Web ACLs are global resources managed via us-east-1
+    regardless of the policy's configured region.
+    """
 
     class resource_type(TypeInfo):
         service = "wafv2"
@@ -173,22 +189,6 @@ class WAFV2(QueryResourceManager):
     def get_client(self):
         return local_session(self.session_factory).client(
             self.resource_type.service, region_name=self.scope_region)
-
-
-# @WAFV2.action_registry.register('tag')
-# @WAFV2.action_registry.register('mark')
-# class WAFV2Tag(UniversalTag):
-#     def get_client(self):
-#         return local_session(self.manager.session_factory).client(
-#             'resourcegroupstaggingapi', region_name=self.manager.scope_region)
-
-
-# @WAFV2.action_registry.register('remove-tag')
-# @WAFV2.action_registry.register('unmark')
-# class WAFV2Untag(UniversalUntag):
-#     def get_client(self):
-#         return local_session(self.manager.session_factory).client(
-#             'resourcegroupstaggingapi', region_name=self.manager.scope_region)
 
 
 @WAFV2.filter_registry.register('logging')
