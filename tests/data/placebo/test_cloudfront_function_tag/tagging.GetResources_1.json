@@ -9,10 +9,6 @@
                     {
                         "Key": "foo",
                         "Value": "bar"
-                    },
-                    {
-                        "Key": "env",
-                        "Value": "test"
                     }
                 ]
             }
