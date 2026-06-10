@@ -16,6 +16,7 @@ from c7n.query import (
 from c7n.utils import local_session, type_schema, select_keys
 from c7n.tags import universal_augment
 
+from .aws import fake_session
 from .securityhub import PostFinding
 
 
@@ -575,23 +576,6 @@ class LastUsage(ListItemFilter):
 
     """
 
-    # Tracked cryptographic operations returned by GetKeyLastUsage.
-    # Reference: https://docs.aws.amazon.com/kms/latest/developerguide/monitoring-keys-determining-usage.html#determining-usage-key-last-usage-tracking
-    TRACKED_OPERATIONS = [
-        'Decrypt',
-        'DeriveSharedSecret',
-        'Encrypt',
-        'GenerateDataKey',
-        'GenerateDataKeyPair',
-        'GenerateDataKeyPairWithoutPlaintext',
-        'GenerateDataKeyWithoutPlaintext',
-        'GenerateMac',
-        'ReEncrypt',
-        'Sign',
-        'Verify',
-        'VerifyMac',
-    ]
-
     schema = type_schema(
         'last-usage',
         attrs={'$ref': '#/definitions/filters_common/list_item_attrs'},
@@ -609,16 +593,22 @@ class LastUsage(ListItemFilter):
         If filtering by Operation, ensure the value is a recognized
         tracked cryptographic operation.
         """
+        # Pull tracked operations from the service model instead of hardcoding
+        session = fake_session()._session
+        service_model = session.get_service_model('kms')
+        tracked_operations = service_model.shape_for(
+            'KeyLastUsageTrackingOperation'
+        ).enum
         for attr in self.data.get('attrs', []):
             if (
                 attr.get('key') in ('Operation', 'KeyLastUsage.Operation')
                 and attr.get('op', 'eq') == 'eq'
                 and attr.get('value')
-                and attr['value'] not in self.TRACKED_OPERATIONS
+                and attr['value'] not in tracked_operations
             ):
                 raise ValueError(
                     f"Invalid Operation value '{attr['value']}'. "
-                    f"Valid operations: {', '.join(self.TRACKED_OPERATIONS)}"
+                    f"Valid operations: {', '.join(tracked_operations)}"
                 )
         return self
 
