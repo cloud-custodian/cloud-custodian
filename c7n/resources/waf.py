@@ -3,14 +3,14 @@
 import functools
 
 from c7n.manager import resources
-from c7n.query import (ConfigSource, QueryResourceManager, TypeInfo,
-                       DescribeSource, DescribeWithResourceTags)
+from c7n.query import ConfigSource, QueryResourceManager, TypeInfo, DescribeSource
 from c7n.tags import universal_augment
 from c7n.filters import ValueFilter, ListItemFilter
 from c7n.utils import type_schema, local_session
 from c7n.actions import BaseAction
-from c7n.exceptions import PolicyValidationError
+from c7n.exceptions import ClientError, PolicyValidationError
 from c7n.resources.aws import shape_validate
+from c7n.utils import is_not_found
 
 
 class DescribeRegionalWaf(DescribeSource):
@@ -22,28 +22,6 @@ class DescribeRegionalWaf(DescribeSource):
     def augment(self, resources):
         resources = super().augment(resources)
         return universal_augment(self.manager, resources)
-
-
-class DescribeWafV2(DescribeWithResourceTags):
-
-    def augment(self, resources):
-        return [{'Scope': self.manager.scope, **r}
-                  for r in super().augment(resources)]
-
-    def get_resources(self, ids):
-        params = {'Scope': self.manager.scope}
-        resources = self.query.filter(self.manager, **params)
-        id_key = self.manager.resource_type.id
-        return [r for r in resources if r[id_key] in ids]
-
-    def get_permissions(self):
-        perms = super().get_permissions()
-        perms.remove('wafv2:GetWebAcl')
-        return perms
-
-    # set REGIONAL for Scope as default
-    def get_query_params(self, query_params):
-        return {**(query_params or {}), 'Scope': self.manager.scope}
 
 
 class DescribeWaf(DescribeSource):
@@ -92,8 +70,63 @@ class RegionalWAF(QueryResourceManager):
     source_mapping = {'describe': DescribeRegionalWaf, 'config': ConfigSource}
 
 
+class DescribeWafV2(DescribeSource):
+
+    # Essentially a copy of DescribeSource.augment with the addition of Scope and Name parameters
+    def augment(self, resources):
+        client = self.manager.get_client()
+        scope = self.manager.scope
+        detail_op, param_name, param_key, detail_path = self.manager.resource_type.detail_spec
+
+        op = getattr(client, detail_op)
+        if self.manager.retry:
+            op = functools.partial(self.manager.retry, op)
+
+        def get_detail(r):
+            kwargs = {
+                param_name: r[param_key],
+                'Scope': scope,
+                'Name': r['Name']
+            }
+            try:
+                response = op(**kwargs)
+            except ClientError as e:
+                if not is_not_found(e):
+                    raise
+                self.manager.log.warning("Resource not found: %s id:%s" % (detail_op, r[param_key]))
+                return None
+            r.update(response.get(detail_path, {}))
+            r['Scope'] = scope
+            return r
+
+        resources = universal_augment(self.manager, resources)
+        return [r for r in map(get_detail, resources) if r is not None]
+
+    def get_resources(self, ids):
+        params = {'Scope': self.manager.scope}
+        resources = self.query.filter(self.manager, **params)
+        id_key = self.manager.resource_type.id
+        return [r for r in resources if r[id_key] in ids]
+
+    def get_permissions(self):
+        perms = super().get_permissions()
+        perms.remove('wafv2:GetWebAcl')
+        return perms
+
+    # set REGIONAL for Scope as default
+    def get_query_params(self, query_params):
+        query_params = query_params or {}
+        # Parse query from policy data
+        queries = self.manager.data.get('query', [])
+        for q in queries:
+            query_params.update(q)
+        query_params['Scope'] = self.manager.scope
+        return query_params
+
+
 @resources.register('wafv2')
 class WAFV2(QueryResourceManager):
+
     class resource_type(TypeInfo):
         service = "wafv2"
         enum_spec = ("list_web_acls", "WebACLs", None)
@@ -108,10 +141,20 @@ class WAFV2(QueryResourceManager):
         permissions_enum = ('wafv2:ListWebACLs',)
         permissions_augment = ('wafv2:GetWebACL', "wafv2:ListTagsForResource")
         universal_taggable = object()
-
     source_mapping = {'describe': DescribeWafV2, 'config': ConfigSource}
 
-    @functools.cached_property
+    # global_resource is required for universal tagging api calls. In order to have scope-aware
+    # global_resource behavior, we need to create a new resource_type instance for each manager
+    # to avoid modifying the shared class-level resource_type
+    def __init__(self, ctx, data):
+        super().__init__(ctx, data)
+        self.resource_type = type(
+            'WAFV2ResourceType',
+            (self.__class__.resource_type,),
+            {'global_resource': self.scope == 'CLOUDFRONT'}
+        )
+
+    @property
     def scope(self):
         for q in self.data.get('query', []):
             if 'Scope' in q:
@@ -130,6 +173,22 @@ class WAFV2(QueryResourceManager):
     def get_client(self):
         return local_session(self.session_factory).client(
             self.resource_type.service, region_name=self.scope_region)
+
+
+# @WAFV2.action_registry.register('tag')
+# @WAFV2.action_registry.register('mark')
+# class WAFV2Tag(UniversalTag):
+#     def get_client(self):
+#         return local_session(self.manager.session_factory).client(
+#             'resourcegroupstaggingapi', region_name=self.manager.scope_region)
+
+
+# @WAFV2.action_registry.register('remove-tag')
+# @WAFV2.action_registry.register('unmark')
+# class WAFV2Untag(UniversalUntag):
+#     def get_client(self):
+#         return local_session(self.manager.session_factory).client(
+#             'resourcegroupstaggingapi', region_name=self.manager.scope_region)
 
 
 @WAFV2.filter_registry.register('logging')
