@@ -850,10 +850,10 @@ class ServiceLimit(Filter):
     def validate(self):
         region = self.manager.data.get('region', '')
         if len(self.global_services.intersection(self.data.get('services', []))):
-            if region != 'us-east-1':
+            if region != get_support_region(self.manager):
                 raise PolicyValidationError(
-                    "Global services: %s must be targeted in us-east-1 on the policy"
-                    % ', '.join(self.global_services))
+                    "Global services: %s must be targeted in %s on the policy"
+                    % (', '.join(self.global_services), get_support_region(self.manager)))
         return self
 
     @classmethod
@@ -935,10 +935,11 @@ class ServiceLimit(Filter):
             return []
 
         # trim to only results for this region
+        support_region = get_support_region(self.manager)
         results['flaggedResources'] = [
             r
             for r in results.get('flaggedResources', [])
-            if r['metadata'][0] == region or (r['metadata'][0] == '-' and region == 'us-east-1')
+            if r['metadata'][0] == region or (r['metadata'][0] == '-' and region == support_region)
         ]
 
         # save all raw limit results to the account resource

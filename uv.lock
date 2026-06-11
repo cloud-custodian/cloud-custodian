@@ -504,16 +504,16 @@ wheels = [
 
 [[package]]
 name = "azure-mgmt-cosmosdb"
-version = "6.4.0"
+version = "9.9.0"
 source = { registry = "https://pypi.org/simple" }
 dependencies = [
-    { name = "azure-common" },
     { name = "azure-mgmt-core" },
     { name = "msrest" },
+    { name = "typing-extensions" },
 ]
-sdist = { url = "https://files.pythonhosted.org/packages/65/81/d6d8812775b253c698e29c4f0f4a983aa4111b874fa9a9f2ae153b9e515a/azure-mgmt-cosmosdb-6.4.0.zip", hash = "sha256:fb6b8ab80ab97214b94ae9e462ba1c459b68a3af296ffc26317ebd3ff500e00b", size = 344309, upload-time = "2021-06-22T02:47:24.021Z" }
+sdist = { url = "https://files.pythonhosted.org/packages/05/e3/8687e481a34c83f5a6e6d9d3a084c8344920aaf6a505b19a299e58f20421/azure_mgmt_cosmosdb-9.9.0.tar.gz", hash = "sha256:4678bf042bdc208aa24fca71767ac29b6f2a2722ac7872608371a5922f3b6c37", size = 285338, upload-time = "2025-11-14T06:29:06.641Z" }
 wheels = [
-    { url = "https://files.pythonhosted.org/packages/d0/f7/2e28b1881382247cdbc150b0f19c58987c802815568ddd02284de5b1c15f/azure_mgmt_cosmosdb-6.4.0-py2.py3-none-any.whl", hash = "sha256:aa10e728be4706189173916e7ecb49da98a8b96fbacbec1d2b48ca6cdad3efc9", size = 290550, upload-time = "2021-06-22T02:47:21.431Z" },
+    { url = "https://files.pythonhosted.org/packages/3e/6b/19a16013a805e506f5e775d79587859852b1a07dd6ae5b377ab541ef4692/azure_mgmt_cosmosdb-9.9.0-py3-none-any.whl", hash = "sha256:31322770c61fdca6bcd1444e9dad501a5a225879c152ec1fd57ab5c68901a1fa", size = 420362, upload-time = "2025-11-14T06:29:09.083Z" },
 ]
 
 [[package]]
@@ -1556,7 +1556,7 @@ requires-dist = [
     { name = "azure-mgmt-containerinstance", specifier = ">=7.0.0,<8.0.0" },
     { name = "azure-mgmt-containerregistry", specifier = ">=14.0.0,<15.0.0" },
     { name = "azure-mgmt-containerservice", specifier = ">=15.0.0,<16.0.0" },
-    { name = "azure-mgmt-cosmosdb", specifier = ">=6.1.0,<7.0.0" },
+    { name = "azure-mgmt-cosmosdb", specifier = ">=6.1.0,<10.0.0" },
     { name = "azure-mgmt-costmanagement", specifier = ">=1.0.0,<2.0.0" },
     { name = "azure-mgmt-databricks", specifier = "==1.0.0b1" },
     { name = "azure-mgmt-datafactory", specifier = ">=1.0.0,<2.0.0" },

@@ -323,6 +323,7 @@ ResourceMap = {
   "aws.scaling-policy": "c7n.resources.asg.ScalingPolicy",
   "aws.secrets-manager": "c7n.resources.secretsmanager.SecretsManager",
   "aws.security-group": "c7n.resources.vpc.SecurityGroup",
+  "aws.security-hub": "c7n.resources.securityhub.SecurityHub",
   "aws.securityhub-finding": "c7n.resources.securityhub.SecurityhubFinding",
   "aws.serverless-app": "c7n.resources.sar.ServerlessApp",
   "aws.servicediscovery-namespace": "c7n.resources.servicediscovery.ServiceDiscoveryNamespace",

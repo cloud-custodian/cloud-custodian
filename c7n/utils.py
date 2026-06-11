@@ -1059,6 +1059,24 @@ def get_human_size(size, precision=2):
     return "%.*f %s" % (precision, size, suffixes[suffixIndex])
 
 
+def is_not_found(err):
+    """Attempt for an aws exception to determine if its a NotFound error.
+
+    Returns boolean.
+
+    Across the set of AWS services the error handling behavior, runs
+    across many different behavior patterns for NotFound style
+    exceptions. We want to use any unambigious signal in the error
+    code but also not flag an exception that could potentially represent
+    another error that user should be informed about.
+    """
+    code = err.response['Error']['Code']
+    for s in ('NotFound', 'NoSuch'):
+        if s in code:
+            return True
+    return False
+
+
 def get_support_region(manager):
     # support is a unique service in that it doesnt support regional endpoints
     # thus, we need to construct the client based off the regions found here:

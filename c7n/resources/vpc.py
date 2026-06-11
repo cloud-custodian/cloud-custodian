@@ -2820,6 +2820,19 @@ class VpcEndpoint(query.QueryResourceManager):
         cfn_type = config_type = "AWS::EC2::VPCEndpoint"
 
 
+@VpcEndpoint.action_registry.register('delete')
+class DeleteVpcEndpoint(BaseAction):
+
+    schema = type_schema('delete')
+    permissions = ('ec2:DeleteVpcEndpoints',)
+
+    def process(self, resources):
+        client = local_session(self.manager.session_factory).client('ec2')
+        for resource_set in chunks(resources, 25):
+            client.delete_vpc_endpoints(
+                VpcEndpointIds=[r['VpcEndpointId'] for r in resource_set])
+
+
 @VpcEndpoint.filter_registry.register('metrics')
 class VpcEndpointMetricsFilter(MetricsFilter):
 
