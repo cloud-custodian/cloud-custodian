@@ -130,7 +130,7 @@ class TagModelAlgorithm(Tag):
 
 @CleanRoomsMLConfiguredModelAlgorithm.action_registry.register('remove-tag')
 class RemoveTagModelAlgorithm(RemoveTag):
-    permissions = ('cleanrooms-ml:UntagResource',)
+    permissions = ('cleanrooms-ml:UnTagResource',)
 
     def process_resource_set(self, client, resources, tags):
         for r in resources:
