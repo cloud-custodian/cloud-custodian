@@ -1,1 +1,0 @@
-2026-06-02 22:12:48,546 - custodian.policy - INFO - policy:test-location-config-region resource:gcp.vertex-ai-endpoint region:us-central1 count:1 time:0.08
