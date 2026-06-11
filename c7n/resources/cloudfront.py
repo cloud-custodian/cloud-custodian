@@ -7,7 +7,8 @@ from botocore.exceptions import ClientError
 from c7n.actions import BaseAction
 from c7n.filters import MetricsFilter, ShieldMetrics, Filter
 from c7n.manager import resources
-from c7n.query import ConfigSource, QueryResourceManager, DescribeSource, TypeInfo
+from c7n.query import (ConfigSource, QueryResourceManager, DescribeSource,
+                       TypeInfo, DescribeWithResourceTags)
 from c7n.tags import universal_augment
 from c7n.utils import local_session, merge_dict, type_schema, get_retry
 from c7n.filters import ValueFilter, WafV2FilterBase
@@ -91,12 +92,6 @@ class StreamingDistribution(QueryResourceManager):
     }
 
 
-class DescribeFunction(DescribeSource):
-
-    def augment(self, resources):
-        return universal_augment(self.manager, resources)
-
-
 @resources.register('cloudfront-function')
 class Function(QueryResourceManager):
     class resource_type(TypeInfo):
@@ -112,15 +107,9 @@ class Function(QueryResourceManager):
         permission_augment = ("cloudfront:ListTagsForResource",)
 
     source_mapping = {
-        'describe': DescribeFunction,
+        'describe': DescribeWithResourceTags,
         'config': ConfigSource
     }
-
-
-class DescribeKeyValueStore(DescribeSource):
-
-    def augment(self, resources):
-        return universal_augment(self.manager, resources)
 
 
 @resources.register('cloudfront-key-value-store')
@@ -138,7 +127,7 @@ class KeyValueStore(QueryResourceManager):
         permission_augment = ("cloudfront:ListTagsForResource",)
 
     source_mapping = {
-        'describe': DescribeKeyValueStore,
+        'describe': DescribeWithResourceTags,
         'config': ConfigSource
     }
 
