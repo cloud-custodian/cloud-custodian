@@ -164,6 +164,7 @@ class WAFV2(QueryResourceManager):
     # instance for each manager to avoid modifying the shared class-level resource_type
     def __init__(self, ctx, data):
         super().__init__(ctx, data)
+        self._client = None
         self.resource_type = type(
             'WAFV2ResourceType',
             (self.__class__.resource_type,),
