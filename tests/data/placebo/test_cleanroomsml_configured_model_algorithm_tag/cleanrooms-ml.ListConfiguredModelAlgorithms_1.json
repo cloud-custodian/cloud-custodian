@@ -1,0 +1,57 @@
+{
+    "status_code": 200,
+    "data": {
+        "ResponseMetadata": {},
+        "configuredModelAlgorithms": [
+            {
+                "createTime": {
+                    "__class__": "datetime",
+                    "year": 2026,
+                    "month": 6,
+                    "day": 9,
+                    "hour": 5,
+                    "minute": 46,
+                    "second": 9,
+                    "microsecond": 383204
+                },
+                "updateTime": {
+                    "__class__": "datetime",
+                    "year": 2026,
+                    "month": 6,
+                    "day": 9,
+                    "hour": 5,
+                    "minute": 46,
+                    "second": 9,
+                    "microsecond": 383204
+                },
+                "configuredModelAlgorithmArn": "arn:aws:cleanrooms-ml:us-east-1:644160558196:configured-model-algorithm/aouupaC7NV12UHajW1tUq2",
+                "name": "c7n-rogue"
+            },
+            {
+                "createTime": {
+                    "__class__": "datetime",
+                    "year": 2026,
+                    "month": 6,
+                    "day": 9,
+                    "hour": 5,
+                    "minute": 45,
+                    "second": 22,
+                    "microsecond": 994308
+                },
+                "updateTime": {
+                    "__class__": "datetime",
+                    "year": 2026,
+                    "month": 6,
+                    "day": 9,
+                    "hour": 5,
+                    "minute": 45,
+                    "second": 22,
+                    "microsecond": 994308
+                },
+                "configuredModelAlgorithmArn": "arn:aws:cleanrooms-ml:us-east-1:644160558196:configured-model-algorithm/WeKkGpWcZW3yMkyvzyhGm9",
+                "name": "c7n-authorized",
+                "description": ""
+            }
+        ]
+    }
+}
