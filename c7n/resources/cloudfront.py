@@ -90,10 +90,12 @@ class StreamingDistribution(QueryResourceManager):
         'config': ConfigSource
     }
 
+
 class DescribeFunction(DescribeSource):
 
     def augment(self, resources):
         return universal_augment(self.manager, resources)
+
 
 @resources.register('cloudfront-function')
 class Function(QueryResourceManager):
@@ -114,10 +116,12 @@ class Function(QueryResourceManager):
         'config': ConfigSource
     }
 
+
 class DescribeKeyValueStore(DescribeSource):
 
     def augment(self, resources):
         return universal_augment(self.manager, resources)
+
 
 @resources.register('cloudfront-key-value-store')
 class KeyValueStore(QueryResourceManager):
