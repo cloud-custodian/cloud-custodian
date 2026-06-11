@@ -187,8 +187,11 @@ class WAFV2(QueryResourceManager):
         return 'us-east-1' if self.scope == 'CLOUDFRONT' else self.region
 
     def get_client(self):
-        return local_session(self.session_factory).client(
-            self.resource_type.service, region_name=self.scope_region)
+        if self._client is None:
+            self._client = local_session(self.session_factory).client(
+                self.resource_type.service, region_name=self.scope_region)
+
+        return self._client
 
 
 @WAFV2.filter_registry.register('logging')
