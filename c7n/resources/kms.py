@@ -16,7 +16,6 @@ from c7n.query import (
 from c7n.utils import local_session, type_schema, select_keys
 from c7n.tags import universal_augment
 
-from .aws import fake_session
 from .securityhub import PostFinding
 
 
@@ -584,53 +583,28 @@ class LastUsage(ListItemFilter):
     )
     schema_alias = False
     permissions = ('kms:GetKeyLastUsage',)
-    annotation_key = 'c7n:LastUsage'
+    item_annotation_key = 'c7n:LastUsage'
     annotate_items = True
+    _client = None
 
-    def validate(self):
-        """Validate filter configuration.
-
-        If filtering by Operation, ensure the value is a recognized
-        tracked cryptographic operation.
-        """
-        # Pull tracked operations from the service model instead of hardcoding
-        session = fake_session()._session
-        service_model = session.get_service_model('kms')
-        tracked_operations = service_model.shape_for(
-            'KeyLastUsageTrackingOperation'
-        ).enum
-        for attr in self.data.get('attrs', []):
-            if (
-                attr.get('key') in ('Operation', 'KeyLastUsage.Operation')
-                and attr.get('op', 'eq') == 'eq'
-                and attr.get('value')
-                and attr['value'] not in tracked_operations
-            ):
-                raise ValueError(
-                    f"Invalid Operation value '{attr['value']}'. "
-                    f"Valid operations: {', '.join(tracked_operations)}"
-                )
-        return self
+    def get_client(self):
+        if self._client is None:
+            self._client = local_session(self.manager.session_factory).client('kms')
+        return self._client
 
     def get_item_values(self, resource):
-        if self.annotation_key in resource:
-            return resource[self.annotation_key]
-
-        client = local_session(self.manager.session_factory).client('kms')
+        client = self.get_client()
         try:
             result = client.get_key_last_usage(KeyId=resource['KeyId'])
         except ClientError as err:
-            self.log.warning(err)
-            resource[self.annotation_key] = []
+            self.log.warning(
+                "error getting last usage for key:%s - %s",
+                resource['KeyId'], err
+            )
             return []
 
-        item = {
-            'KeyLastUsage': result.get('KeyLastUsage', {}),
-            'TrackingStartDate': result['TrackingStartDate'],
-            'KeyCreationDate': result['KeyCreationDate'],
-        }
-        resource[self.annotation_key] = [item]
-        return resource[self.annotation_key]
+        result.pop('ResponseMetadata', None)
+        return [result]
 
 
 @Key.action_registry.register("schedule-deletion")
