@@ -8,7 +8,6 @@ from google.api_core.client_options import ClientOptions
 
 from c7n.testing import C7N_FUNCTIONAL
 from c7n_gcp.client import get_default_project
-from c7n.config import Config
 from gcp_common import BaseTest
 
 
@@ -833,23 +832,16 @@ def test_vertexai_endpoint_location_config_region_singular(test):
     This test verifies that endpoints can be queried from a single location
     using the --region config parameter (singular, not plural).
     """
-    if C7N_FUNCTIONAL:
-        project_id = get_default_project()
-        session_factory = test.record_flight_data(
-            'vertexai-endpoint-location-config-region', project_id=project_id)
-    else:
-        session_factory = test.replay_flight_data(
-            'vertexai-endpoint-location-config-region')
-
-    config = Config.empty(region='us-central1')
-
-    policy = test.load_policy({
-        'name': 'test-location-config-region',
-        'resource': 'gcp.vertex-ai-endpoint'
-    }, session_factory=session_factory, config=config)
-
+    session_factory = test.replay_flight_data('vertexai-endpoint-location-config-region')
+    policy = test.load_policy(
+        {
+            'name': 'test-location-config-region',
+            'resource': 'gcp.vertex-ai-endpoint'
+        },
+        session_factory=session_factory,
+        config=test.get_test_config(region='us-central1')
+    )
     resources = policy.run()
-
     # Verify resources are only from the config region
     if resources:
         locations = {r['name'].split('/')[3] for r in resources}
@@ -863,22 +855,15 @@ def test_vertexai_endpoint_location_config_regions(test):
     This test verifies that endpoints can be queried from specific locations
     using the --regions config parameter.
     """
-
-    if C7N_FUNCTIONAL:
-        project_id = get_default_project()
-        session_factory = test.record_flight_data(
-            'vertexai-endpoint-location-config-regions', project_id=project_id)
-    else:
-        session_factory = test.replay_flight_data(
-            'vertexai-endpoint-location-config-regions')
-
-    config = Config.empty(regions=['us-central1', 'us-west1'])
-
-    policy = test.load_policy({
-        'name': 'test-location-config-regions',
-        'resource': 'gcp.vertex-ai-endpoint'
-    }, session_factory=session_factory, config=config)
-
+    session_factory = test.replay_flight_data('vertexai-endpoint-location-config-regions')
+    policy = test.load_policy(
+        {
+            'name': 'test-location-config-regions',
+            'resource': 'gcp.vertex-ai-endpoint'
+        },
+        session_factory=session_factory,
+        config=test.get_test_config(regions=['us-central1', 'us-west1'])
+    )
     resources = policy.run()
 
     # Verify resources are only from the config regions

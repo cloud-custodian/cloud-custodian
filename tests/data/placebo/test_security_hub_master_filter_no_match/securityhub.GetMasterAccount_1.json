@@ -1,0 +1,10 @@
+{
+    "status_code": 200,
+    "data": {
+        "ResponseMetadata": {},
+        "Master": {
+            "AccountId": "123456799012",
+            "MemberStatus": "Enabled"
+        }
+    }
+}
