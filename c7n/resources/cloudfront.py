@@ -90,24 +90,10 @@ class StreamingDistribution(QueryResourceManager):
         'config': ConfigSource
     }
 
-
 class DescribeFunction(DescribeSource):
+
     def augment(self, resources):
         return universal_augment(self.manager, resources)
-
-    def get_resources(self, ids, cache=True):
-        results = []
-        function_names = []
-        for i in ids:
-            # if we get cloudfront function arn, we pick function name
-            if i.startswith('arn:'):
-                function_names.append(Arn.parse(i).resource)
-            else:
-                function_names.append(i)
-        if function_names:
-            results = super().get_resources(function_names, cache)
-        return results
-
 
 @resources.register('cloudfront-function')
 class Function(QueryResourceManager):
@@ -125,6 +111,30 @@ class Function(QueryResourceManager):
 
     source_mapping = {
         'describe': DescribeFunction,
+        'config': ConfigSource
+    }
+
+class DescribeKeyValueStore(DescribeSource):
+
+    def augment(self, resources):
+        return universal_augment(self.manager, resources)
+
+@resources.register('cloudfront-key-value-store')
+class KeyValueStore(QueryResourceManager):
+    class resource_type(TypeInfo):
+        service = "cloudfront"
+        arn_type = "key-value-store"
+        enum_spec = ("list_key_value_stores", "KeyValueStoreList.Items", None)
+        id = "Name"
+        arn = "ARN"
+        name = "Name"
+        date = "LastModifiedTime"
+        cfn_type = "AWS::CloudFront::KeyValueStore"
+        universal_taggable = True
+        permission_augment = ("cloudfront:ListTagsForResource",)
+
+    source_mapping = {
+        'describe': DescribeKeyValueStore,
         'config': ConfigSource
     }
 

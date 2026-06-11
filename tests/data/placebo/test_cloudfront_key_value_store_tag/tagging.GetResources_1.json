@@ -4,7 +4,7 @@
         "PaginationToken": "",
         "ResourceTagMappingList": [
             {
-                "ResourceARN": "arn:aws:cloudfront::644160558196:function/test",
+                "ResourceARN": "arn:aws:cloudfront::644160558196:key-value-store/ca9f6587-4828-46fe-b4e2-af0bd7007154",
                 "Tags": [
                     {
                         "Key": "foo",

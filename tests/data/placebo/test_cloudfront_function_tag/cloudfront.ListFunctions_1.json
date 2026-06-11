@@ -7,12 +7,12 @@
             "Quantity": 1,
             "Items": [
                 {
-                    "Name": "barbara-test",
+                    "Name": "test",
                     "FunctionConfig": {
                         "Runtime": "cloudfront-js-2.0"
                     },
                     "FunctionMetadata": {
-                        "FunctionARN": "arn:aws:cloudfront::644160558196:function/barbara-test",
+                        "FunctionARN": "arn:aws:cloudfront::644160558196:function/test",
                         "Stage": "DEVELOPMENT",
                         "CreatedTime": {
                             "__class__": "datetime",
