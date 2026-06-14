@@ -47,6 +47,24 @@ from c7n.utils import local_session, dumps, jmespath_search, jmespath_compile, g
 
 log = logging.getLogger('custodian.reports')
 
+# Leading characters that spreadsheet applications (Excel, LibreOffice, Google
+# Sheets) interpret as the start of a formula. Report cells are populated from
+# resource tags and attributes, which anyone able to tag a resource in the
+# account controls, so a value like ``=cmd|'/c calc'!A1`` runs when the report
+# is opened. csv quoting does not stop this; the cell has to be neutralized.
+CSV_INJECTION_PREFIXES = ('=', '+', '-', '@', '\t', '\r')
+
+
+def sanitize_csv_value(value):
+    """Prefix a quote to values a spreadsheet would otherwise treat as a formula."""
+    if isinstance(value, str) and value[:1] in CSV_INJECTION_PREFIXES:
+        return "'" + value
+    return value
+
+
+def sanitize_csv_rows(rows):
+    return [[sanitize_csv_value(v) for v in row] for row in rows]
+
 
 def strip_output_path(path, policy_name):
     """Remove the date portion from an object storage output path.
@@ -100,7 +118,7 @@ def report(policies, start_date, options, output_fh, raw_output_fh=None):
     if options.format == 'csv':
         writer = csv.writer(output_fh, formatter.headers(), quoting=csv.QUOTE_ALL)
         writer.writerow(formatter.headers())
-        writer.writerows(rows)
+        writer.writerows(sanitize_csv_rows(rows))
     elif options.format == 'json':
         print(dumps(records, indent=2))
     else:
