@@ -3495,7 +3495,6 @@ class CrossAccountChecker(TestCase):
         self.assertEqual(len(results), 0)
 
     def test_cross_account_filter_whitelist_org_units(self):
-        """CrossAccountAccessFilter whitelists path with matching OU id."""
         f = self._make_filter({
             'type': 'cross-account',
             'whitelist_org_units': ['ou-ab12-prod'],
@@ -3519,7 +3518,6 @@ class CrossAccountChecker(TestCase):
         self.assertEqual(len(f.process([{'Policy': orgpath_policy}])), 0)
 
     def test_cross_account_filter_whitelist_org_units_from(self):
-        """CrossAccountAccessFilter.get_org_units() with whitelist_org_units_from branch."""
         f = self._make_filter({
             'type': 'cross-account',
             'whitelist_org_units_from': {'url': 's3://b/ous.txt', 'format': 'txt'},
