@@ -103,12 +103,11 @@ class Function(QueryResourceManager):
         name = "Name"
         date = "FunctionMetadata.LastModifiedTime"
         cfn_type = "AWS::CloudFront::Function"
-        universal_taggable = True
+        universal_taggable = object()
         permission_augment = ("cloudfront:ListTagsForResource",)
 
     source_mapping = {
-        'describe': DescribeWithResourceTags,
-        'config': ConfigSource
+        'describe': DescribeWithResourceTags
     }
 
 
@@ -123,7 +122,7 @@ class KeyValueStore(QueryResourceManager):
         name = "Name"
         date = "LastModifiedTime"
         cfn_type = "AWS::CloudFront::KeyValueStore"
-        universal_taggable = True
+        universal_taggable = object()
         permission_augment = ("cloudfront:ListTagsForResource",)
 
     source_mapping = {
