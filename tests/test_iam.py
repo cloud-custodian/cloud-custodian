@@ -2808,6 +2808,86 @@ class CrossAccountChecker(TestCase):
         violations = checker.check(policy)
         self.assertEqual(len(violations), 1)
 
+    def test_principal_org_paths_allowed_org_unit(self):
+        """Whitelisting an OU allows that OU and any descendant path."""
+        parent_ou_path = "o-allowed/r-ab12/ou-ab12-prod/*"
+        nested_ou_path = "o-allowed/r-ab12/ou-ab12-prod/ou-ab12-prod-team/*"
+
+        def policy_for(path):
+            return {
+                "Version": "2012-10-17",
+                "Statement": [{
+                    "Effect": "Allow",
+                    "Principal": "*",
+                    "Action": "s3:GetObject",
+                    "Resource": "*",
+                    "Condition": {
+                        "ForAnyValuesStringLike": {
+                            "aws:PrincipalOrgPaths": [path]
+                        }
+                    }
+                }]
+            }
+
+        checker = PolicyChecker({"allowed_org_units": {"ou-ab12-prod"}})
+        self.assertEqual(len(checker.check(policy_for(parent_ou_path))), 0)
+        self.assertEqual(len(checker.check(policy_for(nested_ou_path))), 0)
+
+        checker = PolicyChecker({"allowed_org_units": {"ou-ab12-prod-team"}})
+        self.assertEqual(len(checker.check(policy_for(parent_ou_path))), 1)
+        self.assertEqual(len(checker.check(policy_for(nested_ou_path))), 0)
+
+        checker = PolicyChecker({"allowed_org_units": {"ou-ab12-dev"}})
+        self.assertEqual(len(checker.check(policy_for(parent_ou_path))), 1)
+
+    def test_principal_org_paths_org_unit_does_not_match_whole_org(self):
+        """An OU whitelist must not allow a policy that grants access to the whole org."""
+        policy = {
+            "Version": "2012-10-17",
+            "Statement": [{
+                "Effect": "Allow",
+                "Principal": "*",
+                "Action": "s3:GetObject",
+                "Resource": "*",
+                "Condition": {
+                    "ForAnyValuesStringLike": {
+                        "aws:PrincipalOrgPaths": ["o-allowed/*"]
+                    }
+                }
+            }]
+        }
+        checker = PolicyChecker({"allowed_org_units": {"ou-ab12-prod"}})
+        self.assertEqual(len(checker.check(policy)), 1)
+
+    def test_principal_org_paths_combines_orgid_and_org_unit(self):
+        """A path is allowed if either its org ID or any segment OU is whitelisted."""
+        policy = {
+            "Version": "2012-10-17",
+            "Statement": [{
+                "Effect": "Allow",
+                "Principal": "*",
+                "Action": "s3:GetObject",
+                "Resource": "*",
+                "Condition": {
+                    "ForAnyValuesStringLike": {
+                        "aws:PrincipalOrgPaths": [
+                            "o-trusted/r-aa11/ou-aa11-anything/*",
+                            "o-other/r-bb22/ou-bb22-prod/*",
+                        ]
+                    }
+                }
+            }]
+        }
+
+        checker = PolicyChecker({
+            "allowed_orgid": {"o-trusted"},
+            "allowed_org_units": {"ou-bb22-prod"},
+        })
+        self.assertEqual(len(checker.check(policy)), 0)
+
+        checker = PolicyChecker({"allowed_orgid": {"o-trusted"}})
+        self.assertEqual(len(checker.check(policy)), 1)
+
     def test_org_id_with_specific_non_whitelisted_account(self):
         """Test that org ID doesn't save specific non-whitelisted account."""
         policy = {
@@ -3412,6 +3492,57 @@ class CrossAccountChecker(TestCase):
         with mock.patch('c7n.filters.iamaccess.ValuesFrom') as mock_vf_cls:
             mock_vf_cls.return_value.get_values.return_value = ['o-example123']
             results = f.process([{'Policy': orgid_policy}])
+        self.assertEqual(len(results), 0)
+
+    def test_cross_account_filter_whitelist_org_units(self):
+        """CrossAccountAccessFilter whitelists path with matching OU id."""
+        f = self._make_filter({
+            'type': 'cross-account',
+            'whitelist_org_units': ['ou-ab12-prod'],
+        })
+        orgpath_policy = json.dumps({
+            "Version": "2012-10-17",
+            "Statement": [{
+                "Effect": "Allow",
+                "Principal": "*",
+                "Action": "*",
+                "Resource": "*",
+                "Condition": {
+                    "ForAnyValuesStringLike": {
+                        "aws:PrincipalOrgPaths": [
+                            "o-example/r-ab12/ou-ab12-prod/*"
+                        ]
+                    }
+                }
+            }]
+        })
+        self.assertEqual(len(f.process([{'Policy': orgpath_policy}])), 0)
+
+    def test_cross_account_filter_whitelist_org_units_from(self):
+        """CrossAccountAccessFilter.get_org_units() with whitelist_org_units_from branch."""
+        f = self._make_filter({
+            'type': 'cross-account',
+            'whitelist_org_units_from': {'url': 's3://b/ous.txt', 'format': 'txt'},
+        })
+        orgpath_policy = json.dumps({
+            "Version": "2012-10-17",
+            "Statement": [{
+                "Effect": "Allow",
+                "Principal": "*",
+                "Action": "*",
+                "Resource": "*",
+                "Condition": {
+                    "ForAnyValuesStringLike": {
+                        "aws:PrincipalOrgPaths": [
+                            "o-example/r-ab12/ou-ab12-prod/*"
+                        ]
+                    }
+                }
+            }]
+        })
+        with mock.patch('c7n.filters.iamaccess.ValuesFrom') as mock_vf_cls:
+            mock_vf_cls.return_value.get_values.return_value = ['ou-ab12-prod']
+            results = f.process([{'Policy': orgpath_policy}])
         self.assertEqual(len(results), 0)
 
 

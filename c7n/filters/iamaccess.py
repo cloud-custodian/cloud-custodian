@@ -92,6 +92,10 @@ class PolicyChecker:
         return self.checker_config.get('allowed_orgid', ())
 
     @property
+    def allowed_org_units(self):
+        return self.checker_config.get('allowed_org_units', ())
+
+    @property
     def whitelist_patterns(self):
         return self.checker_config.get('whitelist_patterns', ())
 
@@ -301,10 +305,17 @@ class PolicyChecker:
         return bool(set(map(_account, c['values'])).difference(self.allowed_orgid))
 
     def handle_aws_principalorgpaths(self, s, c):
-        if not self.allowed_orgid:
+        if not self.allowed_orgid and not self.allowed_org_units:
             return True
-        org_ids = {str(v).split('/')[0] for v in c['values']}
-        return bool(org_ids.difference(self.allowed_orgid))
+        for value in c['values']:
+            segments = str(value).split('/')
+            if self.allowed_orgid and segments[0] in self.allowed_orgid:
+                continue
+            if self.allowed_org_units and any(
+                    seg in self.allowed_org_units for seg in segments):
+                continue
+            return True
+        return False
 
     def handle_aws_principalarn(self, s, c):
         """Handle the aws:PrincipalArn condition key."""
@@ -362,6 +373,8 @@ class CrossAccountAccessFilter(Filter):
         whitelist={'type': 'array', 'items': {'type': 'string'}},
         whitelist_orgids_from={'$ref': '#/definitions/filters_common/value_from'},
         whitelist_orgids={'type': 'array', 'items': {'type': 'string'}},
+        whitelist_org_units_from={'$ref': '#/definitions/filters_common/value_from'},
+        whitelist_org_units={'type': 'array', 'items': {'type': 'string'}},
         whitelist_vpce_from={'$ref': '#/definitions/filters_common/value_from'},
         whitelist_vpce={'type': 'array', 'items': {'type': 'string'}},
         whitelist_vpc_from={'$ref': '#/definitions/filters_common/value_from'},
@@ -387,6 +400,7 @@ class CrossAccountAccessFilter(Filter):
         self.vpcs = self.get_vpcs()
         self.vpces = self.get_vpces()
         self.orgid = self.get_orgids()
+        self.org_units = self.get_org_units()
         self.patterns = self.get_whitelist_patterns()
         self.checker_config = getattr(self, 'checker_config', None) or {}
         self.checker_config.update(
@@ -394,6 +408,7 @@ class CrossAccountAccessFilter(Filter):
              'allowed_vpc': self.vpcs,
              'allowed_vpce': self.vpces,
              'allowed_orgid': self.orgid,
+             'allowed_org_units': self.org_units,
              'check_actions': self.actions,
              'everyone_only': self.everyone_only,
              'whitelist_conditions': self.conditions,
@@ -431,6 +446,13 @@ class CrossAccountAccessFilter(Filter):
             values = ValuesFrom(self.data['whitelist_orgids_from'], self.manager)
             org_ids = org_ids.union(values.get_values())
         return org_ids
+
+    def get_org_units(self):
+        org_units = set(self.data.get('whitelist_org_units', ()))
+        if 'whitelist_org_units_from' in self.data:
+            values = ValuesFrom(self.data['whitelist_org_units_from'], self.manager)
+            org_units = org_units.union(values.get_values())
+        return org_units
 
     def get_whitelist_patterns(self):
         patterns = list(self.data.get('whitelist_patterns', ()))
