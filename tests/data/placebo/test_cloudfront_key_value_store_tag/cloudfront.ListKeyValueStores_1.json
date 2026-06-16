@@ -1,0 +1,28 @@
+{
+    "status_code": 200,
+    "data": {
+        "ResponseMetadata": {},
+        "KeyValueStoreList": {
+            "MaxItems": 100,
+            "Quantity": 1,
+            "Items": [
+                {
+                    "Name": "test",
+                    "Id": "5ba067c1-48ed-4fd3-95ac-74476c900316",
+                    "ARN": "arn:aws:cloudfront::644160558196:key-value-store/5ba067c1-48ed-4fd3-95ac-74476c900316",
+                    "Status": "READY",
+                    "LastModifiedTime": {
+                        "__class__": "datetime",
+                        "year": 2026,
+                        "month": 6,
+                        "day": 11,
+                        "hour": 13,
+                        "minute": 53,
+                        "second": 55,
+                        "microsecond": 195000
+                    }
+                }
+            ]
+        }
+    }
+}
