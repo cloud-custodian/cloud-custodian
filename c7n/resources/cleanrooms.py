@@ -77,6 +77,9 @@ class CleanRoomsCollaborationMember(ChildResourceManager):
         enum_spec = ('list_members', 'memberSummaries', None)
         parent_spec = ('cleanrooms-collaboration', 'collaborationIdentifier', True)
         id = 'accountId'
+        # a member is identified by account id within its parent collaboration
+        # and has no standalone arn;
+        arn = False
         name = 'displayName'
         date = 'updateTime'
         permission_prefix = 'cleanrooms'
