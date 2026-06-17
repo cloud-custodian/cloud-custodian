@@ -53,8 +53,6 @@ ResourceMap = {
   "aws.cleanrooms-collaboration-member": "c7n.resources.cleanrooms.CleanRoomsCollaborationMember",
   "aws.cleanrooms-configured-table": "c7n.resources.cleanrooms.CleanRoomsConfiguredTable",
   "aws.cleanrooms-membership": "c7n.resources.cleanrooms.CleanRoomsMembership",
-  "aws.cleanroomsml-configured-model-algorithm":
-    "c7n.resources.cleanrooms.CleanRoomsMLConfiguredModelAlgorithm",
   "aws.cloud-directory": "c7n.resources.directory.CloudDirectory",
   "aws.cloudhsm-cluster": "c7n.resources.hsm.CloudHSMCluster",
   "aws.cloudhsm-backup": "c7n.resources.hsm.CloudHSMBackup",
