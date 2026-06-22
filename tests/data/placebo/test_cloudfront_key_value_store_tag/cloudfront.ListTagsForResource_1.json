@@ -1,0 +1,18 @@
+{
+    "status_code": 200,
+    "data": {
+        "ResponseMetadata": {},
+        "Tags": {
+            "Items": [
+                {
+                    "Key": "env",
+                    "Value": "test"
+                },
+                {
+                    "Key": "foo",
+                    "Value": "bar"
+                }
+            ]
+        }
+    }
+}

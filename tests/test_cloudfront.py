@@ -947,6 +947,50 @@ class CloudFront(BaseTest):
             'securityhub',
         )
 
+    def test_cloudfront_function_tag(self):
+        factory = self.replay_flight_data("test_cloudfront_function_tag")
+
+        p = self.load_policy(
+            {
+                "name": "cloudfront-function-tag",
+                "resource": "cloudfront-function",
+                "filters": [{"tag:foo": "bar"}],
+                "actions": [{"type": "tag", "key": "env", "value": "test"}],
+            },
+            session_factory=factory,
+        )
+        resources = p.run()
+        self.assertEqual(len(resources), 1)
+        # verify tag applied
+        client = local_session(factory).client("cloudfront")
+        resp = client.list_tags_for_resource(
+            Resource=resources[0]["FunctionMetadata"]["FunctionARN"]
+        )
+        tags = {t['Key']: t['Value'] for t in resp['Tags']['Items']}
+        self.assertEqual(tags.get('env'), 'test')
+
+    def test_cloudfront_key_value_store_tag(self):
+        factory = self.replay_flight_data("test_cloudfront_key_value_store_tag")
+
+        p = self.load_policy(
+            {
+                "name": "cloudfront-key-value-store-tag",
+                "resource": "cloudfront-key-value-store",
+                "filters": [{"tag:foo": "bar"}],
+                "actions": [{"type": "tag", "key": "env", "value": "test"}],
+            },
+            session_factory=factory,
+        )
+        resources = p.run()
+        self.assertEqual(len(resources), 1)
+        # verify tag applied
+        client = local_session(factory).client("cloudfront")
+        resp = client.list_tags_for_resource(
+            Resource=resources[0]["ARN"]
+        )
+        tags = {t['Key']: t['Value'] for t in resp['Tags']['Items']}
+        self.assertEqual(tags.get('env'), 'test')
+
     def test_origin_access_control(self):
         factory = self.replay_flight_data("test_origin_access_control")
 
