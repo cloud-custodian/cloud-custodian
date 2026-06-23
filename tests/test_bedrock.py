@@ -559,6 +559,26 @@ class BedrockAgent(BaseTest):
             resources = client.get_agent(agentId=deleted_agentId)
         self.assertEqual(e.exception.response['Error']['Code'], 'ResourceNotFoundException')
 
+    def test_bedrock_agent_metrics(self):
+        session_factory = self.replay_flight_data('test_bedrock_agent_metrics', region='us-east-2')
+        p = self.load_policy(
+            {"name": "bedrock-agent-metrics",
+             "resource": "bedrock-agent",
+             "filters": [
+                 {"type": "metrics",
+                 "name": "InvocationCount",
+                 "statistics": "Sum",
+                 "days": 30,
+                 "value": 0,
+                 "op": "gt",
+                 "missing-value": 0}
+             ]}, config={"region": "us-east-2"},
+            session_factory=session_factory
+        )
+
+        resources = p.run()
+        self.assertEqual(len(resources), 1)
+
     def test_bedrock_agent_base(self):
         session_factory = self.replay_flight_data('test_bedrock_agent_base')
         p = self.load_policy(

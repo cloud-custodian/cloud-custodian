@@ -11362,6 +11362,7 @@
     "GenerateMac",
     "GenerateRandom",
     "GetKeyPolicy",
+    "GetKeyLastUsage",
     "GetKeyRotationStatus",
     "GetParametersForImport",
     "GetPublicKey",
