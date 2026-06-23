@@ -133,6 +133,11 @@ deploy_resource() {
 
         rm -f cost-management.body
 
+    elif [[ "$fileName" == "budget.json" ]]; then
+
+        az deployment sub create --location $resourceLocation --name cctest-budget \
+            --template-file $file --output None
+
     else
         template_parameters=()
         append_generated_unique_id_parameter "$file" template_parameters
