@@ -30,6 +30,7 @@ import fnmatch
 import logging
 import json
 
+from c7n.exceptions import PolicyValidationError
 from c7n.filters import Filter
 from c7n.resolver import ValuesFrom
 from c7n.utils import type_schema
@@ -307,14 +308,19 @@ class PolicyChecker:
     def handle_aws_principalorgpaths(self, s, c):
         if not self.allowed_orgid and not self.allowed_org_units:
             return True
-        for value in c['values']:
-            segments = str(value).split('/')
-            if self.allowed_orgid and segments[0] in self.allowed_orgid:
-                continue
-            if self.allowed_org_units and any(
-                    seg in self.allowed_org_units for seg in segments):
-                continue
+        return any(not self._org_path_allowed(v) for v in c['values'])
+
+    def _org_path_allowed(self, condition_ou_path):
+        segs = condition_ou_path.split('/')
+        org_seg = segs[0]
+        if org_seg in self.allowed_orgid:
             return True
+        for whitelist_ou_path in self.allowed_org_units:
+            w_segs = whitelist_ou_path.strip('/').split('/')
+            if w_segs[0] != org_seg:
+                continue
+            if w_segs[-1] in segs[1:]:
+                return True
         return False
 
     def handle_aws_principalarn(self, s, c):
@@ -356,6 +362,26 @@ class CrossAccountAccessFilter(Filter):
         whitelist_patterns:
           - "AIDA*"
           - "AROA*"
+
+    Supports a ``whitelist_org_units`` option for trusting principals via
+    ``aws:PrincipalOrgPaths`` conditions. Each entry must be a full OU path
+    starting with the org ID and ending with the OU ID to trust:
+
+    .. code-block:: yaml
+
+      - type: cross-account
+        whitelist_org_units:
+          - "o-abc1234567/r-ab12/ou-ab12-prod"
+
+    Wildcards (``*``, ``?``) are not permitted in whitelist entries. The org
+    ID prefix is required because OU IDs are only unique within an
+    organization. A whitelist matches a policy path when the path's leading
+    segment equals the whitelist's org ID *and* the whitelist's leaf OU ID
+    appears as a literal segment in the path; this means a parent-OU whitelist
+    will not implicitly cover policies that only name a descendant OU. List
+    each OU level you actually want to trust. ``aws:PrincipalOrgPaths`` matching
+    also respects ``whitelist_orgids``. Any policy path whose leading segment
+    matches a whitelisted org ID is accepted regardless of the OU whitelist.
     """
 
     schema = type_schema(
@@ -388,6 +414,22 @@ class CrossAccountAccessFilter(Filter):
     allowlist_key = 'CrossAccountAllowlists'
 
     checker_factory = PolicyChecker
+
+    @staticmethod
+    def _validate_org_unit_path(path):
+        if '*' in path or '?' in path:
+            raise PolicyValidationError(
+                "whitelist_org_units entries must not contain wildcards: %r" % path)
+        segments = path.strip('/').split('/')
+        if len(segments) < 2 or not segments[0].startswith('o-'):
+            raise PolicyValidationError(
+                "whitelist_org_units entries must be full paths starting with "
+                "the org ID (e.g. 'o-abc/r-xyz/ou-target'): %r" % path)
+
+    def validate(self):
+        for path in self.data.get('whitelist_org_units', ()):
+            self._validate_org_unit_path(path)
+        return self
 
     def process(self, resources, event=None):
         self.everyone_only = self.data.get('everyone_only', False)
@@ -452,6 +494,8 @@ class CrossAccountAccessFilter(Filter):
         if 'whitelist_org_units_from' in self.data:
             values = ValuesFrom(self.data['whitelist_org_units_from'], self.manager)
             org_units = org_units.union(values.get_values())
+        for path in org_units:
+            self._validate_org_unit_path(path)
         return org_units
 
     def get_whitelist_patterns(self):

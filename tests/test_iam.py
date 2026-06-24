@@ -2812,6 +2812,7 @@ class CrossAccountChecker(TestCase):
         """Whitelisting an OU allows that OU and any descendant path."""
         parent_ou_path = "o-allowed/r-ab12/ou-ab12-prod/*"
         nested_ou_path = "o-allowed/r-ab12/ou-ab12-prod/ou-ab12-prod-team/*"
+        wildcard_ou_path = "o-allowed/*/ou-ab12-prod/ou-ab12-prod-team/*"
 
         def policy_for(path):
             return {
@@ -2829,16 +2830,24 @@ class CrossAccountChecker(TestCase):
                 }]
             }
 
-        checker = PolicyChecker({"allowed_org_units": {"ou-ab12-prod"}})
+        prod = {"o-allowed/r-ab12/ou-ab12-prod"}
+        team = {"o-allowed/r-ab12/ou-ab12-prod/ou-ab12-prod-team"}
+        dev = {"o-allowed/r-ab12/ou-ab12-dev"}
+
+        checker = PolicyChecker({"allowed_org_units": prod})
         self.assertEqual(len(checker.check(policy_for(parent_ou_path))), 0)
         self.assertEqual(len(checker.check(policy_for(nested_ou_path))), 0)
+        self.assertEqual(len(checker.check(policy_for(wildcard_ou_path))), 0)
 
-        checker = PolicyChecker({"allowed_org_units": {"ou-ab12-prod-team"}})
+        checker = PolicyChecker({"allowed_org_units": team})
         self.assertEqual(len(checker.check(policy_for(parent_ou_path))), 1)
         self.assertEqual(len(checker.check(policy_for(nested_ou_path))), 0)
+        self.assertEqual(len(checker.check(policy_for(wildcard_ou_path))), 0)
 
-        checker = PolicyChecker({"allowed_org_units": {"ou-ab12-dev"}})
+        checker = PolicyChecker({"allowed_org_units": dev})
         self.assertEqual(len(checker.check(policy_for(parent_ou_path))), 1)
+        self.assertEqual(len(checker.check(policy_for(nested_ou_path))), 1)
+        self.assertEqual(len(checker.check(policy_for(wildcard_ou_path))), 1)
 
     def test_principal_org_paths_org_unit_does_not_match_whole_org(self):
         """An OU whitelist must not allow a policy that grants access to the whole org."""
@@ -2856,7 +2865,35 @@ class CrossAccountChecker(TestCase):
                 }
             }]
         }
-        checker = PolicyChecker({"allowed_org_units": {"ou-ab12-prod"}})
+        checker = PolicyChecker({
+            "allowed_org_units": {"o-allowed/r-ab12/ou-ab12-prod"}})
+        self.assertEqual(len(checker.check(policy)), 1)
+
+    def test_principal_org_paths_wildcard_pinned_by_literal_anchors(self):
+        """`o-org/*/ou-target/*` is allowed when anchors fix the org and OU."""
+        policy = {
+            "Version": "2012-10-17",
+            "Statement": [{
+                "Effect": "Allow",
+                "Principal": "*",
+                "Action": "s3:GetObject",
+                "Resource": "*",
+                "Condition": {
+                    "ForAnyValuesStringLike": {
+                        "aws:PrincipalOrgPaths": [
+                            "o-allowed/*/ou-ab12-prod/*"
+                        ]
+                    }
+                }
+            }]
+        }
+        checker = PolicyChecker({
+            "allowed_org_units": {"o-allowed/r-ab12/ou-ab12-prod"}})
+        self.assertEqual(len(checker.check(policy)), 0)
+
+        # Same shape but org segment wildcarded — must be denied
+        policy["Statement"][0]["Condition"]["ForAnyValuesStringLike"][
+            "aws:PrincipalOrgPaths"] = ["*/r-ab12/ou-ab12-prod/*"]
         self.assertEqual(len(checker.check(policy)), 1)
 
     def test_principal_org_paths_combines_orgid_and_org_unit(self):
@@ -2881,7 +2918,7 @@ class CrossAccountChecker(TestCase):
 
         checker = PolicyChecker({
             "allowed_orgid": {"o-trusted"},
-            "allowed_org_units": {"ou-bb22-prod"},
+            "allowed_org_units": {"o-other/r-bb22/ou-bb22-prod"},
         })
         self.assertEqual(len(checker.check(policy)), 0)
 
@@ -3497,7 +3534,7 @@ class CrossAccountChecker(TestCase):
     def test_cross_account_filter_whitelist_org_units(self):
         f = self._make_filter({
             'type': 'cross-account',
-            'whitelist_org_units': ['ou-ab12-prod'],
+            'whitelist_org_units': ['o-example/r-ab12/ou-ab12-prod'],
         })
         orgpath_policy = json.dumps({
             "Version": "2012-10-17",
@@ -3539,9 +3576,26 @@ class CrossAccountChecker(TestCase):
             }]
         })
         with mock.patch('c7n.filters.iamaccess.ValuesFrom') as mock_vf_cls:
-            mock_vf_cls.return_value.get_values.return_value = ['ou-ab12-prod']
+            mock_vf_cls.return_value.get_values.return_value = [
+                'o-example/r-ab12/ou-ab12-prod']
             results = f.process([{'Policy': orgpath_policy}])
         self.assertEqual(len(results), 0)
+
+    def test_cross_account_filter_whitelist_org_units_rejects_wildcard(self):
+        f = self._make_filter({
+            'type': 'cross-account',
+            'whitelist_org_units': ['o-example/r-ab12/ou-ab12-prod/*'],
+        })
+        with self.assertRaises(PolicyValidationError):
+            f.process([{'Policy': '{"Statement": []}'}])
+
+    def test_cross_account_filter_whitelist_org_units_rejects_bare_ou(self):
+        f = self._make_filter({
+            'type': 'cross-account',
+            'whitelist_org_units': ['ou-ab12-prod'],
+        })
+        with self.assertRaises(PolicyValidationError):
+            f.process([{'Policy': '{"Statement": []}'}])
 
 
 class SetRolePolicyAction(BaseTest):
