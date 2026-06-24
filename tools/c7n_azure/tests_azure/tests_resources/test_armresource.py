@@ -252,7 +252,9 @@ class ArmResourceTest(BaseTest):
             ]
         })
         p.run()
-        delete_action_mock.assert_called_with([self.fake_arm_resources[0]])
+        expected = dict(self.fake_arm_resources[0])
+        expected['c7n:MatchedFilters'] = ['name']
+        delete_action_mock.assert_called_with([expected])
 
     @patch('c7n_azure.query.ResourceQuery.filter',
         return_value=fake_arm_resources)
@@ -273,7 +275,9 @@ class ArmResourceTest(BaseTest):
             ]
         })
         p.run()
-        delete_action_mock.assert_called_with([self.fake_arm_resources[0]])
+        expected = dict(self.fake_arm_resources[0])
+        expected['c7n:MatchedFilters'] = ['name']
+        delete_action_mock.assert_called_with([expected])
 
     def test_arm_resource_resource_type_schema_validate(self):
         with self.sign_out_patch():
