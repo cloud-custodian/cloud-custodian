@@ -143,6 +143,10 @@ class WAFV2(QueryResourceManager):
     regardless of the policy's configured region.
     """
 
+    CLOUDFRONT = "CLOUDFRONT"
+    REGIONAL = "REGIONAL"
+    VALID_SCOPES = (CLOUDFRONT, REGIONAL)
+
     class resource_type(TypeInfo):
         service = "wafv2"
         enum_spec = ("list_web_acls", "WebACLs", None)
@@ -157,26 +161,31 @@ class WAFV2(QueryResourceManager):
         permissions_enum = ('wafv2:ListWebACLs',)
         permissions_augment = ('wafv2:GetWebACL', "wafv2:ListTagsForResource")
         universal_taggable = object()
+        global_resource = False
+
+    class cloudfront_resource_type(resource_type):
+        global_resource = True
+
     source_mapping = {'describe': DescribeWafV2, 'config': ConfigSource}
 
-    # global_resource is required for universal tagging api calls to use the correct region. In
-    # order to have scope-aware global_resource behavior, we need to create a new resource_type
-    # instance for each manager to avoid modifying the shared class-level resource_type
     def __init__(self, ctx, data):
         super().__init__(ctx, data)
-        self._client = None
-        self.resource_type = type(
-            'WAFV2ResourceType',
-            (self.__class__.resource_type,),
-            {'global_resource': self.scope == 'CLOUDFRONT'}
-        )
+        if self.scope == self.CLOUDFRONT:
+            self.resource_type = self.cloudfront_resource_type
+
+    def validate(self):
+        for q in self.data.get('query', []):
+            if 'Scope' in q and q['Scope'] not in self.VALID_SCOPES:
+                raise PolicyValidationError(
+                    f"Invalid Scope: {q['Scope']}.  Must be one of {self.VALID_SCOPES}"
+                )
 
     @property
     def scope(self):
         for q in self.data.get('query', []):
             if 'Scope' in q:
                 return q['Scope']
-        return 'REGIONAL'
+        return self.REGIONAL
 
     @property
     def scope_region(self):
@@ -185,7 +194,7 @@ class WAFV2(QueryResourceManager):
         CLOUDFRONT WebACLs are global resources addressed via us-east-1; all other
         (REGIONAL) WebACLs use the policy's region.
         """
-        return 'us-east-1' if self.scope == 'CLOUDFRONT' else self.region
+        return 'us-east-1' if self.scope == self.CLOUDFRONT else self.region
 
     def get_client(self):
         if self._client is None:
