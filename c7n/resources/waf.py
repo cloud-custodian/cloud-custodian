@@ -129,6 +129,65 @@ class WAF(QueryResourceManager):
     source_mapping = {'describe': DescribeWaf, 'config': ConfigSource}
 
 
+@WAF.action_registry.register('delete')
+class WAFDelete(BaseAction):
+    """Delete a WAF Classic (global) Web ACL.
+
+    This action removes all rules from the Web ACL and then deletes it.
+
+    :example:
+
+    .. code-block:: yaml
+
+        policies:
+          - name: delete-waf-classic
+            resource: aws.waf
+            filters:
+              - type: value
+                key: Name
+                op: regex
+                value: "^FMManagedWebACL.*"
+            actions:
+              - type: delete
+    """
+
+    schema = type_schema('delete')
+    permissions = (
+        'waf:DeleteWebACL',
+        'waf:GetChangeToken',
+        'waf:GetWebACL',
+        'waf:UpdateWebACL',
+    )
+
+    def process(self, resources):
+        client = local_session(self.manager.session_factory).client('waf')
+        for r in resources:
+            self._delete_web_acl(client, r)
+
+    def _delete_web_acl(self, client, resource):
+        web_acl_id = resource['WebACLId']
+
+        # Remove all rules from the Web ACL before deletion
+        if resource.get('Rules'):
+            change_token = client.get_change_token()['ChangeToken']
+            updates = [
+                {'Action': 'DELETE', 'ActivatedRule': rule}
+                for rule in resource['Rules']
+            ]
+            client.update_web_acl(
+                WebACLId=web_acl_id,
+                ChangeToken=change_token,
+                Updates=updates,
+                DefaultAction=resource['DefaultAction'],
+            )
+
+        change_token = client.get_change_token()['ChangeToken']
+        client.delete_web_acl(
+            WebACLId=web_acl_id,
+            ChangeToken=change_token,
+        )
+
+
 @resources.register('waf-regional')
 class RegionalWAF(QueryResourceManager):
     class resource_type(TypeInfo):
@@ -147,6 +206,80 @@ class RegionalWAF(QueryResourceManager):
         universal_taggable = object()
 
     source_mapping = {'describe': DescribeRegionalWaf, 'config': ConfigSource}
+
+
+@RegionalWAF.action_registry.register('delete')
+class RegionalWAFDelete(BaseAction):
+    """Delete a WAF Classic (regional) Web ACL.
+
+    This action disassociates the Web ACL from any resources,
+    removes all rules, and then deletes it.
+
+    :example:
+
+    .. code-block:: yaml
+
+        policies:
+          - name: delete-waf-regional-classic
+            resource: aws.waf-regional
+            filters:
+              - type: value
+                key: Name
+                op: regex
+                value: "^FMManagedWebACL.*"
+            actions:
+              - type: delete
+    """
+
+    schema = type_schema('delete')
+    permissions = (
+        'waf-regional:DeleteWebACL',
+        'waf-regional:DisassociateWebACL',
+        'waf-regional:GetChangeToken',
+        'waf-regional:GetWebACL',
+        'waf-regional:ListResourcesForWebACL',
+        'waf-regional:UpdateWebACL',
+    )
+
+    def process(self, resources):
+        client = local_session(self.manager.session_factory).client('waf-regional')
+        for r in resources:
+            self._delete_web_acl(client, r)
+
+    def _delete_web_acl(self, client, resource):
+        web_acl_id = resource['WebACLId']
+
+        # Disassociate from any attached resources
+        for resource_type in ('APPLICATION_LOAD_BALANCER', 'API_GATEWAY'):
+            try:
+                resp = client.list_resources_for_web_acl(
+                    WebACLId=web_acl_id,
+                    ResourceType=resource_type,
+                )
+                for resource_arn in resp.get('ResourceArns', []):
+                    client.disassociate_web_acl(ResourceArn=resource_arn)
+            except client.exceptions.WAFNonexistentItemException:
+                pass
+
+        # Remove all rules from the Web ACL before deletion
+        if resource.get('Rules'):
+            change_token = client.get_change_token()['ChangeToken']
+            updates = [
+                {'Action': 'DELETE', 'ActivatedRule': rule}
+                for rule in resource['Rules']
+            ]
+            client.update_web_acl(
+                WebACLId=web_acl_id,
+                ChangeToken=change_token,
+                Updates=updates,
+                DefaultAction=resource['DefaultAction'],
+            )
+
+        change_token = client.get_change_token()['ChangeToken']
+        client.delete_web_acl(
+            WebACLId=web_acl_id,
+            ChangeToken=change_token,
+        )
 
 
 @resources.register('wafv2')
