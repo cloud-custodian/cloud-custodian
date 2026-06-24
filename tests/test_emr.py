@@ -152,7 +152,6 @@ class TestEMR(BaseTest):
                 'EnableAtRestEncryption': True,
                 'EnableInTransitEncryption': False}})
 
-
     def test_emr_termination_policy(self):
         session_factory = self.replay_flight_data("test_emr_termination_policy")
         p = self.load_policy(
