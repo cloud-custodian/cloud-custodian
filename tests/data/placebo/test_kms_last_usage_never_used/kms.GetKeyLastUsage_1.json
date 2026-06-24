@@ -1,0 +1,28 @@
+{
+  "status_code": 200,
+  "data": {
+    "KeyId": "abcd1234-5678-90ab-cdef-1234567890ab",
+    "KeyLastUsage": {},
+    "TrackingStartDate": {
+      "hour": 0,
+      "__class__": "datetime",
+      "month": 4,
+      "second": 0,
+      "microsecond": 0,
+      "year": 2026,
+      "day": 23,
+      "minute": 0
+    },
+    "KeyCreationDate": {
+      "hour": 10,
+      "__class__": "datetime",
+      "month": 5,
+      "second": 0,
+      "microsecond": 0,
+      "year": 2026,
+      "day": 1,
+      "minute": 0
+    },
+    "ResponseMetadata": {}
+  }
+}
