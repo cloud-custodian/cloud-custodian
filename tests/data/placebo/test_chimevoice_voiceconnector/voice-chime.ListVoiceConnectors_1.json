@@ -1,0 +1,64 @@
+{
+    "status_code": 200,
+    "data": {
+        "ResponseMetadata": {},
+        "VoiceConnectors": [
+            {
+                "VoiceConnectorId": "ddvk97wedue2gzbz8eeeri",
+                "AwsRegion": "us-east-1",
+                "Name": "vc-encryption-on",
+                "OutboundHostName": "ddvk97wedue2gzbz8eeeri.voiceconnector.chime.aws",
+                "RequireEncryption": true,
+                "CreatedTimestamp": {
+                    "__class__": "datetime",
+                    "year": 2024,
+                    "month": 4,
+                    "day": 2,
+                    "hour": 13,
+                    "minute": 4,
+                    "second": 6,
+                    "microsecond": 663000
+                },
+                "UpdatedTimestamp": {
+                    "__class__": "datetime",
+                    "year": 2024,
+                    "month": 4,
+                    "day": 2,
+                    "hour": 13,
+                    "minute": 34,
+                    "second": 59,
+                    "microsecond": 575000
+                },
+                "VoiceConnectorArn": "arn:aws:chime:us-east-1:644160558196:vc/ddvk97wedue2gzbz8eeeri"
+            },
+            {
+                "VoiceConnectorId": "gp9yxbfhynquklulp0dyi4",
+                "AwsRegion": "us-east-1",
+                "Name": "vc-encryption-off",
+                "OutboundHostName": "gp9yxbfhynquklulp0dyi4.voiceconnector.chime.aws",
+                "RequireEncryption": false,
+                "CreatedTimestamp": {
+                    "__class__": "datetime",
+                    "year": 2024,
+                    "month": 4,
+                    "day": 2,
+                    "hour": 13,
+                    "minute": 4,
+                    "second": 22,
+                    "microsecond": 308000
+                },
+                "UpdatedTimestamp": {
+                    "__class__": "datetime",
+                    "year": 2024,
+                    "month": 4,
+                    "day": 2,
+                    "hour": 13,
+                    "minute": 35,
+                    "second": 10,
+                    "microsecond": 202000
+                },
+                "VoiceConnectorArn": "arn:aws:chime:us-east-1:644160558196:vc/gp9yxbfhynquklulp0dyi4"
+            }
+        ]
+    }
+}
