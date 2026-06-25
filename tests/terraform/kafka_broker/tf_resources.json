@@ -1,0 +1,285 @@
+{
+    "pytest-terraform": 1,
+    "outputs": {
+        "bootstrap_brokers": {
+            "value": "",
+            "type": "string"
+        },
+        "cluster_arn": {
+            "value": "arn:aws:kafka:us-east-1:644160558196:cluster/c7n-test-da399252/97ace2be-cf6d-467c-bc6a-e61df089f6c2-18",
+            "type": "string"
+        },
+        "cluster_name": {
+            "value": "c7n-test-da399252",
+            "type": "string"
+        }
+    },
+    "resources": {
+        "aws_availability_zones": {
+            "available": {
+                "all_availability_zones": null,
+                "exclude_names": null,
+                "exclude_zone_ids": null,
+                "filter": null,
+                "group_names": [
+                    "us-east-1-zg-1"
+                ],
+                "id": "us-east-1",
+                "names": [
+                    "us-east-1a",
+                    "us-east-1b",
+                    "us-east-1c",
+                    "us-east-1d",
+                    "us-east-1e",
+                    "us-east-1f"
+                ],
+                "state": "available",
+                "timeouts": null,
+                "zone_ids": [
+                    "use1-az6",
+                    "use1-az1",
+                    "use1-az2",
+                    "use1-az4",
+                    "use1-az3",
+                    "use1-az5"
+                ]
+            }
+        },
+        "aws_msk_cluster": {
+            "test": {
+                "arn": "arn:aws:kafka:us-east-1:644160558196:cluster/c7n-test-da399252/97ace2be-cf6d-467c-bc6a-e61df089f6c2-18",
+                "bootstrap_brokers": "",
+                "bootstrap_brokers_public_sasl_iam": "",
+                "bootstrap_brokers_public_sasl_scram": "",
+                "bootstrap_brokers_public_tls": "",
+                "bootstrap_brokers_sasl_iam": "",
+                "bootstrap_brokers_sasl_scram": "",
+                "bootstrap_brokers_tls": "b-1.c7ntestda399252.yi695k.c18.kafka.us-east-1.amazonaws.com:9094,b-2.c7ntestda399252.yi695k.c18.kafka.us-east-1.amazonaws.com:9094",
+                "bootstrap_brokers_vpc_connectivity_sasl_iam": "",
+                "bootstrap_brokers_vpc_connectivity_sasl_scram": "",
+                "bootstrap_brokers_vpc_connectivity_tls": "",
+                "broker_node_group_info": [
+                    {
+                        "az_distribution": "DEFAULT",
+                        "client_subnets": [
+                            "subnet-0276a17ec8e0ad42f",
+                            "subnet-02e879cee93508233"
+                        ],
+                        "connectivity_info": [
+                            {
+                                "public_access": [
+                                    {
+                                        "type": "DISABLED"
+                                    }
+                                ],
+                                "vpc_connectivity": [
+                                    {
+                                        "client_authentication": [
+                                            {
+                                                "sasl": [
+                                                    {
+                                                        "iam": false,
+                                                        "scram": false
+                                                    }
+                                                ],
+                                                "tls": false
+                                            }
+                                        ]
+                                    }
+                                ]
+                            }
+                        ],
+                        "instance_type": "kafka.t3.small",
+                        "security_groups": [
+                            "sg-049dfc123dab473e1"
+                        ],
+                        "storage_info": [
+                            {
+                                "ebs_storage_info": [
+                                    {
+                                        "provisioned_throughput": [],
+                                        "volume_size": 10
+                                    }
+                                ]
+                            }
+                        ]
+                    }
+                ],
+                "client_authentication": [],
+                "cluster_name": "c7n-test-da399252",
+                "cluster_uuid": "97ace2be-cf6d-467c-bc6a-e61df089f6c2-18",
+                "configuration_info": [],
+                "current_version": "K3P5ROKL5A1OLE",
+                "encryption_info": [
+                    {
+                        "encryption_at_rest_kms_key_arn": "arn:aws:kms:us-east-1:644160558196:key/8aa4e58d-6208-4292-a711-3c79f65d5d5e",
+                        "encryption_in_transit": [
+                            {
+                                "client_broker": "TLS",
+                                "in_cluster": true
+                            }
+                        ]
+                    }
+                ],
+                "enhanced_monitoring": "PER_BROKER",
+                "id": "arn:aws:kafka:us-east-1:644160558196:cluster/c7n-test-da399252/97ace2be-cf6d-467c-bc6a-e61df089f6c2-18",
+                "kafka_version": "3.5.1",
+                "logging_info": [],
+                "number_of_broker_nodes": 2,
+                "open_monitoring": [
+                    {
+                        "prometheus": [
+                            {
+                                "jmx_exporter": [
+                                    {
+                                        "enabled_in_broker": false
+                                    }
+                                ],
+                                "node_exporter": [
+                                    {
+                                        "enabled_in_broker": false
+                                    }
+                                ]
+                            }
+                        ]
+                    }
+                ],
+                "storage_mode": "LOCAL",
+                "tags": {
+                    "Environment": "test",
+                    "Name": "c7n-test-msk-da399252"
+                },
+                "tags_all": {
+                    "Environment": "test",
+                    "Name": "c7n-test-msk-da399252"
+                },
+                "timeouts": null,
+                "zookeeper_connect_string": "z-1.c7ntestda399252.yi695k.c18.kafka.us-east-1.amazonaws.com:2181,z-2.c7ntestda399252.yi695k.c18.kafka.us-east-1.amazonaws.com:2181,z-3.c7ntestda399252.yi695k.c18.kafka.us-east-1.amazonaws.com:2181",
+                "zookeeper_connect_string_tls": "z-1.c7ntestda399252.yi695k.c18.kafka.us-east-1.amazonaws.com:2182,z-2.c7ntestda399252.yi695k.c18.kafka.us-east-1.amazonaws.com:2182,z-3.c7ntestda399252.yi695k.c18.kafka.us-east-1.amazonaws.com:2182"
+            }
+        },
+        "aws_security_group": {
+            "msk": {
+                "arn": "arn:aws:ec2:us-east-1:644160558196:security-group/sg-049dfc123dab473e1",
+                "description": "Managed by Terraform",
+                "egress": [
+                    {
+                        "cidr_blocks": [
+                            "0.0.0.0/0"
+                        ],
+                        "description": "",
+                        "from_port": 0,
+                        "ipv6_cidr_blocks": [],
+                        "prefix_list_ids": [],
+                        "protocol": "-1",
+                        "security_groups": [],
+                        "self": false,
+                        "to_port": 0
+                    }
+                ],
+                "id": "sg-049dfc123dab473e1",
+                "ingress": [
+                    {
+                        "cidr_blocks": [
+                            "10.0.0.0/16"
+                        ],
+                        "description": "",
+                        "from_port": 9092,
+                        "ipv6_cidr_blocks": [],
+                        "prefix_list_ids": [],
+                        "protocol": "tcp",
+                        "security_groups": [],
+                        "self": false,
+                        "to_port": 9098
+                    }
+                ],
+                "name": "msk-test-sg-20251216211048363700000001",
+                "name_prefix": "msk-test-sg-",
+                "owner_id": "644160558196",
+                "revoke_rules_on_delete": false,
+                "tags": {
+                    "Name": "msk-test-sg-da399252"
+                },
+                "tags_all": {
+                    "Name": "msk-test-sg-da399252"
+                },
+                "timeouts": null,
+                "vpc_id": "vpc-06cc97351657fe6e1"
+            }
+        },
+        "aws_subnet": {
+            "msk": {
+                "arn": "arn:aws:ec2:us-east-1:644160558196:subnet/subnet-02e879cee93508233",
+                "assign_ipv6_address_on_creation": false,
+                "availability_zone": "us-east-1a",
+                "availability_zone_id": "use1-az6",
+                "cidr_block": "10.0.0.0/24",
+                "customer_owned_ipv4_pool": "",
+                "enable_dns64": false,
+                "enable_lni_at_device_index": 0,
+                "enable_resource_name_dns_a_record_on_launch": false,
+                "enable_resource_name_dns_aaaa_record_on_launch": false,
+                "id": "subnet-02e879cee93508233",
+                "ipv6_cidr_block": "",
+                "ipv6_cidr_block_association_id": "",
+                "ipv6_native": false,
+                "map_customer_owned_ip_on_launch": false,
+                "map_public_ip_on_launch": false,
+                "outpost_arn": "",
+                "owner_id": "644160558196",
+                "private_dns_hostname_type_on_launch": "ip-name",
+                "tags": {
+                    "Name": "msk-test-subnet-0-da399252"
+                },
+                "tags_all": {
+                    "Name": "msk-test-subnet-0-da399252"
+                },
+                "timeouts": null,
+                "vpc_id": "vpc-06cc97351657fe6e1"
+            }
+        },
+        "aws_vpc": {
+            "msk": {
+                "arn": "arn:aws:ec2:us-east-1:644160558196:vpc/vpc-06cc97351657fe6e1",
+                "assign_generated_ipv6_cidr_block": false,
+                "cidr_block": "10.0.0.0/16",
+                "default_network_acl_id": "acl-05e373e8daa5ad2b3",
+                "default_route_table_id": "rtb-099e9611774075b77",
+                "default_security_group_id": "sg-0538a9f3ca8bcf638",
+                "dhcp_options_id": "dopt-09806453be8480159",
+                "enable_dns_hostnames": true,
+                "enable_dns_support": true,
+                "enable_network_address_usage_metrics": false,
+                "id": "vpc-06cc97351657fe6e1",
+                "instance_tenancy": "default",
+                "ipv4_ipam_pool_id": null,
+                "ipv4_netmask_length": null,
+                "ipv6_association_id": "",
+                "ipv6_cidr_block": "",
+                "ipv6_cidr_block_network_border_group": "",
+                "ipv6_ipam_pool_id": "",
+                "ipv6_netmask_length": 0,
+                "main_route_table_id": "rtb-099e9611774075b77",
+                "owner_id": "644160558196",
+                "tags": {
+                    "Name": "msk-test-vpc-da399252"
+                },
+                "tags_all": {
+                    "Name": "msk-test-vpc-da399252"
+                }
+            }
+        },
+        "random_id": {
+            "id": {
+                "b64_std": "2jmSUg==",
+                "b64_url": "2jmSUg",
+                "byte_length": 4,
+                "dec": "3661206098",
+                "hex": "da399252",
+                "id": "2jmSUg",
+                "keepers": null,
+                "prefix": null
+            }
+        }
+    }
+}
