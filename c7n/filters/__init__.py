@@ -24,3 +24,4 @@ from .iamanalyzer import AccessAnalyzer
 from .metrics import MetricsFilter, ShieldMetrics
 # from .vpc import DefaultVpcBase
 from .waf import WafV2FilterBase, WafClassicRegionalFilterBase
+from .cfn import CloudFormationStackResourceFilter

@@ -49,6 +49,7 @@ ResourceMap = {
   "aws.catalog-portfolio": "c7n.resources.servicecatalog.CatalogPortfolio",
   "aws.catalog-product": "c7n.resources.servicecatalog.CatalogProduct",
   "aws.cfn": "c7n.resources.cfn.CloudFormation",
+  "aws.cfn-stack-resource": "c7n.resources.cfn.CloudFormationStackResource",
   "aws.cloud-directory": "c7n.resources.directory.CloudDirectory",
   "aws.cloudfront-function": "c7n.resources.cloudfront.Function",
   "aws.cloudfront-key-value-store": "c7n.resources.cloudfront.KeyValueStore",
