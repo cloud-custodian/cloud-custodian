@@ -170,6 +170,7 @@ class WAFV2(QueryResourceManager):
 
     def __init__(self, ctx, data):
         super().__init__(ctx, data)
+        self._client = None
         if self.scope == self.CLOUDFRONT:
             self.resource_type = self.cloudfront_resource_type
 
