@@ -9,16 +9,19 @@ templateDirectory="$( cd "$( dirname "$0" )" && pwd )"
 if [[ $# -eq 0 ]]; then
     # If there is no arguments -- deploy everything
     cleanup_all=1
+    skip_list=()
+    cleanup_list=()
 else
     if [[ $1 == "--skip" ]]; then
         # If we see option '--skip' -- deploy everything except for specific templates
         cleanup_all=1
-        skip_list="${@:2}"
-        echo $skip_list
+        skip_list=("${@:2}")
+        cleanup_list=()
     else
         # If there is no '--skip', deploy specific templates
         cleanup_all=0
-        cleanup_list="${@:1}"
+        cleanup_list=("${@:1}")
+        skip_list=()
     fi
 fi
 
@@ -32,6 +35,14 @@ delete_resource() {
         token=$(az account get-access-token --query accessToken --output tsv)
         url=https://management.azure.com/subscriptions/${AZURE_SUBSCRIPTION_ID}/providers/Microsoft.CostManagement/exports/cccostexport?api-version=2019-01-01
         curl -X DELETE -H "Authorization: Bearer ${token}" ${url}
+    elif [[ "$fileName" == "cognitive-service-deployment.json" ]]; then
+        account_name="${AZURE_OPENAI_ACCOUNT_NAME}"
+        if [[ -z "${account_name}" ]]; then
+            account_name=$(az cognitiveservices account list --resource-group $rgName --query [0].name --output tsv)
+        fi
+        if [[ -n "${account_name}" ]]; then
+            az cognitiveservices account delete --resource-group $rgName --name $account_name --yes --output None
+        fi
     elif [[ "$fileName" == "locked.json" ]]; then
         az lock delete --name cctestlockfilter --resource-group $rgName
         az lock delete --name rglock --resource-group $rgName
@@ -67,16 +78,22 @@ delete_cognitive_services() {
 }
 
 function should_cleanup() {
+    local item
     if [[ ${cleanup_all} -eq 1 ]]; then
-        if ! [[ "${skip_list[@]}" =~ $1 ]]; then
-            return 1
-        fi
+        for item in "${skip_list[@]}"; do
+            if [[ "$item" == "$1" ]]; then
+                return 0
+            fi
+        done
+        return 1
     else
-        if [[ "${cleanup_list[@]}" =~ $1 ]]; then
-            return 1
-        fi
+        for item in "${cleanup_list[@]}"; do
+            if [[ "$item" == "$1" ]]; then
+                return 1
+            fi
+        done
+        return 0
     fi
-    return 0
 }
 
 # Delete RG's for each template file
