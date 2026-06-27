@@ -1,0 +1,74 @@
+{
+    "status_code": 200,
+    "data": {
+        "ResponseMetadata": {},
+        "flowArn": "arn:aws:appflow:us-east-1:644160558196:flow/scheduled-flow",
+        "flowName": "scheduled-flow",
+        "kmsArn": "arn:aws:kms:us-east-1:644160558196:key/5a53ba7b-bcae-442d-8f6a-b2e78315d6d3",
+        "flowStatus": "Active",
+        "sourceFlowConfig": {
+            "connectorType": "S3",
+            "sourceConnectorProperties": {
+                "S3": {
+                    "bucketName": "test-bucket",
+                    "bucketPrefix": "preflow"
+                }
+            }
+        },
+        "destinationFlowConfigList": [
+            {
+                "connectorType": "S3",
+                "destinationConnectorProperties": {
+                    "S3": {
+                        "bucketName": "test-bucket",
+                        "s3OutputFormatConfig": {
+                            "fileType": "JSON",
+                            "prefixConfig": {},
+                            "aggregationConfig": {
+                                "aggregationType": "None"
+                            }
+                        }
+                    }
+                }
+            }
+        ],
+        "triggerConfig": {
+            "triggerType": "Scheduled",
+            "triggerProperties": {
+                "Scheduled": {
+                    "scheduleExpression": "rate(1hour)"
+                }
+            }
+        },
+        "tasks": [
+            {
+                "sourceFields": ["field1"],
+                "connectorOperator": {"S3": "NO_OP"},
+                "destinationField": "field1",
+                "taskType": "Map",
+                "taskProperties": {}
+            }
+        ],
+        "createdAt": {
+            "__class__": "datetime",
+            "year": 2021,
+            "month": 2,
+            "day": 23,
+            "hour": 11,
+            "minute": 5,
+            "second": 40,
+            "microsecond": 852000
+        },
+        "lastUpdatedAt": {
+            "__class__": "datetime",
+            "year": 2021,
+            "month": 2,
+            "day": 23,
+            "hour": 11,
+            "minute": 5,
+            "second": 40,
+            "microsecond": 852000
+        },
+        "tags": {}
+    }
+}
