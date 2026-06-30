@@ -1841,6 +1841,59 @@ class AmiBlockPublicAccess(Filter):
         return results
 
 
+@filters.register('payment-cryptography-replication-regions')
+class PaymentCryptographyReplicationRegions(Filter):
+    """Filter an account by its Payment Cryptography default key
+    replication regions.
+
+    :example:
+
+    .. code-block:: yaml
+
+       policies:
+         - name: pmtcrypt-default-replication-regions
+           resource: aws.account
+           filters:
+            - type: payment-cryptography-replication-regions
+              state: true
+              regions: ["us-west-2", "eu-west-1"]
+              match: all
+    """
+
+    annotation_key = 'c7n:payment-cryptography-replication-regions'
+    schema = type_schema(
+        'payment-cryptography-replication-regions',
+        state={'type': 'boolean'},
+        regions={'type': 'array', 'items': {'type': 'string'}},
+        match={'enum': ['all', 'any']})
+    permissions = ('payment-cryptography:GetDefaultKeyReplicationRegions',)
+
+    def process(self, resources, event=None):
+        state = self.data.get('state', True)
+        required = self.data.get('regions')
+        match = self.data.get('match', 'all')
+
+        client = local_session(
+            self.manager.session_factory).client('payment-cryptography')
+        enabled = client.get_default_key_replication_regions().get(
+            'EnabledReplicationRegions', [])
+
+        for r in resources:
+            r[self.annotation_key] = enabled
+
+        if bool(enabled) != state:
+            return []
+
+        if state and required:
+            enabled_set = set(enabled)
+            if match == 'all' and not enabled_set.issuperset(required):
+                return []
+            if match == 'any' and enabled_set.isdisjoint(required):
+                return []
+
+        return resources
+
+
 class GlueCatalogEncryptionEnabled(MultiAttrFilter):
     """ Filter glue catalog by its glue encryption status and KMS key
 
