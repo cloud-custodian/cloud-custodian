@@ -1844,7 +1844,7 @@ class AmiBlockPublicAccess(Filter):
 @filters.register('payment-cryptography-replication-regions')
 class PaymentCryptographyReplicationRegions(Filter):
     """Filter an account by its Payment Cryptography default key
-    replication regions.
+    replication region.
 
     :example:
 
