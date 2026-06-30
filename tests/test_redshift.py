@@ -179,6 +179,23 @@ class TestRedshift(BaseTest):
         resources = p.run()
         self.assertEqual(len(resources), 1)
 
+    def test_redshift_delete_lakehouse_registered(self):
+        factory = self.record_flight_data("test_redshift_delete_lakehouse_registered")
+        p = self.load_policy(
+            {
+                "name": "redshift-delete-lakehouse-registered",
+                "resource": "aws.redshift",
+                "filters": [{"ClusterIdentifier": "c7n-test-redshift"}],
+                "actions": [{"type": "delete", "skip-snapshot": True}],
+            },
+            session_factory=factory,
+        )
+
+        output = self.capture_logging("custodian.actions", level=logging.DEBUG)
+        p.run()
+        print(output.getvalue())
+        self.assertIn("The cluster has an associated lakehouse glue catalog", output.getvalue())
+
     def test_redshift_default_vpc(self):
         session_factory = self.replay_flight_data("test_redshift_default_vpc")
         p = self.load_policy(
