@@ -12,6 +12,7 @@ IFS=$'\n\t'
 
 resourceLocation="South Central US"
 templateDirectory="$( cd "$( dirname "$0" )" && pwd )"
+SUB_ID=$(az account show --query id --output tsv)
 
 print_failed_group_deployment() {
     rgName="$1"
@@ -49,15 +50,19 @@ fi
 if [[ $# -eq 0 ]]; then
     # If there is no arguments -- deploy everything
     deploy_all=1
+    skip_list=()
+    deploy_list=()
 else
     if [[ $1 == "--skip" ]]; then
         # If we see option '--skip' -- deploy everything except for specific templates
         deploy_all=1
-        skip_list="${@:2}"
+        skip_list=("${@:2}")
+        deploy_list=()
     else
         # If there is no '--skip', deploy specific templates
         deploy_all=0
-        deploy_list="${@:1}"
+        deploy_list=("${@:1}")
+        skip_list=()
     fi
 fi
 
@@ -74,12 +79,81 @@ append_generated_unique_id_parameter() {
     fi
 }
 
-deploy_resource() {
-    echo "Deployment for ${filenameNoExtension} started"
+ensure_active_principal_object_id() {
+    if [[ -n "$ASSIGNEE_OBJECT_ID" ]]; then
+        return 0
+    fi
 
+    if [[ ${is_user} -eq 1 ]]; then
+        ASSIGNEE_OBJECT_ID=$(az ad signed-in-user show --query id --output tsv 2>/dev/null)
+        if [[ -n "$ASSIGNEE_OBJECT_ID" ]]; then
+            return 0
+        fi
+    fi
+
+    echo "Unable to resolve ASSIGNEE_OBJECT_ID for role assignment."
+    echo "Set ASSIGNEE_OBJECT_ID environment variable and retry."
+    return 1
+}
+
+ensure_role_for_active_principal() {
+    local resource_group_name="$1"
+    local role_name="$2"
+    local principal_type="${3:-User}"
+    local scope="/subscriptions/${SUB_ID}/resourceGroups/${resource_group_name}"
+
+    if [[ -z "$resource_group_name" ]] || [[ -z "$role_name" ]]; then
+        echo "ensure_role_for_active_principal requires: <resource_group_name> <role_name> [principal_type]"
+        return 1
+    fi
+
+    ensure_active_principal_object_id || return 1
+    echo "Ensuring role '${role_name}' for principal '${ASSIGNEE_OBJECT_ID}' on scope '${scope}'"
+
+    existing_count=$(az role assignment list \
+        --scope "$scope" \
+        --assignee-object-id "$ASSIGNEE_OBJECT_ID" \
+        --role "$role_name" \
+        --query "length(@)" \
+        --output tsv 2>/dev/null)
+
+    if [[ "$existing_count" == "0" ]] || [[ -z "$existing_count" ]]; then
+        echo "Assigning role '$role_name' to '$ASSIGNEE_OBJECT_ID' on '$scope'"
+        az role assignment create \
+            --assignee-object-id "$ASSIGNEE_OBJECT_ID" \
+            --assignee-principal-type "$principal_type" \
+            --role "$role_name" \
+            --scope "$scope" \
+            --output None
+    else
+        echo "Role '$role_name' already assigned for assignee '$ASSIGNEE_OBJECT_ID' on scope '$scope'"
+    fi
+
+    # Propagation check: wait until ARM role assignment query returns the assignment.
+    for attempt in 1 2 3 4 5 6; do
+        existing_count=$(az role assignment list \
+            --scope "$scope" \
+            --assignee-object-id "$ASSIGNEE_OBJECT_ID" \
+            --role "$role_name" \
+            --query "length(@)" \
+            --output tsv 2>/dev/null)
+
+        if [[ "$existing_count" != "0" ]] && [[ -n "$existing_count" ]]; then
+            return 0
+        fi
+
+        echo "Waiting for role assignment propagation (attempt ${attempt}/6) ..."
+        sleep 10
+    done
+
+    echo "Role assignment did not appear after propagation checks."
+    return 1
+}
+deploy_resource() {
     fileName=${1##*/}
     filenameNoExtension=${fileName%.*}
     rgName="test_$filenameNoExtension"
+    echo "Deployment for ${filenameNoExtension} started"
 
     az group create --name $rgName --location $resourceLocation --output None
 
@@ -112,6 +186,93 @@ deploy_resource() {
 
         az deployment group create --resource-group $rgName --template-file $file --parameters client_id=$AZURE_CLIENT_ID client_secret=$AZURE_CLIENT_SECRET --mode Complete --output None
 
+    elif [[ "$fileName" == "cognitive-service-deployment.json" ]]; then
+
+        openai_location="${AZURE_OPENAI_LOCATION:-eastus}"
+        model_name="${AZURE_OPENAI_MODEL_NAME:-gpt-4o-mini}"
+        model_version="${AZURE_OPENAI_MODEL_VERSION:-2024-07-18}"
+        deployment_name="${AZURE_OPENAI_DEPLOYMENT_NAME:-cctest-gpt4o-mini}"
+        account_name="${AZURE_OPENAI_ACCOUNT_NAME}"
+
+        if az cognitiveservices account show-deleted \
+            --resource-group "$rgName" \
+            --location "$openai_location" \
+            --name "$account_name" \
+            --output none 2>/dev/null; then
+            echo "Found soft-deleted Cognitive Services account '${account_name}' in '${rgName}' (${openai_location})."
+            echo "Purging soft-deleted account '${account_name}' before deployment."
+            az cognitiveservices account purge \
+                --resource-group "$rgName" \
+                --location "$openai_location" \
+                --name "$account_name" \
+                --output none || {
+                    echo "Failed to purge soft-deleted account '${account_name}'."
+                    exit 1
+                }
+            sleep 10
+            if az cognitiveservices account show-deleted \
+                --resource-group "$rgName" \
+                --location "$openai_location" \
+                --name "$account_name" \
+                --output none 2>/dev/null; then
+                echo "Soft-deleted account '${account_name}' is still present after purge."
+                exit 1
+            fi
+        fi
+
+        az deployment group create \
+            --resource-group $rgName \
+            --template-file $file \
+            --parameters accountName=$account_name location=$openai_location \
+            --mode Complete \
+            --output None || {
+                echo "Failed to deploy Cognitive Services account '${account_name}' in resource group '${rgName}'."
+                print_failed_group_deployment "$rgName"
+                exit 1
+            }
+
+        account_ready=0
+        for attempt in {1..6}; do
+            if az cognitiveservices account show \
+                --resource-group "$rgName" \
+                --name "$account_name" \
+                --output none 2>/dev/null; then
+                account_ready=1
+                break
+            fi
+            sleep 5
+        done
+
+        if [[ "$account_ready" -ne 1 ]]; then
+            echo "Cognitive Services account '${account_name}' was not found after ARM deployment."
+            print_failed_group_deployment "$rgName"
+            exit 1
+        fi
+
+        if ! az cognitiveservices account deployment create \
+            --resource-group $rgName \
+            --name $account_name \
+            --deployment-name $deployment_name \
+            --model-format OpenAI \
+            --model-name $model_name \
+            --model-version $model_version \
+            --sku-name Standard \
+            --sku-capacity 1 \
+            --output None; then
+            echo "Failed to create Cognitive Services deployment ${deployment_name} in account ${account_name}"
+            exit 1
+        fi
+
+        deployment_count=$(az cognitiveservices account deployment list \
+            --resource-group $rgName \
+            --name $account_name \
+            --query "length(@)" \
+            --output tsv)
+        if [[ -z "$deployment_count" ]] || [[ "$deployment_count" -lt 1 ]]; then
+            echo "No deployments found after provisioning for account ${account_name}"
+            exit 1
+        fi
+
     elif [[ "$fileName" == "cost-management-export.json" ]]; then
 
         if [[ ${is_user} -ne 1 ]]; then
@@ -132,6 +293,190 @@ deploy_resource() {
         curl -X PUT -d "@cost-management.body" -H "content-type: application/json" -H "Authorization: Bearer ${token}" ${url}
 
         rm -f cost-management.body
+
+    elif [[ "$fileName" == "ai-foundry-application.json" ]]; then
+
+        unique_suffix="$(date +%s%N | tail -c 13)"
+
+        account_name="cctestaifoundry${unique_suffix}"
+        project_name="${AZURE_AI_FOUNDRY_PROJECT_NAME:-cctest-${filenameNoExtension}-project}"
+        deployment_name="${AZURE_OPENAI_DEPLOYMENT_NAME:-cctest-gpt41mini}"
+        model_name="${AZURE_OPENAI_MODEL_NAME:-gpt-4.1-mini}"
+        model_version="${AZURE_OPENAI_MODEL_VERSION:-2025-04-14}"
+        app_name="cctest-aifoundry-application"
+        phase1_deployment_name="ai-foundry-application-phase1-${unique_suffix}"
+        phase2_deployment_name="ai-foundry-application-phase2-${unique_suffix}"
+
+        # Phase 1: deploy account + project + model deployment (no application yet).
+        az deployment group create \
+            --name "$phase1_deployment_name" \
+            --resource-group "$rgName" \
+            --template-file "$file" \
+            --parameters "uniqueId=${unique_suffix}" \
+                         "deploymentName=${deployment_name}" \
+                         "modelName=${model_name}" \
+                         "modelVersion=${model_version}" \
+                         "projectName=${project_name}" \
+                         "deployApplication=false" \
+            --mode Incremental \
+            --output None
+
+        # Ensure data-plane role for real agent creation.
+        principal_type="ServicePrincipal"
+        if [[ ${is_user} -eq 1 ]]; then
+            principal_type="User"
+        fi
+        if ! ensure_role_for_active_principal \
+            "$rgName" \
+            "eadc314b-1a2d-4efa-be10-5d325db5065e" \
+            "$principal_type"; then
+            echo "Required role assignment check failed; cannot continue with agent creation."
+            exit 1
+        fi
+
+        # Phase 2: create a modern Foundry agent (no legacy assistants endpoint, no existence checks).
+        project_endpoint="https://${account_name}.services.ai.azure.com/api/projects/${project_name}"
+        generated_agent_name="cctest-aifoundry-agent-${unique_suffix}"
+        export PROJECT_ENDPOINT="${project_endpoint}"
+        export MODEL_DEPLOYMENT_NAME="${deployment_name}"
+        export GENERATED_AGENT_NAME="${generated_agent_name}"
+        export GENERATED_AGENT_INSTRUCTIONS="Fixture agent for Cloud Custodian AI Foundry application tests."
+
+        if ! agent_json=$(python3 - <<'PY'
+import json
+import os
+import sys
+
+try:
+    from azure.ai.projects import AIProjectClient
+    from azure.identity import DefaultAzureCredential
+    from azure.ai.projects.models import PromptAgentDefinition, AgentKind
+except Exception as e:
+    print(f"Missing dependency for modern Foundry agent creation: {e}", file=sys.stderr)
+    print("Install: pip install azure-ai-projects azure-identity", file=sys.stderr)
+    sys.exit(1)
+
+endpoint = os.environ["PROJECT_ENDPOINT"]
+deployment_name = os.environ["MODEL_DEPLOYMENT_NAME"]
+agent_name = os.environ["GENERATED_AGENT_NAME"]
+instructions = os.environ["GENERATED_AGENT_INSTRUCTIONS"]
+
+credential = DefaultAzureCredential()
+client = AIProjectClient(endpoint=endpoint, credential=credential)
+with client:
+    agents_ops = client.agents
+    if hasattr(agents_ops, "create_version") and hasattr(agents_ops, "get"):
+        definition = PromptAgentDefinition(
+            kind=AgentKind.PROMPT,
+            model=deployment_name,
+            instructions=instructions
+        )
+        # Create a new modern agent version and then resolve stable agent details.
+        agents_ops.create_version(
+            agent_name=agent_name,
+            definition=definition,
+            description="Fixture agent for Cloud Custodian AI Foundry application tests."
+        )
+        agent = agents_ops.get(agent_name=agent_name)
+    elif hasattr(agents_ops, "create_agent"):
+        # Compatibility with older/newer SDK shapes that expose create_agent directly.
+        agent = agents_ops.create_agent(
+            model=deployment_name,
+            name=agent_name,
+            instructions=instructions
+        )
+    elif hasattr(agents_ops, "create"):
+        # Compatibility with SDK shapes that expose create directly.
+        agent = agents_ops.create(
+            model=deployment_name,
+            name=agent_name,
+            instructions=instructions
+        )
+    else:
+        methods = [m for m in dir(agents_ops) if not m.startswith("_")]
+        print(
+            "Unable to create Foundry agent: AgentsOperations has neither "
+            "'create_agent' nor 'create'. Available methods: "
+            f"{methods}",
+            file=sys.stderr
+        )
+        sys.exit(1)
+
+if isinstance(agent, dict):
+    agent_id = agent.get("id", "")
+    agent_name_out = agent.get("name", "")
+else:
+    agent_id = getattr(agent, "id", "")
+    agent_name_out = getattr(agent, "name", "")
+
+print(json.dumps({"agentId": agent_id, "agentName": agent_name_out}))
+PY
+        ); then
+            echo "Modern Foundry agent creation failed."
+            exit 1
+        fi
+
+        agent_id=$(echo "${agent_json}" | python3 -c "import json,sys; print(json.load(sys.stdin).get('agentId',''))")
+        agent_name=$(echo "${agent_json}" | python3 -c "import json,sys; print(json.load(sys.stdin).get('agentName',''))")
+        if [[ -z "${agent_id}" ]] || [[ -z "${agent_name}" ]]; then
+            echo "Modern Foundry agent creation returned empty id/name."
+            echo "Raw response: ${agent_json}"
+            exit 1
+        fi
+
+        # Phase 3: deploy application with real agent reference (retry on transient backend errors).
+        app_deploy_ok=0
+        for attempt in 1 2 3 4 5 6; do
+            phase2_attempt_name="${phase2_deployment_name}-attempt${attempt}"
+            deploy_err=""
+            if deploy_err=$(az deployment group create \
+                --name "$phase2_attempt_name" \
+                --resource-group "$rgName" \
+                --template-file "$file" \
+                --parameters "uniqueId=${unique_suffix}" \
+                             "deploymentName=${deployment_name}" \
+                             "modelName=${model_name}" \
+                             "modelVersion=${model_version}" \
+                             "projectName=${project_name}" \
+                             "deployApplication=true" \
+                             "agentId=${agent_id}" \
+                             "agentName=${agent_name}" \
+                --mode Incremental \
+                --output None 2>&1); then
+                app_deploy_ok=1
+                break
+            fi
+
+            # RBAC/data-plane propagation errors: retry.
+            if echo "${deploy_err}" | grep -Eq \
+                "Microsoft\\.CognitiveServices/accounts/AIServices/agents/write|Principal does not have access to API/Operation|PermissionDenied"; then
+                echo "Application deployment hit permission/propagation issue (attempt ${attempt}/6); waiting before retry..."
+                sleep 30
+                continue
+            fi
+
+            # Backend not-ready race: retry.
+            if echo "${deploy_err}" | grep -Eq "ApplicationNotFound|NotFound"; then
+                echo "Application deployment not ready yet (attempt ${attempt}/6); waiting before retry..."
+                sleep 30
+                continue
+            fi
+
+            # SystemError is treated as hard failure for this run.
+            if echo "${deploy_err}" | grep -Eq "Message:[[:space:]]*SystemError|\"code\":\"SystemError\"|code.:.SystemError|\\(SystemError\\)"; then
+                echo "Application deployment failed with SystemError on attempt ${attempt}; stopping retries."
+                echo "${deploy_err}"
+                exit 1
+            fi
+
+            echo "Application deployment failed:"
+            echo "${deploy_err}"
+            exit 1
+        done
+        if [[ "$app_deploy_ok" != "1" ]]; then
+            echo "Application deployment failed after retries."
+            exit 1
+        fi
 
     else
         template_parameters=()
@@ -177,16 +522,22 @@ deploy_policy_assignment() {
 }
 
 function should_deploy() {
+    local item
     if [[ ${deploy_all} -eq 1 ]]; then
-        if ! [[ "${skip_list[@]}" =~ $1 ]]; then
-            return 1
-        fi
+        for item in "${skip_list[@]}"; do
+            if [[ "$item" == "$1" ]]; then
+                return 0
+            fi
+        done
+        return 1
     else
-        if [[ "${deploy_list[@]}" =~ $1 ]]; then
-            return 1
-        fi
+        for item in "${deploy_list[@]}"; do
+            if [[ "$item" == "$1" ]]; then
+                return 1
+            fi
+        done
+        return 0
     fi
-    return 0
 }
 
 # Ensure AZURE_CLIENT_ID and AZURE_CLIENT_SECRET are available for AKS deployment
@@ -199,12 +550,16 @@ if [[ $? -eq 1 ]]; then
 fi
 
 # Create resource groups and deploy for each template file
+pids=()
+jobs=()
 for file in "$templateDirectory"/*.json; do
     fileName=${file##*/}
     filenameNoExtension=${fileName%.*}
     should_deploy "$filenameNoExtension"
     if [[ $? -eq 1 ]]; then
         deploy_resource ${file} &
+        pids+=($!)
+        jobs+=("${filenameNoExtension}")
     fi
 done
 
@@ -212,12 +567,28 @@ done
 should_deploy "containerservice"
 if [[ $? -eq 1 ]]; then
     deploy_acs &
+    pids+=($!)
+    jobs+=("containerservice")
 fi
 
 should_deploy "policy"
 if [[ $? -eq 1 ]]; then
     deploy_policy_assignment &
+    pids+=($!)
+    jobs+=("policy")
 fi
 
 # Wait until all deployments are finished
-wait
+failed=0
+for i in "${!pids[@]}"; do
+    pid="${pids[$i]}"
+    job_name="${jobs[$i]}"
+    if ! wait "$pid"; then
+        echo "Deployment job failed: ${job_name}"
+        failed=1
+    fi
+done
+
+if [[ "$failed" -ne 0 ]]; then
+    exit 1
+fi
