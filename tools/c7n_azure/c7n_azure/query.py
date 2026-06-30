@@ -3,10 +3,7 @@
 
 import logging
 
-try:
-    from collections.abc import Iterable, Mapping
-except ImportError:
-    from collections import Iterable, Mapping
+from collections.abc import Iterable, Mapping
 
 from azure.mgmt.resourcegraph.models import QueryRequest
 from c7n.actions import ActionRegistry
