@@ -4,9 +4,9 @@
 import logging
 
 try:
-    from collections.abc import Iterable
+    from collections.abc import Iterable, Mapping
 except ImportError:
-    from collections import Iterable
+    from collections import Iterable, Mapping
 
 from azure.mgmt.resourcegraph.models import QueryRequest
 from c7n.actions import ActionRegistry
@@ -24,6 +24,18 @@ from c7n_azure.provider import resources
 from c7n_azure.utils import generate_key_vault_url, serialize
 
 log = logging.getLogger('custodian.azure.query')
+
+
+def _serialize(r):
+    # msrest-based SDK models expose `serialize`. Newer azure-core generated
+    # models (e.g. eventgrid 10.5.0b2+) are dict-like (Mapping) and use
+    # `as_dict`. Everything else (e.g. keyvault key/secret properties) falls
+    # back to the attribute-walking `serialize` helper.
+    if hasattr(r, 'serialize'):
+        return r.serialize(True)
+    if isinstance(r, Mapping):
+        return r.as_dict()
+    return serialize(r)
 
 
 class ResourceQuery:
@@ -48,9 +60,9 @@ class ResourceQuery:
             result = op(**params)
 
             if isinstance(result, Iterable):
-                return [r.serialize(True) for r in result]
+                return [_serialize(r) for r in result]
             elif hasattr(result, 'value'):
-                return [r.serialize(True) for r in result.value]
+                return [_serialize(r) for r in result.value]
         except Exception as e:
             log.error("Failed to query resource.\n"
                       "Type: azure.{0}.\n"
@@ -322,7 +334,7 @@ class QueryResourceManager(ResourceManager, metaclass=QueryMeta):
             op(rid, **params)
             for rid in resource_ids
         ]
-        return [r.serialize(True) for r in data]
+        return [_serialize(r) for r in data]
 
     @staticmethod
     def register_actions_and_filters(registry, resource_class):
@@ -419,11 +431,9 @@ class ChildResourceManager(QueryResourceManager, metaclass=QueryMeta):
         result = op(**params)
 
         if isinstance(result, Iterable):
-            # KeyVault items don't have `serialize` method now
-            return [(r.serialize(True) if hasattr(r, 'serialize') else serialize(r))
-                    for r in result]
+            return [_serialize(r) for r in result]
         elif hasattr(result, 'value'):
-            return [r.serialize(True) for r in result.value]
+            return [_serialize(r) for r in result.value]
 
         raise TypeError("Enumerating resources resulted in a return"
                         "value which could not be iterated.")
