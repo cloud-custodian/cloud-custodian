@@ -1,0 +1,184 @@
+{
+  "headers": {
+    "content-type": "application/json; charset=UTF-8",
+    "vary": "Origin, X-Origin, Referer",
+    "date": "Thu, 12 Mar 2026 03:53:54 GMT",
+    "server": "ESF",
+    "x-xss-protection": "0",
+    "x-frame-options": "SAMEORIGIN",
+    "x-content-type-options": "nosniff",
+    "alt-svc": "h3=\":443\"; ma=2592000,h3-29=\":443\"; ma=2592000",
+    "transfer-encoding": "chunked",
+    "status": "200",
+    "content-length": "6510",
+    "-content-encoding": "gzip",
+    "content-location": "https://us-east1-aiplatform.googleapis.com/v1/projects/cloud-custodian/locations/us-east1/modelDeploymentMonitoringJobs?alt=json"
+  },
+  "body": {
+    "modelDeploymentMonitoringJobs": [
+      {
+        "name": "projects/cloud-custodian/locations/us-east1/modelDeploymentMonitoringJobs/4823669180203008000",
+        "displayName": "c7n-monitor-c7n-endpoint-east",
+        "endpoint": "projects/cloud-custodian/locations/us-east1/endpoints/0",
+        "state": "JOB_STATE_PENDING",
+        "scheduleState": "OFFLINE",
+        "modelDeploymentMonitoringObjectiveConfigs": [
+          {
+            "deployedModelId": "2741330977673445376",
+            "objectiveConfig": {
+              "predictionDriftDetectionConfig": {}
+            }
+          }
+        ],
+        "modelDeploymentMonitoringScheduleConfig": {
+          "monitorInterval": "3600s",
+          "monitorWindow": "3600s"
+        },
+        "loggingSamplingStrategy": {
+          "randomSampleConfig": {
+            "sampleRate": 0.8
+          }
+        },
+        "bigqueryTables": [
+          {
+            "logSource": "SERVING",
+            "logType": "PREDICT",
+            "bigqueryTablePath": "bq://stacklet-personal-2.model_deployment_monitoring_8380444641559838720.serving_predict"
+          }
+        ],
+        "createTime": "2026-03-12T03:53:53.368160Z",
+        "updateTime": "2026-03-12T03:53:53.414247Z",
+        "modelMonitoringAlertConfig": {
+          "emailAlertConfig": {},
+          "enableLogging": true
+        },
+        "analysisInstanceSchemaUri": "gs://stacklet-personal-2-vertex-test-models/schema/instance_schema.yaml",
+        "logTtl": "0s"
+      },
+      {
+        "name": "projects/cloud-custodian/locations/us-east1/modelDeploymentMonitoringJobs/2760176125937188864",
+        "displayName": "c7n-monitor-c7n-endpoint-east",
+        "endpoint": "projects/cloud-custodian/locations/us-east1/endpoints/0",
+        "state": "JOB_STATE_CANCELLED",
+        "scheduleState": "OFFLINE",
+        "modelDeploymentMonitoringScheduleConfig": {
+          "monitorInterval": "3600s",
+          "monitorWindow": "3600s"
+        },
+        "loggingSamplingStrategy": {
+          "randomSampleConfig": {
+            "sampleRate": 0.8
+          }
+        },
+        "predictInstanceSchemaUri": "gs://cloud-ai-platform-29435907-c147-4ebd-8a52-0635558e68b1/instance_schemas/job-2760176125937188864/predict",
+        "bigqueryTables": [
+          {
+            "logSource": "SERVING",
+            "logType": "PREDICT",
+            "bigqueryTablePath": "bq://stacklet-personal-2.model_deployment_monitoring_3676434830771355648.serving_predict"
+          }
+        ],
+        "createTime": "2026-03-12T03:15:19.227347Z",
+        "updateTime": "2026-03-12T03:15:22.839893Z",
+        "nextScheduleTime": "2026-03-12T03:00:00Z",
+        "modelMonitoringAlertConfig": {
+          "emailAlertConfig": {},
+          "enableLogging": true
+        },
+        "analysisInstanceSchemaUri": "gs://cloud-ai-platform-29435907-c147-4ebd-8a52-0635558e68b1/instance_schemas/job-2760176125937188864/analysis",
+        "logTtl": "0s",
+        "statsAnomaliesBaseDirectory": {
+          "outputUriPrefix": "gs://cloud-ai-platform-29435907-c147-4ebd-8a52-0635558e68b1/model_monitoring/job-2760176125937188864"
+        },
+        "error": {
+          "code": 9,
+          "message": "Endpoint has been deleted."
+        }
+      },
+      {
+        "name": "projects/cloud-custodian/locations/us-east1/modelDeploymentMonitoringJobs/4329680596075806720",
+        "displayName": "c7n-monitor-c7n-endpoint-east",
+        "endpoint": "projects/cloud-custodian/locations/us-east1/endpoints/0",
+        "state": "JOB_STATE_CANCELLED",
+        "scheduleState": "OFFLINE",
+        "modelDeploymentMonitoringScheduleConfig": {
+          "monitorInterval": "3600s",
+          "monitorWindow": "3600s"
+        },
+        "loggingSamplingStrategy": {
+          "randomSampleConfig": {
+            "sampleRate": 0.8
+          }
+        },
+        "predictInstanceSchemaUri": "gs://cloud-ai-platform-29435907-c147-4ebd-8a52-0635558e68b1/instance_schemas/job-4329680596075806720/predict",
+        "bigqueryTables": [
+          {
+            "logSource": "SERVING",
+            "logType": "PREDICT",
+            "bigqueryTablePath": "bq://stacklet-personal-2.model_deployment_monitoring_7666624100621615104.serving_predict"
+          }
+        ],
+        "createTime": "2026-03-12T02:54:46.189922Z",
+        "updateTime": "2026-03-12T02:54:48.736101Z",
+        "nextScheduleTime": "2026-03-12T02:00:00Z",
+        "modelMonitoringAlertConfig": {
+          "emailAlertConfig": {},
+          "enableLogging": true
+        },
+        "analysisInstanceSchemaUri": "gs://cloud-ai-platform-29435907-c147-4ebd-8a52-0635558e68b1/instance_schemas/job-4329680596075806720/analysis",
+        "logTtl": "0s",
+        "statsAnomaliesBaseDirectory": {
+          "outputUriPrefix": "gs://cloud-ai-platform-29435907-c147-4ebd-8a52-0635558e68b1/model_monitoring/job-4329680596075806720"
+        },
+        "error": {
+          "code": 9,
+          "message": "Endpoint has been deleted."
+        }
+      },
+      {
+        "name": "projects/cloud-custodian/locations/us-east1/modelDeploymentMonitoringJobs/8754467229967319040",
+        "displayName": "c7n-monitor-c7n-endpoint-east",
+        "endpoint": "projects/cloud-custodian/locations/us-east1/endpoints/0",
+        "state": "JOB_STATE_RUNNING",
+        "scheduleState": "OFFLINE",
+        "modelDeploymentMonitoringObjectiveConfigs": [
+          {
+            "deployedModelId": "2925978562395635712",
+            "objectiveConfig": {
+              "predictionDriftDetectionConfig": {}
+            }
+          }
+        ],
+        "modelDeploymentMonitoringScheduleConfig": {
+          "monitorInterval": "3600s",
+          "monitorWindow": "3600s"
+        },
+        "loggingSamplingStrategy": {
+          "randomSampleConfig": {
+            "sampleRate": 0.8
+          }
+        },
+        "predictInstanceSchemaUri": "gs://cloud-ai-platform-29435907-c147-4ebd-8a52-0635558e68b1/instance_schemas/job-8754467229967319040/predict",
+        "bigqueryTables": [
+          {
+            "logSource": "SERVING",
+            "logType": "PREDICT",
+            "bigqueryTablePath": "bq://stacklet-personal-2.model_deployment_monitoring_7666624100621615104.serving_predict"
+          }
+        ],
+        "createTime": "2026-03-12T02:54:43.748932Z",
+        "updateTime": "2026-03-12T02:54:47.413709Z",
+        "nextScheduleTime": "2026-03-12T02:00:00Z",
+        "modelMonitoringAlertConfig": {
+          "emailAlertConfig": {},
+          "enableLogging": true
+        },
+        "analysisInstanceSchemaUri": "gs://cloud-ai-platform-29435907-c147-4ebd-8a52-0635558e68b1/instance_schemas/job-8754467229967319040/analysis",
+        "logTtl": "0s",
+        "statsAnomaliesBaseDirectory": {
+          "outputUriPrefix": "gs://cloud-ai-platform-29435907-c147-4ebd-8a52-0635558e68b1/model_monitoring/job-8754467229967319040"
+        }
+      }
+    ]
+  }
+}
