@@ -20,13 +20,13 @@ jobs:
   Lint:
     runs-on: ubuntu-latest
     steps:
-      - uses: actions/checkout@de0fac2e4500dabe0009e67214ff5f5447ce83dd # ratchet:actions/checkout@v4
-      - uses: actions/setup-python@a309ff8b426b58ec0e2a45f0f869d46889d02405 # ratchet:actions/setup-python@v5
+      - uses: actions/checkout@9c091bb21b7c1c1d1991bb908d89e4e9dddfe3e0 # ratchet:actions/checkout@v4
+      - uses: actions/setup-python@ece7cb06caefa5fff74198d8649806c4678c61a1 # ratchet:actions/setup-python@v5
         with:
           python-version: ${{ env.DEFAULT_PY_VERSION }}
       - name: Install uv
         id: setup-uv-lint
-        uses: astral-sh/setup-uv@08807647e7069bb48b6ef5acd8ec9567f424441b # ratchet:astral-sh/setup-uv@v6
+        uses: astral-sh/setup-uv@fac544c07dec837d0ccb6301d7b5580bf5edae39 # ratchet:astral-sh/setup-uv@v6
         with:
           version: ${{ env.UV_VERSION }}
           enable-cache: true
@@ -54,12 +54,12 @@ jobs:
     runs-on: ubuntu-latest
     needs: Lint
     steps:
-      - uses: actions/checkout@de0fac2e4500dabe0009e67214ff5f5447ce83dd # ratchet:actions/checkout@v4
-      - uses: actions/setup-python@a309ff8b426b58ec0e2a45f0f869d46889d02405 # ratchet:actions/setup-python@v5
+      - uses: actions/checkout@9c091bb21b7c1c1d1991bb908d89e4e9dddfe3e0 # ratchet:actions/checkout@v4
+      - uses: actions/setup-python@ece7cb06caefa5fff74198d8649806c4678c61a1 # ratchet:actions/setup-python@v5
         with:
           python-version: ${{ env.DEFAULT_PY_VERSION }}
         id: setup-uv-analyzer
-      - uses: astral-sh/setup-uv@08807647e7069bb48b6ef5acd8ec9567f424441b # ratchet:astral-sh/setup-uv@v6
+      - uses: astral-sh/setup-uv@fac544c07dec837d0ccb6301d7b5580bf5edae39 # ratchet:astral-sh/setup-uv@v6
         with:
           version: ${{ env.UV_VERSION }}
           enable-cache: true
@@ -78,7 +78,7 @@ jobs:
       id-token: write
       contents: read
     steps:
-      - uses: actions/checkout@de0fac2e4500dabe0009e67214ff5f5447ce83dd # ratchet:actions/checkout@v4
+      - uses: actions/checkout@9c091bb21b7c1c1d1991bb908d89e4e9dddfe3e0 # ratchet:actions/checkout@v4
 
       - name: Install Custodian
         uses: ./.github/composites/install
@@ -87,7 +87,7 @@ jobs:
           uv-version: ${{ env.UV_VERSION }}
 
       - name: Set up doc cache
-        uses: actions/cache@27d5ce7f107fe9357f9df03efb73ab90386fccae # ratchet:actions/cache@v4
+        uses: actions/cache@55cc8345863c7cc4c66a329aec7e433d2d1c52a9 # ratchet:actions/cache@v4
         id: sphinx
         with:
           path: |
@@ -109,7 +109,7 @@ jobs:
         # on its contents, on merges to main we update the cache to prevent
         # staleness.
         if: ${{ github.event_name == 'push' }}
-        uses: actions/cache/save@27d5ce7f107fe9357f9df03efb73ab90386fccae # ratchet:actions/cache/save@v4
+        uses: actions/cache/save@55cc8345863c7cc4c66a329aec7e433d2d1c52a9 # ratchet:actions/cache/save@v4
         with:
           path: |
             docs/build
@@ -131,7 +131,7 @@ jobs:
   Docker:
     runs-on: ubuntu-latest
     steps:
-      - uses: actions/checkout@de0fac2e4500dabe0009e67214ff5f5447ce83dd # ratchet:actions/checkout@v4
+      - uses: actions/checkout@9c091bb21b7c1c1d1991bb908d89e4e9dddfe3e0 # ratchet:actions/checkout@v4
       - name: c7n build and test
         uses: ./.github/composites/docker-build-push
         with:
@@ -154,7 +154,7 @@ jobs:
           - os: ubuntu-latest
             python-version: "3.10"
     steps:
-      - uses: actions/checkout@de0fac2e4500dabe0009e67214ff5f5447ce83dd # ratchet:actions/checkout@v4
+      - uses: actions/checkout@9c091bb21b7c1c1d1991bb908d89e4e9dddfe3e0 # ratchet:actions/checkout@v4
 
       - name: Set up Terraform
         uses: hashicorp/setup-terraform@5e8dbf3c6d9deaf4193ca7a8fb23f2ac83bb6c85 # ratchet:hashicorp/setup-terraform@v4.0.0
@@ -183,7 +183,7 @@ jobs:
           fi
 
       - name: Upload Code Coverage
-        uses: codecov/codecov-action@e79a6962e0d4c0c17b229090214935d2e33f8354 # ratchet:codecov/codecov-action@v5
+        uses: codecov/codecov-action@fb8b3582c8e4def4969c97caa2f19720cb33a72f # ratchet:codecov/codecov-action@v5
         if: contains(matrix.python-version, '3.11') && contains(matrix.os, 'ubuntu')
         with:
           files: ./coverage.xml

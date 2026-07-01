@@ -25,7 +25,7 @@ jobs:
           - c7n-left
     runs-on: ubuntu-latest-8-cores
     steps:
-      - uses: actions/checkout@de0fac2e4500dabe0009e67214ff5f5447ce83dd # ratchet:actions/checkout@v4
+      - uses: actions/checkout@9c091bb21b7c1c1d1991bb908d89e4e9dddfe3e0 # ratchet:actions/checkout@v4
       - name: ${{ matrix.image }} build and push
         uses: ./.github/composites/docker-build-push
         env:
