@@ -1,0 +1,505 @@
+{
+    "status_code": 200,
+    "data": {
+        "WebACL": {
+            "Name": "c7n-test-cloudfront",
+            "Id": "2f7d108e-7a71-465a-963f-34f56f3a0bb5",
+            "ARN": "arn:aws:wafv2:us-east-1:644160558196:global/webacl/c7n-test-cloudfront/2f7d108e-7a71-465a-963f-34f56f3a0bb5",
+            "DefaultAction": {
+                "Allow": {}
+            },
+            "Description": "",
+            "Rules": [
+                {
+                    "Name": "AWS-AWSManagedRulesAntiDDoSRuleSet",
+                    "Priority": 0,
+                    "Statement": {
+                        "ManagedRuleGroupStatement": {
+                            "VendorName": "AWS",
+                            "Name": "AWSManagedRulesAntiDDoSRuleSet",
+                            "ManagedRuleGroupConfigs": [
+                                {
+                                    "AWSManagedRulesAntiDDoSRuleSet": {
+                                        "ClientSideActionConfig": {
+                                            "Challenge": {
+                                                "UsageOfAction": "ENABLED",
+                                                "Sensitivity": "HIGH",
+                                                "ExemptUriRegularExpressions": [
+                                                    {
+                                                        "RegexString": "\\/api\\/|\\.(acc|avi|css|gif|ico|jpe?g|js|json|mp[34]|ogg|otf|pdf|png|tiff?|ttf|webm|webp|woff2?|xml)$"
+                                                    }
+                                                ]
+                                            }
+                                        },
+                                        "SensitivityToBlock": "LOW"
+                                    }
+                                }
+                            ]
+                        }
+                    },
+                    "OverrideAction": {
+                        "Count": {}
+                    },
+                    "VisibilityConfig": {
+                        "SampledRequestsEnabled": true,
+                        "CloudWatchMetricsEnabled": true,
+                        "MetricName": "AWS-AWSManagedRulesAntiDDoSRuleSet"
+                    }
+                },
+                {
+                    "Name": "c7n-test-cloudfront_IPV4_Allow",
+                    "Priority": 1,
+                    "Statement": {
+                        "IPSetReferenceStatement": {
+                            "ARN": "arn:aws:wafv2:us-east-1:644160558196:global/ipset/c7n-test-cloudfront_IPV4_Allow/3963c0df-3ac2-49b5-9f4b-1af26249d8cc"
+                        }
+                    },
+                    "Action": {
+                        "Allow": {}
+                    },
+                    "VisibilityConfig": {
+                        "SampledRequestsEnabled": true,
+                        "CloudWatchMetricsEnabled": true,
+                        "MetricName": "c7n-test-cloudfront_IPV4_Allow"
+                    }
+                },
+                {
+                    "Name": "c7n-test-cloudfront_IPV6_Allow",
+                    "Priority": 2,
+                    "Statement": {
+                        "IPSetReferenceStatement": {
+                            "ARN": "arn:aws:wafv2:us-east-1:644160558196:global/ipset/c7n-test-cloudfront_IPV6_Allow/cc6f0373-1692-4d80-a87a-513b241c4546"
+                        }
+                    },
+                    "Action": {
+                        "Allow": {}
+                    },
+                    "VisibilityConfig": {
+                        "SampledRequestsEnabled": true,
+                        "CloudWatchMetricsEnabled": true,
+                        "MetricName": "c7n-test-cloudfront_IPV6_Allow"
+                    }
+                },
+                {
+                    "Name": "c7n-test-cloudfront_IPV4_Block",
+                    "Priority": 3,
+                    "Statement": {
+                        "IPSetReferenceStatement": {
+                            "ARN": "arn:aws:wafv2:us-east-1:644160558196:global/ipset/c7n-test-cloudfront_IPV4_Block/8acea1e0-919d-41d6-8a02-c67ef25513fb"
+                        }
+                    },
+                    "Action": {
+                        "Block": {}
+                    },
+                    "VisibilityConfig": {
+                        "SampledRequestsEnabled": true,
+                        "CloudWatchMetricsEnabled": true,
+                        "MetricName": "c7n-test-cloudfront_IPV4_Block"
+                    }
+                },
+                {
+                    "Name": "c7n-test-cloudfront_IPV6_Block",
+                    "Priority": 4,
+                    "Statement": {
+                        "IPSetReferenceStatement": {
+                            "ARN": "arn:aws:wafv2:us-east-1:644160558196:global/ipset/c7n-test-cloudfront_IPV6_Block/a5ded2a7-1dd0-42eb-b019-7a6f1d0ebbbb"
+                        }
+                    },
+                    "Action": {
+                        "Block": {}
+                    },
+                    "VisibilityConfig": {
+                        "SampledRequestsEnabled": true,
+                        "CloudWatchMetricsEnabled": true,
+                        "MetricName": "c7n-test-cloudfront_IPV6_Block"
+                    }
+                },
+                {
+                    "Name": "GeoRule",
+                    "Priority": 5,
+                    "Statement": {
+                        "GeoMatchStatement": {
+                            "CountryCodes": [
+                                "CU",
+                                "IR",
+                                "KP",
+                                "RU",
+                                "SY",
+                                "VE"
+                            ]
+                        }
+                    },
+                    "Action": {
+                        "Block": {}
+                    },
+                    "VisibilityConfig": {
+                        "SampledRequestsEnabled": true,
+                        "CloudWatchMetricsEnabled": true,
+                        "MetricName": "GeoRule"
+                    }
+                },
+                {
+                    "Name": "GlobalRateBasedRule",
+                    "Priority": 6,
+                    "Statement": {
+                        "RateBasedStatement": {
+                            "Limit": 1000,
+                            "EvaluationWindowSec": 300,
+                            "AggregateKeyType": "IP"
+                        }
+                    },
+                    "Action": {
+                        "Count": {}
+                    },
+                    "VisibilityConfig": {
+                        "SampledRequestsEnabled": true,
+                        "CloudWatchMetricsEnabled": true,
+                        "MetricName": "GlobalRateBasedRule"
+                    }
+                },
+                {
+                    "Name": "RateBasedRuleGET",
+                    "Priority": 7,
+                    "Statement": {
+                        "RateBasedStatement": {
+                            "Limit": 500,
+                            "EvaluationWindowSec": 300,
+                            "AggregateKeyType": "IP",
+                            "ScopeDownStatement": {
+                                "ByteMatchStatement": {
+                                    "SearchString": "R0VU",
+                                    "FieldToMatch": {
+                                        "Method": {}
+                                    },
+                                    "TextTransformations": [
+                                        {
+                                            "Priority": 0,
+                                            "Type": "NONE"
+                                        }
+                                    ],
+                                    "PositionalConstraint": "EXACTLY"
+                                }
+                            }
+                        }
+                    },
+                    "Action": {
+                        "Count": {}
+                    },
+                    "VisibilityConfig": {
+                        "SampledRequestsEnabled": true,
+                        "CloudWatchMetricsEnabled": true,
+                        "MetricName": "RateBasedRuleGET"
+                    }
+                },
+                {
+                    "Name": "RateBasedRulePOST",
+                    "Priority": 8,
+                    "Statement": {
+                        "RateBasedStatement": {
+                            "Limit": 100,
+                            "EvaluationWindowSec": 300,
+                            "AggregateKeyType": "IP",
+                            "ScopeDownStatement": {
+                                "OrStatement": {
+                                    "Statements": [
+                                        {
+                                            "ByteMatchStatement": {
+                                                "SearchString": "UE9TVA==",
+                                                "FieldToMatch": {
+                                                    "Method": {}
+                                                },
+                                                "TextTransformations": [
+                                                    {
+                                                        "Priority": 0,
+                                                        "Type": "NONE"
+                                                    }
+                                                ],
+                                                "PositionalConstraint": "EXACTLY"
+                                            }
+                                        },
+                                        {
+                                            "ByteMatchStatement": {
+                                                "SearchString": "UFVU",
+                                                "FieldToMatch": {
+                                                    "Method": {}
+                                                },
+                                                "TextTransformations": [
+                                                    {
+                                                        "Priority": 0,
+                                                        "Type": "NONE"
+                                                    }
+                                                ],
+                                                "PositionalConstraint": "EXACTLY"
+                                            }
+                                        },
+                                        {
+                                            "ByteMatchStatement": {
+                                                "SearchString": "REVMRVRF",
+                                                "FieldToMatch": {
+                                                    "Method": {}
+                                                },
+                                                "TextTransformations": [
+                                                    {
+                                                        "Priority": 0,
+                                                        "Type": "NONE"
+                                                    }
+                                                ],
+                                                "PositionalConstraint": "EXACTLY"
+                                            }
+                                        }
+                                    ]
+                                }
+                            }
+                        }
+                    },
+                    "Action": {
+                        "Count": {}
+                    },
+                    "VisibilityConfig": {
+                        "SampledRequestsEnabled": true,
+                        "CloudWatchMetricsEnabled": true,
+                        "MetricName": "RateBasedRulePOST"
+                    }
+                },
+                {
+                    "Name": "BodySizeRestrictionRule",
+                    "Priority": 9,
+                    "Statement": {
+                        "SizeConstraintStatement": {
+                            "FieldToMatch": {
+                                "Body": {
+                                    "OversizeHandling": "MATCH"
+                                }
+                            },
+                            "ComparisonOperator": "GT",
+                            "Size": 16384,
+                            "TextTransformations": [
+                                {
+                                    "Priority": 0,
+                                    "Type": "NONE"
+                                }
+                            ]
+                        }
+                    },
+                    "Action": {
+                        "Count": {}
+                    },
+                    "VisibilityConfig": {
+                        "SampledRequestsEnabled": true,
+                        "CloudWatchMetricsEnabled": true,
+                        "MetricName": "BodySizeRestrictionRule"
+                    }
+                },
+                {
+                    "Name": "AWS-AWSManagedRulesAmazonIpReputationList",
+                    "Priority": 10,
+                    "Statement": {
+                        "ManagedRuleGroupStatement": {
+                            "VendorName": "AWS",
+                            "Name": "AWSManagedRulesAmazonIpReputationList",
+                            "RuleActionOverrides": [
+                                {
+                                    "Name": "AWSManagedReconnaissanceList",
+                                    "ActionToUse": {
+                                        "Count": {}
+                                    }
+                                },
+                                {
+                                    "Name": "AWSManagedIPDDoSList",
+                                    "ActionToUse": {
+                                        "Block": {}
+                                    }
+                                }
+                            ]
+                        }
+                    },
+                    "OverrideAction": {
+                        "None": {}
+                    },
+                    "VisibilityConfig": {
+                        "SampledRequestsEnabled": true,
+                        "CloudWatchMetricsEnabled": true,
+                        "MetricName": "AWS-AWSManagedRulesAmazonIpReputationList"
+                    }
+                },
+                {
+                    "Name": "ManagedIPDDoSRateLimit",
+                    "Priority": 11,
+                    "Statement": {
+                        "RateBasedStatement": {
+                            "Limit": 1000,
+                            "EvaluationWindowSec": 300,
+                            "AggregateKeyType": "IP",
+                            "ScopeDownStatement": {
+                                "LabelMatchStatement": {
+                                    "Scope": "LABEL",
+                                    "Key": "awswaf:managed:aws:amazon-ip-list:AWSManagedIPDDoSList"
+                                }
+                            }
+                        }
+                    },
+                    "Action": {
+                        "Count": {}
+                    },
+                    "VisibilityConfig": {
+                        "SampledRequestsEnabled": true,
+                        "CloudWatchMetricsEnabled": true,
+                        "MetricName": "ManagedIPDDoSRateLimit"
+                    }
+                },
+                {
+                    "Name": "AWS-AWSManagedRulesAnonymousIpList",
+                    "Priority": 12,
+                    "Statement": {
+                        "ManagedRuleGroupStatement": {
+                            "VendorName": "AWS",
+                            "Name": "AWSManagedRulesAnonymousIpList"
+                        }
+                    },
+                    "OverrideAction": {
+                        "None": {}
+                    },
+                    "VisibilityConfig": {
+                        "SampledRequestsEnabled": true,
+                        "CloudWatchMetricsEnabled": true,
+                        "MetricName": "AWS-AWSManagedRulesAnonymousIpList"
+                    }
+                },
+                {
+                    "Name": "AWS-AWSManagedRulesCommonRuleSet",
+                    "Priority": 13,
+                    "Statement": {
+                        "ManagedRuleGroupStatement": {
+                            "VendorName": "AWS",
+                            "Name": "AWSManagedRulesCommonRuleSet"
+                        }
+                    },
+                    "OverrideAction": {
+                        "None": {}
+                    },
+                    "VisibilityConfig": {
+                        "SampledRequestsEnabled": true,
+                        "CloudWatchMetricsEnabled": true,
+                        "MetricName": "AWS-AWSManagedRulesCommonRuleSet"
+                    }
+                },
+                {
+                    "Name": "AWS-AWSManagedRulesKnownBadInputsRuleSet",
+                    "Priority": 14,
+                    "Statement": {
+                        "ManagedRuleGroupStatement": {
+                            "VendorName": "AWS",
+                            "Name": "AWSManagedRulesKnownBadInputsRuleSet"
+                        }
+                    },
+                    "OverrideAction": {
+                        "None": {}
+                    },
+                    "VisibilityConfig": {
+                        "SampledRequestsEnabled": true,
+                        "CloudWatchMetricsEnabled": true,
+                        "MetricName": "AWS-AWSManagedRulesKnownBadInputsRuleSet"
+                    }
+                },
+                {
+                    "Name": "AWS-AWSManagedRulesSQLiRuleSet",
+                    "Priority": 15,
+                    "Statement": {
+                        "ManagedRuleGroupStatement": {
+                            "VendorName": "AWS",
+                            "Name": "AWSManagedRulesSQLiRuleSet"
+                        }
+                    },
+                    "OverrideAction": {
+                        "None": {}
+                    },
+                    "VisibilityConfig": {
+                        "SampledRequestsEnabled": true,
+                        "CloudWatchMetricsEnabled": true,
+                        "MetricName": "AWS-AWSManagedRulesSQLiRuleSet"
+                    }
+                },
+                {
+                    "Name": "AWS-AWSManagedRulesLinuxRuleSet",
+                    "Priority": 16,
+                    "Statement": {
+                        "ManagedRuleGroupStatement": {
+                            "VendorName": "AWS",
+                            "Name": "AWSManagedRulesLinuxRuleSet"
+                        }
+                    },
+                    "OverrideAction": {
+                        "None": {}
+                    },
+                    "VisibilityConfig": {
+                        "SampledRequestsEnabled": true,
+                        "CloudWatchMetricsEnabled": true,
+                        "MetricName": "AWS-AWSManagedRulesLinuxRuleSet"
+                    }
+                },
+                {
+                    "Name": "AWS-AWSManagedRulesBotControlRuleSet",
+                    "Priority": 17,
+                    "Statement": {
+                        "ManagedRuleGroupStatement": {
+                            "VendorName": "AWS",
+                            "Name": "AWSManagedRulesBotControlRuleSet",
+                            "ManagedRuleGroupConfigs": [
+                                {
+                                    "AWSManagedRulesBotControlRuleSet": {
+                                        "InspectionLevel": "COMMON"
+                                    }
+                                }
+                            ]
+                        }
+                    },
+                    "OverrideAction": {
+                        "Count": {}
+                    },
+                    "VisibilityConfig": {
+                        "SampledRequestsEnabled": true,
+                        "CloudWatchMetricsEnabled": true,
+                        "MetricName": "AWS-AWSManagedRulesBotControlRuleSet"
+                    }
+                }
+            ],
+            "VisibilityConfig": {
+                "SampledRequestsEnabled": true,
+                "CloudWatchMetricsEnabled": true,
+                "MetricName": "c7n-test-cloudfront"
+            },
+            "Capacity": 1498,
+            "ManagedByFirewallManager": false,
+            "LabelNamespace": "awswaf:644160558196:webacl:c7n-test-cloudfront:",
+            "RetrofittedByFirewallManager": false,
+            "OnSourceDDoSProtectionConfig": {
+                "ALBLowReputationMode": "ACTIVE_UNDER_DDOS"
+            },
+            "ApplicationConfig": {
+                "Attributes": [
+                    {
+                        "Name": "ApplicationCategory",
+                        "Values": [
+                            "other"
+                        ]
+                    },
+                    {
+                        "Name": "TrafficSource",
+                        "Values": [
+                            "api",
+                            "web"
+                        ]
+                    },
+                    {
+                        "Name": "ProtectionsName",
+                        "Values": [
+                            "Recommended"
+                        ]
+                    }
+                ]
+            }
+        },
+        "LockToken": "40bd3b09-57a1-45b6-a711-6dc378c00dc1",
+        "ResponseMetadata": {}
+    }
+}
