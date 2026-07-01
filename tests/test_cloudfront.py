@@ -1099,82 +1099,35 @@ class CloudFrontWafV2(BaseTest):
         self.assertEqual(len(resources), 1)
 
     def test_wafv2_cloudfront_scope_uses_us_east_1(self):
-        """Test that WAFv2 queries with CLOUDFRONT scope use us-east-1 region.
+        """Regression test: CLOUDFRONT scope must use us-east-1 via WAFV2.get_client().
 
-        This is a regression test for the bug where CLOUDFRONT scope queries
-        would use the policy's region instead of us-east-1, causing:
-        WAFInvalidParameterException: The scope is not valid., field: SCOPE_VALUE
-
-        This test directly verifies the WafV2ResourceQuery behavior.
+        Previously WAFInvalidParameterException would be raised when a policy
+        configured in a non-us-east-1 region queried CLOUDFRONT-scoped WebACLs.
         """
-        from c7n.resources.waf import WafV2ResourceQuery
-        from c7n.query import TypeInfo
+        from c7n.config import Config
+        from c7n.resources.waf import WAFV2
 
-        # Create a real TypeInfo class for WAFv2
-        class MockResourceType(TypeInfo):
-            service = 'wafv2'
-            enum_spec = ('list_web_acls', 'WebACLs', None)
-
-        # Create a mock resource manager with config.region = 'us-west-2'
-        mock_manager = MagicMock()
-        mock_manager.config.region = 'us-west-2'
-        mock_manager.get_client = None  # Force creation of new client
-        mock_manager.resource_type = MockResourceType
-        mock_manager.retry = None
-
-        # Create the query handler
-        query = WafV2ResourceQuery(lambda: MagicMock())
-
-        # Mock local_session to track what region is used
         with patch('c7n.resources.waf.local_session') as mock_local_session:
             mock_session = MagicMock()
-            mock_client = MagicMock()
-            mock_client.list_web_acls.return_value = {'WebACLs': []}
-            mock_client.can_paginate.return_value = False
-            mock_session.client.return_value = mock_client
             mock_local_session.return_value = mock_session
 
-            # Test 1: Query with CLOUDFRONT scope should use us-east-1
-            query.filter(mock_manager, Scope='CLOUDFRONT')
+            ctx = self.get_context(config=Config.empty(region='us-west-2'))
 
-            # Verify client was created with us-east-1, not us-west-2
-            mock_session.client.assert_called()
-            call_args = mock_session.client.call_args
-            self.assertEqual(call_args[0][0], 'wafv2', "Should create wafv2 client")
-            self.assertEqual(
-                call_args[0][1],
-                'us-east-1',
-                "Should use us-east-1 for CLOUDFRONT scope, not us-west-2",
-            )
+            # CLOUDFRONT scope should always use us-east-1
+            manager = WAFV2(ctx, {'query': [{'Scope': 'CLOUDFRONT'}]})
+            manager.get_client()
+            mock_session.client.assert_called_once_with('wafv2', region_name='us-east-1')
 
-            # Reset mock
             mock_session.client.reset_mock()
 
-            # Test 2: Query with REGIONAL scope should use manager's region
-            query.filter(mock_manager, Scope='REGIONAL')
+            # REGIONAL scope should use the configured region
+            manager = WAFV2(ctx, {'query': [{'Scope': 'REGIONAL'}]})
+            manager.get_client()
+            mock_session.client.assert_called_once_with('wafv2', region_name='us-west-2')
 
-            # Verify client was created with us-west-2
-            mock_session.client.assert_called()
-            call_args = mock_session.client.call_args
-            self.assertEqual(call_args[0][0], 'wafv2', "Should create wafv2 client")
-            self.assertEqual(
-                call_args[0][1],
-                'us-west-2',
-                "Should use manager's region (us-west-2) for REGIONAL scope",
-            )
-
-            # Reset mock
             mock_session.client.reset_mock()
 
-            # Test 2: Query with REGIONAL scope should use manager's region
-            query.filter(mock_manager, Scope='REGIONAL')
-
-            # Verify client was created with us-west-2
-            mock_session.client.assert_called()
-            call_args = mock_session.client.call_args
-            self.assertEqual(call_args[0][0], 'wafv2', "Should create wafv2 client")
-            self.assertEqual(
-                call_args[0][1],
-                'us-west-2',
-                "Should use manager's region (us-west-2) for REGIONAL scope",
-            )
+            # No scope in query should default to REGIONAL
+            manager = WAFV2(ctx, {})
+            manager.get_client()
+            mock_session.client.assert_called_once_with('wafv2', region_name='us-west-2')

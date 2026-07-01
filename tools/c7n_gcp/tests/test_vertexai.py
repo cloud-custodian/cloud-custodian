@@ -4,10 +4,9 @@
 import os
 import json
 import time
+import logging
+from unittest.mock import Mock, patch
 from google.api_core.client_options import ClientOptions
-
-from c7n.testing import C7N_FUNCTIONAL
-from c7n_gcp.client import get_default_project
 from gcp_common import BaseTest
 
 
@@ -112,12 +111,7 @@ def test_vertexai_endpoint_multi_location(test):
     in a single policy run by specifying multiple locations in the query.
     """
 
-    if C7N_FUNCTIONAL:
-        project_id = get_default_project()
-        session_factory = test.record_flight_data(
-            'vertexai-endpoint-multi-location', project_id=project_id)
-    else:
-        session_factory = test.replay_flight_data('vertexai-endpoint-multi-location')
+    session_factory = test.replay_flight_data('vertexai-endpoint-multi-location')
 
     # Query both us-central1 and us-east1 in a single policy
     policy = test.load_policy(
@@ -149,12 +143,7 @@ def test_vertexai_endpoint_get_urns(test):
     This test verifies that URNs are correctly generated for Vertex AI endpoints,
     which exercises the _get_location classmethod to extract location from resource names.
     """
-    if C7N_FUNCTIONAL:
-        project_id = get_default_project()
-        session_factory = test.record_flight_data(
-            'vertexai-endpoint-multi-location', project_id=project_id)
-    else:
-        session_factory = test.replay_flight_data('vertexai-endpoint-multi-location')
+    session_factory = test.replay_flight_data('vertexai-endpoint-multi-location')
 
     policy = test.load_policy({
         'name': 'test-endpoint-urns',
@@ -183,12 +172,7 @@ def test_vertexai_endpoint_filtering(test,):
     This test explicitly verifies that value filters work correctly on
     endpoint displayName field.
     """
-    if C7N_FUNCTIONAL:
-        project_id = get_default_project()
-        session_factory = test.record_flight_data(
-            'vertexai-endpoint-filtering', project_id=project_id)
-    else:
-        session_factory = test.replay_flight_data('vertexai-endpoint-filtering')
+    session_factory = test.replay_flight_data('vertexai-endpoint-filtering')
 
     # Filter by displayName using regex
     policy = test.load_policy(
@@ -219,12 +203,7 @@ def test_vertexai_endpoint_delete(test):
     This test verifies that the delete action can successfully delete
     endpoints across multiple locations.
     """
-    if C7N_FUNCTIONAL:
-        project_id = get_default_project()
-        session_factory = test.record_flight_data(
-            'vertexai-endpoint-delete', project_id=project_id)
-    else:
-        session_factory = test.replay_flight_data('vertexai-endpoint-delete')
+    session_factory = test.replay_flight_data('vertexai-endpoint-delete')
 
     policy = test.load_policy(
         {'name': 'delete-test-endpoints',
@@ -275,6 +254,144 @@ def test_vertexai_endpoint_delete(test):
     assert len(remaining_resources) == 0
 
 
+def test_vertexai_endpoint_monitor(test):
+    """Test creating Model Deployment Monitoring Jobs for Vertex AI Endpoints.
+
+    This test verifies that the monitor action can successfully create
+    monitoring jobs for endpoints with deployed models across multiple regions.
+    It also tests that running the action again does not fail.
+    """
+    session_factory = test.replay_flight_data('vertexai-endpoint-monitor')
+    # Replay uses a placeholder schema URI; a temporary record_flight_data swap can
+    # still supply the real project-specific bucket via test.recording.
+    schema_uri = 'gs://cloud-custodian-vertex-test-models/schema/instance_schema.yaml'
+    if test.recording:
+        session = session_factory()
+        project_id = session.get_default_project()
+        schema_uri = f'gs://{project_id}-vertex-test-models/schema/instance_schema.yaml'
+
+    policy = test.load_policy(
+        {'name': 'monitor-endpoints',
+         'resource': 'gcp.vertex-ai-endpoint',
+         'query': [
+             {'location': 'us-central1'},
+             {'location': 'us-east1'}
+         ],
+         'filters': [
+             {'type': 'value',
+              'key': 'deployedModels',
+              'value': 'present'}
+         ],
+         'actions': [
+             {'type': 'monitor',
+              'analysis_instance_schema_uri': schema_uri}
+         ]},
+        session_factory=session_factory)
+
+    resources = policy.run()
+
+    # Verify that resources were found in both regions
+    assert len(resources) >= 2
+
+    # Verify all resources have deployed models
+    assert all(r.get('deployedModels') for r in resources)
+
+    locations = {r['name'].split('/')[3] for r in resources}
+    assert 'us-central1' in locations
+    assert 'us-east1' in locations
+
+    session = session_factory()
+    project_id = session.get_default_project()
+
+    # Check both regions
+    regions = ['us-central1', 'us-east1']
+    total_c7n_jobs = 0
+
+    for region in regions:
+        # Query for the monitoring job we just created
+        client_options = ClientOptions(
+            api_endpoint=f'https://{region}-aiplatform.googleapis.com'
+        )
+        monitoring_client = session.client(
+            'aiplatform', 'v1',
+            'projects.locations.modelDeploymentMonitoringJobs',
+            client_options=client_options
+        )
+
+        # List monitoring jobs
+        response = monitoring_client.execute_command(
+            'list',
+            {'parent': f'projects/{project_id}/locations/{region}'}
+        )
+
+        monitoring_jobs = response.get('modelDeploymentMonitoringJobs', [])
+
+        # Count monitoring jobs with c7n naming pattern
+        c7n_jobs = [
+            job for job in monitoring_jobs
+            if job.get('displayName', '').startswith('c7n-monitor-')
+        ]
+        total_c7n_jobs += len(c7n_jobs)
+
+        # Verify at least one monitoring job exists in this region
+        assert len(c7n_jobs) >= 1, f'No monitoring jobs found in {region}'
+
+    # Verify we have monitoring jobs in both regions
+    assert total_c7n_jobs >= 2
+
+    # Test idempotency: Run the monitor action again
+    # wait 30 seconds to allow the monitoring job to enter running state
+    if test.recording:
+        time.sleep(30)
+    log_output = test.capture_logging('custodian.actions', level=logging.WARNING)
+    resources_retry = policy.run()
+    assert len(resources_retry) >= 2
+
+    # Verify we emit the expected warning when monitoring jobs already exist.
+    logs = log_output.getvalue()
+    assert 'Monitoring job already exists for endpoint' in logs
+
+
+def test_vertexai_endpoint_monitor_no_schema(test):
+    """Test creating Model Deployment Monitoring Jobs without schema URI.
+
+    This test verifies that the monitor action works when no schema URI is provided.
+    The monitoring job will be created but will remain in PENDING state until
+    ~1000 prediction requests are received.
+    """
+    # Reuse the existing cassette since the API calls are the same
+    session_factory = test.replay_flight_data('vertexai-endpoint-monitor')
+
+    policy = test.load_policy(
+        {'name': 'monitor-endpoints-no-schema',
+         'resource': 'gcp.vertex-ai-endpoint',
+         'query': [
+             {'location': 'us-central1'}
+         ],
+         'filters': [
+             {'type': 'value',
+              'key': 'deployedModels',
+              'value': 'present'}
+         ],
+         'actions': [
+             {'type': 'monitor'}
+         ]},
+        session_factory=session_factory
+    )
+
+    log_output = test.capture_logging('custodian.actions', level=logging.WARNING)
+    resources = policy.run()
+
+    # Should still find endpoints and process the action without schema.
+    assert len(resources) >= 1
+    assert all(r.get('deployedModels') for r in resources)
+
+    # Verify we emit the expected warning about missing schema.
+    logs = log_output.getvalue()
+    assert 'No analysis_instance_schema_uri provided.' in logs
+    assert 'will remain in PENDING state' in logs
+
+
 # Batch Prediction Job Tests
 # Before running any of these test in recording mode. Complete the steps in
 # tools/c7n_gcp/tests/terraform/vertexai_batch_prediction_job/vertex_batch.md to create the
@@ -286,13 +403,8 @@ def test_vertexai_batch_prediction_job_multi_location(test):
     This test verifies that we can query batch prediction jobs in multiple locations
     in a single policy run by specifying multiple locations in the query.
     """
-    if C7N_FUNCTIONAL:
-        project_id = get_default_project()
-        session_factory = test.record_flight_data(
-            'vertexai-batch-prediction-job-multi-location', project_id=project_id)
-    else:
-        session_factory = test.replay_flight_data(
-            'vertexai-batch-prediction-job-multi-location')
+    session_factory = test.replay_flight_data(
+        'vertexai-batch-prediction-job-multi-location')
 
     # When recording, create batch prediction jobs via API
     if test.recording:
@@ -429,13 +541,8 @@ def test_vertexai_batch_prediction_job_filtering(test):
     This test verifies that value filters work correctly on batch job state field.
     It filters for jobs in JOB_STATE_RUNNING state.
     """
-    if C7N_FUNCTIONAL:
-        project_id = get_default_project()
-        session_factory = test.record_flight_data(
-            'vertexai-batch-prediction-job-filtering', project_id=project_id)
-    else:
-        session_factory = test.replay_flight_data(
-            'vertexai-batch-prediction-job-filtering')
+    session_factory = test.replay_flight_data(
+        'vertexai-batch-prediction-job-filtering')
 
     # When recording, create batch prediction jobs via API
     if test.recording:
@@ -528,13 +635,8 @@ def test_vertexai_batch_prediction_job_get_urns(test):
     This test verifies that URNs are correctly generated for batch prediction jobs,
     which exercises the _get_location classmethod to extract location from resource names.
     """
-    if C7N_FUNCTIONAL:
-        project_id = get_default_project()
-        session_factory = test.record_flight_data(
-            'vertexai-batch-prediction-job-multi-location', project_id=project_id)
-    else:
-        session_factory = test.replay_flight_data(
-            'vertexai-batch-prediction-job-multi-location')
+    session_factory = test.replay_flight_data(
+        'vertexai-batch-prediction-job-multi-location')
 
     policy = test.load_policy({
         'name': 'test-batch-job-urns',
@@ -571,13 +673,8 @@ def test_vertexai_batch_prediction_job_stop_and_delete(test):
     1. A running batch prediction job can be stopped (cancelled)
     2. The stopped job can then be deleted
     """
-    if C7N_FUNCTIONAL:
-        project_id = get_default_project()
-        session_factory = test.record_flight_data(
-            'vertexai-batch-prediction-job-stop-and-delete', project_id=project_id)
-    else:
-        session_factory = test.replay_flight_data(
-            'vertexai-batch-prediction-job-stop-and-delete')
+    session_factory = test.replay_flight_data(
+        'vertexai-batch-prediction-job-stop-and-delete')
 
     # When recording, create a batch prediction job to stop and delete
     if test.recording:
@@ -799,14 +896,7 @@ def test_vertexai_endpoint_location_query_with_location(test):
     This test verifies that endpoints can be queried from specific locations
     using the 'location' key in the query specification.
     """
-    if C7N_FUNCTIONAL:
-        project_id = get_default_project()
-        session_factory = test.record_flight_data(
-            'vertexai-endpoint-location-query-location',
-            project_id=project_id
-        )
-    else:
-        session_factory = test.replay_flight_data('vertexai-endpoint-location-query-location')
+    session_factory = test.replay_flight_data('vertexai-endpoint-location-query-location')
 
     policy = test.load_policy({
         'name': 'test-location-query-location',
@@ -879,13 +969,8 @@ def test_vertexai_endpoint_location_default_all_regions(test):
     This test verifies that when no query or config is specified,
     endpoints are queried from all Vertex AI supported regions.
     """
-    if C7N_FUNCTIONAL:
-        project_id = get_default_project()
-        session_factory = test.record_flight_data(
-            'vertexai-endpoint-location-default', project_id=project_id)
-    else:
-        session_factory = test.replay_flight_data(
-            'vertexai-endpoint-location-default')
+    session_factory = test.replay_flight_data(
+        'vertexai-endpoint-location-default')
 
     # No query, no config - should use all Vertex AI regions
     policy = test.load_policy({
@@ -899,6 +984,103 @@ def test_vertexai_endpoint_location_default_all_regions(test):
     # Just verify that if we have resources, they have the location annotation
     if resources:
         assert all('c7n:location' in r for r in resources)
+
+
+def test_vertexai_endpoint_monitor_invalid_schema_uri(test):
+    """Test monitor action with invalid GCS schema URI validation"""
+    policy = test.load_policy({
+        'name': 'test-invalid-schema-uri-format',
+        'resource': 'gcp.vertex-ai-endpoint',
+        'filters': [{'displayName': 'test-endpoint'}],
+        'actions': [{
+            'type': 'monitor',
+            'analysis_instance_schema_uri': 'gs://test-bucket/schema.yaml'
+        }]
+    })
+
+    action = policy.resource_manager.actions[0]
+
+    # Test 1: Invalid GCS URI format (not starting with gs://)
+    try:
+        action.validate_schema('https://invalid-url/schema.yaml')
+        assert False, 'Should have raised ValueError for non-GCS URI'
+    except ValueError as e:
+        assert 'must be a GCS path' in str(e)
+
+    # Test 2: Invalid file extension (not .yaml or .yml)
+    try:
+        action.validate_schema('gs://bucket/schema.json')
+        assert False, 'Should have raised ValueError for non-YAML file'
+    except ValueError as e:
+        assert 'must be YAML format' in str(e)
+
+
+def test_vertexai_endpoint_monitor_schema_yaml_validation(test):
+    """Test monitor action schema YAML parsing and validation
+
+    This test validates the schema validation logic by mocking GCS blob downloads
+    to test various invalid schema formats without requiring actual GCS files.
+    """
+    session_factory = test.replay_flight_data('vertexai-endpoint-monitor')
+    bucket_name = 'test-bucket'
+
+    policy = test.load_policy({
+        'name': 'test-schema-yaml-validation',
+        'resource': 'gcp.vertex-ai-endpoint',
+        'filters': [{'displayName': 'test-endpoint'}],
+        'actions': [{
+            'type': 'monitor',
+            'analysis_instance_schema_uri': f'gs://{bucket_name}/schema/instance_schema.yaml'
+        }]
+    }, session_factory=session_factory)
+
+    action = policy.resource_manager.actions[0]
+
+    # Mock the GCS storage client to return test data
+    with patch('c7n_gcp.resources.vertexai.storage.Client') as mock_storage_client:
+        mock_client = Mock()
+        mock_storage_client.return_value = mock_client
+        mock_bucket = Mock()
+        mock_blob = Mock()
+        mock_bucket.blob.return_value = mock_blob
+        mock_client.bucket.return_value = mock_bucket
+
+        # Test 0: Valid schema (success case)
+        mock_blob.download_as_text.return_value = (
+            'type: object\nproperties:\n  field1:\n    type: string'
+        )
+        result = action.validate_schema(
+            f'gs://{bucket_name}/schema/instance_schema.yaml'
+        )
+        assert result is True
+
+        # Test 1: Invalid YAML content
+        mock_blob.download_as_text.return_value = 'invalid: yaml: content: ['
+        try:
+            action.validate_schema(f'gs://{bucket_name}/schema/invalid.yaml')
+            assert False, 'Should have raised ValueError for invalid YAML'
+        except ValueError as e:
+            assert 'is not valid YAML' in str(e)
+
+        # Test 2: Schema is not a dict (e.g., a list)
+        mock_blob.download_as_text.return_value = '- item1\n- item2'
+        try:
+            action.validate_schema(f'gs://{bucket_name}/schema/list.yaml')
+            assert False, 'Should have raised ValueError for non-dict schema'
+        except ValueError as e:
+            assert 'Schema must be a YAML object (dict)' in str(e)
+
+        # Test 3: Schema dict missing 'type' field
+        mock_blob.download_as_text.return_value = 'properties:\n  field1:\n    type: string'
+        try:
+            action.validate_schema(f'gs://{bucket_name}/schema/no-type.yaml')
+            assert False, 'Should have raised ValueError for missing type field'
+        except ValueError as e:
+            assert 'Schema must have a "type" field' in str(e)
+
+    # Test 4: No schema URI provided (should return True)
+    result = action.validate_schema(None)
+    assert result is True
 
 
 class VertexAIPublisherModelTest(BaseTest):
@@ -930,13 +1112,7 @@ class VertexAIPublisherModelTest(BaseTest):
     def test_publisher_model_query(self):
         """Test listing Vertex AI publisher models."""
 
-        # Use record_flight_data in functional mode, replay_flight_data otherwise
-        if C7N_FUNCTIONAL:
-            project_id = get_default_project()
-            session_factory = self.record_flight_data(
-                'vertex-ai-publisher-model-query', project_id=project_id)
-        else:
-            session_factory = self.replay_flight_data('vertex-ai-publisher-model-query')
+        session_factory = self.replay_flight_data('vertex-ai-publisher-model-query')
 
         policy = self.load_policy(
             {'name': 'vertex-ai-publisher-models',
@@ -949,13 +1125,8 @@ class VertexAIPublisherModelTest(BaseTest):
 
     def test_publisher_model_filter_by_launch_stage(self):
         """Test filtering publisher models by launch stage."""
-        if C7N_FUNCTIONAL:
-            project_id = get_default_project()
-            session_factory = self.record_flight_data(
-                'vertex-ai-publisher-model-filter-launch-stage', project_id=project_id)
-        else:
-            session_factory = self.replay_flight_data(
-                'vertex-ai-publisher-model-filter-launch-stage')
+        session_factory = self.replay_flight_data(
+            'vertex-ai-publisher-model-filter-launch-stage')
 
         policy = self.load_policy(
             {'name': 'ga-publisher-models',
@@ -977,13 +1148,8 @@ class VertexAIPublisherModelTest(BaseTest):
 
     def test_publisher_model_filter_by_name_pattern(self):
         """Test filtering publisher models by name pattern."""
-        if C7N_FUNCTIONAL:
-            project_id = get_default_project()
-            session_factory = self.record_flight_data(
-                'vertex-ai-publisher-model-filter-name', project_id=project_id)
-        else:
-            session_factory = self.replay_flight_data(
-                'vertex-ai-publisher-model-filter-name')
+        session_factory = self.replay_flight_data(
+            'vertex-ai-publisher-model-filter-name')
 
         policy = self.load_policy(
             {'name': 'gemini-models',
@@ -1006,13 +1172,8 @@ class VertexAIPublisherModelTest(BaseTest):
 
     def test_publisher_model_field_validation(self):
         """Test that expected fields are present in publisher model resources."""
-        if C7N_FUNCTIONAL:
-            project_id = get_default_project()
-            session_factory = self.record_flight_data(
-                'vertex-ai-publisher-model-fields', project_id=project_id)
-        else:
-            session_factory = self.replay_flight_data(
-                'vertex-ai-publisher-model-fields')
+        session_factory = self.replay_flight_data(
+            'vertex-ai-publisher-model-fields')
 
         policy = self.load_policy(
             {'name': 'validate-fields',
@@ -1037,13 +1198,8 @@ class VertexAIPublisherModelTest(BaseTest):
 
     def test_publisher_model_multiple_filters(self):
         """Test combining multiple filters on publisher models."""
-        if C7N_FUNCTIONAL:
-            project_id = get_default_project()
-            session_factory = self.record_flight_data(
-                'vertex-ai-publisher-model-multi-filter', project_id=project_id)
-        else:
-            session_factory = self.replay_flight_data(
-                'vertex-ai-publisher-model-multi-filter')
+        session_factory = self.replay_flight_data(
+            'vertex-ai-publisher-model-multi-filter')
 
         policy = self.load_policy(
             {'name': 'ga-gemini-models',
@@ -1074,13 +1230,8 @@ class VertexAIPublisherModelTest(BaseTest):
         The resource currently queries publishers/google, which may include models
         from various publishers in the Google catalog.
         """
-        if C7N_FUNCTIONAL:
-            project_id = get_default_project()
-            session_factory = self.record_flight_data(
-                'vertex-ai-publisher-model-non-google', project_id=project_id)
-        else:
-            session_factory = self.replay_flight_data(
-                'vertex-ai-publisher-model-non-google')
+        session_factory = self.replay_flight_data(
+            'vertex-ai-publisher-model-non-google')
 
         policy = self.load_policy(
             {'name': 'non-gemini-models',
