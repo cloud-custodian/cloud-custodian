@@ -1,5 +1,7 @@
 # Copyright The Cloud Custodian Authors.
 # SPDX-License-Identifier: Apache-2.0
+from c7n.exceptions import PolicyValidationError
+
 from .common import BaseTest
 
 
@@ -449,3 +451,147 @@ class WAFTest(BaseTest):
         # Verify that all returned resources have REGIONAL scope (default)
         for resource in resources:
             self.assertEqual(resource['Scope'], 'REGIONAL')
+
+    def test_wafv2_validate_invalid_scope(self):
+        with self.assertRaises(PolicyValidationError) as cm:
+            self.load_policy({
+                "name": "wafv2-bad-scope",
+                "resource": "aws.wafv2",
+                "query": [{"Scope": "cloudfront"}],
+            })
+        self.assertIn("Invalid Scope", str(cm.exception))
+        self.assertIn("cloudfront", str(cm.exception))
+
+    def test_wafv2_global_resource_matches_scope(self):
+        cloudfront = self.load_policy({
+            "name": "wafv2-cf",
+            "resource": "aws.wafv2",
+            "query": [{"Scope": "CLOUDFRONT"}],
+        }).resource_manager
+        self.assertTrue(cloudfront.resource_type.global_resource)
+        self.assertEqual(cloudfront.scope_region, 'us-east-1')
+
+        regional = self.load_policy({
+            "name": "wafv2-regional",
+            "resource": "aws.wafv2",
+        }).resource_manager
+        self.assertFalse(regional.resource_type.global_resource)
+        self.assertEqual(regional.scope_region, regional.region)
+
+    def test_wafv2_cloudfront_set_logging(self):
+        session_factory = self.replay_flight_data("test_wafv2_cloudfront_set_logging")
+        p = self.load_policy(
+            {
+                "name": "wafv2-cloudfront-set-logging",
+                "resource": "aws.wafv2",
+                "query": [{"Scope": "CLOUDFRONT"}],
+                "filters": [{"Name": "c7n-test-cloudfront"}],
+                "actions": [
+                    {
+                        "type": "set-logging",
+                        "destination": "arn:aws:s3:::aws-waf-logs-test-custodian",
+                    }
+                ],
+            },
+            session_factory=session_factory,
+            config={"region": "us-west-2"},
+        )
+        resources = p.run()
+        self.assertEqual(len(resources), 1)
+        self.assertEqual(resources[0]['Name'], 'c7n-test-cloudfront')
+        self.assertEqual(resources[0]['Scope'], 'CLOUDFRONT')
+
+    def test_wafv2_regional_tag(self):
+        session_factory = self.replay_flight_data("test_wafv2_regional_tag")
+        p = self.load_policy(
+            {
+                "name": "wafv2-regional-tag",
+                "resource": "aws.wafv2",
+                "filters": [{"Name": "c7n-test-regional"}],
+                "actions": [{"type": "tag", "key": "Env", "value": "test"}],
+            },
+            session_factory=session_factory,
+            config={"region": "us-east-1"},
+        )
+        resources = p.run()
+        self.assertEqual(len(resources), 1)
+        self.assertEqual(resources[0]['Name'], 'c7n-test-regional')
+        self.assertEqual(resources[0]['Scope'], 'REGIONAL')
+        client = session_factory().client('wafv2', region_name='us-east-1')
+        tags = client.list_tags_for_resource(
+            ResourceARN=resources[0]['ARN'])['TagInfoForResource']['TagList']
+        self.assertEqual(tags[0]['Key'], 'Env')
+        self.assertEqual(tags[0]['Value'], 'test')
+
+    def test_wafv2_regional_remove_tag(self):
+        session_factory = self.replay_flight_data("test_wafv2_regional_remove_tag")
+        p = self.load_policy(
+            {
+                "name": "wafv2-regional-remove-tag",
+                "resource": "aws.wafv2",
+                "filters": [
+                    {"Name": "c7n-test-regional"},
+                    {"tag:Env": "test"},
+                ],
+                "actions": [{"type": "remove-tag", "tags": ["Env"]}],
+            },
+            session_factory=session_factory,
+            config={"region": "us-east-1"},
+        )
+        resources = p.run()
+        self.assertEqual(len(resources), 1)
+        self.assertEqual(resources[0]['Name'], 'c7n-test-regional')
+
+        client = session_factory().client('wafv2', region_name='us-east-1')
+        tags = client.list_tags_for_resource(
+            ResourceARN=resources[0]['ARN'])['TagInfoForResource']['TagList']
+        self.assertEqual(len(tags), 0)
+
+    def test_wafv2_cloudfront_tag(self):
+        session_factory = self.replay_flight_data("test_wafv2_cloudfront_tag")
+        p = self.load_policy(
+            {
+                "name": "wafv2-cloudfront-tag",
+                "resource": "aws.wafv2",
+                "query": [{"Scope": "CLOUDFRONT"}],
+                "filters": [{"Name": "c7n-test-cloudfront"}],
+                "actions": [{"type": "tag", "key": "Env", "value": "test"}],
+            },
+            session_factory=session_factory,
+            config={"region": "us-west-2"},
+        )
+        resources = p.run()
+        self.assertEqual(len(resources), 1)
+        self.assertEqual(resources[0]['Name'], 'c7n-test-cloudfront')
+        self.assertEqual(resources[0]['Scope'], 'CLOUDFRONT')
+
+        client = session_factory().client('wafv2', region_name='us-east-1')
+        tags = client.list_tags_for_resource(
+            ResourceARN=resources[0]['ARN'])['TagInfoForResource']['TagList']
+        self.assertEqual(tags[0]['Key'], 'Env')
+        self.assertEqual(tags[0]['Value'], 'test')
+
+    def test_wafv2_cloudfront_remove_tag(self):
+        session_factory = self.replay_flight_data("test_wafv2_cloudfront_remove_tag")
+        p = self.load_policy(
+            {
+                "name": "wafv2-cloudfront-remove-tag",
+                "resource": "aws.wafv2",
+                "query": [{"Scope": "CLOUDFRONT"}],
+                "filters": [
+                    {"Name": "c7n-test-cloudfront"},
+                    {"tag:Env": "test"},
+                ],
+                "actions": [{"type": "remove-tag", "tags": ["Env"]}],
+            },
+            session_factory=session_factory,
+            config={"region": "us-east-2"},
+        )
+        resources = p.run()
+        self.assertEqual(len(resources), 1)
+        self.assertEqual(resources[0]['Name'], 'c7n-test-cloudfront')
+
+        client = session_factory().client('wafv2', region_name='us-east-1')
+        tags = client.list_tags_for_resource(
+            ResourceARN=resources[0]['ARN'])['TagInfoForResource']['TagList']
+        self.assertEqual(len(tags), 0)
