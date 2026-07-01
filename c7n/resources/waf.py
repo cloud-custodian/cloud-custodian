@@ -202,6 +202,7 @@ class RegionalWAFDelete(BaseAction):
             ChangeToken=change_token,
         )
 
+
 class DescribeWafV2(DescribeSource):
 
     # Essentially a copy of DescribeSource.augment with the addition of Scope and Name parameters
@@ -254,6 +255,7 @@ class DescribeWafV2(DescribeSource):
             query_params.update(q)
         query_params['Scope'] = self.manager.scope
         return query_params
+
 
 @resources.register('wafv2')
 class WAFV2(QueryResourceManager):
