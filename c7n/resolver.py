@@ -275,7 +275,9 @@ class ValuesFrom:
                     return combined_data
             else:
                 if isinstance(self.data.get('expr'), int):
-                    return set([d[self.data['expr']] for d in data])
+                    return set(
+                        [d[self.data['expr']] for d in data
+                         if len(d) > self.data['expr']])
                 data = list(data)
                 if 'expr' in self.data:
                     return self._get_resource_values(data)
