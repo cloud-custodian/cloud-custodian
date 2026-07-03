@@ -1111,6 +1111,26 @@ class IamUserTest(BaseTest):
         self.assertEqual(resources[1]["UserName"], "alphabet_soup_2")
         self.assertEqual(len(resources[1]["c7n:Policies"]), 2)
 
+    def test_iam_user_policy_dedup(self):
+        # A user with more than one matching policy must be returned exactly
+        # once, matched users keep their input order, and non-matching users
+        # are excluded. Guards the dedup behavior of UserPolicy.process.
+        self.patch(UserPolicy, "executor_factory", MainThreadExecutor)
+        f = UserPolicy(
+            {"type": "policy", "key": "PolicyName", "value": "AdministratorAccess"},
+            mock.MagicMock(),
+        )
+        admin = {"PolicyName": "AdministratorAccess"}
+        readonly = {"PolicyName": "ReadOnlyAccess"}
+        resources = [
+            {"UserName": "u1", "c7n:Policies": [admin, admin]},
+            {"UserName": "u2", "c7n:Policies": [readonly]},
+            {"UserName": "u3", "c7n:Policies": [readonly, admin]},
+        ]
+        with mock.patch.object(UserPolicy, "user_policies"):
+            matched = f.process(resources)
+        self.assertEqual([r["UserName"] for r in matched], ["u1", "u3"])
+
     def test_iam_user_access_key_filter(self):
         session_factory = self.replay_flight_data("test_iam_user_access_key_active")
         self.patch(UserAccessKey, "executor_factory", MainThreadExecutor)
