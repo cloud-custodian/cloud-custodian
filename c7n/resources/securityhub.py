@@ -514,10 +514,9 @@ class PostFinding(Action):
         if existing_finding_id:
             finding_id = existing_finding_id
         else:
-            # for fips compliance we need to explicit pass the usage param but it doesn't
-            # exist on python 3.8, directly pass when we drop 3.8 support.
-            params = (sys.version_info.major > 3 and sys.version_info.minor > 8) and {
-                'usedforsecurity': False} or {}
+            # for fips compliance we need to explicitly pass the usage param but it
+            # doesn't exist on python 3.8; guard on version until we drop 3.8 support.
+            params = {'usedforsecurity': False} if sys.version_info >= (3, 9) else {}
             finding_id = '{}/{}/{}/{}'.format(
                 self.manager.config.region,
                 self.manager.config.account_id,
