@@ -67,6 +67,27 @@ class KeyVaultKeyTest(BaseTest):
         self.assertEqual(len(resources), 1)
         self.assertTrue(resources[0]['c7n:kty'].lower(), 'rsa')
 
+    def test_key_vault_keys_type_filters_by_type(self):
+        # Keys already carry 'c7n:kty' so no service call is made; this exercises
+        # the in-memory matching in KeyTypeFilter across a set of keys.
+        resources = [
+            {'id': 'https://kv.vault.azure.net/keys/rsa-key', 'c7n:kty': 'rsa'},
+            {'id': 'https://kv.vault.azure.net/keys/ec-key', 'c7n:kty': 'ec'},
+            {'id': 'https://kv.vault.azure.net/keys/rsa-hsm-key', 'c7n:kty': 'rsa-hsm'},
+        ]
+        p = self.load_policy({
+            'name': 'test-key-vault',
+            'resource': 'azure.keyvault-key',
+            'filters': [
+                {'type': 'key-type', 'key-types': ['RSA', 'RSA-HSM']}
+            ]
+        }, validate=True)
+        matched = p.resource_manager.filters[0].process(resources)
+        self.assertEqual(
+            sorted(r['c7n:kty'] for r in matched),
+            ['rsa', 'rsa-hsm']
+        )
+
     def test_key_vault_keys_rotation(self):
         p = self.load_policy({
             'name': 'test-key-vault',
