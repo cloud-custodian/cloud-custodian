@@ -1149,13 +1149,15 @@ class ReduceFilter(BaseValueFilter):
         if 'group-by' in self.data or 'order' in self.data:
             ordered = self.reorder(ordered, key=lambda r: groups[r]['sortkey'])
         for g in ordered:
-            # discard X first
+            # discard X first, computing the per-group count fresh so a larger
+            # group's discard doesn't leak into subsequent, smaller groups
+            gdrop = drop
             if droppct > 0:
                 n = int(droppct / 100 * len(groups[g]['resources']))
-                if n > drop:
-                    drop = n
-            if drop > 0:
-                groups[g]['resources'] = groups[g]['resources'][drop:]
+                if n > gdrop:
+                    gdrop = n
+            if gdrop > 0:
+                groups[g]['resources'] = groups[g]['resources'][gdrop:]
 
             # then limit the remaining
             count = len(groups[g]['resources'])
