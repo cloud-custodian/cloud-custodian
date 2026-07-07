@@ -112,6 +112,8 @@ ResourceMap = {
   "aws.dms-endpoint": "c7n.resources.dms.DmsEndpoints",
   "aws.dms-instance": "c7n.resources.dms.ReplicationInstance",
   "aws.dms-replication-task": "c7n.resources.dms.DMSReplicationTask",
+  "aws.dsql-cluster": "c7n.resources.dsql.DsqlCluster",
+  "aws.dsql-stream": "c7n.resources.dsql.DsqlStream",
   "aws.dynamodb-backup": "c7n.resources.dynamodb.Backup",
   "aws.dynamodb-stream": "c7n.resources.dynamodb.Stream",
   "aws.dynamodb-table": "c7n.resources.dynamodb.Table",

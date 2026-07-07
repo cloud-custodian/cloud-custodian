@@ -1,0 +1,12 @@
+{
+    "status_code": 200,
+    "data": {
+        "ResponseMetadata": {},
+        "clusters": [
+            {
+                "identifier": "pvt44rmk6jn4fqz6woxye4lrfe",
+                "arn": "arn:aws:dsql:us-east-1:644160558196:cluster/pvt44rmk6jn4fqz6woxye4lrfe"
+            }
+        ]
+    }
+}
