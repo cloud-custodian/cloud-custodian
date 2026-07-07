@@ -85,9 +85,7 @@ class RemoveTagDsqlCluster(RemoveTag):
             client.untag_resource(resourceArn=r['arn'], tagKeys=tag_keys)
 
 
-@DsqlCluster.action_registry.register('mark-for-op')
-class MarkDsqlClusterForOp(TagDelayedAction):
-    """Mark a DSQL cluster for a future operation."""
+DsqlCluster.action_registry.register('mark-for-op', TagDelayedAction)
 
 
 @DsqlCluster.filter_registry.register('cross-account')
@@ -220,7 +218,9 @@ class DsqlStream(ChildResourceManager):
     source_mapping = {'describe-child': DescribeStream}
 
 
-@DsqlStream.filter_registry.register('marked-for-op', TagActionFilter)
+DsqlStream.filter_registry.register('marked-for-op', TagActionFilter)
+
+
 @DsqlStream.action_registry.register('tag')
 class TagDsqlStream(Tag):
     permissions = ('dsql:TagResource',)
@@ -240,9 +240,7 @@ class RemoveTagDsqlStream(RemoveTag):
             client.untag_resource(resourceArn=r['arn'], tagKeys=tag_keys)
 
 
-@DsqlStream.action_registry.register('mark-for-op')
-class MarkDsqlStreamForOp(TagDelayedAction):
-    """Mark a DSQL stream for a future operation."""
+DsqlStream.action_registry.register('mark-for-op', TagDelayedAction)
 
 
 @DsqlStream.action_registry.register('delete')
