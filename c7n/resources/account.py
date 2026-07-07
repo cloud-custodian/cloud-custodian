@@ -1876,9 +1876,9 @@ class PaymentCryptographyReplicationRegions(Filter):
     annotation_key = 'c7n:payment-cryptography-replication-regions'
     schema = type_schema(
         'payment-cryptography-replication-regions',
-        state={'type': 'boolean'},
+        state={'type': 'boolean', 'default': True},
         regions={'type': 'array', 'items': {'type': 'string'}},
-        match={'enum': ['all', 'any']})
+        match={'enum': ['all', 'any'], 'default': 'all'})
     permissions = ('payment-cryptography:GetDefaultKeyReplicationRegions',)
 
     def process(self, resources, event=None):
