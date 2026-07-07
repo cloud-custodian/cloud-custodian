@@ -309,8 +309,9 @@ class TagActionFilter(Filter):
         try:
             action_date = parse(action_date_str)
         except Exception:
+            rid = i.get(self.manager.get_model().id) if self.manager else None
             self.log.warning("could not parse tag:%s value:%s on %s" % (
-                tag, v, i['InstanceId']))
+                tag, v, rid))
             return False
 
         if action_date.tzinfo:
