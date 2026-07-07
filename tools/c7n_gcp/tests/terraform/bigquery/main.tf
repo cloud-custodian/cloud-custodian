@@ -13,8 +13,9 @@ resource "google_bigquery_dataset" "dataset" {
   project    = var.google_project_id
 
   labels = {
-    env      = "default"
-    c7n_test = "bq_table_recommend_partition_cluster"
+    env             = "default"
+    c7n_test        = "bq_table_recommend_partition_cluster"
+    c7n_test_update = "bq_dataset_update"
   }
 }
 
