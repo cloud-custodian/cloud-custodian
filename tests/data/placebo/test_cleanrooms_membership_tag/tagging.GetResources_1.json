@@ -1,0 +1,22 @@
+{
+    "status_code": 200,
+    "data": {
+        "PaginationToken": "",
+        "ResourceTagMappingList": [
+            {
+                "ResourceARN": "arn:aws:cleanrooms:us-east-1:644160558196:membership/471d06d5-b382-4d18-9ad5-8e61ffe2bfac",
+                "Tags": []
+            },
+            {
+                "ResourceARN": "arn:aws:cleanrooms:us-east-1:644160558196:membership/c5773151-1c6c-40ff-86f2-543d68654295",
+                "Tags": [
+                    {
+                        "Key": "ASV",
+                        "Value": "PolicyTestASV"
+                    }
+                ]
+            }
+        ],
+        "ResponseMetadata": {}
+    }
+}
