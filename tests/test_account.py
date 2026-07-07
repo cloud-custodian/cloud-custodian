@@ -402,6 +402,24 @@ class AccountTests(BaseTest):
         # required region is not in the account defaults -> no match
         self.assertEqual(len(resources), 0)
 
+    def test_pmtcrypt_replication_regions_any_match(self):
+        factory = self.replay_flight_data(
+            'test_pmtcrypt_replication_regions_enabled')
+        p = self.load_policy({
+            'name': 'pmtcrypt-replication-any',
+            'resource': 'aws.account',
+            'filters': [{
+                'type': 'payment-cryptography-replication-regions',
+                'state': True,
+                'regions': ['ap-southeast-2', 'us-west-2'],
+                'match': 'any'}]},
+            session_factory=factory)
+        resources = p.run()
+        self.assertEqual(len(resources), 1)
+        self.assertIn(
+            'us-west-2',
+            resources[0]['c7n:payment-cryptography-replication-regions'])
+
     def test_cloudtrail_enabled(self):
         session_factory = self.replay_flight_data("test_account_trail")
         p = self.load_policy(

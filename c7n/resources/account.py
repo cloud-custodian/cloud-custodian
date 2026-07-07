@@ -1844,7 +1844,20 @@ class AmiBlockPublicAccess(Filter):
 @filters.register('payment-cryptography-replication-regions')
 class PaymentCryptographyReplicationRegions(Filter):
     """Filter an account by its Payment Cryptography default key
-    replication region.
+    replication regions.
+
+    The enabled replication regions are recorded on the account resource
+    under the ``c7n:payment-cryptography-replication-regions`` annotation.
+
+    :param state: Whether default key replication should be enabled.
+        When ``true`` (default), the account matches only if at least one
+        replication region is enabled. When ``false``, the account matches
+        only if no replication regions are enabled.
+    :param regions: Optional list of replication regions to check for.
+        Only evaluated when ``state`` is ``true``.
+    :param match: How ``regions`` are compared against the account's
+        enabled replication regions. ``all`` (default) requires every
+        listed region to be enabled; ``any`` requires at least one.
 
     :example:
 
