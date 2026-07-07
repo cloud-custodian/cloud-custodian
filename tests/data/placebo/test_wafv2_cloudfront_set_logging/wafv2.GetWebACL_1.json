@@ -1,0 +1,29 @@
+{
+    "status_code": 200,
+    "data": {
+        "WebACL": {
+            "Name": "c7n-test-cloudfront",
+            "Id": "fd4c4ea7-9990-4321-b0a8-0a929e5acc8e",
+            "ARN": "arn:aws:wafv2:us-east-1:644160558196:global/webacl/c7n-test-cloudfront/fd4c4ea7-9990-4321-b0a8-0a929e5acc8e",
+            "DefaultAction": {
+                "Allow": {}
+            },
+            "Description": "",
+            "Rules": [],
+            "VisibilityConfig": {
+                "SampledRequestsEnabled": true,
+                "CloudWatchMetricsEnabled": true,
+                "MetricName": "c7n-test-cloudfront"
+            },
+            "Capacity": 0,
+            "ManagedByFirewallManager": false,
+            "LabelNamespace": "awswaf:644160558196:webacl:c7n-test-cloudfront:",
+            "RetrofittedByFirewallManager": false,
+            "OnSourceDDoSProtectionConfig": {
+                "ALBLowReputationMode": "ACTIVE_UNDER_DDOS"
+            }
+        },
+        "LockToken": "2757cb2e-5767-47b7-8162-79edd394813b",
+        "ResponseMetadata": {}
+    }
+}
