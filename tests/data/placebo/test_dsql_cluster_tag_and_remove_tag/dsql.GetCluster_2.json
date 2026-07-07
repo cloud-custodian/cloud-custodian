@@ -3,7 +3,7 @@
     "data": {
         "ResponseMetadata": {},
         "identifier": "pvt44rmk6jn4fqz6woxye4lrfe",
-        "arn": "arn:aws:dsql:us-east-1:644160558196:cluster/pvt44rmk6jn4fqz6woxye4lrfe",
+        "arn": "arn:aws:dsql:us-east-1:123456789012:cluster/pvt44rmk6jn4fqz6woxye4lrfe",
         "status": "ACTIVE",
         "creationTime": {
             "__class__": "datetime",

@@ -4,7 +4,7 @@
         "ResponseMetadata": {},
         "clusterIdentifier": "pvt44rmk6jn4fqz6woxye4lrfe",
         "streamIdentifier": "2bt44r5uwqljyipe7vnatvofiy",
-        "arn": "arn:aws:dsql:us-east-1:644160558196:cluster/pvt44rmk6jn4fqz6woxye4lrfe/stream/2bt44r5uwqljyipe7vnatvofiy",
+        "arn": "arn:aws:dsql:us-east-1:123456789012:cluster/pvt44rmk6jn4fqz6woxye4lrfe/stream/2bt44r5uwqljyipe7vnatvofiy",
         "status": "ACTIVE",
         "creationTime": {
             "__class__": "datetime",
@@ -20,8 +20,8 @@
         "format": "JSON",
         "targetDefinition": {
             "kinesis": {
-                "streamArn": "arn:aws:kinesis:us-east-1:644160558196:stream/c7n-dsql-test",
-                "roleArn": "arn:aws:iam::644160558196:role/service-role/dsql-cdc-pvt44rmk6jn4fqz6woxye4-c7n-dsql-test-9c5f8490"
+                "streamArn": "arn:aws:kinesis:us-east-1:123456789012:stream/c7n-dsql-test",
+                "roleArn": "arn:aws:iam::123456789012:role/service-role/dsql-cdc-pvt44rmk6jn4fqz6woxye4-c7n-dsql-test-9c5f8490"
             }
         },
         "tags": {
