@@ -201,6 +201,22 @@ class LambdaTest(BaseTest):
         assert '$LATEST' in versions
         assert set(versions) == {'$LATEST', '6', '12'}
 
+    def test_lambda_trim_versions_retain_latest_default(self):
+        # The advertised schema default for retain-latest must match the
+        # action's actual runtime default (process_lambda reads it as False)
+        # and its documented default. A stale schema default of True would
+        # mislead authors into omitting the flag while the numbered version
+        # is still deleted.
+        p = self.load_policy(
+            {
+                'name': 'lambda-check',
+                'resource': 'lambda',
+                'actions': [{'type': 'trim-versions'}]
+            })
+        action = p.resource_manager.actions[0]
+        assert action.schema['properties']['retain-latest']['default'] is False
+        assert action.data.get('retain-latest', False) is False
+
     def test_lambda_check_permission(self):
         # lots of pre-conditions, iam role with iam read only policy attached
         # and a permission boundary with deny on iam read access.

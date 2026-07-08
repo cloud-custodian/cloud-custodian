@@ -2,6 +2,8 @@
 # SPDX-License-Identifier: Apache-2.0
 
 from gcp_common import BaseTest, event_data
+from c7n.exceptions import PolicyValidationError
+from c7n_gcp.client import get_default_project
 from pytest_terraform import terraform
 
 
@@ -120,6 +122,43 @@ class DnsPolicyTest(BaseTest):
                 f'gcp:dns::{project_id}:policy/custodian'
             ],
         )
+
+    def test_policy_update_validation_error(self):
+        with self.assertRaisesRegex(
+            PolicyValidationError,
+            "policy:gcp-dns-policy-update-invalid action:update "
+            "requires at least one mutable policy field"
+        ):
+            self.load_policy(
+                {
+                    'name': 'gcp-dns-policy-update-invalid',
+                    'resource': 'gcp.dns-policy',
+                    'actions': [{'type': 'update'}]
+                }
+            )
+
+    def test_dns_policy_update(self):
+        project_id = get_default_project()
+        policy_name = 'c7n-dns-policy-update-test'
+
+        session_factory = self.replay_flight_data('dns-policy-update', project_id=project_id)
+
+        policy = self.load_policy(
+            {'name': 'gcp-dns-policy-update',
+             'resource': 'gcp.dns-policy',
+             'filters': [{'name': policy_name}],
+             'actions': [{'type': 'update', 'enableLogging': True}]},
+            session_factory=session_factory)
+        resources = policy.run()
+        self.assertEqual(len(resources), 1)
+
+        client = policy.resource_manager.get_client()
+        updated_policy = client.execute_query(
+            'get',
+            {'project': project_id, 'policy': policy_name}
+        )
+        self.assertEqual(updated_policy['name'], policy_name)
+        self.assertEqual(updated_policy.get('enableLogging'), True)
 
 
 class TestDnsResourceRecordsFilter(BaseTest):
