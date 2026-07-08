@@ -13,8 +13,17 @@ from c7n.resources.elasticsearch import parse_es_version
 from .common import BaseTest
 
 
+# Calling the @terraform decorator registers the
+# `elasticsearch_cross_cluster_search_connections` fixture in this module as a side
+# effect, and adds a mark to the decorated function. We want the side effect,
+# but pytest 9.1+ doesn't allow marks on fixtures.
+#
+# Making the `terraform()` call separately lets us continue to use pytest-terraform
+# on a unittest class in pytest 9.1+.
+terraform('elasticsearch_cross_cluster_search_connections', scope='class')
+
+
 @pytest.fixture(scope='class')
-@terraform('elasticsearch_cross_cluster_search_connections', scope='class')
 def terraform_cross_cluster(elasticsearch_cross_cluster_search_connections, request):
     """Wrap a pytest-terraform fixture for use with unittest
 
