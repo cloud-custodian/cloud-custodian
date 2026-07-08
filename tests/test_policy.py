@@ -270,6 +270,8 @@ class PolicyMetaLint(BaseTest):
 
         whitelist = set(('AwsS3Object', 'Container'))
         todo = set((
+            # q3 2026
+            'AzureResource',
             # q2 2025
             'CodeRepository',
             # q4 2023,
