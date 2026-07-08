@@ -1,7 +1,17 @@
 # Copyright The Cloud Custodian Authors.
 # SPDX-License-Identifier: Apache-2.0
 
+from unittest import mock
+
+from botocore.exceptions import ClientError
+
+from c7n.resources import dsql
+
 from .common import BaseTest
+
+
+def _client_error(code):
+    return ClientError({'Error': {'Code': code, 'Message': code}}, 'Operation')
 
 
 class DsqlClusterTest(BaseTest):
@@ -64,6 +74,90 @@ class DsqlClusterTest(BaseTest):
         refreshed = client.get_cluster(identifier=resources[0]['identifier'])
         self.assertEqual(refreshed['deletionProtectionEnabled'], False)
         self.assertIn(refreshed['status'], ('DELETING', 'DELETED'))
+
+    def test_cross_account_no_policy(self):
+        p = self.load_policy(
+            {
+                "name": "dsql-cross-account-no-policy",
+                "resource": "aws.dsql-cluster",
+                "filters": [{"type": "cross-account"}],
+            }
+        )
+        f = p.resource_manager.filters[0]
+        client = mock.MagicMock()
+        client.get_cluster_policy.side_effect = _client_error('ResourceNotFoundException')
+        resource = {'identifier': 'c1', 'arn': 'arn:aws:dsql:us-east-1:1:cluster/c1'}
+        with mock.patch.object(dsql, 'local_session') as ls:
+            ls.return_value.client.return_value = client
+            resources = f.process([resource])
+        self.assertIsNone(resource['c7n:Policy'])
+        self.assertEqual(resources, [])
+
+    def test_cross_account_error(self):
+        p = self.load_policy(
+            {
+                "name": "dsql-cross-account-error",
+                "resource": "aws.dsql-cluster",
+                "filters": [{"type": "cross-account"}],
+            }
+        )
+        f = p.resource_manager.filters[0]
+        client = mock.MagicMock()
+        client.get_cluster_policy.side_effect = _client_error('AccessDeniedException')
+        resource = {'identifier': 'c1', 'arn': 'arn:aws:dsql:us-east-1:1:cluster/c1'}
+        with mock.patch.object(dsql, 'local_session') as ls:
+            ls.return_value.client.return_value = client
+            with self.assertRaises(ClientError):
+                f.process([resource])
+
+    def test_delete_without_force(self):
+        p = self.load_policy(
+            {
+                "name": "dsql-delete",
+                "resource": "aws.dsql-cluster",
+                "actions": [{"type": "delete"}],
+            }
+        )
+        action = p.resource_manager.actions[0]
+        client = mock.MagicMock()
+        resource = {'identifier': 'c1', 'deletionProtectionEnabled': True}
+        with mock.patch.object(dsql, 'local_session') as ls:
+            ls.return_value.client.return_value = client
+            action.process([resource])
+        client.update_cluster.assert_not_called()
+        client.delete_cluster.assert_called_once_with(identifier='c1')
+
+    def test_delete_missing(self):
+        p = self.load_policy(
+            {
+                "name": "dsql-delete-missing",
+                "resource": "aws.dsql-cluster",
+                "actions": [{"type": "delete"}],
+            }
+        )
+        action = p.resource_manager.actions[0]
+        client = mock.MagicMock()
+        client.delete_cluster.side_effect = _client_error('ResourceNotFoundException')
+        with mock.patch.object(dsql, 'local_session') as ls:
+            ls.return_value.client.return_value = client
+            action.process([{'identifier': 'c1'}])
+        client.delete_cluster.assert_called_once()
+
+    def test_delete_error(self):
+        p = self.load_policy(
+            {
+                "name": "dsql-delete-error",
+                "resource": "aws.dsql-cluster",
+                "actions": [{"type": "delete"}],
+            }
+        )
+        action = p.resource_manager.actions[0]
+        client = mock.MagicMock()
+        client.delete_cluster.side_effect = _client_error('AccessDeniedException')
+        with mock.patch.object(dsql, 'local_session') as ls:
+            ls.return_value.client.return_value = client
+            with self.assertRaises(ClientError):
+                action.process([{'identifier': 'c1'}])
 
 
 class DsqlStreamTest(BaseTest):
