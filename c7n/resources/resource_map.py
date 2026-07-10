@@ -6,6 +6,7 @@ ResourceMap = {
   "aws.account": "c7n.resources.account.Account",
   "aws.acm-certificate": "c7n.resources.acm.Certificate",
   "aws.advisor-check": "c7n.resources.support.AdvisorCheck",
+  "aws.aiops-investigation-group": "c7n.resources.aiops.AIOpsInvestigationGroup",
   "aws.airflow": "c7n.resources.airflow.ApacheAirflow",
   "aws.alarm": "c7n.resources.cw.Alarm",
   "aws.ami": "c7n.resources.ami.AMI",
