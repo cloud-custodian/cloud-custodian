@@ -57,7 +57,7 @@ CSV_INJECTION_PREFIXES = ('=', '+', '-', '@', '\t', '\r')
 
 def sanitize_csv_value(value):
     """Prefix a quote to values a spreadsheet would otherwise treat as a formula."""
-    if isinstance(value, str) and value[:1] in CSV_INJECTION_PREFIXES:
+    if isinstance(value, str) and value and value[0] in CSV_INJECTION_PREFIXES:
         return "'" + value
     return value
 
