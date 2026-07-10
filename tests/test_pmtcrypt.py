@@ -44,6 +44,53 @@ class PmtcryptTest(BaseTest):
         tags = client.list_tags_for_resource(ResourceArn=resources[0]["KeyArn"])["Tags"]
         self.assertEqual(len(tags), 0)
 
+    def test_cross_account(self):
+        session_factory = self.replay_flight_data(
+            "test_pmtcrypt_key_cross_account"
+        )
+        p = self.load_policy(
+            {
+                "name": "pmtcrypt-key-cross-account",
+                "resource": "payment-cryptography-key",
+                "filters": [{"type": "cross-account"}],
+            },
+            session_factory=session_factory,
+        )
+        resources = p.run()
+        self.assertEqual(len(resources), 1)
+        self.assertTrue(resources[0]["CrossAccountViolations"])
+
+    def test_cross_account_same_account(self):
+        session_factory = self.replay_flight_data(
+            "test_pmtcrypt_key_cross_account_same"
+        )
+        p = self.load_policy(
+            {
+                "name": "pmtcrypt-key-cross-account-same",
+                "resource": "payment-cryptography-key",
+                "filters": [{"type": "cross-account"}],
+            },
+            session_factory=session_factory,
+        )
+        resources = p.run()
+        # policy grants only the owning account -> not a violation
+        self.assertEqual(len(resources), 0)
+
+    def test_cross_account_empty(self):
+        session_factory = self.replay_flight_data(
+            "test_pmtcrypt_key_cross_account_empty"
+        )
+        p = self.load_policy(
+            {
+                "name": "pmtcrypt-key-cross-account-empty",
+                "resource": "payment-cryptography-key",
+                "filters": [{"type": "cross-account"}],
+            },
+            session_factory=session_factory,
+        )
+        resources = p.run()
+        self.assertEqual(len(resources), 0)
+
     def test_delete_(self):
         session_factory = self.replay_flight_data(
             "test_payment-cryptography_delete"
