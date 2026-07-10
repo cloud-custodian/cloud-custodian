@@ -1,5 +1,5 @@
 # Governance for Cloud Custodian
-Cloud Custodian is governed with the goals of transparency, vendor neutrality, and scalable community leadership. All contributors are expected to follow the CNCF Code of Conduct.
+Cloud Custodian is governed with the goals of transparency, vendor neutrality, and scalable community leadership. All contributors are expected to follow the [CNCF Code of Conduct](https://github.com/cncf/foundation/blob/main/code-of-conduct.md).
 ## 1. Project Areas
 
 Cloud Custodian is organized into several functional areas, each responsible for a part of the project:
@@ -65,7 +65,7 @@ Failure to meet expectations may lead to emeritus designation or removal after c
 
 ## 7. Code of Conduct
 
-Cloud Custodian follows the CNCF Code of Conduct, which is published in `CODE_OF_CONDUCT.md` and linked across governance and contributor documents.
+Cloud Custodian follows the [CNCF Code of Conduct](https://github.com/cncf/foundation/blob/main/code-of-conduct.md), linked across governance and contributor documents.
 
 ## 8. Transparency & Updates
 `GOVERNANCE.md` is located in the repository root. Updates are tracked in GitHub with dates and rationale.Any changes require review and approval by a majority of Core Maintainers through a pull request. This document is linked from the project’s main `README` and contribution guides.
@@ -75,4 +75,4 @@ Cloud Custodian follows the CNCF Code of Conduct, which is published in `CODE_OF
 - `README.md`  
 - `GOVERNANCE.md` (this document)  
 - `OWNERS.md` (area and core maintainers list)  
-- `CODE_OF_CONDUCT.md` (CNCF Code of Conduct link)
+- [CNCF Code of Conduct](https://github.com/cncf/foundation/blob/main/code-of-conduct.md)
