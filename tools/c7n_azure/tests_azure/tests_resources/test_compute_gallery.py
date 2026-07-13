@@ -52,7 +52,6 @@ class ComputeGalleryTest(BaseTest):
     @pytest.mark.functional
     def test_compute_gallery_location_filter_terraform(self, test, compute_gallery):
         """Test location filter on compute galleries"""
-        test_gallery = compute_gallery.outputs['test_gallery']['value']
 
         # Filter by location
         policy = self.load_policy({

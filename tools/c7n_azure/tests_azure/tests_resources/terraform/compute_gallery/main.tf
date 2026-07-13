@@ -137,27 +137,27 @@ output "secondary_gallery" {
 
 output "linux_image" {
   value = {
-    name     = azurerm_shared_image.linux_image.name
-    id       = azurerm_shared_image.linux_image.id
-    os_type  = azurerm_shared_image.linux_image.os_type
-    gallery  = azurerm_shared_image_gallery.test_gallery.name
+    name    = azurerm_shared_image.linux_image.name
+    id      = azurerm_shared_image.linux_image.id
+    os_type = azurerm_shared_image.linux_image.os_type
+    gallery = azurerm_shared_image_gallery.test_gallery.name
   }
 }
 
 output "windows_image" {
   value = {
-    name     = azurerm_shared_image.windows_image.name
-    id       = azurerm_shared_image.windows_image.id
-    os_type  = azurerm_shared_image.windows_image.os_type
-    gallery  = azurerm_shared_image_gallery.test_gallery.name
+    name    = azurerm_shared_image.windows_image.name
+    id      = azurerm_shared_image.windows_image.id
+    os_type = azurerm_shared_image.windows_image.os_type
+    gallery = azurerm_shared_image_gallery.test_gallery.name
   }
 }
 
 output "secondary_image" {
   value = {
-    name     = azurerm_shared_image.secondary_image.name
-    id       = azurerm_shared_image.secondary_image.id
-    os_type  = azurerm_shared_image.secondary_image.os_type
-    gallery  = azurerm_shared_image_gallery.secondary_gallery.name
+    name    = azurerm_shared_image.secondary_image.name
+    id      = azurerm_shared_image.secondary_image.id
+    os_type = azurerm_shared_image.secondary_image.os_type
+    gallery = azurerm_shared_image_gallery.secondary_gallery.name
   }
 }

@@ -29,7 +29,9 @@ ResourceMap = {
     "azure.cognitiveservice-deployment": "c7n_azure.resources.ai_foundry.AiFoundryCognitiveServiceDeployment", # noqa
     "azure.compute-gallery": "c7n_azure.resources.image_gallery.ComputeGallery",
     "azure.compute-gallery-image": "c7n_azure.resources.image_gallery.ComputeGalleryImage",
-    "azure.compute-gallery-image-version": "c7n_azure.resources.image_gallery.ComputeGalleryImageVersion",
+    "azure.compute-gallery-image-version": (
+        "c7n_azure.resources.image_gallery.ComputeGalleryImageVersion"
+    ),
     "azure.container-group": "c7n_azure.resources.aci.ContainerGroup",
     "azure.containerregistry": "c7n_azure.resources.container_registry.ContainerRegistry",
     "azure.container-registry": "c7n_azure.resources.container_registry.ContainerRegistry",

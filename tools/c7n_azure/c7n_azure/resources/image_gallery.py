@@ -64,7 +64,7 @@ class ComputeGalleryImage(ChildArmResourceManager):
                 key: properties.osType
                 op: eq
                 value: Linux
-    
+
     :example:
 
     Get image definitions within a specific gallery
@@ -235,7 +235,8 @@ class ImageVersionAgeFilter(AgeFilter):
     def get_resource_date(self, resource):
         """Safely extract the published date from nested resource properties."""
         try:
-            date_str = resource.get('properties', {}).get('publishingProfile', {}).get('publishedDate')
+            publishing_profile = resource.get('properties', {}).get('publishingProfile', {})
+            date_str = publishing_profile.get('publishedDate')
             if not date_str:
                 return None
 
@@ -319,7 +320,8 @@ class LatestImageVersionFilter(Filter):
     def _get_published_date(self, resource):
         """Extract published date from resource, defaulting to epoch if not found."""
         try:
-            date_str = resource.get('properties', {}).get('publishingProfile', {}).get('publishedDate')
+            publishing_profile = resource.get('properties', {}).get('publishingProfile', {})
+            date_str = publishing_profile.get('publishedDate')
             if date_str:
                 # Parse ISO format datetime
                 return datetime.fromisoformat(date_str.replace('Z', '+00:00'))
