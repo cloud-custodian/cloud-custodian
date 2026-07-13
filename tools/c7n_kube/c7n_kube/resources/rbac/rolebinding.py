@@ -75,13 +75,9 @@ class RoleRefFilter(ValueFilter):
     annotation_key = "c7n:role-ref"
 
     def process(self, resources, event=None):
-        client = local_session(self.manager.session_factory).client(
-            "RbacAuthorization", "V1"
-        )
+        client = local_session(self.manager.session_factory).client("RbacAuthorization", "V1")
 
-        cluster_roles = {
-            cr.metadata.name: cr for cr in client.list_cluster_role().items
-        }
+        cluster_roles = {cr.metadata.name: cr for cr in client.list_cluster_role().items}
 
         try:
             namespaced_roles = {

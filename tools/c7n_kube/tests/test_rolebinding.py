@@ -38,9 +38,7 @@ class ClusterRoleBindingTest(KubeTest):
         resources = p.run()
         self.assertEqual(len(resources), 1)
         self.assertEqual(resources[0]["metadata"]["name"], "cluster-admin")
-        self.assertEqual(
-            resources[0]["c7n:role-ref"]["metadata"]["name"], "cluster-admin"
-        )
+        self.assertEqual(resources[0]["c7n:role-ref"]["metadata"]["name"], "cluster-admin")
 
 
 class RoleBindingTest(KubeTest):
@@ -77,6 +75,4 @@ class RoleBindingTest(KubeTest):
         resources = p.run()
         self.assertEqual(len(resources), 1)
         self.assertEqual(resources[0]["metadata"]["name"], "wildcard-binding")
-        self.assertEqual(
-            resources[0]["c7n:role-ref"]["metadata"]["name"], "wildcard-role"
-        )
+        self.assertEqual(resources[0]["c7n:role-ref"]["metadata"]["name"], "wildcard-role")
