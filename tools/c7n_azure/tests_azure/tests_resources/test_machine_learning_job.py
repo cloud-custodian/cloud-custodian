@@ -2,6 +2,7 @@
 # SPDX-License-Identifier: Apache-2.0
 
 from ..azure_common import BaseTest, arm_template, cassette_name
+from c7n_azure.resources.machine_learning_job import MachineLearningJob
 
 
 class MachineLearningJobTest(BaseTest):
@@ -12,6 +13,12 @@ class MachineLearningJobTest(BaseTest):
             'resource': 'azure.machine-learning-job'
         }, validate=True)
         self.assertTrue(p)
+
+        for action in ('tag', 'untag', 'auto-tag-user', 'auto-tag-date',
+                       'tag-trim', 'mark-for-op'):
+            self.assertNotIn(action, MachineLearningJob.action_registry)
+        self.assertNotIn('marked-for-op', MachineLearningJob.filter_registry)
+        self.assertNotIn('location', MachineLearningJob.resource_type.default_report_fields)
 
     @arm_template('machine-learning-job.json')
     @cassette_name('machine-learning-jobs')

@@ -42,7 +42,6 @@ class MachineLearningJob(ChildArmResourceManager):
         resource_type = 'Microsoft.MachineLearningServices/workspaces/jobs'
         default_report_fields = (
             'name',
-            'location',
             'resourceGroup',
             '"c7n:parent-id"'
         )

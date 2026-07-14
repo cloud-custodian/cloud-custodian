@@ -62,6 +62,7 @@
                                 "properties": {
                                     "jobType": "Sweep",
                                     "limits": {
+                                        "jobLimitsType": "Sweep",
                                         "maxConcurrentTrials": 20
                                     }
                                 }
