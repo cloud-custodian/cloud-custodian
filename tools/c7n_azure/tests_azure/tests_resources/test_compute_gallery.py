@@ -24,50 +24,6 @@ class ComputeGalleryTest(BaseTest):
             }, validate=True)
             self.assertTrue(p)
 
-    @terraform('compute_gallery')
-    @pytest.mark.functional
-    def test_compute_gallery_discovery_terraform(self, test, compute_gallery):
-        """Test that Cloud Custodian can discover galleries provisioned by Terraform"""
-        # Verify terraform fixtures loaded successfully
-        assert 'test_gallery' in compute_gallery.outputs
-        assert 'secondary_gallery' in compute_gallery.outputs
-
-        test_gallery = compute_gallery.outputs['test_gallery']['value']
-        secondary_gallery = compute_gallery.outputs['secondary_gallery']['value']
-
-        # Run discovery policy
-        policy = self.load_policy({
-            'name': 'test-gallery-discovery',
-            'resource': 'azure.compute-gallery'
-        })
-
-        resources = policy.run()
-
-        # Verify both galleries are discovered
-        gallery_names = {r['name'] for r in resources}
-        assert test_gallery['name'] in gallery_names
-        assert secondary_gallery['name'] in gallery_names
-
-    @terraform('compute_gallery')
-    @pytest.mark.functional
-    def test_compute_gallery_location_filter_terraform(self, test, compute_gallery):
-        """Test location filter on compute galleries"""
-
-        # Filter by location
-        policy = self.load_policy({
-            'name': 'test-gallery-location',
-            'resource': 'azure.compute-gallery',
-            'filters': [
-                {'type': 'value', 'key': 'location', 'op': 'eq', 'value': 'westeurope'}
-            ]
-        })
-
-        resources = policy.run()
-
-        # Verify filtered results
-        assert len(resources) >= 2
-        assert all(r['location'] == 'westeurope' for r in resources)
-
 
 class ComputeGalleryImageTest(BaseTest):
     """Test Compute Gallery Image resource functionality"""
@@ -86,75 +42,6 @@ class ComputeGalleryImageTest(BaseTest):
                 ]
             }, validate=True)
             self.assertTrue(p)
-
-    @terraform('compute_gallery')
-    @pytest.mark.functional
-    def test_compute_gallery_image_discovery_terraform(self, test, compute_gallery):
-        """Test that Cloud Custodian can discover image definitions"""
-        linux_image = compute_gallery.outputs['linux_image']['value']
-        windows_image = compute_gallery.outputs['windows_image']['value']
-
-        # Run discovery policy
-        policy = self.load_policy({
-            'name': 'test-image-discovery',
-            'resource': 'azure.compute-gallery-image'
-        })
-
-        resources = policy.run()
-
-        # Verify images are discovered
-        image_names = {r['name'] for r in resources}
-        assert linux_image['name'] in image_names
-        assert windows_image['name'] in image_names
-
-    @terraform('compute_gallery')
-    @pytest.mark.functional
-    def test_compute_gallery_image_os_filter_terraform(self, test, compute_gallery):
-        """Test OS type filter on image definitions"""
-        linux_image = compute_gallery.outputs['linux_image']['value']
-
-        # Filter by Linux OS type
-        policy = self.load_policy({
-            'name': 'test-linux-images',
-            'resource': 'azure.compute-gallery-image',
-            'filters': [
-                {'type': 'value', 'key': 'properties.osType', 'op': 'eq', 'value': 'Linux'}
-            ]
-        })
-
-        resources = policy.run()
-
-        # Verify all returned resources are Linux
-        assert all(r['properties']['osType'] == 'Linux' for r in resources)
-        assert any(r['name'] == linux_image['name'] for r in resources)
-
-    @terraform('compute_gallery')
-    @pytest.mark.functional
-    def test_compute_gallery_image_gallery_filter_terraform(self, test, compute_gallery):
-        """Test gallery filter on image definitions"""
-        test_gallery = compute_gallery.outputs['test_gallery']['value']
-        linux_image = compute_gallery.outputs['linux_image']['value']
-        windows_image = compute_gallery.outputs['windows_image']['value']
-
-        # Filter by gallery name
-        policy = self.load_policy({
-            'name': 'test-gallery-filter',
-            'resource': 'azure.compute-gallery-image',
-            'filters': [
-                {'type': 'gallery', 'value': test_gallery['name']}
-            ]
-        })
-
-        resources = policy.run()
-
-        # Verify only images from the specified gallery are returned
-        image_names = {r['name'] for r in resources}
-        assert linux_image['name'] in image_names
-        assert windows_image['name'] in image_names
-
-        # Verify all resources belong to the test gallery
-        for r in resources:
-            assert r.get('c7n:parent-id'), "Missing parent-id annotation"
 
 
 class ComputeGalleryImageVersionTest(BaseTest):
@@ -242,3 +129,122 @@ class ComputeGalleryImageVersionTest(BaseTest):
                 ]
             }, validate=True)
             self.assertTrue(p)
+
+
+# Terraform-based functional tests (must be module-level functions)
+
+@terraform('compute_gallery')
+@pytest.mark.functional
+def test_compute_gallery_discovery_terraform(test, compute_gallery):
+    """Test that Cloud Custodian can discover galleries provisioned by Terraform"""
+    # Verify terraform fixtures loaded successfully
+    assert 'test_gallery' in compute_gallery.outputs
+    assert 'secondary_gallery' in compute_gallery.outputs
+
+    test_gallery = compute_gallery.outputs['test_gallery']['value']
+    secondary_gallery = compute_gallery.outputs['secondary_gallery']['value']
+
+    # Run discovery policy
+    policy = test.load_policy({
+        'name': 'test-gallery-discovery',
+        'resource': 'azure.compute-gallery'
+    })
+
+    resources = policy.run()
+
+    # Verify both galleries are discovered
+    gallery_names = {r['name'] for r in resources}
+    assert test_gallery['name'] in gallery_names
+    assert secondary_gallery['name'] in gallery_names
+
+
+@terraform('compute_gallery')
+@pytest.mark.functional
+def test_compute_gallery_location_filter_terraform(test, compute_gallery):
+    """Test location filter on compute galleries"""
+    # Filter by location
+    policy = test.load_policy({
+        'name': 'test-gallery-location',
+        'resource': 'azure.compute-gallery',
+        'filters': [
+            {'type': 'value', 'key': 'location', 'op': 'eq', 'value': 'westeurope'}
+        ]
+    })
+
+    resources = policy.run()
+
+    # Verify filtered results
+    assert len(resources) >= 2
+    assert all(r['location'] == 'westeurope' for r in resources)
+
+
+@terraform('compute_gallery')
+@pytest.mark.functional
+def test_compute_gallery_image_discovery_terraform(test, compute_gallery):
+    """Test that Cloud Custodian can discover image definitions"""
+    linux_image = compute_gallery.outputs['linux_image']['value']
+    windows_image = compute_gallery.outputs['windows_image']['value']
+
+    # Run discovery policy
+    policy = test.load_policy({
+        'name': 'test-image-discovery',
+        'resource': 'azure.compute-gallery-image'
+    })
+
+    resources = policy.run()
+
+    # Verify images are discovered
+    image_names = {r['name'] for r in resources}
+    assert linux_image['name'] in image_names
+    assert windows_image['name'] in image_names
+
+
+@terraform('compute_gallery')
+@pytest.mark.functional
+def test_compute_gallery_image_os_filter_terraform(test, compute_gallery):
+    """Test OS type filter on image definitions"""
+    linux_image = compute_gallery.outputs['linux_image']['value']
+
+    # Filter by Linux OS type
+    policy = test.load_policy({
+        'name': 'test-linux-images',
+        'resource': 'azure.compute-gallery-image',
+        'filters': [
+            {'type': 'value', 'key': 'properties.osType', 'op': 'eq', 'value': 'Linux'}
+        ]
+    })
+
+    resources = policy.run()
+
+    # Verify all returned resources are Linux
+    assert all(r['properties']['osType'] == 'Linux' for r in resources)
+    assert any(r['name'] == linux_image['name'] for r in resources)
+
+
+@terraform('compute_gallery')
+@pytest.mark.functional
+def test_compute_gallery_image_gallery_filter_terraform(test, compute_gallery):
+    """Test gallery filter on image definitions"""
+    test_gallery = compute_gallery.outputs['test_gallery']['value']
+    linux_image = compute_gallery.outputs['linux_image']['value']
+    windows_image = compute_gallery.outputs['windows_image']['value']
+
+    # Filter by gallery name
+    policy = test.load_policy({
+        'name': 'test-gallery-filter',
+        'resource': 'azure.compute-gallery-image',
+        'filters': [
+            {'type': 'gallery', 'value': test_gallery['name']}
+        ]
+    })
+
+    resources = policy.run()
+
+    # Verify only images from the specified gallery are returned
+    image_names = {r['name'] for r in resources}
+    assert linux_image['name'] in image_names
+    assert windows_image['name'] in image_names
+
+    # Verify all resources belong to the test gallery
+    for r in resources:
+        assert r.get('c7n:parent-id'), "Missing parent-id annotation"
