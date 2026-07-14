@@ -8,6 +8,7 @@ resource dict.
 
 MATCH_TRACE_KEY = "c7n:MatchTrace"
 MATCH_TRACE_SUMMARY_KEY = "c7n:MatchTraceSummary"
+MATCH_TRACE_SLIM_KEY = "c7n:MatchTraceSlim"
 
 _MARK = {True: "⊤", False: "⊥", None: "?"}  # logical true / false / unknown
 
@@ -23,6 +24,7 @@ def trace_filter(f, resource):
     - None when the filter cannot be evaluated per-resource (bulk-only)
     """
     from c7n.filters.core import Or, And, Not, ValueFilter
+    from c7n.filters.related import RelatedResourceFilter
 
     if isinstance(f, Not):
         children = [trace_filter(c, resource) for c in f.filters]
@@ -45,6 +47,23 @@ def trace_filter(f, resource):
         matched = all(truthy) if truthy else True
         return {"type": "and", "matched": matched, "children": children}
 
+    if isinstance(f, RelatedResourceFilter):
+        # RelatedResourceFilter's real per-resource logic lives in
+        # process_resource(resource, related), not match() -- match() only
+        # tests a single related object, not the or/and-across-related-ids
+        # semantics process_resource applies. Fetch just this resource's
+        # related objects and defer to the same method process() uses.
+        related = f.get_related([resource])
+        matched = f.process_resource(resource, related)
+        return {
+            "type": "value",
+            "key": f.k,
+            "op": f.op or "eq",
+            "expected": f.v,
+            "related_ids": sorted(related),
+            "matched": matched,
+        }
+
     if isinstance(f, ValueFilter):
         # Calling match() is idempotent -- content_initialized flag ensures
         # f.k/op/v are set on first call and frozen thereafter.
@@ -57,7 +76,7 @@ def trace_filter(f, resource):
         return {
             "type": "value",
             "key": f.k,
-            "op": f.op,
+            "op": f.op or "eq",
             "expected": f.v,
             "actual": actual,
             "value_type": getattr(f, "vtype", None),  # may be None for simple equality checks
@@ -94,10 +113,46 @@ def format_trace(trace):
         return f"{mark} {node_type.upper()}({children})"
 
     if node_type == "value":
-        op = trace["op"] or "eq"
-        return f"{mark} {trace['key']} {op} {trace['expected']!r} -> {trace['actual']!r}"
+        if "related_ids" in trace:
+            return (
+                f"{mark} {trace['key']} {trace['op']} {trace['expected']!r} "
+                f"related:{trace['related_ids']!r}"
+            )
+        return f"{mark} {trace['key']} {trace['op']} {trace['expected']!r} -> {trace['actual']!r}"
 
     return f"{mark} {node_type}"
+
+
+def slim_trace(trace):
+    """Prune a trace_filter() node down to only the children that decided
+    its result -- the branches that actually caused the resource to appear
+    (or not) in the policy, dropping the ones that didn't matter.
+
+    - or: if matched, keep only the matching children (an or needs just one);
+      if not matched, every child failed and all are kept.
+    - and / not: both reduce to an inner AND across children. If that inner
+      AND is True, every child had to pass, so all are kept; if it's False,
+      only the failing child(ren) are kept (the ones that broke it).
+    - Children with matched=None (bulk-only, couldn't be evaluated) are
+      always kept, since we can't rule out their contribution.
+    - Leaf (value) nodes are returned as-is.
+    """
+    node_type = trace["type"]
+    if node_type not in ("and", "or", "not"):
+        return dict(trace)
+
+    children = trace["children"]
+    if node_type == "or":
+        relevant = children if not trace["matched"] else [
+            c for c in children if c["matched"] is not False]
+    else:
+        inner_and_true = trace["matched"] if node_type == "and" else not trace["matched"]
+        relevant = children if inner_and_true else [
+            c for c in children if c["matched"] is not True]
+
+    result = dict(trace)
+    result["children"] = [slim_trace(c) for c in relevant]
+    return result
 
 
 def attach_traces(filters, resources):
@@ -108,7 +163,9 @@ def attach_traces(filters, resources):
     under the ``c7n:MatchTrace`` key directly on the resource dict. A
     condensed, human-readable rendering of the same traces (one string per
     top-level filter, via format_trace) is stored under
-    ``c7n:MatchTraceSummary``.
+    ``c7n:MatchTraceSummary``. A pruned version of the traces containing only
+    the branches that decided the result (via slim_trace) is stored under
+    ``c7n:MatchTraceSlim``.
 
     This function has no return value; it mutates the resource dicts in place.
     """
@@ -116,3 +173,4 @@ def attach_traces(filters, resources):
         traces = [trace_filter(f, resource) for f in filters]
         resource[MATCH_TRACE_KEY] = traces
         resource[MATCH_TRACE_SUMMARY_KEY] = [format_trace(t) for t in traces]
+        resource[MATCH_TRACE_SLIM_KEY] = [slim_trace(t) for t in traces]

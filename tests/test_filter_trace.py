@@ -15,8 +15,10 @@ from c7n.filters.tracer import (
     trace_filter,
     attach_traces,
     format_trace,
+    slim_trace,
     MATCH_TRACE_KEY,
     MATCH_TRACE_SUMMARY_KEY,
+    MATCH_TRACE_SLIM_KEY,
 )
 
 from .common import BaseTest
@@ -67,7 +69,7 @@ class TraceFilterTest(unittest.TestCase):
         result = trace_filter(f, _instance())
         self.assertEqual(result["type"], "value")
         self.assertEqual(result["key"], "Architecture")
-        self.assertEqual(result["op"], None)
+        self.assertEqual(result["op"], "eq")
         self.assertEqual(result["expected"], "x86_64")
         self.assertEqual(result["actual"], "x86_64")
         self.assertTrue(result["matched"])
@@ -188,6 +190,14 @@ class AttachTracesTest(unittest.TestCase):
         self.assertEqual(len(summary), 1)
         self.assertEqual(summary[0], format_trace(resources[0][MATCH_TRACE_KEY][0]))
 
+    def test_attach_traces_sets_slim_key(self):
+        filters = [ec2_filters.factory({"type": "value", "key": "Architecture", "value": "x86_64"})]
+        resources = [_instance()]
+        attach_traces(filters, resources)
+        slim = resources[0][MATCH_TRACE_SLIM_KEY]
+        self.assertEqual(len(slim), 1)
+        self.assertEqual(slim[0], slim_trace(resources[0][MATCH_TRACE_KEY][0]))
+
 
 class FormatTraceTest(unittest.TestCase):
 
@@ -232,6 +242,112 @@ class FormatTraceTest(unittest.TestCase):
 
         trace = trace_filter(BulkOnlyFilter(), _instance())
         self.assertEqual(format_trace(trace), "? BulkOnlyFilter")
+
+
+class SlimTraceTest(unittest.TestCase):
+    """slim_trace() prunes a trace down to only the children that decided
+    the result -- e.g. of 4 ors where only 1 evaluates True, slim keeps
+    just that one.
+    """
+
+    def test_or_matched_keeps_only_the_matching_child(self):
+        f = _or(
+            {"type": "value", "key": "Architecture", "value": "arm64"},
+            {"type": "value", "key": "State.Name", "value": "stopped"},
+            {"type": "value", "key": "Architecture", "value": "x86_64"},  # the one true branch
+            {"type": "value", "key": "EbsOptimized", "value": True},
+        )
+        trace = trace_filter(f, _instance())
+        self.assertTrue(trace["matched"])
+        self.assertEqual(len(trace["children"]), 4)
+
+        slim = slim_trace(trace)
+        self.assertEqual(len(slim["children"]), 1)
+        self.assertEqual(slim["children"][0]["key"], "Architecture")
+        self.assertEqual(slim["children"][0]["expected"], "x86_64")
+
+    def test_or_not_matched_keeps_all_children(self):
+        f = _or(
+            {"type": "value", "key": "Architecture", "value": "arm64"},
+            {"type": "value", "key": "State.Name", "value": "stopped"},
+        )
+        trace = trace_filter(f, _instance())
+        self.assertFalse(trace["matched"])
+        slim = slim_trace(trace)
+        self.assertEqual(len(slim["children"]), 2)
+
+    def test_and_not_matched_keeps_only_failing_children(self):
+        f = _and(
+            {"type": "value", "key": "Architecture", "value": "x86_64"},  # passes
+            {"type": "value", "key": "State.Name", "value": "stopped"},  # fails
+        )
+        trace = trace_filter(f, _instance())
+        self.assertFalse(trace["matched"])
+        slim = slim_trace(trace)
+        self.assertEqual(len(slim["children"]), 1)
+        self.assertEqual(slim["children"][0]["key"], "State.Name")
+
+    def test_and_matched_keeps_all_children(self):
+        f = _and(
+            {"type": "value", "key": "Architecture", "value": "x86_64"},
+            {"type": "value", "key": "State.Name", "value": "running"},
+        )
+        trace = trace_filter(f, _instance())
+        self.assertTrue(trace["matched"])
+        slim = slim_trace(trace)
+        self.assertEqual(len(slim["children"]), 2)
+
+    def test_not_matched_keeps_only_failing_children(self):
+        # not(and-like inner) is True (matched) when the inner and is False,
+        # so slim keeps only the children that failed -- same rule as `and`.
+        f = _not(
+            {"type": "value", "key": "Architecture", "value": "x86_64"},  # passes
+            {"type": "value", "key": "State.Name", "value": "stopped"},  # fails
+        )
+        trace = trace_filter(f, _instance())
+        self.assertTrue(trace["matched"])
+        slim = slim_trace(trace)
+        self.assertEqual(len(slim["children"]), 1)
+        self.assertEqual(slim["children"][0]["key"], "State.Name")
+
+    def test_none_children_are_never_dropped(self):
+        class BulkOnlyFilter:
+            def __call__(self, resource):
+                raise TypeError("resource_count filters operate on the full set")
+
+        f = _or(
+            {"type": "value", "key": "Architecture", "value": "arm64"},  # false
+        )
+        trace = trace_filter(f, _instance())
+        trace["children"].append(trace_filter(BulkOnlyFilter(), _instance()))
+        trace["matched"] = False
+        slim = slim_trace(trace)
+        # both children kept: the false value node (or didn't match, so all
+        # kept) and the unknown bulk-only node regardless.
+        self.assertEqual(len(slim["children"]), 2)
+
+    def test_nested_composite_prunes_recursively(self):
+        f = _and(
+            {"type": "value", "key": "EbsOptimized", "value": False},  # passes
+            {"or": [
+                {"type": "value", "key": "Architecture", "value": "arm64"},  # fails
+                {"type": "value", "key": "State.Name", "value": "running"},  # passes
+            ]},
+        )
+        trace = trace_filter(f, _instance())
+        self.assertTrue(trace["matched"])
+        slim = slim_trace(trace)
+        # and matched -> both top children kept
+        self.assertEqual(len(slim["children"]), 2)
+        or_slim = slim["children"][1]
+        # nested or matched -> only its one true child kept
+        self.assertEqual(len(or_slim["children"]), 1)
+        self.assertEqual(or_slim["children"][0]["key"], "State.Name")
+
+    def test_leaf_node_returned_unchanged(self):
+        f = ec2_filters.factory({"type": "value", "key": "Architecture", "value": "x86_64"})
+        trace = trace_filter(f, _instance())
+        self.assertEqual(slim_trace(trace), trace)
 
 
 class RealPolicyTraceTest(BaseTest):
@@ -300,13 +416,27 @@ class RealPolicyTraceTest(BaseTest):
         self.assertFalse(and_branch["matched"])
         self.assertTrue(absent_branch["matched"])
 
-        # security-group is a RelatedResourceFilter: its real match logic
-        # lives in process_resource(resource, related), not match(), so
-        # trace_filter's ValueFilter branch (which calls f.match()) can't
-        # reproduce the bulk-computed result -- a known tracer limitation
-        # for related-resource filters.
+        # security-group is a RelatedResourceFilter: trace_filter fetches
+        # this resource's related security groups and defers to
+        # process_resource(), the same per-resource path process() uses.
         sg_trace = traces[1]
-        self.assertFalse(sg_trace["matched"])
+        self.assertTrue(sg_trace["matched"])
+        self.assertIn("sg-", "".join(sg_trace["related_ids"]))
+
+        summary = resources[0][MATCH_TRACE_SUMMARY_KEY]
+        self.assertEqual(len(summary), 2)
+        self.assertEqual(summary[0], format_trace(or_trace))
+        self.assertEqual(summary[1], format_trace(sg_trace))
+
+        # or_trace matched via the absent_branch only (and_branch failed),
+        # so slim drops and_branch and keeps just the deciding branch.
+        slim = resources[0][MATCH_TRACE_SLIM_KEY]
+        self.assertEqual(len(slim), 2)
+        or_slim = slim[0]
+        self.assertEqual(len(or_slim["children"]), 1)
+        self.assertEqual(or_slim["children"][0]["key"], "IamInstanceProfile")
+        self.assertEqual(or_slim["children"][0]["expected"], "absent")
+        import pytest; pytest.set_trace()
 
     def test_not_filter_match_trace(self):
         # tests/test_ec2.py::TestFilter::test_not_filter, second policy
