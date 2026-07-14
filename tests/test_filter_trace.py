@@ -436,7 +436,6 @@ class RealPolicyTraceTest(BaseTest):
         self.assertEqual(len(or_slim["children"]), 1)
         self.assertEqual(or_slim["children"][0]["key"], "IamInstanceProfile")
         self.assertEqual(or_slim["children"][0]["expected"], "absent")
-        import pytest; pytest.set_trace()
 
     def test_not_filter_match_trace(self):
         # tests/test_ec2.py::TestFilter::test_not_filter, second policy
@@ -490,13 +489,14 @@ class RealPolicyTraceTest(BaseTest):
         self.assertEqual(len(or_trace["children"]), 3)
 
         summary = resources[0][MATCH_TRACE_SUMMARY_KEY]
-        import pytest; pytest.set_trace()
         self.assertEqual(len(summary), 1)
         self.assertEqual(summary[0], format_trace(not_trace))
         self.assertEqual(
             summary[0],
             "⊤ NOT(⊥ OR(⊥ InstanceId eq 'i-036ee05e8c2ca83b3' -> 'i-012d153789199a2ea', "
-            "⊥ InstanceId eq 'i-03d8207d8285cbf53' -> 'i-012d153789199a2ea'))",
+            "⊥ InstanceId eq 'i-03d8207d8285cbf53' -> 'i-012d153789199a2ea', "
+            "⊥ AND(⊤ InstanceId eq 'i-012d153789199a2ea' -> 'i-012d153789199a2ea', "
+            "⊥ InstanceType eq 't2.large' -> 't2.micro')))",
         )
 
 
