@@ -316,6 +316,7 @@ def get_default_definitions(resource_defs):
                     {'$ref': '#/definitions/max-resources-properties'}
                 ]},
                 'max-resources-percent': {'type': 'number', 'minimum': 0, 'maximum': 100},
+                'match_trace': {'type': 'boolean'},
                 'comment': {'type': 'string'},
                 'comments': {'type': 'string'},
                 'description': {'type': 'string'},
