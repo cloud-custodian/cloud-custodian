@@ -297,7 +297,10 @@ class QuicksightAccountSubscription(ValueFilter):
         return super().process(resources, event)
 
     def __call__(self, r):
-        return super().__call__(r[self.annotation_key])
+        matched = self.match(r[self.annotation_key])
+        if matched and self.annotate:
+            set_annotation(r, ANNOTATION_KEY, self.k)
+        return matched
 
 
 class DescribeQuicksightWithAccountId(query.DescribeSource):
