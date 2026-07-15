@@ -19,6 +19,7 @@ from urllib.request import getproxies, proxy_bypass
 
 from dateutil.parser import ParserError, parse
 
+import importlib.resources
 import jmespath
 from jmespath import functions
 from jmespath.parser import Parser, ParsedResult
@@ -385,17 +386,14 @@ def parse_s3(s3_path):
     return s3_path, bucket, key_prefix
 
 
-REGION_PARTITION_MAP = {
-    'us-gov-east-1': 'aws-us-gov',
-    'us-gov-west-1': 'aws-us-gov',
-    'cn-north-1': 'aws-cn',
-    'cn-northwest-1': 'aws-cn',
-    'us-isob-east-1': 'aws-iso-b',
-    'us-iso-east-1': 'aws-iso'
-}
+REGION_PARTITION_MAP = json.loads(
+    (importlib.resources.files('c7n') / 'data/aws_region_partition_map.json').read_text()
+)
 
 
 def get_partition(region):
+    if not region:
+        return ''
     return REGION_PARTITION_MAP.get(region, 'aws')
 
 
@@ -405,8 +403,8 @@ def generate_arn(
     """Generate an Amazon Resource Name.
     See http://docs.aws.amazon.com/general/latest/gr/aws-arns-and-namespaces.html.
     """
-    if region and region in REGION_PARTITION_MAP:
-        partition = REGION_PARTITION_MAP[region]
+    if region:
+        partition = get_partition(region)
     if service == 's3':
         region = ''
     arn = 'arn:%s:%s:%s:%s:' % (
@@ -1061,6 +1059,24 @@ def get_human_size(size, precision=2):
     return "%.*f %s" % (precision, size, suffixes[suffixIndex])
 
 
+def is_not_found(err):
+    """Attempt for an aws exception to determine if its a NotFound error.
+
+    Returns boolean.
+
+    Across the set of AWS services the error handling behavior, runs
+    across many different behavior patterns for NotFound style
+    exceptions. We want to use any unambigious signal in the error
+    code but also not flag an exception that could potentially represent
+    another error that user should be informed about.
+    """
+    code = err.response['Error']['Code']
+    for s in ('NotFound', 'NoSuch'):
+        if s in code:
+            return True
+    return False
+
+
 def get_support_region(manager):
     # support is a unique service in that it doesnt support regional endpoints
     # thus, we need to construct the client based off the regions found here:
@@ -1217,3 +1233,22 @@ def get_path(path: str, resource: dict):
 def jmespath_compile(expression):
     parsed = C7NJMESPathParser().parse(expression)
     return parsed
+
+
+def snap_to_period_start(start: datetime, end: datetime, period_start: str):
+    """
+    Adjust the start and end timestamps according to `period_start`.
+
+    Args:
+        start (datetime): The original start datetime.
+        end (datetime): The original end datetime.
+        period_start (str): One of 'auto', 'start-of-day'.
+
+    Returns:
+        Tuple[datetime, datetime]: Adjusted (start, end)
+    """
+    if period_start == "start-of-day":
+        start = start.replace(hour=0, minute=0, second=0, microsecond=0)
+        end = end.replace(hour=0, minute=0, second=0, microsecond=0)
+    # 'auto' does nothing
+    return start, end

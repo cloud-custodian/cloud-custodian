@@ -4,6 +4,7 @@
 from c7n.actions import BaseAction
 from c7n.filters import ValueFilter
 from c7n.filters.kms import KmsRelatedFilter
+from c7n.filters.iamaccess import CrossAccountAccessFilter
 from c7n.manager import resources
 from c7n.query import QueryResourceManager, TypeInfo
 from c7n.tags import RemoveTag, Tag, TagActionFilter, TagDelayedAction
@@ -212,6 +213,40 @@ class OpensearchIngestionPipelineConfigFilter(ValueFilter):
         return matched
 
 
+@OpensearchIngestion.filter_registry.register('cross-account')
+class CrossAccountFilter(CrossAccountAccessFilter):
+    """Filter OpenSearch Ingestion Pipelines by cross-account access
+
+    :example:
+
+    .. code-block:: yaml
+
+        policies:
+          - name: osis-cross-account
+            resource: opensearch-ingestion
+            filters:
+              - type: cross-account
+    """
+    policy_attribute = 'c7n:Policy'
+    permissions = ('osis:GetResourcePolicy',)
+
+    def process(self, resources, event=None):
+        client = local_session(self.manager.session_factory).client('osis')
+
+        for r in resources:
+            if self.policy_attribute in r:
+                continue
+
+            # Pipeline Resource Policy cross account check
+            res_policy = self.manager.retry(
+                client.get_resource_policy,
+                ResourceArn=r['PipelineArn'],
+                ignore_err_codes=('ResourceNotFoundException',))
+            if res_policy:
+                r[self.policy_attribute] = res_policy.get('Policy')
+        return super().process(resources, event)
+
+
 @OpensearchIngestion.action_registry.register('tag')
 class TagOpensearchIngestion(Tag):
     """Create tags on an OpenSearch Ingestion Pipeline
@@ -397,3 +432,36 @@ class UpdateOpenSearchIngestion(BaseAction):
                 client.update_pipeline(PipelineName=r['PipelineName'], **params)
             except client.exceptions.ResourceNotFoundException:
                 continue
+
+
+@resources.register('opensearch-reserved')
+class OpensearchReservedInstance(QueryResourceManager):
+    """Lists all the reserved OpenSearch instances
+
+    :example:
+
+    .. code-block:: yaml
+
+        policies:
+          - name: opensearch-reserved-instances-policy
+            resource: aws.opensearch-reserved
+            filters:
+              - type: value
+                key: State
+                value: active
+
+    """
+
+    class resource_type(TypeInfo):
+        service = 'opensearch'
+        name = id = 'ReservedInstanceId'
+        date = 'StartTime'
+        enum_spec = (
+            'describe_reserved_instances',
+            'ReservedInstances',
+            None,
+        )
+        filter_name = 'ReservedInstanceId'
+        filter_type = 'scalar'
+        arn_type = "reserved-instances"
+        permissions_enum = ('es:DescribeReservedInstances',)

@@ -1,0 +1,36 @@
+{
+  "status_code": 200,
+  "data": {
+    "checks": [
+      {
+        "id": "nO7SS0l7J9",
+        "name": "IAM Instance Profiles",
+        "description": "Checks for usage that is more than 80% of the IAM Instance Profiles Limit.",
+        "category": "service_limits",
+        "metadata": [
+          "Region",
+          "Service",
+          "Limit Name",
+          "Limit Amount",
+          "Current Usage",
+          "Status"
+        ]
+      },
+      {
+        "id": "oQ7TT0l7J9",
+        "name": "IAM Roles",
+        "description": "Checks for usage that is more than 80% of the IAM Roles Limit.",
+        "category": "service_limits",
+        "metadata": [
+          "Region",
+          "Service",
+          "Limit Name",
+          "Limit Amount",
+          "Current Usage",
+          "Status"
+        ]
+      }
+    ],
+    "ResponseMetadata": {}
+  }
+}

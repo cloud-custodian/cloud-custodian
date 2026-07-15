@@ -2,6 +2,10 @@
 # SPDX-License-Identifier: Apache-2.0
 ResourceMap = {
     "azure.advisor-recommendation": "c7n_azure.resources.advisor.AdvisorRecommendation",
+    "azure.ai-foundry-project": "c7n_azure.resources.ai_foundry.AIFoundryProject",
+    "azure.ai-foundry-connection": "c7n_azure.resources.ai_foundry.AIFoundryConnection",
+    "azure.ai-foundry-application": "c7n_azure.resources.ai_foundry.AIFoundryApplication",
+    "azure.ai-foundry-agent": "c7n_azure.resources.ai_foundry.AIFoundryAgent",
     "azure.afd-endpoint": "c7n_azure.resources.afd_endpoint.AfdEndpoint",
     "azure.afd-custom-domain": "c7n_azure.resources.afd_custom_domain.AfdCustomDomain",
     "azure.aks": "c7n_azure.resources.k8s_service.KubernetesService",
@@ -20,7 +24,9 @@ ResourceMap = {
     "azure.cdn-custom-domain": "c7n_azure.resources.cdn_custom_domain.CdnCustomDomain",
     "azure.cdn-endpoint": "c7n_azure.resources.cdn_endpoint.CdnEndpoint",
     "azure.cdnprofile": "c7n_azure.resources.cdn.CdnProfile",
-    "azure.cognitiveservice": "c7n_azure.resources.cognitive_service.CognitiveService",
+    "azure.cognitiveservice": "c7n_azure.resources.ai_foundry.CognitiveService",
+    "azure.ai-foundry-deployment": "c7n_azure.resources.ai_foundry.AiFoundryDeployment",
+    "azure.cognitiveservice-deployment": "c7n_azure.resources.ai_foundry.AiFoundryCognitiveServiceDeployment", # noqa
     "azure.container-group": "c7n_azure.resources.aci.ContainerGroup",
     "azure.containerregistry": "c7n_azure.resources.container_registry.ContainerRegistry",
     "azure.container-registry": "c7n_azure.resources.container_registry.ContainerRegistry",
@@ -111,4 +117,8 @@ ResourceMap = {
     "azure.entraid-user": "c7n_azure.resources.entraid_user.EntraIDUser",
     "azure.entraid-group": "c7n_azure.resources.entraid_group.EntraIDGroup",
     "azure.entraid-organization": "c7n_azure.resources.entraid_organization.EntraIDOrganization",
+    "azure.entraid-conditional-access-policy": "c7n_azure.resources.entraid_conditional_access.EntraIDConditionalAccessPolicy", # noqa
+    "azure.entraid-security-defaults": "c7n_azure.resources.entraid_security_defaults.EntraIDSecurityDefaults", # noqa
+    "azure.entraid-authorization-policy": "c7n_azure.resources.entraid_authorization_policy.EntraIDAuthorizationPolicy", # noqa
+    "azure.entraid-named-location": "c7n_azure.resources.entraid_named_locations.EntraIDNamedLocation", # noqa
 }

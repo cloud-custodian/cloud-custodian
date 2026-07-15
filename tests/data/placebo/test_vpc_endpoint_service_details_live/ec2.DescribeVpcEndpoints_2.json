@@ -1,0 +1,169 @@
+{
+    "status_code": 200,
+    "data": {
+        "VpcEndpoints": [
+            {
+                "VpcEndpointId": "vpce-0d3fa19c3b50341d2",
+                "VpcEndpointType": "Gateway",
+                "VpcId": "vpc-d2d616b5",
+                "ServiceName": "com.amazonaws.us-east-1.dynamodb",
+                "State": "available",
+                "PolicyDocument": "{\"Version\":\"2008-10-17\",\"Statement\":[{\"Effect\":\"Allow\",\"Principal\":\"*\",\"Action\":\"*\",\"Resource\":\"*\"}]}",
+                "RouteTableIds": [
+                    "rtb-3bf1b05c"
+                ],
+                "SubnetIds": [],
+                "Groups": [],
+                "IpAddressType": "ipv4",
+                "DnsOptions": {
+                    "DnsRecordIpType": "service-defined"
+                },
+                "PrivateDnsEnabled": false,
+                "RequesterManaged": false,
+                "NetworkInterfaceIds": [],
+                "DnsEntries": [],
+                "CreationTimestamp": {
+                    "__class__": "datetime",
+                    "year": 2023,
+                    "month": 8,
+                    "day": 30,
+                    "hour": 13,
+                    "minute": 49,
+                    "second": 28,
+                    "microsecond": 0
+                },
+                "Tags": [],
+                "OwnerId": "644160558196",
+                "ServiceRegion": "us-east-1"
+            },
+            {
+                "VpcEndpointId": "vpce-0e0a16ee0436b31ac",
+                "VpcEndpointType": "Gateway",
+                "VpcId": "vpc-d2d616b5",
+                "ServiceName": "com.amazonaws.us-east-1.s3",
+                "State": "available",
+                "PolicyDocument": "{\"Version\":\"2008-10-17\",\"Statement\":[{\"Effect\":\"Allow\",\"Principal\":\"*\",\"Action\":\"*\",\"Resource\":\"*\"}]}",
+                "RouteTableIds": [
+                    "rtb-3bf1b05c"
+                ],
+                "SubnetIds": [],
+                "Groups": [],
+                "IpAddressType": "ipv4",
+                "DnsOptions": {
+                    "DnsRecordIpType": "service-defined"
+                },
+                "PrivateDnsEnabled": false,
+                "RequesterManaged": false,
+                "NetworkInterfaceIds": [],
+                "DnsEntries": [],
+                "CreationTimestamp": {
+                    "__class__": "datetime",
+                    "year": 2023,
+                    "month": 8,
+                    "day": 30,
+                    "hour": 13,
+                    "minute": 50,
+                    "second": 46,
+                    "microsecond": 0
+                },
+                "Tags": [],
+                "OwnerId": "644160558196",
+                "ServiceRegion": "us-east-1"
+            },
+            {
+                "VpcEndpointId": "vpce-056fff30475955130",
+                "VpcEndpointType": "Gateway",
+                "VpcId": "vpc-03c66c266923c5427",
+                "ServiceName": "com.amazonaws.us-east-1.s3",
+                "State": "available",
+                "PolicyDocument": "{\"Version\":\"2008-10-17\",\"Statement\":[{\"Effect\":\"Allow\",\"Principal\":\"*\",\"Action\":\"*\",\"Resource\":\"*\"}]}",
+                "RouteTableIds": [
+                    "rtb-025de1f331d524a17",
+                    "rtb-01ab2c397a777eb7b"
+                ],
+                "SubnetIds": [],
+                "Groups": [],
+                "IpAddressType": "ipv4",
+                "DnsOptions": {
+                    "DnsRecordIpType": "service-defined"
+                },
+                "PrivateDnsEnabled": false,
+                "RequesterManaged": false,
+                "NetworkInterfaceIds": [],
+                "DnsEntries": [],
+                "CreationTimestamp": {
+                    "__class__": "datetime",
+                    "year": 2024,
+                    "month": 5,
+                    "day": 5,
+                    "hour": 23,
+                    "minute": 5,
+                    "second": 40,
+                    "microsecond": 0
+                },
+                "Tags": [
+                    {
+                        "Key": "Name",
+                        "Value": "project-vpce-s3"
+                    }
+                ],
+                "OwnerId": "644160558196",
+                "ServiceRegion": "us-east-1"
+            },
+            {
+                "VpcEndpointId": "vpce-0ed5e77b9c6578e6a",
+                "VpcEndpointType": "Interface",
+                "VpcId": "vpc-0207cdabbb60970eb",
+                "ServiceName": "com.amazonaws.us-west-2.s3",
+                "State": "available",
+                "PolicyDocument": "{\n  \"Statement\": [\n    {\n      \"Action\": \"*\",\n      \"Effect\": \"Allow\",\n      \"Principal\": \"*\",\n      \"Resource\": \"*\"\n    }\n  ]\n}",
+                "RouteTableIds": [],
+                "SubnetIds": [
+                    "subnet-060cc450a3823ecd4",
+                    "subnet-0a0cc24bfabbd5f02"
+                ],
+                "Groups": [
+                    {
+                        "GroupId": "sg-091e5c25316cfc6bc",
+                        "GroupName": "default"
+                    }
+                ],
+                "IpAddressType": "ipv4",
+                "DnsOptions": {
+                    "DnsRecordIpType": "ipv4"
+                },
+                "PrivateDnsEnabled": false,
+                "RequesterManaged": false,
+                "NetworkInterfaceIds": [
+                    "eni-04304521a025b7fb8",
+                    "eni-0e1df1136f719048f"
+                ],
+                "DnsEntries": [
+                    {
+                        "DnsName": "*.vpce-0ed5e77b9c6578e6a-lqoz98qp.s3.us-west-2.vpce.amazonaws.com",
+                        "HostedZoneId": "Z1YSA3EXCYUU9Z"
+                    }
+                ],
+                "CreationTimestamp": {
+                    "__class__": "datetime",
+                    "year": 2026,
+                    "month": 4,
+                    "day": 21,
+                    "hour": 20,
+                    "minute": 1,
+                    "second": 11,
+                    "microsecond": 667000
+                },
+                "Tags": [
+                    {
+                        "Key": "Name",
+                        "Value": "vpcendpoint-test"
+                    }
+                ],
+                "OwnerId": "644160558196",
+                "ServiceRegion": "us-west-2"
+            }
+        ],
+        "ResponseMetadata": {}
+    }
+}

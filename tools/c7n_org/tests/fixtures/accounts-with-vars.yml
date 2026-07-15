@@ -1,0 +1,33 @@
+accounts:
+  - name: dev-account
+    account_id: '123456789012'
+    role: 'arn:aws:iam::123456789012:role/CloudCustodian'
+    regions:
+      - us-east-1
+    tags:
+      - dev
+      - testing
+    vars:
+      environment: development
+      cost_center: dev-ops
+
+  - name: prod-account
+    account_id: '987654321098'
+    role: 'arn:aws:iam::987654321098:role/CloudCustodian'
+    regions:
+      - us-east-1
+      - us-west-2
+    tags:
+      - prod
+    vars:
+      environment: production
+      cost_center: finance
+
+  - name: staging-account
+    account_id: '555555555555'
+    role: 'arn:aws:iam::555555555555:role/CloudCustodian'
+    regions:
+      - us-east-1
+    tags:
+      - staging
+    # No vars defined - should trigger errors if policy needs them

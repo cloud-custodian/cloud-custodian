@@ -1,0 +1,55 @@
+{
+    "status_code": 200,
+    "data": {
+        "ResponseMetadata": {},
+        "name": "c7n-test-guardrail-8ff977f0",
+        "guardrailId": "bskwryvo9mu5",
+        "guardrailArn": "arn:aws:bedrock:us-east-1:644160558196:guardrail/bskwryvo9mu5",
+        "version": "DRAFT",
+        "status": "READY",
+        "wordPolicy": {
+            "words": [
+                {
+                    "text": "HATE",
+                    "inputAction": "BLOCK",
+                    "outputAction": "NONE",
+                    "inputEnabled": true,
+                    "outputEnabled": false
+                }
+            ],
+            "managedWordLists": [
+                {
+                    "type": "PROFANITY",
+                    "inputAction": "BLOCK",
+                    "outputAction": "NONE",
+                    "inputEnabled": true,
+                    "outputEnabled": false
+                }
+            ]
+        },
+        "createdAt": {
+            "__class__": "datetime",
+            "year": 2026,
+            "month": 3,
+            "day": 2,
+            "hour": 9,
+            "minute": 29,
+            "second": 53,
+            "microsecond": 195709
+        },
+        "updatedAt": {
+            "__class__": "datetime",
+            "year": 2026,
+            "month": 3,
+            "day": 2,
+            "hour": 9,
+            "minute": 30,
+            "second": 0,
+            "microsecond": 5636
+        },
+        "statusReasons": [],
+        "failureRecommendations": [],
+        "blockedInputMessaging": "example",
+        "blockedOutputsMessaging": "example"
+    }
+}

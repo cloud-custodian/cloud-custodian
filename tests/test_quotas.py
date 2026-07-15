@@ -211,6 +211,27 @@ class TestQuotas(BaseTest):
                 self.assertIn('hard_limit', resource['c7n:UsageMetric'])
                 self.assertEqual(resource['c7n:UsageMetric']['hard_limit'], 100.0)
 
+    def test_usage_metric_filter_statistic_override(self):
+        session_factory = self.replay_flight_data(
+            'test_service_quota_statistic_override')
+        p = self.load_policy({
+            "name": "service-quota-usage-metric-stat-override",
+            "resource": "aws.service-quota",
+            "filters": [
+                {"UsageMetric": "present"},
+                {"type": "usage-metric",
+                 "statistic": "Maximum",
+                 "min_period": 60,
+                 "limit": 80}
+            ]},
+            session_factory=session_factory)
+        resources = p.run()
+        self.assertEqual(len(resources), 1)
+        r = resources[0]
+        self.assertEqual(r['QuotaCode'], 'L-D05C8A75')
+        self.assertEqual(r['c7n:UsageMetric']['statistic'], 'Maximum')
+        self.assertEqual(r['c7n:UsageMetric']['metric'], 3500.0)
+
     def test_usage_filter_round_up(self):
         filter = UsageFilter({})
         self.assertEqual(filter.round_up(1, 60), 60)

@@ -1,10 +1,12 @@
 # Copyright The Cloud Custodian Authors.
 # SPDX-License-Identifier: Apache-2.0
+import copy
+
 from c7n_gcp.provider import resources
 from c7n_gcp.query import QueryResourceManager, TypeInfo
 from c7n_gcp.filters import IamPolicyFilter
 from c7n_gcp.filters.iampolicy import IamPolicyValueFilter
-from c7n.utils import local_session
+from c7n.utils import local_session, jmespath_search
 
 
 @resources.register("cloud-run-service")
@@ -23,6 +25,29 @@ class CloudRunService(QueryResourceManager):
         id = "metadata.selfLink"
         default_report_fields = ["metadata.name", "metadata.creationTimestamp"]
         asset_type = "run.googleapis.com/Service"
+        labels = True
+        labels_op = 'replaceService'
+        labels_perm = 'update'
+
+        @staticmethod
+        def get_label_params(resource, all_labels):
+            metadata = resource['metadata']
+            location = metadata['labels']['cloud.googleapis.com/location']
+            namespace = metadata['namespace']
+            svc_name = metadata['name']
+            body = copy.deepcopy(resource)
+            body['metadata']['labels'] = all_labels
+            return {
+                'name': 'projects/{}/locations/{}/services/{}'.format(
+                    namespace, location, svc_name),
+                'body': body
+            }
+
+    def augment(self, resources):
+        for r in resources:
+            if r.get('metadata', {}).get('labels'):
+                r['labels'] = dict(r['metadata']['labels'])
+        return resources
 
 
 @CloudRunService.filter_registry.register("iam-policy")
@@ -64,6 +89,27 @@ class CloudRunJob(QueryResourceManager):
         id = "metadata.selfLink"
         default_report_fields = ["metadata.name", "metadata.creationTimestamp"]
         asset_type = "run.googleapis.com/Job"
+        labels = True
+        labels_op = 'replaceJob'
+        labels_perm = 'update'
+
+        @staticmethod
+        def get_label_params(resource, all_labels):
+            metadata = resource['metadata']
+            namespace = metadata['namespace']
+            job_name = metadata['name']
+            body = copy.deepcopy(resource)
+            body['metadata']['labels'] = all_labels
+            return {
+                'name': 'namespaces/{}/jobs/{}'.format(namespace, job_name),
+                'body': body
+            }
+
+    def augment(self, resources):
+        for r in resources:
+            if r.get('metadata', {}).get('labels'):
+                r['labels'] = dict(r['metadata']['labels'])
+        return resources
 
 
 @resources.register("cloud-run-revision")
@@ -83,3 +129,16 @@ class CloudRunRevision(QueryResourceManager):
         asset_type = "run.googleapis.com/Revision"
         urn_component = "revision"
         urn_id_segments = (-1,)
+
+        @classmethod
+        def get_metric_resource_name(cls, resource, metric_key=None):
+            # Handle different metric keys for Cloud Run revisions
+            # Since Cloud Run uses nested metadata structure, we must use jmespath
+            if metric_key == 'resource.labels.revision_name':
+                # Extract revision name (e.g., "service-00001-abc")
+                return jmespath_search("metadata.name", resource)
+            elif metric_key == 'resource.labels.service_name':
+                # Extract service name from Knative label (e.g., "service")
+                return jmespath_search('metadata.labels."serving.knative.dev/service"', resource)
+            # Default: return revision name (most common case)
+            return jmespath_search("metadata.name", resource)

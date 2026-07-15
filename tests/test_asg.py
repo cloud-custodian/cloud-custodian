@@ -3,6 +3,8 @@
 from datetime import datetime
 from dateutil import tz as tzutil
 
+from botocore.exceptions import ClientError
+import mock
 import pytest
 from pytest_terraform import terraform
 
@@ -660,6 +662,57 @@ class AutoScalingTest(BaseTest):
             "AutoScalingGroups"
         ].pop()
         self.assertTrue(result["SuspendedProcesses"])
+
+    def test_asg_suspend_force(self):
+        factory = self.replay_flight_data("test_asg_suspend_force")
+        p = self.load_policy(
+            {
+                "name": "asg-suspend-force",
+                "resource": "asg",
+                "filters": [{"tag:SuspendTag": "present"}],
+                "actions": [{"type": "suspend", "force": True}],
+            },
+            session_factory=factory,
+        )
+        resources = p.run()
+        self.assertEqual(len(resources), 1)
+        client = factory().client("autoscaling")
+        result = client.describe_auto_scaling_groups(
+            AutoScalingGroupNames=[resources[0]["AutoScalingGroupName"]]
+        )["AutoScalingGroups"].pop()
+        self.assertTrue(result["SuspendedProcesses"])
+
+        suspend_action = p.resource_manager.actions[0]
+        perms = suspend_action.get_permissions()
+        self.assertIn("ec2:ModifyInstanceAttribute", perms)
+
+    def test_asg_suspend_disable_api_stop_incorrect_instance_state(self):
+        factory = self.replay_flight_data("test_asg_suspend_force")
+        p = self.load_policy(
+            {
+                "name": "asg-suspend-force",
+                "resource": "asg",
+                "filters": [{"tag:SuspendTag": "present"}],
+                "actions": [{"type": "suspend", "force": True}],
+            },
+            session_factory=factory,
+        )
+
+        suspend_action = p.resource_manager.actions[0]
+
+        client = mock.MagicMock()
+        client.modify_instance_attribute.side_effect = ClientError(
+            {
+                "Error": {
+                    "Code": "IncorrectInstanceState",
+                    "Message": "incorrect instance state",
+                }
+            },
+            "ModifyInstanceAttribute",
+        )
+
+        with self.assertRaises(ClientError):
+            suspend_action.disable_api_stop(client, [{"InstanceId": "i-1234"}])
 
     def test_asg_suspend_when_no_instances(self):
         factory = self.replay_flight_data("test_asg_suspend_when_no_instances")

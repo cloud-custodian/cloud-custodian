@@ -431,7 +431,7 @@ class GuardDutyEnabled(MultiAttrFilter):
     def validate(self):
         attrs = set()
         for k in self.data:
-            if k.startswith('Detector') or k.startswith('Master'):
+            if k.startswith('Detector') or k.startswith('Administrator'):
                 attrs.add(k)
         self.multi_attrs = attrs
         return super(GuardDutyEnabled, self).validate()
@@ -850,10 +850,10 @@ class ServiceLimit(Filter):
     def validate(self):
         region = self.manager.data.get('region', '')
         if len(self.global_services.intersection(self.data.get('services', []))):
-            if region != 'us-east-1':
+            if region != get_support_region(self.manager):
                 raise PolicyValidationError(
-                    "Global services: %s must be targeted in us-east-1 on the policy"
-                    % ', '.join(self.global_services))
+                    "Global services: %s must be targeted in %s on the policy"
+                    % (', '.join(self.global_services), get_support_region(self.manager)))
         return self
 
     @classmethod
@@ -935,10 +935,11 @@ class ServiceLimit(Filter):
             return []
 
         # trim to only results for this region
+        support_region = get_support_region(self.manager)
         results['flaggedResources'] = [
             r
             for r in results.get('flaggedResources', [])
-            if r['metadata'][0] == region or (r['metadata'][0] == '-' and region == 'us-east-1')
+            if r['metadata'][0] == region or (r['metadata'][0] == '-' and region == support_region)
         ]
 
         # save all raw limit results to the account resource
@@ -1838,6 +1839,72 @@ class AmiBlockPublicAccess(Filter):
                 results.append(r)
 
         return results
+
+
+@filters.register('payment-cryptography-replication-regions')
+class PaymentCryptographyReplicationRegions(Filter):
+    """Filter an account by its Payment Cryptography default key
+    replication regions.
+
+    The enabled replication regions are recorded on the account resource
+    under the ``c7n:payment-cryptography-replication-regions`` annotation.
+
+    :param state: Whether default key replication should be enabled.
+        When ``true`` (default), the account matches only if at least one
+        replication region is enabled. When ``false``, the account matches
+        only if no replication regions are enabled.
+    :param regions: Optional list of replication regions to check for.
+        Only evaluated when ``state`` is ``true``.
+    :param match: How ``regions`` are compared against the account's
+        enabled replication regions. ``all`` (default) requires every
+        listed region to be enabled; ``any`` requires at least one.
+
+    :example:
+
+    .. code-block:: yaml
+
+       policies:
+         - name: pmtcrypt-default-replication-regions
+           resource: aws.account
+           filters:
+            - type: payment-cryptography-replication-regions
+              state: true
+              regions: ["us-west-2", "eu-west-1"]
+              match: all
+    """
+
+    annotation_key = 'c7n:payment-cryptography-replication-regions'
+    schema = type_schema(
+        'payment-cryptography-replication-regions',
+        state={'type': 'boolean', 'default': True},
+        regions={'type': 'array', 'items': {'type': 'string'}},
+        match={'enum': ['all', 'any'], 'default': 'all'})
+    permissions = ('payment-cryptography:GetDefaultKeyReplicationRegions',)
+
+    def process(self, resources, event=None):
+        state = self.data.get('state', True)
+        required = self.data.get('regions')
+        match = self.data.get('match', 'all')
+
+        client = local_session(
+            self.manager.session_factory).client('payment-cryptography')
+        enabled = client.get_default_key_replication_regions().get(
+            'EnabledReplicationRegions', [])
+
+        for r in resources:
+            r[self.annotation_key] = enabled
+
+        if bool(enabled) != state:
+            return []
+
+        if state and required:
+            enabled_set = set(enabled)
+            if match == 'all' and not enabled_set.issuperset(required):
+                return []
+            if match == 'any' and enabled_set.isdisjoint(required):
+                return []
+
+        return resources
 
 
 class GlueCatalogEncryptionEnabled(MultiAttrFilter):

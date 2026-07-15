@@ -1,0 +1,57 @@
+{
+    "pytest-terraform": 1,
+    "outputs": {},
+    "resources": {
+        "aws_bedrock_guardrail": {
+            "test_guardrail": {
+                "blocked_input_messaging": "example",
+                "blocked_outputs_messaging": "example",
+                "content_policy_config": [
+                    {
+                        "filters_config": [
+                            {
+                                "input_action": null,
+                                "input_enabled": null,
+                                "input_modalities": null,
+                                "input_strength": "MEDIUM",
+                                "output_action": null,
+                                "output_enabled": null,
+                                "output_modalities": null,
+                                "output_strength": "MEDIUM",
+                                "type": "HATE"
+                            }
+                        ],
+                        "tier_config": [
+                            {
+                                "tier_name": "CLASSIC"
+                            }
+                        ]
+                    }
+                ],
+                "contextual_grounding_policy_config": [],
+                "created_at": "2026-03-02T09:29:53Z",
+                "cross_region_config": [],
+                "description": "Test guardrail for C7N",
+                "guardrail_arn": "arn:aws:bedrock:us-east-1:644160558196:guardrail/bskwryvo9mu5",
+                "guardrail_id": "bskwryvo9mu5",
+                "kms_key_arn": null,
+                "name": "c7n-test-guardrail-8ff977f0",
+                "region": "us-east-1",
+                "sensitive_information_policy_config": [],
+                "status": "READY",
+                "tags": {
+                    "Environment": "test",
+                    "Owner": "c7n"
+                },
+                "tags_all": {
+                    "Environment": "test",
+                    "Owner": "c7n"
+                },
+                "timeouts": null,
+                "topic_policy_config": [],
+                "version": "DRAFT",
+                "word_policy_config": []
+            }
+        }
+    }
+}

@@ -9,6 +9,8 @@ accept = (
     'Apache License 2.0',
     'Apache License, Version 2.0',
     'Apache 2.0',
+    'Apache-2.0 AND MIT',
+    'Apache-2.0 OR BSD-2-Clause',
     'Apache-2.0 OR BSD-3-Clause',
     'MIT License',
     'Apache 2',
@@ -38,6 +40,7 @@ whitelist_packages = set(
     (
         #
         # Deps with licenses that get flagged
+        'crc32c',  # tools/c7n_oci dep, LGPL
         'pygit2',  # tools/c7n_policystream dep, GPL w/ Linking Exception
         'ldap3',  # mailer dependency, LGPL
         'sphinx-markdown-tables',  # docgen - GPL

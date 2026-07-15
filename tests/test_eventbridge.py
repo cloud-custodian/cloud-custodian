@@ -246,6 +246,56 @@ class EventRuleTest(BaseTest):
             eventbridge.ValidEventRuleTargetFilter('event-rule').filter_unsupported_resources(r))
 
 
+def test_event_rule_target_del_managed(test):
+    session_factory = test.replay_flight_data("test_event_rule_target_del_managed")
+    log_output = test.capture_logging('custodian.actions')
+    policy = test.load_policy(
+        {
+            "name": "test-event-rule-target-del-managed",
+            "resource": "event-rule-target",
+            "filters": [{"Id": "autoscaling"}],
+            "actions": ["delete"],
+        },
+        session_factory=session_factory,
+    )
+
+    resources = policy.run()
+    test.assertEqual(len(resources), 1)
+    # User was warned we can't delete targets on managed rules without forcing.
+    assert log_output.getvalue().strip() == (
+        'Unable to delete target "autoscaling" for managed rule "AutoScalingManagedRule".'
+        ' Set force to true to remove target.'
+    )
+    # Target still exists.
+    client = session_factory().client('events')
+    targets = client.list_targets_by_rule(Rule='AutoScalingManagedRule').get('Targets')
+    test.assertEqual(len(targets), 1)
+    test.assertEqual(targets[0]['Id'], 'autoscaling')
+
+
+def test_event_rule_target_del_managed_force(test):
+    session_factory = test.replay_flight_data("test_event_rule_target_del_managed_force")
+    log_output = test.capture_logging('custodian.actions')
+    policy = test.load_policy(
+        {
+            "name": "test-event-rule-target-del-managed-force",
+            "resource": "event-rule-target",
+            "filters": [{"Id": "autoscaling"}],
+            "actions": [{"type": "delete", "force": True}],
+        },
+        session_factory=session_factory,
+    )
+
+    resources = policy.run()
+    test.assertEqual(len(resources), 1)
+    # No warning message because we forced.
+    assert log_output.getvalue().strip() == ''
+    # Target got deleted because we forced.
+    client = session_factory().client('events')
+    targets = client.list_targets_by_rule(Rule='AutoScalingManagedRule').get('Targets')
+    test.assertEqual(targets, [])
+
+
 class PipesTest(BaseTest):
 
     def test_event_bridge_pipes_tag(self):

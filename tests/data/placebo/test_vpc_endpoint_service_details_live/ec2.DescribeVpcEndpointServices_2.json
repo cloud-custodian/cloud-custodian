@@ -1,0 +1,88 @@
+{
+    "status_code": 200,
+    "data": {
+        "ServiceNames": [
+            "com.amazonaws.us-east-1.dynamodb",
+            "com.amazonaws.us-east-1.dynamodb"
+        ],
+        "ServiceDetails": [
+            {
+                "ServiceName": "com.amazonaws.us-east-1.dynamodb",
+                "ServiceId": "vpce-svc-04b9ffcb9ee7ef983",
+                "ServiceType": [
+                    {
+                        "ServiceType": "Interface"
+                    }
+                ],
+                "ServiceRegion": "us-east-1",
+                "AvailabilityZoneIds": [
+                    "use1-az4",
+                    "use1-az6",
+                    "use1-az1",
+                    "use1-az2",
+                    "use1-az3",
+                    "use1-az5"
+                ],
+                "AvailabilityZones": [
+                    "us-east-1a",
+                    "us-east-1b",
+                    "us-east-1c",
+                    "us-east-1d",
+                    "us-east-1e",
+                    "us-east-1f"
+                ],
+                "Owner": "amazon",
+                "BaseEndpointDnsNames": [
+                    "dynamodb.us-east-1.vpce.amazonaws.com"
+                ],
+                "VpcEndpointPolicySupported": true,
+                "AcceptanceRequired": false,
+                "ManagesVpcEndpoints": false,
+                "Tags": [],
+                "SupportedIpAddressTypes": [
+                    "ipv6",
+                    "ipv4"
+                ]
+            },
+            {
+                "ServiceName": "com.amazonaws.us-east-1.dynamodb",
+                "ServiceId": "vpce-svc-099eb39957ebe7ecc",
+                "ServiceType": [
+                    {
+                        "ServiceType": "Gateway"
+                    }
+                ],
+                "ServiceRegion": "us-east-1",
+                "AvailabilityZoneIds": [
+                    "use1-az4",
+                    "use1-az6",
+                    "use1-az1",
+                    "use1-az2",
+                    "use1-az3",
+                    "use1-az5"
+                ],
+                "AvailabilityZones": [
+                    "us-east-1a",
+                    "us-east-1b",
+                    "us-east-1c",
+                    "us-east-1d",
+                    "us-east-1e",
+                    "us-east-1f"
+                ],
+                "Owner": "amazon",
+                "BaseEndpointDnsNames": [
+                    "dynamodb.us-east-1.amazonaws.com"
+                ],
+                "VpcEndpointPolicySupported": true,
+                "AcceptanceRequired": false,
+                "ManagesVpcEndpoints": false,
+                "Tags": [],
+                "SupportedIpAddressTypes": [
+                    "ipv4",
+                    "ipv6"
+                ]
+            }
+        ],
+        "ResponseMetadata": {}
+    }
+}

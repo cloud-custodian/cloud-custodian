@@ -24,6 +24,7 @@ class SpannerInstance(QueryResourceManager):
             "name", "displayName", "nodeCount", "state", "config"]
         labels = True
         labels_op = 'patch'
+        labels_perm = 'update'
         asset_type = "spanner.googleapis.com/Instance"
         metric_key = "resource.labels.instance_id"
         urn_component = "instance"

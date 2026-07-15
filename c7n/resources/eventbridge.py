@@ -1,3 +1,5 @@
+from collections import defaultdict
+
 import botocore.exceptions
 from botocore.config import Config
 
@@ -484,22 +486,36 @@ class CrossAccountFilter(CrossAccountAccessFilter):
 
 @EventRuleTarget.action_registry.register('delete')
 class DeleteTarget(BaseAction):
-    schema = type_schema('delete')
+    schema = type_schema('delete', force={'type': 'boolean'})
     permissions = ('events:RemoveTargets',)
 
     def process(self, resources):
         client = local_session(self.manager.session_factory).client('events')
-        rule_targets = {}
+        force = self.data.get('force', False)
+        rule_targets = defaultdict(list)
+
         for r in resources:
             event_bus = r['Rule']['EventBusName']
             rule_id = r['c7n:parent-id']
-            rule_targets.setdefault((rule_id, event_bus), []).append(r['Id'])
+            target_id = r['Id']
+
+            if r['Rule'].get('ManagedBy') and not force:
+                # Skip deleting targets for managed rules if not forcing.
+                self.log.warning(
+                    f'Unable to delete target "{target_id}" for managed rule "{rule_id}".'
+                    ' Set force to true to remove target.'
+                )
+                continue
+
+            rule_targets[(rule_id, event_bus)].append(target_id)
 
         for (rule_id, event_bus), target_ids in rule_targets.items():
             client.remove_targets(
                 Ids=target_ids,
                 Rule=rule_id,
-                EventBusName=event_bus)
+                EventBusName=event_bus,
+                Force=force,
+            )
 
 
 class EventBridgePipesDescribe(DescribeSource):

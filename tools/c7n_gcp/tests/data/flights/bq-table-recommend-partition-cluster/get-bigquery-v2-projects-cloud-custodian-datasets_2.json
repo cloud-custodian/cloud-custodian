@@ -1,0 +1,39 @@
+{
+  "headers": {
+    "etag": "dBaRI/qbLjD72xqjpCGCtw==",
+    "content-type": "application/json; charset=UTF-8",
+    "vary": "Origin, X-Origin, Referer",
+    "date": "Wed, 01 Apr 2026 04:22:58 GMT",
+    "server": "ESF",
+    "x-xss-protection": "0",
+    "x-frame-options": "SAMEORIGIN",
+    "x-content-type-options": "nosniff",
+    "alt-svc": "h3=\":443\"; ma=2592000,h3-29=\":443\"; ma=2592000",
+    "transfer-encoding": "chunked",
+    "status": "200",
+    "content-length": "517",
+    "-content-encoding": "gzip",
+    "content-location": "https://bigquery.googleapis.com/bigquery/v2/projects/cloud-custodian/datasets?filter=labels.c7n_test%3Abq_table_recommend_partition_cluster&alt=json"
+  },
+  "body": {
+    "kind": "bigquery#datasetList",
+    "etag": "dBaRI/qbLjD72xqjpCGCtw==",
+    "datasets": [
+      {
+        "kind": "bigquery#dataset",
+        "id": "stacklet-personal-2:c7n_bq_dataset",
+        "datasetReference": {
+          "datasetId": "c7n_bq_dataset",
+          "projectId": "stacklet-personal-2"
+        },
+        "labels": {
+          "c7n_test": "bq_table_recommend_partition_cluster",
+          "env": "default",
+          "goog-terraform-provisioned": "true"
+        },
+        "location": "US",
+        "type": "DEFAULT"
+      }
+    ]
+  }
+}

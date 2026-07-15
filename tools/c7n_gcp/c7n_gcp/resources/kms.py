@@ -108,6 +108,9 @@ class KmsCryptoKey(ChildResourceManager):
         scc_type = "google.cloud.kms.CryptoKey"
         urn_component = "cryptokey"
         urn_id_segments = (5, 7)
+        labels = True
+        labels_op = 'patch'
+        labels_perm = 'update'
 
         @staticmethod
         def get(client, resource_info):
@@ -117,6 +120,14 @@ class KmsCryptoKey(ChildResourceManager):
                         resource_info['key_ring_id'],
                         resource_info['crypto_key_id'])
             return client.execute_command('get', {'name': name})
+
+        @staticmethod
+        def get_label_params(resource, all_labels):
+            return {
+                'name': resource['name'],
+                'body': {'labels': all_labels},
+                'updateMask': 'labels'
+            }
 
         @classmethod
         def _get_location(cls, resource):

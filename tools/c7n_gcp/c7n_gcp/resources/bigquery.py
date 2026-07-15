@@ -1,9 +1,11 @@
 # Copyright The Cloud Custodian Authors.
 # SPDX-License-Identifier: Apache-2.0
 from c7n.utils import type_schema, jmespath_search
+from c7n.exceptions import PolicyValidationError
 from c7n_gcp.query import QueryResourceManager, TypeInfo, ChildTypeInfo, ChildResourceManager
 from c7n_gcp.provider import resources
 from c7n_gcp.actions import MethodAction
+from c7n_gcp.filters.recommender import RecommenderFilter
 
 
 @resources.register('bq-dataset')
@@ -31,6 +33,7 @@ class DataSet(QueryResourceManager):
         urn_id_path = "datasetReference.datasetId"
         labels = True
         labels_op = 'patch'
+        labels_perm = 'update'
 
         @staticmethod
         def get(client, event):
@@ -59,6 +62,12 @@ class DataSet(QueryResourceManager):
                 client.execute_query(
                     'get', verb_arguments=ref))
         return results
+
+    def get_resource_query(self):
+        if 'query' in self.data:
+            for child in self.data.get('query'):
+                if 'filter' in child:
+                    return {'filter': child['filter']}
 
 
 @resources.register('bq-job')
@@ -117,13 +126,15 @@ class BigQueryTable(ChildResourceManager):
             'parent_get_params': [
                 ('tableReference.projectId', 'projectId'),
                 ('tableReference.datasetId', 'datasetId'),
-            ]
+            ],
+            'use_child_query': True,
         }
         asset_type = "bigquery.googleapis.com/Table"
         urn_component = "table"
         urn_id_path = "tableReference.tableId"
         labels = True
         labels_op = 'patch'
+        labels_perm = 'update'
 
         @classmethod
         def _get_urn_id(cls, resource):
@@ -147,10 +158,13 @@ class BigQueryTable(ChildResourceManager):
         results = []
         for r in resources:
             ref = r['tableReference']
-            results.append(
-                client.execute_query(
-                    'get', verb_arguments=ref))
+            results.append(client.execute_query('get', verb_arguments=ref))
         return results
+
+    def get_resource_query(self):
+        # Allow query values to be consumed by parent dataset listing only.
+        # BigQuery tables.list does not accept a top-level "filter" argument.
+        return None
 
 
 @BigQueryTable.action_registry.register('delete')
@@ -168,6 +182,25 @@ class DeleteBQTable(MethodAction):
         }
 
 
+@BigQueryTable.filter_registry.register('recommend')
+class BigQueryTableRecommenderFilter(RecommenderFilter):
+
+    def match_ids(self, rids, resources):
+        normalized_rids = set()
+        for rid in rids:
+            normalized_rids.add('projects/{}'.format(rid.split('/projects/', 1)[1]))
+
+        for resource in resources:
+            table_ref = resource.get('tableReference', {})
+            table_rid = "projects/{}/datasets/{}/tables/{}".format(
+                table_ref.get('projectId', ''),
+                table_ref.get('datasetId', ''),
+                table_ref.get('tableId', '')
+            )
+            if table_rid in normalized_rids:
+                yield resource
+
+
 @DataSet.action_registry.register('delete')
 class DeleteDataSet(MethodAction):
     schema = type_schema('delete')
@@ -179,4 +212,77 @@ class DeleteDataSet(MethodAction):
         return {
             'projectId': r['datasetReference']['projectId'],
             'datasetId': r['datasetReference']['datasetId']
+        }
+
+
+@DataSet.action_registry.register('update')
+class UpdateDataSet(MethodAction):
+    """Update BigQuery dataset attributes.
+
+    This action supports partial updates via the BigQuery datasets.patch API.
+
+    :example:
+
+    .. code-block:: yaml
+
+        policies:
+          - name: bq-dataset-update-access
+            resource: gcp.bq-dataset
+            filters:
+              - type: value
+                key: id
+                op: contains
+                value: c7n_bq_dataset
+            actions:
+              - type: update
+                access:
+                  - role: READER
+                    userByEmail: analyst@example.com
+    """
+
+    schema = type_schema(
+        'update',
+        **{
+            'access': {'type': 'array', 'items': {'type': 'object'}},
+            'description': {'type': 'string'},
+            'friendlyName': {'type': 'string'},
+            'defaultTableExpirationMs': {'type': 'string'},
+            'defaultPartitionExpirationMs': {'type': 'string'},
+            'maxTimeTravelHours': {'type': 'string'},
+            'storageBillingModel': {'type': 'string'},
+        }
+    )
+    method_spec = {'op': 'patch'}
+    method_perm = 'update'
+    permissions = ('bigquery.datasets.get', 'bigquery.datasets.update')
+    update_fields = (
+        'access',
+        'description',
+        'friendlyName',
+        'defaultTableExpirationMs',
+        'defaultPartitionExpirationMs',
+        'maxTimeTravelHours',
+        'storageBillingModel',
+    )
+
+    def validate(self):
+        super().validate()
+        if not any(field in self.data for field in self.update_fields):
+            raise PolicyValidationError(
+                "policy:{} action:{} requires at least one mutable dataset field".format(
+                    self.manager.ctx.policy.name, self.type
+                )
+            )
+        return self
+
+    def get_resource_params(self, model, r):
+        body = {}
+        for field in UpdateDataSet.update_fields:
+            if field in self.data:
+                body[field] = self.data[field]
+
+        return {
+            'projectId': r['datasetReference']['projectId'],
+            'datasetId': r['datasetReference']['datasetId'],
+            'body': body
         }

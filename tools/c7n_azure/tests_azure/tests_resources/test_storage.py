@@ -10,7 +10,9 @@ from c7n_azure.storage_utils import StorageUtilities
 from unittest.mock import patch, MagicMock, Mock
 from netaddr import IPSet
 from parameterized import parameterized
+from c7n_azure.resources.storage import StorageMetricsFilter
 
+from c7n.exceptions import PolicyValidationError
 from c7n.utils import get_annotation_prefix
 from c7n.utils import local_session
 from ..azure_common import BaseTest, arm_template, cassette_name
@@ -784,3 +786,348 @@ class StorageFileServicesFilterTest(BaseTest):
         self.assertEqual(len(resources), 1)
         self.assertEqual(resources[0]['name'], 'storagefasdfhad2323')
         self.assertEqual(len(resources[0]['c7n:FileServices']), 1)
+
+
+class StorageMetricsFilterTest(BaseTest):
+    """Tests for the StorageMetricsFilter class"""
+
+    def test_storage_metrics_schema_validate(self):
+        """Test that the schema validates correctly for blob storage type"""
+        with self.sign_out_patch():
+            p = self.load_policy({
+                'name': 'test-storage-metrics',
+                'resource': 'azure.storage',
+                'filters': [
+                    {
+                        'type': 'storage-metrics',
+                        'storage-type': 'blob',
+                        'metric': 'BlobCapacity',
+                        'aggregation': 'average',
+                        'op': 'gt',
+                        'threshold': 1000000000,
+                        'timeframe': 24
+                    }
+                ]
+            }, validate=True)
+            self.assertTrue(p)
+
+    def test_storage_metrics_schema_validate_missing_storage_type(self):
+        """Test that schema validation fails when storage-type is missing"""
+        with self.sign_out_patch():
+            with self.assertRaises(PolicyValidationError):
+                self.load_policy({
+                    'name': 'test-storage-metrics',
+                    'resource': 'azure.storage',
+                    'filters': [
+                        {
+                            'type': 'storage-metrics',
+                            'metric': 'BlobCapacity',
+                            'aggregation': 'average',
+                            'op': 'gt',
+                            'threshold': 1000000000
+                        }
+                    ]
+                }, validate=True)
+
+    def test_storage_metrics_schema_validate_invalid_storage_type(self):
+        """Test that schema validation fails for unsupported storage types"""
+        with self.sign_out_patch():
+            with self.assertRaises(PolicyValidationError):
+                self.load_policy({
+                    'name': 'test-storage-metrics',
+                    'resource': 'azure.storage',
+                    'filters': [
+                        {
+                            'type': 'storage-metrics',
+                            'storage-type': 'invalid',
+                            'metric': 'BlobCapacity',
+                            'aggregation': 'average',
+                            'op': 'gt',
+                            'threshold': 1000000000
+                        }
+                    ]
+                }, validate=True)
+
+    @arm_template('storage.json')
+    def test_blob_metrics_filter(self):
+        """Test filtering storage accounts by blob capacity metrics"""
+        p = self.load_policy({
+            'name': 'test-blob-metrics',
+            'resource': 'azure.storage',
+            'filters': [
+                {'type': 'value',
+                 'key': 'name',
+                 'op': 'glob',
+                 'value_type': 'normalize',
+                 'value': 'cctstorage*'},
+                {'type': 'storage-metrics',
+                 'storage-type': 'blob',
+                 'metric': 'BlobCapacity',
+                 'aggregation': 'average',
+                 'op': 'gte',
+                 'threshold': 0,
+                 'timeframe': 24}
+            ]
+        })
+        resources = p.run()
+        # Should find storage accounts with blob data
+        self.assertGreaterEqual(len(resources), 0)
+
+    def test_blob_metrics_namespace_configuration(self):
+        """Test that metric namespace is auto-configured for blob storage type"""
+
+        filter_data = {
+            'type': 'storage-metrics',
+            'storage-type': 'blob',
+            'metric': 'BlobCapacity',
+            'aggregation': 'average',
+            'op': 'gt',
+            'threshold': 1000000000
+        }
+
+        p = self.load_policy({
+            'name': 'test-storage-metrics',
+            'resource': 'azure.storage',
+            'filters': [filter_data]
+        })
+
+        storage_filter = StorageMetricsFilter(filter_data, p.resource_manager)
+
+        # Verify namespace was auto-configured
+        self.assertEqual(
+            storage_filter.metricnamespace,
+            'Microsoft.Storage/storageAccounts/blobServices'
+        )
+
+    def test_blob_metrics_namespace_manual_override(self):
+        """Test that manually specified metric namespace is preserved"""
+
+        custom_namespace = 'CustomNamespace'
+        filter_data = {
+            'type': 'storage-metrics',
+            'storage-type': 'blob',
+            'metric': 'BlobCapacity',
+            'aggregation': 'average',
+            'op': 'gt',
+            'threshold': 1000000000,
+            'metric_namespace': custom_namespace
+        }
+
+        p = self.load_policy({
+            'name': 'test-storage-metrics',
+            'resource': 'azure.storage',
+            'filters': [filter_data]
+        })
+
+        storage_filter = StorageMetricsFilter(filter_data, p.resource_manager)
+
+        # Verify custom namespace was preserved
+        self.assertEqual(
+            storage_filter.metricnamespace,
+            custom_namespace
+        )
+
+    def test_blob_metrics_resource_id_construction(self):
+        """Test that blob storage type correctly appends /blobServices/default to resource ID"""
+
+        # Create a mock storage account resource
+        mock_resource = {
+            'id': '/subscriptions/sub123/resourceGroups/rg1/providers/'
+                  'Microsoft.Storage/storageAccounts/storage1',
+            'name': 'storage1',
+            'resourceGroup': 'rg1'
+        }
+
+        # Create the filter
+        filter_data = {
+            'type': 'storage-metrics',
+            'storage-type': 'blob',
+            'metric': 'BlobCapacity',
+            'aggregation': 'average',
+            'op': 'gt',
+            'threshold': 1000000000
+        }
+
+        p = self.load_policy({
+            'name': 'test-storage-metrics',
+            'resource': 'azure.storage',
+            'filters': [filter_data]
+        })
+
+        storage_filter = StorageMetricsFilter(filter_data, p.resource_manager)
+
+        # Verify that get_resource_id returns the modified ID with service path
+        expected_id = mock_resource['id'] + '/blobServices/default'
+        actual_id = storage_filter.get_resource_id(mock_resource)
+        self.assertEqual(actual_id, expected_id)
+
+    # Queue storage type tests
+    @arm_template('storage.json')
+    def test_queue_metrics_filter(self):
+        """Test filtering storage accounts by queue metrics"""
+        p = self.load_policy({
+            'name': 'test-queue-metrics',
+            'resource': 'azure.storage',
+            'filters': [
+                {'type': 'value',
+                 'key': 'name',
+                 'op': 'glob',
+                 'value_type': 'normalize',
+                 'value': 'cctstorage*'},
+                {
+                    'type': 'storage-metrics',
+                    'storage-type': 'queue',
+                    'metric': 'QueueCapacity',
+                    'aggregation': 'average',
+                    'op': 'gte',
+                    'threshold': 0,
+                    'timeframe': 24
+                }
+            ]
+        })
+        resources = p.run()
+        self.assertGreaterEqual(len(resources), 0)
+
+    def test_queue_metrics_resource_id_construction(self):
+        """Test that queue storage type correctly appends /queueServices/default to resource ID"""
+        mock_resource = {
+            'id': '/subscriptions/sub123/resourceGroups/rg1/providers/'
+                  'Microsoft.Storage/storageAccounts/storage1',
+            'name': 'storage1',
+            'resourceGroup': 'rg1'
+        }
+
+        filter_data = {
+            'type': 'storage-metrics',
+            'storage-type': 'queue',
+            'metric': 'QueueCapacity',
+            'aggregation': 'average',
+            'op': 'gt',
+            'threshold': 1000
+        }
+
+        p = self.load_policy({
+            'name': 'test-storage-metrics',
+            'resource': 'azure.storage',
+            'filters': [filter_data]
+        })
+
+        storage_filter = StorageMetricsFilter(filter_data, p.resource_manager)
+
+        expected_id = mock_resource['id'] + '/queueServices/default'
+        actual_id = storage_filter.get_resource_id(mock_resource)
+        self.assertEqual(actual_id, expected_id)
+
+    # Table storage type tests
+    @arm_template('storage.json')
+    def test_table_metrics_filter(self):
+        """Test filtering storage accounts by table metrics"""
+        p = self.load_policy({
+            'name': 'test-table-metrics',
+            'resource': 'azure.storage',
+            'filters': [
+                {'type': 'value',
+                 'key': 'name',
+                 'op': 'glob',
+                 'value_type': 'normalize',
+                 'value': 'cctstorage*'},
+                {
+                    'type': 'storage-metrics',
+                    'storage-type': 'table',
+                    'metric': 'TableCapacity',
+                    'aggregation': 'average',
+                    'op': 'gte',
+                    'threshold': 0,
+                    'timeframe': 24
+                }
+            ]
+        })
+        resources = p.run()
+        self.assertGreaterEqual(len(resources), 0)
+
+    def test_table_metrics_resource_id_construction(self):
+        """Test that table storage type correctly appends /tableServices/default to resource ID"""
+        mock_resource = {
+            'id': '/subscriptions/sub123/resourceGroups/rg1/providers/'
+                  'Microsoft.Storage/storageAccounts/storage1',
+            'name': 'storage1',
+            'resourceGroup': 'rg1'
+        }
+
+        filter_data = {
+            'type': 'storage-metrics',
+            'storage-type': 'table',
+            'metric': 'TableCapacity',
+            'aggregation': 'average',
+            'op': 'gt',
+            'threshold': 1000
+        }
+
+        p = self.load_policy({
+            'name': 'test-storage-metrics',
+            'resource': 'azure.storage',
+            'filters': [filter_data]
+        })
+
+        storage_filter = StorageMetricsFilter(filter_data, p.resource_manager)
+
+        expected_id = mock_resource['id'] + '/tableServices/default'
+        actual_id = storage_filter.get_resource_id(mock_resource)
+        self.assertEqual(actual_id, expected_id)
+
+    # File storage type tests
+    @arm_template('storage.json')
+    def test_file_metrics_filter(self):
+        """Test filtering storage accounts by file metrics"""
+        p = self.load_policy({
+            'name': 'test-file-metrics',
+            'resource': 'azure.storage',
+            'filters': [
+                {'type': 'value',
+                 'key': 'name',
+                 'op': 'glob',
+                 'value_type': 'normalize',
+                 'value': 'cctstorage*'},
+                {
+                    'type': 'storage-metrics',
+                    'storage-type': 'file',
+                    'metric': 'FileCapacity',
+                    'aggregation': 'average',
+                    'op': 'gte',
+                    'threshold': 0,
+                    'timeframe': 24
+                }
+            ]
+        })
+        resources = p.run()
+        self.assertGreaterEqual(len(resources), 0)
+
+    def test_file_metrics_resource_id_construction(self):
+        """Test that file storage type correctly appends /fileServices/default to resource ID"""
+        mock_resource = {
+            'id': '/subscriptions/sub123/resourceGroups/rg1/providers/'
+                  'Microsoft.Storage/storageAccounts/storage1',
+            'name': 'storage1',
+            'resourceGroup': 'rg1'
+        }
+
+        filter_data = {
+            'type': 'storage-metrics',
+            'storage-type': 'file',
+            'metric': 'FileCapacity',
+            'aggregation': 'average',
+            'op': 'gt',
+            'threshold': 1000
+        }
+
+        p = self.load_policy({
+            'name': 'test-storage-metrics',
+            'resource': 'azure.storage',
+            'filters': [filter_data]
+        })
+
+        storage_filter = StorageMetricsFilter(filter_data, p.resource_manager)
+
+        expected_id = mock_resource['id'] + '/fileServices/default'
+        actual_id = storage_filter.get_resource_id(mock_resource)
+        self.assertEqual(actual_id, expected_id)

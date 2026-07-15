@@ -25,13 +25,13 @@ def test_package_metadata(package):
             p = c
     assert found, "could not find %s pyproject.toml" % package
     data = tomli.loads(p.read_text())
-    md = data['project']
-    urls = data['project']['urls']
-    assert urls.get('homepage') == 'https://cloudcustodian.io'
-    assert urls.get('documentation').startswith('https://cloudcustodian.io/docs')
-    assert urls.get('repository') == 'https://github.com/cloud-custodian/cloud-custodian'
+    md = data.get('project') or data.get('tool', {}).get('poetry', {})
+    urls = md.get('urls', {})
+    assert (urls.get('homepage') or md.get('homepage')) == 'https://cloudcustodian.io'
+    assert (urls.get('documentation') or md.get('documentation')).startswith('https://cloudcustodian.io/docs')
+    assert (urls.get('repository') or md.get('repository')) == 'https://github.com/cloud-custodian/cloud-custodian'
     assert md.get('license') == 'Apache-2.0'
-    assert md.get('authors') == [{'name': 'Cloud Custodian Project'}]
+    assert md.get('authors') in ([{'name': 'Cloud Custodian Project'}], ['Cloud Custodian Project'])
     assert md.get('classifiers', []) == [
         'License :: OSI Approved :: Apache Software License',
         'Topic :: System :: Systems Administration',

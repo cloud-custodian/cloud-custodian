@@ -1,0 +1,38 @@
+{
+    "status_code": 200,
+    "data": {
+        "Capacity": 25,
+        "Rules": [
+            {
+                "Name": "AWSManagedIPReputationList",
+                "Action": {
+                    "Block": {}
+                }
+            },
+            {
+                "Name": "AWSManagedReconnaissanceList",
+                "Action": {
+                    "Block": {}
+                }
+            },
+            {
+                "Name": "AWSManagedIPDDoSList",
+                "Action": {
+                    "Count": {}
+                }
+            }
+        ],
+        "AvailableLabels": [
+            {
+                "Name": "awswaf:managed:aws:amazon-ip-list:AWSManagedIPReputationList"
+            },
+            {
+                "Name": "awswaf:managed:aws:amazon-ip-list:AWSManagedReconnaissanceList"
+            },
+            {
+                "Name": "awswaf:managed:aws:amazon-ip-list:AWSManagedIPDDoSList"
+            }
+        ],
+        "ResponseMetadata": {}
+    }
+}

@@ -3871,6 +3871,32 @@ class EndpointTest(BaseTest):
         self.assertEqual(len(resources), 1)
         self.assertEqual(resources[0]["c7n:matched-security-groups"], ["sg-6c7fa917"])
 
+    def test_endpoint_delete_action(self):
+        factory = self.replay_flight_data("test_vpc_endpoint_delete")
+        p = self.load_policy(
+            {
+                "name": "endpoint-delete",
+                "resource": "vpc-endpoint",
+                "filters": [{"tag:Name": "c7n-test"}],
+                "actions": ["delete"],
+            },
+            session_factory=factory,
+        )
+        self.assertEqual(
+            p.resource_manager.actions[0].get_permissions(),
+            ("ec2:DeleteVpcEndpoints",))
+        resources = p.run()
+        self.assertEqual(len(resources), 1)
+        self.assertEqual(resources[0]["VpcEndpointId"], "vpce-0f0a1d8b9f7c1a2b3")
+
+        client = factory(region="us-east-1").client("ec2")
+        endpoints = client.describe_vpc_endpoints(
+            Filters=[{"Name": "vpc-endpoint-id", "Values": [resources[0]["VpcEndpointId"]]}]
+        )[
+            "VpcEndpoints"
+        ]
+        self.assertFalse(endpoints)
+
     def test_endpoint_cross_account(self):
         session_factory = self.replay_flight_data('test_vpce_cross_account')
         p = self.load_policy(
@@ -4762,3 +4788,36 @@ class TestVpcEndpointServiceDetails(BaseTest):
             "com.amazonaws.us-east-1.s3",
         )
         self.assertTrue(service_details["VpcEndpointPolicySupported"])
+
+    def test_endpoint_service_details_invalid_service_names_excluded(self):
+        session_factory = self.replay_flight_data(
+            "test_vpc_endpoint_service_details_live"
+        )
+        p = self.load_policy(
+            {
+                "name": "vpc-endpoint-policy-supported-only",
+                "resource": "aws.vpc-endpoint",
+                "filters": [
+                    {
+                        "type": "service-details",
+                        "key": "VpcEndpointPolicySupported",
+                        "value": True,
+                    }
+                ],
+            },
+            session_factory=session_factory,
+        )
+        all_resources = self.load_policy(
+            {
+                "name": "vpc-endpoint-all",
+                "resource": "aws.vpc-endpoint",
+            },
+            session_factory=session_factory,
+        ).run()
+        filtered_resources = p.run()
+
+        filtered_names = {r["ServiceName"] for r in filtered_resources}
+
+        self.assertLess(len(filtered_resources), len(all_resources))
+        self.assertIn("com.amazonaws.us-east-1.s3", filtered_names)
+        self.assertNotIn("com.amazonaws.us-west-2.s3", filtered_names)

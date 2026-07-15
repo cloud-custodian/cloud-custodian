@@ -5,7 +5,7 @@ import re
 
 from datetime import datetime
 
-from c7n.utils import local_session, type_schema
+from c7n.utils import local_session, type_schema, group_by
 
 from c7n_gcp.actions import MethodAction
 from c7n_gcp.filters import IamPolicyFilter
@@ -13,7 +13,7 @@ from c7n_gcp.filters.iampolicy import IamPolicyValueFilter
 from c7n_gcp.provider import resources
 from c7n_gcp.query import QueryResourceManager, TypeInfo, ChildResourceManager, ChildTypeInfo
 
-from c7n.filters.core import ValueFilter
+from c7n.filters.core import ListItemFilter, ValueFilter
 from c7n.filters.offhours import OffHour, OnHour
 
 
@@ -413,6 +413,53 @@ class Disk(QueryResourceManager):
                     }}
 
 
+@Disk.filter_registry.register('snapshots')
+class DiskSnapshotsFilter(ListItemFilter):
+    """
+    Filter GCP disks by their snapshots.
+
+    :example:
+
+    .. code-block:: yaml
+
+        policies:
+          - name: disk-without-recent-snapshot
+            resource: gcp.disk
+            filters:
+              - not:
+                - type: snapshots
+                  attrs:
+                    - type: value
+                      key: creationTimestamp
+                      value_type: age
+                      value: 7
+                      op: less-than
+    """
+    schema = type_schema(
+        'snapshots',
+        attrs={'$ref': '#/definitions/filters_common/list_item_attrs'},
+        count={'type': 'number'},
+        count_op={'$ref': '#/definitions/filters_common/comparison_operators'}
+    )
+    permissions = ('compute.snapshots.list',)
+    annotation_key = 'c7n:Snapshots'
+    item_annotation_key = 'c7n:MatchedSnapshots'
+    annotate_items = True
+
+    def process(self, resources, event=None):
+        all_snapshots = self.manager.get_resource_manager('gcp.snapshot').resources()
+
+        grouped = group_by(all_snapshots, 'sourceDisk')
+        for resource in resources:
+            resource[self.annotation_key] = grouped.get(
+                resource['selfLink'], [])
+
+        return super().process(resources, event)
+
+    def get_item_values(self, resource):
+        return resource.get(self.annotation_key, [])
+
+
 @Disk.action_registry.register('snapshot')
 class DiskSnapshot(MethodAction):
     """
@@ -494,12 +541,36 @@ class Snapshot(QueryResourceManager):
         default_report_fields = ["name", "status", "diskSizeGb", "creationTimestamp"]
         asset_type = "compute.googleapis.com/Snapshot"
         urn_component = "snapshot"
+        labels = True
+        labels_op = 'setLabels'
+
+        @staticmethod
+        def parse_params(resc_name):
+            """Takes resourceName (from a log) or selfLink (from a resource) and parses from it the
+            parameters needed to make a request (project and snapshot)"""
+            return re.match('.*?/projects/(.*?)/global/snapshots/(.*)', resc_name).groups()
 
         @staticmethod
         def get(client, resource_info):
             return client.execute_command(
                 'get', {'project': resource_info['project_id'],
                         'snapshot': resource_info['snapshot_id']})
+
+        @classmethod
+        def get_label_params(cls, resource, all_labels):
+            project, snapshot = cls.parse_params(resource['selfLink'])
+            return {'project': project, 'resource': snapshot,
+                    'body': {
+                        'labels': all_labels,
+                        'labelFingerprint': resource['labelFingerprint']
+                    }}
+
+        @classmethod
+        def refresh(cls, client, resource):
+            """This method is used to refresh labelFingerprint when a label action fails because the
+            fingerprint was stale."""
+            project, snapshot = cls.parse_params(resource['selfLink'])
+            return cls.get(client, {'project_id': project, 'snapshot_id': snapshot})
 
 
 @Snapshot.action_registry.register('delete')
@@ -708,6 +779,33 @@ class AutoscalerSet(MethodAction):
                   }}
 
         return result
+
+
+@resources.register('region-commitment')
+class RegionCommitment(QueryResourceManager):
+    """GCP resource: https://cloud.google.com/compute/docs/reference/rest/v1/regionCommitments"""
+
+    class resource_type(TypeInfo):
+        service = 'compute'
+        version = 'v1'
+        component = 'regionCommitments'
+        enum_spec = ('aggregatedList', 'items.*.commitments[]', None)
+        permissions = ('compute.commitments.list',)
+        name = id = 'name'
+        default_report_fields = [
+            "name", "status", "type", "plan", "category", "region", "endTimestamp"]
+        asset_type = "compute.googleapis.com/Commitment"
+        urn_component = "region-commitment"
+
+        @staticmethod
+        def get(client, resource_info):
+            project, region, commitment = re.search(
+                r'projects/(.*?)/regions/(.*?)/commitments/(.*)',
+                resource_info['resourceName']).groups()
+
+            return client.execute_command(
+                'get',
+                {'project': project, 'region': region, 'commitment': commitment})
 
 
 @resources.register('zone')

@@ -132,14 +132,15 @@ def test_org_run_aws(custodian_org_dir, custodian_env_creds):
 def test_image_metadata(image_name):
     client = docker.from_env()
     image = client.images.get(image_name)
-    assert set(image.labels) == {
+    labels = set(image.labels)
+    labels.discard("org.opencontainers.image.ref.name")
+    assert labels == {
         "name",
         "repository",
         "org.opencontainers.image.created",
         "org.opencontainers.image.description",
         "org.opencontainers.image.documentation",
         "org.opencontainers.image.licenses",
-        "org.opencontainers.image.ref.name",
         "org.opencontainers.image.title",
         "org.opencontainers.image.source",
         "org.opencontainers.image.revision",

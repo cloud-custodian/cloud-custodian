@@ -7,6 +7,8 @@ env:
   UV_VERSION: "0.7.12"
   DEFAULT_PY_VERSION: "3.12"
 
+permissions: {}
+
 jobs:
   AWS:
     runs-on: ubuntu-latest
@@ -15,17 +17,17 @@ jobs:
       contents: read
       checks: write
     steps:
-      - uses: actions/checkout@v5
-      - uses: actions/setup-python@v6
+      - uses: actions/checkout@v6.0.2
+      - uses: actions/setup-python@v6.2.0
         with:
           python-version: ${{ env.DEFAULT_PY_VERSION }}
 
-      - uses: aws-actions/configure-aws-credentials@v5
+      - uses: aws-actions/configure-aws-credentials@v6
         with:
           role-to-assume: ${{ secrets.AWS_FTEST_ROLE }}
           aws-region: us-east-1
 
-      - uses: hashicorp/setup-terraform@v3
+      - uses: hashicorp/setup-terraform@v4
         with:
           terraform_wrapper: false
           # last OSS version
@@ -38,16 +40,16 @@ jobs:
           uv-version: ${{ env.UV_VERSION }}
 
       - name: Set up cache
-        uses: actions/cache@v4
+        uses: actions/cache@v5
         id: tfcache
         with:
           path: .tfcache
-          key: tf-${{ runner.os }}-${{ hashFiles('**/*.tf') }}            
+          key: tf-${{ runner.os }}-${{ hashFiles('**/*.tf') }}
 
       - name: Functional Tests
         run: |
           mkdir -p .tfcache
-          pytest -m "terraform and audited and not skiplive" -v tests
+          pytest -m "terraform and audited and not skiplive" -p no:env -v tests
         env:
           C7N_FUNCTIONAL: "true"
           C7N_TEST_RUN: "true"

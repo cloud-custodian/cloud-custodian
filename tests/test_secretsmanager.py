@@ -1,12 +1,18 @@
 # Copyright The Cloud Custodian Authors.
 # SPDX-License-Identifier: Apache-2.0
+import datetime
 import json
-from .common import BaseTest
+from unittest.mock import MagicMock, patch
+
+from botocore.exceptions import ClientError
+from dateutil import parser
+
 from c7n.exceptions import PolicyValidationError
 from c7n.executor import MainThreadExecutor
 from c7n.resources.secretsmanager import SecretsManager
-from unittest.mock import patch, MagicMock
-from botocore.exceptions import ClientError
+from c7n.testing import mock_datetime_now
+
+from .common import BaseTest
 
 
 class TestSecretsManager(BaseTest):
@@ -373,14 +379,15 @@ class TestSecretsManager(BaseTest):
                         'type': 'current-version',
                         'key': 'CreatedDate',
                         'op': 'lt',
-                        'value': 90,
+                        'value': 180,
                         'value_type': 'age'
                     }
                 ]
             },
             session_factory=session_factory
         )
-        resources = p.run()
+        with mock_datetime_now(parser.parse("2026-05-01T00:00:00+00:00"), datetime):
+            resources = p.run()
         self.assertEqual(len(resources), 1)
         self.assertEqual(resources[0]['Name'], 'test_lambda_secret')
         self.assertIn('c7n:CurrentSecretVersion', resources[0])

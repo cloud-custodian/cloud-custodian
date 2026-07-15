@@ -1,0 +1,270 @@
+{
+  "headers": {
+    "content-type": "application/json; charset=UTF-8",
+    "vary": "Origin, X-Origin, Referer",
+    "date": "Mon, 02 Mar 2026 20:38:34 GMT",
+    "server": "ESF",
+    "x-xss-protection": "0",
+    "x-frame-options": "SAMEORIGIN",
+    "x-content-type-options": "nosniff",
+    "alt-svc": "h3=\":443\"; ma=2592000,h3-29=\":443\"; ma=2592000",
+    "transfer-encoding": "chunked",
+    "status": "200",
+    "content-length": "10249",
+    "-content-encoding": "gzip",
+    "content-location": "https://aiplatform.googleapis.com/v1beta1/publishers/google/models?alt=json"
+  },
+  "body": {
+    "publisherModels": [
+      {
+        "name": "publishers/google/models/gemini-1.5-flash-002",
+        "versionId": "default",
+        "openSourceCategory": "PROPRIETARY",
+        "supportedActions": {
+          "openNotebook": {
+            "references": {
+              "global": {
+                "uri": "https://colab.research.google.com/github/GoogleCloudPlatform/generative-ai/blob/main/gemini/getting-started/intro_gemini_1_5_flash.ipynb"
+              }
+            },
+            "title": "Open Notebook"
+          },
+          "openGenerationAiStudio": {
+            "references": {
+              "global": {
+                "uri": "https://console.cloud.google.com/vertex-ai/studio/freeform?model=gemini-1.5-flash-002"
+              }
+            }
+          },
+          "openEvaluationPipeline": {
+            "references": {
+              "global": {
+                "uri": "https://console.cloud.google.com/vertex-ai/pipelines/vertex-ai-templates/autosxs-template"
+              }
+            },
+            "title": "Evaluate"
+          },
+          "openNotebooks": {
+            "notebooks": [
+              {
+                "references": {
+                  "global": {
+                    "uri": "https://colab.research.google.com/github/GoogleCloudPlatform/generative-ai/blob/main/gemini/getting-started/intro_gemini_1_5_flash.ipynb"
+                  }
+                },
+                "title": "Open Notebook"
+              },
+              {
+                "references": {
+                  "global": {
+                    "uri": "https://colab.research.google.com/github/GoogleCloudPlatform/generative-ai/blob/main/gemini/getting-started/intro_gemini_1_5_flash.ipynb"
+                  }
+                },
+                "title": "Open Notebook"
+              }
+            ]
+          }
+        },
+        "launchStage": "GA",
+        "publisherModelTemplate": "projects/{project}/locations/{location}/publishers/google/models/gemini-1.5-flash-002@default"
+      },
+      {
+        "name": "publishers/google/models/gemini-1.5-pro-002",
+        "versionId": "default",
+        "openSourceCategory": "PROPRIETARY",
+        "supportedActions": {
+          "openNotebook": {
+            "references": {
+              "us-central1": {
+                "uri": "https://colab.research.google.com/github/GoogleCloudPlatform/generative-ai/blob/main/gemini/use-cases/retail/product_attributes_extraction.ipynb"
+              }
+            },
+            "title": "Open Notebook",
+            "resourceTitle": "Notebook",
+            "resourceUseCase": "Product Attributes Extraction",
+            "resourceDescription": "Extract product descriptions and attribute json from images using Gemini 1.5 Pro. This notebook also shows the use of self-correcting prompt to improve the quality of the output."
+          },
+          "openGenerationAiStudio": {
+            "references": {
+              "us-central1": {
+                "uri": "https://console.cloud.google.com/vertex-ai/studio/freeform?model=gemini-1.5-pro-002"
+              }
+            }
+          },
+          "openEvaluationPipeline": {
+            "references": {
+              "us-central1": {
+                "uri": "https://console.cloud.google.com/vertex-ai/pipelines/vertex-ai-templates/autosxs-template"
+              }
+            },
+            "title": "Evaluate"
+          },
+          "openNotebooks": {
+            "notebooks": [
+              {
+                "references": {
+                  "us-central1": {
+                    "uri": "https://colab.research.google.com/github/GoogleCloudPlatform/generative-ai/blob/main/gemini/getting-started/intro_gemini_1_5_pro.ipynb"
+                  }
+                },
+                "title": "Open Notebook"
+              },
+              {
+                "references": {
+                  "us-central1": {
+                    "uri": "https://colab.research.google.com/github/GoogleCloudPlatform/generative-ai/blob/main/gemini/getting-started/intro_gemini_1_5_pro.ipynb"
+                  }
+                },
+                "title": "Open Notebook",
+                "resourceTitle": "Notebook",
+                "resourceUseCase": "Vertex AI Gemini API 1.5 Pro",
+                "resourceDescription": "Use the Vertex AI Gemini API 1.5 Pro model to process images, video, audio, and text simultaneously."
+              },
+              {
+                "references": {
+                  "us-central1": {
+                    "uri": "https://colab.research.google.com/github/GoogleCloudPlatform/generative-ai/blob/main/gemini/use-cases/retail/product_attributes_extraction.ipynb"
+                  }
+                },
+                "title": "Open Notebook",
+                "resourceTitle": "Notebook",
+                "resourceUseCase": "Product Attributes Extraction",
+                "resourceDescription": "Extract product descriptions and attribute json from images using Gemini 1.5 Pro. This notebook also shows the use of self-correcting prompt to improve the quality of the output."
+              }
+            ]
+          }
+        },
+        "launchStage": "GA",
+        "publisherModelTemplate": "projects/{project}/locations/{location}/publishers/google/models/gemini-1.5-pro-002@default"
+      },
+      {
+        "name": "publishers/google/models/gemini-2.0-flash-001",
+        "versionId": "default",
+        "supportedActions": {
+          "openNotebook": {
+            "references": {
+              "us-central1": {
+                "uri": "https://colab.research.google.com/github/GoogleCloudPlatform/generative-ai/blob/main/gemini/getting-started/intro_gemini_2_0_flash.ipynb"
+              }
+            },
+            "resourceTitle": "Notebook",
+            "resourceUseCase": "Vertex Serving",
+            "resourceDescription": "Intro to Gemini 2.0 Flash."
+          },
+          "openGenerationAiStudio": {
+            "references": {
+              "us-central1": {
+                "uri": "https://console.cloud.google.com/vertex-ai/generative/multimodal/create/text?model=gemini-2.0-flash-001"
+              }
+            }
+          },
+          "openNotebooks": {
+            "notebooks": [
+              {
+                "references": {
+                  "us-central1": {
+                    "uri": "https://colab.research.google.com/github/GoogleCloudPlatform/generative-ai/blob/main/gemini/getting-started/intro_gemini_2_0_flash.ipynb"
+                  }
+                },
+                "resourceTitle": "Notebook",
+                "resourceUseCase": "Vertex Serving",
+                "resourceDescription": "Intro to Gemini 2.0 Flash."
+              }
+            ]
+          }
+        },
+        "launchStage": "GA",
+        "publisherModelTemplate": "projects/{project}/locations/{location}/publishers/google/models/gemini-2.0-flash-001@default"
+      },
+      {
+        "name": "publishers/google/models/gemini-2.0-flash-lite-001",
+        "versionId": "default",
+        "launchStage": "GA",
+        "publisherModelTemplate": "projects/{project}/locations/{location}/publishers/google/models/gemini-2.0-flash-lite-001@default"
+      },
+      {
+        "name": "publishers/google/models/gemini-2.5-flash-preview-04-17",
+        "versionId": "default",
+        "supportedActions": {
+          "openGenerationAiStudio": {
+            "references": {
+              "us-central1": {
+                "uri": "https://console.cloud.google.com/vertex-ai/generative/multimodal/create/text?model=gemini-2.5-flash-preview-04-17"
+              }
+            }
+          }
+        },
+        "launchStage": "PUBLIC_PREVIEW",
+        "publisherModelTemplate": "projects/{project}/locations/{location}/publishers/google/models/gemini-2.5-flash-preview-04-17@default"
+      },
+      {
+        "name": "publishers/google/models/gemini-2.5-pro-exp-03-25",
+        "versionId": "default",
+        "supportedActions": {
+          "openNotebook": {
+            "references": {
+              "us-central1": {
+                "uri": "https://colab.research.google.com/github/GoogleCloudPlatform/generative-ai/blob/main/gemini/getting-started/intro_gemini_2_5_pro.ipynb"
+              }
+            },
+            "resourceTitle": "Notebook",
+            "resourceUseCase": "Vertex Serving",
+            "resourceDescription": "Intro to Gemini 2.5 Pro."
+          },
+          "openGenerationAiStudio": {
+            "references": {
+              "us-central1": {
+                "uri": "https://console.cloud.google.com/vertex-ai/generative/multimodal/create/text?model=gemini-2.5-pro-exp-03-25"
+              }
+            }
+          },
+          "openNotebooks": {
+            "notebooks": [
+              {
+                "references": {
+                  "us-central1": {
+                    "uri": "https://colab.research.google.com/github/GoogleCloudPlatform/generative-ai/blob/main/gemini/getting-started/intro_gemini_2_5_pro.ipynb"
+                  }
+                },
+                "resourceTitle": "Notebook",
+                "resourceUseCase": "Vertex Serving",
+                "resourceDescription": "Intro to Gemini 2.5 Pro."
+              }
+            ]
+          }
+        },
+        "launchStage": "EXPERIMENTAL",
+        "publisherModelTemplate": "projects/{project}/locations/{location}/publishers/google/models/gemini-2.5-pro-exp-03-25@default"
+      },
+      {
+        "name": "publishers/google/models/gemini-2.0-flash-preview-image-generation",
+        "versionId": "default",
+        "publisherModelTemplate": "projects/{project}/locations/{location}/publishers/google/models/gemini-2.0-flash-preview-image-generation@default"
+      },
+      {
+        "name": "publishers/google/models/gemini-2.5-pro",
+        "versionId": "default",
+        "launchStage": "GA",
+        "publisherModelTemplate": "projects/{project}/locations/{location}/publishers/google/models/gemini-2.5-pro@default"
+      },
+      {
+        "name": "publishers/google/models/gemini-2.5-flash",
+        "versionId": "default",
+        "launchStage": "GA",
+        "publisherModelTemplate": "projects/{project}/locations/{location}/publishers/google/models/gemini-2.5-flash@default"
+      },
+      {
+        "name": "publishers/google/models/gemini-2.5-flash-lite",
+        "versionId": "default",
+        "launchStage": "GA",
+        "publisherModelTemplate": "projects/{project}/locations/{location}/publishers/google/models/gemini-2.5-flash-lite@default"
+      },
+      {
+        "name": "publishers/google/models/gemini-3.1-flash-image-preview",
+        "versionId": "default",
+        "launchStage": "PUBLIC_PREVIEW",
+        "publisherModelTemplate": "projects/{project}/locations/{location}/publishers/google/models/gemini-3.1-flash-image-preview@default"
+      }
+    ]
+  }
+}

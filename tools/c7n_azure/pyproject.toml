@@ -27,12 +27,12 @@ dependencies = [
     "azure-mgmt-automation==0.1.1",
     "azure-mgmt-batch<16.0.0,>=15.0.0",
     "azure-mgmt-cdn<13.0.0,>=12.0.0",
-    "azure-mgmt-cognitiveservices<12.0.0,>=11.0.0",
+    "azure-mgmt-cognitiveservices<14.0.0,>=13.7.0",
     "azure-mgmt-compute<35.0.0,>=34.1.0",
     "azure-mgmt-containerinstance<8.0.0,>=7.0.0",
     "azure-mgmt-containerregistry<15.0.0,>=14.0.0",
     "azure-mgmt-containerservice<16.0.0,>=15.0.0",
-    "azure-mgmt-cosmosdb<7.0.0,>=6.1.0",
+    "azure-mgmt-cosmosdb<10.0.0,>=6.1.0",
     "azure-mgmt-costmanagement<2.0.0,>=1.0.0",
     "azure-mgmt-databricks==1.0.0b1",
     "azure-mgmt-datafactory<2.0.0,>=1.0.0",
@@ -87,7 +87,7 @@ dependencies = [
     "requests<3.0.0,>=2.22.0",
 ]
 name = "c7n_azure"
-version = "0.7.48"
+version = "0.7.51"
 description = "Cloud Custodian - Azure Support"
 readme = "readme.md"
 classifiers = [

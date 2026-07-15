@@ -20,7 +20,7 @@ dependencies = [
     "types-six<2.0.0,>=1.16.10",
 ]
 name = "c7n_mailer"
-version = "0.6.48"
+version = "0.6.51"
 description = "Cloud Custodian - Reference Mailer"
 readme = "README.md"
 classifiers = [
@@ -53,10 +53,10 @@ c7n-mailer-replay = "c7n_mailer.replay:main"
 
 [dependency-groups]
 dev = [
-    "black<25.0,>=23.1",
+    "black>=23.1,<27.0",
     "fakeredis<3.0,>=2.0",
     "mypy<1.0,>=0.931",
-    "pytest<8.0",
+    "pytest",
 ]
 
 [build-system]

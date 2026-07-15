@@ -1,0 +1,36 @@
+{
+    "status_code": 200,
+    "data": {
+        "ResponseMetadata": {},
+        "items": [
+            {
+                "id": "sn-0ab42a03731b11e17",
+                "name": "c7n-test-network-big-herring",
+                "arn": "arn:aws:vpc-lattice:us-east-1:644160558196:servicenetwork/sn-0ab42a03731b11e17",
+                "createdAt": {
+                    "__class__": "datetime",
+                    "year": 2026,
+                    "month": 3,
+                    "day": 13,
+                    "hour": 15,
+                    "minute": 56,
+                    "second": 35,
+                    "microsecond": 812000
+                },
+                "lastUpdatedAt": {
+                    "__class__": "datetime",
+                    "year": 2026,
+                    "month": 3,
+                    "day": 13,
+                    "hour": 15,
+                    "minute": 56,
+                    "second": 35,
+                    "microsecond": 812000
+                },
+                "numberOfAssociatedVPCs": 1,
+                "numberOfAssociatedServices": 0,
+                "numberOfAssociatedResourceConfigurations": 0
+            }
+        ]
+    }
+}

@@ -1,0 +1,54 @@
+{
+  "headers": {
+    "content-type": "application/json; charset=UTF-8",
+    "vary": "Origin, X-Origin, Referer",
+    "date": "Wed, 18 Feb 2026 20:07:30 GMT",
+    "server": "ESF",
+    "x-xss-protection": "0",
+    "x-frame-options": "SAMEORIGIN",
+    "x-content-type-options": "nosniff",
+    "alt-svc": "h3=\":443\"; ma=2592000,h3-29=\":443\"; ma=2592000",
+    "transfer-encoding": "chunked",
+    "status": "200",
+    "content-length": "1414",
+    "-content-encoding": "gzip",
+    "content-location": "https://artifactregistry.googleapis.com/v1/projects/cloud-custodian/locations/us-central1/repositories?alt=json"
+  },
+  "body": {
+    "repositories": [
+      {
+        "name": "projects/cloud-custodian/locations/us-central1/repositories/c7n-artifact-repo",
+        "format": "DOCKER",
+        "description": "Cloud Custodian test artifact repository",
+        "labels": {
+          "goog-terraform-provisioned": "true",
+          "env": "default"
+        },
+        "createTime": "2026-02-18T20:07:21.078488Z",
+        "updateTime": "2026-02-18T20:07:21.078488Z",
+        "mode": "STANDARD_REPOSITORY",
+        "vulnerabilityScanningConfig": {
+          "lastEnableTime": "2026-02-18T20:07:19.747706824Z",
+          "enablementState": "SCANNING_DISABLED",
+          "enablementStateReason": "API containerscanning.googleapis.com is not enabled."
+        },
+        "satisfiesPzi": true
+      },
+      {
+        "name": "projects/cloud-custodian/locations/us-central1/repositories/gae-standard",
+        "format": "DOCKER",
+        "description": "Repository to store images related to App Engine Standard deployments.",
+        "createTime": "2026-01-29T20:01:01.293318Z",
+        "updateTime": "2026-01-29T20:13:00.583414Z",
+        "mode": "STANDARD_REPOSITORY",
+        "sizeBytes": "475091591",
+        "vulnerabilityScanningConfig": {
+          "lastEnableTime": "2026-01-29T20:00:40.256532552Z",
+          "enablementState": "SCANNING_DISABLED",
+          "enablementStateReason": "API containerscanning.googleapis.com is not enabled."
+        },
+        "satisfiesPzi": true
+      }
+    ]
+  }
+}

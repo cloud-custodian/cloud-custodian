@@ -6,10 +6,9 @@ Cloud Custodian (c7n)
 ---
 
 [![slack](https://img.shields.io/badge/slack-chat-yellow)](https://communityinviter.com/apps/cloud-custodian/c7n-chat)
-[![CI](https://github.com/cloud-custodian/cloud-custodian/workflows/CI/badge.svg?event=push)](https://github.com/cloud-custodian/cloud-custodian/actions?query=workflow%3ACI+branch%3Amaster+event%3Apush)
+[![CI](https://github.com/cloud-custodian/cloud-custodian/workflows/CI/badge.svg?event=push)](https://github.com/cloud-custodian/cloud-custodian/actions?query=workflow%3ACI+branch%3Amain+event%3Apush)
 [![](https://img.shields.io/badge/license-Apache%202-blue.svg)](https://www.apache.org/licenses/LICENSE-2.0)
-[![](https://codecov.io/gh/cloud-custodian/cloud-custodian/branch/master/graph/badge.svg)](https://codecov.io/gh/cloud-custodian/cloud-custodian)
-[![](https://requires.io/github/cloud-custodian/cloud-custodian/requirements.svg?branch=master)](https://requires.io/github/cloud-custodian/cloud-custodian/requirements/?branch=master)
+[![](https://codecov.io/gh/cloud-custodian/cloud-custodian/branch/main/graph/badge.svg)](https://codecov.io/gh/cloud-custodian/cloud-custodian)
 [![CII Best Practices](https://bestpractices.coreinfrastructure.org/projects/3402/badge)](https://bestpractices.coreinfrastructure.org/projects/3402)
 
 Cloud Custodian, also known as c7n, is a rules engine for managing
@@ -37,7 +36,7 @@ provider to provide for real time enforcement of policies with builtin
 provisioning. Or it can be run as a simple cron job on a server to
 execute against large existing fleets.
 
-Cloud Custodian is a CNCF Incubating project, lead by a community of hundreds
+Cloud Custodian is a CNCF Incubating project, led by a community of hundreds
 of contributors.
 
 Features
@@ -63,8 +62,8 @@ Features
 Links
 -----
 
--   [Homepage](http://cloudcustodian.io)
--   [Docs](http://cloudcustodian.io/docs/index.html)
+-   [Homepage](https://cloudcustodian.io)
+-   [Docs](https://cloudcustodian.io/docs/index.html)
 -   [Project Roadmap](https://github.com/orgs/cloud-custodian/projects/1)
 -   [Developer Install](https://cloudcustodian.io/docs/developer/installing.html)
 -   [Presentations](https://www.google.com/search?q=cloud+custodian&source=lnms&tbm=vid)
@@ -74,7 +73,7 @@ Quick Install
 -------------
 
 Custodian is published on pypi as a series of packages with the `c7n`
-prefix, its also available as a docker image.
+prefix, it's also available as a docker image.
 
 ```shell
 $ python3 -m venv custodian
@@ -203,7 +202,7 @@ $ docker run -it \
 
 The [custodian cask
 tool](https://cloudcustodian.io/docs/tools/cask.html) is a go binary
-that provides a transparent front end to docker that mirors the regular
+that provides a transparent front end to docker that mirrors the regular
 custodian cli, but automatically takes care of mounting volumes.
 
 Consult the documentation for additional information, or reach out on gitter.
@@ -248,7 +247,7 @@ Additional Tools
 
 The Custodian project also develops and maintains a suite of additional
 tools here
-<https://github.com/cloud-custodian/cloud-custodian/tree/master/tools>:
+<https://github.com/cloud-custodian/cloud-custodian/tree/main/tools>:
 
 - [**_Org_:**](https://cloudcustodian.io/docs/tools/c7n-org.html) Multi-account policy execution.
 
@@ -272,7 +271,7 @@ tools here
 
 - [**_Omni SSM_:**](https://cloudcustodian.io/docs/tools/omnissm.html) EC2 Systems Manager Automation
 
-- [**_Mugc_:**](https://github.com/cloud-custodian/cloud-custodian/tree/master/tools/ops#mugc) A utility used to clean up Cloud Custodian Lambda policies that are deployed in an AWS environment.
+- [**_Mugc_:**](https://github.com/cloud-custodian/cloud-custodian/tree/main/tools/ops#mugc) A utility used to clean up Cloud Custodian Lambda policies that are deployed in an AWS environment.
 
 Contributing
 ------------
@@ -292,7 +291,7 @@ identified the issue positively or negatively.
 Code of Conduct
 ---------------
 
-This project adheres to the [CNCF Code of Conduct](https://github.com/cncf/foundation/blob/master/code-of-conduct.md)
+This project adheres to the [CNCF Code of Conduct](https://github.com/cncf/foundation/blob/main/code-of-conduct.md)
 
 By participating, you are expected to honor this code.
 

@@ -1,0 +1,40 @@
+{
+  "headers": {
+    "content-type": "application/json; charset=UTF-8",
+    "vary": "Origin, X-Origin, Referer",
+    "date": "Wed, 11 Mar 2026 07:52:15 GMT",
+    "server": "ESF",
+    "x-xss-protection": "0",
+    "x-frame-options": "SAMEORIGIN",
+    "x-content-type-options": "nosniff",
+    "alt-svc": "h3=\":443\"; ma=2592000,h3-29=\":443\"; ma=2592000",
+    "transfer-encoding": "chunked",
+    "status": "200",
+    "content-length": "565",
+    "-content-encoding": "gzip",
+    "content-location": "https://apikeys.googleapis.com/v2/projects/cloud-custodian/locations/global/keys/test-key-903d8f3a04c3?alt=json"
+  },
+  "body": {
+    "name": "projects/cloud-custodian/locations/global/keys/test-key-903d8f3a04c3",
+    "displayName": "Test API Key",
+    "createTime": "2026-03-11T07:52:07.383311Z",
+    "uid": "09ce29ea-6bc4-4899-b5eb-b0d88a0d549e",
+    "updateTime": "2026-03-11T07:52:15.123651Z",
+    "annotations": {
+      "custodian-remediated": "true"
+    },
+    "restrictions": {
+      "serverKeyRestrictions": {
+        "allowedIps": [
+          "192.0.2.0/24"
+        ]
+      },
+      "apiTargets": [
+        {
+          "service": "translate.googleapis.com"
+        }
+      ]
+    },
+    "etag": "W/\"40FyrKjTOnSwGJirYCKXdQ==\""
+  }
+}

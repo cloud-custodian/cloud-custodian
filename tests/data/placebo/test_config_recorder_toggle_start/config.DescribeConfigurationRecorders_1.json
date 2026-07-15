@@ -1,0 +1,22 @@
+{
+    "status_code": 200,
+    "data": {
+        "ConfigurationRecorders": [
+            {
+                "name": "default",
+                "roleARN": "arn:aws:iam::644160558196:role/service-role/config-role-us-east-1",
+                "recordingGroup": {
+                    "allSupported": true,
+                    "includeGlobalResourceTypes": true,
+                    "resourceTypes": []
+                }
+            }
+        ],
+        "ResponseMetadata": {
+            "RequestId": "b1b2c3d4-0001-0001-0001-000000000001",
+            "HTTPStatusCode": 200,
+            "HTTPHeaders": {},
+            "RetryAttempts": 0
+        }
+    }
+}

@@ -20,7 +20,8 @@ class RecorderDescribe(DescribeSource):
         client = local_session(self.manager.session_factory).client('config')
         for r in resources:
             status = client.describe_configuration_recorder_status(
-                ConfigurationRecorderNames=[r['name']])['ConfigurationRecordersStatus']
+                ConfigurationRecorderNames=[r['name']]
+            )['ConfigurationRecordersStatus']
             if status:
                 r.update({'status': status.pop()})
 
@@ -45,6 +46,42 @@ class ConfigRecorder(QueryResourceManager):
     source_mapping = {'describe': RecorderDescribe, 'config': ConfigSource}
 
 
+@ConfigRecorder.action_registry.register('toggle-recording')
+class ToggleRecording(BaseAction):
+    """Start or stop the AWS Config configuration recorder.
+
+    :example:
+
+    .. code-block:: yaml
+
+        policies:
+          - name: stop-config-recording
+            resource: config-recorder
+            filters:
+              - type: value
+                key: status.recording
+                value: true
+            actions:
+              - type: toggle-recording
+                enabled: false
+    """
+
+    schema = type_schema('toggle-recording', enabled={'type': 'boolean', 'default': True})
+    permissions = (
+        'config:StartConfigurationRecorder',
+        'config:StopConfigurationRecorder',
+    )
+
+    def process(self, resources):
+        client = local_session(self.manager.session_factory).client('config')
+        enabled = self.data.get('enabled', True)
+        for r in resources:
+            if enabled:
+                client.start_configuration_recorder(ConfigurationRecorderName=r['name'])
+            else:
+                client.stop_configuration_recorder(ConfigurationRecorderName=r['name'])
+
+
 @ConfigRecorder.filter_registry.register('cross-account')
 class ConfigCrossAccountFilter(CrossAccountAccessFilter):
 
@@ -53,7 +90,8 @@ class ConfigCrossAccountFilter(CrossAccountAccessFilter):
         # white list accounts
         allowed_regions={'type': 'array', 'items': {'type': 'string'}},
         whitelist_from=ValuesFrom.schema,
-        whitelist={'type': 'array', 'items': {'type': 'string'}})
+        whitelist={'type': 'array', 'items': {'type': 'string'}},
+    )
 
     permissions = ('config:DescribeAggregationAuthorizations',)
 
@@ -67,8 +105,9 @@ class ConfigCrossAccountFilter(CrossAccountAccessFilter):
         auths = client.describe_aggregation_authorizations().get('AggregationAuthorizations', [])
 
         for a in auths:
-            if (a['AuthorizedAccountId'] not in allowed_accounts or
-                    (allowed_regions and a['AuthorizedAwsRegion'] not in allowed_regions)):
+            if a['AuthorizedAccountId'] not in allowed_accounts or (
+                allowed_regions and a['AuthorizedAwsRegion'] not in allowed_regions
+            ):
                 matched.append(a)
 
         # only 1 config recorder per account
@@ -113,7 +152,6 @@ class ConfigRetentionConfigurations(ValueFilter):
     schema = type_schema(
         "retention",
         rinherit=ValueFilter.schema,
-
     )
     schema_alias = False
     permissions = ("config:DescribeRetentionConfigurations",)
@@ -165,8 +203,8 @@ class RuleStatus(ValueFilter):
 
         for rule_set in chunks(resources, 100):
             for status in client.describe_config_rule_evaluation_status(
-                ConfigRuleNames=[r['ConfigRuleName'] for r in rule_set]).get(
-                    'ConfigRulesEvaluationStatus', []):
+                ConfigRuleNames=[r['ConfigRuleName'] for r in rule_set]
+            ).get('ConfigRulesEvaluationStatus', []):
                 status_map[status['ConfigRuleName']] = status
 
         results = []
@@ -186,8 +224,7 @@ class DeleteRule(BaseAction):
     def process(self, resources):
         client = local_session(self.manager.session_factory).client('config')
         for r in resources:
-            client.delete_config_rule(
-                ConfigRuleName=r['ConfigRuleName'])
+            client.delete_config_rule(ConfigRuleName=r['ConfigRuleName'])
 
 
 @ConfigRule.filter_registry.register('remediation')
@@ -241,7 +278,8 @@ class RuleRemediation(Filter):
                 remediation: *remediation-config
     """
 
-    schema = type_schema('remediation',
+    schema = type_schema(
+        'remediation',
         rule_name={'type': 'string'},
         rule_prefix={'type': 'string'},
         remediation={
@@ -253,11 +291,13 @@ class RuleRemediation(Filter):
                 'parameters': {'type': 'object'},
                 'maximum_automatic_attempts': {
                     'type': 'integer',
-                    'minimum': 1, 'maximum': 25,
+                    'minimum': 1,
+                    'maximum': 25,
                 },
                 'retry_attempt_seconds': {
                     'type': 'integer',
-                    'minimum': 1, 'maximum': 2678000,
+                    'minimum': 1,
+                    'maximum': 2678000,
                 },
                 'execution_controls': {'type': 'object'},
             },
@@ -277,9 +317,7 @@ class RuleRemediation(Filter):
             return []
 
         client = local_session(self.manager.session_factory).client('config')
-        resp = client.describe_remediation_configurations(
-            ConfigRuleNames=[rule_name]
-        )
+        resp = client.describe_remediation_configurations(ConfigRuleNames=[rule_name])
 
         desired_remediation_config = self.data['remediation']
         desired_remediation_config['ConfigRuleName'] = rule_name

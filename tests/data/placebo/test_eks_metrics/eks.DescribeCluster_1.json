@@ -1,0 +1,95 @@
+{
+    "status_code": 200,
+    "data": {
+        "ResponseMetadata": {},
+        "cluster": {
+            "name": "serious-bluegrass-ladybug",
+            "arn": "arn:aws:eks:us-east-1:644160558196:cluster/serious-bluegrass-ladybug",
+            "createdAt": {
+                "__class__": "datetime",
+                "year": 2026,
+                "month": 3,
+                "day": 30,
+                "hour": 12,
+                "minute": 2,
+                "second": 31,
+                "microsecond": 891000
+            },
+            "version": "1.35",
+            "endpoint": "https://5E69E08313AB88C44F4FD90B6D1708F5.gr7.us-east-1.eks.amazonaws.com",
+            "roleArn": "arn:aws:iam::644160558196:role/AmazonEKSAutoClusterRole",
+            "resourcesVpcConfig": {
+                "subnetIds": [
+                    "subnet-06a9b0f5ed8997c47",
+                    "subnet-0b5ccc0c1409c0d07"
+                ],
+                "securityGroupIds": [],
+                "clusterSecurityGroupId": "sg-043afa2e5acd4754c",
+                "vpcId": "vpc-036aee1d9a0ab841c",
+                "endpointPublicAccess": true,
+                "endpointPrivateAccess": true,
+                "publicAccessCidrs": [
+                    "0.0.0.0/0"
+                ]
+            },
+            "kubernetesNetworkConfig": {
+                "serviceIpv4Cidr": "10.100.0.0/16",
+                "ipFamily": "ipv4",
+                "elasticLoadBalancing": {
+                    "enabled": true
+                }
+            },
+            "logging": {
+                "clusterLogging": [
+                    {
+                        "types": [
+                            "api",
+                            "audit",
+                            "authenticator",
+                            "controllerManager",
+                            "scheduler"
+                        ],
+                        "enabled": true
+                    }
+                ]
+            },
+            "identity": {
+                "oidc": {
+                    "issuer": "https://oidc.eks.us-east-1.amazonaws.com/id/5E69E08313AB88C44F4FD90B6D1708F5"
+                }
+            },
+            "status": "ACTIVE",
+            "certificateAuthority": {
+                "data": "LS0tLS1CRUdJTiBDRVJUSUZJQ0FURS0tLS0tCk1JSURCVENDQWUyZ0F3SUJBZ0lJRUZBNlh1UTIrbjh3RFFZSktvWklodmNOQVFFTEJRQXdGVEVUTUJFR0ExVUUKQXhNS2EzVmlaWEp1WlhSbGN6QWVGdzB5TmpBek16QXhOakF6TURSYUZ3MHpOakF6TWpjeE5qQTRNRFJhTUJVeApFekFSQmdOVkJBTVRDbXQxWW1WeWJtVjBaWE13Z2dFaU1BMEdDU3FHU0liM0RRRUJBUVVBQTRJQkR3QXdnZ0VLCkFvSUJBUURpUUNUUWU3dWEzUmFMTEpvT0VMRFVERDh6anNCbUFYRnJhRGZSSWY4djR6aXhIaDZKRVRDRXdNWkIKczdpWU0vaXA2ZFUrRWg3U3YyQTZ2RzFrNVByWU1MckIyOUdkd2NnenZmZUFiMGlIRG03UysrQUs4QmtWMGxYbQp2ZEJKb3krL3ppVHRYS2Nqb29EN2dXN3l0aGJmUzZTN1Exd2JpWkI3VFlidjJib1J2dHNEaXZjMk9xN09tQzJsClQ3NnRaL2Q4NE1Ta1o0SnFzMlphWDhKQnhIMVRrKzNUQVNwcHR2N0lkSVV2QXMrTURNeUQ1K0Z5N0NJbGgvaUkKR1Q1YnFTMmlaWDhiNzNoZUpiQzVtZjlyTHA2bndYMi83bVhvOWNOdWxjclFZamkrRVY5cjhkKzJKVFpXL2ZOSQpqdnNrMVpaYmpKWC9aUTQ4bTVRQVNHSEFnR1NCQWdNQkFBR2pXVEJYTUE0R0ExVWREd0VCL3dRRUF3SUNwREFQCkJnTlZIUk1CQWY4RUJUQURBUUgvTUIwR0ExVWREZ1FXQkJSR2RZRFpOMnJiOFRFOHNlc3RxaEpaelZpQmpUQVYKQmdOVkhSRUVEakFNZ2dwcmRXSmxjbTVsZEdWek1BMEdDU3FHU0liM0RRRUJDd1VBQTRJQkFRQ3ZCL21ESHF3cAovTWZFend0NHlhL1BjdEZHWHREMk55d1FFRndSV29wbXhDM25YeXRyTklDWS9EWGdHcjVHdjhhcFVOT3hWWUl5CmNUaEVmTXFnNVFGSTZGbzh1SVZ6V281MW4yY3N1dnZVQXpOd1h6K2RsZkI1NmhzbFJYQi9EOGJ6YzJDc1Y5R0wKLzM2VXVTV3YyaHFLT01nQ1pFRzQ3Skp0dklUM1M5VGxzc2RNdllOcjNqUmhuRzcxWmNqUCtEejVWaFVacm1YMgpFUHZETGVVWEVra1l5RC93M0ora25wUzhrMUVZMUI5V0U2b3F6Uis2a3dDOW80dXJtQkd4am44dEI5WFIrajl2Cnlub0crK29vU0o1RGVHU0FlWWxheHpNemVVTkRmWlN2Q1IyYk00VU9SeGJiVDVWY09jejVuWHlEdGJPWTY5Q1AKcEZ0Y3F5YVJ0ajRlCi0tLS0tRU5EIENFUlRJRklDQVRFLS0tLS0K"
+            },
+            "platformVersion": "eks.8",
+            "tags": {},
+            "accessConfig": {
+                "authenticationMode": "API"
+            },
+            "upgradePolicy": {
+                "supportType": "STANDARD"
+            },
+            "zonalShiftConfig": {
+                "enabled": true
+            },
+            "computeConfig": {
+                "enabled": true,
+                "nodePools": [
+                    "general-purpose",
+                    "system"
+                ],
+                "nodeRoleArn": "arn:aws:iam::644160558196:role/AmazonEKSAutoNodeRole"
+            },
+            "storageConfig": {
+                "blockStorage": {
+                    "enabled": true
+                }
+            },
+            "deletionProtection": false,
+            "controlPlaneScalingConfig": {
+                "tier": "standard"
+            }
+        }
+    }
+}

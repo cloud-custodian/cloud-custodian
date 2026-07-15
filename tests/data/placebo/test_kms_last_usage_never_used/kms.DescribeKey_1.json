@@ -1,0 +1,27 @@
+{
+  "status_code": 200,
+  "data": {
+    "KeyMetadata": {
+      "Origin": "AWS_KMS",
+      "KeyId": "abcd1234-5678-90ab-cdef-1234567890ab",
+      "Description": "",
+      "KeyManager": "CUSTOMER",
+      "Enabled": true,
+      "KeyUsage": "ENCRYPT_DECRYPT",
+      "KeyState": "Enabled",
+      "CreationDate": {
+        "hour": 10,
+        "__class__": "datetime",
+        "month": 5,
+        "second": 0,
+        "microsecond": 0,
+        "year": 2026,
+        "day": 1,
+        "minute": 0
+      },
+      "Arn": "arn:aws:kms:us-east-1:644160558196:key/abcd1234-5678-90ab-cdef-1234567890ab",
+      "AWSAccountId": "644160558196"
+    },
+    "ResponseMetadata": {}
+  }
+}

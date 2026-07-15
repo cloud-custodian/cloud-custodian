@@ -8,6 +8,7 @@
 - Pratyush Mishra (@PratMis)
 - Matt Heidelbaugh (@mattheidelbaugh)
 - AJ Kerrigan (@ajkerrigan)
+- Dmytro Afanasiev (@dmytro-afanasiev)
 
 ## Aws Provider Maintainers
 

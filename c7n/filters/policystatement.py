@@ -131,6 +131,21 @@ class HasStatementFilter(Filter):
             actionsFormatted = [action.lower() for action in actions]
         return set(actionsFormatted)
 
+    def normalize_condition_keys(self, value):
+        if isinstance(value, dict):
+            return {
+                k.lower(): self.normalize_condition_keys(v)
+                for k, v in value.items()
+            }
+        if isinstance(value, list):
+            return [self.normalize_condition_keys(v) for v in value]
+        return value
+
+    def normalize_statement_value(self, key, value):
+        if key == 'Condition':
+            return self.normalize_condition_keys(value)
+        return value
+
     def __get_matched_statements(self, required_stmts, resource_stmts):
         matched_statements = []
         for required_statement in required_stmts:
@@ -143,12 +158,17 @@ class HasStatementFilter(Filter):
             for resource_statement in resource_stmts:
                 found = 0
                 for req_key, req_value in required_statement.items():
+                    req_value = self.normalize_statement_value(req_key, req_value)
+                    resource_value = resource_statement.get(req_key)
+                    if req_key in resource_statement:
+                        resource_value = self.normalize_statement_value(
+                            req_key, resource_value)
+
                     if req_key in ['Action', 'NotAction'] and \
                         req_key in resource_statement:
 
-                        resource_statement[req_key] = \
-                            self.action_resource_case_insensitive(
-                                resource_statement[req_key])
+                        resource_value = self.action_resource_case_insensitive(
+                            resource_value)
                         req_value = self.action_resource_case_insensitive(
                             req_value)
 
@@ -165,19 +185,16 @@ class HasStatementFilter(Filter):
                             else:
                                 req_value = format_to_set(req_value)
 
-                            if isinstance(resource_statement[req_key], dict):
-                                resource_statement[req_key] = format_dict_with_sets(
-                                    resource_statement[req_key]
-                                    )
+                            if isinstance(resource_value, dict):
+                                resource_value = format_dict_with_sets(
+                                    resource_value)
                             else:
-                                resource_statement[req_key] = format_to_set(
-                                    resource_statement[req_key]
-                                )
+                                resource_value = format_to_set(resource_value)
 
                         # If req_key is not a partial_match element,
                         # do a regular full value match for a given req_value
                         # and the value in the resource_statement
-                        if req_value == resource_statement.get(req_key):
+                        if req_value == resource_value:
                             found += 1
 
                 if found and found == len(required_statement):
@@ -190,7 +207,16 @@ class HasStatementFilter(Filter):
                                 partial_match_value, resource_stmt):
 
         if partial_match_key in resource_stmt:
-            resource_stmt_value = resource_stmt.get(partial_match_key)
+            partial_match_value = self.normalize_statement_value(
+                partial_match_key, partial_match_value)
+            resource_stmt_value = self.normalize_statement_value(
+                partial_match_key, resource_stmt.get(partial_match_key))
+
+            if partial_match_key in ['Action', 'NotAction']:
+                resource_stmt_value = self.action_resource_case_insensitive(
+                    resource_stmt_value)
+                partial_match_value = self.action_resource_case_insensitive(
+                    partial_match_value)
 
             # set as a list in case partial_match_value is a list with len of 1
             if (isinstance(resource_stmt_value, str) or

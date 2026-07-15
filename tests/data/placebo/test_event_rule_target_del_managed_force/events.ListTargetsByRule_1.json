@@ -1,0 +1,12 @@
+{
+    "status_code": 200,
+    "data": {
+        "Targets": [
+            {
+                "Id": "autoscaling",
+                "Arn": "arn:aws:autoscaling:us-east-1:::"
+            }
+        ],
+        "ResponseMetadata": {}
+    }
+}

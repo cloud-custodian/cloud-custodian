@@ -559,7 +559,7 @@ class ScheduleParser:
     """Parses tag values for custom on/off hours schedules.
 
     At the minimum the ``on`` and ``off`` values are required. Each of
-    these must be seperated by a ``;`` in the format described below.
+    these must be separated by a ``;`` in the format described below.
 
     **Schedule format**::
 
