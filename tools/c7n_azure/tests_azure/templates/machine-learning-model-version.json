@@ -16,6 +16,10 @@
         "modelVersion": {
             "type": "string",
             "defaultValue": "1"
+        },
+        "archivedModelVersion": {
+            "type": "string",
+            "defaultValue": "2"
         }
     },
     "variables": {
@@ -73,6 +77,19 @@
                 "modelUri": "azureml://subscriptions/{sub}/resourceGroups/{rg}/workspaces/{ws}/datastores/workspaceblobstore/paths/model.pkl",
                 "modelType": "CustomModel",
                 "isArchived": false
+            },
+            "dependsOn": [
+                "[resourceId('Microsoft.MachineLearningServices/workspaces', variables('workspaceName'))]"
+            ]
+        },
+        {
+            "type": "Microsoft.MachineLearningServices/workspaces/models/versions",
+            "apiVersion": "2023-04-01",
+            "name": "[format('{0}/{1}/{2}', variables('workspaceName'), parameters('modelName'), parameters('archivedModelVersion'))]",
+            "properties": {
+                "modelUri": "azureml://subscriptions/{sub}/resourceGroups/{rg}/workspaces/{ws}/datastores/workspaceblobstore/paths/model.pkl",
+                "modelType": "CustomModel",
+                "isArchived": true
             },
             "dependsOn": [
                 "[resourceId('Microsoft.MachineLearningServices/workspaces', variables('workspaceName'))]"
