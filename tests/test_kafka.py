@@ -252,6 +252,44 @@ class KafkaTest(BaseTest):
             resources[0]['CrossAccountViolations'][0]['Resource'],
             'arn:aws:kafka:us-east-1:644160558196:cluster/demo-cluster-1/b12690b6-7337-464f-b334-628d5575a4b0-21')
 
+    def test_kafka_cross_account_filter_policy_not_found(self):
+        """Test that get_resource_policy returns None when policy is not found."""
+        import unittest.mock as mock
+        from c7n.resources.kafka import KafkaCrossAccountAccessFilter
+
+        session_factory = self.replay_flight_data('test_kafka_cluster_cross_account_filter')
+        p = self.load_policy(
+            {
+                'name': 'kafka-cross-account-filter',
+                'resource': 'kafka',
+                'filters': [
+                    {
+                        'type': 'cross-account'
+                    }
+                ]
+            },
+            session_factory=session_factory,
+            config={'region': 'us-east-1'}
+        )
+
+        # Get the filter instance
+        f = p.resource_manager.filters[0]
+        
+        # Create a test resource without policy annotation
+        test_resource = {
+            'ClusterArn': 'arn:aws:kafka:us-east-1:123456789012:cluster/test-cluster',
+            'ClusterType': 'PROVISIONED'
+        }
+
+        # Mock the retry method to return None (simulating ResourceNotFoundException)
+        with mock.patch.object(f.manager, 'retry', return_value=None):
+            policy = f.get_resource_policy(test_resource)
+            
+        # Verify that policy is None and no UnboundLocalError is raised
+        self.assertIsNone(policy)
+        # Verify that the policy annotation is not set when policy is not found
+        self.assertNotIn('c7n:Policy', test_resource)
+
 
 class TestKafkaClusterConfiguration(BaseTest):
 
