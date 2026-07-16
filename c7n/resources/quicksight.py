@@ -58,6 +58,9 @@ class QuicksightNamespacedResourceManager(query.QueryResourceManager):
 
     @property
     def account_id(self):
+        for q in self.data.get('query', []):
+            if "AwsAccountId" in q:
+                return q["AwsAccountId"]
         return self.config.account_id
 
     @property
