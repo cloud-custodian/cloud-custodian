@@ -134,7 +134,7 @@ class SecurityHubTest(BaseTest):
 
     def test_post_finding_id_fips_usedforsecurity(self):
         # A new finding id is built from hashlib.md5; for FIPS compliance the
-        # usedforsecurity=False flag must actually be passed (on Python >= 3.9).
+        # usedforsecurity=False flag must be passed.
         policy = self.load_policy({
             'name': 's3',
             'resource': 's3',
