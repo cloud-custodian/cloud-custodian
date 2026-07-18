@@ -134,26 +134,72 @@ class UsageFilter(MetricsFilter):
     Default min_period (minimal period) is 300 seconds and is automatically
     set to 60 seconds if users try to set it to anything lower than that.
 
+    The hard_limit parameter prevents quota increase requests from exceeding AWS's
+    maximum allowable limits. Without this, Cloud Custodian may repeatedly submit
+    invalid requests when calculated increases exceed AWS hard limits, creating
+    failed automation cycles.
+
     .. code-block:: yaml
 
         policies:
             - name: service-quota-usage-limit
               description: |
                   find any services that have usage stats of
-                  over 80%
+                  over 70%
               resource: aws.service-quota
               filters:
                 - UsageMetric: present
                 - type: usage-metric
-                  limit: 19
+                  limit: 70
+
+            - name: iam-roles-quota-with-hard-limit
+              description: |
+                  monitor IAM roles per account quota with hard limit
+              resource: aws.service-quota
+              filters:
+                - type: value
+                  key: QuotaCode
+                  value: L-FE177D64
+                - type: usage-metric
+                  hard_limit: 5000
+
+            - name: emr-serverless-vcpu-quota-override
+              description: |
+                  override MetricStatisticRecommendation for quotas
+                  where the API returns an incorrect recommendation
+              resource: aws.service-quota
+              filters:
+                - type: value
+                  key: QuotaCode
+                  value: L-D05C8A75
+                - type: usage-metric
+                  statistic: Maximum
+                  min_period: 60
+                  limit: 80
     """
 
-    schema = type_schema('usage-metric', limit={'type': 'integer'}, min_period={'type': 'integer'})
+    schema = type_schema(
+        'usage-metric',
+        limit={'type': 'integer'},
+        min_period={'type': 'integer'},
+        hard_limit={'type': 'integer'},
+        statistic={'type': 'string', 'enum': [
+            'Maximum', 'Minimum', 'Average', 'Sum', 'SampleCount']},
+    )
+
+    cloudwatch_max_datapoints = 1440
+    # https://boto3.amazonaws.com/v1/documentation/api/1.35.9/reference/services/cloudwatch/client/get_metric_statistics.html
+    # If the StartTime parameter specifies a time stamp that is greater than 3 hours ago,
+    # you must specify the period as follows or no data points in that time range is returned:
+    # - Start time between 3 hours and 15 days ago - Use a multiple of 60 seconds (1 minute).
+    # We systematically use a start time of 24h ago. This means the min period is always 60 seconds.
+    cloudwatch_min_period = 60
 
     permisisons = ('cloudwatch:GetMetricStatistics',)
 
     annotation_key = 'c7n:UsageMetric'
 
+    # see: https://boto3.amazonaws.com/v1/documentation/api/1.35.9/reference/services/service-quotas/client/list_service_quotas.html
     time_delta_map = {
         'MICROSECOND': 'microseconds',
         'MILLISECOND': 'milliseconds',
@@ -174,11 +220,25 @@ class UsageFilter(MetricsFilter):
 
     percentile_regex = re.compile('p\\d{0,2}\\.{0,1}\\d{0,2}')
 
+    def round_up(self, n, d):
+        if n % d == 0:
+            return n
+        return d * (1 + (n // d))
+
     def get_dimensions(self, usage_metric):
         dimensions = []
         for k, v in usage_metric['MetricDimensions'].items():
             dimensions.append({'Name': k, 'Value': v})
         return dimensions
+
+    def scale_period(self, total_seconds, period, min_period):
+        initial_period = period
+        if period < min_period:
+            period = min_period
+        while total_seconds / period > self.cloudwatch_max_datapoints:
+            period += self.cloudwatch_min_period
+        period = self.round_up(period, self.cloudwatch_min_period)
+        return period, period / initial_period
 
     def process(self, resources, event):
         client = local_session(self.manager.session_factory).client('cloudwatch')
@@ -187,7 +247,8 @@ class UsageFilter(MetricsFilter):
         start_time = end_time - timedelta(1)
 
         limit = self.data.get('limit', 80)
-        min_period = max(self.data.get('min_period', 300), 60)
+        min_period = max(self.data.get('min_period', 300), self.cloudwatch_min_period)
+        hard_limit = self.data.get('hard_limit', None)
 
         result = []
 
@@ -196,7 +257,8 @@ class UsageFilter(MetricsFilter):
             quota = r.get('Value')
             if not metric or quota is None:
                 continue
-            stat = metric.get('MetricStatisticRecommendation', 'Maximum')
+            stat = self.data.get(
+                'statistic', metric.get('MetricStatisticRecommendation', 'Maximum'))
             if stat not in self.metric_map and self.percentile_regex.match(stat) is None:
                 continue
 
@@ -206,21 +268,25 @@ class UsageFilter(MetricsFilter):
             else:
                 period = int(timedelta(1).total_seconds())
 
-            # Use scaling to avoid CW limit of 1440 data points
-            metric_scale = 1
-            if period < min_period and stat == "Sum":
-                metric_scale = min_period / period
-                period = min_period
+            total_seconds = (end_time - start_time).total_seconds()
+            period, metric_scale = self.scale_period(total_seconds, period, min_period)
 
-            res = client.get_metric_statistics(
-                Namespace=metric['MetricNamespace'],
-                MetricName=metric['MetricName'],
-                Dimensions=self.get_dimensions(metric),
-                Statistics=[stat],
-                StartTime=start_time,
-                EndTime=end_time,
-                Period=period,
-            )
+            try:
+                res = client.get_metric_statistics(
+                    Namespace=metric['MetricNamespace'],
+                    MetricName=metric['MetricName'],
+                    Dimensions=self.get_dimensions(metric),
+                    Statistics=[stat],
+                    StartTime=start_time,
+                    EndTime=end_time,
+                    Period=period,
+                )
+            except Exception as e:
+                raise Exception(
+                    f'failed to collect metric {metric["MetricName"]}'
+                    f' namespace {metric["MetricNamespace"]}'
+                    f' for service {r.get("ServiceCode")}') from e
+
             if res['Datapoints']:
                 if self.percentile_regex.match(stat):
                     # AWS CloudWatch supports percentile statistic as a statistic but
@@ -246,6 +312,8 @@ class UsageFilter(MetricsFilter):
                         'quota': quota,
                         'metric_scale': metric_scale,
                     }
+                    if hard_limit is not None:
+                        r[self.annotation_key]['hard_limit'] = float(hard_limit)
                     result.append(r)
         return result
 
@@ -324,9 +392,19 @@ class Increase(Action):
         multiplier = self.data.get('multiplier', 1.2)
         error = None
         for r in resources:
-            count = math.ceil(multiplier * r['Value'])
+            count = math.ceil(float(multiplier) * r['Value'])
             if not r['Adjustable']:
                 continue
+            # Skip if quota equals hard_limit
+            if ('c7n:UsageMetric' in r and
+                    'hard_limit' in r['c7n:UsageMetric'] and
+                    r['c7n:UsageMetric']['quota'] == r['c7n:UsageMetric']['hard_limit']):
+                continue
+            # Cap count at hard_limit if it exceeds it
+            if ('c7n:UsageMetric' in r and
+                    'hard_limit' in r['c7n:UsageMetric'] and
+                    count > r['c7n:UsageMetric']['hard_limit']):
+                count = int(r['c7n:UsageMetric']['hard_limit'])
             try:
                 client.request_service_quota_increase(
                     ServiceCode=r['ServiceCode'],

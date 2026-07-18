@@ -1,0 +1,12 @@
+{
+    "status_code": 403,
+    "data": {
+        "Error": {
+            "Message": "Account 644160558196 is not subscribed for QuickSight",
+            "Code": "UnsupportedUserEditionException"
+        },
+        "ResponseMetadata": {},
+        "Message": "Account 644160558196 is not subscribed for QuickSight",
+        "RequestId": "2d0083c6-04dd-44f3-a8f8-2b0f42d73fb0"
+    }
+}

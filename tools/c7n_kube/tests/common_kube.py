@@ -14,7 +14,6 @@ from c7n.resources import load_resources
 
 from c7n_kube.client import Session
 
-
 load_resources()
 
 RECORDED_HOST = "ghost"

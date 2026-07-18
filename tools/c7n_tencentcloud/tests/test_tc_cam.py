@@ -361,12 +361,31 @@ class TestCAM(BaseTest):
                 "description": "Checks IAM Policies if used",
                 "filters": [
                     {
-                        "type": "used"
+                        "type": "used",
+                        "state": True
                     }
                 ]
             },
-            account_id=100002098531
         )
         resources = policy.run()
-        assert len(resources) == 1
-        assert resources[0]["PolicyId"] == 141753149
+        assert len(resources) == 57
+        assert resources[0]["PolicyId"] == 236806532
+
+    @pytest.mark.vcr
+    def test_policy_unused(self):
+        policy = self.load_policy(
+            {
+                "name": "tencentcloud-cam-policy-unused",
+                "resource": "tencentcloud.cam-policy",
+                "description": "Checks IAM Policies if unused",
+                "filters": [
+                    {
+                        "type": "used",
+                        "state": False
+                    }
+                ]
+            },
+        )
+        resources = policy.run()
+        assert len(resources) == 130
+        assert resources[0]["PolicyId"] == 232883536

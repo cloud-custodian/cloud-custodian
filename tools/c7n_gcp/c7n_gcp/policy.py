@@ -1,9 +1,11 @@
 # Copyright The Cloud Custodian Authors.
 # SPDX-License-Identifier: Apache-2.0
 import logging
+import time
 
 from dateutil.tz import tz
 
+from c7n import utils
 from c7n.exceptions import PolicyValidationError
 from c7n.policy import execution, ServerlessExecutionMode, PullMode
 from c7n.utils import local_session, type_schema
@@ -32,8 +34,42 @@ class FunctionMode(ServerlessExecutionMode):
         self.log = logging.getLogger('custodian.gcp.funcexec')
         self.region = policy.options.regions[0] if len(policy.options.regions) else DEFAULT_REGION
 
-    def run(self):
-        raise NotImplementedError("subclass responsibility")
+    def resolve_resources(self, event):
+        raise NotImplementedError("subclass responsibility")  # pragma: no cover
+
+    def run(self, event, context):
+        """Execute a gcp serverless model"""
+        from c7n.actions import EventAction
+
+        s = time.time()
+        resources = self.resolve_resources(event)
+        if not resources:
+            return  # pragma: no cover
+
+        resources = self.policy.resource_manager.filter_resources(resources, event)
+
+        if not resources:  # pragma: no cover
+            self.policy.log.info(
+                "policy: %s resources: %s no resources found"
+                % (self.policy.name, self.policy.resource_type)
+            )
+            return
+        rt = time.time() - s
+
+        with self.policy.ctx as ctx:
+            self.policy.log.info("Filtered resources %d" % len(resources))
+
+            ctx.metrics.put_metric("ResourceCount", len(resources), "Count", Scope="Policy")
+            ctx.metrics.put_metric("ResourceTime", rt, "Seconds", Scope="Policy")
+            ctx.output.write_file("resources.json", utils.dumps(resources, indent=2))
+
+            for action in self.policy.resource_manager.actions:
+                if isinstance(action, EventAction):  # pragma: no cover
+                    action.process(resources, event)
+                else:
+                    action.process(resources)
+
+            return resources
 
     def provision(self):
         self.log.info("Provisioning policy function %s", self.policy.name)
@@ -151,34 +187,6 @@ class ApiAuditMode(FunctionMode):
                 "Resource:%s does not implement retrieval method" % (
                     self.policy.resource_type))
 
-    def run(self, event, context):
-        """Execute a gcp serverless model"""
-        from c7n.actions import EventAction
-
-        resources = self.resolve_resources(event)
-        if not resources:
-            return
-
-        resources = self.policy.resource_manager.filter_resources(
-            resources, event)
-
-        self.policy.log.info("Filtered resources %d" % len(resources))
-
-        if not resources:
-            return
-
-        self.policy.ctx.metrics.put_metric(
-            'ResourceCount', len(resources), 'Count', Scope="Policy",
-            buffer=False)
-
-        for action in self.policy.resource_manager.actions:
-            if isinstance(action, EventAction):
-                action.process(resources, event)
-            else:
-                action.process(resources)
-
-        return resources
-
 
 @execution.register('gcp-scc')
 class SecurityCenterMode(FunctionMode):
@@ -256,31 +264,3 @@ class SecurityCenterMode(FunctionMode):
             raise PolicyValidationError(
                 "Resource:%s is not supported by scc currently" % (
                     self.policy.resource_type))
-
-    def run(self, event, context):
-        """Execute a gcp serverless model"""
-        from c7n.actions import EventAction
-
-        resources = self.resolve_resources(event)
-        if not resources:
-            return
-
-        resources = self.policy.resource_manager.filter_resources(
-            resources, event)
-
-        self.policy.log.info("Filtered resources %d" % len(resources))
-
-        if not resources:
-            return
-
-        self.policy.ctx.metrics.put_metric(
-            'ResourceCount', len(resources), 'Count', Scope="Policy",
-            buffer=False)
-
-        for action in self.policy.resource_manager.actions:
-            if isinstance(action, EventAction):
-                action.process(resources, event)
-            else:
-                action.process(resources)
-
-        return resources

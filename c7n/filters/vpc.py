@@ -49,7 +49,7 @@ class SubnetFilter(MatchResourceValidator, RelatedResourceFilter):
 
     It also supports finding resources on public or private subnets
     via route table introspection to determine if the subnet is
-    associated to an internet gateway.
+    associated to an internet gateway or a nat gateway.
 
     :example:
 
@@ -60,9 +60,9 @@ class SubnetFilter(MatchResourceValidator, RelatedResourceFilter):
            resource: aws.ec2
            filters:
              - type: subnet
+               operator: or
                igw: True
-               key: SubnetId
-               value: present
+               nat: True
 
     """
 
@@ -71,15 +71,17 @@ class SubnetFilter(MatchResourceValidator, RelatedResourceFilter):
         **{'match-resource': {'type': 'boolean'},
            'operator': {'enum': ['and', 'or']},
            'igw': {'enum': [True, False]},
+           'nat': {'enum': [True, False]},
            })
 
     schema_alias = True
     RelatedResource = "c7n.resources.vpc.Subnet"
     AnnotationKey = "matched-subnets"
+    required_keys = set()
 
     def get_permissions(self):
         perms = super().get_permissions()
-        if self.data.get('igw') in (True, False):
+        if self.data.get('igw') in (True, False) or self.data.get('nat') in (True, False):
             perms += self.manager.get_resource_manager(
                 'aws.route-table').get_permissions()
         return perms
@@ -87,16 +89,26 @@ class SubnetFilter(MatchResourceValidator, RelatedResourceFilter):
     def validate(self):
         super().validate()
         self.check_igw = self.data.get('igw')
+        self.check_nat = self.data.get('nat')
 
     def match(self, related):
-        if self.check_igw in [True, False]:
-            if not self.match_igw(related):
-                return False
-        return super().match(related)
+        op = all if self.data.get('operator', 'and') == 'and' else any
+
+        # If the policy doesn't define value filter keys, implicitly
+        # pass and skip the value filter match.
+        value_match = {'key', 'value'}.difference(self.data) or super().match(related)
+
+        return op(
+            (
+                self.match_igw(related),
+                self.match_nat(related),
+                value_match,
+            )
+        )
 
     def process(self, resources, event=None):
         related = self.get_related(resources)
-        if self.check_igw in [True, False]:
+        if self.check_igw in [True, False] or self.check_nat in [True, False]:
             self.route_tables = self.get_route_tables()
         return [r for r in resources if self.process_resource(r, related)]
 
@@ -112,6 +124,8 @@ class SubnetFilter(MatchResourceValidator, RelatedResourceFilter):
         return route_tables
 
     def match_igw(self, subnet):
+        if self.check_igw is None:
+            return True
         rtable = self.route_tables.get(
             subnet['SubnetId'],
             self.route_tables.get(subnet['VpcId']))
@@ -126,6 +140,26 @@ class SubnetFilter(MatchResourceValidator, RelatedResourceFilter):
         if self.check_igw and found_igw:
             return True
         elif not self.check_igw and not found_igw:
+            return True
+        return False
+
+    def match_nat(self, subnet):
+        if self.check_nat is None:
+            return True
+        rtable = self.route_tables.get(
+            subnet['SubnetId'],
+            self.route_tables.get(subnet['VpcId']))
+        if rtable is None:
+            self.log.debug('route table for %s not found', subnet['SubnetId'])
+            return
+        found_nat = False
+        for route in rtable['Routes']:
+            if route.get('NatGatewayId'):
+                found_nat = True
+                break
+        if self.check_nat and found_nat:
+            return True
+        elif not self.check_nat and not found_nat:
             return True
         return False
 

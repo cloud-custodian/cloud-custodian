@@ -1,0 +1,18 @@
+{
+    "status_code": 200,
+    "data": {
+        "PaginationToken": "",
+        "ResourceTagMappingList": [
+            {
+                "ResourceARN": "arn:aws:wafv2:us-east-1:644160558196:global/webacl/global/42c63f12-89cb-436d-b705-0455935cbaf8",
+                "Tags": [
+                    {
+                        "Key": "centralized-logging",
+                        "Value": "true"
+                    }
+                ]
+            }
+        ],
+        "ResponseMetadata": {}
+    }
+}

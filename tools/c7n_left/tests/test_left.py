@@ -29,6 +29,7 @@ try:
     )
     from c7n_left.providers.terraform.graph import Resolver
     from c7n_left.providers.terraform.filters import Taggable
+    from c7n_left.providers.terraform.variables import VariableResolver
 
     LEFT_INSTALLED = True
 except ImportError:
@@ -111,8 +112,12 @@ class PolicyEnv:
         extant["policies"].append(policy)
         policy_file.write_text(json.dumps(extant))
 
-    def run(self, policy_dir=None, terraform_dir=None):
-        config = cli.get_config(terraform_dir or self.policy_dir, policy_dir or self.policy_dir)
+    def run(self, policy_dir=None, terraform_dir=None, terraform_workspace="default"):
+        config = cli.get_config(
+            directory=terraform_dir or self.policy_dir,
+            policy_dir=policy_dir or self.policy_dir,
+            terraform_workspace=terraform_workspace,
+        )
         policies = policy_core.load_policies(config.policy_dir, config)
         reporter = ResultsReporter()
         core.CollectionRunner(policies, config, reporter).run()
@@ -261,13 +266,11 @@ def test_resolver_refs_sans_tfmeta():
 
 
 def test_event_env(policy_env, test):
-    policy_env.write_tf(
-        """
+    policy_env.write_tf("""
 resource "aws_cloudwatch_log_group" "yada" {
   name = "Bar"
 }
-        """
-    )
+        """)
     policy_env.write_policy(
         {
             "name": "check-env",
@@ -287,16 +290,14 @@ resource "aws_cloudwatch_log_group" "yada" {
 
 
 def test_value_from_with_env_interpolate(policy_env, test):
-    policy_env.write_tf(
-        """
+    policy_env.write_tf("""
 resource "aws_cloudwatch_log_group" "yada" {
    name = "Bar"
 }
 resource "aws_cloudwatch_log_group" "bada" {
    name = "Baz"
 }
-        """
-    )
+        """)
     (policy_env.policy_dir / "exceptions").mkdir()
     exceptions_file = policy_env.policy_dir / "exceptions" / "exceptions.json"
     exceptions_file.write_text(
@@ -326,8 +327,7 @@ resource "aws_cloudwatch_log_group" "bada" {
 
 
 def test_data_policy(policy_env):
-    policy_env.write_tf(
-        """
+    policy_env.write_tf("""
 data "aws_ami" "ubuntu" {
   most_recent = true
 
@@ -338,8 +338,7 @@ data "aws_ami" "ubuntu" {
 
   owners = ["099720109477"] # Canonical
 }
-        """
-    )
+        """)
     policy_env.write_policy({"name": "check-data", "resource": "terraform.data.aws_ami"})
     results = policy_env.run()
     assert len(results) == 1
@@ -347,8 +346,7 @@ data "aws_ami" "ubuntu" {
 
 def test_block_types(policy_env):
     # module block type handled separately
-    policy_env.write_tf(
-        """
+    policy_env.write_tf("""
 locals {
    name = "Yada"
 }
@@ -373,8 +371,7 @@ variable "name" {
 output "news" {
   value = "https://lwn.net"
 }
-    """
-    )
+    """)
     policy_env.write_policy({"name": "check-blocks", "resource": "terraform.*"})
     results = policy_env.run()
     assert len(results) == 7
@@ -390,8 +387,7 @@ output "news" {
 
 
 def test_provider_augment_null(policy_env):
-    policy_env.write_tf(
-        """
+    policy_env.write_tf("""
 resource "aws_cloudwatch_log_group" "yada" {
   name = "Yada"
 }
@@ -401,8 +397,7 @@ provider "aws" {
    tags = null
  }
 }
-        """
-    )
+        """)
     policy_env.write_policy(
         {
             "name": "check-tags",
@@ -416,8 +411,7 @@ provider "aws" {
 
 
 def test_provider_tag_augment(policy_env):
-    policy_env.write_tf(
-        """
+    policy_env.write_tf("""
 resource "aws_cloudwatch_log_group" "yada" {
   name = "Yada"
 }
@@ -436,8 +430,7 @@ provider "google" {
   project     = "my-project-id"
   region      = "us-central1"
 }
-        """
-    )
+        """)
     policy_env.write_policy(
         {
             "name": "check-tags",
@@ -451,8 +444,7 @@ provider "google" {
 
 
 def test_value_tag_prefix(policy_env):
-    policy_env.write_tf(
-        """
+    policy_env.write_tf("""
 locals {
   name = "forum"
 }
@@ -471,8 +463,7 @@ resource "aws_cloudwatch_log_group" "test_group_2" {
     Env = "Dev"
   }
 }
-        """
-    )
+        """)
     policy_env.write_policy(
         {
             "name": "check-tags",
@@ -487,8 +478,7 @@ resource "aws_cloudwatch_log_group" "test_group_2" {
 
 
 def test_taggable(policy_env):
-    policy_env.write_tf(
-        """
+    policy_env.write_tf("""
 resource "aws_cloudwatch_log_group" "yada" {
   name = "Yada"
 }
@@ -496,8 +486,7 @@ resource "aws_cloudwatch_log_stream" "foo" {
   name           = "SampleLogStream1234"
   log_group_name = aws_cloudwatch_log_group.yada.name
 }
-        """
-    )
+        """)
     policy_env.write_policy(
         {"name": "check-tags", "resource": "terraform.*", "filters": ["taggable"]}
     )
@@ -509,8 +498,7 @@ resource "aws_cloudwatch_log_stream" "foo" {
 def test_module_unknown_variable(policy_env, test):
     mod_dir = policy_env.policy_dir / "module" / "logs"
     mod_dir.mkdir(parents=True)
-    (mod_dir / "main.tf").write_text(
-        """
+    (mod_dir / "main.tf").write_text("""
         variable env {
            type = string
            default = "Dev"
@@ -533,11 +521,9 @@ def test_module_unknown_variable(policy_env, test):
               Component = var.component
            }
         }
-        """
-    )
+        """)
     (policy_env.policy_dir / "vars.tfvars").write_text('component = "login"')
-    policy_env.write_tf(
-        """
+    policy_env.write_tf("""
         variable component {
             type = string
         }
@@ -553,8 +539,7 @@ def test_module_unknown_variable(policy_env, test):
           app = "authz"
           component = var.component
         }
-        """
-    )
+        """)
 
     conf = Config.empty(reporter=ResultsReporter(), var_files=["vars.tfvars"])
     test.change_cwd(policy_env.policy_dir)
@@ -566,8 +551,7 @@ def test_module_unknown_variable(policy_env, test):
 
 
 def test_graph_merge_unknown_variable_relative_path(policy_env, monkeypatch):
-    policy_env.write_tf(
-        """
+    policy_env.write_tf("""
         variable component {
            type = string
         }
@@ -583,8 +567,7 @@ def test_graph_merge_unknown_variable_relative_path(policy_env, monkeypatch):
               {"Component" = var.component}
            )
         }
-        """
-    )
+        """)
 
     monkeypatch.chdir(policy_env.policy_dir)
     graph = policy_env.get_graph(Path("."))
@@ -594,8 +577,7 @@ def test_graph_merge_unknown_variable_relative_path(policy_env, monkeypatch):
 
 
 def test_graph_merge_unknown_variable(policy_env):
-    policy_env.write_tf(
-        """
+    policy_env.write_tf("""
         variable component {
            type = string
         }
@@ -606,8 +588,7 @@ def test_graph_merge_unknown_variable(policy_env):
               {"Component" = var.component}
            )
         }
-        """
-    )
+        """)
 
     graph = policy_env.get_graph(policy_env.policy_dir)
     resource_types = list(graph.get_resources_by_type("aws_cloudwatch_log_group"))
@@ -616,8 +597,7 @@ def test_graph_merge_unknown_variable(policy_env):
 
 
 def test_graph_merge_function(policy_env):
-    policy_env.write_tf(
-        """
+    policy_env.write_tf("""
         variable component {
            type = string
            default = "application"
@@ -629,17 +609,20 @@ def test_graph_merge_function(policy_env):
               {"Component" = var.component}
            )
         }
-        """
-    )
+        """)
     graph = policy_env.get_graph(policy_env.policy_dir)
     resource_types = list(graph.get_resources_by_type("aws_cloudwatch_log_group"))
     log_group = resource_types.pop()[-1][0]
     assert log_group["tags"] == {"Env": "Public", "Component": "application"}
 
 
+def test_variable_type_default():
+    assert VariableResolver.get_type_default("xyz") == ""
+    assert VariableResolver.get_type_default("map of strings") == {}
+
+
 def test_null_tag_value(policy_env):
-    policy_env.write_tf(
-        """
+    policy_env.write_tf("""
         variable app_tags {
           type = map(string)
         }
@@ -648,8 +631,7 @@ def test_null_tag_value(policy_env):
           instance_type = "t4.medium"
           tags = var.app_tags
         }
-        """
-    )
+        """)
 
     policy_env.write_policy(
         {
@@ -664,8 +646,7 @@ def test_null_tag_value(policy_env):
 
 
 def test_traverse_to_data(policy_env):
-    policy_env.write_tf(
-        """
+    policy_env.write_tf("""
 data "aws_ami" "ubuntu" {
   most_recent = true
 
@@ -681,8 +662,7 @@ resource "aws_instance" "app" {
   ami           = data.aws_ami.ubuntu.id
   instance_type = "t3.micro"
 }
-        """
-    )
+        """)
     policy_env.write_policy(
         {
             "name": "check-image",
@@ -816,6 +796,54 @@ def test_traverse_multi_resource_nested_or(tmp_path):
     }
 
 
+def test_traverse_match_values(policy_env, test):
+    policy_env.write_tf("""
+resource "r" "r1" {
+  name = "r-r1"
+}
+
+resource "r" "r2" {
+  label = "r-r2"
+}
+
+resource "rr" "res" {
+  rn = [r.r1.name]
+  rl = [r.r2.label]
+}
+        """)
+    policy_env.write_policy(
+        {
+            "name": "test1",
+            "resource": "terraform.rr",
+            "filters": [
+                {
+                    "type": "traverse",
+                    "resources": "r",
+                    "attrs": [{"name": "r-r1"}],
+                }
+            ],
+        },
+    )
+    policy_env.write_policy(
+        {
+            "name": "test2",
+            "resource": "terraform.rr",
+            "filters": [
+                {
+                    "type": "traverse",
+                    "resources": "r",
+                    "attrs": [{"label": "r-r2"}],
+                }
+            ],
+        },
+    )
+    res1, res2 = (r.as_dict() for r in policy_env.run())
+    assert res1["policy"]["name"] == "test1"
+    assert res1["resource"]["__tfmeta"]["path"] == "rr.res"
+    assert res2["policy"]["name"] == "test2"
+    assert res2["resource"]["__tfmeta"]["path"] == "rr.res"
+
+
 def test_traverse_filter_not_found(tmp_path):
     resources = run_policy(
         {
@@ -902,14 +930,20 @@ def test_provider_parse():
         "line_start": 5,
         "line_end": 8,
         "src_dir": Path("tests") / "terraform" / "ec2_stop_protection_disabled",
+        "references": [
+            {
+                "id": ANY,
+                "label": "aws_vpc",
+                "name": "example",
+            }
+        ],
     }
 
 
 @pytest.fixture
 def var_tf_setup(tmp_path):
     (tmp_path / "tf").mkdir()
-    (tmp_path / "tf" / "main.tf").write_text(
-        """
+    (tmp_path / "tf" / "main.tf").write_text("""
 variable balancer_type {
   type = string
   default = "application"
@@ -921,8 +955,7 @@ resource "aws_alb" "positive1" {
   load_balancer_type = var.balancer_type
   subnets            = aws_subnet.public.*.id
 }
-        """
-    )
+        """)
 
 
 #
@@ -995,13 +1028,11 @@ def test_graph_var_file(tmp_path, var_tf_setup):
 
 
 def test_cli_execution_error(policy_env, test, debug_cli_runner):
-    policy_env.write_tf(
-        """
+    policy_env.write_tf("""
         resource "aws_cloudwatch_log_group" "yada" {
           name = "Bar"
         }
-        """
-    )
+        """)
 
     policy_env.write_policy(
         {
@@ -1010,7 +1041,7 @@ def test_cli_execution_error(policy_env, test, debug_cli_runner):
         }
     )
 
-    runner = debug_cli_runner
+    runner = CliRunner()
     with patch.object(core.CollectionRunner, "run_policy", side_effect=KeyError("abc")):
         result = runner.invoke(
             cli.cli, ["run", "-p", policy_env.policy_dir, "-d", policy_env.policy_dir]
@@ -1023,8 +1054,7 @@ def test_cli_dump(policy_env, test, debug_cli_runner):
     (policy_env.policy_dir / "vars2.tfvars").write_text('env = "dev"')
     test.change_environment(TF_VAR_REPO="cloud-custodian/cloud-custodian")
 
-    policy_env.write_tf(
-        """
+    policy_env.write_tf("""
         variable "app" {
           type = string
         }
@@ -1041,9 +1071,8 @@ def test_cli_dump(policy_env, test, debug_cli_runner):
             Owner = var.owner
           }
         }
-        """
-    )
-    runner = debug_cli_runner
+        """)
+    runner = CliRunner()
     result = runner.invoke(
         cli.cli,
         [
@@ -1069,6 +1098,97 @@ def test_cli_dump(policy_env, test, debug_cli_runner):
     }
 
 
+def test_cli_dump_bad_tf_silent(policy_env, test, debug_cli_runner):
+    (policy_env.policy_dir / "vars.tfvars").write_text('app = "riddle"')
+    (policy_env.policy_dir / "vars2.tfvars").write_text('env = "dev"')
+    test.change_environment(TF_VAR_REPO="cloud-custodian/cloud-custodian")
+
+    policy_env.write_tf("""
+        # A wild Error appeared!
+        vriable "app" {
+          type = string
+        }
+        variable "env" {
+          type = string
+        }
+        variable "owner" {
+          type = string
+          default = "engineering"
+        }
+        resource "aws_cloudwatch_log_group" "yada" {
+          name = "${var.app}-${var.env}-logs"
+          tags = {
+            Owner = var.owner
+          }
+        }
+        """)
+    runner = CliRunner()
+    result = runner.invoke(
+        cli.cli,
+        [
+            "dump",
+            "-d",
+            str(policy_env.policy_dir),
+            "--var-file",
+            policy_env.policy_dir / "vars.tfvars",
+            "--output-query",
+            "input_vars",
+            # "--var-file",
+            # policy_env.policy_dir / "vars2.tfvars",
+            "--output-file",
+            str(policy_env.policy_dir / "output.json"),
+        ],
+    )
+    # Ensure the existing "quietly pass on HCL errors" behavior is the default.
+    assert result.exit_code == 0
+
+
+def test_cli_dump_bad_tf_error(policy_env, test, debug_cli_runner):
+    (policy_env.policy_dir / "vars.tfvars").write_text('app = "riddle"')
+    (policy_env.policy_dir / "vars2.tfvars").write_text('env = "dev"')
+    test.change_environment(TF_VAR_REPO="cloud-custodian/cloud-custodian")
+
+    policy_env.write_tf("""
+        # A wild Error appeared!
+        vriable "app" {
+          type = string
+        }
+        variable "env" {
+          type = string
+        }
+        variable "owner" {
+          type = string
+          default = "engineering"
+        }
+        resource "aws_cloudwatch_log_group" "yada" {
+          name = "${var.app}-${var.env}-logs"
+          tags = {
+            Owner = var.owner
+          }
+        }
+        """)
+    runner = CliRunner()
+    result = runner.invoke(
+        cli.cli,
+        [
+            "dump",
+            "-d",
+            str(policy_env.policy_dir),
+            "--var-file",
+            policy_env.policy_dir / "vars.tfvars",
+            "--output-query",
+            "input_vars",
+            # "--var-file",
+            # policy_env.policy_dir / "vars2.tfvars",
+            "--output-file",
+            str(policy_env.policy_dir / "output.json"),
+            "--err-invalid",
+        ],
+    )
+    # We now strictly check for TF errors, & bomb out if they're present.
+    assert result.exit_code == 1
+
+
 def test_cli_var_file(tmp_path, var_tf_setup, debug_cli_runner):
     (tmp_path / "tf" / "vars.tfvars").write_text('balancer_type = "network"')
     (tmp_path / "policy.json").write_text(
@@ -1084,7 +1204,8 @@ def test_cli_var_file(tmp_path, var_tf_setup, debug_cli_runner):
             }
         )
     )
-    result = debug_cli_runner.invoke(
+    runner = CliRunner()
+    result = runner.invoke(
         cli.cli,
         [
             "run",
@@ -1107,16 +1228,13 @@ def test_cli_var_file(tmp_path, var_tf_setup, debug_cli_runner):
 
 
 def test_multi_provider_resource_glob_policy(tmp_path, debug_cli_runner):
-    (tmp_path / "policy.yaml").write_text(
-        """
+    (tmp_path / "policy.yaml").write_text("""
         policies:
           - name: check-multi-provider
             resource: "terraform.*"
-        """
-    )
+        """)
     (tmp_path / "tf").mkdir()
-    (tmp_path / "tf" / "main.tf").write_text(
-        """
+    (tmp_path / "tf" / "main.tf").write_text("""
 terraform {
   required_providers {
     oci = {
@@ -1137,10 +1255,10 @@ resource "aws_cloudwatch_log_group" "yada" {
 resource "google_storage_bucket" "static-site" {
   name     = "image-store.com"
   location = "EU"
-}        """
-    )
+}        """)
 
-    result = debug_cli_runner.invoke(
+    runner = CliRunner()
+    result = runner.invoke(
         cli.cli,
         [
             "run",
@@ -1176,8 +1294,7 @@ def test_multi_resource_list_policy(tmp_path):
 
     (tmp_path / "tf").mkdir()
 
-    (tmp_path / "tf" / "main.tf").write_text(
-        """
+    (tmp_path / "tf" / "main.tf").write_text("""
 resource "aws_alb" "positive1" {
   name               = "test-lb-tf"
   internal           = false
@@ -1191,8 +1308,7 @@ resource "aws_lb" "positive3" {
   load_balancer_type = "network"
   subnets            = aws_subnet.public.*.id
 }
-        """
-    )
+        """)
     runner = CliRunner()
     result = runner.invoke(
         cli.cli,
@@ -1322,7 +1438,7 @@ def test_cli_validate_schema_error(tmp_path, caplog):
     runner = CliRunner()
     result = runner.invoke(cli.cli, ["validate", "-p", str(tmp_path)])
     assert result.exit_code == 1
-    caplog.record_tuples[0] == ('c7n.iac', 40, 'Validation failed with 1 errors')
+    caplog.record_tuples[0] == ("c7n.iac", 40, "Validation failed with 1 errors")
     assert "is not valid under any of the given schemas" in caplog.record_tuples[2][-1]
 
 
@@ -1344,8 +1460,7 @@ def test_cli_validate_prechecks(tmp_path, caplog):
 
 
 def test_cli_junit_output(policy_env, tmp_path, debug_cli_runner):
-    policy_env.write_tf(
-        """
+    policy_env.write_tf("""
 resource "aws_cloudwatch_log_group" "yada" {
   name = "Bar"
 }
@@ -1358,8 +1473,7 @@ resource "aws_cloudwatch_log_group" "april" {
         Env = "Dev"
   }
 }
-        """
-    )
+        """)
     policy_env.write_policy(
         {
             "name": "tag-required",
@@ -1410,13 +1524,11 @@ resource "aws_cloudwatch_log_group" "april" {
     reason="runs in github actions as it requires network access for schema validation",
 )
 def test_cli_gitlab_sast_output(policy_env, tmp_path, debug_cli_runner):
-    policy_env.write_tf(
-        """
+    policy_env.write_tf("""
 resource "aws_cloudwatch_log_group" "yada" {
   name = "Bar"
 }
-        """
-    )
+        """)
     policy_env.write_policy(
         {
             "name": "tag-required",
@@ -1426,7 +1538,7 @@ resource "aws_cloudwatch_log_group" "yada" {
             "filters": [{"tags": "absent"}],
         }
     )
-    runner = debug_cli_runner  # CliRunner()
+    runner = CliRunner()
     result = runner.invoke(
         cli.cli,
         [
@@ -1495,8 +1607,7 @@ def test_cli_output_rich(tmp_path):
 
 
 def test_cli_output_rich_pass_count(tmp_path, debug_cli_runner):
-    (tmp_path / "policy.yaml").write_text(
-        """
+    (tmp_path / "policy.yaml").write_text("""
         policies:
           - name: aws-rds-require-encryption
             resource: [ terraform.aws_db_instance, terraform.aws_rds_cluster ]
@@ -1511,11 +1622,9 @@ def test_cli_output_rich_pass_count(tmp_path, debug_cli_runner):
               - or:
                 - storage_encrypted: absent
                 - storage_encrypted: false
-        """
-    )
+        """)
     (tmp_path / "tfroot").mkdir()
-    (tmp_path / "tfroot" / "main.tf").write_text(
-        """
+    (tmp_path / "tfroot" / "main.tf").write_text("""
 resource "aws_db_instance" "default" {
   allocated_storage           = 10
   db_name                     = "mydb"
@@ -1547,8 +1656,7 @@ resource "aws_rds_cluster" "postgresql" {
   #storage_encrypted = true
   # kms_key_id = "1234abcd-12ab-34cd-56ef-1234567890ab"
 }
- """
-    )
+ """)
 
     runner = CliRunner()
     result = runner.invoke(
@@ -1862,7 +1970,7 @@ def test_selection_parse(policy_env):
 def test_selection_resource_filter(policy_env):
     selection = policy_env.get_selection("type=aws_vpc id=example")
     graph = policy_env.get_graph(terraform_dir / "vpc_flow_logs")
-    (rtype, resources) = list(graph.get_resources_by_type("aws_flow_log"))[0]
+    rtype, resources = list(graph.get_resources_by_type("aws_flow_log"))[0]
     assert selection.filter_resources(rtype, resources) == []
 
     for rtype, resources in graph.get_resources_by_type():
@@ -1943,3 +2051,263 @@ def test_selection_policy_filter(policy_env):
 
     selection = policy_env.get_selection("policy=test-a")
     assert {p.name for p in selection.filter_policies(policies)} == {"test-a"}
+
+
+def test_workspace(policy_env):
+    policy_env.write_tf("""
+locals {
+  map = {
+    default = "name-1"
+    other   = "name-2"
+  }
+}
+
+resource "res" "test_res" {
+  name = local.map[terraform.workspace]
+}
+        """)
+    policy_env.write_policy(
+        {
+            "name": "test-a",
+            "resource": "terraform.res",
+            "filters": [{"name": "name-1"}],
+        }
+    )
+    policy_env.write_policy(
+        {
+            "name": "test-b",
+            "resource": "terraform.res",
+            "filters": [{"name": "name-2"}],
+        }
+    )
+    [result] = policy_env.run(terraform_workspace="default")
+    assert result.resource["name"] == "name-1"
+    [result] = policy_env.run(terraform_workspace="other")
+    assert result.resource["name"] == "name-2"
+
+
+def test_from_json_filter(policy_env):
+    policy_env.write_policy(
+        {
+            "name": "ecs-task-definition-with-plaintext-password-string",
+            "resource": "terraform.aws_ecs_task_definition",
+            "filters": [
+                {
+                    "type": "value",
+                    "key": "container_definitions",
+                    "op": "regex",
+                    "value": "(?:.|\n)*(password|secret|token|key)",
+                }
+            ],
+        },
+    )
+    policy_env.write_policy(
+        {
+            "name": "ecs-task-definition-with-plaintext-password-from-json",
+            "resource": "terraform.aws_ecs_task_definition",
+            "filters": [
+                {
+                    "type": "list-item",
+                    "key": "from_json(container_definitions)[].environment[]",
+                    "attrs": [
+                        {
+                            "type": "value",
+                            "key": "name",
+                            "op": "regex",
+                            "value": "(?:.|\n)*(password|secret|token|key)",
+                        },
+                    ],
+                }
+            ],
+        },
+    )
+
+    policy_env.write_tf("""
+data "aws_iam_policy_document" "ecs_assume_role_policy" {
+  statement {
+    actions = ["sts:AssumeRole"]
+    principals {
+      type = "Service"
+      identifiers = [
+        "ecs-tasks.amazonaws.com",
+      ]
+    }
+  }
+}
+resource "aws_secretsmanager_secret" "test_secret" {
+  name                    = "/custodian/test/secret"
+  description             = "The Secret key used to sign and verify JWTs"
+  recovery_window_in_days = 0
+}
+
+locals {
+  secrets = [
+    {
+      valueFrom = aws_secretsmanager_secret.test_secret.arn
+      Name      = "TEST_API_SECRET"
+    }
+  ]
+
+  cubejs_api_container_definition = [
+    {
+      name      = "api"
+      image     = "public.ecr.aws/docker/library/busybox:stable"
+      essential = true
+      portMappings = [
+        {
+          protocol      = "tcp"
+          containerPort = 4000
+          hostPort      = 4000
+        }
+      ]
+      secrets = local.secrets
+      environment = [
+        {
+          name  = "JWT_SECRET"
+          value = "CloudCustodian123!"
+        },
+        {
+          name  = "JWK_ALGS"
+          value = "RS256"
+        },
+      ]
+    }
+  ]
+}
+
+resource "aws_iam_role" "ecs_execution_role" {
+  name                  = "test-execution-role"
+  assume_role_policy    = data.aws_iam_policy_document.ecs_assume_role_policy.json
+  force_detach_policies = true
+}
+
+resource "aws_iam_role" "ecs_task_role" {
+  name                  = "test-exec-role"
+  assume_role_policy    = data.aws_iam_policy_document.ecs_assume_role_policy.json
+  force_detach_policies = true
+}
+
+resource "aws_ecs_task_definition" "test_task_def" {
+  family = "test_task_def"
+
+  requires_compatibilities = ["FARGATE"]
+  network_mode             = "awsvpc"
+  cpu                      = 1
+  memory                   = 512
+  execution_role_arn       = aws_iam_role.ecs_execution_role.arn
+  task_role_arn            = aws_iam_role.ecs_task_role.arn
+
+  container_definitions = jsonencode(local.cubejs_api_container_definition)
+
+  lifecycle {
+    ignore_changes = [
+      tags
+    ]
+  }
+}
+    """)
+    results = policy_env.run()
+    assert results[0].resource["c7n:MatchedFilters"] == ["container_definitions"]
+    assert results[1].resource["c7n:MatchedFilters"] == ["container_definitions"]
+
+
+@pytest.mark.xfail(reason="https://github.com/cloud-custodian/cloud-custodian/issues/9709")
+def test_traverse_list_members(tmp_path):
+    resources = run_policy(
+        {
+            "name": "launch-template-ami-owner",
+            "resource": "terraform.aws_launch_template",
+            "filters": [
+                {
+                    "type": "traverse",
+                    "resources": "data.aws_ami_ids",
+                    "attrs": [
+                        {
+                            "type": "value",
+                            "key": "owners",
+                            "value": "amazon",
+                            "op": "contains",
+                        }
+                    ],
+                }
+            ],
+        },
+        terraform_dir / "traverse_list_members",
+        tmp_path,
+    )
+    assert len(resources) == 2
+    assert {r.resource.name for r in resources} == {
+        "aws_launch_template.bare_list_reference",
+        "aws_launch_template.parenthesized_list_reference",
+    }
+
+
+def test_traverse_multiple_references(tmp_path):
+
+    resources = run_policy(
+        {
+            "name": "azurerm-storage-account-private-endpoint",
+            "resource": ["terraform.azurerm_storage_account"],
+            "filters": [
+                {
+                    "type": "traverse",
+                    "resources": ["azurerm_private_endpoint"],
+                }
+            ],
+        },
+        terraform_dir / "traverse_multiple_references",
+        tmp_path,
+    )
+    assert len(resources) == 2
+
+
+def test_merge_null_elements(tmp_path):
+
+    resources = run_policy(
+        {
+            "name": "aws-tags",
+            "resource": ["terraform.aws_*"],
+            "filters": ["taggable", {"tag:Environment": "absent"}],
+        },
+        terraform_dir / "merge_null_elements",
+        tmp_path,
+    )
+    assert len(resources) == 1
+    assert {r.resource.name for r in resources} == {
+        "aws_instance.untagged",
+    }
+
+
+def test_merge_locals_with_apply_time_values(tmp_path):
+
+    resources = run_policy(
+        {
+            "name": "aws-tags-using-locals",
+            "resource": ["terraform.aws_*"],
+            "filters": ["taggable", {"tag:Environment": "absent"}],
+        },
+        terraform_dir / "merge_locals_with_apply_time_values",
+        tmp_path,
+    )
+    assert len(resources) == 1
+    assert {r.resource.name for r in resources} == {
+        "aws_db_parameter_group.untagged",
+    }
+
+
+def test_attribute_value_presence(tmp_path):
+
+    resources = run_policy(
+        {
+            "name": "aws-role-permission-boundary-specified",
+            "resource": ["terraform.aws_iam_role"],
+            "filters": [{"permissions_boundary": "present"}],
+        },
+        terraform_dir / "attribute_value_presence",
+        tmp_path,
+    )
+    assert len(resources) == 2
+    assert {r.resource.name for r in resources} == {
+        "aws_iam_role.attribute_with_direct_reference",
+        "aws_iam_role.attribute_with_interpolated_reference",
+    }

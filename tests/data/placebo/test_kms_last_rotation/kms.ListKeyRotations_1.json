@@ -1,0 +1,19 @@
+{
+  "status_code": 200,
+  "data": {
+    "ResponseMetadata": {},
+    "Rotations": [
+        {
+            "KeyId": "7179c356-0a8f-465d-897a-0d95391ad50b",
+            "KeyMaterialId": "58AB6C9B-99F7-4F4C-B116-5B7C445BED99",
+            "KeyMaterialDescription": "A description here",
+            "KeyMaterialState": "CURRENT",
+            "ExpirationModel": "KEY_MATERIAL_DOES_NOT_EXPIRE",
+            "RotationDate": "1753908757",
+            "RotationType": "ON_DEMAND"
+        }
+    ],
+    "Truncated": false,
+    "NextToken": ""
+  }
+}

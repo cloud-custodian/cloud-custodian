@@ -1,0 +1,87 @@
+{
+    "status_code": 200,
+    "data": {
+        "ResponseMetadata": {},
+        "cluster": {
+            "name": "seriously-dangerous-rabbit",
+            "arn": "arn:aws:eks:us-east-1:644160558196:cluster/seriously-dangerous-rabbit",
+            "createdAt": {
+                "__class__": "datetime",
+                "year": 2026,
+                "month": 3,
+                "day": 30,
+                "hour": 12,
+                "minute": 14,
+                "second": 36,
+                "microsecond": 670000
+            },
+            "version": "1.35",
+            "endpoint": "https://726A42B0820A9FF10EB8E3A2D2F68D72.gr7.us-east-1.eks.amazonaws.com",
+            "roleArn": "arn:aws:iam::644160558196:role/eksctl-app-dev-cluster-ServiceRole-JkmhsR0OCIQ1",
+            "resourcesVpcConfig": {
+                "subnetIds": [
+                    "subnet-0867db2dcb1462488",
+                    "subnet-0ba582f1e2af5d98a",
+                    "subnet-03f1645fc355b8886"
+                ],
+                "securityGroupIds": [],
+                "clusterSecurityGroupId": "sg-00ffcad35cb685971",
+                "vpcId": "vpc-029654b93830acd5a",
+                "endpointPublicAccess": true,
+                "endpointPrivateAccess": true,
+                "publicAccessCidrs": [
+                    "0.0.0.0/0"
+                ]
+            },
+            "kubernetesNetworkConfig": {
+                "serviceIpv4Cidr": "10.100.0.0/16",
+                "ipFamily": "ipv4",
+                "elasticLoadBalancing": {
+                    "enabled": false
+                }
+            },
+            "logging": {
+                "clusterLogging": [
+                    {
+                        "types": [
+                            "api",
+                            "audit",
+                            "authenticator",
+                            "controllerManager",
+                            "scheduler"
+                        ],
+                        "enabled": true
+                    }
+                ]
+            },
+            "identity": {
+                "oidc": {
+                    "issuer": "https://oidc.eks.us-east-1.amazonaws.com/id/726A42B0820A9FF10EB8E3A2D2F68D72"
+                }
+            },
+            "status": "ACTIVE",
+            "certificateAuthority": {
+                "data": "LS0tLS1CRUdJTiBDRVJUSUZJQ0FURS0tLS0tCk1JSURCVENDQWUyZ0F3SUJBZ0lJWjFaWTNHdG1GYzB3RFFZSktvWklodmNOQVFFTEJRQXdGVEVUTUJFR0ExVUUKQXhNS2EzVmlaWEp1WlhSbGN6QWVGdzB5TmpBek16QXhOakUyTWpWYUZ3MHpOakF6TWpjeE5qSXhNalZhTUJVeApFekFSQmdOVkJBTVRDbXQxWW1WeWJtVjBaWE13Z2dFaU1BMEdDU3FHU0liM0RRRUJBUVVBQTRJQkR3QXdnZ0VLCkFvSUJBUUMxRkxJVndXZlhhNmc3bVFxQS9UbGtRekpRMEVlaDlWMUttemtPcnNyV1hudWdBTTA5YWNVZW9pb3MKZ0V4Wis2cTlwdGhNUFBtSDl4UThVVCt4MW1veitaR2FBQzBOSkR1UjF1L1VLcGJmY3h5VVZpQTdYTWpUOVdLNQpiaGVqR3NaTmwvUmxIV1pzaHVadkNuZHF2YlVadHRlWFZ5S2xkU1ZHbWQwZUxJVlNScCtIeXZIaGRHYjl4cUtJCkNCRVRscFBMSGNZeW0zaXMyY1hMd3NGNHdadUc3QkYreitZcUtHaEJHWmpvcUZ5MERCYmNuV1R1WXBDU2RtT1AKbjU2bU02enlVbU9YNzNLaVVNdjUvckl3V1hEeERLb2F2cXNRM0lIWWM1NE55Nk4rOE1CNytYUXpUZTNjelF4NApIS09ITW4waS9ZNFcwb0Nkc3U2VG1ZUkRPdUlqQWdNQkFBR2pXVEJYTUE0R0ExVWREd0VCL3dRRUF3SUNwREFQCkJnTlZIUk1CQWY4RUJUQURBUUgvTUIwR0ExVWREZ1FXQkJRV2twMXNoOExDaWtKS3pVSVNDRjRSVVdmODNEQVYKQmdOVkhSRUVEakFNZ2dwcmRXSmxjbTVsZEdWek1BMEdDU3FHU0liM0RRRUJDd1VBQTRJQkFRQkpCbTJCNjFKawpDY2NNYVF0djB2cnpXRFZ3ejZONk5BY29LRUhIQ25JaTNnbkNtcG5SdkJjV2d1RHQ4M3lINUh1RzFMeTdGODZGCm5HTGsxeVplNzlSK1NIbFFrMFF0ZG1CMjZkb1l2YWpvbWg2U2NKN2pIa3NveXdRUDNHQzI5cll2eW5oQUpOQXAKSEF1M1VPRkdJNms0NWtoYlFPVWZjcFc5eFNFaEhQeGlpclI5YkRHMkxlV1lNREV3SXZ5ZDdpa0lFN2lHMjlHVwpLbC9WV081ODA3UjVpZExFaUJ2Z2k1Rlo0cnIyVUJMT3N5Q2JhY0xUOC96ckVHMGJ0V1VxYmRjMW1jNzRZR3Z0CmJlY2tVRk00UXZvYlYxN3QwTk93QUh0aHJXNkNhM0wvcGFmUUVqeXlEejJQRkxOaFRPMU1XMlZFYUlBc1VlS3oKQkl3TXZieGtkR081Ci0tLS0tRU5EIENFUlRJRklDQVRFLS0tLS0K"
+            },
+            "platformVersion": "eks.8",
+            "tags": {
+                "App": "SalesEngineering",
+                "Env": "Dev",
+                "Owner": "kapil@stacklet.io"
+            },
+            "accessConfig": {
+                "authenticationMode": "API"
+            },
+            "upgradePolicy": {
+                "supportType": "STANDARD"
+            },
+            "zonalShiftConfig": {
+                "enabled": false
+            },
+            "deletionProtection": false,
+            "controlPlaneScalingConfig": {
+                "tier": "standard"
+            }
+        }
+    }
+}

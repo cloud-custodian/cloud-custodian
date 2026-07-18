@@ -1,0 +1,28 @@
+{
+    "status_code": 200,
+    "data": {
+        "ResponseMetadata": {},
+        "Status": 200,
+        "UserList": [
+            {
+                "Arn": "arn:aws:quicksight:us-east-1:644160558196:user/default/matt@capitalone.com",
+                "UserName": "matt@capitalone.com",
+                "Email": "matthew.heidelbaugh@capitalone.com",
+                "Role": "ADMIN",
+                "IdentityType": "IAM",
+                "Active": true,
+                "PrincipalId": "federated/iam/AIDAZL6XWCR2MLDRO6EIG"
+            },
+            {
+                "Arn": "arn:aws:quicksight:us-east-1:644160558196:user/default/Jerry",
+                "UserName": "Jerry",
+                "Email": "policyfoundry@capitalone.com",
+                "Role": "READER",
+                "IdentityType": "IAM",
+                "Active": true,
+                "PrincipalId": "federated/iam/AIDAZL6XWCR2GMVVY4IYC"
+            }
+        ],
+        "RequestId": "f572532c-0097-4aa7-976b-38fe0ad7590d"
+    }
+}

@@ -1,0 +1,17 @@
+{
+  "status_code": 200,
+  "data": {
+    "AccountIds": ["xxxxxxxxxxxx", "all"],
+    "AccountSharingInfoList": [
+      {
+        "AccountId": "xxxxxxxxxxxx",
+        "SharedDocumentVersion": "$DEFAULT"
+      },
+      {
+        "AccountId": "all",
+        "SharedDocumentVersion": "$DEFAULT"
+      }
+    ],
+    "ResponseMetadata": {}
+  }
+}

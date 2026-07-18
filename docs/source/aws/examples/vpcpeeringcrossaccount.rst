@@ -91,7 +91,7 @@ Using both policies allows you to check both new and existing peering connection
         and Requester account numbers are both internally owned accounts.
         If a connection is going to/from an external AWS account then the
         cloud and security teams are notified of the violating peering connection.
-     filters:
+      filters:
         - or:
             - type: value
               key: "RequesterVpcInfo.OwnerId"

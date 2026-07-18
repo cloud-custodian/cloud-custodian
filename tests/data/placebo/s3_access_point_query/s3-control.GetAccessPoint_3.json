@@ -1,0 +1,12 @@
+{
+    "status_code": 404,
+    "data": {
+        "Error": {
+            "Message": "The specified accesspoint does not exist",
+            "Code": "NoSuchAccessPoint",
+            "AccessPointName": "c7n-ap-rapid-serval"
+        },
+        "HostId": "eahKiAtgaGFSSeno4Kd3MMzCepIXmSCL5yWOS//5sL1HIu81nXVHbMUx3kgX3z1pBRgIC/aCE70=",
+        "ResponseMetadata": {}
+    }
+}

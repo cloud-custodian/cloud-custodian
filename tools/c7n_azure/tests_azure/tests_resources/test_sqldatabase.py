@@ -1,12 +1,18 @@
 # Copyright The Cloud Custodian Authors.
 # SPDX-License-Identifier: Apache-2.0
-from azure.mgmt.sql.models import DatabaseUpdate, Sku, BackupShortTermRetentionPolicy
+from azure.mgmt.sql.models import (
+    DatabaseUpdate,
+    Sku,
+    BackupShortTermRetentionPolicy,
+)
 from ..azure_common import BaseTest, arm_template, cassette_name, requires_arm_polling
 from c7n_azure.resources.sqldatabase import (
-    BackupRetentionPolicyHelper, ShortTermBackupRetentionPolicyAction)
+    BackupRetentionPolicyHelper,
+    ShortTermBackupRetentionPolicyAction,
+)
 from c7n_azure.session import Session
 from c7n_azure.utils import ResourceIdParser
-from mock import patch
+from unittest.mock import patch
 
 from c7n.exceptions import PolicyValidationError
 from c7n.utils import local_session
@@ -448,7 +454,7 @@ class LongTermBackupRetentionPolicyActionTest(BaseTest):
     def setUpClass(cls, *args, **kwargs):
         super(LongTermBackupRetentionPolicyActionTest, cls).setUpClass(*args, **kwargs)
         cls.client = local_session(Session).client('azure.mgmt.sql.SqlManagementClient') \
-            .backup_long_term_retention_policies
+            .long_term_retention_policies
 
     def tearDown(self, *args, **kwargs):
         default_long_term_policy = {

@@ -1,0 +1,42 @@
+{
+    "status_code": 200,
+    "data": {
+        "ResponseMetadata": {},
+        "resourceShares": [
+            {
+                "resourceShareArn": "arn:aws:ram:us-east-1:644160558196:resource-share/a4c9e71b-bb81-4974-8d89-8b0c293ad0d7",
+                "name": "c7n-test-self",
+                "owningAccountId": "644160558196",
+                "allowExternalPrincipals": true,
+                "status": "ACTIVE",
+                "tags": [
+                    {
+                        "key": "test-key",
+                        "value": "test-value"
+                    }
+                ],
+                "creationTime": {
+                    "__class__": "datetime",
+                    "year": 2025,
+                    "month": 3,
+                    "day": 19,
+                    "hour": 10,
+                    "minute": 50,
+                    "second": 13,
+                    "microsecond": 859000
+                },
+                "lastUpdatedTime": {
+                    "__class__": "datetime",
+                    "year": 2025,
+                    "month": 3,
+                    "day": 19,
+                    "hour": 10,
+                    "minute": 50,
+                    "second": 13,
+                    "microsecond": 859000
+                },
+                "featureSet": "STANDARD"
+            }
+        ]
+    }
+}

@@ -16,6 +16,31 @@ class RunServiceTest(BaseTest):
         assert len(resources) == 1
         assert resources[0]["metadata"]["name"] == "hello"
 
+    def test_set_labels(self):
+        project_id = 'cloud-custodian'
+        factory = self.replay_flight_data(
+            "gcp-cloud-run-service-set-labels", project_id=project_id
+        )
+        p = self.load_policy(
+            {
+                'name': 'cloud-run-svc-set-labels',
+                'resource': 'gcp.cloud-run-service',
+                'filters': [
+                    {'type': 'value',
+                     'key': 'metadata.name',
+                     'value': 'hello'}
+                ],
+                'actions': [
+                    {'type': 'set-labels',
+                     'labels': {'environment': 'test'}}
+                ]
+            },
+            session_factory=factory,
+        )
+        resources = p.run()
+        assert len(resources) == 1
+        assert resources[0]['metadata']['name'] == 'hello'
+
     def test_filter(self):
 
         factory = self.replay_flight_data("gcp-cloud-run-service")
@@ -34,7 +59,7 @@ class RunServiceTest(BaseTest):
         assert len(resources) == 1
 
     def test_cloudrun_filter_iam_query(self):
-        project_id = 'cloud-custodian'
+        project_id = self.project_id
         factory = self.replay_flight_data('gcp-cloud-run-service-filter-iam', project_id=project_id)
         p = self.load_policy({
             'name': 'gcp-cloud-run-service-filter-iam',
@@ -66,6 +91,31 @@ class JobServiceTest(BaseTest):
         assert len(resources) == 1
         assert resources[0]["metadata"]["name"] == "job"
 
+    def test_set_labels(self):
+        project_id = 'cloud-custodian'
+        factory = self.replay_flight_data(
+            "gcp-cloud-run-job-set-labels", project_id=project_id
+        )
+        p = self.load_policy(
+            {
+                'name': 'cloud-run-job-set-labels',
+                'resource': 'gcp.cloud-run-job',
+                'filters': [
+                    {'type': 'value',
+                     'key': 'metadata.name',
+                     'value': 'job'}
+                ],
+                'actions': [
+                    {'type': 'set-labels',
+                     'labels': {'environment': 'test'}}
+                ]
+            },
+            session_factory=factory,
+        )
+        resources = p.run()
+        assert len(resources) == 1
+        assert resources[0]['metadata']['name'] == 'job'
+
 
 class RevisionServiceTest(BaseTest):
     def test_query(self):
@@ -77,3 +127,86 @@ class RevisionServiceTest(BaseTest):
         resources = p.run()
         self.assertEqual(len(resources), 1)
         self.assertEqual(resources[0]['metadata']['name'], 'hello-00001-nvq')
+
+    def test_get_metric_resource_name_revision_name(self):
+        """Test extraction of revision name for metrics filtering"""
+        from c7n_gcp.resources.cloudrun import CloudRunRevision
+
+        sample_resource = {
+            'metadata': {
+                'name': 'myservice-00015-kkr',
+                'namespace': '123456789',
+                'labels': {
+                    'serving.knative.dev/service': 'myservice',
+                    'cloud.googleapis.com/location': 'us-central1'
+                }
+            }
+        }
+
+        result = CloudRunRevision.resource_type.get_metric_resource_name(
+            sample_resource,
+            metric_key='resource.labels.revision_name'
+        )
+        self.assertEqual(result, 'myservice-00015-kkr')
+        self.assertIsNotNone(result)
+
+    def test_get_metric_resource_name_service_name(self):
+        """Test extraction of service name for metrics filtering"""
+        from c7n_gcp.resources.cloudrun import CloudRunRevision
+
+        sample_resource = {
+            'metadata': {
+                'name': 'myservice-00015-kkr',
+                'namespace': '123456789',
+                'labels': {
+                    'serving.knative.dev/service': 'myservice',
+                    'cloud.googleapis.com/location': 'us-central1'
+                }
+            }
+        }
+
+        result = CloudRunRevision.resource_type.get_metric_resource_name(
+            sample_resource,
+            metric_key='resource.labels.service_name'
+        )
+        self.assertEqual(result, 'myservice')
+        self.assertIsNotNone(result)
+
+    def test_get_metric_resource_name_default(self):
+        """Test default behavior (returns revision name)"""
+        from c7n_gcp.resources.cloudrun import CloudRunRevision
+
+        sample_resource = {
+            'metadata': {
+                'name': 'myservice-00015-kkr',
+                'namespace': '123456789',
+                'labels': {
+                    'serving.knative.dev/service': 'myservice'
+                }
+            }
+        }
+
+        result = CloudRunRevision.resource_type.get_metric_resource_name(
+            sample_resource,
+            metric_key=None
+        )
+        self.assertEqual(result, 'myservice-00015-kkr')
+
+        result = CloudRunRevision.resource_type.get_metric_resource_name(sample_resource)
+        self.assertEqual(result, 'myservice-00015-kkr')
+
+    def test_get_metric_resource_name_handles_nested_structure(self):
+        """Test that nested metadata.name is correctly extracted (not None)"""
+        from c7n_gcp.resources.cloudrun import CloudRunRevision
+
+        sample_resource = {
+            'metadata': {
+                'name': 'test-revision-abc-123',
+                'namespace': '999999999'
+            }
+        }
+
+        result = CloudRunRevision.resource_type.get_metric_resource_name(sample_resource)
+        self.assertIsNotNone(result)
+        self.assertEqual(result, 'test-revision-abc-123')
+        self.assertNotEqual(result, 'None')

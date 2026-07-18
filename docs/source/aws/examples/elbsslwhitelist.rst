@@ -3,6 +3,7 @@ ELB - SSL Whitelist
 
 .. code-block:: yaml
 
+  policies:
    - name: elb-ssl-whitelist
      description: |
        HTTPS/SSL ELBs should only have whitelisted ciphers/protocols

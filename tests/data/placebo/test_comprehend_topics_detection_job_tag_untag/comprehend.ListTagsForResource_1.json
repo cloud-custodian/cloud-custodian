@@ -1,0 +1,8 @@
+{
+    "status_code": 200,
+    "data": {
+        "ResourceArn": "arn:aws:comprehend:us-east-1:644160558196:topics-detection-job/6cdb67f4dde0896e98f8f740a217c0c8",
+        "Tags": [],
+        "ResponseMetadata": {}
+    }
+}

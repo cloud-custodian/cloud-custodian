@@ -1,0 +1,9 @@
+{
+    "status_code": 200,
+    "data": {
+        "UserId": "AIDAU7FSB3AOQZXE724U2",
+        "Account": "644160558196",
+        "Arn": "arn:aws:iam::644160558196:user/cloud-custodian",
+        "ResponseMetadata": {}
+    }
+}

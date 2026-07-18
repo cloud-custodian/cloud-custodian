@@ -1,32 +1,15 @@
 {
-    "status_code": 200, 
+    "status_code": 200,
     "data": {
         "Rules": [
             {
-                "EventPattern": "{\"detail\":{\"eventName\":[\"AttachUserPolicy\"],\"eventSource\":[\"iam.amazonaws.com\"]},\"detail-type\":[\"AWS API Call via CloudTrail\"]}", 
-                "State": "ENABLED", 
-                "Name": "custodian-checkpolicy", 
-                "Arn": "arn:aws:events:us-east-2:644160558196:rule/custodian-checkpolicy", 
-                "Description": "cloud-custodian lambda policy"
-            }, 
-            {
-                "State": "ENABLED", 
-                "ScheduleExpression": "rate(1 minute)", 
-                "Name": "custodian-stop-night-asg", 
-                "Arn": "arn:aws:events:us-east-2:644160558196:rule/custodian-stop-night-asg", 
-                "Description": "cloud-custodian lambda policy"
+                "Name": "rule-1",
+                "Arn": "arn:aws:events:us-west-1:644160558196:rule/rule-1",
+                "EventPattern": "{\"source\":[\"aws.autoscaling\"],\"detail-type\":[\"EC2 Auto Scaling Instance Refresh Checkpoint Reached\",\"EC2 Auto Scaling Instance Refresh Started\",\"EC2 Auto Scaling Instance Refresh Succeeded\",\"EC2 Auto Scaling Instance Refresh Failed\",\"EC2 Auto Scaling Instance Refresh Cancelled\",\"EC2 Auto Scaling Instance Refresh Started Baking\"]}",
+                "State": "ENABLED",
+                "EventBusName": "default"
             }
-        ], 
-        "ResponseMetadata": {
-            "RetryAttempts": 0, 
-            "HTTPStatusCode": 200, 
-            "RequestId": "0c2e64cb-212a-11e8-bc13-8106a5710750", 
-            "HTTPHeaders": {
-                "x-amzn-requestid": "0c2e64cb-212a-11e8-bc13-8106a5710750", 
-                "date": "Tue, 06 Mar 2018 10:35:10 GMT", 
-                "content-length": "554", 
-                "content-type": "application/x-amz-json-1.1"
-            }
-        }
+        ],
+        "ResponseMetadata": {}
     }
 }

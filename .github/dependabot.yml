@@ -2,13 +2,40 @@ version: 2
 updates:
 
 - package-ecosystem: "github-actions"
-  directory: "/"
+  directories:
+    - "/"
+    - ".github/composites/docker-build-push"
+    - ".github/composites/docs-publish"
+    - ".github/composites/install"
   schedule:
       interval: "monthly"
   commit-message:
       prefix: ":seedling:"
   groups:
     github-actions:
+      patterns:
+        - "*"
+
+
+- package-ecosystem: "uv"
+  directory: "/"
+  schedule:
+      interval: "weekly"
+  commit-message:
+      prefix: ":seedling:"
+  groups:
+    python-requirements:
+      patterns:
+        - "*"
+
+- package-ecosystem: "gomod"
+  directory: "/"
+  schedule:
+      interval: "monthly"
+  commit-message:
+      prefix: ":seedling:"
+  groups:
+    golang-requirements:
       patterns:
         - "*"
 

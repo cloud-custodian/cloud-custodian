@@ -5,7 +5,7 @@ from c7n_azure.function_package import FunctionPackage, AzurePythonPackageArchiv
 from c7n_azure.functionapp_utils import FunctionAppUtilities
 
 from c7n_azure.provisioning.app_insights import AppInsightsUnit
-from mock import patch
+from unittest.mock import patch
 
 from c7n.utils import local_session
 from c7n_azure.session import Session

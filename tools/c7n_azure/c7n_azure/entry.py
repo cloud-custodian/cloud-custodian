@@ -5,6 +5,7 @@
 from c7n_azure.provider import Azure  # NOQA
 
 
+# ruff: noqa
 def initialize_azure():
     # import execution modes
     import c7n_azure.policy

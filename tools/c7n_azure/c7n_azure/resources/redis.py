@@ -35,7 +35,7 @@ class Redis(ArmResourceManager):
 
         service = 'azure.mgmt.redis'
         client = 'RedisManagementClient'
-        enum_spec = ('redis', 'list', None)
+        enum_spec = ('redis', 'list_by_subscription', None)
         default_report_fields = (
             'name',
             'location',
@@ -82,7 +82,7 @@ class RedisFirewallFilter(ListItemFilter):
 
     def get_item_values(self, resource):
         client = self.manager.get_client()
-        rules = client.firewall_rules.list_by_redis_resource(
+        rules = client.firewall_rules.list(
             cache_name=resource["name"],
             resource_group_name=resource["resourceGroup"]
         )

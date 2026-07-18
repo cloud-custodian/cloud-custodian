@@ -1,0 +1,133 @@
+{
+    "pytest-terraform": 1,
+    "outputs": {},
+    "resources": {
+        "aws_efs_file_system": {
+            "example": {
+                "arn": "arn:aws:elasticfilesystem:us-east-1:644160558196:file-system/fs-0e75dd241f036173d",
+                "availability_zone_id": "",
+                "availability_zone_name": "",
+                "creation_token": "terraform-20250104015422335900000002",
+                "dns_name": "fs-0e75dd241f036173d.efs.us-east-1.amazonaws.com",
+                "encrypted": true,
+                "id": "fs-0e75dd241f036173d",
+                "kms_key_id": "arn:aws:kms:us-east-1:644160558196:key/d38e6df4-3a19-4516-9f4b-ab568e9bccc5",
+                "lifecycle_policy": [],
+                "name": "example-efs",
+                "number_of_mount_targets": 0,
+                "owner_id": "644160558196",
+                "performance_mode": "generalPurpose",
+                "protection": [
+                    {
+                        "replication_overwrite": "ENABLED"
+                    }
+                ],
+                "provisioned_throughput_in_mibps": 0,
+                "size_in_bytes": [
+                    {
+                        "value": 6144,
+                        "value_in_ia": 0,
+                        "value_in_standard": 6144
+                    }
+                ],
+                "tags": {
+                    "Name": "example-efs"
+                },
+                "tags_all": {
+                    "Name": "example-efs"
+                },
+                "throughput_mode": "bursting"
+            },
+            "example_client_error": {
+                "arn": "arn:aws:elasticfilesystem:us-east-1:644160558196:file-system/fs-0db9bce66be0fefd6",
+                "availability_zone_id": "",
+                "availability_zone_name": "",
+                "creation_token": "terraform-20250104015422335900000001",
+                "dns_name": "fs-0db9bce66be0fefd6.efs.us-east-1.amazonaws.com",
+                "encrypted": true,
+                "id": "fs-0db9bce66be0fefd6",
+                "kms_key_id": "arn:aws:kms:us-east-1:644160558196:key/d38e6df4-3a19-4516-9f4b-ab568e9bccc5",
+                "lifecycle_policy": [],
+                "name": "example_client_error",
+                "number_of_mount_targets": 0,
+                "owner_id": "644160558196",
+                "performance_mode": "generalPurpose",
+                "protection": [
+                    {
+                        "replication_overwrite": "ENABLED"
+                    }
+                ],
+                "provisioned_throughput_in_mibps": 0,
+                "size_in_bytes": [
+                    {
+                        "value": 6144,
+                        "value_in_ia": 0,
+                        "value_in_standard": 6144
+                    }
+                ],
+                "tags": {
+                    "Name": "example_client_error"
+                },
+                "tags_all": {
+                    "Name": "example_client_error"
+                },
+                "throughput_mode": "bursting"
+            },
+            "example_remove_named": {
+                "arn": "arn:aws:elasticfilesystem:us-east-1:644160558196:file-system/fs-05b97e2b1be5b25f8",
+                "availability_zone_id": "",
+                "availability_zone_name": "",
+                "creation_token": "terraform-20250104015422335900000003",
+                "dns_name": "fs-05b97e2b1be5b25f8.efs.us-east-1.amazonaws.com",
+                "encrypted": true,
+                "id": "fs-05b97e2b1be5b25f8",
+                "kms_key_id": "arn:aws:kms:us-east-1:644160558196:key/d38e6df4-3a19-4516-9f4b-ab568e9bccc5",
+                "lifecycle_policy": [],
+                "name": "example_remove_named",
+                "number_of_mount_targets": 0,
+                "owner_id": "644160558196",
+                "performance_mode": "generalPurpose",
+                "protection": [
+                    {
+                        "replication_overwrite": "ENABLED"
+                    }
+                ],
+                "provisioned_throughput_in_mibps": 0,
+                "size_in_bytes": [
+                    {
+                        "value": 6144,
+                        "value_in_ia": 0,
+                        "value_in_standard": 6144
+                    }
+                ],
+                "tags": {
+                    "Name": "example_remove_named"
+                },
+                "tags_all": {
+                    "Name": "example_remove_named"
+                },
+                "throughput_mode": "bursting"
+            }
+        },
+        "aws_efs_file_system_policy": {
+            "example": {
+                "bypass_policy_lockout_safety_check": false,
+                "file_system_id": "fs-0e75dd241f036173d",
+                "id": "fs-0e75dd241f036173d",
+                "policy": "{\"Id\":\"ExampleEFSResourcePolicy\",\"Statement\":[{\"Action\":\"elasticfilesystem:ClientWrite\",\"Effect\":\"Allow\",\"Principal\":{\"AWS\":\"*\"},\"Resource\":\"arn:aws:elasticfilesystem:us-east-1:644160558196:file-system/fs-0e75dd241f036173d\",\"Sid\":\"PublicAllowAccess\"},{\"Action\":\"elasticfilesystem:ClientWrite\",\"Effect\":\"Allow\",\"Principal\":{\"AWS\":\"arn:aws:iam::644160558196:root\"},\"Resource\":\"arn:aws:elasticfilesystem:us-east-1:644160558196:file-system/fs-0e75dd241f036173d\",\"Sid\":\"SpecificAllow\"}],\"Version\":\"2012-10-17\"}"
+            },
+            "example_client_error": {
+                "bypass_policy_lockout_safety_check": false,
+                "file_system_id": "fs-0db9bce66be0fefd6",
+                "id": "fs-0db9bce66be0fefd6",
+                "policy": "{\"Id\":\"WhatIsIt\",\"Statement\":[{\"Action\":[\"elasticfilesystem:DescribeFileSystemPolicy\",\"elasticfilesystem:DescribeFileSystems\"],\"Effect\":\"Allow\",\"Principal\":{\"AWS\":\"*\"},\"Resource\":\"arn:aws:elasticfilesystem:us-east-1:644160558196:file-system/fs-0db9bce66be0fefd6\",\"Sid\":\"WhatIsIt\"}],\"Version\":\"2012-10-17\"}"
+            },
+            "example_remove_named": {
+                "bypass_policy_lockout_safety_check": false,
+                "file_system_id": "fs-05b97e2b1be5b25f8",
+                "id": "fs-05b97e2b1be5b25f8",
+                "policy": "{\"Id\":\"ExampleEFSResourcePolicy\",\"Statement\":[{\"Action\":\"elasticfilesystem:ClientWrite\",\"Effect\":\"Allow\",\"Principal\":{\"AWS\":\"*\"},\"Resource\":\"arn:aws:elasticfilesystem:us-east-1:644160558196:file-system/fs-05b97e2b1be5b25f8\",\"Sid\":\"SpecificAllow\"},{\"Action\":\"elasticfilesystem:ClientWrite\",\"Effect\":\"Allow\",\"Principal\":{\"AWS\":\"*\"},\"Resource\":\"arn:aws:elasticfilesystem:us-east-1:644160558196:file-system/fs-05b97e2b1be5b25f8\",\"Sid\":\"RemoveMe\"}],\"Version\":\"2012-10-17\"}"
+            }
+        }
+    }
+}

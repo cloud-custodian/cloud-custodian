@@ -12,7 +12,8 @@ from unittest.mock import Mock, patch
 from c7n.config import Bag, Config
 from c7n.exceptions import PolicyValidationError, InvalidOutputConfig
 from c7n.resources import aws, load_resources
-from c7n import output
+from c7n.schema import StructureParser
+from c7n import output, schema
 
 # resolver test needs to patch out thread usage
 from c7n.resources.sqs import SQS
@@ -501,6 +502,55 @@ def test_default_bucket_region_with_explicit_region():
 def test_join_output():
     output_dir = aws.join_output("s3://aws?region=xyz", "suffix")
     assert output_dir == "s3://aws/suffix?region=xyz"
+
+
+def test_shape_schema():
+    policy_data = {"policies": [{
+        "name": "update-eks-config",
+        "resource": "eks",
+        "actions": [{
+                "type": "update-config",
+                "resourcesVpcConfig": {
+                    "endpointPublicAccess": "nay",
+                    "endpointPrivateAccess": True, },
+        }],
+    }]}
+    structure = StructureParser()
+    load_resources(structure.get_resource_types(policy_data))
+    schm = schema.generate()
+    results = schema.validate(policy_data, schm)
+    assert "'nay' is not of type 'boolean'" in str(results)
+
+    policy_data = {"policies": [{
+        "name": "update-eks-config",
+        "resource": "eks",
+        "actions": [{
+            "type": "update-config",
+            "upgradePolicy": {
+                "supportType": "WRONG",
+            }
+        }],
+    }]}
+
+    results = schema.validate(policy_data, schm)
+    assert "'WRONG' is not one of" in str(results)
+
+    policy_data = {"policies": [{
+        "name": "update-eks-config",
+        "resource": "eks",
+        "actions": [{
+            "type": "update-config",
+            "unknownOption": True,
+        }],
+    }]}
+
+    results = schema.validate(policy_data, schm)
+    assert "Additional properties are not allowed" in str(results)
+
+    stage_update_schema = aws.shape_schema(
+        'apigatewayv2', 'UpdateStageRequest', drop_fields=('ApiId', 'StageName')
+    )
+    assert "^.+$" in stage_update_schema["RouteSettings"]["patternProperties"].keys()
 
 
 @vcr.use_cassette(

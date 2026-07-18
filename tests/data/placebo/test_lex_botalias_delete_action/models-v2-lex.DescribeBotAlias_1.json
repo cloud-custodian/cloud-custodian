@@ -1,0 +1,30 @@
+{
+    "status_code": 200,
+    "data": {
+        "ResponseMetadata": {},
+        "botAliasId": "Q70NVXHAKT",
+        "botAliasName": "1234",
+        "botAliasStatus": "Available",
+        "botId": "OTM2WO3PEY",
+        "creationDateTime": {
+            "__class__": "datetime",
+            "year": 2025,
+            "month": 4,
+            "day": 22,
+            "hour": 16,
+            "minute": 42,
+            "second": 4,
+            "microsecond": 703000
+        },
+        "lastUpdatedDateTime": {
+            "__class__": "datetime",
+            "year": 2025,
+            "month": 4,
+            "day": 22,
+            "hour": 16,
+            "minute": 42,
+            "second": 4,
+            "microsecond": 729000
+        }
+    }
+}

@@ -427,6 +427,7 @@ Value Path
 
   .. code-block:: yaml
 
+     policies:
       - name: find-admins-with-user-roles
         resource: gcp.project
         filters:
@@ -455,6 +456,7 @@ account and region:
 
   .. code-block:: yaml
 
+   policies:
     - name: find-task-def-not-using-registry
       resource: aws.ecs-task-definition
       filters:
@@ -480,6 +482,7 @@ incomplete multipart uploads.
 
   .. code-block:: yaml
 
+   policies:
     - name: s3-mpu-cleanup-not-configured
       resource: aws.s3
       filters:
@@ -502,11 +505,12 @@ describe resource call as is the case in the ValueFilter
 
   .. code-block:: yaml
 
+    policies:
      - name: no-ec2-public-ips
        resource: aws.ec2
-       mode:make
-         type: cloudtrail
-         events:
+       mode: make
+         - type: cloudtrail
+           events:
              - RunInstances
        filters:
          - type: event
@@ -664,6 +668,7 @@ instances total, then terminate them.
 
   .. code-block:: yaml
 
+   policies:
     - name: chaos-engineering
       resource: aws.ec2
       filters:

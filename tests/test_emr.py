@@ -2,12 +2,11 @@
 # SPDX-License-Identifier: Apache-2.0
 import unittest
 
-from c7n.config import Config
 from c7n.exceptions import PolicyValidationError
 from c7n.resources import emr
-from c7n.resources.emr import actions, QueryFilter
+from c7n.resources.emr import actions, EMRQueryParser
 
-from .common import BaseTest, Bag
+from .common import BaseTest
 
 
 class TestEMR(BaseTest):
@@ -20,49 +19,8 @@ class TestEMR(BaseTest):
         resources = p.resource_manager.get_resources(["j-1EJMJNTXC63JW"])
         self.assertEqual(resources[0]["Id"], "j-1EJMJNTXC63JW")
 
-    def test_consolidate_query_filter(self):
-        session_factory = self.replay_flight_data("test_emr_query_ids")
-
-        ctx = Bag(session_factory=session_factory, log_dir="", options=Config.empty())
-        query = {
-            "query": [{"tag:foo": "val1"}, {"tag:foo": "val2"}, {"tag:bar": "val3"}]
-        }
-        mgr = emr.EMRCluster(ctx, query)
-        self.assertEqual(
-            mgr.consolidate_query_filter(),
-            [
-                {"Values": ["val1", "val2"], "Name": "tag:foo"},
-                {"Values": ["val3"], "Name": "tag:bar"},
-                # default query
-                {
-                    "Values": ["WAITING", "BOOTSTRAPPING", "RUNNING", "STARTING"],
-                    "Name": "ClusterStates",
-                },
-            ],
-        )
-
-        query = {
-            "query": [
-                {"tag:foo": "val1"},
-                {"tag:foo": "val2"},
-                {"tag:bar": "val3"},
-                {"ClusterStates": "terminated"},
-            ]
-        }
-        mgr = emr.EMRCluster(ctx, query)
-        self.assertEqual(
-            mgr.consolidate_query_filter(),
-            [
-                {"Values": ["val1", "val2"], "Name": "tag:foo"},
-                {"Values": ["val3"], "Name": "tag:bar"},
-                # verify default is overridden
-                {"Values": ["terminated"], "Name": "ClusterStates"},
-            ],
-        )
-
     def test_get_emr_tags(self):
         session_factory = self.replay_flight_data("test_get_emr_tags")
-
         policy = self.load_policy(
             {
                 "name": "test-get-emr-tags",
@@ -195,55 +153,47 @@ class TestEMR(BaseTest):
                 'EnableInTransitEncryption': False}})
 
 
-class TestEMRQueryFilter(unittest.TestCase):
+class TestEMRQueryParser(unittest.TestCase):
+    def test_query(self):
+        self.assertEqual(EMRQueryParser.parse([]), [])
 
-    def test_parse(self):
-        self.assertEqual(QueryFilter.parse([]), [])
-        x = QueryFilter.parse([{"ClusterStates": "terminated"}])
-        self.assertEqual(
-            x[0].query(), {"Name": "ClusterStates", "Values": ["terminated"]}
-        )
+        query = [{'ClusterStates': 'RUNNING'}, {'CreatedBefore': '2022-02-23'}]
+        result_query = [{'ClusterStates': ['RUNNING']}, {'CreatedBefore': '2022-02-23'}]
+        self.assertEqual(EMRQueryParser.parse(query), result_query)
 
-        # Test consolidation of multiple values for query
-        self.assertEqual(QueryFilter.parse([]), [])
-        x = QueryFilter.parse(
-            [
-                {"ClusterStates": "terminated"},
-                {"ClusterStates": "running"},
-                {"ClusterStates": "waiting"},
-            ]
-        )
-        self.assertEqual(
-            x[0].query(), {"Name": "ClusterStates", "Values": ["terminated"]}
-        )
-        self.assertEqual(x[1].query(), {"Name": "ClusterStates", "Values": ["running"]})
-        self.assertEqual(x[2].query(), {"Name": "ClusterStates", "Values": ["waiting"]})
+        query = [{'ClusterStates': ['RUNNING', 'WAITING']}]
+        self.assertEqual(EMRQueryParser.parse(query), query)
 
-        self.assertEqual(QueryFilter.parse([]), [])
-        x = QueryFilter.parse([{"CreatedBefore": 1470968567.05}])
-        self.assertEqual(
-            x[0].query(), {"Name": "CreatedBefore", "Values": 1470968567.05}
-        )
+        query = [{"CreatedBefore": 1470968567.05}]
+        self.assertEqual(EMRQueryParser.parse(query), query)
 
-        self.assertEqual(QueryFilter.parse([]), [])
-        x = QueryFilter.parse([{"CreatedAfter": 1470974021.557}])
-        self.assertEqual(
-            x[0].query(), {"Name": "CreatedAfter", "Values": 1470974021.557}
-        )
+        query = [{"CreatedAfter": '2022-09-15T17:15:20.000Z'}]
+        self.assertEqual(EMRQueryParser.parse(query), query)
 
-        self.assertTrue(
-            isinstance(QueryFilter.parse([{"tag:ASV": "REALTIMEMSG"}])[0], QueryFilter)
-        )
+        query = [{'ClusterStates': 'RUNNING'}, {'ClusterStates': 'WAITING'}]
+        result_query = [{'ClusterStates': ['RUNNING', 'WAITING']}]
+        self.assertEqual(EMRQueryParser.parse(query), result_query)
 
-        self.assertRaises(PolicyValidationError, QueryFilter.parse, [{"tag:ASV": None}])
+    def test_invalid_query(self):
+        self.assertRaises(PolicyValidationError, EMRQueryParser.parse, [{"tag:Test": "True"}])
 
-        self.assertRaises(PolicyValidationError, QueryFilter.parse, [{"foo": "bar"}])
+        self.assertRaises(PolicyValidationError, EMRQueryParser.parse, [{"foo": "bar"}])
 
-        self.assertRaises(
-            PolicyValidationError, QueryFilter.parse, [{"too": "many", "keys": "error"}]
-        )
+        self.assertRaises(PolicyValidationError, EMRQueryParser.parse, [{"tag:ASV": None}])
 
-        self.assertRaises(PolicyValidationError, QueryFilter.parse, ["Not a dictionary"])
+        self.assertRaises(PolicyValidationError, EMRQueryParser.parse, [
+            {"too": "many", "keys": "error"}])
+
+        self.assertRaises(PolicyValidationError, EMRQueryParser.parse, ["Not a dictionary"])
+
+        self.assertRaises(PolicyValidationError, EMRQueryParser.parse, [
+            {"CreatedBefore": '2022-02-23'}, {"CreatedBefore": '2022-02-24'}])
+
+        self.assertRaises(PolicyValidationError, EMRQueryParser.parse, [
+            {"CreatedBefore": ['2022-02-23']}])
+
+        self.assertRaises(PolicyValidationError, EMRQueryParser.parse, [
+            {"CreatedBefore": '2022-02-23'}, ["not a dict"]])
 
 
 class TestTerminate(BaseTest):

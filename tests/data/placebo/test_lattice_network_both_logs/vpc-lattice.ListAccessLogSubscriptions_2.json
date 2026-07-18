@@ -1,0 +1,36 @@
+{
+    "status_code": 200,
+    "data": {
+        "ResponseMetadata": {},
+        "items": [
+            {
+                "arn": "arn:aws:vpc-lattice:us-east-1:644160558196:accesslogsubscription/als-02e643de501f90aa6",
+                "createdAt": {
+                    "__class__": "datetime",
+                    "year": 2025,
+                    "month": 9,
+                    "day": 16,
+                    "hour": 20,
+                    "minute": 17,
+                    "second": 9,
+                    "microsecond": 700000
+                },
+                "destinationArn": "arn:aws:s3:::c7n-lattice-test-logs",
+                "id": "als-02e643de501f90aa6",
+                "lastUpdatedAt": {
+                    "__class__": "datetime",
+                    "year": 2025,
+                    "month": 9,
+                    "day": 16,
+                    "hour": 20,
+                    "minute": 17,
+                    "second": 9,
+                    "microsecond": 700000
+                },
+                "resourceArn": "arn:aws:vpc-lattice:us-east-1:644160558196:servicenetwork/sn-0641bb2a478d9d77b",
+                "resourceId": "sn-0641bb2a478d9d77b",
+                "serviceNetworkLogType": "SERVICE"
+            }
+        ]
+    }
+}

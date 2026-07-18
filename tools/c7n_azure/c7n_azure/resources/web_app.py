@@ -43,7 +43,7 @@ class WebApp(ArmResourceManager):
             resource: azure.webapp
             filters:
               - type: metric
-                metric: Http5xxx
+                metric: Http5xx
                 op: ge
                 aggregation: total
                 threshold: 1000

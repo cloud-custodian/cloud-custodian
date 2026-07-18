@@ -12,12 +12,17 @@ from azure.storage.common.models import Logging, RetentionPolicy
 from azure.storage.file import FileService
 from azure.storage.queue import QueueServiceClient
 from c7n.exceptions import PolicyValidationError
-from c7n.filters.core import type_schema
+from c7n.filters.core import type_schema, ListItemFilter
 from c7n.utils import get_annotation_prefix, local_session
 from c7n_azure.actions.base import AzureBaseAction
 from c7n_azure.actions.firewall import SetFirewallAction
 from c7n_azure.constants import BLOB_TYPE, FILE_TYPE, QUEUE_TYPE, TABLE_TYPE
-from c7n_azure.filters import (FirewallBypassFilter, FirewallRulesFilter, ValueFilter)
+from c7n_azure.filters import (
+    FirewallBypassFilter,
+    FirewallRulesFilter,
+    MetricFilter,
+    ValueFilter,
+)
 from c7n_azure.provider import resources
 from c7n_azure.resources.arm import ArmResourceManager
 from c7n_azure.storage_utils import StorageUtilities
@@ -56,6 +61,69 @@ class Storage(ArmResourceManager):
             'kind',
             'sku.name'
         )
+
+
+@Storage.filter_registry.register("file-services")
+class StorageFileServicesFilter(ListItemFilter):
+    """
+    Filters Storage Accounts by their file services configuration.
+
+    :example:
+
+    Find storage accounts with file services soft delete disabled
+
+    .. code-block:: yaml
+
+        policies:
+          - name: storage-no-file-services-delete-policy
+            resource: azure.storage
+            filters:
+              - type: file-services
+                attrs:
+                  - type: value
+                    key: properties.shareDeleteRetentionPolicy.enabled
+                    value: false
+
+    """
+    schema = type_schema(
+        "file-services",
+        attrs={"$ref": "#/definitions/filters_common/list_item_attrs"},
+        count={"type": "number"},
+        count_op={"$ref": "#/definitions/filters_common/comparison_operators"}
+    )
+    item_annotation_key = "c7n:FileServices"
+    annotate_items = True
+
+    def _process_resources(self, resources, event=None, client=None):
+        if client is None:
+            client = self.manager.get_client()
+
+        for res in resources:
+            if self.item_annotation_key in res:
+                continue
+            file_services = client.file_services.list(
+                resource_group_name=res["resourceGroup"],
+                account_name=res["name"],
+            )
+            # at least one default is present
+            res[self.item_annotation_key] = file_services.serialize(True).get('value', [])
+
+    def process(self, resources, event=None):
+
+        _, exceptions = ThreadHelper.execute_in_parallel(
+            resources=resources,
+            event=event,
+            execution_method=self._process_resources,
+            executor_factory=self.executor_factory,
+            log=self.log,
+            client=self.manager.get_client()  # seems like Azure mgmt clients are thread-safe
+        )
+        if exceptions:
+            raise exceptions[0]  # pragma: no cover
+        return super().process(resources, event)
+
+    def get_item_values(self, resource):
+        return resource.pop(self.item_annotation_key, [])
 
 
 @Storage.action_registry.register('set-firewall-rules')
@@ -179,6 +247,52 @@ class StorageSetFirewallAction(SetFirewallAction):
             resource['resourceGroup'],
             resource['name'],
             StorageAccountUpdateParameters(network_rule_set=rule_set))
+
+
+@Storage.filter_registry.register("management-policy-rules")
+class StorageAccountManagementPolicyRulesFilter(ListItemFilter):
+    """
+    Filter Storage Accounts based on their management policy rules
+
+    :example:
+
+    Find storage accounts where lifecycle policy configured to remove base Blob
+    after less or equal than 3 days
+
+    .. code-block:: yaml
+
+        policies:
+          - name: storage-delete-blob-le-3-days
+            resource: azure.storage
+            filters:
+              - type: management-policy-rules
+                attrs:
+                  - type: value
+                    key: definition.actions.baseBlob.delete.daysAfterModificationGreaterThan
+                    value: 3
+                    op: le
+
+    """
+    schema = type_schema(
+        "management-policy-rules",
+        attrs={"$ref": "#/definitions/filters_common/list_item_attrs"},
+        count={"type": "number"},
+        count_op={"$ref": "#/definitions/filters_common/comparison_operators"}
+    )
+    item_annotation_key = "c7n:management-policy-rules"
+    annotate_items = True
+
+    def get_item_values(self, resource):
+        try:
+            item = self.manager.get_client().management_policies.get(
+                resource_group_name=resource["resourceGroup"],
+                account_name=resource["name"],
+                management_policy_name="default"
+            )
+            return item.serialize(True)["properties"]["policy"].get("rules", [])
+        except Exception as e:  # azure.core.exceptions.ResourceNotFoundError
+            self.log.error(e)
+            return []  # no rules
 
 
 @Storage.filter_registry.register('firewall-rules')
@@ -356,6 +470,85 @@ class StorageDiagnosticSettingsFilter(ValueFilter):
         return storage_account[storage_prefix_property]
 
 
+@Storage.filter_registry.register('storage-metrics')
+class StorageMetricsFilter(MetricFilter):
+    """Filters storage accounts based on service-specific metrics.
+
+    Azure Storage Accounts expose service-specific metrics for blob, queue, table,
+    and file services that require different resource IDs than account-level metrics.
+    This filter enables filtering based on those service-specific metrics.
+
+    Supports: blob, queue, table, file
+
+    Additional examples can be found at: docs/source/azure/examples/metrics-general.rst
+
+    :example:
+
+    Find storage accounts with high blob capacity (over 1GB)
+
+    .. code-block:: yaml
+
+        policies:
+          - name: high-blob-capacity-storage
+            resource: azure.storage
+            filters:
+              - type: storage-metrics
+                storage-type: blob
+                metric: BlobCapacity
+                aggregation: average
+                op: gt
+                threshold: 1000000000
+                timeframe: 24
+
+    """
+
+    # Service-specific path suffixes for resource IDs
+    STORAGE_TYPE_PATHS = {
+        BLOB_TYPE: '/blobServices/default',
+        QUEUE_TYPE: '/queueServices/default',
+        TABLE_TYPE: '/tableServices/default',
+        FILE_TYPE: '/fileServices/default',
+    }
+
+    # Service-specific metric namespaces
+    STORAGE_TYPE_NAMESPACES = {
+        BLOB_TYPE: 'Microsoft.Storage/storageAccounts/blobServices',
+        QUEUE_TYPE: 'Microsoft.Storage/storageAccounts/queueServices',
+        TABLE_TYPE: 'Microsoft.Storage/storageAccounts/tableServices',
+        FILE_TYPE: 'Microsoft.Storage/storageAccounts/fileServices',
+    }
+
+    schema = type_schema(
+        'storage-metrics',
+        rinherit=MetricFilter.schema,
+        **{
+            'storage-type': {
+                'type': 'string',
+                'enum': [BLOB_TYPE, QUEUE_TYPE, TABLE_TYPE, FILE_TYPE],
+            },
+            'required': ['type', 'storage-type', 'metric', 'op', 'threshold'],
+        },
+    )
+
+    def __init__(self, data, manager=None):
+        # Auto-set metric namespace if not provided
+        if 'metric_namespace' not in data:
+            storage_type = data.get('storage-type')
+            if storage_type and storage_type in self.STORAGE_TYPE_NAMESPACES:
+                data = data.copy()
+                data['metric_namespace'] = self.STORAGE_TYPE_NAMESPACES[storage_type]
+
+        super(StorageMetricsFilter, self).__init__(data, manager)
+        self.storage_type = data.get('storage-type')
+
+    def get_resource_id(self, resource):
+        """Override to append storage service path to resource ID."""
+        base_id = super(StorageMetricsFilter, self).get_resource_id(resource)
+        if self.storage_type in self.STORAGE_TYPE_PATHS:
+            return base_id + self.STORAGE_TYPE_PATHS[self.storage_type]
+        return base_id
+
+
 @Storage.action_registry.register('set-log-settings')
 class SetLogSettingsAction(AzureBaseAction):
     """Action that updates the logging settings on storage accounts. The action requires
@@ -528,11 +721,25 @@ class RequireSecureTransferAction(AzureBaseAction):
               actions:
               - type: require-secure-transfer
                 value: True
+
+    You can also set the minimum tls version on a bucket,
+    valid values: TLS1_0, TLS1_1, TLS1_2:
+
+    .. code-block:: yaml
+
+        policies:
+            - name: require-secure-transfer-with-tls-v1-2
+              resource: azure.storage
+              actions:
+              - type: require-secure-transfer
+                value: True
+                minimum_tls_version: TLS1_2
     """
 
     # Default to true assuming user wants secure connection
     schema = type_schema(
         'require-secure-transfer',
+        minimum_tls_version={"type": "string"},
         **{
             'value': {'type': 'boolean', "default": True},
         })
@@ -544,10 +751,18 @@ class RequireSecureTransferAction(AzureBaseAction):
         self.client = self.manager.get_client()
 
     def _process_resource(self, resource):
+        kwargs = {
+            "enable_https_traffic_only": self.data.get("value")
+        }
+
+        if self.data.get("minimum_tls_version"):
+            kwargs["minimum_tls_version"] = self.data.get("minimum_tls_version")
+
+        update_params = StorageAccountUpdateParameters(**kwargs)
         self.client.storage_accounts.update(
             resource['resourceGroup'],
             resource['name'],
-            StorageAccountUpdateParameters(enable_https_traffic_only=self.data.get('value'))
+            update_params,
         )
 
 

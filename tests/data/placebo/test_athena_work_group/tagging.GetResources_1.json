@@ -1,0 +1,26 @@
+{
+    "status_code": 200,
+    "data": {
+        "PaginationToken": "",
+        "ResourceTagMappingList": [
+            {
+                "ResourceARN": "arn:aws:athena:us-east-1:644160558196:workgroup/tf_testm_adapting_dane",
+                "Tags": [
+                    {
+                        "Key": "App",
+                        "Value": "c7n-test"
+                    },
+                    {
+                        "Key": "Env",
+                        "Value": "Dev"
+                    },
+                    {
+                        "Key": "Name",
+                        "Value": "something"
+                    }
+                ]
+            }
+        ],
+        "ResponseMetadata": {}
+    }
+}

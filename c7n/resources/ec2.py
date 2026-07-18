@@ -25,11 +25,12 @@ from c7n.filters import (
 from c7n.filters.offhours import OffHour, OnHour
 from c7n.filters.costhub import CostHubRecommendation
 import c7n.filters.vpc as net_filters
+import c7n.filters.iamrole as iam_filters
 
 from c7n.manager import resources
 from c7n import query, utils
 from c7n.tags import coalesce_copy_user_tags
-from c7n.utils import type_schema, filter_empty, jmespath_search, jmespath_compile
+from c7n.utils import type_schema, filter_empty, jmespath_search, jmespath_compile, QueryParser
 
 from c7n.resources.iam import CheckPermissions, SpecificIamProfileManagedPolicy
 from c7n.resources.securityhub import PostFinding
@@ -43,20 +44,29 @@ actions = ActionRegistry('ec2.actions')
 class DescribeEC2(query.DescribeSource):
 
     def get_query_params(self, query_params):
-        queries = QueryFilter.parse(self.manager.data.get('query', []))
-        qf = []
-        for q in queries:
-            qd = q.query()
-            found = False
-            for f in qf:
-                if qd['Name'] == f['Name']:
-                    f['Values'].extend(qd['Values'])
-                    found = True
-            if not found:
-                qf.append(qd)
         query_params = query_params or {}
-        query_params['Filters'] = qf
+        queries = EC2QueryParser.parse(self.manager.data.get('query', []))
+        for q in queries:
+            query_params.update(q)
         return query_params
+
+    @staticmethod
+    def _flatten_reservations(reservations):
+        instances = []
+        for r in (reservations or []):
+            rid = r.get('ReservationId')
+            for i in r.get('Instances', []):
+                i['ReservationId'] = rid
+                instances.append(i)
+        return instances
+
+    def resources(self, query):
+        reservations = self.query.filter(self.manager, **query)
+        return self._flatten_reservations(reservations)
+
+    def get_resources(self, ids, cache=True):
+        reservations = self.query.get(self.manager, ids)
+        return self._flatten_reservations(reservations)
 
     def augment(self, resources):
         """EC2 API and AWOL Tags
@@ -72,8 +82,6 @@ class DescribeEC2(query.DescribeSource):
         name), so there isn't a good default to ensure that we will
         always get tags from describe_x calls.
         """
-        # First if we're in event based lambda go ahead and skip this,
-        # tags can't be trusted in ec2 instances immediately post creation.
         if not resources or self.manager.data.get(
                 'mode', {}).get('type', '') in (
                     'cloudtrail', 'ec2-instance-state'):
@@ -117,7 +125,7 @@ class EC2(query.QueryResourceManager):
     class resource_type(query.TypeInfo):
         service = 'ec2'
         arn_type = 'instance'
-        enum_spec = ('describe_instances', 'Reservations[].Instances[]', None)
+        enum_spec = ('describe_instances', 'Reservations[]', None)
         id = 'InstanceId'
         filter_name = 'InstanceIds'
         filter_type = 'list'
@@ -165,6 +173,68 @@ class SubnetFilter(net_filters.SubnetFilter):
 class VpcFilter(net_filters.VpcFilter):
 
     RelatedIdsExpression = "VpcId"
+
+
+@filters.register('iam-role')
+class EC2IamRoleFilter(iam_filters.IamRoleFilter):
+    """Filter EC2 instances by their IAM role attribution.
+
+    EC2 instances use IAM instance profiles which contain roles. This filter
+    resolves the role from the instance profile and allows filtering on role attributes.
+
+    :example:
+
+    Find EC2 instances with roles tagged as Production:
+
+    .. code-block:: yaml
+
+    policies:
+        - name: ec2-prod-roles
+          resource: aws.ec2
+          filters:
+            - type: iam-role
+              key: tag:Environment
+              value: Production
+    """
+
+    # Set to bypass validation, not actually used (overriden in get_related_ids)
+    RelatedIdsExpression = ""
+
+    def get_related_ids(self, resources):
+        """Override to get role names (not ARNs) from instance profiles"""
+        profile_arns = [
+            r['IamInstanceProfile']['Arn']
+            for r in resources if 'IamInstanceProfile' in r
+        ]
+        if not profile_arns:
+            return set()
+
+        # Extract profile name (last part after last /) from ARN
+        # ARN format: arn:aws:iam::123456789012:instance-profile/path/ProfileName
+        profile_names = [p.rsplit('/', 1)[-1] for p in profile_arns]
+        profiles = self.manager.get_resource_manager('iam-profile').get_resources(profile_names)
+
+        role_names = set()
+        for arn, profile in zip(profile_arns, profiles):
+            if not profile:
+                self.log.warning(f"Instance profile not found: {arn}")
+                continue
+
+            roles = profile.get('Roles', [])
+            if not roles:
+                self.log.warning(f"Instance profile has no roles: {arn}")
+                continue
+
+            # AWS enforces: Instance profile can only have 1 role
+            # Extract role name from ARN
+            role_arn = roles[0]['Arn']
+            role_name = role_arn.rsplit('/', 1)[-1]
+            role_names.add(role_name)
+
+        return role_names
+
+
+filters.register('iam-role-tag-mirror', iam_filters.IamRoleTagMirror)
 
 
 @filters.register('check-permissions')
@@ -485,6 +555,51 @@ class InstanceImage(ValueFilter, InstanceImageBase):
             # Match instead on empty skeleton?
             return False
         return self.match(image)
+
+
+@filters.register('image-metadata')
+class InstanceImageMetadataFilter(ValueFilter):
+    """Filter EC2 instances based on image metadata.
+
+    Uses describe_instance_image_metadata to fetch AMI state, deprecation
+    status, and public visibility — even for deregistered or deprecated AMIs.
+    Results are stored in the c7n:image-metadata annotation.
+
+    :Example:
+
+    .. code-block:: yaml
+
+        policies:
+          - name: ec2-deregistered-ami
+            resource: aws.ec2
+            filters:
+              - type: image-metadata
+                key: State
+                value: deregistered
+    """
+
+    schema = type_schema('image-metadata', rinherit=ValueFilter.schema)
+    schema_alias = False
+    annotation_key = 'c7n:image-metadata'
+    permissions = ('ec2:DescribeInstanceImageMetadata',)
+    batch_size = 50
+
+    def process(self, resources, event=None):
+        client = utils.local_session(self.manager.session_factory).client('ec2')
+        to_fetch = [r for r in resources if self.annotation_key not in r]
+        for resource_set in utils.chunks(to_fetch, self.batch_size):
+            self.process_resource_set(client, resource_set)
+        return [r for r in resources if self.match(r.get(self.annotation_key, {}))]
+
+    def process_resource_set(self, client, resources):
+        instance_ids = [r['InstanceId'] for r in resources]
+        results = self.manager.retry(
+            client.describe_instance_image_metadata,
+            InstanceIds=instance_ids
+        ).get('InstanceImageMetadata', [])
+        metadata_map = {item['InstanceId']: item['ImageMetadata'] for item in results}
+        for r in resources:
+            r[self.annotation_key] = metadata_map.get(r['InstanceId'], {})
 
 
 @filters.register('offhour')
@@ -1287,7 +1402,7 @@ class InstanceFinding(PostFinding):
         instance = {
             "Type": self.resource_type,
             "Id": "arn:{}:ec2:{}:{}:instance/{}".format(
-                utils.REGION_PARTITION_MAP.get(self.manager.config.region, 'aws'),
+                utils.get_partition(self.manager.config.region),
                 self.manager.config.region,
                 self.manager.config.account_id,
                 r["InstanceId"]),
@@ -1955,8 +2070,8 @@ class AutorecoverAlarm(BaseAction):
                 ActionsEnabled=True,
                 AlarmActions=[
                     'arn:{}:automate:{}:ec2:recover'.format(
-                        utils.REGION_PARTITION_MAP.get(
-                            self.manager.config.region, 'aws'),
+                        utils.get_partition(
+                            self.manager.config.region),
                         i['Placement']['AvailabilityZone'][:-1])
                 ],
                 MetricName='StatusCheckFailed_System',
@@ -2160,73 +2275,42 @@ class PropagateSpotTags(BaseAction):
         return update_instances
 
 
-# Valid EC2 Query Filters
-# http://docs.aws.amazon.com/AWSEC2/latest/CommandLineReference/ApiReference-cmd-DescribeInstances.html
-EC2_VALID_FILTERS = {
-    'architecture': ('i386', 'x86_64'),
-    'availability-zone': str,
-    'iam-instance-profile.arn': str,
-    'image-id': str,
-    'instance-id': str,
-    'instance-lifecycle': ('spot',),
-    'instance-state-name': (
-        'pending',
-        'terminated',
-        'running',
-        'shutting-down',
-        'stopping',
-        'stopped'),
-    'instance.group-id': str,
-    'instance.group-name': str,
-    'tag-key': str,
-    'tag-value': str,
-    'tag:': str,
-    'tenancy': ('dedicated', 'default', 'host'),
-    'vpc-id': str}
+class EC2QueryParser(QueryParser):
 
+    # Valid EC2 Query Filters
+    # https://boto3.amazonaws.com/v1/documentation/api/latest/reference/services/ec2/client/describe_instances.html
+    QuerySchema = {
+        'Filters': {
+            'architecture': ('i386', 'x86_64'),
+            'availability-zone': str,
+            'ebs-optimized': str,
+            'iam-instance-profile.arn': str,
+            'image-id': str,
+            'instance-id': str,
+            'instance-lifecycle': ('spot', 'scheduled', 'capacity-block'),
+            'instance-state-name': (
+                'pending',
+                'terminated',
+                'running',
+                'shutting-down',
+                'stopping',
+                'stopped'),
+            'instance-type': str,
+            'instance.group-id': str,
+            'instance.group-name': str,
+            'owner-id': str,
+            'platform': str,
+            'tag-key': str,
+            'tag-value': str,
+            'tenancy': ('dedicated', 'default', 'host'),
+            'vpc-id': str
+        },
+        'InstanceIds': str,
+        'MaxResults': int,
+    }
+    single_value_fields = ('MaxResults',)
 
-class QueryFilter:
-
-    @classmethod
-    def parse(cls, data):
-        results = []
-        for d in data:
-            if not isinstance(d, dict):
-                raise ValueError(
-                    "EC2 Query Filter Invalid structure %s" % d)
-            results.append(cls(d).validate())
-        return results
-
-    def __init__(self, data):
-        self.data = data
-        self.key = None
-        self.value = None
-
-    def validate(self):
-        if not len(list(self.data.keys())) == 1:
-            raise PolicyValidationError(
-                "EC2 Query Filter Invalid %s" % self.data)
-        self.key = list(self.data.keys())[0]
-        self.value = list(self.data.values())[0]
-
-        if self.key not in EC2_VALID_FILTERS and not self.key.startswith(
-                'tag:'):
-            raise PolicyValidationError(
-                "EC2 Query Filter invalid filter name %s" % (self.data))
-
-        if self.value is None:
-            raise PolicyValidationError(
-                "EC2 Query Filters must have a value, use tag-key"
-                " w/ tag name as value for tag present checks"
-                " %s" % self.data)
-        return self
-
-    def query(self):
-        value = self.value
-        if isinstance(self.value, str):
-            value = [self.value]
-
-        return {'Name': self.key, 'Values': value}
+    type_name = "EC2"
 
 
 @filters.register('instance-attribute')
@@ -2598,3 +2682,34 @@ class CapacityReservation(query.QueryResourceManager):
         filter_type = 'list'
         cfn_type = 'AWS::EC2::CapacityReservation'
         permissions_enum = ('ec2:DescribeCapacityReservations',)
+
+
+@resources.register('ec2-instance-ami')
+class EC2ImageMetadata(query.QueryResourceManager):
+    """Resource for EC2 instance image metadata.
+
+    Provides access to the AMI used by each running EC2 instance via
+    describe_instance_image_metadata, including image state, deprecation
+    time, and public status, even when the AMI is deregistered.
+
+    :Example:
+
+    .. code-block:: yaml
+
+        policies:
+          - name: find-instances-with-deregistered-ami
+            resource: aws.ec2-instance-ami
+            filters:
+              - type: value
+                key: ImageMetadata.State
+                value: deregistered
+    """
+
+    class resource_type(query.TypeInfo):
+        service = 'ec2'
+        arn_type = 'instance'
+        enum_spec = ('describe_instance_image_metadata', 'InstanceImageMetadata', None)
+        id = name = 'InstanceId'
+        id_prefix = 'i-'
+        filter_name = 'InstanceIds'
+        filter_type = 'list'

@@ -1,0 +1,51 @@
+{
+    "status_code": 200,
+    "data": {
+        "NextMarker": "noncompliant_waf",
+        "WebACLs": [
+            {
+                "Name": "compliant-waf",
+                "Id": "d4595dae-518e-4ff7-98ac-609091678beb",
+                "Description": "",
+                "LockToken": "e081f73f-8e5c-4916-b485-1969096102d6",
+                "ARN": "arn:aws:wafv2:us-east-1:644160558196:regional/webacl/compliant-waf/d4595dae-518e-4ff7-98ac-609091678beb"
+            },
+            {
+                "Name": "compliant-waf-3",
+                "Id": "2731e4f8-c467-42ba-a3d6-42d671265f03",
+                "Description": "1 standalone 1 cust. rule group",
+                "LockToken": "cf9d8a76-3d84-4260-a954-569559d6b504",
+                "ARN": "arn:aws:wafv2:us-east-1:644160558196:regional/webacl/compliant-waf-3/2731e4f8-c467-42ba-a3d6-42d671265f03"
+            },
+            {
+                "Name": "compliant-waf-4",
+                "Id": "90d30873-92b9-42dd-b24e-b7f22bb25665",
+                "Description": "1 Custum Rule Group and 0 Standalone",
+                "LockToken": "0b7421a4-6cd0-423c-bccc-361f66f2cc79",
+                "ARN": "arn:aws:wafv2:us-east-1:644160558196:regional/webacl/compliant-waf-4/90d30873-92b9-42dd-b24e-b7f22bb25665"
+            },
+            {
+                "Name": "noncompliant-waf-2",
+                "Id": "c08b8eab-6bd8-4458-849b-5328308fb3fe",
+                "Description": "Standalone Rule",
+                "LockToken": "556f91cb-f46c-430c-9be3-b5a62f99dba9",
+                "ARN": "arn:aws:wafv2:us-east-1:644160558196:regional/webacl/noncompliant-waf-2/c08b8eab-6bd8-4458-849b-5328308fb3fe"
+            },
+            {
+                "Name": "noncompliant-waf-3",
+                "Id": "c30b5c62-c3de-48b6-91a9-778ba13e93ac",
+                "Description": "rule group with no rules",
+                "LockToken": "ff61b70d-7e8c-44a3-82a6-7f497e798456",
+                "ARN": "arn:aws:wafv2:us-east-1:644160558196:regional/webacl/noncompliant-waf-3/c30b5c62-c3de-48b6-91a9-778ba13e93ac"
+            },
+            {
+                "Name": "noncompliant_waf",
+                "Id": "a5cc092e-0be3-4dcf-9c83-891982d1f70f",
+                "Description": "No rules at all",
+                "LockToken": "b68c2aae-3479-4b4d-8f19-e02900d2b635",
+                "ARN": "arn:aws:wafv2:us-east-1:644160558196:regional/webacl/noncompliant_waf/a5cc092e-0be3-4dcf-9c83-891982d1f70f"
+            }
+        ],
+        "ResponseMetadata": {}
+    }
+}

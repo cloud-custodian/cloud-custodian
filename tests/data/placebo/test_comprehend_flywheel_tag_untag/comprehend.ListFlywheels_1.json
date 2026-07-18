@@ -1,0 +1,34 @@
+{
+    "status_code": 200,
+    "data": {
+        "FlywheelSummaryList": [
+            {
+                "FlywheelArn": "arn:aws:comprehend:us-east-1:644160558196:flywheel/TestFlywheelVPC",
+                "DataLakeS3Uri": "s3://c7n-test-s3-bucket/TestFlywheelVPC/schemaVersion=1/20250407T214114Z/",
+                "Status": "ACTIVE",
+                "ModelType": "DOCUMENT_CLASSIFIER",
+                "CreationTime": {
+                    "__class__": "datetime",
+                    "year": 2025,
+                    "month": 4,
+                    "day": 7,
+                    "hour": 17,
+                    "minute": 41,
+                    "second": 14,
+                    "microsecond": 293000
+                },
+                "LastModifiedTime": {
+                    "__class__": "datetime",
+                    "year": 2025,
+                    "month": 4,
+                    "day": 7,
+                    "hour": 17,
+                    "minute": 41,
+                    "second": 36,
+                    "microsecond": 393000
+                }
+            }
+        ],
+        "ResponseMetadata": {}
+    }
+}

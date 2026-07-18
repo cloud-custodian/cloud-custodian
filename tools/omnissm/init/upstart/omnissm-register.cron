@@ -1,2 +1,0 @@
-0 6 * * * root /sbin/initctl start omnissm-register
-@reboot root  /sbin/initctl start omnissm-register

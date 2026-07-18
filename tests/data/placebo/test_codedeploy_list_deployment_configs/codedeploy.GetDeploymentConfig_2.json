@@ -1,0 +1,18 @@
+{
+  "status_code": 200,
+  "data": {
+    "deploymentConfigInfo": {
+      "deploymentConfigId": "00000000-0000-0000-0000-000000000022",
+      "deploymentConfigName": "CodeDeployDefault.ECSCanary10Percent15Minutes",
+      "computePlatform": "ECS",
+      "trafficRoutingConfig": {
+        "type": "TimeBasedCanary",
+        "timeBasedCanary": {
+          "canaryPercentage": 10,
+          "canaryInterval": 15
+        }
+      }
+    },
+    "ResponseMetadata": {}
+  }
+}

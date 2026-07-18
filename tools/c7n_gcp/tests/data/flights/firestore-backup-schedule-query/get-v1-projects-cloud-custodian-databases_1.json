@@ -1,0 +1,64 @@
+{
+  "headers": {
+    "x-debug-tracking-id": "16968628632517955847;o=0",
+    "content-type": "application/json; charset=UTF-8",
+    "vary": "Origin, X-Origin, Referer",
+    "date": "Thu, 02 Apr 2026 00:04:41 GMT",
+    "server": "ESF",
+    "x-xss-protection": "0",
+    "x-frame-options": "SAMEORIGIN",
+    "x-content-type-options": "nosniff",
+    "alt-svc": "h3=\":443\"; ma=2592000,h3-29=\":443\"; ma=2592000",
+    "transfer-encoding": "chunked",
+    "status": "200",
+    "content-length": "1757",
+    "-content-encoding": "gzip",
+    "content-location": "https://firestore.googleapis.com/v1/projects/cloud-custodian/databases?alt=json"
+  },
+  "body": {
+    "databases": [
+      {
+        "name": "projects/cloud-custodian/databases/c7nfs-octopus-east",
+        "uid": "8c5136b4-1c41-4fd0-b036-5cd6712c5f75",
+        "createTime": "2026-04-02T00:04:38.859741Z",
+        "updateTime": "2026-04-02T00:04:38.859741Z",
+        "locationId": "us-east1",
+        "type": "FIRESTORE_NATIVE",
+        "concurrencyMode": "PESSIMISTIC",
+        "versionRetentionPeriod": "3600s",
+        "earliestVersionTime": "2026-04-02T00:04:38.859741Z",
+        "appEngineIntegrationMode": "DISABLED",
+        "pointInTimeRecoveryEnablement": "POINT_IN_TIME_RECOVERY_DISABLED",
+        "deleteProtectionState": "DELETE_PROTECTION_DISABLED",
+        "backupConfig": {
+          "backupSchedulesEnabled": true
+        },
+        "databaseEdition": "STANDARD",
+        "freeTier": true,
+        "realtimeUpdatesMode": "REALTIME_UPDATES_MODE_ENABLED",
+        "etag": "IIX0sZPvzZMDMN3fuZLvzZMD"
+      },
+      {
+        "name": "projects/cloud-custodian/databases/c7nfs-octopus",
+        "uid": "31e2df87-93c8-4773-bd00-003e264a8f90",
+        "createTime": "2026-04-02T00:04:39.004105Z",
+        "updateTime": "2026-04-02T00:04:39.004105Z",
+        "locationId": "us-central1",
+        "type": "FIRESTORE_NATIVE",
+        "concurrencyMode": "PESSIMISTIC",
+        "versionRetentionPeriod": "3600s",
+        "earliestVersionTime": "2026-04-02T00:04:39.004105Z",
+        "appEngineIntegrationMode": "DISABLED",
+        "pointInTimeRecoveryEnablement": "POINT_IN_TIME_RECOVERY_DISABLED",
+        "deleteProtectionState": "DELETE_PROTECTION_DISABLED",
+        "backupConfig": {
+          "backupSchedulesEnabled": true
+        },
+        "databaseEdition": "STANDARD",
+        "freeTier": false,
+        "realtimeUpdatesMode": "REALTIME_UPDATES_MODE_ENABLED",
+        "etag": "IJaisZPvzZMDMMnHwpLvzZMD"
+      }
+    ]
+  }
+}

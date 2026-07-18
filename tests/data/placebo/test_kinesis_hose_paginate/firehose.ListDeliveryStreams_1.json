@@ -1,0 +1,14 @@
+{
+    "status_code": 200,
+    "data": {
+        "DeliveryStreamNames": [
+            "PUT-S3-HFKce",
+            "terraform-kinesis-firehose-extended-s3-test-stream-0",
+            "terraform-kinesis-firehose-extended-s3-test-stream-1",
+            "terraform-kinesis-firehose-extended-s3-test-stream-10",
+            "terraform-kinesis-firehose-extended-s3-test-stream-2"
+        ],
+        "HasMoreDeliveryStreams": true,
+        "ResponseMetadata": {}
+    }
+}

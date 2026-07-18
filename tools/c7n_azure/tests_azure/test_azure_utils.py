@@ -13,7 +13,7 @@ from c7n_azure.utils import (AppInsightsHelper, ManagedGroupHelper, Math,
                              get_keyvault_auth_endpoint, get_keyvault_secret,
                              get_service_tag_ip_space, is_resource_group,
                              is_resource_group_id)
-from mock import Mock, patch
+from unittest.mock import patch, Mock
 from msrestazure.azure_cloud import AZURE_CHINA_CLOUD, AZURE_PUBLIC_CLOUD
 
 from .azure_common import DEFAULT_SUBSCRIPTION_ID, BaseTest

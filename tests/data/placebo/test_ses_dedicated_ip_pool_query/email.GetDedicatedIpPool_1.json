@@ -1,0 +1,10 @@
+{
+    "status_code": 200,
+    "data": {
+        "ResponseMetadata": {},
+        "DedicatedIpPool": {
+            "PoolName": "test-pool",
+            "ScalingMode": "STANDARD"
+        }
+    }
+}

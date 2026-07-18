@@ -1,0 +1,163 @@
+{
+    "pytest-terraform": 1,
+    "outputs": {},
+    "resources": {
+        "google_compute_backend_bucket": {
+            "default": {
+                "bucket_name": "c7n-lb-gfr-default-5d7e",
+                "cdn_policy": [],
+                "compression_mode": "",
+                "creation_timestamp": "2026-04-21T14:07:03.190-07:00",
+                "custom_response_headers": null,
+                "description": "",
+                "edge_security_policy": "",
+                "enable_cdn": false,
+                "id": "projects/cloud-custodian/global/backendBuckets/c7n-lb-bb-default-5d7e",
+                "load_balancing_scheme": "",
+                "name": "c7n-lb-bb-default-5d7e",
+                "params": [],
+                "project": "stacklet-test-policies",
+                "self_link": "https://www.googleapis.com/compute/v1/projects/cloud-custodian/global/backendBuckets/c7n-lb-bb-default-5d7e",
+                "timeouts": null
+            }
+        },
+        "google_compute_global_forwarding_rule": {
+            "default": {
+                "base_forwarding_rule": "",
+                "description": "",
+                "effective_labels": {
+                    "env": "default"
+                },
+                "external_managed_backend_bucket_migration_state": "",
+                "external_managed_backend_bucket_migration_testing_percentage": 0,
+                "forwarding_rule_id": 8038463216630258124,
+                "id": "projects/cloud-custodian/global/forwardingRules/c7n-lb-gfr-default-5d7e",
+                "ip_address": "34.160.244.216",
+                "ip_protocol": "TCP",
+                "ip_version": "",
+                "label_fingerprint": "aMJEA_pTI0o=",
+                "labels": {
+                    "env": "default"
+                },
+                "load_balancing_scheme": "EXTERNAL",
+                "metadata_filters": [],
+                "name": "c7n-lb-gfr-default-5d7e",
+                "network": "",
+                "network_tier": "PREMIUM",
+                "no_automate_dns_zone": null,
+                "port_range": "80-80",
+                "project": "stacklet-test-policies",
+                "psc_connection_id": "",
+                "psc_connection_status": "",
+                "self_link": "https://www.googleapis.com/compute/v1/projects/cloud-custodian/global/forwardingRules/c7n-lb-gfr-default-5d7e",
+                "service_directory_registrations": [],
+                "source_ip_ranges": null,
+                "subnetwork": "",
+                "target": "https://www.googleapis.com/compute/v1/projects/cloud-custodian/global/targetHttpProxies/c7n-lb-http-default-5d7e",
+                "terraform_labels": {
+                    "env": "default"
+                },
+                "timeouts": null
+            }
+        },
+        "google_compute_target_http_proxy": {
+            "default": {
+                "creation_timestamp": "2026-04-21T14:07:36.260-07:00",
+                "description": "",
+                "fingerprint": "o1A9ZzECGDw=",
+                "http_keep_alive_timeout_sec": 0,
+                "id": "projects/cloud-custodian/global/targetHttpProxies/c7n-lb-http-default-5d7e",
+                "name": "c7n-lb-http-default-5d7e",
+                "project": "stacklet-test-policies",
+                "proxy_bind": false,
+                "proxy_id": 7570639349931989495,
+                "self_link": "https://www.googleapis.com/compute/v1/projects/cloud-custodian/global/targetHttpProxies/c7n-lb-http-default-5d7e",
+                "timeouts": null,
+                "url_map": "https://www.googleapis.com/compute/v1/projects/cloud-custodian/global/urlMaps/c7n-lb-um-default-5d7e"
+            }
+        },
+        "google_compute_url_map": {
+            "default": {
+                "creation_timestamp": "2026-04-21T14:07:25.104-07:00",
+                "default_custom_error_response_policy": [],
+                "default_route_action": [],
+                "default_service": "https://www.googleapis.com/compute/v1/projects/cloud-custodian/global/backendBuckets/c7n-lb-bb-default-5d7e",
+                "default_url_redirect": [],
+                "description": "",
+                "fingerprint": "I5nZ33KcGyA=",
+                "header_action": [],
+                "host_rule": [],
+                "id": "projects/cloud-custodian/global/urlMaps/c7n-lb-um-default-5d7e",
+                "map_id": 1401657486293490146,
+                "name": "c7n-lb-um-default-5d7e",
+                "path_matcher": [],
+                "project": "stacklet-test-policies",
+                "self_link": "https://www.googleapis.com/compute/v1/projects/cloud-custodian/global/urlMaps/c7n-lb-um-default-5d7e",
+                "test": [],
+                "timeouts": null
+            }
+        },
+        "google_storage_bucket": {
+            "default": {
+                "autoclass": [],
+                "cors": [],
+                "custom_placement_config": [],
+                "default_event_based_hold": false,
+                "effective_labels": {
+                    "goog-terraform-provisioned": "true"
+                },
+                "enable_object_retention": false,
+                "encryption": [],
+                "force_destroy": true,
+                "hierarchical_namespace": [
+                    {
+                        "enabled": false
+                    }
+                ],
+                "id": "c7n-lb-gfr-default-5d7e",
+                "ip_filter": [],
+                "labels": null,
+                "lifecycle_rule": [],
+                "location": "US",
+                "logging": [],
+                "name": "c7n-lb-gfr-default-5d7e",
+                "project": "stacklet-test-policies",
+                "project_number": 859150599087,
+                "public_access_prevention": "inherited",
+                "requester_pays": false,
+                "retention_policy": [],
+                "rpo": "DEFAULT",
+                "self_link": "https://www.googleapis.com/storage/v1/b/c7n-lb-gfr-default-5d7e",
+                "soft_delete_policy": [
+                    {
+                        "effective_time": "2026-04-21T21:07:02.123Z",
+                        "retention_duration_seconds": 604800
+                    }
+                ],
+                "storage_class": "STANDARD",
+                "terraform_labels": {
+                    "goog-terraform-provisioned": "true"
+                },
+                "time_created": "2026-04-21T21:07:02.123Z",
+                "timeouts": null,
+                "uniform_bucket_level_access": false,
+                "updated": "2026-04-21T21:07:02.123Z",
+                "url": "gs://c7n-lb-gfr-default-5d7e",
+                "versioning": [],
+                "website": []
+            }
+        },
+        "random_id": {
+            "suffix": {
+                "b64_std": "XX4=",
+                "b64_url": "XX4",
+                "byte_length": 2,
+                "dec": "23934",
+                "hex": "5d7e",
+                "id": "XX4",
+                "keepers": null,
+                "prefix": null
+            }
+        }
+    }
+}

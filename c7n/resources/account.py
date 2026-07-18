@@ -172,7 +172,7 @@ class MacieEnabled(ValueFilter):
     """Check status of macie v2 in the account.
 
     Gets the macie session info for the account, and
-    the macie master account for the current account if
+    the macie adminstrator account for the current account if
     configured.
     """
 
@@ -180,7 +180,7 @@ class MacieEnabled(ValueFilter):
     schema_alias = False
     annotation_key = 'c7n:macie'
     annotate = False
-    permissions = ('macie2:GetMacieSession', 'macie2:GetMasterAccount',)
+    permissions = ('macie2:GetMacieSession', 'macie2:GetAdministratorAccount',)
 
     def process(self, resources, event=None):
 
@@ -203,12 +203,13 @@ class MacieEnabled(ValueFilter):
             info = {}
 
         try:
-            minfo = client.get_master_account().get('master')
+            minfo = client.get_administrator_account().get('administrator')
         except (client.exceptions.AccessDeniedException,
                 client.exceptions.ResourceNotFoundException):
             info['master'] = {}
         else:
             info['master'] = minfo
+        info['administrator'] = info['master']
         account[self.annotation_key] = info
 
 
@@ -406,8 +407,8 @@ class GuardDutyEnabled(MultiAttrFilter):
                 filters:
                   - type: guard-duty
                     Detector.Status: ENABLED
-                    Master.AccountId: "00011001"
-                    Master.RelationshipStatus: "Enabled"
+                    Administrator.AccountId: "00011001"
+                    Administrator.RelationshipStatus: "Enabled"
     """
 
     schema = {
@@ -418,19 +419,19 @@ class GuardDutyEnabled(MultiAttrFilter):
             'match-operator': {'enum': ['or', 'and']}},
         'patternProperties': {
             '^Detector': {'oneOf': [{'type': 'object'}, {'type': 'string'}]},
-            '^Master': {'oneOf': [{'type': 'object'}, {'type': 'string'}]}},
+            '^Administrator': {'oneOf': [{'type': 'object'}, {'type': 'string'}]}},
     }
 
     annotation = "c7n:guard-duty"
     permissions = (
-        'guardduty:GetMasterAccount',
+        'guardduty:GetAdministratorAccount',
         'guardduty:ListDetectors',
         'guardduty:GetDetector')
 
     def validate(self):
         attrs = set()
         for k in self.data:
-            if k.startswith('Detector') or k.startswith('Master'):
+            if k.startswith('Detector') or k.startswith('Administrator'):
                 attrs.add(k)
         self.multi_attrs = attrs
         return super(GuardDutyEnabled, self).validate()
@@ -450,8 +451,8 @@ class GuardDutyEnabled(MultiAttrFilter):
 
         detector = client.get_detector(DetectorId=detector_id)
         detector.pop('ResponseMetadata', None)
-        master = client.get_master_account(DetectorId=detector_id).get('Master')
-        resource[self.annotation] = r = {'Detector': detector, 'Master': master}
+        admin = client.get_administrator_account(DetectorId=detector_id).get('Administrator')
+        resource[self.annotation] = r = {'Detector': detector, 'Administrator': admin}
         return r
 
 
@@ -849,10 +850,10 @@ class ServiceLimit(Filter):
     def validate(self):
         region = self.manager.data.get('region', '')
         if len(self.global_services.intersection(self.data.get('services', []))):
-            if region != 'us-east-1':
+            if region != get_support_region(self.manager):
                 raise PolicyValidationError(
-                    "Global services: %s must be targeted in us-east-1 on the policy"
-                    % ', '.join(self.global_services))
+                    "Global services: %s must be targeted in %s on the policy"
+                    % (', '.join(self.global_services), get_support_region(self.manager)))
         return self
 
     @classmethod
@@ -934,10 +935,11 @@ class ServiceLimit(Filter):
             return []
 
         # trim to only results for this region
+        support_region = get_support_region(self.manager)
         results['flaggedResources'] = [
             r
             for r in results.get('flaggedResources', [])
-            if r['metadata'][0] == region or (r['metadata'][0] == '-' and region == 'us-east-1')
+            if r['metadata'][0] == region or (r['metadata'][0] == '-' and region == support_region)
         ]
 
         # save all raw limit results to the account resource
@@ -1273,7 +1275,8 @@ class HasVirtualMFA(Filter):
     permissions = ('iam:ListVirtualMFADevices',)
 
     def mfa_belongs_to_root_account(self, mfa):
-        return mfa['SerialNumber'].endswith(':mfa/root-account-mfa-device')
+        mfa_user = mfa.get('User', {}).get('Arn', '').split(':')[-1]
+        return mfa_user == 'root'
 
     def account_has_virtual_mfa(self, account):
         if not account.get('c7n:VirtualMFADevices'):
@@ -1796,6 +1799,114 @@ class SetS3PublicBlock(BaseAction):
                 PublicAccessBlockConfiguration=config)
 
 
+@filters.register('ami-block-public-access')
+class AmiBlockPublicAccess(Filter):
+    """Scans for AWS accounts that have/do not have Block Public Access set for
+    their AMIs.
+
+    :example:
+
+    .. code-block:: yaml
+
+            policies:
+              - name: unblocked-ami-block-public-access
+                resource: aws.account
+                filters:
+                  - type: ami-block-public-access
+                    value: false
+
+    """
+
+    annotation_key = 'c7n:ami-block-public-access'
+    schema = type_schema('ami-block-public-access', value={'type': 'boolean'})
+    permissions = ('ec2:GetImageBlockPublicAccessState',)
+
+    def process(self, resources, event=None):
+        client = local_session(self.manager.session_factory).client('ec2')
+        is_blocked = self.data.get('value', False)
+        results = []
+
+        # Get account-wide block public access state
+        response = client.get_image_block_public_access_state()
+        account_state = response.get('ImageBlockPublicAccessState', 'unblocked')
+        account_blocked = account_state == 'block-new-sharing'
+
+        for r in resources:
+            r[self.annotation_key] = account_blocked
+
+            # Filter resources based on whether the account state matches the desired value
+            if account_blocked == is_blocked:
+                results.append(r)
+
+        return results
+
+
+@filters.register('payment-cryptography-replication-regions')
+class PaymentCryptographyReplicationRegions(Filter):
+    """Filter an account by its Payment Cryptography default key
+    replication regions.
+
+    The enabled replication regions are recorded on the account resource
+    under the ``c7n:payment-cryptography-replication-regions`` annotation.
+
+    :param state: Whether default key replication should be enabled.
+        When ``true`` (default), the account matches only if at least one
+        replication region is enabled. When ``false``, the account matches
+        only if no replication regions are enabled.
+    :param regions: Optional list of replication regions to check for.
+        Only evaluated when ``state`` is ``true``.
+    :param match: How ``regions`` are compared against the account's
+        enabled replication regions. ``all`` (default) requires every
+        listed region to be enabled; ``any`` requires at least one.
+
+    :example:
+
+    .. code-block:: yaml
+
+       policies:
+         - name: pmtcrypt-default-replication-regions
+           resource: aws.account
+           filters:
+            - type: payment-cryptography-replication-regions
+              state: true
+              regions: ["us-west-2", "eu-west-1"]
+              match: all
+    """
+
+    annotation_key = 'c7n:payment-cryptography-replication-regions'
+    schema = type_schema(
+        'payment-cryptography-replication-regions',
+        state={'type': 'boolean', 'default': True},
+        regions={'type': 'array', 'items': {'type': 'string'}},
+        match={'enum': ['all', 'any'], 'default': 'all'})
+    permissions = ('payment-cryptography:GetDefaultKeyReplicationRegions',)
+
+    def process(self, resources, event=None):
+        state = self.data.get('state', True)
+        required = self.data.get('regions')
+        match = self.data.get('match', 'all')
+
+        client = local_session(
+            self.manager.session_factory).client('payment-cryptography')
+        enabled = client.get_default_key_replication_regions().get(
+            'EnabledReplicationRegions', [])
+
+        for r in resources:
+            r[self.annotation_key] = enabled
+
+        if bool(enabled) != state:
+            return []
+
+        if state and required:
+            enabled_set = set(enabled)
+            if match == 'all' and not enabled_set.issuperset(required):
+                return []
+            if match == 'any' and enabled_set.isdisjoint(required):
+                return []
+
+        return resources
+
+
 class GlueCatalogEncryptionEnabled(MultiAttrFilter):
     """ Filter glue catalog by its glue encryption status and KMS key
 
@@ -1912,11 +2023,9 @@ class EMRBlockPublicAccessConfiguration(ValueFilter):
             'emr', region_name=self.manager.config.region)
 
         for r in resources:
-            try:
-                r[self.annotation_key] = client.get_block_public_access_configuration()
-                r[self.annotation_key].pop('ResponseMetadata')
-            except client.exceptions.NoSuchPublicAccessBlockConfiguration:
-                r[self.annotation_key] = {}
+            r[self.annotation_key] = self.manager.retry(
+                client.get_block_public_access_configuration)
+            r[self.annotation_key].pop('ResponseMetadata')
 
     def __call__(self, r):
         return super(EMRBlockPublicAccessConfiguration, self).__call__(r[self.annotation_key])
@@ -2590,3 +2699,51 @@ class SetEC2MetadataDefaults(BaseAction):
         client = local_session(self.manager.session_factory).client(self.service)
         self.data.pop('type')
         client.modify_instance_metadata_defaults(**self.data)
+
+
+@actions.register('set-security-token-service-preferences')
+class SetSecurityTokenServicePreferences(BaseAction):
+    """Action to set STS preferences."""
+
+    """Action to set STS preferences.
+
+    :example:
+
+    .. code-block:: yaml
+
+            policies:
+              - name: set-sts-preferences
+                resource: account
+                filters:
+                  - or:
+                    - type: iam-summary
+                      key: GlobalEndpointTokenVersion
+                      value: absent
+                      value: optional
+                    - type: iam-summary
+                      key: GlobalEndpointTokenVersion
+                      op: ne
+                      value: 2
+                actions:
+                  - type: set-security-token-service-preferences
+                    token_version: v2Token
+
+    """
+
+    schema = type_schema(
+        'set-security-token-service-preferences',
+        token_version={'type': 'string', 'enum': ['v1Token', 'v2Token']}
+    )
+
+    permissions = ('iam:SetSecurityTokenServicePreferences',)
+
+    def process(self, resources):
+        client = local_session(self.manager.session_factory).client('iam')
+        token_version = self.data.get('token_version', 'v2Token')
+        for resource in resources:
+            self.set_sts_preferences(client, token_version)
+
+    def set_sts_preferences(self, client, token_version):
+        client.set_security_token_service_preferences(
+            GlobalEndpointTokenVersion=token_version
+        )

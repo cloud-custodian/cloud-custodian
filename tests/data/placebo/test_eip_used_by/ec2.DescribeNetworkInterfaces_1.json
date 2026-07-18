@@ -1,0 +1,113 @@
+{
+    "status_code": 200,
+    "data": {
+        "NetworkInterfaces": [
+            {
+                "Association": {
+                    "AllocationId": "eipalloc-089b40a986b3b2954",
+                    "AssociationId": "eipassoc-0befab9d52ce99535",
+                    "IpOwnerId": "123456789012",
+                    "PublicDnsName": "ec2-100-20-250-96.us-west-2.compute.amazonaws.com",
+                    "PublicIp": "100.20.250.96"
+                },
+                "Attachment": {
+                    "AttachmentId": "ela-attach-05917c77bb980c0cf",
+                    "DeleteOnTermination": false,
+                    "DeviceIndex": 1,
+                    "InstanceOwnerId": "amazon-aws",
+                    "Status": "attached"
+                },
+                "AvailabilityZone": "us-west-2a",
+                "Description": "Interface for NAT Gateway nat-03362ee41477cbc96",
+                "Groups": [],
+                "InterfaceType": "nat_gateway",
+                "Ipv6Addresses": [],
+                "MacAddress": "06:4c:11:ac:7a:b3",
+                "NetworkInterfaceId": "eni-0d4abd825d8d1a18a",
+                "OwnerId": "123456789012",
+                "PrivateDnsName": "ip-10-0-1-151.us-west-2.compute.internal",
+                "PrivateIpAddress": "10.0.1.151",
+                "PrivateIpAddresses": [
+                    {
+                        "Association": {
+                            "AllocationId": "eipalloc-089b40a986b3b2954",
+                            "AssociationId": "eipassoc-0befab9d52ce99535",
+                            "IpOwnerId": "123456789012",
+                            "PublicDnsName": "ec2-100-20-250-96.us-west-2.compute.amazonaws.com",
+                            "PublicIp": "100.20.250.96"
+                        },
+                        "Primary": true,
+                        "PrivateDnsName": "ip-10-0-1-151.us-west-2.compute.internal",
+                        "PrivateIpAddress": "10.0.1.151"
+                    }
+                ],
+                "RequesterId": "123456789012",
+                "RequesterManaged": true,
+                "SourceDestCheck": false,
+                "Status": "in-use",
+                "SubnetId": "subnet-05dc5ac96bf4e44b3",
+                "TagSet": [],
+                "VpcId": "vpc-0e21a4d912c312255"
+            },
+            {
+                "Association": {
+                    "AllocationId": "eipalloc-0fd809411832cfc28",
+                    "AssociationId": "eipassoc-0210f966f3702e178",
+                    "IpOwnerId": "123456789012",
+                    "PublicDnsName": "ec2-52-27-14-199.us-west-2.compute.amazonaws.com",
+                    "PublicIp": "52.27.14.199"
+                },
+                "Attachment": {
+                    "AttachTime": {
+                        "__class__": "datetime",
+                        "year": 2025,
+                        "month": 1,
+                        "day": 27,
+                        "hour": 6,
+                        "minute": 53,
+                        "second": 49,
+                        "microsecond": 0
+                    },
+                    "AttachmentId": "eni-attach-07951d8017dcb058c",
+                    "DeleteOnTermination": true,
+                    "DeviceIndex": 0,
+                    "NetworkCardIndex": 0,
+                    "InstanceId": "i-02bdb80e43cda8576",
+                    "InstanceOwnerId": "123456789012",
+                    "Status": "attached"
+                },
+                "AvailabilityZone": "us-west-2c",
+                "Description": "",
+                "Groups": [],
+                "InterfaceType": "interface",
+                "Ipv6Addresses": [],
+                "MacAddress": "0a:8b:69:86:be:ab",
+                "NetworkInterfaceId": "eni-0c460249c6f383b28",
+                "OwnerId": "123456789012",
+                "PrivateDnsName": "ip-10-0-7-84.us-west-2.compute.internal",
+                "PrivateIpAddress": "10.0.7.84",
+                "PrivateIpAddresses": [
+                    {
+                        "Association": {
+                            "AllocationId": "eipalloc-0fd809411832cfc28",
+                            "AssociationId": "eipassoc-0210f966f3702e178",
+                            "IpOwnerId": "123456789012",
+                            "PublicDnsName": "ec2-52-27-14-199.us-west-2.compute.amazonaws.com",
+                            "PublicIp": "52.27.14.199"
+                        },
+                        "Primary": true,
+                        "PrivateDnsName": "ip-10-0-7-84.us-west-2.compute.internal",
+                        "PrivateIpAddress": "10.0.7.84"
+                    }
+                ],
+                "RequesterManaged": false,
+                "SourceDestCheck": true,
+                "Status": "in-use",
+                "SubnetId": "subnet-0c37af384a507f330",
+                "TagSet": [],
+                "VpcId": "vpc-0e21a4d912c312255"
+            }
+        ],
+        "ResponseMetadata": {}
+    }
+}

@@ -4,7 +4,7 @@ from c7n.exceptions import PolicyValidationError
 from c7n.actions import AutoTagUser
 from c7n.utils import query_instances
 from .common import BaseTest, event_data
-from mock import MagicMock
+from unittest.mock import MagicMock
 
 
 class AutoTagCreator(BaseTest):

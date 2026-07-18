@@ -1,0 +1,138 @@
+{
+ "headers": {
+  "content-type": "application/json; charset=UTF-8",
+  "x-guploader-uploadid": "AGQBYWxAg931eQ9UPZB9SmAelsnCotq7Zh-kqFsHT2_7LrPIa0N4kEOS_K21Oa44RNOE-bol0w-y5w",
+  "date": "Fri, 27 Feb 2026 13:23:59 GMT",
+  "vary": "Origin, X-Origin",
+  "cache-control": "private, max-age=0, must-revalidate, no-transform",
+  "expires": "Fri, 27 Feb 2026 13:23:59 GMT",
+  "content-length": "35185",
+  "server": "UploadServer",
+  "alt-svc": "h3=\":443\"; ma=2592000,h3-29=\":443\"; ma=2592000",
+  "status": "200",
+  "content-location": "https://storage.googleapis.com/storage/v1/b?project=stacklet-test-policies&projection=full&alt=json"
+ },
+ "body": {
+  "kind": "storage#buckets",
+  "items": [
+   {
+    "kind": "storage#bucket",
+    "selfLink": "https://www.googleapis.com/storage/v1/b/iam-test-bucket-wuc48fhtok",
+    "id": "iam-test-bucket-wuc48fhtok",
+    "name": "iam-test-bucket-wuc48fhtok",
+    "projectNumber": "859150599087",
+    "generation": "1772198616332255829",
+    "metageneration": "4",
+    "location": "US",
+    "storageClass": "STANDARD",
+    "etag": "CAQ=",
+    "timeCreated": "2026-02-27T13:23:36.605Z",
+    "updated": "2026-02-27T13:23:52.715Z",
+    "acl": [
+     {
+      "kind": "storage#bucketAccessControl",
+      "id": "iam-test-bucket-wuc48fhtok/project-editors-859150599087",
+      "selfLink": "https://www.googleapis.com/storage/v1/b/iam-test-bucket-wuc48fhtok/acl/project-editors-859150599087",
+      "bucket": "iam-test-bucket-wuc48fhtok",
+      "entity": "project-editors-859150599087",
+      "role": "OWNER",
+      "etag": "CAQ=",
+      "projectTeam": {
+       "projectNumber": "859150599087",
+       "team": "editors"
+      }
+     },
+     {
+      "kind": "storage#bucketAccessControl",
+      "id": "iam-test-bucket-wuc48fhtok/project-owners-859150599087",
+      "selfLink": "https://www.googleapis.com/storage/v1/b/iam-test-bucket-wuc48fhtok/acl/project-owners-859150599087",
+      "bucket": "iam-test-bucket-wuc48fhtok",
+      "entity": "project-owners-859150599087",
+      "role": "OWNER",
+      "etag": "CAQ=",
+      "projectTeam": {
+       "projectNumber": "859150599087",
+       "team": "owners"
+      }
+     },
+     {
+      "kind": "storage#bucketAccessControl",
+      "id": "iam-test-bucket-wuc48fhtok/allAuthenticatedUsers",
+      "selfLink": "https://www.googleapis.com/storage/v1/b/iam-test-bucket-wuc48fhtok/acl/allAuthenticatedUsers",
+      "bucket": "iam-test-bucket-wuc48fhtok",
+      "entity": "allAuthenticatedUsers",
+      "role": "READER",
+      "etag": "CAQ="
+     },
+     {
+      "kind": "storage#bucketAccessControl",
+      "id": "iam-test-bucket-wuc48fhtok/project-viewers-859150599087",
+      "selfLink": "https://www.googleapis.com/storage/v1/b/iam-test-bucket-wuc48fhtok/acl/project-viewers-859150599087",
+      "bucket": "iam-test-bucket-wuc48fhtok",
+      "entity": "project-viewers-859150599087",
+      "role": "READER",
+      "etag": "CAQ=",
+      "projectTeam": {
+       "projectNumber": "859150599087",
+       "team": "viewers"
+      }
+     }
+    ],
+    "defaultObjectAcl": [
+     {
+      "kind": "storage#objectAccessControl",
+      "entity": "project-owners-859150599087",
+      "role": "OWNER",
+      "etag": "CAQ=",
+      "projectTeam": {
+       "projectNumber": "859150599087",
+       "team": "owners"
+      }
+     },
+     {
+      "kind": "storage#objectAccessControl",
+      "entity": "project-editors-859150599087",
+      "role": "OWNER",
+      "etag": "CAQ=",
+      "projectTeam": {
+       "projectNumber": "859150599087",
+       "team": "editors"
+      }
+     },
+     {
+      "kind": "storage#objectAccessControl",
+      "entity": "project-viewers-859150599087",
+      "role": "READER",
+      "etag": "CAQ=",
+      "projectTeam": {
+       "projectNumber": "859150599087",
+       "team": "viewers"
+      }
+     }
+    ],
+    "owner": {
+     "entity": "project-owners-859150599087"
+    },
+    "labels": {
+     "env": "default",
+     "goog-terraform-provisioned": "true"
+    },
+    "softDeletePolicy": {
+     "retentionDurationSeconds": "604800",
+     "effectiveTime": "2026-02-27T13:23:36.605Z"
+    },
+    "iamConfiguration": {
+     "bucketPolicyOnly": {
+      "enabled": false
+     },
+     "uniformBucketLevelAccess": {
+      "enabled": false
+     },
+     "publicAccessPrevention": "inherited"
+    },
+    "locationType": "multi-region",
+    "rpo": "DEFAULT"
+   }
+  ]
+ }
+}

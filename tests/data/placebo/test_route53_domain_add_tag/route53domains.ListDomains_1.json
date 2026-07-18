@@ -1,33 +1,23 @@
 {
-    "status_code": 200, 
+    "status_code": 200,
     "data": {
         "Domains": [
             {
-                "TransferLock": false, 
-                "AutoRenew": true, 
+                "DomainName": "c7n-test.com",
+                "AutoRenew": true,
+                "TransferLock": false,
                 "Expiry": {
-                    "hour": 12,
                     "__class__": "datetime",
-                    "month": 8,
-                    "second": 41,
-                    "microsecond": 0,
-                    "year": 2020,
-                    "day": 18,
-                    "minute": 36
-                }, 
-                "DomainName": "genericdomain.com"
+                    "year": 2026,
+                    "month": 10,
+                    "day": 27,
+                    "hour": 14,
+                    "minute": 55,
+                    "second": 6,
+                    "microsecond": 0
+                }
             }
-        ], 
-        "ResponseMetadata": {
-            "RetryAttempts": 0, 
-            "HTTPStatusCode": 200, 
-            "RequestId": "bd2e7c9d-1bde-11e8-ae75-f1873164ab3a", 
-            "HTTPHeaders": {
-                "x-amzn-requestid": "bd2e7c9d-1bde-11e8-ae75-f1873164ab3a", 
-                "date": "Tue, 27 Feb 2018 16:53:30 GMT", 
-                "content-length": "108", 
-                "content-type": "application/x-amz-json-1.1"
-            }
-        }
+        ],
+        "ResponseMetadata": {}
     }
 }

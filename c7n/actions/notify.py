@@ -150,8 +150,15 @@ class Notify(BaseNotify):
     extraction, batch periods, etc.
 
     For expedience and flexibility then, we instead send the data to
-    an sqs queue, for processing. ie. actual communications can be enabled
-    with the c7n-mailer tool, found under tools/c7n_mailer.
+    an sqs queue, for processing.
+
+    .. note::
+
+       The ``notify`` action does not produce complete, human-readable messages
+       on its own. Instead, the `c7n-mailer`_ tool renders and delivers
+       messages by combining ``notify`` output with formatted templates.
+
+       .. _c7n-mailer: ../../tools/c7n-mailer.html
 
     Attaching additional string message attributes are supported on the SNS
     transport, with the exception of the ``mtype`` attribute, which is a

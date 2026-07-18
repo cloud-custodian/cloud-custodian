@@ -24,6 +24,7 @@ class SpannerInstance(QueryResourceManager):
             "name", "displayName", "nodeCount", "state", "config"]
         labels = True
         labels_op = 'patch'
+        labels_perm = 'update'
         asset_type = "spanner.googleapis.com/Instance"
         metric_key = "resource.labels.instance_id"
         urn_component = "instance"
@@ -43,6 +44,11 @@ class SpannerInstance(QueryResourceManager):
                             'labels': all_labels
                         },
                         'field_mask': ', '.join(['labels'])}}
+
+        @staticmethod
+        def get_metric_resource_name(resource, metric_key=None):
+            # Extract instance name from the full resource name
+            return resource["name"].split("/")[-1]
 
 
 @resources.register('spanner-backup')
@@ -64,6 +70,7 @@ class SpannerInstanceBackup(ChildResourceManager):
         default_report_fields = ['name', 'expireTime']
         permissions = ('spanner.backups.list',)
         asset_type = 'spanner.googleapis.com/Backup'
+        allow_metrics_filters = False
 
     def _get_child_enum_args(self, parent_instance):
         return {
@@ -211,6 +218,7 @@ class SpannerDatabaseInstance(ChildResourceManager):
         asset_type = "spanner.googleapis.com/Database"
         urn_component = "database"
         urn_id_segments = (3, 5)
+        allow_metrics_filters = False
 
         @staticmethod
         def get(client, resource_info):

@@ -101,11 +101,17 @@ class MetricsFilter(Filter):
     def get_batch_size(self):
         """get_batch_size
         refer doc: https://www.tencentcloud.com/document/product/248/33881
-        one request only support 1440 data points
-        so it need to calc the batch size
+        A single request can get the data of up to 10 instances
+        for up to 1,440 data points total across instances.
+        So batch size must satisfy both constraints.
         """
+        if self.days <= 0 or self.period <= 0:
+            return 0
         data_points_per_resource = math.ceil(self.days * 86400 / self.period)
-        return math.floor(1440 / data_points_per_resource)
+        # limit by total data points across instances
+        max_instances_by_points = math.floor(1440 / data_points_per_resource)
+        # limit by max instances per request (10)
+        return min(10, max_instances_by_points)
 
     def _get_request_params(self, resources):
         namespace, instances = self.manager.get_metrics_req_params(resources)
@@ -135,7 +141,7 @@ class MetricsFilter(Filter):
     def get_client(self):
         """get_client"""
         return local_session(self.manager.session_factory).client("monitor.tencentcloudapi.com",
-                                                                  "service",
+                                                                  "monitor",
                                                                   "2018-07-24",
                                                                   self.manager.config.region)
 
@@ -143,11 +149,53 @@ class MetricsFilter(Filter):
         """process"""
         log.debug("[metrics filter]start_time=%s, end_time=%s", self.start_time, self.end_time)
 
+        # Create a map from resource_id to resource for quick lookup
+        resource_map = {res[self.resource_metadata.id]: res for res in resources}
+
         matched_resource_ids = []
         for data_point in self.get_metrics_data_point(resources):
             resource_id = self.manager.get_resource_id_from_dimensions(data_point["Dimensions"])
             if resource_id is None:
                 raise PolicyExecutionError("get resource id from metrics response data error")
+
+            # Attach metrics data to the resource (similar to AWS implementation)
+            if resource_id in resource_map:
+                resource = resource_map[resource_id]
+                collected_metrics = resource.setdefault('c7n.metrics', {})
+                # Create cache key similar to AWS pattern
+                key = ".".join(
+                    [
+                        self.resource_metadata.metrics_namespace,
+                        self.metric_name,
+                        self.statistics,
+                        str(self.days),
+                    ]
+                )
+
+                # Store the raw data point and computed metric value
+                collected_metrics[key] = {
+                    'Timestamps': data_point.get('Timestamps', []),
+                    'Values': data_point.get('Values', []),
+                    'Dimensions': data_point.get('Dimensions', []),
+                    'Statistic': self.statistics,
+                    'MetricName': self.metric_name,
+                    'Namespace': self.resource_metadata.metrics_namespace,
+                    'Period': self.period,
+                    'Days': self.days
+                }
+
+                # Compute aggregated value for filtering
+                values = data_point.get("Values", [])
+                if not values and self.missing_value is None:
+                    raise PolicyExecutionError("there is no metrics, but not set missing-value")
+                if not values:
+                    metric_value = self.missing_value
+                else:
+                    metric_value = self.statistics_op(values)
+
+                # Store the computed metric value for easy access
+                collected_metrics[key]['AggregatedValue'] = metric_value
+
             if self.match(data_point):
                 matched_resource_ids.append(resource_id)
             else:

@@ -26,7 +26,7 @@ class TestServer(KubeTest):
     def find_port(self):
         sock = socket.socket()
         sock.bind(("", 0))
-        ((_, port)) = sock.getsockname()
+        _, port = sock.getsockname()
         return port
 
     @contextmanager

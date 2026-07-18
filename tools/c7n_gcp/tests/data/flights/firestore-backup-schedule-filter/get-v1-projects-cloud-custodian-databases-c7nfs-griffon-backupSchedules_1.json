@@ -1,0 +1,29 @@
+{
+  "headers": {
+    "x-debug-tracking-id": "5750195361851635228;o=0",
+    "content-type": "application/json; charset=UTF-8",
+    "vary": "Origin, X-Origin, Referer",
+    "date": "Thu, 02 Apr 2026 00:05:00 GMT",
+    "server": "ESF",
+    "x-xss-protection": "0",
+    "x-frame-options": "SAMEORIGIN",
+    "x-content-type-options": "nosniff",
+    "alt-svc": "h3=\":443\"; ma=2592000,h3-29=\":443\"; ma=2592000",
+    "transfer-encoding": "chunked",
+    "status": "200",
+    "content-length": "327",
+    "-content-encoding": "gzip",
+    "content-location": "https://firestore.googleapis.com/v1/projects/cloud-custodian/databases/c7nfs-griffon/backupSchedules?alt=json"
+  },
+  "body": {
+    "backupSchedules": [
+      {
+        "name": "projects/cloud-custodian/databases/c7nfs-griffon/backupSchedules/8fd577aa-ccd4-4fc5-a7b3-52bebc1d134a",
+        "createTime": "2026-04-02T00:04:58.439002Z",
+        "retention": "1209600s",
+        "dailyRecurrence": {},
+        "updateTime": "2026-04-02T00:04:58.439002Z"
+      }
+    ]
+  }
+}

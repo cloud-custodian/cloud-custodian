@@ -1,0 +1,28 @@
+{
+  "headers": {
+    "content-type": "application/json; charset=UTF-8",
+    "vary": "Origin, X-Origin, Referer",
+    "date": "Mon, 27 Apr 2026 18:11:56 GMT",
+    "server": "ESF",
+    "x-xss-protection": "0",
+    "x-frame-options": "SAMEORIGIN",
+    "x-content-type-options": "nosniff",
+    "alt-svc": "h3=\":443\"; ma=2592000,h3-29=\":443\"; ma=2592000",
+    "transfer-encoding": "chunked",
+    "status": "200",
+    "content-length": "482",
+    "-content-encoding": "gzip"
+  },
+  "body": {
+    "name": "projects/cloud-custodian/locations/us-central1/operations/operation-1777313516860-650750cd3b2eb-54e2f2ce-4dde7474",
+    "metadata": {
+      "@type": "type.googleapis.com/google.cloud.redis.v1.OperationMetadata",
+      "createTime": "2026-04-27T18:11:56.906271382Z",
+      "target": "projects/cloud-custodian/locations/us-central1/instances/c7n-redis-default-5b53",
+      "verb": "update",
+      "cancelRequested": false,
+      "apiVersion": "v1"
+    },
+    "done": false
+  }
+}

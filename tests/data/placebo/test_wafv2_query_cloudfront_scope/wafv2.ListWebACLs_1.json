@@ -1,0 +1,16 @@
+{
+    "status_code": 200,
+    "data": {
+        "NextMarker": "global",
+        "WebACLs": [
+            {
+                "Name": "global",
+                "Id": "42c63f12-89cb-436d-b705-0455935cbaf8",
+                "Description": "",
+                "LockToken": "a6d952da-d12d-49b7-8ace-001c89ba4f16",
+                "ARN": "arn:aws:wafv2:us-east-1:644160558196:global/webacl/global/42c63f12-89cb-436d-b705-0455935cbaf8"
+            }
+        ],
+        "ResponseMetadata": {}
+    }
+}

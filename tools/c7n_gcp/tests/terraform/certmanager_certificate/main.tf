@@ -1,0 +1,73 @@
+provider "google" {}
+
+## Used certificate and private key generated with openssl for testing purposes only. Not valid for production use.
+## Copied from tests/terraform/iam_delete_certificate/cert.tf
+
+resource "google_certificate_manager_certificate" "c7n_test_cert" {
+  name        = "c7n-test-certificate"
+  description = "Cloud Custodian test certificate"
+  location    = "global"
+  scope       = "DEFAULT"
+
+  self_managed {
+    pem_certificate = <<EOF
+-----BEGIN CERTIFICATE-----
+MIIDcTCCAlmgAwIBAgIUdyLoXxEg6f1q3xJTqhCFLFAjSFkwDQYJKoZIhvcNAQEL
+BQAwRzELMAkGA1UEBhMCREUxDzANBgNVBAcMBkJlcmxpbjEVMBMGA1UECgwMVGVz
+dCBDb21wYW55MRAwDgYDVQQDDAdmb28uY29tMCAXDTIwMTExODIxMTcwOVoYDzIy
+OTkxMjMxMjExNzA5WjBHMQswCQYDVQQGEwJERTEPMA0GA1UEBwwGQmVybGluMRUw
+EwYDVQQKDAxUZXN0IENvbXBhbnkxEDAOBgNVBAMMB2Zvby5jb20wggEiMA0GCSqG
+SIb3DQEBAQUAA4IBDwAwggEKAoIBAQDVDdEpgcXd2IflHcOx6lbQXpsNs4NH8LY8
+u0d7g8glWiyErHPz0DgiLEvy74h4pp1w5LAodpCnNflEqCky0QkWhYasc3F0xLbs
+AqNC6FFC/UtBkf6h5b08XxwJ2Iyg0wgWkKO9qEZCbX5iaKizimTs0fffRIN5FQXV
+Aduk8/Nc9OYA2At4i3n+vd8tXDBLeeFUH8qA983Qjf2NnW1174cN8IXzY7bE46ax
+MZOpbhm3zvnqCKDrRQ12VblMH9gZZSc8dBs5eXaZ/L/I8bdL++SYX86jOiQoK6Gd
+0smwjbo5mpxDmMG8iBNC6GgSwLcbBXJrsHKb1eOjXPT9n7Odwu/lAgMBAAGjUzBR
+MB0GA1UdDgQWBBQTiVisMqW/SqBHDmADqp2FqqIuxjAfBgNVHSMEGDAWgBQTiVis
+MqW/SqBHDmADqp2FqqIuxjAPBgNVHRMBAf8EBTADAQH/MA0GCSqGSIb3DQEBCwUA
+A4IBAQB3bCghuy0a8BI+sObx3DhXDOeBpE4IZxOkJALu8/Z3Pnq7N6uC+LElzcu2
+Ni4YU71w60gNQM8lFemIZlFeWnMPQYFx5OS+vxo2xiIXYxQhyOm1F4RnWyol3oYW
+qxyfrnwkOIfQ5kAg6EyxcV2Fyt2qzioafprpGUO5OPFcgspMrTnxSMWyz7ppXZ13
+O2r8eXjgVSggNk8P78j4JnrgJhJAm6879eA32Y2q994wmT9KUNhUbQrFgNPib8W2
+q1Fe/c7vH6Khp47X/tsmFGZpEVFhuRSi+YwApYO/s53TVu145N+WS/rBUxDsvUyD
+HGTJ6VP83qwWSWmnAIxfVpD67pO3
+-----END CERTIFICATE-----
+EOF
+
+    pem_private_key = <<EOF
+-----BEGIN PRIVATE KEY-----
+MIIEvgIBADANBgkqhkiG9w0BAQEFAASCBKgwggSkAgEAAoIBAQDVDdEpgcXd2Ifl
+HcOx6lbQXpsNs4NH8LY8u0d7g8glWiyErHPz0DgiLEvy74h4pp1w5LAodpCnNflE
+qCky0QkWhYasc3F0xLbsAqNC6FFC/UtBkf6h5b08XxwJ2Iyg0wgWkKO9qEZCbX5i
+aKizimTs0fffRIN5FQXVAduk8/Nc9OYA2At4i3n+vd8tXDBLeeFUH8qA983Qjf2N
+nW1174cN8IXzY7bE46axMZOpbhm3zvnqCKDrRQ12VblMH9gZZSc8dBs5eXaZ/L/I
+8bdL++SYX86jOiQoK6Gd0smwjbo5mpxDmMG8iBNC6GgSwLcbBXJrsHKb1eOjXPT9
+n7Odwu/lAgMBAAECggEBALv4Vcq2GTmymasWSJsG8pMidNBwyenFwTLx1I5v5Ty3
+Q0HG2QKKeYwE4vkyRoiUD6IT0ivQ96zfHM5rQvX3oXoCUqCBtd7c07qEVUBpsZBV
+43i1cx+pjvzduOIi8WfO6HroH97rwRlIe1IdnoHRH1wln/iW/Rvt5VhaLExrgxJF
+zwBJhE+BFnPqz5nee3Ds+a3C0eeuTnkABFMCvaoOVDY3dty8hwhe1qQebYfZtoXT
+/FZMptzzsMXFZgpBXg3yyxoeEj/0rlYyR917w/Fabf4NpcRnKUQ9u2uYsK3yVPoM
+0ksMyVQ0fXPikOKNhscw+iDqyLjPv2Q2L2Zfm4nr8cECgYEA8Npe+99Khb7/FR83
+meVnF6992WeXm/NlPfl9FlN4A6BZuGFAPQlZFxCltWH6dzv2RCu1sJBVZqg9o8s/
+DBPIX40yIOlK1pDFs8+eNKwbIfT7ISW2FS1JDS/pNTQG6UNqsvo4FasG2WsksIgT
+hvpwYyZOapdWiXENgQ+WRiBsJzUCgYEA4nPkv1DC3oF4PosF/g1zmaaPjTamMBHF
+3TUAizc5CU67K3esh0o3dSawbEQ0jhjtD+3zP16PTW9OTtKkgKJbvY4SuxNidMIV
+z0CdRRGt/3uPn/SQ6bL05Kzw81VBSa3UgmN/0C3C+abio6u2XnvnccF/i91Wxhbj
+eStiNj3Py/ECgYASrEt66ZfkgKdUIuRzqQZyHqf6J/7oF1m9EU+yYGxIk7EBC4Eo
+ekYO9Lp0MpFxlxODu4PNmZMVb2u//Cz6Kbp6Nf8x8AReWEELrMgOO12rJ0wlCMBy
+Kd2lCRbiihMTGKf4ElAw1d6lEpp4mUQyTc5S0ZB40RzjcQFkBSpYa4EXFQKBgQCj
+7aV/4STQEgVLsTQrTu2KIwrz/MWdMqB7m6zDGrzNQhM4Si+42D8BLXq1RUKOQvkJ
+eQWHsBoowhR79vxiqiWjOL/ScRvqzb0gBPRUVZIRyg6UimSE6KljCNZ8MBFNFusp
+YIHb3+Su+OJD/T/NcgB/VsXQJ/BzAYq14nP8NA7C4QKBgGKlORIJxE33Fx4i8ruP
+YQ71MLUSKSNlCE8OZ/grsP57tWCm/iDyaGYx4cptW/QWA1ROZgWw+tCG1cWKslpN
+SliuPMLJzAglf1vGi4BwT9yrsArO2q2oLoPbdfmrWonBXCy3+AUvxFELpQ8lP9Gl
+j3WTpA0xHl0ZtlX9iuFGn0r+
+-----END PRIVATE KEY-----
+EOF
+  }
+
+  labels = {
+    env = "default"
+  }
+}
+

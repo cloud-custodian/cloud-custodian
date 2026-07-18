@@ -1,0 +1,37 @@
+{
+  "headers": {
+    "content-type": "application/json; charset=UTF-8",
+    "vary": "Origin, X-Origin, Referer",
+    "date": "Tue, 21 Apr 2026 21:08:11 GMT",
+    "server": "ESF",
+    "x-xss-protection": "0",
+    "x-frame-options": "SAMEORIGIN",
+    "x-content-type-options": "nosniff",
+    "alt-svc": "h3=\":443\"; ma=2592000,h3-29=\":443\"; ma=2592000",
+    "transfer-encoding": "chunked",
+    "status": "200",
+    "content-length": "853",
+    "-content-encoding": "gzip",
+    "content-location": "https://compute.googleapis.com/compute/v1/projects/cloud-custodian/global/forwardingRules/c7n-lb-gfr-default-5d7e?alt=json"
+  },
+  "body": {
+    "kind": "compute#forwardingRule",
+    "id": "8038463216630258124",
+    "creationTimestamp": "2026-04-21T14:07:47.610-07:00",
+    "name": "c7n-lb-gfr-default-5d7e",
+    "description": "",
+    "IPAddress": "34.160.244.216",
+    "IPProtocol": "TCP",
+    "portRange": "80-80",
+    "target": "https://www.googleapis.com/compute/v1/projects/cloud-custodian/global/targetHttpProxies/c7n-lb-http-default-5d7e",
+    "selfLink": "https://www.googleapis.com/compute/v1/projects/cloud-custodian/global/forwardingRules/c7n-lb-gfr-default-5d7e",
+    "selfLinkWithId": "https://www.googleapis.com/compute/v1/projects/cloud-custodian/global/forwardingRules/8038463216630258124",
+    "loadBalancingScheme": "EXTERNAL",
+    "networkTier": "PREMIUM",
+    "labels": {
+      "env": "not-the-default"
+    },
+    "labelFingerprint": "ORv95NNSHWA=",
+    "fingerprint": "K-q4bzMtiEA="
+  }
+}

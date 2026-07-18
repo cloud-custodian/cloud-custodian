@@ -1,0 +1,33 @@
+{
+    "status_code": 200,
+    "data": {
+        "ArchiveArn": "arn:aws:ses:us-east-1:644160558196:mailmanager-archive/a-lx5q76dxb65j56qmmcza63wj",
+        "ArchiveId": "a-lx5q76dxb65j56qmmcza63wj",
+        "ArchiveName": "archive-2",
+        "ArchiveState": "ACTIVE",
+        "CreatedTimestamp": {
+            "__class__": "datetime",
+            "year": 2025,
+            "month": 1,
+            "day": 15,
+            "hour": 13,
+            "minute": 30,
+            "second": 53,
+            "microsecond": 799000
+        },
+        "LastUpdatedTimestamp": {
+            "__class__": "datetime",
+            "year": 2025,
+            "month": 1,
+            "day": 15,
+            "hour": 13,
+            "minute": 30,
+            "second": 53,
+            "microsecond": 799000
+        },
+        "Retention": {
+            "RetentionPeriod": "SIX_MONTHS"
+        },
+        "ResponseMetadata": {}
+    }
+}

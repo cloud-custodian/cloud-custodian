@@ -1,0 +1,112 @@
+{
+    "status_code": 200,
+    "data": {
+        "EntityRecognizerPropertiesList": [
+            {
+                "EntityRecognizerArn": "arn:aws:comprehend:us-east-1:644160558196:entity-recognizer/TestVpcEntityRecognizer/version/RBP",
+                "LanguageCode": "en",
+                "Status": "IN_ERROR",
+                "Message": "Amazon Comprehend can't process the request because there isn't enough capacity. Try again later.",
+                "SubmitTime": {
+                    "__class__": "datetime",
+                    "year": 2025,
+                    "month": 7,
+                    "day": 9,
+                    "hour": 12,
+                    "minute": 36,
+                    "second": 17,
+                    "microsecond": 730000
+                },
+                "EndTime": {
+                    "__class__": "datetime",
+                    "year": 2025,
+                    "month": 7,
+                    "day": 9,
+                    "hour": 17,
+                    "minute": 37,
+                    "second": 22,
+                    "microsecond": 55000
+                },
+                "TrainingEndTime": {
+                    "__class__": "datetime",
+                    "year": 2025,
+                    "month": 7,
+                    "day": 9,
+                    "hour": 17,
+                    "minute": 35,
+                    "second": 17,
+                    "microsecond": 928000
+                },
+                "InputDataConfig": {
+                    "DataFormat": "COMPREHEND_CSV",
+                    "EntityTypes": [
+                        {
+                            "Type": "APP_ID"
+                        }
+                    ],
+                    "Documents": {
+                        "S3Uri": "s3://c7n-test-s3-bucket/sample.txt",
+                        "InputFormat": "ONE_DOC_PER_LINE"
+                    },
+                    "EntityList": {
+                        "S3Uri": "s3://c7n-test-s3-bucket/TrainingData5 - Sheet1.csv"
+                    }
+                },
+                "DataAccessRoleArn": "arn:aws:iam::644160558196:role/ComprehendVpcAccessRole",
+                "VolumeKmsKeyId": "arn:aws:kms:us-east-1:644160558196:key/20a0c3ed-99ff-4b38-92e6-e489628e0bfb",
+                "VpcConfig": {
+                    "SecurityGroupIds": [
+                        "sg-0d74b07ab0b3288c0"
+                    ],
+                    "Subnets": [
+                        "subnet-0ebe9abf587c5070c"
+                    ]
+                },
+                "VersionName": "RBP"
+            },
+            {
+                "EntityRecognizerArn": "arn:aws:comprehend:us-east-1:644160558196:entity-recognizer/test-no-RBP",
+                "LanguageCode": "en",
+                "Status": "IN_ERROR",
+                "Message": "DOCUMENT_CORPUS_SIZE_LESS_THAN_MINIMUM: Document corpus size is less than the minimum requirement: 5120 bytes.",
+                "SubmitTime": {
+                    "__class__": "datetime",
+                    "year": 2025,
+                    "month": 10,
+                    "day": 1,
+                    "hour": 15,
+                    "minute": 26,
+                    "second": 44,
+                    "microsecond": 682000
+                },
+                "EndTime": {
+                    "__class__": "datetime",
+                    "year": 2025,
+                    "month": 10,
+                    "day": 1,
+                    "hour": 15,
+                    "minute": 26,
+                    "second": 58,
+                    "microsecond": 635000
+                },
+                "InputDataConfig": {
+                    "DataFormat": "COMPREHEND_CSV",
+                    "EntityTypes": [
+                        {
+                            "Type": "ENGINEER"
+                        }
+                    ],
+                    "Documents": {
+                        "S3Uri": "s3://c7n-test-s3-bucket/TrainingData5 - Sheet1.csv",
+                        "InputFormat": "ONE_DOC_PER_LINE"
+                    },
+                    "Annotations": {
+                        "S3Uri": "s3://c7n-test-s3-bucket/sample.txt"
+                    }
+                },
+                "DataAccessRoleArn": "arn:aws:iam::644160558196:role/ComprehendVpcAccessRole"
+            }
+        ],
+        "ResponseMetadata": {}
+    }
+}

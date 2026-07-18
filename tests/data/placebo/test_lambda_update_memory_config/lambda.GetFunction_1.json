@@ -1,0 +1,50 @@
+{
+    "status_code": 200,
+    "data": {
+        "ResponseMetadata": {},
+        "Configuration": {
+            "FunctionName": "cloud-custodian-memory-resize-test",
+            "FunctionArn": "arn:aws:lambda:us-east-1:644160558196:function:cloud-custodian-memory-resize-test",
+            "Runtime": "nodejs22.x",
+            "Role": "arn:aws:iam::644160558196:role/service-role/cloud-custodian-memory-resize-test-role-fmaa8afs",
+            "Handler": "index.handler",
+            "CodeSize": 295,
+            "Description": "",
+            "Timeout": 3,
+            "MemorySize": 128,
+            "LastModified": "2025-04-13T11:00:48.000+0000",
+            "CodeSha256": "q8E7Nexf5xxhKT9/d4bGpAYOXJYFAUjJ0UDj8OivK8E=",
+            "Version": "$LATEST",
+            "TracingConfig": {
+                "Mode": "PassThrough"
+            },
+            "RevisionId": "a26671c4-040d-420f-9a68-541f213df12c",
+            "State": "Active",
+            "LastUpdateStatus": "InProgress",
+            "LastUpdateStatusReason": "The function is being created.",
+            "LastUpdateStatusReasonCode": "Creating",
+            "PackageType": "Zip",
+            "Architectures": [
+                "x86_64"
+            ],
+            "EphemeralStorage": {
+                "Size": 512
+            },
+            "SnapStart": {
+                "ApplyOn": "None",
+                "OptimizationStatus": "Off"
+            },
+            "RuntimeVersionConfig": {
+                "RuntimeVersionArn": "arn:aws:lambda:us-east-1::runtime:8ce0861cbacc1c3e68742d7537616587fd39490817ec413514cf66613b6bed7d"
+            },
+            "LoggingConfig": {
+                "LogFormat": "Text",
+                "LogGroup": "/aws/lambda/cloud-custodian-memory-resize-test"
+            }
+        },
+        "Code": {
+            "RepositoryType": "S3",
+            "Location": "https://prod-04-2014-tasks.s3.us-east-1.amazonaws.com/snapshots/644160558196/cloud-custodian-memory-resize-test-1a8ed96a-a979-4f03-a0ba-f2888a8d4210?versionId=Py2Miti6F.roFUe1EL8nWqRLt6tUB2eN&X-Amz-Security-Token=IQoJb3JpZ2luX2VjEHEaCXVzLWVhc3QtMSJHMEUCIDwgVWKwi5OcXFNjQQ8I%2BhUBsNi4IVTlkIFdsy2CDDQyAiEAhHO8P10uBECHjc2Cc%2BQ8b0sMaDAGH%2BHN4hDyZKDyiNoqkgII6v%2F%2F%2F%2F%2F%2F%2F%2F%2F%2FARAAGgw3NDk2Nzg5MDI4MzkiDJL3M1402hsA2kfQhCrmATTM6SkAReXjF37mjsy0noqSNpDMieU%2BJGP5g%2BMIxEEqT3n9Iv1j2MqnvpdxbHQ%2Fiucc%2FbREqw%2FRVpXmivzN463MFh24AH6sachourddraOktvy0mVL91qEajtWVwdHGzc3l5m4Hc87vV6cNV9xDH%2BlmpnJ4fbTAtsyI8uC9sFl6r4eD0ndAfi15%2FARJ5Rz%2FxXhmoV0VDtt46KaTT%2FM4VhV4%2BoQAZEr9UUDJAOf9BAUfXInkauUBhgROFiBXbzXjy3oonBZDL97LE0d2ibJXlCKnXN1VICE0SWy%2BwqSh9VnENOnZgbsjMOD57b8GOo8BU3vUnnphI84%2B4TXbTLFikOA4QUbTP9mXWUdCs%2FylGbbxQPQPAz%2BAwGOl2ItyAtUidWtQbPhjoOMHTGUTNDehsy%2FX5%2BHdCVDRjhDtaLGMNE0hjFYY3jDaStmkz1OmEBTtWtk7mPbw9WSE7IxXQ8L%2B%2BDB8m9b08TEImmJ1VlSyvV3FwOOZ8a3wHQoLGjukAYg%3D&X-Amz-Algorithm=AWS4-HMAC-SHA256&X-Amz-Date=20250413T110049Z&X-Amz-SignedHeaders=host&X-Amz-Expires=600&X-Amz-Credential=ASIA25DCYHY3ZAKLVVY2%2F20250413%2Fus-east-1%2Fs3%2Faws4_request&X-Amz-Signature=3c75e04544363e5cd26efa260934bd26dc732e1c883c8e30a25dd62dccff470e"
+        }
+    }
+}

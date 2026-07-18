@@ -1,7 +1,7 @@
 # Copyright The Cloud Custodian Authors.
 # SPDX-License-Identifier: Apache-2.0
 from .azure_common import BaseTest, DEFAULT_SUBSCRIPTION_ID
-from mock import patch
+from unittest.mock import patch
 from c7n_azure.provider import Azure
 from c7n.config import Config
 from msrestazure.azure_cloud import (AZURE_CHINA_CLOUD, AZURE_GERMAN_CLOUD,

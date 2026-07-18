@@ -1,0 +1,37 @@
+{
+    "status_code": 200,
+    "data": {
+        "WorkGroup": {
+            "Name": "tf_testm_adapting_dane",
+            "State": "ENABLED",
+            "Configuration": {
+                "ResultConfiguration": {
+                    "OutputLocation": "s3://tf-test-perfect-beetle/output/",
+                    "EncryptionConfiguration": {
+                        "EncryptionOption": "SSE_KMS",
+                        "KmsKey": "arn:aws:kms:us-east-1:644160558196:key/7ce1a747-8c10-48c0-b19e-ec7984023d2f"
+                    }
+                },
+                "EnforceWorkGroupConfiguration": true,
+                "PublishCloudWatchMetricsEnabled": true,
+                "RequesterPaysEnabled": false,
+                "EngineVersion": {
+                    "SelectedEngineVersion": "AUTO",
+                    "EffectiveEngineVersion": "Athena engine version 3"
+                },
+                "EnableMinimumEncryptionConfiguration": false
+            },
+            "CreationTime": {
+                "__class__": "datetime",
+                "year": 2025,
+                "month": 1,
+                "day": 15,
+                "hour": 18,
+                "minute": 12,
+                "second": 10,
+                "microsecond": 673000
+            }
+        },
+        "ResponseMetadata": {}
+    }
+}

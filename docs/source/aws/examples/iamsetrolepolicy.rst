@@ -5,6 +5,7 @@ Attach required IAM policy to Roles without it:
 
 .. code-block:: yaml
 
+  policies:
     - name: iam-attach-policy
       resource: iam-role
       filters:
@@ -19,6 +20,7 @@ Detach undesired IAM policy from Roles with it:
 
 .. code-block:: yaml
 
+  policies:
     - name: iam-detach-policy
       resource: iam-role
       filters:

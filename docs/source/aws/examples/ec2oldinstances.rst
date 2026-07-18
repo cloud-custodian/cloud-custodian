@@ -3,25 +3,25 @@ EC2 - Old Instance Report
 
 .. code-block:: yaml
 
-   - name: ec2-old-instances
-     resource: ec2
-     comment: |
-       Report running instances older than 60 days
-     filters:
-       - "State.Name": running
-       - type: instance-age
-         days: 60
+    policies:
+      - name: ec2-old-instances
+        resource: ec2
+        comment: |
+          Report running instances older than 60 days
+        filters:
+          - "State.Name": running
+          - type: instance-age
+            days: 60
 
+      # Use Case: Report all AMIs that are 120+ days or older
 
-     # Use Case: Report all AMIs that are 120+ days or older
-
-     - name: ancient-images-report
-       resource: ami
-       comment: |
-         Report on all images older than 90 days which should be de-registered.
-       filters:
-         - type: image-age
-           days: 120
+      - name: ancient-images-report
+        resource: ami
+        comment: |
+          Report on all images older than 90 days which should be de-registered.
+        filters:
+          - type: image-age
+            days: 120
 
 
 Instance Age Filter

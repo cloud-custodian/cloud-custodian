@@ -22,10 +22,13 @@ Individual package tests can be targeted with pytest:
 
 .. code-block:: bash
 
-   $ poetry run pytest -n auto -s tools/c7n_left
+   $ uv run pytest -n auto -s tools/c7n_left
 
 Note we maintain a set of common environment variables used when running tests in `test.env`.
 Beyond dummy values for cloud providers, Of particular note is C7N_VALIDATE.
+
+To override those default testing environment variables, either define overrides in a local
+``.env`` file or run pytest with the ``-p no:env`` option.
 
 
 Operating System Compatibility
@@ -125,6 +128,10 @@ Run this test using the following command, which will also generate flight recor
   .. code-block:: shell
 
     $ pytest tests/path/to/test.py -s -v -k 'test_file_example'
+
+Note that when recording live interactions you may need to override the default test environment
+variables defined in ``test.env``. To do that, either define overrides in a local ``.env`` file
+or run pytest with the ``-p no:env`` option.
 
 This may take a little while as tests are typically interacting with the cloud.
 All terraform state is recorded in the same directory of the terraform module as a ``tf_resources.json`` file.

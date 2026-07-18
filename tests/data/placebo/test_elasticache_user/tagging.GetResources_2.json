@@ -1,0 +1,18 @@
+{
+    "status_code": 200,
+    "data": {
+        "PaginationToken": "",
+        "ResourceTagMappingList": [
+            {
+                "ResourceARN": "arn:aws:elasticache:us-east-1:123456789012:user:c7n-user",
+                "Tags": [
+                    {
+                        "Key": "test-tag",
+                        "Value": "test-value"
+                    }
+                ]
+            }
+        ],
+        "ResponseMetadata": {}
+    }
+}

@@ -52,12 +52,13 @@ class VariableResolver:
         "object": {},
     }
 
-    def __init__(self, source_dir, var_files, reporter=None):
+    def __init__(self, source_dir, var_files, reporter=None, stop_on_hcl_errors=False):
         self.source_dir = source_dir
         self.var_files = var_files
         self.resolved_files = {}
         self.temp_files = []
         self.reporter = reporter
+        self.stop_on_hcl_errors = stop_on_hcl_errors
 
     def _write_file_content(self, content, suffix=".tfvars"):
         fh = tempfile.NamedTemporaryFile(
@@ -120,7 +121,11 @@ class VariableResolver:
                 var_map.update(f_vars)
 
         uninitialized_vars = {}
-        graph_data = tfparse.load_from_path(self.source_dir, allow_downloads=False)
+        graph_data = tfparse.load_from_path(
+            self.source_dir,
+            allow_downloads=False,
+            stop_on_hcl_error=self.stop_on_hcl_errors,
+        )
         for _, variables in TerraformGraph(graph_data, self.source_dir).get_resources_by_type(
             "variable"
         ):
@@ -130,9 +135,9 @@ class VariableResolver:
                 if not v["__tfmeta"]["path"].startswith("variable"):
                     continue
                 if v["__tfmeta"]["label"] not in var_map:
-                    uninitialized_vars[v["__tfmeta"]["label"]] = self.type_defaults[
+                    uninitialized_vars[v["__tfmeta"]["label"]] = self.get_type_default(
                         v.get("type", "string") or "string"
-                    ]
+                    )
 
         if not uninitialized_vars:
             return []
@@ -144,6 +149,15 @@ class VariableResolver:
                 self._write_file_content(json.dumps(uninitialized_vars), ".tfvars.json").name
             ).relative_to(self.source_dir.absolute())
         ]
+
+    @classmethod
+    def get_type_default(cls, vtype):
+        if vtype in cls.type_defaults:
+            return cls.type_defaults[vtype]
+        elif " " in vtype:
+            vtype, _ = vtype.split(' ', 1)
+            return cls.type_defaults[vtype]
+        return cls.type_defaults["string"]
 
     def get_env_variables(self):
         prefix = "TF_VAR_"

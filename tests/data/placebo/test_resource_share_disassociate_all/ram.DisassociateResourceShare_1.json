@@ -1,0 +1,22 @@
+{
+    "status_code": 200,
+    "data": {
+        "ResponseMetadata": {},
+        "resourceShareAssociations": [
+            {
+                "resourceShareArn": "arn:aws:ram:us-east-1:123456789012:resource-share/a4c9e71b-bb81-4974-8d89-8b0c293ad0d7",
+                "associatedEntity": "210987654321",
+                "associationType": "PRINCIPAL",
+                "status": "DISASSOCIATING",
+                "external": false
+            },
+            {
+                "resourceShareArn": "arn:aws:ram:us-east-1:123456789012:resource-share/a4c9e71b-bb81-4974-8d89-8b0c293ad0d7",
+                "associatedEntity": "111111111111",
+                "associationType": "PRINCIPAL",
+                "status": "DISASSOCIATING",
+                "external": false
+            }
+        ]
+    }
+}

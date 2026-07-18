@@ -1,0 +1,67 @@
+{
+    "status_code": 200,
+    "data": {
+        "FileSystems": [
+            {
+                "OwnerId": "644160558196",
+                "CreationTime": {
+                    "__class__": "datetime",
+                    "year": 2025,
+                    "month": 10,
+                    "day": 29,
+                    "hour": 11,
+                    "minute": 44,
+                    "second": 14,
+                    "microsecond": 172000
+                },
+                "FileSystemId": "fs-00e696a505d4b90d5",
+                "FileSystemType": "OPENZFS",
+                "Lifecycle": "AVAILABLE",
+                "StorageCapacity": 1024,
+                "StorageType": "SSD",
+                "VpcId": "vpc-4a9ff72e",
+                "SubnetIds": [
+                    "subnet-5fb47507",
+                    "subnet-425e576a"
+                ],
+                "NetworkInterfaceIds": [
+                    "eni-0e765d8b3beb178f9",
+                    "eni-0948f0930f06aab34"
+                ],
+                "DNSName": "fs-00e696a505d4b90d5.fsx.us-west-2.amazonaws.com",
+                "KmsKeyId": "arn:aws:kms:us-west-2:644160558196:key/5b42e50f-8d8a-4be2-8938-59ccd7a44d0c",
+                "ResourceARN": "arn:aws:fsx:us-west-2:644160558196:file-system/fs-00e696a505d4b90d5",
+                "Tags": [
+                    {
+                        "Key": "Environment",
+                        "Value": "dev"
+                    },
+                    {
+                        "Key": "Name",
+                        "Value": "example-openzfs"
+                    }
+                ],
+                "OpenZFSConfiguration": {
+                    "CopyTagsToBackups": false,
+                    "CopyTagsToVolumes": false,
+                    "DeploymentType": "MULTI_AZ_1",
+                    "ThroughputCapacity": 160,
+                    "WeeklyMaintenanceStartTime": "5:13:30",
+                    "DiskIopsConfiguration": {
+                        "Mode": "AUTOMATIC",
+                        "Iops": 3072
+                    },
+                    "RootVolumeId": "fsvol-0b0d93cfb75a5560e",
+                    "PreferredSubnetId": "subnet-5fb47507",
+                    "EndpointIpAddressRange": "172.31.255.224/28",
+                    "RouteTableIds": [
+                        "rtb-06085062"
+                    ],
+                    "EndpointIpAddress": "172.31.255.226"
+                },
+                "NetworkType": "IPV4"
+            }
+        ],
+        "ResponseMetadata": {}
+    }
+}

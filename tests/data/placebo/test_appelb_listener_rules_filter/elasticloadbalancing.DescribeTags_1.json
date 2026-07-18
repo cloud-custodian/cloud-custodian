@@ -1,0 +1,27 @@
+{
+    "status_code": 200,
+    "data": {
+        "TagDescriptions": [
+            {
+                "ResourceArn": "arn:aws:elasticloadbalancing:us-east-1:123456789012:loadbalancer/app/insecure-alb/1234567890abcdef",
+                "Tags": [
+                    {
+                        "Key": "Name",
+                        "Value": "insecure-alb"
+                    }
+                ]
+            }
+        ],
+        "ResponseMetadata": {
+            "RetryAttempts": 0,
+            "HTTPStatusCode": 200,
+            "RequestId": "12345678-1234-1234-1234-123456789012",
+            "HTTPHeaders": {
+                "x-amzn-requestid": "12345678-1234-1234-1234-123456789012",
+                "content-type": "text/xml",
+                "date": "Tue, 19 Nov 2025 10:00:00 GMT"
+            }
+        }
+    }
+}
+

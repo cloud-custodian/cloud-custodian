@@ -124,14 +124,21 @@ class TerraformProvider(IACSourceProvider):
             p.data["mode"] = {"type": "terraform-source"}
         return policies
 
-    def parse(self, source_dir, var_files=()):
-        resolver = VariableResolver(source_dir, var_files, self.reporter)
+    def parse(self, source_dir, var_files=(), workspace="default", stop_on_hcl_errors=False):
+        resolver = VariableResolver(
+            source_dir,
+            var_files,
+            self.reporter,
+            stop_on_hcl_errors=stop_on_hcl_errors,
+        )
         with resolver.get_variables() as var_files:
             graph = TerraformGraph(
                 load_from_path(
                     source_dir,
                     vars_paths=var_files,
                     allow_downloads=True,
+                    workspace_name=workspace,
+                    stop_on_hcl_error=stop_on_hcl_errors,
                 ),
                 source_dir,
             )

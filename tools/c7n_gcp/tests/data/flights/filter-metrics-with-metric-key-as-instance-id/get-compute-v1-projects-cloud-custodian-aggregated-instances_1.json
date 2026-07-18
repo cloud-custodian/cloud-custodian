@@ -1,0 +1,187 @@
+{
+  "headers": {
+    "etag": "bJ1Dx5Itfxv4MlBj6nEdfXUuMQs=/V0NXQ8Or-j4uTYqQbmrhEdns8dg=",
+    "content-type": "application/json; charset=UTF-8",
+    "vary": "Origin, X-Origin, Referer",
+    "date": "Thu, 01 Apr 2021 18:36:49 GMT",
+    "server": "ESF",
+    "cache-control": "private",
+    "x-xss-protection": "0",
+    "x-frame-options": "SAMEORIGIN",
+    "x-content-type-options": "nosniff",
+    "alt-svc": "h3-29=\":443\"; ma=2592000,h3-T051=\":443\"; ma=2592000,h3-Q050=\":443\"; ma=2592000,h3-Q046=\":443\"; ma=2592000,h3-Q043=\":443\"; ma=2592000,quic=\":443\"; ma=2592000; v=\"46,43\"",
+    "transfer-encoding": "chunked",
+    "status": "200",
+    "content-length": "27497",
+    "-content-encoding": "gzip",
+    "content-location": "https://compute.googleapis.com/compute/v1/projects/cloud-custodian/aggregated/instances?alt=json"
+  },
+  "body": {
+    "id": "projects/cloud-custodian/aggregated/instances",
+    "items": {
+      "zones/us-east4-c": {
+        "instances": [
+          {
+            "kind": "compute#instance",
+            "id": "127589370984384384",
+            "creationTimestamp": "2023-02-02T22:40:35.427-08:00",
+            "name": "name-123",
+            "description": "",
+            "machineType": "https://www.googleapis.com/compute/v1/projects",
+            "status": "TERMINATED",
+            "zone": "https://www.googleapis.com/compute/v1/projects",
+            "canIpForward": false,
+            "networkInterfaces": [
+              {
+                "kind": "compute#networkInterface",
+                "network": "https://www.googleapis.com/compute/v1/projects",
+                "subnetwork": "https://www.googleapis.com/compute/v1/projects",
+                "networkIP": "0.0.0.0",
+                "name": "nic0",
+                "accessConfigs": [
+                  {
+                    "kind": "compute#accessConfig",
+                    "type": "ONE_TO_ONE_NAT",
+                    "name": "External NAT",
+                    "networkTier": "PREMIUM"
+                  }
+                ],
+                "fingerprint": "XYZ",
+                "stackType": "IPV4_ONLY"
+              }
+            ],
+            "disks": [
+              {
+                "kind": "compute#attachedDisk",
+                "type": "PERSISTENT",
+                "mode": "READ_WRITE",
+                "source": "https://www.googleapis.com/compute/v1/projects",
+                "deviceName": "nginx-1",
+                "index": 0,
+                "boot": true,
+                "autoDelete": true,
+                "licenses": [
+                  "https://www.googleapis.com/compute/v1/projects/debian-cloud/global/licenses/debian-10-buster"
+                ],
+                "interface": "SCSI",
+                "guestOsFeatures": [
+                  {
+                    "type": "UEFI_COMPATIBLE"
+                  },
+                  {
+                    "type": "VIRTIO_SCSI_MULTIQUEUE"
+                  }
+                ],
+                "diskSizeGb": "10"
+              }
+            ],
+            "metadata": {
+              "kind": "compute#metadata",
+              "fingerprint": "XYZ",
+              "items": [
+                {
+                  "key": "startup-script",
+                  "value": "#! /bin/bash\napt update\napt -y install nginx"
+                },
+                {
+                  "key": "enable-oslogin",
+                  "value": "true"
+                },
+                {
+                  "key": "enable-osconfig",
+                  "value": "TRUE"
+                }
+              ]
+            },
+            "serviceAccounts": [
+              {
+                "email": "xyz@developer.gserviceaccount.com",
+                "scopes": [
+                  "https://www.googleapis.com/auth/devstorage.read_only",
+                  "https://www.googleapis.com/auth/logging.write",
+                  "https://www.googleapis.com/auth/monitoring.write",
+                  "https://www.googleapis.com/auth/servicecontrol",
+                  "https://www.googleapis.com/auth/service.management.readonly",
+                  "https://www.googleapis.com/auth/trace.append"
+                ]
+              }
+            ],
+            "selfLink": "https://www.googleapis.com/compute/v1/projects",
+            "scheduling": {
+              "onHostMaintenance": "MIGRATE",
+              "automaticRestart": true,
+              "preemptible": false,
+              "provisioningModel": "STANDARD"
+            },
+            "cpuPlatform": "Unknown CPU Platform",
+            "labels": {
+              "goog-ops-agent-policy": "v2-x86-template-1-4-0",
+              "usage": "dev-purpose"
+            },
+            "labelFingerprint": "XYZ",
+            "startRestricted": false,
+            "deletionProtection": false,
+            "reservationAffinity": {
+              "consumeReservationType": "ANY_RESERVATION"
+            },
+            "displayDevice": {
+              "enableDisplay": false
+            },
+            "shieldedInstanceConfig": {
+              "enableSecureBoot": false,
+              "enableVtpm": true,
+              "enableIntegrityMonitoring": true
+            },
+            "shieldedInstanceIntegrityPolicy": {
+              "updateAutoLearnPolicy": true
+            },
+            "confidentialInstanceConfig": {
+              "enableConfidentialCompute": false
+            },
+            "fingerprint": "XYZ",
+            "lastStartTimestamp": "2025-09-10T01:48:58.304-07:00",
+            "lastStopTimestamp": "2025-09-10T01:56:17.580-07:00",
+            "satisfiesPzi": true,
+            "keyRevocationActionType": "NONE",
+            "c7n.metrics": {
+              "compute.googleapis.com/instance/cpu/utilization.ALIGN_NONE.REDUCE_NONE": {
+                "metric": {
+                  "labels": {
+                    "instance_name": "name-123"
+                  },
+                  "type": "compute.googleapis.com/instance/cpu/utilization"
+                },
+                "resource": {
+                  "type": "gce_instance",
+                  "labels": {
+                    "instance_id": "127589370984384384",
+                    "zone": "us-central1-a",
+                    "project_id": "ABC"
+                  }
+                },
+                "metricKind": "GAUGE",
+                "valueType": "DOUBLE",
+                "points": [
+                  {
+                    "interval": {
+                      "startTime": "2025-09-10T08:56:00Z",
+                      "endTime": "2025-09-10T08:56:00Z"
+                    },
+                    "value": {
+                      "doubleValue": 0.01145088399757294
+                    }
+                  }
+                ]
+              }
+            },
+            "c7n:MatchedFilters": [
+              "name"
+            ]
+          }
+        ]
+      }
+    },
+    "selfLink": "https://www.googleapis.com/compute/v1/projects/cloud-custodian/aggregated/instances",
+    "kind": "compute#instanceAggregatedList"
+  }
+}

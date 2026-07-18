@@ -1,0 +1,215 @@
+{
+  "headers": {
+    "content-type": "application/json; charset=UTF-8",
+    "vary": "Origin, X-Origin, Referer",
+    "date": "Thu, 02 Apr 2026 17:17:17 GMT",
+    "server": "ESF",
+    "x-xss-protection": "0",
+    "x-frame-options": "SAMEORIGIN",
+    "x-content-type-options": "nosniff",
+    "alt-svc": "h3=\":443\"; ma=2592000,h3-29=\":443\"; ma=2592000",
+    "transfer-encoding": "chunked",
+    "status": "200",
+    "content-length": "9091",
+    "-content-encoding": "gzip",
+    "content-location": "https://redis.googleapis.com/v1/projects/cloud-custodian/locations/-/clusters?alt=json"
+  },
+  "body": {
+    "clusters": [
+      {
+        "name": "projects/cloud-custodian/locations/us-central1/clusters/c7n-redis-cluster-primary",
+        "createTime": "2026-04-02T17:06:20.505037324Z",
+        "state": "ACTIVE",
+        "uid": "4523a360-f682-49e8-bff4-803ee8a362d7",
+        "replicaCount": 1,
+        "authorizationMode": "AUTH_MODE_IAM_AUTH",
+        "transitEncryptionMode": "TRANSIT_ENCRYPTION_MODE_SERVER_AUTHENTICATION",
+        "sizeGb": 5,
+        "shardCount": 3,
+        "discoveryEndpoints": [
+          {
+            "address": "10.90.0.2",
+            "port": 6379,
+            "pscConfig": {
+              "network": "projects/cloud-custodian/global/networks/c7n-redis-cluster-net"
+            }
+          }
+        ],
+        "pscConnections": [
+          {
+            "pscConnectionId": "107743760214523906",
+            "address": "10.90.0.2",
+            "forwardingRule": "https://www.googleapis.com/compute/v1/projects/cloud-custodian/regions/us-central1/forwardingRules/sca-auto-fr-ea642acd-bd38-4f71-9f73-5ac9476742a3",
+            "projectId": "stacklet-personal-2",
+            "network": "projects/cloud-custodian/global/networks/c7n-redis-cluster-net",
+            "serviceAttachment": "projects/cloud-custodian/regions/us-central1/serviceAttachments/gcp-memorystore-auto-o6f393cd1f31e748-psc-sa"
+          },
+          {
+            "pscConnectionId": "107743760214523907",
+            "address": "10.90.0.3",
+            "forwardingRule": "https://www.googleapis.com/compute/v1/projects/cloud-custodian/regions/us-central1/forwardingRules/sca-auto-fr-3d10f6a6-7164-4381-bcc3-ad43db2d0628",
+            "projectId": "stacklet-personal-2",
+            "network": "projects/cloud-custodian/global/networks/c7n-redis-cluster-net",
+            "serviceAttachment": "projects/cloud-custodian/regions/us-central1/serviceAttachments/gcp-memorystore-auto-o6f393cd1f31e748-psc-sa-2"
+          }
+        ],
+        "nodeType": "REDIS_SHARED_CORE_NANO",
+        "persistenceConfig": {
+          "mode": "DISABLED"
+        },
+        "preciseSizeGb": 4.2,
+        "zoneDistributionConfig": {
+          "mode": "MULTI_ZONE"
+        },
+        "deletionProtectionEnabled": false,
+        "satisfiesPzi": true,
+        "pscServiceAttachments": [
+          {
+            "serviceAttachment": "projects/cloud-custodian/regions/us-central1/serviceAttachments/gcp-memorystore-auto-o6f393cd1f31e748-psc-sa",
+            "connectionType": "CONNECTION_TYPE_DISCOVERY"
+          },
+          {
+            "serviceAttachment": "projects/cloud-custodian/regions/us-central1/serviceAttachments/gcp-memorystore-auto-o6f393cd1f31e748-psc-sa-2"
+          }
+        ],
+        "clusterEndpoints": [
+          {
+            "connections": [
+              {
+                "pscAutoConnection": {
+                  "pscConnectionId": "107743760214523906",
+                  "address": "10.90.0.2",
+                  "forwardingRule": "https://www.googleapis.com/compute/v1/projects/cloud-custodian/regions/us-central1/forwardingRules/sca-auto-fr-ea642acd-bd38-4f71-9f73-5ac9476742a3",
+                  "projectId": "stacklet-personal-2",
+                  "network": "projects/cloud-custodian/global/networks/c7n-redis-cluster-net",
+                  "serviceAttachment": "projects/cloud-custodian/regions/us-central1/serviceAttachments/gcp-memorystore-auto-o6f393cd1f31e748-psc-sa",
+                  "pscConnectionStatus": "PSC_CONNECTION_STATUS_ACTIVE",
+                  "connectionType": "CONNECTION_TYPE_DISCOVERY"
+                }
+              },
+              {
+                "pscAutoConnection": {
+                  "pscConnectionId": "107743760214523907",
+                  "address": "10.90.0.3",
+                  "forwardingRule": "https://www.googleapis.com/compute/v1/projects/cloud-custodian/regions/us-central1/forwardingRules/sca-auto-fr-3d10f6a6-7164-4381-bcc3-ad43db2d0628",
+                  "projectId": "stacklet-personal-2",
+                  "network": "projects/cloud-custodian/global/networks/c7n-redis-cluster-net",
+                  "serviceAttachment": "projects/cloud-custodian/regions/us-central1/serviceAttachments/gcp-memorystore-auto-o6f393cd1f31e748-psc-sa-2",
+                  "pscConnectionStatus": "PSC_CONNECTION_STATUS_ACTIVE"
+                }
+              }
+            ]
+          }
+        ],
+        "automatedBackupConfig": {
+          "automatedBackupMode": "DISABLED"
+        },
+        "encryptionInfo": {
+          "encryptionType": "GOOGLE_DEFAULT_ENCRYPTION"
+        },
+        "effectiveMaintenanceVersion": "REDISCLUSTER_20260312_02_00",
+        "labels": {
+          "goog-terraform-provisioned": "true"
+        },
+        "serverCaMode": "SERVER_CA_MODE_GOOGLE_MANAGED_PER_INSTANCE_CA"
+      },
+      {
+        "name": "projects/cloud-custodian/locations/us-east1/clusters/c7n-redis-cluster-legacy",
+        "createTime": "2026-04-02T17:06:31.426376467Z",
+        "state": "ACTIVE",
+        "uid": "76bc78e1-02ca-4025-838c-ce9404c2bd0a",
+        "replicaCount": 1,
+        "authorizationMode": "AUTH_MODE_DISABLED",
+        "transitEncryptionMode": "TRANSIT_ENCRYPTION_MODE_DISABLED",
+        "sizeGb": 5,
+        "shardCount": 3,
+        "discoveryEndpoints": [
+          {
+            "address": "10.90.0.11",
+            "port": 6379,
+            "pscConfig": {
+              "network": "projects/cloud-custodian/global/networks/c7n-redis-cluster-net"
+            }
+          }
+        ],
+        "pscConnections": [
+          {
+            "pscConnectionId": "107743760214523915",
+            "address": "10.90.0.11",
+            "forwardingRule": "https://www.googleapis.com/compute/v1/projects/cloud-custodian/regions/us-east1/forwardingRules/sca-auto-fr-cac2a4ac-2847-4682-8fbf-ce9d8a59887a",
+            "projectId": "stacklet-personal-2",
+            "network": "projects/cloud-custodian/global/networks/c7n-redis-cluster-net",
+            "serviceAttachment": "projects/cloud-custodian/regions/us-east1/serviceAttachments/gcp-memorystore-auto-c43857fb1ec926a3-psc-sa"
+          },
+          {
+            "pscConnectionId": "107743760214523914",
+            "address": "10.90.0.10",
+            "forwardingRule": "https://www.googleapis.com/compute/v1/projects/cloud-custodian/regions/us-east1/forwardingRules/sca-auto-fr-60f183e3-3cf3-4f3a-aee7-1dd11093d14d",
+            "projectId": "stacklet-personal-2",
+            "network": "projects/cloud-custodian/global/networks/c7n-redis-cluster-net",
+            "serviceAttachment": "projects/cloud-custodian/regions/us-east1/serviceAttachments/gcp-memorystore-auto-c43857fb1ec926a3-psc-sa-2"
+          }
+        ],
+        "nodeType": "REDIS_SHARED_CORE_NANO",
+        "persistenceConfig": {
+          "mode": "DISABLED"
+        },
+        "preciseSizeGb": 4.2,
+        "zoneDistributionConfig": {
+          "mode": "MULTI_ZONE"
+        },
+        "deletionProtectionEnabled": false,
+        "satisfiesPzi": false,
+        "pscServiceAttachments": [
+          {
+            "serviceAttachment": "projects/cloud-custodian/regions/us-east1/serviceAttachments/gcp-memorystore-auto-c43857fb1ec926a3-psc-sa",
+            "connectionType": "CONNECTION_TYPE_DISCOVERY"
+          },
+          {
+            "serviceAttachment": "projects/cloud-custodian/regions/us-east1/serviceAttachments/gcp-memorystore-auto-c43857fb1ec926a3-psc-sa-2"
+          }
+        ],
+        "clusterEndpoints": [
+          {
+            "connections": [
+              {
+                "pscAutoConnection": {
+                  "pscConnectionId": "107743760214523915",
+                  "address": "10.90.0.11",
+                  "forwardingRule": "https://www.googleapis.com/compute/v1/projects/cloud-custodian/regions/us-east1/forwardingRules/sca-auto-fr-cac2a4ac-2847-4682-8fbf-ce9d8a59887a",
+                  "projectId": "stacklet-personal-2",
+                  "network": "projects/cloud-custodian/global/networks/c7n-redis-cluster-net",
+                  "serviceAttachment": "projects/cloud-custodian/regions/us-east1/serviceAttachments/gcp-memorystore-auto-c43857fb1ec926a3-psc-sa",
+                  "pscConnectionStatus": "PSC_CONNECTION_STATUS_ACTIVE",
+                  "connectionType": "CONNECTION_TYPE_DISCOVERY"
+                }
+              },
+              {
+                "pscAutoConnection": {
+                  "pscConnectionId": "107743760214523914",
+                  "address": "10.90.0.10",
+                  "forwardingRule": "https://www.googleapis.com/compute/v1/projects/cloud-custodian/regions/us-east1/forwardingRules/sca-auto-fr-60f183e3-3cf3-4f3a-aee7-1dd11093d14d",
+                  "projectId": "stacklet-personal-2",
+                  "network": "projects/cloud-custodian/global/networks/c7n-redis-cluster-net",
+                  "serviceAttachment": "projects/cloud-custodian/regions/us-east1/serviceAttachments/gcp-memorystore-auto-c43857fb1ec926a3-psc-sa-2",
+                  "pscConnectionStatus": "PSC_CONNECTION_STATUS_ACTIVE"
+                }
+              }
+            ]
+          }
+        ],
+        "automatedBackupConfig": {
+          "automatedBackupMode": "DISABLED"
+        },
+        "encryptionInfo": {
+          "encryptionType": "GOOGLE_DEFAULT_ENCRYPTION"
+        },
+        "effectiveMaintenanceVersion": "REDISCLUSTER_20260312_02_00",
+        "labels": {
+          "goog-terraform-provisioned": "true"
+        },
+        "serverCaMode": "SERVER_CA_MODE_UNSPECIFIED"
+      }
+    ]
+  }
+}

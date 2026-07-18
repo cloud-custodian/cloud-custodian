@@ -1,0 +1,291 @@
+{
+  "version": 1,
+  "interactions": [
+    {
+      "request": {
+        "method": "GET",
+        "uri": "https://management.azure.com/subscriptions/ea42f556-5106-4743-99b0-c129bfa71a47/providers/Microsoft.Web/serverfarms?detailed=true&api-version=2018-02-01",
+        "body": null,
+        "headers": {}
+      },
+      "response": {
+        "status": {
+          "code": 200,
+          "message": "OK"
+        },
+        "headers": {
+          "content-type": [
+            "application/json"
+          ],
+          "cache-control": [
+            "no-cache"
+          ],
+          "date": [
+            "Fri, 13 Sep 2019 21:33:01 GMT"
+          ],
+          "content-length": [
+            "17372"
+          ]
+        },
+        "body": {
+          "data": {
+            "value": [
+              {
+                "id": "/subscriptions/ea42f556-5106-4743-99b0-c129bfa71a47/resourceGroups/test_appserviceplan/providers/Microsoft.Web/serverfarms/cctest-appserviceplan-win",
+                "name": "cctest-appserviceplan-win",
+                "type": "Microsoft.Web/serverfarms",
+                "kind": "app",
+                "location": "East US",
+                "tags": {
+                  "sku": "B1"
+                },
+                "properties": {
+                  "serverFarmId": 14160914,
+                  "name": "cctest-appserviceplan-win",
+                  "workerSize": "Default",
+                  "workerSizeId": 0,
+                  "workerTierName": null,
+                  "numberOfWorkers": 1,
+                  "currentWorkerSize": null,
+                  "currentWorkerSizeId": null,
+                  "currentNumberOfWorkers": null,
+                  "status": "Ready",
+                  "webSpace": "test_appserviceplan-EastUSwebspace",
+                  "subscription": null,
+                  "adminSiteName": null,
+                  "hostingEnvironment": null,
+                  "hostingEnvironmentProfile": null,
+                  "maximumNumberOfWorkers": 10,
+                  "planName": "VirtualDedicatedPlan",
+                  "adminRuntimeSiteName": null,
+                  "computeMode": "Shared",
+                  "siteMode": null,
+                  "geoRegion": "East US",
+                  "perSiteScaling": null,
+                  "maximumElasticWorkerCount": null,
+                  "numberOfSites": 0,
+                  "hostingEnvironmentId": null,
+                  "isSpot": null,
+                  "spotExpirationTime": null,
+                  "freeOfferExpirationTime": null,
+                  "tags": {
+                    "sku": "B1"
+                  },
+                  "kind": "app",
+                  "resourceGroup": "test_appserviceplan",
+                  "reserved": null,
+                  "isXenon": null,
+                  "hyperV": null,
+                  "mdmId": null,
+                  "targetWorkerCount": null,
+                  "targetWorkerSizeId": null,
+                  "provisioningState": null,
+                  "webSiteId": null,
+                  "existingServerFarmIds": null
+                },
+                "sku": {
+                  "name": "S1",
+                  "tier": "Standard",
+                  "size": "S1",
+                  "family": "S",
+                  "capacity": 1
+                }
+              },
+              {
+                "id": "/subscriptions/ea42f556-5106-4743-99b0-c129bfa71a47/resourceGroups/test_appserviceplan/providers/Microsoft.Web/serverfarms/cctest-consumption-win",
+                "name": "cctest-consumption-win",
+                "type": "Microsoft.Web/serverfarms",
+                "kind": "functionapp",
+                "location": "East US",
+                "properties": {
+                  "serverFarmId": 14161208,
+                  "name": "cctest-consumption-win",
+                  "workerSize": "Default",
+                  "workerSizeId": 0,
+                  "workerTierName": null,
+                  "numberOfWorkers": 0,
+                  "currentWorkerSize": null,
+                  "currentWorkerSizeId": null,
+                  "currentNumberOfWorkers": null,
+                  "status": "Ready",
+                  "webSpace": "test_appserviceplan-EastUSwebspace",
+                  "subscription": null,
+                  "adminSiteName": null,
+                  "hostingEnvironment": null,
+                  "hostingEnvironmentProfile": null,
+                  "maximumNumberOfWorkers": 0,
+                  "planName": "VirtualDedicatedPlan",
+                  "adminRuntimeSiteName": null,
+                  "computeMode": "Shared",
+                  "siteMode": null,
+                  "geoRegion": "East US",
+                  "perSiteScaling": null,
+                  "maximumElasticWorkerCount": null,
+                  "numberOfSites": 0,
+                  "hostingEnvironmentId": null,
+                  "isSpot": null,
+                  "spotExpirationTime": null,
+                  "freeOfferExpirationTime": null,
+                  "tags": null,
+                  "kind": "functionapp",
+                  "resourceGroup": "test_appserviceplan",
+                  "reserved": null,
+                  "isXenon": null,
+                  "hyperV": null,
+                  "mdmId": null,
+                  "targetWorkerCount": null,
+                  "targetWorkerSizeId": null,
+                  "provisioningState": null,
+                  "webSiteId": null,
+                  "existingServerFarmIds": null
+                },
+                "sku": {
+                  "name": "Y1",
+                  "tier": "Dynamic",
+                  "size": "Y1",
+                  "family": "Y",
+                  "capacity": 0
+                }
+              }
+            ],
+            "nextLink": null,
+            "id": null
+          }
+        }
+      }
+    },
+    {
+      "request": {
+        "method": "GET",
+        "uri": "https://management.azure.com/subscriptions/ea42f556-5106-4743-99b0-c129bfa71a47/resourceGroups/test_appserviceplan/providers/Microsoft.Web/serverfarms/cctest-appserviceplan-win/sites?api-version=2018-02-01",
+        "body": null,
+        "headers": {}
+      },
+      "response": {
+        "status": {
+          "code": 200,
+          "message": "OK"
+        },
+        "headers": {
+          "content-type": [
+            "application/json"
+          ],
+          "cache-control": [
+            "no-cache"
+          ],
+          "date": [
+            "Fri, 13 Sep 2019 21:33:01 GMT"
+          ],
+          "content-length": [
+            "17372"
+          ]
+        },
+        "body": {
+          "data": {
+            "value": [
+              {
+                "id": "/subscriptions/ea42f556-5106-4743-99b0-c129bfa71a47/resourceGroups/test_appserviceplan/providers/Microsoft.Web/sites/example-app-service-1234fasd142",
+                "name": "example-app-service-1234fasd142",
+                "kind": "app",
+                "type": "Microsoft.Web/serverfarms/sites",
+                "tags": {},
+                "properties": {
+                  "state": "Running",
+                  "hostNames": [
+                    "example-app-service-1234fasd142.azurewebsites.net"
+                  ],
+                  "repositorySiteName": "example-app-service-1234fasd142",
+                  "usageState": "Normal",
+                  "enabled": true,
+                  "enabledHostNames": [
+                    "example-app-service-1234fasd142.azurewebsites.net",
+                    "example-app-service-1234fasd142.scm.azurewebsites.net"
+                  ],
+                  "availabilityState": "Normal",
+                  "hostNameSslStates": [
+                    {
+                      "name": "example-app-service-1234fasd142.azurewebsites.net",
+                      "sslState": "Disabled",
+                      "hostType": "Standard"
+                    },
+                    {
+                      "name": "example-app-service-1234fasd142.scm.azurewebsites.net",
+                      "sslState": "Disabled",
+                      "hostType": "Repository"
+                    }
+                  ],
+                  "reserved": false,
+                  "isXenon": false,
+                  "hyperV": false,
+                  "lastModifiedTimeUtc": "2025-01-13T09:13:57.380Z",
+                  "siteConfig": {
+                    "numberOfWorkers": 1,
+                    "linuxFxVersion": "",
+                    "acrUseManagedIdentityCreds": false,
+                    "alwaysOn": false,
+                    "http20Enabled": false,
+                    "functionAppScaleLimit": 0,
+                    "minimumElasticInstanceCount": 0
+                  },
+                  "scmSiteAlsoStopped": false,
+                  "clientAffinityEnabled": false,
+                  "clientCertEnabled": false,
+                  "clientCertMode": "Required",
+                  "hostNamesDisabled": false,
+                  "customDomainVerificationId": "A86101D55594C814F501573D1067F685110E862D621D27868BEFB0C7C8D81CD3",
+                  "outboundIpAddresses": "20.71.0.115,20.71.1.29,20.71.1.195,20.71.2.155,20.71.6.141,20.73.32.245,20.50.51.178,20.105.224.20",
+                  "possibleOutboundIpAddresses": "20.71.0.115,20.71.1.29,20.71.1.195,20.71.2.155,20.71.6.141,20.73.32.245,20.50.51.178,20.73.35.193,20.73.36.123,20.73.38.232,20.73.193.1,20.73.193.63,20.73.193.249,20.73.194.31,20.73.195.111,20.73.196.147,20.73.196.222,20.73.196.236,20.73.197.25,20.73.197.47,20.73.197.60,20.73.197.89,20.73.197.106,20.73.197.177,20.73.198.215,20.73.198.248,20.73.199.12,20.73.199.58,20.73.199.84,20.73.199.91,20.73.199.106,20.105.224.20",
+                  "containerSize": 0,
+                  "dailyMemoryTimeQuota": 0,
+                  "resourceGroup": "example-resources",
+                  "defaultHostName": "example-app-service-1234fasd142.azurewebsites.net",
+                  "httpsOnly": false,
+                  "redundancyMode": "None",
+                  "storageAccountRequired": false,
+                  "keyVaultReferenceIdentity": "SystemAssigned"
+                }
+              }
+            ],
+            "nextLink": null,
+            "id": null
+          }
+        }
+      }
+    },
+    {
+      "request": {
+        "method": "GET",
+        "uri": "https://management.azure.com/subscriptions/ea42f556-5106-4743-99b0-c129bfa71a47/resourceGroups/test_appserviceplan/providers/Microsoft.Web/serverfarms/cctest-consumption-win/sites?api-version=2018-02-01",
+        "body": null,
+        "headers": {}
+      },
+      "response": {
+        "status": {
+          "code": 200,
+          "message": "OK"
+        },
+        "headers": {
+          "content-type": [
+            "application/json"
+          ],
+          "cache-control": [
+            "no-cache"
+          ],
+          "date": [
+            "Fri, 13 Sep 2019 21:33:01 GMT"
+          ],
+          "content-length": [
+            "17372"
+          ]
+        },
+        "body": {
+          "data": {
+            "value": [],
+            "nextLink": null,
+            "id": null
+          }
+        }
+      }
+    }
+  ]
+}

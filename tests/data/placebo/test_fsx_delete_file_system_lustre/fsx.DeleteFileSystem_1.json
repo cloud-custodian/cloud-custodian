@@ -1,0 +1,8 @@
+{
+    "status_code": 200,
+    "data": {
+        "FileSystemId": "fs-0c594a7c4072e287b",
+        "Lifecycle": "DELETING",
+        "ResponseMetadata": {}
+    }
+}

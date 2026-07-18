@@ -1,0 +1,11 @@
+{
+    "status_code": 400,
+    "data": {
+        "Error": {
+            "Message": "Cannot create backup because this volume's storage virtual machine is deleting.",
+            "Code": "BadRequest"
+        },
+        "ResponseMetadata": {},
+        "Message": "Cannot create backup because this volume's storage virtual machine is deleting."
+    }
+}

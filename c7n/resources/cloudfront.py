@@ -2,10 +2,13 @@
 # SPDX-License-Identifier: Apache-2.0
 import re
 
+from botocore.exceptions import ClientError
+
 from c7n.actions import BaseAction
 from c7n.filters import MetricsFilter, ShieldMetrics, Filter
 from c7n.manager import resources
-from c7n.query import ConfigSource, QueryResourceManager, DescribeSource, TypeInfo
+from c7n.query import (ConfigSource, QueryResourceManager, DescribeSource,
+                       TypeInfo, DescribeWithResourceTags)
 from c7n.tags import universal_augment
 from c7n.utils import local_session, merge_dict, type_schema, get_retry
 from c7n.filters import ValueFilter, WafV2FilterBase
@@ -85,6 +88,45 @@ class StreamingDistribution(QueryResourceManager):
 
     source_mapping = {
         'describe': DescribeStreamingDistribution,
+        'config': ConfigSource
+    }
+
+
+@resources.register('cloudfront-function')
+class Function(QueryResourceManager):
+    class resource_type(TypeInfo):
+        service = "cloudfront"
+        arn_type = "function"
+        enum_spec = ("list_functions", "FunctionList.Items", None)
+        id = "Name"
+        arn = "FunctionMetadata.FunctionARN"
+        name = "Name"
+        date = "FunctionMetadata.LastModifiedTime"
+        cfn_type = "AWS::CloudFront::Function"
+        universal_taggable = object()
+        permission_augment = ("cloudfront:ListTagsForResource",)
+
+    source_mapping = {
+        'describe': DescribeWithResourceTags
+    }
+
+
+@resources.register('cloudfront-key-value-store')
+class KeyValueStore(QueryResourceManager):
+    class resource_type(TypeInfo):
+        service = "cloudfront"
+        arn_type = "key-value-store"
+        enum_spec = ("list_key_value_stores", "KeyValueStoreList.Items", None)
+        id = "Name"
+        arn = "ARN"
+        name = "Name"
+        date = "LastModifiedTime"
+        cfn_type = "AWS::CloudFront::KeyValueStore"
+        universal_taggable = object()
+        permission_augment = ("cloudfront:ListTagsForResource",)
+
+    source_mapping = {
+        'describe': DescribeWithResourceTags,
         'config': ConfigSource
     }
 
@@ -482,12 +524,25 @@ class SetWaf(BaseAction):
                 continue
             if r.get('WebACLId') == target_acl_id:
                 continue
-            result = client.get_distribution_config(Id=r['Id'])
-            config = result['DistributionConfig']
-            config['WebACLId'] = target_acl_id
-            self.retry(
-                client.update_distribution,
-                Id=r['Id'], DistributionConfig=config, IfMatch=result['ETag'])
+            try:
+                result = client.get_distribution_config(Id=r['Id'])
+                config = result['DistributionConfig']
+                config['WebACLId'] = target_acl_id
+                self.retry(
+                    client.update_distribution,
+                    Id=r['Id'], DistributionConfig=config, IfMatch=result['ETag'])
+            except ClientError as e:
+                if e.response['Error']['Code'] == 'InvalidArgument':
+                    # CloudFront distributions with pricing plans cannot have their
+                    # WAF changed. Skip these resources gracefully.
+                    # https://docs.aws.amazon.com/AmazonCloudFront/latest/DeveloperGuide/flat-rate-pricing-plan.html
+                    if 'pricing plan subscription' in str(e):
+                        self.log.warning(
+                            "Skipping WAF update for distribution %s: distribution has a "
+                            "CloudFront pricing plan subscription which requires a web ACL",
+                            r['Id'])
+                        continue
+                raise
 
 
 @Distribution.action_registry.register('set-wafv2')
@@ -567,12 +622,25 @@ class SetWafv2(BaseAction):
                 continue
             if r.get('WebACLId') == target_acl_id:
                 continue
-            result = client.get_distribution_config(Id=r['Id'])
-            config = result['DistributionConfig']
-            config['WebACLId'] = target_acl_id
-            self.retry(
-                client.update_distribution,
-                Id=r['Id'], DistributionConfig=config, IfMatch=result['ETag'])
+            try:
+                result = client.get_distribution_config(Id=r['Id'])
+                config = result['DistributionConfig']
+                config['WebACLId'] = target_acl_id
+                self.retry(
+                    client.update_distribution,
+                    Id=r['Id'], DistributionConfig=config, IfMatch=result['ETag'])
+            except ClientError as e:
+                if e.response['Error']['Code'] == 'InvalidArgument':
+                    # CloudFront distributions with pricing plans cannot have their
+                    # WAF changed. Skip these resources gracefully.
+                    # https://docs.aws.amazon.com/AmazonCloudFront/latest/DeveloperGuide/flat-rate-pricing-plan.html
+                    if 'pricing plan subscription' in str(e):
+                        self.log.warning(
+                            "Skipping WAFv2 update for distribution %s: distribution has a "
+                            "CloudFront pricing plan subscription which requires a web ACL",
+                            r['Id'])
+                        continue
+                raise
 
 
 @Distribution.action_registry.register('disable')

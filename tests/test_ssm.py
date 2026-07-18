@@ -291,6 +291,27 @@ class TestSSM(BaseTest):
         self.assertEqual(len(resources), 2)
         self.assertEqual(resources[0]["c7n:CrossAccountViolations"][0], "yyyyyyyyyyyy")
 
+    def test_get_ssm_documents_everyone_only(self):
+        session_factory = self.replay_flight_data("test_get_ssm_documents_everyone_only")
+        p = self.load_policy(
+            {
+                "name": "retrieve-ssm-documents",
+                "resource": "ssm-document",
+                "filters": [
+                    {
+                        "type": "cross-account",
+                        "whitelist": ["xxxxxxxxxxxx"],
+                        "everyone_only": True
+                    }
+                ]
+            },
+            session_factory=session_factory,
+        )
+
+        resources = p.run()
+        self.assertEqual(len(resources), 1)
+        self.assertEqual(resources[0]["c7n:CrossAccountViolations"][0], "all")
+
     def test_ssm_document_remove_sharing(self):
         session_factory = self.replay_flight_data("test_ssm_document_remove_sharing")
         client = session_factory().client("ssm")

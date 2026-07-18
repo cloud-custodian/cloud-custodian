@@ -1,0 +1,21 @@
+{
+    "status_code": 200,
+    "data": {
+        "directConnectGateways": [
+            {
+                "directConnectGatewayId": "e72d611c-aa39-4fd2-a1d7-da0484ad38fe",
+                "directConnectGatewayName": "c7n-test-directconnect-tagging",
+                "amazonSideAsn": 64512,
+                "ownerAccount": "644160558196",
+                "directConnectGatewayState": "available",
+                "tags": [
+                    {
+                        "key": "existing",
+                        "value": "existing"
+                    }
+                ]
+            }
+        ],
+        "ResponseMetadata": {}
+    }
+}

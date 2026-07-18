@@ -1,0 +1,59 @@
+{
+    "status_code": 200,
+    "data": {
+        "DocumentClassifierPropertiesList": [
+            {
+                "DocumentClassifierArn": "arn:aws:comprehend:us-east-1:644160558196:document-classifier/TestModelVPC",
+                "LanguageCode": "en",
+                "Status": "IN_ERROR",
+                "Message": "NOT_ENOUGH_ACCESS_TO_VPC: The provided data access role does not have at least one of permissions required for Vpc access. Please check documentation.",
+                "SubmitTime": {
+                    "__class__": "datetime",
+                    "year": 2025,
+                    "month": 4,
+                    "day": 7,
+                    "hour": 18,
+                    "minute": 11,
+                    "second": 27,
+                    "microsecond": 562000
+                },
+                "EndTime": {
+                    "__class__": "datetime",
+                    "year": 2025,
+                    "month": 4,
+                    "day": 7,
+                    "hour": 18,
+                    "minute": 15,
+                    "second": 48,
+                    "microsecond": 157000
+                },
+                "TrainingEndTime": {
+                    "__class__": "datetime",
+                    "year": 2025,
+                    "month": 4,
+                    "day": 7,
+                    "hour": 18,
+                    "minute": 14,
+                    "second": 27,
+                    "microsecond": 735000
+                },
+                "InputDataConfig": {
+                    "DataFormat": "COMPREHEND_CSV",
+                    "S3Uri": "s3://c7n-test-s3-bucket"
+                },
+                "OutputDataConfig": {},
+                "DataAccessRoleArn": "arn:aws:iam::644160558196:role/ComprehendVpcAccessRole",
+                "VpcConfig": {
+                    "SecurityGroupIds": [
+                        "sg-0256a8bb3af3ed48e"
+                    ],
+                    "Subnets": [
+                        "subnet-0797208b821c08196"
+                    ]
+                },
+                "Mode": "MULTI_CLASS"
+            }
+        ],
+        "ResponseMetadata": {}
+    }
+}

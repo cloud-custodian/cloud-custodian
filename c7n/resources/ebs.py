@@ -65,11 +65,11 @@ class Snapshot(QueryResourceManager):
         )
 
     def resources(self, query=None):
-        qfilters = SnapshotQueryParser.parse(self.data.get('query', []))
         query = query or {}
-        if qfilters:
-            query['Filters'] = qfilters
-        if query.get('OwnerIds') is None:
+        queries = SnapshotQueryParser.parse(self.data.get('query', []))
+        for q in queries:
+            query.update(q)
+        if 'OwnerIds' not in query:
             query['OwnerIds'] = ['self']
         if 'MaxResults' not in query:
             query['MaxResults'] = 1000
@@ -132,24 +132,72 @@ class ErrorHandler:
             log.warning("Volume id malformed %s" % e_vol_id)
         return e_vol_id
 
+    @staticmethod
+    def remove_volume(rid, resource_set):
+        found = None
+        for r in resource_set:
+            if r['VolumeId'] == rid:
+                found = r
+                break
+        if found:
+            resource_set.remove(found)
+
 
 class SnapshotQueryParser(QueryParser):
 
     QuerySchema = {
-        'description': str,
-        'owner-alias': ('amazon', 'amazon-marketplace', 'microsoft'),
-        'owner-id': str,
-        'progress': str,
-        'snapshot-id': str,
-        'start-time': str,
-        'status': ('pending', 'completed', 'error'),
-        'tag': str,
-        'tag-key': str,
-        'volume-id': str,
-        'volume-size': str,
+        'Filters': {
+            'description': str,
+            'owner-alias': ('amazon', 'amazon-marketplace', 'microsoft'),
+            'owner-id': str,
+            'progress': str,
+            'snapshot-id': str,
+            'start-time': str,
+            'status': ('pending', 'completed', 'error'),
+            'tag': str,
+            'tag-key': str,
+            'volume-id': str,
+            'volume-size': str,
+        },
+        'OwnerIds': str,
+        'RestorableByUserIds': str,
+        'SnapshotIds': str,
+        'MaxResults': int,
     }
+    single_value_fields = ('MaxResults',)
 
-    type_name = 'EBS'
+    type_name = 'EBS Snapshot'
+
+
+class VolumeQueryParser(QueryParser):
+
+    # Valid EBS Volume Query Filters
+    # https://docs.aws.amazon.com/AWSEC2/latest/APIReference/API_DescribeVolumes.html
+    # https://boto3.amazonaws.com/v1/documentation/api/latest/reference/services/ec2/client/describe_volumes.html
+    QuerySchema = {
+        'Filters': {
+            'attachment.attach-time': str,
+            'attachment.delete-on-termination': ('true', 'false'),
+            'attachment.device': str,
+            'attachment.instance-id': str,
+            'attachment.status': ('attaching', 'attached', 'detaching'),
+            'availability-zone': str,
+            'create-time': str,
+            'encrypted': ('true', 'false'),
+            'multi-attach-enabled': ('true', 'false'),
+            'size': int,
+            'snapshot-id': str,
+            'status': ('creating', 'available', 'in-use', 'deleting', 'deleted', 'error'),
+            'tag': str,
+            'tag-key': str,
+            'volume-id': str,
+            'volume-type': ('standard', 'io1', 'io2', 'gp2', 'gp3', 'sc1', 'st1'),
+        },
+        'MaxResults': int,
+    }
+    single_value_fields = ('MaxResults',)
+
+    type_name = 'EBS Volume'
 
 
 @Snapshot.action_registry.register('tag')
@@ -439,19 +487,20 @@ class SnapshotDelete(BaseAction):
                  post, pre - post)
 
         client = local_session(self.manager.session_factory).client('ec2')
+        deleted_snapshots = []
         with self.executor_factory(max_workers=2) as w:
             futures = []
             for snapshot_set in chunks(reversed(snapshots), size=50):
                 futures.append(
-                    w.submit(self.process_snapshot_set, client, snapshot_set))
+                    w.submit(self.process_snapshot_set, client, snapshot_set, deleted_snapshots))
             for f in as_completed(futures):
                 if f.exception():
                     self.log.error(
                         "Exception deleting snapshot set \n %s" % (
                             f.exception()))
-        return snapshots
+        return deleted_snapshots
 
-    def process_snapshot_set(self, client, snapshots_set):
+    def process_snapshot_set(self, client, snapshots_set, deleted_snapshots):
         retry = get_retry((
             'RequestLimitExceeded', 'Client.RequestLimitExceeded'))
 
@@ -462,6 +511,7 @@ class SnapshotDelete(BaseAction):
                 retry(client.delete_snapshot,
                       SnapshotId=s['SnapshotId'],
                       DryRun=self.manager.config.dryrun)
+                deleted_snapshots.append(s)
             except ClientError as e:
                 if e.response['Error']['Code'] == "InvalidSnapshot.NotFound":
                     continue
@@ -663,6 +713,15 @@ class EBS(QueryResourceManager):
             'KmsKeyId'
         )
 
+    def resources(self, query=None):
+        query = query or {}
+        queries = VolumeQueryParser.parse(self.data.get('query', []))
+        for q in queries:
+            query.update(q)
+        if 'MaxResults' not in query:
+            query['MaxResults'] = 1000
+        return super(EBS, self).resources(query=query)
+
     def get_resources(self, ids, cache=True, augment=True):
         if cache:
             resources = self._get_cached_resources(ids)
@@ -678,6 +737,24 @@ class EBS(QueryResourceManager):
                     continue
                 raise
         return []
+
+
+@EBS.action_registry.register('tag')
+class VolumeTag(Tag):
+
+    permissions = ('ec2:CreateTags',)
+
+    def process_resource_set(self, client, resource_set, tags):
+        while resource_set:
+            try:
+                return super(VolumeTag, self).process_resource_set(
+                    client, resource_set, tags)
+            except ClientError as e:
+                bad_vol = ErrorHandler.extract_bad_volume(e)
+                if bad_vol:
+                    ErrorHandler.remove_volume(bad_vol, resource_set)
+                    continue
+                raise
 
 
 @EBS.filter_registry.register('snapshots')
@@ -1017,8 +1094,9 @@ class CopyInstanceTags(BaseAction):
     def initialize(self, volumes):
         instance_vol_map = {}
         for v in volumes:
-            instance_vol_map.setdefault(
-                v['Attachments'][0]['InstanceId'], []).append(v)
+            if v.get('Attachments') and 'InstanceId' in v['Attachments'][0]:
+                instance_vol_map.setdefault(
+                    v['Attachments'][0]['InstanceId'], []).append(v)
         instance_map = {
             i['InstanceId']: i for i in
             self.manager.get_resource_manager('ec2').get_resources(
@@ -1711,10 +1789,15 @@ class ModifyVolume(BaseAction):
 
         for r in resource_set:
             params = {'VolumeId': r['VolumeId']}
-            if piops and ('io1' in (vtype, r['VolumeType']) or
-                          'io2' in (vtype, r['VolumeType'])):
-                # default here if we're changing to io1
-                params['Iops'] = max(int(r.get('Iops', 10) * piops / 100.0), 100)
+            target_type = vtype or r['VolumeType']
+            if piops and target_type in ('io1', 'io2', 'gp3'):
+                if target_type in ('io1', 'io2'):
+                    base_iops = int(r.get('Iops', 10))
+                    min_iops = 100
+                else:  # gp3
+                    base_iops = int(r.get('Iops', 3000))
+                    min_iops = 3000
+                params['Iops'] = max(int(base_iops * piops / 100.0), min_iops)
             if psize:
                 params['Size'] = max(int(r['Size'] * psize / 100.0), 1)
             if vtype:

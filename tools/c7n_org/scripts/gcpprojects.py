@@ -27,7 +27,7 @@ def main(output):
 
             project_info = {
                 'project_id': project['projectId'],
-                'name': project['name'],
+                'name': project.get('name', project['projectId']),
             }
 
             if 'labels' in project:

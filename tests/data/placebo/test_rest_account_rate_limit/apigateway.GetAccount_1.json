@@ -1,0 +1,11 @@
+{
+    "status_code": 429,
+    "data": {
+        "Error": {
+            "Message": "Too Many Requests",
+            "Code": "TooManyRequestsException"
+        },
+        "ResponseMetadata": {},
+        "message": "Too Many Requests"
+    }
+}

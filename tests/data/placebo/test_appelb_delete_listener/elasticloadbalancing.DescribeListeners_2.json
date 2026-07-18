@@ -1,0 +1,54 @@
+{
+    "status_code": 200,
+    "data": {
+        "Listeners": [
+            {
+                "ListenerArn": "arn:aws:elasticloadbalancing:us-east-1:644160558196:listener/app/alb-testing-1/9b007d8464b40d52/3986183ed2fecc58",
+                "LoadBalancerArn": "arn:aws:elasticloadbalancing:us-east-1:644160558196:loadbalancer/app/alb-testing-1/9b007d8464b40d52",
+                "Port": 81,
+                "Protocol": "HTTP",
+                "DefaultActions": [
+                    {
+                        "Type": "forward",
+                        "TargetGroupArn": "arn:aws:elasticloadbalancing:us-east-1:644160558196:targetgroup/test-tg/f5f92a41b7636f90",
+                        "ForwardConfig": {
+                            "TargetGroups": [
+                                {
+                                    "TargetGroupArn": "arn:aws:elasticloadbalancing:us-east-1:644160558196:targetgroup/test-tg/f5f92a41b7636f90",
+                                    "Weight": 1
+                                }
+                            ],
+                            "TargetGroupStickinessConfig": {
+                                "Enabled": false
+                            }
+                        }
+                    }
+                ]
+            },
+            {
+                "ListenerArn": "arn:aws:elasticloadbalancing:us-east-1:644160558196:listener/app/alb-testing-1/9b007d8464b40d52/8c96a69d98fe2562",
+                "LoadBalancerArn": "arn:aws:elasticloadbalancing:us-east-1:644160558196:loadbalancer/app/alb-testing-1/9b007d8464b40d52",
+                "Port": 80,
+                "Protocol": "HTTP",
+                "DefaultActions": [
+                    {
+                        "Type": "forward",
+                        "TargetGroupArn": "arn:aws:elasticloadbalancing:us-east-1:644160558196:targetgroup/test/bf94ca9477d3b25e",
+                        "ForwardConfig": {
+                            "TargetGroups": [
+                                {
+                                    "TargetGroupArn": "arn:aws:elasticloadbalancing:us-east-1:644160558196:targetgroup/test/bf94ca9477d3b25e",
+                                    "Weight": 1
+                                }
+                            ],
+                            "TargetGroupStickinessConfig": {
+                                "Enabled": false
+                            }
+                        }
+                    }
+                ]
+            }
+        ],
+        "ResponseMetadata": {}
+    }
+}

@@ -1,0 +1,37 @@
+{
+    "status_code": 200,
+    "data": {
+        "keyspaces": [
+            {
+                "keyspaceName": "system_schema",
+                "resourceArn": "arn:aws:cassandra:us-east-1:644160558196:/keyspace/system_schema/",
+                "replicationStrategy": "SINGLE_REGION"
+            },
+            {
+                "keyspaceName": "system_schema_mcs",
+                "resourceArn": "arn:aws:cassandra:us-east-1:644160558196:/keyspace/system_schema_mcs/",
+                "replicationStrategy": "SINGLE_REGION"
+            },
+            {
+                "keyspaceName": "system",
+                "resourceArn": "arn:aws:cassandra:us-east-1:644160558196:/keyspace/system/",
+                "replicationStrategy": "SINGLE_REGION"
+            },
+            {
+                "keyspaceName": "system_multiregion_info",
+                "resourceArn": "arn:aws:cassandra:us-east-1:644160558196:/keyspace/system_multiregion_info/",
+                "replicationStrategy": "SINGLE_REGION"
+            },
+            {
+                "keyspaceName": "c7n_test",
+                "resourceArn": "arn:aws:cassandra:us-east-1:644160558196:/keyspace/c7n_test/",
+                "replicationStrategy": "MULTI_REGION",
+                "replicationRegions": [
+                    "us-east-1",
+                    "us-west-2"
+                ]
+            }
+        ],
+        "ResponseMetadata": {}
+    }
+}

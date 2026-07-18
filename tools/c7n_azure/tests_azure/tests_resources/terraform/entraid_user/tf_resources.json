@@ -1,0 +1,569 @@
+{
+    "pytest-terraform": 1,
+    "outputs": {
+        "test_admin_user": {
+            "value": {
+                "account_enabled": true,
+                "department": "IT",
+                "display_name": "C7N Test Admin User",
+                "id": "00000000-0000-0000-0000-000000000000",
+                "job_title": "Administrator",
+                "object_id": "00000000-0000-0000-0000-000000000000",
+                "user_principal_name": "c7n-test-admin-dw2t83rv@example.com"
+            },
+            "type": [
+                "object",
+                {
+                    "account_enabled": "bool",
+                    "department": "string",
+                    "display_name": "string",
+                    "id": "string",
+                    "job_title": "string",
+                    "object_id": "string",
+                    "user_principal_name": "string"
+                }
+            ]
+        },
+        "test_disabled_user": {
+            "value": {
+                "account_enabled": false,
+                "department": "HR",
+                "display_name": "C7N Test Disabled User",
+                "id": "00000000-0000-0000-0000-000000000000",
+                "job_title": "User",
+                "object_id": "00000000-0000-0000-0000-000000000000",
+                "user_principal_name": "c7n-test-disabled-dw2t83rv@example.com"
+            },
+            "type": [
+                "object",
+                {
+                    "account_enabled": "bool",
+                    "department": "string",
+                    "display_name": "string",
+                    "id": "string",
+                    "job_title": "string",
+                    "object_id": "string",
+                    "user_principal_name": "string"
+                }
+            ]
+        },
+        "test_old_password_user": {
+            "value": {
+                "account_enabled": true,
+                "department": "Finance",
+                "display_name": "C7N Test Old Password User",
+                "id": "00000000-0000-0000-0000-000000000000",
+                "job_title": "Analyst",
+                "object_id": "00000000-0000-0000-0000-000000000000",
+                "user_principal_name": "c7n-test-oldpwd-dw2t83rv@example.com"
+            },
+            "type": [
+                "object",
+                {
+                    "account_enabled": "bool",
+                    "department": "string",
+                    "display_name": "string",
+                    "id": "string",
+                    "job_title": "string",
+                    "object_id": "string",
+                    "user_principal_name": "string"
+                }
+            ]
+        },
+        "test_regular_user": {
+            "value": {
+                "account_enabled": true,
+                "department": "Engineering",
+                "display_name": "C7N Test Regular User",
+                "id": "00000000-0000-0000-0000-000000000000",
+                "job_title": "Developer",
+                "object_id": "00000000-0000-0000-0000-000000000000",
+                "user_principal_name": "c7n-test-regular-dw2t83rv@example.com"
+            },
+            "type": [
+                "object",
+                {
+                    "account_enabled": "bool",
+                    "department": "string",
+                    "display_name": "string",
+                    "id": "string",
+                    "job_title": "string",
+                    "object_id": "string",
+                    "user_principal_name": "string"
+                }
+            ]
+        },
+        "test_security_group": {
+            "value": {
+                "description": "Test security group for Cloud Custodian EntraID testing",
+                "display_name": "C7N Test Security Group dw2t83rv",
+                "id": "00000000-0000-0000-0000-000000000000",
+                "object_id": "00000000-0000-0000-0000-000000000000"
+            },
+            "type": [
+                "object",
+                {
+                    "description": "string",
+                    "display_name": "string",
+                    "id": "string",
+                    "object_id": "string"
+                }
+            ]
+        }
+    },
+    "resources": {
+        "azuread_client_config": {
+            "current": {
+                "client_id": "00000000-0000-0000-0000-000000000000",
+                "id": "00000000-0000-0000-0000-000000000000-00000000-0000-0000-0000-000000000000-00000000-0000-0000-0000-000000000000",
+                "object_id": "00000000-0000-0000-0000-000000000000",
+                "tenant_id": "00000000-0000-0000-0000-000000000000",
+                "timeouts": null
+            }
+        },
+        "azuread_domains": {
+            "current": {
+                "admin_managed": false,
+                "domains": [
+                    {
+                        "admin_managed": true,
+                        "authentication_type": "Managed",
+                        "default": false,
+                        "domain_name": "example.com",
+                        "initial": false,
+                        "root": true,
+                        "supported_services": [
+                            "Email"
+                        ],
+                        "verified": true
+                    },
+                    {
+                        "admin_managed": true,
+                        "authentication_type": "Managed",
+                        "default": false,
+                        "domain_name": "testdomain1.com",
+                        "initial": false,
+                        "root": true,
+                        "supported_services": [
+                            "Email"
+                        ],
+                        "verified": true
+                    },
+                    {
+                        "admin_managed": true,
+                        "authentication_type": "Managed",
+                        "default": false,
+                        "domain_name": "testdomain2.com",
+                        "initial": false,
+                        "root": true,
+                        "supported_services": [
+                            "Email"
+                        ],
+                        "verified": true
+                    },
+                    {
+                        "admin_managed": true,
+                        "authentication_type": "Managed",
+                        "default": false,
+                        "domain_name": "testdomain3.org",
+                        "initial": false,
+                        "root": true,
+                        "supported_services": [
+                            "Email"
+                        ],
+                        "verified": true
+                    },
+                    {
+                        "admin_managed": true,
+                        "authentication_type": "Managed",
+                        "default": false,
+                        "domain_name": "testdomain4.com",
+                        "initial": false,
+                        "root": true,
+                        "supported_services": [
+                            "Email"
+                        ],
+                        "verified": true
+                    },
+                    {
+                        "admin_managed": true,
+                        "authentication_type": "Managed",
+                        "default": false,
+                        "domain_name": "testdomain5.org",
+                        "initial": false,
+                        "root": true,
+                        "supported_services": [
+                            "Email"
+                        ],
+                        "verified": true
+                    },
+                    {
+                        "admin_managed": true,
+                        "authentication_type": "Managed",
+                        "default": false,
+                        "domain_name": "testdomain6.org",
+                        "initial": false,
+                        "root": true,
+                        "supported_services": [
+                            "Email"
+                        ],
+                        "verified": true
+                    },
+                    {
+                        "admin_managed": true,
+                        "authentication_type": "Managed",
+                        "default": false,
+                        "domain_name": "testdomain7.com",
+                        "initial": false,
+                        "root": true,
+                        "supported_services": [
+                            "Email"
+                        ],
+                        "verified": true
+                    },
+                    {
+                        "admin_managed": true,
+                        "authentication_type": "Managed",
+                        "default": false,
+                        "domain_name": "mockorg.onmicrosoft.com",
+                        "initial": true,
+                        "root": true,
+                        "supported_services": [
+                            "Email",
+                            "OfficeCommunicationsOnline"
+                        ],
+                        "verified": true
+                    },
+                    {
+                        "admin_managed": true,
+                        "authentication_type": "Managed",
+                        "default": true,
+                        "domain_name": "mockorg.com",
+                        "initial": false,
+                        "root": true,
+                        "supported_services": [
+                            "Email"
+                        ],
+                        "verified": true
+                    },
+                    {
+                        "admin_managed": true,
+                        "authentication_type": "Managed",
+                        "default": false,
+                        "domain_name": "testdomain8.com",
+                        "initial": false,
+                        "root": true,
+                        "supported_services": [
+                            "Email"
+                        ],
+                        "verified": true
+                    },
+                    {
+                        "admin_managed": true,
+                        "authentication_type": "Managed",
+                        "default": false,
+                        "domain_name": "MOCKTESTDOMAIN123456789.example.cloud",
+                        "initial": false,
+                        "root": true,
+                        "supported_services": [],
+                        "verified": true
+                    },
+                    {
+                        "admin_managed": true,
+                        "authentication_type": "Managed",
+                        "default": false,
+                        "domain_name": "testdomain9.com",
+                        "initial": false,
+                        "root": true,
+                        "supported_services": [
+                            "Email"
+                        ],
+                        "verified": true
+                    }
+                ],
+                "id": "domains#00000000-0000-0000-0000-000000000000#MockHashForTestingPurposes123=",
+                "include_unverified": false,
+                "only_default": false,
+                "only_initial": false,
+                "only_root": false,
+                "supports_services": [],
+                "timeouts": null
+            }
+        },
+        "azuread_group": {
+            "test_security_group": {
+                "administrative_unit_ids": null,
+                "assignable_to_role": false,
+                "auto_subscribe_new_members": false,
+                "behaviors": null,
+                "description": "Test security group for Cloud Custodian EntraID testing",
+                "display_name": "C7N Test Security Group dw2t83rv",
+                "dynamic_membership": [],
+                "external_senders_allowed": false,
+                "hide_from_address_lists": false,
+                "hide_from_outlook_clients": false,
+                "id": "00000000-0000-0000-0000-000000000000",
+                "mail": "",
+                "mail_enabled": false,
+                "mail_nickname": "mock-group-1",
+                "members": [],
+                "object_id": "00000000-0000-0000-0000-000000000000",
+                "onpremises_domain_name": "",
+                "onpremises_group_type": "",
+                "onpremises_netbios_name": "",
+                "onpremises_sam_account_name": "",
+                "onpremises_security_identifier": "",
+                "onpremises_sync_enabled": false,
+                "owners": [
+                    "00000000-0000-0000-0000-000000000000"
+                ],
+                "preferred_language": "",
+                "prevent_duplicate_names": false,
+                "provisioning_options": null,
+                "proxy_addresses": [],
+                "security_enabled": true,
+                "theme": "",
+                "timeouts": null,
+                "types": null,
+                "visibility": "",
+                "writeback_enabled": false
+            }
+        },
+        "azuread_group_member": {
+            "admin_member": {
+                "group_object_id": "00000000-0000-0000-0000-000000000000",
+                "id": "00000000-0000-0000-0000-000000000000/member/00000000-0000-0000-0000-000000000000",
+                "member_object_id": "00000000-0000-0000-0000-000000000000",
+                "timeouts": null
+            }
+        },
+        "azuread_user": {
+            "test_admin_user": {
+                "about_me": "",
+                "account_enabled": true,
+                "age_group": "",
+                "business_phones": [],
+                "city": "",
+                "company_name": "",
+                "consent_provided_for_minor": "",
+                "cost_center": "",
+                "country": "",
+                "creation_type": "",
+                "department": "IT",
+                "disable_password_expiration": false,
+                "disable_strong_password": false,
+                "display_name": "C7N Test Admin User",
+                "division": "",
+                "employee_id": "",
+                "employee_type": "",
+                "external_user_state": "",
+                "fax_number": "",
+                "force_password_change": false,
+                "given_name": "",
+                "id": "00000000-0000-0000-0000-000000000000",
+                "im_addresses": [],
+                "job_title": "Administrator",
+                "mail": "",
+                "mail_nickname": "c7n-test-admin-dw2t83rv",
+                "manager_id": "",
+                "mobile_phone": "",
+                "object_id": "00000000-0000-0000-0000-000000000000",
+                "office_location": "",
+                "onpremises_distinguished_name": "",
+                "onpremises_domain_name": "",
+                "onpremises_immutable_id": "",
+                "onpremises_sam_account_name": "",
+                "onpremises_security_identifier": "",
+                "onpremises_sync_enabled": false,
+                "onpremises_user_principal_name": "",
+                "other_mails": null,
+                "password": "P@ssw0rd123!",
+                "postal_code": "",
+                "preferred_language": "",
+                "proxy_addresses": [],
+                "show_in_address_list": true,
+                "state": "",
+                "street_address": "",
+                "surname": "",
+                "timeouts": null,
+                "usage_location": "",
+                "user_principal_name": "c7n-test-admin-dw2t83rv@example.com",
+                "user_type": "Member"
+            },
+            "test_disabled_user": {
+                "about_me": "",
+                "account_enabled": false,
+                "age_group": "",
+                "business_phones": [],
+                "city": "",
+                "company_name": "",
+                "consent_provided_for_minor": "",
+                "cost_center": "",
+                "country": "",
+                "creation_type": "",
+                "department": "HR",
+                "disable_password_expiration": false,
+                "disable_strong_password": false,
+                "display_name": "C7N Test Disabled User",
+                "division": "",
+                "employee_id": "",
+                "employee_type": "",
+                "external_user_state": "",
+                "fax_number": "",
+                "force_password_change": false,
+                "given_name": "",
+                "id": "00000000-0000-0000-0000-000000000000",
+                "im_addresses": [],
+                "job_title": "User",
+                "mail": "",
+                "mail_nickname": "c7n-test-disabled-dw2t83rv",
+                "manager_id": "",
+                "mobile_phone": "",
+                "object_id": "00000000-0000-0000-0000-000000000000",
+                "office_location": "",
+                "onpremises_distinguished_name": "",
+                "onpremises_domain_name": "",
+                "onpremises_immutable_id": "",
+                "onpremises_sam_account_name": "",
+                "onpremises_security_identifier": "",
+                "onpremises_sync_enabled": false,
+                "onpremises_user_principal_name": "",
+                "other_mails": null,
+                "password": "P@ssw0rd123!",
+                "postal_code": "",
+                "preferred_language": "",
+                "proxy_addresses": [],
+                "show_in_address_list": true,
+                "state": "",
+                "street_address": "",
+                "surname": "",
+                "timeouts": null,
+                "usage_location": "",
+                "user_principal_name": "c7n-test-disabled-dw2t83rv@example.com",
+                "user_type": "Member"
+            },
+            "test_old_password_user": {
+                "about_me": "",
+                "account_enabled": true,
+                "age_group": "",
+                "business_phones": [],
+                "city": "",
+                "company_name": "",
+                "consent_provided_for_minor": "",
+                "cost_center": "",
+                "country": "",
+                "creation_type": "",
+                "department": "Finance",
+                "disable_password_expiration": false,
+                "disable_strong_password": false,
+                "display_name": "C7N Test Old Password User",
+                "division": "",
+                "employee_id": "",
+                "employee_type": "",
+                "external_user_state": "",
+                "fax_number": "",
+                "force_password_change": false,
+                "given_name": "",
+                "id": "00000000-0000-0000-0000-000000000000",
+                "im_addresses": [],
+                "job_title": "Analyst",
+                "mail": "",
+                "mail_nickname": "c7n-test-oldpwd-dw2t83rv",
+                "manager_id": "",
+                "mobile_phone": "",
+                "object_id": "00000000-0000-0000-0000-000000000000",
+                "office_location": "",
+                "onpremises_distinguished_name": "",
+                "onpremises_domain_name": "",
+                "onpremises_immutable_id": "",
+                "onpremises_sam_account_name": "",
+                "onpremises_security_identifier": "",
+                "onpremises_sync_enabled": false,
+                "onpremises_user_principal_name": "",
+                "other_mails": null,
+                "password": "OldP@ssw0rd123!",
+                "postal_code": "",
+                "preferred_language": "",
+                "proxy_addresses": [],
+                "show_in_address_list": true,
+                "state": "",
+                "street_address": "",
+                "surname": "",
+                "timeouts": null,
+                "usage_location": "",
+                "user_principal_name": "c7n-test-oldpwd-dw2t83rv@example.com",
+                "user_type": "Member"
+            },
+            "test_regular_user": {
+                "about_me": "",
+                "account_enabled": true,
+                "age_group": "",
+                "business_phones": [],
+                "city": "",
+                "company_name": "",
+                "consent_provided_for_minor": "",
+                "cost_center": "",
+                "country": "",
+                "creation_type": "",
+                "department": "Engineering",
+                "disable_password_expiration": false,
+                "disable_strong_password": false,
+                "display_name": "C7N Test Regular User",
+                "division": "",
+                "employee_id": "",
+                "employee_type": "",
+                "external_user_state": "",
+                "fax_number": "",
+                "force_password_change": false,
+                "given_name": "",
+                "id": "00000000-0000-0000-0000-000000000000",
+                "im_addresses": [],
+                "job_title": "Developer",
+                "mail": "",
+                "mail_nickname": "c7n-test-regular-dw2t83rv",
+                "manager_id": "",
+                "mobile_phone": "",
+                "object_id": "00000000-0000-0000-0000-000000000000",
+                "office_location": "",
+                "onpremises_distinguished_name": "",
+                "onpremises_domain_name": "",
+                "onpremises_immutable_id": "",
+                "onpremises_sam_account_name": "",
+                "onpremises_security_identifier": "",
+                "onpremises_sync_enabled": false,
+                "onpremises_user_principal_name": "",
+                "other_mails": null,
+                "password": "P@ssw0rd123!",
+                "postal_code": "",
+                "preferred_language": "",
+                "proxy_addresses": [],
+                "show_in_address_list": true,
+                "state": "",
+                "street_address": "",
+                "surname": "",
+                "timeouts": null,
+                "usage_location": "",
+                "user_principal_name": "c7n-test-regular-dw2t83rv@example.com",
+                "user_type": "Member"
+            }
+        },
+        "random_string": {
+            "suffix": {
+                "id": "dw2t83rv",
+                "keepers": null,
+                "length": 8,
+                "lower": true,
+                "min_lower": 0,
+                "min_numeric": 0,
+                "min_special": 0,
+                "min_upper": 0,
+                "number": true,
+                "numeric": true,
+                "override_special": null,
+                "result": "dw2t83rv",
+                "special": false,
+                "upper": false
+            }
+        }
+    }
+}

@@ -34,7 +34,7 @@ class AccountTests(BaseTest):
                 'or': [
                     {'type': 'check-macie',
                      'value': 'absent',
-                     'key': 'master.accountId'},
+                     'key': 'administrator.accountId'},
                     {'type': 'check-macie',
                      'key': 'status',
                      'value': 'ENABLED'}]}]
@@ -45,6 +45,7 @@ class AccountTests(BaseTest):
             'createdAt': datetime.datetime(
                 2020, 12, 3, 16, 22, 14, 821000, tzinfo=tz.tzutc()),
             'findingPublishingFrequency': 'FIFTEEN_MINUTES',
+            'administrator': {},
             'master': {},
             'serviceRole': ('arn:aws:iam::{}:role/aws-service-role/'
                             'macie.amazonaws.com/'
@@ -295,6 +296,129 @@ class AccountTests(BaseTest):
              'BlockPublicPolicy': True,
              'IgnorePublicAcls': False,
              'RestrictPublicBuckets': False})
+
+    def test_ami_block_public_access_enabled(self):
+        factory = self.replay_flight_data('test_ami_block_public_access_enabled')
+        p = self.load_policy({
+            'name': 'ami-check-block-enabled',
+            'resource': 'aws.account',
+            'filters': [{
+                'type': 'ami-block-public-access',
+                'value': True
+            }]},
+            session_factory=factory)
+        resources = p.run()
+        # Should return the active account when blocking is enabled
+        self.assertEqual(len(resources), 1)
+
+    def test_ami_block_public_access_disabled(self):
+        factory = self.replay_flight_data('test_ami_block_public_access_disabled')
+        p = self.load_policy({
+            'name': 'ami-check-block-disabled',
+            'resource': 'aws.account',
+            'filters': [{
+                'type': 'ami-block-public-access',
+                'value': False
+            }]},
+            session_factory=factory)
+        resources = p.run()
+        # Should return the active account when blocking is disabled
+        self.assertEqual(len(resources), 1)
+
+    def test_ami_block_public_access_mismatch(self):
+        factory = self.replay_flight_data('test_ami_block_public_access_enabled')
+        p = self.load_policy({
+            'name': 'ami-check-block-mismatch',
+            'resource': 'aws.account',
+            'filters': [{
+                'type': 'ami-block-public-access',
+                'value': False  # Looking for disabled, but account has it enabled
+            }]},
+            session_factory=factory)
+        resources = p.run()
+        # Shouldn't match when account state doesn't match filter
+        self.assertEqual(len(resources), 0)
+
+    def test_pmtcrypt_replication_regions_enabled(self):
+        factory = self.replay_flight_data(
+            'test_pmtcrypt_replication_regions_enabled')
+        p = self.load_policy({
+            'name': 'pmtcrypt-replication-enabled',
+            'resource': 'aws.account',
+            'filters': [{
+                'type': 'payment-cryptography-replication-regions',
+                'state': True}]},
+            session_factory=factory)
+        resources = p.run()
+        self.assertEqual(len(resources), 1)
+        self.assertTrue(resources[0][
+            'c7n:payment-cryptography-replication-regions'])
+
+    def test_pmtcrypt_replication_regions_disabled(self):
+        factory = self.replay_flight_data(
+            'test_pmtcrypt_replication_regions_disabled')
+        p = self.load_policy({
+            'name': 'pmtcrypt-replication-disabled',
+            'resource': 'aws.account',
+            'filters': [{
+                'type': 'payment-cryptography-replication-regions',
+                'state': False}]},
+            session_factory=factory)
+        resources = p.run()
+        # account has no default replication regions -> matches state: false
+        self.assertEqual(len(resources), 1)
+        self.assertEqual(
+            resources[0]['c7n:payment-cryptography-replication-regions'], [])
+
+    def test_pmtcrypt_replication_regions_specific(self):
+        factory = self.replay_flight_data(
+            'test_pmtcrypt_replication_regions_enabled')
+        p = self.load_policy({
+            'name': 'pmtcrypt-replication-specific',
+            'resource': 'aws.account',
+            'filters': [{
+                'type': 'payment-cryptography-replication-regions',
+                'state': True,
+                'regions': ['us-west-2']}]},
+            session_factory=factory)
+        resources = p.run()
+        self.assertEqual(len(resources), 1)
+        self.assertIn(
+            'us-west-2',
+            resources[0]['c7n:payment-cryptography-replication-regions'])
+
+    def test_pmtcrypt_replication_regions_specific_missing(self):
+        factory = self.replay_flight_data(
+            'test_pmtcrypt_replication_regions_enabled')
+        p = self.load_policy({
+            'name': 'pmtcrypt-replication-specific-missing',
+            'resource': 'aws.account',
+            'filters': [{
+                'type': 'payment-cryptography-replication-regions',
+                'state': True,
+                'regions': ['ap-southeast-2']}]},
+            session_factory=factory)
+        resources = p.run()
+        # required region is not in the account defaults -> no match
+        self.assertEqual(len(resources), 0)
+
+    def test_pmtcrypt_replication_regions_any_match(self):
+        factory = self.replay_flight_data(
+            'test_pmtcrypt_replication_regions_enabled')
+        p = self.load_policy({
+            'name': 'pmtcrypt-replication-any',
+            'resource': 'aws.account',
+            'filters': [{
+                'type': 'payment-cryptography-replication-regions',
+                'state': True,
+                'regions': ['ap-southeast-2', 'us-west-2'],
+                'match': 'any'}]},
+            session_factory=factory)
+        resources = p.run()
+        self.assertEqual(len(resources), 1)
+        self.assertIn(
+            'us-west-2',
+            resources[0]['c7n:payment-cryptography-replication-regions'])
 
     def test_cloudtrail_enabled(self):
         session_factory = self.replay_flight_data("test_account_trail")
@@ -662,6 +786,54 @@ class AccountTests(BaseTest):
             "filters": [{"type": "service-limit", "services": ["IAM"]}],
         }
         self.assertRaises(PolicyValidationError, self.load_policy, policy)
+
+    def test_service_limit_govcloud_validate(self):
+        # GovCloud policies targeting IAM must use us-gov-west-1, not us-east-1
+        valid_policy = {
+            "name": "service-limit",
+            "resource": "account",
+            "region": "us-gov-west-1",
+            "filters": [{"type": "service-limit", "services": ["IAM"]}],
+        }
+        p = self.load_policy(valid_policy, config={"region": "us-gov-west-1"})
+        self.assertIsNotNone(p)
+
+        # A GovCloud policy targeting IAM but set to us-east-1 must fail
+        invalid_policy = {
+            "name": "service-limit",
+            "resource": "account",
+            "filters": [{"type": "service-limit", "services": ["IAM"]}],
+        }
+        self.assertRaises(
+            PolicyValidationError,
+            self.load_policy,
+            invalid_policy,
+            config={"region": "us-gov-west-1"},
+        )
+
+    def test_service_limit_govcloud_process_check(self):
+        # Global services (metadata region '-') must be included when running in GovCloud
+        session_factory = self.replay_flight_data("test_account_service_limit_govcloud")
+        p = self.load_policy(
+            {
+                "name": "service-limit",
+                "resource": "account",
+                "region": "us-gov-west-1",
+                "filters": [
+                    {"type": "service-limit", "services": ["IAM"], "threshold": 0.1}
+                ],
+            },
+            config={"region": "us-gov-west-1"},
+            session_factory=session_factory,
+        )
+        with mock_datetime_now(parser.parse("2017-02-23T00:40:00+00:00"), datetime):
+            resources = p.run()
+        self.assertEqual(len(resources), 1)
+        self.assertEqual(
+            {l["service"] for l in resources[0]["c7n:ServiceLimitsExceeded"]},
+            {"IAM"},
+        )
+        self.assertEqual(len(resources[0]["c7n:ServiceLimitsExceeded"]), 2)
 
     def test_service_limit_no_threshold(self):
         # only warns when the default threshold goes to warning or above
@@ -1399,6 +1571,7 @@ class AccountTests(BaseTest):
         )
 
     def test_ec2_metadata_defaults(self):
+
         factory = self.replay_flight_data("test_ec2_metadata_defaults")
         p = self.load_policy(
             {
@@ -1438,6 +1611,34 @@ class AccountTests(BaseTest):
                 "enabled",
             ]
         )
+
+    def test_set_security_token_service_preferences(self):
+
+        factory = self.replay_flight_data("test_set_security_token_service_preferences")
+        p = self.load_policy(
+            {
+                "name": "set-sts-preferences",
+                "resource": "account",
+                "actions": [
+                    {
+                        "type": "set-security-token-service-preferences",
+                        "token_version": "v2Token",
+                    }
+                ],
+            },
+            session_factory=factory,
+        )
+        resources = p.run()
+        self.assertEqual(len(resources), 1)
+
+        client = local_session(factory).client("iam")
+        response = client.get_account_summary()
+        # self.assertIn("SummaryMap", response['SummaryMap'])
+        self.assertIn("SummaryMap", response)
+
+        # Verify that the token version was set correctly
+
+        self.assertEqual(2, response['SummaryMap']['GlobalEndpointTokenVersion'])
 
 
 class AccountDataEvents(BaseTest):

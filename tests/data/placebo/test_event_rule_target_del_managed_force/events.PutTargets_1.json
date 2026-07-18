@@ -1,0 +1,10 @@
+{
+    "status_code": 400,
+    "data": {
+        "Error": {
+            "Message": "Parameter arn:aws:autoscaling:us-east-1::: is not valid. Reason: Service as target config for ARN: arn:aws:autoscaling:us-east-1::: not found. The API call hasn't been recognized as managed rules call",
+            "Code": "ValidationException"
+        },
+        "ResponseMetadata": {}
+    }
+}

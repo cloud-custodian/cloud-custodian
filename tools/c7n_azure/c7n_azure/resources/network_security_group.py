@@ -308,7 +308,7 @@ class FlowLogs(ValueFilter):
 
         return [
             client.flow_logs.get(
-                resource['resourceGroup'],
+                parsed_id['resource_group'],
                 parsed_id['name'],
                 parsed_id['resource_name']
             ).serialize(True).get('properties')

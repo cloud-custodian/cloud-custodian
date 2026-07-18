@@ -1,0 +1,41 @@
+{
+    "status_code": 200,
+    "data": {
+        "ResponseMetadata": {},
+        "configuredTableSummaries": [
+            {
+                "id": "b7401977-f670-42ba-873b-eed937073127",
+                "arn": "arn:aws:cleanrooms:us-east-1:644160558196:configuredtable/b7401977-f670-42ba-873b-eed937073127",
+                "name": "Compliant Table",
+                "createTime": {
+                    "__class__": "datetime",
+                    "year": 2026,
+                    "month": 6,
+                    "day": 10,
+                    "hour": 21,
+                    "minute": 34,
+                    "second": 1,
+                    "microsecond": 87000
+                },
+                "updateTime": {
+                    "__class__": "datetime",
+                    "year": 2026,
+                    "month": 6,
+                    "day": 10,
+                    "hour": 21,
+                    "minute": 34,
+                    "second": 1,
+                    "microsecond": 87000
+                },
+                "analysisRuleTypes": [
+                    "CUSTOM"
+                ],
+                "analysisMethod": "MULTIPLE",
+                "selectedAnalysisMethods": [
+                    "DIRECT_JOB",
+                    "DIRECT_QUERY"
+                ]
+            }
+        ]
+    }
+}

@@ -16,7 +16,7 @@ class TestECR(BaseTest):
         with self.assertRaises(PolicyValidationError) as ecm:
             lifecycle_rule_validate(
                 policy, {'selection': {'tagStatus': 'tagged'}})
-        self.assertIn('tagPrefixList required', str(ecm.exception))
+        self.assertIn('tagPrefixList or tagPatternList required', str(ecm.exception))
         with self.assertRaises(PolicyValidationError) as ecm:
             lifecycle_rule_validate(
                 policy, {'selection': {
@@ -24,6 +24,15 @@ class TestECR(BaseTest):
                     'countNumber': 10, 'countUnit': 'days',
                     'countType': 'imageCountMoreThan'}})
         self.assertIn('countUnit invalid', str(ecm.exception))
+        r = lifecycle_rule_validate(policy, {'selection': {
+            'tagStatus': 'tagged', 'tagPatternList': ["prod*"],
+            'countType': 'sinceImagePushed', 'countUnit': 'days',
+            'countNumber': 14}})
+        self.assertEqual(r, None)
+        r = lifecycle_rule_validate(policy, {'selection': {
+            'tagStatus': 'tagged', 'tagPatternList': ["prod"],
+            'countType': 'imageCountMoreThan', 'countNumber': 1}})
+        self.assertEqual(r, None)
 
     def create_repository(self, client, name):
         """ Create the named repository. Delete existing one first if applicable. """
@@ -288,6 +297,24 @@ class TestECR(BaseTest):
 
     def test_ecr_set_lifecycle(self):
         pass
+
+    def test_ecr_image_query(self):
+        session_factory = self.replay_flight_data("test_ecr_image_query")
+        p = self.load_policy(
+            {
+                "name": "query-ecr-image",
+                "resource": "aws.ecr-image",
+                "query": [
+                    {
+                        "filter": {
+                            "tagStatus": "TAGGED"
+                        }
+                    }
+                ]
+            },
+            session_factory=session_factory)
+        resources = p.run()
+        self.assertEqual(len(resources), 1)
 
     def test_ecr_image_filter_security_finding(self):
         session_factory = self.replay_flight_data("test_ecr_image_filter_security_finding")

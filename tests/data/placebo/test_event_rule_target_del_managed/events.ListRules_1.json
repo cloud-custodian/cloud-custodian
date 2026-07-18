@@ -1,0 +1,26 @@
+{
+    "status_code": 200,
+    "data": {
+        "Rules": [
+            {
+                "Name": "AutoScalingManagedRule",
+                "Arn": "arn:aws:events:us-east-1:644160558196:rule/AutoScalingManagedRule",
+                "EventPattern": "{\"source\":[\"aws.ec2\"],\"detail-type\":[\"EC2 Instance Rebalance Recommendation\",\"EC2 Spot Instance Interruption Warning\"]}",
+                "State": "ENABLED",
+                "Description": "This rule is used to route Instance notifications to EC2 Auto Scaling",
+                "ManagedBy": "autoscaling.amazonaws.com",
+                "EventBusName": "default"
+            },
+            {
+                "Name": "EKSComputeManagedRule",
+                "Arn": "arn:aws:events:us-east-1:644160558196:rule/EKSComputeManagedRule",
+                "EventPattern": "{\"source\": [\"aws.ec2\", \"aws.health\"],\"detail-type\":[\"EC2 Spot Instance Interruption Warning\", \"EC2 Instance State-change Notification\", \"EC2 Instance Rebalance Recommendation\", \"AWS Health Event\"]}",
+                "State": "ENABLED",
+                "Description": "EKSComputeManagedRule",
+                "ManagedBy": "eks.amazonaws.com",
+                "EventBusName": "default"
+            }
+        ],
+        "ResponseMetadata": {}
+    }
+}

@@ -24,9 +24,11 @@ Options:
   --help  Show this message and exit.
 
 Commands:
-  report      report on an AWS cross account policy execution
-  run         run a custodian policy across accounts (AWS, Azure, GCP, OCI)
-  run-script  run a script across AWS accounts
+  aws-accounts  generate c7n-org aws accounts config file
+  report        report on an AWS cross account policy execution
+  run           run a custodian policy across accounts (AWS, Azure, GCP, OCI)
+  run-script    run a script across AWS accounts
+  validate    validate policy files without requiring cloud credentials
 ```
 
 In order to run c7n-org against multiple accounts, a config file must
@@ -97,17 +99,17 @@ tenancies:
 
 ### Config File Generation
 
-We also distribute scripts to generate the necessary config file in the [`scripts` folder](https://github.com/cloud-custodian/cloud-custodian/tree/main/tools/c7n_org/scripts).
+We also distribute subcommands and scripts to generate the necessary config file in the [`scripts` folder](https://github.com/cloud-custodian/cloud-custodian/tree/main/tools/c7n_org/scripts).
 
-**Note:** Currently these are distributed only via git. Per
+**Note:** Besides AWS, these are distributed only via git. Per
 <https://github.com/cloud-custodian/cloud-custodian/issues/2420>, we'll
 be looking to incorporate them into a new c7n-org subcommand.
 
-- For **AWS**, the script `orgaccounts.py` generates a config file
+- For **AWS**, the subcommand `aws-accounts` generates a config file
   from the AWS Organizations API.
 
 ```shell
-python orgaccounts.py -f accounts.yml
+c7n-org aws-accounts -f accounts.yml
 ```
 
 - For **Azure**, the script `azuresubs.py` generates a config file
@@ -228,9 +230,9 @@ Another enhancement for `c7n-org run-script` is to support a few vars in the scr
 The available vars are `account`, `account_id`, `region` and `output_dir`.
 
 ```shell
-c7n-org run-script -s . -c my-projects.yml gcp_check_{region}.sh
+c7n-org run-script -s . -c my-projects.yml "./gcp_check_{region}.sh"
 # or
-c7n-org run-script -s . -c my-projects.yml use_another_policy_result.sh {output_dir}
+c7n-org run-script -s . -c my-projects.yml './use_another_policy_result.sh "{output_dir}"'
 ```
 
 **Note:** Variable interpolation is sensitive to proper quoting and spacing,
@@ -238,6 +240,36 @@ i.e., `{ charge_code }` would be invalid due to the extra white space. Additiona
 yaml parsing can transform a value like `{charge_code}` to null, unless it's quoted
 in strings like the above example. Values that do interpolation into other content
 don't require quoting, i.e., "my_{charge_code}".
+
+## Validating Policies
+
+c7n-org supports validating policy files without requiring cloud credentials.
+This is useful for pre-commit checks and CI/CD pipelines.
+
+```shell
+c7n-org validate -c accounts.yml -u policies.yml
+```
+
+By default, validation performs schema checks, policy structure validation,
+and detects common errors. The `--per-account` flag enables deeper validation
+with account-specific variable expansion:
+
+```shell
+c7n-org validate -c accounts.yml -u policies.yml --per-account
+```
+
+In per-account mode, c7n-org validates that policy variables can be expanded
+correctly for each account, catching issues like missing variable definitions
+that would only appear at runtime.
+
+You can filter which policies and accounts to validate using the same flags
+as the `run` command:
+
+- Filter policies with `-p`, `-l`, or `--resource`
+- Filter accounts with `-a`, `--tags`, or `--not-accounts` (when using `--per-account`)
+- Check for deprecated features with `--check-deprecations`
+
+See `c7n-org validate --help` for more information.
 
 ## Other commands
 
@@ -295,7 +327,3 @@ tenancies:
     environment: test
 
 ```
-
-
-
-

@@ -1,0 +1,34 @@
+{
+    "status_code": 200,
+    "data": {
+        "ARecord": "nu7fvn9gmm5g.fips.wmjb.mail-manager-smtp.amazonaws.com",
+        "CreatedTimestamp": {
+            "__class__": "datetime",
+            "year": 2025,
+            "month": 1,
+            "day": 21,
+            "hour": 12,
+            "minute": 51,
+            "second": 47,
+            "microsecond": 508000
+        },
+        "IngressPointArn": "arn:aws:ses:us-east-1:644160558196:mailmanager-ingress-point/inp-xoabcxzsr2kpnh5gubua2naj",
+        "IngressPointId": "inp-xoabcxzsr2kpnh5gubua2naj",
+        "IngressPointName": "test-ingress-endpoint",
+        "LastUpdatedTimestamp": {
+            "__class__": "datetime",
+            "year": 2025,
+            "month": 1,
+            "day": 21,
+            "hour": 12,
+            "minute": 51,
+            "second": 47,
+            "microsecond": 508000
+        },
+        "RuleSetId": "rs-uvwnepkn25bop7mqs672elqt",
+        "Status": "ACTIVE",
+        "TrafficPolicyId": "tp-kcfaud5rt2ohporfrnok4dpm",
+        "Type": "OPEN",
+        "ResponseMetadata": {}
+    }
+}

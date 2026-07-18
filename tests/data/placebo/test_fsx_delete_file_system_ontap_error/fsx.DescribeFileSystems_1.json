@@ -1,0 +1,74 @@
+{
+    "status_code": 200,
+    "data": {
+        "FileSystems": [
+            {
+                "OwnerId": "644160558196",
+                "CreationTime": {
+                    "__class__": "datetime",
+                    "year": 2025,
+                    "month": 10,
+                    "day": 28,
+                    "hour": 11,
+                    "minute": 17,
+                    "second": 39,
+                    "microsecond": 757000
+                },
+                "FileSystemId": "fs-0eb84c6b1b1984695",
+                "FileSystemType": "ONTAP",
+                "Lifecycle": "AVAILABLE",
+                "StorageCapacity": 1024,
+                "StorageType": "SSD",
+                "VpcId": "vpc-4a9ff72e",
+                "SubnetIds": [
+                    "subnet-5fb47507"
+                ],
+                "NetworkInterfaceIds": [
+                    "eni-061ec36c1e4b28336",
+                    "eni-074f51e60f1fa1e76"
+                ],
+                "KmsKeyId": "arn:aws:kms:us-west-2:644160558196:key/5b42e50f-8d8a-4be2-8938-59ccd7a44d0c",
+                "ResourceARN": "arn:aws:fsx:us-west-2:644160558196:file-system/fs-0eb84c6b1b1984695",
+                "Tags": [
+                    {
+                        "Key": "Environment",
+                        "Value": "dev"
+                    },
+                    {
+                        "Key": "Name",
+                        "Value": "example-ontap"
+                    }
+                ],
+                "OntapConfiguration": {
+                    "DeploymentType": "SINGLE_AZ_1",
+                    "Endpoints": {
+                        "Intercluster": {
+                            "DNSName": "intercluster.fs-0eb84c6b1b1984695.fsx.us-west-2.amazonaws.com",
+                            "IpAddresses": [
+                                "172.31.13.141",
+                                "172.31.14.154"
+                            ]
+                        },
+                        "Management": {
+                            "DNSName": "management.fs-0eb84c6b1b1984695.fsx.us-west-2.amazonaws.com",
+                            "IpAddresses": [
+                                "172.31.0.234"
+                            ]
+                        }
+                    },
+                    "DiskIopsConfiguration": {
+                        "Mode": "AUTOMATIC",
+                        "Iops": 3072
+                    },
+                    "PreferredSubnetId": "subnet-5fb47507",
+                    "ThroughputCapacity": 128,
+                    "WeeklyMaintenanceStartTime": "7:07:00",
+                    "HAPairs": 1,
+                    "ThroughputCapacityPerHAPair": 128
+                },
+                "NetworkType": "IPV4"
+            }
+        ],
+        "ResponseMetadata": {}
+    }
+}

@@ -9,7 +9,7 @@ from collections import defaultdict
 from functools import lru_cache
 
 from c7n.actions import RemovePolicyBase, BaseAction
-from c7n.filters import Filter, CrossAccountAccessFilter, ValueFilter
+from c7n.filters import Filter, CrossAccountAccessFilter, ListItemFilter, ValueFilter
 from c7n.manager import resources
 from c7n.query import (
     ConfigSource, DescribeSource, QueryResourceManager, RetryPageIterator, TypeInfo)
@@ -168,6 +168,13 @@ class KeyRotationStatus(ValueFilter):
                 if e.response['Error']['Code'] == 'AccessDeniedException':
                     self.log.warning(
                         "Access denied when getting rotation status on key:%s",
+                        resource.get('KeyArn'))
+                elif e.response['Error']['Code'] == 'UnsupportedOperationException':
+                    # This is expected for keys that do not support rotation
+                    # e.g. keys in custom keystores or when keys are in certain
+                    # states such as PendingImport.
+                    self.log.warning(
+                        "UnsupportedOperationException when getting rotation status on key:%s",
                         resource.get('KeyArn'))
                 else:
                     raise
@@ -431,3 +438,206 @@ class KmsPostFinding(PostFinding):
             )
 
         return envelope
+
+
+@Key.filter_registry.register('last-rotation')
+class LastRotation(ValueFilter):
+    """Queries KMS keys by the last time they were rotated.
+
+    :example:
+
+    .. code-block:: yaml
+
+            policies:
+              - name: kms-not-rotated-in-last-30
+                resource: kms-key
+                filters:
+                  - type: last-rotation
+                    key: RotationDate
+                    value: 30
+                    value_type: age
+                    op: gte
+
+    """
+
+    schema = type_schema('last-rotation', rinherit=ValueFilter.schema)
+    schema_alias = False
+    permissions = ('kms:ListKeyRotations',)
+    annotation_key = 'c7n:LastRotation'
+
+    def get_last_rotation(self, paginator, key_id):
+        last_rotation = None
+        page_iterator = paginator.paginate(KeyId=key_id)
+        try:
+            rotations = page_iterator.build_full_result().get('Rotations', [])
+            last_rotation = rotations and max(rotations, key=lambda x: x.get('RotationDate', 0))
+        except ClientError as err:
+            self.log.warning(err)
+        return last_rotation
+
+    def process(self, resources, event=None):
+        client = local_session(self.manager.session_factory).client('kms')
+        results = []
+        paginator = client.get_paginator('list_key_rotations')
+
+        for r in resources:
+            if 'c7n:LastRotation' not in r:
+                # If the key is already there, it's cached & we'll skip the API..
+                # If not, we need the API call.
+                r[self.annotation_key] = self.get_last_rotation(paginator, r['KeyId'])
+
+            if self.match(r[self.annotation_key]):
+                # Either we found a rotation date or we're filtering for keys
+                # without a rotation (the match on `None`).
+                results.append(r)
+
+        return results
+
+
+@Key.filter_registry.register('last-usage')
+class LastUsage(ListItemFilter):
+    """Filters KMS keys by their last usage information.
+
+    Uses the ``GetKeyLastUsage`` API to retrieve key usage metadata,
+    enabling multi-attribute matching on last usage timestamp, operation,
+    tracking start date, and key creation date in a single filter.
+
+    The response fields are returned as a single item for filtering:
+
+    - ``KeyLastUsage.Timestamp`` - when the key was last used (absent if never used)
+    - ``KeyLastUsage.Operation`` - the last cryptographic operation performed
+    - ``KeyLastUsage.CloudTrailEventId`` - CloudTrail event ID for the last operation
+    - ``KeyLastUsage.KmsRequestId`` - KMS request ID for the last operation
+    - ``TrackingStartDate`` - when usage tracking began for this key
+    - ``KeyCreationDate`` - when the key was created
+
+    If the key has never been used since tracking began, ``KeyLastUsage``
+    will be empty.
+
+    For more details, see:
+    https://docs.aws.amazon.com/kms/latest/developerguide/monitoring-keys-determining-usage.html
+
+    .. warning::
+
+       Do not use ``GetKeyLastUsage`` as the sole indicator when scheduling
+       a key for deletion. Instead, first disable the key and monitor
+       CloudTrail for ``DisabledException`` entries, as there could be
+       infrequent workflows that depend on the key.
+
+    :example:
+
+    Find keys not used in the last 30 days:
+
+    .. code-block:: yaml
+
+            policies:
+              - name: kms-unused-keys-30-days
+                resource: kms-key
+                filters:
+                  - type: last-usage
+                    attrs:
+                      - type: value
+                        key: KeyLastUsage.Timestamp
+                        value: 30
+                        value_type: age
+                        op: gte
+
+    Find keys that have never been used since tracking began:
+
+    .. code-block:: yaml
+
+              - name: kms-never-used-keys
+                resource: kms-key
+                filters:
+                  - type: last-usage
+                    attrs:
+                      - type: value
+                        key: KeyLastUsage.Timestamp
+                        value: absent
+
+    Find keys last used for Decrypt with usage tracked since a specific date:
+
+    .. code-block:: yaml
+
+              - name: kms-keys-decrypt-recent-tracking
+                resource: kms-key
+                filters:
+                  - type: last-usage
+                    attrs:
+                      - type: value
+                        key: KeyLastUsage.Operation
+                        value: Decrypt
+                      - type: value
+                        key: TrackingStartDate
+                        value_type: age
+                        op: lte
+                        value: 90
+
+    """
+
+    schema = type_schema(
+        'last-usage',
+        attrs={'$ref': '#/definitions/filters_common/list_item_attrs'},
+        count={'type': 'number'},
+        count_op={'$ref': '#/definitions/filters_common/comparison_operators'},
+    )
+    schema_alias = False
+    permissions = ('kms:GetKeyLastUsage',)
+    item_annotation_key = 'c7n:LastUsage'
+    annotate_items = True
+    _client = None
+
+    def get_client(self):
+        if self._client is None:
+            self._client = local_session(self.manager.session_factory).client('kms')
+        return self._client
+
+    def get_item_values(self, resource):
+        client = self.get_client()
+        try:
+            result = client.get_key_last_usage(KeyId=resource['KeyId'])
+        except ClientError as err:
+            self.log.warning(
+                "error getting last usage for key:%s - %s",
+                resource['KeyId'], err
+            )
+            return []
+
+        result.pop('ResponseMetadata', None)
+        return [result]
+
+
+@Key.action_registry.register("schedule-deletion")
+class KmsKeyScheduleDeletion(BaseAction):
+    """Schedule KMS key deletion
+
+    If the number of days is not specified, the default value of 30 days is used.
+    The number of days must be between 7 and 30.
+
+    :example:
+
+    .. code-block:: yaml
+
+        policies:
+          - name: delete-tagged-keys
+            resource: kms-key
+            filters:
+              - type: value
+                key: tag:DeleteAfter
+                op: ge
+                value_type: age # age is a special value type that will be converted to a timestamp
+                value: 0
+            actions:
+              - type: schedule-deletion
+                days: 7
+    """
+
+    permissions = ("kms:ScheduleKeyDeletion",)
+    schema = type_schema("schedule-deletion", days={"type": "integer", "minimum": 7, "maximum": 30})
+
+    def process(self, keys):
+        client = local_session(self.manager.session_factory).client("kms")
+        for k in keys:
+            client.schedule_key_deletion(
+                KeyId=k["KeyId"], PendingWindowInDays=self.data.get("days", 30)
+            )

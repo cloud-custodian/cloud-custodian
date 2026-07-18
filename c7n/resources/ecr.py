@@ -10,7 +10,7 @@ from c7n.query import (
     ConfigSource, DescribeSource, QueryResourceManager, TypeInfo,
     ChildResourceManager, ChildDescribeSource, ChildResourceQuery, sources)
 from c7n import tags
-from c7n.utils import local_session, type_schema
+from c7n.utils import generate_arn, local_session, type_schema
 
 
 class ConfigECR(ConfigSource):
@@ -72,10 +72,9 @@ class ECRImageQuery(ChildResourceQuery):
 
     def get(self, resource_manager, identities):
         m = self.resolve(resource_manager.resource_type)
-        params = {}
+        params = {'ImageIds': [identities]}
         resources = self.filter(resource_manager, **params)
         resources = [r for r in resources if "{}/{}".format(r[0], r[1][m.id]) in identities]
-
         return resources
 
 
@@ -87,14 +86,33 @@ class RepositoryImageDescribeSource(ChildDescribeSource):
     def get_query(self):
         return super().get_query(capture_parent_id=True)
 
+    def get_query_params(self, query):
+        query = query or {}
+        if 'query' not in self.manager.data:
+            return query
+        for q in self.manager.data['query']:
+            query.update(q)
+        return query
+
     def augment(self, resources):
+        # construct an image arn
+        ecr_manager = self.manager.get_resource_manager(self.manager.resource_type.parent_spec[0])
+        rtype = ecr_manager.resource_type
+
+        repo_arn_map = {}
+        for repo_name in list({repo_name for repo_name, image in resources}):
+            repo_arn_map[repo_name] = generate_arn(
+                rtype.service,
+                region=self.manager.config.region,
+                account_id=self.manager.account_id,
+                resource_type=ecr_manager.resource_type.arn_type,
+                separator="/",
+                resource=repo_name
+            )
+
         results = []
-        client = local_session(self.manager.session_factory).client('ecr')
-        for repositoryName, image in resources:
-            repoArn = client.describe_repositories(
-                repositoryNames=[repositoryName])['repositories'][0]['repositoryArn']
-            imageArn = "{}/{}".format(repoArn, image["imageDigest"])
-            image["imageArn"] = imageArn
+        for repo_name, image in resources:
+            image['imageArn'] = "{}/{}".format(repo_arn_map[repo_name], image['imageDigest'])
             results.append(image)
         return results
 
@@ -359,6 +377,7 @@ LIFECYCLE_RULE_SCHEMA = {
             'required': ['countType', 'countNumber', 'tagStatus'],
             'properties': {
                 'tagStatus': {'enum': ['tagged', 'untagged', 'any']},
+                'tagPatternList': {'type': 'array', 'items': {'type': 'string'}},
                 'tagPrefixList': {'type': 'array', 'items': {'type': 'string'}},
                 'countNumber': {'type': 'integer'},
                 'countUnit': {'enum': ['hours', 'days']},
@@ -376,12 +395,13 @@ def lifecycle_rule_validate(policy, rule):
     #
     # https://docs.aws.amazon.com/AmazonECR/latest/userguide/LifecyclePolicies.html#lp_evaluation_rules
 
-    if (rule['selection']['tagStatus'] == 'tagged' and
-            'tagPrefixList' not in rule['selection']):
-        raise PolicyValidationError(
-            ("{} has invalid lifecycle rule {} tagPrefixList "
-             "required for tagStatus: tagged").format(
-                 policy.name, rule))
+    if rule['selection']['tagStatus'] == 'tagged':
+        if ('tagPrefixList' not in rule['selection'] and
+        'tagPatternList' not in rule['selection']):
+            raise PolicyValidationError(
+                ("{} has invalid lifecycle rule {} tagPrefixList or tagPatternList "
+                "required for tagStatus: tagged").format(
+                    policy.name, rule))
     if (rule['selection']['countType'] == 'sinceImagePushed' and
             'countUnit' not in rule['selection']):
         raise PolicyValidationError(

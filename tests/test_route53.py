@@ -404,7 +404,8 @@ class TestResolverQueryLogConfig(BaseTest):
             'resource': 'resolver-logs',
             'filters': [
                 {'type': 'is-associated', 'vpcid': 'vpc-011516c4325953'}]},
-            session_factory=session_factory)
+            session_factory=session_factory,
+            config={'account_id': '123456789012'})
         resources = p.run()
         self.assertEqual(len(resources), 1)
 
@@ -442,6 +443,28 @@ class TestResolverQueryLogConfig(BaseTest):
             'ResolverQueryLogConfigAssociations'][0]['ResourceId'], "vpc-01234567891234")
         self.assertEqual(len(resources), 1)
         self.assertEqual(resources[0]['Id'], "rqlc-01234567891234")
+
+    def test_resolver_query_log_config_associate_skip_shared(self):
+        session_factory = self.replay_flight_data(
+            'test_resolver_query_log_config_associate_skip_shared',
+            region='us-east-2'
+        )
+        p = self.load_policy({
+            'name': 'r53-resolver-query-log-config-associate-skip-shared',
+            'filters': [{
+                'type': 'value', 'key': 'Name', 'op': 'contains', 'value': 'c7n'}],
+            'resource': 'resolver-logs',
+            'actions': [{
+                'type': 'associate-vpc', 'vpcid': 'vpc-06fbfb0683669c546'}]},
+            config={'region': 'us-east-2'},
+            session_factory=session_factory
+        )
+        with self.capture_logging(level=logging.WARNING) as log_output:
+            p.run()
+            self.assertIn(
+                'implicitly filtered 1 of 2 resources key:OwnerId',
+                log_output.getvalue()
+            )
 
     def test_resolver_query_log_config_not_associated(self):
         session_factory = self.replay_flight_data(
@@ -651,3 +674,27 @@ class TestControlPanel(BaseTest):
         self.assertEqual(len(resources), 1)
         self.assertEqual(resources[0]['ControlPanelArn'],
             'arn:aws:route53-recovery-control::644160558196:controlpanel/fd5a6bfc73364a0dbd48d3915867a306')
+
+
+class ResolverRuleTest(BaseTest):
+
+    def test_resolver_rule_query(self):
+        session_factory = self.replay_flight_data("test_resolver_rule_query")
+        p = self.load_policy(
+            {
+                "name": "resolver-rule-list",
+                "resource": "resolver-rule",
+                "filters": [
+                    {
+                        "type": "value",
+                        "key": "Status",
+                        "op": "eq",
+                        "value": "COMPLETE",
+                    }
+                ],
+            },
+            session_factory=session_factory,
+        )
+        resources = p.run()
+        self.assertEqual(len(resources), 1)
+        self.assertEqual(resources[0]["RuleType"], "FORWARD")

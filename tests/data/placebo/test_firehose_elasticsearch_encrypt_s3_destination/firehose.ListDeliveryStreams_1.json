@@ -4,7 +4,7 @@
         "DeliveryStreamNames": [
             "firehose-es"
        ], 
-        "HasMoreDeliveryStreams": true, 
+        "HasMoreDeliveryStreams": false, 
         "ResponseMetadata": {
             "RetryAttempts": 0, 
             "HTTPStatusCode": 200, 

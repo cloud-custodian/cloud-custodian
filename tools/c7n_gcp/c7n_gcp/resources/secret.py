@@ -6,7 +6,7 @@ from c7n_gcp.query import (QueryResourceManager, TypeInfo)
 
 @resources.register('secret')
 class Secret(QueryResourceManager):
-    """GCP resource: https://cloud.google.com/secret-manager/docs/reference/rest/v1
+    """GCP resource: https://cloud.google.com/secret-manager/docs/reference/rest/v1/projects.secrets
     """
     class resource_type(TypeInfo):
         service = 'secretmanager'
@@ -17,5 +17,16 @@ class Secret(QueryResourceManager):
         scope_key = 'parent'
         scope_template = "projects/{}"
         name = id = "name"
+        labels = True
+        labels_op = 'patch'
+        labels_perm = 'update'
         asset_type = "secretmanager.googleapis.com/Secret"
         default_report_fields = ['name', 'createTime', 'expireTime', 'ttl']
+
+        @staticmethod
+        def get_label_params(resource, all_labels):
+            return {
+                'name': resource['name'],
+                'body': {'labels': all_labels},
+                'updateMask': 'labels'
+            }

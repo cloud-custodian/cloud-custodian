@@ -1,0 +1,60 @@
+{
+    "status_code": 200,
+    "data": {
+        "ResponseMetadata": {},
+        "FileSystems": [
+            {
+                "OwnerId": "644160558196",
+                "CreationToken": "quickCreated-f2606782-2162-48de-a22b-487f827898b5",
+                "FileSystemId": "fs-0371f35245f586545",
+                "FileSystemArn": "arn:aws:elasticfilesystem:us-west-1:644160558196:file-system/fs-0371f35245f586545",
+                "CreationTime": {
+                    "__class__": "datetime",
+                    "year": 2025,
+                    "month": 3,
+                    "day": 14,
+                    "hour": 10,
+                    "minute": 23,
+                    "second": 35,
+                    "microsecond": 0
+                },
+                "LifeCycleState": "available",
+                "Name": "efs-has-statement",
+                "NumberOfMountTargets": 0,
+                "SizeInBytes": {
+                    "Value": 6144,
+                    "Timestamp": {
+                        "__class__": "datetime",
+                        "year": 2025,
+                        "month": 5,
+                        "day": 2,
+                        "hour": 13,
+                        "minute": 54,
+                        "second": 27,
+                        "microsecond": 0
+                    },
+                    "ValueInIA": 0,
+                    "ValueInStandard": 6144,
+                    "ValueInArchive": 0
+                },
+                "PerformanceMode": "generalPurpose",
+                "Encrypted": true,
+                "KmsKeyId": "arn:aws:kms:us-west-1:644160558196:key/2efff357-0be1-4cf2-bbc2-ba2165717d84",
+                "ThroughputMode": "elastic",
+                "Tags": [
+                    {
+                        "Key": "Name",
+                        "Value": "efs-has-statement"
+                    },
+                    {
+                        "Key": "aws:elasticfilesystem:default-backup",
+                        "Value": "enabled"
+                    }
+                ],
+                "FileSystemProtection": {
+                    "ReplicationOverwriteProtection": "ENABLED"
+                }
+            }
+        ]
+    }
+}

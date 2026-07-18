@@ -1,0 +1,42 @@
+{
+  "status_code": 200,
+  "data": {
+    "KeyId": "9a2e037b-c775-4bb0-a74f-85619da32b74",
+    "KeyLastUsage": {
+      "Operation": "Decrypt",
+      "Timestamp": {
+        "hour": 7,
+        "__class__": "datetime",
+        "month": 5,
+        "second": 19,
+        "microsecond": 721000,
+        "year": 2026,
+        "day": 1,
+        "minute": 6
+      },
+      "CloudTrailEventId": "73595a59-3b0c-3fab-a33b-98452d4d6e88",
+      "KmsRequestId": "2fd736ba-80c8-4638-a4d9-b02fcf2cbf98"
+    },
+    "TrackingStartDate": {
+      "hour": 0,
+      "__class__": "datetime",
+      "month": 4,
+      "second": 0,
+      "microsecond": 0,
+      "year": 2026,
+      "day": 23,
+      "minute": 0
+    },
+    "KeyCreationDate": {
+      "hour": 19,
+      "__class__": "datetime",
+      "month": 7,
+      "second": 29,
+      "microsecond": 216000,
+      "year": 2025,
+      "day": 29,
+      "minute": 25
+    },
+    "ResponseMetadata": {}
+  }
+}

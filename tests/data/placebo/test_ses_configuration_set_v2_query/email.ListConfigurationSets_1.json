@@ -1,0 +1,10 @@
+{
+    "status_code": 200,
+    "data": {
+        "ResponseMetadata": {},
+        "ConfigurationSets": [
+            "test-c7n",
+            "test-c7n-shared-pool"
+        ]
+    }
+}

@@ -1,0 +1,52 @@
+{
+    "status_code": 200,
+    "data": {
+        "FlywheelProperties": {
+            "FlywheelArn": "arn:aws:comprehend:us-east-1:644160558196:flywheel/TestFlywheelVPC",
+            "DataAccessRoleArn": "arn:aws:iam::644160558196:role/ComprehendVpcAccessRole",
+            "TaskConfig": {
+                "LanguageCode": "en",
+                "DocumentClassificationConfig": {
+                    "Mode": "MULTI_CLASS",
+                    "Labels": [
+                        "COMEDY"
+                    ]
+                }
+            },
+            "DataLakeS3Uri": "s3://c7n-test-s3-bucket/TestFlywheelVPC/schemaVersion=1/20250407T214114Z/",
+            "DataSecurityConfig": {
+                "VpcConfig": {
+                    "SecurityGroupIds": [
+                        "sg-0256a8bb3af3ed48e"
+                    ],
+                    "Subnets": [
+                        "subnet-0797208b821c08196"
+                    ]
+                }
+            },
+            "Status": "ACTIVE",
+            "ModelType": "DOCUMENT_CLASSIFIER",
+            "CreationTime": {
+                "__class__": "datetime",
+                "year": 2025,
+                "month": 4,
+                "day": 7,
+                "hour": 17,
+                "minute": 41,
+                "second": 14,
+                "microsecond": 293000
+            },
+            "LastModifiedTime": {
+                "__class__": "datetime",
+                "year": 2025,
+                "month": 4,
+                "day": 7,
+                "hour": 17,
+                "minute": 41,
+                "second": 36,
+                "microsecond": 393000
+            }
+        },
+        "ResponseMetadata": {}
+    }
+}

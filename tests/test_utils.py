@@ -1,6 +1,7 @@
 # Copyright The Cloud Custodian Authors.
 # SPDX-License-Identifier: Apache-2.0
 import json
+import pytest
 import ipaddress
 import os
 import tempfile
@@ -14,6 +15,7 @@ from c7n import query
 from c7n import utils
 from c7n.config import Config
 from .common import BaseTest
+from datetime import datetime
 
 
 class TestTesting(BaseTest):
@@ -181,20 +183,239 @@ class UtilTest(BaseTest):
                 'a': 1, 'b': 2, 'c': 3, 'x': 1}
 
     def test_merge_dict(self):
-        a = {'detail': {'eventName': ['CreateSubnet'],
-                        'eventSource': ['ec2.amazonaws.com']},
-             'detail-type': ['AWS API Call via CloudTrail']}
-        b = {'detail': {'userIdentity': {
-            'userName': [{'anything-but': 'deputy'}]}}}
+        a = {
+                'detail': {
+                    'eventName': 'CreateSubnet',
+                    'eventSource': ['ec2.amazonaws.com'],
+                    'resources': [{'id': 1}],
+                    'statusCode': 'Pending'
+                },
+                'detail-type': ['AWS API Call via CloudTrail']
+            }
+        b = {
+                'awsregion': 'us-east-1',
+                'detail': {
+                    'eventName': 'UpdateSubnet',
+                    'resources': [{'id': 2}],
+                    'eventSource': 's3.amazonaws.com',
+                    'statusCode': ['Success', 'Failure'],
+                    'userIdentity': {
+                        'userName': [{'anything-but': 'deputy'}]
+                    }
+                }
+            }
+
         self.assertEqual(
             utils.merge_dict(a, b),
-            {'detail-type': ['AWS API Call via CloudTrail'],
-             'detail': {
-                 'eventName': ['CreateSubnet'],
-                 'eventSource': ['ec2.amazonaws.com'],
-                 'userIdentity': {
-                     'userName': [
-                         {'anything-but': 'deputy'}]}}})
+            {
+                'awsregion': 'us-east-1',
+                'detail-type': ['AWS API Call via CloudTrail'],
+                'detail': {
+                    'eventName': 'UpdateSubnet',
+                    'eventSource': ['ec2.amazonaws.com', 's3.amazonaws.com'],
+                    'resources': [{'id': 1}, {'id': 2}],
+                    'statusCode': ['Pending', 'Success', 'Failure'],
+                    'userIdentity': {
+                        'userName': [{'anything-but': 'deputy'}]
+                    }
+                }
+            }
+        )
+
+    def test_merge_dict_iam_condition(self):
+        a = {
+            "Bool": {
+                "aws:SecureTransport": "true",
+            },
+            "StringNotLike": {
+                "aws": "abc"
+            },
+            "StringEquals": {
+                "aws:PrincipalType": "AssumedRole"
+            },
+            "StringLike": {
+                "aws": ["def", "ghi"]
+            },
+            "StringNotLikeIfExists": {
+                "aws": "tsr"
+            }
+            }
+        b = {
+            "StringNotLike": {
+                "aws": "def"
+            },
+            "Bool": {
+                "elasticfilesystem:AccessedViaMountTarget": "true",
+                "aws:SecureTransport": "false"
+            },
+            "StringEquals": {
+                "aws:PrincipalType": [
+                    "AssumedRole",
+                    "User",
+                    "Account"
+                ]
+            },
+            "StringLike": {
+                "aws": "abc"
+            },
+            "StringNotLikeIfExists": {
+                "aws": ["zyx", "wvu"]
+            }
+            }
+
+        self.assertEqual(
+            utils.merge_dict(a, b),
+            {
+                "Bool": {
+                    "aws:SecureTransport": "false",
+                    "elasticfilesystem:AccessedViaMountTarget": "true",
+                },
+                "StringNotLike": {
+                    "aws": "def"
+                },
+                "StringEquals": {
+                    "aws:PrincipalType": [
+                        "AssumedRole",
+                        "User",
+                        "Account"
+                    ]
+                },
+                "StringLike": {
+                    "aws": ["def", "ghi", "abc"]
+                },
+                "StringNotLikeIfExists": {
+                    "aws": ["tsr", "zyx", "wvu"]
+                }
+            }
+        )
+
+    def test_merge_dict_exception(self):
+
+        a = {
+            "a": ["bcd"]
+        }
+        b = {
+            "a": {"abc": 123}
+        }
+        with self.assertRaises(Exception):
+            utils.merge_dict(a, b)
+
+    def test_compare_dicts_using_sets(self):
+        a = {
+                "Bool": {
+                    "aws:SecureTransport": "true",
+                    "elasticfilesystem:AccessedViaMountTarget": "true",
+                },
+                "StringNotLike": {
+                    "aws": "abc"
+                },
+                "StringEquals": {
+                    "aws:PrincipalType": [
+                        "AssumedRole",
+                        "User",
+                        "Account"
+                    ]
+                },
+                "StringNotEquals": {
+                    "aws:PrincipalType": [
+                        "Anonymous",
+                        "User"
+                    ]
+                },
+                "StringNotLikeIfExists": {
+                    "aws": ["zyx"]
+                }
+            }
+        b = {
+            "StringNotLike": {
+                "aws": ["abc"]
+            },
+            "Bool": {
+                "elasticfilesystem:AccessedViaMountTarget": "true",
+                "aws:SecureTransport": "true"
+            },
+            "StringEquals": {
+                "aws:PrincipalType": [
+                    "User",
+                    "AssumedRole",
+                    "Account"
+                ]
+            },
+            "StringNotEquals": {
+                "aws:PrincipalType": [
+                    "Anonymous",
+                    "User"
+                ]
+            },
+            "StringNotLikeIfExists": {
+                "aws": "zyx"
+            }
+            }
+        self.assertTrue(utils.compare_dicts_using_sets(a, b))
+
+    def test_compare_dicts_using_sets_false(self):
+        a = {"a": "abc"}
+        b = {"b": "cde"}
+        self.assertFalse(utils.compare_dicts_using_sets(a, b))
+
+        c = {"a": "bcd"}
+        self.assertFalse(utils.compare_dicts_using_sets(a, c))
+
+    def test_format_to_set(self):
+        self.assertEqual(utils.format_to_set("abcd"), {"abcd"})
+        self.assertEqual(utils.format_to_set(["abc", "def"]), {"abc", "def"})
+        self.assertEqual(utils.format_to_set(123), 123)
+        self.assertEqual(utils.format_to_set(True), True)
+        self.assertEqual(utils.format_to_set(False), False)
+
+    def test_format_dict_with_sets(self):
+        a = {
+                "Bool": {
+                    "aws:SecureTransport": "true",
+                    "elasticfilesystem:AccessedViaMountTarget": "true",
+                },
+                "StringNotLike": {
+                    "aws": "abc"
+                },
+                "StringEquals": {
+                    "aws:PrincipalType": [
+                        "AssumedRole",
+                        "User",
+                        "Account"
+                    ]
+                },
+                "StringNotEquals": {
+                    "aws:PrincipalType": [
+                        "Anonymous",
+                        "User"
+                    ]
+                }
+            }
+        self.assertEqual(utils.format_dict_with_sets(a),
+            {
+                "Bool": {
+                    "aws:SecureTransport": {"true"},
+                    "elasticfilesystem:AccessedViaMountTarget": {"true"},
+                },
+                "StringNotLike": {
+                    "aws": {"abc"}
+                },
+                "StringEquals": {
+                    "aws:PrincipalType": {
+                        "AssumedRole",
+                        "User",
+                        "Account"
+                    }
+                },
+                "StringNotEquals": {
+                    "aws:PrincipalType": {
+                        "Anonymous",
+                        "User"
+                    }
+                }
+            }
+            )
+        self.assertEqual(utils.format_dict_with_sets("abc"), "abc")
 
     def test_local_session_region(self):
         policies = [
@@ -457,6 +678,15 @@ class UtilTest(BaseTest):
     def test_parse_s3(self):
         self.assertRaises(ValueError, utils.parse_s3, "bogus")
         self.assertEqual(utils.parse_s3("s3://things"), ("s3://things", "things", ""))
+        self.assertEqual(
+            utils.parse_s3("s3://bucket/key"),
+            ("s3://bucket/key", "bucket", "/key"))
+        self.assertEqual(
+            utils.parse_s3("s3://bucket/path/to/key"),
+            ("s3://bucket/path/to/key", "bucket", "/path/to/key"))
+        self.assertEqual(
+            utils.parse_s3("s3://bucket/key/"),
+            ("s3://bucket/key", "bucket", "/key"))
 
     def test_reformat_schema(self):
         # Not a real schema, just doing a smoke test of the function
@@ -707,6 +937,34 @@ class UtilTest(BaseTest):
                 {"Description": ""}),
             'unknown')
 
+    def test_start_of_day(self):
+        """
+        Verify that 'start-of-day' correctly snaps start and end to UTC day boundaries.
+        """
+        # Example times
+        start = datetime(2026, 2, 17, 14, 30, 45)
+        end = datetime(2026, 2, 18, 14, 30, 45)
+
+        new_start, new_end = utils.snap_to_period_start(start, end, "start-of-day")
+
+        self.assertEqual(new_start, datetime(2026, 2, 17, 0, 0, 0))
+        self.assertEqual(new_end, datetime(2026, 2, 18, 0, 0, 0))
+
+        # This now spans 1 day (midnight-to-midnight)
+        self.assertEqual((new_end - new_start).days, 1)
+
+    def test_auto(self):
+        """
+        Verify that 'auto' leaves start and end unchanged.
+        """
+        start = datetime(2026, 2, 17, 10, 15, 30)
+        end = datetime(2026, 2, 17, 12, 45, 50)
+
+        new_start, new_end = utils.snap_to_period_start(start, end, "auto")
+
+        self.assertEqual(new_start, start)
+        self.assertEqual(new_end, end)
+
 
 def test_parse_date_floor():
     # bulk of parse date tests are actually in test_filters
@@ -761,3 +1019,16 @@ def test_jmespath_parse_to_json():
         {'foo': '{"]}'}
     )
     assert result is None
+
+
+@pytest.mark.parametrize("region,expected", [
+    ('us-east-1', 'aws'),
+    ('us-gov-west-1', 'aws-us-gov'),
+    ('cn-north-1', 'aws-cn'),
+    ('us-iso-east-1', 'aws-iso'),
+    ('unknown-region', 'aws'),
+    ('', ''),
+    (None, ''),
+])
+def test_get_partition(region, expected):
+    assert utils.get_partition(region) == expected

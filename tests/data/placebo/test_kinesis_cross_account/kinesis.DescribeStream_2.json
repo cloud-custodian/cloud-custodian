@@ -1,0 +1,74 @@
+{
+    "status_code": 200,
+    "data": {
+        "StreamDescription": {
+            "StreamName": "test-stream-2",
+            "StreamARN": "arn:aws:kinesis:us-east-1:644160558196:stream/test-stream-2",
+            "StreamStatus": "ACTIVE",
+            "StreamModeDetails": {
+                "StreamMode": "ON_DEMAND"
+            },
+            "Shards": [
+                {
+                    "ShardId": "shardId-644160558196",
+                    "HashKeyRange": {
+                        "StartingHashKey": "0",
+                        "EndingHashKey": "85070591730234615865843651857942052863"
+                    },
+                    "SequenceNumberRange": {
+                        "StartingSequenceNumber": "49644462275578881371030230964923070125357965104931405826"
+                    }
+                },
+                {
+                    "ShardId": "shardId-644160558196",
+                    "HashKeyRange": {
+                        "StartingHashKey": "85070591730234615865843651857942052864",
+                        "EndingHashKey": "170141183460469231731687303715884105727"
+                    },
+                    "SequenceNumberRange": {
+                        "StartingSequenceNumber": "49644462275601182116228761588064605843630613466437386258"
+                    }
+                },
+                {
+                    "ShardId": "shardId-644160558196",
+                    "HashKeyRange": {
+                        "StartingHashKey": "170141183460469231731687303715884105728",
+                        "EndingHashKey": "255211775190703847597530955573826158591"
+                    },
+                    "SequenceNumberRange": {
+                        "StartingSequenceNumber": "49644462275623482861427292211206141561903261827943366690"
+                    }
+                },
+                {
+                    "ShardId": "shardId-644160558196",
+                    "HashKeyRange": {
+                        "StartingHashKey": "255211775190703847597530955573826158592",
+                        "EndingHashKey": "340282366920938463463374607431768211455"
+                    },
+                    "SequenceNumberRange": {
+                        "StartingSequenceNumber": "49644462275645783606625822834347677280175910189449347122"
+                    }
+                }
+            ],
+            "HasMoreShards": false,
+            "RetentionPeriodHours": 24,
+            "StreamCreationTimestamp": {
+                "__class__": "datetime",
+                "year": 2023,
+                "month": 9,
+                "day": 11,
+                "hour": 16,
+                "minute": 27,
+                "second": 9,
+                "microsecond": 0
+            },
+            "EnhancedMonitoring": [
+                {
+                    "ShardLevelMetrics": []
+                }
+            ],
+            "EncryptionType": "NONE"
+        },
+        "ResponseMetadata": {}
+    }
+}

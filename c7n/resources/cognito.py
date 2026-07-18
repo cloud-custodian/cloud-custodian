@@ -33,7 +33,7 @@ class CognitoIdentityPool(QueryResourceManager):
         id = 'IdentityPoolId'
         name = 'IdentityPoolName'
         arn_type = "identitypool"
-        cfn_type = 'AWS::Cognito::IdentityPool'
+        config_type = cfn_type = 'AWS::Cognito::IdentityPool'
         universal_taggable = object()
         permissions_augment = ("cognito-identity:ListTagsForResource",)
 

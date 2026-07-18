@@ -7,7 +7,6 @@ import os
 
 from c7n.mu import CloudWatchEventSource, LambdaFunction, LambdaManager, PythonPackageArchive
 
-
 log = logging.getLogger("custodian-mailer")
 
 entry_source = """\
@@ -33,8 +32,6 @@ CORE_DEPS = [
     "pyasn1",
     "redis",
     "jmespath",
-    # for other dependencies
-    "pkg_resources",
     # transport datadog - recursive deps
     "datadog",
     "decorator",
@@ -50,7 +47,7 @@ CORE_DEPS = [
     # sendgrid dependencies
     "sendgrid",
     "python_http_client",
-    "ellipticcurve",
+    "ecdsa",
 ]
 
 
@@ -58,10 +55,10 @@ def get_archive(config):
     deps = ["c7n_mailer"] + list(CORE_DEPS)
     archive = PythonPackageArchive(modules=deps)
 
-    for d in set(config["templates_folders"]):
+    for d in sorted(set(config.get("templates_folders", []))):
         if not os.path.exists(d):
             continue
-        for t in [f for f in os.listdir(d) if os.path.splitext(f)[1] == ".j2"]:
+        for t in sorted(f for f in os.listdir(d) if os.path.splitext(f)[1] == ".j2"):
             with open(os.path.join(d, t)) as fh:
                 archive.add_contents("msg-templates/%s" % t, fh.read())
 

@@ -1,11 +1,15 @@
 # Copyright The Cloud Custodian Authors.
 # SPDX-License-Identifier: Apache-2.0
+import json
 import logging
+import re
+from itertools import chain
 
 from botocore.exceptions import ClientError
 from concurrent.futures import as_completed
 
 from c7n.actions import BaseAction
+from c7n.filters import Filter, ListItemFilter
 from c7n.manager import resources
 from c7n.query import QueryResourceManager, TypeInfo
 from c7n.utils import local_session, type_schema
@@ -18,6 +22,7 @@ log = logging.getLogger('custodian.cfn')
 class CloudFormation(QueryResourceManager):
     class resource_type(TypeInfo):
         service = 'cloudformation'
+        arn = 'StackId'  # StackId contains the ARN
         arn_type = 'stack'
         enum_spec = ('describe_stacks', 'Stacks[]', None)
         id = 'StackName'
@@ -213,7 +218,103 @@ class CloudFormationRemoveTag(RemoveTag):
               - type: remove-tag
                 tags: ['DesiredTag']
     """
-
     def process_resource_set(self, client, stacks, keys):
         for s in stacks:
             _tag_stack(client, s, remove=keys)
+
+
+@CloudFormation.filter_registry.register('template')
+class CloudFormationTemplateFilter(Filter):
+    """Filter CloudFormation stacks based on their template body
+
+    This filter retrieves the CloudFormation template for each stack and
+    searches for the regex pattern provided in the template
+
+    :example:
+
+    .. code-block:: yaml
+
+        policies:
+          - name: detect-api-keys-in-templates
+            resource: cfn
+            filters:
+              - type: template
+                pattern: "API_KEY[0-9A-Z]"
+
+    :param pattern: The regular expression pattern to search for within the template
+    :param change-set-name: The name of the change set to retrieve the template for
+    :param template-stage: The stage of the template to retrieve ('Original' or 'Processed')
+    """
+
+    schema = type_schema(
+        'template',
+        required=['pattern'],
+        pattern={'type': 'string'},
+        change_set_name={'type': 'string'},
+        template_stage={'type': 'string', 'enum': ['Original', 'Processed']}
+    )
+    permissions = ('cloudformation:GetTemplate',)
+
+    def process(self, resources, event=None):
+        client = local_session(self.manager.session_factory).client('cloudformation')
+        matched = []
+        pattern = self.data.get('pattern')
+        change_set_name = self.data.get('change_set_name', None)
+        template_stage = self.data.get('template_stage', "Processed")
+
+        regex = re.compile(pattern)
+
+        for r in resources:
+            stack_id = r['StackId']
+            params = {'StackName': stack_id}
+
+            if change_set_name:
+                params['ChangeSetName'] = change_set_name
+
+            if template_stage:
+                params['TemplateStage'] = template_stage
+
+            response = client.get_template(**params)
+            template_body = response.get('TemplateBody')
+
+            # Serialize TemplateBody to a string
+            if isinstance(template_body, dict):
+                template_body = json.dumps(template_body, indent=2)
+
+            if regex.search(template_body):
+                matched.append(r)
+
+        return matched
+
+
+@CloudFormation.filter_registry.register('topic')
+class CloudFormationNotificationTopic(ListItemFilter):
+    schema = type_schema(
+        'topic',
+        attrs={"$ref": "#/definitions/filters_common/list_item_attrs"},
+        count={"type": "number"},
+        count_op={"$ref": "#/definitions/filters_common/comparison_operators"}
+    )
+    annotation_key = "c7n:SnsTopics"
+    FetchThreshold = 10
+    permissions = ('sns:GetTopicAttributes', 'sns:ListTopics')
+
+    def __init__(self, data, manager=None):
+        data['key'] = f'"{self.annotation_key}"'
+        super().__init__(data, manager)
+
+    def process(self, resources, event=None):
+        sns = self.manager.get_resource_manager('aws.sns')
+        topic_arns = set(chain.from_iterable(res.get('NotificationARNs', ()) for res in resources))
+
+        if len(topic_arns) < self.FetchThreshold:
+            topics = sns.get_resources(list(topic_arns))
+        else:
+            topics = sns.resources()
+        model = sns.get_model()
+        by_id = {t[model.id]: t for t in topics}
+        for res in resources:
+            res[self.annotation_key] = [
+                by_id[arn] for arn in res.get('NotificationARNs', ()) if arn in by_id
+            ]
+        return super().process(resources, event)

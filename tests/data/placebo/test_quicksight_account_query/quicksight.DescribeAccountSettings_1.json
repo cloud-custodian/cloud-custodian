@@ -1,0 +1,16 @@
+{
+    "status_code": 200,
+    "data": {
+        "ResponseMetadata": {},
+        "Status": 200,
+        "AccountSettings": {
+            "AccountName": "c7n-test",
+            "Edition": "ENTERPRISE",
+            "DefaultNamespace": "default",
+            "NotificationEmail": "test@c7n.com",
+            "PublicSharingEnabled": false,
+            "TerminationProtectionEnabled": true
+        },
+        "RequestId": "d87bb1de-3749-4915-887a-4acbc7fbb750"
+    }
+}

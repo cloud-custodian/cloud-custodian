@@ -51,6 +51,28 @@ class DirectoryVpcFilter(VpcFilter):
     RelatedIdsExpression = "VpcSettings.VpcId"
 
 
+@Directory.filter_registry.register('is-log-forwarding')
+class DirectoryLogSubscriptionFilter(Filter):
+
+    annotation_key = "c7n:LogSubscriptions"
+    permissions = ("ds:ListLogSubscriptions",)
+    schema = type_schema('is-log-forwarding')
+
+    def process(self, resources, event=None):
+        client = local_session(self.manager.session_factory).client('ds')
+        results = []
+        for r in resources:
+            subs = self.manager.retry(
+                client.list_log_subscriptions,
+                DirectoryId=r["DirectoryId"]
+            )["LogSubscriptions"]
+            if subs:
+                r[self.annotation_key] = subs
+                results.append(r)
+
+        return results
+
+
 @Directory.filter_registry.register('ldap')
 class DirectoryLDAPFilter(Filter):
     """Filter directories based on their LDAP status
@@ -141,10 +163,53 @@ class DirectorySettingsFilter(Filter):
         return matches
 
 
+@Directory.filter_registry.register('trust')
+class DirectoryTrustFilter(ValueFilter):
+    """Filter directories based on their trust relationships
+
+    :example:
+
+        .. code-block:: yaml
+
+            policies:
+              - name: trust-enabled-directories
+                resource: directory
+                filters:
+                  - type: trust
+                    key: TrustState
+                    value: Verified
+              - name: trust-remote-domain
+                resource: directory
+                filters:
+                  - type: trust
+                    key: RemoteDomainName
+                    value: example.com
+    """
+    schema = type_schema(
+        'trust', rinherit=ValueFilter.schema)
+
+    permissions = ('ds:DescribeTrusts',)
+    annotation_key = 'c7n:Trusts'
+
+    def process(self, resources, event=None):
+        client = local_session(self.manager.session_factory).client('ds')
+        trusts = client.describe_trusts()['Trusts']
+        matched = []
+        for r in resources:
+            r[self.annotation_key] = [
+                t for t in trusts if t['DirectoryId'] == r['DirectoryId']]
+            # When there are no trusts, we pass an empty dictionary so that
+            # self.match can evaluate directories without trusts using the absent value
+            resource_trusts = r[self.annotation_key] if len(r[self.annotation_key]) >= 1 else [{}]
+            if any((self.match(trust) for trust in resource_trusts)):
+                matched.append(r)
+        return matched
+
+
 @Directory.action_registry.register('tag')
 class DirectoryTag(Tag):
     """Add tags to a directory
-
+-
     :example:
 
         .. code-block:: yaml
@@ -236,7 +301,7 @@ class CloudDirectory(QueryResourceManager):
 
     class resource_type(TypeInfo):
         service = "clouddirectory"
-        enum_spec = ("list_directories", "Directories", {'state': 'ENABLED'})
+        enum_spec = ("list_directories", "Directories", None)
         arn = id = "DirectoryArn"
         name = "Name"
         arn_type = "directory"
@@ -246,10 +311,12 @@ class CloudDirectory(QueryResourceManager):
     augment = universal_augment
 
     def resources(self, query=None):
-        query_filters = CloudDirectoryQueryParser.parse(self.data.get('query', []))
+        queries = CloudDirectoryQueryParser.parse(self.data.get('query', []))
         query = query or {}
-        if query_filters:
-            query['Filters'] = query_filters
+        for q in queries:
+            query.update(q)
+        if 'state' not in query:
+            query['state'] = 'ENABLED'
         return super(CloudDirectory, self).resources(query=query)
 
 
@@ -313,9 +380,9 @@ class CloudDirectoryDisable(BaseAction):
 
 class CloudDirectoryQueryParser(QueryParser):
     QuerySchema = {
-        'name': str,
-        'directoryArn': str,
-        'state': str,
+        'state': ('ENABLED', 'DISABLED', 'DELETED'),
+        'MaxResults': int,
     }
 
     type_name = 'CloudDirectory'
+    multi_value = False

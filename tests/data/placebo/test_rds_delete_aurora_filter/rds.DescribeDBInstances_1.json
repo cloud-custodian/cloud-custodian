@@ -1,0 +1,122 @@
+{
+    "status_code": 200,
+    "data": {
+        "DBInstances": [
+            {
+                "DBInstanceIdentifier": "aurora-test-instance",
+                "DBInstanceClass": "db.t3.medium",
+                "Engine": "aurora-mysql",
+                "DBInstanceStatus": "available",
+                "MasterUsername": "admin",
+                "DBName": "testdb",
+                "Endpoint": {
+                    "Address": "aurora-test-instance.c1saggy6at26.us-east-1.rds.amazonaws.com",
+                    "Port": 3306,
+                    "HostedZoneId": "Z2R2ITUGPM61AM"
+                },
+                "AllocatedStorage": 1,
+                "InstanceCreateTime": {
+                    "__class__": "datetime",
+                    "year": 2026,
+                    "month": 1,
+                    "day": 5,
+                    "hour": 14,
+                    "minute": 56,
+                    "second": 32,
+                    "microsecond": 620000
+                },
+                "PreferredBackupWindow": "05:33-06:03",
+                "BackupRetentionPeriod": 1,
+                "DBSecurityGroups": [],
+                "VpcSecurityGroups": [
+                    {
+                        "VpcSecurityGroupId": "sg-047fc9367152944a4",
+                        "Status": "active"
+                    }
+                ],
+                "DBParameterGroups": [
+                    {
+                        "DBParameterGroupName": "default.aurora-mysql8.0",
+                        "ParameterApplyStatus": "in-sync"
+                    }
+                ],
+                "AvailabilityZone": "us-east-1b",
+                "DBSubnetGroup": {
+                    "DBSubnetGroupName": "aurora-test-subnet-group",
+                    "DBSubnetGroupDescription": "Managed by Terraform",
+                    "VpcId": "vpc-043861096d345674f",
+                    "SubnetGroupStatus": "Complete",
+                    "Subnets": [
+                        {
+                            "SubnetIdentifier": "subnet-00676d047e749eed1",
+                            "SubnetAvailabilityZone": {
+                                "Name": "us-east-1b"
+                            },
+                            "SubnetOutpost": {},
+                            "SubnetStatus": "Active"
+                        },
+                        {
+                            "SubnetIdentifier": "subnet-053c8222c45eddcfc",
+                            "SubnetAvailabilityZone": {
+                                "Name": "us-east-1a"
+                            },
+                            "SubnetOutpost": {},
+                            "SubnetStatus": "Active"
+                        }
+                    ]
+                },
+                "PreferredMaintenanceWindow": "sat:05:55-sat:06:25",
+                "PendingModifiedValues": {},
+                "MultiAZ": false,
+                "EngineVersion": "8.0.mysql_aurora.3.08.2",
+                "AutoMinorVersionUpgrade": true,
+                "ReadReplicaDBInstanceIdentifiers": [],
+                "LicenseModel": "general-public-license",
+                "StorageThroughput": 0,
+                "OptionGroupMemberships": [
+                    {
+                        "OptionGroupName": "default:aurora-mysql-8-0",
+                        "Status": "in-sync"
+                    }
+                ],
+                "PubliclyAccessible": false,
+                "StorageType": "aurora",
+                "DbInstancePort": 0,
+                "DBClusterIdentifier": "aurora-test-cluster",
+                "StorageEncrypted": false,
+                "DbiResourceId": "db-KKGWR4V64UKKT7JXAD7SMNUJLA",
+                "CACertificateIdentifier": "rds-ca-rsa2048-g1",
+                "DomainMemberships": [],
+                "CopyTagsToSnapshot": false,
+                "MonitoringInterval": 0,
+                "PromotionTier": 0,
+                "DBInstanceArn": "arn:aws:rds:us-east-1:644160558196:db:aurora-test-instance",
+                "IAMDatabaseAuthenticationEnabled": false,
+                "DatabaseInsightsMode": "standard",
+                "PerformanceInsightsEnabled": false,
+                "DeletionProtection": false,
+                "AssociatedRoles": [],
+                "TagList": [],
+                "CustomerOwnedIpEnabled": false,
+                "NetworkType": "IPV4",
+                "BackupTarget": "region",
+                "CertificateDetails": {
+                    "CAIdentifier": "rds-ca-rsa2048-g1",
+                    "ValidTill": {
+                        "__class__": "datetime",
+                        "year": 2027,
+                        "month": 1,
+                        "day": 5,
+                        "hour": 14,
+                        "minute": 55,
+                        "second": 14,
+                        "microsecond": 0
+                    }
+                },
+                "DedicatedLogVolume": false,
+                "EngineLifecycleSupport": "open-source-rds-extended-support"
+            }
+        ],
+        "ResponseMetadata": {}
+    }
+}

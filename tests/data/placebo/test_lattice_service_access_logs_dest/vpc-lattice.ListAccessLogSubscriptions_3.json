@@ -1,0 +1,35 @@
+{
+    "status_code": 200,
+    "data": {
+        "ResponseMetadata": {},
+        "items": [
+            {
+                "arn": "arn:aws:vpc-lattice:us-east-1:644160558196:accesslogsubscription/als-08cc3f4eef3912adc",
+                "createdAt": {
+                    "__class__": "datetime",
+                    "year": 2025,
+                    "month": 9,
+                    "day": 16,
+                    "hour": 20,
+                    "minute": 53,
+                    "second": 12,
+                    "microsecond": 669000
+                },
+                "destinationArn": "arn:aws:s3:::c7n-lattice-test-logs",
+                "id": "als-08cc3f4eef3912adc",
+                "lastUpdatedAt": {
+                    "__class__": "datetime",
+                    "year": 2025,
+                    "month": 9,
+                    "day": 16,
+                    "hour": 20,
+                    "minute": 53,
+                    "second": 12,
+                    "microsecond": 669000
+                },
+                "resourceArn": "arn:aws:vpc-lattice:us-east-1:644160558196:service/svc-06ce5ea9404c8f15b",
+                "resourceId": "svc-06ce5ea9404c8f15b"
+            }
+        ]
+    }
+}

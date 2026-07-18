@@ -57,4 +57,4 @@ def get_tags(client, rg_name, vm_name):
 
 
 def set_tags(client, rg_name, vm_name, tags):
-    client.virtual_machines.begin_update(rg_name, vm_name, VirtualMachineUpdate(tags=tags))
+    client.virtual_machines.begin_update(rg_name, vm_name, VirtualMachineUpdate(tags=tags)).result()

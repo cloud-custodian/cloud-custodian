@@ -1,1 +1,0 @@
-*/30 * * * * root /sbin/initctl start omnissm-inventory

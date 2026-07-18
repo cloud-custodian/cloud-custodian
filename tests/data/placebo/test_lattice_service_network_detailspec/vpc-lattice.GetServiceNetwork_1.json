@@ -1,0 +1,35 @@
+{
+    "status_code": 200,
+    "data": {
+        "ResponseMetadata": {},
+        "id": "sn-058397f50a9fb45c2",
+        "name": "test-lattice-network",
+        "createdAt": {
+            "__class__": "datetime",
+            "year": 2026,
+            "month": 2,
+            "day": 24,
+            "hour": 15,
+            "minute": 39,
+            "second": 15,
+            "microsecond": 515000
+        },
+        "lastUpdatedAt": {
+            "__class__": "datetime",
+            "year": 2026,
+            "month": 2,
+            "day": 24,
+            "hour": 15,
+            "minute": 39,
+            "second": 15,
+            "microsecond": 515000
+        },
+        "arn": "arn:aws:vpc-lattice:us-east-1:644160558196:servicenetwork/sn-058397f50a9fb45c2",
+        "authType": "AWS_IAM",
+        "sharingConfig": {
+            "enabled": true
+        },
+        "numberOfAssociatedVPCs": 0,
+        "numberOfAssociatedServices": 0
+    }
+}

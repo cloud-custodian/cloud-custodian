@@ -1,0 +1,50 @@
+{
+    "pytest-terraform": 1,
+    "outputs": {},
+    "resources": {
+        "aws_caller_identity": {
+            "current": {
+                "account_id": "644160558196",
+                "arn": "arn:aws:sts::644160558196:assumed-role/AWSReservedSSO_admin_1ca370fb35bf6b13/caleb.syring@sixfeetup.com",
+                "id": "644160558196",
+                "user_id": "AROAXGZAMH754FNWODWUX:caleb.syring@sixfeetup.com"
+            }
+        },
+        "aws_sqs_queue": {
+            "test_sqs": {
+                "arn": "arn:aws:sqs:us-east-1:644160558196:test-sqs-remove-matched-empty-sid",
+                "content_based_deduplication": false,
+                "deduplication_scope": "",
+                "delay_seconds": 0,
+                "fifo_queue": false,
+                "fifo_throughput_limit": "",
+                "id": "https://sqs.us-east-1.amazonaws.com/644160558196/test-sqs-remove-matched-empty-sid",
+                "kms_data_key_reuse_period_seconds": 300,
+                "kms_master_key_id": "",
+                "max_message_size": 262144,
+                "message_retention_seconds": 345600,
+                "name": "test-sqs-remove-matched-empty-sid",
+                "name_prefix": "",
+                "policy": "",
+                "receive_wait_time_seconds": 0,
+                "redrive_allow_policy": "",
+                "redrive_policy": "",
+                "region": "us-east-1",
+                "sqs_managed_sse_enabled": true,
+                "tags": null,
+                "tags_all": {},
+                "timeouts": null,
+                "url": "https://sqs.us-east-1.amazonaws.com/644160558196/test-sqs-remove-matched-empty-sid",
+                "visibility_timeout_seconds": 30
+            }
+        },
+        "aws_sqs_queue_policy": {
+            "test_sqs_policy": {
+                "id": "https://sqs.us-east-1.amazonaws.com/644160558196/test-sqs-remove-matched-empty-sid",
+                "policy": "{\"Statement\":[{\"Action\":\"sqs:SendMessage\",\"Effect\":\"Allow\",\"Principal\":\"*\",\"Resource\":\"arn:aws:sqs:us-east-1:644160558196:test-sqs-remove-matched-empty-sid\",\"Sid\":\"WithSid\"},{\"Action\":\"sqs:ReceiveMessage\",\"Effect\":\"Allow\",\"Principal\":\"*\",\"Resource\":\"arn:aws:sqs:us-east-1:644160558196:test-sqs-remove-matched-empty-sid\",\"Sid\":\"\"},{\"Action\":\"sqs:DeleteMessage\",\"Effect\":\"Allow\",\"Principal\":{\"AWS\":\"arn:aws:iam::644160558196:root\"},\"Resource\":\"arn:aws:sqs:us-east-1:644160558196:test-sqs-remove-matched-empty-sid\",\"Sid\":\"SameAccount\"}],\"Version\":\"2012-10-17\"}",
+                "queue_url": "https://sqs.us-east-1.amazonaws.com/644160558196/test-sqs-remove-matched-empty-sid",
+                "region": "us-east-1"
+            }
+        }
+    }
+}

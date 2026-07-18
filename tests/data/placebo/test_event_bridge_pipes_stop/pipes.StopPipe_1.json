@@ -1,0 +1,30 @@
+{
+    "status_code": 200,
+    "data": {
+        "ResponseMetadata": {},
+        "Arn": "arn:aws:pipes:us-east-1:644160558196:pipe/c7n-test",
+        "Name": "c7n-test",
+        "DesiredState": "STOPPED",
+        "CurrentState": "STOPPING",
+        "CreationTime": {
+            "__class__": "datetime",
+            "year": 2025,
+            "month": 8,
+            "day": 28,
+            "hour": 10,
+            "minute": 40,
+            "second": 37,
+            "microsecond": 0
+        },
+        "LastModifiedTime": {
+            "__class__": "datetime",
+            "year": 2025,
+            "month": 8,
+            "day": 28,
+            "hour": 12,
+            "minute": 8,
+            "second": 36,
+            "microsecond": 0
+        }
+    }
+}

@@ -1,0 +1,106 @@
+{
+  "status_code": 200,
+  "data": {
+    "Volumes": [
+      {
+        "CreationTime": 1744030914.019,
+        "FileSystemId": "fs-05b4c44707bc2596e",
+        "Lifecycle": "AVAILABLE",
+        "Name": "fsx",
+        "ResourceARN": "arn:aws:fsx:eu-west-1:644160558196:volume/fs-05b4c44707bc2596e/fsvol-03790c16a7f73c76e",
+        "VolumeId": "fsvol-03790c16a7f73c76e",
+        "VolumeType": "OPENZFS",
+        "OpenZFSConfiguration": {
+          "VolumePath": "/fsx",
+          "StorageCapacityReservationGiB": 0,
+          "StorageCapacityQuotaGiB": 64,
+          "RecordSizeKiB": 128,
+          "DataCompressionType": "LZ4",
+          "CopyTagsToSnapshots": false,
+          "ReadOnly": false,
+          "NfsExports": [
+            {
+              "ClientConfigurations": [
+                {
+                  "Clients": "*",
+                  "Options": [
+                    "rw",
+                    "crossmnt"
+                  ]
+                }
+              ]
+            }
+          ],
+          "UserAndGroupQuotas": [
+            {
+              "Type": "USER",
+              "Id": 0,
+              "StorageCapacityQuotaGiB": 0
+            },
+            {
+              "Type": "GROUP",
+              "Id": 0,
+              "StorageCapacityQuotaGiB": 0
+            }
+          ]
+        }
+      },
+      {
+        "CreationTime": 1744033714.635,
+        "FileSystemId": "fs-05b4c44707bc2596e",
+        "Lifecycle": "AVAILABLE",
+        "Name": "child-vol1",
+        "ResourceARN": "arn:aws:fsx:eu-west-1:644160558196:volume/fs-05b4c44707bc2596e/fsvol-05e36c8043521ac95",
+        "VolumeId": "fsvol-05e36c8043521ac95",
+        "VolumeType": "OPENZFS",
+        "OpenZFSConfiguration": {
+          "ParentVolumeId": "fsvol-03790c16a7f73c76e",
+          "VolumePath": "/fsx/child-vol1",
+          "StorageCapacityReservationGiB": 1,
+          "StorageCapacityQuotaGiB": 1,
+          "RecordSizeKiB": 128,
+          "DataCompressionType": "LZ4",
+          "CopyTagsToSnapshots": false,
+          "ReadOnly": false,
+          "NfsExports": [
+            {
+              "ClientConfigurations": [
+                {
+                  "Clients": "*",
+                  "Options": [
+                    "rw",
+                    "crossmnt"
+                  ]
+                }
+              ]
+            }
+          ],
+          "UserAndGroupQuotas": [
+            {
+              "Type": "USER",
+              "Id": 0,
+              "StorageCapacityQuotaGiB": 0
+            },
+            {
+              "Type": "GROUP",
+              "Id": 0,
+              "StorageCapacityQuotaGiB": 0
+            }
+          ]
+        }
+      }
+    ],
+    "ResponseMetadata": {
+      "RequestId": "4e290ea6-c4c1-4c65-880d-27aecde1da01",
+      "HTTPStatusCode": 200,
+      "HTTPHeaders": {
+        "content-type": "application/x-amz-json-1.1",
+        "date": "Tue, 11 Dec 2018 20:08:43 GMT",
+        "x-amzn-requestid": "4e290ea6-c4c1-4c65-880d-27aecde1da01",
+        "content-length": "765",
+        "connection": "keep-alive"
+      },
+      "RetryAttempts": 0
+    }
+  }
+}

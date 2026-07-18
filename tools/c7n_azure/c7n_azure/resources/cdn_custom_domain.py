@@ -8,11 +8,11 @@ from c7n_azure.utils import ResourceIdParser
 
 @resources.register('cdn-custom-domain')
 class CdnCustomDomain(ChildArmResourceManager):
-    """CDN Endpoint Resource
+    """CDN Custom Domain Resource
 
     :example:
 
-    Returns all CDN endpoints without Https provisioning
+    Returns all CDN custom domains without Https provisioning
 
     .. code-block:: yaml
 

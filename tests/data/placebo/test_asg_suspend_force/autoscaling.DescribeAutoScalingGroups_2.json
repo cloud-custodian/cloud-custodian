@@ -1,0 +1,129 @@
+{
+    "status_code": 200,
+    "data": {
+        "AutoScalingGroups": [
+            {
+                "AutoScalingGroupName": "custodian-suspend-force-recording",
+                "AutoScalingGroupARN": "arn:aws:autoscaling:us-east-1:644160558196:autoScalingGroup:3bb73ea1-805e-43f9-9898-a5a1e03ae202:autoScalingGroupName/custodian-suspend-force-recording",
+                "LaunchTemplate": {
+                    "LaunchTemplateId": "lt-0d738e17104c32f39",
+                    "LaunchTemplateName": "custodian-suspend-force-recording-lt",
+                    "Version": "$Default"
+                },
+                "MinSize": 0,
+                "MaxSize": 1,
+                "DesiredCapacity": 1,
+                "DefaultCooldown": 300,
+                "AvailabilityZones": [
+                    "us-east-1a",
+                    "us-east-1b",
+                    "us-east-1d",
+                    "us-east-1e"
+                ],
+                "LoadBalancerNames": [],
+                "TargetGroupARNs": [],
+                "HealthCheckType": "EC2",
+                "HealthCheckGracePeriod": 0,
+                "Instances": [
+                    {
+                        "InstanceId": "i-08f351a51522595da",
+                        "InstanceType": "t3.micro",
+                        "AvailabilityZone": "us-east-1b",
+                        "LifecycleState": "InService",
+                        "HealthStatus": "Healthy",
+                        "LaunchTemplate": {
+                            "LaunchTemplateId": "lt-0d738e17104c32f39",
+                            "LaunchTemplateName": "custodian-suspend-force-recording-lt",
+                            "Version": "1"
+                        },
+                        "ProtectedFromScaleIn": false
+                    }
+                ],
+                "CreatedTime": {
+                    "__class__": "datetime",
+                    "year": 2026,
+                    "month": 2,
+                    "day": 26,
+                    "hour": 18,
+                    "minute": 39,
+                    "second": 29,
+                    "microsecond": 12000
+                },
+                "SuspendedProcesses": [
+                    {
+                        "ProcessName": "AlarmNotification",
+                        "SuspensionReason": "User suspended at 2026-02-26T18:56:36Z"
+                    },
+                    {
+                        "ProcessName": "HealthCheck",
+                        "SuspensionReason": "User suspended at 2026-02-26T18:56:36Z"
+                    },
+                    {
+                        "ProcessName": "AddToLoadBalancer",
+                        "SuspensionReason": "User suspended at 2026-02-26T18:56:36Z"
+                    },
+                    {
+                        "ProcessName": "ScheduledActions",
+                        "SuspensionReason": "User suspended at 2026-02-26T18:56:36Z"
+                    },
+                    {
+                        "ProcessName": "Terminate",
+                        "SuspensionReason": "User suspended at 2026-02-26T18:56:36Z"
+                    },
+                    {
+                        "ProcessName": "InstanceRefresh",
+                        "SuspensionReason": "User suspended at 2026-02-26T18:56:36Z"
+                    },
+                    {
+                        "ProcessName": "Launch",
+                        "SuspensionReason": "User suspended at 2026-02-26T18:56:36Z"
+                    },
+                    {
+                        "ProcessName": "AZRebalance",
+                        "SuspensionReason": "User suspended at 2026-02-26T18:56:36Z"
+                    },
+                    {
+                        "ProcessName": "ReplaceUnhealthy",
+                        "SuspensionReason": "User suspended at 2026-02-26T18:56:36Z"
+                    }
+                ],
+                "VPCZoneIdentifier": "subnet-efbcccb7,subnet-e3b194de,subnet-044d9e3b66dccd75a,subnet-914763e7",
+                "EnabledMetrics": [],
+                "Tags": [
+                    {
+                        "ResourceId": "custodian-suspend-force-recording",
+                        "ResourceType": "auto-scaling-group",
+                        "Key": "Name",
+                        "Value": "custodian-suspend-force-recording",
+                        "PropagateAtLaunch": false
+                    },
+                    {
+                        "ResourceId": "custodian-suspend-force-recording",
+                        "ResourceType": "auto-scaling-group",
+                        "Key": "SuspendTag",
+                        "Value": "record-test",
+                        "PropagateAtLaunch": false
+                    }
+                ],
+                "TerminationPolicies": [
+                    "Default"
+                ],
+                "NewInstancesProtectedFromScaleIn": false,
+                "ServiceLinkedRoleARN": "arn:aws:iam::644160558196:role/aws-service-role/autoscaling.amazonaws.com/AWSServiceRoleForAutoScaling",
+                "TrafficSources": [],
+                "AvailabilityZoneDistribution": {
+                    "CapacityDistributionStrategy": "balanced-best-effort"
+                },
+                "CapacityReservationSpecification": {
+                    "CapacityReservationPreference": "default"
+                },
+                "InstanceLifecyclePolicy": {
+                    "RetentionTriggers": {
+                        "TerminateHookAbandon": "terminate"
+                    }
+                }
+            }
+        ],
+        "ResponseMetadata": {}
+    }
+}

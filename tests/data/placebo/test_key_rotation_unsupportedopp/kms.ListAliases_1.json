@@ -1,0 +1,34 @@
+{
+    "status_code": 200,
+    "data": {
+        "Aliases": [
+            {
+                "AliasName": "alias/pendingimporttest",
+                "AliasArn": "arn:aws:kms:us-west-2:644160558196:alias/pendingimporttest",
+                "TargetKeyId": "0e70fa46-b702-4fe7-807e-8dea0d333f7d",
+                "CreationDate": {
+                    "__class__": "datetime",
+                    "year": 2025,
+                    "month": 6,
+                    "day": 2,
+                    "hour": 10,
+                    "minute": 43,
+                    "second": 59,
+                    "microsecond": 38000
+                },
+                "LastUpdatedDate": {
+                    "__class__": "datetime",
+                    "year": 2025,
+                    "month": 6,
+                    "day": 2,
+                    "hour": 10,
+                    "minute": 43,
+                    "second": 59,
+                    "microsecond": 38000
+                }
+            }
+        ],
+        "Truncated": false,
+        "ResponseMetadata": {}
+    }
+}

@@ -1,0 +1,14 @@
+{
+    "status_code": 200,
+    "data": {
+        "domainInfo": {
+            "name": "c7n-test",
+            "status": "REGISTERED",
+            "arn": "arn:aws:swf:us-east-1:123456789012:/domain/c7n-test"
+        },
+        "configuration": {
+            "workflowExecutionRetentionPeriodInDays": "90"
+        },
+        "ResponseMetadata": {}
+    }
+}

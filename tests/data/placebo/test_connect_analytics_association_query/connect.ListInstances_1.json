@@ -1,0 +1,50 @@
+{
+    "status_code": 200,
+    "data": {
+        "ResponseMetadata": {},
+        "InstanceSummaryList": [
+            {
+                "Id": "2249c2a9-a798-4ebc-aaaf-86685b6a576d",
+                "Arn": "arn:aws:connect:us-east-1:644160558196:instance/2249c2a9-a798-4ebc-aaaf-86685b6a576d",
+                "IdentityManagementType": "CONNECT_MANAGED",
+                "InstanceAlias": "test-pratyush",
+                "CreatedTime": {
+                    "__class__": "datetime",
+                    "year": 2023,
+                    "month": 5,
+                    "day": 19,
+                    "hour": 11,
+                    "minute": 35,
+                    "second": 3,
+                    "microsecond": 0
+                },
+                "ServiceRole": "arn:aws:iam::644160558196:role/aws-service-role/connect.amazonaws.com/AWSServiceRoleForAmazonConnect_K9nHKntrsk8djqIsEU1K",
+                "InstanceStatus": "ACTIVE",
+                "InboundCallsEnabled": true,
+                "OutboundCallsEnabled": true,
+                "InstanceAccessUrl": "https://test-pratyush.my.connect.aws"
+            },
+            {
+                "Id": "25f1514d-14d0-4a06-b28f-9df132d33d3d",
+                "Arn": "arn:aws:connect:us-east-1:644160558196:instance/25f1514d-14d0-4a06-b28f-9df132d33d3d",
+                "IdentityManagementType": "CONNECT_MANAGED",
+                "InstanceAlias": "c7ntest",
+                "CreatedTime": {
+                    "__class__": "datetime",
+                    "year": 2023,
+                    "month": 4,
+                    "day": 11,
+                    "hour": 9,
+                    "minute": 58,
+                    "second": 50,
+                    "microsecond": 0
+                },
+                "ServiceRole": "arn:aws:iam::644160558196:role/aws-service-role/connect.amazonaws.com/AWSServiceRoleForAmazonConnect_lwIriO3byDrpDLcnkrpg",
+                "InstanceStatus": "ACTIVE",
+                "InboundCallsEnabled": true,
+                "OutboundCallsEnabled": true,
+                "InstanceAccessUrl": "https://c7ntest.my.connect.aws"
+            }
+        ]
+    }
+}

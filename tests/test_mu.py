@@ -22,6 +22,7 @@ from c7n.mu import (
     custodian_archive,
     generate_requirements,
     get_exec_options,
+    normalize_arn,
     BucketLambdaNotification,
     LambdaFunction,
     LambdaManager,
@@ -51,6 +52,24 @@ def test_get_exec_options():
             'tracer': 'default',
             'output_dir': 'gs://mybucket/myprefix',
             'log_group': 'gcp'}
+
+
+def test_normalize_arn():
+    # Unqualified ARN (no version/alias) should remain unchanged
+    base_arn = "arn:aws:lambda:us-east-1:123456789012:function:my-function"
+    assert normalize_arn(base_arn) == base_arn
+
+    # Version-qualified ARN should be stripped
+    versioned_arn = "arn:aws:lambda:us-east-1:123456789012:function:my-function:42"
+    assert normalize_arn(versioned_arn) == base_arn
+
+    # Alias-qualified ARN should be stripped
+    alias_arn = "arn:aws:lambda:us-east-1:123456789012:function:my-function:prod"
+    assert normalize_arn(alias_arn) == base_arn
+
+    # $LATEST pseudo-version should be stripped
+    latest_arn = "arn:aws:lambda:us-east-1:123456789012:function:my-function:$LATEST"
+    assert normalize_arn(latest_arn) == base_arn
 
 
 def test_generate_requirements():
@@ -152,7 +171,7 @@ class PolicyLambdaProvision(Publish):
                 'mode': {
                     'type': 'cloudtrail',
                     'role': 'arn:aws:iam::644160558196:role/custodian-mu',
-                    'runtime': 'python3.9',
+                    'runtime': 'python3.12',
                     'events': ['RunInstances']}})
             pl1 = PolicyLambda(p1)
             mgr = LambdaManager(session_factory)
@@ -191,7 +210,6 @@ class PolicyLambdaProvision(Publish):
             {'ConfigRuleName': 'custodian-configx',
              'Description': 'cloud-custodian lambda policy',
              'MaximumExecutionFrequency': 'Three_Hours',
-             'Scope': {'ComplianceResourceTypes': ['AWS::Kinesis::Stream']},
              'Source': {
                  'Owner': 'CUSTOM_LAMBDA',
                  'SourceDetails': [{'EventSource': 'aws.config',
@@ -491,7 +509,7 @@ class PolicyLambdaProvision(Publish):
             for i in mgr.list_functions()
             if i["FunctionName"] == "custodian-s3-bucket-policy"
         ]
-        self.assertTrue(len(functions), 1)
+        self.assertEqual(len(functions), 1)
 
     def test_cwe_trail(self):
         session_factory = self.replay_flight_data("test_cwe_trail", zdata=True)

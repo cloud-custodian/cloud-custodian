@@ -54,7 +54,7 @@
                 "creationData": {
                     "createOption": "FromImage",
                     "imageReference": {
-                        "id": "/Subscriptions/aa98974b-5d2a-4d98-a78a-382f3715d07e/Providers/Microsoft.Compute/Locations/southcentralus/Publishers/Canonical/ArtifactTypes/VMImage/Offers/UbuntuServer/Skus/16.04.0-LTS/Versions/16.04.201802220"
+                        "id": "/Subscriptions/632790a5-a1aa-4e0c-8cc1-fafbee1d5b39/Providers/Microsoft.Compute/Locations/westus/Publishers/Canonical/ArtifactTypes/VMImage/Offers/ubuntu-24_04-lts/Skus/server/Versions/24.04.202507080"
                     }
                 },
                 "diskSizeGB": 30

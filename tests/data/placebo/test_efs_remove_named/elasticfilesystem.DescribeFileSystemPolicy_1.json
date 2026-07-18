@@ -1,0 +1,8 @@
+{
+    "status_code": 200,
+    "data": {
+        "ResponseMetadata": {},
+        "FileSystemId": "fs-0db9bce66be0fefd6",
+        "Policy": "{\n  \"Version\" : \"2012-10-17\",\n  \"Id\" : \"WhatIsIt\",\n  \"Statement\" : [ {\n    \"Sid\" : \"WhatIsIt\",\n    \"Effect\" : \"Allow\",\n    \"Principal\" : {\n      \"AWS\" : \"*\"\n    },\n    \"Action\" : [ \"elasticfilesystem:DescribeFileSystemPolicy\", \"elasticfilesystem:DescribeFileSystems\" ],\n    \"Resource\" : \"arn:aws:elasticfilesystem:us-east-1:644160558196:file-system/fs-0db9bce66be0fefd6\"\n  } ]\n}"
+    }
+}

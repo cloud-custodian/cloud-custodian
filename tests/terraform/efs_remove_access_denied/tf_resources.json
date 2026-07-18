@@ -1,0 +1,67 @@
+{
+    "pytest-terraform": 1,
+    "outputs": {},
+    "resources": {
+        "aws_efs_file_system": {
+            "example_test": {
+                "arn": "arn:aws:elasticfilesystem:us-east-1:644160558196:file-system/fs-0cfc0ddff36f44742",
+                "availability_zone_id": "",
+                "availability_zone_name": "",
+                "creation_token": "terraform-20250104021434078600000001",
+                "dns_name": "fs-0cfc0ddff36f44742.efs.us-east-1.amazonaws.com",
+                "encrypted": true,
+                "id": "fs-0cfc0ddff36f44742",
+                "kms_key_id": "arn:aws:kms:us-east-1:644160558196:key/d38e6df4-3a19-4516-9f4b-ab568e9bccc5",
+                "lifecycle_policy": [],
+                "name": "example_test",
+                "number_of_mount_targets": 0,
+                "owner_id": "644160558196",
+                "performance_mode": "generalPurpose",
+                "protection": [
+                    {
+                        "replication_overwrite": "ENABLED"
+                    }
+                ],
+                "provisioned_throughput_in_mibps": 0,
+                "size_in_bytes": [
+                    {
+                        "value": 6144,
+                        "value_in_ia": 0,
+                        "value_in_standard": 6144
+                    }
+                ],
+                "tags": {
+                    "Name": "example_test"
+                },
+                "tags_all": {
+                    "Name": "example_test"
+                },
+                "throughput_mode": "bursting"
+            }
+        },
+        "local_file": {
+            "efs_policy_json": {
+                "content": "{\"Id\":\"DenyAllAccess\",\"Statement\":[{\"Action\":[\"elasticfilesystem:DescribeFileSystemPolicy\",\"elasticfilesystem:DescribeFileSystems\"],\"Effect\":\"Deny\",\"Principal\":{\"AWS\":\"*\"},\"Resource\":\"arn:aws:elasticfilesystem:us-east-1:644160558196:file-system/fs-0cfc0ddff36f44742\",\"Sid\":\"DenyAllAccess\"}],\"Version\":\"2012-10-17\"}",
+                "content_base64": null,
+                "content_base64sha256": "aDSM4SbriVBSEYsRNDdpwZ4qUCDISNiiD9Z9LswU6mM=",
+                "content_base64sha512": "TZGdodCeJNEo7iD0D8oNBFznLX50PkA4u2hqzn2cF4W5IS2LsSuoCTcgoaSDTT1g5HC6qdrYNVFTHCGXoxvGnQ==",
+                "content_md5": "8e3826ac5c8981ecfa981006f9bd0a8f",
+                "content_sha1": "5892b070cad0524fbbcadce597480951f83eb3ee",
+                "content_sha256": "68348ce126eb895052118b11343769c19e2a5020c848d8a20fd67d2ecc14ea63",
+                "content_sha512": "4d919da1d09e24d128ee20f40fca0d045ce72d7e743e4038bb686ace7d9c1785b9212d8bb12ba8093720a1a4834d3d60e470baa9dad83551531c2197a31bc69d",
+                "directory_permission": "0777",
+                "file_permission": "0777",
+                "filename": "efs_policy.json",
+                "id": "5892b070cad0524fbbcadce597480951f83eb3ee",
+                "sensitive_content": null,
+                "source": null
+            }
+        },
+        "null_resource": {
+            "apply_policy_with_bypass": {
+                "id": "55703265495278591",
+                "triggers": null
+            }
+        }
+    }
+}

@@ -1,0 +1,18 @@
+{
+  "headers": {
+    "content-type": "application/json; charset=UTF-8",
+    "vary": "Origin, X-Origin, Referer",
+    "date": "Fri, 06 Mar 2026 23:02:00 GMT",
+    "server": "ESF",
+    "x-xss-protection": "0",
+    "x-frame-options": "SAMEORIGIN",
+    "x-content-type-options": "nosniff",
+    "alt-svc": "h3=\":443\"; ma=2592000,h3-29=\":443\"; ma=2592000",
+    "transfer-encoding": "chunked",
+    "status": "200",
+    "content-length": "3",
+    "-content-encoding": "gzip",
+    "content-location": "https://us-west1-aiplatform.googleapis.com/v1/projects/cloud-custodian/locations/us-west1/endpoints?alt=json"
+  },
+  "body": {}
+}

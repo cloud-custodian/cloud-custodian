@@ -3,6 +3,7 @@
 
 from c7n.utils import local_session, type_schema
 from c7n_gcp.actions import MethodAction
+from c7n_gcp.filters.iampolicy import IamPolicyFilter
 
 
 class SetIamPolicy(MethodAction):
@@ -30,7 +31,7 @@ class SetIamPolicy(MethodAction):
         Note the `resource` field in the example that could be changed to another resource that has
         both `setIamPolicy` and `getIamPolicy` methods (such as gcp.spanner-database-instance).
 
-        Example:
+        Example using exact values:
 
         .. code-block:: yaml
 
@@ -55,6 +56,28 @@ class SetIamPolicy(MethodAction):
                           - user:user5@gmail.com
                           - user:user6@gmail.com
                         role: roles/viewer
+
+        Example using the ``iam-policy`` filter with value filter semantics and
+        ``remove-bindings: matched`` for dry-run-safe pattern matching:
+
+        .. code-block:: yaml
+
+            policies:
+              - name: remove-service-account-admin-permissions
+                resource: gcp.project
+                filters:
+                  - type: iam-policy
+                    user-role:
+                      role:
+                        op: glob
+                        value: 'roles/*admin'
+                        value_type: normalize
+                      user:
+                        op: glob
+                        value: 'serviceAccount:*'
+                actions:
+                  - type: set-iam-policy
+                    remove-bindings: matched
         """
     schema = type_schema('set-iam-policy',
                          **{
@@ -70,14 +93,20 @@ class SetIamPolicy(MethodAction):
                                                        'minItems': 1}}
                              },
                              'remove-bindings': {
-                                 'type': 'array',
-                                 'minItems': 1,
-                                 'items': {'role': {'type': 'string'},
-                                           'members': {'oneOf': [
-                                               {'type': 'array',
-                                                'items': {'type': 'string'},
-                                                'minItems': 1},
-                                               {'enum': ['*']}]}}},
+                                 'oneOf': [
+                                     {'enum': ['matched']},
+                                     {
+                                         'type': 'array',
+                                         'minItems': 1,
+                                         'items': {
+                                             'role': {'type': 'string'},
+                                             'members': {'oneOf': [
+                                                 {'type': 'array',
+                                                  'items': {'type': 'string'},
+                                                  'minItems': 1},
+                                                 {'enum': ['*']}]}}}
+                                 ]
+                             },
                          })
     method_spec = {'op': 'setIamPolicy'}
     schema_alias = True
@@ -85,8 +114,9 @@ class SetIamPolicy(MethodAction):
     def get_resource_params(self, model, resource):
         """
         Collects `existing_bindings` with the `_get_existing_bindings` method, `add_bindings` and
-        `remove_bindings` from a policy, then calls `_remove_bindings` with the result of
-        `_add_bindings` being applied to the `existing_bindings`, and finally sets the resulting
+        `remove_bindings` from a policy, applies `_add_bindings` to the `existing_bindings`, then
+        removes bindings either via `_remove_matched_bindings` (when ``remove-bindings: matched``)
+        or `_remove_bindings` (when an explicit list is provided), and finally sets the resulting
         list at the 'bindings' key if there is at least a single record there, or assigns an empty
         object to the 'policy' key in order to avoid errors produced by the API.
 
@@ -95,10 +125,16 @@ class SetIamPolicy(MethodAction):
         """
         params = self._verb_arguments(resource)
         existing_bindings = self._get_existing_bindings(model, resource)
-        add_bindings = self.data['add-bindings'] if 'add-bindings' in self.data else []
-        remove_bindings = self.data['remove-bindings'] if 'remove-bindings' in self.data else []
+        add_bindings = self.data.get('add-bindings', [])
+        remove_bindings = self.data.get('remove-bindings', [])
         bindings_to_set = self._add_bindings(existing_bindings, add_bindings)
-        bindings_to_set = self._remove_bindings(bindings_to_set, remove_bindings)
+
+        if remove_bindings == 'matched':
+            matched_pairs = resource.get(IamPolicyFilter.annotation_key, [])
+            bindings_to_set = self._remove_matched_bindings(bindings_to_set, matched_pairs)
+        else:
+            bindings_to_set = self._remove_bindings(bindings_to_set, remove_bindings)
+
         params['body'] = {
             'policy': {'bindings': bindings_to_set} if len(bindings_to_set) > 0 else {}}
         return params
@@ -206,6 +242,27 @@ class SetIamPolicy(MethodAction):
         for role in roles_to_existing_bindings:
             if role not in roles_to_bindings_to_remove:
                 bindings.append(roles_to_existing_bindings[role])
+        return bindings
+
+    def _remove_matched_bindings(self, existing_bindings, matched_pairs):
+        """Remove specific (role, member) pairs annotated by the iam-policy filter.
+
+        Reads the list of ``{role, member}`` dicts stored by the ``iam-policy`` filter
+        under ``c7n:matched-iam-bindings`` and removes exactly those pairs from
+        ``existing_bindings``, leaving everything else intact.
+
+        :param existing_bindings: list of ``{role, members}`` dicts from the resource
+        :param matched_pairs: list of ``{role, member}`` dicts from the filter annotation
+        """
+        pairs_to_remove = {(p['role'], p['member']) for p in matched_pairs}
+        bindings = []
+        for binding in existing_bindings:
+            updated_members = [
+                m for m in binding['members']
+                if (binding['role'], m) not in pairs_to_remove
+            ]
+            if updated_members:
+                bindings.append({**binding, 'members': updated_members})
         return bindings
 
     def _get_roles_to_bindings_dict(self, bindings_list):

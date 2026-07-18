@@ -1,0 +1,147 @@
+{
+    "status_code": 200,
+    "data": {
+        "NetworkInterfaces": [
+            {
+                "Attachment": {
+                    "AttachmentId": "ela-attach-04b47a37eac5a4278",
+                    "DeleteOnTermination": false,
+                    "DeviceIndex": 1,
+                    "InstanceOwnerId": "amazon-aws",
+                    "Status": "attached"
+                },
+                "AvailabilityZone": "us-west-2a",
+                "Description": "VPC Endpoint Interface vpce-0dfaa364d994a6a2f",
+                "Groups": [
+                    {
+                        "GroupId": "sg-031f71960759a8d50",
+                        "GroupName": "oip-vpc-endpoint-sg"
+                    }
+                ],
+                "InterfaceType": "vpc_endpoint",
+                "Ipv6Addresses": [],
+                "MacAddress": "06:eb:64:3f:f4:27",
+                "NetworkInterfaceId": "eni-054de8d628e757d05",
+                "OwnerId": "644160558196",
+                "PrivateDnsName": "ip-10-0-2-196.us-west-2.compute.internal",
+                "PublicDnsName": "",
+                "PrivateIpAddress": "10.0.2.196",
+                "PrivateIpAddresses": [
+                    {
+                        "Primary": true,
+                        "PrivateDnsName": "ip-10-0-2-196.us-west-2.compute.internal",
+                        "PrivateIpAddress": "10.0.2.196"
+                    }
+                ],
+                "RequesterId": "644160558196",
+                "RequesterManaged": true,
+                "SourceDestCheck": true,
+                "Status": "in-use",
+                "SubnetId": "subnet-0616e6e6a767403e1",
+                "TagSet": [],
+                "VpcId": "vpc-003377c0084c5bcd5",
+                "Operator": {
+                    "Managed": false
+                }
+            },
+            {
+                "Association": {
+                    "AllocationId": "eipalloc-05ba3a8f351f45975",
+                    "AssociationId": "eipassoc-0aa0d4baf8f53fe5e",
+                    "IpOwnerId": "644160558196",
+                    "PublicDnsName": "ec2-54-188-51-165.us-west-2.compute.amazonaws.com",
+                    "PublicIp": "54.188.51.165"
+                },
+                "Attachment": {
+                    "AttachmentId": "ela-attach-00ca26a5d51efa747",
+                    "DeleteOnTermination": false,
+                    "DeviceIndex": 1,
+                    "InstanceOwnerId": "amazon-aws",
+                    "Status": "attached"
+                },
+                "AvailabilityZone": "us-west-2a",
+                "Description": "Interface for NAT Gateway nat-01e6556a25454e5f2",
+                "Groups": [],
+                "InterfaceType": "nat_gateway",
+                "Ipv6Addresses": [],
+                "MacAddress": "06:1b:0c:ae:fa:a1",
+                "NetworkInterfaceId": "eni-02f9c1d34f40af967",
+                "OwnerId": "644160558196",
+                "PrivateDnsName": "ip-10-0-1-153.us-west-2.compute.internal",
+                "PublicDnsName": "ec2-54-188-51-165.us-west-2.compute.amazonaws.com",
+                "PublicIpDnsNameOptions": {
+                    "DnsHostnameType": "public-ipv4-dns-name",
+                    "PublicIpv4DnsName": "ec2-54-188-51-165.us-west-2.compute.amazonaws.com"
+                },
+                "PrivateIpAddress": "10.0.1.153",
+                "PrivateIpAddresses": [
+                    {
+                        "Association": {
+                            "AllocationId": "eipalloc-05ba3a8f351f45975",
+                            "AssociationId": "eipassoc-0aa0d4baf8f53fe5e",
+                            "IpOwnerId": "644160558196",
+                            "PublicDnsName": "ec2-54-188-51-165.us-west-2.compute.amazonaws.com",
+                            "PublicIp": "54.188.51.165"
+                        },
+                        "Primary": true,
+                        "PrivateDnsName": "ip-10-0-1-153.us-west-2.compute.internal",
+                        "PrivateIpAddress": "10.0.1.153"
+                    }
+                ],
+                "RequesterId": "644160558196",
+                "RequesterManaged": true,
+                "SourceDestCheck": false,
+                "Status": "in-use",
+                "SubnetId": "subnet-012f22da152a7028e",
+                "TagSet": [],
+                "VpcId": "vpc-003377c0084c5bcd5",
+                "Operator": {
+                    "Managed": false
+                }
+            },
+            {
+                "Attachment": {
+                    "AttachmentId": "ela-attach-0b64aa1dda24ac683",
+                    "DeleteOnTermination": false,
+                    "DeviceIndex": 1,
+                    "InstanceOwnerId": "amazon-aws",
+                    "Status": "attached"
+                },
+                "AvailabilityZone": "us-west-2b",
+                "Description": "VPC Endpoint Interface vpce-0dfaa364d994a6a2f",
+                "Groups": [
+                    {
+                        "GroupId": "sg-031f71960759a8d50",
+                        "GroupName": "oip-vpc-endpoint-sg"
+                    }
+                ],
+                "InterfaceType": "vpc_endpoint",
+                "Ipv6Addresses": [],
+                "MacAddress": "02:1f:11:b5:c5:6d",
+                "NetworkInterfaceId": "eni-0f14f3abcf2d8086c",
+                "OwnerId": "644160558196",
+                "PrivateDnsName": "ip-10-0-3-64.us-west-2.compute.internal",
+                "PublicDnsName": "",
+                "PrivateIpAddress": "10.0.3.64",
+                "PrivateIpAddresses": [
+                    {
+                        "Primary": true,
+                        "PrivateDnsName": "ip-10-0-3-64.us-west-2.compute.internal",
+                        "PrivateIpAddress": "10.0.3.64"
+                    }
+                ],
+                "RequesterId": "644160558196",
+                "RequesterManaged": true,
+                "SourceDestCheck": true,
+                "Status": "in-use",
+                "SubnetId": "subnet-084d19d6ad68535e0",
+                "TagSet": [],
+                "VpcId": "vpc-003377c0084c5bcd5",
+                "Operator": {
+                    "Managed": false
+                }
+            }
+        ],
+        "ResponseMetadata": {}
+    }
+}

@@ -1,0 +1,31 @@
+{
+  "headers": {
+    "content-type": "application/json; charset=UTF-8",
+    "vary": "Origin, X-Origin, Referer",
+    "date": "Mon, 01 Jan 2024 00:00:00 GMT",
+    "server": "ESF",
+    "x-xss-protection": "0",
+    "x-frame-options": "SAMEORIGIN",
+    "x-content-type-options": "nosniff",
+    "transfer-encoding": "chunked",
+    "status": "200",
+    "content-length": "643",
+    "-content-encoding": "gzip",
+    "content-location": "https://networkconnectivity.googleapis.com/v1/projects/cloud-custodian/locations/global/spokes/custodian-center-spoke?alt=json"
+  },
+  "body": {
+    "name": "projects/cloud-custodian/locations/global/spokes/custodian-center-spoke",
+    "createTime": "2024-01-01T00:00:00.000000000Z",
+    "updateTime": "2024-01-01T00:01:00.000000000Z",
+    "labels": {},
+    "hub": "projects/cloud-custodian/locations/global/hubs/custodian-ncc-hub",
+    "uniqueId": "00000000-0000-0000-0000-000000000001",
+    "state": "ACTIVE",
+    "linkedVpcNetwork": {
+      "uri": "https://www.googleapis.com/compute/v1/projects/cloud-custodian/global/networks/custodian-vpc"
+    },
+    "spokeType": "VPC_NETWORK",
+    "group": "projects/cloud-custodian/locations/global/hubs/custodian-ncc-hub/groups/center",
+    "etag": "2"
+  }
+}

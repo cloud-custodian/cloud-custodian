@@ -9,13 +9,22 @@ import os
 from botocore.paginate import Paginator
 
 from c7n.query import (
-    QueryResourceManager, ChildResourceManager, TypeInfo, RetryPageIterator)
+    DescribeSource,
+    ChildResourceManager,
+    QueryResourceManager,
+    RetryPageIterator,
+    TypeInfo,
+)
 from c7n.manager import resources
 from c7n.utils import chunks, get_retry, generate_arn, local_session, type_schema
 from c7n.actions import BaseAction
 from c7n.filters import Filter, ListItemFilter
 from c7n.resources.shield import IsShieldProtected, SetShieldProtection
-from c7n.tags import RemoveTag, Tag
+from c7n.tags import (
+    RemoveTag,
+    Tag,
+    universal_augment,
+)
 from c7n.filters.related import RelatedResourceFilter
 from c7n import tags, query
 from c7n.filters.iamaccess import CrossAccountAccessFilter
@@ -153,6 +162,7 @@ class Route53Domain(QueryResourceManager):
         service = 'route53domains'
         arn_type = 'r53domain'
         enum_spec = ('list_domains', 'Domains', None)
+        detail_spec = ('get_domain_detail', 'DomainName', 'DomainName', None)
         name = id = 'DomainName'
         global_resource = False
 
@@ -164,7 +174,7 @@ class Route53Domain(QueryResourceManager):
             d['Tags'] = self.retry(
                 client.list_tags_for_domain,
                 DomainName=d['DomainName'])['TagList']
-        return domains
+        return super().augment(domains)
 
 
 @Route53Domain.action_registry.register('tag')
@@ -570,6 +580,42 @@ class IsQueryLoggingEnabled(Filter):
         return results
 
 
+class ResolverRuleDescribeSource(DescribeSource):
+    def augment(self, resources):
+        owner_resource_map = dict(
+            (owner, list(group))
+            for owner, group in itertools.groupby(
+                resources,
+                key=lambda x: x.get('OwnerId') == self.manager.account_id and 'Local' or 'Shared',
+            )
+        )
+        return (
+            universal_augment(self.manager, owner_resource_map.get('Local', []))
+            + owner_resource_map.get('Shared', [])
+        )
+
+
+@resources.register('resolver-rule')
+class ResolverRule(QueryResourceManager):
+    # Resource for managing Route53 Resolver Rules
+    class resource_type(TypeInfo):
+        service = 'route53resolver'
+        arn_type = 'resolver-rule'
+        enum_spec = ('list_resolver_rules', 'ResolverRules', None)
+        id = 'Id'
+        name = 'Name'
+        config_id = 'c7n:ResolverRuleId'
+        universal_taggable = True
+        # Route53 Resolver is regional
+        global_resource = False
+        cfn_type = 'AWS::Route53Resolver::ResolverRule'
+        permissions_augment = ("route53resolver:ListTagsForResource",)
+
+    source_mapping = {
+        'describe': ResolverRuleDescribeSource,
+    }
+
+
 @resources.register('resolver-logs')
 class ResolverQueryLogConfig(QueryResourceManager):
 
@@ -589,6 +635,8 @@ class ResolverQueryLogConfig(QueryResourceManager):
     def augment(self, rqlcs):
         client = local_session(self.session_factory).client('route53resolver')
         for rqlc in rqlcs:
+            if rqlc['OwnerId'] != self.account_id:
+                continue  # don't try to fetch tags for shared resources
             rqlc['Tags'] = self.retry(
                 client.list_tags_for_resource,
                 ResourceArn=rqlc['Arn'])['Tags']
@@ -636,7 +684,7 @@ class ResolverQueryLogConfigAssociate(BaseAction):
 
     def is_associated(self, resource, vpc_id):
         associated = False
-        for association in resource['c7n:Associations']:
+        for association in resource.get('c7n:Associations', ()):
             if association['ResourceId'] == vpc_id:
                 associated = True
                 break
@@ -645,6 +693,9 @@ class ResolverQueryLogConfigAssociate(BaseAction):
     def process(self, resources):
         client = local_session(self.manager.session_factory).client('route53resolver')
         vpc_ids = self.get_vpc_id()
+
+        # Don't try to take action on resources the active account doesn't own
+        resources = self.filter_resources(resources, 'OwnerId', (self.manager.account_id,))
 
         for resource in resources:
             for vpc_id in vpc_ids:

@@ -1,0 +1,31 @@
+{
+    "status_code": 200,
+    "data": {
+        "PaginationToken": "",
+        "ResourceTagMappingList": [
+            {
+                "ResourceARN": "arn:aws:lambda:us-west-2:644160558196:function:test-kms",
+                "Tags": [
+                    {
+                        "Key": "lambda-console:blueprint",
+                        "Value": "hello-world"
+                    },
+                    {
+                        "Key": "Compliance",
+                        "Value": "True"
+                    }
+                ]
+            },
+            {
+                "ResourceARN": "arn:aws:lambda:us-west-2:644160558196:function:hello_world",
+                "Tags": [
+                    {
+                        "Key": "Compliance",
+                        "Value": "True"
+                    }
+                ]
+            }
+        ],
+        "ResponseMetadata": {}
+    }
+}

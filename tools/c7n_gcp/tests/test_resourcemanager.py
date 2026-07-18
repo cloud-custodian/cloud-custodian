@@ -7,6 +7,7 @@ import time
 from unittest import mock
 
 import pytest
+from pytest_terraform import terraform
 
 from c7n_gcp.resources.resourcemanager import (
     FolderIamPolicyFilter, HierarchyAction, OrganizationIamPolicyFilter
@@ -522,6 +523,73 @@ class ProjectTest(BaseTest):
             self.assertTrue("abcdefg" in user_role_pair)
             self.assertTrue('roles/admin' in user_role_pair["abcdefg"])
 
+    def test_project_iam_policy_user_role_value_filter_glob(self):
+        """user-role with value filter objects (glob) annotates matched bindings."""
+        factory = self.replay_flight_data('project-iam-policy')
+        p = self.load_policy({
+            'name': 'resource',
+            'resource': 'gcp.project',
+            'filters': [{
+                'type': 'iam-policy',
+                'user-role': {
+                    'role': {'op': 'glob', 'value': 'roles/owner'},
+                    'user': {'op': 'glob', 'value': 'serviceAccount:*'},
+                }
+            }]},
+            session_factory=factory)
+        resources = p.run()
+        self.assertEqual(len(resources), 1)
+        self.assertEqual(resources[0]['projectId'], 'custodian-test')
+        matched = resources[0]['c7n:matched-iam-bindings']
+        self.assertEqual(len(matched), 1)
+        self.assertEqual(matched[0]['role'], 'roles/owner')
+        self.assertEqual(
+            matched[0]['member'], 'serviceAccount:abc@testproject.iam.gserviceaccount.com')
+
+    def test_project_iam_policy_user_role_value_filter_glob_multi(self):
+        """user-role value filter matching serviceAccounts across roles returns all matches."""
+        factory = self.replay_flight_data('project-iam-policy')
+        p = self.load_policy({
+            'name': 'resource',
+            'resource': 'gcp.project',
+            'filters': [{
+                'type': 'iam-policy',
+                'user-role': {
+                    'role': {'op': 'glob', 'value': 'roles/*'},
+                    'user': {'op': 'glob', 'value': 'serviceAccount:*'},
+                }
+            }]},
+            session_factory=factory)
+        resources = p.run()
+        self.assertEqual(len(resources), 2)
+        project_ids = {r['projectId'] for r in resources}
+        self.assertIn('custodian-test', project_ids)
+        self.assertIn('custodian-test-2', project_ids)
+        for r in resources:
+            self.assertIn('c7n:matched-iam-bindings', r)
+            for pair in r['c7n:matched-iam-bindings']:
+                self.assertTrue(pair['member'].startswith('serviceAccount:'))
+
+    def test_project_iam_policy_user_role_value_filter_has_false(self):
+        """user-role with has: false returns resources with no matching pairs."""
+        factory = self.replay_flight_data('project-iam-policy')
+        p = self.load_policy({
+            'name': 'resource',
+            'resource': 'gcp.project',
+            'filters': [{
+                'type': 'iam-policy',
+                'user-role': {
+                    'has': False,
+                    'role': {'op': 'glob', 'value': 'roles/owner'},
+                    'user': {'op': 'glob', 'value': 'serviceAccount:*'},
+                }
+            }]},
+            session_factory=factory)
+        resources = p.run()
+        self.assertEqual(len(resources), 2)
+        project_ids = {r['projectId'] for r in resources}
+        self.assertNotIn('custodian-test', project_ids)
+
     def test_compute_meta_filter(self):
         factory = self.replay_flight_data('project-compute-meta')
 
@@ -727,3 +795,107 @@ class TestOrgPoliciesFilter(BaseTest):
             'c7n:MatchedFilters': ['constraint']
         }])
         self.assertEqual(len(resources), 1)
+
+
+@terraform("project_iam_policy_chained")
+def test_project_iam_policy_user_role_value_filter_chained_appends(
+    test, project_iam_policy_chained
+):
+    """Chained iam-policy user-role filters accumulate matched bindings instead of overwriting.
+
+    Two sequential filters each match a different role/SA pair on the same project.
+    The action's ``remove-bindings: matched`` then removes both accumulated pairs.
+    """
+    project_id = project_iam_policy_chained.resources['google_project']['project']['project_id']
+    factory = test.replay_flight_data('project-iam-policy-chained-filters')
+    p = test.load_policy(
+        {
+            'name': 'chained-iam-policy-filters',
+            'resource': 'gcp.project',
+            'filters': [
+                {'type': 'value', 'key': 'projectId', 'value': project_id},
+                {
+                    'type': 'iam-policy',
+                    'user-role': {
+                        'role': {'op': 'glob', 'value': 'roles/owner'},
+                        'user': {'op': 'glob', 'value': 'serviceAccount:*'},
+                    },
+                },
+                {
+                    'type': 'iam-policy',
+                    'user-role': {
+                        'role': {'op': 'glob', 'value': 'roles/editor'},
+                        'user': {'op': 'glob', 'value': 'serviceAccount:*'},
+                    },
+                },
+            ],
+            'actions': [{'type': 'set-iam-policy', 'remove-bindings': 'matched'}],
+        },
+        session_factory=factory,
+    )
+    resources = p.run()
+    assert len(resources) == 1
+    matched = resources[0]['c7n:matched-iam-bindings']
+    roles = {pair['role'] for pair in matched}
+    assert 'roles/owner' in roles
+    assert 'roles/editor' in roles
+
+
+@terraform("project_iam_policy_chained")
+def test_project_set_iam_policy_remove_matched(test, project_iam_policy_chained):
+    """remove-bindings: matched removes only the (role, member) pairs annotated by the filter.
+
+    The project has a SA bound to roles/owner (matched and removed) and
+    roles/viewer (not matched, preserved).
+
+    Policy:
+      filters:
+        - type: iam-policy
+          user-role:
+            role: {op: glob, value: 'roles/owner'}
+            user: {op: glob, value: 'serviceAccount:*'}
+      actions:
+        - type: set-iam-policy
+          remove-bindings: matched
+    """
+    sa_email = (
+        'serviceAccount:'
+        + project_iam_policy_chained.resources['google_service_account']['sa']['email']
+    )
+    project_id = project_iam_policy_chained.resources['google_project']['project']['project_id']
+    factory = test.replay_flight_data('project-iam-policy-matched-action')
+
+    policy = test.load_policy(
+        {
+            'name': 'remove-sa-owners',
+            'resource': 'gcp.project',
+            'filters': [
+                {'type': 'value', 'key': 'projectId', 'value': project_id},
+                {
+                    'type': 'iam-policy',
+                    'user-role': {
+                        'role': {'op': 'glob', 'value': 'roles/owner'},
+                        'user': {'op': 'glob', 'value': 'serviceAccount:*'},
+                    },
+                },
+            ],
+            'actions': [{'type': 'set-iam-policy', 'remove-bindings': 'matched'}],
+        },
+        session_factory=factory,
+    )
+
+    resources = policy.run()
+    assert len(resources) == 1
+
+    matched = resources[0]['c7n:matched-iam-bindings']
+    assert len(matched) >= 1
+    assert any(p['role'] == 'roles/owner' for p in matched)
+    assert any(p['member'].startswith('serviceAccount:') for p in matched)
+
+    client = policy.resource_manager.get_client()
+    updated_policy = client.execute_query('getIamPolicy', {'resource': project_id})
+    bindings = {b['role']: b['members'] for b in updated_policy.get('bindings', [])}
+
+    assert sa_email not in bindings.get('roles/owner', [])
+
+    assert sa_email in bindings.get('roles/viewer', [])

@@ -1,0 +1,11 @@
+{
+    "status_code": 200,
+    "data": {
+        "ImageBlockPublicAccessState": "unblocked",
+        "ManagedBy": "account",
+        "ResponseMetadata": {
+            "HTTPStatusCode": 200,
+            "RequestId": "87654321-4321-7654-1098-876543210988"
+        }
+    }
+}

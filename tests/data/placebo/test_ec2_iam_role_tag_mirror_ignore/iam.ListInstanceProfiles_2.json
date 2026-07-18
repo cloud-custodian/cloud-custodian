@@ -1,0 +1,79 @@
+{
+    "status_code": 200,
+    "data": {
+        "InstanceProfiles": [
+            {
+                "Path": "/",
+                "InstanceProfileName": "c7n-pratyush-test",
+                "InstanceProfileId": "AIPAZL6XWCR2N7Y7JXC2Z",
+                "Arn": "arn:aws:iam::644160558196:instance-profile/c7n-pratyush-test",
+                "CreateDate": {
+                    "__class__": "datetime",
+                    "year": 2019,
+                    "month": 3,
+                    "day": 29,
+                    "hour": 18,
+                    "minute": 29,
+                    "second": 17,
+                    "microsecond": 0
+                },
+                "Roles": [
+                    {
+                        "Path": "/",
+                        "RoleName": "c7n-pratyush-test",
+                        "RoleId": "AROAZL6XWCR2M7XDNCL4Y",
+                        "Arn": "arn:aws:iam::644160558196:role/c7n-pratyush-test",
+                        "CreateDate": {
+                            "__class__": "datetime",
+                            "year": 2019,
+                            "month": 3,
+                            "day": 29,
+                            "hour": 18,
+                            "minute": 29,
+                            "second": 17,
+                            "microsecond": 0
+                        },
+                        "AssumeRolePolicyDocument": "%7B%22Version%22%3A%222012-10-17%22%2C%22Statement%22%3A%5B%7B%22Effect%22%3A%22Deny%22%2C%22Principal%22%3A%7B%22Service%22%3A%22ec2.amazonaws.com%22%7D%2C%22Action%22%3A%22sts%3AAssumeRole%22%7D%5D%7D"
+                    }
+                ]
+            },
+            {
+                "Path": "/",
+                "InstanceProfileName": "CloudCustodianRole",
+                "InstanceProfileId": "AIPAJO5EMJ3YEMNUF5ZWM",
+                "Arn": "arn:aws:iam::644160558196:instance-profile/CloudCustodianRole",
+                "CreateDate": {
+                    "__class__": "datetime",
+                    "year": 2016,
+                    "month": 10,
+                    "day": 29,
+                    "hour": 19,
+                    "minute": 39,
+                    "second": 43,
+                    "microsecond": 0
+                },
+                "Roles": [
+                    {
+                        "Path": "/",
+                        "RoleName": "CloudCustodianRole",
+                        "RoleId": "AROAI7ZS26HIW5UKQGHRM",
+                        "Arn": "arn:aws:iam::644160558196:role/CloudCustodianRole",
+                        "CreateDate": {
+                            "__class__": "datetime",
+                            "year": 2016,
+                            "month": 10,
+                            "day": 29,
+                            "hour": 19,
+                            "minute": 39,
+                            "second": 43,
+                            "microsecond": 0
+                        },
+                        "AssumeRolePolicyDocument": "%7B%22Version%22%3A%222012-10-17%22%2C%22Statement%22%3A%5B%7B%22Effect%22%3A%22Allow%22%2C%22Principal%22%3A%7B%22AWS%22%3A%5B%22arn%3Aaws%3Aiam%3A%3A644160558196%3Aroot%22%2C%22arn%3Aaws%3Aiam%3A%3A644160558196%3Auser%2Fpratyush.mishra%40capitalone.com%22%5D%2C%22Service%22%3A%5B%22ec2.amazonaws.com%22%2C%22osis-pipelines.amazonaws.com%22%2C%22lambda.amazonaws.com%22%2C%22edgelambda.amazonaws.com%22%2C%22states.amazonaws.com%22%5D%7D%2C%22Action%22%3A%22sts%3AAssumeRole%22%7D%5D%7D"
+                    }
+                ]
+            }
+        ],
+        "IsTruncated": false,
+        "ResponseMetadata": {}
+    }
+}

@@ -1,0 +1,7 @@
+{
+    "status_code": 200,
+    "data": {
+        "Policy": "{\"Version\":\"2012-10-17\",\"Statement\":[{\"Effect\":\"Allow\",\"Principal\":{\"AWS\":\"arn:aws:iam::644160558196:root\"},\"Action\":\"cloudhsm:DescribeBackups\",\"Resource\":\"arn:aws:cloudhsm:us-east-1:644160558196:backup/backup-6qjbcmkhcxm\"}]}",
+        "ResponseMetadata": {}
+    }
+}

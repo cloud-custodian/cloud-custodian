@@ -1,0 +1,9 @@
+{
+    "status_code": 200,
+    "data": {
+        "ResponseMetadata": {},
+        "resourceArn": "arn:aws:lex:us-east-1:644160558196:bot/OTM2WO3PEY",
+        "policy": "{\"Version\":\"2012-10-17\",\"Statement\":[{\"Sid\":\"botBuilders\",\"Effect\":\"Allow\",\"Principal\":{\"AWS\":\"arn:aws:iam::123456789123:role/test\"},\"Action\":[\"lex:ListBotAliases\",\"lex:UpdateBot\"],\"Resource\":\"arn:aws:lex:us-east-1:644160558196:bot/OTM2WO3PEY\"}]}",
+        "revisionId": "2"
+    }
+}

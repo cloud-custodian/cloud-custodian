@@ -1,0 +1,33 @@
+{
+    "pytest-terraform": 1,
+    "outputs": {},
+    "resources": {
+        "aws_ebs_volume": {
+            "test_volume": {
+                "arn": "arn:aws:ec2:us-east-1:644160558196:volume/vol-0b0d1b4c01088ed2c",
+                "availability_zone": "us-east-1a",
+                "create_time": "2025-12-16T19:32:15Z",
+                "encrypted": false,
+                "final_snapshot": false,
+                "id": "vol-0b0d1b4c01088ed2c",
+                "iops": 3000,
+                "kms_key_id": "",
+                "multi_attach_enabled": false,
+                "outpost_arn": "",
+                "region": "us-east-1",
+                "size": 8,
+                "snapshot_id": "",
+                "tags": {
+                    "Name": "modify_iops_percent_test_volume"
+                },
+                "tags_all": {
+                    "Name": "modify_iops_percent_test_volume"
+                },
+                "throughput": 125,
+                "timeouts": null,
+                "type": "gp3",
+                "volume_initialization_rate": 0
+            }
+        }
+    }
+}

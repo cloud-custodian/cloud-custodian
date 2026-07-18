@@ -1,0 +1,9 @@
+{
+    "status_code": 200,
+    "data": {
+        "tags": {
+            "c7n-public": "Policy"
+        },
+        "ResponseMetadata": {}
+    }
+}

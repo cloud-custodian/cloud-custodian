@@ -10,7 +10,7 @@ functools32==3.2.3-2
 futures==3.3.0
 ipaddress>=1.0.17
 itsdangerous==1.1.0
-Jinja2==3.1.4
+Jinja2==3.1.6
 jmespath>=0.9.0
 jsonschema>=2.5.1
 MarkupSafe==1.1.1

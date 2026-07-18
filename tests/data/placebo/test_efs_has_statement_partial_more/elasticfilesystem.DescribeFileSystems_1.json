@@ -1,0 +1,60 @@
+{
+    "status_code": 200,
+    "data": {
+        "ResponseMetadata": {},
+        "FileSystems": [
+            {
+                "OwnerId": "644160558196",
+                "CreationToken": "quickCreated-75c12365-c76f-4927-96f8-12d4bf27e20f",
+                "FileSystemId": "fs-050482c305683afb2",
+                "FileSystemArn": "arn:aws:elasticfilesystem:us-west-2:644160558196:file-system/fs-050482c305683afb2",
+                "CreationTime": {
+                    "__class__": "datetime",
+                    "year": 2025,
+                    "month": 4,
+                    "day": 29,
+                    "hour": 13,
+                    "minute": 10,
+                    "second": 22,
+                    "microsecond": 0
+                },
+                "LifeCycleState": "available",
+                "Name": "efs-test",
+                "NumberOfMountTargets": 4,
+                "SizeInBytes": {
+                    "Value": 6144,
+                    "Timestamp": {
+                        "__class__": "datetime",
+                        "year": 2025,
+                        "month": 4,
+                        "day": 30,
+                        "hour": 14,
+                        "minute": 24,
+                        "second": 40,
+                        "microsecond": 0
+                    },
+                    "ValueInIA": 0,
+                    "ValueInStandard": 6144,
+                    "ValueInArchive": 0
+                },
+                "PerformanceMode": "generalPurpose",
+                "Encrypted": true,
+                "KmsKeyId": "arn:aws:kms:us-west-2:644160558196:key/64ed10cf-cc32-4512-b473-304be63c9fe4",
+                "ThroughputMode": "elastic",
+                "Tags": [
+                    {
+                        "Key": "Name",
+                        "Value": "efs-test"
+                    },
+                    {
+                        "Key": "aws:elasticfilesystem:default-backup",
+                        "Value": "enabled"
+                    }
+                ],
+                "FileSystemProtection": {
+                    "ReplicationOverwriteProtection": "ENABLED"
+                }
+            }
+        ]
+    }
+}

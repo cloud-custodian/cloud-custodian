@@ -1,0 +1,41 @@
+{
+    "status_code": 200,
+    "data": {
+        "S3AccessPointAttachments": [
+            {
+                "Lifecycle": "AVAILABLE",
+                "CreationTime": {
+                    "__class__": "datetime",
+                    "year": 2025,
+                    "month": 10,
+                    "day": 29,
+                    "hour": 11,
+                    "minute": 56,
+                    "second": 34,
+                    "microsecond": 694000
+                },
+                "Name": "dev-openzfs-ap-attachment",
+                "Type": "OPENZFS",
+                "OpenZFSConfiguration": {
+                    "VolumeId": "fsvol-0e681425f1cd6144a",
+                    "FileSystemIdentity": {
+                        "Type": "POSIX",
+                        "PosixUser": {
+                            "Uid": 1001,
+                            "Gid": 1001,
+                            "SecondaryGids": [
+                                1002,
+                                1003
+                            ]
+                        }
+                    }
+                },
+                "S3AccessPoint": {
+                    "ResourceARN": "arn:aws:s3:us-west-2:644160558196:accesspoint/dev-openzfs-ap-attachment",
+                    "Alias": "dev-openzfs-ap-a-cu6u383zrwrj6z7biz4obdh8r49uhusw2b-ext-s3alias"
+                }
+            }
+        ],
+        "ResponseMetadata": {}
+    }
+}

@@ -1,0 +1,55 @@
+{
+    "status_code": 200,
+    "data": {
+        "EventsDetectionJobPropertiesList": [
+            {
+                "JobId": "1a43330be136ee8db82359c8d75c4ea3",
+                "JobArn": "arn:aws:comprehend:us-east-1:644160558196:events-detection-job/1a43330be136ee8db82359c8d75c4ea3",
+                "JobName": "EventsDetectionJob",
+                "JobStatus": "FAILED",
+                "Message": "NO_WRITE_ACCESS_TO_OUTPUT: The provided data access role does not have write access to the output S3 URI or it does not have access to the output S3 KMS Key.",
+                "SubmitTime": {
+                    "__class__": "datetime",
+                    "year": 2025,
+                    "month": 7,
+                    "day": 8,
+                    "hour": 14,
+                    "minute": 26,
+                    "second": 14,
+                    "microsecond": 474000
+                },
+                "EndTime": {
+                    "__class__": "datetime",
+                    "year": 2025,
+                    "month": 7,
+                    "day": 8,
+                    "hour": 14,
+                    "minute": 26,
+                    "second": 17,
+                    "microsecond": 204000
+                },
+                "InputDataConfig": {
+                    "S3Uri": "s3://c7n-test-s3-bucket/event.txt",
+                    "InputFormat": "ONE_DOC_PER_LINE"
+                },
+                "OutputDataConfig": {
+                    "S3Uri": "s3://c7n-test-s3-bucket/644160558196-EVENTS-1a43330be136ee8db82359c8d75c4ea3/output/",
+                    "KmsKeyId": "arn:aws:kms:us-east-1:644160558196:key/20a0c3ed-99ff-4b38-92e6-e489628e0bfb"
+                },
+                "LanguageCode": "en",
+                "DataAccessRoleArn": "arn:aws:iam::644160558196:role/ComprehendVpcAccessRole",
+                "TargetEventTypes": [
+                    "BANKRUPTCY",
+                    "EMPLOYMENT",
+                    "CORPORATE_ACQUISITION",
+                    "INVESTMENT_GENERAL",
+                    "CORPORATE_MERGER",
+                    "IPO",
+                    "RIGHTS_ISSUE",
+                    "SECONDARY_OFFERING"
+                ]
+            }
+        ],
+        "ResponseMetadata": {}
+    }
+}

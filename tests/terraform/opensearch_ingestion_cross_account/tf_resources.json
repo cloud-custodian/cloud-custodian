@@ -1,0 +1,166 @@
+{
+    "pytest-terraform": 1,
+    "outputs": {},
+    "resources": {
+        "aws_caller_identity": {
+            "current": {
+                "account_id": "644160558196",
+                "arn": "arn:aws:iam::644160558196:user/Ben",
+                "id": "644160558196",
+                "user_id": "AIDA3RYC6HESKFWOTAM6Y"
+            }
+        },
+        "aws_region": {
+            "current": {
+                "description": "US East (N. Virginia)",
+                "endpoint": "ec2.us-east-1.amazonaws.com",
+                "id": "us-east-1",
+                "name": "us-east-1",
+                "region": "us-east-1"
+            }
+        },
+        "aws_cloudwatch_log_group": {
+            "pipeline_logs": {
+                "arn": "arn:aws:logs:us-east-1:644160558196:log-group:/aws/vendedlogs/osis/c7n-pipeline-logs",
+                "deletion_protection_enabled": false,
+                "id": "/aws/vendedlogs/osis/c7n-pipeline-logs",
+                "kms_key_id": "",
+                "log_group_class": "STANDARD",
+                "name": "/aws/vendedlogs/osis/c7n-pipeline-logs",
+                "name_prefix": "",
+                "region": "us-east-1",
+                "retention_in_days": 0,
+                "skip_destroy": false,
+                "tags": null,
+                "tags_all": {}
+            }
+        },
+        "aws_iam_role": {
+            "pipeline_role": {
+                "arn": "arn:aws:iam::644160558196:role/osis-pipeline-role",
+                "assume_role_policy": "{\"Statement\":[{\"Action\":\"sts:AssumeRole\",\"Effect\":\"Allow\",\"Principal\":{\"Service\":\"osis-pipelines.amazonaws.com\"}},{\"Action\":\"sts:AssumeRole\",\"Effect\":\"Allow\",\"Principal\":{\"AWS\":\"arn:aws:iam::644160558196:root\"}}],\"Version\":\"2012-10-17\"}",
+                "create_date": "2026-02-12T14:54:18Z",
+                "description": "",
+                "force_detach_policies": false,
+                "id": "osis-pipeline-role",
+                "inline_policy": [],
+                "managed_policy_arns": [],
+                "max_session_duration": 3600,
+                "name": "osis-pipeline-role",
+                "name_prefix": "",
+                "path": "/",
+                "permissions_boundary": "",
+                "tags": null,
+                "tags_all": {},
+                "unique_id": "AROA3RYC6HESCHW4TRAZO"
+            }
+        },
+        "aws_iam_role_policy": {
+            "pipeline_policy": {
+                "id": "osis-pipeline-role:osis-pipeline-policy",
+                "name": "osis-pipeline-policy",
+                "name_prefix": "",
+                "policy": "{\"Version\":\"2012-10-17\",\"Statement\":[{\"Action\":[\"s3:PutObject\",\"s3:GetBucketLocation\",\"s3:ListBucket\"],\"Effect\":\"Allow\",\"Resource\":[\"arn:aws:s3:::c7n-osis-sink\",\"arn:aws:s3:::c7n-osis-sink/*\"]},{\"Action\":[\"logs:CreateLogGroup\",\"logs:CreateLogStream\",\"logs:PutLogEvents\",\"logs:DescribeLogGroups\",\"logs:DescribeLogStreams\"],\"Effect\":\"Allow\",\"Resource\":\"arn:aws:logs:*:*:*\"}]}",
+                "role": "osis-pipeline-role"
+            }
+        },
+        "aws_osis_pipeline": {
+            "test": {
+                "buffer_options": [],
+                "encryption_at_rest_options": [],
+                "id": "c7n-test",
+                "ingest_endpoint_urls": [
+                    "c7n-test-dxju5zxehoj33fusmav74fwq6i.us-east-1.osis.amazonaws.com"
+                ],
+                "log_publishing_options": [
+                    {
+                        "cloudwatch_log_destination": [
+                            {
+                                "log_group": "/aws/vendedlogs/osis/c7n-pipeline-logs"
+                            }
+                        ],
+                        "is_logging_enabled": true
+                    }
+                ],
+                "max_units": 1,
+                "min_units": 1,
+                "pipeline_arn": "arn:aws:osis:us-east-1:644160558196:pipeline/c7n-test",
+                "pipeline_configuration_body": "version: \"2\"\nopensearch-pipeline:\n  source:\n    http:\n      path: \"/\"\n  sink:\n    - s3:\n        aws:\n          sts_role_arn: \"arn:aws:iam::644160558196:role/osis-pipeline-role\"\n          region: \"us-east-1\"\n        bucket: \"c7n-osis-sink\"\n        threshold:\n          event_collect_timeout: \"60s\"\n        codec:\n          ndjson:\n",
+                "pipeline_name": "c7n-test",
+                "pipeline_role_arn": "arn:aws:iam::644160558196:role/osis-pipeline-role",
+                "region": "us-east-1",
+                "tags": null,
+                "tags_all": {},
+                "timeouts": null,
+                "vpc_options": []
+            }
+        },
+        "aws_s3_bucket": {
+            "sink": {
+                "acceleration_status": "",
+                "acl": null,
+                "arn": "arn:aws:s3:::c7n-osis-sink",
+                "bucket": "c7n-osis-sink",
+                "bucket_domain_name": "c7n-osis-sink.s3.amazonaws.com",
+                "bucket_prefix": "",
+                "bucket_region": "us-east-1",
+                "bucket_regional_domain_name": "c7n-osis-sink.s3.us-east-1.amazonaws.com",
+                "cors_rule": [],
+                "force_destroy": true,
+                "grant": [
+                    {
+                        "id": "8008068d21a78d2f460e1507dc7ab8fdc251898ec5db8ce09f16d31b8659a0be",
+                        "permissions": [
+                            "FULL_CONTROL"
+                        ],
+                        "type": "CanonicalUser",
+                        "uri": ""
+                    }
+                ],
+                "hosted_zone_id": "Z3AQBSTGFYJSTF",
+                "id": "c7n-osis-sink",
+                "lifecycle_rule": [],
+                "logging": [],
+                "object_lock_configuration": [],
+                "object_lock_enabled": false,
+                "policy": "",
+                "region": "us-east-1",
+                "replication_configuration": [],
+                "request_payer": "BucketOwner",
+                "server_side_encryption_configuration": [
+                    {
+                        "rule": [
+                            {
+                                "apply_server_side_encryption_by_default": [
+                                    {
+                                        "kms_master_key_id": "",
+                                        "sse_algorithm": "AES256"
+                                    }
+                                ],
+                                "bucket_key_enabled": false
+                            }
+                        ]
+                    }
+                ],
+                "tags": null,
+                "tags_all": {},
+                "timeouts": null,
+                "versioning": [
+                    {
+                        "enabled": false,
+                        "mfa_delete": false
+                    }
+                ],
+                "website": [],
+                "website_domain": null,
+                "website_endpoint": null
+            }
+        },
+        "null_resource": {
+            "pipeline_policy": {
+                "id": "1060564390008399169",
+                "triggers": null
+            }
+        }
+    }
+}

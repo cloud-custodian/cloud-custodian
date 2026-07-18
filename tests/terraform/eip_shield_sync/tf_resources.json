@@ -1,0 +1,78 @@
+{
+    "pytest-terraform": 1,
+    "outputs": {},
+    "resources": {
+        "aws_eip": {
+            "protected": {
+                "address": null,
+                "allocation_id": "eipalloc-077911b9e349c09eb",
+                "arn": "arn:aws:ec2:us-east-1:644160558196:elastic-ip/eipalloc-077911b9e349c09eb",
+                "associate_with_private_ip": null,
+                "association_id": "",
+                "carrier_ip": "",
+                "customer_owned_ip": "",
+                "customer_owned_ipv4_pool": "",
+                "domain": "vpc",
+                "id": "eipalloc-077911b9e349c09eb",
+                "instance": "",
+                "ipam_pool_id": null,
+                "network_border_group": "us-east-1",
+                "network_interface": "",
+                "private_dns": null,
+                "private_ip": "",
+                "ptr_record": "",
+                "public_dns": "ec2-34-235-51-208.compute-1.amazonaws.com",
+                "public_ip": "34.235.51.208",
+                "public_ipv4_pool": "amazon",
+                "tags": {
+                    "c7n-test": "protected"
+                },
+                "tags_all": {
+                    "c7n-test": "protected"
+                },
+                "timeouts": null,
+                "vpc": true
+            },
+            "unprotected": {
+                "address": null,
+                "allocation_id": "eipalloc-09e3d67a5ace5469f",
+                "arn": "arn:aws:ec2:us-east-1:644160558196:elastic-ip/eipalloc-09e3d67a5ace5469f",
+                "associate_with_private_ip": null,
+                "association_id": "",
+                "carrier_ip": "",
+                "customer_owned_ip": "",
+                "customer_owned_ipv4_pool": "",
+                "domain": "vpc",
+                "id": "eipalloc-09e3d67a5ace5469f",
+                "instance": "",
+                "ipam_pool_id": null,
+                "network_border_group": "us-east-1",
+                "network_interface": "",
+                "private_dns": null,
+                "private_ip": "",
+                "ptr_record": "",
+                "public_dns": "ec2-3-230-55-239.compute-1.amazonaws.com",
+                "public_ip": "3.230.55.239",
+                "public_ipv4_pool": "amazon",
+                "tags": {
+                    "c7n-test": "unprotected"
+                },
+                "tags_all": {
+                    "c7n-test": "unprotected"
+                },
+                "timeouts": null,
+                "vpc": true
+            }
+        },
+        "aws_shield_protection": {
+            "shield_protection": {
+                "arn": "arn:aws:shield::644160558196:protection/2cc319c7-b801-4455-bcc6-93cf578629f1",
+                "id": "2cc319c7-b801-4455-bcc6-93cf578629f1",
+                "name": "shield-protection",
+                "resource_arn": "arn:aws:ec2:us-east-1:644160558196:eip-allocation/eipalloc-077911b9e349c09eb",
+                "tags": null,
+                "tags_all": {}
+            }
+        }
+    }
+}

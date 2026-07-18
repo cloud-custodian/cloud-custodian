@@ -1,0 +1,41 @@
+{
+    "status_code": 200,
+    "data": {
+        "Rotations": [
+            {
+                "KeyId": "arn:aws:kms:us-east-1:644160558196:key/04fa09fb-afe3-46c8-ad3c-410b8047f7b9",
+                "KeyMaterialId": "a36fa37e7dc34424f83dd9ed3091e99bf067e4798e7f0796388e6049587dcd84",
+                "KeyMaterialState": "NON_CURRENT",
+                "RotationDate": {
+                    "__class__": "datetime",
+                    "year": 2024,
+                    "month": 8,
+                    "day": 28,
+                    "hour": 16,
+                    "minute": 11,
+                    "second": 38,
+                    "microsecond": 924000
+                },
+                "RotationType": "AUTOMATIC"
+            },
+            {
+                "KeyId": "arn:aws:kms:us-east-1:644160558196:key/04fa09fb-afe3-46c8-ad3c-410b8047f7b9",
+                "KeyMaterialId": "5a34bc0a3cbf2662932fb6b0fc1ee5e86b20308c726b1520952f3b29fd6372d2",
+                "KeyMaterialState": "CURRENT",
+                "RotationDate": {
+                    "__class__": "datetime",
+                    "year": 2025,
+                    "month": 8,
+                    "day": 28,
+                    "hour": 16,
+                    "minute": 33,
+                    "second": 6,
+                    "microsecond": 754000
+                },
+                "RotationType": "AUTOMATIC"
+            }
+        ],
+        "Truncated": false,
+        "ResponseMetadata": {}
+    }
+}

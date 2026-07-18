@@ -110,7 +110,6 @@ Navigate below to your cloud provider and get started with Cloud Custodian!
    tools/c7n-logexporter
    tools/c7n-trailcreator
    tools/c7n-policystream   
-   tools/omnissm
    tools/c7n-guardian
    tools/c7n-salactus
 
@@ -125,3 +124,4 @@ Navigate below to your cloud provider and get started with Cloud Custodian!
    developer/tests.rst
    developer/documentation.rst
    developer/packaging.rst
+   developer/release.rst

@@ -24,7 +24,6 @@ In the example below, the policy checks if there are any domains contained in th
             subject: Blacklisted domains still in use
             to:
               - email@address
-            subject: Domains no longer in use
             format: txt
             transport:
               type: pubsub

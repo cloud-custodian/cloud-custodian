@@ -1,0 +1,82 @@
+{
+    "status_code": 200,
+    "data": {
+        "DocumentClassifierProperties": {
+            "DocumentClassifierArn": "arn:aws:comprehend:us-east-1:644160558196:document-classifier/TestModelVPC/version/7",
+            "LanguageCode": "en",
+            "Status": "TRAINED",
+            "SubmitTime": {
+                "__class__": "datetime",
+                "year": 2025,
+                "month": 4,
+                "day": 14,
+                "hour": 2,
+                "minute": 59,
+                "second": 40,
+                "microsecond": 248000
+            },
+            "EndTime": {
+                "__class__": "datetime",
+                "year": 2025,
+                "month": 4,
+                "day": 14,
+                "hour": 3,
+                "minute": 32,
+                "second": 24,
+                "microsecond": 888000
+            },
+            "TrainingStartTime": {
+                "__class__": "datetime",
+                "year": 2025,
+                "month": 4,
+                "day": 14,
+                "hour": 3,
+                "minute": 7,
+                "second": 9,
+                "microsecond": 373000
+            },
+            "TrainingEndTime": {
+                "__class__": "datetime",
+                "year": 2025,
+                "month": 4,
+                "day": 14,
+                "hour": 3,
+                "minute": 31,
+                "second": 18,
+                "microsecond": 347000
+            },
+            "InputDataConfig": {
+                "DataFormat": "COMPREHEND_CSV",
+                "S3Uri": "s3://c7n-test-s3-bucket/TrainingData - Sheet1.csv"
+            },
+            "OutputDataConfig": {},
+            "ClassifierMetadata": {
+                "NumberOfLabels": 3,
+                "NumberOfTrainedDocuments": 8,
+                "NumberOfTestDocuments": 1,
+                "EvaluationMetrics": {
+                    "Accuracy": 1.0,
+                    "Precision": 1.0,
+                    "Recall": 1.0,
+                    "F1Score": 1.0,
+                    "MicroPrecision": 1.0,
+                    "MicroRecall": 1.0,
+                    "MicroF1Score": 1.0,
+                    "HammingLoss": 0.0
+                }
+            },
+            "DataAccessRoleArn": "arn:aws:iam::644160558196:role/ComprehendVpcAccessRole",
+            "VpcConfig": {
+                "SecurityGroupIds": [
+                    "sg-0d74b07ab0b3288c0"
+                ],
+                "Subnets": [
+                    "subnet-0ebe9abf587c5070c"
+                ]
+            },
+            "Mode": "MULTI_CLASS",
+            "VersionName": "7"
+        },
+        "ResponseMetadata": {}
+    }
+}

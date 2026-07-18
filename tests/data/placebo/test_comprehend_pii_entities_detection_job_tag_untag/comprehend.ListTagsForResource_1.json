@@ -1,0 +1,8 @@
+{
+    "status_code": 200,
+    "data": {
+        "ResourceArn": "arn:aws:comprehend:us-east-1:644160558196:pii-entities-detection-job/9768d723bc784fd1edec725335cdcb4a",
+        "Tags": [],
+        "ResponseMetadata": {}
+    }
+}

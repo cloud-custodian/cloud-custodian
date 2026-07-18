@@ -7,7 +7,7 @@ from c7n.actions import BaseAction
 from c7n.filters import ValueFilter
 from c7n.filters.kms import KmsRelatedFilter
 from c7n.manager import resources
-from c7n.query import QueryResourceManager, TypeInfo, DescribeSource, ConfigSource
+from c7n.query import DescribeWithResourceTags, QueryResourceManager, TypeInfo, ConfigSource
 from c7n.tags import universal_augment, Tag, RemoveTag
 from c7n.exceptions import PolicyValidationError, PolicyExecutionError
 from c7n.utils import get_retry, local_session, type_schema, chunks, jmespath_search
@@ -15,12 +15,6 @@ from c7n.filters.iamaccess import CrossAccountAccessFilter
 from c7n.resolver import ValuesFrom
 import c7n.filters.vpc as net_filters
 import json
-
-
-class DescribeWorkspace(DescribeSource):
-
-    def augment(self, resources):
-        return universal_augment(self.manager, resources)
 
 
 @resources.register('workspaces')
@@ -33,10 +27,9 @@ class Workspace(QueryResourceManager):
         name = id = dimension = 'WorkspaceId'
         universal_taggable = True
         cfn_type = config_type = 'AWS::WorkSpaces::Workspace'
-        permissions_augment = ("workspaces:DescribeTags",)
 
     source_mapping = {
-        'describe': DescribeWorkspace,
+        'describe': DescribeWithResourceTags,
         'config': ConfigSource
     }
 
@@ -172,9 +165,8 @@ class WorkspaceImage(QueryResourceManager):
         arn_type = 'workspaceimage'
         name = id = 'ImageId'
         universal_taggable = True
-        permissions_augment = ("workspaces:DescribeTags",)
 
-    augment = universal_augment
+    source_mapping = {'describe': DescribeWithResourceTags}
 
 
 @WorkspaceImage.filter_registry.register('cross-account')
@@ -259,8 +251,10 @@ class WorkspaceDirectory(QueryResourceManager):
         id = 'DirectoryId'
         name = 'DirectoryName'
         universal_taggable = True
+        filter_name = 'DirectoryIds'
+        filter_type = 'list'
 
-    augment = universal_augment
+    source_mapping = {'describe': DescribeWithResourceTags}
 
 
 @WorkspaceDirectory.filter_registry.register('security-group')
@@ -362,6 +356,44 @@ class WorkspacesDirectoryClientProperties(ValueFilter):
             if self.match(directory[self.annotation_key]):
                 results.append(directory)
         return results
+
+
+@WorkspaceDirectory.filter_registry.register('directory')
+class WorkspaceDirectoryDirectoryFilter(ValueFilter):
+    schema = type_schema('directory', rinherit=ValueFilter.schema)
+    annotation_key = 'c7n:Directory'
+    FetchThreshold = 10
+    permissions = ('ds:DescribeDirectories', )
+
+    def process(self, resources, event=None):
+        ds = self.manager.get_resource_manager('aws.directory')
+        if len(resources) < self.FetchThreshold:
+            directories = ds.get_resources([
+                res['DirectoryId'] for res in resources if self.annotation_key not in res
+            ])
+        else:
+            directories = ds.resources()
+        model = ds.get_model()
+        by_id = {d[model.id]: d for d in directories}
+        for res in resources:
+            if self.annotation_key in res:
+                continue  # pragma: no cover
+            directory = by_id.get(res['DirectoryId'])
+            if directory:
+                res[self.annotation_key] = directory
+            else:
+                self.log.warning(
+                    "Resource %s:%s references non existent %s: %s",
+                    self.manager.type,
+                    res[model.id],
+                    ds.__class__.__name__,
+                    res['DirectoryId']
+                )
+
+        return super().process(resources, event)
+
+    def __call__(self, r):
+        return super().__call__(r.setdefault(self.annotation_key, None))
 
 
 @WorkspaceDirectory.action_registry.register('modify-client-properties')
@@ -548,18 +580,19 @@ class BrowerPolicyFilter(ValueFilter):
         client = local_session(self.manager.session_factory).client('workspaces-web')
         results = []
         for r in resources:
-            if self.policy_annotation not in r:
-                browserSettings = self.manager.retry(
-                    client.get_browser_settings,
-                    browserSettingsArn=r['browserSettingsArn']).get('browserSettings')
-                browserPolicy = json.loads(browserSettings['browserPolicy'])
-                r[self.policy_annotation] = browserPolicy
-            if self.match(r[self.policy_annotation]):
-                if self.matched_policy_annotation not in r:
-                    r[self.matched_policy_annotation] = [self.data.get('key')]
-                else:
-                    r[self.matched_policy_annotation].append(self.data.get('key'))
-                results.append(r)
+            if 'browserSettingsArn' in r:
+                if (self.policy_annotation not in r):
+                    browserSettings = self.manager.retry(
+                        client.get_browser_settings,
+                        browserSettingsArn=r['browserSettingsArn']).get('browserSettings')
+                    browserPolicy = json.loads(browserSettings['browserPolicy'])
+                    r[self.policy_annotation] = browserPolicy
+                if self.match(r[self.policy_annotation]):
+                    if self.matched_policy_annotation not in r:
+                        r[self.matched_policy_annotation] = [self.data.get('key')]
+                    else:
+                        r[self.matched_policy_annotation].append(self.data.get('key'))
+                    results.append(r)
         return results
 
 
@@ -741,6 +774,8 @@ class WorkspacesBundle(QueryResourceManager):
         arn_type = 'workspacebundle'
         name = id = 'BundleId'
         universal_taggable = True
+
+    source_mapping = {'describe': DescribeWithResourceTags}
 
 
 @WorkspacesBundle.action_registry.register('delete')

@@ -479,6 +479,18 @@ def _eligible_start_stop(db, state="available"):
     if db.get('ReadReplicaSourceDBInstanceIdentifier'):
         return False
 
+    # If the instance is part of an Aurora cluster, it can't be individually
+    # stopped.
+    if db.get('DBClusterIdentifier'):
+        log.warning(
+            (
+                "DB instance %s could not be started/stopped because it's part "
+                "of an Aurora cluster."
+            ),
+            db['DBInstanceIdentifier'],
+        )
+        return False
+
     # TODO is SQL Server mirror is detectable.
     return True
 
@@ -567,7 +579,7 @@ class Delete(BaseAction):
     def process(self, dbs):
         skip = self.data.get('skip-snapshot', False)
         # Can't delete an instance in an aurora cluster, use a policy on the cluster
-        dbs = [r for r in dbs if not r.get('DBClusterIdentifier')]
+        dbs = self.filter_resources(dbs, 'DBClusterIdentifier', (None,))
         # Concurrency feels like overkill here.
         client = local_session(self.manager.session_factory).client('rds')
         for db in dbs:
@@ -993,6 +1005,43 @@ class RDSSubscription(QueryResourceManager):
     augment = universal_augment
 
 
+@RDSSubscription.filter_registry.register('topic')
+class RDSSubscriptionSNSTopic(related.RelatedResourceFilter):
+    """
+    Retrieves topics related to RDS event subscriptions
+
+    :example:
+
+    .. code-block:: yaml
+
+            policies:
+              - name: rds-subscriptions-no-confirmed-topics
+                resource: aws.rds-subscription
+                filters:
+                  - type: topic
+                    key: SubscriptionsConfirmed
+                    value: 0
+                    value_type: integer
+    """
+    schema = type_schema('topic', rinherit=ValueFilter.schema)
+    RelatedResource = 'c7n.resources.sns.SNS'
+    RelatedIdsExpression = 'SnsTopicArn'
+    annotation_key = 'c7n:SnsTopic'
+
+    def process(self, resources, event=None):
+        rel = self.get_related(resources)
+        matched = []
+        for resource in resources:
+            if self.process_resource(resource, rel):
+                # adding full topic details
+                resource[self.annotation_key] = rel.get(
+                    resource[self.RelatedIdsExpression],
+                    None  # can be if value is "absent"
+                )
+                matched.append(resource)
+        return matched
+
+
 @RDSSubscription.action_registry.register('delete')
 class RDSSubscriptionDelete(BaseAction):
     """Deletes a RDS snapshot resource
@@ -1258,6 +1307,7 @@ class CrossAccountAccess(CrossAccountAccessFilter):
 
     def process(self, resources, event=None):
         self.accounts = self.get_accounts()
+        self.everyone_only = self.data.get("everyone_only", False)
         results = []
         with self.executor_factory(max_workers=2) as w:
             futures = []
@@ -1284,6 +1334,8 @@ class CrossAccountAccess(CrossAccountAccessFilter):
                     'DBSnapshotAttributesResult']['DBSnapshotAttributes']}
             r[self.attributes_key] = attrs
             shared_accounts = set(attrs.get('restore', []))
+            if self.everyone_only:
+                shared_accounts = {a for a in shared_accounts if a == 'all'}
             delta_accounts = shared_accounts.difference(self.accounts)
             if delta_accounts:
                 r[self.annotation_key] = list(delta_accounts)
@@ -2047,6 +2099,72 @@ class EngineFilter(ValueFilter):
                 r['c7n:Engine'] = v
                 matched.append(r)
         return matched
+
+
+@filters.register('recommendations')
+class DbRecommendations(Filter):
+    """This filter describes AWS DB recommendations for associated RDS instances.
+    Use this filter in conjunction with jmespath and value filter operators
+    to filter RDS instances based on their DB recommendations.
+
+    :example:
+
+    .. code-block:: yaml
+
+            policies:
+              - name: rds-no-recommendations
+                resource: rds
+                filters:
+                  - type: recommendations
+                    key: Status
+                    value: active
+    """
+
+    schema = type_schema('recommendations', rinherit=ValueFilter.schema)
+    permissions = ('rds:DescribeDBRecommendations',)
+
+    annotation_key = 'c7n:db-recommendations'
+    matched_annotation_key = 'c7n:matched-db-recommendations'
+
+    def process_resource_set(self, client, resources):
+        # Get RDS instance identifiers
+        ids = [r.get('DbiResourceId') for r in resources if r.get('DbiResourceId')]
+        # If no identifiers, short-circuit
+        if not ids:
+            for r in resources:
+                r.setdefault(self.annotation_key, [])
+            return
+        # Get recommendations
+        paginator = client.get_paginator('describe_db_recommendations')
+        recs = []
+        for page in paginator.paginate(Filters=[{'Name': 'dbi-resource-id', 'Values': ids}]):
+            recs.extend(page.get('DBRecommendations', ()))
+        # Match recommendations by ARN
+        by_arn = {}
+        for e in recs:
+            by_arn.setdefault(e.get('ResourceArn'), []).append(e)
+        for r in resources:
+            r[self.annotation_key] = by_arn.get(r.get('DBInstanceArn'), [])
+
+    def process(self, resources, event=None):
+        client = local_session(self.manager.session_factory).client('rds')
+
+        for resource_set in chunks([r for r in resources if self.annotation_key not in r], 50):
+            self.process_resource_set(client, resource_set)
+
+        vf = ValueFilter(self.data)
+        vf.annotate = False
+
+        results = []
+        for r in resources:
+            matched = []
+            for e in r.get(self.annotation_key, ()):
+                if vf(e):
+                    matched.append(e)
+            if matched:
+                r[self.matched_annotation_key] = matched
+                results.append(r)
+        return results
 
 
 class DescribeDBProxy(DescribeSource):

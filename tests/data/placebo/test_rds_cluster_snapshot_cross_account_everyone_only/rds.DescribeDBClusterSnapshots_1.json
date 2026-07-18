@@ -1,0 +1,143 @@
+{
+    "status_code": 200,
+    "data": {
+        "DBClusterSnapshots": [
+            {
+                "AvailabilityZones": [
+                    "us-east-2a",
+                    "us-east-2b",
+                    "us-east-2c"
+                ],
+                "DBClusterSnapshotIdentifier": "c7n-testing-private",
+                "DBClusterIdentifier": "c7n-testing",
+                "SnapshotCreateTime": {
+                    "__class__": "datetime",
+                    "year": 2024,
+                    "month": 10,
+                    "day": 29,
+                    "hour": 18,
+                    "minute": 30,
+                    "second": 6,
+                    "microsecond": 906000
+                },
+                "Engine": "aurora-postgresql",
+                "EngineMode": "provisioned",
+                "AllocatedStorage": 0,
+                "Status": "available",
+                "Port": 0,
+                "VpcId": "vpc-056651ecc06e0c9d3",
+                "ClusterCreateTime": {
+                    "__class__": "datetime",
+                    "year": 2024,
+                    "month": 10,
+                    "day": 29,
+                    "hour": 17,
+                    "minute": 56,
+                    "second": 8,
+                    "microsecond": 675000
+                },
+                "MasterUsername": "postgres",
+                "EngineVersion": "15.4",
+                "LicenseModel": "postgresql-license",
+                "SnapshotType": "manual",
+                "PercentProgress": 100,
+                "StorageEncrypted": false,
+                "DBClusterSnapshotArn": "arn:aws:rds:us-east-2:644160558196:cluster-snapshot:c7n-testing-private",
+                "IAMDatabaseAuthenticationEnabled": false,
+                "TagList": [],
+                "DbClusterResourceId": "cluster-BFTQNW3LT4IAW7PKENIKTOHO7A"
+            },
+            {
+                "AvailabilityZones": [
+                    "us-east-2a",
+                    "us-east-2b",
+                    "us-east-2c"
+                ],
+                "DBClusterSnapshotIdentifier": "c7n-testing-public",
+                "DBClusterIdentifier": "c7n-testing",
+                "SnapshotCreateTime": {
+                    "__class__": "datetime",
+                    "year": 2024,
+                    "month": 10,
+                    "day": 29,
+                    "hour": 18,
+                    "minute": 30,
+                    "second": 6,
+                    "microsecond": 906000
+                },
+                "Engine": "aurora-postgresql",
+                "EngineMode": "provisioned",
+                "AllocatedStorage": 0,
+                "Status": "available",
+                "Port": 0,
+                "VpcId": "vpc-056651ecc06e0c9d3",
+                "ClusterCreateTime": {
+                    "__class__": "datetime",
+                    "year": 2024,
+                    "month": 10,
+                    "day": 29,
+                    "hour": 17,
+                    "minute": 56,
+                    "second": 8,
+                    "microsecond": 675000
+                },
+                "MasterUsername": "postgres",
+                "EngineVersion": "15.4",
+                "LicenseModel": "postgresql-license",
+                "SnapshotType": "manual",
+                "PercentProgress": 100,
+                "StorageEncrypted": false,
+                "DBClusterSnapshotArn": "arn:aws:rds:us-east-2:644160558196:cluster-snapshot:c7n-testing-public",
+                "SourceDBClusterSnapshotArn": "arn:aws:rds:us-east-2:644160558196:cluster-snapshot:c7n-testing-private",
+                "IAMDatabaseAuthenticationEnabled": false,
+                "TagList": []
+            },
+            {
+                "AvailabilityZones": [
+                    "us-east-2a",
+                    "us-east-2b",
+                    "us-east-2c"
+                ],
+                "DBClusterSnapshotIdentifier": "c7n-testing-shared",
+                "DBClusterIdentifier": "c7n-testing",
+                "SnapshotCreateTime": {
+                    "__class__": "datetime",
+                    "year": 2024,
+                    "month": 10,
+                    "day": 29,
+                    "hour": 18,
+                    "minute": 30,
+                    "second": 6,
+                    "microsecond": 906000
+                },
+                "Engine": "aurora-postgresql",
+                "EngineMode": "provisioned",
+                "AllocatedStorage": 0,
+                "Status": "available",
+                "Port": 0,
+                "VpcId": "vpc-056651ecc06e0c9d3",
+                "ClusterCreateTime": {
+                    "__class__": "datetime",
+                    "year": 2024,
+                    "month": 10,
+                    "day": 29,
+                    "hour": 17,
+                    "minute": 56,
+                    "second": 8,
+                    "microsecond": 675000
+                },
+                "MasterUsername": "postgres",
+                "EngineVersion": "15.4",
+                "LicenseModel": "postgresql-license",
+                "SnapshotType": "manual",
+                "PercentProgress": 100,
+                "StorageEncrypted": false,
+                "DBClusterSnapshotArn": "arn:aws:rds:us-east-2:644160558196:cluster-snapshot:c7n-testing-shared",
+                "SourceDBClusterSnapshotArn": "arn:aws:rds:us-east-2:644160558196:cluster-snapshot:c7n-testing-private",
+                "IAMDatabaseAuthenticationEnabled": false,
+                "TagList": []
+            }
+        ],
+        "ResponseMetadata": {}
+    }
+}

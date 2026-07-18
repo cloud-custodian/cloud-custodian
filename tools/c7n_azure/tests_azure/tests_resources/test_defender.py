@@ -67,7 +67,7 @@ class DefenderTest(BaseTest):
         })
         resources = p.run()
         self.assertEqual(1, len(resources))
-        self.assertEqual('azurebilling@epmcseclab.com', resources[0]['properties']['email'])
+        self.assertEqual('azurebilling@epmcseclab.com', resources[0]['properties']['emails'])
 
     def test_azure_defender_contacts_validate_schemas(self):
         p = self.load_policy({

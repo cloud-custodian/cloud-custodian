@@ -7,7 +7,7 @@ from azure.mgmt.monitor.models import EventData
 from .azure_common import BaseTest
 from c7n.resources import load_resources
 from c7n_azure.actions.tagging import AutoTagDate
-from mock import Mock
+from unittest.mock import Mock
 
 
 class ActionsAutotagBaseTest(BaseTest):

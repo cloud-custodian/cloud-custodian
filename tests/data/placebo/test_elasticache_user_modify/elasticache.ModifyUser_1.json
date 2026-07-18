@@ -1,0 +1,18 @@
+{
+    "status_code": 200,
+    "data": {
+        "UserId": "c7n-user",
+        "UserName": "c7n-user",
+        "Status": "modifying",
+        "Engine": "redis",
+        "MinimumEngineVersion": "6.0",
+        "AccessString": "on +@all",
+        "UserGroupIds": [],
+        "Authentication": {
+            "Type": "password",
+            "PasswordCount": 1
+        },
+        "ARN": "arn:aws:elasticache:us-east-1:123456789012:user:c7n-user",
+        "ResponseMetadata": {}
+    }
+}

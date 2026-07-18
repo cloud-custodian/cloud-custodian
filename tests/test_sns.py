@@ -2,6 +2,9 @@
 # SPDX-License-Identifier: Apache-2.0
 import json
 
+import boto3
+import moto
+
 from .common import BaseTest, functional
 from c7n.resources.aws import shape_validate
 from c7n.utils import yaml_load
@@ -784,6 +787,23 @@ class TestSNS(BaseTest):
             rfinding['Details']['AwsSnsTopic'],
             'AwsSnsTopicDetails', 'securityhub')
 
+    @moto.mock_aws
+    def test_sns_topic_get_resources(self):
+        # Event mode / related-resource lookups resolve topics by arn. This
+        # should fetch attributes directly (no account-wide list_topics) and
+        # drop arns that no longer exist rather than failing the whole set.
+        client = boto3.client('sns', region_name='us-east-1')
+        arn = client.create_topic(Name='present')['TopicArn']
+        missing = arn.rsplit(':', 1)[0] + ':gone'
+        p = self.load_policy(
+            {'name': 'sns-get', 'resource': 'aws.sns'},
+            config={'region': 'us-east-1'})
+        resources = p.resource_manager.get_resources([arn, missing])
+        self.assertEqual([r['TopicArn'] for r in resources], [arn])
+        # attributes were augmented in, not just the stub arn
+        self.assertIn('Owner', resources[0])
+        self.assertIn('Tags', resources[0])
+
     def test_sns_config(self):
         session_factory = self.replay_flight_data("test_sns_config")
         p = self.load_policy(
@@ -955,6 +975,40 @@ class TestSNS(BaseTest):
         resources = p.run()
         self.assertEqual(len(resources), 1)
 
+    def test_sns_cross_account_return_allowed(self):
+        session_factory = self.replay_flight_data("test_sns_cross_account_return_allowed")
+
+        p = self.load_policy(
+            {
+                "name": "sns-rm-matched",
+                "resource": "sns",
+                "filters": [
+                    {
+                        "type": "cross-account",
+                        "whitelist": ["644160558196"],
+                        "return_allowed": True
+                    },
+                ],
+            },
+            session_factory=session_factory,
+            config={'region': 'us-east-2'}
+        )
+        resources = p.run()
+
+        self.assertEqual(len(resources), 1)
+        self.assertEqual(resources[0]["TopicArn"], 'arn:aws:sns:us-east-2:644160558196:foo')
+        self.assertEqual(
+            resources[0]['CrossAccountAllowlists'], [
+                {
+                 'Sid': 'allSid1',
+                 'Effect': 'Allow',
+                 'Principal': {'AWS': '*'},
+                 'Action': 'SNS:Subscribe',
+                 'Resource': '*',
+                 'Condition': {'StringEquals': {'AWS:SourceOwner': '644160558196'}},
+                 }
+            ])
+
 
 class TestSubscription(BaseTest):
 
@@ -1007,3 +1061,29 @@ class TestSubscription(BaseTest):
         "arn:aws:sns:us-east-1:644160558196:test")
         self.assertEqual(resources[0]["c7n:Topic"][0],
         "arn:aws:sns:us-east-1:644160558196:test")
+
+    @moto.mock_aws
+    def test_get_resources(self):
+        sns = boto3.client('sns', region_name='us-east-1')
+        sqs = boto3.client('sqs', region_name='us-east-1')
+        topic_arn = sns.create_topic(Name='test')['TopicArn']
+        q_url = sqs.create_queue(QueueName='test')["QueueUrl"]
+        q_arn = sqs.get_queue_attributes(
+            QueueUrl=q_url, AttributeNames=["QueueArn"])["Attributes"]["QueueArn"]
+        sub_arn = sns.subscribe(
+            TopicArn=topic_arn, Protocol='sqs', Endpoint=q_arn, ReturnSubscriptionArn=True
+        )['SubscriptionArn']
+        assert sub_arn
+        p = self.load_policy(
+            {
+               "name": "sns-test",
+               "resource": "sns-subscription",
+            }
+        )
+        # Give an arn that won't match too
+        [resource] = p.resource_manager.get_resources([sub_arn, sub_arn + '-missing'])
+        assert resource['Owner'] == '123456789012'
+        assert resource['Protocol'] == 'sqs'
+        assert resource['Endpoint'] == q_arn
+        assert resource['TopicArn'] == topic_arn
+        assert resource['SubscriptionArn'] == sub_arn

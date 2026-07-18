@@ -3,10 +3,11 @@
   "client_secret": "secret",
   "tenant_id": "tenant",
   "subscription_id": "ea42f556-5106-4743-99b0-c129bfa71a47",
-  "access_token" : "access_token",
+  "access_token": "access_token",
   "keyvault_client_id": "kv_client",
   "keyvault_secret_id": "kv_secret",
   "use_msi": true,
   "client_certificate_path": "/certificate",
-  "client_certificate_password": "password"
+  "client_certificate_password": "password",
+  "federated_token_file": "/token_file"
 }

@@ -203,7 +203,7 @@ class RemovePolicyStatement(RemovePolicyBase):
                     statement_ids: matched
     """
 
-    permissions = ('sqs:GetQueueAttributes', 'sqs:RemovePermission')
+    permissions = ('sqs:GetQueueAttributes', 'sqs:RemovePermission', 'sqs:SetQueueAttributes')
 
     def process(self, resources):
         results = []
@@ -228,10 +228,22 @@ class RemovePolicyStatement(RemovePolicyBase):
         if not found:
             return
 
-        for f in found:
-            client.remove_permission(
+        # It's generally safer to call remove_permission for each permission we want to remove.
+        # However, if any of the permissions we want to remove does not have an Sid (which is
+        # possible), it can't be removed individually. In that case, we have to call
+        # set_queue_attributes to redefine the whole policy without the perm(s) we want to remove.
+        any_missing_sid = any(not f.get('Sid') for f in found)
+        if any_missing_sid:
+            client.set_queue_attributes(
                 QueueUrl=resource['QueueUrl'],
-                Label=f['Sid'])
+                # process_policy removes the perms we don't want from the p object
+                Attributes={'Policy': json.dumps(p)}
+            )
+        else:
+            for f in found:
+                client.remove_permission(
+                    QueueUrl=resource['QueueUrl'],
+                    Label=f['Sid'])
 
         return {'Name': resource['QueueUrl'],
                 'State': 'PolicyRemoved',

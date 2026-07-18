@@ -1,0 +1,149 @@
+{
+    "status_code": 200,
+    "data": {
+        "ServiceNames": [
+            "com.amazonaws.us-east-1.apprunner.requests",
+            "com.amazonaws.us-east-1.s3",
+            "com.amazonaws.us-east-1.s3"
+        ],
+        "ServiceDetails": [
+            {
+                "ServiceName": "com.amazonaws.us-east-1.apprunner.requests",
+                "ServiceId": "vpce-svc-0863a09b7229fa8c6",
+                "ServiceType": [
+                    {
+                        "ServiceType": "Interface"
+                    }
+                ],
+                "ServiceRegion": "us-east-1",
+                "AvailabilityZoneIds": [
+                    "use1-az4",
+                    "use1-az6",
+                    "use1-az1",
+                    "use1-az2",
+                    "use1-az3",
+                    "use1-az5"
+                ],
+                "AvailabilityZones": [
+                    "us-east-1a",
+                    "us-east-1b",
+                    "us-east-1c",
+                    "us-east-1d",
+                    "us-east-1e",
+                    "us-east-1f"
+                ],
+                "Owner": "amazon",
+                "BaseEndpointDnsNames": [
+                    "requests.apprunner.us-east-1.vpce.amazonaws.com"
+                ],
+                "VpcEndpointPolicySupported": false,
+                "AcceptanceRequired": false,
+                "ManagesVpcEndpoints": false,
+                "Tags": [],
+                "SupportedIpAddressTypes": [
+                    "ipv6",
+                    "ipv4"
+                ]
+            },
+            {
+                "ServiceName": "com.amazonaws.us-east-1.s3",
+                "ServiceId": "vpce-svc-0aa7c06513d4872d5",
+                "ServiceType": [
+                    {
+                        "ServiceType": "Gateway"
+                    }
+                ],
+                "ServiceRegion": "us-east-1",
+                "AvailabilityZoneIds": [
+                    "use1-az4",
+                    "use1-az6",
+                    "use1-az1",
+                    "use1-az2",
+                    "use1-az3",
+                    "use1-az5"
+                ],
+                "AvailabilityZones": [
+                    "us-east-1a",
+                    "us-east-1b",
+                    "us-east-1c",
+                    "us-east-1d",
+                    "us-east-1e",
+                    "us-east-1f"
+                ],
+                "Owner": "amazon",
+                "BaseEndpointDnsNames": [
+                    "s3.us-east-1.amazonaws.com"
+                ],
+                "VpcEndpointPolicySupported": true,
+                "AcceptanceRequired": false,
+                "ManagesVpcEndpoints": false,
+                "Tags": [],
+                "SupportedIpAddressTypes": [
+                    "ipv4",
+                    "ipv6"
+                ]
+            },
+            {
+                "ServiceName": "com.amazonaws.us-east-1.s3",
+                "ServiceId": "vpce-svc-081d84efcdc7bac15",
+                "ServiceType": [
+                    {
+                        "ServiceType": "Interface"
+                    }
+                ],
+                "ServiceRegion": "us-east-1",
+                "AvailabilityZoneIds": [
+                    "use1-az4",
+                    "use1-az6",
+                    "use1-az1",
+                    "use1-az2",
+                    "use1-az3",
+                    "use1-az5"
+                ],
+                "AvailabilityZones": [
+                    "us-east-1a",
+                    "us-east-1b",
+                    "us-east-1c",
+                    "us-east-1d",
+                    "us-east-1e",
+                    "us-east-1f"
+                ],
+                "Owner": "amazon",
+                "BaseEndpointDnsNames": [
+                    "s3.us-east-1.vpce.amazonaws.com"
+                ],
+                "PrivateDnsName": "*.s3.us-east-1.amazonaws.com",
+                "PrivateDnsNames": [
+                    {
+                        "PrivateDnsName": "*.s3.us-east-1.amazonaws.com"
+                    },
+                    {
+                        "PrivateDnsName": "*.s3-accesspoint.us-east-1.amazonaws.com"
+                    },
+                    {
+                        "PrivateDnsName": "*.s3-control.us-east-1.amazonaws.com"
+                    },
+                    {
+                        "PrivateDnsName": "*.s3.dualstack.us-east-1.amazonaws.com"
+                    },
+                    {
+                        "PrivateDnsName": "*.s3-control.dualstack.us-east-1.amazonaws.com"
+                    },
+                    {
+                        "PrivateDnsName": "*.s3-accesspoint.dualstack.us-east-1.amazonaws.com"
+                    }
+                ],
+                "VpcEndpointPolicySupported": true,
+                "AcceptanceRequired": false,
+                "ManagesVpcEndpoints": false,
+                "Tags": [],
+                "PrivateDnsNameVerificationState": "verified",
+                "SupportedIpAddressTypes": [
+                    "ipv6",
+                    "ipv4"
+                ]
+            }
+        ],
+        "ResponseMetadata": {}
+    }
+}

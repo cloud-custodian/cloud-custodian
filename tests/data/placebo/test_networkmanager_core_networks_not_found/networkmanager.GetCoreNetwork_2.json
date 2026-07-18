@@ -1,0 +1,22 @@
+{
+    "status_code": 404, 
+    "data": {
+        "ResponseMetadata": {
+            "RetryAttempts": 0, 
+            "HTTPStatusCode": 404, 
+            "RequestId": "6962cb24-0a21-11e7-ac7a-cbccc015f5ed", 
+            "HTTPHeaders": {
+                "x-amzn-requestid": "6962cb24-0a21-11e7-ac7a-cbccc015f5ed", 
+                "content-length": "109", 
+                "connection": "keep-alive", 
+                "date": "Thu, 16 Mar 2024 08:20:27 GMT", 
+                "content-type": "application/json", 
+                "x-amzn-errortype": "ResourceNotFoundException"
+            }
+        }, 
+        "Error": {
+            "Message": "Resource not found.", 
+            "Code": "ResourceNotFoundException"
+        }
+    }
+}

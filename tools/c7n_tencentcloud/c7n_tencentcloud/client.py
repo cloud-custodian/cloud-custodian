@@ -128,17 +128,60 @@ class Client:
 class Session:
     """Session"""
 
-    def __init__(self) -> None:
+    def __init__(self, profile_name=None) -> None:
         """
         credential_file contains secret_id and secret_key.
         the file content format likes:
             {"TENCENTCLOUD_AK":"", "TENCENTCLOUD_SK":""}
+
+        Args:
+            profile_name: Name of the profile to use from ~/.tencentcloud/credentials
         """
         # just using default get_credentials() method
         # steps: Environment Variable -> profile file -> CVM role
         # for reference: https://github.com/TencentCloud/tencentcloud-sdk-python
 
-        cred_provider = credential.DefaultCredentialProvider()
+        if profile_name:
+            # Use profile-specific credential provider
+            # Note: TencentCloud SDK doesn't directly support profile parameter
+            # We need to handle profile loading manually
+            try:
+                import configparser
+
+                # Load profile from ~/.tencentcloud/credentials
+                config_path = os.path.expanduser('~/.tencentcloud/credentials')
+                if os.path.exists(config_path):
+                    config = configparser.ConfigParser()
+                    config.read(config_path)
+
+                    if profile_name in config:
+                        section = config[profile_name]
+                        secret_id = section.get('secret_id')
+                        secret_key = section.get('secret_key')
+
+                        if secret_id and secret_key:
+                            cred = credential.Credential(secret_id=secret_id, secret_key=secret_key)
+                            cred_provider = credential.DefaultCredentialProvider()
+                            cred_provider.cred = cred
+                        else:
+                            raise TencentCloudSDKException(
+                                "Profile '%s' missing secret_id or secret_key" % profile_name
+                            )
+                    else:
+                        raise TencentCloudSDKException(
+                            "Profile '%s' not found in %s" % (profile_name, config_path)
+                        )
+                else:
+                    raise TencentCloudSDKException(
+                        "Credentials file not found: %s" % config_path
+                    )
+            except Exception as e:
+                raise TencentCloudSDKException(
+                    "Failed to load profile '%s': %s" % (profile_name, str(e))
+                )
+        else:
+            # Use default credential provider
+            cred_provider = credential.DefaultCredentialProvider()
 
         # the DefaultCredentialProvider does not handle sts assumed role sessions
         # so we need to check for the token first

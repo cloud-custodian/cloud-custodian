@@ -1,0 +1,41 @@
+{
+  "headers": {
+    "content-type": "application/json; charset=UTF-8",
+    "vary": "Origin, X-Origin, Referer",
+    "date": "Thu, 05 Mar 2026 15:40:23 GMT",
+    "server": "ESF",
+    "x-xss-protection": "0",
+    "x-frame-options": "SAMEORIGIN",
+    "x-content-type-options": "nosniff",
+    "server-timing": "gfet4t7; dur=369",
+    "alt-svc": "h3=\":443\"; ma=2592000,h3-29=\":443\"; ma=2592000",
+    "transfer-encoding": "chunked",
+    "status": "200",
+    "content-length": "5299",
+    "-content-encoding": "gzip"
+  },
+  "body": {
+    "version": 1,
+    "etag": "BwZMSMDIYHw=",
+    "bindings": [
+      {
+        "role": "roles/editor",
+        "members": [
+          "serviceAccount:c7n-iam-chained-x7r2k@stacklet-test-policies.iam.gserviceaccount.com"
+        ]
+      },
+      {
+        "role": "roles/owner",
+        "members": [
+          "serviceAccount:c7n-iam-chained-x7r2k@stacklet-test-policies.iam.gserviceaccount.com"
+        ]
+      },
+      {
+        "role": "roles/viewer",
+        "members": [
+          "serviceAccount:c7n-iam-chained-x7r2k@stacklet-test-policies.iam.gserviceaccount.com"
+        ]
+      }
+    ]
+  }
+}

@@ -4,7 +4,7 @@ import logging
 
 from .azure_common import BaseTest
 from c7n_azure.filters import FirewallRulesFilter
-from mock import Mock
+from unittest.mock import Mock
 from netaddr import IPRange, IPNetwork, IPSet
 
 

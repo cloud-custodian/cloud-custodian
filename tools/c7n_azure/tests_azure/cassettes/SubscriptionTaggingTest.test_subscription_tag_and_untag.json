@@ -1,0 +1,277 @@
+{
+    "version": 1,
+    "interactions": [
+        {
+            "request": {
+                "method": "GET",
+                "uri": "https://management.azure.com/subscriptions/ea42f556-5106-4743-99b0-c129bfa71a47?api-version=2022-12-01",
+                "body": null,
+                "headers": {}
+            },
+            "response": {
+                "status": {
+                    "code": 200,
+                    "message": "OK"
+                },
+                "headers": {
+                    "x-cache": [
+                        "CONFIG_NOCACHE"
+                    ],
+                    "content-length": [
+                        "429"
+                    ],
+                    "cache-control": [
+                        "no-cache"
+                    ],
+                    "date": [
+                        "Tue, 10 Mar 2026 02:46:35 GMT"
+                    ],
+                    "x-ms-ratelimit-remaining-subscription-global-reads": [
+                        "3749"
+                    ],
+                    "content-type": [
+                        "application/json; charset=utf-8"
+                    ],
+                    "x-msedge-ref": [
+                        "Ref A: 795F34E7A1474F7A9D15EA130290510D Ref B: CHI261140508023 Ref C: 2026-03-10T02:46:35Z"
+                    ]
+                },
+                "body": {
+                    "data": {
+                        "id": "/subscriptions/ea42f556-5106-4743-99b0-c129bfa71a47",
+                        "authorizationSource": "RoleBased",
+                        "managedByTenants": [],
+                        "tags": {
+                            "cctest_tag": "ccvalue"
+                        },
+                        "subscriptionId": "ea42f556-5106-4743-99b0-c129bfa71a47",
+                        "tenantId": "00000000-0000-0000-0000-000000000003",
+                        "displayName": "Test Subscription",
+                        "state": "Enabled",
+                        "subscriptionPolicies": {
+                            "locationPlacementId": "Public_2014-09-01",
+                            "quotaId": "PayAsYouGo_2014-09-01",
+                            "spendingLimit": "Off"
+                        }
+                    }
+                }
+            }
+        },
+        {
+            "request": {
+                "method": "GET",
+                "uri": "https://management.azure.com/subscriptions/ea42f556-5106-4743-99b0-c129bfa71a47?api-version=2022-12-01",
+                "body": null,
+                "headers": {}
+            },
+            "response": {
+                "status": {
+                    "code": 200,
+                    "message": "OK"
+                },
+                "headers": {
+                    "x-cache": [
+                        "CONFIG_NOCACHE"
+                    ],
+                    "content-length": [
+                        "429"
+                    ],
+                    "cache-control": [
+                        "no-cache"
+                    ],
+                    "date": [
+                        "Tue, 10 Mar 2026 02:46:35 GMT"
+                    ],
+                    "x-ms-ratelimit-remaining-subscription-global-reads": [
+                        "3749"
+                    ],
+                    "content-type": [
+                        "application/json; charset=utf-8"
+                    ],
+                    "x-msedge-ref": [
+                        "Ref A: D5DA527647E240A288367CAF69DF712C Ref B: CH1AA2020603029 Ref C: 2026-03-10T02:46:35Z"
+                    ]
+                },
+                "body": {
+                    "data": {
+                        "id": "/subscriptions/ea42f556-5106-4743-99b0-c129bfa71a47",
+                        "authorizationSource": "RoleBased",
+                        "managedByTenants": [],
+                        "tags": {
+                            "cctest_tag": "ccvalue"
+                        },
+                        "subscriptionId": "ea42f556-5106-4743-99b0-c129bfa71a47",
+                        "tenantId": "00000000-0000-0000-0000-000000000003",
+                        "displayName": "Test Subscription",
+                        "state": "Enabled",
+                        "subscriptionPolicies": {
+                            "locationPlacementId": "Public_2014-09-01",
+                            "quotaId": "PayAsYouGo_2014-09-01",
+                            "spendingLimit": "Off"
+                        }
+                    }
+                }
+            }
+        },
+        {
+            "request": {
+                "method": "GET",
+                "uri": "https://management.azure.com/subscriptions/ea42f556-5106-4743-99b0-c129bfa71a47?api-version=2022-12-01",
+                "body": null,
+                "headers": {}
+            },
+            "response": {
+                "status": {
+                    "code": 200,
+                    "message": "OK"
+                },
+                "headers": {
+                    "x-cache": [
+                        "CONFIG_NOCACHE"
+                    ],
+                    "content-length": [
+                        "429"
+                    ],
+                    "cache-control": [
+                        "no-cache"
+                    ],
+                    "date": [
+                        "Tue, 10 Mar 2026 02:46:36 GMT"
+                    ],
+                    "x-ms-ratelimit-remaining-subscription-global-reads": [
+                        "3749"
+                    ],
+                    "content-type": [
+                        "application/json; charset=utf-8"
+                    ],
+                    "x-msedge-ref": [
+                        "Ref A: F3C1A03282DD4F519F2CB9B0A26C6366 Ref B: CHI261140514036 Ref C: 2026-03-10T02:46:36Z"
+                    ]
+                },
+                "body": {
+                    "data": {
+                        "id": "/subscriptions/ea42f556-5106-4743-99b0-c129bfa71a47",
+                        "authorizationSource": "RoleBased",
+                        "managedByTenants": [],
+                        "tags": {
+                            "cctest_tag": "ccvalue"
+                        },
+                        "subscriptionId": "ea42f556-5106-4743-99b0-c129bfa71a47",
+                        "tenantId": "00000000-0000-0000-0000-000000000003",
+                        "displayName": "Test Subscription",
+                        "state": "Enabled",
+                        "subscriptionPolicies": {
+                            "locationPlacementId": "Public_2014-09-01",
+                            "quotaId": "PayAsYouGo_2014-09-01",
+                            "spendingLimit": "Off"
+                        }
+                    }
+                }
+            }
+        },
+        {
+            "request": {
+                "method": "PATCH",
+                "uri": "https://management.azure.com/subscriptions/ea42f556-5106-4743-99b0-c129bfa71a47/providers/Microsoft.Resources/tags/default?api-version=2025-03-01",
+                "body": "mock_body",
+                "headers": {}
+            },
+            "response": {
+                "status": {
+                    "code": 200,
+                    "message": "OK"
+                },
+                "headers": {
+                    "x-ms-ratelimit-remaining-subscription-global-writes": [
+                        "2999"
+                    ],
+                    "content-length": [
+                        "179"
+                    ],
+                    "cache-control": [
+                        "no-cache"
+                    ],
+                    "date": [
+                        "Tue, 10 Mar 2026 02:46:36 GMT"
+                    ],
+                    "x-cache": [
+                        "CONFIG_NOCACHE"
+                    ],
+                    "content-type": [
+                        "application/json; charset=utf-8"
+                    ],
+                    "x-msedge-ref": [
+                        "Ref A: 330E1964CDFE40A8BCE0E83D82E54DB5 Ref B: CHI261140508025 Ref C: 2026-03-10T02:46:37Z"
+                    ],
+                    "x-ms-ratelimit-remaining-subscription-writes": [
+                        "199"
+                    ]
+                },
+                "body": {
+                    "data": {
+                        "id": "/subscriptions/ea42f556-5106-4743-99b0-c129bfa71a47/providers/Microsoft.Resources/tags/default",
+                        "name": "default",
+                        "type": "Microsoft.Resources/tags",
+                        "properties": {
+                            "tags": {}
+                        }
+                    }
+                }
+            }
+        },
+        {
+            "request": {
+                "method": "GET",
+                "uri": "https://management.azure.com/subscriptions/ea42f556-5106-4743-99b0-c129bfa71a47?api-version=2022-12-01",
+                "body": null,
+                "headers": {}
+            },
+            "response": {
+                "status": {
+                    "code": 200,
+                    "message": "OK"
+                },
+                "headers": {
+                    "x-cache": [
+                        "CONFIG_NOCACHE"
+                    ],
+                    "content-length": [
+                        "407"
+                    ],
+                    "cache-control": [
+                        "no-cache"
+                    ],
+                    "date": [
+                        "Tue, 10 Mar 2026 02:46:37 GMT"
+                    ],
+                    "x-ms-ratelimit-remaining-subscription-global-reads": [
+                        "3749"
+                    ],
+                    "content-type": [
+                        "application/json; charset=utf-8"
+                    ],
+                    "x-msedge-ref": [
+                        "Ref A: 04790A25886C4847A6547E1237D59063 Ref B: CHI261140509025 Ref C: 2026-03-10T02:46:37Z"
+                    ]
+                },
+                "body": {
+                    "data": {
+                        "id": "/subscriptions/ea42f556-5106-4743-99b0-c129bfa71a47",
+                        "authorizationSource": "RoleBased",
+                        "managedByTenants": [],
+                        "tags": {},
+                        "subscriptionId": "ea42f556-5106-4743-99b0-c129bfa71a47",
+                        "tenantId": "00000000-0000-0000-0000-000000000003",
+                        "displayName": "Test Subscription",
+                        "state": "Enabled",
+                        "subscriptionPolicies": {
+                            "locationPlacementId": "Public_2014-09-01",
+                            "quotaId": "PayAsYouGo_2014-09-01",
+                            "spendingLimit": "Off"
+                        }
+                    }
+                }
+            }
+        }
+    ]
+}

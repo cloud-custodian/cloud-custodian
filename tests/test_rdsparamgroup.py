@@ -132,6 +132,23 @@ class RDSParamGroupTest(BaseTest):
                 break
         self.assertEqual(count, 2)
 
+    def test_rdsparamgroup_unused(self):
+        session_factory = self.replay_flight_data("test_rdsparamgroup_unused")
+        policy = self.load_policy(
+            {
+                "name": "rds-param-group-unused",
+                "resource": "rds-param-group",
+                "filters": [{"type": "unused"}],
+            },
+            session_factory=session_factory,
+        )
+        resources = policy.run()
+        self.assertEqual(len(resources), 2)
+        names = {r['DBParameterGroupName'] for r in resources}
+        self.assertIn("default.mysql8.0", names)
+        self.assertIn("custom-pg-orphan", names)
+        self.assertNotIn("custom-pg-used", names)
+
     def test_rdsparamgroup_param_value_filter(self):
         session_factory = self.replay_flight_data('test_rdsparamgroup_param_value_filter')
         policy = self.load_policy(
@@ -295,6 +312,23 @@ class RDSClusterParamGroupTest(BaseTest):
             if count == 2:
                 break
         self.assertEqual(count, 2)
+
+    def test_rdsclusterparamgroup_unused(self):
+        session_factory = self.replay_flight_data("test_rdsclusterparamgroup_unused")
+        policy = self.load_policy(
+            {
+                "name": "rds-cluster-param-group-unused",
+                "resource": "rds-cluster-param-group",
+                "filters": [{"type": "unused"}],
+            },
+            session_factory=session_factory,
+        )
+        resources = policy.run()
+        self.assertEqual(len(resources), 2)
+        names = {r['DBClusterParameterGroupName'] for r in resources}
+        self.assertIn("default.aurora-mysql8.0", names)
+        self.assertIn("custom-cluster-pg-orphan", names)
+        self.assertNotIn("custom-cluster-pg-used", names)
 
     def test_rdsclusterparamgroup_param_value_filter(self):
         session_factory = self.replay_flight_data('test_rdsclusterparamgroup_param_value_filter')

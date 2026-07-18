@@ -1,0 +1,146 @@
+interactions:
+- request:
+    body: '{"Offset": 0, "Limit": 20}'
+    headers:
+      Accept:
+      - '*/*'
+      Accept-Encoding:
+      - gzip, deflate
+      Connection:
+      - keep-alive
+      Content-Length:
+      - '26'
+      Content-Type:
+      - application/json
+      Host:
+      - dnspod.na-ashburn.tencentcloudapi.com
+      User-Agent:
+      - python-requests/2.32.3
+      X-TC-Action:
+      - DescribeDomainList
+      X-TC-Region:
+      - na-ashburn
+      X-TC-TraceId:
+      - e454747c-ef3a-4c0e-a8c3-0eda9280d6b1
+      X-TC-Version:
+      - '2021-03-23'
+    method: POST
+    uri: https://dnspod.na-ashburn.tencentcloudapi.com/
+  response:
+    body:
+      string: '{"Response":{"RequestId":"cbf4f849-2e6f-4454-9752-e2a43086a93b","DomainCountInfo":{"DomainTotal":8,"AllTotal":8,"MineTotal":8,"ShareTotal":0,"VipTotal":2,"PauseTotal":0,"ErrorTotal":8,"LockTotal":0,"SpamTotal":0,"VipExpire":0,"ShareOutTotal":0,"GroupTotal":0},"DomainList":[{"TTL":600,"CNAMESpeedup":"DISABLE","DNSStatus":"DNSERROR","DomainId":4843238,"Status":"ENABLE","Grade":"DPG_FREE","GroupId":1,"Remark":"","CreatedOn":"2023-06-27
+        20:23:17","UpdatedOn":"2024-12-17 14:55:16","Punycode":"tonykai.xyz","Name":"tonykai.xyz","GradeLevel":1,"GradeTitle":"Free","IsVip":"NO","Owner":"qcloud_uin_100009291175@qcloud.com","VipStartAt":"0000-00-00
+        00:00:00","VipEndAt":"0000-00-00 00:00:00","VipAutoRenew":"NO","TagList":[],"SearchEnginePush":"NO","RecordCount":6,"EffectiveDNS":["a.dnspod.com","b.dnspod.com","c.dnspod.com"]}]}}'
+    headers:
+      Connection:
+      - keep-alive
+      Content-Length:
+      - '4714'
+      Content-Type:
+      - application/json
+      Date:
+      - Tue, 17 Dec 2024 06:57:07 GMT
+      X-TC-TraceId:
+      - e454747c-ef3a-4c0e-a8c3-0eda9280d6b1
+    status:
+      code: 200
+      message: OK
+- request:
+    body: '{"ResourceList": ["qcs::dnspod:na-ashburn:uin/100009291175:domain/5496776",
+      "qcs::dnspod:na-ashburn:uin/100009291175:domain/4509331", "qcs::dnspod:na-ashburn:uin/100009291175:domain/4508284",
+      "qcs::dnspod:na-ashburn:uin/100009291175:domain/4521670", "qcs::dnspod:na-ashburn:uin/100009291175:domain/5490504",
+      "qcs::dnspod:na-ashburn:uin/100009291175:domain/5490219", "qcs::dnspod:na-ashburn:uin/100009291175:domain/4843238",
+      "qcs::dnspod:na-ashburn:uin/100009291175:domain/5398941"]}'
+    headers:
+      Accept:
+      - '*/*'
+      Accept-Encoding:
+      - gzip, deflate
+      Connection:
+      - keep-alive
+      Content-Length:
+      - '482'
+      Content-Type:
+      - application/json
+      Host:
+      - tag.na-ashburn.tencentcloudapi.com
+      User-Agent:
+      - python-requests/2.32.3
+      X-TC-Action:
+      - GetResources
+      X-TC-Region:
+      - na-ashburn
+      X-TC-TraceId:
+      - 89c67eaa-2399-4a81-a301-3da1a95e10d7
+      X-TC-Version:
+      - '2018-08-13'
+    method: POST
+    uri: https://tag.na-ashburn.tencentcloudapi.com/
+  response:
+    body:
+      string: '{"Response":{"PaginationToken":"","ResourceTagMappingList":[],"RequestId":"8075ea56-0ee8-4d70-9fa3-4b19f6ae940c"}}'
+    headers:
+      Connection:
+      - keep-alive
+      Content-Length:
+      - '114'
+      Content-Type:
+      - application/json
+      Date:
+      - Tue, 17 Dec 2024 06:57:09 GMT
+      X-TC-TraceId:
+      - 89c67eaa-2399-4a81-a301-3da1a95e10d7
+    status:
+      code: 200
+      message: OK
+- request:
+    body: '{"Domain": "tonykai.xyz", "Offset": 0, "Limit": 100}'
+    headers:
+      Accept:
+      - '*/*'
+      Accept-Encoding:
+      - gzip, deflate
+      Connection:
+      - keep-alive
+      Content-Length:
+      - '52'
+      Content-Type:
+      - application/json
+      Host:
+      - dnspod.na-ashburn.tencentcloudapi.com
+      User-Agent:
+      - python-requests/2.32.3
+      X-TC-Action:
+      - DescribeRecordList
+      X-TC-Region:
+      - na-ashburn
+      X-TC-TraceId:
+      - 46e016f3-b669-44e2-b9db-5a6aed5d612b
+      X-TC-Version:
+      - '2021-03-23'
+    method: POST
+    uri: https://dnspod.na-ashburn.tencentcloudapi.com/
+  response:
+    body:
+      string: '{"Response":{"RequestId":"8eacd6ed-95ac-4abe-ae0a-0b4fad82e33a","RecordCountInfo":{"SubdomainCount":6,"TotalCount":6,"ListCount":6},"RecordList":[{"Value":"a.dnspod.com.","Status":"ENABLE","UpdatedOn":"2023-06-27
+        20:23:17","Weight":null,"Name":"@","Line":"Default","LineId":"0","Type":"NS","Remark":"","RecordId":34431927,"TTL":86400,"MX":0,"MonitorStatus":""},{"Value":"b.dnspod.com.","Status":"ENABLE","UpdatedOn":"2023-06-27
+        20:23:17","Weight":null,"Name":"@","Line":"Default","LineId":"0","Type":"NS","Remark":"","RecordId":34431928,"TTL":86400,"MX":0,"MonitorStatus":""},{"Value":"c.dnspod.com.","Status":"ENABLE","UpdatedOn":"2023-06-27
+        20:23:17","Weight":null,"Name":"@","Line":"Default","LineId":"0","Type":"NS","Remark":"","RecordId":34431929,"TTL":86400,"MX":0,"MonitorStatus":""},{"Value":"8.8.8.8","Status":"ENABLE","UpdatedOn":"2024-12-17
+        14:55:16","Weight":null,"Name":"c7n","Line":"Default","LineId":"0","Type":"A","Remark":"","RecordId":50853241,"TTL":600,"MX":0,"MonitorStatus":""},{"Value":"43.155.179.201","Status":"ENABLE","UpdatedOn":"2023-06-27
+        20:24:12","Weight":null,"Name":"www","Line":"Default","LineId":"0","Type":"A","Remark":"","RecordId":34431938,"TTL":600,"MX":0,"MonitorStatus":""},{"Value":"8.8.8.8","Status":"ENABLE","UpdatedOn":"2023-07-07
+        13:37:00","Weight":null,"Name":"www","Line":"Default","LineId":"0","Type":"A","Remark":"","RecordId":34572540,"TTL":600,"MX":0,"MonitorStatus":""}]}}'
+    headers:
+      Connection:
+      - keep-alive
+      Content-Length:
+      - '1424'
+      Content-Type:
+      - application/json
+      Date:
+      - Tue, 17 Dec 2024 06:57:16 GMT
+      X-TC-TraceId:
+      - 46e016f3-b669-44e2-b9db-5a6aed5d612b
+    status:
+      code: 200
+      message: OK
+version: 1

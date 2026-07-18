@@ -1,0 +1,46 @@
+{
+  "status_code": 200,
+  "data": {
+    "Users": [
+      {
+        "Path": "/",
+        "UserName": "kapil",
+        "UserId": "AIDAJEZOTH6YPO3DY45QW",
+        "Arn": "arn:aws:iam::644160558196:user/kapil",
+        "CreateDate": {
+          "__class__": "datetime",
+          "year": 2016,
+          "month": 5,
+          "day": 16,
+          "hour": 19,
+          "minute": 3,
+          "second": 36,
+          "microsecond": 0
+        },
+        "PasswordLastUsed": {
+          "__class__": "datetime",
+          "year": 2018,
+          "month": 12,
+          "day": 2,
+          "hour": 3,
+          "minute": 25,
+          "second": 42,
+          "microsecond": 0
+        }
+      }
+    ],
+    "IsTruncated": false,
+    "ResponseMetadata": {
+      "RequestId": "f4378d60-f5e4-11e8-8aa7-a1d0e8b456d5",
+      "HTTPStatusCode": 200,
+      "HTTPHeaders": {
+        "x-amzn-requestid": "f4378d60-f5e4-11e8-8aa7-a1d0e8b456d5",
+        "content-type": "text/xml",
+        "content-length": "5180",
+        "vary": "Accept-Encoding",
+        "date": "Sun, 02 Dec 2018 03:47:12 GMT"
+      },
+      "RetryAttempts": 0
+    }
+  }
+}

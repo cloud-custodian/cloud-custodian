@@ -1,0 +1,118 @@
+{
+    "status_code": 200,
+    "data": {
+        "ResponseMetadata": {},
+        "Status": 200,
+        "DashboardSummaryList": [
+            {
+                "Arn": "arn:aws:quicksight:us-east-1:644160558196:dashboard/not-owner-tagged-dashboard-id",
+                "DashboardId": "not-owner-tagged-dashboard-id",
+                "Name": "not-owner-tagged-dashboard-name",
+                "CreatedTime": {
+                    "__class__": "datetime",
+                    "year": 2025,
+                    "month": 7,
+                    "day": 21,
+                    "hour": 16,
+                    "minute": 0,
+                    "second": 45,
+                    "microsecond": 68000
+                },
+                "LastUpdatedTime": {
+                    "__class__": "datetime",
+                    "year": 2025,
+                    "month": 7,
+                    "day": 21,
+                    "hour": 16,
+                    "minute": 0,
+                    "second": 45,
+                    "microsecond": 343000
+                },
+                "PublishedVersionNumber": 1,
+                "LastPublishedTime": {
+                    "__class__": "datetime",
+                    "year": 2025,
+                    "month": 7,
+                    "day": 21,
+                    "hour": 16,
+                    "minute": 0,
+                    "second": 45,
+                    "microsecond": 68000
+                }
+            },
+            {
+                "Arn": "arn:aws:quicksight:us-east-1:644160558196:dashboard/tagged-dashboard-id",
+                "DashboardId": "tagged-dashboard-id",
+                "Name": "tagged-dashboard-name",
+                "CreatedTime": {
+                    "__class__": "datetime",
+                    "year": 2025,
+                    "month": 7,
+                    "day": 21,
+                    "hour": 16,
+                    "minute": 0,
+                    "second": 45,
+                    "microsecond": 85000
+                },
+                "LastUpdatedTime": {
+                    "__class__": "datetime",
+                    "year": 2025,
+                    "month": 7,
+                    "day": 21,
+                    "hour": 16,
+                    "minute": 0,
+                    "second": 45,
+                    "microsecond": 301000
+                },
+                "PublishedVersionNumber": 1,
+                "LastPublishedTime": {
+                    "__class__": "datetime",
+                    "year": 2025,
+                    "month": 7,
+                    "day": 21,
+                    "hour": 16,
+                    "minute": 0,
+                    "second": 45,
+                    "microsecond": 85000
+                }
+            },
+            {
+                "Arn": "arn:aws:quicksight:us-east-1:644160558196:dashboard/untagged-dashboard-id",
+                "DashboardId": "untagged-dashboard-id",
+                "Name": "untagged-dashboard-name",
+                "CreatedTime": {
+                    "__class__": "datetime",
+                    "year": 2025,
+                    "month": 7,
+                    "day": 21,
+                    "hour": 16,
+                    "minute": 0,
+                    "second": 45,
+                    "microsecond": 99000
+                },
+                "LastUpdatedTime": {
+                    "__class__": "datetime",
+                    "year": 2025,
+                    "month": 7,
+                    "day": 21,
+                    "hour": 16,
+                    "minute": 0,
+                    "second": 46,
+                    "microsecond": 40000
+                },
+                "PublishedVersionNumber": 1,
+                "LastPublishedTime": {
+                    "__class__": "datetime",
+                    "year": 2025,
+                    "month": 7,
+                    "day": 21,
+                    "hour": 16,
+                    "minute": 0,
+                    "second": 45,
+                    "microsecond": 99000
+                }
+            }
+        ],
+        "RequestId": "627b759e-a315-4534-af84-ceb40c04224d"
+    }
+}

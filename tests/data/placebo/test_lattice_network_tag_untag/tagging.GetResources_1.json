@@ -1,0 +1,27 @@
+{
+    "status_code": 200,
+    "data": {
+        "PaginationToken": "",
+        "ResourceTagMappingList": [
+            {
+                "ResourceARN": "arn:aws:vpc-lattice:us-east-1:644160558196:servicenetwork/sn-070d9e8cc80e37098",
+                "Tags": [
+                    {
+                        "Key": "ASV",
+                        "Value": "PolicyTestASV"
+                    }
+                ]
+            },
+            {
+                "ResourceARN": "arn:aws:vpc-lattice:us-east-1:644160558196:servicenetwork/sn-08911a980b03fb795",
+                "Tags": [
+                    {
+                        "Key": "ASV",
+                        "Value": "PolicyTestASV"
+                    }
+                ]
+            }
+        ],
+        "ResponseMetadata": {}
+    }
+}

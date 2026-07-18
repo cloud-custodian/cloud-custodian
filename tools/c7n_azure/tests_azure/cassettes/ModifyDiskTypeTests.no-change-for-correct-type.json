@@ -1,0 +1,459 @@
+{
+    "version": 1,
+    "interactions": [
+        {
+            "request": {
+                "method": "GET",
+                "uri": "https://management.azure.com/subscriptions/ea42f556-5106-4743-99b0-c129bfa71a47/providers/Microsoft.Compute/disks?api-version=2020-09-30",
+                "body": null,
+                "headers": {}
+            },
+            "response": {
+                "status": {
+                    "code": 200,
+                    "message": "OK"
+                },
+                "headers": {
+                    "x-cache": [
+                        "CONFIG_NOCACHE"
+                    ],
+                    "x-ms-original-request-ids": [
+                        "6f550c18-d573-40ca-99d6-e0174865c424",
+                        "85f705e6-c5ff-4c1a-bd07-73cdc795b094"
+                    ],
+                    "content-type": [
+                        "application/json; charset=utf-8"
+                    ],
+                    "x-msedge-ref": [
+                        "Ref A: 095C91D424814B84AD19F4071ED5AF6C Ref B: MRS211050313035 Ref C: 2025-02-10T16:33:16Z"
+                    ],
+                    "date": [
+                        "Mon, 10 Feb 2025 16:33:17 GMT"
+                    ],
+                    "cache-control": [
+                        "no-cache"
+                    ],
+                    "x-ms-ratelimit-remaining-subscription-global-reads": [
+                        "3749"
+                    ],
+                    "content-length": [
+                        "5467"
+                    ]
+                },
+                "body": {
+                    "data": {
+                        "value": [
+                            {
+                                "name": "kkkk",
+                                "id": "/subscriptions/ea42f556-5106-4743-99b0-c129bfa71a47/resourceGroups/TEST-BEN/providers/Microsoft.Compute/disks/kkkk",
+                                "type": "Microsoft.Compute/disks",
+                                "location": "eastus",
+                                "tags": {
+                                    "CA_az_disktypeexc": "true"
+                                },
+                                "zones": [
+                                    "1"
+                                ],
+                                "managedBy": "/subscriptions/ea42f556-5106-4743-99b0-c129bfa71a47/resourceGroups/test-ben/providers/Microsoft.Compute/virtualMachines/test-1",
+                                "sku": {
+                                    "name": "Premium_LRS",
+                                    "tier": "Premium"
+                                },
+                                "properties": {
+                                    "creationData": {
+                                        "createOption": "Empty"
+                                    },
+                                    "diskSizeGB": 4,
+                                    "diskIOPSReadWrite": 120,
+                                    "diskMBpsReadWrite": 25,
+                                    "encryption": {
+                                        "type": "EncryptionAtRestWithPlatformKey"
+                                    },
+                                    "networkAccessPolicy": "AllowAll",
+                                    "timeCreated": "2025-01-21T11:45:22.8082948+00:00",
+                                    "provisioningState": "Succeeded",
+                                    "diskState": "Reserved",
+                                    "diskSizeBytes": 4294967296,
+                                    "uniqueId": "162b31ce-fe87-4b90-a308-d34ecea7feec",
+                                    "tier": "P1"
+                                }
+                            },
+                            {
+                                "name": "test-1_OsDisk_1_96c5e99f83984601b028ff8bf13a1166",
+                                "id": "/subscriptions/ea42f556-5106-4743-99b0-c129bfa71a47/resourceGroups/TEST-BEN/providers/Microsoft.Compute/disks/test-1_OsDisk_1_96c5e99f83984601b028ff8bf13a1166",
+                                "type": "Microsoft.Compute/disks",
+                                "location": "eastus",
+                                "tags": {
+                                    "CA_az_disktypeexc": "true"
+                                },
+                                "zones": [
+                                    "1"
+                                ],
+                                "managedBy": "/subscriptions/ea42f556-5106-4743-99b0-c129bfa71a47/resourceGroups/test-ben/providers/Microsoft.Compute/virtualMachines/test-1",
+                                "sku": {
+                                    "name": "Premium_LRS",
+                                    "tier": "Premium"
+                                },
+                                "properties": {
+                                    "osType": "Linux",
+                                    "hyperVGeneration": "V2",
+                                    "creationData": {
+                                        "createOption": "FromImage",
+                                        "imageReference": {
+                                            "id": "/Subscriptions/ea42f556-5106-4743-99b0-c129bfa71a47/Providers/Microsoft.Compute/Locations/eastus/Publishers/canonical/ArtifactTypes/VMImage/Offers/ubuntu-24_04-lts/Skus/server/Versions/24.04.202408090"
+                                        }
+                                    },
+                                    "diskSizeGB": 30,
+                                    "diskIOPSReadWrite": 120,
+                                    "diskMBpsReadWrite": 25,
+                                    "encryption": {
+                                        "type": "EncryptionAtRestWithPlatformKey"
+                                    },
+                                    "networkAccessPolicy": "AllowAll",
+                                    "timeCreated": "2024-08-11T13:04:55.2330482+00:00",
+                                    "provisioningState": "Succeeded",
+                                    "diskState": "Reserved",
+                                    "diskSizeBytes": 32213303296,
+                                    "uniqueId": "96c5e99f-8398-4601-b028-ff8bf13a1166",
+                                    "tier": "P4"
+                                }
+                            },
+                            {
+                                "name": "cctestvm_disk2_a9097edcfa664ff48c8e88e87d72003e",
+                                "id": "/subscriptions/ea42f556-5106-4743-99b0-c129bfa71a47/resourceGroups/TEST_DISK/providers/Microsoft.Compute/disks/cctestvm_disk2_a9097edcfa664ff48c8e88e87d72003e",
+                                "type": "Microsoft.Compute/disks",
+                                "location": "southcentralus",
+                                "tags": {
+                                    "testtag": "testvalue"
+                                },
+                                "sku": {
+                                    "name": "Standard_LRS",
+                                    "tier": "Standard"
+                                },
+                                "properties": {
+                                    "creationData": {
+                                        "createOption": "Empty"
+                                    },
+                                    "diskSizeGB": 1023,
+                                    "diskIOPSReadWrite": 500,
+                                    "diskMBpsReadWrite": 60,
+                                    "encryption": {
+                                        "type": "EncryptionAtRestWithPlatformKey"
+                                    },
+                                    "networkAccessPolicy": "AllowAll",
+                                    "timeCreated": "2025-02-10T16:29:29.0065471+00:00",
+                                    "provisioningState": "Succeeded",
+                                    "diskState": "Unattached",
+                                    "diskSizeBytes": 1098437885952,
+                                    "uniqueId": "f8067b99-6cd8-4324-8b77-c04947b4eccf"
+                                }
+                            },
+                            {
+                                "name": "disk1",
+                                "id": "/subscriptions/ea42f556-5106-4743-99b0-c129bfa71a47/resourceGroups/TEST_DISK_TYPE_MODIFY/providers/Microsoft.Compute/disks/disk1",
+                                "type": "Microsoft.Compute/disks",
+                                "location": "southcentralus",
+                                "sku": {
+                                    "name": "Standard_LRS",
+                                    "tier": "Standard"
+                                },
+                                "properties": {
+                                    "creationData": {
+                                        "createOption": "Empty"
+                                    },
+                                    "diskSizeGB": 128,
+                                    "diskIOPSReadWrite": 500,
+                                    "diskMBpsReadWrite": 60,
+                                    "encryption": {
+                                        "type": "EncryptionAtRestWithPlatformKey"
+                                    },
+                                    "networkAccessPolicy": "AllowAll",
+                                    "timeCreated": "2025-02-10T16:29:31.0847274+00:00",
+                                    "provisioningState": "Succeeded",
+                                    "diskState": "Unattached",
+                                    "diskSizeBytes": 137438953472,
+                                    "uniqueId": "5ad7e90b-fccc-4b3a-9dcc-709d99f20074"
+                                }
+                            },
+                            {
+                                "name": "disk2",
+                                "id": "/subscriptions/ea42f556-5106-4743-99b0-c129bfa71a47/resourceGroups/TEST_DISK_TYPE_MODIFY/providers/Microsoft.Compute/disks/disk2",
+                                "type": "Microsoft.Compute/disks",
+                                "location": "southcentralus",
+                                "managedBy": "/subscriptions/ea42f556-5106-4743-99b0-c129bfa71a47/resourceGroups/test_disk_type_modify/providers/Microsoft.Compute/virtualMachines/vm-disk-test",
+                                "sku": {
+                                    "name": "Standard_LRS",
+                                    "tier": "Standard"
+                                },
+                                "properties": {
+                                    "creationData": {
+                                        "createOption": "Empty"
+                                    },
+                                    "diskSizeGB": 64,
+                                    "diskIOPSReadWrite": 500,
+                                    "diskMBpsReadWrite": 60,
+                                    "encryption": {
+                                        "type": "EncryptionAtRestWithPlatformKey"
+                                    },
+                                    "networkAccessPolicy": "AllowAll",
+                                    "timeCreated": "2025-02-10T16:29:31.0847274+00:00",
+                                    "provisioningState": "Succeeded",
+                                    "diskState": "Attached",
+                                    "diskSizeBytes": 68719476736,
+                                    "uniqueId": "c94b2f6c-b6f2-4e01-b682-c1f3c12fb68e"
+                                }
+                            },
+                            {
+                                "name": "vm-disk-test_disk1_0785b5d7ea814594aa9f173026092513",
+                                "id": "/subscriptions/ea42f556-5106-4743-99b0-c129bfa71a47/resourceGroups/TEST_DISK_TYPE_MODIFY/providers/Microsoft.Compute/disks/vm-disk-test_disk1_0785b5d7ea814594aa9f173026092513",
+                                "type": "Microsoft.Compute/disks",
+                                "location": "southcentralus",
+                                "managedBy": "/subscriptions/ea42f556-5106-4743-99b0-c129bfa71a47/resourceGroups/test_disk_type_modify/providers/Microsoft.Compute/virtualMachines/vm-disk-test",
+                                "sku": {
+                                    "name": "Standard_LRS",
+                                    "tier": "Standard"
+                                },
+                                "properties": {
+                                    "osType": "Windows",
+                                    "hyperVGeneration": "V2",
+                                    "creationData": {
+                                        "createOption": "FromImage",
+                                        "imageReference": {
+                                            "id": "/Subscriptions/ba3f11f2-e667-41a6-813f-d4915d729491/Providers/Microsoft.Compute/Locations/southcentralus/Publishers/microsoftwindowsdesktop/ArtifactTypes/VMImage/Offers/windows-10/Skus/win10-22h2-avd-g2/Versions/19045.5371.250112"
+                                        }
+                                    },
+                                    "diskSizeGB": 127,
+                                    "diskIOPSReadWrite": 500,
+                                    "diskMBpsReadWrite": 60,
+                                    "encryption": {
+                                        "type": "EncryptionAtRestWithPlatformKey"
+                                    },
+                                    "networkAccessPolicy": "AllowAll",
+                                    "timeCreated": "2025-02-10T16:29:42.3347928+00:00",
+                                    "provisioningState": "Succeeded",
+                                    "diskState": "Attached",
+                                    "diskSizeBytes": 136367308800,
+                                    "uniqueId": "0785b5d7-ea81-4594-aa9f-173026092513"
+                                }
+                            }
+                        ]
+                    }
+                }
+            }
+        },
+        {
+            "request": {
+                "method": "GET",
+                "uri": "https://management.azure.com/subscriptions/ea42f556-5106-4743-99b0-c129bfa71a47/resourceGroups/TEST_DISK_TYPE_MODIFY/providers/Microsoft.Compute/disks/disk1?api-version=2020-09-30",
+                "body": null,
+                "headers": {}
+            },
+            "response": {
+                "status": {
+                    "code": 200,
+                    "message": ""
+                },
+                "headers": {
+                    "x-cache": [
+                        "CONFIG_NOCACHE"
+                    ],
+                    "x-ms-ratelimit-remaining-resource": [
+                        "Microsoft.Compute/LowCostGet3Min;14991,Microsoft.Compute/LowCostGet30Min;119984"
+                    ],
+                    "content-type": [
+                        "application/json; charset=utf-8"
+                    ],
+                    "x-msedge-ref": [
+                        "Ref A: 72F73E4FA7A04580B2BACEA5F7322A68 Ref B: MRS211050619023 Ref C: 2025-02-10T16:33:18Z"
+                    ],
+                    "date": [
+                        "Mon, 10 Feb 2025 16:33:19 GMT"
+                    ],
+                    "cache-control": [
+                        "no-cache"
+                    ],
+                    "content-length": [
+                        "816"
+                    ],
+                    "x-ms-ratelimit-remaining-subscription-global-reads": [
+                        "3749"
+                    ]
+                },
+                "body": {
+                    "data": {
+                        "name": "disk1",
+                        "id": "/subscriptions/ea42f556-5106-4743-99b0-c129bfa71a47/resourceGroups/TEST_DISK_TYPE_MODIFY/providers/Microsoft.Compute/disks/disk1",
+                        "type": "Microsoft.Compute/disks",
+                        "location": "southcentralus",
+                        "sku": {
+                            "name": "Standard_LRS",
+                            "tier": "Standard"
+                        },
+                        "properties": {
+                            "creationData": {
+                                "createOption": "Empty"
+                            },
+                            "diskSizeGB": 128,
+                            "diskIOPSReadWrite": 500,
+                            "diskMBpsReadWrite": 60,
+                            "encryption": {
+                                "type": "EncryptionAtRestWithPlatformKey"
+                            },
+                            "networkAccessPolicy": "AllowAll",
+                            "timeCreated": "2025-02-10T16:29:31.0847274+00:00",
+                            "provisioningState": "Succeeded",
+                            "diskState": "Unattached",
+                            "diskSizeBytes": 137438953472,
+                            "uniqueId": "5ad7e90b-fccc-4b3a-9dcc-709d99f20074"
+                        }
+                    }
+                }
+            }
+        },
+        {
+            "request": {
+                "method": "GET",
+                "uri": "https://management.azure.com/subscriptions/ea42f556-5106-4743-99b0-c129bfa71a47/resourceGroups/TEST_DISK_TYPE_MODIFY/providers/Microsoft.Compute/disks/disk2?api-version=2020-09-30",
+                "body": null,
+                "headers": {}
+            },
+            "response": {
+                "status": {
+                    "code": 200,
+                    "message": ""
+                },
+                "headers": {
+                    "x-cache": [
+                        "CONFIG_NOCACHE"
+                    ],
+                    "x-ms-ratelimit-remaining-resource": [
+                        "Microsoft.Compute/LowCostGet3Min;14990,Microsoft.Compute/LowCostGet30Min;119983"
+                    ],
+                    "content-type": [
+                        "application/json; charset=utf-8"
+                    ],
+                    "x-msedge-ref": [
+                        "Ref A: 2A5590BBC6CC4309912F46D957DC493B Ref B: MRS211050619023 Ref C: 2025-02-10T16:33:19Z"
+                    ],
+                    "date": [
+                        "Mon, 10 Feb 2025 16:33:19 GMT"
+                    ],
+                    "cache-control": [
+                        "no-cache"
+                    ],
+                    "content-length": [
+                        "977"
+                    ],
+                    "x-ms-ratelimit-remaining-subscription-global-reads": [
+                        "3748"
+                    ]
+                },
+                "body": {
+                    "data": {
+                        "name": "disk2",
+                        "id": "/subscriptions/ea42f556-5106-4743-99b0-c129bfa71a47/resourceGroups/TEST_DISK_TYPE_MODIFY/providers/Microsoft.Compute/disks/disk2",
+                        "type": "Microsoft.Compute/disks",
+                        "location": "southcentralus",
+                        "managedBy": "/subscriptions/ea42f556-5106-4743-99b0-c129bfa71a47/resourceGroups/test_disk_type_modify/providers/Microsoft.Compute/virtualMachines/vm-disk-test",
+                        "sku": {
+                            "name": "Standard_LRS",
+                            "tier": "Standard"
+                        },
+                        "properties": {
+                            "creationData": {
+                                "createOption": "Empty"
+                            },
+                            "diskSizeGB": 64,
+                            "diskIOPSReadWrite": 500,
+                            "diskMBpsReadWrite": 60,
+                            "encryption": {
+                                "type": "EncryptionAtRestWithPlatformKey"
+                            },
+                            "networkAccessPolicy": "AllowAll",
+                            "timeCreated": "2025-02-10T16:29:31.0847274+00:00",
+                            "provisioningState": "Succeeded",
+                            "diskState": "Attached",
+                            "diskSizeBytes": 68719476736,
+                            "uniqueId": "c94b2f6c-b6f2-4e01-b682-c1f3c12fb68e"
+                        }
+                    }
+                }
+            }
+        },
+        {
+            "request": {
+                "method": "GET",
+                "uri": "https://management.azure.com/subscriptions/ea42f556-5106-4743-99b0-c129bfa71a47/resourceGroups/TEST_DISK_TYPE_MODIFY/providers/Microsoft.Compute/disks/vm-disk-test_disk1_0785b5d7ea814594aa9f173026092513?api-version=2020-09-30",
+                "body": null,
+                "headers": {}
+            },
+            "response": {
+                "status": {
+                    "code": 200,
+                    "message": ""
+                },
+                "headers": {
+                    "x-cache": [
+                        "CONFIG_NOCACHE"
+                    ],
+                    "x-ms-ratelimit-remaining-resource": [
+                        "Microsoft.Compute/LowCostGet3Min;14989,Microsoft.Compute/LowCostGet30Min;119982"
+                    ],
+                    "content-type": [
+                        "application/json; charset=utf-8"
+                    ],
+                    "x-msedge-ref": [
+                        "Ref A: BE9F298F91D44CBDA9961D8106114C87 Ref B: MRS211050619023 Ref C: 2025-02-10T16:33:20Z"
+                    ],
+                    "date": [
+                        "Mon, 10 Feb 2025 16:33:20 GMT"
+                    ],
+                    "cache-control": [
+                        "no-cache"
+                    ],
+                    "content-length": [
+                        "1416"
+                    ],
+                    "x-ms-ratelimit-remaining-subscription-global-reads": [
+                        "3748"
+                    ]
+                },
+                "body": {
+                    "data": {
+                        "name": "vm-disk-test_disk1_0785b5d7ea814594aa9f173026092513",
+                        "id": "/subscriptions/ea42f556-5106-4743-99b0-c129bfa71a47/resourceGroups/TEST_DISK_TYPE_MODIFY/providers/Microsoft.Compute/disks/vm-disk-test_disk1_0785b5d7ea814594aa9f173026092513",
+                        "type": "Microsoft.Compute/disks",
+                        "location": "southcentralus",
+                        "managedBy": "/subscriptions/ea42f556-5106-4743-99b0-c129bfa71a47/resourceGroups/test_disk_type_modify/providers/Microsoft.Compute/virtualMachines/vm-disk-test",
+                        "sku": {
+                            "name": "Standard_LRS",
+                            "tier": "Standard"
+                        },
+                        "properties": {
+                            "osType": "Windows",
+                            "hyperVGeneration": "V2",
+                            "creationData": {
+                                "createOption": "FromImage",
+                                "imageReference": {
+                                    "id": "/Subscriptions/ba3f11f2-e667-41a6-813f-d4915d729491/Providers/Microsoft.Compute/Locations/southcentralus/Publishers/microsoftwindowsdesktop/ArtifactTypes/VMImage/Offers/windows-10/Skus/win10-22h2-avd-g2/Versions/19045.5371.250112"
+                                }
+                            },
+                            "diskSizeGB": 127,
+                            "diskIOPSReadWrite": 500,
+                            "diskMBpsReadWrite": 60,
+                            "encryption": {
+                                "type": "EncryptionAtRestWithPlatformKey"
+                            },
+                            "networkAccessPolicy": "AllowAll",
+                            "timeCreated": "2025-02-10T16:29:42.3347928+00:00",
+                            "provisioningState": "Succeeded",
+                            "diskState": "Attached",
+                            "diskSizeBytes": 136367308800,
+                            "uniqueId": "0785b5d7-ea81-4594-aa9f-173026092513"
+                        }
+                    }
+                }
+            }
+        }
+    ]
+}

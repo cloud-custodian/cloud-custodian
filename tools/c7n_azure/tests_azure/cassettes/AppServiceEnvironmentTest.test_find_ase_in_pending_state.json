@@ -1,0 +1,88 @@
+{
+  "version": 1,
+  "interactions": [
+    {
+      "request": {
+        "method": "GET",
+        "uri": "https://management.azure.com/subscriptions/ea42f556-5106-4743-99b0-c129bfa71a47/providers/Microsoft.Web/hostingEnvironments?api-version=2018-11-01",
+        "body": null,
+        "headers": {}
+      },
+      "response": {
+        "status": {
+          "code": 200,
+          "message": "OK"
+        },
+        "headers": {
+          "cache-control": [
+            "no-cache"
+          ],
+          "etag": [
+            "\"1D56A6327B0767F\""
+          ],
+          "content-type": [
+            "application/json"
+          ],
+          "date": [
+            "Fri, 13 Sep 2019 18:43:59 GMT"
+          ],
+          "content-length": [
+            "3205"
+          ]
+        },
+        "body": {
+          "data": {
+            "value": [
+              {
+                "id": "/subscriptions/ea42f556-5106-4743-99b0-c129bfa71a47/resourceGroups/test_ase/providers/Microsoft.Web/hostingEnvironments/example-ase",
+                "name": "example-ase",
+                "kind": "ASEV3",
+                "location": "East US",
+                "type": "Microsoft.Web/hostingEnvironments",
+                "tags": {
+                  "ComplianceStatus": "Green",
+                  "CustodianRule": "ecc-azure-433-dep_app_latest_env"
+                },
+                "properties": {
+                  "provisioningState": "InProgress",
+                  "status": "Preparing",
+                  "virtualNetwork": {
+                    "id": "/subscriptions/ea42f556-5106-4743-99b0-c129bfa71a47/resourceGroups/test_ase/providers/Microsoft.Network/virtualNetworks/this-green-vnet/subnets/this-green-subnet",
+                    "name": "this-green-subnet",
+                    "type": "Microsoft.Network/virtualNetworks/subnets",
+                    "subnet": ""
+                  },
+                  "internalLoadBalancingMode": "Web, Publishing",
+                  "multiSize": "Standard_D2d_v4",
+                  "ipsslAddressCount": 0,
+                  "dnsSuffix": "example-ase.appserviceenvironment.net",
+                  "maximumNumberOfMachines": 250,
+                  "suspended": false,
+                  "clusterSettings": [
+                    {
+                      "name": "DisableTls1.0",
+                      "value": "1"
+                    },
+                    {
+                      "name": "InternalEncryption",
+                      "value": "true"
+                    },
+                    {
+                      "name": "FrontEndSSLCipherSuiteOrder",
+                      "value": "TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384,TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256"
+                    }
+                  ],
+                  "hasLinuxWorkers": true,
+                  "dedicatedHostCount": 0
+                },
+                "resourceGroup": "test_ase"
+              }
+            ],
+            "nextLink": null,
+            "id": null
+          }
+        }
+      }
+    }
+  ]
+}

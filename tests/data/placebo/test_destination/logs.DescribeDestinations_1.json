@@ -1,0 +1,15 @@
+{
+    "status_code": 200,
+    "data": {
+        "destinations": [
+            {
+                "destinationName": "test-destination",
+                "targetArn": "arn:aws:kinesis:us-east-1:123456789012:stream/RecipientStream",
+                "roleArn": "arn:aws:iam::123456789012:role/CWLtoKinesisRole",
+                "arn": "arn:aws:logs:us-east-1:123456789012:destination:test-destination",
+                "creationTime": 1739815186983
+            }
+        ],
+        "ResponseMetadata": {}
+    }
+}

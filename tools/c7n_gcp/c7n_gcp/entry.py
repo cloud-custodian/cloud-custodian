@@ -10,12 +10,13 @@ import c7n_gcp.provider # noqa
 logging.getLogger('googleapiclient.discovery').setLevel(logging.WARNING)
 
 
+# ruff: noqa
 def initialize_gcp():
     """Load gcp provider"""
 
     # register execution modes
-    import c7n_gcp.policy # noqa
+    import c7n_gcp.policy
 
     # load shared registered resources
     import c7n_gcp.actions
-    import c7n_gcp.output # noqa
+    import c7n_gcp.output

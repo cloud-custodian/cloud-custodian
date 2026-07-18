@@ -5,7 +5,7 @@ Kubernetes Controller Mode
 
 The Kubernetes Provider also supports executing as a Dynamic Admission Controller. This allows
 you to execute and enforce policies on resources as they are created, updated, or deleted. The
-k8s-admission mode must be run as a separate HTTPS web service with the provided ``c7n-kates`` cli.
+k8s-admission mode must be run as a separate HTTPS web service with the provided ``c7n-kube`` cli.
 
 To run policies in this mode, ensure that the cluster has MutatingAdmissionWebhooks enabled. For
 more info, see the `Kubernetes Docs <https://kubernetes.io/docs/reference/access-authn-authz/admission-controllers/>`_.
@@ -47,7 +47,7 @@ of your web server, e.g. ``https://example.org``:
 
 .. code-block:: bash
 
-   c7n-kates --policy-dir policies --generate --endpoint $endpoint > webhook.yaml
+   c7n-kube --policy-dir policies --generate --endpoint $endpoint > webhook.yaml
 
 This will create a manifest containing a webhook that will inspect the operations and resource types
 that are applicable to your policies. Next, apply the manifest to your Kubernetes Cluster:
@@ -56,11 +56,11 @@ that are applicable to your policies. Next, apply the manifest to your Kubernete
 
    kubectl apply -f webhook.yaml
 
-Next, on your server, start c7n-kates:
+Next, on your server, start c7n-kube:
 
 .. code-block:: bash
 
-   c7n-kates --policy-dir policies
+   c7n-kube --policy-dir policies
 
 Option 2: Helm chart
 ====================
@@ -138,7 +138,7 @@ On the server, you should see:
 
 .. code-block:: bash
 
-  c7n-kates --policy-dir policies
+  c7n-kube --policy-dir policies
   2022-09-14 20:33:49,116: c7n_kube.server:INFO Loaded 1 policies
   2022-09-14 20:33:49,314: c7n_kube.server:INFO Serving at 0.0.0.0 8800
   2022-09-14 20:33:50,558: c7n_kube.server:INFO {"kind":"AdmissionReview","apiVersion":"admission.k8s.io/v1","request":{"uid":"2ec4911a-8a9d-4c8d-8aa5-2d3709877fd0","kind":{"group":"","version":"v1","kind":"Pod"},"resource":{"group":"","version":"v1","resource":"pods"},"requestKind":{"group":"","version":"v1","kind":"Pod"},"requestResource":{"group":"","version":"v1","resource":"pods"},"name":"nginx","namespace":"default","operation":"CREATE","userInfo":{"username":"kubernetes-admin","groups":["system:masters","system:authenticated"]},"object":{"kind":"Pod","apiVersion":"v1","metadata":{"name":"nginx","namespace":"default","uid":"eae00ed2-72d2-4ab4-9012-51ba11a284d0","creationTimestamp":"2022-09-14T20:33:50Z","annotations":{"kubectl.kubernetes.io/last-applied-configuration":"{\"apiVersion\":\"v1\",\"kind\":\"Pod\",\"metadata\":{\"annotations\":{},\"name\":\"nginx\",\"namespace\":\"default\"},\"spec\":{\"containers\":[{\"image\":\"nginx:1.14.2\",\"name\":\"nginx\",\"ports\":[{\"containerPort\":80}]}]}}\n"},"managedFields":[{"manager":"kubectl-client-side-apply","operation":"Update","apiVersion":"v1","time":"2022-09-14T20:33:50Z","fieldsType":"FieldsV1","fieldsV1":{"f:metadata":{"f:annotations":{".":{},"f:kubectl.kubernetes.io/last-applied-configuration":{}}},"f:spec":{"f:containers":{"k:{\"name\":\"nginx\"}":{".":{},"f:image":{},"f:imagePullPolicy":{},"f:name":{},"f:ports":{".":{},"k:{\"containerPort\":80,\"protocol\":\"TCP\"}":{".":{},"f:containerPort":{},"f:protocol":{}}},"f:resources":{},"f:terminationMessagePath":{},"f:terminationMessagePolicy":{}}},"f:dnsPolicy":{},"f:enableServiceLinks":{},"f:restartPolicy":{},"f:schedulerName":{},"f:securityContext":{},"f:terminationGracePeriodSeconds":{}}}}]},"spec":{"volumes":[{"name":"kube-api-access-mb9m2","projected":{"sources":[{"serviceAccountToken":{"expirationSeconds":3607,"path":"token"}},{"configMap":{"name":"kube-root-ca.crt","items":[{"key":"ca.crt","path":"ca.crt"}]}},{"downwardAPI":{"items":[{"path":"namespace","fieldRef":{"apiVersion":"v1","fieldPath":"metadata.namespace"}}]}}],"defaultMode":420}}],"containers":[{"name":"nginx","image":"nginx:1.14.2","ports":[{"containerPort":80,"protocol":"TCP"}],"resources":{},"volumeMounts":[{"name":"kube-api-access-mb9m2","readOnly":true,"mountPath":"/var/run/secrets/kubernetes.io/serviceaccount"}],"terminationMessagePath":"/dev/termination-log","terminationMessagePolicy":"File","imagePullPolicy":"IfNotPresent"}],"restartPolicy":"Always","terminationGracePeriodSeconds":30,"dnsPolicy":"ClusterFirst","serviceAccountName":"default","serviceAccount":"default","securityContext":{},"schedulerName":"default-scheduler","tolerations":[{"key":"node.kubernetes.io/not-ready","operator":"Exists","effect":"NoExecute","tolerationSeconds":300},{"key":"node.kubernetes.io/unreachable","operator":"Exists","effect":"NoExecute","tolerationSeconds":300}],"priority":0,"enableServiceLinks":true,"preemptionPolicy":"PreemptLowerPriority"},"status":{"phase":"Pending","qosClass":"BestEffort"}},"oldObject":null,"dryRun":false,"options":{"kind":"CreateOptions","apiVersion":"meta.k8s.io/v1","fieldManager":"kubectl-client-side-apply"}}}
@@ -179,10 +179,10 @@ filter resources based on the event itself. For instance:
          operations:
          - CREATE
          - UPDATE
-      filters:
-        - type: event
-          key: request.userInfo.username
-          value: foo
+       filters:
+         - type: event
+           key: request.userInfo.username
+           value: foo
 
 A sample event looks like:
 

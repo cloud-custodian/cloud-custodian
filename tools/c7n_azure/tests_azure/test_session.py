@@ -10,16 +10,17 @@ from datetime import datetime, timedelta
 import pytest
 from adal import AdalError
 from azure.core.credentials import AccessToken
-from azure.identity import (ClientSecretCredential, ManagedIdentityCredential)
+from azure.identity import (ClientSecretCredential, ManagedIdentityCredential,
+                            WorkloadIdentityCredential)
 from azure.identity._credentials import azure_cli
 from c7n_azure import constants
 from c7n_azure.session import Session
-from mock import patch
+from unittest.mock import patch
 from msrest.exceptions import AuthenticationError
 from msrestazure.azure_cloud import (AZURE_CHINA_CLOUD, AZURE_US_GOV_CLOUD)
 from requests import HTTPError
 
-from .azure_common import DEFAULT_SUBSCRIPTION_ID, DEFAULT_TENANT_ID, BaseTest
+from .azure_common import DEFAULT_CLIENT_ID, DEFAULT_SUBSCRIPTION_ID, DEFAULT_TENANT_ID, BaseTest
 
 from cryptography.hazmat.primitives import serialization
 from cryptography.hazmat.primitives.asymmetric import rsa
@@ -125,6 +126,19 @@ class SessionTest(BaseTest):
             s = Session()
             self.assertEqual(s.get_subscription_id(), DEFAULT_SUBSCRIPTION_ID)
             self.assertEqual(s.get_tenant_id(), DEFAULT_TENANT_ID)
+        mock_run.assert_called_with(['account', 'show', '--output', 'json'], timeout=10)
+
+    @patch('c7n_azure.session._run_command')
+    @patch('c7n_azure.session.az_identity_version', '1.19.0')
+    def test_initialize_session_old_version(self, mock_run):
+        mock_run.return_value = \
+            f'{{"id":"{DEFAULT_SUBSCRIPTION_ID}", "tenantId":"{DEFAULT_TENANT_ID}"}}'
+
+        with patch.dict(os.environ, {}, clear=True):
+            s = Session()
+            self.assertEqual(s.get_subscription_id(), DEFAULT_SUBSCRIPTION_ID)
+            self.assertEqual(s.get_tenant_id(), DEFAULT_TENANT_ID)
+        mock_run.assert_called_with('az account show --output json', timeout=10)
 
     def test_run_command_signature(self):
         """Catch signature changes in the internal method we use for CLI authentication
@@ -145,7 +159,7 @@ class SessionTest(BaseTest):
         So continuing to rely on _run_command() may be more reliable, as long as we
         catch signature changes to avoid accidental breakage.
         """
-        expected_parameters = {"command", "timeout"}
+        expected_parameters = {"command_args", "timeout"}
         actual_parameters = set(signature(azure_cli._run_command).parameters.keys())
         self.assertSetEqual(expected_parameters, actual_parameters)
 
@@ -196,6 +210,27 @@ class SessionTest(BaseTest):
 #                s.get_credentials()._credential._credential._identity_config["client_id"],
 #                'client')
             self.assertEqual(s.get_subscription_id(), DEFAULT_SUBSCRIPTION_ID)
+
+    def test_initialize_workload_identity(self):
+        with tempfile.NamedTemporaryFile(mode='w', delete=False, suffix='.jwt') as fp:
+            fp.write('fake.jwt.token')
+            token_file = fp.name
+
+        try:
+            with patch.dict(os.environ,
+                            {
+                                constants.ENV_TENANT_ID: DEFAULT_TENANT_ID,
+                                constants.ENV_SUB_ID: DEFAULT_SUBSCRIPTION_ID,
+                                constants.ENV_CLIENT_ID: DEFAULT_CLIENT_ID,
+                                constants.ENV_FEDERATED_TOKEN_FILE: token_file
+                            }, clear=True):
+                s = Session()
+
+                self.assertIsInstance(s.get_credentials()._credential, WorkloadIdentityCredential)
+                self.assertEqual(s.get_subscription_id(), DEFAULT_SUBSCRIPTION_ID)
+                self.assertEqual(s.get_tenant_id(), DEFAULT_TENANT_ID)
+        finally:
+            os.unlink(token_file)
 
     @patch('msrestazure.azure_active_directory.MSIAuthentication.__init__')
     @patch('c7n_azure.session.log.error')
@@ -356,7 +391,7 @@ class SessionTest(BaseTest):
         self.assertEqual(AZURE_CHINA_CLOUD.endpoints.resource_manager,
                          client._client._base_url)
         self.assertEqual(AZURE_CHINA_CLOUD.endpoints.management + ".default",
-                         client._client._config.credential_scopes[0])
+                         client._config.credential_scopes[0])
 
     # This test won't run with real credentials unless the
     # tenant is actually in Azure US Government
@@ -368,7 +403,7 @@ class SessionTest(BaseTest):
         self.assertEqual(AZURE_US_GOV_CLOUD.endpoints.resource_manager,
                          client._client._base_url)
         self.assertEqual(AZURE_US_GOV_CLOUD.endpoints.management + ".default",
-                         client._client._config.credential_scopes[0])
+                         client._config.credential_scopes[0])
 
     @patch('c7n_azure.session.get_keyvault_secret', return_value='{}')
     def test_compare_auth_params(self, _1):
@@ -383,7 +418,8 @@ class SessionTest(BaseTest):
                             constants.ENV_KEYVAULT_CLIENT_ID: 'kv_client',
                             constants.ENV_KEYVAULT_SECRET_ID: 'kv_secret',
                             constants.ENV_CLIENT_CERTIFICATE_PATH: '/certificate',
-                            constants.ENV_CLIENT_CERTIFICATE_PASSWORD: 'password'
+                            constants.ENV_CLIENT_CERTIFICATE_PASSWORD: 'password',
+                            constants.ENV_FEDERATED_TOKEN_FILE: '/token_file'
                         }, clear=True):
             env_params = Session().get_credentials().auth_params
 

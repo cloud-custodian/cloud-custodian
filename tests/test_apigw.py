@@ -1,6 +1,8 @@
 # Copyright The Cloud Custodian Authors.
 # SPDX-License-Identifier: Apache-2.0
+import time
 from botocore.exceptions import ClientError
+from unittest.mock import patch
 
 from .common import BaseTest, event_data
 from c7n.exceptions import PolicyValidationError
@@ -74,6 +76,29 @@ class TestRestAccount(BaseTest):
 
         after_account, = p.resource_manager._get_account()
         self.assertEqual(after_account["cloudwatchRoleArn"], log_role)
+
+    def test_rest_account_exception(self):
+        session_factory = self.replay_flight_data('test_rest_account_exception')
+        p = self.load_policy(
+            {'name': 'rest-account-exception',
+             'resource': 'aws.rest-account'},
+            session_factory=session_factory
+        )
+        with self.assertRaises(ClientError) as e:
+            p.run()
+        self.assertEqual(e.exception.response['Error']['Code'], 'AccessDeniedException')
+
+    def test_rest_account_rate_limit(self):
+        session_factory = self.replay_flight_data('test_rest_account_rate_limit')
+        p = self.load_policy(
+            {'name': 'rest-account-rate-limit',
+             'resource': 'aws.rest-account'},
+            session_factory=session_factory
+        )
+        with patch('c7n.utils.time.sleep', new_callable=time.sleep(0)) as func:
+            resources = p.run()
+        self.assertTrue(func.called)
+        self.assertEqual(len(resources), 1)
 
 
 class TestRestApi(BaseTest):
@@ -193,6 +218,75 @@ class TestRestApi(BaseTest):
                 {"Name": "ApiName", "Value": "c7n-test-2"}
             ],
         )
+
+    def test_rest_api_has_statement(self):
+        session_factory = self.replay_flight_data('test_rest_api_has_statement')
+        p = self.load_policy(
+            {'name': 'api-has-statement',
+             'resource': 'rest-api',
+             'filters': [
+                    {
+                        "type": "has-statement",
+                        "statements": [
+                            {
+                                "Effect": "Allow",
+                                "Action": "execute-api:Invoke",
+                                "Principal": {
+                                    "AWS": "arn:aws:iam::123456789012:root",
+                                },
+                            },
+                            {
+                                "Effect": "Allow",
+                                "Action": "execute-api:Invoke",
+                                "Condition": {
+                                    "StringEquals": {
+                                        "aws:SourceVpc": ["vpc-1a2b3c4d", "vpc-abc123"]
+                                    }
+                                }
+                            }
+                        ]
+                    },
+                ],
+            },
+            session_factory=session_factory
+        )
+        resources = p.run()
+        self.assertEqual(len(resources), 1)
+        self.assertEqual(resources[0]['name'], 'c7n-test')
+
+        p = self.load_policy(
+            {'name': 'api-has-statement',
+             'resource': 'rest-api',
+             'filters': [
+                    {
+                        "type": "has-statement",
+                        "statements": [
+                            {
+                                "Effect": "Allow",
+                                "Action": "execute-api:Invoke",
+                                "Principal": {
+                                    "AWS": "arn:aws:iam::123456789012:root",
+                                },
+                                "PartialMatch": ["Action"],
+                            },
+                            {
+                                "Effect": "Allow",
+                                "Action": "execute-api:Invoke",
+                                "Condition": {
+                                    "StringEquals": {
+                                        "aws:SourceVpc": ["vpc-1a2b3c4d", "vpc-abc123"]
+                                    }
+                                }
+                            }
+                        ]
+                    },
+                ],
+            },
+            session_factory=session_factory
+        )
+        resources = p.run()
+        self.assertEqual(len(resources), 1)
+        self.assertEqual(resources[0]['name'], 'c7n-test')
 
 
 class TestRestResource(BaseTest):
@@ -1095,3 +1189,125 @@ class TestApiGatewayV2Api(BaseTest):
         self.assertEqual(len(resources), 1)
         tags = client.get_tags(ResourceArn=p.resource_manager.get_arns(resources)[0])
         assert 'custodian_cleanup' in tags['Tags']
+
+    def test_apigwv2_update(self):
+        session_factory = self.replay_flight_data('test_apigwv2_api_update')
+        client = session_factory().client("apigatewayv2")
+        p = self.load_policy(
+            {
+                'name': 'update-http-api',
+                'resource': 'apigwv2',
+                'filters': [
+                    {'Name': 'c7n-test'}
+                ],
+                "actions": [
+                    {
+                        'type': 'update',
+                        'CorsConfiguration': {
+                            'AllowCredentials': False,
+                            'MaxAge': 60,
+                        },
+                        'Description': 'updated description',
+                        "DisableExecuteApiEndpoint": False,
+                    }
+                ]
+            },
+            session_factory=session_factory)
+        resources = p.run()
+        self.assertEqual(len(resources), 1)
+        self.assertEqual(resources[0]['Name'], 'c7n-test')
+
+        api = client.get_api(ApiId=resources[0]['ApiId'])
+        self.assertEqual(api['CorsConfiguration'], {
+            'AllowCredentials': False,
+            'MaxAge': 60,
+        })
+        self.assertEqual(api['Description'], 'updated description')
+        self.assertFalse(api['DisableExecuteApiEndpoint'])
+
+    def test_apigwv2_delete(self):
+        session_factory = self.replay_flight_data('test_apigwv2_api_delete')
+        client = session_factory().client("apigatewayv2")
+        p = self.load_policy(
+            {
+                'name': 'delete-http-api',
+                'resource': 'apigwv2',
+                'filters': [
+                    {'Name': 'c7n-test'}
+                ],
+                "actions": [
+                    {
+                        'type': 'delete',
+                    }
+                ]
+            },
+            session_factory=session_factory)
+        resources = p.run()
+        self.assertEqual(len(resources), 1)
+        with self.assertRaises(ClientError) as e:
+            client.get_api(ApiId=resources[0]['ApiId'])
+        self.assertEqual(e.exception.response['Error']['Code'], 'NotFoundException')
+
+
+class TestApiGatewayV2Stage(BaseTest):
+    def test_apigwv2_stage_update(self):
+        session_factory = self.replay_flight_data('test_apigwv2_stage_update')
+        client = session_factory().client("apigatewayv2")
+        p = self.load_policy(
+            {
+                'name': 'update-api-stage',
+                'resource': 'apigwv2-stage',
+                "actions": [
+                    {
+                        'type': 'update',
+                        "AutoDeploy": False,
+                        "Description": "new description",
+                        'DefaultRouteSettings': {
+                            'DetailedMetricsEnabled': False,
+                        },
+                    }
+                ]
+            },
+            session_factory=session_factory)
+        resources = p.run()
+        self.assertEqual(len(resources), 1)
+
+        stage = client.get_stage(
+            ApiId=resources[0]['c7n:parent-id'],
+            StageName=resources[0]['StageName']
+        )
+        self.assertEqual(stage['DefaultRouteSettings'], {
+            'DetailedMetricsEnabled': False,
+        })
+        self.assertEqual(stage['Description'], 'new description')
+        self.assertFalse(stage['AutoDeploy'])
+
+    def test_apigwv2_stage_delete(self):
+        session_factory = self.replay_flight_data('test_apigwv2_stage_delete')
+        client = session_factory().client("apigatewayv2")
+        p = self.load_policy(
+            {
+                'name': 'delete-api-stage',
+                'resource': 'apigwv2-stage',
+                'filters': [
+                    {
+                        'type': 'value',
+                        'key': 'StageName',
+                        'value': 'c7n-test'
+                    }
+                ],
+                "actions": [
+                    {
+                        'type': 'delete',
+                    }
+                ]
+            },
+            session_factory=session_factory)
+        resources = p.run()
+        self.assertEqual(len(resources), 1)
+        with self.assertRaises(ClientError) as e:
+            client.get_stage(
+                ApiId=resources[0]['c7n:parent-id'],
+                StageName=resources[0]['StageName']
+            )
+        self.assertEqual(e.exception.response['Error']['Code'], 'NotFoundException')

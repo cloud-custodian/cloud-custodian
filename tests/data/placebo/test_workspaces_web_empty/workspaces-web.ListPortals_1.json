@@ -1,0 +1,31 @@
+{
+    "status_code": 200,
+    "data": {
+        "ResponseMetadata": {},
+        "portals": [
+            {
+                "authenticationType": "IAM_Identity_Center",
+                "browserType": "Chrome",
+                "creationDate": {
+                    "__class__": "datetime",
+                    "year": 2025,
+                    "month": 1,
+                    "day": 20,
+                    "hour": 11,
+                    "minute": 55,
+                    "second": 5,
+                    "microsecond": 347000
+                },
+                "displayName": "empty-portal",
+                "instanceType": "standard.regular",
+                "maxConcurrentSessions": 5,
+                "networkSettingsArn": "arn:aws:workspaces-web:us-east-1:644160558196:networkSettings/99993a01-2137-4f43-96b2-16261b96f5c9",
+                "portalArn": "arn:aws:workspaces-web:us-east-1:644160558196:portal/fd2b7f2f-18d7-4497-a1bf-f2348a9c8dea",
+                "portalEndpoint": "fd2b7f2f-18d7-4497-a1bf-f2348a9c8dea.workspaces-web.com",
+                "portalStatus": "Active",
+                "rendererType": "AppStream",
+                "userSettingsArn": "arn:aws:workspaces-web:us-east-1:644160558196:userSettings/f91a198e-9aea-44a5-9eac-9b3270b74782"
+            }
+        ]
+    }
+}

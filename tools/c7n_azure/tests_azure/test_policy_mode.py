@@ -4,7 +4,7 @@ from azure.mgmt.storage.models import StorageAccount
 from c7n_azure.constants import FUNCTION_EVENT_TRIGGER_MODE, FUNCTION_TIME_TRIGGER_MODE, \
     CONTAINER_EVENT_TRIGGER_MODE, CONTAINER_TIME_TRIGGER_MODE
 from c7n_azure.policy import AzureEventGridMode, AzureFunctionMode, AzureModeCommon
-from mock import mock, patch, Mock
+from unittest import mock
 
 from c7n.config import Bag
 from c7n.exceptions import PolicyValidationError, PolicyExecutionError
@@ -474,7 +474,8 @@ class AzurePolicyModeTest(BaseTest):
             # verify the advanced filter created
             event_filter = args[4].advanced_filters[0]
             self.assertEqual(event_filter.key, 'Data.OperationName')
-            self.assertEqual(event_filter.values, ['Microsoft.Compute/virtualMachines/write'])
+            self.assertEqual(event_filter.values_property,
+                             ['Microsoft.Compute/virtualMachines/write'])
             self.assertEqual(event_filter.operator_type, 'StringIn')
 
     def test_event_grid_mode_creates_advanced_filtered_subscription_with_multiple_events(self):
@@ -502,7 +503,7 @@ class AzurePolicyModeTest(BaseTest):
             # verify the advanced filter created
             event_filter = args[4].advanced_filters[0]
             self.assertEqual(event_filter.key, 'Data.OperationName')
-            self.assertEqual(event_filter.values,
+            self.assertEqual(event_filter.values_property,
                              ['Microsoft.Compute/virtualMachines/write',
                               'Microsoft.Compute/virtualMachines/powerOff/action'])
             self.assertEqual(event_filter.operator_type, 'StringIn')
@@ -533,7 +534,7 @@ class AzurePolicyModeTest(BaseTest):
 
     @arm_template('emptyrg.json')
     @cassette_name('resourcegroup')
-    @patch('c7n_azure.actions.delete.DeleteAction._process_resource')
+    @mock.patch('c7n_azure.actions.delete.DeleteAction._process_resource')
     def test_empty_group_function_event(self, mock_delete):
         p = self.load_policy({
             'name': 'test-azure-resource-group',
@@ -564,7 +565,7 @@ class AzurePolicyModeTest(BaseTest):
 
     @arm_template('emptyrg.json')
     @cassette_name('resourcegroup')
-    @patch('c7n_azure.actions.delete.DeleteAction._process_resource')
+    @mock.patch('c7n_azure.actions.delete.DeleteAction._process_resource')
     def test_empty_group_container_event(self, mock_delete):
         p = self.load_policy({
             'name': 'test-azure-resource-group',
@@ -587,6 +588,26 @@ class AzurePolicyModeTest(BaseTest):
         self.assertEqual(len(resources), 1)
         self.assertEqual(resources[0]['name'], 'test_emptyrg')
         self.assertTrue(mock_delete.called)
+
+    @arm_template('emptyrg.json')
+    @cassette_name('resourcegroup')
+    def test_empty_group_container_event_no_resources(self):
+        p = self.load_policy({
+            'name': 'test-azure-resource-group',
+            'mode':
+                {'type': CONTAINER_EVENT_TRIGGER_MODE,
+                 'events': ['ResourceGroupWrite']},
+            'resource': 'azure.resourcegroup',
+            'filters': [
+                {'type': 'value',
+                 'key': 'name',
+                 'op': 'eq',
+                 'value': 'not-there'}]})
+
+        event = AzurePolicyModeTest.get_sample_event()
+
+        resources = p.push(event, None)
+        assert resources is None
 
     @arm_template('emptyrg.json')
     def test_empty_group_container_scheduled(self):
@@ -613,7 +634,7 @@ class AzurePolicyModeTest(BaseTest):
         sr_id = nsg_id + '/securityRules/test-rule'
         string_as_is = 'as-is-for-armresource'
         resource_type = ''
-        policy = Mock()
+        policy = mock.Mock()
         policy.resource_manager.resource_type.resource_type = resource_type
 
         event = {'subject': rg_id}

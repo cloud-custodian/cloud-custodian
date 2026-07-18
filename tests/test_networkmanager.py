@@ -21,6 +21,27 @@ class TestNetworkManager(BaseTest):
         for r in resources:
             self.assertEqual(r["State"], "AVAILABLE")
             self.assertTrue(r["CoreNetworkArn"])
+            self.assertTrue("Edges" in r)
+            self.assertTrue("Segments" in r)
+
+    def test_list_core_networks_filter_out_shared_ram_networks(self):
+        # Test Core Networks shared from RAM are filtered out
+        # The test data has 2 Core Networks, one of which is shared from RAM
+        # Shared networks are detected by the 'OwnerAccountId' field
+        session_factory = self.replay_flight_data(
+            "test_networkmanager_core_networks_exclude_ram")
+        p = self.load_policy(
+            {
+                "name": "list-core-networks-verify-exclude-ram",
+                "resource": "networkmanager-core",
+            },
+            session_factory=session_factory,
+        )
+        resources = p.run()
+        self.assertEqual(len(resources), 1)
+
+        for r in resources:
+            self.assertNotEqual(r['OwnerAccountId'], '123456789012')
 
     def test_describe_global_networks(self):
         session_factory = self.replay_flight_data("test_networkmanager_describe_global_networks")

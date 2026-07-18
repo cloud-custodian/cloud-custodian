@@ -1,0 +1,11 @@
+{
+    "status_code": 401,
+    "data": {
+        "Error": {
+            "Message": "Operation is disabled for STANDARD Edition. ",
+            "Code": "AccessDeniedException"
+        },
+        "ResponseMetadata": {},
+        "Message": "Operation is disabled for STANDARD Edition. "
+    }
+}

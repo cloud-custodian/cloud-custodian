@@ -1,0 +1,14 @@
+{
+    "status_code": 200,
+    "data": {
+        "ResponseMetadata": {},
+        "EmailIdentities": [
+            {
+                "IdentityType": "DOMAIN",
+                "IdentityName": "c7n-test.com",
+                "SendingEnabled": false,
+                "VerificationStatus": "PENDING"
+            }
+        ]
+    }
+}

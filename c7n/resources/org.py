@@ -75,7 +75,7 @@ class OrgPolicy(QueryResourceManager, OrgAccess):
         enum_spec = ("list_policies", "Policies", None)
         global_resource = True
         permissions_augment = ("organizations:ListTagsForResource",)
-        universal_augment = object()
+        universal_taggable = object()
 
     def resources(self, query=None):
         q = self.parse_query()
@@ -148,7 +148,7 @@ class OrgUnit(QueryResourceManager):
             "organizations:DescribeOrganizationalUnit",
             "organizations:ListTagsForResource",
         )
-        universal_augment = object()
+        universal_taggable = object()
 
     source_mapping = {"describe": DescribeUnit}
 
@@ -164,7 +164,7 @@ class OrgAccount(QueryResourceManager, OrgAccess):
         enum_spec = ("list_accounts", "Accounts", None)
         global_resource = True
         permissions_augment = ("organizations:ListTagsForResource",)
-        universal_augment = object()
+        universal_taggable = object()
 
     org_session = None
 

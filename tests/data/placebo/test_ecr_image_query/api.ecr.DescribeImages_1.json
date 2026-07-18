@@ -1,0 +1,28 @@
+{
+    "status_code": 200,
+    "data": {
+        "imageDetails": [
+            {
+                "registryId": "11111111111",
+                "repositoryName": "c7n-test",
+                "imageDigest": "sha256:1efe7a31d4efda630d96685b336815bb1c1b620416fbc0de3a61acf0f861d239",
+                "imageTags": [
+                    "latest"
+                ],
+                "imageSizeInBytes": 8106854,
+                "imagePushedAt": {
+                    "__class__": "datetime",
+                    "year": 2018,
+                    "month": 10,
+                    "day": 18,
+                    "hour": 12,
+                    "minute": 32,
+                    "second": 40,
+                    "microsecond": 0
+                },
+                "imageManifestMediaType": "application/vnd.docker.distribution.manifest.v2+json"
+            }
+        ],
+        "ResponseMetadata": {}
+    }
+}

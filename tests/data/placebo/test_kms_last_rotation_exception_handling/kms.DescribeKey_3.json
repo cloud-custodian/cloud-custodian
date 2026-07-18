@@ -1,0 +1,34 @@
+{
+    "status_code": 200,
+    "data": {
+        "KeyMetadata": {
+            "AWSAccountId": "644160558196",
+            "KeyId": "e95331d7-c3c3-403c-bad5-917d6ab53d5d",
+            "Arn": "arn:aws:kms:us-east-1:644160558196:key/e95331d7-c3c3-403c-bad5-917d6ab53d5d",
+            "CreationDate": {
+                "__class__": "datetime",
+                "year": 2022,
+                "month": 3,
+                "day": 12,
+                "hour": 9,
+                "minute": 38,
+                "second": 11,
+                "microsecond": 610000
+            },
+            "Enabled": true,
+            "Description": "Default key that protects my ACM private keys when no other key is defined",
+            "KeyUsage": "ENCRYPT_DECRYPT",
+            "KeyState": "Enabled",
+            "Origin": "AWS_KMS",
+            "KeyManager": "AWS",
+            "CustomerMasterKeySpec": "SYMMETRIC_DEFAULT",
+            "KeySpec": "SYMMETRIC_DEFAULT",
+            "EncryptionAlgorithms": [
+                "SYMMETRIC_DEFAULT"
+            ],
+            "MultiRegion": false,
+            "CurrentKeyMaterialId": "4de315f055719112778c94529d7689a3291565ee87cd6ba94a186913a959eeec"
+        },
+        "ResponseMetadata": {}
+    }
+}

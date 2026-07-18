@@ -13,6 +13,7 @@ from c7n.filters import CrossAccountAccessFilter, ValueFilter, Filter
 from c7n.filters.costhub import CostHubRecommendation
 from c7n.filters.kms import KmsRelatedFilter
 import c7n.filters.vpc as net_filters
+import c7n.filters.iamrole as iam_filters
 from c7n.manager import resources
 from c7n import query, utils
 from c7n.resources.aws import shape_validate
@@ -113,11 +114,56 @@ class VpcFilter(net_filters.VpcFilter):
 AWSLambda.filter_registry.register('network-location', net_filters.NetworkLocation)
 
 
+@AWSLambda.filter_registry.register('iam-role')
+class LambdaIamRoleFilter(iam_filters.IamRoleFilter):
+
+    RelatedIdsExpression = "Role"
+
+    def get_related_ids(self, resources):
+        """Override to extract role names from role ARNs."""
+        role_arns = super().get_related_ids(resources)
+        # Extract role name (last part after last /) from ARN
+        # ARN format: arn:aws:iam::123456789012:role/path/RoleName
+        return {arn.rsplit('/', 1)[-1] for arn in role_arns if arn}
+
+
+AWSLambda.filter_registry.register('iam-role-tag-mirror', iam_filters.IamRoleTagMirror)
+
+
 @AWSLambda.filter_registry.register('check-permissions')
 class LambdaPermissions(CheckPermissions):
 
     def get_iam_arns(self, resources):
         return [r['Role'] for r in resources]
+
+
+@AWSLambda.filter_registry.register('url-config')
+class URLConfig(ValueFilter):
+
+    annotation_key = "c7n:UrlConfig"
+    schema = type_schema('url-config', rinherit=ValueFilter.schema)
+    schema_alias = False
+    permissions = ('lambda:GetFunctionUrlConfig',)
+
+    def process(self, resources, event=None):
+        client = local_session(self.manager.session_factory).client('lambda')
+
+        def _augment(r):
+            try:
+                r[self.annotation_key] = self.manager.retry(
+                    client.get_function_url_config, FunctionName=r['FunctionArn'])
+                r[self.annotation_key].pop('ResponseMetadata')
+            except client.exceptions.ResourceNotFoundException:
+                r[self.annotation_key] = {}
+            return r
+
+        with self.executor_factory(max_workers=2) as w:
+            resources = list(filter(None, w.map(_augment, resources)))
+
+        return super().process(resources, event)
+
+    def __call__(self, i):
+        return super().__call__(i[self.annotation_key])
 
 
 @AWSLambda.filter_registry.register('reserved-concurrency')
@@ -152,7 +198,7 @@ class ReservedConcurrency(ValueFilter):
 
         with self.executor_factory(max_workers=3) as w:
             resources = list(filter(None, w.map(_augment, resources)))
-            return super(ReservedConcurrency, self).process(resources, event)
+        return super(ReservedConcurrency, self).process(resources, event)
 
 
 def get_lambda_policies(client, executor_factory, resources, log):
@@ -345,6 +391,7 @@ class UpdateLambda(Action):
 
         for r in resources:
             params = self.get_parameters(r)
+            params.pop('FunctionName', None)
             try:
                 retry(
                     client.update_function_configuration,
@@ -456,7 +503,9 @@ class LambdaPostFinding(PostFinding):
             r['Layers'] = {
                 'Arn': r['Layers'][0]['Arn'],
                 'CodeSize': r['Layers'][0]['CodeSize']}
-        details.get('VpcConfig', {}).pop('VpcId', None)
+        if 'VpcConfig' in details:
+            details['VpcConfig'] = select_keys(
+                details['VpcConfig'], ['SecurityGroupIds', 'SubnetIds'])
 
         if 'Code' in r and r['Code'].get('RepositoryType') == "S3":
             parsed = urlparse(r['Code']['Location'])
@@ -506,7 +555,7 @@ class VersionTrim(Action):
     schema = type_schema(
         'trim-versions',
         **{'exclude-aliases': {'default': True, 'type': 'boolean'},
-           'retain-latest': {'default': True, 'type': 'boolean'},
+           'retain-latest': {'default': False, 'type': 'boolean'},
            'older-than': {'type': 'number'}})
 
     def process(self, resources):
@@ -958,3 +1007,35 @@ class LambdaEdgeFilter(Filter):
             elif (r['FunctionArn'] not in lambda_edge_cf_map and not self.data.get('state')):
                 results.append(r)
         return results
+
+
+class DescribeEventSourceMappings(query.DescribeSource):
+
+    def augment(self, resources):
+        return universal_augment(
+            self.manager,
+            super(DescribeEventSourceMappings, self).augment(resources))
+
+
+@resources.register('lambda-event-source-mapping')
+class LambdaEventSourceMapping(query.QueryResourceManager):
+
+    class resource_type(query.TypeInfo):
+        service = 'lambda'
+        enum_spec = ('list_event_source_mappings', 'EventSourceMappings', None)
+        detail_spec = ('get_event_source_mapping', 'UUID', 'UUID', None)
+        name = id = 'UUID'
+        arn = "EventSourceMappingArn"
+        cfn_type = 'AWS::Lambda::EventSourceMapping'
+        permissions_augment = ("lambda:ListEventSourceMappings", "lambda:GetEventSourceMapping",
+                                 "lambda:ListTags")
+        universal_taggable = object
+
+    source_mapping = {
+        'describe': DescribeEventSourceMappings,
+    }
+
+
+@LambdaEventSourceMapping.filter_registry.register('kms-key')
+class KmsEventSourceMappingFilter(KmsRelatedFilter):
+    RelatedIdsExpression = 'KMSKeyArn'

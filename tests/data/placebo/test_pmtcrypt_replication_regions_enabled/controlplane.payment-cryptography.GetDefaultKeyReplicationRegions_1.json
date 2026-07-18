@@ -1,0 +1,9 @@
+{
+    "status_code": 200,
+    "data": {
+        "EnabledReplicationRegions": [
+            "us-west-2"
+        ],
+        "ResponseMetadata": {}
+    }
+}

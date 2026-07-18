@@ -1,0 +1,34 @@
+{
+    "status_code": 200,
+    "data": {
+        "items": [
+            {
+                "id": "22amz1ocng",
+                "name": "test-db",
+                "arn": "arn:aws:timestream-influxdb:us-east-1:644160558196:db-instance/22amz1ocng",
+                "status": "AVAILABLE",
+                "endpoint": "22amz1ocng-kx3to6fbi4fumn.timestream-influxdb.us-east-1.on.aws",
+                "port": 8086,
+                "networkType": "IPV4",
+                "dbInstanceType": "db.influx.medium",
+                "dbStorageType": "InfluxIOIncludedT1",
+                "allocatedStorage": 20,
+                "deploymentType": "SINGLE_AZ"
+            },
+            {
+                "id": "m05xvo3vz8",
+                "name": "test-db-2",
+                "arn": "arn:aws:timestream-influxdb:us-east-1:644160558196:db-instance/m05xvo3vz8",
+                "status": "AVAILABLE",
+                "endpoint": "m05xvo3vz8-kx3to6fbi4fumn.timestream-influxdb.us-east-1.on.aws",
+                "port": 8086,
+                "networkType": "IPV4",
+                "dbInstanceType": "db.influx.medium",
+                "dbStorageType": "InfluxIOIncludedT1",
+                "allocatedStorage": 20,
+                "deploymentType": "SINGLE_AZ"
+            }
+        ],
+        "ResponseMetadata": {}
+    }
+}
