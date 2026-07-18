@@ -2,7 +2,7 @@
     "status_code": 200,
     "data": {
         "Key": {
-            "KeyArn": "arn:aws:payment-cryptography:us-east-1:111111111111:key/cdulc4swo525afbk",
+            "KeyArn": "arn:aws:payment-cryptography:us-east-1:111111111111:key/abcdegxuedzuzbwn",
             "KeyAttributes": {
                 "KeyUsage": "TR31_P0_PIN_ENCRYPTION_KEY",
                 "KeyClass": "SYMMETRIC_KEY",

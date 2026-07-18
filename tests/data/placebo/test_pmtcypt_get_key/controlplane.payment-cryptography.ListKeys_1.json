@@ -3,7 +3,7 @@
     "data": {
         "Keys": [
             {
-                "KeyArn": "arn:aws:payment-cryptography:us-east-1:111111111111:key/cdulc4swo525afbk",
+                "KeyArn": "arn:aws:payment-cryptography:us-east-1:111111111111:key/abcdegxuedzuzbwn",
                 "KeyState": "CREATE_COMPLETE",
                 "KeyAttributes": {
                     "KeyUsage": "TR31_P0_PIN_ENCRYPTION_KEY",
