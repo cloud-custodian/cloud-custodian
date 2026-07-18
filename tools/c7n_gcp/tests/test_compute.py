@@ -198,7 +198,7 @@ class InstanceTest(BaseTest):
         self.assertEqual(len(resources), 1)
 
     def test_filter_boot_disk_source_image(self):
-        project_id = 'custodian-testing-439216'
+        project_id = self.project_id
         factory = self.record_flight_data('boot-disk-source-image', project_id=project_id)
         p = self.load_policy(
             {'name': 'boot-disk-source-image',
