@@ -832,6 +832,19 @@ class TestMarkedForAction(BaseFilterTest):
         ]:
             self.assertFilter({"type": "marked-for-op"}, ii, v)
 
+    def test_filter_unparseable_date_without_instance_id(self):
+        # marked-for-op is registered on many non-ec2 resources whose id key
+        # is not InstanceId. An unparseable date on such a resource should be
+        # logged and skipped, not raise KeyError('InstanceId').
+        resource = {
+            "Name": "my-secret",
+            "Tags": [
+                {"Key": "maid_status", "Value": "does not meet policy: stop@notadate"}
+            ],
+        }
+        f = filters.factory({"type": "marked-for-op", "op": "stop"})
+        self.assertFalse(f(resource))
+
 
 class EventFilterTest(BaseFilterTest):
 

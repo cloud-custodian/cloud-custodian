@@ -2,7 +2,7 @@
 # SPDX-License-Identifier: Apache-2.0
 
 from gcp_common import BaseTest, event_data
-from c7n.testing import C7N_FUNCTIONAL
+from c7n.exceptions import PolicyValidationError
 from c7n_gcp.client import get_default_project
 from c7n_gcp.filters.recommender import RecommenderFilter
 from unittest.mock import patch
@@ -215,15 +215,81 @@ class BigQueryTableTest(BaseTest):
         self.assertEqual(result['labels']['env'], 'not-the-default')
 
 
+def test_dataset_update_validation_error(test):
+    with test.assertRaisesRegex(
+        PolicyValidationError,
+        "policy:bq-dataset-update-invalid action:update "
+        "requires at least one mutable dataset field"
+    ):
+        test.load_policy(
+            {
+                'name': 'bq-dataset-update-invalid',
+                'resource': 'gcp.bq-dataset',
+                'actions': [{'type': 'update'}]
+            }
+        )
+
+
+@terraform("bigquery")
+def test_dataset_update(test, bigquery):
+    project_id = get_default_project()
+    dataset_id = 'c7n_bq_dataset'
+
+    session_factory = test.replay_flight_data(
+        'bq-dataset-update', project_id=project_id)
+
+    policy = test.load_policy(
+        {
+            'name': 'bq-dataset-update-access',
+            'resource': 'gcp.bq-dataset',
+            # Use BigQuery server-side dataset filter to avoid listing/augmenting
+            # unrelated monitoring datasets in recordings.
+            'query': [{'filter': 'labels.c7n_test_update:bq_dataset_update'}],
+            'filters': [{
+                'type': 'value',
+                'key': 'datasetReference.datasetId',
+                'value': dataset_id
+            }],
+            'actions': [{
+                'type': 'update',
+                'access': [
+                    {'role': 'READER', 'specialGroup': 'projectReaders'},
+                    {'role': 'WRITER', 'specialGroup': 'projectWriters'},
+                    {'role': 'OWNER', 'specialGroup': 'projectOwners'}
+                ]
+            }]
+        },
+        session_factory=session_factory
+    )
+
+    resources = policy.run()
+    test.assertEqual(len(resources), 1)
+
+    client = policy.resource_manager.get_client()
+    result = client.execute_query(
+        'get',
+        {'projectId': project_id, 'datasetId': dataset_id}
+    )
+    test.assertEqual(result['datasetReference']['datasetId'], dataset_id)
+    expected_access = {
+        ('READER', 'projectReaders'),
+        ('WRITER', 'projectWriters'),
+        ('OWNER', 'projectOwners'),
+    }
+    actual_access = {
+        (entry.get('role'), entry.get('specialGroup'))
+        for entry in result.get('access', [])
+        if 'specialGroup' in entry
+    }
+    test.assertEqual(actual_access, expected_access)
+
+
 @terraform("bigquery")
 def test_table_recommend_partition_cluster_permissions(test, bigquery):
     project_id = get_default_project()
-    if C7N_FUNCTIONAL:
-        session_factory = test.record_flight_data(
-            'bq-table-recommend-partition-cluster', project_id=project_id)
-    else:
-        session_factory = test.replay_flight_data(
-            'bq-table-recommend-partition-cluster', project_id=project_id)
+    session_factory = test.replay_flight_data(
+        'bq-table-recommend-partition-cluster', project_id=project_id)
+
     # Baseline state prior to policy run:
     baseline_policy = test.load_policy(
         {
