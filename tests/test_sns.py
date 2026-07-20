@@ -787,6 +787,23 @@ class TestSNS(BaseTest):
             rfinding['Details']['AwsSnsTopic'],
             'AwsSnsTopicDetails', 'securityhub')
 
+    @moto.mock_aws
+    def test_sns_topic_get_resources(self):
+        # Event mode / related-resource lookups resolve topics by arn. This
+        # should fetch attributes directly (no account-wide list_topics) and
+        # drop arns that no longer exist rather than failing the whole set.
+        client = boto3.client('sns', region_name='us-east-1')
+        arn = client.create_topic(Name='present')['TopicArn']
+        missing = arn.rsplit(':', 1)[0] + ':gone'
+        p = self.load_policy(
+            {'name': 'sns-get', 'resource': 'aws.sns'},
+            config={'region': 'us-east-1'})
+        resources = p.resource_manager.get_resources([arn, missing])
+        self.assertEqual([r['TopicArn'] for r in resources], [arn])
+        # attributes were augmented in, not just the stub arn
+        self.assertIn('Owner', resources[0])
+        self.assertIn('Tags', resources[0])
+
     def test_sns_config(self):
         session_factory = self.replay_flight_data("test_sns_config")
         p = self.load_policy(
