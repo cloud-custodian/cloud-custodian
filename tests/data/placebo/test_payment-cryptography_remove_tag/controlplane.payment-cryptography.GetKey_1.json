@@ -1,0 +1,58 @@
+{
+    "status_code": 200,
+    "data": {
+        "Key": {
+            "KeyArn": "arn:aws:payment-cryptography:us-east-1:111111111111:key/abcdegxuedzuzbwn",
+            "KeyAttributes": {
+                "KeyUsage": "TR31_P0_PIN_ENCRYPTION_KEY",
+                "KeyClass": "SYMMETRIC_KEY",
+                "KeyAlgorithm": "TDES_2KEY",
+                "KeyModesOfUse": {
+                    "Encrypt": true,
+                    "Decrypt": true,
+                    "Wrap": true,
+                    "Unwrap": true,
+                    "Generate": false,
+                    "Sign": false,
+                    "Verify": false,
+                    "DeriveKey": false,
+                    "NoRestrictions": false
+                }
+            },
+            "KeyCheckValue": "C19C35",
+            "KeyCheckValueAlgorithm": "ANSI_X9_24",
+            "Enabled": true,
+            "Exportable": true,
+            "KeyState": "CREATE_COMPLETE",
+            "KeyOrigin": "AWS_PAYMENT_CRYPTOGRAPHY",
+            "CreateTimestamp": {
+                "__class__": "datetime",
+                "year": 2026,
+                "month": 7,
+                "day": 17,
+                "hour": 17,
+                "minute": 26,
+                "second": 42,
+                "microsecond": 431000
+            },
+            "UsageStartTimestamp": {
+                "__class__": "datetime",
+                "year": 2026,
+                "month": 7,
+                "day": 17,
+                "hour": 17,
+                "minute": 26,
+                "second": 42,
+                "microsecond": 163000
+            },
+            "MultiRegionKeyType": "PRIMARY",
+            "ReplicationStatus": {
+                "us-west-2": {
+                    "Status": "SYNCHRONIZED"
+                }
+            },
+            "UsingDefaultReplicationRegions": false
+        },
+        "ResponseMetadata": {}
+    }
+}
