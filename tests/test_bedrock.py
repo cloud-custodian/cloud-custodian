@@ -427,6 +427,34 @@ class BedrockCustomModel(BaseTest):
         self.assertEqual(len(tags), 1)
         self.assertEqual(tags, [{'key': 'foo', 'value': 'bar'}])
 
+    def test_bedrock_custom_model_deployments_filter_schema(self):
+        session_factory = self.replay_flight_data('test_bedrock_custom_model')
+        p = self.load_policy(
+            {
+                'name': 'bedrock-custom-model-no-active-deployment',
+                'resource': 'bedrock-custom-model',
+                'filters': [
+                    {'type': 'deployments', 'status': 'Active', 'value': 'absent'},
+                ],
+            },
+            session_factory=session_factory,
+        )
+        self.assertTrue(p)
+
+    def test_bedrock_custom_model_provisioned_throughputs_filter_schema(self):
+        session_factory = self.replay_flight_data('test_bedrock_custom_model')
+        p = self.load_policy(
+            {
+                'name': 'bedrock-custom-model-no-provisioned-throughput',
+                'resource': 'bedrock-custom-model',
+                'filters': [
+                    {'type': 'provisioned-throughputs', 'status': 'InService', 'value': 'absent'},
+                ],
+            },
+            session_factory=session_factory,
+        )
+        self.assertTrue(p)
+
     def test_bedrock_custom_model_delete(self):
         session_factory = self.replay_flight_data('test_bedrock_custom_model_delete')
         p = self.load_policy(
