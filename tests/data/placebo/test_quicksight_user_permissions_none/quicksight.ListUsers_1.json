@@ -5,8 +5,8 @@
         "Status": 200,
         "UserList": [
             {
-                "Arn": "arn:aws:quicksight:us-east-1:644160558196:user/default/AWS-Developer/abc123",
-                "UserName": "AWS-Developer/abc123",
+                "Arn": "arn:aws:quicksight:us-east-1:644160558196:user/default/AWSReservedSSO_Org003/abc123",
+                "UserName": "AWSReservedSSO_Org003/abc123",
                 "Email": "test@c7n.com",
                 "Role": "ADMIN_PRO",
                 "IdentityType": "IAM",
@@ -14,6 +14,6 @@
                 "PrincipalId": "federated/iam/AROA3FLD2ZISAQPHZK4RY:abc123"
             }
         ],
-        "RequestId": "34fd5b6a-4aca-48d9-970d-6a3cb0523a44"
+        "RequestId": "861348c4-fe2c-4e59-a62f-3a151150cff7"
     }
 }
