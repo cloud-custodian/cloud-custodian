@@ -2,7 +2,7 @@
     "status_code": 200,
     "data": {
         "ResponseMetadata": {},
-        "policy": "{\n  \"Version\" : \"2012-10-17\",\n  \"Statement\" : [ {\n    \"Sid\" : \"Statement\",\n    \"Effect\" : \"Allow\",\n    \"Principal\" : {\n      \"AWS\" : [ \"arn:aws:iam::123456789012:root\", \"arn:aws:iam::210987654321:root\" ]\n    },\n    \"Action\" : \"dsql:*\",\n    \"Resource\" : \"*\"\n  } ]\n}",
-        "policyVersion": "1783369373903"
+        "policy": "{\n  \"Version\" : \"2012-10-17\",\n  \"Statement\" : [ {\n    \"Sid\" : \"Statement\",\n    \"Effect\" : \"Allow\",\n    \"Principal\" : {\n      \"AWS\" : [ \"arn:aws:iam::644160558196:root\", \"arn:aws:iam::123456789012:root\" ]\n    },\n    \"Action\" : \"dsql:*\",\n    \"Resource\" : \"*\"\n  } ]\n}",
+        "policyVersion": "1784571656406"
     }
 }

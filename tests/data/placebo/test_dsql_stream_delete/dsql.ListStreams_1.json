@@ -4,18 +4,18 @@
         "ResponseMetadata": {},
         "streams": [
             {
-                "clusterIdentifier": "pvt44rmk6jn4fqz6woxye4lrfe",
-                "streamIdentifier": "2bt44r5uwqljyipe7vnatvofiy",
-                "arn": "arn:aws:dsql:us-east-1:123456789012:cluster/pvt44rmk6jn4fqz6woxye4lrfe/stream/2bt44r5uwqljyipe7vnatvofiy",
+                "clusterIdentifier": "y5t6ak7knpdufei7vlyn7npruu",
+                "streamIdentifier": "mzt6amh3gl5dssqny7fklj4scm",
+                "arn": "arn:aws:dsql:us-east-1:644160558196:cluster/y5t6ak7knpdufei7vlyn7npruu/stream/mzt6amh3gl5dssqny7fklj4scm",
                 "creationTime": {
                     "__class__": "datetime",
                     "year": 2026,
                     "month": 7,
-                    "day": 6,
-                    "hour": 16,
-                    "minute": 29,
-                    "second": 9,
-                    "microsecond": 409000
+                    "day": 20,
+                    "hour": 14,
+                    "minute": 22,
+                    "second": 31,
+                    "microsecond": 810000
                 },
                 "status": "ACTIVE"
             }

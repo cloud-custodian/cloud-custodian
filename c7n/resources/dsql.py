@@ -8,11 +8,11 @@ from c7n.manager import resources
 from c7n.query import (
     ChildDescribeSource,
     ChildResourceManager,
-    DescribeSource,
+    DescribeWithResourceTags,
     QueryResourceManager,
     TypeInfo,
 )
-from c7n.tags import RemoveTag, Tag, TagActionFilter, TagDelayedAction
+from c7n.tags import RemoveTag, Tag, TagActionFilter, TagDelayedAction, universal_augment
 from c7n.utils import get_retry, local_session, type_schema
 
 
@@ -21,17 +21,6 @@ dsql_retry = get_retry((
     'InternalServerException',
     'ConflictException',
 ))
-
-
-def _tags_to_list(r):
-    r['Tags'] = [{'Key': k, 'Value': v} for k, v in (r.pop('tags', None) or {}).items()]
-    return r
-
-
-class DescribeCluster(DescribeSource):
-
-    def augment(self, resources):
-        return [_tags_to_list(r) for r in super().augment(resources)]
 
 
 @resources.register('dsql-cluster')
@@ -60,7 +49,7 @@ class DsqlCluster(QueryResourceManager):
         date = 'creationTime'
 
     retry = staticmethod(dsql_retry)
-    source_mapping = {'describe': DescribeCluster}
+    source_mapping = {'describe': DescribeWithResourceTags}
 
 
 DsqlCluster.filter_registry.register('marked-for-op', TagActionFilter)
@@ -185,8 +174,8 @@ class DescribeStream(ChildDescribeSource):
                 continue
             detail.pop('ResponseMetadata', None)
             r.update(detail)
-            results.append(_tags_to_list(r))
-        return results
+            results.append(r)
+        return universal_augment(self.manager, results)
 
 
 @resources.register('dsql-stream')
