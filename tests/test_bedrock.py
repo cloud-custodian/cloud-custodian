@@ -1204,3 +1204,57 @@ def test_bedrock_inference_profile_metrics(test):
     test.assertEqual(len(resources), 1)
     test.assertTrue('c7n.metrics' in resources[0])
     test.assertTrue('AWS/Bedrock.InputTokenCount.Sum.1' in resources[0]['c7n.metrics'])
+
+
+def test_bedrock_provisioned_throughput(test):
+    session_factory = test.replay_flight_data(
+        'test_bedrock_provisioned_throughput',
+        region='us-east-2'
+    )
+    p = test.load_policy(
+        {
+            'name': 'bedrock-provisioned-throughput',
+            'resource': 'aws.bedrock-provisioned-throughput',
+            'filters': [
+                {'type': 'value', 'key': 'status', 'value': 'InService'},
+                {'tag:App': 'Project1'},
+            ],
+        },
+        session_factory=session_factory,
+    )
+    resources = p.run()
+    test.assertEqual(len(resources), 1)
+    test.assertEqual(
+        resources[0]['provisionedModelArn'],
+        'arn:aws:bedrock:us-east-2:644160558196:provisioned-model/9k2m1x3z7a2b',
+    )
+
+
+def test_bedrock_provisioned_throughput_metrics_filter(test):
+    session_factory = test.replay_flight_data(
+        'test_bedrock_provisioned_throughput_metrics_filter',
+        region='us-east-2'
+    )
+    p = test.load_policy(
+        {
+            'name': 'bedrock-provisioned-throughput-metrics-filter',
+            'resource': 'aws.bedrock-provisioned-throughput',
+            'filters': [
+                {
+                    'type': 'metrics',
+                    'namespace': 'AWS/Bedrock',
+                    'name': 'Invocations',
+                    'statistics': 'Sum',
+                    'days': 14,
+                    'period': 86400,
+                    'op': 'eq',
+                    'value': 0,
+                    'missing-value': 0,
+                }
+            ],
+        },
+        session_factory=session_factory,
+    )
+    resources = p.run()
+    test.assertEqual(len(resources), 1)
+    test.assertTrue('c7n.metrics' in resources[0])

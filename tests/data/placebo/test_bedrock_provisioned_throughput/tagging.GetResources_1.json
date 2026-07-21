@@ -1,0 +1,18 @@
+{
+    "status_code": 200,
+    "data": {
+        "PaginationToken": "",
+        "ResourceTagMappingList": [
+            {
+                "ResourceARN": "arn:aws:bedrock:us-east-2:644160558196:provisioned-model/9k2m1x3z7a2b",
+                "Tags": [
+                    {
+                        "Key": "App",
+                        "Value": "Project1"
+                    }
+                ]
+            }
+        ],
+        "ResponseMetadata": {}
+    }
+}

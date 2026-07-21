@@ -1,0 +1,49 @@
+{
+    "status_code": 200,
+    "data": {
+        "ResponseMetadata": {},
+        "provisionedModelSummaries": [
+            {
+                "provisionedModelName": "my-provisioned-model",
+                "provisionedModelArn": "arn:aws:bedrock:us-east-2:644160558196:provisioned-model/9k2m1x3z7a2b",
+                "modelArn": "arn:aws:bedrock:us-east-2::foundation-model/anthropic.claude-sonnet-4-20250514-v1:0",
+                "desiredModelArn": "arn:aws:bedrock:us-east-2::foundation-model/anthropic.claude-sonnet-4-20250514-v1:0",
+                "foundationModelArn": "arn:aws:bedrock:us-east-2::foundation-model/anthropic.claude-sonnet-4-20250514-v1:0",
+                "modelUnits": 1,
+                "desiredModelUnits": 1,
+                "status": "InService",
+                "commitmentDuration": "OneMonth",
+                "commitmentExpirationTime": {
+                    "__class__": "datetime",
+                    "year": 2026,
+                    "month": 8,
+                    "day": 14,
+                    "hour": 19,
+                    "minute": 14,
+                    "second": 21,
+                    "microsecond": 0
+                },
+                "creationTime": {
+                    "__class__": "datetime",
+                    "year": 2026,
+                    "month": 5,
+                    "day": 12,
+                    "hour": 19,
+                    "minute": 14,
+                    "second": 21,
+                    "microsecond": 0
+                },
+                "lastModifiedTime": {
+                    "__class__": "datetime",
+                    "year": 2026,
+                    "month": 5,
+                    "day": 12,
+                    "hour": 19,
+                    "minute": 14,
+                    "second": 21,
+                    "microsecond": 0
+                }
+            }
+        ]
+    }
+}

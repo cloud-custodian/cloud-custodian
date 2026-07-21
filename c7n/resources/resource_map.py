@@ -42,6 +42,8 @@ ResourceMap = {
   "aws.bedrock-foundation-model": "c7n.resources.bedrock.BedrockFoundationModel",
   "aws.bedrock-knowledge-base": "c7n.resources.bedrock.BedrockKnowledgeBase",
   "aws.bedrock-model-invocation-job": "c7n.resources.bedrock.BedrockModelInvocationJob",
+  "aws.bedrock-provisioned-throughput":
+    "c7n.resources.bedrock.BedrockProvisionedThroughput",
   "aws.budget": "c7n.resources.budgets.Budget",
   "aws.cache-cluster": "c7n.resources.elasticache.ElastiCacheCluster",
   "aws.cache-snapshot": "c7n.resources.elasticache.ElastiCacheSnapshot",

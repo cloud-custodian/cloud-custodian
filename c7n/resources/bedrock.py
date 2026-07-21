@@ -823,6 +823,51 @@ class InferenceProfileMetrics(MetricsFilter):
         return [{'Name': 'ModelId', 'Value': resource['inferenceProfileId']}]
 
 
+@resources.register('bedrock-provisioned-throughput')
+class BedrockProvisionedThroughput(QueryResourceManager):
+    """AWS Bedrock Provisioned Throughput
+
+    :example:
+
+    .. code-block:: yaml
+
+        policies:
+          - name: bedrock-provisioned-throughput-zero-invocations
+            resource: aws.bedrock-provisioned-throughput
+            filters:
+              - type: value
+                key: status
+                value: InService
+              - type: metrics
+                namespace: AWS/Bedrock
+                name: Invocations
+                statistics: Sum
+                days: 14
+                period: 86400
+                op: eq
+                value: 0
+                missing-value: 0
+    """
+    class resource_type(TypeInfo):
+        service = 'bedrock'
+        enum_spec = ('list_provisioned_model_throughputs',
+                     'provisionedModelSummaries', None)
+        name = 'provisionedModelName'
+        id = arn = 'provisionedModelArn'
+        arn_type = 'provisioned-model-throughput'
+        permission_prefix = 'bedrock'
+        universal_taggable = object()
+        permissions_augment = ("bedrock:ListTagsForResource",)
+
+    augment = universal_augment
+
+
+@BedrockProvisionedThroughput.filter_registry.register('metrics')
+class ProvisionedThroughputMetrics(MetricsFilter):
+    def get_dimensions(self, resource):
+        return [{'Name': 'ModelId', 'Value': resource['provisionedModelArn']}]
+
+
 @resources.register('bedrock-guardrail')
 class BedrockGuardrail(QueryResourceManager):
     class resource_type(TypeInfo):
