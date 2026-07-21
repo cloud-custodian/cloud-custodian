@@ -286,8 +286,9 @@ class KafkaTest(BaseTest):
 
         # Verify that policy is None and no UnboundLocalError is raised
         self.assertIsNone(policy)
-        # Verify that the policy annotation is not set when policy is not found
-        self.assertNotIn('c7n:Policy', test_resource)
+        # Verify that the policy annotation is set to None when policy is not found
+        self.assertIn('c7n:Policy', test_resource)
+        self.assertIsNone(test_resource['c7n:Policy'])
 
 
 class TestKafkaClusterConfiguration(BaseTest):
