@@ -327,9 +327,15 @@ class DeleteEMRSecurityConfiguration(BaseAction):
 class DescribeEMRServerlessApp(DescribeSource):
 
     def augment(self, resources):
-        return universal_augment(
-            self.manager,
-            super().augment(resources))
+        resources = super().augment(resources)
+        client = local_session(self.manager.session_factory).client('emr-serverless')
+        results = []
+        for r in resources:
+            detail = self.manager.retry(
+                client.get_application, applicationId=r['id'])['application']
+            r.update(detail)
+            results.append(r)
+        return universal_augment(self.manager, results)
 
 
 @resources.register('emr-serverless-app')
@@ -346,6 +352,7 @@ class EMRServerless(QueryResourceManager):
         id = 'id'
         date = "createdAt"
         cfn_type = 'AWS::EMRServerless::Application'
+        permissions_augment = ('emr-serverless:GetApplication',)
 
     source_mapping = {
         'describe': DescribeEMRServerlessApp,

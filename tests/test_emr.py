@@ -305,6 +305,27 @@ class TestEMRServerless(BaseTest):
         applications = client.list_applications()['applications']
         self.assertEqual(len(applications), 0)
 
+    def test_emr_serverless_augment(self):
+        session_factory = self.replay_flight_data("test_emr_serverless_augment")
+        p = self.load_policy(
+            {
+                "name": "emr-serverless-augment",
+                "resource": "aws.emr-serverless-app",
+                "filters": [
+                    {"type": "value",
+                     "key": "autoStopConfiguration.idleTimeoutMinutes",
+                     "value": 15}
+                ],
+            },
+            session_factory=session_factory,
+        )
+        resources = p.run()
+        self.assertEqual(len(resources), 1)
+        self.assertEqual(
+            resources[0]["autoStopConfiguration"],
+            {"enabled": True, "idleTimeoutMinutes": 15},
+        )
+
     def test_emr_serverless_markop(self):
         session_factory = self.replay_flight_data("test_emr_serverless_markop")
         p = self.load_policy(
