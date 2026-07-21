@@ -3,12 +3,12 @@
     "data": {
         "ResponseMetadata": {},
         "createdBy": "arn:aws:sts::644160558196:assumed-role/AWSReservedSSO_Org003-Developer_e3d7100119dd6aee/eah523",
-        "createdAt": 1783627530679,
+        "createdAt": 1784660047573,
         "lastModifiedBy": "arn:aws:sts::644160558196:assumed-role/AWSReservedSSO_Org003-Developer_e3d7100119dd6aee/eah523",
-        "lastModifiedAt": 1783627530679,
+        "lastModifiedAt": 1784660047573,
         "name": "DefaultInvestigationGroup",
-        "arn": "arn:aws:aiops:us-east-1:644160558196:investigation-group/ZOG2KR3l1xjgM56j",
-        "roleArn": "arn:aws:iam::644160558196:role/AIOpsRole-DefaultInvestigationGroup-8qvjyj",
+        "arn": "arn:aws:aiops:us-east-1:644160558196:investigation-group/zKIq4Uc78GVq3PFg",
+        "roleArn": "arn:aws:iam::644160558196:role/AIOpsRole-DefaultInvestigationGroup-d07fdn",
         "encryptionConfiguration": {
             "type": "AWS_OWNED_KEY"
         },

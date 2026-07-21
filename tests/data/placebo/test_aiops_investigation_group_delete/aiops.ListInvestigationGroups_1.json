@@ -4,7 +4,7 @@
         "ResponseMetadata": {},
         "investigationGroups": [
             {
-                "arn": "arn:aws:aiops:us-east-1:644160558196:investigation-group/ZOG2KR3l1xjgM56j",
+                "arn": "arn:aws:aiops:us-east-1:644160558196:investigation-group/T1ewGc2UhVD00Sjc",
                 "name": "DefaultInvestigationGroup"
             }
         ]

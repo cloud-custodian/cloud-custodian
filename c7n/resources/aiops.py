@@ -2,39 +2,15 @@
 # SPDX-License-Identifier: Apache-2.0
 
 from c7n.manager import resources
-from c7n.query import QueryResourceManager, TypeInfo, DescribeSource
+from c7n.query import QueryResourceManager, TypeInfo, DescribeWithResourceTags
 from c7n.tags import Tag, RemoveTag, TagActionFilter, TagDelayedAction
 from c7n.utils import local_session, type_schema, get_retry
 from c7n.actions import BaseAction
 
 
-class DescribeInvestigationGroup(DescribeSource):
-
-    def augment(self, resources):
-        resources = super().augment(resources)
-        client = local_session(self.manager.session_factory).client('aiops')
-        for r in resources:
-            tags = self.manager.retry(
-                client.list_tags_for_resource,
-                resourceArn=r['arn'],
-            ).get('tags', {})
-            r['Tags'] = [{'Key': k, 'Value': v} for k, v in tags.items()]
-        return resources
-
-
 @resources.register('aiops-investigation-group')
 class AIOpsInvestigationGroup(QueryResourceManager):
     """AWS AIOps Investigation Group
-
-    :example:
-
-    Find all investigation groups:
-
-    .. code-block:: yaml
-
-        policies:
-          - name: aiops-investigation-groups
-            resource: aws.aiops-investigation-group
 
     :example:
 
@@ -66,7 +42,7 @@ class AIOpsInvestigationGroup(QueryResourceManager):
         'InternalServerException',
     )))
 
-    source_mapping = {'describe': DescribeInvestigationGroup}
+    source_mapping = {'describe': DescribeWithResourceTags}
 
 
 @AIOpsInvestigationGroup.action_registry.register('tag')

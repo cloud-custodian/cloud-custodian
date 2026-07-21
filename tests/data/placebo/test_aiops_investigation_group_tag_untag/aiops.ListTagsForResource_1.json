@@ -2,6 +2,9 @@
     "status_code": 200,
     "data": {
         "ResponseMetadata": {},
-        "tags": {}
+        "tags": {
+            "test": "true",
+            "Env": "production"
+        }
     }
 }
