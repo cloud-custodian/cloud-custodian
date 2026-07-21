@@ -1,0 +1,49 @@
+{
+  "headers": {
+    "etag": "PMI-Crdv71g7cIeZHYd3tZxwjlA=/vP6Bz3HaDcVvWzriKJiqJG6MA68=",
+    "content-type": "application/json; charset=UTF-8",
+    "vary": "Origin, X-Origin, Referer",
+    "date": "Sun, 15 Mar 2026 19:22:43 GMT",
+    "server": "ESF",
+    "x-xss-protection": "0",
+    "x-frame-options": "SAMEORIGIN",
+    "x-content-type-options": "nosniff",
+    "alt-svc": "h3=\":443\"; ma=2592000,h3-29=\":443\"; ma=2592000",
+    "transfer-encoding": "chunked",
+    "status": "200",
+    "content-length": "1113",
+    "-content-encoding": "gzip",
+    "content-location": "https://compute.googleapis.com/compute/v1/projects/cloud-custodian/regions/us-central1/subnetworks/apparent-beetle-subnet?alt=json"
+  },
+  "body": {
+    "kind": "compute#subnetwork",
+    "id": "8594914635421497354",
+    "creationTimestamp": "2026-03-15T12:22:13.589-07:00",
+    "name": "apparent-beetle-subnet",
+    "network": "https://www.googleapis.com/compute/v1/projects/cloud-custodian/global/networks/apparent-beetle-vpc",
+    "ipCidrRange": "10.2.0.0/16",
+    "gatewayAddress": "10.2.0.1",
+    "region": "https://www.googleapis.com/compute/v1/projects/cloud-custodian/regions/us-central1",
+    "selfLink": "https://www.googleapis.com/compute/v1/projects/cloud-custodian/regions/us-central1/subnetworks/apparent-beetle-subnet",
+    "privateIpGoogleAccess": false,
+    "fingerprint": "_WooZcNuCJs=",
+    "allowSubnetCidrRoutesOverlap": false,
+    "enableFlowLogs": true,
+    "privateIpv6GoogleAccess": "DISABLE_GOOGLE_ACCESS",
+    "purpose": "PRIVATE",
+    "logConfig": {
+      "enable": true,
+      "aggregationInterval": "INTERVAL_5_SEC",
+      "flowSampling": 0.5,
+      "metadata": "CUSTOM_METADATA",
+      "metadataFields": [
+        "src_instance",
+        "dest_instance",
+        "src_vpc",
+        "dest_vpc"
+      ],
+      "filterExpr": "true"
+    },
+    "stackType": "IPV4_ONLY"
+  }
+}
