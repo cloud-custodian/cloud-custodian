@@ -3,6 +3,7 @@
 
 from c7n.manager import resources
 from c7n import query
+from c7n.filters import CrossAccountAccessFilter
 from c7n.utils import local_session, type_schema
 from c7n.tags import Tag, RemoveTag
 from c7n.actions import BaseAction
@@ -10,6 +11,7 @@ from c7n.actions import BaseAction
 
 class PmtcryptKeyDescribe(query.DescribeSource):
     def augment(self, pmt_crypt_keys):
+        pmt_crypt_keys = super().augment(pmt_crypt_keys)
         client = local_session(self.manager.session_factory).client('payment-cryptography')
         for r in pmt_crypt_keys:
             tags = client.list_tags_for_resource(ResourceArn=r["KeyArn"]).get('Tags', [])
@@ -31,6 +33,39 @@ class PmtcryptKey(query.QueryResourceManager):
             'KeyArn', 'Key')
 
     source_mapping = {"describe": PmtcryptKeyDescribe, }
+
+
+@PmtcryptKey.filter_registry.register('cross-account')
+class PmtcryptKeyCrossAccount(CrossAccountAccessFilter):
+    """Filter payment-cryptography-key by its resource based policy for
+    cross account access.
+
+    :example:
+
+    .. code-block:: yaml
+
+            policies:
+              - name: payment-cryptography-key-cross-account
+                resource: payment-cryptography-key
+                filters:
+                  - type: cross-account
+    """
+
+    policy_annotation = 'c7n:AccessPolicy'
+    permissions = ('payment-cryptography:GetResourcePolicy',)
+
+    def process(self, resources, event=None):
+        self.client = local_session(
+            self.manager.session_factory).client('payment-cryptography')
+        return super().process(resources, event)
+
+    def get_resource_policy(self, r):
+        if self.policy_annotation in r:
+            return r[self.policy_annotation]
+        result = self.manager.retry(
+            self.client.get_resource_policy, ResourceArn=r['KeyArn'])
+        r[self.policy_annotation] = p = result.get('Policy')
+        return p
 
 
 @PmtcryptKey.action_registry.register('tag')

@@ -16,7 +16,7 @@ dependencies = [
     "urllib3>2",
 ]
 name = "c7n"
-version = "0.9.51"
+version = "0.9.52"
 description = "Cloud Custodian - Policy Rules Engine"
 readme = "README.md"
 classifiers = [
