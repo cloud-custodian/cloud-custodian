@@ -1,0 +1,29 @@
+{
+  "headers": {
+    "content-type": "application/json; charset=UTF-8",
+    "vary": "Origin, X-Origin, Referer",
+    "date": "Tue, 10 Mar 2026 16:48:37 GMT",
+    "server": "ESF",
+    "x-xss-protection": "0",
+    "x-frame-options": "SAMEORIGIN",
+    "x-content-type-options": "nosniff",
+    "alt-svc": "h3=\":443\"; ma=2592000,h3-29=\":443\"; ma=2592000",
+    "transfer-encoding": "chunked",
+    "status": "400",
+    "content-length": "339",
+    "-content-encoding": "gzip"
+  },
+  "body": {
+    "error": {
+      "code": 400,
+      "message": "The field 'entity.managedZone.dnssecConfig.defaultKeySpecs' cannot be modified.",
+      "errors": [
+        {
+          "message": "The field 'entity.managedZone.dnssecConfig.defaultKeySpecs' cannot be modified.",
+          "domain": "global",
+          "reason": "immutableField"
+        }
+      ]
+    }
+  }
+}
