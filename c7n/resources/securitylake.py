@@ -4,7 +4,11 @@ from c7n.actions import BaseAction
 from c7n.manager import resources
 from c7n.query import QueryResourceManager, TypeInfo, DescribeSource
 from c7n.tags import RemoveTag, Tag, TagActionFilter, TagDelayedAction
-from c7n.utils import local_session, type_schema
+from c7n.utils import local_session, type_schema, get_retry
+
+
+securitylake_retry = get_retry(
+    ('ThrottlingException', 'InternalServerException', 'ConflictException'))
 
 
 class SecurityLakeDescribe(DescribeSource):
@@ -30,8 +34,13 @@ class SecurityLakeDataLake(QueryResourceManager):
     .. code-block:: yaml
 
         policies:
-          - name: security-lake-unencrypted
+          - name: security-lake-minimum-lifecycle
             resource: aws.security-lake
+            filter:
+            - type: value
+              key: lifecycleConfiguration.expiration.days
+              op: lt
+              value: 7
     """
 
     class resource_type(TypeInfo):
@@ -44,6 +53,7 @@ class SecurityLakeDataLake(QueryResourceManager):
         permissions_augment = ('securitylake:ListTagsForResource',)
 
     source_mapping = {'describe': SecurityLakeDescribe}
+    retry = staticmethod(securitylake_retry)
 
 
 @resources.register('security-lake-subscriber')
@@ -55,8 +65,13 @@ class SecurityLakeSubscriber(QueryResourceManager):
     .. code-block:: yaml
 
         policies:
-          - name: security-lake-subscribers
+          - name: security-lake-access-type
             resource: aws.security-lake-subscriber
+            filters:
+            - type: value
+              key: accessTypes
+              op: contains
+              value: LAKEFORMATION
     """
 
     class resource_type(TypeInfo):
@@ -71,6 +86,7 @@ class SecurityLakeSubscriber(QueryResourceManager):
         permissions_augment = ('securitylake:ListTagsForResource',)
 
     source_mapping = {'describe': SecurityLakeDescribe}
+    retry = staticmethod(securitylake_retry)
 
 
 @SecurityLakeDataLake.action_registry.register('tag')
