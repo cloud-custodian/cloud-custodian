@@ -10,7 +10,7 @@
             "releaseLabel": "emr-6.9.0",
             "type": "Spark",
             "state": "CREATED",
-            "stateDetails": "Application created by user",
+            "stateDetails": "Application created by user.",
             "createdAt": {
                 "__class__": "datetime",
                 "year": 2023,
