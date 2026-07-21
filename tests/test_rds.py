@@ -2198,6 +2198,37 @@ class RDSProxy(BaseTest):
         self.assertEqual(resources['DBProxies'][0]['DBProxyName'], 'proxy-test-1')
         self.assertEqual(resources['DBProxies'][0]['Status'], 'deleting')
 
+    def test_rds_proxy_modify(self):
+        session_factory = self.replay_flight_data('test_rds_proxy_modify')
+        p = self.load_policy(
+            {
+                'name': 'modify-rds-proxy',
+                'resource': 'aws.rds-proxy',
+                'filters': [
+                    {
+                        'type': 'value',
+                        'key': 'RequireTLS',
+                        'value': False,
+                    }
+                ],
+                'actions': [
+                    {
+                        'type': 'modify-db-proxy',
+                        'update': [
+                            {
+                                'property': 'RequireTLS',
+                                'value': True,
+                            }
+                        ],
+                    }
+                ],
+            },
+            session_factory=session_factory)
+        resources = p.run()
+        self.assertEqual(len(resources), 1)
+        self.assertEqual(resources[0]['DBProxyName'], 'proxy-test-1')
+        self.assertEqual(resources[0]['RequireTLS'], False)
+
     def test_rds_proxy_subnet_filter(self):
         session_factory = self.replay_flight_data("test_rds_proxy_subnet_filter")
         p = self.load_policy(
