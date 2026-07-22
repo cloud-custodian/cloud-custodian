@@ -49,6 +49,10 @@ class CloudWatchEvents:
             'ids': 'requestParameters.dBInstanceIdentifier',
             'source': 'rds.amazonaws.com'},
 
+        'CreateSecurityGroup': {
+            'ids': 'responseElements.groupId',
+            'source': 'ec2.amazonaws.com'},
+
         'CreateVolume': {
             'ids': 'responseElements.volumeId',
             'source': 'ec2.amazonaws.com'},
