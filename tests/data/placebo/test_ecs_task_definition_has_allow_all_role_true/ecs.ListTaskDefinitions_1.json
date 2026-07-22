@@ -1,0 +1,9 @@
+{
+    "status_code": 200,
+    "data": {
+        "taskDefinitionArns": [
+            "arn:aws:ecs:us-east-1:123456789012:task-definition/c7nfail1_service:21",
+            "arn:aws:ecs:us-east-1:123456789012:task-definition/c7nfail2_service:8"        ],
+        "ResponseMetadata": {}
+    }
+}
