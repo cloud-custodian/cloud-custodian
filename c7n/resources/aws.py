@@ -76,7 +76,8 @@ MODEL_SCHEMA_TYPE_MAP = {
     'boolean': 'boolean',
     'long': 'number',
     'double': 'number',
-    'map': 'object'
+    'map': 'object',
+    'timestamp': 'string',
 }
 
 
