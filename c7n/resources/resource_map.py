@@ -304,6 +304,7 @@ ResourceMap = {
   "aws.s3-access-point": "c7n.resources.s3control.AccessPoint",
   "aws.s3-access-point-multi": "c7n.resources.s3control.MultiRegionAccessPoint",
   "aws.s3-storage-lens": "c7n.resources.s3control.StorageLens",
+  "aws.sagemaker-app": "c7n.resources.sagemaker.SagemakerApp",
   "aws.sagemaker-auto-ml-job": "c7n.resources.sagemaker.SagemakerAutoMLJob",
   "aws.sagemaker-cluster": "c7n.resources.sagemaker.Cluster",
   "aws.sagemaker-compilation-job": "c7n.resources.sagemaker.SagemakerCompilationJob",
@@ -320,7 +321,9 @@ ResourceMap = {
   "aws.sagemaker-job": "c7n.resources.sagemaker.SagemakerJob",
   "aws.sagemaker-model": "c7n.resources.sagemaker.Model",
   "aws.sagemaker-notebook": "c7n.resources.sagemaker.NotebookInstance",
+  "aws.sagemaker-space": "c7n.resources.sagemaker.SagemakerSpace",
   "aws.sagemaker-transform-job": "c7n.resources.sagemaker.SagemakerTransformJob",
+  "aws.sagemaker-user-profile": "c7n.resources.sagemaker.SagemakerUserProfile",
   "aws.sagemaker-hyperparameter-tuning-job":
     "c7n.resources.sagemaker.SagemakerHyperParameterTuningJob",
   "aws.sagemaker-model-bias-job-definition":
