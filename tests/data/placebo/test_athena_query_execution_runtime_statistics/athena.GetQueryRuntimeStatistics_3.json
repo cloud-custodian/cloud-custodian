@@ -1,0 +1,80 @@
+{
+    "status_code": 200,
+    "data": {
+        "QueryRuntimeStatistics": {
+            "Timeline": {
+                "QueryQueueTimeInMillis": 104,
+                "ServicePreProcessingTimeInMillis": 89,
+                "QueryPlanningTimeInMillis": 1164,
+                "EngineExecutionTimeInMillis": 1501,
+                "ServiceProcessingTimeInMillis": 66,
+                "TotalExecutionTimeInMillis": 1760
+            },
+            "Rows": {
+                "InputRows": 0,
+                "InputBytes": 0,
+                "OutputBytes": 0,
+                "OutputRows": 0
+            },
+            "OutputStage": {
+                "StageId": 0,
+                "State": "ABORTED",
+                "OutputBytes": 0,
+                "OutputRows": 0,
+                "InputBytes": 0,
+                "InputRows": 0,
+                "ExecutionTime": 0,
+                "QueryStagePlan": {
+                    "Name": "Output",
+                    "Identifier": "{\"columnNames\":\"[sku, offertermcode, ratecode, termtype, pricedescription, startingrange, endingrange, unit, priceperunit, currency, product family, servicecode, location, location type, usagetype, operation, deployment model, deployment model description, region code, servicename, group, group description, certificate domain type, certificate export type, certificate type, storage, datatransferout, instancetype, request count, request duration, description, build, cputupe, gb, pipeline, type, cachememorysize, eventapioperation, graphqloperation, protocol, realtimeoperation, replication type, input format, output format, relatedto, estimate type, accounts, computetype, ml activity, cloudformation-resource provider, category, event type, insightstype, attachment type, pricing unit, deployment location, enhanced infrastructure metrics, resource type, ci type, platopricingtype, granularity, request type, storage class, volume type, product schema description, task mode, task type, transfer type, from location, from location type, to location, to location type, from region code, to region code, device os, execution mode, meter mode, os, alpha-3countrycode, capacity, connection type, continent, country, direct connect location, georegioncode, port speed, sitelink origin pop group, version, virtual interface type, directory size, directory type, directory type description, addon feature, minutestate, tier, transcoding result, video codec, video frame rate, video quality setting, video resolution, availability, durability, ingest type, storageclass, operation type, conversation type, iso, message fee, message type, resolution type, invocation, request, time window, action, report type, awsresource, platoprotectionpolicytype, endpoint type, fee description, client location, dominant/non-dominant, traffic direction, tenancy support, bandwidth, dataplane, groundstation, ondemand, check type, finding type, isshadow, iswebsocket, newcode, device, device type, awsiotevents, individual vehicle, million messages, instance type, freetier, product name, configuration, contract length, design version, region, flow type, reserved tier, product type, subcategory, controllersize, controllerstate, dbstate, nodetype, schedulertype, access point type, capability, commitment (days), message delivery frequency, message delivery order, queue type, clustertype, frequency, feecode, automation group, automation storage, finding group, finding source, finding storage, standard group, standard storage, with active users, fee code, maximum capacity, storage description, partition_0, partition_1, partition_2]\"}",
+                    "Children": [
+                        {
+                            "Name": "Limit",
+                            "Identifier": "{\"count\":\"10\",\"withTies\":\"\",\"inputPreSortedBy\":\"[]\"}",
+                            "Children": [
+                                {
+                                    "Name": "LocalExchange",
+                                    "Identifier": "{\"partitioning\":\"SINGLE\",\"isReplicateNullsAndAny\":\"\",\"hashColumn\":\"[]\",\"arguments\":\"[]\"}",
+                                    "Children": [
+                                        {
+                                            "Name": "RemoteSource",
+                                            "Identifier": "{\"sourceFragmentIds\":\"[1]\"}",
+                                            "Children": [],
+                                            "RemoteSources": [
+                                                "1"
+                                            ]
+                                        }
+                                    ]
+                                }
+                            ]
+                        }
+                    ]
+                },
+                "SubStages": [
+                    {
+                        "StageId": 1,
+                        "State": "ABORTED",
+                        "OutputBytes": 0,
+                        "OutputRows": 0,
+                        "InputBytes": 0,
+                        "InputRows": 0,
+                        "ExecutionTime": 0,
+                        "QueryStagePlan": {
+                            "Name": "LimitPartial",
+                            "Identifier": "{\"count\":\"10\",\"withTies\":\"\",\"inputPreSortedBy\":\"[]\"}",
+                            "Children": [
+                                {
+                                    "Name": "TableScan",
+                                    "Identifier": "{\"table\":\"awsdatacatalog:c7n-athena-test:c7n_frankcontrepois_aws_pricing\"}",
+                                    "Children": []
+                                }
+                            ]
+                        },
+                        "SubStages": []
+                    }
+                ]
+            }
+        },
+        "ResponseMetadata": {}
+    }
+}
