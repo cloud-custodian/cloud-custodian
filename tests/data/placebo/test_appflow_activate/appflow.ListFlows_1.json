@@ -1,0 +1,37 @@
+{
+    "status_code": 200,
+    "data": {
+        "ResponseMetadata": {},
+        "flows": [
+            {
+                "flowArn": "arn:aws:appflow:us-east-1:644160558196:flow/scheduled-flow",
+                "flowName": "scheduled-flow",
+                "flowStatus": "Suspended",
+                "sourceConnectorType": "S3",
+                "destinationConnectorType": "S3",
+                "triggerType": "Scheduled",
+                "createdAt": {
+                    "__class__": "datetime",
+                    "year": 2021,
+                    "month": 2,
+                    "day": 23,
+                    "hour": 11,
+                    "minute": 5,
+                    "second": 40,
+                    "microsecond": 852000
+                },
+                "lastUpdatedAt": {
+                    "__class__": "datetime",
+                    "year": 2021,
+                    "month": 2,
+                    "day": 23,
+                    "hour": 11,
+                    "minute": 5,
+                    "second": 40,
+                    "microsecond": 852000
+                },
+                "tags": {}
+            }
+        ]
+    }
+}
