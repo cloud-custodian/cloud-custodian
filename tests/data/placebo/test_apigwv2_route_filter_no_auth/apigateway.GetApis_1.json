@@ -1,0 +1,29 @@
+{
+    "status_code": 200,
+    "data": {
+        "ResponseMetadata": {},
+        "Items": [
+            {
+                "ApiEndpoint": "https://svr07q9wvj.execute-api.us-east-1.amazonaws.com",
+                "ApiId": "svr07q9wvj",
+                "ApiKeySelectionExpression": "$request.header.x-api-key",
+                "CreatedDate": {
+                    "__class__": "datetime",
+                    "year": 2025,
+                    "month": 12,
+                    "day": 12,
+                    "hour": 23,
+                    "minute": 8,
+                    "second": 1,
+                    "microsecond": 0
+                },
+                "DisableExecuteApiEndpoint": false,
+                "IpAddressType": "ipv4",
+                "Name": "example-api-amazing-kiwi",
+                "ProtocolType": "HTTP",
+                "RouteSelectionExpression": "$request.method $request.path",
+                "Tags": {}
+            }
+        ]
+    }
+}
