@@ -744,7 +744,7 @@ class ValueFilter(BaseValueFilter):
             self.content_initialized = True
             self.vtype = self.data.get('value_type')
 
-        if 'value_path' in self.data:
+        if 'value_path' in self.data and 'value_from' not in self.data:
             self.v = self.get_path_value(i)
 
         if i is None:

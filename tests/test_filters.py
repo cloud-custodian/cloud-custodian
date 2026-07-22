@@ -9,6 +9,7 @@ from dateutil.parser import parse as parse_date
 import random
 import unittest
 import os
+from unittest import mock
 
 from c7n.exceptions import PolicyValidationError, PolicyExecutionError
 from c7n.executor import MainThreadExecutor
@@ -320,6 +321,27 @@ class TestValueFilter(unittest.TestCase):
         # the matching resource that follows.
         self.assertEqual(vf.match(non_matching), False)
         self.assertEqual(vf.match(matching), True)
+
+    def test_value_from_takes_precedence_over_value_path(self):
+        # Regression test for #10521 fix: value_from must still take
+        # precedence over value_path (the original elif ordering), and
+        # its cached-once result must not get overwritten by the
+        # per-resource value_path reevaluation.
+        with mock.patch('c7n.filters.core.ValuesFrom') as values_from:
+            values_from.return_value.get_values.return_value = 'x'
+            vf = filters.factory({
+                "type": "value",
+                "key": "a",
+                "value_from": {"url": "s3://bucket/foo.json"},
+                "value_path": "b",
+                "op": "eq"})
+
+            # 'b' differs from the value_from result on both resources;
+            # if value_path incorrectly took precedence, these would not
+            # both match.
+            self.assertEqual(vf.match({"a": "x", "b": "y"}), True)
+            self.assertEqual(vf.match({"a": "x", "b": "z"}), True)
+            values_from.return_value.get_values.assert_called_once()
 
 
 class TestAgeFilter(unittest.TestCase):
