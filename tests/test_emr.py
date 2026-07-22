@@ -152,6 +152,51 @@ class TestEMR(BaseTest):
                 'EnableAtRestEncryption': True,
                 'EnableInTransitEncryption': False}})
 
+    def test_emr_termination_policy(self):
+        session_factory = self.replay_flight_data("test_emr_termination_policy")
+        p = self.load_policy(
+            {
+                "name": "emr-termination-policy",
+                "resource": "emr",
+                "filters": [
+                    {
+                        "type": "termination-policy",
+                        "key": "IdleTimeout",
+                        "value": "absent",
+                    }
+                ],
+            },
+            config={"region": "us-west-2"},
+            session_factory=session_factory,
+        )
+        resources = p.run()
+        self.assertEqual(len(resources), 1)
+        self.assertEqual(resources[0]["Id"], "j-1OBEPJWLJBMDO")
+        self.assertEqual(resources[0]["c7n:AutoTerminationPolicy"], {})
+
+    def test_emr_termination_policy_present(self):
+        session_factory = self.replay_flight_data("test_emr_termination_policy")
+        p = self.load_policy(
+            {
+                "name": "emr-termination-policy-present",
+                "resource": "emr",
+                "filters": [
+                    {
+                        "type": "termination-policy",
+                        "key": "IdleTimeout",
+                        "value": 3600,
+                    }
+                ],
+            },
+            config={"region": "us-west-2"},
+            session_factory=session_factory,
+        )
+        resources = p.run()
+        self.assertEqual(len(resources), 1)
+        self.assertEqual(resources[0]["Id"], "j-1QXCH9K3E0NMM")
+        self.assertEqual(
+            resources[0]["c7n:AutoTerminationPolicy"], {"IdleTimeout": 3600})
+
 
 class TestEMRQueryParser(unittest.TestCase):
     def test_query(self):

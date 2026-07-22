@@ -1,0 +1,9 @@
+{
+    "status_code": 200,
+    "data": {
+        "AutoTerminationPolicy": {
+            "IdleTimeout": 3600
+        },
+        "ResponseMetadata": {}
+    }
+}

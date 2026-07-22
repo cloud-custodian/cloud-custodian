@@ -285,6 +285,48 @@ class EMRSecurityConfigurationFilter(ValueFilter):
         return results
 
 
+@filters.register('termination-policy')
+class EMRAutoTerminationPolicyFilter(ValueFilter):
+    """Filter EMR clusters based on their auto-termination policy.
+
+    The cluster's auto-termination policy is fetched via the
+    ``GetAutoTerminationPolicy`` API and annotated on the resource under
+    ``c7n:AutoTerminationPolicy`` before being matched against. Clusters
+    without an auto-termination policy are annotated with an empty mapping,
+    so an absent ``IdleTimeout`` matches clusters that have no policy set.
+
+    :example:
+
+    .. code-block:: yaml
+
+      policies:
+        - name: emr-without-auto-termination
+          resource: aws.emr
+          filters:
+            - type: termination-policy
+              key: IdleTimeout
+              value: absent
+
+    """
+    annotation_key = 'c7n:AutoTerminationPolicy'
+    permissions = ("elasticmapreduce:GetAutoTerminationPolicy",)
+    schema = type_schema('termination-policy', rinherit=ValueFilter.schema)
+    schema_alias = False
+
+    def process(self, resources, event=None):
+        client = local_session(self.manager.session_factory).client('emr')
+        results = []
+        for r in resources:
+            if self.annotation_key not in r:
+                policy = self.manager.retry(
+                    client.get_auto_termination_policy,
+                    ClusterId=r['Id']).get('AutoTerminationPolicy', {})
+                r[self.annotation_key] = policy or {}
+            if self.match(r[self.annotation_key]):
+                results.append(r)
+        return results
+
+
 @resources.register('emr-security-configuration')
 class EMRSecurityConfiguration(QueryResourceManager):
     """Resource manager for EMR Security Configuration
