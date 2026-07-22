@@ -16,6 +16,88 @@ from gcp_common import BaseTest
 from c7n_gcp.resources.vertexai import VertexAIEndpoint
 
 
+class VertexAIJobs:
+    """Helper for creating/cleaning up ephemeral Vertex AI jobs in tests.
+
+    Builds clients from ``test.session_factory``, which the test must set
+    (typically via ``test.replay_flight_data(...)`` or
+    ``test.record_flight_data(...)``) before calling create(), so that job
+    creation shares the same recorded/replayed session as the rest of the
+    test.
+
+    Tracks every job created via create() and cleans them up (cancel, poll
+    for a terminal state, then delete) even if the test itself fails.
+    """
+    TERMINAL_STATES = {
+        'JOB_STATE_SUCCEEDED', 'JOB_STATE_FAILED',
+        'JOB_STATE_CANCELLED', 'JOB_STATE_EXPIRED'
+    }
+
+    def __init__(self, test, component, location='us-central1'):
+        self.test = test
+        self.component = component
+        self.location = location
+        self.created = []
+
+    def _client(self, session):
+        return session.client(
+            'aiplatform', 'v1', self.component,
+            client_options=ClientOptions(
+                api_endpoint=f'https://{self.location}-aiplatform.googleapis.com'))
+
+    def create(self, job_spec):
+        session = self.test.session_factory()
+        project = session.get_default_project()
+        client = self._client(session)
+        result = client.execute_command(
+            'create',
+            {'parent': f'projects/{project}/locations/{self.location}', 'body': job_spec})
+        self.created.append((client, result['name']))
+        return result
+
+    def poll_terminal_state(self, client, name, attempts=6):
+        """Poll a job until it reaches a terminal state.
+
+        Returns the last fetched job, or None if the job no longer exists
+        (a 404 while polling, e.g. it was already deleted).
+        """
+        job = None
+        for _ in range(attempts):
+            try:
+                job = client.execute_query('get', {'name': name})
+            except HttpError:
+                return None
+            if job.get('state') in self.TERMINAL_STATES:
+                return job
+            if self.test.recording:
+                time.sleep(10)
+        return job
+
+    def cleanup(self):
+        for client, name in self.created:
+            try:
+                client.execute_command('cancel', {'name': name})
+            except HttpError:
+                pass
+
+            # Cancellation is asynchronous, poll for a terminal state before
+            # attempting delete, otherwise delete fails with FAILED_PRECONDITION.
+            # The job may also already be gone if the test itself deleted it
+            # via a c7n action, in which case there's nothing left to clean up.
+            job = self.poll_terminal_state(client, name)
+            if job is None:
+                continue
+            if job.get('state') not in self.TERMINAL_STATES:
+                print(f'Warning: {name} did not reach a terminal state, '
+                      f'skipping delete cleanup')
+                continue
+
+            try:
+                client.execute_command('delete', {'name': name})
+            except HttpError as e:
+                print(f'Warning: failed to delete {name} during cleanup: {e}')
+
+
 def get_test_model_id(project_id, location):
     """Get full model resource name for testing.
 
@@ -1356,106 +1438,40 @@ class VertexAIPublisherModelTest(BaseTest):
 
 # Custom Job Tests
 
-CUSTOM_JOB_TERMINAL_STATES = {
-    'JOB_STATE_SUCCEEDED', 'JOB_STATE_FAILED',
-    'JOB_STATE_CANCELLED', 'JOB_STATE_EXPIRED'
-}
-
-
-def poll_custom_job_terminal_state(test, client, name, attempts=6):
-    """Poll a Custom Job until it reaches a terminal state.
-
-    Returns the last fetched job, or None if the job no longer exists
-    (a 404 while polling, e.g. it was already deleted).
-    """
-    for _ in range(attempts):
-        try:
-            job = client.execute_query('get', {'name': name})
-        except HttpError:
-            return None
-        if job.get('state') in CUSTOM_JOB_TERMINAL_STATES:
-            return job
-        if test.recording:
-            time.sleep(10)
-    return job
-
-
 @pytest.fixture
-def create_job(test):
+def create_custom_job(test):
     """Create short-lived Vertex AI Custom Jobs for a test, and clean them up after.
-
-    Builds its own Custom Jobs client from ``test.session_factory``, which the
-    test must set (typically via ``test.replay_flight_data(...)`` or
-    ``test.record_flight_data(...)``) before calling the fixture function, so
-    that job creation shares the same recorded/replayed session as the rest
-    of the test.
 
     Yields a function ``(display_name, command, *args)`` that creates a
     Custom Job running the given command in a small public container. Every
     job created is cancelled and deleted after the test completes.
     """
-    location = 'us-central1'
-    image_uri = 'gcr.io/google.com/cloudsdktool/cloud-sdk:slim'
-    created = []
+    jobs = VertexAIJobs(test, 'projects.locations.customJobs')
 
     def _create_job(display_name, command, *args):
-        session = test.session_factory()
-        project = session.get_default_project()
-        client = session.client(
-            'aiplatform', 'v1', 'projects.locations.customJobs',
-            client_options=ClientOptions(
-                api_endpoint=f'https://{location}-aiplatform.googleapis.com'))
-
-        job_spec = {
+        return jobs.create({
             'displayName': display_name,
             'jobSpec': {
                 'workerPoolSpecs': [{
                     'machineSpec': {'machineType': 'n1-standard-4'},
                     'replicaCount': 1,
                     'containerSpec': {
-                        'imageUri': image_uri,
+                        'imageUri': 'gcr.io/google.com/cloudsdktool/cloud-sdk:slim',
                         'command': [command],
                         'args': list(args)
                     }
                 }]
             }
-        }
-
-        result = client.execute_command(
-            'create',
-            {'parent': f'projects/{project}/locations/{location}', 'body': job_spec})
-        created.append((client, result['name']))
-        return result
+        })
 
     try:
         yield _create_job
     finally:
-        for client, name in created:
-            try:
-                client.execute_command('cancel', {'name': name})
-            except HttpError:
-                pass
-
-            # Cancellation is asynchronous, poll for a terminal state before
-            # attempting delete, otherwise delete fails with FAILED_PRECONDITION.
-            # The job may also already be gone if the test itself deleted it
-            # via a c7n action, in which case there's nothing left to clean up.
-            job = poll_custom_job_terminal_state(test, client, name)
-            if job is None:
-                continue
-            if job.get('state') not in CUSTOM_JOB_TERMINAL_STATES:
-                print(f'Warning: {name} did not reach a terminal state, '
-                      f'skipping delete cleanup')
-                continue
-
-            try:
-                client.execute_command('delete', {'name': name})
-            except HttpError as e:
-                print(f'Warning: failed to delete {name} during cleanup: {e}')
+        jobs.cleanup()
 
 
 @terraform('vertexai_custom_job', scope='module')
-def test_vertexai_custom_job_query(test, vertexai_custom_job, create_job):
+def test_vertexai_custom_job_query(test, vertexai_custom_job, create_custom_job):
     """Test creating, listing, filtering, and generating URNs for a Custom Job.
 
     Creates a short-lived Custom Job using a public container image, then
@@ -1465,7 +1481,7 @@ def test_vertexai_custom_job_query(test, vertexai_custom_job, create_job):
 
     test.session_factory = test.replay_flight_data('vertexai_custom_job_query')
 
-    create_job(display_name, 'echo', 'hello from c7n test')
+    create_custom_job(display_name, 'echo', 'hello from c7n test')
 
     policy = test.load_policy(
         {'name': 'vertexai-custom-job-query',
@@ -1489,7 +1505,7 @@ def test_vertexai_custom_job_query(test, vertexai_custom_job, create_job):
 
 
 @terraform('vertexai_custom_job', scope='module')
-def test_vertexai_custom_job_cancel_and_delete(test, vertexai_custom_job, create_job):
+def test_vertexai_custom_job_cancel_and_delete(test, vertexai_custom_job, create_custom_job):
     """Test cancelling and deleting a Custom Job via the c7n actions.
 
     Creates a long-running Custom Job, cancels it via the ``cancel`` action,
@@ -1500,7 +1516,7 @@ def test_vertexai_custom_job_cancel_and_delete(test, vertexai_custom_job, create
 
     test.session_factory = test.replay_flight_data('vertexai_custom_job_cancel_and_delete')
 
-    result = create_job(display_name, 'sleep', '120')
+    result = create_custom_job(display_name, 'sleep', '120')
     job_name = result['name']
 
     cancel_policy = test.load_policy(
@@ -1520,7 +1536,8 @@ def test_vertexai_custom_job_cancel_and_delete(test, vertexai_custom_job, create
         client_options=ClientOptions(
             api_endpoint='https://us-central1-aiplatform.googleapis.com'))
 
-    job = poll_custom_job_terminal_state(test, client, job_name)
+    job = VertexAIJobs(test, 'projects.locations.customJobs').poll_terminal_state(
+        client, job_name)
     assert job is not None
     assert job['state'] == 'JOB_STATE_CANCELLED'
 
@@ -1540,7 +1557,7 @@ def test_vertexai_custom_job_cancel_and_delete(test, vertexai_custom_job, create
 
 
 @terraform('vertexai_custom_job', scope='module')
-def test_vertexai_custom_job_field_filters(test, vertexai_custom_job, create_job):
+def test_vertexai_custom_job_field_filters(test, vertexai_custom_job, create_custom_job):
     """Test filtering Custom Jobs on the fields called out in the feature request.
 
     Covers ``state``, ``createTime``, ``labels``, and nested
@@ -1551,7 +1568,7 @@ def test_vertexai_custom_job_field_filters(test, vertexai_custom_job, create_job
 
     test.session_factory = test.replay_flight_data('vertexai_custom_job_field_filters')
 
-    result = create_job(display_name, 'echo', 'hello from c7n test')
+    result = create_custom_job(display_name, 'echo', 'hello from c7n test')
     job_name = result['name']
 
     policy = test.load_policy(
@@ -1575,6 +1592,178 @@ def test_vertexai_custom_job_field_filters(test, vertexai_custom_job, create_job
                   "length(jobSpec.workerPoolSpecs[?machineSpec.acceleratorType && "
                   "machineSpec.acceleratorType != 'ACCELERATOR_TYPE_UNSPECIFIED'])"),
               'op': 'eq', 'value': 0}
+         ]},
+        session_factory=test.session_factory)
+
+    resources = policy.run()
+    assert len(resources) == 1
+    assert resources[0]['name'] == job_name
+
+
+@pytest.fixture
+def create_hp_job(test):
+    """Create short-lived Vertex AI Hyperparameter Tuning Jobs for a test.
+
+    Yields a function ``(display_name, command, *args)`` that creates a
+    single-trial Hyperparameter Tuning Job running the given command in a
+    small public container. Every job created is cancelled and deleted
+    after the test completes.
+    """
+    jobs = VertexAIJobs(test, 'projects.locations.hyperparameterTuningJobs')
+
+    def _create_hp_job(display_name, command, *args):
+        return jobs.create({
+            'displayName': display_name,
+            'maxTrialCount': 1,
+            'parallelTrialCount': 1,
+            'studySpec': {
+                'metrics': [{'metricId': 'accuracy', 'goal': 'MAXIMIZE'}],
+                'parameters': [{
+                    'parameterId': 'lr',
+                    'discreteValueSpec': {'values': [0.1, 0.2]}
+                }]
+            },
+            'trialJobSpec': {
+                'workerPoolSpecs': [{
+                    'machineSpec': {'machineType': 'n1-standard-4'},
+                    'replicaCount': 1,
+                    'containerSpec': {
+                        'imageUri': 'gcr.io/google.com/cloudsdktool/cloud-sdk:slim',
+                        'command': [command],
+                        'args': list(args)
+                    }
+                }]
+            }
+        })
+
+    try:
+        yield _create_hp_job
+    finally:
+        jobs.cleanup()
+
+
+@terraform('vertexai_hyperparameter_tuning_job', scope='module')
+def test_vertexai_hp_tuning_job_query(test, vertexai_hyperparameter_tuning_job, create_hp_job):
+    """Test creating, listing, filtering, and generating URNs for a Hyperparameter
+    Tuning Job.
+
+    Creates a short-lived, single-trial Hyperparameter Tuning Job using a public
+    container image, then verifies it can be enumerated and filtered on via a
+    standard value filter.
+    """
+    display_name = vertexai_hyperparameter_tuning_job.outputs['job_display_name']['value']
+
+    test.session_factory = test.replay_flight_data('vertexai_hp_tuning_job_query')
+
+    create_hp_job(display_name, 'echo', 'hello from c7n test')
+
+    policy = test.load_policy(
+        {'name': 'vertexai-hp-tuning-job-query',
+         'resource': 'gcp.vertex-ai-hyperparameter-tuning-job',
+         'query': [{'location': 'us-central1'}],
+         'filters': [
+             {'type': 'value',
+              'key': 'displayName',
+              'value': display_name}
+         ]},
+        session_factory=test.session_factory)
+
+    resources = policy.run()
+    assert len(resources) == 1
+    assert resources[0]['displayName'] == display_name
+
+    urns = policy.resource_manager.get_urns(resources)
+    assert len(urns) == 1
+    assert urns[0].startswith('gcp:aiplatform:us-central1:')
+    assert ':hyperparameter-tuning-job/' in urns[0]
+
+
+@terraform('vertexai_hyperparameter_tuning_job', scope='module')
+def test_vertexai_hp_tuning_job_cancel_and_delete(
+        test, vertexai_hyperparameter_tuning_job, create_hp_job):
+    """Test cancelling and deleting a Hyperparameter Tuning Job via the c7n actions.
+
+    Creates a long-running Hyperparameter Tuning Job, cancels it via the
+    ``cancel`` action, waits for it to reach a terminal state, then deletes it
+    via the ``delete`` action and verifies it's gone.
+    """
+    display_name = vertexai_hyperparameter_tuning_job.outputs['job_display_name']['value'] \
+        + '-lifecycle'
+
+    test.session_factory = test.replay_flight_data('vertexai_hp_tuning_job_cancel_and_delete')
+
+    result = create_hp_job(display_name, 'sleep', '120')
+    job_name = result['name']
+
+    cancel_policy = test.load_policy(
+        {'name': 'vertexai-hp-tuning-job-cancel',
+         'resource': 'gcp.vertex-ai-hyperparameter-tuning-job',
+         'query': [{'location': 'us-central1'}],
+         'filters': [{'type': 'value', 'key': 'name', 'value': job_name}],
+         'actions': [{'type': 'cancel'}]},
+        session_factory=test.session_factory)
+
+    resources = cancel_policy.run()
+    assert len(resources) == 1
+    assert resources[0]['name'] == job_name
+
+    client = test.session_factory().client(
+        'aiplatform', 'v1', 'projects.locations.hyperparameterTuningJobs',
+        client_options=ClientOptions(
+            api_endpoint='https://us-central1-aiplatform.googleapis.com'))
+
+    job = VertexAIJobs(test, 'projects.locations.hyperparameterTuningJobs').poll_terminal_state(
+        client, job_name)
+    assert job is not None
+    assert job['state'] == 'JOB_STATE_CANCELLED'
+
+    delete_policy = test.load_policy(
+        {'name': 'vertexai-hp-tuning-job-delete',
+         'resource': 'gcp.vertex-ai-hyperparameter-tuning-job',
+         'query': [{'location': 'us-central1'}],
+         'filters': [{'type': 'value', 'key': 'name', 'value': job_name}],
+         'actions': [{'type': 'delete'}]},
+        session_factory=test.session_factory)
+
+    resources = delete_policy.run()
+    assert len(resources) == 1
+
+    with pytest.raises(HttpError):
+        client.execute_query('get', {'name': job_name})
+
+
+@terraform('vertexai_hyperparameter_tuning_job', scope='module')
+def test_vertexai_hp_tuning_job_field_filters(
+        test, vertexai_hyperparameter_tuning_job, create_hp_job):
+    """Test filtering Hyperparameter Tuning Jobs on the fields called out in the
+    feature request.
+
+    Covers ``parallelTrialCount``, ``maxTrialCount``, ``state``, ``createTime``,
+    and ``labels``, all via the standard value filter.
+    """
+    display_name = vertexai_hyperparameter_tuning_job.outputs['job_display_name']['value'] \
+        + '-filters'
+
+    test.session_factory = test.replay_flight_data('vertexai_hp_tuning_job_field_filters')
+
+    result = create_hp_job(display_name, 'echo', 'hello from c7n test')
+    job_name = result['name']
+
+    policy = test.load_policy(
+        {'name': 'vertexai-hp-tuning-job-field-filters',
+         'resource': 'gcp.vertex-ai-hyperparameter-tuning-job',
+         'query': [{'location': 'us-central1'}],
+         'filters': [
+             {'type': 'value', 'key': 'name', 'value': job_name},
+             {'type': 'value', 'key': 'parallelTrialCount', 'value': 1},
+             {'type': 'value', 'key': 'maxTrialCount', 'value': 1},
+             {'type': 'value', 'key': 'state', 'op': 'in',
+              'value': ['JOB_STATE_PENDING', 'JOB_STATE_QUEUED']},
+             # Using a very big number because time advances and we only
+             # care here that we can make the query.
+             {'type': 'value', 'key': 'createTime', 'value_type': 'age',
+              'op': 'less-than', 'value': 99999},
+             {'type': 'value', 'key': 'labels.env', 'value': 'absent'}
          ]},
         session_factory=test.session_factory)
 

@@ -1,0 +1,78 @@
+{
+  "headers": {
+    "content-type": "application/json; charset=UTF-8",
+    "vary": "Origin, X-Origin, Referer",
+    "date": "Wed, 08 Jul 2026 17:55:02 GMT",
+    "server": "ESF",
+    "x-xss-protection": "0",
+    "x-frame-options": "SAMEORIGIN",
+    "x-content-type-options": "nosniff",
+    "alt-svc": "h3=\":443\"; ma=2592000,h3-29=\":443\"; ma=2592000",
+    "transfer-encoding": "chunked",
+    "status": "200",
+    "content-length": "1551",
+    "-content-encoding": "gzip",
+    "content-location": "https://us-central1-aiplatform.googleapis.com/v1/projects/cloud-custodian/locations/us-central1/hyperparameterTuningJobs?alt=json"
+  },
+  "body": {
+    "hyperparameterTuningJobs": [
+      {
+        "name": "projects/cloud-custodian/locations/us-central1/hyperparameterTuningJobs/2264471144029487104",
+        "displayName": "c7n-test-hp-job-default-ee2e-lifecycle",
+        "studySpec": {
+          "metrics": [
+            {
+              "metricId": "accuracy",
+              "goal": "MAXIMIZE"
+            }
+          ],
+          "parameters": [
+            {
+              "parameterId": "lr",
+              "discreteValueSpec": {
+                "values": [
+                  0.1,
+                  0.2
+                ]
+              }
+            }
+          ]
+        },
+        "maxTrialCount": 1,
+        "parallelTrialCount": 1,
+        "trialJobSpec": {
+          "workerPoolSpecs": [
+            {
+              "machineSpec": {
+                "machineType": "n1-standard-4"
+              },
+              "replicaCount": "1",
+              "diskSpec": {
+                "bootDiskType": "pd-ssd",
+                "bootDiskSizeGb": 100
+              },
+              "containerSpec": {
+                "imageUri": "gcr.io/google.com/cloudsdktool/cloud-sdk:slim",
+                "command": [
+                  "sleep"
+                ],
+                "args": [
+                  "120"
+                ]
+              }
+            }
+          ]
+        },
+        "state": "JOB_STATE_CANCELLED",
+        "createTime": "2026-07-08T17:54:49.017622Z",
+        "startTime": "2026-07-08T17:54:49.165989Z",
+        "endTime": "2026-07-08T17:54:53.811740Z",
+        "updateTime": "2026-07-08T17:54:53.811740Z",
+        "error": {
+          "code": 1,
+          "message": "CANCELED"
+        }
+      }
+    ]
+  }
+}
