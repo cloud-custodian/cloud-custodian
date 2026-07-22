@@ -1,0 +1,411 @@
+{
+  "headers": {
+    "x-guploader-uploadid": "ADPycdu6YS0Kfc5I-J0kmCG9Vhfthw6Si3dj-Ue1aoEVZ-qJ-frsQ-MJbwaRSWr6scx_r1Jv931QhOvDhGA71U4af1NiFnlszpIN",
+    "content-type": "application/json; charset=UTF-8",
+    "date": "Tue, 19 Sep 2023 11:12:58 GMT",
+    "vary": "Origin, X-Origin",
+    "cache-control": "private, max-age=0, must-revalidate, no-transform",
+    "expires": "Tue, 19 Sep 2023 11:12:58 GMT",
+    "content-length": "11843",
+    "server": "UploadServer",
+    "alt-svc": "h3=\":443\"; ma=2592000,h3-29=\":443\"; ma=2592000",
+    "status": "200",
+    "content-location": "https://storage.googleapis.com/storage/v1/b?project=gcp-lab-custodian&alt=json"
+  },
+  "body": {
+    "kind": "storage#buckets",
+    "items": [
+      {
+        "kind": "storage#bucket",
+        "selfLink": "https://www.googleapis.com/storage/v1/b/artifacts.gcp-lab-custodian.appspot.com",
+        "id": "artifacts.gcp-lab-custodian.appspot.com",
+        "name": "artifacts.gcp-lab-custodian.appspot.com",
+        "projectNumber": "443732426401",
+        "metageneration": "3",
+        "location": "US",
+        "storageClass": "STANDARD",
+        "etag": "CAM=",
+        "timeCreated": "2021-07-20T22:48:31.196Z",
+        "updated": "2022-08-01T10:21:11.634Z",
+        "iamConfiguration": {
+          "bucketPolicyOnly": {
+            "enabled": false
+          },
+          "uniformBucketLevelAccess": {
+            "enabled": false
+          },
+          "publicAccessPrevention": "inherited"
+        },
+        "locationType": "multi-region",
+        "rpo": "DEFAULT"
+      },
+      {
+        "kind": "storage#bucket",
+        "selfLink": "https://www.googleapis.com/storage/v1/b/bucket-terraform_tfstate",
+        "id": "bucket-terraform_tfstate",
+        "name": "bucket-terraform_tfstate",
+        "projectNumber": "443732426401",
+        "metageneration": "9",
+        "location": "US-CENTRAL1",
+        "storageClass": "STANDARD",
+        "etag": "CAk=",
+        "timeCreated": "2022-08-01T08:41:35.367Z",
+        "updated": "2022-09-13T14:40:06.249Z",
+        "labels": {
+          "custodianproject": "sandbox"
+        },
+        "iamConfiguration": {
+          "bucketPolicyOnly": {
+            "enabled": true,
+            "lockedTime": "2022-10-30T08:41:35.367Z"
+          },
+          "uniformBucketLevelAccess": {
+            "enabled": true,
+            "lockedTime": "2022-10-30T08:41:35.367Z"
+          },
+          "publicAccessPrevention": "enforced"
+        },
+        "locationType": "region"
+      },
+      {
+        "kind": "storage#bucket",
+        "selfLink": "https://www.googleapis.com/storage/v1/b/bucket_sandbox_terraform",
+        "id": "bucket_sandbox_terraform",
+        "name": "bucket_sandbox_terraform",
+        "projectNumber": "443732426401",
+        "metageneration": "3",
+        "location": "US-CENTRAL1",
+        "storageClass": "STANDARD",
+        "etag": "CAM=",
+        "timeCreated": "2022-09-13T14:44:50.946Z",
+        "updated": "2023-08-25T10:55:38.432Z",
+        "labels": {
+          "custodian": "tf-state"
+        },
+        "iamConfiguration": {
+          "bucketPolicyOnly": {
+            "enabled": true,
+            "lockedTime": "2022-12-12T14:44:50.946Z"
+          },
+          "uniformBucketLevelAccess": {
+            "enabled": true,
+            "lockedTime": "2022-12-12T14:44:50.946Z"
+          },
+          "publicAccessPrevention": "inherited"
+        },
+        "locationType": "region"
+      },
+      {
+        "kind": "storage#bucket",
+        "selfLink": "https://www.googleapis.com/storage/v1/b/dataproc-staging-bucket-452-red",
+        "id": "dataproc-staging-bucket-452-red",
+        "name": "dataproc-staging-bucket-452-red",
+        "projectNumber": "443732426401",
+        "metageneration": "1",
+        "location": "US-CENTRAL1",
+        "storageClass": "STANDARD",
+        "etag": "CAE=",
+        "timeCreated": "2023-09-14T10:31:49.787Z",
+        "updated": "2023-09-14T10:31:49.787Z",
+        "labels": {
+          "custodiarule": "ecc-gcp-452-dataproc_cluster_label_info",
+          "compliancestatus": "red"
+        },
+        "iamConfiguration": {
+          "bucketPolicyOnly": {
+            "enabled": false
+          },
+          "uniformBucketLevelAccess": {
+            "enabled": false
+          },
+          "publicAccessPrevention": "inherited"
+        },
+        "locationType": "region"
+      },
+      {
+        "kind": "storage#bucket",
+        "selfLink": "https://www.googleapis.com/storage/v1/b/dataproc-temp-bucket-452-red",
+        "id": "dataproc-temp-bucket-452-red",
+        "name": "dataproc-temp-bucket-452-red",
+        "projectNumber": "443732426401",
+        "metageneration": "1",
+        "location": "US-CENTRAL1",
+        "storageClass": "STANDARD",
+        "etag": "CAE=",
+        "timeCreated": "2023-09-14T10:31:49.740Z",
+        "updated": "2023-09-14T10:31:49.740Z",
+        "labels": {
+          "compliancestatus": "red",
+          "custodiarule": "ecc-gcp-452-dataproc_cluster_label_info"
+        },
+        "iamConfiguration": {
+          "bucketPolicyOnly": {
+            "enabled": false
+          },
+          "uniformBucketLevelAccess": {
+            "enabled": false
+          },
+          "publicAccessPrevention": "inherited"
+        },
+        "locationType": "region"
+      },
+      {
+        "kind": "storage#bucket",
+        "selfLink": "https://www.googleapis.com/storage/v1/b/for_test_12345678",
+        "id": "for_test_12345678",
+        "name": "for_test_12345678",
+        "projectNumber": "443732426401",
+        "metageneration": "1",
+        "location": "US-EAST1",
+        "storageClass": "STANDARD",
+        "etag": "CAE=",
+        "timeCreated": "2023-09-19T11:10:55.839Z",
+        "updated": "2023-09-19T11:10:55.839Z",
+        "iamConfiguration": {
+          "bucketPolicyOnly": {
+            "enabled": true,
+            "lockedTime": "2023-12-18T11:10:55.839Z"
+          },
+          "uniformBucketLevelAccess": {
+            "enabled": true,
+            "lockedTime": "2023-12-18T11:10:55.839Z"
+          },
+          "publicAccessPrevention": "enforced"
+        },
+        "locationType": "region"
+      },
+      {
+        "kind": "storage#bucket",
+        "selfLink": "https://www.googleapis.com/storage/v1/b/gcf-sources-443732426401-us-central1",
+        "id": "gcf-sources-443732426401-us-central1",
+        "name": "gcf-sources-443732426401-us-central1",
+        "projectNumber": "443732426401",
+        "metageneration": "5",
+        "location": "US-CENTRAL1",
+        "storageClass": "STANDARD",
+        "etag": "CAU=",
+        "timeCreated": "2021-01-26T11:26:15.371Z",
+        "updated": "2023-07-20T15:05:57.814Z",
+        "cors": [
+          {
+            "origin": [
+              "https://*.cloud.google.com",
+              "https://*.corp.google.com",
+              "https://*.corp.google.com:*",
+              "https://*.cloud.google",
+              "https://*.byoid.goog"
+            ],
+            "method": [
+              "GET"
+            ]
+          }
+        ],
+        "iamConfiguration": {
+          "bucketPolicyOnly": {
+            "enabled": false
+          },
+          "uniformBucketLevelAccess": {
+            "enabled": false
+          },
+          "publicAccessPrevention": "inherited"
+        },
+        "locationType": "region"
+      },
+      {
+        "kind": "storage#bucket",
+        "selfLink": "https://www.googleapis.com/storage/v1/b/gcf-v2-sources-443732426401-us-central1",
+        "id": "gcf-v2-sources-443732426401-us-central1",
+        "name": "gcf-v2-sources-443732426401-us-central1",
+        "projectNumber": "443732426401",
+        "metageneration": "1",
+        "location": "US-CENTRAL1",
+        "storageClass": "STANDARD",
+        "etag": "CAE=",
+        "timeCreated": "2023-08-08T12:11:48.553Z",
+        "updated": "2023-08-08T12:11:48.553Z",
+        "cors": [
+          {
+            "origin": [
+              "https://*.cloud.google.com",
+              "https://*.corp.google.com",
+              "https://*.corp.google.com:*",
+              "https://*.cloud.google",
+              "https://*.byoid.goog"
+            ],
+            "method": [
+              "GET"
+            ]
+          }
+        ],
+        "versioning": {
+          "enabled": true
+        },
+        "lifecycle": {
+          "rule": [
+            {
+              "action": {
+                "type": "Delete"
+              },
+              "condition": {
+                "isLive": false,
+                "numNewerVersions": 3
+              }
+            }
+          ]
+        },
+        "iamConfiguration": {
+          "bucketPolicyOnly": {
+            "enabled": true,
+            "lockedTime": "2023-11-06T12:11:48.553Z"
+          },
+          "uniformBucketLevelAccess": {
+            "enabled": true,
+            "lockedTime": "2023-11-06T12:11:48.553Z"
+          },
+          "publicAccessPrevention": "inherited"
+        },
+        "locationType": "region",
+        "satisfiesPZS": false
+      },
+      {
+        "kind": "storage#bucket",
+        "selfLink": "https://www.googleapis.com/storage/v1/b/gcf-v2-uploads-443732426401-us-central1",
+        "id": "gcf-v2-uploads-443732426401-us-central1",
+        "name": "gcf-v2-uploads-443732426401-us-central1",
+        "projectNumber": "443732426401",
+        "metageneration": "1",
+        "location": "US-CENTRAL1",
+        "storageClass": "STANDARD",
+        "etag": "CAE=",
+        "timeCreated": "2023-08-08T12:11:46.289Z",
+        "updated": "2023-08-08T12:11:46.289Z",
+        "cors": [
+          {
+            "origin": [
+              "https://*.cloud.google.com",
+              "https://*.corp.google.com",
+              "https://*.corp.google.com:*",
+              "https://*.cloud.google",
+              "https://*.byoid.goog"
+            ],
+            "method": [
+              "PUT"
+            ],
+            "responseHeader": [
+              "content-type"
+            ]
+          }
+        ],
+        "lifecycle": {
+          "rule": [
+            {
+              "action": {
+                "type": "Delete"
+              },
+              "condition": {
+                "age": 1
+              }
+            }
+          ]
+        },
+        "iamConfiguration": {
+          "bucketPolicyOnly": {
+            "enabled": true,
+            "lockedTime": "2023-11-06T12:11:46.289Z"
+          },
+          "uniformBucketLevelAccess": {
+            "enabled": true,
+            "lockedTime": "2023-11-06T12:11:46.289Z"
+          },
+          "publicAccessPrevention": "inherited"
+        },
+        "locationType": "region",
+        "satisfiesPZS": false
+      },
+      {
+        "kind": "storage#bucket",
+        "selfLink": "https://www.googleapis.com/storage/v1/b/gcp-lab-custodian.appspot.com",
+        "id": "gcp-lab-custodian.appspot.com",
+        "name": "gcp-lab-custodian.appspot.com",
+        "projectNumber": "443732426401",
+        "metageneration": "4",
+        "location": "US",
+        "storageClass": "STANDARD",
+        "etag": "CAQ=",
+        "timeCreated": "2021-03-26T13:43:06.639Z",
+        "updated": "2021-04-06T09:54:29.714Z",
+        "iamConfiguration": {
+          "bucketPolicyOnly": {
+            "enabled": false
+          },
+          "uniformBucketLevelAccess": {
+            "enabled": false
+          },
+          "publicAccessPrevention": "inherited"
+        },
+        "locationType": "multi-region",
+        "rpo": "DEFAULT"
+      },
+      {
+        "kind": "storage#bucket",
+        "selfLink": "https://www.googleapis.com/storage/v1/b/staging.gcp-lab-custodian.appspot.com",
+        "id": "staging.gcp-lab-custodian.appspot.com",
+        "name": "staging.gcp-lab-custodian.appspot.com",
+        "projectNumber": "443732426401",
+        "metageneration": "1",
+        "location": "US",
+        "storageClass": "STANDARD",
+        "etag": "CAE=",
+        "timeCreated": "2021-03-26T13:43:06.733Z",
+        "updated": "2021-03-26T13:43:06.733Z",
+        "lifecycle": {
+          "rule": [
+            {
+              "action": {
+                "type": "Delete"
+              },
+              "condition": {
+                "age": 15
+              }
+            }
+          ]
+        },
+        "iamConfiguration": {
+          "bucketPolicyOnly": {
+            "enabled": false
+          },
+          "uniformBucketLevelAccess": {
+            "enabled": false
+          },
+          "publicAccessPrevention": "inherited"
+        },
+        "locationType": "multi-region",
+        "rpo": "DEFAULT"
+      },
+      {
+        "kind": "storage#bucket",
+        "selfLink": "https://www.googleapis.com/storage/v1/b/us.artifacts.gcp-lab-custodian.appspot.com",
+        "id": "us.artifacts.gcp-lab-custodian.appspot.com",
+        "name": "us.artifacts.gcp-lab-custodian.appspot.com",
+        "projectNumber": "443732426401",
+        "metageneration": "14",
+        "location": "US",
+        "storageClass": "STANDARD",
+        "etag": "CA4=",
+        "timeCreated": "2021-01-26T11:26:41.102Z",
+        "updated": "2021-04-06T10:17:19.721Z",
+        "iamConfiguration": {
+          "bucketPolicyOnly": {
+            "enabled": false
+          },
+          "uniformBucketLevelAccess": {
+            "enabled": false
+          },
+          "publicAccessPrevention": "inherited"
+        },
+        "locationType": "multi-region",
+        "rpo": "DEFAULT"
+      }
+    ]
+  }
+}

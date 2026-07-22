@@ -32,6 +32,8 @@ def test_gcp_resource_metadata_asset_type():
         'function',
         'loadbalancer-ssl-policy',
         'log-exclusion',
+        'logging-sink',
+        'logging-sink-bucket',
         'ml-job',
         'ml-model',
         'notebook',
