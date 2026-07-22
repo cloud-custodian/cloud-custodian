@@ -129,6 +129,24 @@ class PolicyLambdaProvision(Publish):
         self.assertEqual(result["FunctionName"], "custodian-sg-modified")
         self.addCleanup(mgr.remove, pl)
 
+    def test_config_rule_proactive_provision(self):
+        session_factory = self.replay_flight_data("test_config_rule_proactive")
+        p = self.load_policy(
+            {
+                "resource": "security-group",
+                "name": "sg-modified",
+                "mode": {"type": "config-rule",
+                         "role": "custodian-exec",
+                         "evaluation": "proactive"},
+            },
+            session_factory=session_factory
+        )
+        pl = PolicyLambda(p)
+        mgr = LambdaManager(session_factory)
+        result = mgr.publish(pl, "Dev", role=ROLE)
+        self.assertEqual(result["FunctionName"], "custodian-sg-modified")
+        self.addCleanup(mgr.remove, pl)
+
     def test_published_lambda_architecture(self):
         session_factory = self.replay_flight_data("test_published_lambda_architecture")
         with patch('platform.machine', return_value="arm64"):
