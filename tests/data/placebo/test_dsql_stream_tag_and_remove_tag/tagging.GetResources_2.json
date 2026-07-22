@@ -1,0 +1,22 @@
+{
+    "status_code": 200,
+    "data": {
+        "PaginationToken": "",
+        "ResourceTagMappingList": [
+            {
+                "ResourceARN": "arn:aws:dsql:us-east-1:644160558196:cluster/y5t6ak7knpdufei7vlyn7npruu/stream/mzt6amh3gl5dssqny7fklj4scm",
+                "Tags": [
+                    {
+                        "Key": "Env",
+                        "Value": "prod"
+                    },
+                    {
+                        "Key": "Name",
+                        "Value": "c7n-test-stream"
+                    }
+                ]
+            }
+        ],
+        "ResponseMetadata": {}
+    }
+}

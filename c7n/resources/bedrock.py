@@ -2,6 +2,7 @@
 # SPDX-License-Identifier: Apache-2.0
 
 from c7n.manager import resources
+from c7n.exceptions import PolicyValidationError
 from c7n.query import QueryResourceManager, TypeInfo, DescribeSource, DescribeWithResourceTags
 from c7n.tags import RemoveTag, Tag, TagActionFilter, TagDelayedAction, universal_augment
 from c7n.utils import local_session, type_schema, QueryParser
@@ -819,8 +820,121 @@ class DeleteBedrockInferenceProfile(BaseAction):
 
 @BedrockApplicationInferenceProfile.filter_registry.register('metrics')
 class InferenceProfileMetrics(MetricsFilter):
+    """Filter inference profiles by published or combined token usage.
+
+    ``c7n:TotalTokenCount`` is a Custodian-derived metric that sums Bedrock's
+    ``InputTokenCount`` and ``OutputTokenCount`` metrics. Its statistic is
+    always ``Sum`` and defaults to that value when omitted.
+
+    A completed daily total can be selected with ``days: 1``, ``period:
+    86400``, and ``period-start: start-of-day``. For a single completed
+    seven-day aggregate use ``days: 7`` and ``period: 604800``. Using a period
+    of 86400 over seven days produces seven datapoints, all of which must meet
+    the configured comparison.
+
+    :example:
+
+    Match profiles whose total token consumption for the last completed day
+    exceeds 100,000 tokens:
+
+    .. code-block:: yaml
+
+        policies:
+          - name: bedrock-daily-token-usage
+            resource: aws.bedrock-inference-profile
+            filters:
+              - type: metrics
+                name: c7n:TotalTokenCount
+                days: 1
+                period: 86400
+                period-start: start-of-day
+                value: 100000
+                op: greater-than
+
+    :example:
+
+    Match a single completed seven-day aggregate above 700,000 tokens:
+
+    .. code-block:: yaml
+
+        policies:
+          - name: bedrock-weekly-token-usage
+            resource: aws.bedrock-inference-profile
+            filters:
+              - type: metrics
+                name: c7n:TotalTokenCount
+                days: 7
+                period: 604800
+                period-start: start-of-day
+                value: 700000
+                op: greater-than
+    """
+    TOTAL_TOKEN_COUNT = 'c7n:TotalTokenCount'
+
+    def validate(self):
+        if (self.data['name'] == self.TOTAL_TOKEN_COUNT and
+                self.data.get('statistics', 'Sum') != 'Sum'):
+            raise PolicyValidationError(
+                "metrics filter c7n:TotalTokenCount only supports the Sum statistic")
+        return super().validate()
+
+    def process(self, resources, event=None):
+        if self.data['name'] == self.TOTAL_TOKEN_COUNT:
+            self.data.setdefault('statistics', 'Sum')
+        return super().process(resources, event)
+
+    def get_permissions(self):
+        if self.data.get('name') == self.TOTAL_TOKEN_COUNT:
+            return ('cloudwatch:GetMetricData',)
+        return self.permissions
+
     def get_dimensions(self, resource):
         return [{'Name': 'ModelId', 'Value': resource['inferenceProfileId']}]
+
+    def get_metric_data(self, client, params):
+        if self.metric != self.TOTAL_TOKEN_COUNT:
+            return super().get_metric_data(client, params)
+
+        metric_stat = {
+            'Namespace': params['Namespace'],
+            'Dimensions': params['Dimensions'],
+        }
+        queries = []
+        for query_id, metric_name in (
+                ('input', 'InputTokenCount'), ('output', 'OutputTokenCount')):
+            queries.append({
+                'Id': query_id,
+                'MetricStat': {
+                    'Metric': dict(metric_stat, MetricName=metric_name),
+                    'Period': params['Period'],
+                    'Stat': 'Sum',
+                },
+                'ReturnData': False,
+            })
+        queries.append({
+            'Id': 'total',
+            'Expression': 'input + output',
+            'Label': self.TOTAL_TOKEN_COUNT,
+            'ReturnData': True,
+        })
+
+        datapoints = []
+        request = {
+            'MetricDataQueries': queries,
+            'StartTime': params['StartTime'],
+            'EndTime': params['EndTime'],
+        }
+        paginator = client.get_paginator('get_metric_data')
+        for response in paginator.paginate(**request):
+            for result in response.get('MetricDataResults', ()):
+                if result['Id'] != 'total':
+                    continue
+                datapoints.extend({
+                    'Timestamp': timestamp,
+                    self.statistics: value,
+                } for timestamp, value in zip(
+                    result.get('Timestamps', ()), result.get('Values', ())))
+        return datapoints
 
 
 @resources.register('bedrock-guardrail')

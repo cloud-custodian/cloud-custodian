@@ -3,7 +3,9 @@
 import logging
 from .common import ACCOUNT_ID, BaseTest, event_data
 from botocore.exceptions import ClientError
+import pytest
 from pytest_terraform import terraform
+from c7n.exceptions import PolicyValidationError
 from c7n.testing import C7N_FUNCTIONAL
 
 
@@ -1178,29 +1180,78 @@ def test_bedrock_guardrail_update(test, bedrock_guardrail_update):
     test.assertEqual(word_policy['managedWordLists'][0]['type'], 'PROFANITY')
 
 
-def test_bedrock_inference_profile_metrics(test):
+@terraform('bedrock_inference_profile_token_metrics')
+def test_bedrock_inference_profile_token_metrics(
+        test, bedrock_inference_profile_token_metrics):
+    profile_arn = bedrock_inference_profile_token_metrics.outputs[
+        'inference_profile_arn']['value']
+
     session_factory = test.replay_flight_data(
-        'test_bedrock_inference_profile_metrics_filter',
-        region='us-east-2'
-    )
-    p = test.load_policy(
-        {
-            'name': 'bedrock-inference-profile-metrics-filter',
-            'resource': 'aws.bedrock-inference-profile',
-            'filters': [
-                {
+        'bedrock_inference_profile_token_metrics', region='us-east-1')
+
+    def run_metric_policy(metric_name, value=0, statistics='Sum'):
+        metric_filter = {
+            'type': 'metrics',
+            'name': metric_name,
+            'days': 1,
+            'period': 300,
+            'value': value,
+            'op': 'greater-than',
+        }
+        if statistics is not None:
+            metric_filter['statistics'] = statistics
+        policy = test.load_policy(
+            {
+                'name': 'bedrock-inference-profile-token-metrics',
+                'resource': 'aws.bedrock-inference-profile',
+                'filters': [
+                    {'inferenceProfileArn': profile_arn},
+                    metric_filter,
+                ],
+            },
+            session_factory=session_factory,
+            config={'region': 'us-east-1'},
+        )
+        return policy, policy.run()
+
+    for metric_name in ('InputTokenCount', 'OutputTokenCount'):
+        _, resources = run_metric_policy(metric_name)
+        assert len(resources) == 1
+        assert resources[0]['inferenceProfileArn'] == profile_arn
+        annotation_key = 'AWS/Bedrock.%s.Sum.1' % metric_name
+        assert annotation_key in resources[0]['c7n.metrics']
+        assert max(
+            point['Sum'] for point in resources[0]['c7n.metrics'][annotation_key]
+        ) > 0
+
+    total_policy, resources = run_metric_policy('c7n:TotalTokenCount', statistics=None)
+    assert len(resources) == 1
+    assert resources[0]['inferenceProfileArn'] == profile_arn
+    total_key = 'AWS/Bedrock.c7n:TotalTokenCount.Sum.1'
+    assert total_key in resources[0]['c7n.metrics']
+    observed_total = max(
+        point['Sum'] for point in resources[0]['c7n.metrics'][total_key])
+    assert observed_total > 0
+    assert 'cloudwatch:GetMetricData' in total_policy.get_permissions()
+    assert 'cloudwatch:GetMetricStatistics' not in total_policy.get_permissions()
+
+    _, resources = run_metric_policy('c7n:TotalTokenCount', value=observed_total + 1)
+    assert resources == []
+
+
+def test_bedrock_inference_profile_bad_statistics(test):
+    with pytest.raises(
+        PolicyValidationError, match="c7n:TotalTokenCount only supports the Sum statistic"
+    ):
+        test.load_policy(
+            {
+                'name': 'bedrock-inference-profile-invalid-total-statistic',
+                'resource': 'aws.bedrock-inference-profile',
+                'filters': [{
                     'type': 'metrics',
-                    'name': 'InputTokenCount',
-                    'statistics': 'Sum',
-                    'days': 1,
-                    'value': 10000,
-                    'op': 'greater-than',
-                }
-            ]
-        },
-        session_factory=session_factory,
-    )
-    resources = p.run()
-    test.assertEqual(len(resources), 1)
-    test.assertTrue('c7n.metrics' in resources[0])
-    test.assertTrue('AWS/Bedrock.InputTokenCount.Sum.1' in resources[0]['c7n.metrics'])
+                    'name': 'c7n:TotalTokenCount',
+                    'statistics': 'Average',
+                    'value': 0,
+                }],
+            },
+        )
