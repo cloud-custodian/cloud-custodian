@@ -44,6 +44,7 @@ class Config(Bag):
             'output_dir': '',
             'cache_period': 0,
             'dryrun': False,
+            'vars_file': None,
             'authorization_file': None})
         d.update(kw)
         return cls(d)

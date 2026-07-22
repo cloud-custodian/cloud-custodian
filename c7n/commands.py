@@ -133,15 +133,13 @@ def policy_command(f):
 
 def _load_vars(options):
     vars = None
-    if options.vars:
+    if options.vars_file:
         try:
             vars = load_file(options.vars)
         except IOError as e:
             log.error('Problem loading vars file "{}": {}'.format(options.vars, e.strerror))
             sys.exit(1)
-
-    # TODO - provide builtin vars here (such as account)
-
+    options.vars = vars
     return vars
 
 
