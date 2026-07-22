@@ -709,7 +709,8 @@ class ValueFilter(BaseValueFilter):
 
         When using a Value Filter, a ``value_path`` can be specified.
         This means the value(s) the filter will compare against are
-        calculated during the initialization of the filter.
+        recalculated for each resource being filtered, rather than
+        once for the whole filter.
 
         Note that this option only pulls properties of the resource
         currently being filtered.
