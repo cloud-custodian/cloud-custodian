@@ -66,7 +66,8 @@ ResourceMap = {
     "azure.kusto": "c7n_azure.resources.kusto.Kusto",
     "azure.loadbalancer": "c7n_azure.resources.load_balancer.LoadBalancer",
     "azure.logic-app-workflow": "c7n_azure.resources.logic_app.LogicAppWorkflow",
-    "azure.machine-learning-workspace": "c7n_azure.resources.machine_learning_workspace.MachineLearningWorkspace", # noqa
+    "azure.machine-learning-workspace": "c7n_azure.resources.machine_learning.MachineLearningWorkspace", # noqa
+    "azure.machine-learning-data-container": "c7n_azure.resources.machine_learning.MachineLearningDataContainer", # noqa
     "azure.mariadb": "c7n_azure.resources.mariadb.MariaDB",
     "azure.monitor-log-profile": "c7n_azure.resources.monitor_logprofile.MonitorLogprofile",
     "azure.mariadb-server": "c7n_azure.resources.mariadb_server.MariaDBServer",

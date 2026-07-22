@@ -1,5 +1,5 @@
 from c7n_azure.provider import resources
-from c7n_azure.resources.arm import ArmResourceManager
+from c7n_azure.resources.arm import ArmResourceManager, ChildArmResourceManager
 from c7n.utils import type_schema
 from c7n.filters import ListItemFilter
 from c7n_azure.utils import ResourceIdParser
@@ -7,6 +7,7 @@ from azure.mgmt.machinelearningservices.models import (ComputeInstanceProperties
                                                        AmlComputeProperties)
 
 
+# Machine Learning Workspace
 @resources.register('machine-learning-workspace')
 class MachineLearningWorkspace(ArmResourceManager):
     """Machine Learning Workspace Resource
@@ -54,3 +55,59 @@ class ComputeInstancesFilter(ListItemFilter):
             workspace_name=resource['name']
         )
         return [c.serialize(True) for c in computes]
+
+
+# Machine Learning Data Container
+@resources.register('machine-learning-data-container')
+class MachineLearningDataContainer(ChildArmResourceManager):
+    """Machine Learning Data Container Resource
+
+    :example:
+
+    Finds non-archived Machine Learning data containers.
+
+    .. code-block:: yaml
+
+        policies:
+            - name: find-active-machine-learning-data-containers-older-than-90-days
+              resource: azure.machine-learning-data-container
+              filters:
+                - type: value
+                  key: properties.isArchived
+                  value: false
+                - type: value
+                  key: systemData.lastModifiedAt
+                  value_type: age
+                  op: lt
+                  value: 90
+
+    """
+
+    class resource_type(ChildArmResourceManager.resource_type):
+        doc_groups = ['ML']
+
+        service = 'azure.mgmt.machinelearningservices'
+        client = 'MachineLearningServicesMgmtClient'
+        enum_spec = ('data_containers', 'list', None)
+        parent_manager_name = 'machine-learning-workspace'
+        resource_type = 'Microsoft.MachineLearningServices/workspaces/data'
+        default_report_fields = (
+            'name',
+            'resourceGroup',
+            '"c7n:parent-id"',
+            'properties.isArchived',
+            'systemData.lastModifiedAt'
+        )
+
+        @classmethod
+        def extra_args(cls, parent_resource):
+            return {
+                'resource_group_name': parent_resource['resourceGroup'],
+                'workspace_name': parent_resource['name']
+            }
+
+    def augment(self, resources):
+        for resource in resources:
+            if 'id' in resource:
+                resource['resourceGroup'] = ResourceIdParser.get_resource_group(resource['id'])
+        return resources
