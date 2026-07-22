@@ -10,6 +10,7 @@ Cloud Custodian (c7n)
 [![](https://img.shields.io/badge/license-Apache%202-blue.svg)](https://www.apache.org/licenses/LICENSE-2.0)
 [![](https://codecov.io/gh/cloud-custodian/cloud-custodian/branch/main/graph/badge.svg)](https://codecov.io/gh/cloud-custodian/cloud-custodian)
 [![CII Best Practices](https://bestpractices.coreinfrastructure.org/projects/3402/badge)](https://bestpractices.coreinfrastructure.org/projects/3402)
+[![OpenSSF Scorecard](https://api.scorecard.dev/projects/github.com/cloud-custodian/cloud-custodian/badge)](https://scorecard.dev/viewer/?uri=github.com/cloud-custodian/cloud-custodian)
 
 Cloud Custodian, also known as c7n, is a rules engine for managing
 public cloud accounts and resources. It allows users to define
