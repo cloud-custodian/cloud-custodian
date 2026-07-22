@@ -1,11 +1,17 @@
 # Copyright The Cloud Custodian Authors.
 # SPDX-License-Identifier: Apache-2.0
 import logging
+from unittest import mock
+
+import pytest
+
 from .common import ACCOUNT_ID, BaseTest, event_data
 from botocore.exceptions import ClientError
-import pytest
 from pytest_terraform import terraform
 from c7n.exceptions import PolicyValidationError
+from c7n.resources.bedrock import (
+    get_bedrock_output_artifact_prefix, get_bedrock_output_lifecycle,
+    parse_bedrock_output_s3_uri)
 from c7n.testing import C7N_FUNCTIONAL
 
 
@@ -985,6 +991,454 @@ def test_bedrock_model_invocation_job_stop_not_found(test, caplog):
 
     warnings = [r for r in caplog.records if r.levelno == logging.WARNING]
     test.assertEqual(len(warnings), 1)
+
+
+class TestBedrockEvaluationOutputRetention(BaseTest):
+
+    def get_filter(self, data=None, session_factory=None):
+        filter_data = {
+            'type': 'output-retention',
+            'key': '"c7n:BedrockEvaluationOutput".EffectiveExpirationDays',
+            'op': 'eq',
+            'value': 30,
+        }
+        filter_data.update(data or {})
+        policy = self.load_policy(
+            {
+                'name': 'bedrock-evaluation-output-retention',
+                'resource': 'bedrock-evaluation-job',
+                'filters': [filter_data],
+            },
+            session_factory=session_factory,
+            config={'region': 'us-east-1'},
+        )
+        return policy.resource_manager.filters[0]
+
+    def test_parse_uri(self):
+        cases = (
+            ('s3://example/evaluations/', ('example', 'evaluations/', None)),
+            ('s3://example/a%20b/', ('example', 'a%20b/', None)),
+            (None, (None, None, 'missing-uri')),
+            ('', (None, None, 'missing-uri')),
+            ('https://example/key', (None, None, 'invalid-uri')),
+            ('s3:///key', (None, None, 'invalid-uri')),
+            ('s3://example/key?version=1', (None, None, 'invalid-uri')),
+        )
+        for uri, expected in cases:
+            assert parse_bedrock_output_s3_uri(uri) == expected
+
+    def test_lifecycle_calculation(self):
+        rules = [
+            {'ID': 'root-no-filter', 'Status': 'Enabled', 'Expiration': {'Days': 90}},
+            {'ID': 'root-empty-filter', 'Status': 'Enabled', 'Filter': {},
+             'Expiration': {'Days': 80}},
+            {'ID': 'root-empty-prefix', 'Status': 'Enabled', 'Filter': {'Prefix': ''},
+             'Expiration': {'Days': 70}},
+            {'ID': 'legacy', 'Status': 'Enabled', 'Prefix': 'evaluations/',
+             'Expiration': {'Days': 60}},
+            {'ID': 'direct', 'Status': 'Enabled', 'Filter': {'Prefix': 'evaluations/a'},
+             'Expiration': {'Days': 30}},
+            {'ID': 'and', 'Status': 'Enabled',
+             'Filter': {'And': {'Prefix': 'evaluations/a/b'}},
+             'Expiration': {'Days': 20}},
+            {'ID': 'not-covering', 'Status': 'Enabled', 'Filter': {'Prefix': 'other/'},
+             'Expiration': {'Days': 1}},
+            {'ID': 'disabled', 'Status': 'Disabled', 'Filter': {'Prefix': 'evaluations/'},
+             'Expiration': {'Days': 2}},
+            {'ID': 'tagged', 'Status': 'Enabled',
+             'Filter': {'Prefix': 'evaluations/', 'Tag': {'Key': 'a', 'Value': 'b'}},
+             'Expiration': {'Days': 3}},
+            {'ID': 'and-size', 'Status': 'Enabled',
+             'Filter': {'And': {'Prefix': 'evaluations/', 'ObjectSizeGreaterThan': 1}},
+             'Expiration': {'Days': 4}},
+            {'ID': 'date-only', 'Status': 'Enabled', 'Filter': {'Prefix': 'evaluations/'},
+             'Expiration': {'Date': '2030-01-01'}},
+        ]
+        matched, effective = get_bedrock_output_lifecycle(
+            {'Rules': rules}, 'evaluations/a/b/results')
+        assert [r['ID'] for r in matched] == [
+            'root-no-filter', 'root-empty-filter', 'root-empty-prefix', 'legacy',
+            'direct', 'and', 'disabled', 'tagged', 'and-size', 'date-only']
+        assert effective == 20
+        assert get_bedrock_output_lifecycle(None, 'evaluations/') == ([], None)
+
+    def test_versioned_lifecycle_calculation(self):
+        lifecycle = {'Rules': [
+            {'ID': 'current', 'Status': 'Enabled',
+             'Filter': {'Prefix': 'evaluations/'},
+             'Expiration': {'Days': 30}},
+            {'ID': 'noncurrent', 'Status': 'Enabled',
+             'Filter': {'Prefix': 'evaluations/'},
+             'NoncurrentVersionExpiration': {'NoncurrentDays': 10}},
+        ]}
+        matched, effective = get_bedrock_output_lifecycle(
+            lifecycle, 'evaluations/job/id/', {'Status': 'Enabled'})
+        assert [r['ID'] for r in matched] == ['current', 'noncurrent']
+        assert effective == 40
+
+        matched, effective = get_bedrock_output_lifecycle(
+            {'Rules': [lifecycle['Rules'][0]]},
+            'evaluations/job/id/',
+            {'Status': 'Enabled'})
+        assert [r['ID'] for r in matched] == ['current']
+        assert effective is None
+
+        matched, effective = get_bedrock_output_lifecycle(
+            lifecycle, 'evaluations/job/id/', {'Status': 'Suspended'})
+        assert [r['ID'] for r in matched] == ['current', 'noncurrent']
+        assert effective == 40
+
+        matched, effective = get_bedrock_output_lifecycle(
+            {'Rules': [
+                lifecycle['Rules'][0],
+                {'ID': 'newer-noncurrent', 'Status': 'Enabled',
+                 'Filter': {'Prefix': 'evaluations/'},
+                 'NoncurrentVersionExpiration': {
+                     'NoncurrentDays': 10, 'NewerNoncurrentVersions': 2}},
+            ]}, 'evaluations/job/id/', {'Status': 'Enabled'})
+        assert [r['ID'] for r in matched] == ['current', 'newer-noncurrent']
+        assert effective is None
+
+    def test_artifact_prefix_lifecycle_calculation(self):
+        resource = {
+            'jobName': 'my-job',
+            'jobArn': 'arn:aws:bedrock:us-east-1:123456789012:evaluation-job/abc123',
+        }
+        for configured_prefix in ('evaluations', 'evaluations/'):
+            artifact_prefix = get_bedrock_output_artifact_prefix(
+                configured_prefix, resource)
+            assert artifact_prefix == 'evaluations/my-job/abc123/'
+            matched, effective = get_bedrock_output_lifecycle(
+                {'Rules': [
+                    {'ID': 'parent', 'Status': 'Enabled',
+                     'Filter': {'Prefix': 'evaluations/'},
+                     'Expiration': {'Days': 90}},
+                    {'ID': 'job', 'Status': 'Enabled',
+                     'Filter': {'Prefix': 'evaluations/my-job/'},
+                     'Expiration': {'Days': 30}},
+                    {'ID': 'job-id', 'Status': 'Enabled',
+                     'Filter': {'Prefix': 'evaluations/my-job/abc123/'},
+                     'Expiration': {'Days': 20}},
+                ]}, artifact_prefix)
+            assert [r['ID'] for r in matched] == ['parent', 'job', 'job-id']
+            assert effective == 20
+
+    def test_value_comparisons(self):
+        for op, value, expected in (
+                ('gt', 20, True), ('lt', 40, True),
+                ('eq', 30, True), ('gt', 30, False)):
+            output_filter = self.get_filter({'op': op, 'value': value})
+            output_filter._augment_buckets = mock.Mock(return_value={
+                'bucket': {
+                    'Name': 'bucket',
+                    'Location': {'LocationConstraint': None},
+                    'Tags': [],
+                    'Lifecycle': {'Rules': [{
+                        'ID': 'thirty-days', 'Status': 'Enabled',
+                        'Filter': {'Prefix': 'evaluations/job/id/'},
+                        'Expiration': {'Days': 30},
+                    }]},
+                }})
+            job = {
+                'jobName': 'job', 'jobArn': 'arn:aws:bedrock:r:a:evaluation-job/id',
+                'outputDataConfig': {'s3Uri': 's3://bucket/evaluations'}}
+            resources = output_filter.process([job])
+            assert bool(resources) is expected
+            assert ('c7n:OutputBucket' in job) is expected
+
+    def test_absent_value_error_context(self):
+        cases = (
+            (None, {}, 'missing-uri'),
+            ('not-an-s3-uri', {}, 'invalid-uri'),
+            ('s3://missing/evaluations/', {
+                'missing': {
+                    'Name': 'missing', 'Location': {}, 'Tags': [],
+                    'c7n:BedrockOutputBucketError': 'bucket-not-found'}},
+             'bucket-not-found'),
+            ('s3://denied/evaluations/', {
+                'denied': {
+                    'Name': 'denied', 'Location': {'LocationConstraint': None}, 'Tags': [],
+                    'c7n:DeniedMethods': ['get_bucket_lifecycle_configuration']}},
+             'lifecycle-access-denied'),
+        )
+        for uri, buckets, error in cases:
+            output_filter = self.get_filter({'value': 'absent', 'op': 'eq'})
+            output_filter._augment_buckets = mock.Mock(return_value=buckets)
+            job = {'outputDataConfig': {}}
+            if uri is not None:
+                job['outputDataConfig']['s3Uri'] = uri
+            assert output_filter.process([job]) == [job]
+            output = job['c7n:OutputBucket']['c7n:BedrockEvaluationOutput']
+            assert output['Error'] == error
+            assert 'EffectiveExpirationDays' not in output
+
+    def test_shared_bucket_augmented_once_and_context_isolated(self):
+        output_filter = self.get_filter({'op': 'gt', 'value': 0})
+        bucket = {
+            'Name': 'bucket', 'Location': {'LocationConstraint': None}, 'Tags': [],
+            'Lifecycle': {'Rules': [
+                {'ID': 'a', 'Status': 'Enabled', 'Filter': {'Prefix': 'a/'},
+                 'Expiration': {'Days': 10}},
+                {'ID': 'b', 'Status': 'Enabled', 'Filter': {'Prefix': 'b/'},
+                 'Expiration': {'Days': 20}},
+            ]}}
+        output_filter._augment_buckets = mock.Mock(return_value={'bucket': bucket})
+        jobs = [
+            {'jobName': 'a', 'jobArn': 'arn:aws:bedrock:r:a:evaluation-job/id-a',
+             'outputDataConfig': {'s3Uri': 's3://bucket/a/results'}},
+            {'jobName': 'b', 'jobArn': 'arn:aws:bedrock:r:a:evaluation-job/id-b',
+             'outputDataConfig': {'s3Uri': 's3://bucket/b/results'}},
+        ]
+        assert output_filter.process(jobs) == jobs
+        output_filter._augment_buckets.assert_called_once_with(['bucket'])
+        first = jobs[0]['c7n:OutputBucket']['c7n:BedrockEvaluationOutput']
+        second = jobs[1]['c7n:OutputBucket']['c7n:BedrockEvaluationOutput']
+        assert ([r['ID'] for r in first['PrefixMatchedLifecycleRules']],
+                first['EffectiveExpirationDays']) == (['a'], 10)
+        assert ([r['ID'] for r in second['PrefixMatchedLifecycleRules']],
+                second['EffectiveExpirationDays']) == (['b'], 20)
+        assert jobs[0]['c7n:OutputBucket'] is not jobs[1]['c7n:OutputBucket']
+        assert 'c7n:BedrockEvaluationOutput' not in bucket
+
+    def test_retention_augmentation_and_no_list_buckets(self):
+        client = mock.MagicMock()
+        client.meta.region_name = 'us-east-1'
+        client.get_bucket_location.return_value = {'LocationConstraint': None}
+        client.get_bucket_tagging.return_value = {'TagSet': []}
+        client.get_bucket_versioning.return_value = {'Status': 'Enabled'}
+        client.get_bucket_lifecycle_configuration.return_value = {'Rules': [{
+            'ID': 'retention', 'Status': 'Enabled',
+            'Filter': {'Prefix': 'a/a/id-a/'},
+            'Expiration': {'Days': 30},
+            'NoncurrentVersionExpiration': {'NoncurrentDays': 10},
+        }]}
+        session = mock.MagicMock()
+        session.client.return_value = client
+
+        def session_factory():
+            return session
+
+        output_filter = self.get_filter({'op': 'eq', 'value': 40}, session_factory)
+        jobs = [
+            {'jobName': 'a', 'jobArn': 'arn:aws:bedrock:r:a:evaluation-job/id-a',
+             'outputDataConfig': {'s3Uri': 's3://bucket/a'}},
+            {'jobName': 'b', 'jobArn': 'arn:aws:bedrock:r:a:evaluation-job/id-b',
+             'outputDataConfig': {'s3Uri': 's3://bucket/b'}},
+        ]
+        assert output_filter.process(jobs) == [jobs[0]]
+        client.get_bucket_location.assert_called_once_with(Bucket='bucket')
+        client.get_bucket_tagging.assert_called_once_with(Bucket='bucket')
+        client.get_bucket_versioning.assert_called_once_with(Bucket='bucket')
+        client.get_bucket_lifecycle_configuration.assert_called_once_with(Bucket='bucket')
+        assert not client.list_buckets.called
+
+    def test_missing_bucket_from_s3_error(self):
+        client = mock.MagicMock()
+        client.meta.region_name = 'us-east-1'
+        not_found = ClientError(
+            {'Error': {'Code': 'NoSuchBucket', 'Message': 'missing'}},
+            'GetBucketLocation')
+        client.get_bucket_location.side_effect = not_found
+        client.get_bucket_tagging.side_effect = not_found
+        client.get_bucket_lifecycle_configuration.side_effect = not_found
+        session = mock.MagicMock()
+        session.client.return_value = client
+
+        def session_factory():
+            return session
+
+        output_filter = self.get_filter(
+            {'value': 'absent', 'op': 'eq'}, session_factory)
+        job = {'outputDataConfig': {'s3Uri': 's3://missing/evaluations/'}}
+        assert output_filter.process([job]) == [job]
+        bucket = job['c7n:OutputBucket']
+        assert bucket['c7n:BedrockEvaluationOutput']['Error'] == 'bucket-not-found'
+        assert 'c7n:BedrockOutputBucketError' not in bucket
+
+    def test_missing_bucket_after_location_from_s3_error(self):
+        client = mock.MagicMock()
+        client.meta.region_name = 'us-east-1'
+        not_found = ClientError(
+            {'Error': {'Code': 'NoSuchBucket', 'Message': 'missing'}},
+            'GetBucketLifecycleConfiguration')
+        client.get_bucket_location.return_value = {'LocationConstraint': None}
+        client.get_bucket_tagging.return_value = {'TagSet': []}
+        client.get_bucket_lifecycle_configuration.side_effect = not_found
+        session = mock.MagicMock()
+        session.client.return_value = client
+
+        def session_factory():
+            return session
+
+        output_filter = self.get_filter(
+            {'value': 'absent', 'op': 'eq'}, session_factory)
+        job = {'outputDataConfig': {'s3Uri': 's3://missing/evaluations/'}}
+        assert output_filter.process([job]) == [job]
+        bucket = job['c7n:OutputBucket']
+        assert bucket['Location'] == {'LocationConstraint': None}
+        assert bucket['Tags'] == []
+        assert bucket['c7n:BedrockEvaluationOutput']['Error'] == 'bucket-not-found'
+        assert 'c7n:BedrockOutputBucketError' not in bucket
+
+    def test_no_s3_calls_without_output_bucket_filter(self):
+        bedrock = mock.MagicMock()
+        bedrock.list_evaluation_jobs.return_value = {'jobSummaries': []}
+        services = []
+        session = mock.MagicMock()
+
+        def client(service, *args, **kwargs):
+            services.append(service)
+            return bedrock
+
+        session.client.side_effect = client
+
+        def session_factory():
+            return session
+
+        policy = self.load_policy(
+            {'name': 'bedrock-evaluation-no-output-filter',
+             'resource': 'bedrock-evaluation-job'},
+            session_factory=session_factory,
+            config={'region': 'us-east-1'},
+        )
+        with mock.patch('c7n.resources.bedrock.BucketAssembly') as assembly:
+            assert policy.run() == []
+            assembly.assert_not_called()
+        assert 's3' not in services
+
+    def test_permissions_and_validation(self):
+        default = self.get_filter()
+        assert set(default.get_permissions()) == {
+            's3:GetBucketLocation', 's3:GetBucketTagging',
+            's3:GetLifecycleConfiguration', 's3:GetBucketVersioning'}
+
+        with pytest.raises(PolicyValidationError):
+            self.get_filter({'key': 'Versioning.Status', 'value': 'Enabled'})
+
+
+@terraform('bedrock_evaluation_job', scope='function')
+def test_bedrock_evaluation_job(test, bedrock_evaluation_job):
+    session_factory = test.replay_flight_data('bedrock_evaluation_job')
+    job_name = bedrock_evaluation_job.outputs['job_name']['value']
+    output_s3_uri = bedrock_evaluation_job.outputs['output_s3_uri']['value']
+
+    policy = test.load_policy(
+        {
+            'name': 'bedrock-evaluation-job',
+            'resource': 'bedrock-evaluation-job',
+            'filters': [
+                {'jobName': job_name},
+                {'tag:Owner': 'c7n'},
+            ],
+        },
+        session_factory=session_factory,
+        config={'region': 'us-east-1'},
+    )
+
+    resources = policy.run()
+    assert len(resources) == 1
+    assert resources[0]['jobName'] == job_name
+    assert resources[0]['outputDataConfig']['s3Uri'] == output_s3_uri
+    assert resources[0]['jobArn'].startswith('arn:aws:bedrock:')
+    assert resources[0]['status'] in ('InProgress', 'Completed')
+    assert {'Key': 'Owner', 'Value': 'c7n'} in resources[0]['Tags']
+
+
+@terraform('bedrock_evaluation_job', scope='function')
+def test_bedrock_evaluation_job_output_retention(test, bedrock_evaluation_job):
+    session_factory = test.replay_flight_data('bedrock_evaluation_job_output_bucket')
+    job_name = bedrock_evaluation_job.outputs['job_name']['value']
+    output_s3_uri = bedrock_evaluation_job.outputs['output_s3_uri']['value']
+    bucket_name = output_s3_uri.split('/', 3)[2]
+
+    def load_policy(op, value):
+        return test.load_policy(
+            {
+                'name': 'bedrock-evaluation-job-output-retention-%s' % op,
+                'resource': 'bedrock-evaluation-job',
+                'filters': [
+                    {'jobName': job_name},
+                    {
+                        'type': 'output-retention',
+                        'key': (
+                            '"c7n:BedrockEvaluationOutput".'
+                            'EffectiveExpirationDays'),
+                        'op': op,
+                        'value': value,
+                    },
+                ],
+            },
+            session_factory=session_factory,
+            config={'region': 'us-east-1'},
+        )
+
+    resources = load_policy('gt', 20).run()
+    assert len(resources) == 1
+    bucket = resources[0]['c7n:OutputBucket']
+    output = bucket['c7n:BedrockEvaluationOutput']
+    assert bucket['Name'] == bucket_name
+    assert bucket['Versioning']['Status'] == 'Enabled'
+    assert output['S3Uri'] == output_s3_uri
+    assert output['Prefix'] == 'evaluations/'
+    assert output['ArtifactPrefix'] == (
+        'evaluations/%s/%s/' % (job_name, resources[0]['jobArn'].rsplit('/', 1)[-1]))
+    assert output['EffectiveExpirationDays'] == 40
+    assert output['Error'] is None
+    assert [r['ID'] for r in output['PrefixMatchedLifecycleRules']] == [
+        'evaluation-output-retention']
+
+    assert load_policy('lt', 40).run() == []
+
+
+@terraform('bedrock_evaluation_job', scope='function')
+def test_bedrock_evaluation_job_tag_actions(test, bedrock_evaluation_job):
+    session_factory = test.replay_flight_data('bedrock_evaluation_job_tag_actions')
+    client = session_factory().client('bedrock')
+    job_name = bedrock_evaluation_job.outputs['job_name']['value']
+
+    policy = test.load_policy(
+        {
+            'name': 'bedrock-evaluation-job-tag',
+            'resource': 'bedrock-evaluation-job',
+            'filters': [
+                {'jobName': job_name},
+                {'tag:TestTag': 'absent'},
+            ],
+            'actions': [
+                {'type': 'tag', 'key': 'TestTag', 'value': 'TestValue'},
+            ],
+        },
+        session_factory=session_factory,
+        config={'region': 'us-east-1'},
+    )
+
+    resources = policy.run()
+    assert len(resources) == 1
+    job_arn = resources[0]['jobArn']
+    tags = client.list_tags_for_resource(resourceARN=job_arn)['tags']
+    assert {'key': 'TestTag', 'value': 'TestValue'} in tags
+
+    policy = test.load_policy(
+        {
+            'name': 'bedrock-evaluation-job-remove-tag',
+            'resource': 'bedrock-evaluation-job',
+            'filters': [
+                {'jobName': job_name},
+                {'tag:TestTag': 'present'},
+            ],
+            'actions': [
+                {'type': 'remove-tag', 'tags': ['TestTag']},
+            ],
+        },
+        session_factory=session_factory,
+        config={'region': 'us-east-1'},
+    )
+
+    resources = policy.run()
+    assert len(resources) == 1
+    tags = client.list_tags_for_resource(resourceARN=job_arn)['tags']
+    assert 'TestTag' not in {t['key'] for t in tags}
+    assert {'key': 'Owner', 'value': 'c7n'} in tags
 
 
 @terraform('bedrock_guardrail')
