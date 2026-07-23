@@ -2208,7 +2208,9 @@ resource "aws_ecs_task_definition" "test_task_def" {
     """)
     results = policy_env.run()
     assert results[0].resource["c7n:MatchedFilters"] == ["container_definitions"]
-    assert results[1].resource["c7n:MatchedFilters"] == ["container_definitions"]
+    assert results[1].resource["c7n:ListItemMatches"] == [
+        "from_json(container_definitions)[].environment[][0]",
+    ]
 
 
 @pytest.mark.xfail(reason="https://github.com/cloud-custodian/cloud-custodian/issues/9709")

@@ -1286,7 +1286,10 @@ class ListItemFilter(Filter):
                 )
             for idx, list_value in enumerate(list_values):
                 list_value['c7n:_id'] = idx
-            list_resources = frm.filter_resources(list_values, event)
+            # List-item manages ephemeral c7n:_id on list_values; skip the
+            # default deepcopy so cleanup and annotate_items stay consistent.
+            list_resources = frm.filter_resources(
+                list_values, event, copy_resources=False)
             matched_indicies = [r['c7n:_id'] for r in list_resources]
             for idx, list_value in enumerate(list_values):
                 list_value.pop('c7n:_id')
