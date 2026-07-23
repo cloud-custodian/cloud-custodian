@@ -538,6 +538,56 @@ class RunTest(CliTest):
             ]
         )
 
+    def test_cli_vars_option(self):
+        session_factory = self.replay_flight_data("test_cli_vars_option")
+
+        from c7n.policy import PolicyCollection
+
+        self.patch(
+            PolicyCollection,
+            "session_factory",
+            staticmethod(lambda x=None: session_factory),
+        )
+
+        temp_dir = self.get_temp_dir()
+        policy_file = self.write_policy_file(
+            {
+                "policies": [
+                    {
+                        "name": "test_cli_vars_option",
+                        "resource": "ec2",
+                        "conditions": [
+                            {
+                                "type": "value",
+                                "key": "now",
+                                "op": "less-than",
+                                "value_type": "date",
+                                "value": "{holiday_start}"
+                            }
+                        ],
+                    }
+                ]
+            }
+        )
+        resources_file = temp_dir + "/test_cli_vars_option/resources.json"
+        cmd = ["custodian", "run", "-s", temp_dir, policy_file]
+
+        # NOTE case 1 no vars file specified
+        self.run_and_expect_success(cmd)
+        assert not os.path.exists(resources_file)
+
+        # NOTE case 2 vars file specified, not meet conditions
+        vars_file = self.write_policy_file({"vars": {"holiday_start": "2020/01/01"}})
+        cmd = ["custodian", "run", "-s", temp_dir, "--vars", vars_file, policy_file]
+        self.run_and_expect_success(cmd)
+        assert not os.path.exists(resources_file)
+
+        # NOTE case 3 vars file specified, meet conditions
+        vars_file = self.write_policy_file({"vars": {"holiday_start": "2099/01/01"}})
+        cmd = ["custodian", "run", "-s", temp_dir, "--vars", vars_file, policy_file]
+        self.run_and_expect_success(cmd)
+        assert os.path.exists(resources_file)
+
     def test_error(self):
         from c7n.policy import Policy
 
