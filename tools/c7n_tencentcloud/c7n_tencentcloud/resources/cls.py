@@ -2,18 +2,8 @@
 # SPDX-License-Identifier: Apache-2.0
 
 from c7n_tencentcloud.provider import resources
-from c7n_tencentcloud.query import ResourceTypeInfo, QueryResourceManager, DescribeSource
+from c7n_tencentcloud.query import ResourceTypeInfo, QueryResourceManager
 from c7n_tencentcloud.utils import PageMethod
-
-
-class LogGroupDescribe(DescribeSource):
-    def augment(self, resources):
-        """
-        Resource comes with tags, no need to re-query
-        """
-        for res in resources:
-            res["c7n:uin"] = self.resource_manager.config.account_id
-        return resources
 
 
 @resources.register("cls")
@@ -51,4 +41,10 @@ class LogTopic(QueryResourceManager):
         metrics_instance_id_name = "TopicId"
         metrics_namespace = "QCE/CLS"
 
-    source_mapping = {'describe': LogGroupDescribe}
+    def augment(self, resources):
+        """
+        Resource comes with tags, no need to re-query
+        """
+        for res in resources:
+            res["c7n:uin"] = self.config.account_id
+        return resources

@@ -12,12 +12,6 @@ from c7n_tencentcloud.query import ResourceTypeInfo, QueryResourceManager, Descr
 from c7n_tencentcloud.utils import PageMethod
 
 
-class CVMDescribe(DescribeSource):
-
-    def augment(self, resources):
-        return resources
-
-
 @resources.register("cvm")
 class CVM(QueryResourceManager):
     """CVM Cloud Virtual Machine
@@ -39,8 +33,6 @@ class CVM(QueryResourceManager):
               value:
                 - S1.SMALL1
     """
-
-    source_mapping = {'describe': CVMDescribe}
 
     class resource_type(ResourceTypeInfo):
         """resource_type"""
@@ -73,6 +65,9 @@ class CVM(QueryResourceManager):
                                          r["InstanceId"])
             qcs_list.append(qcs)
         return qcs_list
+
+    def augment(self, resources):
+        return resources
 
 
 class CvmAction(TencentCloudBaseAction):
