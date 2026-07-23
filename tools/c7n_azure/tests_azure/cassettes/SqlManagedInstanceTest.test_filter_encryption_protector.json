@@ -1,0 +1,121 @@
+{
+    "version": 1,
+    "interactions": [
+        {
+            "request": {
+                "method": "GET",
+                "uri": "https://management.azure.com/subscriptions/ea42f556-5106-4743-99b0-c129bfa71a47/providers/Microsoft.Sql/managedInstances?api-version=2020-02-02-preview",
+                "body": null,
+                "headers": {}
+            },
+            "response": {
+                "status": {
+                    "code": 200,
+                    "message": "OK"
+                },
+                "headers": {
+                    "date": [
+                        "Fri, 24 Sep 2021 13:43:22 GMT"
+                    ],
+                    "content-type": [
+                        "application/json; charset=utf-8"
+                    ],
+                    "cache-control": [
+                        "no-cache"
+                    ],
+                    "content-length": [
+                        "1276"
+                    ]
+                },
+                "body": {
+                    "data": {
+                        "value": [
+                            {
+                                "identity": {
+                                    "principalId": "068ac866-15e5-4bc3-96fa-495482496d96",
+                                    "type": "SystemAssigned",
+                                    "tenantId": "00000000-0000-0000-0000-000000000003"
+                                },
+                                "sku": {
+                                    "name": "GP_Gen5",
+                                    "tier": "GeneralPurpose",
+                                    "family": "Gen5",
+                                    "capacity": 4
+                                },
+                                "properties": {
+                                    "provisioningState": "Succeeded",
+                                    "fullyQualifiedDomainName": "testsqlmi71.71ccd8863ff8.database.windows.net",
+                                    "administratorLogin": "testadm71",
+                                    "subnetId": "/subscriptions/ea42f556-5106-4743-99b0-c129bfa71a47/resourceGroups/sqlmirg/providers/Microsoft.Network/virtualNetworks/vnet-testsqlmi71/subnets/ManagedInstance",
+                                    "state": "Ready",
+                                    "licenseType": "LicenseIncluded",
+                                    "vCores": 4,
+                                    "storageSizeInGB": 32,
+                                    "collation": "SQL_Latin1_General_CP1_CI_AS",
+                                    "dnsZone": "71ccd8863ff8",
+                                    "publicDataEndpointEnabled": false,
+                                    "proxyOverride": "Proxy",
+                                    "timezoneId": "UTC",
+                                    "maintenanceConfigurationId": "/subscriptions/ea42f556-5106-4743-99b0-c129bfa71a47/providers/Microsoft.Maintenance/publicMaintenanceConfigurations/SQL_Default",
+                                    "privateEndpointConnections": [],
+                                    "minimalTlsVersion": "1.2",
+                                    "storageAccountType": "LRS",
+                                    "zoneRedundant": false
+                                },
+                                "location": "eastus",
+                                "tags": {},
+                                "id": "/subscriptions/ea42f556-5106-4743-99b0-c129bfa71a47/resourceGroups/sqlmirg/providers/Microsoft.Sql/managedInstances/testsqlmi71",
+                                "name": "testsqlmi71",
+                                "type": "Microsoft.Sql/managedInstances"
+                            }
+                        ]
+                    }
+                }
+            }
+        },
+        {
+            "request": {
+                "method": "GET",
+                "uri": "https://management.azure.com/subscriptions/ea42f556-5106-4743-99b0-c129bfa71a47/resourceGroups/sqlmirg/providers/Microsoft.Sql/managedInstances/testsqlmi71/encryptionProtector?api-version=2017-10-01-preview",
+                "body": null,
+                "headers": {}
+            },
+            "response": {
+                "status": {
+                    "code": 200,
+                    "message": "OK"
+                },
+                "headers": {
+                    "date": [
+                        "Fri, 24 Sep 2021 13:43:23 GMT"
+                    ],
+                    "content-type": [
+                        "application/json; charset=utf-8"
+                    ],
+                    "cache-control": [
+                        "no-cache"
+                    ],
+                    "content-length": [
+                        "358"
+                    ]
+                },
+                "body": {
+                    "data": {
+                        "value": [
+                            {
+                                "kind": "servicemanaged",
+                                "properties": {
+                                    "serverKeyName": "ServiceManaged",
+                                    "serverKeyType": "ServiceManaged"
+                                },
+                                "id": "/subscriptions/ea42f556-5106-4743-99b0-c129bfa71a47/resourceGroups/sqlmirg/providers/Microsoft.Sql/managedInstances/testsqlmi71/encryptionProtector/current",
+                                "name": "current",
+                                "type": "Microsoft.Sql/managedInstances/encryptionProtector"
+                            }
+                        ]
+                    }
+                }
+            }
+        }
+    ]
+}

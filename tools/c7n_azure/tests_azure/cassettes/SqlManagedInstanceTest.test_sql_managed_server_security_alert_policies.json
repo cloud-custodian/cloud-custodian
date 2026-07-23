@@ -1,0 +1,132 @@
+{
+    "version": 1,
+    "interactions": [
+        {
+            "request": {
+                "method": "GET",
+                "uri": "https://management.azure.com/subscriptions/ea42f556-5106-4743-99b0-c129bfa71a47/providers/Microsoft.Sql/managedInstances?api-version=2020-02-02-preview",
+                "body": null,
+                "headers": {}
+            },
+            "response": {
+                "status": {
+                    "code": 200,
+                    "message": "OK"
+                },
+                "headers": {
+                    "cache-control": [
+                        "no-cache"
+                    ],
+                    "content-type": [
+                        "application/json; charset=utf-8"
+                    ],
+                    "date": [
+                        "Wed, 29 Sep 2021 10:21:48 GMT"
+                    ],
+                    "content-length": [
+                        "1261"
+                    ]
+                },
+                "body": {
+                    "data": {
+                        "value": [
+                            {
+                                "identity": {
+                                    "principalId": "7153dfac-8387-49e3-87fc-0dd44059a248",
+                                    "type": "SystemAssigned",
+                                    "tenantId": "00000000-0000-0000-0000-000000000003"
+                                },
+                                "sku": {
+                                    "name": "GP_Gen5",
+                                    "tier": "GeneralPurpose",
+                                    "family": "Gen5",
+                                    "capacity": 4
+                                },
+                                "properties": {
+                                    "provisioningState": "Succeeded",
+                                    "fullyQualifiedDomainName": "vvsqlmi1.4b120597217c.database.windows.net",
+                                    "administratorLogin": "vvadm",
+                                    "subnetId": "/subscriptions/ea42f556-5106-4743-99b0-c129bfa71a47/resourceGroups/VV/providers/Microsoft.Network/virtualNetworks/vnet-vvsqlmi1/subnets/ManagedInstance",
+                                    "state": "Ready",
+                                    "licenseType": "LicenseIncluded",
+                                    "vCores": 4,
+                                    "storageSizeInGB": 32,
+                                    "collation": "SQL_Latin1_General_CP1_CI_AS",
+                                    "dnsZone": "4b120597217c",
+                                    "publicDataEndpointEnabled": false,
+                                    "proxyOverride": "Proxy",
+                                    "timezoneId": "UTC",
+                                    "maintenanceConfigurationId": "/subscriptions/ea42f556-5106-4743-99b0-c129bfa71a47/providers/Microsoft.Maintenance/publicMaintenanceConfigurations/SQL_Default",
+                                    "privateEndpointConnections": [],
+                                    "minimalTlsVersion": "1.2",
+                                    "storageAccountType": "LRS",
+                                    "zoneRedundant": false
+                                },
+                                "location": "eastus",
+                                "tags": {
+                                    "VV": "test"
+                                },
+                                "id": "/subscriptions/ea42f556-5106-4743-99b0-c129bfa71a47/resourceGroups/VV/providers/Microsoft.Sql/managedInstances/vvsqlmi1",
+                                "name": "vvsqlmi1",
+                                "type": "Microsoft.Sql/managedInstances"
+                            }
+                        ]
+                    }
+                }
+            }
+        },
+        {
+            "request": {
+                "method": "GET",
+                "uri": "https://management.azure.com/subscriptions/ea42f556-5106-4743-99b0-c129bfa71a47/resourceGroups/VV/providers/Microsoft.Sql/managedInstances/vvsqlmi1/securityAlertPolicies?api-version=2017-03-01-preview",
+                "body": null,
+                "headers": {}
+            },
+            "response": {
+                "status": {
+                    "code": 200,
+                    "message": "OK"
+                },
+                "headers": {
+                    "cache-control": [
+                        "no-cache"
+                    ],
+                    "content-type": [
+                        "application/json; charset=utf-8"
+                    ],
+                    "date": [
+                        "Wed, 29 Sep 2021 10:21:48 GMT"
+                    ],
+                    "content-length": [
+                        "463"
+                    ]
+                },
+                "body": {
+                    "data": {
+                        "value": [
+                            {
+                                "properties": {
+                                    "state": "Disabled",
+                                    "disabledAlerts": [
+                                        ""
+                                    ],
+                                    "emailAddresses": [
+                                        ""
+                                    ],
+                                    "emailAccountAdmins": false,
+                                    "storageEndpoint": "",
+                                    "storageAccountAccessKey": "",
+                                    "retentionDays": 0,
+                                    "creationTime": "2021-09-29T10:07:55.11Z"
+                                },
+                                "id": "/subscriptions/ea42f556-5106-4743-99b0-c129bfa71a47/resourceGroups/VV/providers/Microsoft.Sql/managedInstances/vvsqlmi1/securityAlertPolicies/Default",
+                                "name": "Default",
+                                "type": "Microsoft.Sql/managedInstances/securityAlertPolicies"
+                            }
+                        ]
+                    }
+                }
+            }
+        }
+    ]
+}
