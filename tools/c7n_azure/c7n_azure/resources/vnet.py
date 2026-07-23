@@ -4,7 +4,6 @@
 from c7n_azure.provider import resources
 from c7n_azure.resources.arm import ArmResourceManager
 
-
 @resources.register('vnet')
 class Vnet(ArmResourceManager):
     """Virtual Networks Resource
@@ -32,4 +31,9 @@ class Vnet(ArmResourceManager):
         service = 'azure.mgmt.network'
         client = 'NetworkManagementClient'
         enum_spec = ('virtual_networks', 'list_all', None)
+        default_report_fields = (
+            'name',
+            'location',
+            'resourceGroup'
+        )
         resource_type = 'Microsoft.Network/virtualNetworks'
