@@ -1,0 +1,26 @@
+{
+    "status_code": 200,
+    "data": {
+        "logGroups": [
+            {
+                "logGroupName": "protected",
+                "creationTime": 1784590861140,
+                "metricFilterCount": 0,
+                "arn": "arn:aws:logs:us-east-1:644160558196:log-group:protected:*",
+                "storedBytes": 0,
+                "dataProtectionStatus": "ACTIVATED",
+                "logGroupClass": "STANDARD",
+                "logGroupArn": "arn:aws:logs:us-east-1:644160558196:log-group:protected"
+            },
+            {
+                "logGroupName": "unprotected",
+                "creationTime": 1784590861140,
+                "metricFilterCount": 0,
+                "arn": "arn:aws:logs:us-east-1:644160558196:log-group:unprotected:*",
+                "storedBytes": 0,
+                "logGroupClass": "STANDARD",
+                "logGroupArn": "arn:aws:logs:us-east-1:644160558196:log-group:unprotected"
+            }
+        ]
+    }
+}

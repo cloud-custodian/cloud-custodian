@@ -1468,6 +1468,30 @@ class AccountTests(BaseTest):
         self.assertEqual(resources[0]['c7n:ses-send-stats'], expected_send_stats)
         self.assertEqual(resources[0]['c7n:ses-max-bounce-rate'], 6)
 
+    def test_logs_account_policy(self):
+        factory = self.replay_flight_data('test_account_logs_account_policy')
+        p = self.load_policy({
+            'name': 'account-subscription-filter-non-company-destination',
+            'resource': 'account',
+            'filters': [{
+                'type': 'logs-account-policy',
+                'policy-type': 'SUBSCRIPTION_FILTER_POLICY',
+                'attrs': [{
+                    'type': 'value',
+                    'key': 'policyDocument.DestinationArn',
+                    'op': 'not-in',
+                    'value': [
+                        'arn:aws:logs:us-east-1:123456789012:destination:corp-central']}]}]},
+            config={'region': 'us-east-1'},
+            session_factory=factory)
+        resources = p.run()
+        self.assertEqual(len(resources), 1)
+        policies = resources[0]['c7n:LogsAccountPolicies']
+        self.assertEqual(len(policies), 1)
+        self.assertEqual(
+            policies[0]['policyDocument']['DestinationArn'],
+            'arn:aws:logs:us-east-1:210987654321:destination:external-siem')
+
     def test_bedrock_model_invocation_logging_disabled(self):
         factory = self.replay_flight_data('test_bedrock_model_invocation_logging_disabled')
         p = self.load_policy({

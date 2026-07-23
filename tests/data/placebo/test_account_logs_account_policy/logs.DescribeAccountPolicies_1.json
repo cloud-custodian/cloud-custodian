@@ -1,0 +1,15 @@
+{
+    "status_code": 200,
+    "data": {
+        "accountPolicies": [
+            {
+                "policyName": "account-subscription-forwarding",
+                "policyDocument": "{\"RoleArn\":\"arn:aws:iam::644160558196:role/c7n-test-cwl-subscription\",\"DestinationArn\":\"arn:aws:logs:us-east-1:210987654321:destination:external-siem\",\"FilterPattern\":\"\",\"Distribution\":\"Random\"}",
+                "lastUpdatedTime": 1784810312000,
+                "policyType": "SUBSCRIPTION_FILTER_POLICY",
+                "scope": "ALL",
+                "accountId": "644160558196"
+            }
+        ]
+    }
+}

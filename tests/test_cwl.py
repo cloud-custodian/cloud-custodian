@@ -106,6 +106,36 @@ class LogGroupTest(BaseTest):
         self.assertEqual(len(resources), 1)
         self.assertEqual(resources[0]["c7n:CrossAccountViolations"], ["1111111111111"])
 
+    def test_data_protection(self):
+        factory = self.replay_flight_data("test_log_group_data_protection")
+        p = self.load_policy(
+            {
+                "name": "log-groups-missing-data-protection",
+                "resource": "log-group",
+                "filters": [{"type": "data-protection", "state": False}],
+            },
+            session_factory=factory,
+        )
+        resources = p.run()
+        self.assertEqual(len(resources), 1)
+        self.assertEqual(resources[0]["logGroupName"], "unprotected")
+        self.assertNotIn("c7n:DataProtection", resources[0])
+
+    def test_data_protection_account_level(self):
+        factory = self.replay_flight_data("test_log_group_data_protection_account")
+        p = self.load_policy(
+            {
+                "name": "log-groups-with-data-protection",
+                "resource": "log-group",
+                "filters": [{"type": "data-protection", "state": True}],
+            },
+            session_factory=factory,
+        )
+        resources = p.run()
+        self.assertEqual(len(resources), 2)
+        self.assertEqual(
+            {r["c7n:DataProtection"] for r in resources}, {"account"})
+
     def test_kms_filter(self):
         session_factory = self.replay_flight_data('test_log_group_kms_filter')
         kms = session_factory().client('kms')
