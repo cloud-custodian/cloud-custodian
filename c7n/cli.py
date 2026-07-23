@@ -196,6 +196,7 @@ def _key_val_pair(value):
         raise argparse.ArgumentTypeError(msg)
     return value
 
+
 def _valid_path(value):
     """
     Type checker to ensure that --vars-file is a path to a file
