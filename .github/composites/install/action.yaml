@@ -19,6 +19,15 @@ runs:
         version: ${{ inputs.uv-version }}
         enable-cache: true
 
+    - name: Install just
+      shell: bash
+      run: |
+        if [[ "$RUNNER_OS" == "Windows" ]]; then
+          choco install just -y
+        else
+          curl --proto '=https' --tlsv1.2 -sSf https://just.systems/install.sh | bash -s -- --to /usr/local/bin
+        fi
+
     - name: Set up Python ${{ inputs.python-version }}
       uses: actions/setup-python@a309ff8b426b58ec0e2a45f0f869d46889d02405 # ratchet:actions/setup-python@v5
       with:
@@ -69,7 +78,7 @@ runs:
         if [ -d ".venv" ]; then
           mv .venv .venv-old
         fi
-        make install
+        just install
 
     - name: Output UV Version
       shell: bash

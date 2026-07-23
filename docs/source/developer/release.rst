@@ -9,8 +9,8 @@ Prerequisites / Assumptions
 * Releases are built and published using the ``main`` branch
 * The release process documented here should come _after_ a "release preparation" pull request gets merged. That pull request should:
 
-  * Increment package versions (via ``make pkg-increment``)
-  * Update dependencies (via ``make pkg-rebase``)
+  * Increment package versions (via ``just pkg increment``)
+  * Update dependencies (via ``just pkg update``)
   * Resolve any test breakages related to those dependency updates
 
 .. note::
@@ -45,7 +45,7 @@ Download the release artifacts into a clean working copy:
 
 .. code-block::
 
-    make release-get-artifacts
+    just pkg get-artifacts
 
 Open the Changelog (``release.md``) in a text editor and adjust accordingly so that it makes sense for humans.
 
@@ -68,7 +68,7 @@ Publish Wheel
 
 .. code-block::
 
-    make pkg-publish-wheel PKG_REPO=prodpypi
+    PKG_REPO=prodpypi just pkg publish
 
 Announce
 --------
