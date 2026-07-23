@@ -1,10 +1,56 @@
 {
-    "status_code": 400,
+    "status_code": 200,
     "data": {
-        "Error": {
-            "Code": "InvalidServiceName",
-            "Message": "The Vpc Endpoint Service 'com.amazonaws.us-west-2.s3' does not exist"
-        },
+        "ServiceDetails": [
+            {
+                "ServiceName": "com.amazonaws.us-east-1.dynamodb",
+                "ServiceId": "vpce-svc-04b9ffcb9ee7ef983",
+                "ServiceType": [{"ServiceType": "Interface"}],
+                "ServiceRegion": "us-east-1",
+                "Owner": "amazon",
+                "BaseEndpointDnsNames": ["dynamodb.us-east-1.vpce.amazonaws.com"],
+                "VpcEndpointPolicySupported": true,
+                "AcceptanceRequired": false,
+                "ManagesVpcEndpoints": false,
+                "Tags": []
+            },
+            {
+                "ServiceName": "com.amazonaws.us-east-1.dynamodb",
+                "ServiceId": "vpce-svc-099eb39957ebe7ecc",
+                "ServiceType": [{"ServiceType": "Gateway"}],
+                "ServiceRegion": "us-east-1",
+                "Owner": "amazon",
+                "BaseEndpointDnsNames": ["dynamodb.us-east-1.amazonaws.com"],
+                "VpcEndpointPolicySupported": true,
+                "AcceptanceRequired": false,
+                "ManagesVpcEndpoints": false,
+                "Tags": []
+            },
+            {
+                "ServiceName": "com.amazonaws.us-east-1.s3",
+                "ServiceId": "vpce-svc-0aa7c06513d4872d5",
+                "ServiceType": [{"ServiceType": "Gateway"}],
+                "ServiceRegion": "us-east-1",
+                "Owner": "amazon",
+                "BaseEndpointDnsNames": ["s3.us-east-1.amazonaws.com"],
+                "VpcEndpointPolicySupported": true,
+                "AcceptanceRequired": false,
+                "ManagesVpcEndpoints": false,
+                "Tags": []
+            },
+            {
+                "ServiceName": "com.amazonaws.us-east-1.s3",
+                "ServiceId": "vpce-svc-081d84efcdc7bac15",
+                "ServiceType": [{"ServiceType": "Interface"}],
+                "ServiceRegion": "us-east-1",
+                "Owner": "amazon",
+                "BaseEndpointDnsNames": ["s3.us-east-1.vpce.amazonaws.com"],
+                "VpcEndpointPolicySupported": true,
+                "AcceptanceRequired": false,
+                "ManagesVpcEndpoints": false,
+                "Tags": []
+            }
+        ],
         "ResponseMetadata": {}
     }
 }

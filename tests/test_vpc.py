@@ -4789,7 +4789,7 @@ class TestVpcEndpointServiceDetails(BaseTest):
         )
         self.assertTrue(service_details["VpcEndpointPolicySupported"])
 
-    def test_endpoint_service_details_invalid_service_names_excluded(self):
+    def test_endpoint_service_details_cross_region(self):
         session_factory = self.replay_flight_data(
             "test_vpc_endpoint_service_details_live"
         )
@@ -4807,17 +4807,45 @@ class TestVpcEndpointServiceDetails(BaseTest):
             },
             session_factory=session_factory,
         )
-        all_resources = self.load_policy(
+        resources = p.run()
+        service_names = {r["ServiceName"] for r in resources}
+
+        # All endpoints have VpcEndpointPolicySupported=true, including the
+        # cross-region one (com.amazonaws.us-west-2.s3) which requires a
+        # us-west-2 regional client to describe correctly.
+        self.assertIn("com.amazonaws.us-east-1.s3", service_names)
+        self.assertIn("com.amazonaws.us-east-1.dynamodb", service_names)
+        self.assertIn("com.amazonaws.us-west-2.s3", service_names)
+        cross_region = next(
+            r for r in resources if r["ServiceName"] == "com.amazonaws.us-west-2.s3"
+        )
+        self.assertEqual(cross_region["c7n:ServiceDetails"]["ServiceRegion"], "us-west-2")
+
+    def test_endpoint_service_details_inaccessible_service_skipped(self):
+        """Inaccessible service names (deprecated or cross-account PrivateLink
+        without permission) trigger a per-service fallback; each inaccessible
+        service is logged as a warning and skipped rather than failing the policy."""
+        session_factory = self.replay_flight_data(
+            "test_vpc_endpoint_service_details_inaccessible"
+        )
+        p = self.load_policy(
             {
-                "name": "vpc-endpoint-all",
+                "name": "vpc-endpoint-inaccessible-skipped",
                 "resource": "aws.vpc-endpoint",
+                "filters": [
+                    {
+                        "type": "service-details",
+                        "key": "VpcEndpointPolicySupported",
+                        "value": True,
+                    }
+                ],
             },
             session_factory=session_factory,
-        ).run()
-        filtered_resources = p.run()
+        )
+        resources = p.run()
 
-        filtered_names = {r["ServiceName"] for r in filtered_resources}
-
-        self.assertLess(len(filtered_resources), len(all_resources))
-        self.assertIn("com.amazonaws.us-east-1.s3", filtered_names)
-        self.assertNotIn("com.amazonaws.us-west-2.s3", filtered_names)
+        # Only the s3 endpoint matches; the deprecated service endpoint is
+        # skipped (gets empty c7n:ServiceDetails) and does not appear in results.
+        self.assertEqual(len(resources), 1)
+        self.assertEqual(resources[0]["ServiceName"], "com.amazonaws.us-east-1.s3")
+        self.assertTrue(resources[0]["c7n:ServiceDetails"]["VpcEndpointPolicySupported"])

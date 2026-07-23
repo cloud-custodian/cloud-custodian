@@ -1,0 +1,10 @@
+{
+    "status_code": 400,
+    "data": {
+        "Error": {
+            "Code": "InvalidServiceName",
+            "Message": "The Vpc Endpoint Service 'com.amazonaws.us-east-1.deprecated-service' does not exist"
+        },
+        "ResponseMetadata": {}
+    }
+}
