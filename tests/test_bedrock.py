@@ -1255,3 +1255,62 @@ def test_bedrock_inference_profile_bad_statistics(test):
                 }],
             },
         )
+
+
+class BedrockMantleProject(BaseTest):
+
+    def test_bedrock_mantle_project_query(self):
+        if C7N_FUNCTIONAL:
+            session_factory = self.record_flight_data(
+                'test_bedrock_mantle_project_query', region='us-east-1')
+        else:
+            session_factory = self.replay_flight_data(
+                'test_bedrock_mantle_project_query', region='us-east-1')
+        p = self.load_policy(
+            {
+                'name': 'mantle-project-tagged',
+                'resource': 'aws.bedrock-mantle-project',
+                'filters': [{'tag:Owner': 'c7n'}],
+            },
+            session_factory=session_factory,
+            config={'region': 'us-east-1'},
+        )
+        resources = p.run()
+        self.assertEqual(len(resources), 1)
+        self.assertTrue(resources[0]['Arn'].startswith(
+            'arn:aws:bedrock-mantle:us-east-1:'))
+        self.assertTrue(resources[0]['Id'].startswith('proj_'))
+        tags = {t['Key']: t['Value'] for t in resources[0]['Tags']}
+        self.assertEqual(tags['Owner'], 'c7n')
+
+    def test_bedrock_mantle_project_untagged(self):
+        # the account default project carries no tags; the tagging
+        # api augment must still set an empty Tags list so absent
+        # tag filters match rather than error.
+        if C7N_FUNCTIONAL:
+            session_factory = self.record_flight_data(
+                'test_bedrock_mantle_project_untagged', region='us-east-1')
+        else:
+            session_factory = self.replay_flight_data(
+                'test_bedrock_mantle_project_untagged', region='us-east-1')
+        p = self.load_policy(
+            {
+                'name': 'mantle-project-untagged',
+                'resource': 'aws.bedrock-mantle-project',
+                'filters': [
+                    {'Id': 'default'},
+                    {'tag:Owner': 'absent'},
+                ],
+            },
+            session_factory=session_factory,
+            config={'region': 'us-east-1'},
+        )
+        resources = p.run()
+        self.assertEqual(len(resources), 1)
+        self.assertEqual(resources[0]['Tags'], [])
+        self.assertEqual(
+            sorted(p.get_permissions()),
+            ['bedrock-mantle:ListProjects',
+             'bedrock-mantle:ListTagsForResource',
+             'cloudcontrol:ListResources',
+             'tag:GetResources'])
