@@ -1,0 +1,16 @@
+{
+    "pytest-terraform": 1,
+    "outputs": {},
+    "resources": {
+        "google_compute_project_metadata_item": {
+            "default": {
+                "deletion_policy": "DELETE",
+                "id": "c7n-test-key",
+                "key": "c7n-test-key",
+                "project": "stacklet-test-policies",
+                "timeouts": null,
+                "value": "initial-value"
+            }
+        }
+    }
+}
