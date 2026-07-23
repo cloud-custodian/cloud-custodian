@@ -560,6 +560,51 @@ class LogSubscriptionFilter(ValueFilter):
         return results
 
 
+@LogGroup.filter_registry.register('data-protection')
+class LogGroupDataProtection(Filter):
+    """Filter log groups by their sensitive data protection coverage.
+
+    A log group is considered protected when it has an active log group
+    level data protection policy (its ``dataProtectionStatus`` is
+    ``ACTIVATED``), or when an account level data protection policy is
+    in effect, which covers all log groups in the account. Protected
+    log groups are annotated with ``c7n:DataProtection`` noting whether
+    the coverage is ``log-group`` or ``account`` scoped.
+
+    :example:
+
+    .. code-block:: yaml
+
+            policies:
+              - name: log-groups-missing-data-protection
+                resource: aws.log-group
+                filters:
+                  - type: data-protection
+                    state: false
+    """
+
+    schema = type_schema('data-protection', state={'type': 'boolean'})
+    permissions = (
+        'logs:DescribeAccountPolicies', 'logs:GetDataProtectionPolicy')
+    annotation_key = 'c7n:DataProtection'
+
+    def process(self, resources, event=None):
+        state = self.data.get('state', False)
+        client = local_session(self.manager.session_factory).client('logs')
+        account_policies = self.manager.retry(
+            client.describe_account_policies,
+            policyType='DATA_PROTECTION_POLICY').get('accountPolicies', ())
+        results = []
+        for r in resources:
+            if account_policies:
+                r[self.annotation_key] = 'account'
+            elif r.get('dataProtectionStatus') == 'ACTIVATED':
+                r[self.annotation_key] = 'log-group'
+            if (self.annotation_key in r) == state:
+                results.append(r)
+        return results
+
+
 @LogGroup.filter_registry.register('kms-key')
 class KmsFilter(KmsRelatedFilter):
     RelatedIdsExpression = 'kmsKeyId'

@@ -1,0 +1,15 @@
+{
+    "status_code": 200,
+    "data": {
+        "accountPolicies": [
+            {
+                "policyName": "account-data-protection",
+                "policyDocument": "{\"Name\":\"account-data-protection\",\"Version\":\"2021-06-01\",\"Statement\":[{\"Sid\":\"audit\",\"DataIdentifier\":[\"arn:aws:dataprotection::aws:data-identifier/EmailAddress\"],\"Operation\":{\"Audit\":{\"FindingsDestination\":{}}}},{\"Sid\":\"redact\",\"DataIdentifier\":[\"arn:aws:dataprotection::aws:data-identifier/EmailAddress\"],\"Operation\":{\"Deidentify\":{\"MaskConfig\":{}}}}]}",
+                "lastUpdatedTime": 1784590645204,
+                "policyType": "DATA_PROTECTION_POLICY",
+                "scope": "ALL",
+                "accountId": "644160558196"
+            }
+        ]
+    }
+}
