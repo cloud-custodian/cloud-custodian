@@ -50,7 +50,7 @@ def policy_command(f):
         options.region = ""
         for fp in options.configs:
             try:
-                collection = policy_load(options, fp, validate=validate, vars=vars)
+                collection = policy_load(options, fp, validate=validate)
             except IOError:
                 log.error('policy file does not exist ({})'.format(fp))
                 errors += 1
@@ -123,7 +123,7 @@ def policy_command(f):
 
         # Variable expansion and non schema validation (not optional)
         for p in policies:
-            p.expand_variables(p.get_variables())
+            p.expand_variables(p.get_variables(variables=vars))
             p.validate()
 
         return f(options, list(policies))
@@ -133,11 +133,11 @@ def policy_command(f):
 
 def _load_vars(options):
     vars = None
-    if options.vars:
+    if options.vars_file:
         try:
-            vars = load_file(options.vars)
+            vars = load_file(options.vars_file)
         except IOError as e:
-            log.error('Problem loading vars file "{}": {}'.format(options.vars, e.strerror))
+            log.error('Problem loading vars file "{}": {}'.format(options.vars_file, e.strerror))
             sys.exit(1)
 
     # TODO - provide builtin vars here (such as account)
