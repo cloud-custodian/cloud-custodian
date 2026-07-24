@@ -1058,7 +1058,7 @@ class BedrockMantleProject(QueryResourceManager):
         id = name = 'Id'
         permission_prefix = 'bedrock-mantle'
         permissions_enum = (
-            'cloudcontrol:ListResources',
+            'cloudformation:ListResources',
             'bedrock-mantle:ListProjects',
             'bedrock-mantle:ListTagsForResource')
         universal_taggable = object()

@@ -1312,5 +1312,5 @@ class BedrockMantleProject(BaseTest):
             sorted(p.get_permissions()),
             ['bedrock-mantle:ListProjects',
              'bedrock-mantle:ListTagsForResource',
-             'cloudcontrol:ListResources',
+             'cloudformation:ListResources',
              'tag:GetResources'])
