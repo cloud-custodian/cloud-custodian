@@ -9,6 +9,7 @@ import argparse
 import importlib
 import logging
 import os
+import pathlib
 import pdb
 import sys
 import traceback
@@ -74,10 +75,9 @@ def _default_options(p, exclude=[]):
     output.add_argument("--debug", default=False, help=argparse.SUPPRESS,
                         action="store_true")
 
-    if 'vars' not in exclude:
-        # p.add_argument('--vars', default=None,
-        #               help='Vars file to substitute into policy')
-        p.set_defaults(vars=None)
+    if 'vars-file' not in exclude:
+        p.add_argument('--vars-file', default=None, type=_valid_path,
+                      help='Vars file to substitute into policy')
 
     if 'log-group' not in exclude:
         p.add_argument(
@@ -193,6 +193,17 @@ def _key_val_pair(value):
     """
     if '=' not in value:
         msg = 'values must be of the form `header=field`'
+        raise argparse.ArgumentTypeError(msg)
+    return value
+
+
+def _valid_path(value):
+    """
+    Type checker to ensure that --vars-file is a path to a file
+    """
+    path = pathlib.Path(value)
+    if not path.is_file():
+        msg = 'vars-file must point to a file'
         raise argparse.ArgumentTypeError(msg)
     return value
 

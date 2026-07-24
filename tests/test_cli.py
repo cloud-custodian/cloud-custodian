@@ -2,6 +2,7 @@
 # SPDX-License-Identifier: Apache-2.0
 import json
 import os
+import pathlib
 import sys
 import argparse
 
@@ -85,6 +86,16 @@ class UtilsTest(BaseTest):
         self.assertRaises(ArgumentTypeError, cli._key_val_pair, "invalid option")
         param = "day=today"
         self.assertIs(cli._key_val_pair(param), param)
+
+    def test_valid_path(self):
+        self.assertRaises(ArgumentTypeError, cli._valid_path, "invalid option")
+        param = "mock_path"
+        self.patch(pathlib.Path, "is_file", lambda x: True)
+        self.assertIs(cli._valid_path(param), param)
+        self.patch(pathlib.Path, "is_file", lambda x: False)
+        with self.assertRaises(ArgumentTypeError) as context:
+            cli._valid_path(param)
+        self.assertEqual(str(context.exception), 'vars-file must point to a file')
 
 
 class VersionTest(CliTest):
@@ -536,6 +547,71 @@ class RunTest(CliTest):
                 temp_dir,
                 yaml_file,
             ]
+        )
+
+    def test_vars_file(self):
+        session_factory = self.replay_flight_data(
+            "test_ec2_state_transition_age_filter"
+        )
+
+        from c7n.policy import PolicyCollection
+
+        self.patch(
+            PolicyCollection,
+            "session_factory",
+            staticmethod(lambda x=None: session_factory),
+        )
+
+        temp_dir = self.get_temp_dir()
+        policy_name = "ec2-vars-file"
+        yaml_file = self.write_policy_file(
+            {
+                "policies": [
+                    {
+                        "name": policy_name,
+                        "resource": "ec2",
+                        "filters": [{"State.Name": "{injected_from_vars}"}],
+                    }
+                ]
+            }
+        )
+        vars_file = self.write_policy_file({"injected_from_vars": "running"}, format="json")
+
+        self.run_and_expect_success(
+            [
+                "custodian",
+                "run",
+                "--vars-file",
+                vars_file,
+                "-s",
+                temp_dir,
+                yaml_file,
+            ]
+        )
+
+        # The "{injected_from_vars}" placeholder only matches the two running instances
+        # in the flight data once it is expanded from the vars file.
+        with open(os.path.join(temp_dir, policy_name, "resources.json")) as fh:
+            resources = json.load(fh)
+        self.assertEqual(len(resources), 2)
+
+    def test_vars_file_invalid_path(self):
+        yaml_file = self.write_policy_file(
+            {
+                "policies": [
+                    {"name": "ec2-vars-missing", "resource": "ec2"}
+                ]
+            }
+        )
+        self.run_and_expect_failure(
+            [
+                "custodian",
+                "run",
+                "--vars-file",
+                "does-not-exist.json",
+                yaml_file,
+            ],
+            2,
         )
 
     def test_error(self):
