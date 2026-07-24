@@ -434,12 +434,16 @@ class Tag(Action):
         policies:
           - name: ec2-tag-owner
             resource: aws.ec2
+            filters:
+              - or:
+                - "tag:Owner": empty
+                - "tag:CostCenter": empty
             actions:
               - type: tag
                 tags:
                   Owner:
                     type: resource
-                    key: "Tags[?Key=='team'].Value | [0]"
+                    key: "Tags[?Key=='Team'].Value | [0]"  # set based on Team tag if available
                     default-value: unknown
                   CostCenter:
                     type: resource
