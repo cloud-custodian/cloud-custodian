@@ -967,19 +967,26 @@ class UniversalTag(Tag):
         tag = self.data.get('key') or tag
 
         # Support setting multiple tags in a single go with a mapping
-        tags = self.data.get('tags', {})
-
+        spec_map = dict(self.data.get('tags', {}))
         if msg:
-            tags[tag] = msg
-
-        self.interpolate_values(tags)
+            spec_map[tag] = msg
 
         batch_size = self.data.get('batch_size', self.batch_size)
         client = self.get_client()
 
-        _common_tag_processer(
-            self.executor_factory, batch_size, self.concurrency, client,
-            self.process_resource_set, self.id_key, resources, tags, self.log)
+        if not has_dynamic_tag_values(spec_map):
+            tags = dict(spec_map)
+            self.interpolate_values(tags)
+            _common_tag_processer(
+                self.executor_factory, batch_size, self.concurrency, client,
+                self.process_resource_set, self.id_key, resources, tags, self.log)
+            return
+
+        for resource_set, resolved in self._resolve_and_group(resources, spec_map):
+            _common_tag_processer(
+                self.executor_factory, batch_size, self.concurrency, client,
+                self.process_resource_set, self.id_key, resource_set, resolved,
+                self.log)
 
     def process_resource_set(self, client, resource_set, tags):
         arns = self.manager.get_arns(resource_set)

@@ -703,3 +703,32 @@ class DynamicTagTest(BaseTest):
             [{"InstanceId": "i-1"}, {"InstanceId": "i-2"}], {"K": "v"})
         create_tags.assert_called_once_with(
             Resources=["i-1", "i-2"], Tags=[{"Key": "K", "Value": "v"}], DryRun=False)
+
+
+class DynamicUniversalTagTest(BaseTest):
+    def _run(self, resources, tags, resource='rds'):
+        mock_factory = MagicMock()
+        mock_factory.region = 'us-east-1'
+        tag_resources = mock_factory().client('resourcegroupstaggingapi').tag_resources
+        tag_resources.return_value = {}
+        policy = self.load_policy(
+            {"name": "d", "resource": resource,
+             "actions": [{"type": "tag", "tags": tags}]},
+            session_factory=mock_factory)
+        policy.resource_manager.actions[0].process(resources)
+        return tag_resources
+
+    def test_universal_lookup_hit(self):
+        tag_resources = self._run(
+            [{"DBInstanceIdentifier": "x", "DBInstanceArn": "arn:x",
+              "Engine": "postgres"}],
+            {"Eng": {"type": "resource", "key": "Engine"}})
+        tag_resources.assert_called_once_with(
+            ResourceARNList=["arn:x"], Tags={"Eng": "postgres"})
+
+    def test_universal_static_fast_path(self):
+        tag_resources = self._run(
+            [{"DBInstanceIdentifier": "x", "DBInstanceArn": "arn:x"}],
+            {"K": "v"})
+        tag_resources.assert_called_once_with(
+            ResourceARNList=["arn:x"], Tags={"K": "v"})
