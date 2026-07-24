@@ -110,6 +110,65 @@ def poll_for_state(
     return resources
 
 
+def test_vertexai_dataset_resource_registered(test):
+    """Test that gcp.vertex-ai-dataset resolves as a resource type."""
+    policy = test.load_policy(
+        {'name': 'vertexai-dataset-check',
+         'resource': 'gcp.vertex-ai-dataset'})
+    assert policy.resource_manager.resource_type.component == (
+        'projects.locations.datasets')
+
+
+@terraform('vertexai_dataset', scope='module')
+def test_vertexai_dataset_multi_location(test, vertexai_dataset):
+    """Test querying Vertex AI Datasets across multiple locations."""
+    session_factory = test.replay_flight_data('vertexai-dataset-multi-location')
+
+    policy = test.load_policy(
+        {'name': 'vertexai-datasets-multi-location',
+         'resource': 'gcp.vertex-ai-dataset',
+         'query': [
+             {'location': 'us-central1'},
+             {'location': 'us-east1'}
+         ]},
+        session_factory=session_factory)
+
+    resources = policy.run()
+
+    assert len(resources) >= 2
+    locations = {r['name'].split('/')[3] for r in resources}
+    assert 'us-central1' in locations
+    assert 'us-east1' in locations
+
+
+@terraform('vertexai_dataset', scope='module')
+def test_vertexai_dataset_filtering(test, vertexai_dataset):
+    """Test filtering Vertex AI Datasets on metadataSchemaUri.
+
+    Uses both fixture datasets (image schema vs. tabular schema) to prove
+    the filter actually discriminates, not just returns everything.
+    """
+    session_factory = test.replay_flight_data('vertexai-dataset-filtering')
+
+    policy = test.load_policy(
+        {'name': 'vertexai-datasets-image-schema',
+         'resource': 'gcp.vertex-ai-dataset',
+         'query': [{'location': 'us-central1'}, {'location': 'us-east1'}],
+         'filters': [
+             {'type': 'value',
+              'key': 'metadataSchemaUri',
+              'op': 'glob',
+              'value': '*image*'}
+         ]},
+        session_factory=session_factory)
+
+    resources = policy.run()
+
+    assert len(resources) >= 1
+    assert all('image' in r['metadataSchemaUri'] for r in resources)
+    assert not any('tabular' in r['metadataSchemaUri'] for r in resources)
+
+
 def test_vertexai_endpoint_multi_location(test):
     """Test querying Vertex AI Endpoints across multiple locations.
 
