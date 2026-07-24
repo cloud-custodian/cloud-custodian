@@ -1,9 +1,10 @@
 # Copyright The Cloud Custodian Authors.
 # SPDX-License-Identifier: Apache-2.0
 import logging
+import time
+import pytest
 from .common import ACCOUNT_ID, BaseTest, event_data
 from botocore.exceptions import ClientError
-import pytest
 from pytest_terraform import terraform
 from c7n.exceptions import PolicyValidationError
 from c7n.testing import C7N_FUNCTIONAL
@@ -426,6 +427,34 @@ class BedrockCustomModel(BaseTest):
         tags = client.list_tags_for_resource(resourceARN=resources[0]['modelArn'])['tags']
         self.assertEqual(len(tags), 1)
         self.assertEqual(tags, [{'key': 'foo', 'value': 'bar'}])
+
+    def test_bedrock_custom_model_deployments_filter_schema(self):
+        session_factory = self.replay_flight_data('test_bedrock_custom_model')
+        p = self.load_policy(
+            {
+                'name': 'bedrock-custom-model-no-active-deployment',
+                'resource': 'bedrock-custom-model',
+                'filters': [
+                    {'type': 'deployments', 'status': 'Active', 'value': 'absent'},
+                ],
+            },
+            session_factory=session_factory,
+        )
+        self.assertTrue(p)
+
+    def test_bedrock_custom_model_provisioned_throughputs_filter_schema(self):
+        session_factory = self.replay_flight_data('test_bedrock_custom_model')
+        p = self.load_policy(
+            {
+                'name': 'bedrock-custom-model-no-provisioned-throughput',
+                'resource': 'bedrock-custom-model',
+                'filters': [
+                    {'type': 'provisioned-throughputs', 'status': 'InService', 'value': 'absent'},
+                ],
+            },
+            session_factory=session_factory,
+        )
+        self.assertTrue(p)
 
     def test_bedrock_custom_model_delete(self):
         session_factory = self.replay_flight_data('test_bedrock_custom_model_delete')
@@ -1255,3 +1284,151 @@ def test_bedrock_inference_profile_bad_statistics(test):
                 }],
             },
         )
+
+
+# These tests run against real, prebuilt custom models kept as long-lived
+# fixtures ("pets"). Fine-tuning a custom model takes hours, and for Nova base
+# models it would not complete in the test account at all, so the models can't
+# be created per test run. Two are needed, one per serving path the filters
+# check:
+#   - deployable:    a base model eligible for on-demand custom model
+#                    deployment (backs the `deployments` filter). Llama 3.3 70B.
+#   - provisionable: a base model that can only be served via provisioned
+#                    throughput (backs the `provisioned-throughputs` filter).
+#                    Llama 3.1 8B.
+# If a model is deleted, recreate it (see the terraform + data under
+# specs/10843-aws-bedrock-deployment-filters/) and update its `id`/`region`
+# here, then re-record the affected tests. The id suffix is stable across
+# record/replay; only the 12-digit account segment differs (ACCOUNT_ID on
+# replay, the real account when recording).
+CUSTOM_MODELS = dict(
+    deployable=dict(
+        id="meta.llama3-3-70b-instruct-v1:0:128k/atcpdot5kavs",
+        region="us-west-2",
+    ),
+    provisionable=dict(
+        id="meta.llama3-1-8b-instruct-v1:0:128k/liyn3ip5ckui",
+        region="us-west-2",
+    ),
+)
+
+
+def _custom_model_arn(model, account_id):
+    return "arn:aws:bedrock:{region}:{account_id}:custom-model/{id}".format(
+        account_id=account_id, **model)
+
+
+def wait_for_custom_model_deployment_active(client, deployment_arn, test):
+    status = None
+    for _ in range(60):
+        status = client.get_custom_model_deployment(
+            customModelDeploymentIdentifier=deployment_arn)['status']
+        if status == 'Active':
+            return
+        if status == 'Failed':
+            raise RuntimeError(f'custom model deployment {deployment_arn} failed')
+        if test.recording:
+            time.sleep(20)
+    raise RuntimeError(
+        f'custom model deployment {deployment_arn} did not become Active: {status}')
+
+
+@pytest.fixture
+def create_custom_model_deployment(test):
+    """Create an on-demand custom model deployment for a test, clean it up after.
+
+    Builds its client from ``test.session_factory``, which the test must set
+    (via ``record_flight_data``/``replay_flight_data``) before calling the
+    yielded function, so the create and poll calls record/replay with the rest
+    of the test. Yields ``(model_arn, region) -> deployment_arn`` which creates
+    the deployment and waits for it to become ``Active``.
+    """
+    created = []
+
+    def _create(model_arn, region, name="c7n-test-custom-model-deployment"):
+        client = test.session_factory().client('bedrock', region_name=region)
+        deployment_arn = client.create_custom_model_deployment(
+            modelDeploymentName=name, modelArn=model_arn)['customModelDeploymentArn']
+        created.append((client, deployment_arn))
+        wait_for_custom_model_deployment_active(client, deployment_arn, test)
+        return deployment_arn
+
+    try:
+        yield _create
+    finally:
+        for client, deployment_arn in created:
+            try:
+                client.delete_custom_model_deployment(
+                    customModelDeploymentIdentifier=deployment_arn)
+            except client.exceptions.ResourceNotFoundException:
+                pass
+
+
+def test_bedrock_custom_model_deployments_filter(test, create_custom_model_deployment):
+    model = CUSTOM_MODELS['deployable']
+    test.session_factory = test.replay_flight_data(
+        'test_bedrock_custom_model_deployments_filter', region=model['region'])
+
+    account_id = ACCOUNT_ID
+    if C7N_FUNCTIONAL:
+        account_id = test.session_factory().client(
+            'sts', region_name=model['region']).get_caller_identity()['Account']
+    model_arn = _custom_model_arn(model, account_id)
+
+    # Populate an on-demand deployment on the fixture model; its create/poll
+    # calls are recorded via the same session used below.
+    create_custom_model_deployment(model_arn, model['region'])
+
+    present = test.load_policy(
+        {
+            'name': 'bedrock-custom-model-active-deployment',
+            'resource': 'aws.bedrock-custom-model',
+            'filters': [
+                {'modelArn': model_arn},
+                {'type': 'deployments', 'status': 'Active', 'value': 'present'},
+            ],
+        },
+        session_factory=test.session_factory,
+        config={'region': model['region']},
+    )
+    resources = present.run()
+    test.assertEqual(len(resources), 1)
+    test.assertEqual(resources[0]['modelArn'], model_arn)
+    test.assertEqual(len(resources[0]['c7n:deployments']), 1)
+    test.assertEqual(resources[0]['c7n:deployments'][0]['status'], 'Active')
+
+
+def test_bedrock_custom_model_orphaned(test):
+    # An "orphaned" custom model: Active, but with neither an Active on-demand
+    # deployment nor an InService provisioned throughput -- the issue's target
+    # for cleanup. Exercises the absent branch of both filters at once. Needs
+    # no resource creation: the fixture model has neither serving path.
+    model = CUSTOM_MODELS['deployable']
+    test.session_factory = test.replay_flight_data(
+        'test_bedrock_custom_model_orphaned', region=model['region'])
+
+    account_id = ACCOUNT_ID
+    if C7N_FUNCTIONAL:
+        account_id = test.session_factory().client(
+            'sts', region_name=model['region']).get_caller_identity()['Account']
+    model_arn = _custom_model_arn(model, account_id)
+
+    policy = test.load_policy(
+        {
+            'name': 'bedrock-custom-model-orphaned',
+            'resource': 'aws.bedrock-custom-model',
+            'filters': [
+                {'modelArn': model_arn},
+                {'type': 'deployments', 'status': 'Active', 'value': 'absent'},
+                {'type': 'provisioned-throughputs', 'status': 'InService',
+                 'value': 'absent'},
+            ],
+        },
+        session_factory=test.session_factory,
+        config={'region': model['region']},
+    )
+    resources = policy.run()
+    test.assertEqual(len(resources), 1)
+    test.assertEqual(resources[0]['modelArn'], model_arn)
+    test.assertEqual(resources[0]['c7n:deployments'], [])
+    test.assertEqual(resources[0]['c7n:provisioned-throughputs'], [])

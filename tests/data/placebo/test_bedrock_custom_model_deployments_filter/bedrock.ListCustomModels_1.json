@@ -1,0 +1,46 @@
+{
+    "status_code": 200,
+    "data": {
+        "ResponseMetadata": {},
+        "modelSummaries": [
+            {
+                "modelArn": "arn:aws:bedrock:us-west-2:644160558196:custom-model/meta.llama3-3-70b-instruct-v1:0:128k/atcpdot5kavs",
+                "modelName": "c7n-llama33-clever-leopard",
+                "creationTime": {
+                    "__class__": "datetime",
+                    "year": 2026,
+                    "month": 7,
+                    "day": 24,
+                    "hour": 15,
+                    "minute": 18,
+                    "second": 35,
+                    "microsecond": 468000
+                },
+                "baseModelArn": "arn:aws:bedrock:us-west-2::foundation-model/meta.llama3-3-70b-instruct-v1:0:128k",
+                "baseModelName": "",
+                "customizationType": "FINE_TUNING",
+                "ownerAccountId": "644160558196",
+                "modelStatus": "Active"
+            },
+            {
+                "modelArn": "arn:aws:bedrock:us-west-2:644160558196:custom-model/meta.llama3-1-8b-instruct-v1:0:128k/liyn3ip5ckui",
+                "modelName": "c7n-llama-ft-emerging-marmoset",
+                "creationTime": {
+                    "__class__": "datetime",
+                    "year": 2026,
+                    "month": 7,
+                    "day": 22,
+                    "hour": 14,
+                    "minute": 45,
+                    "second": 1,
+                    "microsecond": 978000
+                },
+                "baseModelArn": "arn:aws:bedrock:us-west-2::foundation-model/meta.llama3-1-8b-instruct-v1:0:128k",
+                "baseModelName": "",
+                "customizationType": "FINE_TUNING",
+                "ownerAccountId": "644160558196",
+                "modelStatus": "Active"
+            }
+        ]
+    }
+}

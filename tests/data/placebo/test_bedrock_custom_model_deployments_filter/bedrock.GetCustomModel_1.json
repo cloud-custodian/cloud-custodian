@@ -1,0 +1,37 @@
+{
+    "status_code": 200,
+    "data": {
+        "ResponseMetadata": {},
+        "modelArn": "arn:aws:bedrock:us-west-2:644160558196:custom-model/meta.llama3-3-70b-instruct-v1:0:128k/atcpdot5kavs",
+        "modelName": "c7n-llama33-clever-leopard",
+        "jobArn": "arn:aws:bedrock:us-west-2:644160558196:model-customization-job/meta.llama3-3-70b-instruct-v1:0:128k/vt6ui6wum0mn",
+        "baseModelArn": "arn:aws:bedrock:us-west-2::foundation-model/meta.llama3-3-70b-instruct-v1:0:128k",
+        "customizationType": "FINE_TUNING",
+        "hyperParameters": {
+            "batchSize": "1",
+            "learningRate": "0.00005",
+            "epochCount": "1"
+        },
+        "trainingDataConfig": {
+            "s3Uri": "s3://c7n-bedrock-llama33-clever-leopard/train.jsonl"
+        },
+        "outputDataConfig": {
+            "s3Uri": "s3://c7n-bedrock-llama33-output-clever-leopard/output/"
+        },
+        "trainingMetrics": {
+            "trainingLoss": -1.0
+        },
+        "validationMetrics": [],
+        "creationTime": {
+            "__class__": "datetime",
+            "year": 2026,
+            "month": 7,
+            "day": 24,
+            "hour": 15,
+            "minute": 18,
+            "second": 35,
+            "microsecond": 468000
+        },
+        "modelStatus": "Active"
+    }
+}

@@ -1,0 +1,7 @@
+{
+    "status_code": 202,
+    "data": {
+        "ResponseMetadata": {},
+        "customModelDeploymentArn": "arn:aws:bedrock:us-west-2:644160558196:custom-model-deployment/c6v9z95m1cwb"
+    }
+}

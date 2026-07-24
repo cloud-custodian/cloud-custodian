@@ -8,7 +8,7 @@ from c7n.tags import RemoveTag, Tag, TagActionFilter, TagDelayedAction, universa
 from c7n.utils import local_session, type_schema, QueryParser
 from c7n.actions import BaseAction
 from c7n.filters.kms import KmsRelatedFilter
-from c7n.filters import MetricsFilter
+from c7n.filters import Filter, MetricsFilter
 from c7n.resources.aws import shape_schema, shape_validate, Arn
 
 
@@ -218,6 +218,106 @@ class BedrockCustomModelKmsFilter(KmsRelatedFilter):
 
     """
     RelatedIdsExpression = 'modelKmsKeyArn'
+
+
+@BedrockCustomModel.filter_registry.register('deployments')
+class ModelDeploymentsFilter(Filter):
+    """Filter custom models by their custom model deployments.
+
+    Queries ``ListCustomModelDeployments`` for deployments referencing the
+    model, optionally scoped server-side by ``status``. Matches
+    ``value: present`` if any matching deployment is found, or
+    ``value: absent`` if none is found.
+
+    :example:
+
+    Find custom models with no active deployment:
+
+    .. code-block:: yaml
+
+        policies:
+          - name: bedrock-custom-model-no-active-deployment
+            resource: aws.bedrock-custom-model
+            filters:
+              - type: deployments
+                status: Active
+                value: absent
+    """
+    schema = type_schema(
+        'deployments',
+        status={'enum': ['Creating', 'Active', 'Failed']},
+        value={'enum': ['present', 'absent']},
+        required=['value'])
+    permissions = ('bedrock:ListCustomModelDeployments',)
+    annotation_key = 'c7n:deployments'
+
+    def process(self, resources, event=None):
+        client = local_session(self.manager.session_factory).client('bedrock')
+        params = {}
+        if 'status' in self.data:
+            params['statusEquals'] = self.data['status']
+        want_present = self.data['value'] == 'present'
+        results = []
+        for r in resources:
+            deployments = self.manager.retry(
+                client.get_paginator('list_custom_model_deployments').paginate(
+                    modelArnEquals=r['modelArn'], **params
+                ).build_full_result
+            )['modelDeploymentSummaries']
+            r[self.annotation_key] = deployments
+            if bool(deployments) == want_present:
+                results.append(r)
+        return results
+
+
+@BedrockCustomModel.filter_registry.register('provisioned-throughputs')
+class ModelProvisionedThroughputsFilter(Filter):
+    """Filter custom models by their provisioned model throughputs.
+
+    Queries ``ListProvisionedModelThroughputs`` for throughputs referencing
+    the model, optionally scoped server-side by ``status``. Matches
+    ``value: present`` if any matching provisioned throughput is found, or
+    ``value: absent`` if none is found.
+
+    :example:
+
+    Find custom models with no in-service provisioned throughput:
+
+    .. code-block:: yaml
+
+        policies:
+          - name: bedrock-custom-model-no-provisioned-throughput
+            resource: aws.bedrock-custom-model
+            filters:
+              - type: provisioned-throughputs
+                status: InService
+                value: absent
+    """
+    schema = type_schema(
+        'provisioned-throughputs',
+        status={'enum': ['Creating', 'InService', 'Updating', 'Failed']},
+        value={'enum': ['present', 'absent']},
+        required=['value'])
+    permissions = ('bedrock:ListProvisionedModelThroughputs',)
+    annotation_key = 'c7n:provisioned-throughputs'
+
+    def process(self, resources, event=None):
+        client = local_session(self.manager.session_factory).client('bedrock')
+        params = {}
+        if 'status' in self.data:
+            params['statusEquals'] = self.data['status']
+        want_present = self.data['value'] == 'present'
+        results = []
+        for r in resources:
+            throughputs = self.manager.retry(
+                client.get_paginator('list_provisioned_model_throughputs').paginate(
+                    modelArnEquals=r['modelArn'], **params
+                ).build_full_result
+            )['provisionedModelSummaries']
+            r[self.annotation_key] = throughputs
+            if bool(throughputs) == want_present:
+                results.append(r)
+        return results
 
 
 class DescribeBedrockCustomizationJob(DescribeSource):
