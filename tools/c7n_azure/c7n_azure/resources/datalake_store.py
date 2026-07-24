@@ -1,11 +1,15 @@
 # Copyright The Cloud Custodian Authors.
 # SPDX-License-Identifier: Apache-2.0
 
+from c7n.deprecated import DeprecatedResource
 from c7n_azure.provider import resources
 from c7n_azure.resources.arm import ArmResourceManager
 
 
 @resources.register('datalake')
+@DeprecatedResource(
+    "Azure Data Lake Store (Gen1) has been retired",
+    removed_after="2027-07-23", force_empty=True)
 class DataLakeStore(ArmResourceManager):
     """Data Lake Resource
 
