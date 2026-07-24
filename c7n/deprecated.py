@@ -242,6 +242,7 @@ class DeprecatedResource(Deprecation):
                 klass.resources = lambda self, *args, **kwargs: []
                 klass.get_resources = lambda self, *args, **kwargs: []
         klass.deprecations = tuple(getattr(klass, 'deprecations', ())) + (self,)
+        klass.is_deprecated = True
         return klass
 
 
