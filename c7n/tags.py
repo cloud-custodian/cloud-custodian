@@ -426,6 +426,24 @@ class TagCountFilter(Filter):
 
 class Tag(Action):
     """Tag an ec2 resource.
+
+    Tag values may be looked up per-resource from resource attributes:
+
+    .. code-block:: yaml
+
+        policies:
+          - name: ec2-tag-owner
+            resource: aws.ec2
+            actions:
+              - type: tag
+                tags:
+                  Owner:
+                    type: resource
+                    key: "Tags[?Key=='team'].Value | [0]"
+                    default-value: unknown
+                  CostCenter:
+                    type: resource
+                    default-value: unassigned   # set only if CostCenter absent
     """
 
     batch_size = 25
@@ -437,9 +455,9 @@ class Tag(Action):
 
     schema = utils.type_schema(
         'tag', aliases=('mark',),
-        tags={'type': 'object'},
+        tags={'type': 'object', 'additionalProperties': tag_value_schema()},
         key={'type': 'string'},
-        value={'type': 'string'},
+        value=tag_value_schema(),
         tag={'type': 'string'},
     )
     schema_alias = True
@@ -462,24 +480,47 @@ class Tag(Action):
         tag = self.data.get('key') or tag
 
         # Support setting multiple tags in a single go with a mapping
-        tags = self.data.get('tags')
-
-        if tags is None:
-            tags = []
-        else:
-            tags = [{'Key': k, 'Value': v} for k, v in tags.items()]
-
+        spec_map = dict(self.data.get('tags') or {})
         if msg:
-            tags.append({'Key': tag, 'Value': msg})
-
-        self.interpolate_values(tags)
+            spec_map[tag] = msg
 
         batch_size = self.data.get('batch_size', self.batch_size)
-
         client = self.get_client()
-        _common_tag_processer(
-            self.executor_factory, batch_size, self.concurrency, client,
-            self.process_resource_set, self.id_key, resources, tags, self.log)
+
+        if not has_dynamic_tag_values(spec_map):
+            tags = [{'Key': k, 'Value': v} for k, v in spec_map.items()]
+            self.interpolate_values(tags)
+            _common_tag_processer(
+                self.executor_factory, batch_size, self.concurrency, client,
+                self.process_resource_set, self.id_key, resources, tags, self.log)
+            return
+
+        for resource_set, resolved in self._resolve_and_group(resources, spec_map):
+            tags = [{'Key': k, 'Value': v} for k, v in resolved.items()]
+            _common_tag_processer(
+                self.executor_factory, batch_size, self.concurrency, client,
+                self.process_resource_set, self.id_key, resource_set, tags, self.log)
+
+    def _resolve_and_group(self, resources, spec_map):
+        """Resolve tag values per resource and group by identical payload.
+
+        Returns a list of (resource_set, resolved_dict). Resources whose
+        payload is empty (all tags conditionally skipped) are dropped.
+        """
+        groups = {}
+        for r in resources:
+            current = resource_tag_keys(r)
+            resolved = {}
+            for name, spec in spec_map.items():
+                value = resolve_tag_value(spec, name, r, current)
+                if value is TAG_VALUE_SKIP:
+                    continue
+                resolved[name] = self.interpolate_single_value(value)
+            if not resolved:
+                continue
+            sig = tuple(sorted(resolved.items()))
+            groups.setdefault(sig, ([], resolved))[0].append(r)
+        return list(groups.values())
 
     def process_resource_set(self, client, resource_set, tags):
         mid = self.manager.get_model().id

@@ -647,3 +647,59 @@ class ResolveTagValueTest(BaseTest):
         self.assertFalse(tagmod.has_dynamic_tag_values({"A": "x"}))
         self.assertTrue(
             tagmod.has_dynamic_tag_values({"A": {"type": "resource", "key": "k"}}))
+
+
+class DynamicTagTest(BaseTest):
+    def _run(self, resources, tags, resource='ec2'):
+        mock_factory = MagicMock()
+        mock_factory.region = 'us-east-1'
+        create_tags = mock_factory().client(resource).create_tags
+        create_tags.return_value = {}
+        policy = self.load_policy(
+            {"name": "d", "resource": resource,
+             "actions": [{"type": "tag", "tags": tags}]},
+            session_factory=mock_factory)
+        policy.resource_manager.actions[0].process(resources)
+        return create_tags
+
+    def test_lookup_key_hit(self):
+        create_tags = self._run(
+            [{"InstanceId": "i-1", "State": {"Name": "running"}}],
+            {"St": {"type": "resource", "key": "State.Name"}})
+        create_tags.assert_called_once_with(
+            Resources=["i-1"], Tags=[{"Key": "St", "Value": "running"}], DryRun=False)
+
+    def test_lookup_key_miss_default(self):
+        create_tags = self._run(
+            [{"InstanceId": "i-1"}],
+            {"St": {"type": "resource", "key": "Nope", "default-value": "dv"}})
+        create_tags.assert_called_once_with(
+            Resources=["i-1"], Tags=[{"Key": "St", "Value": "dv"}], DryRun=False)
+
+    def test_conditional_skip_and_write_group_separately(self):
+        create_tags = self._run(
+            [{"InstanceId": "i-has", "Tags": [{"Key": "Owner", "Value": "x"}]},
+             {"InstanceId": "i-missing"}],
+            {"Owner": {"type": "resource", "default-value": "dv"}})
+        # i-has -> skipped (empty payload, no call); i-missing -> Owner=dv
+        create_tags.assert_called_once_with(
+            Resources=["i-missing"], Tags=[{"Key": "Owner", "Value": "dv"}],
+            DryRun=False)
+
+    def test_dynamic_grouping_two_payloads(self):
+        create_tags = self._run(
+            [{"InstanceId": "i-1", "State": {"Name": "running"}},
+             {"InstanceId": "i-2", "State": {"Name": "stopped"}},
+             {"InstanceId": "i-3", "State": {"Name": "running"}}],
+            {"St": {"type": "resource", "key": "State.Name"}})
+        self.assertEqual(create_tags.call_count, 2)
+        by_value = {c.kwargs["Tags"][0]["Value"]: set(c.kwargs["Resources"])
+                    for c in create_tags.call_args_list}
+        self.assertEqual(by_value["running"], {"i-1", "i-3"})
+        self.assertEqual(by_value["stopped"], {"i-2"})
+
+    def test_static_fast_path_single_call(self):
+        create_tags = self._run(
+            [{"InstanceId": "i-1"}, {"InstanceId": "i-2"}], {"K": "v"})
+        create_tags.assert_called_once_with(
+            Resources=["i-1", "i-2"], Tags=[{"Key": "K", "Value": "v"}], DryRun=False)
