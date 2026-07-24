@@ -7,6 +7,7 @@ import time
 from freezegun import freeze_time
 from unittest.mock import MagicMock, call
 
+from c7n import tags as tagmod
 from c7n.tags import universal_retry, coalesce_copy_user_tags
 from c7n.exceptions import PolicyExecutionError, PolicyValidationError
 from c7n.utils import yaml_load
@@ -603,3 +604,46 @@ class CopyRelatedResourceTag(BaseTest):
             ]
         }
         self.assertRaises(PolicyValidationError, self.load_policy, policy)
+
+
+class ResolveTagValueTest(BaseTest):
+    def test_static_passthrough(self):
+        self.assertEqual(
+            tagmod.resolve_tag_value("plain", "K", {}, set()), "plain")
+
+    def test_lookup_with_key_hit(self):
+        r = {"State": {"Name": "running"}}
+        spec = {"type": "resource", "key": "State.Name"}
+        self.assertEqual(tagmod.resolve_tag_value(spec, "K", r, set()), "running")
+
+    def test_lookup_with_key_miss_uses_default(self):
+        spec = {"type": "resource", "key": "Nope", "default-value": "dv"}
+        self.assertEqual(tagmod.resolve_tag_value(spec, "K", {}, set()), "dv")
+
+    def test_lookup_with_key_miss_no_default_raises(self):
+        spec = {"type": "resource", "key": "Nope"}
+        with self.assertRaises(Exception):
+            tagmod.resolve_tag_value(spec, "K", {}, set())
+
+    def test_conditional_tag_absent_writes_default(self):
+        spec = {"type": "resource", "default-value": "dv"}
+        self.assertEqual(
+            tagmod.resolve_tag_value(spec, "Owner", {}, set()), "dv")
+
+    def test_conditional_tag_present_skips(self):
+        spec = {"type": "resource", "default-value": "dv"}
+        self.assertIs(
+            tagmod.resolve_tag_value(spec, "Owner", {}, {"Owner"}),
+            tagmod.TAG_VALUE_SKIP)
+
+    def test_resource_tag_keys_list_and_dict(self):
+        self.assertEqual(
+            tagmod.resource_tag_keys({"Tags": [{"Key": "A", "Value": "1"}]}), {"A"})
+        self.assertEqual(
+            tagmod.resource_tag_keys({"Tags": {"B": "2"}}), {"B"})
+        self.assertEqual(tagmod.resource_tag_keys({}), set())
+
+    def test_has_dynamic(self):
+        self.assertFalse(tagmod.has_dynamic_tag_values({"A": "x"}))
+        self.assertTrue(
+            tagmod.has_dynamic_tag_values({"A": {"type": "resource", "key": "k"}}))

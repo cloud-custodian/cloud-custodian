@@ -23,9 +23,76 @@ from c7n.exceptions import PolicyValidationError, PolicyExecutionError
 from c7n.resources import load_resources
 from c7n.filters import Filter, OPERATORS
 from c7n.filters.offhours import Time
+from c7n.lookup import Lookup
 from c7n import deprecated, utils
 
 DEFAULT_TAG = "maid_status"
+
+
+# Sentinel: the resolver returns this to omit a tag from a resource's payload.
+TAG_VALUE_SKIP = object()
+
+
+def tag_value_schema():
+    """Schema for a single tag value.
+
+    Accepts a scalar, a resource lookup by key (with optional fallback), or a
+    conditional default with no key (write only when the tag is absent).
+    """
+    return {
+        'oneOf': [
+            {'type': ['string', 'number', 'boolean']},
+            {
+                'type': 'object',
+                'additionalProperties': False,
+                'required': ['type', 'key'],
+                'properties': {
+                    'type': {'enum': [Lookup.RESOURCE_SOURCE]},
+                    'key': {'type': 'string'},
+                    'default-value': {'type': 'string'},
+                },
+            },
+            {
+                'type': 'object',
+                'additionalProperties': False,
+                'required': ['type', 'default-value'],
+                'properties': {
+                    'type': {'enum': [Lookup.RESOURCE_SOURCE]},
+                    'default-value': {'type': 'string'},
+                },
+            },
+        ]
+    }
+
+
+def has_dynamic_tag_values(spec_map):
+    return any(Lookup.is_lookup(v) for v in spec_map.values())
+
+
+def resource_tag_keys(resource):
+    current = resource.get('Tags', [])
+    if isinstance(current, dict):
+        return set(current.keys())
+    keys = set()
+    for t in current or ():
+        if isinstance(t, dict) and 'Key' in t:
+            keys.add(t['Key'])
+    return keys
+
+
+def resolve_tag_value(spec, tag_name, resource, current_tag_keys):
+    """Resolve one tag value spec against a resource.
+
+    Returns the resolved value, or TAG_VALUE_SKIP to omit the tag.
+    """
+    if not Lookup.is_lookup(spec):
+        return spec
+    if 'key' in spec:
+        return Lookup.extract(spec, resource)
+    # Conditional default (no key): write only if the tag is absent.
+    if tag_name in current_tag_keys:
+        return TAG_VALUE_SKIP
+    return spec['default-value']
 
 
 def register_ec2_tags(filters, actions):
