@@ -1354,11 +1354,37 @@ class VertexAIPublisherModelTest(BaseTest):
             )
 
 
+@terraform('vertexai_endpoint_get_resource')
+def test_vertexai_endpoint_get_resource(test, vertexai_endpoint_get_resource):
+    """Test fetching a single Vertex AI Endpoint via get_resource().
+
+    Exercises the resource manager's get_resource(), used by event-driven
+    policies (e.g. gcp-audit mode), which must build a location-scoped
+    client rather than the base class's global one (see PR #10889 review).
+    """
+    endpoint_name = vertexai_endpoint_get_resource.outputs['endpoint_name']['value']
+    display_name = vertexai_endpoint_get_resource.outputs['endpoint_display_name']['value']
+
+    # Flight data recorded here is host-qualified (see recorder.py), so
+    # replay fails unless get_resource() actually builds a location-scoped
+    # client rather than the base class's global one.
+    session_factory = test.replay_flight_data('vertexai_endpoint_get_resource')
+
+    policy = test.load_policy(
+        {'name': 'vertexai-endpoint-get-resource',
+         'resource': 'gcp.vertex-ai-endpoint'},
+        session_factory=session_factory)
+
+    resource = policy.resource_manager.get_resource({'resourceName': endpoint_name})
+    assert resource['name'] == endpoint_name
+    assert resource['displayName'] == display_name
+
 # Custom Job Tests
+
 
 CUSTOM_JOB_TERMINAL_STATES = {
     'JOB_STATE_SUCCEEDED', 'JOB_STATE_FAILED',
-    'JOB_STATE_CANCELLED', 'JOB_STATE_EXPIRED'
+    'JOB_STATE_CANCELLED', 'JOB_STATE_EXPIRED',
 }
 
 
