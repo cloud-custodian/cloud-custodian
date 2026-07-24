@@ -1,7 +1,4 @@
 {
     "status_code": 200,
-    "data": {
-        "Failures": [],
-        "ResponseMetadata": {}
-    }
+    "data": {}
 }
