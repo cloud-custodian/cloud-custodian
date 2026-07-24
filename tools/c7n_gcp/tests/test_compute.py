@@ -4,6 +4,7 @@
 import re
 import time
 
+from c7n_gcp.filters.recommender import get_recommender_data
 from c7n_gcp.resources.compute import Snapshot
 from gcp_common import BaseTest, event_data
 from googleapiclient.errors import HttpError
@@ -811,6 +812,25 @@ class ProjectTest(BaseTest):
 
         self.assertEqual(len(resources), 1)
         self.assertEqual(resources[0]['name'], project_id)
+
+    def test_recommend_usage_commitment_id(self):
+        # https://github.com/cloud-custodian/cloud-custodian/issues/10707
+        # The committed use discount recommender entry had a second recommender
+        # id accidentally concatenated onto its key/id, producing an id the
+        # Recommender API rejects and making the real id unusable in a policy.
+        data = get_recommender_data()
+        rec_id = 'google.compute.commitment.UsageCommitmentRecommender'
+        self.assertIn(rec_id, data)
+        self.assertEqual(data[rec_id]['id'], rec_id)
+        self.assertEqual(data[rec_id]['resource'], 'gcp.compute-project')
+
+        # the documented id validates against gcp.compute-project
+        p = self.load_policy(
+            {'name': 'gcp-compute-project-usage-commitment',
+             'resource': 'gcp.compute-project',
+             'filters': [{'type': 'recommend', 'id': rec_id}]},
+            validate=True)
+        self.assertEqual(len(p.resource_manager.filters), 1)
 
 
 class TestInstanceGroupManager(BaseTest):
