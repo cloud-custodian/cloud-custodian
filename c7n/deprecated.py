@@ -172,6 +172,80 @@ class DeprecatedOptionality(Deprecation):
         return f"Will become an error after {self.removed_after}"
 
 
+_empty_source = None
+
+
+def _get_empty_source():
+    # Lazy import to avoid a circular import: c7n.query imports
+    # c7n.filters/c7n.actions, which import c7n.element, which imports
+    # c7n.deprecated.
+    global _empty_source
+    if _empty_source is None:
+        from c7n.query import DescribeSource
+
+        class EmptySource(DescribeSource):
+            def resources(self, query):
+                return []
+
+            def get_resources(self, resource_ids):
+                return []
+
+            def get_permissions(self):
+                return []
+
+        _empty_source = EmptySource
+    return _empty_source
+
+
+class DeprecatedResource(Deprecation):
+    """A resource type has been deprecated.
+
+    Applied as a decorator on a resource manager class. Always registers
+    a deprecation, so `custodian validate` / `custodian report` surface
+    the resource type's use - this happens regardless of `force_empty`.
+
+    `force_empty` controls whether the resource type is also prevented
+    from returning live data:
+
+    * False (the default): reporting only. Whatever sources or
+      resource-fetch behavior the class already has are left untouched,
+      so the resource type still resolves real data if its backing API
+      still works.
+    * True: every configured source is replaced with a no-op stub that
+      always returns an empty result set. For resource managers with a
+      `source_mapping` attribute (e.g. AWS's QueryResourceManager), each
+      entry in the mapping is replaced. For resource managers with no
+      per-class source override point (e.g. c7n_azure's
+      QueryResourceManager, which always resolves sources from a single
+      shared global registry), `resources()`/`get_resources()` are
+      replaced directly instead.
+    """
+
+    def __init__(self, reason, removed_after=None, link=None, force_empty=False):
+        super().__init__(removed_after, link)
+        self.reason = reason
+        self.force_empty = force_empty
+
+    def __str__(self):
+        return f"resource has been deprecated ({self.reason})"
+
+    def __call__(self, klass):
+        if self.force_empty:
+            empty_source = _get_empty_source()
+            if hasattr(klass, 'source_mapping'):
+                mapping = dict(klass.source_mapping)
+                klass.source_mapping = {key: empty_source for key in mapping}
+            else:
+                # No per-class source override point (e.g. c7n_azure
+                # resource managers) - stub the resource fetch methods
+                # directly instead.
+                klass.resources = lambda self, *args, **kwargs: []
+                klass.get_resources = lambda self, *args, **kwargs: []
+        klass.deprecations = tuple(getattr(klass, 'deprecations', ())) + (self,)
+        klass.is_deprecated = True
+        return klass
+
+
 class Context:
     """Adds extra context to a deprecation."""
     def __init__(self, context, deprecation):
