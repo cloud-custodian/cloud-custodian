@@ -2,6 +2,8 @@
 # SPDX-License-Identifier: Apache-2.0
 import unittest
 
+from pytest_terraform import terraform
+
 from c7n.exceptions import PolicyValidationError
 from c7n.resources import emr
 from c7n.resources.emr import actions, EMRQueryParser
@@ -253,72 +255,99 @@ class TestEMRSecurityConfiguration(BaseTest):
         )
 
 
-class TestEMRServerless(BaseTest):
-    def test_emr_serverless_tag(self):
-        session_factory = self.replay_flight_data("test_emr_serverless_tag")
-        p = self.load_policy(
-            {
-                "name": "emr-serverless-tag",
-                "resource": "aws.emr-serverless-app",
-                "filters": [{"tag:foo": "absent"}],
-                "actions": [{"type": "tag", "tags": {"foo": "bar"}}]
-            },
-            session_factory=session_factory,
-        )
-        resources = p.run()
-        self.assertEqual(len(resources), 1)
-        client = session_factory().client("emr-serverless")
-        tags = client.list_tags_for_resource(resourceArn=resources[0]["arn"])["tags"]
-        self.assertEqual(len(tags), 1)
-        self.assertEqual(tags, {"foo": "bar"})
+@terraform('emr_serverless_app_tag')
+def test_emr_serverless_tag(test, emr_serverless_app_tag):
+    session_factory = test.replay_flight_data("test_emr_serverless_tag")
+    p = test.load_policy(
+        {
+            "name": "emr-serverless-tag",
+            "resource": "aws.emr-serverless-app",
+            "filters": [{"tag:foo": "absent"}],
+            "actions": [{"type": "tag", "tags": {"foo": "bar"}}],
+        },
+        session_factory=session_factory,
+    )
+    resources = p.run()
+    assert len(resources) == 1
+    client = session_factory().client("emr-serverless")
+    tags = client.list_tags_for_resource(resourceArn=resources[0]["arn"])["tags"]
+    assert tags == {"foo": "bar"}
 
-    def test_emr_serverless_remove_tag(self):
-        session_factory = self.replay_flight_data("test_emr_serverless_remove_tag")
-        p = self.load_policy(
-            {
-                'name': "test-emr-serverless-tag",
-                'resource': "aws.emr-serverless-app",
-                'filters': [{'tag:foo': 'present'}],
-                'actions': [{'type': 'remove-tag', 'tags': ['foo']}]
-            },
-            session_factory=session_factory
-        )
-        resources = p.run()
-        self.assertEqual(len(resources), 1)
-        client = session_factory().client("emr-serverless")
-        tags = client.list_tags_for_resource(resourceArn=resources[0]["arn"])["tags"]
-        self.assertEqual(len(tags), 0)
 
-    def test_emr_serverless_delete(self):
-        session_factory = self.replay_flight_data('test_emr_serverless_delete')
-        p = self.load_policy(
-            {
-                'name': 'test-emr-serverless-delete',
-                'resource': 'aws.emr-serverless-app',
-                'actions': [{'type': 'delete'}]
-            },
-            session_factory=session_factory
-        )
-        resources = p.run()
-        self.assertEqual(len(resources), 1)
-        client = session_factory().client('emr-serverless')
-        applications = client.list_applications()['applications']
-        self.assertEqual(len(applications), 0)
+@terraform('emr_serverless_app_remove_tag')
+def test_emr_serverless_remove_tag(test, emr_serverless_app_remove_tag):
+    session_factory = test.replay_flight_data("test_emr_serverless_remove_tag")
+    p = test.load_policy(
+        {
+            'name': "test-emr-serverless-tag",
+            'resource': "aws.emr-serverless-app",
+            'filters': [{'tag:foo': 'present'}],
+            'actions': [{'type': 'remove-tag', 'tags': ['foo']}],
+        },
+        session_factory=session_factory,
+    )
+    resources = p.run()
+    assert len(resources) == 1
+    client = session_factory().client("emr-serverless")
+    tags = client.list_tags_for_resource(resourceArn=resources[0]["arn"])["tags"]
+    assert tags == {}
 
-    def test_emr_serverless_markop(self):
-        session_factory = self.replay_flight_data("test_emr_serverless_markop")
-        p = self.load_policy(
-            {
-                "name": "emr-serverless-markop",
-                "resource": "aws.emr-serverless-app",
-                "filters": [{"tag:foo": "absent"}],
-                "actions": [{"type": "mark-for-op", "op": "notify", "tag": "foo", "days": 2}],
-            },
-            session_factory=session_factory,
-        )
-        resources = p.run()
-        self.assertEqual(len(resources), 1)
-        client = session_factory().client('emr-serverless')
-        tags = client.list_tags_for_resource(resourceArn=resources[0]["arn"])['tags']
-        self.assertEqual(len(tags), 1)
-        self.assertEqual(tags, {'foo': 'Resource does not meet policy: notify@2023/01/26'})
+
+@terraform('emr_serverless_app_markop')
+def test_emr_serverless_markop(test, emr_serverless_app_markop):
+    session_factory = test.replay_flight_data("test_emr_serverless_markop")
+    p = test.load_policy(
+        {
+            "name": "emr-serverless-markop",
+            "resource": "aws.emr-serverless-app",
+            "filters": [{"tag:foo": "absent"}],
+            "actions": [{"type": "mark-for-op", "op": "notify", "tag": "foo", "days": 2}],
+        },
+        session_factory=session_factory,
+    )
+    resources = p.run()
+    assert len(resources) == 1
+    client = session_factory().client('emr-serverless')
+    tags = client.list_tags_for_resource(resourceArn=resources[0]["arn"])['tags']
+    assert len(tags) == 1
+    assert tags['foo'].startswith('Resource does not meet policy: notify@')
+
+
+@terraform('emr_serverless_app_delete',
+           teardown=terraform.TEARDOWN_IGNORE)
+def test_emr_serverless_delete(test, emr_serverless_app_delete):
+    session_factory = test.replay_flight_data('test_emr_serverless_delete')
+    p = test.load_policy(
+        {
+            'name': 'test-emr-serverless-delete',
+            'resource': 'aws.emr-serverless-app',
+            'actions': [{'type': 'delete'}],
+        },
+        session_factory=session_factory,
+    )
+    resources = p.run()
+    assert len(resources) == 1
+    client = session_factory().client('emr-serverless')
+    applications = client.list_applications()['applications']
+    assert len(applications) == 0
+
+
+@terraform('emr_serverless_app_autostop')
+def test_emr_serverless_autostop_filter(test, emr_serverless_app_autostop):
+    session_factory = test.replay_flight_data('test_emr_serverless_autostop_filter')
+    p = test.load_policy(
+        {
+            'name': 'emr-serverless-autostop-disabled',
+            'resource': 'aws.emr-serverless-app',
+            'filters': [
+                {'type': 'value',
+                 'key': 'autoStopConfiguration.enabled',
+                 'value': False},
+            ],
+        },
+        session_factory=session_factory,
+    )
+    resources = p.run()
+    assert len(resources) == 1
+    assert resources[0]['name'] == emr_serverless_app_autostop[
+        'aws_emrserverless_application.autostop_disabled.name']

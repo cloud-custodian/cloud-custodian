@@ -340,6 +340,7 @@ class EMRServerless(QueryResourceManager):
     class resource_type(TypeInfo):
         service = 'emr-serverless'
         enum_spec = ('list_applications', 'applications', None)
+        detail_spec = ('get_application', 'applicationId', 'id', 'application')
         arn = 'arn'
         arn_type = '/applications'
         name = 'name'
