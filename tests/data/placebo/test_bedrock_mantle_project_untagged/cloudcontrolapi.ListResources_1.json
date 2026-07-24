@@ -1,0 +1,17 @@
+{
+    "status_code": 200,
+    "data": {
+        "TypeName": "AWS::BedrockMantle::Project",
+        "ResourceDescriptions": [
+            {
+                "Identifier": "arn:aws:bedrock-mantle:us-east-1:644160558196:project/default",
+                "Properties": "{\"Id\":\"default\",\"Arn\":\"arn:aws:bedrock-mantle:us-east-1:644160558196:project/default\"}"
+            },
+            {
+                "Identifier": "arn:aws:bedrock-mantle:us-east-1:644160558196:project/proj_u5ohxk75k3ehgtswbmcc",
+                "Properties": "{\"Id\":\"proj_u5ohxk75k3ehgtswbmcc\",\"Arn\":\"arn:aws:bedrock-mantle:us-east-1:644160558196:project/proj_u5ohxk75k3ehgtswbmcc\"}"
+            }
+        ],
+        "ResponseMetadata": {}
+    }
+}

@@ -1,5 +1,6 @@
 # Copyright The Cloud Custodian Authors.
 # SPDX-License-Identifier: Apache-2.0
+import json
 
 from c7n.manager import resources
 from c7n.exceptions import PolicyValidationError
@@ -1024,3 +1025,44 @@ class UpdateGuardrail(BaseAction):
                 client.update_guardrail(**params)
             except client.exceptions.ResourceNotFoundException:
                 continue
+
+
+@resources.register('bedrock-mantle-project')
+class BedrockMantleProject(QueryResourceManager):
+    """Bedrock Mantle Project.
+
+    The bedrock-mantle control plane exposes no service sdk client;
+    projects are enumerated via the cloud control api, with tags
+    fetched in batch via the resource groups tagging api.
+
+    :example:
+
+    .. code-block:: yaml
+
+        policies:
+          - name: bedrock-mantle-project-untagged
+            resource: aws.bedrock-mantle-project
+            filters:
+              - type: value
+                key: Id
+                op: ne
+                value: default
+              - tag:Owner: absent
+    """
+    class resource_type(TypeInfo):
+        service = 'cloudcontrol'
+        enum_spec = ('list_resources', 'ResourceDescriptions',
+                     {'TypeName': 'AWS::BedrockMantle::Project'})
+        cfn_type = 'AWS::BedrockMantle::Project'
+        arn = 'Arn'
+        id = name = 'Id'
+        permission_prefix = 'bedrock-mantle'
+        permissions_enum = (
+            'cloudformation:ListResources',
+            'bedrock-mantle:ListProjects',
+            'bedrock-mantle:ListTagsForResource')
+        universal_taggable = object()
+
+    def augment(self, resources):
+        resources = [json.loads(r['Properties']) for r in resources]
+        return universal_augment(self, resources)
