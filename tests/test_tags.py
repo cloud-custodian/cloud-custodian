@@ -704,6 +704,17 @@ class DynamicTagTest(BaseTest):
         create_tags.assert_called_once_with(
             Resources=["i-1", "i-2"], Tags=[{"Key": "K", "Value": "v"}], DryRun=False)
 
+    @freeze_time("2022-06-27 12:34:56")
+    def test_placeholder_interpolated_in_default_value(self):
+        create_tags = self._run(
+            [{"InstanceId": "i-1"}],
+            {"Stamp": {"type": "resource", "key": "Nope",
+                       "default-value": "created-{now}-in-{region}"}})
+        create_tags.assert_called_once_with(
+            Resources=["i-1"],
+            Tags=[{"Key": "Stamp", "Value": "created-2022-06-27 12:34:56-in-us-east-1"}],
+            DryRun=False)
+
 
 class DynamicUniversalTagTest(BaseTest):
     def _run(self, resources, tags, resource='rds'):
