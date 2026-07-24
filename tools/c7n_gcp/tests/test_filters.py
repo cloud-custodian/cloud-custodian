@@ -108,6 +108,31 @@ class TestGCPMetricsFilter(BaseTest):
         resources = p.run()
         self.assertEqual(len(resources), 0)
 
+    def test_metrics_missing_value_zero(self):
+        # When a batch returns no metrics, a `missing-value` of 0 (a falsy but
+        # valid default) must still be applied rather than dropping the resource.
+        session_factory = self.replay_flight_data("filter-no-metrics")
+
+        p = self.load_policy(
+            {
+                "name": "test-metrics",
+                "resource": "gcp.instance",
+                "filters": [
+                    {'type': 'metrics',
+                    'name': 'compute.googleapis.com/instance/cpu/utilization',
+                    'metric-key': 'metric.labels.instance_name',
+                    'aligner': 'ALIGN_MEAN',
+                    'days': 14,
+                    'value': 1,
+                    'missing-value': 0,
+                    'filter': ' resource.labels.zone = "us-east4-c"',
+                    'op': 'less-than'}],
+            },
+            session_factory=session_factory,
+        )
+        resources = p.run()
+        self.assertEqual(len(resources), 1)
+
     def test_batch_resources(self):
         policy = self.load_policy({
             "name": "test_batch_resources",
