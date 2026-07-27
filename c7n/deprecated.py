@@ -198,7 +198,7 @@ def _get_empty_source():
 
 
 class DeprecatedResource(Deprecation):
-    """A resource type has been deprecated.
+    """A resource type that has been deprecated.
 
     Applied as a decorator on a resource manager class. Always registers
     a deprecation, so `custodian validate` / `custodian report` surface
