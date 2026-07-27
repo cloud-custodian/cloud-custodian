@@ -2950,9 +2950,15 @@ class EndpointServiceDetailsFilter(ValueFilter):
         return results
 
     def _describe_services(self, client, regional_groups, current_region):
-        service_names = sorted({n for names in regional_groups.values() for n in names})
         cache = self.manager._cache
-        cache_key = {"ServiceNames": service_names}
+        cache_key = {
+            "account": self.manager.config.account_id,
+            "region": current_region,
+            "ServiceRegions": [
+                (region, sorted(names))
+                for region, names in sorted(regional_groups.items())
+            ],
+        }
 
         with cache:
             cached = cache.get(cache_key)
@@ -2974,13 +2980,17 @@ class EndpointServiceDetailsFilter(ValueFilter):
                     resp = rc.describe_vpc_endpoint_services(ServiceNames=sorted_names)
                     for d in resp.get("ServiceDetails", []):
                         service_map[d["ServiceName"]] = d
-                except ClientError:
+                except ClientError as e:
+                    if e.response["Error"]["Code"] != "InvalidServiceName":
+                        raise
                     for name in sorted_names:
                         try:
                             resp = rc.describe_vpc_endpoint_services(ServiceNames=[name])
                             for d in resp.get("ServiceDetails", []):
                                 service_map[d["ServiceName"]] = d
                         except ClientError as e:
+                            if e.response["Error"]["Code"] != "InvalidServiceName":
+                                raise
                             self.log.warning(
                                 "Error describing VPC endpoint service %s: %s",
                                 name, e

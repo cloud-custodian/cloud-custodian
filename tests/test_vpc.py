@@ -4758,6 +4758,79 @@ class TestVPCEndpointServiceConfiguration(BaseTest):
 
 
 class TestVpcEndpointServiceDetails(BaseTest):
+    def get_filter(self):
+        p = self.load_policy({
+            "name": "vpc-endpoint-service-details",
+            "resource": "aws.vpc-endpoint",
+            "filters": [{
+                "type": "service-details",
+                "key": "VpcEndpointPolicySupported",
+                "value": True,
+            }],
+        })
+        return p.resource_manager.filters[0]
+
+    def test_endpoint_service_details_unexpected_error_raised(self):
+        service_filter = self.get_filter()
+        client = MagicMock()
+        client.describe_vpc_endpoint_services.side_effect = BotoClientError(
+            {"Error": {"Code": "UnauthorizedOperation", "Message": "denied"}},
+            "DescribeVpcEndpointServices",
+        )
+
+        with self.assertRaises(BotoClientError):
+            service_filter._describe_services(
+                client,
+                {"us-east-1": {"com.amazonaws.us-east-1.s3"}},
+                "us-east-1",
+            )
+
+        self.assertEqual(client.describe_vpc_endpoint_services.call_count, 1)
+
+    def test_endpoint_service_details_cache_key_scoped(self):
+        service_filter = self.get_filter()
+        cache = MagicMock()
+        cache.__enter__.return_value = cache
+        cache.get.return_value = None
+        service_filter.manager._cache = cache
+        client = MagicMock()
+        client.describe_vpc_endpoint_services.return_value = {"ServiceDetails": []}
+        service_filter.manager.session_factory = MagicMock()
+        service_filter.manager.session_factory.return_value.client.return_value = client
+
+        service_filter._describe_services(
+            client,
+            {
+                "us-west-2": {"com.amazonaws.us-west-2.s3"},
+                "us-east-1": {"com.amazonaws.us-east-1.s3"},
+            },
+            "us-east-1",
+        )
+
+        cache_key = cache.get.call_args.args[0]
+        self.assertEqual(cache_key["account"], service_filter.manager.config.account_id)
+        self.assertEqual(cache_key["region"], "us-east-1")
+        self.assertEqual(cache_key["ServiceRegions"], [
+            ("us-east-1", ["com.amazonaws.us-east-1.s3"]),
+            ("us-west-2", ["com.amazonaws.us-west-2.s3"]),
+        ])
+
+    def test_endpoint_service_details_missing_service_region_uses_current(self):
+        service_filter = self.get_filter()
+        service_filter.manager.session_factory = MagicMock()
+        service_filter.manager.session_factory.region = "us-east-1"
+        service_name = "com.amazonaws.us-east-1.s3"
+        service_filter._describe_services = MagicMock(return_value={
+            service_name: {"VpcEndpointPolicySupported": True}
+        })
+
+        resources = service_filter.process([{"ServiceName": service_name}])
+
+        self.assertEqual(len(resources), 1)
+        describe_args = service_filter._describe_services.call_args.args
+        self.assertEqual(describe_args[1], {"us-east-1": {service_name}})
+        self.assertEqual(describe_args[2], "us-east-1")
+
     def test_endpoint_service_details_policy_supported(self):
         session_factory = self.replay_flight_data(
             "test_vpc_endpoint_service_details_filter"
@@ -4813,9 +4886,11 @@ class TestVpcEndpointServiceDetails(BaseTest):
         # All endpoints have VpcEndpointPolicySupported=true, including the
         # cross-region one (com.amazonaws.us-west-2.s3) which requires a
         # us-west-2 regional client to describe correctly.
-        self.assertIn("com.amazonaws.us-east-1.s3", service_names)
-        self.assertIn("com.amazonaws.us-east-1.dynamodb", service_names)
-        self.assertIn("com.amazonaws.us-west-2.s3", service_names)
+        self.assertEqual(service_names, {
+            "com.amazonaws.us-east-1.s3",
+            "com.amazonaws.us-east-1.dynamodb",
+            "com.amazonaws.us-west-2.s3",
+        })
         cross_region = next(
             r for r in resources if r["ServiceName"] == "com.amazonaws.us-west-2.s3"
         )
