@@ -24,7 +24,8 @@ arm_tags_unsupported = ['microsoft.network/dnszones/',
                         'microsoft.sql/servers/databases',
                         'microsoft.storage/storageaccounts/blobservices/containers',
                         'microsoft.cognitiveservices/accounts/deployments',
-                        'microsoft.cognitiveservices/accounts/projects/connections']
+                        'microsoft.cognitiveservices/accounts/projects/connections',
+                        'microsoft.machinelearningservices/workspaces/jobs']
 
 
 class ArmTypeInfo(TypeInfo, metaclass=TypeMeta):

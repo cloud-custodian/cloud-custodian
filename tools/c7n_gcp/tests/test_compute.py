@@ -797,6 +797,171 @@ class AutoscalerTest(BaseTest):
         self.assertEqual(result_policy['maxNumReplicas'], 4)
 
 
+@terraform('compute_project_common_instance_metadata_set')
+def test_compute_project_set_common_instance_metadata(
+        test, compute_project_common_instance_metadata_set):
+    project_id = compute_project_common_instance_metadata_set[
+        'google_compute_project_metadata_item.default.project']
+    factory = test.replay_flight_data(
+        'compute-project-set-common-instance-metadata', project_id=project_id)
+
+    policy = test.load_policy(
+        {
+            'name': 'gcp-compute-project-set-common-instance-metadata',
+            'resource': 'gcp.compute-project',
+            'filters': [{'name': project_id}],
+            'actions': [
+                {
+                    'type': 'set-common-instance-metadata',
+                    'metadata': {'c7n-test-key': 'updated-value'},
+                }
+            ],
+        },
+        session_factory=factory,
+    )
+
+    resources = policy.run()
+    assert len(resources) == 1
+
+    if test.recording:
+        time.sleep(2)
+
+    client = policy.resource_manager.get_client()
+    result = client.execute_command('get', {'project': project_id})
+    items = {
+        i['key']: i['value']
+        for i in result.get('commonInstanceMetadata', {}).get('items', [])
+    }
+    assert items.get('c7n-test-key') == 'updated-value'
+
+
+@terraform('compute_project_common_instance_metadata_remove')
+def test_compute_project_remove_common_instance_metadata(
+        test, compute_project_common_instance_metadata_remove):
+    project_id = compute_project_common_instance_metadata_remove[
+        'google_compute_project_metadata_item.default.project']
+    factory = test.replay_flight_data(
+        'compute-project-remove-common-instance-metadata', project_id=project_id)
+    policy = test.load_policy(
+        {
+            'name': 'gcp-compute-project-remove-common-instance-metadata',
+            'resource': 'gcp.compute-project',
+            'filters': [{'name': project_id}],
+            'actions': [
+                {
+                    'type': 'set-common-instance-metadata',
+                    'remove': ['c7n-test-key'],
+                }
+            ],
+        },
+        session_factory=factory,
+    )
+
+    resources = policy.run()
+    assert len(resources) == 1
+
+    if test.recording:
+        time.sleep(2)
+
+    client = policy.resource_manager.get_client()
+    result = client.execute_command('get', {'project': project_id})
+    items = {
+        i['key']: i['value']
+        for i in result.get('commonInstanceMetadata', {}).get('items', [])
+    }
+    assert 'c7n-test-key' not in items
+
+
+@terraform('gcp_instance_metadata_set')
+def test_instance_set_metadata(test, gcp_instance_metadata_set):
+    project_id = gcp_instance_metadata_set['google_compute_instance.default.project']
+    factory = test.replay_flight_data(
+        'instance-set-metadata', project_id=project_id)
+
+    instance_name = gcp_instance_metadata_set['google_compute_instance.default.name']
+    policy = test.load_policy(
+        {
+            'name': 'gcp-instance-set-metadata',
+            'resource': 'gcp.instance',
+            'filters': [{'name': instance_name}],
+            'actions': [
+                {
+                    'type': 'set-metadata',
+                    'metadata': {'c7n-test-key': 'updated-value'},
+                }
+            ],
+        },
+        session_factory=factory,
+    )
+
+    resources = policy.run()
+    assert len(resources) == 1
+    assert resources[0]['name'] == instance_name
+
+    if test.recording:
+        time.sleep(2)
+
+    instance = policy.resource_manager.get_resource({
+        'project_id': project_id,
+        'resourceName': gcp_instance_metadata_set['google_compute_instance.default.id'],
+        'zone': gcp_instance_metadata_set['google_compute_instance.default.zone'],
+    })
+    items = {
+        i['key']: i['value']
+        for i in instance.get('metadata', {}).get('items', [])
+    }
+    assert items.get('c7n-test-key') == 'updated-value'
+
+
+@terraform('gcp_instance_metadata_remove')
+def test_instance_remove_metadata(test, gcp_instance_metadata_remove):
+    project_id = gcp_instance_metadata_remove['google_compute_instance.default.project']
+    factory = test.replay_flight_data(
+        'instance-remove-metadata', project_id=project_id)
+
+    instance_name = gcp_instance_metadata_remove['google_compute_instance.default.name']
+    policy = test.load_policy(
+        {
+            'name': 'gcp-instance-remove-metadata',
+            'resource': 'gcp.instance',
+            'filters': [
+                {'name': instance_name},
+                {
+                    'type': 'value',
+                    'key': "metadata.items[?key=='c7n-test-key'].value | [0]",
+                    'op': 'eq',
+                    'value': 'updated-value',
+                },
+            ],
+            'actions': [
+                {
+                    'type': 'set-metadata',
+                    'remove': ['c7n-test-key'],
+                }
+            ],
+        },
+        session_factory=factory,
+    )
+
+    resources = policy.run()
+    assert len(resources) == 1
+    assert resources[0]['name'] == instance_name
+
+    if test.recording:
+        time.sleep(2)
+
+    instance = policy.resource_manager.get_resource({
+        'project_id': project_id,
+        'resourceName': gcp_instance_metadata_remove['google_compute_instance.default.id'],
+        'zone': gcp_instance_metadata_remove['google_compute_instance.default.zone'],
+    })
+    items = {
+        i['key']: i['value']
+        for i in instance.get('metadata', {}).get('items', [])
+    }
+    assert 'c7n-test-key' not in items
+
+
 class ProjectTest(BaseTest):
 
     def test_projects(self):
