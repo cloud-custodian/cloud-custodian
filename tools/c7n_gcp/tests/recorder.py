@@ -28,20 +28,37 @@ class FlightRecorder(Http):
 
     def get_next_file_path(self, uri, method, record=True):
         uri = sanitize_project_name(uri)
-        base_name = "%s%s" % (
-            method.lower(), urlparse(uri).path.replace('/', '-').replace(':', '-'))
-        data_dir = self._data_path
+        parsed = urlparse(uri)
+        path = parsed.path.replace('/', '-').replace(':', '-')
+        base_name = "%s%s" % (method.lower(), path)
 
-        is_discovery = False
         # We don't record authentication
         if (base_name.startswith('post-oauth2-v4') or
                 base_name.startswith('post-o-oauth2') or
                 base_name.startswith('post-token')):
             return
+
+        data_dir = self._data_path
+        is_discovery = False
+
         # Use a common directory for discovery metadata across tests.
+        # Discovery docs are host-invariant, so this is keyed on path alone.
         if base_name.startswith('get-discovery'):
             data_dir = self._discovery_path
             is_discovery = True
+        else:
+            # Host-qualify the key so requests to different hosts sharing a
+            # path (e.g. Vertex AI's per-region endpoints) can't collide.
+            # New flight data is always recorded host-qualified. Data
+            # recorded before this was added has no host in its name; when
+            # replaying, prefer a host-qualified match if the fixture has
+            # one, otherwise fall back to the legacy (host-less) name.
+            host_qualified_base_name = "%s-%s%s" % (
+                method.lower(), parsed.netloc.replace(':', '-'), path)
+            if (record or
+                os.path.exists(os.path.join(data_dir, f'{host_qualified_base_name}_1.json'))
+                ):
+                base_name = host_qualified_base_name
 
         next_file = None
         while next_file is None:
