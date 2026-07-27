@@ -1469,7 +1469,8 @@ class AccountTests(BaseTest):
         self.assertEqual(resources[0]['c7n:ses-max-bounce-rate'], 6)
 
     def test_logs_account_policy(self):
-        factory = self.replay_flight_data('test_account_logs_account_policy')
+        factory = self.replay_flight_data(
+            'test_account_logs_account_policy', region='ca-central-1')
         p = self.load_policy({
             'name': 'account-subscription-filter-non-company-destination',
             'resource': 'account',
@@ -1482,7 +1483,7 @@ class AccountTests(BaseTest):
                     'op': 'not-in',
                     'value': [
                         'arn:aws:logs:us-east-1:123456789012:destination:corp-central']}]}]},
-            config={'region': 'us-east-1'},
+            config={'region': 'ca-central-1'},
             session_factory=factory)
         resources = p.run()
         self.assertEqual(len(resources), 1)
@@ -1490,7 +1491,7 @@ class AccountTests(BaseTest):
         self.assertEqual(len(policies), 1)
         self.assertEqual(
             policies[0]['policyDocument']['DestinationArn'],
-            'arn:aws:logs:us-east-1:210987654321:destination:external-siem')
+            'arn:aws:kinesis:ca-central-1:644160558196:stream/c7n-test-sub-dest')
 
     def test_bedrock_model_invocation_logging_disabled(self):
         factory = self.replay_flight_data('test_bedrock_model_invocation_logging_disabled')
