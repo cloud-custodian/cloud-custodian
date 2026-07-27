@@ -1,0 +1,36 @@
+{
+    "status_code": 200,
+    "data": {
+        "ResponseMetadata": {},
+        "Status": 200,
+        "DataSources": [
+            {
+                "Arn": "arn:aws:quicksight:us-east-1:644160558196:datasource/af6cc037-15c3-4506-b0c5-f7924cdd4f7e",
+                "DataSourceId": "af6cc037-15c3-4506-b0c5-f7924cdd4f7e",
+                "Name": "c7n_unimplemented_services_ranked.csv",
+                "Type": "FILE",
+                "CreatedTime": {
+                    "__class__": "datetime",
+                    "year": 2026,
+                    "month": 7,
+                    "day": 15,
+                    "hour": 13,
+                    "minute": 55,
+                    "second": 29,
+                    "microsecond": 121000
+                },
+                "LastUpdatedTime": {
+                    "__class__": "datetime",
+                    "year": 2026,
+                    "month": 7,
+                    "day": 15,
+                    "hour": 13,
+                    "minute": 55,
+                    "second": 29,
+                    "microsecond": 776000
+                }
+            }
+        ],
+        "RequestId": "74f73a8a-a602-4ba5-9022-94820f643baf"
+    }
+}

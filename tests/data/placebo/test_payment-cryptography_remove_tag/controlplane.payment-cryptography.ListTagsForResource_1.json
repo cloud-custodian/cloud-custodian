@@ -3,8 +3,8 @@
     "data": {
         "Tags": [
             {
-                "Key": "ResourceOwner",
-                "Value": "DarthVader"
+                "Key": "Department",
+                "Value": "International"
             }
         ],
         "ResponseMetadata": {}

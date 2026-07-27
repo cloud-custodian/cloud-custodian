@@ -1,0 +1,31 @@
+{
+    "status_code": 200,
+    "data": {
+        "ResponseMetadata": {},
+        "clusterIdentifier": "y5t6ak7knpdufei7vlyn7npruu",
+        "streamIdentifier": "mzt6amh3gl5dssqny7fklj4scm",
+        "arn": "arn:aws:dsql:us-east-1:644160558196:cluster/y5t6ak7knpdufei7vlyn7npruu/stream/mzt6amh3gl5dssqny7fklj4scm",
+        "status": "ACTIVE",
+        "creationTime": {
+            "__class__": "datetime",
+            "year": 2026,
+            "month": 7,
+            "day": 20,
+            "hour": 14,
+            "minute": 22,
+            "second": 31,
+            "microsecond": 810000
+        },
+        "ordering": "UNORDERED",
+        "format": "JSON",
+        "targetDefinition": {
+            "kinesis": {
+                "streamArn": "arn:aws:kinesis:us-east-1:644160558196:stream/c7n-test-stream",
+                "roleArn": "arn:aws:iam::644160558196:role/service-role/dsql-cdc-y5t6ak7knpdufei7vlyn7n-c7n-test-stream-15349caa"
+            }
+        },
+        "tags": {
+            "Name": "c7n-test-stream"
+        }
+    }
+}
