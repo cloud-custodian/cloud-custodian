@@ -39,8 +39,6 @@ class SecurityLakeDataLakeTest(BaseTest):
             resourceArn=resources[0]['dataLakeArn'])['tags']
         self.assertIn({'key': 'owner', 'value': 'security'}, tags)
 
-    def test_security_lake_remove_tag(self):
-        session_factory = self.replay_flight_data('test_security_lake_remove_tag')
         p = self.load_policy(
             {
                 'name': 'security-lake-untag',
@@ -52,7 +50,6 @@ class SecurityLakeDataLakeTest(BaseTest):
         )
         resources = p.run()
         self.assertEqual(len(resources), 1)
-        client = session_factory().client('securitylake')
         tags = client.list_tags_for_resource(
             resourceArn=resources[0]['dataLakeArn'])['tags']
         self.assertEqual(tags, [])
@@ -111,9 +108,6 @@ class SecurityLakeSubscriberTest(BaseTest):
             resourceArn=resources[0]['subscriberArn'])['tags']
         self.assertIn({'key': 'owner', 'value': 'security'}, tags)
 
-    def test_security_lake_subscriber_remove_tag(self):
-        session_factory = self.replay_flight_data(
-            'test_security_lake_subscriber_remove_tag')
         p = self.load_policy(
             {
                 'name': 'security-lake-subscriber-untag',
@@ -125,7 +119,6 @@ class SecurityLakeSubscriberTest(BaseTest):
         )
         resources = p.run()
         self.assertEqual(len(resources), 1)
-        client = session_factory().client('securitylake')
         tags = client.list_tags_for_resource(
             resourceArn=resources[0]['subscriberArn'])['tags']
         self.assertEqual(tags, [])
