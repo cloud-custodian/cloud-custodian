@@ -709,7 +709,7 @@ class ValueFilter(BaseValueFilter):
 
         When using a Value Filter, a ``value_path`` can be specified.
         This means the value(s) the filter will compare against are
-        calculated during the initialization of the filter.
+        recalculated for each resource being filtered.
 
         Note that this option only pulls properties of the resource
         currently being filtered.
@@ -739,12 +739,13 @@ class ValueFilter(BaseValueFilter):
             if 'value_from' in self.data:
                 values = ValuesFrom(self.data['value_from'], self.manager)
                 self.v = values.get_values()
-            elif 'value_path' in self.data:
-                self.v = self.get_path_value(i)
-            else:
+            elif 'value_path' not in self.data:
                 self.v = self.data.get('value')
             self.content_initialized = True
             self.vtype = self.data.get('value_type')
+
+        if 'value_path' in self.data and 'value_from' not in self.data:
+            self.v = self.get_path_value(i)
 
         if i is None:
             return False
