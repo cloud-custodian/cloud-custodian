@@ -122,11 +122,14 @@ aws bedrock list-custom-models --region us-west-2   # model still listed
 Training cost is trivial (~$0.002 at $0.00149/1K tokens); the model then costs
 **$1.95/month** to store for as long as it is kept.
 
-## Verifying the model survived teardown
+## The model survives teardown
 
-Destroying the prerequisites should not affect a completed model -- Bedrock
-holds its own copy and does not read these buckets at inference time. Confirm
-after the first build:
+Destroying the prerequisites does not affect a completed model: Bedrock holds
+its own copy and does not read these buckets at inference time. Verified
+2026-07-28 for both fixture models -- after `tofu destroy` each remained
+`Active` (and the sibling deployable model could still be deployed on demand).
+
+To re-check after a future rebuild:
 
 ```bash
 aws bedrock get-custom-model --region us-west-2 \
