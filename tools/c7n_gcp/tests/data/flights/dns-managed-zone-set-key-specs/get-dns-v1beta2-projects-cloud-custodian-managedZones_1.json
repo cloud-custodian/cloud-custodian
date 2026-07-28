@@ -1,0 +1,62 @@
+{
+  "headers": {
+    "content-type": "application/json; charset=UTF-8",
+    "vary": "Origin, X-Origin, Referer",
+    "date": "Fri, 06 Mar 2026 13:28:15 GMT",
+    "server": "ESF",
+    "x-xss-protection": "0",
+    "x-frame-options": "SAMEORIGIN",
+    "x-content-type-options": "nosniff",
+    "alt-svc": "h3=\":443\"; ma=2592000,h3-29=\":443\"; ma=2592000",
+    "transfer-encoding": "chunked",
+    "status": "200",
+    "content-length": "3520",
+    "-content-encoding": "gzip",
+    "content-location": "https://dns.googleapis.com/dns/v1beta2/projects/cloud-custodian/managedZones?alt=json"
+  },
+  "body": {
+    "managedZones": [
+      {
+        "name": "c7n-dnssec-test-zone",
+        "dnsName": "c7n-dnssec-test.example.com.",
+        "description": "Managed by Terraform",
+        "id": "6572188884238882537",
+        "nameServers": [
+          "ns-cloud-e1.googledomains.com.",
+          "ns-cloud-e2.googledomains.com.",
+          "ns-cloud-e3.googledomains.com.",
+          "ns-cloud-e4.googledomains.com."
+        ],
+        "creationTime": "2026-03-06T13:28:12.502Z",
+        "dnssecConfig": {
+          "state": "off",
+          "defaultKeySpecs": [
+            {
+              "keyType": "keySigning",
+              "algorithm": "rsasha256",
+              "keyLength": 2048,
+              "kind": "dns#dnsKeySpec"
+            },
+            {
+              "keyType": "zoneSigning",
+              "algorithm": "rsasha256",
+              "keyLength": 1024,
+              "kind": "dns#dnsKeySpec"
+            }
+          ],
+          "nonExistence": "nsec3",
+          "kind": "dns#managedZoneDnsSecConfig"
+        },
+        "visibility": "public",
+        "labels": {
+          "goog-terraform-provisioned": "true"
+        },
+        "cloudLoggingConfig": {
+          "kind": "dns#managedZoneCloudLoggingConfig"
+        },
+        "kind": "dns#managedZone"
+      }
+    ],
+    "kind": "dns#managedZonesListResponse"
+  }
+}

@@ -1,0 +1,20 @@
+{
+    "status_code": 200,
+    "data": {
+        "ResponseMetadata": {},
+        "clusterIdentifier": "y5t6ak7knpdufei7vlyn7npruu",
+        "streamIdentifier": "mzt6amh3gl5dssqny7fklj4scm",
+        "arn": "arn:aws:dsql:us-east-1:644160558196:cluster/y5t6ak7knpdufei7vlyn7npruu/stream/mzt6amh3gl5dssqny7fklj4scm",
+        "status": "DELETING",
+        "creationTime": {
+            "__class__": "datetime",
+            "year": 2026,
+            "month": 7,
+            "day": 20,
+            "hour": 14,
+            "minute": 22,
+            "second": 31,
+            "microsecond": 810000
+        }
+    }
+}

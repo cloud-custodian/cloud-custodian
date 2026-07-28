@@ -5,24 +5,15 @@
         "Status": 200,
         "UserList": [
             {
-                "Arn": "arn:aws:quicksight:us-east-1:644160558196:user/default/matt@capitalone.com",
-                "UserName": "matt@capitalone.com",
-                "Email": "matthew.heidelbaugh@capitalone.com",
-                "Role": "ADMIN",
+                "Arn": "arn:aws:quicksight:us-east-1:644160558196:user/default/AWS-Developer/abc123",
+                "UserName": "AWS-Developer/abc123",
+                "Email": "test@c7n.com",
+                "Role": "ADMIN_PRO",
                 "IdentityType": "IAM",
                 "Active": true,
-                "PrincipalId": "federated/iam/AIDAZL6XWCR2MLDRO6EIG"
-            },
-            {
-                "Arn": "arn:aws:quicksight:us-east-1:644160558196:user/default/Jerry",
-                "UserName": "Jerry",
-                "Email": "policyfoundry@capitalone.com",
-                "Role": "READER",
-                "IdentityType": "IAM",
-                "Active": true,
-                "PrincipalId": "federated/iam/AIDAZL6XWCR2GMVVY4IYC"
+                "PrincipalId": "federated/iam/AROA3FLD2ZISAQPHZK4RY:abc123"
             }
         ],
-        "RequestId": "f572532c-0097-4aa7-976b-38fe0ad7590d"
+        "RequestId": "34fd5b6a-4aca-48d9-970d-6a3cb0523a44"
     }
 }
