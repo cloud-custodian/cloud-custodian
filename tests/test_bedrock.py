@@ -1287,35 +1287,31 @@ def test_bedrock_inference_profile_bad_statistics(test):
 
 
 # These tests run against real, prebuilt custom models kept as long-lived
-# fixtures ("pets"). Fine-tuning a custom model takes hours, and for Nova base
-# models it would not complete in the test account at all, so the models can't
-# be created per test run. Two are needed, one per serving path the filters
-# check:
+# fixtures. Fine-tuning a custom model takes hours, and for Nova base models it
+# would not complete in the test account at all, so the models can't be created
+# per test run. Two are needed, one per serving path the filters check:
 #   - deployable:    a base model eligible for on-demand custom model
 #                    deployment (backs the `deployments` filter). Llama 3.3 70B.
 #   - provisionable: a base model that can only be served via provisioned
 #                    throughput (backs the `provisioned-throughputs` filter).
 #                    Llama 3.1 8B.
-# If a model is deleted, recreate it (see the terraform + data under
-# specs/10843-aws-bedrock-deployment-filters/) and update its `id`/`region`
-# here, then re-record the affected tests. The id suffix is stable across
-# record/replay; only the 12-digit account segment differs (ACCOUNT_ID on
-# replay, the real account when recording).
+# See tests/terraform/bedrock_{deployable,provisionable}_custom_model for how
+# they are built, and rebuilt if someone deletes them.
+#
+# They are identified by name rather than ARN on purpose: a model's ARN ends in
+# an AWS-generated id that changes every time it is rebuilt, while the name is
+# ours and is fixed. Keying off the name means a rebuild needs no edit here --
+# only re-recording.
 CUSTOM_MODELS = dict(
     deployable=dict(
-        id="meta.llama3-3-70b-instruct-v1:0:128k/atcpdot5kavs",
+        name="KEEP-c7n-deployable-test-fixture",
         region="us-west-2",
     ),
     provisionable=dict(
-        id="meta.llama3-1-8b-instruct-v1:0:128k/liyn3ip5ckui",
+        name="KEEP-c7n-provisionable-test-fixture",
         region="us-west-2",
     ),
 )
-
-
-def _custom_model_arn(model, account_id):
-    return "arn:aws:bedrock:{region}:{account_id}:custom-model/{id}".format(
-        account_id=account_id, **model)
 
 
 def wait_for_custom_model_deployment_active(client, deployment_arn, test):
@@ -1369,22 +1365,21 @@ def test_bedrock_custom_model_deployments_filter(test, create_custom_model_deplo
     test.session_factory = test.replay_flight_data(
         'test_bedrock_custom_model_deployments_filter', region=model['region'])
 
-    account_id = ACCOUNT_ID
-    if C7N_FUNCTIONAL:
-        account_id = test.session_factory().client(
-            'sts', region_name=model['region']).get_caller_identity()['Account']
-    model_arn = _custom_model_arn(model, account_id)
+    # CreateCustomModelDeployment needs the ARN; GetCustomModel takes the name.
+    client = test.session_factory().client('bedrock', region_name=model['region'])
+    model_arn = client.get_custom_model(modelIdentifier=model['name'])['modelArn']
 
     # Populate an on-demand deployment on the fixture model; its create/poll
     # calls are recorded via the same session used below.
     create_custom_model_deployment(model_arn, model['region'])
 
+    # Unscoped, like the orphan test: the policy discovers every custom model
+    # with an active deployment, and the fixture model must be among them.
     present = test.load_policy(
         {
             'name': 'bedrock-custom-model-active-deployment',
             'resource': 'aws.bedrock-custom-model',
             'filters': [
-                {'modelArn': model_arn},
                 {'type': 'deployments', 'status': 'Active', 'value': 'present'},
             ],
         },
@@ -1392,43 +1387,45 @@ def test_bedrock_custom_model_deployments_filter(test, create_custom_model_deplo
         config={'region': model['region']},
     )
     resources = present.run()
-    test.assertEqual(len(resources), 1)
-    test.assertEqual(resources[0]['modelArn'], model_arn)
-    test.assertEqual(len(resources[0]['c7n:deployments']), 1)
-    test.assertEqual(resources[0]['c7n:deployments'][0]['status'], 'Active')
+
+    test.assertGreaterEqual(len(resources), 1)
+    deployed_names = {r['modelName'] for r in resources}
+    test.assertIn(model['name'], deployed_names)
+    for r in resources:
+        test.assertEqual(r['c7n:deployments'][0]['status'], 'Active')
 
 
 def test_bedrock_custom_model_orphaned(test):
     # An "orphaned" custom model: Active, but with neither an Active on-demand
     # deployment nor an InService provisioned throughput -- the issue's target
-    # for cleanup. Exercises the absent branch of both filters at once. Needs
-    # no resource creation: the fixture model has neither serving path.
-    model = CUSTOM_MODELS['deployable']
+    # for cleanup. The policy is unscoped (no model selector), so it discovers
+    # orphans across all custom models via the absent branch of both filters.
+    # Both fixture models are orphaned (the deployable one has no deployment;
+    # the provisionable one has no provisioned throughput), so both must be
+    # found.
+    region = CUSTOM_MODELS['deployable']['region']
     test.session_factory = test.replay_flight_data(
-        'test_bedrock_custom_model_orphaned', region=model['region'])
-
-    account_id = ACCOUNT_ID
-    if C7N_FUNCTIONAL:
-        account_id = test.session_factory().client(
-            'sts', region_name=model['region']).get_caller_identity()['Account']
-    model_arn = _custom_model_arn(model, account_id)
+        'test_bedrock_custom_model_orphaned', region=region)
 
     policy = test.load_policy(
         {
             'name': 'bedrock-custom-model-orphaned',
             'resource': 'aws.bedrock-custom-model',
             'filters': [
-                {'modelArn': model_arn},
                 {'type': 'deployments', 'status': 'Active', 'value': 'absent'},
                 {'type': 'provisioned-throughputs', 'status': 'InService',
                  'value': 'absent'},
             ],
         },
         session_factory=test.session_factory,
-        config={'region': model['region']},
+        config={'region': region},
     )
     resources = policy.run()
-    test.assertEqual(len(resources), 1)
-    test.assertEqual(resources[0]['modelArn'], model_arn)
-    test.assertEqual(resources[0]['c7n:deployments'], [])
-    test.assertEqual(resources[0]['c7n:provisioned-throughputs'], [])
+
+    test.assertGreaterEqual(len(resources), 2)
+    orphan_names = {r['modelName'] for r in resources}
+    for model in CUSTOM_MODELS.values():
+        test.assertIn(model['name'], orphan_names)
+    for r in resources:
+        test.assertEqual(r['c7n:deployments'], [])
+        test.assertEqual(r['c7n:provisioned-throughputs'], [])

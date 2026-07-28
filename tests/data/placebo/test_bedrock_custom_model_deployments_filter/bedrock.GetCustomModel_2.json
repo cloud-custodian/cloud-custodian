@@ -2,9 +2,9 @@
     "status_code": 200,
     "data": {
         "ResponseMetadata": {},
-        "modelArn": "arn:aws:bedrock:us-west-2:644160558196:custom-model/meta.llama3-1-8b-instruct-v1:0:128k/liyn3ip5ckui",
-        "modelName": "c7n-llama-ft-emerging-marmoset",
-        "jobArn": "arn:aws:bedrock:us-west-2:644160558196:model-customization-job/meta.llama3-1-8b-instruct-v1:0:128k/gsfk5r3l6cor",
+        "modelArn": "arn:aws:bedrock:us-west-2:644160558196:custom-model/meta.llama3-1-8b-instruct-v1:0:128k/qzlin7qn403k",
+        "modelName": "KEEP-c7n-provisionable-test-fixture",
+        "jobArn": "arn:aws:bedrock:us-west-2:644160558196:model-customization-job/meta.llama3-1-8b-instruct-v1:0:128k/l2y707814iq7",
         "baseModelArn": "arn:aws:bedrock:us-west-2::foundation-model/meta.llama3-1-8b-instruct-v1:0:128k",
         "customizationType": "FINE_TUNING",
         "hyperParameters": {
@@ -13,10 +13,10 @@
             "epochCount": "1"
         },
         "trainingDataConfig": {
-            "s3Uri": "s3://c7n-bedrock-llama-ft-emerging-marmoset/train.jsonl"
+            "s3Uri": "s3://c7n-bedrock-provisionable-intimate-bird/train.jsonl"
         },
         "outputDataConfig": {
-            "s3Uri": "s3://c7n-bedrock-llama-ft-output-emerging-marmoset/output/"
+            "s3Uri": "s3://c7n-bedrock-provisionable-output-intimate-bird/output/"
         },
         "trainingMetrics": {
             "trainingLoss": -1.0
@@ -26,11 +26,11 @@
             "__class__": "datetime",
             "year": 2026,
             "month": 7,
-            "day": 22,
-            "hour": 14,
-            "minute": 45,
-            "second": 1,
-            "microsecond": 978000
+            "day": 27,
+            "hour": 20,
+            "minute": 24,
+            "second": 33,
+            "microsecond": 562000
         },
         "modelStatus": "Active"
     }
