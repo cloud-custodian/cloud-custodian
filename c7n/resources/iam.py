@@ -1519,14 +1519,17 @@ class AllowAllIamPolicies(Filter):
             statements = [statements]
 
         for s in statements:
+            # Action/Resource are valid as either a bare string ("*") or a
+            # list (["*"]); normalize to a list so both forms are detected.
+            action = s.get('Action')
+            action = [action] if isinstance(action, str) else action
+            resource_val = s.get('Resource')
+            resource_val = [resource_val] if isinstance(resource_val, str) else resource_val
+
             if ('Condition' not in s and
-                    'Action' in s and
-                    isinstance(s['Action'], str) and
-                    s['Action'] == "*" and
-                    'Resource' in s and
-                    isinstance(s['Resource'], str) and
-                    s['Resource'] == "*" and
-                    s['Effect'] == "Allow"):
+                    action == ['*'] and
+                    resource_val == ['*'] and
+                    s.get('Effect') == "Allow"):
                 return True
         return False
 
