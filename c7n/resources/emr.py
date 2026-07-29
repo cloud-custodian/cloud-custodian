@@ -320,7 +320,8 @@ class EMRAutoTerminationPolicyFilter(ValueFilter):
             if self.annotation_key not in r:
                 policy = self.manager.retry(
                     client.get_auto_termination_policy,
-                    ClusterId=r['Id']).get('AutoTerminationPolicy', {})
+                    ClusterId=r['Id'],
+                ).get('AutoTerminationPolicy')
                 r[self.annotation_key] = policy or {}
             if self.match(r[self.annotation_key]):
                 results.append(r)
