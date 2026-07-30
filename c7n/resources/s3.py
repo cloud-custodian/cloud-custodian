@@ -3818,6 +3818,11 @@ class SetBucketEncryption(KMSKeyResolverMixin, BucketActionBase):
 
     `key`: arn, alias, or kms id key
 
+    `use-existing-key`: boolean Optional: Defaults to False.
+    When true, retains the bucket's current KMS key instead of requiring a new one.
+    If used together with `key`, the existing key is preferred and `key` acts as a fallback
+    for buckets that do not already have a KMS key configured.
+
     `bucket-key`: boolean Optional:
     Defaults to True.
     Reduces amount of API traffic from Amazon S3 to KMS and can reduce KMS request
@@ -3849,6 +3854,20 @@ class SetBucketEncryption(KMSKeyResolverMixin, BucketActionBase):
                     key: alias/some/alias/key
                     bucket-key: true
 
+              - name: s3-enable-bucket-key-with-existing-kms-key
+                resource: s3
+                filters:
+                  - type: bucket-encryption
+                    state: True
+                    crypto: aws:kms
+                  - type: bucket-encryption
+                    bucket_key_enabled: False
+                actions:
+                  - type: set-bucket-encryption
+                    crypto: aws:kms
+                    use-existing-key: true
+                    bucket-key: true
+
               - name: s3-enable-default-encryption-aes256
                 resource: s3
                 actions:
@@ -3872,10 +3891,17 @@ class SetBucketEncryption(KMSKeyResolverMixin, BucketActionBase):
             'enabled': {'type': 'boolean'},
             'crypto': {'enum': ['aws:kms', 'AES256']},
             'key': {'type': 'string'},
+            'use-existing-key': {'type': 'boolean'},
             'bucket-key': {'type': 'boolean'}
         },
         'dependencies': {
             'key': {
+                'properties': {
+                    'crypto': {'pattern': 'aws:kms'}
+                },
+                'required': ['crypto']
+            },
+            'use-existing-key': {
                 'properties': {
                     'crypto': {'pattern': 'aws:kms'}
                 },
@@ -3888,7 +3914,7 @@ class SetBucketEncryption(KMSKeyResolverMixin, BucketActionBase):
                    'kms:ListAliases', 'kms:DescribeKey')
 
     def process(self, buckets):
-        if self.data.get('enabled', True):
+        if self.data.get('enabled', True) and self.data.get('key'):
             self.resolve_keys(buckets)
 
         with self.executor_factory(max_workers=3) as w:
@@ -3921,15 +3947,46 @@ class SetBucketEncryption(KMSKeyResolverMixin, BucketActionBase):
         }
 
         if algo == 'aws:kms':
-            key = self.get_key(bucket)
-            if not key:
-                raise Exception('Valid KMS Key required but does not exist')
+            if self.data.get('use-existing-key'):
+                kms_key_id = self.get_existing_key(bucket)
+                if not kms_key_id:
+                    if 'key' in self.data:
+                        key = self.get_key(bucket)
+                        if not key:
+                            raise Exception(
+                                'Fallback KMS key %s could not be resolved' %
+                                self.data['key'])
+                        self.log.warning(
+                            "Bucket:%s has no existing KMS key, "
+                            "using fallback key %s",
+                            bucket['Name'], self.data['key'])
+                        kms_key_id = key['Arn']
+                    else:
+                        raise Exception(
+                            "Bucket:%s has no existing KMS key and no "
+                            "fallback key specified, add a 'key' parameter" %
+                            bucket['Name'])
+            else:
+                key = self.get_key(bucket)
+                if not key:
+                    raise Exception('Valid KMS Key required but does not exist')
+                kms_key_id = key['Arn']
 
-            config['Rules'][0]['ApplyServerSideEncryptionByDefault']['KMSMasterKeyID'] = key['Arn']
+            config['Rules'][0]['ApplyServerSideEncryptionByDefault']['KMSMasterKeyID'] = kms_key_id
         s3.put_bucket_encryption(
             Bucket=bucket['Name'],
             ServerSideEncryptionConfiguration=config
         )
+
+    def get_existing_key(self, bucket):
+        """Retrieve the KMS key currently configured on the bucket."""
+        be = bucket.get('c7n:bucket-encryption', {})
+        rules = be.get('ServerSideEncryptionConfiguration', {}).get('Rules', [])
+        for rule in rules:
+            default = rule.get('ApplyServerSideEncryptionByDefault', {})
+            if default.get('SSEAlgorithm') == 'aws:kms':
+                return default.get('KMSMasterKeyID')
+        return None
 
 
 OWNERSHIP_CONTROLS = ['BucketOwnerEnforced', 'BucketOwnerPreferred', 'ObjectWriter']
