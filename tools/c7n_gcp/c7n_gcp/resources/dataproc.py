@@ -1,6 +1,8 @@
 # Copyright The Cloud Custodian Authors.
 # SPDX-License-Identifier: Apache-2.0
 
+import re
+
 from c7n_gcp.filters import IamPolicyFilter
 from c7n_gcp.filters.iampolicy import IamPolicyValueFilter
 from c7n_gcp.query import ChildResourceManager, ChildTypeInfo
@@ -21,6 +23,9 @@ class DataprocClusters(ChildResourceManager):
             'resource': 'region',
             'child_enum_params': {
                 ('name', 'region')},
+            'parent_get_params': [
+                ('labels."goog-dataproc-location"', 'name'),
+            ],
             'use_child_query': True,
         }
         default_report_fields = ['clusterName', 'status.state', 'status.stateStartTime']
@@ -31,6 +36,16 @@ class DataprocClusters(ChildResourceManager):
         @classmethod
         def _get_location(cls, resource):
             return resource['labels']['goog-dataproc-location']
+
+        @staticmethod
+        def get(client, resource_info):
+            project_id, region, cluster_name = re.match(
+                'projects/(.*?)/regions/(.*?)/clusters/(.*)',
+                resource_info['resourceName']).groups()
+            return client.execute_query(
+                'get', {'projectId': project_id,
+                        'region': region,
+                        'clusterName': cluster_name})
 
 
 @DataprocClusters.filter_registry.register('iam-policy')
