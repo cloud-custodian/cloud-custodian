@@ -2970,14 +2970,16 @@ class EndpointServiceDetailsFilter(ValueFilter):
                 # Cross-region endpoints must be described using a client for
                 # the service's region; using the wrong regional client returns
                 # InvalidServiceName.
-                rc = (
+                regional_client = (
                     client
                     if region == current_region
                     else self.manager.session_factory(region=region).client('ec2')
                 )
                 sorted_names = sorted(names)
                 try:
-                    resp = rc.describe_vpc_endpoint_services(ServiceNames=sorted_names)
+                    # Query all services in this region in one batch first.
+                    resp = regional_client.describe_vpc_endpoint_services(
+                        ServiceNames=sorted_names)
                     for d in resp.get("ServiceDetails", []):
                         service_map[d["ServiceName"]] = d
                 except ClientError as e:
@@ -2985,7 +2987,10 @@ class EndpointServiceDetailsFilter(ValueFilter):
                         raise
                     for name in sorted_names:
                         try:
-                            resp = rc.describe_vpc_endpoint_services(ServiceNames=[name])
+                            # If the batch fails, query each service individually
+                            # to isolate and skip invalid service names.
+                            resp = regional_client.describe_vpc_endpoint_services(
+                                ServiceNames=[name])
                             for d in resp.get("ServiceDetails", []):
                                 service_map[d["ServiceName"]] = d
                         except ClientError as e:
