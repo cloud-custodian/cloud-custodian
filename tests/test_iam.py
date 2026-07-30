@@ -25,6 +25,7 @@ from c7n.resources.iam import (
     UserMfaDevice,
     UsedIamPolicies,
     UnusedIamPolicies,
+    AllowAllIamPolicies,
     UsedInstanceProfiles,
     UnusedInstanceProfiles,
     UsedIamRole,
@@ -1709,6 +1710,64 @@ class IamPolicy(BaseTest):
         )
         resources = p.run()
         self.assertEqual(len(resources), 1)
+
+    def test_iam_has_allow_all_policies_list_form(self):
+        # Regression test: Action/Resource are valid in IAM policy JSON as
+        # either a bare string ("*") or a single-element list (["*"]). The
+        # filter previously only matched the string form via
+        # isinstance(..., str), silently missing an equally common
+        # full-admin policy written with list syntax.
+        f = AllowAllIamPolicies(data={}, manager=None)
+        resource = {'Arn': 'arn:aws:iam::644160558196:policy/ListFormAdmin',
+                    'DefaultVersionId': 'v1'}
+
+        def get_policy_version(document):
+            client = mock.MagicMock()
+            client.get_policy_version.return_value = {
+                'PolicyVersion': {'Document': document}}
+            return client
+
+        # list-form Action/Resource: must be detected as allow-all
+        client = get_policy_version({
+            'Statement': [{
+                'Effect': 'Allow',
+                'Action': ['*'],
+                'Resource': ['*'],
+            }]
+        })
+        self.assertTrue(f.has_allow_all_policy(client, resource))
+
+        # mixed string/list form: must also be detected
+        client = get_policy_version({
+            'Statement': [{
+                'Effect': 'Allow',
+                'Action': '*',
+                'Resource': ['*'],
+            }]
+        })
+        self.assertTrue(f.has_allow_all_policy(client, resource))
+
+        # list form with extra entries alongside "*": still allow-all, since
+        # "*" in either list already grants access to everything regardless
+        # of the other (redundant) entries.
+        client = get_policy_version({
+            'Statement': [{
+                'Effect': 'Allow',
+                'Action': ['*'],
+                'Resource': ['*', 'arn:aws:s3:::some-bucket'],
+            }]
+        })
+        self.assertTrue(f.has_allow_all_policy(client, resource))
+
+        # list form without "*" in either list: not allow-all
+        client = get_policy_version({
+            'Statement': [{
+                'Effect': 'Allow',
+                'Action': ['s3:GetObject'],
+                'Resource': ['arn:aws:s3:::some-bucket'],
+            }]
+        })
+        self.assertFalse(f.has_allow_all_policy(client, resource))
 
 
 @terraform('iam_user_group', teardown=terraform.TEARDOWN_IGNORE)
