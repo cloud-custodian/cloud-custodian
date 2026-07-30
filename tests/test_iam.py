@@ -1747,12 +1747,24 @@ class IamPolicy(BaseTest):
         })
         self.assertTrue(f.has_allow_all_policy(client, resource))
 
-        # list form with more than just "*": not a bare allow-all statement
+        # list form with extra entries alongside "*": still allow-all, since
+        # "*" in either list already grants access to everything regardless
+        # of the other (redundant) entries.
         client = get_policy_version({
             'Statement': [{
                 'Effect': 'Allow',
                 'Action': ['*'],
                 'Resource': ['*', 'arn:aws:s3:::some-bucket'],
+            }]
+        })
+        self.assertTrue(f.has_allow_all_policy(client, resource))
+
+        # list form without "*" in either list: not allow-all
+        client = get_policy_version({
+            'Statement': [{
+                'Effect': 'Allow',
+                'Action': ['s3:GetObject'],
+                'Resource': ['arn:aws:s3:::some-bucket'],
             }]
         })
         self.assertFalse(f.has_allow_all_policy(client, resource))

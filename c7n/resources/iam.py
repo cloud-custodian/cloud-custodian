@@ -1527,8 +1527,8 @@ class AllowAllIamPolicies(Filter):
             resource_val = [resource_val] if isinstance(resource_val, str) else resource_val
 
             if ('Condition' not in s and
-                    action == ['*'] and
-                    resource_val == ['*'] and
+                    action is not None and '*' in action and
+                    resource_val is not None and '*' in resource_val and
                     s.get('Effect') == "Allow"):
                 return True
         return False
