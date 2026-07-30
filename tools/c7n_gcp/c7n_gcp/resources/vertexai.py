@@ -682,6 +682,51 @@ class VertexAIEndpointDelete(VertexAIMethodAction):
         return {'name': resource['name']}
 
 
+@resources.register('vertex-ai-dataset')
+class VertexAIDataset(VertexAIQueryManager):
+    """GCP Vertex AI Dataset Resource
+
+    Vertex AI Datasets hold DataItems and Annotations used to train
+    or evaluate models.
+
+    :example:
+
+    List all Vertex AI Datasets across all locations:
+
+    .. code-block:: yaml
+
+        policies:
+          - name: vertexai-datasets-inventory
+            resource: gcp.vertex-ai-dataset
+
+    :example:
+
+    Find stale datasets (not updated in 90+ days):
+
+    .. code-block:: yaml
+
+        policies:
+          - name: gcp-vertex-ai-datasets-stale
+            resource: gcp.vertex-ai-dataset
+            filters:
+              - type: value
+                key: updateTime
+                value_type: age
+                op: greater-than
+                value: 90
+    """
+
+    class resource_type(VertexAITypeInfo):
+        component = 'projects.locations.datasets'
+        enum_spec = ('list', 'datasets[]', None)
+        default_report_fields = [
+            'name', 'displayName', 'createTime', 'updateTime', 'metadataSchemaUri'
+        ]
+        asset_type = 'aiplatform.googleapis.com/Dataset'
+        permissions = ('aiplatform.datasets.list',)
+        urn_component = 'dataset'
+
+
 @resources.register('vertex-ai-batch-prediction-job')
 class VertexAIBatchPredictionJob(VertexAIQueryManager):
     """GCP Vertex AI Batch Prediction Job Resource
