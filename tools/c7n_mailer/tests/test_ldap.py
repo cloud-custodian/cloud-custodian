@@ -69,6 +69,13 @@ class MailerLdapTest(unittest.TestCase):
         bill_metadata = self.ldap_lookup.get_metadata_from_dn(BILL[0])
         self.assertEqual(bill_metadata["mail"], BILL[1]["mail"][0])
 
+    def test_uid_wildcard_is_not_interpreted_as_filter(self):
+        # a uid sourced from a resource tag / event is attacker influenced,
+        # so an embedded '*' must be treated as a literal, not an ldap
+        # wildcard. there is no user whose uid is the literal string 'peter*'.
+        result = self.ldap_lookup.get_metadata_from_uid("peter*")
+        self.assertEqual(result, {})
+
     def test_to_addr_with_ldap_query(self):
         to_addr = self.ldap_lookup.get_email_to_addrs_from_uid("peter", manager=True)
         self.assertEqual(to_addr, ["peter@initech.com", "bill_lumberg@initech.com"])

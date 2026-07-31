@@ -7,7 +7,8 @@ from botocore.exceptions import ClientError
 from c7n.actions import BaseAction
 from c7n.filters import MetricsFilter, ShieldMetrics, Filter
 from c7n.manager import resources
-from c7n.query import ConfigSource, QueryResourceManager, DescribeSource, TypeInfo
+from c7n.query import (ConfigSource, QueryResourceManager, DescribeSource,
+                       TypeInfo, DescribeWithResourceTags)
 from c7n.tags import universal_augment
 from c7n.utils import local_session, merge_dict, type_schema, get_retry
 from c7n.filters import ValueFilter, WafV2FilterBase
@@ -87,6 +88,45 @@ class StreamingDistribution(QueryResourceManager):
 
     source_mapping = {
         'describe': DescribeStreamingDistribution,
+        'config': ConfigSource
+    }
+
+
+@resources.register('cloudfront-function')
+class Function(QueryResourceManager):
+    class resource_type(TypeInfo):
+        service = "cloudfront"
+        arn_type = "function"
+        enum_spec = ("list_functions", "FunctionList.Items", None)
+        id = "Name"
+        arn = "FunctionMetadata.FunctionARN"
+        name = "Name"
+        date = "FunctionMetadata.LastModifiedTime"
+        cfn_type = "AWS::CloudFront::Function"
+        universal_taggable = object()
+        permission_augment = ("cloudfront:ListTagsForResource",)
+
+    source_mapping = {
+        'describe': DescribeWithResourceTags
+    }
+
+
+@resources.register('cloudfront-key-value-store')
+class KeyValueStore(QueryResourceManager):
+    class resource_type(TypeInfo):
+        service = "cloudfront"
+        arn_type = "key-value-store"
+        enum_spec = ("list_key_value_stores", "KeyValueStoreList.Items", None)
+        id = "Name"
+        arn = "ARN"
+        name = "Name"
+        date = "LastModifiedTime"
+        cfn_type = "AWS::CloudFront::KeyValueStore"
+        universal_taggable = object()
+        permission_augment = ("cloudfront:ListTagsForResource",)
+
+    source_mapping = {
+        'describe': DescribeWithResourceTags,
         'config': ConfigSource
     }
 

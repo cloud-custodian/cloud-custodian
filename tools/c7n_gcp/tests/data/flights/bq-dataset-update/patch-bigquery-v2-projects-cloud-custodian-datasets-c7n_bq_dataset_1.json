@@ -1,0 +1,51 @@
+{
+  "headers": {
+    "etag": "FQ3UnypvZj6325nOwUpazg==",
+    "content-type": "application/json; charset=UTF-8",
+    "vary": "Origin, X-Origin, Referer",
+    "date": "Fri, 27 Mar 2026 22:31:41 GMT",
+    "server": "ESF",
+    "x-xss-protection": "0",
+    "x-frame-options": "SAMEORIGIN",
+    "x-content-type-options": "nosniff",
+    "alt-svc": "h3=\":443\"; ma=2592000,h3-29=\":443\"; ma=2592000",
+    "transfer-encoding": "chunked",
+    "status": "200",
+    "content-length": "843",
+    "-content-encoding": "gzip"
+  },
+  "body": {
+    "kind": "bigquery#dataset",
+    "etag": "FQ3UnypvZj6325nOwUpazg==",
+    "id": "stacklet-personal-2:c7n_bq_dataset",
+    "selfLink": "https://bigquery.googleapis.com/bigquery/v2/projects/cloud-custodian/datasets/c7n_bq_dataset",
+    "datasetReference": {
+      "datasetId": "c7n_bq_dataset",
+      "projectId": "stacklet-personal-2"
+    },
+    "labels": {
+      "c7n_test": "bq_dataset_update",
+      "env": "default",
+      "goog-terraform-provisioned": "true"
+    },
+    "access": [
+      {
+        "role": "WRITER",
+        "specialGroup": "projectWriters"
+      },
+      {
+        "role": "OWNER",
+        "specialGroup": "projectOwners"
+      },
+      {
+        "role": "READER",
+        "specialGroup": "projectReaders"
+      }
+    ],
+    "creationTime": "1774650697765",
+    "lastModifiedTime": "1774650701214",
+    "location": "US",
+    "type": "DEFAULT",
+    "maxTimeTravelHours": "168"
+  }
+}

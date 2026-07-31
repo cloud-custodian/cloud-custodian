@@ -6,7 +6,7 @@ from c7n_gcp.provider import resources
 from c7n_gcp.query import QueryResourceManager, TypeInfo
 from c7n_gcp.filters import IamPolicyFilter
 from c7n_gcp.filters.iampolicy import IamPolicyValueFilter
-from c7n.utils import local_session
+from c7n.utils import local_session, jmespath_search
 
 
 @resources.register("cloud-run-service")
@@ -129,3 +129,16 @@ class CloudRunRevision(QueryResourceManager):
         asset_type = "run.googleapis.com/Revision"
         urn_component = "revision"
         urn_id_segments = (-1,)
+
+        @classmethod
+        def get_metric_resource_name(cls, resource, metric_key=None):
+            # Handle different metric keys for Cloud Run revisions
+            # Since Cloud Run uses nested metadata structure, we must use jmespath
+            if metric_key == 'resource.labels.revision_name':
+                # Extract revision name (e.g., "service-00001-abc")
+                return jmespath_search("metadata.name", resource)
+            elif metric_key == 'resource.labels.service_name':
+                # Extract service name from Knative label (e.g., "service")
+                return jmespath_search('metadata.labels."serving.knative.dev/service"', resource)
+            # Default: return revision name (most common case)
+            return jmespath_search("metadata.name", resource)

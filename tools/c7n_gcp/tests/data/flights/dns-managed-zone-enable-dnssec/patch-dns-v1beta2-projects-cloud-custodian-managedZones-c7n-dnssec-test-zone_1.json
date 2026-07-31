@@ -1,0 +1,106 @@
+{
+  "headers": {
+    "content-type": "application/json; charset=UTF-8",
+    "vary": "Origin, X-Origin, Referer",
+    "date": "Fri, 06 Mar 2026 13:26:28 GMT",
+    "server": "ESF",
+    "x-xss-protection": "0",
+    "x-frame-options": "SAMEORIGIN",
+    "x-content-type-options": "nosniff",
+    "alt-svc": "h3=\":443\"; ma=2592000,h3-29=\":443\"; ma=2592000",
+    "transfer-encoding": "chunked",
+    "status": "200",
+    "content-length": "2576",
+    "-content-encoding": "gzip"
+  },
+  "body": {
+    "id": "eab4a0bf-f154-4e90-adcf-dcbbeb613dd8",
+    "startTime": "2026-03-06T13:26:28.819Z",
+    "status": "pending",
+    "user": "markos@sixfeetup.com",
+    "type": "UPDATE",
+    "zoneContext": {
+      "oldValue": {
+        "name": "c7n-dnssec-test-zone",
+        "dnsName": "c7n-dnssec-test.example.com.",
+        "description": "Managed by Terraform",
+        "id": "5995225543431716528",
+        "nameServers": [
+          "ns-cloud-c1.googledomains.com.",
+          "ns-cloud-c2.googledomains.com.",
+          "ns-cloud-c3.googledomains.com.",
+          "ns-cloud-c4.googledomains.com."
+        ],
+        "creationTime": "2026-03-06T13:26:25.490Z",
+        "dnssecConfig": {
+          "state": "off",
+          "defaultKeySpecs": [
+            {
+              "keyType": "keySigning",
+              "algorithm": "rsasha256",
+              "keyLength": 2048,
+              "kind": "dns#dnsKeySpec"
+            },
+            {
+              "keyType": "zoneSigning",
+              "algorithm": "rsasha256",
+              "keyLength": 1024,
+              "kind": "dns#dnsKeySpec"
+            }
+          ],
+          "nonExistence": "nsec3",
+          "kind": "dns#managedZoneDnsSecConfig"
+        },
+        "visibility": "public",
+        "labels": {
+          "goog-terraform-provisioned": "true"
+        },
+        "cloudLoggingConfig": {
+          "kind": "dns#managedZoneCloudLoggingConfig"
+        },
+        "kind": "dns#managedZone"
+      },
+      "newValue": {
+        "name": "c7n-dnssec-test-zone",
+        "dnsName": "c7n-dnssec-test.example.com.",
+        "description": "Managed by Terraform",
+        "id": "5995225543431716528",
+        "nameServers": [
+          "ns-cloud-c1.googledomains.com.",
+          "ns-cloud-c2.googledomains.com.",
+          "ns-cloud-c3.googledomains.com.",
+          "ns-cloud-c4.googledomains.com."
+        ],
+        "creationTime": "2026-03-06T13:26:25.490Z",
+        "dnssecConfig": {
+          "state": "on",
+          "defaultKeySpecs": [
+            {
+              "keyType": "keySigning",
+              "algorithm": "rsasha256",
+              "keyLength": 2048,
+              "kind": "dns#dnsKeySpec"
+            },
+            {
+              "keyType": "zoneSigning",
+              "algorithm": "rsasha256",
+              "keyLength": 1024,
+              "kind": "dns#dnsKeySpec"
+            }
+          ],
+          "nonExistence": "nsec3",
+          "kind": "dns#managedZoneDnsSecConfig"
+        },
+        "visibility": "public",
+        "labels": {
+          "goog-terraform-provisioned": "true"
+        },
+        "cloudLoggingConfig": {
+          "kind": "dns#managedZoneCloudLoggingConfig"
+        },
+        "kind": "dns#managedZone"
+      }
+    },
+    "kind": "dns#operation"
+  }
+}

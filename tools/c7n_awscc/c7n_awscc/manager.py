@@ -62,17 +62,18 @@ def initialize_resource(resource_name):
         ),
     )
 
-    rtype.action_registry.register(
-        "delete",
-        type(
-            class_name + "Delete",
-            (Delete,),
-            {
-                "permissions": rinfo["handlers"]["delete"]["permissions"],
-                "__module__": mod_name,
-            },
-        ),
-    )
+    if "delete" in rinfo["handlers"]:
+        rtype.action_registry.register(
+            "delete",
+            type(
+                class_name + "Delete",
+                (Delete,),
+                {
+                    "permissions": rinfo["handlers"]["delete"]["permissions"],
+                    "__module__": mod_name,
+                },
+            ),
+        )
 
     if "update" in rinfo["handlers"]:
         rtype.action_registry.register(

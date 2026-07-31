@@ -485,7 +485,7 @@ class AzureEventGridMode(AzureFunctionMode):
 
         # filter specific events
         advance_filter = StringInAdvancedFilter(key='Data.OperationName',
-                                                values=self.subscribed_events)
+                                                values_property=self.subscribed_events)
         event_filter = EventSubscriptionFilter(advanced_filters=[advance_filter])
 
         for subscription_id in self.target_subscription_ids:

@@ -2,13 +2,82 @@
 # SPDX-License-Identifier: Apache-2.0
 
 from c7n.manager import resources
+from c7n.exceptions import PolicyValidationError
 from c7n.query import QueryResourceManager, TypeInfo, DescribeSource, DescribeWithResourceTags
 from c7n.tags import RemoveTag, Tag, TagActionFilter, TagDelayedAction, universal_augment
-from c7n.utils import local_session, type_schema
+from c7n.utils import local_session, type_schema, QueryParser
 from c7n.actions import BaseAction
 from c7n.filters.kms import KmsRelatedFilter
 from c7n.filters import MetricsFilter
-from c7n.resources.aws import shape_schema, shape_validate
+from c7n.resources.aws import shape_schema, shape_validate, Arn
+
+
+class FoundationModelQueryParser(QueryParser):
+    QuerySchema = {
+        'byProvider': str,
+        'byCustomizationType': ('FINE_TUNING', 'CONTINUED_PRE_TRAINING'),
+        'byOutputModality': ('TEXT', 'IMAGE', 'EMBEDDING'),
+        'byInferenceType': ('ON_DEMAND', 'PROVISIONED'),
+    }
+    multi_value = False
+    type_name = 'Bedrock Foundation Model'
+
+
+@resources.register('bedrock-foundation-model')
+class BedrockFoundationModel(QueryResourceManager):
+    """AWS Bedrock Foundation Model
+
+    Foundation models are AWS-managed base models available through Bedrock.
+    This resource is read-only (no delete/tag actions) as these are catalog
+    items managed by AWS.
+
+    Use the ``query`` parameter for server-side filtering to reduce API response size.
+
+    :example:
+
+    Find all Anthropic models using server-side filtering:
+
+    .. code-block:: yaml
+
+        policies:
+          - name: anthropic-models
+            resource: aws.bedrock-foundation-model
+            query:
+              - byProvider: Anthropic
+              - byInferenceType: ON_DEMAND
+
+    :example:
+
+    Find active models with client-side filtering:
+
+    .. code-block:: yaml
+
+        policies:
+          - name: active-text-models
+            resource: aws.bedrock-foundation-model
+            filters:
+              - type: value
+                key: modelLifecycle.status
+                value: ACTIVE
+              - type: value
+                key: outputModalities
+                value: TEXT
+                op: contains
+    """
+    class resource_type(TypeInfo):
+        service = 'bedrock'
+        enum_spec = ('list_foundation_models', 'modelSummaries', None)
+        id = 'modelId'
+        arn = 'modelArn'
+        name = 'modelName'
+        permission_prefix = 'bedrock'
+
+    def resources(self, query=None):
+        query = query or {}
+        queries = FoundationModelQueryParser.parse(self.data.get('query', []))
+        for q in queries:
+            query.update(q)
+        return super().resources(query=query)
 
 
 @resources.register('bedrock-custom-model')
@@ -306,10 +375,47 @@ class BedrockModelInvocationJob(QueryResourceManager):
     class resource_type(TypeInfo):
         service = 'bedrock'
         enum_spec = ('list_model_invocation_jobs', 'invocationJobSummaries[]', None)
-        detail_spec = ('get_model_invocation_job', 'jobIdentifier', 'jobArn', None)
         name = 'jobName'
         id = arn = 'jobArn'
+        arn_type = 'model-invocation-job'
         permission_prefix = 'bedrock'
+        universal_taggable = object()
+        permissions_augment = ("bedrock:ListTagsForResource",)
+
+    augment = universal_augment
+
+
+@BedrockModelInvocationJob.action_registry.register('stop')
+class StopModelInvocationJob(BaseAction):
+    """Stop Bedrock model invocation job
+
+    :example:
+
+    .. code-block:: yaml
+
+        policies:
+            - name: bedrock-stop-untagged-jobs
+              resource: aws.bedrock-model-invocation-job
+              filters:
+                - 'tag:Owner': absent
+                - type: value
+                  key: status
+                  op: in
+                  value: [Submitted, Validating, Scheduled, InProgress]
+              actions:
+                - type: stop
+    """
+    schema = type_schema('stop')
+    permissions = ('bedrock:StopModelInvocationJob',)
+
+    def process(self, resources):
+        client = local_session(self.manager.session_factory).client('bedrock')
+        for r in resources:
+            try:
+                client.stop_model_invocation_job(jobIdentifier=r['jobArn'])
+            except (client.exceptions.ResourceNotFoundException,
+                    client.exceptions.ConflictException) as e:
+                self.log.warning('%s', e)
 
 
 @resources.register('bedrock-agent')
@@ -323,6 +429,7 @@ class BedrockAgent(QueryResourceManager):
         id = "agentId"
         arn = "agentArn"
         permission_prefix = 'bedrock'
+        metrics_namespace = "AWS/Bedrock/Agents"
 
     def augment(self, resources):
         client = local_session(self.session_factory).client('bedrock-agent')
@@ -335,6 +442,87 @@ class BedrockAgent(QueryResourceManager):
             return r
         resources = super().augment(resources)
         return list(map(_augment, resources))
+
+
+@BedrockAgent.filter_registry.register('metrics')
+class AgentMetrics(MetricsFilter):
+    """Cloudwatch metrics for Bedrock Agents.
+
+    Dataplane metrics for a Bedrock Agent, have a number of caveats.
+
+    They are only defined against a tuple of (OperationId, ModelId, AliasId).
+
+    As such to filter them against an Agent, we query metrics against every
+    Alias for each agent.
+
+    Note an OperationId must be supplied via dimension parameter, or a default
+    of InvokeAgent will be used.
+    """
+
+    def validate(self):
+        # operationid must be supplied, of utility with metrics are InvokeAgent
+        # and InvokeInlineAgent.
+        if not self.data.get('dimensions', {}).get("Operation"):
+            self.data.setdefault('dimensions', {})['Operation'] = "InvokeAgent"
+
+    def get_dimensions(self, r):
+        # Operation is injected by validate as a user dim, if not user supplied.
+        return [
+            {'Name': 'AgentAliasArn',
+             'Value': f"{r['parent']['arnAliasBase']}/{r['agentAliasId']}"
+             },
+            {'Name': 'ModelId',
+             'Value': r['parent']['modelId']}
+        ]
+
+    def process(self, resources, event=None):
+        client = local_session(self.manager.session_factory).client('bedrock-agent')
+
+        # we do some fancy footwork :-) for the rest of this metrics filter.
+        #
+        # we switch resources from agents to their set of aliases, if any alias matches
+        # we return back the agent with annotations of the matched alias ids.
+        # Effectively we create a child resource set and return back the parent on any
+        # child matching.
+
+        parents = {r['agentId']: r for r in resources}
+        children = []
+
+        for p in parents.values():
+            p_arn = Arn.parse(p['agentArn'])
+            if 'foundationModel' not in p:
+                # We can't build a valid set of dimensions for agent metrics
+                # without a model ID.
+                continue
+            parent_info = {
+                'agentId': p['agentId'],
+                'arnAliasBase': (f"arn:{p_arn.partition}:bedrock:"
+                                 f"{p_arn.region}:{p_arn.account_id}"
+                                 f":agent-alias/{p_arn.resource}"),
+                'modelId': p['foundationModel']
+            }
+            child_count = 0
+            paginator = client.get_paginator('list_agent_aliases')
+            results = paginator.paginate(agentId=p['agentId'])
+
+            for alias in results.build_full_result().get('agentAliasSummaries', []):
+                alias['parent'] = parent_info
+                children.append(alias)
+                child_count += 1
+            # seems the only way to determine at a parent level
+            # if metrics filer holds true across all children.
+            p['c7n:aliasCount'] = child_count
+
+        matched_children = super().process(children)
+
+        matched_parents = set()
+        for c in matched_children:
+            p = parents[c['parent']['agentId']]
+            p.setdefault('c7n:matchedAliases', []).append(
+                {'id': c['agentAliasId'], 'name': c['agentAliasName']}
+            )
+            matched_parents.add(p['agentId'])
+        return [parents[pid] for pid in matched_parents]
 
 
 @BedrockAgent.filter_registry.register('kms-key')
@@ -632,8 +820,121 @@ class DeleteBedrockInferenceProfile(BaseAction):
 
 @BedrockApplicationInferenceProfile.filter_registry.register('metrics')
 class InferenceProfileMetrics(MetricsFilter):
+    """Filter inference profiles by published or combined token usage.
+
+    ``c7n:TotalTokenCount`` is a Custodian-derived metric that sums Bedrock's
+    ``InputTokenCount`` and ``OutputTokenCount`` metrics. Its statistic is
+    always ``Sum`` and defaults to that value when omitted.
+
+    A completed daily total can be selected with ``days: 1``, ``period:
+    86400``, and ``period-start: start-of-day``. For a single completed
+    seven-day aggregate use ``days: 7`` and ``period: 604800``. Using a period
+    of 86400 over seven days produces seven datapoints, all of which must meet
+    the configured comparison.
+
+    :example:
+
+    Match profiles whose total token consumption for the last completed day
+    exceeds 100,000 tokens:
+
+    .. code-block:: yaml
+
+        policies:
+          - name: bedrock-daily-token-usage
+            resource: aws.bedrock-inference-profile
+            filters:
+              - type: metrics
+                name: c7n:TotalTokenCount
+                days: 1
+                period: 86400
+                period-start: start-of-day
+                value: 100000
+                op: greater-than
+
+    :example:
+
+    Match a single completed seven-day aggregate above 700,000 tokens:
+
+    .. code-block:: yaml
+
+        policies:
+          - name: bedrock-weekly-token-usage
+            resource: aws.bedrock-inference-profile
+            filters:
+              - type: metrics
+                name: c7n:TotalTokenCount
+                days: 7
+                period: 604800
+                period-start: start-of-day
+                value: 700000
+                op: greater-than
+    """
+    TOTAL_TOKEN_COUNT = 'c7n:TotalTokenCount'
+
+    def validate(self):
+        if (self.data['name'] == self.TOTAL_TOKEN_COUNT and
+                self.data.get('statistics', 'Sum') != 'Sum'):
+            raise PolicyValidationError(
+                "metrics filter c7n:TotalTokenCount only supports the Sum statistic")
+        return super().validate()
+
+    def process(self, resources, event=None):
+        if self.data['name'] == self.TOTAL_TOKEN_COUNT:
+            self.data.setdefault('statistics', 'Sum')
+        return super().process(resources, event)
+
+    def get_permissions(self):
+        if self.data.get('name') == self.TOTAL_TOKEN_COUNT:
+            return ('cloudwatch:GetMetricData',)
+        return self.permissions
+
     def get_dimensions(self, resource):
         return [{'Name': 'ModelId', 'Value': resource['inferenceProfileId']}]
+
+    def get_metric_data(self, client, params):
+        if self.metric != self.TOTAL_TOKEN_COUNT:
+            return super().get_metric_data(client, params)
+
+        metric_stat = {
+            'Namespace': params['Namespace'],
+            'Dimensions': params['Dimensions'],
+        }
+        queries = []
+        for query_id, metric_name in (
+                ('input', 'InputTokenCount'), ('output', 'OutputTokenCount')):
+            queries.append({
+                'Id': query_id,
+                'MetricStat': {
+                    'Metric': dict(metric_stat, MetricName=metric_name),
+                    'Period': params['Period'],
+                    'Stat': 'Sum',
+                },
+                'ReturnData': False,
+            })
+        queries.append({
+            'Id': 'total',
+            'Expression': 'input + output',
+            'Label': self.TOTAL_TOKEN_COUNT,
+            'ReturnData': True,
+        })
+
+        datapoints = []
+        request = {
+            'MetricDataQueries': queries,
+            'StartTime': params['StartTime'],
+            'EndTime': params['EndTime'],
+        }
+        paginator = client.get_paginator('get_metric_data')
+        for response in paginator.paginate(**request):
+            for result in response.get('MetricDataResults', ()):
+                if result['Id'] != 'total':
+                    continue
+                datapoints.extend({
+                    'Timestamp': timestamp,
+                    self.statistics: value,
+                } for timestamp, value in zip(
+                    result.get('Timestamps', ()), result.get('Values', ())))
+        return datapoints
 
 
 @resources.register('bedrock-guardrail')

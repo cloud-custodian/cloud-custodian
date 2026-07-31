@@ -1,0 +1,32 @@
+{
+    "status_code": 200,
+    "data": {
+        "ResponseMetadata": {},
+        "modelSummaries": [
+            {
+                "modelArn": "arn:aws:bedrock:us-east-1::foundation-model/amazon.nova-2-lite-v1:0:256k",
+                "modelId": "amazon.nova-2-lite-v1:0:256k",
+                "modelName": "Nova 2 Lite",
+                "providerName": "Amazon",
+                "inputModalities": [
+                    "TEXT",
+                    "IMAGE",
+                    "VIDEO"
+                ],
+                "outputModalities": [
+                    "TEXT"
+                ],
+                "responseStreamingSupported": true,
+                "customizationsSupported": [
+                    "FINE_TUNING"
+                ],
+                "inferenceTypesSupported": [
+                    "PROVISIONED"
+                ],
+                "modelLifecycle": {
+                    "status": "ACTIVE"
+                }
+            }
+        ]
+    }
+}

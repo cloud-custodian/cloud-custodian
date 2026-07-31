@@ -1,8 +1,11 @@
 # Copyright The Cloud Custodian Authors.
 # SPDX-License-Identifier: Apache-2.0
 
+import itertools
+
 import c7n.filters.vpc as net_filters
 from c7n.actions import BaseAction
+from c7n.filters import ValueFilter
 from c7n.filters.kms import KmsRelatedFilter
 from c7n.manager import resources
 from c7n.query import (
@@ -221,6 +224,73 @@ class KmsFilter(KmsRelatedFilter):
     RelatedIdsExpression = 'KmsKeyId'
 
 
+@MemoryDb.filter_registry.register('db-parameter')
+class MemoryDbParameterFilter(ValueFilter):
+    """Applies value type filter on set memorydb cluster parameter values.
+
+    :example:
+
+    .. code-block:: yaml
+
+            policies:
+              - name: memorydb-approved-maxmemory-policy
+                resource: aws.memorydb
+                filters:
+                  - type: db-parameter
+                    key: maxmemory-policy
+                    op: in
+                    value: ["volatile-lru", "allkeys-lru"]
+    """
+
+    schema = type_schema('db-parameter', rinherit=ValueFilter.schema)
+    schema_alias = False
+    permissions = ('memorydb:DescribeClusters', 'memorydb:DescribeParameters',)
+    policy_annotation = 'c7n:MatchedDBParameter'
+
+    @staticmethod
+    def recast(val, datatype):
+        # memorydb reports parameters as string or integer datatypes
+        if datatype == 'integer' and val.isdigit():
+            return int(val)
+        return val
+
+    def handle_paramgroup_cache(self, param_groups):
+        pgcache = {}
+        cache = self.manager._cache
+        client = local_session(self.manager.session_factory).client('memorydb')
+
+        with cache:
+            for pg in sorted(param_groups):
+                cache_key = {
+                    'region': self.manager.config.region,
+                    'account_id': self.manager.config.account_id,
+                    'memorydb-pg': pg}
+                pg_values = cache.get(cache_key)
+                if pg_values is not None:
+                    pgcache[pg] = pg_values
+                    continue
+                paginator = client.get_paginator('describe_parameters')
+                param_list = list(itertools.chain(*[p['Parameters']
+                    for p in paginator.paginate(ParameterGroupName=pg)]))
+                pgcache[pg] = {
+                    p['Name']: self.recast(p['Value'], p['DataType'])
+                    for p in param_list if 'Value' in p}
+                cache.save(cache_key, pgcache[pg])
+        return pgcache
+
+    def process(self, resources, event=None):
+        results = []
+        parameter_group_list = {r['ParameterGroupName'] for r in resources}
+        paramcache = self.handle_paramgroup_cache(parameter_group_list)
+        for resource in resources:
+            pg_values = paramcache[resource['ParameterGroupName']]
+            if self.match(pg_values):
+                resource.setdefault(self.policy_annotation, []).append(
+                    self.data.get('key'))
+                results.append(resource)
+        return results
+
+
 @MemoryDb.filter_registry.register('security-group')
 class SecurityGroupFilter(net_filters.SecurityGroupFilter):
 
@@ -291,6 +361,25 @@ class MemoryDbSubnetGroup(QueryResourceManager):
         'describe': DescribeWithResourceTags,
         'config': ConfigSource
     }
+
+
+@resources.register('memorydb-parameter-group')
+class MemoryDbParameterGroup(QueryResourceManager):
+    """AWS MemoryDb Parameter Group"""
+
+    class resource_type(TypeInfo):
+        service = 'memorydb'
+        arn_type = 'parametergroup'
+        enum_spec = ('describe_parameter_groups',
+                     'ParameterGroups', None)
+        name = id = 'Name'
+        filter_name = 'ParameterGroupName'
+        filter_type = 'scalar'
+        cfn_type = 'AWS::MemoryDB::ParameterGroup'
+        universal_taggable = object()
+        permissions = ('memorydb:DescribeParameterGroups',)
+
+    source_mapping = {'describe': DescribeWithResourceTags}
 
 
 @MemoryDbSnapshot.action_registry.register('delete')

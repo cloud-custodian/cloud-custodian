@@ -555,7 +555,7 @@ class VersionTrim(Action):
     schema = type_schema(
         'trim-versions',
         **{'exclude-aliases': {'default': True, 'type': 'boolean'},
-           'retain-latest': {'default': True, 'type': 'boolean'},
+           'retain-latest': {'default': False, 'type': 'boolean'},
            'older-than': {'type': 'number'}})
 
     def process(self, resources):

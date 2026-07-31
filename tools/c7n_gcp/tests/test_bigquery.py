@@ -2,7 +2,12 @@
 # SPDX-License-Identifier: Apache-2.0
 
 from gcp_common import BaseTest, event_data
+from c7n.exceptions import PolicyValidationError
+from c7n_gcp.client import get_default_project
+from c7n_gcp.filters.recommender import RecommenderFilter
+from unittest.mock import patch
 import time
+from pytest_terraform import terraform
 
 
 class BigQueryDataSetTest(BaseTest):
@@ -208,3 +213,151 @@ class BigQueryTableTest(BaseTest):
         client = p.resource_manager.get_client()
         result = client.execute_query('get', resources[0]['tableReference'])
         self.assertEqual(result['labels']['env'], 'not-the-default')
+
+
+def test_dataset_update_validation_error(test):
+    with test.assertRaisesRegex(
+        PolicyValidationError,
+        "policy:bq-dataset-update-invalid action:update "
+        "requires at least one mutable dataset field"
+    ):
+        test.load_policy(
+            {
+                'name': 'bq-dataset-update-invalid',
+                'resource': 'gcp.bq-dataset',
+                'actions': [{'type': 'update'}]
+            }
+        )
+
+
+@terraform("bigquery")
+def test_dataset_update(test, bigquery):
+    project_id = get_default_project()
+    dataset_id = 'c7n_bq_dataset'
+
+    session_factory = test.replay_flight_data(
+        'bq-dataset-update', project_id=project_id)
+
+    policy = test.load_policy(
+        {
+            'name': 'bq-dataset-update-access',
+            'resource': 'gcp.bq-dataset',
+            # Use BigQuery server-side dataset filter to avoid listing/augmenting
+            # unrelated monitoring datasets in recordings.
+            'query': [{'filter': 'labels.c7n_test_update:bq_dataset_update'}],
+            'filters': [{
+                'type': 'value',
+                'key': 'datasetReference.datasetId',
+                'value': dataset_id
+            }],
+            'actions': [{
+                'type': 'update',
+                'access': [
+                    {'role': 'READER', 'specialGroup': 'projectReaders'},
+                    {'role': 'WRITER', 'specialGroup': 'projectWriters'},
+                    {'role': 'OWNER', 'specialGroup': 'projectOwners'}
+                ]
+            }]
+        },
+        session_factory=session_factory
+    )
+
+    resources = policy.run()
+    test.assertEqual(len(resources), 1)
+
+    client = policy.resource_manager.get_client()
+    result = client.execute_query(
+        'get',
+        {'projectId': project_id, 'datasetId': dataset_id}
+    )
+    test.assertEqual(result['datasetReference']['datasetId'], dataset_id)
+    expected_access = {
+        ('READER', 'projectReaders'),
+        ('WRITER', 'projectWriters'),
+        ('OWNER', 'projectOwners'),
+    }
+    actual_access = {
+        (entry.get('role'), entry.get('specialGroup'))
+        for entry in result.get('access', [])
+        if 'specialGroup' in entry
+    }
+    test.assertEqual(actual_access, expected_access)
+
+
+@terraform("bigquery")
+def test_table_recommend_partition_cluster_permissions(test, bigquery):
+    project_id = get_default_project()
+    session_factory = test.replay_flight_data(
+        'bq-table-recommend-partition-cluster', project_id=project_id)
+
+    # Baseline state prior to policy run:
+    baseline_policy = test.load_policy(
+        {
+            'name': 'bq-table-recommend-partition-cluster-baseline',
+            'resource': 'gcp.bq-table',
+            # Restrict parent dataset enumeration to this test dataset label.
+            'query': [{'filter': 'labels.c7n_test:bq_table_recommend_partition_cluster'}]
+        },
+        session_factory=session_factory,
+    )
+    baseline_resources = baseline_policy.run()
+    test.assertEqual(len(baseline_resources), 1)
+    test.assertEqual('c7n:recommend' in baseline_resources[0], False)
+    policy = test.load_policy(
+        {
+            'name': 'bq-table-recommend-partition-cluster',
+            'resource': 'gcp.bq-table',
+            # Restrict parent dataset enumeration to this test dataset label.
+            'query': [{'filter': 'labels.c7n_test:bq_table_recommend_partition_cluster'}],
+            'filters': [{
+                'type': 'recommend',
+                'id': 'google.bigquery.table.PartitionClusterRecommender'
+            }]
+        },
+        session_factory=session_factory,
+    )
+    test.assertEqual(policy.get_permissions(), {
+        'bigquery.tables.list',
+        'recommender.bigqueryPartitionClusterRecommendations.get',
+        'recommender.bigqueryPartitionClusterRecommendations.list',
+    })
+
+    table_ref = baseline_resources[0]['tableReference']
+    table_rid = (
+        "//bigquery.googleapis.com/"
+        f"projects/{table_ref['projectId']}/"
+        f"datasets/{table_ref['datasetId']}/"
+        f"tables/{table_ref['tableId']}"
+    )
+    # BigQuery partition/cluster recommendations are non deterministic from
+    # workload history and may be absent during test runs; mock for deterministic
+    # recommend-filter matching assertions.
+    mocked_recommendations = [{
+        'name': (
+            f"projects/{table_ref['projectId']}/locations/global/recommenders/"
+            "google.bigquery.table.PartitionClusterRecommender/recommendations/"
+            "c7n-test-bq-table-recommendation"
+        ),
+        'recommenderSubtype': 'PARTITION_CLUSTER_TABLE',
+        'content': {
+            'operationGroups': [{
+                'operations': [{'resource': table_rid}]
+            }]
+        }
+    }]
+    with patch.object(
+        RecommenderFilter, 'get_recommendations', return_value=mocked_recommendations
+    ):
+        resources = policy.run()
+
+    test.assertEqual(len(resources), 1)
+    test.assertEqual('c7n:recommend' in resources[0], True)
+    test.assertEqual(len(resources[0]['c7n:recommend']) >= 1, True)
+    test.assertEqual(resources[0]['tableReference'], baseline_resources[0]['tableReference'])
+    recommendation = resources[0]['c7n:recommend'][0]
+    test.assertEqual(bool(recommendation['name']), True)
+    test.assertEqual(bool(recommendation['recommenderSubtype']), True)
+    test.assertEqual(
+        'google.bigquery.table.PartitionClusterRecommender' in recommendation['name'],
+        True
+    )

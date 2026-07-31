@@ -1,0 +1,11 @@
+{
+  "status_code": 400,
+  "data": {
+    "Error": {
+      "Message": "Access Denied",
+      "Code": "AccessDeniedException"
+    },
+    "ResponseMetadata": {},
+    "message": "Access Denied"
+  }
+}

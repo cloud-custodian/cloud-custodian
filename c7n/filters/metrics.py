@@ -250,6 +250,14 @@ class MetricsFilter(Filter):
             dims.append({'Name': k, 'Value': v})
         return dims
 
+    def get_metric_data(self, client, params):
+        """Retrieve metric datapoints in the filter's normalized shape.
+
+        Resource-specific metric filters may override this method when the
+        metric is not available through GetMetricStatistics.
+        """
+        return client.get_metric_statistics(**params)['Datapoints']
+
     def process_resource_set(self, resource_set):
         client = local_session(
             self.manager.session_factory).client('cloudwatch')
@@ -284,8 +292,7 @@ class MetricsFilter(Filter):
             params[stats_key] = [self.statistics]
 
             if key not in collected_metrics:
-                collected_metrics[key] = client.get_metric_statistics(
-                    **params)['Datapoints']
+                collected_metrics[key] = self.get_metric_data(client, params)
 
             # In certain cases CloudWatch reports no data for a metric.
             # If the policy specifies a fill value for missing data, add

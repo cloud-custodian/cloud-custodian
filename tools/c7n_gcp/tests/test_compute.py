@@ -7,6 +7,7 @@ import time
 from c7n_gcp.resources.compute import Snapshot
 from gcp_common import BaseTest, event_data
 from googleapiclient.errors import HttpError
+from c7n_gcp.client import get_default_project
 from pytest_terraform import terraform
 
 
@@ -408,6 +409,52 @@ class DiskTest(BaseTest):
         result = rec_filter.match_resources(recommends_with_none, resources)
         assert result == []
 
+    def test_disk_snapshots_filter(self):
+        factory = self.replay_flight_data('disk-snapshots-filter', project_id='cloud-custodian')
+        p = self.load_policy(
+            {'name': 'disks-with-snapshots',
+             'resource': 'gcp.disk',
+             'filters': [
+                 {'type': 'snapshots',
+                  'count': 1,
+                  'count_op': 'gte'}]},
+            session_factory=factory)
+        resources = p.run()
+        self.assertEqual(len(resources), 2)
+        names = {r['name'] for r in resources}
+        self.assertEqual(names, {'c7n-jenkins', 'drone'})
+
+    def test_disk_snapshots_filter_attrs(self):
+        factory = self.replay_flight_data('disk-snapshots-filter', project_id='cloud-custodian')
+        p = self.load_policy(
+            {'name': 'disks-with-ready-snapshots',
+             'resource': 'gcp.disk',
+             'filters': [
+                 {'type': 'snapshots',
+                  'attrs': [
+                      {'type': 'value',
+                       'key': 'status',
+                       'value': 'READY'}]}]},
+            session_factory=factory)
+        resources = p.run()
+        self.assertEqual(len(resources), 2)
+        for r in resources:
+            self.assertIn('c7n:Snapshots', r)
+
+    def test_disk_no_snapshots_filter(self):
+        factory = self.replay_flight_data('disk-snapshots-filter', project_id='cloud-custodian')
+        p = self.load_policy(
+            {'name': 'disks-without-snapshots',
+             'resource': 'gcp.disk',
+             'filters': [
+                 {'type': 'snapshots',
+                  'count': 0,
+                  'count_op': 'eq'}]},
+            session_factory=factory)
+        resources = p.run()
+        self.assertEqual(len(resources), 1)
+        self.assertEqual(resources[0]['name'], 'custodian-dev')
+
 
 class SnapshotTest(BaseTest):
 
@@ -750,6 +797,171 @@ class AutoscalerTest(BaseTest):
         self.assertEqual(result_policy['maxNumReplicas'], 4)
 
 
+@terraform('compute_project_common_instance_metadata_set')
+def test_compute_project_set_common_instance_metadata(
+        test, compute_project_common_instance_metadata_set):
+    project_id = compute_project_common_instance_metadata_set[
+        'google_compute_project_metadata_item.default.project']
+    factory = test.replay_flight_data(
+        'compute-project-set-common-instance-metadata', project_id=project_id)
+
+    policy = test.load_policy(
+        {
+            'name': 'gcp-compute-project-set-common-instance-metadata',
+            'resource': 'gcp.compute-project',
+            'filters': [{'name': project_id}],
+            'actions': [
+                {
+                    'type': 'set-common-instance-metadata',
+                    'metadata': {'c7n-test-key': 'updated-value'},
+                }
+            ],
+        },
+        session_factory=factory,
+    )
+
+    resources = policy.run()
+    assert len(resources) == 1
+
+    if test.recording:
+        time.sleep(2)
+
+    client = policy.resource_manager.get_client()
+    result = client.execute_command('get', {'project': project_id})
+    items = {
+        i['key']: i['value']
+        for i in result.get('commonInstanceMetadata', {}).get('items', [])
+    }
+    assert items.get('c7n-test-key') == 'updated-value'
+
+
+@terraform('compute_project_common_instance_metadata_remove')
+def test_compute_project_remove_common_instance_metadata(
+        test, compute_project_common_instance_metadata_remove):
+    project_id = compute_project_common_instance_metadata_remove[
+        'google_compute_project_metadata_item.default.project']
+    factory = test.replay_flight_data(
+        'compute-project-remove-common-instance-metadata', project_id=project_id)
+    policy = test.load_policy(
+        {
+            'name': 'gcp-compute-project-remove-common-instance-metadata',
+            'resource': 'gcp.compute-project',
+            'filters': [{'name': project_id}],
+            'actions': [
+                {
+                    'type': 'set-common-instance-metadata',
+                    'remove': ['c7n-test-key'],
+                }
+            ],
+        },
+        session_factory=factory,
+    )
+
+    resources = policy.run()
+    assert len(resources) == 1
+
+    if test.recording:
+        time.sleep(2)
+
+    client = policy.resource_manager.get_client()
+    result = client.execute_command('get', {'project': project_id})
+    items = {
+        i['key']: i['value']
+        for i in result.get('commonInstanceMetadata', {}).get('items', [])
+    }
+    assert 'c7n-test-key' not in items
+
+
+@terraform('gcp_instance_metadata_set')
+def test_instance_set_metadata(test, gcp_instance_metadata_set):
+    project_id = gcp_instance_metadata_set['google_compute_instance.default.project']
+    factory = test.replay_flight_data(
+        'instance-set-metadata', project_id=project_id)
+
+    instance_name = gcp_instance_metadata_set['google_compute_instance.default.name']
+    policy = test.load_policy(
+        {
+            'name': 'gcp-instance-set-metadata',
+            'resource': 'gcp.instance',
+            'filters': [{'name': instance_name}],
+            'actions': [
+                {
+                    'type': 'set-metadata',
+                    'metadata': {'c7n-test-key': 'updated-value'},
+                }
+            ],
+        },
+        session_factory=factory,
+    )
+
+    resources = policy.run()
+    assert len(resources) == 1
+    assert resources[0]['name'] == instance_name
+
+    if test.recording:
+        time.sleep(2)
+
+    instance = policy.resource_manager.get_resource({
+        'project_id': project_id,
+        'resourceName': gcp_instance_metadata_set['google_compute_instance.default.id'],
+        'zone': gcp_instance_metadata_set['google_compute_instance.default.zone'],
+    })
+    items = {
+        i['key']: i['value']
+        for i in instance.get('metadata', {}).get('items', [])
+    }
+    assert items.get('c7n-test-key') == 'updated-value'
+
+
+@terraform('gcp_instance_metadata_remove')
+def test_instance_remove_metadata(test, gcp_instance_metadata_remove):
+    project_id = gcp_instance_metadata_remove['google_compute_instance.default.project']
+    factory = test.replay_flight_data(
+        'instance-remove-metadata', project_id=project_id)
+
+    instance_name = gcp_instance_metadata_remove['google_compute_instance.default.name']
+    policy = test.load_policy(
+        {
+            'name': 'gcp-instance-remove-metadata',
+            'resource': 'gcp.instance',
+            'filters': [
+                {'name': instance_name},
+                {
+                    'type': 'value',
+                    'key': "metadata.items[?key=='c7n-test-key'].value | [0]",
+                    'op': 'eq',
+                    'value': 'updated-value',
+                },
+            ],
+            'actions': [
+                {
+                    'type': 'set-metadata',
+                    'remove': ['c7n-test-key'],
+                }
+            ],
+        },
+        session_factory=factory,
+    )
+
+    resources = policy.run()
+    assert len(resources) == 1
+    assert resources[0]['name'] == instance_name
+
+    if test.recording:
+        time.sleep(2)
+
+    instance = policy.resource_manager.get_resource({
+        'project_id': project_id,
+        'resourceName': gcp_instance_metadata_remove['google_compute_instance.default.id'],
+        'zone': gcp_instance_metadata_remove['google_compute_instance.default.zone'],
+    })
+    items = {
+        i['key']: i['value']
+        for i in instance.get('metadata', {}).get('items', [])
+    }
+    assert 'c7n-test-key' not in items
+
+
 class ProjectTest(BaseTest):
 
     def test_projects(self):
@@ -781,3 +993,54 @@ class TestInstanceGroupManager(BaseTest):
 
         self.assertEqual(1, len(resources))
         self.assertEqual('instance-group-2', resources[0]['name'])
+
+
+# NOTE: Flight data for Region Commitment tests was manually modified because
+# we cannot reliably test against actual commitments in the test project. Since the
+# minimum is a 12 month commitment
+class RegionCommitmentTest(BaseTest):
+
+    def test_region_commitment_query(self):
+        project_id = get_default_project()
+        session_factory = self.replay_flight_data(
+            'region-commitment-query', project_id=project_id)
+        policy = self.load_policy(
+            {
+                'name': 'region-commitment-query',
+                'resource': 'gcp.region-commitment'
+            },
+            session_factory=session_factory
+        )
+
+        resources = policy.run()
+
+        self.assertEqual(len(resources), 1)
+        self.assertEqual(resources[0]['name'], 'c7n-test')
+        urns = policy.resource_manager.get_urns(resources)
+        self.assertEqual(
+            urns,
+            [f'gcp:compute:us-central1:{project_id}:region-commitment/c7n-test']
+        )
+
+    def test_region_commitment_get(self):
+        project_id = get_default_project()
+        session_factory = self.replay_flight_data(
+            'region-commitment-get', project_id=project_id)
+        policy = self.load_policy(
+            {
+                'name': 'region-commitment-get',
+                'resource': 'gcp.region-commitment'
+            },
+            session_factory=session_factory
+        )
+        client = policy.resource_manager.get_client()
+        resource = policy.resource_manager.resource_type.get(
+            client,
+            {
+                'resourceName':
+                    f'projects/{project_id}/regions/us-central1/commitments/c7n-test'
+            }
+        )
+
+        self.assertEqual(resource['name'], 'c7n-test')
+        self.assertEqual(resource['status'], 'ACTIVE')

@@ -1,0 +1,61 @@
+{
+    "status_code": 200,
+    "data": {
+        "ResponseMetadata": {},
+        "membership": {
+            "id": "c5773151-1c6c-40ff-86f2-543d68654295",
+            "arn": "arn:aws:cleanrooms:us-east-1:644160558196:membership/c5773151-1c6c-40ff-86f2-543d68654295",
+            "collaborationArn": "arn:aws:cleanrooms:us-east-1:644160558196:collaboration/62647862-bee9-42e8-8c07-99b0fc492f3a",
+            "collaborationId": "62647862-bee9-42e8-8c07-99b0fc492f3a",
+            "collaborationCreatorAccountId": "644160558196",
+            "collaborationCreatorDisplayName": "Compliant Member",
+            "collaborationName": "Compliant Collaboration",
+            "createTime": {
+                "__class__": "datetime",
+                "year": 2026,
+                "month": 6,
+                "day": 9,
+                "hour": 2,
+                "minute": 2,
+                "second": 3,
+                "microsecond": 791000
+            },
+            "updateTime": {
+                "__class__": "datetime",
+                "year": 2026,
+                "month": 6,
+                "day": 9,
+                "hour": 2,
+                "minute": 2,
+                "second": 3,
+                "microsecond": 791000
+            },
+            "status": "ACTIVE",
+            "memberAbilities": [
+                "CAN_QUERY",
+                "CAN_RECEIVE_RESULTS"
+            ],
+            "queryLogStatus": "ENABLED",
+            "paymentConfiguration": {
+                "queryCompute": {
+                    "isResponsible": true
+                },
+                "machineLearning": {
+                    "modelTraining": {
+                        "isResponsible": false
+                    },
+                    "modelInference": {
+                        "isResponsible": false
+                    },
+                    "syntheticDataGeneration": {
+                        "isResponsible": false
+                    }
+                },
+                "jobCompute": {
+                    "isResponsible": false
+                }
+            },
+            "isMetricsEnabled": false
+        }
+    }
+}

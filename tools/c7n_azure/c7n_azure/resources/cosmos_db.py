@@ -627,7 +627,7 @@ class OfferHelper:
         if not resources[0].get('c7n:offer'):
             offers = list(account_data_client.ReadOffers())
             for resource in resources:
-                offer = next((o for o in offers if o['resource'] == resource['_self']), None)
+                offer = next((o for o in offers if o['offerResourceId'] == resource['_rid']), None)
                 resource['c7n:offer'] = offer
 
     @staticmethod

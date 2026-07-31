@@ -1,0 +1,70 @@
+{
+    "status_code": 200,
+    "data": {
+        "ResponseMetadata": {},
+        "membership": {
+            "id": "471d06d5-b382-4d18-9ad5-8e61ffe2bfac",
+            "arn": "arn:aws:cleanrooms:us-east-1:644160558196:membership/471d06d5-b382-4d18-9ad5-8e61ffe2bfac",
+            "collaborationArn": "arn:aws:cleanrooms:us-east-1:644160558196:collaboration/8326c03e-8c92-4cc0-9d84-3be7208e1528",
+            "collaborationId": "8326c03e-8c92-4cc0-9d84-3be7208e1528",
+            "collaborationCreatorAccountId": "644160558196",
+            "collaborationCreatorDisplayName": "Noncompliant Test creator",
+            "collaborationName": "Noncompliant Collaboration",
+            "createTime": {
+                "__class__": "datetime",
+                "year": 2026,
+                "month": 6,
+                "day": 9,
+                "hour": 2,
+                "minute": 19,
+                "second": 55,
+                "microsecond": 367000
+            },
+            "updateTime": {
+                "__class__": "datetime",
+                "year": 2026,
+                "month": 6,
+                "day": 9,
+                "hour": 2,
+                "minute": 19,
+                "second": 55,
+                "microsecond": 367000
+            },
+            "status": "ACTIVE",
+            "memberAbilities": [
+                "CAN_RECEIVE_RESULTS"
+            ],
+            "queryLogStatus": "DISABLED",
+            "defaultResultConfiguration": {
+                "outputConfiguration": {
+                    "s3": {
+                        "resultFormat": "CSV",
+                        "bucket": "c7n-lattice-test-logs",
+                        "singleFileOutput": false
+                    }
+                },
+                "roleArn": "arn:aws:iam::644160558196:role/service-role/cleanrooms-query-receiver-20260609004931"
+            },
+            "paymentConfiguration": {
+                "queryCompute": {
+                    "isResponsible": true
+                },
+                "machineLearning": {
+                    "modelTraining": {
+                        "isResponsible": false
+                    },
+                    "modelInference": {
+                        "isResponsible": false
+                    },
+                    "syntheticDataGeneration": {
+                        "isResponsible": false
+                    }
+                },
+                "jobCompute": {
+                    "isResponsible": false
+                }
+            },
+            "isMetricsEnabled": false
+        }
+    }
+}
