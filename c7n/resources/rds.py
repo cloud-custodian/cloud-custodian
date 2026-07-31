@@ -2272,7 +2272,6 @@ class ModifyDBProxy(BaseAction):
                     'property': {'type': 'string', 'enum': [
                         'Auth',
                         'DebugLogging',
-                        'DefaultAuthScheme',
                         'IdleClientTimeout',
                         'NewDBProxyName',
                         'RequireTLS',

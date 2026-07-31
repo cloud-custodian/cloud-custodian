@@ -2244,6 +2244,45 @@ class RDSProxy(BaseTest):
         self.assertEqual(resources['DBProxies'][0]['DBProxyName'], 'proxy-test-1')
         self.assertEqual(resources['DBProxies'][0]['RequireTLS'], True)
 
+    def test_rds_proxy_modify_no_change(self):
+        session_factory = self.replay_flight_data('test_rds_proxy_modify_no_change')
+        modify_calls = []
+
+        def capture_modify_call(params, **kwargs):
+            modify_calls.append(params)
+
+        session_factory().events.register(
+            'before-parameter-build.rds.ModifyDBProxy', capture_modify_call)
+        p = self.load_policy(
+            {
+                'name': 'modify-rds-proxy-no-change',
+                'resource': 'aws.rds-proxy',
+                'filters': [
+                    {
+                        'type': 'value',
+                        'key': 'RequireTLS',
+                        'value': True,
+                    }
+                ],
+                'actions': [
+                    {
+                        'type': 'modify-db-proxy',
+                        'update': [
+                            {
+                                'property': 'RequireTLS',
+                                'value': True,
+                            }
+                        ],
+                    }
+                ],
+            },
+            session_factory=session_factory)
+        resources = p.run()
+        self.assertEqual(len(resources), 1)
+        self.assertEqual(resources[0]['RequireTLS'], True)
+        # value already matches, so the action skips the ModifyDBProxy call
+        self.assertEqual(modify_calls, [])
+
     def test_rds_proxy_subnet_filter(self):
         session_factory = self.replay_flight_data("test_rds_proxy_subnet_filter")
         p = self.load_policy(
