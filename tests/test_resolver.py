@@ -148,6 +148,174 @@ def test_value_from_sqlkv(tmp_path):
     assert values.get_values() == {"magic"}
 
 
+class URIResolverProviderTest(BaseTest):
+    """Test suite for URI resolver provider delegation mechanism (TDD)"""
+
+    def setUp(self):
+        # Save the current registered providers before each test
+        self._saved_uri_providers = URIResolver._uri_providers
+        URIResolver._uri_providers = {}
+
+    def tearDown(self):
+        # Restore the registered providers after each test
+        URIResolver._uri_providers = self._saved_uri_providers
+
+    def test_register_provider(self):
+        """Test that providers can register URI scheme handlers"""
+        def mock_handler(uri, session_factory, cache):
+            return "mock_content"
+
+        # Register a handler for 'mock://' scheme
+        URIResolver.register_provider('mock', mock_handler)
+
+        # Verify the handler is registered
+        self.assertIn('mock', URIResolver._uri_providers)
+        self.assertEqual(URIResolver._uri_providers['mock'], mock_handler)
+
+    def test_register_multiple_providers(self):
+        """Test that multiple providers can be registered for different schemes"""
+        def handler1(uri, session_factory, cache):
+            return "handler1"
+
+        def handler2(uri, session_factory, cache):
+            return "handler2"
+
+        URIResolver.register_provider('scheme1', handler1)
+        URIResolver.register_provider('scheme2', handler2)
+
+        self.assertEqual(len(URIResolver._uri_providers), 2)
+        self.assertEqual(URIResolver._uri_providers['scheme1'], handler1)
+        self.assertEqual(URIResolver._uri_providers['scheme2'], handler2)
+
+    def test_register_provider_overwrites_existing(self):
+        """Test that re-registering a scheme overwrites the previous handler"""
+        def handler1(uri, session_factory, cache):
+            return "handler1"
+
+        def handler2(uri, session_factory, cache):
+            return "handler2"
+
+        URIResolver.register_provider('test', handler1)
+        URIResolver.register_provider('test', handler2)
+
+        # The second handler should overwrite the first
+        self.assertEqual(URIResolver._uri_providers['test'], handler2)
+
+    def test_resolve_with_registered_provider(self):
+        """Test that resolve() delegates to registered provider for matching scheme"""
+        def azure_handler(uri, session_factory, cache):
+            self.assertEqual(uri, 'azure://account.blob.core.windows.net/container/blob.json')
+            return '{"key": "value"}'
+
+        URIResolver.register_provider('azure', azure_handler)
+
+        cache = FakeCache()
+        resolver = URIResolver(None, cache)
+        result = resolver.resolve('azure://account.blob.core.windows.net/container/blob.json', {})
+
+        self.assertEqual(result, '{"key": "value"}')
+
+    def test_resolve_provider_uses_cache(self):
+        """Test that provider resolution respects caching"""
+        call_count = {'count': 0}
+
+        def counting_handler(uri, session_factory, cache):
+            call_count['count'] += 1
+            return f"content_{call_count['count']}"
+
+        URIResolver.register_provider('test', counting_handler)
+
+        cache = FakeCache()
+        resolver = URIResolver(None, cache)
+        uri = 'test://example/file.json'
+
+        # First call should execute handler
+        result1 = resolver.resolve(uri, {})
+        self.assertEqual(result1, 'content_1')
+        self.assertEqual(call_count['count'], 1)
+
+        # Second call should use cache
+        result2 = resolver.resolve(uri, {})
+        self.assertEqual(result2, 'content_1')  # Same content from cache
+        self.assertEqual(call_count['count'], 1)  # Handler not called again
+
+    def test_resolve_http_still_works(self):
+        """Test that http:// URLs still work (backward compatibility)"""
+        cache = FakeCache()
+        resolver = URIResolver(None, cache)
+
+        # Use file:// as a proxy for http:// testing without external dependencies
+        with tempfile.NamedTemporaryFile(mode="w+", dir=os.getcwd(), delete=False) as fh:
+            self.addCleanup(os.unlink, fh.name)
+            content = json.dumps({"http": "test"})
+            fh.write(content)
+            fh.flush()
+            result = resolver.resolve(f"file:{fh.name}", {})
+            self.assertEqual(result, content)
+
+    def test_resolve_unknown_scheme_fallback_to_http(self):
+        """Test that unknown schemes fall back to HTTP handler"""
+        cache = FakeCache()
+        resolver = URIResolver(None, cache)
+
+        # Use file:// to test fallback without external dependencies
+        with tempfile.NamedTemporaryFile(mode="w+", dir=os.getcwd(), delete=False) as fh:
+            self.addCleanup(os.unlink, fh.name)
+            content = json.dumps({"fallback": "test"})
+            fh.write(content)
+            fh.flush()
+            result = resolver.resolve(f"file:{fh.name}", {})
+            self.assertEqual(result, content)
+
+    def test_provider_handler_receives_session_factory(self):
+        """Test that provider handlers receive the session_factory"""
+        received_factory = {'factory': None}
+
+        def test_handler(uri, session_factory, cache):
+            received_factory['factory'] = session_factory
+            return "content"
+
+        URIResolver.register_provider('test', test_handler)
+
+        mock_factory = lambda: None  # noqa: E731
+        cache = FakeCache()
+        resolver = URIResolver(mock_factory, cache)
+        resolver.resolve('test://example/file', {})
+
+        self.assertEqual(received_factory['factory'], mock_factory)
+
+    def test_provider_handler_receives_cache(self):
+        """Test that provider handlers receive the cache object"""
+        received_cache = {'cache': None}
+
+        def test_handler(uri, session_factory, cache):
+            received_cache['cache'] = cache
+            return "content"
+
+        URIResolver.register_provider('test', test_handler)
+
+        test_cache = FakeCache()
+        resolver = URIResolver(None, test_cache)
+        resolver.resolve('test://example/file', {})
+
+        self.assertEqual(received_cache['cache'], test_cache)
+
+    def test_provider_exception_handling(self):
+        """Test that exceptions from providers are properly propagated"""
+        def failing_handler(uri, session_factory, cache):
+            raise ValueError("Test error from provider")
+
+        URIResolver.register_provider('failing', failing_handler)
+
+        cache = FakeCache()
+        resolver = URIResolver(None, cache)
+
+        with self.assertRaises(ValueError) as context:
+            resolver.resolve('failing://example/file', {})
+
+        self.assertIn("Test error from provider", str(context.exception))
+
+
 class UrlValueTest(BaseTest):
 
     def setUp(self):

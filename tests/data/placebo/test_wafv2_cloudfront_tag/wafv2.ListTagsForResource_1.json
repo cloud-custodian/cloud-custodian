@@ -1,0 +1,16 @@
+{
+    "status_code": 200,
+    "data": {
+        "NextMarker": "",
+        "TagInfoForResource": {
+            "ResourceARN": "arn:aws:wafv2:us-east-1:644160558196:global/webacl/c7n-test-cloudfront/2f7d108e-7a71-465a-963f-34f56f3a0bb5",
+            "TagList": [
+                {
+                    "Key": "Env",
+                    "Value": "test"
+                }
+            ]
+        },
+        "ResponseMetadata": {}
+    }
+}

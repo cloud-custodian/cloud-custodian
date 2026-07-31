@@ -180,6 +180,129 @@ class KMSTest(BaseTest):
         self.assertIn("AccessDenied", log.getvalue())
         self.assertEqual(len(resources), 2)
 
+    def test_last_usage(self):
+        session_factory = self.replay_flight_data("test_kms_last_usage")
+        p = self.load_policy(
+            {
+                "name": "kms-last-usage",
+                "resource": "kms-key",
+                "filters": [
+                    {
+                        "type": "last-usage",
+                        "attrs": [
+                            {
+                                "type": "value",
+                                "key": "KeyLastUsage.Timestamp",
+                                "value": 30,
+                                "value_type": "age",
+                                "op": "gte",
+                            }
+                        ],
+                    }
+                ],
+            },
+            session_factory=session_factory,
+        )
+        with freeze_time("2026-06-07T00:00:00+00:00"):
+            resources = p.run()
+        self.assertEqual(len(resources), 1)
+        self.assertIn("c7n:LastUsage", resources[0])
+        self.assertEqual(len(resources[0]["c7n:LastUsage"]), 1)
+        usage = resources[0]["c7n:LastUsage"][0]
+        self.assertEqual(usage["KeyLastUsage"]["Operation"], "Decrypt")
+        self.assertIn("TrackingStartDate", usage)
+        self.assertIn("KeyCreationDate", usage)
+        self.assertIn("KeyId", usage)
+
+    def test_last_usage_never_used(self):
+        session_factory = self.replay_flight_data("test_kms_last_usage_never_used")
+        p = self.load_policy(
+            {
+                "name": "kms-never-used",
+                "resource": "kms-key",
+                "filters": [
+                    {
+                        "type": "last-usage",
+                        "attrs": [
+                            {
+                                "type": "value",
+                                "key": "KeyLastUsage.Timestamp",
+                                "value": "absent",
+                            }
+                        ],
+                    }
+                ],
+            },
+            session_factory=session_factory,
+        )
+        resources = p.run()
+        self.assertEqual(len(resources), 1)
+        self.assertEqual(len(resources[0]["c7n:LastUsage"]), 1)
+        usage = resources[0]["c7n:LastUsage"][0]
+        self.assertEqual(usage["KeyLastUsage"], {})
+        self.assertIn("TrackingStartDate", usage)
+        self.assertIn("KeyCreationDate", usage)
+
+    def test_last_usage_multi_attr(self):
+        session_factory = self.replay_flight_data("test_kms_last_usage")
+        p = self.load_policy(
+            {
+                "name": "kms-last-usage-multi",
+                "resource": "kms-key",
+                "filters": [
+                    {
+                        "type": "last-usage",
+                        "attrs": [
+                            {
+                                "type": "value",
+                                "key": "KeyLastUsage.Operation",
+                                "value": "Decrypt",
+                            },
+                            {
+                                "type": "value",
+                                "key": "KeyLastUsage.Timestamp",
+                                "value": 30,
+                                "value_type": "age",
+                                "op": "gte",
+                            },
+                        ],
+                    }
+                ],
+            },
+            session_factory=session_factory,
+        )
+        with freeze_time("2026-06-07T00:00:00+00:00"):
+            resources = p.run()
+        self.assertEqual(len(resources), 1)
+        usage = resources[0]["c7n:LastUsage"][0]
+        self.assertEqual(usage["KeyLastUsage"]["Operation"], "Decrypt")
+        self.assertIn("TrackingStartDate", usage)
+        self.assertIn("KeyCreationDate", usage)
+
+    def test_last_usage_error(self):
+        session_factory = self.replay_flight_data("test_kms_last_usage_error")
+        p = self.load_policy(
+            {
+                "name": "kms-last-usage-error",
+                "resource": "kms-key",
+                "filters": [
+                    {
+                        "type": "last-usage",
+                        "attrs": [
+                            {
+                                "type": "value",
+                                "key": "KeyLastUsage.Timestamp",
+                                "value": "absent",
+                            }
+                        ],
+                    }
+                ],
+            },
+            session_factory=session_factory,
+        )
+        resources = p.run()
+        self.assertEqual(len(resources), 0)
+
     def test_key_rotation_exception_unsupportedopp(self):
         region = "us-west-2"
         session_factory = self.replay_flight_data(

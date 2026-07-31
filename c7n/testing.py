@@ -61,6 +61,10 @@ class CustodianTestCore:
         self.addCleanup(fh.close)
         return fh.name
 
+    def get_test_config(self, **kw):
+        temp_dir = self.get_temp_dir()
+        return Config.empty(output_dir=temp_dir, **kw)
+
     def get_temp_dir(self):
         """ Return a temporary directory that will get cleaned up. """
         temp_dir = tempfile.mkdtemp()

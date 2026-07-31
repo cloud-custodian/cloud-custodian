@@ -2101,6 +2101,72 @@ class EngineFilter(ValueFilter):
         return matched
 
 
+@filters.register('recommendations')
+class DbRecommendations(Filter):
+    """This filter describes AWS DB recommendations for associated RDS instances.
+    Use this filter in conjunction with jmespath and value filter operators
+    to filter RDS instances based on their DB recommendations.
+
+    :example:
+
+    .. code-block:: yaml
+
+            policies:
+              - name: rds-no-recommendations
+                resource: rds
+                filters:
+                  - type: recommendations
+                    key: Status
+                    value: active
+    """
+
+    schema = type_schema('recommendations', rinherit=ValueFilter.schema)
+    permissions = ('rds:DescribeDBRecommendations',)
+
+    annotation_key = 'c7n:db-recommendations'
+    matched_annotation_key = 'c7n:matched-db-recommendations'
+
+    def process_resource_set(self, client, resources):
+        # Get RDS instance identifiers
+        ids = [r.get('DbiResourceId') for r in resources if r.get('DbiResourceId')]
+        # If no identifiers, short-circuit
+        if not ids:
+            for r in resources:
+                r.setdefault(self.annotation_key, [])
+            return
+        # Get recommendations
+        paginator = client.get_paginator('describe_db_recommendations')
+        recs = []
+        for page in paginator.paginate(Filters=[{'Name': 'dbi-resource-id', 'Values': ids}]):
+            recs.extend(page.get('DBRecommendations', ()))
+        # Match recommendations by ARN
+        by_arn = {}
+        for e in recs:
+            by_arn.setdefault(e.get('ResourceArn'), []).append(e)
+        for r in resources:
+            r[self.annotation_key] = by_arn.get(r.get('DBInstanceArn'), [])
+
+    def process(self, resources, event=None):
+        client = local_session(self.manager.session_factory).client('rds')
+
+        for resource_set in chunks([r for r in resources if self.annotation_key not in r], 50):
+            self.process_resource_set(client, resource_set)
+
+        vf = ValueFilter(self.data)
+        vf.annotate = False
+
+        results = []
+        for r in resources:
+            matched = []
+            for e in r.get(self.annotation_key, ()):
+                if vf(e):
+                    matched.append(e)
+            if matched:
+                r[self.matched_annotation_key] = matched
+                results.append(r)
+        return results
+
+
 class DescribeDBProxy(DescribeSource):
     def augment(self, resources):
         return universal_augment(self.manager, resources)

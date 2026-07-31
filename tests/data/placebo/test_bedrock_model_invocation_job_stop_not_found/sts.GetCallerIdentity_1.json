@@ -1,0 +1,9 @@
+{
+    "status_code": 200,
+    "data": {
+        "UserId": "AROAXGZAMH754FNWODWUX:kody.mullins@sixfeetup.com",
+        "Account": "644160558196",
+        "Arn": "arn:aws:sts::644160558196:assumed-role/AWSReservedSSO_admin_1ca370fb35bf6b13/kody.mullins@sixfeetup.com",
+        "ResponseMetadata": {}
+    }
+}

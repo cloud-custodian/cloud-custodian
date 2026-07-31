@@ -1,0 +1,9 @@
+policies:
+  - name: vpc-with-deprecated-flow-logs-filter
+    resource: aws.vpc
+    description: Uses deprecated flow-logs filter fields
+    filters:
+      - type: flow-logs
+        enabled: true              # DEPRECATED: use list-item style attrs
+        status: active             # DEPRECATED: use list-item style attrs
+        destination-type: s3       # DEPRECATED: use list-item style attrs

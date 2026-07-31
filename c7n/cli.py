@@ -230,7 +230,7 @@ def setup_parser():
     run.add_argument(
         "--skip-validation",
         action="store_true",
-        help="Skips validation of policies (assumes you've run the validate command seperately).")
+        help="Skips validation of policies (assumes you've run the validate command separately).")
 
     metrics_help = ("Emit metrics to provider metrics. Specify 'aws', 'gcp', or 'azure'. "
             "For more details on aws metrics options, see: "

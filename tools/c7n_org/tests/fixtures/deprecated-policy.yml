@@ -1,0 +1,10 @@
+policies:
+  - name: policy-with-deprecated-feature
+    resource: aws.ec2
+    filters:
+      # Using old-style tag filter syntax (deprecated)
+      - "tag:Name": present
+    actions:
+      - type: mark-for-op
+        op: stop
+        days: 7

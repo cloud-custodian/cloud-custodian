@@ -40,3 +40,43 @@ class NotebookInstance(QueryResourceManager):
         @classmethod
         def _get_location(cls, resource):
             return resource['name'].split('/')[3]
+
+
+@resources.register('notebook-v2')
+class NotebookInstanceV2(QueryResourceManager):
+    """
+    GC resource: https://docs.cloud.google.com/gemini-enterprise-agent-platform/notebooks/workbench/reference/rest/v2/projects.locations.instances
+
+    :example: GCP Vertex AI Notebook allows public IPs
+
+    .. yaml:
+
+     policies:
+      - name: gcp-vertex-ai-notebook-with-public-ips
+        description: |
+          GCP Vertex AI Notebook allows public IPs
+        resource: gcp.notebook-v2
+        filters:
+          - type: value
+            key: gceSetup.disablePublicIp
+            # treats missing values as false
+            op: ne
+            value: true
+    """
+    class resource_type(TypeInfo):
+        service = 'notebooks'
+        version = 'v2'
+        component = 'projects.locations.instances'
+        enum_spec = ('list', 'instances[]', None)
+        scope_key = 'parent'
+        name = id = 'name'
+        scope_template = "projects/{}/locations/-"
+        permissions = ('notebooks.instances.list',)
+        default_report_fields = ['name', 'createTime', 'state']
+        urn_id_segments = (-1,)
+        urn_component = "instances"
+        asset_type = "notebooks.googleapis.com/Instance"
+
+        @classmethod
+        def _get_location(cls, resource):
+            return resource['name'].split('/')[3]

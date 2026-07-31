@@ -130,6 +130,42 @@ class SecurityHubTest(BaseTest):
             {'Name': 'xyz', 'CreationDate': 'xtf'})
         self.assertEqual(resource['Id'], "arn:aws:s3:::xyz")
 
+    def test_security_hub_master_filter(self):
+        factory = self.replay_flight_data('test_security_hub_master_filter')
+        policy = self.load_policy(
+            {
+                'name': 'security-hub-not-master',
+                'resource': 'aws.security-hub',
+                'filters': [
+                    {'type': 'master',
+                     'key': 'AccountId',
+                     'value': '644160558196'}
+                ],
+            },
+            session_factory=factory,
+        )
+        resources = policy.run()
+        self.assertEqual(len(resources), 1)
+        self.assertEqual(
+            resources[0]['c7n:Master'].get('AccountId'), '644160558196')
+
+    def test_security_hub_master_filter_no_match(self):
+        factory = self.replay_flight_data('test_security_hub_master_filter_no_match')
+        policy = self.load_policy(
+            {
+                'name': 'security-hub-master-no-match',
+                'resource': 'aws.security-hub',
+                'filters': [
+                    {'type': 'master',
+                     'key': 'AccountId',
+                     'value': '123456789012'}
+                ],
+            },
+            session_factory=factory,
+        )
+        resources = policy.run()
+        self.assertEqual(len(resources), 0)
+
     def test_bucket(self):
         factory = self.replay_flight_data("test_security_hub_bucket")
         policy = self.load_policy(

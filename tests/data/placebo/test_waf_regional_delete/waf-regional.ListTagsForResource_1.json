@@ -1,0 +1,13 @@
+{
+    "status_code": 200,
+    "data": {
+        "Tags": {
+            "TagList": []
+        },
+        "ResponseMetadata": {
+            "RetryAttempts": 0,
+            "HTTPStatusCode": 200,
+            "RequestId": "test-list-tags-regional-001"
+        }
+    }
+}

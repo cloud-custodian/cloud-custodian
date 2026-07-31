@@ -5,7 +5,8 @@ import re
 
 from datetime import datetime
 
-from c7n.utils import local_session, type_schema
+from c7n.exceptions import PolicyValidationError
+from c7n.utils import local_session, type_schema, group_by
 
 from c7n_gcp.actions import MethodAction
 from c7n_gcp.filters import IamPolicyFilter
@@ -13,7 +14,7 @@ from c7n_gcp.filters.iampolicy import IamPolicyValueFilter
 from c7n_gcp.provider import resources
 from c7n_gcp.query import QueryResourceManager, TypeInfo, ChildResourceManager, ChildTypeInfo
 
-from c7n.filters.core import ValueFilter
+from c7n.filters.core import ListItemFilter, ValueFilter
 from c7n.filters.offhours import OffHour, OnHour
 
 
@@ -299,6 +300,77 @@ class CreateMachineImage(MethodAction):
         return session.client(model.service, "beta", "machineImages")
 
 
+@Instance.action_registry.register('set-metadata')
+class InstanceSetMetadata(InstanceAction):
+    """Set or remove metadata key/value pairs on a Compute Engine instance.
+
+    Existing metadata keys not specified in the action are preserved.
+    The fingerprint of the current metadata is used to prevent concurrent
+    update conflicts.
+
+    Both ``metadata`` and ``remove`` are optional and can be used independently
+    or together in the same action.
+
+    :example:
+
+    Set a metadata key:
+
+    .. code-block:: yaml
+
+        policies:
+          - name: gcp-instance-oslogin-remediate
+            resource: gcp.instance
+            filters:
+              - type: value
+                key: "metadata.items[?key=='enable-oslogin'].value | [0]"
+                op: ne
+                value_type: normalize
+                value: "true"
+            actions:
+              - type: set-metadata
+                metadata:
+                  enable-oslogin: "true"
+
+    Remove metadata keys without setting any new ones:
+
+    .. code-block:: yaml
+
+        policies:
+          - name: gcp-instance-remove-metadata
+            resource: gcp.instance
+            actions:
+              - type: set-metadata
+                remove:
+                  - key-one
+                  - key-two
+
+    """
+    schema = type_schema(
+        'set-metadata',
+        metadata={'type': 'object', 'additionalProperties': {'type': 'string'}},
+        remove={'type': 'array', 'items': {'type': 'string'}})
+    method_spec = {'op': 'setMetadata'}
+    permissions = ('compute.instances.setMetadata',)
+
+    def validate(self):
+        if not self.data.get('metadata') and not self.data.get('remove'):
+            raise PolicyValidationError("Must specify one of metadata or remove")
+        return self
+
+    def get_resource_params(self, model, resource):
+        params = super().get_resource_params(model, resource)
+        existing = resource.get('metadata', {})
+        items_map = {i['key']: i['value'] for i in existing.get('items', [])}
+        items_map.update(self.data.get('metadata', {}))
+        for key in self.data.get('remove', []):
+            items_map.pop(key, None)
+        params['body'] = {
+            'fingerprint': existing.get('fingerprint', ''),
+            'items': [{'key': k, 'value': v} for k, v in items_map.items()]
+        }
+        return params
+
+
 @resources.register('image')
 class Image(QueryResourceManager):
 
@@ -411,6 +483,53 @@ class Disk(QueryResourceManager):
                         'labels': all_labels,
                         'labelFingerprint': resource['labelFingerprint']
                     }}
+
+
+@Disk.filter_registry.register('snapshots')
+class DiskSnapshotsFilter(ListItemFilter):
+    """
+    Filter GCP disks by their snapshots.
+
+    :example:
+
+    .. code-block:: yaml
+
+        policies:
+          - name: disk-without-recent-snapshot
+            resource: gcp.disk
+            filters:
+              - not:
+                - type: snapshots
+                  attrs:
+                    - type: value
+                      key: creationTimestamp
+                      value_type: age
+                      value: 7
+                      op: less-than
+    """
+    schema = type_schema(
+        'snapshots',
+        attrs={'$ref': '#/definitions/filters_common/list_item_attrs'},
+        count={'type': 'number'},
+        count_op={'$ref': '#/definitions/filters_common/comparison_operators'}
+    )
+    permissions = ('compute.snapshots.list',)
+    annotation_key = 'c7n:Snapshots'
+    item_annotation_key = 'c7n:MatchedSnapshots'
+    annotate_items = True
+
+    def process(self, resources, event=None):
+        all_snapshots = self.manager.get_resource_manager('gcp.snapshot').resources()
+
+        grouped = group_by(all_snapshots, 'sourceDisk')
+        for resource in resources:
+            resource[self.annotation_key] = grouped.get(
+                resource['selfLink'], [])
+
+        return super().process(resources, event)
+
+    def get_item_values(self, resource):
+        return resource.get(self.annotation_key, [])
 
 
 @Disk.action_registry.register('snapshot')
@@ -734,6 +853,33 @@ class AutoscalerSet(MethodAction):
         return result
 
 
+@resources.register('region-commitment')
+class RegionCommitment(QueryResourceManager):
+    """GCP resource: https://cloud.google.com/compute/docs/reference/rest/v1/regionCommitments"""
+
+    class resource_type(TypeInfo):
+        service = 'compute'
+        version = 'v1'
+        component = 'regionCommitments'
+        enum_spec = ('aggregatedList', 'items.*.commitments[]', None)
+        permissions = ('compute.commitments.list',)
+        name = id = 'name'
+        default_report_fields = [
+            "name", "status", "type", "plan", "category", "region", "endTimestamp"]
+        asset_type = "compute.googleapis.com/Commitment"
+        urn_component = "region-commitment"
+
+        @staticmethod
+        def get(client, resource_info):
+            project, region, commitment = re.search(
+                r'projects/(.*?)/regions/(.*?)/commitments/(.*)',
+                resource_info['resourceName']).groups()
+
+            return client.execute_command(
+                'get',
+                {'project': project, 'region': region, 'commitment': commitment})
+
+
 @resources.register('zone')
 class Zone(QueryResourceManager):
     """GC resource: https://cloud.google.com/compute/docs/reference/rest/v1/zones"""
@@ -765,6 +911,79 @@ class Project(QueryResourceManager):
         def get(client, resource_info):
             return client.execute_command(
                 'get', {'project': resource_info['project_id']})
+
+
+@Project.action_registry.register('set-common-instance-metadata')
+class ProjectSetCommonInstanceMetadata(MethodAction):
+    """Set or remove common instance metadata key/value pairs on a Compute Engine project.
+
+    Common instance metadata is inherited by all instances in the project.
+    Existing metadata keys not specified in the action are preserved.
+    The fingerprint of the current metadata is used to prevent concurrent
+    update conflicts.
+
+    Both ``metadata`` and ``remove`` are optional and can be used independently
+    or together in the same action.
+
+    :example:
+
+    Set a common instance metadata key:
+
+    .. code-block:: yaml
+
+        policies:
+          - name: gcp-project-oslogin-remediate
+            resource: gcp.compute-project
+            filters:
+              - type: value
+                key: "commonInstanceMetadata.items[?key=='enable-oslogin'].value | [0]"
+                op: ne
+                value_type: normalize
+                value: "true"
+            actions:
+              - type: set-common-instance-metadata
+                metadata:
+                  enable-oslogin: "true"
+
+    Remove common instance metadata keys without setting any new ones:
+
+    .. code-block:: yaml
+
+        policies:
+          - name: gcp-project-remove-common-instance-metadata
+            resource: gcp.compute-project
+            actions:
+              - type: set-common-instance-metadata
+                remove:
+                  - key-one
+                  - key-two
+
+    """
+    schema = type_schema(
+        'set-common-instance-metadata',
+        metadata={'type': 'object', 'additionalProperties': {'type': 'string'}},
+        remove={'type': 'array', 'items': {'type': 'string'}})
+    method_spec = {'op': 'setCommonInstanceMetadata'}
+    permissions = ('compute.projects.setCommonInstanceMetadata',)
+
+    def validate(self):
+        if not self.data.get('metadata') and not self.data.get('remove'):
+            raise PolicyValidationError("Must specify one of metadata or remove")
+        return self
+
+    def get_resource_params(self, model, resource):
+        existing = resource.get('commonInstanceMetadata', {})
+        items_map = {i['key']: i['value'] for i in existing.get('items', [])}
+        items_map.update(self.data.get('metadata', {}))
+        for key in self.data.get('remove', []):
+            items_map.pop(key, None)
+        return {
+            'project': resource['name'],
+            'body': {
+                'fingerprint': existing.get('fingerprint', ''),
+                'items': [{'key': k, 'value': v} for k, v in items_map.items()]
+            }
+        }
 
 
 @resources.register('instance-group-manager')

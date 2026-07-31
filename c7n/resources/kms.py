@@ -9,7 +9,7 @@ from collections import defaultdict
 from functools import lru_cache
 
 from c7n.actions import RemovePolicyBase, BaseAction
-from c7n.filters import Filter, CrossAccountAccessFilter, ValueFilter
+from c7n.filters import Filter, CrossAccountAccessFilter, ListItemFilter, ValueFilter
 from c7n.manager import resources
 from c7n.query import (
     ConfigSource, DescribeSource, QueryResourceManager, RetryPageIterator, TypeInfo)
@@ -492,6 +492,119 @@ class LastRotation(ValueFilter):
                 results.append(r)
 
         return results
+
+
+@Key.filter_registry.register('last-usage')
+class LastUsage(ListItemFilter):
+    """Filters KMS keys by their last usage information.
+
+    Uses the ``GetKeyLastUsage`` API to retrieve key usage metadata,
+    enabling multi-attribute matching on last usage timestamp, operation,
+    tracking start date, and key creation date in a single filter.
+
+    The response fields are returned as a single item for filtering:
+
+    - ``KeyLastUsage.Timestamp`` - when the key was last used (absent if never used)
+    - ``KeyLastUsage.Operation`` - the last cryptographic operation performed
+    - ``KeyLastUsage.CloudTrailEventId`` - CloudTrail event ID for the last operation
+    - ``KeyLastUsage.KmsRequestId`` - KMS request ID for the last operation
+    - ``TrackingStartDate`` - when usage tracking began for this key
+    - ``KeyCreationDate`` - when the key was created
+
+    If the key has never been used since tracking began, ``KeyLastUsage``
+    will be empty.
+
+    For more details, see:
+    https://docs.aws.amazon.com/kms/latest/developerguide/monitoring-keys-determining-usage.html
+
+    .. warning::
+
+       Do not use ``GetKeyLastUsage`` as the sole indicator when scheduling
+       a key for deletion. Instead, first disable the key and monitor
+       CloudTrail for ``DisabledException`` entries, as there could be
+       infrequent workflows that depend on the key.
+
+    :example:
+
+    Find keys not used in the last 30 days:
+
+    .. code-block:: yaml
+
+            policies:
+              - name: kms-unused-keys-30-days
+                resource: kms-key
+                filters:
+                  - type: last-usage
+                    attrs:
+                      - type: value
+                        key: KeyLastUsage.Timestamp
+                        value: 30
+                        value_type: age
+                        op: gte
+
+    Find keys that have never been used since tracking began:
+
+    .. code-block:: yaml
+
+              - name: kms-never-used-keys
+                resource: kms-key
+                filters:
+                  - type: last-usage
+                    attrs:
+                      - type: value
+                        key: KeyLastUsage.Timestamp
+                        value: absent
+
+    Find keys last used for Decrypt with usage tracked since a specific date:
+
+    .. code-block:: yaml
+
+              - name: kms-keys-decrypt-recent-tracking
+                resource: kms-key
+                filters:
+                  - type: last-usage
+                    attrs:
+                      - type: value
+                        key: KeyLastUsage.Operation
+                        value: Decrypt
+                      - type: value
+                        key: TrackingStartDate
+                        value_type: age
+                        op: lte
+                        value: 90
+
+    """
+
+    schema = type_schema(
+        'last-usage',
+        attrs={'$ref': '#/definitions/filters_common/list_item_attrs'},
+        count={'type': 'number'},
+        count_op={'$ref': '#/definitions/filters_common/comparison_operators'},
+    )
+    schema_alias = False
+    permissions = ('kms:GetKeyLastUsage',)
+    item_annotation_key = 'c7n:LastUsage'
+    annotate_items = True
+    _client = None
+
+    def get_client(self):
+        if self._client is None:
+            self._client = local_session(self.manager.session_factory).client('kms')
+        return self._client
+
+    def get_item_values(self, resource):
+        client = self.get_client()
+        try:
+            result = client.get_key_last_usage(KeyId=resource['KeyId'])
+        except ClientError as err:
+            self.log.warning(
+                "error getting last usage for key:%s - %s",
+                resource['KeyId'], err
+            )
+            return []
+
+        result.pop('ResponseMetadata', None)
+        return [result]
 
 
 @Key.action_registry.register("schedule-deletion")
