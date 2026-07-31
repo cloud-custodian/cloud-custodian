@@ -30,7 +30,7 @@ DEFAULT_TAG = "maid_status"
 
 
 # Sentinel: the resolver returns this to omit a tag from a resource's payload.
-TAG_VALUE_SKIP = object()
+TAG_VALUE_SKIP = Lookup.SKIP
 
 
 def tag_value_schema():
@@ -38,35 +38,18 @@ def tag_value_schema():
 
     Accepts a scalar, a resource lookup by key (with optional fallback), or a
     conditional default with no key (write only when the tag is absent).
+
+    Tag values are strings, but unquoted YAML scalars have always been
+    accepted here and coerced on the way out, so the scalar form stays wide.
+    A fallback has no such history and is held to a string.
     """
-    return {
-        'oneOf': [
-            {'type': ['string', 'number', 'boolean']},
-            {
-                'type': 'object',
-                'additionalProperties': False,
-                'required': ['type', 'key'],
-                'properties': {
-                    'type': {'enum': [Lookup.RESOURCE_SOURCE]},
-                    'key': {'type': 'string'},
-                    'default-value': {'type': 'string'},
-                },
-            },
-            {
-                'type': 'object',
-                'additionalProperties': False,
-                'required': ['type', 'default-value'],
-                'properties': {
-                    'type': {'enum': [Lookup.RESOURCE_SOURCE]},
-                    'default-value': {'type': 'string'},
-                },
-            },
-        ]
-    }
+    return Lookup.lookup_type(
+        {'type': ['string', 'number', 'boolean']},
+        default_schema={'type': 'string'})
 
 
 def has_dynamic_tag_values(spec_map):
-    return any(Lookup.is_lookup(v) for v in spec_map.values())
+    return Lookup.has_lookups(spec_map)
 
 
 def resource_tag_keys(resource):
@@ -85,14 +68,7 @@ def resolve_tag_value(spec, tag_name, resource, current_tag_keys):
 
     Returns the resolved value, or TAG_VALUE_SKIP to omit the tag.
     """
-    if not Lookup.is_lookup(spec):
-        return spec
-    if 'key' in spec:
-        return Lookup.extract(spec, resource)
-    # Conditional default (no key): write only if the tag is absent.
-    if tag_name in current_tag_keys:
-        return TAG_VALUE_SKIP
-    return spec['default-value']
+    return Lookup.resolve_value(spec, resource, tag_name, current_tag_keys)
 
 
 def register_ec2_tags(filters, actions):

@@ -4,6 +4,7 @@
 module to test some universal tagging infrastructure not directly exposed.
 """
 import time
+import jsonschema
 from freezegun import freeze_time
 from unittest.mock import MagicMock, call
 
@@ -604,6 +605,40 @@ class CopyRelatedResourceTag(BaseTest):
             ]
         }
         self.assertRaises(PolicyValidationError, self.load_policy, policy)
+
+
+class TagValueSchemaTest(BaseTest):
+    """Tag values are strings, but unquoted YAML scalars have always been
+    accepted and coerced. The fallback is a newer field and stays strict.
+    """
+
+    def validates(self, value):
+        try:
+            jsonschema.validate(
+                {'X': value},
+                {'type': 'object',
+                 'additionalProperties': tagmod.tag_value_schema()})
+            return True
+        except jsonschema.ValidationError:
+            return False
+
+    def test_scalar_accepts_number_and_boolean(self):
+        self.assertTrue(self.validates('plain'))
+        self.assertTrue(self.validates(12345))
+        self.assertTrue(self.validates(True))
+
+    def test_default_value_must_be_a_string(self):
+        self.assertTrue(
+            self.validates({'type': 'resource', 'key': 'K', 'default-value': 'd'}))
+        self.assertFalse(
+            self.validates({'type': 'resource', 'key': 'K', 'default-value': 5}))
+        self.assertFalse(
+            self.validates({'type': 'resource', 'default-value': True}))
+
+    def test_non_scalar_values_rejected(self):
+        self.assertFalse(self.validates(['a']))
+        self.assertFalse(self.validates(None))
+        self.assertFalse(self.validates({'foo': 'bar'}))
 
 
 class ResolveTagValueTest(BaseTest):
