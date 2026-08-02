@@ -49,6 +49,21 @@ class ActionsTagTest(BaseTest):
             ]
         }, validate=True))
 
+        self.assertTrue(self.load_policy({
+            'name': 'test-tag-schema-validate',
+            'resource': 'azure.vm',
+            'actions': [
+                {'type': 'tag',
+                 'tags': {
+                     'tag1': 'value1',
+                     'tag2': {
+                         'type': 'resource',
+                         'key': 'name'
+                     }
+                 }},
+            ]
+        }, validate=True))
+
         with self.assertRaises(FilterValidationError):
             # Can't have both tags and tag/value
             self.load_policy(tools.get_policy([
@@ -177,5 +192,61 @@ class ActionsTagTest(BaseTest):
 
         expected_tags = self.existing_tags.copy()
         expected_tags.update({'tag1': 'value1', 'pre-existing-1': 'modified'})
+
+        self.assertEqual(tags, expected_tags)
+
+    @patch('c7n_azure.tags.TagHelper.update_resource_tags')
+    def test_add_or_update_tags_from_resource(self, update_resource_tags):
+        """Verifies values in the tags dictionary are resolved from the resource
+        rather than passed through as the raw lookup directive
+        """
+
+        action = self._get_action(
+            {
+                'tags': {
+                    'tag1': 'value1',
+                    'tag2': {
+                        'type': 'resource',
+                        'key': 'name'
+                    }
+                }
+            })
+
+        resource = tools.get_resource(self.existing_tags)
+
+        action.process([resource])
+
+        tags = tools.get_tags_parameter(update_resource_tags)
+
+        expected_tags = self.existing_tags.copy()
+        expected_tags.update({'tag1': 'value1', 'tag2': resource['name']})
+
+        self.assertEqual(tags, expected_tags)
+
+    @patch('c7n_azure.tags.TagHelper.update_resource_tags')
+    def test_add_or_update_tags_from_resource_default(self, update_resource_tags):
+        """Verifies values in the tags dictionary fall back to default-value
+        when the looked up key does not exist on the resource
+        """
+
+        action = self._get_action(
+            {
+                'tags': {
+                    'tag1': {
+                        'type': 'resource',
+                        'key': 'doesnotexist',
+                        'default-value': 'default_value'
+                    }
+                }
+            })
+
+        resource = tools.get_resource(self.existing_tags)
+
+        action.process([resource])
+
+        tags = tools.get_tags_parameter(update_resource_tags)
+
+        expected_tags = self.existing_tags.copy()
+        expected_tags.update({'tag1': 'default_value'})
 
         self.assertEqual(tags, expected_tags)
