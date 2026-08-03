@@ -3,7 +3,7 @@
 import json
 from botocore.exceptions import ClientError
 from concurrent.futures import as_completed
-from c7n.manager import resources, ResourceManager
+from c7n.manager import resources
 from c7n.query import QueryResourceManager, TypeInfo
 from c7n.utils import local_session, chunks, type_schema, generate_arn
 from c7n.actions import BaseAction, ActionRegistry, RemovePolicyBase
@@ -580,7 +580,7 @@ class GlueWorkflowSecurityConfigFilter(SecurityConfigFilter):
 
 
 @resources.register('glue-catalog')
-class GlueDataCatalog(ResourceManager):
+class GlueDataCatalog(QueryResourceManager):
 
     filter_registry = FilterRegistry('glue-catalog.filters')
     action_registry = ActionRegistry('glue-catalog.actions')
