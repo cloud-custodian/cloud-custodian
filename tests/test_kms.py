@@ -941,6 +941,65 @@ class KMSCrossAccount(BaseTest):
         self.assertEqual(len(resources), 1)
         self.assertEqual(resources[0]["KeyId"], key_info["KeyId"])
 
+    def test_kms_cross_account_access_denied_skipped(self):
+        # A single key that raises AccessDeniedException must be silently
+        # skipped; the rest of the scan must continue (issue #10962).
+        from unittest import mock
+        from botocore.exceptions import ClientError
+        from c7n.resources import kms as kms_module
+
+        self.patch(CrossAccountAccessFilter, "executor_factory", MainThreadExecutor)
+        p = self.load_policy(
+            {
+                "name": "kms-cross-access-denied",
+                "resource": "kms-key",
+                "filters": ["cross-account"],
+            }
+        )
+        f = p.resource_manager.filters[0]
+
+        denied_key = {"KeyId": "denied-key-id", "KeyArn": "arn:aws:kms:us-east-1:123:key/denied"}
+        mock_client = mock.MagicMock()
+        mock_client.get_key_policy.side_effect = ClientError(
+            {"Error": {"Code": "AccessDeniedException", "Message": "Access Denied"}},
+            "GetKeyPolicy",
+        )
+        with mock.patch.object(kms_module, "local_session") as ls:
+            ls.return_value.client.return_value = mock_client
+            results = f.process([denied_key])
+
+        self.assertEqual(results, [])
+        mock_client.get_key_policy.assert_called_once_with(
+            KeyId="denied-key-id", PolicyName="default"
+        )
+
+    def test_kms_cross_account_other_error_reraises(self):
+        # Non-AccessDenied ClientErrors must still propagate (issue #10962).
+        from unittest import mock
+        from botocore.exceptions import ClientError
+        from c7n.resources import kms as kms_module
+
+        self.patch(CrossAccountAccessFilter, "executor_factory", MainThreadExecutor)
+        p = self.load_policy(
+            {
+                "name": "kms-cross-other-error",
+                "resource": "kms-key",
+                "filters": ["cross-account"],
+            }
+        )
+        f = p.resource_manager.filters[0]
+
+        bad_key = {"KeyId": "some-key-id", "KeyArn": "arn:aws:kms:us-east-1:123:key/some"}
+        mock_client = mock.MagicMock()
+        mock_client.get_key_policy.side_effect = ClientError(
+            {"Error": {"Code": "InternalFailure", "Message": "Something broke"}},
+            "GetKeyPolicy",
+        )
+        with mock.patch.object(kms_module, "local_session") as ls:
+            ls.return_value.client.return_value = mock_client
+            with self.assertRaises(ClientError):
+                f.process([bad_key])
+
 
 class KMSMotoTests(BaseTest):
     @pytest.fixture(autouse=True)
