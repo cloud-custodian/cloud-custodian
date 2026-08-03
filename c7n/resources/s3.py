@@ -740,6 +740,95 @@ class S3Metrics(MetricsFilter):
         return dims
 
 
+    def process_resource_set(self, resource_set):
+        matched = []
+
+        # group the buckets by region
+        region_resource_map = {}
+        for r in resource_set:
+            region = get_region(r)
+            region_resource_map.setdefault(region, []).append(r)
+
+        for region, resource_list in region_resource_map.items():
+
+            # For S3, we need to retrieve a cloudwatch client specific to a region.
+            # While we can query, via the API, informations about
+            # any bucket from any region, the metrics are only available in the
+            # bucket region ; so we need to have a client instantiated on that
+            # very region.
+            client_args = {}
+            client_args['region_name'] = region
+            client = local_session(
+                self.manager.session_factory).client('cloudwatch', **client_args)
+
+            for r in resource_list:
+                # if we overload dimensions with multiple resources we get
+                # the statistics/average over those resources.
+                dimensions = self.get_dimensions(r)
+                # Merge in any filter specified metrics, get_dimensions is
+                # commonly overridden so we can't do it there.
+                dimensions.extend(self.get_user_dimensions())
+
+                collected_metrics = r.setdefault('c7n.metrics', {})
+                # Note this annotation cache is policy scoped, not across
+                # policies, still the lack of full qualification on the key
+                # means multiple filters within a policy using the same metric
+                # across different periods or dimensions would be problematic.
+                key = "%s.%s.%s.%s" % (self.namespace, self.metric, self.statistics, str(self.days))
+
+                params = dict(
+                    Namespace=self.namespace,
+                    MetricName=self.metric,
+                    StartTime=self.start,
+                    EndTime=self.end,
+                    Period=self.period,
+                    Dimensions=dimensions
+                )
+
+                stats_key = (self.statistics in self.standard_stats
+                             and 'Statistics' or 'ExtendedStatistics')
+                params[stats_key] = [self.statistics]
+
+                if key not in collected_metrics:
+                    collected_metrics[key] = client.get_metric_statistics(
+                        **params)['Datapoints']
+
+                # In certain cases CloudWatch reports no data for a metric.
+                # If the policy specifies a fill value for missing data, add
+                # that here before testing for matches. Otherwise, skip
+                # matching entirely.
+                if len(collected_metrics[key]) == 0:
+                    if 'missing-value' not in self.data:
+                        continue
+                    collected_metrics[key].append({
+                        'Timestamp': self.start,
+                        self.statistics: self.data['missing-value'],
+                        'c7n:detail': 'Fill value for missing data'
+                    })
+
+                if self.data.get('percent-attr'):
+                    rvalue = r[self.data.get('percent-attr')]
+                    if self.data.get('attr-multiplier'):
+                        rvalue = rvalue * self.data['attr-multiplier']
+                    all_meet_condition = True
+                    for data_point in collected_metrics[key]:
+                        percent = (data_point[self.statistics] / rvalue * 100)
+                        if not self.op(percent, self.value):
+                            all_meet_condition = False
+                            break
+                    if all_meet_condition:
+                        matched.append(r)
+                else:
+                    all_meet_condition = True
+                    for data_point in collected_metrics[key]:
+                        if not self.op(data_point[self.statistics], self.value):
+                            all_meet_condition = False
+                            break
+                    if all_meet_condition:
+                        matched.append(r)
+        return matched
+
+
 @filters.register('cross-account')
 class S3CrossAccountFilter(CrossAccountAccessFilter):
     """Filters cross-account access to S3 buckets
