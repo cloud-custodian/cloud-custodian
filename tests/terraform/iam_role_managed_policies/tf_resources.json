@@ -1,0 +1,60 @@
+{
+    "pytest-terraform": 1,
+    "outputs": {},
+    "resources": {
+        "aws_iam_policy": {
+            "policy": {
+                "arn": "arn:aws:iam::555555555555:policy/test-policy",
+                "description": "A test policy",
+                "id": "arn:aws:iam::555555555555:policy/test-policy",
+                "name": "test-policy",
+                "name_prefix": null,
+                "path": "/",
+                "policy": "{\n  \"Version\": \"2012-10-17\",\n  \"Statement\": [\n    {\n      \"Action\": [\n        \"ec2:Describe*\"\n      ],\n      \"Effect\": \"Allow\",\n      \"Resource\": \"*\"\n    }\n  ]\n}\n"
+            }
+        },
+        "aws_iam_role": {
+            "test_role_with_managed_policy": {
+                "arn": "arn:aws:iam::555555555555:role/test_role_with_managed_policy",
+                "assume_role_policy": "{\"Version\":\"2012-10-17\",\"Statement\":[{\"Sid\":\"\",\"Effect\":\"Allow\",\"Principal\":{\"Service\":[\"ec2.amazonaws.com\",\"lambda.amazonaws.com\"]},\"Action\":\"sts:AssumeRole\"}]}",
+                "create_date": "2021-02-19T17:11:22Z",
+                "description": "",
+                "force_detach_policies": false,
+                "id": "test_role_with_managed_policy",
+                "max_session_duration": 3600,
+                "name": "test_role_with_managed_policy",
+                "name_prefix": null,
+                "path": "/",
+                "permissions_boundary": null,
+                "tags": {
+                    "tag-key": "tag-value"
+                },
+                "unique_id": "XXXXXXXXXXXXXXXXXXX123"
+            },
+            "test_role_with_no_managed_policy": {
+                "arn": "arn:aws:iam::555555555555:role/test_role_with_no_managed_policy",
+                "assume_role_policy": "{\"Version\":\"2012-10-17\",\"Statement\":[{\"Sid\":\"\",\"Effect\":\"Allow\",\"Principal\":{\"Service\":[\"ec2.amazonaws.com\",\"lambda.amazonaws.com\"]},\"Action\":\"sts:AssumeRole\"}]}",
+                "create_date": "2021-02-19T17:11:22Z",
+                "description": "",
+                "force_detach_policies": false,
+                "id": "test_role_with_no_managed_policy",
+                "max_session_duration": 3600,
+                "name": "test_role_with_no_managed_policy",
+                "name_prefix": null,
+                "path": "/",
+                "permissions_boundary": null,
+                "tags": {
+                    "tag-key": "tag-value"
+                },
+                "unique_id": "XXXXXXXXXXXXXXXXXXX321"
+            }
+        },
+        "aws_iam_role_policy_attachment": {
+            "test-attach": {
+                "id": "test_role_with_managed_policy-555555555555",
+                "policy_arn": "arn:aws:iam::555555555555:policy/test-policy",
+                "role": "test_role_with_managed_policy"
+            }
+        }
+    }
+}
