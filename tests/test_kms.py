@@ -973,6 +973,61 @@ class KMSCrossAccount(BaseTest):
             KeyId="denied-key-id", PolicyName="default"
         )
 
+    def test_kms_cross_account_access_denied_does_not_suppress_batch(self):
+        # One denied key must not silently drop the remaining keys in the same
+        # batch.  On main, list() consumed the generator and the second key was
+        # never reached when the first raised.
+        from unittest import mock
+        from botocore.exceptions import ClientError
+        from c7n.resources import kms as kms_module
+
+        self.patch(CrossAccountAccessFilter, "executor_factory", MainThreadExecutor)
+        p = self.load_policy(
+            {
+                "name": "kms-cross-access-denied-batch",
+                "resource": "kms-key",
+                "filters": ["cross-account"],
+            }
+        )
+        f = p.resource_manager.filters[0]
+
+        denied_key = {
+            "KeyId": "denied-key-id",
+            "KeyArn": "arn:aws:kms:us-east-1:123456789012:key/denied",
+        }
+        readable_key = {
+            "KeyId": "readable-key-id",
+            "KeyArn": "arn:aws:kms:us-east-1:123456789012:key/readable",
+        }
+        cross_account_policy = json.dumps({
+            "Version": "2012-10-17",
+            "Statement": [{
+                "Effect": "Allow",
+                "Principal": {"AWS": "*"},
+                "Action": "kms:*",
+                "Resource": "*",
+            }],
+        })
+        access_denied = ClientError(
+            {"Error": {"Code": "AccessDeniedException", "Message": "Access Denied"}},
+            "GetKeyPolicy",
+        )
+        mock_client = mock.MagicMock()
+        mock_client.get_key_policy.side_effect = [
+            access_denied,
+            {"Policy": cross_account_policy},
+        ]
+
+        with mock.patch.object(kms_module, "local_session") as ls:
+            ls.return_value.client.return_value = mock_client
+            results = f.process([denied_key, readable_key])
+
+        # Both keys were attempted — the denial did not short-circuit the batch.
+        self.assertEqual(mock_client.get_key_policy.call_count, 2)
+        # Denied key is dropped; readable key has cross-account access so it is returned.
+        self.assertEqual(len(results), 1)
+        self.assertEqual(results[0]["KeyId"], "readable-key-id")
+
     def test_kms_cross_account_other_error_reraises(self):
         # Non-AccessDenied ClientErrors must still propagate (issue #10962).
         from unittest import mock
