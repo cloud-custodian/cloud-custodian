@@ -28,6 +28,10 @@ class ActionsMarkForOpTest(BaseTest):
                 ]),
                 validate=True))
 
+    def test_class_type_attribute(self):
+        # Regression for https://github.com/cloud-custodian/cloud-custodian/issues/10795.
+        self.assertEqual(TagDelayedAction.type, 'mark-for-op')
+
     @patch('c7n_azure.tags.TagHelper.update_resource_tags')
     def test_mark_for_op(self, update_resource_tags):
         self.patch(TagDelayedAction, 'type', 'mark-for-op')
