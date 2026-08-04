@@ -243,6 +243,46 @@ class KMSCrossAccountAccessFilter(CrossAccountAccessFilter):
             resources, event)
 
 
+@Key.filter_registry.register('policy-access-denied')
+class KMSPolicyAccessDenied(Filter):
+    """Filter KMS keys whose key policy cannot be fetched due to access denial.
+
+    The ``cross-account`` filter silently drops these keys, so under ``c7n-org``
+    an account with inaccessible keys appears to have fewer keys than it does.
+    This filter surfaces them explicitly so they reach ``resources.json``.
+
+    :example:
+
+    .. code-block:: yaml
+
+            policies:
+              - name: kms-key-policy-inaccessible
+                resource: kms-key
+                filters:
+                  - type: policy-access-denied
+    """
+    schema = type_schema('policy-access-denied')
+    permissions = ('kms:GetKeyPolicy',)
+    annotation_key = 'c7n:PolicyAccessDenied'
+
+    def process(self, resources, event=None):
+        client = local_session(self.manager.session_factory).client('kms')
+        results = []
+        for r in resources:
+            key_id = r.get('KeyId')
+            try:
+                client.get_key_policy(KeyId=key_id, PolicyName='default')
+            except ClientError as e:
+                if e.response['Error']['Code'] == 'AccessDeniedException':
+                    self.log.warning(
+                        "Access denied fetching policy for key:%s", key_id)
+                    r[self.annotation_key] = True
+                    results.append(r)
+                else:
+                    raise
+        return results
+
+
 @KeyAlias.filter_registry.register('grant-count')
 class GrantCount(Filter):
     """Filters KMS key grants
