@@ -77,6 +77,20 @@ class AthenaDataCatalog(query.QueryResourceManager):
         universal_taggable = object()
         permissions_augment = ("athena:ListTagsForResource",)
 
+    def augment(self, resources):
+        resources = self.source.augment(resources)
+        # AwsDataCatalog is AWS-managed and present in every account/region.
+        # It cannot be tagged via RGTA; including it causes tag actions to
+        # crash with an empty ResourceARNList.
+        excluded = [r for r in resources if r.get("CatalogName") == "AwsDataCatalog"]
+        if excluded:
+            self.log.warning(
+                "Skipping %d AWS-managed AwsDataCatalog resource(s) "
+                "which cannot be tagged via Resource Groups Tagging API",
+                len(excluded),
+            )
+        return [r for r in resources if r.get("CatalogName") != "AwsDataCatalog"]
+
 
 @resources.register("athena-capacity-reservation")
 class AthenaCapacityReservation(query.QueryResourceManager):

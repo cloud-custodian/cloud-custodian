@@ -57,6 +57,29 @@ def test_athena_catalog_tagging(test):
     assert len(tags) == 0
 
 
+def test_athena_catalog_skips_aws_data_catalog(test):
+    factory = test.replay_flight_data("test_athena_data_catalog_aws_catalog_skip")
+    policy = test.load_policy(
+        {
+            "name": "test-athena-catalog-skip-aws-managed",
+            "resource": "aws.athena-data-catalog",
+            "actions": [
+                {
+                    "type": "tag",
+                    "key": "c7n",
+                    "value": "test",
+                }
+            ],
+        },
+        config={"account_id": ACCOUNT_ID},
+        session_factory=factory,
+    )
+    resources = policy.run()
+    # AwsDataCatalog is AWS-managed; augment filters it before the tag action
+    # so the tag action runs against zero resources (no ParamValidationError).
+    assert len(resources) == 0
+
+
 def test_athena_cancel_capacity_reservation(test):
     factory = test.replay_flight_data("test_athena_cancel_capacity_reservation")
     policy = test.load_policy(
