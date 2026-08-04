@@ -2,7 +2,7 @@
 # SPDX-License-Identifier: Apache-2.0
 from c7n.actions import Action
 from c7n.manager import resources
-from c7n import query
+from c7n import query, tags
 from c7n.utils import type_schema, local_session
 
 from .aws import shape_validate
@@ -61,36 +61,9 @@ class UpdateWorkGroup(Action):
             )
 
 
-class DescribeAthenaCatalog(query.DescribeWithResourceTags):
-    """Source for aws.athena-data-catalog that excludes the AWS-managed
-    AwsDataCatalog entry returned by list_data_catalogs in every account and
-    region.  That entry cannot be tagged via the Resource Groups Tagging API,
-    which causes universal tag/untag actions to crash with an empty
-    ResourceARNList."""
-
-    def resources(self, query):
-        results = super().resources(query)
-        excluded = [r for r in results if r.get("CatalogName") == "AwsDataCatalog"]
-        if excluded:
-            self.manager.log.warning(
-                "Skipping %d AWS-managed AwsDataCatalog resource(s) "
-                "which cannot be tagged via Resource Groups Tagging API",
-                len(excluded),
-            )
-        return [r for r in results if r.get("CatalogName") != "AwsDataCatalog"]
-
-    def get_resources(self, resource_ids, cache=True):
-        return [
-            r for r in super().get_resources(resource_ids, cache)
-            if r.get("CatalogName") != "AwsDataCatalog"
-        ]
-
-
 @resources.register("athena-data-catalog")
 class AthenaDataCatalog(query.QueryResourceManager):
-    source_mapping = {
-        "describe": DescribeAthenaCatalog,
-    }
+    source_mapping = {"describe": query.DescribeWithResourceTags}
 
     class resource_type(query.TypeInfo):
         service = "athena"
@@ -101,6 +74,44 @@ class AthenaDataCatalog(query.QueryResourceManager):
         config_type = cfn_type = "AWS::Athena::DataCatalog"
         universal_taggable = object()
         permissions_augment = ("athena:ListTagsForResource",)
+
+
+class SkipAwsManagedCatalog:
+    """Mixin for AthenaDataCatalog actions that cannot operate on the
+    AWS-managed AwsDataCatalog entry (e.g. tag/untag via Resource Groups
+    Tagging API).  Filters it out before delegating to the real action and
+    emits a warning so operators know why the entry was skipped."""
+
+    def process(self, resources):
+        excluded = [r for r in resources if r.get("CatalogName") == "AwsDataCatalog"]
+        if excluded:
+            self.manager.log.warning(
+                "Skipping %d AWS-managed AwsDataCatalog resource(s) "
+                "which cannot be tagged via Resource Groups Tagging API",
+                len(excluded),
+            )
+        resources = [r for r in resources if r.get("CatalogName") != "AwsDataCatalog"]
+        if not resources:
+            return
+        return super().process(resources)
+
+
+@AthenaDataCatalog.action_registry.register("mark")
+@AthenaDataCatalog.action_registry.register("tag")
+class DataCatalogTag(SkipAwsManagedCatalog, tags.UniversalTag):
+    pass
+
+
+@AthenaDataCatalog.action_registry.register("unmark")
+@AthenaDataCatalog.action_registry.register("untag")
+@AthenaDataCatalog.action_registry.register("remove-tag")
+class DataCatalogUntag(SkipAwsManagedCatalog, tags.UniversalUntag):
+    pass
+
+
+@AthenaDataCatalog.action_registry.register("mark-for-op")
+class DataCatalogMarkForOp(SkipAwsManagedCatalog, tags.UniversalTagDelayedAction):
+    pass
 
 
 @resources.register("athena-capacity-reservation")

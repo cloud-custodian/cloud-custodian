@@ -6,8 +6,6 @@ from unittest import mock
 from pytest_terraform import terraform
 from .zpill import ACCOUNT_ID
 
-from c7n import query as c7n_query
-
 
 def test_athena_catalog_tagging(test):
     factory = test.replay_flight_data("test_athena_data_catalog_tagging")
@@ -79,43 +77,30 @@ def test_athena_catalog_skips_aws_data_catalog(test):
         session_factory=factory,
     )
     resources = policy.run()
-    # AwsDataCatalog is AWS-managed; augment filters it before the tag action
-    # so the tag action runs against zero resources (no ParamValidationError).
-    assert len(resources) == 0
+    # AwsDataCatalog is visible to the source (useful for inventory policies)
+    # but the DataCatalogTag mixin silently skips it before calling tag_resources.
+    # If the mixin had not filtered it, the placebo replay would raise because
+    # there is no recorded tagging.TagResources response.
+    assert len(resources) == 1
+    assert resources[0]["CatalogName"] == "AwsDataCatalog"
 
 
-def test_athena_catalog_source_get_resources_filters_aws_managed(test):
-    p = test.load_policy(
-        {"name": "test-catalog-get-res", "resource": "aws.athena-data-catalog"},
-        config={"account_id": ACCOUNT_ID},
-    )
-    source = p.resource_manager.get_source("describe")
-    raw = [
-        {"CatalogName": "AwsDataCatalog", "Type": "GLUE", "Tags": []},
-        {"CatalogName": "user-catalog", "Type": "HIVE", "Tags": []},
-    ]
-    with mock.patch.object(c7n_query.DescribeWithResourceTags, "get_resources",
-                           return_value=raw):
-        results = source.get_resources(["AwsDataCatalog", "user-catalog"])
-    assert len(results) == 1
-    assert results[0]["CatalogName"] == "user-catalog"
-
-
-def test_athena_catalog_tag_action_skips_empty_arns(test):
+def test_athena_catalog_mixin_skips_aws_managed(test):
+    # DataCatalogTag must not call process_resource_set when only
+    # AwsDataCatalog resources are present.
     p = test.load_policy(
         {
-            "name": "test-tag-empty-arns",
+            "name": "test-mixin-skip",
             "resource": "aws.athena-data-catalog",
             "actions": [{"type": "tag", "key": "c7n", "value": "test"}],
         },
         config={"account_id": ACCOUNT_ID},
     )
     action = p.resource_manager.actions[0]
-    mock_client = mock.MagicMock()
-    resource = {"CatalogName": "some-catalog", "Type": "HIVE", "Tags": []}
-    with mock.patch.object(p.resource_manager, "get_arns", return_value=[]):
-        action.process_resource_set(mock_client, [resource], {"c7n": "test"})
-    mock_client.tag_resources.assert_not_called()
+    aws_managed = [{"CatalogName": "AwsDataCatalog", "Type": "GLUE", "Tags": []}]
+    with mock.patch.object(action, "process_resource_set") as mock_prs:
+        action.process(aws_managed)
+    mock_prs.assert_not_called()
 
 
 def test_athena_cancel_capacity_reservation(test):
