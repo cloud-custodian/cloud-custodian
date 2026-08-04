@@ -61,10 +61,35 @@ class UpdateWorkGroup(Action):
             )
 
 
+class DescribeAthenaCatalog(query.DescribeWithResourceTags):
+    """Source for aws.athena-data-catalog that excludes the AWS-managed
+    AwsDataCatalog entry returned by list_data_catalogs in every account and
+    region.  That entry cannot be tagged via the Resource Groups Tagging API,
+    which causes universal tag/untag actions to crash with an empty
+    ResourceARNList."""
+
+    def resources(self, query):
+        results = super().resources(query)
+        excluded = [r for r in results if r.get("CatalogName") == "AwsDataCatalog"]
+        if excluded:
+            self.manager.log.warning(
+                "Skipping %d AWS-managed AwsDataCatalog resource(s) "
+                "which cannot be tagged via Resource Groups Tagging API",
+                len(excluded),
+            )
+        return [r for r in results if r.get("CatalogName") != "AwsDataCatalog"]
+
+    def get_resources(self, resource_ids, cache=True):
+        return [
+            r for r in super().get_resources(resource_ids, cache)
+            if r.get("CatalogName") != "AwsDataCatalog"
+        ]
+
+
 @resources.register("athena-data-catalog")
 class AthenaDataCatalog(query.QueryResourceManager):
     source_mapping = {
-        "describe": query.DescribeWithResourceTags,
+        "describe": DescribeAthenaCatalog,
     }
 
     class resource_type(query.TypeInfo):
@@ -76,20 +101,6 @@ class AthenaDataCatalog(query.QueryResourceManager):
         config_type = cfn_type = "AWS::Athena::DataCatalog"
         universal_taggable = object()
         permissions_augment = ("athena:ListTagsForResource",)
-
-    def augment(self, resources):
-        resources = self.source.augment(resources)
-        # AwsDataCatalog is AWS-managed and present in every account/region.
-        # It cannot be tagged via RGTA; including it causes tag actions to
-        # crash with an empty ResourceARNList.
-        excluded = [r for r in resources if r.get("CatalogName") == "AwsDataCatalog"]
-        if excluded:
-            self.log.warning(
-                "Skipping %d AWS-managed AwsDataCatalog resource(s) "
-                "which cannot be tagged via Resource Groups Tagging API",
-                len(excluded),
-            )
-        return [r for r in resources if r.get("CatalogName") != "AwsDataCatalog"]
 
 
 @resources.register("athena-capacity-reservation")
