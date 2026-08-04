@@ -1,8 +1,12 @@
 # Copyright The Cloud Custodian Authors.
 # SPDX-License-Identifier: Apache-2.0
 
+from unittest import mock
+
 from pytest_terraform import terraform
 from .zpill import ACCOUNT_ID
+
+from c7n import query as c7n_query
 
 
 def test_athena_catalog_tagging(test):
@@ -78,6 +82,40 @@ def test_athena_catalog_skips_aws_data_catalog(test):
     # AwsDataCatalog is AWS-managed; augment filters it before the tag action
     # so the tag action runs against zero resources (no ParamValidationError).
     assert len(resources) == 0
+
+
+def test_athena_catalog_source_get_resources_filters_aws_managed(test):
+    p = test.load_policy(
+        {"name": "test-catalog-get-res", "resource": "aws.athena-data-catalog"},
+        config={"account_id": ACCOUNT_ID},
+    )
+    source = p.resource_manager.get_source("describe")
+    raw = [
+        {"CatalogName": "AwsDataCatalog", "Type": "GLUE", "Tags": []},
+        {"CatalogName": "user-catalog", "Type": "HIVE", "Tags": []},
+    ]
+    with mock.patch.object(c7n_query.DescribeWithResourceTags, "get_resources",
+                           return_value=raw):
+        results = source.get_resources(["AwsDataCatalog", "user-catalog"])
+    assert len(results) == 1
+    assert results[0]["CatalogName"] == "user-catalog"
+
+
+def test_athena_catalog_tag_action_skips_empty_arns(test):
+    p = test.load_policy(
+        {
+            "name": "test-tag-empty-arns",
+            "resource": "aws.athena-data-catalog",
+            "actions": [{"type": "tag", "key": "c7n", "value": "test"}],
+        },
+        config={"account_id": ACCOUNT_ID},
+    )
+    action = p.resource_manager.actions[0]
+    mock_client = mock.MagicMock()
+    resource = {"CatalogName": "some-catalog", "Type": "HIVE", "Tags": []}
+    with mock.patch.object(p.resource_manager, "get_arns", return_value=[]):
+        action.process_resource_set(mock_client, [resource], {"c7n": "test"})
+    mock_client.tag_resources.assert_not_called()
 
 
 def test_athena_cancel_capacity_reservation(test):
