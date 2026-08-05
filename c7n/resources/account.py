@@ -2665,8 +2665,7 @@ class LogsAccountPolicy(ListItemFilter):
                 break
             params['nextToken'] = response['nextToken']
         for p in policies:
-            with suppress(json.JSONDecodeError, TypeError):
-                p['policyDocument'] = json.loads(p['policyDocument'])
+            p['policyDocument'] = json.loads(p.get('policyDocument') or '{}')
         resource[self.annotation_key] = policies
         return policies
 
