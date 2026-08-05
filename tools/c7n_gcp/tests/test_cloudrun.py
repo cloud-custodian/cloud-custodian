@@ -16,6 +16,18 @@ class RunServiceTest(BaseTest):
         assert len(resources) == 1
         assert resources[0]["metadata"]["name"] == "hello"
 
+    def test_query_empty(self):
+        # regression for #10955: accounts with zero Cloud Run resources must
+        # return [] rather than crash. The source layer returns None (not [])
+        # for an empty result set, which augment() previously iterated over.
+        factory = self.replay_flight_data("gcp-cloud-run-service-empty")
+        p = self.load_policy(
+            {"name": "cloud-run-svc-empty", "resource": "gcp.cloud-run-service"},
+            session_factory=factory,
+        )
+        resources = p.run()
+        assert resources == []
+
     def test_set_labels(self):
         project_id = 'cloud-custodian'
         factory = self.replay_flight_data(
