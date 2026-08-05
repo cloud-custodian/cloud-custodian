@@ -269,7 +269,8 @@ class KMSPolicyAccessDenied(Filter):
         client = local_session(self.manager.session_factory).client('kms')
         results = []
         for r in resources:
-            key_id = r.get('KeyId')
+            key_id = r.get('TargetKeyId', r.get('KeyId'))
+            assert key_id, "Invalid key resources %s" % r
             try:
                 client.get_key_policy(KeyId=key_id, PolicyName='default')
             except ClientError as e:
