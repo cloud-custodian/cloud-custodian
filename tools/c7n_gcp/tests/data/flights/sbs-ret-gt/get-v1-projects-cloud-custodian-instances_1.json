@@ -1,0 +1,46 @@
+{
+  "headers": {
+    "content-type": "application/json; charset=UTF-8",
+    "vary": "Origin, X-Origin, Referer",
+    "date": "Wed, 01 Apr 2026 18:45:10 GMT",
+    "server": "ESF",
+    "x-xss-protection": "0",
+    "x-frame-options": "SAMEORIGIN",
+    "server-timing": "gfet4t7; dur=106",
+    "alt-svc": "h3=\":443\"; ma=2592000,h3-29=\":443\"; ma=2592000",
+    "transfer-encoding": "chunked",
+    "status": "200",
+    "content-length": "788",
+    "-content-encoding": "gzip",
+    "content-location": "https://spanner.googleapis.com/v1/projects/cloud-custodian/instances?alt=json"
+  },
+  "body": {
+    "instances": [
+      {
+        "name": "projects/cloud-custodian/instances/sbsi",
+        "config": "projects/cloud-custodian/instanceConfigs/regional-us-central1",
+        "displayName": "sbsi",
+        "nodeCount": 1,
+        "state": "READY",
+        "labels": {
+          "goog-terraform-provisioned": "true"
+        },
+        "processingUnits": 1000,
+        "instanceType": "PROVISIONED",
+        "createTime": "2026-04-01T18:44:52.504274Z",
+        "updateTime": "2026-04-01T18:44:52.504274Z",
+        "replicaComputeCapacity": [
+          {
+            "replicaSelection": {
+              "location": "us-central1"
+            },
+            "nodeCount": 1
+          }
+        ],
+        "edition": "STANDARD",
+        "resourceLocation": "us-central1",
+        "defaultBackupScheduleType": "AUTOMATIC"
+      }
+    ]
+  }
+}
