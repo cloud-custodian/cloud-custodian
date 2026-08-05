@@ -39,6 +39,19 @@ class Tag(AzureBaseAction):
            - type: tag
              tag: Environment
              value: Test
+
+        - name: azure-tag-from-resource-attr
+          resource: azure.vm
+          description: |
+            Tag all existing virtual machines with values taken from the resource
+          actions:
+           - type: tag
+             tags:
+               Environment: Test
+               ResourceName:
+                type: resource
+                key: name
+                default-value: name_not_found
     """
 
     schema = utils.type_schema(
@@ -46,7 +59,10 @@ class Tag(AzureBaseAction):
         **{
             'value': Lookup.lookup_type({'type': 'string'}),
             'tag': Lookup.lookup_type({'type': 'string'}),
-            'tags': {'type': 'object'}
+            'tags': {
+                'type': 'object',
+                'additionalProperties': Lookup.lookup_type({'type': 'string'})
+            }
         }
     )
     schema_alias = True
@@ -71,7 +87,10 @@ class Tag(AzureBaseAction):
         return TagHelper.add_tags(self, resource, new_tags)
 
     def _get_tags(self, resource):
-        return self.data.get('tags') or {Lookup.extract(
+        tags = self.data.get('tags')
+        if tags:
+            return {k: Lookup.extract(v, resource) for k, v in tags.items()}
+        return {Lookup.extract(
             self.data.get('tag'), resource): Lookup.extract(self.data.get('value'), resource)}
 
 
