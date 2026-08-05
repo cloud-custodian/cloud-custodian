@@ -1,0 +1,42 @@
+{
+    "status_code": 200,
+    "data": {
+        "logGroups": [
+            {
+                "logGroupName": "/c7n-test/protected",
+                "creationTime": 1785168065112,
+                "metricFilterCount": 0,
+                "arn": "arn:aws:logs:ca-central-1:644160558196:log-group:/c7n-test/protected:*",
+                "storedBytes": 0,
+                "dataProtectionStatus": "ACTIVATED",
+                "logGroupClass": "STANDARD",
+                "logGroupArn": "arn:aws:logs:ca-central-1:644160558196:log-group:/c7n-test/protected",
+                "deletionProtectionEnabled": false,
+                "bearerTokenAuthenticationEnabled": false
+            },
+            {
+                "logGroupName": "/c7n-test/unprotected",
+                "creationTime": 1785168065917,
+                "metricFilterCount": 0,
+                "arn": "arn:aws:logs:ca-central-1:644160558196:log-group:/c7n-test/unprotected:*",
+                "storedBytes": 0,
+                "logGroupClass": "STANDARD",
+                "logGroupArn": "arn:aws:logs:ca-central-1:644160558196:log-group:/c7n-test/unprotected",
+                "deletionProtectionEnabled": false,
+                "bearerTokenAuthenticationEnabled": false
+            },
+            {
+                "logGroupName": "/ecs/telegraf",
+                "creationTime": 1545324795722,
+                "metricFilterCount": 0,
+                "arn": "arn:aws:logs:ca-central-1:644160558196:log-group:/ecs/telegraf:*",
+                "storedBytes": 52424,
+                "logGroupClass": "STANDARD",
+                "logGroupArn": "arn:aws:logs:ca-central-1:644160558196:log-group:/ecs/telegraf",
+                "deletionProtectionEnabled": false,
+                "bearerTokenAuthenticationEnabled": false
+            }
+        ],
+        "ResponseMetadata": {}
+    }
+}

@@ -106,6 +106,64 @@ class LogGroupTest(BaseTest):
         self.assertEqual(len(resources), 1)
         self.assertEqual(resources[0]["c7n:CrossAccountViolations"], ["1111111111111"])
 
+    def test_data_protection(self):
+        factory = self.replay_flight_data(
+            "test_log_group_data_protection", region="ca-central-1")
+        p = self.load_policy(
+            {
+                "name": "log-groups-missing-data-protection",
+                "resource": "log-group",
+                "filters": [{"type": "data-protection", "state": False}],
+            },
+            session_factory=factory, config={"region": "ca-central-1"},
+        )
+        resources = p.run()
+        names = [r["logGroupName"] for r in resources]
+        self.assertIn("/c7n-test/unprotected", names)
+        self.assertNotIn("/c7n-test/protected", names)
+        self.assertTrue(all("c7n:DataProtection" not in r for r in resources))
+
+        p = self.load_policy(
+            {
+                "name": "log-groups-with-data-protection",
+                "resource": "log-group",
+                "filters": [{"type": "data-protection", "state": True}],
+            },
+            session_factory=factory, config={"region": "ca-central-1"},
+        )
+        resources = p.run()
+        self.assertEqual(len(resources), 1)
+        self.assertEqual(resources[0]["logGroupName"], "/c7n-test/protected")
+        self.assertEqual(resources[0]["c7n:DataProtection"], "log-group")
+
+    def test_data_protection_account_level(self):
+        factory = self.replay_flight_data(
+            "test_log_group_data_protection_account", region="ca-central-1")
+        p = self.load_policy(
+            {
+                "name": "log-groups-with-data-protection",
+                "resource": "log-group",
+                "filters": [{"type": "data-protection", "state": True}],
+            },
+            session_factory=factory, config={"region": "ca-central-1"},
+        )
+        resources = p.run()
+        names = [r["logGroupName"] for r in resources]
+        self.assertIn("/c7n-test/protected", names)
+        self.assertIn("/c7n-test/unprotected", names)
+        self.assertEqual(
+            {r["c7n:DataProtection"] for r in resources}, {"account"})
+
+        p = self.load_policy(
+            {
+                "name": "log-groups-missing-data-protection",
+                "resource": "log-group",
+                "filters": [{"type": "data-protection", "state": False}],
+            },
+            session_factory=factory, config={"region": "ca-central-1"},
+        )
+        self.assertEqual(p.run(), [])
+
     def test_kms_filter(self):
         session_factory = self.replay_flight_data('test_log_group_kms_filter')
         kms = session_factory().client('kms')
