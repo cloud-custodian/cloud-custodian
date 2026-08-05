@@ -21,6 +21,20 @@ REGION_DATA_PATH = Path(__file__).parent.parent / 'regions.json'
 VERTEXAI_REGION_DATA_PATH = Path(__file__).parent.parent / 'vertexai_regions.json'
 VERTEXAI_PUBLISHER_DATA_PATH = Path(__file__).parent.parent / 'vertexai_publishers.json'
 
+# Job states a job can be cancelled from: the non-terminal JobState values.
+# The rest are either terminal (SUCCEEDED, FAILED, CANCELLED, EXPIRED,
+# PARTIALLY_SUCCEEDED) or already cancelling. The API reference doesn't
+# enumerate cancel's valid starting states, so this is derived from the
+# JobState docs:
+# https://github.com/googleapis/googleapis/blob/master/google/cloud/aiplatform/v1/job_state.proto
+CANCELLABLE_JOB_STATES = (
+    'JOB_STATE_QUEUED',
+    'JOB_STATE_PENDING',
+    'JOB_STATE_RUNNING',
+    'JOB_STATE_PAUSED',
+    'JOB_STATE_UPDATING',
+    )
+
 
 class VertexAIQueryManager(QueryResourceManager):
     """Base class for Vertex AI resources scoped to a location.
@@ -139,6 +153,9 @@ class VertexAIMethodAction(MethodAction):
 
     def process(self, resources):
         model = self.manager.resource_type
+
+        if self.attr_filter:
+            resources = self.filter_resources(resources)
 
         # Group resources by location
         resources_by_location = defaultdict(list)
@@ -993,8 +1010,8 @@ class VertexAICustomJobCancel(VertexAIMethodAction):
     and incident response when jobs are running longer than expected or
     consuming unexpected resources.
 
-    **Note**: Only jobs in JOB_STATE_RUNNING or JOB_STATE_PENDING can be cancelled.
-    Completed, failed, or already cancelled jobs cannot be cancelled.
+    **Note**: Only jobs in a non-terminal state can be cancelled; jobs in any
+    other state are logged and skipped.
 
     :example:
 
@@ -1023,6 +1040,148 @@ class VertexAICustomJobCancel(VertexAIMethodAction):
     schema = type_schema('cancel')
     method_spec = {'op': 'cancel'}
     permissions = ('aiplatform.customJobs.cancel',)
+    attr_filter = ('state', CANCELLABLE_JOB_STATES)
+
+    def get_resource_params(self, model, resource):
+        return {'name': resource['name']}
+
+
+@resources.register('vertex-ai-hyperparameter-tuning-job')
+class VertexAIHyperparameterTuningJob(VertexAIQueryManager):
+    """GCP Vertex AI Hyperparameter Tuning Job Resource
+
+    Vertex AI Hyperparameter Tuning Jobs are used to run automated
+    hyperparameter search workloads for machine learning training.
+
+    :example:
+
+    List all Hyperparameter Tuning Jobs in specific locations:
+
+    .. code-block:: yaml
+
+        policies:
+          - name: vertexai-hyperparameter-tuning-jobs-inventory
+            resource: gcp.vertex-ai-hyperparameter-tuning-job
+            query:
+              - location: us-central1
+              - location: us-east1
+
+    :example:
+
+    Find Hyperparameter Tuning Jobs with a large number of parallel trials:
+
+    .. code-block:: yaml
+
+        policies:
+          - name: gcp-vertex-ai-hyperparameter-tuning-jobs-parallel-trials
+            resource: gcp.vertex-ai-hyperparameter-tuning-job
+            filters:
+              - type: value
+                key: parallelTrialCount
+                op: gt
+                value: 10
+
+    :example:
+
+    Find running Hyperparameter Tuning Jobs:
+
+    .. code-block:: yaml
+
+        policies:
+          - name: gcp-vertex-ai-hyperparameter-tuning-jobs-running
+            resource: gcp.vertex-ai-hyperparameter-tuning-job
+            filters:
+              - type: value
+                key: state
+                value: JOB_STATE_RUNNING
+    """
+
+    class resource_type(VertexAITypeInfo):
+        component = 'projects.locations.hyperparameterTuningJobs'
+        enum_spec = ('list', 'hyperparameterTuningJobs[]', None)
+        default_report_fields = [
+            'name', 'displayName', 'state', 'createTime', 'updateTime',
+            'parallelTrialCount', 'maxTrialCount'
+        ]
+        asset_type = 'aiplatform.googleapis.com/HyperparameterTuningJob'
+        permissions = ('aiplatform.hyperparameterTuningJobs.list',)
+        urn_component = 'hyperparameter-tuning-job'
+
+
+@VertexAIHyperparameterTuningJob.action_registry.register('delete')
+class VertexAIHyperparameterTuningJobDelete(VertexAIMethodAction):
+    """Delete Vertex AI Hyperparameter Tuning Jobs
+
+    Deletes a Vertex AI Hyperparameter Tuning Job. Note that this is an
+    asynchronous operation that returns a long-running operation. The job
+    will be deleted in the background.
+
+    :example:
+
+    Delete failed hyperparameter tuning jobs:
+
+    .. code-block:: yaml
+
+        policies:
+          - name: delete-failed-hyperparameter-tuning-jobs
+            resource: gcp.vertex-ai-hyperparameter-tuning-job
+            filters:
+              - type: value
+                key: state
+                value: JOB_STATE_FAILED
+            actions:
+              - type: delete
+
+    https://cloud.google.com/vertex-ai/docs/reference/rest/v1/projects.locations.hyperparameterTuningJobs/delete
+    """
+
+    schema = type_schema('delete')
+    method_spec = {'op': 'delete'}
+    permissions = ('aiplatform.hyperparameterTuningJobs.delete',)
+
+    def get_resource_params(self, model, resource):
+        return {'name': resource['name']}
+
+
+@VertexAIHyperparameterTuningJob.action_registry.register('cancel')
+class VertexAIHyperparameterTuningJobCancel(VertexAIMethodAction):
+    """Cancel Vertex AI Hyperparameter Tuning Jobs
+
+    Cancels a running Vertex AI Hyperparameter Tuning Job. This is useful for
+    cost control and incident response when jobs are running longer than
+    expected or consuming unexpected resources.
+
+    **Note**: Only jobs in a non-terminal state can be cancelled; jobs in any
+    other state are logged and skipped.
+
+    :example:
+
+    Cancel long-running hyperparameter tuning jobs:
+
+    .. code-block:: yaml
+
+        policies:
+          - name: cancel-long-running-hyperparameter-tuning-jobs
+            resource: gcp.vertex-ai-hyperparameter-tuning-job
+            filters:
+              - type: value
+                key: state
+                value: JOB_STATE_RUNNING
+              - type: value
+                key: createTime
+                value_type: age
+                op: greater-than
+                value: 24
+            actions:
+              - type: cancel
+
+    https://cloud.google.com/vertex-ai/docs/reference/rest/v1/projects.locations.hyperparameterTuningJobs/cancel
+    """
+
+    schema = type_schema('cancel')
+    method_spec = {'op': 'cancel'}
+    permissions = ('aiplatform.hyperparameterTuningJobs.cancel',)
+    attr_filter = ('state', CANCELLABLE_JOB_STATES)
 
     def get_resource_params(self, model, resource):
         return {'name': resource['name']}
