@@ -74,8 +74,10 @@ class BaseLabelAction(MethodAction):
     @classmethod
     def register_resources(cls, registry, resource_class):
         if resource_class.resource_type.labels:
-            resource_class.action_registry.register('set-labels', SetLabelsAction)
-            resource_class.action_registry.register('mark-for-op', LabelDelayedAction)
+            if 'set-labels' not in resource_class.action_registry:
+                resource_class.action_registry.register('set-labels', SetLabelsAction)
+            if 'mark-for-op' not in resource_class.action_registry:
+                resource_class.action_registry.register('mark-for-op', LabelDelayedAction)
 
             resource_class.filter_registry.register('marked-for-op', LabelActionFilter)
 
