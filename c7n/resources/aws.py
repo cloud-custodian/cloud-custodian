@@ -725,12 +725,22 @@ class S3Output(BlobOutput):
             self.ctx.session_factory(region=bucket_region, assume=False).client('s3'))
         return self._transfer
 
+    def get_sse_args(self):
+        # encryption configurable via output url query params, eg
+        # s3://bucket/prefix?sse=aws:kms&kms-key=alias/custodian
+        kms_key = self.config.get('kms-key')
+        sse = self.config.get('sse') or (kms_key and 'aws:kms') or 'AES256'
+        args = {'ServerSideEncryption': sse}
+        if sse == 'aws:kms' and kms_key:
+            args['SSEKMSKeyId'] = kms_key
+        return args
+
     def upload_file(self, path, key):
+        extra_args = {'ACL': 'bucket-owner-full-control'}
+        extra_args.update(self.get_sse_args())
         self.transfer.upload_file(
             path, self.bucket, key,
-            extra_args={
-                'ACL': 'bucket-owner-full-control',
-                'ServerSideEncryption': 'AES256'})
+            extra_args=extra_args)
 
 
 @clouds.register('aws')
