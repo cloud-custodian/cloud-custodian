@@ -14,7 +14,7 @@ reference the resulting model only through `CUSTOM_MODELS` in
 
 Builds the long-lived custom model that backs the `deployments` filter tests on
 `aws.bedrock-custom-model` (`test_bedrock_custom_model_deployments_filter`,
-`test_bedrock_custom_model_orphaned`).
+`test_bedrock_custom_model_undeployed`).
 
 ## Why the model is not a Terraform resource
 
@@ -44,7 +44,7 @@ deployment](https://docs.aws.amazon.com/bedrock/latest/userguide/deploy-custom-m
 Nova models are also eligible (us-east-1) but their fine-tuning jobs do not
 complete in this account -- they sit at `trainingDetails: NotStarted`
 indefinitely. Llama 3.1 8B trains fine but is *not* deployment-eligible, so it
-backs the other fixture (`../bedrock_provisionable_custom_model`) instead.
+cannot exercise this filter.
 
 Note this is text-only fine-tuning despite the docs calling the model "Llama
 3.3 70B Vision Instruct": minimum 100 records, Converse API format

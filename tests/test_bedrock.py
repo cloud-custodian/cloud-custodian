@@ -442,20 +442,6 @@ class BedrockCustomModel(BaseTest):
         )
         self.assertTrue(p)
 
-    def test_bedrock_custom_model_provisioned_throughputs_filter_schema(self):
-        session_factory = self.replay_flight_data('test_bedrock_custom_model')
-        p = self.load_policy(
-            {
-                'name': 'bedrock-custom-model-no-provisioned-throughput',
-                'resource': 'bedrock-custom-model',
-                'filters': [
-                    {'type': 'provisioned-throughputs', 'status': 'InService', 'value': 'absent'},
-                ],
-            },
-            session_factory=session_factory,
-        )
-        self.assertTrue(p)
-
     def test_bedrock_custom_model_delete(self):
         session_factory = self.replay_flight_data('test_bedrock_custom_model_delete')
         p = self.load_policy(
@@ -1286,29 +1272,21 @@ def test_bedrock_inference_profile_bad_statistics(test):
         )
 
 
-# These tests run against real, prebuilt custom models kept as long-lived
-# fixtures. Fine-tuning a custom model takes hours, and for Nova base models it
-# would not complete in the test account at all, so the models can't be created
-# per test run. Two are needed, one per serving path the filters check:
-#   - deployable:    a base model eligible for on-demand custom model
-#                    deployment (backs the `deployments` filter). Llama 3.3 70B.
-#   - provisionable: a base model that can only be served via provisioned
-#                    throughput (backs the `provisioned-throughputs` filter).
-#                    Llama 3.1 8B.
-# See tests/terraform/bedrock_{deployable,provisionable}_custom_model for how
-# they are built, and rebuilt if someone deletes them.
+# These tests run against a real, prebuilt custom model kept as a long-lived
+# fixture. Fine-tuning a custom model takes hours, and for Nova base models it
+# would not complete in the test account at all, so it can't be created per test
+# run. The base model has to be one eligible for on-demand custom model
+# deployment, which is what the `deployments` filter looks for -- Llama 3.3 70B.
+# See tests/terraform/bedrock_deployable_custom_model for how it is built, and
+# rebuilt if someone deletes it.
 #
-# They are identified by name rather than ARN on purpose: a model's ARN ends in
-# an AWS-generated id that changes every time it is rebuilt, while the name is
-# ours and is fixed. Keying off the name means a rebuild needs no edit here --
-# only re-recording.
+# It is identified by name rather than ARN on purpose: a model's ARN ends in an
+# AWS-generated id that changes every time it is rebuilt, while the name is ours
+# and is fixed. Keying off the name means a rebuild needs no edit here -- only
+# re-recording.
 CUSTOM_MODELS = dict(
     deployable=dict(
         name="KEEP-c7n-deployable-test-fixture",
-        region="us-west-2",
-    ),
-    provisionable=dict(
-        name="KEEP-c7n-provisionable-test-fixture",
         region="us-west-2",
     ),
 )
@@ -1373,8 +1351,8 @@ def test_bedrock_custom_model_deployments_filter(test, create_custom_model_deplo
     # calls are recorded via the same session used below.
     create_custom_model_deployment(model_arn, model['region'])
 
-    # Unscoped, like the orphan test: the policy discovers every custom model
-    # with an active deployment, and the fixture model must be among them.
+    # Unscoped, like the undeployed test: the policy discovers every custom
+    # model with an active deployment, and the fixture model must be among them.
     present = test.load_policy(
         {
             'name': 'bedrock-custom-model-active-deployment',
@@ -1395,37 +1373,31 @@ def test_bedrock_custom_model_deployments_filter(test, create_custom_model_deplo
         test.assertEqual(r['c7n:deployments'][0]['status'], 'Active')
 
 
-def test_bedrock_custom_model_orphaned(test):
-    # An "orphaned" custom model: Active, but with neither an Active on-demand
-    # deployment nor an InService provisioned throughput -- the issue's target
-    # for cleanup. The policy is unscoped (no model selector), so it discovers
-    # orphans across all custom models via the absent branch of both filters.
-    # Both fixture models are orphaned (the deployable one has no deployment;
-    # the provisionable one has no provisioned throughput), so both must be
-    # found.
-    region = CUSTOM_MODELS['deployable']['region']
+def test_bedrock_custom_model_undeployed(test):
+    # An undeployed custom model: Active, but with no Active on-demand
+    # deployment -- the issue's target for cleanup, since it costs storage while
+    # serving nothing. The policy is unscoped (no model selector), so it
+    # discovers undeployed models across the account via the filter's absent
+    # branch, and the fixture model must be among them.
+    model = CUSTOM_MODELS['deployable']
     test.session_factory = test.replay_flight_data(
-        'test_bedrock_custom_model_orphaned', region=region)
+        'test_bedrock_custom_model_undeployed', region=model['region'])
 
     policy = test.load_policy(
         {
-            'name': 'bedrock-custom-model-orphaned',
+            'name': 'bedrock-custom-model-undeployed',
             'resource': 'aws.bedrock-custom-model',
             'filters': [
                 {'type': 'deployments', 'status': 'Active', 'value': 'absent'},
-                {'type': 'provisioned-throughputs', 'status': 'InService',
-                 'value': 'absent'},
             ],
         },
         session_factory=test.session_factory,
-        config={'region': region},
+        config={'region': model['region']},
     )
     resources = policy.run()
 
-    test.assertGreaterEqual(len(resources), 2)
-    orphan_names = {r['modelName'] for r in resources}
-    for model in CUSTOM_MODELS.values():
-        test.assertIn(model['name'], orphan_names)
+    test.assertGreaterEqual(len(resources), 1)
+    undeployed_names = {r['modelName'] for r in resources}
+    test.assertIn(model['name'], undeployed_names)
     for r in resources:
         test.assertEqual(r['c7n:deployments'], [])
-        test.assertEqual(r['c7n:provisioned-throughputs'], [])

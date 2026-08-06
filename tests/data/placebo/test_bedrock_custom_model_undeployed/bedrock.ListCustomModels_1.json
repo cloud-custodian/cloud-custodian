@@ -4,25 +4,6 @@
         "ResponseMetadata": {},
         "modelSummaries": [
             {
-                "modelArn": "arn:aws:bedrock:us-west-2:644160558196:custom-model/meta.llama3-1-8b-instruct-v1:0:128k/qzlin7qn403k",
-                "modelName": "KEEP-c7n-provisionable-test-fixture",
-                "creationTime": {
-                    "__class__": "datetime",
-                    "year": 2026,
-                    "month": 7,
-                    "day": 27,
-                    "hour": 20,
-                    "minute": 24,
-                    "second": 33,
-                    "microsecond": 562000
-                },
-                "baseModelArn": "arn:aws:bedrock:us-west-2::foundation-model/meta.llama3-1-8b-instruct-v1:0:128k",
-                "baseModelName": "",
-                "customizationType": "FINE_TUNING",
-                "ownerAccountId": "644160558196",
-                "modelStatus": "Active"
-            },
-            {
                 "modelArn": "arn:aws:bedrock:us-west-2:644160558196:custom-model/meta.llama3-3-70b-instruct-v1:0:128k/ooyhjc4zw7mw",
                 "modelName": "KEEP-c7n-deployable-test-fixture",
                 "creationTime": {

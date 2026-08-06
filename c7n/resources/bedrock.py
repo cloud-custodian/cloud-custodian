@@ -270,56 +270,6 @@ class ModelDeploymentsFilter(Filter):
         return results
 
 
-@BedrockCustomModel.filter_registry.register('provisioned-throughputs')
-class ModelProvisionedThroughputsFilter(Filter):
-    """Filter custom models by their provisioned model throughputs.
-
-    Queries ``ListProvisionedModelThroughputs`` for throughputs referencing
-    the model, optionally scoped server-side by ``status``. Matches
-    ``value: present`` if any matching provisioned throughput is found, or
-    ``value: absent`` if none is found.
-
-    :example:
-
-    Find custom models with no in-service provisioned throughput:
-
-    .. code-block:: yaml
-
-        policies:
-          - name: bedrock-custom-model-no-provisioned-throughput
-            resource: aws.bedrock-custom-model
-            filters:
-              - type: provisioned-throughputs
-                status: InService
-                value: absent
-    """
-    schema = type_schema(
-        'provisioned-throughputs',
-        status={'enum': ['Creating', 'InService', 'Updating', 'Failed']},
-        value={'enum': ['present', 'absent']},
-        required=['value'])
-    permissions = ('bedrock:ListProvisionedModelThroughputs',)
-    annotation_key = 'c7n:provisioned-throughputs'
-
-    def process(self, resources, event=None):
-        client = local_session(self.manager.session_factory).client('bedrock')
-        params = {}
-        if 'status' in self.data:
-            params['statusEquals'] = self.data['status']
-        want_present = self.data['value'] == 'present'
-        results = []
-        for r in resources:
-            throughputs = self.manager.retry(
-                client.get_paginator('list_provisioned_model_throughputs').paginate(
-                    modelArnEquals=r['modelArn'], **params
-                ).build_full_result
-            )['provisionedModelSummaries']
-            r[self.annotation_key] = throughputs
-            if bool(throughputs) == want_present:
-                results.append(r)
-        return results
-
-
 class DescribeBedrockCustomizationJob(DescribeSource):
 
     def augment(self, resources):

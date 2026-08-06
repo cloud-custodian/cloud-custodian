@@ -14,9 +14,8 @@ it queued waiting for training capacity, so blocking is impractical -- and
 credentials tend to expire out from under a long wait. It submits the job and
 prints the command to check on it.
 
-All configuration comes from main.tf's outputs, so this file is identical to the
-one in the sibling bedrock_provisionable_custom_model fixture. Each fixture
-directory is kept self-contained rather than sharing a parameterized script.
+All configuration comes from main.tf's outputs, so this script holds no
+fixture-specific values.
 
 Usage, after `tofu apply` in this directory:
 
