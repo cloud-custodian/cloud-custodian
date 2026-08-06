@@ -1,5 +1,6 @@
 from botocore.exceptions import ClientError
 import time
+from unittest.mock import MagicMock
 
 from .common import BaseTest
 from c7n.utils import local_session
@@ -143,3 +144,20 @@ class TestKeyspaceTable(BaseTest):
                 keyspaceName=resources[0]['keyspaceName'],
                 tableName=resources[0]['tableName']
             )
+
+
+class TestKeyspaceDynamicTag(BaseTest):
+    def test_keyspace_dynamic_tag(self):
+        mock_factory = MagicMock()
+        mock_factory.region = 'us-east-1'
+        tag_resource = mock_factory().client('keyspaces').tag_resource
+        tag_resource.return_value = {}
+        policy = self.load_policy(
+            {'name': 'ks', 'resource': 'keyspace',
+             'actions': [{'type': 'tag', 'tags': {
+                 'Name': {'type': 'resource', 'key': 'keyspaceName'}}}]},
+            session_factory=mock_factory)
+        policy.resource_manager.actions[0].process(
+            [{'keyspaceName': 'ks1', 'resourceArn': 'arn:ks1'}])
+        tag_resource.assert_called_once_with(
+            resourceArn='arn:ks1', tags=[{'key': 'Name', 'value': 'ks1'}])

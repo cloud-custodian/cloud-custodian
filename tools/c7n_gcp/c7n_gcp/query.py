@@ -228,7 +228,7 @@ class QueryResourceManager(ResourceManager, metaclass=QueryMeta):
 
     def _fetch_resources(self, query):
         try:
-            return self.augment(self.source.get_resources(query)) or []
+            return self.augment(self.source.get_resources(query) or [])
         except HttpError as e:
             error_reason, error_code, error_message = extract_errors(e)
 

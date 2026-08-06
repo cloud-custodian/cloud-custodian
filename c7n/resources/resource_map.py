@@ -234,6 +234,7 @@ ResourceMap = {
   "aws.memorydb-user": "c7n.resources.memorydb.MemoryDbUser",
   "aws.memorydb-acl": "c7n.resources.memorydb.MemoryDbAcl",
   "aws.memorydb-subnet-group": "c7n.resources.memorydb.MemoryDbSubnetGroup",
+  "aws.memorydb-parameter-group": "c7n.resources.memorydb.MemoryDbParameterGroup",
   "aws.message-broker": "c7n.resources.mq.MessageBroker",
   "aws.message-config": "c7n.resources.mq.MessageConfig",
   "aws.mirror-session": "c7n.resources.vpc.TrafficMirrorSession",
