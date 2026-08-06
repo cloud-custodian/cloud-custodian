@@ -1284,12 +1284,8 @@ def test_bedrock_inference_profile_bad_statistics(test):
 # AWS-generated id that changes every time it is rebuilt, while the name is ours
 # and is fixed. Keying off the name means a rebuild needs no edit here -- only
 # re-recording.
-CUSTOM_MODELS = dict(
-    deployable=dict(
-        name="KEEP-c7n-deployable-test-fixture",
-        region="us-west-2",
-    ),
-)
+DEPLOYABLE_CUSTOM_MODEL_NAME = "KEEP-c7n-deployable-test-fixture"
+DEPLOYABLE_CUSTOM_MODEL_REGION = "us-west-2"
 
 
 def wait_for_custom_model_deployment_active(client, deployment_arn, test):
@@ -1310,6 +1306,9 @@ def wait_for_custom_model_deployment_active(client, deployment_arn, test):
 @pytest.fixture
 def create_custom_model_deployment(test):
     """Create an on-demand custom model deployment for a test, clean it up after.
+
+    The AWS provider has no custom model deployment resource, so this cannot be
+    a Terraform fixture; the deployment has to be created through the API.
 
     Builds its client from ``test.session_factory``, which the test must set
     (via ``record_flight_data``/``replay_flight_data``) before calling the
@@ -1339,17 +1338,19 @@ def create_custom_model_deployment(test):
 
 
 def test_bedrock_custom_model_deployments_filter(test, create_custom_model_deployment):
-    model = CUSTOM_MODELS['deployable']
     test.session_factory = test.replay_flight_data(
-        'test_bedrock_custom_model_deployments_filter', region=model['region'])
+        'test_bedrock_custom_model_deployments_filter',
+        region=DEPLOYABLE_CUSTOM_MODEL_REGION)
 
     # CreateCustomModelDeployment needs the ARN; GetCustomModel takes the name.
-    client = test.session_factory().client('bedrock', region_name=model['region'])
-    model_arn = client.get_custom_model(modelIdentifier=model['name'])['modelArn']
+    client = test.session_factory().client(
+        'bedrock', region_name=DEPLOYABLE_CUSTOM_MODEL_REGION)
+    model_arn = client.get_custom_model(
+        modelIdentifier=DEPLOYABLE_CUSTOM_MODEL_NAME)['modelArn']
 
     # Populate an on-demand deployment on the fixture model; its create/poll
     # calls are recorded via the same session used below.
-    create_custom_model_deployment(model_arn, model['region'])
+    create_custom_model_deployment(model_arn, DEPLOYABLE_CUSTOM_MODEL_REGION)
 
     # Unscoped, like the undeployed test: the policy discovers every custom
     # model with an active deployment, and the fixture model must be among them.
@@ -1362,13 +1363,13 @@ def test_bedrock_custom_model_deployments_filter(test, create_custom_model_deplo
             ],
         },
         session_factory=test.session_factory,
-        config={'region': model['region']},
+        config={'region': DEPLOYABLE_CUSTOM_MODEL_REGION},
     )
     resources = present.run()
 
     test.assertGreaterEqual(len(resources), 1)
     deployed_names = {r['modelName'] for r in resources}
-    test.assertIn(model['name'], deployed_names)
+    test.assertIn(DEPLOYABLE_CUSTOM_MODEL_NAME, deployed_names)
     for r in resources:
         test.assertEqual(r['c7n:deployments'][0]['status'], 'Active')
 
@@ -1379,9 +1380,9 @@ def test_bedrock_custom_model_undeployed(test):
     # serving nothing. The policy is unscoped (no model selector), so it
     # discovers undeployed models across the account via the filter's absent
     # branch, and the fixture model must be among them.
-    model = CUSTOM_MODELS['deployable']
     test.session_factory = test.replay_flight_data(
-        'test_bedrock_custom_model_undeployed', region=model['region'])
+        'test_bedrock_custom_model_undeployed',
+        region=DEPLOYABLE_CUSTOM_MODEL_REGION)
 
     policy = test.load_policy(
         {
@@ -1392,12 +1393,12 @@ def test_bedrock_custom_model_undeployed(test):
             ],
         },
         session_factory=test.session_factory,
-        config={'region': model['region']},
+        config={'region': DEPLOYABLE_CUSTOM_MODEL_REGION},
     )
     resources = policy.run()
 
     test.assertGreaterEqual(len(resources), 1)
     undeployed_names = {r['modelName'] for r in resources}
-    test.assertIn(model['name'], undeployed_names)
+    test.assertIn(DEPLOYABLE_CUSTOM_MODEL_NAME, undeployed_names)
     for r in resources:
         test.assertEqual(r['c7n:deployments'], [])

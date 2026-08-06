@@ -7,8 +7,8 @@ custom model takes hours, most of it queued waiting for training capacity.
 So, unlike most fixtures in `tests/terraform`, this one is **applied manually,
 out of band**, and is *not* managed by pytest-terraform. No test declares
 `@terraform("bedrock_deployable_custom_model")`, and none should. The tests
-reference the resulting model only through `CUSTOM_MODELS` in
-`tests/test_bedrock.py`, by **model name**.
+reference the resulting model only through `DEPLOYABLE_CUSTOM_MODEL_NAME` in
+`tests/test_bedrock.py`.
 
 # Bedrock "deployable" custom model fixture
 
@@ -34,6 +34,11 @@ account permanently. `setup.py` timestamps each job name to keep them unique.
 of it queued waiting for training capacity, so blocking is impractical -- and
 credentials tend to expire out from under a long wait. It submits and prints the
 command to check on it.
+
+The **deployment** the tests put on this model is not Terraform-managed either,
+for a simpler reason: the AWS provider has no custom model deployment resource
+(checked against hashicorp/aws 6.56.0). The tests create it through the API, in
+a pytest fixture.
 
 ## Why this base model
 
@@ -129,5 +134,6 @@ for `Active` first.
 ## After rebuilding
 
 The model ARN changes (new AWS-generated id), but the **name does not**, so
-`CUSTOM_MODELS` in `tests/test_bedrock.py` needs no edit. The recorded flight
+`DEPLOYABLE_CUSTOM_MODEL_NAME` in `tests/test_bedrock.py` needs no edit. The
+recorded flight
 data does contain the old ARN, so re-record the affected tests.
