@@ -7,6 +7,7 @@ import time
 from freezegun import freeze_time
 from unittest.mock import MagicMock, call
 
+from c7n import tags as tagmod
 from c7n.tags import universal_retry, coalesce_copy_user_tags
 from c7n.exceptions import PolicyExecutionError, PolicyValidationError
 from c7n.utils import yaml_load
@@ -603,3 +604,142 @@ class CopyRelatedResourceTag(BaseTest):
             ]
         }
         self.assertRaises(PolicyValidationError, self.load_policy, policy)
+
+
+class ResolveTagValueTest(BaseTest):
+    def test_static_passthrough(self):
+        self.assertEqual(
+            tagmod.resolve_tag_value("plain", "K", {}, set()), "plain")
+
+    def test_lookup_with_key_hit(self):
+        r = {"State": {"Name": "running"}}
+        spec = {"type": "resource", "key": "State.Name"}
+        self.assertEqual(tagmod.resolve_tag_value(spec, "K", r, set()), "running")
+
+    def test_lookup_with_key_miss_uses_default(self):
+        spec = {"type": "resource", "key": "Nope", "default-value": "dv"}
+        self.assertEqual(tagmod.resolve_tag_value(spec, "K", {}, set()), "dv")
+
+    def test_lookup_with_key_miss_no_default_raises(self):
+        spec = {"type": "resource", "key": "Nope"}
+        with self.assertRaises(Exception):
+            tagmod.resolve_tag_value(spec, "K", {}, set())
+
+    def test_conditional_tag_absent_writes_default(self):
+        spec = {"type": "resource", "default-value": "dv"}
+        self.assertEqual(
+            tagmod.resolve_tag_value(spec, "Owner", {}, set()), "dv")
+
+    def test_conditional_tag_present_skips(self):
+        spec = {"type": "resource", "default-value": "dv"}
+        self.assertIs(
+            tagmod.resolve_tag_value(spec, "Owner", {}, {"Owner"}),
+            tagmod.TAG_VALUE_SKIP)
+
+    def test_resource_tag_keys_list_and_dict(self):
+        self.assertEqual(
+            tagmod.resource_tag_keys({"Tags": [{"Key": "A", "Value": "1"}]}), {"A"})
+        self.assertEqual(
+            tagmod.resource_tag_keys({"Tags": {"B": "2"}}), {"B"})
+        self.assertEqual(tagmod.resource_tag_keys({}), set())
+
+    def test_has_dynamic(self):
+        self.assertFalse(tagmod.has_dynamic_tag_values({"A": "x"}))
+        self.assertTrue(
+            tagmod.has_dynamic_tag_values({"A": {"type": "resource", "key": "k"}}))
+
+
+class DynamicTagTest(BaseTest):
+    def _run(self, resources, tags, resource='ec2'):
+        mock_factory = MagicMock()
+        mock_factory.region = 'us-east-1'
+        create_tags = mock_factory().client(resource).create_tags
+        create_tags.return_value = {}
+        policy = self.load_policy(
+            {"name": "d", "resource": resource,
+             "actions": [{"type": "tag", "tags": tags}]},
+            session_factory=mock_factory)
+        policy.resource_manager.actions[0].process(resources)
+        return create_tags
+
+    def test_lookup_key_hit(self):
+        create_tags = self._run(
+            [{"InstanceId": "i-1", "State": {"Name": "running"}}],
+            {"St": {"type": "resource", "key": "State.Name"}})
+        create_tags.assert_called_once_with(
+            Resources=["i-1"], Tags=[{"Key": "St", "Value": "running"}], DryRun=False)
+
+    def test_lookup_key_miss_default(self):
+        create_tags = self._run(
+            [{"InstanceId": "i-1"}],
+            {"St": {"type": "resource", "key": "Nope", "default-value": "dv"}})
+        create_tags.assert_called_once_with(
+            Resources=["i-1"], Tags=[{"Key": "St", "Value": "dv"}], DryRun=False)
+
+    def test_conditional_skip_and_write_group_separately(self):
+        create_tags = self._run(
+            [{"InstanceId": "i-has", "Tags": [{"Key": "Owner", "Value": "x"}]},
+             {"InstanceId": "i-missing"}],
+            {"Owner": {"type": "resource", "default-value": "dv"}})
+        # i-has -> skipped (empty payload, no call); i-missing -> Owner=dv
+        create_tags.assert_called_once_with(
+            Resources=["i-missing"], Tags=[{"Key": "Owner", "Value": "dv"}],
+            DryRun=False)
+
+    def test_dynamic_grouping_two_payloads(self):
+        create_tags = self._run(
+            [{"InstanceId": "i-1", "State": {"Name": "running"}},
+             {"InstanceId": "i-2", "State": {"Name": "stopped"}},
+             {"InstanceId": "i-3", "State": {"Name": "running"}}],
+            {"St": {"type": "resource", "key": "State.Name"}})
+        self.assertEqual(create_tags.call_count, 2)
+        by_value = {c.kwargs["Tags"][0]["Value"]: set(c.kwargs["Resources"])
+                    for c in create_tags.call_args_list}
+        self.assertEqual(by_value["running"], {"i-1", "i-3"})
+        self.assertEqual(by_value["stopped"], {"i-2"})
+
+    def test_static_fast_path_single_call(self):
+        create_tags = self._run(
+            [{"InstanceId": "i-1"}, {"InstanceId": "i-2"}], {"K": "v"})
+        create_tags.assert_called_once_with(
+            Resources=["i-1", "i-2"], Tags=[{"Key": "K", "Value": "v"}], DryRun=False)
+
+    @freeze_time("2022-06-27 12:34:56")
+    def test_placeholder_interpolated_in_default_value(self):
+        create_tags = self._run(
+            [{"InstanceId": "i-1"}],
+            {"Stamp": {"type": "resource", "key": "Nope",
+                       "default-value": "created-{now}-in-{region}"}})
+        create_tags.assert_called_once_with(
+            Resources=["i-1"],
+            Tags=[{"Key": "Stamp", "Value": "created-2022-06-27 12:34:56-in-us-east-1"}],
+            DryRun=False)
+
+
+class DynamicUniversalTagTest(BaseTest):
+    def _run(self, resources, tags, resource='rds'):
+        mock_factory = MagicMock()
+        mock_factory.region = 'us-east-1'
+        tag_resources = mock_factory().client('resourcegroupstaggingapi').tag_resources
+        tag_resources.return_value = {}
+        policy = self.load_policy(
+            {"name": "d", "resource": resource,
+             "actions": [{"type": "tag", "tags": tags}]},
+            session_factory=mock_factory)
+        policy.resource_manager.actions[0].process(resources)
+        return tag_resources
+
+    def test_universal_lookup_hit(self):
+        tag_resources = self._run(
+            [{"DBInstanceIdentifier": "x", "DBInstanceArn": "arn:x",
+              "Engine": "postgres"}],
+            {"Eng": {"type": "resource", "key": "Engine"}})
+        tag_resources.assert_called_once_with(
+            ResourceARNList=["arn:x"], Tags={"Eng": "postgres"})
+
+    def test_universal_static_fast_path(self):
+        tag_resources = self._run(
+            [{"DBInstanceIdentifier": "x", "DBInstanceArn": "arn:x"}],
+            {"K": "v"})
+        tag_resources.assert_called_once_with(
+            ResourceARNList=["arn:x"], Tags={"K": "v"})
