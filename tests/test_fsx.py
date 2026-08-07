@@ -1447,3 +1447,65 @@ class TestFSxBackup(BaseTest):
         self.assertEqual(len(resources), 3)
         for r in resources:
             self.assertEqual(len(r['c7n:matched-kms-key']), 1)
+
+
+class TestFSxStorageVirtualMachine(BaseTest):
+
+    def test_svm_query(self):
+        session_factory = self.replay_flight_data("test_fsx_svm_managed_ad")
+        p = self.load_policy({
+            "name": "fsx_svm_query",
+            "resource": "aws.fsx-storage-virtual-machine",
+        }, session_factory=session_factory)
+        resources = p.run()
+        self.assertEqual(len(resources), 2)
+        self.assertEqual(
+            sorted(r["StorageVirtualMachineId"] for r in resources),
+            ["svm-05b1f4f80089ba22d", "svm-097e3d446a223c732"])
+
+    def test_svm_not_joined_to_managed_ad(self):
+        # the control: flag any ontap svm not positively resolved to an
+        # aws managed microsoft ad.
+        session_factory = self.replay_flight_data("test_fsx_svm_managed_ad")
+        p = self.load_policy({
+            "name": "fsx-ontap-svm-must-use-managed-ad",
+            "resource": "aws.fsx-storage-virtual-machine",
+            "filters": [{"type": "active-directory", "match": "not-managed"}],
+        }, session_factory=session_factory)
+        resources = p.run()
+        self.assertEqual(len(resources), 1)
+        self.assertEqual(resources[0]["StorageVirtualMachineId"], "svm-05b1f4f80089ba22d")
+        self.assertEqual(
+            resources[0]["c7n:ActiveDirectory"],
+            {"managed": False, "reason": "NoActiveDirectory"})
+
+    def test_svm_joined_to_managed_ad_is_compliant(self):
+        session_factory = self.replay_flight_data("test_fsx_svm_managed_ad")
+        p = self.load_policy({
+            "name": "fsx_svm_managed_ad",
+            "resource": "aws.fsx-storage-virtual-machine",
+            "filters": [{"type": "active-directory", "match": "managed"}],
+        }, session_factory=session_factory)
+        resources = p.run()
+        self.assertEqual(len(resources), 1)
+        r = resources[0]
+        self.assertEqual(r["StorageVirtualMachineId"], "svm-097e3d446a223c732")
+        # fsx reports CORP.C7NTEST.COM, directory service reports
+        # corp.c7ntest.com, so both signals have to resolve.
+        self.assertEqual(
+            r["ActiveDirectoryConfiguration"][
+                "SelfManagedActiveDirectoryConfiguration"]["DomainName"],
+            "CORP.C7NTEST.COM")
+        self.assertEqual(r["c7n:ActiveDirectory"]["DirectoryType"], "MicrosoftAD")
+        self.assertEqual(r["c7n:ActiveDirectory"]["DirectoryId"], "d-90667bfee0")
+        self.assertEqual(r["c7n:ActiveDirectory"]["matched-on"], "dns-ips,domain-name")
+
+    def test_svm_permissions(self):
+        p = self.load_policy({
+            "name": "fsx_svm_permissions",
+            "resource": "aws.fsx-storage-virtual-machine",
+            "filters": [{"type": "active-directory", "match": "not-managed"}],
+        })
+        self.assertEqual(
+            sorted(p.get_permissions()),
+            ["ds:DescribeDirectories", "fsx:DescribeStorageVirtualMachines"])

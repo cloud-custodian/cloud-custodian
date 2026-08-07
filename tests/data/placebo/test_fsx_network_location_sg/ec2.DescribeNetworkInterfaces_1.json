@@ -4,9 +4,8 @@
     "NetworkInterfaces": [
       {
         "NetworkInterfaceId": "eni-0ebf4e9347b99b6d3",
-        "Description": "FSx for ONTAP file system fs-0e3e2a9e1f5ff7a13",
-        "RequesterManaged": true,
-        "RequesterId": "amazon-fsx",
+        "Description": "[Do not detach or untag] Amazon FSx network interface for fs-0e3e2a9e1f5ff7a13",
+        "RequesterManaged": false,
         "Status": "in-use",
         "VpcId": "vpc-d2d616b5",
         "SubnetId": "subnet-3a334610",
@@ -24,9 +23,8 @@
       },
       {
         "NetworkInterfaceId": "eni-0dcc101a580b07620",
-        "Description": "FSx for ONTAP file system fs-0e3e2a9e1f5ff7a13",
-        "RequesterManaged": true,
-        "RequesterId": "amazon-fsx",
+        "Description": "[Do not detach or untag] Amazon FSx network interface for fs-0e3e2a9e1f5ff7a13",
+        "RequesterManaged": false,
         "Status": "in-use",
         "VpcId": "vpc-d2d616b5",
         "SubnetId": "subnet-3a334610",
@@ -44,9 +42,8 @@
       },
       {
         "NetworkInterfaceId": "eni-0316083e722388ce3",
-        "Description": "FSx for Windows file system fs-0bc98cbfb6b356896",
-        "RequesterManaged": true,
-        "RequesterId": "amazon-fsx",
+        "Description": "[Do not detach or untag] Amazon FSx network interface for fs-0bc98cbfb6b356896",
+        "RequesterManaged": false,
         "Status": "in-use",
         "VpcId": "vpc-d2d616b5",
         "SubnetId": "subnet-efbcccb7",

@@ -110,6 +110,120 @@ class FSxVolumesFilter(ListItemFilter):
         return super().process(resources, event)
 
 
+@resources.register('fsx-storage-virtual-machine')
+class FSxStorageVirtualMachine(QueryResourceManager):
+
+    class resource_type(TypeInfo):
+        service = 'fsx'
+        enum_spec = ('describe_storage_virtual_machines', 'StorageVirtualMachines', None)
+        name = 'Name'
+        id = 'StorageVirtualMachineId'
+        arn = 'ResourceARN'
+        date = 'CreationTime'
+        cfn_type = 'AWS::FSx::StorageVirtualMachine'
+        filter_name = 'StorageVirtualMachineIds'
+        filter_type = 'list'
+        id_prefix = 'svm-'
+        default_report_fields = (
+            'StorageVirtualMachineId',
+            'Name',
+            'FileSystemId',
+            'Lifecycle',
+            'Subtype',
+        )
+    permissions = ('fsx:DescribeStorageVirtualMachines',)
+
+
+@FSxStorageVirtualMachine.filter_registry.register('active-directory')
+class SvmActiveDirectoryFilter(Filter):
+    """Filter ontap storage virtual machines on the directory they're joined to.
+
+    Unlike fsx for windows, which reports an ActiveDirectoryId for a managed
+    directory, an ontap svm reports every join - managed or not - through
+    SelfManagedActiveDirectoryConfiguration with no directory id. The joined
+    directory is resolved by matching the svm's configured dns servers against
+    directory service, with the domain name as corroboration.
+
+    `match: managed` fails closed, an svm is only compliant when it can be
+    positively resolved to an aws managed microsoft ad.
+
+    :example:
+
+    .. code-block:: yaml
+
+        policies:
+          - name: fsx-ontap-svm-must-use-managed-ad
+            resource: aws.fsx-storage-virtual-machine
+            filters:
+              - type: active-directory
+                match: not-managed
+    """
+
+    schema = type_schema(
+        'active-directory',
+        match={'enum': ['managed', 'not-managed', 'any']})
+    permissions = ('ds:DescribeDirectories',)
+    annotation_key = 'c7n:ActiveDirectory'
+
+    # a directory shared from another account is reported as SharedMicrosoftAD,
+    # with the owning account's domain controllers in OwnerDirectoryDescription.
+    managed_types = ('MicrosoftAD', 'SharedMicrosoftAD')
+
+    def get_directories(self):
+        client = local_session(self.manager.session_factory).client('ds')
+        directories = []
+        for page in client.get_paginator('describe_directories').paginate():
+            directories.extend(page['DirectoryDescriptions'])
+        return directories
+
+    def resolve(self, svm, directories):
+        ad = (svm.get('ActiveDirectoryConfiguration') or {}).get(
+            'SelfManagedActiveDirectoryConfiguration')
+        if not ad:
+            return {'managed': False, 'reason': 'NoActiveDirectory'}
+
+        dns_ips = set(ad.get('DnsIps') or ())
+        # fsx uppercases the domain name it reports, directory service
+        # doesn't, so the names only compare case insensitively.
+        domain = (ad.get('DomainName') or '').lower().rstrip('.')
+
+        for d in directories:
+            owner = d.get('OwnerDirectoryDescription') or {}
+            directory_ips = set(d.get('DnsIpAddrs') or ()) | set(owner.get('DnsIpAddrs') or ())
+            name_match = domain and domain == d.get('Name', '').lower().rstrip('.')
+            ip_match = bool(dns_ips and dns_ips & directory_ips)
+            if not (ip_match or name_match):
+                continue
+            return {
+                'managed': d.get('Type') in self.managed_types,
+                'reason': (
+                    'ManagedDirectory' if d.get('Type') in self.managed_types
+                    else 'UnmanagedDirectory'),
+                'DirectoryId': d.get('DirectoryId'),
+                'DirectoryType': d.get('Type'),
+                'DirectoryName': d.get('Name'),
+                'matched-on': (
+                    ip_match and name_match and 'dns-ips,domain-name'
+                    or ip_match and 'dns-ips' or 'domain-name'),
+            }
+
+        return {'managed': False, 'reason': 'UnresolvedDirectory',
+                'DomainName': ad.get('DomainName'),
+                'DnsIps': sorted(dns_ips)}
+
+    def process(self, resources, event=None):
+        directories = self.get_directories()
+        match = self.data.get('match', 'not-managed')
+
+        results = []
+        for r in resources:
+            found = self.resolve(r, directories)
+            r[self.annotation_key] = found
+            if match == 'any' or found['managed'] is (match == 'managed'):
+                results.append(r)
+        return results
+
+
 @resources.register('fsx-backup')
 class FSxBackup(QueryResourceManager):
 
