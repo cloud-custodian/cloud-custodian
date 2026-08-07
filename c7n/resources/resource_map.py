@@ -302,6 +302,8 @@ ResourceMap = {
   "aws.rrset": "c7n.resources.route53.ResourceRecordSet",
   "aws.s3": "c7n.resources.s3.S3",
   "aws.s3-directory": "c7n.resources.s3.S3Directory",
+  "aws.s3-table": "c7n.resources.s3tables.Table",
+  "aws.s3-table-bucket": "c7n.resources.s3tables.TableBucket",
   "aws.s3-access-point": "c7n.resources.s3control.AccessPoint",
   "aws.s3-access-point-multi": "c7n.resources.s3control.MultiRegionAccessPoint",
   "aws.s3-storage-lens": "c7n.resources.s3control.StorageLens",

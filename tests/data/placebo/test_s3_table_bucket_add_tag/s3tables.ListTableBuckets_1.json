@@ -1,0 +1,59 @@
+{
+    "status_code": 200,
+    "data": {
+        "ResponseMetadata": {},
+        "tableBuckets": [
+            {
+                "arn": "arn:aws:s3tables:us-east-1:644160558196:bucket/c7n-test-tb-bare",
+                "name": "c7n-test-tb-bare",
+                "ownerAccountId": "644160558196",
+                "createdAt": {
+                    "__class__": "datetime",
+                    "year": 2026,
+                    "month": 8,
+                    "day": 3,
+                    "hour": 2,
+                    "minute": 59,
+                    "second": 39,
+                    "microsecond": 108565
+                },
+                "tableBucketId": "6427d950-ded9-4751-8a9f-52c74dabc91e",
+                "type": "customer"
+            },
+            {
+                "arn": "arn:aws:s3tables:us-east-1:644160558196:bucket/c7n-test-tb-compliant",
+                "name": "c7n-test-tb-compliant",
+                "ownerAccountId": "644160558196",
+                "createdAt": {
+                    "__class__": "datetime",
+                    "year": 2026,
+                    "month": 8,
+                    "day": 3,
+                    "hour": 2,
+                    "minute": 59,
+                    "second": 35,
+                    "microsecond": 655498
+                },
+                "tableBucketId": "a1389b48-9e38-4f41-aa7c-c9cbfa3ca5b1",
+                "type": "customer"
+            },
+            {
+                "arn": "arn:aws:s3tables:us-east-1:644160558196:bucket/c7n-test-tb-open",
+                "name": "c7n-test-tb-open",
+                "ownerAccountId": "644160558196",
+                "createdAt": {
+                    "__class__": "datetime",
+                    "year": 2026,
+                    "month": 8,
+                    "day": 3,
+                    "hour": 2,
+                    "minute": 59,
+                    "second": 37,
+                    "microsecond": 752081
+                },
+                "tableBucketId": "5ec19e60-3df0-4781-93d7-644160558196",
+                "type": "customer"
+            }
+        ]
+    }
+}
