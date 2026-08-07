@@ -1272,18 +1272,9 @@ def test_bedrock_inference_profile_bad_statistics(test):
         )
 
 
-# These tests run against a real, prebuilt custom model kept as a long-lived
-# fixture. Fine-tuning a custom model takes hours, and for Nova base models it
-# would not complete in the test account at all, so it can't be created per test
-# run. The base model has to be one eligible for on-demand custom model
-# deployment, which is what the `deployments` filter looks for -- Llama 3.3 70B.
-# See tests/terraform/bedrock_deployable_custom_model for how it is built, and
-# rebuilt if someone deletes it.
-#
-# It is identified by name rather than ARN on purpose: a model's ARN ends in an
-# AWS-generated id that changes every time it is rebuilt, while the name is ours
-# and is fixed. Keying off the name means a rebuild needs no edit here -- only
-# re-recording.
+# A long-lived model, not built per test run -- fine-tuning takes hours. Found
+# by name, since a rebuild changes its ARN.
+# See tests/terraform/bedrock_deployable_custom_model.
 DEPLOYABLE_CUSTOM_MODEL_NAME = "KEEP-c7n-deployable-test-fixture"
 DEPLOYABLE_CUSTOM_MODEL_REGION = "us-west-2"
 
@@ -1305,16 +1296,12 @@ def wait_for_custom_model_deployment_active(client, deployment_arn, test):
 
 @pytest.fixture
 def create_custom_model_deployment(test):
-    """Create an on-demand custom model deployment for a test, clean it up after.
+    """Create an on-demand custom model deployment, and clean it up after.
 
-    The AWS provider has no custom model deployment resource, so this cannot be
-    a Terraform fixture; the deployment has to be created through the API.
+    Not a Terraform fixture: the AWS provider has no deployment resource.
 
-    Builds its client from ``test.session_factory``, which the test must set
-    (via ``record_flight_data``/``replay_flight_data``) before calling the
-    yielded function, so the create and poll calls record/replay with the rest
-    of the test. Yields ``(model_arn, region) -> deployment_arn`` which creates
-    the deployment and waits for it to become ``Active``.
+    Yields ``(model_arn, region) -> deployment_arn``. Set
+    ``test.session_factory`` first, so its calls record with the test.
     """
     created = []
 
@@ -1348,12 +1335,9 @@ def test_bedrock_custom_model_deployments_filter(test, create_custom_model_deplo
     model_arn = client.get_custom_model(
         modelIdentifier=DEPLOYABLE_CUSTOM_MODEL_NAME)['modelArn']
 
-    # Populate an on-demand deployment on the fixture model; its create/poll
-    # calls are recorded via the same session used below.
     create_custom_model_deployment(model_arn, DEPLOYABLE_CUSTOM_MODEL_REGION)
 
-    # Unscoped, like the undeployed test: the policy discovers every custom
-    # model with an active deployment, and the fixture model must be among them.
+    # Unscoped, as a real policy would be.
     present = test.load_policy(
         {
             'name': 'bedrock-custom-model-active-deployment',
@@ -1367,17 +1351,12 @@ def test_bedrock_custom_model_deployments_filter(test, create_custom_model_deplo
     )
     resources = present.run()
 
-    # Only that the fixture model is among the results: this is a shared
-    # account, so other custom models may come and go.
+    # Shared account, so other models may come and go -- only assert ours.
     assert any(r['modelName'] == DEPLOYABLE_CUSTOM_MODEL_NAME for r in resources)
 
 
 def test_bedrock_custom_model_undeployed(test):
-    # An undeployed custom model: Active, but with no Active on-demand
-    # deployment -- the issue's target for cleanup, since it costs storage while
-    # serving nothing. The policy is unscoped (no model selector), so it
-    # discovers undeployed models across the account via the filter's absent
-    # branch, and the fixture model must be among them.
+    # An Active model with no deployment: costs storage while serving nothing.
     test.session_factory = test.replay_flight_data(
         'test_bedrock_custom_model_undeployed',
         region=DEPLOYABLE_CUSTOM_MODEL_REGION)

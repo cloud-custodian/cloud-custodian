@@ -3,23 +3,11 @@
 # SPDX-License-Identifier: Apache-2.0
 """Submit the customization job that builds this fixture's custom model.
 
-Terraform cannot own the resulting custom model: aws_bedrock_custom_model
-deletes the model on destroy, and this model is a long-lived fixture that must
-survive `tofu destroy` of its transient prerequisites (see README.md). So
-main.tf creates only the buckets, training data, and IAM role, and this script
-submits the job that produces the model.
-
-This script does not wait for the job. Customization takes hours, nearly all of
-it queued waiting for training capacity, so blocking is impractical -- and
-credentials tend to expire out from under a long wait. It submits the job and
-prints the command to check on it.
-
-All configuration comes from main.tf's outputs, so this script holds no
-fixture-specific values.
+Doesn't wait for the job: it takes hours. Prints the command to check on it.
 
 Usage, after `tofu apply` in this directory:
 
-    ./setup.py
+    ../../../.venv/bin/python setup.py
 """
 
 import json
@@ -63,9 +51,7 @@ def main():
     region = outputs['region']
     client = boto3.client('bedrock', region_name=region)
 
-    # Jobs cannot be deleted (there is no DeleteModelCustomizationJob API, only
-    # Stop) and job names must be unique, so timestamp each submission. The
-    # prefix carries the owner's username so accumulated jobs stay attributable.
+    # Job names must be unique.
     job_name = '{}-{:%Y%m%d%H%M%S}'.format(
         outputs['job_name_prefix'], datetime.now(timezone.utc))
 
@@ -78,8 +64,6 @@ def main():
         trainingDataConfig={'s3Uri': outputs['training_data_s3_uri']},
         outputDataConfig={'s3Uri': outputs['output_s3_uri']},
         hyperParameters=outputs['hyperparameters'],
-        # Terraform cannot tag a model it does not create, so tag here. The
-        # KEEP tag explains the fixture to anyone cleaning up the account.
         jobTags=as_tag_list(outputs['fixture_tags']),
         customModelTags=as_tag_list(outputs['fixture_tags']),
     )
