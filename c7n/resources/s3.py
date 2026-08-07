@@ -588,6 +588,10 @@ class BucketAssembly:
             self.region_clients[region] = self.session.client('s3', region_name=region)
             return self.region_clients[region]
 
+    def handle_not_found(self, bucket, method_name, error_code=None):
+        """Allow specialized assembly users to retain a not-found signal."""
+        return
+
     def assemble(self, bucket):
 
         client = self.get_client(self.default_region)
@@ -617,6 +621,7 @@ class BucketAssembly:
             except ClientError as e:
                 code = e.response['Error']['Code']
                 if code.startswith("NoSuch") or "NotFound" in code:
+                    self.handle_not_found(bucket, method_name, code)
                     value = default
                 elif code == 'PermanentRedirect':  # pragma: no cover
                     # (09/2025)- its not clear how we get here given a client region switch post
