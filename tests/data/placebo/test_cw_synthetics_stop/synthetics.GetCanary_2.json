@@ -25,7 +25,7 @@
             "SuccessRetentionPeriodInDays": 31,
             "FailureRetentionPeriodInDays": 31,
             "Status": {
-                "State": "RUNNING"
+                "State": "STOPPING"
             },
             "Timeline": {
                 "Created": {
@@ -44,9 +44,9 @@
                     "month": 10,
                     "day": 5,
                     "hour": 14,
-                    "minute": 14,
-                    "second": 55,
-                    "microsecond": 431000
+                    "minute": 19,
+                    "second": 29,
+                    "microsecond": 677000
                 },
                 "LastStarted": {
                     "__class__": "datetime",
