@@ -1,9 +1,10 @@
 # Copyright The Cloud Custodian Authors.
 # SPDX-License-Identifier: Apache-2.0
 import logging
+import time
+import pytest
 from .common import ACCOUNT_ID, BaseTest, event_data
 from botocore.exceptions import ClientError
-import pytest
 from pytest_terraform import terraform
 from c7n.exceptions import PolicyValidationError
 from c7n.testing import C7N_FUNCTIONAL
@@ -426,6 +427,20 @@ class BedrockCustomModel(BaseTest):
         tags = client.list_tags_for_resource(resourceARN=resources[0]['modelArn'])['tags']
         self.assertEqual(len(tags), 1)
         self.assertEqual(tags, [{'key': 'foo', 'value': 'bar'}])
+
+    def test_bedrock_custom_model_deployments_filter_schema(self):
+        session_factory = self.replay_flight_data('test_bedrock_custom_model')
+        p = self.load_policy(
+            {
+                'name': 'bedrock-custom-model-no-active-deployment',
+                'resource': 'bedrock-custom-model',
+                'filters': [
+                    {'type': 'deployments', 'status': 'Active', 'value': 'absent'},
+                ],
+            },
+            session_factory=session_factory,
+        )
+        self.assertTrue(p)
 
     def test_bedrock_custom_model_delete(self):
         session_factory = self.replay_flight_data('test_bedrock_custom_model_delete')
@@ -1255,3 +1270,108 @@ def test_bedrock_inference_profile_bad_statistics(test):
                 }],
             },
         )
+
+
+# A long-lived model, not built per test run -- fine-tuning takes hours. Found
+# by name, since a rebuild changes its ARN.
+# See tests/terraform/bedrock_deployable_custom_model.
+DEPLOYABLE_CUSTOM_MODEL_NAME = "KEEP-c7n-deployable-test-fixture"
+DEPLOYABLE_CUSTOM_MODEL_REGION = "us-west-2"
+
+
+def wait_for_custom_model_deployment_active(client, deployment_arn, test):
+    status = None
+    for _ in range(60):
+        status = client.get_custom_model_deployment(
+            customModelDeploymentIdentifier=deployment_arn)['status']
+        if status == 'Active':
+            return
+        if status == 'Failed':
+            raise RuntimeError(f'custom model deployment {deployment_arn} failed')
+        if test.recording:
+            time.sleep(20)
+    raise RuntimeError(
+        f'custom model deployment {deployment_arn} did not become Active: {status}')
+
+
+@pytest.fixture
+def create_custom_model_deployment(test):
+    """Create an on-demand custom model deployment, and clean it up after.
+
+    Not a Terraform fixture: the AWS provider has no deployment resource.
+
+    Yields ``(model_arn, region) -> deployment_arn``. Set
+    ``test.session_factory`` first, so its calls record with the test.
+    """
+    created = []
+
+    def _create(model_arn, region, name="c7n-test-custom-model-deployment"):
+        client = test.session_factory().client('bedrock', region_name=region)
+        deployment_arn = client.create_custom_model_deployment(
+            modelDeploymentName=name, modelArn=model_arn)['customModelDeploymentArn']
+        created.append((client, deployment_arn))
+        wait_for_custom_model_deployment_active(client, deployment_arn, test)
+        return deployment_arn
+
+    try:
+        yield _create
+    finally:
+        for client, deployment_arn in created:
+            try:
+                client.delete_custom_model_deployment(
+                    customModelDeploymentIdentifier=deployment_arn)
+            except client.exceptions.ResourceNotFoundException:
+                pass
+
+
+def test_bedrock_custom_model_deployments_filter(test, create_custom_model_deployment):
+    test.session_factory = test.replay_flight_data(
+        'test_bedrock_custom_model_deployments_filter',
+        region=DEPLOYABLE_CUSTOM_MODEL_REGION)
+
+    # CreateCustomModelDeployment needs the ARN; GetCustomModel takes the name.
+    client = test.session_factory().client(
+        'bedrock', region_name=DEPLOYABLE_CUSTOM_MODEL_REGION)
+    model_arn = client.get_custom_model(
+        modelIdentifier=DEPLOYABLE_CUSTOM_MODEL_NAME)['modelArn']
+
+    create_custom_model_deployment(model_arn, DEPLOYABLE_CUSTOM_MODEL_REGION)
+
+    # Unscoped, as a real policy would be.
+    present = test.load_policy(
+        {
+            'name': 'bedrock-custom-model-active-deployment',
+            'resource': 'aws.bedrock-custom-model',
+            'filters': [
+                {'type': 'deployments', 'status': 'Active', 'value': 'present'},
+            ],
+        },
+        session_factory=test.session_factory,
+        config={'region': DEPLOYABLE_CUSTOM_MODEL_REGION},
+    )
+    resources = present.run()
+
+    # Shared account, so other models may come and go -- only assert ours.
+    assert any(r['modelName'] == DEPLOYABLE_CUSTOM_MODEL_NAME for r in resources)
+
+
+def test_bedrock_custom_model_undeployed(test):
+    # An Active model with no deployment: costs storage while serving nothing.
+    test.session_factory = test.replay_flight_data(
+        'test_bedrock_custom_model_undeployed',
+        region=DEPLOYABLE_CUSTOM_MODEL_REGION)
+
+    policy = test.load_policy(
+        {
+            'name': 'bedrock-custom-model-undeployed',
+            'resource': 'aws.bedrock-custom-model',
+            'filters': [
+                {'type': 'deployments', 'status': 'Active', 'value': 'absent'},
+            ],
+        },
+        session_factory=test.session_factory,
+        config={'region': DEPLOYABLE_CUSTOM_MODEL_REGION},
+    )
+    resources = policy.run()
+
+    assert any(r['modelName'] == DEPLOYABLE_CUSTOM_MODEL_NAME for r in resources)
