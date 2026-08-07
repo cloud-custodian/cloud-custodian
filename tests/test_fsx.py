@@ -1147,6 +1147,81 @@ class TestFSx(BaseTest):
         self.assertEqual(len(resources), 1)
         self.assertEqual(len(resources[0]['c7n:matched-vpcs']), 1)
 
+    def test_fsx_security_group_filter(self):
+        session_factory = self.replay_flight_data("test_fsx_network_location_sg")
+        p = self.load_policy({
+            "name": "fsx_security_group_filter",
+            "resource": "aws.fsx",
+            "filters": [{
+                "type": "security-group",
+                "key": "tag:Env",
+                "value": "Staging"
+            }]
+        }, session_factory=session_factory)
+        resources = p.run()
+        self.assertEqual(len(resources), 1)
+        self.assertEqual(resources[0]["FileSystemId"], "fs-0bc98cbfb6b356896")
+        self.assertEqual(
+            resources[0]["c7n:matched-security-groups"],
+            ["sg-0stag00000000000b"])
+
+    def test_fsx_security_group_filter_multiple_enis(self):
+        # an ontap file system carries an eni per ha pair, both of which
+        # have to resolve back to the same file system.
+        session_factory = self.replay_flight_data("test_fsx_network_location_sg")
+        p = self.load_policy({
+            "name": "fsx_security_group_filter_multi_eni",
+            "resource": "aws.fsx",
+            "filters": [{
+                "type": "security-group",
+                "key": "GroupName",
+                "value": "fsx-prod"
+            }]
+        }, session_factory=session_factory)
+        resources = p.run()
+        self.assertEqual(len(resources), 1)
+        self.assertEqual(resources[0]["FileSystemId"], "fs-0e3e2a9e1f5ff7a13")
+        self.assertEqual(len(resources[0]["NetworkInterfaceIds"]), 2)
+
+    def test_fsx_network_location_sg_mismatch(self):
+        session_factory = self.replay_flight_data("test_fsx_network_location_sg")
+        p = self.load_policy({
+            "name": "fsx_network_location_sg",
+            "resource": "aws.fsx",
+            "filters": [{
+                "type": "network-location",
+                "compare": ["resource", "security-group"],
+                "key": "tag:Env"
+            }]
+        }, session_factory=session_factory)
+        resources = p.run()
+        # the ontap file system's tag matches its security group, the
+        # windows one (Dev) does not match its group (Staging).
+        self.assertEqual(len(resources), 1)
+        self.assertEqual(resources[0]["FileSystemId"], "fs-0bc98cbfb6b356896")
+        self.assertEqual(
+            resources[0]["c7n:NetworkLocation"],
+            [{"reason": "ResourceLocationMismatch",
+              "resource": "Dev",
+              "security-groups": {"sg-0stag00000000000b": "Staging"}},
+             {"reason": "SecurityGroupMismatch",
+              "resource": "Dev",
+              "security-groups": {"sg-0stag00000000000b": "Staging"}}])
+
+    def test_fsx_network_location_permissions(self):
+        p = self.load_policy({
+            "name": "fsx_network_location_permissions",
+            "resource": "aws.fsx",
+            "filters": [{
+                "type": "network-location",
+                "compare": ["resource", "security-group"],
+                "key": "tag:Env"
+            }]
+        })
+        # security groups come off the file system's enis, which the base
+        # network-location filter doesn't account for.
+        self.assertIn("ec2:DescribeNetworkInterfaces", p.get_permissions())
+
     def test_fsx_metrics_filter(self):
         session_factory = self.replay_flight_data('test_fsx_metrics_filter')
         p = self.load_policy(

@@ -13,7 +13,8 @@ from c7n.tags import Tag, TagDelayedAction, RemoveTag, coalesce_copy_user_tags, 
 from c7n.utils import type_schema, local_session, chunks, group_by, get_retry
 from c7n.filters import Filter, ListItemFilter, MetricsFilter
 from c7n.filters.kms import KmsRelatedFilter
-from c7n.filters.vpc import SubnetFilter, VpcFilter
+from c7n.filters.vpc import (
+    SecurityGroupFilter, SubnetFilter, VpcFilter, NetworkLocation)
 from c7n.filters.backup import ConsecutiveAwsBackupsFilter
 
 
@@ -724,6 +725,102 @@ class Subnet(SubnetFilter):
 class VpcFilter(VpcFilter):
 
     RelatedIdsExpression = "VpcId"
+
+
+@FSx.filter_registry.register('security-group')
+class FSxSecurityGroupFilter(SecurityGroupFilter):
+    """Filter fsx file systems by their attached security groups.
+
+    describe_file_systems does not report security groups; they are attached
+    to the file system's elastic network interfaces, so they're resolved via
+    the file system's NetworkInterfaceIds.
+
+    :example:
+
+    .. code-block:: yaml
+
+        policies:
+          - name: fsx-public-security-group
+            resource: aws.fsx
+            filters:
+              - type: security-group
+                key: GroupName
+                value: default
+    """
+
+    RelatedIdsExpression = ""
+    eni_group_cache = None
+
+    def get_permissions(self):
+        return tuple(super().get_permissions()) + ('ec2:DescribeNetworkInterfaces',)
+
+    def _describe_eni_groups(self, eni_ids):
+        client = local_session(self.manager.session_factory).client('ec2')
+        groups = {}
+        for eni_set in chunks(sorted(eni_ids), 50):
+            try:
+                enis = client.describe_network_interfaces(
+                    NetworkInterfaceIds=eni_set)['NetworkInterfaces']
+            except client.exceptions.ClientError as e:
+                if e.response['Error']['Code'] != 'InvalidNetworkInterfaceID.NotFound':
+                    raise
+                # a file system being deleted can reference a departed eni,
+                # fall back to individual lookups so one stale id doesn't
+                # discard the whole batch.
+                enis = []
+                for eni_id in eni_set:
+                    try:
+                        enis.extend(client.describe_network_interfaces(
+                            NetworkInterfaceIds=[eni_id])['NetworkInterfaces'])
+                    except client.exceptions.ClientError as e:
+                        if e.response['Error']['Code'] != 'InvalidNetworkInterfaceID.NotFound':
+                            raise
+                        self.log.warning(
+                            'fsx security-group filter, eni:%s not found', eni_id)
+            for eni in enis:
+                groups[eni['NetworkInterfaceId']] = [
+                    g['GroupId'] for g in eni.get('Groups', ())]
+        return groups
+
+    def get_related_ids(self, resources):
+        if self.eni_group_cache is None:
+            eni_ids = set()
+            for r in resources:
+                eni_ids.update(r.get('NetworkInterfaceIds', ()))
+            self.eni_group_cache = (
+                eni_ids and self._describe_eni_groups(eni_ids) or {})
+
+        group_ids = set()
+        for r in resources:
+            for eni_id in r.get('NetworkInterfaceIds', ()):
+                group_ids.update(self.eni_group_cache.get(eni_id, ()))
+        return list(group_ids)
+
+
+@FSx.filter_registry.register('network-location')
+class FSxNetworkLocation(NetworkLocation):
+    """Compare fsx file system, subnet, and security group attributes.
+
+    Security groups are resolved off the file system's network interfaces,
+    which needs an additional permission over the base filter.
+
+    :example:
+
+    .. code-block:: yaml
+
+        policies:
+          - name: fsx-sg-tag-mismatch
+            resource: aws.fsx
+            filters:
+              - type: network-location
+                compare: ["resource", "security-group"]
+                key: "tag:Env"
+    """
+
+    schema_alias = False
+
+    def get_permissions(self):
+        return tuple(super().get_permissions()) + ('ec2:DescribeNetworkInterfaces',)
 
 
 FSx.filter_registry.register('consecutive-aws-backups', ConsecutiveAwsBackupsFilter)
