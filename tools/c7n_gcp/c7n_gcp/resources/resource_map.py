@@ -132,6 +132,7 @@ ResourceMap = {
         "c7n_gcp.resources.vertexai.VertexAIHyperparameterTuningJob"),
     "gcp.vertex-ai-location": "c7n_gcp.resources.vertexai.VertexAILocation",
     "gcp.vpc": "c7n_gcp.resources.network.Network",
+    "gcp.workspace-user": "c7n_gcp.resources.workspace.WorkspaceUser",
     "gcp.zone": "c7n_gcp.resources.compute.Zone",
 }
 # SPDX-License-Identifier: Apache-2.0

@@ -23,6 +23,12 @@ RESOURCE_PERM_WHITELIST = set((
     'vertex-ai-publisher',  # synthetic resource with no permissions
     'vertex-ai-publisher-model',  # catalog resource with no permissions
     'vertex-ai-location',  # metadata resource with no permissions
+    # Workspace resources are authorized by OAuth scopes plus Workspace admin
+    # roles, not by GCP IAM, so nothing they declare can appear in
+    # iam-permissions.json. This exemption necessarily covers their filters
+    # and actions too; their scopes are checked against the API's discovery
+    # document in test_workspace.py instead.
+    'workspace-user',
 ))
 
 

@@ -47,7 +47,10 @@ def test_gcp_resource_metadata_asset_type():
         'region',
         'vertex-ai-publisher',  # Synthetic resource (no asset inventory type)
         'vertex-ai-publisher-model',  # Catalog resource (no asset inventory type)
-        'vertex-ai-location'
+        'vertex-ai-location',
+        # Cloud Identity / Workspace users are not GCP resources, so cloud
+        # asset inventory has no type for them.
+        'workspace-user',
     ))
     missing = set()
     for k, v in GoogleCloud.resources.items():
