@@ -11,7 +11,7 @@ class MatchResourceValidator:
 
     def validate(self):
         if self.data.get('match-resource'):
-            self.required_keys = set('key',)
+            self.required_keys = {'key'}
         return super(MatchResourceValidator, self).validate()
 
 
