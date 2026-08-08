@@ -1509,3 +1509,129 @@ class TestFSxStorageVirtualMachine(BaseTest):
         self.assertEqual(
             sorted(p.get_permissions()),
             ["ds:DescribeDirectories", "fsx:DescribeStorageVirtualMachines"])
+
+
+class TestFSxActiveDirectory(BaseTest):
+
+    def test_fsx_active_directory_violations(self):
+        session_factory = self.replay_flight_data("test_fsx_active_directory")
+        p = self.load_policy({
+            "name": "fsx-must-use-managed-ad",
+            "resource": "aws.fsx",
+            "filters": [{"type": "active-directory", "match": "not-managed"}],
+        }, session_factory=session_factory)
+        resources = p.run()
+        found = {r["FileSystemId"]: r["c7n:ActiveDirectory"] for r in resources}
+
+        # the ontap file system has an svm with no directory at all
+        self.assertEqual(
+            found["fs-0a584801db948c940"]["reason"],
+            "StorageVirtualMachineNotManaged")
+        self.assertEqual(
+            [s["StorageVirtualMachineId"]
+             for s in found["fs-0a584801db948c940"]["storage-virtual-machines"]],
+            ["svm-05b1f4f80089ba22d"])
+
+        # windows names a directory that no longer exists, which would read as
+        # compliant if the id were trusted rather than resolved.
+        self.assertEqual(
+            found["fs-0bc98cbfb6b356896"],
+            {"managed": False, "reason": "DirectoryNotFound",
+             "DirectoryId": "d-90671463e5"})
+
+        # openzfs has no ad integration, so it is not a violation
+        self.assertNotIn("fs-0ba7088f9b54df497", found)
+
+    def test_fsx_active_directory_not_ad_capable_excluded(self):
+        session_factory = self.replay_flight_data("test_fsx_active_directory")
+        p = self.load_policy({
+            "name": "fsx_ad_any",
+            "resource": "aws.fsx",
+            "filters": [{"type": "active-directory", "match": "any"}],
+        }, session_factory=session_factory)
+        resources = p.run()
+        found = {r["FileSystemId"]: r["c7n:ActiveDirectory"] for r in resources}
+        self.assertEqual(found["fs-0ba7088f9b54df497"],
+                         {"managed": None, "reason": "FileSystemTypeNotAdCapable",
+                          "FileSystemType": "OPENZFS"})
+
+    def test_fsx_permissions(self):
+        p = self.load_policy({
+            "name": "fsx_ad_permissions",
+            "resource": "aws.fsx",
+            "filters": [{"type": "active-directory", "match": "not-managed"}],
+        })
+        self.assertEqual(
+            sorted(p.get_permissions()),
+            ["ds:DescribeDirectories", "fsx:DescribeFileSystems",
+             "fsx:DescribeStorageVirtualMachines"])
+
+
+class TestFSxActiveDirectoryResolution(BaseTest):
+    """Resolution edge cases that can't be provoked against a live account."""
+
+    def directories(self):
+        return [{"DirectoryId": "d-managed", "Name": "corp.example.com",
+                 "Type": "MicrosoftAD", "DnsIpAddrs": ["10.0.0.10", "10.0.0.11"]}]
+
+    def svm(self, **ad):
+        return {"Subtype": "DEFAULT", "Lifecycle": "CREATED",
+                "ActiveDirectoryConfiguration": {
+                    "SelfManagedActiveDirectoryConfiguration": ad}}
+
+    def test_domain_name_alone_does_not_clear(self):
+        # an on premises domain of the same name resolves by name too, so a
+        # name match on its own can't establish a managed join.
+        found = c7n.resources.fsx.resolve_svm(
+            self.svm(DomainName="CORP.EXAMPLE.COM", DnsIps=["192.168.50.5"]),
+            self.directories())
+        self.assertEqual(found["managed"], False)
+        self.assertEqual(found["reason"], "DomainNameOnlyMatch")
+
+    def test_dns_ip_match_clears(self):
+        found = c7n.resources.fsx.resolve_svm(
+            self.svm(DomainName="CORP.EXAMPLE.COM", DnsIps=["10.0.0.10"]),
+            self.directories())
+        self.assertEqual(found["managed"], True)
+        self.assertEqual(found["matched-on"], "dns-ips,domain-name")
+
+    def test_unmanaged_directory_type(self):
+        directories = [dict(self.directories()[0], Type="SimpleAD")]
+        found = c7n.resources.fsx.resolve_svm(
+            self.svm(DomainName="CORP.EXAMPLE.COM", DnsIps=["10.0.0.10"]),
+            directories)
+        self.assertEqual(found["managed"], False)
+        self.assertEqual(found["reason"], "UnmanagedDirectory")
+
+    def test_shared_managed_directory(self):
+        # a directory shared from another account reports the owning
+        # account's domain controllers. unverified against live aws.
+        directories = [{"DirectoryId": "d-shared", "Name": "corp.example.com",
+                        "Type": "SharedMicrosoftAD", "DnsIpAddrs": [],
+                        "OwnerDirectoryDescription": {
+                            "DirectoryId": "d-owner", "AccountId": "111111111111",
+                            "DnsIpAddrs": ["10.9.0.10"]}}]
+        found = c7n.resources.fsx.resolve_svm(
+            self.svm(DomainName="CORP.EXAMPLE.COM", DnsIps=["10.9.0.10"]),
+            directories)
+        self.assertEqual(found["managed"], True)
+        self.assertEqual(found["DirectoryType"], "SharedMicrosoftAD")
+
+    def test_replication_target_out_of_scope(self):
+        found = c7n.resources.fsx.resolve_svm(
+            {"Subtype": "DP_DESTINATION", "Lifecycle": "CREATED"}, [])
+        self.assertIsNone(found["managed"])
+        self.assertEqual(found["reason"], "SubtypeNotAdJoined")
+
+    def test_transient_svm_out_of_scope(self):
+        found = c7n.resources.fsx.resolve_svm(
+            {"Subtype": "DEFAULT", "Lifecycle": "CREATING"}, [])
+        self.assertIsNone(found["managed"])
+        self.assertEqual(found["reason"], "TransientLifecycle")
+
+    def test_windows_self_managed_not_cleared(self):
+        fs = {"FileSystemType": "WINDOWS", "WindowsConfiguration": {
+            "SelfManagedActiveDirectoryConfiguration": {
+                "DomainName": "corp.example.com", "DnsIps": ["192.168.50.5"]}}}
+        found = c7n.resources.fsx.resolve_windows(fs, self.directories())
+        self.assertEqual(found["managed"], False)

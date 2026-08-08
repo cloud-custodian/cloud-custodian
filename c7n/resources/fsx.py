@@ -134,17 +134,134 @@ class FSxStorageVirtualMachine(QueryResourceManager):
     permissions = ('fsx:DescribeStorageVirtualMachines',)
 
 
+MANAGED_DIRECTORY_TYPES = ('MicrosoftAD', 'SharedMicrosoftAD')
+
+# replication targets participate in no ad join of their own, they inherit
+# identity from the source, so they aren't in scope for an ad control.
+NON_AD_SVM_SUBTYPES = ('DP_DESTINATION', 'SYNC_DESTINATION', 'SYNC_SOURCE')
+
+# an svm or file system still settling hasn't got its directory yet
+TRANSIENT_SVM_LIFECYCLES = ('CREATING', 'PENDING', 'DELETING')
+TRANSIENT_FS_LIFECYCLES = ('CREATING', 'DELETING')
+
+
+def describe_directories(manager):
+    client = local_session(manager.session_factory).client('ds')
+    directories = []
+    for page in client.get_paginator('describe_directories').paginate():
+        directories.extend(page['DirectoryDescriptions'])
+    return directories
+
+
+def resolve_ad_config(ad, directories):
+    """Resolve a self managed ad config block to a directory service directory.
+
+    fsx reports the domain name uppercased where directory service doesn't, so
+    names only compare case insensitively. A name on its own doesn't establish
+    which domain controllers are actually in use - an on premises domain of the
+    same name resolves identically - so only a dns ip match can clear a
+    resource.
+    """
+    dns_ips = set(ad.get('DnsIps') or ())
+    domain = (ad.get('DomainName') or '').lower().rstrip('.')
+
+    name_only = None
+    for d in directories:
+        owner = d.get('OwnerDirectoryDescription') or {}
+        directory_ips = set(d.get('DnsIpAddrs') or ()) | set(owner.get('DnsIpAddrs') or ())
+        name_match = bool(domain) and domain == d.get('Name', '').lower().rstrip('.')
+        ip_match = bool(dns_ips and dns_ips & directory_ips)
+        if not (ip_match or name_match):
+            continue
+        found = {'DirectoryId': d.get('DirectoryId'),
+                 'DirectoryType': d.get('Type'),
+                 'DirectoryName': d.get('Name'),
+                 'matched-on': (ip_match and name_match and 'dns-ips,domain-name' or
+                                ip_match and 'dns-ips' or 'domain-name')}
+        if not ip_match:
+            name_only = dict(found, managed=False, reason='DomainNameOnlyMatch')
+            continue
+        found['managed'] = d.get('Type') in MANAGED_DIRECTORY_TYPES
+        found['reason'] = (
+            'ManagedDirectory' if found['managed'] else 'UnmanagedDirectory')
+        return found
+
+    if name_only:
+        return name_only
+    return {'managed': False, 'reason': 'UnresolvedDirectory',
+            'DomainName': ad.get('DomainName'), 'DnsIps': sorted(dns_ips)}
+
+
+def resolve_svm(svm, directories):
+    """Resolve an ontap svm's directory, `managed` is None when out of scope."""
+    if svm.get('Subtype') in NON_AD_SVM_SUBTYPES:
+        return {'managed': None, 'reason': 'SubtypeNotAdJoined',
+                'Subtype': svm.get('Subtype')}
+    if svm.get('Lifecycle') in TRANSIENT_SVM_LIFECYCLES:
+        return {'managed': None, 'reason': 'TransientLifecycle',
+                'Lifecycle': svm.get('Lifecycle')}
+    ad = (svm.get('ActiveDirectoryConfiguration') or {}).get(
+        'SelfManagedActiveDirectoryConfiguration')
+    if not ad:
+        return {'managed': False, 'reason': 'NoActiveDirectory'}
+    return resolve_ad_config(ad, directories)
+
+
+def resolve_windows(fs, directories):
+    """Resolve an fsx for windows file system's directory.
+
+    Windows reports an ActiveDirectoryId for a managed directory, but that id
+    outliving the directory it names would otherwise read as compliant, so it's
+    resolved rather than trusted.
+    """
+    config = fs.get('WindowsConfiguration') or {}
+    directory_id = config.get('ActiveDirectoryId')
+    if directory_id:
+        for d in directories:
+            if d.get('DirectoryId') != directory_id:
+                continue
+            managed = d.get('Type') in MANAGED_DIRECTORY_TYPES
+            return {'managed': managed,
+                    'reason': 'ManagedDirectory' if managed else 'UnmanagedDirectory',
+                    'DirectoryId': directory_id,
+                    'DirectoryType': d.get('Type'),
+                    'DirectoryName': d.get('Name'),
+                    'matched-on': 'directory-id'}
+        return {'managed': False, 'reason': 'DirectoryNotFound',
+                'DirectoryId': directory_id}
+    if config.get('SelfManagedActiveDirectoryConfiguration'):
+        return resolve_ad_config(
+            config['SelfManagedActiveDirectoryConfiguration'], directories)
+    return {'managed': False, 'reason': 'NoActiveDirectory'}
+
+
+class ActiveDirectoryFilterBase(Filter):
+
+    schema_alias = False
+    annotation_key = 'c7n:ActiveDirectory'
+
+    def match_found(self, found):
+        match = self.data.get('match', 'not-managed')
+        if match == 'any':
+            return True
+        # `managed` is None for resources an ad join doesn't apply to, which
+        # are neither compliant nor in violation.
+        if found['managed'] is None:
+            return False
+        return found['managed'] is (match == 'managed')
+
+
 @FSxStorageVirtualMachine.filter_registry.register('active-directory')
-class SvmActiveDirectoryFilter(Filter):
+class SvmActiveDirectoryFilter(ActiveDirectoryFilterBase):
     """Filter ontap storage virtual machines on the directory they're joined to.
 
     Unlike fsx for windows, which reports an ActiveDirectoryId for a managed
     directory, an ontap svm reports every join - managed or not - through
     SelfManagedActiveDirectoryConfiguration with no directory id. The joined
     directory is resolved by matching the svm's configured dns servers against
-    directory service, with the domain name as corroboration.
+    directory service.
 
-    `match: managed` fails closed, an svm is only compliant when it can be
+    `match: not-managed` fails closed, an svm is only cleared when it can be
     positively resolved to an aws managed microsoft ad.
 
     :example:
@@ -163,63 +280,92 @@ class SvmActiveDirectoryFilter(Filter):
         'active-directory',
         match={'enum': ['managed', 'not-managed', 'any']})
     permissions = ('ds:DescribeDirectories',)
-    annotation_key = 'c7n:ActiveDirectory'
-
-    # a directory shared from another account is reported as SharedMicrosoftAD,
-    # with the owning account's domain controllers in OwnerDirectoryDescription.
-    managed_types = ('MicrosoftAD', 'SharedMicrosoftAD')
-
-    def get_directories(self):
-        client = local_session(self.manager.session_factory).client('ds')
-        directories = []
-        for page in client.get_paginator('describe_directories').paginate():
-            directories.extend(page['DirectoryDescriptions'])
-        return directories
-
-    def resolve(self, svm, directories):
-        ad = (svm.get('ActiveDirectoryConfiguration') or {}).get(
-            'SelfManagedActiveDirectoryConfiguration')
-        if not ad:
-            return {'managed': False, 'reason': 'NoActiveDirectory'}
-
-        dns_ips = set(ad.get('DnsIps') or ())
-        # fsx uppercases the domain name it reports, directory service
-        # doesn't, so the names only compare case insensitively.
-        domain = (ad.get('DomainName') or '').lower().rstrip('.')
-
-        for d in directories:
-            owner = d.get('OwnerDirectoryDescription') or {}
-            directory_ips = set(d.get('DnsIpAddrs') or ()) | set(owner.get('DnsIpAddrs') or ())
-            name_match = domain and domain == d.get('Name', '').lower().rstrip('.')
-            ip_match = bool(dns_ips and dns_ips & directory_ips)
-            if not (ip_match or name_match):
-                continue
-            return {
-                'managed': d.get('Type') in self.managed_types,
-                'reason': (
-                    'ManagedDirectory' if d.get('Type') in self.managed_types
-                    else 'UnmanagedDirectory'),
-                'DirectoryId': d.get('DirectoryId'),
-                'DirectoryType': d.get('Type'),
-                'DirectoryName': d.get('Name'),
-                'matched-on': (
-                    ip_match and name_match and 'dns-ips,domain-name'
-                    or ip_match and 'dns-ips' or 'domain-name'),
-            }
-
-        return {'managed': False, 'reason': 'UnresolvedDirectory',
-                'DomainName': ad.get('DomainName'),
-                'DnsIps': sorted(dns_ips)}
 
     def process(self, resources, event=None):
-        directories = self.get_directories()
-        match = self.data.get('match', 'not-managed')
+        directories = describe_directories(self.manager)
+        results = []
+        for r in resources:
+            found = resolve_svm(r, directories)
+            r[self.annotation_key] = found
+            if self.match_found(found):
+                results.append(r)
+        return results
+
+
+@FSx.filter_registry.register('active-directory')
+class FSxActiveDirectoryFilter(ActiveDirectoryFilterBase):
+    """Filter fsx file systems on the directory they're joined to.
+
+    Windows file systems are assessed directly. Ontap configures active
+    directory per storage virtual machine, so an ontap file system is assessed
+    through its svms - one that has no svm at all is joined to nothing, and
+    would otherwise go unreported by an svm level policy having no svm to
+    report on.
+
+    :example:
+
+    .. code-block:: yaml
+
+        policies:
+          - name: fsx-must-use-managed-ad
+            resource: aws.fsx
+            filters:
+              - type: active-directory
+                match: not-managed
+    """
+
+    schema = type_schema(
+        'active-directory',
+        match={'enum': ['managed', 'not-managed', 'any']})
+    permissions = ('ds:DescribeDirectories', 'fsx:DescribeStorageVirtualMachines')
+
+    def get_svms(self, resources):
+        svms = self.manager.get_resource_manager(
+            'aws.fsx-storage-virtual-machine').resources()
+        return group_by(svms, 'FileSystemId')
+
+    def resolve_ontap(self, fs, svms, directories):
+        if not svms:
+            return {'managed': False, 'reason': 'NoStorageVirtualMachines'}
+        evaluated = []
+        for svm in svms:
+            found = resolve_svm(svm, directories)
+            found['StorageVirtualMachineId'] = svm['StorageVirtualMachineId']
+            evaluated.append(found)
+        in_scope = [e for e in evaluated if e['managed'] is not None]
+        if not in_scope:
+            return {'managed': None, 'reason': 'NoAdJoinedStorageVirtualMachines',
+                    'storage-virtual-machines': evaluated}
+        violations = [e for e in in_scope if not e['managed']]
+        if violations:
+            return {'managed': False, 'reason': 'StorageVirtualMachineNotManaged',
+                    'storage-virtual-machines': violations}
+        return {'managed': True, 'reason': 'ManagedDirectory',
+                'storage-virtual-machines': in_scope}
+
+    def process(self, resources, event=None):
+        directories = describe_directories(self.manager)
+        svms = {}
+        if any(r.get('FileSystemType') == 'ONTAP' for r in resources):
+            svms = self.get_svms(resources)
 
         results = []
         for r in resources:
-            found = self.resolve(r, directories)
+            fs_type = r.get('FileSystemType')
+            if r.get('Lifecycle') in TRANSIENT_FS_LIFECYCLES:
+                found = {'managed': None, 'reason': 'TransientLifecycle',
+                         'Lifecycle': r.get('Lifecycle')}
+            elif fs_type == 'WINDOWS':
+                found = resolve_windows(r, directories)
+            elif fs_type == 'ONTAP':
+                found = self.resolve_ontap(
+                    r, svms.get(r['FileSystemId'], []), directories)
+            else:
+                # lustre and openzfs have no active directory integration
+                found = {'managed': None, 'reason': 'FileSystemTypeNotAdCapable',
+                         'FileSystemType': fs_type}
             r[self.annotation_key] = found
-            if match == 'any' or found['managed'] is (match == 'managed'):
+            if self.match_found(found):
                 results.append(r)
         return results
 
