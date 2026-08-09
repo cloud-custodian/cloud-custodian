@@ -13,9 +13,34 @@ from c7n.filters import Filter, ListItemFilter
 from c7n.manager import resources
 from c7n.query import QueryResourceManager, TypeInfo
 from c7n.utils import local_session, type_schema
-from c7n.tags import RemoveTag, Tag
+from c7n.tags import RemoveTag, Tag, TagActionFilter, TagDelayedAction
 
 log = logging.getLogger('custodian.cfn')
+
+# Stable states that allow UpdateStack operations (including tagging)
+CFN_UPDATEABLE_STATES = frozenset([
+    'CREATE_COMPLETE',
+    'UPDATE_COMPLETE',
+    'UPDATE_ROLLBACK_COMPLETE',
+    'IMPORT_COMPLETE',
+    'IMPORT_ROLLBACK_COMPLETE',
+    'ROLLBACK_COMPLETE',
+])
+
+
+def _cfn_stack_updatable(stack):
+    """Check if a CloudFormation stack is in a state that allows UpdateStack operations.
+
+    CloudFormation stacks can only be tagged via UpdateStack when in stable states.
+    Stacks in transitional (*_IN_PROGRESS) or failed states will reject update calls.
+
+    Args:
+        stack: CloudFormation stack resource dict
+
+    Returns:
+        bool: True if stack can be updated/tagged, False otherwise
+    """
+    return stack.get('StackStatus', '') in CFN_UPDATEABLE_STATES
 
 
 @resources.register('cfn')
@@ -166,8 +191,15 @@ class CloudFormationAddTag(Tag):
     permissions = ('cloudformation:UpdateStack',)
 
     def process_resource_set(self, client, stacks, tags):
+        skipped = 0
         for s in stacks:
+            if not _cfn_stack_updatable(s):
+                skipped += 1
+                continue
             _tag_stack(client, s, add=tags)
+        if skipped:
+            self.log.warning(
+                "Skipped tagging %d stack(s) due to non-updateable state", skipped)
 
 
 def _tag_stack(client, s, add=(), remove=()):
@@ -219,8 +251,38 @@ class CloudFormationRemoveTag(RemoveTag):
                 tags: ['DesiredTag']
     """
     def process_resource_set(self, client, stacks, keys):
+        skipped = 0
         for s in stacks:
+            if not _cfn_stack_updatable(s):
+                skipped += 1
+                continue
             _tag_stack(client, s, remove=keys)
+        if skipped:
+            self.log.warning(
+                "Skipped removing tags from %d stack(s) due to non-updateable state", skipped)
+
+
+CloudFormation.filter_registry.register('marked-for-op', TagActionFilter)
+
+
+@CloudFormation.action_registry.register('mark-for-op')
+class CloudFormationMarkForOp(TagDelayedAction):
+    """Mark a CloudFormation stack for a future action
+
+    :example:
+
+    .. code-block:: yaml
+
+        policies:
+          - name: cfn-mark-for-delete
+            resource: cfn
+            filters:
+              - StackStatus: CREATE_COMPLETE
+            actions:
+              - type: mark-for-op
+                op: delete
+                days: 1
+    """
 
 
 @CloudFormation.filter_registry.register('template')
