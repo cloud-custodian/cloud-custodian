@@ -104,8 +104,10 @@ class LaunchInfo:
             configs = lc_resources.get_resources(list(config_names))
         else:
             configs = lc_resources.resources()
+        # keyed on the stripped name to match get_launch_id, the api allows
+        # trailing whitespace in the name and reports it back verbatim.
         return {
-            cfg['LaunchConfigurationName']: cfg for cfg in configs
+            cfg['LaunchConfigurationName'].strip(): cfg for cfg in configs
             if cfg['LaunchConfigurationName'] in config_names}
 
     def get_launch_id(self, asg):
@@ -169,10 +171,15 @@ class LaunchInfo:
                     'ami').get_source('describe').get_resources(
                         list(self.get_image_ids()), cache=False)}
 
-    def get_security_group_ids(self):
-        # return set of security group ids for given asg
+    def get_security_group_ids(self, asgs=None):
+        # return set of security group ids for the given asgs, or for every
+        # launch config/template initialized when asgs isn't specified.
+        if asgs is None:
+            launches = [v for k, v in self.items()]
+        else:
+            launches = [launch for launch in map(self.get, asgs) if launch]
         sg_ids = set()
-        for k, v in self.items():
+        for v in launches:
             sg_ids.update(v.get('SecurityGroupIds', ()))
             sg_ids.update(v.get('SecurityGroups', ()))
         return sg_ids
@@ -182,11 +189,14 @@ class LaunchInfo:
 class SecurityGroupFilter(net_filters.SecurityGroupFilter):
 
     RelatedIdsExpression = ""
+    launch_info = None
 
     permissions = ('ec2:DescribeSecurityGroups',) + LaunchInfo.permissions
 
     def get_related_ids(self, asgs):
-        return self.launch_info.get_security_group_ids()
+        if self.launch_info is None:
+            self.launch_info = LaunchInfo(self.manager).initialize(asgs)
+        return self.launch_info.get_security_group_ids(asgs)
 
     def process(self, asgs, event=None):
         self.launch_info = LaunchInfo(self.manager).initialize(asgs)

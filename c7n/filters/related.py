@@ -69,6 +69,12 @@ class RelatedResourceFilter(ValueFilter):
         if self.data.get('match-resource') is True:
             self.data['value'] = self.get_resource_value(
                 self.data['key'], resource)
+            # ValueFilter caches the comparison value on first use, so reset
+            # the cache to compare each resource against its own value rather
+            # than against the first resource's.
+            self.v = None
+            if hasattr(self, 'content_initialized'):
+                del self.content_initialized
 
         if self.data.get('value_type') == 'resource_count':
             count_matches = OPERATORS[self.data.get('op')](len(related_ids), self.data.get('value'))
@@ -151,6 +157,12 @@ class RelatedResourceByIdFilter(RelatedResourceFilter):
         if self.data.get('match-resource') is True:
             self.data['value'] = self.get_resource_value(
                 self.data['key'], resource)
+            # ValueFilter caches the comparison value on first use, so reset
+            # the cache to compare each resource against its own value rather
+            # than against the first resource's.
+            self.v = None
+            if hasattr(self, 'content_initialized'):
+                del self.content_initialized
 
         if self.data.get('value_type') == 'resource_count':
             count_matches = OPERATORS[self.data.get('op')](len(related_ids), self.data.get('value'))

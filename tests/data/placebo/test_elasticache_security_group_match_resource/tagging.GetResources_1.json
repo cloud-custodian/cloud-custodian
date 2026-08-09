@@ -1,0 +1,35 @@
+{
+    "status_code": 200,
+    "data": {
+        "PaginationToken": "",
+        "ResourceTagMappingList": [
+            {
+                "ResourceARN": "arn:aws:elasticache:us-east-1:644160558196:cluster:c7n-nl-ec1",
+                "Tags": [
+                    {
+                        "Key": "AppId",
+                        "Value": "APP1001"
+                    },
+                    {
+                        "Key": "c7n-fixture",
+                        "Value": "network-location"
+                    }
+                ]
+            },
+            {
+                "ResourceARN": "arn:aws:elasticache:us-east-1:644160558196:cluster:c7n-nl-ec2",
+                "Tags": [
+                    {
+                        "Key": "AppId",
+                        "Value": "APP3003"
+                    },
+                    {
+                        "Key": "c7n-fixture",
+                        "Value": "network-location"
+                    }
+                ]
+            }
+        ],
+        "ResponseMetadata": {}
+    }
+}
