@@ -599,8 +599,8 @@ class SetWafv2(BaseAction):
     retry = staticmethod(get_retry(('Throttling',)))
 
     def process(self, resources):
-        query = {'Scope': 'CLOUDFRONT'}
-        wafs = self.manager.get_resource_manager('wafv2').resources(query, augment=False)
+        data = {'query': [{'Scope': 'CLOUDFRONT'}]}
+        wafs = self.manager.get_resource_manager('wafv2', data).resources(augment=False)
         waf_name_id_map = {w['Name']: w['ARN'] for w in wafs}
         state = self.data.get('state', True)
 

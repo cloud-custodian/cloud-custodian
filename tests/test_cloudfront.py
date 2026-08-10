@@ -246,6 +246,32 @@ class CloudFrontWaf(BaseTest):
         resources = policy.push(event_data("event-cloud-trail-tag-distribution.json"))
         self.assertEqual(len(resources), 1)
 
+    def test_set_wafv2_cloudfront_scope(self):
+        """Test that set-wafv2 on distributions uses CLOUDFRONT scope for WebACL lookup."""
+        factory = self.replay_flight_data("test_distribution_set_wafv2_cloudfront_scope")
+        policy = self.load_policy(
+            {
+                "name": "set-wafv2-cloudfront-scope",
+                "resource": "distribution",
+                "filters": [{"type": "wafv2-enabled", "state": False}],
+                "actions": [
+                    {
+                        "type": "set-wafv2",
+                        "state": True,
+                        "force": True,
+                        "web-acl": "BR_IPs_OWASP_Block",
+                    }
+                ],
+            },
+            session_factory=factory,
+        )
+        action = policy.resource_manager.actions[0]
+        # Verify the wafv2 manager is created with CLOUDFRONT scope
+        data = {'query': [{'Scope': 'CLOUDFRONT'}]}
+        mgr = action.manager.get_resource_manager('wafv2', data)
+        self.assertEqual(mgr.scope, 'CLOUDFRONT')
+        self.assertEqual(mgr.scope_region, 'us-east-1')
+
     def test_set_wafv2_pricing_plan_distribution(self):
         """Test that WAFv2 action gracefully skips CloudFront distributions
         with pricing plan subscriptions.
