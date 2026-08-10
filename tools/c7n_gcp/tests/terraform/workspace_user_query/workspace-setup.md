@@ -80,8 +80,7 @@ account and impersonated user fit together, see
    `docs/source/gcp/examples/workspace-user-mfa.rst` filters on
    `isEnrolledIn2Sv: false` *and* `suspended: false`, so:
 
-   - `test_no2sv` is the only user it selects: the CIS-B-GCPF-4.0.0-1.2
-     finding.
+   - `test_no2sv` is the only user it selects, so it is the finding.
    - `test_no2sv_susp` differs from it in only the suspended field, so the
      `suspended: false` clause is load bearing. Without that row, a one
      clause policy would select the same users and the test would prove
@@ -101,7 +100,7 @@ account and impersonated user fit together, see
 
    `test_no2sv_susp` can stay in the root org unit, because it never needs
    to sign in. That also makes it the only unenrolled *and* enforced user,
-   which is what a real CIS 1.2 violation looks like.
+   which is what a real violation looks like.
 
    Enrolling 2sv needs a phone or authenticator app per account, and can
    only be done by signing in as that user. There is no API for it, which

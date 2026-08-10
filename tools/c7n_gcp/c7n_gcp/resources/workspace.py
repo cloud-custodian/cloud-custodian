@@ -30,8 +30,7 @@ class WorkspaceUser(QueryResourceManager):
     :example:
 
     Users that have not enrolled in 2 step verification, Google's term for
-    MFA (CIS-B-GCPF-4.0.0-1.2). Suspended users can't sign in, so they are
-    excluded.
+    MFA. Suspended users can't sign in, so they are excluded.
 
     .. code-block:: yaml
 

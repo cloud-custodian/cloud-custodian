@@ -89,7 +89,7 @@ class WorkspaceUserQueryTest(BaseTest):
             ['test_no2sv@example.com', 'test_no2sv_susp@example.com'])
 
     def test_users_without_2sv_excluding_suspended(self):
-        """The CIS-B-GCPF-4.0.0-1.2 policy as documented.
+        """The policy as documented.
 
         Suspended users can't sign in, so a real policy excludes them. Both
         clauses matter: test_no2sv_susp differs from test_no2sv only in being
@@ -112,8 +112,8 @@ class WorkspaceUserQueryTest(BaseTest):
             ['test_no2sv@example.com'])
 
     def test_delegated_admins_are_distinguishable(self):
-        """isAdmin covers super admins only, so CIS 1.3 style policies need
-        isDelegatedAdmin too. Not a report field, but filterable.
+        """isAdmin covers super admins only, so policies about administrators
+        need isDelegatedAdmin too. Not a report field, but filterable.
         """
         factory = self.replay_flight_data('workspace-user-query')
         policy = self.load_policy(
