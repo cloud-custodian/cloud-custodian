@@ -3,7 +3,7 @@
 
 """Give the workspace an SSO assignment, for recording only.
 
-See terraform/workspace_user_query/workspace-setup.md
+See workspace-setup.md, next to this module, for when this runs.
 """
 
 import os
@@ -21,9 +21,7 @@ SCOPES = (
     'https://www.googleapis.com/auth/cloud-identity.inboundsso',
     )
 ORG_UNIT_PATH = '/test-no-enforcement'
-IDP_METADATA = (
-    pathlib.Path(__file__).parent / 'terraform' / 'workspace_user_query' /
-    'mock-saml-metadata.xml')
+IDP_METADATA = pathlib.Path(__file__).parent / 'mock-saml-metadata.xml'
 
 
 def add_sso_assignment(test) -> None:
@@ -89,7 +87,8 @@ def _org_unit_id(credentials) -> str:
         if unit['orgUnitPath'] == ORG_UNIT_PATH:
             return unit['orgUnitId'].removeprefix('id:')
     raise RuntimeError(
-        '%s missing, see %s' % (ORG_UNIT_PATH, IDP_METADATA.parent))
+        '%s missing, see the workspace-setup.md next to %s'
+        % (ORG_UNIT_PATH, pathlib.Path(__file__).name))
 
 
 def _idp_metadata() -> str:

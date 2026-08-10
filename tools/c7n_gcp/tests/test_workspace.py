@@ -16,7 +16,7 @@ from c7n.config import Bag, Config
 from c7n.exceptions import PolicyExecutionError
 from c7n_gcp.resources.workspace import WorkspaceUser
 from gcp_common import BaseTest
-from workspace_sso import add_sso_assignment
+from terraform.workspace_user_query.workspace_sso import add_sso_assignment
 
 
 class WorkspaceUserMetaTest(BaseTest):
