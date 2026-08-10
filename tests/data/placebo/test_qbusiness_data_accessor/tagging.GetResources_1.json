@@ -1,0 +1,18 @@
+{
+    "status_code": 200,
+    "data": {
+        "ResponseMetadata": {},
+        "PaginationToken": "",
+        "ResourceTagMappingList": [
+            {
+                "ResourceARN": "arn:aws:qbusiness:us-east-1:644160558196:application/ed27546d-6f28-4480-820e-6592404f720f/data-accessor/b52c1e88-6a4d-4f39-8c07-1e9a3d5f7b20",
+                "Tags": [
+                    {
+                        "Key": "team",
+                        "Value": "knowledge-platform"
+                    }
+                ]
+            }
+        ]
+    }
+}
