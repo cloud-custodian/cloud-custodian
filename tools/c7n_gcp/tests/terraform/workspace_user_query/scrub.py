@@ -19,9 +19,10 @@ import sys
 # parents[2] is tests/, from tests/terraform/workspace_user_query/
 FLIGHTS = pathlib.Path(__file__).parents[2] / 'data' / 'flights'
 FLIGHT = (FLIGHTS / 'workspace-user-query'
-          / 'get-admin-directory-v1-users_1.json')
-ASSIGNMENT_FLIGHT = (FLIGHTS / 'workspace-user-sso-assignment'
-                     / 'get-v1beta1-inboundSsoAssignments_1.json')
+          / 'get-admin.googleapis.com-admin-directory-v1-users_1.json')
+ASSIGNMENT_FLIGHT = (
+    FLIGHTS / 'workspace-user-sso-assignment'
+    / 'get-cloudidentity.googleapis.com-v1beta1-inboundSsoAssignments_1.json')
 
 DOMAIN = 'example.com'
 CUSTOMER_ID = 'C03abc123'
