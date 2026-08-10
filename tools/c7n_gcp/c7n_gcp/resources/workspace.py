@@ -22,8 +22,8 @@ class WorkspaceUser(QueryResourceManager):
     """Google Workspace user.
 
     Users live in Cloud Identity / Google Workspace rather than in GCP, so
-    reading them needs its own setup: see :ref:`gcp_workspace_users` for what
-    to configure and why.
+    reading them needs its own setup: see
+    :doc:`/gcp/examples/workspace-user-mfa` for what to configure and why.
 
     https://developers.google.com/admin-sdk/directory/reference/rest/v1/users/list
 
@@ -45,6 +45,15 @@ class WorkspaceUser(QueryResourceManager):
                 key: suspended
                 value: false
     """
+
+    def get_permissions(self):
+        """Nothing to grant in IAM.
+
+        Reading workspace users is authorized by an OAuth scope and the
+        impersonated subject's Workspace privileges, so the derived
+        admin.users.list would name a permission that cannot be granted.
+        """
+        return ()
 
     def get_resource_query(self):
         return {'customer': get_workspace_customer()}

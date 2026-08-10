@@ -53,20 +53,49 @@ Setup needed to use these resources
 -----------------------------------
 
 You need a GCP service account that a Workspace super administrator has
-authorized for the ``admin.directory.user.readonly`` and
-``cloud-identity.inboundsso.readonly`` scopes, and a Workspace user for it to
-impersonate. The impersonated user needs only the ``Users > Read``
-privilege, not super admin.
+authorized, and a Workspace user for it to impersonate. The impersonated
+user needs only the ``Users > Read`` privilege, not super admin.
 
-Both scopes are required. Delegation authorizes the exact scopes requested,
-so omitting either fails the run when its token is requested. The second is
-used for the SSO check described under `Caveats`_.
+1. Create a service account, in the GCP console under
+   IAM & Admin > Service Accounts. It can live in any project.
+
+2. Give it a key: select the account, then Keys > Add key > Create new key,
+   choose JSON, and keep the file it downloads. Delegation signs its own
+   JWT, so a key file is needed rather than the ambient credentials the
+   rest of the provider can use.
+
+   Two of its fields matter below:
+
+   ``client_id``
+     The numeric id, shown in the console as the service account's "Unique
+     ID". This is what step 4 asks for.
+
+   ``client_email``
+     Identifies the service account, but is *not* what step 4 asks for.
+
+3. Enable the APIs these policies call, in the same project under
+   APIs & Services > Library: **Admin SDK API** and **Cloud Identity API**.
+
+4. Authorize the delegation. Sign in to https://admin.google.com as a super
+   administrator, go to Security > Access and data control > API controls >
+   Manage Domain-Wide Delegation, click "Add new", and enter the service
+   account's ``client_id`` with these scopes:
+
+   ``https://www.googleapis.com/auth/admin.directory.user.readonly``
+     Listing users.
+
+   ``https://www.googleapis.com/auth/cloud-identity.inboundsso.readonly``
+     The SSO check described under `Caveats`_.
+
+   Both are required. Delegation authorizes exactly the scopes requested
+   and a broader grant does not imply a narrower one, so omitting either
+   fails the run when its token is requested. Changes here can take a few
+   minutes to take effect.
 
 Then, when running policies, the following environment variables must be set:
 
 ``GOOGLE_APPLICATION_CREDENTIALS``
-  Path to a service account key file. A key is required because delegation self signs
-  a JWT.
+  Path to the key file downloaded above.
 
 ``GOOGLE_WORKSPACE_SUBJECT``
   The Workspace user with the ``Users > Read`` privilege to

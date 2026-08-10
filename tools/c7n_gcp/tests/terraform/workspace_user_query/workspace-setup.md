@@ -19,37 +19,19 @@ account and impersonated user fit together, see
       addresses. This doesn't make them deliverable.  This process
       won't mess with the domains MX records by default.
 
-3. Create a service account in your dev GCP account (IAM & Admin -> Service Accounts).
-   Also define and download a key file that you'll use to authenicate
-   with the service account.
+3. Do the setup that running these policies needs anyway: the service
+   account, its key, the APIs, and the domain-wide delegation entry. See
+   "Setup needed to use these resources" in
+   `docs/source/gcp/examples/workspace-user-mfa.rst`.
 
-   The key file is JSON. Two of its fields are worth knowing:
-
-   - `client_id`: the numeric id you'll paste into the domain-wide
-     delegation entry in step 5. (The console also shows it on the service
-     account as "Unique ID".)
-   - `client_email`: identifies the service account, but is *not* what
-     step 5 wants.
-
-   Point `GOOGLE_APPLICATION_CREDENTIALS` at this file.
-
-4. Log onto the workspace at https://admin.google.com
-
-5. In the workspace, go to
-   Security > Access and data control > API controls > Manage Domain-Wide Delegation.
-   Click "Add new" and enter the service account id (a long string of
-   digits) and these scopes:
+   Recording needs two further scopes on that same delegation entry. No
+   policy uses them; they are for `workspace_sso.py`, which gives the
+   workspace an SSO assignment to record and then removes it:
 
    | scope | needed for |
    |-------|------------|
-   | `admin.directory.user.readonly` | listing users |
-   | `cloud-identity.inboundsso.readonly` | the resource's SSO check |
-   | `admin.directory.orgunit.readonly` | recording only: finding the org unit to assign |
-   | `cloud-identity.inboundsso` | recording only: creating and deleting that assignment |
-
-   The first two are what running policies needs, as
-   `docs/source/gcp/examples/workspace-user-mfa.rst` says. The last two are
-   only used by `workspace_sso.py` while recording.
+   | `admin.directory.orgunit.readonly` | finding the org unit to assign |
+   | `cloud-identity.inboundsso` | creating and deleting the assignment |
 
    Delegation authorizes the exact scope requested, and a broader grant does
    not imply a narrower one: with `cloud-identity.inboundsso` granted,
@@ -57,13 +39,7 @@ account and impersonated user fit together, see
    `unauthorized_client` until it too is listed. Scope changes take a few
    minutes to take effect.
 
-6. Enable the APIs.  In your GCP dev project, navigate to APIs & Services,
-   select "Library", then find and "Enable" each of:
-
-   - Admin SDK API
-   - Cloud Identity API
-
-7. Set up test users.
+4. Set up test users.
 
    This is the state the tests expect. `test_workspace_user_state` asserts
    it, so if that test fails, this table is what to restore the workspace to.
@@ -106,60 +82,60 @@ account and impersonated user fit together, see
    only be done by signing in as that user. There is no API for it, which
    is why this step is manual.
 
-8. Create a sub-organization, `test-no-enforcement`, with 2sv not enforced,
+5. Create a sub-organization, `test-no-enforcement`, with 2sv not enforced,
    and move `test_needno2sv` and `test_no2sv` into it.
 
    This comes before enforcement, because `test_no2sv` is never going to
-   enroll, and enforcement would lock it out of the sign in that step 10
+   enroll, and enforcement would lock it out of the sign in that step 7
    needs.
 
-9. Turn on 2sv enforcement on the root organization unit.
+6. Turn on 2sv enforcement on the root organization unit.
 
    **IMPORTANT! Set up 2sv on the super admin acount first!** Enforcement
    locks out anyone not enrolled, and the super admin is the account the
    tests impersonate.
 
-10. Get the suspended column to match the table.
+7. Get the suspended column to match the table.
 
-    Suspend `test_no2sv_susp` yourself, from the admin console. Don't wait
-    for google to do it: doing it deliberately is reproducible, and shows up
-    as `suspensionReason: ADMIN`.
+   Suspend `test_no2sv_susp` yourself, from the admin console. Don't wait
+   for google to do it: doing it deliberately is reproducible, and shows up
+   as `suspensionReason: ADMIN`.
 
-    `test_no2sv` has to be *un*suspended, and that's the awkward one.
+   `test_no2sv` has to be *un*suspended, and that's the awkward one.
 
-    Google auto suspends freshly created accounts with
-    `suspensionReason: WEB_LOGIN_REQUIRED` when you create several in a
-    short period. It's a periodic sweep rather than a per account timer: our
-    accounts were created up to 18 minutes apart and were all suspended
-    within 11 seconds of each other, about 4.5 hours later. So spacing
-    creation out by a few minutes doesn't help much. What does help is
-    creating the account you need unsuspended last, on its own, and
-    recording promptly.
+   Google auto suspends freshly created accounts with
+   `suspensionReason: WEB_LOGIN_REQUIRED` when you create several in a
+   short period. It's a periodic sweep rather than a per account timer: our
+   accounts were created up to 18 minutes apart and were all suspended
+   within 11 seconds of each other, about 4.5 hours later. So spacing
+   creation out by a few minutes doesn't help much. What does help is
+   creating the account you need unsuspended last, on its own, and
+   recording promptly.
 
-    Once it happens, **an admin cannot clear it** -- the REACTIVATE button
-    is greyed out. Only the user can, by signing in at
-    https://accounts.google.com and entering a code sent to a mobile phone.
-    Two surprises there:
+   Once it happens, **an admin cannot clear it** -- the REACTIVATE button
+   is greyed out. Only the user can, by signing in at
+   https://accounts.google.com and entering a code sent to a mobile phone.
+   Two surprises there:
 
-    - It asks for a phone number rather than using the one on the account.
-      That's abuse throttling, not authentication.
-    - It rate limits per phone number, so the number you used to enroll 2sv
-      on the other accounts will likely be refused with "This phone number
-      has already been used too many times for verification". You may need
-      to borrow a phone.
+   - It asks for a phone number rather than using the one on the account.
+     That's abuse throttling, not authentication.
+   - It rate limits per phone number, so the number you used to enroll 2sv
+     on the other accounts will likely be refused with "This phone number
+     has already been used too many times for verification". You may need
+     to borrow a phone.
 
-    This is only possible at all because step 8 put `test_no2sv` outside 2sv
-    enforcement: an unenrolled user can't complete a sign in while
-    enforcement applies. And it matters because if `test_no2sv` stays
-    suspended, the documented policy selects nothing and the test proves
-    nothing.
+   This is only possible at all because step 5 put `test_no2sv` outside 2sv
+   enforcement: an unenrolled user can't complete a sign in while
+   enforcement applies. And it matters because if `test_no2sv` stays
+   suspended, the documented policy selects nothing and the test proves
+   nothing.
 
-    The remaining users can be suspended or not; no test depends on them.
-    The table records what we happened to have.
+   The remaining users can be suspended or not; no test depends on them.
+   The table records what we happened to have.
 
-11. Assign some admin role to test_admin. It doesn't matter which
-    one. Whatever is first in the list is fine. :) That makes it a
-    delegated admin, which is all the tests care about.
+8. Assign some admin role to test_admin. It doesn't matter which
+   one. Whatever is first in the list is fine. :) That makes it a
+   delegated admin, which is all the tests care about.
 
 Nothing here sets up SSO. `test_sso_assignments_are_rejected` needs the
 workspace to have an inbound SSO assignment, and `workspace_sso.py` creates
