@@ -1,0 +1,16 @@
+{
+    "status_code": 200,
+    "data": {
+        "Tags": [
+            {
+                "Key": "Department",
+                "Value": "International"
+            },
+            {
+                "Key": "Owner",
+                "Value": "Pratyush"
+            }
+        ],
+        "ResponseMetadata": {}
+    }
+}

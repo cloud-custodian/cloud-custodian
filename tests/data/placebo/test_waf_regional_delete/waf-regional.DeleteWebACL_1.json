@@ -1,0 +1,11 @@
+{
+    "status_code": 200,
+    "data": {
+        "ChangeToken": "change-token-regional-002",
+        "ResponseMetadata": {
+            "RetryAttempts": 0,
+            "HTTPStatusCode": 200,
+            "RequestId": "test-delete-webacl-regional-001"
+        }
+    }
+}

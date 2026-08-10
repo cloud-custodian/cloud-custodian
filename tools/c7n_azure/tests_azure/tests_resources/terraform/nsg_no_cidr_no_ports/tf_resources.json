@@ -1,0 +1,138 @@
+{
+    "pytest-terraform": 1,
+    "outputs": {},
+    "resources": {
+        "azurerm_resource_group": {
+            "main": {
+                "id": "/subscriptions/00000000-0000-0000-0000-000000000000/resourceGroups/stacklet-dev-westus",
+                "location": "westus",
+                "managed_by": "",
+                "name": "stacklet-dev-westus",
+                "tags": {},
+                "timeouts": null
+            }
+        },
+        "azurerm_network_security_group": {
+            "allow_all_ingress": {
+                "id": "/subscriptions/00000000-0000-0000-0000-000000000000/resourceGroups/stacklet-dev-westus/providers/Microsoft.Network/networkSecurityGroups/nsg-allow-all-ingress",
+                "location": "westus",
+                "name": "nsg-allow-all-ingress",
+                "resource_group_name": "stacklet-dev-westus",
+                "security_rule": [
+                    {
+                        "access": "Allow",
+                        "description": "",
+                        "destination_address_prefix": "*",
+                        "destination_address_prefixes": [],
+                        "destination_application_security_group_ids": [],
+                        "destination_port_range": "*",
+                        "destination_port_ranges": [],
+                        "direction": "Inbound",
+                        "name": "allow-all-ingress",
+                        "priority": 100,
+                        "protocol": "*",
+                        "source_address_prefix": "*",
+                        "source_address_prefixes": [],
+                        "source_application_security_group_ids": [],
+                        "source_port_range": "*",
+                        "source_port_ranges": []
+                    }
+                ],
+                "tags": null,
+                "timeouts": null
+            },
+            "deny_all_ingress": {
+                "id": "/subscriptions/00000000-0000-0000-0000-000000000000/resourceGroups/stacklet-dev-westus/providers/Microsoft.Network/networkSecurityGroups/nsg-deny-all-ingress",
+                "location": "westus",
+                "name": "nsg-deny-all-ingress",
+                "resource_group_name": "stacklet-dev-westus",
+                "security_rule": [
+                    {
+                        "access": "Deny",
+                        "description": "",
+                        "destination_address_prefix": "*",
+                        "destination_address_prefixes": [],
+                        "destination_application_security_group_ids": [],
+                        "destination_port_range": "*",
+                        "destination_port_ranges": [],
+                        "direction": "Inbound",
+                        "name": "deny-all-ingress",
+                        "priority": 100,
+                        "protocol": "*",
+                        "source_address_prefix": "*",
+                        "source_address_prefixes": [],
+                        "source_application_security_group_ids": [],
+                        "source_port_range": "*",
+                        "source_port_ranges": []
+                    }
+                ],
+                "tags": null,
+                "timeouts": null
+            },
+            "mixed_rules": {
+                "id": "/subscriptions/00000000-0000-0000-0000-000000000000/resourceGroups/stacklet-dev-westus/providers/Microsoft.Network/networkSecurityGroups/nsg-mixed-rules",
+                "location": "westus",
+                "name": "nsg-mixed-rules",
+                "resource_group_name": "stacklet-dev-westus",
+                "security_rule": [
+                    {
+                        "access": "Allow",
+                        "description": "",
+                        "destination_address_prefix": "*",
+                        "destination_address_prefixes": [],
+                        "destination_application_security_group_ids": [],
+                        "destination_port_range": "443",
+                        "destination_port_ranges": [],
+                        "direction": "Inbound",
+                        "name": "allow-https",
+                        "priority": 300,
+                        "protocol": "Tcp",
+                        "source_address_prefix": "*",
+                        "source_address_prefixes": [],
+                        "source_application_security_group_ids": [],
+                        "source_port_range": "*",
+                        "source_port_ranges": []
+                    },
+                    {
+                        "access": "Allow",
+                        "description": "",
+                        "destination_address_prefix": "*",
+                        "destination_address_prefixes": [],
+                        "destination_application_security_group_ids": [],
+                        "destination_port_range": "80",
+                        "destination_port_ranges": [],
+                        "direction": "Inbound",
+                        "name": "allow-http",
+                        "priority": 100,
+                        "protocol": "Tcp",
+                        "source_address_prefix": "*",
+                        "source_address_prefixes": [],
+                        "source_application_security_group_ids": [],
+                        "source_port_range": "*",
+                        "source_port_ranges": []
+                    },
+                    {
+                        "access": "Deny",
+                        "description": "",
+                        "destination_address_prefix": "*",
+                        "destination_address_prefixes": [],
+                        "destination_application_security_group_ids": [],
+                        "destination_port_range": "22",
+                        "destination_port_ranges": [],
+                        "direction": "Inbound",
+                        "name": "deny-ssh",
+                        "priority": 200,
+                        "protocol": "Tcp",
+                        "source_address_prefix": "*",
+                        "source_address_prefixes": [],
+                        "source_application_security_group_ids": [],
+                        "source_port_range": "*",
+                        "source_port_ranges": []
+                    }
+                ],
+                "tags": null,
+                "timeouts": null
+            }
+        }
+    }
+}
