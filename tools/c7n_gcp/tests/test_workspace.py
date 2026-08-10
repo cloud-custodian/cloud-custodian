@@ -9,11 +9,14 @@ import json
 import os
 from unittest import mock
 
+import pytest
 from googleapiclient import discovery_cache
 
 from c7n.config import Bag, Config
+from c7n.exceptions import PolicyExecutionError
 from c7n_gcp.resources.workspace import WorkspaceUser
 from gcp_common import BaseTest
+from workspace_sso import add_sso_assignment
 
 
 class WorkspaceUserMetaTest(BaseTest):
@@ -156,6 +159,26 @@ def test_workspace_user_state(test):
          else r['primaryEmail'].split('@')[0]): tuple(r[f] for f in fields)
         for r in policy.run()}
     assert actual == expected
+
+
+def test_sso_assignments_are_rejected(test):
+    """Resolving which assignment governs a user isn't implemented, so the
+    2sv fields can't be trusted when any assignment exists.
+
+    terraform/workspace_user_query/workspace-setup.md covers what recording
+    this needs.
+    """
+    factory = test.replay_flight_data('workspace-user-sso-assignment')
+    if test.recording:
+        add_sso_assignment(test)
+    policy = test.load_policy(
+        {'name': 'workspace-users', 'resource': 'gcp.workspace-user'},
+        session_factory=factory)
+    with pytest.raises(PolicyExecutionError) as caught:
+        policy.run()
+    assert str(caught.value) == (
+        "Organizations with SSO assignments aren't currently supported by"
+        " gcp.workspace-user.")
 
 
 def test_workspace_user_report_fields(test):

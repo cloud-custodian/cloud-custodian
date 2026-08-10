@@ -1,0 +1,18 @@
+{
+  "headers": {
+    "content-type": "application/json; charset=UTF-8",
+    "vary": "Origin, X-Origin, Referer",
+    "date": "Mon, 10 Aug 2026 19:36:25 GMT",
+    "server": "ESF",
+    "x-xss-protection": "0",
+    "x-frame-options": "SAMEORIGIN",
+    "x-content-type-options": "nosniff",
+    "alt-svc": "h3=\":443\"; ma=2592000,h3-29=\":443\"; ma=2592000",
+    "transfer-encoding": "chunked",
+    "status": "200",
+    "content-length": "3",
+    "-content-encoding": "gzip",
+    "content-location": "https://cloudidentity.googleapis.com/v1beta1/inboundSsoAssignments?filter=customer%3D%3D%22customers%2Fmy_customer%22&alt=json"
+  },
+  "body": {}
+}

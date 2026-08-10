@@ -53,9 +53,14 @@ Setup needed to use these resources
 -----------------------------------
 
 You need a GCP service account that a Workspace super administrator has
-authorized for the ``admin.directory.user.readonly`` scope, and a Workspace
-user for it to impersonate. The impersonated user needs only the
-``Users > Read`` privilege, not super admin.
+authorized for the ``admin.directory.user.readonly`` and
+``cloud-identity.inboundsso.readonly`` scopes, and a Workspace user for it to
+impersonate. The impersonated user needs only the ``Users > Read``
+privilege, not super admin.
+
+Both scopes are required. Delegation authorizes the exact scopes requested,
+so omitting either fails the run when its token is requested. The second is
+used for the SSO check described under `Caveats`_.
 
 Then, when running policies, the following environment variables must be set:
 
@@ -85,8 +90,7 @@ Finding users without MFA
 -------------------------
 
 The Directory API reports 2 step verification, Google's term for MFA, per
-user. This satisfies CIS-B-GCPF-4.0.0-1.2. Suspended users cannot sign in,
-so they are excluded to avoid noise.
+user. Suspended users cannot sign in, so they are excluded to avoid noise.
 
 .. code-block:: yaml
 
@@ -116,6 +120,9 @@ a narrower delegated role appear as ``isDelegatedAdmin`` instead, and neither
 is the same as a GCP ``roles/resourcemanager.organizationAdmin`` binding.
 
 If your organization authenticates through an external identity provider,
-MFA may be enforced there rather than by Google, in which case
-``isEnrolledIn2Sv`` can read false for users who are in fact strongly
-authenticated.
+sign in may be handled there rather than by Google, in which case
+``isEnrolledIn2Sv`` describes a factor Google may never ask for. Which
+provider governs a given user depends on the org unit and group an inbound
+SSO assignment targets, and that isn't resolved here yet. Rather than report
+two step verification as though it were protection, policies fail when the
+Workspace has any inbound SSO assignment.

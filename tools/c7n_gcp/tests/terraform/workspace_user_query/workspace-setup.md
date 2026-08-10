@@ -38,15 +38,30 @@ account and impersonated user fit together, see
 5. In the workspace, go to
    Security > Access and data control > API controls > Manage Domain-Wide Delegation.
    Click "Add new" and enter the service account id (a long string of
-   digits) and, for the
-   "scope":
-   https://www.googleapis.com/auth/admin.directory.user.readonly
+   digits) and these scopes:
 
-6. Enable the workspace API.  In your GCP dev project:
-   1. Navigate to APIs & Services.
-   2. Select "Library".
-   3. Search for Admin SDK API
-   4. Select it and click "Enable"
+   | scope | needed for |
+   |-------|------------|
+   | `admin.directory.user.readonly` | listing users |
+   | `cloud-identity.inboundsso.readonly` | the resource's SSO check |
+   | `admin.directory.orgunit.readonly` | recording only: finding the org unit to assign |
+   | `cloud-identity.inboundsso` | recording only: creating and deleting that assignment |
+
+   The first two are what running policies needs, as
+   `docs/source/gcp/examples/workspace-user-mfa.rst` says. The last two are
+   only used by `workspace_sso.py` while recording.
+
+   Delegation authorizes the exact scope requested, and a broader grant does
+   not imply a narrower one: with `cloud-identity.inboundsso` granted,
+   requesting `cloud-identity.inboundsso.readonly` still fails
+   `unauthorized_client` until it too is listed. Scope changes take a few
+   minutes to take effect.
+
+6. Enable the APIs.  In your GCP dev project, navigate to APIs & Services,
+   select "Library", then find and "Enable" each of:
+
+   - Admin SDK API
+   - Cloud Identity API
 
 7. Set up test users.
 
@@ -147,6 +162,17 @@ account and impersonated user fit together, see
     one. Whatever is first in the list is fine. :) That makes it a
     delegated admin, which is all the tests care about.
 
+Nothing here sets up SSO. `test_sso_assignments_are_rejected` needs the
+workspace to have an inbound SSO assignment, and `workspace_sso.py` creates
+one while recording and removes it afterwards, so the resting state has
+none. Its identity provider is mocksaml.com, whose published metadata is
+kept next to this file as `mock-saml-metadata.xml`; nothing signs in through
+it, it just has to be a real enough provider for Google to accept.
+
+An assignment needs a SAML profile, and a profile is rejected as "not
+complete" until a certificate has been added to it, so all three are created
+and then deleted in reverse.
+
 ## Recording
 
 Temporarily change `replay_flight_data` to `record_flight_data` in the test
@@ -178,13 +204,24 @@ phone number, because we checked for the fields we thought of rather than the
 fields that were there. The script replaces the domain, the super admin's
 identity, ids, etags and the customer id, and drops anything that could carry
 personal data. It fails if it sees a field it doesn't recognize, so a future
-API addition can't slip PII through unnoticed.
+API addition can't slip PII through unnoticed. It scrubs the recorded SSO
+assignment the same way, rewriting the ids google generated for the
+assignment, org unit and profile.
 
 The `test_*` local parts are kept as they are: they're already test names, and
 `test_workspace_user_state` keys off them.
 
 Watch for stray recordings of unrelated calls as well; delete any that the
-test doesn't need.
+test doesn't need. Recording always leaves at least one
+`...serviceAccounts-...-allowedLocations_N.json`, from signing the
+delegation JWT. Replay uses fake credentials and never asks for it, and its
+name carries the real project, so delete those.
+
+Each test's replay starts numbering responses again from `_1`, so two tests
+cannot share a flight directory when they need different answers to the same
+call. That's why the SSO test records into `workspace-user-sso-assignment`
+while everything else uses `workspace-user-query`: one needs an assignment
+listed, the others need none.
 
 Finally, change the test back to `replay_flight_data` and confirm it passes
 with no other edits.

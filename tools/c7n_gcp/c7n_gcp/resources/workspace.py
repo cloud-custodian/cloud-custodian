@@ -6,9 +6,15 @@
 #
 # docs/source/gcp/examples/workspace-user-mfa.rst
 
+from c7n.exceptions import PolicyExecutionError
+from c7n.utils import local_session
+
 from c7n_gcp.client import get_workspace_customer
 from c7n_gcp.provider import resources
 from c7n_gcp.query import QueryResourceManager, TypeInfo
+
+SSO_ASSIGNMENT_SCOPES = (
+    'https://www.googleapis.com/auth/cloud-identity.inboundsso.readonly',)
 
 
 @resources.register('workspace-user')
@@ -43,6 +49,32 @@ class WorkspaceUser(QueryResourceManager):
 
     def get_resource_query(self):
         return {'customer': get_workspace_customer()}
+
+    def resources(self, query=None):
+        self.check_no_sso_assignments()
+        return super().resources(query)
+
+    def check_no_sso_assignments(self):
+        """Refuse to report on users whose sign in Google may not handle.
+
+        An InboundSsoAssignment sends a org unit or a group to an external
+        identity provider, and which assignment wins for a given user isn't
+        resolved here yet, so isEnrolledIn2Sv and isEnforcedIn2Sv can't be
+        read as protection.
+
+        https://cloud.google.com/identity/docs/reference/rest/v1beta1/inboundSsoAssignments/list
+        """
+        client = local_session(self.session_factory).client(
+            'cloudidentity', 'v1beta1', 'inboundSsoAssignments',
+            scopes=SSO_ASSIGNMENT_SCOPES)
+        # The quoting is required, though the api's own example omits it.
+        assignments = client.execute_query(
+            'list',
+            {'filter': 'customer=="customers/%s"' % get_workspace_customer()})
+        if assignments.get('inboundSsoAssignments'):
+            raise PolicyExecutionError(
+                "Organizations with SSO assignments aren't currently"
+                " supported by gcp.workspace-user.")
 
     class resource_type(TypeInfo):
         service = 'admin'
