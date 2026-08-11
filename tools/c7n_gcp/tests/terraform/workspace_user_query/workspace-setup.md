@@ -98,9 +98,10 @@ account and impersonated user fit together, see
 
 7. Get the suspended column to match the table.
 
-   Suspend `test_no2sv_susp` yourself, from the admin console. Don't wait
-   for google to do it: doing it deliberately is reproducible, and shows up
-   as `suspensionReason: ADMIN`.
+   Suspend `test_no2sv_susp` yourself, from the admin console, following
+   https://knowledge.workspace.google.com/admin/users/suspend-a-user-temporarily
+   Don't wait for google to do it: doing it deliberately is reproducible,
+   and shows up as `suspensionReason: ADMIN`.
 
    `test_no2sv` has to be *un*suspended, and that's the awkward one.
 
@@ -114,6 +115,8 @@ account and impersonated user fit together, see
    recording promptly.
 
    Once it happens, **an admin cannot clear it** -- the REACTIVATE button
+   described at
+   https://knowledge.workspace.google.com/admin/users/restore-a-suspended-user
    is greyed out. Only the user can, by signing in at
    https://accounts.google.com and entering a code sent to a mobile phone.
    Two surprises there:
