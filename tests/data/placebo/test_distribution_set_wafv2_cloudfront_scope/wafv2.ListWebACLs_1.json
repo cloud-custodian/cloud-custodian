@@ -1,0 +1,13 @@
+{
+    "status_code": 200,
+    "data": {
+        "ResponseMetadata": {},
+        "WebACLs": [
+            {
+                "Id": "cf-webacl-id-1234",
+                "Name": "BR_IPs_OWASP_Block",
+                "ARN": "arn:aws:wafv2:us-east-1:123456789012:global/webacl/BR_IPs_OWASP_Block/cf-webacl-id-1234"
+            }
+        ]
+    }
+}
