@@ -126,6 +126,13 @@ class VertexAIModels:
             {'parent': f'projects/{project}/locations/{location}',
              'body': {'model': {'displayName': display_name, 'labels': labels or {}}}})
 
+        # The upload operation's name is already scoped under the model it
+        # will produce (.../models/{id}/operations/{opid}), so the model can
+        # be tracked for cleanup immediately -- before polling, which may
+        # fail or time out -- rather than waiting for operation['response'].
+        model_name = operation['name'].rsplit('/operations/', 1)[0]
+        self.created.append((client, model_name))
+
         ops_client = self._client(session, location, 'projects.locations.models.operations')
         for _ in range(30):
             if operation.get('done'):
@@ -133,9 +140,7 @@ class VertexAIModels:
             if self.test.recording:
                 time.sleep(5)
             operation = ops_client.execute_query('get', {'name': operation['name']})
-        model_name = operation['response']['model']
 
-        self.created.append((client, model_name))
         return client.execute_query('get', {'name': model_name})
 
     def cleanup(self):
@@ -313,10 +318,10 @@ def test_vertexai_model_multi_location(test):
     test.session_factory = test.replay_flight_data('vertexai-model-multi-location')
 
     models = VertexAIModels(test)
+    test.addCleanup(models.cleanup)
     if test.recording:
         models.create('us-central1', 'c7n-test-model-central')
         models.create('us-east1', 'c7n-test-model-east')
-    test.addCleanup(models.cleanup)
 
     policy = test.load_policy(
         {'name': 'vertexai-models-multi-location',
@@ -344,10 +349,10 @@ def test_vertexai_model_filtering(test):
     test.session_factory = test.replay_flight_data('vertexai-model-filtering')
 
     models = VertexAIModels(test)
+    test.addCleanup(models.cleanup)
     if test.recording:
         models.create('us-central1', 'c7n-test-model-owned', labels={'owner': 'c7n'})
         models.create('us-central1', 'c7n-test-model-unowned')
-    test.addCleanup(models.cleanup)
 
     policy = test.load_policy(
         {'name': 'vertexai-models-missing-owner-label',
