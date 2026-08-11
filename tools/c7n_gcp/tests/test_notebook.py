@@ -84,6 +84,18 @@ def test_notebook_v2_update_metadata(test, notebook_v2):
         {
             "name": "notebook-v2-update-metadata",
             "resource": "gcp.notebook-v2",
+            # Constrains to the public instance without depending on a
+            # terraform-fixture-derived name -- see test_notebook_v2's note
+            # on why. main.tf still defines a private_instance too, so an
+            # unfiltered list could match both if it's ever listed.
+            "filters": [
+                {
+                    "type": "value",
+                    "key": "gceSetup.disablePublicIp",
+                    "op": "ne",
+                    "value": True,
+                },
+            ],
             "actions": [
                 {
                     "type": "update-metadata",
