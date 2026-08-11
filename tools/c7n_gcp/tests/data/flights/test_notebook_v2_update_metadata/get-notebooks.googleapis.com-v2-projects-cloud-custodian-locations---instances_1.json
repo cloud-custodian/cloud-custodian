@@ -1,0 +1,112 @@
+{
+  "headers": {
+    "content-type": "application/json; charset=UTF-8",
+    "vary": "Origin, X-Origin, Referer",
+    "date": "Tue, 11 Aug 2026 22:34:06 GMT",
+    "server": "ESF",
+    "x-xss-protection": "0",
+    "x-frame-options": "SAMEORIGIN",
+    "x-content-type-options": "nosniff",
+    "alt-svc": "h3=\":443\"; ma=2592000,h3-29=\":443\"; ma=2592000",
+    "transfer-encoding": "chunked",
+    "status": "200",
+    "content-length": "3726",
+    "-content-encoding": "gzip",
+    "content-location": "https://notebooks.googleapis.com/v2/projects/cloud-custodian/locations/-/instances?alt=json"
+  },
+  "body": {
+    "instances": [
+      {
+        "name": "projects/cloud-custodian/locations/us-east1-b/instances/c7n-notebook-public-default-c940",
+        "gceSetup": {
+          "machineType": "https://www.googleapis.com/compute/v1/projects/cloud-custodian/zones/us-east1-b/machineTypes/e2-standard-4",
+          "serviceAccounts": [
+            {
+              "email": "693936050605-compute@developer.gserviceaccount.com",
+              "scopes": [
+                "https://www.googleapis.com/auth/cloud-platform",
+                "https://www.googleapis.com/auth/userinfo.email"
+              ]
+            }
+          ],
+          "bootDisk": {
+            "diskSizeGb": "150",
+            "diskEncryption": "GMEK"
+          },
+          "dataDisks": [
+            {
+              "diskSizeGb": "100",
+              "diskEncryption": "GMEK"
+            }
+          ],
+          "shieldedInstanceConfig": {
+            "enableVtpm": true,
+            "enableIntegrityMonitoring": true
+          },
+          "networkInterfaces": [
+            {
+              "network": "https://www.googleapis.com/compute/v1/projects/cloud-custodian/global/networks/default",
+              "subnet": "https://www.googleapis.com/compute/v1/projects/cloud-custodian/regions/us-east1/subnetworks/default",
+              "accessConfigs": [
+                {
+                  "externalIp": "34.139.222.214"
+                }
+              ]
+            }
+          ],
+          "tags": [
+            "deeplearning-vm",
+            "notebook-instance"
+          ],
+          "metadata": {
+            "disable-swap-binaries": "true",
+            "enable-guest-attributes": "TRUE",
+            "notebooks-api-version": "v2",
+            "enable-jupyterlab4": "true",
+            "proxy-mode": "service_account",
+            "report-event-url": "https://notebooks.googleapis.com/v2/projects/cloud-custodian/locations/us-east1-b/instances/c7n-notebook-public-default-c940:reportInfoSystem",
+            "shutdown-script": "/opt/deeplearning/bin/shutdown_script.sh",
+            "version": "20260809-2130-rc0",
+            "new-proxy-agent-enabled": "true",
+            "enable-oslogin": "TRUE",
+            "proxy-registration-url": "https://us-east1.notebooks.cloud.google.com/tun/m/4592f092208ecc84946b8f8f8016274df1b36a14",
+            "proxy-backend-id": "4cab95e39f52c5c7",
+            "proxy-url": "4cab95e39f52c5c7-dot-us-east1.notebooks.googleusercontent.com",
+            "serial-port-logging-enable": "true",
+            "resource-url": "https://notebooks.googleapis.com/v2/projects/cloud-custodian/locations/us-east1-b/instances/c7n-notebook-public-default-c940",
+            "instance-region": "us-east1",
+            "notebooks-api": "PROD"
+          },
+          "gpuDriverConfig": {},
+          "reservationAffinity": {
+            "consumeReservationType": "RESERVATION_NONE"
+          },
+          "minCpuPlatform": "Intel Broadwell",
+          "instanceId": "1101775890323741813"
+        },
+        "proxyUri": "4cab95e39f52c5c7-dot-us-east1.notebooks.googleusercontent.com",
+        "creator": "jim.fulton@sixfeetup.com",
+        "state": "ACTIVE",
+        "id": "4a54e58d-c59d-4370-bbda-6921f79673f9",
+        "healthState": "HEALTHY",
+        "healthInfo": {
+          "last_updated": "2026-08-11T22:34:01+00:00",
+          "system_health": "1",
+          "docker_status": "1",
+          "jupyterlab_status": "1",
+          "jupyterlab_api_status": "1"
+        },
+        "createTime": "2026-08-11T22:30:48.426001225Z",
+        "updateTime": "2026-08-11T22:34:02.416841663Z",
+        "labels": {
+          "consumer-project-id": "stkl-jim-fulton",
+          "consumer-project-number": "693936050605",
+          "goog-terraform-provisioned": "true",
+          "notebooks-product": "workbench-instances",
+          "resource-name": "c7n-notebook-public-default-c940"
+        },
+        "satisfiesPzi": true
+      }
+    ]
+  }
+}

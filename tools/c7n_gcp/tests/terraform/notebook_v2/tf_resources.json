@@ -3,134 +3,20 @@
     "outputs": {},
     "resources": {
         "google_workbench_instance": {
-            "private_instance": {
-                "create_time": "2026-07-06T21:14:29.701611482Z",
-                "creator": "caleb.syring@sixfeetup.com",
-                "deletion_policy": "DELETE",
-                "desired_state": "ACTIVE",
-                "disable_proxy_access": false,
-                "effective_labels": {
-                    "consumer-project-id": "stacklet-test-policies",
-                    "consumer-project-number": "859150599087",
-                    "goog-terraform-provisioned": "true",
-                    "notebooks-product": "workbench-instances",
-                    "resource-name": "c7n-notebook-private-default-62ac"
-                },
-                "enable_managed_euc": false,
-                "enable_third_party_identity": false,
-                "gce_setup": [
-                    {
-                        "accelerator_configs": [],
-                        "boot_disk": [
-                            {
-                                "disk_encryption": "GMEK",
-                                "disk_size_gb": "150",
-                                "disk_type": "",
-                                "kms_key": ""
-                            }
-                        ],
-                        "confidential_instance_config": [],
-                        "container_image": [],
-                        "data_disks": [
-                            {
-                                "disk_encryption": "GMEK",
-                                "disk_size_gb": "100",
-                                "disk_type": "",
-                                "kms_key": ""
-                            }
-                        ],
-                        "disable_public_ip": true,
-                        "enable_ip_forwarding": false,
-                        "machine_type": "e2-standard-4",
-                        "metadata": {
-                            "disable-swap-binaries": "true",
-                            "enable-guest-attributes": "TRUE",
-                            "enable-jupyterlab4": "true",
-                            "enable-oslogin": "TRUE",
-                            "instance-region": "us-central1",
-                            "notebooks-api": "PROD",
-                            "notebooks-api-version": "v2",
-                            "proxy-backend-id": "c1cccbd5b589747",
-                            "proxy-mode": "service_account",
-                            "proxy-registration-url": "https://us-central1.notebooks.cloud.google.com/tun/m/4592f092208ecc84946b8f8f8016274df1b36a14",
-                            "proxy-url": "c1cccbd5b589747-dot-us-central1.notebooks.googleusercontent.com",
-                            "report-event-url": "https://notebooks.googleapis.com/v2/projects/cloud-custodian/locations/us-central1-a/instances/c7n-notebook-private-default-62ac:reportInfoSystem",
-                            "resource-url": "https://notebooks.googleapis.com/v2/projects/cloud-custodian/locations/us-central1-a/instances/c7n-notebook-private-default-62ac",
-                            "serial-port-logging-enable": "true",
-                            "shutdown-script": "/opt/deeplearning/bin/shutdown_script.sh",
-                            "version": "20260701-2130-rc0"
-                        },
-                        "network_interfaces": [
-                            {
-                                "access_configs": [],
-                                "network": "https://www.googleapis.com/compute/v1/projects/cloud-custodian/global/networks/default",
-                                "nic_type": "",
-                                "subnet": "https://www.googleapis.com/compute/v1/projects/cloud-custodian/regions/us-central1/subnetworks/default"
-                            }
-                        ],
-                        "reservation_affinity": [
-                            {
-                                "consume_reservation_type": "RESERVATION_NONE",
-                                "key": "",
-                                "values": []
-                            }
-                        ],
-                        "service_accounts": [
-                            {
-                                "email": "859150599087-compute@developer.gserviceaccount.com",
-                                "scopes": [
-                                    "https://www.googleapis.com/auth/cloud-platform",
-                                    "https://www.googleapis.com/auth/userinfo.email"
-                                ]
-                            }
-                        ],
-                        "shielded_instance_config": [
-                            {
-                                "enable_integrity_monitoring": true,
-                                "enable_secure_boot": false,
-                                "enable_vtpm": true
-                            }
-                        ],
-                        "tags": [
-                            "deeplearning-vm",
-                            "notebook-instance"
-                        ],
-                        "vm_image": []
-                    }
-                ],
-                "health_info": [
-                    {}
-                ],
-                "health_state": "HEALTHY",
-                "id": "projects/cloud-custodian/locations/us-central1-a/instances/c7n-notebook-private-default-62ac",
-                "instance_id": null,
-                "instance_owners": null,
-                "labels": null,
-                "location": "us-central1-a",
-                "name": "c7n-notebook-private-default-62ac",
-                "project": "stacklet-test-policies",
-                "proxy_uri": "c1cccbd5b589747-dot-us-central1.notebooks.googleusercontent.com",
-                "state": "ACTIVE",
-                "terraform_labels": {
-                    "goog-terraform-provisioned": "true"
-                },
-                "timeouts": null,
-                "update_time": "2026-07-06T21:17:08.522978131Z",
-                "upgrade_history": []
-            },
             "public_instance": {
-                "create_time": "2026-07-06T21:14:29.722087079Z",
-                "creator": "caleb.syring@sixfeetup.com",
+                "create_time": "2026-08-11T22:30:48.426001225Z",
+                "creator": "jim.fulton@sixfeetup.com",
                 "deletion_policy": "DELETE",
                 "desired_state": "ACTIVE",
                 "disable_proxy_access": false,
                 "effective_labels": {
-                    "consumer-project-id": "stacklet-test-policies",
-                    "consumer-project-number": "859150599087",
+                    "consumer-project-id": "stkl-jim-fulton",
+                    "consumer-project-number": "693936050605",
                     "goog-terraform-provisioned": "true",
                     "notebooks-product": "workbench-instances",
-                    "resource-name": "c7n-notebook-public-default-62ac"
+                    "resource-name": "c7n-notebook-public-default-c940"
                 },
+                "enable_deletion_protection": false,
                 "enable_managed_euc": false,
                 "enable_third_party_identity": false,
                 "gce_setup": [
@@ -151,7 +37,8 @@
                                 "disk_encryption": "GMEK",
                                 "disk_size_gb": "100",
                                 "disk_type": "",
-                                "kms_key": ""
+                                "kms_key": "",
+                                "resource_policies": []
                             }
                         ],
                         "disable_public_ip": false,
@@ -162,29 +49,31 @@
                             "enable-guest-attributes": "TRUE",
                             "enable-jupyterlab4": "true",
                             "enable-oslogin": "TRUE",
-                            "instance-region": "us-central1",
+                            "instance-region": "us-east1",
+                            "new-proxy-agent-enabled": "true",
                             "notebooks-api": "PROD",
                             "notebooks-api-version": "v2",
-                            "proxy-backend-id": "42ebbe1e0dc75006",
+                            "proxy-backend-id": "4cab95e39f52c5c7",
                             "proxy-mode": "service_account",
-                            "proxy-registration-url": "https://us-central1.notebooks.cloud.google.com/tun/m/4592f092208ecc84946b8f8f8016274df1b36a14",
-                            "proxy-url": "42ebbe1e0dc75006-dot-us-central1.notebooks.googleusercontent.com",
-                            "report-event-url": "https://notebooks.googleapis.com/v2/projects/cloud-custodian/locations/us-central1-a/instances/c7n-notebook-public-default-62ac:reportInfoSystem",
-                            "resource-url": "https://notebooks.googleapis.com/v2/projects/cloud-custodian/locations/us-central1-a/instances/c7n-notebook-public-default-62ac",
+                            "proxy-registration-url": "https://us-east1.notebooks.cloud.google.com/tun/m/4592f092208ecc84946b8f8f8016274df1b36a14",
+                            "proxy-url": "4cab95e39f52c5c7-dot-us-east1.notebooks.googleusercontent.com",
+                            "report-event-url": "https://notebooks.googleapis.com/v2/projects/cloud-custodian/locations/us-east1-b/instances/c7n-notebook-public-default-c940:reportInfoSystem",
+                            "resource-url": "https://notebooks.googleapis.com/v2/projects/cloud-custodian/locations/us-east1-b/instances/c7n-notebook-public-default-c940",
                             "serial-port-logging-enable": "true",
                             "shutdown-script": "/opt/deeplearning/bin/shutdown_script.sh",
-                            "version": "20260701-2130-rc0"
+                            "version": "20260809-2130-rc0"
                         },
+                        "min_cpu_platform": "Intel Broadwell",
                         "network_interfaces": [
                             {
                                 "access_configs": [
                                     {
-                                        "external_ip": "34.44.21.60"
+                                        "external_ip": "34.139.222.214"
                                     }
                                 ],
                                 "network": "https://www.googleapis.com/compute/v1/projects/cloud-custodian/global/networks/default",
                                 "nic_type": "",
-                                "subnet": "https://www.googleapis.com/compute/v1/projects/cloud-custodian/regions/us-central1/subnetworks/default"
+                                "subnet": "https://www.googleapis.com/compute/v1/projects/cloud-custodian/regions/us-east1/subnetworks/default"
                             }
                         ],
                         "reservation_affinity": [
@@ -196,7 +85,7 @@
                         ],
                         "service_accounts": [
                             {
-                                "email": "859150599087-compute@developer.gserviceaccount.com",
+                                "email": "693936050605-compute@developer.gserviceaccount.com",
                                 "scopes": [
                                     "https://www.googleapis.com/auth/cloud-platform",
                                     "https://www.googleapis.com/auth/userinfo.email"
@@ -221,31 +110,31 @@
                     {}
                 ],
                 "health_state": "HEALTHY",
-                "id": "projects/cloud-custodian/locations/us-central1-a/instances/c7n-notebook-public-default-62ac",
+                "id": "projects/cloud-custodian/locations/us-east1-b/instances/c7n-notebook-public-default-c940",
                 "instance_id": null,
                 "instance_owners": null,
                 "labels": null,
-                "location": "us-central1-a",
-                "name": "c7n-notebook-public-default-62ac",
-                "project": "stacklet-test-policies",
-                "proxy_uri": "42ebbe1e0dc75006-dot-us-central1.notebooks.googleusercontent.com",
+                "location": "us-east1-b",
+                "name": "c7n-notebook-public-default-c940",
+                "project": "stkl-jim-fulton",
+                "proxy_uri": "4cab95e39f52c5c7-dot-us-east1.notebooks.googleusercontent.com",
                 "state": "ACTIVE",
                 "terraform_labels": {
                     "goog-terraform-provisioned": "true"
                 },
                 "timeouts": null,
-                "update_time": "2026-07-06T21:17:07.483043670Z",
+                "update_time": "2026-08-11T22:33:31.790938761Z",
                 "upgrade_history": []
             }
         },
         "random_id": {
             "suffix": {
-                "b64_std": "Yqw=",
-                "b64_url": "Yqw",
+                "b64_std": "yUA=",
+                "b64_url": "yUA",
                 "byte_length": 2,
-                "dec": "25260",
-                "hex": "62ac",
-                "id": "Yqw",
+                "dec": "51520",
+                "hex": "c940",
+                "id": "yUA",
                 "keepers": null,
                 "prefix": null
             }
