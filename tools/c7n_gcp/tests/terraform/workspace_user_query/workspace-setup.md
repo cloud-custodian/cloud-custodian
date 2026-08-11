@@ -89,9 +89,10 @@ account and impersonated user fit together, see
    enroll, and enforcement would lock it out of the sign in that step 7
    needs.
 
-6. Turn on 2sv enforcement on the root organization unit.
+6. Turn on 2sv enforcement on the root organization unit, following
+   https://knowledge.workspace.google.com/admin/security/deploy-2-step-verification#step_5_enforce_2-step_verification_optional
 
-   **IMPORTANT! Set up 2sv on the super admin acount first!** Enforcement
+   **IMPORTANT! Set up 2sv on the super admin account first!** Enforcement
    locks out anyone not enrolled, and the super admin is the account the
    tests impersonate.
 
