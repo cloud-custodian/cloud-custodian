@@ -56,3 +56,24 @@ def test_notebook_v2(test, notebook_v2):
     assert len(resources) == 1
     assert resources[0]["name"].endswith(notebook_name)
     assert resources[0]["gceSetup"]["networkInterfaces"][0]["accessConfigs"][0]["externalIp"]
+
+
+@terraform("notebook_v2")
+def test_notebook_v2_get(test, notebook_v2):
+    factory = test.replay_flight_data("test_notebook_v2_get")
+    policy = test.load_policy(
+        {
+            "name": "notebook-v2-get",
+            "resource": "gcp.notebook-v2",
+        },
+        session_factory=factory,
+    )
+
+    listed = policy.run()
+    assert len(listed) == 1
+
+    fetched = policy.resource_manager.get_resource(
+        {"resourceName": listed[0]["name"]}
+    )
+    assert fetched["name"] == listed[0]["name"]
+    assert fetched["gceSetup"]["metadata"] == listed[0]["gceSetup"].get("metadata", {})

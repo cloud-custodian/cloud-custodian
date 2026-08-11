@@ -77,6 +77,11 @@ class NotebookInstanceV2(QueryResourceManager):
         urn_component = "instances"
         asset_type = "notebooks.googleapis.com/Instance"
 
+        @staticmethod
+        def get(client, resource_info):
+            return client.execute_query(
+                'get', {'name': resource_info['resourceName']})
+
         @classmethod
         def _get_location(cls, resource):
             return resource['name'].split('/')[3]
