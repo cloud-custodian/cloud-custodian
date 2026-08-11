@@ -2926,9 +2926,18 @@ class EndpointServiceDetailsFilter(ValueFilter):
 
     def process(self, resources, event=None):
         client = local_session(self.manager.session_factory).client("ec2")
-        service_names = sorted({r["ServiceName"] for r in resources})
+        current_region = self.manager.config.region
 
-        service_map = self._describe_services(client, service_names)
+        # Group unique service names by ServiceRegion, which is set directly on
+        # each endpoint and correctly identifies cross-region endpoints without
+        # any string parsing. Falls back to current region for older endpoints
+        # that pre-date the ServiceRegion field.
+        regional_groups = {}
+        for r in resources:
+            region = r.get("ServiceRegion", current_region)
+            regional_groups.setdefault(region, set()).add(r["ServiceName"])
+
+        service_map = self._describe_services(client, regional_groups, current_region)
 
         results = []
         for resource in resources:
@@ -2940,30 +2949,57 @@ class EndpointServiceDetailsFilter(ValueFilter):
 
         return results
 
-    def _describe_services(self, client, service_names):
+    def _describe_services(self, client, regional_groups, current_region):
         cache = self.manager._cache
-        cache_key = {"ServiceNames": service_names}
+        cache_key = {
+            "account": self.manager.config.account_id,
+            "region": current_region,
+            "ServiceRegions": [
+                (region, sorted(names))
+                for region, names in sorted(regional_groups.items())
+            ],
+        }
 
         with cache:
             cached = cache.get(cache_key)
             if cached is not None:
                 return cached
 
-            try:
-                resp = client.describe_vpc_endpoint_services(ServiceNames=service_names)
-                service_map = {d["ServiceName"]: d for d in resp.get("ServiceDetails", [])}
-            except ClientError:
-                service_map = {}
-                for name in service_names:
-                    try:
-                        resp = client.describe_vpc_endpoint_services(ServiceNames=[name])
-                        for d in resp.get("ServiceDetails", []):
-                            service_map[d["ServiceName"]] = d
-                    except ClientError as e:
-                        self.log.warning(
-                            "Error describing VPC endpoint service %s: %s",
-                            name, e
-                        )
+            service_map = {}
+            for region, names in regional_groups.items():
+                # Cross-region endpoints must be described using a client for
+                # the service's region; using the wrong regional client returns
+                # InvalidServiceName.
+                regional_client = (
+                    client
+                    if region == current_region
+                    else self.manager.session_factory(region=region).client('ec2')
+                )
+                sorted_names = sorted(names)
+                try:
+                    # Query all services in this region in one batch first.
+                    resp = regional_client.describe_vpc_endpoint_services(
+                        ServiceNames=sorted_names)
+                    for d in resp.get("ServiceDetails", []):
+                        service_map[d["ServiceName"]] = d
+                except ClientError as e:
+                    if e.response["Error"]["Code"] != "InvalidServiceName":
+                        raise
+                    for name in sorted_names:
+                        try:
+                            # If the batch fails, query each service individually
+                            # to isolate and skip invalid service names.
+                            resp = regional_client.describe_vpc_endpoint_services(
+                                ServiceNames=[name])
+                            for d in resp.get("ServiceDetails", []):
+                                service_map[d["ServiceName"]] = d
+                        except ClientError as e:
+                            if e.response["Error"]["Code"] != "InvalidServiceName":
+                                raise
+                            self.log.warning(
+                                "Error describing VPC endpoint service %s: %s",
+                                name, e
+                            )
 
             cache.save(cache_key, service_map)
             return service_map
