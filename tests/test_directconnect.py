@@ -58,6 +58,7 @@ def test_directconnect_tag_filter(test):
     test.assertEqual(len(resources), 1)
     assert resources[0]['Tags'] == [{'Key': 'existing', 'Value': 'existing'}]
 
+
 def test_directconnect_connection_tags(test):
     factory = test.replay_flight_data("test_directconnect_connection_tags")
     p = test.load_policy(
@@ -73,6 +74,7 @@ def test_directconnect_connection_tags(test):
     )
     resources = p.run()
     test.assertEqual(len(resources), 2)
+
 
 @terraform("directconnect_tagging")
 def test_directconnect_tagging(test, directconnect_tagging):
