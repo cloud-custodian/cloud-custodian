@@ -1,7 +1,9 @@
 # Copyright The Cloud Custodian Authors.
 # SPDX-License-Identifier: Apache-2.0
+import pathlib
 from unittest import mock
 
+import google.auth
 import pytest
 
 from c7n_gcp.client import (
@@ -11,6 +13,10 @@ from c7n_gcp.client import (
 )
 
 WORKSPACE_SCOPE = 'https://www.googleapis.com/auth/admin.directory.user.readonly'
+
+# The credentials flight data replay runs on.
+REPLAY_CREDENTIALS = (
+    pathlib.Path(__file__).parent / 'data' / 'credentials.json')
 
 
 class StubServiceAccountCredentials:
@@ -32,11 +38,24 @@ class StubServiceAccountCredentials:
         return StubServiceAccountCredentials(scopes=self.scopes, subject=subject)
 
 
+class StubCredentials:
+    """Credentials supporting neither scoping nor delegation."""
+
+
+def session_with_default_credentials(credentials):
+    """A session that got its credentials from google.auth.default.
+
+    Passing them to Session directly takes a different path, one that
+    doesn't share the thread cached http.
+    """
+    with mock.patch('google.auth.default',
+                    return_value=(credentials, 'proj')):
+        return Session()
+
+
 def service_account_session():
     """A session whose default credentials support delegation."""
-    with mock.patch('google.auth.default',
-                    return_value=(StubServiceAccountCredentials(), 'proj')):
-        return Session()
+    return session_with_default_credentials(StubServiceAccountCredentials())
 
 
 def test_get_workspace_customer_defaults_to_my_customer(monkeypatch):
@@ -57,11 +76,13 @@ def test_get_workspace_subject_unset(monkeypatch):
 def test_unscopable_credentials_are_left_alone(monkeypatch):
     """The invariant the rest of the test suite depends on.
 
-    Flight data replay runs on a committed authorized_user credential, which
-    supports neither with_scopes nor with_subject.
+    Loads the committed credentials rather than whatever the developer has,
+    because the point is that this authorized_user credential supports
+    neither with_scopes nor with_subject.
     """
     monkeypatch.delenv('GOOGLE_WORKSPACE_SUBJECT', raising=False)
-    session = Session()
+    credentials, _ = google.auth.load_credentials_from_file(REPLAY_CREDENTIALS)
+    session = session_with_default_credentials(credentials)
     client = session.client(
         'admin', 'directory_v1', 'users', scopes=(WORKSPACE_SCOPE,))
     assert client._credentials is session._credentials
@@ -92,7 +113,7 @@ def test_subject_impersonates(monkeypatch):
 
 def test_subject_with_non_service_account_credentials_raises(monkeypatch):
     monkeypatch.setenv('GOOGLE_WORKSPACE_SUBJECT', 'admin@example.com')
-    session = Session()
+    session = session_with_default_credentials(StubCredentials())
     with pytest.raises(ValueError) as ectx:
         session.client(
             'admin', 'directory_v1', 'users', scopes=(WORKSPACE_SCOPE,))
