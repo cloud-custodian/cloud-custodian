@@ -1635,3 +1635,21 @@ class TestFSxActiveDirectoryResolution(BaseTest):
                 "DomainName": "corp.example.com", "DnsIps": ["192.168.50.5"]}}}
         found = c7n.resources.fsx.resolve_windows(fs, self.directories())
         self.assertEqual(found["managed"], False)
+
+    def test_duplicate_domain_names_resolve_deterministically(self):
+        # several directories can share a domain name, the annotation should
+        # name the same one regardless of the order the api returns them.
+        svm = self.svm(DomainName="CORP.EXAMPLE.COM", DnsIps=["192.168.50.5"])
+        directories = [
+            {"DirectoryId": "d-1", "Name": "corp.example.com",
+             "Type": "MicrosoftAD", "DnsIpAddrs": ["10.0.0.1"]},
+            {"DirectoryId": "d-2", "Name": "corp.example.com",
+             "Type": "SimpleAD", "DnsIpAddrs": ["10.0.0.2"]}]
+        found = c7n.resources.fsx.resolve_svm(svm, directories)
+        self.assertEqual(found["managed"], False)
+        self.assertEqual(found["reason"], "DomainNameOnlyMatch")
+        self.assertEqual(found["DirectoryId"], "d-1")
+        # and the same answer with the directories the other way round
+        self.assertEqual(
+            c7n.resources.fsx.resolve_svm(
+                svm, list(reversed(directories)))["DirectoryId"], "d-2")

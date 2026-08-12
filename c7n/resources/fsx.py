@@ -179,7 +179,11 @@ def resolve_ad_config(ad, directories):
                  'matched-on': (ip_match and name_match and 'dns-ips,domain-name' or
                                 ip_match and 'dns-ips' or 'domain-name')}
         if not ip_match:
-            name_only = dict(found, managed=False, reason='DomainNameOnlyMatch')
+            # several directories can carry the same domain name, keep the
+            # first so the annotation is stable rather than whichever the
+            # api happened to return last.
+            if name_only is None:
+                name_only = dict(found, managed=False, reason='DomainNameOnlyMatch')
             continue
         found['managed'] = d.get('Type') in MANAGED_DIRECTORY_TYPES
         found['reason'] = (
@@ -264,6 +268,10 @@ class SvmActiveDirectoryFilter(ActiveDirectoryFilterBase):
     `match: not-managed` fails closed, an svm is only cleared when it can be
     positively resolved to an aws managed microsoft ad.
 
+    Note the same violation is reported by the file system level filter of the
+    same name, which names the offending svms in its annotation. Running both
+    against one account reports each violation twice, once per resource type.
+
     :example:
 
     .. code-block:: yaml
@@ -302,6 +310,10 @@ class FSxActiveDirectoryFilter(ActiveDirectoryFilterBase):
     would otherwise go unreported by an svm level policy having no svm to
     report on.
 
+    This covers both file system types, and names the offending svms in its
+    annotation, so it doesn't need pairing with the storage virtual machine
+    filter of the same name - running both reports each violation twice.
+
     :example:
 
     .. code-block:: yaml
@@ -319,7 +331,7 @@ class FSxActiveDirectoryFilter(ActiveDirectoryFilterBase):
         match={'enum': ['managed', 'not-managed', 'any']})
     permissions = ('ds:DescribeDirectories', 'fsx:DescribeStorageVirtualMachines')
 
-    def get_svms(self, resources):
+    def get_svms(self):
         svms = self.manager.get_resource_manager(
             'aws.fsx-storage-virtual-machine').resources()
         return group_by(svms, 'FileSystemId')
@@ -347,7 +359,7 @@ class FSxActiveDirectoryFilter(ActiveDirectoryFilterBase):
         directories = describe_directories(self.manager)
         svms = {}
         if any(r.get('FileSystemType') == 'ONTAP' for r in resources):
-            svms = self.get_svms(resources)
+            svms = self.get_svms()
 
         results = []
         for r in resources:
