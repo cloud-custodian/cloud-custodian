@@ -171,13 +171,9 @@ class LaunchInfo:
                     'ami').get_source('describe').get_resources(
                         list(self.get_image_ids()), cache=False)}
 
-    def get_security_group_ids(self, asgs=None):
-        # return set of security group ids for the given asgs, or for every
-        # launch config/template initialized when asgs isn't specified.
-        if asgs is None:
-            launches = [v for k, v in self.items()]
-        else:
-            launches = [launch for launch in map(self.get, asgs) if launch]
+    def get_security_group_ids(self, asgs):
+        # return set of security group ids for the given asgs
+        launches = [launch for launch in map(self.get, asgs) if launch]
         sg_ids = set()
         for v in launches:
             sg_ids.update(v.get('SecurityGroupIds', ()))
