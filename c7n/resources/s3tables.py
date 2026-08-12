@@ -193,10 +193,6 @@ class TableBucketHasStatement(TableBucketPolicyMixin, HasStatementFilter):
     """
     permissions = ('s3tables:GetTableBucketPolicy',)
 
-    def __init__(self, data, manager=None):
-        super().__init__(data, manager)
-        self.policy_attribute = TableBucketPolicyMixin.policy_attribute
-
     def process(self, resources, event=None):
         client = local_session(self.manager.session_factory).client('s3tables')
         resources = [self.policy_annotate(client, r) for r in resources]
@@ -230,10 +226,6 @@ class TableHasStatement(TablePolicyMixin, HasStatementFilter):
                             "aws:SecureTransport": "false"
     """
     permissions = ('s3tables:GetTablePolicy',)
-
-    def __init__(self, data, manager=None):
-        super().__init__(data, manager)
-        self.policy_attribute = TablePolicyMixin.policy_attribute
 
     def process(self, resources, event=None):
         client = local_session(self.manager.session_factory).client('s3tables')
