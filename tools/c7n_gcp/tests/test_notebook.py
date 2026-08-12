@@ -27,19 +27,22 @@ class NotebookInstanceTest(BaseTest):
         ]
 
 
-@terraform("notebook_v2")
+@terraform("notebook_v2", scope="session")
 def test_notebook_v2(test, notebook_v2):
-    # Doesn't filter by a name derived from the notebook_v2 terraform fixture
-    # output: that fixture is function-scoped, so tf_resources.json on disk
-    # reflects whichever @terraform("notebook_v2") test last provisioned its
-    # own instance -- filtering by such a name here breaks whenever another
-    # test using the same fixture is (re-)recorded.
+    notebook_name = notebook_v2["google_workbench_instance.public_instance.name"]
+
     factory = test.replay_flight_data("notebook_v2")
     policy = test.load_policy(
         {
             "name": "notebook-v2",
             "resource": "gcp.notebook-v2",
             "filters": [
+                {
+                    "type": "value",
+                    "key": "name",
+                    "op": "regex",
+                    "value": f".*{notebook_name}$",
+                },
                 {
                     "type": "value",
                     "key": "gceSetup.disablePublicIp",
@@ -53,16 +56,27 @@ def test_notebook_v2(test, notebook_v2):
 
     resources = policy.run()
     assert len(resources) == 1
+    assert resources[0]["name"].endswith(notebook_name)
     assert resources[0]["gceSetup"]["networkInterfaces"][0]["accessConfigs"][0]["externalIp"]
 
 
-@terraform("notebook_v2")
+@terraform("notebook_v2", scope="session")
 def test_notebook_v2_get(test, notebook_v2):
+    notebook_name = notebook_v2["google_workbench_instance.public_instance.name"]
+
     factory = test.replay_flight_data("test_notebook_v2_get")
     policy = test.load_policy(
         {
             "name": "notebook-v2-get",
             "resource": "gcp.notebook-v2",
+            "filters": [
+                {
+                    "type": "value",
+                    "key": "name",
+                    "op": "regex",
+                    "value": f".*{notebook_name}$",
+                },
+            ],
         },
         session_factory=factory,
     )
@@ -77,23 +91,21 @@ def test_notebook_v2_get(test, notebook_v2):
     assert fetched["gceSetup"]["metadata"] == listed[0]["gceSetup"].get("metadata", {})
 
 
-@terraform("notebook_v2")
+@terraform("notebook_v2", scope="session")
 def test_notebook_v2_update_metadata(test, notebook_v2):
+    notebook_name = notebook_v2["google_workbench_instance.public_instance.name"]
+
     factory = test.replay_flight_data("test_notebook_v2_update_metadata")
     policy = test.load_policy(
         {
             "name": "notebook-v2-update-metadata",
             "resource": "gcp.notebook-v2",
-            # Constrains to the public instance without depending on a
-            # terraform-fixture-derived name -- see test_notebook_v2's note
-            # on why. main.tf still defines a private_instance too, so an
-            # unfiltered list could match both if it's ever listed.
             "filters": [
                 {
                     "type": "value",
-                    "key": "gceSetup.disablePublicIp",
-                    "op": "ne",
-                    "value": True,
+                    "key": "name",
+                    "op": "regex",
+                    "value": f".*{notebook_name}$",
                 },
             ],
             "actions": [

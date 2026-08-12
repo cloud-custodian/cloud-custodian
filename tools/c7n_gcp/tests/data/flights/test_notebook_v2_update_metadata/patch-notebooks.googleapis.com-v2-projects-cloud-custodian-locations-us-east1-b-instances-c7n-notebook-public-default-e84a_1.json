@@ -2,7 +2,7 @@
   "headers": {
     "content-type": "application/json; charset=UTF-8",
     "vary": "Origin, X-Origin, Referer",
-    "date": "Tue, 11 Aug 2026 22:34:07 GMT",
+    "date": "Wed, 12 Aug 2026 17:32:20 GMT",
     "server": "ESF",
     "x-xss-protection": "0",
     "x-frame-options": "SAMEORIGIN",
@@ -14,11 +14,11 @@
     "-content-encoding": "gzip"
   },
   "body": {
-    "name": "projects/cloud-custodian/locations/us-east1-b/operations/operation-1786487646959-658cd1197b750-6a6a2ab2-a4f8ef08",
+    "name": "projects/cloud-custodian/locations/us-east1-b/operations/operation-1786555940298-658dcf8315d97-909c4784-76d85518",
     "metadata": {
       "@type": "type.googleapis.com/google.cloud.notebooks.v2.OperationMetadata",
-      "createTime": "2026-08-11T22:34:07.139028398Z",
-      "target": "projects/cloud-custodian/locations/us-east1-b/instances/c7n-notebook-public-default-c940",
+      "createTime": "2026-08-12T17:32:20.472518464Z",
+      "target": "projects/cloud-custodian/locations/us-east1-b/instances/c7n-notebook-public-default-e84a",
       "verb": "update",
       "requestedCancellation": false,
       "apiVersion": "v2",

@@ -2,7 +2,7 @@
   "headers": {
     "content-type": "application/json; charset=UTF-8",
     "vary": "Origin, X-Origin, Referer",
-    "date": "Tue, 11 Aug 2026 22:34:37 GMT",
+    "date": "Wed, 12 Aug 2026 17:32:51 GMT",
     "server": "ESF",
     "x-xss-protection": "0",
     "x-frame-options": "SAMEORIGIN",
@@ -10,12 +10,12 @@
     "alt-svc": "h3=\":443\"; ma=2592000,h3-29=\":443\"; ma=2592000",
     "transfer-encoding": "chunked",
     "status": "200",
-    "content-length": "3554",
+    "content-length": "3551",
     "-content-encoding": "gzip",
-    "content-location": "https://notebooks.googleapis.com/v2/projects/cloud-custodian/locations/us-east1-b/instances/c7n-notebook-public-default-c940?alt=json"
+    "content-location": "https://notebooks.googleapis.com/v2/projects/cloud-custodian/locations/us-east1-b/instances/c7n-notebook-public-default-e84a?alt=json"
   },
   "body": {
-    "name": "projects/cloud-custodian/locations/us-east1-b/instances/c7n-notebook-public-default-c940",
+    "name": "projects/cloud-custodian/locations/us-east1-b/instances/c7n-notebook-public-default-e84a",
     "gceSetup": {
       "machineType": "https://www.googleapis.com/compute/v1/projects/cloud-custodian/zones/us-east1-b/machineTypes/e2-standard-4",
       "serviceAccounts": [
@@ -53,7 +53,7 @@
           "subnet": "https://www.googleapis.com/compute/v1/projects/cloud-custodian/regions/us-east1/subnetworks/default",
           "accessConfigs": [
             {
-              "externalIp": "34.139.222.214"
+              "externalIp": "34.24.11.45"
             }
           ]
         }
@@ -63,52 +63,52 @@
         "notebook-instance"
       ],
       "metadata": {
-        "instance-region": "us-east1",
-        "proxy-backend-id": "4cab95e39f52c5c7",
-        "new-proxy-agent-enabled": "true",
-        "enable-guest-attributes": "TRUE",
-        "notebooks-api-version": "v2",
-        "proxy-registration-url": "https://us-east1.notebooks.cloud.google.com/tun/m/4592f092208ecc84946b8f8f8016274df1b36a14",
-        "version": "20260809-2130-rc0",
-        "enable-oslogin": "TRUE",
-        "proxy-url": "4cab95e39f52c5c7-dot-us-east1.notebooks.googleusercontent.com",
-        "resource-url": "https://notebooks.googleapis.com/v2/projects/cloud-custodian/locations/us-east1-b/instances/c7n-notebook-public-default-c940",
-        "shutdown-script": "/opt/deeplearning/bin/shutdown_script.sh",
-        "proxy-mode": "service_account",
         "disable-swap-binaries": "true",
+        "resource-url": "https://notebooks.googleapis.com/v2/projects/cloud-custodian/locations/us-east1-b/instances/c7n-notebook-public-default-e84a",
         "notebooks-api": "PROD",
         "idle-timeout-seconds": "3600",
-        "report-event-url": "https://notebooks.googleapis.com/v2/projects/cloud-custodian/locations/us-east1-b/instances/c7n-notebook-public-default-c940:reportInfoSystem",
+        "notebooks-api-version": "v2",
+        "instance-region": "us-east1",
+        "proxy-url": "4c6d45c45d3b5c10-dot-us-east1.notebooks.googleusercontent.com",
+        "version": "20260809-2130-rc0",
+        "report-event-url": "https://notebooks.googleapis.com/v2/projects/cloud-custodian/locations/us-east1-b/instances/c7n-notebook-public-default-e84a:reportInfoSystem",
+        "proxy-registration-url": "https://us-east1.notebooks.cloud.google.com/tun/m/4592f092208ecc84946b8f8f8016274df1b36a14",
         "enable-jupyterlab4": "true",
-        "serial-port-logging-enable": "true"
+        "proxy-mode": "service_account",
+        "proxy-backend-id": "4c6d45c45d3b5c10",
+        "enable-guest-attributes": "TRUE",
+        "shutdown-script": "/opt/deeplearning/bin/shutdown_script.sh",
+        "enable-oslogin": "TRUE",
+        "serial-port-logging-enable": "true",
+        "new-proxy-agent-enabled": "true"
       },
       "gpuDriverConfig": {},
       "reservationAffinity": {
         "consumeReservationType": "RESERVATION_NONE"
       },
       "minCpuPlatform": "Intel Broadwell",
-      "instanceId": "1101775890323741813"
+      "instanceId": "4532768441233380276"
     },
-    "proxyUri": "4cab95e39f52c5c7-dot-us-east1.notebooks.googleusercontent.com",
+    "proxyUri": "4c6d45c45d3b5c10-dot-us-east1.notebooks.googleusercontent.com",
     "creator": "jim.fulton@sixfeetup.com",
     "state": "ACTIVE",
-    "id": "4a54e58d-c59d-4370-bbda-6921f79673f9",
+    "id": "4592c76e-b080-4826-8607-f0a052691732",
     "healthState": "HEALTHY",
     "healthInfo": {
+      "docker_status": "1",
       "jupyterlab_status": "1",
       "jupyterlab_api_status": "1",
-      "last_updated": "2026-08-11T22:34:32+00:00",
-      "system_health": "1",
-      "docker_status": "1"
+      "last_updated": "2026-08-12T17:32:34+00:00",
+      "system_health": "1"
     },
-    "createTime": "2026-08-11T22:30:48.426001225Z",
-    "updateTime": "2026-08-11T22:34:32.924774729Z",
+    "createTime": "2026-08-12T17:28:57.651511852Z",
+    "updateTime": "2026-08-12T17:32:35.449944508Z",
     "labels": {
+      "consumer-project-id": "stkl-jim-fulton",
+      "consumer-project-number": "693936050605",
       "goog-terraform-provisioned": "true",
       "notebooks-product": "workbench-instances",
-      "resource-name": "c7n-notebook-public-default-c940",
-      "consumer-project-id": "stkl-jim-fulton",
-      "consumer-project-number": "693936050605"
+      "resource-name": "c7n-notebook-public-default-e84a"
     },
     "satisfiesPzi": true
   }
