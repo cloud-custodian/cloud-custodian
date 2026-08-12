@@ -136,6 +136,59 @@ class LogGroupTest(BaseTest):
         self.assertEqual(resources[0]["logGroupName"], "/c7n-test/protected")
         self.assertEqual(resources[0]["c7n:DataProtection"], "log-group")
 
+        p = self.load_policy(
+            {
+                "name": "log-groups-masking-email",
+                "resource": "log-group",
+                "filters": [{
+                    "type": "data-protection",
+                    "key": "Statement[].DataIdentifier[]",
+                    "op": "contains",
+                    "value": (
+                        "arn:aws:dataprotection::aws:"
+                        "data-identifier/EmailAddress"),
+                }],
+            },
+            session_factory=factory, config={"region": "ca-central-1"},
+        )
+        resources = p.run()
+        self.assertEqual(len(resources), 1)
+        self.assertEqual(resources[0]["logGroupName"], "/c7n-test/protected")
+        self.assertEqual(
+            resources[0]["c7n:DataProtectionPolicy"]["Statement"][0]
+            ["DataIdentifier"],
+            ["arn:aws:dataprotection::aws:data-identifier/EmailAddress"])
+
+        p = self.load_policy(
+            {
+                "name": "log-groups-masking-ssn",
+                "resource": "log-group",
+                "filters": [{
+                    "type": "data-protection",
+                    "key": "Statement[].DataIdentifier[]",
+                    "op": "contains",
+                    "value": "arn:aws:dataprotection::aws:data-identifier/Ssn",
+                }],
+            },
+            session_factory=factory, config={"region": "ca-central-1"},
+        )
+        self.assertEqual(p.run(), [])
+
+    def test_data_protection_validation(self):
+        with self.assertRaises(PolicyValidationError):
+            self.load_policy(
+                {
+                    "name": "log-groups-data-protection-invalid",
+                    "resource": "log-group",
+                    "filters": [{
+                        "type": "data-protection",
+                        "state": False,
+                        "key": "Statement[].Sid",
+                        "value": "audit",
+                    }],
+                },
+                validate=True)
+
     def test_data_protection_account_level(self):
         factory = self.replay_flight_data(
             "test_log_group_data_protection_account", region="ca-central-1")
@@ -163,6 +216,30 @@ class LogGroupTest(BaseTest):
             session_factory=factory, config={"region": "ca-central-1"},
         )
         self.assertEqual(p.run(), [])
+
+        p = self.load_policy(
+            {
+                "name": "log-groups-masking-email",
+                "resource": "log-group",
+                "filters": [{
+                    "type": "data-protection",
+                    "key": "Statement[].DataIdentifier[]",
+                    "op": "contains",
+                    "value": (
+                        "arn:aws:dataprotection::aws:"
+                        "data-identifier/EmailAddress"),
+                }],
+            },
+            session_factory=factory, config={"region": "ca-central-1"},
+        )
+        resources = p.run()
+        names = [r["logGroupName"] for r in resources]
+        self.assertIn("/c7n-test/protected", names)
+        self.assertIn("/c7n-test/unprotected", names)
+        for r in resources:
+            self.assertEqual(r["c7n:DataProtection"], "account")
+            self.assertEqual(
+                r["c7n:DataProtectionPolicy"]["Name"], "c7n-test-account-dp")
 
     def test_kms_filter(self):
         session_factory = self.replay_flight_data('test_log_group_kms_filter')

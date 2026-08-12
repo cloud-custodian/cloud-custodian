@@ -1,6 +1,7 @@
 # Copyright The Cloud Custodian Authors.
 # SPDX-License-Identifier: Apache-2.0
 import itertools
+import json
 import re
 from collections import defaultdict
 from concurrent.futures import as_completed
@@ -561,7 +562,7 @@ class LogSubscriptionFilter(ValueFilter):
 
 
 @LogGroup.filter_registry.register('data-protection')
-class LogGroupDataProtection(Filter):
+class LogGroupDataProtection(ValueFilter):
     """Filter log groups by their sensitive data protection coverage.
 
     A log group is considered protected when it has an active log group
@@ -570,6 +571,12 @@ class LogGroupDataProtection(Filter):
     in effect, which covers all log groups in the account. Protected
     log groups are annotated with ``c7n:DataProtection`` noting whether
     the coverage is ``log-group`` or ``account`` scoped.
+
+    Value filter expressions match against the effective policy
+    document - the account level document when that is what covers the
+    log group, else the log group's own policy - which is annotated
+    under ``c7n:DataProtectionPolicy``. Content matching implies
+    ``state: true``.
 
     :example:
 
@@ -581,27 +588,69 @@ class LogGroupDataProtection(Filter):
                 filters:
                   - type: data-protection
                     state: false
+
+              - name: log-groups-not-masking-ssn
+                resource: aws.log-group
+                filters:
+                  - not:
+                    - type: data-protection
+                      key: Statement[].DataIdentifier[]
+                      op: contains
+                      value: arn:aws:dataprotection::aws:data-identifier/Ssn
     """
 
-    schema = type_schema('data-protection', state={'type': 'boolean'})
+    schema = type_schema(
+        'data-protection', rinherit=ValueFilter.schema,
+        state={'type': 'boolean'})
     permissions = (
         'logs:DescribeAccountPolicies', 'logs:GetDataProtectionPolicy')
     annotation_key = 'c7n:DataProtection'
+    policy_annotation_key = 'c7n:DataProtectionPolicy'
+
+    def _matches_document(self):
+        return bool(set(self.data) - {'type', 'state'})
+
+    def validate(self):
+        if not self._matches_document():
+            return self
+        if self.data.get('state') is False:
+            raise PolicyValidationError(
+                "data-protection document matching requires state: true %s" % (
+                    self.manager.data,))
+        return super().validate()
 
     def process(self, resources, event=None):
-        state = self.data.get('state', False)
+        matches_document = self._matches_document()
+        state = self.data.get('state', True if matches_document else False)
         client = local_session(self.manager.session_factory).client('logs')
         account_policies = self.manager.retry(
             client.describe_account_policies,
             policyType='DATA_PROTECTION_POLICY').get('accountPolicies', ())
+        account_document = None
+        if account_policies:
+            account_document = json.loads(
+                account_policies[0].get('policyDocument') or '{}')
         results = []
         for r in resources:
             if account_policies:
                 r[self.annotation_key] = 'account'
             elif r.get('dataProtectionStatus') == 'ACTIVATED':
                 r[self.annotation_key] = 'log-group'
-            if (self.annotation_key in r) == state:
-                results.append(r)
+            protected = self.annotation_key in r
+            if protected != state:
+                continue
+            if protected and matches_document:
+                if r[self.annotation_key] == 'account':
+                    document = account_document
+                else:
+                    document = json.loads(self.manager.retry(
+                        client.get_data_protection_policy,
+                        logGroupIdentifier=r['logGroupName']).get(
+                            'policyDocument') or '{}')
+                r[self.policy_annotation_key] = document
+                if not self.match(document):
+                    continue
+            results.append(r)
         return results
 
 
