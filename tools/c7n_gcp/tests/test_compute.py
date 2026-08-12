@@ -8,6 +8,7 @@ from c7n_gcp.resources.compute import Snapshot
 from gcp_common import BaseTest, event_data
 from googleapiclient.errors import HttpError
 from c7n_gcp.client import get_default_project
+from c7n.utils import local_session
 from pytest_terraform import terraform
 
 
@@ -454,6 +455,63 @@ class DiskTest(BaseTest):
         resources = p.run()
         self.assertEqual(len(resources), 1)
         self.assertEqual(resources[0]['name'], 'custodian-dev')
+
+    def test_label_regional_disk(self):
+        project_id = self.project_id
+        factory = self.replay_flight_data('disk-regional-label', project_id=project_id)
+        p = self.load_policy(
+            {'name': 'disk-label',
+             'resource': 'gcp.disk',
+             'filters': [{'name': 'c7n-regional-jenkins'}],
+             'actions': [{'type': 'set-labels',
+                          'labels': {'test_label': 'test_value'}}]},
+            session_factory=factory)
+        resources = p.run()
+        self.assertEqual(len(resources), 1)
+        session = local_session(p.resource_manager.session_factory)
+        client = session.client('compute', 'v1', 'regionDisks')
+        result = client.execute_query(
+            'list', {'project': project_id,
+                     'filter': 'name = c7n-regional-jenkins',
+                     'region': resources[0]['region'].rsplit('/', 1)[-1]})
+        self.assertEqual(result['items'][0]['labels']['test_label'], 'test_value')
+
+    def test_regional_disk_snapshot(self):
+        factory = self.replay_flight_data('disk-regional-snapshot', project_id=self.project_id)
+        p = self.load_policy(
+            {'name': 'regional-disk-snapshot',
+             'resource': 'gcp.disk',
+             'filters': [
+                 {'name': 'c7n-regional-jenkins'}],
+             'actions': ['snapshot']},
+            session_factory=factory)
+        resources = p.run()
+        self.assertEqual(len(resources), 1)
+
+    def test_regional_disk_delete(self):
+        project_id = self.project_id
+        resource_name = 'c7n-regional-jenkins'
+        factory = self.replay_flight_data('disk-regional-delete', project_id=project_id)
+        policy = self.load_policy(
+            {'name': 'regional-disk-delete',
+             'resource': 'gcp.disk',
+             'filters': [
+                 {'name': resource_name}],
+             'actions': ['delete']},
+            session_factory=factory)
+        resources = policy.run()
+        self.assertEqual(resources[0]['name'], resource_name)
+
+        if self.recording:
+            time.sleep(10)
+        session = local_session(policy.resource_manager.session_factory)
+        client = session.client('compute', 'v1', 'regionDisks')
+        region = resources[0]['region'].rsplit('/', 1)[-1]
+        result = client.execute_query(
+            'list', {'project': project_id,
+                     'filter': 'name = {}'.format(resource_name),
+                     'region': region})
+        self.assertEqual(len(result.get('items', [])), 0)
 
 
 class SnapshotTest(BaseTest):

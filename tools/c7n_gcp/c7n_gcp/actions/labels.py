@@ -48,6 +48,14 @@ class BaseLabelAction(MethodAction):
     def get_operation_name(self, model, resource):
         return model.labels_op
 
+    def get_client(self, session, model):
+        # Some resources (e.g. gcp.disk) need a different client depending
+        # on the resource being labeled, since it dispatches to one of
+        # several apis.
+        if get_label_client := getattr(model, 'get_label_client', None):
+            return get_label_client(session)
+        return super().get_client(session, model)
+
     def get_resource_params(self, model, resource):
         current_labels = self._get_current_labels(resource)
         new_labels = self.get_labels_to_add(resource)
