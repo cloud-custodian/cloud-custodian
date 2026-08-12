@@ -1,8 +1,6 @@
 # Copyright The Cloud Custodian Authors.
 # SPDX-License-Identifier: Apache-2.0
-import json
-
-from c7n.filters import Filter, CrossAccountAccessFilter
+from c7n.filters import CrossAccountAccessFilter
 from c7n.filters.policystatement import HasStatementFilter
 from c7n.filters.vpc import SecurityGroupFilter, SubnetFilter, NetworkLocation
 from c7n.manager import resources
@@ -13,7 +11,7 @@ from c7n.query import (
     TypeInfo,
 )
 from c7n.tags import RemoveTag, Tag, TagActionFilter, TagDelayedAction
-from c7n.utils import local_session, type_schema
+from c7n.utils import local_session
 
 
 class DescribeFileSystem(DescribeSource):
@@ -105,7 +103,7 @@ class AccessPoint(ChildResourceManager):
     system, pinning NFS clients to a POSIX identity and root
     directory. They carry no resource policy and no public access
     configuration; file system access is governed by the file system
-    policy (see the ``cross-account`` and ``access-point-account``
+    policy (see the ``cross-account`` and ``has-statement``
     filters on ``aws.s3files-file-system``).
 
     :example:
@@ -123,7 +121,7 @@ class AccessPoint(ChildResourceManager):
 
     class resource_type(TypeInfo):
         service = 's3files'
-        parent_spec = ('s3files-file-system', 'fileSystemId', True)
+        parent_spec = ('s3files-file-system', 'fileSystemId', None)
         enum_spec = ('list_access_points', 'accessPoints', None)
         arn = 'accessPointArn'
         id = 'accessPointId'
@@ -199,10 +197,6 @@ class FileSystemHasStatement(FileSystemPolicyMixin, HasStatementFilter):
     """
     permissions = ('s3files:GetFileSystemPolicy',)
 
-    def __init__(self, data, manager=None):
-        super().__init__(data, manager)
-        self.policy_attribute = FileSystemPolicyMixin.policy_attribute
-
     def process(self, resources, event=None):
         client = local_session(self.manager.session_factory).client('s3files')
         resources = [self.policy_annotate(client, r) for r in resources]
@@ -214,76 +208,6 @@ class FileSystemHasStatement(FileSystemPolicyMixin, HasStatementFilter):
             'account_id': self.manager.config.account_id,
             'region': self.manager.config.region,
         }
-
-
-@FileSystem.filter_registry.register('access-point-account')
-class FileSystemAccessPointAccount(FileSystemPolicyMixin, Filter):
-    """Find file systems whose policy statements reference access
-    points outside of allowed accounts.
-
-    File system policy statements can be scoped to specific access
-    points with the ``s3files:AccessPointArn`` condition key. This
-    filter matches file systems where any such condition references
-    an access point ARN whose account is not in the allowed set
-    (default: the file system owner account). Wildcard account
-    segments are treated as violations.
-
-    :example:
-
-    .. code-block:: yaml
-
-        policies:
-          - name: s3files-foreign-access-point
-            resource: aws.s3files-file-system
-            filters:
-              - type: access-point-account
-    """
-
-    schema = type_schema(
-        'access-point-account',
-        accounts={'type': 'array', 'items': {'type': 'string'}})
-    permissions = ('s3files:GetFileSystemPolicy',)
-
-    annotation_key = 'c7n:ForeignAccessPoints'
-    condition_key = 's3files:accesspointarn'
-
-    def process(self, resources, event=None):
-        client = local_session(self.manager.session_factory).client('s3files')
-        results = []
-        for r in resources:
-            self.policy_annotate(client, r)
-            foreign = self.get_foreign_access_points(r)
-            if foreign:
-                r[self.annotation_key] = sorted(foreign)
-                results.append(r)
-        return results
-
-    def get_foreign_access_points(self, resource):
-        if not resource.get(self.policy_attribute):
-            return []
-        allowed = set(self.data.get('accounts', ()))
-        if not allowed:
-            allowed = {resource['ownerId']}
-        policy = json.loads(resource[self.policy_attribute])
-        statements = policy.get('Statement', [])
-        if isinstance(statements, dict):
-            statements = [statements]
-        foreign = set()
-        for s in statements:
-            for op_values in s.get('Condition', {}).values():
-                if not isinstance(op_values, dict):
-                    continue
-                for ckey, cvalues in op_values.items():
-                    if ckey.lower() != self.condition_key:
-                        continue
-                    if isinstance(cvalues, str):
-                        cvalues = [cvalues]
-                    for arn in cvalues:
-                        parts = arn.split(':')
-                        account = parts[4] if len(parts) > 4 else '*'
-                        if '*' in account or account not in allowed:
-                            foreign.add(arn)
-        return foreign
 
 
 @FileSystem.action_registry.register('tag')

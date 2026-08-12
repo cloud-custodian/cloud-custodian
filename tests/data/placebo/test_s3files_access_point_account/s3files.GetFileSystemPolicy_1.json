@@ -1,8 +1,0 @@
-{
-    "status_code": 200,
-    "data": {
-        "ResponseMetadata": {},
-        "fileSystemId": "fs-02d120d4ae6209b2d",
-        "policy": "{\n  \"Version\" : \"2012-10-17\",\n  \"Statement\" : [ {\n    \"Sid\" : \"SameAccountAP\",\n    \"Effect\" : \"Allow\",\n    \"Principal\" : {\n      \"AWS\" : \"*\"\n    },\n    \"Action\" : \"s3files:ClientMount\",\n    \"Resource\" : \"arn:aws:s3files:us-east-1:644160558196:file-system/fs-02d120d4ae6209b2d\",\n    \"Condition\" : {\n      \"StringEquals\" : {\n        \"s3files:AccessPointArn\" : \"arn:aws:s3files:us-east-1:644160558196:file-system/fs-02d120d4ae6209b2d/access-point/fsap-0c62779cb4df31db0\"\n      }\n    }\n  }, {\n    \"Sid\" : \"AnyAccountAP\",\n    \"Effect\" : \"Allow\",\n    \"Principal\" : {\n      \"AWS\" : \"*\"\n    },\n    \"Action\" : \"s3files:ClientMount\",\n    \"Resource\" : \"arn:aws:s3files:us-east-1:644160558196:file-system/fs-02d120d4ae6209b2d\",\n    \"Condition\" : {\n      \"StringLike\" : {\n        \"s3files:AccessPointArn\" : \"arn:aws:s3files:us-east-1:*:file-system/*/access-point/*\"\n      }\n    }\n  } ]\n}"
-    }
-}

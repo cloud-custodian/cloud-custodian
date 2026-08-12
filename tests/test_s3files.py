@@ -54,22 +54,6 @@ class S3FilesFileSystemTest(BaseTest):
         resources = p.run()
         self.assertEqual(len(resources), 0)
 
-    def test_s3files_access_point_account(self):
-        session_factory = self.replay_flight_data(
-            'test_s3files_access_point_account')
-        p = self.load_policy(
-            {'name': 's3files-foreign-ap',
-             'resource': 'aws.s3files-file-system',
-             'filters': [{'type': 'access-point-account'}]},
-            session_factory=session_factory)
-        resources = p.run()
-        # the policy has one same-account AccessPointArn condition and
-        # one wildcard-account condition; only the latter is foreign
-        self.assertEqual(len(resources), 1)
-        foreign = resources[0]['c7n:ForeignAccessPoints']
-        self.assertEqual(len(foreign), 1)
-        self.assertIn(':*:', foreign[0])
-
     def test_s3files_file_system_tag(self):
         session_factory = self.replay_flight_data('test_s3files_file_system_tag')
         p = self.load_policy(
@@ -143,4 +127,4 @@ class S3FilesAccessPointTest(BaseTest):
         ap = resources[0]
         self.assertTrue(ap['accessPointArn'].startswith('arn:aws:s3files:'))
         self.assertIn('rootDirectory', ap)
-        self.assertIn('c7n:parent-id', ap)
+        self.assertIn('fileSystemId', ap)
