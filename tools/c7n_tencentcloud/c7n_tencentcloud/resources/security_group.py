@@ -60,6 +60,8 @@ class SGPermission(Filter):
         self.ports = 'Ports' in self.data and self.data['Ports'] or ()
         self.any_ports_except = \
             ('AnyPortsExcept' in self.data and self.data['AnyPortsExcept'] or ())
+        self.action = self.data.get('Action')
+        self.protocol = self.data.get('Protocol')
         return super(SGPermission, self).process(resources, event)
 
     # Supported Tencentcloud security-group policy port schema:
@@ -127,6 +129,18 @@ class SGPermission(Filter):
             return None
         return match_op(cidr_match)
 
+    def process_action(self, perm):
+        if not self.action:
+            return None
+        return self.action == perm['Action'].upper()
+
+    def process_protocol(self, perm):
+        if not self.protocol:
+            return None
+        rule_protocol = perm['Protocol'].upper()
+        # ALL includes all protocols and therefore matches any specific protocol we're filtering for
+        return rule_protocol == 'ALL' or self.protocol == perm['Protocol'].upper()
+
     def __call__(self, resource):
         matched = []
         match_op = self.data.get('match-operator', 'and') == 'and' and all or any
@@ -134,6 +148,8 @@ class SGPermission(Filter):
             perm_matches = {}
             perm_matches['ports'] = self.process_ports(perm)
             perm_matches['cidrs'] = self.process_cidrs(perm)
+            perm_matches['action'] = self.process_action(perm)
+            perm_matches['protocol'] = self.process_protocol(perm)
             """None means that the term does not exist in the filter condition,
             and the none result is ignored"""
             perm_match_values = list(filter(
@@ -184,7 +200,9 @@ class IPPermission(SGPermission):
             'Ports': {'type': 'array', 'items': {'type': 'integer'}},
             'AnyPortsExcept': {'type': 'array', 'items': {'type': 'integer'}},
             'Cidr': {},
-            'CidrV6': {}
+            'CidrV6': {},
+            'Action': {'enum': ['ACCEPT', 'DROP']},
+            'Protocol': {'enum': ['TCP', 'UDP', 'ICMP', 'ICMPv6', 'ALL']}
         },
         'required': ['type']}
 
@@ -200,7 +218,9 @@ class IPPermissionEgress(SGPermission):
             'Ports': {'type': 'array', 'items': {'type': 'integer'}},
             'AnyPortsExcept': {'type': 'array', 'items': {'type': 'integer'}},
             'Cidr': {},
-            'CidrV6': {}
+            'CidrV6': {},
+            'Action': {'enum': ['ACCEPT', 'DROP']},
+            'Protocol': {'enum': ['TCP', 'UDP', 'ICMP', 'ICMPv6', 'ALL']}
         },
         'required': ['type']}
 
