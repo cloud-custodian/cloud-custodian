@@ -14,8 +14,9 @@ from c7n.tags import RemoveTag, Tag, TagActionFilter, TagDelayedAction
 from c7n.utils import local_session
 
 
-def _augment_tags(manager, resources, arn_key):
+def _augment_tags(manager, resources):
     client = local_session(manager.session_factory).client('s3tables')
+    arn_key = manager.resource_type.arn
     for r in resources:
         tags = manager.retry(
             client.list_tags_for_resource, resourceArn=r[arn_key]).get('tags', {})
@@ -27,7 +28,7 @@ class DescribeTableBucket(DescribeSource):
 
     def augment(self, resources):
         resources = super().augment(resources)
-        return _augment_tags(self.manager, resources, 'arn')
+        return _augment_tags(self.manager, resources)
 
 
 @resources.register('s3-table-bucket')
@@ -53,7 +54,7 @@ class TableBucket(QueryResourceManager):
 class DescribeTable(ChildDescribeSource):
 
     def augment(self, resources):
-        return _augment_tags(self.manager, resources, 'tableARN')
+        return _augment_tags(self.manager, resources)
 
 
 @resources.register('s3-table')
