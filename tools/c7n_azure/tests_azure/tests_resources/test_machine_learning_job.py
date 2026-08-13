@@ -1,9 +1,8 @@
 # Copyright The Cloud Custodian Authors.
 # SPDX-License-Identifier: Apache-2.0
 
-from unittest.mock import MagicMock
-
 from c7n.utils import local_session
+from c7n_azure.query import _serialize
 from c7n_azure.resources.machine_learning_job import (
     MachineLearningJob,
     MachineLearningJobArchiveAction,
@@ -68,49 +67,7 @@ class MachineLearningJobTest(BaseTest):
         self.assertEqual(1, len(resources))
         self.assertEqual('cctest-sweep-job', resources[0]['name'])
 
-    def test_machine_learning_job_archive_action_updates_job(self):
-        client = MagicMock()
-        manager = MagicMock()
-        manager.get_client.return_value = client
-        resource = {
-            'id': '/subscriptions/ea42f556-5106-4743-99b0-c129bfa71a47'
-                  '/resourceGroups/test_machine-learning-job/providers'
-                  '/Microsoft.MachineLearningServices/workspaces/cctest-mlws'
-                  '/jobs/cctest-sweep-job',
-            'name': 'cctest-sweep-job',
-            'c7n:parent-id': '/subscriptions/ea42f556-5106-4743-99b0-c129bfa71a47'
-                             '/resourceGroups/test_machine-learning-job/providers'
-                             '/Microsoft.MachineLearningServices/workspaces/cctest-mlws',
-            'properties': {'isArchived': False},
-        }
-
-        action = MachineLearningJobArchiveAction({'type': 'archive'}, manager)
-        action._prepare_processing()
-        action._process_resource(resource)
-
-        self.assertTrue(resource['properties']['isArchived'])
-        client.jobs.create_or_update.assert_called_once_with(
-            resource_group_name='test_machine-learning-job',
-            workspace_name='cctest-mlws',
-            id='cctest-sweep-job',
-            body=resource,
-        )
-
-    def test_machine_learning_job_archive_action_skips_archived_job(self):
-        client = MagicMock()
-        manager = MagicMock()
-        manager.get_client.return_value = client
-        resource = {
-            'name': 'cctest-sweep-job',
-            'properties': {'isArchived': True},
-        }
-
-        action = MachineLearningJobArchiveAction({'type': 'archive'}, manager)
-        action._prepare_processing()
-        action._process_resource(resource)
-
-        client.jobs.create_or_update.assert_not_called()
-
+    @arm_template('machine-learning-job-archive.json')
     @cassette_name('machine-learning-job-archive')
     def test_machine_learning_job_archive(self):
         p = self.load_policy({
@@ -119,11 +76,11 @@ class MachineLearningJobTest(BaseTest):
             'filters': [{
                 'type': 'value',
                 'key': 'resourceGroup',
-                'value': 'test_machine-learning-job-10949',
+                'value': 'test_machine-learning-job-archive',
             }, {
                 'type': 'value',
                 'key': 'name',
-                'value': 'happy_soursop_yptvy6nktn',
+                'value': 'cctest-archive-job',
             }, {
                 'type': 'value',
                 'key': 'properties.status',
@@ -148,3 +105,26 @@ class MachineLearningJobTest(BaseTest):
             resources[0]['name'],
         )
         self.assertTrue(job.properties.is_archived)
+
+    @arm_template('machine-learning-job-archive.json')
+    @cassette_name('machine-learning-job-archive-skip')
+    def test_machine_learning_job_archive_skips_archived_job(self):
+        p = self.load_policy({
+            'name': 'archive-machine-learning-job',
+            'resource': 'azure.machine-learning-job',
+            'actions': [{'type': 'archive'}],
+        }, validate=True, session_factory=Session)
+        client = local_session(Session).client(
+            'azure.mgmt.machinelearningservices.MachineLearningServicesMgmtClient')
+        job = client.jobs.get(
+            'test_machine-learning-job-archive',
+            'cctest-mlws-archive',
+            'cctest-archive-job',
+        )
+        resource = _serialize(job)
+
+        self.assertTrue(resource['properties']['isArchived'])
+        action = MachineLearningJobArchiveAction({'type': 'archive'}, p.resource_manager)
+        action._prepare_processing()
+
+        self.assertEqual('already archived', action._process_resource(resource))
