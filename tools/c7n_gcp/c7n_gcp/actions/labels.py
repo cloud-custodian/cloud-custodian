@@ -52,8 +52,8 @@ class BaseLabelAction(MethodAction):
         # Some resources (e.g. gcp.disk) need a different client depending
         # on the resource being labeled, since it dispatches to one of
         # several apis.
-        if get_label_client := getattr(model, 'get_label_client', None):
-            return get_label_client(session)
+        if get_client := getattr(model, 'get_client', None):
+            return get_client(session)
         return super().get_client(session, model)
 
     def get_resource_params(self, model, resource):

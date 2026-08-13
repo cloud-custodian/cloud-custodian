@@ -479,9 +479,7 @@ class ZonalOrRegionalClient:
 class DiskScopeMixin:
 
     def get_client(self, session, model):
-        return ZonalOrRegionalClient(
-            session.client(model.service, model.version, 'disks'),
-            session.client(model.service, model.version, 'regionDisks'))
+        return model.get_client(session)
 
 
 @resources.register('disk')
@@ -502,10 +500,12 @@ class Disk(QueryResourceManager):
 
         @staticmethod
         def get(client, resource_info):
+            loc = ({'region': resource_info['region']} if 'region' in resource_info
+                   else {'zone': resource_info['zone']})
             return client.execute_command(
                 'get', {'project': resource_info['project_id'],
-                        'zone': resource_info['zone'],
-                        'disk': resource_info['disk_id']})
+                        'disk': resource_info['disk_id'],
+                        **loc})
 
         @staticmethod
         def get_label_params(resource, all_labels):
@@ -517,10 +517,18 @@ class Disk(QueryResourceManager):
                     }}
 
         @staticmethod
-        def get_label_client(session):
+        def get_client(session):
             return ZonalOrRegionalClient(
                 session.client('compute', 'v1', 'disks'),
                 session.client('compute', 'v1', 'regionDisks'))
+
+    def get_resource(self, resource_info):
+        # The base implementation's get_client() builds a zonal-only
+        # client, which can't reach regional disks (used by event-driven
+        # policies, e.g. gcp-audit mode).
+        session = local_session(self.session_factory)
+        client = self.resource_type.get_client(session)
+        return self.resource_type.get(client, resource_info)
 
 
 @Disk.filter_registry.register('snapshots')

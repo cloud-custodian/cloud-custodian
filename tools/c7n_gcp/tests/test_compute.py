@@ -514,6 +514,36 @@ class DiskTest(BaseTest):
         self.assertEqual(len(result.get('items', [])), 0)
 
 
+@terraform('disk_regional_audit_get')
+def test_regional_disk_audit_get(test, disk_regional_audit_get):
+    """Record gcp-audit resource resolution for a regional persistent disk."""
+    project_id = test.project_id
+    disk_name = disk_regional_audit_get.outputs['disk_name']['value']
+    region = disk_regional_audit_get.outputs['region']['value']
+    factory = test.replay_flight_data(
+        'disk-regional-audit-get', project_id=project_id)
+    policy = test.load_policy(
+        {'name': 'regional-disk-audit',
+         'resource': 'gcp.disk',
+         'mode': {
+             'type': 'gcp-audit',
+             'methods': ['v1.compute.regionDisks.insert']}},
+        session_factory=factory)
+
+    event = {
+        'resource': {'labels': {
+            'project_id': project_id,
+            'region': region,
+            'disk_id': disk_name}},
+        'protoPayload': {'resourceName': (
+            'projects/{}/regions/{}/disks/{}').format(
+                project_id, region, disk_name)}}
+
+    resources = policy.get_execution_mode().run(event, None)
+    assert resources[0]['name'] == disk_name
+    assert resources[0]['region'].rsplit('/', 1)[-1] == region
+
+
 class SnapshotTest(BaseTest):
 
     def test_snapshot_query(self):

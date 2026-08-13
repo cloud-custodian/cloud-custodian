@@ -1,0 +1,76 @@
+{
+    "pytest-terraform": 1,
+    "outputs": {
+        "disk_name": {
+            "value": "c7n-regional-audit-default-e551",
+            "type": "string"
+        },
+        "region": {
+            "value": "us-central1",
+            "type": "string"
+        }
+    },
+    "resources": {
+        "google_compute_region_disk": {
+            "default": {
+                "access_mode": "",
+                "async_primary_disk": [],
+                "create_snapshot_before_destroy": false,
+                "create_snapshot_before_destroy_prefix": null,
+                "creation_timestamp": "2026-08-13T09:18:56.090-07:00",
+                "deletion_policy": "DELETE",
+                "description": "",
+                "disk_encryption_key": [],
+                "disk_id": "477038953993621632",
+                "effective_labels": {
+                    "goog-terraform-provisioned": "true"
+                },
+                "guest_os_features": [],
+                "id": "projects/cloud-custodian/regions/us-central1/disks/c7n-regional-audit-default-e551",
+                "image": "",
+                "label_fingerprint": "vezUS-42LLM=",
+                "labels": null,
+                "last_attach_timestamp": "",
+                "last_detach_timestamp": "",
+                "licenses": [],
+                "name": "c7n-regional-audit-default-e551",
+                "physical_block_size_bytes": 4096,
+                "project": "stkl-jim-fulton",
+                "provisioned_iops": 0,
+                "provisioned_throughput": 0,
+                "region": "us-central1",
+                "replica_zones": [
+                    "https://www.googleapis.com/compute/v1/projects/cloud-custodian/zones/us-central1-a",
+                    "https://www.googleapis.com/compute/v1/projects/cloud-custodian/zones/us-central1-b"
+                ],
+                "self_link": "https://www.googleapis.com/compute/v1/projects/cloud-custodian/regions/us-central1/disks/c7n-regional-audit-default-e551",
+                "size": 10,
+                "snapshot": "",
+                "source_disk": "",
+                "source_disk_id": "",
+                "source_image_encryption_key": [],
+                "source_image_id": "",
+                "source_snapshot_encryption_key": [],
+                "source_snapshot_id": "",
+                "terraform_labels": {
+                    "goog-terraform-provisioned": "true"
+                },
+                "timeouts": null,
+                "type": "pd-ssd",
+                "users": []
+            }
+        },
+        "random_id": {
+            "suffix": {
+                "b64_std": "5VE=",
+                "b64_url": "5VE",
+                "byte_length": 2,
+                "dec": "58705",
+                "hex": "e551",
+                "id": "5VE",
+                "keepers": null,
+                "prefix": null
+            }
+        }
+    }
+}
