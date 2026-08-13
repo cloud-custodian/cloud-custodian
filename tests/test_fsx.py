@@ -1653,3 +1653,41 @@ class TestFSxActiveDirectoryResolution(BaseTest):
         self.assertEqual(
             c7n.resources.fsx.resolve_svm(
                 svm, list(reversed(directories)))["DirectoryId"], "d-2")
+
+    def test_misconfigured_svm_is_not_cleared(self):
+        # a misconfigured svm keeps reporting the directory it was joined to
+        # while the join itself is broken.
+        svm = dict(self.svm(DomainName="CORP.EXAMPLE.COM", DnsIps=["10.0.0.10"]),
+                   Lifecycle="MISCONFIGURED",
+                   LifecycleTransitionReason={"Message": "Invalid credentials"})
+        found = c7n.resources.fsx.resolve_svm(svm, self.directories())
+        self.assertEqual(found["managed"], False)
+        self.assertEqual(found["reason"], "MisconfiguredDirectoryJoin")
+        self.assertEqual(found["LifecycleTransitionReason"], "Invalid credentials")
+
+    def test_misconfigured_windows_file_system_is_not_cleared(self):
+        # MISCONFIGURED_UNAVAILABLE is documented as unavailable due to a
+        # change in active directory configuration.
+        directories = [{"DirectoryId": "d-managed", "Name": "corp.example.com",
+                        "Type": "MicrosoftAD", "DnsIpAddrs": ["10.0.0.10"]}]
+        self.patch(c7n.resources.fsx, "describe_directories",
+                   lambda manager: directories)
+        f = c7n.resources.fsx.FSxActiveDirectoryFilter(
+            {"type": "active-directory", "match": "not-managed"}, None)
+        f.get_svms = lambda: {}
+
+        broken = {"FileSystemId": "fs-broken", "FileSystemType": "WINDOWS",
+                  "Lifecycle": "MISCONFIGURED_UNAVAILABLE",
+                  "FailureDetails": {"Message": "Cannot reach domain controllers"},
+                  "WindowsConfiguration": {"ActiveDirectoryId": "d-managed"}}
+        healthy = dict(broken, FileSystemId="fs-healthy", Lifecycle="AVAILABLE")
+
+        resources = f.process([broken, healthy])
+        self.assertEqual([r["FileSystemId"] for r in resources], ["fs-broken"])
+        self.assertEqual(
+            broken["c7n:ActiveDirectory"],
+            {"managed": False, "reason": "MisconfiguredDirectoryJoin",
+             "Lifecycle": "MISCONFIGURED_UNAVAILABLE",
+             "FailureDetails": "Cannot reach domain controllers"})
+        # the same file system, healthy, still resolves to the managed directory
+        self.assertEqual(healthy["c7n:ActiveDirectory"]["managed"], True)

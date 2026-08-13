@@ -144,6 +144,13 @@ NON_AD_SVM_SUBTYPES = ('DP_DESTINATION', 'SYNC_DESTINATION', 'SYNC_SOURCE')
 TRANSIENT_SVM_LIFECYCLES = ('CREATING', 'PENDING', 'DELETING')
 TRANSIENT_FS_LIFECYCLES = ('CREATING', 'DELETING')
 
+# a misconfigured resource keeps reporting the directory it was joined to
+# while the join itself is broken, most often expired credentials or domain
+# controllers it can no longer reach. reporting that as joined would clear a
+# resource that isn't actually using the directory.
+BROKEN_AD_SVM_LIFECYCLES = ('MISCONFIGURED',)
+BROKEN_AD_FS_LIFECYCLES = ('MISCONFIGURED', 'MISCONFIGURED_UNAVAILABLE')
+
 
 def describe_directories(manager):
     client = local_session(manager.session_factory).client('ds')
@@ -204,6 +211,11 @@ def resolve_svm(svm, directories):
     if svm.get('Lifecycle') in TRANSIENT_SVM_LIFECYCLES:
         return {'managed': None, 'reason': 'TransientLifecycle',
                 'Lifecycle': svm.get('Lifecycle')}
+    if svm.get('Lifecycle') in BROKEN_AD_SVM_LIFECYCLES:
+        return {'managed': False, 'reason': 'MisconfiguredDirectoryJoin',
+                'Lifecycle': svm.get('Lifecycle'),
+                'LifecycleTransitionReason': (
+                    svm.get('LifecycleTransitionReason') or {}).get('Message')}
     ad = (svm.get('ActiveDirectoryConfiguration') or {}).get(
         'SelfManagedActiveDirectoryConfiguration')
     if not ad:
@@ -367,6 +379,12 @@ class FSxActiveDirectoryFilter(ActiveDirectoryFilterBase):
             if r.get('Lifecycle') in TRANSIENT_FS_LIFECYCLES:
                 found = {'managed': None, 'reason': 'TransientLifecycle',
                          'Lifecycle': r.get('Lifecycle')}
+            elif (r.get('Lifecycle') in BROKEN_AD_FS_LIFECYCLES and
+                    fs_type in ('WINDOWS', 'ONTAP')):
+                found = {'managed': False, 'reason': 'MisconfiguredDirectoryJoin',
+                         'Lifecycle': r.get('Lifecycle'),
+                         'FailureDetails': (
+                             r.get('FailureDetails') or {}).get('Message')}
             elif fs_type == 'WINDOWS':
                 found = resolve_windows(r, directories)
             elif fs_type == 'ONTAP':
