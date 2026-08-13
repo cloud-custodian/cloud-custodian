@@ -98,6 +98,59 @@ class VertexAIJobs:
                 print(f'Warning: failed to delete {name} during cleanup: {e}')
 
 
+class VertexAIModels:
+    """Helper for creating/cleaning up ephemeral Vertex AI models in tests.
+
+    Vertex AI Models, unlike datasets/endpoints, have no Terraform resource,
+    so tests upload a minimal Model directly through the API (mirroring
+    VertexAIJobs above). Upload is a long-running operation; create() polls
+    it to completion and returns the resulting Model.
+    """
+
+    def __init__(self, test):
+        self.test = test
+        self.created = []
+
+    def _client(self, session, location, component='projects.locations.models'):
+        return session.client(
+            'aiplatform', 'v1', component,
+            client_options=ClientOptions(
+                api_endpoint=f'https://{location}-aiplatform.googleapis.com'))
+
+    def create(self, location, display_name, labels=None):
+        session = self.test.session_factory()
+        project = session.get_default_project()
+        client = self._client(session, location)
+        operation = client.execute_command(
+            'upload',
+            {'parent': f'projects/{project}/locations/{location}',
+             'body': {'model': {'displayName': display_name, 'labels': labels or {}}}})
+
+        # The upload operation's name is already scoped under the model it
+        # will produce (.../models/{id}/operations/{opid}), so the model can
+        # be tracked for cleanup immediately -- before polling, which may
+        # fail or time out -- rather than waiting for operation['response'].
+        model_name = operation['name'].rsplit('/operations/', 1)[0]
+        self.created.append((client, model_name))
+
+        ops_client = self._client(session, location, 'projects.locations.models.operations')
+        for _ in range(30):
+            if operation.get('done'):
+                break
+            if self.test.recording:
+                time.sleep(5)
+            operation = ops_client.execute_query('get', {'name': operation['name']})
+
+        return client.execute_query('get', {'name': model_name})
+
+    def cleanup(self):
+        for client, name in self.created:
+            try:
+                client.execute_command('delete', {'name': name})
+            except HttpError:
+                pass
+
+
 def get_test_model_id(project_id, location):
     """Get full model resource name for testing.
 
@@ -201,6 +254,15 @@ def test_vertexai_dataset_resource_registered(test):
         'projects.locations.datasets')
 
 
+def test_vertexai_model_resource_registered(test):
+    """Test that gcp.vertex-ai-model resolves as a resource type."""
+    policy = test.load_policy(
+        {'name': 'vertexai-model-check',
+         'resource': 'gcp.vertex-ai-model'})
+    assert policy.resource_manager.resource_type.component == (
+        'projects.locations.models')
+
+
 @terraform('vertexai_dataset', scope='module')
 def test_vertexai_dataset_multi_location(test, vertexai_dataset):
     """Test querying Vertex AI Datasets across multiple locations."""
@@ -249,6 +311,64 @@ def test_vertexai_dataset_filtering(test, vertexai_dataset):
     assert len(resources) >= 1
     assert all('image' in r['metadataSchemaUri'] for r in resources)
     assert not any('tabular' in r['metadataSchemaUri'] for r in resources)
+
+
+def test_vertexai_model_multi_location(test):
+    """Test querying Vertex AI Models across multiple locations."""
+    test.session_factory = test.replay_flight_data('vertexai-model-multi-location')
+
+    models = VertexAIModels(test)
+    test.addCleanup(models.cleanup)
+    if test.recording:
+        models.create('us-central1', 'c7n-test-model-central')
+        models.create('us-east1', 'c7n-test-model-east')
+
+    policy = test.load_policy(
+        {'name': 'vertexai-models-multi-location',
+         'resource': 'gcp.vertex-ai-model',
+         'query': [
+             {'location': 'us-central1'},
+             {'location': 'us-east1'}
+         ]},
+        session_factory=test.session_factory)
+
+    resources = policy.run()
+
+    assert len(resources) >= 2
+    locations = {r['name'].split('/')[3] for r in resources}
+    assert 'us-central1' in locations
+    assert 'us-east1' in locations
+
+
+def test_vertexai_model_filtering(test):
+    """Test filtering Vertex AI Models on labels.
+
+    Uses two fixture models (one with an owner label, one without) to prove
+    the filter actually discriminates, not just returns everything.
+    """
+    test.session_factory = test.replay_flight_data('vertexai-model-filtering')
+
+    models = VertexAIModels(test)
+    test.addCleanup(models.cleanup)
+    if test.recording:
+        models.create('us-central1', 'c7n-test-model-owned', labels={'owner': 'c7n'})
+        models.create('us-central1', 'c7n-test-model-unowned')
+
+    policy = test.load_policy(
+        {'name': 'vertexai-models-missing-owner-label',
+         'resource': 'gcp.vertex-ai-model',
+         'query': [{'location': 'us-central1'}],
+         'filters': [
+             {'type': 'value',
+              'key': 'labels.owner',
+              'value': 'absent'}
+         ]},
+        session_factory=test.session_factory)
+
+    resources = policy.run()
+
+    assert len(resources) >= 1
+    assert all('owner' not in r.get('labels', {}) for r in resources)
 
 
 def test_vertexai_endpoint_multi_location(test):
