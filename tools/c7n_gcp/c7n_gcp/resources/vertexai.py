@@ -835,7 +835,7 @@ class VertexAIMetadataStoreArtifact(VertexAIQueryManager):
         )
 
         all_resources = []
-        annotation_key = 'c7n:location'
+        location_annotation_key = 'c7n:location'
 
         for location_instance in location_manager.resources():
             location = location_instance['name']
@@ -855,7 +855,7 @@ class VertexAIMetadataStoreArtifact(VertexAIQueryManager):
                             artifacts.extend(page_items)
 
                     for artifact in artifacts:
-                        artifact[annotation_key] = location_instance
+                        artifact[location_annotation_key] = location_instance
 
                     all_resources.extend(artifacts)
 
