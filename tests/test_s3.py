@@ -14,7 +14,7 @@ from unittest import mock
 from unittest import TestCase
 
 from contextlib import suppress
-from botocore.exceptions import ClientError
+from botocore.exceptions import ClientError, ConnectTimeoutError, EndpointConnectionError
 from dateutil.tz import tzutc
 import pytest
 from pytest_terraform import terraform
@@ -122,6 +122,44 @@ def test_s3_assembly_detect_denied(test):
     assert assembly.detect_augment_fields() == [
         'Location', 'Tags', 'Policy', 'Acl', 'Replication', 'Versioning', 'Website',
         'Logging', 'Notification', 'Lifecycle']
+
+
+def test_s3_assembly_connect_timeout(test):
+    # A bucket whose regional endpoint hangs shouldn't abort assembly of
+    # the other fields/buckets - warn and move on (c7n#10859).
+    policy = test.load_policy({'name': 's3-attrs', 'resource': 's3'})
+    assembly = s3.BucketAssembly(policy.resource_manager)
+    assembly.initialize()
+
+    client = mock.MagicMock()
+    client.meta.region_name = assembly.default_region
+    client.get_bucket_location.side_effect = ConnectTimeoutError(endpoint_url='x')
+    assembly.region_clients[assembly.default_region] = client
+
+    log_mock = mock.MagicMock()
+    test.patch(s3, 'log', log_mock)
+
+    bucket = assembly.assemble({'Name': 'zombie-bucket'})
+    assert bucket['Name'] == 'zombie-bucket'
+    assert 'Location' not in bucket
+    log_mock.warning.assert_called_once()
+
+
+def test_s3_assembly_endpoint_connection_error(test):
+    # A bucket removed between list_buckets and augment (dns entry gone)
+    # is treated like a not-found bucket rather than aborting (c7n#10859).
+    policy = test.load_policy({'name': 's3-attrs', 'resource': 's3'})
+    assembly = s3.BucketAssembly(policy.resource_manager)
+    assembly.initialize()
+
+    client = mock.MagicMock()
+    client.meta.region_name = assembly.default_region
+    client.get_bucket_location.side_effect = EndpointConnectionError(endpoint_url='x')
+    assembly.region_clients[assembly.default_region] = client
+
+    bucket = assembly.assemble({'Name': 'deleted-bucket'})
+    assert bucket['Name'] == 'deleted-bucket'
+    assert bucket['Location'] == {}
 
 
 def test_s3_express(test):

@@ -37,7 +37,8 @@ import threading
 import ssl
 
 from botocore.client import Config
-from botocore.exceptions import ClientError
+from botocore.exceptions import (
+    ClientError, ConnectTimeoutError, EndpointConnectionError, ReadTimeoutError)
 
 from collections import defaultdict
 from concurrent.futures import as_completed
@@ -618,6 +619,22 @@ class BucketAssembly:
                     "Bucket ssl error %s: %s %s",
                     bucket['Name'], bucket.get('Location', 'unknown'), e)
                 continue
+            except (ConnectTimeoutError, ReadTimeoutError) as e:
+                # Regional endpoint is reachable but hung/degraded - don't let
+                # one bad bucket abort assembly of the rest of the account.
+                log.warning(
+                    "Bucket:%s unable to invoke method:%s error:%s ",
+                    bucket['Name'], method_name, e)
+                continue
+            except EndpointConnectionError as e:
+                # Endpoint didn't resolve/connect at all - most likely the
+                # bucket was deleted between list_buckets and here (its DNS
+                # entry is gone). Treat like a not-found bucket.
+                log.warning(
+                    "Bucket:%s unable to invoke method:%s error:%s ",
+                    bucket['Name'], method_name, e)
+                self.handle_not_found(bucket, method_name)
+                value = default
             except ClientError as e:
                 code = e.response['Error']['Code']
                 if code.startswith("NoSuch") or "NotFound" in code:
