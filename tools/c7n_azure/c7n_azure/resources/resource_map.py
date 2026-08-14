@@ -69,6 +69,7 @@ ResourceMap = {
     "azure.machine-learning-workspace": "c7n_azure.resources.machine_learning.MachineLearningWorkspace", # noqa
     "azure.machine-learning-data-container": "c7n_azure.resources.machine_learning.MachineLearningDataContainer", # noqa
     "azure.machine-learning-job": "c7n_azure.resources.machine_learning_job.MachineLearningJob",
+    "azure.machine-learning-online-endpoint": "c7n_azure.resources.machine_learning_online_endpoint.MachineLearningOnlineEndpoint", # noqa
     "azure.mariadb": "c7n_azure.resources.mariadb.MariaDB",
     "azure.monitor-log-profile": "c7n_azure.resources.monitor_logprofile.MonitorLogprofile",
     "azure.mariadb-server": "c7n_azure.resources.mariadb_server.MariaDBServer",

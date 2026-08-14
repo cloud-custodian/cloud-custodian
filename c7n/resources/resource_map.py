@@ -39,8 +39,10 @@ ResourceMap = {
   "aws.bedrock-inference-profile":
     "c7n.resources.bedrock.BedrockApplicationInferenceProfile",
   "aws.bedrock-custom-model": "c7n.resources.bedrock.BedrockCustomModel",
+  "aws.bedrock-evaluation-job": "c7n.resources.bedrock.BedrockEvaluationJob",
   "aws.bedrock-foundation-model": "c7n.resources.bedrock.BedrockFoundationModel",
   "aws.bedrock-knowledge-base": "c7n.resources.bedrock.BedrockKnowledgeBase",
+  "aws.bedrock-mantle-project": "c7n.resources.bedrock.BedrockMantleProject",
   "aws.bedrock-model-invocation-job": "c7n.resources.bedrock.BedrockModelInvocationJob",
   "aws.budget": "c7n.resources.budgets.Budget",
   "aws.cache-cluster": "c7n.resources.elasticache.ElastiCacheCluster",
