@@ -1138,6 +1138,7 @@ class Tag(Action):
                 resource: asg
                 actions:
                   - type: tag
+                    propagate: true
                     tags:
                       Owner:
                         type: resource
