@@ -970,6 +970,8 @@ class UniversalTag(Tag):
 
     def process_resource_set(self, client, resource_set, tags):
         arns = self.manager.get_arns(resource_set)
+        if not arns:
+            return
         return universal_retry(
             client.tag_resources, ResourceARNList=arns, Tags=tags)
 
@@ -1004,6 +1006,8 @@ class UniversalUntag(RemoveTag):
 
     def process_resource_set(self, client, resource_set, tag_keys):
         arns = self.manager.get_arns(resource_set)
+        if not arns:
+            return
         return universal_retry(
             client.untag_resources, ResourceARNList=arns, TagKeys=tag_keys)
 

@@ -128,7 +128,10 @@ ResourceMap = {
     "gcp.vertex-ai-custom-job": "c7n_gcp.resources.vertexai.VertexAICustomJob",
     "gcp.vertex-ai-dataset": "c7n_gcp.resources.vertexai.VertexAIDataset",
     "gcp.vertex-ai-endpoint": "c7n_gcp.resources.vertexai.VertexAIEndpoint",
+    "gcp.vertex-ai-hyperparameter-tuning-job": (
+        "c7n_gcp.resources.vertexai.VertexAIHyperparameterTuningJob"),
     "gcp.vertex-ai-location": "c7n_gcp.resources.vertexai.VertexAILocation",
+    "gcp.vertex-ai-model": "c7n_gcp.resources.vertexai.VertexAIModel",
     "gcp.vpc": "c7n_gcp.resources.network.Network",
     "gcp.zone": "c7n_gcp.resources.compute.Zone",
 }
