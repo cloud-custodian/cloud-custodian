@@ -1691,3 +1691,37 @@ class TestFSxActiveDirectoryResolution(BaseTest):
              "FailureDetails": "Cannot reach domain controllers"})
         # the same file system, healthy, still resolves to the managed directory
         self.assertEqual(healthy["c7n:ActiveDirectory"]["managed"], True)
+
+    def test_misconfigured_ontap_still_assessed_through_svms(self):
+        # MISCONFIGURED on a file system is any recoverable failure, and ontap
+        # holds its directory join on the svm, so it must not short circuit
+        # the svm evaluation.
+        directories = [{"DirectoryId": "d-managed", "Name": "corp.example.com",
+                        "Type": "MicrosoftAD", "DnsIpAddrs": ["10.0.0.10"]}]
+        self.patch(c7n.resources.fsx, "describe_directories",
+                   lambda manager: directories)
+        f = c7n.resources.fsx.FSxActiveDirectoryFilter(
+            {"type": "active-directory", "match": "not-managed"}, None)
+        f.get_svms = lambda: {
+            "fs-joined": [self.svm_record("svm-1", ["10.0.0.10"])],
+            "fs-unjoined": [{"StorageVirtualMachineId": "svm-2",
+                             "Subtype": "DEFAULT", "Lifecycle": "CREATED"}]}
+
+        joined = {"FileSystemId": "fs-joined", "FileSystemType": "ONTAP",
+                  "Lifecycle": "MISCONFIGURED"}
+        unjoined = {"FileSystemId": "fs-unjoined", "FileSystemType": "ONTAP",
+                    "Lifecycle": "MISCONFIGURED"}
+
+        resources = f.process([joined, unjoined])
+        # the misconfiguration alone doesn't decide it, the svms do
+        self.assertEqual([r["FileSystemId"] for r in resources], ["fs-unjoined"])
+        self.assertEqual(joined["c7n:ActiveDirectory"]["reason"], "ManagedDirectory")
+        self.assertEqual(unjoined["c7n:ActiveDirectory"]["reason"],
+                         "StorageVirtualMachineNotManaged")
+
+    def svm_record(self, svm_id, dns_ips):
+        return {"StorageVirtualMachineId": svm_id, "Subtype": "DEFAULT",
+                "Lifecycle": "CREATED",
+                "ActiveDirectoryConfiguration": {
+                    "SelfManagedActiveDirectoryConfiguration": {
+                        "DomainName": "CORP.EXAMPLE.COM", "DnsIps": dns_ips}}}

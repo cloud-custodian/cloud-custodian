@@ -149,7 +149,12 @@ TRANSIENT_FS_LIFECYCLES = ('CREATING', 'DELETING')
 # controllers it can no longer reach. reporting that as joined would clear a
 # resource that isn't actually using the directory.
 BROKEN_AD_SVM_LIFECYCLES = ('MISCONFIGURED',)
-BROKEN_AD_FS_LIFECYCLES = ('MISCONFIGURED', 'MISCONFIGURED_UNAVAILABLE')
+
+# only MISCONFIGURED_UNAVAILABLE is documented as an active directory failure,
+# and only for windows. a plain MISCONFIGURED covers any recoverable failure,
+# so it says nothing about the directory join. ontap holds its join on the svm
+# and is assessed there instead.
+BROKEN_AD_FS_LIFECYCLES = ('MISCONFIGURED_UNAVAILABLE',)
 
 
 def describe_directories(manager):
@@ -379,8 +384,8 @@ class FSxActiveDirectoryFilter(ActiveDirectoryFilterBase):
             if r.get('Lifecycle') in TRANSIENT_FS_LIFECYCLES:
                 found = {'managed': None, 'reason': 'TransientLifecycle',
                          'Lifecycle': r.get('Lifecycle')}
-            elif (r.get('Lifecycle') in BROKEN_AD_FS_LIFECYCLES and
-                    fs_type in ('WINDOWS', 'ONTAP')):
+            elif (fs_type == 'WINDOWS' and
+                    r.get('Lifecycle') in BROKEN_AD_FS_LIFECYCLES):
                 found = {'managed': False, 'reason': 'MisconfiguredDirectoryJoin',
                          'Lifecycle': r.get('Lifecycle'),
                          'FailureDetails': (
