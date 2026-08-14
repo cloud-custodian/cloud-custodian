@@ -231,8 +231,15 @@ class KMSCrossAccountAccessFilter(CrossAccountAccessFilter):
         def _augment(r):
             key_id = r.get('TargetKeyId', r.get('KeyId'))
             assert key_id, "Invalid key resources %s" % r
-            r['Policy'] = client.get_key_policy(
-                KeyId=key_id, PolicyName='default')['Policy']
+            try:
+                r['Policy'] = client.get_key_policy(
+                    KeyId=key_id, PolicyName='default')['Policy']
+            except ClientError as e:
+                if e.response['Error']['Code'] == 'AccessDeniedException':
+                    self.log.warning(
+                        "Access denied when getting policy on key:%s", key_id)
+                    return None
+                raise
             return r
 
         self.log.debug("fetching policy for %d kms keys" % len(resources))
