@@ -2,7 +2,7 @@
   "headers": {
     "content-type": "application/json; charset=UTF-8",
     "vary": "Origin, X-Origin, Referer",
-    "date": "Fri, 14 Aug 2026 20:21:48 GMT",
+    "date": "Fri, 14 Aug 2026 20:32:21 GMT",
     "server": "ESF",
     "x-xss-protection": "0",
     "x-frame-options": "SAMEORIGIN",
@@ -12,7 +12,7 @@
     "status": "200",
     "content-length": "3",
     "-content-encoding": "gzip",
-    "content-location": "https://us-central1-aiplatform.googleapis.com/v1/projects/cloud-custodian/locations/us-central1/metadataStores/default/artifacts?alt=json"
+    "content-location": "https://us-central1-aiplatform.googleapis.com/v1/projects/cloud-custodian/locations/us-central1/metadataStores/c7n-store/artifacts?alt=json"
   },
   "body": {}
 }

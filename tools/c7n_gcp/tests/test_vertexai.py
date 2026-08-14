@@ -2054,12 +2054,17 @@ def test_vertexai_metadata_store_artifact_filtering(test, vertexai_metadata_stor
 
     Creates one labeled and one unlabeled artifact in the same metadata
     store to prove the filter discriminates rather than returning everything.
+
+    Uses the project's always-present "default" metadata store rather than
+    the Terraform-provisioned one (kept empty here) to keep recorded
+    flight-data filenames well under Windows' MAX_PATH; the Terraform store
+    still exercises multi-store enumeration since it's listed alongside
+    "default".
     """
-    test.session_factory = test.replay_flight_data(
-        'vertexai_metadata_store_artifact_filtering')
+    test.session_factory = test.replay_flight_data('va_artifact')
 
     project = test.session_factory().get_default_project()
-    store_name = f'projects/{project}/locations/us-central1/metadataStores/c7n-test-metadata-store'
+    store_name = f'projects/{project}/locations/us-central1/metadataStores/default'
 
     artifacts = VertexAIMetadataStoreArtifacts(test)
     test.addCleanup(artifacts.cleanup)
