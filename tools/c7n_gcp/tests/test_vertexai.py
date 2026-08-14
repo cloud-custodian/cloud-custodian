@@ -190,6 +190,7 @@ class VertexAIEvaluationRuns:
             evaluation_request['candidateResponses'] = [
                 {'candidate': 'model-under-test', 'text': prediction}]
 
+        # Create an evaluation item:
         items_client = self._client(session, location, 'projects.locations.evaluationItems')
         item = items_client.execute_command(
             'create',
@@ -201,6 +202,7 @@ class VertexAIEvaluationRuns:
                  }})
         self.created.append((items_client, item['name']))
 
+        # Create its evaluation set:
         sets_client = self._client(session, location, 'projects.locations.evaluationSets')
         eval_set = sets_client.execute_command(
             'create',
@@ -208,6 +210,7 @@ class VertexAIEvaluationRuns:
              'body': {'displayName': f'{display_name}-set', 'evaluationItems': [item['name']]}})
         self.created.append((sets_client, eval_set['name']))
 
+        # Create a run over it
         runs_client = self._client(session, location, 'projects.locations.evaluationRuns')
         run = runs_client.execute_command(
             'create',
