@@ -1595,6 +1595,59 @@ class TestFSxActiveDirectoryResolution(BaseTest):
         # check with its lifecycle
         self.assertTrue(f.in_scope({"Subtype": "DEFAULT", "Lifecycle": "MISCONFIGURED"}))
 
+    def forwarder_svm(self):
+        # joined to the managed ad, but pointed at a resolver endpoint rather
+        # than at the domain controllers themselves
+        return dict(self.svm(DomainName="CORP.EXAMPLE.COM", DnsIps=["10.0.0.2"]),
+                    FileSystemId="fs-1")
+
+    def vpc_directories(self):
+        return [dict(self.directories()[0], VpcSettings={"VpcId": "vpc-1"})]
+
+    def test_resolve_on_defaults_to_dns_ips(self):
+        f = self.filter()
+        directory, resolution = f.resolve(
+            self.forwarder_svm(), self.vpc_directories(), {"fs-1": "vpc-1"})
+        self.assertIsNone(directory)
+        self.assertEqual(resolution["reason"], "DomainNameOnlyMatch")
+
+    def test_resolve_on_same_vpc(self):
+        f = c7n.resources.fsx.SvmActiveDirectoryFilter(
+            {"type": "active-directory", "key": "Type", "value": "MicrosoftAD",
+             "resolve-on": "same-vpc"}, None)
+        directory, resolution = f.resolve(
+            self.forwarder_svm(), self.vpc_directories(), {"fs-1": "vpc-1"})
+        self.assertEqual(directory["DirectoryId"], "d-managed")
+        self.assertEqual(resolution["matched-on"], "domain-name,same-vpc")
+
+    def test_resolve_on_same_vpc_rejects_a_different_vpc(self):
+        # an on premises domain of the same name reached from another vpc
+        # still doesn't resolve
+        f = c7n.resources.fsx.SvmActiveDirectoryFilter(
+            {"type": "active-directory", "key": "Type", "value": "MicrosoftAD",
+             "resolve-on": "same-vpc"}, None)
+        directory, resolution = f.resolve(
+            self.forwarder_svm(), self.vpc_directories(), {"fs-1": "vpc-2"})
+        self.assertIsNone(directory)
+        self.assertEqual(resolution["reason"], "DomainNameOnlyMatch")
+
+    def test_resolve_on_domain_name(self):
+        f = c7n.resources.fsx.SvmActiveDirectoryFilter(
+            {"type": "active-directory", "key": "Type", "value": "MicrosoftAD",
+             "resolve-on": "domain-name"}, None)
+        directory, resolution = f.resolve(
+            self.forwarder_svm(), self.vpc_directories(), None)
+        self.assertEqual(directory["DirectoryId"], "d-managed")
+        self.assertEqual(resolution["matched-on"], "domain-name")
+
+    def test_resolve_on_same_vpc_declares_the_extra_permission(self):
+        p = self.load_policy({
+            "name": "fsx_svm_same_vpc",
+            "resource": "aws.fsx-storage-virtual-machine",
+            "filters": [{"type": "active-directory", "key": "Type",
+                         "value": "MicrosoftAD", "resolve-on": "same-vpc"}]})
+        self.assertIn("fsx:DescribeFileSystems", p.get_permissions())
+
 
 class TestFSxDirectory(BaseTest):
 

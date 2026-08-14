@@ -174,7 +174,20 @@ class SvmActiveDirectoryFilter(ValueFilter):
                   - Lifecycle: MISCONFIGURED
     """
 
-    schema = type_schema('active-directory', rinherit=ValueFilter.schema)
+    schema = type_schema(
+        'active-directory', rinherit=ValueFilter.schema,
+        **{'resolve-on': {
+            'enum': ['dns-ips', 'same-vpc', 'domain-name'],
+            'default': 'dns-ips',
+            'description': (
+                'Evidence accepted when resolving the join. dns-ips only, the '
+                'default, is the sole evidence that establishes which domain '
+                'controllers an svm actually uses. same-vpc additionally '
+                'accepts a domain name match when the directory sits in the '
+                "same vpc as the svm's file system, for estates pointing svms "
+                'at a resolver endpoint rather than at the controllers. '
+                'domain-name accepts a name match outright, which an on '
+                'premises domain of the same name also satisfies.')}})
     schema_alias = False
     annotation_key = 'c7n:ActiveDirectory'
     resolution_key = 'c7n:ActiveDirectoryResolution'
@@ -185,7 +198,14 @@ class SvmActiveDirectoryFilter(ValueFilter):
     transient_lifecycles = ('CREATING', 'PENDING', 'DELETING')
 
     def get_permissions(self):
-        return self.directory_manager().get_permissions()
+        perms = set(self.directory_manager().get_permissions())
+        if self.data.get('resolve-on') == 'same-vpc':
+            perms.update(self.manager.get_resource_manager('aws.fsx').get_permissions())
+        return sorted(perms)
+
+    def get_file_system_vpcs(self):
+        return {f['FileSystemId']: f.get('VpcId') for f in
+                self.manager.get_resource_manager('aws.fsx').resources(augment=False)}
 
     def directory_manager(self):
         return self.manager.get_resource_manager('aws.directory')
@@ -194,7 +214,7 @@ class SvmActiveDirectoryFilter(ValueFilter):
         return (svm.get('Subtype') not in self.non_ad_subtypes and
                 svm.get('Lifecycle') not in self.transient_lifecycles)
 
-    def resolve(self, svm, directories):
+    def resolve(self, svm, directories, file_system_vpcs=None):
         """Resolve the svm's join to a directory service directory.
 
         fsx reports the domain name uppercased where directory service doesn't,
@@ -227,6 +247,15 @@ class SvmActiveDirectoryFilter(ValueFilter):
                 name_only = d
 
         if name_only is not None:
+            resolve_on = self.data.get('resolve-on', 'dns-ips')
+            if resolve_on == 'domain-name':
+                return name_only, {'reason': 'Resolved', 'matched-on': 'domain-name'}
+            if resolve_on == 'same-vpc':
+                fs_vpc = (file_system_vpcs or {}).get(svm.get('FileSystemId'))
+                directory_vpc = (name_only.get('VpcSettings') or {}).get('VpcId')
+                if fs_vpc and directory_vpc and fs_vpc == directory_vpc:
+                    return name_only, {'reason': 'Resolved',
+                                       'matched-on': 'domain-name,same-vpc'}
             return None, {'reason': 'DomainNameOnlyMatch', 'matched-on': 'domain-name',
                           'DirectoryId': name_only.get('DirectoryId')}
         return None, {'reason': 'UnresolvedDirectory',
@@ -234,11 +263,14 @@ class SvmActiveDirectoryFilter(ValueFilter):
 
     def process(self, resources, event=None):
         directories = self.directory_manager().resources(augment=False)
+        file_system_vpcs = (
+            self.get_file_system_vpcs()
+            if self.data.get('resolve-on') == 'same-vpc' else None)
         results = []
         for r in resources:
             if not self.in_scope(r):
                 continue
-            directory, resolution = self.resolve(r, directories)
+            directory, resolution = self.resolve(r, directories, file_system_vpcs)
             # an unresolved join annotates no directory, so a policy asking for
             # a directory attribute matches it rather than clearing it
             r[self.annotation_key] = directory or {}
