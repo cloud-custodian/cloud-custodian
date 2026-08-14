@@ -1,0 +1,44 @@
+{
+  "headers": {
+    "content-type": "application/json; charset=UTF-8",
+    "vary": "Origin, X-Origin, Referer",
+    "date": "Fri, 14 Aug 2026 20:21:47 GMT",
+    "server": "ESF",
+    "x-xss-protection": "0",
+    "x-frame-options": "SAMEORIGIN",
+    "x-content-type-options": "nosniff",
+    "alt-svc": "h3=\":443\"; ma=2592000,h3-29=\":443\"; ma=2592000",
+    "transfer-encoding": "chunked",
+    "status": "200",
+    "content-length": "936",
+    "-content-encoding": "gzip",
+    "content-location": "https://us-central1-aiplatform.googleapis.com/v1/projects/cloud-custodian/locations/us-central1/metadataStores/c7n-test-metadata-store/artifacts?alt=json"
+  },
+  "body": {
+    "artifacts": [
+      {
+        "name": "projects/cloud-custodian/locations/us-central1/metadataStores/c7n-test-metadata-store/artifacts/ad562ada-ce3b-4c9c-b225-5315e5df9fe6",
+        "displayName": "c7n-test-artifact-unlabeled",
+        "etag": "1786738905633",
+        "createTime": "2026-08-14T20:21:45.633Z",
+        "updateTime": "2026-08-14T20:21:45.633Z",
+        "schemaTitle": "system.Artifact",
+        "schemaVersion": "0.0.1",
+        "metadata": {}
+      },
+      {
+        "name": "projects/cloud-custodian/locations/us-central1/metadataStores/c7n-test-metadata-store/artifacts/e228a4a2-e1c3-4c5d-acd9-2e8fc3895790",
+        "displayName": "c7n-test-artifact-labeled",
+        "etag": "1786738904899",
+        "labels": {
+          "owner": "c7n"
+        },
+        "createTime": "2026-08-14T20:21:44.899Z",
+        "updateTime": "2026-08-14T20:21:44.899Z",
+        "schemaTitle": "system.Artifact",
+        "schemaVersion": "0.0.1",
+        "metadata": {}
+      }
+    ]
+  }
+}
