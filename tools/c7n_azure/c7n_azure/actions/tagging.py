@@ -506,6 +506,7 @@ class TagDelayedAction(AzureBaseAction):
 
     """
 
+    type = 'mark-for-op'
     schema = utils.type_schema(
         'mark-for-op',
         tag={'type': 'string'},
