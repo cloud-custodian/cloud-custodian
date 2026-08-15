@@ -8,6 +8,8 @@
   "keyvault_secret_id": "kv_secret",
   "use_msi": true,
   "client_certificate_path": "/certificate",
+  "client_certificate_data": "certificate_data",
   "client_certificate_password": "password",
+  "client_certificate_send_chain": true,
   "federated_token_file": "/token_file"
 }
