@@ -20,5 +20,7 @@ ResourceMap = {
     "k8s.volume": "c7n_kube.resources.core.volume.PersistentVolume",
     "k8s.volume-claim": "c7n_kube.resources.core.volume.PersistentVolumeClaim",
     "k8s.cluster-role": "c7n_kube.resources.rbac.role.ClusterRole",
+    "k8s.cluster-role-binding": "c7n_kube.resources.rbac.rolebinding.ClusterRoleBinding",
     "k8s.role": "c7n_kube.resources.rbac.role.NamespacedRole",
+    "k8s.role-binding": "c7n_kube.resources.rbac.rolebinding.RoleBinding",
 }
