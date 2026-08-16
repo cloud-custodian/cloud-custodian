@@ -50,20 +50,26 @@ def glob_match(value, pattern):
     return fnmatch.fnmatch(value, pattern)
 
 
+def _regex_match(value, regex, flags=0):
+    if isinstance(value, list):
+        for item in value:
+            if not isinstance(item, str):
+                continue
+            if re.match(regex, item, flags=flags):
+                return True
+    elif isinstance(value, str):
+        # Note python 2.5+ internally cache regex
+        # would be nice to use re2
+        return bool(re.match(regex, value, flags=flags))
+    return False
+
+
 def regex_match(value, regex):
-    if not isinstance(value, str):
-        return False
-    # Note python 2.5+ internally cache regex
-    # would be nice to use re2
-    return bool(re.match(regex, value, flags=re.IGNORECASE))
+    return _regex_match(value, regex, flags=re.IGNORECASE)
 
 
 def regex_case_sensitive_match(value, regex):
-    if not isinstance(value, str):
-        return False
-    # Note python 2.5+ internally cache regex
-    # would be nice to use re2
-    return bool(re.match(regex, value))
+    return _regex_match(value, regex, flags=0)
 
 
 def operator_in(x, y):
