@@ -3,7 +3,7 @@
 import re
 
 from c7n.utils import type_schema, local_session
-from c7n_gcp.actions import MethodAction
+from c7n_gcp.actions import MethodAction, SetLabelsAction
 from c7n_gcp.provider import resources
 from c7n_gcp.query import QueryResourceManager, TypeInfo
 
@@ -91,6 +91,26 @@ class LoadBalancingAddressDelete(MethodAction):
             resources = [r for r in resources if 'region' in r]
 
         return resources
+
+
+@LoadBalancingAddress.action_registry.register('set-labels')
+class LoadBalancingAddressSetLabels(SetLabelsAction):
+
+    def process(self, resources):
+        missing_region = [r for r in resources if 'region' not in r]
+        if missing_region:
+            removed = ', '.join([r.get('name', '<unknown>') for r in missing_region])
+            self.log.warning(
+                "policy:%s action:%s skipped %d global addresses, use "
+                "gcp.loadbalancer-global-address to label them: %s",
+                self.manager.ctx.policy.name,
+                self.type,
+                len(missing_region),
+                removed,
+            )
+            resources = [r for r in resources if 'region' in r]
+
+        return super().process(resources)
 
 
 @resources.register('loadbalancer-url-map')
