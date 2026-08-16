@@ -36,6 +36,28 @@ custodian you can.
   - Manage ops items as a resource, to resolve or update ops items.
     See :ref:`ops-item resource <aws.ops-item>`
 
+Document public sharing
++++++++++++++++++++++++
+
+The ``ssm-service-setting`` resource manages the account-level, regional SSM
+Documents console setting ``/ssm/documents/console/public-sharing-permission``.
+Set the value to ``Disable`` to block public document sharing from the console.
+This setting does not remove public permissions from documents that are already
+shared, and it does not replace controls on programmatic document sharing.
+
+For example:
+
+.. code-block:: yaml
+
+    policies:
+      - name: disable-ssm-public-sharing
+        resource: ssm-service-setting
+        filters:
+          - SettingValue: Enable
+        actions:
+          - type: enforce
+            value: Disable
+
 .. image:: opscenter.png
 
 OmniSSM
