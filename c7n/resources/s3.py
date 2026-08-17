@@ -622,11 +622,7 @@ class BucketAssembly:
             except (ConnectTimeoutError, ReadTimeoutError, EndpointConnectionError) as e:
                 # Endpoint is unreachable or hung - could be a degraded/
                 # unreachable region, or a bucket deleted between
-                # list_buckets and here. We can't tell those apart, so
-                # don't assume not-found (that would fabricate a default
-                # for a field we simply couldn't check) - warn and skip
-                # this field, same as the ssl error case above, rather
-                # than aborting assembly of the rest of the account.
+                # list_buckets and here.
                 log.warning(
                     "Bucket: %s unable to invoke method: %s error: %s ",
                     bucket['Name'], method_name, e)
