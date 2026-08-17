@@ -130,6 +130,7 @@ class Taggable(query.QueryResourceManager):
         name = 'ResourceARN'
         arn = name
         permission_prefix = "tag"
+        universal_taggable = object()
 
     def get_permissions(self):
         return ("tag:GetResources", "resource-explorer-2:Search",)
