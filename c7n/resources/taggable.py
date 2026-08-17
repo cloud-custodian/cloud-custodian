@@ -128,9 +128,11 @@ class Taggable(query.QueryResourceManager):
         filter_name = None
         service = 'resourcegrouptagging'
         name = 'ResourceARN'
+        arn = name
+        permission_prefix = "tag"
 
     def get_permissions(self):
-        return ("tag:GetResources", "resource-explorer-2.Search",)
+        return ("tag:GetResources", "resource-explorer-2:Search",)
 
     def validate(self):
         validator = JsonSchemaValidator(DescribeTaggable.schema)

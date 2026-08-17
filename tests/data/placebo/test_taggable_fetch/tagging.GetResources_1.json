@@ -22,6 +22,54 @@
                 }
             },
             {
+                "ResourceARN": "arn:aws:ec2:us-east-1:644160558196:security-group/sg-0e9f83414783e14f6",
+                "Tags": [
+                    {
+                        "Key": "App",
+                        "Value": "AssetDB"
+                    },
+                    {
+                        "Key": "stacklet:app",
+                        "Value": "AssetDB"
+                    }
+                ],
+                "ComplianceDetails": {
+                    "NoncompliantKeys": [],
+                    "KeysWithNoncompliantValues": [],
+                    "MissingTagKeys": [
+                        "Owner",
+                        "Env"
+                    ],
+                    "ComplianceStatus": false
+                }
+            },
+            {
+                "ResourceARN": "arn:aws:ec2:us-east-1:644160558196:security-group/sg-0e17395291d70364b",
+                "Tags": [
+                    {
+                        "Key": "aws:eks:cluster-name",
+                        "Value": "hilarious-dubstep-dolphin"
+                    },
+                    {
+                        "Key": "kubernetes.io/cluster/hilarious-dubstep-dolphin",
+                        "Value": "owned"
+                    },
+                    {
+                        "Key": "Name",
+                        "Value": "eks-cluster-sg-hilarious-dubstep-dolphin-1468068289"
+                    }
+                ],
+                "ComplianceDetails": {
+                    "NoncompliantKeys": [],
+                    "KeysWithNoncompliantValues": [],
+                    "MissingTagKeys": [
+                        "Owner",
+                        "Env"
+                    ],
+                    "ComplianceStatus": false
+                }
+            },
+            {
                 "ResourceARN": "arn:aws:ec2:us-east-1:644160558196:security-group/sg-016dffc44c4b20b1b",
                 "Tags": [
                     {
@@ -93,6 +141,172 @@
                     {
                         "Key": "Name",
                         "Value": "eks-cluster-sg-app-dev-795116951"
+                    }
+                ],
+                "ComplianceDetails": {
+                    "NoncompliantKeys": [],
+                    "KeysWithNoncompliantValues": [],
+                    "MissingTagKeys": [
+                        "Owner",
+                        "Env"
+                    ],
+                    "ComplianceStatus": false
+                }
+            },
+            {
+                "ResourceARN": "arn:aws:ec2:us-east-1:644160558196:security-group/sg-08dd5a37ff1505f4a",
+                "Tags": [
+                    {
+                        "Key": "aws:cloudformation:stack-name",
+                        "Value": "eksctl-app-dev-cluster"
+                    },
+                    {
+                        "Key": "alpha.eksctl.io/cluster-name",
+                        "Value": "app-dev"
+                    },
+                    {
+                        "Key": "aws:cloudformation:stack-id",
+                        "Value": "arn:aws:cloudformation:us-east-1:644160558196:stack/eksctl-app-dev-cluster/d942f6e0-5ff7-11ef-a8b0-0e01479a4f1f"
+                    },
+                    {
+                        "Key": "eksctl.cluster.k8s.io/v1alpha1/cluster-name",
+                        "Value": "app-dev"
+                    },
+                    {
+                        "Key": "alpha.eksctl.io/cluster-oidc-enabled",
+                        "Value": "false"
+                    },
+                    {
+                        "Key": "aws:cloudformation:logical-id",
+                        "Value": "ControlPlaneSecurityGroup"
+                    },
+                    {
+                        "Key": "alpha.eksctl.io/eksctl-version",
+                        "Value": "0.189.0-dev+c9afc4260.2024-08-19T12:43:03Z"
+                    },
+                    {
+                        "Key": "Name",
+                        "Value": "eksctl-app-dev-cluster/ControlPlaneSecurityGroup"
+                    }
+                ],
+                "ComplianceDetails": {
+                    "NoncompliantKeys": [],
+                    "KeysWithNoncompliantValues": [],
+                    "MissingTagKeys": [
+                        "Owner",
+                        "Env"
+                    ],
+                    "ComplianceStatus": false
+                }
+            },
+            {
+                "ResourceARN": "arn:aws:ec2:us-east-1:644160558196:security-group/sg-0073803221c503d85",
+                "Tags": [],
+                "ComplianceDetails": {
+                    "NoncompliantKeys": [],
+                    "KeysWithNoncompliantValues": [],
+                    "MissingTagKeys": [
+                        "Owner",
+                        "Env"
+                    ],
+                    "ComplianceStatus": false
+                }
+            },
+            {
+                "ResourceARN": "arn:aws:ec2:us-east-1:644160558196:security-group/sg-78e5c067",
+                "Tags": [],
+                "ComplianceDetails": {
+                    "NoncompliantKeys": [],
+                    "KeysWithNoncompliantValues": [],
+                    "MissingTagKeys": [
+                        "Owner",
+                        "Env"
+                    ],
+                    "ComplianceStatus": false
+                }
+            },
+            {
+                "ResourceARN": "arn:aws:ec2:us-east-1:644160558196:security-group/sg-0c820878990c7aa41",
+                "Tags": [
+                    {
+                        "Key": "aws:cloudformation:stack-name",
+                        "Value": "eksctl-app-dev-cluster"
+                    },
+                    {
+                        "Key": "alpha.eksctl.io/cluster-name",
+                        "Value": "app-dev"
+                    },
+                    {
+                        "Key": "aws:cloudformation:stack-id",
+                        "Value": "arn:aws:cloudformation:us-east-1:644160558196:stack/eksctl-app-dev-cluster/d942f6e0-5ff7-11ef-a8b0-0e01479a4f1f"
+                    },
+                    {
+                        "Key": "eksctl.cluster.k8s.io/v1alpha1/cluster-name",
+                        "Value": "app-dev"
+                    },
+                    {
+                        "Key": "alpha.eksctl.io/cluster-oidc-enabled",
+                        "Value": "false"
+                    },
+                    {
+                        "Key": "aws:cloudformation:logical-id",
+                        "Value": "ClusterSharedNodeSecurityGroup"
+                    },
+                    {
+                        "Key": "alpha.eksctl.io/eksctl-version",
+                        "Value": "0.189.0-dev+c9afc4260.2024-08-19T12:43:03Z"
+                    },
+                    {
+                        "Key": "Name",
+                        "Value": "eksctl-app-dev-cluster/ClusterSharedNodeSecurityGroup"
+                    }
+                ],
+                "ComplianceDetails": {
+                    "NoncompliantKeys": [],
+                    "KeysWithNoncompliantValues": [],
+                    "MissingTagKeys": [
+                        "Owner",
+                        "Env"
+                    ],
+                    "ComplianceStatus": false
+                }
+            },
+            {
+                "ResourceARN": "arn:aws:ec2:us-east-1:644160558196:security-group/sg-05943f46e0435babd",
+                "Tags": [
+                    {
+                        "Key": "App",
+                        "Value": "AssetDB"
+                    },
+                    {
+                        "Key": "stacklet:app",
+                        "Value": "AssetDB"
+                    }
+                ],
+                "ComplianceDetails": {
+                    "NoncompliantKeys": [],
+                    "KeysWithNoncompliantValues": [],
+                    "MissingTagKeys": [
+                        "Owner",
+                        "Env"
+                    ],
+                    "ComplianceStatus": false
+                }
+            },
+            {
+                "ResourceARN": "arn:aws:ec2:us-east-1:644160558196:security-group/sg-00ffcad35cb685971",
+                "Tags": [
+                    {
+                        "Key": "kubernetes.io/cluster/seriously-dangerous-rabbit",
+                        "Value": "owned"
+                    },
+                    {
+                        "Key": "aws:eks:cluster-name",
+                        "Value": "seriously-dangerous-rabbit"
+                    },
+                    {
+                        "Key": "Name",
+                        "Value": "eks-cluster-sg-seriously-dangerous-rabbit-1831039975"
                     }
                 ],
                 "ComplianceDetails": {

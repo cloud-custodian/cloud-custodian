@@ -18,7 +18,6 @@ def test_taggable_noncompliant(test):
          ]},
         session_factory=factory,
         config={"account_id": ACCOUNT_ID},
-
     )
 
     resources = policy.run()
