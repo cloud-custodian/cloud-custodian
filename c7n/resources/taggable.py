@@ -119,7 +119,70 @@ class DescribeTaggable(query.DescribeSource):
 
 @resources.register("taggable")
 class Taggable(query.QueryResourceManager):
-    """ """
+    """An abstract resource type that represents any taggable resource
+    in AWS. Utilizies server side querying wherever possible utilizing
+    resource group tagging and resource-explorer-2 apis to provide for
+    efficient query of non compliant and non tagged resources, while also
+    providing for bulk tagging operations on those resources.
+
+    This primarily utilizes server side queries against these two services
+    to effect functionality, as such the functionality is mostly exposed
+    via the policy `query` block. Additionally there are pre-requisites on
+    the account enablement of those two services, service linked role for
+    resource-explorer, and an organizations tag policy for non_compliant
+    resource querying active on account, note the tag policy only needs
+    to be in reporting mode.
+
+    .. code-block:: yaml
+
+      policies:
+         - name: non-compliant
+           resource: aws.taggable
+           query:
+            - non_compliant: true
+            - non_tagged: true
+            - check_policy_tags: ["Owner"]
+
+
+    `non_compliant` utilizes the reporting of an applied organization tag
+    policy in affect against the account/region to determine resources that
+    are non compliant. `check_policy_tags` provides a sanity check of the
+    policy authors expectation of the tags being checked, and is verified
+    against what's actually in the account.
+
+    `non_tagged` enables the use of resource-explorer to supplement the
+    results with resources that have never been tagged. It is safe to run
+    against explorer aggregator accounts, as it scopes to only resources
+    within an account.
+
+    `resource_types` can be specified as well, to scope to particular
+    resources types. notably this resource supports resource types not
+    actively supported by custodian, it represents all taggable
+    resources within the provider. Note the values here are represented by
+    those used by the tagging / resource explorer services.
+
+    See the table here for vocabulary
+    https://docs.aws.amazon.com/resource-explorer/latest/userguide/supported-resource-types.html
+
+    `with_tags` represents a server side filter to only return results
+    matching resources with a particular set of tags and tag values.
+
+
+    .. code-block:: yaml
+
+      policies:
+         - name: non-compliant
+           resource: aws.taggable
+           query:
+            - resource_types: [ec2:instance, ec2:security-group]
+            - with_tags:
+               - Key: App
+               - Values: [Apple, Orange, Grapefruit]
+
+
+    The example above will only return ec2 instances and security groups
+    with any of the three defined values for the App tag.
+    """
 
     source_mapping = {"describe": DescribeTaggable}
 
