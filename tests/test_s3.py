@@ -143,7 +143,7 @@ def test_s3_assembly_connect_timeout(test):
     assert bucket['Name'] == 'zombie-bucket'
     assert 'Location' not in bucket
     log_mock.warning.assert_called_once_with(
-        "Bucket:%s unable to invoke method:%s error:%s ",
+        "Bucket: %s unable to invoke method: %s error: %s ",
         'zombie-bucket', 'get_bucket_location', mock.ANY)
 
 

@@ -628,7 +628,7 @@ class BucketAssembly:
                 # this field, same as the ssl error case above, rather
                 # than aborting assembly of the rest of the account.
                 log.warning(
-                    "Bucket:%s unable to invoke method:%s error:%s ",
+                    "Bucket: %s unable to invoke method: %s error: %s ",
                     bucket['Name'], method_name, e)
                 continue
             except ClientError as e:
