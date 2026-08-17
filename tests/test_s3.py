@@ -148,8 +148,10 @@ def test_s3_assembly_connect_timeout(test):
 
 
 def test_s3_assembly_endpoint_connection_error(test):
-    # A bucket removed between list_buckets and augment (dns entry gone)
-    # is treated like a not-found bucket rather than aborting (c7n#10859).
+    # An unreachable bucket endpoint (degraded region, or a bucket deleted
+    # between list_buckets and augment) shouldn't abort assembly of the
+    # rest of the account - warn and move on, same as a connect timeout,
+    # rather than assuming not-found and fabricating a default (c7n#10859).
     policy = test.load_policy({'name': 's3-attrs', 'resource': 's3'})
     assembly = s3.BucketAssembly(policy.resource_manager)
     assembly.initialize()
@@ -161,7 +163,7 @@ def test_s3_assembly_endpoint_connection_error(test):
 
     bucket = assembly.assemble({'Name': 'deleted-bucket'})
     assert bucket['Name'] == 'deleted-bucket'
-    assert bucket['Location'] == {}
+    assert 'Location' not in bucket
 
 
 def test_s3_express(test):
