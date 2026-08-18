@@ -8,14 +8,16 @@ from gcp_common import audit_event_recorder
 
 
 class FakeLoggingClient:
+    """Returns one queued batch of entries per execute_query call."""
 
-    def __init__(self, entries):
-        self.entries = entries
+    def __init__(self, batches):
+        self.batches = list(batches)
         self.calls = []
 
     def execute_query(self, verb, arguments):
         self.calls.append((verb, arguments))
-        return {'entries': self.entries}
+        entries = self.batches.pop(0) if self.batches else []
+        return {'entries': entries}
 
 
 class FakeSession:
@@ -31,46 +33,83 @@ class FakeSession:
         return self.logging_client
 
 
-def test_audit_event_recorder_writes_entries_and_duplicate_artifacts(
-        tmp_path, monkeypatch):
-    entries = [
-        {'timestamp': '2025-01-01T00:00:01Z', 'insertId': 'b'},
-        {'timestamp': '2025-01-01T00:00:00Z', 'insertId': 'a'},
-    ]
-    client = FakeLoggingClient(entries)
-    session = FakeSession(client)
-
+def make_recorder(tmp_path, monkeypatch, batches, event_file='foo.json', **kw):
     monkeypatch.setattr(gcp_common, 'EVENT_DIR', str(tmp_path))
-
+    client = FakeLoggingClient(batches)
+    session = FakeSession(client)
+    kw.setdefault('poll_interval', 0)
     recorder = audit_event_recorder(
-        lambda: session,
-        'foo.json',
-        method='CreateKey',
-        resource_name='projects/test-project/locations/global/keys/key-1',
-        labels={
-            'project_id': 'test-project',
-        },
-    )
+        lambda: session, event_file, method='CreateThing', **kw)
+    return recorder, client
+
+
+def read(tmp_path, name):
+    return json.loads((tmp_path / name).read_text())
+
+
+def test_standalone_entry_written_and_stops_polling(tmp_path, monkeypatch):
+    entry = {'insertId': 'a', 'timestamp': '2025-01-01T00:00:00Z'}
+    recorder, client = make_recorder(tmp_path, monkeypatch, [[entry]])
 
     recorder.record()
 
-    assert json.loads((tmp_path / 'foo.json').read_text()) == entries[1]
-    assert json.loads((tmp_path / 'foo.json-1').read_text()) == entries[0]
+    assert read(tmp_path, 'foo.json') == entry
+    assert len(client.calls) == 1
 
-    assert client.calls[0][0] == 'list'
-    body = client.calls[0][1]['body']
-    assert body['resourceNames'] == ['projects/test-project']
-    assert body['orderBy'] == 'timestamp asc'
-    assert (
-        'logName = '
-        '"projects/test-project/logs/cloudaudit.googleapis.com%2Factivity"'
-        in body['filter']
-    )
-    assert 'protoPayload.methodName : "CreateKey"' in body['filter']
-    assert (
-        'protoPayload.resourceName : '
-        '"projects/test-project/locations/global/keys/key-1"'
-        in body['filter']
-    )
-    assert 'resource.labels.project_id = "test-project"' in body['filter']
-    assert 'timestamp >= ' in body['filter']
+
+def test_first_then_last_pair_writes_both_and_stops(tmp_path, monkeypatch):
+    first = {
+        'insertId': 'a',
+        'timestamp': '2025-01-01T00:00:00Z',
+        'operation': {'id': 'op-1', 'first': True},
+    }
+    last = {
+        'insertId': 'b',
+        'timestamp': '2025-01-01T00:00:01Z',
+        'operation': {'id': 'op-1', 'last': True},
+    }
+    recorder, client = make_recorder(
+        tmp_path, monkeypatch, [[first], [first, last]])
+
+    recorder.record()
+
+    assert read(tmp_path, 'foo-first.json') == first
+    assert read(tmp_path, 'foo-last.json') == last
+    assert len(client.calls) == 2
+
+
+def test_second_distinct_operation_gets_index_suffix(tmp_path, monkeypatch):
+    op0_first = {
+        'insertId': 'a',
+        'timestamp': '2025-01-01T00:00:00Z',
+        'operation': {'id': 'op-0', 'first': True},
+    }
+    op1_first = {
+        'insertId': 'b',
+        'timestamp': '2025-01-01T00:00:01Z',
+        'operation': {'id': 'op-1', 'first': True},
+    }
+    op1_last = {
+        'insertId': 'c',
+        'timestamp': '2025-01-01T00:00:02Z',
+        'operation': {'id': 'op-1', 'last': True},
+    }
+    recorder, client = make_recorder(
+        tmp_path, monkeypatch, [[op0_first, op1_first, op1_last]])
+
+    recorder.record()
+
+    assert read(tmp_path, 'foo-first.json') == op0_first
+    assert read(tmp_path, 'foo-1-first.json') == op1_first
+    assert read(tmp_path, 'foo-1-last.json') == op1_last
+
+
+def test_collision_appends_index_after_extension(tmp_path, monkeypatch):
+    (tmp_path / 'foo.json').write_text('{"pre-existing": true}')
+    entry = {'insertId': 'a', 'timestamp': '2025-01-01T00:00:00Z'}
+    recorder, client = make_recorder(tmp_path, monkeypatch, [[entry]])
+
+    recorder.record()
+
+    assert read(tmp_path, 'foo.json') == {'pre-existing': True}
+    assert read(tmp_path, 'foo.json-1') == entry

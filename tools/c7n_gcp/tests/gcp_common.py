@@ -95,15 +95,46 @@ class AuditEventRecorder:
 
     def record(self) -> None:
         deadline = time.time() + self.timeout
+        operation_index: dict = {}
         while True:
             entries = self._get_entries()
             if entries:
-                self._write_entries(entries)
-                return
+                if self._write_batch(entries, operation_index):
+                    return
             if time.time() >= deadline:
                 raise AssertionError(
                     'No GCP audit log entries matched {}'.format(self.event_file))
             time.sleep(self.poll_interval)
+
+    def _write_batch(self, entries: list[dict], operation_index: dict) -> bool:
+        """Write one poll batch. Returns True when polling should stop."""
+        stop = False
+        for entry in entries:
+            operation = entry.get('operation') or {}
+            operation_id = operation.get('id')
+            if not operation_id:
+                self._write_entry(self.event_file, entry)
+                stop = True
+                continue
+            if operation_id not in operation_index:
+                operation_index[operation_id] = len(operation_index)
+            index = operation_index[operation_id]
+            self._write_entry(
+                self._operation_file_name(index, operation), entry)
+            if operation.get('last'):
+                stop = True
+        return stop
+
+    def _operation_file_name(self, index: int, operation: dict) -> str:
+        base, ext = os.path.splitext(self.event_file)
+        parts = [base]
+        if index > 0:
+            parts.append(str(index))
+        if operation.get('first'):
+            parts.append('first')
+        if operation.get('last'):
+            parts.append('last')
+        return '-'.join(parts) + ext
 
     def _get_entries(self) -> list[dict]:
         session = self.session_factory()
@@ -134,20 +165,18 @@ class AuditEventRecorder:
             'orderBy': 'timestamp asc',
         }
 
-    def _write_entries(self, entries: list[dict]) -> None:
+    def _write_entry(self, event_file: str, entry: dict) -> None:
         os.makedirs(EVENT_DIR, exist_ok=True)
-        for idx, entry in enumerate(entries):
-            event_file = self.event_file if idx == 0 else '{}-{}'.format(
-                self.event_file, idx)
-            with open(os.path.join(EVENT_DIR, event_file), 'w') as fh:
-                json.dump(entry, fh, indent=2, sort_keys=True)
-                fh.write('\n')
-        if len(entries) > 1:
-            log.warning(
-                'Wrote %d matching GCP audit event fixtures for %s',
-                len(entries),
-                self.event_file,
-            )
+        path = os.path.join(EVENT_DIR, event_file)
+        if os.path.exists(path):
+            index = 1
+            while os.path.exists('{}-{}'.format(path, index)):
+                index += 1
+            path = '{}-{}'.format(path, index)
+            log.warning('GCP audit event fixture collision, wrote %s', path)
+        with open(path, 'w') as fh:
+            json.dump(entry, fh, indent=2, sort_keys=True)
+            fh.write('\n')
 
     @staticmethod
     def _format_time(value: datetime.datetime) -> str:
