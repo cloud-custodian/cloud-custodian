@@ -665,6 +665,53 @@ class BedrockKnowledgeBase(BaseTest):
         knowledgebases = client.list_knowledge_bases().get('knowledgeBaseSummaries')
         self.assertEqual(len(knowledgebases), 0)
 
+    def test_bedrock_knowledge_base_retrieval_activity(self):
+        session_factory = self.replay_flight_data(
+            'test_bedrock_knowledge_base_retrieval_activity')
+        p = self.load_policy(
+            {
+                "name": "bedrock-kb-zero-retrieval",
+                "resource": "bedrock-knowledge-base",
+                "filters": [
+                    {
+                        "type": "retrieval-activity",
+                        "source": "cloudtrail-lake",
+                        "days": 30,
+                        "op": "eq",
+                        "value": 0,
+                    }
+                ],
+            },
+            session_factory=session_factory,
+        )
+        resources = p.run()
+        # only the stale knowledge base with no observed retrievals is matched
+        self.assertEqual(len(resources), 1)
+        self.assertEqual(resources[0]['knowledgeBaseId'], 'STALE00001')
+        self.assertEqual(resources[0]['c7n:RetrievalActivity'], 0)
+
+    def test_bedrock_knowledge_base_retrieval_activity_used(self):
+        session_factory = self.replay_flight_data(
+            'test_bedrock_knowledge_base_retrieval_activity')
+        p = self.load_policy(
+            {
+                "name": "bedrock-kb-has-retrieval",
+                "resource": "bedrock-knowledge-base",
+                "filters": [
+                    {
+                        "type": "retrieval-activity",
+                        "op": "gt",
+                        "value": 0,
+                    }
+                ],
+            },
+            session_factory=session_factory,
+        )
+        resources = p.run()
+        self.assertEqual(len(resources), 1)
+        self.assertEqual(resources[0]['knowledgeBaseId'], 'ACTIVE0002')
+        self.assertEqual(resources[0]['c7n:RetrievalActivity'], 5)
+
 
 class BedrockApplicationInferenceProfile(BaseTest):
     def test_bedrock_application_inference_profile(self):

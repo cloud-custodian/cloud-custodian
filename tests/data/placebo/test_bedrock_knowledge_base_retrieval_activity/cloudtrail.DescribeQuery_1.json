@@ -1,0 +1,19 @@
+{
+    "status_code": 200,
+    "data": {
+        "ResponseMetadata": {},
+        "QueryId": "aaaaaaaa-bbbb-cccc-dddd-eeeeeeeeeeee",
+        "QueryStatus": "FINISHED",
+        "QueryStatistics": {
+            "EventsMatched": 5,
+            "EventsScanned": 4210,
+            "BytesScanned": 918273,
+            "ExecutionTimeInMillis": 842,
+            "CreationTime": {
+                "__class__": "datetime",
+                "year": 2026, "month": 8, "day": 17,
+                "hour": 12, "minute": 0, "second": 0, "microsecond": 0
+            }
+        }
+    }
+}
