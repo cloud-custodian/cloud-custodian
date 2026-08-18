@@ -69,10 +69,7 @@ Filtering options
 - ``resource_name`` (optional) -- a substring match against
   ``protoPayload.resourceName``.
 - ``labels`` (optional) -- an exact-match mapping against
-  ``resource.labels``, e.g. ``{"database_id": database_id}``. The query
-  is already scoped to one project via ``resourceNames``, so a
-  ``project_id`` label wouldn't narrow anything further -- use ``labels``
-  for fields that distinguish resources *within* the project.
+  ``resource.labels``, e.g. ``{"database_id": database_id}``.
 - ``start_time_skew`` (default 60s) -- how far before construction time to
   set the query's lower time bound, to guard against clock skew between
   the test host and Cloud Logging.
