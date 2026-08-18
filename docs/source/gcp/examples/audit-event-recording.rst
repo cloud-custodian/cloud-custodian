@@ -104,14 +104,9 @@ operation swept up by the same filter (rare, but possible with a loose or no
 ``resource_name`` substring) would produce ``foo-1-first.json`` /
 ``foo-1-last.json``.
 
-Recording tracks entries it has already written by content hash, so a
-later poll re-returning an entry an earlier poll already wrote (Cloud
-Logging queries are cumulative from a fixed start time) is a no-op, not
-a collision.
-
-If a computed filename already exists on disk from something other than
-this recording run (e.g. a stale fixture left over from an earlier run),
-a numeric suffix is appended *after* the extension instead --
+If a computed filename already exists on disk (e.g. a stale fixture from
+an earlier recording run, or two truly ambiguous matches), a numeric
+suffix is appended *after* the extension instead --
 ``foo.json``, then ``foo.json-1``, ``foo.json-2``, and so on -- and a
 warning is logged. These extra files are left in place rather than
 cleaned up automatically, so they show up in the diff for the developer
