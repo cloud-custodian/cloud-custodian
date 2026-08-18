@@ -55,6 +55,10 @@ def audit_event_recorder(
 
     Construct it before triggering the API call, then call ``record()`` in
     recording mode. Matching log entries are written under ``data/events``.
+
+    See ``docs/source/gcp/examples/audit-event-recording.rst`` for usage,
+    filtering options, file naming, and caveats around multi-entry
+    operations and creation events.
     """
     return AuditEventRecorder(
         session_factory,
