@@ -61,8 +61,7 @@ Once recorded, commit the generated fixture(s) under
 Filtering options
 -------------------
 
-``audit_event_recorder`` takes only structured inputs -- it composes the
-Cloud Logging filter itself, rather than accepting a raw filter string:
+``audit_event_recorder`` takes arguments to filter desired log events:
 
 - ``method`` (required) -- a substring match against
   ``protoPayload.methodName``, e.g. ``"UpdateBackupSchedule"`` rather than
@@ -74,7 +73,7 @@ Cloud Logging filter itself, rather than accepting a raw filter string:
 - ``start_time_skew`` (default 60s) -- how far before construction time to
   set the query's lower time bound, to guard against clock skew between
   the test host and Cloud Logging.
-- ``timeout`` / ``poll_interval`` -- how long, and how often, to poll
+- ``timeout`` / ``poll_interval`` (default 120s/5s) -- how long, and how often, to poll
   before giving up.
 
 ``record()`` polls until at least one matching entry appears (or the
