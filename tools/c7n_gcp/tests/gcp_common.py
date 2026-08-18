@@ -171,16 +171,20 @@ class AuditEventRecorder:
 
     def _write_entry(self, event_file: str, entry: dict) -> None:
         os.makedirs(EVENT_DIR, exist_ok=True)
+        payload = json.dumps(entry, indent=2, sort_keys=True) + '\n'
         path = os.path.join(EVENT_DIR, event_file)
-        if os.path.exists(path):
-            index = 1
-            while os.path.exists('{}-{}'.format(path, index)):
-                index += 1
-            path = '{}-{}'.format(path, index)
+        index = 0
+        while os.path.exists(path):
+            if open(path).read() == payload:
+                # A later poll re-returned an entry an earlier poll
+                # already wrote; not a collision.
+                return
+            index += 1
+            path = '{}-{}'.format(os.path.join(EVENT_DIR, event_file), index)
+        if index:
             log.warning('GCP audit event fixture collision, wrote %s', path)
         with open(path, 'w') as fh:
-            json.dump(entry, fh, indent=2, sort_keys=True)
-            fh.write('\n')
+            fh.write(payload)
 
     @staticmethod
     def _format_time(value: datetime.datetime) -> str:

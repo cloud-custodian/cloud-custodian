@@ -78,6 +78,28 @@ def test_first_then_last_pair_writes_both_and_stops(tmp_path, monkeypatch):
     assert len(client.calls) == 2
 
 
+def test_repolling_the_same_entry_is_not_a_collision(tmp_path, monkeypatch):
+    first = {
+        'insertId': 'a',
+        'timestamp': '2025-01-01T00:00:00Z',
+        'operation': {'id': 'op-1', 'first': True},
+    }
+    last = {
+        'insertId': 'b',
+        'timestamp': '2025-01-01T00:00:01Z',
+        'operation': {'id': 'op-1', 'last': True},
+    }
+    # Cloud Logging queries are cumulative from a fixed start time, so a
+    # later poll re-returns entries an earlier poll already wrote.
+    recorder, client = make_recorder(
+        tmp_path, monkeypatch, [[first], [first], [first, last]])
+
+    recorder.record()
+
+    assert sorted(p.name for p in tmp_path.iterdir()) == [
+        'foo-first.json', 'foo-last.json']
+
+
 def test_second_distinct_operation_gets_index_suffix(tmp_path, monkeypatch):
     op0_first = {
         'insertId': 'a',

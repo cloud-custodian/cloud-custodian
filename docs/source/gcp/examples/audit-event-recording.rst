@@ -104,13 +104,16 @@ operation swept up by the same filter (rare, but possible with a loose or no
 ``resource_name`` substring) would produce ``foo-1-first.json`` /
 ``foo-1-last.json``.
 
-If a computed filename already exists on disk (e.g. a stale fixture from
-an earlier recording run, or two truly ambiguous matches), a numeric
-suffix is appended *after* the extension instead --
-``foo.json``, then ``foo.json-1``, ``foo.json-2``, and so on -- and a
-warning is logged. These extra files are left in place rather than
-cleaned up automatically, so they show up in the diff for the developer
-to sort out (rename, merge, or delete as appropriate).
+If a computed filename already exists on disk with different content
+(e.g. a stale fixture from an earlier recording run, or two truly
+ambiguous matches), a numeric suffix is appended *after* the extension
+instead -- ``foo.json``, then ``foo.json-1``, ``foo.json-2``, and so on
+-- and a warning is logged. These extra files are left in place rather
+than cleaned up automatically, so they show up in the diff for the
+developer to sort out (rename, merge, or delete as appropriate). If the
+existing file's content is identical, it's left as-is and nothing new is
+written -- polling re-returns already-recorded entries as long as an
+operation is still in progress, and that isn't a collision.
 
 Events and operations may have multiple log entries
 -------------------------------------------------------
