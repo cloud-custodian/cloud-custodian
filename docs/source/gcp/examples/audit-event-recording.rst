@@ -19,9 +19,11 @@ Basic usage
 ------------
 
 Construct the recorder *before* triggering the API call, so its polling
-window starts early enough to catch the resulting log entry. Call
-``record()`` only while actually recording; loading the fixture for
-assertions always goes through the existing ``event_data(...)``:
+window starts early enough to catch the resulting log entry. Gate
+``record()`` on ``test.recording`` -- it queries a live Cloud Logging
+client, so it can't run against replayed flight data. Loading the fixture
+for assertions always goes through the existing ``event_data(...)``,
+regardless of mode:
 
 .. code-block:: python
 
@@ -45,7 +47,8 @@ assertions always goes through the existing ``event_data(...)``:
         # trigger the real update here, e.g. a client.execute_command('patch', ...)
         # call, or a Terraform resource change
 
-        recorder.record()
+        if test.recording:
+            recorder.record()
 
         event = event_data("firestore-backup-schedule-update.json")
         exec_mode = policy.get_execution_mode()
