@@ -63,7 +63,6 @@ class VmssSetCapacityAction(AzureBaseAction):
               - type: offhour
                 default_tz: utc
                 offhour: 19
-                onhour: 7
             actions:
               - type: scale
                 capacity: 1
@@ -73,7 +72,6 @@ class VmssSetCapacityAction(AzureBaseAction):
             filters:
               - type: onhour
                 default_tz: utc
-                offhour: 19
                 onhour: 7
             actions:
               - type: scale

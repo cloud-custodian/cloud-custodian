@@ -35,6 +35,26 @@ class VMSSTest(BaseTest):
             }, validate=True)
             self.assertTrue(p)
 
+    def test_validate_offhour_scale_schema(self):
+        with self.sign_out_patch():
+            p = self.load_policy({
+                'name': 'test-vmss-offhour-scale',
+                'resource': 'azure.vmss',
+                'filters': [{'type': 'offhour', 'default_tz': 'utc', 'offhour': 19}],
+                'actions': [{'type': 'scale', 'capacity': 1}]
+            }, validate=True)
+            self.assertTrue(p)
+
+    def test_validate_onhour_scale_schema(self):
+        with self.sign_out_patch():
+            p = self.load_policy({
+                'name': 'test-vmss-onhour-scale',
+                'resource': 'azure.vmss',
+                'filters': [{'type': 'onhour', 'default_tz': 'utc', 'onhour': 7}],
+                'actions': [{'type': 'scale', 'capacity': 10}]
+            }, validate=True)
+            self.assertTrue(p)
+
     @arm_template('vmss.json')
     def test_find_by_name(self):
         p = self.load_policy({
