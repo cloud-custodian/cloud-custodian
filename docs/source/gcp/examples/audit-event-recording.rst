@@ -100,7 +100,7 @@ filename reflects that:
 
 So the common case for an operation-tracked method produces exactly two
 files: ``foo-first.json`` and ``foo-last.json``. A second, distinct
-operation swept up by the same filter (rare, but possible with a loose
+operation swept up by the same filter (rare, but possible with a loose or no
 ``resource_name`` substring) would produce ``foo-1-first.json`` /
 ``foo-1-last.json``.
 
@@ -140,11 +140,11 @@ is less consistent -- see below.
 Creation events don't always identify what was created
 -----------------------------------------------------------
 
-For "update" (PUT-like) audit events, ``protoPayload.resourceName``
+For "update" audit events, ``protoPayload.resourceName``
 reliably names the specific resource being changed, since it already
 exists and already has an assigned id.
 
-For "create" (POST-like) audit events, that isn't reliable. Whether the
+For "create" audit events, that isn't reliable. Whether the
 event identifies the *created* resource depends on whether the resource's
 id is client-specified (e.g. a Dataproc cluster name, chosen by the
 caller) or server-generated (e.g. a Firestore backup schedule id, a UUID
