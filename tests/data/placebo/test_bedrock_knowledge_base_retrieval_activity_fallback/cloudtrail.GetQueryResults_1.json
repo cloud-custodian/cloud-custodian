@@ -1,0 +1,17 @@
+{
+    "status_code": 200,
+    "data": {
+        "ResponseMetadata": {},
+        "QueryStatus": "FINISHED",
+        "NextToken": "results-page-2",
+        "QueryResultRows": [
+            [
+                {"retrievals": "9"}
+            ],
+            [
+                {"arn": "arn:aws:bedrock:us-east-1:644160558196:knowledge-base/STALE00001"},
+                {"retrievals": "not-a-number"}
+            ]
+        ]
+    }
+}

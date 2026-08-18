@@ -1,18 +1,20 @@
 # Copyright The Cloud Custodian Authors.
 # SPDX-License-Identifier: Apache-2.0
+import datetime
 import json
+import time
 
 import copy
 from urllib.parse import urlsplit
 
 from c7n.manager import resources
-from c7n.exceptions import PolicyValidationError
+from c7n.exceptions import PolicyExecutionError, PolicyValidationError
 from c7n.query import QueryResourceManager, TypeInfo, DescribeSource, DescribeWithResourceTags
 from c7n.tags import RemoveTag, Tag, TagActionFilter, TagDelayedAction, universal_augment
 from c7n.utils import local_session, type_schema, QueryParser
 from c7n.actions import BaseAction
 from c7n.filters.kms import KmsRelatedFilter
-from c7n.filters import MetricsFilter, ValueFilter
+from c7n.filters import Filter, MetricsFilter, OPERATORS, ValueFilter
 from c7n.resources.aws import shape_schema, shape_validate, Arn
 from c7n.resources.s3 import BucketAssembly, S3_AUGMENT_TABLE
 
@@ -772,6 +774,161 @@ class DeleteBedrockKnowledgeBase(BaseAction):
                 client.delete_knowledge_base(knowledgeBaseId=r['knowledgeBaseId'])
             except client.exceptions.ResourceNotFoundException:
                 continue
+
+
+@BedrockKnowledgeBase.filter_registry.register('retrieval-activity')
+class KnowledgeBaseRetrievalActivity(Filter):
+    """Filter knowledge bases by historical CloudTrail retrieval activity.
+
+    Queries CloudTrail Lake for ``Retrieve`` and ``RetrieveAndGenerate`` data
+    events recorded against ``AWS::Bedrock::KnowledgeBase`` over a review
+    window, aggregates the count per knowledge base ARN, and joins it back to
+    each enumerated resource. Useful for spotting stale knowledge bases (and
+    their attached vector indexes) that haven't served a retrieval recently.
+
+    A single query runs per policy execution rather than one per resource. The
+    CloudTrail Lake event data store is discovered automatically; pass
+    ``event-data-store`` to pin a specific store id or arn. Every resource is
+    annotated with ``c7n:RetrievalActivity`` holding the observed count so
+    follow-on ``value`` filters or reporting can inspect it.
+
+    :example:
+
+    .. code-block:: yaml
+
+        policies:
+          - name: bedrock-kb-zero-retrieval-activity
+            resource: aws.bedrock-knowledge-base
+            filters:
+              - type: retrieval-activity
+                source: cloudtrail-lake
+                days: 30
+                op: eq
+                value: 0
+              - type: value
+                key: status
+                value: ACTIVE
+    """
+
+    schema = type_schema(
+        'retrieval-activity',
+        source={'enum': ['cloudtrail-lake']},
+        days={'type': 'number', 'minimum': 1},
+        op={'enum': list(OPERATORS.keys())},
+        value={'type': 'number'},
+        **{'event-data-store': {'type': 'string'}})
+    permissions = (
+        'cloudtrail:ListEventDataStores',
+        'cloudtrail:StartQuery',
+        'cloudtrail:DescribeQuery',
+        'cloudtrail:GetQueryResults',
+    )
+
+    annotation_key = 'c7n:RetrievalActivity'
+    retrieval_events = ('Retrieve', 'RetrieveAndGenerate')
+    poll_delay = 2
+    poll_max_attempts = 60
+
+    def process(self, resources, event=None):
+        client = local_session(self.manager.session_factory).client('cloudtrail')
+        store = self.get_event_data_store(client)
+        if store is None:
+            self.log.warning(
+                'retrieval-activity: no enabled cloudtrail lake event data store found')
+            return []
+        counts = self.query_retrieval_counts(client, store)
+        op = OPERATORS[self.data.get('op', 'eq')]
+        value = self.data.get('value', 0)
+        results = []
+        for r in resources:
+            count = counts.get(r.get('knowledgeBaseArn'), 0)
+            r[self.annotation_key] = count
+            if op(count, value):
+                results.append(r)
+        return results
+
+    def get_event_data_store(self, client):
+        explicit = self.data.get('event-data-store')
+        if explicit:
+            return explicit
+        stores = []
+        params = {}
+        while True:
+            resp = client.list_event_data_stores(**params)
+            stores.extend(resp.get('EventDataStores', []))
+            token = resp.get('NextToken')
+            if not token:
+                break
+            params['NextToken'] = token
+        enabled = [s for s in stores if s.get('Status') == 'ENABLED']
+        # prefer a store that already captures bedrock knowledge base data events
+        for s in enabled:
+            if self._selects_kb_data_events(s):
+                return s['EventDataStoreArn']
+        if enabled:
+            return enabled[0]['EventDataStoreArn']
+        return None
+
+    @staticmethod
+    def _selects_kb_data_events(store):
+        for selector in store.get('AdvancedEventSelectors', []):
+            for field in selector.get('FieldSelectors', []):
+                if (field.get('Field') == 'resources.type'
+                        and 'AWS::Bedrock::KnowledgeBase' in field.get('Equals', [])):
+                    return True
+        return False
+
+    def query_retrieval_counts(self, client, store):
+        days = self.data.get('days', 30)
+        since = datetime.datetime.utcnow() - datetime.timedelta(days=days)
+        store_id = store.rsplit('/', 1)[-1]
+        events = ', '.join("'%s'" % e for e in self.retrieval_events)
+        statement = (
+            "SELECT element_at(resources, 1).arn AS arn, COUNT(*) AS retrievals "  # nosec B608
+            "FROM %s "
+            "WHERE eventCategory = 'Data' "
+            "AND eventSource = 'bedrock.amazonaws.com' "
+            "AND eventName IN (%s) "
+            "AND eventTime > '%s' "
+            "GROUP BY element_at(resources, 1).arn" % (
+                store_id, events, since.strftime('%Y-%m-%d %H:%M:%S')))
+        query_id = client.start_query(QueryStatement=statement)['QueryId']
+        self.wait_for_query(client, query_id)
+        return self.collect_results(client, query_id)
+
+    def wait_for_query(self, client, query_id):
+        for _ in range(self.poll_max_attempts):
+            status = client.describe_query(QueryId=query_id).get('QueryStatus')
+            if status == 'FINISHED':
+                return
+            if status in ('FAILED', 'CANCELLED', 'TIMED_OUT'):
+                raise PolicyExecutionError(
+                    'cloudtrail lake query %s ended in state %s' % (query_id, status))
+            time.sleep(self.poll_delay)
+        raise PolicyExecutionError(
+            'cloudtrail lake query %s did not finish in time' % query_id)
+
+    def collect_results(self, client, query_id):
+        counts = {}
+        params = {'QueryId': query_id}
+        while True:
+            resp = client.get_query_results(**params)
+            for row in resp.get('QueryResultRows', []):
+                record = {}
+                for cell in row:
+                    record.update(cell)
+                arn = record.get('arn')
+                if arn is None:
+                    continue
+                try:
+                    counts[arn] = int(record.get('retrievals', 0))
+                except (TypeError, ValueError):
+                    counts[arn] = 0
+            token = resp.get('NextToken')
+            if not token:
+                break
+            params['NextToken'] = token
+        return counts
 
 
 @resources.register('bedrock-inference-profile')
