@@ -67,6 +67,8 @@ ResourceMap = {
     "azure.loadbalancer": "c7n_azure.resources.load_balancer.LoadBalancer",
     "azure.logic-app-workflow": "c7n_azure.resources.logic_app.LogicAppWorkflow",
     "azure.machine-learning-workspace": "c7n_azure.resources.machine_learning.MachineLearningWorkspace", # noqa
+    "azure.machine-learning-online-endpoint": "c7n_azure.resources.machine_learning.MachineLearningOnlineEndpoint", # noqa
+    "azure.machine-learning-online-deployment": "c7n_azure.resources.machine_learning.MachineLearningOnlineDeployment", # noqa
     "azure.machine-learning-data-container": "c7n_azure.resources.machine_learning.MachineLearningDataContainer", # noqa
     "azure.machine-learning-job": "c7n_azure.resources.machine_learning_job.MachineLearningJob",
     "azure.machine-learning-online-endpoint": "c7n_azure.resources.machine_learning_online_endpoint.MachineLearningOnlineEndpoint", # noqa

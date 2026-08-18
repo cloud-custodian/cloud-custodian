@@ -478,6 +478,112 @@ PY
             exit 1
         fi
 
+    elif [[ "$fileName" == "machine-learning-online-deployment.json" ]]; then
+
+        unique_suffix="$(date +%s%N | tail -c 13)"
+        workspace_name="cctestmlonline${unique_suffix}"
+        asset_directory="${templateDirectory}/machine-learning-online-assets"
+        model_directory="${asset_directory}/model"
+
+        # The deployment requires registered model and code assets. First
+        # create only this template's workspace prerequisites so its default
+        # datastore is available for artifact upload.
+        az deployment group create \
+            --resource-group "$rgName" \
+            --template-file "$file" \
+            --parameters "uniqueId=${unique_suffix}" "deployOnlineResources=false" \
+            --mode Incremental \
+            --output None
+
+        subscription_id=$(az account show --query id --output tsv)
+        datastore_url="https://management.azure.com/subscriptions/${subscription_id}/resourceGroups/${rgName}/providers/Microsoft.MachineLearningServices/workspaces/${workspace_name}/datastores?api-version=2023-04-01&isDefault=true"
+        datastore_name=""
+        storage_account=""
+        container_name=""
+        for attempt in {1..12}; do
+            datastore_name=$(az rest --method get --url "$datastore_url" \
+                --query 'value[0].name' --output tsv 2>/dev/null)
+            storage_account=$(az rest --method get --url "$datastore_url" \
+                --query 'value[0].properties.accountName' --output tsv 2>/dev/null)
+            container_name=$(az rest --method get --url "$datastore_url" \
+                --query 'value[0].properties.containerName' --output tsv 2>/dev/null)
+            if [[ -n "$datastore_name" && -n "$storage_account" && -n "$container_name" ]]; then
+                break
+            fi
+            sleep 10
+        done
+
+        if [[ -z "$datastore_name" || -z "$storage_account" || -z "$container_name" ]]; then
+            echo "The default datastore for workspace '${workspace_name}' was not ready."
+            exit 1
+        fi
+
+        # Blob uploads use the Azure Storage data plane. The ARM deployment
+        # role is not sufficient, so grant the current principal the same
+        # scoped data role used by other fixture special cases.
+        principal_type="ServicePrincipal"
+        if [[ ${is_user} -eq 1 ]]; then
+            principal_type="User"
+        fi
+        if ! ensure_role_for_active_principal \
+            "$rgName" \
+            "ba92f5b4-2d11-453d-a403-e96b0029c9fe" \
+            "$principal_type"; then
+            echo "Required Storage Blob Data Contributor role assignment failed."
+            exit 1
+        fi
+
+        if ! command -v uv >/dev/null 2>&1; then
+            echo "The Azure ML deployment fixture requires uv to create its model artifact."
+            exit 1
+        fi
+        if ! sklearn_version=$(uv run --python 3.12 \
+            --with click \
+            --with numpy \
+            --with scikit-learn \
+            python "${asset_directory}/create_test_model.py" \
+            --output-dir "$model_directory"); then
+            echo "Failed to create the Azure ML test model artifact."
+            exit 1
+        fi
+        conda_file=$(printf '%s\n' \
+            'name: cctest-online-environment' \
+            'channels:' \
+            '  - conda-forge' \
+            'dependencies:' \
+            '  - python=3.12' \
+            '  - pip:' \
+            '    - azureml-inference-server-http' \
+            "    - scikit-learn==${sklearn_version}")
+
+        az storage blob upload-batch \
+            --account-name "$storage_account" \
+            --auth-mode login \
+            --destination "${container_name}/model" \
+            --source "${asset_directory}/model" \
+            --output none
+        az storage blob upload-batch \
+            --account-name "$storage_account" \
+            --auth-mode login \
+            --destination "${container_name}/code" \
+            --source "${asset_directory}/code" \
+            --output none
+
+        model_uri="azureml://subscriptions/${subscription_id}/resourceGroups/${rgName}/workspaces/${workspace_name}/datastores/${datastore_name}/paths/model/model.pkl"
+        blob_endpoint=$(az storage account show \
+            --resource-group "$rgName" \
+            --name "$storage_account" \
+            --query 'primaryEndpoints.blob' \
+            --output tsv)
+        code_uri="${blob_endpoint}${container_name}/code"
+
+        az deployment group create \
+            --resource-group "$rgName" \
+            --template-file "$file" \
+            --parameters "uniqueId=${unique_suffix}" "deployOnlineResources=true" "modelUri=${model_uri}" "codeUri=${code_uri}" "condaFile=${conda_file}" \
+            --mode Incremental \
+            --output None
+
     else
         template_parameters=()
         append_generated_unique_id_parameter "$file" template_parameters

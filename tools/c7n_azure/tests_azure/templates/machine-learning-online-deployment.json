@@ -1,0 +1,229 @@
+{
+    "$schema": "https://schema.management.azure.com/schemas/2019-04-01/deploymentTemplate.json#",
+    "contentVersion": "1.0.0.0",
+    "parameters": {
+        "uniqueId": {
+            "type": "string",
+            "metadata": {
+                "description": "Suffix supplied by the Azure test provisioning script."
+            }
+        },
+        "location": {
+            "type": "string",
+            "defaultValue": "eastus"
+        },
+        "deployOnlineResources": {
+            "type": "bool",
+            "defaultValue": true,
+            "metadata": {
+                "description": "Whether to create the model assets, endpoint, and deployment."
+            }
+        },
+        "modelUri": {
+            "type": "string",
+            "defaultValue": "",
+            "metadata": {
+                "description": "Azure ML datastore URI for the uploaded test model artifact."
+            }
+        },
+        "codeUri": {
+            "type": "string",
+            "defaultValue": "",
+            "metadata": {
+                "description": "Azure ML datastore URI for the uploaded scoring-code artifact."
+            }
+        },
+        "condaFile": {
+            "type": "string",
+            "defaultValue": "",
+            "metadata": {
+                "description": "Conda environment specification matching the generated model's scikit-learn version."
+            }
+        }
+    },
+    "variables": {
+        "workspaceName": "[concat('cctestmlonline', parameters('uniqueId'))]",
+        "endpointName": "[concat('cctest-ml-', parameters('uniqueId'))]",
+        "deploymentName": "blue",
+        "modelName": "cctest-online-model",
+        "codeName": "cctest-online-code",
+        "environmentName": "cctest-online-environment",
+        "storageAccountName": "[concat('cctml', parameters('uniqueId'))]",
+        "keyVaultName": "[concat('cctmlkv', parameters('uniqueId'))]",
+        "containerRegistryName": "[concat('cctmlacr', parameters('uniqueId'))]",
+        "applicationInsightsName": "[concat('cctest-ml-online-', parameters('uniqueId'))]"
+    },
+    "resources": [
+        {
+            "type": "Microsoft.Storage/storageAccounts",
+            "apiVersion": "2023-01-01",
+            "name": "[variables('storageAccountName')]",
+            "location": "[parameters('location')]",
+            "sku": {
+                "name": "Standard_LRS"
+            },
+            "kind": "StorageV2"
+        },
+        {
+            "type": "Microsoft.KeyVault/vaults",
+            "apiVersion": "2023-07-01",
+            "name": "[variables('keyVaultName')]",
+            "location": "[parameters('location')]",
+            "properties": {
+                "tenantId": "[subscription().tenantId]",
+                "sku": {
+                    "family": "A",
+                    "name": "standard"
+                },
+                "accessPolicies": [],
+                "enableRbacAuthorization": true
+            }
+        },
+        {
+            "type": "Microsoft.ContainerRegistry/registries",
+            "apiVersion": "2023-07-01",
+            "name": "[variables('containerRegistryName')]",
+            "location": "[parameters('location')]",
+            "sku": {
+                "name": "Basic"
+            },
+            "properties": {
+                "adminUserEnabled": false
+            }
+        },
+        {
+            "type": "Microsoft.Insights/components",
+            "apiVersion": "2020-02-02",
+            "name": "[variables('applicationInsightsName')]",
+            "location": "[parameters('location')]",
+            "kind": "web",
+            "properties": {
+                "Application_Type": "web"
+            }
+        },
+        {
+            "type": "Microsoft.MachineLearningServices/workspaces",
+            "apiVersion": "2023-04-01",
+            "name": "[variables('workspaceName')]",
+            "location": "[parameters('location')]",
+            "identity": {
+                "type": "SystemAssigned"
+            },
+            "sku": {
+                "name": "Basic",
+                "tier": "Basic"
+            },
+            "properties": {
+                "applicationInsights": "[resourceId('Microsoft.Insights/components', variables('applicationInsightsName'))]",
+                "containerRegistry": "[resourceId('Microsoft.ContainerRegistry/registries', variables('containerRegistryName'))]",
+                "keyVault": "[resourceId('Microsoft.KeyVault/vaults', variables('keyVaultName'))]",
+                "storageAccount": "[resourceId('Microsoft.Storage/storageAccounts', variables('storageAccountName'))]"
+            },
+            "dependsOn": [
+                "[resourceId('Microsoft.Storage/storageAccounts', variables('storageAccountName'))]",
+                "[resourceId('Microsoft.KeyVault/vaults', variables('keyVaultName'))]",
+                "[resourceId('Microsoft.ContainerRegistry/registries', variables('containerRegistryName'))]",
+                "[resourceId('Microsoft.Insights/components', variables('applicationInsightsName'))]"
+            ]
+        },
+        {
+            "type": "Microsoft.MachineLearningServices/workspaces/models/versions",
+            "apiVersion": "2023-04-01",
+            "name": "[format('{0}/{1}/1', variables('workspaceName'), variables('modelName'))]",
+            "condition": "[parameters('deployOnlineResources')]",
+            "properties": {
+                "modelType": "custom_model",
+                "modelUri": "[parameters('modelUri')]"
+            },
+            "dependsOn": [
+                "[resourceId('Microsoft.MachineLearningServices/workspaces', variables('workspaceName'))]"
+            ]
+        },
+        {
+            "type": "Microsoft.MachineLearningServices/workspaces/codes/versions",
+            "apiVersion": "2023-04-01",
+            "name": "[format('{0}/{1}/1', variables('workspaceName'), variables('codeName'))]",
+            "condition": "[parameters('deployOnlineResources')]",
+            "properties": {
+                "codeUri": "[parameters('codeUri')]"
+            },
+            "dependsOn": [
+                "[resourceId('Microsoft.MachineLearningServices/workspaces', variables('workspaceName'))]"
+            ]
+        },
+        {
+            "type": "Microsoft.MachineLearningServices/workspaces/environments/versions",
+            "apiVersion": "2023-04-01",
+            "name": "[format('{0}/{1}/1', variables('workspaceName'), variables('environmentName'))]",
+            "condition": "[parameters('deployOnlineResources')]",
+            "properties": {
+                "image": "mcr.microsoft.com/azureml/minimal-py312-inference:latest",
+                "condaFile": "[parameters('condaFile')]"
+            },
+            "dependsOn": [
+                "[resourceId('Microsoft.MachineLearningServices/workspaces', variables('workspaceName'))]"
+            ]
+        },
+        {
+            "type": "Microsoft.MachineLearningServices/workspaces/onlineEndpoints",
+            "apiVersion": "2023-04-01",
+            "name": "[format('{0}/{1}', variables('workspaceName'), variables('endpointName'))]",
+            "condition": "[parameters('deployOnlineResources')]",
+            "location": "[parameters('location')]",
+            "identity": {
+                "type": "SystemAssigned"
+            },
+            "properties": {
+                "authMode": "AMLToken"
+            },
+            "dependsOn": [
+                "[resourceId('Microsoft.MachineLearningServices/workspaces', variables('workspaceName'))]"
+            ]
+        },
+        {
+            "type": "Microsoft.MachineLearningServices/workspaces/onlineEndpoints/deployments",
+            "apiVersion": "2023-04-01",
+            "name": "[format('{0}/{1}/{2}', variables('workspaceName'), variables('endpointName'), variables('deploymentName'))]",
+            "condition": "[parameters('deployOnlineResources')]",
+            "location": "[parameters('location')]",
+            "sku": {
+                "name": "Standard_F2s_v2",
+                "capacity": 1
+            },
+            "properties": {
+                "endpointComputeType": "Managed",
+                "model": "[resourceId('Microsoft.MachineLearningServices/workspaces/models/versions', variables('workspaceName'), variables('modelName'), '1')]",
+                "environmentId": "[resourceId('Microsoft.MachineLearningServices/workspaces/environments/versions', variables('workspaceName'), variables('environmentName'), '1')]",
+                "codeConfiguration": {
+                    "codeId": "[resourceId('Microsoft.MachineLearningServices/workspaces/codes/versions', variables('workspaceName'), variables('codeName'), '1')]",
+                    "scoringScript": "score.py"
+                },
+                "instanceType": "Standard_F2s_v2",
+                "scaleSettings": {
+                    "scaleType": "Default",
+                    "instanceCount": 1
+                }
+            },
+            "dependsOn": [
+                "[resourceId('Microsoft.MachineLearningServices/workspaces/onlineEndpoints', variables('workspaceName'), variables('endpointName'))]",
+                "[resourceId('Microsoft.MachineLearningServices/workspaces/models/versions', variables('workspaceName'), variables('modelName'), '1')]",
+                "[resourceId('Microsoft.MachineLearningServices/workspaces/codes/versions', variables('workspaceName'), variables('codeName'), '1')]",
+                "[resourceId('Microsoft.MachineLearningServices/workspaces/environments/versions', variables('workspaceName'), variables('environmentName'), '1')]"
+            ]
+        }
+    ],
+    "outputs": {
+        "workspaceName": {
+            "type": "string",
+            "value": "[variables('workspaceName')]"
+        },
+        "endpointName": {
+            "type": "string",
+            "value": "[variables('endpointName')]"
+        },
+        "deploymentName": {
+            "type": "string",
+            "value": "[variables('deploymentName')]"
+        }
+    }
+}
