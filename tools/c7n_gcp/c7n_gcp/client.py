@@ -78,6 +78,16 @@ def get_default_project():
             return os.environ[k]
 
 
+def get_workspace_subject() -> str | None:
+    """Workspace admin to impersonate via domain-wide delegation."""
+    return os.environ.get('GOOGLE_WORKSPACE_SUBJECT')
+
+
+def get_workspace_customer() -> str:
+    """Workspace customer id; 'my_customer' is the subject's own account."""
+    return os.environ.get('GOOGLE_WORKSPACE_CUSTOMER', 'my_customer')
+
+
 class PaginationNotSupported(Exception):
     """Pagination not supported on this api."""
 
@@ -254,12 +264,18 @@ class Session:
                 - cache_discovery (bool): Whether to cache discovery docs
                 - client_options (ClientOptions): Custom client options for
                   location-specific endpoints
+                - scopes (tuple): OAuth scopes for APIs not covered by the
+                  session wide cloud-platform scope
 
         Returns:
             object: An instance of repository_class.
         """
+        credentials = self._credentials
+        if kw.get('scopes'):
+            credentials = self._scoped_credentials(kw['scopes'])
+
         service = _create_service_api(
-            self._credentials,
+            credentials,
             service_name,
             version,
             kw.get('developer_key'),
@@ -270,10 +286,41 @@ class Session:
         return ServiceClient(
             gcp_service=service,
             component=component,
-            credentials=self._credentials,
+            credentials=credentials,
             rate_limiter=self._rate_limiter,
-            use_cached_http=self._use_cached_http,
+            # The thread cached http is authorized with the session
+            # credentials, so a client using its own credentials can't share
+            # it.
+            use_cached_http=(
+                self._use_cached_http and credentials is self._credentials),
             http=self._http)
+
+    def _scoped_credentials(self, scopes):
+        """Credentials for an API needing its own scopes and, for Google
+        Workspace, a delegated subject.
+
+        Workspace (Admin SDK) APIs are authorized by domain wide
+        delegation: a service account impersonates a user (the
+        "subject"), who holds needed workspace admin privileges. The
+        service account key is required because with_subject self
+        signs a JWT.
+
+        Credentials that carry fixed scopes, such as the authorized_user
+        credentials used by flight data replay, are returned unchanged.
+        """
+        credentials = self._credentials
+        if hasattr(credentials, 'with_scopes'):
+            credentials = credentials.with_scopes(list(scopes))
+
+        subject = get_workspace_subject()
+        if not subject:
+            return credentials
+        if not hasattr(credentials, 'with_subject'):
+            raise ValueError(
+                "GOOGLE_WORKSPACE_SUBJECT requires service account "
+                "credentials supporting domain wide delegation, got %s" % (
+                    type(credentials).__name__,))
+        return credentials.with_subject(subject)
 
 
 # pylint: disable=too-many-instance-attributes, too-many-arguments

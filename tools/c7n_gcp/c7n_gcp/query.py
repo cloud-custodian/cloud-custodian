@@ -28,7 +28,7 @@ class ResourceQuery:
         m = resource_manager.resource_type
         session = local_session(self.session_factory)
         client = session.client(
-            m.service, m.version, m.component)
+            m.service, m.version, m.component, scopes=m.scopes)
 
         # depends on resource scope
         if m.scope in ('project', 'zone'):
@@ -169,7 +169,8 @@ class QueryResourceManager(ResourceManager, metaclass=QueryMeta):
         return local_session(self.session_factory).client(
             self.resource_type.service,
             self.resource_type.version,
-            self.resource_type.component)
+            self.resource_type.component,
+            scopes=self.resource_type.scopes)
 
     def get_model(self):
         return self.resource_type
@@ -363,6 +364,10 @@ class TypeInfo(metaclass=TypeMeta):
     service = None
     version = None
     component = None
+    # OAuth scopes for APIs not covered by the session's cloud-platform
+    # scope (the Google Workspace Admin SDK). Requesting them also engages
+    # domain wide delegation when GOOGLE_WORKSPACE_SUBJECT is set.
+    scopes = None
 
     # resource enumeration parameters
 
