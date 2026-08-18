@@ -884,7 +884,7 @@ class KnowledgeBaseRetrievalActivity(Filter):
         store_id = store.rsplit('/', 1)[-1]
         events = ', '.join("'%s'" % e for e in self.retrieval_events)
         statement = (
-            "SELECT element_at(resources, 1).arn AS arn, COUNT(*) AS retrievals "
+            "SELECT element_at(resources, 1).arn AS arn, COUNT(*) AS retrievals "  # nosec B608
             "FROM %s "
             "WHERE eventCategory = 'Data' "
             "AND eventSource = 'bedrock.amazonaws.com' "

@@ -1,0 +1,13 @@
+{
+    "status_code": 200,
+    "data": {
+        "ResponseMetadata": {},
+        "EventDataStores": [
+            {
+                "EventDataStoreArn": "arn:aws:cloudtrail:us-east-1:644160558196:eventdatastore/disabled-0000",
+                "Name": "disabled-store",
+                "Status": "PENDING_DELETION"
+            }
+        ]
+    }
+}

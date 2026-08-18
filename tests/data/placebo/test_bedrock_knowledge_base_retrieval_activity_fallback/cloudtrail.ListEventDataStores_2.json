@@ -1,0 +1,22 @@
+{
+    "status_code": 200,
+    "data": {
+        "ResponseMetadata": {},
+        "EventDataStores": [
+            {
+                "EventDataStoreArn": "arn:aws:cloudtrail:us-east-1:644160558196:eventdatastore/s3-data-0002",
+                "Name": "s3-data-store",
+                "Status": "ENABLED",
+                "AdvancedEventSelectors": [
+                    {
+                        "Name": "s3-data-events",
+                        "FieldSelectors": [
+                            {"Field": "eventCategory", "Equals": ["Data"]},
+                            {"Field": "resources.type", "Equals": ["AWS::S3::Object"]}
+                        ]
+                    }
+                ]
+            }
+        ]
+    }
+}
