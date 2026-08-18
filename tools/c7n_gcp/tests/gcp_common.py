@@ -103,30 +103,36 @@ class AuditEventRecorder:
         operation_index: dict = {}
         seen_hashes: set = set()
         while True:
-            entries = self._get_entries()
+            entries = self._dedup_entries(seen_hashes, self._get_entries())
             if entries:
-                if self._write_batch(entries, operation_index, seen_hashes):
+                if self._write_batch(entries, operation_index):
                     return
             if time.time() >= deadline:
                 raise AssertionError(
                     'No GCP audit log entries matched {}'.format(self.event_file))
             time.sleep(self.poll_interval)
 
-    def _write_batch(
-            self, entries: list[dict], operation_index: dict, seen_hashes: set,
-    ) -> bool:
+    def _dedup_entries(self, seen: set, entries: list[dict]) -> list[dict]:
+        """Update seen with each entry's hash. Return the entries not in seen.
+
+        Cloud Logging queries are cumulative from a fixed start time, so a
+        later poll re-returns entries an earlier poll already saw.
+        """
+        new_entries = []
+        for entry in entries:
+            digest = hashlib.sha256(
+                json.dumps(entry, sort_keys=True).encode()).hexdigest()
+            if digest in seen:
+                continue
+            seen.add(digest)
+            new_entries.append(entry)
+        return new_entries
+
+    def _write_batch(self, entries: list[dict], operation_index: dict) -> bool:
         """Write one poll batch. Returns True when polling should stop."""
         stop = False
         for entry in entries:
             payload = json.dumps(entry, indent=2, sort_keys=True) + '\n'
-            digest = hashlib.sha256(payload.encode()).hexdigest()
-            if digest in seen_hashes:
-                # Cloud Logging queries are cumulative from a fixed start
-                # time, so a later poll re-returns entries an earlier poll
-                # already wrote. Not a collision.
-                continue
-            seen_hashes.add(digest)
-
             operation = entry.get('operation') or {}
             operation_id = operation.get('id')
             if not operation_id:

@@ -78,6 +78,19 @@ def test_first_then_last_pair_writes_both_and_stops(tmp_path, monkeypatch):
     assert len(client.calls) == 2
 
 
+def test_dedup_entries_filters_seen_and_updates_seen(tmp_path, monkeypatch):
+    recorder, client = make_recorder(tmp_path, monkeypatch, [])
+    seen = set()
+    entry_a = {'insertId': 'a'}
+    entry_b = {'insertId': 'b'}
+
+    first_pass = recorder._dedup_entries(seen, [entry_a, entry_b])
+    second_pass = recorder._dedup_entries(seen, [entry_a, entry_b])
+
+    assert first_pass == [entry_a, entry_b]
+    assert second_pass == []
+
+
 def test_repolling_the_same_entry_is_not_a_collision(tmp_path, monkeypatch):
     first = {
         'insertId': 'a',
