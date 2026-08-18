@@ -41,7 +41,7 @@ regardless of mode:
             "firestore-backup-schedule-update.json",
             method="UpdateBackupSchedule",
             resource_name=resource_name,
-            labels={"project_id": project_id},
+            labels={"database_id": database_id},
         )
 
         # trigger the real update here, e.g. a client.execute_command('patch', ...)
@@ -69,7 +69,10 @@ Filtering options
 - ``resource_name`` (optional) -- a substring match against
   ``protoPayload.resourceName``.
 - ``labels`` (optional) -- an exact-match mapping against
-  ``resource.labels``, e.g. ``{"project_id": project_id}``.
+  ``resource.labels``, e.g. ``{"database_id": database_id}``. The query
+  is already scoped to one project via ``resourceNames``, so a
+  ``project_id`` label wouldn't narrow anything further -- use ``labels``
+  for fields that distinguish resources *within* the project.
 - ``start_time_skew`` (default 60s) -- how far before construction time to
   set the query's lower time bound, to guard against clock skew between
   the test host and Cloud Logging.
