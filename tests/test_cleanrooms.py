@@ -91,8 +91,10 @@ class TestCleanRoomsCollaboration(BaseTest):
                      "attrs": [
                          {"type": "value", "key": "status",
                           "op": "in", "value": ["ACTIVE", "INVITED"]},
+                         {"type": "value", "key": "accountId",
+                          "op": "in", "value": [self.account_id]},
                          {"type": "value", "key": "abilities", "op": "intersect",
-                          "value": ["CAN_QUERY", "CAN_RECEIVE"]},
+                          "value": ["CAN_QUERY", "CAN_RECEIVE_RESULTS"]},
                      ]},
                 ],
             },
