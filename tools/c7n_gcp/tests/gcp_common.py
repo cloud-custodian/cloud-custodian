@@ -3,6 +3,7 @@
 
 import datetime
 import functools
+import hashlib
 import json
 import logging
 import os
@@ -100,31 +101,43 @@ class AuditEventRecorder:
     def record(self) -> None:
         deadline = time.time() + self.timeout
         operation_index: dict = {}
+        seen_hashes: set = set()
         while True:
             entries = self._get_entries()
             if entries:
-                if self._write_batch(entries, operation_index):
+                if self._write_batch(entries, operation_index, seen_hashes):
                     return
             if time.time() >= deadline:
                 raise AssertionError(
                     'No GCP audit log entries matched {}'.format(self.event_file))
             time.sleep(self.poll_interval)
 
-    def _write_batch(self, entries: list[dict], operation_index: dict) -> bool:
+    def _write_batch(
+            self, entries: list[dict], operation_index: dict, seen_hashes: set,
+    ) -> bool:
         """Write one poll batch. Returns True when polling should stop."""
         stop = False
         for entry in entries:
+            payload = json.dumps(entry, indent=2, sort_keys=True) + '\n'
+            digest = hashlib.sha256(payload.encode()).hexdigest()
+            if digest in seen_hashes:
+                # Cloud Logging queries are cumulative from a fixed start
+                # time, so a later poll re-returns entries an earlier poll
+                # already wrote. Not a collision.
+                continue
+            seen_hashes.add(digest)
+
             operation = entry.get('operation') or {}
             operation_id = operation.get('id')
             if not operation_id:
-                self._write_entry(self.event_file, entry)
+                self._write_entry(self.event_file, payload)
                 stop = True
                 continue
             if operation_id not in operation_index:
                 operation_index[operation_id] = len(operation_index)
             index = operation_index[operation_id]
             self._write_entry(
-                self._operation_file_name(index, operation), entry)
+                self._operation_file_name(index, operation), payload)
             if operation.get('last'):
                 stop = True
         return stop
@@ -169,16 +182,11 @@ class AuditEventRecorder:
             'orderBy': 'timestamp asc',
         }
 
-    def _write_entry(self, event_file: str, entry: dict) -> None:
+    def _write_entry(self, event_file: str, payload: str) -> None:
         os.makedirs(EVENT_DIR, exist_ok=True)
-        payload = json.dumps(entry, indent=2, sort_keys=True) + '\n'
         path = os.path.join(EVENT_DIR, event_file)
         index = 0
         while os.path.exists(path):
-            if open(path).read() == payload:
-                # A later poll re-returned an entry an earlier poll
-                # already wrote; not a collision.
-                return
             index += 1
             path = '{}-{}'.format(os.path.join(EVENT_DIR, event_file), index)
         if index:
