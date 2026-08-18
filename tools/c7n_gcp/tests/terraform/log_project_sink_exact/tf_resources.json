@@ -1,0 +1,92 @@
+{
+    "pytest-terraform": 1,
+    "outputs": {},
+    "resources": {
+        "google_logging_project_sink": {
+            "exact_a": {
+                "bigquery_options": [],
+                "custom_writer_identity": null,
+                "description": "",
+                "destination": "logging.googleapis.com/projects/cloud-custodian/locations/global/buckets/_Default",
+                "disabled": false,
+                "exclusions": [],
+                "filter": "severity>=ERROR AND resource.type=\"gce_instance\"",
+                "id": "projects/cloud-custodian/sinks/c7n-sink-exact-a",
+                "name": "c7n-sink-exact-a",
+                "project": "stacklet-personal-2",
+                "unique_writer_identity": true,
+                "writer_identity": ""
+            },
+            "exact_b": {
+                "bigquery_options": [],
+                "custom_writer_identity": null,
+                "description": "",
+                "destination": "logging.googleapis.com/projects/cloud-custodian/locations/global/buckets/_Default",
+                "disabled": false,
+                "exclusions": [],
+                "filter": "resource.type=\"gce_instance\" AND severity>=ERROR",
+                "id": "projects/cloud-custodian/sinks/c7n-sink-exact-b",
+                "name": "c7n-sink-exact-b",
+                "project": "stacklet-personal-2",
+                "unique_writer_identity": true,
+                "writer_identity": ""
+            },
+            "exact_disabled": {
+                "bigquery_options": [],
+                "custom_writer_identity": null,
+                "description": "",
+                "destination": "logging.googleapis.com/projects/cloud-custodian/locations/global/buckets/_Default",
+                "disabled": true,
+                "exclusions": [],
+                "filter": "severity>=ERROR AND resource.type=\"gce_instance\"",
+                "id": "projects/cloud-custodian/sinks/c7n-sink-exact-disabled",
+                "name": "c7n-sink-exact-disabled",
+                "project": "stacklet-personal-2",
+                "unique_writer_identity": true,
+                "writer_identity": ""
+            },
+            "exact_no_filter_a": {
+                "bigquery_options": [],
+                "custom_writer_identity": null,
+                "description": "",
+                "destination": "logging.googleapis.com/projects/cloud-custodian/locations/global/buckets/_Default",
+                "disabled": false,
+                "exclusions": [],
+                "filter": "",
+                "id": "projects/cloud-custodian/sinks/c7n-sink-exact-no-filter-a",
+                "name": "c7n-sink-exact-no-filter-a",
+                "project": "stacklet-personal-2",
+                "unique_writer_identity": true,
+                "writer_identity": ""
+            },
+            "exact_no_filter_b": {
+                "bigquery_options": [],
+                "custom_writer_identity": null,
+                "description": "",
+                "destination": "logging.googleapis.com/projects/cloud-custodian/locations/global/buckets/_Default",
+                "disabled": false,
+                "exclusions": [],
+                "filter": "",
+                "id": "projects/cloud-custodian/sinks/c7n-sink-exact-no-filter-b",
+                "name": "c7n-sink-exact-no-filter-b",
+                "project": "stacklet-personal-2",
+                "unique_writer_identity": true,
+                "writer_identity": ""
+            },
+            "exact_non_match": {
+                "bigquery_options": [],
+                "custom_writer_identity": null,
+                "description": "",
+                "destination": "logging.googleapis.com/projects/cloud-custodian/locations/global/buckets/_Default",
+                "disabled": false,
+                "exclusions": [],
+                "filter": "severity>=WARNING AND resource.type=\"gce_instance\"",
+                "id": "projects/cloud-custodian/sinks/c7n-sink-exact-non-match",
+                "name": "c7n-sink-exact-non-match",
+                "project": "stacklet-personal-2",
+                "unique_writer_identity": true,
+                "writer_identity": ""
+            }
+        }
+    }
+}
