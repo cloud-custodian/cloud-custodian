@@ -80,6 +80,27 @@ class TestCleanRoomsCollaboration(BaseTest):
         tags = client.list_tags_for_resource(resourceArn=arn)["tags"]
         self.assertNotIn("Env", tags)
 
+    def test_collaboration_members_filter(self):
+        factory = self.replay_flight_data("test_cleanrooms_collaboration_members")
+        p = self.load_policy(
+            {
+                "name": "cleanrooms-collaboration-members",
+                "resource": "aws.cleanrooms-collaboration",
+                "filters": [
+                    {"type": "members",
+                     "attrs": [
+                         {"type": "value", "key": "status",
+                          "op": "in", "value": ["ACTIVE", "INVITED"]},
+                         {"type": "value", "key": "abilities", "op": "intersect",
+                          "value": ["CAN_QUERY", "CAN_RECEIVE"]},
+                     ]},
+                ],
+            },
+            session_factory=factory,
+        )
+        resources = p.run()
+        self.assertEqual(len(resources), 2)
+
 
 class TestCleanRoomsMembership(BaseTest):
 
