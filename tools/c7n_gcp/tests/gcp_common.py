@@ -50,7 +50,7 @@ def audit_event_recorder(
         start_time_skew: int = 60,
         timeout: int = 120,
         poll_interval: int = 5,
-):
+) -> 'AuditEventRecorder':
     """Create a recorder for GCP audit LogEntry event fixtures.
 
     Construct it before triggering the API call, then call ``record()`` in
@@ -84,7 +84,7 @@ class AuditEventRecorder:
             start_time_skew: int = 60,
             timeout: int = 120,
             poll_interval: int = 5,
-    ):
+    ) -> None:
         self.session_factory = session_factory
         self.event_file = event_file
         self.method = method

@@ -100,6 +100,45 @@ def test_repolling_the_same_entry_is_not_a_collision(tmp_path, monkeypatch):
         'foo-first.json', 'foo-last.json']
 
 
+def test_query_body_reflects_structured_filters(tmp_path, monkeypatch):
+    entry = {'insertId': 'a', 'timestamp': '2025-01-01T00:00:00Z'}
+    recorder, client = make_recorder(
+        tmp_path, monkeypatch, [[entry]],
+        resource_name='projects/test-project/things/thing-1',
+        labels={'database_id': 'db-1'},
+    )
+
+    recorder.record()
+
+    verb, arguments = client.calls[0]
+    assert verb == 'list'
+    body = arguments['body']
+    assert body['resourceNames'] == ['projects/test-project']
+    assert body['orderBy'] == 'timestamp asc'
+    assert 'protoPayload.methodName : "CreateThing"' in body['filter']
+    assert (
+        'protoPayload.resourceName : '
+        '"projects/test-project/things/thing-1"'
+        in body['filter']
+    )
+    assert 'resource.labels.database_id = "db-1"' in body['filter']
+    assert 'timestamp >= "' in body['filter']
+
+
+def test_record_raises_after_timeout_with_no_matches(tmp_path, monkeypatch):
+    recorder, client = make_recorder(
+        tmp_path, monkeypatch, [], timeout=0)
+
+    try:
+        recorder.record()
+    except AssertionError:
+        pass
+    else:
+        raise AssertionError('expected record() to raise')
+
+    assert not list(tmp_path.iterdir())
+
+
 def test_second_distinct_operation_gets_index_suffix(tmp_path, monkeypatch):
     op0_first = {
         'insertId': 'a',
