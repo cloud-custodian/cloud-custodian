@@ -2,6 +2,7 @@
 # SPDX-License-Identifier: Apache-2.0
 
 import itertools
+import logging
 import pytest
 
 from c7n.exceptions import PolicyValidationError
@@ -24,6 +25,46 @@ def test_taggable_query_schema_error(test):
     assert "not valid under any of the given schemas" in str(excinfo.value)
 
 
+def test_taggable_check_policy(test, caplog):
+    factory = test.replay_flight_data("test_taggable_check_policy_tags")
+    policy = test.load_policy({
+        "name": "test-taggable-check",
+        "resource": "aws.taggable",
+        "query": [
+            {"non_compliant": True},
+            {"check_policy_tags": ["AppEnv"]},
+            {"resource_types": ["ec2:security-group"]},
+
+        ]},
+        session_factory=factory
+    )
+    assert policy.run() == []
+    assert "policy tags dont match organization" in caplog.text
+    assert "CRITICAL" in caplog.text
+    print(caplog.text)
+
+
+def test_taggable_bad_explorer_index(test, caplog):
+    factory = test.replay_flight_data("test_taggable_bad_explorer_index", region="eu-west-1")
+    policy = test.load_policy({
+        "name": "test-taggable-check",
+        "resource": "aws.taggable",
+        "query": [
+            {"non_compliant": True},
+            {"non_tagged": True},
+            {"resource_types": ["ec2:security-group"]},
+        ]},
+        session_factory=factory,
+        config={'account_id': ACCOUNT_ID, 'region': 'eu-west-1'}
+    )
+
+    caplog.set_level(logging.CRITICAL)
+    policy.run()
+    assert "misconfigured default view" in caplog.text
+    assert "CRITICAL" in caplog.text
+    assert "account:%s region:eu-west-1" % ACCOUNT_ID in caplog.text
+
+
 def test_taggable_noncompliant(test):
     factory = test.replay_flight_data("test_taggable_fetch")
 
@@ -34,7 +75,6 @@ def test_taggable_noncompliant(test):
              {"non_compliant": True},
              {"non_tagged": True},
              {"resource_types": ["ec2:security-group"]},
-             {"check_policy_tags": ["Owner"]}
          ]},
         session_factory=factory,
         config={"account_id": ACCOUNT_ID},
@@ -80,7 +120,6 @@ def test_taggable_tag_action(test):
              {"non_tagged": True},
              {"with_tags": [{"Key": "kubernetes.io/cluster/app-dev", "Values": ["owned"]}]},
              {"resource_types": ["ec2:security-group"]},
-             {"check_policy_tags": ["Owner"]}
          ]},
         session_factory=factory,
         config={"account_id": ACCOUNT_ID}

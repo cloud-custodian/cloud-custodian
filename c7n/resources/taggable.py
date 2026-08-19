@@ -2,8 +2,10 @@
 # SPDX-License-Identifier: Apache-2.0
 """AWS Generic resource to process across all taggable resources."""
 
+import itertools
 from functools import partial
 
+from botocore.exceptions import ClientError
 from jsonschema import Draft7Validator as JsonSchemaValidator
 
 from c7n.config import Bag
@@ -27,6 +29,8 @@ class DescribeTaggable(query.DescribeSource):
                 _make_schema_item({"non_tagged": {"type": "boolean"}}),
                 _make_schema_item(
                     {"resource_types": {"type": "array", "items": {"type": "string"}}}),
+                _make_schema_item(
+                    {"check_policy_tags": {"type": "array", "items": {"type": "string"}}}),
                 _make_schema_item({
                     "with_tags": {
                         "type": "array", "items": _make_schema_item(
@@ -64,13 +68,36 @@ class DescribeTaggable(query.DescribeSource):
         params = {'QueryString': " ".join(parts)}
         return params
 
+    def check_policy_key_matches(self, client, query):
+        if not query.get('check_policy_tags'):
+            return True
+        if not query.non_compliant:
+            return True
+
+        response = client.list_required_tags()
+        required = set(
+            itertools.chain.from_iterable(
+                [rt['ReportingTagKeys'] for rt in response['RequiredTags']]
+            )
+        )
+        expected = set(query.check_policy_tags)
+        return not bool(expected.difference(required))
+
     def resources(self, query):
         query = Bag(query)
         session = local_session(self.manager.session_factory)
         client = session.client('resourcegroupstaggingapi')
         pager = client.get_paginator('get_resources')
-
         results = []
+
+        if not self.check_policy_key_matches(client, query):
+            self.manager.log.critical(
+                "policy tags dont match organization tag policy in effect acocunt %s" % (
+                    self.manager.config.account_id
+                )
+            )
+            return results
+
         for page in pager.paginate(**self.get_params_tagging(query)):
             results.extend(page.get('ResourceTagMappingList', []))
 
@@ -85,11 +112,23 @@ class DescribeTaggable(query.DescribeSource):
         ids = set()
         normalize = partial(self.normalize_explorer_results, query=query)
 
-        for page in pager.paginate(**self.get_params_explorer(query)):
-            results.extend(
-                [r for r in normalize(page.get("Resources", []))
-                 if r['ResourceARN'] not in ids]
-            )
+        try:
+            for page in pager.paginate(**self.get_params_explorer(query)):
+                results.extend(
+                    [r for r in normalize(page.get("Resources", []))
+                     if r['ResourceARN'] not in ids]
+                )
+        except ClientError as e:
+            # a default view without tags included in the index
+            if e.response.get('Error', {}).get('Code') == 'ValidationException':
+                self.manager.log.critical(
+                    "resource explorer account:%s region:%s misconfigured default view" % (
+                        self.manager.config.account_id,
+                        self.manager.config.region
+                    )
+                )
+            else:
+                raise
         self.manager.log.debug("resource-explorer resources %d" % (len(results) - tcount))
         return results
 
@@ -161,10 +200,20 @@ class Taggable(query.QueryResourceManager):
     policy authors expectation of the tags being checked, and is verified
     against what's actually in the account.
 
+    `check_policy_tags` allows specifying a set of tag keys that will
+    be validated against the organization tag policies in affect on
+    the account. if the specified tag keys are not part of the org tag
+    policy being enforced on the account resources and the custodian policy is
+    searching for non_compliant resources, no resources will be
+    returned. This is intended to prevent against mismatches of required tags
+    actually in effect against the account.
+
     `non_tagged` enables the use of resource-explorer to supplement the
     results with resources that have never been tagged. It is safe to run
     against explorer aggregator accounts, as it scopes to only resources
-    within an account.
+    within an account. Note resource explorer does not support tag based
+    searching for iam roles or users, so iam resources that have no tags
+    will require a separate policy.
 
     `resource_types` can be specified as well, to scope to particular
     resources types. notably this resource supports resource types not
@@ -193,6 +242,7 @@ class Taggable(query.QueryResourceManager):
 
     The example above will only return ec2 instances and security groups
     with any of the three defined values for the App tag.
+
     """
 
     source_mapping = {"describe": DescribeTaggable}
