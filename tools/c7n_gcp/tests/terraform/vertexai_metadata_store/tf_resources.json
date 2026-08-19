@@ -1,0 +1,21 @@
+{
+    "pytest-terraform": 1,
+    "outputs": {},
+    "resources": {
+        "google_vertex_ai_metadata_store": {
+            "central": {
+                "create_time": "2026-08-19T18:33:43.520103Z",
+                "deletion_policy": "DELETE",
+                "description": "",
+                "encryption_spec": [],
+                "id": "c7n-store",
+                "name": "c7n-store",
+                "project": "stkl-jim-fulton",
+                "region": "us-central1",
+                "state": [],
+                "timeouts": null,
+                "update_time": "2026-08-19T18:33:44.271652Z"
+            }
+        }
+    }
+}

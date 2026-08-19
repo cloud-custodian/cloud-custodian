@@ -1,0 +1,26 @@
+{
+  "headers": {
+    "content-type": "application/json; charset=UTF-8",
+    "vary": "Origin, X-Origin, Referer",
+    "date": "Wed, 19 Aug 2026 18:33:56 GMT",
+    "server": "ESF",
+    "x-xss-protection": "0",
+    "x-frame-options": "SAMEORIGIN",
+    "x-content-type-options": "nosniff",
+    "alt-svc": "h3=\":443\"; ma=2592000,h3-29=\":443\"; ma=2592000",
+    "transfer-encoding": "chunked",
+    "status": "200",
+    "content-length": "350",
+    "-content-encoding": "gzip"
+  },
+  "body": {
+    "name": "projects/cloud-custodian/locations/us-central1/metadataStores/c7n-store/artifacts/unlabeled",
+    "displayName": "c7n-test-artifact-unlabeled",
+    "etag": "1787164436217",
+    "createTime": "2026-08-19T18:33:56.217Z",
+    "updateTime": "2026-08-19T18:33:56.217Z",
+    "schemaTitle": "system.Artifact",
+    "schemaVersion": "0.0.1",
+    "metadata": {}
+  }
+}

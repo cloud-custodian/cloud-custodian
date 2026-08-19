@@ -1,0 +1,44 @@
+{
+  "headers": {
+    "content-type": "application/json; charset=UTF-8",
+    "vary": "Origin, X-Origin, Referer",
+    "date": "Wed, 19 Aug 2026 18:33:57 GMT",
+    "server": "ESF",
+    "x-xss-protection": "0",
+    "x-frame-options": "SAMEORIGIN",
+    "x-content-type-options": "nosniff",
+    "alt-svc": "h3=\":443\"; ma=2592000,h3-29=\":443\"; ma=2592000",
+    "transfer-encoding": "chunked",
+    "status": "200",
+    "content-length": "852",
+    "-content-encoding": "gzip",
+    "content-location": "https://us-central1-aiplatform.googleapis.com/v1/projects/cloud-custodian/locations/us-central1/metadataStores/c7n-store/artifacts?alt=json"
+  },
+  "body": {
+    "artifacts": [
+      {
+        "name": "projects/cloud-custodian/locations/us-central1/metadataStores/c7n-store/artifacts/unlabeled",
+        "displayName": "c7n-test-artifact-unlabeled",
+        "etag": "1787164436217",
+        "createTime": "2026-08-19T18:33:56.217Z",
+        "updateTime": "2026-08-19T18:33:56.217Z",
+        "schemaTitle": "system.Artifact",
+        "schemaVersion": "0.0.1",
+        "metadata": {}
+      },
+      {
+        "name": "projects/cloud-custodian/locations/us-central1/metadataStores/c7n-store/artifacts/labeled",
+        "displayName": "c7n-test-artifact-labeled",
+        "etag": "1787164435513",
+        "labels": {
+          "owner": "c7n"
+        },
+        "createTime": "2026-08-19T18:33:55.513Z",
+        "updateTime": "2026-08-19T18:33:55.513Z",
+        "schemaTitle": "system.Artifact",
+        "schemaVersion": "0.0.1",
+        "metadata": {}
+      }
+    ]
+  }
+}

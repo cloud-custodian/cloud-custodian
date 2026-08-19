@@ -787,6 +787,84 @@ class VertexAIModel(VertexAIQueryManager):
         urn_component = 'model'
 
 
+@resources.register('vertex-ai-metadata-store-artifact')
+class VertexAIMetadataStoreArtifact(VertexAIQueryManager):
+    """GCP Vertex AI Metadata Store Artifact Resource
+
+    Vertex AI Metadata Store Artifacts represent inputs and outputs (e.g.
+    datasets, models) tracked for ML lineage, cost attribution, and
+    governance.
+
+    :example:
+
+    Find artifacts missing an owner label:
+
+    .. code-block:: yaml
+
+        policies:
+          - name: vertex-ai-artifacts-missing-owner-label
+            resource: gcp.vertex-ai-metadata-store-artifact
+            filters:
+              - type: value
+                key: labels.owner
+                value: absent
+    """
+
+    class resource_type(VertexAITypeInfo):
+        component = 'projects.locations.metadataStores.artifacts'
+        enum_spec = ('list', 'artifacts[]', None)
+        default_report_fields = ['name', 'displayName', 'createTime', 'updateTime']
+        permissions = (
+            'aiplatform.artifacts.list',
+            'aiplatform.metadataStores.list',
+            )
+        urn_component = 'metadata-store-artifact'
+
+    def _fetch_resources(self, query):
+        """Enumerate artifacts across every location and metadata store.
+
+        Artifacts are children of metadata stores, which are themselves
+        scoped to a location, so this adds a metadata-store enumeration
+        step in between the location loop and the artifact listing that
+        VertexAIQueryManager._fetch_resources otherwise does directly.
+        """
+        session = local_session(self.session_factory)
+        project = session.get_default_project()
+
+        location_query = self._get_location_query()
+        location_manager = self.get_resource_manager(
+            resource_type='vertex-ai-location',
+            data=({'query': location_query} if location_query else {})
+        )
+
+        all_resources = []
+        location_annotation_key = 'c7n:location'
+
+        for location_instance in location_manager.resources():
+            location = location_instance['name']
+            store_client = self.get_location_client(
+                session, location, 'projects.locations.metadataStores')
+            artifact_client = self.get_location_client(
+                session, location, self.resource_type.component)
+
+            parent = f'projects/{project}/locations/{location}'
+            for store_page in store_client.execute_paged_query('list', {'parent': parent}):
+                for store in jmespath_search('metadataStores[]', store_page) or []:
+                    artifacts = []
+                    for artifact_page in artifact_client.execute_paged_query(
+                            'list', {'parent': store['name']}):
+                        page_items = jmespath_search('artifacts[]', artifact_page)
+                        if page_items:
+                            artifacts.extend(page_items)
+
+                    for artifact in artifacts:
+                        artifact[location_annotation_key] = location_instance
+
+                    all_resources.extend(artifacts)
+
+        return all_resources
+
+
 @resources.register('vertex-ai-batch-prediction-job')
 class VertexAIBatchPredictionJob(VertexAIQueryManager):
     """GCP Vertex AI Batch Prediction Job Resource

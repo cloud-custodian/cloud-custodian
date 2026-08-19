@@ -151,6 +151,53 @@ class VertexAIModels:
                 pass
 
 
+class VertexAIMetadataStoreArtifacts:
+    """Helper for creating/cleaning up ephemeral Metadata Store artifacts.
+
+    The Metadata Store itself is created via Terraform (no Terraform
+    resource exists for artifacts), so artifacts are created directly
+    through the API, mirroring VertexAIModels above.
+    """
+
+    def __init__(self, test, location='us-central1'):
+        self.test = test
+        self.location = location
+        self.created = []
+
+    def _client(self):
+        session = self.test.session_factory()
+        return session.client(
+            'aiplatform', 'v1', 'projects.locations.metadataStores.artifacts',
+            client_options=ClientOptions(
+                api_endpoint=f'https://{self.location}-aiplatform.googleapis.com'))
+
+    def create(self, store_name, artifact_id, display_name, labels=None):
+        """Create an artifact under store_name.
+
+        artifact_id is explicit rather than a service-generated UUID so
+        recorded flight-data filenames stay well under Windows' MAX_PATH.
+        """
+        client = self._client()
+        artifact = client.execute_command(
+            'create',
+            {'parent': store_name,
+             'artifactId': artifact_id,
+             'body': {
+                 'displayName': display_name,
+                 'schemaTitle': 'system.Artifact',
+                 'labels': labels or {},
+                 }})
+        self.created.append((client, artifact['name']))
+        return artifact
+
+    def cleanup(self):
+        for client, name in self.created:
+            try:
+                client.execute_command('delete', {'name': name})
+            except HttpError:
+                pass
+
+
 def get_test_model_id(project_id, location):
     """Get full model resource name for testing.
 
@@ -1996,3 +2043,69 @@ def test_vertexai_hp_tuning_job_field_filters(
     resources = policy.run()
     assert len(resources) == 1
     assert resources[0]['name'] == job_name
+
+
+def test_vertexai_metadata_store_artifact_resource_registered(test):
+    """Test that gcp.vertex-ai-metadata-store-artifact resolves as a resource type."""
+    policy = test.load_policy(
+        {'name': 'vertexai-metadata-store-artifact-check',
+         'resource': 'gcp.vertex-ai-metadata-store-artifact'})
+    assert policy.resource_manager.resource_type.component == (
+        'projects.locations.metadataStores.artifacts')
+
+
+@terraform('vertexai_metadata_store', scope='module')
+def test_vertexai_metadata_store_artifact_filtering(test, vertexai_metadata_store):
+    """Test filtering Metadata Store Artifacts on a missing label.
+
+    Creates one labeled and one unlabeled artifact in the same metadata
+    store to prove the filter discriminates rather than returning everything.
+
+    Both artifacts go in the Terraform-provisioned store; the project's
+    "default" store is not used because it is created lazily by the first
+    metadata-writing job rather than existing up front.
+    """
+    test.session_factory = test.replay_flight_data('va_artifact')
+
+    project = test.session_factory().get_default_project()
+    store_id = vertexai_metadata_store['google_vertex_ai_metadata_store.central.name']
+    store_name = (
+        f'projects/{project}/locations/us-central1/metadataStores/{store_id}')
+
+    artifacts = VertexAIMetadataStoreArtifacts(test)
+    test.addCleanup(artifacts.cleanup)
+    if test.recording:
+        artifacts.create(
+            store_name, 'labeled', 'c7n-test-artifact-labeled', {'owner': 'c7n'})
+        artifacts.create(store_name, 'unlabeled', 'c7n-test-artifact-unlabeled')
+
+    policy = test.load_policy(
+        {'name': 'vertex-ai-artifacts-missing-owner-label',
+         'resource': 'gcp.vertex-ai-metadata-store-artifact',
+         'query': [{'location': 'us-central1'}],
+         'filters': [
+             {'type': 'value', 'key': 'displayName', 'op': 'glob', 'value': 'c7n-test-artifact-*'}
+         ]},
+        session_factory=test.session_factory)
+
+    resources = policy.run()
+    assert len(resources) == 2
+
+    unlabeled = [r for r in resources if 'owner' not in r.get('labels', {})]
+    labeled = [r for r in resources if r.get('labels', {}).get('owner') == 'c7n']
+    assert len(labeled) == 1
+    assert len(unlabeled) == 1
+
+    policy = test.load_policy(
+        {'name': 'vertex-ai-artifacts-missing-owner-label',
+         'resource': 'gcp.vertex-ai-metadata-store-artifact',
+         'query': [{'location': 'us-central1'}],
+         'filters': [
+             {'type': 'value', 'key': 'displayName', 'op': 'glob', 'value': 'c7n-test-artifact-*'},
+             {'type': 'value', 'key': 'labels.owner', 'value': 'absent'}
+         ]},
+        session_factory=test.session_factory)
+
+    resources = policy.run()
+    assert len(resources) == 1
+    assert resources[0]['displayName'] == 'c7n-test-artifact-unlabeled'
