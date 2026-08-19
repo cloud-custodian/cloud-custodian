@@ -1,6 +1,8 @@
 # Copyright The Cloud Custodian Authors.
 # SPDX-License-Identifier: Apache-2.0
 
+import re
+
 from c7n_gcp.filters import IamPolicyFilter
 from c7n_gcp.filters.iampolicy import IamPolicyValueFilter
 from c7n_gcp.query import ChildResourceManager, ChildTypeInfo
@@ -9,6 +11,12 @@ from c7n_gcp.provider import resources
 
 @resources.register('dataproc-clusters')
 class DataprocClusters(ChildResourceManager):
+
+    def get_resource(self, resource_info):
+        cluster = self.resource_type.get(self.get_client(), resource_info)
+        cluster[self.resource_type.get_parent_annotation_key()] = {
+            'name': self.resource_type._get_location(cluster)}
+        return cluster
 
     class resource_type(ChildTypeInfo):
         service = 'dataproc'
@@ -27,6 +35,18 @@ class DataprocClusters(ChildResourceManager):
         asset_type = "dataproc.googleapis.com/Dataproc"
         urn_component = "dataproc"
         urn_id_segments = (-1,)
+
+        @staticmethod
+        def get(client, resource_info):
+            project, region, cluster = re.search(
+                r'projects/(.*?)/regions/(.*?)/clusters/([^/]+)',
+                resource_info['resourceName'],
+            ).groups()
+            return client.execute_query('get', {
+                'projectId': project,
+                'region': region,
+                'clusterName': cluster,
+            })
 
         @classmethod
         def _get_location(cls, resource):

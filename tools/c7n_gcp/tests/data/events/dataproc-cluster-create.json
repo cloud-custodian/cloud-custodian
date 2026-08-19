@@ -1,0 +1,16 @@
+{
+  "protoPayload": {
+    "@type": "type.googleapis.com/google.cloud.audit.AuditLog",
+    "serviceName": "dataproc.googleapis.com",
+    "methodName": "google.cloud.dataproc.v1.ClusterController.CreateCluster",
+    "resourceName": "projects/cloud-custodian/regions/us-central1/clusters/cluster-test"
+  },
+  "resource": {
+    "type": "cloud_dataproc_cluster",
+    "labels": {
+      "project_id": "cloud-custodian",
+      "region": "us-central1",
+      "cluster_name": "cluster-test"
+    }
+  }
+}
