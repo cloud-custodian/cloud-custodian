@@ -341,11 +341,11 @@ def config_regions(config):
     """Resolve cli/programmatic region selection to explicit region names.
 
     - config.regions is the cli's raw, repeatable '-r/--region' list.
-      
+
       'all' anywhere in it means every region, overriding any other
       entries in the list.  For backward compatibility, however, if
       'all' is present and config.region is set, then config.region is
-      used.      
+      used.
 
     - config.region is a single-region value set by some callers
       (tests, embedders).  Normally an empty string in production.
