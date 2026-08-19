@@ -2092,8 +2092,9 @@ class UserPolicy(ValueFilter):
         matched = []
         for r in resources:
             for p in r['c7n:Policies']:
-                if self.match(p) and r not in matched:
+                if self.match(p):
                     matched.append(r)
+                    break
         return matched
 
 
