@@ -171,11 +171,17 @@ class VertexAIMetadataStoreArtifacts:
             client_options=ClientOptions(
                 api_endpoint=f'https://{self.location}-aiplatform.googleapis.com'))
 
-    def create(self, store_name, display_name, labels=None):
+    def create(self, store_name, artifact_id, display_name, labels=None):
+        """Create an artifact under store_name.
+
+        artifact_id is explicit rather than a service-generated UUID so
+        recorded flight-data filenames stay well under Windows' MAX_PATH.
+        """
         client = self._client()
         artifact = client.execute_command(
             'create',
             {'parent': store_name,
+             'artifactId': artifact_id,
              'body': {
                  'displayName': display_name,
                  'schemaTitle': 'system.Artifact',
@@ -2055,22 +2061,23 @@ def test_vertexai_metadata_store_artifact_filtering(test, vertexai_metadata_stor
     Creates one labeled and one unlabeled artifact in the same metadata
     store to prove the filter discriminates rather than returning everything.
 
-    Uses the project's always-present "default" metadata store rather than
-    the Terraform-provisioned one (kept empty here) to keep recorded
-    flight-data filenames well under Windows' MAX_PATH; the Terraform store
-    still exercises multi-store enumeration since it's listed alongside
-    "default".
+    Both artifacts go in the Terraform-provisioned store; the project's
+    "default" store is not used because it is created lazily by the first
+    metadata-writing job rather than existing up front.
     """
     test.session_factory = test.replay_flight_data('va_artifact')
 
     project = test.session_factory().get_default_project()
-    store_name = f'projects/{project}/locations/us-central1/metadataStores/default'
+    store_id = vertexai_metadata_store['google_vertex_ai_metadata_store.central.name']
+    store_name = (
+        f'projects/{project}/locations/us-central1/metadataStores/{store_id}')
 
     artifacts = VertexAIMetadataStoreArtifacts(test)
     test.addCleanup(artifacts.cleanup)
     if test.recording:
-        artifacts.create(store_name, 'c7n-test-artifact-labeled', {'owner': 'c7n'})
-        artifacts.create(store_name, 'c7n-test-artifact-unlabeled')
+        artifacts.create(
+            store_name, 'labeled', 'c7n-test-artifact-labeled', {'owner': 'c7n'})
+        artifacts.create(store_name, 'unlabeled', 'c7n-test-artifact-unlabeled')
 
     policy = test.load_policy(
         {'name': 'vertex-ai-artifacts-missing-owner-label',
