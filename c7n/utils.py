@@ -1050,9 +1050,9 @@ def select_keys(d, keys):
 def get_human_size(size, precision=2):
     # interesting discussion on 1024 vs 1000 as base
     # https://en.wikipedia.org/wiki/Binary_prefix
-    suffixes = ['B', 'KB', 'MB', 'GB', 'TB', 'PB']
+    suffixes = ['B', 'KB', 'MB', 'GB', 'TB', 'PB', 'EB', 'ZB', 'YB']
     suffixIndex = 0
-    while size > 1024:
+    while size >= 1024 and suffixIndex < len(suffixes) - 1:
         suffixIndex += 1
         size = size / 1024.0
 
