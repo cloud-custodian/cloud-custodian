@@ -814,7 +814,10 @@ class VertexAIMetadataStoreArtifact(VertexAIQueryManager):
         component = 'projects.locations.metadataStores.artifacts'
         enum_spec = ('list', 'artifacts[]', None)
         default_report_fields = ['name', 'displayName', 'createTime', 'updateTime']
-        permissions = ('aiplatform.artifacts.list',)
+        permissions = (
+            'aiplatform.artifacts.list',
+            'aiplatform.metadataStores.list',
+            )
         urn_component = 'metadata-store-artifact'
 
     def _fetch_resources(self, query):
