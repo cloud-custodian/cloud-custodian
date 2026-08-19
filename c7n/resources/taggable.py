@@ -13,19 +13,30 @@ from c7n import query
 from c7n.utils import local_session
 
 
+def _make_schema_item(props):
+    return {"type": "object", "additionalProperties": False, "properties": props}
+
+
 class DescribeTaggable(query.DescribeSource):
 
     schema = {
-        "non_compliant": {"type": "boolean"},
-        "non_tagged": {"type": "boolean"},
-        "resource_types": {"type": "array", "items": {"type": "string"}},
-        "with_tags": {
-            "type": "array", "items": {
-                "type": "object",
-                "properties": {'Key': {'type': 'string'},
-                               'Values': {'type': 'array', 'items': {"type": "string"}}}
-            }
-        },
+        "type": "array",
+        "items": {
+            "oneOf": [
+                _make_schema_item({"non_compliant": {"type": "boolean"}}),
+                _make_schema_item({"non_tagged": {"type": "boolean"}}),
+                _make_schema_item(
+                    {"resource_types": {"type": "array", "items": {"type": "string"}}}),
+                _make_schema_item({
+                    "with_tags": {
+                        "type": "array", "items": _make_schema_item(
+                            {'Key': {'type': 'string'},
+                             'Values': {'type': 'array', 'items': {"type": "string"}}}
+                        )
+                    }
+                })
+            ]
+        }
     }
 
     def get_params_tagging(self, query):
@@ -199,6 +210,10 @@ class Taggable(query.QueryResourceManager):
         return ("tag:GetResources", "resource-explorer-2:Search",)
 
     def validate(self):
+        if 'query' not in self.data:
+            raise PolicyValidationError(
+                "taggable resource requires the use of a `query` block, see docs"
+            )
         validator = JsonSchemaValidator(DescribeTaggable.schema)
         errors = list(validator.iter_errors(self.data['query']))
         if errors:

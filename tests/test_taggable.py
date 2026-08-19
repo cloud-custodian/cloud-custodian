@@ -2,8 +2,26 @@
 # SPDX-License-Identifier: Apache-2.0
 
 import itertools
+import pytest
+
+from c7n.exceptions import PolicyValidationError
 
 from .zpill import ACCOUNT_ID
+
+
+def test_taggable_query_schema_error(test):
+    with pytest.raises(PolicyValidationError) as excinfo:
+        test.load_policy({"name": "xyz", "resource": "aws.taggable"})
+
+    assert "requires the use of a `query`" in str(excinfo.value)
+
+    with pytest.raises(PolicyValidationError) as excinfo:
+        test.load_policy({
+            "name": "xyz", "resource": "aws.taggable",
+            "query": [{"non_compliant": 123}]
+        })
+
+    assert "not valid under any of the given schemas" in str(excinfo.value)
 
 
 def test_taggable_noncompliant(test):
