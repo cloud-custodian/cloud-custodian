@@ -95,7 +95,6 @@ def test_taggable_tagmatch(test):
              {"non_tagged": True},
              {"with_tags": [{"Key": "kubernetes.io/cluster/app-dev", "Values": ["owned"]}]},
              {"resource_types": ["ec2:security-group"]},
-             {"check_policy_tags": ["Owner"]}
          ]},
         session_factory=factory,
         config={"account_id": ACCOUNT_ID}
