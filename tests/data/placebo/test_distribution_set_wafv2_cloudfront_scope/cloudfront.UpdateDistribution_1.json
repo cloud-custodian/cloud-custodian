@@ -1,0 +1,21 @@
+{
+    "status_code": 200,
+    "data": {
+        "ResponseMetadata": {},
+        "Distribution": {
+            "Id": "EDIST1",
+            "ARN": "arn:aws:cloudfront::123456789012:distribution/EDIST1",
+            "Status": "Deployed",
+            "DomainName": "d111111abcdef8.cloudfront.net",
+            "DistributionConfig": {
+                "CallerReference": "ref-1",
+                "Origins": {"Quantity": 1, "Items": [{"Id": "S3", "DomainName": "bucket.s3.amazonaws.com"}]},
+                "DefaultCacheBehavior": {"ViewerProtocolPolicy": "https-only", "TargetOriginId": "S3"},
+                "Comment": "",
+                "Enabled": true,
+                "WebACLId": "arn:aws:wafv2:us-east-1:123456789012:global/webacl/BR_IPs_OWASP_Block/cf-webacl-id-1234"
+            }
+        },
+        "ETag": "E2QWRUHAPOMQZN"
+    }
+}
