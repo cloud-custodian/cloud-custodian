@@ -178,7 +178,7 @@ class Taggable(query.QueryResourceManager):
     efficient query of non compliant and non tagged resources, while also
     providing for bulk tagging operations on those resources.
 
-    This primarily relies server side queries against these two
+    This primarily relies on server side queries against these two
     services to effect functionality, as such the functionality is
     mostly exposed via the policy `query` block which is
     required. Additionally there are pre-requisites on the account
