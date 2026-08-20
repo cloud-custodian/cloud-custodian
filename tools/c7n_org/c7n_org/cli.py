@@ -34,7 +34,13 @@ from c7n.config import Config, Bag
 from c7n.loader import SourceLocator
 from c7n.policy import PolicyCollection, Policy, PolicyValidationError
 from c7n.provider import get_resource_class, clouds as cloud_providers
-from c7n.reports.csvout import Formatter, fs_record_set, record_set, strip_output_path
+from c7n.reports.csvout import (
+    Formatter,
+    fs_record_set,
+    record_set,
+    sanitize_csv_rows,
+    strip_output_path,
+)
 from c7n.resources import load_available, load_resources
 from c7n.schema import StructureParser
 from c7n.utils import (
@@ -461,7 +467,7 @@ def report(config, output, use, output_dir, accounts,
     rows = formatter.to_csv(records, unique=False)
     writer = csv.writer(output, formatter.headers(), quoting=csv.QUOTE_ALL)
     writer.writerow(formatter.headers())
-    writer.writerows(rows)
+    writer.writerows(sanitize_csv_rows(rows))
 
 
 def validate_basic(custodian_config, policy_file, fmt, check_mode, verbose):
