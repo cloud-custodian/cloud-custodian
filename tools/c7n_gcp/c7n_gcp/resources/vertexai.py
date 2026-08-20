@@ -744,6 +744,49 @@ class VertexAIDataset(VertexAIQueryManager):
         urn_component = 'dataset'
 
 
+@resources.register('vertex-ai-model')
+class VertexAIModel(VertexAIQueryManager):
+    """GCP Vertex AI Model Registry Resource
+
+    Vertex AI Model Registry models are ML models uploaded to Vertex AI
+    for deployment, versioning, and lifecycle management.
+
+    :example:
+
+    List all Vertex AI Models across all locations:
+
+    .. code-block:: yaml
+
+        policies:
+          - name: vertexai-models-inventory
+            resource: gcp.vertex-ai-model
+
+    :example:
+
+    Find models missing an owner label:
+
+    .. code-block:: yaml
+
+        policies:
+          - name: vertex-ai-models-missing-owner-label
+            resource: gcp.vertex-ai-model
+            filters:
+              - type: value
+                key: labels.owner
+                value: absent
+    """
+
+    class resource_type(VertexAITypeInfo):
+        component = 'projects.locations.models'
+        enum_spec = ('list', 'models[]', None)
+        default_report_fields = [
+            'name', 'displayName', 'trainingPipeline', 'createTime', 'updateTime'
+        ]
+        asset_type = 'aiplatform.googleapis.com/Model'
+        permissions = ('aiplatform.models.list',)
+        urn_component = 'model'
+
+
 @resources.register('vertex-ai-batch-prediction-job')
 class VertexAIBatchPredictionJob(VertexAIQueryManager):
     """GCP Vertex AI Batch Prediction Job Resource
