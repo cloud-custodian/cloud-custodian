@@ -7,6 +7,7 @@ import hashlib
 import json
 import logging
 import os
+import re
 import shutil
 import time
 import typing
@@ -36,9 +37,22 @@ EVENT_DIR = os.path.join(os.path.dirname(__file__), 'data', 'events')
 
 log = logging.getLogger('custodian.tests.gcp')
 
+EMAIL_RE = re.compile(r'[\w.+%-]+@[\w.-]+\.\w+')
+PLACEHOLDER_EMAIL = 'user@example.com'
+# RFC 5737 TEST-NET-2, reserved for documentation.
+PLACEHOLDER_IP = '198.51.100.1'
+
 
 def event_data(fname):
+    """Load a recorded audit LogEntry fixture.
+
+    Fixtures name the placeholder project (see ``AuditEventRecorder``).
+    When recording, put the live project back so the policy resolves its
+    resource against an account that actually has one.
+    """
     with open(os.path.join(EVENT_DIR, fname)) as fh:
+        if C7N_FUNCTIONAL:
+            return json.loads(fh.read().replace(PROJECT_ID, get_default_project()))
         return json.load(fh)
 
 
@@ -99,6 +113,7 @@ class AuditEventRecorder:
         )
 
     def record(self) -> None:
+        self.project_id = self.session_factory().get_default_project()
         deadline = time.time() + self.timeout
         operations: dict = {}
         seen_hashes: set = set()
@@ -144,7 +159,8 @@ class AuditEventRecorder:
         and whether its ``last`` entry has been seen.
         """
         for entry in entries:
-            payload = json.dumps(entry, indent=2, sort_keys=True) + '\n'
+            payload = json.dumps(
+                self._sanitize(entry), indent=2, sort_keys=True) + '\n'
             operation = entry.get('operation') or {}
             operation_id = operation.get('id')
             if not operation_id:
@@ -168,20 +184,40 @@ class AuditEventRecorder:
             parts.append('last')
         return '-'.join(parts) + ext
 
+    def _sanitize(self, value, key: str = ''):
+        """Replace the recording account's project id, emails and caller ip.
+
+        The project id has to go because flight data is recorded against
+        the placeholder project (see ``recorder.py``), so an event naming
+        the real one would resolve its resource against a project that has
+        no recorded responses. Emails and the caller ip are the recording
+        developer's, and fixtures are committed.
+        """
+        if isinstance(value, dict):
+            return {k: self._sanitize(v, k) for k, v in value.items()}
+        if isinstance(value, list):
+            return [self._sanitize(v, key) for v in value]
+        if not isinstance(value, str):
+            return value
+        if key == 'callerIp':
+            return PLACEHOLDER_IP
+        return EMAIL_RE.sub(
+            PLACEHOLDER_EMAIL, value.replace(self.project_id, PROJECT_ID))
+
     def _get_entries(self) -> list[dict]:
         session = self.session_factory()
         client = session.client('logging', 'v2', 'entries')
         entries = []
         for page in client.execute_paged_query(
-                'list', {'body': self._query_body(session)}):
+                'list', {'body': self._query_body()}):
             entries.extend(page.get('entries', []))
         return sorted(
             entries,
             key=lambda e: (e.get('timestamp', ''), e.get('insertId', '')),
         )
 
-    def _query_body(self, session) -> dict:
-        project_id = session.get_default_project()
+    def _query_body(self) -> dict:
+        project_id = self.project_id
         log_name = 'projects/{}/logs/cloudaudit.googleapis.com%2Factivity'.format(
             project_id)
         filters = [

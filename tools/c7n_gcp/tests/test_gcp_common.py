@@ -269,3 +269,58 @@ def test_record_raises_naming_the_incomplete_operation(tmp_path, monkeypatch):
         assert 'op-0' in str(e)
     else:
         raise AssertionError('expected record() to raise')
+
+
+def test_sanitizes_project_email_and_caller_ip(tmp_path, monkeypatch):
+    entry = {
+        'insertId': 'a',
+        'timestamp': '2025-01-01T00:00:00Z',
+        'logName': 'projects/test-project/logs/cloudaudit.googleapis.com%2Factivity',
+        'resource': {'labels': {'project_id': 'test-project'}},
+        'protoPayload': {
+            'authenticationInfo': {
+                'principalEmail': 'dev@example.org',
+                'principalSubject': 'user:dev@example.org',
+                },
+            'requestMetadata': {'callerIp': '71.33.198.228'},
+            'resourceName': 'projects/test-project/zones/us-central1-a/disks/d',
+            'response': {'user': 'dev@example.org'},
+            },
+        }
+    recorder, client = make_recorder(tmp_path, monkeypatch, [[entry]])
+
+    recorder.record()
+
+    written = read(tmp_path, 'foo.json')
+    payload = written['protoPayload']
+    assert written['resource']['labels']['project_id'] == 'cloud-custodian'
+    assert written['logName'].startswith('projects/cloud-custodian/logs/')
+    assert payload['resourceName'] == (
+        'projects/cloud-custodian/zones/us-central1-a/disks/d')
+    assert payload['authenticationInfo'] == {
+        'principalEmail': 'user@example.com',
+        'principalSubject': 'user:user@example.com',
+        }
+    assert payload['response']['user'] == 'user@example.com'
+    assert payload['requestMetadata']['callerIp'] == '198.51.100.1'
+
+
+def test_sanitize_leaves_other_projects_and_non_strings(tmp_path, monkeypatch):
+    entry = {
+        'insertId': 'a',
+        'timestamp': '2025-01-01T00:00:00Z',
+        'protoPayload': {
+            'request': {
+                'sizeGb': 10,
+                'sourceImage': 'projects/debian-cloud/global/images/family/debian-12',
+                },
+            },
+        }
+    recorder, client = make_recorder(tmp_path, monkeypatch, [[entry]])
+
+    recorder.record()
+
+    request = read(tmp_path, 'foo.json')['protoPayload']['request']
+    assert request['sourceImage'] == (
+        'projects/debian-cloud/global/images/family/debian-12')
+    assert request['sizeGb'] == 10

@@ -116,6 +116,22 @@ warning is logged. These extra files are left in place rather than
 cleaned up automatically, so they show up in the diff for the developer
 to sort out (rename, merge, or delete as appropriate).
 
+Sanitization
+-------------
+
+Recorded entries are rewritten before being written to disk:
+
+- the recording account's project id becomes ``cloud-custodian``, the same
+  placeholder ``recorder.py`` uses for flight data -- an event naming the
+  real project would resolve its resource against a project that has no
+  recorded responses
+- any email address becomes ``user@example.com``
+- ``protoPayload.requestMetadata.callerIp`` becomes ``198.51.100.1``
+
+Other projects an entry refers to (a public image project, say) are left
+alone, as is the ``oauthClientId``, which identifies the client
+application rather than the caller.
+
 Events and operations may have multiple log entries
 -------------------------------------------------------
 
