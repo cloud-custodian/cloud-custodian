@@ -45,7 +45,6 @@ class TableBucket(QueryResourceManager):
         name = 'name'
         date = 'createdAt'
         cfn_type = 'AWS::S3Tables::TableBucket'
-        permission_prefix = 's3tables'
         permissions_augment = ('s3tables:ListTagsForResource',)
 
     source_mapping = {'describe': DescribeTableBucket}
@@ -72,7 +71,6 @@ class Table(ChildResourceManager):
         name = 'name'
         date = 'createdAt'
         cfn_type = 'AWS::S3Tables::Table'
-        permission_prefix = 's3tables'
         permissions_augment = ('s3tables:ListTagsForResource',)
 
     source_mapping = {'describe-child': DescribeTable}
