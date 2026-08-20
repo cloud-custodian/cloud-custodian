@@ -183,7 +183,7 @@ class Taggable(query.QueryResourceManager):
     mostly exposed via the policy `query` block which is
     required. Additionally there are pre-requisites on the account
     enablement of those two services, service linked role for
-    resource-explorer, and default view, and an organizations tag
+    resource-explorer, and default view. For resource group tagging an organizations tag
     policy for non_compliant resource querying active on
     account. note, the tag policy only needs to be in reporting mode.
 
