@@ -20,7 +20,7 @@ class Directory(QueryResourceManager):
         filter_name = 'DirectoryIds'
         filter_type = 'list'
         arn_type = "directory"
-        permission_augment = ('ds:ListTagsForResource',)
+        permissions_augment = ('ds:ListTagsForResource',)
 
     def augment(self, directories):
         client = local_session(self.session_factory).client('ds')

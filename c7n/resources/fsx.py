@@ -126,7 +126,6 @@ class FSxStorageVirtualMachine(QueryResourceManager):
         filter_type = 'list'
         id_prefix = 'svm-'
         universal_taggable = object()
-        permissions_augment = ('fsx:ListTagsForResource',)
         default_report_fields = (
             'StorageVirtualMachineId',
             'Name',
@@ -154,6 +153,9 @@ class SvmActiveDirectoryFilter(ValueFilter):
 
     Replication targets carry no join of their own and svms still settling
     haven't got one yet, so neither is reported on.
+
+    The annotated directory is fetched without its tags, so filter it on the
+    directory's own attributes rather than on `tag:` keys.
 
     :example:
 
@@ -230,7 +232,7 @@ class SvmActiveDirectoryFilter(ValueFilter):
         dns_ips = set(ad.get('DnsIps') or ())
         domain = (ad.get('DomainName') or '').lower().rstrip('.')
 
-        name_only = None
+        name_matches = []
         for d in directories:
             owner = d.get('OwnerDirectoryDescription') or {}
             # a directory shared from another account reports the owning
@@ -241,23 +243,24 @@ class SvmActiveDirectoryFilter(ValueFilter):
             if ip_match:
                 return d, {'reason': 'Resolved',
                            'matched-on': name_match and 'dns-ips,domain-name' or 'dns-ips'}
-            if name_match and name_only is None:
-                # several directories can carry the same domain name, keep the
-                # first so the annotation is stable between runs
-                name_only = d
+            if name_match:
+                name_matches.append(d)
 
-        if name_only is not None:
+        if name_matches:
             resolve_on = self.data.get('resolve-on', 'dns-ips')
             if resolve_on == 'domain-name':
-                return name_only, {'reason': 'Resolved', 'matched-on': 'domain-name'}
+                return name_matches[0], {'reason': 'Resolved', 'matched-on': 'domain-name'}
             if resolve_on == 'same-vpc':
                 fs_vpc = (file_system_vpcs or {}).get(svm.get('FileSystemId'))
-                directory_vpc = (name_only.get('VpcSettings') or {}).get('VpcId')
-                if fs_vpc and directory_vpc and fs_vpc == directory_vpc:
-                    return name_only, {'reason': 'Resolved',
-                                       'matched-on': 'domain-name,same-vpc'}
+                for d in name_matches:
+                    directory_vpc = (d.get('VpcSettings') or {}).get('VpcId')
+                    if fs_vpc and directory_vpc and fs_vpc == directory_vpc:
+                        return d, {'reason': 'Resolved',
+                                   'matched-on': 'domain-name,same-vpc'}
+            # several directories can carry the same domain name, report the
+            # first so the annotation is stable between runs
             return None, {'reason': 'DomainNameOnlyMatch', 'matched-on': 'domain-name',
-                          'DirectoryId': name_only.get('DirectoryId')}
+                          'DirectoryId': name_matches[0].get('DirectoryId')}
         return None, {'reason': 'UnresolvedDirectory',
                       'DomainName': ad.get('DomainName'), 'DnsIps': sorted(dns_ips)}
 
@@ -992,7 +995,13 @@ class FSxDirectoryFilter(RelatedResourceFilter):
             filters:
               - FileSystemType: WINDOWS
               - or:
-                  # no directory, or one that no longer exists
+                  # a self managed join reports no directory id at all, and
+                  # a related resource filter has no id to resolve, so ask for
+                  # the missing id directly
+                  - type: value
+                    key: WindowsConfiguration.ActiveDirectoryId
+                    value: absent
+                  # an id naming a directory that no longer exists
                   - type: directory
                     key: DirectoryId
                     value: absent
@@ -1009,7 +1018,6 @@ class FSxDirectoryFilter(RelatedResourceFilter):
         'directory', rinherit=ValueFilter.schema,
         **{'match-resource': {'type': 'boolean'},
            'operator': {'enum': ['and', 'or']}})
-    schema_alias = False
 
     RelatedResource = "c7n.resources.directory.Directory"
     RelatedIdsExpression = "WindowsConfiguration.ActiveDirectoryId"
