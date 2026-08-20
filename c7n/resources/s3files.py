@@ -44,7 +44,6 @@ class FileSystem(QueryResourceManager):
         name = 'name'
         date = 'creationTime'
         cfn_type = 'AWS::S3Files::FileSystem'
-        permission_prefix = 's3files'
 
     source_mapping = {'describe': DescribeFileSystem}
 
@@ -77,7 +76,6 @@ class MountTarget(ChildResourceManager):
         name = id = 'mountTargetId'
         arn = False
         cfn_type = 'AWS::S3Files::MountTarget'
-        permission_prefix = 's3files'
 
 
 @MountTarget.filter_registry.register('subnet')
@@ -127,7 +125,6 @@ class AccessPoint(ChildResourceManager):
         id = 'accessPointId'
         name = 'name'
         cfn_type = 'AWS::S3Files::AccessPoint'
-        permission_prefix = 's3files'
 
 
 class FileSystemPolicyMixin:
