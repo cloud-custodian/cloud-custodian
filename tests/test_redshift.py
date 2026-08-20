@@ -65,6 +65,33 @@ class TestRedshift(BaseTest):
         self.assertEqual(len(resources), 1)
         self.assertEqual(resources[0]["ClusterIdentifier"], "dev-test")
 
+    def test_redshift_network_location(self):
+        # network-location calls get_related() on the subnet filter directly,
+        # bypassing the process() method that used to fetch the cluster
+        # subnet groups.
+        factory = self.replay_flight_data("test_redshift_network_location")
+        p = self.load_policy(
+            {
+                "name": "redshift-network-location",
+                "resource": "redshift",
+                "filters": [
+                    {
+                        "type": "network-location",
+                        "key": "tag:AppId",
+                        "compare": ["resource", "security-group"],
+                    }
+                ],
+            },
+            session_factory=factory,
+        )
+        resources = p.run()
+        self.assertEqual(
+            [r["ClusterIdentifier"] for r in resources], ["c7n-nl-rs"])
+        self.assertIn(
+            "SecurityGroupMismatch",
+            [e["reason"] for e in resources[0]["c7n:NetworkLocation"]],
+        )
+
     def test_redshift_subnet_filter(self):
         factory = self.replay_flight_data("test_redshift_subnet_filter")
         p = self.load_policy(
