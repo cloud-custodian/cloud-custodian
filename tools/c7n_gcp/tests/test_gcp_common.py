@@ -8,16 +8,19 @@ from gcp_common import audit_event_recorder
 
 
 class FakeLoggingClient:
-    """Returns one queued batch of entries per execute_query call."""
+    """Yields one queued batch of entries, in pages, per query call."""
 
-    def __init__(self, batches):
+    def __init__(self, batches, page_size=None):
         self.batches = list(batches)
+        self.page_size = page_size
         self.calls = []
 
-    def execute_query(self, verb, arguments):
+    def execute_paged_query(self, verb, arguments):
         self.calls.append((verb, arguments))
         entries = self.batches.pop(0) if self.batches else []
-        return {'entries': entries}
+        size = self.page_size or len(entries) or 1
+        for start in range(0, len(entries), size):
+            yield {'entries': entries[start:start + size]}
 
 
 class FakeSession:
@@ -33,9 +36,11 @@ class FakeSession:
         return self.logging_client
 
 
-def make_recorder(tmp_path, monkeypatch, batches, event_file='foo.json', **kw):
+def make_recorder(
+        tmp_path, monkeypatch, batches, event_file='foo.json',
+        page_size=None, **kw):
     monkeypatch.setattr(gcp_common, 'EVENT_DIR', str(tmp_path))
-    client = FakeLoggingClient(batches)
+    client = FakeLoggingClient(batches, page_size)
     session = FakeSession(client)
     kw.setdefault('poll_interval', 0)
     recorder = audit_event_recorder(
@@ -163,17 +168,23 @@ def test_second_distinct_operation_gets_index_suffix(tmp_path, monkeypatch):
         'timestamp': '2025-01-01T00:00:01Z',
         'operation': {'id': 'op-1', 'first': True},
     }
-    op1_last = {
+    op0_last = {
         'insertId': 'c',
         'timestamp': '2025-01-01T00:00:02Z',
+        'operation': {'id': 'op-0', 'last': True},
+    }
+    op1_last = {
+        'insertId': 'd',
+        'timestamp': '2025-01-01T00:00:03Z',
         'operation': {'id': 'op-1', 'last': True},
     }
     recorder, client = make_recorder(
-        tmp_path, monkeypatch, [[op0_first, op1_first, op1_last]])
+        tmp_path, monkeypatch, [[op0_first, op1_first, op0_last, op1_last]])
 
     recorder.record()
 
     assert read(tmp_path, 'foo-first.json') == op0_first
+    assert read(tmp_path, 'foo-last.json') == op0_last
     assert read(tmp_path, 'foo-1-first.json') == op1_first
     assert read(tmp_path, 'foo-1-last.json') == op1_last
 
@@ -187,3 +198,74 @@ def test_collision_appends_index_after_extension(tmp_path, monkeypatch):
 
     assert read(tmp_path, 'foo.json') == {'pre-existing': True}
     assert read(tmp_path, 'foo.json-1') == entry
+
+
+def test_other_operation_completing_first_does_not_stop_polling_early(
+        tmp_path, monkeypatch):
+    # A query filter without a narrow resource_name can match entries from
+    # more than one operation. Polling must not stop as soon as ANY tracked
+    # operation reaches its 'last' entry, or another operation matched by
+    # the same filter is silently left incomplete.
+    op0_first = {
+        'insertId': 'a',
+        'timestamp': '2025-01-01T00:00:00Z',
+        'operation': {'id': 'op-0', 'first': True},
+    }
+    op1_first = {
+        'insertId': 'b',
+        'timestamp': '2025-01-01T00:00:01Z',
+        'operation': {'id': 'op-1', 'first': True},
+    }
+    op1_last = {
+        'insertId': 'c',
+        'timestamp': '2025-01-01T00:00:02Z',
+        'operation': {'id': 'op-1', 'last': True},
+    }
+    op0_last = {
+        'insertId': 'd',
+        'timestamp': '2025-01-01T00:00:03Z',
+        'operation': {'id': 'op-0', 'last': True},
+    }
+    # op-1 completes entirely within the first poll; op-0's 'last' entry
+    # only shows up on the second poll.
+    recorder, client = make_recorder(
+        tmp_path, monkeypatch,
+        [[op0_first, op1_first, op1_last], [op0_last]])
+
+    recorder.record()
+
+    assert read(tmp_path, 'foo-first.json') == op0_first
+    assert read(tmp_path, 'foo-last.json') == op0_last
+    assert len(client.calls) == 2
+
+
+def test_entries_are_collected_across_pages(tmp_path, monkeypatch):
+    # entries.list defaults to 50 results per page, so a poll can span pages.
+    entries = [
+        {'insertId': str(i), 'timestamp': '2025-01-01T00:00:0{}Z'.format(i)}
+        for i in range(3)
+    ]
+    recorder, client = make_recorder(
+        tmp_path, monkeypatch, [entries], page_size=1)
+
+    recorder.record()
+
+    assert sorted(p.name for p in tmp_path.iterdir()) == [
+        'foo.json', 'foo.json-1', 'foo.json-2']
+
+
+def test_record_raises_naming_the_incomplete_operation(tmp_path, monkeypatch):
+    first = {
+        'insertId': 'a',
+        'timestamp': '2025-01-01T00:00:00Z',
+        'operation': {'id': 'op-0', 'first': True},
+    }
+    recorder, client = make_recorder(
+        tmp_path, monkeypatch, [[first]], timeout=0)
+
+    try:
+        recorder.record()
+    except AssertionError as e:
+        assert 'op-0' in str(e)
+    else:
+        raise AssertionError('expected record() to raise')

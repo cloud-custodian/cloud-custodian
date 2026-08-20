@@ -76,16 +76,18 @@ Filtering options
 - ``timeout`` / ``poll_interval`` (default 120s/5s) -- how long, and how often, to poll
   before giving up.
 
-``record()`` polls until at least one matching entry appears (or the
+``record()`` polls until every matching operation is complete (or the
 timeout elapses), rather than issuing a single query -- Cloud Logging
 entries can take a few seconds to become queryable after the underlying
-API call completes.
+API call completes. On timeout it raises, naming any operation still
+missing its ``last`` entry; that usually means the filter is too loose and
+swept up an unrelated operation, so narrow ``resource_name`` or ``labels``.
 
 Files created
 --------------
 
 For a call with no `operation` field (see below), the matching entry is
-written under the requested name, e.g. ``foo.json``, and polling stops.
+written under the requested name, e.g. ``foo.json``.
 
 If an entry belongs to a Cloud Logging *operation* (see below), the
 filename reflects that:
@@ -96,7 +98,9 @@ filename reflects that:
   case doesn't get a numeric suffix at all
 - ``-first`` is appended when ``operation.first`` is set,
   ``-last`` when ``operation.last`` is set
-- polling stops once an entry with ``operation.last`` is seen
+- polling stops once *every* operation seen so far has produced its
+  ``last`` entry -- one operation completing doesn't cut short another
+  operation the same filter matched
 
 So the common case for an operation-tracked method produces exactly two
 files: ``foo-first.json`` and ``foo-last.json``. A second, distinct

@@ -100,14 +100,23 @@ class AuditEventRecorder:
 
     def record(self) -> None:
         deadline = time.time() + self.timeout
-        operation_index: dict = {}
+        operations: dict = {}
         seen_hashes: set = set()
         while True:
             entries = self._dedup_entries(seen_hashes, self._get_entries())
             if entries:
-                if self._write_batch(entries, operation_index):
+                self._write_batch(entries, operations)
+                if all(s['complete'] for s in operations.values()):
                     return
             if time.time() >= deadline:
+                incomplete = [
+                    op_id for op_id, state in operations.items()
+                    if not state['complete']
+                ]
+                if incomplete:
+                    raise AssertionError(
+                        'Timed out recording {}, waiting on operations: {}'
+                        .format(self.event_file, ', '.join(incomplete)))
                 raise AssertionError(
                     'No GCP audit log entries matched {}'.format(self.event_file))
             time.sleep(self.poll_interval)
@@ -128,25 +137,25 @@ class AuditEventRecorder:
             new_entries.append(entry)
         return new_entries
 
-    def _write_batch(self, entries: list[dict], operation_index: dict) -> bool:
-        """Write one poll batch. Returns True when polling should stop."""
-        stop = False
+    def _write_batch(self, entries: list[dict], operations: dict) -> None:
+        """Write one poll batch, updating per-operation state.
+
+        ``operations`` maps ``operation.id`` to its assigned file-name index
+        and whether its ``last`` entry has been seen.
+        """
         for entry in entries:
             payload = json.dumps(entry, indent=2, sort_keys=True) + '\n'
             operation = entry.get('operation') or {}
             operation_id = operation.get('id')
             if not operation_id:
                 self._write_entry(self.event_file, payload)
-                stop = True
                 continue
-            if operation_id not in operation_index:
-                operation_index[operation_id] = len(operation_index)
-            index = operation_index[operation_id]
+            state = operations.setdefault(
+                operation_id, {'index': len(operations), 'complete': False})
             self._write_entry(
-                self._operation_file_name(index, operation), payload)
+                self._operation_file_name(state['index'], operation), payload)
             if operation.get('last'):
-                stop = True
-        return stop
+                state['complete'] = True
 
     def _operation_file_name(self, index: int, operation: dict) -> str:
         base, ext = os.path.splitext(self.event_file)
@@ -162,9 +171,12 @@ class AuditEventRecorder:
     def _get_entries(self) -> list[dict]:
         session = self.session_factory()
         client = session.client('logging', 'v2', 'entries')
-        response = client.execute_query('list', {'body': self._query_body(session)})
+        entries = []
+        for page in client.execute_paged_query(
+                'list', {'body': self._query_body(session)}):
+            entries.extend(page.get('entries', []))
         return sorted(
-            response.get('entries', []),
+            entries,
             key=lambda e: (e.get('timestamp', ''), e.get('insertId', '')),
         )
 
