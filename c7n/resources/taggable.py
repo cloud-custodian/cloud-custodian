@@ -8,9 +8,11 @@ from functools import partial
 from botocore.exceptions import ClientError
 from jsonschema import Draft7Validator as JsonSchemaValidator
 
+from c7n.actions import Action
 from c7n.config import Bag
-from c7n.exceptions import PolicyValidationError
+from c7n.exceptions import PolicyValidationError, ResourceGroupTagError
 from c7n.manager import resources
+from c7n.resources.aws import Arn
 from c7n import query
 from c7n.utils import local_session
 
@@ -27,6 +29,7 @@ class DescribeTaggable(query.DescribeSource):
             "oneOf": [
                 _make_schema_item({"non_compliant": {"type": "boolean"}}),
                 _make_schema_item({"non_tagged": {"type": "boolean"}}),
+                _make_schema_item({"verbose_errors": {"type": "boolean"}}),
                 _make_schema_item(
                     {"resource_types": {"type": "array", "items": {"type": "string"}}}),
                 _make_schema_item(
@@ -92,7 +95,7 @@ class DescribeTaggable(query.DescribeSource):
 
         if not self.check_policy_key_matches(client, query):
             self.manager.log.critical(
-                "policy tags dont match organization tag policy in effect acocunt %s" % (
+                "policy tags dont match organization tag policy in effect account %s" % (
                     self.manager.config.account_id
                 )
             )
@@ -119,7 +122,7 @@ class DescribeTaggable(query.DescribeSource):
                      if r['ResourceARN'] not in ids]
                 )
         except ClientError as e:
-            # a default view without tags included in the index
+            # a default view without tags included in the index OR an account missing a default view
             if e.response.get('Error', {}).get('Code') == 'ValidationException':
                 self.manager.log.critical(
                     "resource explorer account:%s region:%s misconfigured default view" % (
@@ -170,18 +173,19 @@ class DescribeTaggable(query.DescribeSource):
 @resources.register("taggable")
 class Taggable(query.QueryResourceManager):
     """An abstract resource type that represents any taggable resource
-    in AWS. Utilizies server side querying wherever possible utilizing
+    in AWS. Utilizes server side querying wherever possible via
     resource group tagging and resource-explorer-2 apis to provide for
     efficient query of non compliant and non tagged resources, while also
     providing for bulk tagging operations on those resources.
 
-    This primarily utilizes server side queries against these two services
-    to effect functionality, as such the functionality is mostly exposed
-    via the policy `query` block. Additionally there are pre-requisites on
-    the account enablement of those two services, service linked role for
-    resource-explorer, and an organizations tag policy for non_compliant
-    resource querying active on account, note the tag policy only needs
-    to be in reporting mode.
+    This primarily relies server side queries against these two
+    services to effect functionality, as such the functionality is
+    mostly exposed via the policy `query` block which is
+    required. Additionally there are pre-requisites on the account
+    enablement of those two services, service linked role for
+    resource-explorer, and default view, and an organizations tag
+    policy for non_compliant resource querying active on
+    account. note, the tag policy only needs to be in reporting mode.
 
     .. code-block:: yaml
 
@@ -194,32 +198,38 @@ class Taggable(query.QueryResourceManager):
             - check_policy_tags: ["Owner"]
 
 
-    `non_compliant` utilizes the reporting of an applied organization tag
+    `non_compliant` (boolean) utilizes the reporting of an applied organization tag
     policy in affect against the account/region to determine resources that
     are non compliant. `check_policy_tags` provides a sanity check of the
     policy authors expectation of the tags being checked, and is verified
     against what's actually in the account.
 
-    `check_policy_tags` allows specifying a set of tag keys that will
+    `check_policy_tags` allows specifying an array of tag keys that will
     be validated against the organization tag policies in affect on
     the account. if the specified tag keys are not part of the org tag
     policy being enforced on the account resources and the custodian policy is
     searching for non_compliant resources, no resources will be
     returned. This is intended to prevent against mismatches of required tags
-    actually in effect against the account.
+    actually in effect against the account. However tag policies are applied
+    to individual resources, and this check is against the union of all required
+    keys for any resource.
 
-    `non_tagged` enables the use of resource-explorer to supplement the
+    `non_tagged` (boolean) enables the use of resource-explorer to supplement the
     results with resources that have never been tagged. It is safe to run
     against explorer aggregator accounts, as it scopes to only resources
     within an account. Note resource explorer does not support tag based
     searching for iam roles or users, so iam resources that have no tags
     will require a separate policy.
 
-    `resource_types` can be specified as well, to scope to particular
-    resources types. notably this resource supports resource types not
-    actively supported by custodian, it represents all taggable
-    resources within the provider. Note the values here are represented by
-    those used by the tagging / resource explorer services.
+    `verbose_errors` (boolean) when performing tag actions against discovered
+    resources, some resources may not support resource group tagging. By default
+    the service and the resource count are reported back. Enabling this logs
+    a line per resource with the specific error message.
+
+    `resource_types` is to scope the check to particular resources
+    types, default is against all taggable resources. Note the values
+    here are represented by those used by the tagging / resource
+    explorer services.
 
     See the table here for vocabulary
     https://docs.aws.amazon.com/resource-explorer/latest/userguide/supported-resource-types.html
@@ -270,3 +280,38 @@ class Taggable(query.QueryResourceManager):
             raise PolicyValidationError(
                 "taggable resource query misconfiguration %s" % errors
             )
+
+
+class TagActionDispatch(Action):
+
+    def process(self, resources):
+        service_batches = {}
+        for r in resources:
+            service_batches.setdefault(Arn.parse(r['ResourceARN']).service, []).append(r)
+
+        verbose = bool([item for item in self.manager.data['query'] if item.get('verbose_errors')])
+
+        for s, rset in service_batches.items():
+            try:
+                super().process(rset)
+            except ResourceGroupTagError as e:
+                self.manager.log.error(
+                    (f"resource group api error op:{e.operation_name} "
+                     f"on service:{s} with {len(e.errors)} failed resources")
+                )
+                if verbose:
+                    for r_arn, err in e.errors.items():
+                        self.manager.log.error(
+                            f"resource {r_arn} code:{err['ErrorCode']} msg:{err['ErrorMessage']}"
+                        )
+
+
+Taggable.action_registry.register(
+    'tag',
+    type('TaggableTag', (TagActionDispatch, Taggable.action_registry['tag']), {})
+)
+
+Taggable.action_registry.register(
+    'remove-tag',
+    type('TaggableRemoveTag', (TagActionDispatch, Taggable.action_registry['remove-tag']), {})
+)
