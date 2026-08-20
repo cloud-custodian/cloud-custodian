@@ -1,0 +1,99 @@
+{
+    "pytest-terraform": 1,
+    "outputs": {},
+    "resources": {
+        "aws_apigatewayv2_api": {
+            "example": {
+                "api_endpoint": "https://svr07q9wvj.execute-api.us-east-1.amazonaws.com",
+                "api_key_selection_expression": "$request.header.x-api-key",
+                "arn": "arn:aws:apigateway:us-east-1::/apis/svr07q9wvj",
+                "body": null,
+                "cors_configuration": [],
+                "credentials_arn": null,
+                "description": "",
+                "disable_execute_api_endpoint": false,
+                "execution_arn": "arn:aws:execute-api:us-east-1:644160558196:svr07q9wvj",
+                "fail_on_warnings": null,
+                "id": "svr07q9wvj",
+                "ip_address_type": "ipv4",
+                "name": "example-api-amazing-kiwi",
+                "protocol_type": "HTTP",
+                "region": "us-east-1",
+                "route_key": null,
+                "route_selection_expression": "$request.method $request.path",
+                "tags": null,
+                "tags_all": {},
+                "target": null,
+                "version": ""
+            }
+        },
+        "aws_apigatewayv2_integration": {
+            "example": {
+                "api_id": "svr07q9wvj",
+                "connection_id": "",
+                "connection_type": "INTERNET",
+                "content_handling_strategy": "",
+                "credentials_arn": "",
+                "description": "",
+                "id": "ipp55qs",
+                "integration_method": "ANY",
+                "integration_response_selection_expression": "",
+                "integration_subtype": "",
+                "integration_type": "HTTP_PROXY",
+                "integration_uri": "https://example.com",
+                "passthrough_behavior": "",
+                "payload_format_version": "1.0",
+                "region": "us-east-1",
+                "request_parameters": null,
+                "request_templates": null,
+                "response_parameters": [],
+                "template_selection_expression": "",
+                "timeout_milliseconds": 30000,
+                "tls_config": []
+            }
+        },
+        "aws_apigatewayv2_route": {
+            "iam_auth": {
+                "api_id": "svr07q9wvj",
+                "api_key_required": false,
+                "authorization_scopes": null,
+                "authorization_type": "AWS_IAM",
+                "authorizer_id": "",
+                "id": "ck2ui4k",
+                "model_selection_expression": "",
+                "operation_name": "",
+                "region": "us-east-1",
+                "request_models": null,
+                "request_parameter": [],
+                "route_key": "GET /iam-auth",
+                "route_response_selection_expression": "",
+                "target": "integrations/ipp55qs"
+            },
+            "no_auth": {
+                "api_id": "svr07q9wvj",
+                "api_key_required": false,
+                "authorization_scopes": null,
+                "authorization_type": "NONE",
+                "authorizer_id": "",
+                "id": "jxtjrzi",
+                "model_selection_expression": "",
+                "operation_name": "",
+                "region": "us-east-1",
+                "request_models": null,
+                "request_parameter": [],
+                "route_key": "GET /no-auth",
+                "route_response_selection_expression": "",
+                "target": "integrations/ipp55qs"
+            }
+        },
+        "random_pet": {
+            "api": {
+                "id": "example-api-amazing-kiwi",
+                "keepers": null,
+                "length": 2,
+                "prefix": "example-api",
+                "separator": "-"
+            }
+        }
+    }
+}
