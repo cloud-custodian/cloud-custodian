@@ -1,0 +1,80 @@
+{
+    "status_code": 200,
+    "data": {
+        "QueryRuntimeStatistics": {
+            "Timeline": {
+                "QueryQueueTimeInMillis": 116,
+                "ServicePreProcessingTimeInMillis": 98,
+                "QueryPlanningTimeInMillis": 840,
+                "EngineExecutionTimeInMillis": 1588,
+                "ServiceProcessingTimeInMillis": 49,
+                "TotalExecutionTimeInMillis": 1851
+            },
+            "Rows": {
+                "InputRows": 63,
+                "InputBytes": 60522,
+                "OutputBytes": 9540,
+                "OutputRows": 10
+            },
+            "OutputStage": {
+                "StageId": 0,
+                "State": "FINISHED",
+                "OutputBytes": 9540,
+                "OutputRows": 10,
+                "InputBytes": 10490,
+                "InputRows": 11,
+                "ExecutionTime": 235,
+                "QueryStagePlan": {
+                    "Name": "Output",
+                    "Identifier": "{\"columnNames\":\"[sku, offertermcode, ratecode, termtype, pricedescription, startingrange, endingrange, unit, priceperunit, currency, relatedto, leasecontractlength, purchaseoption, offeringclass, product family, servicecode, location, location type, instance type, current generation, instance family, vcpu, physical processor, clock speed, memory, storage, network performance, processor architecture, storage media, volume type, max volume size, max iops/volume, max iops burst performance, max throughput/volume, provisioned, tenancy, ebs optimized, operating system, license model, group, group description, transfer type, from location, from location type, to location, to location type, usagetype, operation, availabilityzone, capacitystatus, classicnetworkingsupport, dedicated ebs throughput, ecu, elastic graphics type, enhanced networking supported, from region code, gpu, gpu memory, instance, instance capacity - 10xlarge, instance capacity - 12xlarge, instance capacity - 16xlarge, instance capacity - 18xlarge, instance capacity - 24xlarge, instance capacity - 2xlarge, instance capacity - 32xlarge, instance capacity - 4xlarge, instance capacity - 8xlarge, instance capacity - 9xlarge, instance capacity - large, instance capacity - medium, instance capacity - metal, instance capacity - xlarge, instancesku, intel avx2 available, intel avx available, intel turbo available, marketoption, normalization size factor, physical cores, pre installed s/w, processor features, product type, region code, resource type, servicename, snapshotarchivefeetype, to region code, volume api name, vpcnetworkingsupport, partition_0]\"}",
+                    "Children": [
+                        {
+                            "Name": "Limit",
+                            "Identifier": "{\"count\":\"10\",\"withTies\":\"\",\"inputPreSortedBy\":\"[]\"}",
+                            "Children": [
+                                {
+                                    "Name": "LocalExchange",
+                                    "Identifier": "{\"partitioning\":\"SINGLE\",\"isReplicateNullsAndAny\":\"\",\"hashColumn\":\"[]\",\"arguments\":\"[]\"}",
+                                    "Children": [
+                                        {
+                                            "Name": "RemoteSource",
+                                            "Identifier": "{\"sourceFragmentIds\":\"[1]\"}",
+                                            "Children": [],
+                                            "RemoteSources": [
+                                                "1"
+                                            ]
+                                        }
+                                    ]
+                                }
+                            ]
+                        }
+                    ]
+                },
+                "SubStages": [
+                    {
+                        "StageId": 1,
+                        "State": "FINISHED",
+                        "OutputBytes": 10490,
+                        "OutputRows": 11,
+                        "InputBytes": 60522,
+                        "InputRows": 63,
+                        "ExecutionTime": 17410,
+                        "QueryStagePlan": {
+                            "Name": "LimitPartial",
+                            "Identifier": "{\"count\":\"10\",\"withTies\":\"\",\"inputPreSortedBy\":\"[]\"}",
+                            "Children": [
+                                {
+                                    "Name": "TableScan",
+                                    "Identifier": "{\"table\":\"awsdatacatalog:c7n-athena-test:c7n_amazonec2\"}",
+                                    "Children": []
+                                }
+                            ]
+                        },
+                        "SubStages": []
+                    }
+                ]
+            }
+        },
+        "ResponseMetadata": {}
+    }
+}
