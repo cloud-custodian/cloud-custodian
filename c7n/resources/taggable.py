@@ -113,7 +113,6 @@ class DescribeTaggable(query.DescribeSource):
         client = session.client('resource-explorer-2')
         pager = client.get_paginator("list_resources")
         ids = {r['ResourceARN'] for r in results}
-        ids = set()
         normalize = partial(self.normalize_explorer_results, query=query)
 
         try:
@@ -293,6 +292,7 @@ class TagActionDispatch(Action):
         verbose = bool([item for item in self.manager.data['query'] if item.get('verbose_errors')])
 
         for s, rset in service_batches.items():
+            self.manager.log.debug("bulk tag service:%s resources:%d" % (s, len(rset)))
             try:
                 super().process(rset)
             except ResourceGroupTagError as e:

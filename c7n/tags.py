@@ -1385,7 +1385,6 @@ def universal_retry(method, ResourceARNList, **kw):
     a retry is performed.
     """
     max_attempts = 6
-
     for idx, delay in enumerate(
             utils.backoff_delays(1.5, 2 ** 8, jitter=True)):
         response = method(ResourceARNList=ResourceARNList, **kw)
@@ -1417,6 +1416,9 @@ def universal_retry(method, ResourceARNList, **kw):
 
         time.sleep(delay)
         ResourceARNList = list(throttles)
+
+        if not ResourceARNList:
+            return response
 
 
 def coalesce_copy_user_tags(resource, copy_tags, user_tags):
