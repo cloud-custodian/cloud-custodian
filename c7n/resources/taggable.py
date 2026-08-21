@@ -69,6 +69,7 @@ class DescribeTaggable(query.DescribeSource):
             for rt in query.resource_types:
                 parts.append(f'resourcetype:{rt}')
         params = {'QueryString': " ".join(parts)}
+        params = {'Filters': {'FilterString': " ".join(parts)}}
         return params
 
     def check_policy_key_matches(self, client, query):
@@ -110,7 +111,7 @@ class DescribeTaggable(query.DescribeSource):
             return results
 
         client = session.client('resource-explorer-2')
-        pager = client.get_paginator("search")
+        pager = client.get_paginator("list_resources")
         ids = {r['ResourceARN'] for r in results}
         ids = set()
         normalize = partial(self.normalize_explorer_results, query=query)
