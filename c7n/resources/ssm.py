@@ -9,9 +9,15 @@ from c7n.actions import Action
 from c7n.exceptions import PolicyValidationError
 from c7n.filters import Filter, CrossAccountAccessFilter, ValueFilter
 from c7n.filters.kms import KmsRelatedFilter
-from c7n.query import QueryResourceManager, TypeInfo
+from c7n.query import DescribeSource, QueryResourceManager, TypeInfo
 from c7n.manager import resources
-from c7n.tags import universal_augment
+from c7n.tags import (
+    universal_augment,
+    Tag as TagAction,
+    RemoveTag as RemoveTagAction,
+    TagDelayedAction,
+    TagActionFilter,
+)
 from c7n.utils import chunks, get_retry, local_session, type_schema, filter_empty
 from c7n.version import version
 
@@ -52,8 +58,154 @@ class DeleteParameter(Action):
                 ignore_err_codes=('ParameterNotFound',))
 
 
+def _hybrid_instances(resources):
+    # ssm tag apis only support hybrid (mi-*) managed instances
+    return [r for r in resources if r['InstanceId'].startswith('mi-')]
+
+
+class DescribeSSMTags(DescribeSource):
+    """Augment ssm resources with tags via ssm:ListTagsForResource.
+
+    ssm's tag apis are keyed on ResourceType + ResourceId rather than
+    arns, and resourcegroupstaggingapi coverage for these resource
+    types is undocumented, so universal (rgta) tagging isn't used here.
+
+    The manager class must define `tag_resource_type` with the resource's
+    ssm AddTagsToResource/ListTagsForResource ResourceType value.
+    """
+
+    def get_taggable(self, resources):
+        return resources
+
+    def augment(self, resources):
+        resources = super().augment(resources)
+        mid = self.manager.resource_type.id
+        rtype = self.manager.tag_resource_type
+
+        def _fetch_tags(resource_set):
+            client = local_session(self.manager.session_factory).client('ssm')
+            for r in resource_set:
+                r['Tags'] = self.manager.retry(
+                    client.list_tags_for_resource,
+                    ResourceType=rtype,
+                    ResourceId=r[mid]).get('TagList', [])
+
+        with self.manager.executor_factory(max_workers=2) as w:
+            list(w.map(_fetch_tags, chunks(self.get_taggable(resources), 20)))
+        return resources
+
+
+class DescribeManagedInstance(DescribeSSMTags):
+    # ec2 (i-*) instance tags aren't reachable via the ssm tag apis
+    def get_taggable(self, resources):
+        return _hybrid_instances(resources)
+
+    def augment(self, resources):
+        resources = super().augment(resources)
+        ec2_instances = [
+            r for r in resources if not r['InstanceId'].startswith('mi-')]
+        if not ec2_instances:
+            return resources
+        client = local_session(self.manager.session_factory).client('ec2')
+        tag_map = {}
+        for chunk in chunks(ec2_instances, 20):
+            for t in self.manager.retry(
+                    client.describe_tags,
+                    Filters=[{
+                        'Name': 'resource-id',
+                        'Values': [r['InstanceId'] for r in chunk]}]).get(
+                            'Tags', ()):
+                tag_map.setdefault(t['ResourceId'], []).append(
+                    {'Key': t['Key'], 'Value': t['Value']})
+        for r in ec2_instances:
+            r['Tags'] = tag_map.get(r['InstanceId'], [])
+        return resources
+
+
+class TagSSMResource(TagAction):
+    """Tag an ssm resource via ssm:AddTagsToResource."""
+
+    permissions = ('ssm:AddTagsToResource',)
+
+    def get_taggable(self, resources):
+        return resources
+
+    def process_resource_set(self, client, resource_set, tags):
+        mid = self.manager.get_model().id
+        for r in self.get_taggable(resource_set):
+            self.manager.retry(
+                client.add_tags_to_resource,
+                ResourceType=self.manager.tag_resource_type,
+                ResourceId=r[mid],
+                Tags=tags)
+
+
+class RemoveTagSSMResource(RemoveTagAction):
+    """Remove tags from an ssm resource via ssm:RemoveTagsFromResource."""
+
+    permissions = ('ssm:RemoveTagsFromResource',)
+
+    def get_taggable(self, resources):
+        return resources
+
+    def process_resource_set(self, client, resource_set, tag_keys):
+        mid = self.manager.get_model().id
+        for r in self.get_taggable(resource_set):
+            self.manager.retry(
+                client.remove_tags_from_resource,
+                ResourceType=self.manager.tag_resource_type,
+                ResourceId=r[mid],
+                TagKeys=tag_keys)
+
+
+class _ManagedInstanceOnly:
+
+    def get_taggable(self, resources):
+        hybrid = _hybrid_instances(resources)
+        if len(hybrid) != len(resources):
+            self.log.warning(
+                "ssm tag apis only support hybrid (mi-*) managed instances, "
+                "skipping %d ec2 instances; use the ec2 resource to tag those",
+                len(resources) - len(hybrid))
+        return hybrid
+
+
+class TagManagedInstance(_ManagedInstanceOnly, TagSSMResource):
+    pass
+
+
+class RemoveTagManagedInstance(_ManagedInstanceOnly, RemoveTagSSMResource):
+    pass
+
+
 @resources.register('ssm-managed-instance')
 class ManagedInstance(QueryResourceManager):
+    """Instances managed by ssm, both ec2 (i-*) and hybrid (mi-*) instances.
+
+    Tags are fetched via the ssm tag apis for hybrid instances and from
+    ec2 for ec2 instances, so tag filters work across the whole resource
+    population. The tag actions only apply to hybrid instances, as the
+    ssm tag apis don't support ec2 instances; use the `aws.ec2` resource
+    to manage those tags.
+
+    :example:
+
+    .. code-block:: yaml
+
+        policies:
+          - name: ssm-hybrid-instance-untagged
+            resource: aws.ssm-managed-instance
+            filters:
+              - type: value
+                key: InstanceId
+                op: glob
+                value: "mi-*"
+              - "tag:Owner": absent
+            actions:
+              - type: tag
+                key: Owner
+                value: unknown
+    """
 
     class resource_type(TypeInfo):
         service = 'ssm'
@@ -62,8 +214,16 @@ class ManagedInstance(QueryResourceManager):
         name = 'Name'
         date = 'RegistrationDate'
         arn_type = "managed-instance"
+        permissions_augment = ("ssm:ListTagsForResource", "ec2:DescribeTags")
 
-    permissions = ('ssm:DescribeInstanceInformation',)
+    tag_resource_type = 'ManagedInstance'
+    source_mapping = {'describe': DescribeManagedInstance}
+
+
+ManagedInstance.action_registry.register('tag', TagManagedInstance)
+ManagedInstance.action_registry.register('remove-tag', RemoveTagManagedInstance)
+ManagedInstance.action_registry.register('mark-for-op', TagDelayedAction)
+ManagedInstance.filter_registry.register('marked-for-op', TagActionFilter)
 
 
 @EC2.action_registry.register('send-command')
@@ -177,10 +337,14 @@ class OpsItem(QueryResourceManager):
         arn_type = 'opsitem'
         id = 'OpsItemId'
         name = 'Title'
+        permissions_augment = ("ssm:ListTagsForResource",)
 
         default_report_fields = (
             'Status', 'Title', 'LastModifiedTime',
             'CreatedBy', 'CreatedTime')
+
+    tag_resource_type = 'OpsItem'
+    source_mapping = {'describe': DescribeSSMTags}
 
     QueryKeys = {
         'Status',
@@ -228,6 +392,12 @@ class OpsItem(QueryResourceManager):
                     "invalid ops-item query %s" % self.data['query'])
             filters.append(q)
         return {'OpsItemFilters': filters}
+
+
+OpsItem.action_registry.register('tag', TagSSMResource)
+OpsItem.action_registry.register('remove-tag', RemoveTagSSMResource)
+OpsItem.action_registry.register('mark-for-op', TagDelayedAction)
+OpsItem.filter_registry.register('marked-for-op', TagActionFilter)
 
 
 @OpsItem.action_registry.register('update')
@@ -883,6 +1053,125 @@ class SsmPatchGroup(QueryResourceManager):
         arn = False
         id = "PatchGroup"
         name = "PatchGroup"
+
+
+@resources.register('ssm-patch-baseline')
+class SSMPatchBaseline(QueryResourceManager):
+    """Custom (account-owned) ssm patch baselines.
+
+    AWS predefined baselines are owned by an aws account and can't be
+    tagged or modified, so only self-owned baselines are enumerated.
+
+    :example:
+
+    .. code-block:: yaml
+
+        policies:
+          - name: ssm-patch-baseline-untagged
+            resource: aws.ssm-patch-baseline
+            filters:
+              - "tag:Owner": absent
+            actions:
+              - type: tag
+                key: Owner
+                value: unknown
+    """
+
+    class resource_type(TypeInfo):
+        service = 'ssm'
+        enum_spec = ('describe_patch_baselines', 'BaselineIdentities', {
+            'Filters': [{'Key': 'OWNER', 'Values': ['Self']}]})
+        id = 'BaselineId'
+        name = 'BaselineName'
+        arn_type = 'patchbaseline'
+        cfn_type = 'AWS::SSM::PatchBaseline'
+        permissions_augment = ("ssm:ListTagsForResource",)
+
+    tag_resource_type = 'PatchBaseline'
+    source_mapping = {'describe': DescribeSSMTags}
+
+
+SSMPatchBaseline.action_registry.register('tag', TagSSMResource)
+SSMPatchBaseline.action_registry.register('remove-tag', RemoveTagSSMResource)
+SSMPatchBaseline.action_registry.register('mark-for-op', TagDelayedAction)
+SSMPatchBaseline.filter_registry.register('marked-for-op', TagActionFilter)
+
+
+@resources.register('ssm-maintenance-window')
+class SSMMaintenanceWindow(QueryResourceManager):
+    """SSM maintenance windows.
+
+    :example:
+
+    .. code-block:: yaml
+
+        policies:
+          - name: ssm-maintenance-window-untagged
+            resource: aws.ssm-maintenance-window
+            filters:
+              - "tag:Owner": absent
+            actions:
+              - type: tag
+                key: Owner
+                value: unknown
+    """
+
+    class resource_type(TypeInfo):
+        service = 'ssm'
+        enum_spec = ('describe_maintenance_windows', 'WindowIdentities', None)
+        id = 'WindowId'
+        name = 'Name'
+        arn_type = 'maintenancewindow'
+        cfn_type = 'AWS::SSM::MaintenanceWindow'
+        permissions_augment = ("ssm:ListTagsForResource",)
+
+    tag_resource_type = 'MaintenanceWindow'
+    source_mapping = {'describe': DescribeSSMTags}
+
+
+SSMMaintenanceWindow.action_registry.register('tag', TagSSMResource)
+SSMMaintenanceWindow.action_registry.register('remove-tag', RemoveTagSSMResource)
+SSMMaintenanceWindow.action_registry.register('mark-for-op', TagDelayedAction)
+SSMMaintenanceWindow.filter_registry.register('marked-for-op', TagActionFilter)
+
+
+@resources.register('ssm-association')
+class SSMAssociation(QueryResourceManager):
+    """SSM State Manager associations.
+
+    :example:
+
+    .. code-block:: yaml
+
+        policies:
+          - name: ssm-association-untagged
+            resource: aws.ssm-association
+            filters:
+              - "tag:Owner": absent
+            actions:
+              - type: tag
+                key: Owner
+                value: unknown
+    """
+
+    class resource_type(TypeInfo):
+        service = 'ssm'
+        enum_spec = ('list_associations', 'Associations', None)
+        id = 'AssociationId'
+        name = 'AssociationName'
+        date = 'LastExecutionDate'
+        arn_type = 'association'
+        cfn_type = 'AWS::SSM::Association'
+        permissions_augment = ("ssm:ListTagsForResource",)
+
+    tag_resource_type = 'Association'
+    source_mapping = {'describe': DescribeSSMTags}
+
+
+SSMAssociation.action_registry.register('tag', TagSSMResource)
+SSMAssociation.action_registry.register('remove-tag', RemoveTagSSMResource)
+SSMAssociation.action_registry.register('mark-for-op', TagDelayedAction)
+SSMAssociation.filter_registry.register('marked-for-op', TagActionFilter)
 
 
 @resources.register('ssm-session-manager')
