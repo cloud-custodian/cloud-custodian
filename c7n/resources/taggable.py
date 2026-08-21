@@ -113,7 +113,6 @@ class DescribeTaggable(query.DescribeSource):
         client = session.client('resource-explorer-2')
         pager = client.get_paginator("list_resources")
         ids = {r['ResourceARN'] for r in results}
-        ids = set()
         normalize = partial(self.normalize_explorer_results, query=query)
 
         try:
