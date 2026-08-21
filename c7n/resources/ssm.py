@@ -67,8 +67,9 @@ class DescribeSSMTags(DescribeSource):
     """Augment ssm resources with tags via ssm:ListTagsForResource.
 
     ssm's tag apis are keyed on ResourceType + ResourceId rather than
-    arns, and resourcegroupstaggingapi coverage for these resource
-    types is undocumented, so universal (rgta) tagging isn't used here.
+    arns, and the resource groups tagging api doesn't support these
+    resource types (only ssm parameters), so universal (rgta) tagging
+    can't be used here.
 
     The manager class must define `tag_resource_type` with the resource's
     ssm AddTagsToResource/ListTagsForResource ResourceType value.
