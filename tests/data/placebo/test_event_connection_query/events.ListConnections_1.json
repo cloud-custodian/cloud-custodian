@@ -1,0 +1,80 @@
+{
+ "status_code": 200,
+ "data": {
+  "Connections": [
+   {
+    "ConnectionArn": "arn:aws:events:us-east-1:644160558196:connection/c7n-test-conn-apikey/6e9c4e5e-0202-4faa-9cab-084328b76102",
+    "Name": "c7n-test-conn-apikey",
+    "ConnectionState": "AUTHORIZED",
+    "AuthorizationType": "API_KEY",
+    "CreationTime": {
+     "__class__": "datetime",
+     "year": 2026,
+     "month": 8,
+     "day": 13,
+     "hour": 2,
+     "minute": 29,
+     "second": 29,
+     "microsecond": 0
+    },
+    "LastModifiedTime": {
+     "__class__": "datetime",
+     "year": 2026,
+     "month": 8,
+     "day": 13,
+     "hour": 2,
+     "minute": 29,
+     "second": 29,
+     "microsecond": 0
+    },
+    "LastAuthorizedTime": {
+     "__class__": "datetime",
+     "year": 2026,
+     "month": 8,
+     "day": 13,
+     "hour": 2,
+     "minute": 29,
+     "second": 29,
+     "microsecond": 0
+    }
+   },
+   {
+    "ConnectionArn": "arn:aws:events:us-east-1:644160558196:connection/c7n-test-conn-basic/95cc4260-854b-44b1-9f02-582b00e0be35",
+    "Name": "c7n-test-conn-basic",
+    "ConnectionState": "AUTHORIZED",
+    "AuthorizationType": "BASIC",
+    "CreationTime": {
+     "__class__": "datetime",
+     "year": 2026,
+     "month": 8,
+     "day": 13,
+     "hour": 2,
+     "minute": 29,
+     "second": 28,
+     "microsecond": 0
+    },
+    "LastModifiedTime": {
+     "__class__": "datetime",
+     "year": 2026,
+     "month": 8,
+     "day": 13,
+     "hour": 2,
+     "minute": 29,
+     "second": 28,
+     "microsecond": 0
+    },
+    "LastAuthorizedTime": {
+     "__class__": "datetime",
+     "year": 2026,
+     "month": 8,
+     "day": 13,
+     "hour": 2,
+     "minute": 29,
+     "second": 28,
+     "microsecond": 0
+    }
+   }
+  ],
+  "ResponseMetadata": {}
+ }
+}
