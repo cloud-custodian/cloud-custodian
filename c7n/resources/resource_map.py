@@ -363,6 +363,7 @@ ResourceMap = {
   "aws.ssm-parameter": "c7n.resources.ssm.SSMParameter",
   "aws.ssm-patch-group": "c7n.resources.ssm.SsmPatchGroup",
   "aws.ssm-session-manager": "c7n.resources.ssm.SSMSessionManager",
+  "aws.ssm-service-setting": "c7n.resources.ssm.SSMServiceSetting",
   "aws.step-machine": "c7n.resources.sfn.StepFunction",
   "aws.storage-gateway": "c7n.resources.storagegw.StorageGateway",
   "aws.streaming-distribution": "c7n.resources.cloudfront.StreamingDistribution",
