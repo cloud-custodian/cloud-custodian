@@ -15,7 +15,11 @@ from c7n.filters.kms import KmsRelatedFilter
 from c7n.manager import resources
 from c7n.query import (
     QueryResourceManager,
-    TypeInfo, DescribeSource, ConfigSource, DescribeWithResourceTags)
+    TypeInfo,
+    DescribeSource,
+    ConfigSource,
+    DescribeWithResourceTags,
+)
 from c7n.resolver import ValuesFrom
 from c7n.tags import universal_augment
 from c7n.utils import type_schema, local_session, chunks, get_retry, jmespath_search
@@ -42,10 +46,7 @@ class Alarm(QueryResourceManager):
         universal_taggable = object()
         permissions_augment = ("cloudwatch:ListTagsForResource",)
 
-    source_mapping = {
-        'describe': DescribeAlarm,
-        'config': ConfigSource
-    }
+    source_mapping = {'describe': DescribeAlarm, 'config': ConfigSource}
 
     retry = staticmethod(get_retry(('Throttled',)))
 
@@ -76,13 +77,12 @@ class AlarmDelete(BaseAction):
     permissions = ('cloudwatch:DeleteAlarms',)
 
     def process(self, resources):
-        client = local_session(
-            self.manager.session_factory).client('cloudwatch')
+        client = local_session(self.manager.session_factory).client('cloudwatch')
 
         for resource_set in chunks(resources, size=100):
             self.manager.retry(
-                client.delete_alarms,
-                AlarmNames=[r['AlarmName'] for r in resource_set])
+                client.delete_alarms, AlarmNames=[r['AlarmName'] for r in resource_set]
+            )
 
 
 @Alarm.filter_registry.register('is-composite-child')
@@ -117,7 +117,6 @@ class IsCompositeChild(Filter):
 
 @resources.register('composite-alarm')
 class CompositeAlarm(QueryResourceManager):
-
     class resource_type(TypeInfo):
         service = 'cloudwatch'
         arn_type = 'alarm'
@@ -159,13 +158,12 @@ class CompositeAlarmDelete(BaseAction):
     permissions = ('cloudwatch:DeleteAlarms',)
 
     def process(self, resources):
-        client = local_session(
-            self.manager.session_factory).client('cloudwatch')
+        client = local_session(self.manager.session_factory).client('cloudwatch')
 
         for resource_set in chunks(resources, size=100):
             self.manager.retry(
-                client.delete_alarms,
-                AlarmNames=[r['AlarmName'] for r in resource_set])
+                client.delete_alarms, AlarmNames=[r['AlarmName'] for r in resource_set]
+            )
 
 
 @resources.register('log-group')
@@ -208,8 +206,7 @@ class InsightRule(QueryResourceManager):
 
         def _add_tags(r):
             arn = self.generate_arn(r['Name'])
-            r['Tags'] = client.list_tags_for_resource(
-                ResourceARN=arn).get('Tags', [])
+            r['Tags'] = client.list_tags_for_resource(ResourceARN=arn).get('Tags', [])
             return r
 
         return list(map(_add_tags, rules))
@@ -239,13 +236,12 @@ class InsightRuleDisable(BaseAction):
     permissions = ('cloudwatch:DisableInsightRules',)
 
     def process(self, resources):
-        client = local_session(
-            self.manager.session_factory).client('cloudwatch')
+        client = local_session(self.manager.session_factory).client('cloudwatch')
 
         for resource_set in chunks(resources, size=100):
             self.manager.retry(
-                client.disable_insight_rules,
-                RuleNames=[r['Name'] for r in resource_set])
+                client.disable_insight_rules, RuleNames=[r['Name'] for r in resource_set]
+            )
 
 
 @InsightRule.action_registry.register('delete')
@@ -272,18 +268,16 @@ class InsightRuleDelete(BaseAction):
     permissions = ('cloudwatch:DeleteInsightRules',)
 
     def process(self, resources):
-        client = local_session(
-            self.manager.session_factory).client('cloudwatch')
+        client = local_session(self.manager.session_factory).client('cloudwatch')
 
         for resource_set in chunks(resources, size=100):
             self.manager.retry(
-                client.delete_insight_rules,
-                RuleNames=[r['Name'] for r in resource_set])
+                client.delete_insight_rules, RuleNames=[r['Name'] for r in resource_set]
+            )
 
 
 @LogGroup.filter_registry.register('metrics')
 class LogGroupMetrics(MetricsFilter):
-
     def get_dimensions(self, resource):
         return [{'Name': 'LogGroupName', 'Value': resource['logGroupName']}]
 
@@ -331,13 +325,18 @@ class LogMetricAlarmFilter(ValueFilter):
         if len(resources) < self.FetchThreshold:
             client = local_session(self.manager.session_factory).client('cloudwatch')
             for r in resources:
-                r[self.annotation_key] = list(itertools.chain(*(
-                    self.manager.retry(
-                        client.describe_alarms_for_metric,
-                        Namespace=t['metricNamespace'],
-                        MetricName=t['metricName'])['MetricAlarms']
-                    for t in r.get('metricTransformations', ())
-                )))
+                r[self.annotation_key] = list(
+                    itertools.chain(
+                        *(
+                            self.manager.retry(
+                                client.describe_alarms_for_metric,
+                                Namespace=t['metricNamespace'],
+                                MetricName=t['metricName'],
+                            )['MetricAlarms']
+                            for t in r.get('metricTransformations', ())
+                        )
+                    )
+                )
         else:
             alarms = self.manager.get_resource_manager('aws.alarm').resources()
 
@@ -348,15 +347,19 @@ class LogMetricAlarmFilter(ValueFilter):
                 alarms_by_metric[(alarm['Namespace'], alarm['MetricName'])].append(alarm)
 
             for r in resources:
-                r[self.annotation_key] = list(itertools.chain(*(
-                    alarms_by_metric.get((t['metricNamespace'], t['metricName']), [])
-                    for t in r.get('metricTransformations', ())
-                )))
+                r[self.annotation_key] = list(
+                    itertools.chain(
+                        *(
+                            alarms_by_metric.get((t['metricNamespace'], t['metricName']), [])
+                            for t in r.get('metricTransformations', ())
+                        )
+                    )
+                )
 
     def get_permissions(self):
         return [
             *self.manager.get_resource_manager('aws.alarm').get_permissions(),
-            'cloudwatch:DescribeAlarmsForMetric'
+            'cloudwatch:DescribeAlarmsForMetric',
         ]
 
     def process(self, resources, event=None):
@@ -393,9 +396,8 @@ class Retention(BaseAction):
         days = self.data['days']
         for r in resources:
             self.manager.retry(
-                client.put_retention_policy,
-                logGroupName=r['logGroupName'],
-                retentionInDays=days)
+                client.put_retention_policy, logGroupName=r['logGroupName'], retentionInDays=days
+            )
 
 
 @LogGroup.action_registry.register('delete')
@@ -423,8 +425,7 @@ class Delete(BaseAction):
         client = local_session(self.manager.session_factory).client('logs')
         for r in resources:
             try:
-                self.manager.retry(
-                    client.delete_log_group, logGroupName=r['logGroupName'])
+                self.manager.retry(client.delete_log_group, logGroupName=r['logGroupName'])
             except client.exceptions.ResourceNotFoundException:
                 continue
 
@@ -445,14 +446,12 @@ class LastWriteDays(Filter):
                     days: 60
     """
 
-    schema = type_schema(
-        'last-write', days={'type': 'number'})
+    schema = type_schema('last-write', days={'type': 'number'})
     permissions = ('logs:DescribeLogStreams',)
 
     def process(self, resources, event=None):
         client = local_session(self.manager.session_factory).client('logs')
-        self.date_threshold = parse_date(datetime.utcnow()) - timedelta(
-            days=self.data['days'])
+        self.date_threshold = parse_date(datetime.utcnow()) - timedelta(days=self.data['days'])
         return [r for r in resources if self.check_group(client, r)]
 
     def check_group(self, client, group):
@@ -461,7 +460,8 @@ class LastWriteDays(Filter):
             logGroupName=group['logGroupName'],
             orderBy='LastEventTime',
             descending=True,
-            limit=3).get('logStreams')
+            limit=3,
+        ).get('logStreams')
         group['streams'] = streams
         if not streams:
             last_timestamp = group['creationTime']
@@ -481,7 +481,8 @@ class LogCrossAccountFilter(CrossAccountAccessFilter):
         'cross-account',
         # white list accounts
         whitelist_from=ValuesFrom.schema,
-        whitelist={'type': 'array', 'items': {'type': 'string'}})
+        whitelist={'type': 'array', 'items': {'type': 'string'}},
+    )
 
     permissions = ('logs:DescribeSubscriptionFilters',)
 
@@ -492,14 +493,10 @@ class LogCrossAccountFilter(CrossAccountAccessFilter):
         with self.executor_factory(max_workers=1) as w:
             futures = []
             for rset in chunks(resources, 50):
-                futures.append(
-                    w.submit(
-                        self.process_resource_set, client, accounts, rset))
+                futures.append(w.submit(self.process_resource_set, client, accounts, rset))
             for f in as_completed(futures):
                 if f.exception():
-                    self.log.error(
-                        "Error checking log groups cross-account %s",
-                        f.exception())
+                    self.log.error("Error checking log groups cross-account %s", f.exception())
                     continue
                 results.extend(f.result())
         return results
@@ -509,15 +506,14 @@ class LogCrossAccountFilter(CrossAccountAccessFilter):
         for r in resources:
             found = False
             filters = self.manager.retry(
-                client.describe_subscription_filters,
-                logGroupName=r['logGroupName']).get('subscriptionFilters', ())
+                client.describe_subscription_filters, logGroupName=r['logGroupName']
+            ).get('subscriptionFilters', ())
             for f in filters:
                 if 'destinationArn' not in f:
                     continue
                 account_id = f['destinationArn'].split(':', 5)[4]
                 if account_id not in accounts:
-                    r.setdefault('c7n:CrossAccountViolations', []).append(
-                        account_id)
+                    r.setdefault('c7n:CrossAccountViolations', []).append(account_id)
                     found = True
             if found:
                 results.append(r)
@@ -540,6 +536,7 @@ class LogSubscriptionFilter(ValueFilter):
                     key: destinationArn
                     value: arn:aws:lambda:us-east-1:123456789876:function:forwarder
     """
+
     schema = type_schema('subscription-filter', rinherit=ValueFilter.schema)
     annotation_key = 'c7n:SubscriptionFilters'
     permissions = ('logs:DescribeSubscriptionFilters',)
@@ -549,8 +546,8 @@ class LogSubscriptionFilter(ValueFilter):
         results = []
         for r in resources:
             filters = self.manager.retry(
-                client.describe_subscription_filters,
-                logGroupName=r['logGroupName']).get('subscriptionFilters', ())
+                client.describe_subscription_filters, logGroupName=r['logGroupName']
+            ).get('subscriptionFilters', ())
             if not any(filters):
                 continue
             for f in filters:
@@ -591,12 +588,11 @@ class EncryptLogGroup(BaseAction):
               - type: set-encryption
                 state: False
     """
+
     schema = type_schema(
-        'set-encryption',
-        **{'kms-key': {'type': 'string'},
-           'state': {'type': 'boolean'}})
-    permissions = (
-        'logs:AssociateKmsKey', 'logs:DisassociateKmsKey', 'kms:DescribeKey')
+        'set-encryption', **{'kms-key': {'type': 'string'}, 'state': {'type': 'boolean'}}
+    )
+    permissions = ('logs:AssociateKmsKey', 'logs:DisassociateKmsKey', 'kms:DescribeKey')
 
     def validate(self):
         if not self.data.get('state', True):
@@ -605,8 +601,7 @@ class EncryptLogGroup(BaseAction):
         if not key:
             raise ValueError('Must specify either a KMS key ARN or Alias')
         if 'alias/' not in key and ':key/' not in key:
-            raise PolicyValidationError(
-                "Invalid kms key format %s" % key)
+            raise PolicyValidationError("Invalid kms key format %s" % key)
         return self
 
     def resolve_key(self, key):
@@ -618,10 +613,11 @@ class EncryptLogGroup(BaseAction):
             return key
 
         # Alias
-        key = local_session(
-            self.manager.session_factory).client(
-                'kms').describe_key(
-                    KeyId=key)['KeyMetadata']['Arn']
+        key = (
+            local_session(self.manager.session_factory)
+            .client('kms')
+            .describe_key(KeyId=key)['KeyMetadata']['Arn']
+        )
         return key
 
     def process(self, resources):
@@ -634,8 +630,7 @@ class EncryptLogGroup(BaseAction):
         for r in resources:
             try:
                 if state:
-                    client.associate_kms_key(
-                        logGroupName=r['logGroupName'], kmsKeyId=key)
+                    client.associate_kms_key(logGroupName=r['logGroupName'], kmsKeyId=key)
                 else:
                     client.disassociate_kms_key(logGroupName=r['logGroupName'])
             except client.exceptions.ResourceNotFoundException:
@@ -661,6 +656,7 @@ class SubscriptionFilter(BaseAction):
                 distribution: Random
                 role_arn: "arn:aws:iam::{account_id}:role/testCrossAccountRole"
     """
+
     schema = type_schema(
         'put-subscription-filter',
         filter_name={'type': 'string'},
@@ -668,7 +664,8 @@ class SubscriptionFilter(BaseAction):
         destination_arn={'type': 'string'},
         distribution={'enum': ['Random', 'ByLogStream']},
         role_arn={'type': 'string'},
-        required=['filter_name', 'destination_arn'])
+        required=['filter_name', 'destination_arn'],
+    )
     permissions = ('logs:PutSubscriptionFilter',)
 
     def process(self, resources):
@@ -678,14 +675,14 @@ class SubscriptionFilter(BaseAction):
             filterName=self.data.get('filter_name'),
             filterPattern=self.data.get('filter_pattern', ''),
             destinationArn=self.data.get('destination_arn'),
-            distribution=self.data.get('distribution', 'ByLogStream'))
+            distribution=self.data.get('distribution', 'ByLogStream'),
+        )
 
         if self.data.get('role_arn'):
             params['roleArn'] = self.data.get('role_arn')
 
         for r in resources:
-            client.put_subscription_filter(
-                logGroupName=r['logGroupName'], **params)
+            client.put_subscription_filter(logGroupName=r['logGroupName'], **params)
 
 
 @resources.register("cloudwatch-dashboard")
@@ -702,7 +699,7 @@ class CloudWatchDashboard(QueryResourceManager):
         global_resource = True
 
     source_mapping = {
-       "describe": DescribeWithResourceTags,
+        "describe": DescribeWithResourceTags,
     }
 
 
@@ -722,13 +719,12 @@ class Destination(QueryResourceManager):
     retry = staticmethod(get_retry(('ServiceUnavailableException', 'OperationAbortedException')))
 
     source_mapping = {
-       "describe": DescribeWithResourceTags,
+        "describe": DescribeWithResourceTags,
     }
 
 
 @Destination.filter_registry.register('cross-account')
 class DestinationCrossAccount(CrossAccountAccessFilter):
-
     permissions = ('logs:DescribeDestinations',)
     policy_attribute = 'accessPolicy'
 
@@ -749,6 +745,7 @@ class DestinationDelete(BaseAction):
             actions:
               - delete
     """
+
     schema = type_schema('delete')
 
     permissions = ('logs:DeleteDestination',)
@@ -775,17 +772,22 @@ class DeliveryDestination(QueryResourceManager):
         cfn_type = "AWS::Logs::DeliveryDestination"
         universal_taggable = object()
 
-    retry = staticmethod(get_retry(
-        ('ConflictException', 'ServiceUnavailableException', 'ThrottlingException',)
-    ))
+    retry = staticmethod(
+        get_retry(
+            (
+                'ConflictException',
+                'ServiceUnavailableException',
+                'ThrottlingException',
+            )
+        )
+    )
     source_mapping = {
-       "describe": DescribeWithResourceTags,
+        "describe": DescribeWithResourceTags,
     }
 
 
 @DeliveryDestination.filter_registry.register('cross-account')
 class DeliveryDestinationCrossAccount(CrossAccountAccessFilter):
-
     policy_attribute = 'c7n:Policy'
     permissions = ('logs:GetDeliveryDestinationPolicy',)
 
@@ -796,7 +798,7 @@ class DeliveryDestinationCrossAccount(CrossAccountAccessFilter):
             resp = self.manager.retry(
                 client.get_delivery_destination_policy,
                 deliveryDestinationName=r['name'],
-                ignore_err_codes=('ResourceNotFoundException',)
+                ignore_err_codes=('ResourceNotFoundException',),
             )
             r[self.policy_attribute] = resp['policy'].get('deliveryDestinationPolicy', {})
         return super().process(resources)
@@ -820,6 +822,7 @@ class DeliveryDestinationDelete(BaseAction):
             actions:
               - delete
     """
+
     schema = type_schema('delete')
 
     permissions = ('logs:DeleteDeliveryDestination',)
@@ -862,11 +865,45 @@ class SyntheticsCanary(QueryResourceManager):
         universal_taggable = object()
 
     def augment(self, resources):
+        client = local_session(self.session_factory).client('synthetics')
+        s3 = local_session(self.session_factory).client('s3')
+
         for r in resources:
             # AWS returns tags as a dict { "Key": "Value" }
             # Custodian expects [{"Key": k, "Value": v}, ...]
             r["Tags"] = [{"Key": k, "Value": v} for k, v in r["Tags"].items()]
 
+            # Grab the runs to extract the log S3 bucket
+            runs = client.get_canary_runs(Name=r['Name'], MaxResults=1).get("CanaryRuns", [])
+            if not runs:
+                r["DestinationUrl"] = None
+                continue
+
+            artifact = runs[0].get("ArtifactS3Location")
+            if not artifact:
+                r["DestinationUrl"] = None
+                continue
+
+            bucket, key_prefix = artifact.split("/", 1)
+            report_key = f"{key_prefix}/SyntheticsReport-PASSED.json"
+
+            try:
+                obj = s3.get_object(Bucket=bucket, Key=report_key)
+                body = obj["Body"].read().decode("utf-8")
+                import json
+
+                report = json.loads(body)
+
+                # Extract destinationUrls
+                steps = report.get("customerScript", {}).get("steps", [])
+                dest_urls = [s.get("destinationUrl") for s in steps if "destinationUrl" in s]
+
+                r["DestinationUrl"] = dest_urls[0] if dest_urls else None
+                r["AllDestinationUrls"] = dest_urls
+
+            except Exception:
+                r["DestinationUrl"] = None
+                r["AllDestinationUrls"] = []
         return resources
 
 
@@ -879,7 +916,13 @@ class StartCanary(BaseAction):
     def process(self, resources):
         client = local_session(self.manager.session_factory).client('synthetics')
         for r in resources:
-            client.start_canary(Name=r['Name'])
+            try:
+                desc = client.get_canary(Name=r['Name'])
+                if desc['Canary']['Status']['State'] == 'STOPPED':
+                    client.start_canary(Name=r['Name'])
+            except Exception as e:
+                self.log.warning("Error starting canary %s: %s", r['Name'], e)
+                continue
 
 
 @SyntheticsCanary.action_registry.register('stop')
@@ -892,7 +935,13 @@ class StopCanary(BaseAction):
         """Stop all running resources"""
         client = local_session(self.manager.session_factory).client('synthetics')
         for r in resources:
-            client.stop_canary(Name=r['Name'])
+            try:
+                desc = client.get_canary(Name=r['Name'])
+                if desc['Canary']['Status']['State'] == 'RUNNING':
+                    client.stop_canary(Name=r['Name'])
+            except Exception as e:
+                self.log.warning("Error stopping canary %s: %s", r['Name'], e)
+                continue
 
 
 @SyntheticsCanary.action_registry.register('delete')
@@ -905,4 +954,10 @@ class DeleteCanary(BaseAction):
         """Delete resources"""
         client = local_session(self.manager.session_factory).client('synthetics')
         for r in resources:
-            client.delete_canary(Name=r['Name'])
+            try:
+                desc = client.get_canary(Name=r['Name'])
+                if desc['Canary']['Status']['State'] == 'STOPPED':
+                    client.delete_canary(Name=r['Name'])
+            except Exception as e:
+                self.log.warning("Error deleting canary %s: %s", r['Name'], e)
+                continue
