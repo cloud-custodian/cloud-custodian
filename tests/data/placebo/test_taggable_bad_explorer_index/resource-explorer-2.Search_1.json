@@ -1,0 +1,17 @@
+{
+    "status_code": 400,
+    "data": {
+        "Error": {
+            "Message": "The specified filter tag is not valid because it uses properties that are not included in the view.",
+            "Code": "ValidationException"
+        },
+        "ResponseMetadata": {},
+        "Message": "The specified filter tag is not valid because it uses properties that are not included in the view.",
+        "FieldList": [
+            {
+                "Name": "QueryString",
+                "ValidationIssue": "Invalid filter name: tag"
+            }
+        ]
+    }
+}
