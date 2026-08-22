@@ -1,0 +1,80 @@
+{
+  "status_code": 200,
+  "data": {
+    "FileSystems": [
+      {
+        "OwnerId": "644160558196",
+        "CreationTime": {
+          "__class__": "datetime",
+          "year": 2026,
+          "month": 8,
+          "day": 7,
+          "hour": 17,
+          "minute": 36,
+          "second": 24,
+          "microsecond": 648000
+        },
+        "FileSystemId": "fs-0a584801db948c940",
+        "FileSystemType": "ONTAP",
+        "Lifecycle": "AVAILABLE",
+        "StorageCapacity": 1024,
+        "StorageType": "SSD",
+        "VpcId": "vpc-d2d616b5",
+        "SubnetIds": [
+          "subnet-efbcccb7"
+        ],
+        "NetworkInterfaceIds": [
+          "eni-048e65a0a31c9e635",
+          "eni-023946ef7c106004b"
+        ],
+        "KmsKeyId": "arn:aws:kms:us-east-1:644160558196:key/7d30a034-2787-478a-85e7-1a2b85205fbc",
+        "ResourceARN": "arn:aws:fsx:us-east-1:644160558196:file-system/fs-0a584801db948c940",
+        "Tags": [
+          {
+            "Key": "Env",
+            "Value": "Prod"
+          },
+          {
+            "Key": "c7n-purpose",
+            "Value": "fsx-ontap-managed-ad-verification"
+          },
+          {
+            "Key": "Name",
+            "Value": "c7n-fsx-ad-verify"
+          }
+        ],
+        "OntapConfiguration": {
+          "AutomaticBackupRetentionDays": 30,
+          "DailyAutomaticBackupStartTime": "09:30",
+          "DeploymentType": "SINGLE_AZ_1",
+          "Endpoints": {
+            "Intercluster": {
+              "DNSName": "intercluster.fs-0a584801db948c940.fsx.us-east-1.amazonaws.com",
+              "IpAddresses": [
+                "172.31.25.41",
+                "172.31.19.204"
+              ]
+            },
+            "Management": {
+              "DNSName": "management.fs-0a584801db948c940.fsx.us-east-1.amazonaws.com",
+              "IpAddresses": [
+                "172.31.26.195"
+              ]
+            }
+          },
+          "DiskIopsConfiguration": {
+            "Mode": "AUTOMATIC",
+            "Iops": 3072
+          },
+          "PreferredSubnetId": "subnet-efbcccb7",
+          "ThroughputCapacity": 128,
+          "WeeklyMaintenanceStartTime": "2:04:30",
+          "HAPairs": 1,
+          "ThroughputCapacityPerHAPair": 128
+        },
+        "NetworkType": "IPV4"
+      }
+    ],
+    "ResponseMetadata": {}
+  }
+}
