@@ -1,0 +1,282 @@
+{
+    "version": 1,
+    "interactions": [
+        {
+            "request": {
+                "method": "GET",
+                "uri": "https://management.azure.com/subscriptions/ea42f556-5106-4743-99b0-c129bfa71a47/providers/Microsoft.Databricks/workspaces?api-version=2018-04-01",
+                "body": null,
+                "headers": {}
+            },
+            "response": {
+                "status": {
+                    "code": 200,
+                    "message": "OK"
+                },
+                "headers": {
+                    "cache-control": [
+                        "no-cache"
+                    ],
+                    "content-type": [
+                        "application/json; charset=utf-8"
+                    ],
+                    "x-ms-ratelimit-remaining-subscription-resource-requests": [
+                        "249"
+                    ],
+                    "x-msedge-ref": [
+                        "Ref A: 8FA71E50263C47A7B2ADDE79A44A9005 Ref B: CPH011050219040 Ref C: 2025-06-30T21:41:13Z"
+                    ],
+                    "x-cache": [
+                        "CONFIG_NOCACHE"
+                    ],
+                    "date": [
+                        "Mon, 30 Jun 2025 21:41:13 GMT"
+                    ],
+                    "x-ms-original-request-ids": [
+                        "eastus:3763cc37-f1be-4c21-94a0-daf3487a4781"
+                    ],
+                    "content-length": [
+                        "1873"
+                    ]
+                },
+                "body": {
+                    "data": {
+                        "value": [
+                            {
+                                "properties": {
+                                    "publicNetworkAccess": "Enabled",
+                                    "managedResourceGroupId": "/subscriptions/ea42f556-5106-4743-99b0-c129bfa71a47/resourceGroups/databricks-rg-databricks-rg",
+                                    "parameters": {
+                                        "customPrivateSubnetName": {
+                                            "type": "String",
+                                            "value": "databricks-private-subnet"
+                                        },
+                                        "customPublicSubnetName": {
+                                            "type": "String",
+                                            "value": "databricks-public-subnet"
+                                        },
+                                        "customVirtualNetworkId": {
+                                            "type": "String",
+                                            "value": "/subscriptions/ea42f556-5106-4743-99b0-c129bfa71a47/resourceGroups/databricks-rg/providers/Microsoft.Network/virtualNetworks/databricks-vnet"
+                                        },
+                                        "enableFedRampCertification": {
+                                            "type": "Bool",
+                                            "value": false
+                                        },
+                                        "enableNoPublicIp": {
+                                            "type": "Bool",
+                                            "value": true
+                                        },
+                                        "prepareEncryption": {
+                                            "type": "Bool",
+                                            "value": false
+                                        },
+                                        "requireInfrastructureEncryption": {
+                                            "type": "Bool",
+                                            "value": false
+                                        },
+                                        "resourceTags": {
+                                            "type": "Object",
+                                            "value": {
+                                                "application": "databricks",
+                                                "databricks-environment": "true"
+                                            }
+                                        },
+                                        "storageAccountName": {
+                                            "type": "String",
+                                            "value": "dbstoragewbeuhaymcezic"
+                                        },
+                                        "storageAccountSkuName": {
+                                            "type": "String",
+                                            "value": "Standard_GRS"
+                                        }
+                                    },
+                                    "provisioningState": "Succeeded",
+                                    "authorizations": [
+                                        {
+                                            "principalId": "9a74af6f-d153-4348-988a-e2672920bee9",
+                                            "roleDefinitionId": "8e3af657-a8ff-443c-a75c-2fe8c4bcb635"
+                                        }
+                                    ],
+                                    "createdBy": {
+                                        "oid": "b95cc733-b44c-43e8-a2b8-ad5bf922f668",
+                                        "puid": "00030000FD7B7555",
+                                        "applicationId": "04b07795-8ddb-461a-bbee-02f9e1bf7b46"
+                                    },
+                                    "updatedBy": {
+                                        "oid": "b95cc733-b44c-43e8-a2b8-ad5bf922f668",
+                                        "puid": "00030000FD7B7555",
+                                        "applicationId": "04b07795-8ddb-461a-bbee-02f9e1bf7b46"
+                                    },
+                                    "workspaceId": "3736718139241295",
+                                    "workspaceUrl": "adb-3736718139241295.15.azuredatabricks.net",
+                                    "createdDateTime": "2025-06-30T19:44:18.8374092Z"
+                                },
+                                "id": "/subscriptions/ea42f556-5106-4743-99b0-c129bfa71a47/resourceGroups/databricks-rg/providers/Microsoft.Databricks/workspaces/databricks-workspace",
+                                "name": "databricks-workspace",
+                                "type": "Microsoft.Databricks/workspaces",
+                                "sku": {
+                                    "name": "premium"
+                                },
+                                "location": "eastus",
+                                "tags": {}
+                            }
+                        ]
+                    }
+                }
+            }
+        },
+        {
+            "request": {
+                "method": "GET",
+                "uri": "https://management.azure.com/subscriptions/ea42f556-5106-4743-99b0-c129bfa71a47/providers/Microsoft.Network/virtualNetworks?api-version=2024-05-01",
+                "body": null,
+                "headers": {}
+            },
+            "response": {
+                "status": {
+                    "code": 200,
+                    "message": "OK"
+                },
+                "headers": {
+                    "cache-control": [
+                        "no-cache"
+                    ],
+                    "content-type": [
+                        "application/json; charset=utf-8"
+                    ],
+                    "x-msedge-ref": [
+                        "Ref A: 2BDCAF6D149D46489C4C265125F6AAA2 Ref B: CPH011050219060 Ref C: 2025-06-30T21:41:14Z"
+                    ],
+                    "x-ms-ratelimit-remaining-subscription-global-reads": [
+                        "3749"
+                    ],
+                    "x-cache": [
+                        "CONFIG_NOCACHE"
+                    ],
+                    "x-ms-original-request-ids": [
+                        "2ece1924-0842-4e1f-8f11-9d8b57bab5c1"
+                    ],
+                    "x-ms-arm-service-request-id": [
+                        "624727f6-2c02-4e8b-a9ad-116738f1c9fd"
+                    ],
+                    "date": [
+                        "Mon, 30 Jun 2025 21:41:14 GMT"
+                    ],
+                    "content-length": [
+                        "3809"
+                    ]
+                },
+                "body": {
+                    "data": {
+                        "value": [
+                            {
+                                "name": "databricks-vnet",
+                                "id": "/subscriptions/ea42f556-5106-4743-99b0-c129bfa71a47/resourceGroups/databricks-rg/providers/Microsoft.Network/virtualNetworks/databricks-vnet",
+                                "etag": "W/\"9fe1a271-eafa-4ba4-b8df-fa65baa67a42\"",
+                                "type": "Microsoft.Network/virtualNetworks",
+                                "location": "eastus",
+                                "tags": {},
+                                "properties": {
+                                    "provisioningState": "Succeeded",
+                                    "resourceGuid": "6647f5a1-d3de-453f-8e14-309c688b56cd",
+                                    "addressSpace": {
+                                        "addressPrefixes": [
+                                            "10.0.0.0/16"
+                                        ]
+                                    },
+                                    "privateEndpointVNetPolicies": "Disabled",
+                                    "dhcpOptions": {
+                                        "dnsServers": []
+                                    },
+                                    "subnets": [
+                                        {
+                                            "name": "databricks-private-subnet",
+                                            "id": "/subscriptions/ea42f556-5106-4743-99b0-c129bfa71a47/resourceGroups/databricks-rg/providers/Microsoft.Network/virtualNetworks/databricks-vnet/subnets/databricks-private-subnet",
+                                            "etag": "W/\"9fe1a271-eafa-4ba4-b8df-fa65baa67a42\"",
+                                            "properties": {
+                                                "provisioningState": "Succeeded",
+                                                "addressPrefix": "10.0.2.0/24",
+                                                "networkSecurityGroup": {
+                                                    "id": "/subscriptions/ea42f556-5106-4743-99b0-c129bfa71a47/resourceGroups/databricks-rg/providers/Microsoft.Network/networkSecurityGroups/databricks-private-nsg"
+                                                },
+                                                "networkIntentPolicies": [
+                                                    {
+                                                        "id": "/subscriptions/ea42f556-5106-4743-99b0-c129bfa71a47/resourceGroups/DATABRICKS-RG/providers/Microsoft.Network/networkIntentPolicies/ADB-EASTUS-NPIP-25CE86F5BF37C7AC5BF4EBC4"
+                                                    }
+                                                ],
+                                                "serviceEndpoints": [],
+                                                "delegations": [
+                                                    {
+                                                        "name": "delegation",
+                                                        "id": "/subscriptions/ea42f556-5106-4743-99b0-c129bfa71a47/resourceGroups/databricks-rg/providers/Microsoft.Network/virtualNetworks/databricks-vnet/subnets/databricks-private-subnet/delegations/delegation",
+                                                        "etag": "W/\"9fe1a271-eafa-4ba4-b8df-fa65baa67a42\"",
+                                                        "properties": {
+                                                            "provisioningState": "Succeeded",
+                                                            "serviceName": "Microsoft.Databricks/workspaces",
+                                                            "actions": [
+                                                                "Microsoft.Network/virtualNetworks/subnets/join/action",
+                                                                "Microsoft.Network/virtualNetworks/subnets/prepareNetworkPolicies/action",
+                                                                "Microsoft.Network/virtualNetworks/subnets/unprepareNetworkPolicies/action"
+                                                            ]
+                                                        },
+                                                        "type": "Microsoft.Network/virtualNetworks/subnets/delegations"
+                                                    }
+                                                ],
+                                                "privateEndpointNetworkPolicies": "Disabled",
+                                                "privateLinkServiceNetworkPolicies": "Enabled",
+                                                "defaultOutboundAccess": true
+                                            },
+                                            "type": "Microsoft.Network/virtualNetworks/subnets"
+                                        },
+                                        {
+                                            "name": "databricks-public-subnet",
+                                            "id": "/subscriptions/ea42f556-5106-4743-99b0-c129bfa71a47/resourceGroups/databricks-rg/providers/Microsoft.Network/virtualNetworks/databricks-vnet/subnets/databricks-public-subnet",
+                                            "etag": "W/\"9fe1a271-eafa-4ba4-b8df-fa65baa67a42\"",
+                                            "properties": {
+                                                "provisioningState": "Succeeded",
+                                                "addressPrefix": "10.0.1.0/24",
+                                                "networkSecurityGroup": {
+                                                    "id": "/subscriptions/ea42f556-5106-4743-99b0-c129bfa71a47/resourceGroups/databricks-rg/providers/Microsoft.Network/networkSecurityGroups/databricks-public-nsg"
+                                                },
+                                                "networkIntentPolicies": [
+                                                    {
+                                                        "id": "/subscriptions/ea42f556-5106-4743-99b0-c129bfa71a47/resourceGroups/DATABRICKS-RG/providers/Microsoft.Network/networkIntentPolicies/ADB-EASTUS-NPIP-9EB4DFC94BD72C25EDDA8C03"
+                                                    }
+                                                ],
+                                                "serviceEndpoints": [],
+                                                "delegations": [
+                                                    {
+                                                        "name": "delegation",
+                                                        "id": "/subscriptions/ea42f556-5106-4743-99b0-c129bfa71a47/resourceGroups/databricks-rg/providers/Microsoft.Network/virtualNetworks/databricks-vnet/subnets/databricks-public-subnet/delegations/delegation",
+                                                        "etag": "W/\"9fe1a271-eafa-4ba4-b8df-fa65baa67a42\"",
+                                                        "properties": {
+                                                            "provisioningState": "Succeeded",
+                                                            "serviceName": "Microsoft.Databricks/workspaces",
+                                                            "actions": [
+                                                                "Microsoft.Network/virtualNetworks/subnets/join/action",
+                                                                "Microsoft.Network/virtualNetworks/subnets/prepareNetworkPolicies/action",
+                                                                "Microsoft.Network/virtualNetworks/subnets/unprepareNetworkPolicies/action"
+                                                            ]
+                                                        },
+                                                        "type": "Microsoft.Network/virtualNetworks/subnets/delegations"
+                                                    }
+                                                ],
+                                                "privateEndpointNetworkPolicies": "Disabled",
+                                                "privateLinkServiceNetworkPolicies": "Enabled",
+                                                "defaultOutboundAccess": true
+                                            },
+                                            "type": "Microsoft.Network/virtualNetworks/subnets"
+                                        }
+                                    ],
+                                    "virtualNetworkPeerings": [],
+                                    "enableDdosProtection": false
+                                }
+                            }
+                        ]
+                    }
+                }
+            }
+        }
+    ]
+}
