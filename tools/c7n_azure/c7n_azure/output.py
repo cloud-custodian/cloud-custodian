@@ -71,8 +71,9 @@ class AzureStorageOutput(DirectoryOutput):
     def upload(self):
         for root, dirs, files in os.walk(self.root_dir):
             for f in files:
-                blob_name = self.join(self.file_prefix, root[len(self.root_dir):], f)
-                blob_name.strip('/')
+                rel_path = root[len(self.root_dir):].replace(os.sep, '/')
+                blob_name = self.join(self.file_prefix, rel_path, f)
+                blob_name = blob_name.strip('/')
                 try:
                     self.blob_service.create_blob_from_path(
                         self.container,
