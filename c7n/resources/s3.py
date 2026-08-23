@@ -37,7 +37,8 @@ import threading
 import ssl
 
 from botocore.client import Config
-from botocore.exceptions import ClientError
+from botocore.exceptions import (
+    ClientError, ConnectTimeoutError, EndpointConnectionError, ReadTimeoutError)
 
 from collections import defaultdict
 from concurrent.futures import as_completed
@@ -617,6 +618,14 @@ class BucketAssembly:
                 log.warning(
                     "Bucket ssl error %s: %s %s",
                     bucket['Name'], bucket.get('Location', 'unknown'), e)
+                continue
+            except (ConnectTimeoutError, ReadTimeoutError, EndpointConnectionError) as e:
+                # Endpoint is unreachable or hung - could be a degraded/
+                # unreachable region, or a bucket deleted between
+                # list_buckets and here.
+                log.warning(
+                    "Bucket: %s unable to invoke method: %s error: %s ",
+                    bucket['Name'], method_name, e)
                 continue
             except ClientError as e:
                 code = e.response['Error']['Code']
