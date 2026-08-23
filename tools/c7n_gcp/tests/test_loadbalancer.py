@@ -95,6 +95,28 @@ class LoadBalancingAddressTest(BaseTest):
 
         self.assertEqual(len(result['items']["regions/{}".format(region)]['addresses']), 0)
 
+    def test_loadbalancer_address_set_labels_skips_global_addresses(self):
+        project_id = self.project_id
+        factory = self.replay_flight_data('lb-addresses-global-addresses',
+                                          project_id=project_id)
+        policy = self.load_policy(
+        {
+            'name': 'label-gcp-ip-addresses',
+            'resource': 'gcp.loadbalancer-address',
+            'filters': [{
+                'type': 'value',
+                'key': 'selfLink',
+                'op': 'regex',
+                'value': '.*/global/addresses/.*'}],
+            'actions': [{
+                'type': 'set-labels',
+                'labels': {'env': 'test'}}]
+        },
+        session_factory=factory)
+        resources = policy.run()
+        self.assertEqual(len(resources), 1)
+        self.assertEqual(resources[0]['name'], 'google-managed-services-default')
+
 
 class LoadBalancingUrlMapTest(BaseTest):
 
