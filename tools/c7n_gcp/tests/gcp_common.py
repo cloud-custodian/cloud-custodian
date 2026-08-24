@@ -62,7 +62,7 @@ def audit_event_recorder(
         method: str,
         resource_name: typing.Optional[str] = None,
         labels: typing.Optional[typing.Mapping[str, str]] = None,
-        start_time_skew: int = 60,
+        start_time_skew_seconds: int = 60,
         timeout: int = 120,
         poll_interval: int = 5,
 ) -> 'AuditEventRecorder':
@@ -81,7 +81,7 @@ def audit_event_recorder(
         method,
         resource_name=resource_name,
         labels=labels,
-        start_time_skew=start_time_skew,
+        start_time_skew_seconds=start_time_skew_seconds,
         timeout=timeout,
         poll_interval=poll_interval,
     )
@@ -96,7 +96,7 @@ class AuditEventRecorder:
             method: str,
             resource_name: typing.Optional[str] = None,
             labels: typing.Optional[typing.Mapping[str, str]] = None,
-            start_time_skew: int = 60,
+            start_time_skew_seconds: int = 60,
             timeout: int = 120,
             poll_interval: int = 5,
     ) -> None:
@@ -109,7 +109,7 @@ class AuditEventRecorder:
         self.poll_interval = poll_interval
         self.start_time = (
             datetime.datetime.now(datetime.timezone.utc) -
-            datetime.timedelta(seconds=start_time_skew)
+            datetime.timedelta(seconds=start_time_skew_seconds)
         )
 
     def record(self) -> None:

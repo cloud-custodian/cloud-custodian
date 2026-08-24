@@ -71,7 +71,7 @@ development project IDs. These are sanitized by the event recorder.
 
                 # Use a large skew to capture create events performed
                 # by Terraform.
-                start_time_skew=900,
+                start_time_skew_seconds=900,
 
                 ).record()
 
@@ -94,7 +94,7 @@ reuses ``setup_session``, so nothing is written to flight data -- and the
 test still passes, against the live api. For the same reason, build the
 setup session directly rather than through ``local_session()``.
 
-The ``start_time_skew`` parameter, as its name implies, is normally
+The ``start_time_skew_seconds`` parameter, as its name implies, is normally
 used to adjust for clock skew and defaults to 60 seconds.  It can also
 be used to work around the fact that the event recorder is created in
 the test body, after Terraform has created test resources.  Future
@@ -121,9 +121,9 @@ Filtering options
   ``protoPayload.resourceName``.
 - ``labels`` (optional) -- an exact-match mapping against
   ``resource.labels``, e.g. ``{"database_id": database_id}``.
-- ``start_time_skew`` (default 60s) -- how far before construction time to
-  set the query's lower time bound. The default covers clock skew between
-  the test host and Cloud Logging, assuming the recorder is constructed
+- ``start_time_skew_seconds`` (default 60) -- how far before construction
+  time to set the query's lower time bound. The default covers clock skew
+  between the test host and Cloud Logging, assuming the recorder is constructed
   around the time the event is triggered. Raise it when the event happened
   earlier -- notably for a resource a ``@terraform`` fixture created before
   the test body ran.

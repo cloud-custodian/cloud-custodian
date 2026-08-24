@@ -585,7 +585,7 @@ def test_disk_audit_mode(test, disk_audit):
                 event_file,
                 method='compute.{}.{}'.format(scopes[scope][0], method),
                 resource_name=names[scope],
-                start_time_skew=900,
+                start_time_skew_seconds=900,
                 ).record()
         # Sessions and their http transports are cached globally, ignoring
         # the factory asked for; without this the policy below reuses
