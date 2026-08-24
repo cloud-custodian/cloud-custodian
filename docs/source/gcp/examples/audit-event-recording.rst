@@ -4,16 +4,17 @@ Recording gcp-audit Event Fixtures
 ====================================
 
 Tests for ``gcp-audit`` mode policies run
-``exec_mode.run(event_data("some-event.json"), None)`` against a fixture
-event -- a Cloud Audit Log ``LogEntry``. ``audit_event_recorder``, in
-``tools/c7n_gcp/tests/gcp_common.py``, records those fixtures from real GCP
-Cloud Audit Log entries instead of hand-writing synthetic event JSON, which
-easily drifts from what GCP actually sends.
+``exec_mode.run(event_data("some-event.json"), None)`` against a
+fixture event -- a Cloud Audit Log ``LogEntry``. The test helper,
+``audit_event_recorder``, in ``tools/c7n_gcp/tests/gcp_common.py``,
+records those fixtures from real GCP Cloud Audit Log entries instead
+of hand-writing synthetic event JSON, which easily drifts from what
+GCP actually sends.
 
-It only queries Cloud Logging -- no logging sink, Pub/Sub topic, or Cloud
-Function is provisioned. That machinery is what a deployed ``gcp-audit``
-policy uses to receive events at runtime; a test only needs the event data
-itself.
+Normally, when running ``gcp-audit`` mode policies, cloud resources are
+created to invoke the policies when configured events occur, as
+indicated by log entries.  The test helper avoids that by capturing
+log entries directly.
 
 Basic usage
 ------------
@@ -22,12 +23,14 @@ Recording is gated on ``test.recording``: it needs a live Cloud Logging
 client, so it can't run against replayed flight data. Loading the fixture
 for assertions always goes through ``event_data(...)``, regardless of mode.
 
-The api calls a recording run makes to *set up* an event -- triggering the
-change, then polling Cloud Logging for it -- are not the behavior under
-test, and should not go through the flight recorder. Cloud Logging returns
-whole ``LogEntry`` objects, so recording those responses as flight data
-commits the caller's email address and ip; the flight recorder sanitizes
-project ids, not those. Do that work with a plain ``Session`` instead:
+API calls made by a recording run to *set up* an event, such as
+triggering a resource change and polling Cloud Logging, are not
+the behavior under test, and should not go through the test flight
+recorder.  For that reason, a separate setup session is used.
+
+Cloud Logging returns whole ``LogEntry`` objects, which include
+sensitive developer data, such as email and IP addresses and
+development project IDs. These are sanitized by the event recorder.
 
 .. code-block:: python
 
@@ -45,6 +48,7 @@ project ids, not those. Do that work with a plain ``Session`` instead:
             "firestore-backup-schedule-update", project_id=project_id)
 
         if test.recording:
+            # Use a separate session for event recording:
             setup_session_factory = functools.partial(
                 Session, project_id=project_id)
             setup_session = setup_session_factory()
@@ -54,12 +58,24 @@ project ids, not those. Do that work with a plain ``Session`` instead:
 
             audit_event_recorder(
                 setup_session_factory,
+
+                # Base name for recorded event-data files:
                 "firestore-backup-schedule-update.json",
+
+                # Required event operation method-name to record:
                 method="UpdateBackupSchedule",
+
+                # Additional filters
                 resource_name=resource_name,
                 labels={"database_id": database_id},
+
+                # Use a large skew to capture create events performed
+                # by Terraform.
+                start_time_skew=900,
+
                 ).record()
 
+            # Prevent the cached setup session from being reused:
             test.cleanUp()
 
         policy = test.load_policy(
@@ -77,6 +93,12 @@ ignoring the factory the caller asked for. Without it the policy below
 reuses ``setup_session``, so nothing is written to flight data -- and the
 test still passes, against the live api. For the same reason, build the
 setup session directly rather than through ``local_session()``.
+
+The ``start_time_skew`` parameter, as its name implies, is normally
+used to adjust for clock skew and defaults to 60 seconds.  It can also
+be used to work around the fact that the event recorder is created in
+the test body, after Terraform has created test resources.  Future
+versions of the test helper will make this unnecessary.
 
 While actually recording, the flight-data and Terraform decorators take
 their recording forms -- ``test.record_flight_data(...)`` and
@@ -118,10 +140,13 @@ swept up an unrelated operation, so narrow ``resource_name`` or ``labels``.
 Files created
 --------------
 
-For a call with no `operation` field (see below), the matching entry is
+Some GCP operations have multiple log entries.  These log entries have
+an ``operation`` field with an ``id`` field used to group them together.
+
+For a call with no ``operation`` field, the matching entry is
 written under the requested name, e.g. ``foo.json``.
 
-If an entry belongs to a Cloud Logging *operation* (see below), the
+If an entry has an ``operation`` field, the
 filename reflects that:
 
 - entries are grouped by ``operation.id``, and each distinct operation
@@ -134,11 +159,11 @@ filename reflects that:
   ``last`` entry -- one operation completing doesn't cut short another
   operation the same filter matched
 
-So the common case for an operation-tracked method produces exactly two
-files: ``foo-first.json`` and ``foo-last.json``. A second, distinct
-operation swept up by the same filter (rare, but possible with a loose or no
-``resource_name`` substring) would produce ``foo-1-first.json`` /
-``foo-1-last.json``.
+So the common case for an operation with multiple log entries produces
+exactly two files: ``foo-first.json`` and ``foo-last.json``. A second,
+distinct operation swept up by the same filter (rare, but possible
+with a loose or no ``resource_name`` substring) would produce
+``foo-1-first.json`` / ``foo-1-last.json``.
 
 If a computed filename already exists on disk (e.g. a stale fixture from
 an earlier recording run, or two truly ambiguous matches), a numeric
@@ -164,52 +189,25 @@ Other projects an entry refers to (a public image project, say) are left
 alone, as is the ``oauthClientId``, which identifies the client
 application rather than the caller.
 
-Events and operations may have multiple log entries
--------------------------------------------------------
+Caveats
+-------
 
-A single logical API call frequently produces more than one Cloud Audit
-Log entry, correlated via a Cloud Logging ``LogEntryOperation``
-(the top-level ``operation`` field: ``id``, ``first``, ``last``) rather
-than anything under ``protoPayload``. Not every method uses this: many
-produce exactly one, standalone log entry per call, with no ``operation``
-field at all.
+Multiple log entries cause multiple policy invocations
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
-This matters for ``gcp-audit`` mode specifically because the deployed
-Cloud Function's Logging sink filters only on ``protoPayload.methodName``.
-Both the ``first`` and ``last`` rows of an operation-tracked call share
-the same method name, so *both* independently match the sink filter and
-get delivered as separate Pub/Sub messages -- meaning a real deployed
-policy can be invoked twice for one real-world API call. Recording both
-rows lets a test exercise the policy against either explicitly, rather
-than assuming the deployed function only ever sees one event per call.
-
-The two rows commonly carry different data: for update-type events the
-``first`` row typically has everything (``request``, permission info) that
-the ``last`` row lacks, with ``last`` mainly signalling completion (or
-failure, via ``protoPayload.status``). For create-type events, the split
-is less consistent -- see below.
+As mentioned earlier, an operation may have multiple log entries. A
+matching policy will be invoked for each entry.
 
 Creation events don't always identify what was created
------------------------------------------------------------
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
 For "update" audit events, ``protoPayload.resourceName``
 reliably names the specific resource being changed, since it already
 exists and already has an assigned id.
 
 For "create" audit events, that isn't reliable. Whether the
-event identifies the *created* resource depends on whether the resource's
-id is client-specified (e.g. a Dataproc cluster name, chosen by the
-caller) or server-generated (e.g. a Firestore backup schedule id, a UUID
-assigned by the API). When the id is server-generated,
-``protoPayload.resourceName`` on the create event often names only the
-*parent* resource, not the child being created -- and depending on the
-service, the child's id may or may not show up elsewhere (``response``,
-or the ``operation.id`` from the previous section). Some create events
-provide no identity for the created resource anywhere in the log entry at
-all.
-
-Recorded event fixtures reflect this reality; a create-mode policy for a
-resource type with server-generated ids may need resource-specific
-handling (e.g. building a value directly from ``protoPayload.request``,
-rather than resolving an id and calling ``get()``) instead of the generic
-``resourceName``-based resolution that works for updates.
+event identifies the *created* resource depends on the resource type.
+For some resources, ``resourceName`` names some other resource that
+serves the role of a factory.  In some, but not all, cases, the
+identity of the created resource occurs somewhere in log entries in a
+resource-type dependent way.
