@@ -14,7 +14,6 @@ from c7n.utils import get_retry, local_session, type_schema
 @resources.register('glacier')
 class Glacier(QueryResourceManager):
 
-    permissions = ('glacier:ListTagsForVault',)
     retry = staticmethod(get_retry(('Throttled',)))
 
     class resource_type(TypeInfo):
@@ -23,22 +22,10 @@ class Glacier(QueryResourceManager):
         name = id = "VaultName"
         arn = "VaultARN"
         arn_type = 'vaults'
-        universal_taggable = True
-
-    def augment(self, resources):
-        def process_tags(resource):
-            client = local_session(self.session_factory).client('glacier')
-            tag_dict = self.retry(
-                client.list_tags_for_vault,
-                vaultName=resource[self.get_model().name])['Tags']
-            tag_list = []
-            for k, v in tag_dict.items():
-                tag_list.append({'Key': k, 'Value': v})
-            resource['Tags'] = tag_list
-            return resource
-
-        with self.executor_factory(max_workers=2) as w:
-            return list(w.map(process_tags, resources))
+        # AWS has retired the Glacier vault tagging/listing API surface;
+        # list_tags_for_vault and the tag/untag calls now raise
+        # NoLongerSupportedException, so vaults are no longer taggable.
+        universal_taggable = False
 
 
 @Glacier.filter_registry.register('cross-account')
