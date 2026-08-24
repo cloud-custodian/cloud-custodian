@@ -18,45 +18,74 @@ itself.
 Basic usage
 ------------
 
-Construct the recorder *before* triggering the API call, so its polling
-window starts early enough to catch the resulting log entry. Gate
-``record()`` on ``test.recording`` -- it queries a live Cloud Logging
+Recording is gated on ``test.recording``: it needs a live Cloud Logging
 client, so it can't run against replayed flight data. Loading the fixture
-for assertions always goes through the existing ``event_data(...)``,
-regardless of mode:
+for assertions always goes through ``event_data(...)``, regardless of mode.
+
+The api calls a recording run makes to *set up* an event -- triggering the
+change, then polling Cloud Logging for it -- are not the behavior under
+test, and should not go through the flight recorder. Cloud Logging returns
+whole ``LogEntry`` objects, so recording those responses as flight data
+commits the caller's email address and ip; the flight recorder sanitizes
+project ids, not those. Do that work with a plain ``Session`` instead:
 
 .. code-block:: python
 
+    import functools
+
+    from c7n_gcp.client import Session
     from gcp_common import audit_event_recorder, event_data
 
+    @terraform("firestore_database")
     def test_firestore_backup_schedule_update(test, firestore_database):
         resource_name = firestore_database.resources[
             "google_firestore_backup_schedule"]["c7n"]["id"]
 
-        session_factory = test.record_flight_data(
+        policy_session_factory = test.replay_flight_data(
             "firestore-backup-schedule-update", project_id=project_id)
 
-        recorder = audit_event_recorder(
-            session_factory,
-            "firestore-backup-schedule-update.json",
-            method="UpdateBackupSchedule",
-            resource_name=resource_name,
-            labels={"database_id": database_id},
-        )
-
-        # trigger the real update here, e.g. a client.execute_command('patch', ...)
-        # call, or a Terraform resource change
-
         if test.recording:
-            recorder.record()
+            setup_session_factory = functools.partial(
+                Session, project_id=project_id)
+            setup_session = setup_session_factory()
 
-        event = event_data("firestore-backup-schedule-update.json")
-        exec_mode = policy.get_execution_mode()
-        resources = exec_mode.run(event, None)
+            # trigger the real change here, e.g.
+            # setup_session.client(...).execute_command("patch", ...)
 
-Once recorded, commit the generated fixture(s) under
-``tools/c7n_gcp/tests/data/events/`` and switch the test to
-``replay_flight_data(...)``, same as any other flight-data test.
+            audit_event_recorder(
+                setup_session_factory,
+                "firestore-backup-schedule-update.json",
+                method="UpdateBackupSchedule",
+                resource_name=resource_name,
+                labels={"database_id": database_id},
+                ).record()
+
+            test.cleanUp()
+
+        policy = test.load_policy(
+            {...}, session_factory=policy_session_factory)
+        [resource] = policy.get_execution_mode().run(
+            event_data("firestore-backup-schedule-update.json"), None)
+
+The recorder takes a session *factory*, not a session, which is why
+``setup_session_factory`` is kept around after being called.
+
+``test.cleanUp()`` at the end of the block is required, not tidiness. A
+session (keyed by region, in ``c7n.utils.CONN_CACHE``) and its http
+transport (keyed by thread, by ``Session.http``) are both cached globally,
+ignoring the factory the caller asked for. Without it the policy below
+reuses ``setup_session``, so nothing is written to flight data -- and the
+test still passes, against the live api. For the same reason, build the
+setup session directly rather than through ``local_session()``.
+
+While actually recording, the flight-data and Terraform decorators take
+their recording forms -- ``test.record_flight_data(...)`` and
+``@terraform("firestore_database", replay=False)``. Once recorded, commit
+the generated fixture(s) under ``tools/c7n_gcp/tests/data/events/`` and
+switch both back, same as any other flight-data test.
+
+``test_disk_audit_mode``, in ``tools/c7n_gcp/tests/test_compute.py``, is a
+worked example.
 
 Filtering options
 -------------------
@@ -71,8 +100,11 @@ Filtering options
 - ``labels`` (optional) -- an exact-match mapping against
   ``resource.labels``, e.g. ``{"database_id": database_id}``.
 - ``start_time_skew`` (default 60s) -- how far before construction time to
-  set the query's lower time bound, to guard against clock skew between
-  the test host and Cloud Logging.
+  set the query's lower time bound. The default covers clock skew between
+  the test host and Cloud Logging, assuming the recorder is constructed
+  around the time the event is triggered. Raise it when the event happened
+  earlier -- notably for a resource a ``@terraform`` fixture created before
+  the test body ran.
 - ``timeout`` / ``poll_interval`` (default 120s/5s) -- how long, and how often, to poll
   before giving up.
 

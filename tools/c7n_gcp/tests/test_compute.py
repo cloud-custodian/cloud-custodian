@@ -552,7 +552,8 @@ def test_disk_audit_mode(test, disk_audit):
         ('disk-regional-update-first-last.json', 'regional'),
         )
 
-    factory = test.replay_flight_data('disk-audit', project_id=project_id)
+    policy_session_factory = test.replay_flight_data(
+        'disk-audit', project_id=project_id)
 
     if test.recording:
         # Setup, not the behavior being replayed: mutating the disks
@@ -601,7 +602,7 @@ def test_disk_audit_mode(test, disk_audit):
                          'v1.compute.disks.setLabels',
                          'v1.compute.regionDisks.insert',
                          'v1.compute.regionDisks.setLabels']}},
-        session_factory=factory)
+        session_factory=policy_session_factory)
     exec_mode = policy.get_execution_mode()
 
     for event_file, scope in events:
