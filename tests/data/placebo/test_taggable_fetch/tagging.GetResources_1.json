@@ -7,6 +7,14 @@
                 "ResourceARN": "arn:aws:ec2:us-east-1:644160558196:security-group/sg-0a7ffda39b37c79e2",
                 "Tags": [
                     {
+                        "Key": "NonCompliant",
+                        "Value": "FOUND"
+                    },
+                    {
+                        "Key": "BulkOwner",
+                        "Value": "kapil@stacklet.io"
+                    },
+                    {
                         "Key": "kubernetes.io/cluster/app-dev",
                         "Value": "owned"
                     }
@@ -31,6 +39,28 @@
                     {
                         "Key": "stacklet:app",
                         "Value": "AssetDB"
+                    },
+                    {
+                        "Key": "BulkOwner",
+                        "Value": "kapil@stacklet.io"
+                    }
+                ],
+                "ComplianceDetails": {
+                    "NoncompliantKeys": [],
+                    "KeysWithNoncompliantValues": [],
+                    "MissingTagKeys": [
+                        "Owner",
+                        "Env"
+                    ],
+                    "ComplianceStatus": false
+                }
+            },
+            {
+                "ResourceARN": "arn:aws:ec2:us-east-1:644160558196:security-group/sg-0620e2bcc8d5ef20b",
+                "Tags": [
+                    {
+                        "Key": "BulkOwner",
+                        "Value": "kapil@stacklet.io"
                     }
                 ],
                 "ComplianceDetails": {
@@ -49,6 +79,10 @@
                     {
                         "Key": "aws:eks:cluster-name",
                         "Value": "hilarious-dubstep-dolphin"
+                    },
+                    {
+                        "Key": "BulkOwner",
+                        "Value": "kapil@stacklet.io"
                     },
                     {
                         "Key": "kubernetes.io/cluster/hilarious-dubstep-dolphin",
@@ -70,6 +104,24 @@
                 }
             },
             {
+                "ResourceARN": "arn:aws:ec2:us-east-1:644160558196:security-group/sg-0924015c361fb7835",
+                "Tags": [
+                    {
+                        "Key": "BulkOwner",
+                        "Value": "kapil@stacklet.io"
+                    }
+                ],
+                "ComplianceDetails": {
+                    "NoncompliantKeys": [],
+                    "KeysWithNoncompliantValues": [],
+                    "MissingTagKeys": [
+                        "Owner",
+                        "Env"
+                    ],
+                    "ComplianceStatus": false
+                }
+            },
+            {
                 "ResourceARN": "arn:aws:ec2:us-east-1:644160558196:security-group/sg-016dffc44c4b20b1b",
                 "Tags": [
                     {
@@ -77,12 +129,8 @@
                         "Value": "eksctl-app-dev-nodegroup-k8s-skunk-workers"
                     },
                     {
-                        "Key": "alpha.eksctl.io/cluster-name",
-                        "Value": "app-dev"
-                    },
-                    {
-                        "Key": "alpha.eksctl.io/nodegroup-name",
-                        "Value": "k8s-skunk-workers"
+                        "Key": "NonCompliant",
+                        "Value": "FOUND"
                     },
                     {
                         "Key": "aws:cloudformation:stack-id",
@@ -93,10 +141,6 @@
                         "Value": "app-dev"
                     },
                     {
-                        "Key": "aws:cloudformation:logical-id",
-                        "Value": "SG"
-                    },
-                    {
                         "Key": "kubernetes.io/cluster/app-dev",
                         "Value": "owned"
                     },
@@ -105,16 +149,32 @@
                         "Value": "unmanaged"
                     },
                     {
-                        "Key": "alpha.eksctl.io/eksctl-version",
-                        "Value": "0.189.0-dev+c9afc4260.2024-08-19T12:43:03Z"
+                        "Key": "eksctl.io/v1alpha2/nodegroup-name",
+                        "Value": "k8s-skunk-workers"
                     },
                     {
                         "Key": "Name",
                         "Value": "eksctl-app-dev-nodegroup-k8s-skunk-workers/SG"
                     },
                     {
-                        "Key": "eksctl.io/v1alpha2/nodegroup-name",
+                        "Key": "alpha.eksctl.io/nodegroup-name",
                         "Value": "k8s-skunk-workers"
+                    },
+                    {
+                        "Key": "alpha.eksctl.io/cluster-name",
+                        "Value": "app-dev"
+                    },
+                    {
+                        "Key": "BulkOwner",
+                        "Value": "kapil@stacklet.io"
+                    },
+                    {
+                        "Key": "aws:cloudformation:logical-id",
+                        "Value": "SG"
+                    },
+                    {
+                        "Key": "alpha.eksctl.io/eksctl-version",
+                        "Value": "0.189.0-dev+c9afc4260.2024-08-19T12:43:03Z"
                     }
                 ],
                 "ComplianceDetails": {
@@ -131,8 +191,16 @@
                 "ResourceARN": "arn:aws:ec2:us-east-1:644160558196:security-group/sg-09f477b3d193ffe74",
                 "Tags": [
                     {
+                        "Key": "NonCompliant",
+                        "Value": "FOUND"
+                    },
+                    {
                         "Key": "aws:eks:cluster-name",
                         "Value": "app-dev"
+                    },
+                    {
+                        "Key": "BulkOwner",
+                        "Value": "kapil@stacklet.io"
                     },
                     {
                         "Key": "kubernetes.io/cluster/app-dev",
@@ -169,6 +237,10 @@
                         "Value": "arn:aws:cloudformation:us-east-1:644160558196:stack/eksctl-app-dev-cluster/d942f6e0-5ff7-11ef-a8b0-0e01479a4f1f"
                     },
                     {
+                        "Key": "BulkOwner",
+                        "Value": "kapil@stacklet.io"
+                    },
+                    {
                         "Key": "eksctl.cluster.k8s.io/v1alpha1/cluster-name",
                         "Value": "app-dev"
                     },
@@ -201,7 +273,12 @@
             },
             {
                 "ResourceARN": "arn:aws:ec2:us-east-1:644160558196:security-group/sg-0073803221c503d85",
-                "Tags": [],
+                "Tags": [
+                    {
+                        "Key": "BulkOwner",
+                        "Value": "kapil@stacklet.io"
+                    }
+                ],
                 "ComplianceDetails": {
                     "NoncompliantKeys": [],
                     "KeysWithNoncompliantValues": [],
@@ -245,6 +322,10 @@
                         "Value": "app-dev"
                     },
                     {
+                        "Key": "BulkOwner",
+                        "Value": "kapil@stacklet.io"
+                    },
+                    {
                         "Key": "alpha.eksctl.io/cluster-oidc-enabled",
                         "Value": "false"
                     },
@@ -281,6 +362,10 @@
                     {
                         "Key": "stacklet:app",
                         "Value": "AssetDB"
+                    },
+                    {
+                        "Key": "BulkOwner",
+                        "Value": "kapil@stacklet.io"
                     }
                 ],
                 "ComplianceDetails": {
@@ -305,8 +390,48 @@
                         "Value": "seriously-dangerous-rabbit"
                     },
                     {
+                        "Key": "BulkOwner",
+                        "Value": "kapil@stacklet.io"
+                    },
+                    {
                         "Key": "Name",
                         "Value": "eks-cluster-sg-seriously-dangerous-rabbit-1831039975"
+                    }
+                ],
+                "ComplianceDetails": {
+                    "NoncompliantKeys": [],
+                    "KeysWithNoncompliantValues": [],
+                    "MissingTagKeys": [
+                        "Owner",
+                        "Env"
+                    ],
+                    "ComplianceStatus": false
+                }
+            },
+            {
+                "ResourceARN": "arn:aws:ec2:us-east-1:644160558196:security-group/sg-00de003b8a9dbca94",
+                "Tags": [
+                    {
+                        "Key": "BulkOwner",
+                        "Value": "kapil@stacklet.io"
+                    }
+                ],
+                "ComplianceDetails": {
+                    "NoncompliantKeys": [],
+                    "KeysWithNoncompliantValues": [],
+                    "MissingTagKeys": [
+                        "Owner",
+                        "Env"
+                    ],
+                    "ComplianceStatus": false
+                }
+            },
+            {
+                "ResourceARN": "arn:aws:ec2:us-east-1:644160558196:security-group/sg-06fd63295a670e46b",
+                "Tags": [
+                    {
+                        "Key": "BulkOwner",
+                        "Value": "kapil@stacklet.io"
                     }
                 ],
                 "ComplianceDetails": {

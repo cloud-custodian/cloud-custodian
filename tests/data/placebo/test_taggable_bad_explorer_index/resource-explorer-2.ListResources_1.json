@@ -9,7 +9,7 @@
         "Message": "The specified filter tag is not valid because it uses properties that are not included in the view.",
         "FieldList": [
             {
-                "Name": "QueryString",
+                "Name": "FieldName",
                 "ValidationIssue": "Invalid filter name: tag"
             }
         ]

@@ -81,7 +81,7 @@ def test_taggable_noncompliant(test):
     )
 
     resources = policy.run()
-    assert len(resources) == 16
+    assert len(resources) == 15
 
 
 def test_taggable_tagmatch(test):
