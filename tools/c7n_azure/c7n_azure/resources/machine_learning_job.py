@@ -85,20 +85,25 @@ class MachineLearningJobCancelAction(AzureBaseAction):
 
     schema = type_schema('cancel')
 
-    uncancellable_statuses = frozenset(
-        ('Completed', 'Failed', 'Canceled', 'CancelRequested'))
+    uncancellable_statuses = frozenset((
+        'Completed',
+        'Failed',
+        'Canceled',
+        'CancelRequested',
+        ))
 
-    def _prepare_processing(self):
+    def _prepare_processing(self) -> None:
         self.client = self.manager.get_client()
 
     def _process_resource(self, resource: dict) -> str:
-        status = resource['properties'].get('status')
+        status = resource['properties']['status']
         if status in self.uncancellable_statuses:
             return f'not cancelled, status is {status}'
 
+        workspace = ResourceIdParser.get_resource_name(resource['c7n:parent-id'])
         self.client.jobs.begin_cancel(
             resource_group_name=ResourceIdParser.get_resource_group(resource['id']),
-            workspace_name=ResourceIdParser.get_resource_name(resource['c7n:parent-id']),
+            workspace_name=workspace,
             id=resource['name'],
             # The default poller would spawn a thread per job to watch the
             # cancellation through to Canceled; requesting it is enough.
