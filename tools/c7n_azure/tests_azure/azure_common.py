@@ -556,14 +556,11 @@ def cassette_name(name):
 
 
 def strict_cassette(name):
-    """Name the cassette, and require every recorded interaction to be played.
+    """Use a cassette requiring all interactions to be played on replay.
 
     ``cassette_name`` constrains a test from one side only: playback rejects a
     request that was never recorded, but stays silent about a recorded request
-    the code under test stops making. A test whose subject *is* a request --
-    the PUT or POST an action issues -- therefore passes just as happily when
-    the action does nothing at all, because its other assertions read recorded
-    responses either way.
+    the code under test stops making.
 
     Mutually exclusive with sharing a cassette between tests, since a shared
     recording is the union of what each of them replays.
