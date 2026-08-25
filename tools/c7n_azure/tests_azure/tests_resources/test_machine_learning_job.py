@@ -5,7 +5,12 @@ from c7n.utils import local_session
 from c7n_azure.resources.machine_learning_job import MachineLearningJob
 from c7n_azure.session import Session
 from c7n_azure.utils import ResourceIdParser
-from ..azure_common import BaseTest, arm_template, cassette_name
+from ..azure_common import (
+    BaseTest,
+    arm_template,
+    cassette_name,
+    strict_cassette,
+    )
 
 
 class MachineLearningJobTest(BaseTest):
@@ -64,7 +69,7 @@ class MachineLearningJobTest(BaseTest):
         self.assertEqual('cctest-sweep-job', resources[0]['name'])
 
     @arm_template('machine-learning-job-cancel.json')
-    @cassette_name('machine-learning-job-cancel')
+    @strict_cassette('machine-learning-job-cancel')
     def test_machine_learning_job_cancel(self):
         p = self.load_policy({
             'name': 'cancel-machine-learning-job',
@@ -92,8 +97,3 @@ class MachineLearningJobTest(BaseTest):
             running['name'],
         )
         self.assertEqual('CancelRequested', job.properties.status)
-
-        # The completed job must not be cancelled: playback holds no cancel
-        # interaction for it, so such a request would fail to match. Conversely
-        # all_played requires that the running job's cancel POST was issued.
-        self.assertTrue(self.cassette.all_played)

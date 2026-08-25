@@ -156,6 +156,22 @@ class AzureVCRBaseTest(VCRTestCase):
         super(AzureVCRBaseTest, self).__init__(*args, **kwargs)
         self.vcr_enabled = not strtobool(os.environ.get('C7N_FUNCTIONAL', 'no'))
 
+    def setUp(self):
+        super(AzureVCRBaseTest, self).setUp()
+        if self.vcr_enabled and getattr(
+                getattr(self, self._testMethodName), 'strict_cassette', False):
+            # Registered after the cassette's own cleanup, so it runs first,
+            # while the cassette is still open.
+            self.addCleanup(self._assert_cassette_fully_played)
+
+    def _assert_cassette_fully_played(self):
+        unplayed = [
+            '{0} {1}'.format(r.method, r.uri)
+            for i, r in enumerate(self.cassette.requests)
+            if not self.cassette.play_counts[i]
+            ]
+        self.assertFalse(unplayed, 'unplayed cassette interactions')
+
     def is_playback(self):
         # You can't do this in setup because it is actually required by the base class
         # setup (via our callbacks), but it is also not possible to do until the base class setup
@@ -535,6 +551,26 @@ def arm_template(template):
 def cassette_name(name):
     def decorator(func):
         func.cassette_name = name
+        return func
+    return decorator
+
+
+def strict_cassette(name):
+    """Name the cassette, and require every recorded interaction to be played.
+
+    ``cassette_name`` constrains a test from one side only: playback rejects a
+    request that was never recorded, but stays silent about a recorded request
+    the code under test stops making. A test whose subject *is* a request --
+    the PUT or POST an action issues -- therefore passes just as happily when
+    the action does nothing at all, because its other assertions read recorded
+    responses either way.
+
+    Mutually exclusive with sharing a cassette between tests, since a shared
+    recording is the union of what each of them replays.
+    """
+    def decorator(func):
+        func.cassette_name = name
+        func.strict_cassette = True
         return func
     return decorator
 
