@@ -14,6 +14,8 @@ import pytest
 from pytest_terraform import terraform
 from dateutil import parser
 
+import botocore.session
+from botocore.stub import Stubber
 from c7n.exceptions import PolicyValidationError
 from c7n.executor import MainThreadExecutor
 from c7n.filters.iamaccess import CrossAccountAccessFilter, PolicyChecker
@@ -25,6 +27,7 @@ from c7n.resources.iam import (
     UserMfaDevice,
     UsedIamPolicies,
     UnusedIamPolicies,
+    AllowAllIamPolicies,
     UsedInstanceProfiles,
     UnusedInstanceProfiles,
     UsedIamRole,
@@ -37,9 +40,13 @@ from c7n.resources.iam import (
     IamUserInlinePolicy,
     IamRoleInlinePolicy,
     IamGroupInlinePolicy,
+    RoleRemoveTag,
+    RoleTag,
     SpecificIamRoleManagedPolicy,
     NoSpecificIamRoleManagedPolicy,
     PolicyQueryParser,
+    UserRemoveTag,
+    UserTag,
     UserServiceSpecificCredentials,
 )
 
@@ -366,6 +373,105 @@ class UserCredentialReportTest(BaseTest):
                 "user_creation_time": "2016-10-06T16:11:27+00:00",
             },
         )
+
+
+class IamTagRetry(BaseTest):
+
+    def test_iam_tag_actions_retry_concurrent_modification(self):
+        self.patch(time, "sleep", lambda _: None)
+        cases = (
+            (RoleTag, "tag_role", "RoleName"),
+            (RoleRemoveTag, "untag_role", "RoleName"),
+            (UserTag, "tag_user", "UserName"),
+            (UserRemoveTag, "untag_user", "UserName"),
+        )
+
+        for action_class, operation_name, id_key in cases:
+            with self.subTest(operation=operation_name):
+                resource = {id_key: "resource-one"}
+                missing = {id_key: "resource-missing"}
+                if operation_name.startswith("untag_"):
+                    tag_key, tags = "TagKeys", ["Env"]
+                else:
+                    tag_key, tags = "Tags", [{"Key": "Env", "Value": "Dev"}]
+                client = botocore.session.get_session().create_client(
+                    "iam",
+                    region_name="us-east-1",
+                    aws_access_key_id="access-key",
+                    aws_secret_access_key="secret-key",
+                )
+                expected = {**resource, tag_key: tags}
+                missing_expected = {**missing, tag_key: tags}
+                stubber = Stubber(client)
+                stubber.add_client_error(
+                    operation_name,
+                    service_error_code="ConcurrentModification",
+                    service_message="simultaneous change",
+                    http_status_code=409,
+                    expected_params=expected,
+                )
+                stubber.add_response(operation_name, {}, expected)
+                stubber.add_client_error(
+                    operation_name,
+                    service_error_code="NoSuchEntity",
+                    service_message="missing",
+                    http_status_code=404,
+                    expected_params=missing_expected,
+                )
+
+                action = action_class({}, mock.Mock())
+                with stubber, mock.patch.object(
+                    client, operation_name, wraps=getattr(client, operation_name)
+                ) as operation:
+                    action.process_resource_set(client, [resource, missing], tags)
+
+                self.assertEqual(operation.call_count, 3)
+                self.assertEqual(
+                    operation.call_args_list,
+                    [
+                        mock.call(**expected),
+                        mock.call(**expected),
+                        mock.call(**missing_expected),
+                    ],
+                )
+
+    def test_iam_tag_retry_uses_single_attempt_budget(self):
+        sleep = mock.Mock()
+        self.patch(time, "sleep", sleep)
+        client = botocore.session.get_session().create_client(
+            "iam",
+            region_name="us-east-1",
+            aws_access_key_id="access-key",
+            aws_secret_access_key="secret-key",
+        )
+        expected = {
+            "RoleName": "resource-one",
+            "Tags": [{"Key": "Env", "Value": "Dev"}],
+        }
+        stubber = Stubber(client)
+        for attempt in range(8):
+            throttled = attempt % 2 == 0
+            stubber.add_client_error(
+                "tag_role",
+                service_error_code="Throttling" if throttled else "ConcurrentModification",
+                service_message="retry",
+                http_status_code=429 if throttled else 409,
+                expected_params=expected,
+            )
+
+        action = RoleTag({}, mock.Mock())
+        with stubber, mock.patch.object(
+            client, "tag_role", wraps=client.tag_role
+        ) as operation:
+            with self.assertRaises(ClientError):
+                action.process_resource_set(
+                    client,
+                    [{"RoleName": "resource-one"}],
+                    [{"Key": "Env", "Value": "Dev"}],
+                )
+
+        self.assertEqual(operation.call_count, 8)
+        self.assertEqual(sleep.call_count, 7)
 
 
 class IamUserTag(BaseTest):
@@ -1111,6 +1217,26 @@ class IamUserTest(BaseTest):
         self.assertEqual(resources[1]["UserName"], "alphabet_soup_2")
         self.assertEqual(len(resources[1]["c7n:Policies"]), 2)
 
+    def test_iam_user_policy_dedup(self):
+        # A user with more than one matching policy must be returned exactly
+        # once, matched users keep their input order, and non-matching users
+        # are excluded. Guards the dedup behavior of UserPolicy.process.
+        self.patch(UserPolicy, "executor_factory", MainThreadExecutor)
+        f = UserPolicy(
+            {"type": "policy", "key": "PolicyName", "value": "AdministratorAccess"},
+            mock.MagicMock(),
+        )
+        admin = {"PolicyName": "AdministratorAccess"}
+        readonly = {"PolicyName": "ReadOnlyAccess"}
+        resources = [
+            {"UserName": "u1", "c7n:Policies": [admin, admin]},
+            {"UserName": "u2", "c7n:Policies": [readonly]},
+            {"UserName": "u3", "c7n:Policies": [readonly, admin]},
+        ]
+        with mock.patch.object(UserPolicy, "user_policies"):
+            matched = f.process(resources)
+        self.assertEqual([r["UserName"] for r in matched], ["u1", "u3"])
+
     def test_iam_user_access_key_filter(self):
         session_factory = self.replay_flight_data("test_iam_user_access_key_active")
         self.patch(UserAccessKey, "executor_factory", MainThreadExecutor)
@@ -1709,6 +1835,64 @@ class IamPolicy(BaseTest):
         )
         resources = p.run()
         self.assertEqual(len(resources), 1)
+
+    def test_iam_has_allow_all_policies_list_form(self):
+        # Regression test: Action/Resource are valid in IAM policy JSON as
+        # either a bare string ("*") or a single-element list (["*"]). The
+        # filter previously only matched the string form via
+        # isinstance(..., str), silently missing an equally common
+        # full-admin policy written with list syntax.
+        f = AllowAllIamPolicies(data={}, manager=None)
+        resource = {'Arn': 'arn:aws:iam::644160558196:policy/ListFormAdmin',
+                    'DefaultVersionId': 'v1'}
+
+        def get_policy_version(document):
+            client = mock.MagicMock()
+            client.get_policy_version.return_value = {
+                'PolicyVersion': {'Document': document}}
+            return client
+
+        # list-form Action/Resource: must be detected as allow-all
+        client = get_policy_version({
+            'Statement': [{
+                'Effect': 'Allow',
+                'Action': ['*'],
+                'Resource': ['*'],
+            }]
+        })
+        self.assertTrue(f.has_allow_all_policy(client, resource))
+
+        # mixed string/list form: must also be detected
+        client = get_policy_version({
+            'Statement': [{
+                'Effect': 'Allow',
+                'Action': '*',
+                'Resource': ['*'],
+            }]
+        })
+        self.assertTrue(f.has_allow_all_policy(client, resource))
+
+        # list form with extra entries alongside "*": still allow-all, since
+        # "*" in either list already grants access to everything regardless
+        # of the other (redundant) entries.
+        client = get_policy_version({
+            'Statement': [{
+                'Effect': 'Allow',
+                'Action': ['*'],
+                'Resource': ['*', 'arn:aws:s3:::some-bucket'],
+            }]
+        })
+        self.assertTrue(f.has_allow_all_policy(client, resource))
+
+        # list form without "*" in either list: not allow-all
+        client = get_policy_version({
+            'Statement': [{
+                'Effect': 'Allow',
+                'Action': ['s3:GetObject'],
+                'Resource': ['arn:aws:s3:::some-bucket'],
+            }]
+        })
+        self.assertFalse(f.has_allow_all_policy(client, resource))
 
 
 @terraform('iam_user_group', teardown=terraform.TEARDOWN_IGNORE)

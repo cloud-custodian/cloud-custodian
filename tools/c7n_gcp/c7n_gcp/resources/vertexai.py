@@ -21,6 +21,20 @@ REGION_DATA_PATH = Path(__file__).parent.parent / 'regions.json'
 VERTEXAI_REGION_DATA_PATH = Path(__file__).parent.parent / 'vertexai_regions.json'
 VERTEXAI_PUBLISHER_DATA_PATH = Path(__file__).parent.parent / 'vertexai_publishers.json'
 
+# Job states a job can be cancelled from: the non-terminal JobState values.
+# The rest are either terminal (SUCCEEDED, FAILED, CANCELLED, EXPIRED,
+# PARTIALLY_SUCCEEDED) or already cancelling. The API reference doesn't
+# enumerate cancel's valid starting states, so this is derived from the
+# JobState docs:
+# https://github.com/googleapis/googleapis/blob/master/google/cloud/aiplatform/v1/job_state.proto
+CANCELLABLE_JOB_STATES = (
+    'JOB_STATE_QUEUED',
+    'JOB_STATE_PENDING',
+    'JOB_STATE_RUNNING',
+    'JOB_STATE_PAUSED',
+    'JOB_STATE_UPDATING',
+    )
+
 
 class VertexAIQueryManager(QueryResourceManager):
     """Base class for Vertex AI resources scoped to a location.
@@ -139,6 +153,9 @@ class VertexAIMethodAction(MethodAction):
 
     def process(self, resources):
         model = self.manager.resource_type
+
+        if self.attr_filter:
+            resources = self.filter_resources(resources)
 
         # Group resources by location
         resources_by_location = defaultdict(list)
@@ -682,6 +699,149 @@ class VertexAIEndpointDelete(VertexAIMethodAction):
         return {'name': resource['name']}
 
 
+@resources.register('vertex-ai-dataset')
+class VertexAIDataset(VertexAIQueryManager):
+    """GCP Vertex AI Dataset Resource
+
+    Vertex AI Datasets hold DataItems and Annotations used to train
+    or evaluate models.
+
+    :example:
+
+    List all Vertex AI Datasets across all locations:
+
+    .. code-block:: yaml
+
+        policies:
+          - name: vertexai-datasets-inventory
+            resource: gcp.vertex-ai-dataset
+
+    :example:
+
+    Find stale datasets (not updated in 90+ days):
+
+    .. code-block:: yaml
+
+        policies:
+          - name: gcp-vertex-ai-datasets-stale
+            resource: gcp.vertex-ai-dataset
+            filters:
+              - type: value
+                key: updateTime
+                value_type: age
+                op: greater-than
+                value: 90
+    """
+
+    class resource_type(VertexAITypeInfo):
+        component = 'projects.locations.datasets'
+        enum_spec = ('list', 'datasets[]', None)
+        default_report_fields = [
+            'name', 'displayName', 'createTime', 'updateTime', 'metadataSchemaUri'
+        ]
+        asset_type = 'aiplatform.googleapis.com/Dataset'
+        permissions = ('aiplatform.datasets.list',)
+        urn_component = 'dataset'
+
+
+@resources.register('vertex-ai-model')
+class VertexAIModel(VertexAIQueryManager):
+    """GCP Vertex AI Model Registry Resource
+
+    Vertex AI Model Registry models are ML models uploaded to Vertex AI
+    for deployment, versioning, and lifecycle management.
+
+    :example:
+
+    List all Vertex AI Models across all locations:
+
+    .. code-block:: yaml
+
+        policies:
+          - name: vertexai-models-inventory
+            resource: gcp.vertex-ai-model
+
+    :example:
+
+    Find models missing an owner label:
+
+    .. code-block:: yaml
+
+        policies:
+          - name: vertex-ai-models-missing-owner-label
+            resource: gcp.vertex-ai-model
+            filters:
+              - type: value
+                key: labels.owner
+                value: absent
+    """
+
+    class resource_type(VertexAITypeInfo):
+        component = 'projects.locations.models'
+        enum_spec = ('list', 'models[]', None)
+        default_report_fields = [
+            'name', 'displayName', 'trainingPipeline', 'createTime', 'updateTime'
+        ]
+        asset_type = 'aiplatform.googleapis.com/Model'
+        permissions = ('aiplatform.models.list',)
+        urn_component = 'model'
+
+
+@resources.register('vertex-ai-evaluation-run')
+class VertexAIEvaluationRun(VertexAIQueryManager):
+    """GCP Vertex AI Evaluation Run Resource
+
+    Vertex AI Evaluation Runs assess model or dataset quality against an
+    evaluation set, producing a terminal state and completion time that
+    can drive a retention-review policy on completed runs.
+
+    :example:
+
+    List all Vertex AI Evaluation Runs across all locations:
+
+    .. code-block:: yaml
+
+        policies:
+          - name: vertexai-evaluation-runs-inventory
+            resource: gcp.vertex-ai-evaluation-run
+
+    :example:
+
+    Find terminal evaluation runs older than 30 days:
+
+    .. code-block:: yaml
+
+        policies:
+          - name: vertex-ai-completed-evaluation-runs-past-retention
+            resource: gcp.vertex-ai-evaluation-run
+            filters:
+              - or:
+                  - type: value
+                    key: state
+                    value: SUCCEEDED
+                  - type: value
+                    key: state
+                    value: FAILED
+                  - type: value
+                    key: state
+                    value: CANCELLED
+              - type: value
+                key: completionTime
+                value_type: age
+                op: greater-than
+                value: 30
+    """
+
+    class resource_type(VertexAITypeInfo):
+        component = 'projects.locations.evaluationRuns'
+        enum_spec = ('list', 'evaluationRuns[]', None)
+        default_report_fields = [
+            'name', 'displayName', 'state', 'createTime', 'completionTime'
+        ]
+        permissions = ('aiplatform.evaluationRuns.list',)
+        urn_component = 'evaluation-run'
+
+
 @resources.register('vertex-ai-batch-prediction-job')
 class VertexAIBatchPredictionJob(VertexAIQueryManager):
     """GCP Vertex AI Batch Prediction Job Resource
@@ -948,8 +1108,8 @@ class VertexAICustomJobCancel(VertexAIMethodAction):
     and incident response when jobs are running longer than expected or
     consuming unexpected resources.
 
-    **Note**: Only jobs in JOB_STATE_RUNNING or JOB_STATE_PENDING can be cancelled.
-    Completed, failed, or already cancelled jobs cannot be cancelled.
+    **Note**: Only jobs in a non-terminal state can be cancelled; jobs in any
+    other state are logged and skipped.
 
     :example:
 
@@ -978,6 +1138,148 @@ class VertexAICustomJobCancel(VertexAIMethodAction):
     schema = type_schema('cancel')
     method_spec = {'op': 'cancel'}
     permissions = ('aiplatform.customJobs.cancel',)
+    attr_filter = ('state', CANCELLABLE_JOB_STATES)
+
+    def get_resource_params(self, model, resource):
+        return {'name': resource['name']}
+
+
+@resources.register('vertex-ai-hyperparameter-tuning-job')
+class VertexAIHyperparameterTuningJob(VertexAIQueryManager):
+    """GCP Vertex AI Hyperparameter Tuning Job Resource
+
+    Vertex AI Hyperparameter Tuning Jobs are used to run automated
+    hyperparameter search workloads for machine learning training.
+
+    :example:
+
+    List all Hyperparameter Tuning Jobs in specific locations:
+
+    .. code-block:: yaml
+
+        policies:
+          - name: vertexai-hyperparameter-tuning-jobs-inventory
+            resource: gcp.vertex-ai-hyperparameter-tuning-job
+            query:
+              - location: us-central1
+              - location: us-east1
+
+    :example:
+
+    Find Hyperparameter Tuning Jobs with a large number of parallel trials:
+
+    .. code-block:: yaml
+
+        policies:
+          - name: gcp-vertex-ai-hyperparameter-tuning-jobs-parallel-trials
+            resource: gcp.vertex-ai-hyperparameter-tuning-job
+            filters:
+              - type: value
+                key: parallelTrialCount
+                op: gt
+                value: 10
+
+    :example:
+
+    Find running Hyperparameter Tuning Jobs:
+
+    .. code-block:: yaml
+
+        policies:
+          - name: gcp-vertex-ai-hyperparameter-tuning-jobs-running
+            resource: gcp.vertex-ai-hyperparameter-tuning-job
+            filters:
+              - type: value
+                key: state
+                value: JOB_STATE_RUNNING
+    """
+
+    class resource_type(VertexAITypeInfo):
+        component = 'projects.locations.hyperparameterTuningJobs'
+        enum_spec = ('list', 'hyperparameterTuningJobs[]', None)
+        default_report_fields = [
+            'name', 'displayName', 'state', 'createTime', 'updateTime',
+            'parallelTrialCount', 'maxTrialCount'
+        ]
+        asset_type = 'aiplatform.googleapis.com/HyperparameterTuningJob'
+        permissions = ('aiplatform.hyperparameterTuningJobs.list',)
+        urn_component = 'hyperparameter-tuning-job'
+
+
+@VertexAIHyperparameterTuningJob.action_registry.register('delete')
+class VertexAIHyperparameterTuningJobDelete(VertexAIMethodAction):
+    """Delete Vertex AI Hyperparameter Tuning Jobs
+
+    Deletes a Vertex AI Hyperparameter Tuning Job. Note that this is an
+    asynchronous operation that returns a long-running operation. The job
+    will be deleted in the background.
+
+    :example:
+
+    Delete failed hyperparameter tuning jobs:
+
+    .. code-block:: yaml
+
+        policies:
+          - name: delete-failed-hyperparameter-tuning-jobs
+            resource: gcp.vertex-ai-hyperparameter-tuning-job
+            filters:
+              - type: value
+                key: state
+                value: JOB_STATE_FAILED
+            actions:
+              - type: delete
+
+    https://cloud.google.com/vertex-ai/docs/reference/rest/v1/projects.locations.hyperparameterTuningJobs/delete
+    """
+
+    schema = type_schema('delete')
+    method_spec = {'op': 'delete'}
+    permissions = ('aiplatform.hyperparameterTuningJobs.delete',)
+
+    def get_resource_params(self, model, resource):
+        return {'name': resource['name']}
+
+
+@VertexAIHyperparameterTuningJob.action_registry.register('cancel')
+class VertexAIHyperparameterTuningJobCancel(VertexAIMethodAction):
+    """Cancel Vertex AI Hyperparameter Tuning Jobs
+
+    Cancels a running Vertex AI Hyperparameter Tuning Job. This is useful for
+    cost control and incident response when jobs are running longer than
+    expected or consuming unexpected resources.
+
+    **Note**: Only jobs in a non-terminal state can be cancelled; jobs in any
+    other state are logged and skipped.
+
+    :example:
+
+    Cancel long-running hyperparameter tuning jobs:
+
+    .. code-block:: yaml
+
+        policies:
+          - name: cancel-long-running-hyperparameter-tuning-jobs
+            resource: gcp.vertex-ai-hyperparameter-tuning-job
+            filters:
+              - type: value
+                key: state
+                value: JOB_STATE_RUNNING
+              - type: value
+                key: createTime
+                value_type: age
+                op: greater-than
+                value: 24
+            actions:
+              - type: cancel
+
+    https://cloud.google.com/vertex-ai/docs/reference/rest/v1/projects.locations.hyperparameterTuningJobs/cancel
+    """
+
+    schema = type_schema('cancel')
+    method_spec = {'op': 'cancel'}
+    permissions = ('aiplatform.hyperparameterTuningJobs.cancel',)
+    attr_filter = ('state', CANCELLABLE_JOB_STATES)
 
     def get_resource_params(self, model, resource):
         return {'name': resource['name']}
