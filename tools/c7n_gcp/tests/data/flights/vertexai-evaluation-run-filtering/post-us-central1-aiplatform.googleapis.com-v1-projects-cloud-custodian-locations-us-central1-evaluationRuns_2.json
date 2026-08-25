@@ -1,0 +1,38 @@
+{
+  "headers": {
+    "content-type": "application/json; charset=UTF-8",
+    "vary": "Origin, X-Origin, Referer",
+    "date": "Fri, 14 Aug 2026 17:30:59 GMT",
+    "server": "ESF",
+    "x-xss-protection": "0",
+    "x-frame-options": "SAMEORIGIN",
+    "x-content-type-options": "nosniff",
+    "alt-svc": "h3=\":443\"; ma=2592000,h3-29=\":443\"; ma=2592000",
+    "transfer-encoding": "chunked",
+    "status": "200",
+    "content-length": "576",
+    "-content-encoding": "gzip"
+  },
+  "body": {
+    "name": "projects/cloud-custodian/locations/us-central1/evaluationRuns/1375049241696665600",
+    "displayName": "c7n-test-eval-run-failed",
+    "metadata": {
+      "pipeline_id": "1606706559881052160"
+    },
+    "dataSource": {
+      "evaluationSet": "projects/cloud-custodian/locations/us-central1/evaluationSets/2203089249551515648"
+    },
+    "evaluationConfig": {
+      "metrics": [
+        {
+          "metric": "exact_match",
+          "computationBasedMetricSpec": {
+            "type": "EXACT_MATCH"
+          }
+        }
+      ]
+    },
+    "state": "PENDING",
+    "completionTime": "1970-01-01T00:00:00Z"
+  }
+}

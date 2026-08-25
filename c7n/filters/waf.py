@@ -223,8 +223,14 @@ class WafV2FilterBase(ValueFilter, metaclass=ABCMeta):
     # based on the scope
     def _get_web_acls(self, scope):
         if self._cached_web_acls is None:
-            self._cached_web_acls = self.manager.get_resource_manager('wafv2').resources(
-                query=dict(Scope=scope),
+            # Scope must be supplied as resource manager data rather than a query
+            # kwarg. The wafv2 manager derives both the API Scope and the region
+            # used for the call from its own data (CLOUDFRONT web acls are global
+            # and must be addressed via us-east-1), and a Scope passed via
+            # resources(query=...) is overwritten by the manager's own value.
+            wafv2 = self.manager.get_resource_manager(
+                'wafv2', {'query': [{'Scope': scope}]})
+            self._cached_web_acls = wafv2.resources(
                 # required to get the additional detail needed for this filter (e.g. Rules), but
                 # the legacy mode does not require additional detail
                 augment=(not self._is_legacy)
