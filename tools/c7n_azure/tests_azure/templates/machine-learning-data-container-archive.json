@@ -1,0 +1,123 @@
+{
+    "$schema": "https://schema.management.azure.com/schemas/2015-01-01/deploymentTemplate.json#",
+    "contentVersion": "1.0.0.0",
+    "parameters": {
+        "uniqueId": {
+            "type": "string"
+        }
+    },
+    "variables": {
+        "workspaceName": "cctest-mlws-dcarchive",
+        "activeDataContainerName": "cctest-dc-active",
+        "archivedDataContainerName": "cctest-dc-archived",
+        "storageName": "[concat('cctestdcst', parameters('uniqueId'))]",
+        "keyVaultName": "[concat('cctestdckv', parameters('uniqueId'))]",
+        "appInsightsName": "[concat('cctestdcai', parameters('uniqueId'))]"
+    },
+    "resources": [
+        {
+            "type": "Microsoft.Storage/storageAccounts",
+            "apiVersion": "2021-04-01",
+            "name": "[variables('storageName')]",
+            "location": "[resourceGroup().location]",
+            "sku": {
+                "name": "Standard_LRS"
+            },
+            "kind": "StorageV2",
+            "properties": {
+                "minimumTlsVersion": "TLS1_2",
+                "supportsHttpsTrafficOnly": true
+            }
+        },
+        {
+            "type": "Microsoft.KeyVault/vaults",
+            "apiVersion": "2021-10-01",
+            "name": "[variables('keyVaultName')]",
+            "location": "[resourceGroup().location]",
+            "properties": {
+                "tenantId": "[subscription().tenantId]",
+                "sku": {
+                    "family": "A",
+                    "name": "standard"
+                },
+                "accessPolicies": [],
+                "enabledForDeployment": false,
+                "enabledForDiskEncryption": false,
+                "enabledForTemplateDeployment": true
+            }
+        },
+        {
+            "type": "Microsoft.Insights/components",
+            "apiVersion": "2020-02-02",
+            "name": "[variables('appInsightsName')]",
+            "location": "[resourceGroup().location]",
+            "kind": "web",
+            "properties": {
+                "Application_Type": "web"
+            }
+        },
+        {
+            "type": "Microsoft.MachineLearningServices/workspaces",
+            "apiVersion": "2023-04-01",
+            "name": "[variables('workspaceName')]",
+            "location": "[resourceGroup().location]",
+            "identity": {
+                "type": "SystemAssigned"
+            },
+            "sku": {
+                "name": "Basic",
+                "tier": "Basic"
+            },
+            "properties": {
+                "friendlyName": "cctest-ml-data-container-archive",
+                "storageAccount": "[resourceId('Microsoft.Storage/storageAccounts', variables('storageName'))]",
+                "keyVault": "[resourceId('Microsoft.KeyVault/vaults', variables('keyVaultName'))]",
+                "applicationInsights": "[resourceId('Microsoft.Insights/components', variables('appInsightsName'))]",
+                "publicNetworkAccess": "Enabled"
+            },
+            "dependsOn": [
+                "[resourceId('Microsoft.Storage/storageAccounts', variables('storageName'))]",
+                "[resourceId('Microsoft.KeyVault/vaults', variables('keyVaultName'))]",
+                "[resourceId('Microsoft.Insights/components', variables('appInsightsName'))]"
+            ]
+        },
+        {
+            "type": "Microsoft.MachineLearningServices/workspaces/data",
+            "apiVersion": "2023-04-01",
+            "name": "[format('{0}/{1}', variables('workspaceName'), variables('activeDataContainerName'))]",
+            "properties": {
+                "description": "Non-archived fixture data container for archive action tests.",
+                "dataType": "uri_file",
+                "isArchived": false,
+                "properties": {
+                    "custodian": "true"
+                },
+                "tags": {
+                    "custodian": "test"
+                }
+            },
+            "dependsOn": [
+                "[resourceId('Microsoft.MachineLearningServices/workspaces', variables('workspaceName'))]"
+            ]
+        },
+        {
+            "type": "Microsoft.MachineLearningServices/workspaces/data",
+            "apiVersion": "2023-04-01",
+            "name": "[format('{0}/{1}', variables('workspaceName'), variables('archivedDataContainerName'))]",
+            "properties": {
+                "description": "Archived fixture data container for archive action tests.",
+                "dataType": "uri_file",
+                "isArchived": true,
+                "properties": {
+                    "custodian": "true"
+                },
+                "tags": {
+                    "custodian": "test"
+                }
+            },
+            "dependsOn": [
+                "[resourceId('Microsoft.MachineLearningServices/workspaces', variables('workspaceName'))]"
+            ]
+        }
+    ]
+}
