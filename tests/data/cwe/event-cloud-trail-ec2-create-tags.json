@@ -1,0 +1,25 @@
+{
+ "eventVersion": "1.08",
+ "eventSource": "ec2.amazonaws.com",
+ "eventName": "CreateTags",
+ "awsRegion": "us-west-2",
+ "requestParameters": {
+  "resourcesSet": {
+   "items": [
+    {"resourceId": "vol-0f9e1b2c3d4e5f6a7"},
+    {"resourceId": "i-0dc224bad2cb08740"}
+   ]
+  },
+  "tagSet": {
+   "items": [
+    {"key": "Env", "value": "Production"}
+   ]
+  }
+ },
+ "responseElements": {"_return": true},
+ "readOnly": false,
+ "eventType": "AwsApiCall",
+ "managementEvent": true,
+ "recipientAccountId": "644160558196",
+ "eventCategory": "Management"
+}
