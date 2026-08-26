@@ -1,0 +1,16 @@
+{
+    "status_code": 200,
+    "data": {
+        "NextMarker": "c7n-test-regional",
+        "WebACLs": [
+            {
+                "Name": "c7n-test-regional",
+                "Id": "fbfff9a0-70db-402d-8586-07df8322a61b",
+                "Description": "",
+                "LockToken": "0843bb29-621a-4381-b00f-ccb1cd979004",
+                "ARN": "arn:aws:wafv2:us-east-1:644160558196:regional/webacl/c7n-test-regional/fbfff9a0-70db-402d-8586-07df8322a61b"
+            }
+        ],
+        "ResponseMetadata": {}
+    }
+}

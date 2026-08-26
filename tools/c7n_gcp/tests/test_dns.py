@@ -1,13 +1,18 @@
 # Copyright The Cloud Custodian Authors.
 # SPDX-License-Identifier: Apache-2.0
 
+from googleapiclient.errors import HttpError
+from pytest_terraform import terraform
+
+from c7n.exceptions import PolicyValidationError
+from c7n_gcp.client import get_default_project
 from gcp_common import BaseTest, event_data
 
 
 class DnsManagedZoneTest(BaseTest):
 
     def test_managed_zone_query(self):
-        project_id = 'cloud-custodian'
+        project_id = self.project_id
         managed_zone_name = 'custodian'
         session_factory = self.replay_flight_data(
             'dns-managed-zone-query', project_id=project_id)
@@ -22,12 +27,12 @@ class DnsManagedZoneTest(BaseTest):
         self.assertEqual(
             policy.resource_manager.get_urns(managed_zone_resources),
             [
-                'gcp:dns::cloud-custodian:managed-zone/custodian'
+                f'gcp:dns::{project_id}:managed-zone/custodian'
             ],
         )
 
     def test_managed_zone_get(self):
-        project_id = 'cloud-custodian'
+        project_id = self.project_id
         resource_name = 'custodian'
         session_factory = self.replay_flight_data(
             'dns-managed-zone-get', project_id=project_id)
@@ -48,12 +53,12 @@ class DnsManagedZoneTest(BaseTest):
         self.assertEqual(
             policy.resource_manager.get_urns(resources),
             [
-                'gcp:dns::cloud-custodian:managed-zone/custodian'
+                f'gcp:dns::{project_id}:managed-zone/custodian'
             ],
         )
 
     def test_managed_zone_delete(self):
-        project_id = "cloud-custodian"
+        project_id = self.project_id
         resource_name = "custodian-delete-test"
 
         factory = self.replay_flight_data('dns-managed-zone-delete')
@@ -75,7 +80,7 @@ class DnsManagedZoneTest(BaseTest):
 class DnsPolicyTest(BaseTest):
 
     def test_policy_query(self):
-        project_id = 'cloud-custodian'
+        project_id = self.project_id
         policy_name = 'custodian'
         session_factory = self.replay_flight_data(
             'dns-policy-query', project_id=project_id)
@@ -90,12 +95,12 @@ class DnsPolicyTest(BaseTest):
         self.assertEqual(
             policy.resource_manager.get_urns(policy_resources),
             [
-                'gcp:dns::cloud-custodian:policy/custodian'
+                f'gcp:dns::{project_id}:policy/custodian'
             ],
         )
 
     def test_policy_get(self):
-        project_id = 'cloud-custodian'
+        project_id = self.project_id
         policy_name = 'custodian'
         session_factory = self.replay_flight_data(
             'dns-policy-get', project_id=project_id)
@@ -116,15 +121,52 @@ class DnsPolicyTest(BaseTest):
         self.assertEqual(
             policy.resource_manager.get_urns(resources),
             [
-                'gcp:dns::cloud-custodian:policy/custodian'
+                f'gcp:dns::{project_id}:policy/custodian'
             ],
         )
+
+    def test_policy_update_validation_error(self):
+        with self.assertRaisesRegex(
+            PolicyValidationError,
+            "policy:gcp-dns-policy-update-invalid action:update "
+            "requires at least one mutable policy field"
+        ):
+            self.load_policy(
+                {
+                    'name': 'gcp-dns-policy-update-invalid',
+                    'resource': 'gcp.dns-policy',
+                    'actions': [{'type': 'update'}]
+                }
+            )
+
+    def test_dns_policy_update(self):
+        project_id = get_default_project()
+        policy_name = 'c7n-dns-policy-update-test'
+
+        session_factory = self.replay_flight_data('dns-policy-update', project_id=project_id)
+
+        policy = self.load_policy(
+            {'name': 'gcp-dns-policy-update',
+             'resource': 'gcp.dns-policy',
+             'filters': [{'name': policy_name}],
+             'actions': [{'type': 'update', 'enableLogging': True}]},
+            session_factory=session_factory)
+        resources = policy.run()
+        self.assertEqual(len(resources), 1)
+
+        client = policy.resource_manager.get_client()
+        updated_policy = client.execute_query(
+            'get',
+            {'project': project_id, 'policy': policy_name}
+        )
+        self.assertEqual(updated_policy['name'], policy_name)
+        self.assertEqual(updated_policy.get('enableLogging'), True)
 
 
 class TestDnsResourceRecordsFilter(BaseTest):
 
     def test_query(self):
-        project_id = 'cloud-custodian'
+        project_id = self.project_id
         session_factory = self.replay_flight_data(
             'test-dns-resource-records-filter-query', project_id=project_id)
 
@@ -145,3 +187,172 @@ class TestDnsResourceRecordsFilter(BaseTest):
 
         self.assertEqual(len(policy_resources), 1)
         self.assertEqual(policy_resources[0]['name'], 'zone-277-red')
+
+
+@terraform("dns_enable_dnssec")
+def test_dns_managed_zone_enable_dnssec(test, dns_enable_dnssec):
+    zone_name = dns_enable_dnssec.resources['google_dns_managed_zone']['public_zone']['name']
+    project_id = dns_enable_dnssec.resources['google_dns_managed_zone']['public_zone']['project']
+
+    factory = test.replay_flight_data('dns-managed-zone-enable-dnssec')
+    p = test.load_policy(
+        {
+            'name': 'gcp-dns-enable-dnssec',
+            'resource': 'gcp.dns-managed-zone',
+            'filters': [
+                {'type': 'value', 'key': 'visibility', 'op': 'eq', 'value': 'public'},
+                {'type': 'value', 'key': 'dnssecConfig.state', 'op': 'ne', 'value': 'on'},
+            ],
+            'actions': [{'type': 'enable-dnssec'}],
+        },
+        session_factory=factory,
+    )
+    resources = p.run()
+    assert len(resources) == 1
+    assert resources[0]['name'] == zone_name
+    assert resources[0]['dnssecConfig']['state'] == 'off'
+
+    client = p.resource_manager.get_client()
+    result = client.execute_query('get', {'project': project_id, 'managedZone': zone_name})
+    assert result['dnssecConfig']['state'] == 'on'
+
+
+@terraform("dns_set_dnssec_key_specs_dnssec_on")
+def test_dns_managed_zone_set_dnssec_key_specs_handle_immutable_field_error(
+    test, dns_set_dnssec_key_specs_dnssec_on
+):
+    zone = dns_set_dnssec_key_specs_dnssec_on.resources['google_dns_managed_zone']['public_zone']
+    zone_name = zone['name']
+    project_id = zone['project']
+
+    factory = test.replay_flight_data('dns-managed-zone-set-key-specs-immutable')
+    p = test.load_policy(
+        {
+            'name': 'gcp-dns-set-dnssec-key-specs-immutable',
+            'resource': 'gcp.dns-managed-zone',
+            'filters': [
+                # Intentionally omit the state filter so the already-enabled
+                # zone is included and the PATCH triggers the immutableField error
+                {'type': 'value', 'key': 'visibility', 'op': 'eq', 'value': 'public'},
+            ],
+            'actions': [
+                {
+                    'type': 'set-dnssec-key-specs',
+                    # Use ecdsap384sha384 so we can confirm below that the zone's
+                    # key specs were NOT changed (still rsasha256 from provisioning)
+                    'defaultKeySpecs': [
+                        {'keyType': 'keySigning', 'algorithm': 'ecdsap384sha384',
+                         'keyLength': 384},
+                        {'keyType': 'zoneSigning', 'algorithm': 'ecdsap384sha384',
+                         'keyLength': 384},
+                    ],
+                }
+            ],
+        },
+        session_factory=factory,
+    )
+    resources = p.run()
+    assert len(resources) == 1
+    assert resources[0]['name'] == zone_name
+    assert resources[0]['dnssecConfig']['state'] == 'on'
+
+    client = p.resource_manager.get_client()
+    result = client.execute_query('get', {'project': project_id, 'managedZone': zone_name})
+    returned_specs = result['dnssecConfig']['defaultKeySpecs']
+    assert all(s['algorithm'] != 'ecdsap384sha384' for s in returned_specs)
+
+
+@terraform("dns_set_dnssec_key_specs")
+def test_dns_managed_zone_set_dnssec_key_specs_handle_error_reraises(
+    test, dns_set_dnssec_key_specs
+):
+    factory = test.replay_flight_data('dns-managed-zone-set-key-specs-error')
+    p = test.load_policy(
+        {
+            'name': 'gcp-dns-set-dnssec-key-specs-error',
+            'resource': 'gcp.dns-managed-zone',
+            'filters': [
+                {'type': 'value', 'key': 'visibility', 'op': 'eq', 'value': 'public'},
+                {'type': 'value', 'key': 'dnssecConfig.state', 'op': 'ne', 'value': 'on'},
+            ],
+            'actions': [
+                {
+                    'type': 'set-dnssec-key-specs',
+                    'defaultKeySpecs': [
+                        {'keyType': 'keySigning', 'algorithm': 'rsasha256', 'keyLength': 2048},
+                        {'keyType': 'keySigning', 'algorithm': 'rsasha256', 'keyLength': 2048},
+                    ],
+                }
+            ],
+        },
+        session_factory=factory,
+    )
+    with test.assertRaises(HttpError):
+        p.run()
+
+
+@terraform("dns_set_dnssec_key_specs")
+def test_dns_managed_zone_set_dnssec_key_specs(test, dns_set_dnssec_key_specs):
+    zone = dns_set_dnssec_key_specs.resources['google_dns_managed_zone']['public_zone']
+    zone_name = zone['name']
+    project_id = zone['project']
+    key_specs = [
+        {'keyType': 'keySigning', 'algorithm': 'rsasha256', 'keyLength': 2048},
+        {'keyType': 'zoneSigning', 'algorithm': 'rsasha512', 'keyLength': 1024},
+    ]
+
+    factory = test.replay_flight_data('dns-managed-zone-set-key-specs')
+    p = test.load_policy(
+        {
+            'name': 'gcp-dns-set-dnssec-key-specs',
+            'resource': 'gcp.dns-managed-zone',
+            'filters': [
+                {'type': 'value', 'key': 'visibility', 'op': 'eq', 'value': 'public'},
+                {'type': 'value', 'key': 'dnssecConfig.state', 'op': 'ne', 'value': 'on'},
+            ],
+            'actions': [
+                {
+                    'type': 'set-dnssec-key-specs',
+                    'defaultKeySpecs': key_specs,
+                }
+            ],
+        },
+        session_factory=factory,
+    )
+    resources = p.run()
+    assert len(resources) == 1
+    assert resources[0]['name'] == zone_name
+
+    client = p.resource_manager.get_client()
+    result = client.execute_query('get', {'project': project_id, 'managedZone': zone_name})
+    returned_specs = result['dnssecConfig']['defaultKeySpecs']
+    assert len(returned_specs) == 2
+    assert returned_specs[0]['keyType'] == 'keySigning'
+    assert returned_specs[0]['algorithm'] == 'rsasha256'
+    assert returned_specs[1]['keyType'] == 'zoneSigning'
+    assert returned_specs[1]['algorithm'] == 'rsasha512'
+
+
+@terraform('dns_managed_zone_set_labels')
+def test_managed_zone_set_labels(test, dns_managed_zone_set_labels):
+    project_id = dns_managed_zone_set_labels['google_dns_managed_zone.default.project']
+    zone_name = dns_managed_zone_set_labels['google_dns_managed_zone.default.name']
+
+    factory = test.replay_flight_data('dns-managed-zone-set-label')
+    policy = test.load_policy(
+        {
+            'name': 'gcp-dns-managed-zone-set-label',
+            'resource': 'gcp.dns-managed-zone',
+            'filters': [{'name': zone_name}],
+            'actions': [{'type': 'set-labels', 'labels': {'env': 'not-the-default'}}]
+        },
+        session_factory=factory
+    )
+
+    resources = policy.run()
+    assert len(resources) == 1
+    assert resources[0]['labels']['env'] == 'default'
+
+    client = policy.resource_manager.get_client()
+    result = client.execute_query('get', {'project': project_id, 'managedZone': zone_name})
+    assert result['labels']['env'] == 'not-the-default'

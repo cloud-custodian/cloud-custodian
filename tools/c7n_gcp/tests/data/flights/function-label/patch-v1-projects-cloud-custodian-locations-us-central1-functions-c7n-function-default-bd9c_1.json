@@ -1,0 +1,53 @@
+{
+  "headers": {
+    "content-type": "application/json; charset=UTF-8",
+    "vary": "Origin, X-Origin, Referer",
+    "date": "Tue, 28 Apr 2026 15:48:18 GMT",
+    "server": "ESF",
+    "x-xss-protection": "0",
+    "x-frame-options": "SAMEORIGIN",
+    "x-content-type-options": "nosniff",
+    "alt-svc": "h3=\":443\"; ma=2592000,h3-29=\":443\"; ma=2592000",
+    "transfer-encoding": "chunked",
+    "status": "200",
+    "content-length": "1747",
+    "-content-encoding": "gzip"
+  },
+  "body": {
+    "name": "operations/c3RhY2tsZXQtdGVzdC1wb2xpY2llcy91cy1jZW50cmFsMS9jN24tZnVuY3Rpb24tZGVmYXVsdC1iZDljL29MSXRCRnl5NV9V",
+    "metadata": {
+      "@type": "type.googleapis.com/google.cloud.functions.v1.OperationMetadataV1",
+      "target": "projects/cloud-custodian/locations/us-central1/functions/c7n-function-default-bd9c",
+      "type": "UPDATE_FUNCTION",
+      "request": {
+        "@type": "type.googleapis.com/google.cloud.functions.v1.CloudFunction",
+        "name": "projects/cloud-custodian/locations/us-central1/functions/c7n-function-default-bd9c",
+        "sourceArchiveUrl": "gs://c7n-function-default-bd9c/function-3d0e868c8d5bface0f0bab8a737a0ce7.zip",
+        "httpsTrigger": {
+          "url": "https://us-central1-stacklet-test-policies.cloudfunctions.net/c7n-function-default-bd9c",
+          "securityLevel": "SECURE_OPTIONAL"
+        },
+        "status": "ACTIVE",
+        "entryPoint": "hello_http",
+        "timeout": "60s",
+        "availableMemoryMb": 128,
+        "serviceAccountEmail": "stacklet-test-policies@appspot.gserviceaccount.com",
+        "updateTime": "2026-04-28T15:48:03.351Z",
+        "versionId": "1",
+        "labels": {
+          "goog-terraform-provisioned": "true",
+          "env": "not-the-default"
+        },
+        "runtime": "python310",
+        "ingressSettings": "ALLOW_ALL",
+        "buildId": "05836c1b-4f81-424a-9ff8-ba6e3596dd3a",
+        "buildName": "projects/cloud-custodian/locations/us-central1/builds/05836c1b-4f81-424a-9ff8-ba6e3596dd3a",
+        "dockerRegistry": "ARTIFACT_REGISTRY",
+        "automaticUpdatePolicy": {},
+        "buildServiceAccount": "projects/cloud-custodian/serviceAccounts/859150599087-compute@developer.gserviceaccount.com"
+      },
+      "versionId": "2",
+      "updateTime": "2026-04-28T15:48:18Z"
+    }
+  }
+}

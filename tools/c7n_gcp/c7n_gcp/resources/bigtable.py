@@ -27,6 +27,7 @@ class BigTableInstance(QueryResourceManager):
         default_report_fields = ['displayName', 'expireTime']
         labels = True
         labels_op = 'partialUpdateInstance'
+        labels_perm = 'update'
 
         @staticmethod
         def get_label_params(resource, all_labels):

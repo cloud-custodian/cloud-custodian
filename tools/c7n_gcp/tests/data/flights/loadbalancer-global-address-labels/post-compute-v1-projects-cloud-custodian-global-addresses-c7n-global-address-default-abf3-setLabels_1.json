@@ -1,0 +1,31 @@
+{
+  "headers": {
+    "content-type": "application/json; charset=UTF-8",
+    "vary": "Origin, X-Origin, Referer",
+    "date": "Tue, 21 Apr 2026 20:41:00 GMT",
+    "server": "ESF",
+    "x-xss-protection": "0",
+    "x-frame-options": "SAMEORIGIN",
+    "x-content-type-options": "nosniff",
+    "alt-svc": "h3=\":443\"; ma=2592000,h3-29=\":443\"; ma=2592000",
+    "transfer-encoding": "chunked",
+    "status": "200",
+    "content-length": "724",
+    "-content-encoding": "gzip"
+  },
+  "body": {
+    "kind": "compute#operation",
+    "id": "5327556666295213619",
+    "name": "operation-1776804060699-64ffe6edf9c14-7741da62-505aecf2",
+    "operationType": "setLabels",
+    "targetLink": "https://www.googleapis.com/compute/v1/projects/cloud-custodian/global/addresses/c7n-global-address-default-abf3",
+    "targetId": "1846832603165515296",
+    "status": "DONE",
+    "user": "caleb.syring@sixfeetup.com",
+    "progress": 100,
+    "insertTime": "2026-04-21T13:41:00.767-07:00",
+    "startTime": "2026-04-21T13:41:00.771-07:00",
+    "endTime": "2026-04-21T13:41:00.771-07:00",
+    "selfLink": "https://www.googleapis.com/compute/v1/projects/cloud-custodian/global/operations/operation-1776804060699-64ffe6edf9c14-7741da62-505aecf2"
+  }
+}

@@ -1,0 +1,50 @@
+{
+  "headers": {
+    "status": "200",
+    "content-type": "application/json; charset=UTF-8",
+    "content-length": "2048"
+  },
+  "body": {
+    "kind": "compute#snapshotList",
+    "id": "projects/cloud-custodian/global/snapshots",
+    "items": [
+      {
+        "kind": "compute#snapshot",
+        "id": "1111111111111111111",
+        "creationTimestamp": "2018-06-01T10:00:00.000-07:00",
+        "name": "c7n-jenkins-snap-1",
+        "status": "READY",
+        "sourceDisk": "https://www.googleapis.com/compute/v1/projects/cloud-custodian/zones/us-central1-b/disks/c7n-jenkins",
+        "sourceDiskId": "2788076175605214111",
+        "diskSizeGb": "10",
+        "selfLink": "https://www.googleapis.com/compute/v1/projects/cloud-custodian/global/snapshots/c7n-jenkins-snap-1",
+        "labelFingerprint": "42WmSpB8rSM="
+      },
+      {
+        "kind": "compute#snapshot",
+        "id": "2222222222222222222",
+        "creationTimestamp": "2018-06-02T10:00:00.000-07:00",
+        "name": "c7n-jenkins-snap-2",
+        "status": "READY",
+        "sourceDisk": "https://www.googleapis.com/compute/v1/projects/cloud-custodian/zones/us-central1-b/disks/c7n-jenkins",
+        "sourceDiskId": "2788076175605214111",
+        "diskSizeGb": "10",
+        "selfLink": "https://www.googleapis.com/compute/v1/projects/cloud-custodian/global/snapshots/c7n-jenkins-snap-2",
+        "labelFingerprint": "42WmSpB8rSM="
+      },
+      {
+        "kind": "compute#snapshot",
+        "id": "3333333333333333333",
+        "creationTimestamp": "2018-06-01T12:00:00.000-07:00",
+        "name": "drone-snap-1",
+        "status": "READY",
+        "sourceDisk": "https://www.googleapis.com/compute/v1/projects/cloud-custodian/zones/us-central1-b/disks/drone",
+        "sourceDiskId": "3901503733671141133",
+        "diskSizeGb": "16",
+        "selfLink": "https://www.googleapis.com/compute/v1/projects/cloud-custodian/global/snapshots/drone-snap-1",
+        "labelFingerprint": "42WmSpB8rSM="
+      }
+    ],
+    "selfLink": "https://www.googleapis.com/compute/v1/projects/cloud-custodian/global/snapshots"
+  }
+}

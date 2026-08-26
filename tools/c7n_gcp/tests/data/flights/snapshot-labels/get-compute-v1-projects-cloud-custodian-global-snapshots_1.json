@@ -1,0 +1,49 @@
+{
+  "headers": {
+    "etag": "5TM9BbOrsh1yfmxxfnDoXtlk3fw=/ltCY9B2_WAzjMqobNHzjB0LNFtE=",
+    "content-type": "application/json; charset=UTF-8",
+    "vary": "Origin, X-Origin, Referer",
+    "date": "Wed, 29 Apr 2026 18:44:19 GMT",
+    "server": "ESF",
+    "x-xss-protection": "0",
+    "x-frame-options": "SAMEORIGIN",
+    "x-content-type-options": "nosniff",
+    "alt-svc": "h3=\":443\"; ma=2592000,h3-29=\":443\"; ma=2592000",
+    "transfer-encoding": "chunked",
+    "status": "200",
+    "content-length": "1137",
+    "-content-encoding": "gzip",
+    "content-location": "https://compute.googleapis.com/compute/v1/projects/cloud-custodian/global/snapshots?alt=json"
+  },
+  "body": {
+    "kind": "compute#snapshotList",
+    "id": "projects/cloud-custodian/global/snapshots",
+    "items": [
+      {
+        "kind": "compute#snapshot",
+        "id": "7576125036782677891",
+        "creationTimestamp": "2026-04-29T11:43:56.576-07:00",
+        "name": "c7n-snapshot-default-d0b4",
+        "status": "READY",
+        "sourceDisk": "https://www.googleapis.com/compute/v1/projects/cloud-custodian/zones/us-central1-a/disks/c7n-disk-default-d0b4",
+        "sourceDiskId": "3705851477175037838",
+        "diskSizeGb": "10",
+        "storageBytes": "0",
+        "storageBytesStatus": "UP_TO_DATE",
+        "selfLink": "https://www.googleapis.com/compute/v1/projects/cloud-custodian/global/snapshots/c7n-snapshot-default-d0b4",
+        "labels": {
+          "goog-terraform-provisioned": "true",
+          "env": "default"
+        },
+        "labelFingerprint": "oWv7t93mrS4=",
+        "storageLocations": [
+          "us"
+        ],
+        "downloadBytes": "3167",
+        "creationSizeBytes": "0",
+        "enableConfidentialCompute": false
+      }
+    ],
+    "selfLink": "https://www.googleapis.com/compute/v1/projects/cloud-custodian/global/snapshots"
+  }
+}

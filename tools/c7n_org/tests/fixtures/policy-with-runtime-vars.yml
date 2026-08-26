@@ -1,0 +1,31 @@
+policies:
+  - name: lambda-with-event-var
+    resource: aws.lambda
+    description: Policy using runtime {event} variable in description
+    comment: "Event variable: {event}"
+    filters:
+      - type: value
+        key: Runtime
+        value: python3.9
+
+  - name: ec2-with-op-var
+    resource: aws.ec2
+    description: Policy using {op} variable for operations
+    comment: "Operation: {op}"
+    filters:
+      - State.Name: running
+
+  - name: s3-with-action-date
+    resource: aws.s3
+    description: Policy using {action_date} for scheduling
+    comment: "Scheduled for: {action_date}"
+    filters:
+      - type: bucket-logging
+        op: disabled
+
+  - name: mixed-variables-policy
+    resource: aws.ec2
+    description: Mix of user vars and runtime vars
+    comment: "Environment {environment} event {event} at {action_date}"
+    filters:
+      - tag:Environment: "{environment}"

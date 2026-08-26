@@ -16,7 +16,7 @@ dependencies = [
     "urllib3>2",
 ]
 name = "c7n"
-version = "0.9.50"
+version = "0.9.52"
 description = "Cloud Custodian - Policy Rules Engine"
 readme = "README.md"
 classifiers = [
@@ -55,7 +55,7 @@ dev = [
     "vcrpy>=4.0.2",
 ]
 lint = [
-    "black<25.0, >=23.1",
+    "black>=23.1,<27.0",
     "ruff~=0.11",
 ]
 addons = [
@@ -91,6 +91,15 @@ build-backend = "hatchling.build"
 [tool.black]
 skip-string-normalization = true
 line-length = 100
+include = '''
+(
+    tools/c7n_left/.*\.py$
+    | tools/c7n_mailer/.*\.py$
+    | tools/c7n_oci/.*\.py$
+    | tools/c7n_kube/.*\.py$
+    | tools/c7n_awscc/.*\.py$
+)
+'''
 
 [tool.ruff]
 line-length = 100

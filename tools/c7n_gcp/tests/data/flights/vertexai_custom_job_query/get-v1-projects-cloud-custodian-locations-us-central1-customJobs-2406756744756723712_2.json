@@ -1,0 +1,53 @@
+{
+  "headers": {
+    "content-type": "application/json; charset=UTF-8",
+    "vary": "Origin, X-Origin, Referer",
+    "date": "Wed, 08 Jul 2026 18:43:34 GMT",
+    "server": "ESF",
+    "x-xss-protection": "0",
+    "x-frame-options": "SAMEORIGIN",
+    "x-content-type-options": "nosniff",
+    "alt-svc": "h3=\":443\"; ma=2592000,h3-29=\":443\"; ma=2592000",
+    "transfer-encoding": "chunked",
+    "status": "200",
+    "content-length": "924",
+    "-content-encoding": "gzip",
+    "content-location": "https://us-central1-aiplatform.googleapis.com/v1/projects/cloud-custodian/locations/us-central1/customJobs/2406756744756723712?alt=json"
+  },
+  "body": {
+    "name": "projects/cloud-custodian/locations/us-central1/customJobs/2406756744756723712",
+    "displayName": "c7n-test-custom-job-default-9b09",
+    "jobSpec": {
+      "workerPoolSpecs": [
+        {
+          "machineSpec": {
+            "machineType": "n1-standard-4"
+          },
+          "replicaCount": "1",
+          "diskSpec": {
+            "bootDiskType": "pd-ssd",
+            "bootDiskSizeGb": 100
+          },
+          "containerSpec": {
+            "imageUri": "gcr.io/google.com/cloudsdktool/cloud-sdk:slim",
+            "command": [
+              "echo"
+            ],
+            "args": [
+              "hello from c7n test"
+            ]
+          }
+        }
+      ]
+    },
+    "state": "JOB_STATE_CANCELLED",
+    "createTime": "2026-07-08T18:43:23.250091Z",
+    "startTime": "2026-07-08T18:43:23.379923Z",
+    "endTime": "2026-07-08T18:43:26.765341Z",
+    "updateTime": "2026-07-08T18:43:26.765341Z",
+    "error": {
+      "code": 1,
+      "message": "CANCELED"
+    }
+  }
+}

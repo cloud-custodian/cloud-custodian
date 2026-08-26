@@ -10,7 +10,6 @@ from common import SQS_MESSAGE_3
 
 from c7n_mailer.datadog_delivery import DataDogDelivery
 
-
 DATADOG_APPLICATION_KEY = "datadog_application_key"
 DATADOG_API_KEY = "datadog_api_key"
 MESSAGE_ANSWER = [

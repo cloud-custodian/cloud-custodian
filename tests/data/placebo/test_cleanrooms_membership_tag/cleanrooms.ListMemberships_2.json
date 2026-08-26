@@ -1,0 +1,113 @@
+{
+    "status_code": 200,
+    "data": {
+        "ResponseMetadata": {},
+        "membershipSummaries": [
+            {
+                "id": "471d06d5-b382-4d18-9ad5-8e61ffe2bfac",
+                "arn": "arn:aws:cleanrooms:us-east-1:644160558196:membership/471d06d5-b382-4d18-9ad5-8e61ffe2bfac",
+                "collaborationArn": "arn:aws:cleanrooms:us-east-1:644160558196:collaboration/8326c03e-8c92-4cc0-9d84-3be7208e1528",
+                "collaborationId": "8326c03e-8c92-4cc0-9d84-3be7208e1528",
+                "collaborationCreatorAccountId": "644160558196",
+                "collaborationCreatorDisplayName": "Noncompliant Test creator",
+                "collaborationName": "Noncompliant Collaboration",
+                "createTime": {
+                    "__class__": "datetime",
+                    "year": 2026,
+                    "month": 6,
+                    "day": 9,
+                    "hour": 2,
+                    "minute": 19,
+                    "second": 55,
+                    "microsecond": 367000
+                },
+                "updateTime": {
+                    "__class__": "datetime",
+                    "year": 2026,
+                    "month": 6,
+                    "day": 9,
+                    "hour": 2,
+                    "minute": 19,
+                    "second": 55,
+                    "microsecond": 367000
+                },
+                "status": "ACTIVE",
+                "memberAbilities": [
+                    "CAN_RECEIVE_RESULTS"
+                ],
+                "paymentConfiguration": {
+                    "queryCompute": {
+                        "isResponsible": true
+                    },
+                    "machineLearning": {
+                        "modelTraining": {
+                            "isResponsible": false
+                        },
+                        "modelInference": {
+                            "isResponsible": false
+                        },
+                        "syntheticDataGeneration": {
+                            "isResponsible": false
+                        }
+                    },
+                    "jobCompute": {
+                        "isResponsible": false
+                    }
+                }
+            },
+            {
+                "id": "c5773151-1c6c-40ff-86f2-543d68654295",
+                "arn": "arn:aws:cleanrooms:us-east-1:644160558196:membership/c5773151-1c6c-40ff-86f2-543d68654295",
+                "collaborationArn": "arn:aws:cleanrooms:us-east-1:644160558196:collaboration/62647862-bee9-42e8-8c07-99b0fc492f3a",
+                "collaborationId": "62647862-bee9-42e8-8c07-99b0fc492f3a",
+                "collaborationCreatorAccountId": "644160558196",
+                "collaborationCreatorDisplayName": "Compliant Member",
+                "collaborationName": "Compliant Collaboration",
+                "createTime": {
+                    "__class__": "datetime",
+                    "year": 2026,
+                    "month": 6,
+                    "day": 9,
+                    "hour": 2,
+                    "minute": 2,
+                    "second": 3,
+                    "microsecond": 791000
+                },
+                "updateTime": {
+                    "__class__": "datetime",
+                    "year": 2026,
+                    "month": 6,
+                    "day": 9,
+                    "hour": 2,
+                    "minute": 2,
+                    "second": 3,
+                    "microsecond": 791000
+                },
+                "status": "ACTIVE",
+                "memberAbilities": [
+                    "CAN_QUERY",
+                    "CAN_RECEIVE_RESULTS"
+                ],
+                "paymentConfiguration": {
+                    "queryCompute": {
+                        "isResponsible": true
+                    },
+                    "machineLearning": {
+                        "modelTraining": {
+                            "isResponsible": false
+                        },
+                        "modelInference": {
+                            "isResponsible": false
+                        },
+                        "syntheticDataGeneration": {
+                            "isResponsible": false
+                        }
+                    },
+                    "jobCompute": {
+                        "isResponsible": false
+                    }
+                }
+            }
+        ]
+    }
+}

@@ -270,6 +270,8 @@ class PolicyMetaLint(BaseTest):
 
         whitelist = set(('AwsS3Object', 'Container'))
         todo = set((
+            # q2 2026
+            'AzureResource',
             # q2 2025
             'CodeRepository',
             # q4 2023,
@@ -991,7 +993,8 @@ class PolicyMetaLint(BaseTest):
             'snowball-cluster', 'snowball', 'ssm-activation',
             'healthcheck', 'event-rule-target', 'log-metric',
             'support-case', 'transit-attachment', 'config-recorder',
-            'apigw-domain-name', 'backup-job', 'quicksight-account', 'codedeploy-config'}
+            'apigw-domain-name', 'backup-job', 'quicksight-account', 'codedeploy-config',
+            'cleanrooms-collaboration-member'}
 
         missing_method = []
         for k, v in manager.resources.items():

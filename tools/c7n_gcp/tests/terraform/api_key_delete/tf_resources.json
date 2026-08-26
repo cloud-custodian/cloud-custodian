@@ -1,0 +1,31 @@
+{
+    "pytest-terraform": 1,
+    "outputs": {},
+    "resources": {
+        "google_apikeys_key": {
+            "api_key": {
+                "display_name": "Test API Key",
+                "id": "projects/cloud-custodian/locations/global/keys/test-key-22f9774c3e5a",
+                "key_string": "AIzaSyBY2zqBTNjfDIuMciw13H_q2sCKHd3N0GY",
+                "name": "test-key-22f9774c3e5a",
+                "project": "stacklet-test-policies",
+                "restrictions": [],
+                "service_account_email": "",
+                "timeouts": null,
+                "uid": "a3943a6e-1e3b-4ba8-b510-4a6e826e642b"
+            }
+        },
+        "random_id": {
+            "suffix": {
+                "b64_std": "Ivl3TD5a",
+                "b64_url": "Ivl3TD5a",
+                "byte_length": 6,
+                "dec": "38454843686490",
+                "hex": "22f9774c3e5a",
+                "id": "Ivl3TD5a",
+                "keepers": null,
+                "prefix": null
+            }
+        }
+    }
+}

@@ -9,7 +9,6 @@ from botocore.paginate import Paginator
 from c7n.query import RetryPageIterator
 from c7n.utils import local_session, jmespath_compile
 
-
 log = logging.getLogger("c7n_awscc.query")
 
 

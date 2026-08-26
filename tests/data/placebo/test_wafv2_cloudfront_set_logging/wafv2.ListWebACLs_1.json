@@ -1,0 +1,16 @@
+{
+    "status_code": 200,
+    "data": {
+        "NextMarker": "c7n-test-cloudfront",
+        "WebACLs": [
+            {
+                "Name": "c7n-test-cloudfront",
+                "Id": "fd4c4ea7-9990-4321-b0a8-0a929e5acc8e",
+                "Description": "",
+                "LockToken": "2757cb2e-5767-47b7-8162-79edd394813b",
+                "ARN": "arn:aws:wafv2:us-east-1:644160558196:global/webacl/c7n-test-cloudfront/fd4c4ea7-9990-4321-b0a8-0a929e5acc8e"
+            }
+        ],
+        "ResponseMetadata": {}
+    }
+}

@@ -1,0 +1,26 @@
+{
+    "status_code": 200,
+    "data": {
+        "ResponseMetadata": {},
+        "DistributionList": {
+            "Items": [
+                {
+                    "Id": "EDIST1",
+                    "ARN": "arn:aws:cloudfront::123456789012:distribution/EDIST1",
+                    "Status": "Deployed",
+                    "LastModifiedTime": "2023-01-01T00:00:00Z",
+                    "DomainName": "d111111abcdef8.cloudfront.net",
+                    "WebACLId": "",
+                    "Origins": {"Quantity": 1, "Items": [{"Id": "S3", "DomainName": "bucket.s3.amazonaws.com"}]},
+                    "DefaultCacheBehavior": {"ViewerProtocolPolicy": "https-only", "TargetOriginId": "S3"},
+                    "CacheBehaviors": {"Quantity": 0, "Items": []},
+                    "CustomErrorResponses": {"Quantity": 0, "Items": []},
+                    "Restrictions": {"GeoRestriction": {"RestrictionType": "none", "Quantity": 0}},
+                    "ViewerCertificate": {},
+                    "IsIPV6Enabled": true,
+                    "Aliases": {"Quantity": 0, "Items": []}
+                }
+            ]
+        }
+    }
+}

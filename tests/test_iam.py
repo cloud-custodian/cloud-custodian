@@ -14,6 +14,8 @@ import pytest
 from pytest_terraform import terraform
 from dateutil import parser
 
+import botocore.session
+from botocore.stub import Stubber
 from c7n.exceptions import PolicyValidationError
 from c7n.executor import MainThreadExecutor
 from c7n.filters.iamaccess import CrossAccountAccessFilter, PolicyChecker
@@ -25,6 +27,7 @@ from c7n.resources.iam import (
     UserMfaDevice,
     UsedIamPolicies,
     UnusedIamPolicies,
+    AllowAllIamPolicies,
     UsedInstanceProfiles,
     UnusedInstanceProfiles,
     UsedIamRole,
@@ -37,9 +40,13 @@ from c7n.resources.iam import (
     IamUserInlinePolicy,
     IamRoleInlinePolicy,
     IamGroupInlinePolicy,
+    RoleRemoveTag,
+    RoleTag,
     SpecificIamRoleManagedPolicy,
     NoSpecificIamRoleManagedPolicy,
     PolicyQueryParser,
+    UserRemoveTag,
+    UserTag,
     UserServiceSpecificCredentials,
 )
 
@@ -366,6 +373,105 @@ class UserCredentialReportTest(BaseTest):
                 "user_creation_time": "2016-10-06T16:11:27+00:00",
             },
         )
+
+
+class IamTagRetry(BaseTest):
+
+    def test_iam_tag_actions_retry_concurrent_modification(self):
+        self.patch(time, "sleep", lambda _: None)
+        cases = (
+            (RoleTag, "tag_role", "RoleName"),
+            (RoleRemoveTag, "untag_role", "RoleName"),
+            (UserTag, "tag_user", "UserName"),
+            (UserRemoveTag, "untag_user", "UserName"),
+        )
+
+        for action_class, operation_name, id_key in cases:
+            with self.subTest(operation=operation_name):
+                resource = {id_key: "resource-one"}
+                missing = {id_key: "resource-missing"}
+                if operation_name.startswith("untag_"):
+                    tag_key, tags = "TagKeys", ["Env"]
+                else:
+                    tag_key, tags = "Tags", [{"Key": "Env", "Value": "Dev"}]
+                client = botocore.session.get_session().create_client(
+                    "iam",
+                    region_name="us-east-1",
+                    aws_access_key_id="access-key",
+                    aws_secret_access_key="secret-key",
+                )
+                expected = {**resource, tag_key: tags}
+                missing_expected = {**missing, tag_key: tags}
+                stubber = Stubber(client)
+                stubber.add_client_error(
+                    operation_name,
+                    service_error_code="ConcurrentModification",
+                    service_message="simultaneous change",
+                    http_status_code=409,
+                    expected_params=expected,
+                )
+                stubber.add_response(operation_name, {}, expected)
+                stubber.add_client_error(
+                    operation_name,
+                    service_error_code="NoSuchEntity",
+                    service_message="missing",
+                    http_status_code=404,
+                    expected_params=missing_expected,
+                )
+
+                action = action_class({}, mock.Mock())
+                with stubber, mock.patch.object(
+                    client, operation_name, wraps=getattr(client, operation_name)
+                ) as operation:
+                    action.process_resource_set(client, [resource, missing], tags)
+
+                self.assertEqual(operation.call_count, 3)
+                self.assertEqual(
+                    operation.call_args_list,
+                    [
+                        mock.call(**expected),
+                        mock.call(**expected),
+                        mock.call(**missing_expected),
+                    ],
+                )
+
+    def test_iam_tag_retry_uses_single_attempt_budget(self):
+        sleep = mock.Mock()
+        self.patch(time, "sleep", sleep)
+        client = botocore.session.get_session().create_client(
+            "iam",
+            region_name="us-east-1",
+            aws_access_key_id="access-key",
+            aws_secret_access_key="secret-key",
+        )
+        expected = {
+            "RoleName": "resource-one",
+            "Tags": [{"Key": "Env", "Value": "Dev"}],
+        }
+        stubber = Stubber(client)
+        for attempt in range(8):
+            throttled = attempt % 2 == 0
+            stubber.add_client_error(
+                "tag_role",
+                service_error_code="Throttling" if throttled else "ConcurrentModification",
+                service_message="retry",
+                http_status_code=429 if throttled else 409,
+                expected_params=expected,
+            )
+
+        action = RoleTag({}, mock.Mock())
+        with stubber, mock.patch.object(
+            client, "tag_role", wraps=client.tag_role
+        ) as operation:
+            with self.assertRaises(ClientError):
+                action.process_resource_set(
+                    client,
+                    [{"RoleName": "resource-one"}],
+                    [{"Key": "Env", "Value": "Dev"}],
+                )
+
+        self.assertEqual(operation.call_count, 8)
+        self.assertEqual(sleep.call_count, 7)
 
 
 class IamUserTag(BaseTest):
@@ -813,6 +919,41 @@ class IamUserTest(BaseTest):
             p.resource_manager.source.augment([{'UserName': 'Kapil'}])
         self.assertEqual(ctx.exception.response['Error']['Code'], 'AccessDenied')
 
+    def test_iam_role_augment_not_found(self):
+        p = self.load_policy({
+            'name': 'iam-role-augment-not-found',
+            'resource': 'iam-role'})
+
+        p.resource_manager.session_factory = sf = mock.MagicMock()
+        sf.region = 'us-east-1'
+        sf.return_value = f = mock.MagicMock()
+        f.client.return_value = c = mock.MagicMock()
+        c.get_role.side_effect = ClientError(
+            {'Error': {'Code': 'AccessDenied',
+                       'Message': 'The role with name test-role cannot be found.'}},
+            'get_role')
+
+        with self.assertRaises(ClientError) as ctx:
+            p.resource_manager.source.augment([{'RoleName': 'test-role'}])
+        self.assertEqual(ctx.exception.response['Error']['Code'], 'AccessDenied')
+
+    def test_iam_role_augment_resource_not_found_ignored(self):
+        p = self.load_policy({
+            'name': 'iam-role-augment-resource-not-found',
+            'resource': 'iam-role'})
+
+        p.resource_manager.session_factory = sf = mock.MagicMock()
+        sf.region = 'us-east-1'
+        sf.return_value = f = mock.MagicMock()
+        f.client.return_value = c = mock.MagicMock()
+        c.get_role.side_effect = ClientError(
+            {'Error': {'Code': 'ResourceNotFoundException',
+                       'Message': 'The role with name test-role cannot be found.'}},
+            'get_role')
+
+        results = p.resource_manager.source.augment([{'RoleName': 'test-role'}])
+        self.assertEqual(results, [])
+
     def test_iam_user_usage(self):
         factory = self.replay_flight_data('test_iam_user_usage')
         p = self.load_policy({
@@ -1075,6 +1216,26 @@ class IamUserTest(BaseTest):
         self.assertEqual(len(resources[0]["c7n:Policies"]), 2)
         self.assertEqual(resources[1]["UserName"], "alphabet_soup_2")
         self.assertEqual(len(resources[1]["c7n:Policies"]), 2)
+
+    def test_iam_user_policy_dedup(self):
+        # A user with more than one matching policy must be returned exactly
+        # once, matched users keep their input order, and non-matching users
+        # are excluded. Guards the dedup behavior of UserPolicy.process.
+        self.patch(UserPolicy, "executor_factory", MainThreadExecutor)
+        f = UserPolicy(
+            {"type": "policy", "key": "PolicyName", "value": "AdministratorAccess"},
+            mock.MagicMock(),
+        )
+        admin = {"PolicyName": "AdministratorAccess"}
+        readonly = {"PolicyName": "ReadOnlyAccess"}
+        resources = [
+            {"UserName": "u1", "c7n:Policies": [admin, admin]},
+            {"UserName": "u2", "c7n:Policies": [readonly]},
+            {"UserName": "u3", "c7n:Policies": [readonly, admin]},
+        ]
+        with mock.patch.object(UserPolicy, "user_policies"):
+            matched = f.process(resources)
+        self.assertEqual([r["UserName"] for r in matched], ["u1", "u3"])
 
     def test_iam_user_access_key_filter(self):
         session_factory = self.replay_flight_data("test_iam_user_access_key_active")
@@ -1674,6 +1835,64 @@ class IamPolicy(BaseTest):
         )
         resources = p.run()
         self.assertEqual(len(resources), 1)
+
+    def test_iam_has_allow_all_policies_list_form(self):
+        # Regression test: Action/Resource are valid in IAM policy JSON as
+        # either a bare string ("*") or a single-element list (["*"]). The
+        # filter previously only matched the string form via
+        # isinstance(..., str), silently missing an equally common
+        # full-admin policy written with list syntax.
+        f = AllowAllIamPolicies(data={}, manager=None)
+        resource = {'Arn': 'arn:aws:iam::644160558196:policy/ListFormAdmin',
+                    'DefaultVersionId': 'v1'}
+
+        def get_policy_version(document):
+            client = mock.MagicMock()
+            client.get_policy_version.return_value = {
+                'PolicyVersion': {'Document': document}}
+            return client
+
+        # list-form Action/Resource: must be detected as allow-all
+        client = get_policy_version({
+            'Statement': [{
+                'Effect': 'Allow',
+                'Action': ['*'],
+                'Resource': ['*'],
+            }]
+        })
+        self.assertTrue(f.has_allow_all_policy(client, resource))
+
+        # mixed string/list form: must also be detected
+        client = get_policy_version({
+            'Statement': [{
+                'Effect': 'Allow',
+                'Action': '*',
+                'Resource': ['*'],
+            }]
+        })
+        self.assertTrue(f.has_allow_all_policy(client, resource))
+
+        # list form with extra entries alongside "*": still allow-all, since
+        # "*" in either list already grants access to everything regardless
+        # of the other (redundant) entries.
+        client = get_policy_version({
+            'Statement': [{
+                'Effect': 'Allow',
+                'Action': ['*'],
+                'Resource': ['*', 'arn:aws:s3:::some-bucket'],
+            }]
+        })
+        self.assertTrue(f.has_allow_all_policy(client, resource))
+
+        # list form without "*" in either list: not allow-all
+        client = get_policy_version({
+            'Statement': [{
+                'Effect': 'Allow',
+                'Action': ['s3:GetObject'],
+                'Resource': ['arn:aws:s3:::some-bucket'],
+            }]
+        })
+        self.assertFalse(f.has_allow_all_policy(client, resource))
 
 
 @terraform('iam_user_group', teardown=terraform.TEARDOWN_IGNORE)
@@ -2736,6 +2955,156 @@ class CrossAccountChecker(TestCase):
         violations = checker.check(policy)
         self.assertEqual(len(violations), 1)
 
+    def test_principal_org_paths_allowed(self):
+        """Test that aws:PrincipalOrgPaths is treated as org-scoping condition."""
+        policy = {
+            "Version": "2012-10-17",
+            "Statement": [{
+                "Effect": "Allow",
+                "Principal": "*",
+                "Action": "s3:GetObject",
+                "Resource": "*",
+                "Condition": {
+                    "ForAnyValuesStringLike": {
+                        "aws:PrincipalOrgPaths": [
+                            "o-allowed/r-ab12/ou-ab12-aaaabbbb/*"
+                        ]
+                    },
+                    "ArnLike": {
+                        "aws:PrincipalArn": "arn:aws:iam::*:role/MyRole"
+                    }
+                }
+            }]
+        }
+
+        # Allowed org ID extracted from path → no violation
+        checker = PolicyChecker({"allowed_orgid": {"o-allowed"}})
+        violations = checker.check(policy)
+        self.assertEqual(len(violations), 0)
+
+        # No allowed org ID → violation
+        checker = PolicyChecker({"allowed_orgid": set()})
+        violations = checker.check(policy)
+        self.assertEqual(len(violations), 1)
+
+        # Wrong org ID → violation
+        checker = PolicyChecker({"allowed_orgid": {"o-other"}})
+        violations = checker.check(policy)
+        self.assertEqual(len(violations), 1)
+
+    def test_principal_org_paths_allowed_org_unit(self):
+        parent_ou_path = "o-allowed/r-ab12/ou-ab12-prod/*"
+        nested_ou_path = "o-allowed/r-ab12/ou-ab12-prod/ou-ab12-prod-team/*"
+        wildcard_ou_path = "o-allowed/*/ou-ab12-prod/ou-ab12-prod-team/*"
+
+        def policy_for(path):
+            return {
+                "Version": "2012-10-17",
+                "Statement": [{
+                    "Effect": "Allow",
+                    "Principal": "*",
+                    "Action": "s3:GetObject",
+                    "Resource": "*",
+                    "Condition": {
+                        "ForAnyValuesStringLike": {
+                            "aws:PrincipalOrgPaths": [path]
+                        }
+                    }
+                }]
+            }
+
+        prod = {"o-allowed/r-ab12/ou-ab12-prod"}
+        team = {"o-allowed/r-ab12/ou-ab12-prod/ou-ab12-prod-team"}
+        dev = {"o-allowed/r-ab12/ou-ab12-dev"}
+
+        checker = PolicyChecker({"allowed_org_units": prod})
+        self.assertEqual(len(checker.check(policy_for(parent_ou_path))), 0)
+        self.assertEqual(len(checker.check(policy_for(nested_ou_path))), 0)
+        self.assertEqual(len(checker.check(policy_for(wildcard_ou_path))), 0)
+
+        checker = PolicyChecker({"allowed_org_units": team})
+        self.assertEqual(len(checker.check(policy_for(parent_ou_path))), 1)
+        self.assertEqual(len(checker.check(policy_for(nested_ou_path))), 0)
+        self.assertEqual(len(checker.check(policy_for(wildcard_ou_path))), 0)
+
+        checker = PolicyChecker({"allowed_org_units": dev})
+        self.assertEqual(len(checker.check(policy_for(parent_ou_path))), 1)
+        self.assertEqual(len(checker.check(policy_for(nested_ou_path))), 1)
+        self.assertEqual(len(checker.check(policy_for(wildcard_ou_path))), 1)
+
+    def test_principal_org_paths_org_unit_does_not_match_whole_org(self):
+        policy = {
+            "Version": "2012-10-17",
+            "Statement": [{
+                "Effect": "Allow",
+                "Principal": "*",
+                "Action": "s3:GetObject",
+                "Resource": "*",
+                "Condition": {
+                    "ForAnyValuesStringLike": {
+                        "aws:PrincipalOrgPaths": ["o-allowed/*"]
+                    }
+                }
+            }]
+        }
+        checker = PolicyChecker({
+            "allowed_org_units": {"o-allowed/r-ab12/ou-ab12-prod"}})
+        self.assertEqual(len(checker.check(policy)), 1)
+
+    def test_principal_org_paths_wildcard_pinned_by_literal_anchors(self):
+        policy = {
+            "Version": "2012-10-17",
+            "Statement": [{
+                "Effect": "Allow",
+                "Principal": "*",
+                "Action": "s3:GetObject",
+                "Resource": "*",
+                "Condition": {
+                    "ForAnyValuesStringLike": {
+                        "aws:PrincipalOrgPaths": [
+                            "o-allowed/*/ou-ab12-prod/*"
+                        ]
+                    }
+                }
+            }]
+        }
+        checker = PolicyChecker({
+            "allowed_org_units": {"o-allowed/r-ab12/ou-ab12-prod"}})
+        self.assertEqual(len(checker.check(policy)), 0)
+
+        # Same shape but org segment wildcarded — must be denied
+        policy["Statement"][0]["Condition"]["ForAnyValuesStringLike"][
+            "aws:PrincipalOrgPaths"] = ["*/r-ab12/ou-ab12-prod/*"]
+        self.assertEqual(len(checker.check(policy)), 1)
+
+    def test_principal_org_paths_combines_orgid_and_org_unit(self):
+        policy = {
+            "Version": "2012-10-17",
+            "Statement": [{
+                "Effect": "Allow",
+                "Principal": "*",
+                "Action": "s3:GetObject",
+                "Resource": "*",
+                "Condition": {
+                    "ForAnyValuesStringLike": {
+                        "aws:PrincipalOrgPaths": [
+                            "o-trusted/r-aa11/ou-aa11-anything/*",
+                            "o-other/r-bb22/ou-bb22-prod/*",
+                        ]
+                    }
+                }
+            }]
+        }
+
+        checker = PolicyChecker({
+            "allowed_orgid": {"o-trusted"},
+            "allowed_org_units": {"o-other/r-bb22/ou-bb22-prod"},
+        })
+        self.assertEqual(len(checker.check(policy)), 0)
+
+        checker = PolicyChecker({"allowed_orgid": {"o-trusted"}})
+        self.assertEqual(len(checker.check(policy)), 1)
+
     def test_org_id_with_specific_non_whitelisted_account(self):
         """Test that org ID doesn't save specific non-whitelisted account."""
         policy = {
@@ -2876,6 +3245,34 @@ class CrossAccountChecker(TestCase):
 
         # All wildcards should be allowed with org ID
         checker = PolicyChecker({"allowed_orgid": {"o-allowed"}})
+        violations = checker.check(policy)
+        self.assertEqual(len(violations), 0)
+
+    def test_org_id_with_mixed_principal_arns_and_whitelisted_account(self):
+        """Test org ID with mixed wildcard and already-whitelisted PrincipalArn values."""
+        policy = {
+            "Version": "2012-10-17",
+            "Statement": [{
+                "Effect": "Allow",
+                "Principal": "*",
+                "Action": "s3:GetObject",
+                "Resource": "*",
+                "Condition": {
+                    "StringEquals": {"aws:PrincipalOrgID": "o-allowed"},
+                    "ArnLike": {
+                        "aws:PrincipalArn": [
+                            "arn:aws:iam::123456789012:role/AllowedRole",
+                            "arn:aws:iam::*:role/*"
+                        ]
+                    }
+                }
+            }]
+        }
+
+        checker = PolicyChecker({
+            "allowed_orgid": {"o-allowed"},
+            "allowed_accounts": {"123456789012"}
+        })
         violations = checker.check(policy)
         self.assertEqual(len(violations), 0)
 
@@ -3314,6 +3711,72 @@ class CrossAccountChecker(TestCase):
             results = f.process([{'Policy': orgid_policy}])
         self.assertEqual(len(results), 0)
 
+    def test_cross_account_filter_whitelist_org_units(self):
+        f = self._make_filter({
+            'type': 'cross-account',
+            'whitelist_org_units': ['o-example/r-ab12/ou-ab12-prod'],
+        })
+        orgpath_policy = json.dumps({
+            "Version": "2012-10-17",
+            "Statement": [{
+                "Effect": "Allow",
+                "Principal": "*",
+                "Action": "*",
+                "Resource": "*",
+                "Condition": {
+                    "ForAnyValuesStringLike": {
+                        "aws:PrincipalOrgPaths": [
+                            "o-example/r-ab12/ou-ab12-prod/*"
+                        ]
+                    }
+                }
+            }]
+        })
+        self.assertEqual(len(f.process([{'Policy': orgpath_policy}])), 0)
+
+    def test_cross_account_filter_whitelist_org_units_from(self):
+        f = self._make_filter({
+            'type': 'cross-account',
+            'whitelist_org_units_from': {'url': 's3://b/ous.txt', 'format': 'txt'},
+        })
+        orgpath_policy = json.dumps({
+            "Version": "2012-10-17",
+            "Statement": [{
+                "Effect": "Allow",
+                "Principal": "*",
+                "Action": "*",
+                "Resource": "*",
+                "Condition": {
+                    "ForAnyValuesStringLike": {
+                        "aws:PrincipalOrgPaths": [
+                            "o-example/r-ab12/ou-ab12-prod/*"
+                        ]
+                    }
+                }
+            }]
+        })
+        with mock.patch('c7n.filters.iamaccess.ValuesFrom') as mock_vf_cls:
+            mock_vf_cls.return_value.get_values.return_value = [
+                'o-example/r-ab12/ou-ab12-prod']
+            results = f.process([{'Policy': orgpath_policy}])
+        self.assertEqual(len(results), 0)
+
+    def test_cross_account_filter_whitelist_org_units_rejects_wildcard(self):
+        f = self._make_filter({
+            'type': 'cross-account',
+            'whitelist_org_units': ['o-example/r-ab12/ou-ab12-prod/*'],
+        })
+        with self.assertRaises(PolicyValidationError):
+            f.process([{'Policy': '{"Statement": []}'}])
+
+    def test_cross_account_filter_whitelist_org_units_rejects_bare_ou(self):
+        f = self._make_filter({
+            'type': 'cross-account',
+            'whitelist_org_units': ['ou-ab12-prod'],
+        })
+        with self.assertRaises(PolicyValidationError):
+            f.process([{'Policy': '{"Statement": []}'}])
+
 
 class SetRolePolicyAction(BaseTest):
     def test_set_policy_attached(self):
@@ -3570,55 +4033,13 @@ class AccessKeyTest(BaseTest):
             session_factory=factory,
         )
         resources = p.run()
-        self.assertTrue(len(resources) >= 0)
+        self.assertTrue(len(resources) == 2)
         for resource in resources:
             # Verify required fields are present
             self.assertIn('AccessKeyId', resource)
             self.assertIn('UserName', resource)
             self.assertIn('Status', resource)
             self.assertIn('CreateDate', resource)
-
-    def test_access_key_filter_by_status(self):
-        """Test filtering access keys by status."""
-        factory = self.replay_flight_data("test_iam_access_key_filter_status")
-        p = self.load_policy(
-            {
-                "name": "iam-access-key-active",
-                "resource": "iam-access-key",
-                "filters": [
-                    {
-                        "type": "value",
-                        "key": "Status",
-                        "value": "Active"
-                    }
-                ]
-            },
-            session_factory=factory,
-        )
-        resources = p.run()
-        for resource in resources:
-            self.assertEqual(resource['Status'], 'Active')
-
-    def test_access_key_filter_by_user(self):
-        """Test filtering access keys by username."""
-        factory = self.replay_flight_data("test_iam_access_key_filter_user")
-        p = self.load_policy(
-            {
-                "name": "iam-access-key-by-user",
-                "resource": "iam-access-key",
-                "filters": [
-                    {
-                        "type": "value",
-                        "key": "UserName",
-                        "value": "test-user"
-                    }
-                ]
-            },
-            session_factory=factory,
-        )
-        resources = p.run()
-        for resource in resources:
-            self.assertEqual(resource['UserName'], 'test-user')
 
     def test_access_key_filter_by_age(self):
         """Test filtering access keys by age."""
@@ -3639,7 +4060,9 @@ class AccessKeyTest(BaseTest):
             },
             session_factory=factory,
         )
-        resources = p.run()
+
+        with freezegun.freeze_time('2020-02-02'):
+            resources = p.run()
         # Just check that we can run this without error
         # The actual age filter logic is handled by C7N core
-        self.assertTrue(len(resources) >= 0)
+        self.assertTrue(len(resources) == 1)

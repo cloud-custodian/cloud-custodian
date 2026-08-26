@@ -1,0 +1,50 @@
+{
+  "headers": {
+    "etag": "4xcOGMZ-ptmm9WrSdl3HVqHLf0Y=/GBtNX0F9MhkeWIp3p3vXxFpWv8A=",
+    "content-type": "application/json; charset=UTF-8",
+    "vary": "Origin, X-Origin, Referer",
+    "date": "Mon, 20 Apr 2026 15:53:30 GMT",
+    "server": "ESF",
+    "x-xss-protection": "0",
+    "x-frame-options": "SAMEORIGIN",
+    "x-content-type-options": "nosniff",
+    "alt-svc": "h3=\":443\"; ma=2592000,h3-29=\":443\"; ma=2592000",
+    "transfer-encoding": "chunked",
+    "status": "200",
+    "content-length": "835",
+    "-content-encoding": "gzip",
+    "content-location": "https://compute.googleapis.com/compute/v1/projects/cloud-custodian/global/securityPolicies/c7n-armor-default-8fa0?alt=json"
+  },
+  "body": {
+    "kind": "compute#securityPolicy",
+    "id": "5307613612721566990",
+    "creationTimestamp": "2026-04-20T08:53:06.058-07:00",
+    "name": "c7n-armor-default-8fa0",
+    "rules": [
+      {
+        "kind": "compute#securityPolicyRule",
+        "description": "",
+        "priority": 2147483647,
+        "match": {
+          "versionedExpr": "SRC_IPS_V1",
+          "config": {
+            "srcIpRanges": [
+              "*"
+            ]
+          }
+        },
+        "action": "allow",
+        "preview": false,
+        "headerAction": {}
+      }
+    ],
+    "fingerprint": "2m3UXDAtEd4=",
+    "selfLink": "https://www.googleapis.com/compute/v1/projects/cloud-custodian/global/securityPolicies/c7n-armor-default-8fa0",
+    "type": "CLOUD_ARMOR",
+    "labels": {
+      "goog-terraform-provisioned": "true",
+      "env": "not-the-default"
+    },
+    "labelFingerprint": "XzoNciJNMTE="
+  }
+}

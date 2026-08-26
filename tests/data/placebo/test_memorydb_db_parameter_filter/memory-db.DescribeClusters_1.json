@@ -1,0 +1,54 @@
+{
+    "status_code": 200,
+    "data": {
+        "Clusters": [
+            {
+                "Name": "c7n-test-memorydb",
+                "Status": "available",
+                "NumberOfShards": 1,
+                "ClusterEndpoint": {
+                    "Address": "clustercfg.c7n-test-memorydb.qgcgte.memorydb.us-east-1.amazonaws.com",
+                    "Port": 6379
+                },
+                "NodeType": "db.t4g.small",
+                "EngineVersion": "7.1",
+                "EnginePatchVersion": "7.1.0",
+                "ParameterGroupName": "c7n-test-custom-params",
+                "ParameterGroupStatus": "in-sync",
+                "SubnetGroupName": "test-subnet",
+                "TLSEnabled": false,
+                "ARN": "arn:aws:memorydb:us-east-1:644160558196:cluster/c7n-test-memorydb",
+                "SnapshotRetentionLimit": 0,
+                "MaintenanceWindow": "sat:03:30-sat:04:30",
+                "SnapshotWindow": "04:30-05:30",
+                "ACLName": "open-access",
+                "AutoMinorVersionUpgrade": true,
+                "DataTiering": "false"
+            },
+            {
+                "Name": "test-cluster-default",
+                "Status": "available",
+                "NumberOfShards": 1,
+                "ClusterEndpoint": {
+                    "Address": "clustercfg.test-cluster-default.qgcgte.memorydb.us-east-1.amazonaws.com",
+                    "Port": 6379
+                },
+                "NodeType": "db.t4g.small",
+                "EngineVersion": "7.1",
+                "EnginePatchVersion": "7.1.0",
+                "ParameterGroupName": "default.memorydb-redis7",
+                "ParameterGroupStatus": "in-sync",
+                "SubnetGroupName": "test-subnet",
+                "TLSEnabled": true,
+                "ARN": "arn:aws:memorydb:us-east-1:644160558196:cluster/test-cluster-default",
+                "SnapshotRetentionLimit": 1,
+                "MaintenanceWindow": "mon:10:00-mon:11:00",
+                "SnapshotWindow": "07:30-08:30",
+                "ACLName": "open-access",
+                "AutoMinorVersionUpgrade": true,
+                "DataTiering": "false"
+            }
+        ],
+        "ResponseMetadata": {}
+    }
+}

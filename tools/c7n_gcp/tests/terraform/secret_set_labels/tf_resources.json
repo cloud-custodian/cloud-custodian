@@ -1,0 +1,47 @@
+{
+    "pytest-terraform": 1,
+    "outputs": {},
+    "resources": {
+        "google_secret_manager_secret": {
+            "secret": {
+                "annotations": null,
+                "create_time": "2026-04-17T21:01:05.172040Z",
+                "deletion_protection": false,
+                "effective_annotations": {},
+                "effective_labels": {
+                    "env": "default",
+                    "goog-terraform-provisioned": "true"
+                },
+                "expire_time": "",
+                "id": "projects/cloud-custodian/secrets/c7n-secret",
+                "labels": {
+                    "env": "default"
+                },
+                "name": "projects/cloud-custodian/secrets/c7n-secret",
+                "project": "stacklet-test-policies",
+                "replication": [
+                    {
+                        "auto": [
+                            {
+                                "customer_managed_encryption": []
+                            }
+                        ],
+                        "user_managed": []
+                    }
+                ],
+                "rotation": [],
+                "secret_id": "c7n-secret",
+                "tags": null,
+                "terraform_labels": {
+                    "env": "default",
+                    "goog-terraform-provisioned": "true"
+                },
+                "timeouts": null,
+                "topics": [],
+                "ttl": null,
+                "version_aliases": null,
+                "version_destroy_ttl": ""
+            }
+        }
+    }
+}

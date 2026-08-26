@@ -1,0 +1,18 @@
+{
+    "status_code": 200,
+    "data": {
+        "PaginationToken": "",
+        "ResourceTagMappingList": [
+            {
+                "ResourceARN": "arn:aws:directconnect::644160558196:dx-gateway/f3d47376-7e1e-4017-87ba-b8a59dbb135f",
+                "Tags": [
+                    {
+                        "Key": "existing",
+                        "Value": "existing"
+                    }
+                ]
+            }
+        ],
+        "ResponseMetadata": {}
+    }
+}

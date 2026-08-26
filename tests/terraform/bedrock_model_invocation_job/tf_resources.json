@@ -1,12 +1,326 @@
 {
     "pytest-terraform": 1,
-    "outputs": {},
+    "outputs": {
+        "input_bucket": {
+            "value": "c7n-bedrock-input-leading-baboon",
+            "type": "string"
+        },
+        "input_s3_uri": {
+            "value": "s3://c7n-bedrock-input-leading-baboon/input.jsonl",
+            "type": "string"
+        },
+        "job_name_prefix": {
+            "value": "c7n-batch-invocation-leading-baboon",
+            "type": "string"
+        },
+        "output_bucket": {
+            "value": "c7n-bedrock-output-leading-baboon",
+            "type": "string"
+        },
+        "output_s3_uri": {
+            "value": "s3://c7n-bedrock-output-leading-baboon/",
+            "type": "string"
+        },
+        "role_arn": {
+            "value": "arn:aws:iam::644160558196:role/c7n-bedrock-batch-leading-baboon",
+            "type": "string"
+        }
+    },
     "resources": {
-        "aws_bedrock_model_invocation_job": {
-            "test_job": {
-                "arn": "arn:aws:bedrock:us-east-1:644160558196:model-invocation-job/abc123def456",
-                "id": "abc123def456",
-                "job_name": "c7n-batch-invocation"
+        "aws_iam_policy_document": {
+            "assume_role": {
+                "id": "3235918949",
+                "json": "{\n  \"Version\": \"2012-10-17\",\n  \"Statement\": [\n    {\n      \"Effect\": \"Allow\",\n      \"Action\": \"sts:AssumeRole\",\n      \"Principal\": {\n        \"Service\": \"bedrock.amazonaws.com\"\n      }\n    }\n  ]\n}",
+                "minified_json": "{\"Version\":\"2012-10-17\",\"Statement\":[{\"Effect\":\"Allow\",\"Action\":\"sts:AssumeRole\",\"Principal\":{\"Service\":\"bedrock.amazonaws.com\"}}]}",
+                "override_json": null,
+                "override_policy_documents": null,
+                "policy_id": null,
+                "source_json": null,
+                "source_policy_documents": null,
+                "statement": [
+                    {
+                        "actions": [
+                            "sts:AssumeRole"
+                        ],
+                        "condition": [],
+                        "effect": "Allow",
+                        "not_actions": [],
+                        "not_principals": [],
+                        "not_resources": [],
+                        "principals": [
+                            {
+                                "identifiers": [
+                                    "bedrock.amazonaws.com"
+                                ],
+                                "type": "Service"
+                            }
+                        ],
+                        "resources": [],
+                        "sid": ""
+                    }
+                ],
+                "version": "2012-10-17"
+            },
+            "batch_access": {
+                "id": "1887175034",
+                "json": "{\n  \"Version\": \"2012-10-17\",\n  \"Statement\": [\n    {\n      \"Effect\": \"Allow\",\n      \"Action\": [\n        \"s3:ListBucket\",\n        \"s3:GetObject\"\n      ],\n      \"Resource\": [\n        \"arn:aws:s3:::c7n-bedrock-input-leading-baboon/*\",\n        \"arn:aws:s3:::c7n-bedrock-input-leading-baboon\"\n      ]\n    },\n    {\n      \"Effect\": \"Allow\",\n      \"Action\": [\n        \"s3:PutObject\",\n        \"s3:ListBucket\",\n        \"s3:AbortMultipartUpload\"\n      ],\n      \"Resource\": [\n        \"arn:aws:s3:::c7n-bedrock-output-leading-baboon/*\",\n        \"arn:aws:s3:::c7n-bedrock-output-leading-baboon\"\n      ]\n    },\n    {\n      \"Effect\": \"Allow\",\n      \"Action\": \"bedrock:InvokeModel\",\n      \"Resource\": \"arn:aws:bedrock:*::foundation-model/*\"\n    }\n  ]\n}",
+                "minified_json": "{\"Version\":\"2012-10-17\",\"Statement\":[{\"Effect\":\"Allow\",\"Action\":[\"s3:ListBucket\",\"s3:GetObject\"],\"Resource\":[\"arn:aws:s3:::c7n-bedrock-input-leading-baboon/*\",\"arn:aws:s3:::c7n-bedrock-input-leading-baboon\"]},{\"Effect\":\"Allow\",\"Action\":[\"s3:PutObject\",\"s3:ListBucket\",\"s3:AbortMultipartUpload\"],\"Resource\":[\"arn:aws:s3:::c7n-bedrock-output-leading-baboon/*\",\"arn:aws:s3:::c7n-bedrock-output-leading-baboon\"]},{\"Effect\":\"Allow\",\"Action\":\"bedrock:InvokeModel\",\"Resource\":\"arn:aws:bedrock:*::foundation-model/*\"}]}",
+                "override_json": null,
+                "override_policy_documents": null,
+                "policy_id": null,
+                "source_json": null,
+                "source_policy_documents": null,
+                "statement": [
+                    {
+                        "actions": [
+                            "s3:GetObject",
+                            "s3:ListBucket"
+                        ],
+                        "condition": [],
+                        "effect": "Allow",
+                        "not_actions": [],
+                        "not_principals": [],
+                        "not_resources": [],
+                        "principals": [],
+                        "resources": [
+                            "arn:aws:s3:::c7n-bedrock-input-leading-baboon",
+                            "arn:aws:s3:::c7n-bedrock-input-leading-baboon/*"
+                        ],
+                        "sid": ""
+                    },
+                    {
+                        "actions": [
+                            "s3:AbortMultipartUpload",
+                            "s3:ListBucket",
+                            "s3:PutObject"
+                        ],
+                        "condition": [],
+                        "effect": "Allow",
+                        "not_actions": [],
+                        "not_principals": [],
+                        "not_resources": [],
+                        "principals": [],
+                        "resources": [
+                            "arn:aws:s3:::c7n-bedrock-output-leading-baboon",
+                            "arn:aws:s3:::c7n-bedrock-output-leading-baboon/*"
+                        ],
+                        "sid": ""
+                    },
+                    {
+                        "actions": [
+                            "bedrock:InvokeModel"
+                        ],
+                        "condition": [],
+                        "effect": "Allow",
+                        "not_actions": [],
+                        "not_principals": [],
+                        "not_resources": [],
+                        "principals": [],
+                        "resources": [
+                            "arn:aws:bedrock:*::foundation-model/*"
+                        ],
+                        "sid": ""
+                    }
+                ],
+                "version": "2012-10-17"
+            }
+        },
+        "aws_iam_role": {
+            "bedrock_batch": {
+                "arn": "arn:aws:iam::644160558196:role/c7n-bedrock-batch-leading-baboon",
+                "assume_role_policy": "{\"Statement\":[{\"Action\":\"sts:AssumeRole\",\"Effect\":\"Allow\",\"Principal\":{\"Service\":\"bedrock.amazonaws.com\"}}],\"Version\":\"2012-10-17\"}",
+                "create_date": "2026-03-13T17:48:53Z",
+                "description": "",
+                "force_detach_policies": false,
+                "id": "c7n-bedrock-batch-leading-baboon",
+                "inline_policy": [],
+                "managed_policy_arns": [],
+                "max_session_duration": 3600,
+                "name": "c7n-bedrock-batch-leading-baboon",
+                "name_prefix": "",
+                "path": "/",
+                "permissions_boundary": "",
+                "tags": null,
+                "tags_all": {},
+                "unique_id": "AROAXGZAMH75UMXG57I3Y"
+            }
+        },
+        "aws_iam_role_policy": {
+            "bedrock_batch": {
+                "id": "c7n-bedrock-batch-leading-baboon:c7n-bedrock-batch-leading-baboon",
+                "name": "c7n-bedrock-batch-leading-baboon",
+                "name_prefix": "",
+                "policy": "{\"Version\":\"2012-10-17\",\"Statement\":[{\"Action\":[\"s3:ListBucket\",\"s3:GetObject\"],\"Effect\":\"Allow\",\"Resource\":[\"arn:aws:s3:::c7n-bedrock-input-leading-baboon/*\",\"arn:aws:s3:::c7n-bedrock-input-leading-baboon\"]},{\"Action\":[\"s3:PutObject\",\"s3:ListBucket\",\"s3:AbortMultipartUpload\"],\"Effect\":\"Allow\",\"Resource\":[\"arn:aws:s3:::c7n-bedrock-output-leading-baboon/*\",\"arn:aws:s3:::c7n-bedrock-output-leading-baboon\"]},{\"Action\":\"bedrock:InvokeModel\",\"Effect\":\"Allow\",\"Resource\":\"arn:aws:bedrock:*::foundation-model/*\"}]}",
+                "role": "c7n-bedrock-batch-leading-baboon"
+            }
+        },
+        "aws_s3_bucket": {
+            "input": {
+                "acceleration_status": "",
+                "acl": null,
+                "arn": "arn:aws:s3:::c7n-bedrock-input-leading-baboon",
+                "bucket": "c7n-bedrock-input-leading-baboon",
+                "bucket_domain_name": "c7n-bedrock-input-leading-baboon.s3.amazonaws.com",
+                "bucket_prefix": "",
+                "bucket_region": "us-east-1",
+                "bucket_regional_domain_name": "c7n-bedrock-input-leading-baboon.s3.us-east-1.amazonaws.com",
+                "cors_rule": [],
+                "force_destroy": true,
+                "grant": [
+                    {
+                        "id": "36b28bc69a41a1f44ff15f3d6bbcf2f5fd96d6cd49206458604c15ad38ebdf65",
+                        "permissions": [
+                            "FULL_CONTROL"
+                        ],
+                        "type": "CanonicalUser",
+                        "uri": ""
+                    }
+                ],
+                "hosted_zone_id": "Z3AQBSTGFYJSTF",
+                "id": "c7n-bedrock-input-leading-baboon",
+                "lifecycle_rule": [],
+                "logging": [],
+                "object_lock_configuration": [],
+                "object_lock_enabled": false,
+                "policy": "",
+                "region": "us-east-1",
+                "replication_configuration": [],
+                "request_payer": "BucketOwner",
+                "server_side_encryption_configuration": [
+                    {
+                        "rule": [
+                            {
+                                "apply_server_side_encryption_by_default": [
+                                    {
+                                        "kms_master_key_id": "",
+                                        "sse_algorithm": "AES256"
+                                    }
+                                ],
+                                "bucket_key_enabled": false
+                            }
+                        ]
+                    }
+                ],
+                "tags": null,
+                "tags_all": {},
+                "timeouts": null,
+                "versioning": [
+                    {
+                        "enabled": false,
+                        "mfa_delete": false
+                    }
+                ],
+                "website": [],
+                "website_domain": null,
+                "website_endpoint": null
+            },
+            "output": {
+                "acceleration_status": "",
+                "acl": null,
+                "arn": "arn:aws:s3:::c7n-bedrock-output-leading-baboon",
+                "bucket": "c7n-bedrock-output-leading-baboon",
+                "bucket_domain_name": "c7n-bedrock-output-leading-baboon.s3.amazonaws.com",
+                "bucket_prefix": "",
+                "bucket_region": "us-east-1",
+                "bucket_regional_domain_name": "c7n-bedrock-output-leading-baboon.s3.us-east-1.amazonaws.com",
+                "cors_rule": [],
+                "force_destroy": true,
+                "grant": [
+                    {
+                        "id": "36b28bc69a41a1f44ff15f3d6bbcf2f5fd96d6cd49206458604c15ad38ebdf65",
+                        "permissions": [
+                            "FULL_CONTROL"
+                        ],
+                        "type": "CanonicalUser",
+                        "uri": ""
+                    }
+                ],
+                "hosted_zone_id": "Z3AQBSTGFYJSTF",
+                "id": "c7n-bedrock-output-leading-baboon",
+                "lifecycle_rule": [],
+                "logging": [],
+                "object_lock_configuration": [],
+                "object_lock_enabled": false,
+                "policy": "",
+                "region": "us-east-1",
+                "replication_configuration": [],
+                "request_payer": "BucketOwner",
+                "server_side_encryption_configuration": [
+                    {
+                        "rule": [
+                            {
+                                "apply_server_side_encryption_by_default": [
+                                    {
+                                        "kms_master_key_id": "",
+                                        "sse_algorithm": "AES256"
+                                    }
+                                ],
+                                "bucket_key_enabled": false
+                            }
+                        ]
+                    }
+                ],
+                "tags": null,
+                "tags_all": {},
+                "timeouts": null,
+                "versioning": [
+                    {
+                        "enabled": false,
+                        "mfa_delete": false
+                    }
+                ],
+                "website": [],
+                "website_domain": null,
+                "website_endpoint": null
+            }
+        },
+        "aws_s3_object": {
+            "input": {
+                "acl": null,
+                "arn": "arn:aws:s3:::c7n-bedrock-input-leading-baboon/input.jsonl",
+                "bucket": "c7n-bedrock-input-leading-baboon",
+                "bucket_key_enabled": false,
+                "cache_control": "",
+                "checksum_algorithm": null,
+                "checksum_crc32": "",
+                "checksum_crc32c": "",
+                "checksum_crc64nvme": "",
+                "checksum_sha1": "",
+                "checksum_sha256": "",
+                "content": "{\"recordId\":\"1\",\"modelInput\":{\"inputText\":\"Hello from c7n\"}}\n",
+                "content_base64": null,
+                "content_disposition": "",
+                "content_encoding": "",
+                "content_language": "",
+                "content_type": "application/octet-stream",
+                "etag": "b2b0bfd4a7f45bfdeb35bc7d22251a3d",
+                "force_destroy": false,
+                "id": "c7n-bedrock-input-leading-baboon/input.jsonl",
+                "key": "input.jsonl",
+                "kms_key_id": null,
+                "metadata": null,
+                "object_lock_legal_hold_status": "",
+                "object_lock_mode": "",
+                "object_lock_retain_until_date": "",
+                "override_provider": [],
+                "region": "us-east-1",
+                "server_side_encryption": "AES256",
+                "source": null,
+                "source_hash": null,
+                "storage_class": "STANDARD",
+                "tags": null,
+                "tags_all": {},
+                "version_id": "",
+                "website_redirect": ""
+            }
+        },
+        "random_pet": {
+            "job": {
+                "id": "leading-baboon",
+                "keepers": null,
+                "length": 2,
+                "prefix": null,
+                "separator": "-"
             }
         }
     }

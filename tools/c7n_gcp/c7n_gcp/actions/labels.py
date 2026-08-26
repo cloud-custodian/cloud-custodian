@@ -19,7 +19,17 @@ from c7n_gcp.provider import resources as gcp_resources
 class BaseLabelAction(MethodAction):
 
     method_spec = {}
-    method_perm = 'update'
+
+    @property
+    def method_perm(self):
+        model = self.manager.get_model()
+
+        # Allow overriding via labels_perm
+        if override := getattr(model, 'labels_perm', None):
+            return override
+
+        # Default the permission name to the operation name
+        return model.labels_op
 
     def get_labels_to_add(self, resource):
         return None
@@ -37,6 +47,14 @@ class BaseLabelAction(MethodAction):
 
     def get_operation_name(self, model, resource):
         return model.labels_op
+
+    def get_client(self, session, model):
+        # Some resources (e.g. gcp.disk) need a different client depending
+        # on the resource being labeled, since it dispatches to one of
+        # several apis.
+        if get_client := getattr(model, 'get_client', None):
+            return get_client(session)
+        return super().get_client(session, model)
 
     def get_resource_params(self, model, resource):
         current_labels = self._get_current_labels(resource)

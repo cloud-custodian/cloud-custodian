@@ -1,0 +1,27 @@
+{
+    "status_code": 200,
+    "data": {
+        "PaginationToken": "",
+        "ResourceTagMappingList": [
+            {
+                "ResourceARN": "arn:aws:bedrock:us-east-2:644160558196:application-inference-profile/93ksxhaxmgyd",
+                "Tags": [
+                    {
+                        "Key": "App",
+                        "Value": "Project2"
+                    }
+                ]
+            },
+            {
+                "ResourceARN": "arn:aws:bedrock:us-east-2:644160558196:application-inference-profile/e1o7cl1twlbo",
+                "Tags": [
+                    {
+                        "Key": "App",
+                        "Value": "Project1"
+                    }
+                ]
+            }
+        ],
+        "ResponseMetadata": {}
+    }
+}

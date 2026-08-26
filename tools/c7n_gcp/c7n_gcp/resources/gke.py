@@ -36,6 +36,7 @@ class KubernetesCluster(QueryResourceManager):
         urn_component = 'cluster'
         labels = True
         labels_op = 'setResourceLabels'
+        labels_perm = 'update'
         urn_zonal = True
 
         @staticmethod

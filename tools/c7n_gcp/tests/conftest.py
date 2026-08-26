@@ -33,13 +33,9 @@ def set_working_directory():
 class CustodianGCPTesting(PyTestUtils, GoogleFlightRecorder):
     @property
     def project_id(self):
-        try:
-            if not self.recording:
-                return PROJECT_ID
-        except AttributeError:
-            raise RuntimeError('project_id not available until after '
-                               'replay or record flight data is invoked')
-        return get_default_project()
+        if C7N_FUNCTIONAL:
+            return get_default_project()
+        return PROJECT_ID
 
     @staticmethod
     def check_report_fields(policy, resources):

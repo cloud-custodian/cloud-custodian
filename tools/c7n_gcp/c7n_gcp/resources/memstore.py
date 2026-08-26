@@ -32,11 +32,22 @@ class RedisInstance(QueryResourceManager):
         scope_key = "parent"
         name = id = "name"
         scope_template = "projects/{}/locations/-"
-        permissions = ("bigtable.instances.list",)
+        permissions = ("redis.instances.list",)
+        labels = True
+        labels_op = "patch"
+        labels_perm = "update"
         default_report_fields = ["displayName", "expireTime"]
         asset_type = "redis.googleapis.com/Instance"
         urn_component = "instance"
         urn_id_segments = (-1,)
+
+        @staticmethod
+        def get_label_params(resource, all_labels):
+            return {
+                "name": resource["name"],
+                "body": {"labels": all_labels},
+                "updateMask": "labels",
+            }
 
         @classmethod
         def _get_location(cls, resource):

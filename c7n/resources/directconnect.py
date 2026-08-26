@@ -1,11 +1,13 @@
 # Copyright The Cloud Custodian Authors.
 # SPDX-License-Identifier: Apache-2.0
 from c7n.manager import resources
-from c7n.query import QueryResourceManager, TypeInfo
+from c7n.query import QueryResourceManager, TypeInfo, DescribeWithResourceTags
 
 
 @resources.register('directconnect')
 class DirectConnect(QueryResourceManager):
+
+    source_mapping = {"describe": DescribeWithResourceTags}
 
     class resource_type(TypeInfo):
         service = 'directconnect'
@@ -20,6 +22,8 @@ class DirectConnect(QueryResourceManager):
 
 @resources.register('directconnect-gateway')
 class DirectConnectGateway(QueryResourceManager):
+
+    source_mapping = {"describe": DescribeWithResourceTags}
 
     class resource_type(TypeInfo):
         service = 'directconnect'

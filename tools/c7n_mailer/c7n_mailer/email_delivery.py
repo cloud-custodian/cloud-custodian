@@ -89,10 +89,8 @@ class EmailDelivery:
                     self.logger.info("adding email %s to targets.", aws_username + "@" + org_domain)
                     return [aws_username + "@" + org_domain]
                 else:
-                    self.logger.warning(
-                        "unable to lookup owner email. \
-                            Please configure LDAP or org_domain"
-                    )
+                    self.logger.warning("unable to lookup owner email. \
+                            Please configure LDAP or org_domain")
             else:
                 self.logger.info("no aws username in event")
         return []

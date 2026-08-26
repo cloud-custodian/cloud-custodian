@@ -1,0 +1,18 @@
+{
+    "status_code": 200,
+    "data": {
+        "PaginationToken": "",
+        "ResourceTagMappingList": [
+            {
+                "ResourceARN": "arn:aws:cleanrooms:us-east-1:644160558196:configuredtable/b7401977-f670-42ba-873b-eed937073127",
+                "Tags": [
+                    {
+                        "Key": "Env",
+                        "Value": "Test"
+                    }
+                ]
+            }
+        ],
+        "ResponseMetadata": {}
+    }
+}

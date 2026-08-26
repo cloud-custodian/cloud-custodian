@@ -25,6 +25,7 @@ class SqlInstance(QueryResourceManager):
         scope = 'project'
         labels = True
         labels_op = 'patch'
+        labels_perm = 'update'
         name = id = 'name'
         default_report_fields = [
             "name", "state", "databaseVersion", "settings.tier", "settings.dataDiskSizeGb"]

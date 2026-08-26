@@ -1,0 +1,58 @@
+{
+  "headers": {
+    "x-debug-tracking-id": "4638340743838782281;o=0",
+    "content-type": "application/json; charset=UTF-8",
+    "vary": "Origin, X-Origin, Referer",
+    "date": "Thu, 02 Apr 2026 01:29:37 GMT",
+    "server": "ESF",
+    "x-xss-protection": "0",
+    "x-frame-options": "SAMEORIGIN",
+    "x-content-type-options": "nosniff",
+    "alt-svc": "h3=\":443\"; ma=2592000,h3-29=\":443\"; ma=2592000",
+    "transfer-encoding": "chunked",
+    "status": "200",
+    "content-length": "1609",
+    "-content-encoding": "gzip",
+    "content-location": "https://firestore.googleapis.com/v1/projects/cloud-custodian/databases?alt=json"
+  },
+  "body": {
+    "databases": [
+      {
+        "name": "projects/cloud-custodian/databases/c7nidx-hawk-east",
+        "uid": "9d657b94-bd5a-4c9a-89c9-d927817dad8e",
+        "createTime": "2026-04-02T01:23:31.187921Z",
+        "updateTime": "2026-04-02T01:23:31.187921Z",
+        "locationId": "us-east1",
+        "type": "FIRESTORE_NATIVE",
+        "concurrencyMode": "PESSIMISTIC",
+        "versionRetentionPeriod": "3600s",
+        "earliestVersionTime": "2026-04-02T01:23:31.187921Z",
+        "appEngineIntegrationMode": "DISABLED",
+        "pointInTimeRecoveryEnablement": "POINT_IN_TIME_RECOVERY_DISABLED",
+        "deleteProtectionState": "DELETE_PROTECTION_DISABLED",
+        "databaseEdition": "STANDARD",
+        "freeTier": true,
+        "realtimeUpdatesMode": "REALTIME_UPDATES_MODE_ENABLED",
+        "etag": "IJqI45GCzpMDMMqQp+OAzpMD"
+      },
+      {
+        "name": "projects/cloud-custodian/databases/c7nidx-hawk",
+        "uid": "1b2973ee-2daa-48a0-affb-cb341665ebc9",
+        "createTime": "2026-04-02T01:23:33.378261Z",
+        "updateTime": "2026-04-02T01:23:33.378261Z",
+        "locationId": "us-central1",
+        "type": "FIRESTORE_NATIVE",
+        "concurrencyMode": "PESSIMISTIC",
+        "versionRetentionPeriod": "3600s",
+        "earliestVersionTime": "2026-04-02T01:23:33.378261Z",
+        "appEngineIntegrationMode": "DISABLED",
+        "pointInTimeRecoveryEnablement": "POINT_IN_TIME_RECOVERY_DISABLED",
+        "deleteProtectionState": "DELETE_PROTECTION_DISABLED",
+        "databaseEdition": "STANDARD",
+        "freeTier": false,
+        "realtimeUpdatesMode": "REALTIME_UPDATES_MODE_ENABLED",
+        "etag": "IIyp4pGCzpMDMLWgoOSAzpMD"
+      }
+    ]
+  }
+}

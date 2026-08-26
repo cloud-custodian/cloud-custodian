@@ -71,7 +71,8 @@ class ResourceQueryTest(BaseTest):
         q = ResourceQuery(p.session_factory)
         resources = q.filter(p.resource_manager)
         self.assertEqual(len(resources), 1)
-        self.assertEqual(resources[0]["InstanceId"], "i-9432cb49")
+        self.assertEqual(
+            resources[0]["Instances"][0]["InstanceId"], "i-9432cb49")
 
     def test_query_get(self):
         session_factory = self.replay_flight_data("test_query_get")
@@ -81,7 +82,8 @@ class ResourceQueryTest(BaseTest):
         q = ResourceQuery(p.session_factory)
         resources = q.get(p.resource_manager, ["i-9432cb49"])
         self.assertEqual(len(resources), 1)
-        self.assertEqual(resources[0]["InstanceId"], "i-9432cb49")
+        self.assertEqual(
+            resources[0]["Instances"][0]["InstanceId"], "i-9432cb49")
 
     def test_query_model_get(self):
         session_factory = self.replay_flight_data("test_query_model")

@@ -43,9 +43,15 @@ class Element:
         search_expr = key_expr
         if not search_expr.startswith('[].'):
             search_expr = '[].' + key_expr
-        results = [r for value, r in zip(
-            jmespath_search(search_expr, resources), resources)
-            if value in allowed_values]
+        # Evaluate per-resource so absent keys resolve to None correctly.
+        # Bulk jmespath [] projection silently drops null/absent values, causing
+        # zip to misalign and filter out resources whose key is missing entirely.
+        results = []
+        for r in resources:
+            values = jmespath_search(search_expr, [r])
+            value = values[0] if values else None
+            if value in allowed_values:
+                results.append(r)
         if resource_count != len(results):
             self.log.warning(
                 "%s implicitly filtered %d of %d resources key:%s on %s",

@@ -1050,13 +1050,31 @@ def select_keys(d, keys):
 def get_human_size(size, precision=2):
     # interesting discussion on 1024 vs 1000 as base
     # https://en.wikipedia.org/wiki/Binary_prefix
-    suffixes = ['B', 'KB', 'MB', 'GB', 'TB', 'PB']
+    suffixes = ['B', 'KB', 'MB', 'GB', 'TB', 'PB', 'EB', 'ZB', 'YB']
     suffixIndex = 0
-    while size > 1024:
+    while size >= 1024 and suffixIndex < len(suffixes) - 1:
         suffixIndex += 1
         size = size / 1024.0
 
     return "%.*f %s" % (precision, size, suffixes[suffixIndex])
+
+
+def is_not_found(err):
+    """Attempt for an aws exception to determine if its a NotFound error.
+
+    Returns boolean.
+
+    Across the set of AWS services the error handling behavior, runs
+    across many different behavior patterns for NotFound style
+    exceptions. We want to use any unambigious signal in the error
+    code but also not flag an exception that could potentially represent
+    another error that user should be informed about.
+    """
+    code = err.response['Error']['Code']
+    for s in ('NotFound', 'NoSuch'):
+        if s in code:
+            return True
+    return False
 
 
 def get_support_region(manager):

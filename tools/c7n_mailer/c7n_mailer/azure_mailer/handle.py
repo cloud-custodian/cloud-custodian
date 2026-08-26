@@ -3,6 +3,7 @@
 """
 Lambda entry point
 """
+
 from c7n_azure.session import Session
 from c7n_azure.constants import STORAGE_AUTH_ENDPOINT
 from c7n_mailer.azure_mailer.azure_queue_processor import MailerAzureQueueProcessor

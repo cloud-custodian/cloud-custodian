@@ -26,6 +26,7 @@ class ArtifactRegistryRepository(RegionalResourceManager):
         default_report_fields = ['name', 'description', 'updateTime', 'sizeBytes']
         labels = True
         labels_op = 'patch'
+        labels_perm = 'update'
 
         @staticmethod
         def get_label_params(resource, all_labels):

@@ -61,6 +61,15 @@ data "aws_iam_policy_document" "batch_access" {
       "${aws_s3_bucket.output.arn}/*",
     ]
   }
+
+  statement {
+    actions = [
+      "bedrock:InvokeModel",
+    ]
+    resources = [
+      "arn:aws:bedrock:*::foundation-model/*",
+    ]
+  }
 }
 
 resource "aws_iam_role_policy" "bedrock_batch" {
@@ -69,24 +78,27 @@ resource "aws_iam_role_policy" "bedrock_batch" {
   policy = data.aws_iam_policy_document.batch_access.json
 }
 
-resource "aws_bedrock_model_invocation_job" "test_job" {
-  job_name = "c7n-batch-invocation-${random_pet.job.id}"
-  model_id = "amazon.titan-text-express-v1"
-  role_arn = aws_iam_role.bedrock_batch.arn
+# Output the resources needed to create the job via helper method
+output "role_arn" {
+  value = aws_iam_role.bedrock_batch.arn
+}
 
-  input_data_config {
-    s3_input_data_config {
-      s3_uri = "s3://${aws_s3_bucket.input.bucket}/${aws_s3_object.input.key}"
-    }
-  }
+output "input_bucket" {
+  value = aws_s3_bucket.input.bucket
+}
 
-  output_data_config {
-    s3_output_data_config {
-      s3_uri = "s3://${aws_s3_bucket.output.bucket}/"
-    }
-  }
+output "output_bucket" {
+  value = aws_s3_bucket.output.bucket
+}
 
-  tags = {
-    Owner = "c7n"
-  }
+output "input_s3_uri" {
+  value = "s3://${aws_s3_bucket.input.bucket}/${aws_s3_object.input.key}"
+}
+
+output "output_s3_uri" {
+  value = "s3://${aws_s3_bucket.output.bucket}/"
+}
+
+output "job_name_prefix" {
+  value = "c7n-batch-invocation-${random_pet.job.id}"
 }

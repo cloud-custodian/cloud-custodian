@@ -1,0 +1,35 @@
+{
+  "headers": {
+    "content-type": "application/json; charset=UTF-8",
+    "vary": "Origin, X-Origin, Referer",
+    "date": "Wed, 29 Apr 2026 21:26:40 GMT",
+    "server": "ESF",
+    "x-xss-protection": "0",
+    "x-frame-options": "SAMEORIGIN",
+    "x-content-type-options": "nosniff",
+    "alt-svc": "h3=\":443\"; ma=2592000,h3-29=\":443\"; ma=2592000",
+    "transfer-encoding": "chunked",
+    "status": "200",
+    "content-length": "477",
+    "-content-encoding": "gzip"
+  },
+  "body": {
+    "name": "projects/cloud-custodian/subscriptions/c7n-subscription-default-b0fa",
+    "topic": "projects/cloud-custodian/topics/c7n-topic-default-b0fa",
+    "pushConfig": {
+      "attributes": {
+        "x-goog-version": "v1"
+      }
+    },
+    "ackDeadlineSeconds": 10,
+    "messageRetentionDuration": "604800s",
+    "labels": {
+      "goog-terraform-provisioned": "true",
+      "env": "not-the-default"
+    },
+    "expirationPolicy": {
+      "ttl": "2678400s"
+    },
+    "state": "ACTIVE"
+  }
+}

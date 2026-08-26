@@ -110,6 +110,7 @@ class KmsCryptoKey(ChildResourceManager):
         urn_id_segments = (5, 7)
         labels = True
         labels_op = 'patch'
+        labels_perm = 'update'
 
         @staticmethod
         def get(client, resource_info):

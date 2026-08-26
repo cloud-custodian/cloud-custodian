@@ -21,6 +21,9 @@ class Function(QueryResourceManager):
         scope_key = 'parent'
         scope_template = "projects/{}/locations/-"
         name = id = "name"
+        labels = True
+        labels_op = "patch"
+        labels_perm = "update"
         metric_key = "resource.labels.function_name"
         default_report_fields = [
             'name', 'runtime', 'eventTrigger.eventType', 'status', 'updateTime']
@@ -39,6 +42,14 @@ class Function(QueryResourceManager):
                     'projects/{project_id}/locations/'
                     '{location_id}/functions/{function_name}').format(
                         **resource_info)})
+
+        @staticmethod
+        def get_label_params(resource, all_labels):
+            return {
+                'name': resource['name'],
+                'body': {'labels': all_labels},
+                'updateMask': 'labels'
+            }
 
         @classmethod
         def _get_location(cls, resource):
