@@ -77,7 +77,7 @@ class MachineLearningDataContainer(ChildArmResourceManager):
                 - type: value
                   key: systemData.lastModifiedAt
                   value_type: age
-                  op: lt
+                  op: gt
                   value: 90
 
     """
