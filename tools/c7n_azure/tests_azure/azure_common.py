@@ -158,7 +158,9 @@ class AzureVCRBaseTest(VCRTestCase):
 
     def setUp(self):
         super(AzureVCRBaseTest, self).setUp()
-        if self.vcr_enabled and getattr(
+        # is_playback() is only meaningful here: by cleanup time a recording
+        # run has written the cassette, making it indistinguishable from one.
+        if self.is_playback() and getattr(
                 getattr(self, self._testMethodName), 'strict_cassette', False):
             # Registered after the cassette's own cleanup, so it runs first,
             # while the cassette is still open.
