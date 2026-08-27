@@ -15,7 +15,7 @@ from c7n.resources import ec2
 from c7n.resources.ec2 import actions, EC2QueryParser
 from c7n import tags, utils
 
-from .common import BaseTest, event_data
+from .common import BaseTest
 
 import pytest
 from pytest_terraform import terraform
@@ -188,121 +188,107 @@ class TestEc2NetworkLocation(BaseTest):
 
 
 AUGMENT_REGION = 'us-east-1'
+AUGMENT_TAG_COUNT = 3
 
 
-def _augment_policy(test, session_factory, **extra):
+def _record_tags(test, session_factory, instance_id):
+    """Capture a DescribeTags response for the back-fill test.
+
+    A live instance returns its tags on describe_instances, so augment()
+    short-circuits while recording and never calls describe_tags. Request it
+    here so replay has a response to serve once the recorded tag set is
+    removed. The response is a genuine one; only the request is ours.
+    """
+    if not test.recording:
+        return
+    client = session_factory().client('ec2')
+    list(client.get_paginator('describe_tags').paginate(
+        Filters=[{'Name': 'resource-id', 'Values': [instance_id]}],
+    ))
+
+
+def _augment_policy(test, session_factory, mode=None):
+    data = {'name': 'ec2-tags', 'resource': 'ec2'}
+    if mode is not None:
+        data['mode'] = mode
     return test.load_policy(
-        dict({'name': 'ec2-tags', 'resource': 'ec2'}, **extra),
+        data,
         session_factory=session_factory,
         config={'region': AUGMENT_REGION},
     )
 
 
-def _record_tags(test, session_factory, instance_ids):
-    """Capture a real DescribeTags response for ids whose Tags get stripped.
+@terraform('ec2_augment_tags', scope='session')
+def test_tag_augment_short_circuit(test, ec2_augment_tags):
+    """Tags in the describe response mean no describe_tags call.
 
-    Live instances return their tags on describe_instances, so augment()
-    never reaches describe_tags while recording. Replay needs that response
-    once the recorded tag set is removed, so fetch it explicitly here. The
-    data is a genuine API response; only the request is ours.
+    The flight data has no DescribeTags response on purpose: placebo raises
+    if one is requested.
     """
-    if not test.recording:
-        return
-    client = session_factory().client('ec2')
-    client.get_paginator('describe_tags').paginate(
-        Filters=[{'Name': 'resource-id', 'Values': instance_ids}],
-    ).build_full_result()
-
-
-@terraform('ec2_augment_tags', scope='session')
-def test_tag_augment_cloudtrail_mode(test, ec2_augment_tags):
     session_factory = test.replay_flight_data(
-        'test_ec2_augment_tags_cloudtrail', region=AUGMENT_REGION)
-    instance_id = ec2_augment_tags['aws_instance.tagged_a.id']
-
-    _record_tags(test, session_factory, [instance_id])
-
-    event = event_data('event-cloud-trail-run-instances.json')
-    event['responseElements']['instancesSet']['items'] = [
-        {'instanceId': instance_id}]
+        'test_ec2_augment_tags_short_circuit', region=AUGMENT_REGION)
+    instance_id = ec2_augment_tags['aws_instance.tagged.id']
 
     policy = _augment_policy(
         test, session_factory,
-        mode={
-            'type': 'cloudtrail',
-            'role': 'arn:aws:iam::644160558196:role/CustodianRole',
-            'events': ['RunInstances'],
-        },
-        filters=[{'tag:Env': 'Production'}],
-    )
-    # push returns None when no resources match
-    resources = policy.push({'detail': event}, None) or []
-    test.assertEqual([r['InstanceId'] for r in resources], [instance_id])
+        mode={'type': 'cloudtrail', 'events': ['RunInstances']})
+    resources = policy.resource_manager.get_resources([instance_id])
+
+    test.assertEqual(len(resources), 1)
     test.assertEqual(
-        {t['Key']: t['Value'] for t in resources[0]['Tags']}['Env'],
-        'Production')
+        len(resources[0]['Tags']), AUGMENT_TAG_COUNT,
+        'Proof found of AWOL tags!')
 
 
 @terraform('ec2_augment_tags', scope='session')
-def test_tag_augment_create_tags_event(test, ec2_augment_tags):
+def test_tag_augment_skipped_for_instance_state(test, ec2_augment_tags):
+    """ec2-instance-state mode still skips the back-fill.
+
+    The flight data has no DescribeTags response, so placebo raises if the
+    lookup is attempted. Tags stays absent, as it did before this change.
+    """
     session_factory = test.replay_flight_data(
-        'test_ec2_augment_tags_create_tags', region=AUGMENT_REGION)
-    instance_id = ec2_augment_tags['aws_instance.tagged_a.id']
-
-    _record_tags(test, session_factory, [instance_id])
-
-    event = event_data('event-cloud-trail-ec2-create-tags.json')
-    event['requestParameters']['resourcesSet']['items'] = [
-        {'resourceId': 'vol-0f9e1b2c3d4e5f6a7'},
-        {'resourceId': instance_id},
-    ]
+        'test_ec2_augment_tags_instance_state', region=AUGMENT_REGION)
+    instance_id = ec2_augment_tags['aws_instance.tagged.id']
 
     policy = _augment_policy(
         test, session_factory,
-        mode={
-            'type': 'cloudtrail',
-            'role': 'arn:aws:iam::644160558196:role/CustodianRole',
-            'events': [{
-                'event': 'CreateTags',
-                'source': 'ec2.amazonaws.com',
-                'ids': 'requestParameters.resourcesSet.items[].resourceId',
-            }],
-        },
-        filters=[{'tag:Env': 'Production'}],
-    )
-    resources = policy.push({'detail': event}, None) or []
-    test.assertEqual([r['InstanceId'] for r in resources], [instance_id])
+        mode={'type': 'ec2-instance-state', 'events': ['pending']})
+    resources = policy.resource_manager.get_resources([instance_id])
+
+    test.assertEqual(len(resources), 1)
+    test.assertNotIn('Tags', resources[0])
 
 
 @terraform('ec2_augment_tags', scope='session')
-def test_tag_augment_partial(test, ec2_augment_tags):
-    # the backfill fills in instances describe_instances omitted a tag set
-    # for, without clobbering the tags it did return for the others
+@pytest.mark.parametrize(
+    'mode',
+    [
+        None,
+        {'type': 'pull'},
+        {'type': 'cloudtrail', 'events': ['RunInstances']},
+    ],
+    ids=['no-mode', 'pull', 'cloudtrail'],
+)
+def test_tag_augment_lookup(test, ec2_augment_tags, mode):
+    """Tags absent from the describe response are backfilled.
+
+    Parametrized over the modes that should reach the lookup; cloudtrail is
+    the one this change enables.
+    """
     session_factory = test.replay_flight_data(
-        'test_ec2_augment_tags_partial', region=AUGMENT_REGION)
-    kept = ec2_augment_tags['aws_instance.tagged_a.id']
-    stripped = ec2_augment_tags['aws_instance.tagged_b.id']
+        'test_ec2_augment_tags_lookup', region=AUGMENT_REGION)
+    instance_id = ec2_augment_tags['aws_instance.tagged.id']
+    _record_tags(test, session_factory, instance_id)
 
-    _record_tags(test, session_factory, [stripped])
+    policy = _augment_policy(test, session_factory, mode=mode)
+    resources = policy.resource_manager.get_resources([instance_id])
 
-    policy = _augment_policy(
-        test, session_factory,
-        filters=[{
-            'type': 'value',
-            'key': 'InstanceId',
-            'op': 'in',
-            'value': [kept, stripped],
-        }],
-    )
-    resources = policy.run()
-    tags = {
-        r['InstanceId']: {t['Key']: t['Value'] for t in r['Tags']}
-        for r in resources
-    }
-    test.assertEqual(sorted(tags), sorted([kept, stripped]))
-    test.assertEqual(tags[kept]['Env'], 'Production')
-    test.assertEqual(tags[stripped]['Env'], 'Production')
-    test.assertEqual(tags[stripped]['Owner'], 'robot')
+    test.assertEqual(len(resources), 1)
+    tags = {t['Key']: t['Value'] for t in resources[0]['Tags']}
+    test.assertEqual(len(tags), AUGMENT_TAG_COUNT)
+    test.assertEqual(tags['Env'], 'Production')
+    test.assertEqual(tags['Owner'], 'robot')
 
 
 class TestTagAugmentation(BaseTest):
