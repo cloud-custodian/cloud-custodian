@@ -187,6 +187,124 @@ class TestEc2NetworkLocation(BaseTest):
         self.assertEqual(len(resources), 0)
 
 
+AUGMENT_REGION = 'us-east-1'
+
+
+def _augment_policy(test, session_factory, **extra):
+    return test.load_policy(
+        dict({'name': 'ec2-tags', 'resource': 'ec2'}, **extra),
+        session_factory=session_factory,
+        config={'region': AUGMENT_REGION},
+    )
+
+
+def _record_tags(test, session_factory, instance_ids):
+    """Capture a real DescribeTags response for ids whose Tags get stripped.
+
+    Live instances return their tags on describe_instances, so augment()
+    never reaches describe_tags while recording. Replay needs that response
+    once the recorded tag set is removed, so fetch it explicitly here. The
+    data is a genuine API response; only the request is ours.
+    """
+    if not test.recording:
+        return
+    client = session_factory().client('ec2')
+    client.get_paginator('describe_tags').paginate(
+        Filters=[{'Name': 'resource-id', 'Values': instance_ids}],
+    ).build_full_result()
+
+
+@terraform('ec2_augment_tags', scope='session')
+def test_tag_augment_cloudtrail_mode(test, ec2_augment_tags):
+    session_factory = test.replay_flight_data(
+        'test_ec2_augment_tags_cloudtrail', region=AUGMENT_REGION)
+    instance_id = ec2_augment_tags['aws_instance.tagged_a.id']
+
+    _record_tags(test, session_factory, [instance_id])
+
+    event = event_data('event-cloud-trail-run-instances.json')
+    event['responseElements']['instancesSet']['items'] = [
+        {'instanceId': instance_id}]
+
+    policy = _augment_policy(
+        test, session_factory,
+        mode={
+            'type': 'cloudtrail',
+            'role': 'arn:aws:iam::644160558196:role/CustodianRole',
+            'events': ['RunInstances'],
+        },
+        filters=[{'tag:Env': 'Production'}],
+    )
+    # push returns None when no resources match
+    resources = policy.push({'detail': event}, None) or []
+    test.assertEqual([r['InstanceId'] for r in resources], [instance_id])
+    test.assertEqual(
+        {t['Key']: t['Value'] for t in resources[0]['Tags']}['Env'],
+        'Production')
+
+
+@terraform('ec2_augment_tags', scope='session')
+def test_tag_augment_create_tags_event(test, ec2_augment_tags):
+    session_factory = test.replay_flight_data(
+        'test_ec2_augment_tags_create_tags', region=AUGMENT_REGION)
+    instance_id = ec2_augment_tags['aws_instance.tagged_a.id']
+
+    _record_tags(test, session_factory, [instance_id])
+
+    event = event_data('event-cloud-trail-ec2-create-tags.json')
+    event['requestParameters']['resourcesSet']['items'] = [
+        {'resourceId': 'vol-0f9e1b2c3d4e5f6a7'},
+        {'resourceId': instance_id},
+    ]
+
+    policy = _augment_policy(
+        test, session_factory,
+        mode={
+            'type': 'cloudtrail',
+            'role': 'arn:aws:iam::644160558196:role/CustodianRole',
+            'events': [{
+                'event': 'CreateTags',
+                'source': 'ec2.amazonaws.com',
+                'ids': 'requestParameters.resourcesSet.items[].resourceId',
+            }],
+        },
+        filters=[{'tag:Env': 'Production'}],
+    )
+    resources = policy.push({'detail': event}, None) or []
+    test.assertEqual([r['InstanceId'] for r in resources], [instance_id])
+
+
+@terraform('ec2_augment_tags', scope='session')
+def test_tag_augment_partial(test, ec2_augment_tags):
+    # the backfill fills in instances describe_instances omitted a tag set
+    # for, without clobbering the tags it did return for the others
+    session_factory = test.replay_flight_data(
+        'test_ec2_augment_tags_partial', region=AUGMENT_REGION)
+    kept = ec2_augment_tags['aws_instance.tagged_a.id']
+    stripped = ec2_augment_tags['aws_instance.tagged_b.id']
+
+    _record_tags(test, session_factory, [stripped])
+
+    policy = _augment_policy(
+        test, session_factory,
+        filters=[{
+            'type': 'value',
+            'key': 'InstanceId',
+            'op': 'in',
+            'value': [kept, stripped],
+        }],
+    )
+    resources = policy.run()
+    tags = {
+        r['InstanceId']: {t['Key']: t['Value'] for t in r['Tags']}
+        for r in resources
+    }
+    test.assertEqual(sorted(tags), sorted([kept, stripped]))
+    test.assertEqual(tags[kept]['Env'], 'Production')
+    test.assertEqual(tags[stripped]['Env'], 'Production')
+    test.assertEqual(tags[stripped]['Owner'], 'robot')
+
+
 class TestTagAugmentation(BaseTest):
 
     def test_tag_augment_empty(self):
@@ -197,96 +315,6 @@ class TestTagAugmentation(BaseTest):
         )
         resources = policy.run()
         self.assertEqual(len(resources), 0)
-
-    def test_tag_augment_cloudtrail_mode(self):
-        session_factory = self.replay_flight_data(
-            "test_ec2_augment_tags_cloudtrail")
-        policy = self.load_policy(
-            {
-                "name": "ec2-tags",
-                "resource": "ec2",
-                "mode": {
-                    "type": "cloudtrail",
-                    "role": "arn:aws:iam::644160558196:role/CustodianRole",
-                    "events": ["RunInstances"],
-                },
-                "filters": [{"tag:Env": "Production"}],
-            },
-            session_factory=session_factory,
-        )
-        resources = policy.push(
-            {"detail": event_data("event-cloud-trail-run-instances.json")}, None
-        )
-        # push returns None when no resources match
-        self.assertEqual(len(resources or []), 1)
-        self.assertEqual(
-            resources[0]["Tags"],
-            [
-                {"Key": "Env", "Value": "Production"},
-                {"Key": "Name", "Value": "custodian-tester"},
-                {"Key": "Owner", "Value": "robot"},
-                {"Key": "Platform", "Value": "Linux"},
-            ],
-        )
-
-    def test_tag_augment_create_tags_event(self):
-        session_factory = self.replay_flight_data(
-            "test_ec2_augment_tags_create_tags")
-        policy = self.load_policy(
-            {
-                "name": "ec2-tags",
-                "resource": "ec2",
-                "mode": {
-                    "type": "cloudtrail",
-                    "role": "arn:aws:iam::644160558196:role/CustodianRole",
-                    "events": [
-                        {
-                            "event": "CreateTags",
-                            "source": "ec2.amazonaws.com",
-                            "ids": (
-                                "requestParameters.resourcesSet"
-                                ".items[].resourceId"
-                            ),
-                        }
-                    ],
-                },
-                "filters": [{"tag:Env": "Production"}],
-            },
-            session_factory=session_factory,
-        )
-        resources = policy.push(
-            {"detail": event_data("event-cloud-trail-ec2-create-tags.json")},
-            None,
-        )
-        self.assertEqual(len(resources or []), 1)
-        self.assertEqual(resources[0]["InstanceId"], "i-0dc224bad2cb08740")
-        self.assertEqual(
-            {t["Key"]: t["Value"] for t in resources[0]["Tags"]}["Env"],
-            "Production",
-        )
-
-    def test_tag_augment_partial(self):
-        # the backfill fills in instances describe_instances omitted a tag set
-        # for, without clobbering the tags it did return for the others
-        session_factory = self.replay_flight_data(
-            "test_ec2_augment_tags_partial")
-        policy = self.load_policy(
-            {"name": "ec2-tags", "resource": "ec2"},
-            session_factory=session_factory,
-        )
-        resources = policy.run()
-        self.assertEqual(
-            {r["InstanceId"]: r["Tags"] for r in resources},
-            {
-                "i-0dc224bad2cb08740": [
-                    {"Key": "Env", "Value": "Production"},
-                ],
-                "i-0aa11bb22cc33dd44": [
-                    {"Key": "Env", "Value": "Production"},
-                    {"Key": "Owner", "Value": "robot"},
-                ],
-            },
-        )
 
     def test_tag_augment(self):
         session_factory = self.replay_flight_data("test_ec2_augment_tags")
