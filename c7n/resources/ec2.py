@@ -4,6 +4,7 @@ import base64
 from collections import defaultdict
 import itertools
 import operator
+import random
 import re
 import zlib
 from typing import List
@@ -83,26 +84,33 @@ class DescribeEC2(query.DescribeSource):
         name), so there isn't a good default to ensure that we will
         always get tags from describe_x calls.
         """
-        if self.manager.data.get('mode', {}).get('type') == 'ec2-instance-state':
+        if not resources or self.manager.data.get(
+                'mode', {}).get('type', '') == 'ec2-instance-state':
             return resources
 
-        # describe_instances and describe_tags read the same eventually
-        # consistent store at effectively the same instant, so a second call
-        # tells us nothing new about an instance that already came back with
-        # tags, even if that tag set is incomplete. Only instances the describe
-        # omitted a tag set for entirely are worth a lookup.
-        without_tags = [r for r in resources if 'Tags' not in r]
-        if not without_tags:
+        # AWOL detector, so we don't make extraneous api calls.
+        resource_count = len(resources)
+        search_count = min(int(resource_count % 0.05) + 1, 5)
+        if search_count > resource_count:
+            search_count = resource_count
+        found = False
+        for r in random.sample(resources, search_count):
+            if 'Tags' in r:
+                found = True
+                break
+
+        if found:
             return resources
 
+        # Okay go and do the tag lookup, for the resources at hand
         client = utils.local_session(self.manager.session_factory).client('ec2')
         m = self.manager.get_model()
-        resource_tags = {}
         paginator = client.get_paginator('describe_tags')
         paginator.PAGE_ITERATOR_CLS = query.RetryPageIterator
+        resource_tags = {}
         # ec2 allows 200 total filter values per request.
         # https://docs.aws.amazon.com/AWSEC2/latest/UserGuide/Using_Filtering.html
-        for id_set in utils.chunks([r[m.id] for r in without_tags], 200):
+        for id_set in utils.chunks([r[m.id] for r in resources], 200):
             for page in paginator.paginate(
                     Filters=[{'Name': 'resource-id', 'Values': id_set}]):
                 for t in page['Tags']:
@@ -110,7 +118,7 @@ class DescribeEC2(query.DescribeSource):
                     rid = t.pop('ResourceId')
                     resource_tags.setdefault(rid, []).append(t)
 
-        for r in without_tags:
+        for r in resources:
             r['Tags'] = resource_tags.get(r[m.id], [])
         return resources
 
