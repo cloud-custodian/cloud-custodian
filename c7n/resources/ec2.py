@@ -43,6 +43,13 @@ filters = FilterRegistry('ec2.filters')
 actions = ActionRegistry('ec2.actions')
 
 
+# Maximum number of instances to look tags up by id for. Above this, fall back
+# to the region-wide resource-type filter: ec2 allows only 200 total filter
+# values per request, and this keeps the response bounded (100 ids, at ec2's
+# limit of 50 tags each).
+EC2_TAG_AUGMENT_BY_INSTANCES_MAX = 100
+
+
 class DescribeEC2(query.DescribeSource):
 
     def get_query_params(self, query_params):
@@ -102,21 +109,21 @@ class DescribeEC2(query.DescribeSource):
         if found:
             return resources
 
-        # Okay go and do the tag lookup, for the resources at hand
+        # Okay go and do the tag lookup
         client = utils.local_session(self.manager.session_factory).client('ec2')
         model = self.manager.get_model()
-        paginator = client.get_paginator('describe_tags')
-        paginator.PAGE_ITERATOR_CLS = query.RetryPageIterator
+        if len(resources) <= EC2_TAG_AUGMENT_BY_INSTANCES_MAX:
+            tag_filter = {'Name': 'resource-id',
+                          'Values': [r[model.id] for r in resources]}
+        else:
+            tag_filter = {'Name': 'resource-type', 'Values': ['instance']}
+        tag_set = self.manager.retry(
+            client.describe_tags, Filters=[tag_filter])['Tags']
         resource_tags = {}
-        # ec2 allows 200 total filter values per request.
-        # https://docs.aws.amazon.com/AWSEC2/latest/UserGuide/Using_Filtering.html
-        for id_set in utils.chunks([r[model.id] for r in resources], 200):
-            for page in paginator.paginate(
-                    Filters=[{'Name': 'resource-id', 'Values': id_set}]):
-                for t in page['Tags']:
-                    t.pop('ResourceType')
-                    rid = t.pop('ResourceId')
-                    resource_tags.setdefault(rid, []).append(t)
+        for t in tag_set:
+            t.pop('ResourceType')
+            rid = t.pop('ResourceId')
+            resource_tags.setdefault(rid, []).append(t)
 
         for r in resources:
             r['Tags'] = resource_tags.get(r[model.id], [])

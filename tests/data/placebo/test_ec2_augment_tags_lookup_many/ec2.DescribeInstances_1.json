@@ -178,6 +178,183 @@
       "PrivateIpAddress": "10.0.1.135"
      }
     ]
+   },
+   {
+    "ReservationId": "r-0028686e60f3cb1d2",
+    "OwnerId": "644160558196",
+    "Groups": [],
+    "Instances": [
+     {
+      "Architecture": "x86_64",
+      "BlockDeviceMappings": [
+       {
+        "DeviceName": "/dev/xvda",
+        "Ebs": {
+         "AttachTime": {
+          "__class__": "datetime",
+          "year": 2026,
+          "month": 8,
+          "day": 28,
+          "hour": 13,
+          "minute": 31,
+          "second": 22,
+          "microsecond": 0
+         },
+         "DeleteOnTermination": true,
+         "Status": "attached",
+         "VolumeId": "vol-0f19dff178eb1088e",
+         "EbsCardIndex": 0
+        }
+       }
+      ],
+      "ClientToken": "terraform-4X2A1ZtTCKXCtbFS0uw6cvrm8z",
+      "EbsOptimized": false,
+      "EnaSupport": true,
+      "Hypervisor": "xen",
+      "NetworkInterfaces": [
+       {
+        "Attachment": {
+         "AttachTime": {
+          "__class__": "datetime",
+          "year": 2026,
+          "month": 8,
+          "day": 28,
+          "hour": 13,
+          "minute": 31,
+          "second": 21,
+          "microsecond": 0
+         },
+         "AttachmentId": "eni-attach-0efde2ec74c2590b2",
+         "DeleteOnTermination": true,
+         "DeviceIndex": 0,
+         "Status": "attached",
+         "NetworkCardIndex": 0
+        },
+        "Description": "",
+        "Groups": [
+         {
+          "GroupId": "sg-03efd2463c50b43b3",
+          "GroupName": "default"
+         }
+        ],
+        "Ipv6Addresses": [],
+        "MacAddress": "02:8d:46:6d:00:23",
+        "NetworkInterfaceId": "eni-03771c09ba04923f3",
+        "OwnerId": "644160558196",
+        "PrivateIpAddress": "10.0.1.19",
+        "PrivateIpAddresses": [
+         {
+          "Primary": true,
+          "PrivateIpAddress": "10.0.1.19"
+         }
+        ],
+        "SourceDestCheck": true,
+        "Status": "in-use",
+        "SubnetId": "subnet-05a56b884d69cc6d4",
+        "VpcId": "vpc-04d0f32e8796558ae",
+        "InterfaceType": "interface",
+        "Operator": {
+         "Managed": false
+        }
+       }
+      ],
+      "RootDeviceName": "/dev/xvda",
+      "RootDeviceType": "ebs",
+      "SecurityGroups": [
+       {
+        "GroupId": "sg-03efd2463c50b43b3",
+        "GroupName": "default"
+       }
+      ],
+      "SourceDestCheck": true,
+      "VirtualizationType": "hvm",
+      "CpuOptions": {
+       "CoreCount": 1,
+       "ThreadsPerCore": 1
+      },
+      "CapacityReservationSpecification": {
+       "CapacityReservationPreference": "open"
+      },
+      "HibernationOptions": {
+       "Configured": false
+      },
+      "MetadataOptions": {
+       "State": "applied",
+       "HttpTokens": "optional",
+       "HttpPutResponseHopLimit": 1,
+       "HttpEndpoint": "enabled",
+       "HttpProtocolIpv6": "disabled",
+       "InstanceMetadataTags": "disabled"
+      },
+      "EnclaveOptions": {
+       "Enabled": false
+      },
+      "PlatformDetails": "Linux/UNIX",
+      "UsageOperation": "RunInstances",
+      "UsageOperationUpdateTime": {
+       "__class__": "datetime",
+       "year": 2026,
+       "month": 8,
+       "day": 28,
+       "hour": 13,
+       "minute": 31,
+       "second": 21,
+       "microsecond": 0
+      },
+      "PrivateDnsNameOptions": {
+       "HostnameType": "ip-name",
+       "EnableResourceNameDnsARecord": false,
+       "EnableResourceNameDnsAAAARecord": false
+      },
+      "MaintenanceOptions": {
+       "AutoRecovery": "default",
+       "RebootMigration": "default"
+      },
+      "CurrentInstanceBootMode": "legacy-bios",
+      "NetworkPerformanceOptions": {
+       "BandwidthWeighting": "default"
+      },
+      "Operator": {
+       "Managed": false,
+       "HiddenByDefault": false
+      },
+      "SecondaryInterfaces": [],
+      "InstanceId": "i-0553ae4ea56b220f0",
+      "ImageId": "ami-0c3a3c65a049b6922",
+      "State": {
+       "Code": 16,
+       "Name": "running"
+      },
+      "PrivateDnsName": "ip-10-0-1-19.ec2.internal",
+      "PublicDnsName": "",
+      "StateTransitionReason": "",
+      "AmiLaunchIndex": 0,
+      "ProductCodes": [],
+      "InstanceType": "t2.micro",
+      "LaunchTime": {
+       "__class__": "datetime",
+       "year": 2026,
+       "month": 8,
+       "day": 28,
+       "hour": 13,
+       "minute": 31,
+       "second": 21,
+       "microsecond": 0
+      },
+      "Placement": {
+       "AvailabilityZoneId": "use1-az1",
+       "GroupName": "",
+       "Tenancy": "default",
+       "AvailabilityZone": "us-east-1a"
+      },
+      "Monitoring": {
+       "State": "disabled"
+      },
+      "SubnetId": "subnet-05a56b884d69cc6d4",
+      "VpcId": "vpc-04d0f32e8796558ae",
+      "PrivateIpAddress": "10.0.1.19"
+     }
+    ]
    }
   ],
   "ResponseMetadata": {}
