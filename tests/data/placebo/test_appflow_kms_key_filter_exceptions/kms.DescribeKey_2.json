@@ -1,0 +1,10 @@
+{
+    "status_code": 500,
+    "data": {
+        "Error": {
+            "Code": "KMSInternalException",
+            "Message": "Internal Server Error"
+        },
+        "ResponseMetadata": {}
+    }
+}
