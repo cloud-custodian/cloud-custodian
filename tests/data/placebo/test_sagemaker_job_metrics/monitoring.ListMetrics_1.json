@@ -1,0 +1,38 @@
+{
+    "status_code": 200,
+    "data": {
+        "Metrics": [
+            {
+                "Namespace": "/aws/sagemaker/TrainingJobs",
+                "MetricName": "DiskUtilization",
+                "Dimensions": [
+                    {
+                        "Name": "Host",
+                        "Value": "c7n-job-metrics-valid-shrew/algo-1"
+                    }
+                ]
+            },
+            {
+                "Namespace": "/aws/sagemaker/TrainingJobs",
+                "MetricName": "MemoryUtilization",
+                "Dimensions": [
+                    {
+                        "Name": "Host",
+                        "Value": "c7n-job-metrics-valid-shrew/algo-1"
+                    }
+                ]
+            },
+            {
+                "Namespace": "/aws/sagemaker/TrainingJobs",
+                "MetricName": "CPUUtilization",
+                "Dimensions": [
+                    {
+                        "Name": "Host",
+                        "Value": "c7n-job-metrics-valid-shrew/algo-1"
+                    }
+                ]
+            }
+        ],
+        "ResponseMetadata": {}
+    }
+}

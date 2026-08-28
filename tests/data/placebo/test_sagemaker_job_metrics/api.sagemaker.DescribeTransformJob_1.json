@@ -1,0 +1,65 @@
+{
+    "status_code": 200,
+    "data": {
+        "TransformJobName": "c7n-job-metrics-valid-shrew",
+        "TransformJobArn": "arn:aws:sagemaker:us-east-1:644160558196:transform-job/c7n-job-metrics-valid-shrew",
+        "TransformJobStatus": "Completed",
+        "ModelName": "c7n-job-metrics-valid-shrew",
+        "TransformInput": {
+            "DataSource": {
+                "S3DataSource": {
+                    "S3DataType": "S3Prefix",
+                    "S3Uri": "s3://c7n-sagemaker-job-metrics-valid-shrew/transform/"
+                }
+            },
+            "ContentType": "text/csv",
+            "CompressionType": "None",
+            "SplitType": "Line"
+        },
+        "TransformOutput": {
+            "S3OutputPath": "s3://c7n-sagemaker-job-metrics-valid-shrew/output/",
+            "AssembleWith": "None",
+            "KmsKeyId": ""
+        },
+        "TransformResources": {
+            "InstanceType": "ml.m5.large",
+            "InstanceCount": 1
+        },
+        "CreationTime": {
+            "__class__": "datetime",
+            "year": 2026,
+            "month": 8,
+            "day": 28,
+            "hour": 12,
+            "minute": 30,
+            "second": 53,
+            "microsecond": 373000
+        },
+        "TransformStartTime": {
+            "__class__": "datetime",
+            "year": 2026,
+            "month": 8,
+            "day": 28,
+            "hour": 12,
+            "minute": 33,
+            "second": 32,
+            "microsecond": 973000
+        },
+        "TransformEndTime": {
+            "__class__": "datetime",
+            "year": 2026,
+            "month": 8,
+            "day": 28,
+            "hour": 12,
+            "minute": 35,
+            "second": 21,
+            "microsecond": 677000
+        },
+        "DataProcessing": {
+            "InputFilter": "$",
+            "OutputFilter": "$",
+            "JoinSource": "None"
+        },
+        "ResponseMetadata": {}
+    }
+}

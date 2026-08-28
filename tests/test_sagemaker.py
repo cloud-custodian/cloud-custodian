@@ -1,5 +1,8 @@
 # Copyright The Cloud Custodian Authors.
 # SPDX-License-Identifier: Apache-2.0
+import time
+
+import boto3
 import pytest
 from pytest_terraform import terraform
 
@@ -1605,3 +1608,204 @@ def test_sagemaker_app(test, sagemaker_studio):
     )
     [resource] = p.run()
     assert resource['AppName'] == sagemaker_studio['aws_sagemaker_app.untagged.app_name']
+
+
+@pytest.mark.audited
+@terraform('sagemaker_endpoint_metrics', scope='module')
+def test_sagemaker_endpoint_metrics_idle(test, sagemaker_endpoint_metrics):
+    # the busy endpoint's invocations land on its second variant, so it is
+    # only distinguishable from the idle endpoint if every variant is queried
+    busy = sagemaker_endpoint_metrics['aws_sagemaker_endpoint.busy.name']
+    idle = sagemaker_endpoint_metrics['aws_sagemaker_endpoint.idle.name']
+    factory = test.replay_flight_data('test_sagemaker_endpoint_metrics_idle')
+
+    if test.recording:
+        runtime = factory().client('sagemaker-runtime')
+        for _ in range(5):
+            runtime.invoke_endpoint(
+                EndpointName=busy,
+                TargetVariant='busy',
+                ContentType='text/csv',
+                Body='1.0',
+                )
+        time.sleep(300)
+
+    p = test.load_policy(
+        {
+            'name': 'sagemaker-endpoints-idle',
+            'resource': 'sagemaker-endpoint',
+            'filters': [
+                {'type': 'value', 'key': 'EndpointName',
+                 'op': 'in', 'value': [busy, idle]},
+                {'type': 'metrics',
+                 'name': 'Invocations',
+                 'statistics': 'Sum',
+                 'days': 1,
+                 'period': 86400,
+                 'value': 0,
+                 'op': 'lte',
+                 'missing-value': 0},
+            ],
+        },
+        session_factory=factory,
+    )
+    [resource] = p.run()
+    assert resource['EndpointName'] == idle
+
+
+@pytest.mark.audited
+@terraform('sagemaker_endpoint_metrics', scope='module')
+def test_sagemaker_endpoint_metrics_utilization(test, sagemaker_endpoint_metrics):
+    # instance utilization metrics are in a namespace of their own, and are
+    # reported by every variant whether or not it is being invoked
+    busy = sagemaker_endpoint_metrics['aws_sagemaker_endpoint.busy.name']
+    factory = test.replay_flight_data(
+        'test_sagemaker_endpoint_metrics_utilization')
+
+    p = test.load_policy(
+        {
+            'name': 'sagemaker-endpoints-underused',
+            'resource': 'sagemaker-endpoint',
+            'filters': [
+                {'EndpointName': busy},
+                {'type': 'metrics',
+                 'namespace': '/aws/sagemaker/Endpoints',
+                 'name': 'CPUUtilization',
+                 'statistics': 'Average',
+                 'days': 1,
+                 'period': 3600,
+                 'value': 400,
+                 'op': 'less-than'},
+            ],
+        },
+        session_factory=factory,
+    )
+    [resource] = p.run()
+    assert resource['EndpointName'] == busy
+    assert len(resource['c7n.metrics']) == 1
+
+
+SAGEMAKER_JOB_RESOURCES = (
+    ('sagemaker-job', 'TrainingJobName'),
+    ('sagemaker-processing-job', 'ProcessingJobName'),
+    ('sagemaker-transform-job', 'TransformJobName'),
+    )
+
+
+def create_sagemaker_jobs(tf):
+    """Run a training, processing and transform job to completion.
+
+    Terraform has no resource types for sagemaker jobs. The jobs are sized
+    to run for a few minutes, long enough to report utilization metrics.
+    """
+    client = boto3.Session().client('sagemaker')
+    name = tf.outputs['job_name']['value']
+    role = tf.outputs['role_arn']['value']
+    image = tf.outputs['image_uri']['value']
+    cluster = {'InstanceType': 'ml.m5.large', 'InstanceCount': 1}
+
+    client.create_training_job(
+        TrainingJobName=name,
+        AlgorithmSpecification={
+            'TrainingImage': image,
+            'TrainingInputMode': 'File',
+            },
+        HyperParameters={'objective': 'reg:squarederror', 'num_round': '1000'},
+        RoleArn=role,
+        InputDataConfig=[{
+            'ChannelName': 'train',
+            'ContentType': 'text/csv',
+            'DataSource': {'S3DataSource': {
+                'S3DataType': 'S3Prefix',
+                'S3Uri': tf.outputs['train_s3_uri']['value'],
+                }},
+            }],
+        OutputDataConfig={'S3OutputPath': tf.outputs['output_s3_uri']['value']},
+        ResourceConfig=dict(cluster, VolumeSizeInGB=10),
+        StoppingCondition={'MaxRuntimeInSeconds': 1800},
+        )
+    client.create_processing_job(
+        ProcessingJobName=name,
+        AppSpecification={
+            'ImageUri': image,
+            'ContainerEntrypoint': ['sleep', '180'],
+            },
+        ProcessingResources={'ClusterConfig': dict(cluster, VolumeSizeInGB=10)},
+        RoleArn=role,
+        StoppingCondition={'MaxRuntimeInSeconds': 1800},
+        )
+    client.create_transform_job(
+        TransformJobName=name,
+        ModelName=tf.outputs['model_name']['value'],
+        TransformInput={
+            'DataSource': {'S3DataSource': {
+                'S3DataType': 'S3Prefix',
+                'S3Uri': tf.outputs['transform_s3_uri']['value'],
+                }},
+            'ContentType': 'text/csv',
+            'SplitType': 'Line',
+            },
+        TransformOutput={'S3OutputPath': tf.outputs['output_s3_uri']['value']},
+        TransformResources=cluster,
+        )
+
+    for waiter, argument in (
+            ('training_job_completed_or_stopped', 'TrainingJobName'),
+            ('processing_job_completed_or_stopped', 'ProcessingJobName'),
+            ('transform_job_completed_or_stopped', 'TransformJobName')):
+        client.get_waiter(waiter).wait(**{argument: name})
+
+    wait_for_job_metrics(name)
+
+
+def wait_for_job_metrics(name):
+    """Wait for the jobs' instances to show up in ListMetrics."""
+    client = boto3.Session().client('cloudwatch')
+    namespaces = ['/aws/sagemaker/%sJobs' % kind
+                  for kind in ('Training', 'Processing', 'Transform')]
+    for _ in range(20):
+        for namespace in list(namespaces):
+            hosts = client.list_metrics(
+                Namespace=namespace, Dimensions=[{'Name': 'Host'}])['Metrics']
+            if any(d['Value'].startswith(name + '/')
+                   for m in hosts for d in m['Dimensions']):
+                namespaces.remove(namespace)
+        if not namespaces:
+            return
+        time.sleep(30)
+    raise AssertionError("no metrics reported for %s" % namespaces)
+
+
+@pytest.mark.audited
+@terraform('sagemaker_job_metrics', scope='module')
+def test_sagemaker_job_metrics(test, sagemaker_job_metrics):
+    # job metrics are dimensioned by a Host the sagemaker apis never report,
+    # so a match here means the job's instances were discovered
+    factory = test.replay_flight_data('test_sagemaker_job_metrics')
+    name = sagemaker_job_metrics.outputs['job_name']['value']
+
+    if test.recording:
+        create_sagemaker_jobs(sagemaker_job_metrics)
+
+    for resource, name_key in SAGEMAKER_JOB_RESOURCES:
+        for value, op, expected in ((400, 'less-than', [name]),
+                                    (1000, 'greater-than', [])):
+            p = test.load_policy(
+                {
+                    'name': 'sagemaker-jobs-utilization',
+                    'resource': resource,
+                    'query': [{'StatusEquals': 'Completed'}],
+                    'filters': [
+                        {name_key: name},
+                        {'type': 'metrics',
+                         'name': 'CPUUtilization',
+                         'statistics': 'Average',
+                         'days': 1,
+                         'period': 3600,
+                         'value': value,
+                         'op': op},
+                    ],
+                },
+                session_factory=factory,
+            )
+            assert [r[name_key] for r in p.run()] == expected

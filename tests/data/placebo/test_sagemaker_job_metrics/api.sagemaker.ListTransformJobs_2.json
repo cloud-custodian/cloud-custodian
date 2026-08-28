@@ -1,0 +1,43 @@
+{
+    "status_code": 200,
+    "data": {
+        "TransformJobSummaries": [
+            {
+                "TransformJobName": "c7n-job-metrics-valid-shrew",
+                "TransformJobArn": "arn:aws:sagemaker:us-east-1:644160558196:transform-job/c7n-job-metrics-valid-shrew",
+                "CreationTime": {
+                    "__class__": "datetime",
+                    "year": 2026,
+                    "month": 8,
+                    "day": 28,
+                    "hour": 12,
+                    "minute": 30,
+                    "second": 53,
+                    "microsecond": 373000
+                },
+                "TransformEndTime": {
+                    "__class__": "datetime",
+                    "year": 2026,
+                    "month": 8,
+                    "day": 28,
+                    "hour": 12,
+                    "minute": 35,
+                    "second": 21,
+                    "microsecond": 677000
+                },
+                "LastModifiedTime": {
+                    "__class__": "datetime",
+                    "year": 2026,
+                    "month": 8,
+                    "day": 28,
+                    "hour": 12,
+                    "minute": 35,
+                    "second": 22,
+                    "microsecond": 87000
+                },
+                "TransformJobStatus": "Completed"
+            }
+        ],
+        "ResponseMetadata": {}
+    }
+}

@@ -8,6 +8,7 @@ from c7n.utils import local_session, type_schema, QueryParser
 from c7n.tags import RemoveTag, Tag, TagActionFilter, TagDelayedAction, universal_augment
 from c7n.filters.vpc import SubnetFilter, SecurityGroupFilter, NetworkLocation
 from c7n.filters.kms import KmsRelatedFilter
+from c7n.filters.metrics import MetricsFilter
 from c7n.filters.offhours import OffHour, OnHour
 
 
@@ -51,6 +52,60 @@ NotebookInstance.filter_registry.register('offhour', OffHour)
 NotebookInstance.filter_registry.register('onhour', OnHour)
 
 
+class SagemakerJobMetrics(MetricsFilter):
+    """Filter sagemaker jobs by the cloudwatch metrics of their instances.
+
+    Job metrics are published per instance under a ``Host`` dimension whose
+    value is only known to cloudwatch, so a job's instances are discovered
+    with ``ListMetrics``. A job matches when all of its instances match.
+
+    Only instances that reported the metric within the last two weeks are
+    discoverable, per ``ListMetrics``.
+
+    :example:
+
+    .. code-block:: yaml
+
+        policies:
+          - name: training-jobs-idle-gpu
+            resource: aws.sagemaker-job
+            filters:
+              - type: metrics
+                name: GPUUtilization
+                statistics: Average
+                days: 1
+                period: 3600
+                value: 10
+                op: less-than
+    """
+
+    permissions = MetricsFilter.permissions + ('cloudwatch:ListMetrics',)
+
+    def process(self, resources, event=None):
+        self.hosts = self.get_hosts()
+        return super().process(resources, event)
+
+    def get_hosts(self):
+        """Map each job name to the ``Host`` dimension values it publishes."""
+        client = local_session(
+            self.manager.session_factory).client('cloudwatch')
+        namespace = (self.data.get('namespace') or
+                     self.manager.get_model().metrics_namespace)
+        hosts = {}
+        for page in client.get_paginator('list_metrics').paginate(
+                Namespace=namespace, Dimensions=[{'Name': 'Host'}]):
+            for metric in page['Metrics']:
+                host = [d['Value'] for d in metric['Dimensions']
+                        if d['Name'] == 'Host'][0]
+                hosts.setdefault(host.rsplit('/', 1)[0], set()).add(host)
+        return hosts
+
+    def get_dimension_sets(self, resource):
+        job = resource[self.manager.get_model().name]
+        return [[{'Name': 'Host', 'Value': host}]
+                for host in sorted(self.hosts.get(job, ()))]
+
+
 @resources.register('sagemaker-job')
 class SagemakerJob(QueryResourceManager):
 
@@ -59,6 +114,7 @@ class SagemakerJob(QueryResourceManager):
         enum_spec = ('list_training_jobs', 'TrainingJobSummaries', None)
         detail_spec = (
             'describe_training_job', 'TrainingJobName', 'TrainingJobName', None)
+        metrics_namespace = '/aws/sagemaker/TrainingJobs'
         arn = id = 'TrainingJobArn'
         name = 'TrainingJobName'
         date = 'CreationTime'
@@ -90,6 +146,9 @@ class SagemakerJob(QueryResourceManager):
         return list(map(_augment, jobs))
 
 
+SagemakerJob.filter_registry.register('metrics', SagemakerJobMetrics)
+
+
 @resources.register('sagemaker-transform-job')
 class SagemakerTransformJob(QueryResourceManager):
 
@@ -99,6 +158,7 @@ class SagemakerTransformJob(QueryResourceManager):
         enum_spec = ('list_transform_jobs', 'TransformJobSummaries', None)
         detail_spec = (
             'describe_transform_job', 'TransformJobName', 'TransformJobName', None)
+        metrics_namespace = '/aws/sagemaker/TransformJobs'
         arn = id = 'TransformJobArn'
         name = 'TransformJobName'
         date = 'CreationTime'
@@ -128,6 +188,9 @@ class SagemakerTransformJob(QueryResourceManager):
             return j
 
         return list(map(_augment, super(SagemakerTransformJob, self).augment(jobs)))
+
+
+SagemakerTransformJob.filter_registry.register('metrics', SagemakerJobMetrics)
 
 
 class SagemakerHyperParameterTuningJobDescribe(DescribeSource):
@@ -256,6 +319,7 @@ class SagemakerProcessingJob(QueryResourceManager):
         enum_spec = ('list_processing_jobs', 'ProcessingJobSummaries', None)
         detail_spec = (
             'describe_processing_job', 'ProcessingJobName', 'ProcessingJobName', None)
+        metrics_namespace = '/aws/sagemaker/ProcessingJobs'
         arn = id = 'ProcessingJobArn'
         name = 'ProcessingJobName'
         date = 'CreationTime'
@@ -275,6 +339,9 @@ class SagemakerProcessingJob(QueryResourceManager):
         for q in self.queries:
             query.update(q)
         return super(SagemakerProcessingJob, self).resources(query=query)
+
+
+SagemakerProcessingJob.filter_registry.register('metrics', SagemakerJobMetrics)
 
 
 class SagemakerModelBiasJobDefinitionDescribe(DescribeSource):
@@ -355,6 +422,7 @@ class SagemakerEndpoint(QueryResourceManager):
         detail_spec = (
             'describe_endpoint', 'EndpointName',
             'EndpointName', None)
+        metrics_namespace = 'AWS/SageMaker'
         arn = id = 'EndpointArn'
         name = 'EndpointName'
         date = 'CreationTime'
@@ -366,6 +434,47 @@ class SagemakerEndpoint(QueryResourceManager):
 
 
 SagemakerEndpoint.filter_registry.register('marked-for-op', TagActionFilter)
+
+
+@SagemakerEndpoint.filter_registry.register('metrics')
+class SagemakerEndpointMetrics(MetricsFilter):
+    """Filter sagemaker endpoints by their cloudwatch metrics.
+
+    Endpoint metrics are published per production variant, so an endpoint
+    matches when all of its variants match. Specify ``dimensions`` to query
+    a variant, or an instance type within a variant, instead.
+
+    Invocation metrics are in the default ``AWS/SageMaker`` namespace;
+    instance utilization metrics need ``namespace:
+    /aws/sagemaker/Endpoints``.
+
+    :example:
+
+    .. code-block:: yaml
+
+        policies:
+          - name: sagemaker-endpoints-idle
+            resource: aws.sagemaker-endpoint
+            filters:
+              - EndpointStatus: InService
+              - type: metrics
+                name: Invocations
+                statistics: Sum
+                days: 7
+                period: 86400
+                value: 0
+                op: lte
+                missing-value: 0
+    """
+
+    def get_dimension_sets(self, resource):
+        endpoint = [{'Name': 'EndpointName', 'Value': resource['EndpointName']}]
+        if 'dimensions' in self.data:
+            return [endpoint]
+        return [
+            endpoint + [{'Name': 'VariantName', 'Value': v['VariantName']}]
+            for v in resource['ProductionVariants']
+            ]
 
 
 class EndpointConfigDescribe(DescribeSource):

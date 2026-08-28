@@ -1,0 +1,44 @@
+{
+    "status_code": 200,
+    "data": {
+        "TrainingJobSummaries": [
+            {
+                "TrainingJobName": "c7n-job-metrics-valid-shrew",
+                "TrainingJobArn": "arn:aws:sagemaker:us-east-1:644160558196:training-job/c7n-job-metrics-valid-shrew",
+                "CreationTime": {
+                    "__class__": "datetime",
+                    "year": 2026,
+                    "month": 8,
+                    "day": 28,
+                    "hour": 12,
+                    "minute": 30,
+                    "second": 52,
+                    "microsecond": 653000
+                },
+                "TrainingEndTime": {
+                    "__class__": "datetime",
+                    "year": 2026,
+                    "month": 8,
+                    "day": 28,
+                    "hour": 12,
+                    "minute": 34,
+                    "second": 4,
+                    "microsecond": 667000
+                },
+                "LastModifiedTime": {
+                    "__class__": "datetime",
+                    "year": 2026,
+                    "month": 8,
+                    "day": 28,
+                    "hour": 12,
+                    "minute": 34,
+                    "second": 5,
+                    "microsecond": 300000
+                },
+                "TrainingJobStatus": "Completed",
+                "SecondaryStatus": "Completed"
+            }
+        ],
+        "ResponseMetadata": {}
+    }
+}
