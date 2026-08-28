@@ -109,23 +109,27 @@ class DescribeEC2(query.DescribeSource):
         if found:
             return resources
 
-        # Okay go and do the tag lookup
+        # Tag lookup
         client = utils.local_session(self.manager.session_factory).client('ec2')
         model = self.manager.get_model()
         if len(resources) <= EC2_TAG_AUGMENT_BY_INSTANCES_MAX:
-            # ec2 ignores MaxResults when a resource-id filter is given, so
-            # this response is never split and there is nothing to page.
+            # ec2 ignores MaxResults for a resource-id filter, so no paginator.
             tag_set = self.manager.retry(
                 client.describe_tags,
                 Filters=[{'Name': 'resource-id',
                           'Values': [r[model.id] for r in resources]}])['Tags']
         else:
-            # Every instance tag in the region, so unbounded: page it.
+            # Potentially many instances and tags, so paginate.
+            # Note that we don't specify a page size, and we never saw
+            # a continuation token without one -- but this covers every
+            # instance tag in the region, so the volume is unbounded and
+            # the paginator is insurance.
             paginator = client.get_paginator('describe_tags')
             paginator.PAGE_ITERATOR_CLS = query.RetryPageIterator
             tag_set = paginator.paginate(
                 Filters=[{'Name': 'resource-type',
                           'Values': ['instance']}]).build_full_result()['Tags']
+
         resource_tags = {}
         for t in tag_set:
             t.pop('ResourceType')
