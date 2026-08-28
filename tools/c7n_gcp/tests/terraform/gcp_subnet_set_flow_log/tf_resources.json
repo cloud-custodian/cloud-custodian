@@ -1,0 +1,76 @@
+{
+    "pytest-terraform": 1,
+    "outputs": {},
+    "resources": {
+        "google_compute_network": {
+            "vpc": {
+                "auto_create_subnetworks": false,
+                "bgp_always_compare_med": false,
+                "bgp_best_path_selection_mode": "LEGACY",
+                "bgp_inter_region_cost": "",
+                "delete_bgp_always_compare_med": false,
+                "delete_default_routes_on_create": false,
+                "description": "",
+                "enable_ula_internal_ipv6": false,
+                "gateway_ipv4": "",
+                "id": "projects/cloud-custodian/global/networks/native-roughy-vpc",
+                "internal_ipv6_range": "",
+                "mtu": 0,
+                "name": "native-roughy-vpc",
+                "network_firewall_policy_enforcement_order": "AFTER_CLASSIC_FIREWALL",
+                "network_id": "3155296971164137627",
+                "network_profile": "",
+                "numeric_id": "3155296971164137627",
+                "params": [],
+                "project": "stacklet-test-policies",
+                "routing_mode": "GLOBAL",
+                "self_link": "https://www.googleapis.com/compute/v1/projects/cloud-custodian/global/networks/native-roughy-vpc",
+                "timeouts": null
+            }
+        },
+        "google_compute_subnetwork": {
+            "default": {
+                "allow_subnet_cidr_routes_overlap": false,
+                "creation_timestamp": "2026-03-15T12:20:42.804-07:00",
+                "description": "",
+                "external_ipv6_prefix": "",
+                "fingerprint": null,
+                "gateway_address": "10.2.0.1",
+                "id": "projects/cloud-custodian/regions/us-central1/subnetworks/native-roughy-subnet",
+                "internal_ipv6_prefix": "",
+                "ip_cidr_range": "10.2.0.0/16",
+                "ip_collection": null,
+                "ipv6_access_type": "",
+                "ipv6_cidr_range": "",
+                "ipv6_gce_endpoint": "",
+                "log_config": [],
+                "name": "native-roughy-subnet",
+                "network": "https://www.googleapis.com/compute/v1/projects/cloud-custodian/global/networks/native-roughy-vpc",
+                "params": [],
+                "private_ip_google_access": false,
+                "private_ipv6_google_access": "DISABLE_GOOGLE_ACCESS",
+                "project": "stacklet-test-policies",
+                "purpose": "PRIVATE",
+                "region": "us-central1",
+                "reserved_internal_range": "",
+                "role": "",
+                "secondary_ip_range": [],
+                "self_link": "https://www.googleapis.com/compute/v1/projects/cloud-custodian/regions/us-central1/subnetworks/native-roughy-subnet",
+                "send_secondary_ip_range_if_empty": null,
+                "stack_type": "IPV4_ONLY",
+                "state": "",
+                "subnetwork_id": 8299078460599089253,
+                "timeouts": null
+            }
+        },
+        "random_pet": {
+            "server": {
+                "id": "native-roughy",
+                "keepers": null,
+                "length": 2,
+                "prefix": null,
+                "separator": "-"
+            }
+        }
+    }
+}
