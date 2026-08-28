@@ -113,12 +113,19 @@ class DescribeEC2(query.DescribeSource):
         client = utils.local_session(self.manager.session_factory).client('ec2')
         model = self.manager.get_model()
         if len(resources) <= EC2_TAG_AUGMENT_BY_INSTANCES_MAX:
-            tag_filter = {'Name': 'resource-id',
-                          'Values': [r[model.id] for r in resources]}
+            # ec2 ignores MaxResults when a resource-id filter is given, so
+            # this response is never split and there is nothing to page.
+            tag_set = self.manager.retry(
+                client.describe_tags,
+                Filters=[{'Name': 'resource-id',
+                          'Values': [r[model.id] for r in resources]}])['Tags']
         else:
-            tag_filter = {'Name': 'resource-type', 'Values': ['instance']}
-        tag_set = self.manager.retry(
-            client.describe_tags, Filters=[tag_filter])['Tags']
+            # Every instance tag in the region, so unbounded: page it.
+            paginator = client.get_paginator('describe_tags')
+            paginator.PAGE_ITERATOR_CLS = query.RetryPageIterator
+            tag_set = paginator.paginate(
+                Filters=[{'Name': 'resource-type',
+                          'Values': ['instance']}]).build_full_result()['Tags']
         resource_tags = {}
         for t in tag_set:
             t.pop('ResourceType')
