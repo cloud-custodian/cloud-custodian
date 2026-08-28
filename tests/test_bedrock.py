@@ -8,7 +8,7 @@ import pytest
 from .common import ACCOUNT_ID, BaseTest, event_data
 from botocore.exceptions import ClientError
 from pytest_terraform import terraform
-from c7n.exceptions import PolicyValidationError
+from c7n.exceptions import PolicyExecutionError, PolicyValidationError
 from c7n.resources.bedrock import (
     get_bedrock_output_artifact_prefix, get_bedrock_output_lifecycle,
     parse_bedrock_output_s3_uri)
@@ -664,6 +664,159 @@ class BedrockKnowledgeBase(BaseTest):
         client = session_factory().client('bedrock-agent')
         knowledgebases = client.list_knowledge_bases().get('knowledgeBaseSummaries')
         self.assertEqual(len(knowledgebases), 0)
+
+    def test_bedrock_knowledge_base_retrieval_activity(self):
+        session_factory = self.replay_flight_data(
+            'test_bedrock_knowledge_base_retrieval_activity')
+        p = self.load_policy(
+            {
+                "name": "bedrock-kb-zero-retrieval",
+                "resource": "bedrock-knowledge-base",
+                "filters": [
+                    {
+                        "type": "retrieval-activity",
+                        "source": "cloudtrail-lake",
+                        "days": 30,
+                        "op": "eq",
+                        "value": 0,
+                    }
+                ],
+            },
+            session_factory=session_factory,
+        )
+        resources = p.run()
+        # only the stale knowledge base with no observed retrievals is matched
+        self.assertEqual(len(resources), 1)
+        self.assertEqual(resources[0]['knowledgeBaseId'], 'STALE00001')
+        self.assertEqual(resources[0]['c7n:RetrievalActivity'], 0)
+
+    def test_bedrock_knowledge_base_retrieval_activity_used(self):
+        session_factory = self.replay_flight_data(
+            'test_bedrock_knowledge_base_retrieval_activity')
+        p = self.load_policy(
+            {
+                "name": "bedrock-kb-has-retrieval",
+                "resource": "bedrock-knowledge-base",
+                "filters": [
+                    {
+                        "type": "retrieval-activity",
+                        "op": "gt",
+                        "value": 0,
+                    }
+                ],
+            },
+            session_factory=session_factory,
+        )
+        resources = p.run()
+        self.assertEqual(len(resources), 1)
+        self.assertEqual(resources[0]['knowledgeBaseId'], 'ACTIVE0002')
+        self.assertEqual(resources[0]['c7n:RetrievalActivity'], 5)
+
+    def test_bedrock_knowledge_base_retrieval_activity_explicit_store(self):
+        session_factory = self.replay_flight_data(
+            'test_bedrock_knowledge_base_retrieval_activity_explicit')
+        p = self.load_policy(
+            {
+                "name": "bedrock-kb-explicit-store",
+                "resource": "bedrock-knowledge-base",
+                "filters": [
+                    {
+                        "type": "retrieval-activity",
+                        "event-data-store": (
+                            "arn:aws:cloudtrail:us-east-1:644160558196:"
+                            "eventdatastore/pinned-store-0001"),
+                        "op": "gt",
+                        "value": 0,
+                    }
+                ],
+            },
+            session_factory=session_factory,
+        )
+        # pinning event-data-store skips discovery entirely
+        resources = p.run()
+        self.assertEqual(len(resources), 1)
+        self.assertEqual(resources[0]['knowledgeBaseId'], 'ACTIVE0002')
+        self.assertEqual(resources[0]['c7n:RetrievalActivity'], 5)
+
+    def test_bedrock_knowledge_base_retrieval_activity_no_store(self):
+        session_factory = self.replay_flight_data(
+            'test_bedrock_knowledge_base_retrieval_activity_no_store')
+        p = self.load_policy(
+            {
+                "name": "bedrock-kb-no-store",
+                "resource": "bedrock-knowledge-base",
+                "filters": [
+                    {"type": "retrieval-activity"},
+                ],
+            },
+            session_factory=session_factory,
+        )
+        # no enabled event data store -> filter matches nothing
+        resources = p.run()
+        self.assertEqual(len(resources), 0)
+
+    def test_bedrock_knowledge_base_retrieval_activity_discovery_fallback(self):
+        session_factory = self.replay_flight_data(
+            'test_bedrock_knowledge_base_retrieval_activity_fallback')
+        p = self.load_policy(
+            {
+                "name": "bedrock-kb-fallback-store",
+                "resource": "bedrock-knowledge-base",
+                "filters": [
+                    {
+                        "type": "retrieval-activity",
+                        "op": "gt",
+                        "value": 0,
+                    }
+                ],
+            },
+            session_factory=session_factory,
+        )
+        # stores are paginated and none carry a bedrock kb selector, so the
+        # first enabled store is used; results are paginated and include a row
+        # with no arn (skipped) and a non-numeric count (coerced to 0)
+        resources = p.run()
+        self.assertEqual(len(resources), 1)
+        self.assertEqual(resources[0]['knowledgeBaseId'], 'ACTIVE0002')
+        self.assertEqual(resources[0]['c7n:RetrievalActivity'], 3)
+
+    def test_bedrock_knowledge_base_retrieval_activity_query_failed(self):
+        session_factory = self.replay_flight_data(
+            'test_bedrock_knowledge_base_retrieval_activity_failed')
+        p = self.load_policy(
+            {
+                "name": "bedrock-kb-query-failed",
+                "resource": "bedrock-knowledge-base",
+                "filters": [
+                    {"type": "retrieval-activity"},
+                ],
+            },
+            session_factory=session_factory,
+        )
+        with self.assertRaises(PolicyExecutionError) as ctx:
+            p.run()
+        self.assertIn('FAILED', str(ctx.exception))
+
+    def test_bedrock_knowledge_base_retrieval_activity_query_timeout(self):
+        session_factory = self.replay_flight_data(
+            'test_bedrock_knowledge_base_retrieval_activity_timeout')
+        p = self.load_policy(
+            {
+                "name": "bedrock-kb-query-timeout",
+                "resource": "bedrock-knowledge-base",
+                "filters": [
+                    {"type": "retrieval-activity"},
+                ],
+            },
+            session_factory=session_factory,
+        )
+        f = p.resource_manager.filters[0]
+        # keep the poll loop short and non-blocking for the test
+        f.poll_max_attempts = 3
+        f.poll_delay = 0
+        with self.assertRaises(PolicyExecutionError) as ctx:
+            p.run()
+        self.assertIn('did not finish', str(ctx.exception))
 
 
 class BedrockApplicationInferenceProfile(BaseTest):

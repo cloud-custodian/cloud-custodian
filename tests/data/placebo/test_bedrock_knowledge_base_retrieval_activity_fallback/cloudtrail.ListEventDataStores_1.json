@@ -1,0 +1,22 @@
+{
+    "status_code": 200,
+    "data": {
+        "ResponseMetadata": {},
+        "NextToken": "page-2",
+        "EventDataStores": [
+            {
+                "EventDataStoreArn": "arn:aws:cloudtrail:us-east-1:644160558196:eventdatastore/mgmt-only-0001",
+                "Name": "mgmt-events-store",
+                "Status": "ENABLED",
+                "AdvancedEventSelectors": [
+                    {
+                        "Name": "management-events",
+                        "FieldSelectors": [
+                            {"Field": "eventCategory", "Equals": ["Management"]}
+                        ]
+                    }
+                ]
+            }
+        ]
+    }
+}
