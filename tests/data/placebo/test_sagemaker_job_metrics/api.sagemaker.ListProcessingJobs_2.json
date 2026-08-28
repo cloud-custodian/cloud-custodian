@@ -3,6 +3,41 @@
     "data": {
         "ProcessingJobSummaries": [
             {
+                "ProcessingJobName": "c7n-job-metrics-accepted-dodo",
+                "ProcessingJobArn": "arn:aws:sagemaker:us-east-1:644160558196:processing-job/c7n-job-metrics-accepted-dodo",
+                "CreationTime": {
+                    "__class__": "datetime",
+                    "year": 2026,
+                    "month": 8,
+                    "day": 28,
+                    "hour": 17,
+                    "minute": 11,
+                    "second": 13,
+                    "microsecond": 503000
+                },
+                "ProcessingEndTime": {
+                    "__class__": "datetime",
+                    "year": 2026,
+                    "month": 8,
+                    "day": 28,
+                    "hour": 17,
+                    "minute": 16,
+                    "second": 50,
+                    "microsecond": 316000
+                },
+                "LastModifiedTime": {
+                    "__class__": "datetime",
+                    "year": 2026,
+                    "month": 8,
+                    "day": 28,
+                    "hour": 17,
+                    "minute": 18,
+                    "second": 47,
+                    "microsecond": 499000
+                },
+                "ProcessingJobStatus": "Completed"
+            },
+            {
                 "ProcessingJobName": "c7n-job-metrics-valid-shrew",
                 "ProcessingJobArn": "arn:aws:sagemaker:us-east-1:644160558196:processing-job/c7n-job-metrics-valid-shrew",
                 "CreationTime": {

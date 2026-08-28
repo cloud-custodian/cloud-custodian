@@ -6,27 +6,27 @@
             "type": "string"
         },
         "job_name": {
-            "value": "c7n-job-metrics-valid-shrew",
+            "value": "c7n-job-metrics-accepted-dodo",
             "type": "string"
         },
         "model_name": {
-            "value": "c7n-job-metrics-valid-shrew",
+            "value": "c7n-job-metrics-accepted-dodo",
             "type": "string"
         },
         "output_s3_uri": {
-            "value": "s3://c7n-sagemaker-job-metrics-valid-shrew/output/",
+            "value": "s3://c7n-sagemaker-job-metrics-accepted-dodo/output/",
             "type": "string"
         },
         "role_arn": {
-            "value": "arn:aws:iam::644160558196:role/c7n-job-metrics-valid-shrew",
+            "value": "arn:aws:iam::644160558196:role/c7n-job-metrics-accepted-dodo",
             "type": "string"
         },
         "train_s3_uri": {
-            "value": "s3://c7n-sagemaker-job-metrics-valid-shrew/train/",
+            "value": "s3://c7n-sagemaker-job-metrics-accepted-dodo/train/",
             "type": "string"
         },
         "transform_s3_uri": {
-            "value": "s3://c7n-sagemaker-job-metrics-valid-shrew/transform/",
+            "value": "s3://c7n-sagemaker-job-metrics-accepted-dodo/transform/",
             "type": "string"
         }
     },
@@ -79,42 +79,42 @@
         },
         "aws_iam_role": {
             "execution": {
-                "arn": "arn:aws:iam::644160558196:role/c7n-job-metrics-valid-shrew",
+                "arn": "arn:aws:iam::644160558196:role/c7n-job-metrics-accepted-dodo",
                 "assume_role_policy": "{\"Statement\":[{\"Action\":\"sts:AssumeRole\",\"Effect\":\"Allow\",\"Principal\":{\"Service\":\"sagemaker.amazonaws.com\"}}],\"Version\":\"2012-10-17\"}",
-                "create_date": "2026-08-28T18:30:41Z",
+                "create_date": "2026-08-28T23:11:02Z",
                 "description": "",
                 "force_detach_policies": false,
-                "id": "c7n-job-metrics-valid-shrew",
+                "id": "c7n-job-metrics-accepted-dodo",
                 "inline_policy": [],
                 "managed_policy_arns": [],
                 "max_session_duration": 3600,
-                "name": "c7n-job-metrics-valid-shrew",
+                "name": "c7n-job-metrics-accepted-dodo",
                 "name_prefix": "",
                 "path": "/",
                 "permissions_boundary": "",
                 "tags": null,
                 "tags_all": {},
-                "unique_id": "AROAV7EQQKWX6NXB7KGDU"
+                "unique_id": "AROAV7EQQKWXSATY6SNGT"
             }
         },
         "aws_iam_role_policy_attachment": {
             "execution": {
-                "id": "c7n-job-metrics-valid-shrew/arn:aws:iam::aws:policy/AmazonSageMakerFullAccess",
+                "id": "c7n-job-metrics-accepted-dodo/arn:aws:iam::aws:policy/AmazonSageMakerFullAccess",
                 "policy_arn": "arn:aws:iam::aws:policy/AmazonSageMakerFullAccess",
-                "role": "c7n-job-metrics-valid-shrew"
+                "role": "c7n-job-metrics-accepted-dodo"
             }
         },
         "aws_s3_bucket": {
             "data": {
                 "acceleration_status": "",
                 "acl": null,
-                "arn": "arn:aws:s3:::c7n-sagemaker-job-metrics-valid-shrew",
-                "bucket": "c7n-sagemaker-job-metrics-valid-shrew",
-                "bucket_domain_name": "c7n-sagemaker-job-metrics-valid-shrew.s3.amazonaws.com",
+                "arn": "arn:aws:s3:::c7n-sagemaker-job-metrics-accepted-dodo",
+                "bucket": "c7n-sagemaker-job-metrics-accepted-dodo",
+                "bucket_domain_name": "c7n-sagemaker-job-metrics-accepted-dodo.s3.amazonaws.com",
                 "bucket_namespace": "global",
                 "bucket_prefix": "",
                 "bucket_region": "us-east-1",
-                "bucket_regional_domain_name": "c7n-sagemaker-job-metrics-valid-shrew.s3.us-east-1.amazonaws.com",
+                "bucket_regional_domain_name": "c7n-sagemaker-job-metrics-accepted-dodo.s3.us-east-1.amazonaws.com",
                 "cors_rule": [],
                 "force_destroy": true,
                 "grant": [
@@ -128,7 +128,7 @@
                     }
                 ],
                 "hosted_zone_id": "Z3AQBSTGFYJSTF",
-                "id": "c7n-sagemaker-job-metrics-valid-shrew",
+                "id": "c7n-sagemaker-job-metrics-accepted-dodo",
                 "lifecycle_rule": [],
                 "logging": [],
                 "object_lock_configuration": [],
@@ -169,8 +169,8 @@
         "aws_s3_object": {
             "model": {
                 "acl": null,
-                "arn": "arn:aws:s3:::c7n-sagemaker-job-metrics-valid-shrew/model.tar.gz",
-                "bucket": "c7n-sagemaker-job-metrics-valid-shrew",
+                "arn": "arn:aws:s3:::c7n-sagemaker-job-metrics-accepted-dodo/model.tar.gz",
+                "bucket": "c7n-sagemaker-job-metrics-accepted-dodo",
                 "bucket_key_enabled": false,
                 "cache_control": "",
                 "checksum_algorithm": null,
@@ -187,7 +187,7 @@
                 "content_type": "application/octet-stream",
                 "etag": "dd8ee194115d990ad16e3ddaf17bf982",
                 "force_destroy": false,
-                "id": "c7n-sagemaker-job-metrics-valid-shrew/model.tar.gz",
+                "id": "c7n-sagemaker-job-metrics-accepted-dodo/model.tar.gz",
                 "key": "model.tar.gz",
                 "kms_key_id": null,
                 "metadata": null,
@@ -207,8 +207,8 @@
             },
             "train": {
                 "acl": null,
-                "arn": "arn:aws:s3:::c7n-sagemaker-job-metrics-valid-shrew/train/train.csv",
-                "bucket": "c7n-sagemaker-job-metrics-valid-shrew",
+                "arn": "arn:aws:s3:::c7n-sagemaker-job-metrics-accepted-dodo/train/train.csv",
+                "bucket": "c7n-sagemaker-job-metrics-accepted-dodo",
                 "bucket_key_enabled": false,
                 "cache_control": "",
                 "checksum_algorithm": null,
@@ -225,7 +225,7 @@
                 "content_type": "application/octet-stream",
                 "etag": "fa1cf63ad2bdcb30c802bc15396fd01e",
                 "force_destroy": false,
-                "id": "c7n-sagemaker-job-metrics-valid-shrew/train/train.csv",
+                "id": "c7n-sagemaker-job-metrics-accepted-dodo/train/train.csv",
                 "key": "train/train.csv",
                 "kms_key_id": null,
                 "metadata": null,
@@ -245,8 +245,8 @@
             },
             "transform": {
                 "acl": null,
-                "arn": "arn:aws:s3:::c7n-sagemaker-job-metrics-valid-shrew/transform/transform.csv",
-                "bucket": "c7n-sagemaker-job-metrics-valid-shrew",
+                "arn": "arn:aws:s3:::c7n-sagemaker-job-metrics-accepted-dodo/transform/transform.csv",
+                "bucket": "c7n-sagemaker-job-metrics-accepted-dodo",
                 "bucket_key_enabled": false,
                 "cache_control": "",
                 "checksum_algorithm": null,
@@ -263,7 +263,7 @@
                 "content_type": "application/octet-stream",
                 "etag": "2b8648c4b815a1059629333eab750cf6",
                 "force_destroy": false,
-                "id": "c7n-sagemaker-job-metrics-valid-shrew/transform/transform.csv",
+                "id": "c7n-sagemaker-job-metrics-accepted-dodo/transform/transform.csv",
                 "key": "transform/transform.csv",
                 "kms_key_id": null,
                 "metadata": null,
@@ -284,13 +284,13 @@
         },
         "aws_sagemaker_model": {
             "main": {
-                "arn": "arn:aws:sagemaker:us-east-1:644160558196:model/c7n-job-metrics-valid-shrew",
+                "arn": "arn:aws:sagemaker:us-east-1:644160558196:model/c7n-job-metrics-accepted-dodo",
                 "container": [],
                 "enable_network_isolation": false,
-                "execution_role_arn": "arn:aws:iam::644160558196:role/c7n-job-metrics-valid-shrew",
-                "id": "c7n-job-metrics-valid-shrew",
+                "execution_role_arn": "arn:aws:iam::644160558196:role/c7n-job-metrics-accepted-dodo",
+                "id": "c7n-job-metrics-accepted-dodo",
                 "inference_execution_config": [],
-                "name": "c7n-job-metrics-valid-shrew",
+                "name": "c7n-job-metrics-accepted-dodo",
                 "primary_container": [
                     {
                         "additional_model_data_source": [],
@@ -307,12 +307,12 @@
                                         "compression_type": "Gzip",
                                         "model_access_config": [],
                                         "s3_data_type": "S3Object",
-                                        "s3_uri": "s3://c7n-sagemaker-job-metrics-valid-shrew/model.tar.gz"
+                                        "s3_uri": "s3://c7n-sagemaker-job-metrics-accepted-dodo/model.tar.gz"
                                     }
                                 ]
                             }
                         ],
-                        "model_data_url": "s3://c7n-sagemaker-job-metrics-valid-shrew/model.tar.gz",
+                        "model_data_url": "s3://c7n-sagemaker-job-metrics-accepted-dodo/model.tar.gz",
                         "model_package_name": "",
                         "multi_model_config": []
                     }
@@ -325,7 +325,7 @@
         },
         "random_pet": {
             "main": {
-                "id": "valid-shrew",
+                "id": "accepted-dodo",
                 "keepers": null,
                 "length": 2,
                 "prefix": null,

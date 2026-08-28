@@ -4,17 +4,7 @@
         "Metrics": [
             {
                 "Namespace": "/aws/sagemaker/TrainingJobs",
-                "MetricName": "DiskUtilization",
-                "Dimensions": [
-                    {
-                        "Name": "Host",
-                        "Value": "c7n-job-metrics-valid-shrew/algo-1"
-                    }
-                ]
-            },
-            {
-                "Namespace": "/aws/sagemaker/TrainingJobs",
-                "MetricName": "MemoryUtilization",
+                "MetricName": "CPUUtilization",
                 "Dimensions": [
                     {
                         "Name": "Host",
@@ -28,7 +18,7 @@
                 "Dimensions": [
                     {
                         "Name": "Host",
-                        "Value": "c7n-job-metrics-valid-shrew/algo-1"
+                        "Value": "c7n-job-metrics-accepted-dodo/algo-1"
                     }
                 ]
             }

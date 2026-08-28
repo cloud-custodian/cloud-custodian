@@ -1,6 +1,8 @@
 # Copyright The Cloud Custodian Authors.
 # SPDX-License-Identifier: Apache-2.0
+import re
 import time
+from unittest import mock
 
 import boto3
 import pytest
@@ -8,6 +10,7 @@ from pytest_terraform import terraform
 
 from .common import BaseTest
 
+from c7n.filters.metrics import MetricsFilter
 from c7n.resources.sagemaker import SagemakerJobQueryParser, CompilationJobQueryParser
 from c7n.exceptions import PolicyValidationError
 
@@ -1610,6 +1613,24 @@ def test_sagemaker_app(test, sagemaker_studio):
     assert resource['AppName'] == sagemaker_studio['aws_sagemaker_app.untagged.app_name']
 
 
+def capture_dimensions():
+    """Capture the dimensions of each GetMetricStatistics call.
+
+    Flight data is matched on the api call name alone, so asserting on the
+    resources a policy returns says nothing about the dimensions it asked
+    cloudwatch for -- which is the whole of what these filters do.
+    """
+    dimensions = []
+    get_metric_data = MetricsFilter.get_metric_data
+
+    def record(self, client, params):
+        dimensions.append(params['Dimensions'])
+        return get_metric_data(self, client, params)
+
+    return dimensions, mock.patch.object(
+        MetricsFilter, 'get_metric_data', record)
+
+
 @pytest.mark.audited
 @terraform('sagemaker_endpoint_metrics', scope='module')
 def test_sagemaker_endpoint_metrics_idle(test, sagemaker_endpoint_metrics):
@@ -1649,8 +1670,13 @@ def test_sagemaker_endpoint_metrics_idle(test, sagemaker_endpoint_metrics):
         },
         session_factory=factory,
     )
-    [resource] = p.run()
+    dimensions, capture = capture_dimensions()
+    with capture:
+        [resource] = p.run()
     assert resource['EndpointName'] == idle
+    assert [[d['Value'] for d in dims] for dims in dimensions] == [
+        [busy, 'quiet'], [busy, 'busy'], [idle, 'AllTraffic']]
+    assert [d['Name'] for d in dimensions[0]] == ['EndpointName', 'VariantName']
 
 
 @pytest.mark.audited
@@ -1680,9 +1706,15 @@ def test_sagemaker_endpoint_metrics_utilization(test, sagemaker_endpoint_metrics
         },
         session_factory=factory,
     )
-    [resource] = p.run()
+    dimensions, capture = capture_dimensions()
+    with capture:
+        [resource] = p.run()
     assert resource['EndpointName'] == busy
-    assert len(resource['c7n.metrics']) == 1
+    assert [[d['Value'] for d in dims] for dims in dimensions] == [
+        [busy, 'quiet'], [busy, 'busy']]
+    # both variants' datapoints are pooled into the one annotation
+    [datapoints] = resource['c7n.metrics'].values()
+    assert len(datapoints) == 2
 
 
 SAGEMAKER_JOB_RESOURCES = (
@@ -1763,7 +1795,7 @@ def wait_for_job_metrics(name):
     client = boto3.Session().client('cloudwatch')
     namespaces = ['/aws/sagemaker/%sJobs' % kind
                   for kind in ('Training', 'Processing', 'Transform')]
-    for _ in range(20):
+    for _ in range(30):
         for namespace in list(namespaces):
             hosts = client.list_metrics(
                 Namespace=namespace, Dimensions=[{'Name': 'Host'}])['Metrics']
@@ -1787,7 +1819,9 @@ def test_sagemaker_job_metrics(test, sagemaker_job_metrics):
     if test.recording:
         create_sagemaker_jobs(sagemaker_job_metrics)
 
+    hosts = {}
     for resource, name_key in SAGEMAKER_JOB_RESOURCES:
+        dimensions, capture = capture_dimensions()
         for value, op, expected in ((400, 'less-than', [name]),
                                     (1000, 'greater-than', [])):
             p = test.load_policy(
@@ -1808,4 +1842,16 @@ def test_sagemaker_job_metrics(test, sagemaker_job_metrics):
                 },
                 session_factory=factory,
             )
-            assert [r[name_key] for r in p.run()] == expected
+            with capture:
+                assert [r[name_key] for r in p.run()] == expected
+        hosts[resource] = [d['Value'] for dims in dimensions for d in dims]
+
+    algo_hosts = hosts['sagemaker-job'] + hosts['sagemaker-processing-job']
+    assert algo_hosts and all(
+        host.startswith(name + '/algo-') for host in algo_hosts)
+    # a transform job's instances are named by ec2 instance id, so the
+    # training convention would not have found them
+    transform_hosts = hosts['sagemaker-transform-job']
+    assert transform_hosts and all(
+        re.fullmatch(name + '/i-[0-9a-f]+', host)
+        for host in transform_hosts)

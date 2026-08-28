@@ -55,12 +55,17 @@ NotebookInstance.filter_registry.register('onhour', OnHour)
 class SagemakerJobMetrics(MetricsFilter):
     """Filter sagemaker jobs by the cloudwatch metrics of their instances.
 
-    Job metrics are published per instance under a ``Host`` dimension whose
-    value is only known to cloudwatch, so a job's instances are discovered
-    with ``ListMetrics``. A job matches when all of its instances match.
+    Registered on training, processing and batch transform jobs. Their
+    metrics are published per instance under a ``Host`` dimension of
+    ``<job-name>/algo-<n>`` for training and processing jobs, and
+    ``<job-name>/<instance-id>`` for transform jobs, whose instance ids no
+    sagemaker api reports. The instances are therefore discovered with
+    ``ListMetrics``, which only knows metrics that reported data within the
+    last two weeks; a job with no discoverable instances has no metric data,
+    so whether it matches is up to ``missing-value``.
 
-    Only instances that reported the metric within the last two weeks are
-    discoverable, per ``ListMetrics``.
+    A job matches when all of its instances match. Specifying ``dimensions``
+    replaces the discovery.
 
     :example:
 
@@ -82,7 +87,7 @@ class SagemakerJobMetrics(MetricsFilter):
     permissions = MetricsFilter.permissions + ('cloudwatch:ListMetrics',)
 
     def process(self, resources, event=None):
-        self.hosts = self.get_hosts()
+        self.hosts = None if self.data.get('dimensions') else self.get_hosts()
         return super().process(resources, event)
 
     def get_hosts(self):
@@ -93,7 +98,9 @@ class SagemakerJobMetrics(MetricsFilter):
                      self.manager.get_model().metrics_namespace)
         hosts = {}
         for page in client.get_paginator('list_metrics').paginate(
-                Namespace=namespace, Dimensions=[{'Name': 'Host'}]):
+                Namespace=namespace,
+                MetricName=self.data['name'],
+                Dimensions=[{'Name': 'Host'}]):
             for metric in page['Metrics']:
                 host = [d['Value'] for d in metric['Dimensions']
                         if d['Name'] == 'Host'][0]
@@ -101,6 +108,8 @@ class SagemakerJobMetrics(MetricsFilter):
         return hosts
 
     def get_dimension_sets(self, resource):
+        if self.hosts is None:
+            return [[]]
         job = resource[self.manager.get_model().name]
         return [[{'Name': 'Host', 'Value': host}]
                 for host in sorted(self.hosts.get(job, ()))]
@@ -469,7 +478,7 @@ class SagemakerEndpointMetrics(MetricsFilter):
 
     def get_dimension_sets(self, resource):
         endpoint = [{'Name': 'EndpointName', 'Value': resource['EndpointName']}]
-        if 'dimensions' in self.data:
+        if self.data.get('dimensions'):
             return [endpoint]
         return [
             endpoint + [{'Name': 'VariantName', 'Value': v['VariantName']}]

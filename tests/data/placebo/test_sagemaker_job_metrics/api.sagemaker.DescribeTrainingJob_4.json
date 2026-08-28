@@ -1,10 +1,10 @@
 {
     "status_code": 200,
     "data": {
-        "TrainingJobName": "c7n-job-metrics-accepted-dodo",
-        "TrainingJobArn": "arn:aws:sagemaker:us-east-1:644160558196:training-job/c7n-job-metrics-accepted-dodo",
+        "TrainingJobName": "c7n-job-metrics-valid-shrew",
+        "TrainingJobArn": "arn:aws:sagemaker:us-east-1:644160558196:training-job/c7n-job-metrics-valid-shrew",
         "ModelArtifacts": {
-            "S3ModelArtifacts": "s3://c7n-sagemaker-job-metrics-accepted-dodo/output/c7n-job-metrics-accepted-dodo/output/model.tar.gz"
+            "S3ModelArtifacts": "s3://c7n-sagemaker-job-metrics-valid-shrew/output/c7n-job-metrics-valid-shrew/output/model.tar.gz"
         },
         "TrainingJobStatus": "Completed",
         "SecondaryStatus": "Completed",
@@ -127,14 +127,14 @@
             ],
             "EnableSageMakerMetricsTimeSeries": false
         },
-        "RoleArn": "arn:aws:iam::644160558196:role/c7n-job-metrics-accepted-dodo",
+        "RoleArn": "arn:aws:iam::644160558196:role/c7n-job-metrics-valid-shrew",
         "InputDataConfig": [
             {
                 "ChannelName": "train",
                 "DataSource": {
                     "S3DataSource": {
                         "S3DataType": "S3Prefix",
-                        "S3Uri": "s3://c7n-sagemaker-job-metrics-accepted-dodo/train/",
+                        "S3Uri": "s3://c7n-sagemaker-job-metrics-valid-shrew/train/",
                         "S3DataDistributionType": "ShardedByS3Key"
                     }
                 },
@@ -145,7 +145,7 @@
         ],
         "OutputDataConfig": {
             "KmsKeyId": "",
-            "S3OutputPath": "s3://c7n-sagemaker-job-metrics-accepted-dodo/output/",
+            "S3OutputPath": "s3://c7n-sagemaker-job-metrics-valid-shrew/output/",
             "CompressionType": "GZIP"
         },
         "ResourceConfig": {
@@ -161,40 +161,40 @@
             "year": 2026,
             "month": 8,
             "day": 28,
-            "hour": 17,
-            "minute": 11,
-            "second": 13,
-            "microsecond": 119000
+            "hour": 12,
+            "minute": 30,
+            "second": 52,
+            "microsecond": 653000
         },
         "TrainingStartTime": {
             "__class__": "datetime",
             "year": 2026,
             "month": 8,
             "day": 28,
-            "hour": 17,
-            "minute": 14,
-            "second": 15,
-            "microsecond": 334000
+            "hour": 12,
+            "minute": 31,
+            "second": 49,
+            "microsecond": 758000
         },
         "TrainingEndTime": {
             "__class__": "datetime",
             "year": 2026,
             "month": 8,
             "day": 28,
-            "hour": 17,
-            "minute": 16,
-            "second": 27,
-            "microsecond": 721000
+            "hour": 12,
+            "minute": 34,
+            "second": 4,
+            "microsecond": 667000
         },
         "LastModifiedTime": {
             "__class__": "datetime",
             "year": 2026,
             "month": 8,
             "day": 28,
-            "hour": 17,
-            "minute": 16,
-            "second": 28,
-            "microsecond": 13000
+            "hour": 12,
+            "minute": 34,
+            "second": 5,
+            "microsecond": 300000
         },
         "SecondaryStatusTransitions": [
             {
@@ -204,20 +204,20 @@
                     "year": 2026,
                     "month": 8,
                     "day": 28,
-                    "hour": 17,
-                    "minute": 11,
-                    "second": 13,
-                    "microsecond": 119000
+                    "hour": 12,
+                    "minute": 30,
+                    "second": 52,
+                    "microsecond": 653000
                 },
                 "EndTime": {
                     "__class__": "datetime",
                     "year": 2026,
                     "month": 8,
                     "day": 28,
-                    "hour": 17,
-                    "minute": 14,
-                    "second": 15,
-                    "microsecond": 334000
+                    "hour": 12,
+                    "minute": 31,
+                    "second": 49,
+                    "microsecond": 758000
                 },
                 "StatusMessage": "Preparing the instances for training"
             },
@@ -228,20 +228,20 @@
                     "year": 2026,
                     "month": 8,
                     "day": 28,
-                    "hour": 17,
-                    "minute": 14,
-                    "second": 15,
-                    "microsecond": 334000
+                    "hour": 12,
+                    "minute": 31,
+                    "second": 49,
+                    "microsecond": 758000
                 },
                 "EndTime": {
                     "__class__": "datetime",
                     "year": 2026,
                     "month": 8,
                     "day": 28,
-                    "hour": 17,
-                    "minute": 15,
-                    "second": 59,
-                    "microsecond": 476000
+                    "hour": 12,
+                    "minute": 33,
+                    "second": 36,
+                    "microsecond": 398000
                 },
                 "StatusMessage": "Downloading the training image"
             },
@@ -252,20 +252,20 @@
                     "year": 2026,
                     "month": 8,
                     "day": 28,
-                    "hour": 17,
-                    "minute": 15,
-                    "second": 59,
-                    "microsecond": 476000
+                    "hour": 12,
+                    "minute": 33,
+                    "second": 36,
+                    "microsecond": 398000
                 },
                 "EndTime": {
                     "__class__": "datetime",
                     "year": 2026,
                     "month": 8,
                     "day": 28,
-                    "hour": 17,
-                    "minute": 16,
-                    "second": 14,
-                    "microsecond": 972000
+                    "hour": 12,
+                    "minute": 33,
+                    "second": 51,
+                    "microsecond": 837000
                 },
                 "StatusMessage": "Training image download completed. Training in progress."
             },
@@ -276,20 +276,20 @@
                     "year": 2026,
                     "month": 8,
                     "day": 28,
-                    "hour": 17,
-                    "minute": 16,
-                    "second": 14,
-                    "microsecond": 972000
+                    "hour": 12,
+                    "minute": 33,
+                    "second": 51,
+                    "microsecond": 837000
                 },
                 "EndTime": {
                     "__class__": "datetime",
                     "year": 2026,
                     "month": 8,
                     "day": 28,
-                    "hour": 17,
-                    "minute": 16,
-                    "second": 27,
-                    "microsecond": 721000
+                    "hour": 12,
+                    "minute": 34,
+                    "second": 4,
+                    "microsecond": 667000
                 },
                 "StatusMessage": "Uploading generated training model"
             },
@@ -300,20 +300,20 @@
                     "year": 2026,
                     "month": 8,
                     "day": 28,
-                    "hour": 17,
-                    "minute": 16,
-                    "second": 27,
-                    "microsecond": 721000
+                    "hour": 12,
+                    "minute": 34,
+                    "second": 4,
+                    "microsecond": 667000
                 },
                 "EndTime": {
                     "__class__": "datetime",
                     "year": 2026,
                     "month": 8,
                     "day": 28,
-                    "hour": 17,
-                    "minute": 16,
-                    "second": 27,
-                    "microsecond": 721000
+                    "hour": 12,
+                    "minute": 34,
+                    "second": 4,
+                    "microsecond": 667000
                 },
                 "StatusMessage": "Training job completed"
             }
@@ -327,9 +327,9 @@
                     "year": 2026,
                     "month": 8,
                     "day": 28,
-                    "hour": 17,
-                    "minute": 16,
-                    "second": 6,
+                    "hour": 12,
+                    "minute": 33,
+                    "second": 44,
                     "microsecond": 0
                 }
             }
@@ -337,8 +337,8 @@
         "EnableNetworkIsolation": false,
         "EnableInterContainerTrafficEncryption": false,
         "EnableManagedSpotTraining": false,
-        "TrainingTimeInSeconds": 132,
-        "BillableTimeInSeconds": 132,
+        "TrainingTimeInSeconds": 135,
+        "BillableTimeInSeconds": 135,
         "ProfilingStatus": "Disabled",
         "ResponseMetadata": {}
     }

@@ -4,7 +4,7 @@
         "Metrics": [
             {
                 "Namespace": "/aws/sagemaker/TransformJobs",
-                "MetricName": "MemoryUtilization",
+                "MetricName": "CPUUtilization",
                 "Dimensions": [
                     {
                         "Name": "Host",
@@ -18,17 +18,7 @@
                 "Dimensions": [
                     {
                         "Name": "Host",
-                        "Value": "c7n-job-metrics-valid-shrew/i-0ed7a3f0a895e8fc5"
-                    }
-                ]
-            },
-            {
-                "Namespace": "/aws/sagemaker/TransformJobs",
-                "MetricName": "DiskUtilization",
-                "Dimensions": [
-                    {
-                        "Name": "Host",
-                        "Value": "c7n-job-metrics-valid-shrew/i-0ed7a3f0a895e8fc5"
+                        "Value": "c7n-job-metrics-accepted-dodo/i-082abe57ff279caab"
                     }
                 ]
             }

@@ -14,21 +14,11 @@
             },
             {
                 "Namespace": "/aws/sagemaker/ProcessingJobs",
-                "MetricName": "DiskUtilization",
+                "MetricName": "CPUUtilization",
                 "Dimensions": [
                     {
                         "Name": "Host",
-                        "Value": "c7n-job-metrics-valid-shrew/algo-1"
-                    }
-                ]
-            },
-            {
-                "Namespace": "/aws/sagemaker/ProcessingJobs",
-                "MetricName": "MemoryUtilization",
-                "Dimensions": [
-                    {
-                        "Name": "Host",
-                        "Value": "c7n-job-metrics-valid-shrew/algo-1"
+                        "Value": "c7n-job-metrics-accepted-dodo/algo-1"
                     }
                 ]
             }

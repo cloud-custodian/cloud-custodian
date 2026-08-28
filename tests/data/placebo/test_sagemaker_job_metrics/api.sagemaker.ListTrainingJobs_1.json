@@ -3,6 +3,42 @@
     "data": {
         "TrainingJobSummaries": [
             {
+                "TrainingJobName": "c7n-job-metrics-accepted-dodo",
+                "TrainingJobArn": "arn:aws:sagemaker:us-east-1:644160558196:training-job/c7n-job-metrics-accepted-dodo",
+                "CreationTime": {
+                    "__class__": "datetime",
+                    "year": 2026,
+                    "month": 8,
+                    "day": 28,
+                    "hour": 17,
+                    "minute": 11,
+                    "second": 13,
+                    "microsecond": 119000
+                },
+                "TrainingEndTime": {
+                    "__class__": "datetime",
+                    "year": 2026,
+                    "month": 8,
+                    "day": 28,
+                    "hour": 17,
+                    "minute": 16,
+                    "second": 27,
+                    "microsecond": 721000
+                },
+                "LastModifiedTime": {
+                    "__class__": "datetime",
+                    "year": 2026,
+                    "month": 8,
+                    "day": 28,
+                    "hour": 17,
+                    "minute": 16,
+                    "second": 28,
+                    "microsecond": 13000
+                },
+                "TrainingJobStatus": "Completed",
+                "SecondaryStatus": "Completed"
+            },
+            {
                 "TrainingJobName": "c7n-job-metrics-valid-shrew",
                 "TrainingJobArn": "arn:aws:sagemaker:us-east-1:644160558196:training-job/c7n-job-metrics-valid-shrew",
                 "CreationTime": {
