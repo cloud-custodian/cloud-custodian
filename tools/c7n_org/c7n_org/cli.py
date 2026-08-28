@@ -195,7 +195,6 @@ def init(config, use, debug, verbose, accounts, tags, policies,
     logging.getLogger().setLevel(level)
     logging.getLogger('botocore').setLevel(logging.ERROR)
     logging.getLogger('s3transfer').setLevel(logging.WARNING)
-    logging.getLogger('custodian.s3').setLevel(logging.ERROR)
     logging.getLogger('urllib3').setLevel(logging.WARNING)
 
     accounts = comma_expand(accounts)
