@@ -40,11 +40,14 @@ jobs:
           terraform_wrapper: false
           # last OSS version
           terraform_version: "1.5.5"
+      - name: Install just
+        run: |
+          curl --proto '=https' --tlsv1.2 -sSf https://just.systems/install.sh | bash -s -- --to /usr/local/bin
       - name: Lint Check
         env:
           RUFF_OUTPUT_FORMAT: github
         run: |
-          make lint
+          just python lint
       - name: Check Workflows
         run: |
           bash <(curl https://raw.githubusercontent.com/rhysd/actionlint/main/scripts/download-actionlint.bash)
@@ -64,12 +67,15 @@ jobs:
           version: ${{ env.UV_VERSION }}
           enable-cache: true
           cache-suffix: "analyzer"
+      - name: Install just
+        run: |
+          curl --proto '=https' --tlsv1.2 -sSf https://just.systems/install.sh | bash -s -- --to /usr/local/bin
       - name: Run Bandit
         run: |
-          make analyzer-bandit
+          just analyzer bandit
       - name: Run Semgrep
         run: |
-          make analyzer-semgrep
+          just analyzer semgrep
 
   Docs:
     runs-on: ubuntu-latest
@@ -102,7 +108,7 @@ jobs:
       - name: Build Docs
         shell: bash
         run: |
-          make sphinx
+          just docs html
 
       - name: Update Docs Cache
         # basically to prevent the docs cache from going stale as we're not keying
@@ -176,10 +182,10 @@ jobs:
         run: |
           if [[ "$COV_RUN" == "true" ]]
           then
-            make test-coverage COVERAGE_TYPE=term
+            COVERAGE_TYPE=term just python coverage
             uv run coverage xml
           else
-            make test
+            just python test
           fi
 
       - name: Upload Code Coverage
