@@ -29,6 +29,7 @@ ResourceMap = {
   "aws.athena-data-catalog": "c7n.resources.athena.AthenaDataCatalog",
   "aws.athena-named-query": "c7n.resources.athena.AthenaNamedQuery",
   "aws.athena-work-group": "c7n.resources.athena.AthenaWorkGroup",
+  "aws.athena-query-execution": "c7n.resources.athena.AthenaQueryExecution",
   "aws.backup-plan": "c7n.resources.backup.BackupPlan",
   "aws.backup-vault": "c7n.resources.backup.BackupVault",
   "aws.batch-compute": "c7n.resources.batch.ComputeEnvironment",
