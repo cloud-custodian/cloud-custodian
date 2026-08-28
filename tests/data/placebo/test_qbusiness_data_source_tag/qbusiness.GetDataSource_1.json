@@ -1,0 +1,71 @@
+{
+    "status_code": 200,
+    "data": {
+        "ResponseMetadata": {},
+        "applicationId": "ed27546d-6f28-4480-820e-6592404f720f",
+        "indexId": "33c51a98-a798-4424-bf2a-ecd12c2796a4",
+        "dataSourceId": "c9fb5b7a-fdaa-4565-ad89-8062951f7038",
+        "dataSourceArn": "arn:aws:qbusiness:us-east-1:644160558196:application/ed27546d-6f28-4480-820e-6592404f720f/index/33c51a98-a798-4424-bf2a-ecd12c2796a4/data-source/c9fb5b7a-fdaa-4565-ad89-8062951f7038",
+        "displayName": "c7n-test-source",
+        "type": "S3V2",
+        "configuration": {
+            "metadataFilesPrefix": null,
+            "deletionProtectionConfiguration": {
+                "enableDeletionProtection": false,
+                "deletionProtectionThreshold": "1"
+            },
+            "accessControlConfiguration": {
+                "aclConfigurationFilePath": null
+            },
+            "connectionConfiguration": {
+                "bucketName": "aws-cloudtrail-logs-644160558196-786c5163",
+                "bucketOwnerAccountId": "644160558196"
+            },
+            "filterConfiguration": {
+                "inclusionPatterns": [],
+                "maxFileSizeInMegaBytes": "50",
+                "inclusionPrefixes": [],
+                "exclusionPatterns": [],
+                "exclusionPrefixes": []
+            },
+            "type": "S3V2",
+            "version": "1.0.0"
+        },
+        "createdAt": {
+            "__class__": "datetime",
+            "year": 2026,
+            "month": 8,
+            "day": 10,
+            "hour": 16,
+            "minute": 13,
+            "second": 41,
+            "microsecond": 422000
+        },
+        "updatedAt": {
+            "__class__": "datetime",
+            "year": 2026,
+            "month": 8,
+            "day": 10,
+            "hour": 16,
+            "minute": 13,
+            "second": 41,
+            "microsecond": 422000
+        },
+        "description": "",
+        "status": "ACTIVE",
+        "syncSchedule": "cron(13 20 1 * ? *)",
+        "roleArn": "arn:aws:iam::644160558196:role/c7n-test-q-business-role",
+        "error": {},
+        "mediaExtractionConfiguration": {
+            "imageExtractionConfiguration": {
+                "imageExtractionStatus": "DISABLED"
+            },
+            "audioExtractionConfiguration": {
+                "audioExtractionStatus": "DISABLED"
+            },
+            "videoExtractionConfiguration": {
+                "videoExtractionStatus": "DISABLED"
+            }
+        }
+    }
+}
