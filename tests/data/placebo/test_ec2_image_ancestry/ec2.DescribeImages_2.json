@@ -1,0 +1,22 @@
+{
+    "status_code": 200,
+    "data": {
+        "Images": [
+            {
+                "ImageId": "ami-parent456",
+                "Name": "ParentAMI",
+                "OwnerId": "999999999999",
+                "State": "available",
+                "CreationDate": "2024-12-01T00:00:00.000Z",
+                "Architecture": "x86_64",
+                "ImageType": "machine",
+                "Public": false,
+                "RootDeviceType": "ebs"
+            }
+        ],
+        "ResponseMetadata": {
+            "HTTPStatusCode": 200,
+            "RequestId": "test-request-4"
+        }
+    }
+}
