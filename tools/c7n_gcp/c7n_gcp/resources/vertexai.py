@@ -784,6 +784,61 @@ class VertexAIModel(VertexAIQueryManager):
         urn_component = 'model'
 
 
+@resources.register('vertex-ai-evaluation-run')
+class VertexAIEvaluationRun(VertexAIQueryManager):
+    """GCP Vertex AI Evaluation Run Resource
+
+    Vertex AI Evaluation Runs assess model or dataset quality against an
+    evaluation set, producing a terminal state and completion time that
+    can drive a retention-review policy on completed runs.
+
+    :example:
+
+    List all Vertex AI Evaluation Runs across all locations:
+
+    .. code-block:: yaml
+
+        policies:
+          - name: vertexai-evaluation-runs-inventory
+            resource: gcp.vertex-ai-evaluation-run
+
+    :example:
+
+    Find terminal evaluation runs older than 30 days:
+
+    .. code-block:: yaml
+
+        policies:
+          - name: vertex-ai-completed-evaluation-runs-past-retention
+            resource: gcp.vertex-ai-evaluation-run
+            filters:
+              - or:
+                  - type: value
+                    key: state
+                    value: SUCCEEDED
+                  - type: value
+                    key: state
+                    value: FAILED
+                  - type: value
+                    key: state
+                    value: CANCELLED
+              - type: value
+                key: completionTime
+                value_type: age
+                op: greater-than
+                value: 30
+    """
+
+    class resource_type(VertexAITypeInfo):
+        component = 'projects.locations.evaluationRuns'
+        enum_spec = ('list', 'evaluationRuns[]', None)
+        default_report_fields = [
+            'name', 'displayName', 'state', 'createTime', 'completionTime'
+        ]
+        permissions = ('aiplatform.evaluationRuns.list',)
+        urn_component = 'evaluation-run'
+
+
 @resources.register('vertex-ai-batch-prediction-job')
 class VertexAIBatchPredictionJob(VertexAIQueryManager):
     """GCP Vertex AI Batch Prediction Job Resource

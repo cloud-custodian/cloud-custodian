@@ -1,0 +1,60 @@
+{
+  "headers": {
+    "content-type": "application/json; charset=UTF-8",
+    "vary": "Origin, X-Origin, Referer",
+    "date": "Fri, 14 Aug 2026 17:30:43 GMT",
+    "server": "ESF",
+    "x-xss-protection": "0",
+    "x-frame-options": "SAMEORIGIN",
+    "x-content-type-options": "nosniff",
+    "alt-svc": "h3=\":443\"; ma=2592000,h3-29=\":443\"; ma=2592000",
+    "transfer-encoding": "chunked",
+    "status": "200",
+    "content-length": "1457",
+    "-content-encoding": "gzip",
+    "content-location": "https://us-east1-aiplatform.googleapis.com/v1/projects/cloud-custodian/locations/us-east1/evaluationRuns?alt=json"
+  },
+  "body": {
+    "evaluationRuns": [
+      {
+        "name": "projects/cloud-custodian/locations/us-east1/evaluationRuns/3188830011155021824",
+        "displayName": "c7n-test-eval-run-east",
+        "metadata": {
+          "pipeline_id": "38034271868289024"
+        },
+        "dataSource": {
+          "evaluationSet": "projects/cloud-custodian/locations/us-east1/evaluationSets/9104167384217812992"
+        },
+        "evaluationConfig": {
+          "metrics": [
+            {
+              "metric": "exact_match",
+              "computationBasedMetricSpec": {
+                "type": "EXACT_MATCH"
+              }
+            }
+          ]
+        },
+        "state": "SUCCEEDED",
+        "evaluationResults": {
+          "summaryMetrics": {
+            "metrics": {
+              "model-under-test/exact_match/VARIANCE": 0,
+              "model-under-test/exact_match/PERCENTILE_P99": 1,
+              "model-under-test/exact_match/AVERAGE": 1,
+              "model-under-test/exact_match/STANDARD_DEVIATION": 0,
+              "model-under-test/exact_match/PERCENTILE_P95": 1,
+              "model-under-test/exact_match/MINIMUM": 1,
+              "model-under-test/exact_match/MAXIMUM": 1,
+              "model-under-test/exact_match/MEDIAN": 1,
+              "model-under-test/exact_match/PERCENTILE_P90": 1
+            },
+            "totalItems": 1
+          },
+          "evaluationSet": "projects/cloud-custodian/locations/us-east1/evaluationSets/1357976025140559872"
+        },
+        "createTime": "2026-08-14T17:30:36.452268Z"
+      }
+    ]
+  }
+}

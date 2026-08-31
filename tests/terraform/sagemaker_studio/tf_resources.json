@@ -1,0 +1,408 @@
+{
+    "pytest-terraform": 1,
+    "outputs": {
+        "app_arn": {
+            "value": "arn:aws:sagemaker:us-east-1:644160558196:app/d-szjlsjfyqmaq/c7n-profile-comic-chicken/JupyterServer/c7n-app-comic-chicken",
+            "type": "string"
+        },
+        "app_name": {
+            "value": "c7n-app-comic-chicken",
+            "type": "string"
+        },
+        "app_untagged_arn": {
+            "value": "arn:aws:sagemaker:us-east-1:644160558196:app/d-szjlsjfyqmaq/c7n-profile-untagged-comic-chicken/JupyterServer/c7n-app-untagged-comic-chicken",
+            "type": "string"
+        },
+        "app_untagged_name": {
+            "value": "c7n-app-untagged-comic-chicken",
+            "type": "string"
+        },
+        "domain_arn": {
+            "value": "arn:aws:sagemaker:us-east-1:644160558196:domain/d-szjlsjfyqmaq",
+            "type": "string"
+        },
+        "domain_id": {
+            "value": "d-szjlsjfyqmaq",
+            "type": "string"
+        },
+        "space_arn": {
+            "value": "arn:aws:sagemaker:us-east-1:644160558196:space/d-szjlsjfyqmaq/c7nspacecomicchicken",
+            "type": "string"
+        },
+        "space_name": {
+            "value": "c7nspacecomicchicken",
+            "type": "string"
+        },
+        "space_untagged_arn": {
+            "value": "arn:aws:sagemaker:us-east-1:644160558196:space/d-szjlsjfyqmaq/c7nspaceuntaggedcomicchicken",
+            "type": "string"
+        },
+        "space_untagged_name": {
+            "value": "c7nspaceuntaggedcomicchicken",
+            "type": "string"
+        },
+        "user_profile_arn": {
+            "value": "arn:aws:sagemaker:us-east-1:644160558196:user-profile/d-szjlsjfyqmaq/c7n-profile-comic-chicken",
+            "type": "string"
+        },
+        "user_profile_name": {
+            "value": "c7n-profile-comic-chicken",
+            "type": "string"
+        },
+        "user_profile_untagged_arn": {
+            "value": "arn:aws:sagemaker:us-east-1:644160558196:user-profile/d-szjlsjfyqmaq/c7n-profile-untagged-comic-chicken",
+            "type": "string"
+        },
+        "user_profile_untagged_name": {
+            "value": "c7n-profile-untagged-comic-chicken",
+            "type": "string"
+        }
+    },
+    "resources": {
+        "aws_iam_policy_document": {
+            "assume_role": {
+                "id": "1147345228",
+                "json": "{\n  \"Version\": \"2012-10-17\",\n  \"Statement\": [\n    {\n      \"Effect\": \"Allow\",\n      \"Action\": \"sts:AssumeRole\",\n      \"Principal\": {\n        \"Service\": \"sagemaker.amazonaws.com\"\n      }\n    }\n  ]\n}",
+                "minified_json": "{\"Version\":\"2012-10-17\",\"Statement\":[{\"Effect\":\"Allow\",\"Action\":\"sts:AssumeRole\",\"Principal\":{\"Service\":\"sagemaker.amazonaws.com\"}}]}",
+                "override_json": null,
+                "override_policy_documents": null,
+                "policy_id": null,
+                "source_json": null,
+                "source_policy_documents": null,
+                "statement": [
+                    {
+                        "actions": [
+                            "sts:AssumeRole"
+                        ],
+                        "condition": [],
+                        "effect": "Allow",
+                        "not_actions": [],
+                        "not_principals": [],
+                        "not_resources": [],
+                        "principals": [
+                            {
+                                "identifiers": [
+                                    "sagemaker.amazonaws.com"
+                                ],
+                                "type": "Service"
+                            }
+                        ],
+                        "resources": [],
+                        "sid": ""
+                    }
+                ],
+                "version": "2012-10-17"
+            }
+        },
+        "aws_subnets": {
+            "default": {
+                "filter": [
+                    {
+                        "name": "vpc-id",
+                        "values": [
+                            "vpc-06149c26f4c960573"
+                        ]
+                    }
+                ],
+                "id": "us-east-1",
+                "ids": [
+                    "subnet-0a6f6f3abb8e90b2f",
+                    "subnet-006cd2b8ad66e5a41",
+                    "subnet-067e017db7e367654",
+                    "subnet-0716a2a72d6945140",
+                    "subnet-0ace79265977756b4",
+                    "subnet-0ee2c19e2088b1244"
+                ],
+                "region": "us-east-1",
+                "tags": null,
+                "timeouts": null
+            }
+        },
+        "aws_vpc": {
+            "default": {
+                "arn": "arn:aws:ec2:us-east-1:644160558196:vpc/vpc-06149c26f4c960573",
+                "cidr_block": "172.31.0.0/16",
+                "cidr_block_associations": [
+                    {
+                        "association_id": "vpc-cidr-assoc-0301c7ade0bfe0ded",
+                        "cidr_block": "172.31.0.0/16",
+                        "state": "associated"
+                    }
+                ],
+                "default": true,
+                "dhcp_options_id": "dopt-0caef10e2e26f8bde",
+                "enable_dns_hostnames": true,
+                "enable_dns_support": true,
+                "enable_network_address_usage_metrics": false,
+                "filter": null,
+                "id": "vpc-06149c26f4c960573",
+                "instance_tenancy": "default",
+                "ipv6_association_id": "",
+                "ipv6_cidr_block": "",
+                "main_route_table_id": "rtb-0dda7323bf338d504",
+                "owner_id": "644160558196",
+                "region": "us-east-1",
+                "state": null,
+                "tags": {},
+                "timeouts": null
+            }
+        },
+        "aws_iam_role": {
+            "execution": {
+                "arn": "arn:aws:iam::644160558196:role/c7n-sagemaker-studio-comic-chicken",
+                "assume_role_policy": "{\"Statement\":[{\"Action\":\"sts:AssumeRole\",\"Effect\":\"Allow\",\"Principal\":{\"Service\":\"sagemaker.amazonaws.com\"}}],\"Version\":\"2012-10-17\"}",
+                "create_date": "2026-07-15T18:18:31Z",
+                "description": "",
+                "force_detach_policies": false,
+                "id": "c7n-sagemaker-studio-comic-chicken",
+                "inline_policy": [],
+                "managed_policy_arns": [],
+                "max_session_duration": 3600,
+                "name": "c7n-sagemaker-studio-comic-chicken",
+                "name_prefix": "",
+                "path": "/",
+                "permissions_boundary": "",
+                "tags": null,
+                "tags_all": {},
+                "unique_id": "AROAV7EQQKWXRQ4C4RJMP"
+            }
+        },
+        "aws_sagemaker_app": {
+            "main": {
+                "app_name": "c7n-app-comic-chicken",
+                "app_type": "JupyterServer",
+                "arn": "arn:aws:sagemaker:us-east-1:644160558196:app/d-szjlsjfyqmaq/c7n-profile-comic-chicken/JupyterServer/c7n-app-comic-chicken",
+                "domain_id": "d-szjlsjfyqmaq",
+                "id": "arn:aws:sagemaker:us-east-1:644160558196:app/d-szjlsjfyqmaq/c7n-profile-comic-chicken/JupyterServer/c7n-app-comic-chicken",
+                "region": "us-east-1",
+                "resource_spec": [
+                    {
+                        "instance_type": "system",
+                        "lifecycle_config_arn": "",
+                        "sagemaker_image_arn": "arn:aws:ecr:us-east-1:644160558196:repository/looseleaf-jupyter-server-3",
+                        "sagemaker_image_version_alias": "",
+                        "sagemaker_image_version_arn": ""
+                    }
+                ],
+                "space_name": "",
+                "tags": {
+                    "favorite-color": "c7n"
+                },
+                "tags_all": {
+                    "favorite-color": "c7n"
+                },
+                "user_profile_name": "c7n-profile-comic-chicken"
+            },
+            "untagged": {
+                "app_name": "c7n-app-untagged-comic-chicken",
+                "app_type": "JupyterServer",
+                "arn": "arn:aws:sagemaker:us-east-1:644160558196:app/d-szjlsjfyqmaq/c7n-profile-untagged-comic-chicken/JupyterServer/c7n-app-untagged-comic-chicken",
+                "domain_id": "d-szjlsjfyqmaq",
+                "id": "arn:aws:sagemaker:us-east-1:644160558196:app/d-szjlsjfyqmaq/c7n-profile-untagged-comic-chicken/JupyterServer/c7n-app-untagged-comic-chicken",
+                "region": "us-east-1",
+                "resource_spec": [
+                    {
+                        "instance_type": "system",
+                        "lifecycle_config_arn": "",
+                        "sagemaker_image_arn": "arn:aws:ecr:us-east-1:644160558196:repository/looseleaf-jupyter-server-3",
+                        "sagemaker_image_version_alias": "",
+                        "sagemaker_image_version_arn": ""
+                    }
+                ],
+                "space_name": "",
+                "tags": null,
+                "tags_all": {},
+                "user_profile_name": "c7n-profile-untagged-comic-chicken"
+            }
+        },
+        "aws_sagemaker_domain": {
+            "main": {
+                "app_network_access_type": "PublicInternetOnly",
+                "app_security_group_management": "",
+                "arn": "arn:aws:sagemaker:us-east-1:644160558196:domain/d-szjlsjfyqmaq",
+                "auth_mode": "IAM",
+                "default_space_settings": [
+                    {
+                        "custom_file_system_config": [],
+                        "custom_posix_user_config": [],
+                        "execution_role": "arn:aws:iam::644160558196:role/c7n-sagemaker-studio-comic-chicken",
+                        "jupyter_lab_app_settings": [],
+                        "jupyter_server_app_settings": [],
+                        "kernel_gateway_app_settings": [],
+                        "security_groups": null,
+                        "space_storage_settings": []
+                    }
+                ],
+                "default_user_settings": [
+                    {
+                        "auto_mount_home_efs": "Enabled",
+                        "canvas_app_settings": [],
+                        "code_editor_app_settings": [],
+                        "custom_file_system_config": [],
+                        "custom_posix_user_config": [],
+                        "default_landing_uri": "studio::",
+                        "execution_role": "arn:aws:iam::644160558196:role/c7n-sagemaker-studio-comic-chicken",
+                        "jupyter_lab_app_settings": [],
+                        "jupyter_server_app_settings": [],
+                        "kernel_gateway_app_settings": [],
+                        "r_session_app_settings": [],
+                        "r_studio_server_pro_app_settings": [],
+                        "security_groups": null,
+                        "sharing_settings": [],
+                        "space_storage_settings": [],
+                        "studio_web_portal": "ENABLED",
+                        "studio_web_portal_settings": [
+                            {
+                                "hidden_app_types": null,
+                                "hidden_instance_types": null,
+                                "hidden_ml_tools": null
+                            }
+                        ],
+                        "tensor_board_app_settings": []
+                    }
+                ],
+                "domain_name": "c7n-studio-comic-chicken",
+                "domain_settings": [],
+                "home_efs_file_system_id": "fs-099437aea3c1b981b",
+                "id": "d-szjlsjfyqmaq",
+                "kms_key_id": "",
+                "region": "us-east-1",
+                "retention_policy": [
+                    {
+                        "home_efs_file_system": "Delete"
+                    }
+                ],
+                "security_group_id_for_domain_boundary": "",
+                "single_sign_on_application_arn": "",
+                "single_sign_on_managed_application_instance_id": "",
+                "subnet_ids": [
+                    "subnet-0a6f6f3abb8e90b2f"
+                ],
+                "tag_propagation": "DISABLED",
+                "tags": null,
+                "tags_all": {},
+                "url": "https://d-szjlsjfyqmaq.studio.us-east-1.sagemaker.aws",
+                "vpc_id": "vpc-06149c26f4c960573"
+            }
+        },
+        "aws_sagemaker_space": {
+            "main": {
+                "arn": "arn:aws:sagemaker:us-east-1:644160558196:space/d-szjlsjfyqmaq/c7nspacecomicchicken",
+                "domain_id": "d-szjlsjfyqmaq",
+                "home_efs_file_system_uid": "200015",
+                "id": "arn:aws:sagemaker:us-east-1:644160558196:space/d-szjlsjfyqmaq/c7nspacecomicchicken",
+                "ownership_settings": [],
+                "region": "us-east-1",
+                "space_display_name": "",
+                "space_name": "c7nspacecomicchicken",
+                "space_settings": [],
+                "space_sharing_settings": [],
+                "tags": {
+                    "favorite-color": "c7n"
+                },
+                "tags_all": {
+                    "favorite-color": "c7n"
+                },
+                "url": "https://fmbqtou3xkfhnso.studio.us-east-1.sagemaker.aws"
+            },
+            "untagged": {
+                "arn": "arn:aws:sagemaker:us-east-1:644160558196:space/d-szjlsjfyqmaq/c7nspaceuntaggedcomicchicken",
+                "domain_id": "d-szjlsjfyqmaq",
+                "home_efs_file_system_uid": "200005",
+                "id": "arn:aws:sagemaker:us-east-1:644160558196:space/d-szjlsjfyqmaq/c7nspaceuntaggedcomicchicken",
+                "ownership_settings": [],
+                "region": "us-east-1",
+                "space_display_name": "",
+                "space_name": "c7nspaceuntaggedcomicchicken",
+                "space_settings": [],
+                "space_sharing_settings": [],
+                "tags": null,
+                "tags_all": {},
+                "url": "https://yri67bja2mhi76a.studio.us-east-1.sagemaker.aws"
+            }
+        },
+        "aws_sagemaker_user_profile": {
+            "main": {
+                "arn": "arn:aws:sagemaker:us-east-1:644160558196:user-profile/d-szjlsjfyqmaq/c7n-profile-comic-chicken",
+                "domain_id": "d-szjlsjfyqmaq",
+                "home_efs_file_system_uid": "200020",
+                "id": "d-szjlsjfyqmaq/c7n-profile-comic-chicken",
+                "region": "us-east-1",
+                "single_sign_on_user_identifier": "",
+                "single_sign_on_user_value": "",
+                "tags": {
+                    "favorite-color": "c7n"
+                },
+                "tags_all": {
+                    "favorite-color": "c7n"
+                },
+                "user_profile_name": "c7n-profile-comic-chicken",
+                "user_settings": [
+                    {
+                        "auto_mount_home_efs": "DefaultAsDomain",
+                        "canvas_app_settings": [],
+                        "code_editor_app_settings": [],
+                        "custom_file_system_config": [],
+                        "custom_posix_user_config": [],
+                        "default_landing_uri": "",
+                        "execution_role": "arn:aws:iam::644160558196:role/c7n-sagemaker-studio-comic-chicken",
+                        "jupyter_lab_app_settings": [],
+                        "jupyter_server_app_settings": [],
+                        "kernel_gateway_app_settings": [],
+                        "r_session_app_settings": [],
+                        "r_studio_server_pro_app_settings": [],
+                        "security_groups": null,
+                        "sharing_settings": [],
+                        "space_storage_settings": [],
+                        "studio_web_portal": "",
+                        "studio_web_portal_settings": [],
+                        "tensor_board_app_settings": []
+                    }
+                ]
+            },
+            "untagged": {
+                "arn": "arn:aws:sagemaker:us-east-1:644160558196:user-profile/d-szjlsjfyqmaq/c7n-profile-untagged-comic-chicken",
+                "domain_id": "d-szjlsjfyqmaq",
+                "home_efs_file_system_uid": "200010",
+                "id": "d-szjlsjfyqmaq/c7n-profile-untagged-comic-chicken",
+                "region": "us-east-1",
+                "single_sign_on_user_identifier": "",
+                "single_sign_on_user_value": "",
+                "tags": null,
+                "tags_all": {},
+                "user_profile_name": "c7n-profile-untagged-comic-chicken",
+                "user_settings": [
+                    {
+                        "auto_mount_home_efs": "DefaultAsDomain",
+                        "canvas_app_settings": [],
+                        "code_editor_app_settings": [],
+                        "custom_file_system_config": [],
+                        "custom_posix_user_config": [],
+                        "default_landing_uri": "",
+                        "execution_role": "arn:aws:iam::644160558196:role/c7n-sagemaker-studio-comic-chicken",
+                        "jupyter_lab_app_settings": [],
+                        "jupyter_server_app_settings": [],
+                        "kernel_gateway_app_settings": [],
+                        "r_session_app_settings": [],
+                        "r_studio_server_pro_app_settings": [],
+                        "security_groups": null,
+                        "sharing_settings": [],
+                        "space_storage_settings": [],
+                        "studio_web_portal": "",
+                        "studio_web_portal_settings": [],
+                        "tensor_board_app_settings": []
+                    }
+                ]
+            }
+        },
+        "random_pet": {
+            "studio": {
+                "id": "comic-chicken",
+                "keepers": null,
+                "length": 2,
+                "prefix": null,
+                "separator": "-"
+            }
+        }
+    }
+}

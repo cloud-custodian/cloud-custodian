@@ -1,0 +1,18 @@
+{
+    "status_code": 200,
+    "data": {
+        "PaginationToken": "",
+        "ResourceTagMappingList": [
+            {
+                "ResourceARN": "arn:aws:vpc-lattice:us-east-1:644160558196:service/svc-0861b4cd69650046a/listener/listener-02e6d6e4b198fd51a/rule/rule-0aa60409d67d5ea6f",
+                "Tags": [
+                    {
+                        "Key": "ExistingKey",
+                        "Value": "ExistingValue"
+                    }
+                ]
+            }
+        ],
+        "ResponseMetadata": {}
+    }
+}
