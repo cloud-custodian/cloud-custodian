@@ -32,6 +32,20 @@ from functools import lru_cache
 log = logging.getLogger('custodian.azure.session')
 
 
+def _as_bool(value):
+    """Interpret an environment/auth-file value as a boolean.
+
+    Accepts real booleans as well as the string forms commonly used in
+    environment variables, so that AZURE_CLIENT_SEND_CERTIFICATE_CHAIN=false
+    is not read as true the way bool("false") would be.
+    """
+    if isinstance(value, bool):
+        return value
+    if value is None:
+        return False
+    return str(value).strip().lower() in ('1', 'true', 'yes', 'on')
+
+
 class AzureCredential:
     def __init__(self, cloud_endpoints, authorization_file=None, subscription_id_override=None):
         # type: (*str, *str) -> None
@@ -52,8 +66,12 @@ class AzureCredential:
                 'keyvault_secret_id': os.environ.get(constants.ENV_KEYVAULT_SECRET_ID),
                 'client_certificate_path': os.environ.get(
                     constants.ENV_CLIENT_CERTIFICATE_PATH),
+                'client_certificate_data': os.environ.get(
+                    constants.ENV_CLIENT_CERTIFICATE_DATA),
                 'client_certificate_password': os.environ.get(
                     constants.ENV_CLIENT_CERTIFICATE_PASSWORD),
+                'client_certificate_send_chain': _as_bool(os.environ.get(
+                    constants.ENV_CLIENT_SEND_CERTIFICATE_CHAIN)),
                 'enable_cli_auth': True
             }
 
@@ -99,13 +117,26 @@ class AzureCredential:
                 authority=self._auth_params['authority'])
         elif (self._auth_params.get('client_id') and
               self._auth_params.get('tenant_id') and
-              self._auth_params.get('client_certificate_path')):
+              (self._auth_params.get('client_certificate_path') or
+               self._auth_params.get('client_certificate_data'))):
             auth_name = 'Certificate'
+            # certificate_path and certificate_data are mutually exclusive,
+            # a path takes precedence when both are supplied.
+            if self._auth_params.get('client_certificate_path'):
+                certificate_source = {
+                    'certificate_path': self._auth_params['client_certificate_path']}
+            else:
+                certificate_data = self._auth_params['client_certificate_data']
+                if isinstance(certificate_data, str):
+                    certificate_data = certificate_data.encode()
+                certificate_source = {'certificate_data': certificate_data}
             self._credential = CertificateCredential(
                 client_id=self._auth_params['client_id'],
                 tenant_id=self._auth_params['tenant_id'],
-                certificate_path=self._auth_params['client_certificate_path'],
-                password=self._auth_params['client_certificate_password'],
+                password=self._auth_params.get('client_certificate_password'),
+                send_certificate_chain=_as_bool(
+                    self._auth_params.get('client_certificate_send_chain')),
+                **certificate_source
             )
         elif self._auth_params.get('use_msi'):
             auth_name = 'MSI'
@@ -368,10 +399,13 @@ class Session:
             constants.ENV_FUNCTION_CLIENT_SECRET
         ]
 
-        required_params = ['client_id', 'client_secret', 'tenant_id']
+        auth_params = self.credentials.auth_params
 
-        function_auth_params = {k: v for k, v in self.credentials.auth_params.items()
-                                if k in required_params and v is not None}
+        # An empty value is treated as absent, so that a caller passing an unset
+        # client secret through as an empty string still falls back to certificate
+        # authentication rather than failing validation below.
+        function_auth_params = {k: v for k, v in auth_params.items()
+                                if k in ('client_id', 'tenant_id', 'client_secret') and v}
         function_auth_params['subscription_id'] = target_subscription_id
 
         # Use dedicated function env vars if available
@@ -380,11 +414,36 @@ class Session:
             function_auth_params['client_secret'] = os.environ[constants.ENV_FUNCTION_CLIENT_SECRET]
             function_auth_params['tenant_id'] = os.environ[constants.ENV_FUNCTION_TENANT_ID]
 
+        # A certificate is an alternative to a client secret. It is embedded in
+        # the auth file rather than referenced by path, because the path from the
+        # deploying environment does not exist in the function host.
+        if 'client_secret' not in function_auth_params:
+            certificate_data = auth_params.get('client_certificate_data')
+            certificate_path = auth_params.get('client_certificate_path')
+            if not certificate_data and certificate_path:
+                with open(certificate_path, 'rb') as certificate_file:
+                    certificate_bytes = certificate_file.read()
+                if b'-----BEGIN' not in certificate_bytes:
+                    raise ValueError(
+                        "Only PEM certificates can be embedded in the function auth "
+                        "file, convert {} to PEM.".format(certificate_path))
+                certificate_data = certificate_bytes.decode()
+            if certificate_data:
+                function_auth_params['client_certificate_data'] = certificate_data
+                if auth_params.get('client_certificate_password'):
+                    function_auth_params['client_certificate_password'] = \
+                        auth_params['client_certificate_password']
+                function_auth_params['client_certificate_send_chain'] = _as_bool(
+                    auth_params.get('client_certificate_send_chain'))
+
         # Verify SP authentication parameters
-        if any(k not in function_auth_params.keys() for k in required_params):
+        if (not all(k in function_auth_params for k in ('client_id', 'tenant_id')) or
+                not (function_auth_params.get('client_secret') or
+                     function_auth_params.get('client_certificate_data'))):
             raise NotImplementedError(
-                "Service Principal credentials are the only "
-                "supported auth mechanism for deploying functions.")
+                "Service Principal credentials, either a client secret or a "
+                "certificate, are the only supported auth mechanism for "
+                "deploying functions.")
 
         return json.dumps(function_auth_params, indent=2)
 
