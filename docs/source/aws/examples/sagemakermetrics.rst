@@ -1,32 +1,15 @@
-Filtering SageMaker based on CloudWatch metrics
-===============================================
+Filtering SageMaker resources on CloudWatch metrics
+===================================================
 
-SageMaker publishes no metric for an endpoint or a job as a whole. Every
-series it publishes is dimensioned one level finer -- per production variant
-for an endpoint, per instance for a job -- so the ``metrics`` filter queries
-one series per variant, or per instance, and combines them.
+The ``metrics`` filter selects SageMaker endpoints and jobs by their
+CloudWatch metrics: endpoints nobody is calling, GPUs barely being used,
+instances that were over-provisioned for the work.
 
-One resource, several series
-----------------------------
+Endpoints that serve no traffic
+-------------------------------
 
-CloudWatch identifies a metric by its namespace, its name, and its exact set
-of dimensions; each distinct set is a separate series. An endpoint named
-``inference`` with variants ``blue`` and ``green`` has two series for
-``Invocations``:
-
-.. code-block:: text
-
-    AWS/SageMaker  Invocations  {EndpointName: inference, VariantName: blue}
-    AWS/SageMaker  Invocations  {EndpointName: inference, VariantName: green}
-
-There is no ``{EndpointName: inference}`` series to ask for, and CloudWatch
-returns statistics only for dimension sets that were actually published --
-never a total across them.
-
-The filter therefore reads the endpoint's variants and queries each one. The
-endpoint matches only if **every datapoint of every series** satisfies the
-condition, so this policy means "no variant of this endpoint has been
-invoked on any of the last 7 days":
+An endpoint bills for its instances from creation until it is deleted,
+whether or not anything calls it.
 
 .. code-block:: yaml
 
@@ -34,7 +17,7 @@ invoked on any of the last 7 days":
       - name: sagemaker-endpoints-idle
         resource: aws.sagemaker-endpoint
         description: |
-          Endpoints billing for instances while serving no traffic
+          In-service endpoints with no invocations in the last week
         filters:
           - EndpointStatus: InService
           - type: metrics
@@ -46,24 +29,45 @@ invoked on any of the last 7 days":
             op: lte
             missing-value: 0
 
-``days`` sets the window and ``period`` divides it into buckets, so
-``days: 7, period: 86400`` asks for seven daily sums -- and all seven, from
-both variants, have to be zero. Widen ``period`` to cover the whole window
-and you are instead testing a single aggregate over the week.
+``missing-value: 0`` is what catches an endpoint that has never been called
+at all: CloudWatch has no invocation data for it, and without a stand-in
+value the filter has nothing to compare and passes it over.
 
-An endpoint whose variants have different instance types will have variants
-that publish nothing for a given metric: GPU metrics do not exist for a
-variant with no GPU. Such a series returns no datapoints and drops out of
-the comparison, leaving the endpoint judged on the variants that do report.
-Scope the policy rather than relying on that.
+Endpoints with under-used GPUs
+------------------------------
 
-Batch transform, training and processing jobs work the same way, one series
-per instance:
+Utilization metrics live in their own namespace, so name it:
 
 .. code-block:: yaml
 
     policies:
-      - name: sagemaker-training-jobs-idle-gpu
+      - name: sagemaker-endpoints-underused-gpu
+        resource: aws.sagemaker-endpoint
+        filters:
+          - EndpointStatus: InService
+          - type: metrics
+            namespace: /aws/sagemaker/Endpoints
+            name: GPUMemoryUtilization
+            statistics: Average
+            days: 14
+            period: 86400
+            value: 20
+            op: less-than
+
+The same namespace carries ``CPUUtilization``, ``MemoryUtilization``,
+``GPUUtilization`` and ``DiskUtilization``. Don't add ``missing-value`` to a
+policy like this one -- see below.
+
+Jobs with under-used instances
+------------------------------
+
+Training, processing and batch transform jobs each default to their own
+namespace, so no ``namespace`` key is needed:
+
+.. code-block:: yaml
+
+    policies:
+      - name: sagemaker-training-jobs-underused-gpu
         resource: aws.sagemaker-job
         filters:
           - type: metrics
@@ -74,32 +78,38 @@ per instance:
             value: 10
             op: less-than
 
-missing-value belongs with totals
----------------------------------
+Job resources return in-progress jobs unless the policy says otherwise, so
+this reports on jobs while they run. Add ``query: [{StatusEquals:
+Completed}]`` to look at finished ones -- their metrics stay available for
+two weeks.
 
-When a series has no data at all, the filter has nothing to compare and
-skips the resource -- it can never match. ``missing-value`` supplies a
-stand-in datapoint so the comparison happens anyway. Buckets *within* a
-series that have no data are simply absent from the results; nothing can be
-substituted for an individual day.
+Adapting these policies
+-----------------------
 
-Whether a stand-in is legitimate depends on what the metric counts:
+**The threshold applies to every interval, not to an average.** ``days``
+sets the window and ``period`` divides it into intervals, in seconds, so
+``days: 14, period: 86400`` gives fourteen daily figures and the resource
+matches only if *all fourteen* satisfy ``op``. One busy day exempts a
+resource from the GPU policy above. To test a single figure for the whole
+window, leave ``period`` out.
 
-- For a total, use it. No ``Invocations`` datapoint means no invocation
-  occurred, so ``missing-value: 0`` states a fact -- and it is what lets the
-  policy above find an endpoint that has never been called since it was
-  created, which is the most idle endpoint of all.
+**A policy covers every variant of an endpoint, and every instance of a
+job.** SageMaker reports separately for each production variant and each job
+instance, and the filter checks all of them: an endpoint counts as idle only
+if none of its variants was invoked. A variant or instance that reports no
+data for the metric is passed over, so an endpoint with one GPU variant and
+one CPU variant is judged on the GPU variant alone for a GPU metric. Filter
+on ``ProductionVariants`` if you need to be certain what you are measuring.
 
-- For a utilization average, leave it out. No ``CPUUtilization`` datapoint
-  means nothing was measured, not that nothing was used. Filling in ``0``
-  asserts an instance was idle when all you know is that it did not report.
+**Use ``missing-value`` for counts, not for utilization.** No
+``Invocations`` datapoint means no request arrived, so ``missing-value: 0``
+records a fact. No ``CPUUtilization`` datapoint means nothing was measured,
+which is not the same as idle -- filling in ``0`` there claims knowledge you
+don't have, and can flag a busy instance that stopped reporting. A stand-in
+value also applies only to a metric with no data *at all*; intervals with no
+data inside an otherwise reporting metric are simply absent.
 
-Naming dimensions explicitly
-----------------------------
-
-The filter fills in the dimensions itself, which is what makes the policies
-above short. To query a different set, give ``dimensions`` and the filter
-uses yours instead of expanding over variants or instances:
+**Add ``dimensions`` to measure one variant instead of all of them.**
 
 .. code-block:: yaml
 
@@ -112,48 +122,36 @@ uses yours instead of expanding over variants or instances:
             value: 20
             op: less-than
             dimensions:
-              VariantName: gpu
+              VariantName: primary
 
-The dimension sets SageMaker publishes, and what the filter uses by default:
+SageMaker also reports per instance type within a variant using instance
+pools (``InstanceType``), and per instance and accelerator when the endpoint
+configuration enables enhanced metrics (``InstanceId``, ``AcceleratorId``).
+Any of those can go in ``dimensions``.
+
+Default namespaces
+------------------
 
 .. list-table::
    :header-rows: 1
-   :widths: 22 30 48
+   :widths: 34 33 33
 
    * - Resource
      - Default namespace
-     - Dimensions
+     - Utilization metrics in
    * - ``sagemaker-endpoint``
      - ``AWS/SageMaker``
-     - ``EndpointName`` + ``VariantName``, one query per production variant.
-       Also published: ``EndpointName, VariantName, InstanceType`` for
-       variants using instance pools, and ``InstanceId`` /
-       ``AcceleratorId`` when the endpoint config enables enhanced metrics.
+     - ``/aws/sagemaker/Endpoints``
    * - ``sagemaker-job``
      - ``/aws/sagemaker/TrainingJobs``
-     - ``Host``, one query per instance
+     - same
    * - ``sagemaker-processing-job``
      - ``/aws/sagemaker/ProcessingJobs``
-     - ``Host``, one query per instance
+     - same
    * - ``sagemaker-transform-job``
      - ``/aws/sagemaker/TransformJobs``
-     - ``Host``, one query per instance
+     - same
 
-Endpoint *utilization* metrics -- ``CPUUtilization``, ``MemoryUtilization``,
-``GPUUtilization``, ``GPUMemoryUtilization``, ``DiskUtilization`` -- are in
-the ``/aws/sagemaker/Endpoints`` namespace rather than the default, so those
-policies have to name it. Invocation metrics are in the default.
-
-A job's ``Host`` value is ``<job-name>/algo-<n>`` for training and
-processing jobs, and ``<job-name>/<instance-id>`` for transform jobs, whose
-instance ids no SageMaker API reports. The filter discovers the values from
-CloudWatch, which only lists metrics that reported within the last two
-weeks.
-
-References
-----------
-
-- `SageMaker metrics in CloudWatch
-  <https://docs.aws.amazon.com/sagemaker/latest/dg/monitoring-cloudwatch.html>`_
-- `GetMetricStatistics
-  <https://docs.aws.amazon.com/AmazonCloudWatch/latest/APIReference/API_GetMetricStatistics.html>`_
+For the metric names each namespace offers, see `SageMaker metrics in
+CloudWatch
+<https://docs.aws.amazon.com/sagemaker/latest/dg/monitoring-cloudwatch.html>`_.

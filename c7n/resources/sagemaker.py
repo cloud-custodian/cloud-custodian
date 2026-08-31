@@ -53,19 +53,17 @@ NotebookInstance.filter_registry.register('onhour', OnHour)
 
 
 class SagemakerJobMetrics(MetricsFilter):
-    """Filter sagemaker jobs by the cloudwatch metrics of their instances.
+    """Filter sagemaker jobs by their instances' cloudwatch metrics.
 
-    Registered on training, processing and batch transform jobs. Their
-    metrics are published per instance under a ``Host`` dimension of
-    ``<job-name>/algo-<n>`` for training and processing jobs, and
-    ``<job-name>/<instance-id>`` for transform jobs, whose instance ids no
-    sagemaker api reports. The instances are therefore discovered with
-    ``ListMetrics``, which only knows metrics that reported data within the
-    last two weeks; a job with no discoverable instances has no metric data,
-    so whether it matches is up to ``missing-value``.
+    Registered on training, processing and batch transform jobs. A job
+    matches when every one of its instances matches. Only instances that
+    reported the metric within the last two weeks can be found, so a job
+    that ran longer ago than that has no metric data.
 
-    A job matches when all of its instances match. Specifying ``dimensions``
-    replaces the discovery.
+    Set ``dimensions`` to measure one instance instead of all of them, by
+    its ``Host`` -- ``<job-name>/algo-<n>`` for a training or processing
+    job. A transform job's hosts carry an ec2 instance id that no sagemaker
+    api reports, so those can only be discovered.
 
     :example:
 
