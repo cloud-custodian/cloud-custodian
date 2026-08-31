@@ -248,10 +248,11 @@ class MetricsFilter(Filter):
         CloudWatch treats each dimension combination as a distinct metric,
         so resources whose metrics are published per sub unit (an endpoint
         variant, a job instance) need one query per sub unit. Override to
-        return a dimension set per sub unit; the sets' datapoints are pooled,
-        so the resource matches only if every datapoint of every sub unit
-        does. Sub units reporting no data drop out of the comparison unless
-        the policy sets missing-value.
+        return a dimension set per sub unit; the sets' datapoints are
+        pooled, so the resource matches only if every datapoint of every sub
+        unit does. A sub unit that reports no data contributes none, and so
+        drops out of the comparison; missing-value applies only when no sub
+        unit reported at all.
         """
         return [self.get_dimensions(resource)]
 
@@ -262,11 +263,6 @@ class MetricsFilter(Filter):
         for k, v in self.data['dimensions'].items():
             dims.append({'Name': k, 'Value': v})
         return dims
-
-    def get_missing_datapoint(self):
-        return {'Timestamp': self.start,
-                self.statistics: self.data['missing-value'],
-                'c7n:detail': 'Fill value for missing data'}
 
     def get_metric_data(self, client, params):
         """Retrieve metric datapoints in the filter's normalized shape.
@@ -313,12 +309,7 @@ class MetricsFilter(Filter):
                         Dimensions=dimensions
                     )
                     params[stats_key] = [self.statistics]
-                    points = self.get_metric_data(client, params)
-                    # fill per dimension set: a sub unit reporting nothing
-                    # would otherwise vanish into the other sets' datapoints
-                    if not points and 'missing-value' in self.data:
-                        points = [self.get_missing_datapoint()]
-                    datapoints.extend(points)
+                    datapoints.extend(self.get_metric_data(client, params))
                 collected_metrics[key] = datapoints
 
             # In certain cases CloudWatch reports no data for a metric.
@@ -328,7 +319,11 @@ class MetricsFilter(Filter):
             if len(collected_metrics[key]) == 0:
                 if 'missing-value' not in self.data:
                     continue
-                collected_metrics[key].append(self.get_missing_datapoint())
+                collected_metrics[key].append({
+                    'Timestamp': self.start,
+                    self.statistics: self.data['missing-value'],
+                    'c7n:detail': 'Fill value for missing data'
+                })
 
             if self.data.get('percent-attr'):
                 rvalue = r[self.data.get('percent-attr')]
