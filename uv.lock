@@ -1024,6 +1024,20 @@ wheels = [
 ]
 
 [[package]]
+name = "azure-mgmt-privatedns"
+version = "2.0.0"
+source = { registry = "https://pypi.org/simple" }
+dependencies = [
+    { name = "azure-mgmt-core" },
+    { name = "isodate" },
+    { name = "typing-extensions" },
+]
+sdist = { url = "https://files.pythonhosted.org/packages/6f/1f/5b79c8677553ca55ab2f09386b9a080adf0b69ea396d928a2a88fcaf069c/azure_mgmt_privatedns-2.0.0.tar.gz", hash = "sha256:e064d222115382493c76be1096e4d8300eb31a9ef45c198aa1919933cb90a124", size = 80136, upload-time = "2026-07-29T09:25:22.926Z" }
+wheels = [
+    { url = "https://files.pythonhosted.org/packages/82/fe/ee58e51a6c28b1dd2eca5fc2e1c0fd0d12edafc4bd94d2683b59d724daab/azure_mgmt_privatedns-2.0.0-py3-none-any.whl", hash = "sha256:c04bfaab7bbfaf2c432dcf4ced18ea0373032f2c87f66d78c17f83baf5930644", size = 82952, upload-time = "2026-07-29T09:25:23.915Z" },
+]
+
+[[package]]
 name = "azure-mgmt-rdbms"
 version = "10.2.0b17"
 source = { registry = "https://pypi.org/simple" }
@@ -1662,6 +1676,7 @@ dependencies = [
     { name = "azure-mgmt-msi" },
     { name = "azure-mgmt-network" },
     { name = "azure-mgmt-policyinsights" },
+    { name = "azure-mgmt-privatedns" },
     { name = "azure-mgmt-rdbms" },
     { name = "azure-mgmt-recoveryservices" },
     { name = "azure-mgmt-recoveryservicesbackup" },
@@ -1753,6 +1768,7 @@ requires-dist = [
     { name = "azure-mgmt-msi", specifier = ">=1.0.0,<2.0.0" },
     { name = "azure-mgmt-network", specifier = ">=28.0.0,<29.0.0" },
     { name = "azure-mgmt-policyinsights", specifier = ">=1.0.0,<2.0.0" },
+    { name = "azure-mgmt-privatedns", specifier = ">=2.0.0,<3.0.0" },
     { name = "azure-mgmt-rdbms", specifier = "==10.2.0b17" },
     { name = "azure-mgmt-recoveryservices", specifier = ">=3.1.0,<4.0.0" },
     { name = "azure-mgmt-recoveryservicesbackup", specifier = ">=7.0.0,<8.0.0" },
