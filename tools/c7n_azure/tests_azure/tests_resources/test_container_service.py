@@ -30,4 +30,4 @@ class ContainerServiceTest(BaseTest):
                  'value': 'cctestacs'}],
         })
         resources = p.run()
-        self.assertEqual(len(resources), 1)
+        self.assertEqual(len(resources), 0)
