@@ -242,6 +242,20 @@ class MetricsFilter(Filter):
         return [{'Name': self.model.dimension,
                  'Value': resource[self.model.dimension]}]
 
+    def get_dimension_sets(self, resource):
+        """The dimension sets to query for a resource.
+
+        CloudWatch treats each dimension combination as a distinct metric,
+        so resources whose metrics are published per sub unit (an endpoint
+        variant, a job instance) need one query per sub unit. Override to
+        return a dimension set per sub unit; the sets' datapoints are
+        pooled, so the resource matches only if every datapoint of every sub
+        unit does. A sub unit that reports no data contributes none, and so
+        drops out of the comparison; missing-value applies only when no sub
+        unit reported at all.
+        """
+        return [self.get_dimensions(resource)]
+
     def get_user_dimensions(self):
         dims = []
         if 'dimensions' not in self.data:
@@ -266,10 +280,12 @@ class MetricsFilter(Filter):
         for r in resource_set:
             # if we overload dimensions with multiple resources we get
             # the statistics/average over those resources.
-            dimensions = self.get_dimensions(r)
             # Merge in any filter specified metrics, get_dimensions is
             # commonly overridden so we can't do it there.
-            dimensions.extend(self.get_user_dimensions())
+            user_dimensions = self.get_user_dimensions()
+            dimension_sets = [
+                dimensions + user_dimensions
+                for dimensions in self.get_dimension_sets(r)]
 
             collected_metrics = r.setdefault('c7n.metrics', {})
             # Note this annotation cache is policy scoped, not across
@@ -278,21 +294,23 @@ class MetricsFilter(Filter):
             # across different periods or dimensions would be problematic.
             key = "%s.%s.%s.%s" % (self.namespace, self.metric, self.statistics, str(self.days))
 
-            params = dict(
-                Namespace=self.namespace,
-                MetricName=self.metric,
-                StartTime=self.start,
-                EndTime=self.end,
-                Period=self.period,
-                Dimensions=dimensions
-            )
-
             stats_key = (self.statistics in self.standard_stats
                          and 'Statistics' or 'ExtendedStatistics')
-            params[stats_key] = [self.statistics]
 
             if key not in collected_metrics:
-                collected_metrics[key] = self.get_metric_data(client, params)
+                datapoints = []
+                for dimensions in dimension_sets:
+                    params = dict(
+                        Namespace=self.namespace,
+                        MetricName=self.metric,
+                        StartTime=self.start,
+                        EndTime=self.end,
+                        Period=self.period,
+                        Dimensions=dimensions
+                    )
+                    params[stats_key] = [self.statistics]
+                    datapoints.extend(self.get_metric_data(client, params))
+                collected_metrics[key] = datapoints
 
             # In certain cases CloudWatch reports no data for a metric.
             # If the policy specifies a fill value for missing data, add

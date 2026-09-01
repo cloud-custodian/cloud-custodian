@@ -1,0 +1,23 @@
+{
+    "status_code": 200,
+    "data": {
+        "Label": "CPUUtilization",
+        "Datapoints": [
+            {
+                "Timestamp": {
+                    "__class__": "datetime",
+                    "year": 2026,
+                    "month": 8,
+                    "day": 28,
+                    "hour": 11,
+                    "minute": 5,
+                    "second": 0,
+                    "microsecond": 0
+                },
+                "Average": 154.51705120078722,
+                "Unit": "Percent"
+            }
+        ],
+        "ResponseMetadata": {}
+    }
+}

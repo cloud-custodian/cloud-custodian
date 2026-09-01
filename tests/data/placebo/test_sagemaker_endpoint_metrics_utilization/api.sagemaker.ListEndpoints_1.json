@@ -1,0 +1,58 @@
+{
+    "status_code": 200,
+    "data": {
+        "Endpoints": [
+            {
+                "EndpointName": "c7n-endpoint-metrics-busy-literate-raptor",
+                "EndpointArn": "arn:aws:sagemaker:us-east-1:644160558196:endpoint/c7n-endpoint-metrics-busy-literate-raptor",
+                "CreationTime": {
+                    "__class__": "datetime",
+                    "year": 2026,
+                    "month": 8,
+                    "day": 28,
+                    "hour": 11,
+                    "minute": 51,
+                    "second": 59,
+                    "microsecond": 161000
+                },
+                "LastModifiedTime": {
+                    "__class__": "datetime",
+                    "year": 2026,
+                    "month": 8,
+                    "day": 28,
+                    "hour": 11,
+                    "minute": 59,
+                    "second": 7,
+                    "microsecond": 609000
+                },
+                "EndpointStatus": "InService"
+            },
+            {
+                "EndpointName": "c7n-endpoint-metrics-idle-literate-raptor",
+                "EndpointArn": "arn:aws:sagemaker:us-east-1:644160558196:endpoint/c7n-endpoint-metrics-idle-literate-raptor",
+                "CreationTime": {
+                    "__class__": "datetime",
+                    "year": 2026,
+                    "month": 8,
+                    "day": 28,
+                    "hour": 11,
+                    "minute": 51,
+                    "second": 57,
+                    "microsecond": 532000
+                },
+                "LastModifiedTime": {
+                    "__class__": "datetime",
+                    "year": 2026,
+                    "month": 8,
+                    "day": 28,
+                    "hour": 11,
+                    "minute": 58,
+                    "second": 59,
+                    "microsecond": 921000
+                },
+                "EndpointStatus": "InService"
+            }
+        ],
+        "ResponseMetadata": {}
+    }
+}

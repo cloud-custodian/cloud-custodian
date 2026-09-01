@@ -118,7 +118,7 @@ ignore = ["E741", "E401"]
 [tool.pytest.ini_options]
 junit_family = "xunit2"
 addopts = "--tb=native"
-markers = ["functional", "skiplive", "audited"]
+markers = ["functional", "skiplive", "audited", "reference_data"]
 python_files = "test_*.py"
 norecursedirs = ["data", "cassettes", "templates", "terraform"]
 filterwarnings = [
