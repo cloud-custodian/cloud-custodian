@@ -1,9 +1,9 @@
 {
     "status_code": 200,
     "data": {
-        "EndpointName": "c7n-endpoint-metrics-busy-literate-raptor",
-        "EndpointArn": "arn:aws:sagemaker:us-east-1:644160558196:endpoint/c7n-endpoint-metrics-busy-literate-raptor",
-        "EndpointConfigName": "c7n-endpoint-metrics-busy-literate-raptor",
+        "EndpointName": "c7n-endpoint-metrics-upward-hippo-busy",
+        "EndpointArn": "arn:aws:sagemaker:us-east-1:644160558196:endpoint/c7n-endpoint-metrics-upward-hippo-busy",
+        "EndpointConfigName": "c7n-endpoint-metrics-upward-hippo-busy",
         "ProductionVariants": [
             {
                 "VariantName": "quiet",
@@ -14,12 +14,12 @@
                         "ResolutionTime": {
                             "__class__": "datetime",
                             "year": 2026,
-                            "month": 8,
-                            "day": 28,
-                            "hour": 11,
-                            "minute": 51,
-                            "second": 59,
-                            "microsecond": 731000
+                            "month": 9,
+                            "day": 1,
+                            "hour": 16,
+                            "minute": 58,
+                            "second": 35,
+                            "microsecond": 267000
                         }
                     }
                 ],
@@ -37,12 +37,12 @@
                         "ResolutionTime": {
                             "__class__": "datetime",
                             "year": 2026,
-                            "month": 8,
-                            "day": 28,
-                            "hour": 11,
-                            "minute": 51,
-                            "second": 59,
-                            "microsecond": 796000
+                            "month": 9,
+                            "day": 1,
+                            "hour": 16,
+                            "minute": 58,
+                            "second": 35,
+                            "microsecond": 201000
                         }
                     }
                 ],
@@ -56,22 +56,22 @@
         "CreationTime": {
             "__class__": "datetime",
             "year": 2026,
-            "month": 8,
-            "day": 28,
-            "hour": 11,
-            "minute": 51,
-            "second": 59,
-            "microsecond": 161000
+            "month": 9,
+            "day": 1,
+            "hour": 16,
+            "minute": 58,
+            "second": 34,
+            "microsecond": 387000
         },
         "LastModifiedTime": {
             "__class__": "datetime",
             "year": 2026,
-            "month": 8,
-            "day": 28,
-            "hour": 11,
-            "minute": 59,
-            "second": 7,
-            "microsecond": 609000
+            "month": 9,
+            "day": 1,
+            "hour": 17,
+            "minute": 5,
+            "second": 16,
+            "microsecond": 782000
         },
         "MetricsConfig": {
             "EnableDetailedObservability": true

@@ -1,21 +1,21 @@
 {
     "status_code": 200,
     "data": {
-        "Label": "Invocations",
+        "Label": "CPUUtilization",
         "Datapoints": [
             {
                 "Timestamp": {
                     "__class__": "datetime",
                     "year": 2026,
-                    "month": 8,
-                    "day": 31,
-                    "hour": 17,
-                    "minute": 11,
+                    "month": 9,
+                    "day": 1,
+                    "hour": 16,
+                    "minute": 16,
                     "second": 0,
                     "microsecond": 0
                 },
-                "Sum": 5.0,
-                "Unit": "None"
+                "Average": 7.620476129408425,
+                "Unit": "Percent"
             }
         ],
         "ResponseMetadata": {}

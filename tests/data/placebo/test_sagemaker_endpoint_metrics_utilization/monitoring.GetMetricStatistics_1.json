@@ -7,14 +7,14 @@
                 "Timestamp": {
                     "__class__": "datetime",
                     "year": 2026,
-                    "month": 8,
-                    "day": 28,
-                    "hour": 11,
-                    "minute": 5,
+                    "month": 9,
+                    "day": 1,
+                    "hour": 16,
+                    "minute": 11,
                     "second": 0,
                     "microsecond": 0
                 },
-                "Average": 153.644160558196,
+                "Average": 134.92706400721872,
                 "Unit": "Percent"
             }
         ],

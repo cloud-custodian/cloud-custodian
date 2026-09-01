@@ -1,6 +1,10 @@
 # Copyright The Cloud Custodian Authors.
 # SPDX-License-Identifier: Apache-2.0
 
+import json
+
+import importlib.resources
+
 from c7n.actions import BaseAction
 from c7n.manager import resources
 from c7n.query import QueryResourceManager, TypeInfo, DescribeSource, ConfigSource
@@ -10,6 +14,13 @@ from c7n.filters.vpc import SubnetFilter, SecurityGroupFilter, NetworkLocation
 from c7n.filters.kms import KmsRelatedFilter
 from c7n.filters.metrics import MetricsFilter
 from c7n.filters.offhours import OffHour, OnHour
+
+# which namespace each metric belongs to and the dimension sets it is
+# published under, generated from the aws documentation -- see
+# test_sagemaker_metrics_data_current
+SAGEMAKER_METRICS = json.loads(
+    (importlib.resources.files('c7n') / 'data/sagemaker_metrics.json'
+     ).read_text())
 
 
 class NotebookDescribe(DescribeSource):
@@ -374,9 +385,18 @@ SagemakerEndpoint.filter_registry.register('marked-for-op', TagActionFilter)
 class SagemakerEndpointMetrics(MetricsFilter):
     """Filter sagemaker endpoints by their cloudwatch metrics.
 
-    Endpoint metrics are published per production variant, so an endpoint
-    matches when all of its variants match. Specify ``dimensions`` to query
-    a variant, or an instance type within a variant, instead.
+    An endpoint reports per sub unit rather than as a whole, and matches
+    when every datapoint of every sub unit satisfies the condition.
+
+    Which sub unit depends on how the endpoint hosts its models. Classically
+    each production variant names a model, and metrics are dimensioned by
+    variant. Alternatively the variant is a compute pool and the models
+    arrive as inference components, in which case the invocation metrics are
+    dimensioned by component alone, with no ``EndpointName`` -- so the
+    filter looks up the endpoint's components and queries each of those.
+    Utilization metrics stay per variant either way.
+
+    Specify ``dimensions`` to query one sub unit instead of all of them.
 
     Invocation metrics are in the default ``AWS/SageMaker`` namespace;
     instance utilization metrics need ``namespace:
@@ -401,14 +421,50 @@ class SagemakerEndpointMetrics(MetricsFilter):
                 missing-value: 0
     """
 
+    permissions = MetricsFilter.permissions + (
+        'sagemaker:ListInferenceComponents',)
+
+    def process(self, resources, event=None):
+        self.components = self.get_components()
+        return super().process(resources, event)
+
+    def get_components(self):
+        """Map each endpoint to the inference components hosted on it.
+
+        An endpoint's variants are in its own describe response, but a
+        component is a separate object whose name need not resemble the
+        endpoint's, so the association only exists here.
+        """
+        client = local_session(
+            self.manager.session_factory).client('sagemaker')
+        components = {}
+        for page in client.get_paginator(
+                'list_inference_components').paginate():
+            for summary in page['InferenceComponents']:
+                components.setdefault(summary['EndpointName'], []).append(
+                    summary['InferenceComponentName'])
+        return components
+
     def get_dimension_sets(self, resource):
         endpoint = [{'Name': 'EndpointName', 'Value': resource['EndpointName']}]
         if self.data.get('dimensions'):
             return [endpoint]
+
+        components = self.components.get(resource['EndpointName'])
+        if components and self.publishes_by_component():
+            return [[{'Name': 'InferenceComponentName', 'Value': name}]
+                    for name in sorted(components)]
+
         return [
             endpoint + [{'Name': 'VariantName', 'Value': v['VariantName']}]
             for v in resource['ProductionVariants']
             ]
+
+    def publishes_by_component(self):
+        """Is this metric published under the component dimension?"""
+        metric = SAGEMAKER_METRICS.get(
+            self.manager.type, {}).get(self.data['name'], {})
+        return ['InferenceComponentName'] in metric.get('dimension_sets', ())
 
 
 class EndpointConfigDescribe(DescribeSource):
