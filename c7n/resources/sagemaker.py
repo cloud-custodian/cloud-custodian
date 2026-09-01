@@ -8,6 +8,7 @@ from c7n.utils import local_session, type_schema, QueryParser
 from c7n.tags import RemoveTag, Tag, TagActionFilter, TagDelayedAction, universal_augment
 from c7n.filters.vpc import SubnetFilter, SecurityGroupFilter, NetworkLocation
 from c7n.filters.kms import KmsRelatedFilter
+from c7n.filters.metrics import MetricsFilter
 from c7n.filters.offhours import OffHour, OnHour
 
 
@@ -355,6 +356,7 @@ class SagemakerEndpoint(QueryResourceManager):
         detail_spec = (
             'describe_endpoint', 'EndpointName',
             'EndpointName', None)
+        metrics_namespace = 'AWS/SageMaker'
         arn = id = 'EndpointArn'
         name = 'EndpointName'
         date = 'CreationTime'
@@ -366,6 +368,47 @@ class SagemakerEndpoint(QueryResourceManager):
 
 
 SagemakerEndpoint.filter_registry.register('marked-for-op', TagActionFilter)
+
+
+@SagemakerEndpoint.filter_registry.register('metrics')
+class SagemakerEndpointMetrics(MetricsFilter):
+    """Filter sagemaker endpoints by their cloudwatch metrics.
+
+    Endpoint metrics are published per production variant, so an endpoint
+    matches when all of its variants match. Specify ``dimensions`` to query
+    a variant, or an instance type within a variant, instead.
+
+    Invocation metrics are in the default ``AWS/SageMaker`` namespace;
+    instance utilization metrics need ``namespace:
+    /aws/sagemaker/Endpoints``.
+
+    :example:
+
+    .. code-block:: yaml
+
+        policies:
+          - name: sagemaker-endpoints-idle
+            resource: aws.sagemaker-endpoint
+            filters:
+              - EndpointStatus: InService
+              - type: metrics
+                name: Invocations
+                statistics: Sum
+                days: 7
+                period: 86400
+                value: 0
+                op: lte
+                missing-value: 0
+    """
+
+    def get_dimension_sets(self, resource):
+        endpoint = [{'Name': 'EndpointName', 'Value': resource['EndpointName']}]
+        if self.data.get('dimensions'):
+            return [endpoint]
+        return [
+            endpoint + [{'Name': 'VariantName', 'Value': v['VariantName']}]
+            for v in resource['ProductionVariants']
+            ]
 
 
 class EndpointConfigDescribe(DescribeSource):

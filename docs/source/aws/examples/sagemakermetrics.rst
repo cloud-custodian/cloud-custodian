@@ -1,7 +1,7 @@
-Filtering SageMaker resources on CloudWatch metrics
+Filtering SageMaker endpoints on CloudWatch metrics
 ===================================================
 
-The ``metrics`` filter selects SageMaker resources by their CloudWatch
+The ``metrics`` filter selects SageMaker endpoints by their CloudWatch
 metrics: endpoints nobody is calling, GPUs barely being used, instances
 that were over-provisioned for the work, and so on.
 
@@ -45,10 +45,10 @@ which is not the same as nothing being used.
 SageMaker metric dimensions
 ---------------------------
 
-Most resources have a single time series. Several SageMaker resources stand
-in front of sub-resources and have a series for each of them.  An endpoint
-has one per production variant. A job one per instance. The condition is
-applied to all of the values in all of those series.
+Most resources have a single time series. An endpoint stands in front of
+sub-resources and has a series for each of them, one per production
+variant. The condition is applied to all of the values in all of those
+series.
 
 Specify ``dimensions`` to narrow a filter to particular sub-resources.
 
@@ -136,50 +136,6 @@ Utilization metrics live in their own namespace, so name it:
 The same namespace carries ``CPUUtilization``, ``MemoryUtilization``,
 ``GPUUtilization`` and ``DiskUtilization``.
 
-SageMaker jobs
---------------
-
-Training, processing and batch transform job series carry one dimension:
-
-``Host``
-   A single instance of a single job, written ``<job-name>/algo-<n>`` for
-   training and processing jobs, and ``<job-name>/<instance-id>`` for
-   transform jobs, whose instance ids are EC2 instance ids that no SageMaker
-   API reports. The filter finds a job's instances from CloudWatch and
-   queries each of them.
-
-To measure one instance, give its whole ``Host``:
-
-.. code-block:: yaml
-
-            dimensions:
-              Host: my-training-job/algo-1
-
-Jobs with under-used instances
-~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-
-Training, processing and batch transform jobs each default to their own
-namespace, so no ``namespace`` key is needed:
-
-.. code-block:: yaml
-
-    policies:
-      - name: sagemaker-training-jobs-underused-gpu
-        resource: aws.sagemaker-job
-        filters:
-          - type: metrics
-            name: GPUUtilization
-            statistics: Average
-            days: 1
-            period: 3600
-            value: 10
-            op: less-than
-
-Job resources return in-progress jobs unless the policy says otherwise, so
-this reports on jobs while they run. Add ``query: [{StatusEquals:
-Completed}]`` to look at finished ones -- their instances remain findable
-for two weeks.
-
 Default namespaces
 ------------------
 
@@ -193,15 +149,6 @@ Default namespaces
    * - ``sagemaker-endpoint``
      - ``AWS/SageMaker``
      - ``/aws/sagemaker/Endpoints``
-   * - ``sagemaker-job``
-     - ``/aws/sagemaker/TrainingJobs``
-     - same
-   * - ``sagemaker-processing-job``
-     - ``/aws/sagemaker/ProcessingJobs``
-     - same
-   * - ``sagemaker-transform-job``
-     - ``/aws/sagemaker/TransformJobs``
-     - same
 
 For the metric names each namespace offers, see `SageMaker metrics in
 CloudWatch
