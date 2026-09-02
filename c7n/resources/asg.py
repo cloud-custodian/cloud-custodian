@@ -22,10 +22,9 @@ from c7n import query
 from c7n.resources.securityhub import PostFinding
 from c7n.tags import (
     TagActionFilter, DEFAULT_TAG, TagCountFilter, TagTrim, TagDelayedAction,
-    TAG_VALUE_SKIP, has_dynamic_tag_values, resolve_tag_value, resource_tag_keys,
-    tag_value_schema)
+    TagValueResolver, has_dynamic_tag_values, tag_value_schema)
 from c7n.utils import (
-    FormatDate, local_session, type_schema, chunks, get_retry, select_keys)
+    local_session, type_schema, chunks, get_retry, select_keys)
 
 from .ec2 import deserialize_user_data
 
@@ -1107,7 +1106,7 @@ class RemoveTag(Action):
 
 @ASG.action_registry.register('tag')
 @ASG.action_registry.register('mark')
-class Tag(Action):
+class Tag(TagValueResolver, Action):
     """Action to add a tag to an ASG
 
     The *propagate* parameter can be used to specify that the tag being added
@@ -1195,18 +1194,14 @@ class Tag(Action):
                 yield asg_set, tags
             return
 
+        # {now} and friends don't vary per asg -- fix them once so a long
+        # run doesn't stamp different timestamps on different asgs.
+        params = self.get_interpolation_params()
         for asg in asgs:
-            current = resource_tag_keys(asg)
-            tags = []
-            for name, spec in spec_map.items():
-                value = resolve_tag_value(spec, name, asg, current)
-                if value is TAG_VALUE_SKIP:
-                    continue
-                tags.append(
-                    {'Key': name, 'Value': self.interpolate_single_value(value)})
-            if not tags:
+            resolved = self.resolve_resource_tags(spec_map, asg, params)
+            if not resolved:
                 continue
-            yield [asg], tags
+            yield [asg], [{'Key': k, 'Value': v} for k, v in resolved.items()]
 
     def process(self, asgs):
         spec_map = self.get_tag_spec_map()
@@ -1245,17 +1240,6 @@ class Tag(Action):
                 tag_params.append(atags)
                 a.setdefault('Tags', []).append(atags)
         self.manager.retry(client.create_or_update_tags, Tags=tag_params)
-
-    def interpolate_single_value(self, value):
-        params = {
-            'account_id': self.manager.config.account_id,
-            'now': FormatDate.utcnow(),
-            'region': self.manager.config.region}
-        return str(value).format(**params)
-
-    def interpolate_values(self, tags):
-        for t in tags:
-            t['Value'] = self.interpolate_single_value(t['Value'])
 
     def get_client(self):
         return local_session(self.manager.session_factory).client('autoscaling')

@@ -13,7 +13,7 @@ from .common import BaseTest
 from c7n.exceptions import PolicyValidationError
 from c7n.resources.asg import LaunchInfo
 from c7n.resources.aws import shape_validate
-from c7n.utils import jmespath_search
+from c7n.utils import FormatDate, jmespath_search
 
 
 class LaunchConfigTest(BaseTest):
@@ -1265,6 +1265,22 @@ class AsgDynamicTagTest(BaseTest):
                    "PropagateAtLaunch": False,
                    "ResourceType": "auto-scaling-group",
                    "ResourceId": "asg-1"}])
+
+    def test_now_resolved_once_for_the_whole_run(self):
+        # asgs are tagged one at a time in the dynamic path, but a clock that
+        # moves on every read should still only be read once for the run
+        ticks = [FormatDate(datetime(2022, 6, 27, 12, 34, 56)),
+                 FormatDate(datetime(2022, 6, 27, 12, 34, 57))]
+        with mock.patch.object(FormatDate, "utcnow", side_effect=ticks) as utcnow:
+            create_tags = self._run(
+                [{"AutoScalingGroupName": "asg-1"},
+                 {"AutoScalingGroupName": "asg-2"}],
+                {"type": "tag", "tags": {"Stamp": {
+                    "type": "resource", "key": "Nope",
+                    "default-value": "at-{now}"}}})
+        self.assertEqual(utcnow.call_count, 1)
+        stamped = [c.kwargs["Tags"][0]["Value"] for c in create_tags.call_args_list]
+        self.assertEqual(stamped, ["at-2022-06-27 12:34:56"] * 2)
 
     def test_malformed_tag_value_rejected(self):
         with self.assertRaises(PolicyValidationError):

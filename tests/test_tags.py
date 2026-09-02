@@ -5,13 +5,14 @@ module to test some universal tagging infrastructure not directly exposed.
 """
 import time
 import jsonschema
+from datetime import datetime
 from freezegun import freeze_time
-from unittest.mock import MagicMock, call
+from unittest.mock import MagicMock, call, patch
 
 from c7n import tags as tagmod
 from c7n.tags import universal_retry, coalesce_copy_user_tags
 from c7n.exceptions import PolicyExecutionError, PolicyValidationError
-from c7n.utils import yaml_load
+from c7n.utils import FormatDate, yaml_load
 
 from .common import BaseTest
 
@@ -748,6 +749,22 @@ class DynamicTagTest(BaseTest):
         create_tags.assert_called_once_with(
             Resources=["i-1"],
             Tags=[{"Key": "Stamp", "Value": "created-2022-06-27 12:34:56-in-us-east-1"}],
+            DryRun=False)
+
+    def test_now_resolved_once_for_the_whole_run(self):
+        # a clock that moves on every read - the run should only read it once,
+        # so every resource lands in one group with one timestamp
+        ticks = [FormatDate(datetime(2022, 6, 27, 12, 34, 56)),
+                 FormatDate(datetime(2022, 6, 27, 12, 34, 57))]
+        with patch.object(FormatDate, "utcnow", side_effect=ticks) as utcnow:
+            create_tags = self._run(
+                [{"InstanceId": "i-1"}, {"InstanceId": "i-2"}],
+                {"Stamp": {"type": "resource", "key": "Nope",
+                           "default-value": "at-{now}"}})
+        self.assertEqual(utcnow.call_count, 1)
+        create_tags.assert_called_once_with(
+            Resources=["i-1", "i-2"],
+            Tags=[{"Key": "Stamp", "Value": "at-2022-06-27 12:34:56"}],
             DryRun=False)
 
 
