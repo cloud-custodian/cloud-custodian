@@ -1,11 +1,13 @@
 # Copyright The Cloud Custodian Authors.
 # SPDX-License-Identifier: Apache-2.0
 
+import itertools
 import json
 
 import importlib.resources
 
 from c7n.actions import BaseAction
+from c7n.exceptions import PolicyValidationError
 from c7n.manager import resources
 from c7n.query import QueryResourceManager, TypeInfo, DescribeSource, ConfigSource
 from c7n.utils import local_session, type_schema, QueryParser
@@ -424,6 +426,43 @@ class SagemakerEndpointMetrics(MetricsFilter):
     permissions = MetricsFilter.permissions + (
         'sagemaker:ListInferenceComponents',)
 
+    # dimensions the filter can supply values for itself; any other
+    # dimension of a published set has to come from the policy
+    fillable = ('EndpointName', 'VariantName', 'InferenceComponentName')
+
+    def validate(self):
+        super().validate()
+        if self.data.get('dimensions') and self.supported_dimension_sets() == []:
+            raise PolicyValidationError(
+                "metrics filter dimensions %s do not select a published "
+                "dimension set for %s; supported: %s" % (
+                    sorted(self.data['dimensions']),
+                    self.data['name'],
+                    self.published_dimension_sets()))
+
+    def published_dimension_sets(self):
+        """The dimension sets aws publishes this metric under, if known.
+
+        Some of an endpoint's metrics are only reported per inference
+        component -- they are documented against the component rather than
+        the endpoint, and reaching them needs the component's namespace.
+        """
+        for resource in (self.manager.type, 'sagemaker-inference-component'):
+            metric = SAGEMAKER_METRICS.get(resource, {}).get(self.data['name'])
+            if metric:
+                return metric['dimension_sets']
+        return None
+
+    def supported_dimension_sets(self):
+        """Those the filter can complete, given what the policy supplied."""
+        published = self.published_dimension_sets()
+        if published is None:
+            return None
+        supplied = set(self.data.get('dimensions', ()))
+        return [names for names in published
+                if supplied.issubset(names)
+                and set(names).issubset(supplied.union(self.fillable))]
+
     def process(self, resources, event=None):
         self.components = self.get_components()
         return super().process(resources, event)
@@ -445,26 +484,37 @@ class SagemakerEndpointMetrics(MetricsFilter):
                     summary['InferenceComponentName'])
         return components
 
+    def get_dimension_values(self, resource):
+        components = self.components.get(resource['EndpointName'], ())
+        return {
+            'EndpointName': [resource['EndpointName']],
+            'VariantName': [v['VariantName']
+                            for v in resource['ProductionVariants']],
+            'InferenceComponentName': sorted(components),
+            }
+
     def get_dimension_sets(self, resource):
-        endpoint = [{'Name': 'EndpointName', 'Value': resource['EndpointName']}]
-        if self.data.get('dimensions'):
-            return [endpoint]
+        values = self.get_dimension_values(resource)
+        supported = self.supported_dimension_sets()
+        if supported is None:
+            # a metric aws has published since the data was generated
+            supported = [['EndpointName', 'VariantName']]
 
-        components = self.components.get(resource['EndpointName'])
-        if components and self.publishes_by_component():
-            return [[{'Name': 'InferenceComponentName', 'Value': name}]
-                    for name in sorted(components)]
+        # an endpoint that hosts inference components reports its
+        # invocations against them rather than against its variants, which
+        # in that state serve only as the compute the components run on
+        if values['InferenceComponentName']:
+            supported = sorted(
+                supported, key=lambda s: 'InferenceComponentName' not in s)
 
-        return [
-            endpoint + [{'Name': 'VariantName', 'Value': v['VariantName']}]
-            for v in resource['ProductionVariants']
-            ]
-
-    def publishes_by_component(self):
-        """Is this metric published under the component dimension?"""
-        metric = SAGEMAKER_METRICS.get(
-            self.manager.type, {}).get(self.data['name'], {})
-        return ['InferenceComponentName'] in metric.get('dimension_sets', ())
+        for names in supported:
+            # the policy's own dimensions are merged in by the base class
+            fill = [n for n in names if n not in self.data.get('dimensions', ())]
+            if all(values[n] for n in fill):
+                return [[{'Name': n, 'Value': v} for n, v in zip(fill, chosen)]
+                        for chosen in itertools.product(
+                            *[values[n] for n in fill])]
+        return []
 
 
 class EndpointConfigDescribe(DescribeSource):

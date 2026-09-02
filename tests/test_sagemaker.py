@@ -1815,6 +1815,29 @@ def test_sagemaker_endpoint_metrics_inference_component_utilization(
         ['EndpointName', 'VariantName']]
 
 
+def test_sagemaker_endpoint_metrics_dimensions_validated(test):
+    # a dimension aws never publishes this metric under is a policy error,
+    # rather than a query that quietly returns nothing
+    policy = {
+        'name': 'sagemaker-endpoints-idle',
+        'resource': 'sagemaker-endpoint',
+        'filters': [
+            {'type': 'metrics',
+             'name': 'Invocations',
+             'value': 0,
+             'dimensions': {'QueueName': 'nope'}},
+        ],
+    }
+    with pytest.raises(PolicyValidationError) as caught:
+        test.load_policy(policy, validate=True)
+    assert 'do not select a published dimension set' in str(caught.value)
+
+    # InstanceType is published, but only together with the variant, which
+    # the filter fills in itself -- so this one is accepted
+    policy['filters'][0]['dimensions'] = {'InstanceType': 'ml.m5.large'}
+    test.load_policy(policy, validate=True)
+
+
 # The sagemaker metrics documentation, as markdown rather than html: every
 # page on docs.aws.amazon.com is served both ways, and the markdown carries
 # the same tables without the surrounding chrome.
