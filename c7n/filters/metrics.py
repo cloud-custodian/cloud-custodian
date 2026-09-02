@@ -294,60 +294,77 @@ class MetricsFilter(Filter):
             # across different periods or dimensions would be problematic.
             key = "%s.%s.%s.%s" % (self.namespace, self.metric, self.statistics, str(self.days))
 
-            stats_key = (self.statistics in self.standard_stats
-                         and 'Statistics' or 'ExtendedStatistics')
-
-            if key not in collected_metrics:
-                datapoints = []
-                for dimensions in dimension_sets:
-                    params = dict(
-                        Namespace=self.namespace,
-                        MetricName=self.metric,
-                        StartTime=self.start,
-                        EndTime=self.end,
-                        Period=self.period,
-                        Dimensions=dimensions
-                    )
-                    params[stats_key] = [self.statistics]
-                    datapoints.extend(self.get_metric_data(client, params))
+            if key in collected_metrics:
+                datapoints = collected_metrics[key]
+            else:
+                datapoints = self.collect(client, dimension_sets, r)
+                if datapoints is None:
+                    # a value failed the condition, so the resource is out
+                    # and the rest of its sets were never fetched. Nothing
+                    # is annotated: the resource isn't in the results, and
+                    # a partial list here would be read as complete by
+                    # another filter sharing this key.
+                    continue
                 collected_metrics[key] = datapoints
 
             # In certain cases CloudWatch reports no data for a metric.
             # If the policy specifies a fill value for missing data, add
             # that here before testing for matches. Otherwise, skip
             # matching entirely.
-            if len(collected_metrics[key]) == 0:
+            if len(datapoints) == 0:
                 if 'missing-value' not in self.data:
                     continue
-                collected_metrics[key].append({
+                datapoints.append({
                     'Timestamp': self.start,
                     self.statistics: self.data['missing-value'],
                     'c7n:detail': 'Fill value for missing data'
                 })
 
-            if self.data.get('percent-attr'):
-                rvalue = r[self.data.get('percent-attr')]
-                if self.data.get('attr-multiplier'):
-                    rvalue = rvalue * self.data['attr-multiplier']
-                all_meet_condition = True
-                for data_point in collected_metrics[key]:
-                    percent = (data_point[self.statistics] / rvalue * 100)
-                    if not self.op(percent, self.value):
-                        all_meet_condition = False
-                        break
-                if all_meet_condition:
-                    matched.append(r)
-            else:
-                all_meet_condition = True
-                for data_point in collected_metrics[key]:
-                    if 'ExtendedStatistics' in data_point:
-                        data_point = data_point['ExtendedStatistics']
-                    if not self.op(data_point[self.statistics], self.value):
-                        all_meet_condition = False
-                        break
-                if all_meet_condition:
-                    matched.append(r)
+            if self.matches(datapoints, r):
+                matched.append(r)
+
         return matched
+
+    def collect(self, client, dimension_sets, resource):
+        """Fetch each dimension set, stopping as soon as one fails.
+
+        Returns the datapoints, or None once a value has failed the
+        condition -- the resource cannot match, so the remaining sets are
+        not worth fetching.
+        """
+        stats_key = (self.statistics in self.standard_stats
+                     and 'Statistics' or 'ExtendedStatistics')
+        datapoints = []
+        for dimensions in dimension_sets:
+            params = dict(
+                Namespace=self.namespace,
+                MetricName=self.metric,
+                StartTime=self.start,
+                EndTime=self.end,
+                Period=self.period,
+                Dimensions=dimensions
+            )
+            params[stats_key] = [self.statistics]
+            points = self.get_metric_data(client, params)
+            if not self.matches(points, resource):
+                return None
+            datapoints.extend(points)
+        return datapoints
+
+    def matches(self, datapoints, resource):
+        """Does every datapoint satisfy the filter's condition?"""
+        if self.data.get('percent-attr'):
+            rvalue = resource[self.data.get('percent-attr')]
+            if self.data.get('attr-multiplier'):
+                rvalue = rvalue * self.data['attr-multiplier']
+            return all(
+                self.op(point[self.statistics] / rvalue * 100, self.value)
+                for point in datapoints)
+        return all(
+            self.op(
+                point.get('ExtendedStatistics', point)[self.statistics],
+                self.value)
+            for point in datapoints)
 
 
 class ShieldMetrics(MetricsFilter):
