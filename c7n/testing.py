@@ -62,9 +62,9 @@ class CustodianTestCore:
         return fh.name
 
     def write_raw_file(self, contents, format="yaml"):
-        """Write a policy file to disk in the specified format.
+        """Write a raw string to disk.
 
-        Input a dictionary and a format. Valid formats are `yaml` and `json`
+        Input a string and a format/suffix.
         Returns the file path.
         """
         fh = tempfile.NamedTemporaryFile(mode="w+b", suffix="." + format, delete=False)
