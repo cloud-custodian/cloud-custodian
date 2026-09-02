@@ -427,6 +427,47 @@ def test_vertexai_evaluation_run_filtering(test):
     assert not any(r['state'] == 'SUCCEEDED' for r in resources)
 
 
+def test_vertexai_evaluation_run_augment_completion_time(test):
+    """GET augment fires only when completionTime appears in filters."""
+    test.session_factory = test.replay_flight_data('vertexai-evaluation-run-filtering')
+
+    policy = test.load_policy(
+        {'name': 'vertexai-evaluation-runs-completion-time',
+         'resource': 'gcp.vertex-ai-evaluation-run',
+         'query': [{'location': 'us-central1'}],
+         'filters': [
+             {'type': 'value',
+              'key': 'completionTime',
+              'value_type': 'age',
+              'op': 'greater-than',
+              'value': 0}
+         ]},
+        session_factory=test.session_factory)
+
+    resources = policy.run()
+
+    assert len(resources) >= 1
+    assert all(r.get('completionTime') for r in resources), (
+        'Expected completionTime to be populated via GET augment')
+
+
+def test_vertexai_evaluation_run_no_augment_without_completion_time_filter(test):
+    """No GET augment when completionTime is absent from filters."""
+    test.session_factory = test.replay_flight_data('vertexai-evaluation-run-filtering')
+
+    policy = test.load_policy(
+        {'name': 'vertexai-evaluation-runs-no-augment',
+         'resource': 'gcp.vertex-ai-evaluation-run',
+         'query': [{'location': 'us-central1'}],
+         'filters': [
+             {'type': 'value', 'key': 'state', 'value': 'FAILED'}
+         ]},
+        session_factory=test.session_factory)
+
+    mgr = policy.resource_manager
+    assert not mgr._needs_completion_time()
+
+
 @terraform('vertexai_dataset', scope='module')
 def test_vertexai_dataset_multi_location(test, vertexai_dataset):
     """Test querying Vertex AI Datasets across multiple locations."""
