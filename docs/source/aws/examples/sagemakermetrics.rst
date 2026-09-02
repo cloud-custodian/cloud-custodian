@@ -45,24 +45,17 @@ which is not the same as nothing being used.
 SageMaker metric dimensions
 ---------------------------
 
-Non-SageMaker resource metrics typically have a single time series.
-SageMaker resource metrics typically have multiple time series, reflecting
-multiple underlying compute resources. These can be divided in several
-ways, so a SageMaker metric typically has several sets of dimensions. See
-``c7n/data/sagemaker_metrics.json``.
+Non-Sagemaker resource metrics typically have a single time series.
+Sagemaker resource metrics typically have multiple timeseries, reflecting
+multiple underlying compute resources.  These can be divided in multiple ways and
+Sagemaker resources metrics typically have multiple sets of
+dimensions.  See `c7n/data/sagemaker_metrics.json`.
 
-A filter supplies some dimensions itself. For an endpoint those are
-``EndpointName``, and the sub-resources it can enumerate: its production
-variants, and the inference components hosted on it. A dimension set is
-supported when the filter can supply every dimension in it, or the policy
-supplies the rest.
+A filter for a resource may not implement all available dimension sets
+and may only implement dimension sets that include a resource identifier.
 
-So specifying ``dimensions`` selects a set rather than adding to one.
-Naming an instance type for an endpoint selects ``EndpointName,
-VariantName, InstanceType`` and queries each variant at that instance
-type. Naming dimensions that no published set can be completed from is a
-policy error, reported when the policy is loaded rather than as an empty
-report later.
+You can select a subset of the time series by specifying values for
+one or more dimensions from one of the supported dimension set.
 
 SageMaker endpoints
 -------------------
