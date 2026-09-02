@@ -1,7 +1,7 @@
 # Copyright The Cloud Custodian Authors.
 # SPDX-License-Identifier: Apache-2.0
 
-from gcp_common import BaseTest
+from gcp_common import BaseTest, event_data
 
 
 class DataprocTest(BaseTest):
@@ -46,3 +46,67 @@ def test_data_proc_query(test):
     ]
 
     test.check_report_fields(p, resources)
+
+
+def test_data_proc_cluster_get_resource(test):
+    project_id = test.project_id
+    test.set_regions('us-central1')
+    factory = test.replay_flight_data(
+        'test_dataproc_clusters_query',
+        project_id=project_id,
+    )
+    p = test.load_policy(
+        {'name': 'dataproc_clusters', 'resource': 'gcp.dataproc-clusters'},
+        session_factory=factory,
+    )
+
+    resource = p.resource_manager.get_resource({
+        'resourceName': (
+            'projects/cloud-custodian/regions/us-central1/clusters/cluster-test'
+        ),
+    })
+
+    assert resource['clusterName'] == 'cluster-test'
+    assert 'lifecycleConfig' not in resource['config']
+    assert resource['c7n:region']['name'] == 'us-central1'
+
+
+def test_data_proc_cluster_audit_events(test):
+    project_id = test.project_id
+    test.set_regions('us-central1')
+    factory = test.replay_flight_data(
+        'test_dataproc_clusters_query',
+        project_id=project_id,
+    )
+    p = test.load_policy(
+        {
+            'name': 'dataproc-cluster-audit',
+            'resource': 'gcp.dataproc-clusters',
+            'mode': {
+                'type': 'gcp-audit',
+                'methods': [
+                    'google.cloud.dataproc.v1.ClusterController.CreateCluster',
+                    'google.cloud.dataproc.v1.ClusterController.UpdateCluster',
+                ],
+            },
+            'filters': [
+                {
+                    'type': 'value',
+                    'key': 'config.lifecycleConfig.idleDeleteTtl',
+                    'value': 'absent',
+                },
+            ],
+        },
+        session_factory=factory,
+    )
+    exec_mode = p.get_execution_mode()
+
+    for event_name in (
+        'dataproc-cluster-create.json',
+        'dataproc-cluster-update.json',
+    ):
+        resources = exec_mode.run(event_data(event_name), None)
+
+        assert len(resources) == 1
+        assert resources[0]['clusterName'] == 'cluster-test'
+        assert resources[0]['c7n:region']['name'] == 'us-central1'
