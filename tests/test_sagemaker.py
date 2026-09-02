@@ -1830,7 +1830,7 @@ def test_sagemaker_endpoint_metrics_dimensions_validated(test):
     }
     with pytest.raises(PolicyValidationError) as caught:
         test.load_policy(policy, validate=True)
-    assert 'do not select a published dimension set' in str(caught.value)
+    assert "can't use dimensions ['QueueName']" in str(caught.value)
 
     # InstanceType is published, but only together with the variant, which
     # the filter fills in itself -- so this one is accepted
