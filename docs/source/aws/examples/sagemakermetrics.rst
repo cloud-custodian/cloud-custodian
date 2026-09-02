@@ -45,12 +45,17 @@ which is not the same as nothing being used.
 SageMaker metric dimensions
 ---------------------------
 
-Most resources have a single time series. An endpoint stands in front of
-sub-resources and has a series for each of them, one per production
-variant. The condition is applied to all of the values in all of those
-series.
+Non-Sagemaker resource metrics typically have a single time series.
+Sagemaker resource metrics typically have multiple timeseries, reflecting
+multiple underlying compute resources.  These can be divided in multiple ways and
+Sagemaker resources metrics typically have multiple sets of
+dimensions.  See `c7n/data/sagemaker_metrics.json`.
 
-Specify ``dimensions`` to narrow a filter to particular sub-resources.
+A filter for a resource may not implement all available dimension sets
+and may only implement dimension sets that include a resource identifier.
+
+You can select a subset of the time series by specifying values for
+one or more dimensions from one of the supported dimension set.
 
 SageMaker endpoints
 -------------------
