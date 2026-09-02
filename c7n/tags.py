@@ -91,6 +91,25 @@ class TagValueResolver:
             'now': utils.FormatDate.utcnow(),
             'region': self.manager.config.region}
 
+    def resolve_and_group(self, resources, spec_map):
+        """Resolve tag values per resource and group by identical payload.
+
+        Returns a list of (resource_set, resolved_dict). Resources whose
+        payload is empty (all tags conditionally skipped) are dropped.
+        """
+        groups = {}
+        # {now} and friends don't vary per resource, so fix them once for the
+        # whole run -- otherwise a large resource set drifts across seconds and
+        # splits into a group per timestamp.
+        params = self.get_interpolation_params()
+        for r in resources:
+            resolved = self.resolve_resource_tags(spec_map, r, params)
+            if not resolved:
+                continue
+            sig = tuple(sorted(resolved.items()))
+            groups.setdefault(sig, ([], resolved))[0].append(r)
+        return list(groups.values())
+
     def resolve_resource_tags(self, spec_map, resource, params):
         """Resolve a spec mapping against one resource.
 
@@ -525,30 +544,11 @@ class Tag(TagValueResolver, Action):
                 self.process_resource_set, self.id_key, resources, tags, self.log)
             return
 
-        for resource_set, resolved in self._resolve_and_group(resources, spec_map):
+        for resource_set, resolved in self.resolve_and_group(resources, spec_map):
             tags = [{'Key': k, 'Value': v} for k, v in resolved.items()]
             _common_tag_processer(
                 self.executor_factory, batch_size, self.concurrency, client,
                 self.process_resource_set, self.id_key, resource_set, tags, self.log)
-
-    def _resolve_and_group(self, resources, spec_map):
-        """Resolve tag values per resource and group by identical payload.
-
-        Returns a list of (resource_set, resolved_dict). Resources whose
-        payload is empty (all tags conditionally skipped) are dropped.
-        """
-        groups = {}
-        # {now} and friends don't vary per resource, so fix them once for the
-        # whole run -- otherwise a large resource set drifts across seconds and
-        # splits into a group per timestamp.
-        params = self.get_interpolation_params()
-        for r in resources:
-            resolved = self.resolve_resource_tags(spec_map, r, params)
-            if not resolved:
-                continue
-            sig = tuple(sorted(resolved.items()))
-            groups.setdefault(sig, ([], resolved))[0].append(r)
-        return list(groups.values())
 
     def process_resource_set(self, client, resource_set, tags):
         mid = self.manager.get_model().id
@@ -995,7 +995,7 @@ class UniversalTag(Tag):
                 self.process_resource_set, self.id_key, resources, tags, self.log)
             return
 
-        for resource_set, resolved in self._resolve_and_group(resources, spec_map):
+        for resource_set, resolved in self.resolve_and_group(resources, spec_map):
             _common_tag_processer(
                 self.executor_factory, batch_size, self.concurrency, client,
                 self.process_resource_set, self.id_key, resource_set, resolved,

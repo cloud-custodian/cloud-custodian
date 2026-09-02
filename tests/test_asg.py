@@ -11,7 +11,7 @@ from pytest_terraform import terraform
 from .common import BaseTest
 
 from c7n.exceptions import PolicyValidationError
-from c7n.resources.asg import LaunchInfo
+from c7n.resources.asg import LaunchInfo, Tag as AsgTag
 from c7n.resources.aws import shape_validate
 from c7n.utils import FormatDate, jmespath_search
 
@@ -1266,9 +1266,30 @@ class AsgDynamicTagTest(BaseTest):
                    "ResourceType": "auto-scaling-group",
                    "ResourceId": "asg-1"}])
 
+    def test_dynamic_values_batch_by_payload(self):
+        # batch_size is 1 today, so raise it to show the dynamic path batches
+        # asgs that resolve to the same payload rather than going one at a time
+        asgs = [{"AutoScalingGroupName": "asg-1",
+                 "Tags": [{"Key": "Env", "Value": "prod"}]},
+                {"AutoScalingGroupName": "asg-2",
+                 "Tags": [{"Key": "Env", "Value": "dev"}]},
+                {"AutoScalingGroupName": "asg-3",
+                 "Tags": [{"Key": "Env", "Value": "prod"}]}]
+        with mock.patch.object(AsgTag, "batch_size", 2):
+            create_tags = self._run(
+                asgs,
+                {"type": "tag", "tags": {"Tier": {
+                    "type": "resource", "key": "Tags[?Key=='Env'].Value | [0]"}}})
+        self.assertEqual(create_tags.call_count, 2)
+        by_value = {c.kwargs["Tags"][0]["Value"]: {t["ResourceId"] for t in c.kwargs["Tags"]}
+                    for c in create_tags.call_args_list}
+        self.assertEqual(by_value["prod"], {"asg-1", "asg-3"})
+        self.assertEqual(by_value["dev"], {"asg-2"})
+
     def test_now_resolved_once_for_the_whole_run(self):
-        # asgs are tagged one at a time in the dynamic path, but a clock that
-        # moves on every read should still only be read once for the run
+        # a clock that moves on every read - the run should only read it once,
+        # so both asgs get stamped alike even though batch_size sends them
+        # in separate calls
         ticks = [FormatDate(datetime(2022, 6, 27, 12, 34, 56)),
                  FormatDate(datetime(2022, 6, 27, 12, 34, 57))]
         with mock.patch.object(FormatDate, "utcnow", side_effect=ticks) as utcnow:

@@ -1183,9 +1183,10 @@ class Tag(TagValueResolver, Action):
     def resolve_tag_sets(self, asgs, spec_map):
         """Yield (asg_set, tags) pairs to submit.
 
-        Static values are shared across a batch of asgs. Dynamic values are
-        resolved against each asg, so those go out an asg at a time, and an
-        asg whose tags all resolve to skip drops out entirely.
+        Static values are shared by every asg, so they go out in batches.
+        Dynamic values are resolved per asg and then regrouped, so asgs that
+        land on the same payload still batch together, and an asg whose tags
+        all resolve to skip drops out entirely.
         """
         if not has_dynamic_tag_values(spec_map):
             tags = [{'Key': k, 'Value': v} for k, v in spec_map.items()]
@@ -1194,14 +1195,10 @@ class Tag(TagValueResolver, Action):
                 yield asg_set, tags
             return
 
-        # {now} and friends don't vary per asg -- fix them once so a long
-        # run doesn't stamp different timestamps on different asgs.
-        params = self.get_interpolation_params()
-        for asg in asgs:
-            resolved = self.resolve_resource_tags(spec_map, asg, params)
-            if not resolved:
-                continue
-            yield [asg], [{'Key': k, 'Value': v} for k, v in resolved.items()]
+        for asg_set, resolved in self.resolve_and_group(asgs, spec_map):
+            tags = [{'Key': k, 'Value': v} for k, v in resolved.items()]
+            for chunk in chunks(asg_set, self.batch_size):
+                yield chunk, tags
 
     def process(self, asgs):
         spec_map = self.get_tag_spec_map()
