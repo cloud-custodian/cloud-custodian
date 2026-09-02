@@ -614,6 +614,32 @@ class RunTest(CliTest):
             2,
         )
 
+    def test_vars_file_bad_contents(self):
+        temp_dir = self.get_temp_dir()
+        yaml_file = self.write_policy_file(
+            {"policies": [{"name": "ec2-vars-missing", "resource": "ec2"}]}
+        )
+        bad_yaml_list = [
+            "- list",  # not mapping type
+            "key2: bad-key: value",  # not valid yaml
+        ]
+        for bad_yaml in bad_yaml_list:
+            vars_file = self.write_raw_file(bad_yaml)
+            self.run_and_expect_failure(
+                [
+                    "custodian",
+                    "run",
+                    "--vars-file",
+                    vars_file,
+                    "-s",
+                    temp_dir,
+                    "--cache",
+                    temp_dir + "/cache",
+                    yaml_file,
+                ],
+                1,
+            )
+
     def test_error(self):
         from c7n.policy import Policy
 
