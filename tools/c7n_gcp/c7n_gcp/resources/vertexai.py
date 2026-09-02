@@ -864,11 +864,8 @@ class VertexAIEvaluationRun(VertexAIQueryManager):
             name = r['name']
             location = name.split('/')[3]
             client = self.get_location_client(session, location, self.resource_type.component)
-            try:
-                detail = client.execute_query('get', verb_arguments={'name': name})
-                r.update(detail)
-            except Exception:
-                pass
+            detail = client.execute_query('get', verb_arguments={'name': name})
+            r.update(detail)
             results.append(r)
         return results
 
