@@ -401,6 +401,54 @@ class AutoScalingTest(BaseTest):
         self.assertEqual(len(resources), 1)
         self.assertEqual(resources[0]["LaunchConfigurationName"], "foo-bar")
 
+    def _run_tag_action(self, resources, action_data):
+        mock_factory = mock.MagicMock()
+        mock_factory.region = 'us-east-1'
+        client = mock_factory().client('autoscaling')
+        client.create_or_update_tags.return_value = {}
+        policy = self.load_policy(
+            {'name': 'asg-tag-spec', 'resource': 'asg',
+             'actions': [dict(action_data, type='tag')]},
+            session_factory=mock_factory)
+        policy.resource_manager.actions[0].process(resources)
+        return client.create_or_update_tags
+
+    def test_asg_tag_value_spec_default(self):
+        # https://github.com/cloud-custodian/cloud-custodian/issues/10997
+        # a value-spec (lookup) tag value used to crash asg's tag action
+        # with AttributeError: 'dict' object has no attribute 'format'
+        create_or_update_tags = self._run_tag_action(
+            [{'AutoScalingGroupName': 'asg-1', 'Tags': []}],
+            {'value': '', 'tags': {'acme_cost_center': {
+                'type': 'resource', 'default-value': '1234'}}})
+        create_or_update_tags.assert_called_once_with(
+            Tags=[{
+                'Key': 'acme_cost_center', 'Value': '1234',
+                'PropagateAtLaunch': False,
+                'ResourceType': 'auto-scaling-group',
+                'ResourceId': 'asg-1'}])
+
+    def test_asg_tag_value_spec_conditional_skip(self):
+        # default-value with no 'key' only writes when the tag is absent
+        create_or_update_tags = self._run_tag_action(
+            [{'AutoScalingGroupName': 'asg-1',
+              'Tags': [{'Key': 'acme_cost_center', 'Value': 'existing'}]}],
+            {'value': '', 'tags': {'acme_cost_center': {
+                'type': 'resource', 'default-value': '1234'}}})
+        create_or_update_tags.assert_not_called()
+
+    def test_asg_tag_value_spec_resource_key(self):
+        create_or_update_tags = self._run_tag_action(
+            [{'AutoScalingGroupName': 'asg-1', 'Tags': [],
+              'Team': 'platform'}],
+            {'value': '', 'tags': {'Owner': {'type': 'resource', 'key': 'Team'}}})
+        create_or_update_tags.assert_called_once_with(
+            Tags=[{
+                'Key': 'Owner', 'Value': 'platform',
+                'PropagateAtLaunch': False,
+                'ResourceType': 'auto-scaling-group',
+                'ResourceId': 'asg-1'}])
+
     def test_asg_tag_and_propagate(self):
         factory = self.replay_flight_data("test_asg_tag")
         p = self.load_policy(

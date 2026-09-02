@@ -20,7 +20,9 @@ import c7n.policy
 from c7n.manager import resources
 from c7n import query
 from c7n.resources.securityhub import PostFinding
-from c7n.tags import TagActionFilter, DEFAULT_TAG, TagCountFilter, TagTrim, TagDelayedAction
+from c7n.tags import (
+    TagActionFilter, DEFAULT_TAG, TagCountFilter, TagTrim, TagDelayedAction,
+    resolve_tag_value, resource_tag_keys, tag_value_schema, TAG_VALUE_SKIP)
 from c7n.utils import (
     FormatDate, local_session, type_schema, chunks, get_retry, select_keys)
 
@@ -1130,8 +1132,8 @@ class Tag(Action):
     schema = type_schema(
         'tag',
         key={'type': 'string'},
-        value={'type': 'string'},
-        tags={'type': 'object'},
+        value=tag_value_schema(),
+        tags={'type': 'object', 'additionalProperties': tag_value_schema()},
         # Backwards compatibility
         tag={'type': 'string'},
         msg={'type': 'string'},
@@ -1141,34 +1143,41 @@ class Tag(Action):
     permissions = ('autoscaling:CreateOrUpdateTags',)
     batch_size = 1
 
-    def get_tag_set(self):
+    def get_tag_set(self, asg):
         tags = []
+        current = resource_tag_keys(asg)
         key = self.data.get('key', self.data.get('tag', DEFAULT_TAG))
         value = self.data.get(
             'value', self.data.get(
                 'msg', 'AutoScaleGroup does not meet policy guidelines'))
         if key and value:
-            tags.append({'Key': key, 'Value': value})
+            resolved = resolve_tag_value(value, key, asg, current)
+            if resolved is not TAG_VALUE_SKIP:
+                tags.append({'Key': key, 'Value': resolved})
 
         for k, v in self.data.get('tags', {}).items():
-            tags.append({'Key': k, 'Value': v})
+            resolved = resolve_tag_value(v, k, asg, current)
+            if resolved is not TAG_VALUE_SKIP:
+                tags.append({'Key': k, 'Value': resolved})
 
         return tags
 
     def process(self, asgs):
-        tags = self.get_tag_set()
         error = None
-
-        self.interpolate_values(tags)
 
         client = self.get_client()
         with self.executor_factory(max_workers=2) as w:
             futures = {}
+            # batch_size is fixed at 1, so each set is resolved against
+            # its single member; get_tag_set()'s lookups are per-resource.
             for asg_set in chunks(asgs, self.batch_size):
+                tags = self.get_tag_set(asg_set[0])
+                self.interpolate_values(tags)
                 futures[w.submit(
-                    self.process_resource_set, client, asg_set, tags)] = asg_set
+                    self.process_resource_set, client, asg_set, tags
+                )] = (asg_set, tags)
             for f in as_completed(futures):
-                asg_set = futures[f]
+                asg_set, tags = futures[f]
                 if f.exception():
                     self.log.exception(
                         "Exception tagging tag:%s error:%s asg:%s" % (
@@ -1192,6 +1201,8 @@ class Tag(Action):
                 atags['ResourceId'] = a['AutoScalingGroupName']
                 tag_params.append(atags)
                 a.setdefault('Tags', []).append(atags)
+        if not tag_params:
+            return
         self.manager.retry(client.create_or_update_tags, Tags=tag_params)
 
     def interpolate_values(self, tags):
@@ -1200,7 +1211,7 @@ class Tag(Action):
             'now': FormatDate.utcnow(),
             'region': self.manager.config.region}
         for t in tags:
-            t['Value'] = t['Value'].format(**params)
+            t['Value'] = str(t['Value']).format(**params)
 
     def get_client(self):
         return local_session(self.manager.session_factory).client('autoscaling')
