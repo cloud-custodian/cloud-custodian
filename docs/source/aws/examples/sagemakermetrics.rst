@@ -42,53 +42,58 @@ Don't do this for utilization metrics. No ``Invocations`` value means no
 request arrived, but no ``CPUUtilization`` value means nothing was measured,
 which is not the same as nothing being used.
 
-SageMaker metric dimensions
----------------------------
+Filtering which metric data for a resource is considered
+--------------------------------------------------------
 
-Non-Sagemaker resource metrics typically have a single time series.
-Sagemaker resource metrics typically have multiple timeseries, reflecting
-multiple underlying compute resources.  These can be divided in multiple ways and
-Sagemaker resources metrics typically have multiple sets of
-dimensions.  See `c7n/data/sagemaker_metrics.json`.
+Sometimes, you may not want to use all of the metric data for a
+resource metric filter. To some degree, you can choose which metric
+data to use.
 
-A filter for a resource may not implement all available dimension sets
-and may only implement dimension sets that include a resource identifier.
+AWS CloudWatch defines `Dimensions
+<https://docs.aws.amazon.com/AmazonCloudWatch/latest/APIReference/API_Dimension.html>`_,
+which are used to identify metric time series.  Each resource metric
+defines one or more dimension sets. A dimension set defines the keys
+that can be used to look up individual metric time series.
 
-You can select a subset of the time series by specifying values for
-one or more dimensions from one of the supported dimension set.
+For example, SageMaker endpoints define a dimension set consisting of
+Endpoint name and variant name.  You can look up an individual metric
+by supplying a specific endpoint name and a specific variant name.
 
-SageMaker endpoints
+Most resource-metrics have only one dimension set, but SageMaker
+resources typically have many.
+
+To limit the metric data used, specify one or more dimension values::
+
+  dimensions:
+    VariantName: gpu
+
+For SageMaker endpoints, supplying a variant of ``gpu`` means only
+the metrics identified for the GPU variant are used.
+
+Allowable dimensions are documented for each resource below.  They
+exclude resource identifiers (e.g. "EndpointName") , which aren't
+allowed in `dimensions` options.
+
+SageMaker Endpoints
 -------------------
 
-An endpoint's series carry two dimensions:
+There are two kinds of endpoints:
 
-``EndpointName``
-   The endpoint's own name, chosen when it was created. The filter supplies
-   this for each endpoint it examines.
+- Classic endpoints that deploy models in variants
 
-``VariantName``
-   Names a production variant -- a model, an instance type and an instance
-   count, serving a share of the endpoint's traffic. An endpoint has at
-   least one, and the filter queries every one of them.
+- Inference-component endpoints that deploy models in inference
+  components in variants
 
-To measure a single variant rather than all of them, name it:
+Allowable dimensions are any combination of:
 
-.. code-block:: yaml
+- VariantName
+- InstanceType
+- InferenceComponentName
 
-          - type: metrics
-            namespace: /aws/sagemaker/Endpoints
-            name: GPUMemoryUtilization
-            statistics: Average
-            days: 14
-            period: 86400
-            value: 20
-            op: less-than
-            dimensions:
-              VariantName: primary
+Specifying InferenceComponentName deselects metrics for all classic
+endpoints.  This means that unless a ``missing-value`` is used, the
+filter won't select any classic endpoints.
 
-A variant that reports no values for a metric is passed over, so an endpoint
-with one GPU variant and one CPU variant is judged on the GPU variant alone
-for a GPU metric.
 
 Endpoints that serve no traffic
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
