@@ -14,7 +14,7 @@ from c7n.credentials import assumed_session
 from c7n.exceptions import PolicyValidationError
 from c7n.filters import Filter, ValueFilter, ListItemFilter
 from c7n.query import QueryResourceManager, TypeInfo, DescribeSource
-from c7n.resources.aws import AWS
+from c7n.resources.aws import AWS, fake_session
 from c7n.tags import universal_augment
 from c7n.utils import local_session, type_schema
 
@@ -22,6 +22,13 @@ from c7n.utils import local_session, type_schema
 log = logging.getLogger("custodian.org-accounts")
 
 ORG_ACCOUNT_SESSION_NAME = "CustodianOrgAccount"
+
+
+def get_policy_types():
+    """Return the Organizations PolicyType enum from the installed botocore."""
+
+    model = fake_session()._session.get_service_model("organizations")
+    return tuple(model.shape_for("PolicyType").enum)
 
 
 class OrgAccess:
@@ -59,12 +66,8 @@ class OrgAccess:
 
 @AWS.resources.register("org-policy")
 class OrgPolicy(QueryResourceManager, OrgAccess):
-    policy_types = (
-        "SERVICE_CONTROL_POLICY",
-        "TAG_POLICY",
-        "BACKUP_POLICY",
-        "AISERVICES_OPT_OUT_POLICY",
-    )
+
+    policy_types = get_policy_types()
 
     class resource_type(TypeInfo):
         service = "organizations"
