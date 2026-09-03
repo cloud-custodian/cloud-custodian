@@ -15,7 +15,8 @@ import c7n
 from .common import BaseTest
 
 from c7n.filters.metrics import MetricsFilter
-from c7n.resources.sagemaker import SagemakerJobQueryParser, CompilationJobQueryParser
+from c7n.resources.sagemaker import (
+    SagemakerEndpoint, SagemakerJobQueryParser, CompilationJobQueryParser)
 from c7n.exceptions import PolicyValidationError
 
 import botocore.exceptions as b_exc
@@ -1850,6 +1851,15 @@ def test_sagemaker_endpoint_metrics_dimensions_validated(test):
         test.load_policy(policy, validate=True)
     assert "doesn't support percent-attr" in str(caught.value)
 
+    # a metric the documentation doesn't describe fails while the policy
+    # is loading, rather than as an empty report later
+    del policy['filters'][0]['percent-attr']
+    policy['filters'][0]['name'] = 'Invocation'
+    with pytest.raises(AssertionError) as caught:
+        test.load_policy(policy, validate=True)
+    assert 'no documented sagemaker-endpoint metric named Invocation' in str(
+        caught.value)
+
 
 def test_sagemaker_metrics_stop_fetching_once_a_value_fails(test):
     # a resource with several sub units costs a call each, and one failing
@@ -1857,7 +1867,7 @@ def test_sagemaker_metrics_stop_fetching_once_a_value_fails(test):
     from c7n.resources.sagemaker import SageMakerMetricsFilter
 
     class ThreeSubUnits(SageMakerMetricsFilter):
-        metric_resources = ()
+        metric_resources = ('sagemaker-endpoint',)
 
         def get_dimension_sets(self, resource):
             return [[{'Name': 'D', 'Value': str(i)}] for i in range(3)]
@@ -1878,6 +1888,26 @@ def test_sagemaker_metrics_stop_fetching_once_a_value_fails(test):
          'op': 'less-than'}, policy.resource_manager)
     assert f.process([{'EndpointName': 'e'}]) == []
     assert requested == ['0']
+
+
+def test_sagemaker_endpoint_metrics_variant_without_components(test):
+    # an endpoint that hosts components reports its invocations against
+    # them, so naming one of its variants that hosts none leaves nothing
+    # to measure. Deciding that from the components left after the
+    # dimensions are applied would make the endpoint look classic and ask
+    # for a variant's invocations, which it never publishes.
+    policy = test.load_policy(
+        {'name': 'endpoints', 'resource': 'sagemaker-endpoint'})
+    klass = SagemakerEndpoint.filter_registry.get('metrics')
+    f = klass(
+        {'type': 'metrics', 'name': 'Invocations', 'statistics': 'Sum',
+         'value': 0, 'op': 'lte', 'dimensions': {'VariantName': 'quiet'}},
+        policy.resource_manager)
+    f.components = {'e': [('component', 'busy')]}
+    resource = {'EndpointName': 'e',
+                'ProductionVariants': [{'VariantName': 'busy'},
+                                       {'VariantName': 'quiet'}]}
+    assert f.get_dimension_sets(resource) == []
 
 
 # The sagemaker metrics documentation, as markdown rather than html: every

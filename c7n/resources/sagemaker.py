@@ -400,16 +400,23 @@ class SageMakerMetricsFilter(MetricsFilter):
         raise NotImplementedError
 
     def published_metric(self):
-        """What the aws documentation says about this metric, if anything."""
+        """What the aws documentation says about this metric.
+
+        The data is generated from that documentation, so a name missing
+        from it is either a typo or a metric aws has published since --
+        regenerate with test_sagemaker_metrics_data_current.
+        """
         for resource in self.metric_resources:
             metric = SAGEMAKER_METRICS.get(resource, {}).get(self.data['name'])
             if metric:
                 return metric
-        return None
+
+        raise AssertionError(
+            "no documented %s metric named %s" % (
+                self.manager.type, self.data['name']))
 
     def published_dimension_sets(self):
-        metric = self.published_metric()
-        return metric and metric['dimension_sets']
+        return self.published_metric()['dimension_sets']
 
     # keys of the shared schema this filter doesn't implement, rather than
     # accepting and ignoring them
@@ -417,6 +424,9 @@ class SageMakerMetricsFilter(MetricsFilter):
 
     def validate(self):
         super().validate()
+        # fail on an undocumented metric name while the policy is being
+        # loaded, rather than on an empty report later
+        self.published_metric()
         if 'namespace' in self.data:
             raise PolicyValidationError(
                 "metrics filter on %s determines the namespace from the "
@@ -430,9 +440,7 @@ class SageMakerMetricsFilter(MetricsFilter):
     def process(self, resources, event=None):
         # the base filter reads the namespace from the policy, so name it
         # there rather than reimplementing the setup around it
-        metric = self.published_metric()
-        if metric:
-            self.data['namespace'] = metric['namespace']
+        self.data['namespace'] = self.published_metric()['namespace']
         return super().process(resources, event)
 
     def process_resource_set(self, resource_set):
@@ -558,15 +566,14 @@ class SagemakerEndpointMetricsFilter(SageMakerMetricsFilter):
                     ', '.join(self.policy_dimensions)))
         if 'InstanceType' in self.data.get('dimensions', ()) and not any(
                 'InstanceType' in names
-                for names in self.published_dimension_sets() or ()):
+                for names in self.published_dimension_sets()):
             raise PolicyValidationError(
                 "metrics filter: %s is not published by instance type" % (
                     self.data['name'],))
 
     def by_component(self):
         """Is this metric reported against inference components?"""
-        return ['InferenceComponentName'] in (
-            self.published_dimension_sets() or ())
+        return ['InferenceComponentName'] in self.published_dimension_sets()
 
     def process(self, resources, event=None):
         self.components = self.get_components()
@@ -592,15 +599,18 @@ class SagemakerEndpointMetricsFilter(SageMakerMetricsFilter):
 
     def get_dimension_sets(self, resource):
         chosen = self.data.get('dimensions', {})
-        components = [
-            name for name, variant in self.components.get(
-                resource['EndpointName'], ())
-            if chosen.get('VariantName', variant) == variant
-            and chosen.get('InferenceComponentName', name) == name]
+        # whether the endpoint hosts components decides which sub unit
+        # reports the metric, so decide that before the policy's
+        # dimensions narrow which of them to use -- filtering first can
+        # leave an endpoint that hosts components looking like one that
+        # doesn't, and reporting nothing
+        hosted = self.components.get(resource['EndpointName'], ())
 
-        if components and self.by_component():
+        if hosted and self.by_component():
             sets = [[{'Name': 'InferenceComponentName', 'Value': name}]
-                    for name in components]
+                    for name, variant in hosted
+                    if chosen.get('VariantName', variant) == variant
+                    and chosen.get('InferenceComponentName', name) == name]
         elif 'InferenceComponentName' in chosen:
             # the endpoint hosts no such component, so has no such metrics
             return []
