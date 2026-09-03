@@ -1,0 +1,120 @@
+{
+    "version": 1,
+    "interactions": [
+        {
+            "request": {
+                "method": "GET",
+                "uri": "https://management.azure.com/subscriptions/ea42f556-5106-4743-99b0-c129bfa71a47/providers/Microsoft.Consumption/budgets?api-version=2021-10-01",
+                "body": null,
+                "headers": {}
+            },
+            "response": {
+                "status": {
+                    "code": 200,
+                    "message": "OK"
+                },
+                "headers": {
+                    "x-ms-operation-identifier": [
+                        "tenantId=72d876e4-6b6f-4622-8566-8200130e81d4,objectId=83fcb2fd-d967-4573-a0f5-ad465aab3ab2/southcentralus/e7907465-27d4-4252-b5ff-c71f774cd1a8"
+                    ],
+                    "x-msedge-ref": [
+                        "Ref A: AF9E8521197A4B8181C007B6DA77379F Ref B: SN4AA2022302019 Ref C: 2026-03-23T20:59:50Z"
+                    ],
+                    "x-ms-ratelimit-remaining-subscription-global-reads": [
+                        "3749"
+                    ],
+                    "content-type": [
+                        "application/json; charset=utf-8"
+                    ],
+                    "content-length": [
+                        "1211"
+                    ],
+                    "cache-control": [
+                        "no-cache"
+                    ],
+                    "session-id": [
+                        "b330a4c4-a6da-451a-8d2e-d50a8290ca73"
+                    ],
+                    "date": [
+                        "Mon, 23 Mar 2026 20:59:51 GMT"
+                    ],
+                    "x-cache": [
+                        "CONFIG_NOCACHE"
+                    ]
+                },
+                "body": {
+                    "data": {
+                        "value": [
+                            {
+                                "id": "/subscriptions/ea42f556-5106-4743-99b0-c129bfa71a47/providers/Microsoft.Consumption/budgets/budget_1001",
+                                "name": "budget_1001",
+                                "type": "Microsoft.Consumption/budgets",
+                                "eTag": "\"1dcbb07e349e2d8\"",
+                                "properties": {
+                                    "timePeriod": {
+                                        "startDate": "2026-03-01T00:00:00Z",
+                                        "endDate": "2036-02-27T00:00:00Z"
+                                    },
+                                    "timeGrain": "Monthly",
+                                    "amount": 1001.0,
+                                    "currentSpend": {
+                                        "amount": 123.45,
+                                        "unit": "USD"
+                                    },
+                                    "category": "Cost",
+                                    "notifications": {
+                                        "actual_gte_90": {
+                                            "enabled": false,
+                                            "operator": "EqualTo",
+                                            "threshold": 90.0,
+                                            "contactEmails": [
+                                                "test@example.com"
+                                            ],
+                                            "contactRoles": [],
+                                            "contactGroups": [],
+                                            "thresholdType": "Actual"
+                                        }
+                                    },
+                                    "filter": {}
+                                }
+                            },
+                            {
+                                "id": "/subscriptions/ea42f556-5106-4743-99b0-c129bfa71a47/providers/Microsoft.Consumption/budgets/budget_1000",
+                                "name": "budget_1000",
+                                "type": "Microsoft.Consumption/budgets",
+                                "eTag": "\"1dcbb07e34a53e9\"",
+                                "properties": {
+                                    "timePeriod": {
+                                        "startDate": "2026-03-01T00:00:00Z",
+                                        "endDate": "2036-02-27T00:00:00Z"
+                                    },
+                                    "timeGrain": "Monthly",
+                                    "amount": 1000.0,
+                                    "currentSpend": {
+                                        "amount": 0.0,
+                                        "unit": "USD"
+                                    },
+                                    "category": "Cost",
+                                    "notifications": {
+                                        "actual_gte_90": {
+                                            "enabled": false,
+                                            "operator": "EqualTo",
+                                            "threshold": 90.0,
+                                            "contactEmails": [
+                                                "test@example.com"
+                                            ],
+                                            "contactRoles": [],
+                                            "contactGroups": [],
+                                            "thresholdType": "Actual"
+                                        }
+                                    },
+                                    "filter": {}
+                                }
+                            }
+                        ]
+                    }
+                }
+            }
+        }
+    ]
+}
