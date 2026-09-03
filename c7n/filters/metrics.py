@@ -242,20 +242,6 @@ class MetricsFilter(Filter):
         return [{'Name': self.model.dimension,
                  'Value': resource[self.model.dimension]}]
 
-    def get_dimension_sets(self, resource):
-        """The dimension sets to query for a resource.
-
-        CloudWatch treats each dimension combination as a distinct metric,
-        so resources whose metrics are published per sub unit (an endpoint
-        variant, a job instance) need one query per sub unit. Override to
-        return a dimension set per sub unit; the sets' datapoints are
-        pooled, so the resource matches only if every datapoint of every sub
-        unit does. A sub unit that reports no data contributes none, and so
-        drops out of the comparison; missing-value applies only when no sub
-        unit reported at all.
-        """
-        return [self.get_dimensions(resource)]
-
     def get_user_dimensions(self):
         dims = []
         if 'dimensions' not in self.data:
@@ -280,12 +266,10 @@ class MetricsFilter(Filter):
         for r in resource_set:
             # if we overload dimensions with multiple resources we get
             # the statistics/average over those resources.
+            dimensions = self.get_dimensions(r)
             # Merge in any filter specified metrics, get_dimensions is
             # commonly overridden so we can't do it there.
-            user_dimensions = self.get_user_dimensions()
-            dimension_sets = [
-                dimensions + user_dimensions
-                for dimensions in self.get_dimension_sets(r)]
+            dimensions.extend(self.get_user_dimensions())
 
             collected_metrics = r.setdefault('c7n.metrics', {})
             # Note this annotation cache is policy scoped, not across
@@ -294,48 +278,6 @@ class MetricsFilter(Filter):
             # across different periods or dimensions would be problematic.
             key = "%s.%s.%s.%s" % (self.namespace, self.metric, self.statistics, str(self.days))
 
-            if key in collected_metrics:
-                datapoints = collected_metrics[key]
-            else:
-                datapoints = self.collect(client, dimension_sets, r)
-                if datapoints is None:
-                    # a value failed the condition, so the resource is out
-                    # and the rest of its sets were never fetched. Nothing
-                    # is annotated: the resource isn't in the results, and
-                    # a partial list here would be read as complete by
-                    # another filter sharing this key.
-                    continue
-                collected_metrics[key] = datapoints
-
-            # In certain cases CloudWatch reports no data for a metric.
-            # If the policy specifies a fill value for missing data, add
-            # that here before testing for matches. Otherwise, skip
-            # matching entirely.
-            if len(datapoints) == 0:
-                if 'missing-value' not in self.data:
-                    continue
-                datapoints.append({
-                    'Timestamp': self.start,
-                    self.statistics: self.data['missing-value'],
-                    'c7n:detail': 'Fill value for missing data'
-                })
-
-            if self.matches(datapoints, r):
-                matched.append(r)
-
-        return matched
-
-    def collect(self, client, dimension_sets, resource):
-        """Fetch each dimension set, stopping as soon as one fails.
-
-        Returns the datapoints, or None once a value has failed the
-        condition -- the resource cannot match, so the remaining sets are
-        not worth fetching.
-        """
-        stats_key = (self.statistics in self.standard_stats
-                     and 'Statistics' or 'ExtendedStatistics')
-        datapoints = []
-        for dimensions in dimension_sets:
             params = dict(
                 Namespace=self.namespace,
                 MetricName=self.metric,
@@ -344,27 +286,50 @@ class MetricsFilter(Filter):
                 Period=self.period,
                 Dimensions=dimensions
             )
-            params[stats_key] = [self.statistics]
-            points = self.get_metric_data(client, params)
-            if not self.matches(points, resource):
-                return None
-            datapoints.extend(points)
-        return datapoints
 
-    def matches(self, datapoints, resource):
-        """Does every datapoint satisfy the filter's condition?"""
-        if self.data.get('percent-attr'):
-            rvalue = resource[self.data.get('percent-attr')]
-            if self.data.get('attr-multiplier'):
-                rvalue = rvalue * self.data['attr-multiplier']
-            return all(
-                self.op(point[self.statistics] / rvalue * 100, self.value)
-                for point in datapoints)
-        return all(
-            self.op(
-                point.get('ExtendedStatistics', point)[self.statistics],
-                self.value)
-            for point in datapoints)
+            stats_key = (self.statistics in self.standard_stats
+                         and 'Statistics' or 'ExtendedStatistics')
+            params[stats_key] = [self.statistics]
+
+            if key not in collected_metrics:
+                collected_metrics[key] = self.get_metric_data(client, params)
+
+            # In certain cases CloudWatch reports no data for a metric.
+            # If the policy specifies a fill value for missing data, add
+            # that here before testing for matches. Otherwise, skip
+            # matching entirely.
+            if len(collected_metrics[key]) == 0:
+                if 'missing-value' not in self.data:
+                    continue
+                collected_metrics[key].append({
+                    'Timestamp': self.start,
+                    self.statistics: self.data['missing-value'],
+                    'c7n:detail': 'Fill value for missing data'
+                })
+
+            if self.data.get('percent-attr'):
+                rvalue = r[self.data.get('percent-attr')]
+                if self.data.get('attr-multiplier'):
+                    rvalue = rvalue * self.data['attr-multiplier']
+                all_meet_condition = True
+                for data_point in collected_metrics[key]:
+                    percent = (data_point[self.statistics] / rvalue * 100)
+                    if not self.op(percent, self.value):
+                        all_meet_condition = False
+                        break
+                if all_meet_condition:
+                    matched.append(r)
+            else:
+                all_meet_condition = True
+                for data_point in collected_metrics[key]:
+                    if 'ExtendedStatistics' in data_point:
+                        data_point = data_point['ExtendedStatistics']
+                    if not self.op(data_point[self.statistics], self.value):
+                        all_meet_condition = False
+                        break
+                if all_meet_condition:
+                    matched.append(r)
+        return matched
 
 
 class ShieldMetrics(MetricsFilter):

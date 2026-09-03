@@ -1700,7 +1700,6 @@ def test_sagemaker_endpoint_metrics_utilization(test, sagemaker_endpoint_metrics
             'filters': [
                 {'EndpointName': busy},
                 {'type': 'metrics',
-                 'namespace': '/aws/sagemaker/Endpoints',
                  'name': 'CPUUtilization',
                  'statistics': 'Average',
                  'days': 1,
@@ -1795,7 +1794,6 @@ def test_sagemaker_endpoint_metrics_inference_component_utilization(
             'filters': [
                 {'EndpointName': endpoint},
                 {'type': 'metrics',
-                 'namespace': '/aws/sagemaker/Endpoints',
                  'name': 'CPUUtilization',
                  'statistics': 'Average',
                  'days': 1,
@@ -1836,6 +1834,42 @@ def test_sagemaker_endpoint_metrics_dimensions_validated(test):
     # the filter fills in itself -- so this one is accepted
     policy['filters'][0]['dimensions'] = {'InstanceType': 'ml.m5.large'}
     test.load_policy(policy, validate=True)
+
+    # the namespace follows from the metric name, so naming it is an error
+    del policy['filters'][0]['dimensions']
+    policy['filters'][0]['namespace'] = '/aws/sagemaker/Endpoints'
+    with pytest.raises(PolicyValidationError) as caught:
+        test.load_policy(policy, validate=True)
+    assert 'determines the namespace' in str(caught.value)
+
+
+def test_sagemaker_metrics_stop_fetching_once_a_value_fails(test):
+    # a resource with several sub units costs a call each, and one failing
+    # value settles it, so the rest are never fetched
+    from c7n.resources.sagemaker import SageMakerMetricsFilter
+
+    class ThreeSubUnits(SageMakerMetricsFilter):
+        metric_resources = ()
+
+        def get_dimension_sets(self, resource):
+            return [[{'Name': 'D', 'Value': str(i)}] for i in range(3)]
+
+    requested = []
+
+    def get_metric_data(self, client, params):
+        value = params['Dimensions'][0]['Value']
+        requested.append(value)
+        # the first sub unit fails the condition, the others would pass
+        return [{'Average': 100 if value == '0' else 1}]
+
+    test.patch(SageMakerMetricsFilter, 'get_metric_data', get_metric_data)
+    policy = test.load_policy(
+        {'name': 'endpoints', 'resource': 'sagemaker-endpoint'})
+    f = ThreeSubUnits(
+        {'type': 'metrics', 'name': 'CPUUtilization', 'value': 50,
+         'op': 'less-than'}, policy.resource_manager)
+    assert f.process([{'EndpointName': 'e'}]) == []
+    assert requested == ['0']
 
 
 # The sagemaker metrics documentation, as markdown rather than html: every

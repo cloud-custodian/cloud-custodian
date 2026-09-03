@@ -125,7 +125,7 @@ at all, for which CloudWatch has no invocation data.
 Endpoints with under-used GPUs
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
-Utilization metrics live in their own namespace, so name it:
+Utilization metrics are reported per variant, like invocations:
 
 .. code-block:: yaml
 
@@ -135,7 +135,6 @@ Utilization metrics live in their own namespace, so name it:
         filters:
           - EndpointStatus: InService
           - type: metrics
-            namespace: /aws/sagemaker/Endpoints
             name: GPUMemoryUtilization
             statistics: Average
             days: 14
@@ -143,23 +142,10 @@ Utilization metrics live in their own namespace, so name it:
             value: 20
             op: less-than
 
-The same namespace carries ``CPUUtilization``, ``MemoryUtilization``,
-``GPUUtilization`` and ``DiskUtilization``.
+``CPUUtilization``, ``MemoryUtilization``, ``GPUUtilization`` and
+``DiskUtilization`` are reported the same way.
 
-Default namespaces
-------------------
-
-.. list-table::
-   :header-rows: 1
-   :widths: 34 33 33
-
-   * - Resource
-     - Default namespace
-     - Utilization metrics in
-   * - ``sagemaker-endpoint``
-     - ``AWS/SageMaker``
-     - ``/aws/sagemaker/Endpoints``
-
-For the metric names each namespace offers, see `SageMaker metrics in
-CloudWatch
+Each metric belongs to one CloudWatch namespace, which the filter looks
+up from the metric name, so policies don't name it. For the metrics
+SageMaker publishes, see `SageMaker metrics in CloudWatch
 <https://docs.aws.amazon.com/sagemaker/latest/dg/monitoring-cloudwatch.html>`_.

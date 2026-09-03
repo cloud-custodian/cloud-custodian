@@ -1259,32 +1259,6 @@ class TestMetricsFilter(BaseTest):
                 for res in resources)
         )
 
-    def test_stops_fetching_once_a_value_fails(self):
-        # a resource with several dimension sets costs a call per set, and
-        # one failing value settles it, so the rest are never fetched
-        from c7n.filters.metrics import MetricsFilter
-
-        class ThreeSets(MetricsFilter):
-
-            def get_dimension_sets(self, resource):
-                return [[{'Name': 'D', 'Value': str(i)}] for i in range(3)]
-
-        requested = []
-
-        def get_metric_data(self, client, params):
-            requested.append(params['Dimensions'][0]['Value'])
-            # the first set fails the condition, the others would pass
-            return [{'Average': 100 if params['Dimensions'][0]['Value'] == '0'
-                     else 1}]
-
-        self.patch(MetricsFilter, 'get_metric_data', get_metric_data)
-        p = self.load_policy({'name': 'ec2', 'resource': 'ec2'})
-        f = ThreeSets(
-            {'type': 'metrics', 'name': 'CPUUtilization', 'value': 50,
-             'op': 'less-than'}, p.resource_manager)
-        self.assertEqual(f.process([{'InstanceId': 'i-1'}]), [])
-        self.assertEqual(requested, ['0'])
-
     def test_metric_period_rounding(self):
         """Round metrics start and end times to align with CloudWatch retention periods"""
 

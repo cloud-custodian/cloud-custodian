@@ -382,13 +382,118 @@ class SagemakerEndpoint(QueryResourceManager):
 SagemakerEndpoint.filter_registry.register('marked-for-op', TagActionFilter)
 
 
+class SageMakerMetricsFilter(MetricsFilter):
+    """Query the several time series a SageMaker resource reports.
+
+    SageMaker resources report per sub unit -- an endpoint per production
+    variant, a job per instance -- so there is no single series to query.
+    Subclasses name the sub units by overriding ``get_dimension_sets``; one
+    ``GetMetricStatistics`` is issued per set, and the resource matches
+    when the condition holds for every value of every one.
+
+    A metric belongs to one namespace, so a policy names the metric and the
+    namespace follows from ``c7n/data/sagemaker_metrics.json``.
+    """
+
+    def get_dimension_sets(self, resource):
+        """The dimension sets naming a resource's sub units."""
+        raise NotImplementedError
+
+    def published_metric(self):
+        """What the aws documentation says about this metric, if anything."""
+        for resource in self.metric_resources:
+            metric = SAGEMAKER_METRICS.get(resource, {}).get(self.data['name'])
+            if metric:
+                return metric
+        return None
+
+    def published_dimension_sets(self):
+        metric = self.published_metric()
+        return metric and metric['dimension_sets']
+
+    def validate(self):
+        super().validate()
+        if 'namespace' in self.data:
+            raise PolicyValidationError(
+                "metrics filter on %s determines the namespace from the "
+                "metric name; remove the namespace" % self.manager.type)
+
+    def process(self, resources, event=None):
+        # the base filter reads the namespace from the policy, so name it
+        # there rather than reimplementing the setup around it
+        metric = self.published_metric()
+        if metric:
+            self.data['namespace'] = metric['namespace']
+        return super().process(resources, event)
+
+    def process_resource_set(self, resource_set):
+        client = local_session(
+            self.manager.session_factory).client('cloudwatch')
+        matched = []
+        for r in resource_set:
+            datapoints = self.get_resource_metrics(client, r)
+            if datapoints is None:
+                # a value failed the condition, so the resource is out and
+                # its remaining sets were never fetched
+                continue
+            if not datapoints:
+                if 'missing-value' not in self.data:
+                    continue
+                datapoints = [{
+                    'Timestamp': self.start,
+                    self.statistics: self.data['missing-value'],
+                    'c7n:detail': 'Fill value for missing data'}]
+            r.setdefault('c7n.metrics', {})[self.metric_key()] = datapoints
+            if self.matches(datapoints):
+                matched.append(r)
+        return matched
+
+    def metric_key(self):
+        return "%s.%s.%s.%s" % (
+            self.namespace, self.metric, self.statistics, str(self.days))
+
+    def get_resource_metrics(self, client, resource):
+        """Fetch a resource's sub units, stopping as soon as one fails.
+
+        Returns None once a value has failed the condition: the resource
+        cannot match, so the remaining sets aren't worth fetching, and a
+        partial list isn't worth annotating.
+        """
+        cached = resource.get('c7n.metrics', {}).get(self.metric_key())
+        if cached is not None:
+            return cached
+        stats_key = (self.statistics in self.standard_stats
+                     and 'Statistics' or 'ExtendedStatistics')
+        datapoints = []
+        for dimensions in self.get_dimension_sets(resource):
+            params = dict(
+                Namespace=self.namespace,
+                MetricName=self.metric,
+                StartTime=self.start,
+                EndTime=self.end,
+                Period=self.period,
+                Dimensions=dimensions)
+            params[stats_key] = [self.statistics]
+            points = self.get_metric_data(client, params)
+            if not self.matches(points):
+                return None
+            datapoints.extend(points)
+        return datapoints
+
+    def matches(self, datapoints):
+        """Does every datapoint satisfy the condition?"""
+        return all(
+            self.op(point.get('ExtendedStatistics', point)[self.statistics],
+                    self.value)
+            for point in datapoints)
+
+
 @SagemakerEndpoint.filter_registry.register('metrics')
-class SagemakerEndpointMetrics(MetricsFilter):
+class SagemakerEndpointMetricsFilter(SageMakerMetricsFilter):
     """Filter sagemaker endpoints by their cloudwatch metrics.
 
-    An endpoint reports per sub unit rather than as a whole, so the filter
-    looks up each of them and the endpoint matches when the condition holds
-    for every value of every one.
+    An endpoint matches when the condition holds for every value of every
+    one of its sub units.
 
     Which sub unit depends on how the endpoint hosts its models. Classically
     each production variant names a model and reports against it.
@@ -400,10 +505,6 @@ class SagemakerEndpointMetrics(MetricsFilter):
     combination of ``VariantName``, ``InstanceType`` and
     ``InferenceComponentName``. Naming a component excludes endpoints that
     have none, since they have no such metrics.
-
-    Invocation metrics are in the default ``AWS/SageMaker`` namespace;
-    instance utilization metrics need ``namespace:
-    /aws/sagemaker/Endpoints``.
 
     :example:
 
@@ -427,6 +528,10 @@ class SagemakerEndpointMetrics(MetricsFilter):
     permissions = MetricsFilter.permissions + (
         'sagemaker:ListInferenceComponents',)
 
+    # metrics documented against an endpoint, and those documented against
+    # the inference components an endpoint may host
+    metric_resources = ('sagemaker-endpoint', 'sagemaker-inference-component')
+
     # what a policy may name. The endpoint's own identity is the filter's
     # to supply, and the remaining published dimensions -- InstanceId,
     # ContainerId -- can't be related back to an endpoint by any api.
@@ -448,19 +553,6 @@ class SagemakerEndpointMetrics(MetricsFilter):
             raise PolicyValidationError(
                 "metrics filter: %s is not published by instance type" % (
                     self.data['name'],))
-
-    def published_dimension_sets(self):
-        """The dimension sets aws publishes this metric under, if known.
-
-        Some of an endpoint's metrics are only reported per inference
-        component, and are documented against the component rather than
-        the endpoint.
-        """
-        for resource in (self.manager.type, 'sagemaker-inference-component'):
-            metric = SAGEMAKER_METRICS.get(resource, {}).get(self.data['name'])
-            if metric:
-                return metric['dimension_sets']
-        return None
 
     def by_component(self):
         """Is this metric reported against inference components?"""
@@ -488,11 +580,6 @@ class SagemakerEndpointMetrics(MetricsFilter):
                     (summary['InferenceComponentName'],
                      summary.get('VariantName')))
         return components
-
-    def get_user_dimensions(self):
-        # a policy's dimensions choose sub units rather than being added to
-        # the query, so get_dimension_sets applies them itself
-        return []
 
     def get_dimension_sets(self, resource):
         chosen = self.data.get('dimensions', {})
