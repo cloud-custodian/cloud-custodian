@@ -1,0 +1,104 @@
+interactions:
+- request:
+    body: null
+    headers:
+      Accept:
+      - application/json
+      Content-Type:
+      - application/json
+      User-Agent:
+      - OpenAPI-Generator/36.0.3/python
+    method: GET
+    uri: https://ghost/api/v1/configmaps?limit=2
+  response:
+    body:
+      string: '{"kind":"ConfigMapList","apiVersion":"v1","metadata":{"resourceVersion":"154","continue":"eyJ2IjoibWV0YS5rOHMuaW8vdjEiLCJydiI6MTU0LCJzdGFydCI6Ii9jN24tdGVzdC9wZy10ZXN0LTAxXHUwMDAwIn0","remainingItemCount":4},"items":[{"metadata":{"name":"pg-test-00","namespace":"c7n-test","uid":"54608c06-7d50-42df-8cb2-796dbd93443d","resourceVersion":"76","creationTimestamp":"2026-09-03T12:30:05Z","annotations":{"kubectl.kubernetes.io/last-applied-configuration":"{\"apiVersion\":\"v1\",\"data\":{\"k\":\"v\"},\"kind\":\"ConfigMap\",\"metadata\":{\"annotations\":{},\"name\":\"pg-test-00\",\"namespace\":\"c7n-test\"}}\n"},"managedFields":[{"manager":"kubectl-client-side-apply","operation":"Update","apiVersion":"v1","time":"2026-09-03T12:30:05Z","fieldsType":"FieldsV1","fieldsV1":{"f:data":{".":{},"f:k":{}},"f:metadata":{"f:annotations":{".":{},"f:kubectl.kubernetes.io/last-applied-configuration":{}}}}}]},"data":{"k":"v"}},{"metadata":{"name":"pg-test-01","namespace":"c7n-test","uid":"1a531063-8971-4eb9-85ce-8af88de7bd98","resourceVersion":"77","creationTimestamp":"2026-09-03T12:30:05Z","annotations":{"kubectl.kubernetes.io/last-applied-configuration":"{\"apiVersion\":\"v1\",\"data\":{\"k\":\"v\"},\"kind\":\"ConfigMap\",\"metadata\":{\"annotations\":{},\"name\":\"pg-test-01\",\"namespace\":\"c7n-test\"}}\n"},"managedFields":[{"manager":"kubectl-client-side-apply","operation":"Update","apiVersion":"v1","time":"2026-09-03T12:30:05Z","fieldsType":"FieldsV1","fieldsV1":{"f:data":{".":{},"f:k":{}},"f:metadata":{"f:annotations":{".":{},"f:kubectl.kubernetes.io/last-applied-configuration":{}}}}}]},"data":{"k":"v"}}]}
+
+        '
+    headers:
+      Audit-Id:
+      - 2d187fa0-fb89-4cc6-bc5b-62ba1fef92cd
+      Cache-Control:
+      - no-cache, private
+      Content-Length:
+      - '1616'
+      Content-Type:
+      - application/json
+      Date:
+      - Thu, 03 Sep 2026 12:36:09 GMT
+      X-Kubernetes-Pf-Flowschema-Uid:
+      - 414213a9-2a93-4395-b483-485722a210db
+      X-Kubernetes-Pf-Prioritylevel-Uid:
+      - 8c8c53d3-90de-44b0-8def-95786b17074d
+    status:
+      code: 200
+      message: OK
+- request:
+    body: null
+    headers:
+      Accept:
+      - application/json
+      Content-Type:
+      - application/json
+      User-Agent:
+      - OpenAPI-Generator/36.0.3/python
+    method: GET
+    uri: https://ghost/api/v1/configmaps?continue=eyJ2IjoibWV0YS5rOHMuaW8vdjEiLCJydiI6MTU0LCJzdGFydCI6Ii9jN24tdGVzdC9wZy10ZXN0LTAxXHUwMDAwIn0&limit=2
+  response:
+    body:
+      string: '{"kind":"ConfigMapList","apiVersion":"v1","metadata":{"resourceVersion":"154","continue":"eyJ2IjoibWV0YS5rOHMuaW8vdjEiLCJydiI6MTU0LCJzdGFydCI6ImM3bi10ZXN0L3BnLXRlc3QtMDNcdTAwMDAifQ","remainingItemCount":2},"items":[{"metadata":{"name":"pg-test-02","namespace":"c7n-test","uid":"3a6ab3ca-2c70-4daa-9992-6d9fc000ecb9","resourceVersion":"78","creationTimestamp":"2026-09-03T12:30:05Z","annotations":{"kubectl.kubernetes.io/last-applied-configuration":"{\"apiVersion\":\"v1\",\"data\":{\"k\":\"v\"},\"kind\":\"ConfigMap\",\"metadata\":{\"annotations\":{},\"name\":\"pg-test-02\",\"namespace\":\"c7n-test\"}}\n"},"managedFields":[{"manager":"kubectl-client-side-apply","operation":"Update","apiVersion":"v1","time":"2026-09-03T12:30:05Z","fieldsType":"FieldsV1","fieldsV1":{"f:data":{".":{},"f:k":{}},"f:metadata":{"f:annotations":{".":{},"f:kubectl.kubernetes.io/last-applied-configuration":{}}}}}]},"data":{"k":"v"}},{"metadata":{"name":"pg-test-03","namespace":"c7n-test","uid":"e925e4ab-c80a-42a2-b8b8-5908c323dd9b","resourceVersion":"79","creationTimestamp":"2026-09-03T12:30:05Z","annotations":{"kubectl.kubernetes.io/last-applied-configuration":"{\"apiVersion\":\"v1\",\"data\":{\"k\":\"v\"},\"kind\":\"ConfigMap\",\"metadata\":{\"annotations\":{},\"name\":\"pg-test-03\",\"namespace\":\"c7n-test\"}}\n"},"managedFields":[{"manager":"kubectl-client-side-apply","operation":"Update","apiVersion":"v1","time":"2026-09-03T12:30:05Z","fieldsType":"FieldsV1","fieldsV1":{"f:data":{".":{},"f:k":{}},"f:metadata":{"f:annotations":{".":{},"f:kubectl.kubernetes.io/last-applied-configuration":{}}}}}]},"data":{"k":"v"}}]}
+
+        '
+    headers:
+      Audit-Id:
+      - aefdaf29-2d35-4d3c-9b28-dcea6fc4519c
+      Cache-Control:
+      - no-cache, private
+      Content-Length:
+      - '1615'
+      Content-Type:
+      - application/json
+      Date:
+      - Thu, 03 Sep 2026 12:36:09 GMT
+      X-Kubernetes-Pf-Flowschema-Uid:
+      - 414213a9-2a93-4395-b483-485722a210db
+      X-Kubernetes-Pf-Prioritylevel-Uid:
+      - 8c8c53d3-90de-44b0-8def-95786b17074d
+    status:
+      code: 200
+      message: OK
+- request:
+    body: null
+    headers:
+      Accept:
+      - application/json
+      Content-Type:
+      - application/json
+      User-Agent:
+      - OpenAPI-Generator/36.0.3/python
+    method: GET
+    uri: https://ghost/api/v1/configmaps?continue=eyJ2IjoibWV0YS5rOHMuaW8vdjEiLCJydiI6MTU0LCJzdGFydCI6ImM3bi10ZXN0L3BnLXRlc3QtMDNcdTAwMDAifQ&limit=2
+  response:
+    body:
+      string: '{"kind":"ConfigMapList","apiVersion":"v1","metadata":{"resourceVersion":"154"},"items":[{"metadata":{"name":"pg-test-04","namespace":"c7n-test","uid":"4ead77d6-a5f3-435c-946f-0a55d8c98dab","resourceVersion":"80","creationTimestamp":"2026-09-03T12:30:05Z","annotations":{"kubectl.kubernetes.io/last-applied-configuration":"{\"apiVersion\":\"v1\",\"data\":{\"k\":\"v\"},\"kind\":\"ConfigMap\",\"metadata\":{\"annotations\":{},\"name\":\"pg-test-04\",\"namespace\":\"c7n-test\"}}\n"},"managedFields":[{"manager":"kubectl-client-side-apply","operation":"Update","apiVersion":"v1","time":"2026-09-03T12:30:05Z","fieldsType":"FieldsV1","fieldsV1":{"f:data":{".":{},"f:k":{}},"f:metadata":{"f:annotations":{".":{},"f:kubectl.kubernetes.io/last-applied-configuration":{}}}}}]},"data":{"k":"v"}},{"metadata":{"name":"kube-apiserver-legacy-service-account-token-tracking","namespace":"kube-system","uid":"ccf7d27a-31a5-497c-bd2e-592326643cff","resourceVersion":"61","creationTimestamp":"2026-09-03T12:29:45Z","managedFields":[{"manager":"kube-apiserver","operation":"Update","apiVersion":"v1","time":"2026-09-03T12:29:45Z","fieldsType":"FieldsV1","fieldsV1":{"f:data":{".":{},"f:since":{}}}}]},"data":{"since":"2026-09-03"}}]}
+
+        '
+    headers:
+      Audit-Id:
+      - b661a9c5-278f-4246-8daa-6ac182c3dc94
+      Cache-Control:
+      - no-cache, private
+      Content-Length:
+      - '1217'
+      Content-Type:
+      - application/json
+      Date:
+      - Thu, 03 Sep 2026 12:36:09 GMT
+      X-Kubernetes-Pf-Flowschema-Uid:
+      - 414213a9-2a93-4395-b483-485722a210db
+      X-Kubernetes-Pf-Prioritylevel-Uid:
+      - 8c8c53d3-90de-44b0-8def-95786b17074d
+    status:
+      code: 200
+      message: OK
+version: 1
