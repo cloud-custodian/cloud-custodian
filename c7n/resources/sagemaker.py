@@ -411,12 +411,21 @@ class SageMakerMetricsFilter(MetricsFilter):
         metric = self.published_metric()
         return metric and metric['dimension_sets']
 
+    # keys of the shared schema this filter doesn't implement, rather than
+    # accepting and ignoring them
+    unsupported = ('percent-attr', 'attr-multiplier')
+
     def validate(self):
         super().validate()
         if 'namespace' in self.data:
             raise PolicyValidationError(
                 "metrics filter on %s determines the namespace from the "
                 "metric name; remove the namespace" % self.manager.type)
+        for key in self.unsupported:
+            if key in self.data:
+                raise PolicyValidationError(
+                    "metrics filter on %s doesn't support %s" % (
+                        self.manager.type, key))
 
     def process(self, resources, event=None):
         # the base filter reads the namespace from the policy, so name it

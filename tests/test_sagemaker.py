@@ -1842,6 +1842,14 @@ def test_sagemaker_endpoint_metrics_dimensions_validated(test):
         test.load_policy(policy, validate=True)
     assert 'determines the namespace' in str(caught.value)
 
+    # and keys of the shared schema this filter doesn't implement are
+    # refused rather than ignored
+    del policy['filters'][0]['namespace']
+    policy['filters'][0]['percent-attr'] = 'InstanceCount'
+    with pytest.raises(PolicyValidationError) as caught:
+        test.load_policy(policy, validate=True)
+    assert "doesn't support percent-attr" in str(caught.value)
+
 
 def test_sagemaker_metrics_stop_fetching_once_a_value_fails(test):
     # a resource with several sub units costs a call each, and one failing
