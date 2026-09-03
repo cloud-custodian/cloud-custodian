@@ -126,6 +126,55 @@ class TestSecretsManager(BaseTest):
         new_tags = client.describe_secret(SecretId="c7n-test-key").get("Tags")
         self.assertTrue("tag@" in new_tags[0].get("Value"))
 
+    def test_tag_action_skips_service_managed_secrets(self):
+        self.patch(SecretsManager, 'executor_factory', MainThreadExecutor)
+        p = self.load_policy({
+            'name': 'tag-secrets',
+            'resource': 'secrets-manager',
+            'actions': [{'type': 'tag', 'key': 'team', 'value': 'platform'}]})
+        action = p.resource_manager.actions[0]
+        resources = [
+            {'Name': 'user-owned', 'ARN': 'secret-arn:user-owned'},
+            {'Name': 'rds!db-abc', 'ARN': 'secret-arn:rds!db-abc',
+             'OwningService': 'rds'}]
+        with patch.object(action, 'process_resource_set') as process_resource_set:
+            action.process(resources)
+        self.assertEqual(process_resource_set.call_count, 1)
+        tagged = process_resource_set.call_args[0][1]
+        self.assertEqual([r['Name'] for r in tagged], ['user-owned'])
+
+    def test_remove_tag_action_skips_service_managed_secrets(self):
+        self.patch(SecretsManager, 'executor_factory', MainThreadExecutor)
+        p = self.load_policy({
+            'name': 'untag-secrets',
+            'resource': 'secrets-manager',
+            'actions': [{'type': 'remove-tag', 'tags': ['stale']}]})
+        action = p.resource_manager.actions[0]
+        resources = [
+            {'Name': 'user-owned', 'ARN': 'secret-arn:user-owned'},
+            {'Name': 'aws-datasync!loc-1', 'ARN': 'secret-arn:aws-datasync!loc-1',
+             'OwningService': 'aws-datasync'}]
+        with patch.object(action, 'process_resource_set') as process_resource_set:
+            action.process(resources)
+        self.assertEqual(process_resource_set.call_count, 1)
+        untagged = process_resource_set.call_args[0][1]
+        self.assertEqual([r['Name'] for r in untagged], ['user-owned'])
+
+    def test_all_service_managed_secret_set_skips_mutation(self):
+        self.patch(SecretsManager, 'executor_factory', MainThreadExecutor)
+        p = self.load_policy({
+            'name': 'mark-secrets',
+            'resource': 'secrets-manager',
+            'actions': [{'type': 'mark-for-op', 'op': 'delete', 'days': 1}]})
+        action = p.resource_manager.actions[0]
+        resources = [{
+            'Name': 'events!conn-1',
+            'ARN': 'secret-arn:events!conn-1',
+            'OwningService': 'events'}]
+        with patch.object(action, 'process_resource_set') as process_resource_set:
+            self.assertEqual(action.process(resources), None)
+        process_resource_set.assert_not_called()
+
     def test_secrets_manager_delete(self):
         self.patch(SecretsManager, 'executor_factory', MainThreadExecutor)
         session_factory = self.replay_flight_data('test_secrets_manager_delete')
