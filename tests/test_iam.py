@@ -14,6 +14,8 @@ import pytest
 from pytest_terraform import terraform
 from dateutil import parser
 
+import botocore.session
+from botocore.stub import Stubber
 from c7n.exceptions import PolicyValidationError
 from c7n.executor import MainThreadExecutor
 from c7n.filters.iamaccess import CrossAccountAccessFilter, PolicyChecker
@@ -38,9 +40,13 @@ from c7n.resources.iam import (
     IamUserInlinePolicy,
     IamRoleInlinePolicy,
     IamGroupInlinePolicy,
+    RoleRemoveTag,
+    RoleTag,
     SpecificIamRoleManagedPolicy,
     NoSpecificIamRoleManagedPolicy,
     PolicyQueryParser,
+    UserRemoveTag,
+    UserTag,
     UserServiceSpecificCredentials,
 )
 
@@ -367,6 +373,105 @@ class UserCredentialReportTest(BaseTest):
                 "user_creation_time": "2016-10-06T16:11:27+00:00",
             },
         )
+
+
+class IamTagRetry(BaseTest):
+
+    def test_iam_tag_actions_retry_concurrent_modification(self):
+        self.patch(time, "sleep", lambda _: None)
+        cases = (
+            (RoleTag, "tag_role", "RoleName"),
+            (RoleRemoveTag, "untag_role", "RoleName"),
+            (UserTag, "tag_user", "UserName"),
+            (UserRemoveTag, "untag_user", "UserName"),
+        )
+
+        for action_class, operation_name, id_key in cases:
+            with self.subTest(operation=operation_name):
+                resource = {id_key: "resource-one"}
+                missing = {id_key: "resource-missing"}
+                if operation_name.startswith("untag_"):
+                    tag_key, tags = "TagKeys", ["Env"]
+                else:
+                    tag_key, tags = "Tags", [{"Key": "Env", "Value": "Dev"}]
+                client = botocore.session.get_session().create_client(
+                    "iam",
+                    region_name="us-east-1",
+                    aws_access_key_id="access-key",
+                    aws_secret_access_key="secret-key",
+                )
+                expected = {**resource, tag_key: tags}
+                missing_expected = {**missing, tag_key: tags}
+                stubber = Stubber(client)
+                stubber.add_client_error(
+                    operation_name,
+                    service_error_code="ConcurrentModification",
+                    service_message="simultaneous change",
+                    http_status_code=409,
+                    expected_params=expected,
+                )
+                stubber.add_response(operation_name, {}, expected)
+                stubber.add_client_error(
+                    operation_name,
+                    service_error_code="NoSuchEntity",
+                    service_message="missing",
+                    http_status_code=404,
+                    expected_params=missing_expected,
+                )
+
+                action = action_class({}, mock.Mock())
+                with stubber, mock.patch.object(
+                    client, operation_name, wraps=getattr(client, operation_name)
+                ) as operation:
+                    action.process_resource_set(client, [resource, missing], tags)
+
+                self.assertEqual(operation.call_count, 3)
+                self.assertEqual(
+                    operation.call_args_list,
+                    [
+                        mock.call(**expected),
+                        mock.call(**expected),
+                        mock.call(**missing_expected),
+                    ],
+                )
+
+    def test_iam_tag_retry_uses_single_attempt_budget(self):
+        sleep = mock.Mock()
+        self.patch(time, "sleep", sleep)
+        client = botocore.session.get_session().create_client(
+            "iam",
+            region_name="us-east-1",
+            aws_access_key_id="access-key",
+            aws_secret_access_key="secret-key",
+        )
+        expected = {
+            "RoleName": "resource-one",
+            "Tags": [{"Key": "Env", "Value": "Dev"}],
+        }
+        stubber = Stubber(client)
+        for attempt in range(8):
+            throttled = attempt % 2 == 0
+            stubber.add_client_error(
+                "tag_role",
+                service_error_code="Throttling" if throttled else "ConcurrentModification",
+                service_message="retry",
+                http_status_code=429 if throttled else 409,
+                expected_params=expected,
+            )
+
+        action = RoleTag({}, mock.Mock())
+        with stubber, mock.patch.object(
+            client, "tag_role", wraps=client.tag_role
+        ) as operation:
+            with self.assertRaises(ClientError):
+                action.process_resource_set(
+                    client,
+                    [{"RoleName": "resource-one"}],
+                    [{"Key": "Env", "Value": "Dev"}],
+                )
+
+        self.assertEqual(operation.call_count, 8)
+        self.assertEqual(sleep.call_count, 7)
 
 
 class IamUserTag(BaseTest):
@@ -2860,7 +2965,7 @@ class CrossAccountChecker(TestCase):
                 "Action": "s3:GetObject",
                 "Resource": "*",
                 "Condition": {
-                    "ForAnyValuesStringLike": {
+                    "ForAnyValue:StringLike": {
                         "aws:PrincipalOrgPaths": [
                             "o-allowed/r-ab12/ou-ab12-aaaabbbb/*"
                         ]
@@ -2901,7 +3006,7 @@ class CrossAccountChecker(TestCase):
                     "Action": "s3:GetObject",
                     "Resource": "*",
                     "Condition": {
-                        "ForAnyValuesStringLike": {
+                        "ForAnyValue:StringLike": {
                             "aws:PrincipalOrgPaths": [path]
                         }
                     }
@@ -2936,7 +3041,7 @@ class CrossAccountChecker(TestCase):
                 "Action": "s3:GetObject",
                 "Resource": "*",
                 "Condition": {
-                    "ForAnyValuesStringLike": {
+                    "ForAnyValue:StringLike": {
                         "aws:PrincipalOrgPaths": ["o-allowed/*"]
                     }
                 }
@@ -2955,7 +3060,7 @@ class CrossAccountChecker(TestCase):
                 "Action": "s3:GetObject",
                 "Resource": "*",
                 "Condition": {
-                    "ForAnyValuesStringLike": {
+                    "ForAnyValue:StringLike": {
                         "aws:PrincipalOrgPaths": [
                             "o-allowed/*/ou-ab12-prod/*"
                         ]
@@ -2968,7 +3073,7 @@ class CrossAccountChecker(TestCase):
         self.assertEqual(len(checker.check(policy)), 0)
 
         # Same shape but org segment wildcarded — must be denied
-        policy["Statement"][0]["Condition"]["ForAnyValuesStringLike"][
+        policy["Statement"][0]["Condition"]["ForAnyValue:StringLike"][
             "aws:PrincipalOrgPaths"] = ["*/r-ab12/ou-ab12-prod/*"]
         self.assertEqual(len(checker.check(policy)), 1)
 
@@ -2981,7 +3086,7 @@ class CrossAccountChecker(TestCase):
                 "Action": "s3:GetObject",
                 "Resource": "*",
                 "Condition": {
-                    "ForAnyValuesStringLike": {
+                    "ForAnyValue:StringLike": {
                         "aws:PrincipalOrgPaths": [
                             "o-trusted/r-aa11/ou-aa11-anything/*",
                             "o-other/r-bb22/ou-bb22-prod/*",
@@ -2998,6 +3103,37 @@ class CrossAccountChecker(TestCase):
         self.assertEqual(len(checker.check(policy)), 0)
 
         checker = PolicyChecker({"allowed_orgid": {"o-trusted"}})
+        self.assertEqual(len(checker.check(policy)), 1)
+
+    def test_principal_org_paths_uses_real_aws_set_operator(self):
+        """Regression: real AWS operator is ``ForAnyValue:StringLike``, not
+        ``ForAnyValues...``. The plural form was never matched, so the
+        condition was dropped and the wildcard principal looked public."""
+        policy = {
+            "Version": "2012-10-17",
+            "Statement": [{
+                "Effect": "Allow",
+                "Principal": "*",
+                "Action": "s3:GetObject",
+                "Resource": "*",
+                "Condition": {
+                    "ForAnyValue:StringLike": {
+                        "aws:PrincipalOrgPaths": [
+                            "o-allowed/r-ab12/ou-ab12-aaaabbbb/*"
+                        ]
+                    }
+                }
+            }]
+        }
+
+        checker = PolicyChecker({"allowed_orgid": {"o-allowed"}})
+        # operator must be normalized, not silently dropped
+        conditions = checker.normalize_conditions(policy["Statement"][0])
+        self.assertEqual(
+            [c["key"] for c in conditions], ["aws:principalorgpaths"])
+        self.assertEqual(len(checker.check(policy)), 0)
+
+        checker = PolicyChecker({"allowed_orgid": {"o-other"}})
         self.assertEqual(len(checker.check(policy)), 1)
 
     def test_org_id_with_specific_non_whitelisted_account(self):
@@ -3619,7 +3755,7 @@ class CrossAccountChecker(TestCase):
                 "Action": "*",
                 "Resource": "*",
                 "Condition": {
-                    "ForAnyValuesStringLike": {
+                    "ForAnyValue:StringLike": {
                         "aws:PrincipalOrgPaths": [
                             "o-example/r-ab12/ou-ab12-prod/*"
                         ]
@@ -3642,7 +3778,7 @@ class CrossAccountChecker(TestCase):
                 "Action": "*",
                 "Resource": "*",
                 "Condition": {
-                    "ForAnyValuesStringLike": {
+                    "ForAnyValue:StringLike": {
                         "aws:PrincipalOrgPaths": [
                             "o-example/r-ab12/ou-ab12-prod/*"
                         ]
