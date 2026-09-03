@@ -22,6 +22,28 @@ class TestQueryPagination(KubeTest):
         resources = query.filter(manager, limit=2)
         self.assertEqual(len(resources), 6)
 
+    def test_pagination_raw_dict_uses_wire_format_continue_key(self):
+        # A raw dict response (e.g. list_cluster_custom_object, never passed
+        # through .to_dict()) carries the continuation token under the
+        # literal wire key "continue", not "_continue" (see query.py).
+        first_page = {
+            "metadata": {"continue": "token"},
+            "items": [{"metadata": {"name": "a"}}],
+        }
+        second_page = {
+            "metadata": {},
+            "items": [{"metadata": {"name": "b"}}],
+        }
+
+        client = MagicMock()
+        client.list_cluster_custom_object.side_effect = [first_page, second_page]
+
+        query = ResourceQuery(session_factory=None)
+        resources = query._invoke_client_enum(
+            client, "list_cluster_custom_object", {"limit": 2}, "items"
+        )
+        self.assertEqual(len(resources), 2)
+
     def test_pagination_shape_change_raises(self):
         first_page = {
             "metadata": {"_continue": "token"},
