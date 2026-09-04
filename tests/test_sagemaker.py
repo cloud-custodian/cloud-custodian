@@ -1717,9 +1717,11 @@ def test_sagemaker_endpoint_metrics_utilization(test, sagemaker_endpoint_metrics
     assert resource['EndpointName'] == busy
     assert [[d['Value'] for d in dims] for dims in dimensions] == [
         [busy, 'quiet'], [busy, 'busy']]
-    # both variants' datapoints are pooled into the one annotation
-    [datapoints] = resource['c7n.metrics'].values()
-    assert len(datapoints) == 2
+    # each variant's series is annotated separately, named by its dimensions
+    annotated = resource['c7n.metrics']
+    assert sorted(key.split('.')[-1] for key in annotated) == [
+        'VariantName=busy', 'VariantName=quiet']
+    assert [len(points) for points in annotated.values()] == [1, 1]
 
 
 @pytest.mark.audited
@@ -1859,6 +1861,41 @@ def test_sagemaker_endpoint_metrics_dimensions_validated(test):
         test.load_policy(policy, validate=True)
     assert 'no documented sagemaker-endpoint metric named Invocation' in str(
         caught.value)
+
+
+def test_sagemaker_metrics_percentile_statistics(test):
+    # a percentile is requested as ExtendedStatistics and comes back nested
+    # under that key, rather than beside Timestamp like a standard statistic
+    from c7n.resources.sagemaker import SageMakerMetricsFilter
+
+    class OneSubUnit(SageMakerMetricsFilter):
+        metric_resources = ('sagemaker-endpoint',)
+
+        def get_dimension_sets(self, resource):
+            return [[{'Name': 'D', 'Value': 'only'}]]
+
+    requested = []
+
+    def get_metric_data(self, client, params):
+        requested.append(params)
+        return [{'Timestamp': 'when', 'Unit': 'Percent',
+                 'ExtendedStatistics': {'p95': 3.1}}]
+
+    test.patch(SageMakerMetricsFilter, 'get_metric_data', get_metric_data)
+    policy = test.load_policy(
+        {'name': 'endpoints', 'resource': 'sagemaker-endpoint'})
+    f = OneSubUnit(
+        {'type': 'metrics', 'name': 'CPUUtilization', 'statistics': 'p95',
+         'value': 50, 'op': 'less-than'}, policy.resource_manager)
+    resource = {'EndpointName': 'e'}
+
+    assert f.process([resource]) == [resource]
+    # asked for the percentile as an extended statistic
+    assert requested[0]['ExtendedStatistics'] == ['p95']
+    assert 'Statistics' not in requested[0]
+    # and the annotation holds the unwrapped values, not the nesting
+    [points] = resource['c7n.metrics'].values()
+    assert points == [{'p95': 3.1}]
 
 
 def test_sagemaker_metrics_stop_fetching_once_a_value_fails(test):

@@ -23,7 +23,7 @@ DimensionName = str
 
 class Dimension(typing.TypedDict):
     Name: DimensionName
-    Value: typing.Any
+    Value: str
 
 
 MetricDimensions = list[Dimension]
@@ -487,10 +487,6 @@ class SageMakerMetricsFilter(MetricsFilter):
 
         return matched
 
-    def metric_key(self):
-        return (f"{self.namespace}.{self.metric}"
-                f".{self.statistics}.{self.days}")
-
     def get_resource_metrics(self, client, resource, extended_statistics):
         """Yield time series for each of our metrics.
 
@@ -501,23 +497,39 @@ class SageMakerMetricsFilter(MetricsFilter):
         This is implemented as a generator, so the caller can stop
         early if the filter condition isn't met.
         """
-        cached = resource.get('c7n.metrics', {}).get(self.metric_key())
-        if cached is not None:
-            yield cached
-        else:
-            stats_key = 'ExtendedStatistics' if extended_statistics else 'Statistics'
-            for dimensions in self.get_dimension_sets(resource):
+        base_key = (
+            f"{self.namespace}"
+            f".{self.metric}"
+            f".{self.statistics}"
+            f".{self.days}"
+            f".{self.period}"
+        )
+        base_params = dict(
+            Namespace=self.namespace,
+            MetricName=self.metric,
+            StartTime=self.start,
+            EndTime=self.end,
+            Period=self.period,
+            **{
+                'ExtendedStatistics' if extended_statistics else 'Statistics':
+                [self.statistics]
+            }
+        )
+        cache = resource.setdefault('c7n.metrics', {})
+        for dimensions in self.get_dimension_sets(resource):
+            dimension_key = '.'.join(f"{d['Name']}={d['Value']}" for d in dimensions)
+            cache_key = f"{base_key}.{dimension_key}"
+            cached = cache.get(cache_key)
+            if cached is not None:
+                yield cached
+            else:
                 params = dict(
-                    Namespace=self.namespace,
-                    MetricName=self.metric,
-                    StartTime=self.start,
-                    EndTime=self.end,
-                    Period=self.period,
+                    base_params,
                     Dimensions=dimensions)
-                params[stats_key] = [self.statistics]
                 points = self.get_metric_data(client, params)
                 if extended_statistics:
                     points = [p['ExtendedStatistics'] for p in points]
+                cache[cache_key] = points
                 yield points
 
 
