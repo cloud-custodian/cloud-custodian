@@ -43,6 +43,13 @@ filters = FilterRegistry('ec2.filters')
 actions = ActionRegistry('ec2.actions')
 
 
+# Maximum number of instances to look tags up by id for. Above this, fall back
+# to the region-wide resource-type filter: ec2 allows only 200 total filter
+# values per request, and this keeps the response bounded (100 ids, at ec2's
+# limit of 50 tags each).
+EC2_TAG_AUGMENT_BY_INSTANCES_MAX = 100
+
+
 class DescribeEC2(query.DescribeSource):
 
     def get_query_params(self, query_params):
@@ -85,8 +92,7 @@ class DescribeEC2(query.DescribeSource):
         always get tags from describe_x calls.
         """
         if not resources or self.manager.data.get(
-                'mode', {}).get('type', '') in (
-                    'cloudtrail', 'ec2-instance-state'):
+                'mode', {}).get('type', '') == 'ec2-instance-state':
             return resources
 
         # AWOL detector, so we don't make extraneous api calls.
@@ -103,21 +109,35 @@ class DescribeEC2(query.DescribeSource):
         if found:
             return resources
 
-        # Okay go and do the tag lookup
+        # Tag lookup
         client = utils.local_session(self.manager.session_factory).client('ec2')
-        tag_set = self.manager.retry(
-            client.describe_tags,
-            Filters=[{'Name': 'resource-type',
-                      'Values': ['instance']}])['Tags']
+        model = self.manager.get_model()
+        if len(resources) <= EC2_TAG_AUGMENT_BY_INSTANCES_MAX:
+            # ec2 ignores MaxResults for a resource-id filter, so no paginator.
+            tag_set = self.manager.retry(
+                client.describe_tags,
+                Filters=[{'Name': 'resource-id',
+                          'Values': [r[model.id] for r in resources]}])['Tags']
+        else:
+            # Potentially many instances and tags, so paginate.
+            # Note that we don't specify a page size, and we never saw
+            # a continuation token without one -- but this covers every
+            # instance tag in the region, so the volume is unbounded and
+            # the paginator is insurance.
+            paginator = client.get_paginator('describe_tags')
+            paginator.PAGE_ITERATOR_CLS = query.RetryPageIterator
+            tag_set = paginator.paginate(
+                Filters=[{'Name': 'resource-type',
+                          'Values': ['instance']}]).build_full_result()['Tags']
+
         resource_tags = {}
         for t in tag_set:
             t.pop('ResourceType')
             rid = t.pop('ResourceId')
             resource_tags.setdefault(rid, []).append(t)
 
-        m = self.manager.get_model()
         for r in resources:
-            r['Tags'] = resource_tags.get(r[m.id], [])
+            r['Tags'] = resource_tags.get(r[model.id], [])
         return resources
 
 
