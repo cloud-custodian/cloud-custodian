@@ -52,7 +52,11 @@ class ResourceQuery:
                     f"be silently dropped"
                 )
             first = False
-            token = res.get("metadata", {}).get("_continue")
+            metadata = res.get("metadata") or {}
+            # .to_dict() renames the wire-format key "continue" (a reserved
+            # word) to "_continue"; a raw dict response that never passed
+            # through .to_dict() keeps the real wire key. Check both.
+            token = metadata.get("continue") or metadata.get("_continue")
             if not token:
                 return items
             params["_continue"] = token
