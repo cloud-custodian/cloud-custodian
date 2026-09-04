@@ -1999,6 +1999,6 @@ def test_sagemaker_metrics_data_current():
     if not SAGEMAKER_METRICS_DATA.exists():
         SAGEMAKER_METRICS_DATA.write_text(
             json.dumps(parsed, indent=2, sort_keys=True) + '\n')
-        pytest.skip('wrote %s' % SAGEMAKER_METRICS_DATA)
+        pytest.skip(f'wrote {SAGEMAKER_METRICS_DATA}')
 
     assert parsed == json.loads(SAGEMAKER_METRICS_DATA.read_text())
