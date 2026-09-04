@@ -1,0 +1,709 @@
+{
+  "sagemaker-endpoint": {
+    "CPUReservation": {
+      "dimension_sets": [
+        [
+          "EndpointName",
+          "VariantName"
+        ],
+        [
+          "EndpointName",
+          "VariantName",
+          "InstanceType"
+        ],
+        [
+          "InstanceId"
+        ],
+        [
+          "AcceleratorId"
+        ]
+      ],
+      "namespace": "/aws/sagemaker/Endpoints"
+    },
+    "CPUUtilization": {
+      "dimension_sets": [
+        [
+          "EndpointName",
+          "VariantName"
+        ],
+        [
+          "EndpointName",
+          "VariantName",
+          "InstanceType"
+        ],
+        [
+          "InstanceId"
+        ],
+        [
+          "AcceleratorId"
+        ]
+      ],
+      "namespace": "/aws/sagemaker/Endpoints"
+    },
+    "CPUUtilizationNormalized": {
+      "dimension_sets": [
+        [
+          "EndpointName",
+          "VariantName"
+        ],
+        [
+          "EndpointName",
+          "VariantName",
+          "InstanceType"
+        ],
+        [
+          "InstanceId"
+        ],
+        [
+          "AcceleratorId"
+        ]
+      ],
+      "namespace": "/aws/sagemaker/Endpoints"
+    },
+    "ConcurrentRequestsPerCopy": {
+      "dimension_sets": [
+        [
+          "EndpointName",
+          "VariantName"
+        ],
+        [
+          "EndpointName",
+          "VariantName",
+          "InstanceType"
+        ],
+        [
+          "InferenceComponentName"
+        ],
+        [
+          "InstanceId"
+        ],
+        [
+          "ContainerId"
+        ]
+      ],
+      "namespace": "AWS/SageMaker"
+    },
+    "ConcurrentRequestsPerModel": {
+      "dimension_sets": [
+        [
+          "EndpointName",
+          "VariantName"
+        ],
+        [
+          "EndpointName",
+          "VariantName",
+          "InstanceType"
+        ],
+        [
+          "InferenceComponentName"
+        ],
+        [
+          "InstanceId"
+        ],
+        [
+          "ContainerId"
+        ]
+      ],
+      "namespace": "AWS/SageMaker"
+    },
+    "DiskUtilization": {
+      "dimension_sets": [
+        [
+          "EndpointName",
+          "VariantName"
+        ],
+        [
+          "EndpointName",
+          "VariantName",
+          "InstanceType"
+        ],
+        [
+          "InstanceId"
+        ],
+        [
+          "AcceleratorId"
+        ]
+      ],
+      "namespace": "/aws/sagemaker/Endpoints"
+    },
+    "FirstChunkLatency": {
+      "dimension_sets": [
+        [
+          "EndpointName",
+          "VariantName"
+        ],
+        [
+          "EndpointName",
+          "VariantName",
+          "InstanceType"
+        ],
+        [
+          "InferenceComponentName"
+        ],
+        [
+          "InstanceId"
+        ],
+        [
+          "ContainerId"
+        ]
+      ],
+      "namespace": "AWS/SageMaker"
+    },
+    "FirstChunkModelLatency": {
+      "dimension_sets": [
+        [
+          "EndpointName",
+          "VariantName"
+        ],
+        [
+          "EndpointName",
+          "VariantName",
+          "InstanceType"
+        ],
+        [
+          "InferenceComponentName"
+        ],
+        [
+          "InstanceId"
+        ],
+        [
+          "ContainerId"
+        ]
+      ],
+      "namespace": "AWS/SageMaker"
+    },
+    "FirstChunkOverheadLatency": {
+      "dimension_sets": [
+        [
+          "EndpointName",
+          "VariantName"
+        ],
+        [
+          "EndpointName",
+          "VariantName",
+          "InstanceType"
+        ],
+        [
+          "InferenceComponentName"
+        ],
+        [
+          "InstanceId"
+        ],
+        [
+          "ContainerId"
+        ]
+      ],
+      "namespace": "AWS/SageMaker"
+    },
+    "GPUMemoryUtilization": {
+      "dimension_sets": [
+        [
+          "EndpointName",
+          "VariantName"
+        ],
+        [
+          "EndpointName",
+          "VariantName",
+          "InstanceType"
+        ],
+        [
+          "InstanceId"
+        ],
+        [
+          "AcceleratorId"
+        ]
+      ],
+      "namespace": "/aws/sagemaker/Endpoints"
+    },
+    "GPUMemoryUtilizationNormalized": {
+      "dimension_sets": [
+        [
+          "EndpointName",
+          "VariantName"
+        ],
+        [
+          "EndpointName",
+          "VariantName",
+          "InstanceType"
+        ],
+        [
+          "InstanceId"
+        ],
+        [
+          "AcceleratorId"
+        ]
+      ],
+      "namespace": "/aws/sagemaker/Endpoints"
+    },
+    "GPUReservation": {
+      "dimension_sets": [
+        [
+          "EndpointName",
+          "VariantName"
+        ],
+        [
+          "EndpointName",
+          "VariantName",
+          "InstanceType"
+        ],
+        [
+          "InstanceId"
+        ],
+        [
+          "AcceleratorId"
+        ]
+      ],
+      "namespace": "/aws/sagemaker/Endpoints"
+    },
+    "GPUUtilization": {
+      "dimension_sets": [
+        [
+          "EndpointName",
+          "VariantName"
+        ],
+        [
+          "EndpointName",
+          "VariantName",
+          "InstanceType"
+        ],
+        [
+          "InstanceId"
+        ],
+        [
+          "AcceleratorId"
+        ]
+      ],
+      "namespace": "/aws/sagemaker/Endpoints"
+    },
+    "GPUUtilizationNormalized": {
+      "dimension_sets": [
+        [
+          "EndpointName",
+          "VariantName"
+        ],
+        [
+          "EndpointName",
+          "VariantName",
+          "InstanceType"
+        ],
+        [
+          "InstanceId"
+        ],
+        [
+          "AcceleratorId"
+        ]
+      ],
+      "namespace": "/aws/sagemaker/Endpoints"
+    },
+    "Invocation4XXErrors": {
+      "dimension_sets": [
+        [
+          "EndpointName",
+          "VariantName"
+        ],
+        [
+          "EndpointName",
+          "VariantName",
+          "InstanceType"
+        ],
+        [
+          "InferenceComponentName"
+        ],
+        [
+          "InstanceId"
+        ],
+        [
+          "ContainerId"
+        ]
+      ],
+      "namespace": "AWS/SageMaker"
+    },
+    "Invocation5XXErrors": {
+      "dimension_sets": [
+        [
+          "EndpointName",
+          "VariantName"
+        ],
+        [
+          "EndpointName",
+          "VariantName",
+          "InstanceType"
+        ],
+        [
+          "InferenceComponentName"
+        ],
+        [
+          "InstanceId"
+        ],
+        [
+          "ContainerId"
+        ]
+      ],
+      "namespace": "AWS/SageMaker"
+    },
+    "InvocationModelErrors": {
+      "dimension_sets": [
+        [
+          "EndpointName",
+          "VariantName"
+        ],
+        [
+          "EndpointName",
+          "VariantName",
+          "InstanceType"
+        ],
+        [
+          "InferenceComponentName"
+        ],
+        [
+          "InstanceId"
+        ],
+        [
+          "ContainerId"
+        ]
+      ],
+      "namespace": "AWS/SageMaker"
+    },
+    "Invocations": {
+      "dimension_sets": [
+        [
+          "EndpointName",
+          "VariantName"
+        ],
+        [
+          "EndpointName",
+          "VariantName",
+          "InstanceType"
+        ],
+        [
+          "InferenceComponentName"
+        ],
+        [
+          "InstanceId"
+        ],
+        [
+          "ContainerId"
+        ]
+      ],
+      "namespace": "AWS/SageMaker"
+    },
+    "InvocationsPerCopy": {
+      "dimension_sets": [
+        [
+          "EndpointName",
+          "VariantName"
+        ],
+        [
+          "EndpointName",
+          "VariantName",
+          "InstanceType"
+        ],
+        [
+          "InferenceComponentName"
+        ],
+        [
+          "InstanceId"
+        ],
+        [
+          "ContainerId"
+        ]
+      ],
+      "namespace": "AWS/SageMaker"
+    },
+    "InvocationsPerInstance": {
+      "dimension_sets": [
+        [
+          "EndpointName",
+          "VariantName"
+        ],
+        [
+          "EndpointName",
+          "VariantName",
+          "InstanceType"
+        ],
+        [
+          "InferenceComponentName"
+        ],
+        [
+          "InstanceId"
+        ],
+        [
+          "ContainerId"
+        ]
+      ],
+      "namespace": "AWS/SageMaker"
+    },
+    "LoadedModelCount": {
+      "dimension_sets": [
+        [
+          "EndpointName",
+          "VariantName"
+        ]
+      ],
+      "namespace": "/aws/sagemaker/Endpoints"
+    },
+    "MemoryReservation": {
+      "dimension_sets": [
+        [
+          "EndpointName",
+          "VariantName"
+        ],
+        [
+          "EndpointName",
+          "VariantName",
+          "InstanceType"
+        ],
+        [
+          "InstanceId"
+        ],
+        [
+          "AcceleratorId"
+        ]
+      ],
+      "namespace": "/aws/sagemaker/Endpoints"
+    },
+    "MemoryUtilization": {
+      "dimension_sets": [
+        [
+          "EndpointName",
+          "VariantName"
+        ],
+        [
+          "EndpointName",
+          "VariantName",
+          "InstanceType"
+        ],
+        [
+          "InstanceId"
+        ],
+        [
+          "AcceleratorId"
+        ]
+      ],
+      "namespace": "/aws/sagemaker/Endpoints"
+    },
+    "MidStreamErrors": {
+      "dimension_sets": [
+        [
+          "EndpointName",
+          "VariantName"
+        ],
+        [
+          "EndpointName",
+          "VariantName",
+          "InstanceType"
+        ],
+        [
+          "InferenceComponentName"
+        ],
+        [
+          "InstanceId"
+        ],
+        [
+          "ContainerId"
+        ]
+      ],
+      "namespace": "AWS/SageMaker"
+    },
+    "ModelCacheHit": {
+      "dimension_sets": [
+        [
+          "EndpointName",
+          "VariantName"
+        ]
+      ],
+      "namespace": "AWS/SageMaker"
+    },
+    "ModelDownloadingTime": {
+      "dimension_sets": [
+        [
+          "EndpointName",
+          "VariantName"
+        ]
+      ],
+      "namespace": "AWS/SageMaker"
+    },
+    "ModelLatency": {
+      "dimension_sets": [
+        [
+          "EndpointName",
+          "VariantName"
+        ],
+        [
+          "EndpointName",
+          "VariantName",
+          "InstanceType"
+        ],
+        [
+          "InferenceComponentName"
+        ],
+        [
+          "InstanceId"
+        ],
+        [
+          "ContainerId"
+        ]
+      ],
+      "namespace": "AWS/SageMaker"
+    },
+    "ModelLoadingTime": {
+      "dimension_sets": [
+        [
+          "EndpointName",
+          "VariantName"
+        ]
+      ],
+      "namespace": "AWS/SageMaker"
+    },
+    "ModelLoadingWaitTime": {
+      "dimension_sets": [
+        [
+          "EndpointName",
+          "VariantName"
+        ]
+      ],
+      "namespace": "AWS/SageMaker"
+    },
+    "ModelSetupTime": {
+      "dimension_sets": [
+        [
+          "EndpointName",
+          "VariantName"
+        ],
+        [
+          "EndpointName",
+          "VariantName",
+          "InstanceType"
+        ],
+        [
+          "InferenceComponentName"
+        ],
+        [
+          "InstanceId"
+        ],
+        [
+          "ContainerId"
+        ]
+      ],
+      "namespace": "AWS/SageMaker"
+    },
+    "ModelUnloadingTime": {
+      "dimension_sets": [
+        [
+          "EndpointName",
+          "VariantName"
+        ]
+      ],
+      "namespace": "AWS/SageMaker"
+    },
+    "OverheadLatency": {
+      "dimension_sets": [
+        [
+          "EndpointName",
+          "VariantName"
+        ],
+        [
+          "EndpointName",
+          "VariantName",
+          "InstanceType"
+        ],
+        [
+          "InferenceComponentName"
+        ],
+        [
+          "InstanceId"
+        ],
+        [
+          "ContainerId"
+        ]
+      ],
+      "namespace": "AWS/SageMaker"
+    }
+  },
+  "sagemaker-inference-component": {
+    "CPUUtilizationNormalized": {
+      "dimension_sets": [
+        [
+          "InferenceComponentName"
+        ],
+        [
+          "InferenceComponentName",
+          "InstanceType"
+        ],
+        [
+          "InstanceId"
+        ],
+        [
+          "ContainerId"
+        ],
+        [
+          "AcceleratorId"
+        ]
+      ],
+      "namespace": "/aws/sagemaker/InferenceComponents"
+    },
+    "GPUMemoryUtilizationNormalized": {
+      "dimension_sets": [
+        [
+          "InferenceComponentName"
+        ],
+        [
+          "InferenceComponentName",
+          "InstanceType"
+        ],
+        [
+          "InstanceId"
+        ],
+        [
+          "ContainerId"
+        ],
+        [
+          "AcceleratorId"
+        ]
+      ],
+      "namespace": "/aws/sagemaker/InferenceComponents"
+    },
+    "GPUUtilizationNormalized": {
+      "dimension_sets": [
+        [
+          "InferenceComponentName"
+        ],
+        [
+          "InferenceComponentName",
+          "InstanceType"
+        ],
+        [
+          "InstanceId"
+        ],
+        [
+          "ContainerId"
+        ],
+        [
+          "AcceleratorId"
+        ]
+      ],
+      "namespace": "/aws/sagemaker/InferenceComponents"
+    },
+    "MemoryUtilizationNormalized": {
+      "dimension_sets": [
+        [
+          "InferenceComponentName"
+        ],
+        [
+          "InferenceComponentName",
+          "InstanceType"
+        ],
+        [
+          "InstanceId"
+        ],
+        [
+          "ContainerId"
+        ],
+        [
+          "AcceleratorId"
+        ]
+      ],
+      "namespace": "/aws/sagemaker/InferenceComponents"
+    }
+  }
+}

@@ -1,0 +1,43 @@
+{
+    "status_code": 200,
+    "data": {
+        "EndpointName": "c7n-endpoint-metrics-upward-hippo-ic",
+        "EndpointArn": "arn:aws:sagemaker:us-east-1:644160558196:endpoint/c7n-endpoint-metrics-upward-hippo-ic",
+        "EndpointConfigName": "c7n-endpoint-metrics-upward-hippo-ic",
+        "ProductionVariants": [
+            {
+                "VariantName": "AllTraffic",
+                "CurrentInstanceCount": 1,
+                "DesiredInstanceCount": 1,
+                "RoutingConfig": {
+                    "RoutingStrategy": "LEAST_OUTSTANDING_REQUESTS"
+                }
+            }
+        ],
+        "EndpointStatus": "InService",
+        "CreationTime": {
+            "__class__": "datetime",
+            "year": 2026,
+            "month": 9,
+            "day": 1,
+            "hour": 16,
+            "minute": 58,
+            "second": 20,
+            "microsecond": 255000
+        },
+        "LastModifiedTime": {
+            "__class__": "datetime",
+            "year": 2026,
+            "month": 9,
+            "day": 1,
+            "hour": 17,
+            "minute": 0,
+            "second": 23,
+            "microsecond": 156000
+        },
+        "MetricsConfig": {
+            "EnableDetailedObservability": true
+        },
+        "ResponseMetadata": {}
+    }
+}

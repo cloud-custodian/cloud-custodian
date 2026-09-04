@@ -1,0 +1,420 @@
+{
+    "pytest-terraform": 1,
+    "outputs": {
+        "component_endpoint_name": {
+            "value": "c7n-endpoint-metrics-upward-hippo-ic",
+            "type": "string"
+        },
+        "component_name": {
+            "value": "c7n-endpoint-metrics-upward-hippo-ic",
+            "type": "string"
+        }
+    },
+    "resources": {
+        "aws_iam_policy_document": {
+            "assume_role": {
+                "id": "1147345228",
+                "json": "{\n  \"Version\": \"2012-10-17\",\n  \"Statement\": [\n    {\n      \"Effect\": \"Allow\",\n      \"Action\": \"sts:AssumeRole\",\n      \"Principal\": {\n        \"Service\": \"sagemaker.amazonaws.com\"\n      }\n    }\n  ]\n}",
+                "minified_json": "{\"Version\":\"2012-10-17\",\"Statement\":[{\"Effect\":\"Allow\",\"Action\":\"sts:AssumeRole\",\"Principal\":{\"Service\":\"sagemaker.amazonaws.com\"}}]}",
+                "override_json": null,
+                "override_policy_documents": null,
+                "policy_id": null,
+                "source_json": null,
+                "source_policy_documents": null,
+                "statement": [
+                    {
+                        "actions": [
+                            "sts:AssumeRole"
+                        ],
+                        "condition": [],
+                        "effect": "Allow",
+                        "not_actions": [],
+                        "not_principals": [],
+                        "not_resources": [],
+                        "principals": [
+                            {
+                                "identifiers": [
+                                    "sagemaker.amazonaws.com"
+                                ],
+                                "type": "Service"
+                            }
+                        ],
+                        "resources": [],
+                        "sid": ""
+                    }
+                ],
+                "version": "2012-10-17"
+            }
+        },
+        "aws_sagemaker_prebuilt_ecr_image": {
+            "xgboost": {
+                "dns_suffix": null,
+                "id": "644160558196",
+                "image_tag": "1.7-1",
+                "region": "us-east-1",
+                "registry_id": "644160558196",
+                "registry_path": "644160558196.dkr.ecr.us-east-1.amazonaws.com/sagemaker-xgboost:1.7-1",
+                "repository_name": "sagemaker-xgboost"
+            }
+        },
+        "aws_cloudformation_stack": {
+            "component": {
+                "capabilities": null,
+                "disable_rollback": false,
+                "iam_role_arn": "",
+                "id": "arn:aws:cloudformation:us-east-1:644160558196:stack/c7n-endpoint-metrics-upward-hippo-ic/ec427ff0-a658-11f1-8241-0affeef325ef",
+                "name": "c7n-endpoint-metrics-upward-hippo-ic",
+                "notification_arns": null,
+                "on_failure": null,
+                "outputs": {},
+                "parameters": {},
+                "policy_body": null,
+                "policy_url": null,
+                "region": "us-east-1",
+                "tags": null,
+                "tags_all": {},
+                "template_body": "{\"Resources\":{\"Component\":{\"Properties\":{\"EndpointName\":\"c7n-endpoint-metrics-upward-hippo-ic\",\"InferenceComponentName\":\"c7n-endpoint-metrics-upward-hippo-ic\",\"RuntimeConfig\":{\"CopyCount\":1},\"Specification\":{\"ComputeResourceRequirements\":{\"MinMemoryRequiredInMb\":1024,\"NumberOfCpuCoresRequired\":1},\"ModelName\":\"c7n-endpoint-metrics-upward-hippo\"},\"VariantName\":\"AllTraffic\"},\"Type\":\"AWS::SageMaker::InferenceComponent\"}}}",
+                "template_url": null,
+                "timeout_in_minutes": 0,
+                "timeouts": null
+            }
+        },
+        "aws_iam_role": {
+            "execution": {
+                "arn": "arn:aws:iam::644160558196:role/c7n-endpoint-metrics-upward-hippo",
+                "assume_role_policy": "{\"Statement\":[{\"Action\":\"sts:AssumeRole\",\"Effect\":\"Allow\",\"Principal\":{\"Service\":\"sagemaker.amazonaws.com\"}}],\"Version\":\"2012-10-17\"}",
+                "create_date": "2026-09-01T22:58:18Z",
+                "description": "",
+                "force_detach_policies": false,
+                "id": "c7n-endpoint-metrics-upward-hippo",
+                "inline_policy": [],
+                "managed_policy_arns": [],
+                "max_session_duration": 3600,
+                "name": "c7n-endpoint-metrics-upward-hippo",
+                "name_prefix": "",
+                "path": "/",
+                "permissions_boundary": "",
+                "tags": null,
+                "tags_all": {},
+                "unique_id": "AROAV7EQQKWX7HN42GJQP"
+            }
+        },
+        "aws_iam_role_policy_attachment": {
+            "execution": {
+                "id": "c7n-endpoint-metrics-upward-hippo/arn:aws:iam::aws:policy/AmazonSageMakerFullAccess",
+                "policy_arn": "arn:aws:iam::aws:policy/AmazonSageMakerFullAccess",
+                "role": "c7n-endpoint-metrics-upward-hippo"
+            }
+        },
+        "aws_s3_bucket": {
+            "model": {
+                "acceleration_status": "",
+                "acl": null,
+                "arn": "arn:aws:s3:::c7n-sagemaker-endpoint-metrics-upward-hippo",
+                "bucket": "c7n-sagemaker-endpoint-metrics-upward-hippo",
+                "bucket_domain_name": "c7n-sagemaker-endpoint-metrics-upward-hippo.s3.amazonaws.com",
+                "bucket_namespace": "global",
+                "bucket_prefix": "",
+                "bucket_region": "us-east-1",
+                "bucket_regional_domain_name": "c7n-sagemaker-endpoint-metrics-upward-hippo.s3.us-east-1.amazonaws.com",
+                "cors_rule": [],
+                "force_destroy": true,
+                "grant": [
+                    {
+                        "id": "46af83c9c3bd517b24c5e1f559f1a1e4694a3a119004c8db795b301befae00ca",
+                        "permissions": [
+                            "FULL_CONTROL"
+                        ],
+                        "type": "CanonicalUser",
+                        "uri": ""
+                    }
+                ],
+                "hosted_zone_id": "Z3AQBSTGFYJSTF",
+                "id": "c7n-sagemaker-endpoint-metrics-upward-hippo",
+                "lifecycle_rule": [],
+                "logging": [],
+                "object_lock_configuration": [],
+                "object_lock_enabled": false,
+                "policy": "",
+                "region": "us-east-1",
+                "replication_configuration": [],
+                "request_payer": "BucketOwner",
+                "server_side_encryption_configuration": [
+                    {
+                        "rule": [
+                            {
+                                "apply_server_side_encryption_by_default": [
+                                    {
+                                        "kms_master_key_id": "",
+                                        "sse_algorithm": "AES256"
+                                    }
+                                ],
+                                "bucket_key_enabled": false
+                            }
+                        ]
+                    }
+                ],
+                "tags": null,
+                "tags_all": {},
+                "timeouts": null,
+                "versioning": [
+                    {
+                        "enabled": false,
+                        "mfa_delete": false
+                    }
+                ],
+                "website": [],
+                "website_domain": null,
+                "website_endpoint": null
+            }
+        },
+        "aws_s3_object": {
+            "model": {
+                "acl": null,
+                "arn": "arn:aws:s3:::c7n-sagemaker-endpoint-metrics-upward-hippo/model.tar.gz",
+                "bucket": "c7n-sagemaker-endpoint-metrics-upward-hippo",
+                "bucket_key_enabled": false,
+                "cache_control": "",
+                "checksum_algorithm": null,
+                "checksum_crc32": "",
+                "checksum_crc32c": "",
+                "checksum_crc64nvme": "",
+                "checksum_sha1": "",
+                "checksum_sha256": "",
+                "content": null,
+                "content_base64": null,
+                "content_disposition": "",
+                "content_encoding": "",
+                "content_language": "",
+                "content_type": "application/octet-stream",
+                "etag": "dd8ee194115d990ad16e3ddaf17bf982",
+                "force_destroy": false,
+                "id": "c7n-sagemaker-endpoint-metrics-upward-hippo/model.tar.gz",
+                "key": "model.tar.gz",
+                "kms_key_id": null,
+                "metadata": null,
+                "object_lock_legal_hold_status": "",
+                "object_lock_mode": "",
+                "object_lock_retain_until_date": "",
+                "override_provider": [],
+                "region": "us-east-1",
+                "server_side_encryption": "AES256",
+                "source": "./model.tar.gz",
+                "source_hash": null,
+                "storage_class": "STANDARD",
+                "tags": null,
+                "tags_all": {},
+                "version_id": "",
+                "website_redirect": ""
+            }
+        },
+        "aws_sagemaker_endpoint": {
+            "busy": {
+                "arn": "arn:aws:sagemaker:us-east-1:644160558196:endpoint/c7n-endpoint-metrics-upward-hippo-busy",
+                "deployment_config": [],
+                "endpoint_config_name": "c7n-endpoint-metrics-upward-hippo-busy",
+                "id": "c7n-endpoint-metrics-upward-hippo-busy",
+                "name": "c7n-endpoint-metrics-upward-hippo-busy",
+                "region": "us-east-1",
+                "tags": null,
+                "tags_all": {}
+            },
+            "component": {
+                "arn": "arn:aws:sagemaker:us-east-1:644160558196:endpoint/c7n-endpoint-metrics-upward-hippo-ic",
+                "deployment_config": [],
+                "endpoint_config_name": "c7n-endpoint-metrics-upward-hippo-ic",
+                "id": "c7n-endpoint-metrics-upward-hippo-ic",
+                "name": "c7n-endpoint-metrics-upward-hippo-ic",
+                "region": "us-east-1",
+                "tags": null,
+                "tags_all": {}
+            },
+            "idle": {
+                "arn": "arn:aws:sagemaker:us-east-1:644160558196:endpoint/c7n-endpoint-metrics-upward-hippo-idle",
+                "deployment_config": [],
+                "endpoint_config_name": "c7n-endpoint-metrics-upward-hippo-idle",
+                "id": "c7n-endpoint-metrics-upward-hippo-idle",
+                "name": "c7n-endpoint-metrics-upward-hippo-idle",
+                "region": "us-east-1",
+                "tags": null,
+                "tags_all": {}
+            }
+        },
+        "aws_sagemaker_endpoint_configuration": {
+            "busy": {
+                "arn": "arn:aws:sagemaker:us-east-1:644160558196:endpoint-config/c7n-endpoint-metrics-upward-hippo-busy",
+                "async_inference_config": [],
+                "data_capture_config": [],
+                "execution_role_arn": "",
+                "id": "c7n-endpoint-metrics-upward-hippo-busy",
+                "kms_key_arn": "",
+                "name": "c7n-endpoint-metrics-upward-hippo-busy",
+                "name_prefix": "",
+                "production_variants": [
+                    {
+                        "accelerator_type": "",
+                        "capacity_reservation_config": [],
+                        "container_startup_health_check_timeout_in_seconds": 0,
+                        "core_dump_config": [],
+                        "enable_ssm_access": false,
+                        "inference_ami_version": "",
+                        "initial_instance_count": 1,
+                        "initial_variant_weight": 1,
+                        "instance_type": "ml.t2.medium",
+                        "managed_instance_scaling": [],
+                        "model_data_download_timeout_in_seconds": 0,
+                        "model_name": "c7n-endpoint-metrics-upward-hippo",
+                        "routing_config": [],
+                        "serverless_config": [],
+                        "variant_name": "quiet",
+                        "volume_size_in_gb": 0
+                    },
+                    {
+                        "accelerator_type": "",
+                        "capacity_reservation_config": [],
+                        "container_startup_health_check_timeout_in_seconds": 0,
+                        "core_dump_config": [],
+                        "enable_ssm_access": false,
+                        "inference_ami_version": "",
+                        "initial_instance_count": 1,
+                        "initial_variant_weight": 1,
+                        "instance_type": "ml.t2.medium",
+                        "managed_instance_scaling": [],
+                        "model_data_download_timeout_in_seconds": 0,
+                        "model_name": "c7n-endpoint-metrics-upward-hippo",
+                        "routing_config": [],
+                        "serverless_config": [],
+                        "variant_name": "busy",
+                        "volume_size_in_gb": 0
+                    }
+                ],
+                "region": "us-east-1",
+                "shadow_production_variants": [],
+                "tags": null,
+                "tags_all": {}
+            },
+            "component": {
+                "arn": "arn:aws:sagemaker:us-east-1:644160558196:endpoint-config/c7n-endpoint-metrics-upward-hippo-ic",
+                "async_inference_config": [],
+                "data_capture_config": [],
+                "execution_role_arn": "arn:aws:iam::644160558196:role/c7n-endpoint-metrics-upward-hippo",
+                "id": "c7n-endpoint-metrics-upward-hippo-ic",
+                "kms_key_arn": "",
+                "name": "c7n-endpoint-metrics-upward-hippo-ic",
+                "name_prefix": "",
+                "production_variants": [
+                    {
+                        "accelerator_type": "",
+                        "capacity_reservation_config": [],
+                        "container_startup_health_check_timeout_in_seconds": 0,
+                        "core_dump_config": [],
+                        "enable_ssm_access": false,
+                        "inference_ami_version": "",
+                        "initial_instance_count": 1,
+                        "initial_variant_weight": 0,
+                        "instance_type": "ml.m5.large",
+                        "managed_instance_scaling": [],
+                        "model_data_download_timeout_in_seconds": 0,
+                        "model_name": "",
+                        "routing_config": [
+                            {
+                                "routing_strategy": "LEAST_OUTSTANDING_REQUESTS"
+                            }
+                        ],
+                        "serverless_config": [],
+                        "variant_name": "AllTraffic",
+                        "volume_size_in_gb": 0
+                    }
+                ],
+                "region": "us-east-1",
+                "shadow_production_variants": [],
+                "tags": null,
+                "tags_all": {}
+            },
+            "idle": {
+                "arn": "arn:aws:sagemaker:us-east-1:644160558196:endpoint-config/c7n-endpoint-metrics-upward-hippo-idle",
+                "async_inference_config": [],
+                "data_capture_config": [],
+                "execution_role_arn": "",
+                "id": "c7n-endpoint-metrics-upward-hippo-idle",
+                "kms_key_arn": "",
+                "name": "c7n-endpoint-metrics-upward-hippo-idle",
+                "name_prefix": "",
+                "production_variants": [
+                    {
+                        "accelerator_type": "",
+                        "capacity_reservation_config": [],
+                        "container_startup_health_check_timeout_in_seconds": 0,
+                        "core_dump_config": [],
+                        "enable_ssm_access": false,
+                        "inference_ami_version": "",
+                        "initial_instance_count": 1,
+                        "initial_variant_weight": 1,
+                        "instance_type": "ml.t2.medium",
+                        "managed_instance_scaling": [],
+                        "model_data_download_timeout_in_seconds": 0,
+                        "model_name": "c7n-endpoint-metrics-upward-hippo",
+                        "routing_config": [],
+                        "serverless_config": [],
+                        "variant_name": "AllTraffic",
+                        "volume_size_in_gb": 0
+                    }
+                ],
+                "region": "us-east-1",
+                "shadow_production_variants": [],
+                "tags": null,
+                "tags_all": {}
+            }
+        },
+        "aws_sagemaker_model": {
+            "main": {
+                "arn": "arn:aws:sagemaker:us-east-1:644160558196:model/c7n-endpoint-metrics-upward-hippo",
+                "container": [],
+                "enable_network_isolation": false,
+                "execution_role_arn": "arn:aws:iam::644160558196:role/c7n-endpoint-metrics-upward-hippo",
+                "id": "c7n-endpoint-metrics-upward-hippo",
+                "inference_execution_config": [],
+                "name": "c7n-endpoint-metrics-upward-hippo",
+                "primary_container": [
+                    {
+                        "additional_model_data_source": [],
+                        "container_hostname": "",
+                        "environment": null,
+                        "image": "644160558196.dkr.ecr.us-east-1.amazonaws.com/sagemaker-xgboost:1.7-1",
+                        "image_config": [],
+                        "inference_specification_name": "",
+                        "mode": "SingleModel",
+                        "model_data_source": [
+                            {
+                                "s3_data_source": [
+                                    {
+                                        "compression_type": "Gzip",
+                                        "model_access_config": [],
+                                        "s3_data_type": "S3Object",
+                                        "s3_uri": "s3://c7n-sagemaker-endpoint-metrics-upward-hippo/model.tar.gz"
+                                    }
+                                ]
+                            }
+                        ],
+                        "model_data_url": "s3://c7n-sagemaker-endpoint-metrics-upward-hippo/model.tar.gz",
+                        "model_package_name": "",
+                        "multi_model_config": []
+                    }
+                ],
+                "region": "us-east-1",
+                "tags": null,
+                "tags_all": {},
+                "vpc_config": []
+            }
+        },
+        "random_pet": {
+            "main": {
+                "id": "upward-hippo",
+                "keepers": null,
+                "length": 2,
+                "prefix": null,
+                "separator": "-"
+            }
+        }
+    }
+}

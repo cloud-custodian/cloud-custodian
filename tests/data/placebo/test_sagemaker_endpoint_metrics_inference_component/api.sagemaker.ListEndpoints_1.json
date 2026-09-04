@@ -1,0 +1,83 @@
+{
+    "status_code": 200,
+    "data": {
+        "Endpoints": [
+            {
+                "EndpointName": "c7n-endpoint-metrics-upward-hippo-busy",
+                "EndpointArn": "arn:aws:sagemaker:us-east-1:644160558196:endpoint/c7n-endpoint-metrics-upward-hippo-busy",
+                "CreationTime": {
+                    "__class__": "datetime",
+                    "year": 2026,
+                    "month": 9,
+                    "day": 1,
+                    "hour": 16,
+                    "minute": 58,
+                    "second": 34,
+                    "microsecond": 387000
+                },
+                "LastModifiedTime": {
+                    "__class__": "datetime",
+                    "year": 2026,
+                    "month": 9,
+                    "day": 1,
+                    "hour": 17,
+                    "minute": 5,
+                    "second": 16,
+                    "microsecond": 782000
+                },
+                "EndpointStatus": "InService"
+            },
+            {
+                "EndpointName": "c7n-endpoint-metrics-upward-hippo-idle",
+                "EndpointArn": "arn:aws:sagemaker:us-east-1:644160558196:endpoint/c7n-endpoint-metrics-upward-hippo-idle",
+                "CreationTime": {
+                    "__class__": "datetime",
+                    "year": 2026,
+                    "month": 9,
+                    "day": 1,
+                    "hour": 16,
+                    "minute": 58,
+                    "second": 32,
+                    "microsecond": 685000
+                },
+                "LastModifiedTime": {
+                    "__class__": "datetime",
+                    "year": 2026,
+                    "month": 9,
+                    "day": 1,
+                    "hour": 17,
+                    "minute": 1,
+                    "second": 47,
+                    "microsecond": 930000
+                },
+                "EndpointStatus": "InService"
+            },
+            {
+                "EndpointName": "c7n-endpoint-metrics-upward-hippo-ic",
+                "EndpointArn": "arn:aws:sagemaker:us-east-1:644160558196:endpoint/c7n-endpoint-metrics-upward-hippo-ic",
+                "CreationTime": {
+                    "__class__": "datetime",
+                    "year": 2026,
+                    "month": 9,
+                    "day": 1,
+                    "hour": 16,
+                    "minute": 58,
+                    "second": 20,
+                    "microsecond": 255000
+                },
+                "LastModifiedTime": {
+                    "__class__": "datetime",
+                    "year": 2026,
+                    "month": 9,
+                    "day": 1,
+                    "hour": 17,
+                    "minute": 0,
+                    "second": 23,
+                    "microsecond": 156000
+                },
+                "EndpointStatus": "InService"
+            }
+        ],
+        "ResponseMetadata": {}
+    }
+}

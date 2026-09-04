@@ -1,0 +1,10 @@
+{
+    "status_code": 200,
+    "data": {
+        "ResponseMetadata": {},
+        "accessToken": "aoaAAAAAGqXaqsXv_hi4mqiWsCfcZYtvTLs1LiKwZzRlrIqUew70QNm2oU6k32j3CfRNzhDi12ovbZcZXkMmiiTKACkc0:MGYCMQCOWT6fa6u4pSxglXo9YSKE/Q0i1N5yT46cglj39Is0pF+EvT2bXalF7q2juqgIwY0CMQC2I4FwM1GPK87d1EodNfOaapqwWb7QKu6i2yjHAh9wVRUGgdcLmqqhCuRVIuXLWe4",
+        "tokenType": "Bearer",
+        "expiresIn": 3600,
+        "refreshToken": "aorAAAAAGqXwf8dd86xsr0oTnmFzfcyVqSgDbtWq27k75OXBCdD--xjw9MFp8zZD4gOV5dJ1v8QAA7Vtk6TKDGoTkCkc0:MGQCMGQi/wbcWVVZ+riArIc9wPWCyG+Q3kLMDcFdfc7tPqCIG9juHET9sgB8zWQqXGpZoQIwN+1qrVpeheXQBigNo7e63FFiGCHJhTn5tus0xfcsQBD2gNL+ps1P3t4WbykmibXT"
+    }
+}

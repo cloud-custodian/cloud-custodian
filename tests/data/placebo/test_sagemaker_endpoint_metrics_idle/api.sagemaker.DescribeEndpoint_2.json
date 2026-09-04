@@ -1,0 +1,58 @@
+{
+    "status_code": 200,
+    "data": {
+        "EndpointName": "c7n-endpoint-metrics-upward-hippo-idle",
+        "EndpointArn": "arn:aws:sagemaker:us-east-1:644160558196:endpoint/c7n-endpoint-metrics-upward-hippo-idle",
+        "EndpointConfigName": "c7n-endpoint-metrics-upward-hippo-idle",
+        "ProductionVariants": [
+            {
+                "VariantName": "AllTraffic",
+                "DeployedImages": [
+                    {
+                        "SpecifiedImage": "644160558196.dkr.ecr.us-east-1.amazonaws.com/sagemaker-xgboost:1.7-1",
+                        "ResolvedImage": "644160558196.dkr.ecr.us-east-1.amazonaws.com/sagemaker-xgboost@sha256:b4f13edb198529c460692015797fa1ca6a8ff1ed64a149297174d922121b8fc4",
+                        "ResolutionTime": {
+                            "__class__": "datetime",
+                            "year": 2026,
+                            "month": 9,
+                            "day": 1,
+                            "hour": 16,
+                            "minute": 58,
+                            "second": 33,
+                            "microsecond": 265000
+                        }
+                    }
+                ],
+                "CurrentWeight": 1.0,
+                "DesiredWeight": 1.0,
+                "CurrentInstanceCount": 1,
+                "DesiredInstanceCount": 1
+            }
+        ],
+        "EndpointStatus": "InService",
+        "CreationTime": {
+            "__class__": "datetime",
+            "year": 2026,
+            "month": 9,
+            "day": 1,
+            "hour": 16,
+            "minute": 58,
+            "second": 32,
+            "microsecond": 685000
+        },
+        "LastModifiedTime": {
+            "__class__": "datetime",
+            "year": 2026,
+            "month": 9,
+            "day": 1,
+            "hour": 17,
+            "minute": 1,
+            "second": 47,
+            "microsecond": 930000
+        },
+        "MetricsConfig": {
+            "EnableDetailedObservability": true
+        },
+        "ResponseMetadata": {}
+    }
+}
