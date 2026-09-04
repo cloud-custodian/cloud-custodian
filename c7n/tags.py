@@ -19,7 +19,9 @@ import time
 
 from c7n.manager import resources as aws_resources
 from c7n.actions import BaseAction as Action, AutoTagUser
-from c7n.exceptions import PolicyValidationError, PolicyExecutionError
+from c7n.exceptions import (
+    PolicyValidationError, PolicyExecutionError, ResourceGroupTagError
+)
 from c7n.resources import load_resources
 from c7n.filters import Filter, OPERATORS
 from c7n.filters.offhours import Time
@@ -1112,10 +1114,14 @@ class UniversalTagRename(Action):
         new_key = self.data['new_key']
 
         for value, rpopulation in values_resources.items():
-            tagger = UniversalTag({'key': new_key, 'value': value}, self.manager)
+            tagger = self.manager.action_registry['tag'](
+                {'key': new_key, 'value': value}, self.manager
+            )
             tagger.process(rpopulation)
         for old_key, rpopulation in old_key_resources.items():
-            cleaner = UniversalUntag({'tags': [old_key]}, self.manager)
+            cleaner = self.manager.action_registry['remove-tag'](
+                {'tags': [old_key]}, self.manager
+            )
             cleaner.process(rpopulation)
 
 
@@ -1165,27 +1171,12 @@ class UniversalTagDelayedAction(TagDelayedAction):
 
         self.log.info("Tagging %d resources for %s on %s" % (
             len(resources), op, action_date))
-
-        tags = {tag: msg}
-
-        batch_size = self.data.get('batch_size', self.batch_size)
-        client = self.get_client()
-
-        _common_tag_processer(
-            self.executor_factory, batch_size, self.concurrency, client,
-            self.process_resource_set, self.id_key, resources, tags, self.log)
-
-    def process_resource_set(self, client, resource_set, tags):
-        arns = self.manager.get_arns(resource_set)
-        return universal_retry(
-            client.tag_resources, ResourceARNList=arns, Tags=tags)
-
-    def get_client(self):
-        # For global resources, manage tags from us-east-1
-        region = (getattr(self.manager.resource_type, 'global_resource', None)
-            and 'us-east-1' or self.manager.region)
-        return utils.local_session(self.manager.session_factory).client(
-            'resourcegroupstaggingapi', region_name=region)
+        tagger = self.manager.action_registry['tag'](
+            {'key': tag, 'value': msg,
+             'batch_size': self.data.get('batch_size', self.batch_size)},
+            self.manager
+        )
+        return tagger.process(resources)
 
 
 class CopyRelatedResourceTag(Tag):
@@ -1405,7 +1396,6 @@ def universal_retry(method, ResourceARNList, **kw):
     a retry is performed.
     """
     max_attempts = 6
-
     for idx, delay in enumerate(
             utils.backoff_delays(1.5, 2 ** 8, jitter=True)):
         response = method(ResourceARNList=ResourceARNList, **kw)
@@ -1423,16 +1413,23 @@ def universal_retry(method, ResourceARNList, **kw):
             elif error_code == 'ResourceNotFoundException':
                 continue
             else:
-                errors[f_arn] = error_code
+                errors[f_arn] = failures[f_arn]
 
         if errors:
-            raise Exception("Resource Tag Errors %s" % (errors))
+            raise ResourceGroupTagError(
+                response.get('ResponseMetadata'),
+                errors,
+                method.__name__
+            )
 
         if idx == max_attempts - 1:
             raise Exception("Resource Tag Throttled %s" % (", ".join(throttles)))
 
         time.sleep(delay)
         ResourceARNList = list(throttles)
+
+        if not ResourceARNList:
+            return response
 
 
 def coalesce_copy_user_tags(resource, copy_tags, user_tags):
