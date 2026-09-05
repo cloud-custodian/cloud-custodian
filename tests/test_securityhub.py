@@ -5,8 +5,10 @@ from c7n.exceptions import PolicyValidationError
 from c7n.resources.aws import shape_validate
 from .common import BaseTest, event_data
 
+import hashlib
 import logging
 import time
+from unittest import mock
 
 LambdaFindingId = "us-east-2/644160558196/81cc9d38b8f8ebfd260ecc81585b4bc9/9f5932aa97900b5164502f41ae393d23" # NOQA
 
@@ -129,6 +131,37 @@ class SecurityHubTest(BaseTest):
         resource = post_finding.format_resource(
             {'Name': 'xyz', 'CreationDate': 'xtf'})
         self.assertEqual(resource['Id'], "arn:aws:s3:::xyz")
+
+    def test_post_finding_id_fips_usedforsecurity(self):
+        # A new finding id is built from hashlib.md5; for FIPS compliance the
+        # usedforsecurity=False flag must be passed.
+        policy = self.load_policy({
+            'name': 's3',
+            'resource': 's3',
+            'actions': [
+                {'type': 'post-finding',
+                 'types': [
+                     "Software and Configuration Checks/AWS Security Best Practices/Network Reachability"  # NOQA
+                 ]}]})
+        post_finding = policy.resource_manager.actions[0]
+
+        real_md5 = hashlib.md5
+        seen_kwargs = []
+
+        def spy_md5(*args, **kwargs):
+            seen_kwargs.append(kwargs)
+            return real_md5(*args)
+
+        with mock.patch(
+                'c7n.resources.securityhub.hashlib.md5', side_effect=spy_md5):
+            finding = post_finding.get_finding(
+                [{'Name': 'xyz'}], None, '2018-01-01T00:00:00Z',
+                '2018-01-01T00:00:00Z')
+
+        self.assertTrue(finding['Id'])
+        self.assertTrue(seen_kwargs)
+        self.assertTrue(
+            all(kw.get('usedforsecurity') is False for kw in seen_kwargs))
 
     def test_security_hub_master_filter(self):
         factory = self.replay_flight_data('test_security_hub_master_filter')
