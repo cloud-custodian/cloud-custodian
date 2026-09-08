@@ -2544,6 +2544,39 @@ class BedrockModelInvocationLogging(ListItemFilter):
         return item_values
 
 
+@filters.register('iot-logging')
+class IoTLogging(Filter):
+    """Check account level IoT logging configuration
+
+    Returns the account when IoT device activity logging is disabled, has no
+    delivery role, or has a default log level of DISABLED.
+
+    :example:
+
+    .. code-block:: yaml
+
+            policies:
+              - name: iot-logging-disabled
+                resource: account
+                filters:
+                  - type: iot-logging
+    """
+    schema = type_schema('iot-logging')
+    permissions = ('iot:GetV2LoggingOptions',)
+    annotation_key = 'c7n:IoTLogging'
+
+    def process(self, resources, event=None):
+        client = local_session(self.manager.session_factory).client('iot')
+        options = client.get_v2_logging_options()
+        options.pop('ResponseMetadata', None)
+        if (not options.get('disableAllLogs')
+                and options.get('roleArn')
+                and options.get('defaultLogLevel') != 'DISABLED'):
+            return []
+        resources[0][self.annotation_key] = options
+        return resources
+
+
 @actions.register('set-bedrock-model-invocation-logging')
 class SetBedrockModelInvocationLogging(BaseAction):
     """Set Bedrock Model Invocation Logging Configuration on an account.

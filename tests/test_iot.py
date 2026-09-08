@@ -18,15 +18,59 @@ class IoTThingTest(BaseTest):
 
 class IoTPolicyTest(BaseTest):
 
-    def test_iot_policy_no_wildcard(self):
+    def test_iot_policy_wildcard(self):
         # placebo: iot.ListPolicies, iot.GetPolicy - include one policy whose
-        # document has an Allow with iot:* or Resource "*", and one scoped.
-        factory = self.replay_flight_data("test_iot_policy_no_wildcard")
+        # document has an Allow with Action iot:* or Resource "*", and one scoped.
+        factory = self.replay_flight_data("test_iot_policy_wildcard")
         p = self.load_policy(
             {
                 "name": "iot-policy-wildcard",
                 "resource": "aws.iot-policy",
-                "filters": [{"type": "no-wildcard"}],
+                "filters": [
+                    {
+                        "type": "has-statement",
+                        "statements": [
+                            {
+                                "Effect": "Allow",
+                                "Action": "iot:*",
+                                "PartialMatch": "Action",
+                            }
+                        ],
+                    }
+                ],
+            },
+            session_factory=factory,
+        )
+        resources = p.run()
+        self.assertEqual(len(resources), 1)
+        self.assertIsInstance(resources[0]["policyDocument"], dict)
+
+    def test_iot_policy_unattached(self):
+        # placebo: iot.ListPolicies, iot.GetPolicy, iot.ListTargetsForPolicy -
+        # one policy with no targets, one attached to a certificate.
+        factory = self.replay_flight_data("test_iot_policy_unattached")
+        p = self.load_policy(
+            {
+                "name": "iot-policy-orphaned",
+                "resource": "aws.iot-policy",
+                "filters": [{"type": "attached", "state": False}],
+            },
+            session_factory=factory,
+        )
+        resources = p.run()
+        self.assertEqual(len(resources), 1)
+        self.assertEqual(resources[0]["c7n:Targets"], [])
+
+    def test_iot_policy_delete(self):
+        # placebo: iot.ListPolicies, iot.GetPolicy, iot.ListTargetsForPolicy,
+        # iot.ListPolicyVersions, iot.DeletePolicy - one unattached policy.
+        factory = self.replay_flight_data("test_iot_policy_delete")
+        p = self.load_policy(
+            {
+                "name": "iot-policy-delete",
+                "resource": "aws.iot-policy",
+                "filters": [{"type": "attached", "state": False}],
+                "actions": [{"type": "delete"}],
             },
             session_factory=factory,
         )

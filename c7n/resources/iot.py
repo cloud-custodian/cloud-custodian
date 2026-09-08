@@ -4,9 +4,9 @@ import json
 
 from c7n.actions import Action
 from c7n.filters import Filter
+from c7n.filters.policystatement import HasStatementFilter
 from c7n.manager import resources
-from c7n.query import QueryResourceManager, TypeInfo
-from c7n.resources.account import Account
+from c7n.query import QueryResourceManager, RetryPageIterator, TypeInfo
 from c7n.utils import local_session, type_schema
 
 
@@ -29,11 +29,7 @@ class IoT(QueryResourceManager):
 
 @resources.register('iot-policy')
 class IoTPolicy(QueryResourceManager):
-    """AWS IoT authorization (device) policy.
-
-    The ``policyDocument`` is fetched per-policy via ``get_policy`` so that
-    filters can inspect the granted actions/resources.
-    """
+    """AWS IoT policy."""
 
     class resource_type(TypeInfo):
         service = 'iot'
@@ -47,87 +43,146 @@ class IoTPolicy(QueryResourceManager):
 
     permissions = ('iot:ListPolicies', 'iot:GetPolicy')
 
+    def augment(self, resources):
+        resources = super().augment(resources)
+        for r in resources:
+            r['policyDocument'] = json.loads(r['policyDocument'])
+        return resources
 
-@IoTPolicy.filter_registry.register('no-wildcard')
-class IoTPolicyNoWildcard(Filter):
-    """Select IoT policies whose document contains a wildcard.
 
-    Matches an ``Allow`` statement that grants ``iot:*`` / ``*`` actions
-    or a ``*`` resource. IoT policy documents use IoT topic / client ARNs
-    (they are not IAM resource policies), so this parses the document
-    directly rather than using CrossAccountAccessFilter.
+class DescribePolicyTargets(Filter):
+    """Base for filters needing the certificates/groups a policy is attached to."""
+
+    permissions = ('iot:ListTargetsForPolicy',)
+    annotation_key = 'c7n:Targets'
+
+    def get_targets(self, resources):
+        client = local_session(self.manager.session_factory).client('iot')
+        for r in resources:
+            if self.annotation_key in r:
+                continue
+            pager = client.get_paginator('list_targets_for_policy')
+            pager.PAGE_ITERATOR_CLS = RetryPageIterator
+            r[self.annotation_key] = pager.paginate(
+                policyName=r['policyName']).build_full_result().get('targets', [])
+
+
+@IoTPolicy.filter_registry.register('attached')
+class IoTPolicyAttached(DescribePolicyTargets):
+    """Filter IoT policies by whether they are attached to any target.
 
     :example:
 
     .. code-block:: yaml
 
         policies:
-          - name: iot-policy-wildcard
+          - name: iot-policy-orphaned
             resource: aws.iot-policy
             filters:
-              - type: no-wildcard
+              - type: attached
+                state: false
     """
 
-    schema = type_schema('no-wildcard')
-    permissions = ('iot:GetPolicy',)
+    schema = type_schema('attached', state={'type': 'boolean'})
 
     def process(self, resources, event=None):
-        return [r for r in resources if self._has_wildcard(r)]
+        self.get_targets(resources)
+        state = self.data.get('state', True)
+        return [r for r in resources
+                if bool(r[self.annotation_key]) == state]
 
-    def _has_wildcard(self, r):
-        doc = r.get('policyDocument')
-        if not doc:
-            return False
-        if isinstance(doc, str):
+
+@IoTPolicy.filter_registry.register('has-statement')
+class IoTPolicyHasStatement(HasStatementFilter):
+
+    policy_attribute = 'policyDocument'
+
+    def get_std_format_args(self, policy):
+        return {
+            'policy_arn': policy['policyArn'],
+            'account_id': self.manager.config.account_id,
+            'region': self.manager.config.region,
+        }
+
+    def process_resource(self, resource):
+        # policyDocument is parsed in augment; the base filter expects a string
+        original = resource[self.policy_attribute]
+        resource[self.policy_attribute] = json.dumps(original)
+        try:
+            return super().process_resource(resource)
+        finally:
+            resource[self.policy_attribute] = original
+
+
+@IoTPolicy.action_registry.register('delete')
+class DeleteIoTPolicy(Action):
+    """Delete an IoT policy.
+
+    Non-default versions are deleted and targets detached first, as required
+    by the API. Set ``force`` to detach targets; without it an attached policy
+    is skipped.
+
+    :example:
+
+    .. code-block:: yaml
+
+        policies:
+          - name: iot-policy-delete-orphaned
+            resource: aws.iot-policy
+            filters:
+              - type: attached
+                state: false
+            actions:
+              - delete
+    """
+
+    schema = type_schema('delete', force={'type': 'boolean'})
+    permissions = (
+        'iot:DeletePolicy', 'iot:DeletePolicyVersion',
+        'iot:ListPolicyVersions', 'iot:ListTargetsForPolicy',
+        'iot:DetachPolicy')
+
+    def process(self, resources):
+        client = local_session(self.manager.session_factory).client('iot')
+        force = self.data.get('force', False)
+        for r in resources:
             try:
-                doc = json.loads(doc)
-            except (ValueError, TypeError):
-                return False
-        statements = doc.get('Statement', [])
-        if isinstance(statements, dict):
-            statements = [statements]
-        for stmt in statements:
-            if stmt.get('Effect') != 'Allow':
+                if not self._detach(client, r, force):
+                    continue
+                self._delete_versions(client, r)
+                client.delete_policy(policyName=r['policyName'])
+            except client.exceptions.ResourceNotFoundException:
                 continue
-            actions = stmt.get('Action', [])
-            actions = [actions] if isinstance(actions, str) else actions
-            resources_ = stmt.get('Resource', [])
-            resources_ = [resources_] if isinstance(resources_, str) else resources_
-            if any(a == '*' or a == 'iot:*' or a.endswith(':*') for a in actions):
-                return True
-            if '*' in resources_:
-                return True
-        return False
+            except client.exceptions.DeleteConflictException as e:
+                self.log.warning(
+                    'policy:%s could not be deleted: %s', r['policyName'], e)
 
+    def _detach(self, client, r, force):
+        targets = r.get(DescribePolicyTargets.annotation_key)
+        if targets is None:
+            targets = client.list_targets_for_policy(
+                policyName=r['policyName']).get('targets', [])
+        if targets and not force:
+            self.log.warning(
+                'policy:%s skipped, attached to %d target(s)',
+                r['policyName'], len(targets))
+            return False
+        for t in targets:
+            client.detach_policy(policyName=r['policyName'], target=t)
+        return True
 
-@resources.register('iot-authorizer')
-class IoTAuthorizer(QueryResourceManager):
-    """AWS IoT custom authorizer."""
-
-    class resource_type(TypeInfo):
-        service = 'iot'
-        enum_spec = ('list_authorizers', 'authorizers', None)
-        detail_spec = (
-            'describe_authorizer', 'authorizerName',
-            'authorizerName', 'authorizerDescription')
-        id = 'authorizerName'
-        name = 'authorizerName'
-        arn = 'authorizerArn'
-        cfn_type = 'AWS::IoT::Authorizer'
-        universal_taggable = object()
-
-    permissions = ('iot:ListAuthorizers', 'iot:DescribeAuthorizer')
+    def _delete_versions(self, client, r):
+        for v in client.list_policy_versions(
+                policyName=r['policyName']).get('policyVersions', []):
+            if v['isDefaultVersion']:
+                continue
+            client.delete_policy_version(
+                policyName=r['policyName'], policyVersionId=v['versionId'])
 
 
 @resources.register('iot-certificate')
 class IoTCertificate(QueryResourceManager):
-    """AWS IoT device X.509 certificate.
-
-    ``describe_certificate`` enriches each certificate with ``validity``
-    (notBefore/notAfter) and ``caCertificateId``. Certificate age is
-    expressed with a ``value`` filter on ``creationDate`` (value_type:
-    age); ``set-inactive`` provides the corrective step.
-    """
+    """AWS IoT device X.509 certificate."""
 
     class resource_type(TypeInfo):
         service = 'iot'
@@ -140,7 +195,6 @@ class IoTCertificate(QueryResourceManager):
         arn = 'certificateArn'
         date = 'creationDate'
         cfn_type = 'AWS::IoT::Certificate'
-        # IoT certificates are NOT taggable in AWS - no universal_taggable.
 
     permissions = ('iot:ListCertificates', 'iot:DescribeCertificate')
 
@@ -200,11 +254,7 @@ class IoTOTAUpdate(QueryResourceManager):
 
 @IoTOTAUpdate.filter_registry.register('unsigned')
 class IoTOTAUpdateUnsigned(Filter):
-    """Select OTA updates that include any unsigned file.
-
-    A file is signed when it carries a ``codeSigning`` block referencing
-    an AWS Signer job (``awsSignerJobId`` / ``startSigningJobParameter``)
-    or a ``customCodeSigning`` signature.
+    """Select OTA updates that include an unsigned file.
 
     :example:
 
@@ -226,8 +276,6 @@ class IoTOTAUpdateUnsigned(Filter):
     def _has_unsigned_file(self, r):
         files = r.get('otaUpdateFiles') or []
         if not files:
-            # No file detail available; treat as non-compliant so it is
-            # surfaced for review rather than silently passing.
             return True
         for f in files:
             signing = f.get('codeSigning') or {}
@@ -238,42 +286,3 @@ class IoTOTAUpdateUnsigned(Filter):
             if not signed:
                 return True
         return False
-
-
-@Account.filter_registry.register('iot-logging')
-class IoTLoggingEnabled(Filter):
-    """Check account-level IoT (V2) logging configuration.
-
-    IoT device activity logging's only destination is CloudWatch Logs, so
-    "enabled and sent to CloudWatch" is satisfied when logging is not
-    disabled, a role is attached, and the default log level is not
-    ``DISABLED``. Returns the account resource when logging is
-    non-compliant.
-
-    :example:
-
-    .. code-block:: yaml
-
-        policies:
-          - name: iot-logging-disabled
-            resource: account
-            filters:
-              - type: iot-logging
-    """
-
-    schema = type_schema('iot-logging')
-    permissions = ('iot:GetV2LoggingOptions',)
-    annotation_key = 'c7n:iot-logging'
-
-    def process(self, resources, event=None):
-        client = local_session(self.manager.session_factory).client('iot')
-        options = client.get_v2_logging_options()
-        options.pop('ResponseMetadata', None)
-        compliant = (
-            not options.get('disableAllLogs', False)
-            and bool(options.get('roleArn'))
-            and options.get('defaultLogLevel') not in (None, 'DISABLED'))
-        if compliant:
-            return []
-        resources[0][self.annotation_key] = options
-        return resources

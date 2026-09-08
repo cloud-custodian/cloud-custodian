@@ -206,7 +206,6 @@ ResourceMap = {
   "aws.inspector2-finding": "c7n.resources.inspector2.Inspector2Finding",
   "aws.internet-gateway": "c7n.resources.vpc.InternetGateway",
   "aws.iot": "c7n.resources.iot.IoT",
-  "aws.iot-authorizer": "c7n.resources.iot.IoTAuthorizer",
   "aws.iot-certificate": "c7n.resources.iot.IoTCertificate",
   "aws.iot-ota-update": "c7n.resources.iot.IoTOTAUpdate",
   "aws.iot-policy": "c7n.resources.iot.IoTPolicy",
