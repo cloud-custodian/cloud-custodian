@@ -14,7 +14,7 @@ from c7n.actions import BaseAction
 from c7n.filters.kms import KmsRelatedFilter
 from c7n.filters import MetricsFilter, ValueFilter
 from c7n.resources.aws import shape_schema, shape_validate, Arn
-from c7n.resources.s3 import BucketAssembly, S3_AUGMENT_TABLE
+from c7n.resources.s3 import BucketAssembly, S3_AUGMENT_TABLE, bucket_client
 
 
 class FoundationModelQueryParser(QueryParser):
@@ -1243,6 +1243,132 @@ class BedrockEvaluationOutputRetention(ValueFilter):
                 resource['c7n:OutputBucket'] = context
                 results.append(resource)
         return results
+
+
+def get_bedrock_job_id(resource):
+    """Return the identifier segment of a job's ARN, used as its output prefix."""
+    job_arn = resource.get('jobArn', '')
+    if '/' in job_arn:
+        return job_arn.rsplit('/', 1)[-1]
+    return resource.get('jobName', '')
+
+
+@BedrockEvaluationJob.action_registry.register('set-output-lifecycle')
+class SetBedrockEvaluationOutputLifecycle(BaseAction):
+    """Ensure a Bedrock evaluation job's S3 output artifacts expire.
+
+    Resolves each job's S3 output bucket and artifact prefix the same way
+    the ``output-retention`` filter does, and adds an enabled lifecycle
+    expiration rule scoped to that prefix when it isn't already covered by
+    an enabled, unconstrained expiration rule guaranteeing at least the
+    configured number of days. Unrelated existing lifecycle rules on the
+    bucket are preserved as-is.
+
+    :example:
+
+    .. code-block:: yaml
+
+        policies:
+          - name: bedrock-evaluation-output-retention-remediate
+            resource: aws.bedrock-evaluation-job
+            filters:
+              - type: output-retention
+                op: gt
+                value: 30
+            actions:
+              - type: set-output-lifecycle
+                days: 30
+    """
+
+    schema = type_schema(
+        'set-output-lifecycle',
+        required=('days',),
+        days={'type': 'integer', 'minimum': 1},
+    )
+
+    def get_permissions(self):
+        fields = {'Location', 'Lifecycle', 'Versioning'}
+        perms = [row[4] for row in S3_AUGMENT_TABLE if row[1] in fields]
+        perms.append('s3:PutLifecycleConfiguration')
+        return tuple(perms)
+
+    def _get_buckets(self, bucket_names):
+        if not bucket_names:
+            return {}
+        assembler = BedrockOutputBucketAssembly(self.manager)
+        assembler.initialize()
+        assembler.augment_fields = {'Location', 'Lifecycle', 'Versioning'}
+        buckets = {}
+        for name in bucket_names:
+            bucket = assembler.assemble({'Name': name})
+            if name in assembler.not_found_buckets:
+                bucket['c7n:BedrockOutputBucketError'] = 'bucket-not-found'
+            buckets[name] = bucket
+        return buckets
+
+    def process(self, resources):
+        by_bucket = {}
+        for resource in resources:
+            s3_uri = resource.get('outputDataConfig', {}).get('s3Uri')
+            bucket_name, prefix, error = parse_bedrock_output_s3_uri(s3_uri)
+            if error:
+                self.log.warning(
+                    "bedrock evaluation job %s has %s output uri, skipping",
+                    resource.get('jobArn'), error)
+                continue
+            artifact_prefix = get_bedrock_output_artifact_prefix(prefix, resource)
+            by_bucket.setdefault(bucket_name, []).append((resource, artifact_prefix))
+
+        buckets = self._get_buckets(sorted(by_bucket))
+        session = local_session(self.manager.session_factory)
+
+        for bucket_name, jobs in by_bucket.items():
+            bucket = buckets.get(bucket_name)
+            if bucket is None or bucket.get('c7n:BedrockOutputBucketError'):
+                self.log.warning(
+                    "unable to resolve output bucket %s, skipping", bucket_name)
+                continue
+            if 'get_bucket_lifecycle_configuration' in bucket.get('c7n:DeniedMethods', ()):
+                self.log.warning(
+                    "access denied reading lifecycle for bucket %s, skipping", bucket_name)
+                continue
+            self._process_bucket(session, bucket, jobs)
+
+    def _process_bucket(self, session, bucket, jobs):
+        days = self.data['days']
+        versioning = bucket.get('Versioning')
+        rules = list((bucket.get('Lifecycle') or {}).get('Rules') or [])
+        changed = False
+
+        for resource, artifact_prefix in jobs:
+            _, effective = get_bedrock_output_lifecycle(
+                {'Rules': rules}, artifact_prefix, versioning)
+            if effective is not None and effective >= days:
+                continue
+
+            rule_id = 'c7n-bedrock-output-retention-%s' % get_bedrock_job_id(resource)
+            new_rule = {
+                'ID': rule_id,
+                'Status': 'Enabled',
+                'Filter': {'Prefix': artifact_prefix},
+                'Expiration': {'Days': days},
+            }
+            for index, existing in enumerate(rules):
+                if existing.get('ID') == rule_id:
+                    if existing != new_rule:
+                        rules[index] = new_rule
+                        changed = True
+                    break
+            else:
+                rules.append(new_rule)
+                changed = True
+
+        if not changed:
+            return
+
+        bucket_s3 = bucket_client(session, bucket)
+        bucket_s3.put_bucket_lifecycle_configuration(
+            Bucket=bucket['Name'], LifecycleConfiguration={'Rules': rules})
 
 
 @resources.register('bedrock-guardrail')

@@ -1316,6 +1316,203 @@ class TestBedrockEvaluationOutputRetention(BaseTest):
             self.get_filter({'key': 'Versioning.Status', 'value': 'Enabled'})
 
 
+class TestSetBedrockEvaluationOutputLifecycle(BaseTest):
+
+    def get_action(self, data=None, session_factory=None):
+        action_data = {'type': 'set-output-lifecycle', 'days': 30}
+        action_data.update(data or {})
+        policy = self.load_policy(
+            {
+                'name': 'bedrock-evaluation-set-output-lifecycle',
+                'resource': 'bedrock-evaluation-job',
+                'actions': [action_data],
+            },
+            session_factory=session_factory,
+            config={'region': 'us-east-1'},
+        )
+        return policy.resource_manager.actions[0]
+
+    def test_permissions(self):
+        action = self.get_action()
+        perms = set(action.get_permissions())
+        assert perms == {
+            's3:GetBucketLocation', 's3:GetLifecycleConfiguration',
+            's3:GetBucketVersioning', 's3:PutLifecycleConfiguration'}
+
+    def job(self, name, job_id, bucket, prefix):
+        return {
+            'jobName': name,
+            'jobArn': 'arn:aws:bedrock:us-east-1:123456789012:evaluation-job/%s' % job_id,
+            'outputDataConfig': {'s3Uri': 's3://%s/%s' % (bucket, prefix)},
+        }
+
+    def test_skips_job_with_invalid_uri(self):
+        action = self.get_action()
+        action._get_buckets = mock.Mock(return_value={})
+        action.process([{'jobArn': 'arn:aws:bedrock:r:a:evaluation-job/id'}])
+        action._get_buckets.assert_called_once_with([])
+
+    def test_skips_bucket_not_found_or_denied(self):
+        action = self.get_action()
+        buckets = {
+            'missing': {'Name': 'missing', 'c7n:BedrockOutputBucketError': 'bucket-not-found'},
+            'denied': {
+                'Name': 'denied', 'Location': {'LocationConstraint': None},
+                'c7n:DeniedMethods': ['get_bucket_lifecycle_configuration']},
+        }
+        action._get_buckets = mock.Mock(return_value=buckets)
+        jobs = [
+            self.job('a', 'id-a', 'missing', 'evaluations'),
+            self.job('b', 'id-b', 'denied', 'evaluations'),
+        ]
+        action.process(jobs)  # should not raise, nothing to put
+
+    def test_already_covered_skips_put(self):
+        client = mock.MagicMock()
+        session = mock.MagicMock()
+        session.client.return_value = client
+
+        def session_factory():
+            return session
+
+        action = self.get_action(session_factory=session_factory)
+        bucket = {
+            'Name': 'bucket', 'Location': {'LocationConstraint': None},
+            'Lifecycle': {'Rules': [{
+                'ID': 'existing', 'Status': 'Enabled',
+                'Filter': {'Prefix': 'evaluations/'},
+                'Expiration': {'Days': 30},
+            }]},
+        }
+        action._get_buckets = mock.Mock(return_value={'bucket': bucket})
+        jobs = [self.job('a', 'id-a', 'bucket', 'evaluations')]
+        action.process(jobs)
+        assert not client.put_bucket_lifecycle_configuration.called
+
+    def test_adds_rule_and_preserves_unrelated_rules(self):
+        client = mock.MagicMock()
+        session = mock.MagicMock()
+        session.client.return_value = client
+
+        def session_factory():
+            return session
+
+        action = self.get_action(session_factory=session_factory)
+        unrelated_rule = {
+            'ID': 'unrelated', 'Status': 'Enabled',
+            'Filter': {'Prefix': 'other/'},
+            'Expiration': {'Days': 5},
+        }
+        bucket = {
+            'Name': 'bucket', 'Location': {'LocationConstraint': None},
+            'Lifecycle': {'Rules': [unrelated_rule]},
+        }
+        action._get_buckets = mock.Mock(return_value={'bucket': bucket})
+        jobs = [self.job('my-job', 'abc123', 'bucket', 'evaluations')]
+        action.process(jobs)
+
+        client.put_bucket_lifecycle_configuration.assert_called_once()
+        _, kwargs = client.put_bucket_lifecycle_configuration.call_args
+        assert kwargs['Bucket'] == 'bucket'
+        rules = kwargs['LifecycleConfiguration']['Rules']
+        assert unrelated_rule in rules
+        new_rule = [r for r in rules if r['ID'] != 'unrelated'][0]
+        assert new_rule == {
+            'ID': 'c7n-bedrock-output-retention-abc123',
+            'Status': 'Enabled',
+            'Filter': {'Prefix': 'evaluations/my-job/abc123/'},
+            'Expiration': {'Days': 30},
+        }
+
+    def test_updates_existing_c7n_rule_by_id(self):
+        client = mock.MagicMock()
+        session = mock.MagicMock()
+        session.client.return_value = client
+
+        def session_factory():
+            return session
+
+        action = self.get_action(
+            {'days': 45}, session_factory=session_factory)
+        existing_rule = {
+            'ID': 'c7n-bedrock-output-retention-abc123',
+            'Status': 'Enabled',
+            'Filter': {'Prefix': 'evaluations/my-job/abc123/'},
+            'Expiration': {'Days': 30},
+        }
+        bucket = {
+            'Name': 'bucket', 'Location': {'LocationConstraint': None},
+            'Lifecycle': {'Rules': [existing_rule]},
+        }
+        action._get_buckets = mock.Mock(return_value={'bucket': bucket})
+        jobs = [self.job('my-job', 'abc123', 'bucket', 'evaluations')]
+        action.process(jobs)
+
+        client.put_bucket_lifecycle_configuration.assert_called_once()
+        _, kwargs = client.put_bucket_lifecycle_configuration.call_args
+        rules = kwargs['LifecycleConfiguration']['Rules']
+        assert len(rules) == 1
+        assert rules[0]['Expiration'] == {'Days': 45}
+
+    def test_no_op_when_rule_unchanged(self):
+        client = mock.MagicMock()
+        session = mock.MagicMock()
+        session.client.return_value = client
+
+        def session_factory():
+            return session
+
+        action = self.get_action(session_factory=session_factory)
+        # existing rule is already an exact match of what the action would
+        # generate for this job, so re-running is a no-op.
+        existing_rule = {
+            'ID': 'c7n-bedrock-output-retention-abc123',
+            'Status': 'Enabled',
+            'Filter': {'Prefix': 'evaluations/my-job/abc123/'},
+            'Expiration': {'Days': 30},
+        }
+        bucket = {
+            'Name': 'bucket', 'Location': {'LocationConstraint': None},
+            'Lifecycle': {'Rules': [existing_rule]},
+        }
+        action._get_buckets = mock.Mock(return_value={'bucket': bucket})
+        jobs = [self.job('my-job', 'abc123', 'bucket', 'evaluations')]
+        action.process(jobs)
+        assert not client.put_bucket_lifecycle_configuration.called
+
+    def test_multiple_jobs_share_bucket_only_uncovered_added(self):
+        client = mock.MagicMock()
+        session = mock.MagicMock()
+        session.client.return_value = client
+
+        def session_factory():
+            return session
+
+        action = self.get_action(session_factory=session_factory)
+        covered_rule = {
+            'ID': 'covered', 'Status': 'Enabled',
+            'Filter': {'Prefix': 'evaluations/covered-job/id-a/'},
+            'Expiration': {'Days': 90},
+        }
+        bucket = {
+            'Name': 'bucket', 'Location': {'LocationConstraint': None},
+            'Lifecycle': {'Rules': [covered_rule]},
+        }
+        action._get_buckets = mock.Mock(return_value={'bucket': bucket})
+        jobs = [
+            self.job('covered-job', 'id-a', 'bucket', 'evaluations'),
+            self.job('uncovered-job', 'id-b', 'bucket', 'evaluations'),
+        ]
+        action.process(jobs)
+
+        client.put_bucket_lifecycle_configuration.assert_called_once()
+        _, kwargs = client.put_bucket_lifecycle_configuration.call_args
+        rules = kwargs['LifecycleConfiguration']['Rules']
+        assert len(rules) == 2
+        ids = {r['ID'] for r in rules}
+        assert ids == {'covered', 'c7n-bedrock-output-retention-id-b'}
+
+
 @terraform('bedrock_evaluation_job', scope='function')
 def test_bedrock_evaluation_job(test, bedrock_evaluation_job):
     session_factory = test.replay_flight_data('bedrock_evaluation_job')
