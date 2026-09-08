@@ -219,6 +219,15 @@ wheels = [
 ]
 
 [[package]]
+name = "appdirs"
+version = "1.4.4"
+source = { registry = "https://pypi.org/simple" }
+sdist = { url = "https://files.pythonhosted.org/packages/d7/d8/05696357e0311f5b5c316d7b95f46c669dd9c15aaeecbb48c7d0aeb88c40/appdirs-1.4.4.tar.gz", hash = "sha256:7d5d0167b2b1ba821647616af46a749d1c653740dd0d2415100fe26e27afdf41", size = 13470, upload-time = "2020-05-11T07:59:51.037Z" }
+wheels = [
+    { url = "https://files.pythonhosted.org/packages/3b/00/2344469e2084fb287c2e0b57b72910309874c3245463acd6cf5e3db69324/appdirs-1.4.4-py2.py3-none-any.whl", hash = "sha256:a841dacd6b99318a741b166adb07e19ee71a274450e68237b4650ca1055ab128", size = 9566, upload-time = "2020-05-11T07:59:49.499Z" },
+]
+
+[[package]]
 name = "applicationinsights"
 version = "0.11.10"
 source = { registry = "https://pypi.org/simple" }
@@ -1891,7 +1900,7 @@ dev = [
 requires-dist = [
     { name = "c7n", editable = "." },
     { name = "click", specifier = ">=8.0" },
-    { name = "python-hcl2", specifier = ">=4.3.2,<9.0.0" },
+    { name = "python-hcl2", specifier = ">=8.1.0,<9.0.0" },
     { name = "rich", specifier = ">=14.0,<15.0" },
     { name = "tfparse", specifier = ">=0.6,<1.0" },
 ]
@@ -2011,7 +2020,7 @@ dev = [
 [package.metadata]
 requires-dist = [
     { name = "c7n", editable = "." },
-    { name = "openstacksdk", specifier = "==4.13.0" },
+    { name = "openstacksdk", specifier = "==0.52.0" },
 ]
 
 [package.metadata.requires-dev]
@@ -2844,7 +2853,7 @@ name = "exceptiongroup"
 version = "1.3.1"
 source = { registry = "https://pypi.org/simple" }
 dependencies = [
-    { name = "typing-extensions" },
+    { name = "typing-extensions", marker = "python_full_version < '3.11'" },
 ]
 sdist = { url = "https://files.pythonhosted.org/packages/50/79/66800aadf48771f6b62f7eb014e352e5d06856655206165d775e675a02c9/exceptiongroup-1.3.1.tar.gz", hash = "sha256:8b412432c6055b0b7d14c310000ae93352ed6754f70fa8f7c34141f91c4e3219", size = 30371, upload-time = "2025-11-21T23:01:54.787Z" }
 wheels = [
@@ -3574,12 +3583,12 @@ resolution-markers = [
     "python_full_version < '3.11'",
 ]
 dependencies = [
-    { name = "iso8601" },
-    { name = "os-service-types", version = "1.8.2", source = { registry = "https://pypi.org/simple" } },
-    { name = "pbr" },
-    { name = "requests" },
-    { name = "stevedore", version = "5.8.0", source = { registry = "https://pypi.org/simple" } },
-    { name = "typing-extensions" },
+    { name = "iso8601", marker = "python_full_version < '3.11'" },
+    { name = "os-service-types", version = "1.8.2", source = { registry = "https://pypi.org/simple" }, marker = "python_full_version < '3.11'" },
+    { name = "pbr", marker = "python_full_version < '3.11'" },
+    { name = "requests", marker = "python_full_version < '3.11'" },
+    { name = "stevedore", version = "5.8.0", source = { registry = "https://pypi.org/simple" }, marker = "python_full_version < '3.11'" },
+    { name = "typing-extensions", marker = "python_full_version < '3.11'" },
 ]
 sdist = { url = "https://files.pythonhosted.org/packages/02/d9/a01a3898657626cbcca9fa0e8fa58facb4632e172bdac622d47950f7e12a/keystoneauth1-5.14.0.tar.gz", hash = "sha256:7b942084d3db27dd285c13253cdfee10b05be0436db1c01e15dc744902197a7f", size = 288739, upload-time = "2026-05-13T09:09:26.125Z" }
 wheels = [
@@ -3597,11 +3606,11 @@ resolution-markers = [
     "python_full_version == '3.11.*'",
 ]
 dependencies = [
-    { name = "iso8601" },
-    { name = "os-service-types", version = "1.9.0", source = { registry = "https://pypi.org/simple" } },
-    { name = "requests" },
-    { name = "stevedore", version = "5.9.1", source = { registry = "https://pypi.org/simple" } },
-    { name = "typing-extensions" },
+    { name = "iso8601", marker = "python_full_version >= '3.11'" },
+    { name = "os-service-types", version = "1.9.0", source = { registry = "https://pypi.org/simple" }, marker = "python_full_version >= '3.11'" },
+    { name = "requests", marker = "python_full_version >= '3.11'" },
+    { name = "stevedore", version = "5.9.1", source = { registry = "https://pypi.org/simple" }, marker = "python_full_version >= '3.11'" },
+    { name = "typing-extensions", marker = "python_full_version >= '3.11'" },
 ]
 sdist = { url = "https://files.pythonhosted.org/packages/22/f5/627b01cde69d0ece2fd552b8c7c34af06acf13a0a77d1829ff0b46a3b45f/keystoneauth1-5.15.0.tar.gz", hash = "sha256:ce2cacdfd028e65bd23ff403d6572ebfab3b006d6d2dde3aa85c263675a9fbb5", size = 288544, upload-time = "2026-07-03T16:21:31.434Z" }
 wheels = [
@@ -4053,6 +4062,15 @@ wheels = [
 ]
 
 [[package]]
+name = "munch"
+version = "4.0.0"
+source = { registry = "https://pypi.org/simple" }
+sdist = { url = "https://files.pythonhosted.org/packages/e7/2b/45098135b5f9f13221820d90f9e0516e11a2a0f55012c13b081d202b782a/munch-4.0.0.tar.gz", hash = "sha256:542cb151461263216a4e37c3fd9afc425feeaf38aaa3025cd2a981fadb422235", size = 19089, upload-time = "2023-07-01T09:49:35.98Z" }
+wheels = [
+    { url = "https://files.pythonhosted.org/packages/56/b3/7c69b37f03260a061883bec0e7b05be7117c1b1c85f5212c72c8c2bc3c8c/munch-4.0.0-py2.py3-none-any.whl", hash = "sha256:71033c45db9fb677a0b7eb517a4ce70ae09258490e419b0e7f00d1e386ecb1b4", size = 9950, upload-time = "2023-07-01T09:49:34.472Z" },
+]
+
+[[package]]
 name = "mypy"
 version = "0.991"
 source = { registry = "https://pypi.org/simple" }
@@ -4112,6 +4130,12 @@ sdist = { url = "https://files.pythonhosted.org/packages/af/96/f4878091248450bbd
 wheels = [
     { url = "https://files.pythonhosted.org/packages/b6/a6/aa2c645188e00f7db040d1b0b1dd353b5b51c67984ada4f6d60aa388982f/netaddr-0.10.1-py2.py3-none-any.whl", hash = "sha256:9822305b42ea1020d54fee322d43cee5622b044c07a1f0130b459bb467efcf88", size = 2220012, upload-time = "2024-01-02T19:05:03.613Z" },
 ]
+
+[[package]]
+name = "netifaces"
+version = "0.11.0"
+source = { registry = "https://pypi.org/simple" }
+sdist = { url = "https://files.pythonhosted.org/packages/a6/91/86a6eac449ddfae239e93ffc1918cf33fd9bab35c04d1e963b311e347a73/netifaces-0.11.0.tar.gz", hash = "sha256:043a79146eb2907edf439899f262b3dfe41717d34124298ed281139a8b93ca32", size = 30106, upload-time = "2021-05-31T08:33:02.506Z" }
 
 [[package]]
 name = "nh3"
@@ -4213,9 +4237,10 @@ wheels = [
 
 [[package]]
 name = "openstacksdk"
-version = "4.13.0"
+version = "0.52.0"
 source = { registry = "https://pypi.org/simple" }
 dependencies = [
+    { name = "appdirs" },
     { name = "cryptography" },
     { name = "decorator" },
     { name = "dogpile-cache" },
@@ -4224,17 +4249,17 @@ dependencies = [
     { name = "jsonpatch" },
     { name = "keystoneauth1", version = "5.14.0", source = { registry = "https://pypi.org/simple" }, marker = "python_full_version < '3.11'" },
     { name = "keystoneauth1", version = "5.15.0", source = { registry = "https://pypi.org/simple" }, marker = "python_full_version >= '3.11'" },
+    { name = "munch" },
+    { name = "netifaces" },
     { name = "os-service-types", version = "1.8.2", source = { registry = "https://pypi.org/simple" }, marker = "python_full_version < '3.11'" },
     { name = "os-service-types", version = "1.9.0", source = { registry = "https://pypi.org/simple" }, marker = "python_full_version >= '3.11'" },
     { name = "pbr" },
-    { name = "platformdirs" },
-    { name = "psutil" },
     { name = "pyyaml" },
-    { name = "typing-extensions" },
+    { name = "requestsexceptions" },
 ]
-sdist = { url = "https://files.pythonhosted.org/packages/eb/ee/12590365cec760c4e559eef4e77ba82b8cd024d98b5ede37750201068b6e/openstacksdk-4.13.0.tar.gz", hash = "sha256:ab5b0d7e3a42de3dbc78497b31b5be53abf77a962986b3a621821e07e38c69a2", size = 1341338, upload-time = "2026-05-18T09:36:52.922Z" }
+sdist = { url = "https://files.pythonhosted.org/packages/84/19/f1bc34691a0db5d5072d389f114d0b99080c8a418912ee8690f825760dbf/openstacksdk-0.52.0.tar.gz", hash = "sha256:c9a2dd8c9d2cf44d7ba2075c7963f8fc79adf98f44af6aac2f4b612c12b798b3", size = 981077, upload-time = "2020-11-18T17:41:53.53Z" }
 wheels = [
-    { url = "https://files.pythonhosted.org/packages/57/90/d07b37783885891d34300610542f60d386c8110fb6b11eb2c2e5220d22b5/openstacksdk-4.13.0-py3-none-any.whl", hash = "sha256:3588662fdfba753ec32336dca836562622017ab8ed7b5bc910dd128681ebac8a", size = 1895999, upload-time = "2026-05-18T09:36:51.121Z" },
+    { url = "https://files.pythonhosted.org/packages/b4/da/d42fda9f5d058bc442a5b9cc4e1555ee69be86e81d55d7e3e62daadfb8bb/openstacksdk-0.52.0-py3-none-any.whl", hash = "sha256:cd8a23539961e2958a4e2e2240ec3d1d801a85d1bd23d7d8f22bbd554db42d2e", size = 1338961, upload-time = "2020-11-18T17:41:26.832Z" },
 ]
 
 [[package]]
@@ -4257,8 +4282,8 @@ resolution-markers = [
     "python_full_version < '3.11'",
 ]
 dependencies = [
-    { name = "pbr" },
-    { name = "typing-extensions" },
+    { name = "pbr", marker = "python_full_version < '3.11'" },
+    { name = "typing-extensions", marker = "python_full_version < '3.11'" },
 ]
 sdist = { url = "https://files.pythonhosted.org/packages/51/62/31e39aa8f2ac5bff0b061ce053f0610c9fe659e12aeca20bfb26d1665024/os_service_types-1.8.2.tar.gz", hash = "sha256:ab7648d7232849943196e1bb00a30e2e25e600fa3b57bb241d15b7f521b5b575", size = 27476, upload-time = "2025-11-21T13:55:47.726Z" }
 wheels = [
@@ -4276,8 +4301,8 @@ resolution-markers = [
     "python_full_version == '3.11.*'",
 ]
 dependencies = [
-    { name = "pbr" },
-    { name = "typing-extensions" },
+    { name = "pbr", marker = "python_full_version >= '3.11'" },
+    { name = "typing-extensions", marker = "python_full_version >= '3.11'" },
 ]
 sdist = { url = "https://files.pythonhosted.org/packages/86/ae/fe7ac23155ae0b4b9779e06e9c5bb4070f2315dc4ca886a88fa3230d344b/os_service_types-1.9.0.tar.gz", hash = "sha256:1f2e5fb71d1f6f4ff31d8992674f2368465bc2f25cd94018015c3ddbfc5c617f", size = 28087, upload-time = "2026-08-04T13:07:43.171Z" }
 wheels = [
@@ -4766,7 +4791,7 @@ resolution-markers = [
     "python_full_version < '3.11'",
 ]
 dependencies = [
-    { name = "cffi" },
+    { name = "cffi", marker = "python_full_version < '3.11'" },
 ]
 sdist = { url = "https://files.pythonhosted.org/packages/2e/ea/762d00f6f518423cd889e39b12028844cc95f91a6413cf7136e184864821/pygit2-1.18.2.tar.gz", hash = "sha256:eca87e0662c965715b7f13491d5e858df2c0908341dee9bde2bc03268e460f55", size = 797200, upload-time = "2025-08-16T13:52:36.853Z" }
 wheels = [
@@ -4819,7 +4844,7 @@ resolution-markers = [
     "python_full_version == '3.11.*'",
 ]
 dependencies = [
-    { name = "cffi" },
+    { name = "cffi", marker = "python_full_version >= '3.11'" },
 ]
 sdist = { url = "https://files.pythonhosted.org/packages/f1/54/9273c78efd3d570091af585bdeb68a46089e80602dafe11989cca40c6d0f/pygit2-1.20.0.tar.gz", hash = "sha256:7253735629c22fff412a72c48c204b19c206fda9fcb01e51113d9689194cb1cf", size = 826041, upload-time = "2026-08-08T14:45:11.281Z" }
 wheels = [
@@ -5070,15 +5095,15 @@ wheels = [
 
 [[package]]
 name = "python-hcl2"
-version = "8.1.3"
+version = "8.1.4"
 source = { registry = "https://pypi.org/simple" }
 dependencies = [
     { name = "lark" },
     { name = "regex" },
 ]
-sdist = { url = "https://files.pythonhosted.org/packages/84/e0/c0bd414505d4c8a70d453d4c9d278b9d9dcf256a82f2c01be56cc0c3ee10/python_hcl2-8.1.3.tar.gz", hash = "sha256:bee7cc697144ac9113a0a29cee22a7cb6c0aa0ba043f2f19040c71d07820044d", size = 118375, upload-time = "2026-08-26T13:02:58.056Z" }
+sdist = { url = "https://files.pythonhosted.org/packages/ff/3b/a66df999c382abf2d37f6c7b618a782958615acd41a53615f994dfd6611b/python_hcl2-8.1.4.tar.gz", hash = "sha256:b4145c930540e99e3e9b4f7de297775bdf856df29782a7abdb0916cbfcab7865", size = 119307, upload-time = "2026-09-08T08:26:26.55Z" }
 wheels = [
-    { url = "https://files.pythonhosted.org/packages/d7/68/98c578b481b83ed1963c92fd148fbde425c1eabb37c417d370858352fb29/python_hcl2-8.1.3-py3-none-any.whl", hash = "sha256:1770376ec6a16f4991aba4fcb3bc6f21f018ff47856d5332f152773341eb2c78", size = 102329, upload-time = "2026-08-26T13:02:56.902Z" },
+    { url = "https://files.pythonhosted.org/packages/5a/c7/9b8918ab4954ecad677b03f36f9121d5467a4285f41507fdc6789a33dc3c/python_hcl2-8.1.4-py3-none-any.whl", hash = "sha256:75738bd95717d692a683495babf4d00063f1b211e2eca04b156c6d79b9a0feae", size = 102957, upload-time = "2026-09-08T08:26:25.344Z" },
 ]
 
 [[package]]
@@ -5467,6 +5492,15 @@ dependencies = [
 sdist = { url = "https://files.pythonhosted.org/packages/f3/61/d7545dafb7ac2230c70d38d31cbfe4cc64f7144dc41f6e4e4b78ecd9f5bb/requests-toolbelt-1.0.0.tar.gz", hash = "sha256:7681a0a3d047012b5bdc0ee37d7f8f07ebe76ab08caeccfc3921ce23c88d5bc6", size = 206888, upload-time = "2023-05-01T04:11:33.229Z" }
 wheels = [
     { url = "https://files.pythonhosted.org/packages/3f/51/d4db610ef29373b879047326cbf6fa98b6c1969d6f6dc423279de2b1be2c/requests_toolbelt-1.0.0-py2.py3-none-any.whl", hash = "sha256:cccfdd665f0a24fcf4726e690f65639d272bb0637b9b92dfd91a5568ccf6bd06", size = 54481, upload-time = "2023-05-01T04:11:28.427Z" },
+]
+
+[[package]]
+name = "requestsexceptions"
+version = "1.4.0"
+source = { registry = "https://pypi.org/simple" }
+sdist = { url = "https://files.pythonhosted.org/packages/82/ed/61b9652d3256503c99b0b8f145d9c8aa24c514caff6efc229989505937c1/requestsexceptions-1.4.0.tar.gz", hash = "sha256:b095cbc77618f066d459a02b137b020c37da9f46d9b057704019c9f77dba3065", size = 6880, upload-time = "2018-02-01T17:04:45.294Z" }
+wheels = [
+    { url = "https://files.pythonhosted.org/packages/01/8c/49ca60ea8c907260da4662582c434bec98716177674e88df3fd340acf06d/requestsexceptions-1.4.0-py2.py3-none-any.whl", hash = "sha256:3083d872b6e07dc5c323563ef37671d992214ad9a32b0ca4a3d7f5500bf38ce3", size = 3802, upload-time = "2018-02-01T17:04:39.07Z" },
 ]
 
 [[package]]
