@@ -4,7 +4,7 @@
 import logging
 
 from c7n.actions import ActionRegistry
-from c7n.exceptions import PolicyValidationError
+from c7n.exceptions import PolicyExecutionError, PolicyValidationError
 from c7n.filters import FilterRegistry
 from c7n.manager import ResourceManager
 from c7n.query import sources
@@ -28,12 +28,34 @@ class ResourceQuery:
         return self._invoke_client_enum(client, enum_op, params, path)
 
     def _invoke_client_enum(self, client, enum_op, params, path):
-        res = getattr(client, enum_op)(**params)
-        if not isinstance(res, dict):
-            res = res.to_dict()
-        if path and path in res:
-            res = res.get(path)
-        return res
+        items = []
+        params = dict(params)
+        first = True
+        # Deliberately unbounded, for consistency with c7n/query.py's own
+        # AWS paginator (which also has no page cap).
+        while True:
+            res = getattr(client, enum_op)(**params)
+            if not isinstance(res, dict):
+                res = res.to_dict()
+            if path and path in res:
+                items.extend(res[path])
+            elif first:
+                # No path in the first response: return it unchanged (non-list
+                # response shape).
+                return res
+            else:
+                # A later page without the expected shape fails loud rather than
+                # silently dropping the items already accumulated from earlier pages.
+                raise PolicyExecutionError(
+                    f"unexpected response on page after the first (missing "
+                    f"{path!r}); {len(items)} item(s) already fetched would "
+                    f"be silently dropped"
+                )
+            first = False
+            token = res.get("metadata", {}).get("_continue")
+            if not token:
+                return items
+            params["_continue"] = token
 
 
 @sources.register("describe-kube")

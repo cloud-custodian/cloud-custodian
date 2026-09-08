@@ -294,6 +294,10 @@ deploy_resource() {
 
         rm -f cost-management.body
 
+    elif [[ "$fileName" == "budget.json" ]]; then
+
+        az deployment sub create --location $resourceLocation --name cctest-budget \
+            --template-file $file --output None
     elif [[ "$fileName" == "ai-foundry-application.json" ]]; then
 
         unique_suffix="$(date +%s%N | tail -c 13)"

@@ -257,7 +257,7 @@ class PolicyChecker:
             'ArnLike',
             'IpAddress',
             'NotIpAddress')
-        set_conditions = ('ForAllValues', 'ForAnyValues')
+        set_conditions = ('ForAllValues', 'ForAnyValue')
 
         for s_cond_op in list(s['Condition'].keys()):
             if s_cond_op not in conditions:

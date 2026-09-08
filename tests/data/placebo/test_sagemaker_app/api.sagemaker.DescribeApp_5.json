@@ -1,0 +1,48 @@
+{
+    "status_code": 200,
+    "data": {
+        "AppArn": "arn:aws:sagemaker:us-east-1:644160558196:app/d-cdvywlci9fz9/c7n-profile-relative-satyr/JupyterServer/c7n-app-relative-satyr",
+        "AppType": "JupyterServer",
+        "AppName": "c7n-app-relative-satyr",
+        "DomainId": "d-cdvywlci9fz9",
+        "UserProfileName": "c7n-profile-relative-satyr",
+        "Status": "Deleted",
+        "EffectiveTrustedIdentityPropagationStatus": "DISABLED",
+        "RecoveryMode": false,
+        "LastHealthCheckTimestamp": {
+            "__class__": "datetime",
+            "year": 2026,
+            "month": 7,
+            "day": 14,
+            "hour": 15,
+            "minute": 36,
+            "second": 15,
+            "microsecond": 690000
+        },
+        "LastUserActivityTimestamp": {
+            "__class__": "datetime",
+            "year": 2026,
+            "month": 7,
+            "day": 14,
+            "hour": 15,
+            "minute": 36,
+            "second": 15,
+            "microsecond": 690000
+        },
+        "CreationTime": {
+            "__class__": "datetime",
+            "year": 2026,
+            "month": 7,
+            "day": 14,
+            "hour": 15,
+            "minute": 36,
+            "second": 15,
+            "microsecond": 690000
+        },
+        "ResourceSpec": {
+            "SageMakerImageArn": "arn:aws:ecr:us-east-1:644160558196:repository/looseleaf-jupyter-server-3",
+            "InstanceType": "system"
+        },
+        "ResponseMetadata": {}
+    }
+}

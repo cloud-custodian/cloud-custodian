@@ -1,0 +1,139 @@
+{
+    "$schema": "https://schema.management.azure.com/schemas/2015-01-01/deploymentTemplate.json#",
+    "contentVersion": "1.0.0.0",
+    "parameters": {
+        "uniqueId": {
+            "type": "string"
+        }
+    },
+    "variables": {
+        "storageAccountName": "[concat('cctestmlws', parameters('uniqueId'))]",
+        "keyVaultName": "[concat('cctestmlws', parameters('uniqueId'))]",
+        "appInsightsName": "[concat('cctestmlws', parameters('uniqueId'))]",
+        "workspaceName": "cctest-mlws-archive",
+        "computeName": "cctestcpuarchive",
+        "environmentName": "cctest-archive-env",
+        "jobName": "cctest-archive-job"
+    },
+    "resources": [
+        {
+            "type": "Microsoft.Storage/storageAccounts",
+            "apiVersion": "2023-01-01",
+            "name": "[variables('storageAccountName')]",
+            "location": "[resourceGroup().location]",
+            "sku": {
+                "name": "Standard_LRS"
+            },
+            "kind": "StorageV2",
+            "properties": {
+                "minimumTlsVersion": "TLS1_2",
+                "allowBlobPublicAccess": false
+            }
+        },
+        {
+            "type": "Microsoft.KeyVault/vaults",
+            "apiVersion": "2023-02-01",
+            "name": "[variables('keyVaultName')]",
+            "location": "[resourceGroup().location]",
+            "properties": {
+                "tenantId": "[subscription().tenantId]",
+                "sku": {
+                    "family": "A",
+                    "name": "standard"
+                },
+                "accessPolicies": []
+            }
+        },
+        {
+            "type": "Microsoft.Insights/components",
+            "apiVersion": "2020-02-02",
+            "name": "[variables('appInsightsName')]",
+            "location": "[resourceGroup().location]",
+            "kind": "web",
+            "properties": {
+                "Application_Type": "web"
+            }
+        },
+        {
+            "type": "Microsoft.MachineLearningServices/workspaces",
+            "apiVersion": "2023-04-01",
+            "name": "[variables('workspaceName')]",
+            "location": "[resourceGroup().location]",
+            "identity": {
+                "type": "SystemAssigned"
+            },
+            "properties": {
+                "friendlyName": "[variables('workspaceName')]",
+                "storageAccount": "[resourceId('Microsoft.Storage/storageAccounts', variables('storageAccountName'))]",
+                "keyVault": "[resourceId('Microsoft.KeyVault/vaults', variables('keyVaultName'))]",
+                "applicationInsights": "[resourceId('Microsoft.Insights/components', variables('appInsightsName'))]"
+            },
+            "dependsOn": [
+                "[resourceId('Microsoft.Storage/storageAccounts', variables('storageAccountName'))]",
+                "[resourceId('Microsoft.KeyVault/vaults', variables('keyVaultName'))]",
+                "[resourceId('Microsoft.Insights/components', variables('appInsightsName'))]"
+            ]
+        },
+        {
+            "type": "Microsoft.MachineLearningServices/workspaces/computes",
+            "apiVersion": "2023-04-01",
+            "name": "[format('{0}/{1}', variables('workspaceName'), variables('computeName'))]",
+            "location": "[resourceGroup().location]",
+            "properties": {
+                "computeLocation": "[resourceGroup().location]",
+                "computeType": "AmlCompute",
+                "disableLocalAuth": true,
+                "properties": {
+                    "enableNodePublicIp": true,
+                    "osType": "Linux",
+                    "remoteLoginPortPublicAccess": "Enabled",
+                    "scaleSettings": {
+                        "maxNodeCount": 1,
+                        "minNodeCount": 0,
+                        "nodeIdleTimeBeforeScaleDown": "PT2M"
+                    },
+                    "vmPriority": "Dedicated",
+                    "vmSize": "Standard_DS3_v2"
+                }
+            },
+            "dependsOn": [
+                "[resourceId('Microsoft.MachineLearningServices/workspaces', variables('workspaceName'))]"
+            ]
+        },
+        {
+            "type": "Microsoft.MachineLearningServices/workspaces/environments/versions",
+            "apiVersion": "2023-04-01",
+            "name": "[format('{0}/{1}/1', variables('workspaceName'), variables('environmentName'))]",
+            "properties": {
+                "environmentType": "UserCreated",
+                "image": "mcr.microsoft.com/azureml/openmpi4.1.0-ubuntu20.04",
+                "isArchived": false,
+                "osType": "Linux",
+                "properties": {
+                    "azureml.labels": "latest"
+                }
+            },
+            "dependsOn": [
+                "[resourceId('Microsoft.MachineLearningServices/workspaces', variables('workspaceName'))]"
+            ]
+        },
+        {
+            "type": "Microsoft.MachineLearningServices/workspaces/jobs",
+            "apiVersion": "2023-04-01",
+            "name": "[format('{0}/{1}', variables('workspaceName'), variables('jobName'))]",
+            "properties": {
+                "command": "echo hello",
+                "computeId": "[resourceId('Microsoft.MachineLearningServices/workspaces/computes', variables('workspaceName'), variables('computeName'))]",
+                "displayName": "cctest_archive_job",
+                "environmentId": "[resourceId('Microsoft.MachineLearningServices/workspaces/environments/versions', variables('workspaceName'), variables('environmentName'), '1')]",
+                "experimentName": "cctest_archive",
+                "isArchived": false,
+                "jobType": "Command"
+            },
+            "dependsOn": [
+                "[resourceId('Microsoft.MachineLearningServices/workspaces/computes', variables('workspaceName'), variables('computeName'))]",
+                "[resourceId('Microsoft.MachineLearningServices/workspaces/environments/versions', variables('workspaceName'), variables('environmentName'), '1')]"
+            ]
+        }
+    ]
+}

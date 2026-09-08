@@ -1,5 +1,8 @@
 # Copyright The Cloud Custodian Authors.
 # SPDX-License-Identifier: Apache-2.0
+import pytest
+from pytest_terraform import terraform
+
 from .common import BaseTest
 
 from c7n.resources.sagemaker import SagemakerJobQueryParser, CompilationJobQueryParser
@@ -1535,3 +1538,70 @@ class CompilationJobQueryParse(BaseTest):
         self.assertRaises(
             PolicyValidationError, SagemakerJobQueryParser.parse, [
                 {'StatusEquals': ['INPROGRESS', 'COMPLETED']}])
+
+
+@pytest.mark.audited
+@terraform('sagemaker_studio', scope='module')
+def test_sagemaker_user_profile(test, sagemaker_studio):
+    # tests the sagemaker-user-profile-untagged example policy: verify the
+    # tagged profile is excluded and the untagged profile is included.
+    factory = test.replay_flight_data('test_sagemaker_user_profile')
+    p = test.load_policy(
+        {
+            'name': 'sagemaker-user-profile-untagged',
+            'resource': 'sagemaker-user-profile',
+            'filters': [{'tag:favorite-color': 'absent'}],
+        },
+        session_factory=factory,
+    )
+    [resource] = p.run()
+    assert resource['UserProfileName'] == sagemaker_studio[
+        'aws_sagemaker_user_profile.untagged.user_profile_name']
+
+
+@pytest.mark.audited
+@terraform('sagemaker_studio', scope='module')
+def test_sagemaker_space(test, sagemaker_studio):
+    # tests the sagemaker-space-untagged example policy: verify the tagged
+    # space is excluded and the untagged space is included.
+    factory = test.replay_flight_data('test_sagemaker_space')
+    p = test.load_policy(
+        {
+            'name': 'sagemaker-space-untagged',
+            'resource': 'sagemaker-space',
+            'filters': [{'tag:favorite-color': 'absent'}],
+        },
+        session_factory=factory,
+    )
+    [resource] = p.run()
+    assert resource['SpaceName'] == sagemaker_studio[
+        'aws_sagemaker_space.untagged.space_name']
+
+
+@pytest.mark.audited
+@terraform('sagemaker_studio', scope='module')
+def test_sagemaker_app(test, sagemaker_studio):
+    # tests the sagemaker-app-untagged example policy: verify the tagged app
+    # is excluded and the untagged app is included.
+    #
+    # SageMaker retains app metadata (and keeps returning it from ListApps
+    # with Status Deleted/Deleting) for up to 24 hours after an app is shut
+    # down, so apps from earlier test recordings against now-destroyed
+    # domains can otherwise still show up here too. See the CreationTime
+    # note on:
+    # https://docs.aws.amazon.com/sagemaker/latest/APIReference/API_DescribeApp.html
+    factory = test.replay_flight_data('test_sagemaker_app')
+    p = test.load_policy(
+        {
+            'name': 'sagemaker-app-untagged',
+            'resource': 'sagemaker-app',
+            'filters': [
+                {'type': 'value', 'key': 'Status', 'op': 'not-in',
+                 'value': ['Deleted', 'Deleting']},
+                {'tag:favorite-color': 'absent'},
+            ],
+        },
+        session_factory=factory,
+    )
+    [resource] = p.run()
+    assert resource['AppName'] == sagemaker_studio['aws_sagemaker_app.untagged.app_name']
