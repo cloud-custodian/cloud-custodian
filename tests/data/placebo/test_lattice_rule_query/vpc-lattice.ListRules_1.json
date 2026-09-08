@@ -1,0 +1,62 @@
+{
+    "status_code": 200,
+    "data": {
+        "ResponseMetadata": {},
+        "items": [
+            {
+                "arn": "arn:aws:vpc-lattice:us-east-1:644160558196:service/svc-0123456789abcdef0/listener/listener-0123456789abcdef0/rule/rule-0123456789abcdef0",
+                "createdAt": {
+                    "__class__": "datetime",
+                    "year": 2025,
+                    "month": 10,
+                    "day": 1,
+                    "hour": 12,
+                    "minute": 32,
+                    "second": 11,
+                    "microsecond": 222000
+                },
+                "id": "rule-0123456789abcdef0",
+                "isDefault": false,
+                "lastUpdatedAt": {
+                    "__class__": "datetime",
+                    "year": 2025,
+                    "month": 10,
+                    "day": 1,
+                    "hour": 12,
+                    "minute": 32,
+                    "second": 18,
+                    "microsecond": 333000
+                },
+                "name": "test-rule",
+                "priority": 10
+            },
+            {
+                "arn": "arn:aws:vpc-lattice:us-east-1:644160558196:service/svc-0123456789abcdef0/listener/listener-0123456789abcdef0/rule/rule-default",
+                "createdAt": {
+                    "__class__": "datetime",
+                    "year": 2025,
+                    "month": 10,
+                    "day": 1,
+                    "hour": 12,
+                    "minute": 32,
+                    "second": 0,
+                    "microsecond": 0
+                },
+                "id": "rule-default",
+                "isDefault": true,
+                "lastUpdatedAt": {
+                    "__class__": "datetime",
+                    "year": 2025,
+                    "month": 10,
+                    "day": 1,
+                    "hour": 12,
+                    "minute": 32,
+                    "second": 0,
+                    "microsecond": 0
+                },
+                "name": "default-rule",
+                "priority": 1
+            }
+        ]
+    }
+}

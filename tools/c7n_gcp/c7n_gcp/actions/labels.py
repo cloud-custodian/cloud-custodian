@@ -48,6 +48,14 @@ class BaseLabelAction(MethodAction):
     def get_operation_name(self, model, resource):
         return model.labels_op
 
+    def get_client(self, session, model):
+        # Some resources (e.g. gcp.disk) need a different client depending
+        # on the resource being labeled, since it dispatches to one of
+        # several apis.
+        if get_client := getattr(model, 'get_client', None):
+            return get_client(session)
+        return super().get_client(session, model)
+
     def get_resource_params(self, model, resource):
         current_labels = self._get_current_labels(resource)
         new_labels = self.get_labels_to_add(resource)
@@ -115,6 +123,18 @@ class SetLabelsAction(BaseLabelAction):
                 key: name
                 default-value: name_not_found
 
+        - name: gcp-add-default-label
+          resource: gcp.instance
+          description: |
+            Omitting key gives a conditional default - the label is set only
+            when it is absent, leaving an existing value untouched
+          actions:
+           - type: set-labels
+             labels:
+               owner:
+                type: resource
+                default-value: platform
+
         - name: gcp-remove-label
           resource: gcp.instance
           description: |
@@ -135,7 +155,14 @@ class SetLabelsAction(BaseLabelAction):
             raise FilterValidationError("Must specify one of labels or remove")
 
     def get_labels_to_add(self, resource):
-        return {k: Lookup.extract(v, resource) for k, v in self.data.get('labels', {}).items()}
+        current = set(self._get_current_labels(resource))
+        labels = {}
+        for name, spec in self.data.get('labels', {}).items():
+            value = Lookup.resolve_value(spec, resource, name, current)
+            if value is Lookup.SKIP:
+                continue
+            labels[name] = value
+        return labels
 
     def get_labels_to_delete(self, resource):
         return self.data.get('remove')
