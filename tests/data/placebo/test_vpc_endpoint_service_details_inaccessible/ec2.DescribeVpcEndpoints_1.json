@@ -1,0 +1,66 @@
+{
+    "status_code": 200,
+    "data": {
+        "VpcEndpoints": [
+            {
+                "VpcEndpointId": "vpce-0aaa000000000001",
+                "VpcEndpointType": "Gateway",
+                "VpcId": "vpc-d2d616b5",
+                "ServiceName": "com.amazonaws.us-east-1.deprecated-service",
+                "State": "available",
+                "RouteTableIds": [],
+                "SubnetIds": [],
+                "Groups": [],
+                "IpAddressType": "ipv4",
+                "DnsOptions": {"DnsRecordIpType": "service-defined"},
+                "PrivateDnsEnabled": false,
+                "RequesterManaged": false,
+                "NetworkInterfaceIds": [],
+                "DnsEntries": [],
+                "CreationTimestamp": {
+                    "__class__": "datetime",
+                    "year": 2022,
+                    "month": 1,
+                    "day": 1,
+                    "hour": 0,
+                    "minute": 0,
+                    "second": 0,
+                    "microsecond": 0
+                },
+                "Tags": [],
+                "OwnerId": "644160558196",
+                "ServiceRegion": "us-east-1"
+            },
+            {
+                "VpcEndpointId": "vpce-0aaa000000000002",
+                "VpcEndpointType": "Gateway",
+                "VpcId": "vpc-d2d616b5",
+                "ServiceName": "com.amazonaws.us-east-1.s3",
+                "State": "available",
+                "RouteTableIds": ["rtb-3bf1b05c"],
+                "SubnetIds": [],
+                "Groups": [],
+                "IpAddressType": "ipv4",
+                "DnsOptions": {"DnsRecordIpType": "service-defined"},
+                "PrivateDnsEnabled": false,
+                "RequesterManaged": false,
+                "NetworkInterfaceIds": [],
+                "DnsEntries": [],
+                "CreationTimestamp": {
+                    "__class__": "datetime",
+                    "year": 2023,
+                    "month": 8,
+                    "day": 30,
+                    "hour": 13,
+                    "minute": 50,
+                    "second": 46,
+                    "microsecond": 0
+                },
+                "Tags": [],
+                "OwnerId": "644160558196",
+                "ServiceRegion": "us-east-1"
+            }
+        ],
+        "ResponseMetadata": {}
+    }
+}

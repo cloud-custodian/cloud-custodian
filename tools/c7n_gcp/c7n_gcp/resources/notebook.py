@@ -1,5 +1,7 @@
 # Copyright The Cloud Custodian Authors.
 # SPDX-License-Identifier: Apache-2.0
+from c7n.utils import type_schema
+from c7n_gcp.actions import MethodAction
 from c7n_gcp.provider import resources
 from c7n_gcp.query import QueryResourceManager, TypeInfo
 
@@ -77,6 +79,53 @@ class NotebookInstanceV2(QueryResourceManager):
         urn_component = "instances"
         asset_type = "notebooks.googleapis.com/Instance"
 
+        @staticmethod
+        def get(client, resource_info):
+            return client.execute_query(
+                'get', {'name': resource_info['resourceName']})
+
         @classmethod
         def _get_location(cls, resource):
             return resource['name'].split('/')[3]
+
+
+@NotebookInstanceV2.action_registry.register('update-metadata')
+class UpdateMetadata(MethodAction):
+    """Merge keys into a notebook-v2 instance's gceSetup.metadata.
+
+    gceSetup.metadata is a map field, so a patch to it replaces the whole
+    map -- this action merges the given keys into the instance's current
+    metadata rather than replacing it outright.
+
+    :example:
+
+    .. yaml:
+
+     policies:
+      - name: notebook-v2-enforce-idle-timeout
+        resource: gcp.notebook-v2
+        filters:
+          - type: value
+            key: gceSetup.metadata."idle-timeout-seconds"
+            value: absent
+        actions:
+          - type: update-metadata
+            metadata:
+              idle-timeout-seconds: "3600"
+    """
+    schema = type_schema(
+        'update-metadata',
+        required=('metadata',),
+        metadata={'type': 'object', 'additionalProperties': {'type': 'string'}},
+    )
+    method_spec = {'op': 'patch'}
+    method_perm = 'update'
+
+    def get_resource_params(self, model, resource):
+        metadata = dict(resource.get('gceSetup', {}).get('metadata') or {})
+        metadata.update(self.data['metadata'])
+        return {
+            'name': resource['name'],
+            'updateMask': 'gceSetup.metadata',
+            'body': {'gceSetup': {'metadata': metadata}},
+        }

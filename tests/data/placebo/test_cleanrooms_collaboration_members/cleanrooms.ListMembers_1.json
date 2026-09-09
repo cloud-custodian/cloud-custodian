@@ -1,0 +1,58 @@
+{
+    "status_code": 200,
+    "data": {
+        "ResponseMetadata": {},
+        "memberSummaries": [
+            {
+                "accountId": "644160558196",
+                "status": "ACTIVE",
+                "displayName": "Compliant Member",
+                "abilities": [
+                    "CAN_QUERY",
+                    "CAN_RECEIVE_RESULTS"
+                ],
+                "createTime": {
+                    "__class__": "datetime",
+                    "year": 2026,
+                    "month": 6,
+                    "day": 9,
+                    "hour": 2,
+                    "minute": 2,
+                    "second": 3,
+                    "microsecond": 366000
+                },
+                "updateTime": {
+                    "__class__": "datetime",
+                    "year": 2026,
+                    "month": 6,
+                    "day": 9,
+                    "hour": 2,
+                    "minute": 2,
+                    "second": 4,
+                    "microsecond": 210000
+                },
+                "membershipId": "c5773151-1c6c-40ff-86f2-543d68654295",
+                "membershipArn": "arn:aws:cleanrooms:us-east-1:644160558196:membership/c5773151-1c6c-40ff-86f2-543d68654295",
+                "paymentConfiguration": {
+                    "queryCompute": {
+                        "isResponsible": true
+                    },
+                    "machineLearning": {
+                        "modelTraining": {
+                            "isResponsible": false
+                        },
+                        "modelInference": {
+                            "isResponsible": false
+                        },
+                        "syntheticDataGeneration": {
+                            "isResponsible": false
+                        }
+                    },
+                    "jobCompute": {
+                        "isResponsible": false
+                    }
+                }
+            }
+        ]
+    }
+}

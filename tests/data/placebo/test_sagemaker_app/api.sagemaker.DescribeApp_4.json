@@ -1,0 +1,48 @@
+{
+    "status_code": 200,
+    "data": {
+        "AppArn": "arn:aws:sagemaker:us-east-1:644160558196:app/d-a056u6jhtsnr/c7n-profile-sound-beetle/JupyterServer/c7n-app-untagged-sound-beetle",
+        "AppType": "JupyterServer",
+        "AppName": "c7n-app-untagged-sound-beetle",
+        "DomainId": "d-a056u6jhtsnr",
+        "UserProfileName": "c7n-profile-sound-beetle",
+        "Status": "Deleted",
+        "EffectiveTrustedIdentityPropagationStatus": "DISABLED",
+        "RecoveryMode": false,
+        "LastHealthCheckTimestamp": {
+            "__class__": "datetime",
+            "year": 2026,
+            "month": 7,
+            "day": 15,
+            "hour": 12,
+            "minute": 8,
+            "second": 1,
+            "microsecond": 159000
+        },
+        "LastUserActivityTimestamp": {
+            "__class__": "datetime",
+            "year": 2026,
+            "month": 7,
+            "day": 15,
+            "hour": 12,
+            "minute": 8,
+            "second": 1,
+            "microsecond": 159000
+        },
+        "CreationTime": {
+            "__class__": "datetime",
+            "year": 2026,
+            "month": 7,
+            "day": 15,
+            "hour": 12,
+            "minute": 8,
+            "second": 1,
+            "microsecond": 159000
+        },
+        "ResourceSpec": {
+            "SageMakerImageArn": "arn:aws:ecr:us-east-1:644160558196:repository/looseleaf-jupyter-server-3",
+            "InstanceType": "system"
+        },
+        "ResponseMetadata": {}
+    }
+}

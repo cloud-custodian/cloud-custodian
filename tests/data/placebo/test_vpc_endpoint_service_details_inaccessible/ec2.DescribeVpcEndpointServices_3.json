@@ -1,0 +1,20 @@
+{
+    "status_code": 200,
+    "data": {
+        "ServiceDetails": [
+            {
+                "ServiceName": "com.amazonaws.us-east-1.s3",
+                "ServiceId": "vpce-svc-0aa7c06513d4872d5",
+                "ServiceType": [{"ServiceType": "Gateway"}],
+                "ServiceRegion": "us-east-1",
+                "Owner": "amazon",
+                "BaseEndpointDnsNames": ["s3.us-east-1.amazonaws.com"],
+                "VpcEndpointPolicySupported": true,
+                "AcceptanceRequired": false,
+                "ManagesVpcEndpoints": false,
+                "Tags": []
+            }
+        ],
+        "ResponseMetadata": {}
+    }
+}

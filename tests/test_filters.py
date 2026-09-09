@@ -1477,6 +1477,30 @@ class TestReduceFilter(BaseFilterTest):
         self.assertEqual(len(rs), 3)
         self.assertEqual([r['InstanceId'] for r in rs], ['D', 'E', 'F'])
 
+    def test_discard_percent_by_group(self):
+        # discard-percent must be computed per group; a larger group's discard
+        # count should not leak into subsequent, smaller groups
+        resources = [
+            dict(InstanceId="A", Group="big", Id="1"),
+            dict(InstanceId="B", Group="big", Id="2"),
+            dict(InstanceId="C", Group="big", Id="3"),
+            dict(InstanceId="D", Group="big", Id="4"),
+            dict(InstanceId="E", Group="small", Id="5"),
+            dict(InstanceId="F", Group="small", Id="6"),
+        ]
+        f = filters.factory(
+            {
+                "type": "reduce",
+                "group-by": "Group",
+                "sort-by": "Id",
+                "order": "asc",
+                "discard-percent": 50,
+            }
+        )
+        rs = f.process(resources)
+        # big (4 items) discards 2 -> C, D; small (2 items) discards 1 -> F
+        self.assertEqual([r['InstanceId'] for r in rs], ['C', 'D', 'F'])
+
     def test_discard_and_limit(self):
         resources = self.instances()
         f = filters.factory(

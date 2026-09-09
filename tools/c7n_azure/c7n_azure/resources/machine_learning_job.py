@@ -1,8 +1,11 @@
 # Copyright The Cloud Custodian Authors.
 # SPDX-License-Identifier: Apache-2.0
 
+from c7n.utils import type_schema
+from c7n_azure.actions.base import AzureBaseAction
 from c7n_azure.provider import resources
 from c7n_azure.resources.arm import ChildArmResourceManager
+from c7n_azure.utils import ResourceIdParser
 
 
 @resources.register('machine-learning-job')
@@ -52,3 +55,26 @@ class MachineLearningJob(ChildArmResourceManager):
                 'resource_group_name': parent_resource['resourceGroup'],
                 'workspace_name': parent_resource['name'],
             }
+
+
+@MachineLearningJob.action_registry.register('archive')
+class MachineLearningJobArchiveAction(AzureBaseAction):
+    """Archive Azure Machine Learning jobs."""
+
+    schema = type_schema('archive')
+
+    def _prepare_processing(self):
+        self.client = self.manager.get_client()
+
+    def _process_resource(self, resource):
+        if resource['properties'].get('isArchived'):
+            return 'already archived'
+
+        resource['properties']['isArchived'] = True
+        self.client.jobs.create_or_update(
+            resource_group_name=ResourceIdParser.get_resource_group(resource['id']),
+            workspace_name=ResourceIdParser.get_resource_name(resource['c7n:parent-id']),
+            id=resource['name'],
+            body=resource,
+        )
+        return 'archived'
