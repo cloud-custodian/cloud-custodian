@@ -372,6 +372,7 @@ ResourceMap = {
   "aws.subnet": "c7n.resources.vpc.Subnet",
   "aws.support-case": "c7n.resources.support.SupportCase",
   "aws.swf-domain": "c7n.resources.swf.SimpleWorkflowDomain",
+  "aws.taggable": "c7n.resources.taggable.Taggable",
   "aws.timestream-database": "c7n.resources.timestream.TimestreamDatabase",
   "aws.timestream-table": "c7n.resources.timestream.TimestreamTable",
   "aws.timestream-influxdb": "c7n.resources.timestream.TimestreamInfluxDB",
