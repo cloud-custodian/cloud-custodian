@@ -1,0 +1,45 @@
+tests/data/placebo/test_eks_tag_deleted_cluster/eks.TagResource_1.json
+  s_bbb04325db545e::t_520bd0dad905f5 1-10
+c7n/resources/ebs.py
+  s_bbb04325db545e::t_5d8e5ae46bc00c 25
+c7n/tags.py
+  s_bbb04325db545e::t_a8845056fc2043 35-43,49,53-71,73,75,77-78,80-82,607,648
+  s_bbb04325db545e::t_ed140d6fa4cce3 11-12,22,44-48,50-52,72,74,76,79,608-609,649-650,1475,1483-1485
+tests/data/placebo/test_eks_tag_deleted_cluster/eks.DescribeCluster_1.json
+  s_bbb04325db545e::t_520bd0dad905f5 1-67
+tests/test_tags.py
+  s_bbb04325db545e::t_879adf9ccacc41 803-804,807,809,822-846,851-854,861,864,869-871,874-875,881,887-898,903-905,912,922
+  s_bbb04325db545e::t_665af626660999 12-13,800-802,805-806,808,810-821,847-850,855-860,862-863,865-868,872-873,876-880,882-886,899-902,906-911,913-921,923-940
+tests/test_eks.py
+  s_bbb04325db545e::t_520bd0dad905f5 186-199
+c7n/resources/eks.py
+  s_3bb5c6ab68f59d::t_a3c1ca93cb112e 13,17,344-346,365-367
+tests/data/placebo/test_eks_tag_deleted_cluster/eks.UntagResource_1.json
+  s_bbb04325db545e::t_520bd0dad905f5 1-10
+tests/data/placebo/test_eks_tag_deleted_cluster/eks.ListClusters_1.json
+  s_bbb04325db545e::t_520bd0dad905f5 1-8
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.5.2",
+  "base_commit_sha": "c64782c5da521dd2e47475f4b1b5d1fa44681848",
+  "prompts": {},
+  "sessions": {
+    "s_3bb5c6ab68f59d": {
+      "agent_id": {
+        "tool": "claude",
+        "id": "db87a38f-ea1b-456e-b0d7-a8b38e8d6db2",
+        "model": "claude-opus-5"
+      },
+      "human_author": "AJ Kerrigan <aj@stacklet.io>"
+    },
+    "s_bbb04325db545e": {
+      "agent_id": {
+        "tool": "claude",
+        "id": "454cfbc7-83d3-411d-a297-5ad09286bebc",
+        "model": "claude-opus-5"
+      },
+      "human_author": "AJ Kerrigan <aj@stacklet.io>"
+    }
+  }
+}
