@@ -18,7 +18,8 @@ from .graph import TerraformGraph
 # `__is_block__` markers). These options restore the pre-8.x output shape
 # that the rest of this module expects from .tfvars parsing.
 HCL2_SERIALIZATION_OPTIONS = hcl2.SerializationOptions(
-    strip_string_quotes=True, explicit_blocks=False, preserve_heredocs=False)
+    strip_string_quotes=True, explicit_blocks=False, preserve_heredocs=False
+)
 
 
 class VariableResolver:
@@ -118,7 +119,8 @@ class VariableResolver:
                         f_vars = json.loads(contents)
                     except json.JSONDecodeError:
                         f_vars = hcl2.loads(
-                            contents, serialization_options=HCL2_SERIALIZATION_OPTIONS)
+                            contents, serialization_options=HCL2_SERIALIZATION_OPTIONS
+                        )
 
                 fpath = type == "user" and self.var_files[idx] or f
                 if isinstance(fpath, Path):
