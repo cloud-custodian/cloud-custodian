@@ -72,7 +72,7 @@ resource "aws_sagemaker_endpoint_configuration" "busy" {
     variant_name           = "quiet"
     model_name             = aws_sagemaker_model.main.name
     initial_instance_count = 1
-    instance_type          = "ml.t2.medium"
+    instance_type          = "ml.c5.large"
     initial_variant_weight = 1
   }
 
@@ -80,7 +80,7 @@ resource "aws_sagemaker_endpoint_configuration" "busy" {
     variant_name           = "busy"
     model_name             = aws_sagemaker_model.main.name
     initial_instance_count = 1
-    instance_type          = "ml.t2.medium"
+    instance_type          = "ml.c5.large"
     initial_variant_weight = 1
   }
 }
@@ -92,7 +92,7 @@ resource "aws_sagemaker_endpoint_configuration" "idle" {
     variant_name           = "AllTraffic"
     model_name             = aws_sagemaker_model.main.name
     initial_instance_count = 1
-    instance_type          = "ml.t2.medium"
+    instance_type          = "ml.c5.large"
     initial_variant_weight = 1
   }
 }

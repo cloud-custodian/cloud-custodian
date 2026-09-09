@@ -37,15 +37,20 @@ class PublishedMetricInfo(typing.TypedDict):
     namespace: Namespace
 
 
-def load_sagemaker_metrics() -> dict[ResourceTypename,
-                                     dict[MetricName, PublishedMetricInfo]]:
+EndpointKind = str
+
+
+def load_sagemaker_metrics() -> dict[
+        ResourceTypename, dict[EndpointKind, dict[MetricName, PublishedMetricInfo]]]:
     """Which namespace each metric belongs to and how it is dimensioned.
 
     Expands data/sagemaker_metrics.yaml, which groups metrics by the
-    documentation table they came from, into a lookup by resource and
-    metric name.
+    documentation table they came from, into a lookup by resource,
+    endpoint kind and metric name.
     """
-    metrics: dict[ResourceTypename, dict[MetricName, PublishedMetricInfo]] = {}
+    metrics: dict[
+        ResourceTypename,
+        dict[EndpointKind, dict[MetricName, PublishedMetricInfo]]] = {}
     sections = yaml.safe_load(
         (importlib.resources.files('c7n') / 'data/sagemaker_metrics.yaml'
          ).read_text())
@@ -58,13 +63,14 @@ def load_sagemaker_metrics() -> dict[ResourceTypename,
                 for dimensions in section['dimensions']
                 ],
             }
-        table = metrics.setdefault(section['resource'], {})
-        for name in section['metrics']:
-            if name in table:
-                raise AssertionError(
-                    f"{name} is in more than one {section['resource']}"
-                    f" section of sagemaker_metrics.yaml")
-            table[name] = published
+        for kind in section['endpoint-kinds']:
+            table = metrics.setdefault(section['resource'], {}).setdefault(kind, {})
+            for name in section['metrics']:
+                if name in table:
+                    raise AssertionError(
+                        f"{name} is in more than one {section['resource']}"
+                        f" {kind} section of sagemaker_metrics.yaml")
+                table[name] = published
 
     return metrics
 

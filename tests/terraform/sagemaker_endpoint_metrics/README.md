@@ -21,6 +21,10 @@ Neither the AWS provider nor OpenTofu has an inference component resource,
 so `aws_cloudformation_stack` stands in for one. Destroying the stack
 destroys the component.
 
+`probe_metrics.py` checks `c7n/data/sagemaker_metrics.yaml` against what
+these endpoints publish, and documents how to update it. Run it with
+credentials for this account once the endpoints are `InService`.
+
 `model.tar.gz` is the smallest artifact the prebuilt XGBoost serving image
 will load:
 

@@ -1,48 +1,69 @@
 # The metrics SageMaker publishes, and the dimensions that identify them.
 #
-# Maintained by hand from, and in the same order as, the tables in
+# Maintained by hand from the tables in
 # https://docs.aws.amazon.com/sagemaker/latest/dg/monitoring-cloudwatch.html
 #
-# Each section is one metric table there, followed by its dimensions table.
-# The namespace is named in the prose above each table. A dimension entry is
-# one row of the dimensions table: the names identifying a single time
-# series.
+# Each section names the metric table it came from. The namespace is in the
+# prose above that table. A dimension entry is one row of the following
+# dimensions table: the names identifying a single time series.
+#
+# endpoint-kinds says which endpoints publish the section's metrics.
+# "classic" endpoints attach a model to each production variant;
+# "inference-component" endpoints carry an execution role and host models as
+# components placed on a variant. The two report invocations under different
+# dimensions, which the documentation lists together without saying which
+# applies when.
 #
 # Only the metrics of resources c7n filters on are listed; the page also
 # covers jobs, Ground Truth, Feature Store and pipelines.
+#
+# The documentation's dimensions tables say which dimensions a metric can be
+# filtered by, not which sets exist, and CloudWatch identifies a series by
+# the exact set. Only sets observed to carry data are listed here -- see
+# specs/10853-aws-sagemaker-endpoint-metrics/live-dimension-sets.md. Notably
+# instance type is published only alongside AvailabilityZone and Region, so
+# the documented "EndpointName, VariantName, InstanceType" is absent.
 
 - title: Endpoint metrics
   resource: sagemaker-endpoint
+  endpoint-kinds: [classic, inference-component]
   namespace: /aws/sagemaker/Endpoints
   metrics:
-    - CPUReservation
     - CPUUtilization
-    - CPUUtilizationNormalized
     - DiskUtilization
     - GPUMemoryUtilization
-    - GPUMemoryUtilizationNormalized
-    - GPUReservation
     - GPUUtilization
-    - GPUUtilizationNormalized
-    - MemoryReservation
     - MemoryUtilization
   dimensions:
     - EndpointName, VariantName
-    - EndpointName, VariantName, InstanceType
-    - InstanceId
-    - AcceleratorId
+
+# Reservations exist only where a component reserves part of an instance,
+# and the normalized metrics report utilization against them. Observed for a
+# component-hosting endpoint and not for a classic one.
+- title: Endpoint metrics
+  resource: sagemaker-endpoint
+  endpoint-kinds: [inference-component]
+  namespace: /aws/sagemaker/Endpoints
+  metrics:
+    - CPUReservation
+    - CPUUtilizationNormalized
+    - GPUMemoryUtilizationNormalized
+    - GPUReservation
+    - GPUUtilizationNormalized
+    - MemoryReservation
+  dimensions:
+    - EndpointName, VariantName
 
 - title: Endpoint invocation metrics
   resource: sagemaker-endpoint
+  endpoint-kinds: [classic]
   namespace: AWS/SageMaker
   metrics:
-    - ConcurrentRequestsPerCopy
     - ConcurrentRequestsPerModel
     - Invocation4XXErrors
     - Invocation5XXErrors
     - InvocationModelErrors
     - Invocations
-    - InvocationsPerCopy
     - InvocationsPerInstance
     - ModelLatency
     - ModelSetupTime
@@ -53,13 +74,33 @@
     - FirstChunkOverheadLatency
   dimensions:
     - EndpointName, VariantName
-    - EndpointName, VariantName, InstanceType
+
+# A component-hosting endpoint reports its invocations per component, with
+# no EndpointName dimension.
+- title: Endpoint invocation metrics
+  resource: sagemaker-endpoint
+  endpoint-kinds: [inference-component]
+  namespace: AWS/SageMaker
+  metrics:
+    - ConcurrentRequestsPerCopy
+    - Invocation4XXErrors
+    - Invocation5XXErrors
+    - InvocationModelErrors
+    - Invocations
+    - InvocationsPerCopy
+    - ModelLatency
+    - ModelSetupTime
+    - OverheadLatency
+    - MidStreamErrors
+    - FirstChunkLatency
+    - FirstChunkModelLatency
+    - FirstChunkOverheadLatency
+  dimensions:
     - InferenceComponentName
-    - InstanceId
-    - ContainerId
 
 - title: Inference component metrics
   resource: sagemaker-inference-component
+  endpoint-kinds: [inference-component]
   namespace: /aws/sagemaker/InferenceComponents
   metrics:
     - CPUUtilizationNormalized
@@ -68,13 +109,10 @@
     - MemoryUtilizationNormalized
   dimensions:
     - InferenceComponentName
-    - InferenceComponentName, InstanceType
-    - InstanceId
-    - ContainerId
-    - AcceleratorId
 
 - title: Multi-model endpoint model loading metrics
   resource: sagemaker-endpoint
+  endpoint-kinds: [classic]
   namespace: AWS/SageMaker
   metrics:
     - ModelLoadingWaitTime
@@ -87,6 +125,7 @@
 
 - title: Multi-model endpoint model instance metrics
   resource: sagemaker-endpoint
+  endpoint-kinds: [classic]
   namespace: /aws/sagemaker/Endpoints
   metrics:
     - LoadedModelCount
