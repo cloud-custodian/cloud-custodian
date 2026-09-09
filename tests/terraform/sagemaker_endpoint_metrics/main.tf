@@ -65,8 +65,16 @@ resource "aws_sagemaker_model" "main" {
 
 # Only the second variant is invoked, so an idle-endpoint policy must skip
 # this endpoint -- which it can only do by querying every variant.
+# A configuration can't be edited, and an endpoint follows its configuration
+# by name, so the name has to change for a variant change to reach the
+# endpoint -- hence name_prefix, which terraform makes unique. The prefix is
+# short because AWS caps it at 37 characters, well under local.name.
 resource "aws_sagemaker_endpoint_configuration" "busy" {
-  name = "${local.name}-busy"
+  name_prefix = "c7n-em-busy-"
+
+  lifecycle {
+    create_before_destroy = true
+  }
 
   production_variants {
     variant_name           = "quiet"
@@ -83,10 +91,24 @@ resource "aws_sagemaker_endpoint_configuration" "busy" {
     instance_type          = "ml.c5.large"
     initial_variant_weight = 1
   }
+
+  # a gpu variant so the endpoint publishes the GPU metrics; nothing here
+  # uses the gpu, but the instance having one is what makes them appear
+  production_variants {
+    variant_name           = "gpu"
+    model_name             = aws_sagemaker_model.main.name
+    initial_instance_count = 1
+    instance_type          = "ml.g5.xlarge"
+    initial_variant_weight = 1
+  }
 }
 
 resource "aws_sagemaker_endpoint_configuration" "idle" {
-  name = "${local.name}-idle"
+  name_prefix = "c7n-em-idle-"
+
+  lifecycle {
+    create_before_destroy = true
+  }
 
   production_variants {
     variant_name           = "AllTraffic"
@@ -115,12 +137,19 @@ resource "aws_sagemaker_endpoint" "idle" {
 ##
 
 resource "aws_sagemaker_endpoint_configuration" "component" {
-  name               = "${local.name}-ic"
+  name_prefix        = "c7n-em-ic-"
   execution_role_arn = aws_iam_role.execution.arn
 
+  lifecycle {
+    create_before_destroy = true
+  }
+
+  # an endpoint with inference components can have only one variant, so the
+  # pool has a gpu and both components share it -- one reserving the
+  # accelerator, one not
   production_variants {
     variant_name           = "AllTraffic"
-    instance_type          = "ml.m5.large"
+    instance_type          = "ml.g5.xlarge"
     initial_instance_count = 1
 
     routing_config {
@@ -129,9 +158,16 @@ resource "aws_sagemaker_endpoint_configuration" "component" {
   }
 }
 
+# An endpoint hosting inference components can't be updated to a different
+# instance type, so a pool change means replacing the endpoint -- and its
+# components with it, hence the stack below follows.
 resource "aws_sagemaker_endpoint" "component" {
   name                 = "${local.name}-ic"
   endpoint_config_name = aws_sagemaker_endpoint_configuration.component.name
+
+  lifecycle {
+    replace_triggered_by = [aws_sagemaker_endpoint_configuration.component]
+  }
 }
 
 # Neither the aws provider nor OpenTofu has an inference component resource,
@@ -139,6 +175,10 @@ resource "aws_sagemaker_endpoint" "component" {
 # stack destroys the component.
 resource "aws_cloudformation_stack" "component" {
   name = "${local.name}-ic"
+
+  lifecycle {
+    replace_triggered_by = [aws_sagemaker_endpoint.component]
+  }
 
   template_body = jsonencode({
     Resources = {
@@ -150,9 +190,12 @@ resource "aws_cloudformation_stack" "component" {
           VariantName            = "AllTraffic"
           Specification = {
             ModelName = aws_sagemaker_model.main.name
+            # every component on a gpu pool has to reserve accelerators,
+            # and ml.g5.xlarge has one, so the endpoint hosts one component
             ComputeResourceRequirements = {
-              MinMemoryRequiredInMb    = 1024
-              NumberOfCpuCoresRequired = 1
+              MinMemoryRequiredInMb              = 1024
+              NumberOfCpuCoresRequired           = 1
+              NumberOfAcceleratorDevicesRequired = 1
             }
           }
           RuntimeConfig = { CopyCount = 1 }

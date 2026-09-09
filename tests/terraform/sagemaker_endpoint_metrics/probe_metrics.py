@@ -113,16 +113,19 @@ def find_components(sagemaker) -> dict[str, list[str]]:
 def invoke(runtime, endpoints, components, count: int) -> None:
     """Invoke one variant of each classic endpoint, and each component.
 
-    A classic endpoint's other variants are left alone: a variant that is
-    never invoked still publishes zeros, which is worth seeing.
+    A variant named "quiet" is left alone: a variant that is never invoked
+    still publishes zeros, which is worth seeing.
     """
     for endpoint in endpoints:
         name = endpoint['EndpointName']
         targets = [
             dict(InferenceComponentName=component)
             for component in components.get(name, ())
-            ] or [dict(TargetVariant=endpoint['ProductionVariants'][-1][
-                'VariantName'])]
+            ] or [
+            dict(TargetVariant=variant['VariantName'])
+            for variant in endpoint['ProductionVariants']
+            if variant['VariantName'] != 'quiet'
+            ]
         for target in targets:
             for _ in range(count):
                 runtime.invoke_endpoint(

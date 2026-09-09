@@ -37,16 +37,17 @@ class PublishedMetricInfo(typing.TypedDict):
     namespace: Namespace
 
 
+# How an endpoint hosts its models, which decides how some of its metrics
+# are dimensioned. Only SagemakerEndpointMetricsFilter cares.
 EndpointKind = str
 
 
 def load_sagemaker_metrics() -> dict[
         ResourceTypename, dict[EndpointKind, dict[MetricName, PublishedMetricInfo]]]:
-    """Which namespace each metric belongs to and how it is dimensioned.
+    """Expand data/sagemaker_metrics.yaml into a lookup.
 
-    Expands data/sagemaker_metrics.yaml, which groups metrics by the
-    documentation table they came from, into a lookup by resource,
-    endpoint kind and metric name.
+    By resource, endpoint kind and metric name. The file groups metrics
+    by the documentation table they came from instead.
     """
     metrics: dict[
         ResourceTypename,
@@ -75,7 +76,38 @@ def load_sagemaker_metrics() -> dict[
     return metrics
 
 
-SAGEMAKER_METRICS = load_sagemaker_metrics()
+def merge_endpoint_kinds(
+        metrics: dict[ResourceTypename,
+                      dict[EndpointKind, dict[MetricName, PublishedMetricInfo]]],
+        ) -> dict[ResourceTypename, dict[MetricName, PublishedMetricInfo]]:
+    """Everything a resource's metrics can be dimensioned by, whatever its kind.
+
+    What a policy can ask for, which is all validation can check: which
+    kinds of resource an account holds isn't known until the policy runs.
+    """
+    merged: dict[ResourceTypename, dict[MetricName, PublishedMetricInfo]] = {}
+    for resource, kinds in metrics.items():
+        table = merged.setdefault(resource, {})
+        for published_by_name in kinds.values():
+            for name, published in published_by_name.items():
+                if name not in table:
+                    table[name] = dict(published)
+                    continue
+                if table[name]['namespace'] != published['namespace']:
+                    raise AssertionError(
+                        f"{resource} publishes {name} in more than one"
+                        f" namespace, so a policy naming it is ambiguous")
+                table[name]['dimension_sets'] = table[name]['dimension_sets'] + [
+                    names for names in published['dimension_sets']
+                    if names not in table[name]['dimension_sets']
+                    ]
+    return merged
+
+
+SAGEMAKER_METRICS_BY_ENDPOINT_KIND = load_sagemaker_metrics()
+
+# what the filters use unless they know a resource's endpoint kind
+SAGEMAKER_METRICS = merge_endpoint_kinds(SAGEMAKER_METRICS_BY_ENDPOINT_KIND)
 
 
 class NotebookDescribe(DescribeSource):
@@ -710,62 +742,41 @@ class SagemakerEndpointMetricsFilter(SageMakerMetricsFilter):
                      summary.get('VariantName')))
         return components
 
-    def published_metric(self):
-        """Metric with all possible dimension sets"""
-        metric = super().published_metric()
-        ic_metric = SAGEMAKER_METRICS['sagemaker-inference-component'].get(
-            self.data['name'])
-        if ic_metric:
-            metric["dimension_sets"] = metric["dimension_sets"] + [
-                dimension_set for dimension_set in ic_metric["dimension_sets"]
-                if dimension_set not in metric["dimension_sets"]
-            ]
+    def resource_kind(self, resource) -> EndpointKind:
+        """How this endpoint hosts its models."""
+        if self.endpoint_components.get(resource['EndpointName']):
+            return 'inference-component'
+        return 'classic'
 
-        return metric
+    def resource_published_metric(
+            self, resource) -> typing.Optional[PublishedMetricInfo]:
+        """What this endpoint publishes, given how it hosts its models.
 
-    def resource_published_metric(self, resource):
-        """Metric with all possible dimension sets"""
-
-        metric = (
-            self.endpoint_components[resource['EndpointName']]
-            and
-            SAGEMAKER_METRICS['sagemaker-inference-component'].get(
-                self.data['name'])
-        )
-
-        if not metric:
-            metric = super().published_metric()
-
-        return metric
-
-    @functools.cached_property
-    def resource_dimension_derived_value(self):
-        given_dimensions = self.data.get('dimensions')
-        if given_dimensions:
-            if 'InferenceComponentName' in given_dimensions:
-                given_inference_component_name = given_dimensions['InferenceComponentName']
-                for (endpoint_name, (inference_component_name, variant_name)
-                     ) in self.endpoint_components:
-                    if inference_component_name == given_inference_component_name:
-                        return EndpointName
-
-        return None
+        An endpoint hosting inference components reports its invocations
+        per component; a classic one reports them per variant. The
+        documentation lists both sets without saying which applies, so
+        the components decide. Some metrics only one kind publishes at
+        all, and the other kind has no series for them.
+        """
+        return SAGEMAKER_METRICS_BY_ENDPOINT_KIND[self.manager.type][
+            self.resource_kind(resource)].get(self.data['name'])
 
     def can_enumerate_dimension(self, dimension_name):
         return dimension_name in ('VariantName', 'InferenceComponentName')
 
-    def enumerate_dimension(self, dimension_name, resource):
+    def enumerate_dimension(self, dimension_name, resource) -> list[str]:
+        """The values of a dimension naming this endpoint's sub units."""
         if dimension_name == 'VariantName':
-            return resource['ProductionVariants']
-        elif dimension_name == 'InferenceComponentName':
-            given_dimensions = self.data.get('dimensions', {})
+            return [variant['VariantName']
+                    for variant in resource['ProductionVariants']]
+
+        if dimension_name == 'InferenceComponentName':
+            chosen_variant = self.data.get('dimensions', {}).get('VariantName')
             return [
-                inference_component_name
-                for inference_component_name, variant_name
-                in (self.endpoint_components
-                    .get(resource[resource_dimension_name], ())
-                    )
-                if given_dimensions.get('VariantName', variant_name) == variant_name
+                name
+                for name, variant in self.endpoint_components.get(
+                    resource['EndpointName'], ())
+                if chosen_variant in (None, variant)
                 ]
 
         raise AssertionError(f"{self} can't enumerate {dimension_name}")
