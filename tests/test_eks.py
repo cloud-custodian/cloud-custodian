@@ -5,7 +5,7 @@ import pytest
 import os
 import json
 from botocore.exceptions import ClientError
-from .common import ACCOUNT_ID, BaseTest
+from .common import BaseTest
 from c7n.exceptions import PolicyValidationError
 
 from pytest_terraform import terraform
