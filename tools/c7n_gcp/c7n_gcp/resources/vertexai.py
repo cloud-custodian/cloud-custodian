@@ -14,7 +14,8 @@ from c7n.utils import local_session, jmespath_search, type_schema
 from c7n_gcp.actions import MethodAction
 from c7n_gcp.filters.metrics import GCPMetricsFilter
 from c7n_gcp.provider import resources
-from c7n_gcp.query import QueryResourceManager, TypeInfo, ChildResourceManager, ChildTypeInfo
+from c7n_gcp.query import (
+    config_regions, QueryResourceManager, TypeInfo, ChildResourceManager, ChildTypeInfo)
 
 
 REGION_DATA_PATH = Path(__file__).parent.parent / 'regions.json'
@@ -235,9 +236,8 @@ class VertexAILocation:
 
         Locations can be specified via:
         1. Policy query: {'query': [{'location': 'us-central1'}, {'location': 'us-east1'}]}
-        2. Config regions: --regions us-central1,us-east1
-        3. Config region: --region us-central1
-        4. Default: All Vertex AI supported regions from vertexai_regions.json
+        2. Configured regions
+        3. Default: All Vertex AI supported regions from vertexai_regions.json
         """
 
         # If query specified in policy, use those locations
@@ -245,13 +245,10 @@ class VertexAILocation:
             query_locations = {q['location'] for q in self.data['query'] if 'location' in q}
             return [{'name': loc} for loc in self.regions if loc in query_locations]
 
-        # If config regions specified, use those
-        if self.config and self.config.regions and 'all' not in self.config.regions:
-            return [{'name': r} for r in self.regions if r in self.config.regions]
-
-        # If single config region specified, use that
-        if self.config and self.config.region and self.config.region != 'us-east-1':
-            return [{'name': self.config.region}] if self.config.region in self.regions else []
+        # If cli/config regions specified, use those
+        regions = config_regions(self.config) if self.config else ()
+        if regions:
+            return [{'name': r} for r in self.regions if r in regions]
 
         # Default: return all Vertex AI supported regions
         return [{'name': loc} for loc in self.regions]
@@ -785,6 +782,61 @@ class VertexAIModel(VertexAIQueryManager):
         asset_type = 'aiplatform.googleapis.com/Model'
         permissions = ('aiplatform.models.list',)
         urn_component = 'model'
+
+
+@resources.register('vertex-ai-evaluation-run')
+class VertexAIEvaluationRun(VertexAIQueryManager):
+    """GCP Vertex AI Evaluation Run Resource
+
+    Vertex AI Evaluation Runs assess model or dataset quality against an
+    evaluation set, producing a terminal state and completion time that
+    can drive a retention-review policy on completed runs.
+
+    :example:
+
+    List all Vertex AI Evaluation Runs across all locations:
+
+    .. code-block:: yaml
+
+        policies:
+          - name: vertexai-evaluation-runs-inventory
+            resource: gcp.vertex-ai-evaluation-run
+
+    :example:
+
+    Find terminal evaluation runs older than 30 days:
+
+    .. code-block:: yaml
+
+        policies:
+          - name: vertex-ai-completed-evaluation-runs-past-retention
+            resource: gcp.vertex-ai-evaluation-run
+            filters:
+              - or:
+                  - type: value
+                    key: state
+                    value: SUCCEEDED
+                  - type: value
+                    key: state
+                    value: FAILED
+                  - type: value
+                    key: state
+                    value: CANCELLED
+              - type: value
+                key: completionTime
+                value_type: age
+                op: greater-than
+                value: 30
+    """
+
+    class resource_type(VertexAITypeInfo):
+        component = 'projects.locations.evaluationRuns'
+        enum_spec = ('list', 'evaluationRuns[]', None)
+        default_report_fields = [
+            'name', 'displayName', 'state', 'createTime', 'completionTime'
+        ]
+        permissions = ('aiplatform.evaluationRuns.list',)
+        urn_component = 'evaluation-run'
 
 
 @resources.register('vertex-ai-batch-prediction-job')

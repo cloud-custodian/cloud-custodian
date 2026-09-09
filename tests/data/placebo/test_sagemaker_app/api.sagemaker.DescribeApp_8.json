@@ -1,0 +1,48 @@
+{
+    "status_code": 200,
+    "data": {
+        "AppArn": "arn:aws:sagemaker:us-east-1:644160558196:app/d-hdmmj0w5a3de/c7n-profile-nice-pangolin/JupyterServer/c7n-app-nice-pangolin",
+        "AppType": "JupyterServer",
+        "AppName": "c7n-app-nice-pangolin",
+        "DomainId": "d-hdmmj0w5a3de",
+        "UserProfileName": "c7n-profile-nice-pangolin",
+        "Status": "Deleted",
+        "EffectiveTrustedIdentityPropagationStatus": "DISABLED",
+        "RecoveryMode": false,
+        "LastHealthCheckTimestamp": {
+            "__class__": "datetime",
+            "year": 2026,
+            "month": 7,
+            "day": 14,
+            "hour": 14,
+            "minute": 24,
+            "second": 16,
+            "microsecond": 333000
+        },
+        "LastUserActivityTimestamp": {
+            "__class__": "datetime",
+            "year": 2026,
+            "month": 7,
+            "day": 14,
+            "hour": 14,
+            "minute": 24,
+            "second": 16,
+            "microsecond": 333000
+        },
+        "CreationTime": {
+            "__class__": "datetime",
+            "year": 2026,
+            "month": 7,
+            "day": 14,
+            "hour": 14,
+            "minute": 24,
+            "second": 16,
+            "microsecond": 333000
+        },
+        "ResourceSpec": {
+            "SageMakerImageArn": "arn:aws:ecr:us-east-1:644160558196:repository/looseleaf-jupyter-server-3",
+            "InstanceType": "system"
+        },
+        "ResponseMetadata": {}
+    }
+}

@@ -1,0 +1,80 @@
+{
+    "pytest-terraform": 1,
+    "outputs": {},
+    "resources": {
+        "azurerm_subscription": {
+            "current": {
+                "display_name": "Stacklet Dev 2",
+                "id": "/subscriptions/00000000-0000-0000-0000-000000000000",
+                "location_placement_id": "Public_2014-09-01",
+                "quota_id": "PayAsYouGo_2014-09-01",
+                "spending_limit": "Off",
+                "state": "Enabled",
+                "subscription_id": "00000000-0000-0000-0000-000000000000",
+                "tags": {},
+                "tenant_id": "00000000-0000-0000-0000-000000000000",
+                "timeouts": null
+            }
+        },
+        "azurerm_consumption_budget_subscription": {
+            "budget_1000": {
+                "amount": 1000,
+                "etag": "\"1dc80c867735072\"",
+                "filter": [],
+                "id": "/subscriptions/00000000-0000-0000-0000-000000000000/providers/Microsoft.Consumption/budgets/budget_1000",
+                "name": "budget_1000",
+                "notification": [
+                    {
+                        "contact_emails": [
+                            "test@example.com"
+                        ],
+                        "contact_groups": [],
+                        "contact_roles": [],
+                        "enabled": false,
+                        "operator": "EqualTo",
+                        "threshold": 90,
+                        "threshold_type": "Actual"
+                    }
+                ],
+                "subscription_id": "/subscriptions/00000000-0000-0000-0000-000000000000",
+                "time_grain": "Monthly",
+                "time_period": [
+                    {
+                        "end_date": "2036-01-01T00:00:00Z",
+                        "start_date": "2026-01-01T00:00:00Z"
+                    }
+                ],
+                "timeouts": null
+            },
+            "budget_1001": {
+                "amount": 1001,
+                "etag": "\"1dc80c8679dd2f7\"",
+                "filter": [],
+                "id": "/subscriptions/00000000-0000-0000-0000-000000000000/providers/Microsoft.Consumption/budgets/budget_1001",
+                "name": "budget_1001",
+                "notification": [
+                    {
+                        "contact_emails": [
+                            "test@example.com"
+                        ],
+                        "contact_groups": [],
+                        "contact_roles": [],
+                        "enabled": false,
+                        "operator": "EqualTo",
+                        "threshold": 90,
+                        "threshold_type": "Actual"
+                    }
+                ],
+                "subscription_id": "/subscriptions/00000000-0000-0000-0000-000000000000",
+                "time_grain": "Monthly",
+                "time_period": [
+                    {
+                        "end_date": "2036-01-01T00:00:00Z",
+                        "start_date": "2026-01-01T00:00:00Z"
+                    }
+                ],
+                "timeouts": null
+            }
+        }
+    }
+}

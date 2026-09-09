@@ -1,0 +1,58 @@
+{
+  "headers": {
+    "content-type": "application/json; charset=UTF-8",
+    "vary": "Origin, X-Origin, Referer",
+    "date": "Fri, 14 Aug 2026 17:30:34 GMT",
+    "server": "ESF",
+    "x-xss-protection": "0",
+    "x-frame-options": "SAMEORIGIN",
+    "x-content-type-options": "nosniff",
+    "alt-svc": "h3=\":443\"; ma=2592000,h3-29=\":443\"; ma=2592000",
+    "transfer-encoding": "chunked",
+    "status": "200",
+    "content-length": "1443",
+    "-content-encoding": "gzip",
+    "content-location": "https://us-central1-aiplatform.googleapis.com/v1/projects/cloud-custodian/locations/us-central1/evaluationRuns/7139656764730900480?alt=json"
+  },
+  "body": {
+    "name": "projects/cloud-custodian/locations/us-central1/evaluationRuns/7139656764730900480",
+    "displayName": "c7n-test-eval-run-central",
+    "metadata": {
+      "pipeline_id": "3047858440639610880"
+    },
+    "dataSource": {
+      "evaluationSet": "projects/cloud-custodian/locations/us-central1/evaluationSets/6420851038072340480"
+    },
+    "evaluationConfig": {
+      "metrics": [
+        {
+          "metric": "exact_match",
+          "computationBasedMetricSpec": {
+            "type": "EXACT_MATCH"
+          }
+        }
+      ]
+    },
+    "state": "SUCCEEDED",
+    "evaluationResults": {
+      "summaryMetrics": {
+        "metrics": {
+          "model-under-test/exact_match/VARIANCE": 0,
+          "model-under-test/exact_match/PERCENTILE_P99": 1,
+          "model-under-test/exact_match/AVERAGE": 1,
+          "model-under-test/exact_match/STANDARD_DEVIATION": 0,
+          "model-under-test/exact_match/PERCENTILE_P95": 1,
+          "model-under-test/exact_match/MINIMUM": 1,
+          "model-under-test/exact_match/MAXIMUM": 1,
+          "model-under-test/exact_match/MEDIAN": 1,
+          "model-under-test/exact_match/PERCENTILE_P90": 1
+        },
+        "totalItems": 1
+      },
+      "evaluationSet": "projects/cloud-custodian/locations/us-central1/evaluationSets/978954575836872704"
+    },
+    "createTime": "2026-08-14T17:30:28.967873Z",
+    "completionTime": "2026-08-14T17:30:30.024033Z",
+    "evaluationSetSnapshot": "projects/cloud-custodian/locations/us-central1/evaluationSets/978954575836872704"
+  }
+}

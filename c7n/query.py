@@ -461,13 +461,14 @@ class QueryResourceManager(ResourceManager, metaclass=QueryMeta):
 
     retry = staticmethod(
         get_retry((
-            'TooManyRequestsException',
-            'ThrottlingException',
+            'Client.RequestLimitExceeded',
+            'InternalServerException',
             'RequestLimitExceeded',
             'Throttled',
             'ThrottledException',
             'Throttling',
-            'Client.RequestLimitExceeded')))
+            'ThrottlingException',
+            'TooManyRequestsException')))
 
     source_mapping = sources
 
