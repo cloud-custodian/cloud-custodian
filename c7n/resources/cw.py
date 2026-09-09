@@ -6,6 +6,8 @@ from collections import defaultdict
 from concurrent.futures import as_completed
 from datetime import datetime, timedelta
 
+from botocore.exceptions import ClientError
+
 from c7n.actions import AutoTagUser, BaseAction
 from c7n.exceptions import PolicyValidationError
 from c7n.filters import Filter, MetricsFilter
@@ -696,10 +698,23 @@ class DescribeDashboard(DescribeSource):
         # fetch their tags from cloudwatch directly.
         resources = super().augment(resources)
         client = local_session(self.manager.session_factory).client('cloudwatch')
+        results = []
         for r, arn in zip(resources, self.manager.get_arns(resources)):
-            r['Tags'] = self.manager.retry(
-                client.list_tags_for_resource, ResourceARN=arn).get('Tags', [])
-        return resources
+            try:
+                tags = self.manager.retry(
+                    client.list_tags_for_resource, ResourceARN=arn).get('Tags', [])
+            except ClientError as e:
+                if e.response['Error']['Code'] not in (
+                        'ResourceNotFound', 'ResourceNotFoundException'):
+                    raise
+                # the dashboard was deleted between enumeration and augment
+                self.manager.log.warning(
+                    "Resource not found: list_tags_for_resource using %s" % {
+                        'ResourceARN': arn})
+                continue
+            r['Tags'] = tags
+            results.append(r)
+        return results
 
 
 @resources.register("cloudwatch-dashboard")
