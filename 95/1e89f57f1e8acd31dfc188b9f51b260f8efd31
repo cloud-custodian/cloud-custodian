@@ -1,0 +1,53 @@
+tests/test_eks.py
+  s_7832c6195d26b8::t_360b67b4cd9c2b 8,186-213
+tests/test_tags.py
+  s_7832c6195d26b8::t_360b67b4cd9c2b 12-13,800-979
+c7n/resources/ebs.py
+  s_7832c6195d26b8::t_360b67b4cd9c2b 25
+tests/data/placebo/test_eks_tag_deleted_cluster/eks.TagResource_1.json
+  s_7832c6195d26b8::t_360b67b4cd9c2b 1-11
+tests/data/placebo/test_native_tag_skips_gone_instance/ec2.DescribeInstances_1.json
+  s_7832c6195d26b8::t_360b67b4cd9c2b 1-374
+tests/data/placebo/test_universal_tag_skips_gone_snapshot/tagging.TagResources_1.json
+  s_7832c6195d26b8::t_360b67b4cd9c2b 1-13
+tests/common.py
+  s_7832c6195d26b8::t_360b67b4cd9c2b 13
+tests/zpill.py
+  s_7832c6195d26b8::t_360b67b4cd9c2b 5,21,272-276,286-297
+tests/data/placebo/test_native_tag_skips_gone_instance/ec2.CreateTags_1.json
+  s_7832c6195d26b8::t_360b67b4cd9c2b 1-10
+tests/data/placebo/test_eks_tag_deleted_cluster/eks.UntagResource_1.json
+  s_7832c6195d26b8::t_360b67b4cd9c2b 1-11
+c7n/tags.py
+  s_7832c6195d26b8::t_360b67b4cd9c2b 11-12,22-23,35-82,607-609,648-650,1475,1483-1485
+tests/data/placebo/test_native_tag_skips_gone_instance/ec2.DescribeInstanceImageMetadata_1.json
+  s_7832c6195d26b8::t_360b67b4cd9c2b 1-132
+tests/data/placebo/test_native_tag_skips_gone_instance/ec2.DescribeInstances_2.json
+  s_7832c6195d26b8::t_360b67b4cd9c2b 1-362
+c7n/resources/eks.py
+  s_7832c6195d26b8::t_360b67b4cd9c2b 13,17,344-346,365-367
+tests/data/placebo/test_native_tag_skips_gone_instance/ec2.CreateTags_2.json
+  s_7832c6195d26b8::t_360b67b4cd9c2b 1-6
+tests/data/placebo/test_native_tag_skips_gone_instance/ec2.DeleteTags_1.json
+  s_7832c6195d26b8::t_360b67b4cd9c2b 1-6
+tests/terraform/ec2_instance_tag/main.tf
+  s_7832c6195d26b8::t_360b67b4cd9c2b 1-36
+tests/terraform/ec2_instance_tag/tf_resources.json
+  s_7832c6195d26b8::t_360b67b4cd9c2b 1-392
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.5.2",
+  "base_commit_sha": "951e89f57f1e8acd31dfc188b9f51b260f8efd31",
+  "prompts": {},
+  "sessions": {
+    "s_7832c6195d26b8": {
+      "agent_id": {
+        "tool": "claude",
+        "id": "debdf9fe-d07c-40bf-8843-d5f34351e5de",
+        "model": "claude-opus-5"
+      },
+      "human_author": "AJ Kerrigan <aj@stacklet.io>"
+    }
+  }
+}
