@@ -1,0 +1,19 @@
+{
+    "status_code": 200,
+    "data": {
+        "ResponseMetadata": {},
+        "versionToken": "51e7791843cb2864236c",
+        "configuration": {
+            "role": "arn:aws:iam::644160558196:role/c7n-test-s3tables-repl-role",
+            "rules": [
+                {
+                    "destinations": [
+                        {
+                            "destinationTableBucketARN": "arn:aws:s3tables:us-east-1:644160558196:bucket/c7n-test-tb-repl-dst"
+                        }
+                    ]
+                }
+            ]
+        }
+    }
+}

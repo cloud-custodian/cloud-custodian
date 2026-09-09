@@ -1,6 +1,6 @@
 # Copyright The Cloud Custodian Authors.
 # SPDX-License-Identifier: Apache-2.0
-from c7n.filters import CrossAccountAccessFilter
+from c7n.filters import CrossAccountAccessFilter, ListItemFilter
 from c7n.filters.policystatement import HasStatementFilter
 from c7n.manager import resources
 from c7n.query import (
@@ -11,7 +11,7 @@ from c7n.query import (
     TypeInfo,
 )
 from c7n.tags import RemoveTag, Tag, TagActionFilter, TagDelayedAction
-from c7n.utils import local_session
+from c7n.utils import local_session, type_schema
 
 
 def _augment_tags(manager, resources):
@@ -236,6 +236,63 @@ class TableHasStatement(TablePolicyMixin, HasStatementFilter):
             'account_id': self.manager.config.account_id,
             'region': self.manager.config.region,
         }
+
+
+@TableBucket.filter_registry.register('replication')
+class TableBucketReplication(ListItemFilter):
+    """Filter table buckets on their replication configuration rules.
+
+    Each destination is annotated with a ``destinationAccount`` derived
+    from its destination table bucket ARN. Table buckets without a
+    replication configuration have no rules and only match a ``count: 0``
+    filter.
+
+    :example:
+
+    .. code-block:: yaml
+
+        policies:
+          - name: s3-table-bucket-replicated-outside-org
+            resource: aws.s3-table-bucket
+            filters:
+              - type: replication
+                attrs:
+                  - type: value
+                    key: destinations[].destinationAccount
+                    op: difference
+                    value:
+                      - "111111111111"
+                      - "222222222222"
+    """
+    schema = type_schema(
+        'replication',
+        attrs={'$ref': '#/definitions/filters_common/list_item_attrs'},
+        count={'type': 'number'},
+        count_op={'$ref': '#/definitions/filters_common/comparison_operators'})
+    permissions = ('s3tables:GetTableBucketReplication',)
+    annotation_key = 'c7n:Replication'
+    annotate_items = True
+
+    def process(self, resources, event=None):
+        self.client = local_session(self.manager.session_factory).client('s3tables')
+        return super().process(resources, event)
+
+    def get_item_values(self, resource):
+        if self.annotation_key not in resource:
+            try:
+                resource[self.annotation_key] = self.manager.retry(
+                    self.client.get_table_bucket_replication,
+                    tableBucketARN=resource['arn'])['configuration']
+            except self.client.exceptions.NotFoundException:
+                resource[self.annotation_key] = None
+        if resource[self.annotation_key] is None:
+            return []
+        rules = resource[self.annotation_key]['rules']
+        for rule in rules:
+            for destination in rule['destinations']:
+                destination['destinationAccount'] = (
+                    destination['destinationTableBucketARN'].split(':')[4])
+        return rules
 
 
 @TableBucket.action_registry.register('tag')

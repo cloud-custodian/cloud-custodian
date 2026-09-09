@@ -85,6 +85,58 @@ class S3TableBucketTest(BaseTest):
             resourceArn=resources[0]['arn'])['tags']
         self.assertNotIn('Env', tags)
 
+    def test_s3_table_bucket_replication_foreign(self):
+        session_factory = self.replay_flight_data(
+            'test_s3_table_bucket_replication_foreign')
+        p = self.load_policy(
+            {'name': 's3-table-bucket-replication-foreign',
+             'resource': 'aws.s3-table-bucket',
+             'filters': [
+                 {'type': 'replication',
+                  'attrs': [
+                      {'type': 'value',
+                       'key': 'destinations[].destinationAccount',
+                       'op': 'difference',
+                       'value': ['111111111111']}]}]},
+            session_factory=session_factory)
+        resources = p.run()
+        self.assertEqual(len(resources), 1)
+        self.assertEqual(resources[0]['name'], 'c7n-test-tb-repl-src')
+        matched = resources[0]['c7n:ListItemMatches']
+        self.assertEqual(
+            matched[0]['destinations'][0]['destinationAccount'],
+            '644160558196')
+
+    def test_s3_table_bucket_replication_allowed(self):
+        session_factory = self.replay_flight_data(
+            'test_s3_table_bucket_replication_allowed')
+        p = self.load_policy(
+            {'name': 's3-table-bucket-replication-allowed',
+             'resource': 'aws.s3-table-bucket',
+             'filters': [
+                 {'type': 'replication',
+                  'attrs': [
+                      {'type': 'value',
+                       'key': 'destinations[].destinationAccount',
+                       'op': 'difference',
+                       'value': ['644160558196']}]}]},
+            session_factory=session_factory)
+        resources = p.run()
+        self.assertEqual(len(resources), 0)
+
+    def test_s3_table_bucket_replication_count(self):
+        # unreplicated buckets match count: 0
+        session_factory = self.replay_flight_data(
+            'test_s3_table_bucket_replication_allowed')
+        p = self.load_policy(
+            {'name': 's3-table-bucket-not-replicated',
+             'resource': 'aws.s3-table-bucket',
+             'filters': [{'type': 'replication', 'count': 0}]},
+            session_factory=session_factory)
+        resources = p.run()
+        self.assertEqual(len(resources), 1)
+        self.assertEqual(resources[0]['name'], 'c7n-test-tb-repl-dst')
+
 
 class S3TableTest(BaseTest):
 
