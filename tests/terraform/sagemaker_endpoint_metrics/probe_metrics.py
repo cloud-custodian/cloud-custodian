@@ -56,14 +56,11 @@ checked. Say so in a comment rather than implying they were measured.
 import argparse
 import collections
 import datetime
-import pathlib
 import time
 
 import boto3
-import yaml
 
-CATALOGUE = (pathlib.Path(__file__).parents[3]
-             / 'c7n' / 'data' / 'sagemaker_metrics.yaml')
+from c7n.resources.sagemaker import SAGEMAKER_METRICS_BY_KIND
 
 PREFIX = 'c7n-endpoint-metrics-'
 
@@ -229,52 +226,57 @@ def main() -> None:
         for name_set, metrics in sorted(by_namespace[namespace].items()):
             print(f"    {list(name_set)}: {len(metrics)} metrics")
 
-    sections = yaml.safe_load(CATALOGUE.read_text())
     print('\nCatalogue entries')
     unexercised: list[str] = []
     mismatched: list[str] = []
-    for section in sections:
-        namespace = section['namespace']
-        name_sets = [
-            tuple(sorted(n.strip() for n in dimensions.split(',')))
-            for dimensions in section['dimensions']
-            ]
-        for kind in section['endpoint-kinds']:
-            resources = [
-                (endpoint, component)
-                for endpoint in endpoints if endpoint['kind'] == kind
-                for component in (components.get(endpoint['EndpointName'])
-                                  or [None])
-                ]
-            for metric in section['metrics']:
-                published = {
-                    name_set
-                    for endpoint, component in resources
-                    for resource in (endpoint['EndpointName'], component)
-                    if resource
-                    for name_set in seen[namespace, resource].get(metric, ())
-                    }
-                if not published:
-                    unexercised.append(f"{metric:32} {kind}")
-                    continue
-
-                matching = [s for s in name_sets if s in published]
-                if not matching:
-                    mismatched.append(
-                        f"{metric:32} {kind:20} catalogue"
-                        f" {[list(s) for s in name_sets]},"
-                        f" published {[list(s) for s in sorted(published)]}")
-                    continue
-
-                queried = [
-                    has_points(cloudwatch, namespace, metric, filled, window)
-                    for name_set in matching
-                    for endpoint, component in resources
-                    for filled in fill(list(name_set), endpoint, component)
+    for resource, by_kind in SAGEMAKER_METRICS_BY_KIND.items():
+        for entry_kind, table in by_kind.items():
+            # an entry under no kind claims every kind publishes it, so
+            # check them one at a time rather than together
+            kinds = ([entry_kind] if entry_kind
+                     else sorted({endpoint['kind'] for endpoint in endpoints}))
+            for kind in kinds:
+                targets = [
+                    (endpoint, component)
+                    for endpoint in endpoints if endpoint['kind'] == kind
+                    for component in (components.get(endpoint['EndpointName'])
+                                      or [None])
                     ]
-                verdict = 'ok      ' if any(queried) else 'no points'
-                print(f"  {verdict} {metric:32} {kind:20}"
-                      f" {[list(s) for s in matching]}")
+                if resource == 'sagemaker-inference-component':
+                    targets = [(e, c) for e, c in targets if c]
+
+                for metric, entry in table.items():
+                    namespace = entry['namespace']
+                    name_sets = [tuple(sorted(names))
+                                 for names in entry['dimension_sets']]
+                    published = {
+                        name_set
+                        for endpoint, component in targets
+                        for named in (endpoint['EndpointName'], component)
+                        if named
+                        for name_set in seen[namespace, named].get(metric, ())
+                        }
+                    if not published:
+                        unexercised.append(f"{metric:32} {kind}")
+                        continue
+
+                    matching = [s for s in name_sets if s in published]
+                    if not matching:
+                        mismatched.append(
+                            f"{metric:32} {kind:20} catalogue"
+                            f" {[list(s) for s in name_sets]},"
+                            f" published {[list(s) for s in sorted(published)]}")
+                        continue
+
+                    queried = [
+                        has_points(cloudwatch, namespace, metric, filled, window)
+                        for name_set in matching
+                        for endpoint, component in targets
+                        for filled in fill(list(name_set), endpoint, component)
+                        ]
+                    verdict = 'ok      ' if any(queried) else 'no points'
+                    print(f"  {verdict} {metric:32} {kind:20}"
+                          f" {[list(s) for s in matching]}")
 
     if mismatched:
         print('\nWrong dimensions -- the catalogue names a set that is not'
@@ -291,8 +293,11 @@ def main() -> None:
     print('\nPublished for our resources but not in the catalogue'
           ' -- do not add these')
     catalogued = {
-        tuple(sorted(n.strip() for n in dimensions.split(',')))
-        for section in sections for dimensions in section['dimensions']
+        tuple(sorted(names))
+        for by_kind in SAGEMAKER_METRICS_BY_KIND.values()
+        for table in by_kind.values()
+        for entry in table.values()
+        for names in entry['dimension_sets']
         }
     for namespace in NAMESPACES:
         for name_set in sorted(by_namespace[namespace]):

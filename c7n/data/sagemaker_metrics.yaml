@@ -7,12 +7,13 @@
 # prose above that table. A dimension entry is one row of the following
 # dimensions table: the names identifying a single time series.
 #
-# endpoint-kinds says which endpoints publish the section's metrics.
-# "classic" endpoints attach a model to each production variant;
-# "inference-component" endpoints carry an execution role and host models as
-# components placed on a variant. The two report invocations under different
-# dimensions, which the documentation lists together without saying which
-# applies when.
+# kind names a variety of the resource, for metrics only some varieties
+# publish; leave it out when every variety publishes the section's metrics.
+# Endpoints come in two kinds: a "classic" endpoint attaches a model to each
+# production variant, while an "inference-component" endpoint carries an
+# execution role and hosts models as components placed on a variant. The two
+# report invocations under different dimensions, which the documentation
+# lists together without saying which applies when.
 #
 # Only the metrics of resources c7n filters on are listed; the page also
 # covers jobs, Ground Truth, Feature Store and pipelines.
@@ -26,7 +27,6 @@
 
 - title: Endpoint metrics
   resource: sagemaker-endpoint
-  endpoint-kinds: [classic, inference-component]
   namespace: /aws/sagemaker/Endpoints
   metrics:
     - CPUUtilization
@@ -42,7 +42,7 @@
 # component-hosting endpoint and not for a classic one.
 - title: Endpoint metrics
   resource: sagemaker-endpoint
-  endpoint-kinds: [inference-component]
+  kind: inference-component
   namespace: /aws/sagemaker/Endpoints
   metrics:
     - CPUReservation
@@ -56,7 +56,7 @@
 
 - title: Endpoint invocation metrics
   resource: sagemaker-endpoint
-  endpoint-kinds: [classic]
+  kind: classic
   namespace: AWS/SageMaker
   metrics:
     - ConcurrentRequestsPerModel
@@ -79,7 +79,7 @@
 # no EndpointName dimension.
 - title: Endpoint invocation metrics
   resource: sagemaker-endpoint
-  endpoint-kinds: [inference-component]
+  kind: inference-component
   namespace: AWS/SageMaker
   metrics:
     - ConcurrentRequestsPerCopy
@@ -100,7 +100,6 @@
 
 - title: Inference component metrics
   resource: sagemaker-inference-component
-  endpoint-kinds: [inference-component]
   namespace: /aws/sagemaker/InferenceComponents
   metrics:
     - CPUUtilizationNormalized
@@ -112,7 +111,7 @@
 
 - title: Multi-model endpoint model loading metrics
   resource: sagemaker-endpoint
-  endpoint-kinds: [classic]
+  kind: classic
   namespace: AWS/SageMaker
   metrics:
     - ModelLoadingWaitTime
@@ -125,7 +124,7 @@
 
 - title: Multi-model endpoint model instance metrics
   resource: sagemaker-endpoint
-  endpoint-kinds: [classic]
+  kind: classic
   namespace: /aws/sagemaker/Endpoints
   metrics:
     - LoadedModelCount

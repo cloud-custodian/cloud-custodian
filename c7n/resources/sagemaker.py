@@ -37,21 +37,21 @@ class PublishedMetricInfo(typing.TypedDict):
     namespace: Namespace
 
 
-# How an endpoint hosts its models, which decides how some of its metrics
-# are dimensioned. Only SagemakerEndpointMetricsFilter cares.
-EndpointKind = str
+# A variety of a resource that publishes some metrics the other varieties
+# don't. None for metrics every variety publishes.
+Kind = typing.Optional[str]
+
+MetricsByKind = dict[ResourceTypename,
+                     dict[Kind, dict[MetricName, PublishedMetricInfo]]]
 
 
-def load_sagemaker_metrics() -> dict[
-        ResourceTypename, dict[EndpointKind, dict[MetricName, PublishedMetricInfo]]]:
+def load_sagemaker_metrics() -> MetricsByKind:
     """Expand data/sagemaker_metrics.yaml into a lookup.
 
-    By resource, endpoint kind and metric name. The file groups metrics
-    by the documentation table they came from instead.
+    By resource, kind and metric name. The file groups metrics by the
+    documentation table they came from instead.
     """
-    metrics: dict[
-        ResourceTypename,
-        dict[EndpointKind, dict[MetricName, PublishedMetricInfo]]] = {}
+    metrics: MetricsByKind = {}
     sections = yaml.safe_load(
         (importlib.resources.files('c7n') / 'data/sagemaker_metrics.yaml'
          ).read_text())
@@ -64,21 +64,20 @@ def load_sagemaker_metrics() -> dict[
                 for dimensions in section['dimensions']
                 ],
             }
-        for kind in section['endpoint-kinds']:
-            table = metrics.setdefault(section['resource'], {}).setdefault(kind, {})
-            for name in section['metrics']:
-                if name in table:
-                    raise AssertionError(
-                        f"{name} is in more than one {section['resource']}"
-                        f" {kind} section of sagemaker_metrics.yaml")
-                table[name] = published
+        kind = section.get('kind')
+        table = metrics.setdefault(section['resource'], {}).setdefault(kind, {})
+        for name in section['metrics']:
+            if name in table:
+                raise AssertionError(
+                    f"{name} is in more than one {section['resource']}"
+                    f" {kind} section of sagemaker_metrics.yaml")
+            table[name] = published
 
     return metrics
 
 
-def merge_endpoint_kinds(
-        metrics: dict[ResourceTypename,
-                      dict[EndpointKind, dict[MetricName, PublishedMetricInfo]]],
+def merge_kinds(
+        metrics: MetricsByKind,
         ) -> dict[ResourceTypename, dict[MetricName, PublishedMetricInfo]]:
     """Everything a resource's metrics can be dimensioned by, whatever its kind.
 
@@ -104,10 +103,26 @@ def merge_endpoint_kinds(
     return merged
 
 
-SAGEMAKER_METRICS_BY_ENDPOINT_KIND = load_sagemaker_metrics()
+def published_metric_of_kind(
+        resource: ResourceTypename, kind: Kind, name: MetricName,
+        ) -> typing.Optional[PublishedMetricInfo]:
+    """What a resource of this kind publishes the metric under, if anything.
 
-# what the filters use unless they know a resource's endpoint kind
-SAGEMAKER_METRICS = merge_endpoint_kinds(SAGEMAKER_METRICS_BY_ENDPOINT_KIND)
+    Metrics no kind is singled out for are kept under no kind, so they're
+    published by every kind.
+    """
+    by_kind = SAGEMAKER_METRICS_BY_KIND[resource]
+    for lookup in (kind, None):
+        published = by_kind.get(lookup, {}).get(name)
+        if published:
+            return published
+    return None
+
+
+SAGEMAKER_METRICS_BY_KIND = load_sagemaker_metrics()
+
+# what the filters use unless they know a resource's kind
+SAGEMAKER_METRICS = merge_kinds(SAGEMAKER_METRICS_BY_KIND)
 
 
 class NotebookDescribe(DescribeSource):
@@ -742,7 +757,7 @@ class SagemakerEndpointMetricsFilter(SageMakerMetricsFilter):
                      summary.get('VariantName')))
         return components
 
-    def resource_kind(self, resource) -> EndpointKind:
+    def resource_kind(self, resource) -> Kind:
         """How this endpoint hosts its models."""
         if self.endpoint_components.get(resource['EndpointName']):
             return 'inference-component'
@@ -758,8 +773,9 @@ class SagemakerEndpointMetricsFilter(SageMakerMetricsFilter):
         the components decide. Some metrics only one kind publishes at
         all, and the other kind has no series for them.
         """
-        return SAGEMAKER_METRICS_BY_ENDPOINT_KIND[self.manager.type][
-            self.resource_kind(resource)].get(self.data['name'])
+        return published_metric_of_kind(
+            self.manager.type, self.resource_kind(resource),
+            self.data['name'])
 
     def can_enumerate_dimension(self, dimension_name):
         return dimension_name in ('VariantName', 'InferenceComponentName')
