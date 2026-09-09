@@ -203,7 +203,7 @@ class TestNetworkManager(BaseTest):
 
     def test_core_network_delete_error(self):
         invalid_network_id = 'core-network-7a6b617270696e736b69'
-        factory = self.record_flight_data("test_core_network_delete_error")
+        factory = self.replay_flight_data("test_core_network_delete_error")
         client = factory().client("networkmanager")
         mock_factory = MagicMock()
         mock_factory.region = 'us-east-1'
