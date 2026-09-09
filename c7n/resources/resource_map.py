@@ -280,6 +280,7 @@ ResourceMap = {
   "aws.rds-cluster-param-group": "c7n.resources.rdsparamgroup.RDSClusterParamGroup",
   "aws.rds-cluster-snapshot": "c7n.resources.rdscluster.RDSClusterSnapshot",
   "aws.rds-db-shard-group": "c7n.resources.rdscluster.RDSDbShardGroup",
+  "aws.rds-global-cluster": "c7n.resources.rdscluster.RDSGlobalCluster",
   "aws.rds-param-group": "c7n.resources.rdsparamgroup.RDSParamGroup",
   "aws.rds-proxy": "c7n.resources.rds.RDSProxy",
   "aws.rds-reserved": "c7n.resources.rds.ReservedRDS",

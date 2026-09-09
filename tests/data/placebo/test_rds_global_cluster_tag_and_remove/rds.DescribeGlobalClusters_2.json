@@ -1,0 +1,48 @@
+{
+    "status_code": 200,
+    "data": {
+        "GlobalClusters": [
+            {
+                "GlobalClusterIdentifier": "c7n-global-tagged",
+                "GlobalClusterResourceId": "cluster-d6881b9e440a7828",
+                "GlobalClusterArn": "arn:aws:rds::644160558196:global-cluster:c7n-global-tagged",
+                "Status": "available",
+                "Engine": "aurora-postgresql",
+                "EngineVersion": "17.7",
+                "EngineLifecycleSupport": "open-source-rds-extended-support",
+                "StorageEncrypted": false,
+                "StorageEncryptionType": "sse-rds",
+                "DeletionProtection": false,
+                "GlobalClusterMembers": [],
+                "Endpoint": "c7n-global-tagged.global-ggxgcqjx92ap.global.rds.amazonaws.com",
+                "TagList": [
+                    {
+                        "Key": "Owner",
+                        "Value": "custodian"
+                    }
+                ]
+            },
+            {
+                "GlobalClusterIdentifier": "c7n-global-untagged",
+                "GlobalClusterResourceId": "cluster-a3d672078780a9eb",
+                "GlobalClusterArn": "arn:aws:rds::644160558196:global-cluster:c7n-global-untagged",
+                "Status": "available",
+                "Engine": "aurora-postgresql",
+                "EngineVersion": "17.7",
+                "EngineLifecycleSupport": "open-source-rds-extended-support",
+                "StorageEncrypted": false,
+                "StorageEncryptionType": "sse-rds",
+                "DeletionProtection": false,
+                "GlobalClusterMembers": [],
+                "Endpoint": "c7n-global-untagged.global-ggxgcqjx92ap.global.rds.amazonaws.com",
+                "TagList": [
+                    {
+                        "Key": "xyz",
+                        "Value": "hello world"
+                    }
+                ]
+            }
+        ],
+        "ResponseMetadata": {}
+    }
+}
