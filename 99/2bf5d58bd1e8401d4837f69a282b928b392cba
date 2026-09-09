@@ -1,0 +1,43 @@
+tests/data/placebo/test_cloudwatch_dashboard_tag/monitoring.ListDashboards_1.json
+  h_07d49deca46b44 6-7,11-15,18
+tests/test_cw_dashboard.py
+  s_3bb5c6ab68f59d::t_84a9aec087dc35 12
+  s_3bb5c6ab68f59d::t_34fcebcedd733b 3,7-10,14-15,17-25,27-32,34-49
+  h_07d49deca46b44 6,11
+tests/test_eks.py
+  s_3bb5c6ab68f59d::t_0d280f2338dabb 193-194
+  s_3bb5c6ab68f59d::t_124ce7b386cb39 8
+  s_3bb5c6ab68f59d::t_60db83c5147333 188-191,195,203-205,208-213
+  s_3bb5c6ab68f59d::t_8e82cc7d8dd3f5 192,202,206-207
+tests/terraform/cloudwatch_dashboard_tag/main.tf
+  h_07d49deca46b44 3
+  s_3bb5c6ab68f59d::t_c5ab4e7fac6811 1-2,4-26
+tests/data/placebo/test_cloudwatch_dashboard_tag/monitoring.ListDashboards_2.json
+  h_07d49deca46b44 1-23
+tests/test_tags.py
+  s_3bb5c6ab68f59d::t_8e82cc7d8dd3f5 871,879
+  s_3bb5c6ab68f59d::t_ff595a064d48a0 807
+  s_3bb5c6ab68f59d::t_0d280f2338dabb 816-817,872-873
+  s_3bb5c6ab68f59d::t_5f2288f7a65350 802-806,808-815,818-870,874-878,880-884,888-890,909-910,913-914,916-917,919-920,940-941,953,968-979
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.5.2",
+  "base_commit_sha": "992bf5d58bd1e8401d4837f69a282b928b392cba",
+  "prompts": {},
+  "humans": {
+    "h_07d49deca46b44": {
+      "author": "AJ Kerrigan <aj@stacklet.io>"
+    }
+  },
+  "sessions": {
+    "s_3bb5c6ab68f59d": {
+      "agent_id": {
+        "tool": "claude",
+        "id": "db87a38f-ea1b-456e-b0d7-a8b38e8d6db2",
+        "model": "claude-opus-5"
+      },
+      "human_author": "AJ Kerrigan <aj@stacklet.io>"
+    }
+  }
+}
