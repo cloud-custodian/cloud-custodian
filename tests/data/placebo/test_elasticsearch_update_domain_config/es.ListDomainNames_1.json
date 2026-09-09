@@ -1,0 +1,16 @@
+{
+    "status_code": 200,
+    "data": {
+        "ResponseMetadata": {},
+        "DomainNames": [
+            {
+                "DomainName": "c7n-test-es-update-config",
+                "EngineType": "Elasticsearch"
+            },
+            {
+                "DomainName": "c7n-test-os-update-config",
+                "EngineType": "Elasticsearch"
+            }
+        ]
+    }
+}

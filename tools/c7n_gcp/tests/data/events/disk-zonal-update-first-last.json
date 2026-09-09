@@ -1,0 +1,93 @@
+{
+  "insertId": "r8phjaf1pajbg",
+  "labels": {
+    "compute.googleapis.com/root_trigger_id": "536091e9-460c-432b-be3d-6c5ccbddc893"
+  },
+  "logName": "projects/cloud-custodian/logs/cloudaudit.googleapis.com%2Factivity",
+  "operation": {
+    "first": true,
+    "id": "operation-1787255391283-6597fd2b86918-c598f483-6c6e18e8",
+    "last": true,
+    "producer": "compute.googleapis.com"
+  },
+  "protoPayload": {
+    "@type": "type.googleapis.com/google.cloud.audit.AuditLog",
+    "apiVersionIdentifier": "v1",
+    "authenticationInfo": {
+      "oauthInfo": {
+        "oauthClientId": "764086051850-6qr4p6gpi6hn506pt8ejuq83di341hur.apps.googleusercontent.com"
+      },
+      "principalEmail": "user@example.com",
+      "principalSubject": "user:user@example.com"
+    },
+    "authorizationInfo": [
+      {
+        "granted": true,
+        "permission": "compute.disks.setLabels",
+        "permissionType": "ADMIN_WRITE",
+        "resource": "projects/cloud-custodian/zones/us-central1-a/disks/c7n-audit-zonal-default-f5b3",
+        "resourceAttributes": {
+          "name": "projects/cloud-custodian/zones/us-central1-a/disks/c7n-audit-zonal-default-f5b3",
+          "service": "compute",
+          "type": "compute.disks"
+        }
+      }
+    ],
+    "methodName": "v1.compute.disks.setLabels",
+    "request": {
+      "@type": "type.googleapis.com/compute.disks.setLabels",
+      "labelFingerprint": "\ufffd\ufffd\ufffdK\ufffd6,\ufffd",
+      "labels": [
+        {
+          "key": "c7n-audit",
+          "value": "recorded"
+        }
+      ]
+    },
+    "requestMetadata": {
+      "callerIp": "198.51.100.1",
+      "callerSuppliedUserAgent": "Python-httplib2/0.32.0 (gzip), custodian-gcp/0.1 (gzip),gzip(gfe)",
+      "destinationAttributes": {},
+      "requestAttributes": {
+        "auth": {},
+        "time": "2026-08-20T19:49:51.387590Z"
+      }
+    },
+    "resourceLocation": {
+      "currentLocations": [
+        "us-central1-a"
+      ]
+    },
+    "resourceName": "projects/cloud-custodian/zones/us-central1-a/disks/c7n-audit-zonal-default-f5b3",
+    "response": {
+      "@type": "type.googleapis.com/operation",
+      "endTime": "2026-08-20T12:49:51.356-07:00",
+      "id": "8069022862371644592",
+      "insertTime": "2026-08-20T12:49:51.349-07:00",
+      "name": "operation-1787255391283-6597fd2b86918-c598f483-6c6e18e8",
+      "operationType": "setLabels",
+      "progress": "100",
+      "selfLink": "https://www.googleapis.com/compute/v1/projects/cloud-custodian/zones/us-central1-a/operations/operation-1787255391283-6597fd2b86918-c598f483-6c6e18e8",
+      "selfLinkWithId": "https://www.googleapis.com/compute/v1/projects/cloud-custodian/zones/us-central1-a/operations/8069022862371644592",
+      "startTime": "2026-08-20T12:49:51.355-07:00",
+      "status": "DONE",
+      "targetId": "4992374716928550077",
+      "targetLink": "https://www.googleapis.com/compute/v1/projects/cloud-custodian/zones/us-central1-a/disks/c7n-audit-zonal-default-f5b3",
+      "user": "user@example.com",
+      "zone": "https://www.googleapis.com/compute/v1/projects/cloud-custodian/zones/us-central1-a"
+    },
+    "serviceName": "compute.googleapis.com",
+    "status": {}
+  },
+  "receiveTimestamp": "2026-08-20T19:49:51.474012965Z",
+  "resource": {
+    "labels": {
+      "disk_id": "4992374716928550077",
+      "project_id": "cloud-custodian",
+      "zone": "us-central1-a"
+    },
+    "type": "gce_disk"
+  },
+  "severity": "NOTICE",
+  "timestamp": "2026-08-20T19:49:51.251408Z"
+}

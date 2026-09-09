@@ -1,0 +1,23 @@
+{
+  "headers": {
+    "etag": "S8CFtOoGhdBCggbCWg-S-jJ1C28=/PMqKmM6iFft3hgn8QAq-itZF31Q=",
+    "content-type": "application/json; charset=UTF-8",
+    "vary": "Origin, X-Origin, Referer",
+    "date": "Wed, 12 Aug 2026 20:04:48 GMT",
+    "server": "ESF",
+    "x-xss-protection": "0",
+    "x-frame-options": "SAMEORIGIN",
+    "x-content-type-options": "nosniff",
+    "alt-svc": "h3=\":443\"; ma=2592000,h3-29=\":443\"; ma=2592000",
+    "transfer-encoding": "chunked",
+    "status": "200",
+    "content-length": "201",
+    "-content-encoding": "gzip",
+    "content-location": "https://compute.googleapis.com/compute/v1/projects/cloud-custodian/regions/us-central1/disks?filter=name+%3D+c7n-regional-jenkins&alt=json"
+  },
+  "body": {
+    "kind": "compute#diskList",
+    "id": "projects/cloud-custodian/regions/us-central1/disks",
+    "selfLink": "https://www.googleapis.com/compute/v1/projects/cloud-custodian/regions/us-central1/disks"
+  }
+}

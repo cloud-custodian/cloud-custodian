@@ -212,6 +212,40 @@ class MemoryDbTest(BaseTest):
         self.assertEqual(len(resources), 1)
         self.assertEqual(resources[0]['Name'], 'test-cluster-2')
 
+    def test_memorydb_db_parameter_filter(self):
+        session_factory = self.replay_flight_data('test_memorydb_db_parameter_filter')
+        p = self.load_policy(
+            {
+                'name': 'memorydb-approved-maxmemory-policy',
+                'resource': 'memorydb',
+                'filters': [
+                    {
+                        'type': 'db-parameter',
+                        'key': 'maxmemory-policy',
+                        'op': 'in',
+                        'value': ['volatile-lru', 'allkeys-lru'],
+                    }
+                ],
+            }, session_factory=session_factory
+        )
+        resources = p.run()
+        self.assertEqual(len(resources), 1)
+        self.assertEqual(resources[0]['Name'], 'c7n-test-memorydb')
+        self.assertEqual(
+            resources[0]['c7n:MatchedDBParameter'], ['maxmemory-policy'])
+
+    def test_memorydb_parameter_group(self):
+        session_factory = self.replay_flight_data('test_memorydb_parameter_group')
+        p = self.load_policy(
+            {
+                'name': 'memorydb-param-group',
+                'resource': 'aws.memorydb-parameter-group',
+            }, session_factory=session_factory
+        )
+        resources = p.run()
+        self.assertEqual(len(resources), 2)
+        self.assertEqual(resources[0]['Name'], 'c7n-test-custom-params')
+
     def test_memorydb_snapshot(self):
         factory = self.replay_flight_data("test_memory_db_snapshot")
         p = self.load_policy({

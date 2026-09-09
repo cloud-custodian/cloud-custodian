@@ -1,0 +1,56 @@
+{
+    "status_code": 200,
+    "data": {
+        "connections": [
+            {
+                "ownerAccount": "644160558196",
+                "connectionId": "dxcon-fgzcsn9l",
+                "connectionName": "EqDC2-Connection-1",
+                "connectionState": "down",
+                "region": "us-east-1",
+                "location": "EqDC2",
+                "bandwidth": "1Gbps",
+                "awsDevice": "EqDC2-smh59gx42nrk",
+                "jumboFrameCapable": true,
+                "awsDeviceV2": "EqDC2-1xlsgcos93m02",
+                "awsLogicalDeviceId": "EqDC2-286h6fezn64ms",
+                "hasLogicalRedundancy": "no",
+                "tags": [
+                    {
+                        "key": "directconnect:resiliency-bundle-id",
+                        "value": "9694dd42-f543-4b1b-9c11-074d695a0d2b"
+                    },
+                    {
+                        "key": "existing",
+                        "value": "existing"
+                    }
+                ],
+                "providerName": "Verizon",
+                "macSecCapable": false
+            },
+            {
+                "ownerAccount": "11111111111",
+                "connectionId": "dxcon-ffy37lbl",
+                "connectionName": "EqDC2-Connection-2",
+                "connectionState": "down",
+                "region": "us-east-1",
+                "location": "EqDC2",
+                "bandwidth": "1Gbps",
+                "awsDevice": "EqDC2-yinkopjvp6av",
+                "jumboFrameCapable": true,
+                "awsDeviceV2": "EqDC2-1u16e4fckodg7",
+                "awsLogicalDeviceId": "EqDC2-20ia05p3m9gu9",
+                "hasLogicalRedundancy": "no",
+                "tags": [
+                    {
+                        "key": "existing",
+                        "value": "existing"
+                    }
+                ],
+                "providerName": "Verizon",
+                "macSecCapable": false
+            }
+        ],
+        "ResponseMetadata": {}
+    }
+}

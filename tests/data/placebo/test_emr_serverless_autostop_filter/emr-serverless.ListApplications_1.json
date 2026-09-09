@@ -1,0 +1,68 @@
+{
+    "status_code": 200,
+    "data": {
+        "ResponseMetadata": {},
+        "applications": [
+            {
+                "id": "00g7c4jplrhduu09",
+                "name": "c7n-test-emr-serverless-autostop-disabled",
+                "arn": "arn:aws:emr-serverless:us-east-1:644160558196:/applications/00g7c4jplrhduu09",
+                "releaseLabel": "emr-6.9.0",
+                "type": "Spark",
+                "state": "CREATED",
+                "stateDetails": "Application created by user.",
+                "createdAt": {
+                    "__class__": "datetime",
+                    "year": 2026,
+                    "month": 7,
+                    "day": 20,
+                    "hour": 13,
+                    "minute": 6,
+                    "second": 49,
+                    "microsecond": 713000
+                },
+                "updatedAt": {
+                    "__class__": "datetime",
+                    "year": 2026,
+                    "month": 7,
+                    "day": 20,
+                    "hour": 13,
+                    "minute": 6,
+                    "second": 49,
+                    "microsecond": 713000
+                },
+                "architecture": "X86_64"
+            },
+            {
+                "id": "00g7c4jplnn1si09",
+                "name": "c7n-test-emr-serverless-autostop-enabled",
+                "arn": "arn:aws:emr-serverless:us-east-1:644160558196:/applications/00g7c4jplnn1si09",
+                "releaseLabel": "emr-6.9.0",
+                "type": "Spark",
+                "state": "CREATED",
+                "stateDetails": "Application created by user.",
+                "createdAt": {
+                    "__class__": "datetime",
+                    "year": 2026,
+                    "month": 7,
+                    "day": 20,
+                    "hour": 13,
+                    "minute": 6,
+                    "second": 49,
+                    "microsecond": 701000
+                },
+                "updatedAt": {
+                    "__class__": "datetime",
+                    "year": 2026,
+                    "month": 7,
+                    "day": 20,
+                    "hour": 13,
+                    "minute": 6,
+                    "second": 49,
+                    "microsecond": 701000
+                },
+                "architecture": "X86_64"
+            }
+        ]
+    }
+}

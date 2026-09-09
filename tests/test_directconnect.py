@@ -59,6 +59,23 @@ def test_directconnect_tag_filter(test):
     assert resources[0]['Tags'] == [{'Key': 'existing', 'Value': 'existing'}]
 
 
+def test_directconnect_connection_tags(test):
+    factory = test.replay_flight_data("test_directconnect_connection_tags")
+    p = test.load_policy(
+        {
+            "name": "test-directconnect-connection-tag-filter",
+            "resource": "directconnect",
+            "filters": [
+                {"type": "value", "key": "tag:existing", "value": "existing"}
+            ],
+        },
+        session_factory=factory,
+        config={'account_id': '11111111111'},
+    )
+    resources = p.run()
+    test.assertEqual(len(resources), 2)
+
+
 @terraform("directconnect_tagging")
 def test_directconnect_tagging(test, directconnect_tagging):
     """DirectConnect APIs return tags in a different format than other services,
