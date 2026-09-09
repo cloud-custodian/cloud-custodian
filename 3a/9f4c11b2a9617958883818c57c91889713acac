@@ -1,0 +1,35 @@
+tests/data/placebo/test_cloudwatch_dashboard_tag/monitoring.ListTagsForResource_1.json
+  s_bbb04325db545e::t_606aa5f63f533f 1-12
+tests/data/placebo/test_cloudwatch_dashboard_tag/monitoring.ListTagsForResource_2.json
+  s_bbb04325db545e::t_606aa5f63f533f 1-7
+tests/data/placebo/test_cloudwatch_dashboard_tag/monitoring.ListTagsForResource_3.json
+  s_bbb04325db545e::t_606aa5f63f533f 1-12
+tests/data/placebo/test_cloudwatch_dashboard_tag/monitoring.ListDashboards_1.json
+  s_bbb04325db545e::t_606aa5f63f533f 1-38
+tests/data/placebo/test_cloudwatch_dashboard_tag/monitoring.TagResource_1.json
+  s_bbb04325db545e::t_606aa5f63f533f 1-6
+tests/data/placebo/test_cloudwatch_dashboard_tag/monitoring.UntagResource_1.json
+  s_bbb04325db545e::t_606aa5f63f533f 1-6
+tests/test_cw_dashboard.py
+  s_bbb04325db545e::t_96155584ca43b7 1-44
+  s_bbb04325db545e::t_438a2da74c9510 45-56
+c7n/resources/cw.py
+  s_bbb04325db545e::t_04c8b064fb6241 20-21,692-697,699-704,716,719,723-777
+  s_bbb04325db545e::t_438a2da74c9510 9,698
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.5.2",
+  "base_commit_sha": "3a9f4c11b2a9617958883818c57c91889713acac",
+  "prompts": {},
+  "sessions": {
+    "s_bbb04325db545e": {
+      "agent_id": {
+        "tool": "claude",
+        "id": "454cfbc7-83d3-411d-a297-5ad09286bebc",
+        "model": "claude-opus-5"
+      },
+      "human_author": "AJ Kerrigan <aj@stacklet.io>"
+    }
+  }
+}
