@@ -1,0 +1,46 @@
+tests/data/placebo/test_cloudwatch_dashboard_tag/monitoring.ListDashboards_2.json
+  s_7832c6195d26b8::t_56a0e166640cf9 1-23
+tests/test_cw_dashboard.py
+  s_7832c6195d26b8::t_56a0e166640cf9 1-49
+tests/data/placebo/test_cloudwatch_dashboard_tag/monitoring.ListTagsForResource_4.json
+  s_7832c6195d26b8::t_56a0e166640cf9 1-12
+tests/data/placebo/test_cloudwatch_dashboard_tag/monitoring.ListTagsForResource_1.json
+  s_7832c6195d26b8::t_56a0e166640cf9 1-7
+tests/data/placebo/test_cloudwatch_dashboard_tag/monitoring.ListDashboards_1.json
+  s_7832c6195d26b8::t_56a0e166640cf9 1-23
+tests/data/placebo/test_cloudwatch_dashboard_tag/monitoring.UntagResource_1.json
+  s_7832c6195d26b8::t_56a0e166640cf9 1-6
+tests/data/placebo/test_cloudwatch_dashboard_tag/monitoring.ListTagsForResource_3.json
+  s_7832c6195d26b8::t_56a0e166640cf9 1-16
+c7n/resources/cw.py
+  s_7832c6195d26b8::t_56a0e166640cf9 9,20-21,692-704,716,719,723-777
+tests/data/placebo/test_cloudwatch_dashboard_tag/monitoring.TagResource_1.json
+  s_7832c6195d26b8::t_56a0e166640cf9 1-6
+tests/terraform/cloudwatch_dashboard_tag/main.tf
+  s_7832c6195d26b8::t_56a0e166640cf9 1-26
+tests/data/placebo/test_cloudwatch_dashboard_tag/monitoring.ListTagsForResource_2.json
+  s_7832c6195d26b8::t_56a0e166640cf9 1-16
+tests/terraform/cloudwatch_dashboard_tag/tf_resources.json
+  s_7832c6195d26b8::t_56a0e166640cf9 1-27
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.5.2",
+  "base_commit_sha": "65df66d8ac92aa101a5d572441d0c91021ddc527",
+  "prompts": {},
+  "humans": {
+    "h_07d49deca46b44": {
+      "author": "AJ Kerrigan <aj@stacklet.io>"
+    }
+  },
+  "sessions": {
+    "s_7832c6195d26b8": {
+      "agent_id": {
+        "tool": "claude",
+        "id": "debdf9fe-d07c-40bf-8843-d5f34351e5de",
+        "model": "claude-opus-5"
+      },
+      "human_author": "AJ Kerrigan <aj@stacklet.io>"
+    }
+  }
+}
