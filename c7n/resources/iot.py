@@ -1,7 +1,5 @@
 # Copyright The Cloud Custodian Authors.
 # SPDX-License-Identifier: Apache-2.0
-import json
-
 from c7n.actions import Action
 from c7n.filters import Filter
 from c7n.filters.policystatement import HasStatementFilter
@@ -43,32 +41,9 @@ class IoTPolicy(QueryResourceManager):
 
     permissions = ('iot:ListPolicies', 'iot:GetPolicy')
 
-    def augment(self, resources):
-        resources = super().augment(resources)
-        for r in resources:
-            r['policyDocument'] = json.loads(r['policyDocument'])
-        return resources
-
-
-class DescribePolicyTargets(Filter):
-    """Base for filters needing the certificates/groups a policy is attached to."""
-
-    permissions = ('iot:ListTargetsForPolicy',)
-    annotation_key = 'c7n:Targets'
-
-    def get_targets(self, resources):
-        client = local_session(self.manager.session_factory).client('iot')
-        for r in resources:
-            if self.annotation_key in r:
-                continue
-            pager = client.get_paginator('list_targets_for_policy')
-            pager.PAGE_ITERATOR_CLS = RetryPageIterator
-            r[self.annotation_key] = pager.paginate(
-                policyName=r['policyName']).build_full_result().get('targets', [])
-
 
 @IoTPolicy.filter_registry.register('attached')
-class IoTPolicyAttached(DescribePolicyTargets):
+class IoTPolicyAttached(Filter):
     """Filter IoT policies by whether they are attached to any target.
 
     :example:
@@ -84,9 +59,16 @@ class IoTPolicyAttached(DescribePolicyTargets):
     """
 
     schema = type_schema('attached', state={'type': 'boolean'})
+    permissions = ('iot:ListTargetsForPolicy',)
+    annotation_key = 'c7n:Targets'
 
     def process(self, resources, event=None):
-        self.get_targets(resources)
+        client = local_session(self.manager.session_factory).client('iot')
+        pager = client.get_paginator('list_targets_for_policy')
+        pager.PAGE_ITERATOR_CLS = RetryPageIterator
+        for r in resources:
+            r[self.annotation_key] = pager.paginate(
+                policyName=r['policyName']).build_full_result().get('targets', [])
         state = self.data.get('state', True)
         return [r for r in resources
                 if bool(r[self.annotation_key]) == state]
@@ -103,15 +85,6 @@ class IoTPolicyHasStatement(HasStatementFilter):
             'account_id': self.manager.config.account_id,
             'region': self.manager.config.region,
         }
-
-    def process_resource(self, resource):
-        # policyDocument is parsed in augment; the base filter expects a string
-        original = resource[self.policy_attribute]
-        resource[self.policy_attribute] = json.dumps(original)
-        try:
-            return super().process_resource(resource)
-        finally:
-            resource[self.policy_attribute] = original
 
 
 @IoTPolicy.action_registry.register('delete')
@@ -158,10 +131,12 @@ class DeleteIoTPolicy(Action):
                     'policy:%s could not be deleted: %s', r['policyName'], e)
 
     def _detach(self, client, r, force):
-        targets = r.get(DescribePolicyTargets.annotation_key)
+        targets = r.get(IoTPolicyAttached.annotation_key)
         if targets is None:
-            targets = client.list_targets_for_policy(
-                policyName=r['policyName']).get('targets', [])
+            pager = client.get_paginator('list_targets_for_policy')
+            pager.PAGE_ITERATOR_CLS = RetryPageIterator
+            targets = pager.paginate(
+                policyName=r['policyName']).build_full_result().get('targets', [])
         if targets and not force:
             self.log.warning(
                 'policy:%s skipped, attached to %d target(s)',

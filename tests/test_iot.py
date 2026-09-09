@@ -43,7 +43,6 @@ class IoTPolicyTest(BaseTest):
         )
         resources = p.run()
         self.assertEqual(len(resources), 1)
-        self.assertIsInstance(resources[0]["policyDocument"], dict)
 
     def test_iot_policy_unattached(self):
         # placebo: iot.ListPolicies, iot.GetPolicy, iot.ListTargetsForPolicy -
