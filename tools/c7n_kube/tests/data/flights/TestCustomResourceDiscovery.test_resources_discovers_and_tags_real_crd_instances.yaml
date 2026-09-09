@@ -1,0 +1,434 @@
+interactions:
+- request:
+    body: null
+    headers:
+      Accept:
+      - application/json
+      Content-Type:
+      - application/json
+      User-Agent:
+      - OpenAPI-Generator/36.0.3/python
+    method: GET
+    uri: https://ghost/apis/apiextensions.k8s.io/v1/customresourcedefinitions
+  response:
+    body:
+      string: '{"kind":"CustomResourceDefinitionList","apiVersion":"apiextensions.k8s.io/v1","metadata":{"resourceVersion":"250"},"items":[{"metadata":{"name":"nodepools.karpenter.sh","uid":"878c3058-92f1-486e-9166-a5cb822add5d","resourceVersion":"78","generation":1,"creationTimestamp":"2026-09-03T21:04:26Z","annotations":{"controller-gen.kubebuilder.io/version":"v0.20.1","kubectl.kubernetes.io/last-applied-configuration":"{\"apiVersion\":\"apiextensions.k8s.io/v1\",\"kind\":\"CustomResourceDefinition\",\"metadata\":{\"annotations\":{\"controller-gen.kubebuilder.io/version\":\"v0.20.1\"},\"name\":\"nodepools.karpenter.sh\"},\"spec\":{\"group\":\"karpenter.sh\",\"names\":{\"categories\":[\"karpenter\"],\"kind\":\"NodePool\",\"listKind\":\"NodePoolList\",\"plural\":\"nodepools\",\"singular\":\"nodepool\"},\"scope\":\"Cluster\",\"versions\":[{\"additionalPrinterColumns\":[{\"jsonPath\":\".spec.template.spec.nodeClassRef.name\",\"name\":\"NodeClass\",\"type\":\"string\"},{\"jsonPath\":\".status.nodes\",\"name\":\"Nodes\",\"type\":\"string\"},{\"jsonPath\":\".status.conditions[?(@.type==\\\"Ready\\\")].status\",\"name\":\"Ready\",\"type\":\"string\"},{\"jsonPath\":\".metadata.creationTimestamp\",\"name\":\"Age\",\"type\":\"date\"},{\"jsonPath\":\".spec.weight\",\"name\":\"Weight\",\"priority\":1,\"type\":\"integer\"},{\"jsonPath\":\".status.resources.cpu\",\"name\":\"CPU\",\"priority\":1,\"type\":\"string\"},{\"jsonPath\":\".status.resources.memory\",\"name\":\"Memory\",\"priority\":1,\"type\":\"string\"}],\"name\":\"v1\",\"schema\":{\"openAPIV3Schema\":{\"description\":\"NodePool
+        is the Schema for the NodePools API\",\"properties\":{\"apiVersion\":{\"description\":\"APIVersion
+        defines the versioned schema of this representation of an object.\\nServers
+        should convert recognized schemas to the latest internal value, and\\nmay
+        reject unrecognized values.\\nMore info: https://git.k8s.io/community/contributors/devel/sig-architecture/api-conventions.md#resources\",\"type\":\"string\"},\"kind\":{\"description\":\"Kind
+        is a string value representing the REST resource this object represents.\\nServers
+        may infer this from the endpoint the client submits requests to.\\nCannot
+        be updated.\\nIn CamelCase.\\nMore info: https://git.k8s.io/community/contributors/devel/sig-architecture/api-conventions.md#types-kinds\",\"type\":\"string\"},\"metadata\":{\"type\":\"object\"},\"spec\":{\"description\":\"NodePoolSpec
+        is the top level nodepool specification. Nodepools\\nlaunch nodes in response
+        to pods that are unschedulable. A single nodepool\\nis capable of managing
+        a diverse set of nodes. Node properties are determined\\nfrom a combination
+        of nodepool and pod scheduling constraints.\",\"properties\":{\"disruption\":{\"default\":{\"consolidateAfter\":\"0s\"},\"description\":\"Disruption
+        contains the parameters that relate to Karpenter''s disruption logic\",\"properties\":{\"budgets\":{\"default\":[{\"nodes\":\"10%\"}],\"description\":\"Budgets
+        is a list of Budgets.\\nIf there are multiple active budgets, Karpenter uses\\nthe
+        most restrictive value. If left undefined,\\nthis will default to one budget
+        with a value to 10%.\",\"items\":{\"description\":\"Budget defines when Karpenter
+        will restrict the\\nnumber of Node Claims that can be terminating simultaneously.\",\"properties\":{\"duration\":{\"description\":\"Duration
+        determines how long a Budget is active since each Schedule hit.\\nOnly minutes
+        and hours are accepted, as cron does not work in seconds.\\nIf omitted, the
+        budget is always active.\\nThis is required if Schedule is set.\\nThis regex
+        has an optional 0s at the end since the duration.String() always adds\\na
+        0s at the end.\",\"pattern\":\"^((([0-9]+(h|m))|([0-9]+h[0-9]+m))(0s)?)$\",\"type\":\"string\"},\"nodes\":{\"default\":\"10%\",\"description\":\"Nodes
+        dictates the maximum number of NodeClaims owned by this NodePool\\nthat can
+        be terminating at once. This is calculated by counting nodes that\\nhave a
+        deletion timestamp set, or are actively being deleted by Karpenter.\\nThis
+        field is required when specifying a budget.\\nThis cannot be of type intstr.IntOrString
+        since kubebuilder doesn''t support pattern\\nchecking for int nodes for IntOrString
+        nodes.\\nRef: https://github.com/kubernetes-sigs/controller-tools/blob/55efe4be40394a288216dab63156b0a64fb82929/pkg/crd/markers/validation.go#L379-L388\",\"pattern\":\"^((100|[0-9]{1,2})%|[0-9]+)$\",\"type\":\"string\"},\"reasons\":{\"description\":\"reasons
+        is a list of disruption methods that this budget applies to. If Reasons is
+        not set, this budget applies to all methods.\\nOtherwise, this will apply
+        to each reason defined.\\nallowed reasons are Underutilized, Empty, and Drifted.\",\"items\":{\"description\":\"DisruptionReason
+        defines valid reasons for disruption budgets.\",\"enum\":[\"Underutilized\",\"Empty\",\"Drifted\"],\"type\":\"string\"},\"maxItems\":50,\"type\":\"array\",\"x-kubernetes-list-type\":\"set\"},\"schedule\":{\"description\":\"Schedule
+        specifies when a budget begins being active, following\\nthe upstream cronjob
+        syntax. If omitted, the budget is always active.\\nTimezones are not supported.\\nThis
+        field is required if Duration is set.\",\"pattern\":\"^(@(annually|yearly|monthly|weekly|daily|midnight|hourly))|((.+)\\\\s(.+)\\\\s(.+)\\\\s(.+)\\\\s(.+))$\",\"type\":\"string\"}},\"required\":[\"nodes\"],\"type\":\"object\"},\"maxItems\":50,\"type\":\"array\",\"x-kubernetes-list-type\":\"atomic\",\"x-kubernetes-validations\":[{\"message\":\"''schedule''
+        must be set with ''duration''\",\"rule\":\"self.all(x, has(x.schedule) ==
+        has(x.duration))\"}]},\"consolidateAfter\":{\"description\":\"ConsolidateAfter
+        is the duration the controller will wait\\nbefore attempting to terminate
+        nodes that are underutilized.\\nRefer to ConsolidationPolicy for how underutilization
+        is considered.\\nWhen replicas is set, ConsolidateAfter is simply ignored\",\"pattern\":\"^(([0-9]+(s|m|h))+|Never)$\",\"type\":\"string\"},\"consolidationPolicy\":{\"default\":\"WhenEmptyOrUnderutilized\",\"description\":\"ConsolidationPolicy
+        describes which nodes Karpenter can disrupt through its consolidation\\nalgorithm.
+        This policy defaults to \\\"WhenEmptyOrUnderutilized\\\" if not specified.\\nValid
+        values: \\\"WhenEmpty\\\", \\\"WhenEmptyOrUnderutilized\\\", \\\"Balanced\\\".\\nWhen
+        replicas is set, ConsolidationPolicy is simply ignored.\",\"enum\":[\"WhenEmpty\",\"WhenEmptyOrUnderutilized\",\"Balanced\"],\"type\":\"string\"}},\"required\":[\"consolidateAfter\"],\"type\":\"object\"},\"limits\":{\"additionalProperties\":{\"anyOf\":[{\"type\":\"integer\"},{\"type\":\"string\"}],\"pattern\":\"^(\\\\+|-)?(([0-9]+(\\\\.[0-9]*)?)|(\\\\.[0-9]+))(([KMGTPE]i)|[numkMGTPE]|([eE](\\\\+|-)?(([0-9]+(\\\\.[0-9]*)?)|(\\\\.[0-9]+))))?$\",\"x-kubernetes-int-or-string\":true},\"description\":\"Limits
+        define a set of bounds for provisioning capacity.\\nLimits other than limits.nodes
+        is not supported when replicas is set.\",\"type\":\"object\"},\"replicas\":{\"description\":\"Replicas
+        is the desired number of nodes for the NodePool. When specified, the NodePool
+        will\\nmaintain this fixed number of replicas rather than scaling based on
+        pod demand.\\nWhen replicas is set:\\n  - The following fields are ignored:\\n      *
+        disruption.consolidationPolicy\\n      * disruption.consolidateAfter\\n  -
+        Only limits.nodes is supported; other resource limits (e.g., CPU, memory)
+        must not be specified.\\n  - Weight is not supported.\\nNote: This field is
+        alpha.\",\"format\":\"int64\",\"minimum\":0,\"type\":\"integer\"},\"template\":{\"description\":\"Template
+        contains the template of possibilities for the provisioning logic to launch
+        a NodeClaim with.\\nNodeClaims launched from this NodePool will often be further
+        constrained than the template specifies.\",\"properties\":{\"metadata\":{\"properties\":{\"annotations\":{\"additionalProperties\":{\"type\":\"string\"},\"description\":\"annotations
+        is an unstructured key value map stored with a resource that may be\\nset
+        by external tools to store and retrieve arbitrary metadata. They are not\\nqueryable
+        and should be preserved when modifying objects.\\nMore info: https://kubernetes.io/docs/concepts/overview/working-with-objects/annotations\",\"type\":\"object\",\"x-kubernetes-map-type\":\"granular\"},\"labels\":{\"additionalProperties\":{\"maxLength\":63,\"pattern\":\"^(([A-Za-z0-9][-A-Za-z0-9_.]*)?[A-Za-z0-9])?$\",\"type\":\"string\"},\"description\":\"labels
+        is a map of string keys and values that can be used to organize and categorize\\n(scope
+        and select) objects. May match selectors of replication controllers\\nand
+        services.\\nMore info: https://kubernetes.io/docs/concepts/overview/working-with-objects/labels\",\"maxProperties\":100,\"type\":\"object\",\"x-kubernetes-map-type\":\"atomic\",\"x-kubernetes-validations\":[{\"message\":\"label
+        domain \\\"karpenter.sh\\\" is restricted\",\"rule\":\"self.all(x, x in [\\\"karpenter.sh/capacity-type\\\",
+        \\\"karpenter.sh/nodepool\\\"] || !x.find(\\\"^([^/]+)\\\").endsWith(\\\"karpenter.sh\\\"))\"},{\"message\":\"label
+        \\\"karpenter.sh/nodepool\\\" is restricted\",\"rule\":\"self.all(x, x !=
+        \\\"karpenter.sh/nodepool\\\")\"},{\"message\":\"label \\\"kubernetes.io/hostname\\\"
+        is restricted\",\"rule\":\"self.all(x, x != \\\"kubernetes.io/hostname\\\")\"}]}},\"type\":\"object\"},\"spec\":{\"description\":\"NodeClaimTemplateSpec
+        describes the desired state of the NodeClaim in the Nodepool\\nNodeClaimTemplateSpec
+        is used in the NodePool''s NodeClaimTemplate, with the resource requests omitted
+        since\\nusers are not able to set resource requests in the NodePool.\",\"properties\":{\"expireAfter\":{\"default\":\"720h\",\"description\":\"ExpireAfter
+        is the duration the controller will wait\\nbefore terminating a node, measured
+        from when the node is created. This\\nis useful to implement features like
+        eventually consistent node upgrade,\\nmemory leak protection, and disruption
+        testing.\",\"pattern\":\"^(([0-9]+(s|m|h))+|Never)$\",\"type\":\"string\"},\"nodeClassRef\":{\"description\":\"NodeClassRef
+        is a reference to an object that defines provider specific configuration\",\"properties\":{\"group\":{\"description\":\"API
+        version of the referent\",\"pattern\":\"^[^/]*$\",\"type\":\"string\",\"x-kubernetes-validations\":[{\"message\":\"group
+        may not be empty\",\"rule\":\"self != ''''\"}]},\"kind\":{\"description\":\"Kind
+        of the referent; More info: https://git.k8s.io/community/contributors/devel/sig-architecture/api-conventions.md#types-kinds\\\"\",\"type\":\"string\",\"x-kubernetes-validations\":[{\"message\":\"kind
+        may not be empty\",\"rule\":\"self != ''''\"}]},\"name\":{\"description\":\"Name
+        of the referent; More info: http://kubernetes.io/docs/user-guide/identifiers#names\",\"type\":\"string\",\"x-kubernetes-validations\":[{\"message\":\"name
+        may not be empty\",\"rule\":\"self != ''''\"}]}},\"required\":[\"group\",\"kind\",\"name\"],\"type\":\"object\",\"x-kubernetes-validations\":[{\"message\":\"nodeClassRef.group
+        is immutable\",\"rule\":\"self.group == oldSelf.group\"},{\"message\":\"nodeClassRef.kind
+        is immutable\",\"rule\":\"self.kind == oldSelf.kind\"}]},\"requirements\":{\"description\":\"Requirements
+        are layered with GetLabels and applied to every node.\",\"items\":{\"description\":\"A
+        node selector requirement is a selector that contains values, a key, an operator
+        that relates the key and values\\nand minValues that represent the requirement
+        to have at least that many values.\",\"properties\":{\"key\":{\"description\":\"The
+        label key that the selector applies to.\",\"maxLength\":316,\"pattern\":\"^([a-z0-9]([-a-z0-9]*[a-z0-9])?(\\\\.[a-z0-9]([-a-z0-9]*[a-z0-9])?)*(\\\\/))?([A-Za-z0-9][-A-Za-z0-9_.]*)?[A-Za-z0-9]$\",\"type\":\"string\",\"x-kubernetes-validations\":[{\"message\":\"label
+        domain \\\"karpenter.sh\\\" is restricted\",\"rule\":\"self in [\\\"karpenter.sh/capacity-type\\\",
+        \\\"karpenter.sh/nodepool\\\"] || !self.find(\\\"^([^/]+)\\\").endsWith(\\\"karpenter.sh\\\")\"},{\"message\":\"label
+        \\\"karpenter.sh/nodepool\\\" is restricted\",\"rule\":\"self != \\\"karpenter.sh/nodepool\\\"\"},{\"message\":\"label
+        \\\"kubernetes.io/hostname\\\" is restricted\",\"rule\":\"self != \\\"kubernetes.io/hostname\\\"\"}]},\"minValues\":{\"description\":\"This
+        field is ALPHA and can be dropped or replaced at any time\\nMinValues is the
+        minimum number of unique values required to define the flexibility of the
+        specific requirement.\",\"maximum\":50,\"minimum\":1,\"type\":\"integer\"},\"operator\":{\"description\":\"Represents
+        a key''s relationship to a set of values.\\nValid operators are In, NotIn,
+        Exists, DoesNotExist. Gt, Lt, Gte, and Lte.\",\"enum\":[\"Gte\",\"Lte\",\"In\",\"NotIn\",\"Exists\",\"DoesNotExist\",\"Gt\",\"Lt\"],\"type\":\"string\"},\"values\":{\"description\":\"An
+        array of string values. If the operator is In or NotIn,\\nthe values array
+        must be non-empty. If the operator is Exists or DoesNotExist,\\nthe values
+        array must be empty. If the operator is Gt, Lt, Gte, or Lte, the values\\narray
+        must have a single element, which will be interpreted as an integer.\\nThis
+        array is replaced during a strategic merge patch.\",\"items\":{\"type\":\"string\"},\"maxLength\":63,\"pattern\":\"^(([A-Za-z0-9][-A-Za-z0-9_.]*)?[A-Za-z0-9])?$\",\"type\":\"array\",\"x-kubernetes-list-type\":\"atomic\"}},\"required\":[\"key\",\"operator\"],\"type\":\"object\"},\"maxItems\":100,\"type\":\"array\",\"x-kubernetes-list-type\":\"atomic\",\"x-kubernetes-validations\":[{\"message\":\"requirements
+        with operator ''In'' must have a value defined\",\"rule\":\"self.all(x, x.operator
+        == ''In'' ? x.values.size() != 0 : true)\"},{\"message\":\"requirements operator
+        ''Gt'', ''Lt'', ''Gte'', or ''Lte'' must have a single positive integer value\",\"rule\":\"self.all(x,
+        (x.operator == ''Gt'' || x.operator == ''Lt'' || x.operator == ''Gte'' ||
+        x.operator == ''Lte'') ? (x.values.size() == 1 \\u0026\\u0026 int(x.values[0])
+        \\u003e= 0) : true)\"},{\"message\":\"requirements with ''minValues'' must
+        have at least that many values specified in the ''values'' field\",\"rule\":\"self.all(x,
+        (x.operator == ''In'' \\u0026\\u0026 has(x.minValues)) ? x.values.size() \\u003e=
+        x.minValues : true)\"}]},\"startupTaints\":{\"description\":\"startupTaints
+        are taints that are applied to nodes upon startup which are expected to be
+        removed automatically\\nwithin a short period of time, typically by a DaemonSet
+        that tolerates the taint. These are commonly used by\\ndaemonsets to allow
+        initialization and enforce startup ordering.  StartupTaints are ignored for
+        provisioning\\npurposes in that pods are not required to tolerate a StartupTaint
+        in order to have nodes provisioned for them.\",\"items\":{\"description\":\"The
+        node this Taint is attached to has the \\\"effect\\\" on\\nany pod that does
+        not tolerate the Taint.\",\"properties\":{\"effect\":{\"description\":\"Required.
+        The effect of the taint on pods\\nthat do not tolerate the taint.\\nValid
+        effects are NoSchedule, PreferNoSchedule and NoExecute.\",\"enum\":[\"NoSchedule\",\"PreferNoSchedule\",\"NoExecute\"],\"type\":\"string\"},\"key\":{\"description\":\"Required.
+        The taint key to be applied to a node.\",\"minLength\":1,\"pattern\":\"^([a-z0-9]([-a-z0-9]*[a-z0-9])?(\\\\.[a-z0-9]([-a-z0-9]*[a-z0-9])?)*(\\\\/))?([A-Za-z0-9][-A-Za-z0-9_.]*)?[A-Za-z0-9]$\",\"type\":\"string\"},\"timeAdded\":{\"description\":\"TimeAdded
+        represents the time at which the taint was added.\",\"format\":\"date-time\",\"type\":\"string\"},\"value\":{\"description\":\"The
+        taint value corresponding to the taint key.\",\"pattern\":\"^([a-z0-9]([-a-z0-9]*[a-z0-9])?(\\\\.[a-z0-9]([-a-z0-9]*[a-z0-9])?)*(\\\\/))?([A-Za-z0-9][-A-Za-z0-9_.]*)?[A-Za-z0-9]$\",\"type\":\"string\"}},\"required\":[\"effect\",\"key\"],\"type\":\"object\"},\"type\":\"array\",\"x-kubernetes-list-type\":\"atomic\"},\"taints\":{\"description\":\"taints
+        will be applied to the NodeClaim''s node.\",\"items\":{\"description\":\"The
+        node this Taint is attached to has the \\\"effect\\\" on\\nany pod that does
+        not tolerate the Taint.\",\"properties\":{\"effect\":{\"description\":\"Required.
+        The effect of the taint on pods\\nthat do not tolerate the taint.\\nValid
+        effects are NoSchedule, PreferNoSchedule and NoExecute.\",\"enum\":[\"NoSchedule\",\"PreferNoSchedule\",\"NoExecute\"],\"type\":\"string\"},\"key\":{\"description\":\"Required.
+        The taint key to be applied to a node.\",\"minLength\":1,\"pattern\":\"^([a-z0-9]([-a-z0-9]*[a-z0-9])?(\\\\.[a-z0-9]([-a-z0-9]*[a-z0-9])?)*(\\\\/))?([A-Za-z0-9][-A-Za-z0-9_.]*)?[A-Za-z0-9]$\",\"type\":\"string\"},\"timeAdded\":{\"description\":\"TimeAdded
+        represents the time at which the taint was added.\",\"format\":\"date-time\",\"type\":\"string\"},\"value\":{\"description\":\"The
+        taint value corresponding to the taint key.\",\"pattern\":\"^([a-z0-9]([-a-z0-9]*[a-z0-9])?(\\\\.[a-z0-9]([-a-z0-9]*[a-z0-9])?)*(\\\\/))?([A-Za-z0-9][-A-Za-z0-9_.]*)?[A-Za-z0-9]$\",\"type\":\"string\"}},\"required\":[\"effect\",\"key\"],\"type\":\"object\"},\"type\":\"array\",\"x-kubernetes-list-type\":\"atomic\"},\"terminationGracePeriod\":{\"description\":\"TerminationGracePeriod
+        is the maximum duration the controller will wait before forcefully deleting
+        the pods on a node, measured from when deletion is first initiated.\\n\\nWarning:
+        this feature takes precedence over a Pod''s terminationGracePeriodSeconds
+        value, and bypasses any blocked PDBs or the karpenter.sh/do-not-disrupt annotation.\\n\\nThis
+        field is intended to be used by cluster administrators to enforce that nodes
+        can be cycled within a given time period.\\nWhen set, drifted nodes will begin
+        draining even if there are pods blocking eviction. Draining will respect PDBs
+        and the do-not-disrupt annotation until the TGP is reached.\\n\\nKarpenter
+        will preemptively delete pods so their terminationGracePeriodSeconds align
+        with the node''s terminationGracePeriod.\\nIf a pod would be terminated without
+        being granted its full terminationGracePeriodSeconds prior to the node timeout,\\nthat
+        pod will be deleted at T = node timeout - pod terminationGracePeriodSeconds.\\n\\nThe
+        feature can also be used to allow maximum time limits for long-running jobs
+        which can delay node termination with preStop hooks.\\nIf left undefined,
+        the controller will wait indefinitely for pods to be drained.\",\"pattern\":\"^([0-9]+(s|m|h))+$\",\"type\":\"string\"}},\"required\":[\"nodeClassRef\",\"requirements\"],\"type\":\"object\"}},\"required\":[\"spec\"],\"type\":\"object\"},\"weight\":{\"description\":\"Weight
+        is the priority given to the nodepool during scheduling. A higher\\nnumerical
+        weight indicates that this nodepool will be ordered\\nahead of other nodepools
+        with lower weights. A nodepool with no weight\\nwill be treated as if it is
+        a nodepool with a weight of 0.\\nWeight is not supported when replicas is
+        set.\",\"format\":\"int32\",\"maximum\":100,\"minimum\":1,\"type\":\"integer\"}},\"required\":[\"template\"],\"type\":\"object\",\"x-kubernetes-validations\":[{\"message\":\"Cannot
+        transition NodePool between static (replicas set) and dynamic (replicas unset)
+        provisioning modes\",\"rule\":\"has(self.replicas) == has(oldSelf.replicas)\"},{\"message\":\"only
+        ''limits.nodes'' is supported on static NodePools\",\"rule\":\"!has(self.replicas)
+        || (!has(self.limits) || size(self.limits) == 0 || (size(self.limits) == 1
+        \\u0026\\u0026 ''nodes'' in self.limits))\"},{\"message\":\"''weight'' is
+        not supported on static NodePools\",\"rule\":\"!has(self.replicas) || !has(self.weight)\"}]},\"status\":{\"description\":\"NodePoolStatus
+        defines the observed state of NodePool\",\"properties\":{\"conditions\":{\"description\":\"Conditions
+        contains signals for health and readiness\",\"items\":{\"description\":\"Condition
+        aliases the upstream type and adds additional helper methods\",\"properties\":{\"lastTransitionTime\":{\"description\":\"lastTransitionTime
+        is the last time the condition transitioned from one status to another.\\nThis
+        should be when the underlying condition changed.  If that is not known, then
+        using the time when the API field changed is acceptable.\",\"format\":\"date-time\",\"type\":\"string\"},\"message\":{\"description\":\"message
+        is a human readable message indicating details about the transition.\\nThis
+        may be an empty string.\",\"maxLength\":32768,\"type\":\"string\"},\"observedGeneration\":{\"description\":\"observedGeneration
+        represents the .metadata.generation that the condition was set based upon.\\nFor
+        instance, if .metadata.generation is currently 12, but the .status.conditions[x].observedGeneration
+        is 9, the condition is out of date\\nwith respect to the current state of
+        the instance.\",\"format\":\"int64\",\"minimum\":0,\"type\":\"integer\"},\"reason\":{\"description\":\"reason
+        contains a programmatic identifier indicating the reason for the condition''s
+        last transition.\\nProducers of specific condition types may define expected
+        values and meanings for this field,\\nand whether the values are considered
+        a guaranteed API.\\nThe value should be a CamelCase string.\\nThis field may
+        not be empty.\",\"maxLength\":1024,\"minLength\":1,\"pattern\":\"^[A-Za-z]([A-Za-z0-9_,:]*[A-Za-z0-9_])?$\",\"type\":\"string\"},\"status\":{\"description\":\"status
+        of the condition, one of True, False, Unknown.\",\"enum\":[\"True\",\"False\",\"Unknown\"],\"type\":\"string\"},\"type\":{\"description\":\"type
+        of condition in CamelCase or in foo.example.com/CamelCase.\",\"maxLength\":316,\"pattern\":\"^([a-z0-9]([-a-z0-9]*[a-z0-9])?(\\\\.[a-z0-9]([-a-z0-9]*[a-z0-9])?)*/)?(([A-Za-z0-9][-A-Za-z0-9_.]*)?[A-Za-z0-9])$\",\"type\":\"string\"}},\"required\":[\"lastTransitionTime\",\"message\",\"reason\",\"status\",\"type\"],\"type\":\"object\"},\"type\":\"array\",\"x-kubernetes-list-map-keys\":[\"type\"],\"x-kubernetes-list-type\":\"map\"},\"nodeClassObservedGeneration\":{\"description\":\"NodeClassObservedGeneration
+        represents the observed nodeClass generation for referenced nodeClass. If
+        this does not match\\nthe actual NodeClass Generation, NodeRegistrationHealthy
+        status condition on the NodePool will be reset\",\"format\":\"int64\",\"type\":\"integer\"},\"nodes\":{\"default\":0,\"description\":\"Nodes
+        is the count of nodes associated with this NodePool\",\"format\":\"int64\",\"type\":\"integer\"},\"resources\":{\"additionalProperties\":{\"anyOf\":[{\"type\":\"integer\"},{\"type\":\"string\"}],\"pattern\":\"^(\\\\+|-)?(([0-9]+(\\\\.[0-9]*)?)|(\\\\.[0-9]+))(([KMGTPE]i)|[numkMGTPE]|([eE](\\\\+|-)?(([0-9]+(\\\\.[0-9]*)?)|(\\\\.[0-9]+))))?$\",\"x-kubernetes-int-or-string\":true},\"description\":\"Resources
+        is the list of resources that have been provisioned.\",\"type\":\"object\"}},\"type\":\"object\"}},\"required\":[\"spec\"],\"type\":\"object\"}},\"served\":true,\"storage\":true,\"subresources\":{\"scale\":{\"specReplicasPath\":\".spec.replicas\",\"statusReplicasPath\":\".status.nodes\"},\"status\":{}}}]}}\n"},"managedFields":[{"manager":"kube-apiserver","operation":"Update","apiVersion":"apiextensions.k8s.io/v1","time":"2026-09-03T21:04:26Z","fieldsType":"FieldsV1","fieldsV1":{"f:status":{"f:acceptedNames":{"f:categories":{},"f:kind":{},"f:listKind":{},"f:plural":{},"f:singular":{}},"f:conditions":{"k:{\"type\":\"Established\"}":{".":{},"f:lastTransitionTime":{},"f:message":{},"f:reason":{},"f:status":{},"f:type":{}},"k:{\"type\":\"NamesAccepted\"}":{".":{},"f:lastTransitionTime":{},"f:message":{},"f:reason":{},"f:status":{},"f:type":{}}}}},"subresource":"status"},{"manager":"kubectl-client-side-apply","operation":"Update","apiVersion":"apiextensions.k8s.io/v1","time":"2026-09-03T21:04:26Z","fieldsType":"FieldsV1","fieldsV1":{"f:metadata":{"f:annotations":{".":{},"f:controller-gen.kubebuilder.io/version":{},"f:kubectl.kubernetes.io/last-applied-configuration":{}}},"f:spec":{"f:conversion":{".":{},"f:strategy":{}},"f:group":{},"f:names":{"f:categories":{},"f:kind":{},"f:listKind":{},"f:plural":{},"f:singular":{}},"f:scope":{},"f:versions":{}}}}]},"spec":{"group":"karpenter.sh","names":{"plural":"nodepools","singular":"nodepool","kind":"NodePool","listKind":"NodePoolList","categories":["karpenter"]},"scope":"Cluster","versions":[{"name":"v1","served":true,"storage":true,"schema":{"openAPIV3Schema":{"description":"NodePool
+        is the Schema for the NodePools API","type":"object","required":["spec"],"properties":{"apiVersion":{"description":"APIVersion
+        defines the versioned schema of this representation of an object.\nServers
+        should convert recognized schemas to the latest internal value, and\nmay reject
+        unrecognized values.\nMore info: https://git.k8s.io/community/contributors/devel/sig-architecture/api-conventions.md#resources","type":"string"},"kind":{"description":"Kind
+        is a string value representing the REST resource this object represents.\nServers
+        may infer this from the endpoint the client submits requests to.\nCannot be
+        updated.\nIn CamelCase.\nMore info: https://git.k8s.io/community/contributors/devel/sig-architecture/api-conventions.md#types-kinds","type":"string"},"metadata":{"type":"object"},"spec":{"description":"NodePoolSpec
+        is the top level nodepool specification. Nodepools\nlaunch nodes in response
+        to pods that are unschedulable. A single nodepool\nis capable of managing
+        a diverse set of nodes. Node properties are determined\nfrom a combination
+        of nodepool and pod scheduling constraints.","type":"object","required":["template"],"properties":{"disruption":{"description":"Disruption
+        contains the parameters that relate to Karpenter''s disruption logic","type":"object","default":{"consolidateAfter":"0s"},"required":["consolidateAfter"],"properties":{"budgets":{"description":"Budgets
+        is a list of Budgets.\nIf there are multiple active budgets, Karpenter uses\nthe
+        most restrictive value. If left undefined,\nthis will default to one budget
+        with a value to 10%.","type":"array","default":[{"nodes":"10%"}],"maxItems":50,"items":{"description":"Budget
+        defines when Karpenter will restrict the\nnumber of Node Claims that can be
+        terminating simultaneously.","type":"object","required":["nodes"],"properties":{"duration":{"description":"Duration
+        determines how long a Budget is active since each Schedule hit.\nOnly minutes
+        and hours are accepted, as cron does not work in seconds.\nIf omitted, the
+        budget is always active.\nThis is required if Schedule is set.\nThis regex
+        has an optional 0s at the end since the duration.String() always adds\na 0s
+        at the end.","type":"string","pattern":"^((([0-9]+(h|m))|([0-9]+h[0-9]+m))(0s)?)$"},"nodes":{"description":"Nodes
+        dictates the maximum number of NodeClaims owned by this NodePool\nthat can
+        be terminating at once. This is calculated by counting nodes that\nhave a
+        deletion timestamp set, or are actively being deleted by Karpenter.\nThis
+        field is required when specifying a budget.\nThis cannot be of type intstr.IntOrString
+        since kubebuilder doesn''t support pattern\nchecking for int nodes for IntOrString
+        nodes.\nRef: https://github.com/kubernetes-sigs/controller-tools/blob/55efe4be40394a288216dab63156b0a64fb82929/pkg/crd/markers/validation.go#L379-L388","type":"string","default":"10%","pattern":"^((100|[0-9]{1,2})%|[0-9]+)$"},"reasons":{"description":"reasons
+        is a list of disruption methods that this budget applies to. If Reasons is
+        not set, this budget applies to all methods.\nOtherwise, this will apply to
+        each reason defined.\nallowed reasons are Underutilized, Empty, and Drifted.","type":"array","maxItems":50,"items":{"description":"DisruptionReason
+        defines valid reasons for disruption budgets.","type":"string","enum":["Underutilized","Empty","Drifted"]},"x-kubernetes-list-type":"set"},"schedule":{"description":"Schedule
+        specifies when a budget begins being active, following\nthe upstream cronjob
+        syntax. If omitted, the budget is always active.\nTimezones are not supported.\nThis
+        field is required if Duration is set.","type":"string","pattern":"^(@(annually|yearly|monthly|weekly|daily|midnight|hourly))|((.+)\\s(.+)\\s(.+)\\s(.+)\\s(.+))$"}}},"x-kubernetes-list-type":"atomic","x-kubernetes-validations":[{"rule":"self.all(x,
+        has(x.schedule) == has(x.duration))","message":"''schedule'' must be set with
+        ''duration''"}]},"consolidateAfter":{"description":"ConsolidateAfter is the
+        duration the controller will wait\nbefore attempting to terminate nodes that
+        are underutilized.\nRefer to ConsolidationPolicy for how underutilization
+        is considered.\nWhen replicas is set, ConsolidateAfter is simply ignored","type":"string","pattern":"^(([0-9]+(s|m|h))+|Never)$"},"consolidationPolicy":{"description":"ConsolidationPolicy
+        describes which nodes Karpenter can disrupt through its consolidation\nalgorithm.
+        This policy defaults to \"WhenEmptyOrUnderutilized\" if not specified.\nValid
+        values: \"WhenEmpty\", \"WhenEmptyOrUnderutilized\", \"Balanced\".\nWhen replicas
+        is set, ConsolidationPolicy is simply ignored.","type":"string","default":"WhenEmptyOrUnderutilized","enum":["WhenEmpty","WhenEmptyOrUnderutilized","Balanced"]}}},"limits":{"description":"Limits
+        define a set of bounds for provisioning capacity.\nLimits other than limits.nodes
+        is not supported when replicas is set.","type":"object","additionalProperties":{"pattern":"^(\\+|-)?(([0-9]+(\\.[0-9]*)?)|(\\.[0-9]+))(([KMGTPE]i)|[numkMGTPE]|([eE](\\+|-)?(([0-9]+(\\.[0-9]*)?)|(\\.[0-9]+))))?$","anyOf":[{"type":"integer"},{"type":"string"}],"x-kubernetes-int-or-string":true}},"replicas":{"description":"Replicas
+        is the desired number of nodes for the NodePool. When specified, the NodePool
+        will\nmaintain this fixed number of replicas rather than scaling based on
+        pod demand.\nWhen replicas is set:\n  - The following fields are ignored:\n      *
+        disruption.consolidationPolicy\n      * disruption.consolidateAfter\n  - Only
+        limits.nodes is supported; other resource limits (e.g., CPU, memory) must
+        not be specified.\n  - Weight is not supported.\nNote: This field is alpha.","type":"integer","format":"int64","minimum":0},"template":{"description":"Template
+        contains the template of possibilities for the provisioning logic to launch
+        a NodeClaim with.\nNodeClaims launched from this NodePool will often be further
+        constrained than the template specifies.","type":"object","required":["spec"],"properties":{"metadata":{"type":"object","properties":{"annotations":{"description":"annotations
+        is an unstructured key value map stored with a resource that may be\nset by
+        external tools to store and retrieve arbitrary metadata. They are not\nqueryable
+        and should be preserved when modifying objects.\nMore info: https://kubernetes.io/docs/concepts/overview/working-with-objects/annotations","type":"object","additionalProperties":{"type":"string"},"x-kubernetes-map-type":"granular"},"labels":{"description":"labels
+        is a map of string keys and values that can be used to organize and categorize\n(scope
+        and select) objects. May match selectors of replication controllers\nand services.\nMore
+        info: https://kubernetes.io/docs/concepts/overview/working-with-objects/labels","type":"object","maxProperties":100,"additionalProperties":{"type":"string","maxLength":63,"pattern":"^(([A-Za-z0-9][-A-Za-z0-9_.]*)?[A-Za-z0-9])?$"},"x-kubernetes-map-type":"atomic","x-kubernetes-validations":[{"rule":"self.all(x,
+        x in [\"karpenter.sh/capacity-type\", \"karpenter.sh/nodepool\"] || !x.find(\"^([^/]+)\").endsWith(\"karpenter.sh\"))","message":"label
+        domain \"karpenter.sh\" is restricted"},{"rule":"self.all(x, x != \"karpenter.sh/nodepool\")","message":"label
+        \"karpenter.sh/nodepool\" is restricted"},{"rule":"self.all(x, x != \"kubernetes.io/hostname\")","message":"label
+        \"kubernetes.io/hostname\" is restricted"}]}}},"spec":{"description":"NodeClaimTemplateSpec
+        describes the desired state of the NodeClaim in the Nodepool\nNodeClaimTemplateSpec
+        is used in the NodePool''s NodeClaimTemplate, with the resource requests omitted
+        since\nusers are not able to set resource requests in the NodePool.","type":"object","required":["nodeClassRef","requirements"],"properties":{"expireAfter":{"description":"ExpireAfter
+        is the duration the controller will wait\nbefore terminating a node, measured
+        from when the node is created. This\nis useful to implement features like
+        eventually consistent node upgrade,\nmemory leak protection, and disruption
+        testing.","type":"string","default":"720h","pattern":"^(([0-9]+(s|m|h))+|Never)$"},"nodeClassRef":{"description":"NodeClassRef
+        is a reference to an object that defines provider specific configuration","type":"object","required":["group","kind","name"],"properties":{"group":{"description":"API
+        version of the referent","type":"string","pattern":"^[^/]*$","x-kubernetes-validations":[{"rule":"self
+        != ''''","message":"group may not be empty"}]},"kind":{"description":"Kind
+        of the referent; More info: https://git.k8s.io/community/contributors/devel/sig-architecture/api-conventions.md#types-kinds\"","type":"string","x-kubernetes-validations":[{"rule":"self
+        != ''''","message":"kind may not be empty"}]},"name":{"description":"Name
+        of the referent; More info: http://kubernetes.io/docs/user-guide/identifiers#names","type":"string","x-kubernetes-validations":[{"rule":"self
+        != ''''","message":"name may not be empty"}]}},"x-kubernetes-validations":[{"rule":"self.group
+        == oldSelf.group","message":"nodeClassRef.group is immutable"},{"rule":"self.kind
+        == oldSelf.kind","message":"nodeClassRef.kind is immutable"}]},"requirements":{"description":"Requirements
+        are layered with GetLabels and applied to every node.","type":"array","maxItems":100,"items":{"description":"A
+        node selector requirement is a selector that contains values, a key, an operator
+        that relates the key and values\nand minValues that represent the requirement
+        to have at least that many values.","type":"object","required":["key","operator"],"properties":{"key":{"description":"The
+        label key that the selector applies to.","type":"string","maxLength":316,"pattern":"^([a-z0-9]([-a-z0-9]*[a-z0-9])?(\\.[a-z0-9]([-a-z0-9]*[a-z0-9])?)*(\\/))?([A-Za-z0-9][-A-Za-z0-9_.]*)?[A-Za-z0-9]$","x-kubernetes-validations":[{"rule":"self
+        in [\"karpenter.sh/capacity-type\", \"karpenter.sh/nodepool\"] || !self.find(\"^([^/]+)\").endsWith(\"karpenter.sh\")","message":"label
+        domain \"karpenter.sh\" is restricted"},{"rule":"self != \"karpenter.sh/nodepool\"","message":"label
+        \"karpenter.sh/nodepool\" is restricted"},{"rule":"self != \"kubernetes.io/hostname\"","message":"label
+        \"kubernetes.io/hostname\" is restricted"}]},"minValues":{"description":"This
+        field is ALPHA and can be dropped or replaced at any time\nMinValues is the
+        minimum number of unique values required to define the flexibility of the
+        specific requirement.","type":"integer","maximum":50,"minimum":1},"operator":{"description":"Represents
+        a key''s relationship to a set of values.\nValid operators are In, NotIn,
+        Exists, DoesNotExist. Gt, Lt, Gte, and Lte.","type":"string","enum":["Gte","Lte","In","NotIn","Exists","DoesNotExist","Gt","Lt"]},"values":{"description":"An
+        array of string values. If the operator is In or NotIn,\nthe values array
+        must be non-empty. If the operator is Exists or DoesNotExist,\nthe values
+        array must be empty. If the operator is Gt, Lt, Gte, or Lte, the values\narray
+        must have a single element, which will be interpreted as an integer.\nThis
+        array is replaced during a strategic merge patch.","type":"array","maxLength":63,"pattern":"^(([A-Za-z0-9][-A-Za-z0-9_.]*)?[A-Za-z0-9])?$","items":{"type":"string"},"x-kubernetes-list-type":"atomic"}}},"x-kubernetes-list-type":"atomic","x-kubernetes-validations":[{"rule":"self.all(x,
+        x.operator == ''In'' ? x.values.size() != 0 : true)","message":"requirements
+        with operator ''In'' must have a value defined"},{"rule":"self.all(x, (x.operator
+        == ''Gt'' || x.operator == ''Lt'' || x.operator == ''Gte'' || x.operator ==
+        ''Lte'') ? (x.values.size() == 1 \u0026\u0026 int(x.values[0]) \u003e= 0)
+        : true)","message":"requirements operator ''Gt'', ''Lt'', ''Gte'', or ''Lte''
+        must have a single positive integer value"},{"rule":"self.all(x, (x.operator
+        == ''In'' \u0026\u0026 has(x.minValues)) ? x.values.size() \u003e= x.minValues
+        : true)","message":"requirements with ''minValues'' must have at least that
+        many values specified in the ''values'' field"}]},"startupTaints":{"description":"startupTaints
+        are taints that are applied to nodes upon startup which are expected to be
+        removed automatically\nwithin a short period of time, typically by a DaemonSet
+        that tolerates the taint. These are commonly used by\ndaemonsets to allow
+        initialization and enforce startup ordering.  StartupTaints are ignored for
+        provisioning\npurposes in that pods are not required to tolerate a StartupTaint
+        in order to have nodes provisioned for them.","type":"array","items":{"description":"The
+        node this Taint is attached to has the \"effect\" on\nany pod that does not
+        tolerate the Taint.","type":"object","required":["effect","key"],"properties":{"effect":{"description":"Required.
+        The effect of the taint on pods\nthat do not tolerate the taint.\nValid effects
+        are NoSchedule, PreferNoSchedule and NoExecute.","type":"string","enum":["NoSchedule","PreferNoSchedule","NoExecute"]},"key":{"description":"Required.
+        The taint key to be applied to a node.","type":"string","minLength":1,"pattern":"^([a-z0-9]([-a-z0-9]*[a-z0-9])?(\\.[a-z0-9]([-a-z0-9]*[a-z0-9])?)*(\\/))?([A-Za-z0-9][-A-Za-z0-9_.]*)?[A-Za-z0-9]$"},"timeAdded":{"description":"TimeAdded
+        represents the time at which the taint was added.","type":"string","format":"date-time"},"value":{"description":"The
+        taint value corresponding to the taint key.","type":"string","pattern":"^([a-z0-9]([-a-z0-9]*[a-z0-9])?(\\.[a-z0-9]([-a-z0-9]*[a-z0-9])?)*(\\/))?([A-Za-z0-9][-A-Za-z0-9_.]*)?[A-Za-z0-9]$"}}},"x-kubernetes-list-type":"atomic"},"taints":{"description":"taints
+        will be applied to the NodeClaim''s node.","type":"array","items":{"description":"The
+        node this Taint is attached to has the \"effect\" on\nany pod that does not
+        tolerate the Taint.","type":"object","required":["effect","key"],"properties":{"effect":{"description":"Required.
+        The effect of the taint on pods\nthat do not tolerate the taint.\nValid effects
+        are NoSchedule, PreferNoSchedule and NoExecute.","type":"string","enum":["NoSchedule","PreferNoSchedule","NoExecute"]},"key":{"description":"Required.
+        The taint key to be applied to a node.","type":"string","minLength":1,"pattern":"^([a-z0-9]([-a-z0-9]*[a-z0-9])?(\\.[a-z0-9]([-a-z0-9]*[a-z0-9])?)*(\\/))?([A-Za-z0-9][-A-Za-z0-9_.]*)?[A-Za-z0-9]$"},"timeAdded":{"description":"TimeAdded
+        represents the time at which the taint was added.","type":"string","format":"date-time"},"value":{"description":"The
+        taint value corresponding to the taint key.","type":"string","pattern":"^([a-z0-9]([-a-z0-9]*[a-z0-9])?(\\.[a-z0-9]([-a-z0-9]*[a-z0-9])?)*(\\/))?([A-Za-z0-9][-A-Za-z0-9_.]*)?[A-Za-z0-9]$"}}},"x-kubernetes-list-type":"atomic"},"terminationGracePeriod":{"description":"TerminationGracePeriod
+        is the maximum duration the controller will wait before forcefully deleting
+        the pods on a node, measured from when deletion is first initiated.\n\nWarning:
+        this feature takes precedence over a Pod''s terminationGracePeriodSeconds
+        value, and bypasses any blocked PDBs or the karpenter.sh/do-not-disrupt annotation.\n\nThis
+        field is intended to be used by cluster administrators to enforce that nodes
+        can be cycled within a given time period.\nWhen set, drifted nodes will begin
+        draining even if there are pods blocking eviction. Draining will respect PDBs
+        and the do-not-disrupt annotation until the TGP is reached.\n\nKarpenter will
+        preemptively delete pods so their terminationGracePeriodSeconds align with
+        the node''s terminationGracePeriod.\nIf a pod would be terminated without
+        being granted its full terminationGracePeriodSeconds prior to the node timeout,\nthat
+        pod will be deleted at T = node timeout - pod terminationGracePeriodSeconds.\n\nThe
+        feature can also be used to allow maximum time limits for long-running jobs
+        which can delay node termination with preStop hooks.\nIf left undefined, the
+        controller will wait indefinitely for pods to be drained.","type":"string","pattern":"^([0-9]+(s|m|h))+$"}}}}},"weight":{"description":"Weight
+        is the priority given to the nodepool during scheduling. A higher\nnumerical
+        weight indicates that this nodepool will be ordered\nahead of other nodepools
+        with lower weights. A nodepool with no weight\nwill be treated as if it is
+        a nodepool with a weight of 0.\nWeight is not supported when replicas is set.","type":"integer","format":"int32","maximum":100,"minimum":1}},"x-kubernetes-validations":[{"rule":"has(self.replicas)
+        == has(oldSelf.replicas)","message":"Cannot transition NodePool between static
+        (replicas set) and dynamic (replicas unset) provisioning modes"},{"rule":"!has(self.replicas)
+        || (!has(self.limits) || size(self.limits) == 0 || (size(self.limits) == 1
+        \u0026\u0026 ''nodes'' in self.limits))","message":"only ''limits.nodes''
+        is supported on static NodePools"},{"rule":"!has(self.replicas) || !has(self.weight)","message":"''weight''
+        is not supported on static NodePools"}]},"status":{"description":"NodePoolStatus
+        defines the observed state of NodePool","type":"object","properties":{"conditions":{"description":"Conditions
+        contains signals for health and readiness","type":"array","items":{"description":"Condition
+        aliases the upstream type and adds additional helper methods","type":"object","required":["lastTransitionTime","message","reason","status","type"],"properties":{"lastTransitionTime":{"description":"lastTransitionTime
+        is the last time the condition transitioned from one status to another.\nThis
+        should be when the underlying condition changed.  If that is not known, then
+        using the time when the API field changed is acceptable.","type":"string","format":"date-time"},"message":{"description":"message
+        is a human readable message indicating details about the transition.\nThis
+        may be an empty string.","type":"string","maxLength":32768},"observedGeneration":{"description":"observedGeneration
+        represents the .metadata.generation that the condition was set based upon.\nFor
+        instance, if .metadata.generation is currently 12, but the .status.conditions[x].observedGeneration
+        is 9, the condition is out of date\nwith respect to the current state of the
+        instance.","type":"integer","format":"int64","minimum":0},"reason":{"description":"reason
+        contains a programmatic identifier indicating the reason for the condition''s
+        last transition.\nProducers of specific condition types may define expected
+        values and meanings for this field,\nand whether the values are considered
+        a guaranteed API.\nThe value should be a CamelCase string.\nThis field may
+        not be empty.","type":"string","maxLength":1024,"minLength":1,"pattern":"^[A-Za-z]([A-Za-z0-9_,:]*[A-Za-z0-9_])?$"},"status":{"description":"status
+        of the condition, one of True, False, Unknown.","type":"string","enum":["True","False","Unknown"]},"type":{"description":"type
+        of condition in CamelCase or in foo.example.com/CamelCase.","type":"string","maxLength":316,"pattern":"^([a-z0-9]([-a-z0-9]*[a-z0-9])?(\\.[a-z0-9]([-a-z0-9]*[a-z0-9])?)*/)?(([A-Za-z0-9][-A-Za-z0-9_.]*)?[A-Za-z0-9])$"}}},"x-kubernetes-list-map-keys":["type"],"x-kubernetes-list-type":"map"},"nodeClassObservedGeneration":{"description":"NodeClassObservedGeneration
+        represents the observed nodeClass generation for referenced nodeClass. If
+        this does not match\nthe actual NodeClass Generation, NodeRegistrationHealthy
+        status condition on the NodePool will be reset","type":"integer","format":"int64"},"nodes":{"description":"Nodes
+        is the count of nodes associated with this NodePool","type":"integer","format":"int64","default":0},"resources":{"description":"Resources
+        is the list of resources that have been provisioned.","type":"object","additionalProperties":{"pattern":"^(\\+|-)?(([0-9]+(\\.[0-9]*)?)|(\\.[0-9]+))(([KMGTPE]i)|[numkMGTPE]|([eE](\\+|-)?(([0-9]+(\\.[0-9]*)?)|(\\.[0-9]+))))?$","anyOf":[{"type":"integer"},{"type":"string"}],"x-kubernetes-int-or-string":true}}}}}}},"subresources":{"status":{},"scale":{"specReplicasPath":".spec.replicas","statusReplicasPath":".status.nodes"}},"additionalPrinterColumns":[{"name":"NodeClass","type":"string","jsonPath":".spec.template.spec.nodeClassRef.name"},{"name":"Nodes","type":"string","jsonPath":".status.nodes"},{"name":"Ready","type":"string","jsonPath":".status.conditions[?(@.type==\"Ready\")].status"},{"name":"Age","type":"date","jsonPath":".metadata.creationTimestamp"},{"name":"Weight","type":"integer","priority":1,"jsonPath":".spec.weight"},{"name":"CPU","type":"string","priority":1,"jsonPath":".status.resources.cpu"},{"name":"Memory","type":"string","priority":1,"jsonPath":".status.resources.memory"}]}],"conversion":{"strategy":"None"}},"status":{"conditions":[{"type":"NamesAccepted","status":"True","lastTransitionTime":"2026-09-03T21:04:26Z","reason":"NoConflicts","message":"no
+        conflicts found"},{"type":"Established","status":"True","lastTransitionTime":"2026-09-03T21:04:26Z","reason":"InitialNamesAccepted","message":"the
+        initial names have been accepted"}],"acceptedNames":{"plural":"nodepools","singular":"nodepool","kind":"NodePool","listKind":"NodePoolList","categories":["karpenter"]},"storedVersions":["v1"]}}]}
+
+        '
+    headers:
+      Audit-Id:
+      - f08c99e6-e890-4259-953e-b3c4b0c5b693
+      Cache-Control:
+      - no-cache, private
+      Content-Type:
+      - application/json
+      Date:
+      - Thu, 03 Sep 2026 21:17:43 GMT
+      Transfer-Encoding:
+      - chunked
+      X-Kubernetes-Pf-Flowschema-Uid:
+      - 17d0245f-080e-4bb8-8d5d-c90323293b5e
+      X-Kubernetes-Pf-Prioritylevel-Uid:
+      - e2737129-286c-4dce-9b08-921b3883f78b
+    status:
+      code: 200
+      message: OK
+- request:
+    body: null
+    headers:
+      Accept:
+      - application/json
+      Content-Type:
+      - application/json
+      User-Agent:
+      - OpenAPI-Generator/36.0.3/python
+    method: GET
+    uri: https://ghost/apis/karpenter.sh/v1/nodepools?limit=250
+  response:
+    body:
+      string: '{"apiVersion":"karpenter.sh/v1","items":[{"apiVersion":"karpenter.sh/v1","kind":"NodePool","metadata":{"annotations":{"kubectl.kubernetes.io/last-applied-configuration":"{\"apiVersion\":\"karpenter.sh/v1\",\"kind\":\"NodePool\",\"metadata\":{\"annotations\":{\"kubernetes.io/description\":\"General
+        purpose NodePool for generic workloads\"},\"name\":\"general-purpose\"},\"spec\":{\"template\":{\"spec\":{\"nodeClassRef\":{\"group\":\"karpenter.k8s.aws\",\"kind\":\"EC2NodeClass\",\"name\":\"default\"},\"requirements\":[{\"key\":\"kubernetes.io/arch\",\"operator\":\"In\",\"values\":[\"amd64\"]},{\"key\":\"kubernetes.io/os\",\"operator\":\"In\",\"values\":[\"linux\"]},{\"key\":\"karpenter.sh/capacity-type\",\"operator\":\"In\",\"values\":[\"on-demand\"]},{\"key\":\"karpenter.k8s.aws/instance-category\",\"operator\":\"In\",\"values\":[\"c\",\"m\",\"r\"]},{\"key\":\"karpenter.k8s.aws/instance-generation\",\"operator\":\"Gt\",\"values\":[\"2\"]}]}}}}\n","kubernetes.io/description":"General
+        purpose NodePool for generic workloads"},"creationTimestamp":"2026-09-03T21:04:36Z","generation":1,"managedFields":[{"apiVersion":"karpenter.sh/v1","fieldsType":"FieldsV1","fieldsV1":{"f:metadata":{"f:annotations":{".":{},"f:kubectl.kubernetes.io/last-applied-configuration":{},"f:kubernetes.io/description":{}}},"f:spec":{".":{},"f:disruption":{".":{},"f:budgets":{},"f:consolidateAfter":{},"f:consolidationPolicy":{}},"f:template":{".":{},"f:spec":{".":{},"f:expireAfter":{},"f:nodeClassRef":{".":{},"f:group":{},"f:kind":{},"f:name":{}},"f:requirements":{}}}}},"manager":"kubectl-client-side-apply","operation":"Update","time":"2026-09-03T21:04:36Z"}],"name":"general-purpose","resourceVersion":"81","uid":"78daf545-7fda-4e80-89c5-b05f3e75041a"},"spec":{"disruption":{"budgets":[{"nodes":"10%"}],"consolidateAfter":"0s","consolidationPolicy":"WhenEmptyOrUnderutilized"},"template":{"spec":{"expireAfter":"720h","nodeClassRef":{"group":"karpenter.k8s.aws","kind":"EC2NodeClass","name":"default"},"requirements":[{"key":"kubernetes.io/arch","operator":"In","values":["amd64"]},{"key":"kubernetes.io/os","operator":"In","values":["linux"]},{"key":"karpenter.sh/capacity-type","operator":"In","values":["on-demand"]},{"key":"karpenter.k8s.aws/instance-category","operator":"In","values":["c","m","r"]},{"key":"karpenter.k8s.aws/instance-generation","operator":"Gt","values":["2"]}]}}}}],"kind":"NodePoolList","metadata":{"continue":"","resourceVersion":"250"}}
+
+        '
+    headers:
+      Audit-Id:
+      - 943ac330-2566-492f-8587-d5ecf3ab7f30
+      Cache-Control:
+      - no-cache, private
+      Content-Type:
+      - application/json
+      Date:
+      - Thu, 03 Sep 2026 21:17:43 GMT
+      Transfer-Encoding:
+      - chunked
+      X-Kubernetes-Pf-Flowschema-Uid:
+      - 17d0245f-080e-4bb8-8d5d-c90323293b5e
+      X-Kubernetes-Pf-Prioritylevel-Uid:
+      - e2737129-286c-4dce-9b08-921b3883f78b
+    status:
+      code: 200
+      message: OK
+version: 1
