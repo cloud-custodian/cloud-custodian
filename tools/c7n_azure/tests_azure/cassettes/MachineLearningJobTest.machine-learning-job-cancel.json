@@ -1,0 +1,713 @@
+{
+    "version": 1,
+    "interactions": [
+        {
+            "request": {
+                "method": "GET",
+                "uri": "https://management.azure.com/subscriptions/ea42f556-5106-4743-99b0-c129bfa71a47/providers/Microsoft.MachineLearningServices/workspaces?api-version=2023-04-01",
+                "body": null,
+                "headers": {}
+            },
+            "response": {
+                "status": {
+                    "code": 200,
+                    "message": "OK"
+                },
+                "headers": {
+                    "cache-control": [
+                        "no-cache"
+                    ],
+                    "x-ms-ratelimit-remaining-subscription-global-reads": [
+                        "3749"
+                    ],
+                    "content-length": [
+                        "5182"
+                    ],
+                    "x-ms-original-request-ids": [
+                        "",
+                        ""
+                    ],
+                    "x-cache": [
+                        "CONFIG_NOCACHE"
+                    ],
+                    "content-type": [
+                        "application/json; charset=utf-8"
+                    ],
+                    "date": [
+                        "Tue, 25 Aug 2026 13:26:46 GMT"
+                    ],
+                    "x-msedge-ref": [
+                        "Ref A: EA23AF2515824AD2A4D46B805A8658FF Ref B: CYS013050702017 Ref C: 2026-08-25T13:26:46Z"
+                    ]
+                },
+                "body": {
+                    "data": {
+                        "value": [
+                            {
+                                "id": "/subscriptions/ea42f556-5106-4743-99b0-c129bfa71a47/resourceGroups/aml-delete-test-0812095033/providers/Microsoft.MachineLearningServices/workspaces/aml-delete-0812095033",
+                                "name": "aml-delete-0812095033",
+                                "type": "Microsoft.MachineLearningServices/workspaces",
+                                "location": "westus",
+                                "tags": {
+                                    "createdByToolkit": "cli-v2-1.34.1"
+                                },
+                                "etag": null,
+                                "properties": {
+                                    "friendlyName": "aml-delete-0812095033",
+                                    "description": "aml-delete-0812095033",
+                                    "storageAccount": "/subscriptions/ea42f556-5106-4743-99b0-c129bfa71a47/resourceGroups/aml-delete-test-0812095033/providers/Microsoft.Storage/storageAccounts/amldeletstorage25aa71048",
+                                    "keyVault": "/subscriptions/ea42f556-5106-4743-99b0-c129bfa71a47/resourceGroups/aml-delete-test-0812095033/providers/Microsoft.Keyvault/vaults/amldeletkeyvault5540f7e4",
+                                    "applicationInsights": "/subscriptions/ea42f556-5106-4743-99b0-c129bfa71a47/resourceGroups/aml-delete-test-0812095033/providers/Microsoft.insights/components/amldeletinsights95d2b2da",
+                                    "hbiWorkspace": false,
+                                    "tenantId": "00000000-0000-0000-0000-000000000003",
+                                    "imageBuildCompute": null,
+                                    "provisioningState": "Succeeded",
+                                    "managedNetwork": {
+                                        "changeableIsolationModes": [
+                                            "AllowInternetOutbound",
+                                            "AllowOnlyApprovedOutbound"
+                                        ],
+                                        "isolationMode": "Disabled",
+                                        "enableNetworkMonitor": false
+                                    },
+                                    "allowRoleAssignmentOnRG": true,
+                                    "v1LegacyMode": false,
+                                    "softDeleteEnabled": false,
+                                    "creationTime": "2026-08-12T14:03:06.5147287Z",
+                                    "notebookInfo": {
+                                        "resourceId": "67293dad521f4e8c82e6f3fe495b572e",
+                                        "fqdn": "ml-aml-delete-08120-westus-fee9f3af-061d-4d78-a2c7-7dc193975323.westus.notebooks.azure.net",
+                                        "isPrivateLinkEnabled": false,
+                                        "notebookPreparationError": null
+                                    },
+                                    "storageHnsEnabled": false,
+                                    "workspaceId": "fee9f3af-061d-4d78-a2c7-7dc193975323",
+                                    "linkedModelInventoryArmId": null,
+                                    "privateLinkCount": 0,
+                                    "publicNetworkAccess": "Enabled",
+                                    "discoveryUrl": "https://westus.api.azureml.ms/discovery",
+                                    "mlFlowTrackingUri": "azureml://westus.api.azureml.ms/mlflow/v1.0/subscriptions/ea42f556-5106-4743-99b0-c129bfa71a47/resourceGroups/aml-delete-test-0812095033/providers/Microsoft.MachineLearningServices/workspaces/aml-delete-0812095033",
+                                    "sdkTelemetryAppInsightsKey": "ad4db683-227d-4cf9-b788-db8d151f62e0",
+                                    "enableDataIsolation": false
+                                },
+                                "identity": {
+                                    "type": "SystemAssigned",
+                                    "principalId": "5088aaa7-547c-4b1a-a0f2-e5242bcfcf49",
+                                    "tenantId": "00000000-0000-0000-0000-000000000003"
+                                },
+                                "kind": "Default",
+                                "sku": {
+                                    "name": "Basic",
+                                    "tier": "Basic"
+                                },
+                                "systemData": {
+                                    "createdAt": "2026-08-12T14:03:06.5147287Z",
+                                    "createdBy": "drea.jenkins@sixfeetup.com",
+                                    "createdByType": "User",
+                                    "lastModifiedAt": "2026-08-12T14:03:06.5147287Z",
+                                    "lastModifiedBy": "drea.jenkins@sixfeetup.com",
+                                    "lastModifiedByType": "User"
+                                }
+                            },
+                            {
+                                "id": "/subscriptions/ea42f556-5106-4743-99b0-c129bfa71a47/resourceGroups/test_machine-learning-job-cancel/providers/Microsoft.MachineLearningServices/workspaces/cctest-mlws-cancel",
+                                "name": "cctest-mlws-cancel",
+                                "type": "Microsoft.MachineLearningServices/workspaces",
+                                "location": "southcentralus",
+                                "tags": {},
+                                "etag": null,
+                                "properties": {
+                                    "friendlyName": "cctest-mlws-cancel",
+                                    "description": "",
+                                    "storageAccount": "/subscriptions/ea42f556-5106-4743-99b0-c129bfa71a47/resourceGroups/test_machine-learning-job-cancel/providers/Microsoft.Storage/storageAccounts/cctestmlws970908088942",
+                                    "keyVault": "/subscriptions/ea42f556-5106-4743-99b0-c129bfa71a47/resourceGroups/test_machine-learning-job-cancel/providers/Microsoft.Keyvault/vaults/cctestmlws970908088942",
+                                    "applicationInsights": "/subscriptions/ea42f556-5106-4743-99b0-c129bfa71a47/resourceGroups/test_machine-learning-job-cancel/providers/Microsoft.insights/components/cctestmlws970908088942",
+                                    "hbiWorkspace": false,
+                                    "tenantId": "00000000-0000-0000-0000-000000000003",
+                                    "imageBuildCompute": null,
+                                    "provisioningState": "Succeeded",
+                                    "managedNetwork": {
+                                        "changeableIsolationModes": [
+                                            "AllowInternetOutbound",
+                                            "AllowOnlyApprovedOutbound"
+                                        ],
+                                        "isolationMode": "Disabled",
+                                        "enableNetworkMonitor": false
+                                    },
+                                    "allowRoleAssignmentOnRG": true,
+                                    "v1LegacyMode": false,
+                                    "softDeleteEnabled": false,
+                                    "creationTime": "2026-08-25T13:03:18.7677055Z",
+                                    "notebookInfo": {
+                                        "resourceId": "07bf556f17984f029aedf3d0f7162d7a",
+                                        "fqdn": "ml-cctest-m-southcentralus-6c4488bb-bb56-4bfe-b4f8-071635256c29.southcentralus.notebooks.azure.net",
+                                        "isPrivateLinkEnabled": false,
+                                        "notebookPreparationError": null
+                                    },
+                                    "storageHnsEnabled": false,
+                                    "workspaceId": "6c4488bb-bb56-4bfe-b4f8-071635256c29",
+                                    "linkedModelInventoryArmId": null,
+                                    "privateLinkCount": 0,
+                                    "publicNetworkAccess": "Enabled",
+                                    "discoveryUrl": "https://southcentralus.api.azureml.ms/discovery",
+                                    "mlFlowTrackingUri": "azureml://southcentralus.api.azureml.ms/mlflow/v1.0/subscriptions/ea42f556-5106-4743-99b0-c129bfa71a47/resourceGroups/test_machine-learning-job-cancel/providers/Microsoft.MachineLearningServices/workspaces/cctest-mlws-cancel",
+                                    "sdkTelemetryAppInsightsKey": "0c54a945-002c-433a-93ea-97b7f084292a",
+                                    "enableDataIsolation": false
+                                },
+                                "identity": {
+                                    "type": "SystemAssigned",
+                                    "principalId": "848a7033-7d11-4b3e-80b0-2e6c0db0715c",
+                                    "tenantId": "00000000-0000-0000-0000-000000000003"
+                                },
+                                "kind": "Default",
+                                "sku": {
+                                    "name": "Basic",
+                                    "tier": "Basic"
+                                },
+                                "systemData": {
+                                    "createdAt": "2026-08-25T13:03:18.7677055Z",
+                                    "createdBy": "jim.fulton@sixfeetup.com",
+                                    "createdByType": "User",
+                                    "lastModifiedAt": "2026-08-25T13:03:18.7677055Z",
+                                    "lastModifiedBy": "jim.fulton@sixfeetup.com",
+                                    "lastModifiedByType": "User"
+                                }
+                            }
+                        ]
+                    }
+                }
+            }
+        },
+        {
+            "request": {
+                "method": "GET",
+                "uri": "https://management.azure.com/subscriptions/ea42f556-5106-4743-99b0-c129bfa71a47/resourceGroups/aml-delete-test-0812095033/providers/Microsoft.MachineLearningServices/workspaces/aml-delete-0812095033/jobs?api-version=2023-04-01",
+                "body": null,
+                "headers": {}
+            },
+            "response": {
+                "status": {
+                    "code": 200,
+                    "message": "OK"
+                },
+                "headers": {
+                    "x-ms-ratelimit-remaining-subscription-global-reads": [
+                        "3749"
+                    ],
+                    "content-length": [
+                        "17"
+                    ],
+                    "date": [
+                        "Tue, 25 Aug 2026 13:26:48 GMT"
+                    ],
+                    "cache-control": [
+                        "no-cache"
+                    ],
+                    "x-ms-response-type": [
+                        "standard"
+                    ],
+                    "request-context": [
+                        "appId=cid-v1:2d2e8e63-272e-4b3c-8598-4ee570a0e70d"
+                    ],
+                    "x-request-time": [
+                        "0.305"
+                    ],
+                    "content-type": [
+                        "application/json; charset=utf-8"
+                    ],
+                    "x-msedge-ref": [
+                        "Ref A: 7CB8DEA9B95148409ABA12B324C06468 Ref B: CYS013050701049 Ref C: 2026-08-25T13:26:48Z"
+                    ],
+                    "azureml-served-by-cluster": [
+                        "vienna-westus-02"
+                    ],
+                    "x-cache": [
+                        "CONFIG_NOCACHE"
+                    ],
+                    "x-ms-operation-identifier": [
+                        "tenantId=72d876e4-6b6f-4622-8566-8200130e81d4,objectId=e89404a5-c7db-4cdf-aed3-31daf7739325/westus/692f2126-c3a0-4092-9fb5-0e4ffbddb138"
+                    ]
+                },
+                "body": {
+                    "data": {
+                        "value": []
+                    }
+                }
+            }
+        },
+        {
+            "request": {
+                "method": "GET",
+                "uri": "https://management.azure.com/subscriptions/ea42f556-5106-4743-99b0-c129bfa71a47/resourceGroups/test_machine-learning-job-cancel/providers/Microsoft.MachineLearningServices/workspaces/cctest-mlws-cancel/jobs?api-version=2023-04-01",
+                "body": null,
+                "headers": {}
+            },
+            "response": {
+                "status": {
+                    "code": 200,
+                    "message": "OK"
+                },
+                "headers": {
+                    "x-ms-ratelimit-remaining-subscription-global-reads": [
+                        "3749"
+                    ],
+                    "content-length": [
+                        "10142"
+                    ],
+                    "date": [
+                        "Tue, 25 Aug 2026 13:26:48 GMT"
+                    ],
+                    "cache-control": [
+                        "no-cache"
+                    ],
+                    "x-ms-response-type": [
+                        "standard"
+                    ],
+                    "request-context": [
+                        "appId=cid-v1:2d2e8e63-272e-4b3c-8598-4ee570a0e70d"
+                    ],
+                    "x-request-time": [
+                        "0.194"
+                    ],
+                    "content-type": [
+                        "application/json; charset=utf-8"
+                    ],
+                    "x-msedge-ref": [
+                        "Ref A: A293055F9A5B4AA7BAEB65AC35C27CFA Ref B: CYS013050703053 Ref C: 2026-08-25T13:26:48Z"
+                    ],
+                    "azureml-served-by-cluster": [
+                        "vienna-southcentralus-02"
+                    ],
+                    "x-cache": [
+                        "CONFIG_NOCACHE"
+                    ],
+                    "x-ms-operation-identifier": [
+                        "tenantId=72d876e4-6b6f-4622-8566-8200130e81d4,objectId=e89404a5-c7db-4cdf-aed3-31daf7739325/southcentralus/bbbbcb1b-6e18-4d67-b0a1-66b19a493219"
+                    ]
+                },
+                "body": {
+                    "data": {
+                        "value": [
+                            {
+                                "id": "/subscriptions/ea42f556-5106-4743-99b0-c129bfa71a47/resourceGroups/test_machine-learning-job-cancel/providers/Microsoft.MachineLearningServices/workspaces/cctest-mlws-cancel/jobs/cctest-running-job",
+                                "name": "cctest-running-job",
+                                "type": "Microsoft.MachineLearningServices/workspaces/jobs",
+                                "properties": {
+                                    "description": null,
+                                    "tags": {
+                                        "_aml_system_ComputeTargetStatus": "{\"AllocationState\":\"steady\",\"PreparingNodeCount\":0,\"RunningNodeCount\":0,\"CurrentNodeCount\":0}"
+                                    },
+                                    "properties": {
+                                        "_azureml.ComputeTargetType": "amlctrain",
+                                        "_azureml.ClusterName": "cctestcpucancel",
+                                        "ProcessInfoFile": "azureml-logs/process_info.json",
+                                        "ProcessStatusFile": "azureml-logs/process_status.json",
+                                        "StartTimeUtc": "2026-08-25 13:26:33"
+                                    },
+                                    "displayName": "cctest_running_job",
+                                    "status": "Running",
+                                    "experimentName": "cctest_cancel",
+                                    "services": {
+                                        "Tracking": {
+                                            "jobServiceType": "Tracking",
+                                            "port": null,
+                                            "endpoint": "azureml://southcentralus.api.azureml.ms/mlflow/v1.0/subscriptions/ea42f556-5106-4743-99b0-c129bfa71a47/resourceGroups/test_machine-learning-job-cancel/providers/Microsoft.MachineLearningServices/workspaces/cctest-mlws-cancel?",
+                                            "status": null,
+                                            "errorMessage": null,
+                                            "properties": null,
+                                            "nodes": null
+                                        },
+                                        "Studio": {
+                                            "jobServiceType": "Studio",
+                                            "port": null,
+                                            "endpoint": "https://ml.azure.com/runs/cctest-running-job?wsid=/subscriptions/ea42f556-5106-4743-99b0-c129bfa71a47/resourcegroups/test_machine-learning-job-cancel/workspaces/cctest-mlws-cancel",
+                                            "status": null,
+                                            "errorMessage": null,
+                                            "properties": null,
+                                            "nodes": null
+                                        }
+                                    },
+                                    "computeId": "/subscriptions/ea42f556-5106-4743-99b0-c129bfa71a47/resourceGroups/test_machine-learning-job-cancel/providers/Microsoft.MachineLearningServices/workspaces/cctest-mlws-cancel/computes/cctestcpucancel",
+                                    "isArchived": false,
+                                    "identity": null,
+                                    "componentId": null,
+                                    "jobType": "Command",
+                                    "resources": {
+                                        "instanceCount": 1,
+                                        "instanceType": null,
+                                        "properties": null,
+                                        "shmSize": "2g",
+                                        "dockerArgs": null
+                                    },
+                                    "codeId": null,
+                                    "command": "sleep 600",
+                                    "environmentId": "/subscriptions/ea42f556-5106-4743-99b0-c129bfa71a47/resourceGroups/test_machine-learning-job-cancel/providers/Microsoft.MachineLearningServices/workspaces/cctest-mlws-cancel/environments/cctest-cancel-env/versions/1",
+                                    "inputs": {},
+                                    "outputs": {
+                                        "default": {
+                                            "description": null,
+                                            "uri": "azureml://datastores/workspaceartifactstore/ExperimentRun/dcid.cctest-running-job",
+                                            "mode": "ReadWriteMount",
+                                            "jobOutputType": "uri_folder"
+                                        }
+                                    },
+                                    "distribution": null,
+                                    "limits": null,
+                                    "environmentVariables": null,
+                                    "parameters": {}
+                                },
+                                "systemData": {
+                                    "createdAt": "2026-08-25T13:23:30.5405095+00:00",
+                                    "createdBy": "Jim Fulton",
+                                    "createdByType": "User"
+                                }
+                            },
+                            {
+                                "id": "/subscriptions/ea42f556-5106-4743-99b0-c129bfa71a47/resourceGroups/test_machine-learning-job-cancel/providers/Microsoft.MachineLearningServices/workspaces/cctest-mlws-cancel/jobs/cctest-cancel-job",
+                                "name": "cctest-cancel-job",
+                                "type": "Microsoft.MachineLearningServices/workspaces/jobs",
+                                "properties": {
+                                    "description": null,
+                                    "tags": {
+                                        "_aml_system_ComputeTargetStatus": "{\"AllocationState\":\"steady\",\"PreparingNodeCount\":0,\"RunningNodeCount\":0,\"CurrentNodeCount\":0}"
+                                    },
+                                    "properties": {
+                                        "_azureml.ComputeTargetType": "amlctrain",
+                                        "_azureml.ClusterName": "cctestcpucancel",
+                                        "ProcessInfoFile": "azureml-logs/process_info.json",
+                                        "ProcessStatusFile": "azureml-logs/process_status.json",
+                                        "StartTimeUtc": "2026-08-25 13:07:02",
+                                        "EndTimeUtc": "2026-08-25 13:15:57"
+                                    },
+                                    "displayName": "cctest_cancel_job",
+                                    "status": "Canceled",
+                                    "experimentName": "cctest_cancel",
+                                    "services": {
+                                        "Tracking": {
+                                            "jobServiceType": "Tracking",
+                                            "port": null,
+                                            "endpoint": "azureml://southcentralus.api.azureml.ms/mlflow/v1.0/subscriptions/ea42f556-5106-4743-99b0-c129bfa71a47/resourceGroups/test_machine-learning-job-cancel/providers/Microsoft.MachineLearningServices/workspaces/cctest-mlws-cancel?",
+                                            "status": null,
+                                            "errorMessage": null,
+                                            "properties": null,
+                                            "nodes": null
+                                        },
+                                        "Studio": {
+                                            "jobServiceType": "Studio",
+                                            "port": null,
+                                            "endpoint": "https://ml.azure.com/runs/cctest-cancel-job?wsid=/subscriptions/ea42f556-5106-4743-99b0-c129bfa71a47/resourcegroups/test_machine-learning-job-cancel/workspaces/cctest-mlws-cancel",
+                                            "status": null,
+                                            "errorMessage": null,
+                                            "properties": null,
+                                            "nodes": null
+                                        }
+                                    },
+                                    "computeId": "/subscriptions/ea42f556-5106-4743-99b0-c129bfa71a47/resourceGroups/test_machine-learning-job-cancel/providers/Microsoft.MachineLearningServices/workspaces/cctest-mlws-cancel/computes/cctestcpucancel",
+                                    "isArchived": false,
+                                    "identity": null,
+                                    "componentId": null,
+                                    "jobType": "Command",
+                                    "resources": {
+                                        "instanceCount": 1,
+                                        "instanceType": null,
+                                        "properties": null,
+                                        "shmSize": "2g",
+                                        "dockerArgs": null
+                                    },
+                                    "codeId": null,
+                                    "command": "sleep 600",
+                                    "environmentId": "/subscriptions/ea42f556-5106-4743-99b0-c129bfa71a47/resourceGroups/test_machine-learning-job-cancel/providers/Microsoft.MachineLearningServices/workspaces/cctest-mlws-cancel/environments/cctest-cancel-env/versions/1",
+                                    "inputs": {},
+                                    "outputs": {
+                                        "default": {
+                                            "description": null,
+                                            "uri": "azureml://datastores/workspaceartifactstore/ExperimentRun/dcid.cctest-cancel-job",
+                                            "mode": "ReadWriteMount",
+                                            "jobOutputType": "uri_folder"
+                                        }
+                                    },
+                                    "distribution": null,
+                                    "limits": null,
+                                    "environmentVariables": null,
+                                    "parameters": {}
+                                },
+                                "systemData": {
+                                    "createdAt": "2026-08-25T13:04:17.9144651+00:00",
+                                    "createdBy": "Jim Fulton",
+                                    "createdByType": "User"
+                                }
+                            },
+                            {
+                                "id": "/subscriptions/ea42f556-5106-4743-99b0-c129bfa71a47/resourceGroups/test_machine-learning-job-cancel/providers/Microsoft.MachineLearningServices/workspaces/cctest-mlws-cancel/jobs/cctest-completed-job",
+                                "name": "cctest-completed-job",
+                                "type": "Microsoft.MachineLearningServices/workspaces/jobs",
+                                "properties": {
+                                    "description": null,
+                                    "tags": {
+                                        "_aml_system_ComputeTargetStatus": "{\"AllocationState\":\"steady\",\"PreparingNodeCount\":0,\"RunningNodeCount\":0,\"CurrentNodeCount\":0}"
+                                    },
+                                    "properties": {
+                                        "_azureml.ComputeTargetType": "amlctrain",
+                                        "_azureml.ClusterName": "cctestcpucancel",
+                                        "ProcessInfoFile": "azureml-logs/process_info.json",
+                                        "ProcessStatusFile": "azureml-logs/process_status.json",
+                                        "StartTimeUtc": "2026-08-25 13:16:10",
+                                        "EndTimeUtc": "2026-08-25 13:16:19"
+                                    },
+                                    "displayName": "cctest_completed_job",
+                                    "status": "Completed",
+                                    "experimentName": "cctest_cancel",
+                                    "services": {
+                                        "Tracking": {
+                                            "jobServiceType": "Tracking",
+                                            "port": null,
+                                            "endpoint": "azureml://southcentralus.api.azureml.ms/mlflow/v1.0/subscriptions/ea42f556-5106-4743-99b0-c129bfa71a47/resourceGroups/test_machine-learning-job-cancel/providers/Microsoft.MachineLearningServices/workspaces/cctest-mlws-cancel?",
+                                            "status": null,
+                                            "errorMessage": null,
+                                            "properties": null,
+                                            "nodes": null
+                                        },
+                                        "Studio": {
+                                            "jobServiceType": "Studio",
+                                            "port": null,
+                                            "endpoint": "https://ml.azure.com/runs/cctest-completed-job?wsid=/subscriptions/ea42f556-5106-4743-99b0-c129bfa71a47/resourcegroups/test_machine-learning-job-cancel/workspaces/cctest-mlws-cancel",
+                                            "status": null,
+                                            "errorMessage": null,
+                                            "properties": null,
+                                            "nodes": null
+                                        }
+                                    },
+                                    "computeId": "/subscriptions/ea42f556-5106-4743-99b0-c129bfa71a47/resourceGroups/test_machine-learning-job-cancel/providers/Microsoft.MachineLearningServices/workspaces/cctest-mlws-cancel/computes/cctestcpucancel",
+                                    "isArchived": false,
+                                    "identity": null,
+                                    "componentId": null,
+                                    "jobType": "Command",
+                                    "resources": {
+                                        "instanceCount": 1,
+                                        "instanceType": null,
+                                        "properties": null,
+                                        "shmSize": "2g",
+                                        "dockerArgs": null
+                                    },
+                                    "codeId": null,
+                                    "command": "echo hello",
+                                    "environmentId": "/subscriptions/ea42f556-5106-4743-99b0-c129bfa71a47/resourceGroups/test_machine-learning-job-cancel/providers/Microsoft.MachineLearningServices/workspaces/cctest-mlws-cancel/environments/cctest-cancel-env/versions/1",
+                                    "inputs": {},
+                                    "outputs": {
+                                        "default": {
+                                            "description": null,
+                                            "uri": "azureml://datastores/workspaceartifactstore/ExperimentRun/dcid.cctest-completed-job",
+                                            "mode": "ReadWriteMount",
+                                            "jobOutputType": "uri_folder"
+                                        }
+                                    },
+                                    "distribution": null,
+                                    "limits": null,
+                                    "environmentVariables": null,
+                                    "parameters": {}
+                                },
+                                "systemData": {
+                                    "createdAt": "2026-08-25T13:04:17.9041614+00:00",
+                                    "createdBy": "Jim Fulton",
+                                    "createdByType": "User"
+                                }
+                            }
+                        ]
+                    }
+                }
+            }
+        },
+        {
+            "request": {
+                "method": "POST",
+                "uri": "https://management.azure.com/subscriptions/ea42f556-5106-4743-99b0-c129bfa71a47/resourceGroups/test_machine-learning-job-cancel/providers/Microsoft.MachineLearningServices/workspaces/cctest-mlws-cancel/jobs/cctest-running-job/cancel?api-version=2023-04-01",
+                "body": null,
+                "headers": {}
+            },
+            "response": {
+                "status": {
+                    "code": 202,
+                    "message": "Accepted"
+                },
+                "headers": {
+                    "x-ms-ratelimit-remaining-subscription-global-writes": [
+                        "2999"
+                    ],
+                    "content-length": [
+                        "4"
+                    ],
+                    "date": [
+                        "Tue, 25 Aug 2026 13:26:49 GMT"
+                    ],
+                    "cache-control": [
+                        "no-cache"
+                    ],
+                    "x-ms-response-type": [
+                        "standard"
+                    ],
+                    "x-ms-async-operation-timeout": [
+                        "PT1H"
+                    ],
+                    "request-context": [
+                        "appId=cid-v1:2d2e8e63-272e-4b3c-8598-4ee570a0e70d"
+                    ],
+                    "location": [
+                        "https://management.azure.com/subscriptions/166f6586-eaab-4dcb-ae98-2bec9520bbd6/providers/Microsoft.MachineLearningServices/locations/southcentralus/mfeOperationResults/jc:6c4488bb-bb56-4bfe-b4f8-071635256c29:cctest-running-job?api-version=2023-04-01&t=639232612102364992&c=MIIHlTCCBn2gAwIBAgIRALL5l5S5oywZFcXHRxM5r3QwDQYJKoZIhvcNAQELBQAwNjE0MDIGA1UEAxMrQ0NNRSBHMSBUTFMgUlNBIDIwNDggU0hBMjU2IDIwNDkgRVVTMiBDQSAwMTAeFw0yNjA4MTcwMzIwMzNaFw0yNzAyMTIwOTIwMzNaMEAxPjA8BgNVBAMTNWFzeW5jb3BlcmF0aW9uc2lnbmluZ2NlcnRpZmljYXRlLm1hbmFnZW1lbnQuYXp1cmUuY29tMIIBIjANBgkqhkiG9w0BAQEFAAOCAQ8AMIIBCgKCAQEAtdwMuItv_qhgk-51bllpvlrjpXOkiVW2hERWoh8zybSjxa3fUl5FChxCr8t9gdZlXksKb7bOA4AFEVXk2kmB_4bkUFls4oIClJRneME6AaV5m4rWxgLfWcI7LXzQoiph-JiQ8amECpD6HrtfEytxOEOUTeTunaI48ZT_HIYhsoa4hPyb3DVq4_dvEEs0TdFKGU0ROPT98mtSvJUZzz2Fh32gkFCgXMjWN4YxReh7A38OJjkZK1ebSYqJjSlzmxjqUXZZW2tZVJA_0nDzD6uTel7Gbg2hQLeO9jOg4zYhDmiFwArbKbLckdOcU8H01eaP53JJzBm8q6BhCLf_eRukTQIDAQABo4IEkjCCBI4wgZ0GA1UdIASBlTCBkjAMBgorBgEEAYI3ewEBMGYGCisGAQQBgjd7AgIwWDBWBggrBgEFBQcCAjBKHkgAMwAzAGUAMAAxADkAMgAxAC0ANABkADYANAAtADQAZgA4AGMALQBhADAANQA1AC0ANQBiAGQAYQBmAGYAZAA1AGUAMwAzAGQwDAYKKwYBBAGCN3sDAjAMBgorBgEEAYI3ewQCMAwGA1UdEwEB_wQCMAAwHQYDVR0lBBYwFAYIKwYBBQUHAwEGCCsGAQUFBwMCMA4GA1UdDwEB_wQEAwIFoDAdBgNVHQ4EFgQU_7velGQ9kafWFOVnIMX4WLH-tEEwHwYDVR0jBBgwFoAU_Ow-26p8H4IeBbihBvlD5wKzCrkwggGyBgNVHR8EggGpMIIBpTBpoGegZYZjaHR0cDovL3ByaW1hcnktY2RuLnBraS5jb3JlLndpbmRvd3MubmV0L2Vhc3R1czIvY3Jscy9jY21lZWFzdHVzMnBraS9jY21lZWFzdHVzMmljYTAxLzI4L2N1cnJlbnQuY3JsMGugaaBnhmVodHRwOi8vc2Vjb25kYXJ5LWNkbi5wa2kuY29yZS53aW5kb3dzLm5ldC9lYXN0dXMyL2NybHMvY2NtZWVhc3R1czJwa2kvY2NtZWVhc3R1czJpY2EwMS8yOC9jdXJyZW50LmNybDBaoFigVoZUaHR0cDovL2NybC5taWNyb3NvZnQuY29tL2Vhc3R1czIvY3Jscy9jY21lZWFzdHVzMnBraS9jY21lZWFzdHVzMmljYTAxLzI4L2N1cnJlbnQuY3JsMG-gbaBrhmlodHRwOi8vY2NtZWVhc3R1czJwa2kuZWFzdHVzMi5wa2kuY29yZS53aW5kb3dzLm5ldC9jZXJ0aWZpY2F0ZUF1dGhvcml0aWVzL2NjbWVlYXN0dXMyaWNhMDEvMjgvY3VycmVudC5jcmwwggG3BggrBgEFBQcBAQSCAakwggGlMGwGCCsGAQUFBzAChmBodHRwOi8vcHJpbWFyeS1jZG4ucGtpLmNvcmUud2luZG93cy5uZXQvZWFzdHVzMi9jYWNlcnRzL2NjbWVlYXN0dXMycGtpL2NjbWVlYXN0dXMyaWNhMDEvY2VydC5jZXIwbgYIKwYBBQUHMAKGYmh0dHA6Ly9zZWNvbmRhcnktY2RuLnBraS5jb3JlLndpbmRvd3MubmV0L2Vhc3R1czIvY2FjZXJ0cy9jY21lZWFzdHVzMnBraS9jY21lZWFzdHVzMmljYTAxL2NlcnQuY2VyMF0GCCsGAQUFBzAChlFodHRwOi8vY3JsLm1pY3Jvc29mdC5jb20vZWFzdHVzMi9jYWNlcnRzL2NjbWVlYXN0dXMycGtpL2NjbWVlYXN0dXMyaWNhMDEvY2VydC5jZXIwZgYIKwYBBQUHMAKGWmh0dHA6Ly9jY21lZWFzdHVzMnBraS5lYXN0dXMyLnBraS5jb3JlLndpbmRvd3MubmV0L2NlcnRpZmljYXRlQXV0aG9yaXRpZXMvY2NtZWVhc3R1czJpY2EwMTANBgkqhkiG9w0BAQsFAAOCAQEAawhbsr1c-5lgatQgLWzPAdj09YYgJglF7rSb5QegP5qYq-7oN7NLpdtPYBTX1-4yAEQrf5aHHIRMw7pDXKqkUb7yrxgKOKAqlhoh9Q1I0Ey00cMxSvvBwmre9B5QCl7X3-_cY9o4F5tqzzbpGIn6K4Do7y_DEvhYpzPQJkmxxFFMrdIGuhsgXINGO0iw8TP0lDXQEFzwBPCOMdO0A7NdpEOUvjszTC4fb2oVr6JWkJbigsX_JgJjURg9DEo0erCeg6PpsoLJTYFR_kBbGAH7zZG5cD8eb38ZZ0KpwHcase4L39MVmejYzGq6PjyUydNm507TP4RI2WHF7k58oU_j5Q&s=Zq2V0013z3Ya3HqaWJHTkcJTmU4HjF7O_6RKhvJfkQqAvf4a5JVlJMqirQ6_yMXVr1Op6eto7NmaRbxjX_kWJzykLJrIwmiNzDbGhoGovxUgje-vVfeLFCz15CJYInTSb6hq0qjNTLluFbY_8uP6UEVy_vwmsi0Koz5j9DzfUsuejs1LR3rP1oDE7h_21gLbevQaqkfdViL5jKwbQFUL5vitzMPwbaWAOSqFyXm4e2w7jG_jAa6G4GIrfabjgmSLkUT2RjLzTfWZSgP-CQjOJyQY7WEtv3ORyFsl5Kunhm5MR4-n7Dk5tUlrUdWuVgsIJNGDzzuDKtNkIZ88Sm1C8g&h=ayx2aPBl1xT8hBtS64mgdlcr4VTa-nXybLbtcaECPT8"
+                    ],
+                    "x-request-time": [
+                        "0.509"
+                    ],
+                    "content-type": [
+                        "application/json; charset=utf-8"
+                    ],
+                    "x-msedge-ref": [
+                        "Ref A: 7AA5287D8DC54FDD949CE963B6E7BE9C Ref B: CYS013050701025 Ref C: 2026-08-25T13:26:49Z"
+                    ],
+                    "azureml-served-by-cluster": [
+                        "vienna-southcentralus-01"
+                    ],
+                    "x-ms-ratelimit-remaining-subscription-writes": [
+                        "199"
+                    ],
+                    "x-cache": [
+                        "CONFIG_NOCACHE"
+                    ],
+                    "x-ms-operation-identifier": [
+                        "tenantId=72d876e4-6b6f-4622-8566-8200130e81d4,objectId=e89404a5-c7db-4cdf-aed3-31daf7739325/southcentralus/8e6514c2-6ec5-4256-ae34-cb14a490ce98"
+                    ]
+                },
+                "body": {
+                    "data": null
+                }
+            }
+        },
+        {
+            "request": {
+                "method": "GET",
+                "uri": "https://management.azure.com/subscriptions/ea42f556-5106-4743-99b0-c129bfa71a47/resourceGroups/test_machine-learning-job-cancel/providers/Microsoft.MachineLearningServices/workspaces/cctest-mlws-cancel/jobs/cctest-running-job?api-version=2023-04-01",
+                "body": null,
+                "headers": {}
+            },
+            "response": {
+                "status": {
+                    "code": 200,
+                    "message": "OK"
+                },
+                "headers": {
+                    "x-ms-ratelimit-remaining-subscription-global-reads": [
+                        "3749"
+                    ],
+                    "content-length": [
+                        "3050"
+                    ],
+                    "date": [
+                        "Tue, 25 Aug 2026 13:26:49 GMT"
+                    ],
+                    "cache-control": [
+                        "no-cache"
+                    ],
+                    "x-ms-response-type": [
+                        "standard"
+                    ],
+                    "request-context": [
+                        "appId=cid-v1:2d2e8e63-272e-4b3c-8598-4ee570a0e70d"
+                    ],
+                    "x-request-time": [
+                        "0.079"
+                    ],
+                    "content-type": [
+                        "application/json; charset=utf-8"
+                    ],
+                    "x-msedge-ref": [
+                        "Ref A: 71995A51560C4B9C9FEC9081C305329F Ref B: CYS013050701027 Ref C: 2026-08-25T13:26:50Z"
+                    ],
+                    "azureml-served-by-cluster": [
+                        "vienna-southcentralus-01"
+                    ],
+                    "x-cache": [
+                        "CONFIG_NOCACHE"
+                    ],
+                    "x-ms-operation-identifier": [
+                        "tenantId=72d876e4-6b6f-4622-8566-8200130e81d4,objectId=e89404a5-c7db-4cdf-aed3-31daf7739325/southcentralus/a103bcf2-94bf-42a4-8a73-15b0e3843028"
+                    ]
+                },
+                "body": {
+                    "data": {
+                        "id": "/subscriptions/ea42f556-5106-4743-99b0-c129bfa71a47/resourceGroups/test_machine-learning-job-cancel/providers/Microsoft.MachineLearningServices/workspaces/cctest-mlws-cancel/jobs/cctest-running-job",
+                        "name": "cctest-running-job",
+                        "type": "Microsoft.MachineLearningServices/workspaces/jobs",
+                        "properties": {
+                            "description": null,
+                            "tags": {
+                                "_aml_system_ComputeTargetStatus": "{\"AllocationState\":\"steady\",\"PreparingNodeCount\":0,\"RunningNodeCount\":0,\"CurrentNodeCount\":0}"
+                            },
+                            "properties": {
+                                "_azureml.ComputeTargetType": "amlctrain",
+                                "_azureml.ClusterName": "cctestcpucancel",
+                                "ProcessInfoFile": "azureml-logs/process_info.json",
+                                "ProcessStatusFile": "azureml-logs/process_status.json",
+                                "StartTimeUtc": "2026-08-25 13:26:33"
+                            },
+                            "displayName": "cctest_running_job",
+                            "status": "CancelRequested",
+                            "experimentName": "cctest_cancel",
+                            "services": {
+                                "Tracking": {
+                                    "jobServiceType": "Tracking",
+                                    "port": null,
+                                    "endpoint": "azureml://southcentralus.api.azureml.ms/mlflow/v1.0/subscriptions/ea42f556-5106-4743-99b0-c129bfa71a47/resourceGroups/test_machine-learning-job-cancel/providers/Microsoft.MachineLearningServices/workspaces/cctest-mlws-cancel?",
+                                    "status": null,
+                                    "errorMessage": null,
+                                    "properties": null,
+                                    "nodes": null
+                                },
+                                "Studio": {
+                                    "jobServiceType": "Studio",
+                                    "port": null,
+                                    "endpoint": "https://ml.azure.com/runs/cctest-running-job?wsid=/subscriptions/ea42f556-5106-4743-99b0-c129bfa71a47/resourcegroups/test_machine-learning-job-cancel/workspaces/cctest-mlws-cancel",
+                                    "status": null,
+                                    "errorMessage": null,
+                                    "properties": null,
+                                    "nodes": null
+                                }
+                            },
+                            "computeId": "/subscriptions/ea42f556-5106-4743-99b0-c129bfa71a47/resourceGroups/test_machine-learning-job-cancel/providers/Microsoft.MachineLearningServices/workspaces/cctest-mlws-cancel/computes/cctestcpucancel",
+                            "isArchived": false,
+                            "identity": null,
+                            "componentId": null,
+                            "jobType": "Command",
+                            "resources": {
+                                "instanceCount": 1,
+                                "instanceType": null,
+                                "properties": null,
+                                "shmSize": "2g",
+                                "dockerArgs": null
+                            },
+                            "codeId": null,
+                            "command": "sleep 600",
+                            "environmentId": "/subscriptions/ea42f556-5106-4743-99b0-c129bfa71a47/resourceGroups/test_machine-learning-job-cancel/providers/Microsoft.MachineLearningServices/workspaces/cctest-mlws-cancel/environments/cctest-cancel-env/versions/1",
+                            "inputs": {},
+                            "outputs": {
+                                "default": {
+                                    "description": null,
+                                    "uri": "azureml://datastores/workspaceartifactstore/ExperimentRun/dcid.cctest-running-job",
+                                    "mode": "ReadWriteMount",
+                                    "jobOutputType": "uri_folder"
+                                }
+                            },
+                            "distribution": null,
+                            "limits": null,
+                            "environmentVariables": null,
+                            "parameters": {}
+                        },
+                        "systemData": {
+                            "createdAt": "2026-08-25T13:23:30.5405095+00:00",
+                            "createdBy": "Jim Fulton",
+                            "createdByType": "User"
+                        }
+                    }
+                }
+            }
+        }
+    ]
+}
