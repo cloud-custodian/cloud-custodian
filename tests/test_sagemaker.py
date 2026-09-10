@@ -1636,19 +1636,23 @@ def capture_dimensions():
 # policies that depend on it.
 # Two policies, each run against both kinds of endpoint:
 #
-#   test                                 policy                       kind
-#   -----------------------------------  ---------------------------  ---------
-#   idle                                 Invocations Sum lte 0,       classic
-#                                        missing-value 0
-#   inference_component                  the same policy              component
-#   never_invoked                        the same policy, against an  component
-#                                        endpoint with no data at all
-#   utilization                          CPUUtilization Average       classic
-#                                        less-than 400
-#   inference_component_utilization      the same policy              component
+#   test                             policy                  endpoints
+#   -------------------------------  ----------------------  -------------------
+#   idle                             Invocations Sum lte 0   two classic
+#   inference_component              the same policy         component
+#   never_invoked                    the same policy         component, uncalled
+#   utilization                      CPUUtilization Average  classic
+#                                    less-than 400
+#   inference_component_utilization  the same policy         component
 #
-# The catalogue tests below cover which metrics can be asked for and
-# whether the dimension sets carry data. These cover what a policy
+# never_invoked is why the idle policy needs no missing-value: an endpoint
+# nothing has called reports a zero for each interval rather than nothing
+# at all, whichever way it hosts its models. What a missing value is for --
+# a metric with no values to compare -- is covered by the two unit tests
+# below it, which don't need an endpoint.
+#
+# The catalogue tests further down cover which metrics can be asked for and
+# whether their dimension sets carry data. These cover what a policy
 # decides once it has the data.
 #
 
