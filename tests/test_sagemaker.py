@@ -10,7 +10,8 @@ from .common import BaseTest
 
 from c7n.filters.metrics import MetricsFilter
 from c7n.resources.sagemaker import (
-    SagemakerEndpoint, SagemakerJobQueryParser, CompilationJobQueryParser)
+    SAGEMAKER_METRICS, SagemakerEndpoint, SagemakerJobQueryParser,
+    CompilationJobQueryParser)
 from c7n.exceptions import PolicyValidationError
 
 import botocore.exceptions as b_exc
@@ -1827,10 +1828,13 @@ def test_sagemaker_endpoint_metrics_dimensions_validated(test):
         test.load_policy(policy, validate=True)
     assert "can't use dimensions ['QueueName']" in str(caught.value)
 
-    # InstanceType is published, but only together with the variant, which
-    # the filter fills in itself -- so this one is accepted
+    # the documentation lists instance type, but the only sets carrying it
+    # also carry AvailabilityZone and Region, which no policy can supply,
+    # so it isn't in the catalogue and naming it is an error too
     policy['filters'][0]['dimensions'] = {'InstanceType': 'ml.m5.large'}
-    test.load_policy(policy, validate=True)
+    with pytest.raises(PolicyValidationError) as caught:
+        test.load_policy(policy, validate=True)
+    assert "can't use dimensions ['InstanceType']" in str(caught.value)
 
     # the namespace follows from the metric name, so naming it is an error
     del policy['filters'][0]['dimensions']
@@ -1863,10 +1867,9 @@ def test_sagemaker_metrics_percentile_statistics(test):
     from c7n.resources.sagemaker import SageMakerMetricsFilter
 
     class OneSubUnit(SageMakerMetricsFilter):
-        metric_resources = ('sagemaker-endpoint',)
 
-        def get_dimension_sets(self, resource):
-            return [[{'Name': 'D', 'Value': 'only'}]]
+        def get_dimensions_set(self, resource):
+            return [{'D': 'only'}]
 
     requested = []
 
@@ -1898,10 +1901,9 @@ def test_sagemaker_metrics_stop_fetching_once_a_value_fails(test):
     from c7n.resources.sagemaker import SageMakerMetricsFilter
 
     class ThreeSubUnits(SageMakerMetricsFilter):
-        metric_resources = ('sagemaker-endpoint',)
 
-        def get_dimension_sets(self, resource):
-            return [[{'Name': 'D', 'Value': str(i)}] for i in range(3)]
+        def get_dimensions_set(self, resource):
+            return [{'D': str(i)} for i in range(3)]
 
     requested = []
 
@@ -1934,8 +1936,52 @@ def test_sagemaker_endpoint_metrics_variant_without_components(test):
         {'type': 'metrics', 'name': 'Invocations', 'statistics': 'Sum',
          'value': 0, 'op': 'lte', 'dimensions': {'VariantName': 'quiet'}},
         policy.resource_manager)
-    f.components = {'e': [('component', 'busy')]}
+    f.endpoint_components = {'e': ['component']}
     resource = {'EndpointName': 'e',
                 'ProductionVariants': [{'VariantName': 'busy'},
                                        {'VariantName': 'quiet'}]}
-    assert f.get_dimension_sets(resource) == []
+    assert f.get_dimensions_set(resource) == []
+
+
+def sagemaker_endpoint_metric_entries():
+    """Every (kind, metric) the catalogue describes for endpoints.
+
+    Only the kinds an endpoint can be: metrics filed under no kind are
+    loaded into every kind, so they show up under each of these.
+    """
+    return [
+        pytest.param(kind, metric, published, id=f"{kind}-{metric}")
+        for kind, by_resource in SAGEMAKER_METRICS.items()
+        if kind is not None
+        for metric, published in by_resource['sagemaker-endpoint'].items()
+        ]
+
+
+@pytest.mark.parametrize('kind,metric,published',
+                         sagemaker_endpoint_metric_entries())
+def test_sagemaker_endpoint_metric_entry(test, kind, metric, published):
+    # every entry the catalogue describes has to resolve, for the kind of
+    # endpoint it's filed under, to that entry's namespace and to
+    # dimensions the filter can actually supply
+    policy = test.load_policy(
+        {'name': 'endpoints', 'resource': 'sagemaker-endpoint'})
+    klass = SagemakerEndpoint.filter_registry.get('metrics')
+    f = klass({'type': 'metrics', 'name': metric, 'value': 0},
+              policy.resource_manager)
+    f.validate()
+
+    endpoint = {'EndpointName': 'e',
+                'ProductionVariants': [{'VariantName': 'AllTraffic'}]}
+    f.endpoint_components = (
+        {'e': ['component']} if kind == 'inference-component' else {})
+    assert f.resource_kind(endpoint) == kind
+
+    assert f.get_resource_namespace(endpoint) == published['namespace']
+
+    dimensions_set = f.get_dimensions_set(endpoint)
+    assert dimensions_set, f"{metric} resolved to no dimensions"
+    assert {tuple(sorted(dimensions)) for dimensions in dimensions_set} == {
+        names for names in published['dimension_sets']}
+    assert all(isinstance(value, str)
+               for dimensions in dimensions_set
+               for value in dimensions.values())

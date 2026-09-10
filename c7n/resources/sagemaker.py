@@ -469,8 +469,9 @@ class SageMakerMetricsFilter(MetricsFilter):
     """
 
     @functools.cached_property
-    def resource_dimension_name(self):
-        return self.model.dimension
+    def resource_dimension_name(self) -> DimensionName:
+        # not self.model, which the base filter only sets once it runs
+        return self.manager.get_model().dimension
 
     def resource_kind(self, _) -> typing.Optional[Kind]:
         return None
@@ -566,10 +567,10 @@ class SageMakerMetricsFilter(MetricsFilter):
             self._can_use_dimension_names(dimension_names)
             for dimension_names in self.published_dimension_sets()
         ):
-            raise AssertionError(
-                f"Can't find metrics for given dimensions: "
-                f"{self.data.get('dimensions', ())}"
-            )
+            raise PolicyValidationError(
+                f"metrics filter on {self.manager.type} can't use dimensions"
+                f" {sorted(self.data.get('dimensions', ()))}"
+                f" for {self.data['name']}")
 
         # fail on an undocumented metric name while the policy is being
         # loaded, rather than on an empty report later
@@ -609,7 +610,7 @@ class SageMakerMetricsFilter(MetricsFilter):
         if dimension_names is None:
             return []
 
-        base_dimensions = self.data.get('dimensions', {})
+        base_dimensions = dict(self.data.get('dimensions', {}))
         resource_dimension_name = self.resource_dimension_name
         resource_dimension_value = resource[resource_dimension_name]
 
@@ -729,7 +730,7 @@ class SageMakerMetricsFilter(MetricsFilter):
 
         # the base filter reads the namespace from the policy, so name it
         # there rather than reimplementing the setup around it
-        self.data['namespace'] = "placeholder"
+        self.data = dict(self.data, namespace='unused')
         return super().process(resources, event)
 
 

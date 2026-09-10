@@ -59,6 +59,11 @@ For example, SageMaker endpoints define a dimension set consisting of
 Endpoint name and variant name.  You can look up an individual metric
 by supplying a specific endpoint name and a specific variant name.
 
+A metric's identity is the whole set, so only the sets CloudWatch
+publishes can be asked for.  The AWS documentation lists the dimensions a
+metric can be filtered by rather than the sets it is published under, and
+some of those combinations carry no data.
+
 Most resource-metrics have only one dimension set, but SageMaker
 resources typically have many.
 
@@ -84,15 +89,17 @@ There are two kinds of endpoints:
 - Inference-component endpoints that deploy models in inference
   components in variants
 
-Allowable dimensions are any combination of:
+Which dimensions you can supply depends on the kind:
 
-- VariantName
-- InstanceType
-- InferenceComponentName
+``VariantName``
+   For a classic endpoint.  A component endpoint reports its invocations
+   against components rather than variants, so naming a variant leaves it
+   with nothing to measure.
 
-Specifying InferenceComponentName deselects metrics for all classic
-endpoints.  This means that unless a ``missing-value`` is used, the
-filter won't select any classic endpoints.
+``InferenceComponentName``
+   For a component endpoint.  Naming one deselects every classic endpoint,
+   so unless a ``missing-value`` is supplied the filter selects none of
+   them.
 
 
 Endpoints that serve no traffic
@@ -119,8 +126,10 @@ whether or not anything calls it.
             op: lte
             missing-value: 0
 
-``missing-value: 0`` is what catches an endpoint that has never been called
-at all, for which CloudWatch has no invocation data.
+``missing-value: 0`` is what catches a component endpoint that has never
+been called, for which CloudWatch has no invocation data at all.  A classic
+endpoint publishes a zero for each interval instead, so its own values
+answer the question.
 
 Endpoints with under-used GPUs
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
