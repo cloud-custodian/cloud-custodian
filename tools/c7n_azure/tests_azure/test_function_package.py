@@ -5,7 +5,6 @@ import os
 import time
 import zipfile
 
-from azure.mgmt.web.models import User
 from c7n_azure.constants import ENV_CUSTODIAN_DISABLE_SSL_CERT_VERIFICATION, \
     FUNCTION_TIME_TRIGGER_MODE, FUNCTION_EVENT_TRIGGER_MODE
 from c7n_azure.function_package import FunctionPackage, AzurePythonPackageArchive
@@ -173,19 +172,65 @@ class FunctionPackageTest(BaseTest):
         post_mock.return_value = status_mock
         packer = FunctionPackage('test')
         packer.pkg = AzurePythonPackageArchive()
-        creds = User(publishing_user_name='user',
-                     publishing_password='password',
-                     scm_uri='https://uri')
 
-        packer.publish(creds)
+        packer.publish('https://testapp.scm.azurewebsites.net', 'test-bearer-token')
 
         post_mock.assert_called_once()
         status_mock.raise_for_status.assert_called_once()
 
         self.assertEqual(post_mock.call_args[0][0],
-                         'https://uri/api/zipdeploy?isAsync=true&synctriggers=true')
+                         'https://testapp.scm.azurewebsites.net'
+                         '/api/zipdeploy?isAsync=true&synctriggers=true')
         self.assertEqual(post_mock.call_args[1]['headers']['content-type'],
                          'application/octet-stream')
+        self.assertEqual(post_mock.call_args[1]['headers']['Authorization'],
+                         'Bearer test-bearer-token')
+
+    @patch('requests.get')
+    def test_status(self, get_mock):
+        get_mock.return_value = MagicMock(status_code=200)
+        packer = FunctionPackage('test')
+
+        result = packer.status('https://testapp.scm.azurewebsites.net', 'test-bearer-token')
+
+        self.assertTrue(result)
+        get_mock.assert_called_once()
+        self.assertEqual(get_mock.call_args[0][0],
+                         'https://testapp.scm.azurewebsites.net/api/deployments')
+        self.assertEqual(get_mock.call_args[1]['headers']['Authorization'],
+                         'Bearer test-bearer-token')
+
+    @patch('requests.get')
+    def test_status_unhealthy(self, get_mock):
+        get_mock.return_value = MagicMock(status_code=503)
+        packer = FunctionPackage('test')
+
+        result = packer.status('https://testapp.scm.azurewebsites.net', 'test-bearer-token')
+
+        self.assertFalse(result)
+
+    @patch('time.sleep')
+    @patch('requests.get')
+    def test_wait_for_status_success(self, get_mock, _sleep):
+        get_mock.return_value = MagicMock(status_code=200)
+        packer = FunctionPackage('test')
+
+        result = packer.wait_for_status('https://testapp.scm.azurewebsites.net', 'test-token')
+
+        self.assertTrue(result)
+        get_mock.assert_called_once()
+
+    @patch('time.sleep')
+    @patch('requests.get')
+    def test_wait_for_status_exhausted(self, get_mock, _sleep):
+        get_mock.return_value = MagicMock(status_code=503)
+        packer = FunctionPackage('test')
+
+        result = packer.wait_for_status(
+            'https://testapp.scm.azurewebsites.net', 'test-token', retries=3, delay=0)
+
+        self.assertFalse(result)
+        self.assertEqual(get_mock.call_count, 3)
 
     def test_env_var_disables_cert_validation(self):
         p = self.load_policy({
