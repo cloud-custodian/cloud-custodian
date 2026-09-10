@@ -1630,6 +1630,28 @@ def capture_dimensions():
     return dimensions, mock.patch.object(
         MetricsFilter, 'get_metric_data', record)
 
+################################################################################
+#
+# Tests that test that we actually fetch correct data by running
+# policies that depend on it.
+# Two policies, each run against both kinds of endpoint:
+#
+#   test                                 policy                       kind
+#   -----------------------------------  ---------------------------  ---------
+#   idle                                 Invocations Sum lte 0,       classic
+#                                        missing-value 0
+#   inference_component                  the same policy              component
+#   never_invoked                        the same policy, against an  component
+#                                        endpoint with no data at all
+#   utilization                          CPUUtilization Average       classic
+#                                        less-than 400
+#   inference_component_utilization      the same policy              component
+#
+# The catalogue tests below cover which metrics can be asked for and
+# whether the dimension sets carry data. These cover what a policy
+# decides once it has the data.
+#
+
 
 @pytest.mark.audited
 @terraform('sagemaker_endpoint_metrics', scope='module')
@@ -1777,6 +1799,47 @@ def test_sagemaker_endpoint_metrics_inference_component(
 
 @pytest.mark.audited
 @terraform('sagemaker_endpoint_metrics', scope='module')
+def test_sagemaker_endpoint_metrics_never_invoked(
+        test, sagemaker_endpoint_metrics):
+    # a component endpoint nobody has called still publishes a zero for
+    # each interval, the same as a classic one, so an idle policy finds it
+    # from its own values and doesn't need a missing value to do it.
+    endpoint = sagemaker_endpoint_metrics.outputs[
+        'idle_component_endpoint_name']['value']
+    factory = test.replay_flight_data(
+        'test_sagemaker_endpoint_metrics_never_invoked')
+
+    idle = {
+        'name': 'sagemaker-endpoints-idle',
+        'resource': 'sagemaker-endpoint',
+        'filters': [
+            {'EndpointName': endpoint},
+            {'type': 'metrics',
+             'name': 'Invocations',
+             'statistics': 'Sum',
+             'days': 1,
+             'period': 86400,
+             'value': 0,
+             'op': 'lte',
+             'missing-value': 0},
+            ],
+        }
+    p = test.load_policy(idle, session_factory=factory)
+    [resource] = p.run()
+    assert resource['EndpointName'] == endpoint
+    # a published zero, not an absence of data
+    [points] = resource['c7n.metrics'].values()
+    assert [point['Sum'] for point in points] == [0.0]
+
+    # so the missing value plays no part in selecting it
+    del idle['filters'][1]['missing-value']
+    p = test.load_policy(idle, session_factory=factory)
+    [resource] = p.run()
+    assert resource['EndpointName'] == endpoint
+
+
+@pytest.mark.audited
+@terraform('sagemaker_endpoint_metrics', scope='module')
 def test_sagemaker_endpoint_metrics_inference_component_utilization(
         test, sagemaker_endpoint_metrics):
     # utilization stays with the variant on a component-hosting endpoint,
@@ -1811,6 +1874,9 @@ def test_sagemaker_endpoint_metrics_inference_component_utilization(
     assert resource['EndpointName'] == endpoint
     assert [[d['Name'] for d in dims] for dims in dimensions] == [
         ['EndpointName', 'VariantName']]
+
+#
+################################################################################
 
 
 def test_sagemaker_endpoint_metrics_dimensions_validated(test):

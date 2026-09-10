@@ -1,9 +1,9 @@
 {
     "status_code": 200,
     "data": {
-        "EndpointName": "c7n-endpoint-metrics-pet-hagfish-ic",
-        "EndpointArn": "arn:aws:sagemaker:us-east-1:644160558196:endpoint/c7n-endpoint-metrics-pet-hagfish-ic",
-        "EndpointConfigName": "c7n-em-ic-d91900d33b489088cdf8bb9978",
+        "EndpointName": "c7n-endpoint-metrics-bold-fowl-ic",
+        "EndpointArn": "arn:aws:sagemaker:us-east-1:644160558196:endpoint/c7n-endpoint-metrics-bold-fowl-ic",
+        "EndpointConfigName": "c7n-em-ic-2fe668b931062054b3fed2e0fe",
         "ProductionVariants": [
             {
                 "VariantName": "AllTraffic",
@@ -20,20 +20,20 @@
             "year": 2026,
             "month": 9,
             "day": 10,
-            "hour": 12,
-            "minute": 16,
-            "second": 7,
-            "microsecond": 740000
+            "hour": 14,
+            "minute": 4,
+            "second": 27,
+            "microsecond": 158000
         },
         "LastModifiedTime": {
             "__class__": "datetime",
             "year": 2026,
             "month": 9,
             "day": 10,
-            "hour": 12,
-            "minute": 18,
-            "second": 16,
-            "microsecond": 445000
+            "hour": 14,
+            "minute": 6,
+            "second": 35,
+            "microsecond": 428000
         },
         "MetricsConfig": {
             "EnableDetailedObservability": true

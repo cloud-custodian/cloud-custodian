@@ -8,15 +8,15 @@
                     "year": 2026,
                     "month": 9,
                     "day": 10,
-                    "hour": 12,
-                    "minute": 18,
-                    "second": 28,
-                    "microsecond": 680000
+                    "hour": 14,
+                    "minute": 6,
+                    "second": 48,
+                    "microsecond": 12000
                 },
-                "InferenceComponentArn": "arn:aws:sagemaker:us-east-1:644160558196:inference-component/c7n-endpoint-metrics-pet-hagfish-ic",
-                "InferenceComponentName": "c7n-endpoint-metrics-pet-hagfish-ic",
-                "EndpointArn": "arn:aws:sagemaker:us-east-1:644160558196:endpoint/c7n-endpoint-metrics-pet-hagfish-ic",
-                "EndpointName": "c7n-endpoint-metrics-pet-hagfish-ic",
+                "InferenceComponentArn": "arn:aws:sagemaker:us-east-1:644160558196:inference-component/c7n-endpoint-metrics-bold-fowl-ic-idle",
+                "InferenceComponentName": "c7n-endpoint-metrics-bold-fowl-ic-idle",
+                "EndpointArn": "arn:aws:sagemaker:us-east-1:644160558196:endpoint/c7n-endpoint-metrics-bold-fowl-ic-idle",
+                "EndpointName": "c7n-endpoint-metrics-bold-fowl-ic-idle",
                 "VariantName": "AllTraffic",
                 "InferenceComponentStatus": "InService",
                 "LastModifiedTime": {
@@ -24,10 +24,38 @@
                     "year": 2026,
                     "month": 9,
                     "day": 10,
-                    "hour": 12,
-                    "minute": 20,
-                    "second": 7,
-                    "microsecond": 532000
+                    "hour": 14,
+                    "minute": 9,
+                    "second": 3,
+                    "microsecond": 549000
+                }
+            },
+            {
+                "CreationTime": {
+                    "__class__": "datetime",
+                    "year": 2026,
+                    "month": 9,
+                    "day": 10,
+                    "hour": 14,
+                    "minute": 6,
+                    "second": 47,
+                    "microsecond": 962000
+                },
+                "InferenceComponentArn": "arn:aws:sagemaker:us-east-1:644160558196:inference-component/c7n-endpoint-metrics-bold-fowl-ic",
+                "InferenceComponentName": "c7n-endpoint-metrics-bold-fowl-ic",
+                "EndpointArn": "arn:aws:sagemaker:us-east-1:644160558196:endpoint/c7n-endpoint-metrics-bold-fowl-ic",
+                "EndpointName": "c7n-endpoint-metrics-bold-fowl-ic",
+                "VariantName": "AllTraffic",
+                "InferenceComponentStatus": "InService",
+                "LastModifiedTime": {
+                    "__class__": "datetime",
+                    "year": 2026,
+                    "month": 9,
+                    "day": 10,
+                    "hour": 14,
+                    "minute": 8,
+                    "second": 26,
+                    "microsecond": 868000
                 }
             }
         ],

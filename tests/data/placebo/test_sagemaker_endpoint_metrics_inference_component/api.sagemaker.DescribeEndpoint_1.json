@@ -1,9 +1,9 @@
 {
     "status_code": 200,
     "data": {
-        "EndpointName": "c7n-endpoint-metrics-pet-hagfish-busy",
-        "EndpointArn": "arn:aws:sagemaker:us-east-1:644160558196:endpoint/c7n-endpoint-metrics-pet-hagfish-busy",
-        "EndpointConfigName": "c7n-em-busy-5b715f3f8901364313488bfd25",
+        "EndpointName": "c7n-endpoint-metrics-bold-fowl-busy",
+        "EndpointArn": "arn:aws:sagemaker:us-east-1:644160558196:endpoint/c7n-endpoint-metrics-bold-fowl-busy",
+        "EndpointConfigName": "c7n-em-busy-6ae3873dc78e414286bf55b763",
         "ProductionVariants": [
             {
                 "VariantName": "quiet",
@@ -16,10 +16,10 @@
                             "year": 2026,
                             "month": 9,
                             "day": 10,
-                            "hour": 12,
-                            "minute": 16,
-                            "second": 19,
-                            "microsecond": 378000
+                            "hour": 14,
+                            "minute": 4,
+                            "second": 37,
+                            "microsecond": 724000
                         }
                     }
                 ],
@@ -39,10 +39,10 @@
                             "year": 2026,
                             "month": 9,
                             "day": 10,
-                            "hour": 12,
-                            "minute": 16,
-                            "second": 19,
-                            "microsecond": 254000
+                            "hour": 14,
+                            "minute": 4,
+                            "second": 37,
+                            "microsecond": 779000
                         }
                     }
                 ],
@@ -62,10 +62,10 @@
                             "year": 2026,
                             "month": 9,
                             "day": 10,
-                            "hour": 12,
-                            "minute": 16,
-                            "second": 19,
-                            "microsecond": 317000
+                            "hour": 14,
+                            "minute": 4,
+                            "second": 37,
+                            "microsecond": 839000
                         }
                     }
                 ],
@@ -81,20 +81,20 @@
             "year": 2026,
             "month": 9,
             "day": 10,
-            "hour": 12,
-            "minute": 16,
-            "second": 17,
-            "microsecond": 10000
+            "hour": 14,
+            "minute": 4,
+            "second": 37,
+            "microsecond": 103000
         },
         "LastModifiedTime": {
             "__class__": "datetime",
             "year": 2026,
             "month": 9,
             "day": 10,
-            "hour": 12,
-            "minute": 19,
-            "second": 55,
-            "microsecond": 257000
+            "hour": 14,
+            "minute": 8,
+            "second": 13,
+            "microsecond": 993000
         },
         "MetricsConfig": {
             "EnableDetailedObservability": true

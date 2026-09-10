@@ -9,12 +9,12 @@
                     "year": 2026,
                     "month": 9,
                     "day": 10,
-                    "hour": 11,
-                    "minute": 36,
+                    "hour": 13,
+                    "minute": 25,
                     "second": 0,
                     "microsecond": 0
                 },
-                "Average": 0.020833333333333332,
+                "Average": 0.0196078431372549,
                 "Unit": "Count"
             }
         ],

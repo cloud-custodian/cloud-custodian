@@ -2,11 +2,19 @@
     "pytest-terraform": 1,
     "outputs": {
         "component_endpoint_name": {
-            "value": "c7n-endpoint-metrics-pet-hagfish-ic",
+            "value": "c7n-endpoint-metrics-bold-fowl-ic",
             "type": "string"
         },
         "component_name": {
-            "value": "c7n-endpoint-metrics-pet-hagfish-ic",
+            "value": "c7n-endpoint-metrics-bold-fowl-ic",
+            "type": "string"
+        },
+        "idle_component_endpoint_name": {
+            "value": "c7n-endpoint-metrics-bold-fowl-ic-idle",
+            "type": "string"
+        },
+        "idle_component_name": {
+            "value": "c7n-endpoint-metrics-bold-fowl-ic-idle",
             "type": "string"
         }
     },
@@ -62,8 +70,8 @@
                 "capabilities": null,
                 "disable_rollback": false,
                 "iam_role_arn": "",
-                "id": "arn:aws:cloudformation:us-east-1:644160558196:stack/c7n-endpoint-metrics-pet-hagfish-ic/0304bea0-ad44-11f1-b133-1291edc70b43",
-                "name": "c7n-endpoint-metrics-pet-hagfish-ic",
+                "id": "arn:aws:cloudformation:us-east-1:644160558196:stack/c7n-endpoint-metrics-bold-fowl-ic/25063290-ad53-11f1-bfe6-0edd12258b05",
+                "name": "c7n-endpoint-metrics-bold-fowl-ic",
                 "notification_arns": null,
                 "on_failure": null,
                 "outputs": {},
@@ -73,7 +81,27 @@
                 "region": "us-east-1",
                 "tags": null,
                 "tags_all": {},
-                "template_body": "{\"Resources\":{\"Component\":{\"Properties\":{\"EndpointName\":\"c7n-endpoint-metrics-pet-hagfish-ic\",\"InferenceComponentName\":\"c7n-endpoint-metrics-pet-hagfish-ic\",\"RuntimeConfig\":{\"CopyCount\":1},\"Specification\":{\"ComputeResourceRequirements\":{\"MinMemoryRequiredInMb\":1024,\"NumberOfAcceleratorDevicesRequired\":1,\"NumberOfCpuCoresRequired\":1},\"ModelName\":\"c7n-endpoint-metrics-pet-hagfish\"},\"VariantName\":\"AllTraffic\"},\"Type\":\"AWS::SageMaker::InferenceComponent\"}}}",
+                "template_body": "{\"Resources\":{\"Component\":{\"Properties\":{\"EndpointName\":\"c7n-endpoint-metrics-bold-fowl-ic\",\"InferenceComponentName\":\"c7n-endpoint-metrics-bold-fowl-ic\",\"RuntimeConfig\":{\"CopyCount\":1},\"Specification\":{\"ComputeResourceRequirements\":{\"MinMemoryRequiredInMb\":1024,\"NumberOfAcceleratorDevicesRequired\":1,\"NumberOfCpuCoresRequired\":1},\"ModelName\":\"c7n-endpoint-metrics-bold-fowl\"},\"VariantName\":\"AllTraffic\"},\"Type\":\"AWS::SageMaker::InferenceComponent\"}}}",
+                "template_url": null,
+                "timeout_in_minutes": 0,
+                "timeouts": null
+            },
+            "component_idle": {
+                "capabilities": null,
+                "disable_rollback": false,
+                "iam_role_arn": "",
+                "id": "arn:aws:cloudformation:us-east-1:644160558196:stack/c7n-endpoint-metrics-bold-fowl-ic-idle/24ebccc0-ad53-11f1-9198-12c0b6cd8fe5",
+                "name": "c7n-endpoint-metrics-bold-fowl-ic-idle",
+                "notification_arns": null,
+                "on_failure": null,
+                "outputs": {},
+                "parameters": {},
+                "policy_body": null,
+                "policy_url": null,
+                "region": "us-east-1",
+                "tags": null,
+                "tags_all": {},
+                "template_body": "{\"Resources\":{\"Component\":{\"Properties\":{\"EndpointName\":\"c7n-endpoint-metrics-bold-fowl-ic-idle\",\"InferenceComponentName\":\"c7n-endpoint-metrics-bold-fowl-ic-idle\",\"RuntimeConfig\":{\"CopyCount\":1},\"Specification\":{\"ComputeResourceRequirements\":{\"MinMemoryRequiredInMb\":1024,\"NumberOfCpuCoresRequired\":1},\"ModelName\":\"c7n-endpoint-metrics-bold-fowl\"},\"VariantName\":\"AllTraffic\"},\"Type\":\"AWS::SageMaker::InferenceComponent\"}}}",
                 "template_url": null,
                 "timeout_in_minutes": 0,
                 "timeouts": null
@@ -81,42 +109,42 @@
         },
         "aws_iam_role": {
             "execution": {
-                "arn": "arn:aws:iam::644160558196:role/c7n-endpoint-metrics-pet-hagfish",
+                "arn": "arn:aws:iam::644160558196:role/c7n-endpoint-metrics-bold-fowl",
                 "assume_role_policy": "{\"Statement\":[{\"Action\":\"sts:AssumeRole\",\"Effect\":\"Allow\",\"Principal\":{\"Service\":\"sagemaker.amazonaws.com\"}}],\"Version\":\"2012-10-17\"}",
-                "create_date": "2026-09-10T18:16:05Z",
+                "create_date": "2026-09-10T20:04:25Z",
                 "description": "",
                 "force_detach_policies": false,
-                "id": "c7n-endpoint-metrics-pet-hagfish",
+                "id": "c7n-endpoint-metrics-bold-fowl",
                 "inline_policy": [],
                 "managed_policy_arns": [],
                 "max_session_duration": 3600,
-                "name": "c7n-endpoint-metrics-pet-hagfish",
+                "name": "c7n-endpoint-metrics-bold-fowl",
                 "name_prefix": "",
                 "path": "/",
                 "permissions_boundary": "",
                 "tags": null,
                 "tags_all": {},
-                "unique_id": "AROAV7EQQKWX7YSIRKXXU"
+                "unique_id": "AROAV7EQQKWX5XB5BD7UU"
             }
         },
         "aws_iam_role_policy_attachment": {
             "execution": {
-                "id": "c7n-endpoint-metrics-pet-hagfish/arn:aws:iam::aws:policy/AmazonSageMakerFullAccess",
+                "id": "c7n-endpoint-metrics-bold-fowl/arn:aws:iam::aws:policy/AmazonSageMakerFullAccess",
                 "policy_arn": "arn:aws:iam::aws:policy/AmazonSageMakerFullAccess",
-                "role": "c7n-endpoint-metrics-pet-hagfish"
+                "role": "c7n-endpoint-metrics-bold-fowl"
             }
         },
         "aws_s3_bucket": {
             "model": {
                 "acceleration_status": "",
                 "acl": null,
-                "arn": "arn:aws:s3:::c7n-sagemaker-endpoint-metrics-pet-hagfish",
-                "bucket": "c7n-sagemaker-endpoint-metrics-pet-hagfish",
-                "bucket_domain_name": "c7n-sagemaker-endpoint-metrics-pet-hagfish.s3.amazonaws.com",
+                "arn": "arn:aws:s3:::c7n-sagemaker-endpoint-metrics-bold-fowl",
+                "bucket": "c7n-sagemaker-endpoint-metrics-bold-fowl",
+                "bucket_domain_name": "c7n-sagemaker-endpoint-metrics-bold-fowl.s3.amazonaws.com",
                 "bucket_namespace": "global",
                 "bucket_prefix": "",
                 "bucket_region": "us-east-1",
-                "bucket_regional_domain_name": "c7n-sagemaker-endpoint-metrics-pet-hagfish.s3.us-east-1.amazonaws.com",
+                "bucket_regional_domain_name": "c7n-sagemaker-endpoint-metrics-bold-fowl.s3.us-east-1.amazonaws.com",
                 "cors_rule": [],
                 "force_destroy": true,
                 "grant": [
@@ -130,7 +158,7 @@
                     }
                 ],
                 "hosted_zone_id": "Z3AQBSTGFYJSTF",
-                "id": "c7n-sagemaker-endpoint-metrics-pet-hagfish",
+                "id": "c7n-sagemaker-endpoint-metrics-bold-fowl",
                 "lifecycle_rule": [],
                 "logging": [],
                 "object_lock_configuration": [],
@@ -171,8 +199,8 @@
         "aws_s3_object": {
             "model": {
                 "acl": null,
-                "arn": "arn:aws:s3:::c7n-sagemaker-endpoint-metrics-pet-hagfish/model.tar.gz",
-                "bucket": "c7n-sagemaker-endpoint-metrics-pet-hagfish",
+                "arn": "arn:aws:s3:::c7n-sagemaker-endpoint-metrics-bold-fowl/model.tar.gz",
+                "bucket": "c7n-sagemaker-endpoint-metrics-bold-fowl",
                 "bucket_key_enabled": false,
                 "cache_control": "",
                 "checksum_algorithm": null,
@@ -189,7 +217,7 @@
                 "content_type": "application/octet-stream",
                 "etag": "dd8ee194115d990ad16e3ddaf17bf982",
                 "force_destroy": false,
-                "id": "c7n-sagemaker-endpoint-metrics-pet-hagfish/model.tar.gz",
+                "id": "c7n-sagemaker-endpoint-metrics-bold-fowl/model.tar.gz",
                 "key": "model.tar.gz",
                 "kms_key_id": null,
                 "metadata": null,
@@ -210,31 +238,41 @@
         },
         "aws_sagemaker_endpoint": {
             "busy": {
-                "arn": "arn:aws:sagemaker:us-east-1:644160558196:endpoint/c7n-endpoint-metrics-pet-hagfish-busy",
+                "arn": "arn:aws:sagemaker:us-east-1:644160558196:endpoint/c7n-endpoint-metrics-bold-fowl-busy",
                 "deployment_config": [],
-                "endpoint_config_name": "c7n-em-busy-5b715f3f8901364313488bfd25",
-                "id": "c7n-endpoint-metrics-pet-hagfish-busy",
-                "name": "c7n-endpoint-metrics-pet-hagfish-busy",
+                "endpoint_config_name": "c7n-em-busy-6ae3873dc78e414286bf55b763",
+                "id": "c7n-endpoint-metrics-bold-fowl-busy",
+                "name": "c7n-endpoint-metrics-bold-fowl-busy",
                 "region": "us-east-1",
                 "tags": null,
                 "tags_all": {}
             },
             "component": {
-                "arn": "arn:aws:sagemaker:us-east-1:644160558196:endpoint/c7n-endpoint-metrics-pet-hagfish-ic",
+                "arn": "arn:aws:sagemaker:us-east-1:644160558196:endpoint/c7n-endpoint-metrics-bold-fowl-ic",
                 "deployment_config": [],
-                "endpoint_config_name": "c7n-em-ic-d91900d33b489088cdf8bb9978",
-                "id": "c7n-endpoint-metrics-pet-hagfish-ic",
-                "name": "c7n-endpoint-metrics-pet-hagfish-ic",
+                "endpoint_config_name": "c7n-em-ic-2fe668b931062054b3fed2e0fe",
+                "id": "c7n-endpoint-metrics-bold-fowl-ic",
+                "name": "c7n-endpoint-metrics-bold-fowl-ic",
+                "region": "us-east-1",
+                "tags": null,
+                "tags_all": {}
+            },
+            "component_idle": {
+                "arn": "arn:aws:sagemaker:us-east-1:644160558196:endpoint/c7n-endpoint-metrics-bold-fowl-ic-idle",
+                "deployment_config": [],
+                "endpoint_config_name": "c7n-em-ic-idle-b15118c942ab694e098eeaf08c",
+                "id": "c7n-endpoint-metrics-bold-fowl-ic-idle",
+                "name": "c7n-endpoint-metrics-bold-fowl-ic-idle",
                 "region": "us-east-1",
                 "tags": null,
                 "tags_all": {}
             },
             "idle": {
-                "arn": "arn:aws:sagemaker:us-east-1:644160558196:endpoint/c7n-endpoint-metrics-pet-hagfish-idle",
+                "arn": "arn:aws:sagemaker:us-east-1:644160558196:endpoint/c7n-endpoint-metrics-bold-fowl-idle",
                 "deployment_config": [],
-                "endpoint_config_name": "c7n-em-idle-a2b7b463224738170164e0b4be",
-                "id": "c7n-endpoint-metrics-pet-hagfish-idle",
-                "name": "c7n-endpoint-metrics-pet-hagfish-idle",
+                "endpoint_config_name": "c7n-em-idle-900bb2c3ad790e42e00a88255f",
+                "id": "c7n-endpoint-metrics-bold-fowl-idle",
+                "name": "c7n-endpoint-metrics-bold-fowl-idle",
                 "region": "us-east-1",
                 "tags": null,
                 "tags_all": {}
@@ -242,13 +280,13 @@
         },
         "aws_sagemaker_endpoint_configuration": {
             "busy": {
-                "arn": "arn:aws:sagemaker:us-east-1:644160558196:endpoint-config/c7n-em-busy-5b715f3f8901364313488bfd25",
+                "arn": "arn:aws:sagemaker:us-east-1:644160558196:endpoint-config/c7n-em-busy-6ae3873dc78e414286bf55b763",
                 "async_inference_config": [],
                 "data_capture_config": [],
                 "execution_role_arn": "",
-                "id": "c7n-em-busy-5b715f3f8901364313488bfd25",
+                "id": "c7n-em-busy-6ae3873dc78e414286bf55b763",
                 "kms_key_arn": "",
-                "name": "c7n-em-busy-5b715f3f8901364313488bfd25",
+                "name": "c7n-em-busy-6ae3873dc78e414286bf55b763",
                 "name_prefix": "c7n-em-busy-",
                 "production_variants": [
                     {
@@ -263,7 +301,7 @@
                         "instance_type": "ml.c5.large",
                         "managed_instance_scaling": [],
                         "model_data_download_timeout_in_seconds": 0,
-                        "model_name": "c7n-endpoint-metrics-pet-hagfish",
+                        "model_name": "c7n-endpoint-metrics-bold-fowl",
                         "routing_config": [],
                         "serverless_config": [],
                         "variant_name": "quiet",
@@ -281,7 +319,7 @@
                         "instance_type": "ml.c5.large",
                         "managed_instance_scaling": [],
                         "model_data_download_timeout_in_seconds": 0,
-                        "model_name": "c7n-endpoint-metrics-pet-hagfish",
+                        "model_name": "c7n-endpoint-metrics-bold-fowl",
                         "routing_config": [],
                         "serverless_config": [],
                         "variant_name": "busy",
@@ -299,7 +337,7 @@
                         "instance_type": "ml.g4dn.xlarge",
                         "managed_instance_scaling": [],
                         "model_data_download_timeout_in_seconds": 0,
-                        "model_name": "c7n-endpoint-metrics-pet-hagfish",
+                        "model_name": "c7n-endpoint-metrics-bold-fowl",
                         "routing_config": [],
                         "serverless_config": [],
                         "variant_name": "gpu",
@@ -312,13 +350,13 @@
                 "tags_all": {}
             },
             "component": {
-                "arn": "arn:aws:sagemaker:us-east-1:644160558196:endpoint-config/c7n-em-ic-d91900d33b489088cdf8bb9978",
+                "arn": "arn:aws:sagemaker:us-east-1:644160558196:endpoint-config/c7n-em-ic-2fe668b931062054b3fed2e0fe",
                 "async_inference_config": [],
                 "data_capture_config": [],
-                "execution_role_arn": "arn:aws:iam::644160558196:role/c7n-endpoint-metrics-pet-hagfish",
-                "id": "c7n-em-ic-d91900d33b489088cdf8bb9978",
+                "execution_role_arn": "arn:aws:iam::644160558196:role/c7n-endpoint-metrics-bold-fowl",
+                "id": "c7n-em-ic-2fe668b931062054b3fed2e0fe",
                 "kms_key_arn": "",
-                "name": "c7n-em-ic-d91900d33b489088cdf8bb9978",
+                "name": "c7n-em-ic-2fe668b931062054b3fed2e0fe",
                 "name_prefix": "c7n-em-ic-",
                 "production_variants": [
                     {
@@ -349,14 +387,52 @@
                 "tags": null,
                 "tags_all": {}
             },
+            "component_idle": {
+                "arn": "arn:aws:sagemaker:us-east-1:644160558196:endpoint-config/c7n-em-ic-idle-b15118c942ab694e098eeaf08c",
+                "async_inference_config": [],
+                "data_capture_config": [],
+                "execution_role_arn": "arn:aws:iam::644160558196:role/c7n-endpoint-metrics-bold-fowl",
+                "id": "c7n-em-ic-idle-b15118c942ab694e098eeaf08c",
+                "kms_key_arn": "",
+                "name": "c7n-em-ic-idle-b15118c942ab694e098eeaf08c",
+                "name_prefix": "c7n-em-ic-idle-",
+                "production_variants": [
+                    {
+                        "accelerator_type": "",
+                        "capacity_reservation_config": [],
+                        "container_startup_health_check_timeout_in_seconds": 0,
+                        "core_dump_config": [],
+                        "enable_ssm_access": false,
+                        "inference_ami_version": "",
+                        "initial_instance_count": 1,
+                        "initial_variant_weight": 0,
+                        "instance_type": "ml.c5.large",
+                        "managed_instance_scaling": [],
+                        "model_data_download_timeout_in_seconds": 0,
+                        "model_name": "",
+                        "routing_config": [
+                            {
+                                "routing_strategy": "LEAST_OUTSTANDING_REQUESTS"
+                            }
+                        ],
+                        "serverless_config": [],
+                        "variant_name": "AllTraffic",
+                        "volume_size_in_gb": 0
+                    }
+                ],
+                "region": "us-east-1",
+                "shadow_production_variants": [],
+                "tags": null,
+                "tags_all": {}
+            },
             "idle": {
-                "arn": "arn:aws:sagemaker:us-east-1:644160558196:endpoint-config/c7n-em-idle-a2b7b463224738170164e0b4be",
+                "arn": "arn:aws:sagemaker:us-east-1:644160558196:endpoint-config/c7n-em-idle-900bb2c3ad790e42e00a88255f",
                 "async_inference_config": [],
                 "data_capture_config": [],
                 "execution_role_arn": "",
-                "id": "c7n-em-idle-a2b7b463224738170164e0b4be",
+                "id": "c7n-em-idle-900bb2c3ad790e42e00a88255f",
                 "kms_key_arn": "",
-                "name": "c7n-em-idle-a2b7b463224738170164e0b4be",
+                "name": "c7n-em-idle-900bb2c3ad790e42e00a88255f",
                 "name_prefix": "c7n-em-idle-",
                 "production_variants": [
                     {
@@ -371,7 +447,7 @@
                         "instance_type": "ml.c5.large",
                         "managed_instance_scaling": [],
                         "model_data_download_timeout_in_seconds": 0,
-                        "model_name": "c7n-endpoint-metrics-pet-hagfish",
+                        "model_name": "c7n-endpoint-metrics-bold-fowl",
                         "routing_config": [],
                         "serverless_config": [],
                         "variant_name": "AllTraffic",
@@ -386,13 +462,13 @@
         },
         "aws_sagemaker_model": {
             "main": {
-                "arn": "arn:aws:sagemaker:us-east-1:644160558196:model/c7n-endpoint-metrics-pet-hagfish",
+                "arn": "arn:aws:sagemaker:us-east-1:644160558196:model/c7n-endpoint-metrics-bold-fowl",
                 "container": [],
                 "enable_network_isolation": false,
-                "execution_role_arn": "arn:aws:iam::644160558196:role/c7n-endpoint-metrics-pet-hagfish",
-                "id": "c7n-endpoint-metrics-pet-hagfish",
+                "execution_role_arn": "arn:aws:iam::644160558196:role/c7n-endpoint-metrics-bold-fowl",
+                "id": "c7n-endpoint-metrics-bold-fowl",
                 "inference_execution_config": [],
-                "name": "c7n-endpoint-metrics-pet-hagfish",
+                "name": "c7n-endpoint-metrics-bold-fowl",
                 "primary_container": [
                     {
                         "additional_model_data_source": [],
@@ -409,12 +485,12 @@
                                         "compression_type": "Gzip",
                                         "model_access_config": [],
                                         "s3_data_type": "S3Object",
-                                        "s3_uri": "s3://c7n-sagemaker-endpoint-metrics-pet-hagfish/model.tar.gz"
+                                        "s3_uri": "s3://c7n-sagemaker-endpoint-metrics-bold-fowl/model.tar.gz"
                                     }
                                 ]
                             }
                         ],
-                        "model_data_url": "s3://c7n-sagemaker-endpoint-metrics-pet-hagfish/model.tar.gz",
+                        "model_data_url": "s3://c7n-sagemaker-endpoint-metrics-bold-fowl/model.tar.gz",
                         "model_package_name": "",
                         "multi_model_config": []
                     }
@@ -427,7 +503,7 @@
         },
         "random_pet": {
             "main": {
-                "id": "pet-hagfish",
+                "id": "bold-fowl",
                 "keepers": null,
                 "length": 2,
                 "prefix": null,

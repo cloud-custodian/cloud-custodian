@@ -205,6 +205,80 @@ resource "aws_cloudformation_stack" "component" {
   })
 }
 
+##
+## A component endpoint nothing ever calls. A classic endpoint publishes a
+## zero for every interval whether or not it is invoked, but this one
+## publishes no invocation data at all, so only a missing-value can decide
+## it. Its pool has no gpu, so its component reserves no accelerator.
+##
+
+resource "aws_sagemaker_endpoint_configuration" "component_idle" {
+  name_prefix        = "c7n-em-ic-idle-"
+  execution_role_arn = aws_iam_role.execution.arn
+
+  lifecycle {
+    create_before_destroy = true
+  }
+
+  production_variants {
+    variant_name           = "AllTraffic"
+    instance_type          = "ml.c5.large"
+    initial_instance_count = 1
+
+    routing_config {
+      routing_strategy = "LEAST_OUTSTANDING_REQUESTS"
+    }
+  }
+}
+
+resource "aws_sagemaker_endpoint" "component_idle" {
+  name                 = "${local.name}-ic-idle"
+  endpoint_config_name = aws_sagemaker_endpoint_configuration.component_idle.name
+
+  lifecycle {
+    replace_triggered_by = [aws_sagemaker_endpoint_configuration.component_idle]
+  }
+}
+
+resource "aws_cloudformation_stack" "component_idle" {
+  name = "${local.name}-ic-idle"
+
+  lifecycle {
+    replace_triggered_by = [aws_sagemaker_endpoint.component_idle]
+  }
+
+  template_body = jsonencode({
+    Resources = {
+      Component = {
+        Type = "AWS::SageMaker::InferenceComponent"
+        Properties = {
+          InferenceComponentName = "${local.name}-ic-idle"
+          EndpointName           = aws_sagemaker_endpoint.component_idle.name
+          VariantName            = "AllTraffic"
+          Specification = {
+            ModelName = aws_sagemaker_model.main.name
+            ComputeResourceRequirements = {
+              MinMemoryRequiredInMb    = 1024
+              NumberOfCpuCoresRequired = 1
+            }
+          }
+          RuntimeConfig = { CopyCount = 1 }
+        }
+      }
+    }
+  })
+}
+
+output "idle_component_endpoint_name" {
+  value = aws_sagemaker_endpoint.component_idle.name
+}
+
+# created by the stack, so depend on it rather than on the name alone
+output "idle_component_name" {
+  value      = "${local.name}-ic-idle"
+  depends_on = [aws_cloudformation_stack.component_idle]
+}
+
 output "component_endpoint_name" {
   value = aws_sagemaker_endpoint.component.name
 }

@@ -124,12 +124,15 @@ whether or not anything calls it.
             period: 86400
             value: 0
             op: lte
-            missing-value: 0
 
-``missing-value: 0`` is what catches a component endpoint that has never
-been called, for which CloudWatch has no invocation data at all.  A classic
-endpoint publishes a zero for each interval instead, so its own values
-answer the question.
+An endpoint reports a zero for an interval in which nothing called it,
+whichever way it hosts its models, so its own values answer the question
+and no ``missing-value`` is needed here.
+
+Supply one when a metric may have no values at all: for an endpoint
+created part way through the window, or for a metric its kind of endpoint
+doesn't publish.  Then ``missing-value: 0`` reads the absence as a zero,
+and leaving it out passes the endpoint over.
 
 Endpoints with under-used GPUs
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
