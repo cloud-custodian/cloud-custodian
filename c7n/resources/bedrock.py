@@ -8,6 +8,7 @@ from urllib.parse import urlsplit
 from c7n.manager import resources
 from c7n.exceptions import PolicyValidationError
 from c7n.query import QueryResourceManager, TypeInfo, DescribeSource, DescribeWithResourceTags
+from c7n.query import RetryPageIterator
 from c7n.tags import RemoveTag, Tag, TagActionFilter, TagDelayedAction, universal_augment
 from c7n.utils import local_session, type_schema, QueryParser
 from c7n.actions import BaseAction
