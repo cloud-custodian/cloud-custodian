@@ -1,0 +1,13 @@
+{
+    "status_code": 200,
+    "data": {
+        "FailedResourcesMap": {
+            "arn:aws:iot:us-east-1:644160558196:thing/MyLightBulb": {
+                "StatusCode": 400,
+                "ErrorCode": "InvalidRequestException",
+                "ErrorMessage": "Invalid resource type in ARN: thing"
+            }
+        },
+        "ResponseMetadata": {}
+    }
+}

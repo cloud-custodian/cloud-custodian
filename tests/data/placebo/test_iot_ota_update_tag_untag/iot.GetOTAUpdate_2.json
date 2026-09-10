@@ -1,0 +1,52 @@
+{
+    "status_code": 200,
+    "data": {
+        "ResponseMetadata": {},
+        "otaUpdateInfo": {
+            "otaUpdateId": "c7n-test-ota-unsigned",
+            "otaUpdateArn": "arn:aws:iot:us-east-1:644160558196:otaupdate/c7n-test-ota-unsigned",
+            "creationDate": {
+                "__class__": "datetime",
+                "year": 2026,
+                "month": 9,
+                "day": 10,
+                "hour": 10,
+                "minute": 2,
+                "second": 23,
+                "microsecond": 533000
+            },
+            "lastModifiedDate": {
+                "__class__": "datetime",
+                "year": 2026,
+                "month": 9,
+                "day": 10,
+                "hour": 10,
+                "minute": 2,
+                "second": 24,
+                "microsecond": 696000
+            },
+            "targets": [
+                "arn:aws:iot:us-east-1:644160558196:thing/MyLightBulb"
+            ],
+            "protocols": [
+                "MQTT"
+            ],
+            "awsJobExecutionsRolloutConfig": {},
+            "awsJobPresignedUrlConfig": {},
+            "targetSelection": "SNAPSHOT",
+            "otaUpdateFiles": [
+                {
+                    "fileName": "firmware.bin",
+                    "fileVersion": "1",
+                    "fileLocation": {
+                        "s3Location": {
+                            "bucket": "c7n-test-iot-ota-644160558196",
+                            "key": "firmware.bin"
+                        }
+                    }
+                }
+            ],
+            "otaUpdateStatus": "CREATE_COMPLETE"
+        }
+    }
+}

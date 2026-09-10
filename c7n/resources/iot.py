@@ -4,8 +4,68 @@ from c7n.actions import Action
 from c7n.filters import Filter
 from c7n.filters.policystatement import HasStatementFilter
 from c7n.manager import resources
-from c7n.query import QueryResourceManager, RetryPageIterator, TypeInfo
-from c7n.utils import local_session, type_schema
+from c7n.query import (
+    DescribeSource, QueryResourceManager, RetryPageIterator, TypeInfo)
+from c7n.tags import RemoveTag, Tag, TagActionFilter, TagDelayedAction
+from c7n.utils import get_retry, local_session, type_schema
+
+
+RETRY = get_retry((
+    'ThrottlingException',
+    'ServiceUnavailableException',
+    'InternalFailureException',
+))
+
+
+class TagIoTResource(Tag):
+
+    permissions = ('iot:TagResource',)
+
+    def process_resource_set(self, client, resources, new_tags):
+        arn_key = self.manager.resource_type.arn
+        for r in resources:
+            try:
+                self.manager.retry(
+                    client.tag_resource, resourceArn=r[arn_key], tags=new_tags)
+            except client.exceptions.ResourceNotFoundException:
+                continue
+
+
+class RemoveTagIoTResource(RemoveTag):
+
+    permissions = ('iot:UntagResource',)
+
+    def process_resource_set(self, client, resources, tag_keys):
+        arn_key = self.manager.resource_type.arn
+        for r in resources:
+            try:
+                self.manager.retry(
+                    client.untag_resource,
+                    resourceArn=r[arn_key], tagKeys=tag_keys)
+            except client.exceptions.ResourceNotFoundException:
+                continue
+
+
+def register_iot_tagging(klass):
+    klass.action_registry.register('tag', TagIoTResource)
+    klass.action_registry.register('remove-tag', RemoveTagIoTResource)
+    klass.action_registry.register('mark-for-op', TagDelayedAction)
+    klass.filter_registry.register('marked-for-op', TagActionFilter)
+    return klass
+
+
+class DescribeIoTResource(DescribeSource):
+
+    def augment(self, resources):
+        resources = super().augment(resources)
+        client = local_session(self.manager.session_factory).client('iot')
+        arn_key = self.manager.resource_type.arn
+        pager = client.get_paginator('list_tags_for_resource')
+        pager.PAGE_ITERATOR_CLS = RetryPageIterator
+        for r in resources:
+            r['Tags'] = pager.paginate(
+                resourceArn=r[arn_key]).build_full_result().get('tags', [])
+        return resources
 
 
 @resources.register('iot')
@@ -22,9 +82,11 @@ class IoT(QueryResourceManager):
             'thingTypeName'
         )
         cfn_type = 'AWS::IoT::Thing'
-        universal_taggable = object()
+
+    retry = staticmethod(RETRY)
 
 
+@register_iot_tagging
 @resources.register('iot-policy')
 class IoTPolicy(QueryResourceManager):
     """AWS IoT policy."""
@@ -37,9 +99,10 @@ class IoTPolicy(QueryResourceManager):
         name = 'policyName'
         arn = 'policyArn'
         cfn_type = 'AWS::IoT::Policy'
-        universal_taggable = object()
+        permissions_augment = ('iot:ListTagsForResource',)
 
-    permissions = ('iot:ListPolicies', 'iot:GetPolicy')
+    source_mapping = {'describe': DescribeIoTResource}
+    retry = staticmethod(RETRY)
 
 
 @IoTPolicy.filter_registry.register('attached')
@@ -123,12 +186,15 @@ class DeleteIoTPolicy(Action):
                 if not self._detach(client, r, force):
                     continue
                 self._delete_versions(client, r)
-                client.delete_policy(policyName=r['policyName'])
+                self.manager.retry(
+                    client.delete_policy, policyName=r['policyName'])
             except client.exceptions.ResourceNotFoundException:
                 continue
             except client.exceptions.DeleteConflictException as e:
                 self.log.warning(
-                    'policy:%s could not be deleted: %s', r['policyName'], e)
+                    'policy:%s could not be deleted, it may take up to five '
+                    'minutes after detachment before deletion succeeds: %s',
+                    r['policyName'], e)
 
     def _detach(self, client, r, force):
         targets = r.get(IoTPolicyAttached.annotation_key)
@@ -139,19 +205,23 @@ class DeleteIoTPolicy(Action):
                 policyName=r['policyName']).build_full_result().get('targets', [])
         if targets and not force:
             self.log.warning(
-                'policy:%s skipped, attached to %d target(s)',
+                'policy:%s detachment skipped, attached to %d target(s).  '
+                'Use "force" flag to detach.',
                 r['policyName'], len(targets))
             return False
         for t in targets:
-            client.detach_policy(policyName=r['policyName'], target=t)
+            self.manager.retry(
+                client.detach_policy, policyName=r['policyName'], target=t)
         return True
 
     def _delete_versions(self, client, r):
-        for v in client.list_policy_versions(
-                policyName=r['policyName']).get('policyVersions', []):
+        versions = self.manager.retry(
+            client.list_policy_versions, policyName=r['policyName'])
+        for v in versions.get('policyVersions', []):
             if v['isDefaultVersion']:
                 continue
-            client.delete_policy_version(
+            self.manager.retry(
+                client.delete_policy_version,
                 policyName=r['policyName'], policyVersionId=v['versionId'])
 
 
@@ -168,10 +238,10 @@ class IoTCertificate(QueryResourceManager):
         id = 'certificateId'
         name = 'certificateId'
         arn = 'certificateArn'
-        date = 'creationDate'
+        date = 'lastModifiedDate'
         cfn_type = 'AWS::IoT::Certificate'
 
-    permissions = ('iot:ListCertificates', 'iot:DescribeCertificate')
+    retry = staticmethod(RETRY)
 
 
 @IoTCertificate.action_registry.register('set-inactive')
@@ -204,13 +274,15 @@ class SetCertificateInactive(Action):
     def process(self, resources):
         client = local_session(self.manager.session_factory).client('iot')
         for r in resources:
-            client.update_certificate(
+            self.manager.retry(
+                client.update_certificate,
                 certificateId=r['certificateId'], newStatus='INACTIVE')
 
 
+@register_iot_tagging
 @resources.register('iot-ota-update')
 class IoTOTAUpdate(QueryResourceManager):
-    """AWS IoT Over-the-Air (OTA) firmware / component update."""
+    """AWS IoT Over-the-Air (OTA) update."""
 
     class resource_type(TypeInfo):
         service = 'iot'
@@ -220,11 +292,13 @@ class IoTOTAUpdate(QueryResourceManager):
         id = 'otaUpdateId'
         name = 'otaUpdateId'
         arn = 'otaUpdateArn'
-        date = 'creationDate'
+        date = 'lastModifiedDate'
         cfn_type = 'AWS::IoT::OTAUpdate'
-        universal_taggable = object()
+        permissions_enum = ('iot:ListOTAUpdates')
+        permissions_augment = ('iot:ListTagsForResource', 'iot:getOTAUpdate')
 
-    permissions = ('iot:ListOTAUpdates', 'iot:GetOTAUpdate')
+    source_mapping = {'describe': DescribeIoTResource}
+    retry = staticmethod(RETRY)
 
 
 @IoTOTAUpdate.filter_registry.register('unsigned')
@@ -249,11 +323,8 @@ class IoTOTAUpdateUnsigned(Filter):
         return [r for r in resources if self._has_unsigned_file(r)]
 
     def _has_unsigned_file(self, r):
-        files = r.get('otaUpdateFiles') or []
-        if not files:
-            return True
-        for f in files:
-            signing = f.get('codeSigning') or {}
+        for f in r.get('otaUpdateFiles', []):
+            signing = f.get('codeSigning', {})
             signed = (
                 signing.get('awsSignerJobId')
                 or signing.get('startSigningJobParameter')
