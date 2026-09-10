@@ -1691,8 +1691,7 @@ def test_sagemaker_endpoint_metrics_idle(test, sagemaker_endpoint_metrics):
                  'days': 1,
                  'period': 86400,
                  'value': 0,
-                 'op': 'lte',
-                 'missing-value': 0},
+                 'op': 'lte'},
             ],
         },
         session_factory=factory,
@@ -1784,8 +1783,7 @@ def test_sagemaker_endpoint_metrics_inference_component(
                  'days': 1,
                  'period': 86400,
                  'value': 0,
-                 'op': 'lte',
-                 'missing-value': 0},
+                 'op': 'lte'},
             ],
         },
         session_factory=factory,
@@ -1824,8 +1822,7 @@ def test_sagemaker_endpoint_metrics_never_invoked(
              'days': 1,
              'period': 86400,
              'value': 0,
-             'op': 'lte',
-             'missing-value': 0},
+             'op': 'lte'},
             ],
         }
     p = test.load_policy(idle, session_factory=factory)
@@ -1835,8 +1832,8 @@ def test_sagemaker_endpoint_metrics_never_invoked(
     [points] = resource['c7n.metrics'].values()
     assert [point['Sum'] for point in points] == [0.0]
 
-    # so the missing value plays no part in selecting it
-    del idle['filters'][1]['missing-value']
+    # so a missing value would make no difference to it
+    idle['filters'][1]['missing-value'] = 0
     p = test.load_policy(idle, session_factory=factory)
     [resource] = p.run()
     assert resource['EndpointName'] == endpoint
