@@ -263,12 +263,12 @@ class ModelDeploymentsFilter(Filter):
             params['statusEquals'] = self.data['status']
         want_present = self.data['value'] == 'present'
         results = []
+        paginator = client.get_paginator('list_custom_model_deployments')
+        paginator.PAGE_ITERATOR_CLS = RetryPageIterator
         for r in resources:
-            deployments = self.manager.retry(
-                client.get_paginator('list_custom_model_deployments').paginate(
-                    modelArnEquals=r['modelArn'], **params
-                ).build_full_result
-            )['modelDeploymentSummaries']
+            deployments = paginator.paginate(
+                modelArnEquals=r['modelArn'], **params
+            ).build_full_result().get('modelDeploymentSummaries', [])
             r[self.annotation_key] = deployments
             if bool(deployments) == want_present:
                 results.append(r)
