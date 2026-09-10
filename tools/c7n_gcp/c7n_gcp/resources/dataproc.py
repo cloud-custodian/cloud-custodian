@@ -39,13 +39,19 @@ class DataprocClusters(ChildResourceManager):
 
         @staticmethod
         def get(client, resource_info):
-            project_id, region, cluster_name = re.match(
-                'projects/(.*?)/regions/(.*?)/clusters/(.*)',
-                resource_info['resourceName']).groups()
-            return client.execute_query(
-                'get', {'projectId': project_id,
-                        'region': region,
-                        'clusterName': cluster_name})
+            resource_name = resource_info['resourceName']
+            if match := re.match(
+                    '(.*/)?projects/([^/]+)/regions/([^/]+)/clusters/([^/]+)$',
+                    resource_name):
+                project_id, region, cluster_name = match.groups()
+                return client.execute_query(
+                    'get', {'projectId': project_id,
+                            'region': region,
+                            'clusterName': cluster_name})
+
+            raise ValueError(
+                f"Couldn't parse project, region, and cluster "
+                f"from resource name, {resource_name}")
 
 
 @DataprocClusters.filter_registry.register('iam-policy')
