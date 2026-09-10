@@ -177,7 +177,19 @@ class MetricFilter(Filter):
                 'PT1M', 'PT5M', 'PT15M', 'PT30M', 'PT1H', 'PT6H', 'PT12H', 'P1D']},
             'aggregation': {'enum': ['total', 'average', 'count', 'minimum', 'maximum']},
             'no_data_action': {'enum': ['include', 'exclude', 'to_zero']},
-            'filter': {'type': 'string'}
+            'filter': {'type': 'string'},
+            'dimensions': {
+                'type': 'array',
+                'items': {
+                    'type': 'object',
+                    'additionalProperties': False,
+                    'required': ['name', 'value'],
+                    'properties': {
+                        'name': {'type': 'string'},
+                        'value': {'type': 'string'},
+                    },
+                },
+            },
         }
     }
     schema_alias = True
@@ -206,6 +218,8 @@ class MetricFilter(Filter):
         self.metricnamespace = self.data.get("metric_namespace", None)
         # default to false if not passed in
         self.period_start = self.data.get('period_start', 'auto')
+        # Optional per-dimension OData clauses for parent-scoped metrics
+        self.dimensions = self.data.get('dimensions', [])
 
     def process(self, resources, event=None):
         # Import utcnow function as it may have been overridden for testing purposes
@@ -262,11 +276,29 @@ class MetricFilter(Filter):
 
         return m
 
+    _DIMENSION_VALUE_SENTINELS = {
+        'resource-name': lambda r: r.get('name'),
+        'resource-id': lambda r: r.get('id'),
+    }
+
+    def resolve_dimension_value(self, resource, value):
+        resolver = self._DIMENSION_VALUE_SENTINELS.get(value)
+        return resolver(resource) if resolver else value
+
     def get_resource_id(self, resource):
+        if self.dimensions and 'c7n:parent-id' in resource:
+            return resource['c7n:parent-id']
         return resource['id']
 
     def get_filter(self, resource):
-        return self.filter
+        if not self.dimensions:
+            return self.filter
+        clauses = [
+            "%s eq '%s'" % (d['name'], self.resolve_dimension_value(resource, d['value']))
+            for d in self.dimensions
+        ]
+        dim_filter = " and ".join(clauses)
+        return "%s and %s" % (self.filter, dim_filter) if self.filter else dim_filter
 
     def _write_metric_to_resource(self, resource, metrics_data, m):
         resource_metrics = resource.setdefault(get_annotation_prefix('metrics'), {})
