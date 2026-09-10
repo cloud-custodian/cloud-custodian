@@ -1,0 +1,132 @@
+{
+    "status_code": 200,
+    "data": {
+        "InstanceImageMetadata": [
+            {
+                "InstanceId": "i-09347f9d6785dbe53",
+                "InstanceType": "t2.micro",
+                "LaunchTime": {
+                    "__class__": "datetime",
+                    "year": 2026,
+                    "month": 9,
+                    "day": 9,
+                    "hour": 14,
+                    "minute": 32,
+                    "second": 26,
+                    "microsecond": 0
+                },
+                "AvailabilityZone": "us-east-1f",
+                "ZoneId": "use1-az5",
+                "State": {
+                    "Code": 48,
+                    "Name": "terminated"
+                },
+                "OwnerId": "644160558196",
+                "ImageMetadata": {
+                    "ImageId": "ami-0757b090c88c85bab",
+                    "Name": "amzn2-ami-hvm-2.0.20260908.0-x86_64-gp2",
+                    "OwnerId": "644160558196",
+                    "State": "available",
+                    "ImageOwnerAlias": "amazon",
+                    "CreationDate": "2026-09-08T17:09:15Z",
+                    "DeprecationTime": "2026-12-07T17:11:00Z",
+                    "IsPublic": true
+                }
+            },
+            {
+                "InstanceId": "i-0fd2708167c1cdb5a",
+                "InstanceType": "t2.micro",
+                "LaunchTime": {
+                    "__class__": "datetime",
+                    "year": 2026,
+                    "month": 9,
+                    "day": 9,
+                    "hour": 14,
+                    "minute": 32,
+                    "second": 26,
+                    "microsecond": 0
+                },
+                "AvailabilityZone": "us-east-1f",
+                "ZoneId": "use1-az5",
+                "State": {
+                    "Code": 48,
+                    "Name": "terminated"
+                },
+                "OwnerId": "644160558196",
+                "ImageMetadata": {
+                    "ImageId": "ami-0757b090c88c85bab",
+                    "Name": "amzn2-ami-hvm-2.0.20260908.0-x86_64-gp2",
+                    "OwnerId": "644160558196",
+                    "State": "available",
+                    "ImageOwnerAlias": "amazon",
+                    "CreationDate": "2026-09-08T17:09:15Z",
+                    "DeprecationTime": "2026-12-07T17:11:00Z",
+                    "IsPublic": true
+                }
+            },
+            {
+                "InstanceId": "i-0e6f711d31e6675f4",
+                "InstanceType": "t2.micro",
+                "LaunchTime": {
+                    "__class__": "datetime",
+                    "year": 2026,
+                    "month": 9,
+                    "day": 9,
+                    "hour": 14,
+                    "minute": 39,
+                    "second": 53,
+                    "microsecond": 0
+                },
+                "AvailabilityZone": "us-east-1c",
+                "ZoneId": "use1-az2",
+                "State": {
+                    "Code": 16,
+                    "Name": "running"
+                },
+                "OwnerId": "644160558196",
+                "ImageMetadata": {
+                    "ImageId": "ami-0757b090c88c85bab",
+                    "Name": "amzn2-ami-hvm-2.0.20260908.0-x86_64-gp2",
+                    "OwnerId": "644160558196",
+                    "State": "available",
+                    "ImageOwnerAlias": "amazon",
+                    "CreationDate": "2026-09-08T17:09:15Z",
+                    "DeprecationTime": "2026-12-07T17:11:00Z",
+                    "IsPublic": true
+                }
+            },
+            {
+                "InstanceId": "i-042a559882c4907dc",
+                "InstanceType": "t2.micro",
+                "LaunchTime": {
+                    "__class__": "datetime",
+                    "year": 2026,
+                    "month": 9,
+                    "day": 9,
+                    "hour": 14,
+                    "minute": 39,
+                    "second": 53,
+                    "microsecond": 0
+                },
+                "AvailabilityZone": "us-east-1c",
+                "ZoneId": "use1-az2",
+                "State": {
+                    "Code": 16,
+                    "Name": "running"
+                },
+                "OwnerId": "644160558196",
+                "ImageMetadata": {
+                    "ImageId": "ami-0757b090c88c85bab",
+                    "Name": "amzn2-ami-hvm-2.0.20260908.0-x86_64-gp2",
+                    "OwnerId": "644160558196",
+                    "State": "available",
+                    "ImageOwnerAlias": "amazon",
+                    "CreationDate": "2026-09-08T17:09:15Z",
+                    "DeprecationTime": "2026-12-07T17:11:00Z",
+                    "IsPublic": true
+                }
+            }
+        ],
+        "ResponseMetadata": {}
+    }
+}
