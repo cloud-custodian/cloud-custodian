@@ -1640,12 +1640,12 @@ def capture_dimensions():
 #   -------------------------------  ----------------------  -------------------
 #   idle                             Invocations Sum lte 0   two classic
 #   inference_component              the same policy         component
-#   never_invoked                    the same policy         component, uncalled
+#   idle_component                   the same policy         component, uncalled
 #   utilization                      CPUUtilization Average  classic
 #                                    less-than 400
 #   inference_component_utilization  the same policy         component
 #
-# never_invoked is why the idle policy needs no missing-value: an endpoint
+# idle_component is why the idle policy needs no missing-value: an endpoint
 # nothing has called reports a zero for each interval rather than nothing
 # at all, whichever way it hosts its models. What a missing value is for --
 # a metric with no values to compare -- is covered by the two unit tests
@@ -1801,7 +1801,7 @@ def test_sagemaker_endpoint_metrics_inference_component(
 
 @pytest.mark.audited
 @terraform('sagemaker_endpoint_metrics', scope='module')
-def test_sagemaker_endpoint_metrics_never_invoked(
+def test_sagemaker_endpoint_metrics_idle_component(
         test, sagemaker_endpoint_metrics):
     # a component endpoint nobody has called still publishes a zero for
     # each interval, the same as a classic one, so an idle policy finds it
@@ -1809,7 +1809,7 @@ def test_sagemaker_endpoint_metrics_never_invoked(
     endpoint = sagemaker_endpoint_metrics.outputs[
         'idle_component_endpoint_name']['value']
     factory = test.replay_flight_data(
-        'test_sagemaker_endpoint_metrics_never_invoked')
+        'test_sagemaker_endpoint_metrics_idle_component')
 
     idle = {
         'name': 'sagemaker-endpoints-idle',
@@ -1930,85 +1930,57 @@ def test_sagemaker_endpoint_metrics_dimensions_validated(test):
         caught.value)
 
 
-def test_sagemaker_metrics_missing_value_decides_when_there_is_no_series(test):
-    # a metric only one kind of endpoint publishes leaves the other kind
-    # with nothing to query at all -- not an empty answer, no question. The
-    # missing value is the only thing that can decide such an endpoint, and
-    # without one it is passed over.
+def test_sagemaker_metrics_missing_value(test):
+    # A metric can have no values in two ways: the endpoint publishes no
+    # series for it at all, or a series that reported nothing over the
+    # window. Either way there is nothing to compare the condition
+    # against, so the missing value decides, and without one the endpoint
+    # is passed over rather than guessed about.
     from c7n.resources.sagemaker import SageMakerMetricsFilter
 
-    requested = []
+    requests = []
 
-    def get_metric_data(self, client, params):
-        requested.append(params)
+    def reports_nothing(self, client, params):
+        requests.append(params)
         return []
 
-    test.patch(SageMakerMetricsFilter, 'get_metric_data', get_metric_data)
+    test.patch(SageMakerMetricsFilter, 'get_metric_data', reports_nothing)
     policy = test.load_policy(
         {'name': 'endpoints', 'resource': 'sagemaker-endpoint'})
-    klass = SagemakerEndpoint.filter_registry.get('metrics')
+    metrics_filter = SagemakerEndpoint.filter_registry.get('metrics')
 
-    # a classic endpoint: the normalized metrics report utilization against
-    # a component's reservation, and it has no components
-    endpoint = {'EndpointName': 'e',
-                'ProductionVariants': [{'VariantName': 'AllTraffic'}]}
+    def selected(metric, **extra):
+        """Does an under-used-endpoint policy on `metric` select a classic one?"""
+        # a fresh endpoint each time: the annotation is also the cache, so
+        # one that has been through the filter isn't queried again
+        endpoint = {'EndpointName': 'e',
+                    'ProductionVariants': [{'VariantName': 'AllTraffic'}]}
+        f = metrics_filter(
+            dict(type='metrics', name=metric, value=20, op='less-than',
+                 **extra),
+            policy.resource_manager)
+        f.endpoint_components = {}
+        return f.process([endpoint]) == [endpoint]
 
-    reported = {'type': 'metrics', 'name': 'CPUUtilizationNormalized',
-                'value': 20, 'op': 'less-than', 'missing-value': 0}
-    f = klass(reported, policy.resource_manager)
-    f.endpoint_components = {}
-    assert f.process([endpoint]) == [endpoint]
-    assert requested == []
+    # CPUUtilization is published per variant, so it is asked about, and
+    # comes back empty
+    assert selected('CPUUtilization', **{'missing-value': 0})
+    assert requests, 'the series should have been queried'
+    assert not selected('CPUUtilization')
 
-    del reported['missing-value']
-    f = klass(reported, policy.resource_manager)
-    f.endpoint_components = {}
-    assert f.process([endpoint]) == []
-    assert requested == []
+    # the normalized metrics report utilization against a component's
+    # reservation, so a classic endpoint has no such series to ask about
+    del requests[:]
+    assert selected('CPUUtilizationNormalized', **{'missing-value': 0})
+    assert requests == [], 'there was nothing to ask about'
+    assert not selected('CPUUtilizationNormalized')
 
-
-def test_sagemaker_metrics_missing_value_decides_when_a_series_is_empty(test):
-    # a series that exists but reports nothing in the window is decided the
-    # same way, and one series with data is enough to settle the endpoint
-    # from its own values instead
-    from c7n.resources.sagemaker import SageMakerMetricsFilter
-
-    class OneSubUnit(SageMakerMetricsFilter):
-
-        def get_dimensions_set(self, resource):
-            return [{'D': 'only'}]
-
-    def no_data(self, client, params):
-        return []
-
-    test.patch(SageMakerMetricsFilter, 'get_metric_data', no_data)
-    policy = test.load_policy(
-        {'name': 'endpoints', 'resource': 'sagemaker-endpoint'})
-
-    # a resource per run: the annotation is also the cache, so a resource
-    # that has been through the filter once isn't queried again
-    def endpoint():
-        return {'EndpointName': 'e'}
-
-    reported = {'type': 'metrics', 'name': 'CPUUtilization', 'value': 20,
-                'op': 'less-than', 'missing-value': 0}
-    resource = endpoint()
-    assert OneSubUnit(reported, policy.resource_manager).process(
-        [resource]) == [resource]
-
-    del reported['missing-value']
-    assert OneSubUnit(reported, policy.resource_manager).process(
-        [endpoint()]) == []
-
-    # the missing value doesn't override a value that was reported
-    reported['missing-value'] = 0
-
-    def too_busy(self, client, params):
+    # and a value that was reported decides for itself
+    def reports_busy(self, client, params):
         return [{'Average': 90}]
 
-    test.patch(SageMakerMetricsFilter, 'get_metric_data', too_busy)
-    assert OneSubUnit(reported, policy.resource_manager).process(
-        [endpoint()]) == []
+    test.patch(SageMakerMetricsFilter, 'get_metric_data', reports_busy)
+    assert not selected('CPUUtilization', **{'missing-value': 0})
 
 
 def test_sagemaker_metrics_percentile_statistics(test):
