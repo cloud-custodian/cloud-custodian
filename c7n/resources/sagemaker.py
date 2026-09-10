@@ -43,7 +43,9 @@ class PublishedMetricInfo(typing.TypedDict):
 # don't. None for metrics every variety publishes.
 Kind = typing.Optional[str]
 
-SAGEMAKER_DIMENSION_SETS: dict[ResourceTypename, dict[MetricName, set[DimensionNames]]] = None
+SAGEMAKER_DIMENSION_SETS: dict[
+    ResourceTypename,
+    dict[MetricName, set[tuple[DimensionName, ...]]]] = None
 SAGEMAKER_METRICS: dict[Kind, dict[ResourceTypename, dict[MetricName, PublishedMetricInfo]]] = None
 
 
@@ -473,7 +475,7 @@ class SageMakerMetricsFilter(MetricsFilter):
         # not self.model, which the base filter only sets once it runs
         return self.manager.get_model().dimension
 
-    def resource_kind(self, _) -> typing.Optional[Kind]:
+    def resource_kind(self, _) -> Kind:
         return None
 
     def published_dimension_sets(self) -> set[DimensionNames]:

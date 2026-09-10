@@ -42,6 +42,11 @@ Don't do this for utilization metrics. No ``Invocations`` value means no
 request arrived, but no ``CPUUtilization`` value means nothing was measured,
 which is not the same as nothing being used.
 
+Whether a metric behaves this way is up to the service publishing it, and
+endpoints don't: an endpoint reports a zero for an interval nothing called
+it, so a policy looking for idle endpoints needs no missing value. See
+`Endpoints that serve no traffic`_ for when one is called for.
+
 Filtering which metric data for a resource is considered
 --------------------------------------------------------
 
