@@ -60,11 +60,10 @@ class DescribeIoTResource(DescribeSource):
         resources = super().augment(resources)
         client = local_session(self.manager.session_factory).client('iot')
         arn_key = self.manager.resource_type.arn
-        pager = client.get_paginator('list_tags_for_resource')
-        pager.PAGE_ITERATOR_CLS = RetryPageIterator
         for r in resources:
-            r['Tags'] = pager.paginate(
-                resourceArn=r[arn_key]).build_full_result().get('tags', [])
+            r['Tags'] = self.manager.retry(
+                client.list_tags_for_resource,
+                resourceArn=r[arn_key]).get('tags', [])
         return resources
 
 
