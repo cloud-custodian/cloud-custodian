@@ -1936,10 +1936,10 @@ def test_sagemaker_metrics_missing_value(test):
     # one the endpoint is passed over rather than guessed about.
     from c7n.resources.sagemaker import SageMakerMetricsFilter
 
-    def reports_nothing(self, client, params):
+    def no_data(self, client, params):
         return []
 
-    test.patch(SageMakerMetricsFilter, 'get_metric_data', reports_nothing)
+    test.patch(SageMakerMetricsFilter, 'get_metric_data', no_data)
     policy = test.load_policy(
         {'name': 'endpoints', 'resource': 'sagemaker-endpoint'})
     metrics_filter = SagemakerEndpoint.filter_registry.get('metrics')
@@ -1960,12 +1960,19 @@ def test_sagemaker_metrics_missing_value(test):
     assert selected(**{'missing-value': 0})
     assert not selected()
 
-    # invocations that were reported decide for themselves
     def reports_invocations(self, client, params):
         return [{'Sum': 5}]
 
     test.patch(SageMakerMetricsFilter, 'get_metric_data', reports_invocations)
+    assert not selected()
     assert not selected(**{'missing-value': 0})
+
+    def zero(self, client, params):
+        return [{'Sum': 0}]
+
+    test.patch(SageMakerMetricsFilter, 'get_metric_data', zero)
+    assert selected()
+    assert selected(**{'missing-value': 0})
 
 
 def test_sagemaker_metrics_percentile_statistics(test):
