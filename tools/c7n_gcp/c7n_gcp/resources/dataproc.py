@@ -41,7 +41,7 @@ class DataprocClusters(ChildResourceManager):
         def get(client, resource_info):
             resource_name = resource_info['resourceName']
             if match := re.match(
-                    '(.*/)?projects/([^/]+)/regions/([^/]+)/clusters/([^/]+)$',
+                    '(?:.*/)?projects/([^/]+)/regions/([^/]+)/clusters/([^/]+)$',
                     resource_name):
                 project_id, region, cluster_name = match.groups()
                 return client.execute_query(
