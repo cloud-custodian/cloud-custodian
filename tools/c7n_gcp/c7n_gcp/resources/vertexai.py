@@ -835,8 +835,39 @@ class VertexAIEvaluationRun(VertexAIQueryManager):
         default_report_fields = [
             'name', 'displayName', 'state', 'createTime', 'completionTime'
         ]
-        permissions = ('aiplatform.evaluationRuns.list',)
+        permissions = ('aiplatform.evaluationRuns.list', 'aiplatform.evaluationRuns.get')
         urn_component = 'evaluation-run'
+
+    def _needs_completion_time(self):
+        """Return True if any filter in the policy references completionTime."""
+        for f in self.data.get('filters', []):
+            if isinstance(f, dict):
+                if f.get('key') == 'completionTime':
+                    return True
+                for sub in f.values():
+                    if isinstance(sub, list):
+                        for item in sub:
+                            if isinstance(item, dict) and item.get('key') == 'completionTime':
+                                return True
+        return False
+
+    def _fetch_resources(self, query):
+        resources = super()._fetch_resources(query)
+        if self._needs_completion_time():
+            resources = self.augment(resources)
+        return resources
+
+    def augment(self, resources):
+        session = local_session(self.session_factory)
+        results = []
+        for r in resources:
+            name = r['name']
+            location = name.split('/')[3]
+            client = self.get_location_client(session, location, self.resource_type.component)
+            detail = client.execute_query('get', verb_arguments={'name': name})
+            r.update(detail)
+            results.append(r)
+        return results
 
 
 @resources.register('vertex-ai-batch-prediction-job')
