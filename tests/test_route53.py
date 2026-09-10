@@ -2,6 +2,7 @@
 # SPDX-License-Identifier: Apache-2.0
 import time
 import logging
+from unittest.mock import MagicMock
 
 import pytest
 from pytest_terraform import terraform
@@ -698,3 +699,37 @@ class ResolverRuleTest(BaseTest):
         resources = p.run()
         self.assertEqual(len(resources), 1)
         self.assertEqual(resources[0]["RuleType"], "FORWARD")
+
+    # https://github.com/cloud-custodian/cloud-custodian/issues/11027
+    # AWS's global auto-defined resolver rules (e.g.
+    # rslvr-autodefined-rr-internet-resolver) have no owning account and
+    # can't be tagged/modified by any customer - actions should skip them.
+
+    auto_defined_rule = {'Id': 'rslvr-autodefined-rr-internet-resolver'}
+    customer_rule = {'Id': 'rslvr-rr-real1'}
+
+    def _tag_policy(self, action):
+        mock_factory = MagicMock()
+        mock_factory.region = 'us-east-1'
+        tag_resources = mock_factory().client('resourcegroupstaggingapi').tag_resources
+        tag_resources.return_value = {}
+        policy = self.load_policy(
+            {'name': 'r', 'resource': 'resolver-rule', 'actions': [action]},
+            session_factory=mock_factory)
+        return policy, tag_resources
+
+    def test_tag_skips_auto_defined_rule(self):
+        policy, tag_resources = self._tag_policy(
+            {'type': 'tag', 'tags': {'Owner': 'platform'}})
+        policy.resource_manager.actions[0].process(
+            [self.auto_defined_rule, self.customer_rule])
+        tag_resources.assert_called_once()
+        arns = tag_resources.call_args.kwargs['ResourceARNList']
+        self.assertEqual(len(arns), 1)
+        self.assertIn('rslvr-rr-real1', arns[0])
+
+    def test_tag_all_auto_defined_noop(self):
+        policy, tag_resources = self._tag_policy(
+            {'type': 'tag', 'tags': {'Owner': 'platform'}})
+        policy.resource_manager.actions[0].process([self.auto_defined_rule])
+        tag_resources.assert_not_called()
