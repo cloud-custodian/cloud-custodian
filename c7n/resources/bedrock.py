@@ -254,7 +254,7 @@ class ModelDeploymentsFilter(Filter):
         value={'enum': ['present', 'absent']},
         required=['value'])
     permissions = ('bedrock:ListCustomModelDeployments',)
-    annotation_key = 'c7n:deployments'
+    annotation_key = 'c7n:Deployments'
 
     def process(self, resources, event=None):
         client = local_session(self.manager.session_factory).client('bedrock')
