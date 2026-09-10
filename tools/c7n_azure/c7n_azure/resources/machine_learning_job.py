@@ -57,6 +57,29 @@ class MachineLearningJob(ChildArmResourceManager):
             }
 
 
+@MachineLearningJob.action_registry.register('archive')
+class MachineLearningJobArchiveAction(AzureBaseAction):
+    """Archive Azure Machine Learning jobs."""
+
+    schema = type_schema('archive')
+
+    def _prepare_processing(self):
+        self.client = self.manager.get_client()
+
+    def _process_resource(self, resource):
+        if resource['properties'].get('isArchived'):
+            return 'already archived'
+
+        resource['properties']['isArchived'] = True
+        self.client.jobs.create_or_update(
+            resource_group_name=ResourceIdParser.get_resource_group(resource['id']),
+            workspace_name=ResourceIdParser.get_resource_name(resource['c7n:parent-id']),
+            id=resource['name'],
+            body=resource,
+        )
+        return 'archived'
+
+
 @MachineLearningJob.action_registry.register('cancel')
 class MachineLearningJobCancelAction(AzureBaseAction):
     """Cancel Azure Machine Learning jobs.

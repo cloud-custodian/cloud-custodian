@@ -1,0 +1,32 @@
+{
+  "headers": {
+    "content-type": "application/json; charset=UTF-8",
+    "vary": "Origin, X-Origin, Referer",
+    "date": "Wed, 12 Aug 2026 20:03:35 GMT",
+    "server": "ESF",
+    "x-xss-protection": "0",
+    "x-frame-options": "SAMEORIGIN",
+    "x-content-type-options": "nosniff",
+    "alt-svc": "h3=\":443\"; ma=2592000,h3-29=\":443\"; ma=2592000",
+    "transfer-encoding": "chunked",
+    "status": "200",
+    "content-length": "817",
+    "-content-encoding": "gzip"
+  },
+  "body": {
+    "kind": "compute#operation",
+    "id": "1422926374755200888",
+    "name": "operation-1786565015150-658df15189ef9-1d4b7499-b1d347f3",
+    "operationType": "setLabels",
+    "targetLink": "https://www.googleapis.com/compute/v1/projects/cloud-custodian/regions/us-central1/disks/c7n-regional-jenkins",
+    "targetId": "6800825139925708326",
+    "status": "DONE",
+    "user": "jim.fulton@sixfeetup.com",
+    "progress": 100,
+    "insertTime": "2026-08-12T13:03:35.257-07:00",
+    "startTime": "2026-08-12T13:03:35.264-07:00",
+    "endTime": "2026-08-12T13:03:35.266-07:00",
+    "selfLink": "https://www.googleapis.com/compute/v1/projects/cloud-custodian/regions/us-central1/operations/operation-1786565015150-658df15189ef9-1d4b7499-b1d347f3",
+    "region": "https://www.googleapis.com/compute/v1/projects/cloud-custodian/regions/us-central1"
+  }
+}
