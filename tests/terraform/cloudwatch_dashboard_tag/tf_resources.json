@@ -1,0 +1,27 @@
+{
+    "pytest-terraform": 1,
+    "outputs": {},
+    "resources": {
+        "aws_cloudwatch_dashboard": {
+            "test": {
+                "dashboard_arn": "arn:aws:cloudwatch::644160558196:dashboard/c7n-test-e3dd19005e27e4f1",
+                "dashboard_body": "{\"widgets\":[{\"height\":6,\"properties\":{\"markdown\":\"cloud custodian test dashboard\"},\"type\":\"text\",\"width\":6,\"x\":0,\"y\":0}]}",
+                "dashboard_name": "c7n-test-e3dd19005e27e4f1",
+                "id": "c7n-test-e3dd19005e27e4f1",
+                "region": "us-east-2"
+            }
+        },
+        "random_id": {
+            "id": {
+                "b64_std": "490ZAF4n5PE=",
+                "b64_url": "490ZAF4n5PE",
+                "byte_length": 8,
+                "dec": "16419307305833063665",
+                "hex": "e3dd19005e27e4f1",
+                "id": "490ZAF4n5PE",
+                "keepers": null,
+                "prefix": null
+            }
+        }
+    }
+}
