@@ -6,6 +6,8 @@ from googleapiclient.errors import HttpError
 from c7n.actions import Action as BaseAction
 from c7n.utils import local_session, chunks
 
+from c7n_gcp.query import TypeInfo
+
 
 class Action(BaseAction):
     pass
@@ -112,7 +114,21 @@ class MethodAction(Action):
     def get_operation_name(self, model, resource):
         return self.method_spec['op']
 
-    def get_resource_params(self, model, resource):
+    def get_resource_params(self, model: TypeInfo, resource: dict) -> dict:
+        """Build the API call parameters for a single method call.
+
+        Subclasses must implement this. The return value is passed
+        straight through to ``invoke_api`` and then
+        ``client.execute_command(op_name, params)``, so its required
+        keys are whatever the GCP API method named by
+        ``method_spec['op']`` expects (e.g. ``name``, ``body``, and
+        ``updateMask`` for a ``patch`` call) -- there is no schema
+        enforcing this shape.
+
+        :param model: the resource's ``resource_type`` (a ``TypeInfo``
+            subclass), as returned by ``self.manager.get_model()``.
+        :param resource: the resource dict being acted on.
+        """
         raise NotImplementedError("subclass responsibility")
 
     def get_client(self, session, model):

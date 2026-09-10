@@ -14,6 +14,12 @@ import hcl2
 TF_JSON_SUFFIX = ".tf.json"
 TF_HCL_SUFFIX = ".tf"
 
+# python-hcl2 8.x changed its defaults (quoted labels/string values, injected
+# `__is_block__` markers). These options restore the pre-8.x output shape that
+# the rest of this module (and c7n_terraform's callers) expect.
+HCL2_SERIALIZATION_OPTIONS = hcl2.SerializationOptions(
+    strip_string_quotes=True, explicit_blocks=False, preserve_heredocs=False)
+
 
 class Block(dict):
 
@@ -408,7 +414,8 @@ class Parser:
 
     def _parse_hcl_file(self, tf_file):
         with open(tf_file) as fp:
-            return self._parse_tf_data(hcl2.load(fp))
+            return self._parse_tf_data(
+                hcl2.load(fp, serialization_options=HCL2_SERIALIZATION_OPTIONS))
 
     def _parse_json_file(self, tf_file):
         with open(tf_file) as fp:
