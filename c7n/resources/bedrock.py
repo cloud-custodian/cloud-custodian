@@ -1012,15 +1012,34 @@ def parse_bedrock_output_s3_uri(s3_uri):
     return parsed.netloc, parsed.path.lstrip('/'), None
 
 
+def _bedrock_job_id_from_arn(job_arn):
+    return job_arn.rsplit('/', 1)[-1] if '/' in job_arn else None
+
+
 def get_bedrock_output_artifact_prefix(output_prefix, resource):
     """Return the common prefix under which Bedrock writes a job's artifacts."""
     job_name = resource.get('jobName')
-    job_arn = resource.get('jobArn', '')
-    job_id = job_arn.rsplit('/', 1)[-1] if '/' in job_arn else None
+    job_id = _bedrock_job_id_from_arn(resource.get('jobArn', ''))
     if not job_name or not job_id:
         return output_prefix
     parent = output_prefix.rstrip('/')
     return '/'.join(filter(None, (parent, job_name, job_id))) + '/'
+
+
+def assemble_bedrock_output_buckets(manager, bucket_names, augment_fields):
+    """Resolve and augment a Bedrock evaluation job's output buckets."""
+    if not bucket_names:
+        return {}
+    assembler = BedrockOutputBucketAssembly(manager)
+    assembler.initialize()
+    assembler.augment_fields = augment_fields
+    buckets = {}
+    for name in bucket_names:
+        bucket = assembler.assemble({'Name': name})
+        if name in assembler.not_found_buckets:
+            bucket['c7n:BedrockOutputBucketError'] = 'bucket-not-found'
+        buckets[name] = bucket
+    return buckets
 
 
 def _lifecycle_rule_prefix(rule):
@@ -1174,19 +1193,9 @@ class BedrockEvaluationOutputRetention(ValueFilter):
         return tuple(row[4] for row in S3_AUGMENT_TABLE if row[1] in fields)
 
     def _augment_buckets(self, bucket_names):
-        if not bucket_names:
-            return {}
-        assembler = BedrockOutputBucketAssembly(self.manager)
-        assembler.initialize()
-        assembler.augment_fields = set(BEDROCK_OUTPUT_BUCKET_MANDATORY_KEYS)
-        assembler.augment_fields.update(('Lifecycle', 'Versioning'))
-        buckets = {}
-        for name in bucket_names:
-            bucket = assembler.assemble({'Name': name})
-            if name in assembler.not_found_buckets:
-                bucket['c7n:BedrockOutputBucketError'] = 'bucket-not-found'
-            buckets[name] = bucket
-        return buckets
+        fields = set(BEDROCK_OUTPUT_BUCKET_MANDATORY_KEYS)
+        fields.update(('Lifecycle', 'Versioning'))
+        return assemble_bedrock_output_buckets(self.manager, bucket_names, fields)
 
     def _get_context(
             self, s3_uri, bucket, bucket_name, prefix, artifact_prefix, error):
@@ -1245,14 +1254,6 @@ class BedrockEvaluationOutputRetention(ValueFilter):
         return results
 
 
-def get_bedrock_job_id(resource):
-    """Return the identifier segment of a job's ARN, used as its output prefix."""
-    job_arn = resource.get('jobArn', '')
-    if '/' in job_arn:
-        return job_arn.rsplit('/', 1)[-1]
-    return resource.get('jobName', '')
-
-
 @BedrockEvaluationJob.action_registry.register('set-output-lifecycle')
 class SetBedrockEvaluationOutputLifecycle(BaseAction):
     """Ensure a Bedrock evaluation job's S3 output artifacts expire.
@@ -1293,18 +1294,8 @@ class SetBedrockEvaluationOutputLifecycle(BaseAction):
         return tuple(perms)
 
     def _get_buckets(self, bucket_names):
-        if not bucket_names:
-            return {}
-        assembler = BedrockOutputBucketAssembly(self.manager)
-        assembler.initialize()
-        assembler.augment_fields = {'Location', 'Lifecycle', 'Versioning'}
-        buckets = {}
-        for name in bucket_names:
-            bucket = assembler.assemble({'Name': name})
-            if name in assembler.not_found_buckets:
-                bucket['c7n:BedrockOutputBucketError'] = 'bucket-not-found'
-            buckets[name] = bucket
-        return buckets
+        return assemble_bedrock_output_buckets(
+            self.manager, bucket_names, {'Location', 'Lifecycle', 'Versioning'})
 
     def process(self, resources):
         by_bucket = {}
@@ -1346,13 +1337,17 @@ class SetBedrockEvaluationOutputLifecycle(BaseAction):
             if effective is not None and effective >= days:
                 continue
 
-            rule_id = 'c7n-bedrock-output-retention-%s' % get_bedrock_job_id(resource)
+            job_id = _bedrock_job_id_from_arn(resource.get('jobArn', '')) or resource.get(
+                'jobName', '')
+            rule_id = 'c7n-bedrock-output-retention-%s' % job_id
             new_rule = {
                 'ID': rule_id,
                 'Status': 'Enabled',
                 'Filter': {'Prefix': artifact_prefix},
                 'Expiration': {'Days': days},
             }
+            if _bucket_is_versioned(versioning):
+                new_rule['NoncurrentVersionExpiration'] = {'NoncurrentDays': days}
             for index, existing in enumerate(rules):
                 if existing.get('ID') == rule_id:
                     if existing != new_rule:
