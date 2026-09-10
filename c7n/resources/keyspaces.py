@@ -68,13 +68,13 @@ Keyspace.filter_registry.register('marked-for-op', TagActionFilter)
 class TagKeyspace(Tag):
     permissions = ('cassandra:TagResource', 'cassandra:TagMultiRegionResource')
 
-    def process(self, resources):
-        client = self.get_client()
-        for r in resources:
-            client.tag_resource(
+    def process_resource_set(self, client, resource_set, tags):
+        cassandra_tags = [{'key': t['Key'], 'value': t['Value']} for t in tags]
+        for r in resource_set:
+            self.manager.retry(
+                client.tag_resource,
                 resourceArn=r['resourceArn'],
-                tags=[{'key': k, 'value': v} for k, v in self.data.get('tags', {}).items()]
-                )
+                tags=cassandra_tags)
 
 
 @Keyspace.action_registry.register('mark-for-op')
@@ -201,13 +201,13 @@ class Table(ChildResourceManager):
 class TagTable(Tag):
     permissions = ('cassandra:TagResource', 'cassandra:TagMultiRegionResource')
 
-    def process(self, resources):
-        client = self.get_client()
-        for r in resources:
-            client.tag_resource(
+    def process_resource_set(self, client, resource_set, tags):
+        cassandra_tags = [{'key': t['Key'], 'value': t['Value']} for t in tags]
+        for r in resource_set:
+            self.manager.retry(
+                client.tag_resource,
                 resourceArn=r['resourceArn'],
-                tags=[{'key': k, 'value': v} for k, v in self.data.get('tags', {}).items()]
-                )
+                tags=cassandra_tags)
 
 
 @Table.action_registry.register('mark-for-op')

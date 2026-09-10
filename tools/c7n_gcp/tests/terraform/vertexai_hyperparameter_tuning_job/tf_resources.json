@@ -1,0 +1,23 @@
+{
+    "pytest-terraform": 1,
+    "outputs": {
+        "job_display_name": {
+            "value": "c7n-test-hp-job-default-ee2e",
+            "type": "string"
+        }
+    },
+    "resources": {
+        "random_id": {
+            "suffix": {
+                "b64_std": "7i4=",
+                "b64_url": "7i4",
+                "byte_length": 2,
+                "dec": "60974",
+                "hex": "ee2e",
+                "id": "7i4",
+                "keepers": null,
+                "prefix": null
+            }
+        }
+    }
+}

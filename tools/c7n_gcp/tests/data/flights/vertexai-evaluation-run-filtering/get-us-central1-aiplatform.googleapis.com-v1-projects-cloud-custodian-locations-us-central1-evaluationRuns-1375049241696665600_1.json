@@ -1,0 +1,48 @@
+{
+  "headers": {
+    "content-type": "application/json; charset=UTF-8",
+    "vary": "Origin, X-Origin, Referer",
+    "date": "Fri, 14 Aug 2026 17:31:04 GMT",
+    "server": "ESF",
+    "x-xss-protection": "0",
+    "x-frame-options": "SAMEORIGIN",
+    "x-content-type-options": "nosniff",
+    "alt-svc": "h3=\":443\"; ma=2592000,h3-29=\":443\"; ma=2592000",
+    "transfer-encoding": "chunked",
+    "status": "200",
+    "content-length": "1004",
+    "-content-encoding": "gzip",
+    "content-location": "https://us-central1-aiplatform.googleapis.com/v1/projects/cloud-custodian/locations/us-central1/evaluationRuns/1375049241696665600?alt=json"
+  },
+  "body": {
+    "name": "projects/cloud-custodian/locations/us-central1/evaluationRuns/1375049241696665600",
+    "displayName": "c7n-test-eval-run-failed",
+    "metadata": {
+      "pipeline_id": "1606706559881052160"
+    },
+    "dataSource": {
+      "evaluationSet": "projects/cloud-custodian/locations/us-central1/evaluationSets/2203089249551515648"
+    },
+    "evaluationConfig": {
+      "metrics": [
+        {
+          "metric": "exact_match",
+          "computationBasedMetricSpec": {
+            "type": "EXACT_MATCH"
+          }
+        }
+      ]
+    },
+    "state": "FAILED",
+    "error": {
+      "code": 9,
+      "message": "No metric scores to aggregate. Please check the result evaluation items for errors."
+    },
+    "evaluationResults": {
+      "evaluationSet": "projects/cloud-custodian/locations/us-central1/evaluationSets/1733588988398141440"
+    },
+    "createTime": "2026-08-14T17:30:59.615666Z",
+    "completionTime": "2026-08-14T17:31:00.781015Z",
+    "evaluationSetSnapshot": "projects/cloud-custodian/locations/us-central1/evaluationSets/1733588988398141440"
+  }
+}

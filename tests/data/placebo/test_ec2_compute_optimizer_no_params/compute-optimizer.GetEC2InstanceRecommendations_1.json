@@ -1,0 +1,15 @@
+{
+    "status_code": 200,
+    "data": {
+        "instanceRecommendations": [
+            {
+                "instanceArn": "arn:aws:ec2:us-east-1:644160558196:instance/i-039b21b80b9602a24"
+            },
+            {
+                "instanceArn": "arn:aws:ec2:us-east-1:644160558196:instance/i-039b21b80b9602a24"
+            }
+        ],
+        "errors": [],
+        "ResponseMetadata": {}
+    }
+}

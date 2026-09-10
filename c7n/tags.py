@@ -23,9 +23,121 @@ from c7n.exceptions import PolicyValidationError, PolicyExecutionError
 from c7n.resources import load_resources
 from c7n.filters import Filter, OPERATORS
 from c7n.filters.offhours import Time
+from c7n.lookup import Lookup
 from c7n import deprecated, utils
 
 DEFAULT_TAG = "maid_status"
+
+
+# Sentinel: the resolver returns this to omit a tag from a resource's payload.
+TAG_VALUE_SKIP = Lookup.SKIP
+
+
+def tag_value_schema():
+    """Schema for a single tag value.
+
+    Accepts a scalar, a resource lookup by key (with optional fallback), or a
+    conditional default with no key (write only when the tag is absent).
+
+    Tag values are strings, but unquoted YAML scalars have always been
+    accepted here and coerced on the way out, so the scalar form stays wide.
+    A fallback has no such history and is held to a string.
+    """
+    return Lookup.lookup_type(
+        {'type': ['string', 'number', 'boolean']},
+        default_schema={'type': 'string'})
+
+
+def has_dynamic_tag_values(spec_map):
+    return Lookup.has_lookups(spec_map)
+
+
+def resource_tag_keys(resource):
+    current = resource.get('Tags', [])
+    if isinstance(current, dict):
+        return set(current.keys())
+    keys = set()
+    for t in current or ():
+        if isinstance(t, dict) and 'Key' in t:
+            keys.add(t['Key'])
+    return keys
+
+
+def resolve_tag_value(spec, tag_name, resource, current_tag_keys):
+    """Resolve one tag value spec against a resource.
+
+    Returns the resolved value, or TAG_VALUE_SKIP to omit the tag.
+    """
+    return Lookup.resolve_value(spec, resource, tag_name, current_tag_keys)
+
+
+class TagValueResolver:
+    """Turn a mapping of tag value specs into concrete tags for a resource.
+
+    A mixin rather than part of Tag itself because the asg tag action isn't a
+    Tag subclass, but resolves the same per-resource lookups and writes the
+    same {account_id}/{now}/{region} placeholders.
+    """
+
+    def get_interpolation_params(self):
+        """Placeholder values shared by every tag in a run.
+
+        None of these depend on the resource being tagged, so a caller
+        resolving values per resource builds them once and passes them back
+        in rather than re-deriving a fresh {now} for each one.
+        """
+        return {
+            'account_id': self.manager.config.account_id,
+            'now': utils.FormatDate.utcnow(),
+            'region': self.manager.config.region}
+
+    def resolve_and_group(self, resources, spec_map):
+        """Resolve tag values per resource and group by identical payload.
+
+        Returns a list of (resource_set, resolved_dict). Resources whose
+        payload is empty (all tags conditionally skipped) are dropped.
+        """
+        groups = {}
+        # {now} and friends don't vary per resource, so fix them once for the
+        # whole run -- otherwise a large resource set drifts across seconds and
+        # splits into a group per timestamp.
+        params = self.get_interpolation_params()
+        for r in resources:
+            resolved = self.resolve_resource_tags(spec_map, r, params)
+            if not resolved:
+                continue
+            sig = tuple(sorted(resolved.items()))
+            groups.setdefault(sig, ([], resolved))[0].append(r)
+        return list(groups.values())
+
+    def resolve_resource_tags(self, spec_map, resource, params):
+        """Resolve a spec mapping against one resource.
+
+        Returns {name: value} of the tags to write - a conditional default the
+        resource already carries is left out, so the mapping comes back empty
+        when there's nothing to do for this resource.
+        """
+        current = resource_tag_keys(resource)
+        resolved = {}
+        for name, spec in spec_map.items():
+            value = resolve_tag_value(spec, name, resource, current)
+            if value is TAG_VALUE_SKIP:
+                continue
+            resolved[name] = self.interpolate_single_value(value, params)
+        return resolved
+
+    def interpolate_single_value(self, value, params=None):
+        """Interpolate placeholders in a single tag value."""
+        if params is None:
+            params = self.get_interpolation_params()
+        return str(value).format(**params)
+
+    def interpolate_values(self, tags, params=None):
+        """Interpolate in a list of tags - 'old' ec2 format"""
+        if params is None:
+            params = self.get_interpolation_params()
+        for t in tags:
+            t['Value'] = self.interpolate_single_value(t['Value'], params)
 
 
 def register_ec2_tags(filters, actions):
@@ -357,8 +469,30 @@ class TagCountFilter(Filter):
         return op(tag_count, count)
 
 
-class Tag(Action):
+class Tag(TagValueResolver, Action):
     """Tag an ec2 resource.
+
+    Tag values may be looked up per-resource from resource attributes:
+
+    .. code-block:: yaml
+
+        policies:
+          - name: ec2-tag-owner
+            resource: aws.ec2
+            filters:
+              - or:
+                - "tag:Owner": empty
+                - "tag:CostCenter": empty
+            actions:
+              - type: tag
+                tags:
+                  Owner:
+                    type: resource
+                    key: "Tags[?Key=='Team'].Value | [0]"  # set based on Team tag if available
+                    default-value: unknown
+                  CostCenter:
+                    type: resource
+                    default-value: unassigned   # set only if CostCenter absent
     """
 
     batch_size = 25
@@ -370,9 +504,9 @@ class Tag(Action):
 
     schema = utils.type_schema(
         'tag', aliases=('mark',),
-        tags={'type': 'object'},
+        tags={'type': 'object', 'additionalProperties': tag_value_schema()},
         key={'type': 'string'},
-        value={'type': 'string'},
+        value=tag_value_schema(),
         tag={'type': 'string'},
     )
     schema_alias = True
@@ -395,24 +529,26 @@ class Tag(Action):
         tag = self.data.get('key') or tag
 
         # Support setting multiple tags in a single go with a mapping
-        tags = self.data.get('tags')
-
-        if tags is None:
-            tags = []
-        else:
-            tags = [{'Key': k, 'Value': v} for k, v in tags.items()]
-
+        spec_map = dict(self.data.get('tags') or {})
         if msg:
-            tags.append({'Key': tag, 'Value': msg})
-
-        self.interpolate_values(tags)
+            spec_map[tag] = msg
 
         batch_size = self.data.get('batch_size', self.batch_size)
-
         client = self.get_client()
-        _common_tag_processer(
-            self.executor_factory, batch_size, self.concurrency, client,
-            self.process_resource_set, self.id_key, resources, tags, self.log)
+
+        if not has_dynamic_tag_values(spec_map):
+            tags = [{'Key': k, 'Value': v} for k, v in spec_map.items()]
+            self.interpolate_values(tags)
+            _common_tag_processer(
+                self.executor_factory, batch_size, self.concurrency, client,
+                self.process_resource_set, self.id_key, resources, tags, self.log)
+            return
+
+        for resource_set, resolved in self.resolve_and_group(resources, spec_map):
+            tags = [{'Key': k, 'Value': v} for k, v in resolved.items()]
+            _common_tag_processer(
+                self.executor_factory, batch_size, self.concurrency, client,
+                self.process_resource_set, self.id_key, resource_set, tags, self.log)
 
     def process_resource_set(self, client, resource_set, tags):
         mid = self.manager.get_model().id
@@ -421,21 +557,6 @@ class Tag(Action):
             Resources=[v[mid] for v in resource_set],
             Tags=tags,
             DryRun=self.manager.config.dryrun)
-
-    def interpolate_single_value(self, tag):
-        """Interpolate in a single tag value.
-        """
-        params = {
-            'account_id': self.manager.config.account_id,
-            'now': utils.FormatDate.utcnow(),
-            'region': self.manager.config.region}
-        return str(tag).format(**params)
-
-    def interpolate_values(self, tags):
-        """Interpolate in a list of tags - 'old' ec2 format
-        """
-        for t in tags:
-            t['Value'] = self.interpolate_single_value(t['Value'])
 
     def get_client(self):
         return utils.local_session(self.manager.session_factory).client(
@@ -859,30 +980,41 @@ class UniversalTag(Tag):
         tag = self.data.get('key') or tag
 
         # Support setting multiple tags in a single go with a mapping
-        tags = self.data.get('tags', {})
-
+        spec_map = dict(self.data.get('tags', {}))
         if msg:
-            tags[tag] = msg
-
-        self.interpolate_values(tags)
+            spec_map[tag] = msg
 
         batch_size = self.data.get('batch_size', self.batch_size)
         client = self.get_client()
 
-        _common_tag_processer(
-            self.executor_factory, batch_size, self.concurrency, client,
-            self.process_resource_set, self.id_key, resources, tags, self.log)
+        if not has_dynamic_tag_values(spec_map):
+            tags = dict(spec_map)
+            self.interpolate_values(tags)
+            _common_tag_processer(
+                self.executor_factory, batch_size, self.concurrency, client,
+                self.process_resource_set, self.id_key, resources, tags, self.log)
+            return
+
+        for resource_set, resolved in self.resolve_and_group(resources, spec_map):
+            _common_tag_processer(
+                self.executor_factory, batch_size, self.concurrency, client,
+                self.process_resource_set, self.id_key, resource_set, resolved,
+                self.log)
 
     def process_resource_set(self, client, resource_set, tags):
         arns = self.manager.get_arns(resource_set)
+        if not arns:
+            return
         return universal_retry(
             client.tag_resources, ResourceARNList=arns, Tags=tags)
 
-    def interpolate_values(self, tags):
+    def interpolate_values(self, tags, params=None):
         """Interpolate in a list of tags - 'new' resourcegroupstaggingapi format
         """
+        if params is None:
+            params = self.get_interpolation_params()
         for key in list(tags.keys()):
-            tags[key] = self.interpolate_single_value(tags[key])
+            tags[key] = self.interpolate_single_value(tags[key], params)
 
     def get_client(self):
         # For global resources, manage tags from us-east-1
@@ -909,6 +1041,8 @@ class UniversalUntag(RemoveTag):
 
     def process_resource_set(self, client, resource_set, tag_keys):
         arns = self.manager.get_arns(resource_set)
+        if not arns:
+            return
         return universal_retry(
             client.untag_resources, ResourceARNList=arns, TagKeys=tag_keys)
 

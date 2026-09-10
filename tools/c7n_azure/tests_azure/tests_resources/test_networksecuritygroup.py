@@ -2,6 +2,9 @@
 # SPDX-License-Identifier: Apache-2.0
 from unittest.mock import patch
 
+from parameterized import parameterized
+from pytest_terraform import terraform
+
 from ..azure_common import BaseTest, arm_template
 
 
@@ -68,6 +71,9 @@ class NetworkSecurityGroupTest(BaseTest):
 
         resources = p.run()
         self.assertEqual(len(resources), 1)
+        self.assertEqual(
+            {r["name"] for r in resources[0]['c7n:matched-ingress-security-rules']}, {'test1'}
+        )
 
     @arm_template('networksecuritygroup.json')
     def test_allow_multiple_ports(self):
@@ -88,6 +94,10 @@ class NetworkSecurityGroupTest(BaseTest):
 
         resources = p.run()
         self.assertEqual(len(resources), 1)
+        self.assertEqual(
+            {r["name"] for r in resources[0]['c7n:matched-ingress-security-rules']},
+            {'test1', 'test2', 'test6'}
+        )
 
     @arm_template('networksecuritygroup.json')
     def test_allow_ports_range_any(self):
@@ -108,6 +118,10 @@ class NetworkSecurityGroupTest(BaseTest):
 
         resources = p.run()
         self.assertEqual(len(resources), 1)
+        self.assertEqual(
+            {r["name"] for r in resources[0]['c7n:matched-ingress-security-rules']},
+            {'test1', 'test6'}
+        )
 
     @arm_template('networksecuritygroup.json')
     def test_deny_port(self):
@@ -127,6 +141,9 @@ class NetworkSecurityGroupTest(BaseTest):
 
         resources = p.run()
         self.assertEqual(len(resources), 1)
+        self.assertEqual(
+            {r["name"] for r in resources[0]['c7n:matched-ingress-security-rules']}, {'test3'}
+        )
 
     @arm_template('networksecuritygroup.json')
     def test_egress_policy_protocols(self):
@@ -148,6 +165,9 @@ class NetworkSecurityGroupTest(BaseTest):
 
         resources = p.run()
         self.assertEqual(len(resources), 1)
+        self.assertEqual(
+            {r["name"] for r in resources[0]['c7n:matched-egress-security-rules']}, {'test5'}
+        )
 
         p = self.load_policy({
             'name': 'test-azure-nsg',
@@ -229,6 +249,9 @@ class NetworkSecurityGroupTest(BaseTest):
 
         resources = p.run()
         self.assertEqual(len(resources), 1)
+        self.assertEqual(
+            {r["name"] for r in resources[0]['c7n:matched-ingress-security-rules']}, {'test1'}
+        )
 
     @arm_template('networksecuritygroup.json')
     def test_cidr_only_match(self):
@@ -249,6 +272,9 @@ class NetworkSecurityGroupTest(BaseTest):
 
         resources = p.run()
         self.assertEqual(len(resources), 1)
+        self.assertEqual(
+            {r["name"] for r in resources[0]['c7n:matched-ingress-security-rules']}, {'test4'}
+        )
 
     @arm_template('networksecuritygroup.json')
     def test_cidr_only_no_match(self):
@@ -292,6 +318,9 @@ class NetworkSecurityGroupTest(BaseTest):
 
         resources = p.run()
         self.assertEqual(len(resources), 1)
+        self.assertEqual(
+            {r["name"] for r in resources[0]['c7n:matched-ingress-security-rules']}, {'test4'}
+        )
 
     @arm_template('networksecuritygroup.json')
     def test_cidr_and_ingress_no_match(self):
@@ -315,6 +344,52 @@ class NetworkSecurityGroupTest(BaseTest):
 
         resources = p.run()
         self.assertEqual(len(resources), 0)
+
+    @parameterized.expand([
+        ('all', 'Allow', {'nsg-allow-all-ingress'}),
+        ('all', 'Deny', {'nsg-deny-all-ingress'}),
+        ('any', 'Allow', {'nsg-allow-all-ingress', 'nsg-mixed-rules'}),
+        ('any', 'Deny', {'nsg-deny-all-ingress', 'nsg-mixed-rules'}),
+    ])
+    @terraform("nsg_no_cidr_no_ports")
+    def test_no_cidr_no_ports(self, match, access, expected_resources):
+        p = self.load_policy({
+                'name': 'test-azure-nsg',
+                'resource': 'azure.networksecuritygroup',
+                'filters': [{
+                    'type': 'ingress',
+                    'match': match,
+                    'access': access
+                }],
+            })
+        resources = p.run()
+        self.assertEqual({r['name'] for r in resources}, expected_resources)
+
+    @terraform("nsg_no_cidr_no_ports")
+    def test_deny_implicit(self):
+        p = self.load_policy({
+            'name': 'test-azure-nsg',
+            'resource': 'azure.networksecuritygroup',
+            'filters': [
+                {'type': 'ingress',
+                'ports': '20-21',
+                'match': 'all',
+                'access': 'Deny'}],
+        })
+
+        resources = p.run()
+
+        self.assertEqual(
+            {r['name'] for r in resources}, {'nsg-mixed-rules', 'nsg-deny-all-ingress'}
+        )
+        for r in resources:
+            matched_rules = {rule['name'] for rule in r['c7n:matched-ingress-security-rules']}
+            # The nsg with mixed rules denies these ports implicitly.
+            if r['name'] == 'nsg-mixed-rules':
+                self.assertEqual(matched_rules, set())
+            # The nsg with a deny all rule denies these ports explicitly.
+            elif r['name'] == 'nsg-deny-all-ingress':
+                self.assertEqual(matched_rules, {'deny-all-ingress'})
 
 
 class NetworkSecurityGroupFlowLogsFilterTest(BaseTest):

@@ -1,0 +1,35 @@
+{
+    "status_code": 200,
+    "data": {
+        "PaginationToken": "",
+        "ResourceTagMappingList": [
+            {
+                "ResourceARN": "arn:aws:bedrock:us-east-1:644160558196:evaluation-job/y36vvtyztckw",
+                "Tags": [
+                    {
+                        "Key": "Owner",
+                        "Value": "c7n"
+                    },
+                    {
+                        "Key": "Environment",
+                        "Value": "test"
+                    }
+                ]
+            },
+            {
+                "ResourceARN": "arn:aws:bedrock:us-east-1:644160558196:evaluation-job/ighzy27iw1l6",
+                "Tags": [
+                    {
+                        "Key": "Owner",
+                        "Value": "c7n"
+                    },
+                    {
+                        "Key": "Environment",
+                        "Value": "test"
+                    }
+                ]
+            }
+        ],
+        "ResponseMetadata": {}
+    }
+}

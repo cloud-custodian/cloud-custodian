@@ -1,0 +1,27 @@
+{
+  "headers": {
+    "content-type": "application/json; charset=UTF-8",
+    "vary": "Origin, X-Origin, Referer",
+    "date": "Tue, 11 Aug 2026 17:48:09 GMT",
+    "server": "ESF",
+    "x-xss-protection": "0",
+    "x-frame-options": "SAMEORIGIN",
+    "x-content-type-options": "nosniff",
+    "alt-svc": "h3=\":443\"; ma=2592000,h3-29=\":443\"; ma=2592000",
+    "transfer-encoding": "chunked",
+    "status": "200",
+    "content-length": "360",
+    "-content-encoding": "gzip",
+    "content-location": "https://us-east1-aiplatform.googleapis.com/v1/projects/cloud-custodian/locations/us-east1/models/7412434604465848320/operations/1343157700774592512?alt=json"
+  },
+  "body": {
+    "name": "projects/cloud-custodian/locations/us-east1/models/7412434604465848320/operations/1343157700774592512",
+    "metadata": {
+      "@type": "type.googleapis.com/google.cloud.aiplatform.v1.UploadModelOperationMetadata",
+      "genericMetadata": {
+        "createTime": "2026-08-11T17:47:12.528040Z",
+        "updateTime": "2026-08-11T17:47:12.528040Z"
+      }
+    }
+  }
+}

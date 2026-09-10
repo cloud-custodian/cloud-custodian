@@ -1,0 +1,18 @@
+{
+    "status_code": 200,
+    "data": {
+        "PaginationToken": "",
+        "ResourceTagMappingList": [
+            {
+                "ResourceARN": "arn:aws:sagemaker:us-east-1:644160558196:space/d-szjlsjfyqmaq/c7nspacecomicchicken",
+                "Tags": [
+                    {
+                        "Key": "favorite-color",
+                        "Value": "c7n"
+                    }
+                ]
+            }
+        ],
+        "ResponseMetadata": {}
+    }
+}
