@@ -1,6 +1,7 @@
 # Copyright The Cloud Custodian Authors.
 # SPDX-License-Identifier: Apache-2.0
 
+import collections.abc
 import functools
 import importlib.resources
 import typing
@@ -20,6 +21,7 @@ from c7n.filters.offhours import OffHour, OnHour
 
 
 DimensionName = str
+DimensionNames = collections.abc.Iterable[str]
 
 
 class Dimension(typing.TypedDict):
@@ -41,88 +43,61 @@ class PublishedMetricInfo(typing.TypedDict):
 # don't. None for metrics every variety publishes.
 Kind = typing.Optional[str]
 
-MetricsByKind = dict[ResourceTypename,
-                     dict[Kind, dict[MetricName, PublishedMetricInfo]]]
+SAGEMAKER_DIMENSION_SETS: dict[ResourceTypename, dict[MetricName, set[DimensionNames]]] = None
+SAGEMAKER_METRICS: dict[Kind, dict[ResourceTypename, dict[MetricName, PublishedMetricInfo]]] = None
 
-
-def load_sagemaker_metrics() -> MetricsByKind:
+def load_sagemaker_metrics():
     """Expand data/sagemaker_metrics.yaml into a lookup.
 
     By resource, kind and metric name. The file groups metrics by the
     documentation table they came from instead.
     """
-    metrics: MetricsByKind = {}
+    global SAGEMAKER_DIMENSION_SETS, SAGEMAKER_METRICS
+
+    SAGEMAKER_METRICS = metrics = {}
+    SAGEMAKER_DIMENSION_SETS = dimension_sets = {}
+
     sections = yaml.safe_load(
         (importlib.resources.files('c7n') / 'data/sagemaker_metrics.yaml'
          ).read_text())
 
+    # Collect data by kind
     for section in sections:
+        section_dimension_sets = set(
+            tuple(name.strip() for name in dimensions.split(','))
+            for dimensions in section['dimensions']
+        )
         published: PublishedMetricInfo = {
             'namespace': section['namespace'],
-            'dimension_sets': [
-                [name.strip() for name in dimensions.split(',')]
-                for dimensions in section['dimensions']
-                ],
+            'dimension_sets': section_dimension_sets,
             }
         kind = section.get('kind')
-        table = metrics.setdefault(section['resource'], {}).setdefault(kind, {})
-        for name in section['metrics']:
-            if name in table:
+        table = metrics.setdefault(kind, {}).setdefault(section['resource'], {})
+        for metric in section['metrics']:
+            if metric in table:
                 raise AssertionError(
-                    f"{name} is in more than one {section['resource']}"
+                    f"{metric} is in more than one {section['resource']}"
                     f" {kind} section of sagemaker_metrics.yaml")
-            table[name] = published
+            table[metric] = published
 
-    return metrics
+        # Accumulate dimension_sets
+        table = dimension_sets.setdefault(section['resource'], {})
+        for metric in section['metrics']:
+            table.setdefault(metric, set()).update(section_dimension_sets)
 
+    # Broadcast data from None to individual kinds
+    if all_kinds := metrics.get(None):
+        for kind in metrics:
+            if kind is not None:
+                for resource in all_kinds:
+                    table = metrics.setdefault(kind, {}).setdefault(resource, {})
+                    resource_metrics = all_kinds[resource]
+                    for metric in resource_metrics:
+                        if metric in table:
+                            raise AssertionError(f"Duplicate metric for {kind} {resource} {metric}")
+                        table[metric] = resource_metrics[metric]
 
-def merge_kinds(
-        metrics: MetricsByKind,
-        ) -> dict[ResourceTypename, dict[MetricName, PublishedMetricInfo]]:
-    """Everything a resource's metrics can be dimensioned by, whatever its kind.
-
-    What a policy can ask for, which is all validation can check: which
-    kinds of resource an account holds isn't known until the policy runs.
-    """
-    merged: dict[ResourceTypename, dict[MetricName, PublishedMetricInfo]] = {}
-    for resource, kinds in metrics.items():
-        table = merged.setdefault(resource, {})
-        for published_by_name in kinds.values():
-            for name, published in published_by_name.items():
-                if name not in table:
-                    table[name] = dict(published)
-                    continue
-                if table[name]['namespace'] != published['namespace']:
-                    raise AssertionError(
-                        f"{resource} publishes {name} in more than one"
-                        f" namespace, so a policy naming it is ambiguous")
-                table[name]['dimension_sets'] = table[name]['dimension_sets'] + [
-                    names for names in published['dimension_sets']
-                    if names not in table[name]['dimension_sets']
-                    ]
-    return merged
-
-
-def published_metric_of_kind(
-        resource: ResourceTypename, kind: Kind, name: MetricName,
-        ) -> typing.Optional[PublishedMetricInfo]:
-    """What a resource of this kind publishes the metric under, if anything.
-
-    Metrics no kind is singled out for are kept under no kind, so they're
-    published by every kind.
-    """
-    by_kind = SAGEMAKER_METRICS_BY_KIND[resource]
-    for lookup in (kind, None):
-        published = by_kind.get(lookup, {}).get(name)
-        if published:
-            return published
-    return None
-
-
-SAGEMAKER_METRICS_BY_KIND = load_sagemaker_metrics()
-
-# what the filters use unless they know a resource's kind
-SAGEMAKER_METRICS = merge_kinds(SAGEMAKER_METRICS_BY_KIND)
+load_sagemaker_metrics()
 
 
 class NotebookDescribe(DescribeSource):
@@ -491,54 +466,46 @@ class SageMakerMetricsFilter(MetricsFilter):
     docs/source/aws/examples/sagemakermetrics.rst
     """
 
-    def published_metric(self) -> PublishedMetricInfo:
-        """What the aws documentation says about this metric.
-
-        The data is maintained by hand from that documentation, so a name
-        missing from it is either a typo or a metric aws has published
-        since -- see data/sagemaker_metrics.yaml.
-        """
-        try:
-            return SAGEMAKER_METRICS[self.manager.type][self.data['name']]
-        except KeyError:
-            raise AssertionError(
-                f"no documented {self.manager.type} metric named"
-                f" {self.data['name']}")
-
-    resource_published_metric = published_metric
-
     @functools.cached_property
     def resource_dimension_name(self):
         return self.model.dimension
 
+    def resource_kind(self, _) -> typing.Optional[Kind]:
+        return None
+
+    def resource_published_metric(self, resource) -> PublishedMetricInfo:
+        """Return the published metrics for the resource kind.
+
+        We don't expect most resources to have different kinds, but
+        endpoint do.
+        """
+        return (
+            SAGEMAKER_METRICS
+            [self.resource_kind(resource)]
+            [self.manager.type]
+            [self.data['name']]
+        )
+    
+    def can_enumerate_dimension(self, _) -> bool:
+        """Can we enumerate this dimention for a given resource.
+        """
+        return False
+
     @functools.cached_property
     def resource_dimension_derived_value(self) -> typing.Optional[str]:
         """Return the value for the resource dimension name for the given dimension
-
-        If the given dimensions include the resource dimension name, return None,
-        as it won't be needed.
-
-        If, for other dimensions, the resource dimensions value can't be derived,
-        return None.
         """
-        return None
 
-    def can_enumerate_dimension(self, _) -> bool:
-        return False
-
-    def _can_use_dimension_name_set(self, dimension_name_set: set[str]) -> typing.Optional[
-            tuple[
-                tuple[int, int],  # sort key
-                set[DimensionName],
-            ]
-    ]:
+    def _can_use_dimension_names(
+            self, dimension_names: DimensionNames
+    ) -> bool:
         given_dimensions = self.data.get('dimensions')
         given_dimenion_names = set(given_dimensions or ())
         resource_dimension_name = self.resource_dimension_name
 
         # Any free dimensions must be enumerable:
         free_dimensions = (
-            set(dimension_name_set)
+            set(dimension_names)
             - given_dimenion_names
             - {resource_dimension_name}
         )
@@ -546,22 +513,27 @@ class SageMakerMetricsFilter(MetricsFilter):
             self.can_enumerate_dimension(dimension_name)
             for dimension_name in free_dimensions
         ):
-            return None
+            return False
 
         # Are all given dimensions present, excluding the resource
         # dimension:
-        if (given_dimenion_names - {resource_dimension_name} - dimension_name_set):
-            return None
+        if given_dimenion_names - {resource_dimension_name} - set(dimension_names):
+            return False
 
         # Is the resource dimension name present:
-        if resource_dimension_name in dimension_name_set:
-            return (0, len(dimension_name_set)), dimension_name_set
+        if resource_dimension_name in dimension_names:
+            return True
 
-        # or can it be derived using a given dimension
-        if self.resource_dimension_derived_value is None:
-            return None
-
-        return (1, len(dimension_name_set)), dimension_name_set
+        # or it can be derived
+        return (
+            # Through enumeration:
+            any(
+                self.can_enumerate_dimension(dimension_name)
+                for dimension_name in dimension_names
+            )
+            # Or via application of given dimensions
+            or self.resource_dimension_derived_value is not None
+            )
 
     # keys of the shared schema this filter doesn't implement, rather than
     # accepting and ignoring them
@@ -571,9 +543,10 @@ class SageMakerMetricsFilter(MetricsFilter):
         super().validate()
 
         # Check that we have usable dimension sets for given dimensions
+        published_dimensions_set = SAGEMAKER_DIMENSION_SETS[self.manager.type][self.data['name']]
         if not any(
-            self.can_use_dimension_name_set(set(dimension_name_set))
-            for dimension_name_set in self.published_metric()["dimension_sets"]
+            self._can_use_dimension_names(dimension_names)
+            for dimension_names in published_dimensions_set
         ):
             raise AssertionError(
                 f"Can't find metrics for given dimensions: "
@@ -592,17 +565,19 @@ class SageMakerMetricsFilter(MetricsFilter):
                     f"metrics filter on {self.manager.type} doesn't"
                     f" support {key}")
 
-    def get_resource_dimension_names(self, resource):
+    def get_resource_dimension_names(self, resource) -> typing.Optional[DimensionNames]:
+        """Get dimension names to get dimension sets for a resource
+        """
         metric = self.resource_published_metric(resource)
         usable = sorted(
-            self._can_use_dimension_name_set(dimension_name_set)
-            for dimension_name_set in metric["dimension_sets"]
+            filter(self._can_use_dimension_names, metric["dimension_sets"]),
+            key=lambda dimension_set: len(dimension_set)
             )
         if usable:
-            return usable[0][1]
+            return usable[0]
 
     def get_dimensions_set(self, resource) -> list[dict[str, str]]:
-        """The dimension sets naming a resource's sub units.
+        """The dimensions set naming a resource's metrics
 
         This is a list of dicts, which is simpler and saner that
         lists of lists of dimensions.  We convert to lists of lists of
@@ -610,7 +585,7 @@ class SageMakerMetricsFilter(MetricsFilter):
         """
 
         dimension_names = self.get_resource_dimension_names(resource)
-        if not dimension_names:
+        if dimension_names is None:
             return []
 
         base_dimensions = self.data.get('dimensions', {})
@@ -625,10 +600,11 @@ class SageMakerMetricsFilter(MetricsFilter):
             else:
                 base_dimensions[resource_dimension_name] = resource_dimension_value
         else:
-            resource_dimension_derived_value = self.resource_dimension_derived_value
-            if resource_dimension_derived_value != resource_dimension_value:
-                # given dimensions select a different resource
-                return []
+            if len(base_dimensions) == len(dimension_names):
+                # There are no free dimensions.  Check the resource
+                # dimension value derived from given values.
+                if self.resource_dimension_derived_value != resource_dimension_value:
+                    return []
 
         result = [base_dimensions]
         for dimension_name in dimension_names:
@@ -636,40 +612,13 @@ class SageMakerMetricsFilter(MetricsFilter):
                 result = [
                     dict(result_dimension, **{dimension_name: dimension_value})
                     for result_dimension in result
-                    for dimension_value in self.enumerate_dimension(dimension_name)
+                    for dimension_value in self.enumerate_dimension(dimension_name, resource)
                 ]
 
         return result
 
-    def process_resource_set(self, resource_set):
-        client = local_session(
-            self.manager.session_factory).client('cloudwatch')
-        extended_statistics = self.statistics not in self.standard_stats
-        matched = []
-        for resource in resource_set:
-            empty = True
-            for points in self.get_resource_metrics(client, resource, extended_statistics):
-                if points:
-                    empty = False
-                    if any(not self.op(point[self.statistics], self.value)
-                           for point in points
-                           ):
-                        # We failed to match a point, so bail
-                        break
-            else:
-                if empty:
-                    # There weren't any data, so the missing value decides.
-                    if 'missing-value' in self.data:
-                        if self.op(self.data['missing-value'], self.value):
-                            matched.append(resource)
-                else:
-                    # There was data and it all satisfied the condition.
-                    matched.append(resource)
-
-        return matched
-
     def get_resource_namespace(self, resource):
-        metric = self.resource_published_metric(self, resource)
+        metric = self.resource_published_metric(resource)
         return metric["namespace"]
 
     def get_resource_metrics(self, client, resource, extended_statistics):
@@ -722,10 +671,37 @@ class SageMakerMetricsFilter(MetricsFilter):
                 cache[cache_key] = points
                 yield points
 
+    def process_resource_set(self, resource_set):
+        client = local_session(
+            self.manager.session_factory).client('cloudwatch')
+        extended_statistics = self.statistics not in self.standard_stats
+        matched = []
+        for resource in resource_set:
+            empty = True
+            for points in self.get_resource_metrics(client, resource, extended_statistics):
+                if points:
+                    empty = False
+                    if any(not self.op(point[self.statistics], self.value)
+                           for point in points
+                           ):
+                        # We failed to match a point, so bail
+                        break
+            else:
+                if empty:
+                    # There weren't any data, so the missing value decides.
+                    if 'missing-value' in self.data:
+                        if self.op(self.data['missing-value'], self.value):
+                            matched.append(resource)
+                else:
+                    # There was data and it all satisfied the condition.
+                    matched.append(resource)
+
+        return matched
+
     def process(self, resources, event=None):
         # the base filter reads the namespace from the policy, so name it
         # there rather than reimplementing the setup around it
-        self.data['namespace'] = self.published_metric()['namespace']
+        self.data['namespace'] = "placeholder"
         return super().process(resources, event)
 
 
@@ -736,6 +712,10 @@ class SagemakerEndpointMetricsFilter(SageMakerMetricsFilter):
     See the MetricsFilter doc string and
     docs/source/aws/examples/sagemakermetrics.rst
     """
+
+    VariantName = "VariantName"
+    ProductionVariants = "ProductionVariants"
+    InferenceComponentName = "InferenceComponentName"
 
     permissions = MetricsFilter.permissions + (
         'sagemaker:ListInferenceComponents',)
@@ -752,50 +732,38 @@ class SagemakerEndpointMetricsFilter(SageMakerMetricsFilter):
         for page in client.get_paginator(
                 'list_inference_components').paginate():
             for summary in page['InferenceComponents']:
-                components.setdefault(summary['EndpointName'], []).append(
-                    (summary['InferenceComponentName'],
-                     summary.get('VariantName')))
+                components.setdefault(summary[self.resource_dimension_name], []).append(
+                    summary['InferenceComponentName'])
         return components
 
     def resource_kind(self, resource) -> Kind:
         """How this endpoint hosts its models."""
-        if self.endpoint_components.get(resource['EndpointName']):
+        if self.endpoint_components.get(resource[self.resource_dimension_name]):
             return 'inference-component'
         return 'classic'
 
-    def resource_published_metric(
-            self, resource) -> typing.Optional[PublishedMetricInfo]:
-        """What this endpoint publishes, given how it hosts its models.
-
-        An endpoint hosting inference components reports its invocations
-        per component; a classic one reports them per variant. The
-        documentation lists both sets without saying which applies, so
-        the components decide. Some metrics only one kind publishes at
-        all, and the other kind has no series for them.
-        """
-        return published_metric_of_kind(
-            self.manager.type, self.resource_kind(resource),
-            self.data['name'])
-
     def can_enumerate_dimension(self, dimension_name):
-        return dimension_name in ('VariantName', 'InferenceComponentName')
+        return dimension_name in (self.VariantName, self.InferenceComponentName)
 
-    def enumerate_dimension(self, dimension_name, resource) -> list[str]:
+    def enumerate_dimension(self, dimension_name, resource) -> collections.abc.Iterable[str]:
         """The values of a dimension naming this endpoint's sub units."""
-        if dimension_name == 'VariantName':
-            return [variant['VariantName']
-                    for variant in resource['ProductionVariants']]
+        if dimension_name == self.VariantName:
+            return [variant[self.VariantName]
+                    for variant in resource[self.ProductionVariants]]
 
-        if dimension_name == 'InferenceComponentName':
-            chosen_variant = self.data.get('dimensions', {}).get('VariantName')
-            return [
-                name
-                for name, variant in self.endpoint_components.get(
-                    resource['EndpointName'], ())
-                if chosen_variant in (None, variant)
-                ]
+        if dimension_name == self.InferenceComponentName:
+            return self.endpoint_components.get(resource[self.resource_dimension_name], ())
 
         raise AssertionError(f"{self} can't enumerate {dimension_name}")
+
+    @functools.cached_property
+    def resource_dimension_derived_value(self) -> typing.Optional[str]:
+        given_dimensions = self.data.get('dimensions')
+        if self.InferenceComponentName in given_dimensions:
+            inference_component_name = given_dimensions[self.InferenceComponentName]
+            for endpoint_name, inference_component_names in self.endpoint_components.items():
+                if  inference_component_name in inference_component_names:
+                    return endpoint_name
 
 
 class EndpointConfigDescribe(DescribeSource):
