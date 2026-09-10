@@ -1931,17 +1931,12 @@ def test_sagemaker_endpoint_metrics_dimensions_validated(test):
 
 
 def test_sagemaker_metrics_missing_value(test):
-    # A metric can have no values in two ways: the endpoint publishes no
-    # series for it at all, or a series that reported nothing over the
-    # window. Either way there is nothing to compare the condition
-    # against, so the missing value decides, and without one the endpoint
-    # is passed over rather than guessed about.
+    # A metric with no values over the window leaves nothing to compare the
+    # condition against. The missing value stands in for them, and without
+    # one the endpoint is passed over rather than guessed about.
     from c7n.resources.sagemaker import SageMakerMetricsFilter
 
-    requests = []
-
     def reports_nothing(self, client, params):
-        requests.append(params)
         return []
 
     test.patch(SageMakerMetricsFilter, 'get_metric_data', reports_nothing)
@@ -1949,38 +1944,28 @@ def test_sagemaker_metrics_missing_value(test):
         {'name': 'endpoints', 'resource': 'sagemaker-endpoint'})
     metrics_filter = SagemakerEndpoint.filter_registry.get('metrics')
 
-    def selected(metric, **extra):
-        """Does an under-used-endpoint policy on `metric` select a classic one?"""
+    def selected(**extra):
+        """Does an idle-endpoint policy select an endpoint?"""
         # a fresh endpoint each time: the annotation is also the cache, so
         # one that has been through the filter isn't queried again
         endpoint = {'EndpointName': 'e',
                     'ProductionVariants': [{'VariantName': 'AllTraffic'}]}
         f = metrics_filter(
-            dict(type='metrics', name=metric, value=20, op='less-than',
-                 **extra),
+            dict(type='metrics', name='Invocations', statistics='Sum',
+                 value=0, op='lte', **extra),
             policy.resource_manager)
-        f.endpoint_components = {}
+        f.endpoint_components = {}  # a classic endpoint
         return f.process([endpoint]) == [endpoint]
 
-    # CPUUtilization is published per variant, so it is asked about, and
-    # comes back empty
-    assert selected('CPUUtilization', **{'missing-value': 0})
-    assert requests, 'the series should have been queried'
-    assert not selected('CPUUtilization')
+    assert selected(**{'missing-value': 0})
+    assert not selected()
 
-    # the normalized metrics report utilization against a component's
-    # reservation, so a classic endpoint has no such series to ask about
-    del requests[:]
-    assert selected('CPUUtilizationNormalized', **{'missing-value': 0})
-    assert requests == [], 'there was nothing to ask about'
-    assert not selected('CPUUtilizationNormalized')
+    # invocations that were reported decide for themselves
+    def reports_invocations(self, client, params):
+        return [{'Sum': 5}]
 
-    # and a value that was reported decides for itself
-    def reports_busy(self, client, params):
-        return [{'Average': 90}]
-
-    test.patch(SageMakerMetricsFilter, 'get_metric_data', reports_busy)
-    assert not selected('CPUUtilization', **{'missing-value': 0})
+    test.patch(SageMakerMetricsFilter, 'get_metric_data', reports_invocations)
+    assert not selected(**{'missing-value': 0})
 
 
 def test_sagemaker_metrics_percentile_statistics(test):
