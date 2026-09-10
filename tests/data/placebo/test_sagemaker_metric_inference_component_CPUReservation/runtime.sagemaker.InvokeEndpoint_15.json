@@ -1,0 +1,13 @@
+{
+    "status_code": 200,
+    "data": {
+        "ResponseMetadata": {},
+        "ContentType": "text/csv; charset=utf-8",
+        "InvokedProductionVariant": "AllTraffic",
+        "Body": {
+            "__class__": "StreamingBody",
+            "__module__": "botocore.response",
+            "body": "MC41NzQ5OTk5ODgwNzkwNzEK"
+        }
+    }
+}

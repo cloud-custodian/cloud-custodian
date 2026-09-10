@@ -1675,6 +1675,8 @@ def test_sagemaker_endpoint_metrics_idle(test, sagemaker_endpoint_metrics):
     with capture:
         [resource] = p.run()
     assert resource['EndpointName'] == idle
+    # the gpu variant is never queried: busy's second variant already
+    # fails the condition, which settles the endpoint
     assert [[d['Value'] for d in dims] for dims in dimensions] == [
         [busy, 'quiet'], [busy, 'busy'], [idle, 'AllTraffic']]
     assert [d['Name'] for d in dimensions[0]] == ['EndpointName', 'VariantName']
@@ -1711,12 +1713,12 @@ def test_sagemaker_endpoint_metrics_utilization(test, sagemaker_endpoint_metrics
         [resource] = p.run()
     assert resource['EndpointName'] == busy
     assert [[d['Value'] for d in dims] for dims in dimensions] == [
-        [busy, 'quiet'], [busy, 'busy']]
+        [busy, 'quiet'], [busy, 'busy'], [busy, 'gpu']]
     # each variant's series is annotated separately, named by its dimensions
     annotated = resource['c7n.metrics']
     assert sorted(key.split('.')[-1] for key in annotated) == [
-        'VariantName=busy', 'VariantName=quiet']
-    assert [len(points) for points in annotated.values()] == [1, 1]
+        'VariantName=busy', 'VariantName=gpu', 'VariantName=quiet']
+    assert [len(points) for points in annotated.values()] == [1, 1, 1]
 
 
 @pytest.mark.audited
@@ -1943,6 +1945,25 @@ def test_sagemaker_endpoint_metrics_variant_without_components(test):
     assert f.get_dimensions_set(resource) == []
 
 
+# Metrics the endpoints in tests/terraform/sagemaker_endpoint_metrics don't
+# produce, so there's nothing to record for them. The streaming metrics need
+# a container that streams responses, ModelSetupTime a model load, and the
+# multi-model metrics an endpoint hosting a model in MultiModel mode.
+UNEXERCISED_METRICS = frozenset((
+    'ModelSetupTime',
+    'MidStreamErrors',
+    'FirstChunkLatency',
+    'FirstChunkModelLatency',
+    'FirstChunkOverheadLatency',
+    'ModelLoadingWaitTime',
+    'ModelUnloadingTime',
+    'ModelDownloadingTime',
+    'ModelLoadingTime',
+    'ModelCacheHit',
+    'LoadedModelCount',
+    ))
+
+
 def sagemaker_endpoint_metric_entries():
     """Every (kind, metric) the catalogue describes for endpoints.
 
@@ -1954,6 +1975,17 @@ def sagemaker_endpoint_metric_entries():
         for kind, by_resource in SAGEMAKER_METRICS.items()
         if kind is not None
         for metric, published in by_resource['sagemaker-endpoint'].items()
+        ]
+
+
+def sagemaker_endpoint_metric_entries_published():
+    """The entries these endpoints can be recorded against."""
+    return [
+        entry if entry.values[1] not in UNEXERCISED_METRICS else
+        pytest.param(*entry.values, id=entry.id,
+                     marks=pytest.mark.skip(
+                         reason='not produced by these endpoints'))
+        for entry in sagemaker_endpoint_metric_entries()
         ]
 
 
@@ -1985,3 +2017,88 @@ def test_sagemaker_endpoint_metric_entry(test, kind, metric, published):
     assert all(isinstance(value, str)
                for dimensions in dimensions_set
                for value in dimensions.values())
+
+
+# Metrics publish a minute or so after an invocation, and one publication
+# window serves every case below, so the traffic is generated once for the
+# whole module rather than per test.
+INVOKED: list[str] = []
+
+# variants and components of the endpoints tests/terraform/
+# sagemaker_endpoint_metrics builds. "quiet" is deliberately left silent.
+ENDPOINT_VARIANTS = {'busy': ('quiet', 'busy', 'gpu'),
+                     'component': ('AllTraffic',)}
+
+
+def invoke_for_metrics(test, factory, endpoints, components):
+    """Give every endpoint something to report, once per recording run."""
+    if not test.recording or INVOKED:
+        return
+    INVOKED.append('done')
+
+    runtime = factory().client('sagemaker-runtime')
+    for name, endpoint in endpoints.items():
+        targets = [{'InferenceComponentName': component}
+                   for component in components.get(endpoint, ())] or [
+            {'TargetVariant': variant}
+            for variant in ENDPOINT_VARIANTS[name]
+            if variant != 'quiet'
+            ]
+        for target in targets:
+            for _ in range(5):
+                runtime.invoke_endpoint(
+                    EndpointName=endpoint, ContentType='text/csv',
+                    Body='1.0', **target)
+    time.sleep(300)
+
+
+@pytest.mark.audited
+@pytest.mark.parametrize('kind,metric,published',
+                         sagemaker_endpoint_metric_entries_published())
+@terraform('sagemaker_endpoint_metrics', scope='module')
+def test_sagemaker_endpoint_metric_published(
+        test, sagemaker_endpoint_metrics, kind, metric, published):
+    # every dimension set the catalogue names for a kind of endpoint has to
+    # carry data for an endpoint of that kind. A set that isn't published
+    # returns nothing, which no policy can tell from a quiet endpoint.
+    endpoints = {
+        name: sagemaker_endpoint_metrics[f'aws_sagemaker_endpoint.{name}.name']
+        for name in ENDPOINT_VARIANTS
+        }
+    component = sagemaker_endpoint_metrics.outputs['component_name']['value']
+    components = {endpoints['component']: [component]}
+
+    factory = test.replay_flight_data(
+        f"test_sagemaker_metric_{kind.replace('-', '_')}_{metric}")
+    invoke_for_metrics(test, factory, endpoints, components)
+
+    hosting = 'component' if kind == 'inference-component' else 'busy'
+    resource = {
+        'EndpointName': endpoints[hosting],
+        'ProductionVariants': [{'VariantName': variant}
+                               for variant in ENDPOINT_VARIANTS[hosting]],
+        }
+
+    p = test.load_policy(
+        {'name': 'sagemaker-endpoint-metric',
+         'resource': 'sagemaker-endpoint',
+         'filters': [
+             {'type': 'metrics', 'name': metric, 'statistics': 'Average',
+              'days': 1, 'period': 3600, 'value': 0, 'op': 'gte'},
+             ]},
+        session_factory=factory,
+        )
+    f = p.resource_manager.filters[-1]
+    # the components come from the module rather than a ListInferenceComponents
+    # call, so each recording holds just the CloudWatch request
+    f.endpoint_components = components
+
+    assert f.process([resource]) == [resource]
+
+    # one series per dimension set, and at least one carrying data: a
+    # GPU metric has nothing for a variant with no GPU, which is why this
+    # isn't every series
+    series = resource['c7n.metrics']
+    assert len(series) == len(f.get_dimensions_set(resource))
+    assert any(points for points in series.values()), (
+        f"{metric} returned no data for any {kind} dimension set")

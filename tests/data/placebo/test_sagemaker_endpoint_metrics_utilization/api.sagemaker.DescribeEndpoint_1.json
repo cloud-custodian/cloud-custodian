@@ -1,9 +1,9 @@
 {
     "status_code": 200,
     "data": {
-        "EndpointName": "c7n-endpoint-metrics-upward-hippo-busy",
-        "EndpointArn": "arn:aws:sagemaker:us-east-1:644160558196:endpoint/c7n-endpoint-metrics-upward-hippo-busy",
-        "EndpointConfigName": "c7n-endpoint-metrics-upward-hippo-busy",
+        "EndpointName": "c7n-endpoint-metrics-pet-hagfish-busy",
+        "EndpointArn": "arn:aws:sagemaker:us-east-1:644160558196:endpoint/c7n-endpoint-metrics-pet-hagfish-busy",
+        "EndpointConfigName": "c7n-em-busy-5b715f3f8901364313488bfd25",
         "ProductionVariants": [
             {
                 "VariantName": "quiet",
@@ -15,11 +15,11 @@
                             "__class__": "datetime",
                             "year": 2026,
                             "month": 9,
-                            "day": 1,
-                            "hour": 16,
-                            "minute": 58,
-                            "second": 35,
-                            "microsecond": 267000
+                            "day": 10,
+                            "hour": 12,
+                            "minute": 16,
+                            "second": 19,
+                            "microsecond": 378000
                         }
                     }
                 ],
@@ -38,11 +38,34 @@
                             "__class__": "datetime",
                             "year": 2026,
                             "month": 9,
-                            "day": 1,
-                            "hour": 16,
-                            "minute": 58,
-                            "second": 35,
-                            "microsecond": 201000
+                            "day": 10,
+                            "hour": 12,
+                            "minute": 16,
+                            "second": 19,
+                            "microsecond": 254000
+                        }
+                    }
+                ],
+                "CurrentWeight": 1.0,
+                "DesiredWeight": 1.0,
+                "CurrentInstanceCount": 1,
+                "DesiredInstanceCount": 1
+            },
+            {
+                "VariantName": "gpu",
+                "DeployedImages": [
+                    {
+                        "SpecifiedImage": "644160558196.dkr.ecr.us-east-1.amazonaws.com/sagemaker-xgboost:1.7-1",
+                        "ResolvedImage": "644160558196.dkr.ecr.us-east-1.amazonaws.com/sagemaker-xgboost@sha256:b4f13edb198529c460692015797fa1ca6a8ff1ed64a149297174d922121b8fc4",
+                        "ResolutionTime": {
+                            "__class__": "datetime",
+                            "year": 2026,
+                            "month": 9,
+                            "day": 10,
+                            "hour": 12,
+                            "minute": 16,
+                            "second": 19,
+                            "microsecond": 317000
                         }
                     }
                 ],
@@ -57,21 +80,21 @@
             "__class__": "datetime",
             "year": 2026,
             "month": 9,
-            "day": 1,
-            "hour": 16,
-            "minute": 58,
-            "second": 34,
-            "microsecond": 387000
+            "day": 10,
+            "hour": 12,
+            "minute": 16,
+            "second": 17,
+            "microsecond": 10000
         },
         "LastModifiedTime": {
             "__class__": "datetime",
             "year": 2026,
             "month": 9,
-            "day": 1,
-            "hour": 17,
-            "minute": 5,
-            "second": 16,
-            "microsecond": 782000
+            "day": 10,
+            "hour": 12,
+            "minute": 19,
+            "second": 55,
+            "microsecond": 257000
         },
         "MetricsConfig": {
             "EnableDetailedObservability": true

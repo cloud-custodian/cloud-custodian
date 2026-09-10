@@ -98,7 +98,7 @@ resource "aws_sagemaker_endpoint_configuration" "busy" {
     variant_name           = "gpu"
     model_name             = aws_sagemaker_model.main.name
     initial_instance_count = 1
-    instance_type          = "ml.g5.xlarge"
+    instance_type          = "ml.g4dn.xlarge"
     initial_variant_weight = 1
   }
 }
@@ -149,7 +149,7 @@ resource "aws_sagemaker_endpoint_configuration" "component" {
   # accelerator, one not
   production_variants {
     variant_name           = "AllTraffic"
-    instance_type          = "ml.g5.xlarge"
+    instance_type          = "ml.g4dn.xlarge"
     initial_instance_count = 1
 
     routing_config {
@@ -191,7 +191,7 @@ resource "aws_cloudformation_stack" "component" {
           Specification = {
             ModelName = aws_sagemaker_model.main.name
             # every component on a gpu pool has to reserve accelerators,
-            # and ml.g5.xlarge has one, so the endpoint hosts one component
+            # and ml.g4dn.xlarge has one, so the endpoint hosts one component
             ComputeResourceRequirements = {
               MinMemoryRequiredInMb              = 1024
               NumberOfCpuCoresRequired           = 1

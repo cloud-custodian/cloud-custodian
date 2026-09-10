@@ -1,9 +1,9 @@
 {
     "status_code": 200,
     "data": {
-        "EndpointName": "c7n-endpoint-metrics-upward-hippo-idle",
-        "EndpointArn": "arn:aws:sagemaker:us-east-1:644160558196:endpoint/c7n-endpoint-metrics-upward-hippo-idle",
-        "EndpointConfigName": "c7n-endpoint-metrics-upward-hippo-idle",
+        "EndpointName": "c7n-endpoint-metrics-pet-hagfish-idle",
+        "EndpointArn": "arn:aws:sagemaker:us-east-1:644160558196:endpoint/c7n-endpoint-metrics-pet-hagfish-idle",
+        "EndpointConfigName": "c7n-em-idle-a2b7b463224738170164e0b4be",
         "ProductionVariants": [
             {
                 "VariantName": "AllTraffic",
@@ -15,11 +15,11 @@
                             "__class__": "datetime",
                             "year": 2026,
                             "month": 9,
-                            "day": 1,
-                            "hour": 16,
-                            "minute": 58,
-                            "second": 33,
-                            "microsecond": 265000
+                            "day": 10,
+                            "hour": 12,
+                            "minute": 16,
+                            "second": 18,
+                            "microsecond": 256000
                         }
                     }
                 ],
@@ -34,21 +34,21 @@
             "__class__": "datetime",
             "year": 2026,
             "month": 9,
-            "day": 1,
-            "hour": 16,
-            "minute": 58,
-            "second": 32,
-            "microsecond": 685000
+            "day": 10,
+            "hour": 12,
+            "minute": 16,
+            "second": 16,
+            "microsecond": 483000
         },
         "LastModifiedTime": {
             "__class__": "datetime",
             "year": 2026,
             "month": 9,
-            "day": 1,
-            "hour": 17,
-            "minute": 1,
-            "second": 47,
-            "microsecond": 930000
+            "day": 10,
+            "hour": 12,
+            "minute": 19,
+            "second": 53,
+            "microsecond": 555000
         },
         "MetricsConfig": {
             "EnableDetailedObservability": true

@@ -7,27 +7,27 @@
                     "__class__": "datetime",
                     "year": 2026,
                     "month": 9,
-                    "day": 1,
-                    "hour": 17,
-                    "minute": 0,
-                    "second": 31,
-                    "microsecond": 549000
+                    "day": 10,
+                    "hour": 12,
+                    "minute": 18,
+                    "second": 28,
+                    "microsecond": 680000
                 },
-                "InferenceComponentArn": "arn:aws:sagemaker:us-east-1:644160558196:inference-component/c7n-endpoint-metrics-upward-hippo-ic",
-                "InferenceComponentName": "c7n-endpoint-metrics-upward-hippo-ic",
-                "EndpointArn": "arn:aws:sagemaker:us-east-1:644160558196:endpoint/c7n-endpoint-metrics-upward-hippo-ic",
-                "EndpointName": "c7n-endpoint-metrics-upward-hippo-ic",
+                "InferenceComponentArn": "arn:aws:sagemaker:us-east-1:644160558196:inference-component/c7n-endpoint-metrics-pet-hagfish-ic",
+                "InferenceComponentName": "c7n-endpoint-metrics-pet-hagfish-ic",
+                "EndpointArn": "arn:aws:sagemaker:us-east-1:644160558196:endpoint/c7n-endpoint-metrics-pet-hagfish-ic",
+                "EndpointName": "c7n-endpoint-metrics-pet-hagfish-ic",
                 "VariantName": "AllTraffic",
                 "InferenceComponentStatus": "InService",
                 "LastModifiedTime": {
                     "__class__": "datetime",
                     "year": 2026,
                     "month": 9,
-                    "day": 1,
-                    "hour": 17,
-                    "minute": 2,
-                    "second": 41,
-                    "microsecond": 706000
+                    "day": 10,
+                    "hour": 12,
+                    "minute": 20,
+                    "second": 7,
+                    "microsecond": 532000
                 }
             }
         ],

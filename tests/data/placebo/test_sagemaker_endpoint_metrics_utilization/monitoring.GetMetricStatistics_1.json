@@ -8,13 +8,13 @@
                     "__class__": "datetime",
                     "year": 2026,
                     "month": 9,
-                    "day": 1,
-                    "hour": 16,
-                    "minute": 11,
+                    "day": 10,
+                    "hour": 11,
+                    "minute": 26,
                     "second": 0,
                     "microsecond": 0
                 },
-                "Average": 134.92706400721872,
+                "Average": 0.05833313154386646,
                 "Unit": "Percent"
             }
         ],
