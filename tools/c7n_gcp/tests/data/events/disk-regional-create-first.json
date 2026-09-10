@@ -1,0 +1,110 @@
+{
+  "insertId": "-o3w95dd34ku",
+  "labels": {
+    "compute.googleapis.com/root_trigger_id": "341f2f26-73f0-49f4-b966-dbd6e87bfe9d"
+  },
+  "logName": "projects/cloud-custodian/logs/cloudaudit.googleapis.com%2Factivity",
+  "operation": {
+    "first": true,
+    "id": "operation-1787255378983-6597fd1fcb972-0bca07bc-e5416c85",
+    "producer": "compute.googleapis.com"
+  },
+  "protoPayload": {
+    "@type": "type.googleapis.com/google.cloud.audit.AuditLog",
+    "apiVersionIdentifier": "v1",
+    "authenticationInfo": {
+      "oauthInfo": {
+        "oauthClientId": "764086051850-6qr4p6gpi6hn506pt8ejuq83di341hur.apps.googleusercontent.com"
+      },
+      "principalEmail": "user@example.com",
+      "principalSubject": "user:user@example.com"
+    },
+    "authorizationInfo": [
+      {
+        "granted": true,
+        "permission": "compute.disks.create",
+        "permissionType": "ADMIN_WRITE",
+        "resource": "projects/cloud-custodian/regions/us-central1/disks/c7n-audit-regional-default-f5b3",
+        "resourceAttributes": {
+          "name": "projects/cloud-custodian/regions/us-central1/disks/c7n-audit-regional-default-f5b3",
+          "service": "compute",
+          "type": "compute.disks"
+        }
+      },
+      {
+        "granted": true,
+        "permission": "compute.disks.setLabels",
+        "permissionType": "ADMIN_WRITE",
+        "resource": "projects/cloud-custodian/regions/us-central1/disks/c7n-audit-regional-default-f5b3",
+        "resourceAttributes": {
+          "name": "projects/cloud-custodian/regions/us-central1/disks/c7n-audit-regional-default-f5b3",
+          "service": "compute",
+          "type": "compute.disks"
+        }
+      }
+    ],
+    "methodName": "v1.compute.regionDisks.insert",
+    "request": {
+      "@type": "type.googleapis.com/compute.regionDisks.insert",
+      "labels": [
+        {
+          "key": "goog-terraform-provisioned",
+          "value": "true"
+        }
+      ],
+      "name": "c7n-audit-regional-default-f5b3",
+      "replicaZones": [
+        "projects/cloud-custodian/global/zones/us-central1-a",
+        "projects/cloud-custodian/global/zones/us-central1-b"
+      ],
+      "sizeGb": "10",
+      "type": "projects/cloud-custodian/regions/us-central1/diskTypes/pd-ssd"
+    },
+    "requestMetadata": {
+      "callerIp": "198.51.100.1",
+      "callerSuppliedUserAgent": "Terraform/1.13.0 (+https://www.terraform.io) Terraform-Plugin-SDK/2.40.1 terraform-provider-google/dev7,gzip(gfe)",
+      "destinationAttributes": {},
+      "requestAttributes": {
+        "auth": {},
+        "time": "2026-08-20T19:49:39.365797Z"
+      }
+    },
+    "resourceLocation": {
+      "currentLocations": [
+        "us-central1"
+      ]
+    },
+    "resourceName": "projects/cloud-custodian/regions/us-central1/disks/c7n-audit-regional-default-f5b3",
+    "response": {
+      "@type": "type.googleapis.com/operation",
+      "id": "7436650565111309500",
+      "insertTime": "2026-08-20T12:49:39.193-07:00",
+      "name": "operation-1787255378983-6597fd1fcb972-0bca07bc-e5416c85",
+      "operationType": "insert",
+      "progress": "0",
+      "region": "https://www.googleapis.com/compute/v1/projects/cloud-custodian/regions/us-central1",
+      "selfLink": "https://www.googleapis.com/compute/v1/projects/cloud-custodian/regions/us-central1/operations/operation-1787255378983-6597fd1fcb972-0bca07bc-e5416c85",
+      "selfLinkWithId": "https://www.googleapis.com/compute/v1/projects/cloud-custodian/regions/us-central1/operations/7436650565111309500",
+      "startTime": "2026-08-20T12:49:39.197-07:00",
+      "status": "RUNNING",
+      "targetId": "685703828320478397",
+      "targetLink": "https://www.googleapis.com/compute/v1/projects/cloud-custodian/regions/us-central1/disks/c7n-audit-regional-default-f5b3",
+      "user": "user@example.com"
+    },
+    "serviceName": "compute.googleapis.com",
+    "status": {}
+  },
+  "receiveTimestamp": "2026-08-20T19:49:39.733197453Z",
+  "resource": {
+    "labels": {
+      "location": "us-central1",
+      "method": "compute.regionDisks.insert",
+      "project_id": "cloud-custodian",
+      "service": "compute.googleapis.com",
+      "version": "v1"
+    },
+    "type": "api"
+  },
+  "severity": "NOTICE",
+  "timestamp": "2026-08-20T19:49:38.935927Z"
+}

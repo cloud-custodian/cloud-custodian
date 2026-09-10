@@ -1,0 +1,63 @@
+{
+    "pytest-terraform": 1,
+    "outputs": {
+        "inference_profile_arn": {
+            "value": "arn:aws:bedrock:us-east-1:644160558196:application-inference-profile/06vsfs68yb4g",
+            "type": "string"
+        }
+    },
+    "resources": {
+        "aws_caller_identity": {
+            "current": {
+                "account_id": "644160558196",
+                "arn": "arn:aws:sts::644160558196:assumed-role/AWSReservedSSO_admin_1ca370fb35bf6b13/kody.mullins@sixfeetup.com",
+                "id": "644160558196",
+                "user_id": "AROAXGZAMH754FNWODWUX:kody.mullins@sixfeetup.com"
+            }
+        },
+        "aws_bedrock_inference_profile": {
+            "token_metrics": {
+                "arn": "arn:aws:bedrock:us-east-1:644160558196:application-inference-profile/06vsfs68yb4g",
+                "created_at": "2026-07-21T19:13:39Z",
+                "description": "Cloud Custodian combined token metrics test",
+                "id": "06vsfs68yb4g",
+                "model_source": [
+                    {
+                        "copy_from": "arn:aws:bedrock:us-east-1:644160558196:inference-profile/us.amazon.nova-lite-v1:0"
+                    }
+                ],
+                "models": [
+                    {
+                        "model_arn": "arn:aws:bedrock:us-east-1::foundation-model/amazon.nova-lite-v1:0"
+                    },
+                    {
+                        "model_arn": "arn:aws:bedrock:us-west-2::foundation-model/amazon.nova-lite-v1:0"
+                    },
+                    {
+                        "model_arn": "arn:aws:bedrock:us-east-2::foundation-model/amazon.nova-lite-v1:0"
+                    }
+                ],
+                "name": "c7n-token-metrics-default-bf98",
+                "region": "us-east-1",
+                "status": "ACTIVE",
+                "tags": null,
+                "tags_all": {},
+                "timeouts": null,
+                "type": "APPLICATION",
+                "updated_at": "2026-07-21T19:13:39Z"
+            }
+        },
+        "random_id": {
+            "suffix": {
+                "b64_std": "v5g=",
+                "b64_url": "v5g",
+                "byte_length": 2,
+                "dec": "49048",
+                "hex": "bf98",
+                "id": "v5g",
+                "keepers": null,
+                "prefix": null
+            }
+        }
+    }
+}

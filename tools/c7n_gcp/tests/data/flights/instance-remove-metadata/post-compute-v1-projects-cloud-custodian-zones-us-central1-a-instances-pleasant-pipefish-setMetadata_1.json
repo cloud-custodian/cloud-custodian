@@ -1,0 +1,31 @@
+{
+  "headers": {
+    "content-type": "application/json; charset=UTF-8",
+    "vary": "Origin, X-Origin, Referer",
+    "date": "Tue, 07 Jul 2026 21:02:24 GMT",
+    "server": "ESF",
+    "x-xss-protection": "0",
+    "x-frame-options": "SAMEORIGIN",
+    "x-content-type-options": "nosniff",
+    "alt-svc": "h3=\":443\"; ma=2592000,h3-29=\":443\"; ma=2592000",
+    "transfer-encoding": "chunked",
+    "status": "200",
+    "content-length": "796",
+    "-content-encoding": "gzip"
+  },
+  "body": {
+    "kind": "compute#operation",
+    "id": "6088518416046544783",
+    "name": "operation-1783458144510-6560bb52ce223-b42312c3-61e13fa0",
+    "zone": "https://www.googleapis.com/compute/v1/projects/cloud-custodian/zones/us-central1-a",
+    "operationType": "setMetadata",
+    "targetLink": "https://www.googleapis.com/compute/v1/projects/cloud-custodian/zones/us-central1-a/instances/pleasant-pipefish",
+    "targetId": "6463665942288193451",
+    "status": "RUNNING",
+    "user": "caleb.syring@sixfeetup.com",
+    "progress": 0,
+    "insertTime": "2026-07-07T14:02:24.742-07:00",
+    "startTime": "2026-07-07T14:02:24.755-07:00",
+    "selfLink": "https://www.googleapis.com/compute/v1/projects/cloud-custodian/zones/us-central1-a/operations/operation-1783458144510-6560bb52ce223-b42312c3-61e13fa0"
+  }
+}

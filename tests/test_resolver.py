@@ -433,6 +433,19 @@ class UrlValueTest(BaseTest):
         os.remove("test_column.csv")
         self.assertEqual(values.get_values(), {"1"})
 
+    def test_csv_column_blank_rows(self):
+        values = self.get_values_from(
+            {"url": "sun.csv", "expr": 1}, "a,b,c\n\n1,2,3\n\n"
+        )
+        self.assertEqual(values.get_values(), {"b", "2"})
+
+    def test_csv_column_ragged_rows_raise(self):
+        values = self.get_values_from(
+            {"url": "sun.csv", "expr": 1}, "a,b,c\n1,2,3\n4\n"
+        )
+        with self.assertRaises(IndexError):
+            values.get_values()
+
     def test_csv_raw(self):
         with open("test_raw.csv", "w") as out:
             writer = csv.writer(out)

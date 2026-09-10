@@ -1,0 +1,38 @@
+{
+  "headers": {
+    "content-type": "application/json; charset=UTF-8",
+    "vary": "Origin, X-Origin, Referer",
+    "date": "Sat, 18 Jul 2026 00:21:18 GMT",
+    "server": "ESF",
+    "x-xss-protection": "0",
+    "x-frame-options": "SAMEORIGIN",
+    "x-content-type-options": "nosniff",
+    "alt-svc": "h3=\":443\"; ma=2592000,h3-29=\":443\"; ma=2592000",
+    "transfer-encoding": "chunked",
+    "status": "200",
+    "content-length": "908",
+    "-content-encoding": "gzip",
+    "content-location": "https://us-central1-aiplatform.googleapis.com/v1/projects/cloud-custodian/locations/us-central1/datasets?alt=json"
+  },
+  "body": {
+    "datasets": [
+      {
+        "name": "projects/cloud-custodian/locations/us-central1/datasets/492212048214622208",
+        "displayName": "c7n-test-dataset-central",
+        "metadataSchemaUri": "gs://google-cloud-aiplatform/schema/dataset/metadata/image_1.0.0.yaml",
+        "createTime": "2026-07-18T00:21:06.994439Z",
+        "updateTime": "2026-07-18T00:21:10.162568Z",
+        "etag": "AMEw9yPkdali9sj6K_Emz1YYBi19JC8V09oUe_h4MaECUNRWEffuCP415epxywwwKM8=",
+        "labels": {
+          "env": "test",
+          "goog-terraform-provisioned": "true"
+        },
+        "metadata": {
+          "dataItemSchemaUri": "gs://google-cloud-aiplatform/schema/dataset/dataitem/image_1.0.0.yaml",
+          "gcsBucket": "cloud-ai-platform-10507420-97a5-4bb6-bf4b-608047b7142a"
+        },
+        "metadataArtifact": "projects/cloud-custodian/locations/us-central1/metadataStores/default/artifacts/db325c22-22cf-466c-8025-b93f8804924b"
+      }
+    ]
+  }
+}

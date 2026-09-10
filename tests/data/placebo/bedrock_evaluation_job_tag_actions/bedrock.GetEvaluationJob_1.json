@@ -1,0 +1,61 @@
+{
+    "status_code": 200,
+    "data": {
+        "ResponseMetadata": {},
+        "jobName": "c7n-evaluation-default-c2dc",
+        "status": "Completed",
+        "jobArn": "arn:aws:bedrock:us-east-1:644160558196:evaluation-job/y36vvtyztckw",
+        "jobDescription": "Cloud Custodian Bedrock evaluation job integration test",
+        "roleArn": "arn:aws:iam::644160558196:role/c7n-evaluation-default-c2dc-role",
+        "jobType": "Automated",
+        "applicationType": "ModelEvaluation",
+        "evaluationConfig": {
+            "automated": {
+                "datasetMetricConfigs": [
+                    {
+                        "taskType": "QuestionAndAnswer",
+                        "dataset": {
+                            "name": "Builtin.BoolQ"
+                        },
+                        "metricNames": [
+                            "Builtin.Accuracy"
+                        ]
+                    }
+                ]
+            }
+        },
+        "inferenceConfig": {
+            "models": [
+                {
+                    "bedrockModel": {
+                        "modelIdentifier": "arn:aws:bedrock:us-east-1::foundation-model/amazon.nova-micro-v1:0",
+                        "inferenceParams": "{\"inferenceConfig\": {\"maxTokens\": 512, \"temperature\": 0.0}}"
+                    }
+                }
+            ]
+        },
+        "outputDataConfig": {
+            "s3Uri": "s3://c7n-evaluation-default-c2dc-output/evaluations/"
+        },
+        "creationTime": {
+            "__class__": "datetime",
+            "year": 2026,
+            "month": 7,
+            "day": 16,
+            "hour": 20,
+            "minute": 24,
+            "second": 11,
+            "microsecond": 791678
+        },
+        "lastModifiedTime": {
+            "__class__": "datetime",
+            "year": 2026,
+            "month": 7,
+            "day": 16,
+            "hour": 20,
+            "minute": 33,
+            "second": 36,
+            "microsecond": 99088
+        }
+    }
+}

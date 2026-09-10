@@ -1,0 +1,46 @@
+{
+    "status_code": 200,
+    "data": {
+        "ResponseMetadata": {},
+        "Status": 200,
+        "DashboardSummaryList": [
+            {
+                "Arn": "arn:aws:quicksight:us-east-1:644160558196:dashboard/7cc4f6cc-4406-4c9f-840a-fbadbe846e32",
+                "DashboardId": "7cc4f6cc-4406-4c9f-840a-fbadbe846e32",
+                "Name": "c7n-test",
+                "CreatedTime": {
+                    "__class__": "datetime",
+                    "year": 2026,
+                    "month": 7,
+                    "day": 15,
+                    "hour": 14,
+                    "minute": 4,
+                    "second": 8,
+                    "microsecond": 159000
+                },
+                "LastUpdatedTime": {
+                    "__class__": "datetime",
+                    "year": 2026,
+                    "month": 7,
+                    "day": 15,
+                    "hour": 14,
+                    "minute": 4,
+                    "second": 7,
+                    "microsecond": 971000
+                },
+                "PublishedVersionNumber": 1,
+                "LastPublishedTime": {
+                    "__class__": "datetime",
+                    "year": 2026,
+                    "month": 7,
+                    "day": 15,
+                    "hour": 14,
+                    "minute": 4,
+                    "second": 8,
+                    "microsecond": 159000
+                }
+            }
+        ],
+        "RequestId": "63a6fdd8-261e-476b-ad31-4d18dbf9608e"
+    }
+}

@@ -11,6 +11,7 @@ from c7n.actions import BaseAction
 
 class PmtcryptKeyDescribe(query.DescribeSource):
     def augment(self, pmt_crypt_keys):
+        pmt_crypt_keys = super().augment(pmt_crypt_keys)
         client = local_session(self.manager.session_factory).client('payment-cryptography')
         for r in pmt_crypt_keys:
             tags = client.list_tags_for_resource(ResourceArn=r["KeyArn"]).get('Tags', [])

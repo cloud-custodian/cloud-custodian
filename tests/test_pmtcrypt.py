@@ -6,6 +6,25 @@ from .common import BaseTest
 
 
 class PmtcryptTest(BaseTest):
+    def test_get_replication_key_filters(self):
+        session_factory = self.replay_flight_data('test_pmtcypt_get_key')
+        p = self.load_policy(
+            {
+                "name": "get-key-payment-cryptography",
+                "resource": "payment-cryptography-key",
+                "filters": [{
+                    "type": "value",
+                    "key": "ReplicationStatus",
+                    "value": "present"
+                }]
+
+            },
+            session_factory=session_factory
+        )
+        resources = p.run()
+        self.assertEqual(len(resources), 1)
+        self.assertIn("ReplicationStatus", resources[0])
+
     def test_tag_action(self):
         session_factory = self.replay_flight_data('test_pmtcrypt_tag_action')
         p = self.load_policy(
@@ -33,7 +52,7 @@ class PmtcryptTest(BaseTest):
             {
                 "name": "remove-tag-payment-cryptography",
                 "resource": "payment-cryptography-key",
-                "actions": [{"type": "remove-tag", "tags": ["ResourceOwner"]}],
+                "actions": [{"type": "remove-tag", "tags": ["Department"]}],
             },
             session_factory=session_factory,
         )
