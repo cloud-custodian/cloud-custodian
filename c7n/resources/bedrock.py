@@ -1322,7 +1322,17 @@ class SetBedrockEvaluationOutputLifecycle(BaseAction):
             if 'get_bucket_lifecycle_configuration' in bucket.get('c7n:DeniedMethods', ()):
                 self.log.warning(
                     "access denied reading lifecycle for bucket %s, skipping", bucket_name)
+ if 'get_bucket_lifecycle_configuration' in bucket.get('c7n:DeniedMethods', ()):
+            denied = bucket.get('c7n:DeniedMethods', ())
+            if 'get_bucket_lifecycle_configuration' in denied:
+                self.log.warning(
+                    "access denied reading lifecycle for bucket %s, skipping", bucket_name)
                 continue
+            if 'get_bucket_versioning' in denied:
+                self.log.warning(
+                    "access denied reading versioning for bucket %s, skipping", bucket_name)
+                continue
+
             self._process_bucket(session, bucket, jobs)
 
     def _process_bucket(self, session, bucket, jobs):
