@@ -156,30 +156,29 @@ class MachineLearningDataContainerTest(BaseTest):
                 'type': 'value',
                 'key': 'resourceGroup',
                 'value': 'test_machine-learning-data-container-archive'
-            }, {
-                'type': 'value',
-                'key': 'name',
-                'value': 'cctest-dc-active'
             }],
             'actions': [{'type': 'archive'}]
         }, validate=True, session_factory=Session)
 
         resources = p.run()
-        assert len(resources) == 1
+        assert sorted(r['name'] for r in resources) == [
+            'cctest-dc-active',
+            'cctest-dc-archived',
+            ]
 
+        active = next(r for r in resources if r['name'] == 'cctest-dc-active')
         client = local_session(Session).client(
             'azure.mgmt.machinelearningservices.MachineLearningServicesMgmtClient')
         container = client.data_containers.get(
-            resources[0]['resourceGroup'],
-            ResourceIdParser.get_resource_name(resources[0]['c7n:parent-id']),
-            resources[0]['name'],
+            active['resourceGroup'],
+            ResourceIdParser.get_resource_name(active['c7n:parent-id']),
+            active['name'],
             )
         assert container.properties.is_archived
 
     @arm_template('machine-learning-data-container-archive.json')
-    @cassette_name('machine-learning-data-container-archived-excluded')
-    def test_machine_learning_data_container_query_excludes_archived(self):
-        """Archived containers are absent: list defaults to listViewType=ActiveOnly."""
+    @cassette_name('machine-learning-data-container-archived-included')
+    def test_machine_learning_data_container_query_includes_archived(self):
         p = self.load_policy({
             'name': 'find-cctest-archive-fixture-data-containers',
             'resource': 'azure.machine-learning-data-container',
@@ -190,7 +189,13 @@ class MachineLearningDataContainerTest(BaseTest):
             }]
         })
         resources = p.run()
-        assert sorted(r['name'] for r in resources) == ['cctest-dc-active']
+        assert {
+            r['name']: r['properties']['isArchived']
+            for r in resources
+            } == {
+                'cctest-dc-active': False,
+                'cctest-dc-archived': True,
+                }
 
     def test_machine_learning_data_container_child_query(self):
         parent_id = (
@@ -235,7 +240,8 @@ class MachineLearningDataContainerTest(BaseTest):
 
         client.data_containers.list.assert_called_once_with(
             resource_group_name='VV',
-            workspace_name='vvmlwrkspc'
+            workspace_name='vvmlwrkspc',
+            list_view_type='All',
         )
         assert len(resources) == 1
         assert resources[0]['id'] == data_container_id
