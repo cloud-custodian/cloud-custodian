@@ -218,7 +218,6 @@ class MetricFilter(Filter):
         self.metricnamespace = self.data.get("metric_namespace", None)
         # default to false if not passed in
         self.period_start = self.data.get('period_start', 'auto')
-        # Optional per-dimension OData clauses for parent-scoped metrics
         self.dimensions = self.data.get('dimensions', [])
 
     def process(self, resources, event=None):
