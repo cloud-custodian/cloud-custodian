@@ -189,10 +189,10 @@ deploy_resource() {
     elif [[ "$fileName" == "cognitive-service-deployment.json" ]]; then
 
         openai_location="${AZURE_OPENAI_LOCATION:-eastus}"
-        model_name="${AZURE_OPENAI_MODEL_NAME:-gpt-4o-mini}"
-        model_version="${AZURE_OPENAI_MODEL_VERSION:-2024-07-18}"
+        model_name="${AZURE_OPENAI_MODEL_NAME:-gpt-5-nano}"
+        model_version="${AZURE_OPENAI_MODEL_VERSION:-2025-08-07}"
         deployment_name="${AZURE_OPENAI_DEPLOYMENT_NAME:-cctest-gpt4o-mini}"
-        account_name="${AZURE_OPENAI_ACCOUNT_NAME}"
+        account_name="${AZURE_OPENAI_ACCOUNT_NAME:-cctestcogdeploy}"
 
         if az cognitiveservices account show-deleted \
             --resource-group "$rgName" \
@@ -249,6 +249,8 @@ deploy_resource() {
             exit 1
         fi
 
+        sku_name="${AZURE_OPENAI_SKU_NAME:-GlobalStandard}"
+
         if ! az cognitiveservices account deployment create \
             --resource-group $rgName \
             --name $account_name \
@@ -256,7 +258,7 @@ deploy_resource() {
             --model-format OpenAI \
             --model-name $model_name \
             --model-version $model_version \
-            --sku-name Standard \
+            --sku-name $sku_name \
             --sku-capacity 1 \
             --output None; then
             echo "Failed to create Cognitive Services deployment ${deployment_name} in account ${account_name}"
