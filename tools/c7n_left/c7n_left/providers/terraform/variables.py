@@ -14,6 +14,13 @@ import hcl2
 from ...core import log
 from .graph import TerraformGraph
 
+# python-hcl2 8.x changed its defaults (quoted string values, injected
+# `__is_block__` markers). These options restore the pre-8.x output shape
+# that the rest of this module expects from .tfvars parsing.
+HCL2_SERIALIZATION_OPTIONS = hcl2.SerializationOptions(
+    strip_string_quotes=True, explicit_blocks=False, preserve_heredocs=False
+)
+
 
 class VariableResolver:
     """Handle variable value inputs.
@@ -111,7 +118,9 @@ class VariableResolver:
                     try:
                         f_vars = json.loads(contents)
                     except json.JSONDecodeError:
-                        f_vars = hcl2.loads(contents)
+                        f_vars = hcl2.loads(
+                            contents, serialization_options=HCL2_SERIALIZATION_OPTIONS
+                        )
 
                 fpath = type == "user" and self.var_files[idx] or f
                 if isinstance(fpath, Path):

@@ -32,7 +32,7 @@ c7n-policystream = "policystream:cli"
 
 [dependency-groups]
 dev = [
-    "mock<5.0.0,>=4.0.2",
+    "mock>=4.0.2,<6.0.0",
     "pytest",
 ]
 

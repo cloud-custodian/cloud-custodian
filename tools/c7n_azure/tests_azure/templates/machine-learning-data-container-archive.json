@@ -7,7 +7,7 @@
         }
     },
     "variables": {
-        "workspaceName": "cctest-mlws-dcarchive",
+        "workspaceName": "[concat('cctest-mlws-dc', parameters('uniqueId'))]",
         "activeDataContainerName": "cctest-dc-active",
         "archivedDataContainerName": "cctest-dc-archived",
         "storageName": "[concat('cctestdcst', parameters('uniqueId'))]",

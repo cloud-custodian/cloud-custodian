@@ -102,7 +102,8 @@ class MachineLearningDataContainer(ChildArmResourceManager):
         def extra_args(cls, parent_resource):
             return {
                 'resource_group_name': parent_resource['resourceGroup'],
-                'workspace_name': parent_resource['name']
+                'workspace_name': parent_resource['name'],
+                'list_view_type': 'All',
             }
 
     def augment(self, resources):
@@ -143,6 +144,9 @@ class MachineLearningDataContainerArchiveAction(AzureBaseAction):
         self.client = self.manager.get_client()
 
     def _process_resource(self, resource):
+        if resource['properties']['isArchived']:
+            return
+
         resource['properties']['isArchived'] = True
         self.client.data_containers.create_or_update(
             resource_group_name=resource['resourceGroup'],

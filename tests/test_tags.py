@@ -4,13 +4,15 @@
 module to test some universal tagging infrastructure not directly exposed.
 """
 import time
+import jsonschema
+from datetime import datetime
 from freezegun import freeze_time
-from unittest.mock import MagicMock, call
+from unittest.mock import MagicMock, call, patch
 
 from c7n import tags as tagmod
 from c7n.tags import universal_retry, coalesce_copy_user_tags
 from c7n.exceptions import PolicyExecutionError, PolicyValidationError
-from c7n.utils import yaml_load
+from c7n.utils import FormatDate, yaml_load
 
 from .common import BaseTest
 
@@ -606,6 +608,40 @@ class CopyRelatedResourceTag(BaseTest):
         self.assertRaises(PolicyValidationError, self.load_policy, policy)
 
 
+class TagValueSchemaTest(BaseTest):
+    """Tag values are strings, but unquoted YAML scalars have always been
+    accepted and coerced. The fallback is a newer field and stays strict.
+    """
+
+    def validates(self, value):
+        try:
+            jsonschema.validate(
+                {'X': value},
+                {'type': 'object',
+                 'additionalProperties': tagmod.tag_value_schema()})
+            return True
+        except jsonschema.ValidationError:
+            return False
+
+    def test_scalar_accepts_number_and_boolean(self):
+        self.assertTrue(self.validates('plain'))
+        self.assertTrue(self.validates(12345))
+        self.assertTrue(self.validates(True))
+
+    def test_default_value_must_be_a_string(self):
+        self.assertTrue(
+            self.validates({'type': 'resource', 'key': 'K', 'default-value': 'd'}))
+        self.assertFalse(
+            self.validates({'type': 'resource', 'key': 'K', 'default-value': 5}))
+        self.assertFalse(
+            self.validates({'type': 'resource', 'default-value': True}))
+
+    def test_non_scalar_values_rejected(self):
+        self.assertFalse(self.validates(['a']))
+        self.assertFalse(self.validates(None))
+        self.assertFalse(self.validates({'foo': 'bar'}))
+
+
 class ResolveTagValueTest(BaseTest):
     def test_static_passthrough(self):
         self.assertEqual(
@@ -713,6 +749,22 @@ class DynamicTagTest(BaseTest):
         create_tags.assert_called_once_with(
             Resources=["i-1"],
             Tags=[{"Key": "Stamp", "Value": "created-2022-06-27 12:34:56-in-us-east-1"}],
+            DryRun=False)
+
+    def test_now_resolved_once_for_the_whole_run(self):
+        # a clock that moves on every read - the run should only read it once,
+        # so every resource lands in one group with one timestamp
+        ticks = [FormatDate(datetime(2022, 6, 27, 12, 34, 56)),
+                 FormatDate(datetime(2022, 6, 27, 12, 34, 57))]
+        with patch.object(FormatDate, "utcnow", side_effect=ticks) as utcnow:
+            create_tags = self._run(
+                [{"InstanceId": "i-1"}, {"InstanceId": "i-2"}],
+                {"Stamp": {"type": "resource", "key": "Nope",
+                           "default-value": "at-{now}"}})
+        self.assertEqual(utcnow.call_count, 1)
+        create_tags.assert_called_once_with(
+            Resources=["i-1", "i-2"],
+            Tags=[{"Key": "Stamp", "Value": "at-2022-06-27 12:34:56"}],
             DryRun=False)
 
 
