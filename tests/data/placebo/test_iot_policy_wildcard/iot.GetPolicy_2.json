@@ -1,0 +1,31 @@
+{
+    "status_code": 200,
+    "data": {
+        "ResponseMetadata": {},
+        "policyName": "c7n-test-iot-scoped",
+        "policyArn": "arn:aws:iot:us-east-1:644160558196:policy/c7n-test-iot-scoped",
+        "policyDocument": "{\"Version\":\"2012-10-17\",\"Statement\":[{\"Effect\":\"Allow\",\"Action\":[\"iot:Connect\"],\"Resource\":\"arn:aws:iot:us-east-1:644160558196:client/${iot:ClientId}\"},{\"Effect\":\"Allow\",\"Action\":[\"iot:Publish\"],\"Resource\":\"arn:aws:iot:us-east-1:644160558196:topic/devices/telemetry\"}]}",
+        "defaultVersionId": "1",
+        "creationDate": {
+            "__class__": "datetime",
+            "year": 2026,
+            "month": 9,
+            "day": 9,
+            "hour": 15,
+            "minute": 16,
+            "second": 48,
+            "microsecond": 978000
+        },
+        "lastModifiedDate": {
+            "__class__": "datetime",
+            "year": 2026,
+            "month": 9,
+            "day": 9,
+            "hour": 15,
+            "minute": 16,
+            "second": 48,
+            "microsecond": 978000
+        },
+        "generationId": "0a530c0b140d2a5888d551cf1a1aa98ea6d2c38fb3ca98b7163044fcc554fe5a"
+    }
+}
