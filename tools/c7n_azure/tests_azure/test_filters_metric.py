@@ -14,7 +14,7 @@ class MetricFilterDimensionsTest(BaseTest):
             'resource': 'azure.vm',
             'filters': [
                 {'type': 'metric',
-                 'metric': 'TotalCalls',
+                 'metric': 'AzureOpenAIRequests',
                  'metric_namespace': 'Microsoft.CognitiveServices/accounts',
                  'op': 'lte',
                  'threshold': 0,
@@ -24,7 +24,7 @@ class MetricFilterDimensionsTest(BaseTest):
         self.assertTrue(p)
 
     def _get_filter(self, dimensions=None):
-        data = {'type': 'metric', 'metric': 'TotalCalls', 'op': 'lte', 'threshold': 0}
+        data = {'type': 'metric', 'metric': 'AzureOpenAIRequests', 'op': 'lte', 'threshold': 0}
         if dimensions is not None:
             data['dimensions'] = dimensions
         return MetricFilter(data=data, manager=Mock())
@@ -81,3 +81,8 @@ class MetricFilterDimensionsTest(BaseTest):
         self.assertEqual(
             f.get_filter(resource),
             "Region eq 'eastus' and ModelDeploymentName eq 'my-deployment'")
+
+    def test_get_metrics_cache_key_differs_by_dimensions(self):
+        f1 = self._get_filter(dimensions=[{'name': 'ModelDeploymentName', 'value': 'dep-a'}])
+        f2 = self._get_filter(dimensions=[{'name': 'ModelDeploymentName', 'value': 'dep-b'}])
+        self.assertNotEqual(f1._get_metrics_cache_key(), f2._get_metrics_cache_key())

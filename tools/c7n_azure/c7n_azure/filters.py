@@ -21,6 +21,7 @@ from azure.core.exceptions import HttpResponseError
 from c7n_azure.provider import resources
 from c7n.filters import Filter, FilterValidationError, ValueFilter
 from c7n.filters.core import PolicyValidationError
+from c7n.exceptions import PolicyExecutionError
 from c7n.filters.metrics import METRIC_WINDOW_ALIGNMENT
 from c7n.filters.related import RelatedResourceFilter
 from c7n.filters.offhours import OffHour, OnHour, Time
@@ -146,6 +147,42 @@ class MetricFilter(Filter):
                 threshold: 20
                 timeframe: 24
                 period_start: start-of-day
+
+    The ``dimensions`` key lets a policy filter a resource by a metric of that
+    resource's parent, restricted back to the resource itself with an OData
+    filter clause. When ``dimensions`` is set, the filter queries the parent
+    resource's scope, taken from the ``c7n:parent-id`` annotation, instead of
+    the resource's own id. Each dimension's ``value`` accepts a literal
+    string, or one of two sentinels: ``resource-name`` (the resource's own
+    ``name``) or ``resource-id`` (the resource's own ``id``). Because those
+    two strings are reserved as sentinels, a dimension value can't currently
+    be the literal string ``resource-name`` or ``resource-id`` themselves.
+
+    :example:
+
+    Find Azure OpenAI model deployments with no requests in the last week,
+    by querying the parent Cognitive Services account's ``AzureOpenAIRequests``
+    metric and filtering it back to the deployment via the
+    ``ModelDeploymentName`` dimension
+
+    .. code-block:: yaml
+
+        policies:
+          - name: unused-openai-deployments
+            resource: azure.cognitiveservice-deployment
+            filters:
+              - type: metric
+                metric: AzureOpenAIRequests
+                metric_namespace: Microsoft.CognitiveServices/accounts
+                aggregation: total
+                op: lte
+                threshold: 0
+                timeframe: 168
+                interval: P1D
+                no_data_action: to_zero
+                dimensions:
+                  - name: ModelDeploymentName
+                    value: resource-name
 
     """
 
@@ -292,10 +329,14 @@ class MetricFilter(Filter):
     def get_filter(self, resource):
         if not self.dimensions:
             return self.filter
-        clauses = [
-            "%s eq '%s'" % (d['name'], self.resolve_dimension_value(resource, d['value']))
-            for d in self.dimensions
-        ]
+        clauses = []
+        for d in self.dimensions:
+            value = self.resolve_dimension_value(resource, d['value'])
+            if value is None:
+                raise PolicyExecutionError(
+                    "policy:%s Could not resolve dimension %s for resource %s" % (
+                        self.manager.ctx.policy.name, d['name'], resource.get('id')))
+            clauses.append("%s eq '%s'" % (d['name'], str(value).replace("'", "''")))
         dim_filter = " and ".join(clauses)
         return "%s and %s" % (self.filter, dim_filter) if self.filter else dim_filter
 
@@ -307,12 +348,13 @@ class MetricFilter(Filter):
         }
 
     def _get_metrics_cache_key(self):
-        return "{}, {}, {}, {}, {}".format(
+        return "{}, {}, {}, {}, {}, {}".format(
             self.metric,
             self.aggregation,
             self.timeframe,
             self.interval,
             self.filter,
+            self.dimensions,
         )
 
     def _get_cached_metric_data(self, resource):

@@ -191,6 +191,8 @@ deploy_resource() {
         openai_location="${AZURE_OPENAI_LOCATION:-eastus}"
         model_name="${AZURE_OPENAI_MODEL_NAME:-gpt-5-nano}"
         model_version="${AZURE_OPENAI_MODEL_VERSION:-2025-08-07}"
+        # Pinned by committed test fixtures (recorded VCR cassettes reference this exact
+        # deployment name) -- do not rename to match the model default above.
         deployment_name="${AZURE_OPENAI_DEPLOYMENT_NAME:-cctest-gpt4o-mini}"
         account_name="${AZURE_OPENAI_ACCOUNT_NAME:-cctestcogdeploy}"
 
