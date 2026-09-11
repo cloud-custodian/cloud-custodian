@@ -68,7 +68,7 @@ def region_gc(options, region, policy_config, policies):
                 # Is it a schedule mode policy function due to empty resource policy?
                 fn = client.get_function(FunctionName=n['FunctionName'])
                 if 'custodian-schedule' in fn.get('Tags', {}).keys():
-                    tag_value = fn.get['Tags']['custodian-schedule']
+                    tag_value = fn['Tags']['custodian-schedule']
                     tag_result = schedule_pattern.search(tag_value)
                     events.append(mu.EventBridgeScheduleSource({
                         'group-name': tag_result.group(2)
