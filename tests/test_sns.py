@@ -975,6 +975,27 @@ class TestSNS(BaseTest):
         resources = p.run()
         self.assertEqual(len(resources), 1)
 
+    def test_sns_cross_account_for_any_value(self):
+        session_factory = self.replay_flight_data("test_sns_cross_account_for_any_value")
+
+        p = self.load_policy(
+            {
+                "name": "sns-for-any-value-matched",
+                "resource": "sns",
+                "filters": [
+                    {
+                        "type": "cross-account",
+                        "whitelist_org_units": [
+                            "o-abcd123456/r-xyz789/ou-xyz789-qrstuvwx"
+                        ]
+                    },
+                ],
+            },
+            session_factory=session_factory,
+        )
+        resources = p.run()
+        self.assertEqual(len(resources), 0)
+
     def test_sns_cross_account_return_allowed(self):
         session_factory = self.replay_flight_data("test_sns_cross_account_return_allowed")
 

@@ -131,6 +131,7 @@ class AzureVCRBaseTest(VCRTestCase):
                         'x-ms-keyvault-network-info',
                         'x-ms-keyvault-region',
                         'x-ms-ratelimit-remaining-subscription-reads',
+                        'x-ms-operation-identifier',
                         'x-ms-request-id',
                         'x-ms-routing-request-id',
                         'x-ms-gateway-service-instanceid',
@@ -301,7 +302,7 @@ class AzureVCRBaseTest(VCRTestCase):
 
     @staticmethod
     def _replace_subscription_id(s):
-        prefixes = ['(/|%2F)?subscriptions(/|%2F)',
+        prefixes = [r'(\\?/|%2F)?subscriptions(\\?/|%2F)',
                     '"subscription":\\s*"']
         regex = r"(?P<prefix>(%s))" \
                 r"[\da-zA-Z]{8}-([\da-zA-Z]{4}-){3}[\da-zA-Z]{12}" \
