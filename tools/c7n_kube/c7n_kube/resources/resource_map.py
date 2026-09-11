@@ -4,6 +4,7 @@ ResourceMap = {
     "k8s.config-map": "c7n_kube.resources.core.configmap.ConfigMap",
     "k8s.custom-cluster-resource": "c7n_kube.resources.crd.CustomResourceDefinition",
     "k8s.custom-namespaced-resource": "c7n_kube.resources.crd.CustomNamespacedResourceDefinition",
+    "k8s.custom-resource": "c7n_kube.resources.custom_resource.CustomResource",
     "k8s.daemon-set": "c7n_kube.resources.apps.daemonset.DaemonSet",
     "k8s.deployment": "c7n_kube.resources.apps.deployment.Deployment",
     "k8s.namespace": "c7n_kube.resources.core.namespace.Namespace",

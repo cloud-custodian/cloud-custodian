@@ -14,6 +14,7 @@ import re
 import sys
 import threading
 import time
+import typing
 from urllib import parse as urlparse
 from urllib.request import getproxies, proxy_bypass
 
@@ -162,9 +163,17 @@ def parse_date(v, tz=None):
     return isinstance(v, datetime) and v or None
 
 
+if typing.TYPE_CHECKING:
+    from c7n.element import ElementJSONSchema
+
+
 def type_schema(
-        type_name, inherits=None, rinherit=None,
-        aliases=None, required=None, **props):
+        type_name: str,
+        inherits: list[str] | None = None,
+        rinherit: 'ElementJSONSchema | None' = None,
+        aliases: list[str] | None = None,
+        required: list[str] | None = None,
+        **props: typing.Any) -> 'ElementJSONSchema':
     """jsonschema generation helper
 
     params:

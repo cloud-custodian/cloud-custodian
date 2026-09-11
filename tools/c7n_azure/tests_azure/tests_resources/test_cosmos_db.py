@@ -1,6 +1,5 @@
 # Copyright The Cloud Custodian Authors.
 # SPDX-License-Identifier: Apache-2.0
-from azure.cosmos.cosmos_client import CosmosClient
 from ..azure_common import BaseTest, arm_template, cassette_name
 from c7n_azure.resources.cosmos_db import (CosmosDBChildResource, CosmosDBFirewallRulesFilter,
                                            CosmosFirewallBypassFilter,
@@ -554,19 +553,21 @@ class CosmosDBThroughputActionsTest(BaseTest):
         account_name = "cctestcosmosdb%s" % sub_id
         key = CosmosDBChildResource.get_cosmos_key(
             'test_cosmosdb', account_name, self.client, readonly=False)
-        self.data_client = CosmosClient(
-            url_connection='https://%s.documents.azure.com:443/' % account_name,
-            auth={
-                'masterKey': key
-            }
-        )
+        # Reuse the same cached client the resources under test go through
+        # (see CosmosDBChildResource.get_cosmos_data_client) rather than
+        # constructing a separate one: azure-cosmos v4 spawns a background
+        # endpoint health-check on every CosmosClient construction, and a
+        # second, uncached client here would race that background call
+        # against whichever cassette happens to be active at the time.
+        self.data_client = CosmosDBChildResource.get_cosmos_data_client(
+            'https://%s.documents.azure.com:443/' % account_name, key)
         self.offer = None
 
     def tearDown(self, *args, **kwargs):
         super(CosmosDBThroughputActionsTest, self).tearDown(*args, **kwargs)
         if self.offer:
             self.offer['content']['offerThroughput'] = 400
-            self.data_client.ReplaceOffer(
+            self.data_client.client_connection.ReplaceOffer(
                 self.offer['_self'],
                 self.offer
             )
@@ -635,7 +636,7 @@ class CosmosDBThroughputActionsTest(BaseTest):
 
         collection_offer['content']['offerThroughput'] = throughput_to_restore + 100
 
-        self.data_client.ReplaceOffer(
+        self.data_client.client_connection.ReplaceOffer(
             collection_offer['_self'],
             collection_offer
         )
@@ -668,7 +669,7 @@ class CosmosDBThroughputActionsTest(BaseTest):
 
     def _assert_offer_throughput_equals(self, throughput, resource_self):
         self.sleep_in_live_mode()
-        offers = self.data_client.ReadOffers()
+        offers = self.data_client.client_connection.ReadOffers()
         offer = next((o for o in offers if o['resource'] == resource_self), None)
         self.assertIsNotNone(offer)
         self.assertEqual(throughput, offer['content']['offerThroughput'])
