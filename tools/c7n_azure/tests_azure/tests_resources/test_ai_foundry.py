@@ -135,6 +135,39 @@ class AiFoundryCognitiveServiceDeploymentTest(BaseTest):
         self.assertGreaterEqual(len(resources), 1)
         self.assertTrue(any(r['name'].endswith(deployment_name) for r in resources))
 
+    @requires_arm_polling
+    @arm_template('cognitive-service-deployment.json')
+    @cassette_name('ai-foundry-cognitiveservice-deployment-metric')
+    def test_cognitiveservice_deployment_metric_filter(self):
+        deployment_name = os.environ.get('AZURE_OPENAI_DEPLOYMENT_NAME', 'cctest-gpt4o-mini')
+        p = self.load_policy(
+            {
+                'name': 'test-azure-cognitiveservice-deployment-metric',
+                'resource': 'azure.cognitiveservice-deployment',
+                'filters': [
+                    {'type': 'value',
+                     'key': 'name',
+                     'op': 'glob',
+                     'value': '*' + deployment_name},
+                    {'type': 'metric',
+                     'metric': 'AzureOpenAIRequests',
+                     'metric_namespace': 'Microsoft.CognitiveServices/accounts',
+                     'aggregation': 'total',
+                     'op': 'lte',
+                     'threshold': 0,
+                     'timeframe': 168,
+                     'interval': 'P1D',
+                     'no_data_action': 'to_zero',
+                     'dimensions': [
+                         {'name': 'ModelDeploymentName', 'value': 'resource-name'}]}],
+            },
+            validate=True,
+        )
+
+        resources = p.run()
+
+        self.assertEqual(len(resources), 1)
+
     def test_cognitiveservice_deployment_tagging_not_implemented(self):
         with self.assertRaises(PolicyValidationError):
             self.load_policy(
