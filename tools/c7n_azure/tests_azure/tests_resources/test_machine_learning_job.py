@@ -14,6 +14,21 @@ from ..azure_common import BaseTest, arm_template, cassette_name
 
 class MachineLearningJobTest(BaseTest):
 
+    def test_machine_learning_job_query_args(self):
+        parent = {
+            'name': 'workspace',
+            'resourceGroup': 'resource-group',
+        }
+
+        self.assertEqual(
+            {
+                'resource_group_name': 'resource-group',
+                'workspace_name': 'workspace',
+                'list_view_type': 'All',
+            },
+            MachineLearningJob.resource_type.extra_args(parent),
+        )
+
     def test_machine_learning_job_schema_validate(self):
         p = self.load_policy({
             'name': 'find-all-machine-learning-jobs',
@@ -35,19 +50,52 @@ class MachineLearningJobTest(BaseTest):
         self.assertNotIn('location', MachineLearningJob.resource_type.default_report_fields)
 
     @arm_template('machine-learning-job.json')
-    @cassette_name('machine-learning-jobs')
+    @cassette_name('machine-learning-jobs-archived')
     def test_machine_learning_job_query(self):
-        p = self.load_policy({
-            'name': 'find-all-machine-learning-jobs',
+        policy = {
+            'name': 'find-machine-learning-job',
             'resource': 'azure.machine-learning-job',
-        })
-        resources = p.run()
+            'filters': [{
+                'type': 'value',
+                'key': 'resourceGroup',
+                'value': 'test_machine-learning-job',
+            }, {
+                'type': 'value',
+                'key': 'name',
+                'value': 'cctest-sweep-job',
+            }],
+        }
+        resources = self.load_policy(policy).run()
+        self.assertEqual(1, len(resources))
+        self.assertFalse(resources[0]['properties']['isArchived'])
+
+        resource = resources[0]
+        resource_group = ResourceIdParser.get_resource_group(resource['id'])
+        workspace = ResourceIdParser.get_resource_name(resource['c7n:parent-id'])
+        client = local_session(Session).client(
+            'azure.mgmt.machinelearningservices.MachineLearningServicesMgmtClient')
+        job = client.jobs.get(resource_group, workspace, resource['name'])
+        while job.properties.status not in ('Completed', 'Failed', 'Canceled'):
+            self.sleep_in_live_mode(30)
+            job = client.jobs.get(resource_group, workspace, resource['name'])
+
+        resource = _serialize(job)
+        resource['properties']['isArchived'] = True
+        client.jobs.create_or_update(
+            resource_group_name=resource_group,
+            workspace_name=workspace,
+            id=resource['name'],
+            body=resource,
+        )
+
+        resources = self.load_policy(policy).run()
         self.assertEqual(1, len(resources))
         self.assertEqual('cctest-sweep-job', resources[0]['name'])
+        self.assertTrue(resources[0]['properties']['isArchived'])
         self.assertIn('/jobs/', resources[0]['id'])
 
     @arm_template('machine-learning-job.json')
-    @cassette_name('machine-learning-jobs')
+    @cassette_name('machine-learning-jobs-archived')
     def test_machine_learning_job_filter_sweep_parallelism(self):
         p = self.load_policy({
             'name': 'ml-sweep-jobs-over-parallelism-limit',
