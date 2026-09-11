@@ -50,7 +50,7 @@ class MachineLearningJobTest(BaseTest):
         self.assertNotIn('location', MachineLearningJob.resource_type.default_report_fields)
 
     @arm_template('machine-learning-job.json')
-    @cassette_name('machine-learning-jobs-archived')
+    @cassette_name('machine-learning-jobs')
     def test_machine_learning_job_query(self):
         policy = {
             'name': 'find-machine-learning-job',
@@ -95,7 +95,7 @@ class MachineLearningJobTest(BaseTest):
         self.assertIn('/jobs/', resources[0]['id'])
 
     @arm_template('machine-learning-job.json')
-    @cassette_name('machine-learning-jobs-archived')
+    @cassette_name('machine-learning-jobs')
     def test_machine_learning_job_filter_sweep_parallelism(self):
         p = self.load_policy({
             'name': 'ml-sweep-jobs-over-parallelism-limit',
