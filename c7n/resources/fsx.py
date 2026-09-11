@@ -11,9 +11,11 @@ from c7n.query import (
 from c7n.actions import BaseAction
 from c7n.tags import Tag, TagDelayedAction, RemoveTag, coalesce_copy_user_tags, TagActionFilter
 from c7n.utils import type_schema, local_session, chunks, group_by, get_retry
-from c7n.filters import Filter, ListItemFilter, MetricsFilter
+from c7n.filters import Filter, ListItemFilter, MetricsFilter, ValueFilter
+from c7n.filters.related import RelatedResourceFilter
 from c7n.filters.kms import KmsRelatedFilter
-from c7n.filters.vpc import SubnetFilter, VpcFilter
+from c7n.filters.vpc import (
+    SecurityGroupFilter, SubnetFilter, VpcFilter, NetworkLocation)
 from c7n.filters.backup import ConsecutiveAwsBackupsFilter
 
 
@@ -107,6 +109,178 @@ class FSxVolumesFilter(ListItemFilter):
         for res in resources:
             res[self.annotation_key] = mapping.get(res[model.id], [])
         return super().process(resources, event)
+
+
+@resources.register('fsx-storage-virtual-machine')
+class FSxStorageVirtualMachine(QueryResourceManager):
+
+    class resource_type(TypeInfo):
+        service = 'fsx'
+        enum_spec = ('describe_storage_virtual_machines', 'StorageVirtualMachines', None)
+        name = 'Name'
+        id = 'StorageVirtualMachineId'
+        arn = 'ResourceARN'
+        date = 'CreationTime'
+        cfn_type = 'AWS::FSx::StorageVirtualMachine'
+        filter_name = 'StorageVirtualMachineIds'
+        filter_type = 'list'
+        id_prefix = 'svm-'
+        universal_taggable = object()
+        default_report_fields = (
+            'StorageVirtualMachineId',
+            'Name',
+            'FileSystemId',
+            'Lifecycle',
+            'Subtype',
+        )
+
+    source_mapping = {
+        'describe': DescribeWithResourceTags
+    }
+    permissions = ('fsx:DescribeStorageVirtualMachines',)
+
+
+@FSxStorageVirtualMachine.filter_registry.register('active-directory')
+class SvmActiveDirectoryFilter(ValueFilter):
+    """Filter ontap storage virtual machines on the directory they're joined to.
+
+    Unlike fsx for windows, which reports an ActiveDirectoryId that the
+    `directory` filter can relate on, an ontap svm reports every join - managed
+    or not - through SelfManagedActiveDirectoryConfiguration with no directory
+    id. The joined directory is resolved by matching the svm's configured dns
+    servers against directory service, and the directory is annotated for
+    filtering.
+
+    Replication targets carry no join of their own and svms still settling
+    haven't got one yet, so neither is reported on.
+
+    The annotated directory is fetched without its tags, so filter it on the
+    directory's own attributes rather than on `tag:` keys.
+
+    :example:
+
+    .. code-block:: yaml
+
+        policies:
+          - name: fsx-ontap-svm-must-use-managed-ad
+            resource: aws.fsx-storage-virtual-machine
+            filters:
+              - or:
+                  # an svm that resolves to no directory matches here too
+                  - type: active-directory
+                    key: Type
+                    value: [MicrosoftAD, SharedMicrosoftAD]
+                    op: not-in
+                  # a misconfigured svm keeps reporting the directory it was
+                  # joined to while the join itself is broken
+                  - Lifecycle: MISCONFIGURED
+    """
+
+    schema = type_schema(
+        'active-directory', rinherit=ValueFilter.schema,
+        **{'resolve-on': {
+            'enum': ['dns-ips', 'same-vpc', 'domain-name'],
+            'default': 'dns-ips',
+            'description': (
+                'Evidence accepted when resolving the join. dns-ips only, the '
+                'default, is the sole evidence that establishes which domain '
+                'controllers an svm actually uses. same-vpc additionally '
+                'accepts a domain name match when the directory sits in the '
+                "same vpc as the svm's file system, for estates pointing svms "
+                'at a resolver endpoint rather than at the controllers. '
+                'domain-name accepts a name match outright, which an on '
+                'premises domain of the same name also satisfies.')}})
+    schema_alias = False
+    annotation_key = 'c7n:ActiveDirectory'
+    resolution_key = 'c7n:ActiveDirectoryResolution'
+
+    # replication targets inherit identity from the source rather than
+    # joining a directory themselves
+    non_ad_subtypes = ('DP_DESTINATION', 'SYNC_DESTINATION', 'SYNC_SOURCE')
+    transient_lifecycles = ('CREATING', 'PENDING', 'DELETING')
+
+    def get_permissions(self):
+        perms = set(self.directory_manager().get_permissions())
+        if self.data.get('resolve-on') == 'same-vpc':
+            perms.update(self.manager.get_resource_manager('aws.fsx').get_permissions())
+        return sorted(perms)
+
+    def get_file_system_vpcs(self):
+        return {f['FileSystemId']: f.get('VpcId') for f in
+                self.manager.get_resource_manager('aws.fsx').resources(augment=False)}
+
+    def directory_manager(self):
+        return self.manager.get_resource_manager('aws.directory')
+
+    def in_scope(self, svm):
+        return (svm.get('Subtype') not in self.non_ad_subtypes and
+                svm.get('Lifecycle') not in self.transient_lifecycles)
+
+    def resolve(self, svm, directories, file_system_vpcs=None):
+        """Resolve the svm's join to a directory service directory.
+
+        fsx reports the domain name uppercased where directory service doesn't,
+        so names only compare case insensitively. A name on its own doesn't
+        establish which domain controllers are in use - an on premises domain of
+        the same name resolves identically - so only a dns ip match resolves.
+        """
+        ad = (svm.get('ActiveDirectoryConfiguration') or {}).get(
+            'SelfManagedActiveDirectoryConfiguration')
+        if not ad:
+            return None, {'reason': 'NoActiveDirectory'}
+
+        dns_ips = set(ad.get('DnsIps') or ())
+        domain = (ad.get('DomainName') or '').lower().rstrip('.')
+
+        name_matches = []
+        for d in directories:
+            owner = d.get('OwnerDirectoryDescription') or {}
+            # a directory shared from another account reports the owning
+            # account's domain controllers
+            directory_ips = set(d.get('DnsIpAddrs') or ()) | set(owner.get('DnsIpAddrs') or ())
+            name_match = bool(domain) and domain == d.get('Name', '').lower().rstrip('.')
+            ip_match = bool(dns_ips and dns_ips & directory_ips)
+            if ip_match:
+                return d, {'reason': 'Resolved',
+                           'matched-on': name_match and 'dns-ips,domain-name' or 'dns-ips'}
+            if name_match:
+                name_matches.append(d)
+
+        if name_matches:
+            resolve_on = self.data.get('resolve-on', 'dns-ips')
+            if resolve_on == 'domain-name':
+                return name_matches[0], {'reason': 'Resolved', 'matched-on': 'domain-name'}
+            if resolve_on == 'same-vpc':
+                fs_vpc = (file_system_vpcs or {}).get(svm.get('FileSystemId'))
+                for d in name_matches:
+                    directory_vpc = (d.get('VpcSettings') or {}).get('VpcId')
+                    if fs_vpc and directory_vpc and fs_vpc == directory_vpc:
+                        return d, {'reason': 'Resolved',
+                                   'matched-on': 'domain-name,same-vpc'}
+            # several directories can carry the same domain name, report the
+            # first so the annotation is stable between runs
+            return None, {'reason': 'DomainNameOnlyMatch', 'matched-on': 'domain-name',
+                          'DirectoryId': name_matches[0].get('DirectoryId')}
+        return None, {'reason': 'UnresolvedDirectory',
+                      'DomainName': ad.get('DomainName'), 'DnsIps': sorted(dns_ips)}
+
+    def process(self, resources, event=None):
+        directories = self.directory_manager().resources(augment=False)
+        file_system_vpcs = (
+            self.get_file_system_vpcs()
+            if self.data.get('resolve-on') == 'same-vpc' else None)
+        results = []
+        for r in resources:
+            if not self.in_scope(r):
+                continue
+            directory, resolution = self.resolve(r, directories, file_system_vpcs)
+            # an unresolved join annotates no directory, so a policy asking for
+            # a directory attribute matches it rather than clearing it
+            r[self.annotation_key] = directory or {}
+            r[self.resolution_key] = resolution
+            if self.match(directory or {}):
+                results.append(r)
+        return results
 
 
 @resources.register('fsx-backup')
@@ -724,6 +898,174 @@ class Subnet(SubnetFilter):
 class VpcFilter(VpcFilter):
 
     RelatedIdsExpression = "VpcId"
+
+
+@FSx.filter_registry.register('security-group')
+class FSxSecurityGroupFilter(SecurityGroupFilter):
+    """Filter fsx file systems by their attached security groups.
+
+    describe_file_systems does not report security groups; they are attached
+    to the file system's elastic network interfaces, so they're resolved via
+    the file system's NetworkInterfaceIds.
+
+    :example:
+
+    .. code-block:: yaml
+
+        policies:
+          - name: fsx-public-security-group
+            resource: aws.fsx
+            filters:
+              - type: security-group
+                key: GroupName
+                value: default
+    """
+
+    RelatedIdsExpression = ""
+    eni_group_cache = None
+
+    def get_permissions(self):
+        return tuple(super().get_permissions()) + ('ec2:DescribeNetworkInterfaces',)
+
+    def _describe_eni_groups(self, eni_ids):
+        client = local_session(self.manager.session_factory).client('ec2')
+        groups = {}
+        for eni_set in chunks(sorted(eni_ids), 50):
+            try:
+                enis = client.describe_network_interfaces(
+                    NetworkInterfaceIds=eni_set)['NetworkInterfaces']
+            except client.exceptions.ClientError as e:
+                if e.response['Error']['Code'] != 'InvalidNetworkInterfaceID.NotFound':
+                    raise
+                # a file system being deleted can reference a departed eni,
+                # fall back to individual lookups so one stale id doesn't
+                # discard the whole batch.
+                enis = []
+                for eni_id in eni_set:
+                    try:
+                        enis.extend(client.describe_network_interfaces(
+                            NetworkInterfaceIds=[eni_id])['NetworkInterfaces'])
+                    except client.exceptions.ClientError as e:
+                        if e.response['Error']['Code'] != 'InvalidNetworkInterfaceID.NotFound':
+                            raise
+                        self.log.warning(
+                            'fsx security-group filter, eni:%s not found', eni_id)
+            for eni in enis:
+                groups[eni['NetworkInterfaceId']] = [
+                    g['GroupId'] for g in eni.get('Groups', ())]
+        return groups
+
+    def get_related_ids(self, resources):
+        if self.eni_group_cache is None:
+            eni_ids = set()
+            for r in resources:
+                eni_ids.update(r.get('NetworkInterfaceIds', ()))
+            self.eni_group_cache = (
+                self._describe_eni_groups(eni_ids) if eni_ids else {})
+
+        group_ids = set()
+        for r in resources:
+            for eni_id in r.get('NetworkInterfaceIds', ()):
+                group_ids.update(self.eni_group_cache.get(eni_id, ()))
+        return list(group_ids)
+
+
+FSx.filter_registry.register('network-location', NetworkLocation)
+
+
+@FSx.filter_registry.register('directory')
+class FSxDirectoryFilter(RelatedResourceFilter):
+    """Filter fsx for windows file systems by the directory they're joined to.
+
+    ActiveDirectoryId is only reported for an aws managed microsoft ad, and a
+    self managed join reports none at all.
+
+    Note an id outlives the directory it names. A related resource that can't
+    be resolved is only treated as a match for `value: absent`, so a policy
+    that asks about a directory attribute has to ask for the missing directory
+    separately, or an id left behind by a deleted directory goes unreported.
+
+    :example:
+
+    .. code-block:: yaml
+
+        policies:
+          - name: fsx-windows-must-use-managed-ad
+            resource: aws.fsx
+            filters:
+              - FileSystemType: WINDOWS
+              - or:
+                  # a self managed join reports no directory id at all, and
+                  # a related resource filter has no id to resolve, so ask for
+                  # the missing id directly
+                  - type: value
+                    key: WindowsConfiguration.ActiveDirectoryId
+                    value: absent
+                  # an id naming a directory that no longer exists
+                  - type: directory
+                    key: DirectoryId
+                    value: absent
+                  - type: directory
+                    key: Type
+                    value: [MicrosoftAD, SharedMicrosoftAD]
+                    op: not-in
+                  # a windows file system unavailable for a change to its
+                  # active directory configuration still names the directory
+                  - Lifecycle: MISCONFIGURED_UNAVAILABLE
+    """
+
+    schema = type_schema(
+        'directory', rinherit=ValueFilter.schema,
+        **{'match-resource': {'type': 'boolean'},
+           'operator': {'enum': ['and', 'or']}})
+
+    RelatedResource = "c7n.resources.directory.Directory"
+    RelatedIdsExpression = "WindowsConfiguration.ActiveDirectoryId"
+    AnnotationKey = "matched-directories"
+
+
+@FSx.filter_registry.register('svm')
+class FSxStorageVirtualMachineFilter(ListItemFilter):
+    """Filter fsx file systems by their storage virtual machines.
+
+    ontap configures active directory per storage virtual machine, so a file
+    system with no svm is joined to nothing at all.
+
+    :example:
+
+    .. code-block:: yaml
+
+        policies:
+          - name: fsx-ontap-without-storage-virtual-machine
+            resource: aws.fsx
+            filters:
+              - FileSystemType: ONTAP
+              - Lifecycle: AVAILABLE
+              - type: svm
+                count: 0
+    """
+
+    schema = type_schema(
+        'svm',
+        attrs={"$ref": "#/definitions/filters_common/list_item_attrs"},
+        count={"type": "number"},
+        count_op={"$ref": "#/definitions/filters_common/comparison_operators"}
+    )
+    annotation_key = 'c7n:StorageVirtualMachines'
+    permissions = ('fsx:DescribeStorageVirtualMachines', 'fsx:ListTagsForResource')
+
+    def __init__(self, data, manager=None):
+        data['key'] = f'"{self.annotation_key}"'
+        super().__init__(data, manager)
+
+    def process(self, resources, event=None):
+        svms = self.manager.get_resource_manager(
+            'aws.fsx-storage-virtual-machine').resources()
+        mapping = group_by(svms, 'FileSystemId')
+        model = self.manager.get_model()
+        for res in resources:
+            res[self.annotation_key] = mapping.get(res[model.id], [])
+        return super().process(resources, event)
 
 
 FSx.filter_registry.register('consecutive-aws-backups', ConsecutiveAwsBackupsFilter)

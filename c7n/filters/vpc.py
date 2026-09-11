@@ -253,6 +253,19 @@ class NetworkLocation(Filter):
     schema_alias = True
     permissions = ('ec2:DescribeSecurityGroups', 'ec2:DescribeSubnets')
 
+    def get_permissions(self):
+        # the work is done by the resource's own security-group and subnet
+        # filters, which can resolve through additional apis - enis for a
+        # file system, subnet groups for a cluster - so take what they
+        # declare rather than assuming the two ec2 calls above.
+        perms = set(self.permissions)
+        for name in ('security-group', 'subnet'):
+            f = self.manager.filter_registry.get(name)
+            if f is None:
+                continue
+            perms.update(f({'type': name}, self.manager).get_permissions())
+        return sorted(perms)
+
     def validate(self):
         rfilters = self.manager.filter_registry.keys()
         if 'subnet' not in rfilters:
