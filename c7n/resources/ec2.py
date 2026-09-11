@@ -77,7 +77,12 @@ class DescribeEC2(query.DescribeSource):
         reservations = self.query.get(self.manager, ids)
         return self._flatten_reservations(reservations)
 
-    def augment(self, resources):
+    def augment(
+            self,
+            resources,
+            *,
+            ec2_tag_augment_by_instances_max=EC2_TAG_AUGMENT_BY_INSTANCES_MAX
+    ):
         """EC2 API and AWOL Tags
 
         While ec2 api generally returns tags when doing describe_x on for
@@ -112,7 +117,7 @@ class DescribeEC2(query.DescribeSource):
         # Tag lookup
         client = utils.local_session(self.manager.session_factory).client('ec2')
         model = self.manager.get_model()
-        if len(resources) <= EC2_TAG_AUGMENT_BY_INSTANCES_MAX:
+        if len(resources) <= ec2_tag_augment_by_instances_max:
             # ec2 ignores MaxResults for a resource-id filter, so no paginator.
             tag_set = self.manager.retry(
                 client.describe_tags,
