@@ -1,7 +1,7 @@
 # The metrics SageMaker publishes, and the dimensions that identify them.
 #
-# Maintained by hand from the tables in
-# https://docs.aws.amazon.com/sagemaker/latest/dg/monitoring-cloudwatch.html
+# Maintained by hand/agent.
+# See tests/terraform/sagemaker_endpoint_metrics/probe_metrics.py
 #
 # Each section names the metric table it came from. The namespace is in the
 # prose above that table. A dimension entry is one row of the following
