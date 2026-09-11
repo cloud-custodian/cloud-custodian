@@ -313,7 +313,7 @@ def test_tag_augment_lookup_by_resource_type(test, ec2_augment_tags):
     """
     session_factory = test.replay_flight_data(
         'test_ec2_augment_tags_lookup_many', region=AUGMENT_REGION)
-    test.patch(ec2, 'EC2_TAG_AUGMENT_BY_INSTANCES_MAX', 1)
+    test.patch(ec2.DescribeEC2, 'tag_augment_by_instances_max', 1)
     ids = [ec2_augment_tags['aws_instance.tagged_a.id'],
            ec2_augment_tags['aws_instance.tagged_b.id']]
     _record_tags(test, session_factory,
