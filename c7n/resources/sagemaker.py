@@ -515,7 +515,10 @@ class SageMakerMetricsFilter(MetricsFilter):
 
     @functools.cached_property
     def resource_dimension_derived_value(self) -> typing.Optional[str]:
-        """Return the value for the resource dimension name for the given dimension
+        """Return the value for the resource dimension name
+
+        Derived from given dimension when the resource identifier isn't
+        available as one of the dimensions used.
         """
 
     def _can_use_dimension_names(
