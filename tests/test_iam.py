@@ -2965,7 +2965,7 @@ class CrossAccountChecker(TestCase):
                 "Action": "s3:GetObject",
                 "Resource": "*",
                 "Condition": {
-                    "ForAnyValuesStringLike": {
+                    "ForAnyValue:StringLike": {
                         "aws:PrincipalOrgPaths": [
                             "o-allowed/r-ab12/ou-ab12-aaaabbbb/*"
                         ]
@@ -3006,7 +3006,7 @@ class CrossAccountChecker(TestCase):
                     "Action": "s3:GetObject",
                     "Resource": "*",
                     "Condition": {
-                        "ForAnyValuesStringLike": {
+                        "ForAnyValue:StringLike": {
                             "aws:PrincipalOrgPaths": [path]
                         }
                     }
@@ -3041,7 +3041,7 @@ class CrossAccountChecker(TestCase):
                 "Action": "s3:GetObject",
                 "Resource": "*",
                 "Condition": {
-                    "ForAnyValuesStringLike": {
+                    "ForAnyValue:StringLike": {
                         "aws:PrincipalOrgPaths": ["o-allowed/*"]
                     }
                 }
@@ -3060,7 +3060,7 @@ class CrossAccountChecker(TestCase):
                 "Action": "s3:GetObject",
                 "Resource": "*",
                 "Condition": {
-                    "ForAnyValuesStringLike": {
+                    "ForAnyValue:StringLike": {
                         "aws:PrincipalOrgPaths": [
                             "o-allowed/*/ou-ab12-prod/*"
                         ]
@@ -3073,7 +3073,7 @@ class CrossAccountChecker(TestCase):
         self.assertEqual(len(checker.check(policy)), 0)
 
         # Same shape but org segment wildcarded — must be denied
-        policy["Statement"][0]["Condition"]["ForAnyValuesStringLike"][
+        policy["Statement"][0]["Condition"]["ForAnyValue:StringLike"][
             "aws:PrincipalOrgPaths"] = ["*/r-ab12/ou-ab12-prod/*"]
         self.assertEqual(len(checker.check(policy)), 1)
 
@@ -3086,7 +3086,7 @@ class CrossAccountChecker(TestCase):
                 "Action": "s3:GetObject",
                 "Resource": "*",
                 "Condition": {
-                    "ForAnyValuesStringLike": {
+                    "ForAnyValue:StringLike": {
                         "aws:PrincipalOrgPaths": [
                             "o-trusted/r-aa11/ou-aa11-anything/*",
                             "o-other/r-bb22/ou-bb22-prod/*",
@@ -3103,6 +3103,37 @@ class CrossAccountChecker(TestCase):
         self.assertEqual(len(checker.check(policy)), 0)
 
         checker = PolicyChecker({"allowed_orgid": {"o-trusted"}})
+        self.assertEqual(len(checker.check(policy)), 1)
+
+    def test_principal_org_paths_uses_real_aws_set_operator(self):
+        """Regression: real AWS operator is ``ForAnyValue:StringLike``, not
+        ``ForAnyValues...``. The plural form was never matched, so the
+        condition was dropped and the wildcard principal looked public."""
+        policy = {
+            "Version": "2012-10-17",
+            "Statement": [{
+                "Effect": "Allow",
+                "Principal": "*",
+                "Action": "s3:GetObject",
+                "Resource": "*",
+                "Condition": {
+                    "ForAnyValue:StringLike": {
+                        "aws:PrincipalOrgPaths": [
+                            "o-allowed/r-ab12/ou-ab12-aaaabbbb/*"
+                        ]
+                    }
+                }
+            }]
+        }
+
+        checker = PolicyChecker({"allowed_orgid": {"o-allowed"}})
+        # operator must be normalized, not silently dropped
+        conditions = checker.normalize_conditions(policy["Statement"][0])
+        self.assertEqual(
+            [c["key"] for c in conditions], ["aws:principalorgpaths"])
+        self.assertEqual(len(checker.check(policy)), 0)
+
+        checker = PolicyChecker({"allowed_orgid": {"o-other"}})
         self.assertEqual(len(checker.check(policy)), 1)
 
     def test_org_id_with_specific_non_whitelisted_account(self):
@@ -3724,7 +3755,7 @@ class CrossAccountChecker(TestCase):
                 "Action": "*",
                 "Resource": "*",
                 "Condition": {
-                    "ForAnyValuesStringLike": {
+                    "ForAnyValue:StringLike": {
                         "aws:PrincipalOrgPaths": [
                             "o-example/r-ab12/ou-ab12-prod/*"
                         ]
@@ -3747,7 +3778,7 @@ class CrossAccountChecker(TestCase):
                 "Action": "*",
                 "Resource": "*",
                 "Condition": {
-                    "ForAnyValuesStringLike": {
+                    "ForAnyValue:StringLike": {
                         "aws:PrincipalOrgPaths": [
                             "o-example/r-ab12/ou-ab12-prod/*"
                         ]
