@@ -1,0 +1,16 @@
+{
+    "status_code": 200,
+    "data": {
+        "accountPolicies": [
+            {
+                "policyName": "c7n-test-account-dp",
+                "policyDocument": "{\n  \"Name\": \"c7n-test-account-dp\",\n  \"Version\": \"2021-06-01\",\n  \"Statement\": [\n    {\"Sid\": \"audit\", \"DataIdentifier\": [\"arn:aws:dataprotection::aws:data-identifier/EmailAddress\"], \"Operation\": {\"Audit\": {\"FindingsDestination\": {}}}},\n    {\"Sid\": \"redact\", \"DataIdentifier\": [\"arn:aws:dataprotection::aws:data-identifier/EmailAddress\"], \"Operation\": {\"Deidentify\": {\"MaskConfig\": {}}}}\n  ]\n}",
+                "lastUpdatedTime": 1786561788455,
+                "policyType": "DATA_PROTECTION_POLICY",
+                "scope": "ALL",
+                "accountId": "644160558196"
+            }
+        ],
+        "ResponseMetadata": {}
+    }
+}
