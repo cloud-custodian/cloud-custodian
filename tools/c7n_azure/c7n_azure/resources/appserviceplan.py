@@ -111,7 +111,7 @@ class AppServicePlanWebAppsFilter(ListItemFilter):
                     self._get_web_apps_by_resource(client, r)
                 ))
         else:
-            all_web_apps = self.manager.get_resource_manager("azure.webapp").resources()
+            all_web_apps = webapp.resources()
             web_apps_by_asp = group_by(all_web_apps, 'properties.serverFarmId')
             for r in resources:
                 r[self.annotation_key] = web_apps_by_asp.get(r["id"], [])

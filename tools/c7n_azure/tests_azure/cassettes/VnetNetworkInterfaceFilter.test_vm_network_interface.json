@@ -1,0 +1,254 @@
+{
+    "version": 1,
+    "interactions": [
+        {
+            "request": {
+                "method": "GET",
+                "uri": "https://management.azure.com/subscriptions/ea42f556-5106-4743-99b0-c129bfa71a47/providers/Microsoft.Network/virtualNetworks?api-version=2019-11-01",
+                "body": null,
+                "headers": {}
+            },
+            "response": {
+                "status": {
+                    "code": 200,
+                    "message": "OK"
+                },
+                "headers": {
+                    "cache-control": [
+                        "no-cache"
+                    ],
+                    "content-length": [
+                        "3746"
+                    ],
+                    "x-ms-original-request-ids": [
+                        "a512882f-1ab6-4d10-a5c8-dc97856b83bd",
+                        "87ca5611-8ce2-4ed2-a5d5-98ac6982315e"
+                    ],
+                    "content-type": [
+                        "application/json; charset=utf-8"
+                    ],
+                    "date": [
+                        "Mon, 27 Sep 2021 09:59:56 GMT"
+                    ]
+                },
+                "body": {
+                    "data": {
+                        "value": [
+                            {
+                                "name": "vnet1-141asbfwroute",
+                                "id": "/subscriptions/ea42f556-5106-4743-99b0-c129bfa71a47/resourceGroups/RG-141asbfwroute/providers/Microsoft.Network/virtualNetworks/vnet1-141asbfwroute",
+                                "etag": "W/\"c119d139-3f4f-4353-aacb-9eb9ba78226f\"",
+                                "type": "Microsoft.Network/virtualNetworks",
+                                "location": "eastus",
+                                "tags": {
+                                    "test": "Red"
+                                },
+                                "properties": {
+                                    "provisioningState": "Succeeded",
+                                    "resourceGuid": "d3026d29-b6fe-4877-b05b-b07cda6ed66b",
+                                    "addressSpace": {
+                                        "addressPrefixes": [
+                                            "10.0.0.0/16"
+                                        ]
+                                    },
+                                    "dhcpOptions": {
+                                        "dnsServers": []
+                                    },
+                                    "subnets": [
+                                        {
+                                            "name": "snet1-141asbfwroute",
+                                            "id": "/subscriptions/ea42f556-5106-4743-99b0-c129bfa71a47/resourceGroups/RG-141asbfwroute/providers/Microsoft.Network/virtualNetworks/vnet1-141asbfwroute/subnets/snet1-141asbfwroute",
+                                            "etag": "W/\"c119d139-3f4f-4353-aacb-9eb9ba78226f\"",
+                                            "properties": {
+                                                "provisioningState": "Succeeded",
+                                                "addressPrefix": "10.0.1.0/24",
+                                                "ipConfigurations": [
+                                                    {
+                                                        "id": "/subscriptions/ea42f556-5106-4743-99b0-c129bfa71a47/resourceGroups/RG-141asbfwroute/providers/Microsoft.Network/networkInterfaces/nic1/ipConfigurations/nic1141asbfwroute"
+                                                    }
+                                                ],
+                                                "serviceEndpoints": [],
+                                                "delegations": [],
+                                                "privateEndpointNetworkPolicies": "Enabled",
+                                                "privateLinkServiceNetworkPolicies": "Enabled"
+                                            },
+                                            "type": "Microsoft.Network/virtualNetworks/subnets"
+                                        }
+                                    ],
+                                    "virtualNetworkPeerings": [],
+                                    "enableDdosProtection": false
+                                }
+                            },
+                            {
+                                "name": "vnet2-141asbfwroute",
+                                "id": "/subscriptions/ea42f556-5106-4743-99b0-c129bfa71a47/resourceGroups/RG-141asbfwroute/providers/Microsoft.Network/virtualNetworks/vnet2-141asbfwroute",
+                                "etag": "W/\"0b294db5-0ff2-4622-acb8-91296d7350f4\"",
+                                "type": "Microsoft.Network/virtualNetworks",
+                                "location": "eastus",
+                                "tags": {
+                                    "test": "Red"
+                                },
+                                "properties": {
+                                    "provisioningState": "Succeeded",
+                                    "resourceGuid": "7665e032-fbc2-48eb-a5f0-519b5111b348",
+                                    "addressSpace": {
+                                        "addressPrefixes": [
+                                            "10.0.0.0/16"
+                                        ]
+                                    },
+                                    "dhcpOptions": {
+                                        "dnsServers": []
+                                    },
+                                    "subnets": [
+                                        {
+                                            "name": "snet2-141asbfwroute",
+                                            "id": "/subscriptions/ea42f556-5106-4743-99b0-c129bfa71a47/resourceGroups/RG-141asbfwroute/providers/Microsoft.Network/virtualNetworks/vnet2-141asbfwroute/subnets/snet2-141asbfwroute",
+                                            "etag": "W/\"0b294db5-0ff2-4622-acb8-91296d7350f4\"",
+                                            "properties": {
+                                                "provisioningState": "Succeeded",
+                                                "addressPrefix": "10.0.2.0/24",
+                                                "ipConfigurations": [
+                                                    {
+                                                        "id": "/subscriptions/ea42f556-5106-4743-99b0-c129bfa71a47/resourceGroups/RG-141asbfwroute/providers/Microsoft.Network/networkInterfaces/nic2/ipConfigurations/nic2141asbfwroute"
+                                                    }
+                                                ],
+                                                "serviceEndpoints": [],
+                                                "delegations": [],
+                                                "privateEndpointNetworkPolicies": "Enabled",
+                                                "privateLinkServiceNetworkPolicies": "Enabled"
+                                            },
+                                            "type": "Microsoft.Network/virtualNetworks/subnets"
+                                        }
+                                    ],
+                                    "virtualNetworkPeerings": [],
+                                    "enableDdosProtection": false
+                                }
+                            }
+                        ]
+                    }
+                }
+            }
+        },
+        {
+            "request": {
+                "method": "GET",
+                "uri": "https://management.azure.com/subscriptions/ea42f556-5106-4743-99b0-c129bfa71a47/providers/Microsoft.Network/networkInterfaces?api-version=2019-11-01",
+                "body": null,
+                "headers": {}
+            },
+            "response": {
+                "status": {
+                    "code": 200,
+                    "message": "OK"
+                },
+                "headers": {
+                    "cache-control": [
+                        "no-cache"
+                    ],
+                    "content-length": [
+                        "4671"
+                    ],
+                    "x-ms-original-request-ids": [
+                        "8b338429-e2ab-4bde-ae9a-7ff023cf2838",
+                        "b2a299df-d4df-4e39-93a8-ba24079ecf13"
+                    ],
+                    "content-type": [
+                        "application/json; charset=utf-8"
+                    ],
+                    "date": [
+                        "Mon, 27 Sep 2021 10:02:06 GMT"
+                    ]
+                },
+                "body": {
+                    "data": {
+                        "value": [
+                            {
+                                "name": "nic1",
+                                "id": "/subscriptions/ea42f556-5106-4743-99b0-c129bfa71a47/resourceGroups/RG-141asbfwroute/providers/Microsoft.Network/networkInterfaces/nic1",
+                                "etag": "W/\"55071466-0bb2-4c6b-a91c-d54e582661f9\"",
+                                "location": "eastus",
+                                "tags": {},
+                                "properties": {
+                                    "provisioningState": "Succeeded",
+                                    "resourceGuid": "ceb5e398-3021-4a6a-9884-79951cbcc261",
+                                    "ipConfigurations": [
+                                        {
+                                            "name": "nic1141asbfwroute",
+                                            "id": "/subscriptions/ea42f556-5106-4743-99b0-c129bfa71a47/resourceGroups/RG-141asbfwroute/providers/Microsoft.Network/networkInterfaces/nic1/ipConfigurations/nic1141asbfwroute",
+                                            "etag": "W/\"55071466-0bb2-4c6b-a91c-d54e582661f9\"",
+                                            "type": "Microsoft.Network/networkInterfaces/ipConfigurations",
+                                            "properties": {
+                                                "provisioningState": "Succeeded",
+                                                "privateIPAddress": "10.0.1.4",
+                                                "privateIPAllocationMethod": "Dynamic",
+                                                "subnet": {
+                                                    "id": "/subscriptions/ea42f556-5106-4743-99b0-c129bfa71a47/resourceGroups/RG-141asbfwroute/providers/Microsoft.Network/virtualNetworks/vnet1-141asbfwroute/subnets/snet1-141asbfwroute"
+                                                },
+                                                "primary": true,
+                                                "privateIPAddressVersion": "IPv4"
+                                            }
+                                        }
+                                    ],
+                                    "dnsSettings": {
+                                        "dnsServers": [],
+                                        "appliedDnsServers": [],
+                                        "internalDomainNameSuffix": "ffwqfu54wz1urmc1wb4nu1wwnd.bx.internal.cloudapp.net"
+                                    },
+                                    "macAddress": "00-22-48-1E-72-FC",
+                                    "enableAcceleratedNetworking": false,
+                                    "enableIPForwarding": false,
+                                    "primary": true,
+                                    "virtualMachine": {
+                                        "id": "/subscriptions/ea42f556-5106-4743-99b0-c129bfa71a47/resourceGroups/RG-141asbfwroute/providers/Microsoft.Compute/virtualMachines/vm1-141asbfwroute"
+                                    },
+                                    "hostedWorkloads": [],
+                                    "tapConfigurations": []
+                                },
+                                "type": "Microsoft.Network/networkInterfaces"
+                            },
+                            {
+                                "name": "nic2",
+                                "id": "/subscriptions/ea42f556-5106-4743-99b0-c129bfa71a47/resourceGroups/RG-141asbfwroute/providers/Microsoft.Network/networkInterfaces/nic2",
+                                "etag": "W/\"507a694d-eb59-4e36-8921-20f02f507e3d\"",
+                                "location": "eastus",
+                                "tags": {},
+                                "properties": {
+                                    "provisioningState": "Succeeded",
+                                    "resourceGuid": "44c2daaa-c8ee-49dd-be40-ef117e2ce3d1",
+                                    "ipConfigurations": [
+                                        {
+                                            "name": "nic2141asbfwroute",
+                                            "id": "/subscriptions/ea42f556-5106-4743-99b0-c129bfa71a47/resourceGroups/RG-141asbfwroute/providers/Microsoft.Network/networkInterfaces/nic2/ipConfigurations/nic2141asbfwroute",
+                                            "etag": "W/\"507a694d-eb59-4e36-8921-20f02f507e3d\"",
+                                            "type": "Microsoft.Network/networkInterfaces/ipConfigurations",
+                                            "properties": {
+                                                "provisioningState": "Succeeded",
+                                                "privateIPAddress": "10.0.2.4",
+                                                "privateIPAllocationMethod": "Dynamic",
+                                                "subnet": {
+                                                    "id": "/subscriptions/ea42f556-5106-4743-99b0-c129bfa71a47/resourceGroups/RG-141asbfwroute/providers/Microsoft.Network/virtualNetworks/vnet2-141asbfwroute/subnets/snet2-141asbfwroute"
+                                                },
+                                                "primary": true,
+                                                "privateIPAddressVersion": "IPv4"
+                                            }
+                                        }
+                                    ],
+                                    "dnsSettings": {
+                                        "dnsServers": [],
+                                        "appliedDnsServers": [],
+                                        "internalDomainNameSuffix": "glqgk3wc5pvurjpqkgnvcentja.bx.internal.cloudapp.net"
+                                    },
+                                    "enableAcceleratedNetworking": false,
+                                    "enableIPForwarding": false,
+                                    "hostedWorkloads": [],
+                                    "tapConfigurations": []
+                                },
+                                "type": "Microsoft.Network/networkInterfaces"
+                            }
+                        ]
+                    }
+                }
+            }
+        }
+    ]
+}
