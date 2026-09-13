@@ -226,11 +226,18 @@ class SecurityGroupFilter(net_filters.SecurityGroupFilter):
 class SubnetFilter(net_filters.SubnetFilter):
 
     RelatedIdsExpression = ""
+    groups = None
 
     def get_permissions(self):
         return RedshiftSubnetGroup(self.manager.ctx, {}).get_permissions()
 
+    def get_subnet_groups(self):
+        return {r['ClusterSubnetGroupName']: r for r in
+                RedshiftSubnetGroup(self.manager.ctx, {}).resources()}
+
     def get_related_ids(self, resources):
+        if self.groups is None:
+            self.groups = self.get_subnet_groups()
         group_ids = set()
         for r in resources:
             group_ids.update(
@@ -239,8 +246,7 @@ class SubnetFilter(net_filters.SubnetFilter):
         return group_ids
 
     def process(self, resources, event=None):
-        self.groups = {r['ClusterSubnetGroupName']: r for r in
-                       RedshiftSubnetGroup(self.manager.ctx, {}).resources()}
+        self.groups = self.get_subnet_groups()
         return super(SubnetFilter, self).process(resources, event)
 
 

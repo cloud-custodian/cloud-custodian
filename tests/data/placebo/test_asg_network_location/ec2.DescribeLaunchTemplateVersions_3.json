@@ -1,0 +1,48 @@
+{
+    "status_code": 200,
+    "data": {
+        "LaunchTemplateVersions": [
+            {
+                "LaunchTemplateId": "lt-05f69d0ff49a3bf33",
+                "LaunchTemplateName": "c7n-public-test",
+                "VersionNumber": 4,
+                "CreateTime": {
+                    "__class__": "datetime",
+                    "year": 2023,
+                    "month": 12,
+                    "day": 14,
+                    "hour": 20,
+                    "minute": 59,
+                    "second": 39,
+                    "microsecond": 0
+                },
+                "CreatedBy": "arn:aws:iam::644160558196:user/pratyush.mishra@capitalone.com",
+                "DefaultVersion": true,
+                "LaunchTemplateData": {
+                    "BlockDeviceMappings": [
+                        {
+                            "DeviceName": "/dev/xvda",
+                            "Ebs": {
+                                "Encrypted": true,
+                                "DeleteOnTermination": true,
+                                "Iops": 3000,
+                                "SnapshotId": "snap-015ca71e26658eb10",
+                                "VolumeSize": 8,
+                                "VolumeType": "gp3",
+                                "Throughput": 125
+                            }
+                        }
+                    ],
+                    "ImageId": "ami-0230bd60aa48260c6",
+                    "SecurityGroupIds": [
+                        "sg-0be736f2d3736d5e7"
+                    ]
+                },
+                "Operator": {
+                    "Managed": false
+                }
+            }
+        ],
+        "ResponseMetadata": {}
+    }
+}
