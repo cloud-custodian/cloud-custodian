@@ -6,7 +6,7 @@ import typing
 
 from c7n import deprecated
 from c7n.executor import ThreadPoolExecutor
-from c7n.utils import jmespath_search
+from c7n.utils import jmespath_compile
 
 
 class ElementJSONSchema(typing.TypedDict, total=False):
@@ -70,9 +70,10 @@ class Element:
         # Evaluate per-resource so absent keys resolve to None correctly.
         # Bulk jmespath [] projection silently drops null/absent values, causing
         # zip to misalign and filter out resources whose key is missing entirely.
+        search_expr = jmespath_compile(search_expr)
         results = []
         for r in resources:
-            values = jmespath_search(search_expr, [r])
+            values = search_expr.search([r])
             value = values[0] if values else None
             if value in allowed_values:
                 results.append(r)
