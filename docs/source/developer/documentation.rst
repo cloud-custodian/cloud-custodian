@@ -80,11 +80,11 @@ Within docstrings, ``rst`` directives allow for highlighting code examples:
 Render the Documentation
 ------------------------
 
-To build the documentation use the make target:
+To build the documentation use the just recipe:
 
 .. code-block:: shell
 
-    make sphinx
+    just docs html
 
 Builds are cached locally and incremental.
 
