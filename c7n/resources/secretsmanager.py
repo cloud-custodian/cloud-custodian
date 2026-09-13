@@ -239,8 +239,31 @@ class SecretVersionFilter(ValueFilter):
         return None
 
 
+class SkipServiceManagedSecret:
+    """Mixin for aws.secrets-manager tag mutation actions which cannot
+    operate on secrets owned by another AWS service (OwningService is
+    set, e.g. rds!db-*, aws-datasync!loc-*, events!connection/*).
+    Such secrets reject TagResource/UntagResource from any other caller
+    with an InvalidRequestException.  Filters them out before delegating
+    to the real action and emits a warning so operators know why the
+    entries were skipped."""
+
+    def process(self, resources):
+        excluded = [r for r in resources if r.get('OwningService')]
+        if excluded:
+            self.manager.log.warning(
+                'Skipping %d service-managed secret(s) which cannot be '
+                'tagged by callers other than the owning service',
+                len(excluded),
+            )
+        resources = [r for r in resources if not r.get('OwningService')]
+        if not resources:
+            return None
+        return super().process(resources)
+
+
 @SecretsManager.action_registry.register('tag')
-class TagSecretsManagerResource(Tag):
+class TagSecretsManagerResource(SkipServiceManagedSecret, Tag):
     """Action to create tag(s) on a Secret resource
 
     :example:
@@ -269,7 +292,7 @@ class TagSecretsManagerResource(Tag):
 
 
 @SecretsManager.action_registry.register('remove-tag')
-class RemoveTagSecretsManagerResource(RemoveTag):
+class RemoveTagSecretsManagerResource(SkipServiceManagedSecret, RemoveTag):
     """Action to remove tag(s) on a Secret resource
 
     :example:
@@ -292,7 +315,7 @@ class RemoveTagSecretsManagerResource(RemoveTag):
 
 
 @SecretsManager.action_registry.register('mark-for-op')
-class MarkSecretForOp(TagDelayedAction):
+class MarkSecretForOp(SkipServiceManagedSecret, TagDelayedAction):
     """Action to mark a Secret resource for deferred action :example:
 
     .. code-block:: yaml
