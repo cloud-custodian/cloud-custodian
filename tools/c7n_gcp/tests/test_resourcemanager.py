@@ -15,8 +15,8 @@ from c7n_gcp.resources.resourcemanager import (
 
 from gcp_common import BaseTest
 
-
 from c7n.exceptions import ResourceLimitExceeded
+from c7n.testing import C7N_FUNCTIONAL
 
 
 class LimitsTest(BaseTest):
@@ -899,3 +899,145 @@ def test_project_set_iam_policy_remove_matched(test, project_iam_policy_chained)
     assert sa_email not in bindings.get('roles/owner', [])
 
     assert sa_email in bindings.get('roles/viewer', [])
+
+
+@terraform("gcp_project_set_iam_policy_audit_config")
+def test_project_set_iam_policy_audit_configs(test, gcp_project_set_iam_policy_audit_config):
+    project_id = gcp_project_set_iam_policy_audit_config.resources[
+        'google_project']['project']['project_id']
+    sa_email = (
+        'serviceAccount:'
+        + gcp_project_set_iam_policy_audit_config.resources[
+            'google_service_account']['sa']['email']
+    )
+
+    def audit_log_types(policy, service):
+        for ac in policy.get('auditConfigs', []):
+            if ac['service'] == service:
+                return {lc['logType'] for lc in ac.get('auditLogConfigs', [])}
+        return set()
+
+    def exempted_members(policy, service, log_type):
+        for ac in policy.get('auditConfigs', []):
+            if ac['service'] == service:
+                for lc in ac.get('auditLogConfigs', []):
+                    if lc['logType'] == log_type:
+                        return set(lc.get('exemptedMembers', []))
+        return set()
+
+    if C7N_FUNCTIONAL:
+        factory = test.record_flight_data(
+            'project-set-iam-policy-audit-configs', project_id=project_id)
+    else:
+        factory = test.replay_flight_data(
+            'project-set-iam-policy-audit-configs', project_id=project_id)
+    policy1 = test.load_policy(
+        {
+            'name': 'add-audit-configs',
+            'resource': 'gcp.project',
+            'filters': [{'type': 'value', 'key': 'projectId', 'value': project_id}],
+            'actions': [
+                {
+                    'type': 'set-iam-policy',
+                    'add-audit-configs': [
+                        {
+                            'service': 'allServices',
+                            'audit-log-configs': [
+                                {'log-type': 'DATA_READ'},
+                                {'log-type': 'DATA_WRITE'},
+                            ],
+                        }
+                    ],
+                }
+            ],
+        },
+        session_factory=factory,
+    )
+    resources = policy1.run()
+    assert len(resources) == 1
+
+    if test.recording:
+        time.sleep(2)
+
+    client1 = policy1.resource_manager.get_client()
+    updated1 = client1.execute_query('getIamPolicy', {'resource': project_id})
+    log_types1 = audit_log_types(updated1, 'allServices')
+    assert 'DATA_READ' in log_types1
+    assert 'DATA_WRITE' in log_types1
+
+    policy2 = test.load_policy(
+        {
+            'name': 'remove-audit-config',
+            'resource': 'gcp.project',
+            'filters': [{'type': 'value', 'key': 'projectId', 'value': project_id}],
+            'actions': [
+                {
+                    'type': 'set-iam-policy',
+                    'remove-audit-configs': [
+                        {
+                            'service': 'allServices',
+                            'audit-log-configs': [{'log-type': 'DATA_WRITE'}],
+                        }
+                    ],
+                }
+            ],
+        },
+        session_factory=factory,
+    )
+    resources = policy2.run()
+    assert len(resources) == 1
+
+    if test.recording:
+        time.sleep(2)
+
+    client2 = policy2.resource_manager.get_client()
+    updated2 = client2.execute_query('getIamPolicy', {'resource': project_id})
+    log_types2 = audit_log_types(updated2, 'allServices')
+    assert 'DATA_READ' in log_types2
+    assert 'DATA_WRITE' not in log_types2
+
+    policy3 = test.load_policy(
+        {
+            'name': 'audit-with-bindings',
+            'resource': 'gcp.project',
+            'filters': [{'type': 'value', 'key': 'projectId', 'value': project_id}],
+            'actions': [
+                {
+                    'type': 'set-iam-policy',
+                    'add-audit-configs': [
+                        {
+                            'service': 'allServices',
+                            'audit-log-configs': [
+                                {
+                                    'log-type': 'DATA_READ',
+                                    'exempted-members': [sa_email],
+                                }
+                            ],
+                        }
+                    ],
+                    'add-bindings': [
+                        {
+                            'role': 'roles/logging.viewer',
+                            'members': [sa_email],
+                        }
+                    ],
+                }
+            ],
+        },
+        session_factory=factory,
+    )
+    resources = policy3.run()
+    assert len(resources) == 1
+
+    if test.recording:
+        time.sleep(2)
+
+    client3 = policy3.resource_manager.get_client()
+    updated3 = client3.execute_query('getIamPolicy', {'resource': project_id})
+
+    exempted = exempted_members(updated3, 'allServices', 'DATA_READ')
+    assert sa_email in exempted
+
+    bindings3 = {b['role']: b['members'] for b in updated3.get('bindings', [])}
+    assert sa_email in bindings3.get('roles/logging.viewer', [])
+    assert sa_email in bindings3.get('roles/viewer', [])
