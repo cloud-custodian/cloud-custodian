@@ -1,0 +1,34 @@
+{
+  "status_code": 200,
+  "data": {
+    "BackupPlan": {
+      "BackupPlanName": "test-backup-plan",
+      "Rules": [
+        {
+          "RuleName": "DailyBackups",
+          "TargetBackupVaultName": "Default",
+          "ScheduleExpression": "cron(0 5 ? * * *)",
+          "StartWindowMinutes": 60,
+          "CompletionWindowMinutes": 120,
+          "Lifecycle": {
+            "DeleteAfterDays": 30
+          }
+        }
+      ]
+    },
+    "BackupPlanId": "test-backup-plan-id",
+    "BackupPlanArn": "arn:aws:backup:us-east-1:644160558196:backup-plan:test-backup-plan-id",
+    "VersionId": "version-1",
+    "CreationDate": "2024-01-15T10:30:00.000Z",
+    "ResponseMetadata": {
+      "RequestId": "12345678-1234-1234-1234-123456789012",
+      "HTTPStatusCode": 200,
+      "HTTPHeaders": {
+        "content-type": "application/x-amz-json-1.1",
+        "date": "Mon, 15 Jan 2024 10:30:00 GMT",
+        "x-amzn-requestid": "12345678-1234-1234-1234-123456789012"
+      },
+      "RetryAttempts": 0
+    }
+  }
+}
