@@ -1,0 +1,30 @@
+{
+  "headers": {
+    "content-type": "application/json; charset=UTF-8",
+    "vary": "Origin, X-Origin, Referer",
+    "date": "Thu, 14 Sep 2023 15:08:59 GMT",
+    "server": "ESF",
+    "cache-control": "private",
+    "x-xss-protection": "0",
+    "x-frame-options": "SAMEORIGIN",
+    "x-content-type-options": "nosniff",
+    "alt-svc": "h3=\":443\"; ma=2592000,h3-29=\":443\"; ma=2592000",
+    "transfer-encoding": "chunked",
+    "status": "200",
+    "content-length": "3373",
+    "-content-encoding": "gzip",
+    "content-location": "https://logging.googleapis.com/v2/projects/cloud-custodian/sinks?alt=json"
+  },
+  "body": {
+    "sinks": [
+      {
+        "name": "dashing-slug-sink",
+        "destination": "storage.googleapis.com/dashing-slug-bucket",
+        "filter": "resource.type = gce_instance AND severity >= WARNING",
+        "writerIdentity": "serviceAccount:service-000@gcp-sa-logging.iam.gserviceaccount.com",
+        "createTime": "2023-09-14T15:08:45.511837531Z",
+        "updateTime": "2023-09-14T15:08:45.511837531Z"
+      }
+    ]
+  }
+}
