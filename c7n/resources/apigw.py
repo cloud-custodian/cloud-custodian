@@ -1382,3 +1382,46 @@ class DeleteApiV2Stage(BaseAction):
                 ApiId=r['c7n:parent-id'],
                 StageName=r['StageName']
             )
+
+
+@resources.register("apigwv2-route")
+class ApiGatewayV2Route(query.ChildResourceManager):
+    """Resource manager for API Gateway V2 Routes.
+
+    API Gateway V2 routes define the routing logic for HTTP and WebSocket APIs.
+    This resource enables filtering routes by authorization type to identify
+    routes that may lack proper authorization controls.
+
+    :example:
+
+    Find routes with no authorization configured:
+
+    .. code-block:: yaml
+
+        policies:
+          - name: apigwv2-routes-without-authorization
+            resource: aws.apigwv2-route
+            filters:
+              - type: value
+                key: AuthorizationType
+                value: NONE
+    """
+
+    class resource_type(query.TypeInfo):
+        service = "apigatewayv2"
+        enum_spec = ('get_routes', 'Items', None)
+        parent_spec = ('aws.apigwv2', 'ApiId', True)
+        arn_type = "/apis"
+        id = "RouteId"
+        name = "RouteKey"
+        cfn_type = "AWS::ApiGatewayV2::Route"
+        permission_prefix = 'apigateway'
+        permissions_enum = ('apigateway:GET',)
+
+    def get_arns(self, resources):
+        partition = get_partition(self.config.region)
+        return [
+            "arn:{}:apigateway:{}::/apis/{}/routes/{}".format(
+                partition, self.config.region, r['c7n:parent-id'], r['RouteId']
+            )
+            for r in resources]
