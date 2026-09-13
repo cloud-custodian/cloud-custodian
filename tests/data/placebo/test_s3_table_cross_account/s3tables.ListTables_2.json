@@ -1,0 +1,64 @@
+{
+    "status_code": 200,
+    "data": {
+        "ResponseMetadata": {},
+        "tables": [
+            {
+                "namespace": [
+                    "testns"
+                ],
+                "name": "c7n_table_clean",
+                "type": "customer",
+                "tableARN": "arn:aws:s3tables:us-east-1:644160558196:bucket/c7n-test-tb-compliant/table/14d6d2ba-eb61-4785-b444-acb022f99148",
+                "createdAt": {
+                    "__class__": "datetime",
+                    "year": 2026,
+                    "month": 8,
+                    "day": 3,
+                    "hour": 2,
+                    "minute": 59,
+                    "second": 52,
+                    "microsecond": 689255
+                },
+                "modifiedAt": {
+                    "__class__": "datetime",
+                    "year": 2026,
+                    "month": 8,
+                    "day": 3,
+                    "hour": 2,
+                    "minute": 59,
+                    "second": 52,
+                    "microsecond": 689255
+                }
+            },
+            {
+                "namespace": [
+                    "testns"
+                ],
+                "name": "c7n_table_open",
+                "type": "customer",
+                "tableARN": "arn:aws:s3tables:us-east-1:644160558196:bucket/c7n-test-tb-compliant/table/e7622b5a-9e66-44f4-a09a-b64551b2b8e5",
+                "createdAt": {
+                    "__class__": "datetime",
+                    "year": 2026,
+                    "month": 8,
+                    "day": 3,
+                    "hour": 2,
+                    "minute": 59,
+                    "second": 51,
+                    "microsecond": 835904
+                },
+                "modifiedAt": {
+                    "__class__": "datetime",
+                    "year": 2026,
+                    "month": 8,
+                    "day": 3,
+                    "hour": 2,
+                    "minute": 59,
+                    "second": 51,
+                    "microsecond": 835904
+                }
+            }
+        ]
+    }
+}

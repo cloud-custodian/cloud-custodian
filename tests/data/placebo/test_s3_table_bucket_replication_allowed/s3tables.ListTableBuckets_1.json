@@ -1,0 +1,42 @@
+{
+    "status_code": 200,
+    "data": {
+        "ResponseMetadata": {},
+        "tableBuckets": [
+            {
+                "arn": "arn:aws:s3tables:us-east-1:644160558196:bucket/c7n-test-tb-repl-dst",
+                "name": "c7n-test-tb-repl-dst",
+                "ownerAccountId": "644160558196",
+                "createdAt": {
+                    "__class__": "datetime",
+                    "year": 2026,
+                    "month": 9,
+                    "day": 9,
+                    "hour": 4,
+                    "minute": 33,
+                    "second": 29,
+                    "microsecond": 21177
+                },
+                "tableBucketId": "1e9671a5-5d1d-459d-ac04-1055b17cda7d",
+                "type": "customer"
+            },
+            {
+                "arn": "arn:aws:s3tables:us-east-1:644160558196:bucket/c7n-test-tb-repl-src",
+                "name": "c7n-test-tb-repl-src",
+                "ownerAccountId": "644160558196",
+                "createdAt": {
+                    "__class__": "datetime",
+                    "year": 2026,
+                    "month": 9,
+                    "day": 9,
+                    "hour": 4,
+                    "minute": 33,
+                    "second": 28,
+                    "microsecond": 114286
+                },
+                "tableBucketId": "fd1cc30e-95ae-45f5-a9fc-57369e344df2",
+                "type": "customer"
+            }
+        ]
+    }
+}
