@@ -1,0 +1,44 @@
+{
+  "headers": {
+    "content-type": "application/json; charset=UTF-8",
+    "vary": "Origin, X-Origin, Referer",
+    "date": "Thu, 02 Apr 2026 17:42:22 GMT",
+    "server": "ESF",
+    "x-xss-protection": "0",
+    "x-frame-options": "SAMEORIGIN",
+    "x-content-type-options": "nosniff",
+    "server-timing": "gfet4t7; dur=94",
+    "alt-svc": "h3=\":443\"; ma=2592000,h3-29=\":443\"; ma=2592000",
+    "transfer-encoding": "chunked",
+    "status": "200",
+    "content-length": "837",
+    "-content-encoding": "gzip",
+    "content-location": "https://logging.googleapis.com/v2/projects/cloud-custodian/locations/-/buckets?alt=json"
+  },
+  "body": {
+    "buckets": [
+      {
+        "name": "projects/cloud-custodian/locations/global/buckets/_Default",
+        "description": "Default bucket",
+        "updateTime": "2026-03-20T16:12:00.048628250Z",
+        "retentionDays": 7,
+        "lifecycleState": "ACTIVE"
+      },
+      {
+        "name": "projects/cloud-custodian/locations/global/buckets/_Required",
+        "description": "Audit bucket",
+        "locked": true,
+        "retentionDays": 400,
+        "lifecycleState": "ACTIVE"
+      },
+      {
+        "name": "projects/cloud-custodian/locations/us-central1/buckets/c7n-log-bucket-set-retention",
+        "description": "Cloud Custodian set retention test log bucket",
+        "createTime": "2026-04-02T17:42:20.439349354Z",
+        "updateTime": "2026-04-02T17:42:20.439349354Z",
+        "retentionDays": 30,
+        "lifecycleState": "ACTIVE"
+      }
+    ]
+  }
+}
