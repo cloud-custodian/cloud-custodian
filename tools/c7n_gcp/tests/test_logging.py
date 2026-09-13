@@ -3,6 +3,8 @@
 
 from googleapiclient.errors import HttpError
 
+from c7n.testing import C7N_FUNCTIONAL
+from c7n_gcp.client import get_default_project
 from gcp_common import BaseTest, event_data
 
 
@@ -91,6 +93,79 @@ class LogProjectSinkTest(BaseTest):
         resources = policy.run()
 
         self.assertEqual(len(resources), 1)
+
+    def test_sink_overlap_exact_filter(test):
+        project_id = get_default_project()
+        if C7N_FUNCTIONAL:
+            session_factory = test.record_flight_data(
+                'log-project-sink-overlap-exact', project_id=project_id)
+        else:
+            session_factory = test.replay_flight_data(
+                'log-project-sink-overlap-exact', project_id=project_id)
+
+        policy = test.load_policy(
+            {
+                'name': 'log-project-sink-overlap-exact',
+                'resource': 'gcp.log-project-sink',
+                'filters': [
+                    {
+                        'type': 'value',
+                        'key': 'name',
+                        'op': 'regex',
+                        'value': '^c7n-sink-exact-',
+                    },
+                    {'type': 'sink-exact'},
+                ],
+            },
+            session_factory=session_factory,
+        )
+
+        resources = policy.run()
+        names = {r['name'] for r in resources}
+
+        assert 'c7n-sink-exact-a' in names
+        assert 'c7n-sink-exact-b' in names
+        assert 'c7n-sink-exact-no-filter-a' in names
+        assert 'c7n-sink-exact-no-filter-b' in names
+        assert 'c7n-sink-exact-non-match' not in names
+        assert 'c7n-sink-exact-disabled' not in names
+
+    def test_sink_overlap_overlap_filter(test):
+        project_id = get_default_project()
+        if C7N_FUNCTIONAL:
+            session_factory = test.record_flight_data(
+                'log-project-sink-overlap', project_id=project_id)
+        else:
+            session_factory = test.replay_flight_data(
+                'log-project-sink-overlap', project_id=project_id)
+
+        policy = test.load_policy(
+            {
+                'name': 'log-project-sink-overlap',
+                'resource': 'gcp.log-project-sink',
+                'filters': [
+                    {
+                        'type': 'value',
+                        'key': 'name',
+                        'op': 'regex',
+                        'value': '^c7n-sink-overlap-',
+                    },
+                    {'type': 'sink-overlap'},
+                ],
+            },
+            session_factory=session_factory,
+        )
+
+        resources = policy.run()
+        names = {r['name'] for r in resources}
+
+        assert 'c7n-sink-overlap-base' in names
+        assert 'c7n-sink-overlap-base-copy' in names
+        assert 'c7n-sink-overlap-subset' in names
+        assert 'c7n-sink-overlap-exclusion' not in names
+        assert 'c7n-sink-overlap-non-match' not in names
+        assert 'c7n-sink-overlap-disabled' not in names
+        assert 'c7n-sink-overlap-other-destination' not in names
 
 
 class LogProjectMetricTest(BaseTest):

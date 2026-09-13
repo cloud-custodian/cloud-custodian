@@ -1,0 +1,83 @@
+{
+  "headers": {
+    "content-type": "application/json; charset=UTF-8",
+    "vary": "Origin, X-Origin, Referer",
+    "date": "Mon, 30 Mar 2026 17:05:07 GMT",
+    "server": "ESF",
+    "x-xss-protection": "0",
+    "x-frame-options": "SAMEORIGIN",
+    "x-content-type-options": "nosniff",
+    "server-timing": "gfet4t7; dur=60",
+    "alt-svc": "h3=\":443\"; ma=2592000,h3-29=\":443\"; ma=2592000",
+    "transfer-encoding": "chunked",
+    "status": "200",
+    "content-length": "3649",
+    "-content-encoding": "gzip",
+    "content-location": "https://logging.googleapis.com/v2/projects/cloud-custodian/sinks?alt=json"
+  },
+  "body": {
+    "sinks": [
+      {
+        "name": "c7n-sink-overlap-base",
+        "destination": "logging.googleapis.com/projects/cloud-custodian/locations/global/buckets/_Default",
+        "filter": "severity>=ERROR",
+        "createTime": "2026-03-30T17:05:03.300669111Z",
+        "updateTime": "2026-03-30T17:05:03.300669111Z",
+        "resourceName": "projects/cloud-custodian/sinks/c7n-sink-overlap-base"
+      },
+      {
+        "name": "c7n-sink-overlap-base-copy",
+        "destination": "logging.googleapis.com/projects/cloud-custodian/locations/global/buckets/_Default",
+        "filter": "severity>=ERROR",
+        "createTime": "2026-03-30T17:05:03.297807735Z",
+        "updateTime": "2026-03-30T17:05:03.297807735Z",
+        "resourceName": "projects/cloud-custodian/sinks/c7n-sink-overlap-base-copy"
+      },
+      {
+        "name": "c7n-sink-overlap-disabled",
+        "destination": "logging.googleapis.com/projects/cloud-custodian/locations/global/buckets/_Default",
+        "filter": "severity>=ERROR",
+        "createTime": "2026-03-30T17:05:03.403182962Z",
+        "updateTime": "2026-03-30T17:05:03.403182962Z",
+        "disabled": true,
+        "resourceName": "projects/cloud-custodian/sinks/c7n-sink-overlap-disabled"
+      },
+      {
+        "name": "c7n-sink-overlap-exclusion",
+        "destination": "logging.googleapis.com/projects/cloud-custodian/locations/global/buckets/_Default",
+        "filter": "severity>=ERROR AND NOT resource.type=\"gce_instance\"",
+        "createTime": "2026-03-30T17:05:03.254243034Z",
+        "updateTime": "2026-03-30T17:05:03.254243034Z",
+        "resourceName": "projects/cloud-custodian/sinks/c7n-sink-overlap-exclusion"
+      },
+      {
+        "name": "c7n-sink-overlap-non-match",
+        "destination": "logging.googleapis.com/projects/cloud-custodian/locations/global/buckets/_Default",
+        "filter": "severity<ERROR",
+        "createTime": "2026-03-30T17:05:03.254021590Z",
+        "updateTime": "2026-03-30T17:05:03.254021590Z",
+        "resourceName": "projects/cloud-custodian/sinks/c7n-sink-overlap-non-match"
+      },
+      {
+        "name": "c7n-sink-overlap-subset",
+        "destination": "logging.googleapis.com/projects/cloud-custodian/locations/global/buckets/_Default",
+        "filter": "severity>=CRITICAL",
+        "createTime": "2026-03-30T17:05:03.212968729Z",
+        "updateTime": "2026-03-30T17:05:03.212968729Z",
+        "resourceName": "projects/cloud-custodian/sinks/c7n-sink-overlap-subset"
+      },
+      {
+        "name": "_Required",
+        "destination": "logging.googleapis.com/projects/cloud-custodian/locations/global/buckets/_Required",
+        "filter": "LOG_ID(\"cloudaudit.googleapis.com/activity\") OR LOG_ID(\"externalaudit.googleapis.com/activity\") OR LOG_ID(\"cloudaudit.googleapis.com/system_event\") OR LOG_ID(\"externalaudit.googleapis.com/system_event\") OR LOG_ID(\"cloudaudit.googleapis.com/access_transparency\") OR LOG_ID(\"externalaudit.googleapis.com/access_transparency\")",
+        "resourceName": "projects/cloud-custodian/sinks/_Required"
+      },
+      {
+        "name": "_Default",
+        "destination": "logging.googleapis.com/projects/cloud-custodian/locations/global/buckets/_Default",
+        "filter": "NOT LOG_ID(\"cloudaudit.googleapis.com/activity\") AND NOT LOG_ID(\"externalaudit.googleapis.com/activity\") AND NOT LOG_ID(\"cloudaudit.googleapis.com/system_event\") AND NOT LOG_ID(\"externalaudit.googleapis.com/system_event\") AND NOT LOG_ID(\"cloudaudit.googleapis.com/access_transparency\") AND NOT LOG_ID(\"externalaudit.googleapis.com/access_transparency\")",
+        "resourceName": "projects/cloud-custodian/sinks/_Default"
+      }
+    ]
+  }
+}

@@ -1,0 +1,92 @@
+{
+    "pytest-terraform": 1,
+    "outputs": {},
+    "resources": {
+        "google_logging_project_sink": {
+            "overlap_base": {
+                "bigquery_options": [],
+                "custom_writer_identity": null,
+                "description": "",
+                "destination": "logging.googleapis.com/projects/cloud-custodian/locations/global/buckets/_Default",
+                "disabled": false,
+                "exclusions": [],
+                "filter": "severity>=ERROR",
+                "id": "projects/cloud-custodian/sinks/c7n-sink-overlap-base",
+                "name": "c7n-sink-overlap-base",
+                "project": "stacklet-personal-2",
+                "unique_writer_identity": true,
+                "writer_identity": ""
+            },
+            "overlap_base_copy": {
+                "bigquery_options": [],
+                "custom_writer_identity": null,
+                "description": "",
+                "destination": "logging.googleapis.com/projects/cloud-custodian/locations/global/buckets/_Default",
+                "disabled": false,
+                "exclusions": [],
+                "filter": "severity>=ERROR",
+                "id": "projects/cloud-custodian/sinks/c7n-sink-overlap-base-copy",
+                "name": "c7n-sink-overlap-base-copy",
+                "project": "stacklet-personal-2",
+                "unique_writer_identity": true,
+                "writer_identity": ""
+            },
+            "overlap_disabled": {
+                "bigquery_options": [],
+                "custom_writer_identity": null,
+                "description": "",
+                "destination": "logging.googleapis.com/projects/cloud-custodian/locations/global/buckets/_Default",
+                "disabled": true,
+                "exclusions": [],
+                "filter": "severity>=ERROR",
+                "id": "projects/cloud-custodian/sinks/c7n-sink-overlap-disabled",
+                "name": "c7n-sink-overlap-disabled",
+                "project": "stacklet-personal-2",
+                "unique_writer_identity": true,
+                "writer_identity": ""
+            },
+            "overlap_exclusion": {
+                "bigquery_options": [],
+                "custom_writer_identity": null,
+                "description": "",
+                "destination": "logging.googleapis.com/projects/cloud-custodian/locations/global/buckets/_Default",
+                "disabled": false,
+                "exclusions": [],
+                "filter": "severity>=ERROR AND NOT resource.type=\"gce_instance\"",
+                "id": "projects/cloud-custodian/sinks/c7n-sink-overlap-exclusion",
+                "name": "c7n-sink-overlap-exclusion",
+                "project": "stacklet-personal-2",
+                "unique_writer_identity": true,
+                "writer_identity": ""
+            },
+            "overlap_non_match": {
+                "bigquery_options": [],
+                "custom_writer_identity": null,
+                "description": "",
+                "destination": "logging.googleapis.com/projects/cloud-custodian/locations/global/buckets/_Default",
+                "disabled": false,
+                "exclusions": [],
+                "filter": "severity<ERROR",
+                "id": "projects/cloud-custodian/sinks/c7n-sink-overlap-non-match",
+                "name": "c7n-sink-overlap-non-match",
+                "project": "stacklet-personal-2",
+                "unique_writer_identity": true,
+                "writer_identity": ""
+            },
+            "overlap_subset": {
+                "bigquery_options": [],
+                "custom_writer_identity": null,
+                "description": "",
+                "destination": "logging.googleapis.com/projects/cloud-custodian/locations/global/buckets/_Default",
+                "disabled": false,
+                "exclusions": [],
+                "filter": "severity>=CRITICAL",
+                "id": "projects/cloud-custodian/sinks/c7n-sink-overlap-subset",
+                "name": "c7n-sink-overlap-subset",
+                "project": "stacklet-personal-2",
+                "unique_writer_identity": true,
+                "writer_identity": ""
+            }
+        }
+    }
+}
