@@ -105,33 +105,43 @@ class SlackDelivery:
                 )
             elif target.startswith("slack://tag/") and "Tags" in resource_list[0]:
                 tag_name = target.split("tag/", 1)[1]
-                result = next(
-                    (item for item in resource_list[0].get("Tags", []) if item["Key"] == tag_name),
-                    None,
-                )
-                if not result:
+                tagged_resources = {}
+
+                for r in resource_list:
+                    tag_value = None
+                    for t in r.get("Tags", []):
+                        if t["Key"] == tag_name:
+                            tag_value = t["Value"]
+                            break
+                    if tag_value:
+                        if tag_value not in tagged_resources:
+                            tagged_resources[tag_value] = []
+                        tagged_resources[tag_value].append(r)
+
+                if not tagged_resources:
                     self.logger.debug("No %s tag found in resource." % tag_name)
                     continue
 
-                resolved_addr = slack_target = result["Value"]
+                for tag_value, resources in tagged_resources.items():
+                    resolved_addr = slack_target = tag_value
 
-                if is_email(resolved_addr):
-                    ims = self.retrieve_user_im([resolved_addr])
-                    slack_target = ims[resolved_addr]
-                elif not resolved_addr.startswith("#"):
-                    resolved_addr = "#" + resolved_addr
-                    slack_target = resolved_addr
+                    if is_email(resolved_addr):
+                        ims = self.retrieve_user_im([resolved_addr])
+                        slack_target = ims.get(resolved_addr)
+                    elif not resolved_addr.startswith("#"):
+                        resolved_addr = "#" + resolved_addr
+                        slack_target = resolved_addr
 
-                slack_messages[resolved_addr] = get_rendered_jinja(
-                    slack_target,
-                    sqs_message,
-                    resource_list,
-                    self.logger,
-                    "slack_template",
-                    "slack_default",
-                    self.config["templates_folders"],
-                )
-                self.logger.debug("Generating message for specified Slack channel.")
+                    slack_messages[resolved_addr] = get_rendered_jinja(
+                        slack_target,
+                        sqs_message,
+                        resources,
+                        self.logger,
+                        "slack_template",
+                        "slack_default",
+                        self.config["templates_folders"],
+                    )
+                    self.logger.debug("Generating message for specified Slack channel.")
         return slack_messages
 
     def slack_handler(self, sqs_message, slack_messages):
