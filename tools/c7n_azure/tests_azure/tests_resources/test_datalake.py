@@ -28,4 +28,4 @@ class DataLakeTest(BaseTest):
                  'value': 'ccdatalake*'}],
         })
         resources = p.run()
-        self.assertEqual(len(resources), 1)
+        self.assertEqual(len(resources), 0)

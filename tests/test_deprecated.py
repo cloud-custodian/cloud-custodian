@@ -39,6 +39,89 @@ class DeprecationTest(BaseTest):
             "field 'severity_normalized' has been deprecated (replaced by 'severity_label')"
         )
 
+    def test_resource(self):
+        deprecation = deprecated.DeprecatedResource(
+            "no longer an available AWS service", '2021-06-30')
+        # Always matches.
+        self.assertTrue(deprecation.check({}))
+        self.assertEqual(
+            str(deprecation),
+            "resource has been deprecated (no longer an available AWS service)"
+        )
+
+
+class DeprecatedResourceTest(BaseTest):
+
+    def test_decorator_returns_same_class(self):
+        class FakeManager:
+            source_mapping = {'describe': 'DescribeStub'}
+
+        deprecation = deprecated.DeprecatedResource("gone")
+        self.assertIs(deprecation(FakeManager), FakeManager)
+
+    def test_decorator_force_empty_false_leaves_source_mapping_untouched(self):
+        class FakeManager:
+            source_mapping = {'describe': 'DescribeStub', 'config': 'ConfigStub'}
+
+        deprecation = deprecated.DeprecatedResource("gone")
+        deprecation(FakeManager)
+        self.assertEqual(
+            FakeManager.source_mapping,
+            {'describe': 'DescribeStub', 'config': 'ConfigStub'})
+
+    def test_decorator_force_empty_overrides_every_source(self):
+        class FakeManager:
+            source_mapping = {'describe': 'DescribeStub', 'config': 'ConfigStub'}
+
+        deprecation = deprecated.DeprecatedResource("gone", force_empty=True)
+        deprecation(FakeManager)
+        self.assertEqual(
+            FakeManager.source_mapping['describe'],
+            FakeManager.source_mapping['config'])
+        self.assertNotEqual(FakeManager.source_mapping['describe'], 'DescribeStub')
+        self.assertNotEqual(FakeManager.source_mapping['config'], 'ConfigStub')
+
+    def test_decorator_preserves_existing_deprecations(self):
+        existing = deprecated.field('foo', 'bar')
+
+        class FakeManager:
+            source_mapping = {'describe': 'DescribeStub'}
+            deprecations = (existing,)
+
+        deprecation = deprecated.DeprecatedResource("gone")
+        deprecation(FakeManager)
+        self.assertEqual(FakeManager.deprecations, (existing, deprecation))
+
+    def test_decorator_without_source_mapping_force_empty_true_stubs_methods(self):
+        class FakeManager:
+            def resources(self, *args, **kwargs):
+                return ['real-resource']
+
+            def get_resources(self, resource_ids, **params):
+                return ['real-resource']
+
+        deprecation = deprecated.DeprecatedResource("gone", force_empty=True)
+        result = deprecation(FakeManager)
+        self.assertIs(result, FakeManager)
+        instance = FakeManager()
+        self.assertEqual(instance.resources(), [])
+        self.assertEqual(instance.get_resources(['id1']), [])
+        self.assertEqual(FakeManager.deprecations, (deprecation,))
+
+    def test_decorator_without_source_mapping_force_empty_false_leaves_methods(self):
+        class FakeManager:
+            def resources(self, *args, **kwargs):
+                return ['real-resource']
+
+            def get_resources(self, resource_ids, **params):
+                return ['real-resource']
+
+        deprecation = deprecated.DeprecatedResource("gone")
+        deprecation(FakeManager)
+        instance = FakeManager()
+        self.assertEqual(instance.resources(), ['real-resource'])
+        self.assertEqual(instance.get_resources(['id1']), ['real-resource'])
+
 
 class ReportTest(BaseTest):
 
@@ -80,7 +163,16 @@ class ReportTest(BaseTest):
                 field 'baz' has been deprecated (replaced by 'yet')
             """)[1:-1])
 
-    # No examples of resource deprecation just yet. Looking for one.
+    def test_resource(self):
+        report = deprecated.Report("some-policy", resource=[
+            deprecated.DeprecatedResource("no longer an available AWS service"),
+        ])
+        self.assertTrue(report)
+        self.assertEqual(report.format(), dedent("""
+            policy 'some-policy'
+              resource:
+                resource has been deprecated (no longer an available AWS service)
+            """)[1:-1])
 
     def test_actions(self):
         report = deprecated.Report("some-policy", actions=[
