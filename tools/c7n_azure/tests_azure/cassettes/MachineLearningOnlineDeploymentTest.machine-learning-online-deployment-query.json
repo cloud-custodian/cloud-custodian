@@ -1,0 +1,463 @@
+{
+    "version": 1,
+    "interactions": [
+        {
+            "request": {
+                "method": "GET",
+                "uri": "https://management.azure.com/subscriptions/ea42f556-5106-4743-99b0-c129bfa71a47/providers/Microsoft.MachineLearningServices/workspaces?api-version=2023-04-01",
+                "body": null,
+                "headers": {}
+            },
+            "response": {
+                "status": {
+                    "code": 200,
+                    "message": "OK"
+                },
+                "headers": {
+                    "content-type": [
+                        "application/json; charset=utf-8"
+                    ],
+                    "x-ms-response-type": [
+                        "standard"
+                    ],
+                    "cache-control": [
+                        "no-cache"
+                    ],
+                    "x-msedge-ref": [
+                        "Ref A: 69A9387728C44C7F952087359423202D Ref B: CHI261140504029 Ref C: 2026-07-21T20:47:36Z"
+                    ],
+                    "x-ms-original-request-ids": [
+                        ""
+                    ],
+                    "request-context": [
+                        "appId=cid-v1:2d2e8e63-272e-4b3c-8598-4ee570a0e70d"
+                    ],
+                    "x-ms-ratelimit-remaining-subscription-global-reads": [
+                        "3749"
+                    ],
+                    "x-request-time": [
+                        "0.048"
+                    ],
+                    "content-length": [
+                        "5334"
+                    ],
+                    "date": [
+                        "Tue, 21 Jul 2026 20:47:37 GMT"
+                    ],
+                    "x-cache": [
+                        "CONFIG_NOCACHE"
+                    ],
+                    "azureml-served-by-cluster": [
+                        "vienna-eastus-02"
+                    ]
+                },
+                "body": {
+                    "data": {
+                        "value": [
+                            {
+                                "id": "/subscriptions/ea42f556-5106-4743-99b0-c129bfa71a47/resourceGroups/test_machine-learning-job/providers/Microsoft.MachineLearningServices/workspaces/cctest-mlws",
+                                "name": "cctest-mlws",
+                                "type": "Microsoft.MachineLearningServices/workspaces",
+                                "location": "eastus",
+                                "tags": {},
+                                "etag": null,
+                                "properties": {
+                                    "friendlyName": "cctest-mlws",
+                                    "description": "",
+                                    "storageAccount": "/subscriptions/ea42f556-5106-4743-99b0-c129bfa71a47/resourceGroups/test_machine-learning-job/providers/Microsoft.Storage/storageAccounts/cctestmlws320870742023",
+                                    "keyVault": "/subscriptions/ea42f556-5106-4743-99b0-c129bfa71a47/resourceGroups/test_machine-learning-job/providers/Microsoft.Keyvault/vaults/cctestmlws320870742023",
+                                    "applicationInsights": "/subscriptions/ea42f556-5106-4743-99b0-c129bfa71a47/resourceGroups/test_machine-learning-job/providers/Microsoft.insights/components/cctestmlws320870742023",
+                                    "hbiWorkspace": false,
+                                    "tenantId": "00000000-0000-0000-0000-000000000003",
+                                    "imageBuildCompute": null,
+                                    "provisioningState": "Succeeded",
+                                    "managedNetwork": {
+                                        "changeableIsolationModes": [
+                                            "AllowInternetOutbound",
+                                            "AllowOnlyApprovedOutbound"
+                                        ],
+                                        "isolationMode": "Disabled",
+                                        "enableNetworkMonitor": false,
+                                        "enableFirewallLog": false
+                                    },
+                                    "allowRoleAssignmentOnRG": true,
+                                    "v1LegacyMode": false,
+                                    "softDeleteEnabled": false,
+                                    "creationTime": "2026-07-06T16:29:09.1733326Z",
+                                    "notebookInfo": {
+                                        "resourceId": "cbc630e6300c4c90ad3ed7ded35adb19",
+                                        "fqdn": "ml-cctest-mlws-eastus-612f3069-9121-470d-9fec-d93aaac22974.eastus.notebooks.azure.net",
+                                        "isPrivateLinkEnabled": false,
+                                        "notebookPreparationError": null
+                                    },
+                                    "storageHnsEnabled": false,
+                                    "workspaceId": "612f3069-9121-470d-9fec-d93aaac22974",
+                                    "linkedModelInventoryArmId": null,
+                                    "privateLinkCount": 0,
+                                    "publicNetworkAccess": "Enabled",
+                                    "discoveryUrl": "https://eastus.api.azureml.ms/discovery",
+                                    "mlFlowTrackingUri": "azureml://eastus.api.azureml.ms/mlflow/v1.0/subscriptions/ea42f556-5106-4743-99b0-c129bfa71a47/resourceGroups/test_machine-learning-job/providers/Microsoft.MachineLearningServices/workspaces/cctest-mlws",
+                                    "sdkTelemetryAppInsightsKey": "f5784ccd-178d-4ecc-9998-b05841b44ae9",
+                                    "enableDataIsolation": false
+                                },
+                                "identity": {
+                                    "type": "SystemAssigned",
+                                    "principalId": "dd21cedf-09fd-4a81-88a5-b6a90e9a7500",
+                                    "tenantId": "00000000-0000-0000-0000-000000000003"
+                                },
+                                "kind": "Default",
+                                "sku": {
+                                    "name": "Basic",
+                                    "tier": "Basic"
+                                },
+                                "systemData": {
+                                    "createdAt": "2026-07-06T16:29:09.1733326Z",
+                                    "createdBy": "mock-user@example.com",
+                                    "createdByType": "User",
+                                    "lastModifiedAt": "2026-07-06T16:29:09.1733326Z",
+                                    "lastModifiedBy": "mock-user@example.com",
+                                    "lastModifiedByType": "User"
+                                }
+                            },
+                            {
+                                "id": "/subscriptions/ea42f556-5106-4743-99b0-c129bfa71a47/resourceGroups/test_machine-learning-online-deployment/providers/Microsoft.MachineLearningServices/workspaces/cctestmlonline635827285077",
+                                "name": "cctestmlonline635827285077",
+                                "type": "Microsoft.MachineLearningServices/workspaces",
+                                "location": "eastus",
+                                "tags": {},
+                                "etag": null,
+                                "properties": {
+                                    "friendlyName": "",
+                                    "description": "",
+                                    "storageAccount": "/subscriptions/ea42f556-5106-4743-99b0-c129bfa71a47/resourceGroups/test_machine-learning-online-deployment/providers/Microsoft.Storage/storageAccounts/cctml635827285077",
+                                    "keyVault": "/subscriptions/ea42f556-5106-4743-99b0-c129bfa71a47/resourceGroups/test_machine-learning-online-deployment/providers/Microsoft.Keyvault/vaults/cctmlkv635827285077",
+                                    "applicationInsights": "/subscriptions/ea42f556-5106-4743-99b0-c129bfa71a47/resourceGroups/test_machine-learning-online-deployment/providers/Microsoft.insights/components/cctest-ml-online-635827285077",
+                                    "hbiWorkspace": false,
+                                    "tenantId": "00000000-0000-0000-0000-000000000003",
+                                    "imageBuildCompute": null,
+                                    "provisioningState": "Succeeded",
+                                    "managedNetwork": {
+                                        "changeableIsolationModes": [
+                                            "AllowInternetOutbound",
+                                            "AllowOnlyApprovedOutbound"
+                                        ],
+                                        "isolationMode": "Disabled",
+                                        "enableNetworkMonitor": false,
+                                        "enableFirewallLog": false
+                                    },
+                                    "allowRoleAssignmentOnRG": true,
+                                    "v1LegacyMode": false,
+                                    "softDeleteEnabled": false,
+                                    "containerRegistry": "/subscriptions/ea42f556-5106-4743-99b0-c129bfa71a47/resourceGroups/test_machine-learning-online-deployment/providers/Microsoft.ContainerRegistry/registries/cctmlacr635827285077",
+                                    "creationTime": "2026-07-21T20:27:42.6243297Z",
+                                    "notebookInfo": {
+                                        "resourceId": "bf87f548b02f4318a5c7af3bc8ad0281",
+                                        "fqdn": "ml-cctestmlonline63-eastus-dc92705d-45ed-4993-af91-91606c43d4cb.eastus.notebooks.azure.net",
+                                        "isPrivateLinkEnabled": false,
+                                        "notebookPreparationError": null
+                                    },
+                                    "storageHnsEnabled": false,
+                                    "workspaceId": "dc92705d-45ed-4993-af91-91606c43d4cb",
+                                    "linkedModelInventoryArmId": null,
+                                    "privateLinkCount": 0,
+                                    "publicNetworkAccess": "Enabled",
+                                    "discoveryUrl": "https://eastus.api.azureml.ms/discovery",
+                                    "mlFlowTrackingUri": "azureml://eastus.api.azureml.ms/mlflow/v1.0/subscriptions/ea42f556-5106-4743-99b0-c129bfa71a47/resourceGroups/test_machine-learning-online-deployment/providers/Microsoft.MachineLearningServices/workspaces/cctestmlonline635827285077",
+                                    "sdkTelemetryAppInsightsKey": "f5784ccd-178d-4ecc-9998-b05841b44ae9",
+                                    "enableDataIsolation": false
+                                },
+                                "identity": {
+                                    "type": "SystemAssigned",
+                                    "principalId": "538e539c-16b4-47be-8f5c-85e64d884ae7",
+                                    "tenantId": "00000000-0000-0000-0000-000000000003"
+                                },
+                                "kind": "Default",
+                                "sku": {
+                                    "name": "Basic",
+                                    "tier": "Basic"
+                                },
+                                "systemData": {
+                                    "createdAt": "2026-07-21T20:27:42.6243297Z",
+                                    "createdBy": "mock-user@example.com",
+                                    "createdByType": "User",
+                                    "lastModifiedAt": "2026-07-21T20:28:30.9243516Z",
+                                    "lastModifiedBy": "mock-user@example.com",
+                                    "lastModifiedByType": "User"
+                                }
+                            }
+                        ]
+                    }
+                }
+            }
+        },
+        {
+            "request": {
+                "method": "GET",
+                "uri": "https://management.azure.com/subscriptions/ea42f556-5106-4743-99b0-c129bfa71a47/resourceGroups/test_machine-learning-job/providers/Microsoft.MachineLearningServices/workspaces/cctest-mlws/onlineEndpoints?api-version=2023-04-01",
+                "body": null,
+                "headers": {}
+            },
+            "response": {
+                "status": {
+                    "code": 200,
+                    "message": "OK"
+                },
+                "headers": {
+                    "content-type": [
+                        "application/json; charset=utf-8"
+                    ],
+                    "x-ms-response-type": [
+                        "standard"
+                    ],
+                    "cache-control": [
+                        "no-cache"
+                    ],
+                    "x-msedge-ref": [
+                        "Ref A: FF77CA9B99E5468B88F5992033594449 Ref B: CHI261140509036 Ref C: 2026-07-21T20:47:37Z"
+                    ],
+                    "x-ms-original-request-ids": [
+                        ""
+                    ],
+                    "request-context": [
+                        "appId=cid-v1:2d2e8e63-272e-4b3c-8598-4ee570a0e70d"
+                    ],
+                    "x-ms-ratelimit-remaining-subscription-global-reads": [
+                        "3749"
+                    ],
+                    "x-request-time": [
+                        "0.030"
+                    ],
+                    "content-length": [
+                        "12"
+                    ],
+                    "date": [
+                        "Tue, 21 Jul 2026 20:47:37 GMT"
+                    ],
+                    "x-cache": [
+                        "CONFIG_NOCACHE"
+                    ],
+                    "azureml-served-by-cluster": [
+                        "vienna-eastus-01"
+                    ]
+                },
+                "body": {
+                    "data": {
+                        "value": []
+                    }
+                }
+            }
+        },
+        {
+            "request": {
+                "method": "GET",
+                "uri": "https://management.azure.com/subscriptions/ea42f556-5106-4743-99b0-c129bfa71a47/resourceGroups/test_machine-learning-online-deployment/providers/Microsoft.MachineLearningServices/workspaces/cctestmlonline635827285077/onlineEndpoints?api-version=2023-04-01",
+                "body": null,
+                "headers": {}
+            },
+            "response": {
+                "status": {
+                    "code": 200,
+                    "message": "OK"
+                },
+                "headers": {
+                    "content-type": [
+                        "application/json; charset=utf-8"
+                    ],
+                    "x-ms-response-type": [
+                        "standard"
+                    ],
+                    "cache-control": [
+                        "no-cache"
+                    ],
+                    "x-msedge-ref": [
+                        "Ref A: 10DA77ECEC594B59BE113CD9178E10E1 Ref B: CHI261140511029 Ref C: 2026-07-21T20:47:38Z"
+                    ],
+                    "x-ms-original-request-ids": [
+                        ""
+                    ],
+                    "request-context": [
+                        "appId=cid-v1:2d2e8e63-272e-4b3c-8598-4ee570a0e70d"
+                    ],
+                    "x-ms-ratelimit-remaining-subscription-global-reads": [
+                        "3749"
+                    ],
+                    "x-request-time": [
+                        "0.035"
+                    ],
+                    "content-length": [
+                        "1581"
+                    ],
+                    "date": [
+                        "Tue, 21 Jul 2026 20:47:37 GMT"
+                    ],
+                    "x-cache": [
+                        "CONFIG_NOCACHE"
+                    ],
+                    "azureml-served-by-cluster": [
+                        "vienna-eastus-02"
+                    ]
+                },
+                "body": {
+                    "data": {
+                        "value": [
+                            {
+                                "id": "/subscriptions/ea42f556-5106-4743-99b0-c129bfa71a47/resourceGroups/test_machine-learning-online-deployment/providers/Microsoft.MachineLearningServices/workspaces/cctestmlonline635827285077/onlineEndpoints/cctest-ml-635827285077",
+                                "name": "cctest-ml-635827285077",
+                                "type": "Microsoft.MachineLearningServices/workspaces/onlineEndpoints",
+                                "properties": {
+                                    "description": null,
+                                    "properties": {
+                                        "azureml.onlineendpointid": "/subscriptions/ea42f556-5106-4743-99b0-c129bfa71a47/resourcegroups/test_machine-learning-online-deployment/providers/microsoft.machinelearningservices/workspaces/cctestmlonline635827285077/onlineendpoints/cctest-ml-635827285077",
+                                        "AzureAsyncOperationUri": "https://management.azure.com/subscriptions/ea42f556-5106-4743-99b0-c129bfa71a47/providers/Microsoft.MachineLearningServices/locations/eastus/mfeOperationsStatus/oeidp:dc92705d-45ed-4993-af91-91606c43d4cb:855ea5cc-38f9-4270-a427-cd47ed690bf2?api-version=2023-04-01"
+                                    },
+                                    "scoringUri": "https://cctest-ml-635827285077.eastus.inference.ml.azure.com/score",
+                                    "swaggerUri": "https://cctest-ml-635827285077.eastus.inference.ml.azure.com/swagger.json",
+                                    "authMode": "AMLToken",
+                                    "provisioningState": "Succeeded",
+                                    "compute": null,
+                                    "publicNetworkAccess": "Enabled",
+                                    "traffic": {},
+                                    "mirrorTraffic": {}
+                                },
+                                "systemData": {
+                                    "createdAt": "2026-07-21T20:28:48.9477913+00:00",
+                                    "createdBy": "Mock User",
+                                    "lastModifiedAt": "2026-07-21T20:28:48.9477913+00:00"
+                                },
+                                "tags": {},
+                                "location": "eastus",
+                                "kind": "Managed",
+                                "identity": {
+                                    "type": "SystemAssigned",
+                                    "principalId": "ce8ed8dc-d1c2-4295-9392-0b11a9f3b396",
+                                    "tenantId": "00000000-0000-0000-0000-000000000003"
+                                }
+                            }
+                        ]
+                    }
+                }
+            }
+        },
+        {
+            "request": {
+                "method": "GET",
+                "uri": "https://management.azure.com/subscriptions/ea42f556-5106-4743-99b0-c129bfa71a47/resourceGroups/test_machine-learning-online-deployment/providers/Microsoft.MachineLearningServices/workspaces/cctestmlonline635827285077/onlineEndpoints/cctest-ml-635827285077/deployments?api-version=2023-04-01",
+                "body": null,
+                "headers": {}
+            },
+            "response": {
+                "status": {
+                    "code": 200,
+                    "message": "OK"
+                },
+                "headers": {
+                    "content-type": [
+                        "application/json; charset=utf-8"
+                    ],
+                    "x-ms-response-type": [
+                        "standard"
+                    ],
+                    "cache-control": [
+                        "no-cache"
+                    ],
+                    "x-msedge-ref": [
+                        "Ref A: 83763DF30766435EA7BA4CAB31BB3157 Ref B: CH1AA2030814031 Ref C: 2026-07-21T20:47:38Z"
+                    ],
+                    "x-ms-original-request-ids": [
+                        ""
+                    ],
+                    "request-context": [
+                        "appId=cid-v1:2d2e8e63-272e-4b3c-8598-4ee570a0e70d"
+                    ],
+                    "x-ms-ratelimit-remaining-subscription-global-reads": [
+                        "3748"
+                    ],
+                    "x-request-time": [
+                        "0.052"
+                    ],
+                    "content-length": [
+                        "2464"
+                    ],
+                    "date": [
+                        "Tue, 21 Jul 2026 20:47:37 GMT"
+                    ],
+                    "x-cache": [
+                        "CONFIG_NOCACHE"
+                    ],
+                    "azureml-served-by-cluster": [
+                        "vienna-eastus-01"
+                    ]
+                },
+                "body": {
+                    "data": {
+                        "value": [
+                            {
+                                "id": "/subscriptions/ea42f556-5106-4743-99b0-c129bfa71a47/resourceGroups/test_machine-learning-online-deployment/providers/Microsoft.MachineLearningServices/workspaces/cctestmlonline635827285077/onlineEndpoints/cctest-ml-635827285077/deployments/blue",
+                                "name": "blue",
+                                "type": "Microsoft.MachineLearningServices/workspaces/onlineEndpoints/deployments",
+                                "properties": {
+                                    "description": null,
+                                    "properties": {
+                                        "AzureAsyncOperationUri": "https://management.azure.com/subscriptions/ea42f556-5106-4743-99b0-c129bfa71a47/providers/Microsoft.MachineLearningServices/locations/eastus/mfeOperationsStatus/odidp:dc92705d-45ed-4993-af91-91606c43d4cb:174d4f29-9116-4daf-bf04-e96b2c3212e5?api-version=2023-04-01"
+                                    },
+                                    "codeConfiguration": {
+                                        "codeId": "/subscriptions/ea42f556-5106-4743-99b0-c129bfa71a47/resourceGroups/test_machine-learning-online-deployment/providers/Microsoft.MachineLearningServices/workspaces/cctestmlonline635827285077/codes/cctest-online-code/versions/1",
+                                        "scoringScript": "score.py"
+                                    },
+                                    "environmentId": "/subscriptions/ea42f556-5106-4743-99b0-c129bfa71a47/resourceGroups/test_machine-learning-online-deployment/providers/Microsoft.MachineLearningServices/workspaces/cctestmlonline635827285077/environments/cctest-online-environment/versions/1",
+                                    "environmentVariables": {
+                                        "AZUREML_MODEL_DIR": "/var/azureml-app/azureml-models/cctest-online-model/1",
+                                        "AZUREML_ENTRY_SCRIPT": "score.py",
+                                        "AML_APP_ROOT": "/var/azureml-app/code"
+                                    },
+                                    "scaleSettings": {
+                                        "scaleType": "Default"
+                                    },
+                                    "requestSettings": {
+                                        "maxQueueWait": "PT0S",
+                                        "requestTimeout": "PT5S",
+                                        "maxConcurrentRequestsPerInstance": 1
+                                    },
+                                    "modelMountPath": null,
+                                    "appInsightsEnabled": false,
+                                    "livenessProbe": {
+                                        "failureThreshold": 30,
+                                        "successThreshold": 1,
+                                        "timeout": "PT2S",
+                                        "period": "PT10S",
+                                        "initialDelay": "PT10S"
+                                    },
+                                    "readinessProbe": {
+                                        "failureThreshold": 30,
+                                        "successThreshold": 1,
+                                        "timeout": "PT2S",
+                                        "period": "PT10S",
+                                        "initialDelay": "PT10S"
+                                    },
+                                    "provisioningState": "Succeeded",
+                                    "instanceType": "Standard_F2s_v2",
+                                    "model": "/subscriptions/ea42f556-5106-4743-99b0-c129bfa71a47/resourceGroups/test_machine-learning-online-deployment/providers/Microsoft.MachineLearningServices/workspaces/cctestmlonline635827285077/models/cctest-online-model/versions/1",
+                                    "egressPublicNetworkAccess": "Enabled",
+                                    "endpointComputeType": "Managed"
+                                },
+                                "systemData": {
+                                    "createdAt": "2026-07-21T20:30:01.8532948+00:00",
+                                    "createdBy": "Kody Mullins",
+                                    "lastModifiedAt": "2026-07-21T20:30:01.8532956+00:00"
+                                },
+                                "tags": {},
+                                "location": "eastus",
+                                "kind": "Managed",
+                                "sku": {
+                                    "name": "Default",
+                                    "tier": "Standard",
+                                    "capacity": 1
+                                }
+                            }
+                        ]
+                    }
+                }
+            }
+        }
+    ]
+}
