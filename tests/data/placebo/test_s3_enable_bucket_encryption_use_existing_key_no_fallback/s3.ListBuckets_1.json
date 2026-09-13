@@ -1,0 +1,25 @@
+{
+    "status_code": 200,
+    "data": {
+        "ResponseMetadata": {},
+        "Buckets": [
+            {
+                "Name": "custodian-test-use-existing-key-skip",
+                "CreationDate": {
+                    "__class__": "datetime",
+                    "year": 2024,
+                    "month": 1,
+                    "day": 15,
+                    "hour": 10,
+                    "minute": 0,
+                    "second": 0,
+                    "microsecond": 0
+                }
+            }
+        ],
+        "Owner": {
+            "DisplayName": "test",
+            "ID": "test-id"
+        }
+    }
+}
