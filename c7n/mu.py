@@ -209,6 +209,9 @@ class PythonPackageArchive:
         src = src[:-1] if src.endswith('.pyc') else src
         self.add_file(src, dest)
 
+    def add_json(self, src, contents):
+        self.add_contents(src, json.dumps(contents, indent=2))
+
     def add_contents(self, dest, contents):
         """Add file contents to the archive under ``dest``.
 
