@@ -1,0 +1,32 @@
+{
+    "status_code": 200,
+    "data": {
+        "KeyMetadata": {
+            "AWSAccountId": "644160558196",
+            "KeyId": "fb3fc7b3-b7de-4f1b-9919-0bb551444ad7",
+            "Arn": "arn:aws:kms:us-east-1:644160558196:key/fb3fc7b3-b7de-4f1b-9919-0bb551444ad7",
+            "CreationDate": {
+                "__class__": "datetime",
+                "year": 2021,
+                "month": 12,
+                "day": 20,
+                "hour": 18,
+                "minute": 5,
+                "second": 21,
+                "microsecond": 200000
+            },
+            "Enabled": true,
+            "Description": "Default key that protects my AppFlow data when no other key is defined",
+            "KeyUsage": "ENCRYPT_DECRYPT",
+            "KeyState": "Enabled",
+            "Origin": "AWS_KMS",
+            "KeyManager": "AWS",
+            "CustomerMasterKeySpec": "SYMMETRIC_DEFAULT",
+            "EncryptionAlgorithms": [
+                "SYMMETRIC_DEFAULT"
+            ],
+            "MultiRegion": false
+        },
+        "ResponseMetadata": {}
+    }
+}
