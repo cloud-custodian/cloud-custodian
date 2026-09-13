@@ -1,0 +1,79 @@
+{
+    "pytest-terraform": 1,
+    "outputs": {},
+    "resources": {
+        "google_spanner_backup_schedule": {
+            "c7n_long_retention": {
+                "database": "sbsd",
+                "encryption_config": [
+                    {
+                        "encryption_type": "USE_DATABASE_ENCRYPTION",
+                        "kms_key_name": "",
+                        "kms_key_names": []
+                    }
+                ],
+                "full_backup_spec": [
+                    {}
+                ],
+                "id": "sbsi/sbsd/sbsl",
+                "incremental_backup_spec": [],
+                "instance": "sbsi",
+                "name": "sbsl",
+                "project": "stacklet-personal-2",
+                "retention_duration": "2678400s",
+                "spec": [
+                    {
+                        "cron_spec": [
+                            {
+                                "text": "0 3 * * *"
+                            }
+                        ]
+                    }
+                ],
+                "timeouts": null
+            }
+        },
+        "google_spanner_database": {
+            "c7n": {
+                "database_dialect": "GOOGLE_STANDARD_SQL",
+                "ddl": null,
+                "default_time_zone": null,
+                "deletion_protection": false,
+                "enable_drop_protection": false,
+                "encryption_config": [],
+                "id": "sbsi/sbsd",
+                "instance": "sbsi",
+                "name": "sbsd",
+                "project": "stacklet-personal-2",
+                "state": "READY",
+                "timeouts": null,
+                "version_retention_period": "1h"
+            }
+        },
+        "google_spanner_instance": {
+            "c7n": {
+                "autoscaling_config": [],
+                "config": "projects/cloud-custodian/instanceConfigs/regional-us-central1",
+                "default_backup_schedule_type": "AUTOMATIC",
+                "display_name": "sbsi",
+                "edition": "STANDARD",
+                "effective_labels": {
+                    "goog-terraform-provisioned": "true"
+                },
+                "force_destroy": false,
+                "id": "stacklet-personal-2/sbsi",
+                "instance_type": "PROVISIONED",
+                "labels": null,
+                "name": "sbsi",
+                "num_nodes": 1,
+                "processing_units": 1000,
+                "project": "stacklet-personal-2",
+                "state": "READY",
+                "terraform_labels": {
+                    "goog-terraform-provisioned": "true"
+                },
+                "timeouts": null
+            }
+        }
+    }
+}
