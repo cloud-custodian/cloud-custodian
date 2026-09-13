@@ -83,6 +83,7 @@ def test_gcp_resource_metadata_asset_type():
         'vertex-ai-publisher',  # Synthetic resource (no asset inventory type)
         'vertex-ai-publisher-model',  # Catalog resource (no asset inventory type)
         'vertex-ai-location',
+        'workspace-user',  # not a GCP resource (no asset inventory type)
         'vertex-ai-evaluation-run',  # No asset inventory type yet
     ))
     missing = set()

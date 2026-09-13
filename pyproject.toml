@@ -135,3 +135,7 @@ omit = ["c7n/resources/opsworks.py", "c7n/resources/qldb.py"]
 [tool.pytest_env]
 env_files = [".env", "test.env"]
 AWS_PROFILE = { unset = true }
+# Set when recording Google Workspace flight data. Left set, they would
+# make the recorded tests depend on the developer's environment.
+GOOGLE_WORKSPACE_SUBJECT = { unset = true }
+GOOGLE_WORKSPACE_CUSTOMER = { unset = true }
