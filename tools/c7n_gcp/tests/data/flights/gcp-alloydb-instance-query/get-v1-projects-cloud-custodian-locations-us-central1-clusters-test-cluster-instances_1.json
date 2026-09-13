@@ -1,0 +1,34 @@
+{
+  "headers": {
+    "content-type": "application/json; charset=UTF-8",
+    "vary": "Origin, X-Origin, Referer",
+    "server": "ESF",
+    "cache-control": "private",
+    "x-xss-protection": "0",
+    "x-frame-options": "SAMEORIGIN",
+    "x-content-type-options": "nosniff",
+    "transfer-encoding": "chunked",
+    "status": "200",
+    "content-location": "https://alloydb.googleapis.com/v1/projects/cloud-custodian/locations/us-central1/clusters/test-cluster/instances?alt=json"
+  },
+  "body": {
+    "instances": [
+      {
+        "name": "projects/cloud-custodian/locations/us-central1/clusters/test-cluster/instances/test-instance",
+        "uid": "99998888-7777-6666-5555-444433332222",
+        "state": "READY",
+        "instanceType": "PRIMARY",
+        "availabilityType": "REGIONAL",
+        "createTime": "2026-06-15T12:10:00.000000Z",
+        "updateTime": "2026-06-15T12:12:00.000000Z",
+        "machineConfig": {
+          "cpuCount": 2
+        },
+        "ipAddress": "10.0.0.5",
+        "labels": {
+          "env": "test"
+        }
+      }
+    ]
+  }
+}
