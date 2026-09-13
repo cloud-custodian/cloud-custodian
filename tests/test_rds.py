@@ -368,6 +368,28 @@ class RDSTest(BaseTest):
         resources = p.run()
         self.assertEqual(len(resources), 5)
 
+    def test_rds_snapshot_config(self):
+        session_factory = self.replay_flight_data("test_rds_snapshot_config")
+        p = self.load_policy(
+            {
+                "name": "rds-snapshot",
+                "resource": "rds-snapshot",
+                "source": "config",
+            },
+            session_factory=session_factory,
+        )
+        resources = p.run()
+        self.assertEqual(len(resources), 1)
+
+        client = session_factory(region="us-east-1").client("rds")
+        snapshot = client.describe_db_snapshots(
+            DBInstanceIdentifier=resources[0]["DBInstanceIdentifier"]
+        )["DBSnapshots"][1]
+        self.assertEqual(
+            snapshot["DBInstanceIdentifier"],
+            resources[0]["DBInstanceIdentifier"]
+        )
+
     def test_rds_restore(self):
         self.patch(rds.RestoreInstance, "executor_factory", MainThreadExecutor)
         self.change_environment(AWS_DEFAULT_REGION="us-east-2")
