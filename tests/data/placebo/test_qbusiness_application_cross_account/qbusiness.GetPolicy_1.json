@@ -1,0 +1,7 @@
+{
+    "status_code": 200,
+    "data": {
+        "ResponseMetadata": {},
+        "policy": "{\"Version\":\"2012-10-17\",\"Statement\":[{\"Sid\":\"c7ntestexternalaccount\",\"Effect\":\"Allow\",\"Principal\":{\"AWS\":\"arn:aws:iam::123456789012:role/q-business-cross-account-test\"},\"Action\":\"qbusiness:SearchRelevantContent\",\"Resource\":\"arn:aws:qbusiness:us-east-1:644160558196:application/ed27546d-6f28-4480-820e-6592404f720f\"}]}"
+    }
+}
