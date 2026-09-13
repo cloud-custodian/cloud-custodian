@@ -603,6 +603,34 @@ class TestEcsTaskDefinition(BaseTest):
         self.assertEqual(len(client.list_tags_for_resource(
             resourceArn=resources[0]["taskDefinitionArn"]).get("tags")), 0)
 
+    def test_ecs_task_definition_has_allow_all_role_true(self):
+        session_factory = self.replay_flight_data(
+            "test_ecs_task_definition_has_allow_all_role_true")
+        p = self.load_policy(
+            {
+                "name": "task-definition-with-inline-policy-allow-all",
+                "resource": "ecs-task-definition",
+                "filters": [{"type": "role-has-allow-all"}],
+            },
+            session_factory=session_factory,
+        )
+        resources = p.run()
+        self.assertEqual(len(resources), 2)
+
+    def test_ecs_task_definition_has_allow_all_role_false(self):
+        session_factory = self.replay_flight_data(
+            "test_ecs_task_definition_has_allow_all_role_false")
+        p = self.load_policy(
+            {
+                "name": "task-definition-with-inline-policy-allow-all",
+                "resource": "ecs-task-definition",
+                "filters": [{"type": "role-has-allow-all"}],
+            },
+            session_factory=session_factory,
+        )
+        resources = p.run()
+        self.assertEqual(len(resources), 0)
+
 
 class TestEcsTask(BaseTest):
 

@@ -1,0 +1,11 @@
+{
+    "status_code": 200,
+    "data": {
+        "taskDefinitionArns": [
+            "arn:aws:ecs:us-east-1:123456789012:task-definition/c7nsuccess1_service:6",
+            "arn:aws:ecs:us-east-1:123456789012:task-definition/c7nsuccess2_service:6",
+            "arn:aws:ecs:us-east-1:123456789012:task-definition/c7nsuccess3_service:1"
+        ],
+        "ResponseMetadata": {}
+    }
+}

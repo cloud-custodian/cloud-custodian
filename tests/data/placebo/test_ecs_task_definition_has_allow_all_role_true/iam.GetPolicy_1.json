@@ -1,0 +1,37 @@
+{
+    "status_code": 200,
+    "data": {
+        "Policy": {
+            "PolicyName": "policy-618033",
+            "PolicyId": "ANPAXO263RKEDYMXZ5234",
+            "Arn": "arn:aws:iam::123456789012:policy/policy-618033",
+            "Path": "/",
+            "DefaultVersionId": "v1",
+            "AttachmentCount": 1,
+            "PermissionsBoundaryUsageCount": 0,
+            "IsAttachable": true,
+            "CreateDate": {
+                "__class__": "datetime",
+                "year": 2023,
+                "month": 1,
+                "day": 24,
+                "hour": 20,
+                "minute": 2,
+                "second": 17,
+                "microsecond": 0
+            },
+            "UpdateDate": {
+                "__class__": "datetime",
+                "year": 2023,
+                "month": 1,
+                "day": 24,
+                "hour": 20,
+                "minute": 2,
+                "second": 17,
+                "microsecond": 0
+            },
+            "Tags": []
+        },
+        "ResponseMetadata": {}
+    }
+}
