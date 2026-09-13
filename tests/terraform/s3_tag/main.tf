@@ -1,6 +1,6 @@
 resource "aws_s3_bucket" "example" {
-  bucket = "my-custodian-test-bucket"
-  acl    = "private"
+  bucket_prefix = "c7ntest"
+  acl           = "private"
 
   tags = {
     original-tag = "original-value"
