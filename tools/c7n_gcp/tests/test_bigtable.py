@@ -1,4 +1,7 @@
 from gcp_common import BaseTest
+from c7n.testing import C7N_FUNCTIONAL
+from c7n_gcp.client import get_default_project
+from pytest_terraform import terraform
 
 
 class BigtableInstanceTest(BaseTest):
@@ -114,3 +117,37 @@ class BigTableInstanceTableTest(BaseTest):
                          resources[0]['name'])
         self.assertEqual('projects/cloud-custodian/instances/custodian-test-instance/tables/custodian-table-red',
                          resources[1]['name'])
+
+
+@terraform("bigtable_gc_rule")
+def test_bigtable_instance_table_filter_gc_rule(test, bigtable_gc_rule):
+    project_id = get_default_project()
+
+    if C7N_FUNCTIONAL:
+        session_factory = test.record_flight_data(
+            'bigtable-instance-table-filter-gc-rule',
+            project_id=project_id,
+        )
+    else:
+        session_factory = test.replay_flight_data(
+            'bigtable-instance-table-filter-gc-rule',
+            project_id=project_id,
+        )
+
+    policy = test.load_policy(
+        {
+            'name': 'bigtable-instance-table-filter-gc-rule',
+            'resource': 'gcp.bigtable-instance-table',
+            'filters': [{
+                'type': 'gc-rule',
+                'key': 'columnFamilies.cf_with_gc.gcRule.maxAge',
+                'value': '86400s',
+                'op': 'eq',
+            }]
+        },
+        session_factory=session_factory,
+    )
+
+    resources = policy.run()
+    assert len(resources) == 1
+    assert resources[0]['name'].endswith('/tables/c7n-gc-table')
