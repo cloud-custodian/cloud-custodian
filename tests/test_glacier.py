@@ -1,21 +1,56 @@
 # Copyright The Cloud Custodian Authors.
 # SPDX-License-Identifier: Apache-2.0
 import json
+import logging
 from .common import BaseTest, functional
 from botocore.exceptions import ClientError
 
+from c7n import deprecated
+
 
 class GlacierTagTest(BaseTest):
+    # https://github.com/cloud-custodian/cloud-custodian/issues/10998
+    # AWS retired the Glacier vault tagging/listing API surface, so
+    # vaults are no longer tag-able and augment() no longer tries to
+    # call the now-defunct list_tags_for_vault. The tag/remove-tag/
+    # mark-for-op actions stay registered as deprecated no-ops (rather
+    # than being removed from the schema) so existing policies still
+    # validate and run instead of hard failing at policy-load time.
 
-    @functional
-    def test_glacier_tag(self):
+    def test_glacier_tag_actions_are_deprecated_noop(self):
         session_factory = self.replay_flight_data("test_glacier_tag")
-        client = session_factory().client("glacier")
-        name = "c7n-glacier-test"
+        actions = (
+            {"type": "tag", "key": "abc", "value": "xyz"},
+            {"type": "remove-tag", "tags": ["abc"]},
+            {"type": "mark-for-op", "op": "notify", "days": 4},
+        )
+        for action in actions:
+            p = self.load_policy(
+                {
+                    "name": "glacier",
+                    "resource": "glacier",
+                    "filters": [
+                        {"type": "value", "key": "VaultName", "value": "c7n-glacier-test"}
+                    ],
+                    "actions": [action],
+                },
+                session_factory=session_factory,
+            )
+            # the action is deprecated, not removed - it's still flagged
+            # for `custodian validate` to surface.
+            self.assertTrue(
+                deprecated.check_deprecations(p.resource_manager.actions[0]))
 
-        client.create_vault(vaultName=name)
-        self.addCleanup(client.delete_vault, vaultName=name)
+            log_output = self.capture_logging("custodian.actions", level=logging.WARNING)
+            resources = p.run()
+            self.assertEqual(len(resources), 1)
+            self.assertIn("no-op", log_output.getvalue())
+            self.assertIn(action["type"], log_output.getvalue())
 
+    def test_glacier_list_no_tag_augment(self):
+        # listing/filtering vaults must not call the retired
+        # list_tags_for_vault API, and resources carry no Tags.
+        session_factory = self.replay_flight_data("test_glacier_tag")
         p = self.load_policy(
             {
                 "name": "glacier",
@@ -23,56 +58,13 @@ class GlacierTagTest(BaseTest):
                 "filters": [
                     {"type": "value", "key": "VaultName", "value": "c7n-glacier-test"}
                 ],
-                "actions": [{"type": "tag", "key": "abc", "value": "xyz"}],
             },
             session_factory=session_factory,
         )
         resources = p.run()
         self.assertEqual(len(resources), 1)
-        self.assertEqual(resources[0]["VaultName"], name)
-
-        tags = client.list_tags_for_vault(vaultName=resources[0]["VaultName"])
-        self.assertEqual(len(tags["Tags"]), 1)
-        self.assertTrue("abc" in tags["Tags"])
-
-    def test_glacier_untag(self):
-        session_factory = self.replay_flight_data("test_glacier_untag")
-        client = session_factory().client("glacier")
-
-        p = self.load_policy(
-            {
-                "name": "glacier",
-                "resource": "glacier",
-                "filters": [{"tag:abc": "present"}],
-                "actions": [{"type": "remove-tag", "tags": ["abc"]}],
-            },
-            session_factory=session_factory,
-        )
-        resources = p.run()
-        self.assertEqual(len(resources), 1)
-
-        tags = client.list_tags_for_vault(vaultName=resources[0]["VaultName"])
-        self.assertEqual(len(tags["Tags"]), 0)
-
-    def test_glacier_markop(self):
-        session_factory = self.replay_flight_data("test_glacier_markop")
-        client = session_factory().client("glacier")
-
-        p = self.load_policy(
-            {
-                "name": "glacier",
-                "resource": "glacier",
-                "filters": [{"tag:abc": "present"}],
-                "actions": [{"type": "mark-for-op", "op": "notify", "days": 4}],
-            },
-            session_factory=session_factory,
-        )
-        resources = p.run()
-        self.assertEqual(len(resources), 1)
-
-        tags = client.list_tags_for_vault(vaultName=resources[0]["VaultName"])
-        self.assertEqual(len(tags["Tags"]), 2)
-        self.assertTrue("maid_status" in tags["Tags"])
+        self.assertEqual(resources[0]["VaultName"], "c7n-glacier-test")
+        self.assertNotIn("Tags", resources[0])
 
 
 class GlacierStatementTest(BaseTest):
