@@ -245,13 +245,13 @@ class OffHoursFilterTest(BaseTest):
         start_day = 14
         t = datetime.datetime(year=2016, day=start_day, month=8, hour=7, minute=20)
         i = instance(Tags=[{"Key": "maid_offhours", "Value": "tz=est"}])
-        f = OnHour({"weekends-only": True})
+        f = OffHour({"weekends-only": True})
         results = []
         with mock_datetime_now(t, datetime) as dt:
             for n in range(7):
                 dt.target = t.replace(day=start_day + n)
                 results.append(f(i))
-        self.assertEqual(results, [False, True, False, False, False, False, False])
+        self.assertEqual(results, [False, False, False, False, False, True, False])
 
     def test_onhour_weekend_support(self):
         start_day = 14
