@@ -278,6 +278,32 @@ class NotifyTest(BaseTest):
         resources = policy.poll()
         self.assertJmes('[]."c7n:MatchedFilters"', resources, [["tag:Testing"]])
 
+    def test_notify_region_queue(self):
+        session_factory = self.replay_flight_data("test_notify_action", zdata=True)
+        policy = self.load_policy(
+            {
+                "name": "instance-check",
+                "resource": "ec2",
+                "filters": [{"tag:Testing": "Testing123"}],
+                "actions": [
+                    {
+                        "type": "notify",
+                        "to": ["someon@example.com"],
+                        "transport": {
+                            "type": "sqs",
+                            "queue": (
+                                "https://us-west-2.queue.amazonaws.com/"
+                                "619193117841/custodian-messages"),
+                        },
+                    }
+                ],
+            },
+            session_factory=session_factory,
+        )
+
+        resources = policy.poll()
+        self.assertJmes('[]."c7n:MatchedFilters"', resources, [["tag:Testing"]])
+
     @functional
     def test_notify_region_var(self):
         session_factory = self.replay_flight_data("test_notify_region_var")
