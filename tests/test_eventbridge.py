@@ -384,3 +384,45 @@ class ApiDestinationTest(BaseTest):
         self.assertEqual(len(resources), 1)
         self.assertEqual(resources[0]["Name"], "test-delete-me")
         self.assertEqual(resources[0]["ApiDestinationState"], "ACTIVE")
+
+
+class ConnectionTest(BaseTest):
+
+    def test_event_connection_query(self):
+        factory = self.replay_flight_data("test_event_connection_query")
+        p = self.load_policy(
+            {
+                "name": "query-connections",
+                "resource": "aws.event-connection",
+            },
+            session_factory=factory,
+        )
+        resources = p.run()
+        self.assertEqual(len(resources), 2)
+        self.assertEqual(
+            sorted(r["AuthorizationType"] for r in resources),
+            ["API_KEY", "BASIC"])
+        self.assertTrue(resources[0]["ConnectionArn"].startswith(
+            "arn:aws:events:us-east-1:644160558196:connection/"))
+
+    def test_event_connection_basic_auth_filter(self):
+        factory = self.replay_flight_data("test_event_connection_query")
+        p = self.load_policy(
+            {
+                "name": "eventbridge-connection-basic-auth",
+                "resource": "aws.event-connection",
+                "filters": [
+                    {
+                        "type": "value",
+                        "key": "AuthorizationType",
+                        "op": "not-in",
+                        "value": ["OAUTH_CLIENT_CREDENTIALS", "API_KEY"],
+                    }
+                ],
+            },
+            session_factory=factory,
+        )
+        resources = p.run()
+        self.assertEqual(len(resources), 1)
+        self.assertEqual(resources[0]["AuthorizationType"], "BASIC")
+        self.assertEqual(resources[0]["Name"], "c7n-test-conn-basic")

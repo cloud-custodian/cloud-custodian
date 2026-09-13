@@ -655,7 +655,6 @@ class PolicyMetaLint(BaseTest):
             'AWS::EventSchemas::RegistryPolicy',
             'AWS::EventSchemas::Schema',
             'AWS::Events::Archive',
-            'AWS::Events::Connection',
             'AWS::Events::Endpoint',
             'AWS::FraudDetector::EntityType',
             'AWS::FraudDetector::Label',

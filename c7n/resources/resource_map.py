@@ -157,6 +157,7 @@ ResourceMap = {
   "aws.eni": "c7n.resources.vpc.NetworkInterface",
   "aws.event-api-destination": "c7n.resources.eventbridge.EventApiDestination",
   "aws.event-bus": "c7n.resources.eventbridge.EventBus",
+  "aws.event-connection": "c7n.resources.eventbridge.EventConnection",
   "aws.event-rule": "c7n.resources.eventbridge.EventRule",
   "aws.event-rule-target": "c7n.resources.eventbridge.EventRuleTarget",
   "aws.eventbridge-pipes": "c7n.resources.eventbridge.EventBridgePipes",
