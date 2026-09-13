@@ -1,0 +1,12 @@
+{
+    "status_code": 200,
+    "data": {
+        "ResponseMetadata": {},
+        "investigationGroups": [
+            {
+                "arn": "arn:aws:aiops:us-east-1:644160558196:investigation-group/zKIq4Uc78GVq3PFg",
+                "name": "DefaultInvestigationGroup"
+            }
+        ]
+    }
+}

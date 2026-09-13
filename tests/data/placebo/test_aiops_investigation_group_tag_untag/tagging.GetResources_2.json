@@ -1,0 +1,22 @@
+{
+    "status_code": 200,
+    "data": {
+        "PaginationToken": "",
+        "ResourceTagMappingList": [
+            {
+                "ResourceARN": "arn:aws:aiops:us-east-1:644160558196:investigation-group/zKIq4Uc78GVq3PFg",
+                "Tags": [
+                    {
+                        "Key": "test",
+                        "Value": "true"
+                    },
+                    {
+                        "Key": "Env",
+                        "Value": "production"
+                    }
+                ]
+            }
+        ],
+        "ResponseMetadata": {}
+    }
+}
