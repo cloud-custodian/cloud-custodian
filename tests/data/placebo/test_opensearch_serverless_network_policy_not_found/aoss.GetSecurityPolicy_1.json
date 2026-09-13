@@ -1,0 +1,27 @@
+{
+    "status_code": 200,
+    "data": {
+        "securityPolicyDetail": {
+            "type": "network",
+            "name": "existing-policy",
+            "policyVersion": "MTY4MzY0NTI4NjI4N18x",
+            "description": "Existing network policy",
+            "policy": [
+                {
+                    "Rules": [
+                        {
+                            "ResourceType": "collection",
+                            "Resource": [
+                                "collection/test-collection"
+                            ]
+                        }
+                    ],
+                    "AllowFromPublic": true
+                }
+            ],
+            "createdDate": 1683645286287,
+            "lastModifiedDate": 1683645286287
+        },
+        "ResponseMetadata": {}
+    }
+}
