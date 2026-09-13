@@ -32,6 +32,8 @@ CORE_DEPS = [
     "pyasn1",
     "redis",
     "jmespath",
+    # redis (recursive dep) - redis.auth.token imports jwt at module scope
+    "jwt",
     # transport datadog - recursive deps
     "datadog",
     "decorator",
