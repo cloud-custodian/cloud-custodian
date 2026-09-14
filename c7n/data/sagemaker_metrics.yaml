@@ -1,0 +1,132 @@
+# The metrics SageMaker publishes, and the dimensions that identify them.
+#
+# Maintained by hand/agent.
+# See tests/terraform/sagemaker_endpoint_metrics/probe_metrics.py
+#
+# Each section names the metric table it came from. The namespace is in the
+# prose above that table. A dimension entry is one row of the following
+# dimensions table: the names identifying a single time series.
+#
+# kind names a variety of the resource, for metrics only some varieties
+# publish; leave it out when every variety publishes the section's metrics.
+# Endpoints come in two kinds: a "classic" endpoint attaches a model to each
+# production variant, while an "inference-component" endpoint carries an
+# execution role and hosts models as components placed on a variant. The two
+# report invocations under different dimensions, which the documentation
+# lists together without saying which applies when.
+#
+# Only the metrics of resources c7n filters on are listed; the page also
+# covers jobs, Ground Truth, Feature Store and pipelines.
+#
+# The documentation's dimensions tables say which dimensions a metric can be
+# filtered by, not which sets exist, and CloudWatch identifies a series by
+# the exact set. Only sets observed to carry data are listed here -- see
+# specs/10853-aws-sagemaker-endpoint-metrics/live-dimension-sets.md. Notably
+# instance type is published only alongside AvailabilityZone and Region, so
+# the documented "EndpointName, VariantName, InstanceType" is absent.
+
+- title: Endpoint metrics
+  resource: sagemaker-endpoint
+  namespace: /aws/sagemaker/Endpoints
+  metrics:
+    - CPUUtilization
+    - DiskUtilization
+    - GPUMemoryUtilization
+    - GPUUtilization
+    - MemoryUtilization
+  dimensions:
+    - EndpointName, VariantName
+
+# Reservations exist only where a component reserves part of an instance,
+# and the normalized metrics report utilization against them. Observed for a
+# component-hosting endpoint and not for a classic one.
+- title: Endpoint metrics
+  resource: sagemaker-endpoint
+  kind: inference-component
+  namespace: /aws/sagemaker/Endpoints
+  metrics:
+    - CPUReservation
+    - CPUUtilizationNormalized
+    - GPUMemoryUtilizationNormalized
+    - GPUReservation
+    - GPUUtilizationNormalized
+    - MemoryReservation
+  dimensions:
+    - EndpointName, VariantName
+
+- title: Endpoint invocation metrics
+  resource: sagemaker-endpoint
+  kind: classic
+  namespace: AWS/SageMaker
+  metrics:
+    - ConcurrentRequestsPerModel
+    - Invocation4XXErrors
+    - Invocation5XXErrors
+    - InvocationModelErrors
+    - Invocations
+    - InvocationsPerInstance
+    - ModelLatency
+    - ModelSetupTime
+    - OverheadLatency
+    - MidStreamErrors
+    - FirstChunkLatency
+    - FirstChunkModelLatency
+    - FirstChunkOverheadLatency
+  dimensions:
+    - EndpointName, VariantName
+
+# A component-hosting endpoint reports its invocations per component, with
+# no EndpointName dimension.
+- title: Endpoint invocation metrics
+  resource: sagemaker-endpoint
+  kind: inference-component
+  namespace: AWS/SageMaker
+  metrics:
+    - ConcurrentRequestsPerCopy
+    - Invocation4XXErrors
+    - Invocation5XXErrors
+    - InvocationModelErrors
+    - Invocations
+    - InvocationsPerCopy
+    - ModelLatency
+    - ModelSetupTime
+    - OverheadLatency
+    - MidStreamErrors
+    - FirstChunkLatency
+    - FirstChunkModelLatency
+    - FirstChunkOverheadLatency
+  dimensions:
+    - InferenceComponentName
+
+- title: Inference component metrics
+  resource: sagemaker-inference-component
+  namespace: /aws/sagemaker/InferenceComponents
+  metrics:
+    - CPUUtilizationNormalized
+    - GPUMemoryUtilizationNormalized
+    - GPUUtilizationNormalized
+    - MemoryUtilizationNormalized
+  dimensions:
+    - InferenceComponentName
+
+- title: Multi-model endpoint model loading metrics
+  resource: sagemaker-endpoint
+  kind: classic
+  namespace: AWS/SageMaker
+  metrics:
+    - ModelLoadingWaitTime
+    - ModelUnloadingTime
+    - ModelDownloadingTime
+    - ModelLoadingTime
+    - ModelCacheHit
+  dimensions:
+    - EndpointName, VariantName
+
+- title: Multi-model endpoint model instance metrics
+  resource: sagemaker-endpoint
+  kind: classic
+  namespace: /aws/sagemaker/Endpoints
+  metrics:
+    - LoadedModelCount
+  dimensions:
+    - EndpointName, VariantName

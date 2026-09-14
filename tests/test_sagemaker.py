@@ -1,11 +1,17 @@
 # Copyright The Cloud Custodian Authors.
 # SPDX-License-Identifier: Apache-2.0
+import time
+from unittest import mock
+
 import pytest
 from pytest_terraform import terraform
 
 from .common import BaseTest
 
-from c7n.resources.sagemaker import SagemakerJobQueryParser, CompilationJobQueryParser
+from c7n.filters.metrics import MetricsFilter
+from c7n.resources.sagemaker import (
+    SAGEMAKER_METRICS, SagemakerEndpoint, SagemakerJobQueryParser,
+    CompilationJobQueryParser)
 from c7n.exceptions import PolicyValidationError
 
 import botocore.exceptions as b_exc
@@ -1605,3 +1611,606 @@ def test_sagemaker_app(test, sagemaker_studio):
     )
     [resource] = p.run()
     assert resource['AppName'] == sagemaker_studio['aws_sagemaker_app.untagged.app_name']
+
+
+def capture_dimensions():
+    """Capture the dimensions of each GetMetricStatistics call.
+
+    Flight data is matched on the api call name alone, so asserting on the
+    resources a policy returns says nothing about the dimensions it asked
+    cloudwatch for -- which is the whole of what these filters do.
+    """
+    dimensions = []
+    get_metric_data = MetricsFilter.get_metric_data
+
+    def record(self, client, params):
+        dimensions.append(params['Dimensions'])
+        return get_metric_data(self, client, params)
+
+    return dimensions, mock.patch.object(
+        MetricsFilter, 'get_metric_data', record)
+
+################################################################################
+#
+# Tests that test that we actually fetch correct data by running
+# policies that depend on it.
+# Two policies, each run against both kinds of endpoint:
+#
+#   test                             policy                  endpoints
+#   -------------------------------  ----------------------  -------------------
+#   idle                             Invocations Sum lte 0   two classic
+#   inference_component              the same policy         component
+#   idle_component                   the same policy         component, uncalled
+#   utilization                      CPUUtilization Average  classic
+#                                    less-than 400
+#   inference_component_utilization  the same policy         component
+#
+# idle_component is why the idle policy needs no missing-value: an endpoint
+# nothing has called reports a zero for each interval rather than nothing
+# at all, whichever way it hosts its models. What a missing value is for --
+# a metric with no values to compare -- is covered by the two unit tests
+# below it, which don't need an endpoint.
+#
+# The catalogue tests further down cover which metrics can be asked for and
+# whether their dimension sets carry data. These cover what a policy
+# decides once it has the data.
+#
+
+
+@pytest.mark.audited
+@terraform('sagemaker_endpoint_metrics', scope='module')
+def test_sagemaker_endpoint_metrics_idle(test, sagemaker_endpoint_metrics):
+    # the busy endpoint's invocations land on its second variant, so it is
+    # only distinguishable from the idle endpoint if every variant is queried
+    busy = sagemaker_endpoint_metrics['aws_sagemaker_endpoint.busy.name']
+    idle = sagemaker_endpoint_metrics['aws_sagemaker_endpoint.idle.name']
+    factory = test.replay_flight_data(
+        'test_sagemaker_endpoint_metrics_idle')
+
+    if test.recording:
+        runtime = factory().client('sagemaker-runtime')
+        for _ in range(5):
+            runtime.invoke_endpoint(
+                EndpointName=busy,
+                TargetVariant='busy',
+                ContentType='text/csv',
+                Body='1.0',
+                )
+        time.sleep(300)
+
+    p = test.load_policy(
+        {
+            'name': 'sagemaker-endpoints-idle',
+            'resource': 'sagemaker-endpoint',
+            'filters': [
+                {'type': 'value', 'key': 'EndpointName',
+                 'op': 'in', 'value': [busy, idle]},
+                {'type': 'metrics',
+                 'name': 'Invocations',
+                 'statistics': 'Sum',
+                 'days': 1,
+                 'period': 86400,
+                 'value': 0,
+                 'op': 'lte'},
+            ],
+        },
+        session_factory=factory,
+    )
+    dimensions, capture = capture_dimensions()
+    with capture:
+        [resource] = p.run()
+    assert resource['EndpointName'] == idle
+    # the gpu variant is never queried: busy's second variant already
+    # fails the condition, which settles the endpoint
+    assert [[d['Value'] for d in dims] for dims in dimensions] == [
+        [busy, 'quiet'], [busy, 'busy'], [idle, 'AllTraffic']]
+    assert [d['Name'] for d in dimensions[0]] == ['EndpointName', 'VariantName']
+
+
+@pytest.mark.audited
+@terraform('sagemaker_endpoint_metrics', scope='module')
+def test_sagemaker_endpoint_metrics_utilization(test, sagemaker_endpoint_metrics):
+    # instance utilization metrics are in a namespace of their own, and are
+    # reported by every variant whether or not it is being invoked
+    busy = sagemaker_endpoint_metrics['aws_sagemaker_endpoint.busy.name']
+    factory = test.replay_flight_data(
+        'test_sagemaker_endpoint_metrics_utilization')
+
+    p = test.load_policy(
+        {
+            'name': 'sagemaker-endpoints-underused',
+            'resource': 'sagemaker-endpoint',
+            'filters': [
+                {'EndpointName': busy},
+                {'type': 'metrics',
+                 'name': 'CPUUtilization',
+                 'statistics': 'Average',
+                 'days': 1,
+                 'period': 3600,
+                 'value': 400,
+                 'op': 'less-than'},
+            ],
+        },
+        session_factory=factory,
+    )
+    dimensions, capture = capture_dimensions()
+    with capture:
+        [resource] = p.run()
+    assert resource['EndpointName'] == busy
+    assert [[d['Value'] for d in dims] for dims in dimensions] == [
+        [busy, 'quiet'], [busy, 'busy'], [busy, 'gpu']]
+    # each variant's series is annotated separately, named by its dimensions
+    annotated = resource['c7n.metrics']
+    assert sorted(key.split('.')[-1] for key in annotated) == [
+        'VariantName=busy', 'VariantName=gpu', 'VariantName=quiet']
+    assert [len(points) for points in annotated.values()] == [1, 1, 1]
+
+
+@pytest.mark.audited
+@terraform('sagemaker_endpoint_metrics', scope='module')
+def test_sagemaker_endpoint_metrics_inference_component(
+        test, sagemaker_endpoint_metrics):
+    # this endpoint's variant hosts no model -- the model arrives as an
+    # inference component, and its invocations are published under the
+    # component's name with no EndpointName dimension anywhere. Querying
+    # the variant returns nothing, which an idle policy would read as idle.
+    endpoint = sagemaker_endpoint_metrics.outputs[
+        'component_endpoint_name']['value']
+    component = sagemaker_endpoint_metrics.outputs['component_name']['value']
+    factory = test.replay_flight_data(
+        'test_sagemaker_endpoint_metrics_inference_component')
+
+    if test.recording:
+        runtime = factory().client('sagemaker-runtime')
+        for _ in range(5):
+            runtime.invoke_endpoint(
+                EndpointName=endpoint,
+                InferenceComponentName=component,
+                ContentType='text/csv',
+                Body='1.0',
+                )
+        time.sleep(300)
+
+    p = test.load_policy(
+        {
+            'name': 'sagemaker-endpoints-idle',
+            'resource': 'sagemaker-endpoint',
+            'filters': [
+                {'EndpointName': endpoint},
+                {'type': 'metrics',
+                 'name': 'Invocations',
+                 'statistics': 'Sum',
+                 'days': 1,
+                 'period': 86400,
+                 'value': 0,
+                 'op': 'lte'},
+            ],
+        },
+        session_factory=factory,
+    )
+    dimensions, capture = capture_dimensions()
+    with capture:
+        resources = p.run()
+
+    # the endpoint is serving traffic, so an idle policy must skip it
+    assert resources == []
+    # and it must have asked about the component, not the variant
+    assert [[(d['Name'], d['Value']) for d in dims] for dims in dimensions] == [
+        [('InferenceComponentName', component)]]
+
+
+@pytest.mark.audited
+@terraform('sagemaker_endpoint_metrics', scope='module')
+def test_sagemaker_endpoint_metrics_idle_component(
+        test, sagemaker_endpoint_metrics):
+    # a component endpoint nobody has called still publishes a zero for
+    # each interval, the same as a classic one, so an idle policy finds it
+    # from its own values and doesn't need a missing value to do it.
+    endpoint = sagemaker_endpoint_metrics.outputs[
+        'idle_component_endpoint_name']['value']
+    factory = test.replay_flight_data(
+        'test_sagemaker_endpoint_metrics_idle_component')
+
+    idle = {
+        'name': 'sagemaker-endpoints-idle',
+        'resource': 'sagemaker-endpoint',
+        'filters': [
+            {'EndpointName': endpoint},
+            {'type': 'metrics',
+             'name': 'Invocations',
+             'statistics': 'Sum',
+             'days': 1,
+             'period': 86400,
+             'value': 0,
+             'op': 'lte'},
+            ],
+        }
+    p = test.load_policy(idle, session_factory=factory)
+    [resource] = p.run()
+    assert resource['EndpointName'] == endpoint
+    # a published zero, not an absence of data
+    [points] = resource['c7n.metrics'].values()
+    assert [point['Sum'] for point in points] == [0.0]
+
+    # so a missing value would make no difference to it
+    idle['filters'][1]['missing-value'] = 0
+    p = test.load_policy(idle, session_factory=factory)
+    [resource] = p.run()
+    assert resource['EndpointName'] == endpoint
+
+
+@pytest.mark.audited
+@terraform('sagemaker_endpoint_metrics', scope='module')
+def test_sagemaker_endpoint_metrics_inference_component_utilization(
+        test, sagemaker_endpoint_metrics):
+    # utilization stays with the variant on a component-hosting endpoint,
+    # even though its invocations moved to the component -- the namespace
+    # decides the sub unit, not the endpoint
+    endpoint = sagemaker_endpoint_metrics.outputs[
+        'component_endpoint_name']['value']
+    factory = test.replay_flight_data(
+        'test_sagemaker_endpoint_metrics_inference_component_utilization')
+
+    p = test.load_policy(
+        {
+            'name': 'sagemaker-endpoints-underused',
+            'resource': 'sagemaker-endpoint',
+            'filters': [
+                {'EndpointName': endpoint},
+                {'type': 'metrics',
+                 'name': 'CPUUtilization',
+                 'statistics': 'Average',
+                 'days': 1,
+                 'period': 3600,
+                 'value': 400,
+                 'op': 'less-than'},
+            ],
+        },
+        session_factory=factory,
+    )
+    dimensions, capture = capture_dimensions()
+    with capture:
+        [resource] = p.run()
+
+    assert resource['EndpointName'] == endpoint
+    assert [[d['Name'] for d in dims] for dims in dimensions] == [
+        ['EndpointName', 'VariantName']]
+
+#
+################################################################################
+
+
+def test_sagemaker_endpoint_metrics_dimensions_validated(test):
+    # a dimension aws never publishes this metric under is a policy error,
+    # rather than a query that quietly returns nothing
+    policy = {
+        'name': 'sagemaker-endpoints-idle',
+        'resource': 'sagemaker-endpoint',
+        'filters': [
+            {'type': 'metrics',
+             'name': 'Invocations',
+             'value': 0,
+             'dimensions': {'QueueName': 'nope'}},
+        ],
+    }
+    with pytest.raises(PolicyValidationError) as caught:
+        test.load_policy(policy, validate=True)
+    assert "can't use dimensions ['QueueName']" in str(caught.value)
+
+    # the documentation lists instance type, but the only sets carrying it
+    # also carry AvailabilityZone and Region, which no policy can supply,
+    # so it isn't in the catalogue and naming it is an error too
+    policy['filters'][0]['dimensions'] = {'InstanceType': 'ml.m5.large'}
+    with pytest.raises(PolicyValidationError) as caught:
+        test.load_policy(policy, validate=True)
+    assert "can't use dimensions ['InstanceType']" in str(caught.value)
+
+    # the namespace follows from the metric name, so naming it is an error
+    del policy['filters'][0]['dimensions']
+    policy['filters'][0]['namespace'] = '/aws/sagemaker/Endpoints'
+    with pytest.raises(PolicyValidationError) as caught:
+        test.load_policy(policy, validate=True)
+    assert 'determines the namespace' in str(caught.value)
+
+    # and keys of the shared schema this filter doesn't implement are
+    # refused rather than ignored
+    del policy['filters'][0]['namespace']
+    policy['filters'][0]['percent-attr'] = 'InstanceCount'
+    with pytest.raises(PolicyValidationError) as caught:
+        test.load_policy(policy, validate=True)
+    assert "doesn't support percent-attr" in str(caught.value)
+
+    # a metric the documentation doesn't describe fails while the policy
+    # is loading, rather than as an empty report later
+    del policy['filters'][0]['percent-attr']
+    policy['filters'][0]['name'] = 'Invocation'
+    with pytest.raises(AssertionError) as caught:
+        test.load_policy(policy, validate=True)
+    assert 'no documented sagemaker-endpoint metric named Invocation' in str(
+        caught.value)
+
+
+def test_sagemaker_metrics_missing_value(test):
+    # A metric with no values over the window leaves nothing to compare the
+    # condition against. The missing value stands in for them, and without
+    # one the endpoint is passed over rather than guessed about.
+    from c7n.resources.sagemaker import SageMakerMetricsFilter
+
+    def no_data(self, client, params):
+        return []
+
+    test.patch(SageMakerMetricsFilter, 'get_metric_data', no_data)
+    policy = test.load_policy(
+        {'name': 'endpoints', 'resource': 'sagemaker-endpoint'})
+    metrics_filter = SagemakerEndpoint.filter_registry.get('metrics')
+
+    def selected(**extra):
+        """Does an idle-endpoint policy select an endpoint?"""
+        # a fresh endpoint each time: the annotation is also the cache, so
+        # one that has been through the filter isn't queried again
+        endpoint = {'EndpointName': 'e',
+                    'ProductionVariants': [{'VariantName': 'AllTraffic'}]}
+        f = metrics_filter(
+            dict(type='metrics', name='Invocations', statistics='Sum',
+                 value=0, op='lte', **extra),
+            policy.resource_manager)
+        f.endpoint_components = {}  # a classic endpoint
+        return f.process([endpoint]) == [endpoint]
+
+    assert selected(**{'missing-value': 0})
+    assert not selected()
+
+    def reports_invocations(self, client, params):
+        return [{'Sum': 5}]
+
+    test.patch(SageMakerMetricsFilter, 'get_metric_data', reports_invocations)
+    assert not selected()
+    assert not selected(**{'missing-value': 0})
+
+    def zero(self, client, params):
+        return [{'Sum': 0}]
+
+    test.patch(SageMakerMetricsFilter, 'get_metric_data', zero)
+    assert selected()
+    assert selected(**{'missing-value': 0})
+
+
+def test_sagemaker_metrics_percentile_statistics(test):
+    # a percentile is requested as ExtendedStatistics and comes back nested
+    # under that key, rather than beside Timestamp like a standard statistic
+    from c7n.resources.sagemaker import SageMakerMetricsFilter
+
+    class OneSubUnit(SageMakerMetricsFilter):
+
+        def get_dimensions_set(self, resource):
+            return [{'D': 'only'}]
+
+    requested = []
+
+    def get_metric_data(self, client, params):
+        requested.append(params)
+        return [{'Timestamp': 'when', 'Unit': 'Percent',
+                 'ExtendedStatistics': {'p95': 3.1}}]
+
+    test.patch(SageMakerMetricsFilter, 'get_metric_data', get_metric_data)
+    policy = test.load_policy(
+        {'name': 'endpoints', 'resource': 'sagemaker-endpoint'})
+    f = OneSubUnit(
+        {'type': 'metrics', 'name': 'CPUUtilization', 'statistics': 'p95',
+         'value': 50, 'op': 'less-than'}, policy.resource_manager)
+    resource = {'EndpointName': 'e'}
+
+    assert f.process([resource]) == [resource]
+    # asked for the percentile as an extended statistic
+    assert requested[0]['ExtendedStatistics'] == ['p95']
+    assert 'Statistics' not in requested[0]
+    # and the annotation holds the unwrapped values, not the nesting
+    [points] = resource['c7n.metrics'].values()
+    assert points == [{'p95': 3.1}]
+
+
+def test_sagemaker_metrics_stop_fetching_once_a_value_fails(test):
+    # a resource with several sub units costs a call each, and one failing
+    # value settles it, so the rest are never fetched
+    from c7n.resources.sagemaker import SageMakerMetricsFilter
+
+    class ThreeSubUnits(SageMakerMetricsFilter):
+
+        def get_dimensions_set(self, resource):
+            return [{'D': str(i)} for i in range(3)]
+
+    requested = []
+
+    def get_metric_data(self, client, params):
+        value = params['Dimensions'][0]['Value']
+        requested.append(value)
+        # the first sub unit fails the condition, the others would pass
+        return [{'Average': 100 if value == '0' else 1}]
+
+    test.patch(SageMakerMetricsFilter, 'get_metric_data', get_metric_data)
+    policy = test.load_policy(
+        {'name': 'endpoints', 'resource': 'sagemaker-endpoint'})
+    f = ThreeSubUnits(
+        {'type': 'metrics', 'name': 'CPUUtilization', 'value': 50,
+         'op': 'less-than'}, policy.resource_manager)
+    assert f.process([{'EndpointName': 'e'}]) == []
+    assert requested == ['0']
+
+
+def test_sagemaker_endpoint_metrics_variant_without_components(test):
+    # an endpoint that hosts components reports its invocations against
+    # them, so naming one of its variants that hosts none leaves nothing
+    # to measure. Deciding that from the components left after the
+    # dimensions are applied would make the endpoint look classic and ask
+    # for a variant's invocations, which it never publishes.
+    policy = test.load_policy(
+        {'name': 'endpoints', 'resource': 'sagemaker-endpoint'})
+    klass = SagemakerEndpoint.filter_registry.get('metrics')
+    f = klass(
+        {'type': 'metrics', 'name': 'Invocations', 'statistics': 'Sum',
+         'value': 0, 'op': 'lte', 'dimensions': {'VariantName': 'quiet'}},
+        policy.resource_manager)
+    f.endpoint_components = {'e': ['component']}
+    resource = {'EndpointName': 'e',
+                'ProductionVariants': [{'VariantName': 'busy'},
+                                       {'VariantName': 'quiet'}]}
+    assert f.get_dimensions_set(resource) == []
+
+
+# Metrics the endpoints in tests/terraform/sagemaker_endpoint_metrics don't
+# produce, so there's nothing to record for them. The streaming metrics need
+# a container that streams responses, ModelSetupTime a model load, and the
+# multi-model metrics an endpoint hosting a model in MultiModel mode.
+UNEXERCISED_METRICS = frozenset((
+    'ModelSetupTime',
+    'MidStreamErrors',
+    'FirstChunkLatency',
+    'FirstChunkModelLatency',
+    'FirstChunkOverheadLatency',
+    'ModelLoadingWaitTime',
+    'ModelUnloadingTime',
+    'ModelDownloadingTime',
+    'ModelLoadingTime',
+    'ModelCacheHit',
+    'LoadedModelCount',
+    ))
+
+
+def sagemaker_endpoint_metric_entries():
+    """Every (kind, metric) the catalogue describes for endpoints.
+
+    Only the kinds an endpoint can be: metrics filed under no kind are
+    loaded into every kind, so they show up under each of these.
+    """
+    return [
+        pytest.param(kind, metric, published, id=f"{kind}-{metric}")
+        for kind, by_resource in SAGEMAKER_METRICS.items()
+        if kind is not None
+        for metric, published in by_resource['sagemaker-endpoint'].items()
+        ]
+
+
+def sagemaker_endpoint_metric_entries_published():
+    """The entries these endpoints can be recorded against."""
+    return [
+        entry if entry.values[1] not in UNEXERCISED_METRICS else
+        pytest.param(*entry.values, id=entry.id,
+                     marks=pytest.mark.skip(
+                         reason='not produced by these endpoints'))
+        for entry in sagemaker_endpoint_metric_entries()
+        ]
+
+
+@pytest.mark.parametrize('kind,metric,published',
+                         sagemaker_endpoint_metric_entries())
+def test_sagemaker_endpoint_metric_entry(test, kind, metric, published):
+    # every entry the catalogue describes has to resolve, for the kind of
+    # endpoint it's filed under, to that entry's namespace and to
+    # dimensions the filter can actually supply
+    policy = test.load_policy(
+        {'name': 'endpoints', 'resource': 'sagemaker-endpoint'})
+    klass = SagemakerEndpoint.filter_registry.get('metrics')
+    f = klass({'type': 'metrics', 'name': metric, 'value': 0},
+              policy.resource_manager)
+    f.validate()
+
+    endpoint = {'EndpointName': 'e',
+                'ProductionVariants': [{'VariantName': 'AllTraffic'}]}
+    f.endpoint_components = (
+        {'e': ['component']} if kind == 'inference-component' else {})
+    assert f.resource_kind(endpoint) == kind
+
+    assert f.get_resource_namespace(endpoint) == published['namespace']
+
+    dimensions_set = f.get_dimensions_set(endpoint)
+    assert dimensions_set, f"{metric} resolved to no dimensions"
+    assert {tuple(sorted(dimensions)) for dimensions in dimensions_set} == {
+        names for names in published['dimension_sets']}
+    assert all(isinstance(value, str)
+               for dimensions in dimensions_set
+               for value in dimensions.values())
+
+
+# Metrics publish a minute or so after an invocation, and one publication
+# window serves every case below, so the traffic is generated once for the
+# whole module rather than per test.
+INVOKED: list[str] = []
+
+# variants and components of the endpoints tests/terraform/
+# sagemaker_endpoint_metrics builds. "quiet" is deliberately left silent.
+ENDPOINT_VARIANTS = {'busy': ('quiet', 'busy', 'gpu'),
+                     'component': ('AllTraffic',)}
+
+
+def invoke_for_metrics(test, factory, endpoints, components):
+    """Give every endpoint something to report, once per recording run."""
+    if not test.recording or INVOKED:
+        return
+    INVOKED.append('done')
+
+    runtime = factory().client('sagemaker-runtime')
+    for name, endpoint in endpoints.items():
+        targets = [{'InferenceComponentName': component}
+                   for component in components.get(endpoint, ())] or [
+            {'TargetVariant': variant}
+            for variant in ENDPOINT_VARIANTS[name]
+            if variant != 'quiet'
+            ]
+        for target in targets:
+            for _ in range(5):
+                runtime.invoke_endpoint(
+                    EndpointName=endpoint, ContentType='text/csv',
+                    Body='1.0', **target)
+    time.sleep(300)
+
+
+@pytest.mark.audited
+@pytest.mark.parametrize('kind,metric,published',
+                         sagemaker_endpoint_metric_entries_published())
+@terraform('sagemaker_endpoint_metrics', scope='module')
+def test_sagemaker_endpoint_metric_published(
+        test, sagemaker_endpoint_metrics, kind, metric, published):
+    # every dimension set the catalogue names for a kind of endpoint has to
+    # carry data for an endpoint of that kind. A set that isn't published
+    # returns nothing, which no policy can tell from a quiet endpoint.
+    endpoints = {
+        name: sagemaker_endpoint_metrics[f'aws_sagemaker_endpoint.{name}.name']
+        for name in ENDPOINT_VARIANTS
+        }
+    component = sagemaker_endpoint_metrics.outputs['component_name']['value']
+    components = {endpoints['component']: [component]}
+
+    factory = test.replay_flight_data(
+        f"test_sagemaker_metric_{kind.replace('-', '_')}_{metric}")
+    invoke_for_metrics(test, factory, endpoints, components)
+
+    hosting = 'component' if kind == 'inference-component' else 'busy'
+    resource = {
+        'EndpointName': endpoints[hosting],
+        'ProductionVariants': [{'VariantName': variant}
+                               for variant in ENDPOINT_VARIANTS[hosting]],
+        }
+
+    p = test.load_policy(
+        {'name': 'sagemaker-endpoint-metric',
+         'resource': 'sagemaker-endpoint',
+         'filters': [
+             {'type': 'metrics', 'name': metric, 'statistics': 'Average',
+              'days': 1, 'period': 3600, 'value': 0, 'op': 'gte'},
+             ]},
+        session_factory=factory,
+        )
+    f = p.resource_manager.filters[-1]
+    # the components come from the module rather than a ListInferenceComponents
+    # call, so each recording holds just the CloudWatch request
+    f.endpoint_components = components
+
+    assert f.process([resource]) == [resource]
+
+    # one series per dimension set, and at least one carrying data: a
+    # GPU metric has nothing for a variant with no GPU, which is why this
+    # isn't every series
+    series = resource['c7n.metrics']
+    assert len(series) == len(f.get_dimensions_set(resource))
+    assert any(points for points in series.values()), (
+        f"{metric} returned no data for any {kind} dimension set")
