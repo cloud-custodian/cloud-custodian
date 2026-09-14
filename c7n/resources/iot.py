@@ -278,6 +278,15 @@ class SetCertificateInactive(Action):
                 certificateId=r['certificateId'], newStatus='INACTIVE')
 
 
+class DescribeIoTOTAUpdate(DescribeIoTResource):
+
+    def get_permissions(self):
+        perms = super().get_permissions()
+        perms.remove('iot:GetOtaUpdate')
+        perms.append('iot:GetOTAUpdate')
+        return perms
+
+
 @register_iot_tagging
 @resources.register('iot-ota-update')
 class IoTOTAUpdate(QueryResourceManager):
@@ -292,11 +301,10 @@ class IoTOTAUpdate(QueryResourceManager):
         name = 'otaUpdateId'
         arn = 'otaUpdateArn'
         date = 'lastModifiedDate'
-        cfn_type = 'AWS::IoT::OTAUpdate'
-        permissions_enum = ('iot:ListOTAUpdates')
-        permissions_augment = ('iot:ListTagsForResource', 'iot:getOTAUpdate')
+        permissions_enum = ('iot:ListOTAUpdates',)
+        permissions_augment = ('iot:ListTagsForResource',)
 
-    source_mapping = {'describe': DescribeIoTResource}
+    source_mapping = {'describe': DescribeIoTOTAUpdate}
     retry = staticmethod(RETRY)
 
 
