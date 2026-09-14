@@ -700,7 +700,6 @@ class PolicyMetaLint(BaseTest):
             'AWS::LookoutMetrics::Alert',
             'AWS::MediaPackage::PackagingConfiguration',
             'AWS::MediaPackage::PackagingGroup',
-            'AWS::RDS::GlobalCluster',
             'AWS::RUM::AppMonitor',
             'AWS::ResilienceHub::ResiliencyPolicy',
             'AWS::RoboMaker::RobotApplicationVersion',
