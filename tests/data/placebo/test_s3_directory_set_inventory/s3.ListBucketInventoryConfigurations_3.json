@@ -1,0 +1,28 @@
+{
+    "status_code": 200,
+    "data": {
+        "ResponseMetadata": {},
+        "InventoryConfigurationList": [
+            {
+                "Destination": {
+                    "S3BucketDestination": {
+                        "Bucket": "arn:aws:s3:::c7n-test-inventory-dest",
+                        "Format": "CSV",
+                        "Prefix": "Inventories/644160558196"
+                    }
+                },
+                "IsEnabled": true,
+                "Id": "c7n-set-inventory-new",
+                "IncludedObjectVersions": "Current",
+                "OptionalFields": [
+                    "Size",
+                    "LastModifiedDate"
+                ],
+                "Schedule": {
+                    "Frequency": "Daily"
+                }
+            }
+        ],
+        "IsTruncated": false
+    }
+}
