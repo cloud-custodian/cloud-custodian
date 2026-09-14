@@ -155,10 +155,10 @@ class StackDriverLogging(LogOutput):
 
         log_group = self.get_log_group()
         project_id = local_session(self.ctx.session_factory).get_default_project()
-        client = LogClient(project_id)
+        client = LogClient(project=project_id)
         return CloudLoggingHandler(
             client,
-            log_group,
+            name=log_group,
             labels={
                 'policy': self.ctx.policy.name,
                 'resource': self.ctx.policy.resource_type},
@@ -167,8 +167,9 @@ class StackDriverLogging(LogOutput):
     def leave_log(self):
         super(StackDriverLogging, self).leave_log()
         # Flush and stop the background thread
-        self.handler.transport.flush()
-        self.handler.transport.worker.stop()
+        if self.handler.transport:
+            self.handler.transport.flush()
+            self.handler.transport.worker.stop()
 
 
 @blob_outputs.register('gs', condition=bool(StorageClient))
