@@ -151,6 +151,101 @@ class VertexAIModels:
                 pass
 
 
+class VertexAIEvaluationRuns:
+    """Helper for creating/cleaning up ephemeral Vertex AI evaluation runs.
+
+    Uses the computation-based EXACT_MATCH metric with a pre-supplied
+    prediction/reference pair, so the run completes by pure computation --
+    no model inference -- making it fast, free, and deterministic.
+    """
+
+    TERMINAL_STATES = {'SUCCEEDED', 'FAILED', 'CANCELLED'}
+
+    def __init__(self, test):
+        self.test = test
+        self.created = []
+
+    def _client(self, session, location, component):
+        return session.client(
+            'aiplatform', 'v1', component,
+            client_options=ClientOptions(
+                api_endpoint=f'https://{location}-aiplatform.googleapis.com'))
+
+    def create(self, location, display_name, prediction='4', reference='4', fail=False):
+        """Create an evaluation item, its evaluation set, and a run over it.
+
+        By default the item has a matching prediction/reference, and the run
+        succeeds. Pass `fail=True` to omit the candidate response, which
+        produces a deterministic FAILED run (no metric score to aggregate).
+        """
+        session = self.test.session_factory()
+        project = session.get_default_project()
+        parent = f'projects/{project}/locations/{location}'
+
+        evaluation_request = {
+            'prompt': {'text': 'What is 2+2?'},
+            'goldenResponse': {'text': reference},
+            }
+        if not fail:
+            evaluation_request['candidateResponses'] = [
+                {'candidate': 'model-under-test', 'text': prediction}]
+
+        # Create an evaluation item:
+        items_client = self._client(session, location, 'projects.locations.evaluationItems')
+        item = items_client.execute_command(
+            'create',
+            {'parent': parent,
+             'body': {
+                 'displayName': f'{display_name}-item',
+                 'evaluationItemType': 'REQUEST',
+                 'evaluationRequest': evaluation_request,
+                 }})
+        self.created.append((items_client, item['name']))
+
+        # Create its evaluation set:
+        sets_client = self._client(session, location, 'projects.locations.evaluationSets')
+        eval_set = sets_client.execute_command(
+            'create',
+            {'parent': parent,
+             'body': {'displayName': f'{display_name}-set', 'evaluationItems': [item['name']]}})
+        self.created.append((sets_client, eval_set['name']))
+
+        # Create a run over it
+        runs_client = self._client(session, location, 'projects.locations.evaluationRuns')
+        run = runs_client.execute_command(
+            'create',
+            {'parent': parent,
+             'body': {
+                 'displayName': display_name,
+                 'dataSource': {'evaluationSet': eval_set['name']},
+                 'evaluationConfig': {
+                     'metrics': [{'metric': 'exact_match',
+                                  'computationBasedMetricSpec': {'type': 'EXACT_MATCH'}}]},
+                 }})
+        self.created.append((runs_client, run['name']))
+
+        for _ in range(6):
+            if run['state'] in self.TERMINAL_STATES:
+                break
+            if self.test.recording:
+                time.sleep(5)
+            run = runs_client.execute_query('get', {'name': run['name']})
+
+        # Track the run's auto-created results set for cleanup, if any.
+        results_set = run.get('evaluationResults', {}).get('evaluationSet')
+        if results_set:
+            self.created.append((sets_client, results_set))
+
+        return run
+
+    def cleanup(self):
+        for client, name in reversed(self.created):
+            try:
+                client.execute_command('delete', {'name': name})
+            except HttpError as e:
+                print(f'Warning: failed to delete {name} during cleanup: {e}')
+
+
 def get_test_model_id(project_id, location):
     """Get full model resource name for testing.
 
@@ -261,6 +356,75 @@ def test_vertexai_model_resource_registered(test):
          'resource': 'gcp.vertex-ai-model'})
     assert policy.resource_manager.resource_type.component == (
         'projects.locations.models')
+
+
+def test_vertexai_evaluation_run_resource_registered(test):
+    """Test that gcp.vertex-ai-evaluation-run resolves as a resource type."""
+    policy = test.load_policy(
+        {'name': 'vertexai-evaluation-run-check',
+         'resource': 'gcp.vertex-ai-evaluation-run'})
+    assert policy.resource_manager.resource_type.component == (
+        'projects.locations.evaluationRuns')
+
+
+def test_vertexai_evaluation_run_multi_location(test):
+    """Test querying Vertex AI Evaluation Runs across multiple locations."""
+    test.session_factory = test.replay_flight_data('vertexai-evaluation-run-multi-location')
+
+    runs = VertexAIEvaluationRuns(test)
+    test.addCleanup(runs.cleanup)
+    if test.recording:
+        runs.create('us-central1', 'c7n-test-eval-run-central')
+        runs.create('us-east1', 'c7n-test-eval-run-east')
+
+    policy = test.load_policy(
+        {'name': 'vertexai-evaluation-runs-multi-location',
+         'resource': 'gcp.vertex-ai-evaluation-run',
+         'query': [
+             {'location': 'us-central1'},
+             {'location': 'us-east1'}
+         ]},
+        session_factory=test.session_factory)
+
+    resources = policy.run()
+
+    assert len(resources) >= 2
+    locations = {r['name'].split('/')[3] for r in resources}
+    assert 'us-central1' in locations
+    assert 'us-east1' in locations
+
+
+def test_vertexai_evaluation_run_filtering(test):
+    """Test filtering Vertex AI Evaluation Runs on state.
+
+    Uses a run that succeeds (matching prediction/reference) and one that
+    fails (no candidate response to score) to prove the filter actually
+    discriminates by state, not just returns everything.
+    """
+    test.session_factory = test.replay_flight_data('vertexai-evaluation-run-filtering')
+
+    runs = VertexAIEvaluationRuns(test)
+    test.addCleanup(runs.cleanup)
+    if test.recording:
+        runs.create('us-central1', 'c7n-test-eval-run-succeeded')
+        runs.create('us-central1', 'c7n-test-eval-run-failed', fail=True)
+
+    policy = test.load_policy(
+        {'name': 'vertexai-evaluation-runs-failed',
+         'resource': 'gcp.vertex-ai-evaluation-run',
+         'query': [{'location': 'us-central1'}],
+         'filters': [
+             {'type': 'value',
+              'key': 'state',
+              'value': 'FAILED'}
+         ]},
+        session_factory=test.session_factory)
+
+    resources = policy.run()
+
+    assert len(resources) >= 1
+    assert all(r['state'] == 'FAILED' for r in resources)
+    assert not any(r['state'] == 'SUCCEEDED' for r in resources)
 
 
 @terraform('vertexai_dataset', scope='module')

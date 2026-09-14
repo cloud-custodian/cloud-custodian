@@ -4,7 +4,7 @@ import json
 from pathlib import Path
 
 from .provider import resources
-from .query import TypeInfo
+from .query import config_regions, TypeInfo
 
 
 REGION_DATA_PATH = Path(__file__).parent / "regions.json"
@@ -49,12 +49,8 @@ class Region:
     def resources(self, resource_ids=()):
         if resource_ids:
             return [{'name': r} for r in self.regions if r in resource_ids]
-        elif self.config.regions or self.config.region != 'us-east-1':
-            regions = list(self.config.regions)
-            regions.append(self.config.region)
-            regions = list(filter(None, regions))
-            if 'us-east-1' in regions:
-                regions.remove('us-east-1')
+        regions = config_regions(self.config)
+        if regions:
             return [{'name': r} for r in self.regions if r in regions]
         elif 'query' in self.data:
             qregions = {q['name'] for q in self.data['query']}

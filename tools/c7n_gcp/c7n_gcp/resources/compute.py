@@ -450,6 +450,42 @@ class DeleteImage(MethodAction):
         return {'project': project, 'image': image_id}
 
 
+# Disks are either zonal (compute.disks) or regional (compute.regionDisks).
+# Both apis take the same params, keyed by 'zone' or 'region' respectively.
+DISK_PATH_RE = re.compile(r'(?:.*/)?projects/(.*?)/(zones|regions)/(.*?)/disks/(.*)')
+
+
+def parse_disk_path(path):
+    """Parse a disk's selfLink or audit log resourceName.
+
+    Returns (project, {'zone': z} | {'region': r}, disk_name).
+    """
+    project, scope, location, name = DISK_PATH_RE.match(path).groups()
+    loc_key = 'zone' if scope == 'zones' else 'region'
+    return project, {loc_key: location}, name
+
+
+class ZonalOrRegionalClient:
+    """Dispatches disk api calls to the zonal or regional client.
+
+    Selection is based on whether `params` has a 'zone' or 'region' key.
+    """
+
+    def __init__(self, zonal, regional):
+        self.zonal = zonal
+        self.regional = regional
+
+    def execute_command(self, op, params):
+        client = self.regional if 'region' in params else self.zonal
+        return client.execute_command(op, params)
+
+
+class DiskScopeMixin:
+
+    def get_client(self, session, model):
+        return model.get_client(session)
+
+
 @resources.register('disk')
 class Disk(QueryResourceManager):
 
@@ -468,21 +504,35 @@ class Disk(QueryResourceManager):
 
         @staticmethod
         def get(client, resource_info):
+            # resourceName is the only part of a disk audit event that
+            # identifies the disk across both scopes: zonal events carry a
+            # numeric disk_id and a zone, regional events carry neither.
+            project, loc, name = parse_disk_path(resource_info['resourceName'])
             return client.execute_command(
-                'get', {'project': resource_info['project_id'],
-                        'zone': resource_info['zone'],
-                        'disk': resource_info['disk_id']})
+                'get', {'project': project, 'disk': name, **loc})
 
         @staticmethod
         def get_label_params(resource, all_labels):
-            path_param_re = re.compile('.*?/projects/(.*?)/zones/(.*?)/disks/(.*)')
-            project, zone, instance = path_param_re.match(
-                resource['selfLink']).groups()
-            return {'project': project, 'zone': zone, 'resource': instance,
+            project, loc, resc_id = parse_disk_path(resource['selfLink'])
+            return {'project': project, 'resource': resc_id, **loc,
                     'body': {
                         'labels': all_labels,
                         'labelFingerprint': resource['labelFingerprint']
                     }}
+
+        @staticmethod
+        def get_client(session):
+            return ZonalOrRegionalClient(
+                session.client('compute', 'v1', 'disks'),
+                session.client('compute', 'v1', 'regionDisks'))
+
+    def get_resource(self, resource_info):
+        # The base implementation's get_client() builds a zonal-only
+        # client, which can't reach regional disks (used by event-driven
+        # policies, e.g. gcp-audit mode).
+        session = local_session(self.session_factory)
+        client = self.resource_type.get_client(session)
+        return self.resource_type.get(client, resource_info)
 
 
 @Disk.filter_registry.register('snapshots')
@@ -533,7 +583,7 @@ class DiskSnapshotsFilter(ListItemFilter):
 
 
 @Disk.action_registry.register('snapshot')
-class DiskSnapshot(MethodAction):
+class DiskSnapshot(DiskScopeMixin, MethodAction):
     """
     `Snapshots <https://cloud.google.com/compute/docs/reference/rest/v1/disks/createSnapshot>`_
     disk.
@@ -563,19 +613,17 @@ class DiskSnapshot(MethodAction):
     """
     schema = type_schema('snapshot', name_format={'type': 'string'})
     method_spec = {'op': 'createSnapshot'}
-    path_param_re = re.compile(
-        '.*?/projects/(.*?)/zones/(.*?)/disks/(.*)')
     attr_filter = ('status', ('RUNNING', 'READY'))
 
     def get_resource_params(self, model, resource):
-        project, zone, resourceId = self.path_param_re.match(resource['selfLink']).groups()
+        project, loc, resourceId = parse_disk_path(resource['selfLink'])
         name_format = self.data.get('name_format', '{disk[name]}')
         name = name_format.format(disk=resource, now=datetime.now())
 
         return {
             'project': project,
-            'zone': zone,
             'disk': resourceId,
+            **loc,
             'body': {
                 'name': name,
                 'labels': resource.get('labels', {}),
@@ -584,20 +632,18 @@ class DiskSnapshot(MethodAction):
 
 
 @Disk.action_registry.register('delete')
-class DiskDelete(MethodAction):
+class DiskDelete(DiskScopeMixin, MethodAction):
 
     schema = type_schema('delete')
     method_spec = {'op': 'delete'}
-    path_param_re = re.compile(
-        '.*?/projects/(.*?)/zones/(.*?)/disks/(.*)')
     attr_filter = ('status', ('RUNNING', 'READY'))
 
     def get_resource_params(self, m, r):
-        project, zone, resourceId = self.path_param_re.match(r['selfLink']).groups()
+        project, loc, resourceId = parse_disk_path(r['selfLink'])
         return {
             'project': project,
-            'zone': zone,
             'disk': resourceId,
+            **loc,
         }
 
 

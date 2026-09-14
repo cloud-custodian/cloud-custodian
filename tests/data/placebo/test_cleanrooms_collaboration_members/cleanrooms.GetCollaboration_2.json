@@ -1,0 +1,49 @@
+{
+    "status_code": 200,
+    "data": {
+        "ResponseMetadata": {},
+        "collaboration": {
+            "id": "8326c03e-8c92-4cc0-9d84-3be7208e1528",
+            "arn": "arn:aws:cleanrooms:us-east-1:644160558196:collaboration/8326c03e-8c92-4cc0-9d84-3be7208e1528",
+            "name": "Noncompliant Collaboration",
+            "description": "Noncompliant CollaborationFor",
+            "creatorAccountId": "644160558196",
+            "creatorDisplayName": "Noncompliant Test creator",
+            "createTime": {
+                "__class__": "datetime",
+                "year": 2026,
+                "month": 6,
+                "day": 9,
+                "hour": 2,
+                "minute": 19,
+                "second": 43,
+                "microsecond": 53000
+            },
+            "updateTime": {
+                "__class__": "datetime",
+                "year": 2026,
+                "month": 6,
+                "day": 9,
+                "hour": 2,
+                "minute": 19,
+                "second": 43,
+                "microsecond": 53000
+            },
+            "memberStatus": "ACTIVE",
+            "membershipId": "471d06d5-b382-4d18-9ad5-8e61ffe2bfac",
+            "membershipArn": "arn:aws:cleanrooms:us-east-1:644160558196:membership/471d06d5-b382-4d18-9ad5-8e61ffe2bfac",
+            "dataEncryptionMetadata": {
+                "allowCleartext": true,
+                "allowDuplicates": false,
+                "allowJoinsOnColumnsWithDifferentNames": false,
+                "preserveNulls": false
+            },
+            "queryLogStatus": "DISABLED",
+            "analyticsEngine": "SPARK",
+            "allowedResultRegions": [
+                "us-east-1"
+            ],
+            "isMetricsEnabled": false
+        }
+    }
+}

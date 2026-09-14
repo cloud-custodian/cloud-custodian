@@ -35,6 +35,12 @@ delete_resource() {
         token=$(az account get-access-token --query accessToken --output tsv)
         url=https://management.azure.com/subscriptions/${AZURE_SUBSCRIPTION_ID}/providers/Microsoft.CostManagement/exports/cccostexport?api-version=2019-01-01
         curl -X DELETE -H "Authorization: Bearer ${token}" ${url}
+    elif [[ "$fileName" == "budget.json" ]]; then
+        token=$(az account get-access-token --query accessToken --output tsv)
+        budget_base_url=https://management.azure.com/subscriptions/${AZURE_SUBSCRIPTION_ID}/providers/Microsoft.Consumption/budgets
+        curl -X DELETE -H "Authorization: Bearer ${token}" "${budget_base_url}/budget_1000?api-version=2023-05-01"
+        curl -X DELETE -H "Authorization: Bearer ${token}" "${budget_base_url}/budget_1001?api-version=2023-05-01"
+        az deployment sub delete --name cctest-budget --output None
     elif [[ "$fileName" == "cognitive-service-deployment.json" ]]; then
         account_name="${AZURE_OPENAI_ACCOUNT_NAME}"
         if [[ -z "${account_name}" ]]; then
