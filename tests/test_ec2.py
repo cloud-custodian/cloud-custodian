@@ -2382,6 +2382,18 @@ class TestLaunchTemplate(BaseTest):
         self.assertEqual(len(resources), 1)
         self.assertEqual(resources[0]['LaunchTemplateId'], good_lt_id)
 
+    def test_launch_template_augment_not_found(self):
+        # Verify that augment() skips templates that no longer exist
+        # rather than raising an error (race condition between list and describe).
+        factory = self.replay_flight_data("test_launch_template_augment_not_found")
+        good_lt_id = 'lt-0877401c93c294001'
+        p = self.load_policy(
+            {'name': 'lt-augment-missing', 'resource': 'aws.launch-template-version'},
+            session_factory=factory)
+        resources = p.run()
+        self.assertEqual(len(resources), 1)
+        self.assertEqual(resources[0]['LaunchTemplateId'], good_lt_id)
+
 
 class TestReservedInstance(BaseTest):
 
