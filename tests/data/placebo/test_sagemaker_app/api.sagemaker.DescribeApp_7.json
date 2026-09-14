@@ -1,0 +1,48 @@
+{
+    "status_code": 200,
+    "data": {
+        "AppArn": "arn:aws:sagemaker:us-east-1:644160558196:app/d-1gl8yb9eznhn/c7n-profile-super-monkfish/JupyterServer/c7n-app-super-monkfish",
+        "AppType": "JupyterServer",
+        "AppName": "c7n-app-super-monkfish",
+        "DomainId": "d-1gl8yb9eznhn",
+        "UserProfileName": "c7n-profile-super-monkfish",
+        "Status": "Deleted",
+        "EffectiveTrustedIdentityPropagationStatus": "DISABLED",
+        "RecoveryMode": false,
+        "LastHealthCheckTimestamp": {
+            "__class__": "datetime",
+            "year": 2026,
+            "month": 7,
+            "day": 14,
+            "hour": 15,
+            "minute": 16,
+            "second": 5,
+            "microsecond": 663000
+        },
+        "LastUserActivityTimestamp": {
+            "__class__": "datetime",
+            "year": 2026,
+            "month": 7,
+            "day": 14,
+            "hour": 15,
+            "minute": 16,
+            "second": 5,
+            "microsecond": 663000
+        },
+        "CreationTime": {
+            "__class__": "datetime",
+            "year": 2026,
+            "month": 7,
+            "day": 14,
+            "hour": 15,
+            "minute": 16,
+            "second": 5,
+            "microsecond": 663000
+        },
+        "ResourceSpec": {
+            "SageMakerImageArn": "arn:aws:ecr:us-east-1:644160558196:repository/looseleaf-jupyter-server-3",
+            "InstanceType": "system"
+        },
+        "ResponseMetadata": {}
+    }
+}

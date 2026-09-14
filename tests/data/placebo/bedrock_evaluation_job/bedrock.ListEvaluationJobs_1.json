@@ -1,0 +1,68 @@
+{
+    "status_code": 200,
+    "data": {
+        "ResponseMetadata": {},
+        "jobSummaries": [
+            {
+                "jobArn": "arn:aws:bedrock:us-east-1:644160558196:evaluation-job/y36vvtyztckw",
+                "jobName": "c7n-evaluation-default-c2dc",
+                "status": "Completed",
+                "creationTime": {
+                    "__class__": "datetime",
+                    "year": 2026,
+                    "month": 7,
+                    "day": 16,
+                    "hour": 20,
+                    "minute": 24,
+                    "second": 11,
+                    "microsecond": 791678
+                },
+                "jobType": "Automated",
+                "evaluationTaskTypes": [
+                    "QuestionAndAnswer"
+                ],
+                "modelIdentifiers": [
+                    "arn:aws:bedrock:us-east-1::foundation-model/amazon.nova-micro-v1:0"
+                ],
+                "inferenceConfigSummary": {
+                    "modelConfigSummary": {
+                        "bedrockModelIdentifiers": [
+                            "arn:aws:bedrock:us-east-1::foundation-model/amazon.nova-micro-v1:0"
+                        ]
+                    }
+                },
+                "applicationType": "ModelEvaluation"
+            },
+            {
+                "jobArn": "arn:aws:bedrock:us-east-1:644160558196:evaluation-job/ighzy27iw1l6",
+                "jobName": "c7n-evaluation-default-8ebe",
+                "status": "InProgress",
+                "creationTime": {
+                    "__class__": "datetime",
+                    "year": 2026,
+                    "month": 7,
+                    "day": 16,
+                    "hour": 22,
+                    "minute": 8,
+                    "second": 31,
+                    "microsecond": 519203
+                },
+                "jobType": "Automated",
+                "evaluationTaskTypes": [
+                    "QuestionAndAnswer"
+                ],
+                "modelIdentifiers": [
+                    "arn:aws:bedrock:us-east-1::foundation-model/amazon.nova-micro-v1:0"
+                ],
+                "inferenceConfigSummary": {
+                    "modelConfigSummary": {
+                        "bedrockModelIdentifiers": [
+                            "arn:aws:bedrock:us-east-1::foundation-model/amazon.nova-micro-v1:0"
+                        ]
+                    }
+                },
+                "applicationType": "ModelEvaluation"
+            }
+        ]
+    }
+}

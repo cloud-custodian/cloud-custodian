@@ -21,6 +21,7 @@ ResourceMap = {
     "azure.backup-vault": "c7n_azure.resources.backup_vault.BackupVault",
     "azure.bastion-host": "c7n_azure.resources.bastion_host.AzureBastionHost",
     "azure.batch": "c7n_azure.resources.batch.Batch",
+    "azure.budget": "c7n_azure.resources.budget.Budget",
     "azure.cdn-custom-domain": "c7n_azure.resources.cdn_custom_domain.CdnCustomDomain",
     "azure.cdn-endpoint": "c7n_azure.resources.cdn_endpoint.CdnEndpoint",
     "azure.cdnprofile": "c7n_azure.resources.cdn.CdnProfile",
@@ -69,6 +70,8 @@ ResourceMap = {
     "azure.machine-learning-workspace": "c7n_azure.resources.machine_learning.MachineLearningWorkspace", # noqa
     "azure.machine-learning-data-container": "c7n_azure.resources.machine_learning.MachineLearningDataContainer", # noqa
     "azure.machine-learning-job": "c7n_azure.resources.machine_learning_job.MachineLearningJob",
+    "azure.machine-learning-model-version": "c7n_azure.resources.machine_learning_model_version.MachineLearningModelVersion", # noqa
+    "azure.machine-learning-online-endpoint": "c7n_azure.resources.machine_learning_online_endpoint.MachineLearningOnlineEndpoint", # noqa
     "azure.mariadb": "c7n_azure.resources.mariadb.MariaDB",
     "azure.monitor-log-profile": "c7n_azure.resources.monitor_logprofile.MonitorLogprofile",
     "azure.mariadb-server": "c7n_azure.resources.mariadb_server.MariaDBServer",
@@ -81,6 +84,8 @@ ResourceMap = {
     "azure.policyassignments": "c7n_azure.resources.policy_assignments.PolicyAssignments",
     "azure.postgresql-database": "c7n_azure.resources.postgresql_database.PostgresqlDatabase",
     "azure.postgresql-server": "c7n_azure.resources.postgresql_server.PostgresqlServer",
+    "azure.private-dns-zone": "c7n_azure.resources.private_dns_zone.PrivateDnsZone",
+    "azure.private-record-set": "c7n_azure.resources.private_record_set.PrivateRecordSet",
     "azure.publicip": "c7n_azure.resources.public_ip.PublicIPAddress",
     "azure.recordset": "c7n_azure.resources.record_set.RecordSet",
     "azure.recovery-services": "c7n_azure.resources.recovery_services.RecoveryServices",
