@@ -158,10 +158,13 @@ def _default_bucket_region(options):
         raise invalid_output
 
 
+def get_service_shape(service, shape_name):
+    model = fake_session()._session.get_service_model(service)
+    return model.shape_for(shape_name)
+
+
 def shape_validate(params, shape_name, service):
-    session = fake_session()._session
-    model = session.get_service_model(service)
-    shape = model.shape_for(shape_name)
+    shape = get_service_shape(service, shape_name)
     validator = ParamValidator()
     report = validator.validate(params, shape)
     if report.has_errors():
@@ -943,8 +946,5 @@ def shape_schema(service, shape_name, drop_fields=()):
             schema[member] = member_schema
         return schema
 
-    session = fake_session()._session
-    model = session.get_service_model(service)
-    shape = model.shape_for(shape_name)
-
+    shape = get_service_shape(service, shape_name)
     return _expand_shape_schema(shape)

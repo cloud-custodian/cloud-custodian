@@ -2,6 +2,7 @@
 # SPDX-License-Identifier: Apache-2.0
 
 from concurrent.futures import as_completed
+from functools import lru_cache
 import json
 import logging
 import os
@@ -14,7 +15,7 @@ from c7n.credentials import assumed_session
 from c7n.exceptions import PolicyValidationError
 from c7n.filters import Filter, ValueFilter, ListItemFilter
 from c7n.query import QueryResourceManager, TypeInfo, DescribeSource
-from c7n.resources.aws import AWS, fake_session
+from c7n.resources.aws import AWS, get_service_shape
 from c7n.tags import universal_augment
 from c7n.utils import local_session, type_schema
 
@@ -24,11 +25,21 @@ log = logging.getLogger("custodian.org-accounts")
 ORG_ACCOUNT_SESSION_NAME = "CustodianOrgAccount"
 
 
+@lru_cache(maxsize=None)
 def get_policy_types():
-    """Return the Organizations PolicyType enum from the installed botocore."""
+    return tuple(get_service_shape("organizations", "PolicyType").enum)
 
-    model = fake_session()._session.get_service_model("organizations")
-    return tuple(model.shape_for("PolicyType").enum)
+
+class PolicyTypeValidator:
+    def validate(self):
+        ptype = self.data["policy-type"]
+        valid = get_policy_types()
+        if ptype not in valid:
+            raise PolicyValidationError(
+                "%s invalid policy-type: %s, valid types: %s"
+                % (self.type, ptype, ", ".join(valid))
+            )
+        return self
 
 
 class OrgAccess:
@@ -66,8 +77,6 @@ class OrgAccess:
 
 @AWS.resources.register("org-policy")
 class OrgPolicy(QueryResourceManager, OrgAccess):
-
-    policy_types = get_policy_types()
 
     class resource_type(TypeInfo):
         service = "organizations"
@@ -196,12 +205,17 @@ class OrgAccount(QueryResourceManager, OrgAccess):
 
 @OrgUnit.filter_registry.register("policy")
 @OrgAccount.filter_registry.register("policy")
-class PolicyFilter(ListItemFilter):
+class PolicyFilter(PolicyTypeValidator, ListItemFilter):
     schema = type_schema(
         "policy",
         required=["policy-type"],
         **{
-            "policy-type": {"enum": OrgPolicy.policy_types},
+            "policy-type": {
+                "type": "string",
+                "description": (
+                    "Organizations policy type, validated against the botocore PolicyType enum"
+                ),
+            },
             "inherited": {"type": "boolean"},
             "attrs": {"$ref": "#/definitions/filters_common/list_item_attrs"},
             "count": {"type": "number"},
@@ -270,7 +284,7 @@ class PolicyFilter(ListItemFilter):
 
 @OrgAccount.action_registry.register("set-policy")
 @OrgUnit.action_registry.register("set-policy")
-class SetPolicy(Action):
+class SetPolicy(PolicyTypeValidator, Action):
     """Set a policy on an org unit or account
 
     .. code-block:: yaml
@@ -325,7 +339,12 @@ class SetPolicy(Action):
         **{
             "name": {"type": "string"},
             "description": {"type": "string"},
-            "policy-type": {"enum": OrgPolicy.policy_types},
+            "policy-type": {
+                "type": "string",
+                "description": (
+                    "Organizations policy type, validated against the botocore PolicyType enum"
+                ),
+            },
             "contents": {"type": "object"},
             "tags": {"$ref": "#/definitions/string_dict"},
         },
