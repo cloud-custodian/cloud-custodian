@@ -6,29 +6,12 @@ from c7n.manager import resources
 from c7n.query import (
     ChildDescribeSource,
     ChildResourceManager,
-    DescribeSource,
+    DescribeWithResourceTags,
     QueryResourceManager,
     TypeInfo,
 )
-from c7n.tags import RemoveTag, Tag, TagActionFilter, TagDelayedAction
+from c7n.tags import universal_augment
 from c7n.utils import local_session, type_schema
-
-
-def _augment_tags(manager, resources):
-    client = local_session(manager.session_factory).client('s3tables')
-    arn_key = manager.resource_type.arn
-    for r in resources:
-        tags = manager.retry(
-            client.list_tags_for_resource, resourceArn=r[arn_key]).get('tags', {})
-        r['Tags'] = [{'Key': k, 'Value': v} for k, v in tags.items()]
-    return resources
-
-
-class DescribeTableBucket(DescribeSource):
-
-    def augment(self, resources):
-        resources = super().augment(resources)
-        return _augment_tags(self.manager, resources)
 
 
 @resources.register('s3-table-bucket')
@@ -45,15 +28,15 @@ class TableBucket(QueryResourceManager):
         name = 'name'
         date = 'createdAt'
         cfn_type = 'AWS::S3Tables::TableBucket'
-        permissions_augment = ('s3tables:ListTagsForResource',)
+        universal_taggable = object()
 
-    source_mapping = {'describe': DescribeTableBucket}
+    source_mapping = {'describe': DescribeWithResourceTags}
 
 
 class DescribeTable(ChildDescribeSource):
 
     def augment(self, resources):
-        return _augment_tags(self.manager, resources)
+        return universal_augment(self.manager, super().augment(resources))
 
 
 @resources.register('s3-table')
@@ -71,7 +54,7 @@ class Table(ChildResourceManager):
         name = 'name'
         date = 'createdAt'
         cfn_type = 'AWS::S3Tables::Table'
-        permissions_augment = ('s3tables:ListTagsForResource',)
+        universal_taggable = object()
 
     source_mapping = {'describe-child': DescribeTable}
 
@@ -293,65 +276,3 @@ class TableBucketReplication(ListItemFilter):
                 destination['destinationAccount'] = (
                     destination['destinationTableBucketARN'].split(':')[4])
         return rules
-
-
-@TableBucket.action_registry.register('tag')
-@Table.action_registry.register('tag')
-class TagS3TablesResource(Tag):
-    """Create tags on an S3 Tables table bucket or table.
-
-    :example:
-
-    .. code-block:: yaml
-
-        policies:
-          - name: s3-table-bucket-tag
-            resource: aws.s3-table-bucket
-            actions:
-              - type: tag
-                key: owner
-                value: data-platform
-    """
-    permissions = ('s3tables:TagResource',)
-
-    def process_resource_set(self, client, resources, new_tags):
-        tags = {t['Key']: t['Value'] for t in new_tags}
-        arn_key = self.manager.resource_type.arn
-        for r in resources:
-            try:
-                client.tag_resource(resourceArn=r[arn_key], tags=tags)
-            except client.exceptions.NotFoundException:
-                continue
-
-
-@TableBucket.action_registry.register('remove-tag')
-@Table.action_registry.register('remove-tag')
-class RemoveTagS3TablesResource(RemoveTag):
-    """Remove tags from an S3 Tables table bucket or table.
-
-    :example:
-
-    .. code-block:: yaml
-
-        policies:
-          - name: s3-table-bucket-remove-tag
-            resource: aws.s3-table-bucket
-            actions:
-              - type: remove-tag
-                tags: ["expired-tag"]
-    """
-    permissions = ('s3tables:UntagResource',)
-
-    def process_resource_set(self, client, resources, tags):
-        arn_key = self.manager.resource_type.arn
-        for r in resources:
-            try:
-                client.untag_resource(resourceArn=r[arn_key], tagKeys=tags)
-            except client.exceptions.NotFoundException:
-                continue
-
-
-TableBucket.filter_registry.register('marked-for-op', TagActionFilter)
-TableBucket.action_registry.register('mark-for-op', TagDelayedAction)
-Table.filter_registry.register('marked-for-op', TagActionFilter)
-Table.action_registry.register('mark-for-op', TagDelayedAction)

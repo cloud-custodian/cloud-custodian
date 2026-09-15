@@ -9,26 +9,26 @@
                 ],
                 "name": "c7n_table_clean",
                 "type": "customer",
-                "tableARN": "arn:aws:s3tables:us-east-1:644160558196:bucket/c7n-test-tb-compliant/table/14d6d2ba-eb61-4785-b444-acb022f99148",
+                "tableARN": "arn:aws:s3tables:us-east-1:644160558196:bucket/c7n-test-tb-compliant/table/5a8f296b-646a-4585-8d9d-2493685368b9",
                 "createdAt": {
                     "__class__": "datetime",
                     "year": 2026,
-                    "month": 8,
-                    "day": 3,
-                    "hour": 2,
-                    "minute": 59,
-                    "second": 52,
-                    "microsecond": 689255
+                    "month": 9,
+                    "day": 15,
+                    "hour": 5,
+                    "minute": 15,
+                    "second": 35,
+                    "microsecond": 91652
                 },
                 "modifiedAt": {
                     "__class__": "datetime",
                     "year": 2026,
-                    "month": 8,
-                    "day": 3,
-                    "hour": 2,
-                    "minute": 59,
-                    "second": 52,
-                    "microsecond": 689255
+                    "month": 9,
+                    "day": 15,
+                    "hour": 5,
+                    "minute": 15,
+                    "second": 35,
+                    "microsecond": 91652
                 }
             },
             {
@@ -37,26 +37,26 @@
                 ],
                 "name": "c7n_table_open",
                 "type": "customer",
-                "tableARN": "arn:aws:s3tables:us-east-1:644160558196:bucket/c7n-test-tb-compliant/table/e7622b5a-9e66-44f4-a09a-b64551b2b8e5",
+                "tableARN": "arn:aws:s3tables:us-east-1:644160558196:bucket/c7n-test-tb-compliant/table/e4602cc0-6907-47d8-abef-12fde3ae9094",
                 "createdAt": {
                     "__class__": "datetime",
                     "year": 2026,
-                    "month": 8,
-                    "day": 3,
-                    "hour": 2,
-                    "minute": 59,
-                    "second": 51,
-                    "microsecond": 835904
+                    "month": 9,
+                    "day": 15,
+                    "hour": 5,
+                    "minute": 15,
+                    "second": 34,
+                    "microsecond": 687105
                 },
                 "modifiedAt": {
                     "__class__": "datetime",
                     "year": 2026,
-                    "month": 8,
-                    "day": 3,
-                    "hour": 2,
-                    "minute": 59,
-                    "second": 51,
-                    "microsecond": 835904
+                    "month": 9,
+                    "day": 15,
+                    "hour": 5,
+                    "minute": 15,
+                    "second": 34,
+                    "microsecond": 687105
                 }
             }
         ]

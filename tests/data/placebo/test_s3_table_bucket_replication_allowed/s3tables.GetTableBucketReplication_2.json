@@ -2,7 +2,7 @@
     "status_code": 200,
     "data": {
         "ResponseMetadata": {},
-        "versionToken": "51e7791843cb2864236c",
+        "versionToken": "77c5f77d21f75ed54446",
         "configuration": {
             "role": "arn:aws:iam::644160558196:role/c7n-test-s3tables-repl-role",
             "rules": [
