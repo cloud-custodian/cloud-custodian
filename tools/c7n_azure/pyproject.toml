@@ -19,7 +19,7 @@ dependencies = [
     "azure-keyvault-keys<5.0.0,>=4.3.1",
     "azure-keyvault-secrets<5.0.0,>=4.2.0",
     "azure-mgmt-advisor<10.0.0,>=9.0.0",
-    "azure-mgmt-apimanagement<2.0.0,>=1.0.0",
+    "azure-mgmt-apimanagement>=1.0.0,<6.0.0",
     "azure-mgmt-appconfiguration==0.7.0",
     "azure-mgmt-applicationinsights<2.0.0,>=1.0.0",
     "azure-mgmt-appplatform<9.0.0,>=8.0.0",
