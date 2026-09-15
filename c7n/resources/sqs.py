@@ -473,10 +473,10 @@ class DeadLetterFilter(Filter):
         all_resources = self.manager.get_resource_manager("sqs").resources()
         all_queue_arn_map = {r['QueueArn']: r for r in all_resources}
         queue_arn_map = {r['QueueArn']: r for r in resources}
-        has_redrive = []
+        has_redrive = set()
         for r in all_resources:
             if r.get("RedrivePolicy"):
-                has_redrive.append(r['QueueArn'])
+                has_redrive.add(r['QueueArn'])
         result = []
         # dead letter queues must exist in the same region and account as the
         # original queue so it should be safe to look for them in our existing
