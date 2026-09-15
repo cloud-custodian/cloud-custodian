@@ -1,0 +1,65 @@
+{
+  "status_code": 200,
+  "data": {
+    "NetworkInterfaces": [
+      {
+        "NetworkInterfaceId": "eni-0ebf4e9347b99b6d3",
+        "Description": "[Do not detach or untag] Amazon FSx network interface for fs-0e3e2a9e1f5ff7a13",
+        "RequesterManaged": false,
+        "Status": "in-use",
+        "VpcId": "vpc-d2d616b5",
+        "SubnetId": "subnet-3a334610",
+        "AvailabilityZone": "us-east-1b",
+        "OwnerId": "644160558196",
+        "InterfaceType": "interface",
+        "Groups": [
+          {
+            "GroupId": "sg-0prod00000000000a",
+            "GroupName": "fsx-prod"
+          }
+        ],
+        "PrivateIpAddress": "172.31.7.194",
+        "TagSet": []
+      },
+      {
+        "NetworkInterfaceId": "eni-0dcc101a580b07620",
+        "Description": "[Do not detach or untag] Amazon FSx network interface for fs-0e3e2a9e1f5ff7a13",
+        "RequesterManaged": false,
+        "Status": "in-use",
+        "VpcId": "vpc-d2d616b5",
+        "SubnetId": "subnet-3a334610",
+        "AvailabilityZone": "us-east-1b",
+        "OwnerId": "644160558196",
+        "InterfaceType": "interface",
+        "Groups": [
+          {
+            "GroupId": "sg-0prod00000000000a",
+            "GroupName": "fsx-prod"
+          }
+        ],
+        "PrivateIpAddress": "172.31.7.194",
+        "TagSet": []
+      },
+      {
+        "NetworkInterfaceId": "eni-0316083e722388ce3",
+        "Description": "[Do not detach or untag] Amazon FSx network interface for fs-0bc98cbfb6b356896",
+        "RequesterManaged": false,
+        "Status": "in-use",
+        "VpcId": "vpc-d2d616b5",
+        "SubnetId": "subnet-efbcccb7",
+        "AvailabilityZone": "us-east-1b",
+        "OwnerId": "644160558196",
+        "InterfaceType": "interface",
+        "Groups": [
+          {
+            "GroupId": "sg-0stag00000000000b",
+            "GroupName": "fsx-staging"
+          }
+        ],
+        "PrivateIpAddress": "172.31.7.194",
+        "TagSet": []
+      }
+    ],
+    "ResponseMetadata": {}
+  }
+}

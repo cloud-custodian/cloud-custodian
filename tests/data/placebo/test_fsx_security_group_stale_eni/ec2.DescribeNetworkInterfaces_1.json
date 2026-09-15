@@ -1,0 +1,10 @@
+{
+  "status_code": 400,
+  "data": {
+    "Error": {
+      "Code": "InvalidNetworkInterfaceID.NotFound",
+      "Message": "The networkInterface ID 'eni-0dcc101a580b07620' does not exist"
+    },
+    "ResponseMetadata": {}
+  }
+}

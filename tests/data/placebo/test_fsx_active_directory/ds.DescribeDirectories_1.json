@@ -1,0 +1,65 @@
+{
+  "status_code": 200,
+  "data": {
+    "DirectoryDescriptions": [
+      {
+        "DirectoryId": "d-90667bfee0",
+        "Name": "corp.c7ntest.com",
+        "ShortName": "C7NTEST",
+        "Size": "Small",
+        "Edition": "Standard",
+        "Alias": "d-90667bfee0",
+        "AccessUrl": "d-90667bfee0.awsapps.com",
+        "Description": "c7n fsx ontap AD-join verification - DELETE AFTER USE",
+        "DnsIpAddrs": [
+          "172.31.1.151",
+          "172.31.23.220"
+        ],
+        "DnsIpv6Addrs": [],
+        "Stage": "Active",
+        "LaunchTime": {
+          "__class__": "datetime",
+          "year": 2026,
+          "month": 8,
+          "day": 7,
+          "hour": 17,
+          "minute": 35,
+          "second": 29,
+          "microsecond": 908000
+        },
+        "StageLastUpdatedDateTime": {
+          "__class__": "datetime",
+          "year": 2026,
+          "month": 8,
+          "day": 7,
+          "hour": 18,
+          "minute": 0,
+          "second": 19,
+          "microsecond": 101000
+        },
+        "Type": "MicrosoftAD",
+        "VpcSettings": {
+          "VpcId": "vpc-d2d616b5",
+          "SubnetIds": [
+            "subnet-914763e7",
+            "subnet-efbcccb7"
+          ],
+          "SecurityGroupId": "sg-097a30d52b3503590",
+          "AvailabilityZones": [
+            "us-east-1a",
+            "us-east-1b"
+          ]
+        },
+        "SsoEnabled": false,
+        "DesiredNumberOfDomainControllers": 2,
+        "RegionsInfo": {
+          "PrimaryRegion": "us-east-1",
+          "AdditionalRegions": []
+        },
+        "OsVersion": "SERVER_2019",
+        "NetworkType": "IPv4"
+      }
+    ],
+    "ResponseMetadata": {}
+  }
+}
