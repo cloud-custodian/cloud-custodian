@@ -1385,3 +1385,11 @@ class VertexAIPublisherModel(ChildResourceManager):
         urn_component = 'publisher-model'
         urn_id_segments = (-1,)
         parent_spec = {'resource': 'vertex-ai-publisher'}
+        metric_key = 'resource.labels.model_user_id'
+
+        @classmethod
+        def get_metric_resource_name(cls, resource, metric_key=None):
+            # Monitoring labels the metric with the bare model id, the
+            # last part of the resource's full
+            # publishers/{publisher}/models/{model} name.
+            return resource['name'].split('/')[-1]
