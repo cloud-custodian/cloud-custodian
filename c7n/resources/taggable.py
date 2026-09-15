@@ -438,7 +438,7 @@ class TagActionDispatch(Action):
                     rset.remove(r)
         elif arn.service == 'ecs':
             for r in list(rset):
-                if Arn.parse(r['ResourceARN']).resource_type == 'task':
+                if ":task/" in r['ResourceARN']:
                     rset.remove(r)
         elif arn.service == 'memorydb':
             for r in list(rset):
@@ -446,14 +446,12 @@ class TagActionDispatch(Action):
                     rset.remove(r)
         elif arn.service == 's3express':
             for r in list(rset):
-                if Arn.parse(r['ResourceARN']).resource_type == 'bucket':
+                if ":bucket/" in r['ResourceARN']:
                     rset.remove(r)
         elif arn.service == 'ssm':
             for r in list(rset):
-                rarn = Arn.parse(r['ResourceARN'])
                 # throws an error if the prefix is not mi-
-                if (rarn.resource_type == 'managed-instance' and
-                    'managed-instance/i-' in r['ResourceARN']):
+                if 'managed-instance/i-' in r['ResourceARN']:
                     rset.remove(r)
         return False
 
