@@ -393,7 +393,7 @@ class TagActionFilter(Filter):
             action_date = parse(action_date_str)
         except Exception:
             self.log.error("could not parse tag:%s value:%s on %s" % (
-                self.tag, v, i['InstanceId']))
+                self.tag, v, i.get('id', i.get('name'))))
             return False
 
         # current_date must match timezones with the parsed date string
