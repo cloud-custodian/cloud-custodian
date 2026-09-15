@@ -386,6 +386,35 @@ class OtherTests(unittest.TestCase):
         )
         self.assertIsNotNone(body)
 
+    def test_html_autoescape_predicate(self):
+        self.assertTrue(utils.html_autoescape("default.html.j2"))
+        self.assertTrue(utils.html_autoescape("report.htm.j2"))
+        self.assertTrue(utils.html_autoescape("default.html"))
+        self.assertFalse(utils.html_autoescape("default.j2"))
+        self.assertFalse(utils.html_autoescape("report.txt.j2"))
+        self.assertFalse(utils.html_autoescape(None))
+
+    def test_get_rendered_jinja_html_escapes_resource_data(self):
+        resource = {"Tags": [{"Key": "Name", "Value": "<img src=x onerror=alert(1)>"}]}
+        message = {
+            "action": {"template": "escape.html"},
+            "policy": {"name": "p", "resource": "ec2"},
+            "account": "a",
+            "account_id": "1",
+            "region": "us-east-1",
+        }
+        body = utils.get_rendered_jinja(
+            ["test@test.com"],
+            message,
+            [resource],
+            logging.getLogger("c7n_mailer.utils.email"),
+            "template",
+            "default",
+            MAILER_CONFIG["templates_folders"],
+        )
+        self.assertNotIn("<img src=x onerror=alert(1)>", body)
+        self.assertIn("&lt;img src=x onerror=alert(1)&gt;", body)
+
     def test_get_date_age(self):
         now = datetime.utcnow().isoformat() + "Z"
         sleep(1.0)
