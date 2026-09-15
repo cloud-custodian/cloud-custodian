@@ -6,7 +6,6 @@ import logging
 import pytest
 
 from c7n.exceptions import PolicyValidationError
-from c7n.resources.aws import Arn
 
 from .zpill import ACCOUNT_ID
 
@@ -136,3 +135,7 @@ def test_taggable_tag_action(test):
     post_tags = {t['Key'] for t in
                  itertools.chain.from_iterable([r['Tags'] for r in post_resources])}
     assert post_tags - pre_tags == {"NonCompliant"}
+
+
+def test_taggable_override_filtering(test):
+    pass
