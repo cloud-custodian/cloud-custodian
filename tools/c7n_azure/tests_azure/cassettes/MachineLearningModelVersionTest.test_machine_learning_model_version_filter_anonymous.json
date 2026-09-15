@@ -69,7 +69,7 @@
                                 "type": "Microsoft.MachineLearningServices/workspaces/models",
                                 "properties": {
                                     "description": "Cloud Custodian test model",
-                                    "latestVersion": "2"
+                                    "latestVersion": "3"
                                 }
                             }
                         ]
@@ -107,7 +107,8 @@
                                 "properties": {
                                     "modelType": "CustomModel",
                                     "modelUri": "azureml://locations/eastus/workspaces/mlvvtest/models/cctest-model/versions/1",
-                                    "isArchived": false
+                                    "isArchived": false,
+                                    "isAnonymous": false
                                 }
                             },
                             {
@@ -117,7 +118,19 @@
                                 "properties": {
                                     "modelType": "CustomModel",
                                     "modelUri": "azureml://locations/eastus/workspaces/mlvvtest/models/cctest-model/versions/2",
-                                    "isArchived": true
+                                    "isArchived": false,
+                                    "isAnonymous": true
+                                }
+                            },
+                            {
+                                "id": "/subscriptions/ea42f556-5106-4743-99b0-c129bfa71a47/resourceGroups/VV/providers/Microsoft.MachineLearningServices/workspaces/mlvvtest/models/cctest-model/versions/3",
+                                "name": "3",
+                                "type": "Microsoft.MachineLearningServices/workspaces/models/versions",
+                                "properties": {
+                                    "modelType": "CustomModel",
+                                    "modelUri": "azureml://locations/eastus/workspaces/mlvvtest/models/cctest-model/versions/3",
+                                    "isArchived": false,
+                                    "isAnonymous": true
                                 }
                             }
                         ]
