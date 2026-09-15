@@ -128,3 +128,20 @@ class S3FilesAccessPointTest(BaseTest):
         self.assertTrue(ap['accessPointArn'].startswith('arn:aws:s3files:'))
         self.assertIn('rootDirectory', ap)
         self.assertIn('fileSystemId', ap)
+        self.assertEqual(ap['Tags'], [{'Key': 'Env', 'Value': 'test'}])
+
+    def test_s3files_access_point_tag(self):
+        session_factory = self.replay_flight_data('test_s3files_access_point_tag')
+        p = self.load_policy(
+            {'name': 's3files-ap-tag',
+             'resource': 'aws.s3files-access-point',
+             'filters': [{'tag:Owner': 'absent'}],
+             'actions': [
+                 {'type': 'tag', 'key': 'Owner', 'value': 'c7n-test'}]},
+            session_factory=session_factory)
+        resources = p.run()
+        self.assertEqual(len(resources), 1)
+        client = session_factory().client('s3files')
+        tags = client.list_tags_for_resource(
+            resourceId=resources[0]['accessPointId'])['tags']
+        self.assertIn({'key': 'Owner', 'value': 'c7n-test'}, tags)

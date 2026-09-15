@@ -5,12 +5,13 @@ from c7n.filters.policystatement import HasStatementFilter
 from c7n.filters.vpc import SecurityGroupFilter, SubnetFilter, NetworkLocation
 from c7n.manager import resources
 from c7n.query import (
+    ChildDescribeSource,
     ChildResourceManager,
     DescribeSource,
     QueryResourceManager,
     TypeInfo,
 )
-from c7n.tags import RemoveTag, Tag, TagActionFilter, TagDelayedAction
+from c7n.tags import universal_augment
 from c7n.utils import local_session
 
 
@@ -44,6 +45,7 @@ class FileSystem(QueryResourceManager):
         name = 'name'
         date = 'creationTime'
         cfn_type = 'AWS::S3Files::FileSystem'
+        universal_taggable = object()
 
     source_mapping = {'describe': DescribeFileSystem}
 
@@ -93,6 +95,12 @@ class MountTargetSecurityGroupFilter(SecurityGroupFilter):
 MountTarget.filter_registry.register('network-location', NetworkLocation)
 
 
+class DescribeAccessPoint(ChildDescribeSource):
+
+    def augment(self, resources):
+        return universal_augment(self.manager, super().augment(resources))
+
+
 @resources.register('s3files-access-point')
 class AccessPoint(ChildResourceManager):
     """AWS S3 Files - Access Point
@@ -125,6 +133,9 @@ class AccessPoint(ChildResourceManager):
         id = 'accessPointId'
         name = 'name'
         cfn_type = 'AWS::S3Files::AccessPoint'
+        universal_taggable = object()
+
+    source_mapping = {'describe-child': DescribeAccessPoint}
 
 
 class FileSystemPolicyMixin:
@@ -205,63 +216,3 @@ class FileSystemHasStatement(FileSystemPolicyMixin, HasStatementFilter):
             'account_id': self.manager.config.account_id,
             'region': self.manager.config.region,
         }
-
-
-@FileSystem.action_registry.register('tag')
-@AccessPoint.action_registry.register('tag')
-class TagS3FilesResource(Tag):
-    """Create tags on an S3 Files file system or access point.
-
-    :example:
-
-    .. code-block:: yaml
-
-        policies:
-          - name: s3files-tag
-            resource: aws.s3files-file-system
-            actions:
-              - type: tag
-                key: owner
-                value: data-platform
-    """
-    permissions = ('s3files:TagResource',)
-
-    def process_resource_set(self, client, resources, new_tags):
-        tags = [{'key': t['Key'], 'value': t['Value']} for t in new_tags]
-        id_key = self.manager.resource_type.id
-        for r in resources:
-            try:
-                client.tag_resource(resourceId=r[id_key], tags=tags)
-            except client.exceptions.ResourceNotFoundException:
-                continue
-
-
-@FileSystem.action_registry.register('remove-tag')
-@AccessPoint.action_registry.register('remove-tag')
-class RemoveTagS3FilesResource(RemoveTag):
-    """Remove tags from an S3 Files file system or access point.
-
-    :example:
-
-    .. code-block:: yaml
-
-        policies:
-          - name: s3files-remove-tag
-            resource: aws.s3files-file-system
-            actions:
-              - type: remove-tag
-                tags: ["expired-tag"]
-    """
-    permissions = ('s3files:UntagResource',)
-
-    def process_resource_set(self, client, resources, tags):
-        id_key = self.manager.resource_type.id
-        for r in resources:
-            try:
-                client.untag_resource(resourceId=r[id_key], tagKeys=tags)
-            except client.exceptions.ResourceNotFoundException:
-                continue
-
-
-FileSystem.filter_registry.register('marked-for-op', TagActionFilter)
-FileSystem.action_registry.register('mark-for-op', TagDelayedAction)
