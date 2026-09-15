@@ -381,6 +381,12 @@ class Taggable(query.QueryResourceManager):
 class TagActionDispatch(Action):
 
     override_actions = {
+        {'ssm', 'managed-instance'): None,
+        ('bedrock', 'agent'): None,
+        ('bedrock', 'agent-alias'): None,
+        ('s3express', 'bucket'): None,
+        ('ecs', 'task'): None,
+        ('cloudformation', 'stack'): None,
         ('autoscaling', 'autoScalingGroup'): 'aws.asg'
 
     }
@@ -423,7 +429,7 @@ class TagActionDispatch(Action):
 
         for r in resources:
             rarn = Arn.parse(r['ResourceARN'])
-            stats[rarn] += 1
+            stats[rarn.service] += 1
             service_batches.setdefault(rarn.service, []).append(r)
 
         verbose = bool([item for item in self.manager.data['query'] if item.get('verbose_errors')])
