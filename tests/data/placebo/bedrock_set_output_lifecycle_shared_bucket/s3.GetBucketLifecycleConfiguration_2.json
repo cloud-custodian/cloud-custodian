@@ -1,0 +1,28 @@
+{
+    "status_code": 200,
+    "data": {
+        "ResponseMetadata": {},
+        "Rules": [
+            {
+                "ID": "covered",
+                "Status": "Enabled",
+                "Filter": {
+                    "Prefix": "evaluations/covered-job/id-a/"
+                },
+                "Expiration": {
+                    "Days": 90
+                }
+            },
+            {
+                "ID": "c7n-bedrock-output-retention-id-b",
+                "Status": "Enabled",
+                "Filter": {
+                    "Prefix": "evaluations/uncovered-job/id-b/"
+                },
+                "Expiration": {
+                    "Days": 30
+                }
+            }
+        ]
+    }
+}

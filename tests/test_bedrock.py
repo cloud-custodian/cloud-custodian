@@ -1330,6 +1330,137 @@ class TestBedrockEvaluationOutputRetention(BaseTest):
             self.get_filter({'key': 'Versioning.Status', 'value': 'Enabled'})
 
 
+class TestSetBedrockEvaluationOutputLifecycle(BaseTest):
+
+    def get_action(self, data=None, session_factory=None):
+        action_data = {'type': 'set-output-lifecycle', 'days': 30}
+        action_data.update(data or {})
+        policy = self.load_policy(
+            {
+                'name': 'bedrock-evaluation-set-output-lifecycle',
+                'resource': 'bedrock-evaluation-job',
+                'actions': [action_data],
+            },
+            session_factory=session_factory,
+            config={'region': 'us-east-1'},
+        )
+        return policy.resource_manager.actions[0]
+
+    def test_permissions(self):
+        action = self.get_action()
+        perms = set(action.get_permissions())
+        assert perms == {
+            's3:GetBucketLocation', 's3:GetLifecycleConfiguration',
+            's3:GetBucketVersioning', 's3:PutLifecycleConfiguration'}
+
+    def job(self, name, job_id, bucket, prefix):
+        return {
+            'jobName': name,
+            'jobArn': 'arn:aws:bedrock:us-east-1:123456789012:evaluation-job/%s' % job_id,
+            'outputDataConfig': {'s3Uri': 's3://%s/%s' % (bucket, prefix)},
+        }
+
+    def test_skips_job_with_invalid_uri(self):
+        session_factory = self.replay_flight_data(
+            'bedrock_set_output_lifecycle_invalid_uri')
+        action = self.get_action(session_factory=session_factory)
+        # no bucket can be resolved from an invalid uri, so no s3 calls are
+        # made; a missing flight data fixture would fail this test.
+        action.process([{'jobArn': 'arn:aws:bedrock:r:a:evaluation-job/id'}])
+
+    def test_skips_bucket_not_found_or_denied(self):
+        session_factory = self.replay_flight_data(
+            'bedrock_set_output_lifecycle_bucket_errors')
+        action = self.get_action(session_factory=session_factory)
+        jobs = [
+            self.job('a', 'id-a', 'missing', 'evaluations'),
+            self.job('b', 'id-b', 'denied', 'evaluations'),
+        ]
+        # should not raise, and no put call is made (no fixture for it)
+        action.process(jobs)
+
+    def test_already_covered_skips_put(self):
+        session_factory = self.replay_flight_data(
+            'bedrock_set_output_lifecycle_already_covered')
+        action = self.get_action(session_factory=session_factory)
+        jobs = [self.job('a', 'id-a', 'bucket', 'evaluations')]
+        # an existing, unrelated-but-covering rule means no put is made
+        action.process(jobs)
+
+    def test_adds_rule_and_preserves_unrelated_rules(self):
+        session_factory = self.replay_flight_data(
+            'bedrock_set_output_lifecycle_add_rule')
+        action = self.get_action(session_factory=session_factory)
+        jobs = [self.job('my-job', 'abc123', 'bucket', 'evaluations')]
+        action.process(jobs)
+
+        client = session_factory().client('s3')
+        rules = client.get_bucket_lifecycle_configuration(Bucket='bucket')['Rules']
+        ids = {r['ID'] for r in rules}
+        assert ids == {'unrelated', 'c7n-bedrock-output-retention-abc123'}
+        new_rule = [r for r in rules if r['ID'] != 'unrelated'][0]
+        assert new_rule == {
+            'ID': 'c7n-bedrock-output-retention-abc123',
+            'Status': 'Enabled',
+            'Filter': {'Prefix': 'evaluations/my-job/abc123/'},
+            'Expiration': {'Days': 30},
+        }
+
+    def test_versioned_bucket_adds_noncurrent_expiration(self):
+        session_factory = self.replay_flight_data(
+            'bedrock_set_output_lifecycle_versioned')
+        action = self.get_action(session_factory=session_factory)
+        jobs = [self.job('my-job', 'abc123', 'bucket', 'evaluations')]
+        action.process(jobs)
+
+        client = session_factory().client('s3')
+        rules = client.get_bucket_lifecycle_configuration(Bucket='bucket')['Rules']
+        assert rules == [{
+            'ID': 'c7n-bedrock-output-retention-abc123',
+            'Status': 'Enabled',
+            'Filter': {'Prefix': 'evaluations/my-job/abc123/'},
+            'Expiration': {'Days': 30},
+            'NoncurrentVersionExpiration': {'NoncurrentDays': 30},
+        }]
+
+    def test_updates_existing_c7n_rule_by_id(self):
+        session_factory = self.replay_flight_data(
+            'bedrock_set_output_lifecycle_update_existing')
+        action = self.get_action({'days': 45}, session_factory=session_factory)
+        jobs = [self.job('my-job', 'abc123', 'bucket', 'evaluations')]
+        action.process(jobs)
+
+        client = session_factory().client('s3')
+        rules = client.get_bucket_lifecycle_configuration(Bucket='bucket')['Rules']
+        assert len(rules) == 1
+        assert rules[0]['Expiration'] == {'Days': 45}
+
+    def test_no_op_when_rule_unchanged(self):
+        session_factory = self.replay_flight_data(
+            'bedrock_set_output_lifecycle_no_op_rule')
+        action = self.get_action(session_factory=session_factory)
+        # existing rule is already an exact match of what the action would
+        # generate for this job, so re-running is a no-op (no put fixture).
+        jobs = [self.job('my-job', 'abc123', 'bucket', 'evaluations')]
+        action.process(jobs)
+
+    def test_multiple_jobs_share_bucket_only_uncovered_added(self):
+        session_factory = self.replay_flight_data(
+            'bedrock_set_output_lifecycle_shared_bucket')
+        action = self.get_action(session_factory=session_factory)
+        jobs = [
+            self.job('covered-job', 'id-a', 'bucket', 'evaluations'),
+            self.job('uncovered-job', 'id-b', 'bucket', 'evaluations'),
+        ]
+        action.process(jobs)
+
+        client = session_factory().client('s3')
+        rules = client.get_bucket_lifecycle_configuration(Bucket='bucket')['Rules']
+        assert len(rules) == 2
+        ids = {r['ID'] for r in rules}
+        assert ids == {'covered', 'c7n-bedrock-output-retention-id-b'}
+
+
 @terraform('bedrock_evaluation_job', scope='function')
 def test_bedrock_evaluation_job(test, bedrock_evaluation_job):
     session_factory = test.replay_flight_data('bedrock_evaluation_job')

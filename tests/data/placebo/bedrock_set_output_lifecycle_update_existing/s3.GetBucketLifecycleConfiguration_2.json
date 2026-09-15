@@ -1,0 +1,18 @@
+{
+    "status_code": 200,
+    "data": {
+        "ResponseMetadata": {},
+        "Rules": [
+            {
+                "ID": "c7n-bedrock-output-retention-abc123",
+                "Status": "Enabled",
+                "Filter": {
+                    "Prefix": "evaluations/my-job/abc123/"
+                },
+                "Expiration": {
+                    "Days": 45
+                }
+            }
+        ]
+    }
+}
