@@ -10,8 +10,8 @@ from datetime import datetime, timedelta
 import pytest
 from adal import AdalError
 from azure.core.credentials import AccessToken
-from azure.identity import (ClientSecretCredential, ManagedIdentityCredential,
-                            WorkloadIdentityCredential)
+from azure.identity import (CertificateCredential, ClientSecretCredential,
+                            ManagedIdentityCredential, WorkloadIdentityCredential)
 from azure.identity._credentials import azure_cli
 from c7n_azure import constants
 from c7n_azure.session import Session
@@ -277,6 +277,21 @@ class SessionTest(BaseTest):
             self.assertEqual(s.get_subscription_id(), DEFAULT_SUBSCRIPTION_ID)
             self.assertIsNotNone(creds._credential)
 
+    def test_initialize_certificate_data(self):
+        with patch.dict(os.environ,
+                        {
+                            constants.ENV_TENANT_ID: 'tenant',
+                            constants.ENV_SUB_ID: DEFAULT_SUBSCRIPTION_ID,
+                            constants.ENV_CLIENT_ID: 'client',
+                            constants.ENV_CLIENT_CERTIFICATE_DATA:
+                                self.generate_fake_cert('password').decode(),
+                            constants.ENV_CLIENT_CERTIFICATE_PASSWORD: 'password'
+                        }, clear=True):
+            s = Session()
+            creds = s.get_credentials()
+            self.assertEqual(s.get_subscription_id(), DEFAULT_SUBSCRIPTION_ID)
+            self.assertIsInstance(creds._credential, CertificateCredential)
+
     def test_get_functions_auth_string(self):
         with patch('azure.common.credentials.ServicePrincipalCredentials.__init__',
                    autospec=True, return_value=None):
@@ -323,6 +338,78 @@ class SessionTest(BaseTest):
                              }"""
 
                 self.assertEqual(json.loads(auth), json.loads(expected))
+
+    def test_get_functions_auth_string_certificate(self):
+        pem = self.generate_fake_cert('password')
+        with tempfile.NamedTemporaryFile(delete=False) as fp:
+            fp.write(pem)
+            filename = fp.name
+        with patch.dict(os.environ,
+                        {
+                            constants.ENV_TENANT_ID: 'tenant',
+                            constants.ENV_SUB_ID: DEFAULT_SUBSCRIPTION_ID,
+                            constants.ENV_CLIENT_ID: 'client',
+                            constants.ENV_CLIENT_CERTIFICATE_PATH: filename,
+                            constants.ENV_CLIENT_CERTIFICATE_PASSWORD: 'password',
+                            constants.ENV_CLIENT_SEND_CERTIFICATE_CHAIN: 'true'
+                        }, clear=True):
+            s = Session()
+
+            auth = json.loads(s.get_functions_auth_string(CUSTOM_SUBSCRIPTION_ID))
+
+        # the certificate is embedded, the deploying host's path is not usable
+        # from the function host
+        self.assertEqual(auth, {"client_id": "client",
+                                "tenant_id": "tenant",
+                                "subscription_id": CUSTOM_SUBSCRIPTION_ID,
+                                "client_certificate_data": pem.decode(),
+                                "client_certificate_password": "password",
+                                "client_certificate_send_chain": True})
+
+        # the embedded auth file is enough to authenticate by certificate
+        with tempfile.NamedTemporaryFile(mode='w+', suffix='.json', delete=False) as fp:
+            json.dump(auth, fp)
+            auth_file = fp.name
+        with patch.dict(os.environ, {}, clear=True):
+            creds = Session(authorization_file=auth_file).get_credentials()
+            self.assertIsInstance(creds._credential, CertificateCredential)
+
+    def test_get_functions_auth_string_certificate_empty_secret(self):
+        # an unset client secret may reach us as an empty string rather than being
+        # absent, which must not mask the certificate
+        pem = self.generate_fake_cert('password')
+        with tempfile.NamedTemporaryFile(delete=False) as fp:
+            fp.write(pem)
+            filename = fp.name
+        with patch.dict(os.environ,
+                        {
+                            constants.ENV_TENANT_ID: 'tenant',
+                            constants.ENV_SUB_ID: DEFAULT_SUBSCRIPTION_ID,
+                            constants.ENV_CLIENT_ID: 'client',
+                            constants.ENV_CLIENT_SECRET: '',
+                            constants.ENV_CLIENT_CERTIFICATE_PATH: filename,
+                            constants.ENV_CLIENT_CERTIFICATE_PASSWORD: 'password',
+                            constants.ENV_CLIENT_SEND_CERTIFICATE_CHAIN: 'true'
+                        }, clear=True):
+            auth = json.loads(
+                Session().get_functions_auth_string(CUSTOM_SUBSCRIPTION_ID))
+
+        self.assertNotIn('client_secret', auth)
+        self.assertEqual(auth['client_certificate_data'], pem.decode())
+        self.assertTrue(auth['client_certificate_send_chain'])
+
+    def test_get_functions_auth_string_no_service_principal(self):
+        with patch.dict(os.environ,
+                        {
+                            constants.ENV_ACCESS_TOKEN: 'token',
+                            constants.ENV_TENANT_ID: 'tenant',
+                            constants.ENV_CLIENT_ID: 'client',
+                            constants.ENV_SUB_ID: DEFAULT_SUBSCRIPTION_ID
+                        }, clear=True):
+            s = Session()
+
+            with self.assertRaises(NotImplementedError):
+                s.get_functions_auth_string(CUSTOM_SUBSCRIPTION_ID)
 
     # TODO this test has been flakey in ci, disabling temporarily
     def xtest_get_function_target_subscription(self):
@@ -418,7 +505,9 @@ class SessionTest(BaseTest):
                             constants.ENV_KEYVAULT_CLIENT_ID: 'kv_client',
                             constants.ENV_KEYVAULT_SECRET_ID: 'kv_secret',
                             constants.ENV_CLIENT_CERTIFICATE_PATH: '/certificate',
+                            constants.ENV_CLIENT_CERTIFICATE_DATA: 'certificate_data',
                             constants.ENV_CLIENT_CERTIFICATE_PASSWORD: 'password',
+                            constants.ENV_CLIENT_SEND_CERTIFICATE_CHAIN: 'true',
                             constants.ENV_FEDERATED_TOKEN_FILE: '/token_file'
                         }, clear=True):
             env_params = Session().get_credentials().auth_params
