@@ -23,6 +23,7 @@ RESOURCE_PERM_WHITELIST = set((
     'vertex-ai-publisher',  # synthetic resource with no permissions
     'vertex-ai-publisher-model',  # catalog resource with no permissions
     'vertex-ai-location',  # metadata resource with no permissions
+    'workspace-user',  # OAuth scope and workspace roles, not GCP IAM
 ))
 
 
