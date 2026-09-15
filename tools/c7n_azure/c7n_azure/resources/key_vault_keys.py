@@ -145,6 +145,7 @@ class KeyTypeFilter(Filter):
 
     def _process_resource_set(self, resources, event):
         matched = []
+        key_types = {t.lower() for t in self.data.get('key-types', ())}
         for resource in resources:
             try:
                 if 'c7n:kty' not in resource:
@@ -154,7 +155,7 @@ class KeyTypeFilter(Filter):
 
                     resource['c7n:kty'] = key.key.kty.lower()
 
-                if resource['c7n:kty'] in [t.lower() for t in self.data['key-types']]:
+                if resource['c7n:kty'] in key_types:
                     matched.append(resource)
             except Exception as error:
                 log.warning(error)
