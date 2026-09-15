@@ -40,18 +40,33 @@ class Tag(AzureBaseAction):
              tag: Environment
              value: Test
 
-        - name: azure-tag-from-resource-attr
+    :example:
+
+    Tag values may also be resolved per resource. A value of the form
+    ``{type: resource, key: <jmespath>}`` is looked up against the resource,
+    falling back to ``default-value`` when the path yields nothing. Omitting
+    ``key`` gives a conditional default: the tag is written only when it is
+    not already present, leaving existing values untouched.
+
+    .. code-block:: yaml
+
+      policies:
+        - name: azure-vm-set-default-tags
           resource: azure.vm
-          description: |
-            Tag all existing virtual machines with values taken from the resource
+          filters:
+            - or:
+              - "tag:Env": empty
+              - "tag:Owner": empty
           actions:
            - type: tag
              tags:
-               Environment: Test
-               ResourceName:
-                type: resource
-                key: name
-                default-value: name_not_found
+               Env:
+                 type: resource
+                 key: tags.Environment   # seed from an existing tag if present
+                 default-value: unknown  # otherwise fall back
+               Owner:
+                 type: resource
+                 default-value: platform@example.com  # only set if Owner absent
     """
 
     schema = utils.type_schema(
@@ -61,7 +76,9 @@ class Tag(AzureBaseAction):
             'tag': Lookup.lookup_type({'type': 'string'}),
             'tags': {
                 'type': 'object',
-                'additionalProperties': Lookup.lookup_type({'type': 'string'})
+                'additionalProperties': Lookup.lookup_type(
+                    {'type': ['string', 'number', 'boolean']},
+                    default_schema={'type': 'string'}),
             }
         }
     )
@@ -88,10 +105,18 @@ class Tag(AzureBaseAction):
 
     def _get_tags(self, resource):
         tags = self.data.get('tags')
-        if tags:
-            return {k: Lookup.extract(v, resource) for k, v in tags.items()}
-        return {Lookup.extract(
-            self.data.get('tag'), resource): Lookup.extract(self.data.get('value'), resource)}
+        if not tags:
+            return {Lookup.extract(self.data.get('tag'), resource):
+                    Lookup.extract(self.data.get('value'), resource)}
+
+        current = set(resource.get('tags') or ())
+        resolved = {}
+        for name, spec in tags.items():
+            value = Lookup.resolve_value(spec, resource, name, current)
+            if value is Lookup.SKIP:
+                continue
+            resolved[name] = value
+        return resolved
 
 
 class RemoveTag(AzureBaseAction):

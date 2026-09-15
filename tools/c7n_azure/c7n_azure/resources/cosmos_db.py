@@ -5,7 +5,7 @@ import logging
 from itertools import groupby
 
 from azure.cosmos.cosmos_client import CosmosClient
-from azure.cosmos.errors import HTTPFailure
+from azure.cosmos.exceptions import CosmosHttpResponseError
 from azure.mgmt.cosmosdb.models import VirtualNetworkRule
 
 from c7n_azure import constants
@@ -171,15 +171,32 @@ class CosmosDBChildResource(ChildResourceManager):
             resource_name)
         return key_result.primary_readonly_master_key if readonly else key_result.primary_master_key
 
+    @staticmethod
+    @lru_cache()
+    def get_cosmos_data_client(url, key):
+        # Cached per (url, key): azure-cosmos v4's CosmosClient spawns a
+        # background endpoint health-check on every construction, so we
+        # reuse one client per account rather than building a fresh one
+        # (and its background thread) on every enumeration/action call.
+        data_client = CosmosClient(url, {'masterKey': key})
+        # That health-check runs in a daemon thread kicked off from inside
+        # the constructor - block until it settles so callers (and test
+        # cassettes recorded against the synchronous v3 client) never race
+        # it.
+        refresh_thread = getattr(
+            getattr(data_client.client_connection, '_global_endpoint_manager', None),
+            '_refresh_thread', None)
+        if refresh_thread is not None:
+            refresh_thread.join(timeout=30)
+        return data_client
+
     def get_data_client(self, parent_resource):
         key = CosmosDBChildResource.get_cosmos_key(
             parent_resource['resourceGroup'],
             parent_resource.get('name'),
             self.get_parent_manager().get_client())
-        data_client = CosmosClient(
-            url_connection=parent_resource.get('properties').get('documentEndpoint'),
-            auth={'masterKey': key})
-        return data_client
+        return CosmosDBChildResource.get_cosmos_data_client(
+            parent_resource.get('properties').get('documentEndpoint'), key)
 
 
 @resources.register('cosmosdb-database')
@@ -202,8 +219,8 @@ class CosmosDBDatabase(CosmosDBChildResource):
         data_client = self.get_data_client(parent_resource)
 
         try:
-            databases = list(data_client.ReadDatabases())
-        except HTTPFailure as e:
+            databases = list(data_client.client_connection.ReadDatabases())
+        except CosmosHttpResponseError as e:
             if e.status_code == 403:
                 log.error("403 Forbidden. Ensure identity has `Cosmos DB Account Reader` or"
                           "`DocumentDB Accounts Contributor` and that firewall is not "
@@ -282,8 +299,8 @@ class CosmosDBCollection(CosmosDBChildResource):
         data_client = self.get_data_client(parent_resource)
 
         try:
-            databases = list(data_client.ReadDatabases())
-        except HTTPFailure as e:
+            databases = list(data_client.client_connection.ReadDatabases())
+        except CosmosHttpResponseError as e:
             if e.status_code == 403:
                 log.error("403 Forbidden. Ensure identity has `Cosmos DB Account Reader` or"
                           "`DocumentDB Accounts Contributor` and that firewall is not "
@@ -293,7 +310,7 @@ class CosmosDBCollection(CosmosDBChildResource):
         collections = []
 
         for d in databases:
-            container_result = list(data_client.ReadContainers(d['_self']))
+            container_result = list(data_client.client_connection.ReadContainers(d['_self']))
             for c in container_result:
                 c.update({'c7n:document-endpoint':
                          parent_resource.get('properties').get('documentEndpoint')})
@@ -457,7 +474,7 @@ class CosmosDBReplaceOfferAction(AzureBaseAction):
         new_offer = dict(offer)
         new_offer.pop('c7n:MatchedFilters', None)
         new_offer['content']['offerThroughput'] = throughput
-        account_client.ReplaceOffer(offer['_self'], new_offer)
+        account_client.client_connection.ReplaceOffer(offer['_self'], new_offer)
 
 
 @CosmosDBCollection.action_registry.register('restore-throughput-state')
@@ -619,13 +636,12 @@ class OfferHelper:
             manager.get_client(),
             readonly
         )
-        data_client = CosmosClient(url_connection=account_endpoint, auth={'masterKey': key})
-        return data_client
+        return CosmosDBChildResource.get_cosmos_data_client(account_endpoint, key)
 
     @staticmethod
     def populate_offer_data_for_account(resources, account_data_client):
         if not resources[0].get('c7n:offer'):
-            offers = list(account_data_client.ReadOffers())
+            offers = list(account_data_client.client_connection.ReadOffers())
             for resource in resources:
                 offer = next((o for o in offers if o['offerResourceId'] == resource['_rid']), None)
                 resource['c7n:offer'] = offer
