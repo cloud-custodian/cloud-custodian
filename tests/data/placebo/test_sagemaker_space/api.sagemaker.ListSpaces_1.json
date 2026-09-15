@@ -1,0 +1,58 @@
+{
+    "status_code": 200,
+    "data": {
+        "Spaces": [
+            {
+                "DomainId": "d-szjlsjfyqmaq",
+                "SpaceName": "c7nspacecomicchicken",
+                "Status": "InService",
+                "CreationTime": {
+                    "__class__": "datetime",
+                    "year": 2026,
+                    "month": 7,
+                    "day": 15,
+                    "hour": 12,
+                    "minute": 20,
+                    "second": 47,
+                    "microsecond": 367000
+                },
+                "LastModifiedTime": {
+                    "__class__": "datetime",
+                    "year": 2026,
+                    "month": 7,
+                    "day": 15,
+                    "hour": 12,
+                    "minute": 20,
+                    "second": 50,
+                    "microsecond": 150000
+                }
+            },
+            {
+                "DomainId": "d-szjlsjfyqmaq",
+                "SpaceName": "c7nspaceuntaggedcomicchicken",
+                "Status": "InService",
+                "CreationTime": {
+                    "__class__": "datetime",
+                    "year": 2026,
+                    "month": 7,
+                    "day": 15,
+                    "hour": 12,
+                    "minute": 20,
+                    "second": 47,
+                    "microsecond": 199000
+                },
+                "LastModifiedTime": {
+                    "__class__": "datetime",
+                    "year": 2026,
+                    "month": 7,
+                    "day": 15,
+                    "hour": 12,
+                    "minute": 20,
+                    "second": 49,
+                    "microsecond": 379000
+                }
+            }
+        ],
+        "ResponseMetadata": {}
+    }
+}

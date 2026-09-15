@@ -249,6 +249,15 @@ class DescribeWafV2(DescribeSource):
     # set REGIONAL for Scope as default
     def get_query_params(self, query_params):
         query_params = query_params or {}
+        # Scope is owned by the resource manager, since it also determines which
+        # region the wafv2 API is called in. Fail loudly rather than silently
+        # discarding a conflicting Scope supplied by the caller.
+        requested_scope = query_params.get('Scope')
+        if requested_scope is not None and requested_scope != self.manager.scope:
+            raise PolicyValidationError(
+                "wafv2 Scope conflict: %s was requested but the resource manager "
+                "scope is %s. Pass Scope via the resource manager's 'query' data."
+                % (requested_scope, self.manager.scope))
         # Parse query from policy data
         queries = self.manager.data.get('query', [])
         for q in queries:

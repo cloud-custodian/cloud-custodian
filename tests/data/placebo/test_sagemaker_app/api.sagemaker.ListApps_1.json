@@ -1,0 +1,176 @@
+{
+    "status_code": 200,
+    "data": {
+        "Apps": [
+            {
+                "DomainId": "d-szjlsjfyqmaq",
+                "UserProfileName": "c7n-profile-comic-chicken",
+                "AppType": "JupyterServer",
+                "AppName": "c7n-app-comic-chicken",
+                "Status": "InService",
+                "CreationTime": {
+                    "__class__": "datetime",
+                    "year": 2026,
+                    "month": 7,
+                    "day": 15,
+                    "hour": 12,
+                    "minute": 20,
+                    "second": 51,
+                    "microsecond": 484000
+                },
+                "ResourceSpec": {
+                    "SageMakerImageArn": "arn:aws:ecr:us-east-1:644160558196:repository/looseleaf-jupyter-server-3",
+                    "InstanceType": "system"
+                }
+            },
+            {
+                "DomainId": "d-szjlsjfyqmaq",
+                "UserProfileName": "c7n-profile-untagged-comic-chicken",
+                "AppType": "JupyterServer",
+                "AppName": "c7n-app-untagged-comic-chicken",
+                "Status": "InService",
+                "CreationTime": {
+                    "__class__": "datetime",
+                    "year": 2026,
+                    "month": 7,
+                    "day": 15,
+                    "hour": 12,
+                    "minute": 20,
+                    "second": 51,
+                    "microsecond": 477000
+                },
+                "ResourceSpec": {
+                    "SageMakerImageArn": "arn:aws:ecr:us-east-1:644160558196:repository/looseleaf-jupyter-server-3",
+                    "InstanceType": "system"
+                }
+            },
+            {
+                "DomainId": "d-a056u6jhtsnr",
+                "UserProfileName": "c7n-profile-sound-beetle",
+                "AppType": "JupyterServer",
+                "AppName": "c7n-app-sound-beetle",
+                "Status": "Deleted",
+                "CreationTime": {
+                    "__class__": "datetime",
+                    "year": 2026,
+                    "month": 7,
+                    "day": 15,
+                    "hour": 12,
+                    "minute": 8,
+                    "second": 1,
+                    "microsecond": 160000
+                },
+                "ResourceSpec": {
+                    "SageMakerImageArn": "arn:aws:ecr:us-east-1:644160558196:repository/looseleaf-jupyter-server-3",
+                    "InstanceType": "system"
+                }
+            },
+            {
+                "DomainId": "d-a056u6jhtsnr",
+                "UserProfileName": "c7n-profile-sound-beetle",
+                "AppType": "JupyterServer",
+                "AppName": "c7n-app-untagged-sound-beetle",
+                "Status": "Deleted",
+                "CreationTime": {
+                    "__class__": "datetime",
+                    "year": 2026,
+                    "month": 7,
+                    "day": 15,
+                    "hour": 12,
+                    "minute": 8,
+                    "second": 1,
+                    "microsecond": 159000
+                },
+                "ResourceSpec": {
+                    "SageMakerImageArn": "arn:aws:ecr:us-east-1:644160558196:repository/looseleaf-jupyter-server-3",
+                    "InstanceType": "system"
+                }
+            },
+            {
+                "DomainId": "d-cdvywlci9fz9",
+                "UserProfileName": "c7n-profile-relative-satyr",
+                "AppType": "JupyterServer",
+                "AppName": "c7n-app-relative-satyr",
+                "Status": "Deleted",
+                "CreationTime": {
+                    "__class__": "datetime",
+                    "year": 2026,
+                    "month": 7,
+                    "day": 14,
+                    "hour": 15,
+                    "minute": 36,
+                    "second": 15,
+                    "microsecond": 690000
+                },
+                "ResourceSpec": {
+                    "SageMakerImageArn": "arn:aws:ecr:us-east-1:644160558196:repository/looseleaf-jupyter-server-3",
+                    "InstanceType": "system"
+                }
+            },
+            {
+                "DomainId": "d-8qju6kwhkbxw",
+                "UserProfileName": "c7n-profile-literate-dingo",
+                "AppType": "JupyterServer",
+                "AppName": "c7n-app-literate-dingo",
+                "Status": "Deleted",
+                "CreationTime": {
+                    "__class__": "datetime",
+                    "year": 2026,
+                    "month": 7,
+                    "day": 14,
+                    "hour": 15,
+                    "minute": 25,
+                    "second": 56,
+                    "microsecond": 736000
+                },
+                "ResourceSpec": {
+                    "SageMakerImageArn": "arn:aws:ecr:us-east-1:644160558196:repository/looseleaf-jupyter-server-3",
+                    "InstanceType": "system"
+                }
+            },
+            {
+                "DomainId": "d-1gl8yb9eznhn",
+                "UserProfileName": "c7n-profile-super-monkfish",
+                "AppType": "JupyterServer",
+                "AppName": "c7n-app-super-monkfish",
+                "Status": "Deleted",
+                "CreationTime": {
+                    "__class__": "datetime",
+                    "year": 2026,
+                    "month": 7,
+                    "day": 14,
+                    "hour": 15,
+                    "minute": 16,
+                    "second": 5,
+                    "microsecond": 663000
+                },
+                "ResourceSpec": {
+                    "SageMakerImageArn": "arn:aws:ecr:us-east-1:644160558196:repository/looseleaf-jupyter-server-3",
+                    "InstanceType": "system"
+                }
+            },
+            {
+                "DomainId": "d-hdmmj0w5a3de",
+                "UserProfileName": "c7n-profile-nice-pangolin",
+                "AppType": "JupyterServer",
+                "AppName": "c7n-app-nice-pangolin",
+                "Status": "Deleted",
+                "CreationTime": {
+                    "__class__": "datetime",
+                    "year": 2026,
+                    "month": 7,
+                    "day": 14,
+                    "hour": 14,
+                    "minute": 24,
+                    "second": 16,
+                    "microsecond": 333000
+                },
+                "ResourceSpec": {
+                    "SageMakerImageArn": "arn:aws:ecr:us-east-1:644160558196:repository/looseleaf-jupyter-server-3",
+                    "InstanceType": "system"
+                }
+            }
+        ],
+        "ResponseMetadata": {}
+    }
+}

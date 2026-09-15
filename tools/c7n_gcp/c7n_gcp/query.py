@@ -4,6 +4,7 @@
 import json
 import itertools
 import logging
+import os
 import re
 import jmespath
 
@@ -336,15 +337,36 @@ class ChildResourceManager(QueryResourceManager):
         return result
 
 
+def config_regions(config):
+    """Resolve cli/programmatic region selection to explicit region names.
+
+    - config.regions is the cli's raw, repeatable '-r/--region' list.
+
+      'all' anywhere in it means every region, overriding any other
+      entries in the list.  For backward compatibility, however, if
+      'all' is present and config.region is set, then config.region is
+      used.
+
+    - config.region is a single-region value set by some callers
+      (tests, embedders).  Normally an empty string in production.
+      Lore suggests it could be set to
+      `os.environ.get('AWS_DEFAULT_REGION', 'us-east-1')`, but that
+      seems unlikely for GCP.
+
+    Returns () when nothing explicit was given, meaning "no filter".
+    """
+    if config.regions and 'all' not in config.regions:
+        return tuple(config.regions)
+    elif config.region and config.region != os.environ.get('AWS_DEFAULT_REGION', 'us-east-1'):
+        return (config.region,)
+    return ()
+
+
 class RegionalResourceManager(ChildResourceManager):
 
     def get_parent_resource_query(self):
-        query = None
-        if self.config.regions and 'all' not in self.config.regions:
-            query = [{'name': r} for r in self.config.regions]
-        elif self.config.region:
-            query = [{'name': self.config.region}]
-        return query
+        regions = config_regions(self.config)
+        return [{'name': r} for r in regions] if regions else None
 
 
 class TypeMeta(type):

@@ -1,0 +1,23 @@
+{
+    "status_code": 200,
+    "data": {
+        "DashboardEntries": [
+            {
+                "DashboardName": "c7n-test-e3dd19005e27e4f1",
+                "DashboardArn": "arn:aws:cloudwatch::644160558196:dashboard/c7n-test-e3dd19005e27e4f1",
+                "LastModified": {
+                    "__class__": "datetime",
+                    "year": 2026,
+                    "month": 9,
+                    "day": 8,
+                    "hour": 22,
+                    "minute": 59,
+                    "second": 16,
+                    "microsecond": 0
+                },
+                "Size": 158
+            }
+        ],
+        "ResponseMetadata": {}
+    }
+}
