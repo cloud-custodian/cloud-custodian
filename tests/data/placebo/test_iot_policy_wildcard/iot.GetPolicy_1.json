@@ -1,0 +1,31 @@
+{
+    "status_code": 200,
+    "data": {
+        "ResponseMetadata": {},
+        "policyName": "c7n-test-iot-wildcard",
+        "policyArn": "arn:aws:iot:us-east-1:644160558196:policy/c7n-test-iot-wildcard",
+        "policyDocument": "{\"Version\":\"2012-10-17\",\"Statement\":[{\"Effect\":\"Allow\",\"Action\":\"iot:*\",\"Resource\":\"*\"}]}",
+        "defaultVersionId": "1",
+        "creationDate": {
+            "__class__": "datetime",
+            "year": 2026,
+            "month": 9,
+            "day": 9,
+            "hour": 15,
+            "minute": 16,
+            "second": 26,
+            "microsecond": 656000
+        },
+        "lastModifiedDate": {
+            "__class__": "datetime",
+            "year": 2026,
+            "month": 9,
+            "day": 9,
+            "hour": 15,
+            "minute": 16,
+            "second": 26,
+            "microsecond": 656000
+        },
+        "generationId": "0ae7f702ec9065f88943b57fb0ddc034bbde46e538cfd0b4985ddcfdb9b2ef3c"
+    }
+}
