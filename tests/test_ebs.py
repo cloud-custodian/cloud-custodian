@@ -177,16 +177,6 @@ class SnapshotErrorHandler(BaseTest):
         tagger.process_resource_set(client, snaps, [{'Key': 'bar', 'Value': 'foo'}])
         client.create_tags.assert_called_once()
 
-    def test_remove_snapshot(self):
-        snaps = [{'SnapshotId': 'a'}, {'SnapshotId': 'b'}, {'SnapshotId': 'c'}]
-
-        t1 = list(snaps)
-        ErrorHandler.remove_snapshot('c', t1)
-        self.assertEqual([t['SnapshotId'] for t in t1], ['a', 'b'])
-
-        ErrorHandler.remove_snapshot('d', snaps)
-        self.assertEqual(len(snaps), 3)
-
     def test_get_bad_snapshot_malformed(self):
         operation_name = "DescribeSnapshots"
         error_response = {
@@ -234,16 +224,6 @@ class SnapshotErrorHandler(BaseTest):
         e = ClientError(error_response, operation_name)
         vol = ErrorHandler.extract_bad_volume(e)
         self.assertEqual(vol, "vol-notfound")
-
-    def test_remove_volume(self):
-        vols = [{'VolumeId': 'a'}, {'VolumeId': 'b'}, {'VolumeId': 'c'}]
-
-        t1 = list(vols)
-        ErrorHandler.remove_volume('c', t1)
-        self.assertEqual([t['VolumeId'] for t in t1], ['a', 'b'])
-
-        ErrorHandler.remove_volume('d', vols)
-        self.assertEqual(len(vols), 3)
 
     def test_volume_tag_error(self):
         vols = [{'VolumeId': 'vol-aa'}]

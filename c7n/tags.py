@@ -8,6 +8,8 @@ to ec2 (subnets, vpc, security-groups, volumes, instances,
 snapshots) and resources that support Amazon's Resource Groups Tagging API
 
 """
+import re
+
 from collections import Counter
 from concurrent.futures import as_completed
 
@@ -16,6 +18,8 @@ from dateutil import tz as tzutil
 from dateutil.parser import parse
 
 import time
+
+from botocore.exceptions import ClientError
 
 from c7n.manager import resources as aws_resources
 from c7n.actions import BaseAction as Action, AutoTagUser
@@ -27,6 +31,54 @@ from c7n.lookup import Lookup
 from c7n import deprecated, utils
 
 DEFAULT_TAG = "maid_status"
+
+# Tag actions inherently race with resource deletion, we enumerate a
+# resource set and then mutate it. ec2 fails the whole batch when any
+# resource in it is unusable, but names the offending ids in the error
+# message, so we can drop those and tag the rest.
+EC2_BAD_RESOURCE_ID = re.compile(r'^Invalid.+\.(NotFound|Malformed)$')
+QUOTED_RESOURCE_IDS = re.compile(r"['\"]([^'\"]+)['\"]")
+
+# Other services report a resource as already gone with a service specific
+# error code - query protocol services use <ResourceType>NotFound(Fault),
+# json protocol services use (Resource)NotFoundException.
+RESOURCE_GONE_ERROR = re.compile(r'NotFound(Fault|Exception)?$')
+
+
+def is_resource_gone(error_code):
+    """Does an api error code mean the resource we wanted is already gone?"""
+    return bool(RESOURCE_GONE_ERROR.search(error_code))
+
+
+def extract_bad_resource_ids(e):
+    """Extract the resource ids an ec2 api call rejected from its error.
+
+    ec2 names the ids it couldn't use in the error message, ie
+    ``The instance IDs 'i-0e8f4b9a' do not exist``.
+    """
+    if not EC2_BAD_RESOURCE_ID.match(e.response['Error']['Code']):
+        return ()
+    return tuple(
+        rid.strip(" []")
+        for quoted in QUOTED_RESOURCE_IDS.findall(e.response['Error']['Message'])
+        for rid in quoted.split(','))
+
+
+def retry_skip_bad_ids(retry, method, resource_ids, log, **kw):
+    """Invoke a batched ec2 tag api call, skipping unusable resource ids.
+
+    A resource deleted between enumeration and tagging fails the entire
+    batch, so drop the ids ec2 rejected and tag the ones still around.
+    """
+    while resource_ids:
+        try:
+            return retry(method, Resources=resource_ids, **kw)
+        except ClientError as e:
+            bad_ids = set(extract_bad_resource_ids(e)).intersection(resource_ids)
+            if not bad_ids:
+                raise
+            log.info("skipping missing resources %s", ", ".join(sorted(bad_ids)))
+            resource_ids = [r for r in resource_ids if r not in bad_ids]
 
 
 # Sentinel: the resolver returns this to omit a tag from a resource's payload.
@@ -552,9 +604,9 @@ class Tag(TagValueResolver, Action):
 
     def process_resource_set(self, client, resource_set, tags):
         mid = self.manager.get_model().id
-        self.manager.retry(
-            client.create_tags,
-            Resources=[v[mid] for v in resource_set],
+        retry_skip_bad_ids(
+            self.manager.retry, client.create_tags,
+            [v[mid] for v in resource_set], self.log,
             Tags=tags,
             DryRun=self.manager.config.dryrun)
 
@@ -593,9 +645,9 @@ class RemoveTag(Action):
             self.process_resource_set, self.id_key, resources, tags, self.log)
 
     def process_resource_set(self, client, resource_set, tag_keys):
-        return self.manager.retry(
-            client.delete_tags,
-            Resources=[v[self.id_key] for v in resource_set],
+        return retry_skip_bad_ids(
+            self.manager.retry, client.delete_tags,
+            [v[self.id_key] for v in resource_set], self.log,
             Tags=[{'Key': k} for k in tag_keys],
             DryRun=self.manager.config.dryrun)
 
@@ -1420,13 +1472,17 @@ def universal_retry(method, ResourceARNList, **kw):
             error_code = failures[f_arn]['ErrorCode']
             if error_code == 'ThrottlingException':
                 throttles.add(f_arn)
-            elif error_code == 'ResourceNotFoundException':
+            elif is_resource_gone(error_code):
                 continue
             else:
                 errors[f_arn] = error_code
 
         if errors:
             raise Exception("Resource Tag Errors %s" % (errors))
+
+        if not throttles:
+            # everything else was skipped, the api rejects an empty arn list
+            return response
 
         if idx == max_attempts - 1:
             raise Exception("Resource Tag Throttled %s" % (", ".join(throttles)))
