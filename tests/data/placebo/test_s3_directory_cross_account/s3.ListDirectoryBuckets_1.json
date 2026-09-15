@@ -1,0 +1,50 @@
+{
+    "status_code": 200,
+    "data": {
+        "ResponseMetadata": {},
+        "Buckets": [
+            {
+                "Name": "c7n-test-inventory--use1-az4--x-s3",
+                "CreationDate": {
+                    "__class__": "datetime",
+                    "year": 2026,
+                    "month": 8,
+                    "day": 27,
+                    "hour": 17,
+                    "minute": 57,
+                    "second": 21,
+                    "microsecond": 545000
+                },
+                "BucketArn": "arn:aws:s3express:us-east-1:644160558196:bucket/c7n-test-inventory--use1-az4--x-s3"
+            },
+            {
+                "Name": "c7n-test-policy-sid--use1-az4--x-s3",
+                "CreationDate": {
+                    "__class__": "datetime",
+                    "year": 2026,
+                    "month": 8,
+                    "day": 27,
+                    "hour": 19,
+                    "minute": 16,
+                    "second": 6,
+                    "microsecond": 585000
+                },
+                "BucketArn": "arn:aws:s3express:us-east-1:644160558196:bucket/c7n-test-policy-sid--use1-az4--x-s3"
+            },
+            {
+                "Name": "c7n-test-cross-account--use1-az4--x-s3",
+                "CreationDate": {
+                    "__class__": "datetime",
+                    "year": 2026,
+                    "month": 8,
+                    "day": 31,
+                    "hour": 18,
+                    "minute": 34,
+                    "second": 48,
+                    "microsecond": 586000
+                },
+                "BucketArn": "arn:aws:s3express:us-east-1:644160558196:bucket/c7n-test-cross-account--use1-az4--x-s3"
+            }
+        ]
+    }
+}
