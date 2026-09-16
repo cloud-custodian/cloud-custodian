@@ -98,17 +98,6 @@
   dimensions:
     - InferenceComponentName
 
-- title: Inference component metrics
-  resource: sagemaker-inference-component
-  namespace: /aws/sagemaker/InferenceComponents
-  metrics:
-    - CPUUtilizationNormalized
-    - GPUMemoryUtilizationNormalized
-    - GPUUtilizationNormalized
-    - MemoryUtilizationNormalized
-  dimensions:
-    - InferenceComponentName
-
 - title: Multi-model endpoint model loading metrics
   resource: sagemaker-endpoint
   kind: classic

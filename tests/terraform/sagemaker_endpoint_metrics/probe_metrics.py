@@ -1,5 +1,13 @@
 """Check sagemaker_metrics.yaml against what these endpoints really publish.
 
+Reads the file as written, section by section, because its job is to
+help write that file. What the filters make of it is their own affair,
+and the test suite covers it.
+
+NOTE! This is weird :smile:. Part documentation, part prompt, part
+code, and it will need to be updated to add more resources.  It is
+what it is, but it's still valuable.
+
 Run against the endpoints this terraform module creates, with credentials
 for the account they live in:
 
@@ -25,7 +33,7 @@ the table, not in it. Add metrics the page has gained, remove ones it has
 dropped, and keep each section's metric list in the page's order so the two
 can be read side by side.
 
-This script is the only source of *dimension sets* and of `endpoint-kinds`.
+This script is the only source of *dimension sets* and of `kind`.
 Do not take the page's dimensions tables literally: they list the dimensions
 a metric can be filtered by, and CloudWatch identifies a series by an exact
 set of dimensions. Instance type, for example, is documented as
@@ -40,7 +48,7 @@ So, for dimensions:
   - Never add a set this script found but the page doesn't mention: those
     exist, but c7n has no way to supply an AvailabilityZone or a Region.
 
-And for endpoint-kinds, `classic` means a model is attached to each
+And for `kind`, `classic` means a model is attached to each
 production variant, `inference-component` means the configuration carries an
 execution role and models arrive as components. A section's metrics belong
 to the kinds this script saw publishing them.
@@ -49,18 +57,22 @@ The script cannot see everything. It reports which catalogue entries it
 could not check -- metrics no endpoint here publishes, such as the GPU
 metrics with no GPU instance in the account, and the multi-model metrics
 with no multi-model endpoint. Those entries stay as they are, and their
-`endpoint-kinds` remain reasoning by analogy with the metrics that were
-checked. Say so in a comment rather than implying they were measured.
+`kind` remains reasoning by analogy with the metrics that were checked.
+Say so in a comment rather than implying they were measured.
+
 """
 
 import argparse
 import collections
 import datetime
+import pathlib
 import time
 
 import boto3
+import yaml
 
-from c7n.resources.sagemaker import SAGEMAKER_METRICS_BY_KIND
+CATALOGUE = (pathlib.Path(__file__).parents[3]
+             / 'c7n' / 'data' / 'sagemaker_metrics.yaml')
 
 PREFIX = 'c7n-endpoint-metrics-'
 
@@ -229,54 +241,53 @@ def main() -> None:
     print('\nCatalogue entries')
     unexercised: list[str] = []
     mismatched: list[str] = []
-    for resource, by_kind in SAGEMAKER_METRICS_BY_KIND.items():
-        for entry_kind, table in by_kind.items():
-            # an entry under no kind claims every kind publishes it, so
-            # check them one at a time rather than together
-            kinds = ([entry_kind] if entry_kind
-                     else sorted({endpoint['kind'] for endpoint in endpoints}))
+    for section in yaml.safe_load(CATALOGUE.read_text()):
+        namespace = section['namespace']
+        name_sets = [tuple(sorted(name.strip() for name in dimensions.split(',')))
+                     for dimensions in section['dimensions']]
+        # a section with no kind claims every kind publishes its metrics,
+        # so check them one kind at a time rather than together
+        section_kind = section.get('kind')
+        kinds = ([section_kind] if section_kind
+                 else sorted({endpoint['kind'] for endpoint in endpoints}))
+
+        for metric in section['metrics']:
             for kind in kinds:
+                where = section_kind or f"any kind (as {kind})"
                 targets = [
                     (endpoint, component)
                     for endpoint in endpoints if endpoint['kind'] == kind
                     for component in (components.get(endpoint['EndpointName'])
                                       or [None])
                     ]
-                if resource == 'sagemaker-inference-component':
-                    targets = [(e, c) for e, c in targets if c]
+                published = {
+                    name_set
+                    for endpoint, component in targets
+                    for named in (endpoint['EndpointName'], component)
+                    if named
+                    for name_set in seen[namespace, named].get(metric, ())
+                    }
+                if not published:
+                    unexercised.append(f"{metric:32} {where}")
+                    continue
 
-                for metric, entry in table.items():
-                    namespace = entry['namespace']
-                    name_sets = [tuple(sorted(names))
-                                 for names in entry['dimension_sets']]
-                    published = {
-                        name_set
-                        for endpoint, component in targets
-                        for named in (endpoint['EndpointName'], component)
-                        if named
-                        for name_set in seen[namespace, named].get(metric, ())
-                        }
-                    if not published:
-                        unexercised.append(f"{metric:32} {kind}")
-                        continue
+                matching = [s for s in name_sets if s in published]
+                if not matching:
+                    mismatched.append(
+                        f"{metric:32} {where:22} file"
+                        f" {[list(s) for s in name_sets]},"
+                        f" published {[list(s) for s in sorted(published)]}")
+                    continue
 
-                    matching = [s for s in name_sets if s in published]
-                    if not matching:
-                        mismatched.append(
-                            f"{metric:32} {kind:20} catalogue"
-                            f" {[list(s) for s in name_sets]},"
-                            f" published {[list(s) for s in sorted(published)]}")
-                        continue
-
-                    queried = [
-                        has_points(cloudwatch, namespace, metric, filled, window)
-                        for name_set in matching
-                        for endpoint, component in targets
-                        for filled in fill(list(name_set), endpoint, component)
-                        ]
-                    verdict = 'ok      ' if any(queried) else 'no points'
-                    print(f"  {verdict} {metric:32} {kind:20}"
-                          f" {[list(s) for s in matching]}")
+                queried = [
+                    has_points(cloudwatch, namespace, metric, filled, window)
+                    for name_set in matching
+                    for endpoint, component in targets
+                    for filled in fill(list(name_set), endpoint, component)
+                    ]
+                verdict = 'ok      ' if any(queried) else 'no points'
+                print(f"  {verdict} {metric:32} {where:22}"
+                      f" {[list(s) for s in matching]}")
 
     if mismatched:
         print('\nWrong dimensions -- the catalogue names a set that is not'
@@ -293,11 +304,9 @@ def main() -> None:
     print('\nPublished for our resources but not in the catalogue'
           ' -- do not add these')
     catalogued = {
-        tuple(sorted(names))
-        for by_kind in SAGEMAKER_METRICS_BY_KIND.values()
-        for table in by_kind.values()
-        for entry in table.values()
-        for names in entry['dimension_sets']
+        tuple(sorted(name.strip() for name in dimensions.split(',')))
+        for section in yaml.safe_load(CATALOGUE.read_text())
+        for dimensions in section['dimensions']
         }
     for namespace in NAMESPACES:
         for name_set in sorted(by_namespace[namespace]):
