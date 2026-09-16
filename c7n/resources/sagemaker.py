@@ -540,9 +540,10 @@ class SageMakerMetricsFilter(MetricsFilter):
         ):
             return False
 
-        # Are all given dimensions present, excluding the resource
-        # dimension:
-        if given_dimenion_names - {resource_dimension_name} - set(dimension_names):
+        # Are all given dimensions present?  Including the resource
+        # dimension, which only a set that has it can be given, since
+        # that's the set we'd supply its value to.
+        if given_dimenion_names - set(dimension_names):
             return False
 
         # Is the resource dimension name present:

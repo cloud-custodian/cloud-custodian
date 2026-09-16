@@ -1920,14 +1920,50 @@ def test_sagemaker_endpoint_metrics_dimensions_validated(test):
         test.load_policy(policy, validate=True)
     assert "doesn't support percent-attr" in str(caught.value)
 
+    # naming the endpoint is allowed -- it is part of the dimension set a
+    # classic endpoint's metrics are published under
+    del policy['filters'][0]['percent-attr']
+    policy['filters'][0]['dimensions'] = {'EndpointName': 'an-endpoint'}
+    test.load_policy(policy, validate=True)
+
+    # but not alongside a component, because no set carries both, and
+    # sending both would ask cloudwatch for a series it never publishes
+    policy['filters'][0]['dimensions']['InferenceComponentName'] = 'a-component'
+    with pytest.raises(PolicyValidationError) as caught:
+        test.load_policy(policy, validate=True)
+    assert ("can't use dimensions ['EndpointName', 'InferenceComponentName']"
+            in str(caught.value))
+
     # a metric the documentation doesn't describe fails while the policy
     # is loading, rather than as an empty report later
-    del policy['filters'][0]['percent-attr']
+    del policy['filters'][0]['dimensions']
     policy['filters'][0]['name'] = 'Invocation'
     with pytest.raises(AssertionError) as caught:
         test.load_policy(policy, validate=True)
     assert 'no documented sagemaker-endpoint metric named Invocation' in str(
         caught.value)
+
+
+def test_sagemaker_endpoint_metrics_resource_dimension_never_queried(test):
+    # validation refuses EndpointName alongside a component, so this is the
+    # belt-and-braces half: were such a filter built without validating,
+    # the two still mustn't reach cloudwatch together, which publishes no
+    # such series and would report the endpoint as having no data at all
+    policy = test.load_policy(
+        {'name': 'endpoints', 'resource': 'sagemaker-endpoint'})
+    klass = SagemakerEndpoint.filter_registry.get('metrics')
+    f = klass(
+        {'type': 'metrics', 'name': 'Invocations', 'statistics': 'Sum',
+         'value': 0, 'op': 'lte',
+         'dimensions': {'InferenceComponentName': 'comp',
+                        'EndpointName': 'e'}},
+        policy.resource_manager)
+    f.endpoint_components = {'e': ['comp']}
+    endpoint = {'EndpointName': 'e',
+                'ProductionVariants': [{'VariantName': 'AllTraffic'}]}
+
+    assert f.get_resource_dimension_names(endpoint) is None
+    assert f.get_dimensions_set(endpoint) == []
 
 
 def test_sagemaker_metrics_missing_value(test):
