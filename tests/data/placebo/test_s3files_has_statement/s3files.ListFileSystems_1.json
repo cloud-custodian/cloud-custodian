@@ -1,0 +1,26 @@
+{
+    "status_code": 200,
+    "data": {
+        "ResponseMetadata": {},
+        "fileSystems": [
+            {
+                "creationTime": {
+                    "__class__": "datetime",
+                    "year": 2026,
+                    "month": 8,
+                    "day": 2,
+                    "hour": 23,
+                    "minute": 2,
+                    "second": 38,
+                    "microsecond": 0
+                },
+                "fileSystemArn": "arn:aws:s3files:us-east-1:644160558196:file-system/fs-02d120d4ae6209b2d",
+                "fileSystemId": "fs-02d120d4ae6209b2d",
+                "bucket": "arn:aws:s3:::c7n-s3files-backing-644160558196",
+                "status": "available",
+                "roleArn": "arn:aws:iam::644160558196:role/c7n-test-s3files-role",
+                "ownerId": "644160558196"
+            }
+        ]
+    }
+}
