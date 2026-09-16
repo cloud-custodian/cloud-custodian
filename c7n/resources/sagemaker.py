@@ -453,7 +453,15 @@ class SagemakerEndpoint(QueryResourceManager):
         date = 'CreationTime'
         cfn_type = 'AWS::SageMaker::Endpoint'
 
+        # Metrics:
         dimension = 'EndpointName'
+
+        # This is right except when it's AWS/SageMaker or
+        # /aws/sagemaker/InferenceComponents. This gets overridden by
+        # SagemakerMetricsFilter.  MetricsFilter wants something set
+        # here or in filter data and making users specify it in filter
+        # data is mean.
+        metrics_namespace = '/aws/sagemaker/Endpoints'
 
     permissions = ('sagemaker:ListTags',)
 
@@ -732,9 +740,6 @@ class SageMakerMetricsFilter(MetricsFilter):
         # fail on an undocumented metric name even if we weren't validated
         self.published_dimension_sets()
 
-        # the base filter reads the namespace from the policy, so name it
-        # there rather than reimplementing the setup around it
-        self.data = dict(self.data, namespace='unused')
         return super().process(resources, event)
 
 
