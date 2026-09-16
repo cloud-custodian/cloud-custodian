@@ -4,7 +4,7 @@
         "Error": {
             "Code": "NoSuchBucketPolicy",
             "Message": "The bucket policy does not exist",
-            "BucketName": "c7n-test-inventory--use1-az4--x-s3"
+            "BucketName": "c7n-test-cross-account--use1-az4--x-s3"
         },
         "ResponseMetadata": {}
     }

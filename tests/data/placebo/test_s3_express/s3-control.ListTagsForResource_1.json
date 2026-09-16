@@ -2,6 +2,11 @@
     "status_code": 200,
     "data": {
         "ResponseMetadata": {},
-        "Tags": []
+        "Tags": [
+            {
+                "Key": "c7n",
+                "Value": "true"
+            }
+        ]
     }
 }

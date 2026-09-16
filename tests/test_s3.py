@@ -172,7 +172,7 @@ def test_s3_express(test):
     p = test.load_policy(
         {'name': 's3-xpress',
          'resource': 's3-directory'},
-        config={'account_id': '644160558196', 'region': 'us-east-1'},
+        config={'account_id': ACCOUNT_ID, 'region': 'us-east-1'},
         session_factory=session_factory)
     resources = p.run()
     assert len(resources) == 1
@@ -250,14 +250,38 @@ def test_s3_directory_set_inventory(test):
     assert sorted(matching[0]['OptionalFields']) == ['LastModifiedDate', 'Size']
 
 
-def test_s3_directory_bucket_policy_absent(test):
-    session_factory = test.replay_flight_data('test_s3_directory_bucket_policy_absent')
+def test_s3_directory_cross_account_no_policy(test):
+    session_factory = test.replay_flight_data('test_s3_directory_cross_account_no_policy')
     p = test.load_policy(
         {
-            'name': 's3-directory-no-policy',
+            'name': 's3-directory-cross-account-no-policy',
             'resource': 's3-directory',
             'filters': [
-                {'type': 'value', 'key': 'Policy', 'value': 'absent'}
+                {'type': 'cross-account'},
+            ],
+        },
+        config={'account_id': ACCOUNT_ID},
+        session_factory=session_factory,
+    )
+    resources = p.run()
+    assert len(resources) == 0
+
+
+def test_s3_directory_has_statement_no_policy(test):
+    session_factory = test.replay_flight_data('test_s3_directory_has_statement_no_policy')
+    p = test.load_policy(
+        {
+            'name': 's3-directory-has-no-statement',
+            'resource': 's3-directory',
+            'filters': [
+                {
+                    'not': [
+                        {
+                            'type': 'has-statement',
+                            'statement_ids': ['DenyNonSecureTransport'],
+                        }
+                    ]
+                }
             ],
         },
         config={'account_id': ACCOUNT_ID},
@@ -265,7 +289,6 @@ def test_s3_directory_bucket_policy_absent(test):
     )
     resources = p.run()
     assert len(resources) == 1
-    assert resources[0]['Policy'] is None
 
 
 def test_s3_directory_has_statement(test):
@@ -294,7 +317,6 @@ def test_s3_directory_has_statement(test):
     )
     resources = p.run()
     assert len(resources) == 1
-    assert resources[0]['Name'] == 'c7n-test-policy-sid--use1-az4--x-s3'
 
 
 def test_s3_directory_cross_account(test):

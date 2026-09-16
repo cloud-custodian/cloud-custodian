@@ -4112,22 +4112,9 @@ class BucketReplication(ListItemFilter):
 class DescribeS3Directory(query.DescribeSource):
 
     def augment(self, buckets):
-        client = local_session(self.manager.session_factory).client('s3')
         s3control_client = local_session(self.manager.session_factory).client('s3control')
         account_id = self.manager.config.account_id
         for bucket in buckets:
-            try:
-                bucket['Policy'] = client.get_bucket_policy(
-                    Bucket=bucket['Name'])['Policy']
-            except ClientError as e:
-                code = e.response['Error']['Code']
-                if code.startswith('NoSuch') or 'NotFound' in code:
-                    bucket['Policy'] = None
-                elif code == 'AccessDenied':
-                    bucket.setdefault('c7n:DeniedMethods', []).append(
-                        'get_bucket_policy')
-                else:
-                    raise
             try:
                 bucket['Tags'] = s3control_client.list_tags_for_resource(
                     AccountId=account_id,
@@ -4143,6 +4130,24 @@ class DescribeS3Directory(query.DescribeSource):
                 else:
                     raise
         return buckets
+
+
+def get_s3_directory_bucket_policy(manager, bucket):
+    if 'Policy' in bucket:
+        return bucket['Policy']
+    client = local_session(manager.session_factory).client('s3')
+    try:
+        bucket['Policy'] = client.get_bucket_policy(Bucket=bucket['Name'])['Policy']
+    except ClientError as e:
+        code = e.response['Error']['Code']
+        if code.startswith('NoSuch') or 'NotFound' in code:
+            bucket['Policy'] = None
+        elif code == 'AccessDenied':
+            bucket.setdefault('c7n:DeniedMethods', []).append('get_bucket_policy')
+            bucket['Policy'] = None
+        else:
+            raise
+    return bucket['Policy']
 
 
 @resources.register('s3-directory')
@@ -4228,6 +4233,11 @@ class S3DirectoryCrossAccountFilter(CrossAccountAccessFilter):
     """
     permissions = ('s3express:GetBucketPolicy',)
 
+    def process(self, resources, event=None):
+        for r in resources:
+            get_s3_directory_bucket_policy(self.manager, r)
+        return super().process(resources, event)
+
 
 @S3Directory.filter_registry.register('has-statement')
 class S3DirectoryHasStatementFilter(HasStatementFilter):
@@ -4245,10 +4255,16 @@ class S3DirectoryHasStatementFilter(HasStatementFilter):
                 statement_ids:
                   - DenyNonSecureTransport
     """
+    permissions = ('s3express:GetBucketPolicy',)
+
     def get_std_format_args(self, bucket):
         return {
             'account_id': self.manager.config.account_id,
             'region': self.manager.config.region,
             'bucket_name': bucket['Name'],
-            'bucket_region': self.manager.config.region,
         }
+
+    def process(self, resources, event=None):
+        for r in resources:
+            get_s3_directory_bucket_policy(self.manager, r)
+        return super().process(resources, event)
