@@ -1,0 +1,46 @@
+{
+ "status_code": 200,
+ "data": {
+  "ConnectionArn": "arn:aws:events:us-east-1:644160558196:connection/c7n-test-conn-basic/95cc4260-854b-44b1-9f02-582b00e0be35",
+  "Name": "c7n-test-conn-basic",
+  "ConnectionState": "AUTHORIZED",
+  "AuthorizationType": "BASIC",
+  "SecretArn": "arn:aws:secretsmanager:us-east-1:644160558196:secret:events!connection/c7n-test-conn-basic/a0ccaa8e-bc55-43a7-9296-c200d0afcf86-LSS8wK",
+  "AuthParameters": {
+   "BasicAuthParameters": {
+    "Username": "c7ntest"
+   }
+  },
+  "CreationTime": {
+   "__class__": "datetime",
+   "year": 2026,
+   "month": 8,
+   "day": 13,
+   "hour": 2,
+   "minute": 29,
+   "second": 28,
+   "microsecond": 0
+  },
+  "LastModifiedTime": {
+   "__class__": "datetime",
+   "year": 2026,
+   "month": 8,
+   "day": 13,
+   "hour": 2,
+   "minute": 29,
+   "second": 28,
+   "microsecond": 0
+  },
+  "LastAuthorizedTime": {
+   "__class__": "datetime",
+   "year": 2026,
+   "month": 8,
+   "day": 13,
+   "hour": 2,
+   "minute": 29,
+   "second": 28,
+   "microsecond": 0
+  },
+  "ResponseMetadata": {}
+ }
+}
