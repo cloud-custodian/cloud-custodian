@@ -1261,3 +1261,140 @@ class SagemakerDomain(QueryResourceManager):
 @SagemakerDomain.filter_registry.register('kms-key')
 class SagemakerDomainKmsFilter(KmsRelatedFilter):
     RelatedIdsExpression = 'KmsKeyId'
+
+
+class SagemakerUserProfileDescribe(DescribeSource):
+
+    def augment(self, resources):
+        client = local_session(self.manager.session_factory).client('sagemaker')
+        resources = [
+            self.manager.retry(
+                client.describe_user_profile,
+                DomainId=r['DomainId'],
+                UserProfileName=r['UserProfileName'],
+                ignore_err_codes=('ResourceNotFound',))
+            for r in resources]
+        resources = [r for r in resources if r]
+        return universal_augment(self.manager, resources)
+
+
+@resources.register('sagemaker-user-profile')
+class SagemakerUserProfile(QueryResourceManager):
+    """AWS SageMaker Studio User Profile
+
+    :example:
+
+    .. code-block:: yaml
+
+        policies:
+          - name: sagemaker-user-profile-untagged
+            resource: aws.sagemaker-user-profile
+            filters:
+              - tag:favorite-color: absent
+    """
+
+    class resource_type(TypeInfo):
+        service = 'sagemaker'
+        enum_spec = ('list_user_profiles', 'UserProfiles', None)
+        arn = id = 'UserProfileArn'
+        name = 'UserProfileName'
+        date = 'CreationTime'
+        cfn_type = 'AWS::SageMaker::UserProfile'
+        permission_prefix = 'sagemaker'
+        permissions_augment = ("sagemaker:DescribeUserProfile",)
+        universal_taggable = object()
+
+    source_mapping = {'describe': SagemakerUserProfileDescribe}
+
+
+class SagemakerSpaceDescribe(DescribeSource):
+
+    def augment(self, resources):
+        client = local_session(self.manager.session_factory).client('sagemaker')
+        resources = [
+            self.manager.retry(
+                client.describe_space,
+                DomainId=r['DomainId'],
+                SpaceName=r['SpaceName'],
+                ignore_err_codes=('ResourceNotFound',))
+            for r in resources]
+        resources = [r for r in resources if r]
+        return universal_augment(self.manager, resources)
+
+
+@resources.register('sagemaker-space')
+class SagemakerSpace(QueryResourceManager):
+    """AWS SageMaker Studio Space
+
+    :example:
+
+    .. code-block:: yaml
+
+        policies:
+          - name: sagemaker-space-untagged
+            resource: aws.sagemaker-space
+            filters:
+              - tag:favorite-color: absent
+    """
+
+    class resource_type(TypeInfo):
+        service = 'sagemaker'
+        enum_spec = ('list_spaces', 'Spaces', None)
+        arn = id = 'SpaceArn'
+        name = 'SpaceName'
+        date = 'CreationTime'
+        cfn_type = 'AWS::SageMaker::Space'
+        permission_prefix = 'sagemaker'
+        permissions_augment = ("sagemaker:DescribeSpace",)
+        universal_taggable = object()
+
+    source_mapping = {'describe': SagemakerSpaceDescribe}
+
+
+class SagemakerAppDescribe(DescribeSource):
+
+    def augment(self, resources):
+        client = local_session(self.manager.session_factory).client('sagemaker')
+
+        def _describe(r):
+            kw = dict(
+                DomainId=r['DomainId'], AppType=r['AppType'], AppName=r['AppName'])
+            if r.get('UserProfileName'):
+                kw['UserProfileName'] = r['UserProfileName']
+            if r.get('SpaceName'):
+                kw['SpaceName'] = r['SpaceName']
+            return self.manager.retry(
+                client.describe_app, ignore_err_codes=('ResourceNotFound',), **kw)
+
+        resources = [_describe(r) for r in resources]
+        resources = [r for r in resources if r]
+        return universal_augment(self.manager, resources)
+
+
+@resources.register('sagemaker-app')
+class SagemakerApp(QueryResourceManager):
+    """AWS SageMaker Studio App
+
+    :example:
+
+    .. code-block:: yaml
+
+        policies:
+          - name: sagemaker-app-untagged
+            resource: aws.sagemaker-app
+            filters:
+              - tag:favorite-color: absent
+    """
+
+    class resource_type(TypeInfo):
+        service = 'sagemaker'
+        enum_spec = ('list_apps', 'Apps', None)
+        arn = id = 'AppArn'
+        name = 'AppName'
+        date = 'CreationTime'
+        cfn_type = 'AWS::SageMaker::App'
+        permission_prefix = 'sagemaker'
+        permissions_augment = ("sagemaker:DescribeApp",)
+        universal_taggable = object()
+
+    source_mapping = {'describe': SagemakerAppDescribe}

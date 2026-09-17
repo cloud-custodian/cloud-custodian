@@ -1,0 +1,13 @@
+{
+    "status_code": 200,
+    "data": {
+        "ResponseMetadata": {},
+        "PaginationToken": "",
+        "ResourceTagMappingList": [
+            {
+                "ResourceARN": "arn:aws:cloudfront::123456789012:distribution/E1EXAMPLE1234",
+                "Tags": []
+            }
+        ]
+    }
+}

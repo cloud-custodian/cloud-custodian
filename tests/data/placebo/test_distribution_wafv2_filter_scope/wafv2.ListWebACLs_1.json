@@ -1,0 +1,16 @@
+{
+    "status_code": 200,
+    "data": {
+        "ResponseMetadata": {},
+        "NextMarker": "",
+        "WebACLs": [
+            {
+                "Name": "example-cloudfront-acl",
+                "Id": "11111111-2222-3333-4444-555555555555",
+                "Description": "",
+                "LockToken": "22222222-3333-4444-5555-666666666666",
+                "ARN": "arn:aws:wafv2:us-east-1:123456789012:global/webacl/example-cloudfront-acl/11111111-2222-3333-4444-555555555555"
+            }
+        ]
+    }
+}

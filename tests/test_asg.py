@@ -11,9 +11,9 @@ from pytest_terraform import terraform
 from .common import BaseTest
 
 from c7n.exceptions import PolicyValidationError
-from c7n.resources.asg import LaunchInfo
+from c7n.resources.asg import LaunchInfo, Tag as AsgTag
 from c7n.resources.aws import shape_validate
-from c7n.utils import jmespath_search
+from c7n.utils import FormatDate, jmespath_search
 
 
 class LaunchConfigTest(BaseTest):
@@ -1178,3 +1178,173 @@ class AutoScalingPolicy(BaseTest):
         resources = p.run()
         self.assertEqual(len(resources), 1)
         self.assertTrue(resources[0].get('Enabled'))
+
+
+class AsgDynamicTagTest(BaseTest):
+    """Dynamic tag values on the asg-specific tag action.
+
+    The asg tag action is not a c7n.tags.Tag subclass, so it needs its own
+    wiring for the resource lookup form of a tag value.
+    """
+
+    def _run(self, asgs, action):
+        mock_factory = mock.MagicMock()
+        mock_factory.region = 'us-east-1'
+        create_tags = mock_factory().client('autoscaling').create_or_update_tags
+        create_tags.return_value = {}
+        policy = self.load_policy(
+            {"name": "d", "resource": "asg", "actions": [action]},
+            session_factory=mock_factory)
+        policy.resource_manager.actions[0].process(asgs)
+        return create_tags
+
+    def test_lookup_key_hit(self):
+        create_tags = self._run(
+            [{"AutoScalingGroupName": "asg-1",
+              "Tags": [{"Key": "Team", "Value": "platform"}]}],
+            {"type": "tag", "tags": {"Owner": {
+                "type": "resource", "key": "Tags[?Key=='Team'].Value | [0]"}}})
+        create_tags.assert_called_once_with(
+            Tags=[{"Key": "Owner", "Value": "platform",
+                   "PropagateAtLaunch": False,
+                   "ResourceType": "auto-scaling-group",
+                   "ResourceId": "asg-1"}])
+
+    def test_lookup_key_miss_uses_default(self):
+        create_tags = self._run(
+            [{"AutoScalingGroupName": "asg-1"}],
+            {"type": "tag", "tags": {"Owner": {
+                "type": "resource", "key": "Nope", "default-value": "unknown"}}})
+        create_tags.assert_called_once_with(
+            Tags=[{"Key": "Owner", "Value": "unknown",
+                   "PropagateAtLaunch": False,
+                   "ResourceType": "auto-scaling-group",
+                   "ResourceId": "asg-1"}])
+
+    def test_conditional_default_skips_asg_with_tag_present(self):
+        create_tags = self._run(
+            [{"AutoScalingGroupName": "asg-has",
+              "Tags": [{"Key": "Owner", "Value": "keep-me"}]}],
+            {"type": "tag", "tags": {"Owner": {
+                "type": "resource", "default-value": "unassigned"}}})
+        create_tags.assert_not_called()
+
+    def test_conditional_default_writes_per_asg(self):
+        create_tags = self._run(
+            [{"AutoScalingGroupName": "asg-has",
+              "Tags": [{"Key": "Owner", "Value": "keep-me"}]},
+             {"AutoScalingGroupName": "asg-missing"}],
+            {"type": "tag", "tags": {"Owner": {
+                "type": "resource", "default-value": "unassigned"}}})
+        create_tags.assert_called_once_with(
+            Tags=[{"Key": "Owner", "Value": "unassigned",
+                   "PropagateAtLaunch": False,
+                   "ResourceType": "auto-scaling-group",
+                   "ResourceId": "asg-missing"}])
+
+    def test_lookup_in_single_value_form(self):
+        create_tags = self._run(
+            [{"AutoScalingGroupName": "asg-1",
+              "Tags": [{"Key": "Team", "Value": "platform"}]}],
+            {"type": "tag", "key": "Owner", "propagate": True,
+             "value": {"type": "resource", "key": "Tags[?Key=='Team'].Value | [0]"}})
+        create_tags.assert_called_once_with(
+            Tags=[{"Key": "Owner", "Value": "platform",
+                   "PropagateAtLaunch": True,
+                   "ResourceType": "auto-scaling-group",
+                   "ResourceId": "asg-1"}])
+
+    def test_placeholder_interpolated_in_lookup_default(self):
+        create_tags = self._run(
+            [{"AutoScalingGroupName": "asg-1"}],
+            {"type": "tag", "tags": {"Stamp": {
+                "type": "resource", "key": "Nope",
+                "default-value": "made-in-{region}"}}})
+        create_tags.assert_called_once_with(
+            Tags=[{"Key": "Stamp", "Value": "made-in-us-east-1",
+                   "PropagateAtLaunch": False,
+                   "ResourceType": "auto-scaling-group",
+                   "ResourceId": "asg-1"}])
+
+    def test_dynamic_values_batch_by_payload(self):
+        # batch_size is 1 today, so raise it to show the dynamic path batches
+        # asgs that resolve to the same payload rather than going one at a time
+        asgs = [{"AutoScalingGroupName": "asg-1",
+                 "Tags": [{"Key": "Env", "Value": "prod"}]},
+                {"AutoScalingGroupName": "asg-2",
+                 "Tags": [{"Key": "Env", "Value": "dev"}]},
+                {"AutoScalingGroupName": "asg-3",
+                 "Tags": [{"Key": "Env", "Value": "prod"}]}]
+        with mock.patch.object(AsgTag, "batch_size", 2):
+            create_tags = self._run(
+                asgs,
+                {"type": "tag", "tags": {"Tier": {
+                    "type": "resource", "key": "Tags[?Key=='Env'].Value | [0]"}}})
+        self.assertEqual(create_tags.call_count, 2)
+        by_value = {c.kwargs["Tags"][0]["Value"]: {t["ResourceId"] for t in c.kwargs["Tags"]}
+                    for c in create_tags.call_args_list}
+        self.assertEqual(by_value["prod"], {"asg-1", "asg-3"})
+        self.assertEqual(by_value["dev"], {"asg-2"})
+
+    def test_now_resolved_once_for_the_whole_run(self):
+        # a clock that moves on every read - the run should only read it once,
+        # so both asgs get stamped alike even though batch_size sends them
+        # in separate calls
+        ticks = [FormatDate(datetime(2022, 6, 27, 12, 34, 56)),
+                 FormatDate(datetime(2022, 6, 27, 12, 34, 57))]
+        with mock.patch.object(FormatDate, "utcnow", side_effect=ticks) as utcnow:
+            create_tags = self._run(
+                [{"AutoScalingGroupName": "asg-1"},
+                 {"AutoScalingGroupName": "asg-2"}],
+                {"type": "tag", "tags": {"Stamp": {
+                    "type": "resource", "key": "Nope",
+                    "default-value": "at-{now}"}}})
+        self.assertEqual(utcnow.call_count, 1)
+        stamped = [c.kwargs["Tags"][0]["Value"] for c in create_tags.call_args_list]
+        self.assertEqual(stamped, ["at-2022-06-27 12:34:56"] * 2)
+
+    def test_malformed_tag_value_rejected(self):
+        with self.assertRaises(PolicyValidationError):
+            self.load_policy(
+                {"name": "d", "resource": "asg",
+                 "actions": [{"type": "tag", "tags": {"Owner": {"foo": "bar"}}}]},
+                validate=True)
+
+    def test_tags_mapping_does_not_add_default_marker(self):
+        create_tags = self._run(
+            [{"AutoScalingGroupName": "asg-1"}],
+            {"type": "tag", "tags": {"Owner": "platform"}})
+        create_tags.assert_called_once_with(
+            Tags=[{"Key": "Owner", "Value": "platform",
+                   "PropagateAtLaunch": False,
+                   "ResourceType": "auto-scaling-group",
+                   "ResourceId": "asg-1"}])
+
+    def test_bare_mark_still_writes_default_marker(self):
+        create_tags = self._run(
+            [{"AutoScalingGroupName": "asg-1"}], {"type": "mark"})
+        create_tags.assert_called_once_with(
+            Tags=[{"Key": "maid_status",
+                   "Value": "AutoScaleGroup does not meet policy guidelines",
+                   "PropagateAtLaunch": False,
+                   "ResourceType": "auto-scaling-group",
+                   "ResourceId": "asg-1"}])
+
+    def test_auto_tag_user_does_not_add_default_marker(self):
+        mock_factory = mock.MagicMock()
+        mock_factory.region = 'us-east-1'
+        create_tags = mock_factory().client('autoscaling').create_or_update_tags
+        create_tags.return_value = {}
+        policy = self.load_policy(
+            {"name": "d", "resource": "asg",
+             "mode": {"type": "cloudtrail", "events": ["CreateAutoScalingGroup"]},
+             "actions": [{"type": "auto-tag-user", "tag": "CreatorName"}]},
+            session_factory=mock_factory)
+        action = policy.resource_manager.actions[0]
+        action.set_resource_tags(
+            {"CreatorName": "alice"}, [{"AutoScalingGroupName": "asg-1"}])
+        create_tags.assert_called_once_with(
+            Tags=[{"Key": "CreatorName", "Value": "alice",
+                   "PropagateAtLaunch": False,
+                   "ResourceType": "auto-scaling-group",
+                   "ResourceId": "asg-1"}])

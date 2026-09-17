@@ -3,11 +3,12 @@
 
 import re
 
+from c7n.exceptions import PolicyExecutionError, PolicyValidationError
 from c7n.utils import local_session, type_schema
 from c7n_gcp.provider import resources
 from c7n_gcp.query import QueryResourceManager, TypeInfo, ChildResourceManager, ChildTypeInfo, \
     GcpLocation
-from c7n_gcp.actions import SetIamPolicy
+from c7n_gcp.actions import MethodAction, SetIamPolicy
 from c7n_gcp.filters import IamPolicyFilter
 from c7n.filters import Filter
 
@@ -132,6 +133,112 @@ class KmsCryptoKey(ChildResourceManager):
         @classmethod
         def _get_location(cls, resource):
             return resource["name"].split('/')[3]
+
+
+@KmsCryptoKey.action_registry.register('update')
+class KmsCryptoKeyUpdate(MethodAction):
+    """Update mutable properties of a gcp.kms-cryptokey resource.
+
+    GCP action is https://cloud.google.com/kms/docs/reference/rest/v1/projects.locations.keyRings.cryptoKeys/patch
+
+    ``rotationPeriod``/``nextRotationTime`` are only valid for keys with
+    ``purpose`` ``ENCRYPT_DECRYPT`` (enforced at run time, not by schema).
+
+    :Example:
+
+    .. code-block:: yaml
+
+        policies:
+          - name: gcp-kms-cryptokey-set-rotation
+            resource: gcp.kms-cryptokey
+            actions:
+              - type: update
+                rotationPeriod: 7776000s
+                nextRotationTime: "2027-01-01T00:00:00Z"
+    """
+
+    rotation_fields = frozenset(('rotationPeriod', 'nextRotationTime'))
+
+    schema = type_schema(
+        'update',
+        **{
+            'rotationPeriod': {'type': 'string'},
+            'nextRotationTime': {'type': 'string'},
+            'versionTemplate': {
+                'type': 'object',
+                'minProperties': 1,
+                'additionalProperties': False,
+                'properties': {
+                    'algorithm': {'type': 'string'},
+                },
+            },
+            'keyAccessJustificationsPolicy': {
+                'type': 'object',
+                'minProperties': 1,
+                'additionalProperties': False,
+                'properties': {
+                    'allowedAccessReasons': {
+                        'type': 'array',
+                        'minItems': 1,
+                        'items': {
+                            'enum': [
+                                'REASON_UNSPECIFIED',
+                                'CUSTOMER_INITIATED_SUPPORT',
+                                'GOOGLE_INITIATED_SERVICE',
+                                'THIRD_PARTY_DATA_REQUEST',
+                                'GOOGLE_INITIATED_REVIEW',
+                                'CUSTOMER_INITIATED_ACCESS',
+                                'GOOGLE_INITIATED_SYSTEM_OPERATION',
+                                'REASON_NOT_EXPECTED',
+                                'MODIFIED_CUSTOMER_INITIATED_ACCESS',
+                                'MODIFIED_GOOGLE_INITIATED_SYSTEM_OPERATION',
+                                'GOOGLE_RESPONSE_TO_PRODUCTION_ALERT',
+                                'CUSTOMER_AUTHORIZED_WORKFLOW_SERVICING',
+                            ],
+                        },
+                    },
+                },
+            },
+        })
+    schema['dependencies'] = {
+        'rotationPeriod': ['nextRotationTime'],
+    }
+    method_spec = {'op': 'patch'}
+    method_perm = 'update'
+
+    def validate(self):
+        super().validate()
+        if not (self.data.keys() - {'type'}):
+            raise PolicyValidationError(
+                "policy:%s action:%s requires at least one field to update" % (
+                    self.manager.ctx.policy.name, self.type))
+        return self
+
+    def process_resource_set(self, client, model, resources):
+        if self.rotation_fields & self.data.keys():
+            invalid = [
+                r['name'] for r in resources
+                if r.get('purpose') != 'ENCRYPT_DECRYPT'
+            ]
+            if invalid:
+                raise PolicyExecutionError(
+                    "Automatic rotation requires CryptoKeys with purpose "
+                    "ENCRYPT_DECRYPT; found: %s" % ', '.join(invalid))
+        return super().process_resource_set(client, model, resources)
+
+    def get_resource_params(self, model, resource):
+        fields = {k: v for k, v in self.data.items() if k != 'type'}
+        mask_paths = []
+        for key, value in fields.items():
+            if isinstance(value, dict):
+                mask_paths.extend('%s.%s' % (key, subkey) for subkey in value)
+            else:
+                mask_paths.append(key)
+        return {
+            'name': resource['name'],
+            'body': fields,
+            'updateMask': ','.join(mask_paths),
+        }
 
 
 @KmsCryptoKey.filter_registry.register('iam-policy')

@@ -154,9 +154,9 @@ class FunctionPackage:
         # add config and policy
         self._add_functions_required_files(policy, requirements, queue_name, identity)
 
-    def wait_for_status(self, deployment_creds, retries=10, delay=15):
+    def wait_for_status(self, scm_uri, token, retries=10, delay=15):
         for r in range(retries):
-            if self.status(deployment_creds):
+            if self.status(scm_uri, token):
                 return True
             else:
                 self.log.info('(%s/%s) Will retry Function App status check in %s seconds...'
@@ -164,10 +164,11 @@ class FunctionPackage:
                 time.sleep(delay)
         return False
 
-    def status(self, deployment_creds):
-        status_url = '%s/api/deployments' % deployment_creds.scm_uri
+    def status(self, scm_uri, token):
+        status_url = '%s/api/deployments' % scm_uri
+        headers = {'Authorization': 'Bearer %s' % token}
 
-        r = requests.get(status_url, verify=self.enable_ssl_cert, timeout=60)
+        r = requests.get(status_url, headers=headers, verify=self.enable_ssl_cert, timeout=60)
         if r.status_code != 200:
             self.log.error("Application service returned an error.\n%s\n%s"
                            % (r.status_code, r.text))
@@ -175,13 +176,16 @@ class FunctionPackage:
 
         return True
 
-    def publish(self, deployment_creds):
+    def publish(self, scm_uri, token):
         self.close()
         # update perms of the package
         os.chmod(self.pkg.path, 0o0644)
 
-        zip_api_url = '%s/api/zipdeploy?isAsync=true&synctriggers=true' % deployment_creds.scm_uri
-        headers = {'content-type': 'application/octet-stream'}
+        zip_api_url = '%s/api/zipdeploy?isAsync=true&synctriggers=true' % scm_uri
+        headers = {
+            'content-type': 'application/octet-stream',
+            'Authorization': 'Bearer %s' % token,
+        }
         self.log.info("Publishing Function package from %s" % self.pkg.path)
 
         zip_file = self.pkg.get_bytes()

@@ -1,0 +1,70 @@
+{
+    "status_code": 200,
+    "data": {
+        "ResponseMetadata": {},
+        "collaborationList": [
+            {
+                "id": "62647862-bee9-42e8-8c07-99b0fc492f3a",
+                "arn": "arn:aws:cleanrooms:us-east-1:644160558196:collaboration/62647862-bee9-42e8-8c07-99b0fc492f3a",
+                "name": "Compliant Collaboration",
+                "creatorAccountId": "644160558196",
+                "creatorDisplayName": "Compliant Member",
+                "createTime": {
+                    "__class__": "datetime",
+                    "year": 2026,
+                    "month": 6,
+                    "day": 9,
+                    "hour": 2,
+                    "minute": 2,
+                    "second": 3,
+                    "microsecond": 366000
+                },
+                "updateTime": {
+                    "__class__": "datetime",
+                    "year": 2026,
+                    "month": 6,
+                    "day": 9,
+                    "hour": 2,
+                    "minute": 2,
+                    "second": 3,
+                    "microsecond": 366000
+                },
+                "memberStatus": "ACTIVE",
+                "membershipId": "c5773151-1c6c-40ff-86f2-543d68654295",
+                "membershipArn": "arn:aws:cleanrooms:us-east-1:644160558196:membership/c5773151-1c6c-40ff-86f2-543d68654295",
+                "analyticsEngine": "SPARK"
+            },
+            {
+                "id": "8326c03e-8c92-4cc0-9d84-3be7208e1528",
+                "arn": "arn:aws:cleanrooms:us-east-1:644160558196:collaboration/8326c03e-8c92-4cc0-9d84-3be7208e1528",
+                "name": "Noncompliant Collaboration",
+                "creatorAccountId": "644160558196",
+                "creatorDisplayName": "Noncompliant Test creator",
+                "createTime": {
+                    "__class__": "datetime",
+                    "year": 2026,
+                    "month": 6,
+                    "day": 9,
+                    "hour": 2,
+                    "minute": 19,
+                    "second": 43,
+                    "microsecond": 53000
+                },
+                "updateTime": {
+                    "__class__": "datetime",
+                    "year": 2026,
+                    "month": 6,
+                    "day": 9,
+                    "hour": 2,
+                    "minute": 19,
+                    "second": 43,
+                    "microsecond": 53000
+                },
+                "memberStatus": "ACTIVE",
+                "membershipId": "471d06d5-b382-4d18-9ad5-8e61ffe2bfac",
+                "membershipArn": "arn:aws:cleanrooms:us-east-1:644160558196:membership/471d06d5-b382-4d18-9ad5-8e61ffe2bfac",
+                "analyticsEngine": "SPARK"
+            }
+        ]
+    }
+}
