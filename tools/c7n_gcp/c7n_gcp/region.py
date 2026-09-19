@@ -39,6 +39,9 @@ class Region:
     def get_permissions(self):
         return ()
 
+    def get_resource(self, resource_info):
+        return {'name': resource_info['name']}
+
     @classmethod
     def set_regions(cls, regions):
         # test helper
