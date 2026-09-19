@@ -1350,9 +1350,14 @@ class TestSetBedrockEvaluationOutputLifecycle(BaseTest):
         session_factory = self.replay_flight_data(
             'bedrock_set_output_lifecycle_invalid_uri')
         action = self.get_action(session_factory=session_factory)
+        job_arn = 'arn:aws:bedrock:r:a:evaluation-job/id'
         # no bucket can be resolved from an invalid uri, so no s3 calls are
         # made; a missing flight data fixture would fail this test.
-        action.process([{'jobArn': 'arn:aws:bedrock:r:a:evaluation-job/id'}])
+        with self.assertLogs('custodian.actions', level='WARNING') as cm:
+            action.process([{'jobArn': job_arn}])
+        assert len(cm.output) == 1
+        assert 'missing-uri' in cm.output[0]
+        assert job_arn in cm.output[0]
 
     def test_skips_bucket_not_found_or_denied(self):
         session_factory = self.replay_flight_data(
@@ -1363,7 +1368,22 @@ class TestSetBedrockEvaluationOutputLifecycle(BaseTest):
             self.job('b', 'id-b', 'denied', 'evaluations'),
         ]
         # should not raise, and no put call is made (no fixture for it)
-        action.process(jobs)
+        with self.assertLogs('custodian.actions', level='WARNING') as cm:
+            action.process(jobs)
+        assert len(cm.output) == 2
+        assert 'unable to resolve output bucket missing' in cm.output[0]
+        assert 'access denied reading lifecycle for bucket denied' in cm.output[1]
+
+    def test_skips_bucket_with_versioning_denied(self):
+        session_factory = self.replay_flight_data(
+            'bedrock_set_output_lifecycle_versioning_denied')
+        action = self.get_action(session_factory=session_factory)
+        jobs = [self.job('a', 'id-a', 'bucket', 'evaluations')]
+        # should not raise, and no put call is made (no fixture for it)
+        with self.assertLogs('custodian.actions', level='WARNING') as cm:
+            action.process(jobs)
+        assert len(cm.output) == 1
+        assert 'access denied reading versioning for bucket bucket' in cm.output[0]
 
     def test_already_covered_skips_put(self):
         session_factory = self.replay_flight_data(

@@ -1089,6 +1089,23 @@ def _bucket_is_versioned(versioning):
     return versioning.get('Status') in ('Enabled', 'Suspended')
 
 
+def _lifecycle_rule_matches_managed_fields(existing, new_rule):
+    """Compare only the fields this action manages on a lifecycle rule.
+
+    Avoids full-dict equality so unrelated fields AWS may return on an
+    existing rule (e.g. AbortIncompleteMultipartUpload) don't force a
+    redundant put on every run.
+    """
+    return (
+        existing.get('Status') == new_rule.get('Status') and
+        existing.get('Filter') == new_rule.get('Filter') and
+        (existing.get('Expiration') or {}).get('Days') ==
+        (new_rule.get('Expiration') or {}).get('Days') and
+        (existing.get('NoncurrentVersionExpiration') or {}).get('NoncurrentDays') ==
+        (new_rule.get('NoncurrentVersionExpiration') or {}).get('NoncurrentDays')
+    )
+
+
 def get_bedrock_output_lifecycle(lifecycle, output_prefix, versioning=None):
     """Calculate covering lifecycle rules and guaranteed expiration days."""
     rules = lifecycle.get('Rules', []) if isinstance(lifecycle, dict) else []
@@ -1319,10 +1336,6 @@ class SetBedrockEvaluationOutputLifecycle(BaseAction):
                 self.log.warning(
                     "unable to resolve output bucket %s, skipping", bucket_name)
                 continue
-            if 'get_bucket_lifecycle_configuration' in bucket.get('c7n:DeniedMethods', ()):
-                self.log.warning(
-                    "access denied reading lifecycle for bucket %s, skipping", bucket_name)
- if 'get_bucket_lifecycle_configuration' in bucket.get('c7n:DeniedMethods', ()):
             denied = bucket.get('c7n:DeniedMethods', ())
             if 'get_bucket_lifecycle_configuration' in denied:
                 self.log.warning(
@@ -1332,7 +1345,6 @@ class SetBedrockEvaluationOutputLifecycle(BaseAction):
                 self.log.warning(
                     "access denied reading versioning for bucket %s, skipping", bucket_name)
                 continue
-
             self._process_bucket(session, bucket, jobs)
 
     def _process_bucket(self, session, bucket, jobs):
@@ -1360,7 +1372,7 @@ class SetBedrockEvaluationOutputLifecycle(BaseAction):
                 new_rule['NoncurrentVersionExpiration'] = {'NoncurrentDays': days}
             for index, existing in enumerate(rules):
                 if existing.get('ID') == rule_id:
-                    if existing != new_rule:
+                    if not _lifecycle_rule_matches_managed_fields(existing, new_rule):
                         rules[index] = new_rule
                         changed = True
                     break
