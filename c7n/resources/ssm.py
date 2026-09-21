@@ -9,7 +9,7 @@ from c7n.actions import Action
 from c7n.exceptions import PolicyValidationError
 from c7n.filters import Filter, CrossAccountAccessFilter, ValueFilter
 from c7n.filters.kms import KmsRelatedFilter
-from c7n.query import QueryResourceManager, TypeInfo
+from c7n.query import QueryResourceManager, DescribeSource, TypeInfo
 from c7n.manager import resources
 from c7n.tags import universal_augment
 from c7n.utils import chunks, get_retry, local_session, type_schema, filter_empty
@@ -17,6 +17,64 @@ from c7n.version import version
 
 from .aws import shape_validate
 from .ec2 import EC2
+
+
+SSM_SERVICE_SETTING_ID = '/ssm/documents/console/public-sharing-permission'
+
+
+class DescribeSSMServiceSetting(DescribeSource):
+    """Source for the regional SSM console public-sharing setting."""
+
+    def get_permissions(self):
+        return ('ssm:GetServiceSetting',)
+
+    def get_setting(self):
+        client = local_session(self.manager.session_factory).client('ssm')
+        return client.get_service_setting(
+            SettingId=SSM_SERVICE_SETTING_ID)['ServiceSetting']
+
+    def resources(self, query=None):
+        return [self.get_setting()]
+
+    def get_resources(self, ids, cache=True, augment=True):
+        setting = self.get_setting()
+        if not ids or setting['SettingId'] in ids:
+            return [setting]
+        return []
+
+
+@resources.register('ssm-service-setting')
+class SSMServiceSetting(QueryResourceManager):
+    """Regional account-level SSM console public-sharing service setting."""
+
+    class resource_type(TypeInfo):
+        service = 'ssm'
+        id = name = 'SettingId'
+        arn_type = 'servicesetting'
+
+    source_mapping = {'describe': DescribeSSMServiceSetting}
+
+
+@SSMServiceSetting.action_registry.register('enforce')
+class EnforceSSMServiceSetting(Action):
+    """Enforce the SSM console public-sharing setting.
+
+    Set the value to ``Disable`` to block public sharing from the SSM
+    Documents console. The setting is account-level and regional.
+    """
+
+    schema = type_schema(
+        'enforce',
+        value={'type': 'string', 'enum': ['Enable', 'Disable']})
+    permissions = ('ssm:UpdateServiceSetting',)
+
+    def process(self, resources):
+        client = local_session(self.manager.session_factory).client('ssm')
+        value = self.data.get('value', 'Disable')
+        for resource in resources:
+            client.update_service_setting(
+                SettingId=resource.get('SettingId', SSM_SERVICE_SETTING_ID),
+                SettingValue=value)
 
 
 @resources.register('ssm-parameter')

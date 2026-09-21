@@ -2,6 +2,7 @@
 # SPDX-License-Identifier: Apache-2.0
 import json
 import time
+from unittest.mock import MagicMock, patch
 
 from c7n.exceptions import PolicyValidationError
 from pytest_terraform import terraform
@@ -128,6 +129,71 @@ class TestOpsCenter(BaseTest):
 
 
 class TestSSM(BaseTest):
+
+    def test_ssm_service_setting_query(self):
+        client = MagicMock()
+        client.get_service_setting.return_value = {
+            'ServiceSetting': {
+                'SettingId': '/ssm/documents/console/public-sharing-permission',
+                'SettingValue': 'Enable',
+                'Status': 'Default'}}
+        session = MagicMock()
+        session.client.return_value = client
+        manager = MagicMock(session_factory=MagicMock())
+
+        with patch('c7n.resources.ssm.local_session', return_value=session):
+            from c7n.resources.ssm import DescribeSSMServiceSetting
+            source = DescribeSSMServiceSetting(manager)
+            resources = source.resources()
+            matching = source.get_resources([
+                '/ssm/documents/console/public-sharing-permission'])
+            missing = source.get_resources(['/ssm/unknown'])
+
+        self.assertEqual(source.get_permissions(), ('ssm:GetServiceSetting',))
+        self.assertEqual(resources[0]['SettingValue'], 'Enable')
+        self.assertEqual(matching[0]['SettingValue'], 'Enable')
+        self.assertEqual(missing, [])
+        client.get_service_setting.assert_called_with(
+            SettingId='/ssm/documents/console/public-sharing-permission')
+
+    def test_ssm_service_setting_enforce_defaults_to_disable(self):
+        client = MagicMock()
+        session = MagicMock()
+        session.client.return_value = client
+        manager = MagicMock(session_factory=MagicMock())
+
+        with patch('c7n.resources.ssm.local_session', return_value=session):
+            from c7n.resources.ssm import EnforceSSMServiceSetting
+            EnforceSSMServiceSetting({'type': 'enforce'}, manager).process([{
+                'SettingId': '/ssm/documents/console/public-sharing-permission'}])
+
+        client.update_service_setting.assert_called_once_with(
+            SettingId='/ssm/documents/console/public-sharing-permission',
+            SettingValue='Disable')
+
+    def test_ssm_service_setting_policy(self):
+        client = MagicMock()
+        client.get_service_setting.return_value = {
+            'ServiceSetting': {
+                'SettingId': '/ssm/documents/console/public-sharing-permission',
+                'SettingValue': 'Enable',
+                'Status': 'Default'}}
+        session = MagicMock()
+        session.client.return_value = client
+
+        with patch('c7n.resources.ssm.local_session', return_value=session):
+            p = self.load_policy({
+                'name': 'disable-ssm-document-public-sharing',
+                'resource': 'aws.ssm-service-setting',
+                'filters': [{'SettingValue': 'Enable'}],
+                'actions': [{'type': 'enforce'}]})
+            resources = p.run()
+
+        self.assertEqual(len(resources), 1)
+        self.assertEqual(resources[0]['SettingValue'], 'Enable')
+        client.update_service_setting.assert_called_once_with(
+            SettingId='/ssm/documents/console/public-sharing-permission',
+            SettingValue='Disable')
 
     def test_ec2_ssm_send_command_validate(self):
         self.assertRaises(
