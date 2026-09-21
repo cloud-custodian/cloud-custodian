@@ -38,3 +38,19 @@ as a large portion of our contributor community don't have familiarity with it.
 The contributor agreement signing  process is managed through the use of the Linux Foundation's EasyCLA opensource project
 and is automatically verified on any pull requests.
 
+
+Governance
+----------
+
+See `GOVERNANCE.md <https://github.com/cloud-custodian/cloud-custodian/blob/main/GOVERNANCE.md>`_
+for details on project areas, maintainer roles, and decision-making, and
+`OWNERS.md <https://github.com/cloud-custodian/cloud-custodian/blob/main/OWNERS.md>`_
+for the current list of maintainers.
+
+
+Security
+--------
+
+See `SECURITY.md <https://github.com/cloud-custodian/cloud-custodian/blob/main/SECURITY.md>`_
+for how to report a security related issue or vulnerability.
+
