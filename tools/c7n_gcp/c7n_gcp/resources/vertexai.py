@@ -840,6 +840,7 @@ class VertexAIMetadataStoreArtifact(VertexAIQueryManager):
 
         all_resources = []
         location_annotation_key = 'c7n:location'
+        enum_op, path, _ = self.resource_type.enum_spec
 
         for location_instance in location_manager.resources():
             location = location_instance['name']
@@ -855,8 +856,8 @@ class VertexAIMetadataStoreArtifact(VertexAIQueryManager):
                             session, location, self.resource_type.component)
                     artifacts = []
                     for artifact_page in artifact_client.execute_paged_query(
-                            'list', {'parent': store['name']}):
-                        page_items = jmespath_search('artifacts[]', artifact_page)
+                            enum_op, {'parent': store['name']}):
+                        page_items = jmespath_search(path, artifact_page)
                         if page_items:
                             artifacts.extend(page_items)
 
