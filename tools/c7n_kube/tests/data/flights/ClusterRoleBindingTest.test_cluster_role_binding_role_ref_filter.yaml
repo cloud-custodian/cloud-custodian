@@ -1,0 +1,68 @@
+interactions:
+- request:
+    body: null
+    headers: &id001
+      Accept: application/json
+      Content-Type: application/json
+      User-Agent: Swagger-Codegen/10.0.1/python
+    method: GET
+    uri: https://ghost/apis/rbac.authorization.k8s.io/v1/clusterrolebindings
+  response:
+    body:
+      string: '{"kind": "ClusterRoleBindingList", "apiVersion": "rbac.authorization.k8s.io/v1",
+        "items": [{"metadata": {"name": "cluster-admin"}, "roleRef": {"apiGroup":
+        "rbac.authorization.k8s.io", "kind": "ClusterRole", "name": "cluster-admin"},
+        "subjects": [{"kind": "User", "name": "test-user"}]}, {"metadata": {"name":
+        "cert-manager-cainjector"}, "roleRef": {"apiGroup": "rbac.authorization.k8s.io",
+        "kind": "ClusterRole", "name": "cert-manager-cainjector"}, "subjects": [{"kind":
+        "User", "name": "test-user"}]}, {"metadata": {"name": "system:controller:token-cleaner"},
+        "roleRef": {"apiGroup": "rbac.authorization.k8s.io", "kind": "ClusterRole",
+        "name": "system:controller:token-cleaner"}, "subjects": [{"kind": "User",
+        "name": "test-user"}]}]}
+
+
+        '
+    headers: &id002
+      Cache-Control: no-cache, private
+      Content-Type: application/json
+      Date: Tue, 25 Oct 2022 13:31:34 GMT
+    status:
+      code: 200
+      message: OK
+- request:
+    body: null
+    headers: *id001
+    method: GET
+    uri: https://ghost/apis/rbac.authorization.k8s.io/v1/clusterroles
+  response:
+    body:
+      string: '{"kind": "ClusterRoleList", "apiVersion": "rbac.authorization.k8s.io/v1",
+        "items": [{"metadata": {"name": "cluster-admin"}, "rules": [{"verbs": ["*"],
+        "apiGroups": ["*"], "resources": ["*"]}]}, {"metadata": {"name": "cert-manager-cainjector"},
+        "rules": [{"verbs": ["get"], "apiGroups": [""], "resources": ["events"]}]},
+        {"metadata": {"name": "system:controller:token-cleaner"}, "rules": [{"verbs":
+        ["delete"], "apiGroups": [""], "resources": ["secrets"]}]}]}
+
+
+        '
+    headers: *id002
+    status:
+      code: 200
+      message: OK
+- request:
+    body: null
+    headers: *id001
+    method: GET
+    uri: https://ghost/apis/rbac.authorization.k8s.io/v1/roles
+  response:
+    body:
+      string: '{"kind": "RoleList", "apiVersion": "rbac.authorization.k8s.io/v1",
+        "items": []}
+
+
+        '
+    headers: *id002
+    status:
+      code: 200
+      message: OK
+version: 1

@@ -1,0 +1,36 @@
+interactions:
+- request:
+    body: null
+    headers:
+      Accept:
+      - application/json
+      Content-Type:
+      - application/json
+      User-Agent:
+      - Swagger-Codegen/10.0.1/python
+    method: GET
+    uri: https://ghost/apis/rbac.authorization.k8s.io/v1/clusterrolebindings
+  response:
+    body:
+      string: '{"kind":"ClusterRoleBindingList","apiVersion":"rbac.authorization.k8s.io/v1","metadata":{"resourceVersion":"1156146"},"items":[{"metadata":{"name":"cluster-admin","uid":"6c9e0f2b-1d4a-4b8b-9f3e-1a2b3c4d5e6f","resourceVersion":"175","creationTimestamp":"2022-10-10T15:02:29Z","labels":{"kubernetes.io/bootstrapping":"rbac-defaults"},"annotations":{"rbac.authorization.kubernetes.io/autoupdate":"true"}},"roleRef":{"apiGroup":"rbac.authorization.k8s.io","kind":"ClusterRole","name":"cluster-admin"},"subjects":[{"kind":"Group","apiGroup":"rbac.authorization.k8s.io","name":"system:masters"}]},{"metadata":{"name":"cert-manager-cainjector","uid":"7d8e1f3c-2e5b-4c9c-a04f-2b3c4d5e6f70","resourceVersion":"15745","creationTimestamp":"2022-10-10T18:46:55Z","labels":{"app":"cainjector","app.kubernetes.io/component":"cainjector","app.kubernetes.io/instance":"cert-manager","app.kubernetes.io/name":"cainjector"}},"roleRef":{"apiGroup":"rbac.authorization.k8s.io","kind":"ClusterRole","name":"cert-manager-cainjector"},"subjects":[{"kind":"ServiceAccount","name":"cert-manager-cainjector","namespace":"cert-manager"}]},{"metadata":{"name":"system:controller:token-cleaner","uid":"8e9f2a4d-3f6c-4d0d-b15a-3c4d5e6f7081","resourceVersion":"183","creationTimestamp":"2022-10-10T15:02:29Z","labels":{"kubernetes.io/bootstrapping":"rbac-defaults"},"annotations":{"rbac.authorization.kubernetes.io/autoupdate":"true"}},"roleRef":{"apiGroup":"rbac.authorization.k8s.io","kind":"ClusterRole","name":"system:controller:token-cleaner"},"subjects":[{"kind":"ServiceAccount","name":"token-cleaner","namespace":"kube-system"}]}]}
+
+        '
+    headers:
+      Audit-Id:
+      - 8b6b7a2e-1234-4f3c-91ad-abcdef012345
+      Cache-Control:
+      - no-cache, private
+      Content-Type:
+      - application/json
+      Date:
+      - Tue, 25 Oct 2022 13:31:34 GMT
+      Transfer-Encoding:
+      - chunked
+      X-Kubernetes-Pf-Flowschema-Uid:
+      - 6934332f-22cd-43ef-a389-9620e5d58cb6
+      X-Kubernetes-Pf-Prioritylevel-Uid:
+      - 2ff72234-6653-4ad6-9a50-8b48c49c6a7e
+    status:
+      code: 200
+      message: OK
+version: 1
