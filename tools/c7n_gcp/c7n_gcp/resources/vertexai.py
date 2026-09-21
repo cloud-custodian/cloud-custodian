@@ -819,6 +819,7 @@ class VertexAIMetadataStoreArtifact(VertexAIQueryManager):
             'aiplatform.metadataStores.list',
             )
         urn_component = 'metadata-store-artifact'
+        urn_id_segments = (-3, -1)
 
     def _fetch_resources(self, query):
         """Enumerate artifacts across every location and metadata store.

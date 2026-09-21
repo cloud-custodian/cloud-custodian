@@ -2054,6 +2054,28 @@ def test_vertexai_metadata_store_artifact_resource_registered(test):
         'projects.locations.metadataStores.artifacts')
 
 
+def test_vertexai_metadata_store_artifact_get_urns(test):
+    policy = test.load_policy(
+        {'name': 'vertexai-metadata-store-artifact-urns',
+         'resource': 'gcp.vertex-ai-metadata-store-artifact'})
+    artifacts = [
+        {'name': ('projects/cloud-custodian/locations/us-central1/'
+                  'metadataStores/store-a/artifacts/labeled')},
+        {'name': ('projects/cloud-custodian/locations/us-central1/'
+                  'metadataStores/store-b/artifacts/labeled')},
+        ]
+
+    assert policy.resource_manager.resource_type.get_urns(
+        artifacts,
+        'cloud-custodian',
+        ) == [
+            ('gcp:aiplatform:us-central1:cloud-custodian:'
+             'metadata-store-artifact/store-a/labeled'),
+            ('gcp:aiplatform:us-central1:cloud-custodian:'
+             'metadata-store-artifact/store-b/labeled'),
+            ]
+
+
 @terraform('vertexai_metadata_store', scope='module')
 def test_vertexai_metadata_store_artifact_filtering(test, vertexai_metadata_store):
     """Test filtering Metadata Store Artifacts on a missing label.
