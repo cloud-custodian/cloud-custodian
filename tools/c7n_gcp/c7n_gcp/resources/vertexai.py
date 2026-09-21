@@ -845,12 +845,14 @@ class VertexAIMetadataStoreArtifact(VertexAIQueryManager):
             location = location_instance['name']
             store_client = self.get_location_client(
                 session, location, 'projects.locations.metadataStores')
-            artifact_client = self.get_location_client(
-                session, location, self.resource_type.component)
+            artifact_client = None
 
             parent = f'projects/{project}/locations/{location}'
             for store_page in store_client.execute_paged_query('list', {'parent': parent}):
                 for store in jmespath_search('metadataStores[]', store_page) or []:
+                    if artifact_client is None:
+                        artifact_client = self.get_location_client(
+                            session, location, self.resource_type.component)
                     artifacts = []
                     for artifact_page in artifact_client.execute_paged_query(
                             'list', {'parent': store['name']}):

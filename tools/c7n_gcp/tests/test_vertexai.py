@@ -2076,6 +2076,41 @@ def test_vertexai_metadata_store_artifact_get_urns(test):
             ]
 
 
+def test_vertexai_metadata_store_artifact_skips_client_without_stores(test):
+    policy = test.load_policy(
+        {'name': 'vertexai-metadata-store-artifact-empty-location',
+         'resource': 'gcp.vertex-ai-metadata-store-artifact'})
+    manager = policy.resource_manager
+    session = Mock()
+    session.get_default_project.return_value = 'cloud-custodian'
+    location_manager = Mock()
+    location_manager.resources.return_value = [{'name': 'us-central1'}]
+    store_client = Mock()
+    store_client.execute_paged_query.return_value = [{}]
+
+    with (
+        patch('c7n_gcp.resources.vertexai.local_session', return_value=session),
+        patch.object(
+            manager,
+            'get_resource_manager',
+            return_value=location_manager,
+            ),
+        patch.object(
+            manager,
+            'get_location_client',
+            return_value=store_client,
+            ) as get_location_client,
+        ):
+        resources = manager._fetch_resources({})
+
+    assert resources == []
+    get_location_client.assert_called_once_with(
+        session,
+        'us-central1',
+        'projects.locations.metadataStores',
+        )
+
+
 @terraform('vertexai_metadata_store', scope='module')
 def test_vertexai_metadata_store_artifact_filtering(test, vertexai_metadata_store):
     """Test filtering Metadata Store Artifacts on a missing label.
