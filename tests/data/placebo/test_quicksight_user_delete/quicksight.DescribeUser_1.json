@@ -1,0 +1,13 @@
+{
+    "status_code": 404,
+    "data": {
+        "Error": {
+            "Message": "AWS account id: 644160558196, Namespace: default, Username: c7n-test. ",
+            "Code": "ResourceNotFoundException"
+        },
+        "ResponseMetadata": {},
+        "Message": "AWS account id: 644160558196, Namespace: default, Username: c7n-test. ",
+        "ResourceType": "USER",
+        "RequestId": "8a147eb0-d171-4d10-8112-7896710b0761"
+    }
+}

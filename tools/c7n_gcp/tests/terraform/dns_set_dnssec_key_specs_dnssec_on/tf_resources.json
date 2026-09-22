@@ -1,0 +1,62 @@
+{
+    "pytest-terraform": 1,
+    "outputs": {},
+    "resources": {
+        "google_dns_managed_zone": {
+            "public_zone": {
+                "cloud_logging_config": [
+                    {
+                        "enable_logging": false
+                    }
+                ],
+                "creation_time": "2026-03-10T16:48:33.653Z",
+                "description": "Managed by Terraform",
+                "dns_name": "c7n-dnssec-on-test.example.com.",
+                "dnssec_config": [
+                    {
+                        "default_key_specs": [
+                            {
+                                "algorithm": "rsasha256",
+                                "key_length": 2048,
+                                "key_type": "keySigning",
+                                "kind": "dns#dnsKeySpec"
+                            },
+                            {
+                                "algorithm": "rsasha256",
+                                "key_length": 1024,
+                                "key_type": "zoneSigning",
+                                "kind": "dns#dnsKeySpec"
+                            }
+                        ],
+                        "kind": "dns#managedZoneDnsSecConfig",
+                        "non_existence": "nsec3",
+                        "state": "on"
+                    }
+                ],
+                "effective_labels": {
+                    "goog-terraform-provisioned": "true"
+                },
+                "force_destroy": false,
+                "forwarding_config": [],
+                "id": "projects/cloud-custodian/managedZones/c7n-dnssec-on-test-zone",
+                "labels": null,
+                "managed_zone_id": 794545147190172705,
+                "name": "c7n-dnssec-on-test-zone",
+                "name_servers": [
+                    "ns-cloud-c1.googledomains.com.",
+                    "ns-cloud-c2.googledomains.com.",
+                    "ns-cloud-c3.googledomains.com.",
+                    "ns-cloud-c4.googledomains.com."
+                ],
+                "peering_config": [],
+                "private_visibility_config": [],
+                "project": "markos-stacklet",
+                "terraform_labels": {
+                    "goog-terraform-provisioned": "true"
+                },
+                "timeouts": null,
+                "visibility": "public"
+            }
+        }
+    }
+}

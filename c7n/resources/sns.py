@@ -18,6 +18,13 @@ from c7n.resources.securityhub import PostFinding
 
 class DescribeTopic(DescribeSource):
 
+    def get_resources(self, ids, cache=True):
+        # list_topics has no server-side filter, so the default get-by-id path
+        # lists every topic and matches client-side. We already have the ARNs,
+        # so build resources directly and let augment() enrich them; a stale
+        # arn just 404s in get_topic_attributes and is dropped (is_not_found).
+        return [{'TopicArn': i} for i in ids]
+
     def augment(self, resources):
         resources = super().augment(resources)
         return universal_augment(self.manager, resources)

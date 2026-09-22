@@ -1,0 +1,31 @@
+{
+    "status_code": 200,
+    "data": {
+        "PaginationToken": "",
+        "ResourceTagMappingList": [
+            {
+                "ResourceARN": "arn:aws:directconnect:us-east-1:11111111111:dxcon/dxcon-fgzcsn9l",
+                "Tags": [
+                    {
+                        "Key": "existing",
+                        "Value": "existing"
+                    },
+                    {
+                        "Key": "directconnect:resiliency-bundle-id",
+                        "Value": "9694dd42-f543-4b1b-9c11-074d695a0d2b"
+                    }
+                ]
+            },
+            {
+                "ResourceARN": "arn:aws:directconnect:us-east-1:11111111111:dxcon/dxcon-ffy37lbl",
+                "Tags": [
+                    {
+                        "Key": "existing",
+                        "Value": "existing"
+                    }
+                ]
+            }
+        ],
+        "ResponseMetadata": {}
+    }
+}

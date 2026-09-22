@@ -1,0 +1,16 @@
+{
+    "status_code": 200,
+    "data": {
+        "ResponseMetadata": {
+            "RetryAttempts": 0,
+            "HTTPStatusCode": 200,
+            "RequestId": "test-list-webacls-001"
+        },
+        "WebACLs": [
+            {
+                "WebACLId": "aaa11111-0fd2-4e07-a74c-27bf25adc0bf",
+                "Name": "FMManagedWebACLb9879827-21f7-46e5-872b-23e2bf811adc"
+            }
+        ]
+    }
+}

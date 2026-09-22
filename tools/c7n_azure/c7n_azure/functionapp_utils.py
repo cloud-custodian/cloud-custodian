@@ -98,16 +98,20 @@ class FunctionAppUtilities:
     @classmethod
     def publish_functions_package(cls, function_params, package):
         session = local_session(Session)
-        web_client = session.client('azure.mgmt.web.WebSiteManagementClient')
 
         cls.log.info('Publishing Function application')
 
-        publish_creds = web_client.web_apps.begin_list_publishing_credentials(
-            function_params.function_app['resource_group_name'],
-            function_params.function_app['name']).result()
+        app_name = function_params.function_app['name']
 
-        if package.wait_for_status(publish_creds):
-            package.publish(publish_creds)
+        # Use an Entra ID bearer token instead of SCM Basic Auth publishing credentials, so
+        # deployment works in tenants where Basic Auth is disabled by policy. Requires the
+        # deploying identity to hold Website Contributor (or equivalent) on the Function App.
+        scm_uri = 'https://{}.scm.azurewebsites.net'.format(app_name)
+        token_scope = session.cloud_endpoints.endpoints.resource_manager.rstrip('/') + '/.default'
+        token = session.get_credentials().get_token(token_scope).token
+
+        if package.wait_for_status(scm_uri, token):
+            package.publish(scm_uri, token)
             cls.log.info('Finished publishing Function application')
         else:
             cls.log.error("Aborted deployment, ensure Application Service is healthy.")

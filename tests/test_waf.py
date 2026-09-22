@@ -19,6 +19,56 @@ class WAFTest(BaseTest):
         )
         self.assertEqual(resources[0]["DefaultAction"], {"Type": "BLOCK"})
 
+    def test_waf_delete(self):
+        session_factory = self.replay_flight_data("test_waf_delete")
+        p = self.load_policy(
+            {
+                "name": "waf-delete-test",
+                "resource": "waf",
+                "filters": [
+                    {
+                        "type": "value",
+                        "key": "Name",
+                        "op": "regex",
+                        "value": "^FMManagedWebACL.*",
+                    }
+                ],
+                "actions": [{"type": "delete"}],
+            },
+            session_factory=session_factory,
+        )
+        resources = p.run()
+        self.assertEqual(len(resources), 1)
+        self.assertEqual(
+            resources[0]["Name"],
+            "FMManagedWebACLb9879827-21f7-46e5-872b-23e2bf811adc",
+        )
+
+    def test_waf_regional_delete(self):
+        session_factory = self.replay_flight_data("test_waf_regional_delete")
+        p = self.load_policy(
+            {
+                "name": "waf-regional-delete-test",
+                "resource": "waf-regional",
+                "filters": [
+                    {
+                        "type": "value",
+                        "key": "Name",
+                        "op": "regex",
+                        "value": "^FMManagedWebACL.*",
+                    }
+                ],
+                "actions": [{"type": "delete"}],
+            },
+            session_factory=session_factory,
+        )
+        resources = p.run()
+        self.assertEqual(len(resources), 1)
+        self.assertEqual(
+            resources[0]["Name"],
+            "FMManagedWebACLregional-test",
+        )
+
     def test_wafv2_resolve_resources(self):
         session_factory = self.replay_flight_data(
             "test_wafv2_resolve_resources",

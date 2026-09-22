@@ -1,0 +1,24 @@
+{
+    "status_code": 200,
+    "data": {
+        "WebACL": {
+            "WebACLId": "aaa11111-0fd2-4e07-a74c-27bf25adc0bf",
+            "Name": "FMManagedWebACLb9879827-21f7-46e5-872b-23e2bf811adc",
+            "DefaultAction": {"Type": "ALLOW"},
+            "Rules": [
+                {
+                    "Priority": 1,
+                    "RuleId": "rule-001",
+                    "Action": {"Type": "BLOCK"},
+                    "Type": "REGULAR"
+                }
+            ],
+            "MetricName": "FMManagedWebACL"
+        },
+        "ResponseMetadata": {
+            "RetryAttempts": 0,
+            "HTTPStatusCode": 200,
+            "RequestId": "test-get-webacl-001"
+        }
+    }
+}

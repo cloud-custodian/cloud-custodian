@@ -1,0 +1,15 @@
+{
+    "status_code": 200,
+    "data": {
+        "ResponseMetadata": {},
+        "ETag": "E2QWRUHAPOMQZL",
+        "DistributionConfig": {
+            "CallerReference": "ref-1",
+            "Origins": {"Quantity": 1, "Items": [{"Id": "S3", "DomainName": "bucket.s3.amazonaws.com"}]},
+            "DefaultCacheBehavior": {"ViewerProtocolPolicy": "https-only", "TargetOriginId": "S3"},
+            "Comment": "",
+            "Enabled": true,
+            "WebACLId": ""
+        }
+    }
+}

@@ -3,25 +3,25 @@
     "data": {
         "Keys": [
             {
-                "KeyArn": "arn:aws:payment-cryptography:us-east-1:111111111111:key/abcdigxuedzuzbwn",
+                "KeyArn": "arn:aws:payment-cryptography:us-east-1:111111111111:key/abcdegxuedzuzbwn",
                 "KeyState": "CREATE_COMPLETE",
                 "KeyAttributes": {
-                    "KeyUsage": "TR31_C0_CARD_VERIFICATION_KEY",
+                    "KeyUsage": "TR31_P0_PIN_ENCRYPTION_KEY",
                     "KeyClass": "SYMMETRIC_KEY",
                     "KeyAlgorithm": "TDES_2KEY",
                     "KeyModesOfUse": {
-                        "Encrypt": false,
-                        "Decrypt": false,
-                        "Wrap": false,
-                        "Unwrap": false,
-                        "Generate": true,
+                        "Encrypt": true,
+                        "Decrypt": true,
+                        "Wrap": true,
+                        "Unwrap": true,
+                        "Generate": false,
                         "Sign": false,
-                        "Verify": true,
+                        "Verify": false,
                         "DeriveKey": false,
                         "NoRestrictions": false
                     }
                 },
-                "KeyCheckValue": "8EA237",
+                "KeyCheckValue": "C19C35",
                 "Exportable": true,
                 "Enabled": true
             }

@@ -322,7 +322,5 @@ class KafkaCrossAccountAccessFilter(CrossAccountAccessFilter):
                 client.get_cluster_policy,
                 ClusterArn=r['ClusterArn'],
                 ignore_err_codes=('ResourceNotFoundException'))
-        if result:
-            policy = result.get(self.policy_attribute, None)
-            r[self.policy_annotation] = policy
-        return policy
+        r[self.policy_annotation] = result.get(self.policy_attribute, None) if result else None
+        return r[self.policy_annotation]

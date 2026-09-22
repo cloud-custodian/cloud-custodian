@@ -1,0 +1,15 @@
+{
+    "status_code": 200,
+    "data": {
+        "ResponseMetadata": {},
+        "Status": 200,
+        "AccountInfo": {
+            "AccountName": "c7n-test",
+            "Edition": "ENTERPRISE",
+            "NotificationEmail": "test@c7n.com",
+            "AuthenticationType": "IDENTITY_POOL",
+            "AccountSubscriptionStatus": "ACCOUNT_CREATED"
+        },
+        "RequestId": "eb787387-d509-41b6-901d-7b6b1690cf00"
+    }
+}

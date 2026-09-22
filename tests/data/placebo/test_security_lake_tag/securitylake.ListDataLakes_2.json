@@ -1,0 +1,17 @@
+{
+    "status_code": 200,
+    "data": {
+        "ResponseMetadata": {},
+        "dataLakes": [
+            {
+                "dataLakeArn": "arn:aws:securitylake:us-east-1:644160558196:data-lake/default",
+                "region": "us-east-1",
+                "s3BucketArn": "arn:aws:s3:::aws-security-data-lake-us-east-1-abc123",
+                "createStatus": "COMPLETED",
+                "encryptionConfiguration": {
+                    "kmsKeyId": "S3_MANAGED_KEY"
+                }
+            }
+        ]
+    }
+}

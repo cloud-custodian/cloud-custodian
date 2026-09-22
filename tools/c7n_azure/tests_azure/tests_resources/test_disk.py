@@ -83,7 +83,7 @@ class ModifyDiskTypeTests(BaseTest):
 
     # --- TESTING new Action--- ###
 
-    @pytest.mark.vcr(record_mode='ALL')
+    @pytest.mark.vcr(record_mode='all')
     @arm_template('disk_type_modify.json')
     @cassette_name('change_sku_unattached_disks')
     def test_change_sku_unattached_disks(self):
@@ -119,7 +119,7 @@ class ModifyDiskTypeTests(BaseTest):
             disk = self._fetch_disk(resource['id'])
             self.assertEqual(disk.sku.name, 'Standard_LRS')
 
-    @pytest.mark.vcr(record_mode='ALL')
+    @pytest.mark.vcr(record_mode='all')
     @arm_template('disk_type_modify.json')
     @cassette_name('change-attached-disk-type')
     def test_change_sku_attached_disks(self):
@@ -156,7 +156,7 @@ class ModifyDiskTypeTests(BaseTest):
             self.assertEqual(disk.sku.name, 'Standard_LRS')
             self.assertIsNotNone(disk.last_ownership_update_time)
 
-    @pytest.mark.vcr(record_mode='ALL')
+    @pytest.mark.vcr(record_mode='all')
     @arm_template('disk_type_modify.json')
     @cassette_name('no-change-for-correct-type')
     def test_no_change_for_correct_sku(self):
@@ -187,7 +187,7 @@ class ModifyDiskTypeTests(BaseTest):
             disk = self._fetch_disk(resource['id'])
             self.assertEqual(disk.sku.name, 'Standard_LRS')
 
-    @pytest.mark.vcr(record_mode='ALL')
+    @pytest.mark.vcr(record_mode='all')
     @arm_template('disk_type_modify.json')
     @cassette_name('skip-unsupported-disk-state')
     def test_skip_unsupported_disk_state(self):

@@ -1,0 +1,31 @@
+{
+  "headers": {
+    "content-type": "application/json; charset=UTF-8",
+    "vary": "Origin, X-Origin, Referer",
+    "date": "Tue, 07 Jul 2026 20:56:24 GMT",
+    "server": "ESF",
+    "x-xss-protection": "0",
+    "x-frame-options": "SAMEORIGIN",
+    "x-content-type-options": "nosniff",
+    "alt-svc": "h3=\":443\"; ma=2592000,h3-29=\":443\"; ma=2592000",
+    "transfer-encoding": "chunked",
+    "status": "200",
+    "content-length": "791",
+    "-content-encoding": "gzip"
+  },
+  "body": {
+    "kind": "compute#operation",
+    "id": "5628127673153804567",
+    "name": "operation-1783457784661-6560b9fba0684-ff36a1a7-f5c3ab7c",
+    "zone": "https://www.googleapis.com/compute/v1/projects/cloud-custodian/zones/us-central1-a",
+    "operationType": "setMetadata",
+    "targetLink": "https://www.googleapis.com/compute/v1/projects/cloud-custodian/zones/us-central1-a/instances/distinct-lab",
+    "targetId": "1726110852075018505",
+    "status": "RUNNING",
+    "user": "caleb.syring@sixfeetup.com",
+    "progress": 0,
+    "insertTime": "2026-07-07T13:56:24.855-07:00",
+    "startTime": "2026-07-07T13:56:24.866-07:00",
+    "selfLink": "https://www.googleapis.com/compute/v1/projects/cloud-custodian/zones/us-central1-a/operations/operation-1783457784661-6560b9fba0684-ff36a1a7-f5c3ab7c"
+  }
+}

@@ -1,0 +1,212 @@
+{
+    "status_code": 200,
+    "data": {
+        "ResponseMetadata": {},
+        "DomainStatusList": [
+            {
+                "DomainId": "644160558196/c7n-test-es-update-config",
+                "DomainName": "c7n-test-es-update-config",
+                "ARN": "arn:aws:es:us-east-1:644160558196:domain/c7n-test-es-update-config",
+                "Created": true,
+                "Deleted": false,
+                "Endpoint": "search-c7n-test-es-update-config-iplz5qqp6nbbanqmdbrd3hlice.us-east-1.es.amazonaws.com",
+                "Processing": false,
+                "UpgradeProcessing": false,
+                "ElasticsearchVersion": "7.10",
+                "ElasticsearchClusterConfig": {
+                    "InstanceType": "t3.small.elasticsearch",
+                    "InstanceCount": 1,
+                    "DedicatedMasterEnabled": false,
+                    "ZoneAwarenessEnabled": false,
+                    "WarmEnabled": false,
+                    "ColdStorageOptions": {
+                        "Enabled": false
+                    }
+                },
+                "EBSOptions": {
+                    "EBSEnabled": true,
+                    "VolumeType": "gp2",
+                    "VolumeSize": 10
+                },
+                "AccessPolicies": "",
+                "SnapshotOptions": {
+                    "AutomatedSnapshotStartHour": 0
+                },
+                "CognitoOptions": {
+                    "Enabled": false
+                },
+                "EncryptionAtRestOptions": {
+                    "Enabled": false
+                },
+                "NodeToNodeEncryptionOptions": {
+                    "Enabled": false
+                },
+                "AdvancedOptions": {
+                    "override_main_response_version": "false",
+                    "rest.action.multi.allow_explicit_index": "true"
+                },
+                "ServiceSoftwareOptions": {
+                    "CurrentVersion": "Elasticsearch_7_10_R20251106",
+                    "NewVersion": "",
+                    "UpdateAvailable": false,
+                    "Cancellable": false,
+                    "UpdateStatus": "COMPLETED",
+                    "Description": "There is no software update available for this domain.",
+                    "AutomatedUpdateDate": {
+                        "__class__": "datetime",
+                        "year": 1969,
+                        "month": 12,
+                        "day": 31,
+                        "hour": 19,
+                        "minute": 0,
+                        "second": 0,
+                        "microsecond": 0
+                    },
+                    "OptionalDeployment": true
+                },
+                "DomainEndpointOptions": {
+                    "EnforceHTTPS": false,
+                    "TLSSecurityPolicy": "Policy-Min-TLS-1-2-2019-07",
+                    "CustomEndpointEnabled": false
+                },
+                "AdvancedSecurityOptions": {
+                    "Enabled": false,
+                    "InternalUserDatabaseEnabled": false,
+                    "AnonymousAuthEnabled": false
+                },
+                "AutoTuneOptions": {
+                    "State": "DISABLED"
+                },
+                "ChangeProgressDetails": {
+                    "ChangeId": "11348912-f93a-4528-93f7-5264a57017eb",
+                    "ConfigChangeStatus": "Completed",
+                    "StartTime": {
+                        "__class__": "datetime",
+                        "year": 2026,
+                        "month": 2,
+                        "day": 10,
+                        "hour": 14,
+                        "minute": 34,
+                        "second": 18,
+                        "microsecond": 113000
+                    },
+                    "LastUpdatedTime": {
+                        "__class__": "datetime",
+                        "year": 2026,
+                        "month": 2,
+                        "day": 10,
+                        "hour": 14,
+                        "minute": 44,
+                        "second": 24,
+                        "microsecond": 537000
+                    },
+                    "InitiatedBy": "CUSTOMER"
+                },
+                "DomainProcessingStatus": "Active",
+                "ModifyingProperties": []
+            },
+            {
+                "DomainId": "644160558196/c7n-test-os-update-config",
+                "DomainName": "c7n-test-os-update-config",
+                "ARN": "arn:aws:es:us-east-1:644160558196:domain/c7n-test-os-update-config",
+                "Created": true,
+                "Deleted": false,
+                "Endpoint": "search-c7n-test-os-update-config-d2nkiammliqfruj5wskknfif74.us-east-1.es.amazonaws.com",
+                "Processing": false,
+                "UpgradeProcessing": false,
+                "ElasticsearchVersion": "7.10",
+                "ElasticsearchClusterConfig": {
+                    "InstanceType": "t3.small.elasticsearch",
+                    "InstanceCount": 1,
+                    "DedicatedMasterEnabled": false,
+                    "ZoneAwarenessEnabled": false,
+                    "WarmEnabled": false,
+                    "ColdStorageOptions": {
+                        "Enabled": false
+                    }
+                },
+                "EBSOptions": {
+                    "EBSEnabled": true,
+                    "VolumeType": "gp2",
+                    "VolumeSize": 10
+                },
+                "AccessPolicies": "",
+                "SnapshotOptions": {
+                    "AutomatedSnapshotStartHour": 0
+                },
+                "CognitoOptions": {
+                    "Enabled": false
+                },
+                "EncryptionAtRestOptions": {
+                    "Enabled": false
+                },
+                "NodeToNodeEncryptionOptions": {
+                    "Enabled": false
+                },
+                "AdvancedOptions": {
+                    "override_main_response_version": "false",
+                    "rest.action.multi.allow_explicit_index": "true"
+                },
+                "ServiceSoftwareOptions": {
+                    "CurrentVersion": "Elasticsearch_7_10_R20251106",
+                    "NewVersion": "",
+                    "UpdateAvailable": false,
+                    "Cancellable": false,
+                    "UpdateStatus": "COMPLETED",
+                    "Description": "There is no software update available for this domain.",
+                    "AutomatedUpdateDate": {
+                        "__class__": "datetime",
+                        "year": 1969,
+                        "month": 12,
+                        "day": 31,
+                        "hour": 19,
+                        "minute": 0,
+                        "second": 0,
+                        "microsecond": 0
+                    },
+                    "OptionalDeployment": true
+                },
+                "DomainEndpointOptions": {
+                    "EnforceHTTPS": false,
+                    "TLSSecurityPolicy": "Policy-Min-TLS-1-2-2019-07",
+                    "CustomEndpointEnabled": false
+                },
+                "AdvancedSecurityOptions": {
+                    "Enabled": false,
+                    "InternalUserDatabaseEnabled": false,
+                    "AnonymousAuthEnabled": false
+                },
+                "AutoTuneOptions": {
+                    "State": "DISABLED"
+                },
+                "ChangeProgressDetails": {
+                    "ChangeId": "a2bb4c44-16ef-49d6-a3df-2c43ff8d661b",
+                    "ConfigChangeStatus": "Completed",
+                    "StartTime": {
+                        "__class__": "datetime",
+                        "year": 2026,
+                        "month": 2,
+                        "day": 10,
+                        "hour": 14,
+                        "minute": 34,
+                        "second": 18,
+                        "microsecond": 34000
+                    },
+                    "LastUpdatedTime": {
+                        "__class__": "datetime",
+                        "year": 2026,
+                        "month": 2,
+                        "day": 10,
+                        "hour": 14,
+                        "minute": 44,
+                        "second": 3,
+                        "microsecond": 286000
+                    },
+                    "InitiatedBy": "CUSTOMER"
+                },
+                "DomainProcessingStatus": "Active",
+                "ModifyingProperties": []
+            }
+        ]
+    }
+}

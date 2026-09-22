@@ -1,0 +1,14 @@
+{
+    "status_code": 200,
+    "data": {
+        "ResponseMetadata": {},
+        "Status": 200,
+        "Tags": [
+            {
+                "Key": "Owner",
+                "Value": "c7n"
+            }
+        ],
+        "RequestId": "c0c3ac5c-ed02-4a90-99bc-a4bea918aca4"
+    }
+}

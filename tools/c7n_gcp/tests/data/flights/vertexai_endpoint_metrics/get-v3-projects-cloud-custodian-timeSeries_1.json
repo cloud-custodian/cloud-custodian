@@ -1,0 +1,54 @@
+{
+  "headers": {
+    "content-type": "application/json; charset=UTF-8",
+    "vary": "Origin, X-Origin, Referer",
+    "date": "Wed, 08 Jul 2026 22:00:26 GMT",
+    "server": "ESF",
+    "x-xss-protection": "0",
+    "x-frame-options": "SAMEORIGIN",
+    "x-content-type-options": "nosniff",
+    "alt-svc": "h3=\":443\"; ma=2592000,h3-29=\":443\"; ma=2592000",
+    "transfer-encoding": "chunked",
+    "status": "200",
+    "content-length": "947",
+    "-content-encoding": "gzip",
+    "content-location": "https://monitoring.googleapis.com/v3/projects/cloud-custodian/timeSeries?filter=metric.type+%3D+%22aiplatform.googleapis.com%2Fprediction%2Fonline%2Fprediction_count%22+AND+%28+resource.labels.endpoint_id+%3D+%22c7n-endpoint-default-7509%22+%29&interval.startTime=2026-07-07T22%3A00%3A25Z&interval.endTime=2026-07-08T22%3A00%3A25Z&aggregation.alignmentPeriod=86400s&aggregation.perSeriesAligner=ALIGN_SUM&aggregation.crossSeriesReducer=REDUCE_NONE&view=FULL&alt=json"
+  },
+  "body": {
+    "timeSeries": [
+      {
+        "metric": {
+          "labels": {
+            "spot": "false",
+            "deployed_model_id": "5509121152913506304",
+            "model_display_name": "c7n-metrics-model-28b7b0bb",
+            "endpoint_display_name": "c7n-endpoint-default-7509"
+          },
+          "type": "aiplatform.googleapis.com/prediction/online/prediction_count"
+        },
+        "resource": {
+          "type": "aiplatform.googleapis.com/Endpoint",
+          "labels": {
+            "endpoint_id": "c7n-endpoint-default-7509",
+            "project_id": "stacklet-test-policies",
+            "location": "us-central1"
+          }
+        },
+        "metricKind": "DELTA",
+        "valueType": "INT64",
+        "points": [
+          {
+            "interval": {
+              "startTime": "2026-07-07T22:00:25Z",
+              "endTime": "2026-07-08T22:00:25Z"
+            },
+            "value": {
+              "int64Value": "2"
+            }
+          }
+        ]
+      }
+    ],
+    "unit": "1"
+  }
+}

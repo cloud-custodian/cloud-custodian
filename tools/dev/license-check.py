@@ -5,10 +5,12 @@ import sys
 
 accept = (
     'MIT',
+    'MIT-0',
     'BSD',
     'Apache License 2.0',
     'Apache License, Version 2.0',
     'Apache 2.0',
+    'Apache-2.0 AND MIT',
     'Apache-2.0 OR BSD-2-Clause',
     'Apache-2.0 OR BSD-3-Clause',
     'MIT License',
@@ -39,6 +41,7 @@ whitelist_packages = set(
     (
         #
         # Deps with licenses that get flagged
+        'crc32c',  # tools/c7n_oci dep, LGPL
         'pygit2',  # tools/c7n_policystream dep, GPL w/ Linking Exception
         'ldap3',  # mailer dependency, LGPL
         'sphinx-markdown-tables',  # docgen - GPL
@@ -50,6 +53,7 @@ whitelist_packages = set(
         'uritemplate',  # Dual license BSD 3-Clause OR Apache-2.0
         # https://github.com/GrahamDumpleton/wrapt/issues/298
         'wrapt',  # BSD-2-Clause .. packaging update is missing license spdx header
+        'regex',  # Apache-2.0 AND CNRI-Python, because it derives from CPython's re module
     )
 )
 

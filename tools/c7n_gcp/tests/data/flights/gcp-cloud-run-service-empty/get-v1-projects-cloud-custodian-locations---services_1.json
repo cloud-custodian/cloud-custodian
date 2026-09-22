@@ -1,0 +1,14 @@
+{
+  "headers": {
+    "content-type": "application/json; charset=UTF-8",
+    "vary": "Origin, X-Origin, Referer",
+    "server": "ESF",
+    "cache-control": "private",
+    "status": "200",
+    "content-location": "https://run.googleapis.com/v1/projects/cloud-custodian/locations/-/services?alt=json"
+  },
+  "body": {
+    "apiVersion": "serving.knative.dev/v1",
+    "kind": "ServiceList"
+  }
+}

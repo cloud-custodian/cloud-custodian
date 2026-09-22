@@ -8,7 +8,7 @@ dependencies = [
     "Jinja2<4.0,>=3.0",
     "boto3>=1.11.12",
     "datadog<1.0.0,>=0.34.0",
-    "importlib-metadata<9.0,>=8.0",
+    "importlib-metadata>=8.0,<10.0",
     "jsonpatch<2.0,>=1.25",
     "jsonpointer>=2.0",
     "jsonschema>=4.18",
@@ -20,7 +20,7 @@ dependencies = [
     "types-six<2.0.0,>=1.16.10",
 ]
 name = "c7n_mailer"
-version = "0.6.50"
+version = "0.6.51"
 description = "Cloud Custodian - Reference Mailer"
 readme = "README.md"
 classifiers = [

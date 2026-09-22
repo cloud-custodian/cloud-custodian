@@ -1,0 +1,8 @@
+{
+    "status_code": 200,
+    "data": {
+        "ResourceArn": "arn:aws:payment-cryptography:us-east-1:644160558196:key/vhwflzja45wd3hqj",
+        "Policy": "{}",
+        "ResponseMetadata": {}
+    }
+}

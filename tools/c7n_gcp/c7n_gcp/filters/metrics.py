@@ -117,6 +117,7 @@ class GCPMetricsFilter(Filter):
            not hasattr(self.manager.resource_type, 'metric_key'):
             raise FilterValidationError("metric-key not defined for resource %s,"
             "so must be provided in the policy" % (self.manager.type))
+
         return self
 
     def process(self, resources, event=None):
@@ -164,7 +165,6 @@ class GCPMetricsFilter(Filter):
 
         if not time_series_data:
             self.log.info("No metrics found for {}".format(self.c7n_metric_key))
-            return []
 
         self.split_by_resource(time_series_data)
         matched = [r for r in resources if self.process_resource(r)]
@@ -222,9 +222,9 @@ class GCPMetricsFilter(Filter):
         resource_name = self.manager.resource_type.get_metric_resource_name(
             resource, metric_key=self.metric_key)
         metric = self.resource_metric_dict.get(resource_name)
-        if not metric and not self.missing_value:
+        if metric is None and self.missing_value is None:
             return False
-        if not metric:
+        if metric is None:
             metric_value = self.missing_value
         else:
             metric_value = float(list(metric["points"][0]["value"].values())[0])
@@ -237,7 +237,8 @@ class GCPMetricsFilter(Filter):
     @classmethod
     def register_resources(klass, registry, resource_class):
         if resource_class.filter_registry:
-            if resource_class.resource_type.allow_metrics_filters:
+            if resource_class.resource_type.allow_metrics_filters and \
+                    'metrics' not in resource_class.filter_registry:
                 resource_class.filter_registry.register('metrics', klass)
 
 

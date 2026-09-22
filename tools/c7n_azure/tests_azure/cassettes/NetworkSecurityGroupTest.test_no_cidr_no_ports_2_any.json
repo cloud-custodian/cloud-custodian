@@ -1,0 +1,603 @@
+{
+    "version": 1,
+    "interactions": [
+        {
+            "request": {
+                "method": "GET",
+                "uri": "https://management.azure.com/subscriptions/ea42f556-5106-4743-99b0-c129bfa71a47/providers/Microsoft.Network/networkSecurityGroups?api-version=2024-05-01",
+                "body": null,
+                "headers": {}
+            },
+            "response": {
+                "status": {
+                    "code": 200,
+                    "message": "OK"
+                },
+                "headers": {
+                    "x-cache": [
+                        "CONFIG_NOCACHE"
+                    ],
+                    "x-ms-ratelimit-remaining-subscription-global-reads": [
+                        "3749"
+                    ],
+                    "content-length": [
+                        "18372"
+                    ],
+                    "x-msedge-ref": [
+                        "Ref A: 8AEDF940C9054F6A88C72EBE9BAB80A5 Ref B: SN4AA2022301029 Ref C: 2026-03-24T14:29:39Z"
+                    ],
+                    "cache-control": [
+                        "no-cache"
+                    ],
+                    "content-type": [
+                        "application/json; charset=utf-8"
+                    ],
+                    "x-ms-arm-service-request-id": [
+                        "205969f4-24de-42b9-8d2b-64dc6f413be9"
+                    ],
+                    "x-ms-original-request-ids": [
+                        "f6fa840b-390d-4002-a12d-d84c45e1fad7"
+                    ],
+                    "date": [
+                        "Tue, 24 Mar 2026 14:29:39 GMT"
+                    ]
+                },
+                "body": {
+                    "data": {
+                        "value": [
+                            {
+                                "name": "nsg-allow-all-ingress",
+                                "id": "/subscriptions/ea42f556-5106-4743-99b0-c129bfa71a47/resourceGroups/stacklet-dev-westus/providers/Microsoft.Network/networkSecurityGroups/nsg-allow-all-ingress",
+                                "etag": "W/\"9d18056b-1391-43ab-ab62-b276262318e0\"",
+                                "type": "Microsoft.Network/networkSecurityGroups",
+                                "location": "westus",
+                                "tags": {},
+                                "properties": {
+                                    "provisioningState": "Succeeded",
+                                    "resourceGuid": "89f045be-2a50-4259-821d-bbdc5cb4abbb",
+                                    "securityRules": [
+                                        {
+                                            "name": "allow-all-ingress",
+                                            "id": "/subscriptions/ea42f556-5106-4743-99b0-c129bfa71a47/resourceGroups/stacklet-dev-westus/providers/Microsoft.Network/networkSecurityGroups/nsg-allow-all-ingress/securityRules/allow-all-ingress",
+                                            "etag": "W/\"9d18056b-1391-43ab-ab62-b276262318e0\"",
+                                            "type": "Microsoft.Network/networkSecurityGroups/securityRules",
+                                            "properties": {
+                                                "provisioningState": "Succeeded",
+                                                "protocol": "*",
+                                                "sourcePortRange": "*",
+                                                "destinationPortRange": "*",
+                                                "sourceAddressPrefix": "*",
+                                                "destinationAddressPrefix": "*",
+                                                "access": "Allow",
+                                                "priority": 100,
+                                                "direction": "Inbound",
+                                                "sourcePortRanges": [],
+                                                "destinationPortRanges": [],
+                                                "sourceAddressPrefixes": [],
+                                                "destinationAddressPrefixes": []
+                                            }
+                                        }
+                                    ],
+                                    "defaultSecurityRules": [
+                                        {
+                                            "name": "AllowVnetInBound",
+                                            "id": "/subscriptions/ea42f556-5106-4743-99b0-c129bfa71a47/resourceGroups/stacklet-dev-westus/providers/Microsoft.Network/networkSecurityGroups/nsg-allow-all-ingress/defaultSecurityRules/AllowVnetInBound",
+                                            "etag": "W/\"9d18056b-1391-43ab-ab62-b276262318e0\"",
+                                            "type": "Microsoft.Network/networkSecurityGroups/defaultSecurityRules",
+                                            "properties": {
+                                                "provisioningState": "Succeeded",
+                                                "description": "Allow inbound traffic from all VMs in VNET",
+                                                "protocol": "*",
+                                                "sourcePortRange": "*",
+                                                "destinationPortRange": "*",
+                                                "sourceAddressPrefix": "VirtualNetwork",
+                                                "destinationAddressPrefix": "VirtualNetwork",
+                                                "access": "Allow",
+                                                "priority": 65000,
+                                                "direction": "Inbound",
+                                                "sourcePortRanges": [],
+                                                "destinationPortRanges": [],
+                                                "sourceAddressPrefixes": [],
+                                                "destinationAddressPrefixes": []
+                                            }
+                                        },
+                                        {
+                                            "name": "AllowAzureLoadBalancerInBound",
+                                            "id": "/subscriptions/ea42f556-5106-4743-99b0-c129bfa71a47/resourceGroups/stacklet-dev-westus/providers/Microsoft.Network/networkSecurityGroups/nsg-allow-all-ingress/defaultSecurityRules/AllowAzureLoadBalancerInBound",
+                                            "etag": "W/\"9d18056b-1391-43ab-ab62-b276262318e0\"",
+                                            "type": "Microsoft.Network/networkSecurityGroups/defaultSecurityRules",
+                                            "properties": {
+                                                "provisioningState": "Succeeded",
+                                                "description": "Allow inbound traffic from azure load balancer",
+                                                "protocol": "*",
+                                                "sourcePortRange": "*",
+                                                "destinationPortRange": "*",
+                                                "sourceAddressPrefix": "AzureLoadBalancer",
+                                                "destinationAddressPrefix": "*",
+                                                "access": "Allow",
+                                                "priority": 65001,
+                                                "direction": "Inbound",
+                                                "sourcePortRanges": [],
+                                                "destinationPortRanges": [],
+                                                "sourceAddressPrefixes": [],
+                                                "destinationAddressPrefixes": []
+                                            }
+                                        },
+                                        {
+                                            "name": "DenyAllInBound",
+                                            "id": "/subscriptions/ea42f556-5106-4743-99b0-c129bfa71a47/resourceGroups/stacklet-dev-westus/providers/Microsoft.Network/networkSecurityGroups/nsg-allow-all-ingress/defaultSecurityRules/DenyAllInBound",
+                                            "etag": "W/\"9d18056b-1391-43ab-ab62-b276262318e0\"",
+                                            "type": "Microsoft.Network/networkSecurityGroups/defaultSecurityRules",
+                                            "properties": {
+                                                "provisioningState": "Succeeded",
+                                                "description": "Deny all inbound traffic",
+                                                "protocol": "*",
+                                                "sourcePortRange": "*",
+                                                "destinationPortRange": "*",
+                                                "sourceAddressPrefix": "*",
+                                                "destinationAddressPrefix": "*",
+                                                "access": "Deny",
+                                                "priority": 65500,
+                                                "direction": "Inbound",
+                                                "sourcePortRanges": [],
+                                                "destinationPortRanges": [],
+                                                "sourceAddressPrefixes": [],
+                                                "destinationAddressPrefixes": []
+                                            }
+                                        },
+                                        {
+                                            "name": "AllowVnetOutBound",
+                                            "id": "/subscriptions/ea42f556-5106-4743-99b0-c129bfa71a47/resourceGroups/stacklet-dev-westus/providers/Microsoft.Network/networkSecurityGroups/nsg-allow-all-ingress/defaultSecurityRules/AllowVnetOutBound",
+                                            "etag": "W/\"9d18056b-1391-43ab-ab62-b276262318e0\"",
+                                            "type": "Microsoft.Network/networkSecurityGroups/defaultSecurityRules",
+                                            "properties": {
+                                                "provisioningState": "Succeeded",
+                                                "description": "Allow outbound traffic from all VMs to all VMs in VNET",
+                                                "protocol": "*",
+                                                "sourcePortRange": "*",
+                                                "destinationPortRange": "*",
+                                                "sourceAddressPrefix": "VirtualNetwork",
+                                                "destinationAddressPrefix": "VirtualNetwork",
+                                                "access": "Allow",
+                                                "priority": 65000,
+                                                "direction": "Outbound",
+                                                "sourcePortRanges": [],
+                                                "destinationPortRanges": [],
+                                                "sourceAddressPrefixes": [],
+                                                "destinationAddressPrefixes": []
+                                            }
+                                        },
+                                        {
+                                            "name": "AllowInternetOutBound",
+                                            "id": "/subscriptions/ea42f556-5106-4743-99b0-c129bfa71a47/resourceGroups/stacklet-dev-westus/providers/Microsoft.Network/networkSecurityGroups/nsg-allow-all-ingress/defaultSecurityRules/AllowInternetOutBound",
+                                            "etag": "W/\"9d18056b-1391-43ab-ab62-b276262318e0\"",
+                                            "type": "Microsoft.Network/networkSecurityGroups/defaultSecurityRules",
+                                            "properties": {
+                                                "provisioningState": "Succeeded",
+                                                "description": "Allow outbound traffic from all VMs to Internet",
+                                                "protocol": "*",
+                                                "sourcePortRange": "*",
+                                                "destinationPortRange": "*",
+                                                "sourceAddressPrefix": "*",
+                                                "destinationAddressPrefix": "Internet",
+                                                "access": "Allow",
+                                                "priority": 65001,
+                                                "direction": "Outbound",
+                                                "sourcePortRanges": [],
+                                                "destinationPortRanges": [],
+                                                "sourceAddressPrefixes": [],
+                                                "destinationAddressPrefixes": []
+                                            }
+                                        },
+                                        {
+                                            "name": "DenyAllOutBound",
+                                            "id": "/subscriptions/ea42f556-5106-4743-99b0-c129bfa71a47/resourceGroups/stacklet-dev-westus/providers/Microsoft.Network/networkSecurityGroups/nsg-allow-all-ingress/defaultSecurityRules/DenyAllOutBound",
+                                            "etag": "W/\"9d18056b-1391-43ab-ab62-b276262318e0\"",
+                                            "type": "Microsoft.Network/networkSecurityGroups/defaultSecurityRules",
+                                            "properties": {
+                                                "provisioningState": "Succeeded",
+                                                "description": "Deny all outbound traffic",
+                                                "protocol": "*",
+                                                "sourcePortRange": "*",
+                                                "destinationPortRange": "*",
+                                                "sourceAddressPrefix": "*",
+                                                "destinationAddressPrefix": "*",
+                                                "access": "Deny",
+                                                "priority": 65500,
+                                                "direction": "Outbound",
+                                                "sourcePortRanges": [],
+                                                "destinationPortRanges": [],
+                                                "sourceAddressPrefixes": [],
+                                                "destinationAddressPrefixes": []
+                                            }
+                                        }
+                                    ]
+                                }
+                            },
+                            {
+                                "name": "nsg-deny-all-ingress",
+                                "id": "/subscriptions/ea42f556-5106-4743-99b0-c129bfa71a47/resourceGroups/stacklet-dev-westus/providers/Microsoft.Network/networkSecurityGroups/nsg-deny-all-ingress",
+                                "etag": "W/\"ced38800-9059-4651-aed1-499815040f5c\"",
+                                "type": "Microsoft.Network/networkSecurityGroups",
+                                "location": "westus",
+                                "tags": {},
+                                "properties": {
+                                    "provisioningState": "Succeeded",
+                                    "resourceGuid": "36be1ab0-0eab-4c2c-86af-1c44ce185bda",
+                                    "securityRules": [
+                                        {
+                                            "name": "deny-all-ingress",
+                                            "id": "/subscriptions/ea42f556-5106-4743-99b0-c129bfa71a47/resourceGroups/stacklet-dev-westus/providers/Microsoft.Network/networkSecurityGroups/nsg-deny-all-ingress/securityRules/deny-all-ingress",
+                                            "etag": "W/\"ced38800-9059-4651-aed1-499815040f5c\"",
+                                            "type": "Microsoft.Network/networkSecurityGroups/securityRules",
+                                            "properties": {
+                                                "provisioningState": "Succeeded",
+                                                "protocol": "*",
+                                                "sourcePortRange": "*",
+                                                "destinationPortRange": "*",
+                                                "sourceAddressPrefix": "*",
+                                                "destinationAddressPrefix": "*",
+                                                "access": "Deny",
+                                                "priority": 100,
+                                                "direction": "Inbound",
+                                                "sourcePortRanges": [],
+                                                "destinationPortRanges": [],
+                                                "sourceAddressPrefixes": [],
+                                                "destinationAddressPrefixes": []
+                                            }
+                                        }
+                                    ],
+                                    "defaultSecurityRules": [
+                                        {
+                                            "name": "AllowVnetInBound",
+                                            "id": "/subscriptions/ea42f556-5106-4743-99b0-c129bfa71a47/resourceGroups/stacklet-dev-westus/providers/Microsoft.Network/networkSecurityGroups/nsg-deny-all-ingress/defaultSecurityRules/AllowVnetInBound",
+                                            "etag": "W/\"ced38800-9059-4651-aed1-499815040f5c\"",
+                                            "type": "Microsoft.Network/networkSecurityGroups/defaultSecurityRules",
+                                            "properties": {
+                                                "provisioningState": "Succeeded",
+                                                "description": "Allow inbound traffic from all VMs in VNET",
+                                                "protocol": "*",
+                                                "sourcePortRange": "*",
+                                                "destinationPortRange": "*",
+                                                "sourceAddressPrefix": "VirtualNetwork",
+                                                "destinationAddressPrefix": "VirtualNetwork",
+                                                "access": "Allow",
+                                                "priority": 65000,
+                                                "direction": "Inbound",
+                                                "sourcePortRanges": [],
+                                                "destinationPortRanges": [],
+                                                "sourceAddressPrefixes": [],
+                                                "destinationAddressPrefixes": []
+                                            }
+                                        },
+                                        {
+                                            "name": "AllowAzureLoadBalancerInBound",
+                                            "id": "/subscriptions/ea42f556-5106-4743-99b0-c129bfa71a47/resourceGroups/stacklet-dev-westus/providers/Microsoft.Network/networkSecurityGroups/nsg-deny-all-ingress/defaultSecurityRules/AllowAzureLoadBalancerInBound",
+                                            "etag": "W/\"ced38800-9059-4651-aed1-499815040f5c\"",
+                                            "type": "Microsoft.Network/networkSecurityGroups/defaultSecurityRules",
+                                            "properties": {
+                                                "provisioningState": "Succeeded",
+                                                "description": "Allow inbound traffic from azure load balancer",
+                                                "protocol": "*",
+                                                "sourcePortRange": "*",
+                                                "destinationPortRange": "*",
+                                                "sourceAddressPrefix": "AzureLoadBalancer",
+                                                "destinationAddressPrefix": "*",
+                                                "access": "Allow",
+                                                "priority": 65001,
+                                                "direction": "Inbound",
+                                                "sourcePortRanges": [],
+                                                "destinationPortRanges": [],
+                                                "sourceAddressPrefixes": [],
+                                                "destinationAddressPrefixes": []
+                                            }
+                                        },
+                                        {
+                                            "name": "DenyAllInBound",
+                                            "id": "/subscriptions/ea42f556-5106-4743-99b0-c129bfa71a47/resourceGroups/stacklet-dev-westus/providers/Microsoft.Network/networkSecurityGroups/nsg-deny-all-ingress/defaultSecurityRules/DenyAllInBound",
+                                            "etag": "W/\"ced38800-9059-4651-aed1-499815040f5c\"",
+                                            "type": "Microsoft.Network/networkSecurityGroups/defaultSecurityRules",
+                                            "properties": {
+                                                "provisioningState": "Succeeded",
+                                                "description": "Deny all inbound traffic",
+                                                "protocol": "*",
+                                                "sourcePortRange": "*",
+                                                "destinationPortRange": "*",
+                                                "sourceAddressPrefix": "*",
+                                                "destinationAddressPrefix": "*",
+                                                "access": "Deny",
+                                                "priority": 65500,
+                                                "direction": "Inbound",
+                                                "sourcePortRanges": [],
+                                                "destinationPortRanges": [],
+                                                "sourceAddressPrefixes": [],
+                                                "destinationAddressPrefixes": []
+                                            }
+                                        },
+                                        {
+                                            "name": "AllowVnetOutBound",
+                                            "id": "/subscriptions/ea42f556-5106-4743-99b0-c129bfa71a47/resourceGroups/stacklet-dev-westus/providers/Microsoft.Network/networkSecurityGroups/nsg-deny-all-ingress/defaultSecurityRules/AllowVnetOutBound",
+                                            "etag": "W/\"ced38800-9059-4651-aed1-499815040f5c\"",
+                                            "type": "Microsoft.Network/networkSecurityGroups/defaultSecurityRules",
+                                            "properties": {
+                                                "provisioningState": "Succeeded",
+                                                "description": "Allow outbound traffic from all VMs to all VMs in VNET",
+                                                "protocol": "*",
+                                                "sourcePortRange": "*",
+                                                "destinationPortRange": "*",
+                                                "sourceAddressPrefix": "VirtualNetwork",
+                                                "destinationAddressPrefix": "VirtualNetwork",
+                                                "access": "Allow",
+                                                "priority": 65000,
+                                                "direction": "Outbound",
+                                                "sourcePortRanges": [],
+                                                "destinationPortRanges": [],
+                                                "sourceAddressPrefixes": [],
+                                                "destinationAddressPrefixes": []
+                                            }
+                                        },
+                                        {
+                                            "name": "AllowInternetOutBound",
+                                            "id": "/subscriptions/ea42f556-5106-4743-99b0-c129bfa71a47/resourceGroups/stacklet-dev-westus/providers/Microsoft.Network/networkSecurityGroups/nsg-deny-all-ingress/defaultSecurityRules/AllowInternetOutBound",
+                                            "etag": "W/\"ced38800-9059-4651-aed1-499815040f5c\"",
+                                            "type": "Microsoft.Network/networkSecurityGroups/defaultSecurityRules",
+                                            "properties": {
+                                                "provisioningState": "Succeeded",
+                                                "description": "Allow outbound traffic from all VMs to Internet",
+                                                "protocol": "*",
+                                                "sourcePortRange": "*",
+                                                "destinationPortRange": "*",
+                                                "sourceAddressPrefix": "*",
+                                                "destinationAddressPrefix": "Internet",
+                                                "access": "Allow",
+                                                "priority": 65001,
+                                                "direction": "Outbound",
+                                                "sourcePortRanges": [],
+                                                "destinationPortRanges": [],
+                                                "sourceAddressPrefixes": [],
+                                                "destinationAddressPrefixes": []
+                                            }
+                                        },
+                                        {
+                                            "name": "DenyAllOutBound",
+                                            "id": "/subscriptions/ea42f556-5106-4743-99b0-c129bfa71a47/resourceGroups/stacklet-dev-westus/providers/Microsoft.Network/networkSecurityGroups/nsg-deny-all-ingress/defaultSecurityRules/DenyAllOutBound",
+                                            "etag": "W/\"ced38800-9059-4651-aed1-499815040f5c\"",
+                                            "type": "Microsoft.Network/networkSecurityGroups/defaultSecurityRules",
+                                            "properties": {
+                                                "provisioningState": "Succeeded",
+                                                "description": "Deny all outbound traffic",
+                                                "protocol": "*",
+                                                "sourcePortRange": "*",
+                                                "destinationPortRange": "*",
+                                                "sourceAddressPrefix": "*",
+                                                "destinationAddressPrefix": "*",
+                                                "access": "Deny",
+                                                "priority": 65500,
+                                                "direction": "Outbound",
+                                                "sourcePortRanges": [],
+                                                "destinationPortRanges": [],
+                                                "sourceAddressPrefixes": [],
+                                                "destinationAddressPrefixes": []
+                                            }
+                                        }
+                                    ]
+                                }
+                            },
+                            {
+                                "name": "nsg-mixed-rules",
+                                "id": "/subscriptions/ea42f556-5106-4743-99b0-c129bfa71a47/resourceGroups/stacklet-dev-westus/providers/Microsoft.Network/networkSecurityGroups/nsg-mixed-rules",
+                                "etag": "W/\"75e83b27-c9d4-4565-9143-a4e4249aa1bf\"",
+                                "type": "Microsoft.Network/networkSecurityGroups",
+                                "location": "westus",
+                                "tags": {},
+                                "properties": {
+                                    "provisioningState": "Succeeded",
+                                    "resourceGuid": "c4424890-ae4e-42ca-ac1d-f8fb6451bcdf",
+                                    "securityRules": [
+                                        {
+                                            "name": "allow-https",
+                                            "id": "/subscriptions/ea42f556-5106-4743-99b0-c129bfa71a47/resourceGroups/stacklet-dev-westus/providers/Microsoft.Network/networkSecurityGroups/nsg-mixed-rules/securityRules/allow-https",
+                                            "etag": "W/\"75e83b27-c9d4-4565-9143-a4e4249aa1bf\"",
+                                            "type": "Microsoft.Network/networkSecurityGroups/securityRules",
+                                            "properties": {
+                                                "provisioningState": "Succeeded",
+                                                "protocol": "Tcp",
+                                                "sourcePortRange": "*",
+                                                "destinationPortRange": "443",
+                                                "sourceAddressPrefix": "*",
+                                                "destinationAddressPrefix": "*",
+                                                "access": "Allow",
+                                                "priority": 300,
+                                                "direction": "Inbound",
+                                                "sourcePortRanges": [],
+                                                "destinationPortRanges": [],
+                                                "sourceAddressPrefixes": [],
+                                                "destinationAddressPrefixes": []
+                                            }
+                                        },
+                                        {
+                                            "name": "deny-ssh",
+                                            "id": "/subscriptions/ea42f556-5106-4743-99b0-c129bfa71a47/resourceGroups/stacklet-dev-westus/providers/Microsoft.Network/networkSecurityGroups/nsg-mixed-rules/securityRules/deny-ssh",
+                                            "etag": "W/\"75e83b27-c9d4-4565-9143-a4e4249aa1bf\"",
+                                            "type": "Microsoft.Network/networkSecurityGroups/securityRules",
+                                            "properties": {
+                                                "provisioningState": "Succeeded",
+                                                "protocol": "Tcp",
+                                                "sourcePortRange": "*",
+                                                "destinationPortRange": "22",
+                                                "sourceAddressPrefix": "*",
+                                                "destinationAddressPrefix": "*",
+                                                "access": "Deny",
+                                                "priority": 200,
+                                                "direction": "Inbound",
+                                                "sourcePortRanges": [],
+                                                "destinationPortRanges": [],
+                                                "sourceAddressPrefixes": [],
+                                                "destinationAddressPrefixes": []
+                                            }
+                                        },
+                                        {
+                                            "name": "allow-http",
+                                            "id": "/subscriptions/ea42f556-5106-4743-99b0-c129bfa71a47/resourceGroups/stacklet-dev-westus/providers/Microsoft.Network/networkSecurityGroups/nsg-mixed-rules/securityRules/allow-http",
+                                            "etag": "W/\"75e83b27-c9d4-4565-9143-a4e4249aa1bf\"",
+                                            "type": "Microsoft.Network/networkSecurityGroups/securityRules",
+                                            "properties": {
+                                                "provisioningState": "Succeeded",
+                                                "protocol": "Tcp",
+                                                "sourcePortRange": "*",
+                                                "destinationPortRange": "80",
+                                                "sourceAddressPrefix": "*",
+                                                "destinationAddressPrefix": "*",
+                                                "access": "Allow",
+                                                "priority": 100,
+                                                "direction": "Inbound",
+                                                "sourcePortRanges": [],
+                                                "destinationPortRanges": [],
+                                                "sourceAddressPrefixes": [],
+                                                "destinationAddressPrefixes": []
+                                            }
+                                        }
+                                    ],
+                                    "defaultSecurityRules": [
+                                        {
+                                            "name": "AllowVnetInBound",
+                                            "id": "/subscriptions/ea42f556-5106-4743-99b0-c129bfa71a47/resourceGroups/stacklet-dev-westus/providers/Microsoft.Network/networkSecurityGroups/nsg-mixed-rules/defaultSecurityRules/AllowVnetInBound",
+                                            "etag": "W/\"75e83b27-c9d4-4565-9143-a4e4249aa1bf\"",
+                                            "type": "Microsoft.Network/networkSecurityGroups/defaultSecurityRules",
+                                            "properties": {
+                                                "provisioningState": "Succeeded",
+                                                "description": "Allow inbound traffic from all VMs in VNET",
+                                                "protocol": "*",
+                                                "sourcePortRange": "*",
+                                                "destinationPortRange": "*",
+                                                "sourceAddressPrefix": "VirtualNetwork",
+                                                "destinationAddressPrefix": "VirtualNetwork",
+                                                "access": "Allow",
+                                                "priority": 65000,
+                                                "direction": "Inbound",
+                                                "sourcePortRanges": [],
+                                                "destinationPortRanges": [],
+                                                "sourceAddressPrefixes": [],
+                                                "destinationAddressPrefixes": []
+                                            }
+                                        },
+                                        {
+                                            "name": "AllowAzureLoadBalancerInBound",
+                                            "id": "/subscriptions/ea42f556-5106-4743-99b0-c129bfa71a47/resourceGroups/stacklet-dev-westus/providers/Microsoft.Network/networkSecurityGroups/nsg-mixed-rules/defaultSecurityRules/AllowAzureLoadBalancerInBound",
+                                            "etag": "W/\"75e83b27-c9d4-4565-9143-a4e4249aa1bf\"",
+                                            "type": "Microsoft.Network/networkSecurityGroups/defaultSecurityRules",
+                                            "properties": {
+                                                "provisioningState": "Succeeded",
+                                                "description": "Allow inbound traffic from azure load balancer",
+                                                "protocol": "*",
+                                                "sourcePortRange": "*",
+                                                "destinationPortRange": "*",
+                                                "sourceAddressPrefix": "AzureLoadBalancer",
+                                                "destinationAddressPrefix": "*",
+                                                "access": "Allow",
+                                                "priority": 65001,
+                                                "direction": "Inbound",
+                                                "sourcePortRanges": [],
+                                                "destinationPortRanges": [],
+                                                "sourceAddressPrefixes": [],
+                                                "destinationAddressPrefixes": []
+                                            }
+                                        },
+                                        {
+                                            "name": "DenyAllInBound",
+                                            "id": "/subscriptions/ea42f556-5106-4743-99b0-c129bfa71a47/resourceGroups/stacklet-dev-westus/providers/Microsoft.Network/networkSecurityGroups/nsg-mixed-rules/defaultSecurityRules/DenyAllInBound",
+                                            "etag": "W/\"75e83b27-c9d4-4565-9143-a4e4249aa1bf\"",
+                                            "type": "Microsoft.Network/networkSecurityGroups/defaultSecurityRules",
+                                            "properties": {
+                                                "provisioningState": "Succeeded",
+                                                "description": "Deny all inbound traffic",
+                                                "protocol": "*",
+                                                "sourcePortRange": "*",
+                                                "destinationPortRange": "*",
+                                                "sourceAddressPrefix": "*",
+                                                "destinationAddressPrefix": "*",
+                                                "access": "Deny",
+                                                "priority": 65500,
+                                                "direction": "Inbound",
+                                                "sourcePortRanges": [],
+                                                "destinationPortRanges": [],
+                                                "sourceAddressPrefixes": [],
+                                                "destinationAddressPrefixes": []
+                                            }
+                                        },
+                                        {
+                                            "name": "AllowVnetOutBound",
+                                            "id": "/subscriptions/ea42f556-5106-4743-99b0-c129bfa71a47/resourceGroups/stacklet-dev-westus/providers/Microsoft.Network/networkSecurityGroups/nsg-mixed-rules/defaultSecurityRules/AllowVnetOutBound",
+                                            "etag": "W/\"75e83b27-c9d4-4565-9143-a4e4249aa1bf\"",
+                                            "type": "Microsoft.Network/networkSecurityGroups/defaultSecurityRules",
+                                            "properties": {
+                                                "provisioningState": "Succeeded",
+                                                "description": "Allow outbound traffic from all VMs to all VMs in VNET",
+                                                "protocol": "*",
+                                                "sourcePortRange": "*",
+                                                "destinationPortRange": "*",
+                                                "sourceAddressPrefix": "VirtualNetwork",
+                                                "destinationAddressPrefix": "VirtualNetwork",
+                                                "access": "Allow",
+                                                "priority": 65000,
+                                                "direction": "Outbound",
+                                                "sourcePortRanges": [],
+                                                "destinationPortRanges": [],
+                                                "sourceAddressPrefixes": [],
+                                                "destinationAddressPrefixes": []
+                                            }
+                                        },
+                                        {
+                                            "name": "AllowInternetOutBound",
+                                            "id": "/subscriptions/ea42f556-5106-4743-99b0-c129bfa71a47/resourceGroups/stacklet-dev-westus/providers/Microsoft.Network/networkSecurityGroups/nsg-mixed-rules/defaultSecurityRules/AllowInternetOutBound",
+                                            "etag": "W/\"75e83b27-c9d4-4565-9143-a4e4249aa1bf\"",
+                                            "type": "Microsoft.Network/networkSecurityGroups/defaultSecurityRules",
+                                            "properties": {
+                                                "provisioningState": "Succeeded",
+                                                "description": "Allow outbound traffic from all VMs to Internet",
+                                                "protocol": "*",
+                                                "sourcePortRange": "*",
+                                                "destinationPortRange": "*",
+                                                "sourceAddressPrefix": "*",
+                                                "destinationAddressPrefix": "Internet",
+                                                "access": "Allow",
+                                                "priority": 65001,
+                                                "direction": "Outbound",
+                                                "sourcePortRanges": [],
+                                                "destinationPortRanges": [],
+                                                "sourceAddressPrefixes": [],
+                                                "destinationAddressPrefixes": []
+                                            }
+                                        },
+                                        {
+                                            "name": "DenyAllOutBound",
+                                            "id": "/subscriptions/ea42f556-5106-4743-99b0-c129bfa71a47/resourceGroups/stacklet-dev-westus/providers/Microsoft.Network/networkSecurityGroups/nsg-mixed-rules/defaultSecurityRules/DenyAllOutBound",
+                                            "etag": "W/\"75e83b27-c9d4-4565-9143-a4e4249aa1bf\"",
+                                            "type": "Microsoft.Network/networkSecurityGroups/defaultSecurityRules",
+                                            "properties": {
+                                                "provisioningState": "Succeeded",
+                                                "description": "Deny all outbound traffic",
+                                                "protocol": "*",
+                                                "sourcePortRange": "*",
+                                                "destinationPortRange": "*",
+                                                "sourceAddressPrefix": "*",
+                                                "destinationAddressPrefix": "*",
+                                                "access": "Deny",
+                                                "priority": 65500,
+                                                "direction": "Outbound",
+                                                "sourcePortRanges": [],
+                                                "destinationPortRanges": [],
+                                                "sourceAddressPrefixes": [],
+                                                "destinationAddressPrefixes": []
+                                            }
+                                        }
+                                    ]
+                                }
+                            }
+                        ]
+                    }
+                }
+            }
+        }
+    ]
+}

@@ -474,7 +474,8 @@ class AzurePolicyModeTest(BaseTest):
             # verify the advanced filter created
             event_filter = args[4].advanced_filters[0]
             self.assertEqual(event_filter.key, 'Data.OperationName')
-            self.assertEqual(event_filter.values, ['Microsoft.Compute/virtualMachines/write'])
+            self.assertEqual(event_filter.values_property,
+                             ['Microsoft.Compute/virtualMachines/write'])
             self.assertEqual(event_filter.operator_type, 'StringIn')
 
     def test_event_grid_mode_creates_advanced_filtered_subscription_with_multiple_events(self):
@@ -502,7 +503,7 @@ class AzurePolicyModeTest(BaseTest):
             # verify the advanced filter created
             event_filter = args[4].advanced_filters[0]
             self.assertEqual(event_filter.key, 'Data.OperationName')
-            self.assertEqual(event_filter.values,
+            self.assertEqual(event_filter.values_property,
                              ['Microsoft.Compute/virtualMachines/write',
                               'Microsoft.Compute/virtualMachines/powerOff/action'])
             self.assertEqual(event_filter.operator_type, 'StringIn')

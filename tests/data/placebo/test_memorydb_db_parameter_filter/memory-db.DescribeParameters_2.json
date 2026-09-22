@@ -1,0 +1,32 @@
+{
+    "status_code": 200,
+    "data": {
+        "Parameters": [
+            {
+                "Name": "activedefrag",
+                "Value": "no",
+                "Description": "Enabled active memory defragmentation",
+                "DataType": "string",
+                "AllowedValues": "yes,no",
+                "MinimumEngineVersion": "7.0.5"
+            },
+            {
+                "Name": "maxmemory-policy",
+                "Value": "noeviction",
+                "Description": "Max memory policy",
+                "DataType": "string",
+                "AllowedValues": "volatile-lru,allkeys-lru,volatile-lfu,allkeys-lfu,volatile-random,allkeys-random,volatile-ttl,noeviction",
+                "MinimumEngineVersion": "7.0.5"
+            },
+            {
+                "Name": "timeout",
+                "Value": "0",
+                "Description": "Close connection if client is idle for a given number of seconds, or never if 0",
+                "DataType": "integer",
+                "AllowedValues": "0,20-",
+                "MinimumEngineVersion": "7.0.5"
+            }
+        ],
+        "ResponseMetadata": {}
+    }
+}

@@ -339,6 +339,87 @@ class AccountTests(BaseTest):
         # Shouldn't match when account state doesn't match filter
         self.assertEqual(len(resources), 0)
 
+    def test_pmtcrypt_replication_regions_enabled(self):
+        factory = self.replay_flight_data(
+            'test_pmtcrypt_replication_regions_enabled')
+        p = self.load_policy({
+            'name': 'pmtcrypt-replication-enabled',
+            'resource': 'aws.account',
+            'filters': [{
+                'type': 'payment-cryptography-replication-regions',
+                'state': True}]},
+            session_factory=factory)
+        resources = p.run()
+        self.assertEqual(len(resources), 1)
+        self.assertTrue(resources[0][
+            'c7n:payment-cryptography-replication-regions'])
+
+    def test_pmtcrypt_replication_regions_disabled(self):
+        factory = self.replay_flight_data(
+            'test_pmtcrypt_replication_regions_disabled')
+        p = self.load_policy({
+            'name': 'pmtcrypt-replication-disabled',
+            'resource': 'aws.account',
+            'filters': [{
+                'type': 'payment-cryptography-replication-regions',
+                'state': False}]},
+            session_factory=factory)
+        resources = p.run()
+        # account has no default replication regions -> matches state: false
+        self.assertEqual(len(resources), 1)
+        self.assertEqual(
+            resources[0]['c7n:payment-cryptography-replication-regions'], [])
+
+    def test_pmtcrypt_replication_regions_specific(self):
+        factory = self.replay_flight_data(
+            'test_pmtcrypt_replication_regions_enabled')
+        p = self.load_policy({
+            'name': 'pmtcrypt-replication-specific',
+            'resource': 'aws.account',
+            'filters': [{
+                'type': 'payment-cryptography-replication-regions',
+                'state': True,
+                'regions': ['us-west-2']}]},
+            session_factory=factory)
+        resources = p.run()
+        self.assertEqual(len(resources), 1)
+        self.assertIn(
+            'us-west-2',
+            resources[0]['c7n:payment-cryptography-replication-regions'])
+
+    def test_pmtcrypt_replication_regions_specific_missing(self):
+        factory = self.replay_flight_data(
+            'test_pmtcrypt_replication_regions_enabled')
+        p = self.load_policy({
+            'name': 'pmtcrypt-replication-specific-missing',
+            'resource': 'aws.account',
+            'filters': [{
+                'type': 'payment-cryptography-replication-regions',
+                'state': True,
+                'regions': ['ap-southeast-2']}]},
+            session_factory=factory)
+        resources = p.run()
+        # required region is not in the account defaults -> no match
+        self.assertEqual(len(resources), 0)
+
+    def test_pmtcrypt_replication_regions_any_match(self):
+        factory = self.replay_flight_data(
+            'test_pmtcrypt_replication_regions_enabled')
+        p = self.load_policy({
+            'name': 'pmtcrypt-replication-any',
+            'resource': 'aws.account',
+            'filters': [{
+                'type': 'payment-cryptography-replication-regions',
+                'state': True,
+                'regions': ['ap-southeast-2', 'us-west-2'],
+                'match': 'any'}]},
+            session_factory=factory)
+        resources = p.run()
+        self.assertEqual(len(resources), 1)
+        self.assertIn(
+            'us-west-2',
+            resources[0]['c7n:payment-cryptography-replication-regions'])
+
     def test_cloudtrail_enabled(self):
         session_factory = self.replay_flight_data("test_account_trail")
         p = self.load_policy(

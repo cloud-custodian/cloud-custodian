@@ -1,0 +1,25 @@
+{
+    "status_code": 200,
+    "data": {
+        "WebACL": {
+            "WebACLId": "bbb22222-1234-5678-abcd-111111111111",
+            "Name": "FMManagedWebACLregional-test",
+            "WebACLArn": "arn:aws:waf-regional:us-east-1:123456789012:webacl/bbb22222-1234-5678-abcd-111111111111",
+            "DefaultAction": {"Type": "ALLOW"},
+            "Rules": [
+                {
+                    "Priority": 1,
+                    "RuleId": "rule-regional-001",
+                    "Action": {"Type": "BLOCK"},
+                    "Type": "REGULAR"
+                }
+            ],
+            "MetricName": "FMManagedWebACLregional"
+        },
+        "ResponseMetadata": {
+            "RetryAttempts": 0,
+            "HTTPStatusCode": 200,
+            "RequestId": "test-get-webacl-regional-001"
+        }
+    }
+}

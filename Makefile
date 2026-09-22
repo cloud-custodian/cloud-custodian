@@ -9,8 +9,6 @@ PKG_SET := tools/c7n_gcp tools/c7n_kube tools/c7n_openstack tools/c7n_mailer too
 
 PKG_SET_OLD := tools/c7n_logexporter tools/c7n_trailcreator tools/c7n_terraform
 
-FMT_SET := tools/c7n_left tools/c7n_mailer tools/c7n_oci tools/c7n_kube tools/c7n_awscc
-
 COVERAGE_TYPE := html
 ARGS :=
 IMAGE := c7n
@@ -55,16 +53,22 @@ test-functional-azure:
 # note this will provision real resources in Azure's public cloud environment
 	C7N_FUNCTIONAL=yes uv run pytest tools/c7n_azure/tests_azure -k terraform -m functional $(ARGS)
 
+test-gcp:
+# run only the GCP test suite
+	. uv run pytest -n auto tools/c7n_gcp/tests $(ARGS)
+
 sphinx:
 	make -f docs/Makefile.sphinx html
 
 lint:
 	uv run --no-project ruff check c7n tests tools
-	uv run --no-project black --check $(FMT_SET)
+# See black config in pyproject.toml for included dirs
+	uv run --no-project black --check .
 	terraform fmt -check -recursive .
 
 format:
-	uv run black $(FMT_SET)
+# See black config in pyproject.toml for included dirs
+	uv run black .
 	uv run ruff check --fix c7n tests tools
 	terraform fmt -recursive .
 

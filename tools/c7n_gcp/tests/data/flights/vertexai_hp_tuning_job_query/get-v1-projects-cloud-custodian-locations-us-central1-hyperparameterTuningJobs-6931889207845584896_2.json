@@ -1,0 +1,74 @@
+{
+  "headers": {
+    "content-type": "application/json; charset=UTF-8",
+    "vary": "Origin, X-Origin, Referer",
+    "date": "Wed, 08 Jul 2026 17:54:47 GMT",
+    "server": "ESF",
+    "x-xss-protection": "0",
+    "x-frame-options": "SAMEORIGIN",
+    "x-content-type-options": "nosniff",
+    "alt-svc": "h3=\":443\"; ma=2592000,h3-29=\":443\"; ma=2592000",
+    "transfer-encoding": "chunked",
+    "status": "200",
+    "content-length": "1281",
+    "-content-encoding": "gzip",
+    "content-location": "https://us-central1-aiplatform.googleapis.com/v1/projects/cloud-custodian/locations/us-central1/hyperparameterTuningJobs/6931889207845584896?alt=json"
+  },
+  "body": {
+    "name": "projects/cloud-custodian/locations/us-central1/hyperparameterTuningJobs/6931889207845584896",
+    "displayName": "c7n-test-hp-job-default-ee2e",
+    "studySpec": {
+      "metrics": [
+        {
+          "metricId": "accuracy",
+          "goal": "MAXIMIZE"
+        }
+      ],
+      "parameters": [
+        {
+          "parameterId": "lr",
+          "discreteValueSpec": {
+            "values": [
+              0.1,
+              0.2
+            ]
+          }
+        }
+      ]
+    },
+    "maxTrialCount": 1,
+    "parallelTrialCount": 1,
+    "trialJobSpec": {
+      "workerPoolSpecs": [
+        {
+          "machineSpec": {
+            "machineType": "n1-standard-4"
+          },
+          "replicaCount": "1",
+          "diskSpec": {
+            "bootDiskType": "pd-ssd",
+            "bootDiskSizeGb": 100
+          },
+          "containerSpec": {
+            "imageUri": "gcr.io/google.com/cloudsdktool/cloud-sdk:slim",
+            "command": [
+              "echo"
+            ],
+            "args": [
+              "hello from c7n test"
+            ]
+          }
+        }
+      ]
+    },
+    "state": "JOB_STATE_CANCELLED",
+    "createTime": "2026-07-08T17:54:34.363472Z",
+    "startTime": "2026-07-08T17:54:36Z",
+    "endTime": "2026-07-08T17:54:41.216828Z",
+    "updateTime": "2026-07-08T17:54:41.216828Z",
+    "error": {
+      "code": 1,
+      "message": "CANCELED"
+    }
+  }
+}

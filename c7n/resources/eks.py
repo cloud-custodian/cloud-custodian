@@ -10,9 +10,11 @@ from c7n.filters.vpc import SecurityGroupFilter, SubnetFilter, VpcFilter
 from c7n.manager import resources
 from c7n.resources.aws import shape_schema
 from c7n import tags, query
+from c7n.tags import is_resource_gone
 from c7n.query import QueryResourceManager, TypeInfo, DescribeSource, \
     ChildResourceManager, ChildDescribeSource
 from c7n.utils import local_session, type_schema, get_retry
+from botocore.exceptions import ClientError
 from botocore.waiter import WaiterModel, create_waiter_with_client
 from .aws import shape_validate
 from .ecs import ContainerConfigSource
@@ -339,7 +341,9 @@ class EKSTag(tags.Tag):
                     client.tag_resource,
                     resourceArn=r['arn'],
                     tags={t['Key']: t['Value'] for t in tags})
-            except client.exceptions.ResourceNotFoundException:
+            except ClientError as e:
+                if not is_resource_gone(e.response['Error']['Code']):
+                    raise
                 continue
 
 
@@ -358,7 +362,9 @@ class EKSRemoveTag(tags.RemoveTag):
                 self.manager.retry(
                     client.untag_resource,
                     resourceArn=r['arn'], tagKeys=tags)
-            except client.exceptions.ResourceNotFoundException:
+            except ClientError as e:
+                if not is_resource_gone(e.response['Error']['Code']):
+                    raise
                 continue
 
 

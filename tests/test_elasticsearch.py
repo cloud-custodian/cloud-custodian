@@ -13,8 +13,17 @@ from c7n.resources.elasticsearch import parse_es_version
 from .common import BaseTest
 
 
+# Calling the @terraform decorator registers the
+# `elasticsearch_cross_cluster_search_connections` fixture in this module as a side
+# effect, and adds a mark to the decorated function. We want the side effect,
+# but pytest 9.1+ doesn't allow marks on fixtures.
+#
+# Making the `terraform()` call separately lets us continue to use pytest-terraform
+# on a unittest class in pytest 9.1+.
+terraform('elasticsearch_cross_cluster_search_connections', scope='class')
+
+
 @pytest.fixture(scope='class')
-@terraform('elasticsearch_cross_cluster_search_connections', scope='class')
 def terraform_cross_cluster(elasticsearch_cross_cluster_search_connections, request):
     """Wrap a pytest-terraform fixture for use with unittest
 
@@ -769,6 +778,35 @@ class ElasticSearch(BaseTest):
         self.assertEqual(state['AUDIT_LOGS']['Enabled'], True)
         self.assertEqual(state['AUDIT_LOGS']['CloudWatchLogsLogGroupArn'],
             "arn:aws:logs:us-east-1:123456789012:log-group:/aws/domains/test-es-dom/audit-logs:*")
+
+
+@terraform('elasticsearch_update_domain_config')
+def test_elasticsearch_update_domain_config(test, elasticsearch_update_domain_config):
+    factory = test.replay_flight_data("test_elasticsearch_update_domain_config")
+    p = test.load_policy(
+        {
+            "name": "es-update-domain-config",
+            "resource": "elasticsearch",
+            "actions": [
+                {
+                    "type": "update-domain-config",
+                    "EBSOptions": {
+                        "VolumeType": "gp3"
+                    }
+                }
+            ]
+        },
+        session_factory=factory,
+    )
+
+    resources = p.run()
+    test.assertEqual(len(resources), 2)
+
+    client = factory().client("es")
+    es_resp = client.describe_elasticsearch_domain_config(DomainName='c7n-test-es-update-config')
+    assert es_resp['DomainConfig']['EBSOptions']['Options']['VolumeType'] == 'gp3'
+    os_resp = client.describe_elasticsearch_domain_config(DomainName='c7n-test-os-update-config')
+    assert os_resp['DomainConfig']['EBSOptions']['Options']['VolumeType'] == 'gp3'
 
 
 class TestReservedInstances(BaseTest):

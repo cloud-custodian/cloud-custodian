@@ -64,6 +64,7 @@
                 "description": "",
                 "effective_labels": {
                     "c7n_test": "bq_table_recommend_partition_cluster",
+                    "c7n_test_update": "bq_dataset_update",
                     "env": "default",
                     "goog-terraform-provisioned": "true"
                 },
@@ -75,6 +76,7 @@
                 "is_case_insensitive": false,
                 "labels": {
                     "c7n_test": "bq_table_recommend_partition_cluster",
+                    "c7n_test_update": "bq_dataset_update",
                     "env": "default"
                 },
                 "last_modified_time": 1775017375484,
@@ -86,6 +88,7 @@
                 "storage_billing_model": "",
                 "terraform_labels": {
                     "c7n_test": "bq_table_recommend_partition_cluster",
+                    "c7n_test_update": "bq_dataset_update",
                     "env": "default",
                     "goog-terraform-provisioned": "true"
                 },

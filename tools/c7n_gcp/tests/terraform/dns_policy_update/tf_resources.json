@@ -1,0 +1,58 @@
+{
+    "pytest-terraform": 1,
+    "outputs": {},
+    "resources": {
+        "google_compute_network": {
+            "policy_network": {
+                "auto_create_subnetworks": false,
+                "bgp_always_compare_med": false,
+                "bgp_best_path_selection_mode": "LEGACY",
+                "bgp_inter_region_cost": "",
+                "delete_bgp_always_compare_med": false,
+                "delete_default_routes_on_create": false,
+                "description": "",
+                "enable_ula_internal_ipv6": false,
+                "gateway_ipv4": "",
+                "id": "projects/cloud-custodian/global/networks/c7n-dns-policy-network",
+                "internal_ipv6_range": "",
+                "mtu": 0,
+                "name": "c7n-dns-policy-network",
+                "network_firewall_policy_enforcement_order": "AFTER_CLASSIC_FIREWALL",
+                "network_id": "5996275227379320340",
+                "network_profile": "",
+                "numeric_id": "5996275227379320340",
+                "params": [],
+                "project": "stacklet-personal-2",
+                "routing_mode": "REGIONAL",
+                "self_link": "https://www.googleapis.com/compute/v1/projects/cloud-custodian/global/networks/c7n-dns-policy-network",
+                "timeouts": null
+            }
+        },
+        "google_dns_policy": {
+            "default": {
+                "alternative_name_server_config": [],
+                "description": "Managed by Terraform",
+                "dns64_config": [
+                    {
+                        "scope": [
+                            {
+                                "all_queries": false
+                            }
+                        ]
+                    }
+                ],
+                "enable_inbound_forwarding": false,
+                "enable_logging": false,
+                "id": "projects/cloud-custodian/policies/c7n-dns-policy-update-test",
+                "name": "c7n-dns-policy-update-test",
+                "networks": [
+                    {
+                        "network_url": "projects/cloud-custodian/global/networks/c7n-dns-policy-network"
+                    }
+                ],
+                "project": "stacklet-personal-2",
+                "timeouts": null
+            }
+        }
+    }
+}

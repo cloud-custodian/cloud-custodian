@@ -1,0 +1,36 @@
+{
+    "pytest-terraform": 1,
+    "outputs": {
+        "endpoint_name": {
+            "value": "projects/cloud-custodian/locations/us-central1/endpoints/8574775075432038400",
+            "type": "string"
+        },
+        "endpoint_display_name": {
+            "value": "c7n-test-get-resource-default-0916",
+            "type": "string"
+        }
+    },
+    "resources": {
+        "random_id": {
+            "suffix": {
+                "b64_std": "CRY=",
+                "b64_url": "CRY",
+                "byte_length": 2,
+                "dec": "2326",
+                "hex": "0916",
+                "id": "CRY",
+                "keepers": null,
+                "prefix": null
+            }
+        },
+        "google_vertex_ai_endpoint": {
+            "get_resource": {
+                "id": "projects/cloud-custodian/locations/us-central1/endpoints/8574775075432038400",
+                "name": "c7n-test-get-resource-default-0916",
+                "display_name": "c7n-test-get-resource-default-0916",
+                "location": "us-central1",
+                "region": "us-central1"
+            }
+        }
+    }
+}

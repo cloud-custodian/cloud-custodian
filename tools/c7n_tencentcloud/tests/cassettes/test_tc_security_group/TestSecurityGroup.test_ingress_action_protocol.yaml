@@ -1,0 +1,1146 @@
+interactions:
+- request:
+    body: '{"Offset": "0", "Limit": "20"}'
+    headers:
+      Accept:
+      - '*/*'
+      Accept-Encoding:
+      - gzip, deflate
+      Connection:
+      - keep-alive
+      Content-Length:
+      - '30'
+      Content-Type:
+      - application/json
+      Host:
+      - vpc.na-ashburn.tencentcloudapi.com
+      User-Agent:
+      - python-requests/2.32.5
+      X-TC-Action:
+      - DescribeSecurityGroups
+      X-TC-Region:
+      - na-ashburn
+      X-TC-TraceId:
+      - b7141884-f4eb-489f-afd9-9d4e3a4e5c44
+      X-TC-Version:
+      - '2017-03-12'
+    method: POST
+    uri: https://vpc.na-ashburn.tencentcloudapi.com/
+  response:
+    body:
+      string: "{\n    \"Response\": {\n        \"SecurityGroupSet\": [\n            {\n
+        \               \"SecurityGroupId\": \"sg-6ykrshfb\",\n                \"SecurityGroupName\":
+        \"sg-allow-all-ingress\",\n                \"SecurityGroupDesc\": \"Allow
+        all ingress\",\n                \"ProjectId\": \"0\",\n                \"IsDefault\":
+        false,\n                \"CreatedTime\": \"2025-12-09 23:14:50\",\n                \"UpdateTime\":
+        \"2025-12-09 23:14:52\",\n                \"TagSet\": [],\n                \"Region\":
+        \"na-ashburn\"\n            },\n            {\n                \"SecurityGroupId\":
+        \"sg-c7xghhr3\",\n                \"SecurityGroupName\": \"sg-deny-all-ingress\",\n
+        \               \"SecurityGroupDesc\": \"Deny all ingress\",\n                \"ProjectId\":
+        \"0\",\n                \"IsDefault\": false,\n                \"CreatedTime\":
+        \"2025-12-09 23:14:50\",\n                \"UpdateTime\": \"2025-12-09 23:14:52\",\n
+        \               \"TagSet\": [],\n                \"Region\": \"na-ashburn\"\n
+        \           },\n            {\n                \"SecurityGroupId\": \"sg-6ts6s7hx\",\n
+        \               \"SecurityGroupName\": \"sg-allow-tcp-ingress\",\n                \"SecurityGroupDesc\":
+        \"Allow TCP ingress\",\n                \"ProjectId\": \"0\",\n                \"IsDefault\":
+        false,\n                \"CreatedTime\": \"2025-12-09 23:14:50\",\n                \"UpdateTime\":
+        \"2025-12-09 23:14:52\",\n                \"TagSet\": [],\n                \"Region\":
+        \"na-ashburn\"\n            }\n        ],\n        \"TotalCount\": 3,\n        \"RegionStatistics\":
+        [\n            {\n                \"TotalCount\": 3,\n                \"Region\":
+        \"na-ashburn\"\n            }\n        ],\n        \"RequestId\": \"bd756613-9e19-4d24-a29f-ba683753c39c\"\n
+        \   }\n}"
+    headers:
+      Connection:
+      - keep-alive
+      Content-Length:
+      - '1623'
+      Content-Type:
+      - application/json
+      Date:
+      - Tue, 09 Dec 2025 19:50:02 GMT
+      X-TC-TraceId:
+      - b7141884-f4eb-489f-afd9-9d4e3a4e5c44
+    status:
+      code: 200
+      message: OK
+- request:
+    body: '{"ResourceList": ["qcs::vpc:na-ashburn:uin/100000750436:sg/sg-6ykrshfb",
+      "qcs::vpc:na-ashburn:uin/100000750436:sg/sg-c7xghhr3", "qcs::vpc:na-ashburn:uin/100000750436:sg/sg-6ts6s7hx"]}'
+    headers:
+      Accept:
+      - '*/*'
+      Accept-Encoding:
+      - gzip, deflate
+      Connection:
+      - keep-alive
+      Content-Length:
+      - '183'
+      Content-Type:
+      - application/json
+      Host:
+      - tag.na-ashburn.tencentcloudapi.com
+      User-Agent:
+      - python-requests/2.32.5
+      X-TC-Action:
+      - GetResources
+      X-TC-Region:
+      - na-ashburn
+      X-TC-TraceId:
+      - ce846f56-9dc0-420f-a001-0caa60887183
+      X-TC-Version:
+      - '2018-08-13'
+    method: POST
+    uri: https://tag.na-ashburn.tencentcloudapi.com/
+  response:
+    body:
+      string: '{"Response":{"PaginationToken":"","ResourceTagMappingList":[],"RequestId":"6bff5c5a-7f98-4457-9140-83ac47b35e09"}}'
+    headers:
+      Connection:
+      - keep-alive
+      Content-Length:
+      - '114'
+      Content-Type:
+      - application/json
+      Date:
+      - Tue, 09 Dec 2025 19:50:03 GMT
+      X-TC-TraceId:
+      - ce846f56-9dc0-420f-a001-0caa60887183
+    status:
+      code: 200
+      message: OK
+- request:
+    body: '{"SecurityGroupId": "sg-6ykrshfb"}'
+    headers:
+      Accept:
+      - '*/*'
+      Accept-Encoding:
+      - gzip, deflate
+      Connection:
+      - keep-alive
+      Content-Length:
+      - '34'
+      Content-Type:
+      - application/json
+      Host:
+      - vpc.na-ashburn.tencentcloudapi.com
+      User-Agent:
+      - python-requests/2.32.5
+      X-TC-Action:
+      - DescribeSecurityGroupPolicies
+      X-TC-Region:
+      - na-ashburn
+      X-TC-TraceId:
+      - fe3fe894-1b04-4347-bf3f-707f0fab0374
+      X-TC-Version:
+      - '2017-03-12'
+    method: POST
+    uri: https://vpc.na-ashburn.tencentcloudapi.com/
+  response:
+    body:
+      string: "{\n    \"Response\": {\n        \"SecurityGroupPolicySet\": {\n            \"Ingress\":
+        [\n                {\n                    \"PolicyIndex\": 0,\n                    \"Priority\":
+        1,\n                    \"Port\": \"ALL\",\n                    \"CidrBlock\":
+        \"0.0.0.0\\/0\",\n                    \"Ipv6CidrBlock\": \"\",\n                    \"SecurityGroupId\":
+        \"\",\n                    \"Action\": \"ACCEPT\",\n                    \"ModifyTime\":
+        \"2025-12-09 23:14:52\",\n                    \"PolicyDescription\": \"Allow
+        all ingress\",\n                    \"Protocol\": \"ALL\",\n                    \"ServiceTemplate\":
+        {\n                        \"ServiceId\": \"\",\n                        \"ServiceGroupId\":
+        \"\"\n                    },\n                    \"AddressTemplate\": {\n
+        \                       \"AddressId\": \"\",\n                        \"AddressGroupId\":
+        \"\"\n                    },\n                    \"Diff\": false\n                }\n
+        \           ],\n            \"Egress\": [],\n            \"Version\": \"1\",\n
+        \           \"PolicyStatistics\": {\n                \"IngressIPv4TotalCount\":
+        1,\n                \"IngressIPv6TotalCount\": 0,\n                \"EgressIPv4TotalCount\":
+        0,\n                \"EgressIPv6TotalCount\": 0\n            }\n        },\n
+        \       \"RequestId\": \"c20ccc2c-ab83-4649-99a7-ad7d002f80da\"\n    }\n}"
+    headers:
+      Connection:
+      - keep-alive
+      Content-Length:
+      - '1256'
+      Content-Type:
+      - application/json
+      Date:
+      - Tue, 09 Dec 2025 19:50:03 GMT
+      X-TC-TraceId:
+      - fe3fe894-1b04-4347-bf3f-707f0fab0374
+    status:
+      code: 200
+      message: OK
+- request:
+    body: '{"SecurityGroupId": "sg-c7xghhr3"}'
+    headers:
+      Accept:
+      - '*/*'
+      Accept-Encoding:
+      - gzip, deflate
+      Connection:
+      - keep-alive
+      Content-Length:
+      - '34'
+      Content-Type:
+      - application/json
+      Host:
+      - vpc.na-ashburn.tencentcloudapi.com
+      User-Agent:
+      - python-requests/2.32.5
+      X-TC-Action:
+      - DescribeSecurityGroupPolicies
+      X-TC-Region:
+      - na-ashburn
+      X-TC-TraceId:
+      - f8188c99-2e51-41d5-bdf1-f8ba9b994a1f
+      X-TC-Version:
+      - '2017-03-12'
+    method: POST
+    uri: https://vpc.na-ashburn.tencentcloudapi.com/
+  response:
+    body:
+      string: "{\n    \"Response\": {\n        \"SecurityGroupPolicySet\": {\n            \"Ingress\":
+        [\n                {\n                    \"PolicyIndex\": 0,\n                    \"Priority\":
+        1,\n                    \"Port\": \"ALL\",\n                    \"CidrBlock\":
+        \"0.0.0.0\\/0\",\n                    \"Ipv6CidrBlock\": \"\",\n                    \"SecurityGroupId\":
+        \"\",\n                    \"Action\": \"DROP\",\n                    \"ModifyTime\":
+        \"2025-12-09 23:14:52\",\n                    \"PolicyDescription\": \"Deny
+        all ingress\",\n                    \"Protocol\": \"ALL\",\n                    \"ServiceTemplate\":
+        {\n                        \"ServiceId\": \"\",\n                        \"ServiceGroupId\":
+        \"\"\n                    },\n                    \"AddressTemplate\": {\n
+        \                       \"AddressId\": \"\",\n                        \"AddressGroupId\":
+        \"\"\n                    },\n                    \"Diff\": false\n                }\n
+        \           ],\n            \"Egress\": [],\n            \"Version\": \"1\",\n
+        \           \"PolicyStatistics\": {\n                \"IngressIPv4TotalCount\":
+        1,\n                \"IngressIPv6TotalCount\": 0,\n                \"EgressIPv4TotalCount\":
+        0,\n                \"EgressIPv6TotalCount\": 0\n            }\n        },\n
+        \       \"RequestId\": \"506a4cb7-c17f-4518-ad61-ba1e97aa0d88\"\n    }\n}"
+    headers:
+      Connection:
+      - keep-alive
+      Content-Length:
+      - '1253'
+      Content-Type:
+      - application/json
+      Date:
+      - Tue, 09 Dec 2025 19:50:03 GMT
+      X-TC-TraceId:
+      - f8188c99-2e51-41d5-bdf1-f8ba9b994a1f
+    status:
+      code: 200
+      message: OK
+- request:
+    body: '{"SecurityGroupId": "sg-6ts6s7hx"}'
+    headers:
+      Accept:
+      - '*/*'
+      Accept-Encoding:
+      - gzip, deflate
+      Connection:
+      - keep-alive
+      Content-Length:
+      - '34'
+      Content-Type:
+      - application/json
+      Host:
+      - vpc.na-ashburn.tencentcloudapi.com
+      User-Agent:
+      - python-requests/2.32.5
+      X-TC-Action:
+      - DescribeSecurityGroupPolicies
+      X-TC-Region:
+      - na-ashburn
+      X-TC-TraceId:
+      - 03ff7656-3bd4-47c0-86a1-7912db10ab00
+      X-TC-Version:
+      - '2017-03-12'
+    method: POST
+    uri: https://vpc.na-ashburn.tencentcloudapi.com/
+  response:
+    body:
+      string: "{\n    \"Response\": {\n        \"SecurityGroupPolicySet\": {\n            \"Ingress\":
+        [\n                {\n                    \"PolicyIndex\": 0,\n                    \"Priority\":
+        1,\n                    \"Port\": \"ALL\",\n                    \"CidrBlock\":
+        \"0.0.0.0\\/0\",\n                    \"Ipv6CidrBlock\": \"\",\n                    \"SecurityGroupId\":
+        \"\",\n                    \"Action\": \"ACCEPT\",\n                    \"ModifyTime\":
+        \"2025-12-09 23:14:52\",\n                    \"PolicyDescription\": \"Allow
+        all TCP ingress\",\n                    \"Protocol\": \"tcp\",\n                    \"ServiceTemplate\":
+        {\n                        \"ServiceId\": \"\",\n                        \"ServiceGroupId\":
+        \"\"\n                    },\n                    \"AddressTemplate\": {\n
+        \                       \"AddressId\": \"\",\n                        \"AddressGroupId\":
+        \"\"\n                    },\n                    \"Diff\": false\n                }\n
+        \           ],\n            \"Egress\": [],\n            \"Version\": \"1\",\n
+        \           \"PolicyStatistics\": {\n                \"IngressIPv4TotalCount\":
+        1,\n                \"IngressIPv6TotalCount\": 0,\n                \"EgressIPv4TotalCount\":
+        0,\n                \"EgressIPv6TotalCount\": 0\n            }\n        },\n
+        \       \"RequestId\": \"a335c960-a5d3-4290-83ef-bf5d92361a0d\"\n    }\n}"
+    headers:
+      Connection:
+      - keep-alive
+      Content-Length:
+      - '1260'
+      Content-Type:
+      - application/json
+      Date:
+      - Tue, 09 Dec 2025 19:50:04 GMT
+      X-TC-TraceId:
+      - 03ff7656-3bd4-47c0-86a1-7912db10ab00
+    status:
+      code: 200
+      message: OK
+- request:
+    body: '{"Offset": "0", "Limit": "20"}'
+    headers:
+      Accept:
+      - '*/*'
+      Accept-Encoding:
+      - gzip, deflate
+      Connection:
+      - keep-alive
+      Content-Length:
+      - '30'
+      Content-Type:
+      - application/json
+      Host:
+      - vpc.na-ashburn.tencentcloudapi.com
+      User-Agent:
+      - python-requests/2.32.5
+      X-TC-Action:
+      - DescribeSecurityGroups
+      X-TC-Region:
+      - na-ashburn
+      X-TC-TraceId:
+      - ff410ad3-b507-42ab-b95c-596fe34803ce
+      X-TC-Version:
+      - '2017-03-12'
+    method: POST
+    uri: https://vpc.na-ashburn.tencentcloudapi.com/
+  response:
+    body:
+      string: "{\n    \"Response\": {\n        \"SecurityGroupSet\": [\n            {\n
+        \               \"SecurityGroupId\": \"sg-6ykrshfb\",\n                \"SecurityGroupName\":
+        \"sg-allow-all-ingress\",\n                \"SecurityGroupDesc\": \"Allow
+        all ingress\",\n                \"ProjectId\": \"0\",\n                \"IsDefault\":
+        false,\n                \"CreatedTime\": \"2025-12-09 23:14:50\",\n                \"UpdateTime\":
+        \"2025-12-09 23:14:52\",\n                \"TagSet\": [],\n                \"Region\":
+        \"na-ashburn\"\n            },\n            {\n                \"SecurityGroupId\":
+        \"sg-c7xghhr3\",\n                \"SecurityGroupName\": \"sg-deny-all-ingress\",\n
+        \               \"SecurityGroupDesc\": \"Deny all ingress\",\n                \"ProjectId\":
+        \"0\",\n                \"IsDefault\": false,\n                \"CreatedTime\":
+        \"2025-12-09 23:14:50\",\n                \"UpdateTime\": \"2025-12-09 23:14:52\",\n
+        \               \"TagSet\": [],\n                \"Region\": \"na-ashburn\"\n
+        \           },\n            {\n                \"SecurityGroupId\": \"sg-6ts6s7hx\",\n
+        \               \"SecurityGroupName\": \"sg-allow-tcp-ingress\",\n                \"SecurityGroupDesc\":
+        \"Allow TCP ingress\",\n                \"ProjectId\": \"0\",\n                \"IsDefault\":
+        false,\n                \"CreatedTime\": \"2025-12-09 23:14:50\",\n                \"UpdateTime\":
+        \"2025-12-09 23:14:52\",\n                \"TagSet\": [],\n                \"Region\":
+        \"na-ashburn\"\n            }\n        ],\n        \"TotalCount\": 3,\n        \"RegionStatistics\":
+        [\n            {\n                \"TotalCount\": 3,\n                \"Region\":
+        \"na-ashburn\"\n            }\n        ],\n        \"RequestId\": \"bb37f605-d057-4d54-895b-6448d4723cac\"\n
+        \   }\n}"
+    headers:
+      Connection:
+      - keep-alive
+      Content-Length:
+      - '1623'
+      Content-Type:
+      - application/json
+      Date:
+      - Tue, 09 Dec 2025 19:50:04 GMT
+      X-TC-TraceId:
+      - ff410ad3-b507-42ab-b95c-596fe34803ce
+    status:
+      code: 200
+      message: OK
+- request:
+    body: '{"ResourceList": ["qcs::vpc:na-ashburn:uin/100000750436:sg/sg-6ykrshfb",
+      "qcs::vpc:na-ashburn:uin/100000750436:sg/sg-c7xghhr3", "qcs::vpc:na-ashburn:uin/100000750436:sg/sg-6ts6s7hx"]}'
+    headers:
+      Accept:
+      - '*/*'
+      Accept-Encoding:
+      - gzip, deflate
+      Connection:
+      - keep-alive
+      Content-Length:
+      - '183'
+      Content-Type:
+      - application/json
+      Host:
+      - tag.na-ashburn.tencentcloudapi.com
+      User-Agent:
+      - python-requests/2.32.5
+      X-TC-Action:
+      - GetResources
+      X-TC-Region:
+      - na-ashburn
+      X-TC-TraceId:
+      - 5680d56e-dd4a-41b9-acbc-367e1ee2c3cc
+      X-TC-Version:
+      - '2018-08-13'
+    method: POST
+    uri: https://tag.na-ashburn.tencentcloudapi.com/
+  response:
+    body:
+      string: '{"Response":{"PaginationToken":"","ResourceTagMappingList":[],"RequestId":"d9ab2326-cec6-4969-abce-1020455f47d1"}}'
+    headers:
+      Connection:
+      - keep-alive
+      Content-Length:
+      - '114'
+      Content-Type:
+      - application/json
+      Date:
+      - Tue, 09 Dec 2025 19:50:05 GMT
+      X-TC-TraceId:
+      - 5680d56e-dd4a-41b9-acbc-367e1ee2c3cc
+    status:
+      code: 200
+      message: OK
+- request:
+    body: '{"SecurityGroupId": "sg-6ykrshfb"}'
+    headers:
+      Accept:
+      - '*/*'
+      Accept-Encoding:
+      - gzip, deflate
+      Connection:
+      - keep-alive
+      Content-Length:
+      - '34'
+      Content-Type:
+      - application/json
+      Host:
+      - vpc.na-ashburn.tencentcloudapi.com
+      User-Agent:
+      - python-requests/2.32.5
+      X-TC-Action:
+      - DescribeSecurityGroupPolicies
+      X-TC-Region:
+      - na-ashburn
+      X-TC-TraceId:
+      - ed89340f-0f8e-4b0e-ac2f-9f6cc1a909bc
+      X-TC-Version:
+      - '2017-03-12'
+    method: POST
+    uri: https://vpc.na-ashburn.tencentcloudapi.com/
+  response:
+    body:
+      string: "{\n    \"Response\": {\n        \"SecurityGroupPolicySet\": {\n            \"Ingress\":
+        [\n                {\n                    \"PolicyIndex\": 0,\n                    \"Priority\":
+        1,\n                    \"Port\": \"ALL\",\n                    \"CidrBlock\":
+        \"0.0.0.0\\/0\",\n                    \"Ipv6CidrBlock\": \"\",\n                    \"SecurityGroupId\":
+        \"\",\n                    \"Action\": \"ACCEPT\",\n                    \"ModifyTime\":
+        \"2025-12-09 23:14:52\",\n                    \"PolicyDescription\": \"Allow
+        all ingress\",\n                    \"Protocol\": \"ALL\",\n                    \"ServiceTemplate\":
+        {\n                        \"ServiceId\": \"\",\n                        \"ServiceGroupId\":
+        \"\"\n                    },\n                    \"AddressTemplate\": {\n
+        \                       \"AddressId\": \"\",\n                        \"AddressGroupId\":
+        \"\"\n                    },\n                    \"Diff\": false\n                }\n
+        \           ],\n            \"Egress\": [],\n            \"Version\": \"1\",\n
+        \           \"PolicyStatistics\": {\n                \"IngressIPv4TotalCount\":
+        1,\n                \"IngressIPv6TotalCount\": 0,\n                \"EgressIPv4TotalCount\":
+        0,\n                \"EgressIPv6TotalCount\": 0\n            }\n        },\n
+        \       \"RequestId\": \"a74b4019-e9a6-429c-ae32-0796b8b5482f\"\n    }\n}"
+    headers:
+      Connection:
+      - keep-alive
+      Content-Length:
+      - '1256'
+      Content-Type:
+      - application/json
+      Date:
+      - Tue, 09 Dec 2025 19:50:05 GMT
+      X-TC-TraceId:
+      - ed89340f-0f8e-4b0e-ac2f-9f6cc1a909bc
+    status:
+      code: 200
+      message: OK
+- request:
+    body: '{"SecurityGroupId": "sg-c7xghhr3"}'
+    headers:
+      Accept:
+      - '*/*'
+      Accept-Encoding:
+      - gzip, deflate
+      Connection:
+      - keep-alive
+      Content-Length:
+      - '34'
+      Content-Type:
+      - application/json
+      Host:
+      - vpc.na-ashburn.tencentcloudapi.com
+      User-Agent:
+      - python-requests/2.32.5
+      X-TC-Action:
+      - DescribeSecurityGroupPolicies
+      X-TC-Region:
+      - na-ashburn
+      X-TC-TraceId:
+      - 4834845b-0506-4557-b2a2-4cf4f8f1cb6f
+      X-TC-Version:
+      - '2017-03-12'
+    method: POST
+    uri: https://vpc.na-ashburn.tencentcloudapi.com/
+  response:
+    body:
+      string: "{\n    \"Response\": {\n        \"SecurityGroupPolicySet\": {\n            \"Ingress\":
+        [\n                {\n                    \"PolicyIndex\": 0,\n                    \"Priority\":
+        1,\n                    \"Port\": \"ALL\",\n                    \"CidrBlock\":
+        \"0.0.0.0\\/0\",\n                    \"Ipv6CidrBlock\": \"\",\n                    \"SecurityGroupId\":
+        \"\",\n                    \"Action\": \"DROP\",\n                    \"ModifyTime\":
+        \"2025-12-09 23:14:52\",\n                    \"PolicyDescription\": \"Deny
+        all ingress\",\n                    \"Protocol\": \"ALL\",\n                    \"ServiceTemplate\":
+        {\n                        \"ServiceId\": \"\",\n                        \"ServiceGroupId\":
+        \"\"\n                    },\n                    \"AddressTemplate\": {\n
+        \                       \"AddressId\": \"\",\n                        \"AddressGroupId\":
+        \"\"\n                    },\n                    \"Diff\": false\n                }\n
+        \           ],\n            \"Egress\": [],\n            \"Version\": \"1\",\n
+        \           \"PolicyStatistics\": {\n                \"IngressIPv4TotalCount\":
+        1,\n                \"IngressIPv6TotalCount\": 0,\n                \"EgressIPv4TotalCount\":
+        0,\n                \"EgressIPv6TotalCount\": 0\n            }\n        },\n
+        \       \"RequestId\": \"f649563e-91db-4690-a88b-bfdd43d24a62\"\n    }\n}"
+    headers:
+      Connection:
+      - keep-alive
+      Content-Length:
+      - '1253'
+      Content-Type:
+      - application/json
+      Date:
+      - Tue, 09 Dec 2025 19:50:05 GMT
+      X-TC-TraceId:
+      - 4834845b-0506-4557-b2a2-4cf4f8f1cb6f
+    status:
+      code: 200
+      message: OK
+- request:
+    body: '{"SecurityGroupId": "sg-6ts6s7hx"}'
+    headers:
+      Accept:
+      - '*/*'
+      Accept-Encoding:
+      - gzip, deflate
+      Connection:
+      - keep-alive
+      Content-Length:
+      - '34'
+      Content-Type:
+      - application/json
+      Host:
+      - vpc.na-ashburn.tencentcloudapi.com
+      User-Agent:
+      - python-requests/2.32.5
+      X-TC-Action:
+      - DescribeSecurityGroupPolicies
+      X-TC-Region:
+      - na-ashburn
+      X-TC-TraceId:
+      - 22b749ca-7b22-474b-8b06-6b1feb2b69f8
+      X-TC-Version:
+      - '2017-03-12'
+    method: POST
+    uri: https://vpc.na-ashburn.tencentcloudapi.com/
+  response:
+    body:
+      string: "{\n    \"Response\": {\n        \"SecurityGroupPolicySet\": {\n            \"Ingress\":
+        [\n                {\n                    \"PolicyIndex\": 0,\n                    \"Priority\":
+        1,\n                    \"Port\": \"ALL\",\n                    \"CidrBlock\":
+        \"0.0.0.0\\/0\",\n                    \"Ipv6CidrBlock\": \"\",\n                    \"SecurityGroupId\":
+        \"\",\n                    \"Action\": \"ACCEPT\",\n                    \"ModifyTime\":
+        \"2025-12-09 23:14:52\",\n                    \"PolicyDescription\": \"Allow
+        all TCP ingress\",\n                    \"Protocol\": \"tcp\",\n                    \"ServiceTemplate\":
+        {\n                        \"ServiceId\": \"\",\n                        \"ServiceGroupId\":
+        \"\"\n                    },\n                    \"AddressTemplate\": {\n
+        \                       \"AddressId\": \"\",\n                        \"AddressGroupId\":
+        \"\"\n                    },\n                    \"Diff\": false\n                }\n
+        \           ],\n            \"Egress\": [],\n            \"Version\": \"1\",\n
+        \           \"PolicyStatistics\": {\n                \"IngressIPv4TotalCount\":
+        1,\n                \"IngressIPv6TotalCount\": 0,\n                \"EgressIPv4TotalCount\":
+        0,\n                \"EgressIPv6TotalCount\": 0\n            }\n        },\n
+        \       \"RequestId\": \"ff83d083-b5a3-40a2-be19-fe6fa21c9219\"\n    }\n}"
+    headers:
+      Connection:
+      - keep-alive
+      Content-Length:
+      - '1260'
+      Content-Type:
+      - application/json
+      Date:
+      - Tue, 09 Dec 2025 19:50:05 GMT
+      X-TC-TraceId:
+      - 22b749ca-7b22-474b-8b06-6b1feb2b69f8
+    status:
+      code: 200
+      message: OK
+- request:
+    body: '{"Offset": "0", "Limit": "20"}'
+    headers:
+      Accept:
+      - '*/*'
+      Accept-Encoding:
+      - gzip, deflate
+      Connection:
+      - keep-alive
+      Content-Length:
+      - '30'
+      Content-Type:
+      - application/json
+      Host:
+      - vpc.na-ashburn.tencentcloudapi.com
+      User-Agent:
+      - python-requests/2.32.5
+      X-TC-Action:
+      - DescribeSecurityGroups
+      X-TC-Region:
+      - na-ashburn
+      X-TC-TraceId:
+      - d7597955-a004-493a-9ffc-4a9d6d463e40
+      X-TC-Version:
+      - '2017-03-12'
+    method: POST
+    uri: https://vpc.na-ashburn.tencentcloudapi.com/
+  response:
+    body:
+      string: "{\n    \"Response\": {\n        \"SecurityGroupSet\": [\n            {\n
+        \               \"SecurityGroupId\": \"sg-6ykrshfb\",\n                \"SecurityGroupName\":
+        \"sg-allow-all-ingress\",\n                \"SecurityGroupDesc\": \"Allow
+        all ingress\",\n                \"ProjectId\": \"0\",\n                \"IsDefault\":
+        false,\n                \"CreatedTime\": \"2025-12-09 23:14:50\",\n                \"UpdateTime\":
+        \"2025-12-09 23:14:52\",\n                \"TagSet\": [],\n                \"Region\":
+        \"na-ashburn\"\n            },\n            {\n                \"SecurityGroupId\":
+        \"sg-c7xghhr3\",\n                \"SecurityGroupName\": \"sg-deny-all-ingress\",\n
+        \               \"SecurityGroupDesc\": \"Deny all ingress\",\n                \"ProjectId\":
+        \"0\",\n                \"IsDefault\": false,\n                \"CreatedTime\":
+        \"2025-12-09 23:14:50\",\n                \"UpdateTime\": \"2025-12-09 23:14:52\",\n
+        \               \"TagSet\": [],\n                \"Region\": \"na-ashburn\"\n
+        \           },\n            {\n                \"SecurityGroupId\": \"sg-6ts6s7hx\",\n
+        \               \"SecurityGroupName\": \"sg-allow-tcp-ingress\",\n                \"SecurityGroupDesc\":
+        \"Allow TCP ingress\",\n                \"ProjectId\": \"0\",\n                \"IsDefault\":
+        false,\n                \"CreatedTime\": \"2025-12-09 23:14:50\",\n                \"UpdateTime\":
+        \"2025-12-09 23:14:52\",\n                \"TagSet\": [],\n                \"Region\":
+        \"na-ashburn\"\n            }\n        ],\n        \"TotalCount\": 3,\n        \"RegionStatistics\":
+        [\n            {\n                \"TotalCount\": 3,\n                \"Region\":
+        \"na-ashburn\"\n            }\n        ],\n        \"RequestId\": \"b52ac573-b6f2-4ffd-b250-5c1336b77ab6\"\n
+        \   }\n}"
+    headers:
+      Connection:
+      - keep-alive
+      Content-Length:
+      - '1623'
+      Content-Type:
+      - application/json
+      Date:
+      - Tue, 09 Dec 2025 19:50:06 GMT
+      X-TC-TraceId:
+      - d7597955-a004-493a-9ffc-4a9d6d463e40
+    status:
+      code: 200
+      message: OK
+- request:
+    body: '{"ResourceList": ["qcs::vpc:na-ashburn:uin/100000750436:sg/sg-6ykrshfb",
+      "qcs::vpc:na-ashburn:uin/100000750436:sg/sg-c7xghhr3", "qcs::vpc:na-ashburn:uin/100000750436:sg/sg-6ts6s7hx"]}'
+    headers:
+      Accept:
+      - '*/*'
+      Accept-Encoding:
+      - gzip, deflate
+      Connection:
+      - keep-alive
+      Content-Length:
+      - '183'
+      Content-Type:
+      - application/json
+      Host:
+      - tag.na-ashburn.tencentcloudapi.com
+      User-Agent:
+      - python-requests/2.32.5
+      X-TC-Action:
+      - GetResources
+      X-TC-Region:
+      - na-ashburn
+      X-TC-TraceId:
+      - 3a3a8b71-bd52-40a3-863f-073515a742ee
+      X-TC-Version:
+      - '2018-08-13'
+    method: POST
+    uri: https://tag.na-ashburn.tencentcloudapi.com/
+  response:
+    body:
+      string: '{"Response":{"PaginationToken":"","ResourceTagMappingList":[],"RequestId":"2e0950dc-3bb7-41db-83c9-e1d1e090e593"}}'
+    headers:
+      Connection:
+      - keep-alive
+      Content-Length:
+      - '114'
+      Content-Type:
+      - application/json
+      Date:
+      - Tue, 09 Dec 2025 19:50:06 GMT
+      X-TC-TraceId:
+      - 3a3a8b71-bd52-40a3-863f-073515a742ee
+    status:
+      code: 200
+      message: OK
+- request:
+    body: '{"SecurityGroupId": "sg-6ykrshfb"}'
+    headers:
+      Accept:
+      - '*/*'
+      Accept-Encoding:
+      - gzip, deflate
+      Connection:
+      - keep-alive
+      Content-Length:
+      - '34'
+      Content-Type:
+      - application/json
+      Host:
+      - vpc.na-ashburn.tencentcloudapi.com
+      User-Agent:
+      - python-requests/2.32.5
+      X-TC-Action:
+      - DescribeSecurityGroupPolicies
+      X-TC-Region:
+      - na-ashburn
+      X-TC-TraceId:
+      - f131e5ed-fe48-4f9a-9c18-346fc8f75063
+      X-TC-Version:
+      - '2017-03-12'
+    method: POST
+    uri: https://vpc.na-ashburn.tencentcloudapi.com/
+  response:
+    body:
+      string: "{\n    \"Response\": {\n        \"SecurityGroupPolicySet\": {\n            \"Ingress\":
+        [\n                {\n                    \"PolicyIndex\": 0,\n                    \"Priority\":
+        1,\n                    \"Port\": \"ALL\",\n                    \"CidrBlock\":
+        \"0.0.0.0\\/0\",\n                    \"Ipv6CidrBlock\": \"\",\n                    \"SecurityGroupId\":
+        \"\",\n                    \"Action\": \"ACCEPT\",\n                    \"ModifyTime\":
+        \"2025-12-09 23:14:52\",\n                    \"PolicyDescription\": \"Allow
+        all ingress\",\n                    \"Protocol\": \"ALL\",\n                    \"ServiceTemplate\":
+        {\n                        \"ServiceId\": \"\",\n                        \"ServiceGroupId\":
+        \"\"\n                    },\n                    \"AddressTemplate\": {\n
+        \                       \"AddressId\": \"\",\n                        \"AddressGroupId\":
+        \"\"\n                    },\n                    \"Diff\": false\n                }\n
+        \           ],\n            \"Egress\": [],\n            \"Version\": \"1\",\n
+        \           \"PolicyStatistics\": {\n                \"IngressIPv4TotalCount\":
+        1,\n                \"IngressIPv6TotalCount\": 0,\n                \"EgressIPv4TotalCount\":
+        0,\n                \"EgressIPv6TotalCount\": 0\n            }\n        },\n
+        \       \"RequestId\": \"b7e23992-19b5-4a3b-bd62-fd1d9fcb87b1\"\n    }\n}"
+    headers:
+      Connection:
+      - keep-alive
+      Content-Length:
+      - '1256'
+      Content-Type:
+      - application/json
+      Date:
+      - Tue, 09 Dec 2025 19:50:07 GMT
+      X-TC-TraceId:
+      - f131e5ed-fe48-4f9a-9c18-346fc8f75063
+    status:
+      code: 200
+      message: OK
+- request:
+    body: '{"SecurityGroupId": "sg-c7xghhr3"}'
+    headers:
+      Accept:
+      - '*/*'
+      Accept-Encoding:
+      - gzip, deflate
+      Connection:
+      - keep-alive
+      Content-Length:
+      - '34'
+      Content-Type:
+      - application/json
+      Host:
+      - vpc.na-ashburn.tencentcloudapi.com
+      User-Agent:
+      - python-requests/2.32.5
+      X-TC-Action:
+      - DescribeSecurityGroupPolicies
+      X-TC-Region:
+      - na-ashburn
+      X-TC-TraceId:
+      - 13ddb455-45ce-48ea-8544-758d6d7dbbd0
+      X-TC-Version:
+      - '2017-03-12'
+    method: POST
+    uri: https://vpc.na-ashburn.tencentcloudapi.com/
+  response:
+    body:
+      string: "{\n    \"Response\": {\n        \"SecurityGroupPolicySet\": {\n            \"Ingress\":
+        [\n                {\n                    \"PolicyIndex\": 0,\n                    \"Priority\":
+        1,\n                    \"Port\": \"ALL\",\n                    \"CidrBlock\":
+        \"0.0.0.0\\/0\",\n                    \"Ipv6CidrBlock\": \"\",\n                    \"SecurityGroupId\":
+        \"\",\n                    \"Action\": \"DROP\",\n                    \"ModifyTime\":
+        \"2025-12-09 23:14:52\",\n                    \"PolicyDescription\": \"Deny
+        all ingress\",\n                    \"Protocol\": \"ALL\",\n                    \"ServiceTemplate\":
+        {\n                        \"ServiceId\": \"\",\n                        \"ServiceGroupId\":
+        \"\"\n                    },\n                    \"AddressTemplate\": {\n
+        \                       \"AddressId\": \"\",\n                        \"AddressGroupId\":
+        \"\"\n                    },\n                    \"Diff\": false\n                }\n
+        \           ],\n            \"Egress\": [],\n            \"Version\": \"1\",\n
+        \           \"PolicyStatistics\": {\n                \"IngressIPv4TotalCount\":
+        1,\n                \"IngressIPv6TotalCount\": 0,\n                \"EgressIPv4TotalCount\":
+        0,\n                \"EgressIPv6TotalCount\": 0\n            }\n        },\n
+        \       \"RequestId\": \"e7504c0a-b9f7-4802-ab01-5320a39a6dfa\"\n    }\n}"
+    headers:
+      Connection:
+      - keep-alive
+      Content-Length:
+      - '1253'
+      Content-Type:
+      - application/json
+      Date:
+      - Tue, 09 Dec 2025 19:50:07 GMT
+      X-TC-TraceId:
+      - 13ddb455-45ce-48ea-8544-758d6d7dbbd0
+    status:
+      code: 200
+      message: OK
+- request:
+    body: '{"SecurityGroupId": "sg-6ts6s7hx"}'
+    headers:
+      Accept:
+      - '*/*'
+      Accept-Encoding:
+      - gzip, deflate
+      Connection:
+      - keep-alive
+      Content-Length:
+      - '34'
+      Content-Type:
+      - application/json
+      Host:
+      - vpc.na-ashburn.tencentcloudapi.com
+      User-Agent:
+      - python-requests/2.32.5
+      X-TC-Action:
+      - DescribeSecurityGroupPolicies
+      X-TC-Region:
+      - na-ashburn
+      X-TC-TraceId:
+      - 365ae65e-a92f-41ab-b8c2-af94c476ac7f
+      X-TC-Version:
+      - '2017-03-12'
+    method: POST
+    uri: https://vpc.na-ashburn.tencentcloudapi.com/
+  response:
+    body:
+      string: "{\n    \"Response\": {\n        \"SecurityGroupPolicySet\": {\n            \"Ingress\":
+        [\n                {\n                    \"PolicyIndex\": 0,\n                    \"Priority\":
+        1,\n                    \"Port\": \"ALL\",\n                    \"CidrBlock\":
+        \"0.0.0.0\\/0\",\n                    \"Ipv6CidrBlock\": \"\",\n                    \"SecurityGroupId\":
+        \"\",\n                    \"Action\": \"ACCEPT\",\n                    \"ModifyTime\":
+        \"2025-12-09 23:14:52\",\n                    \"PolicyDescription\": \"Allow
+        all TCP ingress\",\n                    \"Protocol\": \"tcp\",\n                    \"ServiceTemplate\":
+        {\n                        \"ServiceId\": \"\",\n                        \"ServiceGroupId\":
+        \"\"\n                    },\n                    \"AddressTemplate\": {\n
+        \                       \"AddressId\": \"\",\n                        \"AddressGroupId\":
+        \"\"\n                    },\n                    \"Diff\": false\n                }\n
+        \           ],\n            \"Egress\": [],\n            \"Version\": \"1\",\n
+        \           \"PolicyStatistics\": {\n                \"IngressIPv4TotalCount\":
+        1,\n                \"IngressIPv6TotalCount\": 0,\n                \"EgressIPv4TotalCount\":
+        0,\n                \"EgressIPv6TotalCount\": 0\n            }\n        },\n
+        \       \"RequestId\": \"f8e9e813-9f66-455a-b786-ac4ca44ecc0d\"\n    }\n}"
+    headers:
+      Connection:
+      - keep-alive
+      Content-Length:
+      - '1260'
+      Content-Type:
+      - application/json
+      Date:
+      - Tue, 09 Dec 2025 19:50:07 GMT
+      X-TC-TraceId:
+      - 365ae65e-a92f-41ab-b8c2-af94c476ac7f
+    status:
+      code: 200
+      message: OK
+- request:
+    body: '{"Offset": "0", "Limit": "20"}'
+    headers:
+      Accept:
+      - '*/*'
+      Accept-Encoding:
+      - gzip, deflate
+      Connection:
+      - keep-alive
+      Content-Length:
+      - '30'
+      Content-Type:
+      - application/json
+      Host:
+      - vpc.na-ashburn.tencentcloudapi.com
+      User-Agent:
+      - python-requests/2.32.5
+      X-TC-Action:
+      - DescribeSecurityGroups
+      X-TC-Region:
+      - na-ashburn
+      X-TC-TraceId:
+      - 8932659c-4067-4333-935b-a05e7eb831e7
+      X-TC-Version:
+      - '2017-03-12'
+    method: POST
+    uri: https://vpc.na-ashburn.tencentcloudapi.com/
+  response:
+    body:
+      string: "{\n    \"Response\": {\n        \"SecurityGroupSet\": [\n            {\n
+        \               \"SecurityGroupId\": \"sg-6ykrshfb\",\n                \"SecurityGroupName\":
+        \"sg-allow-all-ingress\",\n                \"SecurityGroupDesc\": \"Allow
+        all ingress\",\n                \"ProjectId\": \"0\",\n                \"IsDefault\":
+        false,\n                \"CreatedTime\": \"2025-12-09 23:14:50\",\n                \"UpdateTime\":
+        \"2025-12-09 23:14:52\",\n                \"TagSet\": [],\n                \"Region\":
+        \"na-ashburn\"\n            },\n            {\n                \"SecurityGroupId\":
+        \"sg-c7xghhr3\",\n                \"SecurityGroupName\": \"sg-deny-all-ingress\",\n
+        \               \"SecurityGroupDesc\": \"Deny all ingress\",\n                \"ProjectId\":
+        \"0\",\n                \"IsDefault\": false,\n                \"CreatedTime\":
+        \"2025-12-09 23:14:50\",\n                \"UpdateTime\": \"2025-12-09 23:14:52\",\n
+        \               \"TagSet\": [],\n                \"Region\": \"na-ashburn\"\n
+        \           },\n            {\n                \"SecurityGroupId\": \"sg-6ts6s7hx\",\n
+        \               \"SecurityGroupName\": \"sg-allow-tcp-ingress\",\n                \"SecurityGroupDesc\":
+        \"Allow TCP ingress\",\n                \"ProjectId\": \"0\",\n                \"IsDefault\":
+        false,\n                \"CreatedTime\": \"2025-12-09 23:14:50\",\n                \"UpdateTime\":
+        \"2025-12-09 23:14:52\",\n                \"TagSet\": [],\n                \"Region\":
+        \"na-ashburn\"\n            }\n        ],\n        \"TotalCount\": 3,\n        \"RegionStatistics\":
+        [\n            {\n                \"TotalCount\": 3,\n                \"Region\":
+        \"na-ashburn\"\n            }\n        ],\n        \"RequestId\": \"d7f81200-6d5a-47c6-b684-efde0bc710bd\"\n
+        \   }\n}"
+    headers:
+      Connection:
+      - keep-alive
+      Content-Length:
+      - '1623'
+      Content-Type:
+      - application/json
+      Date:
+      - Tue, 09 Dec 2025 19:50:08 GMT
+      X-TC-TraceId:
+      - 8932659c-4067-4333-935b-a05e7eb831e7
+    status:
+      code: 200
+      message: OK
+- request:
+    body: '{"ResourceList": ["qcs::vpc:na-ashburn:uin/100000750436:sg/sg-6ykrshfb",
+      "qcs::vpc:na-ashburn:uin/100000750436:sg/sg-c7xghhr3", "qcs::vpc:na-ashburn:uin/100000750436:sg/sg-6ts6s7hx"]}'
+    headers:
+      Accept:
+      - '*/*'
+      Accept-Encoding:
+      - gzip, deflate
+      Connection:
+      - keep-alive
+      Content-Length:
+      - '183'
+      Content-Type:
+      - application/json
+      Host:
+      - tag.na-ashburn.tencentcloudapi.com
+      User-Agent:
+      - python-requests/2.32.5
+      X-TC-Action:
+      - GetResources
+      X-TC-Region:
+      - na-ashburn
+      X-TC-TraceId:
+      - 06d4ff10-0046-46bb-b02b-7935c57abf71
+      X-TC-Version:
+      - '2018-08-13'
+    method: POST
+    uri: https://tag.na-ashburn.tencentcloudapi.com/
+  response:
+    body:
+      string: '{"Response":{"PaginationToken":"","ResourceTagMappingList":[],"RequestId":"dad1984f-c4a4-4740-8593-e63aca384970"}}'
+    headers:
+      Connection:
+      - keep-alive
+      Content-Length:
+      - '114'
+      Content-Type:
+      - application/json
+      Date:
+      - Tue, 09 Dec 2025 19:50:08 GMT
+      X-TC-TraceId:
+      - 06d4ff10-0046-46bb-b02b-7935c57abf71
+    status:
+      code: 200
+      message: OK
+- request:
+    body: '{"SecurityGroupId": "sg-6ykrshfb"}'
+    headers:
+      Accept:
+      - '*/*'
+      Accept-Encoding:
+      - gzip, deflate
+      Connection:
+      - keep-alive
+      Content-Length:
+      - '34'
+      Content-Type:
+      - application/json
+      Host:
+      - vpc.na-ashburn.tencentcloudapi.com
+      User-Agent:
+      - python-requests/2.32.5
+      X-TC-Action:
+      - DescribeSecurityGroupPolicies
+      X-TC-Region:
+      - na-ashburn
+      X-TC-TraceId:
+      - 5ee0f2e4-b151-418f-9316-2cbbe89c4a85
+      X-TC-Version:
+      - '2017-03-12'
+    method: POST
+    uri: https://vpc.na-ashburn.tencentcloudapi.com/
+  response:
+    body:
+      string: "{\n    \"Response\": {\n        \"SecurityGroupPolicySet\": {\n            \"Ingress\":
+        [\n                {\n                    \"PolicyIndex\": 0,\n                    \"Priority\":
+        1,\n                    \"Port\": \"ALL\",\n                    \"CidrBlock\":
+        \"0.0.0.0\\/0\",\n                    \"Ipv6CidrBlock\": \"\",\n                    \"SecurityGroupId\":
+        \"\",\n                    \"Action\": \"ACCEPT\",\n                    \"ModifyTime\":
+        \"2025-12-09 23:14:52\",\n                    \"PolicyDescription\": \"Allow
+        all ingress\",\n                    \"Protocol\": \"ALL\",\n                    \"ServiceTemplate\":
+        {\n                        \"ServiceId\": \"\",\n                        \"ServiceGroupId\":
+        \"\"\n                    },\n                    \"AddressTemplate\": {\n
+        \                       \"AddressId\": \"\",\n                        \"AddressGroupId\":
+        \"\"\n                    },\n                    \"Diff\": false\n                }\n
+        \           ],\n            \"Egress\": [],\n            \"Version\": \"1\",\n
+        \           \"PolicyStatistics\": {\n                \"IngressIPv4TotalCount\":
+        1,\n                \"IngressIPv6TotalCount\": 0,\n                \"EgressIPv4TotalCount\":
+        0,\n                \"EgressIPv6TotalCount\": 0\n            }\n        },\n
+        \       \"RequestId\": \"3b11b09b-ee14-4fa6-96fb-1f4b24fddb40\"\n    }\n}"
+    headers:
+      Connection:
+      - keep-alive
+      Content-Length:
+      - '1256'
+      Content-Type:
+      - application/json
+      Date:
+      - Tue, 09 Dec 2025 19:50:09 GMT
+      X-TC-TraceId:
+      - 5ee0f2e4-b151-418f-9316-2cbbe89c4a85
+    status:
+      code: 200
+      message: OK
+- request:
+    body: '{"SecurityGroupId": "sg-c7xghhr3"}'
+    headers:
+      Accept:
+      - '*/*'
+      Accept-Encoding:
+      - gzip, deflate
+      Connection:
+      - keep-alive
+      Content-Length:
+      - '34'
+      Content-Type:
+      - application/json
+      Host:
+      - vpc.na-ashburn.tencentcloudapi.com
+      User-Agent:
+      - python-requests/2.32.5
+      X-TC-Action:
+      - DescribeSecurityGroupPolicies
+      X-TC-Region:
+      - na-ashburn
+      X-TC-TraceId:
+      - 8bb4cdff-1fe4-49b2-aaf7-79e0e012067f
+      X-TC-Version:
+      - '2017-03-12'
+    method: POST
+    uri: https://vpc.na-ashburn.tencentcloudapi.com/
+  response:
+    body:
+      string: "{\n    \"Response\": {\n        \"SecurityGroupPolicySet\": {\n            \"Ingress\":
+        [\n                {\n                    \"PolicyIndex\": 0,\n                    \"Priority\":
+        1,\n                    \"Port\": \"ALL\",\n                    \"CidrBlock\":
+        \"0.0.0.0\\/0\",\n                    \"Ipv6CidrBlock\": \"\",\n                    \"SecurityGroupId\":
+        \"\",\n                    \"Action\": \"DROP\",\n                    \"ModifyTime\":
+        \"2025-12-09 23:14:52\",\n                    \"PolicyDescription\": \"Deny
+        all ingress\",\n                    \"Protocol\": \"ALL\",\n                    \"ServiceTemplate\":
+        {\n                        \"ServiceId\": \"\",\n                        \"ServiceGroupId\":
+        \"\"\n                    },\n                    \"AddressTemplate\": {\n
+        \                       \"AddressId\": \"\",\n                        \"AddressGroupId\":
+        \"\"\n                    },\n                    \"Diff\": false\n                }\n
+        \           ],\n            \"Egress\": [],\n            \"Version\": \"1\",\n
+        \           \"PolicyStatistics\": {\n                \"IngressIPv4TotalCount\":
+        1,\n                \"IngressIPv6TotalCount\": 0,\n                \"EgressIPv4TotalCount\":
+        0,\n                \"EgressIPv6TotalCount\": 0\n            }\n        },\n
+        \       \"RequestId\": \"fe154e1e-c753-4f24-b874-cee9f5a398f1\"\n    }\n}"
+    headers:
+      Connection:
+      - keep-alive
+      Content-Length:
+      - '1253'
+      Content-Type:
+      - application/json
+      Date:
+      - Tue, 09 Dec 2025 19:50:09 GMT
+      X-TC-TraceId:
+      - 8bb4cdff-1fe4-49b2-aaf7-79e0e012067f
+    status:
+      code: 200
+      message: OK
+- request:
+    body: '{"SecurityGroupId": "sg-6ts6s7hx"}'
+    headers:
+      Accept:
+      - '*/*'
+      Accept-Encoding:
+      - gzip, deflate
+      Connection:
+      - keep-alive
+      Content-Length:
+      - '34'
+      Content-Type:
+      - application/json
+      Host:
+      - vpc.na-ashburn.tencentcloudapi.com
+      User-Agent:
+      - python-requests/2.32.5
+      X-TC-Action:
+      - DescribeSecurityGroupPolicies
+      X-TC-Region:
+      - na-ashburn
+      X-TC-TraceId:
+      - c59d22bc-6e81-4e6a-a2c9-7f49428e62b4
+      X-TC-Version:
+      - '2017-03-12'
+    method: POST
+    uri: https://vpc.na-ashburn.tencentcloudapi.com/
+  response:
+    body:
+      string: "{\n    \"Response\": {\n        \"SecurityGroupPolicySet\": {\n            \"Ingress\":
+        [\n                {\n                    \"PolicyIndex\": 0,\n                    \"Priority\":
+        1,\n                    \"Port\": \"ALL\",\n                    \"CidrBlock\":
+        \"0.0.0.0\\/0\",\n                    \"Ipv6CidrBlock\": \"\",\n                    \"SecurityGroupId\":
+        \"\",\n                    \"Action\": \"ACCEPT\",\n                    \"ModifyTime\":
+        \"2025-12-09 23:14:52\",\n                    \"PolicyDescription\": \"Allow
+        all TCP ingress\",\n                    \"Protocol\": \"tcp\",\n                    \"ServiceTemplate\":
+        {\n                        \"ServiceId\": \"\",\n                        \"ServiceGroupId\":
+        \"\"\n                    },\n                    \"AddressTemplate\": {\n
+        \                       \"AddressId\": \"\",\n                        \"AddressGroupId\":
+        \"\"\n                    },\n                    \"Diff\": false\n                }\n
+        \           ],\n            \"Egress\": [],\n            \"Version\": \"1\",\n
+        \           \"PolicyStatistics\": {\n                \"IngressIPv4TotalCount\":
+        1,\n                \"IngressIPv6TotalCount\": 0,\n                \"EgressIPv4TotalCount\":
+        0,\n                \"EgressIPv6TotalCount\": 0\n            }\n        },\n
+        \       \"RequestId\": \"30befbb8-9f20-449f-b578-2cc8f218eccb\"\n    }\n}"
+    headers:
+      Connection:
+      - keep-alive
+      Content-Length:
+      - '1260'
+      Content-Type:
+      - application/json
+      Date:
+      - Tue, 09 Dec 2025 19:50:09 GMT
+      X-TC-TraceId:
+      - c59d22bc-6e81-4e6a-a2c9-7f49428e62b4
+    status:
+      code: 200
+      message: OK
+version: 1

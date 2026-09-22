@@ -24,6 +24,7 @@ from c7n.mu import (
     get_exec_options,
     normalize_arn,
     BucketLambdaNotification,
+    ConfigRule,
     LambdaFunction,
     LambdaManager,
     PolicyLambda,
@@ -216,6 +217,67 @@ class PolicyLambdaProvision(Publish):
                                     'MessageType': 'ScheduledNotification'}],
                  'SourceIdentifier': 'arn:aws:lambda:us-east-1:644160558196:function:CloudCustodian'} # noqa
              })
+
+    def test_config_rule_update_strips_readonly_fields(self):
+        # Regression test: AWS Config's DescribeConfigRules response for an
+        # existing rule includes output-only / system-managed fields
+        # (ConfigRuleArn, ConfigRuleId, CreatedBy, RuleEvaluationVisibility)
+        # that PutConfigRule can reject if echoed back verbatim on update,
+        # even for an ordinary customer-owned CUSTOM_LAMBDA rule that
+        # happens to use EvaluationModes, e.g.:
+        #
+        #   InvalidParameterValueException: AWS Config populates the
+        #   RuleEvaluationVisibility field for ServiceLinkedConfigRule.
+        #   Try again without populating the RuleEvaluationVisibility
+        #   field.
+        #
+        # ConfigRule.add() previously did `rule.update(params)` and PUT
+        # the entire merged dict back, round-tripping those fields.
+        from c7n.resources.kinesis import KinesisStream
+        self.patch(KinesisStream.resource_type, 'config_type', None)
+
+        p = self.load_policy({
+            'name': 'configx',
+            'resource': 'aws.kinesis',
+            'mode': {
+                'schedule': 'Three_Hours',
+                'type': 'config-poll-rule'}})
+        mu_policy = PolicyLambda(p)
+        mu_policy.arn = "arn:aws:lambda:us-east-1:644160558196:function:CloudCustodian"
+
+        rule_mgr = ConfigRule(p.data['mode'], lambda: None)
+        rule_mgr._client = mock.MagicMock()
+
+        # A live rule as AWS Config would return it via DescribeConfigRules,
+        # including the read-only fields that must not be sent back.
+        existing_rule = {
+            'ConfigRuleName': 'custodian-configx',
+            'ConfigRuleArn': 'arn:aws:config:us-east-1:644160558196:config-rule/config-rule-abcdef',
+            'ConfigRuleId': 'config-rule-abcdef',
+            'ConfigRuleState': 'ACTIVE',
+            'CreatedBy': '',
+            'Description': 'stale description',
+            'Source': {
+                'Owner': 'CUSTOM_LAMBDA',
+                'SourceIdentifier': mu_policy.arn,
+                'SourceDetails': [{'EventSource': 'aws.config',
+                                    'MessageType': 'ScheduledNotification'}]},
+            'MaximumExecutionFrequency': 'Three_Hours',
+            'EvaluationModes': [{'Mode': 'DETECTIVE'}],
+            'RuleEvaluationVisibility': 'EXTERNAL',
+        }
+        rule_mgr.get = mock.MagicMock(return_value=dict(existing_rule))
+
+        rule_mgr.add(mu_policy, existing=True)
+
+        rule_mgr.client.put_config_rule.assert_called_once()
+        sent_rule = rule_mgr.client.put_config_rule.call_args.kwargs['ConfigRule']
+
+        for readonly_field in ConfigRule.readonly_fields:
+            self.assertNotIn(readonly_field, sent_rule)
+        self.assertEqual(sent_rule['ConfigRuleName'], 'custodian-configx')
+        # fields we do manage should still make it through
+        self.assertEqual(sent_rule['MaximumExecutionFrequency'], 'Three_Hours')
 
     def test_config_rule_evaluation(self):
         session_factory = self.replay_flight_data("test_config_rule_evaluate")
