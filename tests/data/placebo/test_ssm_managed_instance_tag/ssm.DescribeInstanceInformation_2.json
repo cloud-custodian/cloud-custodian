@@ -1,0 +1,120 @@
+{
+    "status_code": 200,
+    "data": {
+        "InstanceInformationList": [
+            {
+                "InstanceId": "mi-036e234ffb4be392c",
+                "PingStatus": "Online",
+                "LastPingDateTime": {
+                    "__class__": "datetime",
+                    "year": 2026,
+                    "month": 8,
+                    "day": 20,
+                    "hour": 20,
+                    "minute": 2,
+                    "second": 9,
+                    "microsecond": 526000
+                },
+                "AgentVersion": "3.3.4624.0",
+                "IsLatestVersion": false,
+                "PlatformType": "Linux",
+                "PlatformName": "Amazon Linux",
+                "PlatformVersion": "2023",
+                "ActivationId": "318b35aa-8092-4687-beb7-182fe8b95c8a",
+                "IamRole": "SSMServiceRole",
+                "RegistrationDate": {
+                    "__class__": "datetime",
+                    "year": 2026,
+                    "month": 8,
+                    "day": 20,
+                    "hour": 19,
+                    "minute": 58,
+                    "second": 7,
+                    "microsecond": 886000
+                },
+                "ResourceType": "ManagedInstance",
+                "IPAddress": "172.31.31.9",
+                "ComputerName": "ip-172-31-31-9.ec2.internal",
+                "AssociationStatus": "Success",
+                "LastAssociationExecutionDate": {
+                    "__class__": "datetime",
+                    "year": 2026,
+                    "month": 8,
+                    "day": 20,
+                    "hour": 19,
+                    "minute": 58,
+                    "second": 51,
+                    "microsecond": 421000
+                },
+                "LastSuccessfulAssociationExecutionDate": {
+                    "__class__": "datetime",
+                    "year": 2026,
+                    "month": 8,
+                    "day": 20,
+                    "hour": 19,
+                    "minute": 58,
+                    "second": 51,
+                    "microsecond": 421000
+                },
+                "AssociationOverview": {
+                    "InstanceAssociationStatusAggregatedCount": {
+                        "Success": 1
+                    }
+                },
+                "SourceId": "mi-036e234ffb4be392c",
+                "SourceType": "AWS::SSM::ManagedInstance"
+            },
+            {
+                "InstanceId": "i-0585418e43dc3377d",
+                "PingStatus": "Online",
+                "LastPingDateTime": {
+                    "__class__": "datetime",
+                    "year": 2026,
+                    "month": 8,
+                    "day": 20,
+                    "hour": 20,
+                    "minute": 3,
+                    "second": 55,
+                    "microsecond": 894000
+                },
+                "AgentVersion": "3.3.4624.0",
+                "IsLatestVersion": false,
+                "PlatformType": "Linux",
+                "PlatformName": "Amazon Linux",
+                "PlatformVersion": "2023",
+                "ResourceType": "EC2Instance",
+                "IPAddress": "172.31.22.42",
+                "ComputerName": "ip-172-31-22-42.ec2.internal",
+                "AssociationStatus": "Success",
+                "LastAssociationExecutionDate": {
+                    "__class__": "datetime",
+                    "year": 2026,
+                    "month": 8,
+                    "day": 20,
+                    "hour": 19,
+                    "minute": 58,
+                    "second": 39,
+                    "microsecond": 576000
+                },
+                "LastSuccessfulAssociationExecutionDate": {
+                    "__class__": "datetime",
+                    "year": 2026,
+                    "month": 8,
+                    "day": 20,
+                    "hour": 19,
+                    "minute": 58,
+                    "second": 39,
+                    "microsecond": 576000
+                },
+                "AssociationOverview": {
+                    "InstanceAssociationStatusAggregatedCount": {
+                        "Success": 1
+                    }
+                },
+                "SourceId": "i-0585418e43dc3377d",
+                "SourceType": "AWS::EC2::Instance"
+            }
+        ],
+        "ResponseMetadata": {}
+    }
+}
