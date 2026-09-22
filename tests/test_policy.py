@@ -206,8 +206,9 @@ class PolicyMetaLint(BaseTest):
         overrides = overrides.difference(
             {'account', 's3', 'hostedzone', 'log-group', 'rest-api', 'redshift-snapshot',
              'rest-stage', 'codedeploy-app', 'codedeploy-group', 'fis-template', 'dlm-policy',
-             'apigwv2', 'apigwv2-stage', 'lexv2-bot-alias', 'apigw-domain-name', 'fis-experiment',
-             'launch-template-version', 'glue-table', 'glue-catalog', 'cloudwatch-synthetics'})
+             'apigwv2', 'apigwv2-route', 'apigwv2-stage', 'lexv2-bot-alias', 'apigw-domain-name',
+             'fis-experiment', 'launch-template-version', 'glue-table', 'glue-catalog',
+             'cloudwatch-synthetics'})
         if overrides:
             raise ValueError("unknown arn overrides in %s" % (", ".join(overrides)))
 
@@ -655,7 +656,6 @@ class PolicyMetaLint(BaseTest):
             'AWS::EventSchemas::RegistryPolicy',
             'AWS::EventSchemas::Schema',
             'AWS::Events::Archive',
-            'AWS::Events::Connection',
             'AWS::Events::Endpoint',
             'AWS::FraudDetector::EntityType',
             'AWS::FraudDetector::Label',
@@ -993,7 +993,7 @@ class PolicyMetaLint(BaseTest):
             'healthcheck', 'event-rule-target', 'log-metric',
             'support-case', 'transit-attachment', 'config-recorder',
             'apigw-domain-name', 'backup-job', 'quicksight-account', 'codedeploy-config',
-            'cleanrooms-collaboration-member'}
+            'cleanrooms-collaboration-member', 's3files-mount-target'}
 
         missing_method = []
         for k, v in manager.resources.items():
