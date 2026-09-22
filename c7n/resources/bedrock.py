@@ -86,6 +86,16 @@ class BedrockFoundationModel(QueryResourceManager):
         return super().resources(query=query)
 
 
+@resources.register('bedrock-custom-model-deployment')
+class BedrockCustomModelDeployment(QueryResourceManager):
+    class resource_type(TypeInfo):
+        service = 'bedrock'
+        enum_spec = ('list_custom_model_deployments', 'modelDeploymentSummaries[]', None)
+        name = "customModelDeploymentName"
+        id = arn = "customModelDeploymentArn"
+        permission_prefix = 'bedrock'
+
+
 @resources.register('bedrock-custom-model')
 class BedrockCustomModel(QueryResourceManager):
     class resource_type(TypeInfo):
