@@ -1887,3 +1887,33 @@ class BedrockMantleProject(BaseTest):
              'bedrock-mantle:ListTagsForResource',
              'cloudformation:ListResources',
              'tag:GetResources'])
+
+
+def test_bedrock_custom_model_deployment_query(test):
+
+    # point at the recorded json
+    session_factory = test.replay_flight_data(
+        'test_bedrock_custom_model_deployment_query', region='us-west-2'
+    )
+
+    # load the policy
+    p = test.load_policy(
+        {
+            'name': 'bedrock-custom-model-deployment',
+            'resource': 'aws.bedrock-custom-model-deployment',
+            'filters': []
+        },
+        session_factory=session_factory,
+        config={'region': 'us-west-2'}
+    )
+
+    # run the policy
+    resources = p.run()
+
+    assert len(resources) == 1
+    deployment_arn = (
+        'arn:aws:bedrock:us-west-2:644160558196:'
+        'custom-model-deployment/zboxrwysx8m7')
+
+    assert resources[0]['customModelDeploymentArn'] == deployment_arn
+    assert resources[0]['status'] == 'Active'
