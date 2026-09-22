@@ -1,0 +1,12 @@
+{
+    "status_code": 404,
+    "data": {
+        "Error": {
+            "Message": "File system policy does not exist.",
+            "Code": "ResourceNotFoundException"
+        },
+        "ResponseMetadata": {},
+        "errorCode": "ResourceNotFoundException",
+        "message": "File system policy does not exist."
+    }
+}
