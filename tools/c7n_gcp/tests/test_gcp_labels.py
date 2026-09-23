@@ -292,6 +292,24 @@ class SetLabelsRemoveTest(BaseTest):
                     {'keep': 'yes', 'remove_a': 'a'})
                 self.assertEqual(params['body']['labels'], {'keep': 'yes'})
 
+    def test_unchanged_labels_skip_write(self):
+        for resource_type in ('gcp.bucket', 'gcp.instance'):
+            for action in (
+                    {'type': 'set-labels', 'remove': ['missing']},
+                    {'type': 'set-labels', 'labels': {'keep': 'yes'}}):
+                with self.subTest(resource_type=resource_type, action=action):
+                    policy = self.load_policy({
+                        'name': 'test-label-noop',
+                        'resource': resource_type,
+                        'actions': [action]})
+                    manager = policy.resource_manager
+                    resource = dict(
+                        LABEL_REMOVAL_RESOURCES[resource_type], labels={'keep': 'yes'})
+                    client = mock.MagicMock()
+                    manager.actions[0].process_resource_set(
+                        client, manager.get_model(), [resource])
+                    client.execute_command.assert_not_called()
+
     def test_merge_patch_types_flagged(self):
         for resource_type in LABEL_REMOVAL_RESOURCES:
             with self.subTest(resource_type=resource_type):
@@ -313,14 +331,19 @@ class SetLabelsClearToRemoveTest(BaseTest):
     subset of labels clears them all and then sets the survivors.
     """
 
-    def run_action(self, action, current_labels, client=None):
+    def run_action(self, action, current_labels, client=None, fresh_labels=None):
+        """Run the action against a zone listed with current_labels, whose
+        labels are fresh_labels (default: unchanged) when refreshed.
+        """
         policy = self.load_policy({
             'name': 'test-label-clear-to-remove',
             'resource': 'gcp.dns-managed-zone',
             'actions': [action]})
         manager = policy.resource_manager
         resource = dict(LABEL_REMOVAL_RESOURCES['gcp.dns-managed-zone'], labels=current_labels)
-        client = client or mock.MagicMock()
+        self.client = client = client or mock.MagicMock()
+        client.execute_query.return_value = {
+            'labels': current_labels if fresh_labels is None else fresh_labels}
         manager.actions[0].process_resource_set(client, manager.get_model(), [resource])
         return [
             (op, params['body']['labels'])
@@ -335,6 +358,25 @@ class SetLabelsClearToRemoveTest(BaseTest):
             ('patch', {'keep': None, 'remove_a': None, 'remove_b': None}),
             ('patch', {'keep': 'yes'}),
         ])
+        self.client.execute_query.assert_called_once_with(
+            'get', {'project': 'cloud-custodian', 'managedZone': 'zone-1'})
+
+    def test_partial_remove_keeps_labels_added_since_listing(self):
+        calls = self.run_action(
+            {'type': 'set-labels', 'remove': ['remove_a']},
+            {'keep': 'yes', 'remove_a': 'a'},
+            fresh_labels={'keep': 'yes', 'remove_a': 'a', 'added_later': 'x'})
+        self.assertEqual(calls, [
+            ('patch', {'keep': None, 'remove_a': None, 'added_later': None}),
+            ('patch', {'keep': 'yes', 'added_later': 'x'}),
+        ])
+
+    def test_remove_already_gone_since_listing_is_noop(self):
+        calls = self.run_action(
+            {'type': 'set-labels', 'remove': ['remove_a']},
+            {'keep': 'yes', 'remove_a': 'a'},
+            fresh_labels={'keep': 'yes'})
+        self.assertEqual(calls, [])
 
     def test_partial_remove_with_add(self):
         calls = self.run_action(
@@ -362,15 +404,17 @@ class SetLabelsClearToRemoveTest(BaseTest):
             {'remove_a': 'a', 'remove_b': 'b'})
         self.assertEqual(calls, [('patch', {'remove_a': None, 'remove_b': None})])
 
-    def test_remove_absent_label_is_single_patch(self):
+    def test_remove_absent_label_is_noop(self):
         calls = self.run_action(
             {'type': 'set-labels', 'remove': ['missing']}, {'keep': 'yes'})
-        self.assertEqual(calls, [('patch', {'keep': 'yes'})])
+        self.assertEqual(calls, [])
+        self.client.execute_query.assert_not_called()
 
     def test_add_is_single_patch(self):
         calls = self.run_action(
             {'type': 'set-labels', 'labels': {'added': 'new'}}, {'keep': 'yes'})
         self.assertEqual(calls, [('patch', {'keep': 'yes', 'added': 'new'})])
+        self.client.execute_query.assert_not_called()
 
     def test_set_failure_after_clear_logs_labels(self):
         client = mock.MagicMock()

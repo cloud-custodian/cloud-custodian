@@ -57,44 +57,60 @@ class BaseLabelAction(MethodAction):
         return super().get_client(session, model)
 
     def get_resource_params(self, model, resource):
-        current_labels = self._get_current_labels(resource)
-        new_labels = self.get_labels_to_add(resource)
-        remove_labels = self.get_labels_to_delete(resource)
-        all_labels = self._merge_labels(current_labels, new_labels, remove_labels)
-        if remove_labels and model.labels_merge_patch:
-            all_labels.update({k: None for k in remove_labels if k in current_labels})
+        _, labels, removed = self.resolve_labels(resource)
+        if removed and model.labels_merge_patch:
+            labels = dict(labels, **{k: None for k in removed})
+        return model.get_label_params(resource, labels)
 
-        return model.get_label_params(resource, all_labels)
+    def resolve_labels(self, resource):
+        """Return the resource's current labels, its labels once this action
+        applies, and the labels being removed that it currently has.
+        """
+        current = self._get_current_labels(resource)
+        remove = self.get_labels_to_delete(resource) or ()
+        labels = self._merge_labels(current, self.get_labels_to_add(resource), remove)
+        return current, labels, [k for k in remove if k in current]
 
     def _get_current_labels(self, resource):
         return resource.get('labels', {})
 
     def process_resource_set(self, client, model, resources):
+        # Skip resources the action leaves as they are, rather than send a
+        # write that changes nothing.
+        resources = [r for r in resources if self.changes_labels(r)]
         if not model.labels_clear_to_remove:
             return super().process_resource_set(client, model, resources)
         for resource in resources:
             self.process_clear_to_remove(client, model, resource)
 
+    def changes_labels(self, resource):
+        current, labels, _ = self.resolve_labels(resource)
+        return labels != current
+
     def process_clear_to_remove(self, client, model, resource):
-        current_labels = self._get_current_labels(resource)
-        remove_labels = self.get_labels_to_delete(resource) or ()
-        if not any(k in current_labels for k in remove_labels):
-            return super().process_resource_set(client, model, [resource])
+        if self.resolve_labels(resource)[2]:
+            # Clearing wipes every label, so work from the labels the resource
+            # has now rather than when it was listed.
+            fresh = model.refresh(client, resource)
+            resource = dict(resource, labels=fresh.get('labels', {}))
+        current, labels, removed = self.resolve_labels(resource)
+        if labels == current:
+            return
+        if not removed:
+            self.invoke_api(client, model.labels_op, model.get_label_params(resource, labels))
+            return
 
         self.invoke_api(client, model.labels_op, model.get_label_params(
-            resource, {k: None for k in current_labels}))
-
-        keep_labels = self._merge_labels(
-            current_labels, self.get_labels_to_add(resource), remove_labels)
-        if not keep_labels:
+            resource, {k: None for k in current}))
+        if not labels:
             return
         try:
-            super().process_resource_set(client, model, [resource])
+            self.invoke_api(client, model.labels_op, model.get_label_params(resource, labels))
         except HttpError:
             self.log.error(
                 "policy:%s action:%s cleared labels on %s but failed to set %s",
                 self.manager.ctx.policy.name, self.type,
-                resource.get(model.name), keep_labels)
+                resource.get(model.name), labels)
             raise
 
     def handle_resource_error(self, client, model, resource, op_name, params, error):

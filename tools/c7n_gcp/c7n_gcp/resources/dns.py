@@ -45,6 +45,11 @@ class DnsManagedZone(QueryResourceManager):
                 'body': {'labels': all_labels}
             }
 
+        @staticmethod
+        def refresh(client, resource):
+            return client.execute_query(
+                'get', {'project': resource['project_id'], 'managedZone': resource['name']})
+
     def augment(self, resources):
         project = local_session(self.session_factory).get_default_project()
         for resource in resources:
