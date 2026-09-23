@@ -16,6 +16,7 @@ import os
 import shutil
 import time
 import tempfile
+import urllib.request
 import zipfile
 import platform
 import re
@@ -37,6 +38,7 @@ except ImportError:
 from c7n.exceptions import ClientError
 from c7n.cwe import CloudWatchEvents
 from c7n.utils import parse_s3, local_session, get_retry, merge_dict
+from c7n.version import version
 
 log = logging.getLogger('custodian.serverless')
 
@@ -623,6 +625,25 @@ class LambdaManager:
                 FunctionVersion=func_version)
         return alias_result['AliasArn']
 
+    def get_policy_names(self, func_name):
+        """Names of the policies deployed in a policy lambda's config.json.
+
+        Returns None if the function doesn't exist.
+        """
+        existing = self.get(func_name)
+        if not existing:
+            return None
+        location = existing.get('Code', {}).get('Location', '')
+        if not location.startswith('https://'):
+            return []
+        with urllib.request.urlopen(location) as fh:  # nosec - lambda presigned url
+            archive = zipfile.ZipFile(io.BytesIO(fh.read()))
+        try:
+            config = json.loads(archive.read('config.json'))
+        except KeyError:
+            return []
+        return [p['name'] for p in config.get('policies', ())]
+
     def get(self, func_name, qualifier=None):
         params = {'FunctionName': func_name}
         if qualifier:
@@ -873,10 +894,14 @@ class PolicyLambda(AbstractLambdaFunction):
         self.policy = policy
         self.archive = custodian_archive(packages=self.packages)
 
+    @staticmethod
+    def get_function_name(policy):
+        prefix = policy.data['mode'].get('function-prefix', 'custodian-')
+        return "%s%s" % (prefix, policy.name)
+
     @property
     def name(self):
-        prefix = self.policy.data['mode'].get('function-prefix', 'custodian-')
-        return "%s%s" % (prefix, self.policy.name)
+        return self.get_function_name(self.policy)
 
     event_name = name
 
@@ -987,6 +1012,233 @@ class PolicyLambda(AbstractLambdaFunction):
         self.archive.add_contents('custodian_policy.py', PolicyHandlerTemplate)
         self.archive.close()
         return self.archive
+
+
+# Mode keys which are specific to a member policy of a lambda group, all other
+# mode keys configure the shared function and must match to be grouped.
+GROUP_MEMBER_MODE_KEYS = ('type', 'events', 'group', 'delay')
+GROUP_NAME_MARKER = 'group-'
+GROUP_TAG = 'custodian-group'
+MAX_LAMBDA_FUNCTION_NAME_LENGTH = 64
+
+
+def get_group_key(policy):
+    """Serialize the configuration a policy needs from its lambda function.
+
+    Policies with the same group key can safely share a function.
+    """
+    mode = {k: v for k, v in policy.data['mode'].items()
+            if k not in GROUP_MEMBER_MODE_KEYS}
+    # custodian reserved tags are set at provision time, ignore them
+    mode['tags'] = {k: v for k, v in mode.get('tags', {}).items()
+                    if not k.startswith('custodian-')}
+    return json.dumps({
+        'region': policy.options.region,
+        'execution-options': get_exec_options(policy.options),
+        'mode': mode}, sort_keys=True)
+
+
+def get_group_name(policy):
+    """Name of the lambda group function for a policy.
+
+    Groups are keyed by the event sources (services) the policy subscribes
+    to along with its function configuration, ie. all compatible policies
+    on ec2 api calls share a function.
+    """
+    mode = policy.data['mode']
+    prefix = mode.get('function-prefix', 'custodian-')
+    sources = sorted({s for s, _ in CloudWatchEvents.get_subscriptions(mode)})
+    digest = hashlib.sha256(
+        (get_group_key(policy) + json.dumps(sources)).encode('utf8')).hexdigest()[:8]
+    slug = '-'.join(s.split('.', 1)[0] for s in sources)
+    budget = MAX_LAMBDA_FUNCTION_NAME_LENGTH - len(prefix) - len(GROUP_NAME_MARKER) - 9
+    slug = slug[:max(budget, 0)].strip('-')
+    if slug:
+        return "%s%s%s-%s" % (prefix, GROUP_NAME_MARKER, slug, digest)
+    return "%s%s%s" % (prefix, GROUP_NAME_MARKER, digest)
+
+
+def group_policies(policies):
+    """Partition policies into lambda groups, returns a dict of name -> policies."""
+    groups = {}
+    for p in policies:
+        groups.setdefault(get_group_name(p), []).append(p)
+    return groups
+
+
+class PolicyLambdaGroup(PolicyLambda):
+    """A single lambda function serving several cloudtrail mode policies.
+
+    The function's event rule subscribes to the union of the member
+    policies' events, and the handler dispatches each event only to
+    the members subscribed to it.
+    """
+
+    def __init__(self, name, policies):
+        self.group_name = name
+        self.policies = sorted(policies, key=lambda p: p.name)
+        super().__init__(self.policies[0])
+
+    @property
+    def name(self):
+        return self.group_name
+
+    event_name = name
+
+    @property
+    def policy_names(self):
+        return [p.name for p in self.policies]
+
+    @property
+    def description(self):
+        description = "cloud-custodian lambda policy group: %s" % (
+            ", ".join(self.policy_names))
+        if len(description) > 256:
+            description = description[:253] + '...'
+        return description
+
+    @property
+    def tags(self):
+        tags = {k: v for k, v in self.policy.data['mode'].get('tags', {}).items()
+                if not k.startswith('custodian-')}
+        tags['custodian-info'] = "mode=cloudtrail-group:version=%s" % version
+        tags[GROUP_TAG] = self.name
+        return tags
+
+    def get_group_mode(self):
+        events, seen = [], set()
+        for p in self.policies:
+            for e in p.data['mode'].get('events', ()):
+                k = json.dumps(e, sort_keys=True)
+                if k in seen:
+                    continue
+                seen.add(k)
+                events.append(e)
+        mode = {'type': 'cloudtrail', 'events': events}
+        if self.policy.data['mode'].get('pattern'):
+            mode['pattern'] = self.policy.data['mode']['pattern']
+        return mode
+
+    def get_events(self, session_factory):
+        return [CloudWatchEventSource(self.get_group_mode(), session_factory)]
+
+    def get_archive(self):
+        self.archive.add_contents(
+            'config.json', json.dumps(
+                {'execution-options': get_exec_options(self.policy.options),
+                 'function-group': self.name,
+                 'policies': [p.data for p in self.policies]}, indent=2))
+        self.archive.add_contents('custodian_policy.py', PolicyHandlerTemplate)
+        self.archive.close()
+        return self.archive
+
+
+class PolicyLambdaGroupManager:
+    """Provision cloudtrail policies as shared lambda group functions.
+
+    Group membership is stored in the deployed function's config.json,
+    which allows diffing membership on update and deprovisioning
+    functions that the groups supersede, namely
+
+      - standalone functions previously provisioned for a member policy.
+      - group functions whose members have all moved to other groups,
+        ie. due to a configuration change altering the group name.
+    """
+
+    def __init__(self, policies):
+        self.groups = group_policies(policies)
+
+    def publish(self):
+        """Publish all groups, returns the names of policies that failed."""
+        errored = []
+        regions = {}
+        for name, members in self.groups.items():
+            regions.setdefault(members[0].options.region, {})[name] = members
+
+        for region, groups in regions.items():
+            manager = self.get_lambda_manager(next(iter(groups.values()))[0])
+            published = {}
+            for name, members in groups.items():
+                try:
+                    self.publish_group(manager, name, members)
+                    published[name] = members
+                except Exception:
+                    log.exception("Error provisioning policy lambda group:%s", name)
+                    errored.extend(p.name for p in members)
+            if published and len(published) == len(groups):
+                self.remove_superseded_groups(manager, groups)
+        return errored
+
+    @staticmethod
+    def get_lambda_manager(policy):
+        try:
+            return LambdaManager(policy.session_factory)
+        except ClientError:
+            # For cli usage by normal users, don't assume the role just use
+            # it for the lambda
+            return LambdaManager(lambda assume=False: policy.session_factory(assume))
+
+    def publish_group(self, manager, name, members):
+        func = PolicyLambdaGroup(name, members)
+        previous = manager.get_policy_names(name)
+        if previous is None:
+            log.info("Provisioning policy lambda group:%s region:%s policies:%s",
+                     name, members[0].options.region, ", ".join(func.policy_names))
+        else:
+            added = sorted(set(func.policy_names).difference(previous))
+            removed = sorted(set(previous).difference(func.policy_names))
+            log.info("Updating policy lambda group:%s region:%s added:%s removed:%s",
+                     name, members[0].options.region,
+                     ", ".join(added) or "none", ", ".join(removed) or "none")
+        result = manager.publish(func, role=members[0].options.assume_role)
+        # remove standalone functions for members only after the group is
+        # live, preferring a brief overlap over missed events.
+        for p in members:
+            self.remove_standalone(manager, p)
+        return result
+
+    def remove_standalone(self, manager, policy):
+        func_name = PolicyLambda.get_function_name(policy)
+        existing = manager.get(func_name)
+        if not existing or 'custodian-info' not in existing.get('Tags', {}):
+            return False
+        log.info("Removing policy lambda:%s superseded by lambda group", func_name)
+        manager.remove(self.get_removal_func(existing, manager.session_factory))
+        return True
+
+    def remove_superseded_groups(self, manager, groups):
+        prefixes = {m.data['mode'].get('function-prefix', 'custodian-') + GROUP_NAME_MARKER
+                    for members in groups.values() for m in members}
+        grouped = {m.name for members in groups.values() for m in members}
+        for f in manager.list_functions():
+            fname = f['FunctionName']
+            if fname in groups or not any(fname.startswith(p) for p in prefixes):
+                continue
+            existing = manager.get(fname)
+            if not existing or GROUP_TAG not in existing.get('Tags', {}):
+                continue
+            previous = manager.get_policy_names(fname) or []
+            if previous and grouped.issuperset(previous):
+                log.info("Removing policy lambda group:%s superseded by groups", fname)
+                manager.remove(self.get_removal_func(existing, manager.session_factory))
+            elif grouped.intersection(previous):
+                log.warning(
+                    "Policy lambda group:%s shares policies:%s with provisioned groups, "
+                    "those policies will execute twice until it is removed",
+                    fname, ", ".join(sorted(grouped.intersection(previous))))
+
+    @staticmethod
+    def get_removal_func(existing, session_factory):
+        config = existing['Configuration']
+        return LambdaFunction({
+            'name': config['FunctionName'],
+            'role': config['Role'],
+            'handler': config['Handler'],
+            'timeout': config['Timeout'],
+            'memory_size': config['MemorySize'],
+            'description': config.get('Description', ''),
+            'runtime': config.get('Runtime', ''),
+            'events': [CloudWatchEventSource({}, session_factory)]}, None)
 
 
 def zinfo(fname):

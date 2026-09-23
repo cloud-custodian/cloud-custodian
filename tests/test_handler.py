@@ -151,3 +151,40 @@ class HandleTest(BaseTest):
         )
         self.assertEqual(handler.dispatch_event({"detail": {}}, None), True)
         self.assertEqual(executions, [({"detail": {}, "debug": True}, None)])
+
+    def test_dispatch_grouped_subscribed_policies(self):
+        self.setupLambdaEnv({
+            'function-group': 'custodian-group-ec2-abcd1234',
+            'policies': [
+                {'resource': 'ec2', 'name': 'ec2-run',
+                 'mode': {'type': 'cloudtrail', 'group': True,
+                          'events': ['RunInstances']}},
+                {'resource': 'ec2', 'name': 'ec2-tag',
+                 'mode': {'type': 'cloudtrail', 'group': True,
+                          'events': [{'source': 'ec2.amazonaws.com',
+                                      'event': 'CreateTags',
+                                      'ids': 'requestParameters.resourcesSet.items[].resourceId'}]}}
+            ]})
+        pushed = []
+        self.patch(Policy, 'push', lambda p, event, context: pushed.append(p.name))
+
+        handler.dispatch_event({'detail': {
+            'eventSource': 'ec2.amazonaws.com', 'eventName': 'CreateTags'}}, None)
+        self.assertEqual(pushed, ['ec2-tag'])
+
+        handler.dispatch_event({'detail': {
+            'eventSource': 'ec2.amazonaws.com', 'eventName': 'RunInstances'}}, None)
+        self.assertEqual(pushed, ['ec2-tag', 'ec2-run'])
+
+        handler.dispatch_event({'detail': {
+            'eventSource': 's3.amazonaws.com', 'eventName': 'CreateTags'}}, None)
+        self.assertEqual(pushed, ['ec2-tag', 'ec2-run'])
+
+    def test_dispatch_ungrouped_ignores_subscription(self):
+        _, executions = self.setupLambdaEnv({
+            'policies': [
+                {'resource': 'ec2', 'name': 'ec2-run',
+                 'mode': {'type': 'cloudtrail', 'events': ['RunInstances']}}]})
+        handler.dispatch_event({'detail': {
+            'eventSource': 'ec2.amazonaws.com', 'eventName': 'CreateTags'}}, None)
+        self.assertEqual(len(executions), 1)
