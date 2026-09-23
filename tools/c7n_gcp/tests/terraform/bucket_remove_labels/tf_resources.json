@@ -1,0 +1,182 @@
+{
+    "pytest-terraform": 1,
+    "outputs": {},
+    "resources": {
+        "google_storage_bucket": {
+            "absent": {
+                "autoclass": [],
+                "cors": [],
+                "custom_placement_config": [],
+                "default_event_based_hold": false,
+                "deletion_policy": "DELETE",
+                "effective_labels": {
+                    "c7n_keep": "yes"
+                },
+                "enable_object_retention": false,
+                "encryption": [],
+                "force_destroy": true,
+                "hierarchical_namespace": [
+                    {
+                        "enabled": false
+                    }
+                ],
+                "id": "c7n-remove-labels-absent-1066",
+                "ip_filter": [],
+                "labels": {
+                    "c7n_keep": "yes"
+                },
+                "lifecycle_rule": [],
+                "location": "US",
+                "logging": [],
+                "name": "c7n-remove-labels-absent-1066",
+                "project": "cloud-custodian",
+                "project_number": 123456789012,
+                "public_access_prevention": "inherited",
+                "requester_pays": false,
+                "retention_policy": [],
+                "rpo": "DEFAULT",
+                "self_link": "https://www.googleapis.com/storage/v1/b/c7n-remove-labels-absent-1066",
+                "soft_delete_policy": [
+                    {
+                        "effective_time": "2026-09-23T16:54:20.657Z",
+                        "retention_duration_seconds": 604800
+                    }
+                ],
+                "storage_class": "STANDARD",
+                "terraform_labels": {
+                    "c7n_keep": "yes"
+                },
+                "time_created": "2026-09-23T16:54:20.657Z",
+                "timeouts": null,
+                "uniform_bucket_level_access": true,
+                "updated": "2026-09-23T16:54:20.657Z",
+                "url": "gs://c7n-remove-labels-absent-1066",
+                "versioning": [],
+                "website": []
+            },
+            "full": {
+                "autoclass": [],
+                "cors": [],
+                "custom_placement_config": [],
+                "default_event_based_hold": false,
+                "deletion_policy": "DELETE",
+                "effective_labels": {
+                    "c7n_remove_a": "a",
+                    "c7n_remove_b": "b"
+                },
+                "enable_object_retention": false,
+                "encryption": [],
+                "force_destroy": true,
+                "hierarchical_namespace": [
+                    {
+                        "enabled": false
+                    }
+                ],
+                "id": "c7n-remove-labels-full-1066",
+                "ip_filter": [],
+                "labels": {
+                    "c7n_remove_a": "a",
+                    "c7n_remove_b": "b"
+                },
+                "lifecycle_rule": [],
+                "location": "US",
+                "logging": [],
+                "name": "c7n-remove-labels-full-1066",
+                "project": "cloud-custodian",
+                "project_number": 123456789012,
+                "public_access_prevention": "inherited",
+                "requester_pays": false,
+                "retention_policy": [],
+                "rpo": "DEFAULT",
+                "self_link": "https://www.googleapis.com/storage/v1/b/c7n-remove-labels-full-1066",
+                "soft_delete_policy": [
+                    {
+                        "effective_time": "2026-09-23T16:54:20.725Z",
+                        "retention_duration_seconds": 604800
+                    }
+                ],
+                "storage_class": "STANDARD",
+                "terraform_labels": {
+                    "c7n_remove_a": "a",
+                    "c7n_remove_b": "b"
+                },
+                "time_created": "2026-09-23T16:54:20.725Z",
+                "timeouts": null,
+                "uniform_bucket_level_access": true,
+                "updated": "2026-09-23T16:54:20.725Z",
+                "url": "gs://c7n-remove-labels-full-1066",
+                "versioning": [],
+                "website": []
+            },
+            "partial": {
+                "autoclass": [],
+                "cors": [],
+                "custom_placement_config": [],
+                "default_event_based_hold": false,
+                "deletion_policy": "DELETE",
+                "effective_labels": {
+                    "c7n_keep": "yes",
+                    "c7n_remove_a": "a",
+                    "c7n_remove_b": "b"
+                },
+                "enable_object_retention": false,
+                "encryption": [],
+                "force_destroy": true,
+                "hierarchical_namespace": [
+                    {
+                        "enabled": false
+                    }
+                ],
+                "id": "c7n-remove-labels-partial-1066",
+                "ip_filter": [],
+                "labels": {
+                    "c7n_keep": "yes",
+                    "c7n_remove_a": "a",
+                    "c7n_remove_b": "b"
+                },
+                "lifecycle_rule": [],
+                "location": "US",
+                "logging": [],
+                "name": "c7n-remove-labels-partial-1066",
+                "project": "cloud-custodian",
+                "project_number": 123456789012,
+                "public_access_prevention": "inherited",
+                "requester_pays": false,
+                "retention_policy": [],
+                "rpo": "DEFAULT",
+                "self_link": "https://www.googleapis.com/storage/v1/b/c7n-remove-labels-partial-1066",
+                "soft_delete_policy": [
+                    {
+                        "effective_time": "2026-09-23T16:54:20.760Z",
+                        "retention_duration_seconds": 604800
+                    }
+                ],
+                "storage_class": "STANDARD",
+                "terraform_labels": {
+                    "c7n_keep": "yes",
+                    "c7n_remove_a": "a",
+                    "c7n_remove_b": "b"
+                },
+                "time_created": "2026-09-23T16:54:20.760Z",
+                "timeouts": null,
+                "uniform_bucket_level_access": true,
+                "updated": "2026-09-23T16:54:20.760Z",
+                "url": "gs://c7n-remove-labels-partial-1066",
+                "versioning": [],
+                "website": []
+            }
+        },
+        "random_id": {
+            "suffix": {
+                "b64_std": "EGY=",
+                "b64_url": "EGY",
+                "byte_length": 2,
+                "dec": "4198",
+                "hex": "1066",
+                "id": "EGY",
+                "keepers": null,
+                "prefix": null
+            }
+        }
+    }
+}

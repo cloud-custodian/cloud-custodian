@@ -344,7 +344,7 @@ def test_bucket_remove_labels(test, bucket_remove_labels):
     buckets = bucket_remove_labels.resources['google_storage_bucket']
     names = {case: buckets[case]['name'] for case in ('partial', 'full', 'absent')}
 
-    factory = test.record_flight_data('bucket-remove-labels')
+    factory = test.replay_flight_data('bucket-remove-labels')
     policy = test.load_policy(
         {'name': 'bucket-remove-labels',
          'resource': 'gcp.bucket',
