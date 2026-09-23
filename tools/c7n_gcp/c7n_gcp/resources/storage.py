@@ -41,6 +41,7 @@ class Bucket(QueryResourceManager):
         labels = True
         labels_op = 'patch'
         labels_perm = 'update'
+        labels_merge_patch = True
 
         @staticmethod
         def get(client, resource_info):

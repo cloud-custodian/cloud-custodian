@@ -405,10 +405,11 @@ class TypeInfo(metaclass=TypeMeta):
 
     labels = False
     labels_op = 'setLabels'
-    # Whether labels_op merges the submitted labels into the existing ones
-    # rather than replacing them. None infers it from the label params: a
-    # patch without an update mask merges. Set True or False to override.
-    labels_merge_patch = None
+    # Set when labels_op merges the submitted labels into the existing ones
+    # rather than replacing them, typically a patch the api offers no update
+    # mask for. Omitted keys are left in place, so removing a label means
+    # sending it with a null value.
+    labels_merge_patch = False
     # Set when labels_op merges but drops null values, so a subset of labels
     # can't be removed in one call. Removal then clears every label and sets
     # the survivors back in a second call.

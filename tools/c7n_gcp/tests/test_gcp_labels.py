@@ -8,7 +8,6 @@ from httplib2 import Response
 
 from c7n.filters import FilterValidationError
 from c7n.resources import load_resources
-from c7n_gcp.actions.labels import has_update_mask
 from c7n_gcp.provider import resources
 
 
@@ -293,14 +292,20 @@ class SetLabelsRemoveTest(BaseTest):
                     {'keep': 'yes', 'remove_a': 'a'})
                 self.assertEqual(params['body']['labels'], {'keep': 'yes'})
 
-    def test_merge_patch_override(self):
-        policy = self.load_policy({'name': 'test', 'resource': 'gcp.bucket'})
-        self.patch(policy.resource_manager.get_model(), 'labels_merge_patch', False)
+    def test_merge_patch_types_flagged(self):
+        for resource_type in LABEL_REMOVAL_RESOURCES:
+            with self.subTest(resource_type=resource_type):
+                policy = self.load_policy({'name': 'test', 'resource': resource_type})
+                self.assertEqual(
+                    policy.resource_manager.get_model().labels_merge_patch,
+                    resource_type in MERGE_PATCH_TYPES)
+
+    def test_merge_patch_ignores_mask_like_label_keys(self):
         params = self.get_params(
             'gcp.bucket',
-            {'type': 'set-labels', 'remove': ['remove_a']},
-            {'keep': 'yes', 'remove_a': 'a'})
-        self.assertEqual(params['body']['labels'], {'keep': 'yes'})
+            {'type': 'set-labels', 'remove': ['env']},
+            {'update_mask': 'x', 'env': 'prod'})
+        self.assertEqual(params['body']['labels'], {'update_mask': 'x', 'env': None})
 
 
 class SetLabelsClearToRemoveTest(BaseTest):
@@ -382,11 +387,14 @@ class SetLabelsClearToRemoveTest(BaseTest):
             log_output.getvalue())
 
 
-def test_has_update_mask():
-    assert has_update_mask({'name': 'x', 'updateMask': 'labels'})
-    assert has_update_mask({'body': {'instance': {}, 'field_mask': 'labels'}})
-    assert not has_update_mask({'body': {'labels': {}, 'netmask': '255.255.255.0'}})
-    assert not has_update_mask({'bucket': 'x', 'body': {'labels': {}}})
+# Update mask spellings used across apis, in query parameters or the body.
+UPDATE_MASK_KEYS = frozenset(('updateMask', 'update_mask', 'fieldMask', 'field_mask'))
+
+
+def has_update_mask(params):
+    if not isinstance(params, dict):
+        return False
+    return any(k in UPDATE_MASK_KEYS or has_update_mask(v) for k, v in params.items())
 
 
 # Superset of the identity fields read by patch-op get_label_params
@@ -401,18 +409,22 @@ PATCH_LABEL_RESOURCE = {
 }
 
 
-def test_inferred_merge_patch_types():
-    """Snapshot of the types whose label removal sends nulls, so a change to
-    the inferred set shows up in review.
+def test_patch_label_ops_declare_merge_semantics():
+    """A labels patch without an update mask merges into the existing labels,
+    so removal only works if the type declares how (labels_merge_patch or
+    labels_clear_to_remove), and a masked patch must declare neither.
     """
     load_resources(('gcp.*',))
-    inferred = set()
+    mismatched = []
     for name, resource in resources.items():
         model = resource.resource_type
         if not model.labels or model.labels_op != 'patch':
             continue
-        action = resource.action_registry['set-labels']({'remove': ['env']})
-        params = model.get_label_params(PATCH_LABEL_RESOURCE, {'env': 'test'})
-        if action.is_merge_patch(model, params):
-            inferred.add(name)
-    assert inferred == set(MERGE_PATCH_TYPES)
+        # No labels, so label keys can't be mistaken for a mask.
+        params = model.get_label_params(PATCH_LABEL_RESOURCE, {})
+        merges = model.labels_merge_patch or model.labels_clear_to_remove
+        if has_update_mask(params) == merges:
+            mismatched.append(name)
+    assert not mismatched, (
+        "labels patch without an update mask should set labels_merge_patch or "
+        "labels_clear_to_remove, and a masked one neither: %s" % ", ".join(sorted(mismatched)))
