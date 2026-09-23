@@ -6,7 +6,9 @@ from collections import defaultdict
 from concurrent.futures import as_completed
 from datetime import datetime, timedelta
 
-from c7n.actions import BaseAction
+from botocore.exceptions import ClientError
+
+from c7n.actions import AutoTagUser, BaseAction
 from c7n.exceptions import PolicyValidationError
 from c7n.filters import Filter, MetricsFilter
 from c7n.filters.core import parse_date, ValueFilter
@@ -17,7 +19,8 @@ from c7n.query import (
     QueryResourceManager,
     TypeInfo, DescribeSource, ConfigSource, DescribeWithResourceTags)
 from c7n.resolver import ValuesFrom
-from c7n.tags import universal_augment
+from c7n.tags import (
+    RemoveTag, Tag, TagActionFilter, TagDelayedAction, universal_augment)
 from c7n.utils import type_schema, local_session, chunks, get_retry, jmespath_search
 
 
@@ -688,6 +691,32 @@ class SubscriptionFilter(BaseAction):
                 logGroupName=r['logGroupName'], **params)
 
 
+class DescribeDashboard(DescribeSource):
+
+    def augment(self, resources):
+        # Dashboards aren't supported by the resource groups tagging api,
+        # fetch their tags from cloudwatch directly.
+        resources = super().augment(resources)
+        client = local_session(self.manager.session_factory).client('cloudwatch')
+        results = []
+        for r, arn in zip(resources, self.manager.get_arns(resources)):
+            try:
+                tags = self.manager.retry(
+                    client.list_tags_for_resource, ResourceARN=arn).get('Tags', [])
+            except ClientError as e:
+                if e.response['Error']['Code'] not in (
+                        'ResourceNotFound', 'ResourceNotFoundException'):
+                    raise
+                # the dashboard was deleted between enumeration and augment
+                self.manager.log.warning(
+                    "Resource not found: list_tags_for_resource using %s" % {
+                        'ResourceARN': arn})
+                continue
+            r['Tags'] = tags
+            results.append(r)
+        return results
+
+
 @resources.register("cloudwatch-dashboard")
 class CloudWatchDashboard(QueryResourceManager):
     class resource_type(TypeInfo):
@@ -698,12 +727,69 @@ class CloudWatchDashboard(QueryResourceManager):
         id = "DashboardName"
         name = "DashboardName"
         cfn_type = "AWS::CloudWatch::Dashboard"
-        universal_taggable = object()
         global_resource = True
+        permissions_augment = ("cloudwatch:ListTagsForResource",)
 
     source_mapping = {
-       "describe": DescribeWithResourceTags,
+       "describe": DescribeDashboard,
     }
+
+
+@CloudWatchDashboard.action_registry.register('tag')
+class DashboardTag(Tag):
+    """Add tags to a cloudwatch dashboard
+
+    :example:
+
+    .. code-block:: yaml
+
+            policies:
+              - name: cloudwatch-dashboard-tag-owner
+                resource: aws.cloudwatch-dashboard
+                filters:
+                  - "tag:Owner": absent
+                actions:
+                  - type: tag
+                    key: Owner
+                    value: platform-team
+    """
+
+    permissions = ("cloudwatch:TagResource",)
+
+    def process_resource_set(self, client, resource_set, tags):
+        for arn in self.manager.get_arns(resource_set):
+            self.manager.retry(client.tag_resource, ResourceARN=arn, Tags=tags)
+
+
+@CloudWatchDashboard.action_registry.register('remove-tag')
+class DashboardRemoveTag(RemoveTag):
+    """Remove tags from a cloudwatch dashboard
+
+    :example:
+
+    .. code-block:: yaml
+
+            policies:
+              - name: cloudwatch-dashboard-remove-owner
+                resource: aws.cloudwatch-dashboard
+                filters:
+                  - "tag:Owner": present
+                actions:
+                  - type: remove-tag
+                    tags: [Owner]
+    """
+
+    permissions = ("cloudwatch:UntagResource",)
+
+    def process_resource_set(self, client, resource_set, tag_keys):
+        for arn in self.manager.get_arns(resource_set):
+            self.manager.retry(
+                client.untag_resource, ResourceARN=arn, TagKeys=tag_keys)
+
+
+CloudWatchDashboard.filter_registry.register('marked-for-op', TagActionFilter)
+CloudWatchDashboard.action_registry.register('mark-for-op', TagDelayedAction)
+CloudWatchDashboard.action_registry.register('auto-tag-user', AutoTagUser)
 
 
 @resources.register("destination")
