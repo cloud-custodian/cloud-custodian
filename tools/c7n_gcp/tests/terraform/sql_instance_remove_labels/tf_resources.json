@@ -1,0 +1,494 @@
+{
+    "pytest-terraform": 1,
+    "outputs": {},
+    "resources": {
+        "google_sql_database_instance": {
+            "absent": {
+                "available_maintenance_versions": [],
+                "backupdr_backup": null,
+                "clone": [],
+                "connection_name": "cloud-custodian:us-central1:c7n-remove-labels-absent-57b9",
+                "database_version": "MYSQL_8_0",
+                "deletion_policy": "DELETE",
+                "deletion_protection": false,
+                "dns_name": "",
+                "dns_names": [],
+                "encryption_key_name": null,
+                "enforce_new_sql_network_architecture": true,
+                "final_backup_description": null,
+                "first_ip_address": "136.65.246.78",
+                "id": "c7n-remove-labels-absent-57b9",
+                "include_replicas_for_major_version_upgrade": null,
+                "instance_type": "CLOUD_SQL_INSTANCE",
+                "ip_address": [
+                    {
+                        "ip_address": "136.65.246.78",
+                        "time_to_retire": "",
+                        "type": "PRIMARY"
+                    }
+                ],
+                "maintenance_version": "MYSQL_8_0_45.R20260726.00_27",
+                "master_instance_name": "",
+                "name": "c7n-remove-labels-absent-57b9",
+                "node_count": 0,
+                "point_in_time_restore_context": [],
+                "private_ip_address": "",
+                "project": "cloud-custodian",
+                "psc_service_attachment_link": "",
+                "public_ip_address": "136.65.246.78",
+                "region": "us-central1",
+                "replica_configuration": [],
+                "replica_names": [],
+                "replication_cluster": [
+                    {
+                        "dr_replica": false,
+                        "failover_dr_replica_name": "",
+                        "psa_write_endpoint": ""
+                    }
+                ],
+                "restore_backup_context": [],
+                "root_password": null,
+                "root_password_wo": null,
+                "root_password_wo_version": null,
+                "self_link": "https://sqladmin.googleapis.com/sql/v1beta4/projects/cloud-custodian/instances/c7n-remove-labels-absent-57b9",
+                "server_ca_cert": [
+                    {
+                        "cert": "-----BEGIN CERTIFICATE-----\nMIIDcTCCAlmgAwIBAgIBADANBgkqhkiG9w0BAQsFADBwMS0wKwYDVQQuEyRkNmQ2\nMmI3YS01OWY2LTRkNWYtOGQ1NC0wMDk2ZDU4NWJhNzMxHDAaBgNVBAMTE0Nsb3Vk\nIFNRTCBTZXJ2ZXIgQ0ExFDASBgNVBAoTC0dvb2dsZSwgSW5jMQswCQYDVQQGEwJV\nUzAeFw0yNjA5MjMxNTI0MDVaFw0zNjA5MjAxNTI1MDVaMHAxLTArBgNVBC4TJGQ2\nZDYyYjdhLTU5ZjYtNGQ1Zi04ZDU0LTAwOTZkNTg1YmE3MzEcMBoGA1UEAxMTQ2xv\ndWQgU1FMIFNlcnZlciBDQTEUMBIGA1UEChMLR29vZ2xlLCBJbmMxCzAJBgNVBAYT\nAlVTMIIBIjANBgkqhkiG9w0BAQEFAAOCAQ8AMIIBCgKCAQEAr4iPBqr8TCrBHdP/\nxf3ZF1TNwjalYogn2+j5cSRhWEfLLX6iiiaX859tB0YlBR7Lmqxtern6dTT4BtJv\ne6ZlOkqm42znUGkuz5wbIiCp6P4UpJ8XH9Smjsh4LJrsgJmTYx/m3nrEig1gH7lp\nBTb7LW95E/W6qvIAuu7WYGopVjQGXqJF6bWmhU81jHyJaxASO/tgaURfRU5H/VCZ\nty4Bo2nrmXRpN8MdaCLc40KpBReQhuVYSCimzJ+NL+0s2r3D6pT2CzbymUMO1ZlP\nCS8xxTOHOq3KCvxzi6/VSvicOrdD/YdZeN3VQ2KhCPpyVy541T60F/kC+UyBO/Kj\nBW+ySwIDAQABoxYwFDASBgNVHRMBAf8ECDAGAQH/AgEAMA0GCSqGSIb3DQEBCwUA\nA4IBAQCJj1vchDkQCP/HMWnTDGVCnFCRxyW2XPhvjGoWowv4iMXCGoZ+4bMkvRcb\n7NUOKZkvQQxnBMKaosR856GxPgdaIu1jmie9ygelXyOqyRzr6ire/Va6aF6xBXVa\naSy00iHhgan5PlgoZJ5JrWRU9FqhWRzwckedxGBYEtvjXCpJQtnIEqytt5yLItBZ\nUJh9xcymrXrY16eV8U2UyQkPfJkkBipJDVRdHKLoSesmq5AIk6GXLNDZjPKz8kM1\nzV+a0sY4rUSLW5fTbA3i2d3QyuZffIlDKAwyI9ez5jQhcxJ/QK9e1kUQuS48j3vG\nzS0xpY5O3Ekl2zXBn93wnjAOXNaV\n-----END CERTIFICATE-----",
+                        "common_name": "C=US,O=Google\\, Inc,CN=Cloud SQL Server CA,dnQualifier=d6d62b7a-59f6-4d5f-8d54-0096d585ba73",
+                        "create_time": "2026-09-23T15:24:05.910Z",
+                        "expiration_time": "2036-09-20T15:25:05.910Z",
+                        "sha1_fingerprint": "b74ce3374863a6af97c3e817ecd1af3e43fc3f61"
+                    }
+                ],
+                "service_account_email_address": "p123456789012-23y8vo@gcp-sa-cloud-sql.iam.gserviceaccount.com",
+                "settings": [
+                    {
+                        "activation_policy": "ALWAYS",
+                        "active_directory_config": [],
+                        "advanced_machine_features": [],
+                        "auto_upgrade_enabled": false,
+                        "availability_type": "ZONAL",
+                        "backup_configuration": [
+                            {
+                                "backup_retention_settings": [
+                                    {
+                                        "retained_backups": 7,
+                                        "retention_unit": "COUNT"
+                                    }
+                                ],
+                                "backup_tier": "STANDARD",
+                                "binary_log_enabled": false,
+                                "enabled": false,
+                                "location": "",
+                                "point_in_time_recovery_enabled": false,
+                                "start_time": "04:00",
+                                "transaction_log_retention_days": 7
+                            }
+                        ],
+                        "collation": "",
+                        "connection_pool_config": [],
+                        "connector_enforcement": "NOT_REQUIRED",
+                        "data_api_access": "",
+                        "data_cache_config": [
+                            {
+                                "data_cache_enabled": false
+                            }
+                        ],
+                        "data_disk_provisioned_iops": 0,
+                        "data_disk_provisioned_throughput": 0,
+                        "database_flags": [],
+                        "deletion_protection_enabled": false,
+                        "deny_maintenance_period": [],
+                        "disk_autoresize": true,
+                        "disk_autoresize_limit": 0,
+                        "disk_size": 10,
+                        "disk_type": "PD_SSD",
+                        "edition": "ENTERPRISE",
+                        "effective_availability_type": "ZONAL",
+                        "enable_dataplex_integration": false,
+                        "enable_google_ml_integration": false,
+                        "entraid_config": [],
+                        "final_backup_config": [],
+                        "insights_config": [],
+                        "ip_configuration": [
+                            {
+                                "allocated_ip_range": "",
+                                "authorized_networks": [],
+                                "custom_subject_alternative_names": [],
+                                "enable_private_path_for_google_cloud_services": false,
+                                "ipv4_enabled": true,
+                                "private_network": "",
+                                "psc_config": [],
+                                "server_ca_mode": "GOOGLE_MANAGED_INTERNAL_CA",
+                                "server_ca_pool": "",
+                                "server_certificate_rotation_mode": "SERVER_CERTIFICATE_ROTATION_MODE_UNSPECIFIED",
+                                "ssl_mode": "ALLOW_UNENCRYPTED_AND_ENCRYPTED"
+                            }
+                        ],
+                        "location_preference": [
+                            {
+                                "follow_gae_application": "",
+                                "secondary_zone": "",
+                                "zone": "us-central1-a"
+                            }
+                        ],
+                        "maintenance_window": [],
+                        "password_validation_policy": [],
+                        "pricing_plan": "PER_USE",
+                        "read_pool_auto_scale_config": [
+                            {
+                                "disable_scale_in": false,
+                                "enabled": false,
+                                "max_node_count": 0,
+                                "min_node_count": 0,
+                                "scale_in_cooldown_seconds": 0,
+                                "scale_out_cooldown_seconds": 0,
+                                "target_metrics": []
+                            }
+                        ],
+                        "replication_lag_max_seconds": 31536000,
+                        "retain_backups_on_delete": false,
+                        "sql_server_audit_config": [],
+                        "tier": "db-f1-micro",
+                        "time_zone": "",
+                        "user_labels": {
+                            "c7n_keep": "yes"
+                        },
+                        "version": 1
+                    }
+                ],
+                "switch_transaction_logs_to_cloud_storage_enabled": null,
+                "timeouts": null
+            },
+            "full": {
+                "available_maintenance_versions": [],
+                "backupdr_backup": null,
+                "clone": [],
+                "connection_name": "cloud-custodian:us-central1:c7n-remove-labels-full-57b9",
+                "database_version": "MYSQL_8_0",
+                "deletion_policy": "DELETE",
+                "deletion_protection": false,
+                "dns_name": "",
+                "dns_names": [],
+                "encryption_key_name": null,
+                "enforce_new_sql_network_architecture": true,
+                "final_backup_description": null,
+                "first_ip_address": "34.46.47.14",
+                "id": "c7n-remove-labels-full-57b9",
+                "include_replicas_for_major_version_upgrade": null,
+                "instance_type": "CLOUD_SQL_INSTANCE",
+                "ip_address": [
+                    {
+                        "ip_address": "34.46.47.14",
+                        "time_to_retire": "",
+                        "type": "PRIMARY"
+                    }
+                ],
+                "maintenance_version": "MYSQL_8_0_45.R20260726.00_27",
+                "master_instance_name": "",
+                "name": "c7n-remove-labels-full-57b9",
+                "node_count": 0,
+                "point_in_time_restore_context": [],
+                "private_ip_address": "",
+                "project": "cloud-custodian",
+                "psc_service_attachment_link": "",
+                "public_ip_address": "34.46.47.14",
+                "region": "us-central1",
+                "replica_configuration": [],
+                "replica_names": [],
+                "replication_cluster": [
+                    {
+                        "dr_replica": false,
+                        "failover_dr_replica_name": "",
+                        "psa_write_endpoint": ""
+                    }
+                ],
+                "restore_backup_context": [],
+                "root_password": null,
+                "root_password_wo": null,
+                "root_password_wo_version": null,
+                "self_link": "https://sqladmin.googleapis.com/sql/v1beta4/projects/cloud-custodian/instances/c7n-remove-labels-full-57b9",
+                "server_ca_cert": [
+                    {
+                        "cert": "-----BEGIN CERTIFICATE-----\nMIIDcTCCAlmgAwIBAgIBADANBgkqhkiG9w0BAQsFADBwMS0wKwYDVQQuEyRlMDk1\nODgwMy03Mjc1LTQ4YjUtYjQ1OC0xMDcwZmViYjAzMDAxHDAaBgNVBAMTE0Nsb3Vk\nIFNRTCBTZXJ2ZXIgQ0ExFDASBgNVBAoTC0dvb2dsZSwgSW5jMQswCQYDVQQGEwJV\nUzAeFw0yNjA5MjMxNTI0MTBaFw0zNjA5MjAxNTI1MTBaMHAxLTArBgNVBC4TJGUw\nOTU4ODAzLTcyNzUtNDhiNS1iNDU4LTEwNzBmZWJiMDMwMDEcMBoGA1UEAxMTQ2xv\ndWQgU1FMIFNlcnZlciBDQTEUMBIGA1UEChMLR29vZ2xlLCBJbmMxCzAJBgNVBAYT\nAlVTMIIBIjANBgkqhkiG9w0BAQEFAAOCAQ8AMIIBCgKCAQEAw8/x5NNiA5mSkpAn\n7uRz6m8vZFqfos7QfwlCGBBK8xehVVB51MYgnJN9m3dPqRB/JKDjRnFnCUKLoIYb\noUxaidI8GH8glQXl/m4ppjLtlC4/AFiuXlA/s4PvVjoWYE8z2+YMohrdFy4VShUP\nPDWo+hvTBVuC3RCMrEGPtneL7aWQxcnlrU6eCC/di134/A9oY01FojBCcDpm8tL2\nBckITWRzd7vhy2Lpda/lbBiovuvKWOp3+S47lJpABXqFWS57CX5iC8ghLSIIeP/z\nuEJZ3VrERjWNm4PkZDEJEV36JI4g0hepXl7AP9/TkKuWI5NedL4E5gMRL/ob5mni\nmkepXQIDAQABoxYwFDASBgNVHRMBAf8ECDAGAQH/AgEAMA0GCSqGSIb3DQEBCwUA\nA4IBAQBH3Hgbvfp8o6Hik2kjEpqS7Wmw/f7518BrD6KUZRx+UfhT+divrmzB+5TT\n/3UZHpVv1QfpAsu3Ol5qtkpfFXqi3+8YjO2Z4oFTDqyxQj+XF08wgulcOYdbBTjn\nJ79KlZi7jg/T4FuayNkx8HfbOTSwa3ZwHiGSBjxTvVKcWaqD9rae3pUlHJ1h2b9d\ng12RzHzWhfqNXHlRa3ZgffvBl5bCHDPTLO4pcwaqQ6KlEIxZkbHkr2/fflgbj0cz\nGx3xpeYAyZ+Ai1GSGimj/2FMeGKKBL4aujEZmlE1gW4oXOw4ZWTZP4fgztT/VixA\nJEeYzNCxbljeRWUqiQvunefDCoW8\n-----END CERTIFICATE-----",
+                        "common_name": "C=US,O=Google\\, Inc,CN=Cloud SQL Server CA,dnQualifier=e0958803-7275-48b5-b458-1070febb0300",
+                        "create_time": "2026-09-23T15:24:10.773Z",
+                        "expiration_time": "2036-09-20T15:25:10.773Z",
+                        "sha1_fingerprint": "cb8336ae27748fe582bd88725ecbef790aac26f1"
+                    }
+                ],
+                "service_account_email_address": "p123456789012-kef1w5@gcp-sa-cloud-sql.iam.gserviceaccount.com",
+                "settings": [
+                    {
+                        "activation_policy": "ALWAYS",
+                        "active_directory_config": [],
+                        "advanced_machine_features": [],
+                        "auto_upgrade_enabled": false,
+                        "availability_type": "ZONAL",
+                        "backup_configuration": [
+                            {
+                                "backup_retention_settings": [
+                                    {
+                                        "retained_backups": 7,
+                                        "retention_unit": "COUNT"
+                                    }
+                                ],
+                                "backup_tier": "STANDARD",
+                                "binary_log_enabled": false,
+                                "enabled": false,
+                                "location": "",
+                                "point_in_time_recovery_enabled": false,
+                                "start_time": "23:00",
+                                "transaction_log_retention_days": 7
+                            }
+                        ],
+                        "collation": "",
+                        "connection_pool_config": [],
+                        "connector_enforcement": "NOT_REQUIRED",
+                        "data_api_access": "",
+                        "data_cache_config": [
+                            {
+                                "data_cache_enabled": false
+                            }
+                        ],
+                        "data_disk_provisioned_iops": 0,
+                        "data_disk_provisioned_throughput": 0,
+                        "database_flags": [],
+                        "deletion_protection_enabled": false,
+                        "deny_maintenance_period": [],
+                        "disk_autoresize": true,
+                        "disk_autoresize_limit": 0,
+                        "disk_size": 10,
+                        "disk_type": "PD_SSD",
+                        "edition": "ENTERPRISE",
+                        "effective_availability_type": "ZONAL",
+                        "enable_dataplex_integration": false,
+                        "enable_google_ml_integration": false,
+                        "entraid_config": [],
+                        "final_backup_config": [],
+                        "insights_config": [],
+                        "ip_configuration": [
+                            {
+                                "allocated_ip_range": "",
+                                "authorized_networks": [],
+                                "custom_subject_alternative_names": [],
+                                "enable_private_path_for_google_cloud_services": false,
+                                "ipv4_enabled": true,
+                                "private_network": "",
+                                "psc_config": [],
+                                "server_ca_mode": "GOOGLE_MANAGED_INTERNAL_CA",
+                                "server_ca_pool": "",
+                                "server_certificate_rotation_mode": "SERVER_CERTIFICATE_ROTATION_MODE_UNSPECIFIED",
+                                "ssl_mode": "ALLOW_UNENCRYPTED_AND_ENCRYPTED"
+                            }
+                        ],
+                        "location_preference": [
+                            {
+                                "follow_gae_application": "",
+                                "secondary_zone": "",
+                                "zone": "us-central1-a"
+                            }
+                        ],
+                        "maintenance_window": [],
+                        "password_validation_policy": [],
+                        "pricing_plan": "PER_USE",
+                        "read_pool_auto_scale_config": [
+                            {
+                                "disable_scale_in": false,
+                                "enabled": false,
+                                "max_node_count": 0,
+                                "min_node_count": 0,
+                                "scale_in_cooldown_seconds": 0,
+                                "scale_out_cooldown_seconds": 0,
+                                "target_metrics": []
+                            }
+                        ],
+                        "replication_lag_max_seconds": 31536000,
+                        "retain_backups_on_delete": false,
+                        "sql_server_audit_config": [],
+                        "tier": "db-f1-micro",
+                        "time_zone": "",
+                        "user_labels": {
+                            "c7n_remove_a": "a",
+                            "c7n_remove_b": "b"
+                        },
+                        "version": 1
+                    }
+                ],
+                "switch_transaction_logs_to_cloud_storage_enabled": null,
+                "timeouts": null
+            },
+            "partial": {
+                "available_maintenance_versions": [],
+                "backupdr_backup": null,
+                "clone": [],
+                "connection_name": "cloud-custodian:us-central1:c7n-remove-labels-partial-57b9",
+                "database_version": "MYSQL_8_0",
+                "deletion_policy": "DELETE",
+                "deletion_protection": false,
+                "dns_name": "",
+                "dns_names": [],
+                "encryption_key_name": null,
+                "enforce_new_sql_network_architecture": true,
+                "final_backup_description": null,
+                "first_ip_address": "34.44.135.162",
+                "id": "c7n-remove-labels-partial-57b9",
+                "include_replicas_for_major_version_upgrade": null,
+                "instance_type": "CLOUD_SQL_INSTANCE",
+                "ip_address": [
+                    {
+                        "ip_address": "34.44.135.162",
+                        "time_to_retire": "",
+                        "type": "PRIMARY"
+                    }
+                ],
+                "maintenance_version": "MYSQL_8_0_45.R20260726.00_27",
+                "master_instance_name": "",
+                "name": "c7n-remove-labels-partial-57b9",
+                "node_count": 0,
+                "point_in_time_restore_context": [],
+                "private_ip_address": "",
+                "project": "cloud-custodian",
+                "psc_service_attachment_link": "",
+                "public_ip_address": "34.44.135.162",
+                "region": "us-central1",
+                "replica_configuration": [],
+                "replica_names": [],
+                "replication_cluster": [
+                    {
+                        "dr_replica": false,
+                        "failover_dr_replica_name": "",
+                        "psa_write_endpoint": ""
+                    }
+                ],
+                "restore_backup_context": [],
+                "root_password": null,
+                "root_password_wo": null,
+                "root_password_wo_version": null,
+                "self_link": "https://sqladmin.googleapis.com/sql/v1beta4/projects/cloud-custodian/instances/c7n-remove-labels-partial-57b9",
+                "server_ca_cert": [
+                    {
+                        "cert": "-----BEGIN CERTIFICATE-----\nMIIDcTCCAlmgAwIBAgIBADANBgkqhkiG9w0BAQsFADBwMS0wKwYDVQQuEyRjZTU1\nY2U4MC1mYjk4LTRjY2QtOTZiMy1hMWVkZDBhMDEwMjMxHDAaBgNVBAMTE0Nsb3Vk\nIFNRTCBTZXJ2ZXIgQ0ExFDASBgNVBAoTC0dvb2dsZSwgSW5jMQswCQYDVQQGEwJV\nUzAeFw0yNjA5MjMxNTI0MDZaFw0zNjA5MjAxNTI1MDZaMHAxLTArBgNVBC4TJGNl\nNTVjZTgwLWZiOTgtNGNjZC05NmIzLWExZWRkMGEwMTAyMzEcMBoGA1UEAxMTQ2xv\ndWQgU1FMIFNlcnZlciBDQTEUMBIGA1UEChMLR29vZ2xlLCBJbmMxCzAJBgNVBAYT\nAlVTMIIBIjANBgkqhkiG9w0BAQEFAAOCAQ8AMIIBCgKCAQEArTEXv4a2j2rOUv9b\nVsuktGRN2Lddm8QxB2ZfvXV7SegH6OdzCSEu+GRLcE9Y87cB38aZGq1FOVexOGJw\nwfdEsrbXYHpbFiZZsiTZf/aj7MB0z8Gd6ba01ZARYzAsfSdTgo8bV1Rk9gOkVsmL\nHgrn91VtD/SH7jQJT6TQGcZoefY1B761kRRGZOJlPntUwe9RKFix+tNQS5w91dzo\nrzYowDEV9j5jEz4lOHLf137R3rzkJfZs8G4nYkxUw6uXbZTlczZL80jxtZPQyhkE\niYj4gaGNPNhhQbzHB/V9x6XNhTVOhEZXH9Xu09b3gejwdu2y5sfIEuLAfe+r0Zjg\nMigoDQIDAQABoxYwFDASBgNVHRMBAf8ECDAGAQH/AgEAMA0GCSqGSIb3DQEBCwUA\nA4IBAQAqdN8OZsfSAc6/RQe6Ru9gMoQrLjbJdp6ixJpY2DLljxYAKXlJnC2bif0l\n/zA/2WJbgSOMlwoc74A0ue7hA/W7Qibjy3pydKNW9wlodDi3u0ZvlsN/UFlVP4pP\naut6pqcKR0ARm6VOZoiPhF9owJO/Uu+m5iRmDYxVafJPdkXTFeatM+hjbn1Mv1HP\nR+nGIu02vZUUzikcD4h9DSk6IREzwr2nOcNAbip2y5usco7fLhpX8KBvJOahN3bE\nU1J2vvKqI9GYEgwpvZM2swPOWpDCZ/WepWLZo6yd40JoE1K914Z5KCJQK5T/ZDTs\n7TLs1OtyW2oGsUUzal0a0O7ErMuL\n-----END CERTIFICATE-----",
+                        "common_name": "C=US,O=Google\\, Inc,CN=Cloud SQL Server CA,dnQualifier=ce55ce80-fb98-4ccd-96b3-a1edd0a01023",
+                        "create_time": "2026-09-23T15:24:06.332Z",
+                        "expiration_time": "2036-09-20T15:25:06.332Z",
+                        "sha1_fingerprint": "b8608559dcee1f47bc66f04bedcf42517823276b"
+                    }
+                ],
+                "service_account_email_address": "p123456789012-crg5c4@gcp-sa-cloud-sql.iam.gserviceaccount.com",
+                "settings": [
+                    {
+                        "activation_policy": "ALWAYS",
+                        "active_directory_config": [],
+                        "advanced_machine_features": [],
+                        "auto_upgrade_enabled": false,
+                        "availability_type": "ZONAL",
+                        "backup_configuration": [
+                            {
+                                "backup_retention_settings": [
+                                    {
+                                        "retained_backups": 7,
+                                        "retention_unit": "COUNT"
+                                    }
+                                ],
+                                "backup_tier": "STANDARD",
+                                "binary_log_enabled": false,
+                                "enabled": false,
+                                "location": "",
+                                "point_in_time_recovery_enabled": false,
+                                "start_time": "23:00",
+                                "transaction_log_retention_days": 7
+                            }
+                        ],
+                        "collation": "",
+                        "connection_pool_config": [],
+                        "connector_enforcement": "NOT_REQUIRED",
+                        "data_api_access": "",
+                        "data_cache_config": [
+                            {
+                                "data_cache_enabled": false
+                            }
+                        ],
+                        "data_disk_provisioned_iops": 0,
+                        "data_disk_provisioned_throughput": 0,
+                        "database_flags": [],
+                        "deletion_protection_enabled": false,
+                        "deny_maintenance_period": [],
+                        "disk_autoresize": true,
+                        "disk_autoresize_limit": 0,
+                        "disk_size": 10,
+                        "disk_type": "PD_SSD",
+                        "edition": "ENTERPRISE",
+                        "effective_availability_type": "ZONAL",
+                        "enable_dataplex_integration": false,
+                        "enable_google_ml_integration": false,
+                        "entraid_config": [],
+                        "final_backup_config": [],
+                        "insights_config": [],
+                        "ip_configuration": [
+                            {
+                                "allocated_ip_range": "",
+                                "authorized_networks": [],
+                                "custom_subject_alternative_names": [],
+                                "enable_private_path_for_google_cloud_services": false,
+                                "ipv4_enabled": true,
+                                "private_network": "",
+                                "psc_config": [],
+                                "server_ca_mode": "GOOGLE_MANAGED_INTERNAL_CA",
+                                "server_ca_pool": "",
+                                "server_certificate_rotation_mode": "SERVER_CERTIFICATE_ROTATION_MODE_UNSPECIFIED",
+                                "ssl_mode": "ALLOW_UNENCRYPTED_AND_ENCRYPTED"
+                            }
+                        ],
+                        "location_preference": [
+                            {
+                                "follow_gae_application": "",
+                                "secondary_zone": "",
+                                "zone": "us-central1-a"
+                            }
+                        ],
+                        "maintenance_window": [],
+                        "password_validation_policy": [],
+                        "pricing_plan": "PER_USE",
+                        "read_pool_auto_scale_config": [
+                            {
+                                "disable_scale_in": false,
+                                "enabled": false,
+                                "max_node_count": 0,
+                                "min_node_count": 0,
+                                "scale_in_cooldown_seconds": 0,
+                                "scale_out_cooldown_seconds": 0,
+                                "target_metrics": []
+                            }
+                        ],
+                        "replication_lag_max_seconds": 31536000,
+                        "retain_backups_on_delete": false,
+                        "sql_server_audit_config": [],
+                        "tier": "db-f1-micro",
+                        "time_zone": "",
+                        "user_labels": {
+                            "c7n_keep": "yes",
+                            "c7n_remove_a": "a",
+                            "c7n_remove_b": "b"
+                        },
+                        "version": 1
+                    }
+                ],
+                "switch_transaction_logs_to_cloud_storage_enabled": null,
+                "timeouts": null
+            }
+        },
+        "random_id": {
+            "suffix": {
+                "b64_std": "V7k=",
+                "b64_url": "V7k",
+                "byte_length": 2,
+                "dec": "22457",
+                "hex": "57b9",
+                "id": "V7k",
+                "keepers": null,
+                "prefix": null
+            }
+        }
+    }
+}

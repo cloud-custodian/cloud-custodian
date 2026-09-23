@@ -505,7 +505,7 @@ def test_sql_instance_remove_labels(test, sql_instance_remove_labels):
     project_id = instances['partial']['project']
     names = {case: instances[case]['name'] for case in ('partial', 'full', 'absent')}
 
-    factory = test.record_flight_data('sql-instance-remove-labels')
+    factory = test.replay_flight_data('sql-instance-remove-labels')
     policy = test.load_policy(
         {'name': 'sql-instance-remove-labels',
          'resource': 'gcp.sql-instance',
