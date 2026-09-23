@@ -68,9 +68,12 @@ def sanitize_recording(dirty_str):
     sanitized = sanitize_project_name(dirty_str)
     # Bodies also carry the project outside of resource paths, e.g.
     # bigquery's "projectId" and "<project>:<dataset>" ids.
+    # Only whole ids, so a short id can't rewrite values that merely contain
+    # it (e.g. custodian inside cloud-custodian, or c7n inside c7n_test).
     project_id = get_default_project()
     if project_id and project_id != PROJECT_ID:
-        sanitized = sanitized.replace(project_id, PROJECT_ID)
+        sanitized = re.sub(
+            r'(?<![\w-]){}(?![\w-])'.format(re.escape(project_id)), PROJECT_ID, sanitized)
     for project_number in get_project_numbers(dirty_str):
         sanitized = re.sub(
             r'(?<![0-9]){}(?![0-9])'.format(re.escape(project_number)), PROJECT_NUMBER, sanitized)
