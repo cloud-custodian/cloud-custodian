@@ -2479,28 +2479,39 @@ def test_vertexai_metadata_store_artifact_propagates_other_http_errors(test):
 
 @terraform('vertexai_metadata_store', scope='module')
 def test_vertexai_metadata_store_artifact_filtering(test, vertexai_metadata_store):
-    """Test filtering Metadata Store Artifacts on a missing label.
+    """Test aggregation and filtering across Metadata Stores.
 
-    Creates one labeled and one unlabeled artifact in the same metadata
-    store to prove the filter discriminates rather than returning everything.
-
-    Both artifacts go in the Terraform-provisioned store; the project's
-    "default" store is not used because it is created lazily by the first
-    metadata-writing job rather than existing up front.
+    Creates one artifact in each Terraform-provisioned store. Both use the
+    same store-scoped artifact ID; one is labeled and the other is not.
     """
     test.session_factory = test.replay_flight_data('va_artifact')
 
     project = test.session_factory().get_default_project()
-    store_id = vertexai_metadata_store['google_vertex_ai_metadata_store.central.name']
-    store_name = (
-        f'projects/{project}/locations/us-central1/metadataStores/{store_id}')
+    store_ids = [
+        vertexai_metadata_store[
+            'google_vertex_ai_metadata_store.central_a.name'],
+        vertexai_metadata_store[
+            'google_vertex_ai_metadata_store.central_b.name'],
+        ]
+    store_names = [
+        f'projects/{project}/locations/us-central1/metadataStores/{store_id}'
+        for store_id in store_ids
+        ]
 
     artifacts = VertexAIMetadataStoreArtifacts(test)
     test.addCleanup(artifacts.cleanup)
     if test.recording:
         artifacts.create(
-            store_name, 'labeled', 'c7n-test-artifact-labeled', {'owner': 'c7n'})
-        artifacts.create(store_name, 'unlabeled', 'c7n-test-artifact-unlabeled')
+            store_names[0],
+            'artifact',
+            'c7n-test-artifact-labeled',
+            {'owner': 'c7n'},
+            )
+        artifacts.create(
+            store_names[1],
+            'artifact',
+            'c7n-test-artifact-unlabeled',
+            )
 
     policy = test.load_policy(
         {'name': 'vertex-ai-artifacts-missing-owner-label',
@@ -2513,6 +2524,11 @@ def test_vertexai_metadata_store_artifact_filtering(test, vertexai_metadata_stor
 
     resources = policy.run()
     assert len(resources) == 2
+    assert {
+        resource['name'].split('/')[5]
+        for resource in resources
+        } == set(store_ids)
+    assert len(set(policy.resource_manager.get_urns(resources))) == 2
 
     unlabeled = [r for r in resources if 'owner' not in r.get('labels', {})]
     labeled = [r for r in resources if r.get('labels', {}).get('owner') == 'c7n']
