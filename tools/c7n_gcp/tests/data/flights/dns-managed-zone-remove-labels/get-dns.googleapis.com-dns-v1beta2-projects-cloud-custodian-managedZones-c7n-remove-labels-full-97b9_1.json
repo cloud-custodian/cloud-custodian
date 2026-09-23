@@ -1,0 +1,36 @@
+{
+  "headers": {
+    "etag": "20cd9e3374868e21000001a0cf1f2bc1",
+    "content-type": "application/json; charset=UTF-8",
+    "vary": "Origin, X-Origin, Referer",
+    "date": "Wed, 23 Sep 2026 16:35:22 GMT",
+    "server": "ESF",
+    "x-xss-protection": "0",
+    "x-frame-options": "SAMEORIGIN",
+    "x-content-type-options": "nosniff",
+    "alt-svc": "h3=\":443\"; ma=2592000,h3-29=\":443\"; ma=2592000",
+    "transfer-encoding": "chunked",
+    "status": "200",
+    "content-length": "528",
+    "-content-encoding": "gzip",
+    "content-location": "https://dns.googleapis.com/dns/v1beta2/projects/cloud-custodian/managedZones/c7n-remove-labels-full-97b9?alt=json"
+  },
+  "body": {
+    "name": "c7n-remove-labels-full-97b9",
+    "dnsName": "c7n-remove-labels-full-97b9.example.com.",
+    "description": "Managed by Terraform",
+    "id": "2363719323274874401",
+    "nameServers": [
+      "ns-cloud-d1.googledomains.com.",
+      "ns-cloud-d2.googledomains.com.",
+      "ns-cloud-d3.googledomains.com.",
+      "ns-cloud-d4.googledomains.com."
+    ],
+    "creationTime": "2026-09-23T16:35:18.748Z",
+    "visibility": "public",
+    "cloudLoggingConfig": {
+      "kind": "dns#managedZoneCloudLoggingConfig"
+    },
+    "kind": "dns#managedZone"
+  }
+}

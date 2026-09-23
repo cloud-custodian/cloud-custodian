@@ -1,0 +1,140 @@
+{
+    "pytest-terraform": 1,
+    "outputs": {},
+    "resources": {
+        "google_dns_managed_zone": {
+            "absent": {
+                "cloud_logging_config": [
+                    {
+                        "enable_logging": false
+                    }
+                ],
+                "creation_time": "2026-09-23T16:35:18.201Z",
+                "deletion_policy": "DELETE",
+                "description": "Managed by Terraform",
+                "dns_name": "c7n-remove-labels-absent-97b9.example.com.",
+                "dnssec_config": [],
+                "effective_labels": {
+                    "c7n_keep": "yes"
+                },
+                "force_destroy": false,
+                "forwarding_config": [],
+                "id": "projects/cloud-custodian/managedZones/c7n-remove-labels-absent-97b9",
+                "labels": {
+                    "c7n_keep": "yes"
+                },
+                "managed_zone_id": 1509160448225446627,
+                "name": "c7n-remove-labels-absent-97b9",
+                "name_servers": [
+                    "ns-cloud-b1.googledomains.com.",
+                    "ns-cloud-b2.googledomains.com.",
+                    "ns-cloud-b3.googledomains.com.",
+                    "ns-cloud-b4.googledomains.com."
+                ],
+                "peering_config": [],
+                "private_visibility_config": [],
+                "project": "cloud-custodian",
+                "terraform_labels": {
+                    "c7n_keep": "yes"
+                },
+                "timeouts": null,
+                "visibility": "public"
+            },
+            "full": {
+                "cloud_logging_config": [
+                    {
+                        "enable_logging": false
+                    }
+                ],
+                "creation_time": "2026-09-23T16:35:18.748Z",
+                "deletion_policy": "DELETE",
+                "description": "Managed by Terraform",
+                "dns_name": "c7n-remove-labels-full-97b9.example.com.",
+                "dnssec_config": [],
+                "effective_labels": {
+                    "c7n_remove_a": "a",
+                    "c7n_remove_b": "b"
+                },
+                "force_destroy": false,
+                "forwarding_config": [],
+                "id": "projects/cloud-custodian/managedZones/c7n-remove-labels-full-97b9",
+                "labels": {
+                    "c7n_remove_a": "a",
+                    "c7n_remove_b": "b"
+                },
+                "managed_zone_id": 2363719323274874401,
+                "name": "c7n-remove-labels-full-97b9",
+                "name_servers": [
+                    "ns-cloud-d1.googledomains.com.",
+                    "ns-cloud-d2.googledomains.com.",
+                    "ns-cloud-d3.googledomains.com.",
+                    "ns-cloud-d4.googledomains.com."
+                ],
+                "peering_config": [],
+                "private_visibility_config": [],
+                "project": "cloud-custodian",
+                "terraform_labels": {
+                    "c7n_remove_a": "a",
+                    "c7n_remove_b": "b"
+                },
+                "timeouts": null,
+                "visibility": "public"
+            },
+            "partial": {
+                "cloud_logging_config": [
+                    {
+                        "enable_logging": false
+                    }
+                ],
+                "creation_time": "2026-09-23T16:35:19.755Z",
+                "deletion_policy": "DELETE",
+                "description": "Managed by Terraform",
+                "dns_name": "c7n-remove-labels-partial-97b9.example.com.",
+                "dnssec_config": [],
+                "effective_labels": {
+                    "c7n_keep": "yes",
+                    "c7n_remove_a": "a",
+                    "c7n_remove_b": "b"
+                },
+                "force_destroy": false,
+                "forwarding_config": [],
+                "id": "projects/cloud-custodian/managedZones/c7n-remove-labels-partial-97b9",
+                "labels": {
+                    "c7n_keep": "yes",
+                    "c7n_remove_a": "a",
+                    "c7n_remove_b": "b"
+                },
+                "managed_zone_id": 5776481125275416090,
+                "name": "c7n-remove-labels-partial-97b9",
+                "name_servers": [
+                    "ns-cloud-c1.googledomains.com.",
+                    "ns-cloud-c2.googledomains.com.",
+                    "ns-cloud-c3.googledomains.com.",
+                    "ns-cloud-c4.googledomains.com."
+                ],
+                "peering_config": [],
+                "private_visibility_config": [],
+                "project": "cloud-custodian",
+                "terraform_labels": {
+                    "c7n_keep": "yes",
+                    "c7n_remove_a": "a",
+                    "c7n_remove_b": "b"
+                },
+                "timeouts": null,
+                "visibility": "public"
+            }
+        },
+        "random_id": {
+            "suffix": {
+                "b64_std": "l7k=",
+                "b64_url": "l7k",
+                "byte_length": 2,
+                "dec": "38841",
+                "hex": "97b9",
+                "id": "l7k",
+                "keepers": null,
+                "prefix": null
+            }
+        }
+    }
+}

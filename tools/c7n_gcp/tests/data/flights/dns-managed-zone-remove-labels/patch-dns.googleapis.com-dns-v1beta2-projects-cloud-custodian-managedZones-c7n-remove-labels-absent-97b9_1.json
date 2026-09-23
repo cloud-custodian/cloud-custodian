@@ -1,0 +1,68 @@
+{
+  "headers": {
+    "content-type": "application/json; charset=UTF-8",
+    "vary": "Origin, X-Origin, Referer",
+    "date": "Wed, 23 Sep 2026 16:35:21 GMT",
+    "server": "ESF",
+    "x-xss-protection": "0",
+    "x-frame-options": "SAMEORIGIN",
+    "x-content-type-options": "nosniff",
+    "alt-svc": "h3=\":443\"; ma=2592000,h3-29=\":443\"; ma=2592000",
+    "transfer-encoding": "chunked",
+    "status": "200",
+    "content-length": "1552",
+    "-content-encoding": "gzip"
+  },
+  "body": {
+    "id": "f6d59c4c-4c8e-4c8b-b2ec-67201367fc4b",
+    "startTime": "2026-09-23T16:35:21.350Z",
+    "status": "done",
+    "user": "user@example.com",
+    "type": "UPDATE",
+    "zoneContext": {
+      "oldValue": {
+        "name": "c7n-remove-labels-absent-97b9",
+        "dnsName": "c7n-remove-labels-absent-97b9.example.com.",
+        "description": "Managed by Terraform",
+        "id": "1509160448225446627",
+        "nameServers": [
+          "ns-cloud-b1.googledomains.com.",
+          "ns-cloud-b2.googledomains.com.",
+          "ns-cloud-b3.googledomains.com.",
+          "ns-cloud-b4.googledomains.com."
+        ],
+        "creationTime": "2026-09-23T16:35:18.201Z",
+        "visibility": "public",
+        "labels": {
+          "c7n_keep": "yes"
+        },
+        "cloudLoggingConfig": {
+          "kind": "dns#managedZoneCloudLoggingConfig"
+        },
+        "kind": "dns#managedZone"
+      },
+      "newValue": {
+        "name": "c7n-remove-labels-absent-97b9",
+        "dnsName": "c7n-remove-labels-absent-97b9.example.com.",
+        "description": "Managed by Terraform",
+        "id": "1509160448225446627",
+        "nameServers": [
+          "ns-cloud-b1.googledomains.com.",
+          "ns-cloud-b2.googledomains.com.",
+          "ns-cloud-b3.googledomains.com.",
+          "ns-cloud-b4.googledomains.com."
+        ],
+        "creationTime": "2026-09-23T16:35:18.201Z",
+        "visibility": "public",
+        "labels": {
+          "c7n_keep": "yes"
+        },
+        "cloudLoggingConfig": {
+          "kind": "dns#managedZoneCloudLoggingConfig"
+        },
+        "kind": "dns#managedZone"
+      }
+    },
+    "kind": "dns#operation"
+  }
+}

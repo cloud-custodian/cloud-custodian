@@ -364,7 +364,7 @@ def test_managed_zone_remove_labels(test, dns_managed_zone_remove_labels):
     project_id = zones['partial']['project']
     names = {case: zones[case]['name'] for case in ('partial', 'full', 'absent')}
 
-    factory = test.record_flight_data('dns-managed-zone-remove-labels')
+    factory = test.replay_flight_data('dns-managed-zone-remove-labels')
     policy = test.load_policy(
         {'name': 'gcp-dns-managed-zone-remove-labels',
          'resource': 'gcp.dns-managed-zone',
