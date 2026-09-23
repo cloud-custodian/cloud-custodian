@@ -409,6 +409,10 @@ class TypeInfo(metaclass=TypeMeta):
     # rather than replacing them. None infers it from the label params: a
     # patch without an update mask merges. Set True or False to override.
     labels_merge_patch = None
+    # Set when labels_op merges but drops null values, so a subset of labels
+    # can't be removed in one call. Removal then clears every label and sets
+    # the survivors back in a second call.
+    labels_clear_to_remove = False
 
     # required for reporting
     id = None

@@ -23,6 +23,8 @@ class DnsManagedZone(QueryResourceManager):
         labels = True
         labels_op = 'patch'
         labels_perm = 'update'
+        # patch drops null label values rather than deleting the key
+        labels_clear_to_remove = True
         default_report_fields = ['id', 'name', 'dnsName', 'creationTime', 'visibility']
         asset_type = "dns.googleapis.com/ManagedZone"
         scc_type = "google.cloud.dns.ManagedZone"

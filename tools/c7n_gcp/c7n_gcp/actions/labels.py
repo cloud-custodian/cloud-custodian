@@ -83,12 +83,42 @@ class BaseLabelAction(MethodAction):
         Omitted keys are left in place by a merge, so removing a label means
         sending it with a null value. A patch without an update mask merges.
         """
+        if model.labels_clear_to_remove:
+            return False
         if model.labels_merge_patch is not None:
             return model.labels_merge_patch
         return model.labels_op == 'patch' and not has_update_mask(params)
 
     def _get_current_labels(self, resource):
         return resource.get('labels', {})
+
+    def process_resource_set(self, client, model, resources):
+        if not model.labels_clear_to_remove:
+            return super().process_resource_set(client, model, resources)
+        for resource in resources:
+            self.process_clear_to_remove(client, model, resource)
+
+    def process_clear_to_remove(self, client, model, resource):
+        current_labels = self._get_current_labels(resource)
+        remove_labels = self.get_labels_to_delete(resource) or ()
+        if not any(k in current_labels for k in remove_labels):
+            return super().process_resource_set(client, model, [resource])
+
+        self.invoke_api(client, model.labels_op, model.get_label_params(
+            resource, {k: None for k in current_labels}))
+
+        keep_labels = self._merge_labels(
+            current_labels, self.get_labels_to_add(resource), remove_labels)
+        if not keep_labels:
+            return
+        try:
+            super().process_resource_set(client, model, [resource])
+        except HttpError:
+            self.log.error(
+                "policy:%s action:%s cleared labels on %s but failed to set %s",
+                self.manager.ctx.policy.name, self.type,
+                resource.get(model.name), keep_labels)
+            raise
 
     def handle_resource_error(self, client, model, resource, op_name, params, error):
         if 'fingerprint' not in error.reason or not model.refresh:

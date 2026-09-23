@@ -1,6 +1,10 @@
 # Copyright The Cloud Custodian Authors.
 # SPDX-License-Identifier: Apache-2.0
+from unittest import mock
+
 from gcp_common import BaseTest
+from googleapiclient.errors import HttpError
+from httplib2 import Response
 
 from c7n.filters import FilterValidationError
 from c7n.resources import load_resources
@@ -207,8 +211,7 @@ LABEL_REMOVAL_RESOURCES = {
 
 # Label ops with merge-patch semantics: omitted keys are left in place, so
 # removal must send the key with a null value.
-MERGE_PATCH_TYPES = (
-    'gcp.bucket', 'gcp.bq-dataset', 'gcp.bq-table', 'gcp.dns-managed-zone', 'gcp.sql-instance')
+MERGE_PATCH_TYPES = ('gcp.bucket', 'gcp.bq-dataset', 'gcp.bq-table', 'gcp.sql-instance')
 
 
 def label_body(resource_type, params):
@@ -298,6 +301,85 @@ class SetLabelsRemoveTest(BaseTest):
             {'type': 'set-labels', 'remove': ['remove_a']},
             {'keep': 'yes', 'remove_a': 'a'})
         self.assertEqual(params['body']['labels'], {'keep': 'yes'})
+
+
+class SetLabelsClearToRemoveTest(BaseTest):
+    """gcp.dns-managed-zone patches drop null label values, so removing a
+    subset of labels clears them all and then sets the survivors.
+    """
+
+    def run_action(self, action, current_labels, client=None):
+        policy = self.load_policy({
+            'name': 'test-label-clear-to-remove',
+            'resource': 'gcp.dns-managed-zone',
+            'actions': [action]})
+        manager = policy.resource_manager
+        resource = dict(LABEL_REMOVAL_RESOURCES['gcp.dns-managed-zone'], labels=current_labels)
+        client = client or mock.MagicMock()
+        manager.actions[0].process_resource_set(client, manager.get_model(), [resource])
+        return [
+            (op, params['body']['labels'])
+            for (op, params), _ in client.execute_command.call_args_list
+        ]
+
+    def test_partial_remove_clears_then_sets(self):
+        calls = self.run_action(
+            {'type': 'set-labels', 'remove': ['remove_a', 'remove_b']},
+            {'keep': 'yes', 'remove_a': 'a', 'remove_b': 'b'})
+        self.assertEqual(calls, [
+            ('patch', {'keep': None, 'remove_a': None, 'remove_b': None}),
+            ('patch', {'keep': 'yes'}),
+        ])
+
+    def test_partial_remove_with_add(self):
+        calls = self.run_action(
+            {'type': 'set-labels', 'labels': {'added': 'new'}, 'remove': ['remove_a']},
+            {'keep': 'yes', 'remove_a': 'a'})
+        self.assertEqual(calls, [
+            ('patch', {'keep': None, 'remove_a': None}),
+            ('patch', {'keep': 'yes', 'added': 'new'}),
+        ])
+
+    def test_replace_all_with_add_clears_then_sets(self):
+        # Every existing label goes, but one is added, so a single patch
+        # would leave the removed labels in place.
+        calls = self.run_action(
+            {'type': 'set-labels', 'labels': {'added': 'new'}, 'remove': ['remove_a']},
+            {'remove_a': 'a'})
+        self.assertEqual(calls, [
+            ('patch', {'remove_a': None}),
+            ('patch', {'added': 'new'}),
+        ])
+
+    def test_full_remove_only_clears(self):
+        calls = self.run_action(
+            {'type': 'set-labels', 'remove': ['remove_a', 'remove_b']},
+            {'remove_a': 'a', 'remove_b': 'b'})
+        self.assertEqual(calls, [('patch', {'remove_a': None, 'remove_b': None})])
+
+    def test_remove_absent_label_is_single_patch(self):
+        calls = self.run_action(
+            {'type': 'set-labels', 'remove': ['missing']}, {'keep': 'yes'})
+        self.assertEqual(calls, [('patch', {'keep': 'yes'})])
+
+    def test_add_is_single_patch(self):
+        calls = self.run_action(
+            {'type': 'set-labels', 'labels': {'added': 'new'}}, {'keep': 'yes'})
+        self.assertEqual(calls, [('patch', {'keep': 'yes', 'added': 'new'})])
+
+    def test_set_failure_after_clear_logs_labels(self):
+        client = mock.MagicMock()
+        client.execute_command.side_effect = [
+            {}, HttpError(Response({'status': '500'}), b'')]
+        log_output = self.capture_logging('custodian.actions')
+        with self.assertRaises(HttpError):
+            self.run_action(
+                {'type': 'set-labels', 'remove': ['remove_a']},
+                {'keep': 'yes', 'remove_a': 'a'},
+                client=client)
+        self.assertIn(
+            "cleared labels on zone-1 but failed to set {'keep': 'yes'}",
+            log_output.getvalue())
 
 
 def test_has_update_mask():
