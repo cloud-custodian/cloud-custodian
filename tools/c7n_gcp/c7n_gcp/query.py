@@ -405,6 +405,10 @@ class TypeInfo(metaclass=TypeMeta):
 
     labels = False
     labels_op = 'setLabels'
+    # Whether labels_op merges the submitted labels into the existing ones
+    # rather than replacing them. None infers it from the label params: a
+    # patch without an update mask merges. Set True or False to override.
+    labels_merge_patch = None
 
     # required for reporting
     id = None

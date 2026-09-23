@@ -497,3 +497,36 @@ class SqlSslCertTest(BaseTest):
                 f"gcp:sqladmin:us-central1:{project_id}:ssl-cert/custodian-postgres/49a10ed7135e3171ce5e448cc785bc63b5b81e6c",  # noqa: E501
             ],
         )
+
+
+@terraform('sql_instance_remove_labels')
+def test_sql_instance_remove_labels(test, sql_instance_remove_labels):
+    instances = sql_instance_remove_labels.resources['google_sql_database_instance']
+    project_id = instances['partial']['project']
+    names = {case: instances[case]['name'] for case in ('partial', 'full', 'absent')}
+
+    factory = test.record_flight_data('sql-instance-remove-labels')
+    policy = test.load_policy(
+        {'name': 'sql-instance-remove-labels',
+         'resource': 'gcp.sql-instance',
+         'filters': [{'type': 'value', 'key': 'name', 'op': 'in',
+                      'value': list(names.values())}],
+         'actions': [{'type': 'set-labels', 'remove': ['c7n_remove_a', 'c7n_remove_b']}]},
+        session_factory=factory)
+    assert len(policy.run()) == 3
+
+    # instances.patch returns a long-running operation
+    if test.recording:
+        time.sleep(30)
+
+    client = policy.resource_manager.get_client()
+    labels = {
+        case: client.execute_query(
+            'get', {'project': project_id, 'instance': name})['settings'].get('userLabels', {})
+        for case, name in names.items()
+    }
+    assert labels == {
+        'partial': {'c7n_keep': 'yes'},
+        'full': {},
+        'absent': {'c7n_keep': 'yes'},
+    }

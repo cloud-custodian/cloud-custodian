@@ -330,3 +330,32 @@ class BucketTest(BaseTest):
         client = p.resource_manager.get_client()
         result = client.execute_query('get', {'bucket': 'c7n-bucket'})
         self.assertEqual(result['labels']['env'], 'not-the-default')
+
+
+@terraform('bucket_remove_labels')
+def test_bucket_remove_labels(test, bucket_remove_labels):
+    buckets = bucket_remove_labels.resources['google_storage_bucket']
+    names = {case: buckets[case]['name'] for case in ('partial', 'full', 'absent')}
+
+    factory = test.record_flight_data('bucket-remove-labels')
+    policy = test.load_policy(
+        {'name': 'bucket-remove-labels',
+         'resource': 'gcp.bucket',
+         'filters': [{'type': 'value', 'key': 'name', 'op': 'in',
+                      'value': list(names.values())}],
+         'actions': [{'type': 'set-labels', 'remove': ['c7n_remove_a', 'c7n_remove_b']}]},
+        session_factory=factory)
+
+    resources = policy.run()
+    assert len(resources) == 3
+
+    client = policy.resource_manager.get_client()
+    labels = {
+        case: client.execute_query('get', {'bucket': name}).get('labels', {})
+        for case, name in names.items()
+    }
+    assert labels == {
+        'partial': {'c7n_keep': 'yes'},
+        'full': {},
+        'absent': {'c7n_keep': 'yes'},
+    }

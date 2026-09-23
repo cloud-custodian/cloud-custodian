@@ -15,6 +15,15 @@ from c7n_gcp.actions import MethodAction
 from c7n_gcp.filters.labels import LabelActionFilter
 from c7n_gcp.provider import resources as gcp_resources
 
+# Update mask spellings used across apis, in query parameters or the body.
+UPDATE_MASK_KEYS = frozenset(('updateMask', 'update_mask', 'fieldMask', 'field_mask'))
+
+
+def has_update_mask(params):
+    if not isinstance(params, dict):
+        return False
+    return any(k in UPDATE_MASK_KEYS or has_update_mask(v) for k, v in params.items())
+
 
 class BaseLabelAction(MethodAction):
 
@@ -62,7 +71,21 @@ class BaseLabelAction(MethodAction):
         remove_labels = self.get_labels_to_delete(resource)
         all_labels = self._merge_labels(current_labels, new_labels, remove_labels)
 
-        return model.get_label_params(resource, all_labels)
+        params = model.get_label_params(resource, all_labels)
+        if remove_labels and self.is_merge_patch(model, params):
+            all_labels.update({k: None for k in remove_labels if k in current_labels})
+            params = model.get_label_params(resource, all_labels)
+        return params
+
+    def is_merge_patch(self, model, params):
+        """Whether labels_op merges the submitted labels into the existing ones.
+
+        Omitted keys are left in place by a merge, so removing a label means
+        sending it with a null value. A patch without an update mask merges.
+        """
+        if model.labels_merge_patch is not None:
+            return model.labels_merge_patch
+        return model.labels_op == 'patch' and not has_update_mask(params)
 
     def _get_current_labels(self, resource):
         return resource.get('labels', {})
