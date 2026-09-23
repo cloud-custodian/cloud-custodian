@@ -54,8 +54,8 @@
                         "view": []
                     }
                 ],
-                "creation_time": 1790166882642,
-                "dataset_id": "c7n_remove_labels_tables_45ae",
+                "creation_time": 1790188828460,
+                "dataset_id": "c7n_remove_labels_tables_d461",
                 "default_collation": "",
                 "default_encryption_configuration": [],
                 "default_partition_expiration_ms": 0,
@@ -66,21 +66,21 @@
                 "effective_labels": {
                     "c7n_test": "bq_table_remove_labels"
                 },
-                "etag": "X/AoOOACwN9A5OooVyyn4g==",
+                "etag": "wccTW09RsAgx7ahyW47s1Q==",
                 "external_catalog_dataset_options": [],
                 "external_dataset_reference": [],
                 "friendly_name": "",
-                "id": "projects/cloud-custodian/datasets/c7n_remove_labels_tables_45ae",
+                "id": "projects/cloud-custodian/datasets/c7n_remove_labels_tables_d461",
                 "is_case_insensitive": false,
                 "labels": {
                     "c7n_test": "bq_table_remove_labels"
                 },
-                "last_modified_time": 1790166882642,
+                "last_modified_time": 1790188828460,
                 "location": "US",
                 "max_time_travel_hours": "168",
                 "project": "cloud-custodian",
                 "resource_tags": null,
-                "self_link": "https://bigquery.googleapis.com/bigquery/v2/projects/cloud-custodian/datasets/c7n_remove_labels_tables_45ae",
+                "self_link": "https://bigquery.googleapis.com/bigquery/v2/projects/cloud-custodian/datasets/c7n_remove_labels_tables_d461",
                 "storage_billing_model": "",
                 "terraform_labels": {
                     "c7n_test": "bq_table_remove_labels"
@@ -92,8 +92,8 @@
             "absent": {
                 "biglake_configuration": [],
                 "clustering": null,
-                "creation_time": 1790166883316,
-                "dataset_id": "c7n_remove_labels_tables_45ae",
+                "creation_time": 1790188829068,
+                "dataset_id": "c7n_remove_labels_tables_d461",
                 "deletion_policy": "DELETE",
                 "deletion_protection": false,
                 "description": "",
@@ -101,19 +101,19 @@
                     "c7n_keep": "yes"
                 },
                 "encryption_configuration": [],
-                "etag": "PRG388m2NHDtR3Ag0CepqA==",
+                "etag": "lnvUDCUKKtBPcI/A0tkcNA==",
                 "expiration_time": null,
                 "external_catalog_table_options": [],
                 "external_data_configuration": [],
                 "friendly_name": "",
                 "generated_schema_columns": "",
-                "id": "projects/cloud-custodian/datasets/c7n_remove_labels_tables_45ae/tables/absent",
+                "id": "projects/cloud-custodian/datasets/c7n_remove_labels_tables_d461/tables/absent",
                 "ignore_auto_generated_schema": false,
                 "ignore_schema_changes": null,
                 "labels": {
                     "c7n_keep": "yes"
                 },
-                "last_modified_time": 1790166883473,
+                "last_modified_time": 1790188829258,
                 "location": "US",
                 "materialized_view": [],
                 "max_staleness": "",
@@ -126,7 +126,7 @@
                 "resource_tags": null,
                 "schema": "[{\"mode\":\"REQUIRED\",\"name\":\"id\",\"type\":\"INTEGER\"}]",
                 "schema_foreign_type_info": [],
-                "self_link": "https://bigquery.googleapis.com/bigquery/v2/projects/cloud-custodian/datasets/c7n_remove_labels_tables_45ae/tables/absent",
+                "self_link": "https://bigquery.googleapis.com/bigquery/v2/projects/cloud-custodian/datasets/c7n_remove_labels_tables_d461/tables/absent",
                 "table_constraints": [],
                 "table_id": "absent",
                 "table_metadata_view": null,
@@ -141,8 +141,8 @@
             "full": {
                 "biglake_configuration": [],
                 "clustering": null,
-                "creation_time": 1790166883295,
-                "dataset_id": "c7n_remove_labels_tables_45ae",
+                "creation_time": 1790188829076,
+                "dataset_id": "c7n_remove_labels_tables_d461",
                 "deletion_policy": "DELETE",
                 "deletion_protection": false,
                 "description": "",
@@ -151,20 +151,20 @@
                     "c7n_remove_b": "b"
                 },
                 "encryption_configuration": [],
-                "etag": "ZZobBGkWt5Qrd4Pp4KNEKA==",
+                "etag": "7EbZF6f7hftRgp07j9NqSQ==",
                 "expiration_time": null,
                 "external_catalog_table_options": [],
                 "external_data_configuration": [],
                 "friendly_name": "",
                 "generated_schema_columns": "",
-                "id": "projects/cloud-custodian/datasets/c7n_remove_labels_tables_45ae/tables/full",
+                "id": "projects/cloud-custodian/datasets/c7n_remove_labels_tables_d461/tables/full",
                 "ignore_auto_generated_schema": false,
                 "ignore_schema_changes": null,
                 "labels": {
                     "c7n_remove_a": "a",
                     "c7n_remove_b": "b"
                 },
-                "last_modified_time": 1790166883468,
+                "last_modified_time": 1790188829258,
                 "location": "US",
                 "materialized_view": [],
                 "max_staleness": "",
@@ -177,7 +177,7 @@
                 "resource_tags": null,
                 "schema": "[{\"mode\":\"REQUIRED\",\"name\":\"id\",\"type\":\"INTEGER\"}]",
                 "schema_foreign_type_info": [],
-                "self_link": "https://bigquery.googleapis.com/bigquery/v2/projects/cloud-custodian/datasets/c7n_remove_labels_tables_45ae/tables/full",
+                "self_link": "https://bigquery.googleapis.com/bigquery/v2/projects/cloud-custodian/datasets/c7n_remove_labels_tables_d461/tables/full",
                 "table_constraints": [],
                 "table_id": "full",
                 "table_metadata_view": null,
@@ -193,8 +193,8 @@
             "partial": {
                 "biglake_configuration": [],
                 "clustering": null,
-                "creation_time": 1790166883323,
-                "dataset_id": "c7n_remove_labels_tables_45ae",
+                "creation_time": 1790188829182,
+                "dataset_id": "c7n_remove_labels_tables_d461",
                 "deletion_policy": "DELETE",
                 "deletion_protection": false,
                 "description": "",
@@ -204,13 +204,13 @@
                     "c7n_remove_b": "b"
                 },
                 "encryption_configuration": [],
-                "etag": "by5jHGdO8DarcvMd7+BumA==",
+                "etag": "NM+a9Ifpp0OM1hU8nCPCbQ==",
                 "expiration_time": null,
                 "external_catalog_table_options": [],
                 "external_data_configuration": [],
                 "friendly_name": "",
                 "generated_schema_columns": "",
-                "id": "projects/cloud-custodian/datasets/c7n_remove_labels_tables_45ae/tables/partial",
+                "id": "projects/cloud-custodian/datasets/c7n_remove_labels_tables_d461/tables/partial",
                 "ignore_auto_generated_schema": false,
                 "ignore_schema_changes": null,
                 "labels": {
@@ -218,7 +218,7 @@
                     "c7n_remove_a": "a",
                     "c7n_remove_b": "b"
                 },
-                "last_modified_time": 1790166883472,
+                "last_modified_time": 1790188829360,
                 "location": "US",
                 "materialized_view": [],
                 "max_staleness": "",
@@ -231,7 +231,7 @@
                 "resource_tags": null,
                 "schema": "[{\"mode\":\"REQUIRED\",\"name\":\"id\",\"type\":\"INTEGER\"}]",
                 "schema_foreign_type_info": [],
-                "self_link": "https://bigquery.googleapis.com/bigquery/v2/projects/cloud-custodian/datasets/c7n_remove_labels_tables_45ae/tables/partial",
+                "self_link": "https://bigquery.googleapis.com/bigquery/v2/projects/cloud-custodian/datasets/c7n_remove_labels_tables_d461/tables/partial",
                 "table_constraints": [],
                 "table_id": "partial",
                 "table_metadata_view": null,
@@ -248,12 +248,12 @@
         },
         "random_id": {
             "suffix": {
-                "b64_std": "Ra4=",
-                "b64_url": "Ra4",
+                "b64_std": "1GE=",
+                "b64_url": "1GE",
                 "byte_length": 2,
-                "dec": "17838",
-                "hex": "45ae",
-                "id": "Ra4",
+                "dec": "54369",
+                "hex": "d461",
+                "id": "1GE",
                 "keepers": null,
                 "prefix": null
             }

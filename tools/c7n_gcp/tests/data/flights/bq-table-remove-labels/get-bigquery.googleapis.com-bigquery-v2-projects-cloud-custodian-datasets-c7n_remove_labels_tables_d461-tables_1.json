@@ -1,0 +1,70 @@
+{
+  "headers": {
+    "etag": "W7CcCvCv1eDqy7HxqPgE9Q==",
+    "content-type": "application/json; charset=UTF-8",
+    "vary": "Origin, X-Origin, Referer",
+    "date": "Wed, 23 Sep 2026 18:40:31 GMT",
+    "server": "ESF",
+    "x-xss-protection": "0",
+    "x-frame-options": "SAMEORIGIN",
+    "x-content-type-options": "nosniff",
+    "alt-svc": "h3=\":443\"; ma=2592000,h3-29=\":443\"; ma=2592000",
+    "transfer-encoding": "chunked",
+    "status": "200",
+    "content-length": "1325",
+    "-content-encoding": "gzip",
+    "content-location": "https://bigquery.googleapis.com/bigquery/v2/projects/cloud-custodian/datasets/c7n_remove_labels_tables_d461/tables?alt=json"
+  },
+  "body": {
+    "kind": "bigquery#tableList",
+    "etag": "W7CcCvCv1eDqy7HxqPgE9Q==",
+    "tables": [
+      {
+        "kind": "bigquery#table",
+        "id": "cloud-custodian:c7n_remove_labels_tables_d461.absent",
+        "tableReference": {
+          "projectId": "cloud-custodian",
+          "datasetId": "c7n_remove_labels_tables_d461",
+          "tableId": "absent"
+        },
+        "type": "TABLE",
+        "labels": {
+          "c7n_keep": "yes"
+        },
+        "creationTime": "1790188829068"
+      },
+      {
+        "kind": "bigquery#table",
+        "id": "cloud-custodian:c7n_remove_labels_tables_d461.full",
+        "tableReference": {
+          "projectId": "cloud-custodian",
+          "datasetId": "c7n_remove_labels_tables_d461",
+          "tableId": "full"
+        },
+        "type": "TABLE",
+        "labels": {
+          "c7n_remove_a": "a",
+          "c7n_remove_b": "b"
+        },
+        "creationTime": "1790188829076"
+      },
+      {
+        "kind": "bigquery#table",
+        "id": "cloud-custodian:c7n_remove_labels_tables_d461.partial",
+        "tableReference": {
+          "projectId": "cloud-custodian",
+          "datasetId": "c7n_remove_labels_tables_d461",
+          "tableId": "partial"
+        },
+        "type": "TABLE",
+        "labels": {
+          "c7n_remove_a": "a",
+          "c7n_remove_b": "b",
+          "c7n_keep": "yes"
+        },
+        "creationTime": "1790188829182"
+      }
+    ],
+    "totalItems": 3
+  }
+}

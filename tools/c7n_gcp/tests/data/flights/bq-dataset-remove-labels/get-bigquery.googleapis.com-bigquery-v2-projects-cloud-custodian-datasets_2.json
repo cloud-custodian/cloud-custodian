@@ -1,9 +1,9 @@
 {
   "headers": {
-    "etag": "Awfzk8f1DqTDOKVPvPLO2w==",
+    "etag": "PhMfi5s7t2HzijjB7laO0g==",
     "content-type": "application/json; charset=UTF-8",
     "vary": "Origin, X-Origin, Referer",
-    "date": "Wed, 23 Sep 2026 12:34:34 GMT",
+    "date": "Wed, 23 Sep 2026 18:40:21 GMT",
     "server": "ESF",
     "x-xss-protection": "0",
     "x-frame-options": "SAMEORIGIN",
@@ -17,13 +17,13 @@
   },
   "body": {
     "kind": "bigquery#datasetList",
-    "etag": "Awfzk8f1DqTDOKVPvPLO2w==",
+    "etag": "PhMfi5s7t2HzijjB7laO0g==",
     "datasets": [
       {
         "kind": "bigquery#dataset",
-        "id": "cloud-custodian:c7n_remove_labels_full_a979",
+        "id": "cloud-custodian:c7n_remove_labels_full_2783",
         "datasetReference": {
-          "datasetId": "c7n_remove_labels_full_a979",
+          "datasetId": "c7n_remove_labels_full_2783",
           "projectId": "cloud-custodian"
         },
         "labels": {

@@ -20,7 +20,7 @@
                         "enabled": false
                     }
                 ],
-                "id": "c7n-remove-labels-absent-1066",
+                "id": "c7n-remove-labels-absent-e0e3",
                 "ip_filter": [],
                 "labels": {
                     "c7n_keep": "yes"
@@ -28,17 +28,17 @@
                 "lifecycle_rule": [],
                 "location": "US",
                 "logging": [],
-                "name": "c7n-remove-labels-absent-1066",
+                "name": "c7n-remove-labels-absent-e0e3",
                 "project": "cloud-custodian",
                 "project_number": 123456789012,
                 "public_access_prevention": "inherited",
                 "requester_pays": false,
                 "retention_policy": [],
                 "rpo": "DEFAULT",
-                "self_link": "https://www.googleapis.com/storage/v1/b/c7n-remove-labels-absent-1066",
+                "self_link": "https://www.googleapis.com/storage/v1/b/c7n-remove-labels-absent-e0e3",
                 "soft_delete_policy": [
                     {
-                        "effective_time": "2026-09-23T16:54:20.657Z",
+                        "effective_time": "2026-09-23T18:39:58.443Z",
                         "retention_duration_seconds": 604800
                     }
                 ],
@@ -46,11 +46,11 @@
                 "terraform_labels": {
                     "c7n_keep": "yes"
                 },
-                "time_created": "2026-09-23T16:54:20.657Z",
+                "time_created": "2026-09-23T18:39:58.443Z",
                 "timeouts": null,
                 "uniform_bucket_level_access": true,
-                "updated": "2026-09-23T16:54:20.657Z",
-                "url": "gs://c7n-remove-labels-absent-1066",
+                "updated": "2026-09-23T18:39:58.443Z",
+                "url": "gs://c7n-remove-labels-absent-e0e3",
                 "versioning": [],
                 "website": []
             },
@@ -72,7 +72,7 @@
                         "enabled": false
                     }
                 ],
-                "id": "c7n-remove-labels-full-1066",
+                "id": "c7n-remove-labels-full-e0e3",
                 "ip_filter": [],
                 "labels": {
                     "c7n_remove_a": "a",
@@ -81,17 +81,17 @@
                 "lifecycle_rule": [],
                 "location": "US",
                 "logging": [],
-                "name": "c7n-remove-labels-full-1066",
+                "name": "c7n-remove-labels-full-e0e3",
                 "project": "cloud-custodian",
                 "project_number": 123456789012,
                 "public_access_prevention": "inherited",
                 "requester_pays": false,
                 "retention_policy": [],
                 "rpo": "DEFAULT",
-                "self_link": "https://www.googleapis.com/storage/v1/b/c7n-remove-labels-full-1066",
+                "self_link": "https://www.googleapis.com/storage/v1/b/c7n-remove-labels-full-e0e3",
                 "soft_delete_policy": [
                     {
-                        "effective_time": "2026-09-23T16:54:20.725Z",
+                        "effective_time": "2026-09-23T18:39:58.418Z",
                         "retention_duration_seconds": 604800
                     }
                 ],
@@ -100,11 +100,11 @@
                     "c7n_remove_a": "a",
                     "c7n_remove_b": "b"
                 },
-                "time_created": "2026-09-23T16:54:20.725Z",
+                "time_created": "2026-09-23T18:39:58.418Z",
                 "timeouts": null,
                 "uniform_bucket_level_access": true,
-                "updated": "2026-09-23T16:54:20.725Z",
-                "url": "gs://c7n-remove-labels-full-1066",
+                "updated": "2026-09-23T18:39:58.418Z",
+                "url": "gs://c7n-remove-labels-full-e0e3",
                 "versioning": [],
                 "website": []
             },
@@ -127,7 +127,7 @@
                         "enabled": false
                     }
                 ],
-                "id": "c7n-remove-labels-partial-1066",
+                "id": "c7n-remove-labels-partial-e0e3",
                 "ip_filter": [],
                 "labels": {
                     "c7n_keep": "yes",
@@ -137,17 +137,17 @@
                 "lifecycle_rule": [],
                 "location": "US",
                 "logging": [],
-                "name": "c7n-remove-labels-partial-1066",
+                "name": "c7n-remove-labels-partial-e0e3",
                 "project": "cloud-custodian",
                 "project_number": 123456789012,
                 "public_access_prevention": "inherited",
                 "requester_pays": false,
                 "retention_policy": [],
                 "rpo": "DEFAULT",
-                "self_link": "https://www.googleapis.com/storage/v1/b/c7n-remove-labels-partial-1066",
+                "self_link": "https://www.googleapis.com/storage/v1/b/c7n-remove-labels-partial-e0e3",
                 "soft_delete_policy": [
                     {
-                        "effective_time": "2026-09-23T16:54:20.760Z",
+                        "effective_time": "2026-09-23T18:39:58.443Z",
                         "retention_duration_seconds": 604800
                     }
                 ],
@@ -157,23 +157,23 @@
                     "c7n_remove_a": "a",
                     "c7n_remove_b": "b"
                 },
-                "time_created": "2026-09-23T16:54:20.760Z",
+                "time_created": "2026-09-23T18:39:58.443Z",
                 "timeouts": null,
                 "uniform_bucket_level_access": true,
-                "updated": "2026-09-23T16:54:20.760Z",
-                "url": "gs://c7n-remove-labels-partial-1066",
+                "updated": "2026-09-23T18:39:58.443Z",
+                "url": "gs://c7n-remove-labels-partial-e0e3",
                 "versioning": [],
                 "website": []
             }
         },
         "random_id": {
             "suffix": {
-                "b64_std": "EGY=",
-                "b64_url": "EGY",
+                "b64_std": "4OM=",
+                "b64_url": "4OM",
                 "byte_length": 2,
-                "dec": "4198",
-                "hex": "1066",
-                "id": "EGY",
+                "dec": "57571",
+                "hex": "e0e3",
+                "id": "4OM",
                 "keepers": null,
                 "prefix": null
             }

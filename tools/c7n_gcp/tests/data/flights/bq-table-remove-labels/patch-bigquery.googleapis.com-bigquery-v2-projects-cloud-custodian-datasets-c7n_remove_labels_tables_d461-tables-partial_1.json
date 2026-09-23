@@ -1,0 +1,50 @@
+{
+  "headers": {
+    "etag": "jkt2pjJ8qGXMWbtJ6UOl8w==",
+    "content-type": "application/json; charset=UTF-8",
+    "vary": "Origin, X-Origin, Referer",
+    "date": "Wed, 23 Sep 2026 18:40:33 GMT",
+    "server": "ESF",
+    "x-xss-protection": "0",
+    "x-frame-options": "SAMEORIGIN",
+    "x-content-type-options": "nosniff",
+    "alt-svc": "h3=\":443\"; ma=2592000,h3-29=\":443\"; ma=2592000",
+    "transfer-encoding": "chunked",
+    "status": "200",
+    "content-length": "848",
+    "-content-encoding": "gzip"
+  },
+  "body": {
+    "kind": "bigquery#table",
+    "etag": "jkt2pjJ8qGXMWbtJ6UOl8w==",
+    "id": "cloud-custodian:c7n_remove_labels_tables_d461.partial",
+    "selfLink": "https://bigquery.googleapis.com/bigquery/v2/projects/cloud-custodian/datasets/c7n_remove_labels_tables_d461/tables/partial",
+    "tableReference": {
+      "projectId": "cloud-custodian",
+      "datasetId": "c7n_remove_labels_tables_d461",
+      "tableId": "partial"
+    },
+    "labels": {
+      "c7n_keep": "yes"
+    },
+    "schema": {
+      "fields": [
+        {
+          "name": "id",
+          "type": "INTEGER",
+          "mode": "REQUIRED"
+        }
+      ]
+    },
+    "numBytes": "0",
+    "numLongTermBytes": "0",
+    "numRows": "0",
+    "creationTime": "1790188829182",
+    "lastModifiedTime": "1790188833448",
+    "type": "TABLE",
+    "location": "US",
+    "numTotalLogicalBytes": "0",
+    "numActiveLogicalBytes": "0",
+    "numLongTermLogicalBytes": "0"
+  }
+}

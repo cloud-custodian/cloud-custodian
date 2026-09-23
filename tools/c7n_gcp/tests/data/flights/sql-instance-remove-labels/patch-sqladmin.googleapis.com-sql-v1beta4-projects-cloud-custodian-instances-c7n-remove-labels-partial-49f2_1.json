@@ -1,0 +1,28 @@
+{
+  "headers": {
+    "content-type": "application/json; charset=UTF-8",
+    "vary": "Origin, X-Origin, Referer",
+    "date": "Wed, 23 Sep 2026 18:53:01 GMT",
+    "server": "ESF",
+    "x-xss-protection": "0",
+    "x-frame-options": "SAMEORIGIN",
+    "x-content-type-options": "nosniff",
+    "alt-svc": "h3=\":443\"; ma=2592000,h3-29=\":443\"; ma=2592000",
+    "transfer-encoding": "chunked",
+    "status": "200",
+    "content-length": "541",
+    "-content-encoding": "gzip"
+  },
+  "body": {
+    "kind": "sql#operation",
+    "targetLink": "https://sqladmin.googleapis.com/sql/v1beta4/projects/cloud-custodian/instances/c7n-remove-labels-partial-49f2",
+    "status": "PENDING",
+    "user": "user@example.com",
+    "insertTime": "2026-09-23T18:53:01.852Z",
+    "operationType": "UPDATE",
+    "name": "e50695f1-8d08-4b00-90ac-6a7400000032",
+    "targetId": "c7n-remove-labels-partial-49f2",
+    "selfLink": "https://sqladmin.googleapis.com/sql/v1beta4/projects/cloud-custodian/operations/e50695f1-8d08-4b00-90ac-6a7400000032",
+    "targetProject": "cloud-custodian"
+  }
+}

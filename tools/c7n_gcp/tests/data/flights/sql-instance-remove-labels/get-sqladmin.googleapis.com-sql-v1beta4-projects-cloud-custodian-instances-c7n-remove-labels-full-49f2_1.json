@@ -1,0 +1,212 @@
+{
+  "headers": {
+    "content-type": "application/json; charset=UTF-8",
+    "vary": "Origin, X-Origin, Referer",
+    "date": "Wed, 23 Sep 2026 18:53:32 GMT",
+    "server": "ESF",
+    "x-xss-protection": "0",
+    "x-frame-options": "SAMEORIGIN",
+    "x-content-type-options": "nosniff",
+    "alt-svc": "h3=\":443\"; ma=2592000,h3-29=\":443\"; ma=2592000",
+    "transfer-encoding": "chunked",
+    "status": "200",
+    "content-length": "6768",
+    "-content-encoding": "gzip",
+    "content-location": "https://sqladmin.googleapis.com/sql/v1beta4/projects/cloud-custodian/instances/c7n-remove-labels-full-49f2?alt=json"
+  },
+  "body": {
+    "kind": "sql#instance",
+    "state": "RUNNABLE",
+    "databaseVersion": "MYSQL_8_0",
+    "settings": {
+      "authorizedGaeApplications": [],
+      "tier": "db-f1-micro",
+      "kind": "sql#settings",
+      "availabilityType": "ZONAL",
+      "pricingPlan": "PER_USE",
+      "replicationType": "SYNCHRONOUS",
+      "activationPolicy": "ALWAYS",
+      "ipConfiguration": {
+        "authorizedNetworks": [],
+        "sslMode": "ALLOW_UNENCRYPTED_AND_ENCRYPTED",
+        "ipv4Enabled": true,
+        "requireSsl": false,
+        "serverCaMode": "GOOGLE_MANAGED_INTERNAL_CA",
+        "serverCertificateRotationMode": "SERVER_CERTIFICATE_ROTATION_MODE_UNSPECIFIED"
+      },
+      "locationPreference": {
+        "zone": "us-central1-a",
+        "kind": "sql#locationPreference"
+      },
+      "dataDiskType": "PD_SSD",
+      "backupConfiguration": {
+        "startTime": "16:00",
+        "kind": "sql#backupConfiguration",
+        "backupRetentionSettings": {
+          "retentionUnit": "COUNT",
+          "retainedBackups": 7
+        },
+        "enabled": false,
+        "transactionLogRetentionDays": 7,
+        "transactionalLogStorageState": "TRANSACTIONAL_LOG_STORAGE_STATE_UNSPECIFIED",
+        "backupTier": "STANDARD"
+      },
+      "edition": "ENTERPRISE",
+      "connectorEnforcement": "NOT_REQUIRED",
+      "settingsVersion": "2",
+      "storageAutoResizeLimit": "0",
+      "storageAutoResize": true,
+      "dataDiskSizeGb": "10",
+      "deletionProtectionEnabled": false,
+      "replicationLagMaxSeconds": 31536000,
+      "enableGoogleMlIntegration": false,
+      "enableDataplexIntegration": false,
+      "retainBackupsOnDelete": false
+    },
+    "etag": "e756b54a20aa77e5d20930297e749051285e5756523041c3b4013bfed4b36f29",
+    "ipAddresses": [
+      {
+        "type": "PRIMARY",
+        "ipAddress": "34.170.169.61"
+      }
+    ],
+    "serverCaCert": {
+      "kind": "sql#sslCert",
+      "certSerialNumber": "0",
+      "cert": "-----BEGIN CERTIFICATE-----\nMIIDcTCCAlmgAwIBAgIBADANBgkqhkiG9w0BAQsFADBwMS0wKwYDVQQuEyRkOTdi\nZDFjNC05NzY4LTQxN2EtOTUyNi03NDhhNjRjNzI1NzcxHDAaBgNVBAMTE0Nsb3Vk\nIFNRTCBTZXJ2ZXIgQ0ExFDASBgNVBAoTC0dvb2dsZSwgSW5jMQswCQYDVQQGEwJV\nUzAeFw0yNjA5MjMxODQwMzdaFw0zNjA5MjAxODQxMzdaMHAxLTArBgNVBC4TJGQ5\nN2JkMWM0LTk3NjgtNDE3YS05NTI2LTc0OGE2NGM3MjU3NzEcMBoGA1UEAxMTQ2xv\ndWQgU1FMIFNlcnZlciBDQTEUMBIGA1UEChMLR29vZ2xlLCBJbmMxCzAJBgNVBAYT\nAlVTMIIBIjANBgkqhkiG9w0BAQEFAAOCAQ8AMIIBCgKCAQEAsaNoLYihNqLf4cIt\n2MzwjRDNJldt/ra6koDIX7/tS7HL073yjbvpC/nXQUyaJwyTMVr6a6WMrii8a33f\nJLD1slmARMZjpjUw4AOhqAPvR7z6xdJiSWwETUXScdrtUFr7lC6zaJvX3pOhlGdM\nIMpB+mT4UELJPuCaLm4WsUH1CwFTSCI+j37fnMcAv1P8N52+M1Hd1lyWCpesFzVF\nn6whv0GhUmIj6R+HoF61xm7+eG7CSJTt36qLS/KzpgxDMl3H3Kjsni+BjpWjpNt5\nQNnVA8CR/+8uZ9kwDTj8NikcJ4iCBzUlLQ/9lcevSXdbE2JPcQV52IgcrQCak8Rc\nD+lYKQIDAQABoxYwFDASBgNVHRMBAf8ECDAGAQH/AgEAMA0GCSqGSIb3DQEBCwUA\nA4IBAQABVoUql2Gvlh06Ra2NSrrWqoAksqZ56A98mO7c6S2NO6DcYaNWbqam7NZZ\nMHPUYAV1MLx3ksPkDjTCMr0fcb6VwM5mISLNLjXYybW+JHgqwVYeb9jTGS2MLV1A\nSXMOXcqSoih7UODBJUiPT6vakQmKZMFazIPXEuADjGzxDZ1r56WylcBy9uJj86gC\n7fCavXCBEkvkSDVdGrBjZansnBkmAp10L015HCZd6eZlMreTSVpXcie+WFpsPEfI\nHiGfnxa8FB15h9Yf6ctc2YoK9cq1G95jvbBwzlxGj+oVqK+vu2kDgtpE/JEuIDMp\nQ6xJwYqIGjQP8XIavS+ngg4F7L/K\n-----END CERTIFICATE-----",
+      "commonName": "C=US,O=Google\\, Inc,CN=Cloud SQL Server CA,dnQualifier=d97bd1c4-9768-417a-9526-748a64c72577",
+      "sha1Fingerprint": "96236bbb14b9a3af7d15b1c8c5d4626e018fc903",
+      "instance": "c7n-remove-labels-full-49f2",
+      "createTime": "2026-09-23T18:40:37.394Z",
+      "expirationTime": "2036-09-20T18:41:37.394Z"
+    },
+    "instanceType": "CLOUD_SQL_INSTANCE",
+    "project": "cloud-custodian",
+    "serviceAccountEmailAddress": "p123456789012-vj5alq@gcp-sa-cloud-sql.iam.gserviceaccount.com",
+    "backendType": "SECOND_GEN",
+    "selfLink": "https://sqladmin.googleapis.com/sql/v1beta4/projects/cloud-custodian/instances/c7n-remove-labels-full-49f2",
+    "connectionName": "cloud-custodian:us-central1:c7n-remove-labels-full-49f2",
+    "name": "c7n-remove-labels-full-49f2",
+    "region": "us-central1",
+    "gceZone": "us-central1-a",
+    "databaseInstalledVersion": "MYSQL_8_0_45",
+    "maintenanceVersion": "MYSQL_8_0_45.R20260726.00_27",
+    "upgradableDatabaseVersions": [
+      {
+        "majorVersion": "MYSQL_8_0",
+        "name": "MYSQL_8_0_18",
+        "displayName": "MySQL 8.0.18"
+      },
+      {
+        "majorVersion": "MYSQL_8_0",
+        "name": "MYSQL_8_0_26",
+        "displayName": "MySQL 8.0.26"
+      },
+      {
+        "majorVersion": "MYSQL_8_0",
+        "name": "MYSQL_8_0_27",
+        "displayName": "MySQL 8.0.27"
+      },
+      {
+        "majorVersion": "MYSQL_8_0",
+        "name": "MYSQL_8_0_28",
+        "displayName": "MySQL 8.0.28"
+      },
+      {
+        "majorVersion": "MYSQL_8_0",
+        "name": "MYSQL_8_0_29",
+        "displayName": "MySQL 8.0.29"
+      },
+      {
+        "majorVersion": "MYSQL_8_0",
+        "name": "MYSQL_8_0_30",
+        "displayName": "MySQL 8.0.30"
+      },
+      {
+        "majorVersion": "MYSQL_8_0",
+        "name": "MYSQL_8_0_31",
+        "displayName": "MySQL 8.0.31"
+      },
+      {
+        "majorVersion": "MYSQL_8_0",
+        "name": "MYSQL_8_0_32",
+        "displayName": "MySQL 8.0.32"
+      },
+      {
+        "majorVersion": "MYSQL_8_0",
+        "name": "MYSQL_8_0_33",
+        "displayName": "MySQL 8.0.33"
+      },
+      {
+        "majorVersion": "MYSQL_8_0",
+        "name": "MYSQL_8_0_34",
+        "displayName": "MySQL 8.0.34"
+      },
+      {
+        "majorVersion": "MYSQL_8_0",
+        "name": "MYSQL_8_0_35",
+        "displayName": "MySQL 8.0.35"
+      },
+      {
+        "majorVersion": "MYSQL_8_0",
+        "name": "MYSQL_8_0_36",
+        "displayName": "MySQL 8.0.36"
+      },
+      {
+        "majorVersion": "MYSQL_8_0",
+        "name": "MYSQL_8_0_37",
+        "displayName": "MySQL 8.0.37"
+      },
+      {
+        "majorVersion": "MYSQL_8_0",
+        "name": "MYSQL_8_0_39",
+        "displayName": "MySQL 8.0.39"
+      },
+      {
+        "majorVersion": "MYSQL_8_0",
+        "name": "MYSQL_8_0_40",
+        "displayName": "MySQL 8.0.40"
+      },
+      {
+        "majorVersion": "MYSQL_8_0",
+        "name": "MYSQL_8_0_41",
+        "displayName": "MySQL 8.0.41"
+      },
+      {
+        "majorVersion": "MYSQL_8_0",
+        "name": "MYSQL_8_0_42",
+        "displayName": "MySQL 8.0.42"
+      },
+      {
+        "majorVersion": "MYSQL_8_0",
+        "name": "MYSQL_8_0_43",
+        "displayName": "MySQL 8.0.43"
+      },
+      {
+        "majorVersion": "MYSQL_8_0",
+        "name": "MYSQL_8_0_44",
+        "displayName": "MySQL 8.0.44"
+      },
+      {
+        "majorVersion": "MYSQL_8_0",
+        "name": "MYSQL_8_0_46",
+        "displayName": "MySQL 8.0.46"
+      },
+      {
+        "majorVersion": "MYSQL_8_4",
+        "name": "MYSQL_8_4",
+        "displayName": "MySQL 8.4"
+      }
+    ],
+    "geminiConfig": {
+      "entitled": false,
+      "activeQueryEnabled": false,
+      "indexAdvisorEnabled": false,
+      "flagRecommenderEnabled": true
+    },
+    "createTime": "2026-09-23T18:40:47.145Z",
+    "sqlNetworkArchitecture": "NEW_NETWORK_ARCHITECTURE",
+    "satisfiesPzi": true,
+    "includeReplicasForMajorVersionUpgrade": false
+  }
+}
