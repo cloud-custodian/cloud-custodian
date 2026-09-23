@@ -9,7 +9,7 @@ from c7n_gcp.client import get_default_project
 from c7n_gcp.region import Region
 from gcp_common import PROJECT_ID, GoogleFlightRecorder
 from pytest_terraform.tf import LazyPluginCacheDir, LazyReplay
-from recorder import sanitize_project_name
+from recorder import sanitize_recording
 
 from c7n.testing import C7N_FUNCTIONAL, PyTestUtils, reset_session_cache
 from c7n.utils import jmespath_search
@@ -57,4 +57,4 @@ def test(request):
 
 def pytest_terraform_modify_state(tfstate):
     """ Sanitize functional testing account data """
-    tfstate.update(sanitize_project_name(str(tfstate)))
+    tfstate.update(sanitize_recording(str(tfstate)))

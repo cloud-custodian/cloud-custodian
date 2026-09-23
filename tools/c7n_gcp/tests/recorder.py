@@ -5,9 +5,12 @@ import bz2
 import json
 import os
 import re
+import warnings
 from urllib.parse import urlparse
 
 from httplib2 import Http, Response
+
+from c7n_gcp.client import get_default_project
 
 
 PROJECT_ID = "cloud-custodian"
@@ -16,6 +19,64 @@ PROJECT_ID = "cloud-custodian"
 def sanitize_project_name(dirty_str):
     sanitized = 'projects/{}/'.format(PROJECT_ID)
     return re.sub(r'projects/([0-9a-zA-Z_-]+)/', sanitized, dirty_str)
+
+
+# Stands in for the live project number in recordings.
+PROJECT_NUMBER = "123456789012"
+# The live project number turns up in many forms (ACL entities, generated
+# bucket names, service agents), so it's scrubbed wherever it's known: set
+# from the environment when recording, or learned from responses that
+# report it.
+PROJECT_NUMBER_ENV = "GOOGLE_CLOUD_PROJECT_NUMBER"
+
+# Service agent emails embed the project number, e.g.
+# p<number>-<id>@gcp-sa-cloud-sql.iam.gserviceaccount.com
+SERVICE_AGENT_NUMBER = re.compile(
+    r'(?<![0-9])[0-9]{10,13}(?=[^"@\s]*@[a-z0-9.-]*gserviceaccount\.com)')
+
+PROJECT_NUMBER_SOURCES = (
+    # e.g. storage's "projectNumber" and terraform's "project_number"
+    re.compile(r'"(?:projectNumber|project_number)":\s*"?([0-9]+)"?'),
+    SERVICE_AGENT_NUMBER,
+)
+
+# Project numbers learned so far, so they're scrubbed from later responses
+# that don't report them.
+learned_project_numbers = set()
+
+RECORDING_SUBSTITUTIONS = (
+    # BigQuery grants a new dataset's creator an owner access entry.
+    (re.compile(r'("(?:userByEmail|user_by_email)":\s*")[^"]+"'), r'\1user@example.com"'),
+    # Long-running operations (e.g. Cloud SQL) record the caller.
+    (re.compile(r'("user":\s*")[^"@]+@[^"]+"'), r'\1user@example.com"'),
+    (SERVICE_AGENT_NUMBER, PROJECT_NUMBER),
+)
+
+
+def get_project_numbers(dirty_str):
+    for pattern in PROJECT_NUMBER_SOURCES:
+        learned_project_numbers.update(pattern.findall(dirty_str))
+    numbers = set(learned_project_numbers)
+    if os.environ.get(PROJECT_NUMBER_ENV):
+        numbers.add(os.environ[PROJECT_NUMBER_ENV])
+    numbers.discard(PROJECT_NUMBER)
+    return numbers
+
+
+def sanitize_recording(dirty_str):
+    """Scrub account details from recorded responses and terraform state."""
+    sanitized = sanitize_project_name(dirty_str)
+    # Bodies also carry the project outside of resource paths, e.g.
+    # bigquery's "projectId" and "<project>:<dataset>" ids.
+    project_id = get_default_project()
+    if project_id and project_id != PROJECT_ID:
+        sanitized = sanitized.replace(project_id, PROJECT_ID)
+    for project_number in get_project_numbers(dirty_str):
+        sanitized = re.sub(
+            r'(?<![0-9]){}(?![0-9])'.format(re.escape(project_number)), PROJECT_NUMBER, sanitized)
+    for pattern, replacement in RECORDING_SUBSTITUTIONS:
+        sanitized = pattern.sub(replacement, sanitized)
+    return sanitized
 
 
 class FlightRecorder(Http):
@@ -86,6 +147,14 @@ class FlightRecorder(Http):
 
 class HttpRecorder(FlightRecorder):
 
+    def __init__(self, data_path=None, discovery_path=None):
+        if not os.environ.get(PROJECT_NUMBER_ENV):
+            warnings.warn(
+                "%s is not set, the live project number may leak into recordings "
+                "made before a response reports it"
+                % PROJECT_NUMBER_ENV)
+        super().__init__(data_path, discovery_path)
+
     def request(self, uri, method="GET", body=None, headers=None,
                 redirections=1, connection_type=None):
         response, content = super(HttpRecorder, self).request(
@@ -104,7 +173,7 @@ class HttpRecorder(FlightRecorder):
             if not content:
                 content = '{}'
             recorded['body'] = json.loads(content)
-            fh.write(sanitize_project_name(json.dumps(recorded, indent=2)).encode('utf8'))
+            fh.write(sanitize_recording(json.dumps(recorded, indent=2)).encode('utf8'))
 
         return response, content
 
