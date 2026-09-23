@@ -1,0 +1,35 @@
+{
+  "headers": {
+    "content-type": "application/json; charset=UTF-8",
+    "vary": "Origin, X-Origin, Referer",
+    "date": "Fri, 14 Aug 2026 17:30:35 GMT",
+    "server": "ESF",
+    "x-xss-protection": "0",
+    "x-frame-options": "SAMEORIGIN",
+    "x-content-type-options": "nosniff",
+    "alt-svc": "h3=\":443\"; ma=2592000,h3-29=\":443\"; ma=2592000",
+    "transfer-encoding": "chunked",
+    "status": "200",
+    "content-length": "418",
+    "-content-encoding": "gzip"
+  },
+  "body": {
+    "name": "projects/cloud-custodian/locations/us-east1/evaluationItems/2870129968774381568",
+    "displayName": "c7n-test-eval-run-east-item",
+    "evaluationItemType": "REQUEST",
+    "evaluationRequest": {
+      "prompt": {
+        "text": "What is 2+2?"
+      },
+      "goldenResponse": {
+        "text": "4"
+      },
+      "candidateResponses": [
+        {
+          "candidate": "model-under-test",
+          "text": "4"
+        }
+      ]
+    }
+  }
+}

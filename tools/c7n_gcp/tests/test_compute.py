@@ -1,13 +1,15 @@
 # Copyright The Cloud Custodian Authors.
 # SPDX-License-Identifier: Apache-2.0
 
+import functools
 import re
 import time
 
 from c7n_gcp.resources.compute import Snapshot
-from gcp_common import BaseTest, event_data
+from gcp_common import BaseTest, audit_event_recorder, event_data
 from googleapiclient.errors import HttpError
-from c7n_gcp.client import get_default_project
+from c7n_gcp.client import Session, get_default_project
+from c7n.utils import local_session
 from pytest_terraform import terraform
 
 
@@ -454,6 +456,158 @@ class DiskTest(BaseTest):
         resources = p.run()
         self.assertEqual(len(resources), 1)
         self.assertEqual(resources[0]['name'], 'custodian-dev')
+
+    def test_label_regional_disk(self):
+        project_id = self.project_id
+        factory = self.replay_flight_data('disk-regional-label', project_id=project_id)
+        p = self.load_policy(
+            {'name': 'disk-label',
+             'resource': 'gcp.disk',
+             'filters': [{'name': 'c7n-regional-jenkins'}],
+             'actions': [{'type': 'set-labels',
+                          'labels': {'test_label': 'test_value'}}]},
+            session_factory=factory)
+        resources = p.run()
+        self.assertEqual(len(resources), 1)
+        session = local_session(p.resource_manager.session_factory)
+        client = session.client('compute', 'v1', 'regionDisks')
+        result = client.execute_query(
+            'list', {'project': project_id,
+                     'filter': 'name = c7n-regional-jenkins',
+                     'region': resources[0]['region'].rsplit('/', 1)[-1]})
+        self.assertEqual(result['items'][0]['labels']['test_label'], 'test_value')
+
+    def test_regional_disk_snapshot(self):
+        factory = self.replay_flight_data('disk-regional-snapshot', project_id=self.project_id)
+        p = self.load_policy(
+            {'name': 'regional-disk-snapshot',
+             'resource': 'gcp.disk',
+             'filters': [
+                 {'name': 'c7n-regional-jenkins'}],
+             'actions': ['snapshot']},
+            session_factory=factory)
+        resources = p.run()
+        self.assertEqual(len(resources), 1)
+
+    def test_regional_disk_delete(self):
+        project_id = self.project_id
+        resource_name = 'c7n-regional-jenkins'
+        factory = self.replay_flight_data('disk-regional-delete', project_id=project_id)
+        policy = self.load_policy(
+            {'name': 'regional-disk-delete',
+             'resource': 'gcp.disk',
+             'filters': [
+                 {'name': resource_name}],
+             'actions': ['delete']},
+            session_factory=factory)
+        resources = policy.run()
+        self.assertEqual(resources[0]['name'], resource_name)
+
+        if self.recording:
+            time.sleep(10)
+        session = local_session(policy.resource_manager.session_factory)
+        client = session.client('compute', 'v1', 'regionDisks')
+        region = resources[0]['region'].rsplit('/', 1)[-1]
+        result = client.execute_query(
+            'list', {'project': project_id,
+                     'filter': 'name = {}'.format(resource_name),
+                     'region': region})
+        self.assertEqual(len(result.get('items', [])), 0)
+
+
+@terraform('disk_audit')
+def test_disk_audit_mode(test, disk_audit):
+    """gcp-audit resolution of zonal and regional disks, on create and update.
+
+    Zonal disk events identify the disk by a numeric ``disk_id`` label,
+    regional ones carry no disk identity at all -- and a ``location`` label
+    rather than ``region`` -- so resolution goes through ``resourceName``.
+    """
+    project_id = test.project_id
+    names = {
+        'zonal': disk_audit.outputs['zonal_disk_name']['value'],
+        'regional': disk_audit.outputs['regional_disk_name']['value'],
+        }
+    scopes = {
+        'zonal': ('disks', {'zone': disk_audit.outputs['zone']['value']}),
+        'regional': ('regionDisks', {'region': disk_audit.outputs['region']['value']}),
+        }
+
+    # (base event file, disk scope, mutating method)
+    recordings = (
+        ('disk-zonal-create.json', 'zonal', 'insert'),
+        ('disk-regional-create.json', 'regional', 'insert'),
+        ('disk-zonal-update.json', 'zonal', 'setLabels'),
+        ('disk-regional-update.json', 'regional', 'setLabels'),
+        )
+
+    # The files those recordings produce. Every entry of an operation is
+    # delivered to a deployed policy as its own event, so each is exercised.
+    events = (
+        ('disk-zonal-create-first.json', 'zonal'),
+        ('disk-zonal-create-last.json', 'zonal'),
+        ('disk-regional-create-first.json', 'regional'),
+        ('disk-regional-create-last.json', 'regional'),
+        ('disk-zonal-update-first-last.json', 'zonal'),
+        ('disk-regional-update-first-last.json', 'regional'),
+        )
+
+    policy_session_factory = test.replay_flight_data(
+        'disk-audit', project_id=project_id)
+
+    if test.recording:
+        # Setup, not the behavior being replayed: mutating the disks
+        # produces the update events, and the recorder polls Cloud Logging
+        # for all four. A plain session keeps those responses -- which
+        # include the caller's email and ip -- out of the flight data.
+        setup_session_factory = functools.partial(Session, project_id=project_id)
+        setup_session = setup_session_factory()
+        for scope, name in names.items():
+            component, loc = scopes[scope]
+            client = setup_session.client('compute', 'v1', component)
+
+            # Updating labels is always two requests:
+            # 1. A get, for the labelFingerprint, to demonstrate that
+            #    you are updating data that is current.
+            # 2. The actual update.
+            disk = client.execute_command(
+                'get', {'project': project_id, 'disk': name, **loc})
+            client.execute_command(
+                'setLabels',
+                {'project': project_id, 'resource': name, **loc,
+                 'body': {'labels': {'c7n-audit': 'recorded'},
+                          'labelFingerprint': disk['labelFingerprint']}})
+        for event_file, scope, method in recordings:
+            # Terraform created both disks before this body ran, so the
+            # create queries need a window reaching back past that.
+            audit_event_recorder(
+                setup_session_factory,
+                event_file,
+                method='compute.{}.{}'.format(scopes[scope][0], method),
+                resource_name=names[scope],
+                start_time_skew_seconds=900,
+                ).record()
+        # Sessions and their http transports are cached globally, ignoring
+        # the factory asked for; without this the policy below reuses
+        # setup_session and records nothing. (Same reason it is built
+        # directly above rather than via local_session.)
+        test.cleanUp()
+
+    policy = test.load_policy(
+        {'name': 'disk-audit',
+         'resource': 'gcp.disk',
+         'mode': {
+             'type': 'gcp-audit',
+             'methods': ['v1.compute.disks.insert',
+                         'v1.compute.disks.setLabels',
+                         'v1.compute.regionDisks.insert',
+                         'v1.compute.regionDisks.setLabels']}},
+        session_factory=policy_session_factory)
+    exec_mode = policy.get_execution_mode()
+
+    for event_file, scope in events:
+        [resource] = exec_mode.run(event_data(event_file), None)
+        assert resource['name'] == names[scope], event_file
 
 
 class SnapshotTest(BaseTest):

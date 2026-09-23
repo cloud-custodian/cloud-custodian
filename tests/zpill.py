@@ -2,6 +2,7 @@
 # SPDX-License-Identifier: Apache-2.0
 import base64
 import fnmatch
+import functools
 from io import BytesIO
 import json
 import os
@@ -17,6 +18,7 @@ from botocore.response import StreamingBody
 from placebo import pill
 
 from c7n.testing import CustodianTestCore
+from c7n.utils import get_account_id_from_sts
 
 # Custodian Test Account. This is used only for testing.
 
@@ -267,6 +269,11 @@ class RedPill(pill.Pill):
         super(RedPill, self).save_response(service, operation, response_data, http_response)
 
 
+@functools.lru_cache(maxsize=None)
+def get_recording_account_id():
+    return get_account_id_from_sts(boto3.Session())
+
+
 class PillTest(CustodianTestCore):
     archive_path = os.path.join(os.path.dirname(os.path.abspath(__file__)), "placebo_data.zip")
 
@@ -275,6 +282,19 @@ class PillTest(CustodianTestCore):
     output_dir = os.path.join(os.path.dirname(os.path.abspath(__file__)), "data", "output")
 
     recording = False
+
+    @property
+    def account_id(self):
+        """The account id to construct arns with.
+
+        Recorded api data is sanitized to ACCOUNT_ID, but while recording
+        (or running functionally) we're talking to a real account and need
+        its real id, which is what the aws provider's initialization would
+        have resolved for us.
+        """
+        if not self.recording:
+            return ACCOUNT_ID
+        return get_recording_account_id()
 
     def cleanUp(self):
         self.pill = None
