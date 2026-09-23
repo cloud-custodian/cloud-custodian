@@ -12,7 +12,7 @@ from azure.storage.common.models import Logging, RetentionPolicy
 from azure.storage.file import FileService
 from azure.storage.queue import QueueServiceClient
 from c7n.exceptions import PolicyValidationError
-from c7n.filters.core import type_schema, ListItemFilter
+from c7n.filters.core import type_schema, Filter, ListItemFilter
 from c7n.utils import get_annotation_prefix, local_session
 from c7n_azure.actions.base import AzureBaseAction
 from c7n_azure.actions.firewall import SetFirewallAction
@@ -764,6 +764,50 @@ class RequireSecureTransferAction(AzureBaseAction):
             resource['name'],
             update_params,
         )
+
+
+@Storage.filter_registry.register('blob-public-access')
+class BlobPublicAccessFilter(Filter):
+    """Filter Storage Accounts by whether anonymous (public) blob access is
+    allowed at the account level (the ``allowBlobPublicAccess`` property).
+
+    Azure does not always return ``allowBlobPublicAccess`` in the account
+    properties. When it is absent the account permits anonymous access, so this
+    filter treats a missing value as ``True`` (allowed). This makes it suitable
+    for the CIS Microsoft Azure Foundations control "Ensure that 'Allow Blob
+    Anonymous Access' is set to 'Disabled'", which a plain ``value`` filter
+    would miss on accounts where the property is not present.
+
+    :example:
+
+    Find all Storage Accounts that allow anonymous blob access (CIS 4.17),
+    including those where the property is unset, and disable it.
+
+    .. code-block:: yaml
+
+        policies:
+            - name: cis-4-17-blob-anonymous-access
+              resource: azure.storage
+              filters:
+                - type: blob-public-access
+                  value: true
+              actions:
+                - type: set-blob-public-access
+                  value: False
+    """
+
+    schema = type_schema(
+        'blob-public-access',
+        **{
+            'value': {'type': 'boolean', 'default': True},
+        })
+
+    def process(self, resources, event=None):
+        target = self.data.get('value', True)
+        return [
+            r for r in resources
+            if r.get('properties', {}).get('allowBlobPublicAccess', True) == target
+        ]
 
 
 @Storage.action_registry.register('set-blob-public-access')

@@ -647,6 +647,42 @@ class StorageTest(BaseTest):
             self.assertEqual(args[2],
                 StorageAccountUpdateParameters(enable_https_traffic_only=True))
 
+    @arm_template("storage.json")
+    def test_storage_blob_public_access_filter(self):
+        # allowBlobPublicAccess is absent in the API response for these
+        # accounts, which Azure treats as "allowed"; value: true must match.
+        p = self.load_policy({
+            'name': 'cis-4-17-blob-anonymous-access',
+            'resource': 'azure.storage',
+            'filters': [
+                {'type': 'value',
+                'key': 'name',
+                'op': 'glob',
+                'value_type': 'normalize',
+                'value': 'cctstorage*'},
+                {'type': 'blob-public-access',
+                'value': True}
+            ]
+        })
+        resources = p.run()
+        self.assertEqual(len(resources), 1)
+
+        # No account has anonymous access explicitly disabled in this data set.
+        p = self.load_policy({
+            'name': 'cis-4-17-compliant',
+            'resource': 'azure.storage',
+            'filters': [
+                {'type': 'value',
+                'key': 'name',
+                'op': 'glob',
+                'value_type': 'normalize',
+                'value': 'cctstorage*'},
+                {'type': 'blob-public-access',
+                'value': False}
+            ]
+        })
+        self.assertEqual(len(p.run()), 0)
+
     def test_storage_settings_set_blob_public_access(self):
         with patch('azure.mgmt.storage.v%s.operations.'
         '_storage_accounts_operations.StorageAccountsOperations.update'
