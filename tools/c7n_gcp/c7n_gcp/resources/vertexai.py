@@ -112,7 +112,7 @@ class VertexAIQueryManager(QueryResourceManager):
 
             # Invoke the client enumeration (Vertex AI API supports pagination)
             location_resources = []
-            with self.ignore_access_errors():
+            with self._ignore_access_errors():
                 for page in client.execute_paged_query(enum_op, params):
                     page_items = jmespath_search(path, page)
                     if page_items:
@@ -850,7 +850,7 @@ class VertexAIMetadataStoreArtifact(VertexAIQueryManager):
             artifact_client = None
 
             parent = f'projects/{project}/locations/{location}'
-            with self.ignore_access_errors():
+            with self._ignore_access_errors():
                 for store_page in store_client.execute_paged_query(
                         'list', {'parent': parent}):
                     stores = jmespath_search('metadataStores[]', store_page) or []
@@ -859,7 +859,7 @@ class VertexAIMetadataStoreArtifact(VertexAIQueryManager):
                             artifact_client = self.get_location_client(
                                 session, location, self.resource_type.component)
                         artifacts = []
-                        with self.ignore_access_errors():
+                        with self._ignore_access_errors():
                             for artifact_page in artifact_client.execute_paged_query(
                                     enum_op, {'parent': store['name']}):
                                 page_items = jmespath_search(path, artifact_page)

@@ -228,7 +228,7 @@ class QueryResourceManager(ResourceManager, metaclass=QueryMeta):
         return max_resource_limits.check_resource_limits()
 
     @contextlib.contextmanager
-    def ignore_access_errors(self):
+    def _ignore_access_errors(self):
         """Log and ignore errors indicating that a resource API is disabled."""
         try:
             yield
@@ -251,7 +251,7 @@ class QueryResourceManager(ResourceManager, metaclass=QueryMeta):
 
     def _fetch_resources(self, query):
         result = []
-        with self.ignore_access_errors():
+        with self._ignore_access_errors():
             result = self.augment(self.source.get_resources(query) or [])
 
         return result
