@@ -189,6 +189,13 @@ def test_bucket_set_iam_policy_remove_nonexistent_is_noop(test, bucket_set_iam_p
 
 class BucketTest(BaseTest):
 
+    def test_bucket_query_prefix(self):
+        p = self.load_policy(
+            {'name': 'prefixed-buckets',
+             'resource': 'gcp.bucket',
+             'query': [{'prefix': 'logs-'}]})
+        self.assertEqual(p.resource_manager.get_resource_query(), {'prefix': 'logs-'})
+
     def test_bucket_query(self):
         project_id = self.project_id
         factory = self.replay_flight_data('bucket-query', project_id)
@@ -341,6 +348,8 @@ def test_bucket_remove_labels(test, bucket_remove_labels):
     policy = test.load_policy(
         {'name': 'bucket-remove-labels',
          'resource': 'gcp.bucket',
+         # Keep unrelated buckets in the project out of the recording.
+         'query': [{'prefix': 'c7n-remove-labels-'}],
          'filters': [{'type': 'value', 'key': 'name', 'op': 'in',
                       'value': list(names.values())}],
          'actions': [{'type': 'set-labels', 'remove': ['c7n_remove_a', 'c7n_remove_b']}]},

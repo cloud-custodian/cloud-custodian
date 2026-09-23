@@ -10,6 +10,20 @@ from c7n_gcp.filters import IamPolicyFilter
 
 @resources.register('bucket')
 class Bucket(QueryResourceManager):
+    """GCP resource: https://cloud.google.com/storage/docs/json_api/v1/buckets
+
+    Listing can be narrowed server-side to buckets whose names start with a prefix.
+
+    :example:
+
+    .. code-block:: yaml
+
+        policies:
+          - name: gcp-logging-buckets
+            resource: gcp.bucket
+            query:
+              - prefix: logs-
+    """
 
     class resource_type(TypeInfo):
         service = 'storage'
@@ -43,6 +57,13 @@ class Bucket(QueryResourceManager):
         @staticmethod
         def get_label_params(resource, all_labels):
             return {'bucket': resource['name'], 'body': {'labels': all_labels}}
+
+    def get_resource_query(self):
+        # https://cloud.google.com/storage/docs/json_api/v1/buckets/list
+        if 'query' in self.data:
+            for child in self.data.get('query'):
+                if 'prefix' in child:
+                    return {'prefix': child['prefix']}
 
 
 @Bucket.filter_registry.register('iam-policy')
