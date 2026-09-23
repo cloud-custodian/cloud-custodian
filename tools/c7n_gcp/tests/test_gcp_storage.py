@@ -4,6 +4,7 @@
 import time
 
 from gcp_common import BaseTest
+from c7n.exceptions import PolicyValidationError
 from pytest_terraform import terraform
 
 
@@ -195,6 +196,17 @@ class BucketTest(BaseTest):
              'resource': 'gcp.bucket',
              'query': [{'prefix': 'logs-'}]})
         self.assertEqual(p.resource_manager.get_resource_query(), {'prefix': 'logs-'})
+
+    def test_bucket_query_rejects_unsupported(self):
+        for query in (
+                [{'Prefix': 'logs-'}],
+                [{'prefix': 'logs-', 'filter': 'x'}],
+                [{'prefix': 'logs-'}, {'prefix': 'tmp-'}],
+                ['logs-']):
+            with self.subTest(query=query):
+                with self.assertRaises(PolicyValidationError):
+                    self.load_policy(
+                        {'name': 'bad-bucket-query', 'resource': 'gcp.bucket', 'query': query})
 
     def test_bucket_query(self):
         project_id = self.project_id

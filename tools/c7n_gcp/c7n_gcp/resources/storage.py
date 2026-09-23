@@ -1,5 +1,6 @@
 # Copyright The Cloud Custodian Authors.
 # SPDX-License-Identifier: Apache-2.0
+from c7n.exceptions import PolicyValidationError
 from c7n.utils import type_schema
 from c7n_gcp.actions import MethodAction
 from c7n_gcp.actions.iampolicy import SetIamPolicy
@@ -59,12 +60,20 @@ class Bucket(QueryResourceManager):
         def get_label_params(resource, all_labels):
             return {'bucket': resource['name'], 'body': {'labels': all_labels}}
 
+    def validate(self):
+        super().validate()
+        query = self.data.get('query', [])
+        if len(query) > 1 or any(
+                not isinstance(child, dict) or set(child) != {'prefix'} for child in query):
+            raise PolicyValidationError(
+                "%s: gcp.bucket query supports a single prefix, e.g. [{prefix: logs-}]"
+                % self.ctx.policy.name)
+        return self
+
     def get_resource_query(self):
         # https://cloud.google.com/storage/docs/json_api/v1/buckets/list
         if 'query' in self.data:
-            for child in self.data.get('query'):
-                if 'prefix' in child:
-                    return {'prefix': child['prefix']}
+            return {'prefix': self.data['query'][0]['prefix']}
 
 
 @Bucket.filter_registry.register('iam-policy')
