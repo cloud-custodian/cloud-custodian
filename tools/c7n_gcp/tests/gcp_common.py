@@ -7,7 +7,6 @@ import hashlib
 import json
 import logging
 import os
-import re
 import shutil
 import time
 import typing
@@ -25,8 +24,10 @@ from c7n.testing import (
 from c7n_gcp.client import Session, LOCAL_THREAD, get_default_project
 
 from recorder import (
+    EMAIL_RE,
     HttpRecorder,
     HttpReplay,
+    PLACEHOLDER_EMAIL,
     PROJECT_ID,
 )
 
@@ -37,8 +38,6 @@ EVENT_DIR = os.path.join(os.path.dirname(__file__), 'data', 'events')
 
 log = logging.getLogger('custodian.tests.gcp')
 
-EMAIL_RE = re.compile(r'[\w.+%-]+@[\w.-]+\.\w+')
-PLACEHOLDER_EMAIL = 'user@example.com'
 # RFC 5737 TEST-NET-2, reserved for documentation.
 PLACEHOLDER_IP = '198.51.100.1'
 

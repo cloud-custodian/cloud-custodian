@@ -29,38 +29,43 @@ PROJECT_NUMBER = "123456789012"
 # report it.
 PROJECT_NUMBER_ENV = "GOOGLE_CLOUD_PROJECT_NUMBER"
 
-# Service agent emails embed the project number, e.g.
-# p<number>-<id>@gcp-sa-cloud-sql.iam.gserviceaccount.com
+# Google-managed service agents embed the project number, e.g.
+# service-<number>@gcp-sa-pubsub.iam.gserviceaccount.com,
+# p<number>-<id>@gcp-sa-cloud-sql.iam.gserviceaccount.com and
+# <number>-compute@developer.gserviceaccount.com. User-managed service
+# accounts live under <project>.iam.gserviceaccount.com and aren't matched.
 SERVICE_AGENT_NUMBER = re.compile(
-    r'(?<![0-9])[0-9]{10,13}(?=[^"@\s]*@[a-z0-9.-]*gserviceaccount\.com)')
+    r'(?<![\w.-])(?P<prefix>service-|p)?(?P<number>[0-9]{10,13})'
+    r'(?=(?:-[a-z0-9]+)?@(?:gcp-sa-[a-z0-9-]+\.iam|developer|cloudservices|cloudbuild)'
+    r'\.gserviceaccount\.com)')
 
-PROJECT_NUMBER_SOURCES = (
-    # e.g. storage's "projectNumber" and terraform's "project_number"
-    re.compile(r'"(?:projectNumber|project_number)":\s*"?([0-9]+)"?'),
-    SERVICE_AGENT_NUMBER,
-)
+# e.g. storage's "projectNumber" and terraform's "project_number"
+PROJECT_NUMBER_FIELD = re.compile(r'"(?:projectNumber|project_number)":\s*"?([0-9]+)"?')
 
 # Project numbers learned so far, so they're scrubbed from later responses
 # that don't report them.
 learned_project_numbers = set()
 
-RECORDING_SUBSTITUTIONS = (
-    # BigQuery grants a new dataset's creator an owner access entry.
-    (re.compile(r'("(?:userByEmail|user_by_email)":\s*")[^"]+"'), r'\1user@example.com"'),
-    # Long-running operations (e.g. Cloud SQL) record the caller.
-    (re.compile(r'("user":\s*")[^"@]+@[^"]+"'), r'\1user@example.com"'),
-    (SERVICE_AGENT_NUMBER, PROJECT_NUMBER),
-)
+EMAIL_RE = re.compile(r'[\w.+%-]+@[\w.-]+\.\w+')
+PLACEHOLDER_EMAIL = 'user@example.com'
 
 
 def get_project_numbers(dirty_str):
-    for pattern in PROJECT_NUMBER_SOURCES:
-        learned_project_numbers.update(pattern.findall(dirty_str))
+    learned_project_numbers.update(PROJECT_NUMBER_FIELD.findall(dirty_str))
+    learned_project_numbers.update(
+        m.group('number') for m in SERVICE_AGENT_NUMBER.finditer(dirty_str))
     numbers = set(learned_project_numbers)
     if os.environ.get(PROJECT_NUMBER_ENV):
         numbers.add(os.environ[PROJECT_NUMBER_ENV])
     numbers.discard(PROJECT_NUMBER)
     return numbers
+
+
+def scrub_email(match):
+    # Service accounts belong to the project rather than a person, and are
+    # already scrubbed of the project id and number.
+    email = match.group()
+    return email if email.endswith('.gserviceaccount.com') else PLACEHOLDER_EMAIL
 
 
 def sanitize_recording(dirty_str):
@@ -77,9 +82,9 @@ def sanitize_recording(dirty_str):
     for project_number in get_project_numbers(dirty_str):
         sanitized = re.sub(
             r'(?<![0-9]){}(?![0-9])'.format(re.escape(project_number)), PROJECT_NUMBER, sanitized)
-    for pattern, replacement in RECORDING_SUBSTITUTIONS:
-        sanitized = pattern.sub(replacement, sanitized)
-    return sanitized
+    sanitized = SERVICE_AGENT_NUMBER.sub(
+        lambda m: (m.group('prefix') or '') + PROJECT_NUMBER, sanitized)
+    return EMAIL_RE.sub(scrub_email, sanitized)
 
 
 class FlightRecorder(Http):
