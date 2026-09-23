@@ -368,7 +368,7 @@ def test_dataset_remove_labels(test, bq_dataset_remove_labels):
     datasets = bq_dataset_remove_labels.resources['google_bigquery_dataset']
     project_id = datasets['partial']['project']
 
-    factory = test.record_flight_data('bq-dataset-remove-labels')
+    factory = test.replay_flight_data('bq-dataset-remove-labels')
     policy = test.load_policy(
         {'name': 'bq-dataset-remove-labels',
          'resource': 'gcp.bq-dataset',
@@ -404,7 +404,7 @@ def test_table_remove_labels(test, bq_table_remove_labels):
     tables = bq_table_remove_labels.resources['google_bigquery_table']
     project_id = tables['partial']['project']
 
-    factory = test.record_flight_data('bq-table-remove-labels')
+    factory = test.replay_flight_data('bq-table-remove-labels')
     policy = test.load_policy(
         {'name': 'bq-table-remove-labels',
          'resource': 'gcp.bq-table',

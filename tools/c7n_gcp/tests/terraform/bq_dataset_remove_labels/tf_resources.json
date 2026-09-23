@@ -1,0 +1,284 @@
+{
+    "pytest-terraform": 1,
+    "outputs": {},
+    "resources": {
+        "google_bigquery_dataset": {
+            "absent": {
+                "access": [
+                    {
+                        "condition": [],
+                        "dataset": [],
+                        "domain": "",
+                        "group_by_email": "",
+                        "iam_member": "",
+                        "role": "OWNER",
+                        "routine": [],
+                        "special_group": "",
+                        "user_by_email": "user@example.com",
+                        "view": []
+                    },
+                    {
+                        "condition": [],
+                        "dataset": [],
+                        "domain": "",
+                        "group_by_email": "",
+                        "iam_member": "",
+                        "role": "OWNER",
+                        "routine": [],
+                        "special_group": "projectOwners",
+                        "user_by_email": "",
+                        "view": []
+                    },
+                    {
+                        "condition": [],
+                        "dataset": [],
+                        "domain": "",
+                        "group_by_email": "",
+                        "iam_member": "",
+                        "role": "READER",
+                        "routine": [],
+                        "special_group": "projectReaders",
+                        "user_by_email": "",
+                        "view": []
+                    },
+                    {
+                        "condition": [],
+                        "dataset": [],
+                        "domain": "",
+                        "group_by_email": "",
+                        "iam_member": "",
+                        "role": "WRITER",
+                        "routine": [],
+                        "special_group": "projectWriters",
+                        "user_by_email": "",
+                        "view": []
+                    }
+                ],
+                "creation_time": 1790166871545,
+                "dataset_id": "c7n_remove_labels_absent_a979",
+                "default_collation": "",
+                "default_encryption_configuration": [],
+                "default_partition_expiration_ms": 0,
+                "default_table_expiration_ms": 0,
+                "delete_contents_on_destroy": true,
+                "deletion_policy": "DELETE",
+                "description": "",
+                "effective_labels": {
+                    "c7n_keep": "yes",
+                    "c7n_test": "bq_dataset_remove_labels"
+                },
+                "etag": "NTR6TZnlyIIAAzAywXp2BQ==",
+                "external_catalog_dataset_options": [],
+                "external_dataset_reference": [],
+                "friendly_name": "",
+                "id": "projects/cloud-custodian/datasets/c7n_remove_labels_absent_a979",
+                "is_case_insensitive": false,
+                "labels": {
+                    "c7n_keep": "yes",
+                    "c7n_test": "bq_dataset_remove_labels"
+                },
+                "last_modified_time": 1790166871545,
+                "location": "US",
+                "max_time_travel_hours": "168",
+                "project": "cloud-custodian",
+                "resource_tags": null,
+                "self_link": "https://bigquery.googleapis.com/bigquery/v2/projects/cloud-custodian/datasets/c7n_remove_labels_absent_a979",
+                "storage_billing_model": "",
+                "terraform_labels": {
+                    "c7n_keep": "yes",
+                    "c7n_test": "bq_dataset_remove_labels"
+                },
+                "timeouts": null
+            },
+            "full": {
+                "access": [
+                    {
+                        "condition": [],
+                        "dataset": [],
+                        "domain": "",
+                        "group_by_email": "",
+                        "iam_member": "",
+                        "role": "OWNER",
+                        "routine": [],
+                        "special_group": "",
+                        "user_by_email": "user@example.com",
+                        "view": []
+                    },
+                    {
+                        "condition": [],
+                        "dataset": [],
+                        "domain": "",
+                        "group_by_email": "",
+                        "iam_member": "",
+                        "role": "OWNER",
+                        "routine": [],
+                        "special_group": "projectOwners",
+                        "user_by_email": "",
+                        "view": []
+                    },
+                    {
+                        "condition": [],
+                        "dataset": [],
+                        "domain": "",
+                        "group_by_email": "",
+                        "iam_member": "",
+                        "role": "READER",
+                        "routine": [],
+                        "special_group": "projectReaders",
+                        "user_by_email": "",
+                        "view": []
+                    },
+                    {
+                        "condition": [],
+                        "dataset": [],
+                        "domain": "",
+                        "group_by_email": "",
+                        "iam_member": "",
+                        "role": "WRITER",
+                        "routine": [],
+                        "special_group": "projectWriters",
+                        "user_by_email": "",
+                        "view": []
+                    }
+                ],
+                "creation_time": 1790166871686,
+                "dataset_id": "c7n_remove_labels_full_a979",
+                "default_collation": "",
+                "default_encryption_configuration": [],
+                "default_partition_expiration_ms": 0,
+                "default_table_expiration_ms": 0,
+                "delete_contents_on_destroy": true,
+                "deletion_policy": "DELETE",
+                "description": "",
+                "effective_labels": {
+                    "c7n_remove_full": "yes"
+                },
+                "etag": "B89gP3bJCH8VNCka1MQGRQ==",
+                "external_catalog_dataset_options": [],
+                "external_dataset_reference": [],
+                "friendly_name": "",
+                "id": "projects/cloud-custodian/datasets/c7n_remove_labels_full_a979",
+                "is_case_insensitive": false,
+                "labels": {
+                    "c7n_remove_full": "yes"
+                },
+                "last_modified_time": 1790166871686,
+                "location": "US",
+                "max_time_travel_hours": "168",
+                "project": "cloud-custodian",
+                "resource_tags": null,
+                "self_link": "https://bigquery.googleapis.com/bigquery/v2/projects/cloud-custodian/datasets/c7n_remove_labels_full_a979",
+                "storage_billing_model": "",
+                "terraform_labels": {
+                    "c7n_remove_full": "yes"
+                },
+                "timeouts": null
+            },
+            "partial": {
+                "access": [
+                    {
+                        "condition": [],
+                        "dataset": [],
+                        "domain": "",
+                        "group_by_email": "",
+                        "iam_member": "",
+                        "role": "OWNER",
+                        "routine": [],
+                        "special_group": "",
+                        "user_by_email": "user@example.com",
+                        "view": []
+                    },
+                    {
+                        "condition": [],
+                        "dataset": [],
+                        "domain": "",
+                        "group_by_email": "",
+                        "iam_member": "",
+                        "role": "OWNER",
+                        "routine": [],
+                        "special_group": "projectOwners",
+                        "user_by_email": "",
+                        "view": []
+                    },
+                    {
+                        "condition": [],
+                        "dataset": [],
+                        "domain": "",
+                        "group_by_email": "",
+                        "iam_member": "",
+                        "role": "READER",
+                        "routine": [],
+                        "special_group": "projectReaders",
+                        "user_by_email": "",
+                        "view": []
+                    },
+                    {
+                        "condition": [],
+                        "dataset": [],
+                        "domain": "",
+                        "group_by_email": "",
+                        "iam_member": "",
+                        "role": "WRITER",
+                        "routine": [],
+                        "special_group": "projectWriters",
+                        "user_by_email": "",
+                        "view": []
+                    }
+                ],
+                "creation_time": 1790166871532,
+                "dataset_id": "c7n_remove_labels_partial_a979",
+                "default_collation": "",
+                "default_encryption_configuration": [],
+                "default_partition_expiration_ms": 0,
+                "default_table_expiration_ms": 0,
+                "delete_contents_on_destroy": true,
+                "deletion_policy": "DELETE",
+                "description": "",
+                "effective_labels": {
+                    "c7n_keep": "yes",
+                    "c7n_remove_a": "a",
+                    "c7n_remove_b": "b",
+                    "c7n_test": "bq_dataset_remove_labels"
+                },
+                "etag": "e7xwY9OX/S5tFhiME+iFtA==",
+                "external_catalog_dataset_options": [],
+                "external_dataset_reference": [],
+                "friendly_name": "",
+                "id": "projects/cloud-custodian/datasets/c7n_remove_labels_partial_a979",
+                "is_case_insensitive": false,
+                "labels": {
+                    "c7n_keep": "yes",
+                    "c7n_remove_a": "a",
+                    "c7n_remove_b": "b",
+                    "c7n_test": "bq_dataset_remove_labels"
+                },
+                "last_modified_time": 1790166871532,
+                "location": "US",
+                "max_time_travel_hours": "168",
+                "project": "cloud-custodian",
+                "resource_tags": null,
+                "self_link": "https://bigquery.googleapis.com/bigquery/v2/projects/cloud-custodian/datasets/c7n_remove_labels_partial_a979",
+                "storage_billing_model": "",
+                "terraform_labels": {
+                    "c7n_keep": "yes",
+                    "c7n_remove_a": "a",
+                    "c7n_remove_b": "b",
+                    "c7n_test": "bq_dataset_remove_labels"
+                },
+                "timeouts": null
+            }
+        },
+        "random_id": {
+            "suffix": {
+                "b64_std": "qXk=",
+                "b64_url": "qXk",
+                "byte_length": 2,
+                "dec": "43385",
+                "hex": "a979",
+                "id": "qXk",
+                "keepers": null,
+                "prefix": null
+            }
+        }
+    }
+}

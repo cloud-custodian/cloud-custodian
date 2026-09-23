@@ -1,0 +1,262 @@
+{
+    "pytest-terraform": 1,
+    "outputs": {},
+    "resources": {
+        "google_bigquery_dataset": {
+            "dataset": {
+                "access": [
+                    {
+                        "condition": [],
+                        "dataset": [],
+                        "domain": "",
+                        "group_by_email": "",
+                        "iam_member": "",
+                        "role": "OWNER",
+                        "routine": [],
+                        "special_group": "",
+                        "user_by_email": "user@example.com",
+                        "view": []
+                    },
+                    {
+                        "condition": [],
+                        "dataset": [],
+                        "domain": "",
+                        "group_by_email": "",
+                        "iam_member": "",
+                        "role": "OWNER",
+                        "routine": [],
+                        "special_group": "projectOwners",
+                        "user_by_email": "",
+                        "view": []
+                    },
+                    {
+                        "condition": [],
+                        "dataset": [],
+                        "domain": "",
+                        "group_by_email": "",
+                        "iam_member": "",
+                        "role": "READER",
+                        "routine": [],
+                        "special_group": "projectReaders",
+                        "user_by_email": "",
+                        "view": []
+                    },
+                    {
+                        "condition": [],
+                        "dataset": [],
+                        "domain": "",
+                        "group_by_email": "",
+                        "iam_member": "",
+                        "role": "WRITER",
+                        "routine": [],
+                        "special_group": "projectWriters",
+                        "user_by_email": "",
+                        "view": []
+                    }
+                ],
+                "creation_time": 1790166882642,
+                "dataset_id": "c7n_remove_labels_tables_45ae",
+                "default_collation": "",
+                "default_encryption_configuration": [],
+                "default_partition_expiration_ms": 0,
+                "default_table_expiration_ms": 0,
+                "delete_contents_on_destroy": true,
+                "deletion_policy": "DELETE",
+                "description": "",
+                "effective_labels": {
+                    "c7n_test": "bq_table_remove_labels"
+                },
+                "etag": "X/AoOOACwN9A5OooVyyn4g==",
+                "external_catalog_dataset_options": [],
+                "external_dataset_reference": [],
+                "friendly_name": "",
+                "id": "projects/cloud-custodian/datasets/c7n_remove_labels_tables_45ae",
+                "is_case_insensitive": false,
+                "labels": {
+                    "c7n_test": "bq_table_remove_labels"
+                },
+                "last_modified_time": 1790166882642,
+                "location": "US",
+                "max_time_travel_hours": "168",
+                "project": "cloud-custodian",
+                "resource_tags": null,
+                "self_link": "https://bigquery.googleapis.com/bigquery/v2/projects/cloud-custodian/datasets/c7n_remove_labels_tables_45ae",
+                "storage_billing_model": "",
+                "terraform_labels": {
+                    "c7n_test": "bq_table_remove_labels"
+                },
+                "timeouts": null
+            }
+        },
+        "google_bigquery_table": {
+            "absent": {
+                "biglake_configuration": [],
+                "clustering": null,
+                "creation_time": 1790166883316,
+                "dataset_id": "c7n_remove_labels_tables_45ae",
+                "deletion_policy": "DELETE",
+                "deletion_protection": false,
+                "description": "",
+                "effective_labels": {
+                    "c7n_keep": "yes"
+                },
+                "encryption_configuration": [],
+                "etag": "PRG388m2NHDtR3Ag0CepqA==",
+                "expiration_time": null,
+                "external_catalog_table_options": [],
+                "external_data_configuration": [],
+                "friendly_name": "",
+                "generated_schema_columns": "",
+                "id": "projects/cloud-custodian/datasets/c7n_remove_labels_tables_45ae/tables/absent",
+                "ignore_auto_generated_schema": false,
+                "ignore_schema_changes": null,
+                "labels": {
+                    "c7n_keep": "yes"
+                },
+                "last_modified_time": 1790166883473,
+                "location": "US",
+                "materialized_view": [],
+                "max_staleness": "",
+                "num_bytes": null,
+                "num_long_term_bytes": null,
+                "num_rows": null,
+                "project": "cloud-custodian",
+                "range_partitioning": [],
+                "require_partition_filter": null,
+                "resource_tags": null,
+                "schema": "[{\"mode\":\"REQUIRED\",\"name\":\"id\",\"type\":\"INTEGER\"}]",
+                "schema_foreign_type_info": [],
+                "self_link": "https://bigquery.googleapis.com/bigquery/v2/projects/cloud-custodian/datasets/c7n_remove_labels_tables_45ae/tables/absent",
+                "table_constraints": [],
+                "table_id": "absent",
+                "table_metadata_view": null,
+                "table_replication_info": [],
+                "terraform_labels": {
+                    "c7n_keep": "yes"
+                },
+                "time_partitioning": [],
+                "type": "TABLE",
+                "view": []
+            },
+            "full": {
+                "biglake_configuration": [],
+                "clustering": null,
+                "creation_time": 1790166883295,
+                "dataset_id": "c7n_remove_labels_tables_45ae",
+                "deletion_policy": "DELETE",
+                "deletion_protection": false,
+                "description": "",
+                "effective_labels": {
+                    "c7n_remove_a": "a",
+                    "c7n_remove_b": "b"
+                },
+                "encryption_configuration": [],
+                "etag": "ZZobBGkWt5Qrd4Pp4KNEKA==",
+                "expiration_time": null,
+                "external_catalog_table_options": [],
+                "external_data_configuration": [],
+                "friendly_name": "",
+                "generated_schema_columns": "",
+                "id": "projects/cloud-custodian/datasets/c7n_remove_labels_tables_45ae/tables/full",
+                "ignore_auto_generated_schema": false,
+                "ignore_schema_changes": null,
+                "labels": {
+                    "c7n_remove_a": "a",
+                    "c7n_remove_b": "b"
+                },
+                "last_modified_time": 1790166883468,
+                "location": "US",
+                "materialized_view": [],
+                "max_staleness": "",
+                "num_bytes": null,
+                "num_long_term_bytes": null,
+                "num_rows": null,
+                "project": "cloud-custodian",
+                "range_partitioning": [],
+                "require_partition_filter": null,
+                "resource_tags": null,
+                "schema": "[{\"mode\":\"REQUIRED\",\"name\":\"id\",\"type\":\"INTEGER\"}]",
+                "schema_foreign_type_info": [],
+                "self_link": "https://bigquery.googleapis.com/bigquery/v2/projects/cloud-custodian/datasets/c7n_remove_labels_tables_45ae/tables/full",
+                "table_constraints": [],
+                "table_id": "full",
+                "table_metadata_view": null,
+                "table_replication_info": [],
+                "terraform_labels": {
+                    "c7n_remove_a": "a",
+                    "c7n_remove_b": "b"
+                },
+                "time_partitioning": [],
+                "type": "TABLE",
+                "view": []
+            },
+            "partial": {
+                "biglake_configuration": [],
+                "clustering": null,
+                "creation_time": 1790166883323,
+                "dataset_id": "c7n_remove_labels_tables_45ae",
+                "deletion_policy": "DELETE",
+                "deletion_protection": false,
+                "description": "",
+                "effective_labels": {
+                    "c7n_keep": "yes",
+                    "c7n_remove_a": "a",
+                    "c7n_remove_b": "b"
+                },
+                "encryption_configuration": [],
+                "etag": "by5jHGdO8DarcvMd7+BumA==",
+                "expiration_time": null,
+                "external_catalog_table_options": [],
+                "external_data_configuration": [],
+                "friendly_name": "",
+                "generated_schema_columns": "",
+                "id": "projects/cloud-custodian/datasets/c7n_remove_labels_tables_45ae/tables/partial",
+                "ignore_auto_generated_schema": false,
+                "ignore_schema_changes": null,
+                "labels": {
+                    "c7n_keep": "yes",
+                    "c7n_remove_a": "a",
+                    "c7n_remove_b": "b"
+                },
+                "last_modified_time": 1790166883472,
+                "location": "US",
+                "materialized_view": [],
+                "max_staleness": "",
+                "num_bytes": null,
+                "num_long_term_bytes": null,
+                "num_rows": null,
+                "project": "cloud-custodian",
+                "range_partitioning": [],
+                "require_partition_filter": null,
+                "resource_tags": null,
+                "schema": "[{\"mode\":\"REQUIRED\",\"name\":\"id\",\"type\":\"INTEGER\"}]",
+                "schema_foreign_type_info": [],
+                "self_link": "https://bigquery.googleapis.com/bigquery/v2/projects/cloud-custodian/datasets/c7n_remove_labels_tables_45ae/tables/partial",
+                "table_constraints": [],
+                "table_id": "partial",
+                "table_metadata_view": null,
+                "table_replication_info": [],
+                "terraform_labels": {
+                    "c7n_keep": "yes",
+                    "c7n_remove_a": "a",
+                    "c7n_remove_b": "b"
+                },
+                "time_partitioning": [],
+                "type": "TABLE",
+                "view": []
+            }
+        },
+        "random_id": {
+            "suffix": {
+                "b64_std": "Ra4=",
+                "b64_url": "Ra4",
+                "byte_length": 2,
+                "dec": "17838",
+                "hex": "45ae",
+                "id": "Ra4",
+                "keepers": null,
+                "prefix": null
+            }
+        }
+    }
+}
