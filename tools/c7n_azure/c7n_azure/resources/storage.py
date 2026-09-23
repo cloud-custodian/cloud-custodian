@@ -766,6 +766,57 @@ class RequireSecureTransferAction(AzureBaseAction):
         )
 
 
+@Storage.action_registry.register('set-blob-public-access')
+class SetBlobPublicAccessAction(AzureBaseAction):
+    """Action that updates the ``allowBlobPublicAccess`` setting on Storage Accounts.
+
+    This is the account-level master switch for anonymous (public) blob access.
+    When set to ``False``, anonymous access is denied for all containers and blobs
+    in the account regardless of an individual container's ``publicAccess`` setting.
+    This is the recommended remediation for CIS Microsoft Azure Foundations control
+    "Ensure that 'Allow Blob Anonymous Access' is set to 'Disabled'".
+
+    To manage the public access level of an individual container instead, see the
+    ``set-public-access`` action on the ``azure.storage-container`` resource.
+
+    :example:
+
+    Disable anonymous blob access on all storage accounts that currently allow it.
+
+    .. code-block:: yaml
+
+        policies:
+            - name: disable-blob-anonymous-access
+              resource: azure.storage
+              filters:
+                - type: value
+                  key: properties.allowBlobPublicAccess
+                  value: true
+              actions:
+                - type: set-blob-public-access
+                  value: False
+    """
+
+    # Default to False assuming the user wants anonymous access disabled
+    schema = type_schema(
+        'set-blob-public-access',
+        **{
+            'value': {'type': 'boolean', 'default': False},
+        })
+
+    def _prepare_processing(self):
+        self.client = self.manager.get_client()
+
+    def _process_resource(self, resource):
+        update_params = StorageAccountUpdateParameters(
+            allow_blob_public_access=self.data.get('value', False))
+        self.client.storage_accounts.update(
+            resource['resourceGroup'],
+            resource['name'],
+            update_params,
+        )
+
+
 @Storage.filter_registry.register('blob-services')
 class BlobServicesFilter(ValueFilter):
     """
