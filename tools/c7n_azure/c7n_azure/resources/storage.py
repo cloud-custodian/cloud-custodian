@@ -806,7 +806,7 @@ class BlobPublicAccessFilter(Filter):
         target = self.data.get('value', True)
         return [
             r for r in resources
-            if r.get('properties', {}).get('allowBlobPublicAccess', True) == target
+            if r['properties'].get('allowBlobPublicAccess', True) == target
         ]
 
 
