@@ -16,6 +16,20 @@ from gcp_common import BaseTest
 from c7n_gcp.resources.vertexai import VertexAIEndpoint
 
 
+def _make_http_error(
+    code: int,
+    message: str,
+    reason: str | None = None,
+) -> HttpError:
+    error = {'code': code, 'message': message}
+    if reason:
+        error['errors'] = [{'reason': reason}]
+    return HttpError(
+        Mock(status=code, reason=message),
+        json.dumps({'error': error}).encode(),
+        )
+
+
 class VertexAIJobs:
     """Helper for creating/cleaning up ephemeral Vertex AI jobs in tests.
 
@@ -449,6 +463,55 @@ def test_vertexai_endpoint_multi_location(test):
 
     # Verify each resource has the c7n:location annotation
     assert all('c7n:location' in r for r in resources)
+
+
+def test_vertexai_query_manager_continues_after_disabled_error(test, caplog):
+    policy = test.load_policy(
+        {'name': 'vertexai-endpoint-disabled-location',
+         'resource': 'gcp.vertex-ai-endpoint'})
+    manager = policy.resource_manager
+    session = Mock()
+    session.get_default_project.return_value = 'cloud-custodian'
+    locations = [
+        {'name': 'us-east1'},
+        {'name': 'us-central1'},
+        ]
+    location_manager = Mock()
+    location_manager.resources.return_value = locations
+    disabled_client = Mock()
+    disabled_client.execute_paged_query.side_effect = _make_http_error(
+        403,
+        'Vertex AI API is disabled in us-east1',
+        'accessNotConfigured',
+        )
+    endpoint = {
+        'name': ('projects/cloud-custodian/locations/us-central1/'
+                 'endpoints/endpoint-id'),
+        }
+    available_client = Mock()
+    available_client.execute_paged_query.return_value = [
+        {'endpoints': [endpoint]},
+        ]
+
+    with (
+        patch('c7n_gcp.resources.vertexai.local_session', return_value=session),
+        patch.object(
+            manager,
+            'get_resource_manager',
+            return_value=location_manager,
+            ),
+        patch.object(
+            manager,
+            'get_location_client',
+            side_effect=[disabled_client, available_client],
+            ),
+        caplog.at_level(logging.WARNING),
+        ):
+        resources = manager._fetch_resources({})
+
+    assert resources == [endpoint]
+    assert endpoint['c7n:location'] == locations[1]
+    assert 'Vertex AI API is disabled in us-east1' in caplog.text
 
 
 def test_vertexai_endpoint_get_urns(test):
@@ -2109,6 +2172,145 @@ def test_vertexai_metadata_store_artifact_skips_client_without_stores(test):
         'us-central1',
         'projects.locations.metadataStores',
         )
+
+
+def test_vertexai_metadata_store_artifact_continues_after_disabled_store_error(
+    test,
+    caplog,
+):
+    policy = test.load_policy(
+        {'name': 'vertexai-metadata-store-artifact-disabled-location',
+         'resource': 'gcp.vertex-ai-metadata-store-artifact'})
+    manager = policy.resource_manager
+    session = Mock()
+    session.get_default_project.return_value = 'cloud-custodian'
+    location_manager = Mock()
+    location_manager.resources.return_value = [
+        {'name': 'us-east1'},
+        {'name': 'us-central1'},
+        ]
+    disabled_store_client = Mock()
+    disabled_store_client.execute_paged_query.side_effect = _make_http_error(
+        403,
+        'Vertex AI API is disabled in us-east1',
+        'accessNotConfigured',
+        )
+    store_client = Mock()
+    store_client.execute_paged_query.return_value = [
+        {'metadataStores': [{'name': 'store-name'}]},
+        ]
+    artifact = {
+        'name': ('projects/cloud-custodian/locations/us-central1/'
+                 'metadataStores/store-name/artifacts/artifact-id'),
+        }
+    artifact_client = Mock()
+    artifact_client.execute_paged_query.return_value = [
+        {'artifacts': [artifact]},
+        ]
+
+    with (
+        patch('c7n_gcp.resources.vertexai.local_session', return_value=session),
+        patch.object(
+            manager,
+            'get_resource_manager',
+            return_value=location_manager,
+            ),
+        patch.object(
+            manager,
+            'get_location_client',
+            side_effect=[disabled_store_client, store_client, artifact_client],
+            ),
+        caplog.at_level(logging.WARNING),
+        ):
+        resources = manager._fetch_resources({})
+
+    assert [resource['name'] for resource in resources] == [artifact['name']]
+    assert 'Vertex AI API is disabled in us-east1' in caplog.text
+
+
+def test_vertexai_metadata_store_artifact_continues_after_disabled_artifact_error(
+    test,
+    caplog,
+):
+    policy = test.load_policy(
+        {'name': 'vertexai-metadata-store-artifact-disabled-store',
+         'resource': 'gcp.vertex-ai-metadata-store-artifact'})
+    manager = policy.resource_manager
+    session = Mock()
+    session.get_default_project.return_value = 'cloud-custodian'
+    location_manager = Mock()
+    location_manager.resources.return_value = [{'name': 'us-central1'}]
+    store_client = Mock()
+    store_client.execute_paged_query.return_value = [
+        {'metadataStores': [
+            {'name': 'disabled-store'},
+            {'name': 'available-store'},
+            ]},
+        ]
+    artifact = {
+        'name': ('projects/cloud-custodian/locations/us-central1/'
+                 'metadataStores/available-store/artifacts/artifact-id'),
+        }
+    artifact_client = Mock()
+    artifact_client.execute_paged_query.side_effect = [
+        _make_http_error(
+            403,
+            'Vertex AI API is disabled for disabled-store',
+            'accessNotConfigured',
+            ),
+        [{'artifacts': [artifact]}],
+        ]
+
+    with (
+        patch('c7n_gcp.resources.vertexai.local_session', return_value=session),
+        patch.object(
+            manager,
+            'get_resource_manager',
+            return_value=location_manager,
+            ),
+        patch.object(
+            manager,
+            'get_location_client',
+            side_effect=[store_client, artifact_client],
+            ),
+        caplog.at_level(logging.WARNING),
+        ):
+        resources = manager._fetch_resources({})
+
+    assert [resource['name'] for resource in resources] == [artifact['name']]
+    assert 'Vertex AI API is disabled for disabled-store' in caplog.text
+
+
+def test_vertexai_metadata_store_artifact_propagates_other_http_errors(test):
+    policy = test.load_policy(
+        {'name': 'vertexai-metadata-store-artifact-api-error',
+         'resource': 'gcp.vertex-ai-metadata-store-artifact'})
+    manager = policy.resource_manager
+    session = Mock()
+    session.get_default_project.return_value = 'cloud-custodian'
+    location_manager = Mock()
+    location_manager.resources.return_value = [{'name': 'us-central1'}]
+    store_client = Mock()
+    error = _make_http_error(500, 'Vertex AI backend failure')
+    store_client.execute_paged_query.side_effect = error
+
+    with (
+        patch('c7n_gcp.resources.vertexai.local_session', return_value=session),
+        patch.object(
+            manager,
+            'get_resource_manager',
+            return_value=location_manager,
+            ),
+        patch.object(
+            manager,
+            'get_location_client',
+            return_value=store_client,
+            ),
+        pytest.raises(HttpError) as raised,
+        ):
+        manager._fetch_resources({})
+
+    assert raised.value is error
 
 
 @terraform('vertexai_metadata_store', scope='module')

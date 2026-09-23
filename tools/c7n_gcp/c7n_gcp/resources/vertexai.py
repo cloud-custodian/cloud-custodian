@@ -112,10 +112,11 @@ class VertexAIQueryManager(QueryResourceManager):
 
             # Invoke the client enumeration (Vertex AI API supports pagination)
             location_resources = []
-            for page in client.execute_paged_query(enum_op, params):
-                page_items = jmespath_search(path, page)
-                if page_items:
-                    location_resources.extend(page_items)
+            with self.ignore_access_errors():
+                for page in client.execute_paged_query(enum_op, params):
+                    page_items = jmespath_search(path, page)
+                    if page_items:
+                        location_resources.extend(page_items)
 
             # Annotate resources with their location
             for resource in location_resources:
@@ -849,22 +850,26 @@ class VertexAIMetadataStoreArtifact(VertexAIQueryManager):
             artifact_client = None
 
             parent = f'projects/{project}/locations/{location}'
-            for store_page in store_client.execute_paged_query('list', {'parent': parent}):
-                for store in jmespath_search('metadataStores[]', store_page) or []:
-                    if artifact_client is None:
-                        artifact_client = self.get_location_client(
-                            session, location, self.resource_type.component)
-                    artifacts = []
-                    for artifact_page in artifact_client.execute_paged_query(
-                            enum_op, {'parent': store['name']}):
-                        page_items = jmespath_search(path, artifact_page)
-                        if page_items:
-                            artifacts.extend(page_items)
+            with self.ignore_access_errors():
+                for store_page in store_client.execute_paged_query(
+                        'list', {'parent': parent}):
+                    stores = jmespath_search('metadataStores[]', store_page) or []
+                    for store in stores:
+                        if artifact_client is None:
+                            artifact_client = self.get_location_client(
+                                session, location, self.resource_type.component)
+                        artifacts = []
+                        with self.ignore_access_errors():
+                            for artifact_page in artifact_client.execute_paged_query(
+                                    enum_op, {'parent': store['name']}):
+                                page_items = jmespath_search(path, artifact_page)
+                                if page_items:
+                                    artifacts.extend(page_items)
 
-                    for artifact in artifacts:
-                        artifact[location_annotation_key] = location_instance
+                        for artifact in artifacts:
+                            artifact[location_annotation_key] = location_instance
 
-                    all_resources.extend(artifacts)
+                        all_resources.extend(artifacts)
 
         return all_resources
 
