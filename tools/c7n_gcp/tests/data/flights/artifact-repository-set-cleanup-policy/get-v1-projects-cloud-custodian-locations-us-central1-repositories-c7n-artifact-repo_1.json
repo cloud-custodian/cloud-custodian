@@ -1,0 +1,46 @@
+{
+  "headers": {
+    "content-type": "application/json; charset=UTF-8",
+    "vary": "Origin, X-Origin, Referer",
+    "date": "Thu, 26 Mar 2026 03:12:16 GMT",
+    "server": "ESF",
+    "x-xss-protection": "0",
+    "x-frame-options": "SAMEORIGIN",
+    "x-content-type-options": "nosniff",
+    "alt-svc": "h3=\":443\"; ma=2592000,h3-29=\":443\"; ma=2592000",
+    "transfer-encoding": "chunked",
+    "status": "200",
+    "content-length": "935",
+    "-content-encoding": "gzip",
+    "content-location": "https://artifactregistry.googleapis.com/v1/projects/cloud-custodian/locations/us-central1/repositories/c7n-artifact-repo?alt=json"
+  },
+  "body": {
+    "name": "projects/cloud-custodian/locations/us-central1/repositories/c7n-artifact-repo",
+    "format": "DOCKER",
+    "description": "Cloud Custodian test artifact repository",
+    "labels": {
+      "env": "default",
+      "goog-terraform-provisioned": "true"
+    },
+    "createTime": "2026-03-26T03:12:05.059761Z",
+    "updateTime": "2026-03-26T03:12:16.127849Z",
+    "mode": "STANDARD_REPOSITORY",
+    "cleanupPolicies": {
+      "delete-old": {
+        "id": "delete-old",
+        "action": "DELETE",
+        "condition": {
+          "tagState": "TAG_STATE_UNSPECIFIED",
+          "olderThan": "2592000s"
+        }
+      }
+    },
+    "vulnerabilityScanningConfig": {
+      "lastEnableTime": "2026-03-26T03:12:04.356100467Z",
+      "enablementState": "SCANNING_DISABLED",
+      "enablementStateReason": "API containerscanning.googleapis.com is not enabled."
+    },
+    "satisfiesPzi": true,
+    "registryUri": "us-central1-docker.pkg.dev/stacklet-personal-2/c7n-artifact-repo"
+  }
+}
