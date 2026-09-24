@@ -4,6 +4,7 @@
 .eggs/
 .terraform
 .terraform.lock.hcl
+*.tfstate*
 # c7n/version.py
 src/
 deps/
