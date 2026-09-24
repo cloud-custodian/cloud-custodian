@@ -1,0 +1,59 @@
+{
+  "$schema": "http://schema.management.azure.com/schemas/2015-01-01/deploymentTemplate.json#",
+  "contentVersion": "1.0.0.0",
+  "parameters": {
+    "storageAccountName": {
+      "type": "string",
+      "defaultValue": "[concat('ccfilesvc', uniqueString(resourceGroup().id))]"
+    }
+  },
+  "variables": {},
+  "resources": [
+    {
+      "name": "[parameters('storageAccountName')]",
+      "type": "Microsoft.Storage/storageAccounts",
+      "apiVersion": "2024-01-01",
+      "sku": {
+        "name": "Standard_LRS"
+      },
+      "kind": "StorageV2",
+      "location": "South Central US",
+      "tags": {},
+      "properties": {
+        "supportsHttpsTrafficOnly": true
+      },
+      "resources": [
+        {
+          "type": "fileServices",
+          "apiVersion": "2024-01-01",
+          "name": "default",
+          "dependsOn": [
+            "[parameters('storageAccountName')]"
+          ],
+          "properties": {
+            "shareDeleteRetentionPolicy": {
+              "enabled": false
+            },
+            "protocolSettings": {
+              "smb": {
+                "channelEncryption": "AES-128-CCM;AES-128-GCM;AES-256-GCM"
+              }
+            },
+            "cors": {
+              "corsRules": [
+                {
+                  "allowedOrigins": ["https://example.com"],
+                  "allowedMethods": ["GET"],
+                  "maxAgeInSeconds": 200,
+                  "exposedHeaders": ["*"],
+                  "allowedHeaders": ["*"]
+                }
+              ]
+            }
+          }
+        }
+      ]
+    }
+  ],
+  "outputs": {}
+}

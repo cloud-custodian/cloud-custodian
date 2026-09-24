@@ -788,6 +788,94 @@ class StorageFileServicesFilterTest(BaseTest):
         self.assertEqual(len(resources[0]['c7n:FileServices']), 1)
 
 
+class StorageSetFileServicesActionTest(BaseTest):
+    def test_schema_validate(self):
+        with self.sign_out_patch():
+            p = self.load_policy({
+                'name': 'test-set-file-services',
+                'resource': 'azure.storage',
+                'actions': [{
+                    'type': 'set-file-services',
+                    'share-delete-retention-enabled': True,
+                    'share-delete-retention-days': 7,
+                    'smb-channel-encryption': ['AES-256-GCM'],
+                }]
+            }, validate=True)
+            self.assertTrue(p)
+
+    def test_validate_share_delete_retention_days_out_of_range(self):
+        with self.sign_out_patch():
+            with self.assertRaises(PolicyValidationError):
+                self.load_policy({
+                    'name': 'test-set-file-services-invalid-days',
+                    'resource': 'azure.storage',
+                    'actions': [{
+                        'type': 'set-file-services',
+                        'share-delete-retention-days': 400,
+                    }]
+                }, validate=True)
+
+    @arm_template('storage-file-services.json')
+    def test_set_file_services(self):
+        discovery_policy = self.load_policy({
+            'name': 'test-set-file-services-discovery',
+            'resource': 'azure.storage',
+            'filters': [
+                {'type': 'value',
+                 'key': 'name',
+                 'op': 'glob',
+                 'value_type': 'normalize',
+                 'value': 'ccfilesvc*'}
+            ]
+        })
+        resources = discovery_policy.run()
+        self.assertEqual(len(resources), 1)
+
+        resource = resources[0]
+        rg = resource['resourceGroup']
+        name = resource['name']
+
+        client = self.session.client('azure.mgmt.storage.StorageManagementClient')
+
+        # Baseline set explicitly by storage-file-services.json: soft delete off,
+        # all three SMB channel encryption algorithms allowed, one CORS rule.
+        before = client.file_services.list(rg, name).value[0]
+        self.assertFalse(before.share_delete_retention_policy.enabled)
+        self.assertEqual(
+            before.protocol_settings.smb.channel_encryption,
+            'AES-128-CCM;AES-128-GCM;AES-256-GCM')
+        self.assertEqual(len(before.cors.cors_rules), 1)
+
+        p = self.load_policy({
+            'name': 'test-set-file-services',
+            'resource': 'azure.storage',
+            'filters': [
+                {'type': 'value',
+                 'key': 'name',
+                 'op': 'glob',
+                 'value_type': 'normalize',
+                 'value': 'ccfilesvc*'}
+            ],
+            'actions': [{
+                'type': 'set-file-services',
+                'share-delete-retention-enabled': True,
+                'share-delete-retention-days': 7,
+                'smb-channel-encryption': ['AES-256-GCM'],
+            }]
+        })
+        p.run()
+
+        after = client.file_services.list(rg, name).value[0]
+        self.assertTrue(after.share_delete_retention_policy.enabled)
+        self.assertEqual(after.share_delete_retention_policy.days, 7)
+        self.assertEqual(after.protocol_settings.smb.channel_encryption, 'AES-256-GCM')
+
+        # cors-rules wasn't part of this action's data, so the merge in
+        # SetFileServicesAction._process_resource must have preserved it.
+        self.assertEqual(len(after.cors.cors_rules), 1)
+        self.assertEqual(after.cors.cors_rules[0].allowed_origins, ['https://example.com'])
+
+
 class StorageMetricsFilterTest(BaseTest):
     """Tests for the StorageMetricsFilter class"""
 
