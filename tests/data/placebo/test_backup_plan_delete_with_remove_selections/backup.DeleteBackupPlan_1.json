@@ -1,0 +1,19 @@
+{
+  "status_code": 200,
+  "data": {
+    "BackupPlanId": "test-backup-plan-id",
+    "BackupPlanArn": "arn:aws:backup:us-east-1:644160558196:backup-plan:test-backup-plan-id",
+    "DeletionDate": "2024-01-15T10:30:02.000Z",
+    "VersionId": "version-1",
+    "ResponseMetadata": {
+      "RequestId": "12345678-1234-1234-1234-123456789015",
+      "HTTPStatusCode": 200,
+      "HTTPHeaders": {
+        "content-type": "application/x-amz-json-1.1",
+        "date": "Mon, 15 Jan 2024 10:30:02 GMT",
+        "x-amzn-requestid": "12345678-1234-1234-1234-123456789015"
+      },
+      "RetryAttempts": 0
+    }
+  }
+}
