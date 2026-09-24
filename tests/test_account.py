@@ -22,7 +22,96 @@ from .common import functional
 TRAIL = "nosetest"
 
 
+class AlternateContactClient:
+
+    class exceptions:
+        class ResourceNotFoundException(Exception):
+            pass
+
+        class AccessDeniedException(Exception):
+            pass
+
+    def __init__(self, alternate_contact=None, error=None):
+        self.alternate_contact = alternate_contact or {}
+        self.error = error
+
+    def get_alternate_contact(self, **kwargs):
+        if self.error == 'not-found':
+            raise self.exceptions.ResourceNotFoundException()
+        if self.error == 'denied':
+            raise self.exceptions.AccessDeniedException('denied')
+        return {'AlternateContact': self.alternate_contact}
+
+
 class AccountTests(BaseTest):
+
+    def _get_account_alternate_contact_policy(self, filter_data, client):
+        self.patch(
+            account.DescribeAccount,
+            'get_account',
+            lambda x: {'account_id': '123456789012', 'account_name': 'test-account'})
+        self.patch(
+            account,
+            'local_session',
+            lambda session_factory: mock.Mock(client=lambda service: client))
+        return self.load_policy(
+            {'name': 'alternate-contact-test', 'resource': 'aws.account', 'filters': [filter_data]})
+
+    def test_alternate_contact_present(self):
+        p = self._get_account_alternate_contact_policy(
+            {
+                'type': 'alternate-contact',
+                'contact-type': 'SECURITY',
+                'state': 'present'},
+            AlternateContactClient(
+                alternate_contact={
+                    'EmailAddress': 'security@example.com',
+                    'Name': 'Security Team',
+                    'PhoneNumber': '+15555550123',
+                    'Title': 'Security'}))
+        resources = p.run()
+        self.assertEqual(len(resources), 1)
+        self.assertEqual(
+            resources[0]['c7n:alternate-contact']['SECURITY']['EmailAddress'],
+            'security@example.com')
+
+    def test_alternate_contact_present_value_filter(self):
+        p = self._get_account_alternate_contact_policy(
+            {
+                'type': 'alternate-contact',
+                'contact-type': 'SECURITY',
+                'key': 'EmailAddress',
+                'value': 'security@example.com'},
+            AlternateContactClient(
+                alternate_contact={
+                    'EmailAddress': 'security@example.com',
+                    'Name': 'Security Team',
+                    'PhoneNumber': '+15555550123',
+                    'Title': 'Security'}))
+        resources = p.run()
+        self.assertEqual(len(resources), 1)
+
+    def test_alternate_contact_missing(self):
+        p = self._get_account_alternate_contact_policy(
+            {
+                'type': 'alternate-contact',
+                'contact-type': 'SECURITY',
+                'state': 'missing'},
+            AlternateContactClient(error='not-found'))
+        resources = p.run()
+        self.assertEqual(len(resources), 1)
+
+    def test_alternate_contact_access_denied(self):
+        p = self._get_account_alternate_contact_policy(
+            {
+                'type': 'alternate-contact',
+                'contact-type': 'SECURITY',
+                'state': 'missing'},
+            AlternateContactClient(error='denied'))
+        with self.capture_logging(level=logging.WARNING) as output:
+            resources = p.run()
+            self.assertEqual(len(resources), 0)
+            self.assertIn('cannot query SECURITY contact', output.getvalue())
 
     def test_macie(self):
         factory = self.replay_flight_data(
