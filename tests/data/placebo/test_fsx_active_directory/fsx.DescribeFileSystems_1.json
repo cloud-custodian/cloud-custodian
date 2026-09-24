@@ -1,0 +1,172 @@
+{
+  "status_code": 200,
+  "data": {
+    "FileSystems": [
+      {
+        "OwnerId": "644160558196",
+        "CreationTime": {
+          "__class__": "datetime",
+          "year": 2026,
+          "month": 8,
+          "day": 7,
+          "hour": 17,
+          "minute": 36,
+          "second": 24,
+          "microsecond": 648000
+        },
+        "FileSystemId": "fs-0a584801db948c940",
+        "FileSystemType": "ONTAP",
+        "Lifecycle": "AVAILABLE",
+        "StorageCapacity": 1024,
+        "StorageType": "SSD",
+        "VpcId": "vpc-d2d616b5",
+        "SubnetIds": [
+          "subnet-efbcccb7"
+        ],
+        "NetworkInterfaceIds": [
+          "eni-048e65a0a31c9e635",
+          "eni-023946ef7c106004b"
+        ],
+        "KmsKeyId": "arn:aws:kms:us-east-1:644160558196:key/7d30a034-2787-478a-85e7-1a2b85205fbc",
+        "ResourceARN": "arn:aws:fsx:us-east-1:644160558196:file-system/fs-0a584801db948c940",
+        "Tags": [
+          {
+            "Key": "Env",
+            "Value": "Prod"
+          },
+          {
+            "Key": "c7n-purpose",
+            "Value": "fsx-ontap-managed-ad-verification"
+          },
+          {
+            "Key": "Name",
+            "Value": "c7n-fsx-ad-verify"
+          }
+        ],
+        "OntapConfiguration": {
+          "AutomaticBackupRetentionDays": 30,
+          "DailyAutomaticBackupStartTime": "09:30",
+          "DeploymentType": "SINGLE_AZ_1",
+          "Endpoints": {
+            "Intercluster": {
+              "DNSName": "intercluster.fs-0a584801db948c940.fsx.us-east-1.amazonaws.com",
+              "IpAddresses": [
+                "172.31.25.41",
+                "172.31.19.204"
+              ]
+            },
+            "Management": {
+              "DNSName": "management.fs-0a584801db948c940.fsx.us-east-1.amazonaws.com",
+              "IpAddresses": [
+                "172.31.26.195"
+              ]
+            }
+          },
+          "DiskIopsConfiguration": {
+            "Mode": "AUTOMATIC",
+            "Iops": 3072
+          },
+          "PreferredSubnetId": "subnet-efbcccb7",
+          "ThroughputCapacity": 128,
+          "WeeklyMaintenanceStartTime": "2:04:30",
+          "HAPairs": 1,
+          "ThroughputCapacityPerHAPair": 128
+        },
+        "NetworkType": "IPV4"
+      },
+      {
+        "OwnerId": "644160558196",
+        "CreationTime": {
+          "__class__": "datetime",
+          "year": 2018,
+          "month": 12,
+          "day": 11,
+          "hour": 14,
+          "minute": 24,
+          "second": 27,
+          "microsecond": 838000
+        },
+        "FileSystemId": "fs-0bc98cbfb6b356896",
+        "FileSystemType": "WINDOWS",
+        "Lifecycle": "AVAILABLE",
+        "StorageCapacity": 300,
+        "VpcId": "vpc-d2d616b5",
+        "SubnetIds": [
+          "subnet-3a334610"
+        ],
+        "NetworkInterfaceIds": [
+          "eni-0316083e722388ce3"
+        ],
+        "DNSName": "fs-0bc98cbfb6b356896.test.com",
+        "KmsKeyId": "arn:aws:kms:us-east-1:644160558196:key/7d30a034-2787-478a-85e7-1a2b85205fbc",
+        "ResourceARN": "arn:aws:fsx:us-east-1:644160558196:file-system/fs-0bc98cbfb6b356896",
+        "Tags": [
+          {
+            "Key": "Name",
+            "Value": "test"
+          }
+        ],
+        "WindowsConfiguration": {
+          "ActiveDirectoryId": "d-90671463e5",
+          "ThroughputCapacity": 8,
+          "WeeklyMaintenanceStartTime": "3:08:30",
+          "DailyAutomaticBackupStartTime": "04:00",
+          "AutomaticBackupRetentionDays": 7,
+          "CopyTagsToBackups": false
+        }
+      },
+      {
+        "OwnerId": "644160558196",
+        "CreationTime": {
+          "__class__": "datetime",
+          "year": 2025,
+          "month": 10,
+          "day": 21,
+          "hour": 13,
+          "minute": 35,
+          "second": 20,
+          "microsecond": 322000
+        },
+        "FileSystemId": "fs-0ba7088f9b54df497",
+        "FileSystemType": "OPENZFS",
+        "Lifecycle": "AVAILABLE",
+        "StorageCapacity": 1024,
+        "StorageType": "SSD",
+        "VpcId": "vpc-4a9ff72e",
+        "SubnetIds": [
+          "subnet-5fb47507"
+        ],
+        "NetworkInterfaceIds": [
+          "eni-09021c5644b6c7b58"
+        ],
+        "DNSName": "fs-0ba7088f9b54df497.fsx.us-west-2.amazonaws.com",
+        "KmsKeyId": "arn:aws:kms:us-west-2:644160558196:key/5b42e50f-8d8a-4be2-8938-59ccd7a44d0c",
+        "ResourceARN": "arn:aws:fsx:us-west-2:644160558196:file-system/fs-0ba7088f9b54df497",
+        "Tags": [
+          {
+            "Key": "Environment",
+            "Value": "dev"
+          },
+          {
+            "Key": "Name",
+            "Value": "example-openzfs"
+          }
+        ],
+        "OpenZFSConfiguration": {
+          "CopyTagsToBackups": false,
+          "CopyTagsToVolumes": false,
+          "DeploymentType": "SINGLE_AZ_1",
+          "ThroughputCapacity": 64,
+          "WeeklyMaintenanceStartTime": "5:10:30",
+          "DiskIopsConfiguration": {
+            "Mode": "AUTOMATIC",
+            "Iops": 3072
+          },
+          "RootVolumeId": "fsvol-0fcd3847da5309e45"
+        },
+        "NetworkType": "IPV4"
+      }
+    ],
+    "ResponseMetadata": {}
+  }
+}

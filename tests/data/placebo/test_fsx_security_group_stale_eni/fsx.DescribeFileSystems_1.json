@@ -1,0 +1,44 @@
+{
+  "status_code": 200,
+  "data": {
+    "FileSystems": [
+      {
+        "OwnerId": "644160558196",
+        "CreationTime": {
+          "__class__": "datetime",
+          "year": 2025,
+          "month": 10,
+          "day": 21,
+          "hour": 10,
+          "minute": 0,
+          "second": 0,
+          "microsecond": 0
+        },
+        "FileSystemId": "fs-0e3e2a9e1f5ff7a13",
+        "FileSystemType": "ONTAP",
+        "Lifecycle": "AVAILABLE",
+        "StorageCapacity": 1024,
+        "VpcId": "vpc-d2d616b5",
+        "SubnetIds": [
+          "subnet-3a334610"
+        ],
+        "NetworkInterfaceIds": [
+          "eni-0ebf4e9347b99b6d3",
+          "eni-0dcc101a580b07620"
+        ],
+        "ResourceARN": "arn:aws:fsx:us-east-1:644160558196:file-system/fs-0e3e2a9e1f5ff7a13",
+        "Tags": [
+          {
+            "Key": "Env",
+            "Value": "Prod"
+          }
+        ],
+        "OntapConfiguration": {
+          "DeploymentType": "SINGLE_AZ_1",
+          "ThroughputCapacity": 128
+        }
+      }
+    ],
+    "ResponseMetadata": {}
+  }
+}
