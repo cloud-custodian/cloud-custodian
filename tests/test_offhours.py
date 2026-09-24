@@ -11,6 +11,7 @@ from .common import BaseTest, instance
 from c7n.exceptions import PolicyValidationError
 from c7n.filters.offhours import OffHour, OnHour, ScheduleParser, Time
 from c7n.testing import mock_datetime_now
+import mock
 
 
 class OffHoursFilterTest(BaseTest):
@@ -632,11 +633,51 @@ class ScheduleParserTest(BaseTest):
         ("bar;off=(m-f,5);zebrablue,on=(t-w,5)", None),
     ]
 
+    # Testing the 'disabled' cases
+    table_intercepted_schedule = [
+        # 'Normal' schedule in custom tag
+        (
+            "on=(m-s,10);off=(m-f,18);tz=et",
+            {
+                "on": [{"days": [0, 1, 2, 3, 4, 5], "hour": 10}],
+                "off": [{"days": [0, 1, 2, 3, 4], "hour": 18}],
+                "tz": "et",
+            },
+        ),
+        # No 'off' schedule in custom tag : default setting of the filter apply
+        (
+            "on=(m-s,10);tz=et",
+            {
+                "off": [{"days": (0, 1, 2, 3, 4), "hour": 21}],
+                "tz": "et",
+            },
+        ),
+        # Disabled 'off' schedule in custom tag : ne schedule should apply
+        (
+            "on=(m-s,10);off=disabled;tz=et",
+            {
+                "on": [{"days": [0, 1, 2, 3, 4, 5], "hour": 10}],
+                "tz": "et",
+            },
+        ),
+    ]
+
     def test_schedule_parser(self):
         self.maxDiff = None
         parser = ScheduleParser({"tz": "et"})
         for value, expected in self.table:
             self.assertEqual(parser.parse(value), expected)
+
+    def test_offhours_offhour_schedule_applied(self):
+        """Testing the 'disabled' cases"""
+        off = OffHour({"default_tz": "et", "offhour": 21})
+        mocked_match = mock.MagicMock(name='match')
+        off.match = mocked_match
+        for value, expected in self.table_intercepted_schedule:
+            i = instance(Tags=[{"Key": "maid_offhours", "Value": value}])
+            mocked_match.reset_mock()
+            off(i)
+            mocked_match.assert_called_once_with(mock.ANY, expected)
 
     def test_offhours_skip(self):
         t = datetime.datetime(
