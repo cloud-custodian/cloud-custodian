@@ -23,6 +23,8 @@ ResourceMap = {
   "aws.appdiscovery-agent": "c7n.resources.discovery.AppdiscoveryAgent",
   "aws.appstream-fleet": "c7n.resources.appstream.AppStreamFleet",
   "aws.appstream-stack": "c7n.resources.appstream.AppStreamStack",
+  "aws.appsync-channel-namespace": "c7n.resources.appsync.ChannelNamespace",
+  "aws.appsync-event-api": "c7n.resources.appsync.EventApi",
   "aws.artifact-domain": "c7n.resources.artifact.ArtifactDomain",
   "aws.artifact-repo": "c7n.resources.artifact.ArtifactRepo",
   "aws.asg": "c7n.resources.asg.ASG",

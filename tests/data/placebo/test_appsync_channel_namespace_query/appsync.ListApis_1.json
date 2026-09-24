@@ -1,0 +1,26 @@
+{
+    "status_code": 200,
+    "data": {
+        "ResponseMetadata": {},
+        "apis": [
+            {
+                "apiId": "st7ke6ruefclllukmr6efhujrm",
+                "name": "c7n-test-event-api",
+                "tags": {
+                    "Env": "test"
+                },
+                "apiArn": "arn:aws:appsync:us-east-1:644160558196:apis/st7ke6ruefclllukmr6efhujrm",
+                "created": {
+                    "__class__": "datetime",
+                    "year": 2026,
+                    "month": 9,
+                    "day": 24,
+                    "hour": 1,
+                    "minute": 17,
+                    "second": 28,
+                    "microsecond": 391000
+                }
+            }
+        ]
+    }
+}
