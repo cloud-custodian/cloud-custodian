@@ -4,8 +4,11 @@
 from unittest import mock
 
 from botocore.exceptions import ClientError
+from dateutil import parser
 
+import c7n.filters.backup
 from c7n.resources import dsql
+from c7n.testing import mock_datetime_now
 
 from .common import BaseTest
 
@@ -74,6 +77,28 @@ class DsqlClusterTest(BaseTest):
         refreshed = client.get_cluster(identifier=resources[0]['identifier'])
         self.assertEqual(refreshed['deletionProtectionEnabled'], False)
         self.assertIn(refreshed['status'], ('DELETING', 'DELETED'))
+
+    def test_consecutive_aws_backups(self):
+        factory = self.replay_flight_data("test_dsql_cluster_consecutive_aws_backups")
+        p = self.load_policy(
+            {
+                "name": "dsql-consecutive-aws-backups",
+                "resource": "aws.dsql-cluster",
+                "filters": [
+                    {
+                        "type": "consecutive-aws-backups",
+                        "count": 1,
+                        "period": "days",
+                        "status": "COMPLETED",
+                    }
+                ],
+            },
+            session_factory=factory,
+        )
+        with mock_datetime_now(parser.parse("2026-09-25T22:00:00+00:00"), c7n.filters.backup):
+            resources = p.run()
+        self.assertEqual(len(resources), 1)
+        self.assertEqual(resources[0]["c7n:AwsBackups"][0]["Status"], "COMPLETED")
 
     def test_cross_account_no_policy(self):
         p = self.load_policy(
