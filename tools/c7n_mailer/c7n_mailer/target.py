@@ -49,7 +49,7 @@ class MessageTargetMixin(object):
         if any(e.startswith("datadog") for e in message.get("action", ()).get("to")):
             from .datadog_delivery import DataDogDelivery
 
-            datadog_delivery = DataDogDelivery(self.config, self.session, self.logger)
+            datadog_delivery = DataDogDelivery(self.config, self.logger)
             datadog_message_packages = datadog_delivery.get_datadog_message_packages(message)
 
             try:

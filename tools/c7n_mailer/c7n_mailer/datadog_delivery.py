@@ -12,10 +12,9 @@ class DataDogDelivery:
     DATADOG_API_KEY = "datadog_api_key"
     DATADOG_APPLICATION_KEY = "datadog_application_key"
 
-    def __init__(self, config, session, logger):
+    def __init__(self, config, logger):
         self.config = config
         self.logger = logger
-        self.session = session
         self.datadog_api_key = self.config.get(self.DATADOG_API_KEY, None)
         self.datadog_application_key = self.config.get(self.DATADOG_APPLICATION_KEY, None)
 
