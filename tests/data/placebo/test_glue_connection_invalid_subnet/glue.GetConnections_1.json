@@ -1,0 +1,83 @@
+{
+    "status_code": 200,
+    "data": {
+        "ConnectionList": [
+            {
+                "Name": "test-connection-delete-me-jan-6",
+                "ConnectionType": "JDBC",
+                "ConnectionProperties": {
+                    "JDBC_CONNECTION_URL": "jdbc:postgresql://delete-me-jan-6.cz6wy8cci3uf.us-east-1.rds.amazonaws.com:5432/delete-me-jan-6",
+                    "USERNAME": "postgres"
+                },
+                "PhysicalConnectionRequirements": {
+                    "SubnetId": "['subnet-068dfbf3f275a6ae8','subnet-0472841b16adf7476']",
+                    "SecurityGroupIdList": [
+                        "sg-6c7fa917"
+                    ],
+                    "AvailabilityZone": "us-east-1a"
+                },
+                "CreationTime": {
+                    "__class__": "datetime",
+                    "year": 2026,
+                    "month": 1,
+                    "day": 6,
+                    "hour": 13,
+                    "minute": 4,
+                    "second": 1,
+                    "microsecond": 106000
+                },
+                "LastUpdatedTime": {
+                    "__class__": "datetime",
+                    "year": 2026,
+                    "month": 1,
+                    "day": 6,
+                    "hour": 13,
+                    "minute": 4,
+                    "second": 1,
+                    "microsecond": 106000
+                },
+                "LastUpdatedBy": "user/Aman",
+                "ConnectionSchemaVersion": 1
+            },
+            {
+                "Name": "test2",
+                "ConnectionType": "NETWORK",
+                "ConnectionProperties": {
+                    "JDBC_ENFORCE_SSL": "false",
+                    "KAFKA_SSL_ENABLED": "false"
+                },
+                "PhysicalConnectionRequirements": {
+                    "SubnetId": "['subnet-060cc450a3823ecd4']",
+                    "SecurityGroupIdList": [
+                        "sg-068fd26858a29d437",
+                        "sg-0d74b07ab0b3288c0"
+                    ],
+                    "AvailabilityZone": "us-east-1b"
+                },
+                "CreationTime": {
+                    "__class__": "datetime",
+                    "year": 2023,
+                    "month": 11,
+                    "day": 21,
+                    "hour": 15,
+                    "minute": 51,
+                    "second": 14,
+                    "microsecond": 646000
+                },
+                "LastUpdatedTime": {
+                    "__class__": "datetime",
+                    "year": 2024,
+                    "month": 5,
+                    "day": 5,
+                    "hour": 19,
+                    "minute": 23,
+                    "second": 7,
+                    "microsecond": 30000
+                },
+                "LastUpdatedBy": "user/timmy",
+                "ConnectionSchemaVersion": 1
+            }
+        ],
+        "ResponseMetadata": {}
+    }
+}
