@@ -314,6 +314,7 @@ ResourceMap = {
   "aws.s3files-mount-target": "c7n.resources.s3files.MountTarget",
   "aws.s3-access-point": "c7n.resources.s3control.AccessPoint",
   "aws.s3-access-point-multi": "c7n.resources.s3control.MultiRegionAccessPoint",
+  "aws.s3-directory-access-point": "c7n.resources.s3control.DirectoryAccessPoint",
   "aws.s3-storage-lens": "c7n.resources.s3control.StorageLens",
   "aws.sagemaker-app": "c7n.resources.sagemaker.SagemakerApp",
   "aws.sagemaker-auto-ml-job": "c7n.resources.sagemaker.SagemakerAutoMLJob",

@@ -4109,6 +4109,47 @@ class BucketReplication(ListItemFilter):
         replication['CrossRegion'] = destination_region != source_region
 
 
+class DescribeS3Directory(query.DescribeSource):
+
+    def augment(self, buckets):
+        s3control_client = local_session(self.manager.session_factory).client('s3control')
+        account_id = self.manager.config.account_id
+        for bucket in buckets:
+            try:
+                bucket['Tags'] = s3control_client.list_tags_for_resource(
+                    AccountId=account_id,
+                    ResourceArn=self.manager.generate_arn(bucket['Name']),
+                ).get('Tags', [])
+            except ClientError as e:
+                code = e.response['Error']['Code']
+                if code.startswith('NoSuch') or 'NotFound' in code:
+                    bucket['Tags'] = []
+                elif code == 'AccessDenied':
+                    bucket.setdefault('c7n:DeniedMethods', []).append(
+                        'list_tags_for_resource')
+                else:
+                    raise
+        return buckets
+
+
+def get_s3_directory_bucket_policy(manager, bucket):
+    if 'Policy' in bucket:
+        return bucket['Policy']
+    client = local_session(manager.session_factory).client('s3')
+    try:
+        bucket['Policy'] = client.get_bucket_policy(Bucket=bucket['Name'])['Policy']
+    except ClientError as e:
+        code = e.response['Error']['Code']
+        if code.startswith('NoSuch') or 'NotFound' in code:
+            bucket['Policy'] = None
+        elif code == 'AccessDenied':
+            bucket.setdefault('c7n:DeniedMethods', []).append('get_bucket_policy')
+            bucket['Policy'] = None
+        else:
+            raise
+    return bucket['Policy']
+
+
 @resources.register('s3-directory')
 class S3Directory(query.QueryResourceManager):
 
@@ -4123,3 +4164,107 @@ class S3Directory(query.QueryResourceManager):
         dimension = 'BucketName'
         cfn_type = 'AWS::S3Express::DirectoryBucket'
         permissions_enum = ("s3express:ListAllMyDirectoryBuckets",)
+        permissions_augment = ("s3express:GetBucketPolicy", "s3express:ListTagsForResource")
+
+    source_mapping = {'describe': DescribeS3Directory}
+
+
+@S3Directory.filter_registry.register('inventory')
+class S3DirectoryInventory(Inventory):
+    permissions = ('s3express:GetInventoryConfiguration',)
+    schema_alias = False
+
+    def process(self, buckets, event=None):
+        # directory buckets are subject to a low per-account quota,
+        # so thread-pool concurrency here doesnt seem necessary
+        return [b for b in buckets if self.process_bucket(b)]
+
+    def process_bucket(self, b):
+        if 'c7n:inventories' not in b:
+            client = local_session(self.manager.session_factory).client('s3')
+            inventories = client.list_bucket_inventory_configurations(
+                Bucket=b['Name']).get('InventoryConfigurationList', [])
+            b['c7n:inventories'] = inventories
+        for i in b['c7n:inventories']:
+            if self.match(i):
+                return True
+
+
+@S3Directory.action_registry.register('set-inventory')
+class S3DirectorySetInventory(SetInventory):
+    """Configure bucket inventories for an S3 Express directory bucket.
+
+    :example:
+
+    .. code-block:: yaml
+
+        policies:
+          - name: s3-directory-inventory-required
+            resource: aws.s3-directory
+            filters:
+              - not:
+                - type: inventory
+                  key: IsEnabled
+                  value: true
+            actions:
+              - type: set-inventory
+                name: required-inventory
+                destination: some-bucket
+                state: enabled
+    """
+    permissions = ('s3express:PutInventoryConfiguration', 's3express:GetInventoryConfiguration')
+
+
+@S3Directory.filter_registry.register('cross-account')
+class S3DirectoryCrossAccountFilter(CrossAccountAccessFilter):
+    """Filter S3 Express directory buckets with cross-account access.
+
+    :example:
+
+    .. code-block:: yaml
+
+        policies:
+          - name: s3-directory-cross-account
+            resource: aws.s3-directory
+            filters:
+              - type: cross-account
+                whitelist_orgids:
+                  - o-xxxxxxxxxx
+    """
+    permissions = ('s3express:GetBucketPolicy',)
+
+    def process(self, resources, event=None):
+        for r in resources:
+            get_s3_directory_bucket_policy(self.manager, r)
+        return super().process(resources, event)
+
+
+@S3Directory.filter_registry.register('has-statement')
+class S3DirectoryHasStatementFilter(HasStatementFilter):
+    """Find S3 Express directory buckets with matching policy statements.
+
+    :example:
+
+    .. code-block:: yaml
+
+        policies:
+          - name: s3-directory-deny-non-secure
+            resource: aws.s3-directory
+            filters:
+              - type: has-statement
+                statement_ids:
+                  - DenyNonSecureTransport
+    """
+    permissions = ('s3express:GetBucketPolicy',)
+
+    def get_std_format_args(self, bucket):
+        return {
+            'account_id': self.manager.config.account_id,
+            'region': self.manager.config.region,
+            'bucket_name': bucket['Name'],
+        }
+
+    def process(self, resources, event=None):
+        for r in resources:
+            get_s3_directory_bucket_policy(self.manager, r)
+        return super().process(resources, event)

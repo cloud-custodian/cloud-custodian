@@ -18,6 +18,7 @@ from botocore.exceptions import ClientError, ConnectTimeoutError, EndpointConnec
 from dateutil.tz import tzutc
 import pytest
 from pytest_terraform import terraform
+from .zpill import ACCOUNT_ID
 
 from c7n.exceptions import PolicyExecutionError, PolicyValidationError
 from c7n.executor import MainThreadExecutor
@@ -171,13 +172,173 @@ def test_s3_express(test):
     p = test.load_policy(
         {'name': 's3-xpress',
          'resource': 's3-directory'},
-        config={'account_id': '644160558196', 'region': 'us-east-1'},
+        config={'account_id': ACCOUNT_ID, 'region': 'us-east-1'},
         session_factory=session_factory)
     resources = p.run()
     assert len(resources) == 1
     assert p.resource_manager.get_arns(resources) == [
         'arn:aws:s3express:us-east-1:644160558196:bucket/test-zone--use1-az4--x-s3'
     ]
+
+
+def test_s3_directory_inventory_filter(test):
+    bucket_name = 'c7n-test-inventory--use1-az4--x-s3'
+    session_factory = test.replay_flight_data('test_s3_directory_inventory_filter')
+
+    p = test.load_policy(
+        {
+            'name': 's3-directory-inventory-enabled',
+            'resource': 's3-directory',
+            'filters': [
+                {'type': 'inventory', 'key': 'IsEnabled', 'value': True},
+            ],
+        },
+        config={'account_id': ACCOUNT_ID},
+        session_factory=session_factory,
+    )
+    resources = p.run()
+    assert len(resources) == 1
+    assert resources[0]['Name'] == bucket_name
+    tag_map = {t['Key']: t['Value'] for t in resources[0]['Tags']}
+    assert 'c7n' in tag_map
+
+    inventories = resources[0]['c7n:inventories']
+    assert any(i['IsEnabled'] for i in inventories)
+
+
+def test_s3_directory_set_inventory(test):
+    bucket_name = 'c7n-test-inventory--use1-az4--x-s3'
+    destination_bucket_name = 'c7n-test-inventory-dest'
+    inventory_id = 'c7n-set-inventory-new'
+
+    factory = test.replay_flight_data('test_s3_directory_set_inventory')
+    client = factory().client('s3')
+
+    existing = client.list_bucket_inventory_configurations(
+        Bucket=bucket_name).get('InventoryConfigurationList', [])
+    assert not [i for i in existing if i['Id'] == inventory_id]
+
+    p = test.load_policy(
+        {
+            'name': 's3-directory-set-inventory',
+            'resource': 's3-directory',
+            'filters': [{'Name': bucket_name}],
+            'actions': [
+                {
+                    'type': 'set-inventory',
+                    'name': inventory_id,
+                    'destination': destination_bucket_name,
+                    'state': 'enabled',
+                    'fields': ['Size', 'LastModifiedDate'],
+                }
+            ],
+        },
+        config={'account_id': ACCOUNT_ID},
+        session_factory=factory,
+    )
+    resources = p.run()
+    assert len(resources) == 1
+    test.addCleanup(
+        client.delete_bucket_inventory_configuration,
+        Bucket=bucket_name, Id=inventory_id)
+
+    invs = client.list_bucket_inventory_configurations(
+        Bucket=bucket_name).get('InventoryConfigurationList')
+    matching = [i for i in invs if i['Id'] == inventory_id]
+    assert len(matching) == 1
+    assert matching[0]['IsEnabled'] is True
+    assert sorted(matching[0]['OptionalFields']) == ['LastModifiedDate', 'Size']
+
+
+def test_s3_directory_cross_account_no_policy(test):
+    session_factory = test.replay_flight_data('test_s3_directory_cross_account_no_policy')
+    p = test.load_policy(
+        {
+            'name': 's3-directory-cross-account-no-policy',
+            'resource': 's3-directory',
+            'filters': [
+                {'type': 'cross-account'},
+            ],
+        },
+        config={'account_id': ACCOUNT_ID},
+        session_factory=session_factory,
+    )
+    resources = p.run()
+    assert len(resources) == 0
+
+
+def test_s3_directory_has_statement_no_policy(test):
+    session_factory = test.replay_flight_data('test_s3_directory_has_statement_no_policy')
+    p = test.load_policy(
+        {
+            'name': 's3-directory-has-no-statement',
+            'resource': 's3-directory',
+            'filters': [
+                {
+                    'not': [
+                        {
+                            'type': 'has-statement',
+                            'statement_ids': ['DenyNonSecureTransport'],
+                        }
+                    ]
+                }
+            ],
+        },
+        config={'account_id': ACCOUNT_ID},
+        session_factory=session_factory,
+    )
+    resources = p.run()
+    assert len(resources) == 1
+
+
+def test_s3_directory_has_statement(test):
+    session_factory = test.replay_flight_data('test_s3_directory_has_statement')
+    p = test.load_policy(
+        {
+            'name': 's3-directory-has-deny-non-secure',
+            'resource': 's3-directory',
+            'filters': [
+                {
+                    'type': 'has-statement',
+                    'statements': [
+                        {
+                            'Effect': 'Deny',
+                            'Action': 's3express:*',
+                            'Condition': {
+                                'Bool': {'aws:SecureTransport': 'false'}
+                            },
+                        }
+                    ],
+                }
+            ],
+        },
+        config={'account_id': ACCOUNT_ID},
+        session_factory=session_factory,
+    )
+    resources = p.run()
+    assert len(resources) == 1
+
+
+def test_s3_directory_cross_account(test):
+    bucket_name = 'c7n-test-cross-account--use1-az4--x-s3'
+    session_factory = test.replay_flight_data('test_s3_directory_cross_account')
+
+    p = test.load_policy(
+        {
+            'name': 's3-directory-cross-account',
+            'resource': 'aws.s3-directory',
+            'filters': [
+                {'type': 'cross-account'},
+            ],
+
+        },
+        config={'account_id': ACCOUNT_ID},
+        session_factory=session_factory,
+    )
+    resources = p.run()
+    assert len(resources) == 1
+    assert resources[0]['Name'] == bucket_name
+    assert 'CrossAccountViolations' in resources[0]
 
 
 @pytest.mark.audited

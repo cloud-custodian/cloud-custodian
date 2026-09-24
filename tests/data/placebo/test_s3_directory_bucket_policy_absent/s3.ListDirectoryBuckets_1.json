@@ -4,7 +4,7 @@
         "ResponseMetadata": {},
         "Buckets": [
             {
-                "Name": "test-zone--use1-az4--x-s3",
+                "Name": "c7n-test-inventory--use1-az4--x-s3",
                 "CreationDate": {
                     "__class__": "datetime",
                     "year": 2026,
@@ -15,7 +15,7 @@
                     "second": 21,
                     "microsecond": 545000
                 },
-                "BucketArn": "arn:aws:s3express:us-east-1:644160558196:bucket/test-zone--use1-az4--x-s3"
+                "BucketArn": "arn:aws:s3express:us-east-1:644160558196:bucket/c7n-test-inventory--use1-az4--x-s3"
             }
         ]
     }

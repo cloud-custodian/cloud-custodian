@@ -1,0 +1,16 @@
+{
+    "status_code": 200,
+    "data": {
+        "ResponseMetadata": {},
+        "AccessPointList": [
+            {
+                "Name": "c7n-test-cross-account-ap--use1-az4--xa-s3",
+                "NetworkOrigin": "Internet",
+                "Bucket": "c7n-test-cross-account-ap--use1-az4--x-s3",
+                "AccessPointArn": "arn:aws:s3express:us-east-1:644160558196:accesspoint/c7n-test-cross-account-ap--use1-az4--xa-s3",
+                "Alias": "c7n-test-cross-account-ap--use1-az4--xa-s3",
+                "BucketAccountId": "644160558196"
+            }
+        ]
+    }
+}
