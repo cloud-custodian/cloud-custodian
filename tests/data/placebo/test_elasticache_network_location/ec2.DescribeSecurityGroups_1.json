@@ -1,0 +1,72 @@
+{
+    "status_code": 200,
+    "data": {
+        "SecurityGroups": [
+            {
+                "GroupId": "sg-0e39ada22191178b0",
+                "IpPermissionsEgress": [
+                    {
+                        "IpProtocol": "-1",
+                        "UserIdGroupPairs": [],
+                        "IpRanges": [
+                            {
+                                "CidrIp": "0.0.0.0/0"
+                            }
+                        ],
+                        "Ipv6Ranges": [],
+                        "PrefixListIds": []
+                    }
+                ],
+                "Tags": [
+                    {
+                        "Key": "AppId",
+                        "Value": "APP1001"
+                    },
+                    {
+                        "Key": "c7n-fixture",
+                        "Value": "network-location"
+                    }
+                ],
+                "VpcId": "vpc-d2d616b5",
+                "SecurityGroupArn": "arn:aws:ec2:us-east-1:644160558196:security-group/sg-0e39ada22191178b0",
+                "OwnerId": "644160558196",
+                "GroupName": "c7n-nl-sg-a",
+                "Description": "c7n network-location fixture sg a",
+                "IpPermissions": []
+            },
+            {
+                "GroupId": "sg-0744b361de5bd9cf1",
+                "IpPermissionsEgress": [
+                    {
+                        "IpProtocol": "-1",
+                        "UserIdGroupPairs": [],
+                        "IpRanges": [
+                            {
+                                "CidrIp": "0.0.0.0/0"
+                            }
+                        ],
+                        "Ipv6Ranges": [],
+                        "PrefixListIds": []
+                    }
+                ],
+                "Tags": [
+                    {
+                        "Key": "AppId",
+                        "Value": "APP3003"
+                    },
+                    {
+                        "Key": "c7n-fixture",
+                        "Value": "network-location"
+                    }
+                ],
+                "VpcId": "vpc-d2d616b5",
+                "SecurityGroupArn": "arn:aws:ec2:us-east-1:644160558196:security-group/sg-0744b361de5bd9cf1",
+                "OwnerId": "644160558196",
+                "GroupName": "c7n-nl-sg-b",
+                "Description": "c7n network-location fixture sg b",
+                "IpPermissions": []
+            }
+        ],
+        "ResponseMetadata": {}
+    }
+}

@@ -1,0 +1,199 @@
+{
+    "status_code": 200,
+    "data": {
+        "SecurityGroups": [
+            {
+                "GroupId": "sg-0e39ada22191178b0",
+                "IpPermissionsEgress": [
+                    {
+                        "IpProtocol": "-1",
+                        "UserIdGroupPairs": [],
+                        "IpRanges": [
+                            {
+                                "CidrIp": "0.0.0.0/0"
+                            }
+                        ],
+                        "Ipv6Ranges": [],
+                        "PrefixListIds": []
+                    }
+                ],
+                "Tags": [
+                    {
+                        "Key": "AppId",
+                        "Value": "APP1001"
+                    },
+                    {
+                        "Key": "c7n-fixture",
+                        "Value": "network-location"
+                    }
+                ],
+                "VpcId": "vpc-d2d616b5",
+                "SecurityGroupArn": "arn:aws:ec2:us-east-1:644160558196:security-group/sg-0e39ada22191178b0",
+                "OwnerId": "644160558196",
+                "GroupName": "c7n-nl-sg-a",
+                "Description": "c7n network-location fixture sg a",
+                "IpPermissions": []
+            },
+            {
+                "GroupId": "sg-0616b55f1f99947fd",
+                "IpPermissionsEgress": [
+                    {
+                        "IpProtocol": "-1",
+                        "UserIdGroupPairs": [],
+                        "IpRanges": [
+                            {
+                                "CidrIp": "0.0.0.0/0"
+                            }
+                        ],
+                        "Ipv6Ranges": [],
+                        "PrefixListIds": []
+                    }
+                ],
+                "Tags": [
+                    {
+                        "Key": "NetworkLocation",
+                        "Value": "CustFacing,EntFacing"
+                    },
+                    {
+                        "Key": "Owner",
+                        "Value": "sean.snider@capitalone.com"
+                    },
+                    {
+                        "Key": "TestTag",
+                        "Value": "TestValue"
+                    }
+                ],
+                "VpcId": "vpc-d2d616b5",
+                "SecurityGroupArn": "arn:aws:ec2:us-east-1:644160558196:security-group/sg-0616b55f1f99947fd",
+                "OwnerId": "644160558196",
+                "GroupName": "AutoScaling-Security-Group-2",
+                "Description": "AutoScaling-Security-Group-2 (2019-03-11 17:52:14.716-04:00)",
+                "IpPermissions": [
+                    {
+                        "IpProtocol": "tcp",
+                        "FromPort": 22,
+                        "ToPort": 22,
+                        "UserIdGroupPairs": [],
+                        "IpRanges": [
+                            {
+                                "CidrIp": "0.0.0.0/0"
+                            }
+                        ],
+                        "Ipv6Ranges": [],
+                        "PrefixListIds": []
+                    }
+                ]
+            },
+            {
+                "GroupId": "sg-0be736f2d3736d5e7",
+                "IpPermissionsEgress": [
+                    {
+                        "IpProtocol": "-1",
+                        "UserIdGroupPairs": [],
+                        "IpRanges": [
+                            {
+                                "CidrIp": "0.0.0.0/0"
+                            }
+                        ],
+                        "Ipv6Ranges": [],
+                        "PrefixListIds": []
+                    }
+                ],
+                "VpcId": "vpc-d2d616b5",
+                "SecurityGroupArn": "arn:aws:ec2:us-east-1:644160558196:security-group/sg-0be736f2d3736d5e7",
+                "OwnerId": "644160558196",
+                "GroupName": "airflow-security-group-test-V4MRq2",
+                "Description": "Security Group for Amazon MWAA Environment test",
+                "IpPermissions": [
+                    {
+                        "IpProtocol": "-1",
+                        "UserIdGroupPairs": [
+                            {
+                                "UserId": "644160558196",
+                                "GroupId": "sg-0be736f2d3736d5e7"
+                            }
+                        ],
+                        "IpRanges": [],
+                        "Ipv6Ranges": [],
+                        "PrefixListIds": []
+                    }
+                ]
+            },
+            {
+                "GroupId": "sg-0e33f40203e9a81b6",
+                "IpPermissionsEgress": [
+                    {
+                        "IpProtocol": "-1",
+                        "UserIdGroupPairs": [],
+                        "IpRanges": [
+                            {
+                                "CidrIp": "0.0.0.0/0"
+                            }
+                        ],
+                        "Ipv6Ranges": [],
+                        "PrefixListIds": []
+                    }
+                ],
+                "Tags": [
+                    {
+                        "Key": "NetworkLocation",
+                        "Value": "Enterprise"
+                    }
+                ],
+                "VpcId": "vpc-d2d616b5",
+                "SecurityGroupArn": "arn:aws:ec2:us-east-1:644160558196:security-group/sg-0e33f40203e9a81b6",
+                "OwnerId": "644160558196",
+                "GroupName": "AutoScaling-Security-Group-3",
+                "Description": "AutoScaling-Security-Group-3 (2020-06-22 14:02:40.644-04:00)",
+                "IpPermissions": [
+                    {
+                        "IpProtocol": "tcp",
+                        "FromPort": 22,
+                        "ToPort": 22,
+                        "UserIdGroupPairs": [],
+                        "IpRanges": [
+                            {
+                                "CidrIp": "0.0.0.0/0"
+                            }
+                        ],
+                        "Ipv6Ranges": [],
+                        "PrefixListIds": []
+                    }
+                ]
+            },
+            {
+                "GroupId": "sg-0744b361de5bd9cf1",
+                "IpPermissionsEgress": [
+                    {
+                        "IpProtocol": "-1",
+                        "UserIdGroupPairs": [],
+                        "IpRanges": [
+                            {
+                                "CidrIp": "0.0.0.0/0"
+                            }
+                        ],
+                        "Ipv6Ranges": [],
+                        "PrefixListIds": []
+                    }
+                ],
+                "Tags": [
+                    {
+                        "Key": "AppId",
+                        "Value": "APP3003"
+                    },
+                    {
+                        "Key": "c7n-fixture",
+                        "Value": "network-location"
+                    }
+                ],
+                "VpcId": "vpc-d2d616b5",
+                "SecurityGroupArn": "arn:aws:ec2:us-east-1:644160558196:security-group/sg-0744b361de5bd9cf1",
+                "OwnerId": "644160558196",
+                "GroupName": "c7n-nl-sg-b",
+                "Description": "c7n network-location fixture sg b",
+                "IpPermissions": []
+            }
+        ],
+        "ResponseMetadata": {}
+    }
+}

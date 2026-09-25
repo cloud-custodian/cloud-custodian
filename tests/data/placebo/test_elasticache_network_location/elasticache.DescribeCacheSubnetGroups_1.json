@@ -1,0 +1,91 @@
+{
+    "status_code": 200,
+    "data": {
+        "CacheSubnetGroups": [
+            {
+                "CacheSubnetGroupName": "c7n-nl-csg",
+                "CacheSubnetGroupDescription": "c7n fixture",
+                "VpcId": "vpc-d2d616b5",
+                "Subnets": [
+                    {
+                        "SubnetIdentifier": "subnet-efbcccb7",
+                        "SubnetAvailabilityZone": {
+                            "Name": "us-east-1b"
+                        },
+                        "SupportedNetworkTypes": [
+                            "ipv4"
+                        ]
+                    },
+                    {
+                        "SubnetIdentifier": "subnet-044d9e3b66dccd75a",
+                        "SubnetAvailabilityZone": {
+                            "Name": "us-east-1d"
+                        },
+                        "SupportedNetworkTypes": [
+                            "ipv4"
+                        ]
+                    }
+                ],
+                "ARN": "arn:aws:elasticache:us-east-1:644160558196:subnetgroup:c7n-nl-csg",
+                "SupportedNetworkTypes": [
+                    "ipv4"
+                ]
+            },
+            {
+                "CacheSubnetGroupName": "default",
+                "CacheSubnetGroupDescription": "Default CacheSubnetGroup",
+                "VpcId": "vpc-d2d616b5",
+                "Subnets": [
+                    {
+                        "SubnetIdentifier": "subnet-efbcccb7",
+                        "SubnetAvailabilityZone": {
+                            "Name": "us-east-1b"
+                        },
+                        "SupportedNetworkTypes": [
+                            "ipv4"
+                        ]
+                    },
+                    {
+                        "SubnetIdentifier": "subnet-e3b194de",
+                        "SubnetAvailabilityZone": {
+                            "Name": "us-east-1e"
+                        },
+                        "SupportedNetworkTypes": [
+                            "ipv4"
+                        ]
+                    },
+                    {
+                        "SubnetIdentifier": "subnet-914763e7",
+                        "SubnetAvailabilityZone": {
+                            "Name": "us-east-1a"
+                        },
+                        "SupportedNetworkTypes": [
+                            "ipv4"
+                        ]
+                    }
+                ],
+                "ARN": "arn:aws:elasticache:us-east-1:644160558196:subnetgroup:default",
+                "SupportedNetworkTypes": [
+                    "ipv4"
+                ]
+            },
+            {
+                "CacheSubnetGroupName": "msg",
+                "CacheSubnetGroupDescription": " ",
+                "VpcId": "vpc-f1516b97",
+                "Subnets": [],
+                "ARN": "arn:aws:elasticache:us-east-1:644160558196:subnetgroup:msg",
+                "SupportedNetworkTypes": []
+            },
+            {
+                "CacheSubnetGroupName": "test",
+                "CacheSubnetGroupDescription": " ",
+                "VpcId": "vpc-03005fb9b8740263d",
+                "Subnets": [],
+                "ARN": "arn:aws:elasticache:us-east-1:644160558196:subnetgroup:test",
+                "SupportedNetworkTypes": []
+            }
+        ],
+        "ResponseMetadata": {}
+    }
+}
