@@ -448,6 +448,10 @@ class TypeInfo(metaclass=TypeMeta):
     # Assume they generally can, and flip this to `False` for those that don't.
     allow_metrics_filters = True
 
+    # Metric keys a resource type accepts in an explicit `metric-key` policy
+    # option, beyond its default `metric_key`. `None` means no restriction.
+    supported_metric_keys = None
+
     @classmethod
     def get_metric_resource_name(cls, resource, metric_key=None):
         return resource.get(cls.name)

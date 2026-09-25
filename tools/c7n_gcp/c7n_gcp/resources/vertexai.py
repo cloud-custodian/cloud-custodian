@@ -9,10 +9,8 @@ from google.cloud import storage
 from googleapiclient.errors import HttpError
 import yaml
 
-from c7n.filters.core import FilterValidationError
 from c7n.utils import local_session, jmespath_search, type_schema
 from c7n_gcp.actions import MethodAction
-from c7n_gcp.filters.metrics import GCPMetricsFilter
 from c7n_gcp.provider import resources
 from c7n_gcp.query import (
     config_regions, QueryResourceManager, TypeInfo, ChildResourceManager, ChildTypeInfo)
@@ -299,24 +297,12 @@ class VertexAIEndpoint(VertexAIQueryManager):
         permissions = ('aiplatform.endpoints.list',)
         urn_component = 'endpoint'
         metric_key = 'resource.labels.endpoint_id'
+        supported_metric_keys = ('resource.labels.endpoint_id',)
 
         @classmethod
         def get_metric_resource_name(cls, resource, metric_key=None):
             # Endpoint metrics are keyed by the terminal endpoint id.
             return resource['name'].split('/')[-1]
-
-
-@VertexAIEndpoint.filter_registry.register('metrics')
-class VertexAIEndpointMetricsFilter(GCPMetricsFilter):
-
-    def validate(self):
-        super().validate()
-        metric_key = self.data.get('metric-key')
-        if metric_key and metric_key != self.manager.resource_type.metric_key:
-            raise FilterValidationError(
-                "vertex-ai-endpoint metrics filter only supports "
-                f"metric-key '{self.manager.resource_type.metric_key}', got '{metric_key}'")
-        return self
 
 
 @VertexAIEndpoint.action_registry.register('monitor')
@@ -1472,3 +1458,12 @@ class VertexAIPublisherModel(ChildResourceManager):
         urn_component = 'publisher-model'
         urn_id_segments = (-1,)
         parent_spec = {'resource': 'vertex-ai-publisher'}
+        metric_key = 'resource.labels.model_user_id'
+        supported_metric_keys = ('resource.labels.model_user_id',)
+
+        @classmethod
+        def get_metric_resource_name(cls, resource, metric_key=None):
+            # Monitoring labels the metric with the bare model id, the
+            # last part of the resource's full
+            # publishers/{publisher}/models/{model} name.
+            return resource['name'].split('/')[-1]

@@ -5,6 +5,7 @@ import os
 import json
 import time
 import logging
+from datetime import datetime, timedelta, timezone
 from unittest.mock import Mock, patch
 import pytest
 from google.api_core.client_options import ClientOptions
@@ -13,7 +14,7 @@ from pytest_terraform import terraform
 from c7n.filters.core import FilterValidationError
 from c7n_gcp.client import get_default_project
 from gcp_common import BaseTest
-from c7n_gcp.resources.vertexai import VertexAIEndpoint
+from c7n_gcp.resources.vertexai import VertexAIEndpoint, VertexAIPublisherModel
 
 
 def _make_http_error(
@@ -730,10 +731,117 @@ def test_vertexai_endpoint_metric_resource_name():
     )
 
 
+def _generate_publisher_model_traffic(project_id, location, model, calls=5):
+    """Send generateContent calls to a Model Garden model.
+
+    Only runs during recording, since Cloud Monitoring's token_count
+    metric has no data until the model gets requests.
+    """
+    import google.auth
+    from google.auth.transport.requests import AuthorizedSession
+
+    credentials, _ = google.auth.default(
+        scopes=['https://www.googleapis.com/auth/cloud-platform'])
+    session = AuthorizedSession(credentials)
+    url = (
+        f'https://{location}-aiplatform.googleapis.com/v1/projects/'
+        f'{project_id}/locations/{location}/publishers/google/models/'
+        f'{model}:generateContent'
+    )
+    body = {'contents': [{'role': 'user', 'parts': [{'text': 'Say OK.'}]}]}
+    for _ in range(calls):
+        resp = session.post(url, json=body, timeout=30)
+        resp.raise_for_status()
+
+
+def _wait_for_publisher_model_metric(
+        project_id, metric_type, model, timeout=1800, interval=30):
+    """Poll Cloud Monitoring until ``metric_type`` has a data point for
+    ``model``. Avoids guessing a fixed propagation delay.
+    """
+    import google.auth
+    from google.auth.transport.requests import AuthorizedSession
+
+    credentials, _ = google.auth.default(
+        scopes=['https://www.googleapis.com/auth/cloud-platform'])
+    session = AuthorizedSession(credentials)
+    url = f'https://monitoring.googleapis.com/v3/projects/{project_id}/timeSeries'
+    now = datetime.now(timezone.utc).replace(microsecond=0)
+    params = {
+        'filter': (
+            f'metric.type = "{metric_type}" AND '
+            f'resource.labels.model_user_id = "{model}"'
+        ),
+        'interval.startTime': (now - timedelta(hours=6)).isoformat(),
+        'interval.endTime': now.isoformat(),
+        'view': 'FULL',
+    }
+    deadline = time.time() + timeout
+    while True:
+        resp = session.get(url, params=params, timeout=30)
+        resp.raise_for_status()
+        if resp.json().get('timeSeries'):
+            return
+        if time.time() >= deadline:
+            raise TimeoutError(
+                f'{metric_type} did not appear for {model} '
+                f'within {timeout}s of polling')
+        time.sleep(interval)
+
+
+def test_vertexai_publisher_model_metrics(test):
+    """Test the metrics filter against a live publisher-model metric.
+
+    Recording this test sends Gemini calls, then polls Cloud Monitoring
+    until ``token_count`` shows up for the model, instead of a fixed
+    sleep. See ``_generate_publisher_model_traffic`` and
+    ``_wait_for_publisher_model_metric`` above.
+    """
+    project_id = get_default_project()
+    location = 'us-central1'
+    model = 'gemini-2.5-flash'
+    metric_type = 'aiplatform.googleapis.com/publisher/online_serving/token_count'
+
+    session_factory = test.replay_flight_data(
+        'vertex-ai-publisher-model-metrics')
+
+    if test.recording:
+        _generate_publisher_model_traffic(project_id, location, model)
+        _wait_for_publisher_model_metric(project_id, metric_type, model)
+
+    policy = test.load_policy(
+        {
+            'name': 'publisher-model-token-count',
+            'resource': 'gcp.vertex-ai-publisher-model',
+            'filters': [
+                {'type': 'value', 'key': 'name',
+                 'value': f'publishers/google/models/{model}'},
+                {
+                    'type': 'metrics',
+                    'name': metric_type,
+                    'aligner': 'ALIGN_SUM',
+                    'days': 1,
+                    'op': 'greater-than',
+                    'value': 0,
+                },
+            ],
+        },
+        session_factory=session_factory,
+    )
+
+    resources = policy.run()
+
+    assert len(resources) == 1
+    metric_name = f'{metric_type}.ALIGN_SUM.REDUCE_NONE'
+    assert metric_name in resources[0]['c7n.metrics']
+    assert resources[0]['c7n.metrics'][metric_name] is not None
+    assert resources[0]['c7n.metrics'][metric_name]['points']
+
+
 def test_vertexai_endpoint_metrics_invalid_metric_key(test):
     with pytest.raises(
         FilterValidationError,
-        match="only supports metric-key 'resource.labels.endpoint_id'",
+        match="metric-key 'metric.labels.deployed_model_id' not supported",
     ):
         test.load_policy({
             'name': 'vertexai-endpoint-invalid-metric-key',
@@ -1887,6 +1995,51 @@ class VertexAIPublisherModelTest(BaseTest):
                 resource.get('name', '').lower(),
                 f'Model {resource.get("name")} unexpectedly matched Gemini pattern'
             )
+
+    def test_publisher_model_metric_resource_name(self):
+        """Test get_metric_resource_name derives the bare model id
+        across a few publishers.
+        """
+        cases = [
+            ('publishers/google/models/gemini-1.5-pro', 'gemini-1.5-pro'),
+            ('publishers/anthropic/models/claude-sonnet-4-5', 'claude-sonnet-4-5'),
+            ('publishers/meta/models/llama-3.1-405b-instruct-maas',
+             'llama-3.1-405b-instruct-maas'),
+        ]
+        for name, expected in cases:
+            resource = {'name': name}
+            self.assertEqual(
+                VertexAIPublisherModel.resource_type.get_metric_resource_name(resource),
+                expected)
+            # Explicitly passing the metric key works too.
+            self.assertEqual(
+                VertexAIPublisherModel.resource_type.get_metric_resource_name(
+                    resource, metric_key='resource.labels.model_user_id'),
+                expected)
+
+    def test_publisher_model_metrics_filter_registration(self):
+        """Test the metrics filter is usable without a metric-key restriction."""
+        policy = self.load_policy(
+            {'name': 'publisher-model-dedicated-capacity',
+             'resource': 'gcp.vertex-ai-publisher-model',
+             'filters': [
+                 {'type': 'metrics',
+                  'name': 'aiplatform.googleapis.com/publisher/online_serving/'
+                          'dedicated_token_limit',
+                  'aligner': 'ALIGN_MAX',
+                  'reducer': 'REDUCE_MAX',
+                  'group-by-fields': [
+                      'resource.labels.resource_container',
+                      'resource.labels.publisher',
+                      'resource.labels.model_user_id',
+                  ],
+                  'days': 1,
+                  'op': 'gt',
+                  'value': 0}
+             ]})
+        self.assertEqual(
+            policy.resource_manager.resource_type.metric_key,
+            'resource.labels.model_user_id')
 
 
 @terraform('vertexai_endpoint_get_resource')
