@@ -630,6 +630,16 @@ class ScheduleParserTest(BaseTest):
         # random extra again
         ("off=(m-f,5);zebrablue,on=(t-w,5)", None),
         ("bar;off=(m-f,5);zebrablue,on=(t-w,5)", None),
+        ################
+        # space after the ';' separator (keys_are_valid already accepts this)
+        (
+            "off=(m-f,19); on=(m-f,7)",
+            {
+                "off": [{"days": [0, 1, 2, 3, 4], "hour": 19}],
+                "on": [{"days": [0, 1, 2, 3, 4], "hour": 7}],
+                "tz": "et",
+            },
+        ),
     ]
 
     def test_schedule_parser(self):
