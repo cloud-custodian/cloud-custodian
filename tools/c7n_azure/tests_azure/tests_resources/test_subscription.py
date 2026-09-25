@@ -2,9 +2,10 @@
 # SPDX-License-Identifier: Apache-2.0
 from unittest.mock import patch
 
-from ..azure_common import BaseTest, cassette_name
+from ..azure_common import BaseTest, DEFAULT_SUBSCRIPTION_ID, arm_template, cassette_name
 from c7n_azure.session import Session
 from c7n.utils import local_session
+from azure.core.exceptions import ResourceNotFoundError
 from azure.mgmt.resource import SubscriptionClient
 
 
@@ -107,6 +108,69 @@ class SubscriptionDiagnosticSettingsFilterTest(BaseTest):
         }, validate=True)
 
         self.assertEqual(0, len(p.run()))
+
+
+class SubscriptionDiagnosticSettingsStorageFilterTest(BaseTest):
+
+    def _policy(self, op):
+        return self.load_policy({
+            'name': 'test-sub-diag-storage',
+            'resource': 'azure.subscription',
+            'filters': [{
+                'type': 'diagnostic-settings-storage',
+                'key': 'properties.encryption.keySource',
+                'op': op,
+                'value_type': 'normalize',
+                'value': 'microsoft.keyvault'
+            }]
+        }, validate=True)
+
+    @arm_template('subscription-diagnostic-storage.json')
+    def test_storage_not_cmk_match(self):
+        resources = self._policy('ne').run()
+        assert len(resources) == 1
+        storage = resources[0]['c7n:DiagnosticSettingsStorage']
+        assert len(storage) == 1
+        assert storage[0]['name'].startswith('cctestsubdiag')
+        assert storage[0]['resourceGroup'] == 'test_subscription-diagnostic-storage'
+        assert storage[0]['properties']['encryption']['keySource'] == 'Microsoft.Storage'
+
+    @arm_template('subscription-diagnostic-storage.json')
+    def test_storage_cmk_no_match(self):
+        assert self._policy('eq').run() == []
+
+    def test_no_storage_destination(self):
+        f = self._policy('ne').resource_manager.filters[0]
+        subscription = {
+            'c7n:diagnostic-settings': [
+                {'properties': {'workspaceId': 'workspace'}}
+            ],
+        }
+        with patch(
+            'c7n_azure.resources.subscription.StorageManagementClient'
+        ) as client:
+            assert f.process([subscription]) == []
+        client.assert_not_called()
+
+    def test_storage_not_found(self):
+        storage_id = (
+            f'/subscriptions/{DEFAULT_SUBSCRIPTION_ID}/resourceGroups/rg'
+            '/providers/Microsoft.Storage/storageAccounts/missing'
+        )
+        f = self._policy('ne').resource_manager.filters[0]
+        subscription = {
+            'c7n:diagnostic-settings': [
+                {'properties': {'storageAccountId': storage_id}}
+            ],
+        }
+        with patch(
+            'c7n_azure.resources.subscription.StorageManagementClient'
+        ) as client:
+            client.return_value.storage_accounts.get_properties.side_effect = \
+                ResourceNotFoundError('not found')
+            assert f.process([subscription]) == []
+        client.return_value.storage_accounts.get_properties.assert_called_once_with(
+            'rg', 'missing')
 
 
 class SubscriptionTaggingTest(BaseTest):
