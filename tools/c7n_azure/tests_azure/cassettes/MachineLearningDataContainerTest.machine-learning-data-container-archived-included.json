@@ -14,31 +14,31 @@
                     "message": "OK"
                 },
                 "headers": {
-                    "content-type": [
-                        "application/json; charset=utf-8"
+                    "cache-control": [
+                        "no-cache"
                     ],
                     "date": [
-                        "Fri, 11 Sep 2026 16:21:29 GMT"
+                        "Fri, 11 Sep 2026 16:19:16 GMT"
                     ],
-                    "x-cache": [
-                        "CONFIG_NOCACHE"
+                    "x-ms-ratelimit-remaining-subscription-global-reads": [
+                        "3749"
                     ],
                     "x-ms-original-request-ids": [
                         "",
                         "",
                         ""
                     ],
+                    "x-cache": [
+                        "CONFIG_NOCACHE"
+                    ],
+                    "content-type": [
+                        "application/json; charset=utf-8"
+                    ],
                     "content-length": [
-                        "12815"
-                    ],
-                    "x-ms-ratelimit-remaining-subscription-global-reads": [
-                        "3749"
-                    ],
-                    "cache-control": [
-                        "no-cache"
+                        "10273"
                     ],
                     "x-msedge-ref": [
-                        "Ref A: 11013DD7D7FE4EFD81E8F832BA140615 Ref B: CYS013050702019 Ref C: 2026-09-11T16:21:29Z"
+                        "Ref A: 5098CBF3FF244C5E8CEB9D23D5EC22A6 Ref B: CYS013050704019 Ref C: 2026-09-11T16:19:16Z"
                     ]
                 },
                 "body": {
@@ -301,70 +301,6 @@
                                     "lastModifiedBy": "mock-user@example.com",
                                     "lastModifiedByType": "User"
                                 }
-                            },
-                            {
-                                "id": "/subscriptions/ea42f556-5106-4743-99b0-c129bfa71a47/resourceGroups/test_machine-learning/providers/Microsoft.MachineLearningServices/workspaces/cctestml591895132702",
-                                "name": "cctestml591895132702",
-                                "type": "Microsoft.MachineLearningServices/workspaces",
-                                "location": "southcentralus",
-                                "tags": {},
-                                "etag": null,
-                                "properties": {
-                                    "friendlyName": "cctest-machine-learning-workspace",
-                                    "description": "",
-                                    "storageAccount": "/subscriptions/ea42f556-5106-4743-99b0-c129bfa71a47/resourceGroups/test_machine-learning/providers/Microsoft.Storage/storageAccounts/cctestmlst591895132702",
-                                    "keyVault": "/subscriptions/ea42f556-5106-4743-99b0-c129bfa71a47/resourceGroups/test_machine-learning/providers/Microsoft.Keyvault/vaults/cctestmlkv591895132702",
-                                    "applicationInsights": "/subscriptions/ea42f556-5106-4743-99b0-c129bfa71a47/resourceGroups/test_machine-learning/providers/Microsoft.insights/components/cctestmlai591895132702",
-                                    "hbiWorkspace": false,
-                                    "tenantId": "00000000-0000-0000-0000-000000000003",
-                                    "imageBuildCompute": null,
-                                    "provisioningState": "Succeeded",
-                                    "managedNetwork": {
-                                        "changeableIsolationModes": [
-                                            "AllowInternetOutbound",
-                                            "AllowOnlyApprovedOutbound"
-                                        ],
-                                        "isolationMode": "Disabled",
-                                        "enableNetworkMonitor": false
-                                    },
-                                    "allowRoleAssignmentOnRG": true,
-                                    "v1LegacyMode": false,
-                                    "softDeleteEnabled": false,
-                                    "creationTime": "2026-09-11T16:20:18.6412940Z",
-                                    "notebookInfo": {
-                                        "resourceId": "4845617443774d858e0578b7d89edd7b",
-                                        "fqdn": "ml-cctestml-southcentralus-de76d53e-1060-4af5-9461-d49de11bf264.southcentralus.notebooks.azure.net",
-                                        "isPrivateLinkEnabled": false,
-                                        "notebookPreparationError": null
-                                    },
-                                    "storageHnsEnabled": false,
-                                    "workspaceId": "de76d53e-1060-4af5-9461-d49de11bf264",
-                                    "linkedModelInventoryArmId": null,
-                                    "privateLinkCount": 0,
-                                    "publicNetworkAccess": "Enabled",
-                                    "discoveryUrl": "https://southcentralus.api.azureml.ms/discovery",
-                                    "mlFlowTrackingUri": "azureml://southcentralus.api.azureml.ms/mlflow/v1.0/subscriptions/ea42f556-5106-4743-99b0-c129bfa71a47/resourceGroups/test_machine-learning/providers/Microsoft.MachineLearningServices/workspaces/cctestml591895132702",
-                                    "sdkTelemetryAppInsightsKey": "0c54a945-002c-433a-93ea-97b7f084292a",
-                                    "enableDataIsolation": false
-                                },
-                                "identity": {
-                                    "type": "SystemAssigned",
-                                    "principalId": "eb1e048d-58ed-4222-82d9-0ac58c53ec38",
-                                    "tenantId": "00000000-0000-0000-0000-000000000003"
-                                },
-                                "kind": "Default",
-                                "sku": {
-                                    "name": "Basic",
-                                    "tier": "Basic"
-                                },
-                                "systemData": {
-                                    "createdAt": "2026-09-11T16:20:18.641294Z",
-                                    "createdBy": "mock-user@example.com",
-                                    "createdByType": "User",
-                                    "lastModifiedAt": "2026-09-11T16:20:18.641294Z",
-                                    "lastModifiedBy": "mock-user@example.com",
-                                    "lastModifiedByType": "User"
-                                }
                             }
                         ]
                     }
@@ -384,41 +320,41 @@
                     "message": "OK"
                 },
                 "headers": {
-                    "content-type": [
-                        "application/json; charset=utf-8"
+                    "content-length": [
+                        "1659"
                     ],
-                    "date": [
-                        "Fri, 11 Sep 2026 16:21:30 GMT"
-                    ],
-                    "x-cache": [
-                        "CONFIG_NOCACHE"
-                    ],
-                    "cache-control": [
-                        "no-cache"
-                    ],
-                    "x-msedge-ref": [
-                        "Ref A: FA63F6BD755C41E4BB42F17C78193AEF Ref B: CYS013050702009 Ref C: 2026-09-11T16:21:30Z"
-                    ],
-                    "x-ms-response-type": [
-                        "standard"
+                    "x-request-time": [
+                        "0.103"
                     ],
                     "request-context": [
                         "appId=cid-v1:2d2e8e63-272e-4b3c-8598-4ee570a0e70d"
                     ],
-                    "x-request-time": [
-                        "0.096"
+                    "date": [
+                        "Fri, 11 Sep 2026 16:19:18 GMT"
                     ],
-                    "content-length": [
-                        "1659"
+                    "x-cache": [
+                        "CONFIG_NOCACHE"
+                    ],
+                    "x-ms-response-type": [
+                        "standard"
                     ],
                     "azureml-served-by-cluster": [
                         "vienna-westus-01"
                     ],
+                    "x-msedge-ref": [
+                        "Ref A: 1DAB6D052A7B4E5B9723A09530389652 Ref B: CYS013050703053 Ref C: 2026-09-11T16:19:17Z"
+                    ],
                     "x-ms-ratelimit-remaining-subscription-global-reads": [
                         "3749"
                     ],
+                    "content-type": [
+                        "application/json; charset=utf-8"
+                    ],
+                    "cache-control": [
+                        "no-cache"
+                    ],
                     "x-ms-operation-identifier": [
-                        "tenantId=72d876e4-6b6f-4622-8566-8200130e81d4,objectId=e89404a5-c7db-4cdf-aed3-31daf7739325/westus/9998ab7d-0478-42b6-94f5-900cf4f7b9e0"
+                        "tenantId=72d876e4-6b6f-4622-8566-8200130e81d4,objectId=e89404a5-c7db-4cdf-aed3-31daf7739325/westus/e27b17a1-440a-430a-ae74-c9321be94a08"
                     ]
                 },
                 "body": {
@@ -434,7 +370,7 @@
                                     "properties": null,
                                     "isArchived": false,
                                     "latestVersion": null,
-                                    "nextVersion": "2026-09-11-16-21-30-8843508",
+                                    "nextVersion": "2026-09-11-16-19-18-4454522",
                                     "dataType": "uri_file"
                                 },
                                 "systemData": {
@@ -454,7 +390,7 @@
                                     "properties": null,
                                     "isArchived": false,
                                     "latestVersion": null,
-                                    "nextVersion": "2026-09-11-16-21-30-8843600",
+                                    "nextVersion": "2026-09-11-16-19-18-4454629",
                                     "dataType": "uri_file"
                                 },
                                 "systemData": {
@@ -482,41 +418,41 @@
                     "message": "OK"
                 },
                 "headers": {
-                    "content-type": [
-                        "application/json; charset=utf-8"
+                    "content-length": [
+                        "17"
                     ],
-                    "date": [
-                        "Fri, 11 Sep 2026 16:21:31 GMT"
-                    ],
-                    "x-cache": [
-                        "CONFIG_NOCACHE"
-                    ],
-                    "cache-control": [
-                        "no-cache"
-                    ],
-                    "x-msedge-ref": [
-                        "Ref A: 8A642F75E20D48E09E55970146F87DA9 Ref B: CYS013050702023 Ref C: 2026-09-11T16:21:31Z"
-                    ],
-                    "x-ms-response-type": [
-                        "standard"
+                    "x-request-time": [
+                        "0.381"
                     ],
                     "request-context": [
                         "appId=cid-v1:2d2e8e63-272e-4b3c-8598-4ee570a0e70d"
                     ],
-                    "x-request-time": [
-                        "0.075"
+                    "date": [
+                        "Fri, 11 Sep 2026 16:19:18 GMT"
                     ],
-                    "content-length": [
-                        "17"
+                    "x-cache": [
+                        "CONFIG_NOCACHE"
+                    ],
+                    "x-ms-response-type": [
+                        "standard"
                     ],
                     "azureml-served-by-cluster": [
-                        "vienna-eastus-01"
+                        "vienna-eastus-02"
+                    ],
+                    "x-msedge-ref": [
+                        "Ref A: D022E684B80A48E18057DE3A4BC29AF8 Ref B: CYS013050701051 Ref C: 2026-09-11T16:19:18Z"
                     ],
                     "x-ms-ratelimit-remaining-subscription-global-reads": [
                         "3749"
                     ],
+                    "content-type": [
+                        "application/json; charset=utf-8"
+                    ],
+                    "cache-control": [
+                        "no-cache"
+                    ],
                     "x-ms-operation-identifier": [
-                        "tenantId=72d876e4-6b6f-4622-8566-8200130e81d4,objectId=e89404a5-c7db-4cdf-aed3-31daf7739325/eastus/0ab1e95f-f53a-4f83-bf7b-b2ba31db4aa2"
+                        "tenantId=72d876e4-6b6f-4622-8566-8200130e81d4,objectId=e89404a5-c7db-4cdf-aed3-31daf7739325/eastus/43a432a3-f657-406b-a079-a793e0081037"
                     ]
                 },
                 "body": {
@@ -539,41 +475,41 @@
                     "message": "OK"
                 },
                 "headers": {
-                    "content-type": [
-                        "application/json; charset=utf-8"
+                    "content-length": [
+                        "17"
                     ],
-                    "date": [
-                        "Fri, 11 Sep 2026 16:21:31 GMT"
-                    ],
-                    "x-cache": [
-                        "CONFIG_NOCACHE"
-                    ],
-                    "cache-control": [
-                        "no-cache"
-                    ],
-                    "x-msedge-ref": [
-                        "Ref A: 8E16BD7C3D424611AC2BE2C370A9B548 Ref B: CYS013050701011 Ref C: 2026-09-11T16:21:31Z"
-                    ],
-                    "x-ms-response-type": [
-                        "standard"
+                    "x-request-time": [
+                        "0.116"
                     ],
                     "request-context": [
                         "appId=cid-v1:2d2e8e63-272e-4b3c-8598-4ee570a0e70d"
                     ],
-                    "x-request-time": [
-                        "0.053"
+                    "date": [
+                        "Fri, 11 Sep 2026 16:19:19 GMT"
                     ],
-                    "content-length": [
-                        "17"
+                    "x-cache": [
+                        "CONFIG_NOCACHE"
+                    ],
+                    "x-ms-response-type": [
+                        "standard"
                     ],
                     "azureml-served-by-cluster": [
-                        "vienna-southcentralus-02"
+                        "vienna-southcentralus-01"
+                    ],
+                    "x-msedge-ref": [
+                        "Ref A: F10C295460204534ABFB2D670EBCB6A1 Ref B: CYS013050704011 Ref C: 2026-09-11T16:19:19Z"
                     ],
                     "x-ms-ratelimit-remaining-subscription-global-reads": [
                         "3749"
                     ],
+                    "content-type": [
+                        "application/json; charset=utf-8"
+                    ],
+                    "cache-control": [
+                        "no-cache"
+                    ],
                     "x-ms-operation-identifier": [
-                        "tenantId=72d876e4-6b6f-4622-8566-8200130e81d4,objectId=e89404a5-c7db-4cdf-aed3-31daf7739325/southcentralus/ee5a8017-1066-44da-9d07-219fdc0b3f33"
+                        "tenantId=72d876e4-6b6f-4622-8566-8200130e81d4,objectId=e89404a5-c7db-4cdf-aed3-31daf7739325/westcentralus/0171f6ff-6210-419e-b108-70b970df2422"
                     ]
                 },
                 "body": {
@@ -596,41 +532,41 @@
                     "message": "OK"
                 },
                 "headers": {
-                    "content-type": [
-                        "application/json; charset=utf-8"
+                    "content-length": [
+                        "1845"
                     ],
-                    "date": [
-                        "Fri, 11 Sep 2026 16:21:32 GMT"
-                    ],
-                    "x-cache": [
-                        "CONFIG_NOCACHE"
-                    ],
-                    "cache-control": [
-                        "no-cache"
-                    ],
-                    "x-msedge-ref": [
-                        "Ref A: 1912B351FB474C33A376F63300F4CB65 Ref B: CYS013050701009 Ref C: 2026-09-11T16:21:32Z"
-                    ],
-                    "x-ms-response-type": [
-                        "standard"
+                    "x-request-time": [
+                        "0.203"
                     ],
                     "request-context": [
                         "appId=cid-v1:2d2e8e63-272e-4b3c-8598-4ee570a0e70d"
                     ],
-                    "x-request-time": [
-                        "0.136"
+                    "date": [
+                        "Fri, 11 Sep 2026 16:19:20 GMT"
                     ],
-                    "content-length": [
-                        "1845"
+                    "x-cache": [
+                        "CONFIG_NOCACHE"
+                    ],
+                    "x-ms-response-type": [
+                        "standard"
                     ],
                     "azureml-served-by-cluster": [
                         "vienna-southcentralus-02"
                     ],
+                    "x-msedge-ref": [
+                        "Ref A: C1BC697C435A49B88CFBC83C8EDA505E Ref B: CYS013050703037 Ref C: 2026-09-11T16:19:20Z"
+                    ],
                     "x-ms-ratelimit-remaining-subscription-global-reads": [
                         "3749"
                     ],
+                    "content-type": [
+                        "application/json; charset=utf-8"
+                    ],
+                    "cache-control": [
+                        "no-cache"
+                    ],
                     "x-ms-operation-identifier": [
-                        "tenantId=72d876e4-6b6f-4622-8566-8200130e81d4,objectId=e89404a5-c7db-4cdf-aed3-31daf7739325/southcentralus/fd73749f-3894-4aa5-ba28-3ddead1c23a9"
+                        "tenantId=72d876e4-6b6f-4622-8566-8200130e81d4,objectId=e89404a5-c7db-4cdf-aed3-31daf7739325/southcentralus/a3246830-6a5e-4d45-b1da-1333c965aa2c"
                     ]
                 },
                 "body": {
@@ -648,7 +584,7 @@
                                     "properties": null,
                                     "isArchived": false,
                                     "latestVersion": null,
-                                    "nextVersion": "2026-09-11-16-21-32-4027759",
+                                    "nextVersion": "2026-09-11-16-19-20-5049655",
                                     "dataType": "uri_file"
                                 },
                                 "systemData": {
@@ -670,7 +606,7 @@
                                     "properties": null,
                                     "isArchived": true,
                                     "latestVersion": null,
-                                    "nextVersion": "2026-09-11-16-21-32-4027849",
+                                    "nextVersion": "2026-09-11-16-19-20-5049779",
                                     "dataType": "uri_file"
                                 },
                                 "systemData": {
@@ -678,86 +614,6 @@
                                     "createdBy": "Jim Fulton",
                                     "createdByType": "User",
                                     "lastModifiedAt": "2026-09-11T16:19:02.0364923+00:00"
-                                }
-                            }
-                        ]
-                    }
-                }
-            }
-        },
-        {
-            "request": {
-                "method": "GET",
-                "uri": "https://management.azure.com/subscriptions/ea42f556-5106-4743-99b0-c129bfa71a47/resourceGroups/test_machine-learning/providers/Microsoft.MachineLearningServices/workspaces/cctestml591895132702/data?api-version=2023-04-01&listViewType=All",
-                "body": null,
-                "headers": {}
-            },
-            "response": {
-                "status": {
-                    "code": 200,
-                    "message": "OK"
-                },
-                "headers": {
-                    "content-type": [
-                        "application/json; charset=utf-8"
-                    ],
-                    "date": [
-                        "Fri, 11 Sep 2026 16:21:32 GMT"
-                    ],
-                    "x-cache": [
-                        "CONFIG_NOCACHE"
-                    ],
-                    "cache-control": [
-                        "no-cache"
-                    ],
-                    "x-msedge-ref": [
-                        "Ref A: 19D6C69155824BEBBD807A962D278B49 Ref B: CYS013050702017 Ref C: 2026-09-11T16:21:32Z"
-                    ],
-                    "x-ms-response-type": [
-                        "standard"
-                    ],
-                    "request-context": [
-                        "appId=cid-v1:2d2e8e63-272e-4b3c-8598-4ee570a0e70d"
-                    ],
-                    "x-request-time": [
-                        "0.146"
-                    ],
-                    "content-length": [
-                        "908"
-                    ],
-                    "azureml-served-by-cluster": [
-                        "vienna-southcentralus-02"
-                    ],
-                    "x-ms-ratelimit-remaining-subscription-global-reads": [
-                        "3749"
-                    ],
-                    "x-ms-operation-identifier": [
-                        "tenantId=72d876e4-6b6f-4622-8566-8200130e81d4,objectId=e89404a5-c7db-4cdf-aed3-31daf7739325/southcentralus/684e72bf-8187-42f9-a653-e2b75e58a35d"
-                    ]
-                },
-                "body": {
-                    "data": {
-                        "value": [
-                            {
-                                "id": "/subscriptions/ea42f556-5106-4743-99b0-c129bfa71a47/resourceGroups/test_machine-learning/providers/Microsoft.MachineLearningServices/workspaces/cctestml591895132702/data/cctest-ml-data-container",
-                                "name": "cctest-ml-data-container",
-                                "type": "Microsoft.MachineLearningServices/workspaces/data",
-                                "properties": {
-                                    "description": "Fixture data container for Cloud Custodian tests.",
-                                    "tags": {
-                                        "custodian": "test"
-                                    },
-                                    "properties": null,
-                                    "isArchived": false,
-                                    "latestVersion": null,
-                                    "nextVersion": "2026-09-11-16-21-32-9493508",
-                                    "dataType": "uri_file"
-                                },
-                                "systemData": {
-                                    "createdAt": "2026-09-11T16:21:08.2693782+00:00",
-                                    "createdBy": "Jim Fulton",
-                                    "createdByType": "User",
-                                    "lastModifiedAt": "2026-09-11T16:21:08.2799133+00:00"
                                 }
                             }
                         ]
