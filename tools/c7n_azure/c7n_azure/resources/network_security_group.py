@@ -10,6 +10,7 @@ from c7n.actions import BaseAction
 from c7n.filters import Filter, FilterValidationError
 from c7n.filters.core import PolicyValidationError, ValueFilter
 from c7n.utils import type_schema
+from c7n_azure.actions.base import AzureBaseAction
 from c7n_azure.provider import resources
 from c7n_azure.resources.arm import ArmResourceManager
 from c7n_azure.utils import PortsRangeHelper, StringUtils
@@ -459,3 +460,56 @@ class OpenRules(NetworkSecurityGroupPortsAction):
     """
     schema = type_schema('open', rinherit=NetworkSecurityGroupPortsAction.schema)
     access_action = ALLOW_OPERATION
+
+
+@NetworkSecurityGroup.action_registry.register('remove-rules')
+class RemoveRules(AzureBaseAction):
+    """Remove security rules from a Network Security Group
+
+    Deletes the rules matched by an ``ingress`` or ``egress`` filter, or every rule in
+    that direction with ``all``. Unlike ``close``, which adds a higher priority Deny
+    rule above the offending one, this removes the offending rule itself.
+
+    :example:
+
+    Remove inbound rules that allow traffic from any source
+
+    .. code-block:: yaml
+
+        policies:
+          - name: remove-public-ingress
+            resource: azure.networksecuritygroup
+            filters:
+              - type: ingress
+                source: '*'
+                access: Allow
+            actions:
+              - type: remove-rules
+                ingress: matched
+    """
+    schema = type_schema(
+        'remove-rules',
+        ingress={'type': 'string', 'enum': ['matched', 'all']},
+        egress={'type': 'string', 'enum': ['matched', 'all']},
+    )
+
+    def _prepare_processing(self):
+        self.client = self.manager.get_client()
+
+    def _process_resource(self, nsg):
+        for key, direction, annotation in (
+                ('ingress', 'Inbound', IngressFilter.matched_annotation_key),
+                ('egress', 'Outbound', EgressFilter.matched_annotation_key)):
+
+            mode = self.data.get(key, 'matched')
+            if mode == 'matched':
+                rules = nsg.get(annotation, ())
+            elif mode == 'all':
+                rules = [r for r in nsg['properties']['securityRules']
+                         if StringUtils.equal(r['properties']['direction'], direction)]
+            else:
+                continue
+
+            for rule in rules:
+                self.client.security_rules.begin_delete(
+                    nsg['resourceGroup'], nsg['name'], rule['name'])
