@@ -1,0 +1,56 @@
+{
+    "status_code": 200,
+    "data": {
+        "ResponseMetadata": {},
+        "otaUpdateInfo": {
+            "otaUpdateId": "c7n-test-ota-unsigned",
+            "otaUpdateArn": "arn:aws:iot:us-east-1:644160558196:otaupdate/c7n-test-ota-unsigned",
+            "creationDate": {
+                "__class__": "datetime",
+                "year": 2026,
+                "month": 9,
+                "day": 10,
+                "hour": 10,
+                "minute": 2,
+                "second": 23,
+                "microsecond": 533000
+            },
+            "lastModifiedDate": {
+                "__class__": "datetime",
+                "year": 2026,
+                "month": 9,
+                "day": 10,
+                "hour": 10,
+                "minute": 2,
+                "second": 24,
+                "microsecond": 696000
+            },
+            "targets": [
+                "arn:aws:iot:us-east-1:644160558196:thing/MyLightBulb"
+            ],
+            "protocols": [
+                "MQTT"
+            ],
+            "awsJobExecutionsRolloutConfig": {},
+            "awsJobPresignedUrlConfig": {},
+            "targetSelection": "SNAPSHOT",
+            "otaUpdateFiles": [
+                {
+                    "fileName": "firmware.bin",
+                    "fileVersion": "1",
+                    "fileLocation": {
+                        "s3Location": {
+                            "bucket": "c7n-test-iot-ota-644160558196",
+                            "key": "firmware.bin"
+                        }
+                    }
+                }
+            ],
+            "otaUpdateStatus": "CREATE_FAILED",
+            "errorInfo": {
+                "code": "AWSIotException",
+                "message": "User: arn:aws:sts::644160558196:assumed-role/c7n-test-iot-ota-role/943de91e2d4f48b89486889171dababe is not authorized to perform: iot:CreateStream on resource: arn:aws:iot:us-east-1:644160558196:stream/AFR_OTA-96b5f25d-3ac0-4764-9799-f5e8657f6334 because no identity-based policy allows the iot:CreateStream action (Service: AWSIot; Status Code: 403; Error Code: AccessDeniedException; Request ID: 711ff242-c010-4193-82ec-a39cb0d98282; Proxy: null)"
+            }
+        }
+    }
+}
