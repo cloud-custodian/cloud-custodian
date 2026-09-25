@@ -694,12 +694,37 @@ class PHDMode(LambdaMode):
 
 @execution.register('cloudtrail')
 class CloudTrailMode(LambdaMode):
-    """A lambda policy using cloudwatch events rules on cloudtrail api logs."""
+    """A lambda policy using cloudwatch events rules on cloudtrail api logs.
+
+    Setting `group: true` provisions the policy into a lambda function
+    shared with other compatible grouped policies subscribing to the
+    same event sources, instead of a function per policy. Policies are
+    compatible when all their function configuration (role, runtime,
+    memory, prefix, tags, etc) matches.
+
+    :example:
+
+    .. code-block:: yaml
+
+      policies:
+        - name: ec2-require-owner
+          resource: aws.ec2
+          mode:
+            type: cloudtrail
+            group: true
+            role: CustodianLambdaRole
+            events:
+              - RunInstances
+    """
 
     schema = utils.type_schema(
         'cloudtrail',
         delay={'type': 'integer',
                'description': 'sleep for delay seconds before processing an event'},
+        group={'type': 'boolean',
+               'description': (
+                   'share a lambda function with compatible policies '
+                   'subscribed to the same event sources')},
         events={'type': 'array', 'items': {
             'oneOf': [
                 {'type': 'string'},
@@ -722,12 +747,32 @@ class CloudTrailMode(LambdaMode):
                 assert e in CloudWatchEvents.trail_events, "event shortcut not defined: %s" % e
             if isinstance(e, dict):
                 jmespath_compile(e['ids'])
+        if self.policy.data['mode'].get('group'):
+            from c7n.mu import get_group_name
+            if len(get_group_name(self.policy)) > 64:
+                raise PolicyValidationError(
+                    "policy:%s function-prefix too long for a lambda group" % (
+                        self.policy.name))
         if isinstance(self.policy.resource_manager, query.ChildResourceManager):
             if not getattr(self.policy.resource_manager.resource_type,
                            'supports_trailevents', False):
                 raise ValueError(
                     "resource:%s does not support cloudtrail mode policies" % (
                         self.policy.resource_type))
+
+    @property
+    def is_grouped(self):
+        return bool(self.policy.data['mode'].get('group'))
+
+    def provision(self):
+        if self.is_grouped:
+            # grouped functions are provisioned for the policy collection,
+            # see c7n.mu.PolicyLambdaGroupManager
+            self.policy.log.warning(
+                "policy:%s lambda groups are only provisioned via custodian run, skipping",
+                self.policy.name)
+            return
+        return super().provision()
 
     def resolve_resources(self, event):
         # override to enable delay before fetching resources
