@@ -29,15 +29,19 @@ PROJECT_NUMBER = "123456789012"
 # report it.
 PROJECT_NUMBER_ENV = "GOOGLE_CLOUD_PROJECT_NUMBER"
 
-# Google-managed service agents embed the project number, e.g.
-# service-<number>@gcp-sa-pubsub.iam.gserviceaccount.com,
-# p<number>-<id>@gcp-sa-cloud-sql.iam.gserviceaccount.com and
-# <number>-compute@developer.gserviceaccount.com. User-managed service
-# accounts live under <project>.iam.gserviceaccount.com and aren't matched.
+# Google-managed service agents embed the project number:
+# - service-<number>@<agent>.iam.gserviceaccount.com, e.g. gcp-sa-pubsub
+#   or gs-project-accounts
+# - p<number>-<id>@gcp-sa-<agent>.iam.gserviceaccount.com, e.g. cloud-sql
+# - <number>[-<id>]@<agent>.gserviceaccount.com, e.g. -compute@developer or
+#   @cloudservices; user-managed account ids can't start with a digit
+# Storage ACLs name them as user-<email> entities.
 SERVICE_AGENT_NUMBER = re.compile(
-    r'(?<![\w.-])(?P<prefix>service-|p)?(?P<number>[0-9]{10,13})'
-    r'(?=(?:-[a-z0-9]+)?@(?:gcp-sa-[a-z0-9-]+\.iam|developer|cloudservices|cloudbuild)'
-    r'\.gserviceaccount\.com)')
+    r'(?:(?<![\w.-])|(?<=\buser-))(?P<prefix>'
+    r'service-(?=[0-9]{10,13}@[a-z0-9-]+\.iam\.gserviceaccount\.com)'
+    r'|p(?=[0-9]{10,13}-[a-z0-9]+@gcp-sa-[a-z0-9-]+\.iam\.gserviceaccount\.com)'
+    r'|(?=[0-9]{10,13}(?:-[a-z0-9]+)?@[a-z0-9.-]+\.gserviceaccount\.com)'
+    r')(?P<number>[0-9]{10,13})')
 
 # e.g. storage's "projectNumber" and terraform's "project_number"
 PROJECT_NUMBER_FIELD = re.compile(r'"(?:projectNumber|project_number)":\s*"?([0-9]+)"?')
@@ -81,9 +85,11 @@ def sanitize_recording(dirty_str):
             r'(?<![\w-]){}(?![\w-])'.format(re.escape(project_id)), PROJECT_ID, sanitized)
     for project_number in get_project_numbers(dirty_str):
         sanitized = re.sub(
-            r'(?<![0-9]){}(?![0-9])'.format(re.escape(project_number)), PROJECT_NUMBER, sanitized)
+            # Not after a ".", so a coincidental fraction (e.g. of a
+            # timestamp's seconds) is left alone.
+            r'(?<![0-9.]){}(?![0-9])'.format(re.escape(project_number)), PROJECT_NUMBER, sanitized)
     sanitized = SERVICE_AGENT_NUMBER.sub(
-        lambda m: (m.group('prefix') or '') + PROJECT_NUMBER, sanitized)
+        lambda m: m.group('prefix') + PROJECT_NUMBER, sanitized)
     return EMAIL_RE.sub(scrub_email, sanitized)
 
 
