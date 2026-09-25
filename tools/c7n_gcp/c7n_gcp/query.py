@@ -1,6 +1,7 @@
 # Copyright The Cloud Custodian Authors.
 # SPDX-License-Identifier: Apache-2.0
 
+import contextlib
 import json
 import itertools
 import logging
@@ -227,9 +228,11 @@ class QueryResourceManager(ResourceManager, metaclass=QueryMeta):
         max_resource_limits = MaxResourceLimit(p, selection_count, population_count)
         return max_resource_limits.check_resource_limits()
 
-    def _fetch_resources(self, query):
+    @contextlib.contextmanager
+    def _ignore_access_errors(self):
+        """Log and ignore errors indicating that a resource API is disabled."""
         try:
-            return self.augment(self.source.get_resources(query) or [])
+            yield
         except HttpError as e:
             error_reason, error_code, error_message = extract_errors(e)
 
@@ -237,15 +240,22 @@ class QueryResourceManager(ResourceManager, metaclass=QueryMeta):
                 raise
             if error_code == 403 and 'disabled' in error_message:
                 log.warning(error_message)
-                return []
+                return
             elif error_reason == 'accessNotConfigured':
                 log.warning(
                     "Resource:%s not available -> Service:%s not enabled on %s",
                     self.type,
                     self.resource_type.service,
                     local_session(self.session_factory).get_default_project())
-                return []
+                return
             raise
+
+    def _fetch_resources(self, query):
+        result = []
+        with self._ignore_access_errors():
+            result = self.augment(self.source.get_resources(query) or [])
+
+        return result
 
     def augment(self, resources):
         return resources

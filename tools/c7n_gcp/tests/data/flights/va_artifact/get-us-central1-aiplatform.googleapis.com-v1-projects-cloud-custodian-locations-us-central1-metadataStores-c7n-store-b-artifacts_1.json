@@ -1,0 +1,31 @@
+{
+  "headers": {
+    "content-type": "application/json; charset=UTF-8",
+    "vary": "Origin, X-Origin, Referer",
+    "date": "Wed, 23 Sep 2026 19:43:53 GMT",
+    "server": "ESF",
+    "x-xss-protection": "0",
+    "x-frame-options": "SAMEORIGIN",
+    "x-content-type-options": "nosniff",
+    "alt-svc": "h3=\":443\"; ma=2592000,h3-29=\":443\"; ma=2592000",
+    "transfer-encoding": "chunked",
+    "status": "200",
+    "content-length": "416",
+    "-content-encoding": "gzip",
+    "content-location": "https://us-central1-aiplatform.googleapis.com/v1/projects/cloud-custodian/locations/us-central1/metadataStores/c7n-store-b/artifacts?alt=json"
+  },
+  "body": {
+    "artifacts": [
+      {
+        "name": "projects/cloud-custodian/locations/us-central1/metadataStores/c7n-store-b/artifacts/artifact",
+        "displayName": "c7n-test-artifact-unlabeled",
+        "etag": "1790192632057",
+        "createTime": "2026-09-23T19:43:52.057Z",
+        "updateTime": "2026-09-23T19:43:52.057Z",
+        "schemaTitle": "system.Artifact",
+        "schemaVersion": "0.0.1",
+        "metadata": {}
+      }
+    ]
+  }
+}
