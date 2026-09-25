@@ -54,6 +54,7 @@ class MachineLearningJob(ChildArmResourceManager):
             return {
                 'resource_group_name': parent_resource['resourceGroup'],
                 'workspace_name': parent_resource['name'],
+                'list_view_type': 'All',
             }
 
 
