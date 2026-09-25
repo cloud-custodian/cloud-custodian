@@ -23,20 +23,24 @@ def test_sanitize_project_number_skips_fractions(monkeypatch):
     assert sanitize_recording(timestamp) == timestamp
 
 
-@pytest.mark.parametrize('email', [
+SERVICE_AGENT_EMAILS = [
     'service-{}@gcp-sa-pubsub.iam.gserviceaccount.com',
     'service-{}@gs-project-accounts.iam.gserviceaccount.com',
     'p{}-abc123@gcp-sa-cloud-sql.iam.gserviceaccount.com',
     '{}-compute@developer.gserviceaccount.com',
     '{}@cloudservices.gserviceaccount.com',
-])
-def test_sanitize_service_agent_number(monkeypatch, email):
+]
+
+
+# Each form is sanitized on its own, since a number learned from one would
+# scrub the others and hide a miss. Storage ACLs name service agents as
+# user-<email> entities.
+@pytest.mark.parametrize('template', ['"{}"', '"user-{}"'], ids=['email', 'acl-entity'])
+@pytest.mark.parametrize('email', SERVICE_AGENT_EMAILS)
+def test_sanitize_service_agent_number(monkeypatch, email, template):
     monkeypatch.setattr(recorder, 'learned_project_numbers', set())
-    # Storage ACLs name service agents as user-<email> entities.
-    dirty = '{"email": "%s", "entity": "user-%s"}' % ((email.format('999888777433'),) * 2)
-    assert sanitize_recording(dirty) == '{"email": "%s", "entity": "user-%s"}' % (
-        (email.format(PROJECT_NUMBER),) * 2)
-    assert recorder.learned_project_numbers == {'999888777433'}
+    dirty = template.format(email.format('999888777433'))
+    assert sanitize_recording(dirty) == template.format(email.format(PROJECT_NUMBER))
 
 
 def test_sanitize_ignores_user_managed_service_account(monkeypatch):
