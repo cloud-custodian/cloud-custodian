@@ -1,0 +1,46 @@
+{
+  "headers": {
+    "content-type": "application/json; charset=UTF-8",
+    "vary": "Origin, X-Origin, Referer",
+    "date": "Fri, 25 Sep 2026 20:56:23 GMT",
+    "server": "ESF",
+    "x-xss-protection": "0",
+    "x-frame-options": "SAMEORIGIN",
+    "x-content-type-options": "nosniff",
+    "alt-svc": "h3=\":443\"; ma=2592000,h3-29=\":443\"; ma=2592000",
+    "transfer-encoding": "chunked",
+    "status": "200",
+    "content-length": "621",
+    "-content-encoding": "gzip",
+    "content-location": "https://monitoring.googleapis.com/v3/projects/cloud-custodian/timeSeries?filter=metric.type+%3D+%22aiplatform.googleapis.com%2Fpublisher%2Fonline_serving%2Ftoken_count%22&interval.startTime=2026-09-24T20%3A56%3A22Z&interval.endTime=2026-09-25T20%3A56%3A22Z&aggregation.alignmentPeriod=86400.0s&aggregation.perSeriesAligner=ALIGN_SUM&aggregation.crossSeriesReducer=REDUCE_SUM&view=FULL&alt=json"
+  },
+  "body": {
+    "timeSeries": [
+      {
+        "metric": {
+          "type": "aiplatform.googleapis.com/publisher/online_serving/token_count"
+        },
+        "resource": {
+          "type": "aiplatform.googleapis.com/PublisherModel",
+          "labels": {
+            "project_id": "cloud-custodian"
+          }
+        },
+        "metricKind": "DELTA",
+        "valueType": "INT64",
+        "points": [
+          {
+            "interval": {
+              "startTime": "2026-09-24T20:56:22Z",
+              "endTime": "2026-09-25T20:56:22Z"
+            },
+            "value": {
+              "int64Value": "31"
+            }
+          }
+        ]
+      }
+    ],
+    "unit": "1"
+  }
+}
