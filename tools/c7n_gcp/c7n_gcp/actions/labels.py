@@ -31,6 +31,9 @@ class BaseLabelAction(MethodAction):
         # Default the permission name to the operation name
         return model.labels_op
 
+    def get_permissions(self):
+        return super().get_permissions() + tuple(self.manager.get_model().labels_permissions)
+
     def get_labels_to_add(self, resource):
         return None
 
@@ -80,8 +83,19 @@ class BaseLabelAction(MethodAction):
         resources = [r for r in resources if self.changes_labels(r)]
         if not model.labels_clear_to_remove:
             return super().process_resource_set(client, model, resources)
+        # Each removal waits on its clear, so one slow or failing resource
+        # mustn't hold back the rest. Report the failure once all are tried.
+        error = None
         for resource in resources:
-            self.process_clear_to_remove(client, model, resource)
+            try:
+                self.process_clear_to_remove(client, model, resource)
+            except (HttpError, TimeoutError) as e:
+                self.log.error(
+                    "policy:%s action:%s failed to relabel %s: %s",
+                    self.manager.ctx.policy.name, self.type, resource.get(model.name), e)
+                error = e
+        if error:
+            raise error
 
     def changes_labels(self, resource):
         current, labels, _ = self.resolve_labels(resource)

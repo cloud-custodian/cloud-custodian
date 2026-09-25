@@ -414,6 +414,9 @@ class TypeInfo(metaclass=TypeMeta):
     # can't be removed in one call. Removal then clears every label and sets
     # the survivors back in a second call.
     labels_clear_to_remove = False
+    # Permissions label actions need beyond the one for labels_op, e.g. to
+    # poll the operation a label change returns.
+    labels_permissions = ()
 
     # required for reporting
     id = None

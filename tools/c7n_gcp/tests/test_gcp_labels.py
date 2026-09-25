@@ -485,6 +485,39 @@ class SetLabelsClearToRemoveTest(BaseTest):
             client.execute_command.call_args[0][1]['body']['labels'],
             {'keep': 'yes', 'remove_a': 'a'})
 
+    def test_failure_does_not_block_other_zones(self):
+        policy = self.load_policy({
+            'name': 'test-label-clear-to-remove',
+            'resource': 'gcp.dns-managed-zone',
+            'actions': [{'type': 'set-labels', 'remove': ['remove_a']}]})
+        manager = policy.resource_manager
+        model = manager.get_model()
+        zones = [
+            dict(LABEL_REMOVAL_RESOURCES['gcp.dns-managed-zone'], name=name,
+                 labels={'keep': 'yes', 'remove_a': 'a'})
+            for name in ('zone-1', 'zone-2')]
+        client = mock.MagicMock()
+        client.execute_query.return_value = {'labels': {'keep': 'yes', 'remove_a': 'a'}}
+        client.execute_command.return_value = {'id': 'op-1', 'status': 'pending'}
+        wait = mock.MagicMock(side_effect=[TimeoutError, None])
+        with mock.patch.object(model, 'wait_for_label_op', wait), \
+                self.assertRaises(TimeoutError):
+            manager.actions[0].process_resource_set(client, model, zones)
+        zone_2_labels = [
+            params['body']['labels']
+            for (_, params), _ in client.execute_command.call_args_list
+            if params['managedZone'] == 'zone-2']
+        self.assertEqual(zone_2_labels, [{'keep': None, 'remove_a': None}, {'keep': 'yes'}])
+
+    def test_permissions_include_operation_poll(self):
+        policy = self.load_policy({
+            'name': 'test-label-perms',
+            'resource': 'gcp.dns-managed-zone',
+            'actions': [{'type': 'set-labels', 'labels': {'env': 'prod'}}]})
+        self.assertEqual(
+            set(policy.resource_manager.actions[0].get_permissions()),
+            {'dns.managedZones.update', 'dns.managedZones.get', 'dns.managedZoneOperations.get'})
+
 
 class DnsManagedZoneLabelOpsTest(BaseTest):
 

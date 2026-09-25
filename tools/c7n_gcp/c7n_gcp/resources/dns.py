@@ -27,6 +27,9 @@ class DnsManagedZone(QueryResourceManager):
         labels_perm = 'update'
         # patch drops null label values rather than deleting the key
         labels_clear_to_remove = True
+        # Removal refreshes the zone, and wait_for_label_op polls the clear's
+        # operation.
+        labels_permissions = ('dns.managedZones.get', 'dns.managedZoneOperations.get')
         default_report_fields = ['id', 'name', 'dnsName', 'creationTime', 'visibility']
         asset_type = "dns.googleapis.com/ManagedZone"
         scc_type = "google.cloud.dns.ManagedZone"
@@ -56,8 +59,13 @@ class DnsManagedZone(QueryResourceManager):
                 'get', {'project': resource['project_id'], 'managedZone': resource['name']})
 
         @staticmethod
-        def wait_for_label_op(session_factory, resource, operation, timeout=60, interval=2):
-            """Wait for a zone update to finish before another is sent."""
+        def wait_for_label_op(session_factory, resource, operation, timeout=20, interval=2):
+            """Wait for a zone update to finish before another is sent.
+
+            Zone label updates normally finish within seconds. The wait is kept
+            short since zones are processed one at a time, and a policy's
+            serverless budget has to cover all of them.
+            """
             if operation.get('status') != 'pending':
                 return operation
             client = local_session(session_factory).client(
