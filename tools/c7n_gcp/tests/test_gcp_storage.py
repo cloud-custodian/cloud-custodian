@@ -204,6 +204,8 @@ class BucketTest(BaseTest):
                 [{'Prefix': 'logs-'}],
                 [{'prefix': 'logs-', 'filter': 'x'}],
                 [{'prefix': 'logs-'}, {'prefix': 'tmp-'}],
+                [{'prefix': 123}],
+                [{'prefix': None}],
                 ['logs-']):
             with self.subTest(query=query):
                 with self.assertRaises(PolicyValidationError):
