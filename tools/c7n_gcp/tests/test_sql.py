@@ -515,18 +515,22 @@ def test_sql_instance_remove_labels(test, sql_instance_remove_labels):
         session_factory=factory)
     assert len(policy.run()) == 3
 
-    # instances.patch returns a long-running operation
-    if test.recording:
-        time.sleep(30)
-
-    client = policy.resource_manager.get_client()
-    labels = {
-        case: client.execute_query(
-            'get', {'project': project_id, 'instance': name})['settings'].get('userLabels', {})
-        for case, name in names.items()
-    }
-    assert labels == {
+    expected = {
         'partial': {'c7n_keep': 'yes'},
         'full': {},
         'absent': {'c7n_keep': 'yes'},
     }
+    client = policy.resource_manager.get_client()
+    # instances.patch returns a long-running operation, so poll until the
+    # labels settle. Replay walks the same recorded gets, without sleeping.
+    for _ in range(30):
+        labels = {
+            case: client.execute_query(
+                'get', {'project': project_id, 'instance': name})['settings'].get('userLabels', {})
+            for case, name in names.items()
+        }
+        if labels == expected:
+            break
+        if test.recording:
+            time.sleep(10)
+    assert labels == expected
