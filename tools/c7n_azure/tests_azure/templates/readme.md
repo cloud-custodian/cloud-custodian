@@ -30,8 +30,9 @@ If you deploy `cognitive-service-deployment`, provisioning creates an OpenAI acc
 
 - `AZURE_OPENAI_ACCOUNT_NAME` (default: `cctestcogdeploy`)
 - `AZURE_OPENAI_LOCATION` (default: `eastus`)
-- `AZURE_OPENAI_MODEL_NAME` (default: `gpt-4o-mini`)
-- `AZURE_OPENAI_MODEL_VERSION` (default: `2024-07-18`)
+- `AZURE_OPENAI_MODEL_NAME` (default: `gpt-5-nano`)
+- `AZURE_OPENAI_MODEL_VERSION` (default: `2025-08-07`)
 - `AZURE_OPENAI_DEPLOYMENT_NAME` (default: `cctest-gpt4o-mini`)
+- `AZURE_OPENAI_SKU_NAME` (default: `GlobalStandard`) — must be a SKU the chosen model/version actually supports; check with `az cognitiveservices account list-models --resource-group <rg> --name <account> -o json` (the `skus` field per model) if changing the model.
 
 If a soft-deleted Cognitive Services account with the target name already exists, provisioning will purge it automatically before redeploying.
