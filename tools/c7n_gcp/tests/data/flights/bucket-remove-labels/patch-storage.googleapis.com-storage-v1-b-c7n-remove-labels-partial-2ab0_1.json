@@ -1,14 +1,14 @@
 {
   "headers": {
     "content-type": "application/json; charset=UTF-8",
-    "x-guploader-uploadid": "AP6rU826ZzjvMLl5L5r_dI5P5HYohpKA74TxPQ5ipP4iGfT0imWAPkkqDB6iM8k4H8a4lC4jmy6w1GQ",
+    "x-guploader-uploadid": "AP6rU80d8y0VYVXG5nGQchE42oUiY7gRG29INfO5Pu16Mz0-ZINJq2v1eVB4q6O1gA-QLKsZzdYxr44",
     "etag": "CAI=",
-    "date": "Wed, 23 Sep 2026 18:40:00 GMT",
+    "date": "Fri, 25 Sep 2026 15:55:54 GMT",
     "vary": "Origin, X-Origin",
     "cache-control": "no-cache, no-store, max-age=0, must-revalidate",
     "expires": "Mon, 01 Jan 1990 00:00:00 GMT",
     "pragma": "no-cache",
-    "x-goog-gcs-base-ts": "1a0cf914ba4",
+    "x-goog-gcs-base-ts": "1a0d947c31d",
     "content-length": "957",
     "server": "UploadServer",
     "alt-svc": "h3=\":443\"; ma=2592000,h3-29=\":443\"; ma=2592000",
@@ -16,32 +16,32 @@
   },
   "body": {
     "kind": "storage#bucket",
-    "selfLink": "https://www.googleapis.com/storage/v1/b/c7n-remove-labels-partial-e0e3",
-    "id": "c7n-remove-labels-partial-e0e3",
-    "name": "c7n-remove-labels-partial-e0e3",
+    "selfLink": "https://www.googleapis.com/storage/v1/b/c7n-remove-labels-partial-2ab0",
+    "id": "c7n-remove-labels-partial-2ab0",
+    "name": "c7n-remove-labels-partial-2ab0",
     "projectNumber": "123456789012",
-    "generation": "1790188798203319574",
+    "generation": "1790351751177561394",
     "metageneration": "2",
     "location": "US",
     "storageClass": "STANDARD",
     "etag": "CAI=",
-    "timeCreated": "2026-09-23T18:39:58.443Z",
-    "updated": "2026-09-23T18:40:00.898Z",
+    "timeCreated": "2026-09-25T15:55:51.434Z",
+    "updated": "2026-09-25T15:55:53.989Z",
     "labels": {
       "c7n_keep": "yes"
     },
     "softDeletePolicy": {
       "retentionDurationSeconds": "604800",
-      "effectiveTime": "2026-09-23T18:39:58.443Z"
+      "effectiveTime": "2026-09-25T15:55:51.434Z"
     },
     "iamConfiguration": {
       "bucketPolicyOnly": {
         "enabled": true,
-        "lockedTime": "2026-12-22T18:39:58.443Z"
+        "lockedTime": "2026-12-24T15:55:51.434Z"
       },
       "uniformBucketLevelAccess": {
         "enabled": true,
-        "lockedTime": "2026-12-22T18:39:58.443Z"
+        "lockedTime": "2026-12-24T15:55:51.434Z"
       },
       "publicAccessPrevention": "inherited"
     },

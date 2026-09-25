@@ -1,9 +1,9 @@
 {
   "headers": {
-    "etag": "yJ7H1rbIImRr+Sv9u/f/RA==",
+    "etag": "4rXf+ltO17eeOYH7MxILZA==",
     "content-type": "application/json; charset=UTF-8",
     "vary": "Origin, X-Origin, Referer",
-    "date": "Wed, 23 Sep 2026 18:40:22 GMT",
+    "date": "Fri, 25 Sep 2026 15:56:06 GMT",
     "server": "ESF",
     "x-xss-protection": "0",
     "x-frame-options": "SAMEORIGIN",
@@ -11,22 +11,18 @@
     "alt-svc": "h3=\":443\"; ma=2592000,h3-29=\":443\"; ma=2592000",
     "transfer-encoding": "chunked",
     "status": "200",
-    "content-length": "907",
+    "content-length": "813",
     "-content-encoding": "gzip",
-    "content-location": "https://bigquery.googleapis.com/bigquery/v2/projects/cloud-custodian/datasets/c7n_remove_labels_partial_2783?alt=json"
+    "content-location": "https://bigquery.googleapis.com/bigquery/v2/projects/cloud-custodian/datasets/c7n_remove_labels_full_1301?alt=json"
   },
   "body": {
     "kind": "bigquery#dataset",
-    "etag": "yJ7H1rbIImRr+Sv9u/f/RA==",
-    "id": "cloud-custodian:c7n_remove_labels_partial_2783",
-    "selfLink": "https://bigquery.googleapis.com/bigquery/v2/projects/cloud-custodian/datasets/c7n_remove_labels_partial_2783",
+    "etag": "4rXf+ltO17eeOYH7MxILZA==",
+    "id": "cloud-custodian:c7n_remove_labels_full_1301",
+    "selfLink": "https://bigquery.googleapis.com/bigquery/v2/projects/cloud-custodian/datasets/c7n_remove_labels_full_1301",
     "datasetReference": {
-      "datasetId": "c7n_remove_labels_partial_2783",
+      "datasetId": "c7n_remove_labels_full_1301",
       "projectId": "cloud-custodian"
-    },
-    "labels": {
-      "c7n_keep": "yes",
-      "c7n_test": "bq_dataset_remove_labels"
     },
     "access": [
       {
@@ -46,8 +42,8 @@
         "specialGroup": "projectReaders"
       }
     ],
-    "creationTime": "1790188818352",
-    "lastModifiedTime": "1790188820911",
+    "creationTime": "1790351761484",
+    "lastModifiedTime": "1790351765409",
     "location": "US",
     "type": "DEFAULT",
     "maxTimeTravelHours": "168"

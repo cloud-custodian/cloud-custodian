@@ -2,7 +2,7 @@
   "headers": {
     "content-type": "application/json; charset=UTF-8",
     "vary": "Origin, X-Origin, Referer",
-    "date": "Wed, 23 Sep 2026 18:53:01 GMT",
+    "date": "Fri, 25 Sep 2026 16:11:13 GMT",
     "server": "ESF",
     "x-xss-protection": "0",
     "x-frame-options": "SAMEORIGIN",
@@ -15,14 +15,14 @@
   },
   "body": {
     "kind": "sql#operation",
-    "targetLink": "https://sqladmin.googleapis.com/sql/v1beta4/projects/cloud-custodian/instances/c7n-remove-labels-full-49f2",
+    "targetLink": "https://sqladmin.googleapis.com/sql/v1beta4/projects/cloud-custodian/instances/c7n-remove-labels-full-8451",
     "status": "PENDING",
     "user": "user@example.com",
-    "insertTime": "2026-09-23T18:53:01.538Z",
+    "insertTime": "2026-09-25T16:11:13.930Z",
     "operationType": "UPDATE",
-    "name": "45cba448-9598-4c52-bb24-aac600000032",
-    "targetId": "c7n-remove-labels-full-49f2",
-    "selfLink": "https://sqladmin.googleapis.com/sql/v1beta4/projects/cloud-custodian/operations/45cba448-9598-4c52-bb24-aac600000032",
+    "name": "1fd90f19-53d3-46e7-b7b6-eaa900000032",
+    "targetId": "c7n-remove-labels-full-8451",
+    "selfLink": "https://sqladmin.googleapis.com/sql/v1beta4/projects/cloud-custodian/operations/1fd90f19-53d3-46e7-b7b6-eaa900000032",
     "targetProject": "cloud-custodian"
   }
 }

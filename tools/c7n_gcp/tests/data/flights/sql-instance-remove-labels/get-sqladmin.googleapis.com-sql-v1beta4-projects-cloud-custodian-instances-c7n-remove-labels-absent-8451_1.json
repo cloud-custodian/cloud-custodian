@@ -2,7 +2,7 @@
   "headers": {
     "content-type": "application/json; charset=UTF-8",
     "vary": "Origin, X-Origin, Referer",
-    "date": "Wed, 23 Sep 2026 18:53:32 GMT",
+    "date": "Fri, 25 Sep 2026 16:11:14 GMT",
     "server": "ESF",
     "x-xss-protection": "0",
     "x-frame-options": "SAMEORIGIN",
@@ -10,9 +10,9 @@
     "alt-svc": "h3=\":443\"; ma=2592000,h3-29=\":443\"; ma=2592000",
     "transfer-encoding": "chunked",
     "status": "200",
-    "content-length": "6832",
+    "content-length": "6829",
     "-content-encoding": "gzip",
-    "content-location": "https://sqladmin.googleapis.com/sql/v1beta4/projects/cloud-custodian/instances/c7n-remove-labels-partial-49f2?alt=json"
+    "content-location": "https://sqladmin.googleapis.com/sql/v1beta4/projects/cloud-custodian/instances/c7n-remove-labels-absent-8451?alt=json"
   },
   "body": {
     "kind": "sql#instance",
@@ -56,7 +56,7 @@
       },
       "edition": "ENTERPRISE",
       "connectorEnforcement": "NOT_REQUIRED",
-      "settingsVersion": "2",
+      "settingsVersion": "1",
       "storageAutoResizeLimit": "0",
       "storageAutoResize": true,
       "dataDiskSizeGb": "10",
@@ -66,30 +66,30 @@
       "enableDataplexIntegration": false,
       "retainBackupsOnDelete": false
     },
-    "etag": "8caa6970debd2cc389daf0954d9009a427d8398f62d51eb3b1d3964d31f1007b",
+    "etag": "74bf7d6631765b0307a69bef7cf6875eb9ec4a7441a094fbfc9fb4af065f56a1",
     "ipAddresses": [
       {
         "type": "PRIMARY",
-        "ipAddress": "136.113.101.32"
+        "ipAddress": "35.225.204.186"
       }
     ],
     "serverCaCert": {
       "kind": "sql#sslCert",
       "certSerialNumber": "0",
-      "cert": "-----BEGIN CERTIFICATE-----\nMIIDcTCCAlmgAwIBAgIBADANBgkqhkiG9w0BAQsFADBwMS0wKwYDVQQuEyRkNzI1\nODgwYS1iNDExLTRkOTQtYjcwNS1jZjJjZDkxYjM0MDYxHDAaBgNVBAMTE0Nsb3Vk\nIFNRTCBTZXJ2ZXIgQ0ExFDASBgNVBAoTC0dvb2dsZSwgSW5jMQswCQYDVQQGEwJV\nUzAeFw0yNjA5MjMxODQwNDBaFw0zNjA5MjAxODQxNDBaMHAxLTArBgNVBC4TJGQ3\nMjU4ODBhLWI0MTEtNGQ5NC1iNzA1LWNmMmNkOTFiMzQwNjEcMBoGA1UEAxMTQ2xv\ndWQgU1FMIFNlcnZlciBDQTEUMBIGA1UEChMLR29vZ2xlLCBJbmMxCzAJBgNVBAYT\nAlVTMIIBIjANBgkqhkiG9w0BAQEFAAOCAQ8AMIIBCgKCAQEA3vIx0fY5/73XtMc/\nB30/GB36RA9pBwXj33kkpU8+QNfX3QTw8MFQcLAeOkz/TRyl0g2MMg9VutmfK0Od\nie/79lXYaLD1kWfnt5vZBLy81ZoNALPnT38PtX7LSn7gW4pFpjV/uceS9h1KCltS\nRtYJSLCEVuMn2Cx407eVNJ9nDdRCNLzmBQyYHDwuyj+BvFWltlA7kn/6+Y9PCBL2\nPVejPBkiL4s3mlVBSUjgmDtYKCcgyuWgOC22SU7mbRGNXD3c9PYritVT0Rmt9Pel\nCvqGlLxkiWt/kogQ4Z9HAwkKdXHP03K5jbXnby51A+gGMzYz4w2SUJDQvNMyzhyR\nP6DKYwIDAQABoxYwFDASBgNVHRMBAf8ECDAGAQH/AgEAMA0GCSqGSIb3DQEBCwUA\nA4IBAQCD0R5fbnEfHcMIRrh6k8gviz/OuX7GzDr8we9Nr1sxdR2QyPvq/3BQEAwM\nf/cjGmE682X8sJqXNud+/Es74NX58HiFiRKAQFzV0esJ45uHbw0q/ZWB5wj47s+B\nU7XjlL0H8MRpiosg6zvT2MHwFjoLIQJ4icpUz0Ul+y1MF1tv4JLRKX92VCGRpnij\n4AJ7vHSXqyu/p8ZcJR8m7b2Al1fN6w4IhjYmGu9JQKdOt5cq2i+ffDkTueL7bAMl\n7LIxIToDRNUTbpF6Z5WhAfHw33Q6XRGXmJS882W5REvn422Lt6z+RTZcIfVAIVlM\nZxW79pcRHdyyt0emPcorElbvYbTn\n-----END CERTIFICATE-----",
-      "commonName": "C=US,O=Google\\, Inc,CN=Cloud SQL Server CA,dnQualifier=d725880a-b411-4d94-b705-cf2cd91b3406",
-      "sha1Fingerprint": "0b5db2e260debc5542e76a757eb75820dafd04b0",
-      "instance": "c7n-remove-labels-partial-49f2",
-      "createTime": "2026-09-23T18:40:40.457Z",
-      "expirationTime": "2036-09-20T18:41:40.457Z"
+      "cert": "-----BEGIN CERTIFICATE-----\nMIIDcTCCAlmgAwIBAgIBADANBgkqhkiG9w0BAQsFADBwMS0wKwYDVQQuEyQzMzAy\nY2M2Mi0xY2EyLTRhMmYtYWFmYS0xYzM1MTM1ZDJiZTMxHDAaBgNVBAMTE0Nsb3Vk\nIFNRTCBTZXJ2ZXIgQ0ExFDASBgNVBAoTC0dvb2dsZSwgSW5jMQswCQYDVQQGEwJV\nUzAeFw0yNjA5MjUxNTU2MDVaFw0zNjA5MjIxNTU3MDVaMHAxLTArBgNVBC4TJDMz\nMDJjYzYyLTFjYTItNGEyZi1hYWZhLTFjMzUxMzVkMmJlMzEcMBoGA1UEAxMTQ2xv\ndWQgU1FMIFNlcnZlciBDQTEUMBIGA1UEChMLR29vZ2xlLCBJbmMxCzAJBgNVBAYT\nAlVTMIIBIjANBgkqhkiG9w0BAQEFAAOCAQ8AMIIBCgKCAQEAzsP7uNLLnhL31Rsv\nnH9iTKNV73djJMuIjbkztM/uviD1BiO3bAUtSysVdGDosYrDD9g5g2252fb9ftm6\nHky/7l31gI4EdN6rIBqtWa6ZENWRzXUBtqeWXgPRhOCqvzyXIzpfPvkFBs3IdFc7\nRkINV50brYIkQQnXVxMJZctqcD5JNnq5dj6k0je9WTsQjRyI4aAWCsUZcgqagm3I\nzSLKKJ7KrAXszV2Zbf0R1e4jPCdHjbRJH5ai6duNJd05K98xhQekNZiSupdUtadZ\n02CiFfnerGFGlqiPv6BsahzzhXdw1zvterY2Z/rjfWflIUGZV+Dz1KkfvghvvlGF\nHCuTuwIDAQABoxYwFDASBgNVHRMBAf8ECDAGAQH/AgEAMA0GCSqGSIb3DQEBCwUA\nA4IBAQCNE9v/fp9DPhj8dwFX2FGXBpiyXe8npP+DwQSxwzb2Au7IyN54K7SoBc3b\n3iI4FQwVM1LAun4es1nOCjr174yexi8/jsfQmU1T3Tqxod4zPMMMYD+70Drlo7l3\nX4h8Z6MDI6K/Pr7OXjQI6eMk9I2BfmbLInE/44qdYJOvH9UqKB8nCWWFr04Ktpp2\nEipkOcA28bL2uebbB82tm/k1DPSvP8YmdIrXmHHdaHo3ges5zk5DQszdVCa/wpVP\nv32XwOgiEryW6zFBodK3yNBg4DnlbrdZUNd66Kd+4LVggzt7v4RltpdDlQJMM839\nal5hmu3j5wtZx9WY5q4OPvoob1aE\n-----END CERTIFICATE-----",
+      "commonName": "C=US,O=Google\\, Inc,CN=Cloud SQL Server CA,dnQualifier=3302cc62-1ca2-4a2f-aafa-1c35135d2be3",
+      "sha1Fingerprint": "9ea6cf5b36f41db91c3821406e1792bb9111cda5",
+      "instance": "c7n-remove-labels-absent-8451",
+      "createTime": "2026-09-25T15:56:05.813Z",
+      "expirationTime": "2036-09-22T15:57:05.813Z"
     },
     "instanceType": "CLOUD_SQL_INSTANCE",
     "project": "cloud-custodian",
-    "serviceAccountEmailAddress": "p123456789012-ritj8y@gcp-sa-cloud-sql.iam.gserviceaccount.com",
+    "serviceAccountEmailAddress": "p123456789012-11qk30@gcp-sa-cloud-sql.iam.gserviceaccount.com",
     "backendType": "SECOND_GEN",
-    "selfLink": "https://sqladmin.googleapis.com/sql/v1beta4/projects/cloud-custodian/instances/c7n-remove-labels-partial-49f2",
-    "connectionName": "cloud-custodian:us-central1:c7n-remove-labels-partial-49f2",
-    "name": "c7n-remove-labels-partial-49f2",
+    "selfLink": "https://sqladmin.googleapis.com/sql/v1beta4/projects/cloud-custodian/instances/c7n-remove-labels-absent-8451",
+    "connectionName": "cloud-custodian:us-central1:c7n-remove-labels-absent-8451",
+    "name": "c7n-remove-labels-absent-8451",
     "region": "us-central1",
     "gceZone": "us-central1-a",
     "databaseInstalledVersion": "MYSQL_8_0_45",
@@ -207,9 +207,9 @@
       "indexAdvisorEnabled": false,
       "flagRecommenderEnabled": true
     },
-    "createTime": "2026-09-23T18:40:47.136Z",
+    "createTime": "2026-09-25T15:56:25.991Z",
     "sqlNetworkArchitecture": "NEW_NETWORK_ARCHITECTURE",
-    "satisfiesPzi": true,
+    "satisfiesPzi": false,
     "includeReplicasForMajorVersionUpgrade": false
   }
 }

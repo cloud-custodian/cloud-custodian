@@ -1,9 +1,9 @@
 {
   "headers": {
-    "etag": "jkt2pjJ8qGXMWbtJ6UOl8w==",
+    "etag": "n9pdQi3EdXxqgD61vMxVSA==",
     "content-type": "application/json; charset=UTF-8",
     "vary": "Origin, X-Origin, Referer",
-    "date": "Wed, 23 Sep 2026 18:40:33 GMT",
+    "date": "Fri, 25 Sep 2026 15:56:16 GMT",
     "server": "ESF",
     "x-xss-protection": "0",
     "x-frame-options": "SAMEORIGIN",
@@ -11,21 +11,23 @@
     "alt-svc": "h3=\":443\"; ma=2592000,h3-29=\":443\"; ma=2592000",
     "transfer-encoding": "chunked",
     "status": "200",
-    "content-length": "848",
+    "content-length": "898",
     "-content-encoding": "gzip",
-    "content-location": "https://bigquery.googleapis.com/bigquery/v2/projects/cloud-custodian/datasets/c7n_remove_labels_tables_d461/tables/partial?alt=json"
+    "content-location": "https://bigquery.googleapis.com/bigquery/v2/projects/cloud-custodian/datasets/c7n_remove_labels_tables_13eb/tables/partial?alt=json"
   },
   "body": {
     "kind": "bigquery#table",
-    "etag": "jkt2pjJ8qGXMWbtJ6UOl8w==",
-    "id": "cloud-custodian:c7n_remove_labels_tables_d461.partial",
-    "selfLink": "https://bigquery.googleapis.com/bigquery/v2/projects/cloud-custodian/datasets/c7n_remove_labels_tables_d461/tables/partial",
+    "etag": "n9pdQi3EdXxqgD61vMxVSA==",
+    "id": "cloud-custodian:c7n_remove_labels_tables_13eb.partial",
+    "selfLink": "https://bigquery.googleapis.com/bigquery/v2/projects/cloud-custodian/datasets/c7n_remove_labels_tables_13eb/tables/partial",
     "tableReference": {
       "projectId": "cloud-custodian",
-      "datasetId": "c7n_remove_labels_tables_d461",
+      "datasetId": "c7n_remove_labels_tables_13eb",
       "tableId": "partial"
     },
     "labels": {
+      "c7n_remove_a": "a",
+      "c7n_remove_b": "b",
       "c7n_keep": "yes"
     },
     "schema": {
@@ -40,8 +42,8 @@
     "numBytes": "0",
     "numLongTermBytes": "0",
     "numRows": "0",
-    "creationTime": "1790188829182",
-    "lastModifiedTime": "1790188833448",
+    "creationTime": "1790351773891",
+    "lastModifiedTime": "1790351774064",
     "type": "TABLE",
     "location": "US",
     "numTotalLogicalBytes": "0",

@@ -1,9 +1,9 @@
 {
   "headers": {
-    "etag": "dI69jsqum8mR2jC/fLjm7w==",
+    "etag": "oqxWCNf+2uipKo1cqr5LcQ==",
     "content-type": "application/json; charset=UTF-8",
     "vary": "Origin, X-Origin, Referer",
-    "date": "Wed, 23 Sep 2026 18:40:22 GMT",
+    "date": "Fri, 25 Sep 2026 15:56:03 GMT",
     "server": "ESF",
     "x-xss-protection": "0",
     "x-frame-options": "SAMEORIGIN",
@@ -11,18 +11,24 @@
     "alt-svc": "h3=\":443\"; ma=2592000,h3-29=\":443\"; ma=2592000",
     "transfer-encoding": "chunked",
     "status": "200",
-    "content-length": "813",
+    "content-length": "957",
     "-content-encoding": "gzip",
-    "content-location": "https://bigquery.googleapis.com/bigquery/v2/projects/cloud-custodian/datasets/c7n_remove_labels_full_2783?alt=json"
+    "content-location": "https://bigquery.googleapis.com/bigquery/v2/projects/cloud-custodian/datasets/c7n_remove_labels_partial_1301?alt=json"
   },
   "body": {
     "kind": "bigquery#dataset",
-    "etag": "dI69jsqum8mR2jC/fLjm7w==",
-    "id": "cloud-custodian:c7n_remove_labels_full_2783",
-    "selfLink": "https://bigquery.googleapis.com/bigquery/v2/projects/cloud-custodian/datasets/c7n_remove_labels_full_2783",
+    "etag": "oqxWCNf+2uipKo1cqr5LcQ==",
+    "id": "cloud-custodian:c7n_remove_labels_partial_1301",
+    "selfLink": "https://bigquery.googleapis.com/bigquery/v2/projects/cloud-custodian/datasets/c7n_remove_labels_partial_1301",
     "datasetReference": {
-      "datasetId": "c7n_remove_labels_full_2783",
+      "datasetId": "c7n_remove_labels_partial_1301",
       "projectId": "cloud-custodian"
+    },
+    "labels": {
+      "c7n_keep": "yes",
+      "c7n_remove_a": "a",
+      "c7n_remove_b": "b",
+      "c7n_test": "bq_dataset_remove_labels"
     },
     "access": [
       {
@@ -42,8 +48,8 @@
         "specialGroup": "projectReaders"
       }
     ],
-    "creationTime": "1790188818371",
-    "lastModifiedTime": "1790188821917",
+    "creationTime": "1790351761384",
+    "lastModifiedTime": "1790351761384",
     "location": "US",
     "type": "DEFAULT",
     "maxTimeTravelHours": "168"

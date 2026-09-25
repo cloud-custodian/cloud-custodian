@@ -1,9 +1,9 @@
 {
   "headers": {
-    "etag": "wccTW09RsAgx7ahyW47s1Q==",
+    "etag": "tAap1AIIHgy6J+PMd+Bayw==",
     "content-type": "application/json; charset=UTF-8",
     "vary": "Origin, X-Origin, Referer",
-    "date": "Wed, 23 Sep 2026 18:40:31 GMT",
+    "date": "Fri, 25 Sep 2026 15:56:15 GMT",
     "server": "ESF",
     "x-xss-protection": "0",
     "x-frame-options": "SAMEORIGIN",
@@ -13,15 +13,15 @@
     "status": "200",
     "content-length": "879",
     "-content-encoding": "gzip",
-    "content-location": "https://bigquery.googleapis.com/bigquery/v2/projects/cloud-custodian/datasets/c7n_remove_labels_tables_d461?alt=json"
+    "content-location": "https://bigquery.googleapis.com/bigquery/v2/projects/cloud-custodian/datasets/c7n_remove_labels_tables_13eb?alt=json"
   },
   "body": {
     "kind": "bigquery#dataset",
-    "etag": "wccTW09RsAgx7ahyW47s1Q==",
-    "id": "cloud-custodian:c7n_remove_labels_tables_d461",
-    "selfLink": "https://bigquery.googleapis.com/bigquery/v2/projects/cloud-custodian/datasets/c7n_remove_labels_tables_d461",
+    "etag": "tAap1AIIHgy6J+PMd+Bayw==",
+    "id": "cloud-custodian:c7n_remove_labels_tables_13eb",
+    "selfLink": "https://bigquery.googleapis.com/bigquery/v2/projects/cloud-custodian/datasets/c7n_remove_labels_tables_13eb",
     "datasetReference": {
-      "datasetId": "c7n_remove_labels_tables_d461",
+      "datasetId": "c7n_remove_labels_tables_13eb",
       "projectId": "cloud-custodian"
     },
     "labels": {
@@ -45,8 +45,8 @@
         "specialGroup": "projectReaders"
       }
     ],
-    "creationTime": "1790188828460",
-    "lastModifiedTime": "1790188828460",
+    "creationTime": "1790351773270",
+    "lastModifiedTime": "1790351773270",
     "location": "US",
     "type": "DEFAULT",
     "maxTimeTravelHours": "168"

@@ -1,14 +1,14 @@
 {
   "headers": {
     "content-type": "application/json; charset=UTF-8",
-    "x-guploader-uploadid": "AP6rU83vlzUFdgbuJAymG_f2ajcYciDQD6_z-Rn8z6NBbH4kFb55i8xQ3kfBgelpqIFDVgkFy7ureIGAgPd3VQ",
+    "x-guploader-uploadid": "AP6rU81W7brBKYmIwTnK78YwhbVXn4jeAWBiveDNuSWTbv7sNBNzKVm6jQ_d8pV_LIc0istKFrw0YGI",
     "etag": "CAI=",
-    "date": "Wed, 23 Sep 2026 18:40:00 GMT",
+    "date": "Fri, 25 Sep 2026 15:55:53 GMT",
     "vary": "Origin, X-Origin",
     "cache-control": "no-cache, no-store, max-age=0, must-revalidate",
     "expires": "Mon, 01 Jan 1990 00:00:00 GMT",
     "pragma": "no-cache",
-    "x-goog-gcs-base-ts": "1a0cf914a6f",
+    "x-goog-gcs-base-ts": "1a0d947c1ed",
     "content-length": "907",
     "server": "UploadServer",
     "alt-svc": "h3=\":443\"; ma=2592000,h3-29=\":443\"; ma=2592000",
@@ -16,29 +16,29 @@
   },
   "body": {
     "kind": "storage#bucket",
-    "selfLink": "https://www.googleapis.com/storage/v1/b/c7n-remove-labels-full-e0e3",
-    "id": "c7n-remove-labels-full-e0e3",
-    "name": "c7n-remove-labels-full-e0e3",
+    "selfLink": "https://www.googleapis.com/storage/v1/b/c7n-remove-labels-full-2ab0",
+    "id": "c7n-remove-labels-full-2ab0",
+    "name": "c7n-remove-labels-full-2ab0",
     "projectNumber": "123456789012",
-    "generation": "1790188798152601266",
+    "generation": "1790351751264143218",
     "metageneration": "2",
     "location": "US",
     "storageClass": "STANDARD",
     "etag": "CAI=",
-    "timeCreated": "2026-09-23T18:39:58.418Z",
-    "updated": "2026-09-23T18:40:00.591Z",
+    "timeCreated": "2026-09-25T15:55:51.490Z",
+    "updated": "2026-09-25T15:55:53.683Z",
     "softDeletePolicy": {
       "retentionDurationSeconds": "604800",
-      "effectiveTime": "2026-09-23T18:39:58.418Z"
+      "effectiveTime": "2026-09-25T15:55:51.490Z"
     },
     "iamConfiguration": {
       "bucketPolicyOnly": {
         "enabled": true,
-        "lockedTime": "2026-12-22T18:39:58.418Z"
+        "lockedTime": "2026-12-24T15:55:51.490Z"
       },
       "uniformBucketLevelAccess": {
         "enabled": true,
-        "lockedTime": "2026-12-22T18:39:58.418Z"
+        "lockedTime": "2026-12-24T15:55:51.490Z"
       },
       "publicAccessPrevention": "inherited"
     },
