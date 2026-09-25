@@ -23,6 +23,17 @@ def test_sanitize_project_number_skips_fractions(monkeypatch):
     assert sanitize_recording(timestamp) == timestamp
 
 
+@pytest.mark.parametrize('dirty', [
+    '{"projectNumber": "12", "a": 12, "b": "a12b"}',
+    '{"project_number": 999888777433, "a": 999888777433}',
+], ids=['short', 'unquoted'])
+def test_sanitize_ignores_non_project_number_field(monkeypatch, dirty):
+    # Every occurrence of a learned number is scrubbed, so a value that
+    # isn't a real project number mustn't be learned.
+    monkeypatch.setattr(recorder, 'learned_project_numbers', set())
+    assert sanitize_recording(dirty) == dirty
+
+
 SERVICE_AGENT_EMAILS = [
     'service-{}@gcp-sa-pubsub.iam.gserviceaccount.com',
     'service-{}@gs-project-accounts.iam.gserviceaccount.com',

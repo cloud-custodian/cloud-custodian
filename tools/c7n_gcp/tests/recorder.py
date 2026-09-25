@@ -43,8 +43,11 @@ SERVICE_AGENT_NUMBER = re.compile(
     r'|(?=[0-9]{10,13}(?:-[a-z0-9]+)?@[a-z0-9.-]+\.gserviceaccount\.com)'
     r')(?P<number>[0-9]{10,13})')
 
-# e.g. storage's "projectNumber" and terraform's "project_number"
-PROJECT_NUMBER_FIELD = re.compile(r'"(?:projectNumber|project_number)":\s*"?([0-9]+)"?')
+# e.g. storage's "projectNumber" and terraform's "project_number", both
+# reported as strings. Only project-number-sized values, since every
+# occurrence of a learned number is scrubbed.
+PROJECT_NUMBER_FIELD = re.compile(
+    r'"(?:projectNumber|project_number)":\s*"([0-9]{10,13})"')
 
 # Project numbers learned so far, so they're scrubbed from later responses
 # that don't report them.
