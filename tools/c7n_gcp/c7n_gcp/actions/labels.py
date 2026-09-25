@@ -6,6 +6,7 @@ from dateutil import tz as tzutil
 
 from googleapiclient.errors import HttpError
 
+from c7n.exceptions import PolicyExecutionError
 from c7n.utils import type_schema
 from c7n.filters import FilterValidationError
 from c7n.filters.offhours import Time
@@ -60,9 +61,13 @@ class BaseLabelAction(MethodAction):
         return super().get_client(session, model)
 
     def get_resource_params(self, model, resource):
-        _, labels, removed = self.resolve_labels(resource)
-        if removed and model.labels_merge_patch:
-            labels = dict(labels, **{k: None for k in removed})
+        _, labels, _ = self.resolve_labels(resource)
+        if model.labels_merge_patch:
+            # Null every label being removed, not just those the resource was
+            # listed with, so one added since listing is removed too. Nulling
+            # an absent label changes nothing.
+            remove = self.get_labels_to_delete(resource) or ()
+            labels = dict(labels, **{k: None for k in remove})
         return model.get_label_params(resource, labels)
 
     def resolve_labels(self, resource):
@@ -85,7 +90,7 @@ class BaseLabelAction(MethodAction):
             return super().process_resource_set(client, model, resources)
         # Each removal waits on its clear, so one slow or failing resource
         # mustn't hold back the rest. Report the failure once all are tried.
-        error = None
+        errors = {}
         for resource in resources:
             try:
                 self.process_clear_to_remove(client, model, resource)
@@ -93,9 +98,14 @@ class BaseLabelAction(MethodAction):
                 self.log.error(
                     "policy:%s action:%s failed to relabel %s: %s",
                     self.manager.ctx.policy.name, self.type, resource.get(model.name), e)
-                error = e
-        if error:
-            raise error
+                errors[resource.get(model.name)] = e
+        if len(errors) == 1:
+            raise next(iter(errors.values()))
+        if errors:
+            raise PolicyExecutionError(
+                "policy:%s action:%s failed to relabel %d resources: %s" % (
+                    self.manager.ctx.policy.name, self.type, len(errors),
+                    ", ".join(map(str, errors)))) from list(errors.values())[-1]
 
     def changes_labels(self, resource):
         current, labels, _ = self.resolve_labels(resource)

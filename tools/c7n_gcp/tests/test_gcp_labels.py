@@ -6,6 +6,7 @@ from gcp_common import BaseTest
 from googleapiclient.errors import HttpError
 from httplib2 import Response
 
+from c7n.exceptions import PolicyExecutionError
 from c7n.filters import FilterValidationError
 from c7n.resources import load_resources
 from c7n_gcp.provider import resources
@@ -250,14 +251,18 @@ class SetLabelsRemoveTest(BaseTest):
                     {'remove_a': 'a'})
                 self.assertEqual(label_body(resource_type, params), {'remove_a': None})
 
-    def test_merge_patch_remove_absent_label_is_noop(self):
+    def test_merge_patch_nulls_remove_label_absent_when_listed(self):
+        # The label may have been added since listing, and nulling one that
+        # is still absent changes nothing.
         for resource_type in MERGE_PATCH_TYPES:
             with self.subTest(resource_type=resource_type):
                 params = self.get_params(
                     resource_type,
-                    {'type': 'set-labels', 'remove': ['missing']},
+                    {'type': 'set-labels', 'labels': {'added': 'new'}, 'remove': ['missing']},
                     {'keep': 'yes'})
-                self.assertEqual(label_body(resource_type, params), {'keep': 'yes'})
+                self.assertEqual(
+                    label_body(resource_type, params),
+                    {'keep': 'yes', 'added': 'new', 'missing': None})
 
     def test_merge_patch_add_and_remove(self):
         for resource_type in MERGE_PATCH_TYPES:
@@ -436,6 +441,23 @@ class SetLabelsClearToRemoveTest(BaseTest):
         self.assertIn(
             "failed to set labels on zone-1, restored {'keep': 'yes', 'remove_a': 'a'}",
             log_output.getvalue())
+
+    def test_failures_across_resources_all_reported(self):
+        policy = self.load_policy({
+            'name': 'test-label-clear-to-remove',
+            'resource': 'gcp.dns-managed-zone',
+            'actions': [{'type': 'set-labels', 'labels': {'added': 'new'}}]})
+        manager = policy.resource_manager
+        zones = [
+            dict(LABEL_REMOVAL_RESOURCES['gcp.dns-managed-zone'], name=name, labels={})
+            for name in ('zone-1', 'zone-2', 'zone-3')]
+        client = mock.MagicMock()
+        error = HttpError(Response({'status': '500'}), b'')
+        client.execute_command.side_effect = [error, {}, error]
+        with self.assertRaisesRegex(
+                PolicyExecutionError, 'failed to relabel 2 resources: zone-1, zone-3'):
+            manager.actions[0].process_resource_set(client, manager.get_model(), zones)
+        self.assertEqual(client.execute_command.call_count, 3)
 
     def test_set_and_restore_failure_logs_labels(self):
         client = mock.MagicMock()
