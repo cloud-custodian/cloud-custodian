@@ -21,6 +21,7 @@ from c7n.testing import (
     C7N_FUNCTIONAL,
 )
 
+from c7n_gcp.actions.core import MethodAction
 from c7n_gcp.client import Session, LOCAL_THREAD, get_default_project
 
 from recorder import (
@@ -40,6 +41,19 @@ log = logging.getLogger('custodian.tests.gcp')
 
 # RFC 5737 TEST-NET-2, reserved for documentation.
 PLACEHOLDER_IP = '198.51.100.1'
+
+
+def capture_api_params(test):
+    """Record the params of every api call the policy's actions make."""
+    captured = []
+    invoke_api = MethodAction.invoke_api
+
+    def record(action, client, op_name, params):
+        captured.append((op_name, params))
+        return invoke_api(action, client, op_name, params)
+
+    test.patch(MethodAction, 'invoke_api', record)
+    return captured
 
 
 def event_data(fname):

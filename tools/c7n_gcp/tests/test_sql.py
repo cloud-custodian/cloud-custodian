@@ -4,7 +4,7 @@
 import time
 
 from c7n.testing import C7N_FUNCTIONAL
-from gcp_common import BaseTest, event_data
+from gcp_common import BaseTest, capture_api_params, event_data
 from googleapiclient.errors import HttpError
 from dateutil import parser
 from freezegun import freeze_time
@@ -513,7 +513,19 @@ def test_sql_instance_remove_labels(test, sql_instance_remove_labels):
                       'value': list(names.values())}],
          'actions': [{'type': 'set-labels', 'remove': ['c7n_remove_a', 'c7n_remove_b']}]},
         session_factory=factory)
+    captured = capture_api_params(test)
     assert len(policy.run()) == 3
+
+    # Replay doesn't match on request bodies, so check the merge patch
+    # nulls the removed labels rather than leaving them out.
+    patched = {
+        params['instance']: params['body']['settings']['userLabels']
+        for op_name, params in captured if op_name == 'patch'
+    }
+    assert patched == {
+        names['partial']: {'c7n_keep': 'yes', 'c7n_remove_a': None, 'c7n_remove_b': None},
+        names['full']: {'c7n_remove_a': None, 'c7n_remove_b': None},
+    }
 
     expected = {
         'partial': {'c7n_keep': 'yes'},
