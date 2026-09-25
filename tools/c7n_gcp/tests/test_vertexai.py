@@ -488,6 +488,108 @@ def test_vertexai_evaluation_run_filtering(test):
     assert not any(r['state'] == 'SUCCEEDED' for r in resources)
 
 
+def test_vertexai_evaluation_run_augment_completion_time(test):
+    """GET augment fires only when completionTime appears in filters."""
+    test.session_factory = test.replay_flight_data('vertexai-evaluation-run-filtering')
+
+    policy = test.load_policy(
+        {'name': 'vertexai-evaluation-runs-completion-time',
+         'resource': 'gcp.vertex-ai-evaluation-run',
+         'query': [{'location': 'us-central1'}],
+         'filters': [
+             {'type': 'value',
+              'key': 'completionTime',
+              'value_type': 'age',
+              'op': 'greater-than',
+              'value': 0}
+         ]},
+        session_factory=test.session_factory)
+
+    resources = policy.run()
+
+    assert len(resources) >= 1
+    assert all(r.get('completionTime') for r in resources), (
+        'Expected completionTime to be populated via GET augment')
+
+
+def test_vertexai_evaluation_run_no_augment_without_completion_time_filter(test):
+    """No GET augment when completionTime is absent from filters."""
+    test.session_factory = test.replay_flight_data('vertexai-evaluation-run-filtering')
+
+    policy = test.load_policy(
+        {'name': 'vertexai-evaluation-runs-no-augment',
+         'resource': 'gcp.vertex-ai-evaluation-run',
+         'query': [{'location': 'us-central1'}],
+         'filters': [
+             {'type': 'value', 'key': 'state', 'value': 'FAILED'}
+         ]},
+        session_factory=test.session_factory)
+
+    mgr = policy.resource_manager
+    assert not mgr._needs_completion_time()
+
+
+def test_vertexai_evaluation_run_needs_completion_time_deeply_nested(test):
+    """_needs_completion_time() must find completionTime at any nesting depth.
+
+    The current two-level walk misses or > and > completionTime; this test
+    proves a recursive traversal is required.
+    """
+    policy = test.load_policy(
+        {'name': 'vertexai-evaluation-run-deep-filter',
+         'resource': 'gcp.vertex-ai-evaluation-run',
+         'query': [{'location': 'us-central1'}],
+         'filters': [
+             {'or': [
+                 {'and': [
+                     {'type': 'value',
+                      'key': 'completionTime',
+                      'op': 'greater-than',
+                      'value': 30}
+                 ]}
+             ]}
+         ]})
+    assert policy.resource_manager._needs_completion_time(), (
+        '_needs_completion_time() did not find completionTime nested '
+        'inside or > and')
+
+
+def test_vertexai_evaluation_run_cache_key_differs_by_augment_need(test):
+    """Policies that need completionTime augment must get a distinct cache key.
+
+    Without this, a policy that runs first and caches unaugmented resources
+    will poison the cache for a later policy that requires completionTime.
+    """
+    query = [{'location': 'us-central1'}]
+
+    augment_policy = test.load_policy(
+        {'name': 'vertexai-evaluation-run-cache-augment',
+         'resource': 'gcp.vertex-ai-evaluation-run',
+         'query': query,
+         'filters': [
+             {'type': 'value',
+              'key': 'completionTime',
+              'op': 'greater-than',
+              'value': 0}
+         ]})
+
+    no_augment_policy = test.load_policy(
+        {'name': 'vertexai-evaluation-run-cache-no-augment',
+         'resource': 'gcp.vertex-ai-evaluation-run',
+         'query': query,
+         'filters': [
+             {'type': 'value', 'key': 'state', 'value': 'FAILED'}
+         ]})
+
+    q = {'filter': query}
+    augment_key = augment_policy.resource_manager.get_cache_key(q)
+    no_augment_key = no_augment_policy.resource_manager.get_cache_key(q)
+
+    assert augment_key != no_augment_key, (
+        'Cache key collision: both policies map to the same key, so the '
+        'first run can poison the cache for the second')
+
+
 @terraform('vertexai_dataset', scope='module')
 def test_vertexai_dataset_multi_location(test, vertexai_dataset):
     """Test querying Vertex AI Datasets across multiple locations."""
