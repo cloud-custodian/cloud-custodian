@@ -1,0 +1,93 @@
+{
+    "pytest-terraform": 1,
+    "outputs": {},
+    "resources": {
+        "google_kms_crypto_key": {
+            "c7n_test_key": {
+                "crypto_key_backend": "",
+                "deletion_policy": "DELETE",
+                "destroy_scheduled_duration": "2592000s",
+                "effective_labels": {
+                    "goog-terraform-provisioned": "true"
+                },
+                "id": "projects/cloud-custodian/locations/us-central1/keyRings/c7n-test-keyring-gibbon/cryptoKeys/c7n-test-cryptokey",
+                "import_only": false,
+                "key_ring": "projects/cloud-custodian/locations/us-central1/keyRings/c7n-test-keyring-gibbon",
+                "labels": null,
+                "name": "c7n-test-cryptokey",
+                "primary": [
+                    {
+                        "name": "projects/cloud-custodian/locations/us-central1/keyRings/c7n-test-keyring-gibbon/cryptoKeys/c7n-test-cryptokey/cryptoKeyVersions/1",
+                        "state": "ENABLED"
+                    }
+                ],
+                "purpose": "ENCRYPT_DECRYPT",
+                "rotation_period": "",
+                "skip_initial_version_creation": false,
+                "terraform_labels": {
+                    "goog-terraform-provisioned": "true"
+                },
+                "timeouts": null,
+                "version_template": [
+                    {
+                        "algorithm": "GOOGLE_SYMMETRIC_ENCRYPTION",
+                        "protection_level": "SOFTWARE"
+                    }
+                ]
+            }
+        },
+        "google_kms_crypto_key_iam_member": {
+            "decrypter": {
+                "condition": [],
+                "crypto_key_id": "projects/cloud-custodian/locations/us-central1/keyRings/c7n-test-keyring-gibbon/cryptoKeys/c7n-test-cryptokey",
+                "etag": "BwZcU3Iscag=",
+                "id": "projects/cloud-custodian/locations/us-central1/keyRings/c7n-test-keyring-gibbon/cryptoKeys/c7n-test-cryptokey/roles/cloudkms.cryptoKeyDecrypter/serviceAccount:c7n-kms-gibbon@cloud-custodian.iam.gserviceaccount.com",
+                "member": "serviceAccount:c7n-kms-gibbon@cloud-custodian.iam.gserviceaccount.com",
+                "role": "roles/cloudkms.cryptoKeyDecrypter"
+            },
+            "encrypter": {
+                "condition": [],
+                "crypto_key_id": "projects/cloud-custodian/locations/us-central1/keyRings/c7n-test-keyring-gibbon/cryptoKeys/c7n-test-cryptokey",
+                "etag": "BwZcU3Iscag=",
+                "id": "projects/cloud-custodian/locations/us-central1/keyRings/c7n-test-keyring-gibbon/cryptoKeys/c7n-test-cryptokey/roles/cloudkms.cryptoKeyEncrypter/serviceAccount:c7n-kms-gibbon@cloud-custodian.iam.gserviceaccount.com",
+                "member": "serviceAccount:c7n-kms-gibbon@cloud-custodian.iam.gserviceaccount.com",
+                "role": "roles/cloudkms.cryptoKeyEncrypter"
+            }
+        },
+        "google_kms_key_ring": {
+            "c7n_test": {
+                "id": "projects/cloud-custodian/locations/us-central1/keyRings/c7n-test-keyring-gibbon",
+                "location": "us-central1",
+                "name": "c7n-test-keyring-gibbon",
+                "project": "cloud-custodian",
+                "timeouts": null
+            }
+        },
+        "google_service_account": {
+            "c7n_test": {
+                "account_id": "c7n-kms-gibbon",
+                "create_ignore_already_exists": null,
+                "deletion_policy": "DELETE",
+                "description": "",
+                "disabled": false,
+                "display_name": "",
+                "email": "c7n-kms-gibbon@cloud-custodian.iam.gserviceaccount.com",
+                "id": "projects/cloud-custodian/serviceAccounts/c7n-kms-gibbon@cloud-custodian.iam.gserviceaccount.com",
+                "member": "serviceAccount:c7n-kms-gibbon@cloud-custodian.iam.gserviceaccount.com",
+                "name": "projects/cloud-custodian/serviceAccounts/c7n-kms-gibbon@cloud-custodian.iam.gserviceaccount.com",
+                "project": "cloud-custodian",
+                "timeouts": null,
+                "unique_id": "100000000000000000000"
+            }
+        },
+        "random_pet": {
+            "keyring": {
+                "id": "gibbon",
+                "keepers": null,
+                "length": 1,
+                "prefix": null,
+                "separator": "-"
+            }
+        }
+    }
+}
