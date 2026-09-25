@@ -100,18 +100,36 @@ class BaseLabelAction(MethodAction):
             self.invoke_api(client, model.labels_op, model.get_label_params(resource, labels))
             return
 
-        self.invoke_api(client, model.labels_op, model.get_label_params(
+        cleared = self.invoke_api(client, model.labels_op, model.get_label_params(
             resource, {k: None for k in current}))
         if not labels:
             return
         try:
+            # The set must not race the clear, or it can be wiped by it.
+            if wait := getattr(model, 'wait_for_label_op', None):
+                wait(self.manager.session_factory, resource, cleared)
+            self.invoke_api(client, model.labels_op, model.get_label_params(resource, labels))
+        except (HttpError, TimeoutError):
+            self.restore_labels(client, model, resource, current)
+            raise
+
+    def restore_labels(self, client, model, resource, labels):
+        """Best-effort restore of labels cleared ahead of a set that failed.
+
+        The resource is left unlabelled otherwise, and a re-run can't recover
+        the labels since there are none left to work from.
+        """
+        name = resource.get(model.name)
+        try:
             self.invoke_api(client, model.labels_op, model.get_label_params(resource, labels))
         except HttpError:
             self.log.error(
-                "policy:%s action:%s cleared labels on %s but failed to set %s",
-                self.manager.ctx.policy.name, self.type,
-                resource.get(model.name), labels)
-            raise
+                "policy:%s action:%s cleared labels on %s and failed to restore %s",
+                self.manager.ctx.policy.name, self.type, name, labels)
+        else:
+            self.log.warning(
+                "policy:%s action:%s failed to set labels on %s, restored %s",
+                self.manager.ctx.policy.name, self.type, name, labels)
 
     def handle_resource_error(self, client, model, resource, op_name, params, error):
         if 'fingerprint' not in error.reason or not model.refresh:

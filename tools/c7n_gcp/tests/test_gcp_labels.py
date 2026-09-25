@@ -416,10 +416,31 @@ class SetLabelsClearToRemoveTest(BaseTest):
         self.assertEqual(calls, [('patch', {'keep': 'yes', 'added': 'new'})])
         self.client.execute_query.assert_not_called()
 
-    def test_set_failure_after_clear_logs_labels(self):
+    def test_set_failure_restores_cleared_labels(self):
         client = mock.MagicMock()
         client.execute_command.side_effect = [
-            {}, HttpError(Response({'status': '500'}), b'')]
+            {}, HttpError(Response({'status': '500'}), b''), {}]
+        log_output = self.capture_logging('custodian.actions')
+        with self.assertRaises(HttpError):
+            self.run_action(
+                {'type': 'set-labels', 'remove': ['remove_a']},
+                {'keep': 'yes', 'remove_a': 'a'},
+                client=client)
+        calls = [params['body']['labels']
+                 for (_, params), _ in client.execute_command.call_args_list]
+        self.assertEqual(calls, [
+            {'keep': None, 'remove_a': None},
+            {'keep': 'yes'},
+            {'keep': 'yes', 'remove_a': 'a'},
+        ])
+        self.assertIn(
+            "failed to set labels on zone-1, restored {'keep': 'yes', 'remove_a': 'a'}",
+            log_output.getvalue())
+
+    def test_set_and_restore_failure_logs_labels(self):
+        client = mock.MagicMock()
+        error = HttpError(Response({'status': '500'}), b'')
+        client.execute_command.side_effect = [{}, error, error]
         log_output = self.capture_logging('custodian.actions')
         with self.assertRaises(HttpError):
             self.run_action(
@@ -427,8 +448,89 @@ class SetLabelsClearToRemoveTest(BaseTest):
                 {'keep': 'yes', 'remove_a': 'a'},
                 client=client)
         self.assertIn(
-            "cleared labels on zone-1 but failed to set {'keep': 'yes'}",
+            "cleared labels on zone-1 and failed to restore {'keep': 'yes', 'remove_a': 'a'}",
             log_output.getvalue())
+
+    def test_set_waits_for_clear(self):
+        client = mock.MagicMock()
+        pending = {'id': 'op-1', 'status': 'pending'}
+        client.execute_command.side_effect = [pending, {}]
+        model = self.load_policy(
+            {'name': 'test', 'resource': 'gcp.dns-managed-zone'}).resource_manager.get_model()
+        sent_before_wait = []
+        wait = mock.MagicMock(side_effect=lambda *args: sent_before_wait.append(
+            client.execute_command.call_count))
+        with mock.patch.object(model, 'wait_for_label_op', wait):
+            self.run_action(
+                {'type': 'set-labels', 'remove': ['remove_a']},
+                {'keep': 'yes', 'remove_a': 'a'},
+                client=client)
+        self.assertEqual(wait.call_args[0][2], pending)
+        self.assertEqual(sent_before_wait, [1])
+        self.assertEqual(client.execute_command.call_count, 2)
+
+    def test_wait_timeout_restores_cleared_labels(self):
+        client = mock.MagicMock()
+        client.execute_command.side_effect = [{'id': 'op-1', 'status': 'pending'}, {}]
+        model = self.load_policy(
+            {'name': 'test', 'resource': 'gcp.dns-managed-zone'}).resource_manager.get_model()
+        with mock.patch.object(
+                model, 'wait_for_label_op', mock.MagicMock(side_effect=TimeoutError)), \
+                self.assertRaises(TimeoutError):
+            self.run_action(
+                {'type': 'set-labels', 'remove': ['remove_a']},
+                {'keep': 'yes', 'remove_a': 'a'},
+                client=client)
+        self.assertEqual(
+            client.execute_command.call_args[0][1]['body']['labels'],
+            {'keep': 'yes', 'remove_a': 'a'})
+
+
+class DnsManagedZoneLabelOpsTest(BaseTest):
+
+    def get_model(self):
+        return self.load_policy(
+            {'name': 'test', 'resource': 'gcp.dns-managed-zone'}).resource_manager.get_model()
+
+    def test_get_sets_project_id(self):
+        client = mock.MagicMock()
+        client.execute_query.return_value = {'name': 'zone-1'}
+        zone = self.get_model().get(
+            client, {'project_id': 'cloud-custodian', 'zone_name': 'zone-1'})
+        self.assertEqual(zone['project_id'], 'cloud-custodian')
+
+    def test_wait_for_label_op_polls_pending(self):
+        client = mock.MagicMock()
+        client.execute_query.side_effect = [
+            {'id': 'op-1', 'status': 'pending'}, {'id': 'op-1', 'status': 'done'}]
+        session = mock.MagicMock()
+        session.client.return_value = client
+        with mock.patch('c7n_gcp.resources.dns.local_session', return_value=session), \
+                mock.patch('c7n_gcp.resources.dns.time.sleep'):
+            op = self.get_model().wait_for_label_op(
+                None, LABEL_REMOVAL_RESOURCES['gcp.dns-managed-zone'],
+                {'id': 'op-1', 'status': 'pending'})
+        self.assertEqual(op['status'], 'done')
+        client.execute_query.assert_called_with('get', {
+            'project': 'cloud-custodian', 'managedZone': 'zone-1', 'operation': 'op-1'})
+
+    def test_wait_for_label_op_skips_done(self):
+        with mock.patch('c7n_gcp.resources.dns.local_session') as local_session:
+            self.get_model().wait_for_label_op(
+                None, LABEL_REMOVAL_RESOURCES['gcp.dns-managed-zone'], {'status': 'done'})
+        local_session.assert_not_called()
+
+    def test_wait_for_label_op_times_out(self):
+        client = mock.MagicMock()
+        client.execute_query.return_value = {'id': 'op-1', 'status': 'pending'}
+        session = mock.MagicMock()
+        session.client.return_value = client
+        with mock.patch('c7n_gcp.resources.dns.local_session', return_value=session), \
+                mock.patch('c7n_gcp.resources.dns.time.sleep'), \
+                self.assertRaises(TimeoutError):
+            self.get_model().wait_for_label_op(
+                None, LABEL_REMOVAL_RESOURCES['gcp.dns-managed-zone'],
+                {'id': 'op-1', 'status': 'pending'}, timeout=0)
 
 
 # Update mask spellings used across apis, in query parameters or the body.
