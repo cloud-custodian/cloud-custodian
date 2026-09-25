@@ -41,6 +41,7 @@ class ResourceManager:
     permissions = ()
     get_client = None
     get_schema = None
+    is_deprecated = False
 
     def __init__(self, ctx, data):
         self.ctx = ctx
