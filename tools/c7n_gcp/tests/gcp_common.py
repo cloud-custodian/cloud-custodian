@@ -1,6 +1,7 @@
 # Copyright The Cloud Custodian Authors.
 # SPDX-License-Identifier: Apache-2.0
 
+import copy
 import datetime
 import functools
 import hashlib
@@ -49,7 +50,8 @@ def capture_api_params(test):
     invoke_api = MethodAction.invoke_api
 
     def record(action, client, op_name, params):
-        captured.append((op_name, params))
+        # Snapshot, since a retry can mutate params after the call.
+        captured.append((op_name, copy.deepcopy(params)))
         return invoke_api(action, client, op_name, params)
 
     test.patch(MethodAction, 'invoke_api', record)
