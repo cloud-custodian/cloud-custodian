@@ -34,7 +34,6 @@ class ActionsMarkForOpTest(BaseTest):
 
     @patch('c7n_azure.tags.TagHelper.update_resource_tags')
     def test_mark_for_op(self, update_resource_tags):
-        self.patch(TagDelayedAction, 'type', 'mark-for-op')
         action = self._get_action({'op': 'stop', 'days': self.DAYS})
         resource = tools.get_resource(self.existing_tags)
 
