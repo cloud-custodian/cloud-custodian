@@ -884,8 +884,77 @@ class DeleteBedrockInferenceProfile(BaseAction):
                 continue
 
 
+# Shared by the Bedrock resources whose metrics are attributed by ModelId.
+# Subclasses bind get_dimensions; everything else here is common to them.
+class BedrockTokenMetrics(MetricsFilter):
+
+    TOTAL_TOKEN_COUNT = 'c7n:TotalTokenCount'
+
+    def validate(self):
+        if (self.data['name'] == self.TOTAL_TOKEN_COUNT and
+                self.data.get('statistics', 'Sum') != 'Sum'):
+            raise PolicyValidationError(
+                "metrics filter c7n:TotalTokenCount only supports the Sum statistic")
+        return super().validate()
+
+    def process(self, resources, event=None):
+        if self.data['name'] == self.TOTAL_TOKEN_COUNT:
+            self.data.setdefault('statistics', 'Sum')
+        return super().process(resources, event)
+
+    def get_permissions(self):
+        if self.data.get('name') == self.TOTAL_TOKEN_COUNT:
+            return ('cloudwatch:GetMetricData',)
+        return self.permissions
+
+    def get_metric_data(self, client, params):
+        if self.metric != self.TOTAL_TOKEN_COUNT:
+            return super().get_metric_data(client, params)
+
+        metric_stat = {
+            'Namespace': params['Namespace'],
+            'Dimensions': params['Dimensions'],
+        }
+        queries = []
+        for query_id, metric_name in (
+                ('input', 'InputTokenCount'), ('output', 'OutputTokenCount')):
+            queries.append({
+                'Id': query_id,
+                'MetricStat': {
+                    'Metric': dict(metric_stat, MetricName=metric_name),
+                    'Period': params['Period'],
+                    'Stat': 'Sum',
+                },
+                'ReturnData': False,
+            })
+        queries.append({
+            'Id': 'total',
+            'Expression': 'input + output',
+            'Label': self.TOTAL_TOKEN_COUNT,
+            'ReturnData': True,
+        })
+
+        datapoints = []
+        request = {
+            'MetricDataQueries': queries,
+            'StartTime': params['StartTime'],
+            'EndTime': params['EndTime'],
+        }
+        paginator = client.get_paginator('get_metric_data')
+        for response in paginator.paginate(**request):
+            for result in response.get('MetricDataResults', ()):
+                if result['Id'] != 'total':
+                    continue
+                datapoints.extend({
+                    'Timestamp': timestamp,
+                    self.statistics: value,
+                } for timestamp, value in zip(
+                    result.get('Timestamps', ()), result.get('Values', ())))
+        return datapoints
+
+
 @BedrockApplicationInferenceProfile.filter_registry.register('metrics')
-class InferenceProfileMetrics(MetricsFilter):
+class InferenceProfileMetrics(BedrockTokenMetrics):
     """Filter inference profiles by published or combined token usage.
 
     ``c7n:TotalTokenCount`` is a Custodian-derived metric that sums Bedrock's
@@ -935,72 +1004,73 @@ class InferenceProfileMetrics(MetricsFilter):
                 value: 700000
                 op: greater-than
     """
-    TOTAL_TOKEN_COUNT = 'c7n:TotalTokenCount'
-
-    def validate(self):
-        if (self.data['name'] == self.TOTAL_TOKEN_COUNT and
-                self.data.get('statistics', 'Sum') != 'Sum'):
-            raise PolicyValidationError(
-                "metrics filter c7n:TotalTokenCount only supports the Sum statistic")
-        return super().validate()
-
-    def process(self, resources, event=None):
-        if self.data['name'] == self.TOTAL_TOKEN_COUNT:
-            self.data.setdefault('statistics', 'Sum')
-        return super().process(resources, event)
-
-    def get_permissions(self):
-        if self.data.get('name') == self.TOTAL_TOKEN_COUNT:
-            return ('cloudwatch:GetMetricData',)
-        return self.permissions
 
     def get_dimensions(self, resource):
         return [{'Name': 'ModelId', 'Value': resource['inferenceProfileId']}]
 
-    def get_metric_data(self, client, params):
-        if self.metric != self.TOTAL_TOKEN_COUNT:
-            return super().get_metric_data(client, params)
 
-        metric_stat = {
-            'Namespace': params['Namespace'],
-            'Dimensions': params['Dimensions'],
-        }
-        queries = []
-        for query_id, metric_name in (
-                ('input', 'InputTokenCount'), ('output', 'OutputTokenCount')):
-            queries.append({
-                'Id': query_id,
-                'MetricStat': {
-                    'Metric': dict(metric_stat, MetricName=metric_name),
-                    'Period': params['Period'],
-                    'Stat': 'Sum',
-                },
-                'ReturnData': False,
-            })
-        queries.append({
-            'Id': 'total',
-            'Expression': 'input + output',
-            'Label': self.TOTAL_TOKEN_COUNT,
-            'ReturnData': True,
-        })
+@BedrockCustomModelDeployment.filter_registry.register('metrics')
+class CustomModelDeploymentMetrics(BedrockTokenMetrics):
+    """Filter custom model deployments by published or combined token usage.
 
-        datapoints = []
-        request = {
-            'MetricDataQueries': queries,
-            'StartTime': params['StartTime'],
-            'EndTime': params['EndTime'],
-        }
-        paginator = client.get_paginator('get_metric_data')
-        for response in paginator.paginate(**request):
-            for result in response.get('MetricDataResults', ()):
-                if result['Id'] != 'total':
-                    continue
-                datapoints.extend({
-                    'Timestamp': timestamp,
-                    self.statistics: value,
-                } for timestamp, value in zip(
-                    result.get('Timestamps', ()), result.get('Values', ())))
-        return datapoints
+    Invocations against a custom model deployment are attributed in CloudWatch
+    under the ``AWS/Bedrock`` namespace with the deployment ARN as the
+    ``ModelId`` dimension, so a deployment is measured independently of the
+    model it serves.
+
+    ``c7n:TotalTokenCount`` is a Custodian-derived metric that sums Bedrock's
+    ``InputTokenCount`` and ``OutputTokenCount`` metrics. Its statistic is
+    always ``Sum`` and defaults to that value when omitted.
+
+    :example:
+
+    Match active deployments whose total token consumption for the last
+    completed day exceeds 100,000 tokens:
+
+    .. code-block:: yaml
+
+        policies:
+          - name: bedrock-custom-model-deployment-daily-token-limit
+            resource: aws.bedrock-custom-model-deployment
+            filters:
+              - type: value
+                key: status
+                value: Active
+              - type: metrics
+                name: c7n:TotalTokenCount
+                statistics: Sum
+                days: 1
+                period: 86400
+                period-start: start-of-day
+                value: 100000
+                op: greater-than
+
+    :example:
+
+    Match active deployments that have served no invocations in two weeks:
+
+    .. code-block:: yaml
+
+        policies:
+          - name: bedrock-custom-model-deployment-idle
+            resource: aws.bedrock-custom-model-deployment
+            filters:
+              - type: value
+                key: status
+                value: Active
+              - type: metrics
+                namespace: AWS/Bedrock
+                name: Invocations
+                statistics: Sum
+                days: 14
+                period: 86400
+                value: 0
+                missing-value: 0
+                op: eq
+    """
+
+    def get_dimensions(self, resource):
+        return [{'Name': 'ModelId', 'Value': resource['customModelDeploymentArn']}]
 
 
 @resources.register('bedrock-evaluation-job')
