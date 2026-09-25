@@ -10,6 +10,7 @@ import pytest
 from google.api_core.client_options import ClientOptions
 from googleapiclient.errors import HttpError
 from pytest_terraform import terraform
+from c7n.exceptions import PolicyExecutionError
 from c7n.filters.core import FilterValidationError
 from c7n_gcp.client import get_default_project
 from gcp_common import BaseTest
@@ -793,6 +794,105 @@ def test_vertexai_endpoint_metrics(test, vertexai_endpoint_metrics):
     assert metric_name in resources[0]["c7n.metrics"]
     assert resources[0]["c7n.metrics"][metric_name] is not None
     assert resources[0]["c7n.metrics"][metric_name]["points"]
+
+
+def test_vertexai_endpoint_tuned_model_tokens_metric_unreduced(test):
+    """
+    tuned_model/online_serving/tokens carries a type label, so one endpoint
+    returns an input series and an output series. Absent group-by-fields and a
+    reducer to collapse them, the filter holds two values with no basis for
+    choosing between them, and refuses the query. Running this test in record
+    mode is involved. See the readme in
+    tests/terraform/vertexai_tuned_model_metrics/.
+    """
+    project_id = get_default_project()
+    location = "us-central1"
+    metric_type = "aiplatform.googleapis.com/tuned_model/online_serving/tokens"
+    # Matches the tunedModelDisplayName passed to tuningJobs.create in
+    # run_tuning.py when this fixture was recorded.
+    endpoint_display_name = "c7n-11097-distribution-metric-test"
+
+    session_factory = test.replay_flight_data(
+        "vertexai_endpoint_tuned_model_tokens_metric", project_id=project_id
+    )
+
+    policy = test.load_policy(
+        {
+            "name": "vertexai-endpoint-tuned-model-tokens",
+            "resource": "gcp.vertex-ai-endpoint",
+            "query": [{"location": location}],
+            "filters": [
+                {"type": "value", "key": "displayName", "value": endpoint_display_name},
+                {
+                    "type": "metrics",
+                    "name": metric_type,
+                    "aligner": "ALIGN_SUM",
+                    "days": 1,
+                    "op": "greater-than",
+                    "value": 0,
+                },
+            ],
+        },
+        session_factory=session_factory,
+    )
+
+    with pytest.raises(PolicyExecutionError) as excinfo:
+        policy.run()
+
+    assert "returned multiple timeSeries" in str(excinfo.value)
+
+
+def test_vertexai_endpoint_tuned_model_tokens_metric(test):
+    """
+    Regression test for GCPMetricsFilter failing on DISTRIBUTION-typed
+    metrics (issue #11097). group-by-fields and REDUCE_SUM collapse the
+    metric's input and output series server-side, so the filter receives one
+    series per endpoint and reduces its distribution to a scalar. Running this
+    test in record mode is involved. See the readme in
+    tests/terraform/vertexai_tuned_model_metrics/.
+    """
+    project_id = get_default_project()
+    location = "us-central1"
+    metric_type = "aiplatform.googleapis.com/tuned_model/online_serving/tokens"
+    # Matches the tunedModelDisplayName passed to tuningJobs.create in
+    # run_tuning.py when this fixture was recorded.
+    endpoint_display_name = "c7n-11097-distribution-metric-test"
+
+    session_factory = test.replay_flight_data(
+        "vertexai_endpoint_tuned_model_tokens_metric_reduced", project_id=project_id
+    )
+
+    policy = test.load_policy(
+        {
+            "name": "vertexai-endpoint-tuned-model-tokens",
+            "resource": "gcp.vertex-ai-endpoint",
+            "query": [{"location": location}],
+            "filters": [
+                {"type": "value", "key": "displayName", "value": endpoint_display_name},
+                {
+                    "type": "metrics",
+                    "name": metric_type,
+                    "aligner": "ALIGN_SUM",
+                    "reducer": "REDUCE_SUM",
+                    "group-by-fields": ["resource.labels.endpoint_id"],
+                    "days": 1,
+                    "op": "greater-than",
+                    "value": 0,
+                },
+            ],
+        },
+        session_factory=session_factory,
+    )
+
+    resources = policy.run()
+
+    assert len(resources) == 1
+    metric_name = f"{metric_type}.ALIGN_SUM.REDUCE_SUM"
+    series = resources[0]["c7n.metrics"][metric_name]
+    distribution = series["points"][0]["value"]["distributionValue"]
+    # Matching on greater-than 0 means count * mean cleared the threshold, so
+    # the filter reduced the distribution rather than choking on the dict.
+    assert int(distribution["count"]) * float(distribution["mean"]) > 0
 
 
 def test_vertexai_endpoint_filtering(test,):

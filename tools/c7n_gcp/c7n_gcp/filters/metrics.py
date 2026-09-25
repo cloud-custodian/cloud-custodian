@@ -5,6 +5,7 @@ Monitoring Metrics suppport for resources
 """
 from datetime import datetime, timedelta
 
+from c7n.exceptions import PolicyExecutionError
 from c7n.filters.core import Filter, OPERATORS, FilterValidationError
 from c7n.filters.metrics import METRIC_WINDOW_ALIGNMENT
 from c7n.utils import local_session, type_schema, jmespath_search, snap_to_period_start
@@ -107,6 +108,7 @@ class GCPMetricsFilter(Filter):
           'reducer': {'type': 'string', 'enum': REDUCERS},
           'aligner': {'type': 'string', 'enum': ALIGNERS},
           'value': {'type': 'number'},
+          'value-type': {'type': 'string', 'enum': ['count', 'mean', 'sum']},
           'filter': {'type': 'string'},
           'missing-value': {'type': 'number'},
           'required': ('value', 'name', 'op')})
@@ -140,6 +142,7 @@ class GCPMetricsFilter(Filter):
         self.resource_metric_dict = {}
         self.op = OPERATORS[self.data.get('op', 'less-than')]
         self.value = self.data['value']
+        self.value_type = self.data.get('value-type', 'sum')
         self.filter = self.data.get('filter', '')
         self.c7n_metric_key = "%s.%s.%s" % (self.metric, self.aligner, self.reducer)
 
@@ -213,9 +216,31 @@ class GCPMetricsFilter(Filter):
         return batched_filters
 
     def split_by_resource(self, metric_list):
-        for m in metric_list:
-            resource_name = jmespath_search(self.metric_key, m)
-            self.resource_metric_dict[resource_name] = m
+        # metric_key is a path into a series, such as resource.labels.endpoint_id,
+        # so this reads each series' own id for the resource it describes.
+        for series in metric_list:
+            resource_name = jmespath_search(self.metric_key, series)
+            if resource_name in self.resource_metric_dict:
+                raise PolicyExecutionError(
+                    "metric %s returned multiple timeSeries for %s. Collapse them with "
+                    "'group-by-fields' and a 'reducer', or select one with 'filter'" % (
+                        self.metric, resource_name))
+            self.resource_metric_dict[resource_name] = series
+
+    def get_point_value(self, value):
+        distribution = value.get('distributionValue')
+        if distribution is None:
+            return float(list(value.values())[0])
+        # count is an int64 field, serialized by the API as a string. Proto3
+        # JSON omits both fields when they hold their default, which the API
+        # does for an alignment period with no samples.
+        count = int(distribution.get('count', 0))
+        mean = float(distribution.get('mean', 0.0))
+        if self.value_type == 'count':
+            return count
+        if self.value_type == 'mean':
+            return mean
+        return count * mean
 
     def process_resource(self, resource):
         resource_metric = resource.setdefault('c7n.metrics', {})
@@ -227,7 +252,8 @@ class GCPMetricsFilter(Filter):
         if metric is None:
             metric_value = self.missing_value
         else:
-            metric_value = float(list(metric["points"][0]["value"].values())[0])
+            metric_value = sum(
+                self.get_point_value(p["value"]) for p in metric["points"])
 
         resource_metric[self.c7n_metric_key] = metric
 
