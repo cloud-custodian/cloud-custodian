@@ -29,7 +29,7 @@ jobs:
       - name: Build Wheels
         shell: bash
         run: |
-          make pkg-build-wheel
+          just pkg build-wheel
 
       - name: Build ChangeLog
         shell: bash
@@ -62,7 +62,7 @@ jobs:
           set -euxo pipefail
           uv run python tools/dev/staging-clean.py
           uv run python tools/dev/devpkg.py gen-qa-requires -r . --output wheels-manifest.txt
-          make pkg-publish-wheel PKG_REPO=${{ env.PKG_REPO }}
+          PKG_REPO=${{ env.PKG_REPO }} just pkg publish
 
       - uses: actions/upload-artifact@043fb46d1a93c77aae656e7c1c64a875d1fc6a0a # ratchet:actions/upload-artifact@v4
         with:
@@ -151,4 +151,4 @@ jobs:
 #      - name: Publish
 #        if: startsWith(github.ref, 'refs/tags/')
 #        run: |
-#          make pkg-publish PKG_REPO=pypi
+#          PKG_REPO=pypi just pkg publish

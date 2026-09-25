@@ -10,13 +10,13 @@ Unit tests can be run with:
 
 .. code-block:: bash
 
-   $ make test
+   $ just python test
 
 Linting can be run with:
 
 .. code-block:: bash
 
-  $ make lint
+  $ just python lint
 
 Individual package tests can be targeted with pytest:
 

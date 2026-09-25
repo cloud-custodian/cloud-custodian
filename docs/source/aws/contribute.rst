@@ -10,7 +10,7 @@ Run the following commands in the root directory after cloning Cloud Custodian:
 
 .. code-block:: bash
 
-    make install
+    just install
     source bin/activate
 
 This creates a virtual env in your enlistment and installs all packages as editable.

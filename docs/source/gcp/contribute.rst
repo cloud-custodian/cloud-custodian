@@ -4,11 +4,11 @@ Developer Guide
 =================
 
 The c7n developer install includes c7n_gcp.  A shortcut for creating a virtual env for development is available
-in the makefile:
+using ``just``:
 
 .. code-block:: bash
 
-    make install
+    just install
     source bin/activate
 
 This creates a virtual env in your enlistment and installs all packages as editable.
