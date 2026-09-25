@@ -26,6 +26,7 @@ class SqlInstance(QueryResourceManager):
         labels = True
         labels_op = 'patch'
         labels_perm = 'update'
+        labels_merge_patch = True
         name = id = 'name'
         default_report_fields = [
             "name", "state", "databaseVersion", "settings.tier", "settings.dataDiskSizeGb"]

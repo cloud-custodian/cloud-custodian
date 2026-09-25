@@ -1,13 +1,13 @@
 # Copyright The Cloud Custodian Authors.
 # SPDX-License-Identifier: Apache-2.0
 
+import copy
 import datetime
 import functools
 import hashlib
 import json
 import logging
 import os
-import re
 import shutil
 import time
 import typing
@@ -22,11 +22,14 @@ from c7n.testing import (
     C7N_FUNCTIONAL,
 )
 
+from c7n_gcp.actions.core import MethodAction
 from c7n_gcp.client import Session, LOCAL_THREAD, get_default_project
 
 from recorder import (
+    EMAIL_RE,
     HttpRecorder,
     HttpReplay,
+    PLACEHOLDER_EMAIL,
     PROJECT_ID,
 )
 
@@ -37,10 +40,22 @@ EVENT_DIR = os.path.join(os.path.dirname(__file__), 'data', 'events')
 
 log = logging.getLogger('custodian.tests.gcp')
 
-EMAIL_RE = re.compile(r'[\w.+%-]+@[\w.-]+\.\w+')
-PLACEHOLDER_EMAIL = 'user@example.com'
 # RFC 5737 TEST-NET-2, reserved for documentation.
 PLACEHOLDER_IP = '198.51.100.1'
+
+
+def capture_api_params(test):
+    """Record the params of every api call the policy's actions make."""
+    captured = []
+    invoke_api = MethodAction.invoke_api
+
+    def record(action, client, op_name, params):
+        # Snapshot, since a retry can mutate params after the call.
+        captured.append((op_name, copy.deepcopy(params)))
+        return invoke_api(action, client, op_name, params)
+
+    test.patch(MethodAction, 'invoke_api', record)
+    return captured
 
 
 def event_data(fname):

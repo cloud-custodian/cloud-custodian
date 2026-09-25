@@ -34,6 +34,7 @@ class DataSet(QueryResourceManager):
         labels = True
         labels_op = 'patch'
         labels_perm = 'update'
+        labels_merge_patch = True
 
         @staticmethod
         def get(client, event):
@@ -135,6 +136,7 @@ class BigQueryTable(ChildResourceManager):
         labels = True
         labels_op = 'patch'
         labels_perm = 'update'
+        labels_merge_patch = True
 
         @classmethod
         def _get_urn_id(cls, resource):

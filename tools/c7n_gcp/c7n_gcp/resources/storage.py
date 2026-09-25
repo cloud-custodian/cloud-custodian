@@ -1,5 +1,6 @@
 # Copyright The Cloud Custodian Authors.
 # SPDX-License-Identifier: Apache-2.0
+from c7n.exceptions import PolicyValidationError
 from c7n.utils import type_schema
 from c7n_gcp.actions import MethodAction
 from c7n_gcp.actions.iampolicy import SetIamPolicy
@@ -10,6 +11,20 @@ from c7n_gcp.filters import IamPolicyFilter
 
 @resources.register('bucket')
 class Bucket(QueryResourceManager):
+    """GCP resource: https://cloud.google.com/storage/docs/json_api/v1/buckets
+
+    Listing can be narrowed server-side to buckets whose names start with a prefix.
+
+    :example:
+
+    .. code-block:: yaml
+
+        policies:
+          - name: gcp-logging-buckets
+            resource: gcp.bucket
+            query:
+              - prefix: logs-
+    """
 
     class resource_type(TypeInfo):
         service = 'storage'
@@ -27,6 +42,7 @@ class Bucket(QueryResourceManager):
         labels = True
         labels_op = 'patch'
         labels_perm = 'update'
+        labels_merge_patch = True
 
         @staticmethod
         def get(client, resource_info):
@@ -43,6 +59,24 @@ class Bucket(QueryResourceManager):
         @staticmethod
         def get_label_params(resource, all_labels):
             return {'bucket': resource['name'], 'body': {'labels': all_labels}}
+
+    def validate(self):
+        super().validate()
+        if 'query' not in self.data:
+            return self
+        query = self.data['query']
+        if (not isinstance(query, list) or len(query) != 1
+                or not isinstance(query[0], dict) or set(query[0]) != {'prefix'}
+                or not isinstance(query[0]['prefix'], str)):
+            raise PolicyValidationError(
+                "%s: gcp.bucket query supports a single prefix, e.g. [{prefix: logs-}]"
+                % self.ctx.policy.name)
+        return self
+
+    def get_resource_query(self):
+        # https://cloud.google.com/storage/docs/json_api/v1/buckets/list
+        if 'query' in self.data:
+            return {'prefix': self.data['query'][0]['prefix']}
 
 
 @Bucket.filter_registry.register('iam-policy')

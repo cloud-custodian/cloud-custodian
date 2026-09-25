@@ -4,6 +4,7 @@
 import time
 
 from gcp_common import BaseTest
+from c7n.exceptions import PolicyValidationError
 from pytest_terraform import terraform
 
 
@@ -189,6 +190,28 @@ def test_bucket_set_iam_policy_remove_nonexistent_is_noop(test, bucket_set_iam_p
 
 class BucketTest(BaseTest):
 
+    def test_bucket_query_prefix(self):
+        p = self.load_policy(
+            {'name': 'prefixed-buckets',
+             'resource': 'gcp.bucket',
+             'query': [{'prefix': 'logs-'}]})
+        self.assertEqual(p.resource_manager.get_resource_query(), {'prefix': 'logs-'})
+
+    def test_bucket_query_rejects_unsupported(self):
+        for query in (
+                [],
+                {'prefix': 'logs-'},
+                [{'Prefix': 'logs-'}],
+                [{'prefix': 'logs-', 'filter': 'x'}],
+                [{'prefix': 'logs-'}, {'prefix': 'tmp-'}],
+                [{'prefix': 123}],
+                [{'prefix': None}],
+                ['logs-']):
+            with self.subTest(query=query):
+                with self.assertRaises(PolicyValidationError):
+                    self.load_policy(
+                        {'name': 'bad-bucket-query', 'resource': 'gcp.bucket', 'query': query})
+
     def test_bucket_query(self):
         project_id = self.project_id
         factory = self.replay_flight_data('bucket-query', project_id)
@@ -330,3 +353,34 @@ class BucketTest(BaseTest):
         client = p.resource_manager.get_client()
         result = client.execute_query('get', {'bucket': 'c7n-bucket'})
         self.assertEqual(result['labels']['env'], 'not-the-default')
+
+
+@terraform('bucket_remove_labels')
+def test_bucket_remove_labels(test, bucket_remove_labels):
+    buckets = bucket_remove_labels.resources['google_storage_bucket']
+    names = {case: buckets[case]['name'] for case in ('partial', 'full', 'absent')}
+
+    factory = test.replay_flight_data('bucket-remove-labels')
+    policy = test.load_policy(
+        {'name': 'bucket-remove-labels',
+         'resource': 'gcp.bucket',
+         # Keep unrelated buckets in the project out of the recording.
+         'query': [{'prefix': 'c7n-remove-labels-'}],
+         'filters': [{'type': 'value', 'key': 'name', 'op': 'in',
+                      'value': list(names.values())}],
+         'actions': [{'type': 'set-labels', 'remove': ['c7n_remove_a', 'c7n_remove_b']}]},
+        session_factory=factory)
+
+    resources = policy.run()
+    assert len(resources) == 3
+
+    client = policy.resource_manager.get_client()
+    labels = {
+        case: client.execute_query('get', {'bucket': name}).get('labels', {})
+        for case, name in names.items()
+    }
+    assert labels == {
+        'partial': {'c7n_keep': 'yes'},
+        'full': {},
+        'absent': {'c7n_keep': 'yes'},
+    }

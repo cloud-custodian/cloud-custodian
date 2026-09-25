@@ -1,0 +1,54 @@
+{
+  "headers": {
+    "etag": "+O6Dp6R3vNI0JctbjTbAew==",
+    "content-type": "application/json; charset=UTF-8",
+    "vary": "Origin, X-Origin, Referer",
+    "date": "Fri, 25 Sep 2026 15:56:04 GMT",
+    "server": "ESF",
+    "x-xss-protection": "0",
+    "x-frame-options": "SAMEORIGIN",
+    "x-content-type-options": "nosniff",
+    "alt-svc": "h3=\":443\"; ma=2592000,h3-29=\":443\"; ma=2592000",
+    "transfer-encoding": "chunked",
+    "status": "200",
+    "content-length": "907",
+    "-content-encoding": "gzip"
+  },
+  "body": {
+    "kind": "bigquery#dataset",
+    "etag": "+O6Dp6R3vNI0JctbjTbAew==",
+    "id": "cloud-custodian:c7n_remove_labels_partial_1301",
+    "selfLink": "https://bigquery.googleapis.com/bigquery/v2/projects/cloud-custodian/datasets/c7n_remove_labels_partial_1301",
+    "datasetReference": {
+      "datasetId": "c7n_remove_labels_partial_1301",
+      "projectId": "cloud-custodian"
+    },
+    "labels": {
+      "c7n_keep": "yes",
+      "c7n_test": "bq_dataset_remove_labels"
+    },
+    "access": [
+      {
+        "role": "WRITER",
+        "specialGroup": "projectWriters"
+      },
+      {
+        "role": "OWNER",
+        "specialGroup": "projectOwners"
+      },
+      {
+        "role": "OWNER",
+        "userByEmail": "user@example.com"
+      },
+      {
+        "role": "READER",
+        "specialGroup": "projectReaders"
+      }
+    ],
+    "creationTime": "1790351761384",
+    "lastModifiedTime": "1790351764311",
+    "location": "US",
+    "type": "DEFAULT",
+    "maxTimeTravelHours": "168"
+  }
+}

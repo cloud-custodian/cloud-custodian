@@ -1,0 +1,51 @@
+{
+  "headers": {
+    "content-type": "application/json; charset=UTF-8",
+    "x-guploader-uploadid": "AP6rU82OTtz5rQM6egy-pO4h9GP-92CJ0jFL7HHIgpPfwQJqArBIomjzMDdFKfx9-1b1w54txspqH44",
+    "etag": "CAI=",
+    "date": "Fri, 25 Sep 2026 15:55:54 GMT",
+    "vary": "Origin, X-Origin",
+    "cache-control": "private, max-age=0, must-revalidate, no-transform",
+    "expires": "Fri, 25 Sep 2026 15:55:54 GMT",
+    "x-goog-gcs-base-ts": "1a0d947c35c",
+    "content-length": "957",
+    "server": "UploadServer",
+    "alt-svc": "h3=\":443\"; ma=2592000,h3-29=\":443\"; ma=2592000",
+    "status": "200",
+    "content-location": "https://storage.googleapis.com/storage/v1/b/c7n-remove-labels-partial-2ab0?alt=json"
+  },
+  "body": {
+    "kind": "storage#bucket",
+    "selfLink": "https://www.googleapis.com/storage/v1/b/c7n-remove-labels-partial-2ab0",
+    "id": "c7n-remove-labels-partial-2ab0",
+    "name": "c7n-remove-labels-partial-2ab0",
+    "projectNumber": "123456789012",
+    "generation": "1790351751177561394",
+    "metageneration": "2",
+    "location": "US",
+    "storageClass": "STANDARD",
+    "etag": "CAI=",
+    "timeCreated": "2026-09-25T15:55:51.434Z",
+    "updated": "2026-09-25T15:55:53.989Z",
+    "labels": {
+      "c7n_keep": "yes"
+    },
+    "softDeletePolicy": {
+      "retentionDurationSeconds": "604800",
+      "effectiveTime": "2026-09-25T15:55:51.434Z"
+    },
+    "iamConfiguration": {
+      "bucketPolicyOnly": {
+        "enabled": true,
+        "lockedTime": "2026-12-24T15:55:51.434Z"
+      },
+      "uniformBucketLevelAccess": {
+        "enabled": true,
+        "lockedTime": "2026-12-24T15:55:51.434Z"
+      },
+      "publicAccessPrevention": "inherited"
+    },
+    "locationType": "multi-region",
+    "rpo": "DEFAULT"
+  }
+}

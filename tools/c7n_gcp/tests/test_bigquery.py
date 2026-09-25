@@ -361,3 +361,69 @@ def test_table_recommend_partition_cluster_permissions(test, bigquery):
         'google.bigquery.table.PartitionClusterRecommender' in recommendation['name'],
         True
     )
+
+
+@terraform('bq_dataset_remove_labels')
+def test_dataset_remove_labels(test, bq_dataset_remove_labels):
+    datasets = bq_dataset_remove_labels.resources['google_bigquery_dataset']
+    project_id = datasets['partial']['project']
+
+    factory = test.replay_flight_data('bq-dataset-remove-labels')
+    policy = test.load_policy(
+        {'name': 'bq-dataset-remove-labels',
+         'resource': 'gcp.bq-dataset',
+         'query': [{'filter': 'labels.c7n_test:bq_dataset_remove_labels'}],
+         'actions': [{'type': 'set-labels', 'remove': ['c7n_remove_a', 'c7n_remove_b']}]},
+        session_factory=factory)
+    assert len(policy.run()) == 2
+
+    full_policy = test.load_policy(
+        {'name': 'bq-dataset-remove-labels-full',
+         'resource': 'gcp.bq-dataset',
+         'query': [{'filter': 'labels.c7n_remove_full'}],
+         'actions': [{'type': 'set-labels', 'remove': ['c7n_remove_full']}]},
+        session_factory=factory)
+    assert len(full_policy.run()) == 1
+
+    client = policy.resource_manager.get_client()
+    labels = {
+        case: client.execute_query('get', {
+            'projectId': project_id,
+            'datasetId': datasets[case]['dataset_id']}).get('labels', {})
+        for case in ('partial', 'full', 'absent')
+    }
+    assert labels == {
+        'partial': {'c7n_test': 'bq_dataset_remove_labels', 'c7n_keep': 'yes'},
+        'full': {},
+        'absent': {'c7n_test': 'bq_dataset_remove_labels', 'c7n_keep': 'yes'},
+    }
+
+
+@terraform('bq_table_remove_labels')
+def test_table_remove_labels(test, bq_table_remove_labels):
+    tables = bq_table_remove_labels.resources['google_bigquery_table']
+    project_id = tables['partial']['project']
+
+    factory = test.replay_flight_data('bq-table-remove-labels')
+    policy = test.load_policy(
+        {'name': 'bq-table-remove-labels',
+         'resource': 'gcp.bq-table',
+         # Restrict parent dataset enumeration to this test dataset label.
+         'query': [{'filter': 'labels.c7n_test:bq_table_remove_labels'}],
+         'actions': [{'type': 'set-labels', 'remove': ['c7n_remove_a', 'c7n_remove_b']}]},
+        session_factory=factory)
+    assert len(policy.run()) == 3
+
+    client = policy.resource_manager.get_client()
+    labels = {
+        case: client.execute_query('get', {
+            'projectId': project_id,
+            'datasetId': tables[case]['dataset_id'],
+            'tableId': tables[case]['table_id']}).get('labels', {})
+        for case in ('partial', 'full', 'absent')
+    }
+    assert labels == {
+        'partial': {'c7n_keep': 'yes'},
+        'full': {},
+        'absent': {'c7n_keep': 'yes'},
+    }
