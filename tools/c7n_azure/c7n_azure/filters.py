@@ -17,6 +17,7 @@ from c7n_azure.utils import (IpRangeHelper, Math, ResourceIdParser,
                              StringUtils, ThreadHelper, now, utcnow, is_resource_group)
 from dateutil.parser import parse
 from azure.core.exceptions import HttpResponseError
+from msrestazure.tools import parse_resource_id
 
 from c7n_azure.provider import resources
 from c7n.filters import Filter, FilterValidationError, ValueFilter
@@ -405,6 +406,44 @@ class TagActionFilter(Filter):
 
         return current_date >= (
             action_date - timedelta(days=self.skew, hours=self.skew_hours))
+
+
+class FlowLogsFilter(ValueFilter, metaclass=ABCMeta):
+    """Base filter for resources that reference flow logs via a list of
+    ``properties.flowLogs`` references (e.g. Network Security Groups and
+    Virtual Networks). The Azure API only returns a reference (``id``) to
+    each flow log, so this filter resolves each one to its full properties
+    (including ``retentionPolicy``) before evaluating the subfilter.
+    """
+
+    schema = type_schema('flow-logs', rinherit=ValueFilter.schema)
+
+    annotation_key = 'c7n:flow-logs'
+
+    def _get_flow_logs(self, resource):
+        parsed_ids = [
+            parse_resource_id(log['id'])
+            for log in resource['properties'].get('flowLogs', [])
+        ]
+
+        client = self.manager.get_client()
+
+        return [
+            client.flow_logs.get(
+                parsed_id['resource_group'],
+                parsed_id['name'],
+                parsed_id['resource_name']
+            ).serialize(True).get('properties')
+            for parsed_id in parsed_ids
+        ]
+
+    def __call__(self, resource):
+        if self.annotation_key not in resource['properties']:
+            resource['properties'][self.annotation_key] = {
+                'logs': self._get_flow_logs(resource)
+            }
+
+        return super().__call__(resource['properties'][self.annotation_key])
 
 
 class DiagnosticSettingsFilter(ValueFilter):

@@ -507,6 +507,24 @@ PY
         az cosmosdb update -g $rgName -n cctestcosmosdb$suffix --ip-range-filter $allow_list
     fi
 
+    if [[ "$fileName" == "vnet.json" ]]; then
+        storage_account_id=$(az storage account list --resource-group $rgName --query "[0].id" --output tsv)
+        vnet_id=$(az network vnet show --resource-group $rgName --name c7n-vnet --query id --output tsv)
+        watcher_name=$(az network watcher list --query "[?location=='southcentralus'].name" --output tsv)
+        watcher_rg=$(az network watcher list --query "[?location=='southcentralus'].resourceGroup" --output tsv)
+
+        echo "Creating vnet flow log for c7n-vnet using network watcher ${watcher_name} (${watcher_rg})..."
+        az network watcher flow-log create \
+            --resource-group "$watcher_rg" \
+            --location southcentralus \
+            --name c7n-vnet-flowlog \
+            --vnet "$vnet_id" \
+            --storage-account "$storage_account_id" \
+            --enabled true \
+            --retention 90 \
+            --output None
+    fi
+
     echo "Deployment for ${filenameNoExtension} complete"
 }
 

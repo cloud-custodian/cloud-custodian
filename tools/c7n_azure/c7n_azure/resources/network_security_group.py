@@ -4,12 +4,12 @@
 import uuid
 
 from azure.core.exceptions import AzureError
-from msrestazure.tools import parse_resource_id
 
 from c7n.actions import BaseAction
 from c7n.filters import Filter, FilterValidationError
 from c7n.filters.core import PolicyValidationError, ValueFilter
 from c7n.utils import type_schema
+from c7n_azure.filters import FlowLogsFilter
 from c7n_azure.provider import resources
 from c7n_azure.resources.arm import ArmResourceManager
 from c7n_azure.utils import PortsRangeHelper, StringUtils
@@ -290,7 +290,7 @@ class EgressFilter(NetworkSecurityGroupFilter):
 
 
 @NetworkSecurityGroup.filter_registry.register('flow-logs')
-class FlowLogs(ValueFilter):
+class FlowLogs(FlowLogsFilter):
     """Filter a Network Security Group by its associated flow logs. NOTE: only one flow log
     can be assigned to a Network Security Group, but to maintain parity with the Azure API, a list
     of flow logs is returned to the filter.
@@ -314,33 +314,6 @@ class FlowLogs(ValueFilter):
                   op: lt
                   value: 90
     """
-
-    schema = type_schema('flow-logs', rinherit=ValueFilter.schema)
-
-    def _get_flow_logs(self, resource):
-        parsed_ids = [
-            parse_resource_id(log['id'])
-            for log in resource['properties'].get('flowLogs', [])
-        ]
-
-        client = self.manager.get_client()
-
-        return [
-            client.flow_logs.get(
-                parsed_id['resource_group'],
-                parsed_id['name'],
-                parsed_id['resource_name']
-            ).serialize(True).get('properties')
-            for parsed_id in parsed_ids
-        ]
-
-    def __call__(self, resource):
-        key = 'c7n:flow-logs'
-
-        if key not in resource['properties']:
-            resource['properties'][key] = {'logs': self._get_flow_logs(resource)}
-
-        return super().__call__(resource['properties'][key])
 
 
 class NetworkSecurityGroupPortsAction(BaseAction):
