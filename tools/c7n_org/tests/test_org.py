@@ -6,6 +6,7 @@ import os
 
 import pytest
 import yaml
+from botocore.exceptions import ClientError
 
 from c7n.testing import TestUtils
 from click.testing import CliRunner
@@ -183,6 +184,51 @@ class OrgTest(TestUtils):
         self.assertEqual(
             log_output.getvalue().strip(),
             "Policy resource counts Counter({'compute': 96, 'serverless': 48})")
+
+    def test_run_account_continues_after_access_denied(self):
+        denied_policy = mock.MagicMock(
+            execution_mode='pull', conditions=mock.Mock(env_vars={}))
+        denied_policy.name = 'denied'
+        denied_policy.get_variables.return_value = {}
+        denied_policy.run.side_effect = ClientError(
+            {
+                'Error': {
+                    'Code': 'AccessDenied',
+                    'Message': 'Access denied',
+                }
+            },
+            'GetBucketAcl',
+        )
+
+        succeeding_policy = mock.MagicMock(
+            execution_mode='pull', conditions=mock.Mock(env_vars={}))
+        succeeding_policy.name = 'succeeding'
+        succeeding_policy.get_variables.return_value = {}
+        succeeding_policy.run.return_value = [{}]
+
+        with mock.patch.object(
+                org.PolicyCollection, 'from_data',
+                return_value=[denied_policy, succeeding_policy]), \
+                mock.patch.object(org, 'load_available'):
+            counts, success = org.run_account(
+                {
+                    'name': 'dev',
+                    'account_id': '112233445566',
+                },
+                'us-east-1',
+                {'policies': []},
+                self.get_temp_dir(),
+                0,
+                self.get_temp_dir(),
+                False,
+                False,
+                False,
+            )
+
+        self.assertEqual(counts, {'succeeding': 1})
+        self.assertFalse(success)
+        denied_policy.run.assert_called_once_with()
+        succeeding_policy.run.assert_called_once_with()
 
     def test_filter_policies(self):
         d = {'policies': [

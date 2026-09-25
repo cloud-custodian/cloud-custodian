@@ -1265,7 +1265,7 @@ def run_account(account, region, policies_config, output_path,
                 if e.response['Error']['Code'] == 'AccessDenied':
                     log.warning('Access denied api:%s policy:%s account:%s region:%s',
                                 e.operation_name, p.name, account['name'], region)
-                    return policy_counts, success
+                    continue
                 log.error(
                     "Exception running policy:%s account:%s region:%s error:%s",
                     p.name, account['name'], region, e)
