@@ -1,0 +1,15 @@
+{
+  "headers": {
+    "content-type": "application/json; charset=UTF-8",
+    "status": "200"
+  },
+  "body": {
+    "billingAccounts": [
+      {
+        "name": "billingAccounts/CU570D-1A4CU5-70D1A4",
+        "open": true,
+        "displayName": "Custodian"
+      }
+    ]
+  }
+}

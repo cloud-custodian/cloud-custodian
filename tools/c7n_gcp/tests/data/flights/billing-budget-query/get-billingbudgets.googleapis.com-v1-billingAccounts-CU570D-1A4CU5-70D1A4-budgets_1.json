@@ -1,0 +1,59 @@
+{
+  "headers": {
+    "content-type": "application/json; charset=UTF-8",
+    "status": "200"
+  },
+  "body": {
+    "budgets": [
+      {
+        "name": "billingAccounts/CU570D-1A4CU5-70D1A4/budgets/abc123def456",
+        "displayName": "Monthly GCP Budget",
+        "budgetFilter": {
+          "projects": ["projects/cloud-custodian"],
+          "services": ["services/C7E2-9256-1C43"]
+        },
+        "amount": {
+          "specifiedAmount": {
+            "currencyCode": "USD",
+            "units": "1000"
+          }
+        },
+        "thresholdRules": [
+          {
+            "thresholdPercent": 0.5,
+            "spendBasis": "CURRENT_SPEND"
+          },
+          {
+            "thresholdPercent": 0.9,
+            "spendBasis": "CURRENT_SPEND"
+          }
+        ],
+        "notificationsRule": {
+          "pubsubTopic": "projects/cloud-custodian/topics/budget-alerts",
+          "monitoringNotificationChannels": []
+        },
+        "etag": "abc123"
+      },
+      {
+        "name": "billingAccounts/CU570D-1A4CU5-70D1A4/budgets/xyz789uvw012",
+        "displayName": "Last Period Budget",
+        "budgetFilter": {
+          "projects": ["projects/cloud-custodian"]
+        },
+        "amount": {
+          "lastPeriodAmount": {}
+        },
+        "thresholdRules": [
+          {
+            "thresholdPercent": 1.0,
+            "spendBasis": "CURRENT_SPEND"
+          }
+        ],
+        "notificationsRule": {
+          "monitoringNotificationChannels": []
+        },
+        "etag": "xyz789"
+      }
+    ]
+  }
+}

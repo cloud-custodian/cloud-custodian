@@ -25,6 +25,7 @@ ResourceMap = {
     "gcp.build": "c7n_gcp.resources.build.CloudBuild",
     "gcp.certmanager-certificate": (
         "c7n_gcp.resources.certificatemanager.CertificateManagerCertificate"),
+    "gcp.billing-budget": "c7n_gcp.resources.billingbudgets.BillingBudget",
     "gcp.cloudbilling-account": "c7n_gcp.resources.cloudbilling.CloudBillingAccount",
     "gcp.cloud-run-service": "c7n_gcp.resources.cloudrun.CloudRunService",
     "gcp.cloud-run-job": "c7n_gcp.resources.cloudrun.CloudRunJob",
