@@ -199,6 +199,8 @@ class BucketTest(BaseTest):
 
     def test_bucket_query_rejects_unsupported(self):
         for query in (
+                [],
+                {'prefix': 'logs-'},
                 [{'Prefix': 'logs-'}],
                 [{'prefix': 'logs-', 'filter': 'x'}],
                 [{'prefix': 'logs-'}, {'prefix': 'tmp-'}],

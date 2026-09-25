@@ -62,9 +62,11 @@ class Bucket(QueryResourceManager):
 
     def validate(self):
         super().validate()
-        query = self.data.get('query', [])
-        if len(query) > 1 or any(
-                not isinstance(child, dict) or set(child) != {'prefix'} for child in query):
+        if 'query' not in self.data:
+            return self
+        query = self.data['query']
+        if (not isinstance(query, list) or len(query) != 1
+                or not isinstance(query[0], dict) or set(query[0]) != {'prefix'}):
             raise PolicyValidationError(
                 "%s: gcp.bucket query supports a single prefix, e.g. [{prefix: logs-}]"
                 % self.ctx.policy.name)
