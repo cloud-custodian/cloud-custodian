@@ -98,9 +98,9 @@ class CostFilterTest(BaseTest):
         self.assertEqual(definition.dataset.aggregation['totalCost'].name, 'PreTaxCost')
 
         if not resource_group:
-            self.assertEqual(definition.dataset.filter.dimension.name, 'ResourceType')
-            self.assertEqual(definition.dataset.filter.dimension.operator, 'In')
-            self.assertEqual(definition.dataset.filter.dimension.values,
+            self.assertEqual(definition.dataset.filter.dimensions.name, 'ResourceType')
+            self.assertEqual(definition.dataset.filter.dimensions.operator, 'In')
+            self.assertEqual(definition.dataset.filter.dimensions.values,
                              ['Microsoft.Compute/virtualMachines'])
 
         mock.assert_called_once_with('/subscriptions/' + subscription_id, definition)
