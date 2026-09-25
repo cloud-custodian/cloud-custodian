@@ -1,0 +1,45 @@
+{
+    "pytest-terraform": 1,
+    "outputs": {},
+    "resources": {
+        "google_project": {
+            "project": {
+                "auto_create_network": null,
+                "billing_account": "0189B3-1C2257-05D123",
+                "deletion_policy": "PREVENT",
+                "effective_labels": {
+                    "generative-language": "enabled"
+                },
+                "folder_id": "",
+                "id": "projects/stacklet-test-policies",
+                "labels": {
+                    "generative-language": "enabled"
+                },
+                "name": "stacklet-test-policies",
+                "number": "859150599087",
+                "org_id": "728386023487",
+                "project_id": "stacklet-test-policies",
+                "tags": null,
+                "terraform_labels": {
+                    "generative-language": "enabled"
+                }
+            }
+        },
+        "google_service_account": {
+            "sa": {
+                "account_id": "c7n-audit-config-test",
+                "create_ignore_already_exists": null,
+                "description": "",
+                "disabled": false,
+                "display_name": "C7N Audit Config Test SA",
+                "email": "c7n-audit-config-test@stacklet-test-policies.iam.gserviceaccount.com",
+                "id": "projects/cloud-custodian/serviceAccounts/c7n-audit-config-test@stacklet-test-policies.iam.gserviceaccount.com",
+                "member": "serviceAccount:c7n-audit-config-test@stacklet-test-policies.iam.gserviceaccount.com",
+                "name": "projects/cloud-custodian/serviceAccounts/c7n-audit-config-test@stacklet-test-policies.iam.gserviceaccount.com",
+                "project": "stacklet-test-policies",
+                "timeouts": null,
+                "unique_id": "111983412695634630948"
+            }
+        }
+    }
+}
