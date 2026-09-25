@@ -187,6 +187,150 @@ class TestEc2NetworkLocation(BaseTest):
         self.assertEqual(len(resources), 0)
 
 
+AUGMENT_REGION = 'us-east-1'
+AUGMENT_TAG_COUNT = 3
+CLOUDTRAIL_MODE = {'type': 'cloudtrail', 'events': ['RunInstances']}
+
+
+def _record_tags(test, session_factory, tag_filter):
+    """Capture the DescribeTags response the back-fill will need on replay.
+
+    Live instances return their tags on describe_instances, so augment()
+    short-circuits while recording and never calls describe_tags. Issue the
+    call the code would make, so replay has a response to serve once the
+    recorded tag set is removed. The response is genuine; only the request
+    is ours.
+    """
+    if not test.recording:
+        return
+    utils.local_session(session_factory).client('ec2').describe_tags(
+        Filters=[tag_filter])
+
+
+def _capture_tag_filters(test, session_factory):
+    """Collect the Filters sent on each DescribeTags request.
+
+    Placebo stores only responses and replays them regardless of request, so
+    hooking the request is the only way to assert which filter the back-fill
+    chose. It has to be before-parameter-build rather than before-call:
+    placebo answers before-call itself, and botocore stops at the first
+    handler that returns a response.
+    """
+    sent = []
+    utils.local_session(session_factory).events.register(
+        'before-parameter-build.ec2.DescribeTags',
+        lambda params, **kw: sent.append(params['Filters']))
+    return sent
+
+
+def _augment_policy(test, session_factory, mode=None):
+    data = {'name': 'ec2-tags', 'resource': 'ec2'}
+    if mode is not None:
+        data['mode'] = mode
+    return test.load_policy(
+        data,
+        session_factory=session_factory,
+        config={'region': AUGMENT_REGION},
+    )
+
+
+@terraform('ec2_augment_tags', scope='session')
+def test_tag_augment_short_circuit(test, ec2_augment_tags):
+    """Tags in the describe response mean no describe_tags call.
+
+    The flight data has no DescribeTags response on purpose: placebo raises
+    if one is requested.
+    """
+    session_factory = test.replay_flight_data(
+        'test_ec2_augment_tags_short_circuit', region=AUGMENT_REGION)
+    instance_id = ec2_augment_tags['aws_instance.tagged_a.id']
+
+    policy = _augment_policy(test, session_factory, mode=CLOUDTRAIL_MODE)
+    resources = policy.resource_manager.get_resources([instance_id])
+
+    test.assertEqual(len(resources), 1)
+    test.assertEqual(
+        len(resources[0]['Tags']), AUGMENT_TAG_COUNT,
+        'Proof found of AWOL tags!')
+
+
+@terraform('ec2_augment_tags', scope='session')
+def test_tag_augment_skipped_for_instance_state(test, ec2_augment_tags):
+    """ec2-instance-state mode still skips the back-fill.
+
+    The flight data has no DescribeTags response, so placebo raises if the
+    lookup is attempted. Tags stays absent, as it did before this change.
+    """
+    session_factory = test.replay_flight_data(
+        'test_ec2_augment_tags_instance_state', region=AUGMENT_REGION)
+    instance_id = ec2_augment_tags['aws_instance.tagged_a.id']
+
+    policy = _augment_policy(
+        test, session_factory,
+        mode={'type': 'ec2-instance-state', 'events': ['pending']})
+    resources = policy.resource_manager.get_resources([instance_id])
+
+    test.assertEqual(len(resources), 1)
+    test.assertNotIn('Tags', resources[0])
+
+
+@terraform('ec2_augment_tags', scope='session')
+@pytest.mark.parametrize(
+    'mode',
+    [None, {'type': 'pull'}, CLOUDTRAIL_MODE],
+    ids=['no-mode', 'pull', 'cloudtrail'],
+)
+def test_tag_augment_lookup_by_id(test, ec2_augment_tags, mode):
+    """Up to the ceiling, tags are looked up by instance id.
+
+    Parametrized over the modes that should reach the lookup; cloudtrail is
+    the one this change enables.
+    """
+    session_factory = test.replay_flight_data(
+        'test_ec2_augment_tags_lookup', region=AUGMENT_REGION)
+    instance_id = ec2_augment_tags['aws_instance.tagged_a.id']
+    _record_tags(test, session_factory,
+                 {'Name': 'resource-id', 'Values': [instance_id]})
+    sent = _capture_tag_filters(test, session_factory)
+
+    policy = _augment_policy(test, session_factory, mode=mode)
+    resources = policy.resource_manager.get_resources([instance_id])
+
+    test.assertEqual(len(resources), 1)
+    tags = {t['Key']: t['Value'] for t in resources[0]['Tags']}
+    test.assertEqual(len(tags), AUGMENT_TAG_COUNT)
+    test.assertEqual(tags['Env'], 'Production')
+    test.assertEqual(
+        sent, [[{'Name': 'resource-id', 'Values': [instance_id]}]])
+
+
+@terraform('ec2_augment_tags', scope='session')
+def test_tag_augment_lookup_by_resource_type(test, ec2_augment_tags):
+    """Above the ceiling, fall back to the region-wide resource-type filter.
+
+    The ceiling is patched down rather than provisioning enough instances to
+    cross it.
+    """
+    session_factory = test.replay_flight_data(
+        'test_ec2_augment_tags_lookup_many', region=AUGMENT_REGION)
+    test.patch(ec2, 'EC2_TAG_AUGMENT_BY_INSTANCES_MAX', 1)
+    ids = [ec2_augment_tags['aws_instance.tagged_a.id'],
+           ec2_augment_tags['aws_instance.tagged_b.id']]
+    _record_tags(test, session_factory,
+                 {'Name': 'resource-type', 'Values': ['instance']})
+    sent = _capture_tag_filters(test, session_factory)
+
+    policy = _augment_policy(test, session_factory)
+    resources = policy.resource_manager.get_resources(ids)
+
+    test.assertEqual(sorted(r['InstanceId'] for r in resources), sorted(ids))
+    for r in resources:
+        test.assertEqual(
+            {t['Key']: t['Value'] for t in r['Tags']}['Env'], 'Production')
+    test.assertEqual(
+        sent, [[{'Name': 'resource-type', 'Values': ['instance']}]])
+
+
 class TestTagAugmentation(BaseTest):
 
     def test_tag_augment_empty(self):
