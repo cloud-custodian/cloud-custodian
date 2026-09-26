@@ -111,11 +111,10 @@ class LabelActionFilter(Filter):
                 self.label, v, i['name']))
             return False
 
-        # current_date must match timezones with the parsed date string
-        if action_date.tzinfo:
-            action_date = action_date.astimezone(self.tz)
-            current_date = datetime.now(tz=self.tz)
-        else:
-            current_date = datetime.now()
+        # mark-for-op writes the label as wall time in the policy's tz (utc
+        # by default); strptime never yields tzinfo, so attach it and
+        # compare against now in that same tz, not the host's local time.
+        action_date = action_date.replace(tzinfo=self.tz)
+        current_date = datetime.now(tz=self.tz)
 
         return current_date >= (action_date - timedelta(days=self.skew, hours=self.skew_hours))

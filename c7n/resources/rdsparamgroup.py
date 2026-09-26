@@ -8,7 +8,7 @@ from botocore.exceptions import ClientError
 from c7n.actions import ActionRegistry, BaseAction
 from c7n.filters import FilterRegistry, ValueFilter, Filter
 from c7n.manager import resources
-from c7n.query import QueryResourceManager, TypeInfo
+from c7n.query import QueryResourceManager, TypeInfo, paginate_op
 from c7n.utils import (type_schema, local_session, chunks, jmespath_search)
 from c7n.tags import universal_augment
 from c7n.resources.rds import ParameterFilter
@@ -452,11 +452,12 @@ class PGModify(PGMixin, Modify):
     permissions = ('rds:DescribeDBParameters', 'rds:ModifyDBParameterGroup')
 
     def get_current_params(self, client, name):
-        params = client.describe_db_parameters(DBParameterGroupName=name)
+        params = paginate_op(
+            client, 'describe_db_parameters', 'Parameters', DBParameterGroupName=name)
         return {x['ParameterName']: {
                 'ParameterValue': x.get('ParameterValue'),
                 'ApplyMethod': x['ApplyMethod']}
-                for x in params.get('Parameters', [])}
+                for x in params}
 
     def do_modify(self, client, name, params):
         client.modify_db_parameter_group(DBParameterGroupName=name, Parameters=params)
@@ -487,11 +488,13 @@ class PGClusterModify(PGClusterMixin, Modify):
     permissions = ('rds:DescribeDBClusterParameters', 'rds:ModifyDBClusterParameterGroup')
 
     def get_current_params(self, client, name):
-        params = client.describe_db_cluster_parameters(DBClusterParameterGroupName=name)
+        params = paginate_op(
+            client, 'describe_db_cluster_parameters', 'Parameters',
+            DBClusterParameterGroupName=name)
         return {x['ParameterName']: {
                 'ParameterValue': x.get('ParameterValue'),
                 'ApplyMethod': x['ApplyMethod']}
-                for x in params.get('Parameters', [])}
+                for x in params}
 
     def do_modify(self, client, name, params):
         client.modify_db_cluster_parameter_group(

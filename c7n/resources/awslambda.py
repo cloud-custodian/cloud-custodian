@@ -7,6 +7,7 @@ from botocore.exceptions import ClientError
 from botocore.paginate import Paginator
 from concurrent.futures import as_completed
 from datetime import timedelta, datetime
+from dateutil.tz import tzutc
 
 from c7n.actions import Action, RemovePolicyBase, ModifyVpcSecurityGroupsAction
 from c7n.filters import CrossAccountAccessFilter, ValueFilter, Filter
@@ -586,7 +587,7 @@ class VersionTrim(Action):
         date_threshold = self.data.get('older-than')
         date_threshold = (
             date_threshold and
-            parse_date(datetime.utcnow()) - timedelta(days=date_threshold) or
+            datetime.now(tz=tzutc()) - timedelta(days=date_threshold) or
             None)
         aliased_versions = ()
 

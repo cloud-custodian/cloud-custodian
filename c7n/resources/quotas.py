@@ -9,7 +9,7 @@ import re
 import math
 
 from concurrent.futures import as_completed
-from datetime import timedelta, datetime
+from datetime import timedelta
 from statistics import mean
 from time import sleep
 
@@ -20,7 +20,7 @@ from c7n.filters.metrics import MetricsFilter
 from c7n.filters.related import RelatedResourceFilter
 from c7n.manager import resources
 from c7n.query import QueryResourceManager, TypeInfo, ChildResourceManager
-from c7n.utils import local_session, type_schema, get_retry
+from c7n.utils import local_session, type_schema, get_retry, utcnow_naive
 
 
 @resources.register('service-quota-request')
@@ -237,7 +237,7 @@ class UsageFilter(MetricsFilter):
     def process(self, resources, event):
         client = local_session(self.manager.session_factory).client('cloudwatch')
 
-        end_time = datetime.utcnow()
+        end_time = utcnow_naive()
         start_time = end_time - timedelta(1)
 
         limit = self.data.get('limit', 80)

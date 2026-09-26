@@ -46,9 +46,7 @@ class OCIBaseAction(BaseAction, ABC):
                 self.perform_action(resource)
             except Exception as ex:
                 res = resource.get("id", resource.get("name"))
-                log.exception(
-                    f"Unable to submit action against the instance - {res} Reason: {{ex.message}}"
-                )
+                log.exception(f"Unable to submit action against the instance - {res} Reason: {ex}")
                 self.handle_exception(resource, resources, ex)
         return self.process_result(resources)
 

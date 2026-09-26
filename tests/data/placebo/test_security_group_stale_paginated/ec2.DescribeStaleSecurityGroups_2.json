@@ -1,0 +1,30 @@
+{
+    "status_code": 200,
+    "data": {
+        "StaleSecurityGroupSet": [
+            {
+                "GroupId": "sg-0second",
+                "GroupName": "second",
+                "Description": "second",
+                "VpcId": "vpc-0stale",
+                "StaleIpPermissions": [
+                    {
+                        "FromPort": 443,
+                        "ToPort": 443,
+                        "IpProtocol": "tcp",
+                        "UserIdGroupPairs": [
+                            {
+                                "GroupId": "sg-0gone",
+                                "VpcId": "vpc-0peer",
+                                "VpcPeeringConnectionId": "pcx-0peer",
+                                "PeeringStatus": "active"
+                            }
+                        ]
+                    }
+                ],
+                "StaleIpPermissionsEgress": []
+            }
+        ],
+        "ResponseMetadata": {}
+    }
+}

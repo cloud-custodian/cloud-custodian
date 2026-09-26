@@ -123,7 +123,10 @@ python_files = "test_*.py"
 norecursedirs = ["data", "cassettes", "templates", "terraform"]
 filterwarnings = [
     "ignore::DeprecationWarning",
-    "ignore::PendingDeprecationWarning"
+    "ignore::PendingDeprecationWarning",
+    # our own deprecations are bugs, later entries win so this overrides
+    # the ignore above for c7n.* modules only
+    "error::DeprecationWarning:c7n\\."
 ]
 
 

@@ -3,7 +3,7 @@
 import logging
 import itertools
 from concurrent.futures import as_completed
-from datetime import datetime, timedelta
+from datetime import timedelta
 from itertools import chain
 
 from c7n.actions import BaseAction
@@ -19,7 +19,7 @@ from .aws import shape_validate
 from c7n.exceptions import PolicyValidationError
 from botocore.exceptions import ClientError
 from c7n.utils import (
-    type_schema, local_session, get_retry, snapshot_identifier, chunks)
+    type_schema, local_session, get_retry, snapshot_identifier, chunks, utcnow_naive)
 
 from c7n.resources.rds import ParameterFilter
 from c7n.filters.backup import ConsecutiveAwsBackupsFilter
@@ -776,7 +776,7 @@ class ConsecutiveSnapshots(Filter):
         client = local_session(self.manager.session_factory).client('rds')
         results = []
         retention = self.data.get('days')
-        utcnow = datetime.utcnow()
+        utcnow = utcnow_naive()
         expected_dates = set()
         for days in range(1, retention + 1):
             expected_dates.add((utcnow - timedelta(days=days)).strftime('%Y-%m-%d'))

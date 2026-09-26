@@ -1,9 +1,13 @@
 # Copyright The Cloud Custodian Authors.
 # SPDX-License-Identifier: Apache-2.0
+from datetime import datetime, timezone
+from unittest import mock
+
 from .common import BaseTest
 
 from c7n.exceptions import PolicyValidationError
 from c7n.executor import MainThreadExecutor
+from c7n.resources import elb as elb_module
 from c7n.resources.elb import ELB, SetSslListenerPolicy
 
 
@@ -372,6 +376,44 @@ class SSLPolicyTest(BaseTest):
             },
             session_factory=None,
             validate=False,
+        )
+
+    def test_set_ssl_listener_policy_name_is_utc(self):
+        # the epoch suffix used to come from a naive utcnow(), whose
+        # timestamp() reinterprets it in the host's local zone, so the
+        # value was off by the utc offset.
+        policy = self.load_policy(
+            {
+                "name": "test-ssl-policy-name",
+                "resource": "elb",
+                "actions": [
+                    {
+                        "type": "set-ssl-listener-policy",
+                        "name": "testpolicy",
+                        "attributes": ["Protocol-TLSv1.2"],
+                    }
+                ],
+            },
+            session_factory=None,
+        )
+        action = policy.resource_manager.actions[0]
+        client = mock.MagicMock()
+        stamp = datetime(2017, 5, 2, 22, 18, 28, tzinfo=timezone.utc)
+        with mock.patch.object(elb_module, "datetime") as fake_datetime:
+            fake_datetime.now.return_value = stamp
+            action.process_elb(
+                client,
+                {
+                    "LoadBalancerName": "test-elb",
+                    "ListenerDescriptions": [
+                        {"Listener": {"Protocol": "HTTPS", "LoadBalancerPort": 443}}
+                    ],
+                },
+            )
+        fake_datetime.now.assert_called_once_with(timezone.utc)
+        self.assertEqual(
+            client.create_load_balancer_policy.call_args[1]["PolicyName"],
+            "testpolicy-1493763508000",
         )
 
 

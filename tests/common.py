@@ -120,6 +120,27 @@ class ConfigTest(BaseTest):
         return queue_url
 
 
+def record_api_params(session_factory, service, operation):
+    """Collect the parameters of every call made to service.operation.
+
+    Placebo replays responses without looking at requests, this gives a
+    test a way to assert on what was asked for.
+
+    This relies on the replay session factory handing back the same cached
+    session on every call. Under C7N_FUNCTIONAL each call makes a new
+    session, so the handler is registered on a throwaway one and nothing is
+    recorded.
+    """
+    calls = []
+
+    def record(params, **kwargs):
+        calls.append(dict(params))
+
+    session_factory().events.register(
+        'provide-client-params.%s.%s' % (service, operation), record)
+    return calls
+
+
 def placebo_dir(name):
     return os.path.join(os.path.dirname(__file__), "data", "placebo", name)
 

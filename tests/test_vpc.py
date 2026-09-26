@@ -1,12 +1,14 @@
 # Copyright The Cloud Custodian Authors.
 # SPDX-License-Identifier: Apache-2.0
+import json
 import logging
+import os
 import time
 from .common import BaseTest, functional, event_data, load_data
 from unittest.mock import MagicMock
 
 from botocore.exceptions import ClientError as BotoClientError
-from c7n.exceptions import PolicyValidationError
+from c7n.exceptions import PolicyValidationError, PolicyExecutionError
 from c7n.resources.aws import shape_validate
 from pytest_terraform import terraform
 
@@ -2274,6 +2276,17 @@ class SecurityGroupTest(BaseTest):
             ["sg-1235a", "sg-4671"],
         )
 
+    def test_stale_paginated(self):
+        # the vpc's stale groups span two pages
+        factory = self.replay_flight_data("test_security_group_stale_paginated")
+        p = self.load_policy(
+            {"name": "sg-stale", "resource": "security-group", "filters": ["stale"]},
+            session_factory=factory,
+        )
+        resources = p.run()
+        self.assertEqual(
+            sorted(r["GroupId"] for r in resources), ["sg-0first", "sg-0second"])
+
     @functional
     def test_stale(self):
         # setup a multi vpc security group reference, break the ref
@@ -2436,6 +2449,101 @@ class SecurityGroupTest(BaseTest):
                 validate=True)
         except PolicyValidationError:
             self.fail("should pass validation")
+
+    def test_match_resource_validator_requires_key(self):
+        # match-resource still needs a key to compare on
+        with self.assertRaises(PolicyValidationError):
+            self.load_policy(
+                {'name': 'related-sg',
+                 'resource': 'elb',
+                 'filters': [{'type': 'security-group', 'match-resource': True}]},
+                validate=True)
+
+    def test_match_resource_per_resource_value(self):
+        # each resource must be compared against its own tag value, not the
+        # first resource's
+        p = self.load_policy(
+            {'name': 'related-sg',
+             'resource': 'elb',
+             'filters': [
+                 {'type': 'security-group',
+                  'match-resource': True,
+                  'key': 'tag:Application'}]})
+        f = p.resource_manager.filters[0]
+        related = {
+            'sg-1': {'GroupId': 'sg-1', 'Tags': [{'Key': 'Application', 'Value': 'web'}]},
+            'sg-2': {'GroupId': 'sg-2', 'Tags': [{'Key': 'Application', 'Value': 'db'}]},
+        }
+        web = {'LoadBalancerName': 'web', 'SecurityGroups': ['sg-1'],
+               'Tags': [{'Key': 'Application', 'Value': 'web'}]}
+        db = {'LoadBalancerName': 'db', 'SecurityGroups': ['sg-2'],
+              'Tags': [{'Key': 'Application', 'Value': 'db'}]}
+        crossed = {'LoadBalancerName': 'crossed', 'SecurityGroups': ['sg-1'],
+                   'Tags': [{'Key': 'Application', 'Value': 'db'}]}
+        self.assertTrue(f.process_resource(web, related))
+        self.assertTrue(f.process_resource(db, related))
+        self.assertFalse(f.process_resource(crossed, related))
+
+    def test_match_resource_per_resource_value_by_id(self):
+        p = self.load_policy(
+            {'name': 'related-endpoint',
+             'resource': 'vpc',
+             'filters': [
+                 {'type': 'vpc-endpoint',
+                  'match-resource': True,
+                  'key': 'tag:Env',
+                  'value': 'replaced-per-resource'}]},
+            # no by-id filter exposes match-resource in its schema yet, the
+            # shared code path still has to honour it
+            validate=False)
+        f = p.resource_manager.filters[0]
+        related = {
+            'vpc-1': [{'VpcEndpointId': 'vpce-1', 'VpcId': 'vpc-1',
+                       'Tags': [{'Key': 'Env', 'Value': 'dev'}]}],
+            'vpc-2': [{'VpcEndpointId': 'vpce-2', 'VpcId': 'vpc-2',
+                       'Tags': [{'Key': 'Env', 'Value': 'prod'}]}],
+        }
+        dev = {'VpcId': 'vpc-1', 'Tags': [{'Key': 'Env', 'Value': 'dev'}]}
+        prod = {'VpcId': 'vpc-2', 'Tags': [{'Key': 'Env', 'Value': 'prod'}]}
+        self.assertTrue(f.process_resource(dev, related))
+        self.assertTrue(f.process_resource(prod, related))
+
+    def test_subnet_filter_value_from(self):
+        # a value_from source has to be applied the same way a literal value is
+        values = os.path.join(self.get_temp_dir(), 'locations.json')
+        with open(values, 'w') as fh:
+            json.dump(['Database'], fh)
+        p = self.load_policy(
+            {'name': 'ec2-subnet',
+             'resource': 'ec2',
+             'filters': [
+                 {'type': 'subnet',
+                  'key': 'tag:Location',
+                  'op': 'in',
+                  'value_from': {'url': 'file://' + values, 'format': 'json'}}]})
+        f = p.resource_manager.filters[0]
+        f.route_tables = {}
+        subnet = {'SubnetId': 'subnet-1', 'VpcId': 'vpc-1', 'Tags': []}
+        self.assertFalse(f.match(dict(subnet, Tags=[{'Key': 'Location', 'Value': 'Web'}])))
+        self.assertTrue(f.match(dict(subnet, Tags=[{'Key': 'Location', 'Value': 'Database'}])))
+
+    def test_modify_security_groups_unresolved_name(self):
+        # a name that only exists in another vpc must not silently reuse the
+        # id resolved for the previous name
+        p = self.load_policy(
+            {'name': 'sg-modify',
+             'resource': 'ec2',
+             'actions': [{'type': 'modify-security-groups', 'add': ['web', 'db']}]})
+        action = p.resource_manager.actions[0]
+        groups = [
+            {'GroupName': 'web', 'GroupId': 'sg-web', 'VpcId': 'vpc-1'},
+            {'GroupName': 'db', 'GroupId': 'sg-db', 'VpcId': 'vpc-2'},
+        ]
+        r = {'InstanceId': 'i-1', 'VpcId': 'vpc-1'}
+        with self.assertRaises(PolicyExecutionError):
+            action.resolve_group_names(r, ['web', 'db'], groups)
+        self.assertEqual(
+            action.resolve_group_names(r, ['web'], groups), ['sg-web'])
 
     @functional
     def test_only_ports(self):
@@ -4514,6 +4622,26 @@ class TestPrefixList(BaseTest):
         resources = p.run()
         assert 'c7n:matched-entries' in resources[0]
         assert 'c7n:prefix-entries' in resources[0]
+
+    def test_prefix_entry_paginated(self):
+        # the matching entry is on the second page of entries
+        factory = self.replay_flight_data("test_prefix_list_entry_paginated")
+        p = self.load_policy(
+            {'name': 'prefix-get',
+             'resource': 'aws.prefix-list',
+             'filters': [
+                 {'type': 'entry',
+                  'key': 'Cidr',
+                  'value': '172.31.2.10/32',
+                  'value_type': 'cidr',
+                  'op': 'contains'}
+             ]},
+            session_factory=factory)
+        resources = p.run()
+        self.assertEqual(len(resources), 1)
+        self.assertEqual(
+            [e['Cidr'] for e in resources[0]['c7n:prefix-entries']],
+            ['10.0.0.0/16', '172.31.0.0/16'])
 
 
 class TestModifySubnet(BaseTest):

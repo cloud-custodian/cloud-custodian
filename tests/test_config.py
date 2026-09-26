@@ -296,3 +296,28 @@ class ConfigRuleTest(BaseTest):
         )
         resources = p.run()
         assert len(resources) == 1
+
+
+class ConfigRuleStatusBatchTest(BaseTest):
+
+    def test_status_batches_within_api_limit(self):
+        import boto3
+        from unittest import mock
+        from c7n.resources import config as config_resources
+
+        p = self.load_policy({
+            'name': 'config-rule-status', 'resource': 'config-rule',
+            'filters': [{'type': 'status', 'key': 'LastErrorCode', 'value': 'absent'}]})
+        real = boto3.client('config', region_name='us-east-1')
+        client = mock.MagicMock()
+        client.meta.service_model = real.meta.service_model
+        client.describe_config_rule_evaluation_status.side_effect = lambda ConfigRuleNames: {
+            'ConfigRulesEvaluationStatus': [
+                {'ConfigRuleName': n} for n in ConfigRuleNames]}
+        self.patch(config_resources, 'local_session', lambda factory: mock.MagicMock(
+            client=mock.MagicMock(return_value=client)))
+        rules = [{'ConfigRuleName': 'rule-%02d' % i} for i in range(30)]
+        self.assertEqual(len(p.resource_manager.filters[0].process(rules)), 30)
+        sizes = [len(c[1]['ConfigRuleNames']) for c in
+                 client.describe_config_rule_evaluation_status.call_args_list]
+        self.assertEqual(sizes, [25, 5])

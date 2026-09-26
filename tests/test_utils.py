@@ -4,6 +4,7 @@ import json
 import pytest
 import ipaddress
 import os
+import sys
 import tempfile
 import time
 from unittest import mock
@@ -25,6 +26,68 @@ class TestTesting(BaseTest):
             AssertionError,
             self.assertRegex,
             "^hello", "not hello world")
+
+    def test_mock_datetime_now_freezes_utils_callers(self):
+        # callers that go through the module (utils.utcnow_naive(), as
+        # aws.py/policy.py/metric.py do) and FormatDate.utcnow must be frozen
+        import datetime as dt_mod
+        from c7n.resources import aws
+        from c7n.testing import mock_datetime_now
+
+        target = parse_date("2020-12-03T04:47:15+00:00")
+        with mock_datetime_now(target, dt_mod):
+            self.assertEqual(utils.utcnow_naive(), datetime(2020, 12, 3, 4, 47, 15))
+            self.assertIsNone(utils.utcnow_naive().tzinfo)
+            self.assertEqual(
+                utils.FormatDate.utcnow().datetime, datetime(2020, 12, 3, 4, 47, 15))
+            self.assertIs(aws.utils.utcnow_naive, utils.utcnow_naive)
+        self.assertNotEqual(utils.utcnow_naive().year, 2020)
+
+    def test_mock_datetime_now_naive_for_aware_target(self):
+        # the real helper returns naive utc, the mock must too
+        from c7n.filters import metrics
+        from c7n.testing import mock_datetime_now
+
+        target = parse_date("2020-12-03T06:47:15+02:00")
+        with mock_datetime_now(target, metrics):
+            self.assertEqual(metrics.utcnow_naive(), datetime(2020, 12, 3, 4, 47, 15))
+
+    def test_mock_datetime_now_nothing_to_patch(self):
+        from c7n.testing import mock_datetime_now
+
+        with self.assertRaises(ValueError):
+            mock_datetime_now(parse_date("2020-12-03T04:47:15+00:00"), json)
+
+    def test_mock_datetime_now_skips_third_party_modules(self):
+        # a module level __getattr__ must not be run by the utcnow_naive sweep
+        import datetime as dt_mod
+        import types
+        from c7n.testing import mock_datetime_now
+
+        looked_up = []
+        mod = types.ModuleType('thirdparty_lazy')
+
+        def module_getattr(name):
+            looked_up.append(name)
+            raise AttributeError(name)
+
+        mod.__getattr__ = module_getattr
+        with mock.patch.dict(sys.modules, thirdparty_lazy=mod), \
+                mock_datetime_now(parse_date("2020-12-03T04:47:15+00:00"), dt_mod):
+            self.assertEqual(utils.utcnow_naive(), datetime(2020, 12, 3, 4, 47, 15))
+        self.assertEqual(looked_up, [])
+
+    def test_mock_datetime_now_failed_enter_undoes_patches(self):
+        import types
+        from c7n.testing import _MockedPatches
+
+        holder = types.SimpleNamespace(value=1)
+        patches = _MockedPatches([
+            mock.patch.object(holder, 'value', 2),
+            mock.patch.object(holder, 'missing', 3)], None)
+        with self.assertRaises(AttributeError):
+            patches.__enter__()
+        self.assertEqual(holder.value, 1)
 
 
 class Backoff(BaseTest):
@@ -541,6 +604,18 @@ class UtilTest(BaseTest):
         res = utils.type_schema("tester", inherits=["tested"])
         self.assertIn({"$ref": "tested"}, res["allOf"])
 
+    def test_type_schema_does_not_mutate_required(self):
+        required = ["key"]
+        first = utils.type_schema("first", required=required)
+        second = utils.type_schema("second", required=required)
+        self.assertEqual(required, ["key"])
+        self.assertEqual(first["required"], ["key", "type"])
+        self.assertEqual(second["required"], ["key", "type"])
+
+    def test_type_schema_tuple_required(self):
+        self.assertEqual(
+            utils.type_schema("tester", required=("key",))["required"], ["key", "type"])
+
     def test_generate_arn(self):
         self.assertEqual(
             utils.generate_arn("s3", "my_bucket"), "arn:aws:s3:::my_bucket"
@@ -1055,3 +1130,23 @@ def test_get_human_size_beyond_largest_suffix():
     # suffix rather than raising IndexError
     assert utils.get_human_size(1024 ** 9) == '1024.00 YB'
     assert utils.get_human_size(1024 ** 5 * 2000) == '1.95 EB'
+
+
+def test_error_code_arguments_are_sequences():
+    """`codes=('X')` is a string, and `in` on it does substring matching."""
+    import ast
+    import pathlib
+    import c7n
+
+    offenders = []
+    for path in pathlib.Path(c7n.__file__).parent.rglob('*.py'):
+        tree = ast.parse(path.read_text(), str(path))
+        for node in ast.walk(tree):
+            if not isinstance(node, ast.Call):
+                continue
+            for kw in node.keywords:
+                if (kw.arg in ('ignore_err_codes', 'retry_codes') and
+                        isinstance(kw.value, ast.Constant) and
+                        isinstance(kw.value.value, str)):
+                    offenders.append('%s:%d' % (path, kw.value.lineno))
+    assert offenders == []

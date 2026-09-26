@@ -2,7 +2,7 @@
 # SPDX-License-Identifier: Apache-2.0
 from collections import Counter, defaultdict
 from collections.abc import Mapping
-from datetime import timedelta, datetime
+from datetime import timedelta
 from functools import wraps
 import json
 import itertools
@@ -21,7 +21,7 @@ from c7n.loader import SourceLocator
 from c7n.provider import clouds
 from c7n.policy import Policy, PolicyCollection, load as policy_load
 from c7n.schema import ElementSchema, StructureParser, generate
-from c7n.utils import load_file, local_session, SafeLoader, yaml_dump
+from c7n.utils import load_file, local_session, SafeLoader, yaml_dump, utcnow_naive
 from c7n.config import Bag, Config
 from c7n.resources import (
     load_resources, load_available, load_providers, PROVIDER_NAMES)
@@ -337,7 +337,7 @@ def report(options, policies):
         sys.exit(1)
 
     delta = timedelta(days=options.days)
-    begin_date = datetime.now() - delta
+    begin_date = utcnow_naive() - delta
     do_report(
         policies, begin_date, options, sys.stdout, raw_output_fh=options.raw)
 
@@ -518,7 +518,7 @@ def _print_cls_schema(cls):
         print(yaml_dump(component_schema))
     else:
         # Shouldn't ever hit this, so exclude from cover
-        print("No schema is available for this item.", file=sys.sterr)  # pragma: no cover
+        print("No schema is available for this item.", file=sys.stderr)  # pragma: no cover
     print('')
     return
 
@@ -533,7 +533,7 @@ def _metrics_get_endpoints(options):
         start = options.start
         end = options.end
     else:
-        end = datetime.utcnow()
+        end = utcnow_naive()
         start = end - timedelta(options.days)
 
     return start, end

@@ -12,6 +12,7 @@ import json
 from typing import List
 
 import os
+import re
 
 from c7n.actions import ActionRegistry
 from c7n.exceptions import ClientError, ResourceLimitExceeded, PolicyExecutionError
@@ -49,10 +50,14 @@ class ResourceQuery:
     def _invoke_client_enum(self, client, enum_op, params, path, retry=None):
         if client.can_paginate(enum_op):
             p = client.get_paginator(enum_op)
+        else:
+            p = _generic_paginator(client, enum_op, path)
+        if p is not None:
+            # both paginators retry only when the caller asks for it, as
+            # the single call below doesn't either
             if retry:
                 p.PAGE_ITERATOR_CLS = RetryPageIterator
-            results = p.paginate(**params)
-            data = results.build_full_result()
+            data = p.paginate(**params).build_full_result()
         else:
             op = getattr(client, enum_op)
             data = op(**params)
@@ -211,6 +216,69 @@ class QueryMeta(type):
 
 def _napi(op_name):
     return op_name.title().replace('_', '')
+
+
+# pagination tokens apis use without always shipping a botocore paginator.
+# NextMarker is left out on purpose: waf and wafv2 (the only users here)
+# hand back a NextMarker on every listing, including single page ones, and
+# how they answer a request for the page after the last is unverified.
+_PAGE_TOKENS = ('NextToken', 'nextToken', 'Marker')
+# result keys botocore's build_full_result can merge and write back
+_RESULT_KEY = re.compile(r'^[A-Za-z_]\w*(\.[A-Za-z_]\w*)*$')
+
+
+def _generic_paginator(client, enum_op, path):
+    """A paginator for an enum op that pages but has no botocore paginator.
+
+    Plenty of apis take and return a NextToken (or similar) without botocore
+    shipping a paginator for them, and a single call then only ever sees the
+    first page. When the same token is in both the input and output shapes,
+    page on it. Returns None when that can't be done safely.
+    """
+    if not path:
+        return None
+    # 'Items[]' pages the same as 'Items', the flatten is applied afterwards
+    result_key = path[:-2] if path.endswith('[]') else path
+    if not _RESULT_KEY.match(result_key):
+        return None
+    api_name = client.meta.method_to_api_mapping.get(enum_op, _napi(enum_op))
+    model = client.meta.service_model.operation_model(api_name)
+    if model.input_shape is None or model.output_shape is None:
+        return None
+    inputs, outputs = model.input_shape.members, model.output_shape.members
+    token = next((t for t in _PAGE_TOKENS if t in inputs and t in outputs), None)
+    if token is None:
+        return None
+    paginator = Paginator(
+        getattr(client, enum_op),
+        {'input_token': token, 'output_token': token, 'result_key': result_key},
+        model)
+    return paginator
+
+
+def paginate_op(client, op, result_key, **params):
+    """Call op across every page it returns, and give back result_key's items.
+
+    Uses botocore's paginator when the op ships one, otherwise pages on a
+    token the op takes and returns (see _generic_paginator). An op that
+    can't be paged either way is called once, as before. Every call is
+    retried.
+
+    result_key names a top level key of the response; a nested path
+    (dotted, or any other jmespath expression) raises ValueError rather
+    than quietly returning nothing.
+    """
+    if not result_key.isidentifier():
+        raise ValueError(
+            "paginate_op result_key must be a top level key, not %r" % (result_key,))
+    if client.can_paginate(op):
+        paginator = client.get_paginator(op)
+    else:
+        paginator = _generic_paginator(client, op, result_key)
+    if paginator is None:
+        return QueryResourceManager.retry(getattr(client, op), **params).get(result_key, [])
+    paginator.PAGE_ITERATOR_CLS = RetryPageIterator
+    return paginator.paginate(**params).build_full_result().get(result_key, [])
 
 
 sources = PluginRegistry('sources')
@@ -412,15 +480,22 @@ class ConfigSource:
                 len(resource_ids),
                 self.manager.__class__.__name__.lower())
 
+            futures = []
             for resource_set in chunks(resource_ids, 50):
-                futures = []
                 futures.append(w.submit(self.get_resources, resource_set))
-                for f in as_completed(futures):
-                    if f.exception():
-                        self.manager.log.error(
-                            "Exception getting resources from config \n %s" % (
-                                f.exception()))
-                    results.extend(f.result())
+            # log every failed chunk, but don't hand back (and let the
+            # manager cache) a silently partial resource list.
+            error = None
+            for f in as_completed(futures):
+                if f.exception():
+                    self.manager.log.error(
+                        "Exception getting resources from config \n %s" % (
+                            f.exception()))
+                    error = error or f.exception()
+                    continue
+                results.extend(f.result())
+            if error is not None:
+                raise error
         return results
 
     def resources(self, query=None):

@@ -172,6 +172,14 @@ class ElasticSearchCrossAccountAccessFilter(CrossAccountAccessFilter):
         return super().process(resources)
 
 
+def _connection_schema(name):
+    # a nested value block rather than a typed filter, policies don't give it
+    # a 'type' key, so don't require one.
+    schema = type_schema(name, required=['key', 'value'], rinherit=ValueFilter.schema)
+    schema['required'].remove('type')
+    return schema
+
+
 @ElasticSearchDomain.filter_registry.register('cross-cluster')
 class ElasticSearchCrossClusterFilter(Filter):
     """
@@ -196,12 +204,8 @@ class ElasticSearchCrossClusterFilter(Filter):
                     value: '123456789'
     """
     schema = type_schema(type_name="cross-cluster",
-                         inbound=type_schema(type_name='inbound',
-                                             required=('key', 'value'),
-                                             rinherit=ValueFilter.schema),
-                         outbound=type_schema(type_name='outbound',
-                                              required=('key', 'value'),
-                                              rinherit=ValueFilter.schema),)
+                         inbound=_connection_schema('inbound'),
+                         outbound=_connection_schema('outbound'))
     schema_alias = False
     annotation_key = "c7n:SearchConnections"
     matched_key = "c7n:MatchedConnections"

@@ -151,7 +151,7 @@ class DeleteKeyspace(BaseAction):
         for r in resources:
             self.manager.retry(
                 client.delete_keyspace,
-                ignore_err_codes=('ResourceNotFoundException'),
+                ignore_err_codes=('ResourceNotFoundException',),
                 keyspaceName=r['keyspaceName'],
             )
 
@@ -287,7 +287,7 @@ class DeleteTable(BaseAction):
         for r in resources:
             self.manager.retry(
                 client.delete_table,
-                ignore_err_codes=('ResourceNotFoundException'),
+                ignore_err_codes=('ResourceNotFoundException',),
                 keyspaceName=r['keyspaceName'],
                 tableName=r['tableName'],
             )

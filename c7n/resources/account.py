@@ -18,8 +18,10 @@ from c7n.filters.kms import KmsRelatedFilter
 from c7n.filters.multiattr import MultiAttrFilter
 from c7n.filters.missing import Missing
 from c7n.manager import resources
-from c7n.utils import local_session, type_schema, generate_arn, get_support_region, jmespath_search
-from c7n.query import QueryResourceManager, TypeInfo, DescribeSource
+from c7n.utils import (
+    local_session, type_schema, generate_arn, get_support_region,
+    utcnow_naive)
+from c7n.query import QueryResourceManager, TypeInfo, DescribeSource, paginate_op
 from c7n.filters import ListItemFilter
 
 from c7n.resources.iam import CredentialReport
@@ -348,12 +350,13 @@ class CloudTrailEnabled(Filter):
                     continue
                 log_group_name = t['CloudWatchLogsLogGroupArn'].split(':')[6]
                 try:
-                    metric_filters_log_group = \
-                        client_logs.describe_metric_filters(
-                            logGroupName=log_group_name)['metricFilters']
+                    metric_filters_log_group = paginate_op(
+                        client_logs, 'describe_metric_filters', 'metricFilters',
+                        logGroupName=log_group_name)
                 except ClientError as e:
                     if e.response['Error']['Code'] == 'ResourceNotFoundException':
                         continue
+                    raise
                 filter_matched = None
                 if metric_filters_log_group:
                     for f in metric_filters_log_group:
@@ -2167,10 +2170,11 @@ class LakeformationFilter(Filter):
 
     def process_account(self, account):
         client = local_session(self.manager.session_factory).client('lakeformation')
+        # a location registered with a prefix is arn:aws:s3:::bucket/prefix,
+        # only the bucket part can be matched against the account's buckets
         lake_buckets = {
-            Arn.parse(r).resource for r in jmespath_search(
-                'ResourceInfoList[].ResourceArn',
-                client.list_resources())
+            Arn.parse(r['ResourceArn']).resource.split('/', 1)[0]
+            for r in paginate_op(client, 'list_resources', 'ResourceInfoList')
         }
         buckets = {
             b['Name'] for b in
@@ -2466,7 +2470,7 @@ class SesConsecutiveStats(Filter):
         get_send_stats = client.get_send_statistics()
         results = []
         check_days = self.data.get('days', 2)
-        utcnow = datetime.datetime.utcnow()
+        utcnow = utcnow_naive()
         expected_dates = set()
 
         for days in range(1, check_days + 1):

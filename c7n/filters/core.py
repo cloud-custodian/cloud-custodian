@@ -650,7 +650,8 @@ class ValueFilter(BaseValueFilter):
         # the value filters because it operates on the full resource list
         if self.data.get('value_type') == 'resource_count':
             return self._validate_resource_count()
-        elif self.data.get('value_type') == 'date':
+        elif self.data.get('value_type') == 'date' and 'value' in self.data:
+            # value_from / value_path values are only known at run time
             if not parse_date(self.data.get('value')):
                 raise PolicyValidationError(
                     "value_type: date with invalid date value:%s",
@@ -668,8 +669,9 @@ class ValueFilter(BaseValueFilter):
             if self.data['op'] not in OPERATORS:
                 raise PolicyValidationError(
                     "Invalid operator in value filter %s" % self.data)
-            if self.data['op'] in {'regex', 'regex-case'}:
-                # Sanity check that we can compile
+            if self.data['op'] in {'regex', 'regex-case'} and 'value' in self.data:
+                # Sanity check that we can compile, value_from / value_path
+                # patterns are only known at run time
                 try:
                     re.compile(self.data['value'])
                 except re.error as e:

@@ -1,0 +1,22 @@
+{
+    "status_code": 200,
+    "data": {
+        "Group": {
+            "Path": "/",
+            "GroupName": "devs",
+            "GroupId": "AGPAEXAMPLEDEVS000001",
+            "Arn": "arn:aws:iam::123456789012:group/devs"
+        },
+        "Users": [
+            {
+                "Path": "/",
+                "UserName": "alice",
+                "UserId": "AIDAALICE000000000000",
+                "Arn": "arn:aws:iam::123456789012:user/alice"
+            }
+        ],
+        "IsTruncated": true,
+        "Marker": "users-2",
+        "ResponseMetadata": {}
+    }
+}

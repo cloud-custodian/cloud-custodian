@@ -15,6 +15,9 @@ inputs:
   platforms:
     description: "Platforms to build, e.g. linux/arm64,linux/amd64"
     default: "linux/amd64"
+  uv-version:
+    description: "uv version used to build the image"
+    default: "0.7.12"
 runs:
   using: "composite"
   steps:
@@ -71,7 +74,8 @@ runs:
       id: install-custodian
       uses: ./.github/composites/install
       with:
-        python-version: "3.11"
+        python-version: "3.12"
+        uv-version: ${{ inputs.uv-version }}
 
     # build a single platform image first in order to actually load the image from buildx
     # manifests are not supported yet

@@ -7,8 +7,6 @@ PKG_REPO = testpypi
 PKG_INCREMENT := patch
 PKG_SET := tools/c7n_gcp tools/c7n_kube tools/c7n_openstack tools/c7n_mailer tools/c7n_policystream tools/c7n_org tools/c7n_sphinxext tools/c7n_awscc tools/c7n_tencentcloud tools/c7n_azure tools/c7n_oci tools/c7n_left
 
-PKG_SET_OLD := tools/c7n_logexporter tools/c7n_trailcreator tools/c7n_terraform
-
 COVERAGE_TYPE := html
 ARGS :=
 IMAGE := c7n
@@ -32,7 +30,6 @@ test:
 
 test-coverage:
 	uv run pytest -n auto \
-            --cov-config .coveragerc \
             --cov-report $(COVERAGE_TYPE) \
             --cov c7n \
             --cov tools/c7n_azure/c7n_azure \
@@ -40,7 +37,7 @@ test-coverage:
             --cov tools/c7n_kube/c7n_kube \
             --cov tools/c7n_left/c7n_left \
             --cov tools/c7n_mailer/c7n_mailer \
-            --cov tools/c7n_policystream/c7n_policystream \
+            --cov policystream \
             --cov tools/c7n_tencentcloud/c7n_tencentcloud \
             --cov tools/c7n_oci/c7n_oci \
             tests tools $(ARGS)
@@ -55,7 +52,7 @@ test-functional-azure:
 
 test-gcp:
 # run only the GCP test suite
-	. uv run pytest -n auto tools/c7n_gcp/tests $(ARGS)
+	uv run pytest -n auto tools/c7n_gcp/tests $(ARGS)
 
 sphinx:
 	make -f docs/Makefile.sphinx html
@@ -159,6 +156,10 @@ analyzer-bandit:
 	 tools/c7n_mailer/c7n_mailer \
 	 tools/c7n_policystream/policystream.py \
 	 tools/c7n_trailcreator/c7n_trailcreator \
+	 tools/c7n_awscc/c7n_awscc \
+	 tools/c7n_kube/c7n_kube \
+	 tools/c7n_openstack/c7n_openstack \
+	 tools/c7n_tencentcloud/c7n_tencentcloud \
 	 c7n
 
 
@@ -173,4 +174,8 @@ analyzer-semgrep:
 	 tools/c7n_mailer/c7n_mailer \
 	 tools/c7n_policystream/policystream.py \
 	 tools/c7n_trailcreator/c7n_trailcreator \
+	 tools/c7n_awscc/c7n_awscc \
+	 tools/c7n_kube/c7n_kube \
+	 tools/c7n_openstack/c7n_openstack \
+	 tools/c7n_tencentcloud/c7n_tencentcloud \
 	 c7n

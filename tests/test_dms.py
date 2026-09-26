@@ -278,3 +278,23 @@ class DmsEndpointTests(BaseTest):
         self.assertEqual(
             [ep["EndpointIdentifier"], ep["Status"]], ["c7n-test", "deleting"]
         )
+
+
+class DmsInstanceAugmentTest(BaseTest):
+
+    def test_augment_tags_each_instance_once(self):
+        # each chunk used to be handed the full resource list
+        from unittest import mock
+        from c7n.resources import dms
+        p = self.load_policy({'name': 'dms', 'resource': 'dms-instance'})
+        resources = [
+            {'ReplicationInstanceIdentifier': 'r%02d' % i,
+             'ReplicationInstanceArn': 'arn:aws:dms:us-east-1:123:rep:r%02d' % i}
+            for i in range(25)]
+        client = mock.MagicMock()
+        client.list_tags_for_resource.return_value = {'TagList': []}
+        self.patch(dms, 'local_session', lambda factory: mock.MagicMock(
+            client=mock.MagicMock(return_value=client)))
+        p.resource_manager.source.augment(resources)
+        self.assertEqual(client.list_tags_for_resource.call_count, 25)
+        self.assertTrue(all('Tags' in r for r in resources))

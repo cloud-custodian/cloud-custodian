@@ -6,7 +6,6 @@ from c7n.provider import clouds, Provider
 from collections import Counter, namedtuple
 import contextlib
 import copy
-import datetime
 import itertools
 import logging
 import os
@@ -408,7 +407,7 @@ class MetricsOutput(Metrics):
     def _format_metric(self, key, value, unit, dimensions):
         d = {
             "MetricName": key,
-            "Timestamp": datetime.datetime.utcnow(),
+            "Timestamp": utils.utcnow_naive(),
             "Value": value,
             "Unit": unit}
         d["Dimensions"] = [
@@ -477,7 +476,7 @@ class CloudWatchLogOutput(LogOutput):
                 region=self.ctx.options.region,
                 account=self.ctx.options.account_id,
                 policy=self.ctx.policy.name,
-                now=datetime.datetime.utcnow())
+                now=utils.utcnow_naive())
         return log_stream
 
     def get_handler(self):

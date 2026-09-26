@@ -550,11 +550,11 @@ class DeleteElastiCacheSnapshot(BaseAction):
             for snapshot_set in chunks(reversed(snapshots), size=50):
                 futures.append(
                     w.submit(self.process_snapshot_set, client, snapshot_set))
-                for f in as_completed(futures):
-                    if f.exception():
-                        self.log.error(
-                            "Exception deleting snapshot set \n %s",
-                            f.exception())
+            for f in as_completed(futures):
+                if f.exception():
+                    self.log.error(
+                        "Exception deleting snapshot set \n %s",
+                        f.exception())
         return snapshots
 
     def process_snapshot_set(self, client, snapshots_set):

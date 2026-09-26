@@ -11,7 +11,7 @@ class MatchResourceValidator:
 
     def validate(self):
         if self.data.get('match-resource'):
-            self.required_keys = set('key',)
+            self.required_keys = {'key'}
         return super(MatchResourceValidator, self).validate()
 
 
@@ -95,8 +95,10 @@ class SubnetFilter(MatchResourceValidator, RelatedResourceFilter):
         op = all if self.data.get('operator', 'and') == 'and' else any
 
         # If the policy doesn't define value filter keys, implicitly
-        # pass and skip the value filter match.
-        value_match = {'key', 'value'}.difference(self.data) or super().match(related)
+        # pass and skip the value filter match. A value can come from
+        # value, value_from or value_path.
+        has_value = {'value', 'value_from', 'value_path'}.intersection(self.data)
+        value_match = not ('key' in self.data and has_value) or super().match(related)
 
         return op(
             (

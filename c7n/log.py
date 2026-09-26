@@ -16,20 +16,16 @@ from c7n.exceptions import ClientError
 import itertools
 import logging
 from operator import itemgetter
+import queue
 import threading
 import time
-
-try:
-    import Queue
-except ImportError:  # pragma: no cover
-    import queue as Queue
 
 from c7n.utils import get_retry
 
 FLUSH_MARKER = object()
 SHUTDOWN_MARKER = object()
 
-EMPTY = Queue.Empty
+EMPTY = queue.Empty
 
 
 class Error:
@@ -60,7 +56,7 @@ class CloudWatchLogHandler(logging.Handler):
         self.log_stream = log_stream
         self.session_factory = session_factory
         self.transport = None
-        self.queue = Queue.Queue()
+        self.queue = queue.Queue()
         self.threads = []
         # do some basic buffering before sending to transport to minimize
         # queue/threading overhead
@@ -210,7 +206,7 @@ class Transport:
             try:
                 datum = self.queue.get(block=True, timeout=self.batch_interval)
             except EMPTY:
-                if Queue is None:
+                if queue is None:
                     return
                 datum = None
             if datum is None:

@@ -29,7 +29,7 @@ updates:
         - "*"
 
 - package-ecosystem: "gomod"
-  directory: "/"
+  directory: "/tools/cask"
   schedule:
       interval: "monthly"
   commit-message:

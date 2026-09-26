@@ -2,7 +2,7 @@
 # SPDX-License-Identifier: Apache-2.0
 from c7n.exceptions import PolicyValidationError
 
-from .common import BaseTest
+from .common import BaseTest, record_api_params
 
 
 class WAFTest(BaseTest):
@@ -116,6 +116,30 @@ class WAFTest(BaseTest):
                 }
             ]
         )
+
+    def test_wafv2_logging_configuration_paginated(self):
+        # the acl's logging configuration is on the second page, and the
+        # third page is empty while still carrying a marker
+        session_factory = self.replay_flight_data(
+            'test_wafv2_logging_configuration_paginated')
+        listed = record_api_params(session_factory, 'wafv2', 'ListLoggingConfigurations')
+        p = self.load_policy(
+            {'name': 'foo',
+             'resource': 'aws.wafv2',
+             'filters': [{
+                 'type': 'logging',
+                 'key': 'RedactedFields[].SingleHeader.Name',
+                 'value': 'user-agent',
+                 'value_type': 'swap',
+                 'op': 'in'}]},
+            session_factory=session_factory,
+            config={'region': 'us-east-1'})
+        resources = p.run()
+        self.assertEqual(len(resources), 1)
+        self.assertEqual(
+            [c.get('NextMarker') for c in listed], [None, 'marker-2', 'marker-3'])
+        self.assertIn(
+            'wafv2:ListLoggingConfigurations', p.resource_manager.filters[0].get_permissions())
 
     def test_wafv2_logging_not_enabled(self):
         session_factory = self.replay_flight_data(

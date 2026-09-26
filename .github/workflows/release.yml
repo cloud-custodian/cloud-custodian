@@ -16,7 +16,7 @@ jobs:
       contents: read
       checks: write
     steps:
-      - uses: actions/checkout@de0fac2e4500dabe0009e67214ff5f5447ce83dd # ratchet:actions/checkout@v4
+      - uses: actions/checkout@de0fac2e4500dabe0009e67214ff5f5447ce83dd # ratchet:actions/checkout@v6.0.2
         with:
           fetch-depth: 0
 
@@ -50,7 +50,7 @@ jobs:
           PKG_DOMAIN: release-staging
           PKG_REPO: stagec7n
         run: |
-          ./tools/dev/staging-auth.sh >> /dev/null
+          ./tools/dev/staging-auth.sh
 
       - name: Stage Wheels
         shell: bash
@@ -80,9 +80,9 @@ jobs:
       contents: read
       checks: write
     steps:
-      - uses: actions/checkout@de0fac2e4500dabe0009e67214ff5f5447ce83dd # ratchet:actions/checkout@v4
+      - uses: actions/checkout@de0fac2e4500dabe0009e67214ff5f5447ce83dd # ratchet:actions/checkout@v6.0.2
       - name: Setup Python
-        uses: actions/setup-python@a309ff8b426b58ec0e2a45f0f869d46889d02405 # ratchet:actions/setup-python@v5
+        uses: actions/setup-python@a309ff8b426b58ec0e2a45f0f869d46889d02405 # ratchet:actions/setup-python@v6.2.0
         with:
           python-version: ${{ env.DEFAULT_PY_VERSION }}
 
@@ -102,13 +102,13 @@ jobs:
           PKG_DOMAIN: release-staging
           PKG_REPO: stagec7n
         run: |
-          ./tools/dev/staging-auth.sh >> /dev/null
+          ./tools/dev/staging-auth.sh
 
       - name: Install Staged
         shell: bash
         run: |
-          set -euxo pipefail
-          pip install -r wheels-manifest.txt  --index-url ${{ env.STAGE_INDEX_URL }} --extra-index-url https://pypi.org/simple/
+          set -euo pipefail
+          pip install -r wheels-manifest.txt --index-url "$STAGE_INDEX_URL" --extra-index-url https://pypi.org/simple/
 
       - name: Smoke Test
         shell: bash
@@ -121,7 +121,7 @@ jobs:
     runs-on: ubuntu-latest
     needs: TestWheels
     steps:
-      - uses: actions/checkout@de0fac2e4500dabe0009e67214ff5f5447ce83dd # ratchet:actions/checkout@v4
+      - uses: actions/checkout@de0fac2e4500dabe0009e67214ff5f5447ce83dd # ratchet:actions/checkout@v6.0.2
       - name: Install Custodian
         uses: ./.github/composites/install
         with:

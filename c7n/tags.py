@@ -331,7 +331,7 @@ class TagTrim(Action):
     def process(self, resources):
         self.id_key = self.manager.get_model().id
 
-        self.preserve = set(self.data.get('preserve'))
+        self.preserve = set(self.data.get('preserve', ()))
         self.space = self.data.get('space', 3)
 
         client = utils.local_session(
@@ -376,7 +376,7 @@ class TagTrim(Action):
                 "Could not find any candidates to trim %s" % i[self.id_key])
             return
 
-        self.process_tag_removal(i, candidates)
+        self.process_tag_removal(client, i, candidates)
 
     def process_tag_removal(self, client, resource, tags):
         self.manager.retry(
@@ -481,9 +481,11 @@ class TagActionFilter(Filter):
         if action_date.tzinfo:
             # if action_date is timezone aware, set to timezone provided
             action_date = action_date.astimezone(tz)
-            current_date = datetime.now(tz=tz)
         else:
-            current_date = datetime.now()
+            # a date only tag is written as the date in the policy's tz (utc
+            # by default), compare it against now in that tz, not host local.
+            action_date = action_date.replace(tzinfo=tz)
+        current_date = datetime.now(tz=tz)
 
         return current_date >= (
             action_date - timedelta(days=skew, hours=skew_hours))
@@ -910,9 +912,7 @@ class NormalizeTag(Action):
     schema = utils.type_schema(
         'normalize-tag',
         key={'type': 'string'},
-        action={'type': 'string',
-                'items': {
-                    'enum': ['upper', 'lower', 'title' 'strip', 'replace']}},
+        action={'type': 'string', 'enum': ['upper', 'lower', 'title', 'strip']},
         value={'type': 'string'})
 
     permissions = ('ec2:CreateTags',)
@@ -982,7 +982,9 @@ class NormalizeTag(Action):
                 elif action == 'title' and not r.istitle():
                     new_value = r.title()
                 elif action == 'strip' and value and value in r:
-                    new_value = r.strip(value)
+                    # remove the text, str.strip would treat it as a set of
+                    # characters to trim from both ends
+                    new_value = r.replace(value, '')
                 if new_value:
                     futures.append(
                         w.submit(self.process_transform, new_value, resource_set[r]))

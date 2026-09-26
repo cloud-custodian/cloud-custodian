@@ -1,7 +1,10 @@
 # Copyright The Cloud Custodian Authors.
 # SPDX-License-Identifier: Apache-2.0
-from .common import BaseTest, functional
+import boto3
 from botocore.exceptions import ClientError
+from botocore.stub import Stubber
+
+from .common import BaseTest, functional
 
 
 class RDSParamGroupTest(BaseTest):
@@ -350,3 +353,38 @@ class RDSClusterParamGroupTest(BaseTest):
 
         resources = policy.resource_manager.resources()
         self.assertEqual(len(resources), 1)
+
+
+class ParamGroupCurrentParamsTest(BaseTest):
+
+    def stubbed_client(self, method, name_key):
+        client = boto3.Session(region_name='us-east-1').client(
+            'rds', aws_access_key_id='x', aws_secret_access_key='x')
+        stubber = Stubber(client)
+        param = {'ParameterValue': '1', 'ApplyMethod': 'immediate'}
+        stubber.add_response(
+            method, {'Parameters': [dict(param, ParameterName='autocommit')], 'Marker': 'm1'},
+            {name_key: 'pg'})
+        stubber.add_response(
+            method, {'Parameters': [dict(param, ParameterName='max_connections')]},
+            {name_key: 'pg', 'Marker': 'm1'})
+        stubber.activate()
+        self.addCleanup(stubber.deactivate)
+        return client, stubber
+
+    def check(self, resource, method, name_key):
+        p = self.load_policy({
+            'name': 'pg-modify', 'resource': resource,
+            'actions': [{'type': 'modify', 'params': [{'name': 'autocommit', 'value': '0'}]}]})
+        client, stubber = self.stubbed_client(method, name_key)
+        params = p.resource_manager.actions[0].get_current_params(client, 'pg')
+        self.assertEqual(sorted(params), ['autocommit', 'max_connections'])
+        stubber.assert_no_pending_responses()
+
+    def test_db_parameter_group_params_paginated(self):
+        self.check('rds-param-group', 'describe_db_parameters', 'DBParameterGroupName')
+
+    def test_cluster_parameter_group_params_paginated(self):
+        self.check(
+            'rds-cluster-param-group', 'describe_db_cluster_parameters',
+            'DBClusterParameterGroupName')
