@@ -1072,7 +1072,7 @@ class TagEcsResource(Tag):
                 continue
             client.tag_resource(resourceArn=r[mid], tags=tags)
         if old_arns:
-            self.log.warn("Couldn't tag %d resource(s). Needs new ARN format", old_arns)
+            self.log.warning("Couldn't tag %d resource(s). Needs new ARN format", old_arns)
 
 
 @ECSCluster.action_registry.register('remove-tag')
@@ -1109,7 +1109,7 @@ class RemoveTagEcsResource(RemoveTag):
                 continue
             client.untag_resource(resourceArn=r[self.id_key], tagKeys=keys)
         if old_arns != 0:
-            self.log.warn("Couldn't untag %d resource(s). Needs new ARN format", old_arns)
+            self.log.warning("Couldn't untag %d resource(s). Needs new ARN format", old_arns)
 
 
 @ECSCluster.action_registry.register('mark-for-op')

@@ -385,3 +385,28 @@ class FunctionTest(BaseTest):
         resources = exec_mode.run(event, None)
         self.assertEqual(len(resources), 1)
         self.assertEqual(resources[0]['id'], "a22222222222222222")
+
+
+def test_upload_closes_archive_body():
+    from unittest import mock
+    from c7n_gcp import mu as gcp_mu
+
+    bodies = []
+
+    def request(url, method=None, headers=None, body=None):
+        bodies.append(body)
+        return {'status': '200'}, b''
+
+    manager = gcp_mu.CloudFunctionManager.__new__(gcp_mu.CloudFunctionManager)
+    manager.client = mock.MagicMock()
+    manager.client.execute_command.return_value = {'uploadUrl': 'https://upload'}
+    manager.session = mock.MagicMock()
+    manager._get_http_client = lambda client: mock.MagicMock(request=request)
+    archive = gcp_mu.custodian_archive()
+    archive.close()
+    try:
+        manager._upload(archive, 'us-central1')
+    finally:
+        archive.remove()
+    assert len(bodies) == 1
+    assert bodies[0].closed

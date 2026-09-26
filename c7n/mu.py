@@ -88,11 +88,12 @@ class PythonPackageArchive:
             if self._temp_archive_file:
                 self._temp_archive_file.close()
                 os.unlink(self.path)
-        except AttributeError:
+        except (AttributeError, OSError):
             # Finalizers in python are fairly problematic, especially when
             # breaking cycle references, there are no ordering guaranteees
             # so our tempfile may already be gc'd before this ref'd version
-            # is called.
+            # is called. The file may also already be gone, nothing to do
+            # about that from a finalizer either.
             pass
 
     @property
@@ -234,8 +235,21 @@ class PythonPackageArchive:
         return self
 
     def remove(self):
-        """Dispose of the temp file for garbage collection."""
-        if self._temp_archive_file:
+        """Dispose of the temp file."""
+        if self._temp_archive_file is None:
+            return
+        if not self._closed:
+            # the zipfile is still holding the temp file open; closing the
+            # temp file out from under it leaves its finalizer to raise
+            # "seek of closed file" while writing the central directory.
+            self._zip_file.close()
+            self._closed = True
+        # created with delete=False, dropping the reference alone leaks it
+        try:
+            self._temp_archive_file.close()
+            os.unlink(self._temp_archive_file.name)
+        finally:
+            # don't leave __del__ to retry a removal that already failed
             self._temp_archive_file = None
 
     def get_checksum(self, encoder=base64.b64encode, hasher=hashlib.sha256):
@@ -247,7 +261,8 @@ class PythonPackageArchive:
     def get_bytes(self):
         """Return the entire zip file as a byte string. """
         assert self._closed, "Archive not closed"
-        return self.get_stream().read()
+        with self.get_stream() as fh:
+            return fh.read()
 
     def get_stream(self):
         """Return the entire zip file as a stream. """
@@ -1635,28 +1650,24 @@ class SQSSubscription:
         self.session_factory = session_factory
         self.batch_size = batch_size
 
+    @staticmethod
+    def get_event_mappings(client, func):
+        mappings = client.get_paginator('list_event_source_mappings').paginate(
+            FunctionName=func.name).build_full_result().get('EventSourceMappings', ())
+        return {m['EventSourceArn']: m for m in mappings}
+
     def add(self, func, existing):
         client = local_session(self.session_factory).client('lambda')
-        event_mappings = {
-            m['EventSourceArn']: m for m in client.list_event_source_mappings(
-                FunctionName=func.name).get('EventSourceMappings', ())}
+        event_mappings = self.get_event_mappings(client, func)
 
         modified = False
         for queue_arn in self.queue_arns:
-            mapping = None
-            if queue_arn in event_mappings:
-                mapping = event_mappings[queue_arn]
-                if (mapping['State'] == 'Enabled' or
-                        mapping['BatchSize'] != self.batch_size):
-                    continue
-                modified = True
-            else:
-                modified = True
-
-            if not modified:
-                return modified
-
+            mapping = event_mappings.get(queue_arn)
             if mapping is not None:
+                # already subscribed as configured
+                if (mapping['State'] == 'Enabled' and
+                        mapping['BatchSize'] == self.batch_size):
+                    continue
                 log.info(
                     "Updating subscription %s on %s", func.name, queue_arn)
                 client.update_event_source_mapping(
@@ -1669,13 +1680,12 @@ class SQSSubscription:
                     FunctionName=func.name,
                     EventSourceArn=queue_arn,
                     BatchSize=self.batch_size)
-            return modified
+            modified = True
+        return modified
 
     def remove(self, func, func_deleted=True):
         client = local_session(self.session_factory).client('lambda')
-        event_mappings = {
-            m['EventSourceArn']: m for m in client.list_event_source_mappings(
-                FunctionName=func.name).get('EventSourceMappings', ())}
+        event_mappings = self.get_event_mappings(client, func)
 
         found = None
         for queue_arn in self.queue_arns:

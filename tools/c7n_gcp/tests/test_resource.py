@@ -135,3 +135,8 @@ def test_load_gcp_policies(tmp_path):
 
     assert len(loaded) == 1
     assert loaded[0].resource_type == 'gcp.instance'
+
+
+def test_resource_map_entries_import():
+    # every gcp resource map entry must name a class that exists
+    assert load_resources(['gcp.*']) == []

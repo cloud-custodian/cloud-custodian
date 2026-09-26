@@ -133,7 +133,7 @@ class EntraIDUser(GraphResourceManager):
                 user['signInActivity']['lastSignInDateTime'].replace('Z', '+00:00')
             )
             return (
-                datetime.now().replace(tzinfo=last_signin.tzinfo) - last_signin
+                datetime.now(last_signin.tzinfo) - last_signin
             ).days
         except Exception:
             return 999
@@ -158,7 +158,7 @@ class EntraIDUser(GraphResourceManager):
                 user['lastPasswordChangeDateTime'].replace('Z', '+00:00')
             )
             return (
-                datetime.now().replace(tzinfo=pwd_change.tzinfo) - pwd_change
+                datetime.now(pwd_change.tzinfo) - pwd_change
             ).days
         except Exception:
             return 0

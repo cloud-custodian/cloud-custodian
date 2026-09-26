@@ -11,21 +11,30 @@ on:
 
 permissions: {}
 
+env:
+  UV_VERSION: "0.7.12"
+
 jobs:
   Publish:
     permissions:
+      # job level permissions replace the workflow level ones wholesale,
+      # so contents has to be restated for actions/checkout
+      contents: read
       id-token: write
     strategy:
       matrix:
         image:
           - c7n
+          - c7n-kube
           - c7n-org
           - mailer
           - policystream
           - c7n-left
-    runs-on: ubuntu-latest-8-cores
+    # the larger runner only exists on the upstream repo; forks would queue
+    # against a label nothing ever picks up
+    runs-on: ${{ github.repository == 'cloud-custodian/cloud-custodian' && 'ubuntu-latest-8-cores' || 'ubuntu-latest' }}
     steps:
-      - uses: actions/checkout@de0fac2e4500dabe0009e67214ff5f5447ce83dd # ratchet:actions/checkout@v4
+      - uses: actions/checkout@de0fac2e4500dabe0009e67214ff5f5447ce83dd # ratchet:actions/checkout@v6.0.2
       - name: ${{ matrix.image }} build and push
         uses: ./.github/composites/docker-build-push
         env:
@@ -35,6 +44,7 @@ jobs:
           name: ${{ matrix.image }}
           push: true
           platforms: linux/arm64,linux/amd64
+          uv-version: ${{ env.UV_VERSION }}
 
       - name: Notify Slack
         uses: ravsamhq/notify-slack-action@be814b201e233b2dc673608aa46e5447c8ab13f2 # ratchet:ravsamhq/notify-slack-action@v2

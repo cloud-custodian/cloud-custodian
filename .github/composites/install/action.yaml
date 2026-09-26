@@ -4,7 +4,7 @@ inputs:
   python-version:
     required: true
   uv-version:
-    required: true
+    default: "0.7.12"
 outputs:
   uv-version:
     description: "uv version"
@@ -14,22 +14,27 @@ runs:
   using: "composite"
   steps:
     - name: Install uv
-      uses: astral-sh/setup-uv@08807647e7069bb48b6ef5acd8ec9567f424441b # ratchet:astral-sh/setup-uv@v5
+      uses: astral-sh/setup-uv@08807647e7069bb48b6ef5acd8ec9567f424441b # ratchet:astral-sh/setup-uv@v8.1.0
       with:
         version: ${{ inputs.uv-version }}
         enable-cache: true
 
     - name: Set up Python ${{ inputs.python-version }}
-      uses: actions/setup-python@a309ff8b426b58ec0e2a45f0f869d46889d02405 # ratchet:actions/setup-python@v5
+      uses: actions/setup-python@a309ff8b426b58ec0e2a45f0f869d46889d02405 # ratchet:actions/setup-python@v6.2.0
       with:
         python-version: ${{ inputs.python-version }}
 
+    # cache keys are immutable, so a bad venv can't be replaced under the key
+    # it was restored from. restore by prefix and save under a per-run key
+    # instead, the newest entry for the prefix wins on the next restore.
     - name: Set up cache
-      uses: actions/cache@27d5ce7f107fe9357f9df03efb73ab90386fccae # ratchet:actions/cache@v5.0.5
+      uses: actions/cache/restore@27d5ce7f107fe9357f9df03efb73ab90386fccae # ratchet:actions/cache/restore@v5.0.5
       id: cache
       with:
         path: .venv
-        key: venv-${{ runner.os }}-${{ inputs.python-version }}-${{ hashFiles('uv.lock') }}
+        key: venv-${{ runner.os }}-${{ inputs.python-version }}-${{ hashFiles('uv.lock') }}-${{ github.run_id }}-${{ github.run_attempt }}
+        restore-keys: |
+          venv-${{ runner.os }}-${{ inputs.python-version }}-${{ hashFiles('uv.lock') }}-
 
     - name: Update PATH
       shell: bash
@@ -44,7 +49,7 @@ runs:
         fi
 
     - name: Ensure cache is healthy
-      if: steps.cache.outputs.cache-hit == 'true'
+      if: steps.cache.outputs.cache-matched-key != ''
       id: cache_check
       shell: bash
       run: |
@@ -53,19 +58,19 @@ runs:
            echo "Cache Green"
         else
            rm -rf .venv
-           echo "venv==recreate" >> $GITHUB_OUTPUT
+           echo "venv=recreate" >> $GITHUB_OUTPUT
            echo "Cache Red"
         fi
 
     - name: Install
-      if: steps.cache.outputs.cache-hit != 'true' || steps.cache_check.outputs.venv != 'success'
+      if: steps.cache.outputs.cache-matched-key == '' || steps.cache_check.outputs.venv != 'success'
       shell: bash
       env:
         CHECK_VENV: ${{ steps.cache_check.outputs.venv }}
-        CACHE_HIT: ${{ steps.cache.outputs.cache-hit }}
+        CACHE_KEY: ${{ steps.cache.outputs.cache-matched-key }}
       run: |
         echo "check venv $CHECK_VENV"
-        echo "cache hit $CACHE_HIT"
+        echo "restored cache key $CACHE_KEY"
         if [ -d ".venv" ]; then
           mv .venv .venv-old
         fi
@@ -81,9 +86,11 @@ runs:
       run: cd tools/c7n_awscc && uv run python build.py
 
 
+    # save whenever the venv was built here: nothing was restored (the plain
+    # actions/cache post step used to cover this) or the restored one was bad.
     - name: Save cache
-      if: steps.cache.outputs.cache-hit == 'true' && steps.cache_check.outputs.venv == 'recreate'
-      uses: actions/cache/save@27d5ce7f107fe9357f9df03efb73ab90386fccae # ratchet:actions/cache@v5.0.5
+      if: steps.cache.outputs.cache-matched-key == '' || steps.cache_check.outputs.venv == 'recreate'
+      uses: actions/cache/save@27d5ce7f107fe9357f9df03efb73ab90386fccae # ratchet:actions/cache/save@v5.0.5
       with:
         path: .venv
-        key: venv-${{ runner.os }}-${{ inputs.python-version }}-${{ hashFiles('uv.lock') }}
+        key: ${{ steps.cache.outputs.cache-primary-key }}

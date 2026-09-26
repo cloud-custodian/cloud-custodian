@@ -3,7 +3,6 @@
 #
 import json
 from collections import Counter
-from datetime import datetime
 from pathlib import Path
 from importlib.metadata import version as pkg_version
 import sys
@@ -19,7 +18,7 @@ from rich.text import Text
 from .core import CollectionRunner, PolicyMetadata
 from .utils import SEVERITY_LEVELS
 from c7n.output import OutputRegistry
-from c7n.utils import jmespath_search, filter_empty
+from c7n.utils import jmespath_search, filter_empty, utcnow_naive
 
 report_outputs = OutputRegistry("left")
 
@@ -484,7 +483,7 @@ class JunitReport(Output):
         self.policy_results[policy.name].extend(results)
 
     def on_execution_started(self, policies, graph):
-        self.start_time = datetime.utcnow()
+        self.start_time = utcnow_naive()
         self.policies = {p.name: p for p in sorted(map(PolicyMetadata, policies), key=severity_key)}
         self.policy_resources = {pname: [] for pname in self.policies}
         self.policy_results = {pname: [] for pname in self.policies}
@@ -516,7 +515,7 @@ class JunitReport(Output):
         return {
             "id": "c7n-left",
             "name": "IaC Policy Compliance",
-            "time": "%0.2f" % (datetime.utcnow() - self.start_time).total_seconds(),
+            "time": "%0.2f" % (utcnow_naive() - self.start_time).total_seconds(),
             "tests": str(sum(map(len, self.policy_resources.values()))),
             "failures": str(sum(map(len, self.policy_results.values()))),
         }
@@ -587,7 +586,7 @@ class GitlabSAST(Output):
         self.results.extend(results)
 
     def on_execution_started(self, *args):
-        self.start_time = datetime.utcnow().replace(microsecond=0)
+        self.start_time = utcnow_naive().replace(microsecond=0)
 
     def on_execution_ended(self):
         formatted_results = [self.format_result(r) for r in self.results]
@@ -601,7 +600,7 @@ class GitlabSAST(Output):
                         "type": "sast",
                         "status": "success",
                         "start_time": self.start_time.isoformat(),
-                        "end_time": datetime.utcnow().replace(microsecond=0).isoformat(),
+                        "end_time": utcnow_naive().replace(microsecond=0).isoformat(),
                         "analyzer": self.get_analyzer(),
                         "scanner": self.get_scanner(),
                     },

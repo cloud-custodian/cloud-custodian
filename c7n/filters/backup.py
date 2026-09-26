@@ -1,8 +1,8 @@
 # Copyright The Cloud Custodian Authors.
 # SPDX-License-Identifier: Apache-2.0
 from .core import Filter
-from datetime import datetime, timedelta
-from c7n.utils import type_schema, local_session, chunks
+from datetime import timedelta
+from c7n.utils import type_schema, local_session, chunks, utcnow_naive
 from c7n.query import RetryPageIterator
 
 
@@ -44,11 +44,11 @@ class ConsecutiveAwsBackupsFilter(Filter):
     def get_date(self, time):
         period = self.data.get('period')
         if period == 'weeks':
-            date = (datetime.utcnow() - timedelta(weeks=time)).strftime('%Y-%m-%d')
+            date = (utcnow_naive() - timedelta(weeks=time)).strftime('%Y-%m-%d')
         elif period == 'hours':
-            date = (datetime.utcnow() - timedelta(hours=time)).strftime('%Y-%m-%d-%H')
+            date = (utcnow_naive() - timedelta(hours=time)).strftime('%Y-%m-%d-%H')
         else:
-            date = (datetime.utcnow() - timedelta(days=time)).strftime('%Y-%m-%d')
+            date = (utcnow_naive() - timedelta(days=time)).strftime('%Y-%m-%d')
         return date
 
     def process(self, resources, event=None):

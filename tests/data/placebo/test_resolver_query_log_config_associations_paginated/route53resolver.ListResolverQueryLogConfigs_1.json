@@ -1,0 +1,28 @@
+{
+    "status_code": 200,
+    "data": {
+        "TotalCount": 2,
+        "TotalFilteredCount": 2,
+        "ResolverQueryLogConfigs": [
+            {
+                "Id": "rqlc-aaaa",
+                "OwnerId": "123456789012",
+                "Status": "CREATED",
+                "ShareStatus": "NOT_SHARED",
+                "Arn": "arn:aws:route53resolver:us-east-1:123456789012:resolver-query-log-config/rqlc-aaaa",
+                "Name": "first",
+                "DestinationArn": "arn:aws:s3:::rqlc-logs-123456789012"
+            },
+            {
+                "Id": "rqlc-bbbb",
+                "OwnerId": "123456789012",
+                "Status": "CREATED",
+                "ShareStatus": "NOT_SHARED",
+                "Arn": "arn:aws:route53resolver:us-east-1:123456789012:resolver-query-log-config/rqlc-bbbb",
+                "Name": "second",
+                "DestinationArn": "arn:aws:s3:::rqlc-logs-123456789012"
+            }
+        ],
+        "ResponseMetadata": {}
+    }
+}

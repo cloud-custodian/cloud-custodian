@@ -262,7 +262,7 @@ class SqlBackupRun(SqlInstanceChildWithSelfLink):
             :param insert_time: a UTC ISO formatted date time string
             :return: an integer number of microseconds since unix epoch
             """
-            delta = parse(insert_time).replace(tzinfo=None) - datetime.utcfromtimestamp(0)
+            delta = parse(insert_time).replace(tzinfo=None) - datetime(1970, 1, 1)
             return int(delta.total_seconds()) * 1000 + int(delta.microseconds / 1000)
 
 

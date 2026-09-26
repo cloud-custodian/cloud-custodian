@@ -16,7 +16,10 @@ from unittest import mock
 from unittest.mock import patch
 import zipfile
 
+import boto3
+from botocore.stub import Stubber
 
+from c7n import mu as c7n_mu
 from c7n.config import Config
 from c7n.mu import (
     custodian_archive,
@@ -1386,6 +1389,96 @@ class PolicyLambdaProvision(Publish):
         self.assertEqual(result["Runtime"], "python3.6")
 
 
+class SQSSubscriptionTest(BaseTest):
+
+    def get_client(self, mappings=()):
+        client = mock.MagicMock()
+        client.get_paginator.return_value.paginate.return_value.build_full_result.return_value = {
+            'EventSourceMappings': list(mappings)}
+        session = mock.MagicMock()
+        session.client.return_value = client
+        self.patch(c7n_mu, 'local_session', lambda factory: session)
+        return client
+
+    def test_add_subscribes_every_queue(self):
+        client = self.get_client()
+        sub = SQSSubscription(None, ['arn:aws:sqs:us-east-1:123:a', 'arn:aws:sqs:us-east-1:123:b'])
+        self.assertTrue(sub.add(mock.MagicMock(name='func'), None))
+        self.assertEqual(
+            [c[1]['EventSourceArn'] for c in client.create_event_source_mapping.call_args_list],
+            ['arn:aws:sqs:us-east-1:123:a', 'arn:aws:sqs:us-east-1:123:b'])
+
+    def test_add_updates_only_mismatched_mappings(self):
+        client = self.get_client([
+            # as configured, left alone
+            {'EventSourceArn': 'arn:aws:sqs:us-east-1:123:ok', 'UUID': 'ok',
+             'State': 'Enabled', 'BatchSize': 10},
+            {'EventSourceArn': 'arn:aws:sqs:us-east-1:123:disabled', 'UUID': 'disabled',
+             'State': 'Disabled', 'BatchSize': 10},
+            {'EventSourceArn': 'arn:aws:sqs:us-east-1:123:batch', 'UUID': 'batch',
+             'State': 'Enabled', 'BatchSize': 1},
+        ])
+        sub = SQSSubscription(None, [
+            'arn:aws:sqs:us-east-1:123:ok',
+            'arn:aws:sqs:us-east-1:123:disabled',
+            'arn:aws:sqs:us-east-1:123:batch'])
+        self.assertTrue(sub.add(mock.MagicMock(name='func'), None))
+        self.assertEqual(
+            [c[1]['UUID'] for c in client.update_event_source_mapping.call_args_list],
+            ['disabled', 'batch'])
+        client.create_event_source_mapping.assert_not_called()
+
+    def test_add_nothing_to_do(self):
+        client = self.get_client([
+            {'EventSourceArn': 'arn:aws:sqs:us-east-1:123:ok', 'UUID': 'ok',
+             'State': 'Enabled', 'BatchSize': 10}])
+        sub = SQSSubscription(None, ['arn:aws:sqs:us-east-1:123:ok'])
+        self.assertFalse(sub.add(mock.MagicMock(name='func'), None))
+        client.update_event_source_mapping.assert_not_called()
+        client.create_event_source_mapping.assert_not_called()
+
+    def test_mappings_are_paginated(self):
+        # a queue whose mapping is only on the second page is already
+        # subscribed, and must be neither subscribed again nor missed on remove
+        client = boto3.Session(region_name='us-east-1').client(
+            'lambda', aws_access_key_id='x', aws_secret_access_key='x')
+        self.patch(c7n_mu, 'local_session', lambda factory: mock.MagicMock(
+            client=mock.MagicMock(return_value=client)))
+        func = mock.MagicMock()
+        func.name = 'custodian-sqs'
+        queue = 'arn:aws:sqs:us-east-1:123456789012:page-two'
+        pages = [
+            {'EventSourceMappings': [{
+                'EventSourceArn': 'arn:aws:sqs:us-east-1:123456789012:page-one',
+                'UUID': 'a1b2c3d4-0000-0000-0000-000000000001',
+                'State': 'Enabled', 'BatchSize': 10}],
+             'NextMarker': 'page-2'},
+            {'EventSourceMappings': [{
+                'EventSourceArn': queue,
+                'UUID': 'a1b2c3d4-0000-0000-0000-000000000002',
+                'State': 'Enabled', 'BatchSize': 10}]}]
+        sub = SQSSubscription(None, [queue])
+        with Stubber(client) as stubber:
+            stubber.add_response(
+                'list_event_source_mappings', pages[0], {'FunctionName': func.name})
+            stubber.add_response(
+                'list_event_source_mappings', pages[1],
+                {'FunctionName': func.name, 'Marker': 'page-2'})
+            self.assertFalse(sub.add(func, None))
+            stubber.assert_no_pending_responses()
+
+            stubber.add_response(
+                'list_event_source_mappings', pages[0], {'FunctionName': func.name})
+            stubber.add_response(
+                'list_event_source_mappings', pages[1],
+                {'FunctionName': func.name, 'Marker': 'page-2'})
+            stubber.add_response(
+                'delete_event_source_mapping', {},
+                {'UUID': 'a1b2c3d4-0000-0000-0000-000000000002'})
+            self.assertTrue(sub.remove(func))
+            stubber.assert_no_pending_responses()
+
+
 class PythonArchiveTest(unittest.TestCase):
 
     def make_archive(self, modules=(), cache_file=None):
@@ -1550,6 +1643,57 @@ class PythonArchiveTest(unittest.TestCase):
         with archive.get_reader() as reader:
             self.assertEqual(b"So yummy!", reader.read("cheese.txt"))
             self.assertEqual(b"True!", reader.read("cheese/is/yummy.txt"))
+
+    def test_remove_an_open_archive(self):
+        # remove() closed the temp file while the zipfile still held it,
+        # and the zipfile's finalizer then raised on the closed handle.
+        archive = self.make_open_archive()
+        path = archive.path
+        archive.remove()
+        self.assertTrue(archive._closed)
+        self.assertFalse(os.path.exists(path))
+        archive.__del__()
+
+    def test_remove_failure_clears_temp_file(self):
+        # a failed unlink in remove() must not leave the finalizer to retry
+        # it (and raise from __del__)
+        archive = self.make_archive()
+        # windows can't unlink a file that is still open
+        archive._temp_archive_file.close()
+        os.unlink(archive.path)
+        with self.assertRaises(FileNotFoundError):
+            archive.remove()
+        self.assertIsNone(archive._temp_archive_file)
+        archive.__del__()
+
+    def test_del_tolerates_missing_temp_file(self):
+        # no remove() cleanup here, the file is deliberately gone
+        archive = PythonPackageArchive()
+        archive.close()
+        path = archive.path
+        # windows can't unlink a file that is still open
+        archive._temp_archive_file.close()
+        os.unlink(path)
+        # nothing to raise to from a finalizer
+        archive.__del__()
+        self.assertFalse(os.path.exists(path))
+
+    def test_get_bytes_closes_stream(self):
+        # get_bytes() used to leak the file handle opened by get_stream(),
+        # which leaks a descriptor on every lambda publish.
+        archive = self.make_archive()
+        opened = []
+        get_stream = archive.get_stream
+
+        def tracking_get_stream():
+            fh = get_stream()
+            opened.append(fh)
+            return fh
+
+        archive.get_stream = tracking_get_stream
+        self.assertEqual(archive.get_bytes()[:2], b"PK")
+        self.assertEqual(len(opened), 1)
+        self.assertTrue(opened[0].closed)
 
 
 class PycCase(unittest.TestCase):

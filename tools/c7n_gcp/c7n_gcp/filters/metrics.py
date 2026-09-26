@@ -3,11 +3,12 @@
 """
 Monitoring Metrics suppport for resources
 """
-from datetime import datetime, timedelta
+from datetime import timedelta
 
 from c7n.filters.core import Filter, OPERATORS, FilterValidationError
 from c7n.filters.metrics import METRIC_WINDOW_ALIGNMENT
-from c7n.utils import local_session, type_schema, jmespath_search, snap_to_period_start
+from c7n.utils import (
+    local_session, type_schema, jmespath_search, snap_to_period_start, utcnow_naive)
 
 from c7n_gcp.provider import resources as gcp_resources
 
@@ -131,7 +132,7 @@ class GCPMetricsFilter(Filter):
         self.group_by_fields = self.data.get('group-by-fields', [])
         self.missing_value = self.data.get('missing-value')
 
-        self.end = datetime.utcnow().replace(microsecond=0)
+        self.end = utcnow_naive().replace(microsecond=0)
         self.start = self.end - duration
         self.period_start = self.data.get('period-start', 'auto')
         self.start, self.end = snap_to_period_start(self.start, self.end, self.period_start)

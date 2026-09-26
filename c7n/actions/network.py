@@ -198,11 +198,12 @@ class ModifyVpcSecurityGroupsAction(Action):
                 "with modify-security-group: {resource_id}",
                 resource_id=r[self.manager.resource_type.id]))
 
-        found = False
         for n in names:
+            found = False
             for g in groups:
                 if g['GroupName'] == n and g['VpcId'] == vpc_id:
                     found = g['GroupId']
+                    break
             if not found:
                 raise PolicyExecutionError(self._format_error((
                     "policy:{policy} could not resolve sg:{name} for "

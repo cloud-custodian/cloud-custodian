@@ -80,7 +80,9 @@ class CostManagementExportFilterLastExecution(Filter):
     def process(self, resources, event=None):
         self.client = self.manager.get_client()
         self.scope = 'subscriptions/{0}'.format(self.manager.get_session().get_subscription_id())
-        self.min_date = datetime.datetime.now() - datetime.timedelta(days=self.data['age'])
+        # submitted_time comes back as an aware utc datetime, compare dates in utc
+        self.min_date = datetime.datetime.now(datetime.timezone.utc) - datetime.timedelta(
+            days=self.data['age'])
 
         result, _ = ThreadHelper.execute_in_parallel(
             resources=resources,

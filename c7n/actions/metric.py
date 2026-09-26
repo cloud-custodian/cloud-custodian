@@ -1,6 +1,5 @@
 # Copyright The Cloud Custodian Authors.
 # SPDX-License-Identifier: Apache-2.0
-from datetime import datetime
 
 from .core import BaseAction
 from c7n.manager import resources
@@ -111,7 +110,7 @@ class PutMetric(BaseAction):
         # dimensions are passed as a list of dicts
         dimensions = self.data.get('dimensions', [])
 
-        now = datetime.utcnow()
+        now = utils.utcnow_naive()
 
         # reduce the resources by the key expression, and apply the operation to derive the value
         values = []
@@ -122,7 +121,7 @@ class PutMetric(BaseAction):
             # I had to wrap resourses in a dict like this in order to not have jmespath expressions
             # start with [] in the yaml files.  It fails to parse otherwise.
         except TypeError as oops:
-            self.log.error(oops.message)
+            self.log.error(str(oops))
 
         value = 0
         try:

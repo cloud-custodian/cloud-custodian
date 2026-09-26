@@ -12,7 +12,7 @@ from c7n.actions import ActionRegistry, BaseAction, ModifyVpcSecurityGroupsActio
 from c7n.exceptions import PolicyValidationError
 from c7n.filters import Filter, FilterRegistry, ValueFilter, ShieldMetrics
 import c7n.filters.vpc as net_filters
-from datetime import datetime
+from datetime import datetime, timezone
 from c7n import tags
 from c7n.manager import resources
 from c7n.query import ConfigSource, QueryResourceManager, DescribeSource, TypeInfo
@@ -270,7 +270,7 @@ class SetSslListenerPolicy(BaseAction):
         # to make it unique within the
         # set of policies for this load balancer.
         policy_name = self.data.get('name') + '-' + \
-            str(int(datetime.utcnow().timestamp() * 1000))
+            str(int(datetime.now(timezone.utc).timestamp() * 1000))
         lb_name = elb['LoadBalancerName']
         attrs = self.data.get('attributes')
 

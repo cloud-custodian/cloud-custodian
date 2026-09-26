@@ -21,7 +21,7 @@ from dateutil import parser
 from dateutil import tz as tzutil
 import c7n.filters.backup
 
-from .common import BaseTest, event_data
+from .common import BaseTest, event_data, record_api_params
 from pytest_terraform import terraform
 
 logger = logging.getLogger(name="c7n.tests")
@@ -308,6 +308,25 @@ class RDSTest(BaseTest):
 
         resources = p.run()
         self.assertEqual(len(resources), 1)
+
+    def test_rds_snapshot_prefix(self):
+        session_factory = self.replay_flight_data("test_rds_snapshot")
+        created = record_api_params(session_factory, 'rds', 'CreateDBSnapshot')
+        p = self.load_policy(
+            {
+                "name": "rds-snapshot",
+                "resource": "rds",
+                "filters": [{"DBInstanceIdentifier": "c7n-snapshot-test"}],
+                "actions": [{"type": "snapshot", "snapshot-prefix": "nightly"}],
+            },
+            session_factory=session_factory,
+            validate=True,
+        )
+        resources = p.run()
+        self.assertEqual(len(resources), 1)
+        self.assertEqual(len(created), 1)
+        self.assertTrue(
+            created[0]['DBSnapshotIdentifier'].startswith('nightly-c7n-snapshot-test-'))
 
     def test_rds_snapshot(self):
         session_factory = self.replay_flight_data("test_rds_snapshot")

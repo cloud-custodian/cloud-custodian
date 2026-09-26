@@ -951,3 +951,24 @@ class TestGlueDataCatalog(BaseTest):
         p.push(event_data("event-cloud-trail-catalog-put-resource-policy.json"), None)
         after_cat_setting = client.get_resource_policy()
         assert 'o-4amkskbcf3' not in after_cat_setting.get('PolicyInJson')
+
+
+class GlueSecurityConfigurationKmsFilter(BaseTest):
+
+    def test_key_type_selects_related_ids(self):
+        expected = {
+            None: 'EncryptionConfiguration.*[][].KmsKeyArn',
+            's3': 'EncryptionConfiguration.S3Encryption[].KmsKeyArn',
+            'cloudwatch': 'EncryptionConfiguration.CloudWatchEncryption.KmsKeyArn',
+            'job-bookmarks': 'EncryptionConfiguration.JobBookmarksEncryption.KmsKeyArn',
+        }
+        for key_type, expression in expected.items():
+            f = {'type': 'kms-key', 'key': 'c7n:AliasName', 'value': 'alias/x'}
+            if key_type:
+                f['key-type'] = key_type
+            p = self.load_policy({
+                'name': 'glue-sec-config-kms',
+                'resource': 'glue-security-configuration',
+                'filters': [f]})
+            self.assertEqual(
+                p.resource_manager.filters[0].RelatedIdsExpression, expression, key_type)

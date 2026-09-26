@@ -1,7 +1,7 @@
 # Copyright The Cloud Custodian Authors.
 # SPDX-License-Identifier: Apache-2.0
 from argparse import Namespace
-from datetime import datetime, timedelta
+from datetime import datetime, timedelta, timezone
 import os
 import pickle
 import sqlite3
@@ -61,6 +61,22 @@ def test_sqlkv_get_expired(tmp_path):
     kv1 = {'a': 'b', 'c': 'd'}
     kv.save(kv1, kv1, datetime.utcnow() - timedelta(days=10))
     assert kv.get(kv1) is None
+
+
+def test_sqlkv_save_aware_timestamp(tmp_path):
+    kv = cache.SqlKvCache(config.Bag(cache=tmp_path / "cache.db", cache_period=60))
+    kv.load()
+    fresh, stale = {'a': 'fresh'}, {'a': 'stale'}
+    plus_two = timezone(timedelta(hours=2))
+    # 30 minutes ago, expressed in a +02:00 offset
+    kv.save(fresh, fresh, datetime.now(plus_two) - timedelta(minutes=30))
+    kv.save(stale, stale, datetime.now(plus_two) - timedelta(minutes=90))
+    assert kv.get(fresh) == fresh
+    assert kv.get(stale) is None
+    create_date, = kv.conn.execute(
+        'select create_date from c7n_cache where key = ?',
+        [sqlite3.Binary(cache.encode(fresh))]).fetchone()
+    assert datetime.fromisoformat(create_date).tzinfo is None
 
 
 def test_sqlkv_load_gc(tmp_path):
