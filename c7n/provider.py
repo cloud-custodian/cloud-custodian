@@ -45,9 +45,16 @@ class Provider(metaclass=abc.ABCMeta):
         region execution and filtering policies for applicable regions.
         """
 
+
     @abc.abstractmethod
     def get_session_factory(self, options):
         """Get a credential/session factory for api usage."""
+
+    @staticmethod
+    def initialize_resource(resource_class):
+        """Perform initialize provider specific filter/action registry
+        registrations.
+        """
 
     @classmethod
     def get_resource_types(cls, resource_types):
