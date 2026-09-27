@@ -250,13 +250,16 @@ To enable logging to CloudWatch logs, Stackdriver, or Azure AppInsights, use the
   custodian run -s output -l gcp://cloud-custodian/policies policy.yml
 
 You can also store the output of your Custodian logs in a cloud provider's blob storage like S3
-or Azure Storage accounts::
+, Azure Storage accounts or Google Cloud Storage::
 
   # AWS S3
   custodian run -s s3://my-custodian-bucket policy.yml
 
   # Azure Storage Accounts
   custodian run -s azure://my-custodian-storage-account policy.yml
+
+  # Google Cloud Storage
+  custodian run -s gs://my-custodian-bucket policy.yml
 
 .. _mailer_and_notifications_deployment:
 
