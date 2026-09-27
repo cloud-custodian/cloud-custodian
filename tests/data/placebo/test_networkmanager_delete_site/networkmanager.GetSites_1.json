@@ -1,0 +1,34 @@
+{
+    "status_code": 200,
+    "data": {
+        "ResponseMetadata": {},
+        "Sites": [
+            {
+                "SiteId": "site-0a54703922a2056d3",
+                "SiteArn": "arn:aws:networkmanager::644160558196:site/global-network-077b7e4d1b5d9989c/site-0a54703922a2056d3",
+                "GlobalNetworkId": "global-network-077b7e4d1b5d9989c",
+                "CreatedAt": {
+                    "__class__": "datetime",
+                    "year": 2024,
+                    "month": 9,
+                    "day": 3,
+                    "hour": 20,
+                    "minute": 55,
+                    "second": 3,
+                    "microsecond": 0
+                },
+                "State": "AVAILABLE",
+                "Tags": [
+                    {
+                        "Key": "deleteme",
+                        "Value": "delete"
+                    },
+                    {
+                        "Key": "Name",
+                        "Value": "c7n-test"
+                    }
+                ]
+            }
+        ]
+    }
+}
