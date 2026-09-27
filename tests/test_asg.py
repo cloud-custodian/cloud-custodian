@@ -978,6 +978,49 @@ class AutoScalingTest(BaseTest):
             sorted(["subnet-65dbce1d", "subnet-b77a4ffd", "subnet-db9f62b2"]),
         )
 
+    def test_asg_security_group_per_asg(self):
+        # related ids are resolved per asg, rather than from the union of
+        # every launch config/template the filter has loaded.
+        factory = self.replay_flight_data("test_asg_network_location")
+        p = self.load_policy(
+            {
+                "name": "asg-security-group-per-asg",
+                "resource": "asg",
+                "filters": [
+                    {"type": "security-group", "key": "GroupName",
+                     "value": "c7n-nl-sg-a"}
+                ],
+            },
+            session_factory=factory,
+        )
+        resources = p.run()
+        # only c7n-nl-asg-1's launch template references c7n-nl-sg-a
+        self.assertEqual(
+            [r["AutoScalingGroupName"] for r in resources], ["c7n-nl-asg-1"])
+
+    def test_asg_network_location(self):
+        # network-location calls get_related() on the security group filter
+        # directly, without the process() method that used to initialize the
+        # launch info the related ids are resolved from.
+        factory = self.replay_flight_data("test_asg_network_location")
+        p = self.load_policy(
+            {
+                "name": "asg-network-location",
+                "resource": "asg",
+                "filters": [
+                    {
+                        "type": "network-location",
+                        "key": "tag:AppId",
+                        "compare": ["resource", "security-group"],
+                    }
+                ],
+            },
+            session_factory=factory,
+        )
+        resources = p.run()
+        self.assertIn(
+            "c7n-nl-asg-1", [r["AutoScalingGroupName"] for r in resources])
+
     def test_asg_security_group_not_matched(self):
         factory = self.replay_flight_data("test_asg_security_group_not_matched")
         p = self.load_policy(
