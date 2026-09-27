@@ -942,6 +942,93 @@ class KMSCrossAccount(BaseTest):
         self.assertEqual(resources[0]["KeyId"], key_info["KeyId"])
 
 
+class KMSPolicyAccessDeniedTest(BaseTest):
+
+    def _make_filter(self, name="kms-policy-access-denied"):
+        from c7n.executor import MainThreadExecutor
+        p = self.load_policy(
+            {"name": name, "resource": "kms-key",
+             "filters": [{"type": "policy-access-denied"}]}
+        )
+        f = p.resource_manager.filters[0]
+        self.patch(f, "executor_factory", MainThreadExecutor)
+        return f
+
+    def test_policy_access_denied_matches_inaccessible_key(self):
+        from unittest import mock
+        from botocore.exceptions import ClientError
+        from c7n.resources import kms as kms_module
+
+        f = self._make_filter()
+        key = {"KeyId": "denied-key", "KeyArn": "arn:aws:kms:us-east-1:123:key/denied"}
+        mock_client = mock.MagicMock()
+        mock_client.get_key_policy.side_effect = ClientError(
+            {"Error": {"Code": "AccessDeniedException", "Message": "Denied"}},
+            "GetKeyPolicy",
+        )
+        with mock.patch.object(kms_module, "local_session") as ls:
+            ls.return_value.client.return_value = mock_client
+            results = f.process([key])
+
+        self.assertEqual(len(results), 1)
+        self.assertEqual(results[0]["KeyId"], "denied-key")
+        self.assertTrue(results[0]["c7n:PolicyAccessDenied"])
+
+    def test_policy_access_denied_excludes_accessible_key(self):
+        from unittest import mock
+        from c7n.resources import kms as kms_module
+
+        f = self._make_filter()
+        key = {"KeyId": "ok-key", "KeyArn": "arn:aws:kms:us-east-1:123:key/ok"}
+        mock_client = mock.MagicMock()
+        mock_client.get_key_policy.return_value = {"Policy": "{}"}
+        with mock.patch.object(kms_module, "local_session") as ls:
+            ls.return_value.client.return_value = mock_client
+            results = f.process([key])
+
+        self.assertEqual(results, [])
+
+    def test_policy_access_denied_other_error_reraises(self):
+        from unittest import mock
+        from botocore.exceptions import ClientError
+        from c7n.resources import kms as kms_module
+
+        f = self._make_filter()
+        key = {"KeyId": "bad-key", "KeyArn": "arn:aws:kms:us-east-1:123:key/bad"}
+        mock_client = mock.MagicMock()
+        mock_client.get_key_policy.side_effect = ClientError(
+            {"Error": {"Code": "InternalFailure", "Message": "Boom"}},
+            "GetKeyPolicy",
+        )
+        with mock.patch.object(kms_module, "local_session") as ls:
+            ls.return_value.client.return_value = mock_client
+            with self.assertRaises(ClientError):
+                f.process([key])
+
+    def test_policy_access_denied_mixed_batch(self):
+        # Denied keys are returned; accessible keys are excluded.
+        from unittest import mock
+        from botocore.exceptions import ClientError
+        from c7n.resources import kms as kms_module
+
+        f = self._make_filter()
+        denied = {"KeyId": "denied", "KeyArn": "arn:aws:kms:us-east-1:123:key/denied"}
+        accessible = {"KeyId": "ok", "KeyArn": "arn:aws:kms:us-east-1:123:key/ok"}
+        access_denied = ClientError(
+            {"Error": {"Code": "AccessDeniedException", "Message": "Denied"}},
+            "GetKeyPolicy",
+        )
+        mock_client = mock.MagicMock()
+        mock_client.get_key_policy.side_effect = [access_denied, {"Policy": "{}"}]
+        with mock.patch.object(kms_module, "local_session") as ls:
+            ls.return_value.client.return_value = mock_client
+            results = f.process([denied, accessible])
+
+        self.assertEqual(len(results), 1)
+        self.assertEqual(results[0]["KeyId"], "denied")
+        self.assertEqual(mock_client.get_key_policy.call_count, 2)
+
+
 class KMSMotoTests(BaseTest):
     @pytest.fixture(autouse=True)
     def use_utc_timezone(self, monkeypatch):
