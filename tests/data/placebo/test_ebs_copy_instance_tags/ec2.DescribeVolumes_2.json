@@ -1,0 +1,50 @@
+{
+    "status_code": 200, 
+    "data": {
+        "ResponseMetadata": {
+            "HTTPStatusCode": 200, 
+            "RequestId": "37d42735-bd60-460c-b3f5-c86fa29197a5"
+        }, 
+        "Volumes": [
+            {
+                "AvailabilityZone": "us-west-2c", 
+                "Attachments": [
+                    {
+                        "AttachTime": {
+                            "hour": 5, 
+                            "__class__": "datetime", 
+                            "month": 4, 
+                            "second": 29, 
+                            "microsecond": 0, 
+                            "year": 2016, 
+                            "day": 14, 
+                            "minute": 17
+                        }, 
+                        "InstanceId": "i-1aebf7c0", 
+                        "VolumeId": "vol-2b047792", 
+                        "State": "attached", 
+                        "DeleteOnTermination": true, 
+                        "Device": "/dev/xvda"
+                    }
+                ], 
+                "Encrypted": false, 
+                "VolumeType": "gp2", 
+                "VolumeId": "vol-2b047792", 
+                "State": "in-use", 
+                "Iops": 24, 
+                "SnapshotId": "snap-eef4cdae", 
+                "CreateTime": {
+                    "hour": 5, 
+                    "__class__": "datetime", 
+                    "month": 4, 
+                    "second": 29, 
+                    "microsecond": 813000, 
+                    "year": 2016, 
+                    "day": 14, 
+                    "minute": 17
+                }, 
+                "Size": 8
+            }
+        ]
+    }
+}

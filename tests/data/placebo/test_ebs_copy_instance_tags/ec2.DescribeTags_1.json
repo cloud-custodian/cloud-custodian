@@ -5,6 +5,13 @@
             "HTTPStatusCode": 200, 
             "RequestId": "ea74902e-4f6c-40aa-adce-8bf0273e7f37"
         }, 
-        "Tags": []
+        "Tags": [
+          {
+            "ResourceType": "volume",
+            "ResourceId": "vol-2b047792",
+            "Value": "Original Value",
+            "Key": "Testing"
+          }
+        ]
     }
 }
