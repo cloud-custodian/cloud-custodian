@@ -389,14 +389,18 @@ class Notify(BaseNotify):
 
     def send_sqs(self, message, payload):
         queue = self.data['transport']['queue'].format(**message)
+        domain = None
+        if queue.startswith('https://'):
+            domain = queue[len('https://'):].split('/', 1)[0]
+
         if queue.startswith('https://queue.amazonaws.com'):
             region = 'us-east-1'
             queue_url = queue
-        elif 'queue.amazonaws.com' in queue:
-            region = queue[len('https://'):].split('.', 1)[0]
+        elif domain and domain.endswith('queue.amazonaws.com'):
+            region = domain.split('.', 1)[0]
             queue_url = queue
-        elif queue.startswith('https://sqs.'):
-            region = queue.split('.', 2)[1]
+        elif domain and domain.startswith('sqs.'):
+            region = domain.split('.', 2)[1]
             queue_url = queue
         elif queue.startswith('arn:'):
             queue_arn_split = queue.split(':', 5)
