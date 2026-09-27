@@ -5,8 +5,10 @@ Advanced Usage
 
 * :ref:`run-multiple-regions`
 * :ref:`report-multiple-regions`
-* :ref:`report-custom-fields`
+* :ref:`scheduling-policy-execution`
 * :ref:`policy_resource_limits`
+* :ref:`report-custom-fields`
+* :ref:`policy-variable-expansion`
 
 .. _run-multiple-regions:
 
@@ -272,3 +274,58 @@ To remove the default fields and only add the desired ones, the ``--no-default-f
 flag can be specified and then specific fields can be added in, e.g.::
 
   custodian report -s out --no-default-fields --field Image=ImageId policy.yml
+
+.. _policy-variable-expansion:
+
+Policy variable expansion
+-------------------------
+
+Policy authors can take advantage of variables to make policies easier to manage. These variables come in multiple forms:
+
+File-level ``vars`` block
+~~~~~~~~~~~~~~~~~~~~~~~~~
+
+A ``vars`` block at the top of a policy file allows multiple policies to reference the same shared value. The :doc:`Elastic IP cleanup policy </aws/examples/eipgarbagecollect>` is a good illustration - it defines shared values at the top of the file including a common policy execution mode:
+
+.. code-block:: yaml
+
+  vars:
+    run_mode: &run_mode
+      type: periodic
+      schedule: "rate(1 day)"
+      tags:
+        app: "c7n"
+        env: "tools"
+        account: "{account_id}"
+
+In this example ``&run_mode`` represents a *YAML anchor*. If several policies in the same file need to run on the same schedule, they can use the *YAML alias* ``*run_mode`` in their ``mode`` blocks. That avoids some risk of typos or inconsistencies, and allows the mode to be changed in a single place later:
+
+.. code-block:: yaml
+
+  policies:
+    - name: unused-eip-mark
+      resource: network-addr
+      mode:
+        <<: *run_mode
+
+    - name: unused-eip-unmark-if-in-use
+      resource: network-addr
+      mode:
+        <<: *run_mode
+
+TODO
+----
+
+* Standard runtime variables
+
+  * account_id
+
+  * region
+
+  * now
+
+  * less used but available: partition, policy
+
+* Filter/action-level variables
+
+* Disambiguate `c7n-org variables </tools/c7n-org.html#defining-and-using-variables>`_
