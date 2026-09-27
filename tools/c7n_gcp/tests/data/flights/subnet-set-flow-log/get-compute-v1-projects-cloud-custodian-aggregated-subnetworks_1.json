@@ -1,0 +1,50 @@
+{
+  "headers": {
+    "etag": "ysULMGwQRoIV3X2x_cg4BSvzMcA=/PSCaoW2JlI88h08mSfvXYVFAvds=",
+    "content-type": "application/json; charset=UTF-8",
+    "vary": "Origin, X-Origin, Referer",
+    "date": "Sun, 15 Mar 2026 19:21:09 GMT",
+    "server": "ESF",
+    "x-xss-protection": "0",
+    "x-frame-options": "SAMEORIGIN",
+    "x-content-type-options": "nosniff",
+    "alt-svc": "h3=\":443\"; ma=2592000,h3-29=\":443\"; ma=2592000",
+    "transfer-encoding": "chunked",
+    "status": "200",
+    "content-length": "45270",
+    "-content-encoding": "gzip",
+    "content-location": "https://compute.googleapis.com/compute/v1/projects/cloud-custodian/aggregated/subnetworks?alt=json"
+  },
+  "body": {
+    "kind": "compute#subnetworkAggregatedList",
+    "id": "projects/cloud-custodian/aggregated/subnetworks",
+    "items": {
+      "regions/us-central1": {
+        "subnetworks": [
+          {
+            "kind": "compute#subnetwork",
+            "id": "8299078460599089253",
+            "creationTimestamp": "2026-03-15T12:20:42.804-07:00",
+            "name": "native-roughy-subnet",
+            "network": "https://www.googleapis.com/compute/v1/projects/cloud-custodian/global/networks/native-roughy-vpc",
+            "ipCidrRange": "10.2.0.0/16",
+            "gatewayAddress": "10.2.0.1",
+            "region": "https://www.googleapis.com/compute/v1/projects/cloud-custodian/regions/us-central1",
+            "selfLink": "https://www.googleapis.com/compute/v1/projects/cloud-custodian/regions/us-central1/subnetworks/native-roughy-subnet",
+            "privateIpGoogleAccess": false,
+            "fingerprint": "jpPB3jgDLc8=",
+            "allowSubnetCidrRoutesOverlap": false,
+            "enableFlowLogs": false,
+            "privateIpv6GoogleAccess": "DISABLE_GOOGLE_ACCESS",
+            "purpose": "PRIVATE",
+            "logConfig": {
+              "enable": false
+            },
+            "stackType": "IPV4_ONLY"
+          }
+        ]
+      }
+    },
+    "selfLink": "https://www.googleapis.com/compute/v1/projects/cloud-custodian/aggregated/subnetworks"
+  }
+}
