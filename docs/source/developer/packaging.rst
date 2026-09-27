@@ -25,18 +25,18 @@ management activities.
 
 Usage
 -----
-We maintain several makefile targets that can be used to front end
+We maintain several ``just`` recipes that can be used to front end
 uv.
 
-  - `make install` installs custodian using uv.
+  - ``just install`` installs custodian using uv.
 
-  - `make pkg-increment` update all project versions
+  - ``just pkg increment`` update all project versions
 
-  - `make pkg-rebase` update dependencies across projects
+  - ``just pkg update`` update dependencies across projects
 
-  - `make pkg-build-wheel` build wheels and lint for all projects
+  - ``just pkg build-wheel`` build wheels and lint for all projects
 
-  - `make pkg-publish-wheel` publish previously built wheels for all projects
+  - ``just pkg publish`` publish previously built wheels for all projects
 
 
 Caveats
