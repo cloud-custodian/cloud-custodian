@@ -1,0 +1,9 @@
+{
+    "status_code": 200,
+    "data": {
+        "logGroupIdentifier": "/c7n-test/protected",
+        "policyDocument": "{\n  \"Name\": \"test-dp\",\n  \"Version\": \"2021-06-01\",\n  \"Statement\": [\n    {\"Sid\": \"audit\", \"DataIdentifier\": [\"arn:aws:dataprotection::aws:data-identifier/EmailAddress\"], \"Operation\": {\"Audit\": {\"FindingsDestination\": {}}}},\n    {\"Sid\": \"redact\", \"DataIdentifier\": [\"arn:aws:dataprotection::aws:data-identifier/EmailAddress\"], \"Operation\": {\"Deidentify\": {\"MaskConfig\": {}}}}\n  ]\n}",
+        "lastUpdatedTime": 1786561760361,
+        "ResponseMetadata": {}
+    }
+}
