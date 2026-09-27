@@ -21,8 +21,7 @@ The xray support can be enabled on the command line using::
 
 Note custodian does not require an X-Ray daemon running as it will stream
 traces directly sending to the X-Ray service. It will use the daemon if
-the AWS_XRAY_DAEMON_ADDRESS environment variable is set. Lambda policies
-should set tracing_config to enable use of the daemon.
+the AWS_XRAY_DAEMON_ADDRESS environment variable is set.
 
 
 By default custodian XRay integration will use the account's xray sampling rules
