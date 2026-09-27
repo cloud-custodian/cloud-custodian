@@ -1,0 +1,72 @@
+{
+    "pytest-terraform": 1,
+    "outputs": {},
+    "resources": {
+        "google_logging_project_sink": {
+            "c7n": {
+                "bigquery_options": [],
+                "description": "",
+                "destination": "storage.googleapis.com/dashing-slug-bucket",
+                "disabled": false,
+                "exclusions": [],
+                "filter": "resource.type = gce_instance AND severity >= WARNING",
+                "id": "projects/cloud-custodian/sinks/dashing-slug-sink",
+                "name": "dashing-slug-sink",
+                "project": "cloud-custodian",
+                "unique_writer_identity": true,
+                "writer_identity": "serviceAccount:service-000@gcp-sa-logging.iam.gserviceaccount.com"
+            }
+        },
+        "google_project_iam_binding": {
+            "c7n": {
+                "condition": [],
+                "etag": "BwYFUw3jg3g=",
+                "id": "cloud-custodian/roles/storage.objectCreator",
+                "members": [
+                    "serviceAccount:service-000@gcp-sa-logging.iam.gserviceaccount.com"
+                ],
+                "project": "cloud-custodian",
+                "role": "roles/storage.objectCreator"
+            }
+        },
+        "google_storage_bucket": {
+            "c7n": {
+                "autoclass": [],
+                "cors": [],
+                "custom_placement_config": [],
+                "default_event_based_hold": false,
+                "encryption": [],
+                "force_destroy": false,
+                "id": "dashing-slug-bucket",
+                "labels": {},
+                "lifecycle_rule": [],
+                "location": "US-CENTRAL1",
+                "logging": [],
+                "name": "dashing-slug-bucket",
+                "project": "cloud-custodian",
+                "public_access_prevention": "inherited",
+                "requester_pays": false,
+                "retention_policy": {
+                    "is_locked": false,
+                    "retention_period": 111
+                },
+                "self_link": "https://www.googleapis.com/storage/v1/b/dashing-slug-bucket",
+                "storage_class": "STANDARD",
+                "timeouts": null,
+                "uniform_bucket_level_access": false,
+                "url": "gs://dashing-slug-bucket",
+                "versioning": [],
+                "website": []
+            }
+        },
+        "random_pet": {
+            "server": {
+                "id": "dashing-slug",
+                "keepers": null,
+                "length": 2,
+                "prefix": null,
+                "separator": "-"
+            }
+        }
+    }
+}

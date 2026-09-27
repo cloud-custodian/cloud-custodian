@@ -1,0 +1,71 @@
+{
+  "headers": {
+    "content-type": "application/json; charset=UTF-8",
+    "vary": "Origin, X-Origin, Referer",
+    "date": "Tue, 19 Sep 2023 11:12:56 GMT",
+    "server": "ESF",
+    "cache-control": "private",
+    "x-xss-protection": "0",
+    "x-frame-options": "SAMEORIGIN",
+    "x-content-type-options": "nosniff",
+    "alt-svc": "h3=\":443\"; ma=2592000,h3-29=\":443\"; ma=2592000",
+    "transfer-encoding": "chunked",
+    "status": "200",
+    "content-length": "3260",
+    "-content-encoding": "gzip",
+    "content-location": "https://logging.googleapis.com/v2/projects/cloud-custodian/sinks?alt=json"
+  },
+  "body": {
+    "sinks": [
+      {
+        "name": "custodian-auto-audit-makaka-policy",
+        "destination": "pubsub.googleapis.com/projects/cloud-custodian/topics/custodian-auto-audit-makaka-policy",
+        "filter": "logName = \"projects/cloud-custodian/logs/cloudaudit.googleapis.com%2Factivity\" AND protoPayload.methodName = (\"v1.compute.disks.insert\")",
+        "writerIdentity": "serviceAccount:cloud-logs@system.gserviceaccount.com",
+        "createTime": "2021-03-22T15:56:31.547803614Z",
+        "updateTime": "2021-03-22T15:56:31.547803614Z"
+      },
+      {
+        "name": "custodian-auto-audit-policy",
+        "destination": "pubsub.googleapis.com/projects/cloud-custodian/topics/custodian-auto-audit-policy",
+        "filter": "logName = \"projects/cloud-custodian/logs/cloudaudit.googleapis.com%2Factivity\" AND protoPayload.methodName = (\"v1.compute.disks.createSnapshot\")",
+        "writerIdentity": "serviceAccount:cloud-logs@system.gserviceaccount.com",
+        "createTime": "2021-03-22T15:50:17.500204307Z",
+        "updateTime": "2021-03-22T16:22:29.905555221Z"
+      },
+      {
+        "name": "custodian-auto-audit-role-get",
+        "destination": "pubsub.googleapis.com/projects/cloud-custodian/topics/custodian-auto-audit-role-get",
+        "filter": "logName = \"projects/cloud-custodian/logs/cloudaudit.googleapis.com%2Factivity\" AND protoPayload.methodName = (\"google.iam.admin.v1.CreateServiceAccountKey\")",
+        "writerIdentity": "serviceAccount:cloud-logs@system.gserviceaccount.com",
+        "createTime": "2021-03-28T13:33:28.626985092Z",
+        "updateTime": "2021-03-29T08:52:29.529750738Z"
+      },
+      {
+        "name": "fwqer4",
+        "destination": "storage.googleapis.com/hyreu6t",
+        "filter": "grewyrr",
+        "writerIdentity": "serviceAccount:service-443732426401@gcp-sa-logging.iam.gserviceaccount.com",
+        "createTime": "2023-07-31T13:15:25.106947679Z",
+        "updateTime": "2023-07-31T13:17:19.902617008Z"
+      },
+      {
+        "name": "sink1",
+        "destination": "storage.googleapis.com/for_test_12345678",
+        "writerIdentity": "serviceAccount:cloud-logs@system.gserviceaccount.com",
+        "createTime": "2023-09-19T11:11:28.907071408Z",
+        "updateTime": "2023-09-19T11:11:28.907071408Z"
+      },
+      {
+        "name": "_Required",
+        "destination": "logging.googleapis.com/projects/cloud-custodian/locations/global/buckets/_Required",
+        "filter": "LOG_ID(\"cloudaudit.googleapis.com/activity\") OR LOG_ID(\"externalaudit.googleapis.com/activity\") OR LOG_ID(\"cloudaudit.googleapis.com/system_event\") OR LOG_ID(\"externalaudit.googleapis.com/system_event\") OR LOG_ID(\"cloudaudit.googleapis.com/access_transparency\") OR LOG_ID(\"externalaudit.googleapis.com/access_transparency\")"
+      },
+      {
+        "name": "_Default",
+        "destination": "logging.googleapis.com/projects/cloud-custodian/locations/global/buckets/_Default",
+        "filter": "NOT LOG_ID(\"cloudaudit.googleapis.com/activity\") AND NOT LOG_ID(\"externalaudit.googleapis.com/activity\") AND NOT LOG_ID(\"cloudaudit.googleapis.com/system_event\") AND NOT LOG_ID(\"externalaudit.googleapis.com/system_event\") AND NOT LOG_ID(\"cloudaudit.googleapis.com/access_transparency\") AND NOT LOG_ID(\"externalaudit.googleapis.com/access_transparency\")"
+      }
+    ]
+  }
+}
