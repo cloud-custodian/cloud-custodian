@@ -1,0 +1,96 @@
+interactions:
+- request:
+    body: '{"Offset": 0, "Limit": 10}'
+    headers:
+      Accept:
+      - '*/*'
+      Accept-Encoding:
+      - gzip, deflate
+      Connection:
+      - keep-alive
+      Content-Length:
+      - '26'
+      Content-Type:
+      - application/json
+      Host:
+      - dcdb.ap-nanjing.tencentcloudapi.com
+      User-Agent:
+      - python-requests/2.32.3
+      X-TC-Action:
+      - DescribeDCDBInstances
+      X-TC-Region:
+      - ap-nanjing
+      X-TC-TraceId:
+      - f2393428-ae9c-42b5-af01-edca635b18d7
+      X-TC-Version:
+      - '2018-04-11'
+    method: POST
+    uri: https://dcdb.ap-nanjing.tencentcloudapi.com/
+  response:
+    body:
+      string: "{\"Response\":{\"Instances\":[{\"AccountId\":200040230681,\"AccountName\":\"2852365741@qq.com\",\"AppId\":1258685193,\"AutoRenewFlag\":0,\"Cpu\":8,\"CreateTime\":\"2025-05-19
+        10:51:10\",\"DbEngine\":\"MySQL\",\"DbVersion\":\"8.0\",\"DbVersionId\":\"8.0\",\"DcnDstNum\":0,\"DcnFlag\":0,\"DcnStatus\":0,\"ExclusterId\":\"\",\"ExclusterName\":\"\",\"Id\":15232,\"InstanceId\":\"tdsqlshard-b1ckdxcx\",\"InstanceName\":\"tdsqlshard-b1ckdxcx\",\"InstanceType\":2,\"Ipv6Flag\":0,\"IsAuditSupported\":1,\"IsTmp\":0,\"IsolatedTimestamp\":\"0000-00-00
+        00:00:00\",\"Locker\":0,\"Memory\":16,\"NodeCount\":2,\"Paymode\":\"postpaid\",\"PeriodEndTime\":\"0001-01-01
+        00:00:00\",\"Pid\":1001670,\"ProjectId\":0,\"Region\":\"ap-nanjing\",\"ResourceTags\":[],\"SerialId\":\"group_1747623070_1144507\",\"ShardCount\":2,\"ShardDetail\":[{\"Cpu\":4,\"Createtime\":\"2025-05-19
+        10:51:10\",\"Memory\":8,\"NodeCount\":1,\"Pid\":1001670,\"ShardId\":13637,\"ShardInstanceId\":\"shard-djw9iesp\",\"ShardSerialId\":\"set_1747623198_1\",\"Status\":2,\"Storage\":500},{\"Cpu\":4,\"Createtime\":\"2025-05-19
+        10:51:10\",\"Memory\":8,\"NodeCount\":1,\"Pid\":1001670,\"ShardId\":13638,\"ShardInstanceId\":\"shard-ccarts5j\",\"ShardSerialId\":\"set_1747623305_3\",\"Status\":2,\"Storage\":500}],\"Status\":2,\"StatusDesc\":\"\u8FD0\u884C\u4E2D\",\"Storage\":1000,\"SubnetId\":1564368,\"TradeConfigs\":[{\"BillingDetailItem\":\"sv_dcdb_mem_single_hignio\",\"BillingItem\":\"v_dcdb_mem\",\"BillingType\":\"memory\",\"CreateCategoryId\":101354,\"ModifyCategoryId\":101355,\"ProductCode\":\"p_dcdb\",\"RenewCategoryId\":1026554,\"SubProductCode\":\"sp_dcdb_highio_single\"},{\"BillingDetailItem\":\"sv_dcdb_disk_single_hignio\",\"BillingItem\":\"v_dcdb_disk\",\"BillingType\":\"storage\",\"CreateCategoryId\":101354,\"ModifyCategoryId\":101355,\"ProductCode\":\"p_dcdb\",\"RenewCategoryId\":1026554,\"SubProductCode\":\"sp_dcdb_highio_single\"}],\"Uin\":\"100009291175\",\"UniqueSubnetId\":\"subnet-qtlwbsck\",\"UniqueVpcId\":\"vpc-ilalellp\",\"UpdateTime\":\"2025-05-19
+        10:59:20\",\"Vip\":\"10.0.0.8\",\"Vipv6\":\"\",\"VpcId\":14584483,\"Vport\":3306,\"WanDomain\":\"\",\"WanPort\":0,\"WanPortIpv6\":0,\"WanStatus\":0,\"WanStatusIpv6\":0,\"WanVip\":\"\",\"WanVipv6\":\"\",\"Zone\":\"ap-nanjing-2\"}],\"RequestId\":\"bd9055d0-6235-429d-abda-30877596983c\",\"TotalCount\":1}}"
+    headers:
+      Connection:
+      - keep-alive
+      Content-Length:
+      - '2052'
+      Content-Type:
+      - application/json
+      Date:
+      - Tue, 20 May 2025 02:44:06 GMT
+      X-TC-TraceId:
+      - f2393428-ae9c-42b5-af01-edca635b18d7
+    status:
+      code: 200
+      message: OK
+- request:
+    body: '{"ResourceList": ["qcs::dcdb:ap-nanjing:uin/100009291175:instanceId/tdsqlshard-b1ckdxcx"]}'
+    headers:
+      Accept:
+      - '*/*'
+      Accept-Encoding:
+      - gzip, deflate
+      Connection:
+      - keep-alive
+      Content-Length:
+      - '90'
+      Content-Type:
+      - application/json
+      Host:
+      - tag.ap-nanjing.tencentcloudapi.com
+      User-Agent:
+      - python-requests/2.32.3
+      X-TC-Action:
+      - GetResources
+      X-TC-Region:
+      - ap-nanjing
+      X-TC-TraceId:
+      - b6bd413d-9211-4f11-80b2-7ce61933b55a
+      X-TC-Version:
+      - '2018-08-13'
+    method: POST
+    uri: https://tag.ap-nanjing.tencentcloudapi.com/
+  response:
+    body:
+      string: '{"Response":{"PaginationToken":"","ResourceTagMappingList":[],"RequestId":"6099bd31-d6d2-4d49-9d97-c61235517ecc"}}'
+    headers:
+      Connection:
+      - keep-alive
+      Content-Length:
+      - '114'
+      Content-Type:
+      - application/json
+      Date:
+      - Tue, 20 May 2025 02:44:07 GMT
+      X-TC-TraceId:
+      - b6bd413d-9211-4f11-80b2-7ce61933b55a
+    status:
+      code: 200
+      message: OK
+version: 1
