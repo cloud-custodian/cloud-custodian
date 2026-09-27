@@ -38,6 +38,51 @@ class ProjectRole(QueryResourceManager):
                         resource_info['role_name'].rsplit('/', 1)[-1])})
 
 
+@resources.register('organization-role')
+class OrganizationRole(ChildResourceManager):
+    """GCP Organization custom role.
+
+    https://cloud.google.com/iam/docs/reference/rest/v1/organizations.roles#Role
+    """
+
+    def _get_parent_resource_info(self, child_instance):
+        organization_id = child_instance['name'].split('/')[1]
+        return {'resourceName': 'organizations/{}'.format(organization_id)}
+
+    class resource_type(ChildTypeInfo):
+        service = 'iam'
+        version = 'v1'
+        component = 'organizations.roles'
+        enum_spec = ('list', 'roles[]', None)
+        scope = None
+        scope_key = 'parent'
+        name = id = "name"
+        default_report_fields = ['name', 'title', 'description', 'stage', 'deleted']
+        parent_spec = {
+            'resource': 'organization',
+            'child_enum_params': [
+                ('name', 'parent')
+            ]
+        }
+        asset_type = "iam.googleapis.com/Role"
+        urn_component = "organization-role"
+        urn_id_segments = (-1,)  # Just use the last segment of the id in the URN
+        urn_has_project = False
+
+        @staticmethod
+        def get(client, resource_info):
+            role_name = resource_info.get('name', '')
+            if role_name.startswith('organizations/'):
+                full_name = role_name
+            elif 'resourceName' in resource_info:
+                full_name = resource_info['resourceName'].rsplit('//iam.googleapis.com/', 1)[-1]
+            else:
+                full_name = 'organizations/{}/roles/{}'.format(
+                    resource_info['organization_id'],
+                    resource_info['role_name'].rsplit('/', 1)[-1])
+            return client.execute_query('get', {'name': full_name})
+
+
 @resources.register('service-account')
 class ServiceAccount(QueryResourceManager):
 
@@ -177,8 +222,10 @@ class DeleteServiceAccountKey(MethodAction):
 
 @resources.register('iam-role')
 class Role(QueryResourceManager):
-    """GCP Organization Role
-    https://cloud.google.com/iam/docs/reference/rest/v1/organizations.roles#Role
+    """GCP predefined role.
+
+    For custom roles, use `gcp.organization-role` or `gcp.project-role`.
+    https://cloud.google.com/iam/docs/understanding-roles
     """
     class resource_type(TypeInfo):
         service = 'iam'

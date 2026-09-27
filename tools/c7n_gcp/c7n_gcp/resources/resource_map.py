@@ -97,6 +97,7 @@ ResourceMap = {
     "gcp.notebook": "c7n_gcp.resources.notebook.NotebookInstance",
     "gcp.notebook-v2": "c7n_gcp.resources.notebook.NotebookInstanceV2",
     "gcp.organization": "c7n_gcp.resources.resourcemanager.Organization",
+    "gcp.organization-role": "c7n_gcp.resources.iam.OrganizationRole",
     "gcp.patch-deployment": "c7n_gcp.resources.osconfig.PatchDeployment",
     "gcp.project": "c7n_gcp.resources.resourcemanager.Project",
     "gcp.project-role": "c7n_gcp.resources.iam.ProjectRole",
