@@ -1,0 +1,765 @@
+{
+    "version": 1,
+    "interactions": [
+        {
+            "request": {
+                "method": "GET",
+                "uri": "https://management.azure.com/subscriptions/ea42f556-5106-4743-99b0-c129bfa71a47/providers/Microsoft.Network/virtualNetworks?api-version=2020-08-01",
+                "body": null,
+                "headers": {}
+            },
+            "response": {
+                "status": {
+                    "code": 200,
+                    "message": "OK"
+                },
+                "headers": {
+                    "content-length": [
+                        "6181"
+                    ],
+                    "content-type": [
+                        "application/json; charset=utf-8"
+                    ],
+                    "x-ms-original-request-ids": [
+                        "e799d6c4-b296-45cc-be90-4ad9041eac0e",
+                        "febfb5d2-e5ed-4ac7-8798-b3a2e6198090"
+                    ],
+                    "cache-control": [
+                        "no-cache"
+                    ],
+                    "date": [
+                        "Thu, 17 Aug 2023 22:58:34 GMT"
+                    ]
+                },
+                "body": {
+                    "data": {
+                        "value": [
+                            {
+                                "name": "virtual-network-cbsuccess",
+                                "id": "/subscriptions/ea42f556-5106-4743-99b0-c129bfa71a47/resourceGroups/cfb-edgfpkym/providers/Microsoft.Network/virtualNetworks/virtual-network-cbsuccess",
+                                "etag": "W/\"30b7011b-1e89-4574-991c-26ae8b62a7f0\"",
+                                "type": "Microsoft.Network/virtualNetworks",
+                                "location": "eastus",
+                                "tags": {
+                                    "c7n": "true",
+                                    "product_id": "13742"
+                                },
+                                "properties": {
+                                    "provisioningState": "Succeeded",
+                                    "resourceGuid": "8d167c65-ff23-4a8b-9a3f-bccf168db204",
+                                    "addressSpace": {
+                                        "addressPrefixes": [
+                                            "11.0.0.0/16"
+                                        ]
+                                    },
+                                    "dhcpOptions": {
+                                        "dnsServers": []
+                                    },
+                                    "subnets": [
+                                        {
+                                            "name": "GatewaySubnet",
+                                            "id": "/subscriptions/ea42f556-5106-4743-99b0-c129bfa71a47/resourceGroups/cfb-edgfpkym/providers/Microsoft.Network/virtualNetworks/virtual-network-cbsuccess/subnets/GatewaySubnet",
+                                            "etag": "W/\"30b7011b-1e89-4574-991c-26ae8b62a7f0\"",
+                                            "properties": {
+                                                "provisioningState": "Succeeded",
+                                                "addressPrefix": "11.0.0.0/24",
+                                                "ipConfigurations": [
+                                                    {
+                                                        "id": "/subscriptions/ea42f556-5106-4743-99b0-c129bfa71a47/resourceGroups/CFB-EDGFPKYM/providers/Microsoft.Network/virtualNetworkGateways/VPN-CBSUCCESS/ipConfigurations/CONFIG-VPN-CBSUCCESS"
+                                                    }
+                                                ],
+                                                "serviceEndpoints": [],
+                                                "delegations": [],
+                                                "privateEndpointNetworkPolicies": "Enabled",
+                                                "privateLinkServiceNetworkPolicies": "Enabled"
+                                            },
+                                            "type": "Microsoft.Network/virtualNetworks/subnets"
+                                        }
+                                    ],
+                                    "virtualNetworkPeerings": [],
+                                    "cloudServices": [
+                                        {
+                                            "id": "/subscriptions/39d0777e-9e7b-4507-bf5a-0b4e2887eaae/resourceGroups/ARMRG-9E530077-8D8B-4BA4-8D8F-8C52FFD0EA4C/providers/Microsoft.Compute/cloudServices/azuregateway-9e530077-8d8b-4ba4-8d8f-8c52ffd0ea4c-e2ef687d60ae"
+                                        }
+                                    ],
+                                    "enableDdosProtection": false
+                                }
+                            },
+                            {
+                                "name": "MySharedVnet",
+                                "id": "/subscriptions/ea42f556-5106-4743-99b0-c129bfa71a47/resourceGroups/cfb-gzrqnpxh-enc-group/providers/Microsoft.Network/virtualNetworks/MySharedVnet",
+                                "etag": "W/\"8506dbe6-ba3d-4fcb-b4a1-77addfa2a49e\"",
+                                "type": "Microsoft.Network/virtualNetworks",
+                                "location": "eastus",
+                                "tags": {
+                                    "product_id": "13742"
+                                },
+                                "properties": {
+                                    "provisioningState": "Succeeded",
+                                    "resourceGuid": "1ff073fe-4aa5-4657-a3b7-592b78dd9204",
+                                    "addressSpace": {
+                                        "addressPrefixes": [
+                                            "10.0.0.0/16"
+                                        ]
+                                    },
+                                    "dhcpOptions": {
+                                        "dnsServers": []
+                                    },
+                                    "subnets": [
+                                        {
+                                            "name": "MySubnet",
+                                            "id": "/subscriptions/ea42f556-5106-4743-99b0-c129bfa71a47/resourceGroups/cfb-gzrqnpxh-enc-group/providers/Microsoft.Network/virtualNetworks/MySharedVnet/subnets/MySubnet",
+                                            "etag": "W/\"8506dbe6-ba3d-4fcb-b4a1-77addfa2a49e\"",
+                                            "properties": {
+                                                "provisioningState": "Succeeded",
+                                                "addressPrefix": "10.0.0.0/24",
+                                                "delegations": [],
+                                                "privateEndpointNetworkPolicies": "Disabled",
+                                                "privateLinkServiceNetworkPolicies": "Enabled"
+                                            },
+                                            "type": "Microsoft.Network/virtualNetworks/subnets"
+                                        }
+                                    ],
+                                    "virtualNetworkPeerings": [],
+                                    "enableDdosProtection": false
+                                }
+                            },
+                            {
+                                "name": "virtual-network-cbfail",
+                                "id": "/subscriptions/ea42f556-5106-4743-99b0-c129bfa71a47/resourceGroups/cfb-jbnrjttg/providers/Microsoft.Network/virtualNetworks/virtual-network-cbfail",
+                                "etag": "W/\"98e80ac5-7610-44e8-920b-22c7ac6865d3\"",
+                                "type": "Microsoft.Network/virtualNetworks",
+                                "location": "eastus",
+                                "tags": {
+                                    "c7n": "true",
+                                    "product_id": "13742"
+                                },
+                                "properties": {
+                                    "provisioningState": "Succeeded",
+                                    "resourceGuid": "e976fe65-ef93-4be2-aa9b-e2aee7264a05",
+                                    "addressSpace": {
+                                        "addressPrefixes": [
+                                            "10.0.0.0/16"
+                                        ]
+                                    },
+                                    "dhcpOptions": {
+                                        "dnsServers": []
+                                    },
+                                    "subnets": [
+                                        {
+                                            "name": "GatewaySubnet",
+                                            "id": "/subscriptions/ea42f556-5106-4743-99b0-c129bfa71a47/resourceGroups/cfb-jbnrjttg/providers/Microsoft.Network/virtualNetworks/virtual-network-cbfail/subnets/GatewaySubnet",
+                                            "etag": "W/\"98e80ac5-7610-44e8-920b-22c7ac6865d3\"",
+                                            "properties": {
+                                                "provisioningState": "Succeeded",
+                                                "addressPrefix": "10.0.0.0/24",
+                                                "ipConfigurations": [
+                                                    {
+                                                        "id": "/subscriptions/ea42f556-5106-4743-99b0-c129bfa71a47/resourceGroups/CFB-JBNRJTTG/providers/Microsoft.Network/virtualNetworkGateways/VPN-CBFAIL/ipConfigurations/CONFIG-VPN-CBFAIL"
+                                                    }
+                                                ],
+                                                "serviceEndpoints": [],
+                                                "delegations": [],
+                                                "privateEndpointNetworkPolicies": "Enabled",
+                                                "privateLinkServiceNetworkPolicies": "Enabled"
+                                            },
+                                            "type": "Microsoft.Network/virtualNetworks/subnets"
+                                        }
+                                    ],
+                                    "virtualNetworkPeerings": [],
+                                    "cloudServices": [
+                                        {
+                                            "id": "/subscriptions/18c34083-62e8-4cf4-acc3-7e6190b7e25f/resourceGroups/ARMRG-BA230077-50D6-4D99-81B4-6DBBFD66DDF4/providers/Microsoft.Compute/cloudServices/azuregateway-ba230077-50d6-4d99-81b4-6dbbfd66ddf4-c04e3ab896b6"
+                                        }
+                                    ],
+                                    "enableDdosProtection": false
+                                }
+                            },
+                            {
+                                "name": "examplevnet",
+                                "id": "/subscriptions/ea42f556-5106-4743-99b0-c129bfa71a47/resourceGroups/cfb-ujspdziu/providers/Microsoft.Network/virtualNetworks/examplevnet",
+                                "etag": "W/\"da575b07-4777-4687-8a65-702b7fc9d685\"",
+                                "type": "Microsoft.Network/virtualNetworks",
+                                "location": "centralus",
+                                "tags": {
+                                    "product_id": "13742"
+                                },
+                                "properties": {
+                                    "provisioningState": "Succeeded",
+                                    "resourceGuid": "a0197ef5-402e-40a9-9ff5-dadba4a921f9",
+                                    "addressSpace": {
+                                        "addressPrefixes": [
+                                            "10.0.0.0/16"
+                                        ]
+                                    },
+                                    "dhcpOptions": {
+                                        "dnsServers": []
+                                    },
+                                    "subnets": [
+                                        {
+                                            "name": "AzurevnetSubnet",
+                                            "id": "/subscriptions/ea42f556-5106-4743-99b0-c129bfa71a47/resourceGroups/cfb-ujspdziu/providers/Microsoft.Network/virtualNetworks/examplevnet/subnets/AzurevnetSubnet",
+                                            "etag": "W/\"da575b07-4777-4687-8a65-702b7fc9d685\"",
+                                            "properties": {
+                                                "provisioningState": "Succeeded",
+                                                "addressPrefix": "10.0.2.0/24",
+                                                "ipConfigurations": [
+                                                    {
+                                                        "id": "/subscriptions/ea42f556-5106-4743-99b0-c129bfa71a47/resourceGroups/CFB-UJSPDZIU/providers/Microsoft.Network/networkInterfaces/CFB-UJSPDZIU-ANIE/ipConfigurations/INTERNAL"
+                                                    }
+                                                ],
+                                                "serviceEndpoints": [],
+                                                "delegations": [],
+                                                "privateEndpointNetworkPolicies": "Enabled",
+                                                "privateLinkServiceNetworkPolicies": "Enabled"
+                                            },
+                                            "type": "Microsoft.Network/virtualNetworks/subnets"
+                                        },
+                                        {
+                                            "name": "AzureBastionSubnet",
+                                            "id": "/subscriptions/ea42f556-5106-4743-99b0-c129bfa71a47/resourceGroups/cfb-ujspdziu/providers/Microsoft.Network/virtualNetworks/examplevnet/subnets/AzureBastionSubnet",
+                                            "etag": "W/\"da575b07-4777-4687-8a65-702b7fc9d685\"",
+                                            "properties": {
+                                                "provisioningState": "Succeeded",
+                                                "addressPrefix": "10.0.253.0/24",
+                                                "ipConfigurations": [
+                                                    {
+                                                        "id": "/subscriptions/ea42f556-5106-4743-99b0-c129bfa71a47/resourceGroups/CFB-UJSPDZIU/providers/Microsoft.Network/bastionHosts/EXAMPLEBASTION/bastionHostIpConfigurations/CONFIGURATION"
+                                                    }
+                                                ],
+                                                "serviceEndpoints": [],
+                                                "delegations": [],
+                                                "privateEndpointNetworkPolicies": "Enabled",
+                                                "privateLinkServiceNetworkPolicies": "Enabled"
+                                            },
+                                            "type": "Microsoft.Network/virtualNetworks/subnets"
+                                        }
+                                    ],
+                                    "virtualNetworkPeerings": [],
+                                    "enableDdosProtection": false
+                                }
+                            }
+                        ]
+                    }
+                }
+            }
+        },
+        {
+            "request": {
+                "method": "GET",
+                "uri": "https://management.azure.com/subscriptions/ea42f556-5106-4743-99b0-c129bfa71a47/resourceGroups/cfb-edgfpkym/providers/Microsoft.Network/virtualNetworkGateways?api-version=2020-08-01",
+                "body": null,
+                "headers": {}
+            },
+            "response": {
+                "status": {
+                    "code": 200,
+                    "message": "OK"
+                },
+                "headers": {
+                    "content-type": [
+                        "application/json; charset=utf-8"
+                    ],
+                    "cache-control": [
+                        "no-cache"
+                    ],
+                    "x-ms-arm-service-request-id": [
+                        "72ce0626-05ce-4658-b95b-938e981c291f"
+                    ],
+                    "date": [
+                        "Thu, 17 Aug 2023 22:58:35 GMT"
+                    ],
+                    "content-length": [
+                        "6133"
+                    ]
+                },
+                "body": {
+                    "data": {
+                        "value": [
+                            {
+                                "name": "vpn-cbsuccess",
+                                "id": "/subscriptions/ea42f556-5106-4743-99b0-c129bfa71a47/resourceGroups/cfb-edgfpkym/providers/Microsoft.Network/virtualNetworkGateways/vpn-cbsuccess",
+                                "etag": "W/\"29ce8e5f-8a02-4ae6-a0d1-f2a949f779f5\"",
+                                "type": "Microsoft.Network/virtualNetworkGateways",
+                                "location": "eastus",
+                                "tags": {
+                                    "c7n": "true",
+                                    "product_id": "13742"
+                                },
+                                "properties": {
+                                    "provisioningState": "Succeeded",
+                                    "resourceGuid": "e60a5f19-fe51-440b-a4c7-1575fffb789b",
+                                    "packetCaptureDiagnosticState": "None",
+                                    "enablePrivateIpAddress": false,
+                                    "isMigrateToCSES": false,
+                                    "ipConfigurations": [
+                                        {
+                                            "name": "config-vpn-cbsuccess",
+                                            "id": "/subscriptions/ea42f556-5106-4743-99b0-c129bfa71a47/resourceGroups/cfb-edgfpkym/providers/Microsoft.Network/virtualNetworkGateways/vpn-cbsuccess/ipConfigurations/config-vpn-cbsuccess",
+                                            "etag": "W/\"29ce8e5f-8a02-4ae6-a0d1-f2a949f779f5\"",
+                                            "type": "Microsoft.Network/virtualNetworkGateways/ipConfigurations",
+                                            "properties": {
+                                                "provisioningState": "Succeeded",
+                                                "privateIPAllocationMethod": "Dynamic",
+                                                "publicIPAddress": {
+                                                    "id": "/subscriptions/ea42f556-5106-4743-99b0-c129bfa71a47/resourceGroups/cfb-edgfpkym/providers/Microsoft.Network/publicIPAddresses/vpn-eastus-pip-gw-cbsuccess"
+                                                },
+                                                "subnet": {
+                                                    "id": "/subscriptions/ea42f556-5106-4743-99b0-c129bfa71a47/resourceGroups/cfb-edgfpkym/providers/Microsoft.Network/virtualNetworks/virtual-network-cbsuccess/subnets/GatewaySubnet"
+                                                }
+                                            }
+                                        }
+                                    ],
+                                    "virtualNetworkGatewayPolicyGroups": [],
+                                    "sku": {
+                                        "name": "VpnGw1",
+                                        "tier": "VpnGw1",
+                                        "capacity": 2
+                                    },
+                                    "gatewayType": "Vpn",
+                                    "vpnType": "RouteBased",
+                                    "enableBgp": false,
+                                    "activeActive": false,
+                                    "vpnClientConfiguration": {
+                                        "vpnClientAddressPool": {
+                                            "addressPrefixes": [
+                                                "11.2.0.0/24"
+                                            ]
+                                        },
+                                        "vpnClientProtocols": [
+                                            "OpenVPN",
+                                            "IkeV2"
+                                        ],
+                                        "vpnAuthenticationTypes": [
+                                            "Certificate"
+                                        ],
+                                        "vpnClientRootCertificates": [
+                                            {
+                                                "name": "DigiCert-Federated-ID-Root-CA",
+                                                "id": "/subscriptions/ea42f556-5106-4743-99b0-c129bfa71a47/resourceGroups/cfb-edgfpkym/providers/Microsoft.Network/virtualNetworkGateways/vpn-cbsuccess/vpnClientRootCertificates/DigiCert-Federated-ID-Root-CA",
+                                                "etag": "W/\"29ce8e5f-8a02-4ae6-a0d1-f2a949f779f5\"",
+                                                "properties": {
+                                                    "provisioningState": "Succeeded",
+                                                    "publicCertData": "MIIDuzCCAqOgAwIBAgIQCHTZWCM+IlfFIRXIvyKSrjANBgkqhkiG9w0BAQsFADBn\nMQswCQYDVQQGEwJVUzEVMBMGA1UEChMMRGlnaUNlcnQgSW5jMRkwFwYDVQQLExB3\nd3cuZGlnaWNlcnQuY29tMSYwJAYDVQQDEx1EaWdpQ2VydCBGZWRlcmF0ZWQgSUQg\nUm9vdCBDQTAeFw0xMzAxMTUxMjAwMDBaFw0zMzAxMTUxMjAwMDBaMGcxCzAJBgNV\nBAYTAlVTMRUwEwYDVQQKEwxEaWdpQ2VydCBJbmMxGTAXBgNVBAsTEHd3dy5kaWdp\nY2VydC5jb20xJjAkBgNVBAMTHURpZ2lDZXJ0IEZlZGVyYXRlZCBJRCBSb290IENB\nMIIBIjANBgkqhkiG9w0BAQEFAAOCAQ8AMIIBCgKCAQEAvAEB4pcCqnNNOWE6Ur5j\nQPUH+1y1F9KdHTRSza6k5iDlXq1kGS1qAkuKtw9JsiNRrjltmFnzMZRBbX8Tlfl8\nzAhBmb6dDduDGED01kBsTkgywYPxXVTKec0WxYEEF0oMn4wSYNl0lt2eJAKHXjNf\nGTwiibdP8CUR2ghSM2sUTI8Nt1Omfc4SMHhGhYD64uJMbX98THQ/4LMGuYegou+d\nGTiahfHtjn7AboSEknwAMJHCh5RlYZZ6B1O4QbKJ+34Q0eKgnI3X6Vc9u0zf6DH8\nDk+4zQDYRRTqTnVO3VT8jzqDlCRuNtq6YvryOWN74/dq8LQhUnXHvFyrsdMaE1X2\nDwIDAQABo2MwYTAPBgNVHRMBAf8EBTADAQH/MA4GA1UdDwEB/wQEAwIBhjAdBgNV\nHQ4EFgQUGRdkFnbGt1EWjKwbUne+5OaZvRYwHwYDVR0jBBgwFoAUGRdkFnbGt1EW\njKwbUne+5OaZvRYwDQYJKoZIhvcNAQELBQADggEBAHcqsHkrjpESqfuVTRiptJfP\n9JbdtWqRTmOf6uJi2c8YVqI6XlKXsD8C1dUUaaHKLUJzvKiazibVuBwMIT84AyqR\nQELn3e0BtgEymEygMU569b01ZPxoFSnNXc7qDZBDef8WfqAV/sxkTi8L9BkmFYfL\nuGLOhRJOFprPdoDIUBB+tmCl3oDcBy3vnUeOEioz8zAkprcb3GHwHAK+vHmmfgcn\nWsfMLH4JCLa/tRYL+Rw/N3ybCkDp00s0WUZ+AoDywSl0Q/ZEnNY0MsFiw6LyIdbq\nM/s/1JRtO3bDSzD9TazRVzn2oBqzSa8VgIo5C1nOnoAKJTlsClJKvIhnRlaLQqk=\n"
+                                                },
+                                                "type": "Microsoft.Network/virtualNetworkGateways/vpnClientRootCertificates"
+                                            }
+                                        ],
+                                        "vpnClientRevokedCertificates": [
+                                            {
+                                                "name": "Verizon-Global-Root-CA",
+                                                "id": "/subscriptions/ea42f556-5106-4743-99b0-c129bfa71a47/resourceGroups/cfb-edgfpkym/providers/Microsoft.Network/virtualNetworkGateways/vpn-cbsuccess/vpnClientRevokedCertificates/Verizon-Global-Root-CA",
+                                                "etag": "W/\"29ce8e5f-8a02-4ae6-a0d1-f2a949f779f5\"",
+                                                "properties": {
+                                                    "provisioningState": "Succeeded",
+                                                    "thumbprint": "912198EEF23DCAC40939312FEE97DD560BAE49B1"
+                                                },
+                                                "type": "Microsoft.Network/virtualNetworkGateways/vpnClientRevokedCertificates"
+                                            }
+                                        ],
+                                        "vngClientConnectionConfigurations": [],
+                                        "radiusServerAddress": "",
+                                        "radiusServerSecret": "",
+                                        "radiusServers": [],
+                                        "vpnClientIpsecPolicies": [],
+                                        "aadTenant": "",
+                                        "aadAudience": "",
+                                        "aadIssuer": ""
+                                    },
+                                    "bgpSettings": {
+                                        "asn": 65515,
+                                        "bgpPeeringAddress": "11.0.0.254",
+                                        "peerWeight": 0,
+                                        "bgpPeeringAddresses": [
+                                            {
+                                                "ipconfigurationId": "/subscriptions/ea42f556-5106-4743-99b0-c129bfa71a47/resourceGroups/cfb-edgfpkym/providers/Microsoft.Network/virtualNetworkGateways/vpn-cbsuccess/ipConfigurations/config-vpn-cbsuccess",
+                                                "defaultBgpIpAddresses": [
+                                                    "11.0.0.254"
+                                                ],
+                                                "customBgpIpAddresses": [],
+                                                "tunnelIpAddresses": [
+                                                    "20.231.229.121"
+                                                ]
+                                            }
+                                        ]
+                                    },
+                                    "vpnGatewayGeneration": "Generation1"
+                                }
+                            }
+                        ]
+                    }
+                }
+            }
+        },
+        {
+            "request": {
+                "method": "GET",
+                "uri": "https://management.azure.com/subscriptions/ea42f556-5106-4743-99b0-c129bfa71a47/resourceGroups/cfb-gzrqnpxh-enc-group/providers/Microsoft.Network/virtualNetworkGateways?api-version=2020-08-01",
+                "body": null,
+                "headers": {}
+            },
+            "response": {
+                "status": {
+                    "code": 200,
+                    "message": "OK"
+                },
+                "headers": {
+                    "content-length": [
+                        "12"
+                    ],
+                    "content-type": [
+                        "application/json; charset=utf-8"
+                    ],
+                    "cache-control": [
+                        "no-cache"
+                    ],
+                    "date": [
+                        "Thu, 17 Aug 2023 22:58:35 GMT"
+                    ]
+                },
+                "body": {
+                    "data": {
+                        "value": []
+                    }
+                }
+            }
+        },
+        {
+            "request": {
+                "method": "GET",
+                "uri": "https://management.azure.com/subscriptions/ea42f556-5106-4743-99b0-c129bfa71a47/resourceGroups/cfb-jbnrjttg/providers/Microsoft.Network/virtualNetworkGateways?api-version=2020-08-01",
+                "body": null,
+                "headers": {}
+            },
+            "response": {
+                "status": {
+                    "code": 200,
+                    "message": "OK"
+                },
+                "headers": {
+                    "content-type": [
+                        "application/json; charset=utf-8"
+                    ],
+                    "cache-control": [
+                        "no-cache"
+                    ],
+                    "x-ms-arm-service-request-id": [
+                        "9db7c9c3-4382-49a8-9e51-d8327cf69d0b"
+                    ],
+                    "date": [
+                        "Thu, 17 Aug 2023 22:58:35 GMT"
+                    ],
+                    "content-length": [
+                        "6100"
+                    ]
+                },
+                "body": {
+                    "data": {
+                        "value": [
+                            {
+                                "name": "vpn-cbfail",
+                                "id": "/subscriptions/ea42f556-5106-4743-99b0-c129bfa71a47/resourceGroups/cfb-jbnrjttg/providers/Microsoft.Network/virtualNetworkGateways/vpn-cbfail",
+                                "etag": "W/\"8e4c951b-3b02-4512-8d10-16ef8d8f31e2\"",
+                                "type": "Microsoft.Network/virtualNetworkGateways",
+                                "location": "eastus",
+                                "tags": {
+                                    "c7n": "true",
+                                    "product_id": "13742"
+                                },
+                                "properties": {
+                                    "provisioningState": "Succeeded",
+                                    "resourceGuid": "78fc0b6d-cf3f-408b-80a8-c0dc22884cf0",
+                                    "packetCaptureDiagnosticState": "None",
+                                    "enablePrivateIpAddress": false,
+                                    "isMigrateToCSES": false,
+                                    "ipConfigurations": [
+                                        {
+                                            "name": "config-vpn-cbfail",
+                                            "id": "/subscriptions/ea42f556-5106-4743-99b0-c129bfa71a47/resourceGroups/cfb-jbnrjttg/providers/Microsoft.Network/virtualNetworkGateways/vpn-cbfail/ipConfigurations/config-vpn-cbfail",
+                                            "etag": "W/\"8e4c951b-3b02-4512-8d10-16ef8d8f31e2\"",
+                                            "type": "Microsoft.Network/virtualNetworkGateways/ipConfigurations",
+                                            "properties": {
+                                                "provisioningState": "Succeeded",
+                                                "privateIPAllocationMethod": "Dynamic",
+                                                "publicIPAddress": {
+                                                    "id": "/subscriptions/ea42f556-5106-4743-99b0-c129bfa71a47/resourceGroups/cfb-jbnrjttg/providers/Microsoft.Network/publicIPAddresses/vpn-eastus-pip-gw-cbfail"
+                                                },
+                                                "subnet": {
+                                                    "id": "/subscriptions/ea42f556-5106-4743-99b0-c129bfa71a47/resourceGroups/cfb-jbnrjttg/providers/Microsoft.Network/virtualNetworks/virtual-network-cbfail/subnets/GatewaySubnet"
+                                                }
+                                            }
+                                        }
+                                    ],
+                                    "virtualNetworkGatewayPolicyGroups": [],
+                                    "sku": {
+                                        "name": "VpnGw1",
+                                        "tier": "VpnGw1",
+                                        "capacity": 2
+                                    },
+                                    "gatewayType": "Vpn",
+                                    "vpnType": "RouteBased",
+                                    "enableBgp": false,
+                                    "activeActive": false,
+                                    "vpnClientConfiguration": {
+                                        "vpnClientAddressPool": {
+                                            "addressPrefixes": [
+                                                "10.2.0.0/24"
+                                            ]
+                                        },
+                                        "vpnClientProtocols": [
+                                            "OpenVPN",
+                                            "IkeV2"
+                                        ],
+                                        "vpnAuthenticationTypes": [
+                                            "Certificate"
+                                        ],
+                                        "vpnClientRootCertificates": [
+                                            {
+                                                "name": "DigiCert-Federated-ID-Root-CA",
+                                                "id": "/subscriptions/ea42f556-5106-4743-99b0-c129bfa71a47/resourceGroups/cfb-jbnrjttg/providers/Microsoft.Network/virtualNetworkGateways/vpn-cbfail/vpnClientRootCertificates/DigiCert-Federated-ID-Root-CA",
+                                                "etag": "W/\"8e4c951b-3b02-4512-8d10-16ef8d8f31e2\"",
+                                                "properties": {
+                                                    "provisioningState": "Succeeded",
+                                                    "publicCertData": "MIIDuzCCAqOgAwIBAgIQCHTZWCM+IlfFIRXIvyKSrjANBgkqhkiG9w0BAQsFADBn\nMQswCQYDVQQGEwJVUzEVMBMGA1UEChMMRGlnaUNlcnQgSW5jMRkwFwYDVQQLExB3\nd3cuZGlnaWNlcnQuY29tMSYwJAYDVQQDEx1EaWdpQ2VydCBGZWRlcmF0ZWQgSUQg\nUm9vdCBDQTAeFw0xMzAxMTUxMjAwMDBaFw0zMzAxMTUxMjAwMDBaMGcxCzAJBgNV\nBAYTAlVTMRUwEwYDVQQKEwxEaWdpQ2VydCBJbmMxGTAXBgNVBAsTEHd3dy5kaWdp\nY2VydC5jb20xJjAkBgNVBAMTHURpZ2lDZXJ0IEZlZGVyYXRlZCBJRCBSb290IENB\nMIIBIjANBgkqhkiG9w0BAQEFAAOCAQ8AMIIBCgKCAQEAvAEB4pcCqnNNOWE6Ur5j\nQPUH+1y1F9KdHTRSza6k5iDlXq1kGS1qAkuKtw9JsiNRrjltmFnzMZRBbX8Tlfl8\nzAhBmb6dDduDGED01kBsTkgywYPxXVTKec0WxYEEF0oMn4wSYNl0lt2eJAKHXjNf\nGTwiibdP8CUR2ghSM2sUTI8Nt1Omfc4SMHhGhYD64uJMbX98THQ/4LMGuYegou+d\nGTiahfHtjn7AboSEknwAMJHCh5RlYZZ6B1O4QbKJ+34Q0eKgnI3X6Vc9u0zf6DH8\nDk+4zQDYRRTqTnVO3VT8jzqDlCRuNtq6YvryOWN74/dq8LQhUnXHvFyrsdMaE1X2\nDwIDAQABo2MwYTAPBgNVHRMBAf8EBTADAQH/MA4GA1UdDwEB/wQEAwIBhjAdBgNV\nHQ4EFgQUGRdkFnbGt1EWjKwbUne+5OaZvRYwHwYDVR0jBBgwFoAUGRdkFnbGt1EW\njKwbUne+5OaZvRYwDQYJKoZIhvcNAQELBQADggEBAHcqsHkrjpESqfuVTRiptJfP\n9JbdtWqRTmOf6uJi2c8YVqI6XlKXsD8C1dUUaaHKLUJzvKiazibVuBwMIT84AyqR\nQELn3e0BtgEymEygMU569b01ZPxoFSnNXc7qDZBDef8WfqAV/sxkTi8L9BkmFYfL\nuGLOhRJOFprPdoDIUBB+tmCl3oDcBy3vnUeOEioz8zAkprcb3GHwHAK+vHmmfgcn\nWsfMLH4JCLa/tRYL+Rw/N3ybCkDp00s0WUZ+AoDywSl0Q/ZEnNY0MsFiw6LyIdbq\nM/s/1JRtO3bDSzD9TazRVzn2oBqzSa8VgIo5C1nOnoAKJTlsClJKvIhnRlaLQqk=\n"
+                                                },
+                                                "type": "Microsoft.Network/virtualNetworkGateways/vpnClientRootCertificates"
+                                            }
+                                        ],
+                                        "vpnClientRevokedCertificates": [
+                                            {
+                                                "name": "Verizon-Global-Root-CA",
+                                                "id": "/subscriptions/ea42f556-5106-4743-99b0-c129bfa71a47/resourceGroups/cfb-jbnrjttg/providers/Microsoft.Network/virtualNetworkGateways/vpn-cbfail/vpnClientRevokedCertificates/Verizon-Global-Root-CA",
+                                                "etag": "W/\"8e4c951b-3b02-4512-8d10-16ef8d8f31e2\"",
+                                                "properties": {
+                                                    "provisioningState": "Succeeded",
+                                                    "thumbprint": "912198EEF23DCAC40939312FEE97DD560BAE49B1"
+                                                },
+                                                "type": "Microsoft.Network/virtualNetworkGateways/vpnClientRevokedCertificates"
+                                            }
+                                        ],
+                                        "vngClientConnectionConfigurations": [],
+                                        "radiusServerAddress": "",
+                                        "radiusServerSecret": "",
+                                        "radiusServers": [],
+                                        "vpnClientIpsecPolicies": [],
+                                        "aadTenant": "",
+                                        "aadAudience": "",
+                                        "aadIssuer": ""
+                                    },
+                                    "bgpSettings": {
+                                        "asn": 65515,
+                                        "bgpPeeringAddress": "10.0.0.254",
+                                        "peerWeight": 0,
+                                        "bgpPeeringAddresses": [
+                                            {
+                                                "ipconfigurationId": "/subscriptions/ea42f556-5106-4743-99b0-c129bfa71a47/resourceGroups/cfb-jbnrjttg/providers/Microsoft.Network/virtualNetworkGateways/vpn-cbfail/ipConfigurations/config-vpn-cbfail",
+                                                "defaultBgpIpAddresses": [
+                                                    "10.0.0.254"
+                                                ],
+                                                "customBgpIpAddresses": [],
+                                                "tunnelIpAddresses": [
+                                                    "20.232.112.210"
+                                                ]
+                                            }
+                                        ]
+                                    },
+                                    "vpnGatewayGeneration": "Generation1"
+                                }
+                            }
+                        ]
+                    }
+                }
+            }
+        },
+        {
+            "request": {
+                "method": "GET",
+                "uri": "https://management.azure.com/subscriptions/ea42f556-5106-4743-99b0-c129bfa71a47/resourceGroups/cfb-ujspdziu/providers/Microsoft.Network/virtualNetworkGateways?api-version=2020-08-01",
+                "body": null,
+                "headers": {}
+            },
+            "response": {
+                "status": {
+                    "code": 200,
+                    "message": "OK"
+                },
+                "headers": {
+                    "content-length": [
+                        "12"
+                    ],
+                    "content-type": [
+                        "application/json; charset=utf-8"
+                    ],
+                    "cache-control": [
+                        "no-cache"
+                    ],
+                    "date": [
+                        "Thu, 17 Aug 2023 22:58:35 GMT"
+                    ]
+                },
+                "body": {
+                    "data": {
+                        "value": []
+                    }
+                }
+            }
+        },
+        {
+            "request": {
+                "method": "GET",
+                "uri": "https://management.azure.com/subscriptions/ea42f556-5106-4743-99b0-c129bfa71a47/resourceGroups/cfb-edgfpkym/providers/Microsoft.Network/connections?api-version=2020-08-01",
+                "body": null,
+                "headers": {}
+            },
+            "response": {
+                "status": {
+                    "code": 200,
+                    "message": "OK"
+                },
+                "headers": {
+                    "content-type": [
+                        "application/json; charset=utf-8"
+                    ],
+                    "cache-control": [
+                        "no-cache"
+                    ],
+                    "x-ms-arm-service-request-id": [
+                        "71756c54-5d0b-431b-8105-821f1b0aeb5c"
+                    ],
+                    "date": [
+                        "Thu, 17 Aug 2023 22:58:35 GMT"
+                    ],
+                    "content-length": [
+                        "1937"
+                    ]
+                },
+                "body": {
+                    "data": {
+                        "value": [
+                            {
+                                "name": "vpnconn-cbsuccess",
+                                "id": "/subscriptions/ea42f556-5106-4743-99b0-c129bfa71a47/resourceGroups/cfb-edgfpkym/providers/Microsoft.Network/connections/vpnconn-cbsuccess",
+                                "etag": "W/\"4001fe1f-6957-449e-8465-026a529e21d8\"",
+                                "type": "Microsoft.Network/connections",
+                                "location": "eastus",
+                                "tags": {
+                                    "c7n": "true",
+                                    "product_id": "13742"
+                                },
+                                "properties": {
+                                    "provisioningState": "Succeeded",
+                                    "resourceGuid": "df1b574a-bbe8-44e6-aff9-83ceba7476b0",
+                                    "packetCaptureDiagnosticState": "None",
+                                    "virtualNetworkGateway1": {
+                                        "id": "/subscriptions/ea42f556-5106-4743-99b0-c129bfa71a47/resourceGroups/cfb-edgfpkym/providers/Microsoft.Network/virtualNetworkGateways/vpn-cbsuccess"
+                                    },
+                                    "localNetworkGateway2": {
+                                        "id": "/subscriptions/ea42f556-5106-4743-99b0-c129bfa71a47/resourceGroups/cfb-edgfpkym/providers/Microsoft.Network/localNetworkGateways/local-vpn-cbsuccess"
+                                    },
+                                    "connectionType": "IPsec",
+                                    "connectionProtocol": "IKEv2",
+                                    "routingWeight": 0,
+                                    "authenticationType": "PSK",
+                                    "enableBgp": false,
+                                    "useLocalAzureIpAddress": false,
+                                    "usePolicyBasedTrafficSelectors": false,
+                                    "ipsecPolicies": [
+                                        {
+                                            "saLifeTimeSeconds": 27000,
+                                            "saDataSizeKilobytes": 0,
+                                            "ipsecEncryption": "AES256",
+                                            "ipsecIntegrity": "SHA256",
+                                            "ikeEncryption": "AES256",
+                                            "ikeIntegrity": "SHA384",
+                                            "dhGroup": "DHGroup24",
+                                            "pfsGroup": "None"
+                                        }
+                                    ],
+                                    "trafficSelectorPolicies": [],
+                                    "ingressBytesTransferred": 0,
+                                    "egressBytesTransferred": 0,
+                                    "expressRouteGatewayBypass": false,
+                                    "dpdTimeoutSeconds": 0,
+                                    "connectionMode": "Default"
+                                }
+                            }
+                        ]
+                    }
+                }
+            }
+        },
+        {
+            "request": {
+                "method": "GET",
+                "uri": "https://management.azure.com/subscriptions/ea42f556-5106-4743-99b0-c129bfa71a47/resourceGroups/cfb-jbnrjttg/providers/Microsoft.Network/connections?api-version=2020-08-01",
+                "body": null,
+                "headers": {}
+            },
+            "response": {
+                "status": {
+                    "code": 200,
+                    "message": "OK"
+                },
+                "headers": {
+                    "content-type": [
+                        "application/json; charset=utf-8"
+                    ],
+                    "cache-control": [
+                        "no-cache"
+                    ],
+                    "x-ms-arm-service-request-id": [
+                        "d1933bfd-be7b-4377-8b2c-bb0012a6918b"
+                    ],
+                    "date": [
+                        "Thu, 17 Aug 2023 22:58:36 GMT"
+                    ],
+                    "content-length": [
+                        "1579"
+                    ]
+                },
+                "body": {
+                    "data": {
+                        "value": [
+                            {
+                                "name": "vpnconn-cbfail",
+                                "id": "/subscriptions/ea42f556-5106-4743-99b0-c129bfa71a47/resourceGroups/cfb-jbnrjttg/providers/Microsoft.Network/connections/vpnconn-cbfail",
+                                "etag": "W/\"bde6b4d6-74df-4378-bbab-f7a949d4696a\"",
+                                "type": "Microsoft.Network/connections",
+                                "location": "eastus",
+                                "tags": {
+                                    "c7n": "true",
+                                    "product_id": "13742"
+                                },
+                                "properties": {
+                                    "provisioningState": "Succeeded",
+                                    "resourceGuid": "823ea09e-bbde-4168-bd34-6702c9d6831c",
+                                    "packetCaptureDiagnosticState": "None",
+                                    "virtualNetworkGateway1": {
+                                        "id": "/subscriptions/ea42f556-5106-4743-99b0-c129bfa71a47/resourceGroups/cfb-jbnrjttg/providers/Microsoft.Network/virtualNetworkGateways/vpn-cbfail"
+                                    },
+                                    "localNetworkGateway2": {
+                                        "id": "/subscriptions/ea42f556-5106-4743-99b0-c129bfa71a47/resourceGroups/cfb-jbnrjttg/providers/Microsoft.Network/localNetworkGateways/local-vpn-cbfail"
+                                    },
+                                    "connectionType": "IPsec",
+                                    "connectionProtocol": "IKEv2",
+                                    "routingWeight": 0,
+                                    "authenticationType": "PSK",
+                                    "enableBgp": false,
+                                    "useLocalAzureIpAddress": false,
+                                    "usePolicyBasedTrafficSelectors": false,
+                                    "ipsecPolicies": [],
+                                    "trafficSelectorPolicies": [],
+                                    "ingressBytesTransferred": 0,
+                                    "egressBytesTransferred": 0,
+                                    "expressRouteGatewayBypass": false,
+                                    "dpdTimeoutSeconds": 45,
+                                    "connectionMode": "Default"
+                                }
+                            }
+                        ]
+                    }
+                }
+            }
+        }
+    ]
+}
