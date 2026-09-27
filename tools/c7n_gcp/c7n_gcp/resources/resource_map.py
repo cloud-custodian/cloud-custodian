@@ -1,5 +1,7 @@
 # Copyright The Cloud Custodian Authors.
 ResourceMap = {
+    "gcp.alloydb-cluster": "c7n_gcp.resources.alloydb.AlloyDBCluster",
+    "gcp.alloydb-instance": "c7n_gcp.resources.alloydb.AlloyDBInstance",
     "gcp.api-key": "c7n_gcp.resources.iam.ApiKey",
     "gcp.armor-policy": "c7n_gcp.resources.armor.SecurityPolicy",
     "gcp.app-engine": "c7n_gcp.resources.appengine.AppEngineApp",
