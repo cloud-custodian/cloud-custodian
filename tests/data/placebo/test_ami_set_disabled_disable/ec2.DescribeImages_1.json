@@ -1,0 +1,156 @@
+{
+    "status_code": 200,
+    "data": {
+        "Images": [
+            {
+                "PlatformDetails": "Linux/UNIX",
+                "UsageOperation": "RunInstances",
+                "BlockDeviceMappings": [
+                    {
+                        "Ebs": {
+                            "DeleteOnTermination": true,
+                            "Iops": 3000,
+                            "SnapshotId": "snap-0a580eed1d8b98130",
+                            "VolumeSize": 100,
+                            "VolumeType": "gp3",
+                            "Throughput": 125,
+                            "Encrypted": false
+                        },
+                        "DeviceName": "/dev/xvda"
+                    }
+                ],
+                "Description": "This image is created by the AWS Backup service.",
+                "EnaSupport": true,
+                "Hypervisor": "xen",
+                "Name": "AwsBackup_i-0e6014ff729c395a9_705FE5A3-40DA-A8A9-772E-4293BA46D461",
+                "RootDeviceName": "/dev/xvda",
+                "RootDeviceType": "ebs",
+                "Tags": [
+                    {
+                        "Key": "automation",
+                        "Value": "terraform"
+                    },
+                    {
+                        "Key": "aws:backup:source-resource",
+                        "Value": "i-0e6014ff729c395a9:705FE5A3-40DA-A8A9-772E-4293BA46D461"
+                    },
+                    {
+                        "Key": "application",
+                        "Value": "demoec2"
+                    },
+                    {
+                        "Key": "automation.config",
+                        "Value": "demoec2.sandbox"
+                    },
+                    {
+                        "Key": "kubernetes.io/cluster/demoec2-sandbox",
+                        "Value": "owned"
+                    },
+                    {
+                        "Key": "environment",
+                        "Value": "sandbox"
+                    },
+                    {
+                        "Key": "Name",
+                        "Value": "demoec2-sandbox-0"
+                    },
+                    {
+                        "Key": "cloudformation",
+                        "Value": "this_is_a_test"
+                    }
+                ],
+                "VirtualizationType": "hvm",
+                "BootMode": "uefi-preferred",
+                "ImdsSupport": "v2.0",
+                "SourceInstanceId": "i-0e6014ff729c395a9",
+                "DeregistrationProtection": "disabled",
+                "SourceImageId": "ami-0fb6158ae71f901ed",
+                "SourceImageRegion": "us-east-1",
+                "FreeTierEligible": true,
+                "ImageId": "ami-00415e659887728c0",
+                "ImageLocation": "644160558196/AwsBackup_i-0e6014ff729c395a9_705FE5A3-40DA-A8A9-772E-4293BA46D461",
+                "State": "available",
+                "OwnerId": "644160558196",
+                "CreationDate": "2025-12-10T07:38:23.000Z",
+                "Public": false,
+                "Architecture": "x86_64",
+                "ImageType": "machine"
+            },
+            {
+                "PlatformDetails": "Linux/UNIX",
+                "UsageOperation": "RunInstances",
+                "BlockDeviceMappings": [
+                    {
+                        "Ebs": {
+                            "DeleteOnTermination": true,
+                            "Iops": 3000,
+                            "SnapshotId": "snap-05ec50edb4aeac57b",
+                            "VolumeSize": 100,
+                            "VolumeType": "gp3",
+                            "Throughput": 125,
+                            "Encrypted": false
+                        },
+                        "DeviceName": "/dev/xvda"
+                    }
+                ],
+                "Description": "This image is created by the AWS Backup service.",
+                "EnaSupport": true,
+                "Hypervisor": "xen",
+                "Name": "AwsBackup_i-033753f256fa9f19c_69225124-4B19-E06F-7C19-7234654F854D",
+                "RootDeviceName": "/dev/xvda",
+                "RootDeviceType": "ebs",
+                "Tags": [
+                    {
+                        "Key": "cloudformation",
+                        "Value": "this_is_a_test"
+                    },
+                    {
+                        "Key": "Name",
+                        "Value": "demoec2-sandbox-0"
+                    },
+                    {
+                        "Key": "kubernetes.io/cluster/demoec2-sandbox",
+                        "Value": "owned"
+                    },
+                    {
+                        "Key": "automation",
+                        "Value": "terraform"
+                    },
+                    {
+                        "Key": "automation.config",
+                        "Value": "demoec2.sandbox"
+                    },
+                    {
+                        "Key": "aws:backup:source-resource",
+                        "Value": "i-033753f256fa9f19c:69225124-4B19-E06F-7C19-7234654F854D"
+                    },
+                    {
+                        "Key": "environment",
+                        "Value": "sandbox"
+                    },
+                    {
+                        "Key": "application",
+                        "Value": "demoec2"
+                    }
+                ],
+                "VirtualizationType": "hvm",
+                "BootMode": "uefi-preferred",
+                "ImdsSupport": "v2.0",
+                "SourceInstanceId": "i-033753f256fa9f19c",
+                "DeregistrationProtection": "disabled",
+                "SourceImageId": "ami-0fb6158ae71f901ed",
+                "SourceImageRegion": "us-east-1",
+                "FreeTierEligible": true,
+                "ImageId": "ami-06902a5fc08ba032e",
+                "ImageLocation": "644160558196/AwsBackup_i-033753f256fa9f19c_69225124-4B19-E06F-7C19-7234654F854D",
+                "State": "available",
+                "OwnerId": "644160558196",
+                "CreationDate": "2025-12-12T07:31:45.000Z",
+                "Public": false,
+                "Architecture": "x86_64",
+                "ImageType": "machine"
+            }
+        ],
+        "ResponseMetadata": {}
+    }
+}
