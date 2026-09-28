@@ -2,6 +2,7 @@
 # SPDX-License-Identifier: Apache-2.0
 import time
 from botocore.exceptions import ClientError
+from .zpill import ACCOUNT_ID
 import pytest
 from pytest_terraform import terraform
 from .common import (
@@ -37,6 +38,25 @@ def test_s3_access_point(test, s3_access_point):
         client.get_access_point(
             AccountId=p.options['account_id'], Name=resources[0]['Name']
         )
+
+
+def test_s3_directory_access_point_filter(test):
+    access_point_name = 'c7n-test-cross-account-ap--use1-az4--xa-s3'
+    session_factory = test.replay_flight_data(
+        'test_s3_directory_access_point_filter')
+
+    p = test.load_policy(
+        {
+            'name': 's3-directory-access-point',
+            'resource': 'aws.s3-directory-access-point',
+        },
+        config={'account_id': ACCOUNT_ID},
+        session_factory=session_factory,
+    )
+
+    resources = p.run()
+    assert len(resources) == 1
+    assert resources[0]['Name'] == access_point_name
 
 
 class TestStorageLens(BaseTest):
@@ -167,3 +187,25 @@ class TestMultiRegionAccessPoint(BaseTest):
 
         resources = p.run()
         self.assertEqual(len(resources), 1)
+
+
+def test_s3_directory_access_point_cross_account(test):
+    access_point_name = 'c7n-test-cross-account-ap--use1-az4--xa-s3'
+    session_factory = test.replay_flight_data(
+        'test_s3_directory_access_point_cross_account')
+
+    p = test.load_policy(
+        {
+            'name': 's3-directory-access-point-cross-account',
+            'resource': 'aws.s3-directory-access-point',
+            'filters': [
+                {'type': 'cross-account'},
+            ],
+        },
+        config={'account_id': ACCOUNT_ID},
+        session_factory=session_factory,
+    )
+    resources = p.run()
+    assert len(resources) == 1
+    assert resources[0]['Name'] == access_point_name
+    assert 'CrossAccountViolations' in resources[0]

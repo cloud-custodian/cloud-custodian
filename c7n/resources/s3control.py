@@ -1,5 +1,7 @@
 # Copyright The Cloud Custodian Authors.
 # SPDX-License-Identifier: Apache-2.0
+from botocore.exceptions import ClientError
+
 from c7n.actions import Action
 from c7n.filters.iamaccess import CrossAccountAccessFilter
 from c7n.manager import resources
@@ -185,3 +187,49 @@ class DeleteStorageLens(BaseAction):
                 ConfigId=configId,
                 AccountId=accountId
             )
+
+
+class DirectoryAccessPointDescribe(DescribeSource):
+    def get_query_params(self, query_params):
+        query_params = query_params or {}
+        query_params['AccountId'] = self.manager.config.account_id
+        return query_params
+
+
+@resources.register('s3-directory-access-point')
+class DirectoryAccessPoint(QueryResourceManager):
+    class resource_type(TypeInfo):
+        service = 's3control'
+        id = name = 'Name'
+        enum_spec = ('list_access_points_for_directory_buckets', 'AccessPointList', None)
+        arn = 'AccessPointArn'
+        arn_service = 's3'
+        arn_type = 'accesspoint'
+        permission_prefix = 's3express'
+
+    source_mapping = {'describe': DirectoryAccessPointDescribe}
+
+
+@DirectoryAccessPoint.filter_registry.register('cross-account')
+class DirectoryAccessPointCrossAccount(CrossAccountAccessFilter):
+    policy_attribute = 'c7n:Policy'
+    permissions = ('s3express:GetAccessPointPolicy',)
+
+    def process(self, resources, event=None):
+        client = local_session(self.manager.session_factory).client('s3control')
+        account_id = self.manager.config.account_id
+        for r in resources:
+            if self.policy_attribute in r:
+                continue
+            try:
+                r['c7n:Policy'] = client.get_access_point_policy(
+                    AccountId=account_id, Name=r['Name']).get('Policy')
+            except ClientError as e:
+                code = e.response['Error']['Code']
+                if code == 'NoSuchAccessPointPolicy':
+                    r['c7n:Policy'] = None
+                elif code == 'AccessDenied':
+                    r.setdefault('c7n:DeniedMethods', []).append('get_access_point_policy')
+                else:
+                    raise
+        return super().process(resources, event)
