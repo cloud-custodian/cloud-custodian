@@ -1,0 +1,26 @@
+{
+    "status_code": 200,
+    "data": {
+        "WindowIdentities": [
+            {
+                "WindowId": "mw-09f3ae26ced958b2f",
+                "Name": "c7n-test-tagged",
+                "Enabled": true,
+                "Duration": 2,
+                "Cutoff": 1,
+                "Schedule": "cron(0 4 ? * SUN *)",
+                "NextExecutionTime": "2026-08-23T04:00Z"
+            },
+            {
+                "WindowId": "mw-0f38dc5bab46dfa73",
+                "Name": "c7n-test-untagged",
+                "Enabled": true,
+                "Duration": 2,
+                "Cutoff": 1,
+                "Schedule": "cron(0 4 ? * SUN *)",
+                "NextExecutionTime": "2026-08-23T04:00Z"
+            }
+        ],
+        "ResponseMetadata": {}
+    }
+}

@@ -16,6 +16,20 @@ from gcp_common import BaseTest
 from c7n_gcp.resources.vertexai import VertexAIEndpoint
 
 
+def _make_http_error(
+    code: int,
+    message: str,
+    reason: str | None = None,
+) -> HttpError:
+    error = {'code': code, 'message': message}
+    if reason:
+        error['errors'] = [{'reason': reason}]
+    return HttpError(
+        Mock(status=code, reason=message),
+        json.dumps({'error': error}).encode(),
+        )
+
+
 class VertexAIJobs:
     """Helper for creating/cleaning up ephemeral Vertex AI jobs in tests.
 
@@ -244,6 +258,53 @@ class VertexAIEvaluationRuns:
                 client.execute_command('delete', {'name': name})
             except HttpError as e:
                 print(f'Warning: failed to delete {name} during cleanup: {e}')
+
+
+class VertexAIMetadataStoreArtifacts:
+    """Helper for creating/cleaning up ephemeral Metadata Store artifacts.
+
+    The Metadata Store itself is created via Terraform (no Terraform
+    resource exists for artifacts), so artifacts are created directly
+    through the API, mirroring VertexAIModels above.
+    """
+
+    def __init__(self, test, location='us-central1'):
+        self.test = test
+        self.location = location
+        self.created = []
+
+    def _client(self):
+        session = self.test.session_factory()
+        return session.client(
+            'aiplatform', 'v1', 'projects.locations.metadataStores.artifacts',
+            client_options=ClientOptions(
+                api_endpoint=f'https://{self.location}-aiplatform.googleapis.com'))
+
+    def create(self, store_name, artifact_id, display_name, labels=None):
+        """Create an artifact under store_name.
+
+        artifact_id is explicit rather than a service-generated UUID so
+        recorded flight-data filenames stay well under Windows' MAX_PATH.
+        """
+        client = self._client()
+        artifact = client.execute_command(
+            'create',
+            {'parent': store_name,
+             'artifactId': artifact_id,
+             'body': {
+                 'displayName': display_name,
+                 'schemaTitle': 'system.Artifact',
+                 'labels': labels or {},
+                 }})
+        self.created.append((client, artifact['name']))
+        return artifact
+
+    def cleanup(self):
+        for client, name in self.created:
+            try:
+                client.execute_command('delete', {'name': name})
+            except HttpError:
+                pass
 
 
 def get_test_model_id(project_id, location):
@@ -566,6 +627,55 @@ def test_vertexai_endpoint_multi_location(test):
 
     # Verify each resource has the c7n:location annotation
     assert all('c7n:location' in r for r in resources)
+
+
+def test_vertexai_query_manager_continues_after_disabled_error(test, caplog):
+    policy = test.load_policy(
+        {'name': 'vertexai-endpoint-disabled-location',
+         'resource': 'gcp.vertex-ai-endpoint'})
+    manager = policy.resource_manager
+    session = Mock()
+    session.get_default_project.return_value = 'cloud-custodian'
+    locations = [
+        {'name': 'us-east1'},
+        {'name': 'us-central1'},
+        ]
+    location_manager = Mock()
+    location_manager.resources.return_value = locations
+    disabled_client = Mock()
+    disabled_client.execute_paged_query.side_effect = _make_http_error(
+        403,
+        'Vertex AI API is disabled in us-east1',
+        'accessNotConfigured',
+        )
+    endpoint = {
+        'name': ('projects/cloud-custodian/locations/us-central1/'
+                 'endpoints/endpoint-id'),
+        }
+    available_client = Mock()
+    available_client.execute_paged_query.return_value = [
+        {'endpoints': [endpoint]},
+        ]
+
+    with (
+        patch('c7n_gcp.resources.vertexai.local_session', return_value=session),
+        patch.object(
+            manager,
+            'get_resource_manager',
+            return_value=location_manager,
+            ),
+        patch.object(
+            manager,
+            'get_location_client',
+            side_effect=[disabled_client, available_client],
+            ),
+        caplog.at_level(logging.WARNING),
+        ):
+        resources = manager._fetch_resources({})
+
+    assert resources == [endpoint]
+    assert endpoint['c7n:location'] == locations[1]
+    assert 'Vertex AI API is disabled in us-east1' in caplog.text
 
 
 def test_vertexai_endpoint_get_urns(test):
@@ -2160,3 +2270,281 @@ def test_vertexai_hp_tuning_job_field_filters(
     resources = policy.run()
     assert len(resources) == 1
     assert resources[0]['name'] == job_name
+
+
+def test_vertexai_metadata_store_artifact_resource_registered(test):
+    """Test that gcp.vertex-ai-metadata-store-artifact resolves as a resource type."""
+    policy = test.load_policy(
+        {'name': 'vertexai-metadata-store-artifact-check',
+         'resource': 'gcp.vertex-ai-metadata-store-artifact'})
+    assert policy.resource_manager.resource_type.component == (
+        'projects.locations.metadataStores.artifacts')
+
+
+def test_vertexai_metadata_store_artifact_get_urns(test):
+    policy = test.load_policy(
+        {'name': 'vertexai-metadata-store-artifact-urns',
+         'resource': 'gcp.vertex-ai-metadata-store-artifact'})
+    artifacts = [
+        {'name': ('projects/cloud-custodian/locations/us-central1/'
+                  'metadataStores/store-a/artifacts/labeled')},
+        {'name': ('projects/cloud-custodian/locations/us-central1/'
+                  'metadataStores/store-b/artifacts/labeled')},
+        ]
+
+    assert policy.resource_manager.resource_type.get_urns(
+        artifacts,
+        'cloud-custodian',
+        ) == [
+            ('gcp:aiplatform:us-central1:cloud-custodian:'
+             'metadata-store-artifact/store-a/labeled'),
+            ('gcp:aiplatform:us-central1:cloud-custodian:'
+             'metadata-store-artifact/store-b/labeled'),
+            ]
+
+
+def test_vertexai_metadata_store_artifact_skips_client_without_stores(test):
+    policy = test.load_policy(
+        {'name': 'vertexai-metadata-store-artifact-empty-location',
+         'resource': 'gcp.vertex-ai-metadata-store-artifact'})
+    manager = policy.resource_manager
+    session = Mock()
+    session.get_default_project.return_value = 'cloud-custodian'
+    location_manager = Mock()
+    location_manager.resources.return_value = [{'name': 'us-central1'}]
+    store_client = Mock()
+    store_client.execute_paged_query.return_value = [{}]
+
+    with (
+        patch('c7n_gcp.resources.vertexai.local_session', return_value=session),
+        patch.object(
+            manager,
+            'get_resource_manager',
+            return_value=location_manager,
+            ),
+        patch.object(
+            manager,
+            'get_location_client',
+            return_value=store_client,
+            ) as get_location_client,
+        ):
+        resources = manager._fetch_resources({})
+
+    assert resources == []
+    get_location_client.assert_called_once_with(
+        session,
+        'us-central1',
+        'projects.locations.metadataStores',
+        )
+
+
+def test_vertexai_metadata_store_artifact_continues_after_disabled_store_error(
+    test,
+    caplog,
+):
+    policy = test.load_policy(
+        {'name': 'vertexai-metadata-store-artifact-disabled-location',
+         'resource': 'gcp.vertex-ai-metadata-store-artifact'})
+    manager = policy.resource_manager
+    session = Mock()
+    session.get_default_project.return_value = 'cloud-custodian'
+    location_manager = Mock()
+    location_manager.resources.return_value = [
+        {'name': 'us-east1'},
+        {'name': 'us-central1'},
+        ]
+    disabled_store_client = Mock()
+    disabled_store_client.execute_paged_query.side_effect = _make_http_error(
+        403,
+        'Vertex AI API is disabled in us-east1',
+        'accessNotConfigured',
+        )
+    store_client = Mock()
+    store_client.execute_paged_query.return_value = [
+        {'metadataStores': [{'name': 'store-name'}]},
+        ]
+    artifact = {
+        'name': ('projects/cloud-custodian/locations/us-central1/'
+                 'metadataStores/store-name/artifacts/artifact-id'),
+        }
+    artifact_client = Mock()
+    artifact_client.execute_paged_query.return_value = [
+        {'artifacts': [artifact]},
+        ]
+
+    with (
+        patch('c7n_gcp.resources.vertexai.local_session', return_value=session),
+        patch.object(
+            manager,
+            'get_resource_manager',
+            return_value=location_manager,
+            ),
+        patch.object(
+            manager,
+            'get_location_client',
+            side_effect=[disabled_store_client, store_client, artifact_client],
+            ),
+        caplog.at_level(logging.WARNING),
+        ):
+        resources = manager._fetch_resources({})
+
+    assert [resource['name'] for resource in resources] == [artifact['name']]
+    assert 'Vertex AI API is disabled in us-east1' in caplog.text
+
+
+def test_vertexai_metadata_store_artifact_continues_after_disabled_artifact_error(
+    test,
+    caplog,
+):
+    policy = test.load_policy(
+        {'name': 'vertexai-metadata-store-artifact-disabled-store',
+         'resource': 'gcp.vertex-ai-metadata-store-artifact'})
+    manager = policy.resource_manager
+    session = Mock()
+    session.get_default_project.return_value = 'cloud-custodian'
+    location_manager = Mock()
+    location_manager.resources.return_value = [{'name': 'us-central1'}]
+    store_client = Mock()
+    store_client.execute_paged_query.return_value = [
+        {'metadataStores': [
+            {'name': 'disabled-store'},
+            {'name': 'available-store'},
+            ]},
+        ]
+    artifact = {
+        'name': ('projects/cloud-custodian/locations/us-central1/'
+                 'metadataStores/available-store/artifacts/artifact-id'),
+        }
+    artifact_client = Mock()
+    artifact_client.execute_paged_query.side_effect = [
+        _make_http_error(
+            403,
+            'Vertex AI API is disabled for disabled-store',
+            'accessNotConfigured',
+            ),
+        [{'artifacts': [artifact]}],
+        ]
+
+    with (
+        patch('c7n_gcp.resources.vertexai.local_session', return_value=session),
+        patch.object(
+            manager,
+            'get_resource_manager',
+            return_value=location_manager,
+            ),
+        patch.object(
+            manager,
+            'get_location_client',
+            side_effect=[store_client, artifact_client],
+            ),
+        caplog.at_level(logging.WARNING),
+        ):
+        resources = manager._fetch_resources({})
+
+    assert [resource['name'] for resource in resources] == [artifact['name']]
+    assert 'Vertex AI API is disabled for disabled-store' in caplog.text
+
+
+def test_vertexai_metadata_store_artifact_propagates_other_http_errors(test):
+    policy = test.load_policy(
+        {'name': 'vertexai-metadata-store-artifact-api-error',
+         'resource': 'gcp.vertex-ai-metadata-store-artifact'})
+    manager = policy.resource_manager
+    session = Mock()
+    session.get_default_project.return_value = 'cloud-custodian'
+    location_manager = Mock()
+    location_manager.resources.return_value = [{'name': 'us-central1'}]
+    store_client = Mock()
+    error = _make_http_error(500, 'Vertex AI backend failure')
+    store_client.execute_paged_query.side_effect = error
+
+    with (
+        patch('c7n_gcp.resources.vertexai.local_session', return_value=session),
+        patch.object(
+            manager,
+            'get_resource_manager',
+            return_value=location_manager,
+            ),
+        patch.object(
+            manager,
+            'get_location_client',
+            return_value=store_client,
+            ),
+        pytest.raises(HttpError) as raised,
+        ):
+        manager._fetch_resources({})
+
+    assert raised.value is error
+
+
+@terraform('vertexai_metadata_store', scope='module')
+def test_vertexai_metadata_store_artifact_filtering(test, vertexai_metadata_store):
+    """Test aggregation and filtering across Metadata Stores.
+
+    Creates one artifact in each Terraform-provisioned store. Both use the
+    same store-scoped artifact ID; one is labeled and the other is not.
+    """
+    test.session_factory = test.replay_flight_data('va_artifact')
+
+    project = test.session_factory().get_default_project()
+    store_ids = [
+        vertexai_metadata_store[
+            'google_vertex_ai_metadata_store.central_a.name'],
+        vertexai_metadata_store[
+            'google_vertex_ai_metadata_store.central_b.name'],
+        ]
+    store_names = [
+        f'projects/{project}/locations/us-central1/metadataStores/{store_id}'
+        for store_id in store_ids
+        ]
+
+    artifacts = VertexAIMetadataStoreArtifacts(test)
+    test.addCleanup(artifacts.cleanup)
+    if test.recording:
+        artifacts.create(
+            store_names[0],
+            'artifact',
+            'c7n-test-artifact-labeled',
+            {'owner': 'c7n'},
+            )
+        artifacts.create(
+            store_names[1],
+            'artifact',
+            'c7n-test-artifact-unlabeled',
+            )
+
+    policy = test.load_policy(
+        {'name': 'vertex-ai-artifacts-missing-owner-label',
+         'resource': 'gcp.vertex-ai-metadata-store-artifact',
+         'query': [{'location': 'us-central1'}],
+         'filters': [
+             {'type': 'value', 'key': 'displayName', 'op': 'glob', 'value': 'c7n-test-artifact-*'}
+         ]},
+        session_factory=test.session_factory)
+
+    resources = policy.run()
+    assert len(resources) == 2
+    assert {
+        resource['name'].split('/')[5]
+        for resource in resources
+        } == set(store_ids)
+    assert len(set(policy.resource_manager.get_urns(resources))) == 2
+
+    unlabeled = [r for r in resources if 'owner' not in r.get('labels', {})]
+    labeled = [r for r in resources if r.get('labels', {}).get('owner') == 'c7n']
+    assert len(labeled) == 1
+    assert len(unlabeled) == 1
+
+    policy = test.load_policy(
+        {'name': 'vertex-ai-artifacts-missing-owner-label',
+         'resource': 'gcp.vertex-ai-metadata-store-artifact',
+         'query': [{'location': 'us-central1'}],
+         'filters': [
+             {'type': 'value', 'key': 'displayName', 'op': 'glob', 'value': 'c7n-test-artifact-*'},
+             {'type': 'value', 'key': 'labels.owner', 'value': 'absent'}
+         ]},
+        session_factory=test.session_factory)
+
+    resources = policy.run()
+    assert len(resources) == 1
+    assert resources[0]['displayName'] == 'c7n-test-artifact-unlabeled'

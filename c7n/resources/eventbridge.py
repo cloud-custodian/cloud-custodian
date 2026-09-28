@@ -106,6 +106,37 @@ class EventApiDestination(QueryResourceManager):
         id = name = 'Name'
 
 
+@resources.register('event-connection')
+class EventConnection(QueryResourceManager):
+    """EventBridge Connection Resource
+
+    :example:
+
+    .. code-block:: yaml
+
+        policies:
+          - name: eventbridge-connection-basic-auth
+            resource: aws.event-connection
+            filters:
+              - type: value
+                key: AuthorizationType
+                op: not-in
+                value:
+                  - OAUTH_CLIENT_CREDENTIALS
+                  - API_KEY
+    """
+
+    class resource_type(TypeInfo):
+        service = 'events'
+        arn_type = 'connection'
+        arn = 'ConnectionArn'
+        enum_spec = ('list_connections', 'Connections', None)
+        detail_spec = ('describe_connection', 'Name', 'Name', None)
+        config_type = cfn_type = 'AWS::Events::Connection'
+        id = name = 'Name'
+        date = 'LastModifiedTime'
+
+
 class EventRuleQuery(ChildResourceQuery):
 
     def get_parent_parameters(self, params, parent_id, parent_key):

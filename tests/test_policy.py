@@ -656,7 +656,6 @@ class PolicyMetaLint(BaseTest):
             'AWS::EventSchemas::RegistryPolicy',
             'AWS::EventSchemas::Schema',
             'AWS::Events::Archive',
-            'AWS::Events::Connection',
             'AWS::Events::Endpoint',
             'AWS::FraudDetector::EntityType',
             'AWS::FraudDetector::Label',
@@ -700,7 +699,6 @@ class PolicyMetaLint(BaseTest):
             'AWS::LookoutMetrics::Alert',
             'AWS::MediaPackage::PackagingConfiguration',
             'AWS::MediaPackage::PackagingGroup',
-            'AWS::RDS::GlobalCluster',
             'AWS::RUM::AppMonitor',
             'AWS::ResilienceHub::ResiliencyPolicy',
             'AWS::RoboMaker::RobotApplicationVersion',
@@ -995,7 +993,7 @@ class PolicyMetaLint(BaseTest):
             'healthcheck', 'event-rule-target', 'log-metric',
             'support-case', 'transit-attachment', 'config-recorder',
             'apigw-domain-name', 'backup-job', 'quicksight-account', 'codedeploy-config',
-            'cleanrooms-collaboration-member'}
+            'cleanrooms-collaboration-member', 's3files-mount-target'}
 
         missing_method = []
         for k, v in manager.resources.items():

@@ -1,0 +1,66 @@
+{
+    "status_code": 200,
+    "data": {
+        "OpsItemSummaries": [
+            {
+                "CreatedBy": "arn:aws:iam::644160558196:user/developer",
+                "CreatedTime": {
+                    "__class__": "datetime",
+                    "year": 2026,
+                    "month": 8,
+                    "day": 20,
+                    "hour": 18,
+                    "minute": 27,
+                    "second": 51,
+                    "microsecond": 311000
+                },
+                "LastModifiedBy": "arn:aws:iam::644160558196:user/developer",
+                "LastModifiedTime": {
+                    "__class__": "datetime",
+                    "year": 2026,
+                    "month": 8,
+                    "day": 20,
+                    "hour": 18,
+                    "minute": 27,
+                    "second": 51,
+                    "microsecond": 311000
+                },
+                "Source": "c7n-test",
+                "Status": "Open",
+                "OpsItemId": "oi-5576c67d5c46",
+                "Title": "c7n-test-mark",
+                "OpsItemType": "/aws/issue"
+            },
+            {
+                "CreatedBy": "arn:aws:iam::644160558196:user/developer",
+                "CreatedTime": {
+                    "__class__": "datetime",
+                    "year": 2026,
+                    "month": 8,
+                    "day": 20,
+                    "hour": 18,
+                    "minute": 27,
+                    "second": 50,
+                    "microsecond": 482000
+                },
+                "LastModifiedBy": "arn:aws:iam::644160558196:user/developer",
+                "LastModifiedTime": {
+                    "__class__": "datetime",
+                    "year": 2026,
+                    "month": 8,
+                    "day": 20,
+                    "hour": 18,
+                    "minute": 27,
+                    "second": 50,
+                    "microsecond": 482000
+                },
+                "Source": "c7n-test",
+                "Status": "Open",
+                "OpsItemId": "oi-82ad691908f6",
+                "Title": "c7n-test-tag",
+                "OpsItemType": "/aws/issue"
+            }
+        ],
+        "ResponseMetadata": {}
+    }
+}
