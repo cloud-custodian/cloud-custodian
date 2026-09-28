@@ -1,0 +1,26 @@
+{
+  "status_code": 200,
+  "data": {
+    "BackupVaultList": [
+      {
+        "BackupVaultName": "test-backup-vault",
+        "BackupVaultArn": "arn:aws:backup:us-east-1:644160558196:backup-vault:test-backup-vault",
+        "CreationDate": "2024-01-15T10:30:00.000Z",
+        "EncryptionKeyArn": "arn:aws:kms:us-east-1:644160558196:key/12345678-1234-1234-1234-123456789012",
+        "CreatorRequestId": "test-request-id",
+        "NumberOfRecoveryPoints": 0,
+        "Locked": false
+      }
+    ],
+    "ResponseMetadata": {
+      "RequestId": "12345678-1234-1234-1234-123456789012",
+      "HTTPStatusCode": 200,
+      "HTTPHeaders": {
+        "content-type": "application/x-amz-json-1.1",
+        "date": "Mon, 15 Jan 2024 10:30:00 GMT",
+        "x-amzn-requestid": "12345678-1234-1234-1234-123456789012"
+      },
+      "RetryAttempts": 0
+    }
+  }
+}

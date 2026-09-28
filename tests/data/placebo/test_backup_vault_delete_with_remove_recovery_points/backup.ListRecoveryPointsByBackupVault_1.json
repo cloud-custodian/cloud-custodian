@@ -1,0 +1,58 @@
+{
+  "status_code": 200,
+  "data": {
+    "RecoveryPoints": [
+      {
+        "RecoveryPointArn": "arn:aws:backup:us-east-1:644160558196:recovery-point:a1b2c3d4-e5f6-4a5b-8c9d-0e1f2a3b4c5d",
+        "BackupVaultName": "test-backup-vault",
+        "BackupVaultArn": "arn:aws:backup:us-east-1:644160558196:backup-vault:test-backup-vault",
+        "ResourceArn": "arn:aws:ec2:us-east-1:644160558196:instance/i-1234567890abcdef0",
+        "ResourceType": "EC2",
+        "CreationDate": "2024-01-14T10:30:00.000Z",
+        "CompletionDate": "2024-01-14T11:00:00.000Z",
+        "Status": "COMPLETED",
+        "StatusMessage": "Backup completed successfully",
+        "BackupSizeInBytes": 8589934592,
+        "IamRoleArn": "arn:aws:iam::644160558196:role/service-role/AWSBackupDefaultServiceRole",
+        "CreatedBy": {
+          "BackupPlanId": "sample-backup-plan-id",
+          "BackupPlanArn": "arn:aws:backup:us-east-1:644160558196:backup-plan:sample-backup-plan-id",
+          "BackupPlanVersion": "version-1",
+          "BackupRuleId": "rule-1"
+        },
+        "IsEncrypted": true,
+        "LastRestoreTime": "2024-01-14T12:00:00.000Z"
+      },
+      {
+        "RecoveryPointArn": "arn:aws:backup:us-east-1:644160558196:recovery-point:f6e7d8c9-b0a1-4d3e-9f8a-7b6c5d4e3f2a",
+        "BackupVaultName": "test-backup-vault",
+        "BackupVaultArn": "arn:aws:backup:us-east-1:644160558196:backup-vault:test-backup-vault",
+        "ResourceArn": "arn:aws:rds:us-east-1:644160558196:db:my-database",
+        "ResourceType": "RDS",
+        "CreationDate": "2024-01-13T10:30:00.000Z",
+        "CompletionDate": "2024-01-13T11:30:00.000Z",
+        "Status": "COMPLETED",
+        "StatusMessage": "Backup completed successfully",
+        "BackupSizeInBytes": 21474836480,
+        "IamRoleArn": "arn:aws:iam::644160558196:role/service-role/AWSBackupDefaultServiceRole",
+        "CreatedBy": {
+          "BackupPlanId": "sample-backup-plan-id",
+          "BackupPlanArn": "arn:aws:backup:us-east-1:644160558196:backup-plan:sample-backup-plan-id",
+          "BackupPlanVersion": "version-1",
+          "BackupRuleId": "rule-1"
+        },
+        "IsEncrypted": true
+      }
+    ],
+    "ResponseMetadata": {
+      "RequestId": "12345678-1234-1234-1234-123456789012",
+      "HTTPStatusCode": 200,
+      "HTTPHeaders": {
+        "content-type": "application/x-amz-json-1.1",
+        "date": "Mon, 15 Jan 2024 10:30:00 GMT",
+        "x-amzn-requestid": "12345678-1234-1234-1234-123456789012"
+      },
+      "RetryAttempts": 0
+    }
+  }
+}

@@ -1,0 +1,16 @@
+{
+  "status_code": 200,
+  "data": {
+    "BackupVaultList": [],
+    "ResponseMetadata": {
+      "RequestId": "12345678-1234-1234-1234-123456789016",
+      "HTTPStatusCode": 200,
+      "HTTPHeaders": {
+        "content-type": "application/x-amz-json-1.1",
+        "date": "Mon, 15 Jan 2024 10:30:03 GMT",
+        "x-amzn-requestid": "12345678-1234-1234-1234-123456789016"
+      },
+      "RetryAttempts": 0
+    }
+  }
+}
