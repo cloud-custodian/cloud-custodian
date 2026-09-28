@@ -4,7 +4,7 @@
         "PaginationToken": "",
         "ResourceTagMappingList": [
             {
-                "ResourceARN": "arn:aws:emr-serverless:us-east-1:644160558196:/applications/00f7bot3h1dbr009",
+                "ResourceARN": "arn:aws:emr-serverless:us-east-1:644160558196:/applications/00g7c4rdj2nvis09",
                 "Tags": [
                     {
                         "Key": "foo",

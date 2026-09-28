@@ -1,0 +1,54 @@
+{
+    "status_code": 200,
+    "data": {
+        "ResponseMetadata": {},
+        "application": {
+            "applicationId": "00g7c4rdj2nvis09",
+            "name": "c7n-test-emr-serverless-remove-tag",
+            "arn": "arn:aws:emr-serverless:us-east-1:644160558196:/applications/00g7c4rdj2nvis09",
+            "releaseLabel": "emr-6.9.0",
+            "type": "Spark",
+            "state": "CREATED",
+            "stateDetails": "Application created by user.",
+            "createdAt": {
+                "__class__": "datetime",
+                "year": 2026,
+                "month": 7,
+                "day": 20,
+                "hour": 13,
+                "minute": 20,
+                "second": 9,
+                "microsecond": 79000
+            },
+            "updatedAt": {
+                "__class__": "datetime",
+                "year": 2026,
+                "month": 7,
+                "day": 20,
+                "hour": 13,
+                "minute": 20,
+                "second": 9,
+                "microsecond": 79000
+            },
+            "tags": {
+                "foo": "bar"
+            },
+            "autoStartConfiguration": {
+                "enabled": true
+            },
+            "autoStopConfiguration": {
+                "enabled": true,
+                "idleTimeoutMinutes": 15
+            },
+            "architecture": "X86_64",
+            "monitoringConfiguration": {
+                "managedPersistenceMonitoringConfiguration": {
+                    "enabled": true
+                }
+            },
+            "jobLevelCostAllocationConfiguration": {
+                "enabled": false
+            }
+        }
+    }
+}

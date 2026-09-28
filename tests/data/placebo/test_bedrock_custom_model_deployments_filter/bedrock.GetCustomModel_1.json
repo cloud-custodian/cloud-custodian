@@ -1,0 +1,37 @@
+{
+    "status_code": 200,
+    "data": {
+        "ResponseMetadata": {},
+        "modelArn": "arn:aws:bedrock:us-west-2:644160558196:custom-model/meta.llama3-3-70b-instruct-v1:0:128k/ooyhjc4zw7mw",
+        "modelName": "KEEP-c7n-deployable-test-fixture",
+        "jobArn": "arn:aws:bedrock:us-west-2:644160558196:model-customization-job/meta.llama3-3-70b-instruct-v1:0:128k/tamdglrqxysj",
+        "baseModelArn": "arn:aws:bedrock:us-west-2::foundation-model/meta.llama3-3-70b-instruct-v1:0:128k",
+        "customizationType": "FINE_TUNING",
+        "hyperParameters": {
+            "batchSize": "1",
+            "learningRate": "0.00005",
+            "epochCount": "1"
+        },
+        "trainingDataConfig": {
+            "s3Uri": "s3://c7n-bedrock-deployable-chief-fawn/train.jsonl"
+        },
+        "outputDataConfig": {
+            "s3Uri": "s3://c7n-bedrock-deployable-output-chief-fawn/output/"
+        },
+        "trainingMetrics": {
+            "trainingLoss": -1.0
+        },
+        "validationMetrics": [],
+        "creationTime": {
+            "__class__": "datetime",
+            "year": 2026,
+            "month": 7,
+            "day": 27,
+            "hour": 20,
+            "minute": 22,
+            "second": 54,
+            "microsecond": 996000
+        },
+        "modelStatus": "Active"
+    }
+}

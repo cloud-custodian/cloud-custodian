@@ -53,6 +53,7 @@ whitelist_packages = set(
         'uritemplate',  # Dual license BSD 3-Clause OR Apache-2.0
         # https://github.com/GrahamDumpleton/wrapt/issues/298
         'wrapt',  # BSD-2-Clause .. packaging update is missing license spdx header
+        'regex',  # Apache-2.0 AND CNRI-Python, because it derives from CPython's re module
     )
 )
 

@@ -2,6 +2,7 @@
 # SPDX-License-Identifier: Apache-2.0
 
 from gcp_common import BaseTest
+from pytest_terraform import terraform
 
 
 class DataprocTest(BaseTest):
@@ -27,6 +28,24 @@ class DataprocTest(BaseTest):
 
         self.assertEqual(1, len(resources))
         self.assertEqual('cluster-8065', resources[0]['clusterName'])
+
+
+@terraform('dataproc_cluster')
+def test_dataproc_clusters_get(test, dataproc_cluster):
+    project_id = dataproc_cluster['google_dataproc_cluster.default.project']
+    region = dataproc_cluster['google_dataproc_cluster.default.region']
+    cluster_name = dataproc_cluster['google_dataproc_cluster.default.name']
+
+    factory = test.replay_flight_data('dataproc-clusters-get', project_id=project_id)
+    p = test.load_policy({
+        'name': 'dataproc-get',
+        'resource': 'gcp.dataproc-clusters',
+    }, session_factory=factory)
+    resource = p.resource_manager.get_resource({
+        'resourceName': f'projects/{project_id}/regions/{region}/clusters/{cluster_name}',
+    })
+    assert resource['clusterName'] == cluster_name
+    assert resource['c7n:region']['name'] == region
 
 
 def test_data_proc_query(test):

@@ -1,0 +1,20 @@
+{
+    "status_code": 200,
+    "data": {
+        "ResponseMetadata": {},
+        "tags": [
+            {
+                "key": "owner",
+                "value": "jim.fulton@sixfeetup.com"
+            },
+            {
+                "key": "purpose",
+                "value": "cloud-custodian issue 10843 test fixture"
+            },
+            {
+                "key": "KEEP",
+                "value": "jimfulton deployable test custom model"
+            }
+        ]
+    }
+}

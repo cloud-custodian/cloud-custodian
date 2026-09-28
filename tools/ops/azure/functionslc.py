@@ -38,7 +38,7 @@ def wait_for_remote_builds(deployments):
     while finished < total:
         for name, params in deployments.items():
             try:
-                params['status'] = get_build_status(params['scm_uri'])
+                params['status'] = get_build_status(params['scm_uri'], params['token'])
             except Exception:
                 params['status'] = DeploymentStatus.Active
 
@@ -54,16 +54,18 @@ def wait_for_remote_builds(deployments):
             time.sleep(30)
 
 
-def get_build_status(scm_uri):
+def get_build_status(scm_uri, token):
+    headers = {'Authorization': 'Bearer %s' % token}
+
     is_deploying_uri = '%s/api/isdeploying' % scm_uri
-    is_deploying = requests.get(is_deploying_uri).json()['value']
+    is_deploying = requests.get(is_deploying_uri, headers=headers).json()['value']
 
     if strtobool(is_deploying):
         return DeploymentStatus.Active
 
     # Get build status
     deployments_uri = '%s/deployments' % scm_uri
-    r = requests.get(deployments_uri).json()
+    r = requests.get(deployments_uri, headers=headers).json()
     if len(r) == 0:
         return DeploymentStatus.NotFound
 
@@ -83,7 +85,6 @@ def cli(**kwargs):
         if p.provider_name == 'azure'], policy_config)
 
     session = policies.policies[0].session_factory()
-    web_client = session.client('azure.mgmt.web.WebSiteManagementClient')
 
     deployments = {}
     credentials_load_failed = 0
@@ -94,13 +95,15 @@ def cli(**kwargs):
             continue
         try:
             params = AzureFunctionMode(p).get_function_app_params()
-            creds = web_client.web_apps.begin_list_publishing_credentials(
-                params.function_app_resource_group_name,
-                params.function_app_name).result()
-            deployments[p.name] = {'scm_uri': creds.scm_uri, 'status': None}
-            log.info('Retrieved deployment credentials for %s policy', p.name)
+            app_name = params.function_app['name']
+            scm_uri = 'https://{}.scm.azurewebsites.net'.format(app_name)
+            token_scope = session.cloud_endpoints.endpoints.resource_manager.rstrip('/') \
+                + '/.default'
+            token = session.get_credentials().get_token(token_scope).token
+            deployments[p.name] = {'scm_uri': scm_uri, 'token': token, 'status': None}
+            log.info('Retrieved deployment token for %s policy', p.name)
         except Exception:
-            log.error('Unable to retrieve deployment credentials for %s policy', p.name)
+            log.error('Unable to retrieve deployment token for %s policy', p.name)
             credentials_load_failed += 1
 
     wait_for_remote_builds(deployments)
@@ -112,7 +115,7 @@ def cli(**kwargs):
         if params['status'] != DeploymentStatus.Succeeded:
             log.info('%s: %s', name, params['status'])
             if params['status'] == DeploymentStatus.Failed:
-                log.error('Build logs can be retrieved here: %s', params['scm_uri'])
+                log.error('Build logs can be retrieved here: %s/api/deployments', params['scm_uri'])
                 fail += 1
             else:
                 not_found += 1

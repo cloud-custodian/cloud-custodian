@@ -7,7 +7,7 @@ requires-python = "<4.0.0,>=3.9.2"
 dependencies = [
     "c7n",
     "click<9.0,>=8.0",
-    "python-hcl2<5.0.0,>=4.3.2",
+    "python-hcl2<9.0.0,>=8.1.0",
 ]
 name = "c7n_terraform"
 version = "0.1.36"

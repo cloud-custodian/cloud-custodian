@@ -481,7 +481,8 @@ class AzureEventGridMode(AzureFunctionMode):
     def _create_event_subscription(self, storage_account, queue_name, session):
         self.log.info('Creating event grid subscription')
         destination = StorageQueueEventSubscriptionDestination(resource_id=storage_account.id,
-                                                               queue_name=queue_name)
+                                                               queue_name=queue_name,
+                                                               endpoint_type='StorageQueue')
 
         # filter specific events
         advance_filter = StringInAdvancedFilter(key='Data.OperationName',

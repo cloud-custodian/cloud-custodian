@@ -8,11 +8,12 @@ from urllib.parse import urlsplit
 from c7n.manager import resources
 from c7n.exceptions import PolicyValidationError
 from c7n.query import QueryResourceManager, TypeInfo, DescribeSource, DescribeWithResourceTags
+from c7n.query import RetryPageIterator
 from c7n.tags import RemoveTag, Tag, TagActionFilter, TagDelayedAction, universal_augment
 from c7n.utils import local_session, type_schema, QueryParser
 from c7n.actions import BaseAction
 from c7n.filters.kms import KmsRelatedFilter
-from c7n.filters import MetricsFilter, ValueFilter
+from c7n.filters import Filter, MetricsFilter, ValueFilter
 from c7n.resources.aws import shape_schema, shape_validate, Arn
 from c7n.resources.s3 import BucketAssembly, S3_AUGMENT_TABLE
 
@@ -223,6 +224,56 @@ class BedrockCustomModelKmsFilter(KmsRelatedFilter):
 
     """
     RelatedIdsExpression = 'modelKmsKeyArn'
+
+
+@BedrockCustomModel.filter_registry.register('deployments')
+class ModelDeploymentsFilter(Filter):
+    """Filter custom models by their custom model deployments.
+
+    Queries ``ListCustomModelDeployments`` for deployments referencing the
+    model, optionally scoped server-side by ``status``. Matches
+    ``value: present`` if any matching deployment is found, or
+    ``value: absent`` if none is found.
+
+    :example:
+
+    Find custom models with no active deployment:
+
+    .. code-block:: yaml
+
+        policies:
+          - name: bedrock-custom-model-no-active-deployment
+            resource: aws.bedrock-custom-model
+            filters:
+              - type: deployments
+                status: Active
+                value: absent
+    """
+    schema = type_schema(
+        'deployments',
+        status={'enum': ['Creating', 'Active', 'Failed']},
+        value={'enum': ['present', 'absent']},
+        required=['value'])
+    permissions = ('bedrock:ListCustomModelDeployments',)
+    annotation_key = 'c7n:Deployments'
+
+    def process(self, resources, event=None):
+        client = local_session(self.manager.session_factory).client('bedrock')
+        params = {}
+        if 'status' in self.data:
+            params['statusEquals'] = self.data['status']
+        want_present = self.data['value'] == 'present'
+        results = []
+        paginator = client.get_paginator('list_custom_model_deployments')
+        paginator.PAGE_ITERATOR_CLS = RetryPageIterator
+        for r in resources:
+            deployments = paginator.paginate(
+                modelArnEquals=r['modelArn'], **params
+            ).build_full_result().get('modelDeploymentSummaries', [])
+            r[self.annotation_key] = deployments
+            if bool(deployments) == want_present:
+                results.append(r)
+        return results
 
 
 class DescribeBedrockCustomizationJob(DescribeSource):
