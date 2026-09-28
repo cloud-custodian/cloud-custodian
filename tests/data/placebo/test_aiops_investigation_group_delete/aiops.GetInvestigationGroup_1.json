@@ -1,0 +1,18 @@
+{
+    "status_code": 200,
+    "data": {
+        "ResponseMetadata": {},
+        "createdBy": "arn:aws:sts::644160558196:assumed-role/AWSReservedSSO_Org003-Developer_e3d7100119dd6aee/eah523",
+        "createdAt": 1784661319165,
+        "lastModifiedBy": "arn:aws:sts::644160558196:assumed-role/AWSReservedSSO_Org003-Developer_e3d7100119dd6aee/eah523",
+        "lastModifiedAt": 1784661319165,
+        "name": "DefaultInvestigationGroup",
+        "arn": "arn:aws:aiops:us-east-1:644160558196:investigation-group/T1ewGc2UhVD00Sjc",
+        "roleArn": "arn:aws:iam::644160558196:role/AIOpsRole-DefaultInvestigationGroup-bgqsjg",
+        "encryptionConfiguration": {
+            "type": "AWS_OWNED_KEY"
+        },
+        "retentionInDays": 90,
+        "isCloudTrailEventHistoryEnabled": true
+    }
+}

@@ -1,0 +1,33 @@
+{
+    "status_code": 200,
+    "data": {
+        "ResponseMetadata": {},
+        "indices": [
+            {
+                "displayName": "c7n-test",
+                "indexId": "33c51a98-a798-4424-bf2a-ecd12c2796a4",
+                "createdAt": {
+                    "__class__": "datetime",
+                    "year": 2026,
+                    "month": 8,
+                    "day": 10,
+                    "hour": 15,
+                    "minute": 51,
+                    "second": 55,
+                    "microsecond": 314000
+                },
+                "updatedAt": {
+                    "__class__": "datetime",
+                    "year": 2026,
+                    "month": 8,
+                    "day": 10,
+                    "hour": 15,
+                    "minute": 51,
+                    "second": 55,
+                    "microsecond": 314000
+                },
+                "status": "ACTIVE"
+            }
+        ]
+    }
+}
