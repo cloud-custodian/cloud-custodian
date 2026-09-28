@@ -1,0 +1,14 @@
+{
+    "status_code": 200,
+    "data": {
+        "Associations": [
+            {
+                "TransitGatewayAttachmentId": "tgw-attach-012ef2aaf4901cac2",
+                "ResourceId": "vpc-07fd2a08ea9fed01f",
+                "ResourceType": "vpc",
+                "State": "associated"
+            }
+        ],
+        "ResponseMetadata": {}
+    }
+}

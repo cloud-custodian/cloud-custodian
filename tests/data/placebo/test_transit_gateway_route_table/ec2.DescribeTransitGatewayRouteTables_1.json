@@ -1,0 +1,94 @@
+{
+    "status_code": 200,
+    "data": {
+        "TransitGatewayRouteTables": [
+            {
+                "TransitGatewayRouteTableId": "tgw-rtb-00833e95e9c1450b8",
+                "TransitGatewayId": "tgw-042e2dcbb989cd56b",
+                "State": "available",
+                "DefaultAssociationRouteTable": false,
+                "DefaultPropagationRouteTable": false,
+                "CreationTime": {
+                    "__class__": "datetime",
+                    "year": 2026,
+                    "month": 1,
+                    "day": 7,
+                    "hour": 19,
+                    "minute": 38,
+                    "second": 1,
+                    "microsecond": 0
+                },
+                "Tags": [
+                    {
+                        "Key": "Name",
+                        "Value": "c7n-test-available-rt"
+                    }
+                ]
+            },
+            {
+                "TransitGatewayRouteTableId": "tgw-rtb-00d141aa6e0e3e3d6",
+                "TransitGatewayId": "tgw-0bc0b9c3c2f6b2ee2",
+                "State": "available",
+                "DefaultAssociationRouteTable": true,
+                "DefaultPropagationRouteTable": true,
+                "CreationTime": {
+                    "__class__": "datetime",
+                    "year": 2025,
+                    "month": 12,
+                    "day": 10,
+                    "hour": 15,
+                    "minute": 38,
+                    "second": 24,
+                    "microsecond": 0
+                },
+                "Tags": []
+            },
+            {
+                "TransitGatewayRouteTableId": "tgw-rtb-03489f8162a22b2de",
+                "TransitGatewayId": "tgw-0bc0b9c3c2f6b2ee2",
+                "State": "available",
+                "DefaultAssociationRouteTable": false,
+                "DefaultPropagationRouteTable": false,
+                "CreationTime": {
+                    "__class__": "datetime",
+                    "year": 2025,
+                    "month": 12,
+                    "day": 10,
+                    "hour": 15,
+                    "minute": 39,
+                    "second": 10,
+                    "microsecond": 0
+                },
+                "Tags": [
+                    {
+                        "Key": "State",
+                        "Value": "available"
+                    },
+                    {
+                        "Key": "Name",
+                        "Value": "c7n-test-available-rt"
+                    }
+                ]
+            },
+            {
+                "TransitGatewayRouteTableId": "tgw-rtb-072cda9b8e9bc95da",
+                "TransitGatewayId": "tgw-042e2dcbb989cd56b",
+                "State": "available",
+                "DefaultAssociationRouteTable": true,
+                "DefaultPropagationRouteTable": true,
+                "CreationTime": {
+                    "__class__": "datetime",
+                    "year": 2026,
+                    "month": 1,
+                    "day": 7,
+                    "hour": 19,
+                    "minute": 37,
+                    "second": 38,
+                    "microsecond": 0
+                },
+                "Tags": []
+            }
+        ],
+        "ResponseMetadata": {}
+    }
+}
