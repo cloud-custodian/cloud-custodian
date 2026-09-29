@@ -1,0 +1,95 @@
+{
+  "headers": {
+    "content-type": "application/json; charset=UTF-8",
+    "vary": "Origin, X-Origin, Referer",
+    "date": "Mon, 28 Sep 2026 17:46:36 GMT",
+    "server": "ESF",
+    "x-xss-protection": "0",
+    "x-frame-options": "SAMEORIGIN",
+    "x-content-type-options": "nosniff",
+    "alt-svc": "h3=\":443\"; ma=2592000,h3-29=\":443\"; ma=2592000",
+    "transfer-encoding": "chunked",
+    "status": "200",
+    "content-length": "1908",
+    "-content-encoding": "gzip",
+    "content-location": "https://billingbudgets.googleapis.com/v1/billingAccounts/0189B7-1C2253-05D127/budgets?alt=json"
+  },
+  "body": {
+    "budgets": [
+      {
+        "name": "billingAccounts/0189B7-1C2253-05D127/budgets/2eb2e87a-0af1-4131-9b5e-1dacd6a41a6f",
+        "displayName": "Test Budget 1",
+        "budgetFilter": {
+          "projects": [
+            "projects/1098479648729"
+          ],
+          "creditTypesTreatment": "INCLUDE_ALL_CREDITS",
+          "calendarPeriod": "MONTH"
+        },
+        "amount": {
+          "specifiedAmount": {
+            "currencyCode": "USD",
+            "units": "10"
+          }
+        },
+        "thresholdRules": [
+          {
+            "thresholdPercent": 0.5,
+            "spendBasis": "CURRENT_SPEND"
+          },
+          {
+            "thresholdPercent": 0.9,
+            "spendBasis": "CURRENT_SPEND"
+          },
+          {
+            "thresholdPercent": 1,
+            "spendBasis": "CURRENT_SPEND"
+          }
+        ],
+        "notificationsRule": {},
+        "etag": "1788384670513595"
+      },
+      {
+        "name": "billingAccounts/0189B7-1C2253-05D127/budgets/54f10f98-316a-44b8-97b2-faf61d9748ca",
+        "displayName": "Test Budget 2",
+        "budgetFilter": {
+          "projects": [
+            "projects/1098479648729"
+          ],
+          "creditTypesTreatment": "INCLUDE_ALL_CREDITS",
+          "customPeriod": {
+            "startDate": {
+              "year": 2024,
+              "month": 6,
+              "day": 1
+            }
+          }
+        },
+        "amount": {
+          "specifiedAmount": {
+            "currencyCode": "USD",
+            "units": "100"
+          }
+        },
+        "thresholdRules": [
+          {
+            "thresholdPercent": 0.5,
+            "spendBasis": "CURRENT_SPEND"
+          },
+          {
+            "thresholdPercent": 0.9,
+            "spendBasis": "CURRENT_SPEND"
+          },
+          {
+            "thresholdPercent": 1,
+            "spendBasis": "CURRENT_SPEND"
+          }
+        ],
+        "notificationsRule": {
+          "enableProjectLevelRecipients": true
+        },
+        "etag": "1719437332327503"
+      }
+    ]
+  }
+}
