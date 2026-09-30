@@ -104,6 +104,7 @@ class Function(QueryResourceManager):
         date = "FunctionMetadata.LastModifiedTime"
         cfn_type = "AWS::CloudFront::Function"
         universal_taggable = object()
+        global_resource = True
         permission_augment = ("cloudfront:ListTagsForResource",)
 
     source_mapping = {
