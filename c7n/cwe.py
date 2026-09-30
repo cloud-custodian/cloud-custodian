@@ -103,6 +103,31 @@ class CloudWatchEvents:
         return False
 
     @classmethod
+    def get_subscriptions(cls, mode):
+        """Return the (eventSource, eventName) pairs a cloudtrail mode subscribes to."""
+        subscriptions = set()
+        for e in mode.get('events', ()):
+            if isinstance(e, dict):
+                subscriptions.add((e['source'], e['event']))
+                continue
+            info = cls.get(e)
+            if info is None:
+                continue
+            subscriptions.add((info['source'], info.get('event', e)))
+        return subscriptions
+
+    @classmethod
+    def is_subscribed(cls, event, mode):
+        """Check whether a cloudtrail event is one the given mode subscribes to.
+
+        Used by grouped policy lambdas, where a single function receives
+        the union of its member policies' events.
+        """
+        detail = event.get('detail') or {}
+        key = (detail.get('eventSource'), detail.get('eventName'))
+        return key in cls.get_subscriptions(mode)
+
+    @classmethod
     def get_trail_ids(cls, event, mode):
         """extract resources ids from a cloud trail event."""
         resource_ids = ()

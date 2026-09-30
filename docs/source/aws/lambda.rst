@@ -86,7 +86,54 @@ have been defined to allow for easier policy writing as for the
 
 Refer to the `AWS execution modes documention
 <https://cloudcustodian.io/docs/aws/resources/aws-modes.html#cloudtrail>`_ for a
-list of other configurable options. 
+list of other configurable options.
+
+Grouping CloudTrail Policies
+++++++++++++++++++++++++++++
+
+By default each policy is deployed as its own Lambda function and
+EventBridge rule. Large policy sets can instead share functions by
+setting ``group: true`` in the cloudtrail mode:
+
+.. code-block:: yaml
+
+   policies:
+     - name: ec2-require-owner-tag
+       resource: ec2
+       mode:
+         type: cloudtrail
+         group: true
+         role: arn:aws:iam::{account_id}:role/CustodianLambda
+         events:
+           - RunInstances
+     - name: ec2-tag-change-audit
+       resource: ec2
+       mode:
+         type: cloudtrail
+         group: true
+         role: arn:aws:iam::{account_id}:role/CustodianLambda
+         events:
+           - source: ec2.amazonaws.com
+             event: CreateTags
+             ids: "requestParameters.resourcesSet.items[].resourceId"
+
+``custodian run`` groups policies with the same event sources
+(``ec2.amazonaws.com`` above) and the same function configuration
+(role, runtime, memory, timeout, prefix, tags, network and execution
+options) into one function named
+``{function-prefix}group-{services}-{hash}``. The function's rule
+subscribes to the union of its members' events, and each event is only
+dispatched to the policies that subscribe to it.
+
+When provisioning, custodian compares the new group with the one that is
+deployed, logs added and removed policies, removes standalone functions
+that grouped policies previously used, and removes group functions that
+the current groups replace. Grouped policies can only be provisioned with
+``custodian run`` on the policy file. ``mugc`` recognizes group functions.
+
+To stop grouping a policy, remove ``group: true`` and run the policy
+file again. The group no longer includes the policy, and custodian
+provisions a standalone function for it.
 
 
 EC2 Instance State Events

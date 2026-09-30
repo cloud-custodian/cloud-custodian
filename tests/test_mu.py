@@ -18,6 +18,7 @@ import zipfile
 
 
 from c7n.config import Config
+from c7n.exceptions import PolicyValidationError
 from c7n.mu import (
     custodian_archive,
     generate_requirements,
@@ -1648,3 +1649,202 @@ class DiffTags(unittest.TestCase):
     def test_update(self):
         assert LambdaManager.diff_tags(
             {"Foo": "Bar"}, {"Foo": "Baz"}) == ({"Foo": "Baz"}, [])
+
+
+class PolicyLambdaGroupTest(BaseTest):
+
+    def get_policy(self, name, events=('RunInstances',), resource='aws.ec2', **mode):
+        mode.setdefault('role', 'arn:aws:iam::123456789012:role/custodian')
+        return self.load_policy({
+            'name': name,
+            'resource': resource,
+            'mode': dict(type='cloudtrail', group=True, events=list(events), **mode)})
+
+    def test_cwe_subscriptions(self):
+        from c7n.cwe import CloudWatchEvents
+        mode = {'events': [
+            'CreateFunction',
+            {'source': 'ec2.amazonaws.com', 'event': 'CreateTags', 'ids': 'x'}]}
+        self.assertEqual(
+            CloudWatchEvents.get_subscriptions(mode),
+            {('lambda.amazonaws.com', 'CreateFunction20150331'),
+             ('ec2.amazonaws.com', 'CreateTags')})
+        self.assertTrue(CloudWatchEvents.is_subscribed({'detail': {
+            'eventSource': 'lambda.amazonaws.com',
+            'eventName': 'CreateFunction20150331'}}, mode))
+        self.assertFalse(CloudWatchEvents.is_subscribed({'detail': {
+            'eventSource': 'ec2.amazonaws.com', 'eventName': 'RunInstances'}}, mode))
+        self.assertFalse(CloudWatchEvents.is_subscribed({}, mode))
+
+    def test_group_policies(self):
+        from c7n.mu import group_policies
+        run = self.get_policy('ec2-run')
+        tag = self.get_policy('ec2-tag', events=[{
+            'source': 'ec2.amazonaws.com', 'event': 'CreateTags',
+            'ids': 'requestParameters.resourcesSet.items[].resourceId'}], delay=5)
+        other_role = self.get_policy('ec2-role', role='other')
+        s3 = self.get_policy('s3-create', events=['CreateBucket'], resource='aws.s3')
+
+        groups = group_policies([run, tag, other_role, s3])
+        self.assertEqual(
+            sorted(sorted(p.name for p in members) for members in groups.values()),
+            [['ec2-role'], ['ec2-run', 'ec2-tag'], ['s3-create']])
+        for name in groups:
+            self.assertTrue(name.startswith('custodian-group-'))
+            self.assertTrue(len(name) <= 64)
+        # names are stable across invocations
+        self.assertEqual(set(groups), set(group_policies([s3, other_role, tag, run])))
+
+    def test_group_name_long_prefix(self):
+        from c7n.mu import get_group_name
+        p = self.get_policy('ec2-run', **{'function-prefix': 'x' * 46})
+        name = get_group_name(p)
+        self.assertEqual(len(name), 64)
+        self.assertTrue(name.startswith('x' * 46 + 'group-ec2-'))
+
+    def test_group_invalid_prefix(self):
+        self.assertRaises(
+            PolicyValidationError, self.get_policy, 'ec2',
+            **{'function-prefix': 'x' * 55})
+
+    def test_policy_lambda_group(self):
+        from c7n.mu import PolicyLambdaGroup
+        run = self.get_policy('ec2-run', tags={'owner': 'ops', 'custodian-info': 'x'})
+        both = self.get_policy(
+            'ec2-both', events=['RunInstances', 'CreateVolume'], tags={'owner': 'ops'})
+        func = PolicyLambdaGroup('custodian-group-ec2-abcd1234', [run, both])
+
+        self.assertEqual(func.name, 'custodian-group-ec2-abcd1234')
+        self.assertEqual(func.event_name, func.name)
+        self.assertEqual(func.policy_names, ['ec2-both', 'ec2-run'])
+        self.assertEqual(
+            func.description, 'cloud-custodian lambda policy group: ec2-both, ec2-run')
+        self.assertEqual(func.tags['owner'], 'ops')
+        self.assertEqual(func.tags['custodian-group'], func.name)
+        self.assertTrue(func.tags['custodian-info'].startswith('mode=cloudtrail-group:'))
+        self.assertEqual(
+            func.get_group_mode(),
+            {'type': 'cloudtrail', 'events': ['RunInstances', 'CreateVolume']})
+
+        events = func.get_events(None)
+        self.assertEqual(len(events), 1)
+        self.assertEqual(
+            json.loads(events[0].render_event_pattern())['detail']['eventName'],
+            ['RunInstances', 'CreateVolume'])
+
+        config = json.loads(func.get_archive().get_reader().read('config.json'))
+        self.assertEqual(config['function-group'], func.name)
+        self.assertEqual([p['name'] for p in config['policies']], ['ec2-both', 'ec2-run'])
+
+    def test_group_description_truncated(self):
+        from c7n.mu import PolicyLambdaGroup
+        policies = [self.get_policy('ec2-policy-%02d' % i) for i in range(30)]
+        func = PolicyLambdaGroup('custodian-group-ec2-abcd1234', policies)
+        self.assertEqual(len(func.description), 256)
+        self.assertTrue(func.description.endswith('...'))
+
+    def test_get_policy_names(self):
+        manager = LambdaManager.__new__(LambdaManager)
+        manager.get = mock.MagicMock(return_value=False)
+        self.assertEqual(manager.get_policy_names('foo'), None)
+
+        archive = PythonPackageArchive()
+        archive.add_contents('config.json', json.dumps(
+            {'policies': [{'name': 'a'}, {'name': 'b'}]}))
+        archive.close()
+        self.addCleanup(archive.remove)
+        manager.get.return_value = {'Code': {'Location': 'https://example.com/code'}}
+        with patch('c7n.mu.urllib.request.urlopen') as urlopen:
+            urlopen.return_value.__enter__.return_value.read.return_value = (
+                archive.get_bytes())
+            self.assertEqual(manager.get_policy_names('foo'), ['a', 'b'])
+
+        manager.get.return_value = {'Code': {'Location': 'file:///etc/passwd'}}
+        self.assertEqual(manager.get_policy_names('foo'), [])
+
+    def get_manager(self, functions=(), policy_names=None):
+        manager = mock.MagicMock()
+        functions = {f['Configuration']['FunctionName']: f for f in functions}
+        manager.get.side_effect = lambda name: functions.get(name, False)
+        manager.list_functions.return_value = [
+            f['Configuration'] for f in functions.values()]
+        manager.get_policy_names.side_effect = lambda name: (
+            policy_names or {}).get(name)
+        return manager
+
+    @staticmethod
+    def get_function(name, tags):
+        return {
+            'Configuration': {
+                'FunctionName': name, 'Role': 'role', 'Handler': 'h',
+                'Timeout': 60, 'MemorySize': 512, 'Runtime': 'python3.11'},
+            'Tags': tags}
+
+    def test_publish_group_removes_standalone(self):
+        from c7n.mu import PolicyLambdaGroupManager
+        run = self.get_policy('ec2-run')
+        tag = self.get_policy('ec2-tag')
+        # a custodian standalone function, and a same named foreign function
+        manager = self.get_manager(
+            [self.get_function('custodian-ec2-run', {'custodian-info': 'mode=cloudtrail'}),
+             self.get_function('custodian-ec2-tag', {})],
+            {'custodian-group-ec2-abcd1234': ['ec2-run', 'ec2-old']})
+        log_output = self.capture_logging('custodian.serverless')
+
+        PolicyLambdaGroupManager([]).publish_group(
+            manager, 'custodian-group-ec2-abcd1234', [run, tag])
+
+        self.assertEqual(
+            manager.publish.call_args[0][0].policy_names, ['ec2-run', 'ec2-tag'])
+        self.assertEqual(
+            [c[0][0].name for c in manager.remove.call_args_list], ['custodian-ec2-run'])
+        self.assertIn('added:ec2-tag removed:ec2-old', log_output.getvalue())
+
+    def test_remove_superseded_groups(self):
+        from c7n.mu import PolicyLambdaGroupManager
+        run = self.get_policy('ec2-run')
+        tag = self.get_policy('ec2-tag')
+        manager = self.get_manager(
+            [self.get_function('custodian-group-ec2-current', {'custodian-group': 'x'}),
+             self.get_function('custodian-group-ec2-old', {'custodian-group': 'x'}),
+             self.get_function('custodian-group-ec2-shared', {'custodian-group': 'x'}),
+             self.get_function('custodian-group-ec2-other', {'custodian-group': 'x'}),
+             self.get_function('custodian-group-ec2-untagged', {}),
+             self.get_function('custodian-ec2-run', {'custodian-info': 'x'})],
+            {'custodian-group-ec2-old': ['ec2-run', 'ec2-tag'],
+             'custodian-group-ec2-shared': ['ec2-run', 'foreign'],
+             'custodian-group-ec2-other': ['foreign'],
+             'custodian-group-ec2-untagged': ['ec2-run']})
+        log_output = self.capture_logging('custodian.serverless')
+
+        PolicyLambdaGroupManager([]).remove_superseded_groups(
+            manager, {'custodian-group-ec2-current': [run, tag]})
+        self.assertEqual(
+            [c[0][0].name for c in manager.remove.call_args_list],
+            ['custodian-group-ec2-old'])
+        self.assertIn(
+            'custodian-group-ec2-shared shares policies:ec2-run', log_output.getvalue())
+
+    def test_publish(self):
+        from c7n.mu import PolicyLambdaGroupManager
+        run = self.get_policy('ec2-run')
+        s3 = self.get_policy('s3-create', events=['CreateBucket'], resource='aws.s3')
+        group_manager = PolicyLambdaGroupManager([run, s3])
+        manager = self.get_manager()
+
+        def publish_group(manager, name, members):
+            if members[0].name == 's3-create':
+                raise ValueError('boom')
+
+        self.patch(group_manager, 'get_lambda_manager', lambda p: manager)
+        self.patch(group_manager, 'publish_group', publish_group)
+        self.patch(group_manager, 'remove_superseded_groups', mock.MagicMock())
+        self.capture_logging('custodian.serverless')
+
+        self.assertEqual(group_manager.publish(), ['s3-create'])
+        # don't garbage collect when some groups failed to publish
+        group_manager.remove_superseded_groups.assert_not_called()
+
+    def test_mode_provision_skips_grouped(self):
+        p = self.get_policy('ec2-run')
+        self.assertEqual(p.provision(), None)

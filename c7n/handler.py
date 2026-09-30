@@ -8,6 +8,7 @@ import logging
 import json
 
 from c7n.config import Config
+from c7n.cwe import CloudWatchEvents
 from c7n.structure import StructureParser
 from c7n.resources import load_resources
 from c7n.resources.aws import AWS
@@ -162,7 +163,12 @@ def dispatch_event(event, context):
         return False
 
     policies = PolicyCollection.from_data(policy_data, policy_config)
+    grouped = bool(policy_data.get('function-group'))
     for p in policies:
+        # a grouped lambda receives the union of its members' events, only
+        # dispatch to the policies that subscribed to this one.
+        if grouped and not CloudWatchEvents.is_subscribed(event, p.data.get('mode', {})):
+            continue
         try:
             # validation provides for an initialization point for
             # some filters/actions.
