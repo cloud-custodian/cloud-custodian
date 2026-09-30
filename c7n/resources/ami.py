@@ -565,6 +565,107 @@ class ImageAgeFilter(AgeFilter):
         days={'type': 'number', 'minimum': 0})
 
 
+@AMI.filter_registry.register('image-ancestry')
+class ImageAncestryFilter(Filter):
+    """Filters images based on parent owner using GetImageAncestry API
+
+    Flags AMIs that don't have an approved owner in their ancestry chain.
+    max_depth defaults to 1 (immediate parent). Set to 2 to include grandparent, etc.
+
+    :example:
+
+    .. code-block:: yaml
+
+            policies:
+              - name: ami-non-approved-parent
+                resource: ami
+                filters:
+                  - type: image-ancestry
+                    approved_owners:
+                      - '123456789012'
+                      - amazon
+                    max_depth: 2
+    """
+
+    schema = type_schema(
+        'image-ancestry',
+        approved_owners={'type': 'array', 'items': {'type': 'string'}},
+        max_depth={'type': 'integer', 'minimum': 1},
+        required=['approved_owners'])
+
+    def get_permissions(self):
+        return ['ec2:DescribeImages', 'ec2:GetImageAncestry']
+
+    def process(self, resources, event=None):
+        client = local_session(self.manager.session_factory).client('ec2')
+        results = []
+
+        for r in resources:
+            if self._check_parent_owner(client, r):
+                results.append(r)
+
+        return results
+
+    def _check_parent_owner(self, client, resource):
+        approved_owners = self.data['approved_owners']
+        # Check if the AMI itself is from an approved owner
+        ami_owner = resource.get('ImageOwnerAlias') or resource.get('OwnerId')
+        if ami_owner in self.data['approved_owners']:
+            return False  # AMI is approved, skip ancestry check
+
+        if 'c7n:image-ancestry' not in resource:
+            try:
+                ancestry = client.get_image_ancestry(ImageId=resource['ImageId'])
+                resource['c7n:image-ancestry'] = ancestry.get('ImageAncestryEntries', [])
+            except ClientError as e:
+                log.warning(f"Error getting ancestry for {resource['ImageId']}: {e}")
+                resource['c7n:image-ancestry'] = []
+        ancestry = resource['c7n:image-ancestry']
+        max_depth = self.data.get('max_depth', 1)
+
+        # Check ancestors up to max_depth
+        for depth in range(min(max_depth, len(ancestry))):
+            parent_entry = ancestry[depth]
+            parent_id = parent_entry.get('ImageId')
+
+            if not parent_id:
+                continue
+
+            # Skip if we already looked up the owner
+            if 'OwnerId' in parent_entry or 'ImageOwnerAlias' in parent_entry:
+                owner = parent_entry.get('ImageOwnerAlias') or parent_entry.get('OwnerId')
+                if owner in approved_owners:
+                    return False
+                continue
+
+            try:
+                resp = client.describe_images(
+                    ImageIds=[parent_id],
+                    IncludeDeprecated=True,
+                    IncludeDisabled=True
+                )
+                if not resp.get('Images'):
+                    continue
+
+                parent_image = resp['Images'][0]
+                owner = parent_image.get('ImageOwnerAlias') or parent_image.get('OwnerId')
+
+                # Cache the owner info in the ancestry entry
+                parent_entry['OwnerId'] = parent_image.get('OwnerId')
+                if parent_image.get('ImageOwnerAlias'):
+                    parent_entry['ImageOwnerAlias'] = parent_image['ImageOwnerAlias']
+
+                if owner in approved_owners:
+                    return False
+            except ClientError as e:
+                if e.response['Error']['Code'] != 'InvalidAMIID.NotFound':
+                    log.warning(f"Error describing parent image {parent_id}: {e}")
+                continue
+
+        # No approved ancestor found, flag this AMI
+        return True
+
+
 @AMI.filter_registry.register('unused')
 class ImageUnusedFilter(Filter):
     """Filters images based on usage
