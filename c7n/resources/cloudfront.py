@@ -123,6 +123,7 @@ class KeyValueStore(QueryResourceManager):
         date = "LastModifiedTime"
         cfn_type = "AWS::CloudFront::KeyValueStore"
         universal_taggable = object()
+        global_resource = True
         permission_augment = ("cloudfront:ListTagsForResource",)
 
     source_mapping = {
