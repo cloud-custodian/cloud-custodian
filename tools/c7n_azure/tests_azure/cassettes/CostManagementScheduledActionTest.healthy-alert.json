@@ -1,0 +1,90 @@
+{
+    "version": 1,
+    "interactions": [
+        {
+            "request": {
+                "method": "GET",
+                "uri": "https://management.azure.com/subscriptions/ea42f556-5106-4743-99b0-c129bfa71a47/providers/Microsoft.CostManagement/scheduledActions?api-version=2022-10-01",
+                "body": null,
+                "headers": {}
+            },
+            "response": {
+                "status": {
+                    "code": 200,
+                    "message": "OK"
+                },
+                "headers": {
+                    "date": [
+                        "Tue, 15 Sep 2026 03:13:34 GMT"
+                    ],
+                    "cache-control": [
+                        "no-cache"
+                    ],
+                    "x-cache": [
+                        "CONFIG_NOCACHE"
+                    ],
+                    "x-msedge-ref": [
+                        "Ref A: 7B0A7F87AB774836AC24E6A63ED07E0A Ref B: CHI261140509023 Ref C: 2026-09-15T03:13:33Z"
+                    ],
+                    "content-length": [
+                        "1160"
+                    ],
+                    "x-ms-ratelimit-remaining-subscription-global-reads": [
+                        "3749"
+                    ],
+                    "content-type": [
+                        "application/json; charset=utf-8"
+                    ]
+                },
+                "body": {
+                    "data": {
+                        "value": [
+                            {
+                                "id": "subscriptions/ea42f556-5106-4743-99b0-c129bfa71a47/providers/Microsoft.CostManagement/scheduledActions/cctestscheduledaction",
+                                "name": "cctestscheduledaction",
+                                "kind": "InsightAlert",
+                                "type": "Microsoft.CostManagement/ScheduledActions",
+                                "eTag": "\"0400b20e-0000-0100-0000-6aa8b7040000\"",
+                                "systemData": {
+                                    "createdAt": "2026-09-15T03:09:56.445444Z",
+                                    "createdBy": "kody.mullins@sixfeetup.com",
+                                    "lastModifiedAt": "2026-09-15T03:09:56.4454355Z",
+                                    "lastModifiedBy": "kody.mullins@sixfeetup.com"
+                                },
+                                "properties": {
+                                    "displayName": "cctestscheduledaction",
+                                    "scope": "subscriptions/ea42f556-5106-4743-99b0-c129bfa71a47",
+                                    "status": "Enabled",
+                                    "viewId": "/subscriptions/ea42f556-5106-4743-99b0-c129bfa71a47/providers/Microsoft.CostManagement/views/ms:DailyAnomalyByResource",
+                                    "fileDestination": {
+                                        "fileFormats": []
+                                    },
+                                    "schedule": {
+                                        "frequency": "Daily",
+                                        "hourOfDay": 12,
+                                        "daysOfWeek": null,
+                                        "weeksOfMonth": null,
+                                        "dayOfMonth": 0,
+                                        "startDate": "2026-09-15T00:00:00Z",
+                                        "endDate": "2030-09-14T00:00:00Z"
+                                    },
+                                    "notification": {
+                                        "subject": "Cost anomaly detected",
+                                        "message": null,
+                                        "to": [
+                                            "cctest@example.com"
+                                        ],
+                                        "language": "en",
+                                        "regionalFormat": "en-us"
+                                    },
+                                    "notificationEmail": "kody.mullins@sixfeetup.com"
+                                }
+                            }
+                        ],
+                        "nextLink": null
+                    }
+                }
+            }
+        }
+    ]
+}

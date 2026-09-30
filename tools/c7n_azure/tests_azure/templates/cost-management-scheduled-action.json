@@ -1,0 +1,44 @@
+{
+  "$schema": "https://schema.management.azure.com/schemas/2018-05-01/subscriptionDeploymentTemplate.json#",
+  "contentVersion": "1.0.0.0",
+  "parameters": {
+    "startDate": {
+      "type": "string",
+      "defaultValue": "[utcNow('yyyy-MM-ddT00:00:00Z')]"
+    },
+    "status": {
+      "type": "string",
+      "defaultValue": "Enabled",
+      "allowedValues": [
+        "Enabled",
+        "Disabled"
+      ]
+    }
+  },
+  "variables": {
+  },
+  "resources": [
+    {
+      "type": "Microsoft.CostManagement/scheduledActions",
+      "apiVersion": "2023-11-01",
+      "name": "cctestscheduledaction",
+      "kind": "InsightAlert",
+      "properties": {
+        "displayName": "cctestscheduledaction",
+        "status": "[parameters('status')]",
+        "viewId": "[concat(subscription().id, '/providers/Microsoft.CostManagement/views/ms:DailyAnomalyByResource')]",
+        "notification": {
+          "to": [
+            "cctest@example.com"
+          ],
+          "subject": "Cost anomaly detected"
+        },
+        "schedule": {
+          "frequency": "Daily",
+          "startDate": "[parameters('startDate')]",
+          "endDate": "[dateTimeAdd(parameters('startDate'), 'P4Y')]"
+        }
+      }
+    }
+  ]
+}
