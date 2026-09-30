@@ -83,6 +83,16 @@ class DeployTests(unittest.TestCase):
         assert archive.size > 10000  # this should really be about 1.5 MB
         assert len(archive.get_filenames()) > 50  # should be > 500
 
+    def test_get_archive_bundles_redis_jwt_dep(self):
+        # redis imports jwt at module scope in redis/auth/token.py and the
+        # mailer imports redis unconditionally via ldap_lookup so an archive
+        # carrying redis without jwt fails on import in the deployed function.
+        archive = deploy.get_archive({"templates_folders": []})
+        names = archive.get_filenames()
+        assert "redis/auth/token.py" in names
+        assert any(n == "jwt" or n.startswith("jwt/") for n in names)
+        archive.remove()
+
     def test_get_archive_with_templates(self):
         with (
             tempfile.TemporaryDirectory() as template_folder1,
