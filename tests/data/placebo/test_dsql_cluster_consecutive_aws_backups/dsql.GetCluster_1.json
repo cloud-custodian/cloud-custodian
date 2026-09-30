@@ -1,0 +1,28 @@
+{
+    "status_code": 200,
+    "data": {
+        "ResponseMetadata": {},
+        "identifier": "pnudiyynanlerpax6szgnpv6j4",
+        "arn": "arn:aws:dsql:us-east-1:644160558196:cluster/pnudiyynanlerpax6szgnpv6j4",
+        "status": "ACTIVE",
+        "creationTime": {
+            "__class__": "datetime",
+            "year": 2026,
+            "month": 9,
+            "day": 24,
+            "hour": 9,
+            "minute": 23,
+            "second": 13,
+            "microsecond": 133000
+        },
+        "deletionProtectionEnabled": false,
+        "tags": {
+            "Name": "c7n-test"
+        },
+        "encryptionDetails": {
+            "encryptionType": "AWS_OWNED_KMS_KEY",
+            "encryptionStatus": "ENABLED"
+        },
+        "endpoint": "pnudiyynanlerpax6szgnpv6j4.dsql.us-east-1.on.aws"
+    }
+}
