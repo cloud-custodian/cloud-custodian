@@ -65,6 +65,9 @@ addons = [
     "psutil>=5.7",
 ]
 
+[tool.uv]
+exclude-newer  = "5 days"
+
 [tool.uv.sources]
 c7n = { workspace = true }
 
