@@ -53,6 +53,7 @@ class MachineLearningModelVersion(ChildArmResourceManager):
             for version in client.model_versions.list(
                     resource_group_name=resource_group,
                     workspace_name=workspace_name,
-                    name=container.name):
+                    name=container.name,
+                    list_view_type="All"):
                 versions.append(version.serialize(True))
         return versions

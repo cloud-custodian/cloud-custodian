@@ -381,7 +381,7 @@ class WAFV2LoggingFilter(ValueFilter):
 
     def process(self, resources, event=None):
         client = self.manager.get_client()
-        logging_confs = client.list_logging_configurations(Scope='REGIONAL')[
+        logging_confs = client.list_logging_configurations(Scope=self.manager.scope)[
             'LoggingConfigurations'
         ]
         resource_map = {r['ARN']: r for r in resources}
