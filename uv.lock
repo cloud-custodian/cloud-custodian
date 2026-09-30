@@ -819,17 +819,16 @@ wheels = [
 
 [[package]]
 name = "azure-mgmt-eventgrid"
-version = "10.4.0"
+version = "10.5.0b2"
 source = { registry = "https://pypi.org/simple" }
 dependencies = [
-    { name = "azure-common" },
     { name = "azure-mgmt-core" },
     { name = "isodate" },
     { name = "typing-extensions" },
 ]
-sdist = { url = "https://files.pythonhosted.org/packages/bb/68/24a2921b66827a571a3da75cc12289b7029a7c436087c0c5b2b4ca387aa3/azure_mgmt_eventgrid-10.4.0.tar.gz", hash = "sha256:303e5e27cf4bb5ec833ba4e5a9ef70b5bc410e190412ec47cde59d82e413fb7e", size = 258796, upload-time = "2025-03-24T03:32:20.39Z" }
+sdist = { url = "https://files.pythonhosted.org/packages/16/0a/10b25d3a338121fd8cabfda54b5d28b3e55cfc7ea77fce6d455d441c0be4/azure_mgmt_eventgrid-10.5.0b2.tar.gz", hash = "sha256:0edb26e30078f1046c08db467175b8dbce09bbd8f64d6d42f464f1cdf0667f8c", size = 256292, upload-time = "2026-05-12T04:37:51.579Z" }
 wheels = [
-    { url = "https://files.pythonhosted.org/packages/8d/c7/6dfac325b4b081038aa3495e048740b44d0a68b7da97d922e0aa47a67351/azure_mgmt_eventgrid-10.4.0-py3-none-any.whl", hash = "sha256:5e4637245bbff33298d5f427971b870dbb03d873a3ef68f328190a7b7a38c56f", size = 353207, upload-time = "2025-03-24T03:32:22.847Z" },
+    { url = "https://files.pythonhosted.org/packages/43/d1/25bbf0c0cee83ed316d0460eeb6c4f2348a27c4f6811ff4e062eeb5df334/azure_mgmt_eventgrid-10.5.0b2-py3-none-any.whl", hash = "sha256:55192a0f1dcf53354344f32cc3ddfa8f457e7ae59498edc55cc3275e6d0e2895", size = 250153, upload-time = "2026-05-12T04:37:53.392Z" },
 ]
 
 [[package]]
@@ -1474,30 +1473,30 @@ wheels = [
 
 [[package]]
 name = "boto3"
-version = "1.43.102"
+version = "1.43.103"
 source = { registry = "https://pypi.org/simple" }
 dependencies = [
     { name = "botocore" },
     { name = "jmespath" },
     { name = "s3transfer" },
 ]
-sdist = { url = "https://files.pythonhosted.org/packages/9a/e6/2a24a2013beecdd9a381bcf7a11981478a1f5f78e37908c0fddba3cd915f/boto3-1.43.102.tar.gz", hash = "sha256:440bdd9fbf88d57809b68839fb690f19e4db65fa5539e60cc803ebd7b9e5e8fc", size = 112696, upload-time = "2026-09-24T19:25:18.329Z" }
+sdist = { url = "https://files.pythonhosted.org/packages/46/59/012898d78087105e9c20fe31605d3f1999921745e1890ee0f0d993846e2e/boto3-1.43.103.tar.gz", hash = "sha256:524821052527f6446d249bf710847b032d9b12135e346c9751777a0a2811cf04", size = 112687, upload-time = "2026-09-25T19:26:30.427Z" }
 wheels = [
-    { url = "https://files.pythonhosted.org/packages/46/ea/5bb0e8a8a4b04221b054365a5904fd63b6bcc22edcf4aa75a253f946b86e/boto3-1.43.102-py3-none-any.whl", hash = "sha256:b2a06cbbcb2cb0484f126172eab0881252f01007e8f7e0607ecac131cff9f744", size = 140042, upload-time = "2026-09-24T19:25:16.822Z" },
+    { url = "https://files.pythonhosted.org/packages/f2/66/6eb2e92c57b30e54c87fe14c8cd71de3aed9184f3cec95c39132a3fcc61f/boto3-1.43.103-py3-none-any.whl", hash = "sha256:574796187eb4e4fcaaf5c1b88c1724a1ba5a95bc27aeae5573676178666acc71", size = 140044, upload-time = "2026-09-25T19:26:29.085Z" },
 ]
 
 [[package]]
 name = "botocore"
-version = "1.43.102"
+version = "1.43.103"
 source = { registry = "https://pypi.org/simple" }
 dependencies = [
     { name = "jmespath" },
     { name = "python-dateutil" },
     { name = "urllib3" },
 ]
-sdist = { url = "https://files.pythonhosted.org/packages/7d/12/97d043f9bfdd54984f8d562169a9ac800c7b94a5b5fdb9b7d7b46659ebd2/botocore-1.43.102.tar.gz", hash = "sha256:3239f3c8611f0fbfb1a3fda77fb70e18f87bec102edf38f67e40902c56639c10", size = 16232455, upload-time = "2026-09-24T19:25:13.238Z" }
+sdist = { url = "https://files.pythonhosted.org/packages/3c/83/acbee6f2e3b1f02de935fef0c48a387511bf979149dc6b44466aaafba6a5/botocore-1.43.103.tar.gz", hash = "sha256:8c7f220e09f3b7ec99c59c716aa66cf6f5b2b57fd8731544054f3778aa744c6a", size = 16243609, upload-time = "2026-09-25T19:26:25.884Z" }
 wheels = [
-    { url = "https://files.pythonhosted.org/packages/5a/95/e2791a9dfc989e3580ce087085a45a67987e693f364e2461904d962e3951/botocore-1.43.102-py3-none-any.whl", hash = "sha256:78d9dcee19950444b4ff0250125aff735da4f7d6db46eb1e9aca82dc8f101a66", size = 15926988, upload-time = "2026-09-24T19:25:09.891Z" },
+    { url = "https://files.pythonhosted.org/packages/8c/47/790ba88ec849d1e07b5866458b67e79b291164f3de7f23429b4dcb7e2ced/botocore-1.43.103-py3-none-any.whl", hash = "sha256:6a6a561a6de43845ae42bc7ff7e2c798742bfa277f5215398f9c15ed9b1bd67c", size = 15938608, upload-time = "2026-09-25T19:26:23.162Z" },
 ]
 
 [[package]]
@@ -1759,7 +1758,7 @@ requires-dist = [
     { name = "azure-mgmt-dataprotection", specifier = ">=1.4.0,<2.0.0" },
     { name = "azure-mgmt-desktopvirtualization", specifier = ">=1.0.0,<2.0.0" },
     { name = "azure-mgmt-dns", specifier = "==8.0.0b1" },
-    { name = "azure-mgmt-eventgrid", specifier = ">=10.3.0b4,<11.0.0" },
+    { name = "azure-mgmt-eventgrid", specifier = ">=10.5.0b2,<11.0.0" },
     { name = "azure-mgmt-eventhub", specifier = ">=11.0.0,<12.0.0" },
     { name = "azure-mgmt-frontdoor", specifier = ">=1.0.0,<2.0.0" },
     { name = "azure-mgmt-hdinsight", specifier = ">=7.0.0,<8.0.0" },
