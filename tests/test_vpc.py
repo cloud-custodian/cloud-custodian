@@ -790,6 +790,27 @@ class VpcTest(BaseTest):
 
 class NetworkLocationTest(BaseTest):
 
+    def test_permissions_come_from_the_resources_own_filters(self):
+        # network-location does its work through the resource's own
+        # security-group and subnet filters, and those can resolve through
+        # further apis, so its permissions have to follow theirs.
+        p = self.load_policy({
+            "name": "netloc-perms",
+            "resource": "aws.ec2",
+            "filters": [{"type": "network-location", "key": "tag:Env"}]})
+        self.assertEqual(
+            sorted(p.get_permissions()),
+            ["ec2:DescribeInstances", "ec2:DescribeSecurityGroups",
+             "ec2:DescribeSubnets", "ec2:DescribeTags"])
+
+        # fsx has no security groups on the resource at all, its filter goes
+        # through the file system's network interfaces
+        p = self.load_policy({
+            "name": "netloc-perms-fsx",
+            "resource": "aws.fsx",
+            "filters": [{"type": "network-location", "key": "tag:Env"}]})
+        self.assertIn("ec2:DescribeNetworkInterfaces", p.get_permissions())
+
     def test_network_location_sg_missing(self):
         self.factory = self.replay_flight_data("test_network_location_sg_missing_loc")
         client = self.factory().client("ec2")
