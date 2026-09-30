@@ -145,6 +145,7 @@ pkg-update:
 	    --group addons \
 	    --group lint \
             --extra gcp --extra azure \
+	    --exclude-newer "5 days" \
             --upgrade
 
 pkg-show-update:
