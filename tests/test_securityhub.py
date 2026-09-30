@@ -145,7 +145,10 @@ class SecurityHubTest(BaseTest):
             over_limit,
             'x' * (SECHUB_VALUE_SIZE_LIMIT - len(SECHUB_TRUNCATION_MARKER))
             + SECHUB_TRUNCATION_MARKER)
-        self.assertEqual(len(over_limit), SECHUB_VALUE_SIZE_LIMIT)
+        # Deliberately the literal rather than SECHUB_VALUE_SIZE_LIMIT. The cap
+        # is the service's, so this pins what Security Hub accepts instead of
+        # restating whatever the constant currently says.
+        self.assertEqual(len(over_limit), 1024)
 
     def test_other_finding_truncates_oversize_string(self):
         # A resource policy document arrives as a string, and a real one runs
