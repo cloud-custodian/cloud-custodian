@@ -1,11 +1,14 @@
 # Copyright The Cloud Custodian Authors.
 # SPDX-License-Identifier: Apache-2.0
+import datetime
 import logging
 import os
 import sys
 import time
 from unittest import mock
 
+import google.auth
+from google.auth.transport.requests import AuthorizedSession
 import pytest
 from pytest_terraform import terraform
 
@@ -16,7 +19,16 @@ from c7n_gcp.resources.resourcemanager import (
 from gcp_common import BaseTest
 
 
-from c7n.exceptions import ResourceLimitExceeded
+from c7n.exceptions import (
+    PolicyExecutionError,
+    PolicyValidationError,
+    ResourceLimitExceeded,
+)
+from c7n.testing import C7N_FUNCTIONAL
+
+
+TOKEN_COUNT_METRIC = 'aiplatform.googleapis.com/publisher/online_serving/token_count'
+TOKEN_COUNT_ANNOTATION = f'{TOKEN_COUNT_METRIC}.ALIGN_SUM.REDUCE_SUM'
 
 
 class LimitsTest(BaseTest):
@@ -290,6 +302,55 @@ class FolderTest(BaseTest):
 
 class ProjectTest(BaseTest):
 
+    def generate_token_count_metric(self):
+        credentials, _ = google.auth.default(
+            scopes=['https://www.googleapis.com/auth/cloud-platform']
+        )
+        session = AuthorizedSession(credentials)
+        model = 'gemini-2.5-flash'
+        response = session.post(
+            'https://us-central1-aiplatform.googleapis.com/v1/'
+            f'projects/{self.project_id}/locations/us-central1/'
+            f'publishers/google/models/{model}:generateContent',
+            json={
+                'contents': [
+                    {
+                        'role': 'user',
+                        'parts': [{'text': 'Reply with: metric recording test'}],
+                    },
+                ],
+            },
+        )
+        response.raise_for_status()
+
+        deadline = time.time() + 300
+        while True:
+            end = datetime.datetime.now(datetime.timezone.utc).replace(microsecond=0)
+            response = session.get(
+                f'https://monitoring.googleapis.com/v3/projects/'
+                f'{self.project_id}/timeSeries',
+                params={
+                    'filter': f'metric.type = "{TOKEN_COUNT_METRIC}"',
+                    'interval.startTime': (
+                        end - datetime.timedelta(days=1)
+                    ).isoformat(),
+                    'interval.endTime': end.isoformat(),
+                    'view': 'FULL',
+                },
+            )
+            response.raise_for_status()
+            if response.json().get('timeSeries'):
+                return
+            if time.time() >= deadline:
+                raise RuntimeError('timed out waiting for token-count metric')
+            time.sleep(10)
+
+    def project_metric_session(self, flight, generate_metric=False):
+        if C7N_FUNCTIONAL and generate_metric:
+            self.generate_token_count_metric()
+        factory = self.record_flight_data if C7N_FUNCTIONAL else self.replay_flight_data
+        return factory(flight, project_id=self.project_id)
+
     def test_project_get(self):
         factory = self.replay_flight_data(
             'project-get-resource', project_id='cloud-custodian')
@@ -306,6 +367,246 @@ class ProjectTest(BaseTest):
                 "gcp:cloudresourcemanager:::project/cloud-custodian",
             ],
         )
+
+    def test_project_metric_filter_rejects_resource_grouping(self):
+        for field, value in (
+            ('metric-key', 'resource.labels.project_id'),
+            ('group-by-fields', ['resource.labels.project_id']),
+        ):
+            with self.subTest(field=field):
+                with self.assertRaises(PolicyValidationError):
+                    self.load_policy(
+                        {
+                            'name': 'project-metric-invalid',
+                            'resource': 'gcp.project',
+                            'filters': [
+                                {
+                                    'type': 'metric',
+                                    'name': 'example.googleapis.com/metric',
+                                    'op': 'gt',
+                                    'value': 0,
+                                    field: value,
+                                },
+                            ],
+                        },
+                    )
+
+    def test_project_metric_filter_rejects_paginated_series(self):
+        policy = self.load_policy(
+            {
+                'name': 'project-metric-paginated',
+                'resource': 'gcp.project',
+                'filters': [
+                    {
+                        'type': 'metric',
+                        'name': TOKEN_COUNT_METRIC,
+                        'days': 1,
+                        'aligner': 'ALIGN_SUM',
+                        'op': 'gt',
+                        'value': 0,
+                    },
+                ],
+            },
+        )
+        metric_filter = policy.resource_manager.filters[0]
+        series = {
+            'metric': {'type': TOKEN_COUNT_METRIC},
+            'resource': {
+                'type': 'aiplatform.googleapis.com/PublisherModel',
+                'labels': {'project_id': 'resource-project'},
+            },
+            'points': [
+                {
+                    'interval': {
+                        'startTime': '2026-09-24T00:00:00Z',
+                        'endTime': '2026-09-25T00:00:00Z',
+                    },
+                    'value': {'int64Value': '1'},
+                },
+            ],
+        }
+        client = mock.Mock()
+        client.execute_query.return_value = {
+            'timeSeries': [series],
+            'nextPageToken': 'next-page',
+        }
+        client.execute_paged_query.return_value = iter(
+            [
+                {'timeSeries': [series], 'nextPageToken': 'next-page'},
+                {'timeSeries': [series]},
+            ]
+        )
+        session = mock.Mock()
+        session.client.return_value = client
+
+        with mock.patch(
+            'c7n_gcp.resources.resourcemanager.local_session',
+            return_value=session,
+        ):
+            with self.assertRaisesRegex(
+                PolicyExecutionError,
+                'project metric query returned more than one time series',
+            ):
+                metric_filter.process([{'projectId': 'resource-project'}])
+
+    def test_project_metric_filter_uses_resource_project(self):
+        policy = self.load_policy(
+            {
+                'name': 'project-metric-scope',
+                'resource': 'gcp.project',
+                'filters': [
+                    {
+                        'type': 'metric',
+                        'name': TOKEN_COUNT_METRIC,
+                        'missing-value': 0,
+                        'op': 'eq',
+                        'value': 0,
+                    },
+                ],
+            },
+        )
+        metric_filter = policy.resource_manager.filters[0]
+        requests = []
+
+        class Client:
+            def execute_paged_query(self, verb, arguments):
+                requests.append((verb, arguments))
+                yield {}
+
+        class Session:
+            def client(self, service, version, component):
+                return Client()
+
+            def get_default_project(self):
+                return 'default-project'
+
+        with mock.patch(
+            'c7n_gcp.resources.resourcemanager.local_session',
+            return_value=Session(),
+        ):
+            resources = metric_filter.process([{'projectId': 'resource-project'}])
+
+        self.assertEqual(len(resources), 1)
+        self.assertEqual(requests[0][1]['name'], 'projects/resource-project')
+
+    def test_project_metric_filter(self):
+        project_id = self.project_id
+        session_factory = self.project_metric_session(
+            'project-metric-filter',
+            generate_metric=True,
+        )
+        policy = self.load_policy(
+            {
+                'name': 'project-metric',
+                'resource': 'gcp.project',
+                'query': [{'filter': f'id:{project_id}'}],
+                'filters': [
+                    {
+                        'type': 'metric',
+                        'name': TOKEN_COUNT_METRIC,
+                        'days': 1,
+                        'aligner': 'ALIGN_SUM',
+                        'reducer': 'REDUCE_SUM',
+                        'op': 'gt',
+                        'value': 0,
+                    },
+                ],
+            },
+            session_factory=session_factory,
+        )
+
+        resources = policy.run()
+
+        self.assertEqual(len(resources), 1)
+        metric = resources[0]['c7n.metrics'][TOKEN_COUNT_ANNOTATION]
+        self.assertGreater(
+            int(metric['points'][0]['value']['int64Value']),
+            0,
+        )
+
+        nonmatching_policy = self.load_policy(
+            {
+                'name': 'project-metric-nonmatching',
+                'resource': 'gcp.project',
+                'query': [{'filter': f'id:{project_id}'}],
+                'filters': [
+                    {
+                        'type': 'metric',
+                        'name': TOKEN_COUNT_METRIC,
+                        'days': 1,
+                        'aligner': 'ALIGN_SUM',
+                        'reducer': 'REDUCE_SUM',
+                        'op': 'gt',
+                        'value': 10**12,
+                    },
+                ],
+            },
+            session_factory=session_factory,
+        )
+        self.assertEqual(nonmatching_policy.run(), [])
+
+    def test_project_metric_filter_missing_value(self):
+        project_id = self.project_id
+        session_factory = self.project_metric_session(
+            'project-metric-filter-missing-value'
+        )
+        policy = self.load_policy(
+            {
+                'name': 'project-metric-missing-value',
+                'resource': 'gcp.project',
+                'query': [{'filter': f'id:{project_id}'}],
+                'filters': [
+                    {
+                        'type': 'metric',
+                        'name': TOKEN_COUNT_METRIC,
+                        'days': 1,
+                        'aligner': 'ALIGN_SUM',
+                        'reducer': 'REDUCE_SUM',
+                        'filter': 'metric.labels.type = "does-not-exist"',
+                        'missing-value': 0,
+                        'op': 'eq',
+                        'value': 0,
+                    },
+                ],
+            },
+            session_factory=session_factory,
+        )
+
+        resources = policy.run()
+
+        self.assertEqual(len(resources), 1)
+        self.assertIsNone(resources[0]['c7n.metrics'][TOKEN_COUNT_ANNOTATION])
+
+    def test_project_metric_filter_rejects_multiple_series(self):
+        project_id = self.project_id
+        session_factory = self.project_metric_session(
+            'project-metric-filter-multiple-series',
+            generate_metric=True,
+        )
+        policy = self.load_policy(
+            {
+                'name': 'project-metric-multiple-series',
+                'resource': 'gcp.project',
+                'query': [{'filter': f'id:{project_id}'}],
+                'filters': [
+                    {
+                        'type': 'metric',
+                        'name': TOKEN_COUNT_METRIC,
+                        'days': 1,
+                        'aligner': 'ALIGN_SUM',
+                        'op': 'gt',
+                        'value': 0,
+                    },
+                ],
+            },
+            session_factory=session_factory,
+        )
+
+        with self.assertRaisesRegex(
+            PolicyExecutionError,
+            'project metric query returned more than one time series',
+        ):
+            policy.run()
 
     @pytest.mark.skipif(
         sys.platform.startswith('win'), reason='windows file path fun')

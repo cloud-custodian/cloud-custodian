@@ -3,14 +3,17 @@
 
 import itertools
 from c7n_gcp.filters.iampolicy import IamPolicyFilter
+from c7n_gcp.filters.metrics import ALIGNERS, REDUCERS, GCPMetricsFilter
 
 from c7n_gcp.actions import SetIamPolicy, MethodAction
 from c7n_gcp.provider import resources
 from c7n_gcp.query import QueryResourceManager, TypeInfo
 
+from c7n.exceptions import PolicyExecutionError
 from c7n.resolver import ValuesFrom
 from c7n.utils import type_schema, local_session
-from c7n.filters.core import ValueFilter, ListItemFilter
+from c7n.filters.core import OPERATORS, ValueFilter, ListItemFilter
+from c7n.filters.metrics import METRIC_WINDOW_ALIGNMENT
 from c7n.filters.missing import Missing
 
 from googleapiclient.errors import HttpError
@@ -134,6 +137,88 @@ class Project(QueryResourceManager):
 
 
 Project.filter_registry.register('missing', Missing)
+
+
+@Project.filter_registry.register('metric')
+class GCPProjectMetricsFilter(GCPMetricsFilter):
+    """Filter projects by an aggregate Cloud Monitoring metric.
+
+    The project supplies the Monitoring API scope, so this filter does not use
+    the resource join key required by the generic ``metrics`` filter.
+
+    :example:
+
+    .. code-block:: yaml
+
+        policies:
+          - name: vertex-ai-project-monthly-token-usage
+            resource: gcp.project
+            filters:
+              - type: metric
+                name: aiplatform.googleapis.com/publisher/online_serving/token_count
+                days: 30
+                period-start: start-of-day
+                aligner: ALIGN_SUM
+                reducer: REDUCE_SUM
+                op: gt
+                value: 3000000
+    """
+
+    schema = type_schema(
+        'metric',
+        **{
+            'name': {'type': 'string'},
+            'days': {'type': 'number'},
+            'period-start': {'type': 'string', 'enum': METRIC_WINDOW_ALIGNMENT},
+            'op': {'type': 'string', 'enum': list(OPERATORS.keys())},
+            'reducer': {'type': 'string', 'enum': REDUCERS},
+            'aligner': {'type': 'string', 'enum': ALIGNERS},
+            'value': {'type': 'number'},
+            'filter': {'type': 'string'},
+            'missing-value': {'type': 'number'},
+            'required': ('value', 'name', 'op'),
+        },
+    )
+
+    def validate(self):
+        return self
+
+    def metric_project(self, resource=None):
+        return resource['projectId']
+
+    def process(self, resources, event=None):
+        self.initialize_metric()
+        self.metric_key = None
+
+        session = local_session(self.manager.session_factory)
+        client = session.client('monitoring', 'v3', 'projects.timeSeries')
+        query_filter = f'metric.type = "{self.metric}"'
+        if self.filter:
+            query_filter = f'{query_filter} AND ({self.filter})'
+        query_params = self.get_query_params(query_filter)
+
+        for resource in resources:
+            time_series = []
+            pages = client.execute_paged_query(
+                'list',
+                {
+                    'name': f'projects/{self.metric_project(resource)}',
+                    **query_params,
+                },
+            )
+            for page in pages:
+                time_series.extend(page.get('timeSeries', []))
+                if len(time_series) > 1:
+                    raise PolicyExecutionError(
+                        'project metric query returned more than one time series'
+                    )
+            if time_series:
+                resource_name = self.manager.resource_type.get_metric_resource_name(
+                    resource,
+                )
+                self.resource_metric_dict[resource_name] = time_series[0]
+
+        return [resource for resource in resources if self.process_resource(resource)]
 
 
 @Project.filter_registry.register('iam-policy')

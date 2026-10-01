@@ -1,0 +1,33 @@
+{
+  "headers": {
+    "content-type": "application/json; charset=UTF-8",
+    "vary": "Origin, X-Origin, Referer",
+    "date": "Fri, 25 Sep 2026 20:51:17 GMT",
+    "server": "ESF",
+    "x-xss-protection": "0",
+    "x-frame-options": "SAMEORIGIN",
+    "x-content-type-options": "nosniff",
+    "server-timing": "gfet4t7; dur=207",
+    "alt-svc": "h3=\":443\"; ma=2592000,h3-29=\":443\"; ma=2592000",
+    "transfer-encoding": "chunked",
+    "status": "200",
+    "content-length": "315",
+    "-content-encoding": "gzip",
+    "content-location": "https://cloudresourcemanager.googleapis.com/v1/projects?filter=id%3Acloud-custodian&alt=json"
+  },
+  "body": {
+    "projects": [
+      {
+        "projectNumber": "693936050605",
+        "projectId": "cloud-custodian",
+        "lifecycleState": "ACTIVE",
+        "name": "cloud-custodian",
+        "createTime": "2026-07-02T19:11:33.870Z",
+        "parent": {
+          "type": "organization",
+          "id": "728386023487"
+        }
+      }
+    ]
+  }
+}
