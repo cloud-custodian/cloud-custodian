@@ -114,12 +114,17 @@ dimensions:
 ``VariantName``
    Narrows a classic endpoint's invocations to one variant.  A component
    endpoint doesn't report invocations per variant, so naming one leaves it
-   with nothing to measure, and it drops out of the results.
+   with nothing to measure, and unless a ``missing-value`` is supplied it
+   drops out of the results.
 
 ``InferenceComponentName``
    Narrows a component endpoint's invocations to one component.  Naming one
-   deselects every classic endpoint, so unless a ``missing-value`` is
-   supplied the filter selects none of them.
+   leaves every classic endpoint with nothing to measure, and the same
+   applies to them.
+
+Either way, an endpoint with nothing to measure is decided by the
+``missing-value``, if the policy gives one, exactly as an endpoint whose
+series reported nothing would be.
 
 
 Endpoints that serve no traffic
