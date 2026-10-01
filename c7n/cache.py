@@ -5,7 +5,7 @@ multiple policies on the same resource type.
 """
 import pickle  # nosec nosemgrep
 
-from datetime import datetime, timedelta
+from datetime import datetime, timedelta, timezone
 import os
 import logging
 import sqlite3
@@ -93,6 +93,17 @@ def encode(key):
     return pickle.dumps(key, protocol=pickle.HIGHEST_PROTOCOL)  # nosemgrep
 
 
+def _utcnow():
+    # naive utc, matches what the existing cache rows were written with
+    return datetime.now(timezone.utc).replace(tzinfo=None)
+
+
+def _format_ts(ts):
+    # same layout the (deprecated in 3.12) default sqlite3 datetime adapter
+    # produced, so rows written by older versions still sort and parse.
+    return ts.isoformat(sep=' ')
+
+
 def resolve_path(path):
     return os.path.abspath(
         os.path.expanduser(
@@ -131,7 +142,7 @@ class SqlKvCache(Cache):
         with self.conn as cursor:
             result = cursor.execute(
                 'delete from c7n_cache where create_date < ?',
-                [datetime.utcnow() - timedelta(minutes=self.cache_period)])
+                [_format_ts(_utcnow() - timedelta(minutes=self.cache_period))])
             if result.rowcount:
                 log.debug('expired %d stale cache entries', result.rowcount)
 
@@ -150,17 +161,22 @@ class SqlKvCache(Cache):
             if row is None:
                 return None
             value, create_date = row
-            create_date = sqlite3.converters['TIMESTAMP'](create_date.encode('utf8'))
-            if (datetime.utcnow() - create_date).total_seconds() / 60.0 > self.cache_period:
+            create_date = datetime.fromisoformat(create_date)
+            if (_utcnow() - create_date).total_seconds() / 60.0 > self.cache_period:
                 return None
             return pickle.loads(value)  # nosec nosemgrep
 
     def save(self, key, data, timestamp=None):
         with self.conn as cursor:
-            timestamp = timestamp or datetime.utcnow()
+            timestamp = timestamp or _utcnow()
+            if timestamp.tzinfo is not None:
+                # rows are naive utc, an aware value would neither compare
+                # nor sort against them
+                timestamp = timestamp.astimezone(timezone.utc).replace(tzinfo=None)
             cursor.execute(
                 'replace into c7n_cache (key, value, create_date) values (?, ?, ?)',
-                (sqlite3.Binary(encode(key)), sqlite3.Binary(encode(data)), timestamp))
+                (sqlite3.Binary(encode(key)), sqlite3.Binary(encode(data)),
+                 _format_ts(timestamp)))
 
     def size(self):
         return os.path.exists(self.cache_path) and os.path.getsize(self.cache_path) or 0

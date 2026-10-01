@@ -12,6 +12,7 @@ from dateutil.tz import tzutc
 from freezegun import freeze_time
 
 from c7n.resources.aws import shape_validate
+from c7n.testing import local_timezone
 from .common import BaseTest, functional
 
 from c7n.config import Config
@@ -694,6 +695,36 @@ class KMSTagging(BaseTest):
 
         shape_validate(
             rfinding['Details']['AwsKmsKey'], 'AwsKmsKeyDetails', 'securityhub')
+
+    def test_kms_post_finding_local_creation_date(self):
+        # botocore returns tzlocal datetimes, the finding must carry the same
+        # instant regardless of the host's timezone
+        from datetime import datetime
+        from dateutil.tz import tzlocal
+
+        p = self.load_policy({
+            'name': 'kms-key',
+            'resource': 'aws.kms-key',
+            'actions': [
+                {'type': 'post-finding',
+                 'types': [
+                     'Software and Configuration Checks/OrgStandard/abc-123']}]},
+            config={'region': 'us-west-2', 'account_id': '644160558196'})
+        with local_timezone('Asia/Tokyo'):
+            key = {
+                'AWSAccountId': '644160558196',
+                'KeyId': '44d25a5c-7efa-44ed-8436-b9511ea921b3',
+                'Arn': 'arn:aws:kms:us-west-2:644160558196:key/'
+                       '44d25a5c-7efa-44ed-8436-b9511ea921b3',
+                'KeyManager': 'CUSTOMER',
+                'KeyState': 'Enabled',
+                'Origin': 'AWS_KMS',
+                # 2017-05-05T06:56:38.394Z, as botocore would return it
+                'CreationDate': datetime.fromtimestamp(1493967398.394, tz=tzlocal()),
+            }
+            rfinding = p.resource_manager.actions[0].format_resource(key)
+        self.assertEqual(
+            rfinding['Details']['AwsKmsKey']['CreationDate'], 1493967398.394)
 
 
 class KMSCrossAccount(BaseTest):

@@ -3,7 +3,7 @@ from c7n.actions import Action
 from c7n.filters.kms import KmsRelatedFilter
 from c7n.filters.vpc import SecurityGroupFilter, SubnetFilter
 import c7n.filters.vpc as net_filters
-from c7n.query import DescribeSource, QueryResourceManager, TypeInfo
+from c7n.query import DescribeSource, QueryResourceManager, TypeInfo, paginate_op
 from c7n.utils import local_session, type_schema
 from c7n.tags import (
     TagDelayedAction,
@@ -296,7 +296,8 @@ class TimestreamDatabaseDelete(Action):
                         f'Unable to delete database:{r["DatabaseName"]}, '
                         'tables must be deleted first')
                     continue
-                tables = client.list_tables(DatabaseName=r['DatabaseName'])['Tables']
+                tables = paginate_op(
+                    client, 'list_tables', 'Tables', DatabaseName=r['DatabaseName'])
                 TimestreamTableDelete(
                     data={'type': 'delete'},
                     manager=self.manager,

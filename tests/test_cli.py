@@ -13,7 +13,8 @@ from c7n import cli, version, commands
 from c7n.resolver import ValuesFrom
 from c7n.resources import aws
 from c7n.schema import ElementSchema, generate
-from c7n.utils import yaml_dump, yaml_load
+from c7n.testing import local_timezone
+from c7n.utils import utcnow_naive, yaml_dump, yaml_load
 from c7n.commands import LoadSessionPolicyJson
 
 import pytest
@@ -378,6 +379,24 @@ class SchemaTest(CliTest):
 
 
 class ReportTest(CliTest):
+
+    def test_report_begin_date_is_utc(self):
+        # s3 output paths are laid out by utc date, so the report window has
+        # to be computed in utc too, not the host's local time.
+        from c7n import reports
+
+        captured = []
+        self.patch(
+            reports, 'report',
+            lambda policies, begin_date, *args, **kw: captured.append(begin_date))
+        yaml_file = self.write_policy_file(
+            {"policies": [{"name": "report-utc", "resource": "ec2"}]})
+        with local_timezone('Asia/Tokyo'):
+            self.run_and_expect_success(
+                ["custodian", "report", "--days", "2", "-s", self.output_dir, yaml_file])
+        expected = utcnow_naive() - timedelta(days=2)
+        self.assertEqual(len(captured), 1)
+        self.assertLess(abs((expected - captured[0]).total_seconds()), 60)
 
     def test_report(self):
         policy_name = "ec2-running-instances"

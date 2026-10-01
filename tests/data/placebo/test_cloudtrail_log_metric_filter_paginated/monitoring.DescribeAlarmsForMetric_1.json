@@ -1,0 +1,59 @@
+{
+    "status_code": 200,
+    "data": {
+        "MetricAlarms": [
+            {
+                "AlarmName": "Management_Console_Auth_Failure",
+                "AlarmArn": "arn:aws:cloudwatch:us-east-1:644160558196:alarm:Management_Console_Auth_Failure",
+                "AlarmConfigurationUpdatedTimestamp": {
+                    "__class__": "datetime",
+                    "year": 2023,
+                    "month": 9,
+                    "day": 22,
+                    "hour": 8,
+                    "minute": 32,
+                    "second": 15,
+                    "microsecond": 70000
+                },
+                "ActionsEnabled": true,
+                "OKActions": [],
+                "AlarmActions": [
+                    "arn:aws:sns:us-east-1:644160558196:test-sns"
+                ],
+                "InsufficientDataActions": [],
+                "StateValue": "INSUFFICIENT_DATA",
+                "StateReason": "Unchecked: Initial alarm creation",
+                "StateUpdatedTimestamp": {
+                    "__class__": "datetime",
+                    "year": 2023,
+                    "month": 9,
+                    "day": 22,
+                    "hour": 8,
+                    "minute": 32,
+                    "second": 15,
+                    "microsecond": 70000
+                },
+                "MetricName": "Management_Console_Auth_Failure",
+                "Namespace": "Management_Console_Auth_Failure",
+                "Statistic": "Sum",
+                "Dimensions": [],
+                "Period": 300,
+                "EvaluationPeriods": 1,
+                "Threshold": 1.0,
+                "ComparisonOperator": "GreaterThanOrEqualToThreshold",
+                "TreatMissingData": "missing",
+                "StateTransitionedTimestamp": {
+                    "__class__": "datetime",
+                    "year": 2023,
+                    "month": 9,
+                    "day": 22,
+                    "hour": 8,
+                    "minute": 32,
+                    "second": 15,
+                    "microsecond": 70000
+                }
+            }
+        ],
+        "ResponseMetadata": {}
+    }
+}

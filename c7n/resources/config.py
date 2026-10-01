@@ -201,7 +201,11 @@ class RuleStatus(ValueFilter):
         status_map = {}
         client = local_session(self.manager.session_factory).client('config')
 
-        for rule_set in chunks(resources, 100):
+        # the api caps ConfigRuleNames (25 at the time of writing)
+        batch_size = client.meta.service_model.operation_model(
+            'DescribeConfigRuleEvaluationStatus').input_shape.members[
+                'ConfigRuleNames'].metadata.get('max', 25)
+        for rule_set in chunks(resources, batch_size):
             for status in client.describe_config_rule_evaluation_status(
                 ConfigRuleNames=[r['ConfigRuleName'] for r in rule_set]
             ).get('ConfigRulesEvaluationStatus', []):

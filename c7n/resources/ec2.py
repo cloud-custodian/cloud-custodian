@@ -919,6 +919,7 @@ class UserData(ValueFilter):
                 except ClientError as e:
                     if e.response['Error']['Code'] == 'InvalidInstanceId.NotFound':
                         continue
+                    raise
                 if 'Value' not in result['UserData']:
                     r[self.annotation] = None
                 else:
@@ -2406,9 +2407,9 @@ class LaunchTemplate(query.QueryResourceManager):
         template_versions = []
         for r in resources:
             template_versions.extend(
-                client.describe_launch_template_versions(
-                    LaunchTemplateId=r['LaunchTemplateId']).get(
-                        'LaunchTemplateVersions', ()))
+                query.paginate_op(
+                    client, 'describe_launch_template_versions', 'LaunchTemplateVersions',
+                    LaunchTemplateId=r['LaunchTemplateId']))
         return template_versions
 
     def get_arns(self, resources):
@@ -2451,9 +2452,9 @@ class LaunchTemplate(query.QueryResourceManager):
         # We may end up fetching duplicates on $Latest and $Version
         for tid, tversions in t_versions.items():
             try:
-                ltv = client.describe_launch_template_versions(
-                    LaunchTemplateId=tid, Versions=tversions).get(
-                        'LaunchTemplateVersions')
+                ltv = query.paginate_op(
+                    client, 'describe_launch_template_versions', 'LaunchTemplateVersions',
+                    LaunchTemplateId=tid, Versions=tversions)
             except ClientError as e:
                 if e.response['Error']['Code'] == "InvalidLaunchTemplateId.NotFound":
                     continue

@@ -32,6 +32,7 @@ from c7n.query import (
     DescribeSource,
     QueryResourceManager,
     TypeInfo,
+    paginate_op,
 )
 from c7n.resolver import ValuesFrom
 from c7n.tags import TagActionFilter, TagDelayedAction, Tag, RemoveTag, universal_augment
@@ -406,6 +407,7 @@ class DescribePolicy(DescribeSource):
             except ClientError as e:
                 if e.response['Error']['Code'] == 'NoSuchEntityException':
                     continue
+                raise
         return results
 
     def augment(self, resources):
@@ -816,7 +818,9 @@ class IamRoleUsage(Filter):
         perms = list(itertools.chain(*[
             self.manager.get_resource_manager(m).get_permissions()
             for m in ['lambda', 'launch-config', 'ec2']]))
-        perms.extend(['ecs:DescribeClusters', 'ecs:DescribeServices'])
+        perms.extend([
+            'ecs:ListClusters', 'ecs:DescribeClusters',
+            'ecs:ListServices', 'ecs:DescribeServices'])
         return perms
 
     def service_role_usage(self):
@@ -839,15 +843,18 @@ class IamRoleUsage(Filter):
     def scan_ecs_roles(self):
         results = []
         client = local_session(self.manager.session_factory).client('ecs')
-        for cluster in client.describe_clusters()['clusters']:
-            services = client.list_services(
-                cluster=cluster['clusterName'])['serviceArns']
-            if services:
-                for service in client.describe_services(
-                        cluster=cluster['clusterName'],
-                        services=services)['services']:
-                    if 'roleArn' in service:
-                        results.append(service['roleArn'])
+        # describe_clusters with no names only looks up the default cluster
+        cluster_arns = paginate_op(client, 'list_clusters', 'clusterArns')
+        for cluster_set in chunks(cluster_arns, 100):
+            for cluster in client.describe_clusters(clusters=cluster_set)['clusters']:
+                services = paginate_op(
+                    client, 'list_services', 'serviceArns', cluster=cluster['clusterArn'])
+                for service_set in chunks(services, 10):
+                    for service in client.describe_services(
+                            cluster=cluster['clusterArn'],
+                            services=service_set)['services']:
+                        if 'roleArn' in service:
+                            results.append(service['roleArn'])
         return results
 
     def collect_profile_roles(self):
@@ -2141,7 +2148,9 @@ class GroupMembership(ValueFilter):
                 futures.append(
                     w.submit(self.get_user_groups, client, user_set))
             for f in as_completed(futures):
-                pass
+                if f.exception():
+                    self.log.error(
+                        "Error retrieving groups for users: %s", f.exception())
 
         matched = []
         for r in resources:
@@ -3036,7 +3045,7 @@ class UserGroupDelete(BaseAction):
               force: True
     """
     schema = type_schema('delete', force={'type': 'boolean'})
-    permissions = ('iam:DeleteGroup', 'iam:RemoveUserFromGroup')
+    permissions = ('iam:DeleteGroup', 'iam:GetGroup', 'iam:RemoveUserFromGroup')
 
     def process(self, resources):
         client = local_session(self.manager.session_factory).client('iam')
@@ -3047,7 +3056,7 @@ class UserGroupDelete(BaseAction):
         error = None
         force = self.data.get('force', False)
         if force:
-            users = client.get_group(GroupName=r['GroupName']).get('Users', [])
+            users = paginate_op(client, 'get_group', 'Users', GroupName=r['GroupName'])
             for user in users:
                 client.remove_user_from_group(
                     UserName=user['UserName'], GroupName=r['GroupName'])

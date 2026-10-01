@@ -1,0 +1,34 @@
+{
+    "status_code": 200,
+    "data": {
+        "Databases": [
+            {
+                "Arn": "arn:aws:timestream:us-east-1:644160558196:database/asdfasdfasdf",
+                "DatabaseName": "asdfasdfasdf",
+                "TableCount": 1,
+                "KmsKeyId": "arn:aws:kms:us-east-1:644160558196:key/eb703ede-7c05-4cfc-b650-5c6f31b8e019",
+                "CreationTime": {
+                    "__class__": "datetime",
+                    "year": 2023,
+                    "month": 1,
+                    "day": 13,
+                    "hour": 16,
+                    "minute": 10,
+                    "second": 35,
+                    "microsecond": 480000
+                },
+                "LastUpdatedTime": {
+                    "__class__": "datetime",
+                    "year": 2023,
+                    "month": 1,
+                    "day": 13,
+                    "hour": 16,
+                    "minute": 10,
+                    "second": 35,
+                    "microsecond": 473000
+                }
+            }
+        ],
+        "ResponseMetadata": {}
+    }
+}

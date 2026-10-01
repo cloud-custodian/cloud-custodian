@@ -1,9 +1,17 @@
 #!/usr/bin/env bash
 # PKG_DOMAIN, PKG_REPO, and valid aws creds and region as pre-reqs
-set -euxo pipefail
-export CODEARTIFACT_OWNER=`aws sts get-caller-identity --query Account --output text`
-export CODEARTIFACT_REPOSITORY_URL=`aws codeartifact get-repository-endpoint --domain $PKG_DOMAIN --domain-owner $CODEARTIFACT_OWNER --repository $PKG_REPO --format pypi --query repositoryEndpoint --output text`
-export CODEARTIFACT_AUTH_TOKEN=`aws codeartifact get-authorization-token --domain $PKG_DOMAIN --domain-owner $CODEARTIFACT_OWNER --query authorizationToken --output text`
+set -euo pipefail
+# assign before exporting, `export X=$(cmd)` masks a failing cmd under set -e
+CODEARTIFACT_OWNER=$(aws sts get-caller-identity --query Account --output text)
+export CODEARTIFACT_OWNER
+CODEARTIFACT_REPOSITORY_URL=$(aws codeartifact get-repository-endpoint --domain $PKG_DOMAIN --domain-owner $CODEARTIFACT_OWNER --repository $PKG_REPO --format pypi --query repositoryEndpoint --output text)
+export CODEARTIFACT_REPOSITORY_URL
+CODEARTIFACT_AUTH_TOKEN=$(aws codeartifact get-authorization-token --domain $PKG_DOMAIN --domain-owner $CODEARTIFACT_OWNER --query authorizationToken --output text)
+# keep the token out of the job log, it is not a github secret so it is not
+# masked by default. this has to reach the runner's stdout, so callers must
+# not redirect this script's output.
+echo "::add-mask::${CODEARTIFACT_AUTH_TOKEN}"
+export CODEARTIFACT_AUTH_TOKEN
 export CODEARTIFACT_USER=aws
 
 echo TWINE_USERNAME=$CODEARTIFACT_USER >> $GITHUB_ENV

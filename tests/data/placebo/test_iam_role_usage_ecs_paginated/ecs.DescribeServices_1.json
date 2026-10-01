@@ -1,0 +1,21 @@
+{
+    "status_code": 200,
+    "data": {
+        "services": [
+            {
+                "serviceArn": "arn:aws:ecs:us-east-1:123456789012:service/app/web",
+                "serviceName": "web",
+                "clusterArn": "arn:aws:ecs:us-east-1:123456789012:cluster/app",
+                "roleArn": "arn:aws:iam::123456789012:role/ecs-web"
+            },
+            {
+                "serviceArn": "arn:aws:ecs:us-east-1:123456789012:service/app/worker",
+                "serviceName": "worker",
+                "clusterArn": "arn:aws:ecs:us-east-1:123456789012:cluster/app",
+                "roleArn": "arn:aws:iam::123456789012:role/ecs-worker"
+            }
+        ],
+        "failures": [],
+        "ResponseMetadata": {}
+    }
+}

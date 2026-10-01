@@ -139,6 +139,7 @@ class Deregister(BaseAction):
                 except ClientError as e:
                     if e.response['Error']['Code'] == 'InvalidSnapshot.InUse':
                         continue
+                    raise
 
 
 @AMI.action_registry.register('set-deprecation')

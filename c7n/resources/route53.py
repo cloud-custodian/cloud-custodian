@@ -277,7 +277,7 @@ class ResourceRecordSetRemove(BaseAction):
                             }
                         ]
                     },
-                    ignore_err_codes=('InvalidChangeBatch'))
+                    ignore_err_codes=('InvalidChangeBatch',))
         except Exception as e:
             self.log.warning(
                 "ResourceRecordSet delete error: %s", e)
@@ -322,7 +322,7 @@ class Delete(BaseAction):
                 self.manager.retry(
                     client.delete_hosted_zone,
                     Id=hz['Id'],
-                    ignore_err_codes=('NoSuchHostedZone'))
+                    ignore_err_codes=('NoSuchHostedZone',))
             except client.exceptions.HostedZoneNotEmpty as e:
                 self.log.warning(
                     "HostedZone: %s cannot be deleted, "
@@ -356,7 +356,7 @@ class Delete(BaseAction):
                         }
                     ]
                 },
-                ignore_err_codes=('InvalidChangeBatch'))
+                ignore_err_codes=('InvalidChangeBatch',))
 
 
 @HostedZone.action_registry.register('set-query-logging')
@@ -400,7 +400,7 @@ class SetQueryLogging(BaseAction):
         'route53:DeleteQueryLoggingConfig',
         'logs:DescribeLogGroups',
         'logs:CreateLogGroup',
-        'logs:GetResourcePolicy',
+        'logs:DescribeResourcePolicies',
         'logs:PutResourcePolicy')
 
     schema = type_schema(
@@ -432,7 +432,7 @@ class SetQueryLogging(BaseAction):
     def get_permissions(self):
         perms = []
         if self.data.get('set-permissions'):
-            perms.extend(('logs:GetResourcePolicy', 'logs:PutResourcePolicy'))
+            perms.extend(('logs:DescribeResourcePolicies', 'logs:PutResourcePolicy'))
         if self.data.get('state', True):
             perms.append('route53:CreateQueryLoggingConfig')
             perms.append('logs:CreateLogGroup')
@@ -680,8 +680,10 @@ class ResolverQueryLogConfig(QueryResourceManager):
             rqlc['Tags'] = self.retry(
                 client.list_tags_for_resource,
                 ResourceArn=rqlc['Arn'])['Tags']
-            rqlc[self.annotation_key] = client.list_resolver_query_log_config_associations().get(
-                'ResolverQueryLogConfigAssociations')
+            rqlc[self.annotation_key] = query.paginate_op(
+                client, 'list_resolver_query_log_config_associations',
+                'ResolverQueryLogConfigAssociations',
+                Filters=[{'Name': 'ResolverQueryLogConfigId', 'Values': [rqlc['Id']]}])
         return rqlcs
 
 

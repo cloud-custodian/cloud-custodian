@@ -26,8 +26,9 @@ class AdmissionControllerServer(http.server.HTTPServer):
     def __init__(self, policy_dir, on_exception="warn", *args, **kwargs):
         self.policy_dir = policy_dir
         self.on_exception = on_exception
-        temp_dir = tempfile.TemporaryDirectory()
-        self.directory_loader = DirectoryLoader(Config.empty(output_dir=temp_dir.name))
+        # keep a reference, the directory is removed as soon as this object is collected
+        self._temp_dir = tempfile.TemporaryDirectory()
+        self.directory_loader = DirectoryLoader(Config.empty(output_dir=self._temp_dir.name))
         policy_collection = self.directory_loader.load_directory(os.path.abspath(self.policy_dir))
         self.policy_collection = policy_collection.filter(modes=["k8s-admission"])
         log.info(f"Loaded {len(self.policy_collection)} policies")
@@ -193,13 +194,12 @@ def init(
     if use_tls:
         import ssl
 
-        server.socket = ssl.wrap_socket(
-            server.socket,
-            server_side=True,
-            certfile=cert_path,
-            keyfile=cert_key_path,
-            ca_certs=ca_cert_path,
-        )
+        # ssl.wrap_socket() was removed in python 3.12
+        context = ssl.SSLContext(ssl.PROTOCOL_TLS_SERVER)
+        context.load_cert_chain(certfile=cert_path, keyfile=cert_key_path)
+        if ca_cert_path:
+            context.load_verify_locations(cafile=ca_cert_path)
+        server.socket = context.wrap_socket(server.socket, server_side=True)
 
     log.info(f"Serving at http{'s' if use_tls else ''}://{host}:{port}")
     while True:

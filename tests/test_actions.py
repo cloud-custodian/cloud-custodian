@@ -1,5 +1,8 @@
 # Copyright The Cloud Custodian Authors.
 # SPDX-License-Identifier: Apache-2.0
+import io
+from unittest.mock import MagicMock, patch
+
 from botocore.exceptions import ClientError
 from c7n.exceptions import PolicyValidationError
 from c7n.actions import Action, ActionRegistry
@@ -51,3 +54,22 @@ class ActionRegistryTest(BaseTest):
         self.assertRaises(
             PolicyValidationError, ActionRegistry("test.actions").factory, "foo", None
         )
+
+
+class InvokeLambdaTest(BaseTest):
+
+    def test_qualifier_is_passed(self):
+        p = self.load_policy(
+            {'name': 'invoke',
+             'resource': 'ec2',
+             'actions': [
+                 {'type': 'invoke-lambda', 'function': 'handler', 'qualifier': 'prod'}]})
+        action = p.resource_manager.actions[0]
+        client = MagicMock()
+        client.invoke.return_value = {'Payload': io.BytesIO(b'{}')}
+        with patch('c7n.utils.local_session') as session, \
+                patch('c7n.utils.get_account_alias_from_sts', return_value='alias'):
+            session.return_value.client.return_value = client
+            action.process([{'InstanceId': 'i-1'}])
+        self.assertEqual(client.invoke.call_args.kwargs['Qualifier'], 'prod')
+        self.assertEqual(client.invoke.call_args.kwargs['FunctionName'], 'handler')

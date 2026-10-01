@@ -1,0 +1,10 @@
+{
+    "status_code": 200,
+    "data": {
+        "serviceArns": [
+            "arn:aws:ecs:us-east-1:123456789012:service/app/web"
+        ],
+        "nextToken": "services-2",
+        "ResponseMetadata": {}
+    }
+}

@@ -17,17 +17,17 @@ jobs:
       contents: read
       checks: write
     steps:
-      - uses: actions/checkout@v6.0.2
-      - uses: actions/setup-python@v6.2.0
+      - uses: actions/checkout@de0fac2e4500dabe0009e67214ff5f5447ce83dd # ratchet:actions/checkout@v6.0.2
+      - uses: actions/setup-python@a309ff8b426b58ec0e2a45f0f869d46889d02405 # ratchet:actions/setup-python@v6.2.0
         with:
           python-version: ${{ env.DEFAULT_PY_VERSION }}
 
-      - uses: aws-actions/configure-aws-credentials@v6
+      - uses: aws-actions/configure-aws-credentials@e1253824e5c10ff9df46874f81ed3ec929e19cfd # ratchet:aws-actions/configure-aws-credentials@v6.3.0
         with:
           role-to-assume: ${{ secrets.AWS_FTEST_ROLE }}
           aws-region: us-east-1
 
-      - uses: hashicorp/setup-terraform@v4
+      - uses: hashicorp/setup-terraform@dfe3c3f87815947d99a8997f908cb6525fc44e9e # ratchet:hashicorp/setup-terraform@v4.0.1
         with:
           terraform_wrapper: false
           # last OSS version
@@ -40,7 +40,7 @@ jobs:
           uv-version: ${{ env.UV_VERSION }}
 
       - name: Set up cache
-        uses: actions/cache@v5
+        uses: actions/cache@caa296126883cff596d87d8935842f9db880ef25 # ratchet:actions/cache@v5.1.0
         id: tfcache
         with:
           path: .tfcache
@@ -55,7 +55,7 @@ jobs:
           C7N_TEST_RUN: "true"
 
       - name: Notify Slack
-        uses: ravsamhq/notify-slack-action@v2
+        uses: ravsamhq/notify-slack-action@be814b201e233b2dc673608aa46e5447c8ab13f2 # ratchet:ravsamhq/notify-slack-action@v2
         if: always()
         env:
           SLACK_WEBHOOK_URL: ${{ secrets.SLACK_CI_HOOK }}

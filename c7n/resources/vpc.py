@@ -1348,8 +1348,9 @@ class Stale(Filter):
         self.log.debug("Querying %d vpc for stale refs", len(vpc_ids))
         stale_count = 0
         for vpc_id in vpc_ids:
-            stale_groups = client.describe_stale_security_groups(
-                VpcId=vpc_id).get('StaleSecurityGroupSet', ())
+            stale_groups = query.paginate_op(
+                client, 'describe_stale_security_groups', 'StaleSecurityGroupSet',
+                VpcId=vpc_id)
 
             stale_count += len(stale_groups)
             for s in stale_groups:
@@ -3378,8 +3379,9 @@ class Entry(Filter):
         for r in resources:
             if self.annotation_key in r:
                 continue
-            r[self.annotation_key] = client.get_managed_prefix_list_entries(
-                PrefixListId=r['PrefixListId']).get('Entries', ())
+            r[self.annotation_key] = query.paginate_op(
+                client, 'get_managed_prefix_list_entries', 'Entries',
+                PrefixListId=r['PrefixListId'])
 
         vf = ValueFilter(self.data)
         vf.annotate = False

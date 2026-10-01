@@ -5,7 +5,7 @@
 
 import csv
 from collections import Counter
-from datetime import timedelta, datetime
+from datetime import timedelta
 import logging
 import os
 import time
@@ -44,20 +44,13 @@ from c7n.reports.csvout import (
 from c7n.resources import load_available, load_resources
 from c7n.schema import StructureParser
 from c7n.utils import (
-    CONN_CACHE, dumps, filter_empty, format_string_values, get_policy_provider, join_output_path)
+    CONN_CACHE, dumps, filter_empty, format_string_values, get_policy_provider, join_output_path,
+    utcnow_naive)
 
 from c7n_org.utils import environ, account_tags
 from c7n_org import orgaccounts
 
 log = logging.getLogger('c7n_org')
-
-# Workaround OSX issue, note this exists for py2 but there
-# isn't anything we can do in that case.
-# https://bugs.python.org/issue33725
-if sys.platform == 'darwin' and (
-        sys.version_info.major > 3 and sys.version_info.minor > 4):
-    multiprocessing.set_start_method('spawn')
-
 
 WORKER_COUNT = int(
     os.environ.get('C7N_ORG_PARALLEL', multiprocessing.cpu_count() * 4))
@@ -359,7 +352,7 @@ def report_account(account, region, policies_config, output_path, cache_path, de
 
         if p.ctx.output.type == "s3":
             delta = timedelta(days=1)
-            begin_date = datetime.now() - delta
+            begin_date = utcnow_naive() - delta
 
             policy_records = record_set(
                 p.session_factory,

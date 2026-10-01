@@ -579,6 +579,22 @@ class AccountTests(BaseTest):
         self.assertNotRegex(logs_metrics['metricFilters'][0]['filterPattern'],
                             pdata['filters'][0]['log-metric-filter-pattern'])
 
+    def test_cloudtrail_log_metric_filter_paginated(self):
+        # the matching metric filter is on the second page of the log group's
+        # metric filters, the account is compliant and so filtered out
+        session_factory = self.replay_flight_data("test_cloudtrail_log_metric_filter_paginated")
+        p = self.load_policy({
+            'name': 'paginated-log-metric-filter',
+            'resource': 'account',
+            'filters': [{
+                'type': 'check-cloudtrail',
+                'log-metric-filter-pattern': {
+                    'type': 'value',
+                    'op': 'regex',
+                    'value': '.*Failed authentication.*'}}]},
+            session_factory=session_factory)
+        self.assertEqual(p.run(), [])
+
     def test_cloudtrail_success_management_advanced_events_included(self):
         session_factory = self.replay_flight_data(
             "test_cloudtrail_success_management_advanced_events_included")
@@ -1828,6 +1844,29 @@ class AccountDataEvents(BaseTest):
         resources = p.run()
         self.assertEqual(len(resources), 1)
 
+        self.assertEqual(
+            resources[0]["c7n:lake-cross-account-s3"], ["testarena.com"])
+
+    def test_lakeformation_filter_ignores_own_bucket_prefix(self):
+        # arn:aws:s3:::reboot-s3-bad-01/exports/ is a prefix in an owned bucket
+        factory = self.replay_flight_data("test_lakeformation_cross_account_s3_own_prefix")
+        p = self.load_policy(
+            {'name': 'lakeformation-cross-account-bucket',
+             'resource': 'account',
+             'filters': [{'type': 'lakeformation-s3-cross-account'}]},
+            session_factory=factory)
+        self.assertEqual(p.run(), [])
+
+    def test_lakeformation_filter_paginated(self):
+        # the cross account location is on the second page
+        factory = self.replay_flight_data("test_lakeformation_cross_account_s3_paginated")
+        p = self.load_policy(
+            {'name': 'lakeformation-cross-account-bucket',
+             'resource': 'account',
+             'filters': [{'type': 'lakeformation-s3-cross-account'}]},
+            session_factory=factory)
+        resources = p.run()
+        self.assertEqual(len(resources), 1)
         self.assertEqual(
             resources[0]["c7n:lake-cross-account-s3"], ["testarena.com"])
 

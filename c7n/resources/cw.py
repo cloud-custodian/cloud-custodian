@@ -5,6 +5,7 @@ import re
 from collections import defaultdict
 from concurrent.futures import as_completed
 from datetime import datetime, timedelta
+from dateutil.tz import tzutc
 
 from botocore.exceptions import ClientError
 
@@ -454,7 +455,7 @@ class LastWriteDays(Filter):
 
     def process(self, resources, event=None):
         client = local_session(self.manager.session_factory).client('logs')
-        self.date_threshold = parse_date(datetime.utcnow()) - timedelta(
+        self.date_threshold = datetime.now(tz=tzutc()) - timedelta(
             days=self.data['days'])
         return [r for r in resources if self.check_group(client, r)]
 

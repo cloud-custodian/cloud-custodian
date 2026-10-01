@@ -5,7 +5,7 @@ module to test some universal tagging infrastructure not directly exposed.
 """
 import time
 import jsonschema
-from datetime import datetime
+from datetime import datetime, timedelta, timezone
 from freezegun import freeze_time
 from unittest.mock import MagicMock, call, patch
 
@@ -977,3 +977,45 @@ class ResourceGoneTest(BaseTest):
         universal_retry(method, ["arn:abc"])
         method.assert_called_once()
         sleep.assert_not_called()
+
+
+class HostLocalNow(datetime):
+    """now() for 2024-01-14 20:00 utc on a host running at utc+9.
+
+    freezegun can't stand in here, its tz_offset also shifts aware nows.
+    """
+    instant = datetime(2024, 1, 14, 20, 0, tzinfo=timezone.utc)
+
+    @classmethod
+    def now(cls, tz=None):
+        if tz is None:
+            return cls.instant.astimezone(timezone(timedelta(hours=9))).replace(tzinfo=None)
+        return cls.instant.astimezone(tz)
+
+
+class MarkedForOpTimezoneTest(BaseTest):
+
+    def setUp(self):
+        super().setUp()
+        self.patch(tagmod, 'datetime', HostLocalNow)
+
+    def marked(self, value, **extra):
+        p = self.load_policy({
+            'name': 'marked',
+            'resource': 'ec2',
+            'filters': [dict({'type': 'marked-for-op', 'op': 'stop'}, **extra)]})
+        return p.resource_manager.filters[0]({'Tags': [
+            {'Key': 'maid_status', 'Value': 'Resource does not meet policy: %s' % value}]})
+
+    def test_date_only_uses_policy_tz_not_host_local(self):
+        # mark-for-op writes a date only tag as the date in the policy's tz,
+        # utc by default, where it is still the 14th; host local is the 15th
+        self.assertFalse(self.marked('stop@2024/01/15'))
+        self.assertTrue(self.marked('stop@2024/01/14'))
+        # in tokyo it is the 15th
+        self.assertTrue(self.marked('stop@2024/01/15', tz='jst'))
+        self.assertFalse(self.marked('stop@2024/01/16', tz='jst'))
+
+    def test_tz_aware_tag_unchanged(self):
+        self.assertTrue(self.marked('stop@2024/01/14 1900 UTC'))
+        self.assertFalse(self.marked('stop@2024/01/14 2100 UTC'))

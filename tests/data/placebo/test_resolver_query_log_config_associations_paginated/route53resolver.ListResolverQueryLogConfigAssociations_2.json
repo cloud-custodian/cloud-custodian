@@ -1,0 +1,18 @@
+{
+    "status_code": 200,
+    "data": {
+        "TotalCount": 3,
+        "TotalFilteredCount": 2,
+        "ResolverQueryLogConfigAssociations": [
+            {
+                "Id": "rqlca-a2",
+                "ResolverQueryLogConfigId": "rqlc-aaaa",
+                "ResourceId": "vpc-0a2",
+                "Status": "ACTIVE",
+                "Error": "NONE",
+                "ErrorMessage": ""
+            }
+        ],
+        "ResponseMetadata": {}
+    }
+}

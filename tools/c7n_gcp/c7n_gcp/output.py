@@ -6,7 +6,6 @@ TODO: provider policy execution initialization for outputs
 
 
 """
-import datetime
 import logging
 import time
 
@@ -30,7 +29,7 @@ from c7n.output import (
     BlobOutput,
     Metrics,
     LogOutput)
-from c7n.utils import local_session
+from c7n.utils import local_session, utcnow_naive
 
 
 @metrics_outputs.register('gcp')
@@ -108,7 +107,7 @@ class StackDriverMetrics(Metrics):
         # Resource is a Google controlled vocabulary with artificial
         # limitations on resource type there's not much useful we can
         # utilize.
-        now = datetime.datetime.utcnow()
+        now = utcnow_naive()
         metrics_series = {
             'metric': {
                 'type': 'custom.googleapis.com/custodian/policy/%s' % key.lower(),

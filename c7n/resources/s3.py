@@ -2782,6 +2782,7 @@ class DeleteGlobalGrants(BucketActionBase):
         except ClientError as e:
             if e.response['Error']['Code'] == 'NoSuchBucket':
                 return
+            raise
         return b
 
 

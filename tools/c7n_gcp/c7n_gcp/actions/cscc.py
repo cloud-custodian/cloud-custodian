@@ -1,12 +1,11 @@
 # Copyright The Cloud Custodian Authors.
 # SPDX-License-Identifier: Apache-2.0
-import datetime
 import json
 import hashlib
 from urllib.parse import urlparse
 
 from c7n.exceptions import PolicyExecutionError, PolicyValidationError
-from c7n.utils import local_session, type_schema
+from c7n.utils import local_session, type_schema, utcnow_naive
 from .core import MethodAction
 
 from c7n_gcp.provider import resources as gcp_resources
@@ -157,7 +156,7 @@ class PostFinding(MethodAction):
             'state': 'ACTIVE',
             'category': self.data.get('category', self.DefaultCategory),
             'severity': self.data.get('severity', self.DefaultSeverity),
-            'eventTime': datetime.datetime.utcnow().isoformat('T') + 'Z',
+            'eventTime': utcnow_naive().isoformat('T') + 'Z',
             'sourceProperties': {
                 'resource_type': self.manager.type,
                 'title': policy.data.get('title', policy.name),

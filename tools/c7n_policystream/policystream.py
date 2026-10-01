@@ -952,7 +952,15 @@ if __name__ == '__main__':
         raise
     except KeyboardInterrupt:
         raise
-    except: # NOQA
-        import traceback, pdb, sys
+    except Exception:
+        import sys
+        import traceback
+
         traceback.print_exc()
-        pdb.post_mortem(sys.exc_info()[-1])
+        # only drop into the debugger when explicitly asked for; unattended
+        # runs would otherwise block forever on the pdb prompt.
+        if os.environ.get('C7N_DEBUG', '').lower() in ('1', 'true', 'yes', 'on'):
+            import pdb
+
+            pdb.post_mortem(sys.exc_info()[-1])
+        sys.exit(1)

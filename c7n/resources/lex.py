@@ -135,7 +135,7 @@ class LexV2BotCrossAccountAccessFilter(CrossAccountAccessFilter):
         result = self.manager.retry(
             client.describe_resource_policy,
             resourceArn=self.manager.generate_arn(r['botId']),
-            ignore_err_codes=('ResourceNotFoundException'))
+            ignore_err_codes=('ResourceNotFoundException',))
         if result:
             pol = result.get('policy', None)
             r[self.policy_attribute] = pol
@@ -169,7 +169,7 @@ class LexV2BotAliasCrossAccountAccessFilter(CrossAccountAccessFilter):
                 client.describe_resource_policy,
                 resourceArn=self.manager.generate_arn
                 (f"bot-alias/{r['c7n:parent-id']}/{r['botAliasId']}"),
-                ignore_err_codes=('ResourceNotFoundException'))
+                ignore_err_codes=('ResourceNotFoundException',))
         if result:
             pol = result.get('policy', None)
             r[self.policy_attribute] = pol

@@ -41,6 +41,7 @@ class FileSystem(QueryResourceManager):
         enum_spec = ('list_file_systems', 'fileSystems', None)
         detail_spec = ('get_file_system', 'fileSystemId', 'fileSystemId', None)
         arn = 'fileSystemArn'
+        arn_type = 'file-system'
         id = 'fileSystemId'
         name = 'name'
         date = 'creationTime'

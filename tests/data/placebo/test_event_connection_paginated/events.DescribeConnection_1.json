@@ -1,0 +1,41 @@
+{
+ "status_code": 200,
+ "data": {
+  "ConnectionArn": "arn:aws:events:us-east-1:644160558196:connection/c7n-test-conn-page-one/6e9c4e5e-0202-4faa-9cab-084328b76102",
+  "Name": "c7n-test-conn-page-one",
+  "ConnectionState": "AUTHORIZED",
+  "AuthorizationType": "API_KEY",
+  "CreationTime": {
+   "__class__": "datetime",
+   "year": 2026,
+   "month": 8,
+   "day": 13,
+   "hour": 2,
+   "minute": 29,
+   "second": 29,
+   "microsecond": 0
+  },
+  "LastModifiedTime": {
+   "__class__": "datetime",
+   "year": 2026,
+   "month": 8,
+   "day": 13,
+   "hour": 2,
+   "minute": 29,
+   "second": 29,
+   "microsecond": 0
+  },
+  "LastAuthorizedTime": {
+   "__class__": "datetime",
+   "year": 2026,
+   "month": 8,
+   "day": 13,
+   "hour": 2,
+   "minute": 29,
+   "second": 29,
+   "microsecond": 0
+  },
+  "SecretArn": "arn:aws:secretsmanager:us-east-1:644160558196:secret:events!connection/c7n-test-conn-page-one/b34fa77f-5c25-4b80-af6f-76153a18ddaf-o0S3lh",
+  "ResponseMetadata": {}
+ }
+}

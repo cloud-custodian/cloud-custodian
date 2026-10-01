@@ -116,7 +116,18 @@ def test_sqs_set_encryption_options(test):
     assert collected.pop() == {'SqsManagedSseEnabled': 'true',
                                'KmsMasterKeyId': ''}
 
+    set_encrypt.data = {'enabled': True}
+    set_encrypt.process([{}])
+    assert collected.pop() == {'SqsManagedSseEnabled': 'true',
+                               'KmsMasterKeyId': ''}
+
     set_encrypt.data = {'key': 'xyz'}
+    set_encrypt.process([{}])
+    assert collected.pop() == {'SqsManagedSseEnabled': 'false',
+                               'KmsDataKeyReusePeriodSeconds': '300',
+                               'KmsMasterKeyId': 'alias/xyz'}
+
+    set_encrypt.data = {'enabled': True, 'key': 'xyz'}
     set_encrypt.process([{}])
     assert collected.pop() == {'SqsManagedSseEnabled': 'false',
                                'KmsDataKeyReusePeriodSeconds': '300',

@@ -5,7 +5,6 @@ from datetime import datetime, timedelta
 import functools
 import json
 import os
-import time
 import yaml
 
 import jmespath
@@ -94,8 +93,10 @@ def get_rendered_jinja(
     # tz. if no execution start time was passed use current time.
     execution_start = sqs_message.get("execution_start")
     if not execution_start:
-        execution_start = time.mktime(datetime.utcnow().timetuple())
-    execution_start = datetime.utcfromtimestamp(execution_start).isoformat()
+        execution_start = datetime.now(tz=tzutc()).timestamp()
+    execution_start = (
+        datetime.fromtimestamp(execution_start, tz=tzutc()).replace(tzinfo=None).isoformat()
+    )
 
     rendered_jinja = template.render(
         recipient=target,
@@ -168,7 +169,7 @@ def date_time_format(utc_str, tz_str="US/Eastern", format="%Y %b %d %H:%M %Z"):
 
 
 def get_date_time_delta(delta):
-    return str(datetime.now().replace(tzinfo=gettz("UTC")) + timedelta(delta))
+    return str(datetime.now(tz=gettz("UTC")) + timedelta(delta))
 
 
 def get_date_age(date, unit="days"):

@@ -2,7 +2,7 @@
 # SPDX-License-Identifier: Apache-2.0
 import copy
 from collections import UserString
-from datetime import datetime, timedelta
+from datetime import datetime, timedelta, timezone
 from dateutil.tz import tzutc
 import json
 import itertools
@@ -11,7 +11,6 @@ import logging
 import os
 import random
 import re
-import sys
 import threading
 import time
 import typing
@@ -210,11 +209,9 @@ def type_schema(
     for k, v in props.items():
         if v is None:
             del s['properties'][k]
-    if not required:
-        required = []
-    if isinstance(required, list):
-        required.append('type')
-    s['required'] = required
+    # copy, the caller may be reusing the list across schemas, and callers
+    # pass tuples too, which need 'type' just the same
+    s['required'] = list(required or ()) + ['type']
     if inherits:
         extended = s
         s = {'allOf': [{'$ref': i} for i in inherits]}
@@ -514,23 +511,6 @@ class IPv4Network(ipaddress.IPv4Network):
             return self.supernet_of(other)
         return super(IPv4Network, self).__contains__(other)
 
-    if (sys.version_info.major == 3 and sys.version_info.minor <= 6):  # pragma: no cover
-        @staticmethod
-        def _is_subnet_of(a, b):
-            try:
-                # Always false if one is v4 and the other is v6.
-                if a._version != b._version:
-                    raise TypeError(f"{a} and {b} are not of the same version")
-                return (b.network_address <= a.network_address and
-                        b.broadcast_address >= a.broadcast_address)
-            except AttributeError:
-                raise TypeError(f"Unable to test subnet containment "
-                                f"between {a} and {b}")
-
-        def supernet_of(self, other):
-            """Return True if this network is a supernet of other."""
-            return self._is_subnet_of(other, self)
-
 
 class IPv4List:
     def __init__(self, ipv4_list):
@@ -706,6 +686,14 @@ class DeferredFormatString(UserString):
         return "".join(("{", self.data, f":{format_spec}" if format_spec else "", "}"))
 
 
+def utcnow_naive():
+    """Naive datetime for the current UTC time.
+
+    Drop in replacement for datetime.utcnow(), deprecated in python 3.12.
+    """
+    return datetime.now(timezone.utc).replace(tzinfo=None)
+
+
 class FormatDate:
     """a datetime wrapper with extended pyformat syntax"""
 
@@ -723,7 +711,7 @@ class FormatDate:
 
     @classmethod
     def utcnow(cls):
-        return cls(datetime.utcnow())
+        return cls(utcnow_naive())
 
     def __getattr__(self, k):
         return getattr(self._d, k)

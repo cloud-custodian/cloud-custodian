@@ -1,0 +1,17 @@
+{
+    "status_code": 200,
+    "data": {
+        "LoggingConfigurations": [
+            {
+                "ResourceArn": "arn:aws:wafv2:us-east-1:123456789012:regional/webacl/other/00000000-0000-0000-0000-000000000000",
+                "LogDestinationConfigs": [
+                    "arn:aws:logs:us-east-1:123456789012:log-group:aws-waf-logs-c7n-functional20221209221532919100000001"
+                ],
+                "RedactedFields": [],
+                "ManagedByFirewallManager": false
+            }
+        ],
+        "NextMarker": "marker-2",
+        "ResponseMetadata": {}
+    }
+}

@@ -1,5 +1,6 @@
 # Copyright The Cloud Custodian Authors.
 # SPDX-License-Identifier: Apache-2.0
+import contextlib
 import time
 import uuid
 import os
@@ -73,14 +74,14 @@ class ExecutionContext:
     def __enter__(self):
         self.initialize()
         self.session_factory.policy_name = self.policy.name
-        self.sys_stats.__enter__()
-        self.output.__enter__()
-        self.logs.__enter__()
-        if self.output_logs:
-            self.output_logs.__enter__()
-
-        self.api_stats.__enter__()
-        self.tracer.__enter__()
+        # __exit__ only runs once __enter__ has returned, so if entering one
+        # of these fails, exit the ones already entered before re-raising.
+        with contextlib.ExitStack() as entered:
+            for cm in (self.sys_stats, self.output, self.logs, self.output_logs,
+                       self.api_stats, self.tracer):
+                if cm is not None:
+                    entered.enter_context(cm)
+            entered.pop_all()
 
         # Api stats and user agent modification by policy require updating
         # in place the cached session thread local.
@@ -102,6 +103,9 @@ class ExecutionContext:
                 self.output_logs.__exit__(exc_type, exc_value, exc_traceback)
             self.output.__exit__(exc_type, exc_value, exc_traceback)
 
+        # after the output block, a sys stats (psutil) failure must not cost
+        # us the metrics flush and the output upload
+        self.sys_stats.__exit__(exc_type, exc_value, exc_traceback)
         self.tracer.__exit__()
 
         self.session_factory.policy_name = None

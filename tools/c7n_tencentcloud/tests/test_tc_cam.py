@@ -389,3 +389,25 @@ class TestCAM(BaseTest):
         resources = policy.run()
         assert len(resources) == 130
         assert resources[0]["PolicyId"] == 232883536
+
+
+class TestCAMGroupErrors(BaseTest):
+
+    def test_group_lookup_errors_are_logged(self, caplog):
+        import logging
+        from unittest import mock
+        policy = self.load_policy(
+            {
+                "name": "tencentcloud-cam-user-group-errors",
+                "resource": "tencentcloud.cam-user",
+                "filters": [{"type": "group", "key": "GroupName", "value": "demo"}]
+            },
+            account_id=100002098531
+        )
+        f = policy.resource_manager.filters[0]
+        client = mock.MagicMock()
+        client.execute_query.side_effect = ValueError("throttled")
+        policy.resource_manager._query_client = client
+        with caplog.at_level(logging.ERROR, logger=f.log.name):
+            assert f.process([{"Uin": 1}]) == []
+        assert "throttled" in caplog.text

@@ -857,7 +857,8 @@ class FilterRestIntegration(ValueFilter):
                 results.append(integration)
             except ClientError as e:
                 if e.response['Error']['Code'] == 'NotFoundException':
-                    pass
+                    continue
+                raise
 
         return results
 
@@ -1149,6 +1150,7 @@ class DomainNameRemediateTls(BaseAction):
             except ClientError as e:
                 if e.response['Error']['Code'] in retryable:
                     continue
+                raise
 
 
 class ApiGwV2DescribeSource(query.DescribeSource):

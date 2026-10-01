@@ -2,7 +2,7 @@
 # SPDX-License-Identifier: Apache-2.0
 
 from __future__ import annotations
-from datetime import datetime, timedelta
+from datetime import timedelta
 
 from c7n.manager import resources
 from c7n.query import (
@@ -10,7 +10,7 @@ from c7n.query import (
     DescribeWithResourceTags)
 from c7n.actions import BaseAction
 from c7n.tags import Tag, TagDelayedAction, RemoveTag, coalesce_copy_user_tags, TagActionFilter
-from c7n.utils import type_schema, local_session, chunks, group_by, get_retry
+from c7n.utils import type_schema, local_session, chunks, group_by, get_retry, utcnow_naive
 from c7n.filters import Filter, ListItemFilter, MetricsFilter
 from c7n.filters.kms import KmsRelatedFilter
 from c7n.filters.vpc import SubnetFilter, VpcFilter
@@ -547,7 +547,7 @@ class DeleteFileSystem(BaseAction):
         retry_delay = self.data.get('retry-delay', 1)
         retry_max_attempts = self.data.get('retry-max-attempts', 1)
         retry = get_retry(
-            retry_codes=('BadRequest'),
+            retry_codes=('BadRequest',),
             min_delay=retry_delay,
             max_attempts=retry_max_attempts,
             log_retries=True,
@@ -687,7 +687,7 @@ class ConsecutiveBackups(Filter):
         results = []
         ontap_resource_set, nonontap_resource_set = [], []
         retention = self.data.get('days')
-        utcnow = datetime.utcnow()
+        utcnow = utcnow_naive()
         expected_dates = set()
         for days in range(1, retention + 1):
             expected_dates.add((utcnow - timedelta(days=days)).strftime('%Y-%m-%d'))

@@ -7,11 +7,11 @@ import re
 
 from collections import namedtuple
 from concurrent.futures import as_completed
-from datetime import datetime, timedelta
+from datetime import timedelta
 
 from c7n.exceptions import PolicyValidationError
 from c7n.filters.core import Filter, OPERATORS
-from c7n.utils import local_session, type_schema, chunks, snap_to_period_start
+from c7n.utils import local_session, type_schema, chunks, snap_to_period_start, utcnow_naive
 
 METRIC_WINDOW_ALIGNMENT = [
     'auto',
@@ -179,7 +179,7 @@ class MetricsFilter(Filter):
         """  # noqa: E501
 
         duration = timedelta(self.days)
-        now = datetime.utcnow()
+        now = utcnow_naive()
         MetricWindow = namedtuple('MetricWindow', 'start end')
 
         if duration <= timedelta(days=(1 / 8.0)):

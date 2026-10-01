@@ -482,9 +482,12 @@ class KmsPostFinding(PostFinding):
 
         # Securityhub expects a unix timestamp for CreationDate
         if 'CreationDate' in payload and isinstance(payload['CreationDate'], datetime):
-            payload['CreationDate'] = (
-                payload['CreationDate'].replace(tzinfo=timezone.utc).timestamp()
-            )
+            created = payload['CreationDate']
+            # botocore hands back aware (tzlocal) values, relabelling those as
+            # utc would shift them by the host's offset
+            if created.tzinfo is None:
+                created = created.replace(tzinfo=timezone.utc)
+            payload['CreationDate'] = created.timestamp()
 
         return envelope
 

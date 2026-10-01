@@ -11,9 +11,10 @@ from dateutil.parser import parse as date_parse
 
 from c7n.ctx import ExecutionContext
 from c7n.config import Config
-from c7n.output import DirectoryOutput, BlobOutput, LogFile, Metrics, metrics_outputs
+from c7n.output import (
+    DirectoryOutput, BlobOutput, LogFile, LogMetrics, Metrics, metrics_outputs)
 from c7n.resources.aws import S3Output, MetricsOutput, inspect_bucket_region
-from c7n.testing import mock_datetime_now, TestUtils
+from c7n.testing import local_timezone, mock_datetime_now, TestUtils
 
 from .common import Bag, BaseTest
 
@@ -45,6 +46,59 @@ class MetricsTest(BaseTest):
     def test_boolean_config_compatibility(self):
         self.assertTrue(
             isinstance(metrics_outputs.select(True, {}), MetricsOutput))
+
+    def test_log_metrics_timestamp_is_utc(self):
+        # same as the cloudwatch metrics output, naive utc, whatever the
+        # host's local timezone
+        ctx = Bag(policy=Bag(name='test', resource_type='ec2'))
+        moutput = LogMetrics(ctx, {})
+        with local_timezone('Asia/Tokyo'):
+            moutput.put_metric('ResourceCount', 1, 'Count')
+        stamp = moutput.buf[0]['Timestamp']
+        self.assertIsNone(stamp.tzinfo)
+        utcnow = datetime.datetime.now(datetime.timezone.utc).replace(tzinfo=None)
+        self.assertLess(abs(utcnow - stamp), datetime.timedelta(minutes=5))
+
+
+class ExecutionContextExitTest(BaseTest):
+
+    def test_enter_failure_exits_entered_outputs(self):
+        p = self.load_policy({'name': 'ctx-enter', 'resource': 'ec2'})
+        ctx = p.ctx
+        outputs = {}
+
+        def initialize():
+            for name in ('sys_stats', 'output', 'logs', 'api_stats'):
+                outputs[name] = mock.MagicMock(name=name)
+                setattr(ctx, name, outputs[name])
+            ctx.output_logs = None
+            outputs['logs'].__enter__.side_effect = RuntimeError('log group')
+
+        ctx.initialize = initialize
+        with self.assertRaisesRegex(RuntimeError, 'log group'):
+            ctx.__enter__()
+        outputs['sys_stats'].__exit__.assert_called_once()
+        outputs['output'].__exit__.assert_called_once()
+        # exited with the failure
+        self.assertIn(RuntimeError, outputs['output'].__exit__.call_args[0])
+        outputs['logs'].__exit__.assert_not_called()
+        outputs['api_stats'].__enter__.assert_not_called()
+
+    def test_sys_stats_failure_still_flushes_output(self):
+        p = self.load_policy(
+            {'name': 'ctx-exit', 'resource': 'ec2'},
+            output_dir=self.get_temp_dir())
+        ctx = p.ctx
+        ctx.__enter__()
+        ctx.sys_stats.__exit__ = mock.Mock(side_effect=RuntimeError('psutil'))
+        ctx.metrics.flush = mock.Mock()
+        output_exit = mock.Mock(wraps=ctx.output.__exit__)
+        ctx.output.__exit__ = output_exit
+        with self.assertRaises(RuntimeError):
+            ctx.__exit__()
+        ctx.metrics.flush.assert_called_once_with()
+        output_exit.assert_called_once()
+        ctx.sys_stats.__exit__.assert_called_once()
 
 
 class DirOutputTest(BaseTest):

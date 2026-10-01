@@ -8,7 +8,7 @@ import pytest
 from pytest_terraform import terraform
 
 from botocore.exceptions import ClientError
-from .common import BaseTest
+from .common import BaseTest, record_api_params
 
 
 class Route53HostedZoneTest(BaseTest):
@@ -733,3 +733,39 @@ class ResolverRuleTest(BaseTest):
             {'type': 'tag', 'tags': {'Owner': 'platform'}})
         policy.resource_manager.actions[0].process([self.auto_defined_rule])
         tag_resources.assert_not_called()
+
+
+class Route53QueryLogPermissionsTest(BaseTest):
+
+    def test_set_query_logging_permissions_are_valid(self):
+        from .common import load_data
+        perms = load_data('iam-actions.json')
+        p = self.load_policy({
+            'name': 'r53-query-log', 'resource': 'hostedzone',
+            'actions': [{'type': 'set-query-logging', 'set-permissions': True}]})
+        action = p.resource_manager.actions[0]
+        for perm in set(action.get_permissions()) | set(action.permissions):
+            service, name = perm.split(':')
+            self.assertIn(name, perms[service], perm)
+
+
+class TestResolverQueryLogConfigAssociations(BaseTest):
+
+    def test_associations_scoped_per_config_and_paged(self):
+        factory = self.replay_flight_data(
+            'test_resolver_query_log_config_associations_paginated')
+        listed = record_api_params(
+            factory, 'route53resolver', 'ListResolverQueryLogConfigAssociations')
+        p = self.load_policy(
+            {'name': 'r53-resolver-logs', 'resource': 'resolver-logs'},
+            session_factory=factory,
+            config={'account_id': '123456789012'})
+        resources = {r['Id']: r for r in p.run()}
+        self.assertEqual(
+            {rid: [a['Id'] for a in r['c7n:Associations']] for rid, r in resources.items()},
+            {'rqlc-aaaa': ['rqlca-a1', 'rqlca-a2'], 'rqlc-bbbb': ['rqlca-b1']})
+        # each config asks only for its own associations
+        self.assertEqual(
+            [c['Filters'] for c in listed],
+            [[{'Name': 'ResolverQueryLogConfigId', 'Values': ['rqlc-aaaa']}]] * 2 +
+            [[{'Name': 'ResolverQueryLogConfigId', 'Values': ['rqlc-bbbb']}]])

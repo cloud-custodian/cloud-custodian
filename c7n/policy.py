@@ -405,7 +405,9 @@ class LambdaMode(ServerlessExecutionMode):
             'kms_key_arn': {'type': 'string'},
             'tracing_config': {'type': 'object'},
             'security_groups': {'type': 'array'},
-            'subnets': {'type': 'array'}
+            'subnets': {'type': 'array'},
+            # false drops the root logger's handlers in the lambda
+            'log': {'type': 'boolean'},
         }
     }
 
@@ -521,7 +523,8 @@ class LambdaMode(ServerlessExecutionMode):
         mode = self.policy.data.get('mode', {})
         if not bool(mode.get("log", True)):
             root = logging.getLogger()
-            map(root.removeHandler, root.handlers[:])
+            for handler in root.handlers[:]:
+                root.removeHandler(handler)
             root.handlers = [logging.NullHandler()]
 
     def run_resource_set(self, event, resources):
@@ -668,10 +671,9 @@ class PHDMode(LambdaMode):
         entities = []
         paginator = client.get_paginator('describe_affected_entities')
         for event_set in utils.chunks(event_arns, 10):
-            # Note: we aren't using event_set here, just event_arns.
             entities.extend(list(itertools.chain(
                             *[p['entities'] for p in paginator.paginate(
-                                filter={'eventArns': event_arns})])))
+                                filter={'eventArns': event_set})])))
         return entities
 
     def resolve_resources(self, event):
@@ -1295,7 +1297,7 @@ class Policy:
             'now': (
                 utils.DeferredFormatString('now')
                 if isinstance(self.get_execution_mode(), ServerlessExecutionMode)
-                else utils.FormatDate(datetime.utcnow())
+                else utils.FormatDate(utils.utcnow_naive())
             ),
             # account increase limit action
             'service': '{service}',

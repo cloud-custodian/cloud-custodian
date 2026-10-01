@@ -500,7 +500,7 @@ class KmsFilter(KmsRelatedFilter):
             'job-bookmarks': 'EncryptionConfiguration.JobBookmarksEncryption.KmsKeyArn',
             'all': 'EncryptionConfiguration.*[][].KmsKeyArn'
         }
-        key_type = self.data.get('key_type', 'all')
+        key_type = self.data.get('key-type', 'all')
         self.RelatedIdsExpression = key_type_to_related_ids[key_type]
 
 

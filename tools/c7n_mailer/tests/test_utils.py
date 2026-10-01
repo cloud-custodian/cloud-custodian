@@ -3,17 +3,20 @@
 # -*- coding: utf-8 -*-
 
 import builtins
-from datetime import datetime
+from datetime import datetime, timezone
 from importlib import reload
 import os
+import tempfile
+import time
 from time import sleep
 import unittest
+import yaml
 import jinja2
 import logging
 from mock import Mock, patch
 
 import c7n_mailer
-from c7n_mailer import utils
+from c7n_mailer import replay, utils
 from c7n_mailer.azure_mailer.azure_queue_processor import MailerAzureQueueProcessor
 from c7n_mailer.gcp_mailer.gcp_queue_processor import MailerGcpQueueProcessor
 from c7n_mailer.sqs_queue_processor import MailerSqsQueueProcessor
@@ -406,3 +409,49 @@ class OtherTests(unittest.TestCase):
         session_mock.get_session_for_resource.return_value = session_mock
 
         self.assertEqual(utils.kms_decrypt(config, Mock(), session_mock, "test"), config["test"])
+
+
+class ReplayTest(unittest.TestCase):
+
+    def make_output_dir(self, tmp_dir, policy_name):
+        policy_file = os.path.join(tmp_dir, "policy.yml")
+        with open(policy_file, "w") as fh:
+            fh.write(
+                yaml.safe_dump(
+                    {
+                        "policies": [
+                            {
+                                "name": policy_name,
+                                "resource": "ec2",
+                                "actions": [{"type": "notify"}],
+                            }
+                        ]
+                    }
+                )
+            )
+        os.makedirs(os.path.join(tmp_dir, policy_name))
+        with open(os.path.join(tmp_dir, policy_name, "resources.json"), "w") as fh:
+            fh.write("[]")
+        return policy_file
+
+    def test_mimic_sqs_execution_start_is_epoch(self):
+        # execution_start came from a naive utc datetime, and .timestamp()
+        # on a naive datetime reads it as local time, so the value was off
+        # by the host's utc offset rather than being the epoch it claims.
+        with tempfile.TemporaryDirectory() as tmp_dir:
+            policy_file = self.make_output_dir(tmp_dir, "ec2-check")
+
+            before = time.time()
+            template = replay.mimic_sqs("us-east-1", policy_file, None, 0, tmp_dir)
+            after = time.time()
+            self.assertGreaterEqual(template["execution_start"], before)
+            self.assertLessEqual(template["execution_start"], after)
+
+            # and pin it down independently of the host's zone
+            stamp = datetime(2024, 3, 1, 12, 0, tzinfo=timezone.utc)
+            with patch.object(replay, "datetime") as fake_datetime:
+                fake_datetime.now.return_value = stamp
+                template = replay.mimic_sqs("us-east-1", policy_file, None, 0, tmp_dir)
+
+        fake_datetime.now.assert_called_once_with(timezone.utc)
+        self.assertEqual(template["execution_start"], 1709294400.0)

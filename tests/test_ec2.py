@@ -563,6 +563,24 @@ class TestHealthEventsFilter(BaseTest):
         resources = policy.run()
         self.assertEqual(len(resources), 1)
 
+    def test_ec2_health_events_filter_paginated(self):
+        # the instance's event is on the second page of health events
+        session_factory = self.replay_flight_data("test_ec2_health_events_filter_paginated")
+        policy = self.load_policy(
+            {
+                "name": "ec2-health-events-filter",
+                "resource": "ec2",
+                "filters": [{"type": "health-event"}],
+            },
+            session_factory=session_factory,
+        )
+        resources = policy.run()
+        self.assertEqual(len(resources), 1)
+        self.assertEqual(
+            [e['arn'] for e in resources[0]['c7n:HealthEvent']],
+            ['arn:aws:health:us-west-2::event/AWS_EC2_PERSISTENT_INSTANCE_RETIREMENT_SCHEDULED'
+             '12345678-1234-1234-1234-123456789012'])
+
 
 class TestTagTrim(BaseTest):
 
@@ -614,6 +632,60 @@ class TestTagTrim(BaseTest):
         self.assertEqual(len(start_tags) - 1, len(end_tags))
         self.assertTrue("Containers" in start_tags)
         self.assertFalse("Containers" in end_tags)
+
+
+class TestTagTrimUnit(BaseTest):
+
+    def get_action(self, **data):
+        p = self.load_policy(
+            {'name': 'ec2-tag-trim', 'resource': 'ec2',
+             'actions': [dict(type='tag-trim', **data)]},
+            session_factory=lambda *a, **kw: mock.MagicMock())
+        return p.resource_manager.actions[0]
+
+    def test_tag_trim_without_preserve(self):
+        self.patch(tags.TagTrim, "max_tag_count", 10)
+        action = self.get_action(space=1)
+        instance = {
+            'InstanceId': 'i-1',
+            'Tags': [{'Key': 'k%02d' % i, 'Value': 'v'} for i in range(10)]}
+        client = mock.MagicMock()
+        self.patch(tags.utils, 'local_session', lambda factory: mock.MagicMock(
+            client=mock.MagicMock(return_value=client)))
+        log = self.capture_logging('custodian.actions', level=logging.WARNING)
+        action.process([instance])
+        self.assertEqual(log.getvalue(), '')
+        client.delete_tags.assert_called_once()
+        self.assertEqual(
+            client.delete_tags.call_args[1]['Tags'], [{'Key': 'k00'}])
+
+
+class TestNormalizeTagUnit(BaseTest):
+
+    def test_action_enum_enforced(self):
+        for action in ('titlestrip', 'replace', 'bogus'):
+            with self.assertRaises(PolicyValidationError):
+                self.load_policy(
+                    {'name': 'ec2-normalize', 'resource': 'ec2',
+                     'actions': [{'type': 'normalize-tag', 'key': 'k', 'action': action}]},
+                    validate=True)
+        for action in ('upper', 'lower', 'title', 'strip'):
+            self.load_policy(
+                {'name': 'ec2-normalize', 'resource': 'ec2',
+                 'actions': [{'type': 'normalize-tag', 'key': 'k', 'action': action}]},
+                validate=True)
+
+    def test_strip_removes_text(self):
+        p = self.load_policy(
+            {'name': 'ec2-normalize', 'resource': 'ec2',
+             'actions': [{'type': 'normalize-tag', 'key': 'Env',
+                          'action': 'strip', 'value': 'blah'}]})
+        action = p.resource_manager.actions[0]
+        transformed = []
+        action.process_transform = lambda value, rset: transformed.append(value)
+        action.process([
+            {'InstanceId': 'i-1', 'Tags': [{'Key': 'Env', 'Value': 'hello-blah'}]}])
+        self.assertEqual(transformed, ['hello-'])
 
 
 class TestVolumeFilter(BaseTest):
@@ -2390,6 +2462,23 @@ class TestLaunchTemplate(BaseTest):
         resources = p.run()
         self.assertEqual(len(resources), 8)
         self.assertTrue(all(['LaunchTemplateData' in r for r in resources]))
+
+    def test_launch_template_versions_paginated(self):
+        # a template's versions span two pages, both when enumerating and
+        # when fetching by template id
+        factory = self.replay_flight_data('test_launch_template_versions_paginated')
+        p = self.load_policy({
+            'name': 'lt-versions',
+            'resource': 'aws.launch-template-version'}, session_factory=factory)
+        resources = p.run()
+        self.assertEqual(sorted(r['VersionNumber'] for r in resources), [1, 2])
+
+        factory = self.replay_flight_data('test_launch_template_versions_paginated')
+        p = self.load_policy({
+            'name': 'lt-versions',
+            'resource': 'aws.launch-template-version'}, session_factory=factory)
+        resources = p.resource_manager.get_resources(['lt-0877401c93c294001'])
+        self.assertEqual(sorted(r['VersionNumber'] for r in resources), [1, 2])
 
     def test_launch_template_id_not_found(self):
         factory = self.replay_flight_data("test_launch_template_id_not_found")

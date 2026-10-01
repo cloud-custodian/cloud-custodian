@@ -662,6 +662,21 @@ class DynamoDbAccelerator(BaseTest):
         self.assertEqual(len(resources), 1)
         self.assertEqual(resources[0]['ClusterName'], 'c7n-test')
 
+    def test_subnet_group_filter_paginated(self):
+        # the cluster's subnet group is on the second page of subnet groups
+        session_factory = self.replay_flight_data(
+            "test_dax_subnet_group_filter_paginated")
+        p = self.load_policy({
+            "name": "dax-cluster",
+            "resource": "dax",
+            "filters": [{
+                "type": "subnet",
+                "key": "MapPublicIpOnLaunch",
+                "value": False}]}, session_factory=session_factory)
+        resources = p.run()
+        self.assertEqual(len(resources), 1)
+        self.assertEqual(resources[0]['ClusterName'], 'c7n-test')
+
     def test_dax_get_resource(self):
         session_factory = self.replay_flight_data('test_dax_get_resource')
 

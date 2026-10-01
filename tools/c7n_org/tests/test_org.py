@@ -1,13 +1,15 @@
 # Copyright The Cloud Custodian Authors.
 # SPDX-License-Identifier: Apache-2.0
 import copy
+from datetime import timedelta
 from unittest import mock
 import os
 
 import pytest
 import yaml
 
-from c7n.testing import TestUtils
+from c7n.testing import TestUtils, local_timezone
+from c7n.utils import utcnow_naive
 from click.testing import CliRunner
 
 from c7n_org import cli as org
@@ -1381,3 +1383,25 @@ projects:
         assert 'basic' in log_text or 'account-agnostic' in log_text
         # Should show that accounts were loaded and filtered
         assert 'filtered to 1 account' in log_text or 'loaded' in log_text
+
+
+def test_report_account_s3_begin_date_is_utc(tmp_path, monkeypatch):
+    # s3 output paths are laid out by utc date, the record lookup window must
+    # be computed in utc too, not the host's local time.
+    monkeypatch.setattr(
+        'c7n.resources.aws.inspect_bucket_region', lambda *a, **kw: 'us-east-1')
+    captured = []
+
+    def fake_record_set(session_factory, bucket, prefix, begin_date, *args, **kw):
+        captured.append(begin_date)
+        return []
+
+    monkeypatch.setattr(org, 'record_set', fake_record_set)
+    with local_timezone('Asia/Tokyo'):
+        org.report_account(
+            {'name': 'dev', 'account_id': '112233445566'}, 'us-east-1',
+            {'policies': [{'name': 'report-utc', 'resource': 'aws.ec2'}]},
+            's3://a-bucket/prefix', str(tmp_path), False)
+    expected = utcnow_naive() - timedelta(days=1)
+    assert len(captured) == 1
+    assert abs((expected - captured[0]).total_seconds()) < 60

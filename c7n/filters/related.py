@@ -67,8 +67,7 @@ class RelatedResourceFilter(ValueFilter):
         found = []
 
         if self.data.get('match-resource') is True:
-            self.data['value'] = self.get_resource_value(
-                self.data['key'], resource)
+            self._set_match_value(resource)
 
         if self.data.get('value_type') == 'resource_count':
             count_matches = OPERATORS[self.data.get('op')](len(related_ids), self.data.get('value'))
@@ -82,7 +81,7 @@ class RelatedResourceFilter(ValueFilter):
                 # in the event that the filter is looking specifically for absent values, we can
                 # safely assume that the non-existent related resource will have an absent value at
                 # any given key
-                if self.data['value'] == 'absent':
+                if self.data.get('value') == 'absent':
                     found.append(rid)
                 else:
                     self.log.warning(
@@ -103,6 +102,14 @@ class RelatedResourceFilter(ValueFilter):
         elif op == 'and' and len(found) == len(related_ids):
             return True
         return False
+
+    def _set_match_value(self, resource):
+        # ValueFilter.match caches the comparison value in self.v on first
+        # use, so updating the policy data alone would compare every later
+        # resource against the first resource's value.
+        self.data['value'] = self.get_resource_value(self.data['key'], resource)
+        if getattr(self, 'content_initialized', False):
+            self.v = self.data['value']
 
     def _add_annotations(self, related_ids, resource):
         if self.AnnotationKey is not None:
@@ -149,8 +156,7 @@ class RelatedResourceByIdFilter(RelatedResourceFilter):
         found = []
 
         if self.data.get('match-resource') is True:
-            self.data['value'] = self.get_resource_value(
-                self.data['key'], resource)
+            self._set_match_value(resource)
 
         if self.data.get('value_type') == 'resource_count':
             count_matches = OPERATORS[self.data.get('op')](len(related_ids), self.data.get('value'))

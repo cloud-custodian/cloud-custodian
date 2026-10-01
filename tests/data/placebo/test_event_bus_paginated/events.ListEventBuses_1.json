@@ -1,0 +1,13 @@
+{
+ "status_code": 200,
+ "data": {
+  "EventBuses": [
+   {
+    "Name": "c7n-test-bus-page-one",
+    "Arn": "arn:aws:events:us-east-1:644160558196:event-bus/c7n-test-bus-page-one"
+   }
+  ],
+  "NextToken": "c2FtcGxlLW5leHQtdG9rZW4=",
+  "ResponseMetadata": {}
+ }
+}
