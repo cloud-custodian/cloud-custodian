@@ -1,0 +1,36 @@
+{
+    "status_code": 200,
+    "data": {
+        "ResponseMetadata": {},
+        "plugins": [
+            {
+                "pluginId": "7d4e9a02-3f61-4c8b-9e15-6a2f0c1b8d34",
+                "displayName": "c7n-test-plugin",
+                "type": "CUSTOM",
+                "serverUrl": "https://c7n-test-plugin.example.com",
+                "state": "ENABLED",
+                "buildStatus": "READY",
+                "createdAt": {
+                    "__class__": "datetime",
+                    "year": 2025,
+                    "month": 11,
+                    "day": 14,
+                    "hour": 9,
+                    "minute": 23,
+                    "second": 41,
+                    "microsecond": 512000
+                },
+                "updatedAt": {
+                    "__class__": "datetime",
+                    "year": 2026,
+                    "month": 5,
+                    "day": 2,
+                    "hour": 16,
+                    "minute": 7,
+                    "second": 18,
+                    "microsecond": 884000
+                }
+            }
+        ]
+    }
+}

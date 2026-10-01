@@ -42,7 +42,7 @@ dependencies = [
     "azure-mgmt-dataprotection<2.0.0,>=1.4.0",
     "azure-mgmt-desktopvirtualization<2.0.0,>=1.0.0",
     "azure-mgmt-dns==8.0.0b1",
-    "azure-mgmt-eventgrid<11.0.0,>=10.3.0b4",
+    "azure-mgmt-eventgrid<11.0.0,>=10.5.0b2",
     "azure-mgmt-eventhub<12.0.0,>=11.0.0",
     "azure-mgmt-frontdoor<2.0.0,>=1.0.0",
     "azure-mgmt-hdinsight<8.0.0,>=7.0.0",
@@ -89,7 +89,7 @@ dependencies = [
     "requests<3.0.0,>=2.22.0",
 ]
 name = "c7n_azure"
-version = "0.7.51"
+version = "0.7.52"
 description = "Cloud Custodian - Azure Support"
 readme = "readme.md"
 classifiers = [

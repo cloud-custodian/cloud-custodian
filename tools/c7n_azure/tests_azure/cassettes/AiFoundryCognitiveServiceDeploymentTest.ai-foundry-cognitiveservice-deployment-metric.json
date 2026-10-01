@@ -1,0 +1,690 @@
+{
+    "version": 1,
+    "interactions": [
+        {
+            "request": {
+                "method": "GET",
+                "uri": "https://management.azure.com/subscriptions/ea42f556-5106-4743-99b0-c129bfa71a47/providers/Microsoft.CognitiveServices/accounts?api-version=2025-06-01",
+                "body": null,
+                "headers": {}
+            },
+            "response": {
+                "status": {
+                    "code": 200,
+                    "message": "OK"
+                },
+                "headers": {
+                    "x-msedge-ref": [
+                        "Ref A: 6838DD0B86B444919A5282C85806DC0F Ref B: BL2AA2011003031 Ref C: 2026-09-11T19:41:33Z"
+                    ],
+                    "x-envoy-upstream-service-time": [
+                        "14"
+                    ],
+                    "content-length": [
+                        "637"
+                    ],
+                    "x-ms-original-request-ids": [
+                        "1932b8bb-e679-4921-a9dc-d3c9d9dfc4d3"
+                    ],
+                    "x-cache": [
+                        "CONFIG_NOCACHE"
+                    ],
+                    "date": [
+                        "Fri, 11 Sep 2026 19:41:32 GMT"
+                    ],
+                    "content-type": [
+                        "application/json; charset=utf-8"
+                    ],
+                    "cache-control": [
+                        "no-cache"
+                    ],
+                    "x-ms-ratelimit-remaining-subscription-global-reads": [
+                        "3749"
+                    ]
+                },
+                "body": {
+                    "data": {
+                        "value": [],
+                        "nextLink": "https://management.azure.com/subscriptions/ea42f556-5106-4743-99b0-c129bfa71a47/providers/Microsoft.CognitiveServices/accounts?api-version=2025-06-01&%24skiptoken=7VE9b8IwFPwvVtuJkA%2fAgkioimiRgshSKEFVFtt5BDfEjmwnkCL%2bew3q1oWhY4cb7t6X3t0ZCTiZJRelRuEZvUar9fsKhWhvTK1D162IIAVUIEyffDUK%2bkxWrm6oZorXhkuhXR%2fjHR6NsQOEUGeYM%2boQmIydgAKbjAKP0hy7tZItz0FpN%2bFMSS13pj%2bTheCGt7AC1XIG2iWMyUYY%2fUxq7rS22x6YBl4wcjzseP7Tgy55vZYliCl0i%2bZju%2ffW6bwjwaaLPyVPB4bF4q21vNnOYkzFRtPZyWqLPa3yw1UD%2f8hperjVLT8lL9HxLsyPfGlB0%2fnwuseiu2vuut%2fO7bZ%2bHgvvcZCjSw8RVUVFoaAgBvLbQ9bz6C1BvVseCVElKCuds59IMhRm%2f6H8MvzPQsnQBV2%2bAQ%3d%3d"
+                    }
+                }
+            }
+        },
+        {
+            "request": {
+                "method": "GET",
+                "uri": "https://management.azure.com/subscriptions/ea42f556-5106-4743-99b0-c129bfa71a47/providers/Microsoft.CognitiveServices/accounts?api-version=2025-06-01&$skiptoken=7VE9b8IwFPwvVtuJkA/AgkioimiRgshSKEFVFtt5BDfEjmwnkCL%2Bew3q1oWhY4cb7t6X3t0ZCTiZJRelRuEZvUar9fsKhWhvTK1D162IIAVUIEyffDUK%2BkxWrm6oZorXhkuhXR/jHR6NsQOEUGeYM%2BoQmIydgAKbjAKP0hy7tZItz0FpN%2BFMSS13pj%2BTheCGt7AC1XIG2iWMyUYY/Uxq7rS22x6YBl4wcjzseP7Tgy55vZYliCl0i%2BZju/fW6bwjwaaLPyVPB4bF4q21vNnOYkzFRtPZyWqLPa3yw1UD/8hperjVLT8lL9HxLsyPfGlB0/nwuseiu2vuut/O7bZ%2BHgvvcZCjSw8RVUVFoaAgBvLbQ9bz6C1BvVseCVElKCuds59IMhRm/6H8MvzPQsnQBV2%2BAQ%3D%3D",
+                "body": null,
+                "headers": {}
+            },
+            "response": {
+                "status": {
+                    "code": 200,
+                    "message": "OK"
+                },
+                "headers": {
+                    "x-msedge-ref": [
+                        "Ref A: 0731C7393889434EBA101E6FBB7A2DC4 Ref B: YQ1AA2090602054 Ref C: 2026-09-11T19:41:33Z"
+                    ],
+                    "x-envoy-upstream-service-time": [
+                        "14"
+                    ],
+                    "content-length": [
+                        "643"
+                    ],
+                    "x-ms-original-request-ids": [
+                        "63ff3dd3-5b22-4de5-b2cd-0717fe4f8abd"
+                    ],
+                    "x-cache": [
+                        "CONFIG_NOCACHE"
+                    ],
+                    "date": [
+                        "Fri, 11 Sep 2026 19:41:33 GMT"
+                    ],
+                    "content-type": [
+                        "application/json; charset=utf-8"
+                    ],
+                    "cache-control": [
+                        "no-cache"
+                    ],
+                    "x-ms-ratelimit-remaining-subscription-global-reads": [
+                        "3749"
+                    ]
+                },
+                "body": {
+                    "data": {
+                        "value": [],
+                        "nextLink": "https://management.azure.com/subscriptions/ea42f556-5106-4743-99b0-c129bfa71a47/providers/Microsoft.CognitiveServices/accounts?api-version=2025-06-01&%24skiptoken=7VHBTsJAFPyXjXqytBRogIQYUkVLaEwAaWO47G4fZW272%2bxuWyrh313QxIMH%2fQAPc5h5k%2fdeZo6Iw0EvGM8UGh%2fRw3S1flmhMdprXaqxbReY4xQK4LqD3ysJHSoKW1VEUclKzQRXdtfzdt5g6FmAMbH6CSUWhtHQcgnQ0cB1CEk8u5SiZglIZYeMSqHETnd8kXKmWQ0rkDWjoGxMqai4Vne4ZFZt3ObAxHXcgeV4ltO9uVIZK9ciAz6Bdl69xntnHc1a7G7a4E2wqKdpwJe14VXsBx7hG0X8g9Hme1Ik%2bVmDbsNIlF%2fmhrfh%2fbT5E2YNWxiQaNY%2f74n9%2beMyb9gu7iYBd657CTrdfof5zJ9EnphIjYhlMU1TCSnWkFy%2bNwFPlyH69IdYZiCNdNx%2b5b9F4%2b1%2fAz9a%2bbWBLTqh0wc%3d"
+                    }
+                }
+            }
+        },
+        {
+            "request": {
+                "method": "GET",
+                "uri": "https://management.azure.com/subscriptions/ea42f556-5106-4743-99b0-c129bfa71a47/providers/Microsoft.CognitiveServices/accounts?api-version=2025-06-01&$skiptoken=7VHBTsJAFPyXjXqytBRogIQYUkVLaEwAaWO47G4fZW272%2BxuWyrh313QxIMH/QAPc5h5k/deZo6Iw0EvGM8UGh/Rw3S1flmhMdprXaqxbReY4xQK4LqD3ysJHSoKW1VEUclKzQRXdtfzdt5g6FmAMbH6CSUWhtHQcgnQ0cB1CEk8u5SiZglIZYeMSqHETnd8kXKmWQ0rkDWjoGxMqai4Vne4ZFZt3ObAxHXcgeV4ltO9uVIZK9ciAz6Bdl69xntnHc1a7G7a4E2wqKdpwJe14VXsBx7hG0X8g9Hme1Ik%2BVmDbsNIlF/mhrfh/bT5E2YNWxiQaNY/74n9%2BeMyb9gu7iYBd657CTrdfof5zJ9EnphIjYhlMU1TCSnWkFy%2BNwFPlyH69IdYZiCNdNx%2B5b9F4%2B1/Az9a%2BbWBLTqh0wc%3D",
+                "body": null,
+                "headers": {}
+            },
+            "response": {
+                "status": {
+                    "code": 200,
+                    "message": "OK"
+                },
+                "headers": {
+                    "x-msedge-ref": [
+                        "Ref A: C8519699D6544A71BFB6F2B91DDE610F Ref B: YQ1AA2090601034 Ref C: 2026-09-11T19:41:34Z"
+                    ],
+                    "x-envoy-upstream-service-time": [
+                        "31"
+                    ],
+                    "content-length": [
+                        "5777"
+                    ],
+                    "x-ms-original-request-ids": [
+                        "9a46de96-7bb2-4f6b-9ec9-04ec608faa75"
+                    ],
+                    "x-cache": [
+                        "CONFIG_NOCACHE"
+                    ],
+                    "date": [
+                        "Fri, 11 Sep 2026 19:41:34 GMT"
+                    ],
+                    "content-type": [
+                        "application/json; charset=utf-8"
+                    ],
+                    "cache-control": [
+                        "no-cache"
+                    ],
+                    "x-ms-ratelimit-remaining-subscription-global-reads": [
+                        "3749"
+                    ]
+                },
+                "body": {
+                    "data": {
+                        "value": [
+                            {
+                                "id": "/subscriptions/ea42f556-5106-4743-99b0-c129bfa71a47/resourceGroups/test_cognitive-service-deployment/providers/Microsoft.CognitiveServices/accounts/cctestcogdeploy",
+                                "name": "cctestcogdeploy",
+                                "type": "Microsoft.CognitiveServices/accounts",
+                                "etag": "\"7d002376-0000-0100-0000-6aa455fc0000\"",
+                                "location": "eastus",
+                                "sku": {
+                                    "name": "S0"
+                                },
+                                "kind": "OpenAI",
+                                "properties": {
+                                    "endpoint": "https://cctestcogdeploy.openai.azure.com/",
+                                    "provisioningState": "Succeeded",
+                                    "internalId": "0d074c9ec6c8418fb9cd65d19aed7ab9",
+                                    "dateCreated": "2026-09-11T19:00:47.704445Z",
+                                    "apiProperties": {},
+                                    "callRateLimit": {
+                                        "rules": [
+                                            {
+                                                "key": "openai.dalle.post",
+                                                "renewalPeriod": 1,
+                                                "count": 30,
+                                                "matchPatterns": [
+                                                    {
+                                                        "path": "dalle/*",
+                                                        "method": "POST"
+                                                    },
+                                                    {
+                                                        "path": "openai/images/*",
+                                                        "method": "POST"
+                                                    }
+                                                ]
+                                            },
+                                            {
+                                                "key": "openai.dalle.other",
+                                                "renewalPeriod": 1,
+                                                "count": 30,
+                                                "matchPatterns": [
+                                                    {
+                                                        "path": "dalle/*",
+                                                        "method": "*"
+                                                    },
+                                                    {
+                                                        "path": "openai/operations/images/*",
+                                                        "method": "*"
+                                                    }
+                                                ]
+                                            },
+                                            {
+                                                "key": "openai.assistants.list",
+                                                "renewalPeriod": 60,
+                                                "count": 120,
+                                                "matchPatterns": [
+                                                    {
+                                                        "path": "openai/assistants",
+                                                        "method": "GET"
+                                                    }
+                                                ]
+                                            },
+                                            {
+                                                "key": "openai.threads.list",
+                                                "renewalPeriod": 60,
+                                                "count": 120,
+                                                "matchPatterns": [
+                                                    {
+                                                        "path": "openai/threads",
+                                                        "method": "GET"
+                                                    }
+                                                ]
+                                            },
+                                            {
+                                                "key": "openai.vectorstores.list",
+                                                "renewalPeriod": 60,
+                                                "count": 120,
+                                                "matchPatterns": [
+                                                    {
+                                                        "path": "openai/vector_stores",
+                                                        "method": "GET"
+                                                    }
+                                                ]
+                                            },
+                                            {
+                                                "key": "openai.vectorstores.post",
+                                                "renewalPeriod": 1,
+                                                "count": 60,
+                                                "matchPatterns": [
+                                                    {
+                                                        "path": "openai/vector_stores",
+                                                        "method": "POST"
+                                                    },
+                                                    {
+                                                        "path": "openai/vector_stores/*",
+                                                        "method": "POST"
+                                                    }
+                                                ]
+                                            },
+                                            {
+                                                "key": "openai.assistants.default",
+                                                "renewalPeriod": 60,
+                                                "count": 6000,
+                                                "matchPatterns": [
+                                                    {
+                                                        "path": "openai/assistants",
+                                                        "method": "*"
+                                                    },
+                                                    {
+                                                        "path": "openai/assistants/*",
+                                                        "method": "*"
+                                                    },
+                                                    {
+                                                        "path": "openai/threads",
+                                                        "method": "*"
+                                                    },
+                                                    {
+                                                        "path": "openai/threads/*",
+                                                        "method": "*"
+                                                    },
+                                                    {
+                                                        "path": "openai/vector_stores",
+                                                        "method": "*"
+                                                    },
+                                                    {
+                                                        "path": "openai/vector_stores/*",
+                                                        "method": "*"
+                                                    }
+                                                ]
+                                            },
+                                            {
+                                                "key": "openai.responses.default",
+                                                "renewalPeriod": 1,
+                                                "count": 100000,
+                                                "matchPatterns": [
+                                                    {
+                                                        "path": "openai/responses",
+                                                        "method": "*"
+                                                    },
+                                                    {
+                                                        "path": "openai/responses/*",
+                                                        "method": "*"
+                                                    }
+                                                ]
+                                            },
+                                            {
+                                                "key": "openai.batches.post",
+                                                "renewalPeriod": 60,
+                                                "count": 30,
+                                                "matchPatterns": [
+                                                    {
+                                                        "path": "openai/v1/batches",
+                                                        "method": "POST"
+                                                    },
+                                                    {
+                                                        "path": "openai/batches",
+                                                        "method": "POST"
+                                                    }
+                                                ]
+                                            },
+                                            {
+                                                "key": "openai.batches.get",
+                                                "renewalPeriod": 60,
+                                                "count": 500,
+                                                "matchPatterns": [
+                                                    {
+                                                        "path": "openai/v1/batches/*",
+                                                        "method": "GET"
+                                                    },
+                                                    {
+                                                        "path": "openai/batches/*",
+                                                        "method": "GET"
+                                                    }
+                                                ]
+                                            },
+                                            {
+                                                "key": "openai.batches.list",
+                                                "renewalPeriod": 60,
+                                                "count": 100,
+                                                "matchPatterns": [
+                                                    {
+                                                        "path": "openai/v1/batches",
+                                                        "method": "GET"
+                                                    },
+                                                    {
+                                                        "path": "openai/batches",
+                                                        "method": "GET"
+                                                    }
+                                                ]
+                                            },
+                                            {
+                                                "key": "openai.moderations.post",
+                                                "renewalPeriod": 60,
+                                                "count": 120,
+                                                "matchPatterns": [
+                                                    {
+                                                        "path": "openai/v1/moderations",
+                                                        "method": "POST"
+                                                    },
+                                                    {
+                                                        "path": "openai/v1/moderations/exp/m4",
+                                                        "method": "POST"
+                                                    },
+                                                    {
+                                                        "path": "openai/v1/moderations/exp/safeberry",
+                                                        "method": "POST"
+                                                    },
+                                                    {
+                                                        "path": "openai/v1/safeberry/moderations",
+                                                        "method": "POST"
+                                                    }
+                                                ]
+                                            },
+                                            {
+                                                "key": "openai",
+                                                "renewalPeriod": 1,
+                                                "count": 30,
+                                                "matchPatterns": [
+                                                    {
+                                                        "path": "openai/*",
+                                                        "method": "*"
+                                                    }
+                                                ]
+                                            },
+                                            {
+                                                "key": "default",
+                                                "renewalPeriod": 1,
+                                                "count": 30,
+                                                "matchPatterns": [
+                                                    {
+                                                        "path": "*",
+                                                        "method": "*"
+                                                    }
+                                                ]
+                                            }
+                                        ]
+                                    },
+                                    "isMigrated": false,
+                                    "customSubDomainName": "cctestcogdeploy",
+                                    "allowProjectManagement": false,
+                                    "privateEndpointConnections": [],
+                                    "publicNetworkAccess": "Enabled",
+                                    "capabilities": [
+                                        {
+                                            "name": "VirtualNetworks"
+                                        },
+                                        {
+                                            "name": "CustomerManagedKey"
+                                        },
+                                        {
+                                            "name": "EnabledApimVnet",
+                                            "value": "true"
+                                        },
+                                        {
+                                            "name": "useEndpointRateLimiter",
+                                            "value": "Enabled"
+                                        },
+                                        {
+                                            "name": "MaxFineTuneCount",
+                                            "value": "500"
+                                        },
+                                        {
+                                            "name": "MaxRunningFineTuneCount",
+                                            "value": "3"
+                                        },
+                                        {
+                                            "name": "MaxUserFileCount",
+                                            "value": "100"
+                                        },
+                                        {
+                                            "name": "MaxTrainingFileSize",
+                                            "value": "512000000"
+                                        },
+                                        {
+                                            "name": "MaxUserFileImportDurationInHours",
+                                            "value": "1"
+                                        },
+                                        {
+                                            "name": "MaxFineTuneJobDurationInHours",
+                                            "value": "720"
+                                        },
+                                        {
+                                            "name": "MaxEvaluationRunDurationInHours",
+                                            "value": "5"
+                                        },
+                                        {
+                                            "name": "MaxRunningEvaluationCount",
+                                            "value": "5"
+                                        },
+                                        {
+                                            "name": "MaxRunningGlobalStandardFineTuneCount",
+                                            "value": "3"
+                                        },
+                                        {
+                                            "name": "TrustedServices",
+                                            "value": "Microsoft.CognitiveServices,Microsoft.MachineLearningServices,Microsoft.Search,Microsoft.VideoIndexer"
+                                        },
+                                        {
+                                            "name": "NetworkSecurityPerimeter"
+                                        },
+                                        {
+                                            "name": "RaiMonitor"
+                                        },
+                                        {
+                                            "name": "quotaRefundsEnabled",
+                                            "value": "false"
+                                        }
+                                    ],
+                                    "endpoints": {
+                                        "OpenAI Language Model Instance API": "https://cctestcogdeploy.openai.azure.com/",
+                                        "OpenAI Dall-E API": "https://cctestcogdeploy.openai.azure.com/",
+                                        "OpenAI Sora API": "https://cctestcogdeploy.openai.azure.com/",
+                                        "OpenAI Moderations API": "https://cctestcogdeploy.openai.azure.com/",
+                                        "OpenAI Whisper API": "https://cctestcogdeploy.openai.azure.com/",
+                                        "OpenAI Model Scaleset API": "https://cctestcogdeploy.openai.azure.com/",
+                                        "OpenAI Realtime API": "https://cctestcogdeploy.openai.azure.com/",
+                                        "Token Service API": "https://cctestcogdeploy.openai.azure.com/",
+                                        "Azure OpenAI Legacy API - Latest moniker": "https://cctestcogdeploy.openai.azure.com/",
+                                        "OpenAI Response API on Websocket": "https://cctestcogdeploy.openai.azure.com/",
+                                        "OpenAI Realtime Translation WebSocket API": "https://cctestcogdeploy.openai.azure.com/",
+                                        "OpenAI Realtime Live WebSocket API": "https://cctestcogdeploy.openai.azure.com/"
+                                    }
+                                },
+                                "systemData": {
+                                    "createdBy": "test@example.com",
+                                    "createdByType": "User",
+                                    "createdAt": "2026-09-11T19:00:47.0950693Z",
+                                    "lastModifiedBy": "test@example.com",
+                                    "lastModifiedByType": "User",
+                                    "lastModifiedAt": "2026-09-11T19:26:17.286859Z"
+                                }
+                            }
+                        ],
+                        "nextLink": "https://management.azure.com/subscriptions/ea42f556-5106-4743-99b0-c129bfa71a47/providers/Microsoft.CognitiveServices/accounts?api-version=2025-06-01&%24skiptoken=7VHLTsJAFP2Xibqy9AE00IQYgqIlNiaAQEw387iUse1MMzMtr%2fDvDmjiwoV%2bgIuzOOee3HtzzhEJ2JlnLnKNoiN6GM7mrzMUoY0xlY5ct8QCZ1CCMC18qBW0qCxdXRNNFa8Ml0K7fhiuw24vdABj4nQYJQ6Gfs8JCNB%2bN%2fAIYaFbKdlwBkq7CadKark2rZHMBDe8gRmohlPQLqZU1sLoO1xxp7Fue2AQeEHX8ULH82%2budM6rucxBDGA%2fqd9WG2%2b%2bHO9xsNjH75Iv24bGYtpYXq9GcUjEQpPRzmqTDSlZcdbA33KyLC5zyw%2fJ%2fXD7J4y3%2fNmCLMed857VaPI4LbZ8vfJZLLzrNkOn2%2b8wX8STLJiN1IpYlcMsU5BhA%2bzyvQ14OE3Qpz%2fBKgdlpWP6lX%2bKovS%2fgR%2bt%2fNpAik7o9AE%3d"
+                    }
+                }
+            }
+        },
+        {
+            "request": {
+                "method": "GET",
+                "uri": "https://management.azure.com/subscriptions/ea42f556-5106-4743-99b0-c129bfa71a47/providers/Microsoft.CognitiveServices/accounts?api-version=2025-06-01&$skiptoken=7VHLTsJAFP2Xibqy9AE00IQYgqIlNiaAQEw387iUse1MMzMtr/DvDmjiwoV%2BgIuzOOee3HtzzhEJ2JlnLnKNoiN6GM7mrzMUoY0xlY5ct8QCZ1CCMC18qBW0qCxdXRNNFa8Ml0K7fhiuw24vdABj4nQYJQ6Gfs8JCNB%2BN/AIYaFbKdlwBkq7CadKark2rZHMBDe8gRmohlPQLqZU1sLoO1xxp7Fue2AQeEHX8ULH82%2BudM6rucxBDGA/qd9WG2%2B%2BHO9xsNjH75Iv24bGYtpYXq9GcUjEQpPRzmqTDSlZcdbA33KyLC5zyw/J/XD7J4y3/NmCLMed857VaPI4LbZ8vfJZLLzrNkOn2%2B8wX8STLJiN1IpYlcMsU5BhA%2BzyvQ14OE3Qpz/BKgdlpWP6lX%2BKovS/gR%2Bt/NpAik7o9AE%3D",
+                "body": null,
+                "headers": {}
+            },
+            "response": {
+                "status": {
+                    "code": 200,
+                    "message": "OK"
+                },
+                "headers": {
+                    "x-msedge-ref": [
+                        "Ref A: A206CE8DCF314CD68AD40276CBDB2DDE Ref B: MNZ221060610047 Ref C: 2026-09-11T19:41:35Z"
+                    ],
+                    "x-envoy-upstream-service-time": [
+                        "19"
+                    ],
+                    "content-length": [
+                        "12"
+                    ],
+                    "x-ms-original-request-ids": [
+                        "788590c8-1484-43c0-add0-9ab5e4b91fba"
+                    ],
+                    "x-cache": [
+                        "CONFIG_NOCACHE"
+                    ],
+                    "date": [
+                        "Fri, 11 Sep 2026 19:41:35 GMT"
+                    ],
+                    "content-type": [
+                        "application/json; charset=utf-8"
+                    ],
+                    "cache-control": [
+                        "no-cache"
+                    ],
+                    "x-ms-ratelimit-remaining-subscription-global-reads": [
+                        "3749"
+                    ]
+                },
+                "body": {
+                    "data": {
+                        "value": []
+                    }
+                }
+            }
+        },
+        {
+            "request": {
+                "method": "GET",
+                "uri": "https://management.azure.com//subscriptions/ea42f556-5106-4743-99b0-c129bfa71a47/resourceGroups/test_cognitive-service-deployment/providers/Microsoft.CognitiveServices/accounts/cctestcogdeploy/deployments?api-version=2024-10-01",
+                "body": null,
+                "headers": {}
+            },
+            "response": {
+                "status": {
+                    "code": 200,
+                    "message": "OK"
+                },
+                "headers": {
+                    "x-msedge-ref": [
+                        "Ref A: 721138783B054B14BCA5B39B894D74F2 Ref B: YQ1AA2090601062 Ref C: 2026-09-11T19:41:36Z"
+                    ],
+                    "x-envoy-upstream-service-time": [
+                        "32"
+                    ],
+                    "content-length": [
+                        "1088"
+                    ],
+                    "date": [
+                        "Fri, 11 Sep 2026 19:41:35 GMT"
+                    ],
+                    "x-cache": [
+                        "CONFIG_NOCACHE"
+                    ],
+                    "content-type": [
+                        "application/json; charset=utf-8"
+                    ],
+                    "cache-control": [
+                        "no-cache"
+                    ],
+                    "x-ms-ratelimit-remaining-subscription-global-reads": [
+                        "3749"
+                    ]
+                },
+                "body": {
+                    "data": {
+                        "value": [
+                            {
+                                "id": "/subscriptions/ea42f556-5106-4743-99b0-c129bfa71a47/resourceGroups/test_cognitive-service-deployment/providers/Microsoft.CognitiveServices/accounts/cctestcogdeploy/deployments/cctest-gpt4o-mini",
+                                "type": "Microsoft.CognitiveServices/accounts/deployments",
+                                "name": "cctest-gpt4o-mini",
+                                "sku": {
+                                    "name": "GlobalStandard",
+                                    "capacity": 1
+                                },
+                                "properties": {
+                                    "model": {
+                                        "format": "OpenAI",
+                                        "name": "gpt-5-nano",
+                                        "version": "2025-08-07"
+                                    },
+                                    "versionUpgradeOption": "OnceNewDefaultVersionAvailable",
+                                    "currentCapacity": 1,
+                                    "capabilities": {
+                                        "area": "US",
+                                        "chatCompletion": "true",
+                                        "responses": "true",
+                                        "agentsV2": "true",
+                                        "assistants": "true"
+                                    },
+                                    "raiPolicyName": "Microsoft.DefaultV2",
+                                    "provisioningState": "Succeeded",
+                                    "rateLimits": [
+                                        {
+                                            "key": "request",
+                                            "renewalPeriod": 60,
+                                            "count": 1
+                                        },
+                                        {
+                                            "key": "token",
+                                            "renewalPeriod": 60,
+                                            "count": 1000
+                                        }
+                                    ]
+                                },
+                                "systemData": {
+                                    "createdBy": "test@example.com",
+                                    "createdByType": "User",
+                                    "createdAt": "2026-09-11T19:26:50.364454Z",
+                                    "lastModifiedBy": "test@example.com",
+                                    "lastModifiedByType": "User",
+                                    "lastModifiedAt": "2026-09-11T19:26:50.364454Z"
+                                },
+                                "etag": "\"f3938b46-af9b-44f8-b7a3-261f5e435935\""
+                            }
+                        ]
+                    }
+                }
+            }
+        },
+        {
+            "request": {
+                "method": "GET",
+                "uri": "https://management.azure.com/subscriptions/ea42f556-5106-4743-99b0-c129bfa71a47/resourceGroups/test_cognitive-service-deployment/providers/Microsoft.CognitiveServices/accounts/cctestcogdeploy/providers/microsoft.insights/metrics?timespan=2026-09-04%2023%3A59%3A59%2F2026-09-11%2023%3A59%3A59&interval=P1D&metricnames=AzureOpenAIRequests&aggregation=total&$filter=ModelDeploymentName%20eq%20%27cctest-gpt4o-mini%27&api-version=2018-01-01&metricnamespace=Microsoft.CognitiveServices%2Faccounts",
+                "body": null,
+                "headers": {}
+            },
+            "response": {
+                "status": {
+                    "code": 200,
+                    "message": "OK"
+                },
+                "headers": {
+                    "x-msedge-ref": [
+                        "Ref A: 7BF3C6AE8DC243398E8C0D7FA787B50B Ref B: MNZ221060618045 Ref C: 2026-09-11T19:41:37Z"
+                    ],
+                    "x-envoy-upstream-service-time": [
+                        "51"
+                    ],
+                    "mise-correlation-id": [
+                        "d7936be2-923a-4f65-b41a-3c490be6bbd3"
+                    ],
+                    "content-length": [
+                        "1034"
+                    ],
+                    "date": [
+                        "Fri, 11 Sep 2026 19:41:37 GMT"
+                    ],
+                    "x-cache": [
+                        "CONFIG_NOCACHE"
+                    ],
+                    "content-type": [
+                        "application/json; charset=utf-8"
+                    ],
+                    "cache-control": [
+                        "no-cache"
+                    ],
+                    "x-ms-ratelimit-remaining-subscription-resource-requests": [
+                        "999"
+                    ]
+                },
+                "body": {
+                    "data": {
+                        "cost": 10079,
+                        "timespan": "2026-09-04T23:59:59Z/2026-09-11T23:59:59Z",
+                        "interval": "P1D",
+                        "value": [
+                            {
+                                "id": "/subscriptions/ea42f556-5106-4743-99b0-c129bfa71a47/resourceGroups/test_cognitive-service-deployment/providers/Microsoft.CognitiveServices/accounts/cctestcogdeploy/providers/Microsoft.Insights/metrics/AzureOpenAIRequests",
+                                "type": "Microsoft.Insights/metrics",
+                                "name": {
+                                    "value": "AzureOpenAIRequests",
+                                    "localizedValue": "Azure OpenAI Requests"
+                                },
+                                "displayDescription": "Number of calls made to the Azure OpenAI API over a period of time. Applies to PTU, PTU-Managed and Pay-as-you-go deployments. To breakdown API requests, you can add a filter or apply splitting by the following dimensions: ModelDeploymentName, ModelName, ModelVersion, StatusCode (successful, clienterrors, server errors), IsSpillover for spillover information, ServiceTier, StreamType (Streaming vs non-streaming requests) and operation.",
+                                "unit": "Count",
+                                "timeseries": [],
+                                "errorCode": "Success"
+                            }
+                        ],
+                        "namespace": "Microsoft.CognitiveServices/accounts",
+                        "resourceregion": "eastus"
+                    }
+                }
+            }
+        }
+    ]
+}
