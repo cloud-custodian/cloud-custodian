@@ -1,0 +1,1851 @@
+{
+  "headers": {
+    "content-type": "application/json; charset=UTF-8",
+    "vary": "Origin, X-Origin, Referer",
+    "date": "Tue, 29 Sep 2026 21:32:44 GMT",
+    "server": "ESF",
+    "x-xss-protection": "0",
+    "x-frame-options": "SAMEORIGIN",
+    "x-content-type-options": "nosniff",
+    "alt-svc": "h3=\":443\"; ma=2592000,h3-29=\":443\"; ma=2592000",
+    "transfer-encoding": "chunked",
+    "status": "200",
+    "content-length": "63848",
+    "-content-encoding": "gzip",
+    "content-location": "https://serviceusage.googleapis.com/v1/projects/cloud-custodian/services:batchGet?names=projects%2Fcloud-custodian%2Fservices%2Fcloudasset.googleapis.com&names=projects%2Fcloud-custodian%2Fservices%2Fserviceusage.googleapis.com&alt=json"
+  },
+  "body": {
+    "services": [
+      {
+        "name": "projects/cloud-custodian/services/cloudasset.googleapis.com",
+        "config": {
+          "name": "cloudasset.googleapis.com",
+          "title": "Cloud Asset API",
+          "apis": [
+            {
+              "name": "google.longrunning.Operations",
+              "methods": [
+                {
+                  "name": "GetOperation"
+                }
+              ],
+              "version": "v1"
+            },
+            {
+              "name": "google.cloud.asset.v1.AssetService",
+              "methods": [
+                {
+                  "name": "ExportAssets"
+                },
+                {
+                  "name": "ListAssets"
+                },
+                {
+                  "name": "BatchGetAssetsHistory"
+                },
+                {
+                  "name": "CreateFeed"
+                },
+                {
+                  "name": "GetFeed"
+                },
+                {
+                  "name": "ListFeeds"
+                },
+                {
+                  "name": "UpdateFeed"
+                },
+                {
+                  "name": "DeleteFeed"
+                },
+                {
+                  "name": "SearchAllResources"
+                },
+                {
+                  "name": "SearchAllIamPolicies"
+                },
+                {
+                  "name": "AnalyzeIamPolicy"
+                },
+                {
+                  "name": "AnalyzeIamPolicyLongrunning"
+                },
+                {
+                  "name": "AnalyzeMove"
+                },
+                {
+                  "name": "QueryAssets"
+                },
+                {
+                  "name": "CreateSavedQuery"
+                },
+                {
+                  "name": "GetSavedQuery"
+                },
+                {
+                  "name": "ListSavedQueries"
+                },
+                {
+                  "name": "UpdateSavedQuery"
+                },
+                {
+                  "name": "DeleteSavedQuery"
+                },
+                {
+                  "name": "BatchGetEffectiveIamPolicies"
+                },
+                {
+                  "name": "AnalyzeOrgPolicies"
+                },
+                {
+                  "name": "AnalyzeOrgPolicyGovernedContainers"
+                },
+                {
+                  "name": "AnalyzeOrgPolicyGovernedAssets"
+                }
+              ],
+              "version": "v1"
+            },
+            {
+              "name": "google.cloud.asset.v1beta1.AssetService",
+              "methods": [
+                {
+                  "name": "ExportAssets"
+                },
+                {
+                  "name": "BatchGetAssetsHistory"
+                }
+              ],
+              "version": "v1beta1"
+            },
+            {
+              "name": "google.cloud.asset.v1p1beta1.AssetService",
+              "methods": [
+                {
+                  "name": "SearchAllResources"
+                },
+                {
+                  "name": "SearchAllIamPolicies"
+                }
+              ],
+              "version": "v1p1beta1"
+            },
+            {
+              "name": "google.cloud.asset.v1p2beta1.AssetService",
+              "methods": [
+                {
+                  "name": "CreateFeed"
+                },
+                {
+                  "name": "GetFeed"
+                },
+                {
+                  "name": "ListFeeds"
+                },
+                {
+                  "name": "UpdateFeed"
+                },
+                {
+                  "name": "DeleteFeed"
+                }
+              ],
+              "version": "v1p2beta1"
+            },
+            {
+              "name": "google.cloud.asset.v1p5beta1.AssetService",
+              "methods": [
+                {
+                  "name": "ListAssets"
+                }
+              ],
+              "version": "v1p5beta1"
+            },
+            {
+              "name": "google.cloud.asset.v1p7beta1.AssetService",
+              "methods": [
+                {
+                  "name": "ExportAssets"
+                }
+              ],
+              "version": "v1p7beta1"
+            },
+            {
+              "name": "google.discovery.Discovery",
+              "methods": [
+                {
+                  "name": "GetDiscovery"
+                },
+                {
+                  "name": "GetDiscoveryRest"
+                }
+              ],
+              "version": "v1"
+            }
+          ],
+          "documentation": {
+            "summary": "The Cloud Asset API manages the history and inventory of Google Cloud resources."
+          },
+          "quota": {
+            "limits": [
+              {
+                "name": "queryAssetsWithStatementQpmPerNoOrgProject",
+                "metric": "cloudasset.googleapis.com/query_assets_statement_requests_per_standalone_project",
+                "unit": "1/min/{project}",
+                "values": {
+                  "STANDARD": "20"
+                }
+              },
+              {
+                "name": "queryAssetsWithJobReferenceQpmPerNoOrgProject",
+                "metric": "cloudasset.googleapis.com/query_assets_jobreference_requests_per_standalone_project",
+                "unit": "1/min/{project}",
+                "values": {
+                  "STANDARD": "200"
+                }
+              },
+              {
+                "name": "queryAssetsWithStatementQpmPerOrganization",
+                "metric": "cloudasset.googleapis.com/query_assets_statement_requests_per_organization",
+                "unit": "1/min/{organization}",
+                "values": {
+                  "STANDARD": "280"
+                }
+              },
+              {
+                "name": "queryAssetsWithJobReferenceQpmPerOrganization",
+                "metric": "cloudasset.googleapis.com/query_assets_jobreference_requests_per_organization",
+                "unit": "1/min/{organization}",
+                "values": {
+                  "STANDARD": "200"
+                }
+              },
+              {
+                "name": "traverseGraphQpmPerProject",
+                "metric": "cloudasset.googleapis.com/traverse_graph_requests",
+                "unit": "1/min/{project}",
+                "values": {
+                  "STANDARD": "20"
+                }
+              },
+              {
+                "name": "exportAssetsQpmPerProject",
+                "metric": "cloudasset.googleapis.com/export_assets_requests",
+                "unit": "1/min/{project}",
+                "values": {
+                  "STANDARD": "60"
+                }
+              },
+              {
+                "name": "exportAssetsQpdPerProject",
+                "metric": "cloudasset.googleapis.com/export_assets_requests",
+                "unit": "1/d/{project}",
+                "values": {
+                  "STANDARD": "6000"
+                }
+              },
+              {
+                "name": "exportAssetsQpmPerNoOrgProject",
+                "metric": "cloudasset.googleapis.com/export_assets_requests_per_standalone_project",
+                "unit": "1/min/{project}",
+                "values": {
+                  "STANDARD": "-1"
+                }
+              },
+              {
+                "name": "exportAssetsQpdPerNoOrgProject",
+                "metric": "cloudasset.googleapis.com/export_assets_requests_per_standalone_project",
+                "unit": "1/d/{project}",
+                "values": {
+                  "STANDARD": "-1"
+                }
+              },
+              {
+                "name": "exportAssetsQpmPerOrg",
+                "metric": "cloudasset.googleapis.com/export_assets_requests_per_organization",
+                "unit": "1/min/{organization}",
+                "values": {
+                  "STANDARD": "75"
+                }
+              },
+              {
+                "name": "exportAssetsQpdPerOrg",
+                "metric": "cloudasset.googleapis.com/export_assets_requests_per_organization",
+                "unit": "1/d/{organization}",
+                "values": {
+                  "STANDARD": "7200"
+                }
+              },
+              {
+                "name": "batchGetAssetsHistoryQpmPerProject",
+                "metric": "cloudasset.googleapis.com/batch_get_assets_history_requests",
+                "unit": "1/min/{project}",
+                "values": {
+                  "STANDARD": "100"
+                }
+              },
+              {
+                "name": "batchGetAssetsHistoryQpmPerNoOrgProject",
+                "metric": "cloudasset.googleapis.com/batch_get_assets_history_requests_per_standalone_project",
+                "unit": "1/min/{project}",
+                "values": {
+                  "STANDARD": "-1"
+                }
+              },
+              {
+                "name": "batchGetAssetsHistoryQpmPerOrg",
+                "metric": "cloudasset.googleapis.com/batch_get_assets_history_requests_per_organization",
+                "unit": "1/min/{organization}",
+                "values": {
+                  "STANDARD": "180"
+                }
+              },
+              {
+                "name": "operationsQpmPerProject",
+                "metric": "cloudasset.googleapis.com/operations_requests",
+                "unit": "1/min/{project}",
+                "values": {
+                  "STANDARD": "600"
+                }
+              },
+              {
+                "name": "apiSearchAllResourcesQpmPerProject",
+                "metric": "cloudasset.googleapis.com/search_all_resources_requests",
+                "unit": "1/min/{project}",
+                "values": {
+                  "STANDARD": "400"
+                }
+              },
+              {
+                "name": "apiSearchAllResourcesQpmPerStandaloneProject",
+                "metric": "cloudasset.googleapis.com/search_all_resources_requests_per_standalone_project",
+                "unit": "1/min/{project}",
+                "values": {
+                  "STANDARD": "400"
+                }
+              },
+              {
+                "name": "apiSearchAllResourcesQpmPerOrg",
+                "metric": "cloudasset.googleapis.com/search_all_resources_requests_per_organization",
+                "unit": "1/min/{organization}",
+                "values": {
+                  "STANDARD": "1500"
+                }
+              },
+              {
+                "name": "apiSearchAllIamPoliciesQpmPerProject",
+                "metric": "cloudasset.googleapis.com/search_all_iam_policies_requests",
+                "unit": "1/min/{project}",
+                "values": {
+                  "STANDARD": "400"
+                }
+              },
+              {
+                "name": "apiSearchAllIamPoliciesQpmPerStandaloneProject",
+                "metric": "cloudasset.googleapis.com/search_all_iam_policies_requests_per_standalone_project",
+                "unit": "1/min/{project}",
+                "values": {
+                  "STANDARD": "400"
+                }
+              },
+              {
+                "name": "apiSearchAllIamPoliciesQpmPerOrg",
+                "metric": "cloudasset.googleapis.com/search_all_iam_policies_requests_per_organization",
+                "unit": "1/min/{organization}",
+                "values": {
+                  "STANDARD": "3000"
+                }
+              },
+              {
+                "name": "apiFeedQpmPerProject",
+                "metric": "cloudasset.googleapis.com/feed_requests",
+                "unit": "1/min/{project}",
+                "values": {
+                  "STANDARD": "600"
+                }
+              },
+              {
+                "name": "apiFeedQpmPerNoOrgProject",
+                "metric": "cloudasset.googleapis.com/feed_requests_per_standalone_project",
+                "unit": "1/min/{project}",
+                "values": {
+                  "STANDARD": "-1"
+                }
+              },
+              {
+                "name": "apiFeedQpmPerOrg",
+                "metric": "cloudasset.googleapis.com/feed_requests_per_organization",
+                "unit": "1/min/{organization}",
+                "values": {
+                  "STANDARD": "30"
+                }
+              },
+              {
+                "name": "apiSavedQueryQpmPerProject",
+                "metric": "cloudasset.googleapis.com/saved_query_requests",
+                "unit": "1/min/{project}",
+                "values": {
+                  "STANDARD": "600"
+                }
+              },
+              {
+                "name": "apiSavedQueryQpdPerNoOrgProject",
+                "metric": "cloudasset.googleapis.com/saved_query_requests_per_standalone_project",
+                "unit": "1/d/{project}",
+                "values": {
+                  "STANDARD": "-1"
+                }
+              },
+              {
+                "name": "apiSavedQueryQpdPerOrg",
+                "metric": "cloudasset.googleapis.com/saved_query_requests_per_organization",
+                "unit": "1/d/{organization}",
+                "values": {
+                  "STANDARD": "-1"
+                }
+              },
+              {
+                "name": "queryAssetTypesQpmPerProject",
+                "metric": "cloudasset.googleapis.com/query_asset_types_requests",
+                "unit": "1/min/{project}",
+                "values": {
+                  "STANDARD": "100"
+                }
+              },
+              {
+                "name": "analyzeIamPolicyQpmPerProject",
+                "metric": "cloudasset.googleapis.com/analyze_iam_policy_requests",
+                "unit": "1/min/{project}",
+                "values": {
+                  "STANDARD": "100"
+                }
+              },
+              {
+                "name": "analyzeIamPolicyQpdPerProject",
+                "metric": "cloudasset.googleapis.com/analyze_iam_policy_requests",
+                "unit": "1/d/{project}",
+                "values": {
+                  "VERY_HIGH": "4000",
+                  "VERY_LOW": "40",
+                  "LOW": "200",
+                  "STANDARD": "400",
+                  "HIGH": "1000"
+                }
+              },
+              {
+                "name": "analyzeIamPolicyQpdPerNoOrgProject",
+                "metric": "cloudasset.googleapis.com/analyze_iam_policy_requests_per_standalone_project",
+                "unit": "1/d/{project}",
+                "values": {
+                  "STANDARD": "-1"
+                }
+              },
+              {
+                "name": "analyzeIamPolicyQpdPerOrganization",
+                "metric": "cloudasset.googleapis.com/analyze_iam_policy_requests_per_organization",
+                "unit": "1/d/{organization}",
+                "values": {
+                  "STANDARD": "-1"
+                }
+              },
+              {
+                "name": "AnalyzeIamPolicyLongrunningQpmPerProject",
+                "metric": "cloudasset.googleapis.com/analyze_iam_policy_longrunning_requests",
+                "unit": "1/min/{project}",
+                "values": {
+                  "STANDARD": "100"
+                }
+              },
+              {
+                "name": "AnalyzeIamPolicyLongrunningQpdPerProject",
+                "metric": "cloudasset.googleapis.com/analyze_iam_policy_longrunning_requests",
+                "unit": "1/d/{project}",
+                "values": {
+                  "VERY_LOW": "40",
+                  "LOW": "200",
+                  "STANDARD": "400",
+                  "HIGH": "1000",
+                  "VERY_HIGH": "4000"
+                }
+              },
+              {
+                "name": "analyzeIamPolicyLongrunningQpdPerNoOrgProject",
+                "metric": "cloudasset.googleapis.com/analyze_iam_policy_longrunning_requests_per_standalone_project",
+                "unit": "1/d/{project}",
+                "values": {
+                  "STANDARD": "-1"
+                }
+              },
+              {
+                "name": "analyzeIamPolicyLongrunningQpdPerOrganization",
+                "metric": "cloudasset.googleapis.com/analyze_iam_policy_longrunning_requests_per_organization",
+                "unit": "1/d/{organization}",
+                "values": {
+                  "STANDARD": "-1"
+                }
+              },
+              {
+                "name": "batchGetEffectiveIamPoliciesQpmPerProject",
+                "metric": "cloudasset.googleapis.com/batch_get_effective_iam_policies_requests",
+                "unit": "1/min/{project}",
+                "values": {
+                  "STANDARD": "100"
+                }
+              },
+              {
+                "name": "batchGetEffectiveIamPoliciesQpdPerNoOrgProject",
+                "metric": "cloudasset.googleapis.com/batch_get_effective_iam_policies_requests_per_standalone_project",
+                "unit": "1/d/{project}",
+                "values": {
+                  "STANDARD": "-1"
+                }
+              },
+              {
+                "name": "batchGetEffectiveIamPoliciesQpdPerOrg",
+                "metric": "cloudasset.googleapis.com/batch_get_effective_iam_policies_requests_per_organization",
+                "unit": "1/d/{organization}",
+                "values": {
+                  "STANDARD": "-1"
+                }
+              },
+              {
+                "name": "listEffectiveIamDenyPoliciesQpmPerProject",
+                "metric": "cloudasset.googleapis.com/list_effective_iam_deny_policies_requests",
+                "unit": "1/min/{project}",
+                "values": {
+                  "STANDARD": "100"
+                }
+              },
+              {
+                "name": "listEffectiveIamDenyPoliciesQpdPerNoOrgProject",
+                "metric": "cloudasset.googleapis.com/list_effective_iam_deny_policies_requests_per_standalone_project",
+                "unit": "1/d/{project}",
+                "values": {
+                  "STANDARD": "-1"
+                }
+              },
+              {
+                "name": "listEffectiveIamDenyPoliciesQpdPerOrg",
+                "metric": "cloudasset.googleapis.com/list_effective_iam_deny_policies_requests_per_organization",
+                "unit": "1/d/{organization}",
+                "values": {
+                  "STANDARD": "-1"
+                }
+              },
+              {
+                "name": "analyzeOrgPolicyGovernedAssetsQpmPerProject",
+                "metric": "cloudasset.googleapis.com/analyze_org_policy_governed_assets_requests",
+                "unit": "1/min/{project}",
+                "values": {
+                  "STANDARD": "100"
+                }
+              },
+              {
+                "name": "analyzeOrgPolicyGovernedAssetsQpdPerNoOrgProject",
+                "metric": "cloudasset.googleapis.com/analyze_org_policy_governed_assets_requests_per_standalone_project",
+                "unit": "1/d/{project}",
+                "values": {
+                  "STANDARD": "-1"
+                }
+              },
+              {
+                "name": "analyzeOrgPolicyGovernedAssetsQpdPerOrg",
+                "metric": "cloudasset.googleapis.com/analyze_org_policy_governed_assets_requests_per_organization",
+                "unit": "1/d/{organization}",
+                "values": {
+                  "STANDARD": "-1"
+                }
+              },
+              {
+                "name": "analyzeOrgPolicyGovernedContainersQpmPerProject",
+                "metric": "cloudasset.googleapis.com/analyze_org_policy_governed_containers_requests",
+                "unit": "1/min/{project}",
+                "values": {
+                  "STANDARD": "100"
+                }
+              },
+              {
+                "name": "analyzeOrgPolicyGovernedContainersQpdPerNoOrgProject",
+                "metric": "cloudasset.googleapis.com/analyze_org_policy_governed_containers_requests_per_standalone_project",
+                "unit": "1/d/{project}",
+                "values": {
+                  "STANDARD": "-1"
+                }
+              },
+              {
+                "name": "analyzeOrgPolicyGovernedContainersQpdPerOrg",
+                "metric": "cloudasset.googleapis.com/analyze_org_policy_governed_containers_requests_per_organization",
+                "unit": "1/d/{organization}",
+                "values": {
+                  "STANDARD": "-1"
+                }
+              },
+              {
+                "name": "analyzeOrgPoliciesQpmPerProject",
+                "metric": "cloudasset.googleapis.com/analyze_org_policies_requests",
+                "unit": "1/min/{project}",
+                "values": {
+                  "STANDARD": "100"
+                }
+              },
+              {
+                "name": "analyzeOrgPoliciesQpdPerNoOrgProject",
+                "metric": "cloudasset.googleapis.com/analyze_org_policies_requests_per_standalone_project",
+                "unit": "1/d/{project}",
+                "values": {
+                  "STANDARD": "-1"
+                }
+              },
+              {
+                "name": "analyzeOrgPoliciesQpdPerOrg",
+                "metric": "cloudasset.googleapis.com/analyze_org_policies_requests_per_organization",
+                "unit": "1/d/{organization}",
+                "values": {
+                  "STANDARD": "-1"
+                }
+              },
+              {
+                "name": "policyAnalyzerRequestsQpdPerNoOrgProject",
+                "metric": "cloudasset.googleapis.com/policy_analyzer_requests_per_standalone_project",
+                "unit": "1/d/{project}",
+                "values": {
+                  "STANDARD": "20"
+                }
+              },
+              {
+                "name": "policyAnalyzerRequestsQpdPerOrg",
+                "metric": "cloudasset.googleapis.com/policy_analyzer_requests_per_organization",
+                "unit": "1/d/{organization}",
+                "values": {
+                  "STANDARD": "20"
+                }
+              },
+              {
+                "name": "policyAnalyzerDiscoveryRequestsQpdPerNoOrgProject",
+                "metric": "cloudasset.googleapis.com/policy_analyzer_discovery_requests_per_standalone_project",
+                "unit": "1/d/{project}",
+                "values": {
+                  "STANDARD": "20"
+                }
+              },
+              {
+                "name": "policyAnalyzerDiscoveryRequestsQpdPerOrg",
+                "metric": "cloudasset.googleapis.com/policy_analyzer_discovery_requests_per_organization",
+                "unit": "1/d/{organization}",
+                "values": {
+                  "STANDARD": "20"
+                }
+              },
+              {
+                "name": "listAssetsQpmPerProject",
+                "metric": "cloudasset.googleapis.com/list_assets_requests",
+                "unit": "1/min/{project}",
+                "values": {
+                  "STANDARD": "100"
+                }
+              },
+              {
+                "name": "listAssetsQpmPerNoOrgProject",
+                "metric": "cloudasset.googleapis.com/list_assets_requests_per_standalone_project",
+                "unit": "1/min/{project}",
+                "values": {
+                  "STANDARD": "-1"
+                }
+              },
+              {
+                "name": "listAssetsQpmPerOrg",
+                "metric": "cloudasset.googleapis.com/list_assets_requests_per_organization",
+                "unit": "1/min/{organization}",
+                "values": {
+                  "STANDARD": "800"
+                }
+              },
+              {
+                "name": "analyzeMoveQpmPerProject",
+                "metric": "cloudasset.googleapis.com/analyze_move_requests",
+                "unit": "1/min/{project}",
+                "values": {
+                  "STANDARD": "30"
+                }
+              }
+            ]
+          },
+          "authentication": {
+            "rules": [
+              {
+                "oauth": {
+                  "canonicalScopes": "https://www.googleapis.com/auth/cloud-platform"
+                }
+              },
+              {
+                "oauth": {
+                  "canonicalScopes": "https://www.googleapis.com/auth/cloud-platform,\nhttps://www.googleapis.com/auth/cloudasset"
+                }
+              },
+              {
+                "oauth": {
+                  "canonicalScopes": "https://www.googleapis.com/auth/cloud-platform"
+                }
+              },
+              {
+                "oauth": {
+                  "canonicalScopes": "https://www.googleapis.com/auth/cloud-platform"
+                }
+              },
+              {
+                "oauth": {
+                  "canonicalScopes": "https://www.googleapis.com/auth/cloud-platform"
+                }
+              },
+              {
+                "oauth": {
+                  "canonicalScopes": "https://www.googleapis.com/auth/cloud-platform"
+                }
+              },
+              {
+                "oauth": {
+                  "canonicalScopes": "https://www.googleapis.com/auth/cloud-platform,\nhttps://www.googleapis.com/auth/cloudasset"
+                }
+              },
+              {
+                "oauth": {
+                  "canonicalScopes": "https://www.googleapis.com/auth/cloud-platform"
+                }
+              },
+              {
+                "oauth": {
+                  "canonicalScopes": "https://www.googleapis.com/auth/cloud-platform"
+                }
+              },
+              {
+                "oauth": {
+                  "canonicalScopes": "https://www.googleapis.com/auth/cloud-platform"
+                }
+              },
+              {
+                "oauth": {
+                  "canonicalScopes": "https://www.googleapis.com/auth/cloud-platform"
+                }
+              },
+              {
+                "oauth": {
+                  "canonicalScopes": "https://www.googleapis.com/auth/cloud-platform"
+                }
+              },
+              {
+                "oauth": {
+                  "canonicalScopes": "https://www.googleapis.com/auth/cloud-platform"
+                }
+              },
+              {
+                "oauth": {
+                  "canonicalScopes": "https://www.googleapis.com/auth/cloud-platform"
+                }
+              },
+              {
+                "oauth": {
+                  "canonicalScopes": "https://www.googleapis.com/auth/cloud-platform"
+                }
+              },
+              {
+                "oauth": {
+                  "canonicalScopes": "https://www.googleapis.com/auth/cloud-platform"
+                }
+              },
+              {
+                "oauth": {
+                  "canonicalScopes": "https://www.googleapis.com/auth/cloud-platform,\nhttps://www.googleapis.com/auth/cloudasset"
+                }
+              },
+              {
+                "oauth": {
+                  "canonicalScopes": "https://www.googleapis.com/auth/cloud-platform,\nhttps://www.googleapis.com/auth/cloudasset"
+                }
+              },
+              {
+                "oauth": {
+                  "canonicalScopes": "https://www.googleapis.com/auth/cloud-platform"
+                }
+              },
+              {
+                "oauth": {
+                  "canonicalScopes": "https://www.googleapis.com/auth/cloud-platform"
+                }
+              },
+              {
+                "oauth": {
+                  "canonicalScopes": "https://www.googleapis.com/auth/cloud-platform"
+                }
+              },
+              {
+                "oauth": {
+                  "canonicalScopes": "https://www.googleapis.com/auth/cloud-platform"
+                }
+              },
+              {
+                "oauth": {
+                  "canonicalScopes": "https://www.googleapis.com/auth/cloud-platform"
+                }
+              },
+              {
+                "oauth": {
+                  "canonicalScopes": "https://www.googleapis.com/auth/cloud-platform"
+                }
+              },
+              {
+                "oauth": {
+                  "canonicalScopes": "https://www.googleapis.com/auth/cloud-platform"
+                }
+              },
+              {
+                "oauth": {
+                  "canonicalScopes": "https://www.googleapis.com/auth/cloud-platform"
+                }
+              },
+              {
+                "oauth": {
+                  "canonicalScopes": "https://www.googleapis.com/auth/cloud-platform"
+                }
+              },
+              {
+                "oauth": {
+                  "canonicalScopes": "https://www.googleapis.com/auth/cloud-platform"
+                }
+              },
+              {
+                "oauth": {
+                  "canonicalScopes": "https://www.googleapis.com/auth/cloud-platform"
+                }
+              },
+              {
+                "oauth": {
+                  "canonicalScopes": "https://www.googleapis.com/auth/cloud-platform"
+                }
+              },
+              {
+                "oauth": {
+                  "canonicalScopes": "https://www.googleapis.com/auth/cloud-platform"
+                }
+              },
+              {
+                "oauth": {
+                  "canonicalScopes": "https://www.googleapis.com/auth/cloud-platform"
+                }
+              },
+              {
+                "oauth": {
+                  "canonicalScopes": "https://www.googleapis.com/auth/cloud-platform"
+                }
+              },
+              {
+                "oauth": {
+                  "canonicalScopes": "https://www.googleapis.com/auth/cloud-platform"
+                }
+              },
+              {
+                "oauth": {
+                  "canonicalScopes": "https://www.googleapis.com/auth/cloud-platform"
+                }
+              },
+              {
+                "oauth": {
+                  "canonicalScopes": "https://www.googleapis.com/auth/cloud-platform"
+                }
+              },
+              {
+                "oauth": {
+                  "canonicalScopes": "https://www.googleapis.com/auth/cloud-platform"
+                }
+              },
+              {
+                "oauth": {
+                  "canonicalScopes": "https://www.googleapis.com/auth/cloud-platform"
+                }
+              },
+              {
+                "oauth": {
+                  "canonicalScopes": "https://www.googleapis.com/auth/cloud-platform"
+                }
+              },
+              {
+                "oauth": {
+                  "canonicalScopes": "https://www.googleapis.com/auth/cloud-platform"
+                }
+              },
+              {
+                "oauth": {
+                  "canonicalScopes": "https://www.googleapis.com/auth/cloud-platform"
+                }
+              },
+              {
+                "oauth": {
+                  "canonicalScopes": "https://www.googleapis.com/auth/cloud-platform"
+                }
+              },
+              {
+                "oauth": {
+                  "canonicalScopes": "https://www.googleapis.com/auth/cloud-platform"
+                }
+              },
+              {
+                "oauth": {
+                  "canonicalScopes": "https://www.googleapis.com/auth/cloud-platform"
+                }
+              },
+              {
+                "oauth": {
+                  "canonicalScopes": "https://www.googleapis.com/auth/cloud-platform"
+                }
+              },
+              {
+                "oauth": {
+                  "canonicalScopes": "https://www.googleapis.com/auth/cloud-platform"
+                }
+              },
+              {
+                "oauth": {
+                  "canonicalScopes": "https://www.googleapis.com/auth/cloud-platform"
+                }
+              },
+              {
+                "oauth": {
+                  "canonicalScopes": "https://www.googleapis.com/auth/cloud-platform"
+                }
+              },
+              {
+                "oauth": {
+                  "canonicalScopes": "https://www.googleapis.com/auth/cloud-platform"
+                }
+              },
+              {
+                "oauth": {
+                  "canonicalScopes": "https://www.googleapis.com/auth/cloud-platform"
+                }
+              },
+              {
+                "oauth": {
+                  "canonicalScopes": "https://www.googleapis.com/auth/cloud-platform"
+                }
+              },
+              {
+                "oauth": {
+                  "canonicalScopes": "https://www.googleapis.com/auth/cloud-platform"
+                }
+              },
+              {
+                "oauth": {
+                  "canonicalScopes": "https://www.googleapis.com/auth/cloud-platform"
+                }
+              },
+              {
+                "oauth": {
+                  "canonicalScopes": "https://www.googleapis.com/auth/cloud-platform"
+                }
+              },
+              {
+                "oauth": {
+                  "canonicalScopes": "https://www.googleapis.com/auth/cloud-platform"
+                }
+              },
+              {
+                "oauth": {
+                  "canonicalScopes": "https://www.googleapis.com/auth/cloud-platform"
+                }
+              },
+              {
+                "oauth": {
+                  "canonicalScopes": "https://www.googleapis.com/auth/cloud-platform"
+                }
+              },
+              {
+                "oauth": {
+                  "canonicalScopes": "https://www.googleapis.com/auth/cloud-platform"
+                }
+              },
+              {
+                "oauth": {
+                  "canonicalScopes": "https://www.googleapis.com/auth/cloud-platform"
+                }
+              },
+              {
+                "oauth": {
+                  "canonicalScopes": "https://www.googleapis.com/auth/cloud-platform"
+                }
+              },
+              {
+                "oauth": {
+                  "canonicalScopes": "https://www.googleapis.com/auth/cloud-platform"
+                }
+              },
+              {
+                "oauth": {
+                  "canonicalScopes": "https://www.googleapis.com/auth/cloud-platform"
+                }
+              },
+              {
+                "oauth": {
+                  "canonicalScopes": "https://www.googleapis.com/auth/cloud-platform"
+                }
+              },
+              {
+                "oauth": {
+                  "canonicalScopes": "https://www.googleapis.com/auth/cloud-platform"
+                }
+              },
+              {
+                "oauth": {
+                  "canonicalScopes": "https://www.googleapis.com/auth/cloud-platform"
+                }
+              },
+              {},
+              {}
+            ]
+          },
+          "usage": {
+            "requirements": [
+              "serviceusage.googleapis.com/tos/cloud"
+            ]
+          },
+          "endpoints": [
+            {
+              "name": "cloudasset.googleapis.com"
+            },
+            {
+              "name": "cloudasset.clients6.google.com"
+            },
+            {
+              "name": "content-cloudasset.googleapis.com"
+            },
+            {
+              "name": "cloudasset.mtls.googleapis.com"
+            },
+            {
+              "name": "cloudasset.mtls.clients6.google.com"
+            },
+            {
+              "name": "content-cloudasset.mtls.googleapis.com"
+            }
+          ],
+          "monitoring": {}
+        },
+        "state": "DISABLED",
+        "parent": "projects/926761696986"
+      },
+      {
+        "name": "projects/cloud-custodian/services/serviceusage.googleapis.com",
+        "config": {
+          "name": "serviceusage.googleapis.com",
+          "title": "Service Usage API",
+          "apis": [
+            {
+              "name": "google.longrunning.Operations",
+              "methods": [
+                {
+                  "name": "ListOperations"
+                },
+                {
+                  "name": "GetOperation"
+                },
+                {
+                  "name": "DeleteOperation"
+                },
+                {
+                  "name": "CancelOperation"
+                },
+                {
+                  "name": "WaitOperation"
+                }
+              ],
+              "version": "v1"
+            },
+            {
+              "name": "google.api.serviceusage.v1.ServiceUsage",
+              "methods": [
+                {
+                  "name": "EnableService"
+                },
+                {
+                  "name": "DisableService"
+                },
+                {
+                  "name": "GetService"
+                },
+                {
+                  "name": "ListServices"
+                },
+                {
+                  "name": "BatchEnableServices"
+                },
+                {
+                  "name": "BatchGetServices"
+                }
+              ],
+              "version": "v1"
+            },
+            {
+              "name": "google.api.serviceusage.v1alpha.ServiceUsage",
+              "version": "v1alpha"
+            },
+            {
+              "name": "google.api.serviceusage.v1beta1.ServiceUsage",
+              "methods": [
+                {
+                  "name": "EnableService"
+                },
+                {
+                  "name": "DisableService"
+                },
+                {
+                  "name": "GetService"
+                },
+                {
+                  "name": "ListServices"
+                },
+                {
+                  "name": "BatchEnableServices"
+                },
+                {
+                  "name": "ListConsumerQuotaMetrics"
+                },
+                {
+                  "name": "GetConsumerQuotaMetric"
+                },
+                {
+                  "name": "GetConsumerQuotaLimit"
+                },
+                {
+                  "name": "CreateAdminOverride"
+                },
+                {
+                  "name": "UpdateAdminOverride"
+                },
+                {
+                  "name": "DeleteAdminOverride"
+                },
+                {
+                  "name": "ListAdminOverrides"
+                },
+                {
+                  "name": "ImportAdminOverrides"
+                },
+                {
+                  "name": "CreateConsumerOverride"
+                },
+                {
+                  "name": "UpdateConsumerOverride"
+                },
+                {
+                  "name": "DeleteConsumerOverride"
+                },
+                {
+                  "name": "ListConsumerOverrides"
+                },
+                {
+                  "name": "ImportConsumerOverrides"
+                },
+                {
+                  "name": "GenerateServiceIdentity"
+                }
+              ],
+              "version": "v1beta1"
+            },
+            {
+              "name": "google.api.serviceusage.v2.ServiceUsage",
+              "version": "v2"
+            },
+            {
+              "name": "google.api.serviceusage.v2alpha.ServiceUsage",
+              "version": "v2alpha"
+            },
+            {
+              "name": "google.api.serviceusage.v2beta.ServiceUsage",
+              "methods": [
+                {
+                  "name": "GetConsumerPolicy"
+                },
+                {
+                  "name": "UpdateConsumerPolicy"
+                },
+                {
+                  "name": "GetMcpPolicy"
+                },
+                {
+                  "name": "UpdateMcpPolicy"
+                },
+                {
+                  "name": "GetContentSecurityPolicy"
+                },
+                {
+                  "name": "UpdateContentSecurityPolicy"
+                },
+                {
+                  "name": "AnalyzeConsumerPolicy"
+                },
+                {
+                  "name": "GetEffectivePolicy"
+                },
+                {
+                  "name": "TestEnabled"
+                },
+                {
+                  "name": "GetEffectiveMcpPolicy"
+                },
+                {
+                  "name": "TestMcpEnabled"
+                },
+                {
+                  "name": "GetService"
+                },
+                {
+                  "name": "BatchGetServices"
+                },
+                {
+                  "name": "ListServiceGroups"
+                },
+                {
+                  "name": "ListGroupMembers"
+                },
+                {
+                  "name": "ListExpandedMembers"
+                },
+                {
+                  "name": "ListDependentServices"
+                },
+                {
+                  "name": "ListCatalogMembers"
+                },
+                {
+                  "name": "ListPublicServices"
+                },
+                {
+                  "name": "ListSharedServices"
+                }
+              ],
+              "version": "v2beta"
+            },
+            {
+              "name": "google.discovery.Discovery",
+              "methods": [
+                {
+                  "name": "GetDiscovery"
+                },
+                {
+                  "name": "GetDiscoveryRest"
+                }
+              ],
+              "version": "v1"
+            }
+          ],
+          "documentation": {
+            "summary": "Enables services that service consumers want to use on Google Cloud Platform, lists the available or enabled services, or disables services that service consumers no longer use."
+          },
+          "quota": {
+            "limits": [
+              {
+                "name": "DefaultRequestsPerMinutePerProject",
+                "metric": "serviceusage.googleapis.com/default_requests",
+                "unit": "1/min/{project}",
+                "values": {
+                  "STANDARD": "600"
+                }
+              },
+              {
+                "name": "MutateRequestsPerMinutePerProject",
+                "metric": "serviceusage.googleapis.com/mutate_requests",
+                "unit": "1/min/{project}",
+                "values": {
+                  "STANDARD": "120"
+                }
+              },
+              {
+                "name": "ListAvailableRequestsPerMinutePerProject",
+                "metric": "serviceusage.googleapis.com/list_available_requests",
+                "unit": "1/min/{project}",
+                "values": {
+                  "STANDARD": "60"
+                }
+              },
+              {
+                "name": "ListEnabledRequestsPerMinutePerProject",
+                "metric": "serviceusage.googleapis.com/list_enabled_requests",
+                "unit": "1/min/{project}",
+                "values": {
+                  "STANDARD": "600"
+                }
+              },
+              {
+                "name": "ListPublicRequestsPerMinutePerProject",
+                "metric": "serviceusage.googleapis.com/list_public_requests",
+                "unit": "1/min/{project}",
+                "values": {
+                  "STANDARD": "60"
+                }
+              }
+            ]
+          },
+          "authentication": {
+            "rules": [
+              {
+                "oauth": {
+                  "canonicalScopes": "https://www.googleapis.com/auth/service.management, https://www.googleapis.com/auth/cloud-platform"
+                }
+              },
+              {
+                "oauth": {
+                  "canonicalScopes": "https://www.googleapis.com/auth/service.management, https://www.googleapis.com/auth/cloud-platform"
+                }
+              },
+              {
+                "oauth": {
+                  "canonicalScopes": "https://www.googleapis.com/auth/service.management, https://www.googleapis.com/auth/cloud-platform"
+                }
+              },
+              {
+                "oauth": {
+                  "canonicalScopes": "https://www.googleapis.com/auth/service.management, https://www.googleapis.com/auth/cloud-platform"
+                }
+              },
+              {
+                "oauth": {
+                  "canonicalScopes": "https://www.googleapis.com/auth/service.management, https://www.googleapis.com/auth/cloud-platform"
+                }
+              },
+              {
+                "oauth": {
+                  "canonicalScopes": "https://www.googleapis.com/auth/service.management, https://www.googleapis.com/auth/cloud-platform"
+                }
+              },
+              {
+                "oauth": {
+                  "canonicalScopes": "https://www.googleapis.com/auth/service.management, https://www.googleapis.com/auth/cloud-platform"
+                }
+              },
+              {
+                "oauth": {
+                  "canonicalScopes": "https://www.googleapis.com/auth/cloud-platform.read-only, https://www.googleapis.com/auth/cloud-platform"
+                }
+              },
+              {
+                "oauth": {
+                  "canonicalScopes": "https://www.googleapis.com/auth/cloud-platform.read-only, https://www.googleapis.com/auth/cloud-platform"
+                }
+              },
+              {
+                "oauth": {
+                  "canonicalScopes": "https://www.googleapis.com/auth/cloud-platform.read-only, https://www.googleapis.com/auth/cloud-platform"
+                }
+              },
+              {
+                "oauth": {
+                  "canonicalScopes": "https://www.googleapis.com/auth/service.management, https://www.googleapis.com/auth/cloud-platform"
+                }
+              },
+              {
+                "oauth": {
+                  "canonicalScopes": "https://www.googleapis.com/auth/cloud-platform.read-only, https://www.googleapis.com/auth/cloud-platform"
+                }
+              },
+              {
+                "oauth": {
+                  "canonicalScopes": "https://www.googleapis.com/auth/cloud-platform.read-only, https://www.googleapis.com/auth/cloud-platform"
+                }
+              },
+              {
+                "oauth": {
+                  "canonicalScopes": "https://www.googleapis.com/auth/cloud-platform.read-only, https://www.googleapis.com/auth/cloud-platform"
+                }
+              },
+              {
+                "oauth": {
+                  "canonicalScopes": "https://www.googleapis.com/auth/cloud-platform.read-only, https://www.googleapis.com/auth/cloud-platform"
+                }
+              },
+              {
+                "oauth": {
+                  "canonicalScopes": "https://www.googleapis.com/auth/service.management, https://www.googleapis.com/auth/cloud-platform"
+                }
+              },
+              {
+                "oauth": {
+                  "canonicalScopes": "https://www.googleapis.com/auth/service.management, https://www.googleapis.com/auth/cloud-platform"
+                }
+              },
+              {
+                "oauth": {
+                  "canonicalScopes": "https://www.googleapis.com/auth/service.management, https://www.googleapis.com/auth/cloud-platform"
+                }
+              },
+              {
+                "oauth": {
+                  "canonicalScopes": "https://www.googleapis.com/auth/cloud-platform.read-only, https://www.googleapis.com/auth/cloud-platform"
+                }
+              },
+              {
+                "oauth": {
+                  "canonicalScopes": "https://www.googleapis.com/auth/service.management, https://www.googleapis.com/auth/cloud-platform"
+                }
+              },
+              {
+                "oauth": {
+                  "canonicalScopes": "https://www.googleapis.com/auth/service.management, https://www.googleapis.com/auth/cloud-platform"
+                }
+              },
+              {
+                "oauth": {
+                  "canonicalScopes": "https://www.googleapis.com/auth/cloud-platform.read-only, https://www.googleapis.com/auth/cloud-platform"
+                }
+              },
+              {
+                "oauth": {
+                  "canonicalScopes": "https://www.googleapis.com/auth/cloud-platform.read-only, https://www.googleapis.com/auth/cloud-platform"
+                }
+              },
+              {
+                "oauth": {
+                  "canonicalScopes": "https://www.googleapis.com/auth/service.management, https://www.googleapis.com/auth/cloud-platform"
+                }
+              },
+              {
+                "oauth": {
+                  "canonicalScopes": "https://www.googleapis.com/auth/cloud-platform.read-only, https://www.googleapis.com/auth/cloud-platform"
+                }
+              },
+              {
+                "oauth": {
+                  "canonicalScopes": "https://www.googleapis.com/auth/cloud-platform.read-only, https://www.googleapis.com/auth/cloud-platform"
+                }
+              },
+              {
+                "oauth": {
+                  "canonicalScopes": "https://www.googleapis.com/auth/cloud-platform.read-only, https://www.googleapis.com/auth/cloud-platform"
+                }
+              },
+              {
+                "oauth": {
+                  "canonicalScopes": "https://www.googleapis.com/auth/service.management, https://www.googleapis.com/auth/cloud-platform"
+                }
+              },
+              {
+                "oauth": {
+                  "canonicalScopes": "https://www.googleapis.com/auth/service.management, https://www.googleapis.com/auth/cloud-platform"
+                }
+              },
+              {
+                "oauth": {
+                  "canonicalScopes": "https://www.googleapis.com/auth/service.management, https://www.googleapis.com/auth/cloud-platform"
+                }
+              },
+              {
+                "oauth": {
+                  "canonicalScopes": "https://www.googleapis.com/auth/cloud-platform.read-only, https://www.googleapis.com/auth/cloud-platform"
+                }
+              },
+              {
+                "oauth": {
+                  "canonicalScopes": "https://www.googleapis.com/auth/service.management, https://www.googleapis.com/auth/cloud-platform"
+                }
+              },
+              {
+                "oauth": {
+                  "canonicalScopes": "https://www.googleapis.com/auth/service.management, https://www.googleapis.com/auth/cloud-platform"
+                }
+              },
+              {
+                "oauth": {
+                  "canonicalScopes": "https://www.googleapis.com/auth/service.management, https://www.googleapis.com/auth/cloud-platform"
+                }
+              },
+              {
+                "oauth": {
+                  "canonicalScopes": "https://www.googleapis.com/auth/service.management, https://www.googleapis.com/auth/cloud-platform"
+                }
+              },
+              {
+                "oauth": {
+                  "canonicalScopes": "https://www.googleapis.com/auth/service.management, https://www.googleapis.com/auth/cloud-platform"
+                }
+              },
+              {
+                "oauth": {
+                  "canonicalScopes": "https://www.googleapis.com/auth/cloud-platform.read-only, https://www.googleapis.com/auth/cloud-platform"
+                }
+              },
+              {
+                "oauth": {
+                  "canonicalScopes": "https://www.googleapis.com/auth/service.management, https://www.googleapis.com/auth/cloud-platform"
+                }
+              },
+              {
+                "oauth": {
+                  "canonicalScopes": "https://www.googleapis.com/auth/service.management, https://www.googleapis.com/auth/cloud-platform"
+                }
+              },
+              {
+                "oauth": {
+                  "canonicalScopes": "https://www.googleapis.com/auth/cloud-platform.read-only, https://www.googleapis.com/auth/cloud-platform"
+                }
+              },
+              {
+                "oauth": {
+                  "canonicalScopes": "https://www.googleapis.com/auth/service.management, https://www.googleapis.com/auth/cloud-platform"
+                }
+              },
+              {
+                "oauth": {
+                  "canonicalScopes": "https://www.googleapis.com/auth/cloud-platform.read-only, https://www.googleapis.com/auth/cloud-platform"
+                }
+              },
+              {
+                "oauth": {
+                  "canonicalScopes": "https://www.googleapis.com/auth/service.management, https://www.googleapis.com/auth/cloud-platform"
+                }
+              },
+              {
+                "oauth": {
+                  "canonicalScopes": "https://www.googleapis.com/auth/service.management, https://www.googleapis.com/auth/cloud-platform"
+                }
+              },
+              {
+                "oauth": {
+                  "canonicalScopes": "https://www.googleapis.com/auth/service.management, https://www.googleapis.com/auth/cloud-platform"
+                }
+              },
+              {
+                "oauth": {
+                  "canonicalScopes": "https://www.googleapis.com/auth/cloud-platform.read-only, https://www.googleapis.com/auth/cloud-platform"
+                }
+              },
+              {
+                "oauth": {
+                  "canonicalScopes": "https://www.googleapis.com/auth/cloud-platform.read-only, https://www.googleapis.com/auth/cloud-platform"
+                }
+              },
+              {
+                "oauth": {
+                  "canonicalScopes": "https://www.googleapis.com/auth/service.management, https://www.googleapis.com/auth/cloud-platform"
+                }
+              },
+              {
+                "oauth": {
+                  "canonicalScopes": "https://www.googleapis.com/auth/cloud-platform.read-only, https://www.googleapis.com/auth/cloud-platform"
+                }
+              },
+              {
+                "oauth": {
+                  "canonicalScopes": "https://www.googleapis.com/auth/service.management, https://www.googleapis.com/auth/cloud-platform"
+                }
+              },
+              {
+                "oauth": {
+                  "canonicalScopes": "https://www.googleapis.com/auth/cloud-platform.read-only, https://www.googleapis.com/auth/cloud-platform"
+                }
+              },
+              {
+                "oauth": {
+                  "canonicalScopes": "https://www.googleapis.com/auth/cloud-platform.read-only, https://www.googleapis.com/auth/cloud-platform"
+                }
+              },
+              {
+                "oauth": {
+                  "canonicalScopes": "https://www.googleapis.com/auth/cloud-platform.read-only, https://www.googleapis.com/auth/cloud-platform"
+                }
+              },
+              {
+                "oauth": {
+                  "canonicalScopes": "https://www.googleapis.com/auth/cloud-platform.read-only, https://www.googleapis.com/auth/cloud-platform"
+                }
+              },
+              {
+                "oauth": {
+                  "canonicalScopes": "https://www.googleapis.com/auth/cloud-platform.read-only, https://www.googleapis.com/auth/cloud-platform"
+                }
+              },
+              {
+                "oauth": {
+                  "canonicalScopes": "https://www.googleapis.com/auth/cloud-platform.read-only, https://www.googleapis.com/auth/cloud-platform"
+                }
+              },
+              {
+                "oauth": {
+                  "canonicalScopes": "https://www.googleapis.com/auth/cloud-platform.read-only, https://www.googleapis.com/auth/cloud-platform"
+                }
+              },
+              {
+                "oauth": {
+                  "canonicalScopes": "https://www.googleapis.com/auth/cloud-platform.read-only, https://www.googleapis.com/auth/cloud-platform"
+                }
+              },
+              {
+                "oauth": {
+                  "canonicalScopes": "https://www.googleapis.com/auth/cloud-platform.read-only, https://www.googleapis.com/auth/cloud-platform"
+                }
+              },
+              {
+                "oauth": {
+                  "canonicalScopes": "https://www.googleapis.com/auth/cloud-platform.read-only, https://www.googleapis.com/auth/cloud-platform"
+                }
+              },
+              {
+                "oauth": {
+                  "canonicalScopes": "https://www.googleapis.com/auth/cloud-platform.read-only, https://www.googleapis.com/auth/cloud-platform"
+                }
+              },
+              {
+                "oauth": {
+                  "canonicalScopes": "https://www.googleapis.com/auth/cloud-platform.read-only, https://www.googleapis.com/auth/cloud-platform"
+                }
+              },
+              {
+                "oauth": {
+                  "canonicalScopes": "https://www.googleapis.com/auth/cloud-platform.read-only, https://www.googleapis.com/auth/cloud-platform"
+                }
+              },
+              {
+                "oauth": {
+                  "canonicalScopes": "https://www.googleapis.com/auth/cloud-platform.read-only, https://www.googleapis.com/auth/cloud-platform"
+                }
+              },
+              {
+                "oauth": {
+                  "canonicalScopes": "https://www.googleapis.com/auth/cloud-platform.read-only, https://www.googleapis.com/auth/cloud-platform"
+                }
+              },
+              {
+                "oauth": {
+                  "canonicalScopes": "https://www.googleapis.com/auth/cloud-platform.read-only, https://www.googleapis.com/auth/cloud-platform"
+                }
+              },
+              {
+                "oauth": {
+                  "canonicalScopes": "https://www.googleapis.com/auth/service.management, https://www.googleapis.com/auth/cloud-platform"
+                }
+              },
+              {
+                "oauth": {
+                  "canonicalScopes": "https://www.googleapis.com/auth/service.management, https://www.googleapis.com/auth/cloud-platform"
+                }
+              },
+              {
+                "oauth": {
+                  "canonicalScopes": "https://www.googleapis.com/auth/cloud-platform.read-only, https://www.googleapis.com/auth/cloud-platform"
+                }
+              },
+              {
+                "oauth": {
+                  "canonicalScopes": "https://www.googleapis.com/auth/service.management, https://www.googleapis.com/auth/cloud-platform"
+                }
+              },
+              {
+                "oauth": {
+                  "canonicalScopes": "https://www.googleapis.com/auth/cloud-platform.read-only, https://www.googleapis.com/auth/cloud-platform"
+                }
+              },
+              {
+                "oauth": {
+                  "canonicalScopes": "https://www.googleapis.com/auth/cloud-platform.read-only, https://www.googleapis.com/auth/cloud-platform"
+                }
+              },
+              {
+                "oauth": {
+                  "canonicalScopes": "https://www.googleapis.com/auth/cloud-platform.read-only, https://www.googleapis.com/auth/cloud-platform"
+                }
+              },
+              {
+                "oauth": {
+                  "canonicalScopes": "https://www.googleapis.com/auth/cloud-platform.read-only, https://www.googleapis.com/auth/cloud-platform"
+                }
+              },
+              {
+                "oauth": {
+                  "canonicalScopes": "https://www.googleapis.com/auth/cloud-platform.read-only, https://www.googleapis.com/auth/cloud-platform"
+                }
+              },
+              {
+                "oauth": {
+                  "canonicalScopes": "https://www.googleapis.com/auth/cloud-platform.read-only, https://www.googleapis.com/auth/cloud-platform"
+                }
+              },
+              {
+                "oauth": {
+                  "canonicalScopes": "https://www.googleapis.com/auth/cloud-platform.read-only, https://www.googleapis.com/auth/cloud-platform"
+                }
+              },
+              {
+                "oauth": {
+                  "canonicalScopes": "https://www.googleapis.com/auth/cloud-platform.read-only, https://www.googleapis.com/auth/cloud-platform"
+                }
+              },
+              {
+                "oauth": {
+                  "canonicalScopes": "https://www.googleapis.com/auth/cloud-platform.read-only, https://www.googleapis.com/auth/cloud-platform"
+                }
+              },
+              {
+                "oauth": {
+                  "canonicalScopes": "https://www.googleapis.com/auth/cloud-platform.read-only, https://www.googleapis.com/auth/cloud-platform"
+                }
+              },
+              {
+                "oauth": {
+                  "canonicalScopes": "https://www.googleapis.com/auth/cloud-platform.read-only, https://www.googleapis.com/auth/cloud-platform"
+                }
+              },
+              {
+                "oauth": {
+                  "canonicalScopes": "https://www.googleapis.com/auth/cloud-platform.read-only, https://www.googleapis.com/auth/cloud-platform"
+                }
+              },
+              {
+                "oauth": {
+                  "canonicalScopes": "https://www.googleapis.com/auth/cloud-platform.read-only, https://www.googleapis.com/auth/cloud-platform"
+                }
+              },
+              {
+                "oauth": {
+                  "canonicalScopes": "https://www.googleapis.com/auth/cloud-platform.read-only, https://www.googleapis.com/auth/cloud-platform"
+                }
+              },
+              {
+                "oauth": {
+                  "canonicalScopes": "https://www.googleapis.com/auth/service.management, https://www.googleapis.com/auth/cloud-platform"
+                }
+              },
+              {
+                "oauth": {
+                  "canonicalScopes": "https://www.googleapis.com/auth/cloud-platform.read-only, https://www.googleapis.com/auth/cloud-platform"
+                }
+              },
+              {
+                "oauth": {
+                  "canonicalScopes": "https://www.googleapis.com/auth/service.management, https://www.googleapis.com/auth/cloud-platform"
+                }
+              },
+              {
+                "oauth": {
+                  "canonicalScopes": "https://www.googleapis.com/auth/cloud-platform.read-only, https://www.googleapis.com/auth/cloud-platform"
+                }
+              },
+              {
+                "oauth": {
+                  "canonicalScopes": "https://www.googleapis.com/auth/service.management, https://www.googleapis.com/auth/cloud-platform"
+                }
+              },
+              {
+                "oauth": {
+                  "canonicalScopes": "https://www.googleapis.com/auth/cloud-platform.read-only, https://www.googleapis.com/auth/cloud-platform"
+                }
+              },
+              {
+                "oauth": {
+                  "canonicalScopes": "https://www.googleapis.com/auth/cloud-platform.read-only, https://www.googleapis.com/auth/cloud-platform"
+                }
+              },
+              {
+                "oauth": {
+                  "canonicalScopes": "https://www.googleapis.com/auth/cloud-platform.read-only, https://www.googleapis.com/auth/cloud-platform"
+                }
+              },
+              {
+                "oauth": {
+                  "canonicalScopes": "https://www.googleapis.com/auth/cloud-platform.read-only, https://www.googleapis.com/auth/cloud-platform"
+                }
+              },
+              {
+                "oauth": {
+                  "canonicalScopes": "https://www.googleapis.com/auth/cloud-platform.read-only, https://www.googleapis.com/auth/cloud-platform"
+                }
+              },
+              {
+                "oauth": {
+                  "canonicalScopes": "https://www.googleapis.com/auth/cloud-platform.read-only, https://www.googleapis.com/auth/cloud-platform"
+                }
+              },
+              {
+                "oauth": {
+                  "canonicalScopes": "https://www.googleapis.com/auth/cloud-platform.read-only, https://www.googleapis.com/auth/cloud-platform"
+                }
+              },
+              {
+                "oauth": {
+                  "canonicalScopes": "https://www.googleapis.com/auth/cloud-platform.read-only, https://www.googleapis.com/auth/cloud-platform"
+                }
+              },
+              {
+                "oauth": {
+                  "canonicalScopes": "https://www.googleapis.com/auth/cloud-platform.read-only, https://www.googleapis.com/auth/cloud-platform"
+                }
+              },
+              {
+                "oauth": {
+                  "canonicalScopes": "https://www.googleapis.com/auth/cloud-platform.read-only, https://www.googleapis.com/auth/cloud-platform"
+                }
+              },
+              {
+                "oauth": {
+                  "canonicalScopes": "https://www.googleapis.com/auth/cloud-platform.read-only, https://www.googleapis.com/auth/cloud-platform"
+                }
+              },
+              {
+                "oauth": {
+                  "canonicalScopes": "https://www.googleapis.com/auth/cloud-platform.read-only, https://www.googleapis.com/auth/cloud-platform"
+                }
+              },
+              {
+                "oauth": {
+                  "canonicalScopes": "https://www.googleapis.com/auth/cloud-platform.read-only, https://www.googleapis.com/auth/cloud-platform"
+                }
+              },
+              {
+                "oauth": {
+                  "canonicalScopes": "https://www.googleapis.com/auth/cloud-platform.read-only, https://www.googleapis.com/auth/cloud-platform"
+                }
+              },
+              {
+                "oauth": {
+                  "canonicalScopes": "https://www.googleapis.com/auth/cloud-platform.read-only, https://www.googleapis.com/auth/cloud-platform"
+                }
+              },
+              {
+                "oauth": {
+                  "canonicalScopes": "https://www.googleapis.com/auth/cloud-platform.read-only, https://www.googleapis.com/auth/cloud-platform"
+                }
+              },
+              {
+                "oauth": {
+                  "canonicalScopes": "https://www.googleapis.com/auth/cloud-platform.read-only, https://www.googleapis.com/auth/cloud-platform"
+                }
+              }
+            ]
+          },
+          "usage": {
+            "requirements": [
+              "serviceusage.googleapis.com/tos/cloud"
+            ]
+          },
+          "endpoints": [
+            {
+              "name": "serviceusage.googleapis.com"
+            },
+            {
+              "name": "serviceusage.clients6.google.com"
+            },
+            {
+              "name": "content-serviceusage.googleapis.com"
+            },
+            {
+              "name": "serviceusage.mtls.googleapis.com"
+            },
+            {
+              "name": "serviceusage.mtls.clients6.google.com"
+            },
+            {
+              "name": "content-serviceusage.mtls.googleapis.com"
+            }
+          ],
+          "monitoring": {}
+        },
+        "state": "DISABLED",
+        "parent": "projects/926761696986"
+      }
+    ]
+  }
+}

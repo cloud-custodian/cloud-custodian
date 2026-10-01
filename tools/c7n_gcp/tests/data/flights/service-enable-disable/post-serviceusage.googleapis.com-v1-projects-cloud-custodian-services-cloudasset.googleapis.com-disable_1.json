@@ -1,0 +1,19 @@
+{
+  "headers": {
+    "content-type": "application/json; charset=UTF-8",
+    "vary": "Origin, X-Origin, Referer",
+    "date": "Tue, 29 Sep 2026 21:36:18 GMT",
+    "server": "ESF",
+    "x-xss-protection": "0",
+    "x-frame-options": "SAMEORIGIN",
+    "x-content-type-options": "nosniff",
+    "alt-svc": "h3=\":443\"; ma=2592000,h3-29=\":443\"; ma=2592000",
+    "transfer-encoding": "chunked",
+    "status": "200",
+    "content-length": "85",
+    "-content-encoding": "gzip"
+  },
+  "body": {
+    "name": "operations/acat.p17-926761696986-ec9cb236-e66a-4ce6-90d0-1a8d8f243f88"
+  }
+}
