@@ -5,9 +5,10 @@ from c7n.filters.core import ValueFilter
 
 from c7n_gcp.actions import MethodAction
 from c7n_gcp.provider import resources
-from c7n_gcp.query import QueryResourceManager, TypeInfo
+from c7n_gcp.query import (
+    ChildResourceManager, ChildTypeInfo, QueryResourceManager, TypeInfo)
 
-# TODO .. folder, billing account, org sink
+# TODO .. folder, billing account sink
 # how to map them given a project level root entity sans use of c7n-org
 
 
@@ -95,6 +96,59 @@ class DeletePubSubTopic(MethodAction):
         session = local_session(self.manager.session_factory)
         project = session.get_default_project()
         return {'sinkName': 'projects/{}/sinks/{}'.format(project, r['name'])}
+
+
+@resources.register('log-organization-sink')
+class LogOrganizationSink(ChildResourceManager):
+    """GCP resource: https://cloud.google.com/logging/docs/reference/v2/rest/v2/organizations.sinks
+
+    Sinks are enumerated for every organization visible to the caller, and each
+    sink is annotated with its parent organization.
+
+    :example:
+
+    Find organizations without an aggregated sink that exports all log entries
+
+    .. code-block:: yaml
+
+        policies:
+          - name: gcp-org-aggregated-log-sink-missing
+            resource: gcp.organization
+            filters:
+              - type: missing
+                policy:
+                  resource: gcp.log-organization-sink
+                  filters:
+                    - type: value
+                      key: filter
+                      value: empty
+                    - includeChildren: true
+    """
+
+    class resource_type(ChildTypeInfo):
+        service = 'logging'
+        version = 'v2'
+        component = 'organizations.sinks'
+        enum_spec = ('list', 'sinks[]', None)
+        scope = None
+        name = id = 'name'
+        default_report_fields = [
+            "name", "description", "destination", "filter", "includeChildren",
+            "writerIdentity", "createTime"]
+        parent_spec = {
+            'resource': 'organization',
+            'child_enum_params': [
+                ('name', 'parent')
+            ]
+        }
+        asset_type = "logging.googleapis.com/LogSink"
+        urn_component = "organization-sink"
+        urn_has_project = False
+
+        @classmethod
+        def _get_urn_id(cls, resource):
+            org_id = cls.get_parent(resource)['name'].rsplit('/', 1)[-1]
+            return '{}/{}'.format(org_id, resource['name'])
 
 
 @resources.register('log-project-metric')
