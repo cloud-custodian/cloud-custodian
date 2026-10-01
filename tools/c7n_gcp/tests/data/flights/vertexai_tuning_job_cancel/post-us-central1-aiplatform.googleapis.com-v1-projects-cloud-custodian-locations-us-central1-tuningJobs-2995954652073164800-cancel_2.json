@@ -1,0 +1,23 @@
+{
+  "headers": {
+    "vary": "Origin, X-Origin, Referer",
+    "content-type": "application/json; charset=UTF-8",
+    "date": "Thu, 01 Oct 2026 19:44:51 GMT",
+    "server": "ESF",
+    "x-xss-protection": "0",
+    "x-frame-options": "SAMEORIGIN",
+    "x-content-type-options": "nosniff",
+    "alt-svc": "h3=\":443\"; ma=2592000,h3-29=\":443\"; ma=2592000",
+    "transfer-encoding": "chunked",
+    "status": "400",
+    "content-length": "240",
+    "-content-encoding": "gzip"
+  },
+  "body": {
+    "error": {
+      "code": 400,
+      "message": "The TuningJob \"projects/cloud-custodian/locations/us-central1/tuningJobs/2995954652073164800\" is in state JOB_STATE_CANCELLED and cannot be canceled.",
+      "status": "FAILED_PRECONDITION"
+    }
+  }
+}

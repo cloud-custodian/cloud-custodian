@@ -1,0 +1,159 @@
+{
+  "headers": {
+    "content-type": "application/json; charset=UTF-8",
+    "vary": "Origin, X-Origin, Referer",
+    "date": "Thu, 01 Oct 2026 19:43:48 GMT",
+    "server": "ESF",
+    "x-xss-protection": "0",
+    "x-frame-options": "SAMEORIGIN",
+    "x-content-type-options": "nosniff",
+    "alt-svc": "h3=\":443\"; ma=2592000,h3-29=\":443\"; ma=2592000",
+    "transfer-encoding": "chunked",
+    "status": "200",
+    "content-length": "5107",
+    "-content-encoding": "gzip",
+    "content-location": "https://us-central1-aiplatform.googleapis.com/v1/projects/cloud-custodian/locations/us-central1/tuningJobs?alt=json"
+  },
+  "body": {
+    "tuningJobs": [
+      {
+        "name": "projects/cloud-custodian/locations/us-central1/tuningJobs/1044207163561476096",
+        "tunedModelDisplayName": "c7n-test-tuning-job-default-7dbe",
+        "baseModel": "gemini-2.5-flash-lite",
+        "supervisedTuningSpec": {
+          "trainingDatasetUri": "gs://c7n-vertex-tune-7dbe/train.jsonl",
+          "hyperParameters": {
+            "epochCount": "1"
+          }
+        },
+        "state": "JOB_STATE_RUNNING",
+        "createTime": "2026-10-01T19:43:47.657191Z",
+        "startTime": "2026-10-01T19:43:47.718608Z",
+        "updateTime": "2026-10-01T19:43:47.718608Z"
+      },
+      {
+        "name": "projects/cloud-custodian/locations/us-central1/tuningJobs/8632772535680761856",
+        "tunedModelDisplayName": "c7n-test-tuning-job-default-a277-filters",
+        "baseModel": "gemini-2.5-flash-lite",
+        "supervisedTuningSpec": {
+          "trainingDatasetUri": "gs://c7n-vertex-tune-a277/train.jsonl",
+          "hyperParameters": {
+            "epochCount": "1"
+          },
+          "exportLastCheckpointOnly": true
+        },
+        "state": "JOB_STATE_FAILED",
+        "createTime": "2026-10-01T19:40:05.283227Z",
+        "startTime": "2026-10-01T19:40:05.361511Z",
+        "endTime": "2026-10-01T19:41:25.283173Z",
+        "updateTime": "2026-10-01T19:41:25.283173Z",
+        "error": {
+          "code": 13,
+          "message": "Internal error occurred. Contact Vertex AI."
+        },
+        "labels": {
+          "owner": "c7n-test",
+          "dataset-id": "c7n-addition",
+          "data-classification": "confidential"
+        },
+        "tunedModel": {
+          "model": "projects/cloud-custodian/locations/us-central1/models/6251463025476239360@1"
+        },
+        "serviceAccount": "c7n-tune-a277@cloud-custodian.iam.gserviceaccount.com"
+      },
+      {
+        "name": "projects/cloud-custodian/locations/us-central1/tuningJobs/6398987120504995840",
+        "tunedModelDisplayName": "c7n-test-tuning-job-default-511f-filters",
+        "baseModel": "gemini-2.5-flash-lite",
+        "supervisedTuningSpec": {
+          "trainingDatasetUri": "gs://c7n-vertex-tune-511f/train.jsonl",
+          "hyperParameters": {
+            "epochCount": "1"
+          },
+          "exportLastCheckpointOnly": true
+        },
+        "state": "JOB_STATE_FAILED",
+        "createTime": "2026-10-01T19:35:44.143482Z",
+        "startTime": "2026-10-01T19:35:44.214500Z",
+        "endTime": "2026-10-01T19:36:55.672453Z",
+        "updateTime": "2026-10-01T19:36:55.672453Z",
+        "error": {
+          "code": 13,
+          "message": "Internal error occurred. Contact Vertex AI."
+        },
+        "labels": {
+          "owner": "c7n-test",
+          "dataset-id": "c7n-addition",
+          "data-classification": "confidential"
+        },
+        "serviceAccount": "c7n-tune-511f@cloud-custodian.iam.gserviceaccount.com"
+      },
+      {
+        "name": "projects/cloud-custodian/locations/us-central1/tuningJobs/6316796427305484288",
+        "tunedModelDisplayName": "c7n-test-tuning-job-default-be3a-filters",
+        "baseModel": "gemini-2.5-flash-lite",
+        "supervisedTuningSpec": {
+          "trainingDatasetUri": "gs://c7n-vertex-tune-be3a/train.jsonl",
+          "hyperParameters": {
+            "epochCount": "1"
+          },
+          "exportLastCheckpointOnly": true
+        },
+        "state": "JOB_STATE_CANCELLED",
+        "createTime": "2026-10-01T19:30:10.512523Z",
+        "startTime": "2026-10-01T19:30:10.566363Z",
+        "endTime": "2026-10-01T19:30:42.960378Z",
+        "updateTime": "2026-10-01T19:30:42.960378Z",
+        "error": {
+          "code": 1,
+          "message": "CANCELED"
+        },
+        "labels": {
+          "owner": "c7n-test",
+          "dataset-id": "c7n-addition",
+          "data-classification": "confidential"
+        },
+        "serviceAccount": "c7n-tune-be3a@cloud-custodian.iam.gserviceaccount.com"
+      },
+      {
+        "name": "projects/cloud-custodian/locations/us-central1/tuningJobs/6032225225851011072",
+        "tunedModelDisplayName": "c7n-test-tuning-job-default-ab52-cancel",
+        "baseModel": "gemini-2.5-flash-lite",
+        "supervisedTuningSpec": {
+          "trainingDatasetUri": "gs://c7n-vertex-tune-ab52/train.jsonl",
+          "hyperParameters": {
+            "epochCount": "1"
+          }
+        },
+        "state": "JOB_STATE_CANCELLED",
+        "createTime": "2026-10-01T19:14:26.168834Z",
+        "startTime": "2026-10-01T19:14:26.234608Z",
+        "endTime": "2026-10-01T19:14:27.479201Z",
+        "updateTime": "2026-10-01T19:14:27.479201Z",
+        "error": {
+          "code": 1,
+          "message": "CANCELED"
+        }
+      },
+      {
+        "name": "projects/cloud-custodian/locations/us-central1/tuningJobs/7884330572607127552",
+        "tunedModelDisplayName": "c7n-test-tuning-job-default-3105-cancel",
+        "baseModel": "gemini-2.5-flash-lite",
+        "supervisedTuningSpec": {
+          "trainingDatasetUri": "gs://c7n-vertex-tune-3105/train.jsonl",
+          "hyperParameters": {
+            "epochCount": "1"
+          }
+        },
+        "state": "JOB_STATE_CANCELLED",
+        "createTime": "2026-10-01T19:11:58.338450Z",
+        "endTime": "2026-10-01T19:11:59.265901Z",
+        "updateTime": "2026-10-01T19:11:59.265901Z",
+        "error": {
+          "code": 1,
+          "message": "CANCELED"
+        }
+      }
+    ]
+  }
+}
