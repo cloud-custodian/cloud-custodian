@@ -12,7 +12,7 @@ from azure.storage.common.models import Logging, RetentionPolicy
 from azure.storage.file import FileService
 from azure.storage.queue import QueueServiceClient
 from c7n.exceptions import PolicyValidationError
-from c7n.filters.core import type_schema, ListItemFilter
+from c7n.filters.core import type_schema, Filter, ListItemFilter
 from c7n.utils import get_annotation_prefix, local_session
 from c7n_azure.actions.base import AzureBaseAction
 from c7n_azure.actions.firewall import SetFirewallAction
@@ -759,6 +759,101 @@ class RequireSecureTransferAction(AzureBaseAction):
             kwargs["minimum_tls_version"] = self.data.get("minimum_tls_version")
 
         update_params = StorageAccountUpdateParameters(**kwargs)
+        self.client.storage_accounts.update(
+            resource['resourceGroup'],
+            resource['name'],
+            update_params,
+        )
+
+
+@Storage.filter_registry.register('blob-public-access')
+class BlobPublicAccessFilter(Filter):
+    """Filter Storage Accounts by whether anonymous (public) blob access is
+    allowed at the account level (the ``allowBlobPublicAccess`` property).
+
+    Azure does not always return ``allowBlobPublicAccess`` in the account
+    properties. When it is absent the account permits anonymous access, so this
+    filter treats a missing value as ``True`` (allowed). This makes it suitable
+    for the CIS Microsoft Azure Foundations control "Ensure that 'Allow Blob
+    Anonymous Access' is set to 'Disabled'", which a plain ``value`` filter
+    would miss on accounts where the property is not present.
+
+    :example:
+
+    Find all Storage Accounts that allow anonymous blob access (CIS 4.17),
+    including those where the property is unset, and disable it.
+
+    .. code-block:: yaml
+
+        policies:
+            - name: cis-4-17-blob-anonymous-access
+              resource: azure.storage
+              filters:
+                - type: blob-public-access
+                  value: true
+              actions:
+                - type: set-blob-public-access
+                  value: False
+    """
+
+    schema = type_schema(
+        'blob-public-access',
+        **{
+            'value': {'type': 'boolean', 'default': True},
+        })
+
+    def process(self, resources, event=None):
+        target = self.data.get('value', True)
+        return [
+            r for r in resources
+            if r['properties'].get('allowBlobPublicAccess', True) == target
+        ]
+
+
+@Storage.action_registry.register('set-blob-public-access')
+class SetBlobPublicAccessAction(AzureBaseAction):
+    """Action that updates the ``allowBlobPublicAccess`` setting on Storage Accounts.
+
+    This is the account-level master switch for anonymous (public) blob access.
+    When set to ``False``, anonymous access is denied for all containers and blobs
+    in the account regardless of an individual container's ``publicAccess`` setting.
+    This is the recommended remediation for CIS Microsoft Azure Foundations control
+    "Ensure that 'Allow Blob Anonymous Access' is set to 'Disabled'".
+
+    To manage the public access level of an individual container instead, see the
+    ``set-public-access`` action on the ``azure.storage-container`` resource.
+
+    :example:
+
+    Disable anonymous blob access on all storage accounts that currently allow it.
+
+    .. code-block:: yaml
+
+        policies:
+            - name: disable-blob-anonymous-access
+              resource: azure.storage
+              filters:
+                - type: value
+                  key: properties.allowBlobPublicAccess
+                  value: true
+              actions:
+                - type: set-blob-public-access
+                  value: False
+    """
+
+    # Default to False assuming the user wants anonymous access disabled
+    schema = type_schema(
+        'set-blob-public-access',
+        **{
+            'value': {'type': 'boolean', 'default': False},
+        })
+
+    def _prepare_processing(self):
+        self.client = self.manager.get_client()
+
+    def _process_resource(self, resource):
+        update_params = StorageAccountUpdateParameters(
+            allow_blob_public_access=self.data.get('value', False))
         self.client.storage_accounts.update(
             resource['resourceGroup'],
             resource['name'],
