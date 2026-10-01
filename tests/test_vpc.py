@@ -4936,8 +4936,8 @@ class SecurityGroupPaginationTest(BaseTest):
         self.assertEqual(filter_.call_args.kwargs.get('MaxResults'), 1000)
 
     def test_get_resources_omits_max_results(self):
-        # EC2 rejects MaxResults alongside GroupIds, and get_resources swallows
-        # the ClientError, so by-id lookups must not be paged.
+        # EC2 rejects MaxResults alongside GroupIds and get_resources swallows
+        # the ClientError so by-id lookups must not be paged.
         p = self.load_policy({'name': 'sg', 'resource': 'aws.security-group'})
         with mock.patch('c7n.query.ResourceQuery.get', return_value=[]) as get_, \
                 mock.patch('c7n.query.ResourceQuery.filter') as filter_:
