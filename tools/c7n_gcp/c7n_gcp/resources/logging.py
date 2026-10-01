@@ -1,11 +1,14 @@
 # Copyright The Cloud Custodian Authors.
 # SPDX-License-Identifier: Apache-2.0
+from collections import defaultdict
+
 from c7n.utils import local_session, type_schema
-from c7n.filters.core import ValueFilter
+from c7n.filters.core import Filter, ValueFilter
 
 from c7n_gcp.actions import MethodAction
 from c7n_gcp.provider import resources
 from c7n_gcp.query import QueryResourceManager, TypeInfo
+from c7n_gcp.utils import canonicalize_cloud_logging_filter, cloud_logging_filters_overlap
 
 # TODO .. folder, billing account, org sink
 # how to map them given a project level root entity sans use of c7n-org
@@ -83,6 +86,152 @@ class LogProjectSinkBucketFilter(ValueFilter):
 
         # call value filter on the bucket object
         return super().__call__(sink[self.cache_key])
+
+
+class LogProjectSinkRelationshipFilterBase(Filter):
+    """Reusable base for sink relationship filters (exact/overlap)."""
+
+    annotation_key = 'c7n:matched-sinks'
+    permissions = ('logging.sinks.list',)
+
+    def _normalize_filter(self, sink):
+        sink_filter = sink.get('filter')
+        if not sink_filter:
+            return 'true'
+        return canonicalize_cloud_logging_filter(sink_filter)
+
+    def _iter_candidate_sinks(self, resources):
+        for sink in resources:
+            if sink.get('disabled', False):
+                continue
+            destination = sink.get('destination')
+            yield destination, sink
+
+    def _iter_matched_groups(self, relation_groups):
+        raise NotImplementedError(  # pragma: no cover
+            "subclass must implement _iter_matched_groups"
+        )
+
+    def _annotate_group(self, sinks):
+        sink_names = [s.get('name') for s in sinks if s.get('name')]
+        for sink in sinks:
+            sink[self.annotation_key] = [
+                n for n in sink_names if n != sink.get('name')
+            ]
+
+    def process(self, resources, event=None):
+        destination_groups = defaultdict(lambda: defaultdict(list))
+
+        for destination, sink in self._iter_candidate_sinks(resources):
+            destination_groups[destination][self._normalize_filter(sink)].append(sink)
+
+        matched = []
+        for relation_groups in destination_groups.values():
+            for sinks in self._iter_matched_groups(relation_groups):
+                self._annotate_group(sinks)
+                matched.extend(sinks)
+        return matched
+
+
+@LogProjectSink.filter_registry.register('sink-exact')
+class LogProjectSinkExactFilter(LogProjectSinkRelationshipFilterBase):
+    """Match enabled sinks that share an identical effective routing filter with
+    at least one other enabled sink targeting the same destination.
+
+    Filter strings are canonicalized before comparison so that logically
+    equivalent expressions (e.g. different field orderings) are treated as
+    duplicates.  Disabled sinks are ignored.
+
+    :example:
+
+    Find all project sinks that are exact duplicates of another sink:
+
+    .. code-block:: yaml
+
+        policies:
+          - name: gcp-log-project-sink-exact-duplicates
+            resource: gcp.log-project-sink
+            filters:
+              - type: sink-exact
+
+    """
+
+    schema = type_schema('sink-exact')
+
+    def _iter_matched_groups(self, relation_groups):
+        for sinks in relation_groups.values():
+            if len(sinks) > 1:
+                yield sinks
+
+
+@LogProjectSink.filter_registry.register('sink-overlap')
+class LogProjectSinkOverlapFilter(LogProjectSinkRelationshipFilterBase):
+    """Match enabled sinks whose effective routing filter overlaps with at least
+    one other enabled sink targeting the same destination.
+
+    Two filters overlap when they can both match the same log entry.  The
+    analyser uses canonicalized filter expressions and understands equality,
+    inequality, and numeric/severity range constraints.  Filters containing
+    complex logic (OR, NOT) are conservatively treated as non-overlapping to
+    avoid false positives.  Disabled sinks are ignored.
+
+    :example:
+
+    Find all project sinks whose log routing overlaps with a sibling sink:
+
+    .. code-block:: yaml
+
+        policies:
+          - name: gcp-log-project-sink-overlapping
+            resource: gcp.log-project-sink
+            filters:
+              - type: sink-overlap
+
+    """
+
+    schema = type_schema('sink-overlap')
+
+    def _iter_matched_groups(self, relation_groups):
+        relation_items = list(relation_groups.items())
+
+        matched_indexes = set()
+        adjacency = {idx: set() for idx in range(len(relation_items))}
+
+        for idx, (_expr, sinks) in enumerate(relation_items):
+            if len(sinks) > 1:
+                matched_indexes.add(idx)
+
+        for left in range(len(relation_items)):
+            left_expression = relation_items[left][0]
+            for right in range(left + 1, len(relation_items)):
+                right_expression = relation_items[right][0]
+                if not self._filters_overlap(left_expression, right_expression):
+                    continue
+                matched_indexes.update((left, right))
+                adjacency[left].add(right)
+                adjacency[right].add(left)
+
+        visited = set()
+        for idx in sorted(matched_indexes):
+            if idx in visited:
+                continue
+            queue = [idx]
+            component = []
+            while queue:
+                current = queue.pop()
+                if current in visited:
+                    continue
+                visited.add(current)
+                component.append(current)
+                queue.extend(adjacency[current] - visited)
+            sinks = []
+            for entry_idx in component:
+                sinks.extend(relation_items[entry_idx][1])
+            if len(sinks) > 1:
+                yield sinks
+
+    def _filters_overlap(self, left_expression, right_expression):
+        return cloud_logging_filters_overlap(left_expression, right_expression)
 
 
 @LogProjectSink.action_registry.register('delete')
