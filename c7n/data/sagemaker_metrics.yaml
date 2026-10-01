@@ -21,7 +21,7 @@
 # The documentation's dimensions tables say which dimensions a metric can be
 # filtered by, not which sets exist, and CloudWatch identifies a series by
 # the exact set. Only sets observed to carry data are listed here -- see
-# specs/10853-aws-sagemaker-endpoint-metrics/live-dimension-sets.md. Notably
+# tests/terraform/sagemaker_endpoint_metrics/probe_metrics.py. Notably
 # instance type is published only alongside AvailabilityZone and Region, so
 # the documented "EndpointName, VariantName, InstanceType" is absent.
 

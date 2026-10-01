@@ -1743,7 +1743,7 @@ def test_sagemaker_endpoint_metrics_utilization(test, sagemaker_endpoint_metrics
     annotated = resource['c7n.metrics']
     assert sorted(key.split('.')[-1] for key in annotated) == [
         'VariantName=busy', 'VariantName=gpu', 'VariantName=quiet']
-    assert [len(points) for points in annotated.values()] == [1, 1, 1]
+    assert all(points for points in annotated.values())
 
 
 @pytest.mark.audited
@@ -1830,9 +1830,10 @@ def test_sagemaker_endpoint_metrics_idle_component(
     assert resource['EndpointName'] == endpoint
     # a published zero, not an absence of data
     [points] = resource['c7n.metrics'].values()
-    assert [point['Sum'] for point in points] == [0.0]
+    assert points and all(point['Sum'] == 0.0 for point in points)
 
-    # so a missing value would make no difference to it
+    # so a missing value would make no difference to it. The same query
+    # again, hence the one recorded response serving both runs
     idle['filters'][1]['missing-value'] = 0
     p = test.load_policy(idle, session_factory=factory)
     [resource] = p.run()

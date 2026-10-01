@@ -109,13 +109,16 @@ def find_endpoints(sagemaker) -> list[dict]:
     return endpoints
 
 
-def find_components(sagemaker) -> dict[str, list[str]]:
+def find_components(sagemaker, endpoints: list[dict]) -> dict[str, list[str]]:
+    """The components on our endpoints, ignoring the rest of the account."""
+    ours = {endpoint['EndpointName'] for endpoint in endpoints}
     components = collections.defaultdict(list)
     for page in sagemaker.get_paginator(
             'list_inference_components').paginate():
         for summary in page['InferenceComponents']:
-            components[summary['EndpointName']].append(
-                summary['InferenceComponentName'])
+            if summary['EndpointName'] in ours:
+                components[summary['EndpointName']].append(
+                    summary['InferenceComponentName'])
     return components
 
 
@@ -203,7 +206,7 @@ def main() -> None:
     endpoints = find_endpoints(sagemaker)
     if not endpoints:
         raise SystemExit(f"no endpoints named {PREFIX}* -- run terraform apply")
-    components = find_components(sagemaker)
+    components = find_components(sagemaker, endpoints)
 
     print('Endpoints')
     for endpoint in endpoints:

@@ -7,6 +7,11 @@ resource "random_pet" "main" {
 
 locals {
   name = "c7n-endpoint-metrics-${random_pet.main.id}"
+
+  # the stacks below name the components, and the outputs report those
+  # names to the tests, so both read them from here
+  component      = "${local.name}-ic"
+  idle_component = "${local.name}-ic-idle"
 }
 
 data "aws_iam_policy_document" "assume_role" {
@@ -53,6 +58,10 @@ resource "aws_sagemaker_model" "main" {
   name               = local.name
   execution_role_arn = aws_iam_role.execution.arn
 
+  # the arn alone orders this after the role, not after its policy, and an
+  # endpoint whose role can't yet read the artifact fails to come up
+  depends_on = [aws_iam_role_policy_attachment.execution]
+
   primary_container {
     image          = data.aws_sagemaker_prebuilt_ecr_image.xgboost.registry_path
     model_data_url = "s3://${aws_s3_bucket.model.id}/${aws_s3_object.model.key}"
@@ -63,8 +72,9 @@ resource "aws_sagemaker_model" "main" {
 ## Classic endpoints: the model is attached to each production variant.
 ##
 
-# Only the second variant is invoked, so an idle-endpoint policy must skip
-# this endpoint -- which it can only do by querying every variant.
+# Every variant but "quiet" is invoked, so an idle-endpoint policy must skip
+# this endpoint -- which it can only do by querying more than its first
+# variant. "gpu" is here so the GPU metrics have an instance to report.
 # A configuration can't be edited, and an endpoint follows its configuration
 # by name, so the name has to change for a variant change to reach the
 # endpoint -- hence name_prefix, which terraform makes unique. The prefix is
@@ -185,7 +195,7 @@ resource "aws_cloudformation_stack" "component" {
       Component = {
         Type = "AWS::SageMaker::InferenceComponent"
         Properties = {
-          InferenceComponentName = "${local.name}-ic"
+          InferenceComponentName = local.component
           EndpointName           = aws_sagemaker_endpoint.component.name
           VariantName            = "AllTraffic"
           Specification = {
@@ -252,7 +262,7 @@ resource "aws_cloudformation_stack" "component_idle" {
       Component = {
         Type = "AWS::SageMaker::InferenceComponent"
         Properties = {
-          InferenceComponentName = "${local.name}-ic-idle"
+          InferenceComponentName = local.idle_component
           EndpointName           = aws_sagemaker_endpoint.component_idle.name
           VariantName            = "AllTraffic"
           Specification = {
@@ -275,7 +285,7 @@ output "idle_component_endpoint_name" {
 
 # created by the stack, so depend on it rather than on the name alone
 output "idle_component_name" {
-  value      = "${local.name}-ic-idle"
+  value      = local.idle_component
   depends_on = [aws_cloudformation_stack.component_idle]
 }
 
@@ -285,6 +295,6 @@ output "component_endpoint_name" {
 
 # created by the stack, so depend on it rather than on the name alone
 output "component_name" {
-  value      = "${local.name}-ic"
+  value      = local.component
   depends_on = [aws_cloudformation_stack.component]
 }

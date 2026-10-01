@@ -671,11 +671,14 @@ class SageMakerMetricsFilter(MetricsFilter):
             return
 
         namespace = self.get_resource_namespace(resource)
+        # the window, not just its length: period-start moves start and end
+        # without changing days or period
         base_key = (
             f"{namespace}"
             f".{self.metric}"
             f".{self.statistics}"
-            f".{self.days}"
+            f".{self.start.isoformat()}"
+            f".{self.end.isoformat()}"
             f".{self.period}"
         )
         base_params = dict(
@@ -775,7 +778,16 @@ class SagemakerEndpointMetricsFilter(SageMakerMetricsFilter):
         return components
 
     def resource_kind(self, resource) -> Kind:
-        """How this endpoint hosts its models."""
+        """How this endpoint hosts its models.
+
+        An endpoint built to host components but hosting none right now
+        is reported classic, which costs nothing: its invocations aren't
+        published per variant, and nothing is reserving the instance, so
+        the metrics that only a component endpoint publishes have no data
+        either. Reading the endpoint's configuration instead -- an
+        execution role and no variant naming a model -- would classify it
+        correctly at the price of a DescribeEndpointConfig per endpoint.
+        """
         if self.endpoint_components.get(resource[self.resource_dimension_name]):
             return 'inference-component'
         return 'classic'

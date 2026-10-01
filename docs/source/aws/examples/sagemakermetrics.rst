@@ -80,9 +80,10 @@ To limit the metric data used, specify one or more dimension values::
 For SageMaker endpoints, supplying a variant of ``gpu`` means only
 the metrics identified for the GPU variant are used.
 
-Allowable dimensions are documented for each resource below.  They
-exclude resource identifiers (e.g. "EndpointName") , which aren't
-allowed in `dimensions` options.
+Allowable dimensions are documented for each resource below.  A
+resource's own identifier (e.g. "EndpointName") is supplied for you, so
+there's rarely a reason to name it; naming a different resource's leaves
+nothing to measure.
 
 SageMaker Endpoints
 -------------------
@@ -94,17 +95,31 @@ There are two kinds of endpoints:
 - Inference-component endpoints that deploy models in inference
   components in variants
 
-Which dimensions you can supply depends on the kind:
+Which dimensions you can supply depends on the metric, and for
+invocations on the kind of endpoint as well.
+
+Utilization metrics -- ``CPUUtilization`` and the rest -- are reported per
+variant whichever kind of endpoint publishes them, so ``VariantName``
+narrows them in both cases:
+
+.. code-block:: yaml
+
+    dimensions:
+      VariantName: gpu
+
+Invocations and latencies are reported per variant by a classic endpoint
+and per component by a component endpoint, so the two kinds take different
+dimensions:
 
 ``VariantName``
-   For a classic endpoint.  A component endpoint reports its invocations
-   against components rather than variants, so naming a variant leaves it
-   with nothing to measure.
+   Narrows a classic endpoint's invocations to one variant.  A component
+   endpoint doesn't report invocations per variant, so naming one leaves it
+   with nothing to measure, and it drops out of the results.
 
 ``InferenceComponentName``
-   For a component endpoint.  Naming one deselects every classic endpoint,
-   so unless a ``missing-value`` is supplied the filter selects none of
-   them.
+   Narrows a component endpoint's invocations to one component.  Naming one
+   deselects every classic endpoint, so unless a ``missing-value`` is
+   supplied the filter selects none of them.
 
 
 Endpoints that serve no traffic
