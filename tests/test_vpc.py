@@ -3,6 +3,7 @@
 import logging
 import time
 from .common import BaseTest, functional, event_data, load_data
+from unittest import mock
 from unittest.mock import MagicMock
 
 from botocore.exceptions import ClientError as BotoClientError
@@ -4924,3 +4925,29 @@ class TestVpcEndpointServiceDetails(BaseTest):
         self.assertEqual(len(resources), 1)
         self.assertEqual(resources[0]["ServiceName"], "com.amazonaws.us-east-1.s3")
         self.assertTrue(resources[0]["c7n:ServiceDetails"]["VpcEndpointPolicySupported"])
+
+
+class SecurityGroupPaginationTest(BaseTest):
+
+    def test_describe_sends_max_results(self):
+        p = self.load_policy({'name': 'sg', 'resource': 'aws.security-group'})
+        with mock.patch('c7n.query.ResourceQuery.filter', return_value=[]) as filter_:
+            p.resource_manager.resources()
+        self.assertEqual(filter_.call_args.kwargs.get('MaxResults'), 1000)
+
+    def test_get_resources_omits_max_results(self):
+        # EC2 rejects MaxResults alongside GroupIds, and get_resources swallows
+        # the ClientError, so by-id lookups must not be paged.
+        p = self.load_policy({'name': 'sg', 'resource': 'aws.security-group'})
+        with mock.patch('c7n.query.ResourceQuery.get', return_value=[]) as get_, \
+                mock.patch('c7n.query.ResourceQuery.filter') as filter_:
+            p.resource_manager.get_resources(['sg-0123456789abcdef0'], cache=False)
+        get_.assert_called_once()
+        filter_.assert_not_called()
+
+    def test_config_source_query_untouched(self):
+        p = self.load_policy(
+            {'name': 'sg', 'resource': 'aws.security-group', 'source': 'config'})
+        with mock.patch('c7n.query.ConfigSource.resources', return_value=[]) as res:
+            p.resource_manager.resources()
+        self.assertNotIn('MaxResults', res.call_args.args[0] or {})
