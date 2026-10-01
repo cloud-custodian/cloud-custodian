@@ -83,6 +83,7 @@ ResourceMap = {
     "azure.networkwatcher": "c7n_azure.resources.network_watcher.NetworkWatcher",
     "azure.policyassignments": "c7n_azure.resources.policy_assignments.PolicyAssignments",
     "azure.postgresql-database": "c7n_azure.resources.postgresql_database.PostgresqlDatabase",
+    "azure.postgresql-flexible-server": "c7n_azure.resources.psql_flexi.PostgresqlServer",
     "azure.postgresql-server": "c7n_azure.resources.postgresql_server.PostgresqlServer",
     "azure.private-dns-zone": "c7n_azure.resources.private_dns_zone.PrivateDnsZone",
     "azure.private-record-set": "c7n_azure.resources.private_record_set.PrivateRecordSet",
