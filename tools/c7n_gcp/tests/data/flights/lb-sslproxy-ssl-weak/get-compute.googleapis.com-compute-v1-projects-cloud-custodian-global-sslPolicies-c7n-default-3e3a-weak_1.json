@@ -1,0 +1,44 @@
+{
+  "headers": {
+    "content-type": "application/json; charset=UTF-8",
+    "vary": "Origin, X-Origin, Referer",
+    "date": "Wed, 30 Sep 2026 15:59:47 GMT",
+    "server": "ESF",
+    "x-xss-protection": "0",
+    "x-frame-options": "SAMEORIGIN",
+    "x-content-type-options": "nosniff",
+    "alt-svc": "h3=\":443\"; ma=2592000,h3-29=\":443\"; ma=2592000",
+    "transfer-encoding": "chunked",
+    "status": "200",
+    "content-length": "1043",
+    "-content-encoding": "gzip",
+    "content-location": "https://compute.googleapis.com/compute/v1/projects/cloud-custodian/global/sslPolicies/c7n-default-3e3a-weak?alt=json"
+  },
+  "body": {
+    "kind": "compute#sslPolicy",
+    "id": "5845612821165936425",
+    "creationTimestamp": "2026-09-30T08:59:02.633-07:00",
+    "selfLink": "https://www.googleapis.com/compute/v1/projects/cloud-custodian/global/sslPolicies/c7n-default-3e3a-weak",
+    "name": "c7n-default-3e3a-weak",
+    "profile": "COMPATIBLE",
+    "minTlsVersion": "TLS_1_0",
+    "enabledFeatures": [
+      "TLS_ECDHE_ECDSA_WITH_AES_128_CBC_SHA",
+      "TLS_ECDHE_ECDSA_WITH_AES_128_GCM_SHA256",
+      "TLS_ECDHE_ECDSA_WITH_AES_256_CBC_SHA",
+      "TLS_ECDHE_ECDSA_WITH_AES_256_GCM_SHA384",
+      "TLS_ECDHE_ECDSA_WITH_CHACHA20_POLY1305_SHA256",
+      "TLS_ECDHE_RSA_WITH_AES_128_CBC_SHA",
+      "TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256",
+      "TLS_ECDHE_RSA_WITH_AES_256_CBC_SHA",
+      "TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384",
+      "TLS_ECDHE_RSA_WITH_CHACHA20_POLY1305_SHA256",
+      "TLS_RSA_WITH_3DES_EDE_CBC_SHA",
+      "TLS_RSA_WITH_AES_128_CBC_SHA",
+      "TLS_RSA_WITH_AES_128_GCM_SHA256",
+      "TLS_RSA_WITH_AES_256_CBC_SHA",
+      "TLS_RSA_WITH_AES_256_GCM_SHA384"
+    ],
+    "fingerprint": "UCiJtMU0f-Q="
+  }
+}
