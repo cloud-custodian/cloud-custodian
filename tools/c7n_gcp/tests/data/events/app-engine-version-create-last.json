@@ -1,0 +1,46 @@
+{
+  "insertId": "3m1ytqcld1",
+  "logName": "projects/cloud-custodian/logs/cloudaudit.googleapis.com%2Factivity",
+  "operation": {
+    "id": "operation-1790883212996-65ccc7dbeae98-27695256-2dd852e5",
+    "last": true,
+    "producer": "appengine.googleapis.com"
+  },
+  "protoPayload": {
+    "@type": "type.googleapis.com/google.cloud.audit.AuditLog",
+    "authenticationInfo": {
+      "oauthInfo": {
+        "oauthClientId": "32555940559.apps.googleusercontent.com"
+      },
+      "principalEmail": "user@example.com"
+    },
+    "methodName": "google.appengine.v1.Versions.CreateVersion",
+    "requestMetadata": {
+      "destinationAttributes": {},
+      "requestAttributes": {}
+    },
+    "resourceLocation": {
+      "currentLocations": [
+        "us-central1"
+      ]
+    },
+    "resourceName": "apps/cloud-custodian/services/default/versions/c7n-always-fd72",
+    "response": {
+      "@type": "type.googleapis.com/google.appengine.v1.Version"
+    },
+    "serviceName": "appengine.googleapis.com",
+    "status": {}
+  },
+  "receiveTimestamp": "2026-10-01T19:34:01.732298958Z",
+  "resource": {
+    "labels": {
+      "module_id": "default",
+      "project_id": "cloud-custodian",
+      "version_id": "c7n-always-fd72",
+      "zone": ""
+    },
+    "type": "gae_app"
+  },
+  "severity": "NOTICE",
+  "timestamp": "2026-10-01T19:34:01.707367737Z"
+}

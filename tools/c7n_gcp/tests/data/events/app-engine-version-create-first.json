@@ -1,0 +1,72 @@
+{
+  "insertId": "q352tndjl20",
+  "logName": "projects/cloud-custodian/logs/cloudaudit.googleapis.com%2Factivity",
+  "operation": {
+    "first": true,
+    "id": "operation-1790883212996-65ccc7dbeae98-27695256-2dd852e5",
+    "producer": "appengine.googleapis.com"
+  },
+  "protoPayload": {
+    "@type": "type.googleapis.com/google.cloud.audit.AuditLog",
+    "authenticationInfo": {
+      "oauthInfo": {
+        "oauthClientId": "32555940559.apps.googleusercontent.com"
+      },
+      "principalEmail": "user@example.com"
+    },
+    "authorizationInfo": [
+      {
+        "granted": true,
+        "permission": "appengine.versions.create",
+        "permissionType": "ADMIN_WRITE",
+        "resource": "projects/cloud-custodian/locations/us-central1/applications/cloud-custodian/services/default",
+        "resourceAttributes": {}
+      }
+    ],
+    "metadata": {
+      "@type": "type.googleapis.com/google.appengine.v1.CreateVersionRequest",
+      "parent": "projects/cloud-custodian/locations/us-central1/applications/cloud-custodian/services/default",
+      "version": {
+        "entrypoint": {
+          "shell": "node app.js"
+        },
+        "id": "c7n-always-fd72",
+        "runtime": "nodejs24"
+      }
+    },
+    "methodName": "google.appengine.v1.Versions.CreateVersion",
+    "request": {
+      "@type": "type.googleapis.com/google.appengine.v1.CreateVersionRequest",
+      "parent": "projects/cloud-custodian/locations/us-central1/applications/cloud-custodian/services/default"
+    },
+    "requestMetadata": {
+      "callerIp": "198.51.100.1",
+      "callerSuppliedUserAgent": "Terraform/1.11.5 (+https://www.terraform.io) Terraform-Plugin-SDK/2.40.1 terraform-provider-google/dev8,gzip(gfe)",
+      "destinationAttributes": {},
+      "requestAttributes": {
+        "auth": {},
+        "time": "2026-10-01T19:33:32.976233876Z"
+      }
+    },
+    "resourceLocation": {
+      "currentLocations": [
+        "us-central1"
+      ]
+    },
+    "resourceName": "apps/cloud-custodian/services/default/versions/c7n-always-fd72",
+    "serviceName": "appengine.googleapis.com",
+    "status": {}
+  },
+  "receiveTimestamp": "2026-10-01T19:33:33.666377664Z",
+  "resource": {
+    "labels": {
+      "module_id": "default",
+      "project_id": "cloud-custodian",
+      "version_id": "c7n-always-fd72",
+      "zone": ""
+    },
+    "type": "gae_app"
+  },
+  "severity": "NOTICE",
+  "timestamp": "2026-10-01T19:33:32.946509587Z"
+}

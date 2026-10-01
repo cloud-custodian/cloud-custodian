@@ -177,11 +177,15 @@ class AppEngineServiceVersion(ChildResourceManager):
     https://cloud.google.com/appengine/docs/admin-api/reference/rest/v1/apps.services.versions
     """
 
+    def _get_parent_resource_info(self, child_instance):
+        return {'resourceName': re.match(
+            '(apps/.*?/services/.*?)/versions/.*', child_instance['name']).group(1)}
+
     class resource_type(AppEngineChildTypeInfo):
         component = 'apps.services.versions'
         name = 'name'
         id = 'id'
-        enum_spec = ('list', 'versions[]', None)
+        enum_spec = ('list', 'versions[]', {'view': 'FULL'})
         default_report_fields = ['name', 'instanceClass', 'runtime', 'runtimeChannel', 'vm']
         urn_component = "versions"
         asset_type = "appengine.googleapis.com/Version"
@@ -192,3 +196,12 @@ class AppEngineServiceVersion(ChildResourceManager):
                 ('name', 'appsId', 'regex', r'/(.*?)/')
             ]
         }
+
+        @staticmethod
+        def get(client, resource_info):
+            apps_id, service_id, version_id = re.match(
+                '.*?apps/([^/]+)/services/([^/]+)/versions/([^/]+)$',
+                resource_info['resourceName']).groups()
+            return client.execute_query('get', {
+                'appsId': apps_id, 'servicesId': service_id,
+                'versionsId': version_id, 'view': 'FULL'})
