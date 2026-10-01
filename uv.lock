@@ -223,15 +223,6 @@ wheels = [
 ]
 
 [[package]]
-name = "appdirs"
-version = "1.4.4"
-source = { registry = "https://pypi.org/simple" }
-sdist = { url = "https://files.pythonhosted.org/packages/d7/d8/05696357e0311f5b5c316d7b95f46c669dd9c15aaeecbb48c7d0aeb88c40/appdirs-1.4.4.tar.gz", hash = "sha256:7d5d0167b2b1ba821647616af46a749d1c653740dd0d2415100fe26e27afdf41", size = 13470, upload-time = "2020-05-11T07:59:51.037Z" }
-wheels = [
-    { url = "https://files.pythonhosted.org/packages/3b/00/2344469e2084fb287c2e0b57b72910309874c3245463acd6cf5e3db69324/appdirs-1.4.4-py2.py3-none-any.whl", hash = "sha256:a841dacd6b99318a741b166adb07e19ee71a274450e68237b4650ca1055ab128", size = 9566, upload-time = "2020-05-11T07:59:49.499Z" },
-]
-
-[[package]]
 name = "applicationinsights"
 version = "0.11.10"
 source = { registry = "https://pypi.org/simple" }
@@ -470,16 +461,17 @@ wheels = [
 
 [[package]]
 name = "azure-mgmt-apimanagement"
-version = "1.0.0"
+version = "5.0.0"
 source = { registry = "https://pypi.org/simple" }
 dependencies = [
     { name = "azure-common" },
     { name = "azure-mgmt-core" },
-    { name = "msrest" },
+    { name = "isodate" },
+    { name = "typing-extensions" },
 ]
-sdist = { url = "https://files.pythonhosted.org/packages/71/e5/cb6cbae700e9b61415456fd269682f3a86391c95fe2724c4565dda2d62d7/azure-mgmt-apimanagement-1.0.0.zip", hash = "sha256:3ad7e2c3d20dd0141f9e2c0ae923121f7cbe7333bb314850e6f8b606636e3589", size = 561538, upload-time = "2021-01-04T03:58:35.047Z" }
+sdist = { url = "https://files.pythonhosted.org/packages/25/e4/3e536f0374bccb203886ef7aeb1148e063de6be31187034179ddcbf1adff/azure_mgmt_apimanagement-5.0.0.tar.gz", hash = "sha256:0ab7fe17e70fe3154cd840ff47d19d7a4610217003eaa7c21acf3511a6e57999", size = 625729, upload-time = "2025-04-22T06:24:05.364Z" }
 wheels = [
-    { url = "https://files.pythonhosted.org/packages/a7/e6/c5327f7c24ff31c87be32e48cd47fb3b83bc8b80e919daace96eb2335a9d/azure_mgmt_apimanagement-1.0.0-py2.py3-none-any.whl", hash = "sha256:a8803545668fcf34bac26ca499297baf1587cad9792a1d09a067e086aa5c037c", size = 543732, upload-time = "2021-01-04T03:58:33.42Z" },
+    { url = "https://files.pythonhosted.org/packages/5b/d8/1406ff959601b1a93fb662b1a76067ecef7094680efcdd75c007457f9efd/azure_mgmt_apimanagement-5.0.0-py3-none-any.whl", hash = "sha256:b88c42a392333b60722fb86f15d092dfc19a8d67510dccd15c217381dff4e6ec", size = 1150262, upload-time = "2025-04-22T06:24:07.012Z" },
 ]
 
 [[package]]
@@ -1735,7 +1727,7 @@ requires-dist = [
     { name = "azure-keyvault-keys", specifier = ">=4.3.1,<5.0.0" },
     { name = "azure-keyvault-secrets", specifier = ">=4.2.0,<5.0.0" },
     { name = "azure-mgmt-advisor", specifier = ">=9.0.0,<10.0.0" },
-    { name = "azure-mgmt-apimanagement", specifier = ">=1.0.0,<2.0.0" },
+    { name = "azure-mgmt-apimanagement", specifier = ">=1.0.0,<6.0.0" },
     { name = "azure-mgmt-appconfiguration", specifier = "==0.7.0" },
     { name = "azure-mgmt-applicationinsights", specifier = ">=1.0.0,<2.0.0" },
     { name = "azure-mgmt-appplatform", specifier = ">=8.0.0,<9.0.0" },
@@ -1842,7 +1834,7 @@ requires-dist = [
     { name = "google-cloud-logging", specifier = ">=3.2,<4.0" },
     { name = "google-cloud-monitoring", specifier = ">=2.5.0,<3.0.0" },
     { name = "google-cloud-storage", specifier = ">=2.7,<4.0" },
-    { name = "pyrate-limiter", specifier = ">=2.8.4,<3.0.0" },
+    { name = "pyrate-limiter", specifier = ">=2.8.4,<5.0.0" },
     { name = "retrying", specifier = ">=1.3.3,<2.0.0" },
 ]
 
@@ -1905,7 +1897,7 @@ requires-dist = [
     { name = "c7n", editable = "." },
     { name = "click", specifier = ">=8.0" },
     { name = "python-hcl2", specifier = ">=8.1.0,<9.0.0" },
-    { name = "rich", specifier = ">=14.0,<15.0" },
+    { name = "rich", specifier = ">=14.0,<16.0" },
     { name = "tfparse", specifier = ">=0.6,<1.0" },
 ]
 
@@ -1967,7 +1959,7 @@ requires-dist = [
     { name = "ldap3", specifier = ">=2.6.1,<3.0.0" },
     { name = "python-dateutil", specifier = ">=2.8.1,<3.0.0" },
     { name = "pyyaml", specifier = ">=5.4.0" },
-    { name = "redis", specifier = ">=5.0,<6.0" },
+    { name = "redis", specifier = ">=5.0,<9.0" },
     { name = "sendgrid", specifier = ">=6.1.1,<6.12.5" },
     { name = "types-six", specifier = ">=1.16.10,<2.0.0" },
 ]
@@ -2024,7 +2016,7 @@ dev = [
 [package.metadata]
 requires-dist = [
     { name = "c7n", editable = "." },
-    { name = "openstacksdk", specifier = "==0.52.0" },
+    { name = "openstacksdk", specifier = "==4.13.0" },
 ]
 
 [package.metadata.requires-dev]
@@ -4141,15 +4133,6 @@ wheels = [
 ]
 
 [[package]]
-name = "munch"
-version = "4.0.0"
-source = { registry = "https://pypi.org/simple" }
-sdist = { url = "https://files.pythonhosted.org/packages/e7/2b/45098135b5f9f13221820d90f9e0516e11a2a0f55012c13b081d202b782a/munch-4.0.0.tar.gz", hash = "sha256:542cb151461263216a4e37c3fd9afc425feeaf38aaa3025cd2a981fadb422235", size = 19089, upload-time = "2023-07-01T09:49:35.98Z" }
-wheels = [
-    { url = "https://files.pythonhosted.org/packages/56/b3/7c69b37f03260a061883bec0e7b05be7117c1b1c85f5212c72c8c2bc3c8c/munch-4.0.0-py2.py3-none-any.whl", hash = "sha256:71033c45db9fb677a0b7eb517a4ce70ae09258490e419b0e7f00d1e386ecb1b4", size = 9950, upload-time = "2023-07-01T09:49:34.472Z" },
-]
-
-[[package]]
 name = "mypy"
 version = "0.991"
 source = { registry = "https://pypi.org/simple" }
@@ -4209,12 +4192,6 @@ sdist = { url = "https://files.pythonhosted.org/packages/af/96/f4878091248450bbd
 wheels = [
     { url = "https://files.pythonhosted.org/packages/b6/a6/aa2c645188e00f7db040d1b0b1dd353b5b51c67984ada4f6d60aa388982f/netaddr-0.10.1-py2.py3-none-any.whl", hash = "sha256:9822305b42ea1020d54fee322d43cee5622b044c07a1f0130b459bb467efcf88", size = 2220012, upload-time = "2024-01-02T19:05:03.613Z" },
 ]
-
-[[package]]
-name = "netifaces"
-version = "0.11.0"
-source = { registry = "https://pypi.org/simple" }
-sdist = { url = "https://files.pythonhosted.org/packages/a6/91/86a6eac449ddfae239e93ffc1918cf33fd9bab35c04d1e963b311e347a73/netifaces-0.11.0.tar.gz", hash = "sha256:043a79146eb2907edf439899f262b3dfe41717d34124298ed281139a8b93ca32", size = 30106, upload-time = "2021-05-31T08:33:02.506Z" }
 
 [[package]]
 name = "nh3"
@@ -4316,10 +4293,9 @@ wheels = [
 
 [[package]]
 name = "openstacksdk"
-version = "0.52.0"
+version = "4.13.0"
 source = { registry = "https://pypi.org/simple" }
 dependencies = [
-    { name = "appdirs" },
     { name = "cryptography" },
     { name = "decorator" },
     { name = "dogpile-cache" },
@@ -4328,17 +4304,17 @@ dependencies = [
     { name = "jsonpatch" },
     { name = "keystoneauth1", version = "5.14.0", source = { registry = "https://pypi.org/simple" }, marker = "python_full_version < '3.11'" },
     { name = "keystoneauth1", version = "5.17.0", source = { registry = "https://pypi.org/simple" }, marker = "python_full_version >= '3.11'" },
-    { name = "munch" },
-    { name = "netifaces" },
     { name = "os-service-types", version = "1.8.2", source = { registry = "https://pypi.org/simple" }, marker = "python_full_version < '3.11'" },
     { name = "os-service-types", version = "1.9.0", source = { registry = "https://pypi.org/simple" }, marker = "python_full_version >= '3.11'" },
     { name = "pbr" },
+    { name = "platformdirs" },
+    { name = "psutil" },
     { name = "pyyaml" },
-    { name = "requestsexceptions" },
+    { name = "typing-extensions" },
 ]
-sdist = { url = "https://files.pythonhosted.org/packages/84/19/f1bc34691a0db5d5072d389f114d0b99080c8a418912ee8690f825760dbf/openstacksdk-0.52.0.tar.gz", hash = "sha256:c9a2dd8c9d2cf44d7ba2075c7963f8fc79adf98f44af6aac2f4b612c12b798b3", size = 981077, upload-time = "2020-11-18T17:41:53.53Z" }
+sdist = { url = "https://files.pythonhosted.org/packages/eb/ee/12590365cec760c4e559eef4e77ba82b8cd024d98b5ede37750201068b6e/openstacksdk-4.13.0.tar.gz", hash = "sha256:ab5b0d7e3a42de3dbc78497b31b5be53abf77a962986b3a621821e07e38c69a2", size = 1341338, upload-time = "2026-05-18T09:36:52.922Z" }
 wheels = [
-    { url = "https://files.pythonhosted.org/packages/b4/da/d42fda9f5d058bc442a5b9cc4e1555ee69be86e81d55d7e3e62daadfb8bb/openstacksdk-0.52.0-py3-none-any.whl", hash = "sha256:cd8a23539961e2958a4e2e2240ec3d1d801a85d1bd23d7d8f22bbd554db42d2e", size = 1338961, upload-time = "2020-11-18T17:41:26.832Z" },
+    { url = "https://files.pythonhosted.org/packages/57/90/d07b37783885891d34300610542f60d386c8110fb6b11eb2c2e5220d22b5/openstacksdk-4.13.0-py3-none-any.whl", hash = "sha256:3588662fdfba753ec32336dca836562622017ab8ed7b5bc910dd128681ebac8a", size = 1895999, upload-time = "2026-05-18T09:36:51.121Z" },
 ]
 
 [[package]]
@@ -5061,11 +5037,11 @@ wheels = [
 
 [[package]]
 name = "pyrate-limiter"
-version = "2.10.0"
+version = "4.5.0"
 source = { registry = "https://pypi.org/simple" }
-sdist = { url = "https://files.pythonhosted.org/packages/c0/a2/bb73c385e6d68cbe0ebe6ff16c22c96a79194c1298b2942005fcaf3eda9d/pyrate_limiter-2.10.0.tar.gz", hash = "sha256:98cc52cdbe058458e945ae87d4fd5a73186497ffa545ee6e98372f8599a5bd34", size = 49915, upload-time = "2023-02-26T16:03:08.883Z" }
+sdist = { url = "https://files.pythonhosted.org/packages/62/43/48693393af06b9fffbaea6bb8fe03be3c3f17be5d1423dab347d1aad1dde/pyrate_limiter-4.5.0.tar.gz", hash = "sha256:098345fff3a52b84dee9bcf6973f184c8b3ef8d34e1f4f781ac0773e3984598b", size = 123240, upload-time = "2026-08-30T10:35:39.272Z" }
 wheels = [
-    { url = "https://files.pythonhosted.org/packages/4f/2e/cad6d72ca044bff3b0d53b491f5116582e0704fea59672906d44b9600514/pyrate_limiter-2.10.0-py3-none-any.whl", hash = "sha256:a99e52159f5ed5eb58118bed8c645e30818e7c0e0d127a0585c8277c776b0f7f", size = 16376, upload-time = "2023-02-26T16:03:06.447Z" },
+    { url = "https://files.pythonhosted.org/packages/64/dc/02f88649feeabf4282c8c194a6f6060ca858041bab1204365b5d8ef8a95e/pyrate_limiter-4.5.0-py3-none-any.whl", hash = "sha256:e7320a715adf404cb7b2f399e05ceb59cae165275b21f7708eb1b9fd9608e91c", size = 57188, upload-time = "2026-08-30T10:35:38.069Z" },
 ]
 
 [[package]]
@@ -5387,15 +5363,14 @@ wheels = [
 
 [[package]]
 name = "redis"
-version = "5.3.1"
+version = "8.1.0"
 source = { registry = "https://pypi.org/simple" }
 dependencies = [
     { name = "async-timeout", marker = "python_full_version < '3.11.3'" },
-    { name = "pyjwt" },
 ]
-sdist = { url = "https://files.pythonhosted.org/packages/6a/cf/128b1b6d7086200c9f387bd4be9b2572a30b90745ef078bd8b235042dc9f/redis-5.3.1.tar.gz", hash = "sha256:ca49577a531ea64039b5a36db3d6cd1a0c7a60c34124d46924a45b956e8cf14c", size = 4626200, upload-time = "2025-07-25T08:06:27.778Z" }
+sdist = { url = "https://files.pythonhosted.org/packages/a8/99/604f0b666d4c616d891cf77ebb9db6bb21601344c051aebf1b72b9ff915f/redis-8.1.0.tar.gz", hash = "sha256:6e1a19beef9225c83efd689c7e6b7da2d5215b1f42cd13b7fc3714d0a09c7b25", size = 5254356, upload-time = "2026-07-30T08:51:00.269Z" }
 wheels = [
-    { url = "https://files.pythonhosted.org/packages/7f/26/5c5fa0e83c3621db835cfc1f1d789b37e7fa99ed54423b5f519beb931aa7/redis-5.3.1-py3-none-any.whl", hash = "sha256:dc1909bd24669cc31b5f67a039700b16ec30571096c5f1f0d9d2324bff31af97", size = 272833, upload-time = "2025-07-25T08:06:26.317Z" },
+    { url = "https://files.pythonhosted.org/packages/66/9d/c5731f6e3608663d4d3656fd8d3aecee8b509c3082818f5a13eae925baea/redis-8.1.0-py3-none-any.whl", hash = "sha256:a4fe1aac3d3b3cc791d4b3d5931c5a956045dc951ee74d1c913ee3ac4d2ee9fb", size = 560618, upload-time = "2026-07-30T08:50:58.497Z" },
 ]
 
 [[package]]
@@ -5591,15 +5566,6 @@ wheels = [
 ]
 
 [[package]]
-name = "requestsexceptions"
-version = "1.4.0"
-source = { registry = "https://pypi.org/simple" }
-sdist = { url = "https://files.pythonhosted.org/packages/82/ed/61b9652d3256503c99b0b8f145d9c8aa24c514caff6efc229989505937c1/requestsexceptions-1.4.0.tar.gz", hash = "sha256:b095cbc77618f066d459a02b137b020c37da9f46d9b057704019c9f77dba3065", size = 6880, upload-time = "2018-02-01T17:04:45.294Z" }
-wheels = [
-    { url = "https://files.pythonhosted.org/packages/01/8c/49ca60ea8c907260da4662582c434bec98716177674e88df3fd340acf06d/requestsexceptions-1.4.0-py2.py3-none-any.whl", hash = "sha256:3083d872b6e07dc5c323563ef37671d992214ad9a32b0ca4a3d7f5500bf38ce3", size = 3802, upload-time = "2018-02-01T17:04:39.07Z" },
-]
-
-[[package]]
 name = "responses"
 version = "0.26.3"
 source = { registry = "https://pypi.org/simple" }
@@ -5645,15 +5611,15 @@ wheels = [
 
 [[package]]
 name = "rich"
-version = "14.3.4"
+version = "15.0.0"
 source = { registry = "https://pypi.org/simple" }
 dependencies = [
     { name = "markdown-it-py" },
     { name = "pygments" },
 ]
-sdist = { url = "https://files.pythonhosted.org/packages/e9/67/cae617f1351490c25a4b8ac3b8b63a4dda609295d8222bad12242dfdc629/rich-14.3.4.tar.gz", hash = "sha256:817e02727f2b25b40ef56f5aa2217f400c8489f79ca8f46ea2b70dd5e14558a9", size = 230524, upload-time = "2026-04-11T02:57:45.419Z" }
+sdist = { url = "https://files.pythonhosted.org/packages/c0/8f/0722ca900cc807c13a6a0c696dacf35430f72e0ec571c4275d2371fca3e9/rich-15.0.0.tar.gz", hash = "sha256:edd07a4824c6b40189fb7ac9bc4c52536e9780fbbfbddf6f1e2502c31b068c36", size = 230680, upload-time = "2026-04-12T08:24:00.75Z" }
 wheels = [
-    { url = "https://files.pythonhosted.org/packages/b3/76/6d163cfac87b632216f71879e6b2cf17163f773ff59c00b5ff4900a80fa3/rich-14.3.4-py3-none-any.whl", hash = "sha256:07e7adb4690f68864777b1450859253bed81a99a31ac321ac1817b2313558952", size = 310480, upload-time = "2026-04-11T02:57:47.484Z" },
+    { url = "https://files.pythonhosted.org/packages/82/3b/64d4899d73f91ba49a8c18a8ff3f0ea8f1c1d75481760df8c68ef5235bf5/rich-15.0.0-py3-none-any.whl", hash = "sha256:33bd4ef74232fb73fe9279a257718407f169c09b78a87ad3d296f548e27de0bb", size = 310654, upload-time = "2026-04-12T08:24:02.83Z" },
 ]
 
 [[package]]
