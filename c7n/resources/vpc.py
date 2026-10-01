@@ -909,7 +909,7 @@ class SecurityGroup(query.QueryResourceManager):
         # Without MaxResults, DescribeSecurityGroups returns every group in the
         # region in one response, which does not scale to large accounts.
         # Only the describe path is paged: by-id lookups go through
-        # get_resources(), where EC2 rejects MaxResults alongside GroupIds, and
+        # get_resources(), where EC2 rejects MaxResults alongside GroupIds and
         # the config source expects its own query shape.
         if self.source_type == 'describe':
             query = dict(query or {})
