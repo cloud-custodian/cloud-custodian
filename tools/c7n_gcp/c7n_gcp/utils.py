@@ -1,3 +1,14 @@
+def filter_tree_has_key(node, key):
+    """Recursively check whether a policy filter structure references `key`."""
+    if isinstance(node, dict):
+        if node.get('key') == key:
+            return True
+        return any(filter_tree_has_key(v, key) for v in node.values())
+    if isinstance(node, list):
+        return any(filter_tree_has_key(item, key) for item in node)
+    return False
+
+
 def get_firewall_port_ranges(firewall_resources):
     for r_index, r in enumerate(firewall_resources):
         action = "allowed" if "allowed" in r else "denied"
