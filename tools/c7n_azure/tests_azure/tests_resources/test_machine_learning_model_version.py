@@ -39,3 +39,19 @@ class MachineLearningModelVersionTest(BaseTest):
         resources = p.run()
         self.assertEqual(1, len(resources))
         self.assertEqual('2', resources[0]['name'])
+
+    @arm_template('machine-learning-model-version.json')
+    def test_machine_learning_model_version_filter_anonymous(self):
+        p = self.load_policy({
+            'name': 'find-anonymous-model-versions',
+            'resource': 'azure.machine-learning-model-version',
+            'filters': [{
+                'type': 'value',
+                'key': 'properties.isAnonymous',
+                'value': True
+            }],
+        })
+        resources = p.run()
+        self.assertEqual(2, len(resources))
+        self.assertTrue(all(r['properties']['isAnonymous'] for r in resources))
+        self.assertEqual({'2', '3'}, {r['name'] for r in resources})
