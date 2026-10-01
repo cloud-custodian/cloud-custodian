@@ -886,6 +886,19 @@ class ConfigSG(query.ConfigSource):
         return r
 
 
+class DescribeSecurityGroups(query.DescribeSource):
+
+    def resources(self, query):
+        # Without MaxResults, DescribeSecurityGroups returns every group in the
+        # region in one response, which does not scale to large accounts.
+        # Paging here rather than in the manager keeps the cache key unchanged
+        # and leaves by-id lookups alone since EC2 rejects MaxResults alongside
+        # GroupIds.
+        query = dict(query or {})
+        query.setdefault('MaxResults', 1000)
+        return super().resources(query)
+
+
 @resources.register('security-group')
 class SecurityGroup(query.QueryResourceManager):
 
@@ -902,19 +915,8 @@ class SecurityGroup(query.QueryResourceManager):
 
     source_mapping = {
         'config': ConfigSG,
-        'describe': query.DescribeSource
+        'describe': DescribeSecurityGroups
     }
-
-    def resources(self, query=None, augment=True):
-        # Without MaxResults, DescribeSecurityGroups returns every group in the
-        # region in one response, which does not scale to large accounts.
-        # Only the describe path is paged: by-id lookups go through
-        # get_resources(), where EC2 rejects MaxResults alongside GroupIds and
-        # the config source expects its own query shape.
-        if self.source_type == 'describe':
-            query = dict(query or {})
-            query.setdefault('MaxResults', 1000)
-        return super().resources(query=query, augment=augment)
 
 
 @SecurityGroup.filter_registry.register('diff')

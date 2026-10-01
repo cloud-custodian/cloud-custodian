@@ -4939,11 +4939,23 @@ class SecurityGroupPaginationTest(BaseTest):
         # EC2 rejects MaxResults alongside GroupIds and get_resources swallows
         # the ClientError so by-id lookups must not be paged.
         p = self.load_policy({'name': 'sg', 'resource': 'aws.security-group'})
-        with mock.patch('c7n.query.ResourceQuery.get', return_value=[]) as get_, \
-                mock.patch('c7n.query.ResourceQuery.filter') as filter_:
+        with mock.patch('c7n.query.ResourceQuery.filter', return_value=[]) as filter_:
             p.resource_manager.get_resources(['sg-0123456789abcdef0'], cache=False)
-        get_.assert_called_once()
-        filter_.assert_not_called()
+        filter_.assert_called_once()
+        self.assertEqual(filter_.call_args.kwargs['GroupIds'], ['sg-0123456789abcdef0'])
+        self.assertNotIn('MaxResults', filter_.call_args.kwargs)
+
+    def test_get_resources_reuses_cached_listing(self):
+        # Paging must not change the listing's cache key or by-id lookups
+        # after a full listing miss the cache and call the API again.
+        p = self.load_policy(
+            {'name': 'sg', 'resource': 'aws.security-group'}, cache=True)
+        sg = {'GroupId': 'sg-0123456789abcdef0'}
+        with mock.patch('c7n.query.ResourceQuery.filter', return_value=[sg]) as filter_:
+            p.resource_manager.resources()
+            found = p.resource_manager.get_resources([sg['GroupId']])
+        self.assertEqual(found, [sg])
+        filter_.assert_called_once()
 
     def test_config_source_query_untouched(self):
         p = self.load_policy(
