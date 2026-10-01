@@ -39,6 +39,7 @@ class MachineLearningJob(ChildArmResourceManager):
     class resource_type(ChildArmResourceManager.resource_type):
         doc_groups = ['AI + Machine Learning']
         service = 'azure.mgmt.machinelearningservices'
+        raise_on_exception = False
         client = 'MachineLearningServicesMgmtClient'
         enum_spec = ('jobs', 'list', None)
         parent_manager_name = 'machine-learning-workspace'

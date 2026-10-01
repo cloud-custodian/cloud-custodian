@@ -1,6 +1,10 @@
 # Copyright The Cloud Custodian Authors.
 # SPDX-License-Identifier: Apache-2.0
 
+from unittest.mock import Mock
+
+from azure.core.exceptions import ResourceNotFoundError
+
 from c7n.utils import local_session
 from c7n_azure.query import _serialize
 from c7n_azure.resources.machine_learning_job import (
@@ -166,6 +170,60 @@ class MachineLearningJobTest(BaseTest):
             resources[0]['name'],
         )
         self.assertTrue(job.properties.is_archived)
+
+    def test_machine_learning_job_raise_on_exception_false(self):
+        # Stale Resource Graph entries for deleted workspaces yield 404s on job
+        # enumeration. raise_on_exception=False ensures those workspaces are
+        # skipped with a warning rather than aborting the entire policy run.
+        self.assertFalse(MachineLearningJob.resource_type.raise_on_exception)
+
+    def test_machine_learning_job_continues_after_failed_workspace(self):
+        # When one workspace raises ResourceNotFoundError during child enumeration
+        # (e.g. a ghost entry in Azure Resource Graph for a deleted workspace),
+        # the run should continue and return jobs from healthy workspaces.
+        ghost_parent = {
+            'id': '/subscriptions/sub/resourceGroups/rg-ghost/providers/'
+                  'Microsoft.MachineLearningServices/workspaces/ghost-ws',
+            'name': 'ghost-ws',
+            'resourceGroup': 'rg-ghost',
+        }
+        good_parent = {
+            'id': '/subscriptions/sub/resourceGroups/rg/providers/'
+                  'Microsoft.MachineLearningServices/workspaces/good-ws',
+            'name': 'good-ws',
+            'resourceGroup': 'rg',
+        }
+        good_job = {
+            'id': '/subscriptions/sub/resourceGroups/rg/providers/'
+                  'Microsoft.MachineLearningServices/workspaces/good-ws/jobs/job1',
+            'name': 'job1',
+            'resourceGroup': 'rg',
+            'type': 'Microsoft.MachineLearningServices/workspaces/jobs',
+            'properties': {'jobType': 'Command'},
+        }
+
+        parent_manager = Mock()
+        parent_manager.resource_type.id = 'id'
+        parent_manager.resources.return_value = [ghost_parent, good_parent]
+
+        p = self.load_policy({
+            'name': 'find-all-machine-learning-jobs',
+            'resource': 'azure.machine-learning-job',
+        })
+        manager = p.resource_manager
+        manager.get_parent_manager = Mock(return_value=parent_manager)
+
+        def enumerate_side_effect(parent, type_info, **kwargs):
+            if parent['name'] == 'ghost-ws':
+                raise ResourceNotFoundError('ParentResourceNotFound')
+            return [good_job]
+
+        manager.enumerate_resources = Mock(side_effect=enumerate_side_effect)
+
+        resources = manager.resources()
+
+        self.assertEqual(1, len(resources))
+        self.assertEqual('job1', resources[0]['name'])
 
     @arm_template('machine-learning-job-archive.json')
     @cassette_name('machine-learning-job-archive-skip')
