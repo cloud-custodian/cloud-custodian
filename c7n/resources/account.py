@@ -12,7 +12,7 @@ from dateutil.parser import parse as parse_date
 from dateutil.tz import tzutc
 
 from c7n.actions import ActionRegistry, BaseAction
-from c7n.exceptions import PolicyValidationError
+from c7n.exceptions import PolicyExecutionError, PolicyValidationError
 from c7n.filters import Filter, FilterRegistry, ValueFilter
 from c7n.filters.kms import KmsRelatedFilter
 from c7n.filters.multiattr import MultiAttrFilter
@@ -623,6 +623,91 @@ class AccessAnalyzer(ValueFilter):
                 matched_analyzers.append(analyzer)
         account[self.annotation_key] = matched_analyzers
         return matched_analyzers and resources or []
+
+
+@actions.register('create-access-analyzer')
+class CreateAccessAnalyzer(BaseAction):
+    """Create an external access analyzer in the policy's account and region.
+
+    ``analyzer-type`` defaults to ``ACCOUNT`` and also supports ``ORGANIZATION``.
+    Organization analyzers require the management or delegated administrator
+    account, with trusted access to IAM Access Analyzer already enabled.
+
+    An existing analyzer with the same name and type is left unchanged, including
+    its status, tags, and archive rules. A different type raises an error.
+    This action does not create unused-access or internal-access analyzers.
+    ``archive-rules`` accepts the ``ruleName`` and ``filter`` fields from the
+    Access Analyzer ``CreateAnalyzer`` API.
+
+    IAM Access Analyzer creates its service-linked role automatically when needed.
+    The execution role therefore needs ``iam:CreateServiceLinkedRole`` for
+    ``access-analyzer.amazonaws.com`` in addition to the analyzer permissions.
+
+    :example:
+
+    .. code-block:: yaml
+
+        policies:
+          - name: enable-missing-access-analyzer
+            resource: aws.account
+            filters:
+              - not:
+                  - type: access-analyzer
+                    key: "[type, status]"
+                    value: [ACCOUNT, ACTIVE]
+            actions:
+              - type: create-access-analyzer
+                analyzer-name: custodian-external-access
+                analyzer-type: ACCOUNT
+                tags:
+                  Owner: Security
+    """
+
+    schema = type_schema(
+        'create-access-analyzer', required=['analyzer-name'], **{
+            'analyzer-name': {'type': 'string', 'minLength': 1, 'maxLength': 255,
+                              'pattern': '^[A-Za-z][A-Za-z0-9_.-]*$'},
+            'analyzer-type': {'enum': ['ACCOUNT', 'ORGANIZATION']},
+            'archive-rules': {'type': 'array', 'items': {'type': 'object'}},
+            'tags': {'type': 'object', 'additionalProperties': {'type': 'string'}},
+        })
+    permissions = (
+        'access-analyzer:GetAnalyzer', 'access-analyzer:CreateAnalyzer',
+        'iam:CreateServiceLinkedRole')
+
+    def get_permissions(self):
+        if self.data.get('tags'):
+            return self.permissions + ('access-analyzer:TagResource',)
+        return self.permissions
+
+    def get_params(self):
+        params = {
+            'analyzerName': self.data['analyzer-name'],
+            'type': self.data.get('analyzer-type', 'ACCOUNT'),
+        }
+        for key, api_key in (('archive-rules', 'archiveRules'), ('tags', 'tags')):
+            if key in self.data:
+                params[api_key] = self.data[key]
+        return params
+
+    def validate(self):
+        shape_validate(self.get_params(), 'CreateAnalyzerRequest', 'accessanalyzer')
+        return self
+
+    def process(self, resources):
+        client = local_session(self.manager.session_factory).client('accessanalyzer')
+        params = self.get_params()
+        existing = self.manager.retry(
+            client.get_analyzer, analyzerName=params['analyzerName'],
+            ignore_err_codes=('ResourceNotFoundException',))
+        if existing:
+            analyzer_type = existing['analyzer']['type']
+            if analyzer_type != params['type']:
+                raise PolicyExecutionError(
+                    "Access analyzer %s already has type %s, requested %s" % (
+                        params['analyzerName'], analyzer_type, params['type']))
+            return
+        self.manager.retry(client.create_analyzer, **params)
 
 
 @filters.register('password-policy')
