@@ -1,0 +1,90 @@
+{
+  "headers": {
+    "content-type": "application/json; charset=UTF-8",
+    "vary": "Origin, X-Origin, Referer",
+    "date": "Fri, 11 Sep 2026 20:40:19 GMT",
+    "server": "ESF",
+    "x-xss-protection": "0",
+    "x-frame-options": "SAMEORIGIN",
+    "x-content-type-options": "nosniff",
+    "alt-svc": "h3=\":443\"; ma=2592000,h3-29=\":443\"; ma=2592000",
+    "transfer-encoding": "chunked",
+    "status": "200",
+    "content-length": "1866",
+    "-content-encoding": "gzip",
+    "content-location": "https://monitoring.googleapis.com/v3/projects/cloud-custodian/timeSeries?filter=metric.type+%3D+%22aiplatform.googleapis.com%2Fpublisher%2Fonline_serving%2Ftoken_count%22+AND+%28+resource.labels.model_user_id+%3D+%22gemini-2.5-flash%22+%29+&interval.startTime=2026-09-10T20%3A40%3A19Z&interval.endTime=2026-09-11T20%3A40%3A19Z&aggregation.alignmentPeriod=86400.0s&aggregation.perSeriesAligner=ALIGN_SUM&aggregation.crossSeriesReducer=REDUCE_NONE&view=FULL&alt=json"
+  },
+  "body": {
+    "timeSeries": [
+      {
+        "metric": {
+          "labels": {
+            "request_type": "shared",
+            "source": "us-central1",
+            "shared_request_type": "standard",
+            "type": "input"
+          },
+          "type": "aiplatform.googleapis.com/publisher/online_serving/token_count"
+        },
+        "resource": {
+          "type": "aiplatform.googleapis.com/PublisherModel",
+          "labels": {
+            "publisher": "google",
+            "project_id": "cloud-custodian",
+            "location": "us-central1",
+            "model_user_id": "gemini-2.5-flash",
+            "model_version_id": ""
+          }
+        },
+        "metricKind": "DELTA",
+        "valueType": "INT64",
+        "points": [
+          {
+            "interval": {
+              "startTime": "2026-09-10T20:40:19Z",
+              "endTime": "2026-09-11T20:40:19Z"
+            },
+            "value": {
+              "int64Value": "18"
+            }
+          }
+        ]
+      },
+      {
+        "metric": {
+          "labels": {
+            "shared_request_type": "standard",
+            "source": "us-central1",
+            "type": "output",
+            "request_type": "shared"
+          },
+          "type": "aiplatform.googleapis.com/publisher/online_serving/token_count"
+        },
+        "resource": {
+          "type": "aiplatform.googleapis.com/PublisherModel",
+          "labels": {
+            "project_id": "cloud-custodian",
+            "model_version_id": "",
+            "publisher": "google",
+            "model_user_id": "gemini-2.5-flash",
+            "location": "us-central1"
+          }
+        },
+        "metricKind": "DELTA",
+        "valueType": "INT64",
+        "points": [
+          {
+            "interval": {
+              "startTime": "2026-09-10T20:40:19Z",
+              "endTime": "2026-09-11T20:40:19Z"
+            },
+            "value": {
+              "int64Value": "119"
+            }
+          }
+        ]
+      }
+    ],
+    "unit": "1"
+  }
+}
