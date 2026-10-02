@@ -2437,6 +2437,18 @@ class SecurityGroupTest(BaseTest):
         except PolicyValidationError:
             self.fail("should pass validation")
 
+        self.assertRaises(
+            PolicyValidationError,
+            self.load_policy,
+            {'name': 'related-sg-no-key',
+             'resource': 'elb',
+             'filters': [
+                 {'type': 'security-group',
+                  'match-resource': True,
+                  'op': 'not-equal',
+                  'operator': 'or'}]},
+            validate=True)
+
     @functional
     def test_only_ports(self):
         factory = self.replay_flight_data("test_security_group_only_ports")
