@@ -1,17 +1,22 @@
 # Copyright The Cloud Custodian Authors.
 # SPDX-License-Identifier: Apache-2.0
+from datetime import datetime, timezone
 import logging
 import time
+
+import boto3
 import pytest
 
 from unittest import mock
 from .common import ACCOUNT_ID, BaseTest, event_data
 from botocore.exceptions import ClientError
+from botocore.stub import Stubber
 from pytest_terraform import terraform
-from c7n.exceptions import PolicyValidationError
+from c7n.exceptions import PolicyExecutionError, PolicyValidationError
 from c7n.resources.bedrock import (
-    get_bedrock_output_artifact_prefix, get_bedrock_output_lifecycle,
-    parse_bedrock_output_s3_uri)
+    KnowledgeBaseRetrievalActivity, count_retrievals, get_bedrock_output_artifact_prefix,
+    get_bedrock_output_lifecycle, parse_bedrock_output_s3_uri, parse_log_group_arn,
+    records_all_knowledge_base_events)
 from c7n.testing import C7N_FUNCTIONAL
 
 
@@ -1887,3 +1892,547 @@ class BedrockMantleProject(BaseTest):
              'bedrock-mantle:ListTagsForResource',
              'cloudformation:ListResources',
              'tag:GetResources'])
+
+
+def knowledge_base_selector(*extra_conditions):
+    return {'FieldSelectors': [
+        {'Field': 'eventCategory', 'Equals': ['Data']},
+        {'Field': 'resources.type', 'Equals': ['AWS::Bedrock::KnowledgeBase']},
+        *extra_conditions,
+    ]}
+
+
+@pytest.mark.parametrize('selectors, expected', [
+    pytest.param(
+        {'AdvancedEventSelectors': [knowledge_base_selector()]}, True,
+        id='exact'),
+    pytest.param(
+        {'AdvancedEventSelectors': [
+            {'FieldSelectors': [{'Field': 'eventCategory', 'Equals': ['Management']}]},
+            knowledge_base_selector(),
+        ]}, True,
+        id='beside-management-events'),
+    pytest.param(
+        {'AdvancedEventSelectors': [
+            knowledge_base_selector({'Field': 'readOnly', 'Equals': ['true']})]}, False,
+        id='read-only-condition'),
+    pytest.param(
+        {'AdvancedEventSelectors': [knowledge_base_selector(
+            {'Field': 'resources.ARN', 'StartsWith': [
+                'arn:aws:bedrock:us-east-1:123456789012:knowledge-base/ABCDEFGHIJ']})]}, False,
+        id='one-knowledge-base-only'),
+    pytest.param(
+        {'AdvancedEventSelectors': [{'FieldSelectors': [
+            {'Field': 'eventCategory', 'Equals': ['Data']},
+            {'Field': 'resources.type', 'Equals': ['AWS::Bedrock::AgentAlias']},
+        ]}]}, False,
+        id='other-resource-type'),
+    pytest.param(
+        {'AdvancedEventSelectors': [{'FieldSelectors': [
+            {'Field': 'eventCategory', 'Equals': ['Data']},
+            {'Field': 'resources.type', 'Equals': ['AWS::Bedrock::KnowledgeBase'],
+             'NotEquals': ['AWS::Bedrock::KnowledgeBase']},
+        ]}]}, False,
+        id='extra-operator'),
+    pytest.param(
+        {'EventSelectors': [{'ReadWriteType': 'All', 'IncludeManagementEvents': True}]}, False,
+        id='basic-selectors-only'),
+])
+def test_records_all_knowledge_base_events(selectors, expected):
+    assert records_all_knowledge_base_events(selectors) is expected
+
+
+@pytest.mark.parametrize('arn, expected', [
+    pytest.param(
+        'arn:aws:logs:us-east-2:123456789012:log-group:/aws/cloudtrail/kb:*',
+        ('123456789012', 'us-east-2', '/aws/cloudtrail/kb'),
+        id='trail-format-with-leading-slash'),
+    pytest.param(
+        'arn:aws:logs:us-west-2:123456789012:log-group:kb-events',
+        ('123456789012', 'us-west-2', 'kb-events'),
+        id='plain'),
+])
+def test_parse_log_group_arn(arn, expected):
+    assert parse_log_group_arn(arn) == expected
+
+
+@pytest.mark.parametrize('arn', [
+    pytest.param('arn:aws:logs:us-east-1:123456789012:log-group', id='no-name'),
+    pytest.param('arn:aws:cloudtrail:us-east-1:123456789012:trail/kb', id='not-a-log-group'),
+])
+def test_parse_log_group_arn_rejects(arn):
+    with pytest.raises(ValueError):
+        parse_log_group_arn(arn)
+
+
+KB_ARN = 'arn:aws:bedrock:us-east-1:123456789012:knowledge-base/ABCDEFGHIJ'
+RESULT_ROW = [{'field': 'resources.0.ARN', 'value': KB_ARN}, {'field': 'retrievals', 'value': '4'}]
+
+
+def test_count_retrievals():
+    rows = [RESULT_ROW, [{'field': 'retrievals', 'value': '2'}]]
+    assert count_retrievals(rows) == {KB_ARN: 4}
+
+
+def retrieval_activity_policy_data(**filter_data):
+    return {
+        'name': 'bedrock-knowledge-base-retrieval-activity',
+        'resource': 'aws.bedrock-knowledge-base',
+        'filters': [{'type': 'retrieval-activity', 'source': 'cloudwatch-logs', **filter_data}],
+    }
+
+
+@pytest.mark.parametrize('filter_data', [
+    pytest.param({'source': 'cloudtrail-lake'}, id='unknown-source'),
+    pytest.param(
+        {'log-group': 'arn:aws:logs:us-east-1:123456789012:log-group'}, id='bad-log-group-arn'),
+])
+def test_retrieval_activity_rejects_invalid_policy(test, filter_data):
+    with pytest.raises(PolicyValidationError):
+        test.load_policy(retrieval_activity_policy_data(**filter_data), validate=True)
+
+
+def test_retrieval_activity_permissions(test):
+    policy = test.load_policy(retrieval_activity_policy_data())
+    assert {
+        'cloudtrail:DescribeTrails', 'cloudtrail:GetEventSelectors', 'cloudtrail:GetTrailStatus',
+        'logs:DescribeLogGroups', 'logs:StartQuery', 'logs:GetQueryResults', 'logs:StopQuery',
+    } <= policy.get_permissions()
+
+
+def retrieval_activity_filter(test, cache=False, **filter_data):
+    policy = test.load_policy(
+        retrieval_activity_policy_data(**filter_data),
+        config={'region': 'us-east-1', 'account_id': ACCOUNT_ID}, cache=cache)
+    activity = policy.resource_manager.filters[0]
+    activity.poll_delay = 0
+    activity.poll_max_attempts = 3
+    return activity
+
+
+def use_logs_client(monkeypatch, logs):
+    """Hand the filter this logs client, and return the regions it asked for."""
+    regions = []
+
+    def client(service, region_name):
+        regions.append(region_name)
+        return logs
+
+    monkeypatch.setattr(
+        'c7n.resources.bedrock.local_session',
+        lambda session_factory: mock.Mock(client=client))
+    return regions
+
+
+def query_statuses(*statuses, results=()):
+    """A logs client that returns one query status per get_query_results call."""
+    client = mock.Mock()
+    client.get_query_results.side_effect = [
+        {'status': status, 'results': list(results) if status == 'Complete' else []}
+        for status in statuses]
+    return client
+
+
+def test_retrieval_activity_query_request(test, monkeypatch):
+    logs = boto3.client('logs', region_name='us-east-1')
+    stubber = Stubber(logs)
+    stubber.add_response('start_query', {'queryId': 'query-1'}, {
+        'logGroupName': 'kb-events',
+        'startTime': 1_000_000_000 - 30 * 86400,
+        'endTime': 1_000_000_000,
+        'queryString': (
+            'filter eventSource = "bedrock.amazonaws.com" and eventName = "Retrieve"'
+            ' | stats count(*) as retrievals by resources.0.ARN'),
+    })
+    stubber.add_response(
+        'get_query_results', {'status': 'Complete', 'results': [RESULT_ROW]},
+        {'queryId': 'query-1'})
+    activity = retrieval_activity_filter(test, days=30)
+    regions = use_logs_client(monkeypatch, logs)
+    monkeypatch.setattr(time, 'time', lambda: 1_000_000_000)
+
+    with stubber:
+        assert activity.query_log_group('us-east-2', 'kb-events') == {KB_ARN: 4}
+    stubber.assert_no_pending_responses()
+    # The log group's region, not the policy's (us-east-1).
+    assert regions == ['us-east-2']
+
+
+def test_retrieval_activity_retries_query_limit(test, monkeypatch):
+    logs = boto3.client('logs', region_name='us-east-1')
+    stubber = Stubber(logs)
+    stubber.add_client_error('start_query', 'LimitExceededException')
+    stubber.add_response('start_query', {'queryId': 'query-1'})
+    stubber.add_response('get_query_results', {'status': 'Complete', 'results': [RESULT_ROW]})
+    activity = retrieval_activity_filter(test)
+    use_logs_client(monkeypatch, logs)
+    monkeypatch.setattr(time, 'sleep', lambda seconds: None)
+
+    with stubber:
+        assert activity.query_log_group('us-east-1', 'kb-events') == {KB_ARN: 4}
+    stubber.assert_no_pending_responses()
+
+
+def test_retrieval_activity_caches_counts(test, monkeypatch):
+    logs = boto3.client('logs', region_name='us-east-1')
+    stubber = Stubber(logs)
+    stubber.add_response('start_query', {'queryId': 'query-1'})
+    stubber.add_response('get_query_results', {'status': 'Complete', 'results': [RESULT_ROW]})
+    activity = retrieval_activity_filter(test, cache=True)
+    use_logs_client(monkeypatch, logs)
+
+    with stubber:
+        first = activity.query_log_group('us-east-1', 'kb-events')
+        # A second region's run reads the same log group: no second query.
+        second = activity.query_log_group('us-east-1', 'kb-events')
+    assert first == second == {KB_ARN: 4}
+    stubber.assert_no_pending_responses()
+
+
+def test_retrieval_activity_cache_key_includes_days(test, monkeypatch):
+    logs = boto3.client('logs', region_name='us-east-1')
+    stubber = Stubber(logs)
+    for query_id in ('query-30', 'query-60'):
+        stubber.add_response('start_query', {'queryId': query_id})
+        stubber.add_response('get_query_results', {'status': 'Complete', 'results': []})
+    activity = retrieval_activity_filter(test, cache=True, days=30)
+    use_logs_client(monkeypatch, logs)
+
+    with stubber:
+        activity.query_log_group('us-east-1', 'kb-events')
+        activity.data['days'] = 60
+        activity.query_log_group('us-east-1', 'kb-events')
+    stubber.assert_no_pending_responses()
+
+
+def test_retrieval_activity_describe_log_group_exact_name(test, monkeypatch):
+    logs = boto3.client('logs', region_name='us-east-1')
+    stubber = Stubber(logs)
+    stubber.add_response('describe_log_groups', {'logGroups': [
+        {'logGroupName': 'kb-events-archive', 'retentionInDays': 1},
+        {'logGroupName': 'kb-events', 'retentionInDays': 30},
+    ]}, {'logGroupNamePrefix': 'kb-events'})
+    activity = retrieval_activity_filter(test)
+    regions = use_logs_client(monkeypatch, logs)
+
+    with stubber:
+        assert activity.describe_log_group('us-east-2', 'kb-events') == {
+            'logGroupName': 'kb-events', 'retentionInDays': 30}
+    assert regions == ['us-east-2']
+
+
+def test_retrieval_activity_query_completes(test):
+    client = query_statuses('Scheduled', 'Running', 'Complete', results=[RESULT_ROW])
+    assert retrieval_activity_filter(test).wait_for_query(client, 'query-1') == [RESULT_ROW]
+    assert client.get_query_results.call_count == 3
+    client.stop_query.assert_not_called()
+
+
+def test_retrieval_activity_query_fails(test):
+    with pytest.raises(PolicyExecutionError, match='ended Failed'):
+        retrieval_activity_filter(test).wait_for_query(
+            query_statuses('Running', 'Failed'), 'query-1')
+
+
+def test_retrieval_activity_query_times_out(test):
+    client = query_statuses('Running', 'Running', 'Running')
+    client.stop_query.side_effect = ClientError(
+        {'Error': {'Code': 'InvalidParameterException', 'Message': 'query already ended'}},
+        'StopQuery')
+    # The stop_query error must not hide the timeout.
+    with pytest.raises(PolicyExecutionError, match='did not finish'):
+        retrieval_activity_filter(test).wait_for_query(client, 'query-1')
+    client.stop_query.assert_called_once_with(queryId='query-1')
+
+
+def test_retrieval_activity_query_more_pages(test):
+    client = mock.Mock()
+    client.get_query_results.return_value = {
+        'status': 'Complete', 'results': [RESULT_ROW], 'nextToken': 'more'}
+    with pytest.raises(PolicyExecutionError, match='more than'):
+        retrieval_activity_filter(test).wait_for_query(client, 'query-1')
+
+
+def test_retrieval_activity_query_row_limit(test):
+    activity = retrieval_activity_filter(test)
+    activity.max_query_rows = 2
+    with pytest.raises(PolicyExecutionError, match='more than 2 rows'):
+        activity.wait_for_query(
+            query_statuses('Complete', results=[RESULT_ROW, RESULT_ROW]), 'query-1')
+
+
+def test_retrieval_activity_trail_discovery(test, monkeypatch, caplog):
+    started = datetime(2026, 9, 1, tzinfo=timezone.utc)
+
+    def trail(name, account=ACCOUNT_ID, log_group=True, writes_to=None):
+        t = {'Name': name, 'TrailARN': f'arn:aws:cloudtrail:us-east-1:{account}:trail/{name}'}
+        if log_group:
+            t['CloudWatchLogsLogGroupArn'] = (
+                f'arn:aws:logs:us-east-1:{account}:log-group:{writes_to or name}-events:*')
+        return t
+
+    trails = {t['Name']: t for t in (
+        trail('no-log-group', log_group=False),
+        trail('organization', account='111111111111'),
+        trail('read-only'),
+        trail('stopped'),
+        trail('delivery-error'),
+        trail('qualifies'),
+        trail('qualifies-later', writes_to='qualifies'),
+    )}
+    selectors = {
+        t['TrailARN']: {'AdvancedEventSelectors': [knowledge_base_selector()]}
+        for t in trails.values()}
+    selectors[trails['read-only']['TrailARN']] = {'AdvancedEventSelectors': [
+        knowledge_base_selector({'Field': 'readOnly', 'Equals': ['true']})]}
+    statuses = {
+        t['TrailARN']: {'IsLogging': True, 'StartLoggingTime': started} for t in trails.values()}
+    statuses[trails['stopped']['TrailARN']]['IsLogging'] = False
+    statuses[trails['delivery-error']['TrailARN']]['LatestCloudWatchLogsDeliveryError'] = (
+        'AccessDenied')
+    statuses[trails['qualifies-later']['TrailARN']]['StartLoggingTime'] = (
+        datetime(2026, 9, 20, tzinfo=timezone.utc))
+
+    client = mock.Mock()
+    client.get_event_selectors.side_effect = lambda TrailName: selectors[TrailName]
+    client.get_trail_status.side_effect = lambda Name: statuses[Name]
+    activity = retrieval_activity_filter(test)
+    activity.manager.get_resource_manager = (
+        lambda name: mock.Mock(resources=lambda: list(trails.values())))
+    monkeypatch.setattr(
+        'c7n.resources.bedrock.get_trail_groups',
+        lambda session_factory, trails: {'us-east-1': (client, trails)})
+
+    with caplog.at_level(logging.WARNING):
+        # Two trails write to one log group: its history starts with the earlier one.
+        assert activity.get_trail_log_groups() == {
+            (ACCOUNT_ID, 'us-east-1', 'qualifies-events'): started.timestamp()}
+    assert 'skipping trail delivery-error' in caplog.text
+    # Trails without a log group, or owned by another account, cost no API calls.
+    asked = str(client.get_event_selectors.call_args_list)
+    assert 'no-log-group' not in asked and 'organization' not in asked
+
+
+def test_retrieval_activity_requires_account_id(test):
+    policy = test.load_policy(retrieval_activity_policy_data(), config={'region': 'us-east-1'})
+    with pytest.raises(PolicyExecutionError, match='account ID is unknown'):
+        policy.resource_manager.filters[0].get_trail_log_groups()
+
+
+NOW = 2_000_000_000
+DAY = 86400
+KB_EVENTS = (ACCOUNT_ID, 'us-east-1', 'kb-events')
+
+
+def log_group(name, created_days_ago=60, retention=None):
+    description = {'logGroupName': name, 'creationTime': (NOW - created_days_ago * DAY) * 1000}
+    if retention is not None:
+        description['retentionInDays'] = retention
+    return description
+
+
+def choose_log_groups(test, monkeypatch, log_groups, trail_log_groups=None, **filter_data):
+    """Run log group selection against stand-in trails and log groups."""
+    if trail_log_groups is None:
+        trail_log_groups = {KB_EVENTS: NOW - 60 * DAY}
+    activity = retrieval_activity_filter(test, **filter_data)
+    activity.get_trail_log_groups = lambda: trail_log_groups
+    activity.describe_log_group = lambda region, name: log_groups.get(name)
+    monkeypatch.setattr(time, 'time', lambda: NOW)
+    return activity.get_log_groups()
+
+
+@pytest.mark.parametrize('retention', [
+    pytest.param(None, id='never-expires'),
+    pytest.param(30, id='exactly-days'),
+])
+def test_retrieval_activity_keeps_log_group(test, monkeypatch, retention):
+    log_groups = {'kb-events': log_group('kb-events', retention=retention)}
+    assert choose_log_groups(test, monkeypatch, log_groups, days=30) == [('us-east-1', 'kb-events')]
+
+
+def test_retrieval_activity_log_group_in_another_region(test, monkeypatch):
+    # A multi-region trail homed in us-east-2, seen from a us-east-1 policy.
+    trail_log_groups = {(ACCOUNT_ID, 'us-east-2', 'kb-events'): NOW - 60 * DAY}
+    activity = retrieval_activity_filter(test)
+    activity.get_trail_log_groups = lambda: trail_log_groups
+    activity.describe_log_group = (
+        lambda region, name: log_group(name) if region == 'us-east-2' else None)
+    monkeypatch.setattr(time, 'time', lambda: NOW)
+
+    assert activity.get_log_groups() == [('us-east-2', 'kb-events')]
+
+
+def test_retrieval_activity_skips_deleted_log_group(test, monkeypatch, caplog):
+    trail_log_groups = {
+        (ACCOUNT_ID, 'us-east-1', 'deleted'): NOW - 60 * DAY,
+        KB_EVENTS: NOW - 60 * DAY,
+    }
+    with caplog.at_level(logging.WARNING):
+        assert choose_log_groups(
+            test, monkeypatch, {'kb-events': log_group('kb-events')}, trail_log_groups,
+        ) == [('us-east-1', 'kb-events')]
+    assert 'skipping log group deleted not found' in caplog.text
+
+
+def test_retrieval_activity_raises_without_log_groups(test, monkeypatch):
+    with pytest.raises(PolicyExecutionError, match='no log group holds every knowledge base'):
+        choose_log_groups(test, monkeypatch, {}, trail_log_groups={})
+
+
+def test_retrieval_activity_raises_inside_not(test):
+    # Under `not`, matching nothing would match every knowledge base.
+    policy = test.load_policy({
+        'name': 'bedrock-knowledge-base-retrieval-activity',
+        'resource': 'aws.bedrock-knowledge-base',
+        'filters': [{'not': [{'type': 'retrieval-activity', 'op': 'gt', 'value': 0}]}],
+    }, config={'region': 'us-east-1', 'account_id': ACCOUNT_ID})
+    activity = policy.resource_manager.filters[0].filters[0]
+    activity.get_trail_log_groups = lambda: {}
+
+    with pytest.raises(PolicyExecutionError):
+        policy.resource_manager.filter_resources(
+            [{'knowledgeBaseId': 'ABCDEFGHIJ', 'knowledgeBaseArn': KB_ARN}])
+
+
+@pytest.mark.parametrize('name', [
+    pytest.param('kb-events', id='name-in-policy-region'),
+    pytest.param(f'arn:aws:logs:us-east-1:{ACCOUNT_ID}:log-group:kb-events:*', id='arn'),
+])
+def test_retrieval_activity_explicit_log_group(test, monkeypatch, name):
+    trail_log_groups = {
+        KB_EVENTS: NOW - 60 * DAY,
+        (ACCOUNT_ID, 'us-east-1', 'security-events'): NOW - 60 * DAY,
+    }
+    log_groups = {n: log_group(n) for n in ('kb-events', 'security-events')}
+    assert choose_log_groups(
+        test, monkeypatch, log_groups, trail_log_groups, **{'log-group': name},
+    ) == [('us-east-1', 'kb-events')]
+
+
+@pytest.mark.parametrize('name', [
+    pytest.param('settings-changes', id='not-fed-by-a-qualifying-trail'),
+    pytest.param('arn:aws:logs:us-east-1:111111111111:log-group:kb-events', id='other-account'),
+])
+def test_retrieval_activity_explicit_log_group_rejected(test, monkeypatch, name):
+    with pytest.raises(PolicyExecutionError, match='does not receive every knowledge base'):
+        choose_log_groups(
+            test, monkeypatch, {'kb-events': log_group('kb-events')}, **{'log-group': name})
+
+
+def test_retrieval_activity_explicit_log_group_short_retention(test, monkeypatch):
+    with pytest.raises(PolicyExecutionError, match='fewer than 30 days'):
+        choose_log_groups(
+            test, monkeypatch, {'kb-events': log_group('kb-events', retention=7)},
+            days=30, **{'log-group': 'kb-events'})
+
+
+@pytest.mark.parametrize('created_days_ago, trail_started_days_ago, warned', [
+    pytest.param(60, 60, False, id='full-history'),
+    pytest.param(3, 60, True, id='new-log-group'),
+    pytest.param(60, 3, True, id='new-trail'),
+])
+def test_retrieval_activity_short_history_warning(
+        test, monkeypatch, caplog, created_days_ago, trail_started_days_ago, warned):
+    trail_log_groups = {KB_EVENTS: NOW - trail_started_days_ago * DAY}
+    log_groups = {'kb-events': log_group('kb-events', created_days_ago=created_days_ago)}
+    with caplog.at_level(logging.WARNING):
+        assert choose_log_groups(
+            test, monkeypatch, log_groups, trail_log_groups, days=30,
+        ) == [('us-east-1', 'kb-events')]
+    assert ('may be low' in caplog.text) is warned
+
+
+def test_retrieval_activity_takes_highest_count_across_log_groups(test):
+    activity = retrieval_activity_filter(test, op='gt', value=0)
+    activity.get_log_groups = lambda: [('us-east-1', 'first'), ('us-east-2', 'second')]
+    counts = {'first': {KB_ARN: 2}, 'second': {KB_ARN: 5}}
+    activity.query_log_group = lambda region, name: counts[name]
+
+    matched = activity.process([{'knowledgeBaseArn': KB_ARN}])
+
+    assert [r['c7n:RetrievalActivity'] for r in matched] == [5]
+
+
+def retrieval_activity_flight_data(test, monkeypatch, name):
+    session_factory = test.replay_flight_data(
+        f'bedrock_knowledge_base_retrieval_activity_{name}', region='us-east-1')
+    if not test.recording:
+        monkeypatch.setattr(KnowledgeBaseRetrievalActivity, 'poll_delay', 0)
+    return session_factory
+
+
+def retrieval_activity_policy(test, session_factory, **filter_data):
+    return test.load_policy(
+        retrieval_activity_policy_data(**{'days': 1, **filter_data}),
+        session_factory=session_factory,
+        config={'region': 'us-east-1', 'account_id': test.account_id},
+    )
+
+
+@terraform('bedrock_knowledge_base_retrieval_activity', scope='session')
+def test_bedrock_knowledge_base_retrieval_activity_idle(
+        test, bedrock_knowledge_base_retrieval_activity, monkeypatch):
+    outputs = bedrock_knowledge_base_retrieval_activity.outputs
+    session_factory = retrieval_activity_flight_data(test, monkeypatch, 'idle')
+
+    resources = retrieval_activity_policy(test, session_factory, op='eq', value=0).run()
+
+    assert [r['knowledgeBaseArn'] for r in resources] == [
+        outputs['idle_knowledge_base_arn']['value']]
+    assert resources[0]['c7n:RetrievalActivity'] == 0
+
+
+@terraform('bedrock_knowledge_base_retrieval_activity', scope='session')
+def test_bedrock_knowledge_base_retrieval_activity_count(
+        test, bedrock_knowledge_base_retrieval_activity, monkeypatch):
+    outputs = bedrock_knowledge_base_retrieval_activity.outputs
+    session_factory = retrieval_activity_flight_data(test, monkeypatch, 'count')
+
+    resources = retrieval_activity_policy(test, session_factory, op='gt', value=0).run()
+
+    counts = {r['knowledgeBaseArn']: r['c7n:RetrievalActivity'] for r in resources}
+    used = outputs['used_knowledge_base_arn']['value']
+    canary = outputs['canary_knowledge_base_arn']['value']
+    assert set(counts) == {used, canary}
+    # One direct Retrieve, plus the Retrieve that Bedrock runs inside the
+    # RetrieveAndGenerate and RetrieveAndGenerateStream calls.
+    assert counts[used] == 3
+    assert counts[canary] > 0
+
+
+@terraform('bedrock_knowledge_base_retrieval_activity', scope='session')
+def test_bedrock_knowledge_base_retrieval_activity_short_retention(
+        test, bedrock_knowledge_base_retrieval_activity, monkeypatch, caplog):
+    session_factory = retrieval_activity_flight_data(test, monkeypatch, 'short_retention')
+    policy = retrieval_activity_policy(test, session_factory, days=2, op='eq', value=0)
+
+    with caplog.at_level(logging.WARNING):
+        with pytest.raises(PolicyExecutionError, match='no log group holds every knowledge base'):
+            policy.run()
+    assert 'kb-activity-default-8ddc keeps events for fewer than 2 days' in caplog.text
+
+
+@terraform('bedrock_knowledge_base_retrieval_activity', scope='session')
+def test_bedrock_knowledge_base_retrieval_activity_explicit_log_group(
+        test, bedrock_knowledge_base_retrieval_activity, monkeypatch):
+    outputs = bedrock_knowledge_base_retrieval_activity.outputs
+    session_factory = retrieval_activity_flight_data(test, monkeypatch, 'explicit_log_group')
+
+    resources = retrieval_activity_policy(
+        test, session_factory, op='eq', value=0,
+        **{'log-group': outputs['log_group_name']['value']}).run()
+
+    assert [r['knowledgeBaseArn'] for r in resources] == [
+        outputs['idle_knowledge_base_arn']['value']]
+
+
+@terraform('bedrock_knowledge_base_retrieval_activity', scope='session')
+def test_bedrock_knowledge_base_retrieval_activity_missing_log_group(
+        test, bedrock_knowledge_base_retrieval_activity, monkeypatch):
+    session_factory = retrieval_activity_flight_data(test, monkeypatch, 'missing_log_group')
+    policy = retrieval_activity_policy(
+        test, session_factory, **{'log-group': 'c7n-kb-activity-missing'})
+
+    with pytest.raises(PolicyExecutionError, match='does not receive every knowledge base'):
+        policy.run()

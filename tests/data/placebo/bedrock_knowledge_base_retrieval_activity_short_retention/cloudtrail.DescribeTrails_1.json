@@ -1,0 +1,34 @@
+{
+    "status_code": 200,
+    "data": {
+        "trailList": [
+            {
+                "Name": "c7n-kb-activity-default-8ddc",
+                "S3BucketName": "c7n-kb-activity-default-8ddc",
+                "IncludeGlobalServiceEvents": true,
+                "IsMultiRegionTrail": false,
+                "HomeRegion": "us-east-1",
+                "TrailARN": "arn:aws:cloudtrail:us-east-1:644160558196:trail/c7n-kb-activity-default-8ddc",
+                "LogFileValidationEnabled": false,
+                "CloudWatchLogsLogGroupArn": "arn:aws:logs:us-east-1:644160558196:log-group:c7n-kb-activity-default-8ddc:*",
+                "CloudWatchLogsRoleArn": "arn:aws:iam::644160558196:role/c7n-kb-activity-default-8ddc-trail",
+                "HasCustomEventSelectors": true,
+                "HasInsightSelectors": false,
+                "IsOrganizationTrail": false
+            },
+            {
+                "Name": "other-trail",
+                "S3BucketName": "aws-cloudtrail-logs-644160558196-00000000",
+                "IncludeGlobalServiceEvents": true,
+                "IsMultiRegionTrail": true,
+                "HomeRegion": "us-east-2",
+                "TrailARN": "arn:aws:cloudtrail:us-east-2:644160558196:trail/other-trail",
+                "LogFileValidationEnabled": false,
+                "HasCustomEventSelectors": true,
+                "HasInsightSelectors": false,
+                "IsOrganizationTrail": false
+            }
+        ],
+        "ResponseMetadata": {}
+    }
+}

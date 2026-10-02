@@ -1,20 +1,23 @@
 # Copyright The Cloud Custodian Authors.
 # SPDX-License-Identifier: Apache-2.0
+from datetime import datetime, timezone
 import json
+import time
 
 import copy
 from urllib.parse import urlsplit
 
 from c7n.manager import resources
-from c7n.exceptions import PolicyValidationError
+from c7n.exceptions import ClientError, PolicyExecutionError, PolicyValidationError
 from c7n.query import QueryResourceManager, TypeInfo, DescribeSource, DescribeWithResourceTags
 from c7n.query import RetryPageIterator
 from c7n.tags import RemoveTag, Tag, TagActionFilter, TagDelayedAction, universal_augment
-from c7n.utils import local_session, type_schema, QueryParser
+from c7n.utils import get_retry, local_session, type_schema, QueryParser
 from c7n.actions import BaseAction
 from c7n.filters.kms import KmsRelatedFilter
-from c7n.filters import Filter, MetricsFilter, ValueFilter
+from c7n.filters import Filter, MetricsFilter, OPERATORS, ValueFilter
 from c7n.resources.aws import shape_schema, shape_validate, Arn
+from c7n.resources.cloudtrail import get_trail_groups
 from c7n.resources.s3 import BucketAssembly, S3_AUGMENT_TABLE
 
 
@@ -823,6 +826,278 @@ class DeleteBedrockKnowledgeBase(BaseAction):
                 client.delete_knowledge_base(knowledgeBaseId=r['knowledgeBaseId'])
             except client.exceptions.ResourceNotFoundException:
                 continue
+
+
+KNOWLEDGE_BASE_DATA_EVENTS = {
+    'eventCategory': 'Data',
+    'resources.type': 'AWS::Bedrock::KnowledgeBase',
+}
+
+
+def records_all_knowledge_base_events(event_selectors):
+    """Whether a trail's event selectors record every knowledge base data event.
+
+    Only a selector with exactly these two conditions qualifies. Any further
+    condition, such as ``readOnly`` or ``resources.ARN``, can drop searches.
+    """
+    for selector in event_selectors.get('AdvancedEventSelectors', ()):
+        conditions = {c['Field']: c for c in selector['FieldSelectors']}
+        if conditions.keys() != KNOWLEDGE_BASE_DATA_EVENTS.keys():
+            continue
+        if all(condition.keys() == {'Field', 'Equals'}
+               and KNOWLEDGE_BASE_DATA_EVENTS[field] in condition['Equals']
+               for field, condition in conditions.items()):
+            return True
+    return False
+
+
+def parse_log_group_arn(arn):
+    """Split a log group ARN, with or without a trailing ':*', into account, region and name."""
+    # Not Arn.parse, which drops the leading slash from names like /aws/...
+    parts = arn.removesuffix(':*').split(':', 6)
+    if len(parts) != 7 or parts[2] != 'logs' or parts[5] != 'log-group' or not parts[6]:
+        raise ValueError(f'not a log group ARN: {arn}')
+    return parts[4], parts[3], parts[6]
+
+
+def count_retrievals(rows):
+    """Turn Logs Insights result rows into a count per knowledge base ARN."""
+    counts = {}
+    for row in rows:
+        cells = {cell['field']: cell['value'] for cell in row}
+        if 'resources.0.ARN' in cells:
+            counts[cells['resources.0.ARN']] = int(cells['retrievals'])
+    return counts
+
+
+@BedrockKnowledgeBase.filter_registry.register('retrieval-activity')
+class KnowledgeBaseRetrievalActivity(Filter):
+    """Filter knowledge bases by how many times they were searched.
+
+    Counts ``Retrieve`` CloudTrail data events over the last ``days`` days from
+    the CloudWatch Logs log group of each logging trail in this account whose
+    advanced event selector is exactly ``eventCategory`` = ``Data`` and
+    ``resources.type`` = ``AWS::Bedrock::KnowledgeBase``. Set ``log-group`` to
+    the name or ARN of one of those log groups to read only that one; a name is
+    looked up in the policy's region. The count is annotated as
+    ``c7n:RetrievalActivity``. Raises an error if no such log group keeps
+    ``days`` days of events. Only ``VECTOR`` knowledge bases have been
+    measured, so filter on that type as below.
+
+    :example:
+
+    .. code-block:: yaml
+
+        policies:
+          - name: bedrock-knowledge-base-unused
+            resource: aws.bedrock-knowledge-base
+            filters:
+              - knowledgeBaseConfiguration.type: VECTOR
+              - type: retrieval-activity
+                source: cloudwatch-logs
+                days: 30
+                op: eq
+                value: 0
+    """
+
+    schema = type_schema(
+        'retrieval-activity',
+        source={'enum': ['cloudwatch-logs']},
+        days={'type': 'number', 'minimum': 1},
+        op={'$ref': '#/definitions/filters_common/comparison_operators'},
+        value={'type': 'number'},
+        **{'log-group': {'type': 'string', 'minLength': 1}})
+    permissions = (
+        'cloudtrail:GetEventSelectors',
+        'cloudtrail:GetTrailStatus',
+        'logs:DescribeLogGroups',
+        'logs:StartQuery',
+        'logs:GetQueryResults',
+        'logs:StopQuery',
+    )
+    annotation_key = 'c7n:RetrievalActivity'
+    query = (
+        'filter eventSource = "bedrock.amazonaws.com" and eventName = "Retrieve"'
+        ' | stats count(*) as retrievals by resources.0.ARN')
+    max_query_rows = 10000
+    poll_delay = 2
+    poll_max_attempts = 300
+    retry = staticmethod(get_retry((
+        'LimitExceededException', 'ServiceUnavailableException', 'ThrottlingException')))
+
+    @property
+    def days(self):
+        return self.data.get('days', 30)
+
+    def validate(self):
+        log_group = self.data.get('log-group', '')
+        if log_group.startswith('arn:'):
+            try:
+                parse_log_group_arn(log_group)
+            except ValueError as e:
+                raise PolicyValidationError(f'retrieval-activity: {e}')
+        return self
+
+    def get_permissions(self):
+        return self.permissions + tuple(
+            self.manager.get_resource_manager('cloudtrail').get_permissions())
+
+    def process(self, resources, event=None):
+        counts = {}
+        for region, name in self.get_log_groups():
+            # Every qualifying log group receives every knowledge base data event, so
+            # they hold copies of the same events: take the highest count, not the sum.
+            for arn, count in self.query_log_group(region, name).items():
+                counts[arn] = max(count, counts.get(arn, 0))
+
+        op = OPERATORS[self.data.get('op', 'eq')]
+        value = self.data.get('value', 0)
+        matched = []
+        for r, arn in zip(resources, self.manager.get_arns(resources)):
+            r[self.annotation_key] = counts.get(arn, 0)
+            if op(r[self.annotation_key], value):
+                matched.append(r)
+        return matched
+
+    def get_log_groups(self):
+        """Return (region, name) for each log group that holds the whole window of events."""
+        log_groups = self.get_trail_log_groups()
+        explicit = self.data.get('log-group')
+        if explicit:
+            if explicit.startswith('arn:'):
+                wanted = parse_log_group_arn(explicit)
+            else:
+                wanted = (self.manager.account_id, self.manager.config.region, explicit)
+            if wanted not in log_groups:
+                raise PolicyExecutionError(
+                    f'retrieval-activity: log group {wanted[2]} in {wanted[1]} does not receive '
+                    'every knowledge base data event from a logging trail in this account')
+            log_groups = {wanted: log_groups[wanted]}
+
+        usable = []
+        for (account, region, name), trail_started in sorted(log_groups.items()):
+            log_group = self.describe_log_group(region, name)
+            retention = log_group and log_group.get('retentionInDays')
+            if log_group is None:
+                problem = f'log group {name} not found'
+            elif retention is not None and retention < self.days:
+                problem = (
+                    f'log group {name} keeps events for fewer than {self.days} days '
+                    f'(retention {retention})')
+            else:
+                problem = None
+            if problem and explicit:
+                raise PolicyExecutionError(f'retrieval-activity: {problem}')
+            if problem:
+                self.log.warning('retrieval-activity: skipping %s', problem)
+                continue
+            self.warn_if_short_history(name, log_group['creationTime'] / 1000, trail_started)
+            usable.append((region, name))
+
+        if not usable:
+            raise PolicyExecutionError(
+                'retrieval-activity: no log group holds every knowledge base data event '
+                f'for the last {self.days} days')
+        return usable
+
+    def get_trail_log_groups(self):
+        """Log groups receiving every knowledge base data event from a trail in this account.
+
+        Returns a mapping of (account, region, name) to when the earliest of
+        the trails writing to it started logging.
+        """
+        account = self.manager.account_id
+        if not account:
+            raise PolicyExecutionError(
+                'retrieval-activity: the account ID is unknown, so trails in this account '
+                'cannot be told apart from organization trails')
+        # Trails owned by another account, such as organization trails, can't be read here.
+        trails = [
+            t for t in self.manager.get_resource_manager('cloudtrail').resources()
+            if t['TrailARN'].split(':')[4] == account]
+        log_groups = {}
+        for client, region_trails in get_trail_groups(
+                self.manager.session_factory, trails).values():
+            for trail in region_trails:
+                if 'CloudWatchLogsLogGroupArn' not in trail:
+                    continue
+                selectors = client.get_event_selectors(TrailName=trail['TrailARN'])
+                if not records_all_knowledge_base_events(selectors):
+                    continue
+                status = client.get_trail_status(Name=trail['TrailARN'])
+                if not status['IsLogging']:
+                    continue
+                if status.get('LatestCloudWatchLogsDeliveryError'):
+                    self.log.warning(
+                        'retrieval-activity: skipping trail %s, which cannot deliver to '
+                        'CloudWatch Logs: %s', trail['Name'],
+                        status['LatestCloudWatchLogsDeliveryError'])
+                    continue
+                key = parse_log_group_arn(trail['CloudWatchLogsLogGroupArn'])
+                started = status['StartLoggingTime'].timestamp()
+                log_groups[key] = min(started, log_groups.get(key, started))
+        return log_groups
+
+    def warn_if_short_history(self, name, created, trail_started):
+        history_start = max(created, trail_started)
+        if history_start > time.time() - self.days * 86400:
+            self.log.warning(
+                'retrieval-activity: log group %s only has events since %s, so counts for '
+                'the last %s days may be low', name,
+                datetime.fromtimestamp(history_start, timezone.utc).isoformat(), self.days)
+
+    def describe_log_group(self, region, name):
+        client = local_session(self.manager.session_factory).client('logs', region_name=region)
+        paginator = client.get_paginator('describe_log_groups')
+        paginator.PAGE_ITERATOR_CLS = RetryPageIterator
+        for page in paginator.paginate(logGroupNamePrefix=name):
+            for log_group in page['logGroups']:
+                if log_group['logGroupName'] == name:
+                    return log_group
+        return None
+
+    def query_log_group(self, region, name):
+        cache_key = {
+            'account': self.manager.account_id,
+            'retrieval-activity': f'{region}:{name}',
+            'days': self.days,
+        }
+        with self.manager._cache as cache:
+            counts = cache.get(cache_key)
+            if counts is None:
+                client = local_session(self.manager.session_factory).client(
+                    'logs', region_name=region)
+                end = int(time.time())
+                query_id = self.retry(
+                    client.start_query,
+                    logGroupName=name,
+                    startTime=end - int(self.days * 86400),
+                    endTime=end,
+                    queryString=self.query)['queryId']
+                counts = count_retrievals(self.wait_for_query(client, query_id))
+                cache.save(cache_key, counts)
+        return counts
+
+    def wait_for_query(self, client, query_id):
+        for _ in range(self.poll_max_attempts):
+            response = self.retry(client.get_query_results, queryId=query_id)
+            if response['status'] == 'Complete':
+                if response.get('nextToken') or len(response['results']) >= self.max_query_rows:
+                    raise PolicyExecutionError(
+                        f'retrieval-activity: Logs Insights query {query_id} returned more than '
+                        f'{self.max_query_rows} rows, so some knowledge bases would be missed')
+                return response['results']
+            if response['status'] not in ('Scheduled', 'Running'):
+                raise PolicyExecutionError(
+                    f'retrieval-activity: Logs Insights query {query_id} ended '
+                    f'{response["status"]}')
+            time.sleep(self.poll_delay)
+        try:
+            client.stop_query(queryId=query_id)
+        except ClientError as e:
+            self.log.debug('retrieval-activity: could not stop query %s: %s', query_id, e)
+        raise PolicyExecutionError(
+            f'retrieval-activity: Logs Insights query {query_id} did not finish')
 
 
 @resources.register('bedrock-inference-profile')

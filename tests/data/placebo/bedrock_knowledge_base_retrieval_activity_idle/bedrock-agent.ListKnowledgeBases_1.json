@@ -1,0 +1,53 @@
+{
+    "status_code": 200,
+    "data": {
+        "ResponseMetadata": {},
+        "knowledgeBaseSummaries": [
+            {
+                "knowledgeBaseId": "ZVBNVYLKJC",
+                "name": "c7n-kb-activity-default-8ddc-canary",
+                "status": "ACTIVE",
+                "updatedAt": {
+                    "__class__": "datetime",
+                    "year": 2026,
+                    "month": 10,
+                    "day": 2,
+                    "hour": 20,
+                    "minute": 42,
+                    "second": 4,
+                    "microsecond": 569620
+                }
+            },
+            {
+                "knowledgeBaseId": "I8EBEGGCCW",
+                "name": "c7n-kb-activity-default-8ddc-used",
+                "status": "ACTIVE",
+                "updatedAt": {
+                    "__class__": "datetime",
+                    "year": 2026,
+                    "month": 10,
+                    "day": 2,
+                    "hour": 20,
+                    "minute": 42,
+                    "second": 4,
+                    "microsecond": 440822
+                }
+            },
+            {
+                "knowledgeBaseId": "E5XOKVPNYU",
+                "name": "c7n-kb-activity-default-8ddc-idle",
+                "status": "ACTIVE",
+                "updatedAt": {
+                    "__class__": "datetime",
+                    "year": 2026,
+                    "month": 10,
+                    "day": 2,
+                    "hour": 20,
+                    "minute": 42,
+                    "second": 4,
+                    "microsecond": 457975
+                }
+            }
+        ]
+    }
+}
