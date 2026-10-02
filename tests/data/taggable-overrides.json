@@ -1,0 +1,99 @@
+[
+{
+"ResourceARN": "arn:aws:apigateway:us-east-1::/apis/0mt9yx690a/stages/production",
+"Tags": [],
+"OwningAccountId": "644160558196",
+"ResourceType": "apigateway:apis/stages",
+"LastReportedAt": "2026-09-14T02:16:00+00:00",
+"ComplianceDetails": {
+"ComplianceStatus": false,
+"MissingTagKeys": []
+}
+},
+{
+"ResourceARN": "arn:aws:bedrock:us-east-1:644160558196:agent-alias/5FFBRI3MYM/9BURUS1YWF",
+"Tags": [],
+"OwningAccountId": "644160558196",
+"ResourceType": "bedrock:agent-alias",
+"LastReportedAt": "2026-09-14T03:29:02+00:00",
+"ComplianceDetails": {
+"ComplianceStatus": false,
+"MissingTagKeys": []
+}
+},
+{
+"ResourceARN": "arn:aws:cassandra:us-east-1:644160558196:/keyspace/testing/",
+"Tags": [
+{
+"Key": "App",
+"Value": "Dev"
+},
+{
+"Key": "SanityCheck",
+"Value": "Yes"
+}
+],
+"ComplianceDetails": {
+"NoncompliantKeys": [],
+"KeysWithNoncompliantValues": [],
+"MissingTagKeys": [
+"Owner"
+],
+"ComplianceStatus": false
+}
+},
+{
+"ResourceARN": "arn:aws:ecs:us-east-1:644160558196:task/kapilt-assetdb/f0c04c35edd54645b60b4dfe19519084",
+"Tags": [
+{
+"Key": "aws:ecs:serviceName",
+"Value": "gcp-cai-feed-processor"
+},
+{
+"Key": "aws:ecs:clusterName",
+"Value": "kapilt-assetdb"
+}
+],
+"ComplianceDetails": {
+"NoncompliantKeys": [],
+"KeysWithNoncompliantValues": [],
+"MissingTagKeys": [
+"Owner"
+],
+"ComplianceStatus": false
+}
+},
+{
+"ResourceARN": "arn:aws:memorydb:us-east-1:644160558196:parametergroup/default.memorydb-redis7.search.preview",
+"Tags": [],
+"OwningAccountId": "644160558196",
+"ResourceType": "memorydb:parametergroup",
+"LastReportedAt": "2026-09-12T19:44:04+00:00",
+"ComplianceDetails": {
+"ComplianceStatus": false,
+"MissingTagKeys": []
+}
+},
+{
+"ResourceARN": "arn:aws:s3express:us-east-1:644160558196:bucket/test-zone--use1-az4--x-s3",
+"Tags": [],
+"OwningAccountId": "644160558196",
+"ResourceType": "s3express:bucket",
+"LastReportedAt": "2026-08-30T18:49:35+00:00",
+"ComplianceDetails": {
+"ComplianceStatus": false,
+"MissingTagKeys": []
+}
+},
+{
+"ResourceARN": "arn:aws:ssm:us-east-1:644160558196:managed-instance/i-01193ca66c7e115a8",
+"Tags": [],
+"OwningAccountId": "644160558196",
+"ResourceType": "ssm:managed-instance",
+"LastReportedAt": "2026-09-15T17:59:22+00:00",
+"ComplianceDetails": {
+"ComplianceStatus": false,
+"MissingTagKeys": []
+}
+}
+]
