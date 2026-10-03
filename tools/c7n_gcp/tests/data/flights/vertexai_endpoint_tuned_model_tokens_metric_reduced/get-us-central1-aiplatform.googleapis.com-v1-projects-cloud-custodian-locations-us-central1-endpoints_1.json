@@ -1,0 +1,51 @@
+{
+  "headers": {
+    "content-type": "application/json; charset=UTF-8",
+    "vary": "Origin, X-Origin, Referer",
+    "date": "Wed, 23 Sep 2026 18:17:01 GMT",
+    "server": "ESF",
+    "x-xss-protection": "0",
+    "x-frame-options": "SAMEORIGIN",
+    "x-content-type-options": "nosniff",
+    "alt-svc": "h3=\":443\"; ma=2592000,h3-29=\":443\"; ma=2592000",
+    "transfer-encoding": "chunked",
+    "status": "200",
+    "content-length": "1182",
+    "-content-encoding": "gzip",
+    "content-location": "https://us-central1-aiplatform.googleapis.com/v1/projects/cloud-custodian/locations/us-central1/endpoints?alt=json"
+  },
+  "body": {
+    "endpoints": [
+      {
+        "name": "projects/cloud-custodian/locations/us-central1/endpoints/5347660069397856256",
+        "displayName": "c7n-11097-distribution-metric-test",
+        "deployedModels": [
+          {
+            "id": "4382631907838394368",
+            "model": "projects/cloud-custodian/locations/us-central1/models/6297765659145142272",
+            "displayName": "c7n-11097-distribution-metric-test",
+            "createTime": "2026-09-23T16:57:53.604185Z",
+            "automaticResources": {
+              "minReplicaCount": 1,
+              "maxReplicaCount": 1
+            },
+            "disableContainerLogging": true,
+            "modelVersionId": "1"
+          }
+        ],
+        "trafficSplit": {
+          "4382631907838394368": 100
+        },
+        "etag": "AMEw9yNVi8nvs--kyXBcPlehGe8uLq6hG3pG5gVSAKfxqlVRpOCpdOyXts-vCu1sZaB8",
+        "labels": {
+          "google-vertex-llm-tuning-job-id": "8152792279447240704",
+          "tune-type": "sft",
+          "goog-drz-vertex-ai-tuning-uuid": "8152792279447240704",
+          "goog-drz-vertex-ai-tuning-location": "us-central1"
+        },
+        "createTime": "2026-09-23T16:57:41.693385Z",
+        "updateTime": "2026-09-23T16:57:55.556461Z"
+      }
+    ]
+  }
+}

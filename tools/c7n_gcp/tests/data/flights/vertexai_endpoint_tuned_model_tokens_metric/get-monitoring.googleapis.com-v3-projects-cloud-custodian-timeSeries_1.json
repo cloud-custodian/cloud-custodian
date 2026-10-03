@@ -1,0 +1,119 @@
+{
+  "headers": {
+    "content-type": "application/json; charset=UTF-8",
+    "vary": "Origin, X-Origin, Referer",
+    "date": "Tue, 15 Sep 2026 23:56:51 GMT",
+    "server": "ESF",
+    "x-xss-protection": "0",
+    "x-frame-options": "SAMEORIGIN",
+    "x-content-type-options": "nosniff",
+    "alt-svc": "h3=\":443\"; ma=2592000,h3-29=\":443\"; ma=2592000",
+    "transfer-encoding": "chunked",
+    "status": "200",
+    "content-length": "2539",
+    "-content-encoding": "gzip",
+    "content-location": "https://monitoring.googleapis.com/v3/projects/cloud-custodian/timeSeries?filter=metric.type+%3D+%22aiplatform.googleapis.com%2Ftuned_model%2Fonline_serving%2Ftokens%22+AND+%28+resource.labels.endpoint_id+%3D+%223381592541446012928%22+OR+resource.labels.endpoint_id+%3D+%226997983042224521216%22+%29+&interval.startTime=2026-09-14T23%3A56%3A51Z&interval.endTime=2026-09-15T23%3A56%3A51Z&aggregation.alignmentPeriod=86400.0s&aggregation.perSeriesAligner=ALIGN_SUM&aggregation.crossSeriesReducer=REDUCE_NONE&view=FULL&alt=json"
+  },
+  "body": {
+    "timeSeries": [
+      {
+        "metric": {
+          "labels": {
+            "request_type": "shared",
+            "type": "input"
+          },
+          "type": "aiplatform.googleapis.com/tuned_model/online_serving/tokens"
+        },
+        "resource": {
+          "type": "aiplatform.googleapis.com/Endpoint",
+          "labels": {
+            "endpoint_id": "3381592541446012928",
+            "project_id": "cloud-custodian",
+            "location": "us-central1"
+          }
+        },
+        "metricKind": "DELTA",
+        "valueType": "DISTRIBUTION",
+        "points": [
+          {
+            "interval": {
+              "startTime": "2026-09-14T23:56:51Z",
+              "endTime": "2026-09-15T23:56:51Z"
+            },
+            "value": {
+              "distributionValue": {
+                "count": "5",
+                "mean": 7,
+                "bucketOptions": {
+                  "exponentialBuckets": {
+                    "numFiniteBuckets": 17,
+                    "growthFactor": 2,
+                    "scale": 1
+                  }
+                },
+                "bucketCounts": [
+                  "0",
+                  "0",
+                  "0",
+                  "5"
+                ]
+              }
+            }
+          }
+        ]
+      },
+      {
+        "metric": {
+          "labels": {
+            "type": "output",
+            "request_type": "shared"
+          },
+          "type": "aiplatform.googleapis.com/tuned_model/online_serving/tokens"
+        },
+        "resource": {
+          "type": "aiplatform.googleapis.com/Endpoint",
+          "labels": {
+            "location": "us-central1",
+            "project_id": "cloud-custodian",
+            "endpoint_id": "3381592541446012928"
+          }
+        },
+        "metricKind": "DELTA",
+        "valueType": "DISTRIBUTION",
+        "points": [
+          {
+            "interval": {
+              "startTime": "2026-09-14T23:56:51Z",
+              "endTime": "2026-09-15T23:56:51Z"
+            },
+            "value": {
+              "distributionValue": {
+                "count": "5",
+                "mean": 49.6,
+                "sumOfSquaredDeviation": 1343.2,
+                "bucketOptions": {
+                  "exponentialBuckets": {
+                    "numFiniteBuckets": 17,
+                    "growthFactor": 2,
+                    "scale": 1
+                  }
+                },
+                "bucketCounts": [
+                  "0",
+                  "0",
+                  "0",
+                  "0",
+                  "0",
+                  "1",
+                  "2",
+                  "2"
+                ]
+              }
+            }
+          }
+        ]
+      }
+    ],
+    "unit": "1"
+  }
+}
