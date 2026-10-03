@@ -1,0 +1,90 @@
+{
+    "pytest-terraform": 1,
+    "outputs": {},
+    "resources": {
+        "google_project_iam_member": {
+            "bad_admin": {
+                "condition": [
+                    {
+                        "description": "",
+                        "expression": "request.time < timestamp(\"2100-01-01T00:00:00Z\")",
+                        "title": "c7n-sod-bad-5c22"
+                    }
+                ],
+                "etag": "BwZcv7anK4w=",
+                "id": "stkl-liam-callahan/roles/cloudkms.admin/serviceAccount:c7n-sod-bad-5c22@stkl-liam-callahan.iam.gserviceaccount.com/c7n-sod-bad-5c22//request.time < timestamp(\"2100-01-01T00:00:00Z\")",
+                "member": "serviceAccount:c7n-sod-bad-5c22@stkl-liam-callahan.iam.gserviceaccount.com",
+                "project": "stkl-liam-callahan",
+                "role": "roles/cloudkms.admin"
+            },
+            "bad_encrypter_decrypter": {
+                "condition": [],
+                "etag": "BwZcv7anK4w=",
+                "id": "stkl-liam-callahan/roles/cloudkms.cryptoKeyEncrypterDecrypter/serviceAccount:c7n-sod-bad-5c22@stkl-liam-callahan.iam.gserviceaccount.com",
+                "member": "serviceAccount:c7n-sod-bad-5c22@stkl-liam-callahan.iam.gserviceaccount.com",
+                "project": "stkl-liam-callahan",
+                "role": "roles/cloudkms.cryptoKeyEncrypterDecrypter"
+            },
+            "bad_viewer": {
+                "condition": [],
+                "etag": "BwZcv7anK4w=",
+                "id": "stkl-liam-callahan/roles/viewer/serviceAccount:c7n-sod-bad-5c22@stkl-liam-callahan.iam.gserviceaccount.com",
+                "member": "serviceAccount:c7n-sod-bad-5c22@stkl-liam-callahan.iam.gserviceaccount.com",
+                "project": "stkl-liam-callahan",
+                "role": "roles/viewer"
+            },
+            "good_admin": {
+                "condition": [],
+                "etag": "BwZcv7anK4w=",
+                "id": "stkl-liam-callahan/roles/cloudkms.admin/serviceAccount:c7n-sod-good-5c22@stkl-liam-callahan.iam.gserviceaccount.com",
+                "member": "serviceAccount:c7n-sod-good-5c22@stkl-liam-callahan.iam.gserviceaccount.com",
+                "project": "stkl-liam-callahan",
+                "role": "roles/cloudkms.admin"
+            }
+        },
+        "google_service_account": {
+            "bad": {
+                "account_id": "c7n-sod-bad-5c22",
+                "create_ignore_already_exists": null,
+                "deletion_policy": "DELETE",
+                "description": "",
+                "disabled": false,
+                "display_name": "C7N Separation of Duties Bad SA",
+                "email": "c7n-sod-bad-5c22@stkl-liam-callahan.iam.gserviceaccount.com",
+                "id": "projects/cloud-custodian/serviceAccounts/c7n-sod-bad-5c22@stkl-liam-callahan.iam.gserviceaccount.com",
+                "member": "serviceAccount:c7n-sod-bad-5c22@stkl-liam-callahan.iam.gserviceaccount.com",
+                "name": "projects/cloud-custodian/serviceAccounts/c7n-sod-bad-5c22@stkl-liam-callahan.iam.gserviceaccount.com",
+                "project": "stkl-liam-callahan",
+                "timeouts": null,
+                "unique_id": "114417496766919180164"
+            },
+            "good": {
+                "account_id": "c7n-sod-good-5c22",
+                "create_ignore_already_exists": null,
+                "deletion_policy": "DELETE",
+                "description": "",
+                "disabled": false,
+                "display_name": "C7N Separation of Duties Good SA",
+                "email": "c7n-sod-good-5c22@stkl-liam-callahan.iam.gserviceaccount.com",
+                "id": "projects/cloud-custodian/serviceAccounts/c7n-sod-good-5c22@stkl-liam-callahan.iam.gserviceaccount.com",
+                "member": "serviceAccount:c7n-sod-good-5c22@stkl-liam-callahan.iam.gserviceaccount.com",
+                "name": "projects/cloud-custodian/serviceAccounts/c7n-sod-good-5c22@stkl-liam-callahan.iam.gserviceaccount.com",
+                "project": "stkl-liam-callahan",
+                "timeouts": null,
+                "unique_id": "115466213567192562879"
+            }
+        },
+        "random_id": {
+            "suffix": {
+                "b64_std": "XCI=",
+                "b64_url": "XCI",
+                "byte_length": 2,
+                "dec": "23586",
+                "hex": "5c22",
+                "id": "XCI",
+                "keepers": null,
+                "prefix": null
+            }
+        }
+    }
+}

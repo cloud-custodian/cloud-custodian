@@ -1,0 +1,47 @@
+{
+  "headers": {
+    "content-type": "application/json; charset=UTF-8",
+    "vary": "Origin, X-Origin, Referer",
+    "date": "Thu, 01 Oct 2026 04:18:58 GMT",
+    "server": "ESF",
+    "x-xss-protection": "0",
+    "x-frame-options": "SAMEORIGIN",
+    "x-content-type-options": "nosniff",
+    "server-timing": "gfet4t7; dur=156",
+    "alt-svc": "h3=\":443\"; ma=2592000,h3-29=\":443\"; ma=2592000",
+    "transfer-encoding": "chunked",
+    "status": "200",
+    "content-length": "1488",
+    "-content-encoding": "gzip"
+  },
+  "body": {
+    "version": 1,
+    "etag": "BwZcv7anK4w=",
+    "bindings": [
+      {
+        "role": "roles/cloudkms.admin",
+        "members": [
+          "serviceAccount:c7n-sod-good-5c22@stkl-liam-callahan.iam.gserviceaccount.com"
+        ]
+      },
+      {
+        "role": "roles/cloudkms.admin_withcond_33d3e1409291ae853c0e",
+        "members": [
+          "serviceAccount:c7n-sod-bad-5c22@stkl-liam-callahan.iam.gserviceaccount.com"
+        ]
+      },
+      {
+        "role": "roles/cloudkms.cryptoKeyEncrypterDecrypter",
+        "members": [
+          "serviceAccount:c7n-sod-bad-5c22@stkl-liam-callahan.iam.gserviceaccount.com"
+        ]
+      },
+      {
+        "role": "roles/viewer",
+        "members": [
+          "serviceAccount:c7n-sod-bad-5c22@stkl-liam-callahan.iam.gserviceaccount.com"
+        ]
+      }
+    ]
+  }
+}
