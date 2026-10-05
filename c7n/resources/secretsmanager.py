@@ -16,6 +16,13 @@ from c7n.filters.core import ValueFilter
 
 class DescribeSecret(DescribeSource):
 
+    def get_resources(self, ids, cache=True):
+        # secrets can be referenced by name or by arn, ie. the
+        # secretId of a cloudtrail event is often the full arn.
+        ids = set(ids)
+        return [r for r in self.query.filter(self.manager)
+                if r['Name'] in ids or r['ARN'] in ids]
+
     def _augment_secret(self, secret, client):
         detail_op, param_name, param_key, _ = self.manager.resource_type.detail_spec
         op = getattr(client, detail_op)
