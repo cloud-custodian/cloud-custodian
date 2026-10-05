@@ -1,8 +1,11 @@
 # Copyright The Cloud Custodian Authors.
 # SPDX-License-Identifier: Apache-2.0
 
+from c7n.filters import ListItemFilter
+from c7n.utils import type_schema
 from c7n_azure.provider import resources
 from c7n_azure.resources.arm import ChildArmResourceManager
+from c7n_azure.utils import ResourceIdParser
 
 
 @resources.register('machine-learning-online-endpoint')
@@ -51,3 +54,45 @@ class MachineLearningOnlineEndpoint(ChildArmResourceManager):
                 'resource_group_name': parent_resource['resourceGroup'],
                 'workspace_name': parent_resource['name'],
             }
+
+
+@MachineLearningOnlineEndpoint.filter_registry.register('online-deployments')
+class OnlineDeploymentsFilter(ListItemFilter):
+    """Filter online endpoints by their child deployments.
+
+    :example:
+
+    Find succeeded endpoints with more than three served model versions.
+
+    .. code-block:: yaml
+
+        policies:
+          - name: ml-endpoints-too-many-deployments
+            resource: azure.machine-learning-online-endpoint
+            filters:
+              - properties.provisioningState: Succeeded
+              - type: online-deployments
+                attrs:
+                  - type: value
+                    key: properties.model
+                    value: present
+                count: 3
+                count_op: gt
+    """
+
+    schema = type_schema(
+        'online-deployments',
+        attrs={'$ref': '#/definitions/filters_common/list_item_attrs'},
+        count={'type': 'number'},
+        count_op={'$ref': '#/definitions/filters_common/comparison_operators'},
+    )
+    annotate_items = True
+    item_annotation_key = 'c7n:OnlineDeployments'
+
+    def get_item_values(self, resource):
+        deployments = self.manager.get_client().online_deployments.list(
+            resource_group_name=ResourceIdParser.get_resource_group(resource['id']),
+            workspace_name=resource['c7n:parent-id'].rstrip('/').rsplit('/', 1)[-1],
+            endpoint_name=resource['name'],
+        )
+        return [deployment.serialize(True) for deployment in deployments]

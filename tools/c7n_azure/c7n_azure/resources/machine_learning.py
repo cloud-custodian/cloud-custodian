@@ -57,6 +57,57 @@ class ComputeInstancesFilter(ListItemFilter):
         return [c.serialize(True) for c in computes]
 
 
+@resources.register('machine-learning-online-deployment')
+class MachineLearningOnlineDeployment(ChildArmResourceManager):
+    """Azure Machine Learning online deployment resource.
+
+    Deployments are enumerated beneath every online endpoint and include the
+    deployment's ``properties.model`` reference.
+
+    :example:
+
+    Find deployments whose model is not approved.
+
+    .. code-block:: yaml
+
+        policies:
+          - name: ml-online-deployments-for-approved-models
+            resource: azure.machine-learning-online-deployment
+            filters:
+              - type: value
+                key: properties.model
+                op: not-in
+                value:
+                  - azureml:model-a:12
+                  - azureml:model-b:4
+    """
+
+    class resource_type(ChildArmResourceManager.resource_type):
+        doc_groups = ['ML']
+        service = 'azure.mgmt.machinelearningservices'
+        client = 'MachineLearningServicesMgmtClient'
+        enum_spec = ('online_deployments', 'list', None)
+        parent_manager_name = 'machine-learning-online-endpoint'
+        resource_type = (
+            'Microsoft.MachineLearningServices/workspaces/onlineEndpoints/deployments'
+        )
+        default_report_fields = (
+            'name',
+            'location',
+            'resourceGroup',
+            '"c7n:parent-id"',
+            'properties.model',
+        )
+
+        @classmethod
+        def extra_args(cls, parent_resource):
+            return {
+                'resource_group_name': ResourceIdParser.get_resource_group(parent_resource['id']),
+                'workspace_name': parent_resource['c7n:parent-id'].rstrip('/').rsplit('/', 1)[-1],
+                'endpoint_name': parent_resource['name'],
+            }
+
+
 @resources.register('machine-learning-data-container')
 class MachineLearningDataContainer(ChildArmResourceManager):
     """Machine Learning Data Container Resource
