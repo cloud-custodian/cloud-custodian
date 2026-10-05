@@ -41,6 +41,11 @@ delete_resource() {
         curl -X DELETE -H "Authorization: Bearer ${token}" "${budget_base_url}/budget_1000?api-version=2023-05-01"
         curl -X DELETE -H "Authorization: Bearer ${token}" "${budget_base_url}/budget_1001?api-version=2023-05-01"
         az deployment sub delete --name cctest-budget --output None
+    elif [[ "$fileName" == "subscription-diagnostic-storage.json" ]]; then
+        # subscription scoped, so not removed with the resource group
+        az monitor diagnostic-settings subscription delete \
+            --name cctest-subscription-diagnostic-storage --yes --output None
+        az deployment sub delete --name cctest-subscription-diagnostic-storage --output None
     elif [[ "$fileName" == "cognitive-service-deployment.json" ]]; then
         account_name="${AZURE_OPENAI_ACCOUNT_NAME}"
         if [[ -z "${account_name}" ]]; then
