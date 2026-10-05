@@ -36,6 +36,7 @@ ResourceMap = {
     "azure.cosmosdb-collection": "c7n_azure.resources.cosmos_db.CosmosDBCollection",
     "azure.cosmosdb-database": "c7n_azure.resources.cosmos_db.CosmosDBDatabase",
     "azure.cost-management-export": "c7n_azure.resources.cost_management_export.CostManagementExport",  # noqa
+    "azure.cost-management-scheduled-action": "c7n_azure.resources.cost_management_scheduled_action.CostManagementScheduledAction",  # noqa
     "azure.databricks": "c7n_azure.resources.databricks.Databricks",
     "azure.datafactory": "c7n_azure.resources.data_factory.DataFactory",
     "azure.datalake": "c7n_azure.resources.datalake_store.DataLakeStore",
