@@ -302,17 +302,17 @@ def test_tag_augment_lookup_by_id(test, ec2_augment_tags, mode):
 
 @terraform('ec2_augment_tags', scope='session')
 def test_tag_augment_lookup_by_resource_type(test, ec2_augment_tags):
-    """Above the ceiling, fall back to the region-wide resource-type filter.
-
-    The ceiling is patched down rather than provisioning enough instances to
-    cross it.
-    """
+    """The region-wide lookup recovers instance tags across multiple pages."""
     session_factory = test.replay_flight_data(
         'test_ec2_augment_tags_lookup_many', region=AUGMENT_REGION)
     test.patch(ec2, 'EC2_TAG_AUGMENT_BY_INSTANCES_MAX', 1)
     ids = [ec2_augment_tags['aws_instance.tagged_a.id'],
            ec2_augment_tags['aws_instance.tagged_b.id']]
     _strip_instance_tags(session_factory)
+    # Six instance tags require multiple pages with this page size.
+    utils.local_session(session_factory).events.register(
+        'before-parameter-build.ec2.DescribeTags',
+        lambda params, **kw: params.update(MaxResults=5))
     sent = _capture_tag_filters(test, session_factory)
 
     policy = _augment_policy(test, session_factory)
@@ -321,9 +321,11 @@ def test_tag_augment_lookup_by_resource_type(test, ec2_augment_tags):
     test.assertEqual(sorted(r['InstanceId'] for r in resources), sorted(ids))
     for r in resources:
         test.assertEqual(
-            {t['Key']: t['Value'] for t in r['Tags']}['Env'], 'Production')
-    test.assertEqual(
-        sent, [[{'Name': 'resource-type', 'Values': ['instance']}]])
+            {t['Key']: t['Value'] for t in r['Tags']},
+            {'Env': 'Production', 'Name': 'custodian-tester', 'Owner': 'robot'})
+    test.assertGreater(len(sent), 1)
+    for filters in sent:
+        test.assertEqual(filters, [{'Name': 'resource-type', 'Values': ['instance']}])
 
 
 class TestTagAugmentation(BaseTest):

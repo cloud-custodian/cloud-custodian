@@ -81,9 +81,9 @@
         "aws_instance": {
             "tagged_a": {
                 "ami": "ami-0f8848d57eb4fe2d2",
-                "arn": "arn:aws:ec2:us-east-1:644160558196:instance/i-019ef33f8a3e0e78a",
+                "arn": "arn:aws:ec2:us-east-1:644160558196:instance/i-0f0b98cda19cde0a0",
                 "associate_public_ip_address": false,
-                "availability_zone": "us-east-1a",
+                "availability_zone": "us-east-1b",
                 "capacity_reservation_specification": [
                     {
                         "capacity_reservation_preference": "open",
@@ -120,7 +120,7 @@
                 "host_id": "",
                 "host_resource_group_arn": null,
                 "iam_instance_profile": "",
-                "id": "i-019ef33f8a3e0e78a",
+                "id": "i-0f0b98cda19cde0a0",
                 "instance_initiated_shutdown_behavior": "stop",
                 "instance_lifecycle": "",
                 "instance_market_options": [],
@@ -154,11 +154,11 @@
                 "primary_network_interface": [
                     {
                         "delete_on_termination": true,
-                        "network_interface_id": "eni-047f83ff683e76201"
+                        "network_interface_id": "eni-0b119f9162c9c3ebf"
                     }
                 ],
-                "primary_network_interface_id": "eni-047f83ff683e76201",
-                "private_dns": "ip-10-0-1-192.ec2.internal",
+                "primary_network_interface_id": "eni-0b119f9162c9c3ebf",
+                "private_dns": "ip-10-0-1-79.ec2.internal",
                 "private_dns_name_options": [
                     {
                         "enable_resource_name_dns_a_record": false,
@@ -166,7 +166,7 @@
                         "hostname_type": "ip-name"
                     }
                 ],
-                "private_ip": "10.0.1.192",
+                "private_ip": "10.0.1.79",
                 "public_dns": "",
                 "public_ip": "",
                 "region": "us-east-1",
@@ -180,7 +180,7 @@
                         "tags": {},
                         "tags_all": {},
                         "throughput": 0,
-                        "volume_id": "vol-0b040ba203ed17665",
+                        "volume_id": "vol-07758c92d403d0fd0",
                         "volume_size": 8,
                         "volume_type": "gp2"
                     }
@@ -190,7 +190,7 @@
                 "security_groups": [],
                 "source_dest_check": true,
                 "spot_instance_request_id": "",
-                "subnet_id": "subnet-0467ae718eff268de",
+                "subnet_id": "subnet-0d517737a3ddc6342",
                 "tags": {
                     "Env": "Production",
                     "Name": "custodian-tester",
@@ -208,14 +208,14 @@
                 "user_data_replace_on_change": false,
                 "volume_tags": null,
                 "vpc_security_group_ids": [
-                    "sg-0131a2520e8929234"
+                    "sg-091079d352b8ffdcf"
                 ]
             },
             "tagged_b": {
                 "ami": "ami-0f8848d57eb4fe2d2",
-                "arn": "arn:aws:ec2:us-east-1:644160558196:instance/i-084315c0e2744a9fe",
+                "arn": "arn:aws:ec2:us-east-1:644160558196:instance/i-0877d42a6928968d2",
                 "associate_public_ip_address": false,
-                "availability_zone": "us-east-1a",
+                "availability_zone": "us-east-1b",
                 "capacity_reservation_specification": [
                     {
                         "capacity_reservation_preference": "open",
@@ -252,7 +252,7 @@
                 "host_id": "",
                 "host_resource_group_arn": null,
                 "iam_instance_profile": "",
-                "id": "i-084315c0e2744a9fe",
+                "id": "i-0877d42a6928968d2",
                 "instance_initiated_shutdown_behavior": "stop",
                 "instance_lifecycle": "",
                 "instance_market_options": [],
@@ -286,11 +286,11 @@
                 "primary_network_interface": [
                     {
                         "delete_on_termination": true,
-                        "network_interface_id": "eni-0a7e1bdd9b748f247"
+                        "network_interface_id": "eni-0707f5ab16555de2a"
                     }
                 ],
-                "primary_network_interface_id": "eni-0a7e1bdd9b748f247",
-                "private_dns": "ip-10-0-1-74.ec2.internal",
+                "primary_network_interface_id": "eni-0707f5ab16555de2a",
+                "private_dns": "ip-10-0-1-122.ec2.internal",
                 "private_dns_name_options": [
                     {
                         "enable_resource_name_dns_a_record": false,
@@ -298,7 +298,7 @@
                         "hostname_type": "ip-name"
                     }
                 ],
-                "private_ip": "10.0.1.74",
+                "private_ip": "10.0.1.122",
                 "public_dns": "",
                 "public_ip": "",
                 "region": "us-east-1",
@@ -312,7 +312,7 @@
                         "tags": {},
                         "tags_all": {},
                         "throughput": 0,
-                        "volume_id": "vol-056b086d1cdbe18bd",
+                        "volume_id": "vol-01a4a812d6e1e264f",
                         "volume_size": 8,
                         "volume_type": "gp2"
                     }
@@ -322,7 +322,7 @@
                 "security_groups": [],
                 "source_dest_check": true,
                 "spot_instance_request_id": "",
-                "subnet_id": "subnet-0467ae718eff268de",
+                "subnet_id": "subnet-0d517737a3ddc6342",
                 "tags": {
                     "Env": "Production",
                     "Name": "custodian-tester",
@@ -340,23 +340,23 @@
                 "user_data_replace_on_change": false,
                 "volume_tags": null,
                 "vpc_security_group_ids": [
-                    "sg-0131a2520e8929234"
+                    "sg-091079d352b8ffdcf"
                 ]
             }
         },
         "aws_subnet": {
             "example": {
-                "arn": "arn:aws:ec2:us-east-1:644160558196:subnet/subnet-0467ae718eff268de",
+                "arn": "arn:aws:ec2:us-east-1:644160558196:subnet/subnet-0d517737a3ddc6342",
                 "assign_ipv6_address_on_creation": false,
-                "availability_zone": "us-east-1a",
-                "availability_zone_id": "use1-az1",
+                "availability_zone": "us-east-1b",
+                "availability_zone_id": "use1-az2",
                 "cidr_block": "10.0.1.0/24",
                 "customer_owned_ipv4_pool": "",
                 "enable_dns64": false,
                 "enable_lni_at_device_index": 0,
                 "enable_resource_name_dns_a_record_on_launch": false,
                 "enable_resource_name_dns_aaaa_record_on_launch": false,
-                "id": "subnet-0467ae718eff268de",
+                "id": "subnet-0d517737a3ddc6342",
                 "ipv4_ipam_pool_id": null,
                 "ipv4_netmask_length": null,
                 "ipv6_cidr_block": "",
@@ -373,22 +373,22 @@
                 "tags": null,
                 "tags_all": {},
                 "timeouts": null,
-                "vpc_id": "vpc-0b8ea408912640192"
+                "vpc_id": "vpc-0b03ecd013983bb42"
             }
         },
         "aws_vpc": {
             "example": {
-                "arn": "arn:aws:ec2:us-east-1:644160558196:vpc/vpc-0b8ea408912640192",
+                "arn": "arn:aws:ec2:us-east-1:644160558196:vpc/vpc-0b03ecd013983bb42",
                 "assign_generated_ipv6_cidr_block": false,
                 "cidr_block": "10.0.0.0/16",
-                "default_network_acl_id": "acl-0f6b1ac5d17e88a79",
-                "default_route_table_id": "rtb-0a568d61a9d329bf4",
-                "default_security_group_id": "sg-0131a2520e8929234",
+                "default_network_acl_id": "acl-00a4e20e103da96bc",
+                "default_route_table_id": "rtb-0b77f9f964c5751fc",
+                "default_security_group_id": "sg-091079d352b8ffdcf",
                 "dhcp_options_id": "dopt-0caef10e2e26f8bde",
                 "enable_dns_hostnames": false,
                 "enable_dns_support": true,
                 "enable_network_address_usage_metrics": false,
-                "id": "vpc-0b8ea408912640192",
+                "id": "vpc-0b03ecd013983bb42",
                 "instance_tenancy": "default",
                 "ipv4_ipam_pool_id": null,
                 "ipv4_netmask_length": null,
@@ -397,7 +397,7 @@
                 "ipv6_cidr_block_network_border_group": "",
                 "ipv6_ipam_pool_id": "",
                 "ipv6_netmask_length": 0,
-                "main_route_table_id": "rtb-0a568d61a9d329bf4",
+                "main_route_table_id": "rtb-0b77f9f964c5751fc",
                 "owner_id": "644160558196",
                 "region": "us-east-1",
                 "tags": null,
