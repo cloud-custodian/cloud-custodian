@@ -421,51 +421,6 @@
         {
             "request": {
                 "method": "GET",
-                "uri": "https://management.azure.com/subscriptions/ea42f556-5106-4743-99b0-c129bfa71a47/resourceGroups/test_machine-learning-job/providers/Microsoft.MachineLearningServices/workspaces/cctest-mlws-792454565316/jobs?api-version=2023-04-01&listViewType=All",
-                "body": null,
-                "headers": {}
-            },
-            "response": {
-                "status": {
-                    "code": 404,
-                    "message": "Not Found"
-                },
-                "headers": {
-                    "x-cache": [
-                        "CONFIG_NOCACHE"
-                    ],
-                    "date": [
-                        "Wed, 30 Sep 2026 20:07:43 GMT"
-                    ],
-                    "content-length": [
-                        "117"
-                    ],
-                    "x-msedge-ref": [
-                        "Ref A: 88688D2191094CA992326B4DA7623D94 Ref B: CYS013050704037 Ref C: 2026-09-30T20:07:44Z"
-                    ],
-                    "cache-control": [
-                        "no-cache"
-                    ],
-                    "x-ms-failure-cause": [
-                        "gateway"
-                    ],
-                    "content-type": [
-                        "application/json; charset=utf-8"
-                    ]
-                },
-                "body": {
-                    "data": {
-                        "error": {
-                            "code": "ResourceGroupNotFound",
-                            "message": "Resource group 'test_machine-learning-job' could not be found."
-                        }
-                    }
-                }
-            }
-        },
-        {
-            "request": {
-                "method": "GET",
                 "uri": "https://management.azure.com/subscriptions/ea42f556-5106-4743-99b0-c129bfa71a47/resourceGroups/test_machine-learning-job-cancel/providers/Microsoft.MachineLearningServices/workspaces/cctest-mlws-job-cancel/jobs?api-version=2023-04-01&listViewType=All",
                 "body": null,
                 "headers": {}
