@@ -283,6 +283,10 @@ class OrgTest(TestUtils):
                 return_value=mock.MagicMock(return_value=profile_session)))
             bootstrap = self._all_regions_bootstrap(account)
             self.assertEqual(get_partition(bootstrap), partition)
+            if partition == 'aws':
+                # get_partition answers 'aws' for any region it doesn't know,
+                # so check the fallback region itself
+                self.assertEqual(bootstrap, 'us-east-1')
 
     def test_filter_accounts(self):
 
