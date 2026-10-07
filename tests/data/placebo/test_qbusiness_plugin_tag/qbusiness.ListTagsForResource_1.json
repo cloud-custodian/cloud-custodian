@@ -1,0 +1,16 @@
+{
+    "status_code": 200,
+    "data": {
+        "ResponseMetadata": {},
+        "tags": [
+            {
+                "key": "team",
+                "value": "knowledge-platform"
+            },
+            {
+                "key": "Env",
+                "value": "Test"
+            }
+        ]
+    }
+}
