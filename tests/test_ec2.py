@@ -192,19 +192,15 @@ AUGMENT_TAG_COUNT = 3
 CLOUDTRAIL_MODE = {'type': 'cloudtrail', 'events': ['RunInstances']}
 
 
-def _record_tags(test, session_factory, tag_filter):
-    """Capture the DescribeTags response the back-fill will need on replay.
+def _strip_instance_tags(session_factory) -> None:
+    """Simulate missing DescribeInstances tags in live and replay runs."""
+    def strip_tags(parsed: dict, **kw) -> None:
+        for reservation in parsed['Reservations']:
+            for instance in reservation['Instances']:
+                instance.pop('Tags', None)
 
-    Live instances return their tags on describe_instances, so augment()
-    short-circuits while recording and never calls describe_tags. Issue the
-    call the code would make, so replay has a response to serve once the
-    recorded tag set is removed. The response is genuine; only the request
-    is ours.
-    """
-    if not test.recording:
-        return
-    utils.local_session(session_factory).client('ec2').describe_tags(
-        Filters=[tag_filter])
+    utils.local_session(session_factory).events.register(
+        'after-call.ec2.DescribeInstances', strip_tags)
 
 
 def _capture_tag_filters(test, session_factory):
@@ -263,6 +259,7 @@ def test_tag_augment_skipped_for_instance_state(test, ec2_augment_tags):
     """
     session_factory = test.replay_flight_data(
         'test_ec2_augment_tags_instance_state', region=AUGMENT_REGION)
+    _strip_instance_tags(session_factory)
     instance_id = ec2_augment_tags['aws_instance.tagged_a.id']
 
     policy = _augment_policy(
@@ -289,8 +286,7 @@ def test_tag_augment_lookup_by_id(test, ec2_augment_tags, mode):
     session_factory = test.replay_flight_data(
         'test_ec2_augment_tags_lookup', region=AUGMENT_REGION)
     instance_id = ec2_augment_tags['aws_instance.tagged_a.id']
-    _record_tags(test, session_factory,
-                 {'Name': 'resource-id', 'Values': [instance_id]})
+    _strip_instance_tags(session_factory)
     sent = _capture_tag_filters(test, session_factory)
 
     policy = _augment_policy(test, session_factory, mode=mode)
@@ -316,8 +312,7 @@ def test_tag_augment_lookup_by_resource_type(test, ec2_augment_tags):
     test.patch(ec2, 'EC2_TAG_AUGMENT_BY_INSTANCES_MAX', 1)
     ids = [ec2_augment_tags['aws_instance.tagged_a.id'],
            ec2_augment_tags['aws_instance.tagged_b.id']]
-    _record_tags(test, session_factory,
-                 {'Name': 'resource-type', 'Values': ['instance']})
+    _strip_instance_tags(session_factory)
     sent = _capture_tag_filters(test, session_factory)
 
     policy = _augment_policy(test, session_factory)
