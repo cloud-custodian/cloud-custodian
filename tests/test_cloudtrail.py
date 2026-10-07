@@ -1,6 +1,8 @@
 # Copyright The Cloud Custodian Authors.
 # SPDX-License-Identifier: Apache-2.0
 import time
+from unittest.mock import MagicMock
+
 from .common import BaseTest
 
 
@@ -192,3 +194,66 @@ class CloudTrail(BaseTest):
             client.exceptions.TrailNotFoundException,
             client.delete_trail,
             Name=resources[0]['Name'])
+
+
+class CloudTrailTagShadowTest(BaseTest):
+    # https://github.com/cloud-custodian/cloud-custodian/issues/10976
+    # The Resource Groups Tagging API rejects a trail ARN whose region differs
+    # from the region it's invoked in, so tag actions must skip shadow trails
+    # (multi-region / organization trail copies seen outside their home region).
+
+    def _policy(self, action):
+        mock_factory = MagicMock()
+        mock_factory.region = 'us-east-1'
+        client = mock_factory().client('resourcegroupstaggingapi')
+        client.tag_resources.return_value = {}
+        client.untag_resources.return_value = {}
+        policy = self.load_policy(
+            {'name': 't', 'resource': 'aws.cloudtrail', 'actions': [action]},
+            session_factory=mock_factory)
+        config = policy.resource_manager.config
+
+        arn = 'arn:aws:cloudtrail:%s:%s:trail/%s'
+        self.home = {
+            'Name': 'home', 'TrailARN': arn % (config.region, config.account_id, 'home'),
+            'IsMultiRegionTrail': True, 'HomeRegion': config.region}
+        # multi-region trail whose home is elsewhere
+        self.shadow = {
+            'Name': 'shadow', 'TrailARN': arn % ('us-west-2', config.account_id, 'shadow'),
+            'IsMultiRegionTrail': True, 'HomeRegion': 'us-west-2'}
+        # organization trail owned by another account
+        self.org_shadow = {
+            'Name': 'org', 'TrailARN': arn % (config.region, '999999999999', 'org'),
+            'IsOrganizationTrail': True, 'HomeRegion': config.region}
+        return policy, client
+
+    def test_tag_skips_shadow_trails(self):
+        policy, client = self._policy({'type': 'tag', 'tags': {'Owner': 'platform'}})
+        policy.resource_manager.actions[0].process(
+            [self.home, self.shadow, self.org_shadow])
+        client.tag_resources.assert_called_once_with(
+            ResourceARNList=[self.home['TrailARN']], Tags={'Owner': 'platform'})
+
+    def test_remove_tag_skips_shadow_trails(self):
+        policy, client = self._policy({'type': 'remove-tag', 'tags': ['Owner']})
+        policy.resource_manager.actions[0].process(
+            [self.home, self.shadow, self.org_shadow])
+        client.untag_resources.assert_called_once()
+        self.assertEqual(
+            client.untag_resources.call_args.kwargs['ResourceARNList'],
+            [self.home['TrailARN']])
+
+    def test_mark_for_op_skips_shadow_trails(self):
+        policy, client = self._policy({'type': 'mark-for-op', 'op': 'notify', 'days': 4})
+        policy.resource_manager.actions[0].process(
+            [self.home, self.shadow, self.org_shadow])
+        client.tag_resources.assert_called_once()
+        self.assertEqual(
+            client.tag_resources.call_args.kwargs['ResourceARNList'],
+            [self.home['TrailARN']])
+        self.assertIn('maid_status', client.tag_resources.call_args.kwargs['Tags'])
+
+    def test_tag_all_shadow_noop(self):
+        policy, client = self._policy({'type': 'tag', 'tags': {'Owner': 'platform'}})
+        policy.resource_manager.actions[0].process([self.shadow, self.org_shadow])
+        client.tag_resources.assert_not_called()
