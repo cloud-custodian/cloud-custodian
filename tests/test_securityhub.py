@@ -3,8 +3,14 @@
 
 from c7n.exceptions import PolicyValidationError
 from c7n.resources.aws import shape_validate
+from c7n.resources.securityhub import (
+    SECHUB_TRUNCATION_MARKER,
+    SECHUB_VALUE_SIZE_LIMIT,
+    truncate_value,
+)
 from .common import BaseTest, event_data
 
+import json
 import logging
 import time
 
@@ -129,6 +135,54 @@ class SecurityHubTest(BaseTest):
         resource = post_finding.format_resource(
             {'Name': 'xyz', 'CreationDate': 'xtf'})
         self.assertEqual(resource['Id'], "arn:aws:s3:::xyz")
+
+    def test_truncate_value(self):
+        self.assertEqual(truncate_value('short'), 'short')
+        at_limit = 'x' * SECHUB_VALUE_SIZE_LIMIT
+        self.assertEqual(truncate_value(at_limit), at_limit)
+        over_limit = truncate_value('x' * (SECHUB_VALUE_SIZE_LIMIT + 1))
+        self.assertEqual(
+            over_limit,
+            'x' * (SECHUB_VALUE_SIZE_LIMIT - len(SECHUB_TRUNCATION_MARKER))
+            + SECHUB_TRUNCATION_MARKER)
+        # Deliberately the literal rather than SECHUB_VALUE_SIZE_LIMIT. The cap
+        # is the service's, so this pins what Security Hub accepts instead of
+        # restating whatever the constant currently says.
+        self.assertEqual(len(over_limit), 1024)
+
+    def test_other_finding_truncates_oversize_string(self):
+        # A resource policy document arrives as a string, and a real one runs
+        # well past the value size limit. Security Hub rejects the entire
+        # finding if it is posted intact.
+        policy = self.load_policy({
+            'name': 'secret-finding',
+            'resource': 'aws.secrets-manager',
+            'actions': [
+                {'type': 'post-finding',
+                 'types': [
+                     "Software and Configuration Checks/AWS Security Best Practices"
+                 ]}]})
+        post_finding = policy.resource_manager.actions[0]
+        resource = post_finding.format_resource({
+            'ARN': 'arn:aws:secretsmanager:us-east-1:644160558196:secret:xyz',
+            'Name': 'xyz',
+            'Policy': json.dumps({'Statement': ['x' * 2000]}),
+        })
+        details = resource['Details']['Other']
+        self.assertEqual(len(details['Policy']), SECHUB_VALUE_SIZE_LIMIT)
+        self.assertTrue(details['Policy'].endswith(SECHUB_TRUNCATION_MARKER))
+        # Values inside the limit are left alone.
+        self.assertEqual(details['Name'], 'xyz')
+
+        # A value of exactly the limit is accepted by the service, so it is
+        # passed through rather than shortened.
+        at_limit = 'y' * SECHUB_VALUE_SIZE_LIMIT
+        resource = post_finding.format_resource({
+            'ARN': 'arn:aws:secretsmanager:us-east-1:644160558196:secret:xyz',
+            'Name': 'xyz',
+            'Policy': at_limit,
+        })
+        self.assertEqual(resource['Details']['Other']['Policy'], at_limit)
 
     def test_security_hub_master_filter(self):
         factory = self.replay_flight_data('test_security_hub_master_filter')

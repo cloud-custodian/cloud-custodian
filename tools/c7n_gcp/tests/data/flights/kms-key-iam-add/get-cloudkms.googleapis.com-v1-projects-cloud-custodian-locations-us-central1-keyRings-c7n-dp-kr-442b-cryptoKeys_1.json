@@ -1,0 +1,45 @@
+{
+  "headers": {
+    "content-type": "application/json; charset=UTF-8",
+    "vary": "Origin, X-Origin, Referer",
+    "date": "Fri, 25 Sep 2026 19:08:53 GMT",
+    "server": "ESF",
+    "x-xss-protection": "0",
+    "x-frame-options": "SAMEORIGIN",
+    "x-content-type-options": "nosniff",
+    "alt-svc": "h3=\":443\"; ma=2592000,h3-29=\":443\"; ma=2592000",
+    "transfer-encoding": "chunked",
+    "status": "200",
+    "content-length": "1008",
+    "-content-encoding": "gzip",
+    "content-location": "https://cloudkms.googleapis.com/v1/projects/cloud-custodian/locations/us-central1/keyRings/c7n-dp-kr-442b/cryptoKeys?alt=json"
+  },
+  "body": {
+    "cryptoKeys": [
+      {
+        "name": "projects/cloud-custodian/locations/us-central1/keyRings/c7n-dp-kr-442b/cryptoKeys/c7n-dp-key-442b",
+        "primary": {
+          "name": "projects/cloud-custodian/locations/us-central1/keyRings/c7n-dp-kr-442b/cryptoKeys/c7n-dp-key-442b/cryptoKeyVersions/2",
+          "state": "ENABLED",
+          "createTime": "2026-09-22T18:54:14.102414216Z",
+          "protectionLevel": "SOFTWARE",
+          "algorithm": "GOOGLE_SYMMETRIC_ENCRYPTION",
+          "generateTime": "2026-09-22T18:54:14.102414216Z"
+        },
+        "purpose": "ENCRYPT_DECRYPT",
+        "createTime": "2026-02-04T19:43:34.626576729Z",
+        "nextRotationTime": "2026-12-21T18:54:14.102414Z",
+        "rotationPeriod": "7776000s",
+        "labels": {
+          "goog-terraform-provisioned": "true"
+        },
+        "versionTemplate": {
+          "protectionLevel": "SOFTWARE",
+          "algorithm": "GOOGLE_SYMMETRIC_ENCRYPTION"
+        },
+        "destroyScheduledDuration": "2592000s"
+      }
+    ],
+    "totalSize": 1
+  }
+}
