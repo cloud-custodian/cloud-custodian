@@ -511,6 +511,33 @@ PY
         az cosmosdb update -g $rgName -n cctestcosmosdb$suffix --ip-range-filter $allow_list
     fi
 
+    if [[ "$fileName" == "vnet.json" ]]; then
+        storage_account_id=$(az storage account list --resource-group $rgName --query "[0].id" --output tsv)
+        vnet_id=$(az network vnet show --resource-group $rgName --name c7n-vnet --query id --output tsv)
+        watcher_name=$(az network watcher list --query "[?location=='southcentralus'].name" --output tsv)
+        watcher_rg=$(az network watcher list --query "[?location=='southcentralus'].resourceGroup" --output tsv)
+        if [[ -z "$watcher_name" || -z "$watcher_rg" ]]; then
+            echo "No network watcher found in southcentralus; cannot create flow log for c7n-vnet."
+            exit 1
+        fi
+
+        # Retention is deliberately below 90 days so the flow-logs retention
+        # filter test has a non-compliant flow log to match.
+        echo "Creating vnet flow log for c7n-vnet using network watcher ${watcher_name} (${watcher_rg})..."
+        if ! az network watcher flow-log create \
+            --resource-group "$watcher_rg" \
+            --location southcentralus \
+            --name c7n-vnet-flowlog \
+            --vnet "$vnet_id" \
+            --storage-account "$storage_account_id" \
+            --enabled true \
+            --retention 30 \
+            --output None; then
+            echo "Failed to create flow log for c7n-vnet."
+            exit 1
+        fi
+    fi
+
     echo "Deployment for ${filenameNoExtension} complete"
 }
 
