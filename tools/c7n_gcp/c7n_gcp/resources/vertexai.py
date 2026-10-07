@@ -1369,6 +1369,179 @@ class VertexAIHyperparameterTuningJobCancel(VertexAIMethodAction):
         return {'name': resource['name']}
 
 
+@resources.register('vertex-ai-tuning-job')
+class VertexAITuningJob(VertexAIQueryManager):
+    """GCP Vertex AI Tuning Job Resource
+
+    Vertex AI Tuning Jobs fine-tune foundation models (e.g. supervised
+    fine-tuning or preference optimization of Gemini models). They are
+    distinct from Hyperparameter Tuning Jobs, which run automated
+    hyperparameter search over custom training workloads.
+
+    :example:
+
+    List all Tuning Jobs in specific locations:
+
+    .. code-block:: yaml
+
+        policies:
+          - name: vertexai-tuning-jobs-inventory
+            resource: gcp.vertex-ai-tuning-job
+            query:
+              - location: us-central1
+              - location: europe-west4
+
+    :example:
+
+    Find Tuning Jobs that have been running for more than 24 hours:
+
+    .. code-block:: yaml
+
+        policies:
+          - name: gcp-vertex-ai-tuning-jobs-long-running
+            resource: gcp.vertex-ai-tuning-job
+            filters:
+              - type: value
+                key: state
+                value: JOB_STATE_RUNNING
+              - type: value
+                key: startTime
+                value_type: age
+                op: greater-than
+                value: 1
+
+    :example:
+
+    Find Tuning Jobs not using an approved service account:
+
+    .. code-block:: yaml
+
+        policies:
+          - name: gcp-vertex-ai-tuning-jobs-unapproved-service-account
+            resource: gcp.vertex-ai-tuning-job
+            filters:
+              - type: value
+                key: serviceAccount
+                op: not-in
+                value:
+                  - tuning@my-project.iam.gserviceaccount.com
+
+    :example:
+
+    Find Tuning Jobs missing a valid data-classification label:
+
+    .. code-block:: yaml
+
+        policies:
+          - name: gcp-vertex-ai-tuning-jobs-data-classification
+            resource: gcp.vertex-ai-tuning-job
+            filters:
+              - not:
+                - type: value
+                  key: labels."data-classification"
+                  op: in
+                  value: [public, private, confidential, restricted]
+    """
+
+    class resource_type(VertexAITypeInfo):
+        component = 'projects.locations.tuningJobs'
+        enum_spec = ('list', 'tuningJobs[]', None)
+        default_report_fields = [
+            'name', 'tunedModelDisplayName', 'baseModel', 'state',
+            'createTime', 'startTime', 'endTime'
+        ]
+        # Tuning Jobs aren't a supported Cloud Asset Inventory type.
+        permissions = ('aiplatform.tuningJobs.list',)
+        urn_component = 'tuning-job'
+
+    def _fetch_resources(self, query):
+        """Enumerate Tuning Jobs per location, skipping denied locations.
+
+        Tuning Jobs are available in fewer locations than the rest of Vertex
+        AI, and listing them in some (e.g. me-central2) is rejected with a
+        403 rather than returning an empty list. GCP uses the same 403 for a
+        missing permission, so log it rather than failing the whole policy
+        over one location.
+        """
+        session = local_session(self.session_factory)
+        project = session.get_default_project()
+
+        location_query = self._get_location_query()
+        location_manager = self.get_resource_manager(
+            resource_type='vertex-ai-location',
+            data=({'query': location_query} if location_query else {})
+        )
+
+        enum_op, path, _ = self.resource_type.enum_spec
+        all_resources = []
+        for location_instance in location_manager.resources():
+            location = location_instance['name']
+            client = self.get_location_client(session, location, self.resource_type.component)
+            params = {'parent': f'projects/{project}/locations/{location}'}
+
+            location_resources = []
+            try:
+                for page in client.execute_paged_query(enum_op, params):
+                    location_resources.extend(jmespath_search(path, page) or [])
+            except HttpError as e:
+                if e.resp.status != 403:
+                    raise
+                self.log.warning(
+                    'Skipping location %s, listing tuning jobs was denied: %s',
+                    location, e.reason)
+                continue
+
+            for resource in location_resources:
+                resource['c7n:location'] = location_instance
+            all_resources.extend(location_resources)
+
+        return all_resources
+
+
+@VertexAITuningJob.action_registry.register('cancel')
+class VertexAITuningJobCancel(VertexAIMethodAction):
+    """Cancel Vertex AI Tuning Jobs
+
+    Cancels a running Vertex AI Tuning Job. This is useful for cost control
+    when fine-tuning jobs run longer than expected or were submitted without
+    approval.
+
+    **Note**: Only jobs in a non-terminal state can be cancelled; jobs in any
+    other state are logged and skipped.
+
+    :example:
+
+    Cancel tuning jobs that have been running for more than 24 hours:
+
+    .. code-block:: yaml
+
+        policies:
+          - name: cancel-long-running-tuning-jobs
+            resource: gcp.vertex-ai-tuning-job
+            filters:
+              - type: value
+                key: state
+                value: JOB_STATE_RUNNING
+              - type: value
+                key: startTime
+                value_type: age
+                op: greater-than
+                value: 1
+            actions:
+              - type: cancel
+
+    https://cloud.google.com/vertex-ai/docs/reference/rest/v1/projects.locations.tuningJobs/cancel
+    """
+
+    schema = type_schema('cancel')
+    method_spec = {'op': 'cancel'}
+    permissions = ('aiplatform.tuningJobs.cancel',)
+    attr_filter = ('state', CANCELLABLE_JOB_STATES)
+
+    def get_resource_params(self, model, resource):
+        return {'name': resource['name']}
+
+
 def get_vertex_ai_publishers():
     """Load Vertex AI Model Garden publishers from generated JSON data."""
     with open(VERTEXAI_PUBLISHER_DATA_PATH) as fh:

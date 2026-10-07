@@ -40,17 +40,20 @@ class VertexAIJobs:
     test.
 
     Tracks every job created via create() and cleans them up (cancel, poll
-    for a terminal state, then delete) even if the test itself fails.
+    for a terminal state, then delete) even if the test itself fails. Pass
+    ``deletable=False`` for job types whose API has no delete method (e.g.
+    Tuning Jobs), which are only cancelled.
     """
     TERMINAL_STATES = {
         'JOB_STATE_SUCCEEDED', 'JOB_STATE_FAILED',
         'JOB_STATE_CANCELLED', 'JOB_STATE_EXPIRED'
     }
 
-    def __init__(self, test, component, location='us-central1'):
+    def __init__(self, test, component, location='us-central1', deletable=True):
         self.test = test
         self.component = component
         self.location = location
+        self.deletable = deletable
         self.created = []
 
     def _client(self, session):
@@ -75,14 +78,37 @@ class VertexAIJobs:
         Returns the last fetched job, or None if the job no longer exists
         (a 404 while polling, e.g. it was already deleted).
         """
+        return self.poll_state(client, name, self.TERMINAL_STATES, attempts)
+
+    def poll_state(self, client, name, states, attempts=6):
+        """Poll a job until its state is one of ``states``.
+
+        Returns the last fetched job, or None if the job no longer exists.
+        """
+        return self.poll(client, name, lambda job: job.get('state') in states, attempts)
+
+    def poll(self, client, name, predicate, attempts=6, description=None):
+        """Poll a job until ``predicate(job)`` is true.
+
+        Prints progress when a ``description`` of the awaited condition is
+        given. Returns the last fetched job, or None if the job no longer
+        exists.
+        """
+        if description:
+            print(f'\nWaiting for {name} {description}...')
         job = None
-        for _ in range(attempts):
+        for attempt in range(1, attempts + 1):
             try:
                 job = client.execute_query('get', {'name': name})
             except HttpError:
                 return None
-            if job.get('state') in self.TERMINAL_STATES:
+            if predicate(job):
+                if description:
+                    print(f'  Check {attempt}/{attempts}: {job.get("state")}, done')
                 return job
+            if description:
+                print(f'  Check {attempt}/{attempts}: {job.get("state")}, '
+                      f'retrying in 10 seconds...')
             if self.test.recording:
                 time.sleep(10)
         return job
@@ -93,6 +119,9 @@ class VertexAIJobs:
                 client.execute_command('cancel', {'name': name})
             except HttpError:
                 pass
+
+            if not self.deletable:
+                continue
 
             # Cancellation is asynchronous, poll for a terminal state before
             # attempting delete, otherwise delete fails with FAILED_PRECONDITION.
@@ -2213,7 +2242,8 @@ def test_vertexai_hp_tuning_job_cancel_and_delete(
 
 @pytest.mark.parametrize(
     'resource',
-    ['gcp.vertex-ai-custom-job', 'gcp.vertex-ai-hyperparameter-tuning-job'],
+    ['gcp.vertex-ai-custom-job', 'gcp.vertex-ai-hyperparameter-tuning-job',
+     'gcp.vertex-ai-tuning-job'],
     )
 def test_vertexai_job_cancel_skips_non_cancellable_states(test, resource):
     """The cancel action skips jobs that aren't in a cancellable state."""
@@ -2270,6 +2300,250 @@ def test_vertexai_hp_tuning_job_field_filters(
     resources = policy.run()
     assert len(resources) == 1
     assert resources[0]['name'] == job_name
+
+
+@pytest.fixture
+def create_tuning_job(test):
+    """Create short-lived Vertex AI Tuning Jobs for a test.
+
+    Yields a function ``(display_name, training_data_uri, **job_fields)``
+    that starts a single-epoch supervised fine-tuning job on a small Gemini
+    model. Extra keyword arguments (e.g. ``labels``, ``serviceAccount``) are
+    added to the job body. Tuning Jobs have no delete API, so every job
+    created is only cancelled after the test completes.
+    """
+    jobs = VertexAIJobs(test, 'projects.locations.tuningJobs', deletable=False)
+
+    def _create_tuning_job(display_name, training_data_uri, **job_fields):
+        job_spec = {
+            'baseModel': 'gemini-2.5-flash-lite',
+            'tunedModelDisplayName': display_name,
+            'supervisedTuningSpec': {
+                'trainingDatasetUri': training_data_uri,
+                'hyperParameters': {'epochCount': 1},
+            },
+            **job_fields
+        }
+        # The Tuning Service Agent's grant on a custom service account can
+        # take several minutes to propagate after the Terraform apply, and
+        # until then create is rejected. Retry that rejection only.
+        attempts = 10
+        print(f'\nCreating tuning job {display_name}...')
+        for attempt in range(1, attempts + 1):
+            try:
+                job = jobs.create(job_spec)
+            except HttpError as e:
+                if 'serviceAccountTokenCreator' not in str(e) or attempt == attempts:
+                    raise
+                print(f'  Attempt {attempt}/{attempts}: waiting on service account '
+                      f'IAM propagation, retrying in 30 seconds...')
+                if test.recording:
+                    time.sleep(30)
+                continue
+            print(f'  Attempt {attempt}/{attempts}: created {job["name"]}')
+            return job
+
+    try:
+        yield _create_tuning_job
+    finally:
+        jobs.cleanup()
+
+
+def tuning_job_client(test):
+    return test.session_factory().client(
+        'aiplatform', 'v1', 'projects.locations.tuningJobs',
+        client_options=ClientOptions(
+            api_endpoint='https://us-central1-aiplatform.googleapis.com'))
+
+
+@terraform('vertexai_tuning_job', scope='module')
+def test_vertexai_tuning_job_query(test, vertexai_tuning_job, create_tuning_job):
+    """Test listing, filtering, and generating URNs for a Tuning Job."""
+    outputs = vertexai_tuning_job.outputs
+    display_name = outputs['job_display_name']['value']
+
+    test.session_factory = test.replay_flight_data('vertexai_tuning_job_query')
+
+    create_tuning_job(display_name, outputs['training_data_uri']['value'])
+
+    policy = test.load_policy(
+        {'name': 'vertexai-tuning-job-query',
+         'resource': 'gcp.vertex-ai-tuning-job',
+         'query': [{'location': 'us-central1'}],
+         'filters': [
+             {'type': 'value',
+              'key': 'tunedModelDisplayName',
+              'value': display_name}
+         ]},
+        session_factory=test.session_factory)
+
+    resources = policy.run()
+    assert len(resources) == 1
+    assert resources[0]['tunedModelDisplayName'] == display_name
+
+    urns = policy.resource_manager.get_urns(resources)
+    assert len(urns) == 1
+    assert urns[0].startswith('gcp:aiplatform:us-central1:')
+    assert ':tuning-job/' in urns[0]
+
+
+@terraform('vertexai_tuning_job', scope='module')
+def test_vertexai_tuning_job_cancel(test, vertexai_tuning_job, create_tuning_job):
+    """Test cancelling a Tuning Job via the ``cancel`` action."""
+    outputs = vertexai_tuning_job.outputs
+    display_name = outputs['job_display_name']['value'] + '-cancel'
+
+    test.session_factory = test.replay_flight_data('vertexai_tuning_job_cancel')
+
+    job_name = create_tuning_job(
+        display_name, outputs['training_data_uri']['value'])['name']
+
+    policy = test.load_policy(
+        {'name': 'vertexai-tuning-job-cancel',
+         'resource': 'gcp.vertex-ai-tuning-job',
+         'query': [{'location': 'us-central1'}],
+         'filters': [{'type': 'value', 'key': 'name', 'value': job_name}],
+         'actions': [{'type': 'cancel'}]},
+        session_factory=test.session_factory)
+
+    resources = policy.run()
+    assert len(resources) == 1
+    assert resources[0]['name'] == job_name
+
+    job = VertexAIJobs(test, 'projects.locations.tuningJobs').poll_terminal_state(
+        tuning_job_client(test), job_name, attempts=30)
+    assert job is not None
+    assert job['state'] == 'JOB_STATE_CANCELLED'
+
+
+@terraform('vertexai_tuning_job', scope='module')
+def test_vertexai_tuning_job_field_filters(test, vertexai_tuning_job, create_tuning_job):
+    """Test filtering a running Tuning Job on the fields its policies use.
+
+    Covers ``state`` and ``startTime`` (runtime limit), ``serviceAccount``
+    (approved service accounts), and the ``owner``, ``dataset-id`` and
+    ``data-classification`` labels (required metadata).
+    """
+    # Recording in a project that has never run a Tuning Job: Google only
+    # creates the Tuning Service Agent on a project's first tuning job, so
+    # the fixture's token creator binding fails with "does not exist".
+    # Temporarily comment out ``tuning_agent_token_creator`` in the
+    # Terraform fixture, record another tuning job test (e.g.
+    # test_vertexai_tuning_job_cancel) to create the agent, then restore it
+    # and record this test.
+    outputs = vertexai_tuning_job.outputs
+    display_name = outputs['job_display_name']['value'] + '-filters'
+    service_account = outputs['service_account_email']['value']
+
+    test.session_factory = test.replay_flight_data('vertexai_tuning_job_field_filters')
+
+    job_name = create_tuning_job(
+        display_name, outputs['training_data_uri']['value'],
+        serviceAccount=service_account,
+        labels={
+            'owner': 'c7n-test',
+            'dataset-id': 'c7n-addition',
+            'data-classification': 'confidential',
+        })['name']
+
+    # startTime is only set once the job starts running, and the API only
+    # returns serviceAccount some time after the job is created.
+    job = VertexAIJobs(test, 'projects.locations.tuningJobs').poll(
+        tuning_job_client(test), job_name,
+        lambda job: job.get('state') == 'JOB_STATE_RUNNING' and 'serviceAccount' in job,
+        attempts=60, description='to be running with its service account')
+    assert job is not None
+    assert job['state'] == 'JOB_STATE_RUNNING'
+    assert job['serviceAccount'] == service_account
+
+    policy = test.load_policy(
+        {'name': 'vertexai-tuning-job-field-filters',
+         'resource': 'gcp.vertex-ai-tuning-job',
+         'query': [{'location': 'us-central1'}],
+         'filters': [
+             {'type': 'value', 'key': 'name', 'value': job_name},
+             {'type': 'value', 'key': 'state', 'value': 'JOB_STATE_RUNNING'},
+             {'type': 'value', 'key': 'startTime', 'value_type': 'age',
+              'op': 'greater-than', 'value': 0},
+             {'type': 'value', 'key': 'serviceAccount', 'op': 'in',
+              'value': [service_account]},
+             {'type': 'value', 'key': 'labels.owner', 'op': 'regex',
+              'value': '^[a-z0-9._@+-]+$'},
+             {'type': 'value', 'key': 'labels."dataset-id"', 'op': 'regex',
+              'value': '^[a-z0-9._-]+$'},
+             {'type': 'value', 'key': 'labels."data-classification"', 'op': 'in',
+              'value': ['public', 'private', 'confidential', 'restricted']},
+         ]},
+        session_factory=test.session_factory)
+
+    resources = policy.run()
+    assert len(resources) == 1
+    assert resources[0]['name'] == job_name
+
+
+@terraform('vertexai_tuning_job', scope='module')
+def test_vertexai_tuning_job_missing_metadata(test, vertexai_tuning_job, create_tuning_job):
+    """Test that a Tuning Job without labels or a service account is flagged.
+
+    Mirrors the required-metadata and approved-service-account policies:
+    absent labels fail the ``not`` blocks, and an unset ``serviceAccount``
+    is ``not-in`` the approved list.
+    """
+    outputs = vertexai_tuning_job.outputs
+    display_name = outputs['job_display_name']['value'] + '-bare'
+
+    test.session_factory = test.replay_flight_data('vertexai_tuning_job_missing_metadata')
+
+    job_name = create_tuning_job(
+        display_name, outputs['training_data_uri']['value'])['name']
+
+    policy = test.load_policy(
+        {'name': 'vertexai-tuning-job-missing-metadata',
+         'resource': 'gcp.vertex-ai-tuning-job',
+         'query': [{'location': 'us-central1'}],
+         'filters': [
+             {'type': 'value', 'key': 'name', 'value': job_name},
+             {'type': 'value', 'key': 'serviceAccount', 'op': 'not-in',
+              'value': [outputs['service_account_email']['value']]},
+             {'or': [
+                 {'not': [{'type': 'value', 'key': 'labels.owner',
+                           'op': 'regex', 'value': '^[a-z0-9._@+-]+$'}]},
+                 {'not': [{'type': 'value', 'key': 'labels."dataset-id"',
+                           'op': 'regex', 'value': '^[a-z0-9._-]+$'}]},
+                 {'not': [{'type': 'value', 'key': 'labels."data-classification"',
+                           'op': 'in',
+                           'value': ['public', 'private', 'confidential', 'restricted']}]},
+             ]},
+         ]},
+        session_factory=test.session_factory)
+
+    resources = policy.run()
+    assert len(resources) == 1
+    assert resources[0]['name'] == job_name
+
+
+def test_vertexai_tuning_job_unavailable_location(test, caplog):
+    """A location that rejects listing Tuning Jobs is skipped, not fatal.
+
+    me-central2 answers tuningJobs.list with a 403 even though the rest of
+    Vertex AI is available there.
+    """
+    test.session_factory = test.replay_flight_data('vertexai_tuning_job_unavailable_location')
+
+    policy = test.load_policy(
+        {'name': 'vertexai-tuning-job-unavailable-location',
+         'resource': 'gcp.vertex-ai-tuning-job',
+         'query': [
+             {'location': 'us-central1'},
+             {'location': 'me-central2'}
+         ]},
+        session_factory=test.session_factory)
+
+    resources = policy.run()
+
+    assert resources
+    assert {r['c7n:location']['name'] for r in resources} == {'us-central1'}
+    assert 'Skipping location me-central2' in caplog.text
 
 
 def test_vertexai_metadata_store_artifact_resource_registered(test):
