@@ -1,0 +1,35 @@
+{
+  "status_code": 200,
+  "data": {
+    "PaginationToken": "",
+    "ResourceTagMappingList": [
+      {
+        "ResourceARN": "arn:aws:fsx:us-east-1:644160558196:storage-virtual-machine/fs-0a584801db948c940/svm-097e3d446a223c732",
+        "Tags": [
+          {
+            "Key": "Name",
+            "Value": "c7n-fsx-ad-verify"
+          },
+          {
+            "Key": "c7n-purpose",
+            "Value": "fsx-ontap-managed-ad-verification"
+          }
+        ]
+      },
+      {
+        "ResourceARN": "arn:aws:fsx:us-east-1:644160558196:storage-virtual-machine/fs-0a584801db948c940/svm-05b1f4f80089ba22d",
+        "Tags": [
+          {
+            "Key": "Name",
+            "Value": "c7n-fsx-ad-verify"
+          },
+          {
+            "Key": "c7n-purpose",
+            "Value": "fsx-ontap-managed-ad-verification"
+          }
+        ]
+      }
+    ],
+    "ResponseMetadata": {}
+  }
+}
