@@ -70,6 +70,9 @@ class MetricsFilter(Filter):
     Rather than skipping those resources, "missing-value: 0" causes the
     policy to treat their request counts as 0.
 
+    Missing values only make sense when the statistic represents a
+    total, such as a sum or count.
+
     Note the default statistic for metrics is Average.
 
     The ``period-start`` key allows you to align the metric window in two ways.
@@ -89,7 +92,38 @@ class MetricsFilter(Filter):
             value: 30
             op: less-than
             period-start: start-of-day
+
+    Cloudwatch metrics are time series identified by a metric name,
+    a metric namespace, and by key-value pairs called "dimensions".  A
+    "dimension set" identifies the possible keys and is often as
+    simple as a single element that is a resource identifier, like
+    BucketName.
+
+    Metric filters automatically supply a dimension that is the resource
+    identifier.
+
+    Additional dimensions can be provided to narrow the metric data
+    used:
+
+    .. code-block:: yaml
+
+      dimensions:
+        StorageType: StandardStorage
     """
+    #
+    # Note: metric filters are implemented by:
+    #
+    # - enumerating resources for a resource type.
+    #
+    # - For each resource:
+    #
+    #   - Fetch the metric for the resource, identified by the metric
+    #     name, namespace, and resource dimensions.
+    #
+    #   - Evaluate the condition against the data.
+    #     The filter matches if the condition holds for every data point.
+    #     If there are no data, the filter doesn't match.
+    #     A missing value can be supplied to be used when there are no data.
 
     schema = type_schema(
         'metrics',

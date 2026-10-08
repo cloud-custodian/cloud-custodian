@@ -1,0 +1,84 @@
+{
+    "pytest-terraform": 1,
+    "outputs": {},
+    "resources": {
+        "google_data_loss_prevention_discovery_config": {
+            "c7n": {
+                "actions": [],
+                "create_time": "2026-10-02T14:02:36.223251Z",
+                "deletion_policy": "DELETE",
+                "display_name": "c7n-dlp-discovery-configs",
+                "errors": [],
+                "id": "projects/cloud-custodian/locations/us/discoveryConfigs/8338945954561565050",
+                "inspect_templates": [
+                    "projects/cloud-custodian/locations/us/inspectTemplates/4167487095981753467"
+                ],
+                "last_run_time": "",
+                "location": "us",
+                "name": "8338945954561565050",
+                "org_config": [],
+                "other_cloud_starting_location": [],
+                "parent": "projects/cloud-custodian/locations/us",
+                "status": "PAUSED",
+                "targets": [
+                    {
+                        "big_query_target": [
+                            {
+                                "cadence": [],
+                                "conditions": [],
+                                "disabled": [],
+                                "filter": [
+                                    {
+                                        "other_tables": [
+                                            {}
+                                        ],
+                                        "table_reference": [],
+                                        "tables": []
+                                    }
+                                ]
+                            }
+                        ],
+                        "cloud_sql_target": [],
+                        "cloud_storage_target": [],
+                        "other_cloud_target": [],
+                        "secrets_target": []
+                    }
+                ],
+                "timeouts": null,
+                "update_time": "2026-10-02T14:02:36.223251Z"
+            }
+        },
+        "google_data_loss_prevention_inspect_template": {
+            "c7n": {
+                "allow_limited_availability_info_types": false,
+                "deletion_policy": "DELETE",
+                "description": "",
+                "display_name": "c7n-dlp-discovery-configs",
+                "id": "projects/cloud-custodian/locations/us/inspectTemplates/4167487095981753467",
+                "inspect_config": [
+                    {
+                        "content_options": null,
+                        "custom_info_types": [],
+                        "exclude_info_types": false,
+                        "include_quote": false,
+                        "info_types": [
+                            {
+                                "name": "EMAIL_ADDRESS",
+                                "sensitivity_score": [],
+                                "version": ""
+                            }
+                        ],
+                        "limits": [],
+                        "min_likelihood": "POSSIBLE",
+                        "min_likelihood_per_info_type": [],
+                        "rule_set": []
+                    }
+                ],
+                "name": "4167487095981753467",
+                "parent": "projects/cloud-custodian/locations/us",
+                "template_id": "4167487095981753467",
+                "timeouts": null
+            }
+        }
+    }
+}

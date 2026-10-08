@@ -1,0 +1,43 @@
+{
+    "status_code": 200,
+    "data": {
+        "EndpointName": "c7n-endpoint-metrics-bold-fowl-ic",
+        "EndpointArn": "arn:aws:sagemaker:us-east-1:644160558196:endpoint/c7n-endpoint-metrics-bold-fowl-ic",
+        "EndpointConfigName": "c7n-em-ic-2fe668b931062054b3fed2e0fe",
+        "ProductionVariants": [
+            {
+                "VariantName": "AllTraffic",
+                "CurrentInstanceCount": 1,
+                "DesiredInstanceCount": 1,
+                "RoutingConfig": {
+                    "RoutingStrategy": "LEAST_OUTSTANDING_REQUESTS"
+                }
+            }
+        ],
+        "EndpointStatus": "InService",
+        "CreationTime": {
+            "__class__": "datetime",
+            "year": 2026,
+            "month": 9,
+            "day": 10,
+            "hour": 14,
+            "minute": 4,
+            "second": 27,
+            "microsecond": 158000
+        },
+        "LastModifiedTime": {
+            "__class__": "datetime",
+            "year": 2026,
+            "month": 9,
+            "day": 10,
+            "hour": 14,
+            "minute": 6,
+            "second": 35,
+            "microsecond": 428000
+        },
+        "MetricsConfig": {
+            "EnableDetailedObservability": true
+        },
+        "ResponseMetadata": {}
+    }
+}

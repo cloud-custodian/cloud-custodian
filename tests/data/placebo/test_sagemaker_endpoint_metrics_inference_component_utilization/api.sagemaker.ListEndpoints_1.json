@@ -1,0 +1,108 @@
+{
+    "status_code": 200,
+    "data": {
+        "Endpoints": [
+            {
+                "EndpointName": "c7n-endpoint-metrics-bold-fowl-busy",
+                "EndpointArn": "arn:aws:sagemaker:us-east-1:644160558196:endpoint/c7n-endpoint-metrics-bold-fowl-busy",
+                "CreationTime": {
+                    "__class__": "datetime",
+                    "year": 2026,
+                    "month": 9,
+                    "day": 10,
+                    "hour": 14,
+                    "minute": 4,
+                    "second": 37,
+                    "microsecond": 103000
+                },
+                "LastModifiedTime": {
+                    "__class__": "datetime",
+                    "year": 2026,
+                    "month": 9,
+                    "day": 10,
+                    "hour": 14,
+                    "minute": 8,
+                    "second": 13,
+                    "microsecond": 993000
+                },
+                "EndpointStatus": "InService"
+            },
+            {
+                "EndpointName": "c7n-endpoint-metrics-bold-fowl-idle",
+                "EndpointArn": "arn:aws:sagemaker:us-east-1:644160558196:endpoint/c7n-endpoint-metrics-bold-fowl-idle",
+                "CreationTime": {
+                    "__class__": "datetime",
+                    "year": 2026,
+                    "month": 9,
+                    "day": 10,
+                    "hour": 14,
+                    "minute": 4,
+                    "second": 36,
+                    "microsecond": 645000
+                },
+                "LastModifiedTime": {
+                    "__class__": "datetime",
+                    "year": 2026,
+                    "month": 9,
+                    "day": 10,
+                    "hour": 14,
+                    "minute": 8,
+                    "second": 12,
+                    "microsecond": 731000
+                },
+                "EndpointStatus": "InService"
+            },
+            {
+                "EndpointName": "c7n-endpoint-metrics-bold-fowl-ic",
+                "EndpointArn": "arn:aws:sagemaker:us-east-1:644160558196:endpoint/c7n-endpoint-metrics-bold-fowl-ic",
+                "CreationTime": {
+                    "__class__": "datetime",
+                    "year": 2026,
+                    "month": 9,
+                    "day": 10,
+                    "hour": 14,
+                    "minute": 4,
+                    "second": 27,
+                    "microsecond": 158000
+                },
+                "LastModifiedTime": {
+                    "__class__": "datetime",
+                    "year": 2026,
+                    "month": 9,
+                    "day": 10,
+                    "hour": 14,
+                    "minute": 6,
+                    "second": 35,
+                    "microsecond": 428000
+                },
+                "EndpointStatus": "InService"
+            },
+            {
+                "EndpointName": "c7n-endpoint-metrics-bold-fowl-ic-idle",
+                "EndpointArn": "arn:aws:sagemaker:us-east-1:644160558196:endpoint/c7n-endpoint-metrics-bold-fowl-ic-idle",
+                "CreationTime": {
+                    "__class__": "datetime",
+                    "year": 2026,
+                    "month": 9,
+                    "day": 10,
+                    "hour": 14,
+                    "minute": 4,
+                    "second": 27,
+                    "microsecond": 71000
+                },
+                "LastModifiedTime": {
+                    "__class__": "datetime",
+                    "year": 2026,
+                    "month": 9,
+                    "day": 10,
+                    "hour": 14,
+                    "minute": 6,
+                    "second": 35,
+                    "microsecond": 273000
+                },
+                "EndpointStatus": "InService"
+            }
+        ],
+        "ResponseMetadata": {}
+    }
+}

@@ -488,6 +488,175 @@ class AccessApprovalFilter(ValueFilter):
         return access_approval
 
 
+class DlpDiscoveryConfigsFilter(ListItemFilter):
+    """Filter Resources based on Sensitive Data Protection (DLP) discovery configurations
+
+    Only configurations created directly under the resource are listed, from every location.
+    Folder-scoped configurations are created under the organization, so an organization
+    lists them but not project-level ones.
+
+    Organizations with no running discovery configuration:
+
+    .. code-block:: yaml
+
+      - name: org-no-running-dlp-discovery-configs
+        resource: gcp.organization
+        filters:
+        - type: dlp-discovery-configs
+          count: 0
+          attrs:
+            - status: RUNNING
+    """
+    schema = type_schema(
+        'dlp-discovery-configs',
+        attrs={'$ref': '#/definitions/filters_common/list_item_attrs'},
+        count={'type': 'number'},
+        count_op={'$ref': '#/definitions/filters_common/comparison_operators'}
+    )
+    schema_alias = False
+
+    annotate_items = True
+    # there is no `dlp.discoveryConfigs.list` IAM permission; DLP checks `dlp.jobTriggers.list`.
+    permissions = ('dlp.jobTriggers.list',)
+    component = None
+
+    def get_parent(self, resource):
+        raise NotImplementedError("subclass responsibility")
+
+    def get_item_values(self, resource):
+        return self.list_configs(self.component, self.get_parent(resource))
+
+    def list_configs(self, component, parent):
+        session = local_session(self.manager.session_factory)
+        client = session.client('dlp', 'v2', component)
+        pages = client.execute_paged_query('list', {'parent': f"{parent}/locations/-"})
+        configs = []
+        for page in pages:
+            configs.extend(page.get('discoveryConfigs', []))
+        return configs
+
+
+@Organization.filter_registry.register('dlp-discovery-configs')
+class OrgDlpDiscoveryConfigsFilter(DlpDiscoveryConfigsFilter):
+    component = 'organizations.locations.discoveryConfigs'
+
+    def get_parent(self, resource):
+        return resource['name']
+
+
+@Project.filter_registry.register('dlp-discovery-configs')
+class ProjectDlpDiscoveryConfigsFilter(DlpDiscoveryConfigsFilter):
+    """Filter projects based on Sensitive Data Protection (DLP) discovery configurations
+
+    Lists the project's own configurations from every location. With inherited: true it
+    also adds, for each discovery type, the closest RUNNING folder or organization
+    configuration above the project, which is the one Google runs for it. Targets that a
+    closer configuration already covers are removed, and configurations for other clouds
+    are not inherited. This needs dlp.jobTriggers.list on the organization and
+    resourcemanager.projects.get on the project.
+
+    A listed configuration can still profile none of the project's data: project ID
+    patterns, conditions and configuration errors are not evaluated, and disabled targets
+    are only excluded if the policy checks for them, as the BigQuery example does.
+
+    Projects with a paused discovery configuration:
+
+    .. code-block:: yaml
+
+      - name: project-paused-dlp-discovery-configs
+        resource: gcp.project
+        filters:
+        - type: dlp-discovery-configs
+          attrs:
+            - status: PAUSED
+
+    Projects whose BigQuery data no running configuration covers, counting inherited ones:
+
+    .. code-block:: yaml
+
+      - name: project-no-running-bigquery-discovery
+        resource: gcp.project
+        filters:
+        - type: dlp-discovery-configs
+          inherited: true
+          count: 0
+          attrs:
+            - status: RUNNING
+            - type: value
+              key: "targets[?bigQueryTarget && bigQueryTarget.disabled == `null`]"
+              value: not-null
+    """
+    schema = type_schema(
+        'dlp-discovery-configs',
+        rinherit=DlpDiscoveryConfigsFilter.schema,
+        inherited={'type': 'boolean'}
+    )
+    component = 'projects.locations.discoveryConfigs'
+    ancestors = None
+    org_configs = None
+
+    def get_parent(self, resource):
+        return f"projects/{resource['projectId']}"
+
+    def get_permissions(self):
+        if self.data.get('inherited'):
+            return self.permissions + ('resourcemanager.projects.get',)
+        return self.permissions
+
+    def process(self, resources, event=None):
+        self.ancestors, self.org_configs = {}, {}
+        return super().process(resources, event)
+
+    def get_item_values(self, resource):
+        configs = super().get_item_values(resource)
+        if self.data.get('inherited'):
+            configs.extend(self.get_inherited_configs(resource))
+        return configs
+
+    def get_ancestors(self, resource):
+        parent = resource.get('parent') or {}
+        if parent.get('type') == 'organization':
+            return [], parent['id']
+        if parent.get('type') != 'folder':
+            return [], None
+        if parent['id'] not in self.ancestors:
+            session = local_session(self.manager.session_factory)
+            client = session.client('cloudresourcemanager', 'v1', 'projects')
+            ancestry = client.execute_command(
+                'getAncestry', {'projectId': resource['projectId']}).get('ancestor', [])
+            folders = [
+                a['resourceId']['id'] for a in ancestry if a['resourceId']['type'] == 'folder']
+            # ancestors run from the project up, so the organization is last
+            self.ancestors[parent['id']] = folders, ancestry[-1]['resourceId']['id']
+        return self.ancestors[parent['id']]
+
+    def get_inherited_configs(self, resource):
+        folders, org_id = self.get_ancestors(resource)
+        if org_id is None:
+            return []
+        if org_id not in self.org_configs:
+            self.org_configs[org_id] = self.list_configs(
+                OrgDlpDiscoveryConfigsFilter.component, f"organizations/{org_id}")
+        # Google runs only the closest active folder or organization configuration of each
+        # discovery type for a project, so walk up from the nearest folder and skip types a
+        # closer configuration has claimed. Other-cloud targets never scan the project.
+        # https://docs.cloud.google.com/sensitive-data-protection/docs/data-profiles
+        scopes = [('folderId', f) for f in folders] + [('organizationId', org_id)]
+        claimed, inherited = set(), []
+        for key, scope_id in scopes:
+            for config in self.org_configs[org_id]:
+                location = config.get('orgConfig', {}).get('location', {})
+                if config.get('status') != 'RUNNING' or location.get(key) != scope_id:
+                    continue
+                targets = [
+                    t for t in config.get('targets', [])
+                    if 'otherCloudTarget' not in t and not claimed & set(t)]
+                if targets:
+                    claimed.update(*targets)
+                    inherited.append(dict(config, targets=targets))
+        return inherited
+
+
 @Organization.filter_registry.register('iam-policy')
 class OrganizationIamPolicyFilter(IamPolicyFilter):
     """
