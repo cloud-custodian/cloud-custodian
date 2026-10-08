@@ -12,6 +12,7 @@ import yaml
 from c7n.filters.core import FilterValidationError
 from c7n.utils import local_session, jmespath_search, type_schema
 from c7n_gcp.actions import MethodAction
+from c7n_gcp.utils import filter_tree_has_key
 from c7n_gcp.filters.metrics import GCPMetricsFilter
 from c7n_gcp.provider import resources
 from c7n_gcp.query import (
@@ -836,8 +837,35 @@ class VertexAIEvaluationRun(VertexAIQueryManager):
         default_report_fields = [
             'name', 'displayName', 'state', 'createTime', 'completionTime'
         ]
-        permissions = ('aiplatform.evaluationRuns.list',)
+        permissions = ('aiplatform.evaluationRuns.list', 'aiplatform.evaluationRuns.get')
         urn_component = 'evaluation-run'
+
+    def _needs_completion_time(self):
+        return filter_tree_has_key(self.data.get('filters', []), 'completionTime')
+
+    def get_cache_key(self, query):
+        key = super().get_cache_key(query)
+        key['completionTime_augment'] = self._needs_completion_time()
+        return key
+
+    def _fetch_resources(self, query):
+        resources = super()._fetch_resources(query)
+        if self._needs_completion_time():
+            resources = self.augment(resources)
+        return resources
+
+    def augment(self, resources):
+        session = local_session(self.session_factory)
+
+        def _get(r):
+            location = self.resource_type._get_location(r)
+            client = self.get_location_client(session, location, self.resource_type.component)
+            detail = client.execute_query('get', verb_arguments={'name': r['name']})
+            r.update(detail)
+            return r
+
+        with self.executor_factory(max_workers=2) as w:
+            return list(w.map(_get, resources))
 
 
 @resources.register('vertex-ai-metadata-store-artifact')
