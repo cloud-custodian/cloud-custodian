@@ -30,6 +30,7 @@ from c7n.query import (
     ChildResourceManager,
     ConfigSource,
     DescribeSource,
+    DescribeWithResourceTags,
     QueryResourceManager,
     TypeInfo,
 )
@@ -460,6 +461,11 @@ class InstanceProfile(QueryResourceManager):
         global_resource = True
         arn = 'Arn'
         cfn_type = 'AWS::IAM::InstanceProfile'
+        universal_taggable = object()
+
+    # list_instance_profiles does not return tags, fetch them in bulk
+    # via the resource groups tagging api.
+    source_mapping = {'describe': DescribeWithResourceTags}
 
 
 @resources.register('iam-certificate')

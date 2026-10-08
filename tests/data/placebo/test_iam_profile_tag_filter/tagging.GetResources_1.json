@@ -1,0 +1,22 @@
+{
+    "status_code": 200,
+    "data": {
+        "PaginationToken": "",
+        "ResourceTagMappingList": [
+            {
+                "ResourceARN": "arn:aws:iam::123456789012:instance-profile/app-profile",
+                "Tags": [
+                    {
+                        "Key": "Owner",
+                        "Value": "platform"
+                    },
+                    {
+                        "Key": "Environment",
+                        "Value": "dev"
+                    }
+                ]
+            }
+        ],
+        "ResponseMetadata": {}
+    }
+}

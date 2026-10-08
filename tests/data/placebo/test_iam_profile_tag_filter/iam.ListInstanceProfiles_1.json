@@ -1,0 +1,43 @@
+{
+    "status_code": 200,
+    "data": {
+        "InstanceProfiles": [
+            {
+                "Path": "/",
+                "InstanceProfileName": "app-profile",
+                "InstanceProfileId": "AIPAEXAMPLEAPPPROFILE",
+                "Arn": "arn:aws:iam::123456789012:instance-profile/app-profile",
+                "CreateDate": {
+                    "__class__": "datetime",
+                    "year": 2026,
+                    "month": 9,
+                    "day": 1,
+                    "hour": 12,
+                    "minute": 0,
+                    "second": 0,
+                    "microsecond": 0
+                },
+                "Roles": []
+            },
+            {
+                "Path": "/",
+                "InstanceProfileName": "untagged-profile",
+                "InstanceProfileId": "AIPAEXAMPLEUNTAGGED",
+                "Arn": "arn:aws:iam::123456789012:instance-profile/untagged-profile",
+                "CreateDate": {
+                    "__class__": "datetime",
+                    "year": 2026,
+                    "month": 9,
+                    "day": 1,
+                    "hour": 12,
+                    "minute": 0,
+                    "second": 0,
+                    "microsecond": 0
+                },
+                "Roles": []
+            }
+        ],
+        "IsTruncated": false,
+        "ResponseMetadata": {}
+    }
+}
