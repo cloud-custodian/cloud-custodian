@@ -679,7 +679,7 @@ class ImageUnusedFilter(Filter):
 
         tmpl_mgr = self.manager.get_resource_manager('launch-template-version')
         for tversion in tmpl_mgr.get_resources(
-                list(tmpl_mgr.get_asg_templates(asgs).keys())):
+                list(tmpl_mgr.get_asg_templates(asgs).keys()), augment=False):
             image_ids.add(tversion['LaunchTemplateData'].get('ImageId'))
         return image_ids
 

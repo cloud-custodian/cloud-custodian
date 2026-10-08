@@ -90,7 +90,7 @@ class LaunchInfo:
         return {
             (t['LaunchTemplateId'],
              str(t.get('c7n:VersionAlias', t['VersionNumber']))): t['LaunchTemplateData']
-            for t in tmpl_mgr.get_resources(template_ids)}
+            for t in tmpl_mgr.get_resources(template_ids, augment=False)}
 
     def get_launch_configs(self, asgs):
         """Return a mapping of launch configs for the given set of asgs"""

@@ -1,0 +1,30 @@
+{
+    "status_code": 200,
+    "data": {
+        "LaunchTemplates": [
+            {
+                "LaunchTemplateId": "lt-00b3b2755218e3fdd",
+                "LaunchTemplateName": "test-template",
+                "CreateTime": {
+                    "__class__": "datetime",
+                    "year": 2019,
+                    "month": 1,
+                    "day": 31,
+                    "hour": 11,
+                    "minute": 0,
+                    "second": 0,
+                    "microsecond": 0
+                },
+                "DefaultVersionNumber": 1,
+                "LatestVersionNumber": 4,
+                "Tags": [
+                    {
+                        "Key": "Owner",
+                        "Value": "test"
+                    }
+                ]
+            }
+        ],
+        "ResponseMetadata": {}
+    }
+}

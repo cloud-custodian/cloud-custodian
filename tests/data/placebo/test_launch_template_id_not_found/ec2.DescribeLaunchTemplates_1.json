@@ -1,0 +1,31 @@
+{
+    "status_code": 200,
+    "data": {
+        "LaunchTemplates": [
+            {
+                "LaunchTemplateId": "lt-0877401c93c294001",
+                "LaunchTemplateName": "test-template",
+                "CreateTime": {
+                    "__class__": "datetime",
+                    "year": 2026,
+                    "month": 9,
+                    "day": 1,
+                    "hour": 10,
+                    "minute": 0,
+                    "second": 0,
+                    "microsecond": 0
+                },
+                "CreatedBy": "arn:aws:iam::123456789012:user/test",
+                "DefaultVersionNumber": 1,
+                "LatestVersionNumber": 3,
+                "Tags": [
+                    {
+                        "Key": "Owner",
+                        "Value": "platform"
+                    }
+                ]
+            }
+        ],
+        "ResponseMetadata": {}
+    }
+}
