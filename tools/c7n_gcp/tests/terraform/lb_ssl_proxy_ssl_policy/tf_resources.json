@@ -1,0 +1,235 @@
+{
+    "pytest-terraform": 1,
+    "outputs": {},
+    "resources": {
+        "google_compute_backend_service": {
+            "default": {
+                "affinity_cookie_ttl_sec": 0,
+                "backend": [],
+                "cdn_policy": [],
+                "circuit_breakers": [],
+                "compression_mode": "",
+                "connection_draining_timeout_sec": 300,
+                "consistent_hash": [],
+                "creation_timestamp": "2026-09-30T08:59:13.820-07:00",
+                "custom_metrics": [],
+                "custom_request_headers": null,
+                "custom_response_headers": null,
+                "deletion_policy": "DELETE",
+                "description": "",
+                "edge_security_policy": "",
+                "enable_cdn": false,
+                "external_managed_migration_state": "",
+                "external_managed_migration_testing_percentage": 0,
+                "fingerprint": "vXJbJt4CzBE=",
+                "generated_id": 3342100174151388990,
+                "health_checks": [
+                    "projects/cloud-custodian/global/healthChecks/c7n-default-3e3a-hc"
+                ],
+                "iap": [],
+                "id": "projects/cloud-custodian/global/backendServices/c7n-default-3e3a-bs",
+                "ip_address_selection_policy": "",
+                "load_balancing_scheme": "EXTERNAL",
+                "locality_lb_policies": [],
+                "locality_lb_policy": "",
+                "log_config": [],
+                "max_stream_duration": [],
+                "name": "c7n-default-3e3a-bs",
+                "outlier_detection": [],
+                "params": [],
+                "port_name": "http",
+                "project": "stkl-kody-mullins",
+                "protocol": "SSL",
+                "security_policy": "",
+                "security_settings": [],
+                "self_link": "https://www.googleapis.com/compute/v1/projects/cloud-custodian/global/backendServices/c7n-default-3e3a-bs",
+                "service_lb_policy": "",
+                "session_affinity": "NONE",
+                "strong_session_affinity_cookie": [],
+                "timeout_sec": 30,
+                "timeouts": null,
+                "tls_settings": []
+            }
+        },
+        "google_compute_health_check": {
+            "default": {
+                "check_interval_sec": 5,
+                "creation_timestamp": "2026-09-30T08:59:02.551-07:00",
+                "deletion_policy": "DELETE",
+                "description": "",
+                "grpc_health_check": [],
+                "grpc_tls_health_check": [],
+                "healthy_threshold": 2,
+                "http2_health_check": [],
+                "http_health_check": [],
+                "https_health_check": [],
+                "id": "projects/cloud-custodian/global/healthChecks/c7n-default-3e3a-hc",
+                "log_config": [
+                    {
+                        "enable": false
+                    }
+                ],
+                "name": "c7n-default-3e3a-hc",
+                "project": "stkl-kody-mullins",
+                "self_link": "https://www.googleapis.com/compute/v1/projects/cloud-custodian/global/healthChecks/c7n-default-3e3a-hc",
+                "source_regions": null,
+                "ssl_health_check": [],
+                "tcp_health_check": [
+                    {
+                        "port": 443,
+                        "port_name": "",
+                        "port_specification": "",
+                        "proxy_header": "NONE",
+                        "request": "",
+                        "response": ""
+                    }
+                ],
+                "timeout_sec": 5,
+                "timeouts": null,
+                "type": "TCP",
+                "unhealthy_threshold": 2
+            }
+        },
+        "google_compute_ssl_certificate": {
+            "default": {
+                "certificate": "-----BEGIN CERTIFICATE-----\nMIIC6zCCAdOgAwIBAgIQSVqlpaoM1rF855e1uKOvHzANBgkqhkiG9w0BAQsFADAW\nMRQwEgYDVQQDEwtleGFtcGxlLmNvbTAeFw0yNjA5MzAxNTU5MDFaFw0yNjEwMDEx\nNTU5MDFaMBYxFDASBgNVBAMTC2V4YW1wbGUuY29tMIIBIjANBgkqhkiG9w0BAQEF\nAAOCAQ8AMIIBCgKCAQEAxlbJqgc97SZBdOAfoz4Vcx1FtyrKDrn+yhPDkDbVzDQQ\nbSGqRSHAkTY8zb3qTcmqckIAsy1t/CAvBXXr/XHy8zA64Rg4fhv7qgqKSvxighXG\n4FlxJimTcwhwuu3I1XbT9Rhz5d4JsN4pce5FnCW2v22gl014t2YGIPzIHGod8LPs\nqK6/Fk46M1Oc6DdnYMAJP+1r2Dn7fm5eCf/B4IsDtY3/7+ur9KXipIVu0OO0SEQ2\nLfXhivCleiMY9z3B39rWLl30R77Yhr4qZxdiQ2FpXDBusjM28T4a4CXY4+wzo8wX\nHkO8doXZpwlXIdU1blhfvAbZoLkiBoiMVz8p4eD/WQIDAQABozUwMzAOBgNVHQ8B\nAf8EBAMCBaAwEwYDVR0lBAwwCgYIKwYBBQUHAwEwDAYDVR0TAQH/BAIwADANBgkq\nhkiG9w0BAQsFAAOCAQEAmwIc5at5dceTzUANV7yu2XsqTI2EFeDezzdnQqqVHAJE\nFwuoynvNq0XCOHmNo0xWHaaiQNl5bgDHnZ4haSKNGqtnwNpmefhUA8fICKT9eHOk\nN93yeL2FzDb76Wqcc6ySXLJHMIWerrMrCn1DPDHgQvxvcBs5H9L1Mxu8gM8g3sC1\nuxLpxc5Pt9OOqPNK/MbZLKV6W94FFVtwni20Yo29WRwwEvT5M/zhATp52sexzorQ\nhUnQSA7RWeax+tp+BTGyh7gMHOk1gGxTdLVkuJfzd/Bfrp7c+Nw/hhaPDx9kLju6\nBSTLfzTsDVMd04oFiQnhYraGg9LKsUHU5vr/t+OqnQ==\n-----END CERTIFICATE-----\n",
+                "certificate_id": 7186965733733076777,
+                "creation_timestamp": "2026-09-30T08:59:02.549-07:00",
+                "deletion_policy": "DELETE",
+                "description": "",
+                "expire_time": "2026-10-01T08:59:01.000-07:00",
+                "id": "projects/cloud-custodian/global/sslCertificates/c7n-default-3e3a-cert",
+                "name": "c7n-default-3e3a-cert",
+                "name_prefix": null,
+                "private_key": "-----BEGIN RSA PRIVATE KEY-----\nMIIEowIBAAKCAQEAxlbJqgc97SZBdOAfoz4Vcx1FtyrKDrn+yhPDkDbVzDQQbSGq\nRSHAkTY8zb3qTcmqckIAsy1t/CAvBXXr/XHy8zA64Rg4fhv7qgqKSvxighXG4Flx\nJimTcwhwuu3I1XbT9Rhz5d4JsN4pce5FnCW2v22gl014t2YGIPzIHGod8LPsqK6/\nFk46M1Oc6DdnYMAJP+1r2Dn7fm5eCf/B4IsDtY3/7+ur9KXipIVu0OO0SEQ2LfXh\nivCleiMY9z3B39rWLl30R77Yhr4qZxdiQ2FpXDBusjM28T4a4CXY4+wzo8wXHkO8\ndoXZpwlXIdU1blhfvAbZoLkiBoiMVz8p4eD/WQIDAQABAoIBAAZGxE/LtgoNah2y\novsAPF8IcoaVms/PqHsIwulLJvBfnGkhBdmgCWSUVg+/s7ddoKBy1haqzckgU+9F\nDaBXV7QaQbQSV2VRlDZLv5fDDV38UO8UEth9kSjfKpbBGW18kBVjPksBqrECEscu\nyQf5ieMxwFbRZjbNinecRZE1Ss3CturlM5bH7Kni7cjjoeOKpPOpIQEQ4ToeVh7i\ngf6vBvlyV/bC/I3aPHuvNZ3F4P4h0LW5Xmtu3YV04PVfxHFNgoUAV6sKxrBY/87E\nlIQodC7id/HYRRgZuatZxAIcOGapxGVxjwrInESTxrzmaJ/acSeDkY96s/Ks5nNo\nmNoHjIECgYEA5uiv3WQwEG0hd3YiflZBBASgKA2hhY9DP9AKQs1nTAgOEHZulb5Y\nfZmEWhMSB6k/CWx8ngOC1LFc/MRtMFhpA8PWT5o1bWsqnKZWTH6vgWwr3fLpo8Om\nXwD9tLxLM4LxuMwauGAZXj6fh0f/E2DS9EtetwBkBWzijrDiyg9M9ZkCgYEA2+QW\nJtAZ7pamjDWopDkz+zSwG6PEoCZ19sVdw85Z2zsoLp7i2m0ieAgHOeC+BnEFquJH\nI/lTts1P8GiV0GbaQxfQB2wCJ0DFCx9kv845U6WWK9bTyBER6hb/+sb6yjiNiqPX\nLaob1F+H1yc0I2YcTRHJq5sLJogJPWs6aDNi78ECgYBGWNFrQ2CZQIYXnPf5QVHh\nZX9ddHmm9PRp9nmJzIYR1cpjHZGnMSxIZ4K45mJxzxATUOfORAeRwM8xeq5BMk4c\nBYe/DJ4GTcXXn51fBKF3bnsWzTB84dhHzUd9zneio9v8jsH9NdnEqpNzZW3Ce5cJ\nMgUS/515QajsC9ur72lk0QKBgQC1aqrz/sFGXTiveR3Xz/IZEVEynJz+3Hx6yj8f\n60GrZFU0kZXsTBoiGc2MbOWafukEIYg8H9p3eVC4sjDYLeNpc14IoY3tQLzQ/meq\n78PQRU9uf+FesOas0akEB+KlsJ7mgWJopG4te1uhoRCdHAPBeil+0X4TniyxZaRc\nj/jSgQKBgCCKBokS0Mc9EsRuBLoQGHxscLJhA1eGe+P8PzY+4YLGKdfAReb2hCUH\nGyaGMFAvvjuqOCfFeb2THRV7ARXrH8+sgEmcoeFCR3+ab5dGiBVxedKaVKvHmPAq\n53XUDB+TlSIC7/25pUwdhCQQ538PA/TDgM/iE8nVmtmOSBbAMWM9\n-----END RSA PRIVATE KEY-----\n",
+                "private_key_wo": null,
+                "private_key_wo_version": "",
+                "project": "stkl-kody-mullins",
+                "self_link": "https://www.googleapis.com/compute/v1/projects/cloud-custodian/global/sslCertificates/c7n-default-3e3a-cert",
+                "timeouts": null
+            }
+        },
+        "google_compute_ssl_policy": {
+            "weak": {
+                "creation_timestamp": "2026-09-30T08:59:02.633-07:00",
+                "custom_features": null,
+                "deletion_policy": "DELETE",
+                "description": "",
+                "enabled_features": [
+                    "TLS_ECDHE_ECDSA_WITH_AES_128_CBC_SHA",
+                    "TLS_ECDHE_ECDSA_WITH_AES_128_GCM_SHA256",
+                    "TLS_ECDHE_ECDSA_WITH_AES_256_CBC_SHA",
+                    "TLS_ECDHE_ECDSA_WITH_AES_256_GCM_SHA384",
+                    "TLS_ECDHE_ECDSA_WITH_CHACHA20_POLY1305_SHA256",
+                    "TLS_ECDHE_RSA_WITH_AES_128_CBC_SHA",
+                    "TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256",
+                    "TLS_ECDHE_RSA_WITH_AES_256_CBC_SHA",
+                    "TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384",
+                    "TLS_ECDHE_RSA_WITH_CHACHA20_POLY1305_SHA256",
+                    "TLS_RSA_WITH_3DES_EDE_CBC_SHA",
+                    "TLS_RSA_WITH_AES_128_CBC_SHA",
+                    "TLS_RSA_WITH_AES_128_GCM_SHA256",
+                    "TLS_RSA_WITH_AES_256_CBC_SHA",
+                    "TLS_RSA_WITH_AES_256_GCM_SHA384"
+                ],
+                "fingerprint": "UCiJtMU0f-Q=",
+                "id": "projects/cloud-custodian/global/sslPolicies/c7n-default-3e3a-weak",
+                "min_tls_version": "TLS_1_0",
+                "name": "c7n-default-3e3a-weak",
+                "post_quantum_key_exchange": "",
+                "profile": "COMPATIBLE",
+                "project": "stkl-kody-mullins",
+                "self_link": "https://www.googleapis.com/compute/v1/projects/cloud-custodian/global/sslPolicies/c7n-default-3e3a-weak",
+                "timeouts": null
+            }
+        },
+        "google_compute_target_ssl_proxy": {
+            "weak": {
+                "backend_service": "https://www.googleapis.com/compute/v1/projects/cloud-custodian/global/backendServices/c7n-default-3e3a-bs",
+                "certificate_map": "",
+                "creation_timestamp": "2026-09-30T08:59:35.339-07:00",
+                "deletion_policy": "DELETE",
+                "description": "",
+                "id": "projects/cloud-custodian/global/targetSslProxies/c7n-default-3e3a-ssl-weak",
+                "name": "c7n-default-3e3a-ssl-weak",
+                "project": "stkl-kody-mullins",
+                "proxy_header": "NONE",
+                "proxy_id": 4588591286513078024,
+                "self_link": "https://www.googleapis.com/compute/v1/projects/cloud-custodian/global/targetSslProxies/c7n-default-3e3a-ssl-weak",
+                "ssl_certificates": [
+                    "https://www.googleapis.com/compute/v1/projects/cloud-custodian/global/sslCertificates/c7n-default-3e3a-cert"
+                ],
+                "ssl_policy": "https://www.googleapis.com/compute/v1/projects/cloud-custodian/global/sslPolicies/c7n-default-3e3a-weak",
+                "timeouts": null
+            }
+        },
+        "random_id": {
+            "suffix": {
+                "b64_std": "Pjo=",
+                "b64_url": "Pjo",
+                "byte_length": 2,
+                "dec": "15930",
+                "hex": "3e3a",
+                "id": "Pjo",
+                "keepers": null,
+                "prefix": null
+            }
+        },
+        "tls_private_key": {
+            "default": {
+                "algorithm": "RSA",
+                "ecdsa_curve": "P224",
+                "id": "195768d04606d9bc8dc9233bff552e1294125646",
+                "private_key_openssh": "-----BEGIN OPENSSH PRIVATE KEY-----\nb3BlbnNzaC1rZXktdjEAAAAABG5vbmUAAAAEbm9uZQAAAAAAAAABAAABFwAAAAdz\nc2gtcnNhAAAAAwEAAQAAAQEAxlbJqgc97SZBdOAfoz4Vcx1FtyrKDrn+yhPDkDbV\nzDQQbSGqRSHAkTY8zb3qTcmqckIAsy1t/CAvBXXr/XHy8zA64Rg4fhv7qgqKSvxi\nghXG4FlxJimTcwhwuu3I1XbT9Rhz5d4JsN4pce5FnCW2v22gl014t2YGIPzIHGod\n8LPsqK6/Fk46M1Oc6DdnYMAJP+1r2Dn7fm5eCf/B4IsDtY3/7+ur9KXipIVu0OO0\nSEQ2LfXhivCleiMY9z3B39rWLl30R77Yhr4qZxdiQ2FpXDBusjM28T4a4CXY4+wz\no8wXHkO8doXZpwlXIdU1blhfvAbZoLkiBoiMVz8p4eD/WQAAA7iOOgWZjjoFmQAA\nAAdzc2gtcnNhAAABAQDGVsmqBz3tJkF04B+jPhVzHUW3KsoOuf7KE8OQNtXMNBBt\nIapFIcCRNjzNvepNyapyQgCzLW38IC8Fdev9cfLzMDrhGDh+G/uqCopK/GKCFcbg\nWXEmKZNzCHC67cjVdtP1GHPl3gmw3ilx7kWcJba/baCXTXi3ZgYg/Mgcah3ws+yo\nrr8WTjozU5zoN2dgwAk/7WvYOft+bl4J/8HgiwO1jf/v66v0peKkhW7Q47RIRDYt\n9eGK8KV6Ixj3PcHf2tYuXfRHvtiGvipnF2JDYWlcMG6yMzbxPhrgJdjj7DOjzBce\nQ7x2hdmnCVch1TVuWF+8BtmguSIGiIxXPynh4P9ZAAAAAwEAAQAAAQAGRsRPy7YK\nDWodsqL7ADxfCHKGlZrPz6h7CMLpSybwX5xpIQXZoAlklFYPv7O3XaCgctYWqs3J\nIFPvRQ2gV1e0GkG0EldlUZQ2S7+Xww1d/FDvFBLYfZEo3yqWwRltfJAVYz5LAaqx\nAhLHLskH+YnjMcBW0WY2zYp3nEWRNUrNwrbq5TOWx+yp4u3I46HjiqTzqSEBEOE6\nHlYe4oH+rwb5clf2wvyN2jx7rzWdxeD+IdC1uV5rbt2FdOD1X8RxTYKFAFerCsaw\nWP/OxJSEKHQu4nfx2EUYGbmrWcQCHDhmqcRlcY8KyJxEk8a85mif2nEng5GPerPy\nrOZzaJjaB4yBAAAAgCCKBokS0Mc9EsRuBLoQGHxscLJhA1eGe+P8PzY+4YLGKdfA\nReb2hCUHGyaGMFAvvjuqOCfFeb2THRV7ARXrH8+sgEmcoeFCR3+ab5dGiBVxedKa\nVKvHmPAq53XUDB+TlSIC7/25pUwdhCQQ538PA/TDgM/iE8nVmtmOSBbAMWM9AAAA\ngQDm6K/dZDAQbSF3diJ+VkEEBKAoDaGFj0M/0ApCzWdMCA4Qdm6Vvlh9mYRaExIH\nqT8JbHyeA4LUsVz8xG0wWGkDw9ZPmjVtayqcplZMfq+BbCvd8umjw6ZfAP20vEsz\ngvG4zBq4YBlePp+HR/8TYNL0S163AGQFbOKOsOLKD0z1mQAAAIEA2+QWJtAZ7pam\njDWopDkz+zSwG6PEoCZ19sVdw85Z2zsoLp7i2m0ieAgHOeC+BnEFquJHI/lTts1P\n8GiV0GbaQxfQB2wCJ0DFCx9kv845U6WWK9bTyBER6hb/+sb6yjiNiqPXLaob1F+H\n1yc0I2YcTRHJq5sLJogJPWs6aDNi78EAAAAAAQID\n-----END OPENSSH PRIVATE KEY-----\n",
+                "private_key_pem": "-----BEGIN RSA PRIVATE KEY-----\nMIIEowIBAAKCAQEAxlbJqgc97SZBdOAfoz4Vcx1FtyrKDrn+yhPDkDbVzDQQbSGq\nRSHAkTY8zb3qTcmqckIAsy1t/CAvBXXr/XHy8zA64Rg4fhv7qgqKSvxighXG4Flx\nJimTcwhwuu3I1XbT9Rhz5d4JsN4pce5FnCW2v22gl014t2YGIPzIHGod8LPsqK6/\nFk46M1Oc6DdnYMAJP+1r2Dn7fm5eCf/B4IsDtY3/7+ur9KXipIVu0OO0SEQ2LfXh\nivCleiMY9z3B39rWLl30R77Yhr4qZxdiQ2FpXDBusjM28T4a4CXY4+wzo8wXHkO8\ndoXZpwlXIdU1blhfvAbZoLkiBoiMVz8p4eD/WQIDAQABAoIBAAZGxE/LtgoNah2y\novsAPF8IcoaVms/PqHsIwulLJvBfnGkhBdmgCWSUVg+/s7ddoKBy1haqzckgU+9F\nDaBXV7QaQbQSV2VRlDZLv5fDDV38UO8UEth9kSjfKpbBGW18kBVjPksBqrECEscu\nyQf5ieMxwFbRZjbNinecRZE1Ss3CturlM5bH7Kni7cjjoeOKpPOpIQEQ4ToeVh7i\ngf6vBvlyV/bC/I3aPHuvNZ3F4P4h0LW5Xmtu3YV04PVfxHFNgoUAV6sKxrBY/87E\nlIQodC7id/HYRRgZuatZxAIcOGapxGVxjwrInESTxrzmaJ/acSeDkY96s/Ks5nNo\nmNoHjIECgYEA5uiv3WQwEG0hd3YiflZBBASgKA2hhY9DP9AKQs1nTAgOEHZulb5Y\nfZmEWhMSB6k/CWx8ngOC1LFc/MRtMFhpA8PWT5o1bWsqnKZWTH6vgWwr3fLpo8Om\nXwD9tLxLM4LxuMwauGAZXj6fh0f/E2DS9EtetwBkBWzijrDiyg9M9ZkCgYEA2+QW\nJtAZ7pamjDWopDkz+zSwG6PEoCZ19sVdw85Z2zsoLp7i2m0ieAgHOeC+BnEFquJH\nI/lTts1P8GiV0GbaQxfQB2wCJ0DFCx9kv845U6WWK9bTyBER6hb/+sb6yjiNiqPX\nLaob1F+H1yc0I2YcTRHJq5sLJogJPWs6aDNi78ECgYBGWNFrQ2CZQIYXnPf5QVHh\nZX9ddHmm9PRp9nmJzIYR1cpjHZGnMSxIZ4K45mJxzxATUOfORAeRwM8xeq5BMk4c\nBYe/DJ4GTcXXn51fBKF3bnsWzTB84dhHzUd9zneio9v8jsH9NdnEqpNzZW3Ce5cJ\nMgUS/515QajsC9ur72lk0QKBgQC1aqrz/sFGXTiveR3Xz/IZEVEynJz+3Hx6yj8f\n60GrZFU0kZXsTBoiGc2MbOWafukEIYg8H9p3eVC4sjDYLeNpc14IoY3tQLzQ/meq\n78PQRU9uf+FesOas0akEB+KlsJ7mgWJopG4te1uhoRCdHAPBeil+0X4TniyxZaRc\nj/jSgQKBgCCKBokS0Mc9EsRuBLoQGHxscLJhA1eGe+P8PzY+4YLGKdfAReb2hCUH\nGyaGMFAvvjuqOCfFeb2THRV7ARXrH8+sgEmcoeFCR3+ab5dGiBVxedKaVKvHmPAq\n53XUDB+TlSIC7/25pUwdhCQQ538PA/TDgM/iE8nVmtmOSBbAMWM9\n-----END RSA PRIVATE KEY-----\n",
+                "private_key_pem_pkcs8": "-----BEGIN PRIVATE KEY-----\nMIIEvQIBADANBgkqhkiG9w0BAQEFAASCBKcwggSjAgEAAoIBAQDGVsmqBz3tJkF0\n4B+jPhVzHUW3KsoOuf7KE8OQNtXMNBBtIapFIcCRNjzNvepNyapyQgCzLW38IC8F\ndev9cfLzMDrhGDh+G/uqCopK/GKCFcbgWXEmKZNzCHC67cjVdtP1GHPl3gmw3ilx\n7kWcJba/baCXTXi3ZgYg/Mgcah3ws+yorr8WTjozU5zoN2dgwAk/7WvYOft+bl4J\n/8HgiwO1jf/v66v0peKkhW7Q47RIRDYt9eGK8KV6Ixj3PcHf2tYuXfRHvtiGvipn\nF2JDYWlcMG6yMzbxPhrgJdjj7DOjzBceQ7x2hdmnCVch1TVuWF+8BtmguSIGiIxX\nPynh4P9ZAgMBAAECggEABkbET8u2Cg1qHbKi+wA8XwhyhpWaz8+oewjC6Usm8F+c\naSEF2aAJZJRWD7+zt12goHLWFqrNySBT70UNoFdXtBpBtBJXZVGUNku/l8MNXfxQ\n7xQS2H2RKN8qlsEZbXyQFWM+SwGqsQISxy7JB/mJ4zHAVtFmNs2Kd5xFkTVKzcK2\n6uUzlsfsqeLtyOOh44qk86khARDhOh5WHuKB/q8G+XJX9sL8jdo8e681ncXg/iHQ\ntblea27dhXTg9V/EcU2ChQBXqwrGsFj/zsSUhCh0LuJ38dhFGBm5q1nEAhw4ZqnE\nZXGPCsicRJPGvOZon9pxJ4ORj3qz8qzmc2iY2geMgQKBgQDm6K/dZDAQbSF3diJ+\nVkEEBKAoDaGFj0M/0ApCzWdMCA4Qdm6Vvlh9mYRaExIHqT8JbHyeA4LUsVz8xG0w\nWGkDw9ZPmjVtayqcplZMfq+BbCvd8umjw6ZfAP20vEszgvG4zBq4YBlePp+HR/8T\nYNL0S163AGQFbOKOsOLKD0z1mQKBgQDb5BYm0BnulqaMNaikOTP7NLAbo8SgJnX2\nxV3DzlnbOygunuLabSJ4CAc54L4GcQWq4kcj+VO2zU/waJXQZtpDF9AHbAInQMUL\nH2S/zjlTpZYr1tPIERHqFv/6xvrKOI2Ko9ctqhvUX4fXJzQjZhxNEcmrmwsmiAk9\nazpoM2LvwQKBgEZY0WtDYJlAhhec9/lBUeFlf110eab09Gn2eYnMhhHVymMdkacx\nLEhngrjmYnHPEBNQ585EB5HAzzF6rkEyThwFh78MngZNxdefnV8EoXduexbNMHzh\n2EfNR33Od6Kj2/yOwf012cSqk3NlbcJ7lwkyBRL/nXlBqOwL26vvaWTRAoGBALVq\nqvP+wUZdOK95HdfP8hkRUTKcnP7cfHrKPx/rQatkVTSRlexMGiIZzYxs5Zp+6QQh\niDwf2nd5ULiyMNgt42lzXgihje1AvND+Z6rvw9BFT25/4V6w5qzRqQQH4qWwnuaB\nYmikbi17W6GhEJ0cA8F6KX7RfhOeLLFlpFyP+NKBAoGAIIoGiRLQxz0SxG4EuhAY\nfGxwsmEDV4Z74/w/Nj7hgsYp18BF5vaEJQcbJoYwUC++O6o4J8V5vZMdFXsBFesf\nz6yASZyh4UJHf5pvl0aIFXF50ppUq8eY8CrnddQMH5OVIgLv/bmlTB2EJBDnfw8D\n9MOAz+ITydWa2Y5IFsAxYz0=\n-----END PRIVATE KEY-----\n",
+                "public_key_fingerprint_md5": "b6:e0:7c:0c:c4:e5:4c:61:1a:0c:df:36:4f:4d:04:51",
+                "public_key_fingerprint_sha256": "SHA256:NgC8G1Dm4Ol93v36VC1wzG4jjg06eSf57fSGGFZ12Lk",
+                "public_key_openssh": "ssh-rsa AAAAB3NzaC1yc2EAAAADAQABAAABAQDGVsmqBz3tJkF04B+jPhVzHUW3KsoOuf7KE8OQNtXMNBBtIapFIcCRNjzNvepNyapyQgCzLW38IC8Fdev9cfLzMDrhGDh+G/uqCopK/GKCFcbgWXEmKZNzCHC67cjVdtP1GHPl3gmw3ilx7kWcJba/baCXTXi3ZgYg/Mgcah3ws+yorr8WTjozU5zoN2dgwAk/7WvYOft+bl4J/8HgiwO1jf/v66v0peKkhW7Q47RIRDYt9eGK8KV6Ixj3PcHf2tYuXfRHvtiGvipnF2JDYWlcMG6yMzbxPhrgJdjj7DOjzBceQ7x2hdmnCVch1TVuWF+8BtmguSIGiIxXPynh4P9Z\n",
+                "public_key_pem": "-----BEGIN PUBLIC KEY-----\nMIIBIjANBgkqhkiG9w0BAQEFAAOCAQ8AMIIBCgKCAQEAxlbJqgc97SZBdOAfoz4V\ncx1FtyrKDrn+yhPDkDbVzDQQbSGqRSHAkTY8zb3qTcmqckIAsy1t/CAvBXXr/XHy\n8zA64Rg4fhv7qgqKSvxighXG4FlxJimTcwhwuu3I1XbT9Rhz5d4JsN4pce5FnCW2\nv22gl014t2YGIPzIHGod8LPsqK6/Fk46M1Oc6DdnYMAJP+1r2Dn7fm5eCf/B4IsD\ntY3/7+ur9KXipIVu0OO0SEQ2LfXhivCleiMY9z3B39rWLl30R77Yhr4qZxdiQ2Fp\nXDBusjM28T4a4CXY4+wzo8wXHkO8doXZpwlXIdU1blhfvAbZoLkiBoiMVz8p4eD/\nWQIDAQAB\n-----END PUBLIC KEY-----\n",
+                "rsa_bits": 2048
+            }
+        },
+        "tls_self_signed_cert": {
+            "default": {
+                "allowed_uses": [
+                    "key_encipherment",
+                    "digital_signature",
+                    "server_auth"
+                ],
+                "cert_pem": "-----BEGIN CERTIFICATE-----\nMIIC6zCCAdOgAwIBAgIQSVqlpaoM1rF855e1uKOvHzANBgkqhkiG9w0BAQsFADAW\nMRQwEgYDVQQDEwtleGFtcGxlLmNvbTAeFw0yNjA5MzAxNTU5MDFaFw0yNjEwMDEx\nNTU5MDFaMBYxFDASBgNVBAMTC2V4YW1wbGUuY29tMIIBIjANBgkqhkiG9w0BAQEF\nAAOCAQ8AMIIBCgKCAQEAxlbJqgc97SZBdOAfoz4Vcx1FtyrKDrn+yhPDkDbVzDQQ\nbSGqRSHAkTY8zb3qTcmqckIAsy1t/CAvBXXr/XHy8zA64Rg4fhv7qgqKSvxighXG\n4FlxJimTcwhwuu3I1XbT9Rhz5d4JsN4pce5FnCW2v22gl014t2YGIPzIHGod8LPs\nqK6/Fk46M1Oc6DdnYMAJP+1r2Dn7fm5eCf/B4IsDtY3/7+ur9KXipIVu0OO0SEQ2\nLfXhivCleiMY9z3B39rWLl30R77Yhr4qZxdiQ2FpXDBusjM28T4a4CXY4+wzo8wX\nHkO8doXZpwlXIdU1blhfvAbZoLkiBoiMVz8p4eD/WQIDAQABozUwMzAOBgNVHQ8B\nAf8EBAMCBaAwEwYDVR0lBAwwCgYIKwYBBQUHAwEwDAYDVR0TAQH/BAIwADANBgkq\nhkiG9w0BAQsFAAOCAQEAmwIc5at5dceTzUANV7yu2XsqTI2EFeDezzdnQqqVHAJE\nFwuoynvNq0XCOHmNo0xWHaaiQNl5bgDHnZ4haSKNGqtnwNpmefhUA8fICKT9eHOk\nN93yeL2FzDb76Wqcc6ySXLJHMIWerrMrCn1DPDHgQvxvcBs5H9L1Mxu8gM8g3sC1\nuxLpxc5Pt9OOqPNK/MbZLKV6W94FFVtwni20Yo29WRwwEvT5M/zhATp52sexzorQ\nhUnQSA7RWeax+tp+BTGyh7gMHOk1gGxTdLVkuJfzd/Bfrp7c+Nw/hhaPDx9kLju6\nBSTLfzTsDVMd04oFiQnhYraGg9LKsUHU5vr/t+OqnQ==\n-----END CERTIFICATE-----\n",
+                "dns_names": null,
+                "early_renewal_hours": 0,
+                "id": "97504310132426383227746715872350416671",
+                "ip_addresses": null,
+                "is_ca_certificate": false,
+                "key_algorithm": "RSA",
+                "max_path_length": null,
+                "private_key_pem": "-----BEGIN RSA PRIVATE KEY-----\nMIIEowIBAAKCAQEAxlbJqgc97SZBdOAfoz4Vcx1FtyrKDrn+yhPDkDbVzDQQbSGq\nRSHAkTY8zb3qTcmqckIAsy1t/CAvBXXr/XHy8zA64Rg4fhv7qgqKSvxighXG4Flx\nJimTcwhwuu3I1XbT9Rhz5d4JsN4pce5FnCW2v22gl014t2YGIPzIHGod8LPsqK6/\nFk46M1Oc6DdnYMAJP+1r2Dn7fm5eCf/B4IsDtY3/7+ur9KXipIVu0OO0SEQ2LfXh\nivCleiMY9z3B39rWLl30R77Yhr4qZxdiQ2FpXDBusjM28T4a4CXY4+wzo8wXHkO8\ndoXZpwlXIdU1blhfvAbZoLkiBoiMVz8p4eD/WQIDAQABAoIBAAZGxE/LtgoNah2y\novsAPF8IcoaVms/PqHsIwulLJvBfnGkhBdmgCWSUVg+/s7ddoKBy1haqzckgU+9F\nDaBXV7QaQbQSV2VRlDZLv5fDDV38UO8UEth9kSjfKpbBGW18kBVjPksBqrECEscu\nyQf5ieMxwFbRZjbNinecRZE1Ss3CturlM5bH7Kni7cjjoeOKpPOpIQEQ4ToeVh7i\ngf6vBvlyV/bC/I3aPHuvNZ3F4P4h0LW5Xmtu3YV04PVfxHFNgoUAV6sKxrBY/87E\nlIQodC7id/HYRRgZuatZxAIcOGapxGVxjwrInESTxrzmaJ/acSeDkY96s/Ks5nNo\nmNoHjIECgYEA5uiv3WQwEG0hd3YiflZBBASgKA2hhY9DP9AKQs1nTAgOEHZulb5Y\nfZmEWhMSB6k/CWx8ngOC1LFc/MRtMFhpA8PWT5o1bWsqnKZWTH6vgWwr3fLpo8Om\nXwD9tLxLM4LxuMwauGAZXj6fh0f/E2DS9EtetwBkBWzijrDiyg9M9ZkCgYEA2+QW\nJtAZ7pamjDWopDkz+zSwG6PEoCZ19sVdw85Z2zsoLp7i2m0ieAgHOeC+BnEFquJH\nI/lTts1P8GiV0GbaQxfQB2wCJ0DFCx9kv845U6WWK9bTyBER6hb/+sb6yjiNiqPX\nLaob1F+H1yc0I2YcTRHJq5sLJogJPWs6aDNi78ECgYBGWNFrQ2CZQIYXnPf5QVHh\nZX9ddHmm9PRp9nmJzIYR1cpjHZGnMSxIZ4K45mJxzxATUOfORAeRwM8xeq5BMk4c\nBYe/DJ4GTcXXn51fBKF3bnsWzTB84dhHzUd9zneio9v8jsH9NdnEqpNzZW3Ce5cJ\nMgUS/515QajsC9ur72lk0QKBgQC1aqrz/sFGXTiveR3Xz/IZEVEynJz+3Hx6yj8f\n60GrZFU0kZXsTBoiGc2MbOWafukEIYg8H9p3eVC4sjDYLeNpc14IoY3tQLzQ/meq\n78PQRU9uf+FesOas0akEB+KlsJ7mgWJopG4te1uhoRCdHAPBeil+0X4TniyxZaRc\nj/jSgQKBgCCKBokS0Mc9EsRuBLoQGHxscLJhA1eGe+P8PzY+4YLGKdfAReb2hCUH\nGyaGMFAvvjuqOCfFeb2THRV7ARXrH8+sgEmcoeFCR3+ab5dGiBVxedKaVKvHmPAq\n53XUDB+TlSIC7/25pUwdhCQQ538PA/TDgM/iE8nVmtmOSBbAMWM9\n-----END RSA PRIVATE KEY-----\n",
+                "private_key_pem_wo": null,
+                "private_key_pem_wo_version": null,
+                "ready_for_renewal": false,
+                "set_authority_key_id": false,
+                "set_subject_key_id": false,
+                "subject": [
+                    {
+                        "common_name": "example.com",
+                        "country": null,
+                        "email_address": null,
+                        "locality": null,
+                        "organization": null,
+                        "organizational_unit": null,
+                        "postal_code": null,
+                        "province": null,
+                        "serial_number": null,
+                        "street_address": null
+                    }
+                ],
+                "uris": null,
+                "validity_end_time": "2026-10-01T10:59:01.836068853-05:00",
+                "validity_period_hours": 24,
+                "validity_start_time": "2026-09-30T10:59:01.836068853-05:00"
+            }
+        }
+    }
+}
