@@ -1510,8 +1510,10 @@ class IamInstanceProfileTags(BaseTest):
             session_factory=session_factory,
         )
         resources = p.run()
+        # pathed-profile has a non-root path, its arn carries the path
         self.assertEqual(
-            [r["InstanceProfileName"] for r in resources], ["app-profile"])
+            [r["InstanceProfileName"] for r in resources],
+            ["app-profile", "pathed-profile"])
         self.assertEqual(
             {t["Key"]: t["Value"] for t in resources[0]["Tags"]},
             {"Owner": "platform", "Environment": "dev"})

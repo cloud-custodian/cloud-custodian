@@ -20,6 +20,23 @@
                 "Roles": []
             },
             {
+                "Path": "/team/",
+                "InstanceProfileName": "pathed-profile",
+                "InstanceProfileId": "AIPAEXAMPLEPATHEDPROFILE",
+                "Arn": "arn:aws:iam::123456789012:instance-profile/team/pathed-profile",
+                "CreateDate": {
+                    "__class__": "datetime",
+                    "year": 2026,
+                    "month": 9,
+                    "day": 1,
+                    "hour": 12,
+                    "minute": 0,
+                    "second": 0,
+                    "microsecond": 0
+                },
+                "Roles": []
+            },
+            {
                 "Path": "/",
                 "InstanceProfileName": "untagged-profile",
                 "InstanceProfileId": "AIPAEXAMPLEUNTAGGED",

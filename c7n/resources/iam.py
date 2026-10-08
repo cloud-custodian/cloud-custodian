@@ -863,7 +863,7 @@ class IamRoleUsage(Filter):
         profiles.update(self.scan_ec2_roles())
 
         manager = self.manager.get_resource_manager('iam-profile')
-        iprofiles = manager.resources()
+        iprofiles = manager.resources(augment=False)
         results = []
         for p in iprofiles:
             if p['InstanceProfileName'] not in profiles:

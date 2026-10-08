@@ -15,6 +15,15 @@
                         "Value": "dev"
                     }
                 ]
+            },
+            {
+                "ResourceARN": "arn:aws:iam::123456789012:instance-profile/team/pathed-profile",
+                "Tags": [
+                    {
+                        "Key": "Owner",
+                        "Value": "platform"
+                    }
+                ]
             }
         ],
         "ResponseMetadata": {}
