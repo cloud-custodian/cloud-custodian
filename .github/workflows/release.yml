@@ -18,6 +18,7 @@ jobs:
     steps:
       - uses: actions/checkout@de0fac2e4500dabe0009e67214ff5f5447ce83dd # ratchet:actions/checkout@v4
         with:
+          persist-credentials: false
           fetch-depth: 0
 
       - name: Install Custodian
@@ -81,6 +82,8 @@ jobs:
       checks: write
     steps:
       - uses: actions/checkout@de0fac2e4500dabe0009e67214ff5f5447ce83dd # ratchet:actions/checkout@v4
+        with:
+          persist-credentials: false
       - name: Setup Python
         uses: actions/setup-python@a309ff8b426b58ec0e2a45f0f869d46889d02405 # ratchet:actions/setup-python@v5
         with:
@@ -122,6 +125,8 @@ jobs:
     needs: TestWheels
     steps:
       - uses: actions/checkout@de0fac2e4500dabe0009e67214ff5f5447ce83dd # ratchet:actions/checkout@v4
+        with:
+          persist-credentials: false
       - name: Install Custodian
         uses: ./.github/composites/install
         with:
