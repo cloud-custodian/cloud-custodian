@@ -827,7 +827,10 @@ def test_vertexai_publisher_model_metrics(test):
                 {
                     'type': 'metrics',
                     'name': metric_type,
+                    'filter': 'metric.labels.type = "input"',
                     'aligner': 'ALIGN_SUM',
+                    'reducer': 'REDUCE_SUM',
+                    'group-by-fields': ['resource.labels.model_user_id'],
                     'days': 1,
                     'op': 'greater-than',
                     'value': 0,
@@ -840,10 +843,10 @@ def test_vertexai_publisher_model_metrics(test):
     resources = policy.run()
 
     assert len(resources) == 1
-    metric_name = f'{metric_type}.ALIGN_SUM.REDUCE_NONE'
-    assert metric_name in resources[0]['c7n.metrics']
-    assert resources[0]['c7n.metrics'][metric_name] is not None
-    assert resources[0]['c7n.metrics'][metric_name]['points']
+    metric_name = f'{metric_type}.ALIGN_SUM.REDUCE_SUM'
+    metric = resources[0]['c7n.metrics'][metric_name]
+    assert metric['resource']['labels']['model_user_id'] == model
+    assert len(metric['points']) == 1
 
 
 def test_vertexai_endpoint_metrics_invalid_metric_key(test):
@@ -2046,7 +2049,8 @@ class VertexAIPublisherModelTest(BaseTest):
                 expected)
 
     def test_publisher_model_metrics_filter_registration(self):
-        """Test the metrics filter is usable without a metric-key restriction."""
+        """Test the metrics filter registers on publisher models and
+        defaults metric-key to the model id label."""
         policy = self.load_policy(
             {'name': 'publisher-model-dedicated-capacity',
              'resource': 'gcp.vertex-ai-publisher-model',

@@ -2,7 +2,7 @@
   "headers": {
     "content-type": "application/json; charset=UTF-8",
     "vary": "Origin, X-Origin, Referer",
-    "date": "Fri, 11 Sep 2026 20:40:18 GMT",
+    "date": "Fri, 09 Oct 2026 01:01:04 GMT",
     "server": "ESF",
     "x-xss-protection": "0",
     "x-frame-options": "SAMEORIGIN",
@@ -10,7 +10,7 @@
     "alt-svc": "h3=\":443\"; ma=2592000,h3-29=\":443\"; ma=2592000",
     "transfer-encoding": "chunked",
     "status": "200",
-    "content-length": "12026",
+    "content-length": "12050",
     "-content-encoding": "gzip",
     "content-location": "https://aiplatform.googleapis.com/v1beta1/publishers/google/models?alt=json"
   },
@@ -288,10 +288,10 @@
         "publisherModelTemplate": "projects/{project}/locations/{location}/publishers/google/models/gemini-3.8-flash@default"
       },
       {
-        "name": "publishers/google/models/spicy-mayo",
+        "name": "publishers/google/models/gemini-nano-banana-2.1",
         "versionId": "default",
         "launchStage": "GA",
-        "publisherModelTemplate": "projects/{project}/locations/{location}/publishers/google/models/spicy-mayo@default"
+        "publisherModelTemplate": "projects/{project}/locations/{location}/publishers/google/models/gemini-nano-banana-2.1@default"
       }
     ]
   }

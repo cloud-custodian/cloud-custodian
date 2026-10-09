@@ -449,7 +449,7 @@ class TypeInfo(metaclass=TypeMeta):
     allow_metrics_filters = True
 
     # Metric keys a resource type accepts in an explicit `metric-key` policy
-    # option, beyond its default `metric_key`. `None` means no restriction.
+    # option, including its default `metric_key`. `None` means no restriction.
     supported_metric_keys = None
 
     @classmethod
