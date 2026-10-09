@@ -1,0 +1,90 @@
+{
+    "pytest-terraform": 1,
+    "outputs": {},
+    "resources": {
+        "google_project_iam_member": {
+            "bad_admin": {
+                "condition": [
+                    {
+                        "description": "",
+                        "expression": "request.time < timestamp(\"2100-01-01T00:00:00Z\")",
+                        "title": "c7n-sod-bad-bed7"
+                    }
+                ],
+                "etag": "BwZdNLN/HTg=",
+                "id": "cloud-custodian/roles/cloudkms.admin/serviceAccount:c7n-sod-bad-bed7@cloud-custodian.iam.gserviceaccount.com/c7n-sod-bad-bed7//request.time < timestamp(\"2100-01-01T00:00:00Z\")",
+                "member": "serviceAccount:c7n-sod-bad-bed7@cloud-custodian.iam.gserviceaccount.com",
+                "project": "cloud-custodian",
+                "role": "roles/cloudkms.admin"
+            },
+            "bad_encrypter_decrypter": {
+                "condition": [],
+                "etag": "BwZdNLN/HTg=",
+                "id": "cloud-custodian/roles/cloudkms.cryptoKeyEncrypterDecrypter/serviceAccount:c7n-sod-bad-bed7@cloud-custodian.iam.gserviceaccount.com",
+                "member": "serviceAccount:c7n-sod-bad-bed7@cloud-custodian.iam.gserviceaccount.com",
+                "project": "cloud-custodian",
+                "role": "roles/cloudkms.cryptoKeyEncrypterDecrypter"
+            },
+            "bad_viewer": {
+                "condition": [],
+                "etag": "BwZdNLN/HTg=",
+                "id": "cloud-custodian/roles/viewer/serviceAccount:c7n-sod-bad-bed7@cloud-custodian.iam.gserviceaccount.com",
+                "member": "serviceAccount:c7n-sod-bad-bed7@cloud-custodian.iam.gserviceaccount.com",
+                "project": "cloud-custodian",
+                "role": "roles/viewer"
+            },
+            "good_admin": {
+                "condition": [],
+                "etag": "BwZdNLQmGtw=",
+                "id": "cloud-custodian/roles/cloudkms.admin/serviceAccount:c7n-sod-good-bed7@cloud-custodian.iam.gserviceaccount.com",
+                "member": "serviceAccount:c7n-sod-good-bed7@cloud-custodian.iam.gserviceaccount.com",
+                "project": "cloud-custodian",
+                "role": "roles/cloudkms.admin"
+            }
+        },
+        "google_service_account": {
+            "bad": {
+                "account_id": "c7n-sod-bad-bed7",
+                "create_ignore_already_exists": null,
+                "deletion_policy": "DELETE",
+                "description": "",
+                "disabled": false,
+                "display_name": "C7N Separation of Duties Bad SA",
+                "email": "c7n-sod-bad-bed7@cloud-custodian.iam.gserviceaccount.com",
+                "id": "projects/cloud-custodian/serviceAccounts/c7n-sod-bad-bed7@cloud-custodian.iam.gserviceaccount.com",
+                "member": "serviceAccount:c7n-sod-bad-bed7@cloud-custodian.iam.gserviceaccount.com",
+                "name": "projects/cloud-custodian/serviceAccounts/c7n-sod-bad-bed7@cloud-custodian.iam.gserviceaccount.com",
+                "project": "cloud-custodian",
+                "timeouts": null,
+                "unique_id": "102607085954253738247"
+            },
+            "good": {
+                "account_id": "c7n-sod-good-bed7",
+                "create_ignore_already_exists": null,
+                "deletion_policy": "DELETE",
+                "description": "",
+                "disabled": false,
+                "display_name": "C7N Separation of Duties Good SA",
+                "email": "c7n-sod-good-bed7@cloud-custodian.iam.gserviceaccount.com",
+                "id": "projects/cloud-custodian/serviceAccounts/c7n-sod-good-bed7@cloud-custodian.iam.gserviceaccount.com",
+                "member": "serviceAccount:c7n-sod-good-bed7@cloud-custodian.iam.gserviceaccount.com",
+                "name": "projects/cloud-custodian/serviceAccounts/c7n-sod-good-bed7@cloud-custodian.iam.gserviceaccount.com",
+                "project": "cloud-custodian",
+                "timeouts": null,
+                "unique_id": "115192417908261283109"
+            }
+        },
+        "random_id": {
+            "suffix": {
+                "b64_std": "vtc=",
+                "b64_url": "vtc",
+                "byte_length": 2,
+                "dec": "48855",
+                "hex": "bed7",
+                "id": "vtc",
+                "keepers": null,
+                "prefix": null
+            }
+        }
+    }
+}
