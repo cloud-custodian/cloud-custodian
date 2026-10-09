@@ -57,6 +57,55 @@ def test_bucket_set_iam_policy_remove_public_access(test, bucket_set_iam_policy)
     assert sa_email in all_members
 
 
+@terraform("bucket_public_access_enforced")
+def test_bucket_public_access_enforced(test, bucket_public_access_enforced):
+    bucket_name = (
+        bucket_public_access_enforced.resources['google_storage_bucket']['bucket']['name'])
+    factory = test.replay_flight_data('bucket-public-access-enforced')
+    policy = test.load_policy(
+        {'name': 'bucket-public-access-enforced',
+         'resource': 'gcp.bucket',
+         'filters': [
+             {'name': bucket_name},
+             {'type': 'value',
+              'key': 'iamConfiguration.publicAccessPrevention',
+              'value': 'enforced',
+              'op': 'ne'}],
+         'actions': [{'type': 'set-public-access-prevention', 'state': 'enforced'}]},
+        session_factory=factory)
+    resources = policy.run()
+    assert len(resources) == 1
+    assert resources[0]['name'] == bucket_name
+
+    bucket = policy.resource_manager.get_resource({'bucket_name': bucket_name})
+    assert bucket['iamConfiguration']['publicAccessPrevention'] == 'enforced'
+    # patching public access prevention must not reset uniform access
+    assert bucket['iamConfiguration']['uniformBucketLevelAccess']['enabled'] is True
+
+
+@terraform("bucket_public_access_inherited")
+def test_bucket_public_access_inherited(test, bucket_public_access_inherited):
+    bucket_name = (
+        bucket_public_access_inherited.resources['google_storage_bucket']['bucket']['name'])
+    factory = test.replay_flight_data('bucket-public-access-inherited')
+    policy = test.load_policy(
+        {'name': 'bucket-public-access-inherited',
+         'resource': 'gcp.bucket',
+         'filters': [
+             {'name': bucket_name},
+             {'iamConfiguration.publicAccessPrevention': 'enforced'}],
+         'actions': [{'type': 'set-public-access-prevention', 'state': 'inherited'}]},
+        session_factory=factory)
+    resources = policy.run()
+    assert len(resources) == 1
+    assert resources[0]['name'] == bucket_name
+
+    bucket = policy.resource_manager.get_resource({'bucket_name': bucket_name})
+    assert bucket['iamConfiguration']['publicAccessPrevention'] == 'inherited'
+    # patching public access prevention must not reset uniform access
+    assert bucket['iamConfiguration']['uniformBucketLevelAccess']['enabled'] is True
+
+
 @terraform("bucket_set_iam_policy")
 def test_bucket_set_iam_policy_add_bindings(test, bucket_set_iam_policy):
     bucket_name = bucket_set_iam_policy.resources['google_storage_bucket']['bucket']['name']

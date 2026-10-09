@@ -1,0 +1,59 @@
+{
+    "status_code": 200,
+    "data": {
+        "ResponseMetadata": {},
+        "certificateDescription": {
+            "certificateArn": "arn:aws:iot:us-east-1:644160558196:cert/6969630f630be222c36e9860129f7dd6a9ad132264e8a28b695043c2e68ed7a5",
+            "certificateId": "6969630f630be222c36e9860129f7dd6a9ad132264e8a28b695043c2e68ed7a5",
+            "status": "ACTIVE",
+            "certificatePem": "-----BEGIN CERTIFICATE-----\nMIIDWTCCAkGgAwIBAgIUWFTN5o/slZ/2twBgyviexrtCgD0wDQYJKoZIhvcNAQEL\nBQAwTTFLMEkGA1UECwxCQW1hem9uIFdlYiBTZXJ2aWNlcyBPPUFtYXpvbi5jb20g\nSW5jLiBMPVNlYXR0bGUgU1Q9V2FzaGluZ3RvbiBDPVVTMB4XDTI2MDkwOTIwMTIw\nOFoXDTQ5MTIzMTIzNTk1OVowHjEcMBoGA1UEAwwTQVdTIElvVCBDZXJ0aWZpY2F0\nZTCCASIwDQYJKoZIhvcNAQEBBQADggEPADCCAQoCggEBALC7RWgH/gYXudBiZhha\nOUmQiLbsi00NrXBCSNgi0j1Knb3BNr2ERifuph+FWmHE0GTFlwnhkJdxW+GDUxf4\n3ZpNPZvFD9LzXZiBz2b2z6NXhtqhShzP4TEcG2yOZc2+zmGTDs6psPBW2erkFQC3\nFcMEn3mYE8/gzsrvgR7kW5xYZstB9ahCykrCSkOH1ZQ2TtGI84Kuj81xIZ7OoSxS\nxT3uIZVtVeyhf2hjEsMof9syLjlUd6C0guafepXXS1WncdGfoeD1cc8ZbUi/MiVJ\nqJDNQ8jBMeDvVP3cb8Gyx3ye016xKK9T6DTj9/f36RGKKFo98nmQdDKoQXbtHV4D\nhbECAwEAAaNgMF4wHwYDVR0jBBgwFoAUaJ/QZNsnbsmF0cLGMsn5JgI9G9cwHQYD\nVR0OBBYEFGt3RQsx2JO1fLnKqLP1gHYTBDz8MAwGA1UdEwEB/wQCMAAwDgYDVR0P\nAQH/BAQDAgeAMA0GCSqGSIb3DQEBCwUAA4IBAQA98OXTem8mC1G2SFJIi5IuiX6c\ntlhU+FeRGXZip2MeZg3YLkQoXujQMn4a9K8yviy+16Ww5+Nkhlg/Ff5xiaZcbYiH\n3nE/kMgK8Ag0wgloNe1MJvQeR14eb2hu/gum7QjPnBwuCaAb4eV6sxeGaUhOmz8X\nHSqL0YQxI5A8NmFymcs/imEwJsheMkeVN8f4klG5cHOQF5UDlwqxB/yPogfD8z1O\nYyviJU/Dmzan6IxXBHBsu70rNtMWT7JN0gelM/I9x4XHAfZyweNWrcFhyw7fZQku\nieKVl/wgJNJORNJLo+ZueEjtakC/TcKCXk8Ec6NNR77Eu0IY2g0n2Y6cajkX\n-----END CERTIFICATE-----\n",
+            "ownedBy": "644160558196",
+            "creationDate": {
+                "__class__": "datetime",
+                "year": 2024,
+                "month": 9,
+                "day": 9,
+                "hour": 16,
+                "minute": 14,
+                "second": 8,
+                "microsecond": 401000
+            },
+            "lastModifiedDate": {
+                "__class__": "datetime",
+                "year": 2026,
+                "month": 9,
+                "day": 9,
+                "hour": 16,
+                "minute": 14,
+                "second": 8,
+                "microsecond": 401000
+            },
+            "customerVersion": 1,
+            "transferData": {},
+            "generationId": "92e23901-f03b-488f-a65c-bed291c17cd0",
+            "validity": {
+                "notBefore": {
+                    "__class__": "datetime",
+                    "year": 2024,
+                    "month": 9,
+                    "day": 9,
+                    "hour": 16,
+                    "minute": 12,
+                    "second": 8,
+                    "microsecond": 0
+                },
+                "notAfter": {
+                    "__class__": "datetime",
+                    "year": 2049,
+                    "month": 12,
+                    "day": 31,
+                    "hour": 18,
+                    "minute": 59,
+                    "second": 59,
+                    "microsecond": 0
+                }
+            },
+            "certificateMode": "DEFAULT"
+        }
+    }
+}

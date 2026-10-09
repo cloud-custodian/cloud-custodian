@@ -182,7 +182,7 @@ class Image:
     defaults = dict(
         base_build_image="ubuntu:24.04",
         base_target_image="ubuntu:24.04",
-        uv_version="0.7.6",
+        uv_version="0.12.19",
         packages="",
         providers=" ".join(default_providers),
         pre_entry="",

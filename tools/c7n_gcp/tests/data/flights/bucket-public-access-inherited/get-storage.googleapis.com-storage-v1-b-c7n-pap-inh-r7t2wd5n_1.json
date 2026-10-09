@@ -1,0 +1,50 @@
+{
+  "headers": {
+    "content-type": "application/json; charset=UTF-8",
+    "etag": "CAI=",
+    "date": "Wed, 07 Oct 2026 14:22:40 GMT",
+    "vary": "Origin, X-Origin",
+    "cache-control": "private, max-age=0, must-revalidate, no-transform",
+    "expires": "Wed, 07 Oct 2026 14:22:40 GMT",
+    "x-goog-gcs-base-ts": "1a116beb9f2",
+    "content-length": "945",
+    "server": "UploadServer",
+    "alt-svc": "h3=\":443\"; ma=2592000,h3-29=\":443\"; ma=2592000",
+    "status": "200",
+    "content-location": "https://storage.googleapis.com/storage/v1/b/c7n-pap-inh-r7t2wd5n?alt=json"
+  },
+  "body": {
+    "kind": "storage#bucket",
+    "selfLink": "https://www.googleapis.com/storage/v1/b/c7n-pap-inh-r7t2wd5n",
+    "id": "c7n-pap-inh-r7t2wd5n",
+    "name": "c7n-pap-inh-r7t2wd5n",
+    "projectNumber": "000000000000",
+    "generation": "1791382958223744443",
+    "metageneration": "2",
+    "location": "US",
+    "storageClass": "STANDARD",
+    "etag": "CAI=",
+    "timeCreated": "2026-10-07T14:22:38.534Z",
+    "updated": "2026-10-07T14:22:40.498Z",
+    "labels": {
+      "goog-terraform-provisioned": "true"
+    },
+    "softDeletePolicy": {
+      "retentionDurationSeconds": "604800",
+      "effectiveTime": "2026-10-07T14:22:38.534Z"
+    },
+    "iamConfiguration": {
+      "bucketPolicyOnly": {
+        "enabled": true,
+        "lockedTime": "2027-01-05T14:22:38.534Z"
+      },
+      "uniformBucketLevelAccess": {
+        "enabled": true,
+        "lockedTime": "2027-01-05T14:22:38.534Z"
+      },
+      "publicAccessPrevention": "inherited"
+    },
+    "locationType": "multi-region",
+    "rpo": "DEFAULT"
+  }
+}

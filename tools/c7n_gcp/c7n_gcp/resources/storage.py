@@ -99,6 +99,57 @@ class BucketLevelAccess(MethodAction):
                 'body': {'iamConfiguration': {'uniformBucketLevelAccess': {'enabled': enabled}}}}
 
 
+@Bucket.action_registry.register('set-public-access-prevention')
+class BucketSetPublicAccess(MethodAction):
+    '''Set public access prevention on a bucket.
+
+    ``state`` is required and accepts:
+
+    - ``enforced``: requests authorized through ``allUsers`` or
+      ``allAuthenticatedUsers`` are rejected. Existing IAM policies and ACLs
+      granting that access are left in place but overridden. To remove them,
+      also use the ``set-iam-policy`` action with ``remove-bindings``.
+    - ``inherited``: public access prevention is determined by the
+      ``storage.publicAccessPrevention`` organization policy constraint. If
+      that constraint is not enforced, any existing public IAM policies or
+      ACLs on the bucket take effect again.
+
+    https://cloud.google.com/storage/docs/public-access-prevention
+
+    Example Policy:
+
+    .. code-block:: yaml
+
+      policies:
+       - name: enforce-bucket-public-access-prevention
+         resource: gcp.bucket
+         filters:
+          - type: value
+            key: iamConfiguration.publicAccessPrevention
+            value: enforced
+            op: ne
+         actions:
+          - type: set-public-access-prevention
+            state: enforced
+    '''
+
+    schema = type_schema(
+        'set-public-access-prevention',
+        required=['state'],
+        state={'type': 'string', 'enum': ['enforced', 'inherited']})
+    method_spec = {'op': 'patch'}
+    # buckets.patch requires setIamPolicy in addition to update when
+    # changing public access prevention.
+    # https://cloud.google.com/storage/docs/json_api/v1/buckets/patch
+    permissions = ('storage.buckets.update', 'storage.buckets.setIamPolicy')
+
+    def get_resource_params(self, model, resource):
+        return {'bucket': resource['name'],
+                'fields': 'iamConfiguration',
+                'projection': 'noAcl',
+                'body': {'iamConfiguration': {'publicAccessPrevention': self.data['state']}}}
+
+
 @Bucket.action_registry.register('set-iam-policy')
 class BucketSetIamPolicy(SetIamPolicy):
     """Manage GCP bucket IAM policy bindings.

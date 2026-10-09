@@ -1,0 +1,16 @@
+{
+    "status_code": 200,
+    "data": {
+        "ResponseMetadata": {},
+        "policies": [
+            {
+                "policyName": "c7n-test-iot-wildcard",
+                "policyArn": "arn:aws:iot:us-east-1:644160558196:policy/c7n-test-iot-wildcard"
+            },
+            {
+                "policyName": "c7n-test-iot-scoped",
+                "policyArn": "arn:aws:iot:us-east-1:644160558196:policy/c7n-test-iot-scoped"
+            }
+        ]
+    }
+}
