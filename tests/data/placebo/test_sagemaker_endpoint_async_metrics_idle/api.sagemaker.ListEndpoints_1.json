@@ -1,0 +1,58 @@
+{
+    "status_code": 200,
+    "data": {
+        "Endpoints": [
+            {
+                "EndpointName": "c7n-endpoint-metrics-async-concrete-crayfish-idle",
+                "EndpointArn": "arn:aws:sagemaker:us-east-1:644160558196:endpoint/c7n-endpoint-metrics-async-concrete-crayfish-idle",
+                "CreationTime": {
+                    "__class__": "datetime",
+                    "year": 2026,
+                    "month": 10,
+                    "day": 7,
+                    "hour": 17,
+                    "minute": 5,
+                    "second": 14,
+                    "microsecond": 74000
+                },
+                "LastModifiedTime": {
+                    "__class__": "datetime",
+                    "year": 2026,
+                    "month": 10,
+                    "day": 7,
+                    "hour": 17,
+                    "minute": 9,
+                    "second": 0,
+                    "microsecond": 350000
+                },
+                "EndpointStatus": "InService"
+            },
+            {
+                "EndpointName": "c7n-endpoint-metrics-async-concrete-crayfish-busy",
+                "EndpointArn": "arn:aws:sagemaker:us-east-1:644160558196:endpoint/c7n-endpoint-metrics-async-concrete-crayfish-busy",
+                "CreationTime": {
+                    "__class__": "datetime",
+                    "year": 2026,
+                    "month": 10,
+                    "day": 7,
+                    "hour": 17,
+                    "minute": 5,
+                    "second": 12,
+                    "microsecond": 603000
+                },
+                "LastModifiedTime": {
+                    "__class__": "datetime",
+                    "year": 2026,
+                    "month": 10,
+                    "day": 7,
+                    "hour": 17,
+                    "minute": 8,
+                    "second": 54,
+                    "microsecond": 226000
+                },
+                "EndpointStatus": "InService"
+            }
+        ],
+        "ResponseMetadata": {}
+    }
+}

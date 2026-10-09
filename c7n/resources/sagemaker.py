@@ -757,6 +757,7 @@ class SagemakerEndpointMetricsFilter(SageMakerMetricsFilter):
     VariantName = "VariantName"
     ProductionVariants = "ProductionVariants"
     InferenceComponentName = "InferenceComponentName"
+    AsyncInferenceConfig = "AsyncInferenceConfig"
 
     permissions = MetricsFilter.permissions + (
         'sagemaker:ListInferenceComponents',)
@@ -765,7 +766,7 @@ class SagemakerEndpointMetricsFilter(SageMakerMetricsFilter):
     def endpoint_components(self):
         """Map each endpoint to the inference components hosted on it.
 
-        An endpoint without inference components is assumed to be a classic endpoint.
+        An endpoint without inference components is assumed to be classic or async.
         """
         client = local_session(
             self.manager.session_factory).client('sagemaker')
@@ -780,6 +781,9 @@ class SagemakerEndpointMetricsFilter(SageMakerMetricsFilter):
     def resource_kind(self, resource) -> Kind:
         """How this endpoint hosts its models.
 
+        An async endpoint is classified first, since it publishes the async
+        metrics; DescribeEndpoint already carries its AsyncInferenceConfig.
+
         An endpoint built to host components but hosting none right now
         is reported classic, which costs nothing: its invocations aren't
         published per variant, and nothing is reserving the instance, so
@@ -788,6 +792,8 @@ class SagemakerEndpointMetricsFilter(SageMakerMetricsFilter):
         execution role and no variant naming a model -- would classify it
         correctly at the price of a DescribeEndpointConfig per endpoint.
         """
+        if self.AsyncInferenceConfig in resource:
+            return 'async'
         if self.endpoint_components.get(resource[self.resource_dimension_name]):
             return 'inference-component'
         return 'classic'
