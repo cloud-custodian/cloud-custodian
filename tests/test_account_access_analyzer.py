@@ -1,6 +1,7 @@
 # Copyright The Cloud Custodian Authors.
 # SPDX-License-Identifier: Apache-2.0
 import datetime
+import logging
 from unittest import mock
 
 import boto3
@@ -30,12 +31,12 @@ def analyzer_session():
         iam.assert_no_pending_responses()
 
 
-def analyzer_summary(analyzer_type='ACCOUNT'):
+def analyzer_summary(analyzer_type='ACCOUNT', name=ANALYZER_NAME, status='ACTIVE'):
     return {
-        'arn': ANALYZER_ARN,
-        'name': ANALYZER_NAME,
+        'arn': ANALYZER_ARN.rsplit('/', 1)[0] + '/' + name,
+        'name': name,
         'type': analyzer_type,
-        'status': 'ACTIVE',
+        'status': status,
         'createdAt': datetime.datetime(2026, 1, 1, tzinfo=datetime.timezone.utc),
     }
 
@@ -54,13 +55,10 @@ def load_analyzer_policy(test, factory=None, **options):
 
 def test_create_access_analyzer_repeated_run(test, analyzer_session):
     factory, analyzer, _ = analyzer_session
-    analyzer.add_client_error(
-        'get_analyzer', service_error_code='ResourceNotFoundException',
-        http_status_code=404, expected_params={'analyzerName': ANALYZER_NAME})
+    analyzer.add_response('list_analyzers', {'analyzers': []}, {})
     analyzer.add_response('create_analyzer', {'arn': ANALYZER_ARN}, {
         'analyzerName': ANALYZER_NAME, 'type': 'ACCOUNT'})
-    analyzer.add_response('get_analyzer', {'analyzer': analyzer_summary()}, {
-        'analyzerName': ANALYZER_NAME})
+    analyzer.add_response('list_analyzers', {'analyzers': [analyzer_summary()]}, {})
     policy = load_analyzer_policy(test, factory)
     action = policy.resource_manager.actions[0]
     original = dict(action.data)
@@ -76,9 +74,7 @@ def test_create_access_analyzer_options(test, analyzer_session):
     rules = [{'ruleName': 'trusted-account', 'filter': {
         'principal.AWS': {'eq': ['123456789012']}}}]
     tags = {'Owner': 'Security'}
-    analyzer.add_client_error(
-        'get_analyzer', service_error_code='ResourceNotFoundException',
-        http_status_code=404, expected_params={'analyzerName': ANALYZER_NAME})
+    analyzer.add_response('list_analyzers', {'analyzers': []}, {})
     analyzer.add_response('create_analyzer', {'arn': ANALYZER_ARN}, {
         'analyzerName': ANALYZER_NAME, 'type': 'ORGANIZATION',
         'archiveRules': rules, 'tags': tags})
@@ -90,8 +86,8 @@ def test_create_access_analyzer_options(test, analyzer_session):
 
 def test_create_access_analyzer_type_conflict(test, analyzer_session):
     factory, analyzer, _ = analyzer_session
-    analyzer.add_response('get_analyzer', {'analyzer': analyzer_summary('ORGANIZATION')}, {
-        'analyzerName': ANALYZER_NAME})
+    analyzer.add_response(
+        'list_analyzers', {'analyzers': [analyzer_summary('ORGANIZATION')]}, {})
     policy = load_analyzer_policy(test, factory)
 
     with pytest.raises(PolicyExecutionError, match='ORGANIZATION.*ACCOUNT'):
@@ -99,19 +95,17 @@ def test_create_access_analyzer_type_conflict(test, analyzer_session):
 
 
 @pytest.mark.parametrize('operation,code', [
-    ('get_analyzer', 'AccessDeniedException'),
+    ('list_analyzers', 'AccessDeniedException'),
     ('create_analyzer', 'AccessDeniedException'),
     ('create_analyzer', 'ServiceQuotaExceededException'),
     ('create_analyzer', 'ConflictException'),
 ])
 def test_create_access_analyzer_api_error(test, analyzer_session, operation, code):
     factory, analyzer, _ = analyzer_session
-    expected = {'analyzerName': ANALYZER_NAME}
+    expected = {}
     if operation == 'create_analyzer':
-        analyzer.add_client_error(
-            'get_analyzer', service_error_code='ResourceNotFoundException',
-            http_status_code=404, expected_params=expected)
-        expected = {**expected, 'type': 'ACCOUNT'}
+        analyzer.add_response('list_analyzers', {'analyzers': []}, {})
+        expected = {'analyzerName': ANALYZER_NAME, 'type': 'ACCOUNT'}
     analyzer.add_client_error(operation, service_error_code=code, expected_params=expected)
     policy = load_analyzer_policy(test, factory)
 
@@ -148,7 +142,7 @@ def test_create_access_analyzer_permissions(test, tags):
     policy = load_analyzer_policy(test, **({'tags': tags} if tags else {}))
     permissions = policy.resource_manager.actions[0].get_permissions()
     assert set(permissions) == {
-        'access-analyzer:GetAnalyzer', 'access-analyzer:CreateAnalyzer',
+        'access-analyzer:ListAnalyzers', 'access-analyzer:CreateAnalyzer',
         'iam:CreateServiceLinkedRole',
     } | ({'access-analyzer:TagResource'} if tags else set())
 
@@ -164,9 +158,7 @@ def test_create_access_analyzer_with_account_filter(test, analyzer_session, exis
         'arn': 'arn:aws:access-analyzer:us-east-1:123456789012:analyzer/other-unused-access',
     }] if existing_type else []
     analyzer.add_response('list_analyzers', {'analyzers': existing}, {})
-    analyzer.add_client_error(
-        'get_analyzer', service_error_code='ResourceNotFoundException',
-        http_status_code=404, expected_params={'analyzerName': ANALYZER_NAME})
+    analyzer.add_response('list_analyzers', {'analyzers': []}, {})
     analyzer.add_response('create_analyzer', {'arn': ANALYZER_ARN}, {
         'analyzerName': ANALYZER_NAME, 'type': 'ACCOUNT'})
     analyzer.add_response('list_analyzers', {'analyzers': [analyzer_summary()]}, {})
@@ -186,23 +178,89 @@ def test_create_access_analyzer_with_account_filter(test, analyzer_session, exis
     assert policy.run() == []
 
 
-@pytest.mark.parametrize('operation', ['get_analyzer', 'create_analyzer'])
+@pytest.mark.parametrize('operation', ['list_analyzers', 'create_analyzer'])
 def test_create_access_analyzer_retries_throttling(
         test, analyzer_session, monkeypatch, operation):
     factory, analyzer, _ = analyzer_session
     monkeypatch.setattr('c7n.utils.time.sleep', lambda _: None)
-    expected = {'analyzerName': ANALYZER_NAME}
+    expected = {}
     if operation == 'create_analyzer':
-        analyzer.add_client_error(
-            'get_analyzer', service_error_code='ResourceNotFoundException',
-            http_status_code=404, expected_params=expected)
-        expected = {**expected, 'type': 'ACCOUNT'}
+        analyzer.add_response('list_analyzers', {'analyzers': []}, {})
+        expected = {'analyzerName': ANALYZER_NAME, 'type': 'ACCOUNT'}
     analyzer.add_client_error(
         operation, service_error_code='ThrottlingException',
         http_status_code=429, expected_params=expected)
-    response = {'analyzer': analyzer_summary()} if operation == 'get_analyzer' else {
+    response = {'analyzers': [analyzer_summary()]} if operation == 'list_analyzers' else {
         'arn': ANALYZER_ARN}
     analyzer.add_response(operation, response, expected)
     policy = load_analyzer_policy(test, factory)
 
     policy.resource_manager.actions[0].process([{'account_id': '123456789012'}])
+
+
+@pytest.mark.parametrize('analyzer_type', ['ACCOUNT', 'ORGANIZATION'])
+@pytest.mark.parametrize('status', ['ACTIVE', 'CREATING', 'DISABLED', 'FAILED'])
+def test_create_access_analyzer_existing_in_region(
+        test, analyzer_session, caplog, analyzer_type, status):
+    factory, analyzer, _ = analyzer_session
+    existing = analyzer_summary(analyzer_type, name='existing-external-access', status=status)
+    if status == 'FAILED':
+        existing['statusReason'] = {'code': 'INTERNAL_ERROR'}
+    analyzer.add_response('list_analyzers', {'analyzers': [existing]}, {})
+    policy = load_analyzer_policy(test, factory, **{'analyzer-type': analyzer_type})
+
+    with caplog.at_level(logging.INFO, logger='custodian.actions'):
+        policy.resource_manager.actions[0].process([{'account_id': '123456789012'}])
+
+    assert 'existing-external-access' in caplog.text
+    assert analyzer_type in caplog.text
+    assert 'status ' + status in caplog.text
+    assert 'skipping creation' in caplog.text
+    assert caplog.records[-1].levelno == (
+        logging.INFO if status == 'ACTIVE' else logging.WARNING)
+    assert ('INTERNAL_ERROR' if status == 'FAILED' else 'unspecified') in caplog.text
+
+
+@pytest.mark.parametrize('existing_type', [
+    'ORGANIZATION', 'ACCOUNT_UNUSED_ACCESS', 'ACCOUNT_INTERNAL_ACCESS'])
+def test_create_access_analyzer_other_types(test, analyzer_session, existing_type):
+    factory, analyzer, _ = analyzer_session
+    analyzer.add_response('list_analyzers', {
+        'analyzers': [analyzer_summary(existing_type, name='other-analyzer')]}, {})
+    analyzer.add_response('create_analyzer', {'arn': ANALYZER_ARN}, {
+        'analyzerName': ANALYZER_NAME, 'type': 'ACCOUNT'})
+
+    load_analyzer_policy(test, factory).resource_manager.actions[0].process(
+        [{'account_id': '123456789012'}])
+
+
+@pytest.mark.parametrize('existing_type', ['ACCOUNT', 'ACCOUNT_UNUSED_ACCESS'])
+def test_create_access_analyzer_paginated(test, analyzer_session, existing_type):
+    factory, analyzer, _ = analyzer_session
+    analyzer.add_response('list_analyzers', {'analyzers': [], 'nextToken': 'next-page'}, {})
+    analyzer.add_response('list_analyzers', {
+        'analyzers': [analyzer_summary(existing_type, name='other-analyzer')]}, {
+        'nextToken': 'next-page'})
+    if existing_type != 'ACCOUNT':
+        analyzer.add_response('create_analyzer', {'arn': ANALYZER_ARN}, {
+            'analyzerName': ANALYZER_NAME, 'type': 'ACCOUNT'})
+
+    load_analyzer_policy(test, factory).resource_manager.actions[0].process(
+        [{'account_id': '123456789012'}])
+
+
+def test_create_access_analyzer_recorded(test, caplog):
+    factory = test.replay_flight_data('test_create_access_analyzer', region='us-east-1')
+    policy = load_analyzer_policy(test, factory)
+
+    # Count calls as placebo playback can reuse a response if called again.
+    with mock.patch.object(policy.resource_manager.actions[0].manager, 'retry',
+                           wraps=policy.resource_manager.retry) as retry:
+        with caplog.at_level(logging.INFO, logger='custodian.actions'):
+            assert len(policy.run()) == 1
+            assert len(policy.run()) == 1
+        operations = [call.args[0].__name__ for call in retry.call_args_list]
+
+    assert operations.count('create_analyzer') == 1
+    assert operations.count('list_analyzers') == 2
+    assert 'skipping creation' in caplog.text

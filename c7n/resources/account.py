@@ -633,8 +633,11 @@ class CreateAccessAnalyzer(BaseAction):
     Organization analyzers require the management or delegated administrator
     account, with trusted access to IAM Access Analyzer already enabled.
 
-    An existing analyzer with the same name and type is left unchanged, including
-    its status, tags, and archive rules. A different type raises an error.
+    An existing analyzer of the requested type in the region is left unchanged,
+    regardless of its name, including its tags and archive rules. Non-active
+    analyzers are logged with their status and status reason; they are not
+    replaced. The configured name is used only when creating an analyzer.
+    When creation is needed, a name already used by a different type raises an error.
     This action does not create unused-access or internal-access analyzers.
     ``archive-rules`` accepts the ``ruleName`` and ``filter`` fields from the
     Access Analyzer ``CreateAnalyzer`` API.
@@ -672,7 +675,7 @@ class CreateAccessAnalyzer(BaseAction):
             'tags': {'type': 'object', 'additionalProperties': {'type': 'string'}},
         })
     permissions = (
-        'access-analyzer:GetAnalyzer', 'access-analyzer:CreateAnalyzer',
+        'access-analyzer:ListAnalyzers', 'access-analyzer:CreateAnalyzer',
         'iam:CreateServiceLinkedRole')
 
     def get_permissions(self):
@@ -697,16 +700,29 @@ class CreateAccessAnalyzer(BaseAction):
     def process(self, resources):
         client = local_session(self.manager.session_factory).client('accessanalyzer')
         params = self.get_params()
-        existing = self.manager.retry(
-            client.get_analyzer, analyzerName=params['analyzerName'],
-            ignore_err_codes=('ResourceNotFoundException',))
+        analyzers = []
+        list_params = {}
+        while True:
+            response = self.manager.retry(client.list_analyzers, **list_params)
+            analyzers.extend(response['analyzers'])
+            if not response.get('nextToken'):
+                break
+            list_params['nextToken'] = response['nextToken']
+        existing = [a for a in analyzers if a['type'] == params['type']]
         if existing:
-            analyzer_type = existing['analyzer']['type']
-            if analyzer_type != params['type']:
+            for analyzer in existing:
+                log = self.log.info if analyzer['status'] == 'ACTIVE' else self.log.warning
+                log(
+                    "Access analyzer %s of type %s already exists with status %s "
+                    "(reason: %s); skipping creation",
+                    analyzer['name'], analyzer['type'], analyzer['status'],
+                    analyzer.get('statusReason', {}).get('code', 'unspecified'))
+            return
+        for analyzer in analyzers:
+            if analyzer['name'] == params['analyzerName']:
                 raise PolicyExecutionError(
                     "Access analyzer %s already has type %s, requested %s" % (
-                        params['analyzerName'], analyzer_type, params['type']))
-            return
+                        params['analyzerName'], analyzer['type'], params['type']))
         self.manager.retry(client.create_analyzer, **params)
 
 
