@@ -4,7 +4,7 @@
 import time
 
 from c7n.testing import C7N_FUNCTIONAL
-from gcp_common import BaseTest, event_data
+from gcp_common import BaseTest, capture_api_params, event_data
 from googleapiclient.errors import HttpError
 from dateutil import parser
 from freezegun import freeze_time
@@ -497,3 +497,52 @@ class SqlSslCertTest(BaseTest):
                 f"gcp:sqladmin:us-central1:{project_id}:ssl-cert/custodian-postgres/49a10ed7135e3171ce5e448cc785bc63b5b81e6c",  # noqa: E501
             ],
         )
+
+
+@terraform('sql_instance_remove_labels')
+def test_sql_instance_remove_labels(test, sql_instance_remove_labels):
+    instances = sql_instance_remove_labels.resources['google_sql_database_instance']
+    project_id = instances['partial']['project']
+    names = {case: instances[case]['name'] for case in ('partial', 'full', 'absent')}
+
+    factory = test.replay_flight_data('sql-instance-remove-labels')
+    policy = test.load_policy(
+        {'name': 'sql-instance-remove-labels',
+         'resource': 'gcp.sql-instance',
+         'filters': [{'type': 'value', 'key': 'name', 'op': 'in',
+                      'value': list(names.values())}],
+         'actions': [{'type': 'set-labels', 'remove': ['c7n_remove_a', 'c7n_remove_b']}]},
+        session_factory=factory)
+    captured = capture_api_params(test)
+    assert len(policy.run()) == 3
+
+    # Replay doesn't match on request bodies, so check the merge patch
+    # nulls the removed labels rather than leaving them out.
+    patched = {
+        params['instance']: params['body']['settings']['userLabels']
+        for op_name, params in captured if op_name == 'patch'
+    }
+    assert patched == {
+        names['partial']: {'c7n_keep': 'yes', 'c7n_remove_a': None, 'c7n_remove_b': None},
+        names['full']: {'c7n_remove_a': None, 'c7n_remove_b': None},
+    }
+
+    expected = {
+        'partial': {'c7n_keep': 'yes'},
+        'full': {},
+        'absent': {'c7n_keep': 'yes'},
+    }
+    client = policy.resource_manager.get_client()
+    # instances.patch returns a long-running operation, so poll until the
+    # labels settle. Replay walks the same recorded gets, without sleeping.
+    for _ in range(30):
+        labels = {
+            case: client.execute_query(
+                'get', {'project': project_id, 'instance': name})['settings'].get('userLabels', {})
+            for case, name in names.items()
+        }
+        if labels == expected:
+            break
+        if test.recording:
+            time.sleep(10)
+    assert labels == expected

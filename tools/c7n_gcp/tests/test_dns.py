@@ -356,3 +356,32 @@ def test_managed_zone_set_labels(test, dns_managed_zone_set_labels):
     client = policy.resource_manager.get_client()
     result = client.execute_query('get', {'project': project_id, 'managedZone': zone_name})
     assert result['labels']['env'] == 'not-the-default'
+
+
+@terraform('dns_managed_zone_remove_labels')
+def test_managed_zone_remove_labels(test, dns_managed_zone_remove_labels):
+    zones = dns_managed_zone_remove_labels.resources['google_dns_managed_zone']
+    project_id = zones['partial']['project']
+    names = {case: zones[case]['name'] for case in ('partial', 'full', 'absent')}
+
+    factory = test.replay_flight_data('dns-managed-zone-remove-labels')
+    policy = test.load_policy(
+        {'name': 'gcp-dns-managed-zone-remove-labels',
+         'resource': 'gcp.dns-managed-zone',
+         'filters': [{'type': 'value', 'key': 'name', 'op': 'in',
+                      'value': list(names.values())}],
+         'actions': [{'type': 'set-labels', 'remove': ['c7n_remove_a', 'c7n_remove_b']}]},
+        session_factory=factory)
+    assert len(policy.run()) == 3
+
+    client = policy.resource_manager.get_client()
+    labels = {
+        case: client.execute_query(
+            'get', {'project': project_id, 'managedZone': name}).get('labels', {})
+        for case, name in names.items()
+    }
+    assert labels == {
+        'partial': {'c7n_keep': 'yes'},
+        'full': {},
+        'absent': {'c7n_keep': 'yes'},
+    }
