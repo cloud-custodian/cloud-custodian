@@ -2,12 +2,14 @@
 # SPDX-License-Identifier: Apache-2.0
 import datetime
 
-from azure.mgmt.compute.models import HardwareProfile, VirtualMachineUpdate
+import pytest
 from ..azure_common import BaseTest, arm_template, cassette_name
 from c7n_azure.session import Session
 from dateutil import tz as tzutils
+from jsonschema.exceptions import ValidationError
 from unittest.mock import patch
 
+from c7n.exceptions import PolicyValidationError
 from c7n.testing import mock_datetime_now
 from c7n.utils import local_session
 
@@ -221,35 +223,6 @@ class VMTest(BaseTest):
     @arm_template('vm.json')
     @cassette_name('virtual_machine')
     @patch('c7n_azure.resources.vm.InstanceViewFilter.process', return_value=fake_running_vms)
-    def test_resize(self, resize_action_mock):
-        with patch(self._get_vm_client_string() + '.begin_update') as resize_action_mock:
-            p = self.load_policy({
-                'name': 'test-azure-vm',
-                'resource': 'azure.vm',
-                'filters': [
-                    {'type': 'value',
-                     'key': 'name',
-                     'op': 'eq',
-                     'value_type': 'normalize',
-                     'value': 'cctestvm'}],
-                'actions': [
-                    {'type': 'resize',
-                     'vmSize': 'Standard_A2_v2'}
-                ]
-            })
-            p.run()
-
-        expected_hardware_profile = HardwareProfile(vm_size='Standard_A2_v2')
-
-        resize_action_mock.assert_called_with(
-            self.fake_running_vms[0]['resourceGroup'],
-            self.fake_running_vms[0]['name'],
-            VirtualMachineUpdate(hardware_profile=expected_hardware_profile)
-        )
-
-    @arm_template('vm.json')
-    @cassette_name('virtual_machine')
-    @patch('c7n_azure.resources.vm.InstanceViewFilter.process', return_value=fake_running_vms)
     @patch('c7n_azure.actions.delete.DeleteAction.process', return_value='')
     def test_delete(self, delete_action_mock, filter_mock):
 
@@ -392,3 +365,145 @@ class VMTest(BaseTest):
         self.assertEqual(len(resources), 1)
         self.assertEqual(resources[0]['name'], 'cctestvm')
         self.assertEqual(resources[0]['c7n:JitPolicyPorts'][0]['number'], 22)
+
+
+class VMResizeTest(BaseTest):
+    """Live tests for the azure.vm resize action.
+
+    The vm-resize.json fixture provisions dedicated VMs for each test so every
+    test starts from an untouched baseline. Starting sizes are set per VM in
+    the template and mirrored in the ``baselines`` passed to the helpers.
+
+    Recording these tests leaves the VMs resized, and the tests assert the
+    template's starting sizes. After every recording run, reset the VMs before
+    recording again by re-running provision from the repo root:
+
+        bash tools/c7n_azure/tests_azure/templates/provision.sh vm-resize
+
+    This resizes each VM back to its starting size without recreating it.
+    """
+
+    resource_group = 'test_vm-resize'
+
+    def _get_vm(self, vm_name):
+        client = local_session(Session).client('azure.mgmt.compute.ComputeManagementClient')
+        return client.virtual_machines.get(self.resource_group, vm_name)
+
+    def _wait_for_vm_size(self, vm_name, vm_size):
+        for _ in range(40):
+            vm = self._get_vm(vm_name)
+            if (vm.hardware_profile.vm_size == vm_size and
+                    vm.provisioning_state == 'Succeeded'):
+                return vm
+            self.sleep_in_live_mode(15)
+        raise AssertionError('%s never reached size %s' % (vm_name, vm_size))
+
+    def _name_filter(self, sizes):
+        return [{'type': 'value',
+                 'key': 'name',
+                 'op': 'in',
+                 'value': sorted(sizes)}]
+
+    def _discover_vms(self, sizes):
+        """Resolve the VMs and capture their baseline; sizes is {vm_name: starting_size}."""
+        p = self.load_policy({
+            'name': 'test-azure-vm-resize-discover',
+            'resource': 'azure.vm',
+            'filters': self._name_filter(sizes),
+        })
+        resources = p.run()
+        assert sorted(r['name'] for r in resources) == sorted(sizes)
+        assert {r['resourceGroup'].lower() for r in resources} == {self.resource_group}
+
+        baselines = {}
+        for vm_name, vm_size in sizes.items():
+            vm = self._get_vm(vm_name)
+            assert vm.hardware_profile.vm_size == vm_size
+            assert vm.tags == {'testtag': 'testvalue'}
+            baselines[vm_name] = vm
+        return baselines
+
+    def _run_resize(self, sizes, action):
+        p = self.load_policy({
+            'name': 'test-azure-vm-resize',
+            'resource': 'azure.vm',
+            'filters': self._name_filter(sizes),
+            'actions': [action]
+        })
+        resources = p.run()
+        assert {r['name']: r['properties']['hardwareProfile']['vmSize']
+                for r in resources} == sizes
+
+    def _assert_resized(self, baseline, vm_size):
+        vm = self._wait_for_vm_size(baseline.name, vm_size)
+        assert vm.tags == baseline.tags
+        assert vm.os_profile.computer_name == baseline.os_profile.computer_name
+
+    @arm_template('vm-resize.json')
+    def test_resize(self):
+        sizes = {'cctestvmresize-vmsize': 'Standard_B1s'}
+        baselines = self._discover_vms(sizes)
+        self._run_resize(sizes, {'type': 'resize', 'vmSize': 'Standard_B1ms'})
+        self._assert_resized(baselines['cctestvmresize-vmsize'], 'Standard_B1ms')
+
+    @arm_template('vm-resize.json')
+    def test_resize_type_map(self):
+        # One policy over VMs of different sizes: each mapped VM gets its own
+        # target, and a VM whose size is not in the map (no default) is skipped.
+        sizes = {
+            'cctestvmresize-map-b1s': 'Standard_B1s',
+            'cctestvmresize-map-b1ms': 'Standard_B1ms',
+            'cctestvmresize-map-unmapped': 'Standard_B2s',
+        }
+        baselines = self._discover_vms(sizes)
+        self._run_resize(sizes, {
+            'type': 'resize',
+            'type-map': {
+                # matched case-insensitively against the current size
+                'standard_b1s': 'Standard_B1ms',
+                'Standard_B1ms': 'Standard_B1s'}})
+
+        self._assert_resized(baselines['cctestvmresize-map-b1s'], 'Standard_B1ms')
+        self._assert_resized(baselines['cctestvmresize-map-b1ms'], 'Standard_B1s')
+
+        unmapped = self._get_vm('cctestvmresize-map-unmapped')
+        assert unmapped.hardware_profile.vm_size == 'Standard_B2s'
+        assert unmapped.provisioning_state == 'Succeeded'
+
+    @arm_template('vm-resize.json')
+    def test_resize_type_map_default(self):
+        sizes = {'cctestvmresize-default': 'Standard_B1s'}
+        baselines = self._discover_vms(sizes)
+        self._run_resize(sizes, {
+            'type': 'resize',
+            'type-map': {'Standard_B2s': 'Standard_B1s'},
+            'default': 'Standard_B1ms'})
+        self._assert_resized(baselines['cctestvmresize-default'], 'Standard_B1ms')
+
+    def test_resize_schema_validation(self):
+        with self.sign_out_patch():
+            for action in (
+                {'type': 'resize', 'type-map': {'Standard_A1_v2': 'Standard_A2_v2'}},
+                {'type': 'resize', 'default': 'Standard_A2_v2'},
+                {'type': 'resize', 'type-map': {'Standard_A1_v2': 'Standard_A2_v2'},
+                 'default': 'Standard_B2s'},
+            ):
+                assert self.load_policy({
+                    'name': 'test-azure-vm-resize',
+                    'resource': 'azure.vm',
+                    'actions': [action]
+                }, validate=True)
+
+            for action in (
+                {'type': 'resize'},
+                {'type': 'resize', 'vmSize': 'Standard_A2_v2', 'default': 'Standard_B2s'},
+                {'type': 'resize', 'vmSize': 'Standard_A2_v2',
+                 'type-map': {'Standard_A1_v2': 'Standard_A2_v2'}},
+                {'type': 'resize', 'type-map': {'Standard_A1_v2': 2}},
+            ):
+                with pytest.raises((PolicyValidationError, ValidationError)):
+                    self.load_policy({
+                        'name': 'test-azure-vm-resize',
+                        'resource': 'azure.vm',
+                        'actions': [action]
+                    }, validate=True)

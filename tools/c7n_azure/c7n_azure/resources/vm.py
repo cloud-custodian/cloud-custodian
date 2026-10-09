@@ -5,6 +5,7 @@ from c7n_azure.actions.base import AzureBaseAction
 from c7n_azure.provider import resources
 from c7n_azure.resources.arm import ArmResourceManager
 
+from c7n.exceptions import PolicyValidationError
 from c7n.filters.core import ValueFilter, type_schema, ListItemFilter
 from c7n.filters.related import RelatedResourceFilter
 from c7n.utils import local_session
@@ -414,24 +415,85 @@ class VmResizeAction(AzureBaseAction):
             actions:
               - type: resize
                 vmSize: Standard_A2_v2
+
+    :example:
+
+    Resize VMs based on their current size. ``type-map`` keys are matched
+    case-insensitively against the VM's current size. VMs whose size is not
+    in ``type-map`` are resized to ``default`` if given, otherwise skipped.
+
+    .. code-block:: yaml
+
+        policies:
+          - name: resize-vms-by-size
+            resource: azure.vm
+            filters:
+              - "tag:rightsize": "true"
+            actions:
+              - type: resize
+                type-map:
+                  Standard_D4s_v3: Standard_D2s_v3
+                  Standard_D8s_v3: Standard_D4s_v3
+
+    .. warning::
+
+        ``default`` resizes **every** VM matched by the policy's filters whose
+        current size is not a key in ``type-map``, regardless of what that
+        size is. This can downsize production workloads, upsize VMs into a
+        more expensive size, or move VMs to a size that lacks capacity they
+        depend on (vCPUs, memory, data disk count, accelerated networking,
+        premium storage, etc.). Using ``default`` without ``type-map`` resizes
+        every matched VM to one size. Resizing restarts a running VM.
+
+        Only use ``default`` with filters that narrow the policy to VMs you
+        intend to resize, and prefer an explicit ``type-map`` entry for each
+        size you expect. Running the policy with ``--dryrun`` first shows
+        which VMs would be affected.
     """
 
     schema = type_schema(
         'resize',
-        required=['vmSize'],
         **{
-            'vmSize': {'type': 'string'}
+            'vmSize': {'type': 'string'},
+            'type-map': {
+                'type': 'object',
+                'additionalProperties': {'type': 'string'}
+            },
+            'default': {'type': 'string'}
         })
 
-    def __init__(self, data, manager=None):
-        super(VmResizeAction, self).__init__(data, manager)
-        self.vm_size = self.data['vmSize']
+    def validate(self):
+        has_mapping = 'type-map' in self.data or 'default' in self.data
+        if 'vmSize' in self.data and has_mapping:
+            raise PolicyValidationError(
+                "%s: vmSize cannot be combined with type-map or default on %s" % (
+                    self.manager.data['name'], self.type))
+        if 'vmSize' not in self.data and not has_mapping:
+            raise PolicyValidationError(
+                "%s: one of vmSize, type-map, or default is required on %s" % (
+                    self.manager.data['name'], self.type))
+        return self
 
     def _prepare_processing(self):
         self.client = self.manager.get_client()
+        self.type_map = {
+            k.lower(): v for k, v in self.data.get('type-map', {}).items()}
+
+    def _get_target_size(self, current_size):
+        if 'vmSize' in self.data:
+            return self.data['vmSize']
+        return self.type_map.get(
+            (current_size or '').lower(), self.data.get('default'))
 
     def _process_resource(self, resource):
-        hardware_profile = HardwareProfile(vm_size=self.vm_size)
+        current_size = resource.get(
+            'properties', {}).get('hardwareProfile', {}).get('vmSize')
+        target_size = self._get_target_size(current_size)
+        if not target_size or (
+                current_size and target_size.lower() == current_size.lower()):
+            return
+
+        hardware_profile = HardwareProfile(vm_size=target_size)
 
         self.client.virtual_machines.begin_update(
             resource['resourceGroup'],
