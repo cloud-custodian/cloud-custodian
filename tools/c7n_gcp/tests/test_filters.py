@@ -2,7 +2,7 @@
 # SPDX-License-Identifier: Apache-2.0
 from gcp_common import BaseTest
 from c7n_gcp.filters.metrics import GCPMetricsFilter
-from c7n.exceptions import PolicyValidationError
+from c7n.exceptions import PolicyExecutionError, PolicyValidationError
 
 
 class TestGCPMetricsFilter(BaseTest):
@@ -270,6 +270,209 @@ class TestGCPMetricsFilter(BaseTest):
         expected_period = (metrics_filter.end - metrics_filter.start).total_seconds()
         actual_period = float(metrics_filter.period.rstrip("s"))
         self.assertEqual(actual_period, expected_period)
+
+    def _process_resource(self, metric_filter, points):
+        # process([]) sets up self.* attributes (value_type, op, etc.) without
+        # making any API call, since batch_resources([]) short-circuits to [].
+        # See test_batch_resources above for the same pattern.
+        metric_filter.process([])
+        resource = {"name": "test-instance"}
+        resource_name = metric_filter.manager.resource_type.get_metric_resource_name(
+            resource, metric_key=metric_filter.metric_key)
+        metric_filter.resource_metric_dict[resource_name] = {"points": points}
+        return metric_filter.process_resource(resource)
+
+    def test_distribution_value_default_sum(self):
+        # count * mean is the default reduction: a distribution with
+        # count=4, mean=2.5 has a total ("sum") of 10.0. Both values are
+        # exact in binary floating point, so op: equal is safe here.
+        policy = self.load_policy({
+            "name": "test_distribution_value",
+            "resource": "gcp.instance"})
+        metric_filter = GCPMetricsFilter({
+            'type': 'metrics',
+            'name': 'aiplatform.googleapis.com/tuned_model/online_serving/tokens',
+            'metric-key': 'metric.labels.instance_name',
+            'value': 10.0,
+            'op': 'equal'}, manager=policy.resource_manager)
+        points = [{"value": {"distributionValue": {"count": "4", "mean": 2.5}}}]
+        self.assertTrue(self._process_resource(metric_filter, points))
+
+    def test_distribution_value_type_count(self):
+        policy = self.load_policy({
+            "name": "test_distribution_value",
+            "resource": "gcp.instance"})
+        metric_filter = GCPMetricsFilter({
+            'type': 'metrics',
+            'name': 'aiplatform.googleapis.com/tuned_model/online_serving/tokens',
+            'metric-key': 'metric.labels.instance_name',
+            'value-type': 'count',
+            'value': 4,
+            'op': 'equal'}, manager=policy.resource_manager)
+        points = [{"value": {"distributionValue": {"count": "4", "mean": 2.5}}}]
+        self.assertTrue(self._process_resource(metric_filter, points))
+
+    def test_distribution_value_type_mean(self):
+        policy = self.load_policy({
+            "name": "test_distribution_value",
+            "resource": "gcp.instance"})
+        metric_filter = GCPMetricsFilter({
+            'type': 'metrics',
+            'name': 'aiplatform.googleapis.com/tuned_model/online_serving/tokens',
+            'metric-key': 'metric.labels.instance_name',
+            'value-type': 'mean',
+            'value': 2.5,
+            'op': 'equal'}, manager=policy.resource_manager)
+        points = [{"value": {"distributionValue": {"count": "4", "mean": 2.5}}}]
+        self.assertTrue(self._process_resource(metric_filter, points))
+
+    def test_distribution_value_type_mean_multiple_points(self):
+        # The window mean weights each point's mean by its count:
+        # (2 * 3.0 + 1 * 4.0) / 3 = 10 / 3, not 3.0 + 4.0.
+        policy = self.load_policy({
+            "name": "test_distribution_value",
+            "resource": "gcp.instance"})
+        metric_filter = GCPMetricsFilter({
+            'type': 'metrics',
+            'name': 'aiplatform.googleapis.com/tuned_model/online_serving/tokens',
+            'metric-key': 'metric.labels.instance_name',
+            'value-type': 'mean',
+            'value': 10 / 3,
+            'op': 'equal'}, manager=policy.resource_manager)
+        points = [
+            {"value": {"distributionValue": {"count": "2", "mean": 3.0}}},
+            {"value": {"distributionValue": {"count": "1", "mean": 4.0}}},
+        ]
+        self.assertTrue(self._process_resource(metric_filter, points))
+
+    def test_distribution_value_type_mean_no_samples(self):
+        policy = self.load_policy({
+            "name": "test_distribution_value",
+            "resource": "gcp.instance"})
+        metric_filter = GCPMetricsFilter({
+            'type': 'metrics',
+            'name': 'aiplatform.googleapis.com/tuned_model/online_serving/tokens',
+            'metric-key': 'metric.labels.instance_name',
+            'value-type': 'mean',
+            'value': 0,
+            'op': 'equal'}, manager=policy.resource_manager)
+        points = [{"value": {"distributionValue": {}}}]
+        self.assertTrue(self._process_resource(metric_filter, points))
+
+    def _distribution_filter(self, op, value, value_type=None):
+        policy = self.load_policy({
+            "name": "test_distribution_value",
+            "resource": "gcp.instance"})
+        data = {
+            'type': 'metrics',
+            'name': 'aiplatform.googleapis.com/tuned_model/online_serving/tokens',
+            'metric-key': 'metric.labels.instance_name',
+            'value': value,
+            'op': op}
+        if value_type:
+            data['value-type'] = value_type
+        return GCPMetricsFilter(data, manager=policy.resource_manager)
+
+    def test_distribution_value_equal_tolerates_float_error(self):
+        # 3 * 0.1 is 0.30000000000000004 in binary floating point, so an exact
+        # comparison against 0.3 fails.
+        self.assertNotEqual(3 * 0.1, 0.3)
+        metric_filter = self._distribution_filter('equal', 0.3)
+        points = [{"value": {"distributionValue": {"count": "3", "mean": 0.1}}}]
+        self.assertTrue(self._process_resource(metric_filter, points))
+
+    def test_distribution_value_not_equal_tolerates_float_error(self):
+        metric_filter = self._distribution_filter('not-equal', 0.3)
+        points = [{"value": {"distributionValue": {"count": "3", "mean": 0.1}}}]
+        self.assertFalse(self._process_resource(metric_filter, points))
+
+    def test_distribution_value_equal_still_rejects_different_values(self):
+        metric_filter = self._distribution_filter('equal', 0.31)
+        points = [{"value": {"distributionValue": {"count": "3", "mean": 0.1}}}]
+        self.assertFalse(self._process_resource(metric_filter, points))
+
+    def test_distribution_value_equal_zero_after_cancellation(self):
+        # Means of 0.1, 0.2, and -0.3 sum to 2.8e-17 instead of 0.
+        self.assertNotEqual(0.1 + 0.2 - 0.3, 0)
+        metric_filter = self._distribution_filter('equal', 0)
+        points = [
+            {"value": {"distributionValue": {"count": "1", "mean": 0.1}}},
+            {"value": {"distributionValue": {"count": "1", "mean": 0.2}}},
+            {"value": {"distributionValue": {"count": "1", "mean": -0.3}}},
+        ]
+        self.assertTrue(self._process_resource(metric_filter, points))
+
+    def test_scalar_value_sums_multiple_points(self):
+        policy = self.load_policy({
+            "name": "test_distribution_value",
+            "resource": "gcp.instance"})
+        metric_filter = GCPMetricsFilter({
+            'type': 'metrics',
+            'name': 'compute.googleapis.com/instance/cpu/utilization',
+            'metric-key': 'metric.labels.instance_name',
+            'value': 30.0,
+            'op': 'equal'}, manager=policy.resource_manager)
+        points = [
+            {"value": {"int64Value": "10"}},
+            {"value": {"int64Value": "20"}},
+        ]
+        self.assertTrue(self._process_resource(metric_filter, points))
+
+    def test_distribution_value_sums_multiple_points(self):
+        policy = self.load_policy({
+            "name": "test_distribution_value",
+            "resource": "gcp.instance"})
+        metric_filter = GCPMetricsFilter({
+            'type': 'metrics',
+            'name': 'aiplatform.googleapis.com/tuned_model/online_serving/tokens',
+            'metric-key': 'metric.labels.instance_name',
+            'value': 10.0,
+            'op': 'equal'}, manager=policy.resource_manager)
+        points = [
+            {"value": {"distributionValue": {"count": "2", "mean": 3.0}}},
+            {"value": {"distributionValue": {"count": "1", "mean": 4.0}}},
+        ]
+        self.assertTrue(self._process_resource(metric_filter, points))
+
+    def test_distribution_value_omits_count_and_mean(self):
+        # Proto3 JSON drops a field set to its default, so an alignment period
+        # that recorded no samples arrives with neither count nor mean.
+        policy = self.load_policy({
+            "name": "test_distribution_value",
+            "resource": "gcp.instance"})
+        metric_filter = GCPMetricsFilter({
+            'type': 'metrics',
+            'name': 'aiplatform.googleapis.com/tuned_model/online_serving/tokens',
+            'metric-key': 'metric.labels.instance_name',
+            'value': 0.0,
+            'op': 'equal'}, manager=policy.resource_manager)
+        points = [{"value": {"distributionValue": {
+            "bucketOptions": {"exponentialBuckets": {
+                "numFiniteBuckets": 17, "growthFactor": 2, "scale": 1}}}}}]
+        self.assertTrue(self._process_resource(metric_filter, points))
+
+    def test_multiple_timeseries_per_resource_raises(self):
+        # A metric label such as type=input/output splits one resource across
+        # several series, and picking one of them is the policy author's call.
+        policy = self.load_policy({
+            "name": "test_multiple_timeseries",
+            "resource": "gcp.instance"})
+        metric_filter = GCPMetricsFilter({
+            'type': 'metrics',
+            'name': 'aiplatform.googleapis.com/tuned_model/online_serving/tokens',
+            'metric-key': 'metric.labels.instance_name',
+            'value': 10.0,
+            'op': 'equal'}, manager=policy.resource_manager)
+        metric_filter.process([])
+        series = [
+            {"metric": {"labels": {"instance_name": "test-instance", "type": "input"}},
+             "points": [{"value": {"distributionValue": {"count": "5", "mean": 7.0}}}]},
+            {"metric": {"labels": {"instance_name": "test-instance", "type": "output"}},
+             "points": [{"value": {"distributionValue": {"count": "5", "mean": 49.6}}}]},
+        ]
+        with self.assertRaises(PolicyExecutionError) as cm:
+            metric_filter.split_by_resource(series)
+        self.assertIn("multiple timeSeries for test-instance", str(cm.exception))
 
 
 class TestSecurityComandCenterFindingsFilter(BaseTest):

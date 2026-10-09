@@ -3,8 +3,11 @@
 """
 Monitoring Metrics suppport for resources
 """
+import math
+import operator
 from datetime import datetime, timedelta
 
+from c7n.exceptions import PolicyExecutionError
 from c7n.filters.core import Filter, OPERATORS, FilterValidationError
 from c7n.filters.metrics import METRIC_WINDOW_ALIGNMENT
 from c7n.utils import local_session, type_schema, jmespath_search, snap_to_period_start
@@ -107,6 +110,7 @@ class GCPMetricsFilter(Filter):
           'reducer': {'type': 'string', 'enum': REDUCERS},
           'aligner': {'type': 'string', 'enum': ALIGNERS},
           'value': {'type': 'number'},
+          'value-type': {'type': 'string', 'enum': ['count', 'mean', 'sum']},
           'filter': {'type': 'string'},
           'missing-value': {'type': 'number'},
           'required': ('value', 'name', 'op')})
@@ -151,6 +155,7 @@ class GCPMetricsFilter(Filter):
         self.resource_metric_dict = {}
         self.op = OPERATORS[self.data.get('op', 'less-than')]
         self.value = self.data['value']
+        self.value_type = self.data.get('value-type', 'sum')
         self.filter = self.data.get('filter', '')
         self.c7n_metric_key = "%s.%s.%s" % (self.metric, self.aligner, self.reducer)
 
@@ -224,9 +229,43 @@ class GCPMetricsFilter(Filter):
         return batched_filters
 
     def split_by_resource(self, metric_list):
-        for m in metric_list:
-            resource_name = jmespath_search(self.metric_key, m)
-            self.resource_metric_dict[resource_name] = m
+        # metric_key is a path into a series, such as resource.labels.endpoint_id,
+        # so this reads each series' own id for the resource it describes.
+        for series in metric_list:
+            resource_name = jmespath_search(self.metric_key, series)
+            if resource_name in self.resource_metric_dict:
+                raise PolicyExecutionError(
+                    "metric %s returned multiple timeSeries for %s. Collapse them with "
+                    "'group-by-fields' and a 'reducer', or select one with 'filter'" % (
+                        self.metric, resource_name))
+            self.resource_metric_dict[resource_name] = series
+
+    def get_distribution_parts(self, distribution):
+        # count is an int64 field, serialized by the API as a string. Proto3
+        # JSON omits both fields when they hold their default, which the API
+        # does for an alignment period with no samples.
+        return int(distribution.get('count', 0)), float(distribution.get('mean', 0.0))
+
+    def get_point_value(self, value):
+        distribution = value.get('distributionValue')
+        if distribution is None:
+            return float(list(value.values())[0])
+        count, mean = self.get_distribution_parts(distribution)
+        if self.value_type == 'count':
+            return count
+        if self.value_type == 'mean':
+            return mean
+        return count * mean
+
+    def get_metric_value(self, points):
+        values = [p["value"] for p in points]
+        if self.value_type == 'mean' and any('distributionValue' in v for v in values):
+            # Summing per-point means is meaningless. Weight each mean by its count.
+            parts = [self.get_distribution_parts(v.get('distributionValue', {}))
+                     for v in values]
+            count = sum(c for c, _ in parts)
+            return sum(c * m for c, m in parts) / count if count else 0.0
+        return sum(self.get_point_value(v) for v in values)
 
     def process_resource(self, resource):
         resource_metric = resource.setdefault('c7n.metrics', {})
@@ -238,12 +277,24 @@ class GCPMetricsFilter(Filter):
         if metric is None:
             metric_value = self.missing_value
         else:
-            metric_value = float(list(metric["points"][0]["value"].values())[0])
+            metric_value = self.get_metric_value(metric["points"])
 
         resource_metric[self.c7n_metric_key] = metric
 
-        matched = self.op(metric_value, self.value)
-        return matched
+        return self.compare(metric_value, metric)
+
+    def compare(self, metric_value, metric):
+        # count * mean rebuilds a sum from a rounded mean, so it can differ from the
+        # true sum by a few ulps. An exact == or != would then fail on values such as
+        # 3 * 0.1 against 0.3. Counts are integers and stay exact.
+        approximate = (
+            metric is not None and self.value_type != 'count' and
+            any('distributionValue' in p["value"] for p in metric["points"]))
+        if approximate and self.op in (operator.eq, operator.ne):
+            close = math.isclose(
+                metric_value, self.value, rel_tol=1e-12, abs_tol=1e-12)
+            return close if self.op is operator.eq else not close
+        return self.op(metric_value, self.value)
 
     @classmethod
     def register_resources(klass, registry, resource_class):
