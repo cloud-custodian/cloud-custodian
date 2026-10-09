@@ -259,13 +259,12 @@ class TagSecretsManagerResource(Tag):
     permissions = ('secretsmanager:TagResource',)
 
     def process_resource_set(self, client, resources, new_tags):
+        # TagResource upserts, so send only the new tags. Re-sending existing
+        # tags would put unrelated keys in aws:TagKeys (and aws: system keys
+        # are rejected outright).
+        tags = [{'Key': t['Key'], 'Value': t['Value']} for t in new_tags]
         for r in resources:
-            tags = {t['Key']: t['Value'] for t in r.get('Tags', ())
-                    if not t['Key'].startswith('aws:')}
-            for t in new_tags:
-                tags[t['Key']] = t['Value']
-            formatted_tags = [{'Key': k, 'Value': v} for k, v in tags.items()]
-            client.tag_resource(SecretId=r['ARN'], Tags=formatted_tags)
+            client.tag_resource(SecretId=r['ARN'], Tags=tags)
 
 
 @SecretsManager.action_registry.register('remove-tag')
