@@ -1034,6 +1034,19 @@ def test_get_partition(region, expected):
     assert utils.get_partition(region) == expected
 
 
+def test_get_partition_region():
+    import botocore.session
+
+    for partition in botocore.session.get_session().get_available_partitions():
+        region = utils.get_partition_region(partition)
+        assert utils.get_partition(region) == partition
+    # us-east-1 only exists in the commercial partition
+    assert utils.get_partition_region('aws') == 'us-east-1'
+    # a partition botocore doesn't know, or none at all, keeps the default
+    for partition in ('aws-not-a-partition', '', None):
+        assert utils.get_partition_region(partition) == 'us-east-1'
+
+
 @pytest.mark.parametrize("size,expected", [
     (0, '0.00 B'),
     (1023, '1023.00 B'),

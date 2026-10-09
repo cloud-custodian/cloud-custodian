@@ -406,6 +406,24 @@ def get_partition(region):
     return REGION_PARTITION_MAP.get(region, 'aws')
 
 
+def get_partition_region(partition):
+    """A region of `partition` to call when no region is otherwise given.
+
+    For a partition's global endpoints, and to ask which regions it has.
+    us-east-1 exists only in the commercial partition, where every account has
+    it enabled, unlike some opt-in regions. Other partitions take the first
+    region botocore lists for ec2. A partition botocore doesn't know, or none
+    at all, keeps us-east-1.
+    """
+    if partition and partition != 'aws':
+        # botocore is only a dependency of the aws provider, so import it here
+        from botocore.session import get_session
+        regions = get_session().get_available_regions('ec2', partition_name=partition)
+        if regions:
+            return sorted(regions)[0]
+    return 'us-east-1'
+
+
 def generate_arn(
         service, resource, partition='aws',
         region=None, account_id=None, resource_type=None, separator='/'):
