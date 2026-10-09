@@ -1,5 +1,6 @@
 # Copyright The Cloud Custodian Authors.
 # SPDX-License-Identifier: Apache-2.0
+import json
 import logging
 import isodate
 import operator
@@ -523,11 +524,33 @@ class DiagnosticSettingsFilter(ValueFilter):
                 value: True
                 op: in
                 value_type: swap
+
+    :example:
+
+    Find KeyVaults that don't send AuditEvent logs anywhere. A log entry that uses a
+    category group has ``category_group`` set instead of ``category``. On a Key Vault
+    both the ``audit`` and ``allLogs`` groups include AuditEvent, so either one counts.
+    The filter matches a resource when any one of its settings matches, and Azure may
+    list unconfigured groups such as ``audit`` as disabled.
+
+    .. code-block:: yaml
+
+        policies:
+          - name: find-keyvaults-without-audit-logs
+            resource: azure.keyvault
+            filters:
+              - not:
+                - type: diagnostic-settings
+                  key: >-
+                    logs[?(category == 'AuditEvent' || category_group == 'audit'
+                    || category_group == 'allLogs') && enabled]
+                  value: not-null
     """
 
     schema = type_schema('diagnostic-settings', rinherit=ValueFilter.schema)
     schema_alias = True
     log = logging.getLogger('custodian.azure.filters.DiagnosticSettingsFilter')
+    api_version = '2021-05-01-preview'
 
     def process(self, resources, event=None):
         futures = []
@@ -548,12 +571,20 @@ class DiagnosticSettingsFilter(ValueFilter):
             return results
 
     def process_resource_set(self, resources):
-        #: :type: azure.mgmt.monitor.MonitorManagementClient
-        client = self.manager.get_client('azure.mgmt.monitor.MonitorManagementClient')
+        #: :type: azure.mgmt.resource.ResourceManagementClient
+        client = self.manager.get_client('azure.mgmt.resource.ResourceManagementClient')
         matched = []
         for resource in resources:
-            settings = client.diagnostic_settings.list(resource['id'])
-            settings = [s.as_dict() for s in settings.value]
+            # Not the monitor SDK: it lists at 2017-05-01-preview, where Azure leaves out
+            # any setting that uses a category group such as allLogs.
+            response = client.resources.get_by_id(
+                f"{resource['id']}/providers/Microsoft.Insights/diagnosticSettings",
+                self.api_version,
+                # text(), not json(): older azure-mgmt-resource releases return
+                # responses that have no json() method.
+                cls=lambda pipeline_response, deserialized, headers: json.loads(
+                    pipeline_response.http_response.text()))
+            settings = [self._normalize(s) for s in response.get('value') or []]
             # put an empty item in when no diag settings, so the absent operator can function
             if not settings:
                 settings = [{}]
@@ -563,6 +594,25 @@ class DiagnosticSettingsFilter(ValueFilter):
                 matched.append(resource)
 
         return matched
+
+    @classmethod
+    def _normalize(cls, setting):
+        """Shape a raw diagnostic setting the way the monitor SDK's as_dict() did, which
+        existing policies are written against: properties flattened, snake_case keys,
+        nulls dropped. Fields that model didn't know, such as category_group, are kept.
+        """
+        setting = dict(setting)
+        setting.update(setting.pop('properties', None) or {})
+        return cls._snake_case_keys(setting)
+
+    @classmethod
+    def _snake_case_keys(cls, value):
+        if isinstance(value, dict):
+            return {StringUtils.camel_to_snake(k): cls._snake_case_keys(v)
+                    for k, v in value.items() if v is not None}
+        if isinstance(value, list):
+            return [cls._snake_case_keys(v) for v in value]
+        return value
 
 
 class PolicyCompliantFilter(Filter):

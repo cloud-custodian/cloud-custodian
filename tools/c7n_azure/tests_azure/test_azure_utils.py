@@ -190,6 +190,14 @@ class UtilsTest(BaseTest):
         self.assertEqual(StringUtils.snake_to_camel("test_abc"), "testAbc")
         self.assertEqual(StringUtils.snake_to_camel("test_abc_def"), "testAbcDef")
 
+    def test_camel_to_snake(self):
+        self.assertEqual(StringUtils.camel_to_snake(""), "")
+        self.assertEqual(StringUtils.camel_to_snake("test"), "test")
+        self.assertEqual(StringUtils.camel_to_snake("Test"), "test")
+        self.assertEqual(StringUtils.camel_to_snake("testAbc"), "test_abc")
+        self.assertEqual(StringUtils.camel_to_snake("eventHubAuthorizationRuleId"),
+                         "event_hub_authorization_rule_id")
+
     def test_naming_hash(self):
         source = 'Lorem ipsum dolor sit amet'
         source2 = 'amet sit dolor ipsum Lorem'
