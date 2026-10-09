@@ -1,0 +1,43 @@
+{
+    "status_code": 200,
+    "data": {
+        "TrailARN": "arn:aws:cloudtrail:us-east-1:644160558196:trail/c7n-selectors-42695-basic",
+        "AdvancedEventSelectors": [
+            {
+                "Name": "Log all management events",
+                "FieldSelectors": [
+                    {
+                        "Field": "eventCategory",
+                        "Equals": [
+                            "Management"
+                        ]
+                    }
+                ]
+            },
+            {
+                "Name": "Log S3 object writes",
+                "FieldSelectors": [
+                    {
+                        "Field": "eventCategory",
+                        "Equals": [
+                            "Data"
+                        ]
+                    },
+                    {
+                        "Field": "resources.type",
+                        "Equals": [
+                            "AWS::S3::Object"
+                        ]
+                    },
+                    {
+                        "Field": "readOnly",
+                        "Equals": [
+                            "false"
+                        ]
+                    }
+                ]
+            }
+        ],
+        "ResponseMetadata": {}
+    }
+}
