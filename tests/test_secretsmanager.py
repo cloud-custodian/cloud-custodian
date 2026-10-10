@@ -277,6 +277,17 @@ class TestSecretsManager(BaseTest):
         self.assertEqual(resources[1].get('VersionIdsToStages'), None)
         self.assertEqual(resources[1]['c7n:DeniedMethods'], ['describe_secret'])
 
+    def test_secrets_manager_get_resources_by_arn(self):
+        self.patch(SecretsManager, 'executor_factory', MainThreadExecutor)
+        session_factory = self.replay_flight_data("test_secrets_manager_describe")
+        p = self.load_policy({
+            "name": "get-secret-by-arn",
+            "resource": "aws.secrets-manager",
+        }, session_factory=session_factory)
+        arn = "arn:aws:secretsmanager:us-east-1:644160558196:secret:c7n-test-key-XTUSpD"
+        resources = p.resource_manager.get_resources([arn])
+        self.assertEqual([r['Name'] for r in resources], ['c7n-test-key'])
+
     def test_secrets_manager_replica_access_denied(self):
         self.patch(SecretsManager, 'executor_factory', MainThreadExecutor)
         session_factory = self.replay_flight_data('test_secrets_manager_replica_access_denied')
