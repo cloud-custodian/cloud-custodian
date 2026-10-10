@@ -214,7 +214,9 @@ class EC2IamRoleFilter(iam_filters.IamRoleFilter):
         # Extract profile name (last part after last /) from ARN
         # ARN format: arn:aws:iam::123456789012:instance-profile/path/ProfileName
         profile_names = [p.rsplit('/', 1)[-1] for p in profile_arns]
-        profiles = self.manager.get_resource_manager('iam-profile').get_resources(profile_names)
+        # instance profile tags aren't needed here, skip the tagging api lookup
+        profiles = self.manager.get_resource_manager('iam-profile').get_resources(
+            profile_names, augment=False)
 
         role_names = set()
         for arn, profile in zip(profile_arns, profiles):
@@ -255,7 +257,8 @@ class ComputePermissions(CheckPermissions):
                 [p[0] for p in profile_arns],
                 self.manager.get_resource_manager(
                     'iam-profile').get_resources(
-                        [p[0].split('/', 1)[-1] for p in profile_arns]))}
+                        [p[0].split('/', 1)[-1] for p in profile_arns],
+                        augment=False))}
         return [
             profile_role_map.get(r.get('IamInstanceProfile', {}).get('Arn'))
             for r in resources]
@@ -2642,7 +2645,8 @@ class HasSpecificManagedPolicy(SpecificIamProfileManagedPolicy):
 
     def process(self, resources, event=None):
         client = utils.local_session(self.manager.session_factory).client('iam')
-        iam_profiles = self.manager.get_resource_manager('iam-profile').resources()
+        iam_profiles = self.manager.get_resource_manager('iam-profile').resources(
+            augment=False)
         iam_profiles_mapping = {profile['Arn']: profile for profile in iam_profiles}
 
         results = []
