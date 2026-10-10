@@ -2,7 +2,30 @@
     "status_code": 200,
     "data": {
         "PaginationToken": "",
-        "ResourceTagMappingList": [],
+        "ResourceTagMappingList": [
+            {
+                "ResourceARN": "arn:aws:iam::123456789012:instance-profile/app-profile",
+                "Tags": [
+                    {
+                        "Key": "Stale",
+                        "Value": "true"
+                    },
+                    {
+                        "Key": "Environment",
+                        "Value": "dev"
+                    }
+                ]
+            },
+            {
+                "ResourceARN": "arn:aws:iam::123456789012:instance-profile/owned-profile",
+                "Tags": [
+                    {
+                        "Key": "Owner",
+                        "Value": "security"
+                    }
+                ]
+            }
+        ],
         "ResponseMetadata": {}
     }
 }

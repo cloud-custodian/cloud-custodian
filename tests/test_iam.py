@@ -18,6 +18,7 @@ import botocore.session
 from botocore.stub import Stubber
 from c7n.exceptions import PolicyValidationError
 from c7n.executor import MainThreadExecutor
+from c7n import tags as c7n_tags
 from c7n.filters.iamaccess import CrossAccountAccessFilter, PolicyChecker
 from c7n.mu import LambdaManager, LambdaFunction, PythonPackageArchive
 from botocore.exceptions import ClientError
@@ -1534,9 +1535,22 @@ class IamInstanceProfileTags(BaseTest):
         )
         self.assertIn("mark-for-op", p.resource_manager.action_registry)
         self.assertIn("marked-for-op", p.resource_manager.filter_registry)
-        resources = p.run()
-        self.assertEqual(len(resources), 1)
-        self.assertEqual(resources[0]["InstanceProfileName"], "app-profile")
+        # placebo replay does not record request parameters, so spy on the
+        # tagging api calls made by the actions and assert what was sent.
+        with mock.patch.object(
+                c7n_tags, "universal_retry", wraps=c7n_tags.universal_retry) as retry:
+            resources = p.run()
+        self.assertEqual(
+            [r["InstanceProfileName"] for r in resources], ["app-profile"])
+        arn = "arn:aws:iam::123456789012:instance-profile/app-profile"
+        calls = {c.args[0].__name__: c.kwargs for c in retry.call_args_list}
+        self.assertEqual(sorted(calls), ["tag_resources", "untag_resources"])
+        self.assertEqual(
+            calls["tag_resources"],
+            {"ResourceARNList": [arn], "Tags": {"Owner": "platform"}})
+        self.assertEqual(
+            calls["untag_resources"],
+            {"ResourceARNList": [arn], "TagKeys": ["Stale"]})
 
 
 class IamInstanceProfileActions(BaseTest):
