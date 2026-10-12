@@ -6,10 +6,6 @@
             {
                 "Key": "original-tag",
                 "Value": "original-value"
-            },
-            {
-                "Key": "new-tag",
-                "Value": "new-value"
             }
         ]
     }
