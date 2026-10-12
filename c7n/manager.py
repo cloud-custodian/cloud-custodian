@@ -1,6 +1,7 @@
 # Copyright The Cloud Custodian Authors.
 # SPDX-License-Identifier: Apache-2.0
 from collections import deque
+import copy
 import logging
 
 from c7n import cache, deprecated
@@ -99,7 +100,11 @@ class ResourceManager:
             return klass(self.ctx, {'source': self.source_type})
         return klass(self.ctx, data or {})
 
-    def filter_resources(self, resources, event=None):
+    def filter_resources(self, resources, event=None, copy_resources=True):
+        # Filters annotate resource dicts in-place; copy so cached
+        # resource lists are not polluted across policy executions.
+        if copy_resources and resources:
+            resources = copy.deepcopy(resources)
         original = len(resources)
         if event and event.get('debug', False):
             self.log.info(
