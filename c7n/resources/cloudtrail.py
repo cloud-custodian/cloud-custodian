@@ -6,7 +6,8 @@ from c7n.actions import Action, BaseAction
 from c7n.exceptions import PolicyValidationError
 from c7n.filters import ValueFilter, Filter
 from c7n.manager import resources
-from c7n.tags import universal_augment
+from c7n.tags import (
+    universal_augment, UniversalTag, UniversalUntag, UniversalTagDelayedAction)
 from c7n.query import ConfigSource, DescribeSource, QueryResourceManager, TypeInfo
 from c7n.utils import local_session, type_schema
 
@@ -80,6 +81,40 @@ class IsShadow(Filter):
         if t.get('IsMultiRegionTrail') and t['HomeRegion'] != self.manager.config.region:
             return True
         return False
+
+
+class SkipShadowTrail:
+    """Mixin for CloudTrail tag actions, which can't operate on shadow trails.
+
+    The Resource Groups Tagging API rejects a trail ARN whose region differs
+    from the region it is invoked in, so tagging a multi-region or
+    organization trail from any region other than its home region always
+    fails. Filter shadow trails out (as update-trail, set-logging and delete
+    already do) so only the modifiable origin trail is acted on.
+    """
+
+    def process(self, resources):
+        shadow_check = IsShadow({'state': False}, self.manager)
+        shadow_check.embedded = True
+        resources = shadow_check.process(resources)
+        if not resources:
+            return
+        return super().process(resources)
+
+
+@CloudTrail.action_registry.register('tag')
+class CloudTrailTag(SkipShadowTrail, UniversalTag):
+    pass
+
+
+@CloudTrail.action_registry.register('remove-tag')
+class CloudTrailRemoveTag(SkipShadowTrail, UniversalUntag):
+    pass
+
+
+@CloudTrail.action_registry.register('mark-for-op')
+class CloudTrailMarkForOp(SkipShadowTrail, UniversalTagDelayedAction):
+    pass
 
 
 @CloudTrail.filter_registry.register('status')
