@@ -1,0 +1,113 @@
+{
+    "status_code": 200,
+    "data": {
+        "Clusters": [
+            {
+                "ClusterIdentifier": "c7n-test-redshift",
+                "NodeType": "ra3.xlplus",
+                "ClusterStatus": "available",
+                "ClusterAvailabilityStatus": "Available",
+                "MasterUsername": "awsuser",
+                "DBName": "test",
+                "Endpoint": {
+                    "Address": "c7n-test-redshift.cbfpjoynzfab.us-east-1.redshift.amazonaws.com",
+                    "Port": 5439,
+                    "VpcEndpoints": [
+                        {
+                            "VpcEndpointId": "vpce-0965ac0d5c55b9741",
+                            "VpcId": "vpc-013f466175ab8b593",
+                            "NetworkInterfaces": [
+                                {
+                                    "NetworkInterfaceId": "eni-0f2ec15384f700f53",
+                                    "SubnetId": "subnet-0b6e72066ec785fa5",
+                                    "PrivateIpAddress": "10.0.0.72",
+                                    "AvailabilityZone": "us-east-1a"
+                                }
+                            ]
+                        }
+                    ]
+                },
+                "ClusterCreateTime": {
+                    "__class__": "datetime",
+                    "year": 2026,
+                    "month": 6,
+                    "day": 30,
+                    "hour": 0,
+                    "minute": 46,
+                    "second": 9,
+                    "microsecond": 713000
+                },
+                "AutomatedSnapshotRetentionPeriod": 1,
+                "ManualSnapshotRetentionPeriod": -1,
+                "ClusterSecurityGroups": [],
+                "VpcSecurityGroups": [
+                    {
+                        "VpcSecurityGroupId": "sg-01156922ad9c738e6",
+                        "Status": "active"
+                    }
+                ],
+                "ClusterParameterGroups": [
+                    {
+                        "ParameterGroupName": "c7n-test-redshift",
+                        "ParameterApplyStatus": "in-sync"
+                    }
+                ],
+                "ClusterSubnetGroupName": "c7n-test-redshift",
+                "VpcId": "vpc-013f466175ab8b593",
+                "AvailabilityZone": "us-east-1a",
+                "PreferredMaintenanceWindow": "sat:10:00-sat:10:30",
+                "PendingModifiedValues": {},
+                "ClusterVersion": "1.0",
+                "AllowVersionUpgrade": true,
+                "NumberOfNodes": 1,
+                "PubliclyAccessible": false,
+                "Encrypted": true,
+                "ClusterPublicKey": "ssh-rsa AAAAB3NzaC1yc2EAAAADAQABAAABAQDF+uPvvhaW8bBZn7dJOYg+xeZwugJHGPSaX3BNKanddRTuBjqfB5YtV1DPvmPRwIBNlao5aHw0vC+0ztWekuZaI8Ez1dSBZjHRD278wtYeX7nMY1/uARd6brm7tDN35RdPiN9Q/+lsmjhUrPp9Oh4j7osYKTFvpq60phXhCCJeQOwGdsIEKlb5CjCEH+RUaahsui8sKlka7lAsfUZvzN1Zl6bJF0pIAvLG7psjj0WpErd4SFk2tTzYsnmlaaPkdlr0EojHxVficYYArKCnzpGDJDe4kjtO7xU5na64ywnK7yuRTc8VDoZfFqGpHPyZH/5f38Ucf1S/EikDbywmNUdZ Amazon-Redshift\n",
+                "ClusterNodes": [
+                    {
+                        "NodeRole": "SHARED",
+                        "PrivateIPAddress": "10.0.0.121",
+                        "PublicIPAddress": "54.237.232.38"
+                    }
+                ],
+                "ClusterRevisionNumber": "331388",
+                "Tags": [
+                    {
+                        "Key": "Project",
+                        "Value": "c7n-redshift"
+                    },
+                    {
+                        "Key": "Env",
+                        "Value": "test"
+                    }
+                ],
+                "KmsKeyId": "AWS_OWNED_KMS_KEY",
+                "EnhancedVpcRouting": false,
+                "IamRoles": [],
+                "MaintenanceTrackName": "current",
+                "DeferredMaintenanceWindows": [],
+                "NextMaintenanceWindowStartTime": {
+                    "__class__": "datetime",
+                    "year": 2026,
+                    "month": 7,
+                    "day": 4,
+                    "hour": 10,
+                    "minute": 0,
+                    "second": 0,
+                    "microsecond": 0
+                },
+                "AvailabilityZoneRelocationStatus": "disabled",
+                "ClusterNamespaceArn": "arn:aws:redshift:us-east-1:644160558196:namespace:ede75cf5-eb77-4045-9cb0-7ce836256680",
+                "AquaConfiguration": {
+                    "AquaStatus": "disabled",
+                    "AquaConfigurationStatus": "auto"
+                },
+                "MasterPasswordSecretArn": "arn:aws:secretsmanager:us-east-1:644160558196:secret:redshift!c7n-test-redshift-awsuser-5tJOpX",
+                "MultiAZ": "Disabled",
+                "LakehouseRegistrationStatus": "REGISTERED",
+                "CatalogArn": "arn:aws:glue:us-east-1:644160558196:catalog/c7n-test-catalog"
+            }
+        ],
+        "ResponseMetadata": {}
+    }
+}
