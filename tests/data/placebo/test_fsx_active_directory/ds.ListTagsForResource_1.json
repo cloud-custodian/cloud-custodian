@@ -1,0 +1,16 @@
+{
+  "status_code": 200,
+  "data": {
+    "Tags": [
+      {
+        "Key": "Name",
+        "Value": "c7n-fsx-ad-verify"
+      },
+      {
+        "Key": "c7n-purpose",
+        "Value": "fsx-ontap-managed-ad-verification"
+      }
+    ],
+    "ResponseMetadata": {}
+  }
+}
