@@ -19,6 +19,7 @@ from c7n.resources.elb import ELB
 from c7n.testing import mock_datetime_now
 from c7n.utils import annotation
 from .common import instance, event_data, Bag, BaseTest
+from c7n.filters.related import RelatedResourceByIdFilter
 from c7n.filters.core import AnnotationSweeper, ValueRegex, parse_date as core_parse_date
 
 
@@ -1974,3 +1975,34 @@ class AnnotationSweeperTest(unittest.TestCase):
 
 if __name__ == "__main__":
     unittest.main()
+
+
+class TestRelatedResourceByIdFilter(unittest.TestCase):
+    """RelatedResourceByIdFilter overrides process_resource rather than
+    reusing the base implementation, so the match-resource handling shared
+    with RelatedResourceFilter is exercised directly here."""
+
+    def get_filter(self):
+        class ServiceFilter(RelatedResourceByIdFilter):
+            RelatedIdsExpression = "ServiceId"
+            RelatedResource = "c7n.resources.vpc.VPC"
+
+        return ServiceFilter(
+            {"type": "service", "key": "Env", "match-resource": True})
+
+    def test_match_resource_uses_each_resources_own_value(self):
+        f = self.get_filter()
+        prod = {"ServiceId": "svc-1", "Env": "prod"}
+        dev = {"ServiceId": "svc-2", "Env": "dev"}
+        related = {"svc-1": [{"Env": "prod"}], "svc-2": [{"Env": "dev"}]}
+
+        # each resource agrees with its own related resource, so both match
+        # regardless of the order they are processed in.
+        self.assertTrue(f.process_resource(prod, related))
+        self.assertTrue(f.process_resource(dev, related))
+
+    def test_match_resource_reports_mismatch(self):
+        f = self.get_filter()
+        related = {"svc-1": [{"Env": "dev"}]}
+        self.assertFalse(
+            f.process_resource({"ServiceId": "svc-1", "Env": "prod"}, related))

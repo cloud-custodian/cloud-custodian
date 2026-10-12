@@ -52,6 +52,66 @@ class TestElastiCacheCluster(BaseTest):
             ["myec-001", "myec-002", "myec-003"],
         )
 
+    def test_elasticache_network_location(self):
+        # network-location instantiates the subnet filter and calls
+        # get_related() on it directly, without going through its process()
+        # method, which is where the cache subnet groups used to be fetched.
+        session_factory = self.replay_flight_data(
+            "test_elasticache_network_location")
+        p = self.load_policy(
+            {
+                "name": "elasticache-network-location",
+                "resource": "cache-cluster",
+                "filters": [
+                    {
+                        "type": "network-location",
+                        "key": "tag:AppId",
+                        "compare": ["resource", "security-group"],
+                    }
+                ],
+            },
+            session_factory=session_factory,
+        )
+        resources = p.run()
+        # c7n-nl-ec1 is tagged AppId/APP1001 but is attached to a security
+        # group tagged AppId/APP3003. c7n-nl-ec2 agrees with its only group.
+        self.assertEqual(
+            [r["CacheClusterId"] for r in resources], ["c7n-nl-ec1"])
+        self.assertIn(
+            "SecurityGroupMismatch",
+            [e["reason"] for e in resources[0]["c7n:NetworkLocation"]],
+        )
+
+    def test_elasticache_security_group_match_resource(self):
+        # match-resource compares each resource against its own value, not
+        # against the first resource processed.
+        session_factory = self.replay_flight_data(
+            "test_elasticache_security_group_match_resource")
+        p = self.load_policy(
+            {
+                "name": "elasticache-security-group-match-resource",
+                "resource": "cache-cluster",
+                "filters": [
+                    {
+                        "not": [
+                            {
+                                "type": "security-group",
+                                "key": "tag:AppId",
+                                "match-resource": True,
+                                "operator": "and",
+                            }
+                        ]
+                    }
+                ],
+            },
+            session_factory=session_factory,
+        )
+        resources = p.run()
+        # c7n-nl-ec2 is tagged AppId/APP3003 and its only security group is
+        # tagged AppId/APP3003, so it matches and must not be reported.
+        self.assertEqual(
+            [r["CacheClusterId"] for r in resources], ["c7n-nl-ec1"])
+
     def test_elasticache_subnet_filter(self):
         session_factory = self.replay_flight_data(
             "test_elasticache_subnet_group_filter"
