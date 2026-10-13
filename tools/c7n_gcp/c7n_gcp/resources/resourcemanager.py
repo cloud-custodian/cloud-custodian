@@ -45,6 +45,9 @@ class Organization(QueryResourceManager):
                 'get', {'name': "organizations/" + org})
 
 
+Organization.filter_registry.register('missing', Missing)
+
+
 @Organization.action_registry.register('set-iam-policy')
 class OrganizationSetIamPolicy(SetIamPolicy):
     """

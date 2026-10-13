@@ -2,6 +2,7 @@
 # SPDX-License-Identifier: Apache-2.0
 
 from googleapiclient.errors import HttpError
+from pytest_terraform import terraform
 
 from gcp_common import BaseTest, event_data
 
@@ -178,3 +179,81 @@ class LogExclusionTest(BaseTest):
                 f'gcp:logging::{project_id}:exclusion/qwerty',
             ],
         )
+
+
+@terraform("log_org_sink", scope="session", replay=False)
+def test_log_org_sink_query(test, log_org_sink):
+    all_name = log_org_sink["google_logging_organization_sink.all_entries.name"]
+    filtered_name = log_org_sink["google_logging_organization_sink.filtered.name"]
+    factory = test.record_flight_data("log-org-sink-query")
+    policy = test.load_policy(
+        {
+            "name": "log-org-sink-query",
+            "resource": "gcp.log-organization-sink",
+            # The organization always holds _Default and _Required sinks and may hold
+            # others, so match only the fixture's sinks to keep the assertions stable.
+            "filters": [
+                {"type": "value", "key": "name", "op": "in", "value": [all_name, filtered_name]}
+            ],
+        },
+        session_factory=factory,
+    )
+
+    sinks = {r["name"]: r for r in policy.run()}
+
+    assert set(sinks) == {all_name, filtered_name}
+    assert "filter" not in sinks[all_name]
+    assert sinks[all_name]["includeChildren"] is True
+    assert sinks[filtered_name]["filter"] == "severity >= ERROR"
+    org_id = sinks[all_name]["c7n:organization"]["name"].rsplit("/", 1)[-1]
+    assert policy.resource_manager.get_urns([sinks[all_name]]) == [
+        f"gcp:logging:::organization-sink/{org_id}/{all_name}"
+    ]
+
+
+def _org_sink_policy(test, log_org_sink, factory, sink_name=None):
+    org_id = log_org_sink["google_logging_organization_sink.filtered.org_id"]
+    # The caller may see several organizations; evaluate only the fixture's.
+    filters = [{"name": f"organizations/{org_id}"}]
+    if sink_name:
+        filters.append({
+            "type": "missing",
+            "policy": {
+                "resource": "gcp.log-organization-sink",
+                # Scope to one fixture sink so pre-existing organization sinks
+                # cannot satisfy or defeat the missing check.
+                "filters": [
+                    {"name": sink_name},
+                    {"type": "value", "key": "filter", "value": "empty"},
+                ],
+            },
+        })
+    return test.load_policy(
+        {"name": "log-org-sink-missing", "resource": "gcp.organization", "filters": filters},
+        session_factory=factory,
+    ), org_id
+
+
+@terraform("log_org_sink", scope="session", replay=False)
+def test_log_org_sink_missing_unfiltered_exists(test, log_org_sink):
+    sink_name = log_org_sink["google_logging_organization_sink.all_entries.name"]
+    factory = test.record_flight_data("log-org-sink-exists")
+
+    # Without the missing filter the organization is returned, so an empty
+    # result below comes from the unfiltered sink, not an unreadable organization.
+    visible, org_id = _org_sink_policy(test, log_org_sink, factory)
+    assert [r["name"] for r in visible.run()] == [f"organizations/{org_id}"]
+
+    policy, _ = _org_sink_policy(test, log_org_sink, factory, sink_name)
+    assert policy.run() == []
+
+
+@terraform("log_org_sink", scope="session", replay=False)
+def test_log_org_sink_missing_only_filtered(test, log_org_sink):
+    sink_name = log_org_sink["google_logging_organization_sink.filtered.name"]
+    factory = test.record_flight_data("log-org-sink-absent")
+    policy, org_id = _org_sink_policy(test, log_org_sink, factory, sink_name)
+
+    resources = policy.run()
+
+    assert [r["name"] for r in resources] == [f"organizations/{org_id}"]
