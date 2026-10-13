@@ -1152,8 +1152,8 @@ def _lifecycle_rule_matches_managed_fields(existing, new_rule):
         existing.get('Filter') == new_rule.get('Filter') and
         (existing.get('Expiration') or {}).get('Days') ==
         (new_rule.get('Expiration') or {}).get('Days') and
-        (existing.get('NoncurrentVersionExpiration') or {}).get('NoncurrentDays') ==
-        (new_rule.get('NoncurrentVersionExpiration') or {}).get('NoncurrentDays')
+        existing.get('NoncurrentVersionExpiration') ==
+        new_rule.get('NoncurrentVersionExpiration')
     )
 
 
