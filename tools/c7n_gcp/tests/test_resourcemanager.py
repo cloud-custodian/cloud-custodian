@@ -10,13 +10,22 @@ import pytest
 from pytest_terraform import terraform
 
 from c7n_gcp.resources.resourcemanager import (
-    FolderIamPolicyFilter, HierarchyAction, OrganizationIamPolicyFilter
+    DlpDiscoveryConfigsFilter, FolderIamPolicyFilter, HierarchyAction, OrganizationIamPolicyFilter
 )
 
 from gcp_common import BaseTest
 
 
 from c7n.exceptions import ResourceLimitExceeded
+
+ORG_ID = '999999999999'
+FOLDER_ID = '111111111111'
+UPPER_FOLDER_ID = '222222222222'
+OTHER_FOLDER_ID = '333333333333'
+ORG_PARENT = {'type': 'organization', 'id': ORG_ID}
+FOLDER_PARENT = {'type': 'folder', 'id': FOLDER_ID}
+ANCESTRY = [
+    ('project', 'p'), ('folder', FOLDER_ID), ('folder', UPPER_FOLDER_ID), ('organization', ORG_ID)]
 
 
 class LimitsTest(BaseTest):
@@ -899,3 +908,216 @@ def test_project_set_iam_policy_remove_matched(test, project_iam_policy_chained)
     assert sa_email not in bindings.get('roles/owner', [])
 
     assert sa_email in bindings.get('roles/viewer', [])
+
+
+@terraform("project_dlp_discovery_configs")
+def test_project_dlp_discovery_configs(test, project_dlp_discovery_configs):
+    # recording needs the DLP API enabled and a quota project for user credentials
+    discovery_config = project_dlp_discovery_configs.resources[
+        'google_data_loss_prevention_discovery_config']['c7n']
+    factory = test.replay_flight_data('project-dlp-discovery-configs')
+    p = test.load_policy(
+        {
+            'name': 'project-dlp-discovery-configs',
+            'resource': 'gcp.project',
+            'query': [{'filter': f'id:{test.project_id}'}],
+            'filters': [
+                {'type': 'dlp-discovery-configs', 'attrs': [{'status': 'PAUSED'}]},
+            ],
+        },
+        session_factory=factory,
+    )
+
+    resources = p.run()
+
+    assert len(resources) == 1
+    assert resources[0]['projectId'] == test.project_id
+    matches = resources[0]['c7n:ListItemMatches']
+    assert [m['name'] for m in matches] == [discovery_config['id']]
+
+
+@pytest.mark.parametrize('resource_type, resource, component, parent', [
+    pytest.param(
+        'gcp.organization', {'name': f'organizations/{ORG_ID}'},
+        'organizations.locations.discoveryConfigs', f'organizations/{ORG_ID}/locations/-',
+        id='organization'),
+    pytest.param(
+        'gcp.project', {'projectId': 'cloud-custodian'},
+        'projects.locations.discoveryConfigs', 'projects/cloud-custodian/locations/-',
+        id='project'),
+])
+def test_dlp_discovery_configs_filter_get_item_values(
+        test, resource_type, resource, component, parent):
+    session = mock.Mock()
+    client = session.client.return_value
+    client.execute_paged_query.return_value = [
+        {'discoveryConfigs': [{'name': 'c1'}]}, {'discoveryConfigs': [{'name': 'c2'}]}, {}]
+    p = test.load_policy({
+        'name': 'dlp-discovery-configs',
+        'resource': resource_type,
+        'filters': [{'type': 'dlp-discovery-configs'}],
+    })
+    dlp_filter = p.resource_manager.filters[0]
+
+    with mock.patch('c7n_gcp.resources.resourcemanager.local_session', return_value=session):
+        configs = dlp_filter.get_item_values(resource)
+
+    assert configs == [{'name': 'c1'}, {'name': 'c2'}]
+    session.client.assert_called_once_with('dlp', 'v2', component)
+    client.execute_paged_query.assert_called_once_with('list', {'parent': parent})
+
+
+def test_dlp_discovery_configs_filter_requires_parent():
+    with pytest.raises(NotImplementedError, match="subclass responsibility"):
+        DlpDiscoveryConfigsFilter(data={}, manager=mock.Mock()).get_parent({})
+
+
+def dlp_config(name, status='RUNNING', folder=None, org=None, targets=('bigQueryTarget',)):
+    config = {'name': name, 'status': status, 'targets': [{t: {}} for t in targets]}
+    if folder:
+        config['orgConfig'] = {'location': {'folderId': folder}}
+    elif org:
+        config['orgConfig'] = {'location': {'organizationId': org}}
+    return config
+
+
+def dlp_session(own=(), org_configs=()):
+    dlp_projects, dlp_orgs, crm = mock.Mock(), mock.Mock(), mock.Mock()
+    dlp_projects.execute_paged_query.return_value = [{'discoveryConfigs': list(own)}]
+    dlp_orgs.execute_paged_query.return_value = [{'discoveryConfigs': list(org_configs)}]
+    crm.execute_command.return_value = {
+        'ancestor': [{'resourceId': {'type': t, 'id': i}} for t, i in ANCESTRY]}
+    clients = {
+        ('dlp', 'v2', 'projects.locations.discoveryConfigs'): dlp_projects,
+        ('dlp', 'v2', 'organizations.locations.discoveryConfigs'): dlp_orgs,
+        ('cloudresourcemanager', 'v1', 'projects'): crm,
+    }
+    session = mock.Mock()
+    session.client.side_effect = lambda *args: clients[args]
+    return session, dlp_orgs, crm
+
+
+def run_dlp_inherited(test, session, projects, **data):
+    p = test.load_policy({
+        'name': 'dlp-inherited',
+        'resource': 'gcp.project',
+        'filters': [dict({'type': 'dlp-discovery-configs', 'inherited': True}, **data)],
+    })
+    with mock.patch('c7n_gcp.resources.resourcemanager.local_session', return_value=session):
+        return p.resource_manager.filters[0].process(projects)
+
+
+@pytest.mark.parametrize('parent, own, org_configs, expected', [
+    pytest.param(ORG_PARENT, [dlp_config('own')], [], ['own'], id='own'),
+    pytest.param(
+        FOLDER_PARENT, [dlp_config('own')], [dlp_config('folder', folder=FOLDER_ID)],
+        ['own', 'folder'], id='own-does-not-block'),
+    pytest.param(
+        FOLDER_PARENT, [], [dlp_config('folder', folder=FOLDER_ID)], ['folder'],
+        id='parent-folder'),
+    pytest.param(
+        FOLDER_PARENT, [], [dlp_config('upper', folder=UPPER_FOLDER_ID)], ['upper'],
+        id='nested-folder'),
+    pytest.param(FOLDER_PARENT, [], [dlp_config('org', org=ORG_ID)], ['org'], id='org'),
+    pytest.param(FOLDER_PARENT, [], [], [], id='none'),
+    pytest.param(
+        FOLDER_PARENT, [], [dlp_config('paused', 'PAUSED', folder=FOLDER_ID)], [],
+        id='paused'),
+    pytest.param(
+        FOLDER_PARENT, [], [dlp_config('unset', 'STATUS_UNSPECIFIED', folder=FOLDER_ID)], [],
+        id='unspecified-status'),
+    pytest.param(
+        FOLDER_PARENT, [], [dlp_config('sibling', folder=OTHER_FOLDER_ID)], [],
+        id='sibling-folder'),
+    pytest.param(
+        FOLDER_PARENT, [],
+        [dlp_config('org', org=ORG_ID), dlp_config('folder', folder=FOLDER_ID)],
+        ['folder'], id='closest-wins'),
+    pytest.param(
+        FOLDER_PARENT, [],
+        [dlp_config('upper', folder=UPPER_FOLDER_ID), dlp_config('folder', folder=FOLDER_ID)],
+        ['folder'], id='nearest-folder-wins'),
+    pytest.param(
+        FOLDER_PARENT, [],
+        [dlp_config('org', org=ORG_ID), dlp_config('paused', 'PAUSED', folder=FOLDER_ID)],
+        ['org'], id='paused-does-not-block'),
+    pytest.param(
+        FOLDER_PARENT, [],
+        [dlp_config('org', org=ORG_ID),
+         dlp_config('secrets', folder=FOLDER_ID, targets=('secretsTarget',))],
+        ['secrets', 'org'], id='other-type-does-not-block'),
+    pytest.param(
+        FOLDER_PARENT, [], [dlp_config('s3', org=ORG_ID, targets=('otherCloudTarget',))], [],
+        id='other-cloud-not-inherited'),
+    pytest.param(
+        None, [dlp_config('own')], [dlp_config('org', org=ORG_ID)], ['own'],
+        id='no-organization'),
+])
+def test_dlp_discovery_configs_inherited(test, parent, own, org_configs, expected):
+    session, _, _ = dlp_session(own, org_configs)
+    project = {'projectId': 'p', 'parent': parent} if parent else {'projectId': 'p'}
+
+    matched = run_dlp_inherited(test, session, [project])
+
+    assert [c['name'] for r in matched for c in r['c7n:ListItemMatches']] == expected
+
+
+def test_dlp_discovery_configs_inherited_keeps_unclaimed_targets(test):
+    org = dlp_config('org', org=ORG_ID, targets=('bigQueryTarget', 'cloudSqlTarget'))
+    session, _, _ = dlp_session(org_configs=[org, dlp_config('folder', folder=FOLDER_ID)])
+
+    matched = run_dlp_inherited(test, session, [{'projectId': 'p', 'parent': FOLDER_PARENT}])
+
+    assert [(c['name'], c['targets']) for c in matched[0]['c7n:ListItemMatches']] == [
+        ('folder', [{'bigQueryTarget': {}}]), ('org', [{'cloudSqlTarget': {}}])]
+
+
+def test_dlp_discovery_configs_inherited_calls_and_copies(test):
+    session, dlp_orgs, crm = dlp_session(org_configs=[dlp_config('org', org=ORG_ID)])
+    projects = [
+        {'projectId': 'a', 'parent': ORG_PARENT},
+        {'projectId': 'b', 'parent': FOLDER_PARENT},
+        {'projectId': 'c', 'parent': FOLDER_PARENT},
+        {'projectId': 'd'},
+    ]
+
+    matched = run_dlp_inherited(test, session, projects, attrs=[{'status': 'RUNNING'}])
+
+    assert [r['projectId'] for r in matched] == ['a', 'b', 'c']
+    matches = [r['c7n:ListItemMatches'][0] for r in matched]
+    assert len({id(m) for m in matches}) == 3
+    assert all(m['c7n:MatchedFilters'] == ['status'] for m in matches)
+    dlp_orgs.execute_paged_query.assert_called_once_with(
+        'list', {'parent': f'organizations/{ORG_ID}/locations/-'})
+    crm.execute_command.assert_called_once_with('getAncestry', {'projectId': 'b'})
+
+
+def test_dlp_discovery_configs_inherited_ancestry_per_folder(test):
+    session, _, crm = dlp_session(org_configs=[dlp_config('other', folder=OTHER_FOLDER_ID)])
+    folder_of = {'a': FOLDER_ID, 'b': OTHER_FOLDER_ID}
+    crm.execute_command.side_effect = lambda verb, params: {'ancestor': [
+        {'resourceId': {'type': 'project', 'id': params['projectId']}},
+        {'resourceId': {'type': 'folder', 'id': folder_of[params['projectId']]}},
+        {'resourceId': {'type': 'organization', 'id': ORG_ID}}]}
+    projects = [
+        {'projectId': 'a', 'parent': FOLDER_PARENT},
+        {'projectId': 'b', 'parent': {'type': 'folder', 'id': OTHER_FOLDER_ID}},
+    ]
+
+    matched = run_dlp_inherited(test, session, projects)
+
+    assert [r['projectId'] for r in matched] == ['b']
+    assert crm.execute_command.call_count == 2
+
+
+def test_dlp_discovery_configs_inherited_permissions(test):
+    def permissions(**data):
+        p = test.load_policy({
+            'name': 'dlp-permissions',
+            'resource': 'gcp.project',
+            'filters': [dict({'type': 'dlp-discovery-configs'}, **data)],
+        })
+        return p.resource_manager.filters[0].get_permissions()
+
+    assert permissions() == ('dlp.jobTriggers.list',)
+    assert permissions(inherited=True) == ('dlp.jobTriggers.list', 'resourcemanager.projects.get')

@@ -16,7 +16,7 @@ dependencies = [
     "urllib3>2",
 ]
 name = "c7n"
-version = "0.9.52"
+version = "0.9.53"
 description = "Cloud Custodian - Policy Rules Engine"
 readme = "README.md"
 classifiers = [
@@ -64,6 +64,9 @@ addons = [
     "jsonpatch<2.0,>=1.25",
     "psutil>=5.7",
 ]
+
+[tool.uv]
+exclude-newer = "5 days"
 
 [tool.uv.sources]
 c7n = { workspace = true }

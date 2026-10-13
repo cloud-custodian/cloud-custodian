@@ -1,6 +1,7 @@
 # Copyright The Cloud Custodian Authors.
 # SPDX-License-Identifier: Apache-2.0
 import csv
+import hashlib
 import io
 import json
 import os.path
@@ -37,8 +38,28 @@ class URIResolver:
         """
         cls._uri_providers[scheme] = handler
 
+    def get_cache_key(self, uri, headers):
+        """Build the cache key for a uri fetch.
+
+        Headers can carry per-caller authorization, so a response fetched
+        with one set of credentials must not be served to a caller
+        presenting different ones. Headers are hashed rather than embedded
+        to keep credentials out of the on-disk cache. Without headers the
+        key keeps its original form, so existing caches stay valid.
+        """
+        if not headers:
+            return ("uri-resolver", uri)
+        # header names are case insensitive, canonicalize before hashing
+        canonical = json.dumps(
+            sorted((k.lower(), v) for k, v in headers.items()),
+            separators=(',', ':'),
+        )
+        digest = hashlib.sha256(canonical.encode('utf8')).hexdigest()
+        return ("uri-resolver", uri, digest)
+
     def resolve(self, uri, headers):
-        contents = self.cache.get(("uri-resolver", uri))
+        cache_key = self.get_cache_key(uri, headers)
+        contents = self.cache.get(cache_key)
         if contents is not None:
             return contents
 
@@ -58,8 +79,8 @@ class URIResolver:
             contents = self.get_s3_uri(uri)
         elif scheme in ('http', 'https', 'file'):
             # Standard URL schemes handled by urllib
-            headers.update({"Accept-Encoding": "gzip"})
-            req = Request(uri, headers=headers)
+            # copy rather than mutate, the caller's dict keys the cache
+            req = Request(uri, headers={**headers, "Accept-Encoding": "gzip"})
             with closing(urlopen(req)) as response:  # nosec nosemgrep
                 contents = self.handle_response_encoding(response)
         elif scheme in self._uri_providers:
@@ -74,7 +95,7 @@ class URIResolver:
                 f"Registered provider schemes: {provider_schemes}"
             )
 
-        self.cache.save(("uri-resolver", uri), contents)
+        self.cache.save(cache_key, contents)
         return contents
 
     def handle_response_encoding(self, response):

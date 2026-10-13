@@ -1,0 +1,123 @@
+{
+  "headers": {
+    "content-type": "application/json; charset=UTF-8",
+    "vary": "Origin, X-Origin, Referer",
+    "date": "Fri, 25 Sep 2026 19:08:56 GMT",
+    "server": "ESF",
+    "x-xss-protection": "0",
+    "x-frame-options": "SAMEORIGIN",
+    "x-content-type-options": "nosniff",
+    "alt-svc": "h3=\":443\"; ma=2592000,h3-29=\":443\"; ma=2592000",
+    "transfer-encoding": "chunked",
+    "status": "200",
+    "content-length": "4373",
+    "-content-encoding": "gzip",
+    "content-location": "https://cloudkms.googleapis.com/v1/projects/cloud-custodian/locations/us-central1/keyRings/c7n-kr-drea-5734/cryptoKeys?alt=json"
+  },
+  "body": {
+    "cryptoKeys": [
+      {
+        "name": "projects/cloud-custodian/locations/us-central1/keyRings/c7n-kr-drea-5734/cryptoKeys/c7n-key-bad-365d-drea-5734",
+        "primary": {
+          "name": "projects/cloud-custodian/locations/us-central1/keyRings/c7n-kr-drea-5734/cryptoKeys/c7n-key-bad-365d-drea-5734/cryptoKeyVersions/1",
+          "state": "DESTROY_SCHEDULED",
+          "createTime": "2026-09-15T18:53:21.192000741Z",
+          "destroyTime": "2026-10-15T18:56:07.619116Z",
+          "protectionLevel": "SOFTWARE",
+          "algorithm": "GOOGLE_SYMMETRIC_ENCRYPTION",
+          "generateTime": "2026-09-15T18:53:21.192000741Z"
+        },
+        "purpose": "ENCRYPT_DECRYPT",
+        "createTime": "2026-09-15T18:53:21.192000741Z",
+        "labels": {
+          "goog-terraform-provisioned": "true"
+        },
+        "versionTemplate": {
+          "protectionLevel": "SOFTWARE",
+          "algorithm": "GOOGLE_SYMMETRIC_ENCRYPTION"
+        },
+        "destroyScheduledDuration": "2592000s"
+      },
+      {
+        "name": "projects/cloud-custodian/locations/us-central1/keyRings/c7n-kr-drea-5734/cryptoKeys/c7n-key-bad-asym-drea-5734",
+        "purpose": "ASYMMETRIC_SIGN",
+        "createTime": "2026-09-15T18:53:21.331948677Z",
+        "labels": {
+          "goog-terraform-provisioned": "true"
+        },
+        "versionTemplate": {
+          "protectionLevel": "SOFTWARE",
+          "algorithm": "RSA_SIGN_PKCS1_2048_SHA256"
+        },
+        "destroyScheduledDuration": "2592000s"
+      },
+      {
+        "name": "projects/cloud-custodian/locations/us-central1/keyRings/c7n-kr-drea-5734/cryptoKeys/c7n-key-bad-norot-drea-5734",
+        "primary": {
+          "name": "projects/cloud-custodian/locations/us-central1/keyRings/c7n-kr-drea-5734/cryptoKeys/c7n-key-bad-norot-drea-5734/cryptoKeyVersions/1",
+          "state": "DESTROY_SCHEDULED",
+          "createTime": "2026-09-15T18:53:21.341384980Z",
+          "destroyTime": "2026-10-15T18:56:07.654552Z",
+          "protectionLevel": "SOFTWARE",
+          "algorithm": "GOOGLE_SYMMETRIC_ENCRYPTION",
+          "generateTime": "2026-09-15T18:53:21.341384980Z"
+        },
+        "purpose": "ENCRYPT_DECRYPT",
+        "createTime": "2026-09-15T18:53:21.341384980Z",
+        "labels": {
+          "goog-terraform-provisioned": "true"
+        },
+        "versionTemplate": {
+          "protectionLevel": "SOFTWARE",
+          "algorithm": "GOOGLE_SYMMETRIC_ENCRYPTION"
+        },
+        "destroyScheduledDuration": "2592000s"
+      },
+      {
+        "name": "projects/cloud-custodian/locations/us-central1/keyRings/c7n-kr-drea-5734/cryptoKeys/c7n-key-good-30d-drea-5734",
+        "primary": {
+          "name": "projects/cloud-custodian/locations/us-central1/keyRings/c7n-kr-drea-5734/cryptoKeys/c7n-key-good-30d-drea-5734/cryptoKeyVersions/1",
+          "state": "DESTROY_SCHEDULED",
+          "createTime": "2026-09-15T18:53:21.336337913Z",
+          "destroyTime": "2026-10-15T18:56:07.820874Z",
+          "protectionLevel": "SOFTWARE",
+          "algorithm": "GOOGLE_SYMMETRIC_ENCRYPTION",
+          "generateTime": "2026-09-15T18:53:21.336337913Z"
+        },
+        "purpose": "ENCRYPT_DECRYPT",
+        "createTime": "2026-09-15T18:53:21.336337913Z",
+        "labels": {
+          "goog-terraform-provisioned": "true"
+        },
+        "versionTemplate": {
+          "protectionLevel": "SOFTWARE",
+          "algorithm": "GOOGLE_SYMMETRIC_ENCRYPTION"
+        },
+        "destroyScheduledDuration": "2592000s"
+      },
+      {
+        "name": "projects/cloud-custodian/locations/us-central1/keyRings/c7n-kr-drea-5734/cryptoKeys/c7n-key-good-90d-drea-5734",
+        "primary": {
+          "name": "projects/cloud-custodian/locations/us-central1/keyRings/c7n-kr-drea-5734/cryptoKeys/c7n-key-good-90d-drea-5734/cryptoKeyVersions/1",
+          "state": "DESTROY_SCHEDULED",
+          "createTime": "2026-09-15T18:53:21.327953380Z",
+          "destroyTime": "2026-10-15T18:56:07.751797Z",
+          "protectionLevel": "SOFTWARE",
+          "algorithm": "GOOGLE_SYMMETRIC_ENCRYPTION",
+          "generateTime": "2026-09-15T18:53:21.327953380Z"
+        },
+        "purpose": "ENCRYPT_DECRYPT",
+        "createTime": "2026-09-15T18:53:21.327953380Z",
+        "labels": {
+          "goog-terraform-provisioned": "true"
+        },
+        "versionTemplate": {
+          "protectionLevel": "SOFTWARE",
+          "algorithm": "GOOGLE_SYMMETRIC_ENCRYPTION"
+        },
+        "destroyScheduledDuration": "2592000s"
+      }
+    ],
+    "totalSize": 5
+  }
+}

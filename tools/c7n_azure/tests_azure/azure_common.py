@@ -159,8 +159,10 @@ class AzureVCRBaseTest(VCRTestCase):
 
     def setUp(self):
         super(AzureVCRBaseTest, self).setUp()
-        # is_playback() is only meaningful here: by cleanup time a recording
-        # run has written the cassette, making it indistinguishable from one.
+
+        # When playing back, if we're in strict mode, make sure
+        # We played the whole cassette.  Otherwise, the default,
+        # we may only play a subset.
         if self.is_playback() and getattr(
                 getattr(self, self._testMethodName), 'strict_cassette', False):
             # Registered after the cassette's own cleanup, so it runs first,
@@ -255,6 +257,17 @@ class AzureVCRBaseTest(VCRTestCase):
         response['headers'] = {k.lower(): v for (k, v) in
                                response['headers'].items()
                                if k.lower() not in self.FILTERED_HEADERS}
+
+        # Headers such as location and azure-asyncoperation carry the
+        # subscription id, and are not covered by the body scrubbing below.
+        response['headers'] = {
+            k: [self._replace_subscription_id(self._replace_tenant_id(value))
+                for value in v]
+            for (k, v) in response['headers'].items()
+            }
+
+        if not response['body'].get('string'):
+            return response
 
         content_type = response['headers'].get('content-type', (None,))[0]
         if not content_type or 'application/json' not in content_type:
