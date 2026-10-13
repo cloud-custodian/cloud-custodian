@@ -1,0 +1,34 @@
+{
+  "headers": {
+    "content-type": "application/json; charset=UTF-8",
+    "vary": "Origin, X-Origin, Referer",
+    "date": "Wed, 01 Apr 2026 18:41:46 GMT",
+    "server": "ESF",
+    "x-xss-protection": "0",
+    "x-frame-options": "SAMEORIGIN",
+    "server-timing": "gfet4t7; dur=45",
+    "alt-svc": "h3=\":443\"; ma=2592000,h3-29=\":443\"; ma=2592000",
+    "transfer-encoding": "chunked",
+    "status": "200",
+    "content-length": "444",
+    "-content-encoding": "gzip",
+    "content-location": "https://spanner.googleapis.com/v1/projects/cloud-custodian/instances/sbsi/databases?alt=json"
+  },
+  "body": {
+    "databases": [
+      {
+        "name": "projects/cloud-custodian/instances/sbsi/databases/sbsd",
+        "state": "READY",
+        "createTime": "2026-04-01T18:41:43.851853Z",
+        "versionRetentionPeriod": "1h",
+        "earliestVersionTime": "2026-04-01T18:41:43.851853Z",
+        "encryptionInfo": [
+          {
+            "encryptionType": "GOOGLE_DEFAULT_ENCRYPTION"
+          }
+        ],
+        "databaseDialect": "GOOGLE_STANDARD_SQL"
+      }
+    ]
+  }
+}

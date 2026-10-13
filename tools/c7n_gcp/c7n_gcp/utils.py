@@ -14,3 +14,30 @@ def get_firewall_port_ranges(firewall_resources):
                 r[action][protocol_index] = protocol
         firewall_resources[r_index] = r
     return firewall_resources
+
+
+def parse_protobuf_duration_to_seconds(duration):
+    """Convert a protobuf Duration string (for example ``2592000s``) to int seconds."""
+    expected_format = "Expected format <seconds>s (e.g. 2592000s)."
+
+    if duration is None:
+        return None
+
+    if not isinstance(duration, str):
+        raise ValueError(
+            f"Expected protobuf duration as string. {expected_format} "
+            f"got {type(duration).__name__}"
+        )
+
+    duration_value = duration.strip()
+    if not duration_value.endswith('s'):
+        raise ValueError(
+            f"Invalid protobuf duration format: {duration}. {expected_format}"
+        )
+
+    try:
+        return int(duration_value[:-1])
+    except (TypeError, ValueError):
+        raise ValueError(
+            f"Invalid protobuf duration format: {duration}. {expected_format}"
+        )
