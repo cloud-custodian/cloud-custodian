@@ -285,7 +285,7 @@ def test_instance_set_can_ip_forward(test, gcp_instance_set_can_ip_forward):
     instance_name = gcp_instance_set_can_ip_forward['google_compute_instance.default.name']
     policy = test.load_policy(
         {
-            'name': 'gcp-instance-set-can-ip-forward',
+            'name': 'gcp-instance-set-ip-forwarding',
             'resource': 'gcp.instance',
             'filters': [
                 {'name': instance_name},
@@ -298,7 +298,7 @@ def test_instance_set_can_ip_forward(test, gcp_instance_set_can_ip_forward):
             ],
             'actions': [
                 {
-                    'type': 'set-can-ip-forward',
+                    'type': 'set-ip-forwarding',
                     'enabled': True,
                 }
             ],

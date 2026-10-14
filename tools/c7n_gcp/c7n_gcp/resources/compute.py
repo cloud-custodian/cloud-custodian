@@ -299,8 +299,8 @@ class CreateMachineImage(MethodAction):
         return session.client(model.service, "beta", "machineImages")
 
 
-@Instance.action_registry.register('set-can-ip-forward')
-class InstanceSetCanIpForward(InstanceAction):
+@Instance.action_registry.register('set-ip-forwarding')
+class InstanceSetIpForwarding(InstanceAction):
     """Enable or disable IP forwarding on a Compute Engine instance.
 
     The ``enabled`` parameter is required and must be a boolean.
@@ -320,7 +320,7 @@ class InstanceSetCanIpForward(InstanceAction):
                 op: eq
                 value: false
             actions:
-              - type: set-can-ip-forward
+              - type: set-ip-forwarding
                 enabled: true
 
     Disable IP forwarding on instances that should not have it:
@@ -336,12 +336,12 @@ class InstanceSetCanIpForward(InstanceAction):
                 op: eq
                 value: true
             actions:
-              - type: set-can-ip-forward
+              - type: set-ip-forwarding
                 enabled: false
 
     """
     schema = type_schema(
-        'set-can-ip-forward',
+        'set-ip-forwarding',
         required=['enabled'],
         enabled={'type': 'boolean'})
     method_spec = {'op': 'update'}
