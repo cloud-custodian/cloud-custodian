@@ -449,7 +449,8 @@ _COMPLEMENT_OPERATORS = {'=': '!=', '!=': '=', '>': '<=', '>=': '<', '<': '>=', 
 def _cloud_logging_field_satisfiable(field, constraints):
     # Built-in LogEntry field names ignore letter case.
     severity = field.lower() == 'severity'
-    present = any(
+    # Every entry has a severity: LogEntry.severity defaults to DEFAULT.
+    present = severity or any(
         not negated and op in _PRESENCE_OPERATORS for negated, op, _ in constraints
     )
     understood = True

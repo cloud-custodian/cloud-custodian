@@ -285,6 +285,8 @@ def _compare(left, right):
         # Severity names only order the severity field.
         ('labels.level="error"', 'labels.level!="500"'),
         ('severity!=ERROR', 'severity>=WARNING'),
+        # Severity is always present, so a negated range is its complement.
+        ('NOT severity<ERROR', 'severity>=WARNING'),
     ],
 )
 def test_compare_cloud_logging_filters_proven_overlap(left, right):
@@ -354,6 +356,8 @@ def test_compare_cloud_logging_filters_possible_overlap(left, right):
         'resource.type="a" AND resource.type="b"',
         'textPayload:"x" AND NOT textPayload:"x"',
         'NOT true',
+        # Every entry has a severity of at least DEFAULT.
+        'NOT severity>=DEFAULT',
     ],
 )
 def test_compare_cloud_logging_filters_unsatisfiable_filter_overlaps_nothing(contradiction):
