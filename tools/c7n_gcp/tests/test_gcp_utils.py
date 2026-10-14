@@ -300,7 +300,7 @@ def test_cloud_logging_filters_overlap_non_coercible_ordered_values_fall_back_to
     assert cloud_logging_filters_overlap(left, right)
 
 
-def test_cloud_logging_filters_overlap_complex_logic_default_is_conservative():
+def test_cloud_logging_filters_overlap_literal_and_its_negation_are_disjoint():
     left = canonicalize_cloud_logging_filter('NOT resource.type="gce_instance"')
     right = canonicalize_cloud_logging_filter('resource.type="gce_instance"')
     assert not cloud_logging_filters_overlap(left, right)
@@ -330,13 +330,62 @@ def test_cloud_logging_filters_overlap_disjoint_on_exclusive_touching_bounds():
     assert not cloud_logging_filters_overlap(left, right)
 
 
-def test_cloud_logging_filters_overlap_exclusion_not_clause_is_treated_as_complex():
-    # A filter that combines a positive condition with a NOT exclusion is
-    # treated as complex logic.  The default conservative behaviour is to
-    # report no overlap so that sinks with exclusion clauses are never
-    # incorrectly grouped with other sinks.
+def test_cloud_logging_filters_overlap_subset_with_not_clause_overlaps():
     left = canonicalize_cloud_logging_filter(
         'severity>=ERROR AND NOT resource.type="gce_instance"'
     )
     right = canonicalize_cloud_logging_filter('severity>=ERROR')
-    assert not cloud_logging_filters_overlap(left, right)
+    assert cloud_logging_filters_overlap(left, right)
+
+
+@pytest.mark.parametrize(
+    "left,right,expected",
+    [
+        # OR is evaluated per alternative, including RHS value lists.
+        ('resource.type=("gce_instance" OR "k8s_container")',
+         'resource.type="gce_instance"', True),
+        ('resource.type=("gce_instance" OR "k8s_container")',
+         'resource.type="cloud_run_revision"', False),
+        # Shape of the GCP-managed _Required and _Default sinks.
+        ('LOG_ID("a") OR LOG_ID("b")', 'NOT LOG_ID("a") AND NOT LOG_ID("b")', False),
+        ('NOT LOG_ID("a") AND NOT LOG_ID("b")', 'severity>=ERROR', True),
+        # A negated range is complemented once the field must be present.
+        ('NOT severity>=ERROR', 'severity>=CRITICAL', False),
+        ('NOT httpRequest.status>=500', 'resource.type="gce_instance"', True),
+        ('NOT sample!=1 AND sample>0', 'sample=2', False),
+        # De Morgan: NOT (a OR b) needs both a and b to be false.
+        ('NOT (resource.type="a" OR resource.type="b")', 'resource.type="b"', False),
+        ('NOT (resource.type="a" AND severity>=ERROR)', 'resource.type="a"', True),
+    ],
+)
+def test_cloud_logging_filters_overlap_boolean_logic(left, right, expected):
+    assert cloud_logging_filters_overlap(
+        canonicalize_cloud_logging_filter(left),
+        canonicalize_cloud_logging_filter(right),
+    ) is expected
+
+
+@pytest.mark.parametrize(
+    "contradiction",
+    [
+        'severity>=ERROR AND severity<=WARNING',
+        'severity>ERROR AND severity<ERROR',
+        'resource.type="a" AND resource.type="b"',
+        'NOT true',
+    ],
+)
+def test_cloud_logging_filters_overlap_unsatisfiable_filter_overlaps_nothing(contradiction):
+    canonical = canonicalize_cloud_logging_filter(contradiction)
+    assert not cloud_logging_filters_overlap(canonical, 'true')
+    assert not cloud_logging_filters_overlap(canonical, canonical)
+
+
+def test_cloud_logging_filters_overlap_oversized_normal_form_is_assumed_to_overlap():
+    # Nine ANDed two-way ORs expand to 2**9 conjunctions, past the cap.
+    left = canonicalize_cloud_logging_filter(
+        ' AND '.join(f'(f{i}="a" OR f{i}="b")' for i in range(9))
+    )
+    right = canonicalize_cloud_logging_filter(
+        ' AND '.join(f'f{i}="c"' for i in range(9))
+    )
+    assert cloud_logging_filters_overlap(left, right)

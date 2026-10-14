@@ -94,19 +94,20 @@ class LogProjectSinkOverlapFilter(Filter):
     overlaps with, at least one other enabled sink targeting the same
     destination.
 
-    ``match`` controls how sink filters are compared:
+    A sink's effective routing is its filter minus its enabled exclusions.
+    ``match`` controls how effective routing is compared:
 
-    - ``overlap`` (default): two filters overlap when they can both match the
-      same log entry.  The analyser understands equality, inequality, and
-      numeric/severity range constraints.  Filters containing complex logic
-      (OR, NOT) are conservatively treated as non-overlapping to avoid false
-      positives.
-    - ``exact``: filter strings are canonicalized before comparison so that
+    - ``overlap`` (default): two sinks overlap when some log entry could match
+      both.  The analyser understands AND/OR/NOT, equality, inequality, and
+      numeric/severity ranges.  Comparisons it cannot evaluate, such as ``:``
+      and regular expression matches, are assumed satisfiable, so sinks are
+      reported as overlapping unless they are provably disjoint.
+    - ``exact``: effective routing is canonicalized before comparison so that
       logically equivalent expressions (e.g. different field orderings) are
       treated as duplicates.
 
-    Disabled sinks are ignored.  Matched sinks are annotated with the names of
-    their peers under ``c7n:matched-sinks``.
+    Disabled sinks are ignored.  Each matched sink is annotated with the names
+    of the sinks it directly matches under ``c7n:matched-sinks``.
 
     :example:
 
@@ -139,11 +140,19 @@ class LogProjectSinkOverlapFilter(Filter):
     annotation_key = 'c7n:matched-sinks'
     permissions = ('logging.sinks.list',)
 
-    def _normalize_filter(self, sink):
-        sink_filter = sink.get('filter')
-        if not sink_filter:
+    def _effective_filter(self, sink):
+        # A sink routes entries that match its filter and none of its
+        # enabled exclusions.
+        parts = []
+        if sink.get('filter'):
+            parts.append('(%s)' % sink['filter'])
+        for exclusion in sink.get('exclusions', ()):
+            if exclusion.get('disabled', False) or not exclusion.get('filter'):
+                continue
+            parts.append('NOT (%s)' % exclusion['filter'])
+        if not parts:
             return 'true'
-        return canonicalize_cloud_logging_filter(sink_filter)
+        return canonicalize_cloud_logging_filter(' AND '.join(parts))
 
     def _iter_candidate_sinks(self, resources):
         for sink in resources:
@@ -152,77 +161,39 @@ class LogProjectSinkOverlapFilter(Filter):
             destination = sink.get('destination')
             yield destination, sink
 
-    def _iter_matched_groups(self, relation_groups):
-        if self.data.get('match', 'overlap') == 'exact':
-            return self._iter_exact_groups(relation_groups)
-        return self._iter_overlap_groups(relation_groups)
-
-    def _annotate_group(self, sinks):
-        sink_names = [s.get('name') for s in sinks if s.get('name')]
-        for sink in sinks:
-            sink[self.annotation_key] = [
-                n for n in sink_names if n != sink.get('name')
-            ]
-
     def process(self, resources, event=None):
         destination_groups = defaultdict(lambda: defaultdict(list))
 
         for destination, sink in self._iter_candidate_sinks(resources):
-            destination_groups[destination][self._normalize_filter(sink)].append(sink)
+            destination_groups[destination][self._effective_filter(sink)].append(sink)
 
         matched = []
         for relation_groups in destination_groups.values():
-            for sinks in self._iter_matched_groups(relation_groups):
-                self._annotate_group(sinks)
-                matched.extend(sinks)
+            for sink, peers in self._iter_matches(relation_groups):
+                sink[self.annotation_key] = [p.get('name') for p in peers]
+                matched.append(sink)
         return matched
 
-    def _iter_exact_groups(self, relation_groups):
-        for sinks in relation_groups.values():
-            if len(sinks) > 1:
-                yield sinks
-
-    def _iter_overlap_groups(self, relation_groups):
-        relation_items = list(relation_groups.items())
-
-        matched_indexes = set()
-        adjacency = {idx: set() for idx in range(len(relation_items))}
-
-        for idx, (_expr, sinks) in enumerate(relation_items):
-            if len(sinks) > 1:
-                matched_indexes.add(idx)
-
-        for left in range(len(relation_items)):
-            left_expression = relation_items[left][0]
-            for right in range(left + 1, len(relation_items)):
-                right_expression = relation_items[right][0]
-                if not self._filters_overlap(left_expression, right_expression):
-                    continue
-                matched_indexes.update((left, right))
-                adjacency[left].add(right)
-                adjacency[right].add(left)
-
-        visited = set()
-        for idx in sorted(matched_indexes):
-            if idx in visited:
-                continue
-            queue = [idx]
-            component = []
-            while queue:
-                current = queue.pop()
-                if current in visited:
-                    continue
-                visited.add(current)
-                component.append(current)
-                queue.extend(adjacency[current] - visited)
-            sinks = []
-            for entry_idx in component:
-                sinks.extend(relation_items[entry_idx][1])
-            if len(sinks) > 1:
-                yield sinks
-
-    def _filters_overlap(self, left_expression, right_expression):
-        return cloud_logging_filters_overlap(left_expression, right_expression)
+    def _iter_matches(self, relation_groups):
+        # Each sink is paired with the sinks it directly matches, not with
+        # everything reachable through a chain of overlaps.
+        exact = self.data.get('match', 'overlap') == 'exact'
+        for expression, sinks in relation_groups.items():
+            if exact:
+                candidates = sinks
+            else:
+                # Comparing an expression with itself drops same-filter
+                # peers when the filter can never match anything.
+                candidates = [
+                    peer
+                    for other, peers in relation_groups.items()
+                    if cloud_logging_filters_overlap(expression, other)
+                    for peer in peers
+                ]
+            for sink in sinks:
+                peers = [p for p in candidates if p is not sink]
+                if peers:
+                    yield sink, peers
 
 
 @LogProjectSink.action_registry.register('delete')

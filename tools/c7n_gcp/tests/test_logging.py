@@ -162,10 +162,62 @@ class LogProjectSinkTest(BaseTest):
         assert 'c7n-sink-overlap-base' in names
         assert 'c7n-sink-overlap-base-copy' in names
         assert 'c7n-sink-overlap-subset' in names
-        assert 'c7n-sink-overlap-exclusion' not in names
+        # severity>=ERROR AND NOT resource.type="gce_instance" is a subset of base
+        assert 'c7n-sink-overlap-exclusion' in names
         assert 'c7n-sink-overlap-non-match' not in names
         assert 'c7n-sink-overlap-disabled' not in names
         assert 'c7n-sink-overlap-other-destination' not in names
+
+    def _process_sink_overlap(self, match, sinks):
+        policy = self.load_policy({
+            'name': 'log-project-sink-overlap-process',
+            'resource': 'gcp.log-project-sink',
+            'filters': [{'type': 'sink-overlap', 'match': match}]})
+        matched = policy.resource_manager.filters[0].process(sinks)
+        return {s['name']: s['c7n:matched-sinks'] for s in matched}
+
+    def test_sink_overlap_annotates_direct_matches_only(self):
+        destination = 'logging.googleapis.com/projects/p/locations/global/buckets/b'
+        matched = self._process_sink_overlap('overlap', [
+            {'name': 'low', 'destination': destination, 'filter': 'severity<=ERROR'},
+            {'name': 'mid', 'destination': destination, 'filter': 'severity>=ERROR'},
+            {'name': 'high', 'destination': destination, 'filter': 'severity>=CRITICAL'},
+        ])
+        # low and high only overlap through mid, so they are not peers.
+        self.assertEqual(matched, {
+            'low': ['mid'],
+            'mid': ['low', 'high'],
+            'high': ['mid'],
+        })
+
+    def test_sink_overlap_applies_enabled_exclusions(self):
+        destination = 'logging.googleapis.com/projects/p/locations/global/buckets/b'
+
+        def sinks():
+            return [
+                {'name': 'base', 'destination': destination, 'filter': 'severity>=ERROR'},
+                {'name': 'excluded', 'destination': destination, 'filter': 'severity>=ERROR',
+                 'exclusions': [{'name': 'all', 'filter': 'severity>=ERROR'}]},
+                {'name': 'disabled-exclusion', 'destination': destination,
+                 'filter': 'severity>=ERROR',
+                 'exclusions': [{'name': 'all', 'filter': 'severity>=ERROR',
+                                 'disabled': True}]},
+                {'name': 'partial-exclusion', 'destination': destination,
+                 'filter': 'severity>=ERROR',
+                 'exclusions': [{'name': 'gce', 'filter': 'resource.type="gce_instance"'}]},
+            ]
+
+        # An exclusion that removes every entry leaves nothing to overlap.
+        self.assertEqual(self._process_sink_overlap('overlap', sinks()), {
+            'base': ['disabled-exclusion', 'partial-exclusion'],
+            'disabled-exclusion': ['base', 'partial-exclusion'],
+            'partial-exclusion': ['base', 'disabled-exclusion'],
+        })
+        # Only sinks with the same filter and enabled exclusions are duplicates.
+        self.assertEqual(self._process_sink_overlap('exact', sinks()), {
+            'base': ['disabled-exclusion'],
+            'disabled-exclusion': ['base'],
+        })
 
 
 class LogProjectMetricTest(BaseTest):

@@ -303,57 +303,115 @@ def canonicalize_cloud_logging_filter(expression):
 def cloud_logging_filters_overlap(left_expression, right_expression):
     """Determine whether two Cloud Logging filters overlap.
 
-    This helper is designed for sink relationship filters and can be reused by
-    other logging-aware filters that need conservative overlap semantics.
+    Two filters overlap when some log entry could match both.  Each filter is
+    rewritten as an OR of AND-ed literals (disjunctive normal form), and the
+    filters overlap when any conjunction of one is satisfiable together with
+    any conjunction of the other.
+
+    A combined conjunction is unsatisfiable when it contains:
+
+    - a literal and its negation, e.g. ``LOG_ID("x")`` and ``NOT LOG_ID("x")``;
+    - two different equality values for one field, or an equality value that
+      is also excluded with ``!=`` or ``NOT``;
+    - numeric or severity ranges with no common value, including a range that
+      is empty on its own, e.g. ``severity>=ERROR AND severity<=WARNING``.
+
+    Literals the analyser cannot evaluate, such as ``:`` and regular
+    expression matches or global search terms, are assumed satisfiable, so
+    filters are reported as overlapping unless they are provably disjoint.
+    Filters whose normal form grows beyond ``_MAX_DNF_CONJUNCTIONS`` are also
+    assumed to overlap.
     """
-    if left_expression == right_expression:
+    left = _to_cloud_logging_dnf(parse_cloud_logging_filter(left_expression)['ast'])
+    right = _to_cloud_logging_dnf(parse_cloud_logging_filter(right_expression)['ast'])
+    if left is None or right is None:
         return True
-    if left_expression == 'true' or right_expression == 'true':
-        return True
-
-    left = parse_cloud_logging_filter(left_expression)
-    right = parse_cloud_logging_filter(right_expression)
-
-    if _has_complex_cloud_logging_logic(left) or _has_complex_cloud_logging_logic(right):
-        return False
-
-    left_constraints = _group_cloud_logging_predicates(left['predicates'])
-    right_constraints = _group_cloud_logging_predicates(right['predicates'])
-    return not _cloud_logging_constraints_disjoint(left_constraints, right_constraints)
-
-
-def _has_complex_cloud_logging_logic(parsed):
-    """Return True if the filter contains logic the overlap analyser cannot evaluate.
-
-    Filters with OR, NOT, or bare non-true terms are treated as "complex" and
-    cloud_logging_filters_overlap conservatively returns False (non-overlapping).
-
-    Known semantic gap — NOT:
-        ``NOT resource.type="gce_instance"`` technically overlaps with any filter
-        that matches a different resource type, but proving this requires enumerating
-        the complete value domain for each field, which is unbounded.  Treating NOT
-        as complex produces false negatives (sinks that actually overlap are reported
-        as non-overlapping) rather than false positives.  The GCP-managed ``_Default``
-        sink always uses a chain of NOT terms, so real projects will routinely hit
-        this path.
-    """
-    operators = set(parsed.get('operators', ()))
-    terms = parsed.get('terms', ())
-    return (
-        'or' in operators
-        or 'not' in operators
-        or any(t.lower() != 'true' for t in terms)
+    return any(
+        _cloud_logging_conjunction_satisfiable(left_conj + right_conj)
+        for left_conj in left
+        for right_conj in right
     )
 
 
-def _group_cloud_logging_predicates(predicates):
-    grouped = {}
-    for predicate in predicates:
-        lhs = predicate['lhs'].strip().lower()
-        grouped.setdefault(lhs, []).append(
-            (predicate['op'], _normalize_cloud_logging_rhs(predicate['rhs']))
+_MAX_DNF_CONJUNCTIONS = 256
+
+
+def _to_cloud_logging_dnf(node, negated=False):
+    """Return ``node`` as a list of conjunctions of ``(negated, leaf)`` literals.
+
+    NOT is pushed down to the leaves with De Morgan's laws.  Returns None when
+    the result would exceed ``_MAX_DNF_CONJUNCTIONS`` conjunctions.
+    """
+    node_type = node['type']
+    if node_type == 'not':
+        return _to_cloud_logging_dnf(node['expr'], not negated)
+    if node_type not in ('and', 'or'):
+        return [[(negated, node)]]
+
+    parts = [_to_cloud_logging_dnf(child, negated) for child in node['children']]
+    if any(part is None for part in parts):
+        return None
+    # A negated AND is an OR of the negated children, and vice versa.
+    if (node_type == 'and') == negated:
+        result = [conj for part in parts for conj in part]
+    else:
+        result = [[]]
+        for part in parts:
+            result = [conj + other for conj in result for other in part]
+            if len(result) > _MAX_DNF_CONJUNCTIONS:
+                return None
+    if len(result) > _MAX_DNF_CONJUNCTIONS:
+        return None
+    return result
+
+
+def _cloud_logging_conjunction_satisfiable(literals):
+    polarity = {}
+    fields = {}
+    for negated, node in literals:
+        key = CloudLoggingFilterParser._canonicalize_node(node)
+        if polarity.setdefault(key, negated) != negated:
+            return False
+        if node['type'] == 'term':
+            if key == 'true' and negated:
+                return False
+            continue
+        field = CloudLoggingFilterParser._render_tokens(node['lhs_tokens'], canonical=True)
+        value = _normalize_cloud_logging_rhs(
+            CloudLoggingFilterParser._render_tokens(node['rhs_tokens'])
         )
-    return grouped
+        fields.setdefault(field, []).append((negated, node['op'], value))
+    return all(_cloud_logging_field_satisfiable(c) for c in fields.values())
+
+
+# Comparisons that can only match when the field is present on the entry.
+_PRESENCE_OPERATORS = {'=', '>', '>=', '<', '<='}
+_COMPLEMENT_OPERATORS = {'=': '!=', '!=': '=', '>': '<=', '>=': '<', '<': '>=', '<=': '>'}
+
+
+def _cloud_logging_field_satisfiable(constraints):
+    present = any(
+        not negated and op in _PRESENCE_OPERATORS for negated, op, _ in constraints
+    )
+    effective = []
+    for negated, op, value in constraints:
+        if not negated:
+            effective.append((op, value))
+        elif op == '=':
+            # NOT field="x" holds when the field is absent or has another
+            # value, so it always excludes "x".
+            effective.append(('!=', value))
+        elif present and op in _COMPLEMENT_OPERATORS:
+            # Once another literal requires the field to be present, a
+            # negated comparison is its complement.
+            effective.append((_COMPLEMENT_OPERATORS[op], value))
+
+    eq = {value for op, value in effective if op == '='}
+    ne = {value for op, value in effective if op == '!='}
+    if len(eq) > 1 or eq & ne:
+        return False
+    interval = _to_cloud_logging_numeric_interval(effective)
+    return interval is None or not interval.empty
 
 
 def _normalize_cloud_logging_rhs(rhs):
@@ -365,35 +423,6 @@ def _normalize_cloud_logging_rhs(rhs):
     return value.lower()
 
 
-def _cloud_logging_constraints_disjoint(left_constraints, right_constraints):
-    for lhs in set(left_constraints).intersection(right_constraints):
-        left_predicates = left_constraints[lhs]
-        right_predicates = right_constraints[lhs]
-        if _cloud_logging_field_constraints_disjoint(left_predicates, right_predicates):
-            return True
-    return False
-
-
-def _cloud_logging_field_constraints_disjoint(left_predicates, right_predicates):
-    left_eq = {value for op, value in left_predicates if op == '='}
-    right_eq = {value for op, value in right_predicates if op == '='}
-    left_ne = {value for op, value in left_predicates if op == '!='}
-    right_ne = {value for op, value in right_predicates if op == '!='}
-
-    if left_eq and right_eq and left_eq.isdisjoint(right_eq):
-        return True
-    if left_eq and left_eq.issubset(right_ne):
-        return True
-    if right_eq and right_eq.issubset(left_ne):
-        return True
-
-    left_interval = _to_cloud_logging_numeric_interval(left_predicates)
-    right_interval = _to_cloud_logging_numeric_interval(right_predicates)
-    if left_interval and right_interval:
-        return _cloud_logging_intervals_disjoint(left_interval, right_interval)
-    return False
-
-
 @dataclass
 class _Interval:
     """Closed/open numeric interval used for Cloud Logging filter overlap checks."""
@@ -401,6 +430,12 @@ class _Interval:
     lower_inclusive: bool = True
     upper: float = float('inf')
     upper_inclusive: bool = True
+
+    @property
+    def empty(self):
+        if self.lower > self.upper:
+            return True
+        return self.lower == self.upper and not (self.lower_inclusive and self.upper_inclusive)
 
 
 def _to_cloud_logging_numeric_interval(predicates):
@@ -453,18 +488,6 @@ def _coerce_cloud_logging_ordered_value(value):
     if lowered in _SEVERITY_ORDER:
         return float(_SEVERITY_ORDER[lowered])
     return None
-
-
-def _cloud_logging_intervals_disjoint(left: _Interval, right: _Interval) -> bool:
-    if left.upper < right.lower:
-        return True
-    if right.upper < left.lower:
-        return True
-    if left.upper == right.lower and not (left.upper_inclusive and right.lower_inclusive):
-        return True
-    if right.upper == left.lower and not (right.upper_inclusive and left.lower_inclusive):
-        return True
-    return False
 
 
 def get_firewall_port_ranges(firewall_resources):
