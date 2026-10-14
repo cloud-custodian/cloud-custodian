@@ -111,7 +111,9 @@ class LogProjectSinkOverlapFilter(Filter):
       logically equivalent expressions (e.g. different field orderings) are
       treated as duplicates.
 
-    Disabled sinks are ignored.  Each matched sink is annotated with the names
+    Disabled sinks are ignored.  A sink whose effective routing cannot be
+    parsed is logged and left out of ``overlap`` comparisons; with ``exact``
+    it only matches sinks with the same filter text.  Each matched sink is annotated with the names
     of the sinks it directly matches under ``c7n:matched-sinks``, and with the
     names of the sinks it possibly matches under
     ``c7n:possible-matched-sinks``.
@@ -176,7 +178,17 @@ class LogProjectSinkOverlapFilter(Filter):
             parts.append('NOT (%s)' % exclusion['filter'])
         if not parts:
             return 'true'
-        return canonicalize_cloud_logging_filter(' AND '.join(parts))
+        expression = ' AND '.join(parts)
+        try:
+            return canonicalize_cloud_logging_filter(expression)
+        except ValueError as e:
+            self.log.warning(
+                f"Unable to parse effective filter of log sink {sink.get('name')}: {e}")
+            if self.data.get('match', 'overlap') == 'overlap':
+                return None
+            # Identical unparseable filters are still exact duplicates.  A
+            # canonical key always parses, so this cannot collide with one.
+            return ' '.join(expression.split())
 
     def _iter_candidate_sinks(self, resources):
         for sink in resources:
@@ -189,7 +201,10 @@ class LogProjectSinkOverlapFilter(Filter):
         destination_groups = defaultdict(lambda: defaultdict(list))
 
         for destination, sink in self._iter_candidate_sinks(resources):
-            destination_groups[destination][self._effective_filter(sink)].append(sink)
+            expression = self._effective_filter(sink)
+            if expression is None:
+                continue
+            destination_groups[destination][expression].append(sink)
 
         matched = []
         for relation_groups in destination_groups.values():

@@ -9,6 +9,7 @@ log = logging.getLogger('c7n_gcp.utils')
 
 
 _COMPARISON_OPERATORS = {'>=', '<=', '!=', '=~', '!~', '=', '>', '<', ':'}
+_REGEX_OPERATORS = {'=~', '!~'}
 _SEVERITY_ORDER = {
     "default": 0,
     "debug": 100,
@@ -279,17 +280,21 @@ class CloudLoggingFilterParser:
             return "(" + joiner.join(children) + ")"
         if node_type == "not":
             return f"NOT {cls._canonicalize_node(node['expr'])}"
+        # Comparisons ignore letter case except for regular expressions, but
+        # map and struct keys in a field path are case-sensitive.
         if node_type == "predicate":
-            lhs = cls._render_tokens(node["lhs_tokens"], canonical=True)
-            rhs = cls._render_tokens(node["rhs_tokens"], canonical=True)
+            lhs = cls._render_tokens(node["lhs_tokens"])
+            rhs = cls._render_tokens(
+                node["rhs_tokens"], lower=node["op"] not in _REGEX_OPERATORS
+            )
             return f"{lhs} {node['op']} {rhs}"
-        return cls._render_tokens(node["tokens"], canonical=True)
+        return cls._render_tokens(node["tokens"], lower=True)
 
     @classmethod
-    def _render_tokens(cls, tokens, canonical=False):
+    def _render_tokens(cls, tokens, lower=False):
         rendered = []
         for token_type, value in tokens:
-            if canonical and token_type == "WORD":
+            if lower and token_type in ("WORD", "STRING"):
                 rendered.append(value.lower())
             else:
                 rendered.append(value)
@@ -415,11 +420,16 @@ def _cloud_logging_conjunction_satisfiable(literals):
             else:
                 result = CloudLoggingOverlap.POSSIBLE
             continue
-        field = CloudLoggingFilterParser._render_tokens(node['lhs_tokens'], canonical=True)
+        field = CloudLoggingFilterParser._render_tokens(node['lhs_tokens'])
         value = _normalize_cloud_logging_rhs(
             CloudLoggingFilterParser._render_tokens(node['rhs_tokens'])
         )
         fields.setdefault(field, []).append((negated, node['op'], value))
+
+    # Built-in field names ignore letter case but map and struct keys do
+    # not, so paths that differ only in case may or may not be one field.
+    if len({field.lower() for field in fields}) < len(fields):
+        result = CloudLoggingOverlap.POSSIBLE
 
     for field, constraints in fields.items():
         field_result = _cloud_logging_field_satisfiable(field, constraints)
@@ -437,7 +447,8 @@ _COMPLEMENT_OPERATORS = {'=': '!=', '!=': '=', '>': '<=', '>=': '<', '<': '>=', 
 
 
 def _cloud_logging_field_satisfiable(field, constraints):
-    severity = field == 'severity'
+    # Built-in LogEntry field names ignore letter case.
+    severity = field.lower() == 'severity'
     present = any(
         not negated and op in _PRESENCE_OPERATORS for negated, op, _ in constraints
     )

@@ -217,6 +217,39 @@ class LogProjectSinkTest(BaseTest):
             'debug': ([], ['timeouts', 'timeouts-copy']),
         })
 
+    def test_sink_overlap_unparseable_filters_do_not_fail_the_policy(self):
+        destination = 'logging.googleapis.com/projects/p/locations/global/buckets/b'
+
+        def sinks():
+            return [
+                {'name': 'base', 'destination': destination, 'filter': 'severity>=ERROR'},
+                {'name': 'copy', 'destination': destination, 'filter': 'severity>=ERROR'},
+                {'name': 'bad', 'destination': destination,
+                 'filter': 'severity>=ERROR AND (resource.type="gce_instance"'},
+                {'name': 'bad-copy', 'destination': destination,
+                 'filter': 'severity>=ERROR  AND (resource.type="gce_instance"'},
+                {'name': 'bad-exclusion', 'destination': destination,
+                 'filter': 'severity>=ERROR',
+                 'exclusions': [{'name': 'broken', 'filter': 'resource.type="gce_instance")'}]},
+            ]
+
+        with self.assertLogs('custodian.filters', level='WARNING') as logs:
+            overlap = self._process_sink_overlap('overlap', sinks())
+        self.assertEqual(len(logs.records), 3)
+        self.assertIn('log sink bad:', logs.output[0])
+        # Unparseable sinks are left out of overlap comparisons.
+        self.assertEqual(overlap, {'base': ['copy'], 'copy': ['base']})
+
+        with self.assertLogs('custodian.filters', level='WARNING'):
+            exact = self._process_sink_overlap('exact', sinks())
+        # Identical unparseable filters, ignoring whitespace, are duplicates.
+        self.assertEqual(exact, {
+            'base': ['copy'],
+            'copy': ['base'],
+            'bad': ['bad-copy'],
+            'bad-copy': ['bad'],
+        })
+
     def test_sink_overlap_applies_enabled_exclusions(self):
         destination = 'logging.googleapis.com/projects/p/locations/global/buckets/b'
 

@@ -222,6 +222,34 @@ def test_canonicalize_cloud_logging_filter_is_idempotent():
     assert canonicalize_cloud_logging_filter(canonical) == canonical
 
 
+@pytest.mark.parametrize(
+    "first,second",
+    [
+        # String comparisons and search terms ignore letter case.
+        ('logName="Foo"', 'logName="foo"'),
+        ('severity>=ERROR', 'severity>=error'),
+        ('"Timeout"', '"timeout"'),
+    ],
+)
+def test_canonicalize_cloud_logging_filter_ignores_value_case(first, second):
+    assert canonicalize_cloud_logging_filter(first) == canonicalize_cloud_logging_filter(second)
+
+
+@pytest.mark.parametrize(
+    "first,second",
+    [
+        # Map and struct keys are case-sensitive.
+        ('labels.Env="prod"', 'labels.env="prod"'),
+        ('jsonPayload.userId="a"', 'jsonPayload.userid="a"'),
+        # Regular expressions are case-sensitive.
+        ('labels.env=~"^Prod"', 'labels.env=~"^prod"'),
+        ('labels.env!~Prod', 'labels.env!~prod'),
+    ],
+)
+def test_canonicalize_cloud_logging_filter_keeps_case_sensitive_parts(first, second):
+    assert canonicalize_cloud_logging_filter(first) != canonicalize_cloud_logging_filter(second)
+
+
 def test_parse_cloud_logging_filter_handles_parenthesized_lhs_expression():
     parsed = parse_cloud_logging_filter("sample(insertId)=1")
     assert parsed["predicates"][0]["lhs"] == "sample ( insertId )"
@@ -308,6 +336,10 @@ def test_compare_cloud_logging_filters_proven_disjoint(left, right):
         # Excluding a value inside a range may empty it for integer fields.
         ('httpRequest.status>199 AND httpRequest.status<201',
          'httpRequest.status!=200'),
+        # Paths that differ only in case may be one built-in field or two
+        # distinct map keys.
+        ('SEVERITY>=ERROR', 'severity<ERROR'),
+        ('labels.Env="a"', 'labels.env="b"'),
     ],
 )
 def test_compare_cloud_logging_filters_possible_overlap(left, right):
