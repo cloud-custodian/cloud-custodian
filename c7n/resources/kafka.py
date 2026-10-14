@@ -90,6 +90,7 @@ class KafkaBroker(ChildResourceManager):
         service = 'kafka'
         parent_spec = ('kafka', 'ClusterArn', True)
         enum_spec = ('list_nodes', 'NodeInfoList', None)
+        permissions_enum = ('kafka:ListClustersV2', 'kafka:ListNodes')
         name = id = 'BrokerId'
         arn = False
         dimension = 'Broker ID'
