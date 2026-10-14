@@ -4,8 +4,9 @@
 import functools
 import re
 import time
+from unittest import mock
 
-from c7n_gcp.resources.compute import Snapshot
+from c7n_gcp.resources.compute import InstanceSetIpForwarding, Snapshot
 from gcp_common import BaseTest, audit_event_recorder, event_data
 from googleapiclient.errors import HttpError
 from c7n_gcp.client import Session, get_default_project
@@ -308,9 +309,22 @@ def test_instance_set_can_ip_forward(test, gcp_instance_set_can_ip_forward):
         session_factory=factory,
     )
 
-    resources = policy.run()
+    # Replay serves the recorded GET regardless of what was sent, so check
+    # the update request itself.
+    with mock.patch.object(
+            InstanceSetIpForwarding, 'invoke_api', autospec=True,
+            side_effect=InstanceSetIpForwarding.invoke_api) as invoke_api:
+        resources = policy.run()
     assert len(resources) == 1
     assert resources[0]['name'] == instance_name
+
+    assert invoke_api.call_count == 1
+    _, _, op_name, params = invoke_api.call_args.args
+    assert op_name == 'update'
+    assert params['body']['canIpForward'] is True
+    assert params['body']['machineType'] == resources[0]['machineType']
+    assert params['minimalAction'] == 'REFRESH'
+    assert params['mostDisruptiveAllowedAction'] == 'REFRESH'
 
     # The update is an async zonal operation; poll until it is reflected.
     for _ in range(10):
@@ -323,6 +337,7 @@ def test_instance_set_can_ip_forward(test, gcp_instance_set_can_ip_forward):
             break
         time.sleep(2)
     assert instance['canIpForward'] is True
+    assert instance['machineType'] == resources[0]['machineType']
 
 
 class DiskTest(BaseTest):
