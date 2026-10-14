@@ -8,7 +8,11 @@ from c7n.filters.core import Filter, ValueFilter
 from c7n_gcp.actions import MethodAction
 from c7n_gcp.provider import resources
 from c7n_gcp.query import QueryResourceManager, TypeInfo
-from c7n_gcp.utils import canonicalize_cloud_logging_filter, cloud_logging_filters_overlap
+from c7n_gcp.utils import (
+    CloudLoggingOverlap,
+    canonicalize_cloud_logging_filter,
+    compare_cloud_logging_filters,
+)
 
 # TODO .. folder, billing account, org sink
 # how to map them given a project level root entity sans use of c7n-org
@@ -99,19 +103,23 @@ class LogProjectSinkOverlapFilter(Filter):
 
     - ``overlap`` (default): two sinks overlap when some log entry could match
       both.  The analyser understands AND/OR/NOT, equality, inequality, and
-      numeric/severity ranges.  Comparisons it cannot evaluate, such as ``:``
-      and regular expression matches, are assumed satisfiable, so sinks are
-      reported as overlapping unless they are provably disjoint.
+      numeric/severity ranges.  When a filter also uses comparisons it cannot
+      evaluate, such as ``:`` and regular expression matches, global search
+      terms or ``LOG_ID``, sinks that are not provably disjoint are reported
+      as possible matches.
     - ``exact``: effective routing is canonicalized before comparison so that
       logically equivalent expressions (e.g. different field orderings) are
       treated as duplicates.
 
     Disabled sinks are ignored.  Each matched sink is annotated with the names
-    of the sinks it directly matches under ``c7n:matched-sinks``.
+    of the sinks it directly matches under ``c7n:matched-sinks``, and with the
+    names of the sinks it possibly matches under
+    ``c7n:possible-matched-sinks``.
 
     :example:
 
-    Find all project sinks whose log routing overlaps with a sibling sink:
+    Find all project sinks whose log routing overlaps, or possibly overlaps,
+    with a sibling sink:
 
     .. code-block:: yaml
 
@@ -120,6 +128,21 @@ class LogProjectSinkOverlapFilter(Filter):
             resource: gcp.log-project-sink
             filters:
               - type: sink-overlap
+
+    :example:
+
+    Find only project sinks whose overlap with a sibling sink is proven:
+
+    .. code-block:: yaml
+
+        policies:
+          - name: gcp-log-project-sink-proven-overlap
+            resource: gcp.log-project-sink
+            filters:
+              - type: sink-overlap
+              - type: value
+                key: '"c7n:matched-sinks"'
+                value: not-null
 
     :example:
 
@@ -138,6 +161,7 @@ class LogProjectSinkOverlapFilter(Filter):
 
     schema = type_schema('sink-overlap', match={'enum': ['exact', 'overlap']})
     annotation_key = 'c7n:matched-sinks'
+    possible_annotation_key = 'c7n:possible-matched-sinks'
     permissions = ('logging.sinks.list',)
 
     def _effective_filter(self, sink):
@@ -169,8 +193,9 @@ class LogProjectSinkOverlapFilter(Filter):
 
         matched = []
         for relation_groups in destination_groups.values():
-            for sink, peers in self._iter_matches(relation_groups):
+            for sink, peers, possible in self._iter_matches(relation_groups):
                 sink[self.annotation_key] = [p.get('name') for p in peers]
+                sink[self.possible_annotation_key] = [p.get('name') for p in possible]
                 matched.append(sink)
         return matched
 
@@ -180,20 +205,25 @@ class LogProjectSinkOverlapFilter(Filter):
         exact = self.data.get('match', 'overlap') == 'exact'
         for expression, sinks in relation_groups.items():
             if exact:
-                candidates = sinks
+                results = [(sinks, CloudLoggingOverlap.OVERLAP)]
             else:
-                # Comparing an expression with itself drops same-filter
-                # peers when the filter can never match anything.
-                candidates = [
-                    peer
-                    for other, peers in relation_groups.items()
-                    if cloud_logging_filters_overlap(expression, other)
-                    for peer in peers
-                ]
+                results = []
+                for other, peers in relation_groups.items():
+                    result = compare_cloud_logging_filters(expression, other)
+                    # Identical effective filters route the same entries, so
+                    # they overlap unless the filter provably matches nothing.
+                    if other == expression and result is CloudLoggingOverlap.POSSIBLE:
+                        result = CloudLoggingOverlap.OVERLAP
+                    results.append((peers, result))
             for sink in sinks:
-                peers = [p for p in candidates if p is not sink]
-                if peers:
-                    yield sink, peers
+                peers, possible = [], []
+                for others, result in results:
+                    if result is CloudLoggingOverlap.OVERLAP:
+                        peers.extend(p for p in others if p is not sink)
+                    elif result is CloudLoggingOverlap.POSSIBLE:
+                        possible.extend(p for p in others if p is not sink)
+                if peers or possible:
+                    yield sink, peers, possible
 
 
 @LogProjectSink.action_registry.register('delete')

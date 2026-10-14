@@ -190,6 +190,33 @@ class LogProjectSinkTest(BaseTest):
             'high': ['mid'],
         })
 
+    def test_sink_overlap_annotates_possible_matches_separately(self):
+        destination = 'logging.googleapis.com/projects/p/locations/global/buckets/b'
+        policy = self.load_policy({
+            'name': 'log-project-sink-overlap-possible',
+            'resource': 'gcp.log-project-sink',
+            'filters': [{'type': 'sink-overlap'}]})
+        matched = policy.resource_manager.filters[0].process([
+            {'name': 'errors', 'destination': destination, 'filter': 'severity>=ERROR'},
+            {'name': 'critical', 'destination': destination, 'filter': 'severity>=CRITICAL'},
+            {'name': 'timeouts', 'destination': destination, 'filter': 'textPayload:"timeout"'},
+            {'name': 'timeouts-copy', 'destination': destination,
+             'filter': 'textPayload:"timeout"'},
+            {'name': 'debug', 'destination': destination, 'filter': 'severity<=DEBUG'},
+        ])
+        annotations = {
+            s['name']: (s['c7n:matched-sinks'], s['c7n:possible-matched-sinks'])
+            for s in matched
+        }
+        self.assertEqual(annotations, {
+            'errors': (['critical'], ['timeouts', 'timeouts-copy']),
+            'critical': (['errors'], ['timeouts', 'timeouts-copy']),
+            # Identical filters are proven duplicates even when unevaluable.
+            'timeouts': (['timeouts-copy'], ['errors', 'critical', 'debug']),
+            'timeouts-copy': (['timeouts'], ['errors', 'critical', 'debug']),
+            'debug': ([], ['timeouts', 'timeouts-copy']),
+        })
+
     def test_sink_overlap_applies_enabled_exclusions(self):
         destination = 'logging.googleapis.com/projects/p/locations/global/buckets/b'
 

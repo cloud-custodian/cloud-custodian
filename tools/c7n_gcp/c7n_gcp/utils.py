@@ -1,5 +1,11 @@
+import functools
+import logging
 import re
 from dataclasses import dataclass
+from enum import Enum
+
+
+log = logging.getLogger('c7n_gcp.utils')
 
 
 _COMPARISON_OPERATORS = {'>=', '<=', '!=', '=~', '!~', '=', '>', '<', ':'}
@@ -300,15 +306,26 @@ def canonicalize_cloud_logging_filter(expression):
     return CloudLoggingFilterParser.canonicalize(expression)
 
 
-def cloud_logging_filters_overlap(left_expression, right_expression):
-    """Determine whether two Cloud Logging filters overlap.
+class CloudLoggingOverlap(Enum):
+    """Result of comparing two Cloud Logging filters."""
 
-    Two filters overlap when some log entry could match both.  Each filter is
-    rewritten as an OR of AND-ed literals (disjunctive normal form), and the
-    filters overlap when any conjunction of one is satisfiable together with
-    any conjunction of the other.
+    # No log entry can match both filters.
+    DISJOINT = 'disjoint'
+    # The filters are not provably disjoint, but they contain comparisons the
+    # analyser cannot evaluate, so overlap could not be proven either.
+    POSSIBLE = 'possible'
+    # Some log entry matches both filters.
+    OVERLAP = 'overlap'
 
-    A combined conjunction is unsatisfiable when it contains:
+
+def compare_cloud_logging_filters(left_expression, right_expression):
+    """Compare two Cloud Logging filters for overlap.
+
+    Each filter is rewritten as an OR of AND-ed literals (disjunctive normal
+    form), and every conjunction of one filter is combined with every
+    conjunction of the other.
+
+    A combined conjunction is provably unsatisfiable when it contains:
 
     - a literal and its negation, e.g. ``LOG_ID("x")`` and ``NOT LOG_ID("x")``;
     - two different equality values for one field, or an equality value that
@@ -316,24 +333,40 @@ def cloud_logging_filters_overlap(left_expression, right_expression):
     - numeric or severity ranges with no common value, including a range that
       is empty on its own, e.g. ``severity>=ERROR AND severity<=WARNING``.
 
-    Literals the analyser cannot evaluate, such as ``:`` and regular
-    expression matches or global search terms, are assumed satisfiable, so
-    filters are reported as overlapping unless they are provably disjoint.
-    Filters whose normal form grows beyond ``_MAX_DNF_CONJUNCTIONS`` are also
-    assumed to overlap.
+    It is provably satisfiable when, in addition, every literal is an
+    equality, inequality or numeric/severity range comparison.  Literals the
+    analyser cannot evaluate, such as ``:`` and regular expression matches,
+    global search terms and functions like ``LOG_ID``, leave the result
+    ``POSSIBLE`` unless a contradiction is found.  Filters whose normal form
+    grows beyond ``_MAX_DNF_CONJUNCTIONS`` are logged and also ``POSSIBLE``.
     """
-    left = _to_cloud_logging_dnf(parse_cloud_logging_filter(left_expression)['ast'])
-    right = _to_cloud_logging_dnf(parse_cloud_logging_filter(right_expression)['ast'])
+    left = _cloud_logging_filter_dnf(left_expression)
+    right = _cloud_logging_filter_dnf(right_expression)
     if left is None or right is None:
-        return True
-    return any(
-        _cloud_logging_conjunction_satisfiable(left_conj + right_conj)
-        for left_conj in left
-        for right_conj in right
-    )
+        return CloudLoggingOverlap.POSSIBLE
+
+    result = CloudLoggingOverlap.DISJOINT
+    for left_conj in left:
+        for right_conj in right:
+            conj_result = _cloud_logging_conjunction_satisfiable(left_conj + right_conj)
+            if conj_result is CloudLoggingOverlap.OVERLAP:
+                return conj_result
+            if conj_result is CloudLoggingOverlap.POSSIBLE:
+                result = conj_result
+    return result
 
 
 _MAX_DNF_CONJUNCTIONS = 256
+
+
+@functools.lru_cache(maxsize=1024)
+def _cloud_logging_filter_dnf(expression):
+    dnf = _to_cloud_logging_dnf(parse_cloud_logging_filter(expression)['ast'])
+    if dnf is None:
+        log.warning(
+            "Cloud Logging filter is too complex to compare for overlap "
+            f"(more than {_MAX_DNF_CONJUNCTIONS} conjunctions): {expression}")
+    return dnf
 
 
 def _to_cloud_logging_dnf(node, negated=False):
@@ -366,52 +399,102 @@ def _to_cloud_logging_dnf(node, negated=False):
 
 
 def _cloud_logging_conjunction_satisfiable(literals):
+    """Return OVERLAP if the conjunction is provably satisfiable, DISJOINT if
+    it is provably unsatisfiable, and POSSIBLE otherwise."""
     polarity = {}
     fields = {}
+    result = CloudLoggingOverlap.OVERLAP
     for negated, node in literals:
         key = CloudLoggingFilterParser._canonicalize_node(node)
         if polarity.setdefault(key, negated) != negated:
-            return False
+            return CloudLoggingOverlap.DISJOINT
         if node['type'] == 'term':
-            if key == 'true' and negated:
-                return False
+            if key == 'true':
+                if negated:
+                    return CloudLoggingOverlap.DISJOINT
+            else:
+                result = CloudLoggingOverlap.POSSIBLE
             continue
         field = CloudLoggingFilterParser._render_tokens(node['lhs_tokens'], canonical=True)
         value = _normalize_cloud_logging_rhs(
             CloudLoggingFilterParser._render_tokens(node['rhs_tokens'])
         )
         fields.setdefault(field, []).append((negated, node['op'], value))
-    return all(_cloud_logging_field_satisfiable(c) for c in fields.values())
+
+    for field, constraints in fields.items():
+        field_result = _cloud_logging_field_satisfiable(field, constraints)
+        if field_result is CloudLoggingOverlap.DISJOINT:
+            return field_result
+        if field_result is CloudLoggingOverlap.POSSIBLE:
+            result = field_result
+    return result
 
 
 # Comparisons that can only match when the field is present on the entry.
 _PRESENCE_OPERATORS = {'=', '>', '>=', '<', '<='}
+_ORDERED_OPERATORS = {'>', '>=', '<', '<='}
 _COMPLEMENT_OPERATORS = {'=': '!=', '!=': '=', '>': '<=', '>=': '<', '<': '>=', '<=': '>'}
 
 
-def _cloud_logging_field_satisfiable(constraints):
+def _cloud_logging_field_satisfiable(field, constraints):
+    severity = field == 'severity'
     present = any(
         not negated and op in _PRESENCE_OPERATORS for negated, op, _ in constraints
     )
+    understood = True
     effective = []
     for negated, op, value in constraints:
-        if not negated:
-            effective.append((op, value))
-        elif op == '=':
-            # NOT field="x" holds when the field is absent or has another
-            # value, so it always excludes "x".
-            effective.append(('!=', value))
-        elif present and op in _COMPLEMENT_OPERATORS:
-            # Once another literal requires the field to be present, a
-            # negated comparison is its complement.
-            effective.append((_COMPLEMENT_OPERATORS[op], value))
+        if negated:
+            if op == '=':
+                # NOT field="x" holds when the field is absent or has another
+                # value, so it always excludes "x".
+                op = '!='
+            elif present and op in _COMPLEMENT_OPERATORS:
+                # Once another literal requires the field to be present, a
+                # negated comparison is its complement.
+                op = _COMPLEMENT_OPERATORS[op]
+            else:
+                # May hold only because the field is absent.
+                understood = False
+                continue
+        if op in _ORDERED_OPERATORS:
+            if _coerce_cloud_logging_ordered_value(value, severity) is None:
+                understood = False
+                continue
+        elif op not in ('=', '!='):
+            understood = False
+            continue
+        effective.append((op, value))
 
     eq = {value for op, value in effective if op == '='}
     ne = {value for op, value in effective if op == '!='}
     if len(eq) > 1 or eq & ne:
-        return False
-    interval = _to_cloud_logging_numeric_interval(effective)
-    return interval is None or not interval.empty
+        return CloudLoggingOverlap.DISJOINT
+
+    interval = _to_cloud_logging_numeric_interval(effective, severity)
+    if interval is not None:
+        excluded = {_coerce_cloud_logging_ordered_value(value, severity) for value in ne}
+        if severity:
+            # Every entry has exactly one of the fixed severity levels.
+            if not any(
+                interval.contains(level) and level not in excluded
+                for level in _SEVERITY_ORDER.values()
+            ):
+                return CloudLoggingOverlap.DISJOINT
+        else:
+            if interval.empty:
+                return CloudLoggingOverlap.DISJOINT
+            if interval.lower == interval.upper and interval.lower in excluded:
+                return CloudLoggingOverlap.DISJOINT
+            if any(v is not None and interval.contains(v) for v in excluded):
+                # Excluding values inside a range only leaves a match if the
+                # field is not restricted to those values, e.g. integers.
+                understood = False
+        if any(_coerce_cloud_logging_ordered_value(v, severity) is None for v in eq):
+            # A non-numeric equality alongside a numeric range.
+            understood = False
+
+    return CloudLoggingOverlap.OVERLAP if understood else CloudLoggingOverlap.POSSIBLE
 
 
 def _normalize_cloud_logging_rhs(rhs):
@@ -437,8 +520,13 @@ class _Interval:
             return True
         return self.lower == self.upper and not (self.lower_inclusive and self.upper_inclusive)
 
+    def contains(self, value):
+        above = value > self.lower or (value == self.lower and self.lower_inclusive)
+        below = value < self.upper or (value == self.upper and self.upper_inclusive)
+        return above and below
 
-def _to_cloud_logging_numeric_interval(predicates):
+
+def _to_cloud_logging_numeric_interval(predicates, severity=False):
     lower = float('-inf')
     lower_inclusive = True
     upper = float('inf')
@@ -448,7 +536,7 @@ def _to_cloud_logging_numeric_interval(predicates):
     for op, value in predicates:
         if op not in ('=', '>', '>=', '<', '<='):
             continue
-        numeric_value = _coerce_cloud_logging_ordered_value(value)
+        numeric_value = _coerce_cloud_logging_ordered_value(value, severity)
         if numeric_value is None:
             continue
 
@@ -478,14 +566,15 @@ def _to_cloud_logging_numeric_interval(predicates):
     return _Interval(lower, lower_inclusive, upper, upper_inclusive)
 
 
-def _coerce_cloud_logging_ordered_value(value):
+def _coerce_cloud_logging_ordered_value(value, severity=False):
     try:
         return float(value)
     except (TypeError, ValueError):
         pass
 
+    # Severity names only order the top-level severity field.
     lowered = str(value).strip().lower()
-    if lowered in _SEVERITY_ORDER:
+    if severity and lowered in _SEVERITY_ORDER:
         return float(_SEVERITY_ORDER[lowered])
     return None
 
