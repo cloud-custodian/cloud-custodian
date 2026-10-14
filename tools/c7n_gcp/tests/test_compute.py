@@ -310,14 +310,16 @@ def test_instance_set_can_ip_forward(test, gcp_instance_set_can_ip_forward):
     assert len(resources) == 1
     assert resources[0]['name'] == instance_name
 
-    if test.recording:
+    # The update is an async zonal operation; poll until it is reflected.
+    for _ in range(10):
+        instance = policy.resource_manager.get_resource({
+            'project_id': project_id,
+            'resourceName': gcp_instance_set_can_ip_forward['google_compute_instance.default.id'],
+            'zone': gcp_instance_set_can_ip_forward['google_compute_instance.default.zone'],
+        })
+        if instance['canIpForward'] or not test.recording:
+            break
         time.sleep(2)
-
-    instance = policy.resource_manager.get_resource({
-        'project_id': project_id,
-        'resourceName': gcp_instance_set_can_ip_forward['google_compute_instance.default.id'],
-        'zone': gcp_instance_set_can_ip_forward['google_compute_instance.default.zone'],
-    })
     assert instance['canIpForward'] is True
 
 
