@@ -43,23 +43,24 @@ def analyzer_summary(analyzer_type='ACCOUNT', name=ANALYZER_NAME, status='ACTIVE
 
 def load_analyzer_policy(test, factory=None, **options):
     return test.load_policy({
-        'name': 'create-access-analyzer',
+        'name': 'set-access-analyzer',
         'resource': 'aws.account',
         'actions': [{
-            'type': 'create-access-analyzer',
+            'type': 'set-access-analyzer',
             'analyzer-name': ANALYZER_NAME,
             **options,
         }],
     }, session_factory=factory)
 
 
-def test_create_access_analyzer_repeated_run(test, analyzer_session):
+@pytest.mark.parametrize('options', [{}, {'enabled': True}])
+def test_set_access_analyzer_repeated_run(test, analyzer_session, options):
     factory, analyzer, _ = analyzer_session
     analyzer.add_response('list_analyzers', {'analyzers': []}, {})
     analyzer.add_response('create_analyzer', {'arn': ANALYZER_ARN}, {
         'analyzerName': ANALYZER_NAME, 'type': 'ACCOUNT'})
     analyzer.add_response('list_analyzers', {'analyzers': [analyzer_summary()]}, {})
-    policy = load_analyzer_policy(test, factory)
+    policy = load_analyzer_policy(test, factory, **options)
     action = policy.resource_manager.actions[0]
     original = dict(action.data)
 
@@ -69,7 +70,7 @@ def test_create_access_analyzer_repeated_run(test, analyzer_session):
     assert action.data == original
 
 
-def test_create_access_analyzer_options(test, analyzer_session):
+def test_set_access_analyzer_options(test, analyzer_session):
     factory, analyzer, _ = analyzer_session
     rules = [{'ruleName': 'trusted-account', 'filter': {
         'principal.AWS': {'eq': ['123456789012']}}}]
@@ -84,7 +85,7 @@ def test_create_access_analyzer_options(test, analyzer_session):
     policy.resource_manager.actions[0].process([{'account_id': '123456789012'}])
 
 
-def test_create_access_analyzer_type_conflict(test, analyzer_session):
+def test_set_access_analyzer_type_conflict(test, analyzer_session):
     factory, analyzer, _ = analyzer_session
     analyzer.add_response(
         'list_analyzers', {'analyzers': [analyzer_summary('ORGANIZATION')]}, {})
@@ -100,7 +101,7 @@ def test_create_access_analyzer_type_conflict(test, analyzer_session):
     ('create_analyzer', 'ServiceQuotaExceededException'),
     ('create_analyzer', 'ConflictException'),
 ])
-def test_create_access_analyzer_api_error(test, analyzer_session, operation, code):
+def test_set_access_analyzer_api_error(test, analyzer_session, operation, code):
     factory, analyzer, _ = analyzer_session
     expected = {}
     if operation == 'create_analyzer':
@@ -115,6 +116,8 @@ def test_create_access_analyzer_api_error(test, analyzer_session, operation, cod
 
 
 @pytest.mark.parametrize('options', [
+    {'enabled': 'false'},
+    {'enabled': 0},
     {'analyzer-name': ''},
     {'analyzer-name': 'invalid/name'},
     {'analyzer-name': 'a' * 256},
@@ -124,21 +127,22 @@ def test_create_access_analyzer_api_error(test, analyzer_session, operation, cod
     {'archive-rules': [{'ruleName': 'invalid', 'filter': {'isPublic': {'exists': 'yes'}}}]},
     {'archive-rules': [{'ruleName': 'invalid', 'filter': {}, 'unknown': True}]},
 ])
-def test_create_access_analyzer_invalid_options(test, options):
+def test_set_access_analyzer_invalid_options(test, options):
     with pytest.raises(PolicyValidationError):
         load_analyzer_policy(test, **options)
 
 
-def test_create_access_analyzer_requires_name(test):
+@pytest.mark.parametrize('enabled', [True, False])
+def test_set_access_analyzer_requires_name(test, enabled):
     with pytest.raises(PolicyValidationError):
         test.load_policy({
             'name': 'missing-analyzer-name', 'resource': 'aws.account',
-            'actions': [{'type': 'create-access-analyzer'}],
+            'actions': [{'type': 'set-access-analyzer', 'enabled': enabled}],
         })
 
 
 @pytest.mark.parametrize('tags', [None, {'Owner': 'Security'}])
-def test_create_access_analyzer_permissions(test, tags):
+def test_set_access_analyzer_permissions(test, tags):
     policy = load_analyzer_policy(test, **({'tags': tags} if tags else {}))
     permissions = policy.resource_manager.actions[0].get_permissions()
     assert set(permissions) == {
@@ -148,7 +152,7 @@ def test_create_access_analyzer_permissions(test, tags):
 
 
 @pytest.mark.parametrize('existing_type', [None, 'ACCOUNT_UNUSED_ACCESS'])
-def test_create_access_analyzer_with_account_filter(test, analyzer_session, existing_type):
+def test_set_access_analyzer_with_account_filter(test, analyzer_session, existing_type):
     factory, analyzer, iam = analyzer_session
     for _ in range(2):
         iam.add_response('list_account_aliases', {'AccountAliases': []}, {})
@@ -170,7 +174,7 @@ def test_create_access_analyzer_with_account_filter(test, analyzer_session, exis
             'value': ['ACCOUNT', 'ACTIVE'],
         }]}],
         'actions': [{
-            'type': 'create-access-analyzer', 'analyzer-name': ANALYZER_NAME,
+            'type': 'set-access-analyzer', 'analyzer-name': ANALYZER_NAME,
         }],
     }, session_factory=factory)
 
@@ -179,7 +183,7 @@ def test_create_access_analyzer_with_account_filter(test, analyzer_session, exis
 
 
 @pytest.mark.parametrize('operation', ['list_analyzers', 'create_analyzer'])
-def test_create_access_analyzer_retries_throttling(
+def test_set_access_analyzer_retries_throttling(
         test, analyzer_session, monkeypatch, operation):
     factory, analyzer, _ = analyzer_session
     monkeypatch.setattr('c7n.utils.time.sleep', lambda _: None)
@@ -200,7 +204,7 @@ def test_create_access_analyzer_retries_throttling(
 
 @pytest.mark.parametrize('analyzer_type', ['ACCOUNT', 'ORGANIZATION'])
 @pytest.mark.parametrize('status', ['ACTIVE', 'CREATING', 'DISABLED', 'FAILED'])
-def test_create_access_analyzer_existing_in_region(
+def test_set_access_analyzer_existing_in_region(
         test, analyzer_session, caplog, analyzer_type, status):
     factory, analyzer, _ = analyzer_session
     existing = analyzer_summary(analyzer_type, name='existing-external-access', status=status)
@@ -223,7 +227,7 @@ def test_create_access_analyzer_existing_in_region(
 
 @pytest.mark.parametrize('existing_type', [
     'ORGANIZATION', 'ACCOUNT_UNUSED_ACCESS', 'ACCOUNT_INTERNAL_ACCESS'])
-def test_create_access_analyzer_other_types(test, analyzer_session, existing_type):
+def test_set_access_analyzer_other_types(test, analyzer_session, existing_type):
     factory, analyzer, _ = analyzer_session
     analyzer.add_response('list_analyzers', {
         'analyzers': [analyzer_summary(existing_type, name='other-analyzer')]}, {})
@@ -235,7 +239,7 @@ def test_create_access_analyzer_other_types(test, analyzer_session, existing_typ
 
 
 @pytest.mark.parametrize('existing_type', ['ACCOUNT', 'ACCOUNT_UNUSED_ACCESS'])
-def test_create_access_analyzer_paginated(test, analyzer_session, existing_type):
+def test_set_access_analyzer_paginated(test, analyzer_session, existing_type):
     factory, analyzer, _ = analyzer_session
     analyzer.add_response('list_analyzers', {'analyzers': [], 'nextToken': 'next-page'}, {})
     analyzer.add_response('list_analyzers', {
@@ -249,7 +253,7 @@ def test_create_access_analyzer_paginated(test, analyzer_session, existing_type)
         [{'account_id': '123456789012'}])
 
 
-def test_create_access_analyzer_recorded(test, caplog):
+def test_set_access_analyzer_recorded(test, caplog):
     factory = test.replay_flight_data('test_create_access_analyzer', region='us-east-1')
     policy = load_analyzer_policy(test, factory)
 
@@ -264,3 +268,132 @@ def test_create_access_analyzer_recorded(test, caplog):
     assert operations.count('create_analyzer') == 1
     assert operations.count('list_analyzers') == 2
     assert 'skipping creation' in caplog.text
+
+
+@pytest.mark.parametrize('analyzer_type', ['ACCOUNT', 'ORGANIZATION'])
+@pytest.mark.parametrize('status', ['ACTIVE', 'CREATING', 'DISABLED', 'FAILED'])
+def test_set_access_analyzer_delete_named(
+        test, analyzer_session, analyzer_type, status):
+    factory, analyzer, _ = analyzer_session
+    # Even a differently named analyzer of the requested type must be preserved.
+    unrelated = [analyzer_summary(analyzer_type, name='other-external-access'),
+                 analyzer_summary('ACCOUNT_UNUSED_ACCESS', name='other-unused-access')]
+    analyzer.add_response('list_analyzers', {
+        'analyzers': unrelated, 'nextToken': 'next-page'}, {})
+    analyzer.add_response('list_analyzers', {
+        'analyzers': [analyzer_summary(analyzer_type, status=status)]}, {
+        'nextToken': 'next-page'})
+    analyzer.add_response('delete_analyzer', {}, {'analyzerName': ANALYZER_NAME})
+    analyzer.add_response('list_analyzers', {'analyzers': unrelated}, {})
+    policy = load_analyzer_policy(test, factory, **{
+        'enabled': False, 'analyzer-type': analyzer_type,
+        'tags': {'Owner': 'Security'},
+        'archive-rules': [{'ruleName': 'missing-filter'}],
+    })
+    action = policy.resource_manager.actions[0]
+    original = dict(action.data)
+
+    action.process([{'account_id': '123456789012'}])
+    action.process([{'account_id': '123456789012'}])
+
+    assert action.data == original
+
+
+@pytest.mark.parametrize('existing_type', [None, 'ACCOUNT', 'ORGANIZATION'])
+def test_set_access_analyzer_delete_missing(test, analyzer_session, existing_type):
+    factory, analyzer, _ = analyzer_session
+    unrelated = [analyzer_summary(existing_type, name='other-analyzer')] if existing_type else []
+    analyzer.add_response('list_analyzers', {'analyzers': unrelated}, {})
+
+    load_analyzer_policy(test, factory, enabled=False).resource_manager.actions[0].process(
+        [{'account_id': '123456789012'}])
+
+
+@pytest.mark.parametrize('requested_type,existing_type', [
+    ('ACCOUNT', 'ORGANIZATION'),
+    ('ORGANIZATION', 'ACCOUNT'),
+    ('ACCOUNT', 'ACCOUNT_UNUSED_ACCESS'),
+    ('ACCOUNT', 'ACCOUNT_INTERNAL_ACCESS'),
+])
+def test_set_access_analyzer_delete_type_conflict(
+        test, analyzer_session, requested_type, existing_type):
+    factory, analyzer, _ = analyzer_session
+    analyzer.add_response('list_analyzers', {'analyzers': [
+        analyzer_summary(requested_type, name='other-external-access'),
+        analyzer_summary(existing_type),
+    ]}, {})
+    policy = load_analyzer_policy(test, factory, **{
+        'enabled': False, 'analyzer-type': requested_type})
+
+    with pytest.raises(PolicyExecutionError, match=existing_type + '.*' + requested_type):
+        policy.resource_manager.actions[0].process([{'account_id': '123456789012'}])
+
+
+@pytest.mark.parametrize('tags', [None, {'Owner': 'Security'}])
+def test_set_access_analyzer_delete_permissions(test, tags):
+    policy = load_analyzer_policy(test, enabled=False, **({'tags': tags} if tags else {}))
+
+    assert set(policy.resource_manager.actions[0].get_permissions()) == {
+        'access-analyzer:ListAnalyzers', 'access-analyzer:DeleteAnalyzer'}
+
+
+@pytest.mark.parametrize('operation,code', [
+    ('list_analyzers', 'AccessDeniedException'),
+    ('delete_analyzer', 'AccessDeniedException'),
+    ('delete_analyzer', 'InternalServerException'),
+    ('delete_analyzer', 'ValidationException'),
+])
+def test_set_access_analyzer_delete_api_error(
+        test, analyzer_session, monkeypatch, operation, code):
+    factory, analyzer, _ = analyzer_session
+    monkeypatch.setattr('c7n.utils.time.sleep', lambda _: None)
+    expected = {}
+    if operation == 'delete_analyzer':
+        analyzer.add_response('list_analyzers', {'analyzers': [analyzer_summary()]}, {})
+        expected = {'analyzerName': ANALYZER_NAME}
+    # Transient errors must still propagate after the manager exhausts its retries.
+    for _ in range(8 if code == 'InternalServerException' else 1):
+        analyzer.add_client_error(operation, service_error_code=code, expected_params=expected)
+    policy = load_analyzer_policy(test, factory, enabled=False)
+
+    with pytest.raises(ClientError) as error:
+        policy.resource_manager.actions[0].process([{'account_id': '123456789012'}])
+    assert error.value.response['Error']['Code'] == code
+
+
+def test_set_access_analyzer_delete_disappeared(test, analyzer_session):
+    factory, analyzer, _ = analyzer_session
+    analyzer.add_response('list_analyzers', {'analyzers': [analyzer_summary()]}, {})
+    analyzer.add_client_error(
+        'delete_analyzer', service_error_code='ResourceNotFoundException',
+        http_status_code=404, expected_params={'analyzerName': ANALYZER_NAME})
+
+    load_analyzer_policy(test, factory, enabled=False).resource_manager.actions[0].process(
+        [{'account_id': '123456789012'}])
+
+
+@pytest.mark.parametrize('operation', ['list_analyzers', 'delete_analyzer'])
+def test_set_access_analyzer_delete_retries_throttling(
+        test, analyzer_session, monkeypatch, operation):
+    factory, analyzer, _ = analyzer_session
+    monkeypatch.setattr('c7n.utils.time.sleep', lambda _: None)
+    expected = {}
+    if operation == 'delete_analyzer':
+        analyzer.add_response('list_analyzers', {'analyzers': [analyzer_summary()]}, {})
+        expected = {'analyzerName': ANALYZER_NAME}
+    analyzer.add_client_error(
+        operation, service_error_code='ThrottlingException',
+        http_status_code=429, expected_params=expected)
+    response = {'analyzers': []} if operation == 'list_analyzers' else {}
+    analyzer.add_response(operation, response, expected)
+
+    load_analyzer_policy(test, factory, enabled=False).resource_manager.actions[0].process(
+        [{'account_id': '123456789012'}])
+
+
+def test_create_access_analyzer_action_removed(test):
+    with pytest.raises(PolicyValidationError):
+        test.load_policy({
+            'name': 'old-analyzer-action', 'resource': 'aws.account',
+            'actions': [{'type': 'create-access-analyzer', 'analyzer-name': ANALYZER_NAME}],
+        })
