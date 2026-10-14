@@ -43,9 +43,11 @@ request arrived, but no ``CPUUtilization`` value means nothing was measured,
 which is not the same as nothing being used.
 
 Whether a metric behaves this way is up to the service publishing it, and
-endpoints don't: an endpoint reports a zero for an interval nothing called
-it, so a policy looking for idle endpoints needs no missing value. See
-`Endpoints that serve no traffic`_ for when one is called for.
+real-time endpoints don't: one reports a zero for an interval nothing
+called it, so a policy looking for idle real-time endpoints needs no
+missing value. An asynchronous endpoint can have no
+``InvocationsProcessed`` at all: one that hasn't processed a request has none.
+See `Endpoints that serve no traffic`_.
 
 Filtering which metric data for a resource is considered
 --------------------------------------------------------
@@ -88,19 +90,22 @@ nothing to measure.
 SageMaker Endpoints
 -------------------
 
-There are two kinds of endpoints:
+There are three kinds of endpoints:
 
 - Classic endpoints that deploy models in variants
 
 - Inference-component endpoints that deploy models in inference
   components in variants
 
+- Asynchronous endpoints, whose configuration has an
+  ``AsyncInferenceConfig``
+
 Which dimensions you can supply depends on the metric, and for
 invocations on the kind of endpoint as well.
 
 Utilization metrics -- ``CPUUtilization`` and the rest -- are reported per
 variant whichever kind of endpoint publishes them, so ``VariantName``
-narrows them in both cases:
+narrows them in every case:
 
 .. code-block:: yaml
 
@@ -108,7 +113,7 @@ narrows them in both cases:
       VariantName: gpu
 
 Invocations and latencies are reported per variant by a classic endpoint
-and per component by a component endpoint, so the two kinds take different
+and per component by a component endpoint, so those two kinds take different
 dimensions:
 
 ``VariantName``
@@ -119,19 +124,34 @@ dimensions:
 
 ``InferenceComponentName``
    Narrows a component endpoint's invocations to one component.  Naming one
-   leaves every classic endpoint with nothing to measure, and the same
-   applies to them.
+   leaves every classic or asynchronous endpoint with nothing to measure,
+   and the same applies to them.
 
 Either way, an endpoint with nothing to measure is decided by the
 ``missing-value``, if the policy gives one, exactly as an endpoint whose
 series reported nothing would be.
 
+Asynchronous endpoints
+~~~~~~~~~~~~~~~~~~~~~~
+
+Of the real-time invocation metrics, an asynchronous endpoint publishes
+only ``Invocation4XXErrors``, ``Invocation5XXErrors`` and ``ModelLatency``;
+it counts requests in ``InvocationsProcessed`` instead. `Asynchronous
+inference metrics
+<https://docs.aws.amazon.com/sagemaker/latest/dg/async-inference-monitor.html>`_
+lists the rest, and misspells it ``InvocationsProcesssed``.
+
+The queue belongs to the endpoint rather than a variant, so
+``ApproximateBacklogSize``, ``ApproximateBacklogSizePerInstance``,
+``ApproximateAgeOfOldestRequest`` and ``HasBacklogWithoutCapacity`` take no
+``VariantName``. The rest are reported per variant.
+
 
 Endpoints that serve no traffic
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
-An endpoint bills for its instances from creation until it is deleted,
-whether or not anything calls it.
+An endpoint bills for the instances it holds, whether or not anything
+calls it.
 
 .. code-block:: yaml
 
@@ -150,14 +170,53 @@ whether or not anything calls it.
             value: 0
             op: lte
 
-An endpoint reports a zero for an interval in which nothing called it,
-whichever way it hosts its models, so its own values answer the question
-and no ``missing-value`` is needed here.
+A real-time endpoint reports a zero for an interval in which nothing called
+it, whichever way it hosts its models, so its own values answer the
+question and no ``missing-value`` is needed here.
 
 Supply one when a metric may have no values at all: for an endpoint
 created part way through the window, or for a metric its kind of endpoint
 doesn't publish.  Then ``missing-value: 0`` reads the absence as a zero,
-and leaving it out passes the endpoint over.
+and leaving it out passes the endpoint over. For ``Invocations``, that means
+a missing value matches every asynchronous endpoint, busy or not.
+
+The policy above passes over asynchronous endpoints, which publish no
+``Invocations``. Their ``InvocationsProcessed`` needs ``missing-value: 0``,
+and because real-time endpoints have no ``InvocationsProcessed`` either,
+that branch also requires an ``AsyncInferenceConfig``:
+
+.. code-block:: yaml
+
+    policies:
+      - name: sagemaker-endpoints-idle-including-async
+        resource: aws.sagemaker-endpoint
+        description: |
+          In-service endpoints, real-time or async, that processed no
+          requests in the last week
+        filters:
+          - EndpointStatus: InService
+          - or:
+            - type: metrics
+              name: Invocations
+              statistics: Sum
+              days: 7
+              period: 86400
+              value: 0
+              op: lte
+            - and:
+              - AsyncInferenceConfig: present
+              - type: metrics
+                name: InvocationsProcessed
+                statistics: Sum
+                days: 7
+                period: 86400
+                value: 0
+                op: lte
+                missing-value: 0
+
+An async endpoint whose requests are still queued, such as one scaled to
+zero instances, has processed none either; ``ApproximateBacklogSize`` shows
+whether any are waiting.
 
 Endpoints with under-used GPUs
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
