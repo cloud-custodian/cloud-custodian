@@ -27,15 +27,29 @@ _TOKEN_RE = re.compile(
     r'|(?P<WORD>[^\s()=><:!~]+)'
     r'|(?P<UNKNOWN>[^\s])'  # catch-all: tolerate uncommon punctuation (but not whitespace)
 )
+# Logical operators are case-sensitive: lowercase and/or/not are search terms.
 _LOGICAL_WORDS = {'AND', 'OR', 'NOT'}
+_NEGATIVE_NUMBER_RE = re.compile(r'-\d')
 
 
 def _tokenize_cloud_logging_filter(expression):
     tokens = []
     for m in _TOKEN_RE.finditer(expression):
         kind, value = m.lastgroup, m.group()
-        if kind == 'WORD' and value.upper() in _LOGICAL_WORDS:
-            tokens.append(('LOGIC', value.upper()))
+        if kind == 'WORD' and value in _LOGICAL_WORDS:
+            tokens.append(('LOGIC', value))
+        elif (
+            kind == 'WORD'
+            and value.startswith('-')
+            and not (tokens and tokens[-1][0] == 'OP')
+            and not _NEGATIVE_NUMBER_RE.match(value)
+        ):
+            # A leading minus on a term is shorthand for NOT, e.g.
+            # -resource.type="gce_instance".  A minus after a comparison
+            # operator or before a digit is part of the value.
+            tokens.append(('LOGIC', 'NOT'))
+            if value[1:]:
+                tokens.append(('WORD', value[1:]))
         elif kind == 'UNKNOWN':
             tokens.append(('WORD', value))  # tolerate uncommon punctuation
         else:
@@ -63,8 +77,13 @@ class _TokenStream:
 class CloudLoggingFilterParser:
     """Parser for Cloud Logging query expressions.
 
-    The parser supports logical operators (AND/OR/NOT), grouping parentheses,
-    and all documented comparison/match operators used in sink filters.
+    The parser supports logical operators (AND/OR/NOT and the ``-`` shorthand
+    for NOT), implicit AND between adjacent terms, grouping parentheses,
+    parenthesized value lists on the right-hand side of a comparison, and all
+    documented comparison/match operators used in sink filters.
+
+    Cloud Logging gives NOT the highest precedence, followed by OR and then
+    AND, so ``a OR b AND c`` means ``(a OR b) AND c``.
     """
 
     comparison_operators = _COMPARISON_OPERATORS
@@ -77,7 +96,7 @@ class CloudLoggingFilterParser:
             return cls._build_result(node)
 
         stream = _TokenStream(_tokenize_cloud_logging_filter(normalized))
-        ast = cls._parse_or(stream)
+        ast = cls._parse_and(stream, cls._parse_predicate)
         if stream.peek() is not None:
             raise ValueError("Unable to parse full Cloud Logging filter expression")
         return cls._build_result(ast)
@@ -87,98 +106,124 @@ class CloudLoggingFilterParser:
         parsed = cls.parse(expression)
         return cls._canonicalize_node(parsed["ast"])
 
-    @classmethod
-    def _parse_or(cls, stream):
-        node = cls._parse_and(stream)
-        children = [node]
-        while True:
-            token = stream.peek()
-            if token and token[0] == "LOGIC" and token[1] == "OR":
-                stream.consume()
-                children.append(cls._parse_and(stream))
-                continue
-            break
-        if len(children) == 1:
-            return children[0]
-        return {"type": "or", "children": children}
+    # The boolean grammar is shared by whole expressions and by parenthesized
+    # value lists, so each level takes the ``leaf`` parser to use for its
+    # innermost operands.
 
     @classmethod
-    def _parse_and(cls, stream):
-        node = cls._parse_not(stream)
-        children = [node]
+    def _parse_and(cls, stream, leaf):
+        # AND has the lowest precedence.  Adjacent terms with no operator
+        # between them are an implicit AND.
+        children = [cls._parse_or(stream, leaf)]
         while True:
             token = stream.peek()
-            if token and token[0] == "LOGIC" and token[1] == "AND":
+            if token is None or token[0] == "RPAREN":
+                break
+            if token == ("LOGIC", "AND"):
                 stream.consume()
-                children.append(cls._parse_not(stream))
-                continue
-            break
-        if len(children) == 1:
-            return children[0]
-        return {"type": "and", "children": children}
+            children.append(cls._parse_or(stream, leaf))
+        return cls._join("and", children)
 
     @classmethod
-    def _parse_not(cls, stream):
-        token = stream.peek()
-        if token and token[0] == "LOGIC" and token[1] == "NOT":
+    def _parse_or(cls, stream, leaf):
+        children = [cls._parse_not(stream, leaf)]
+        while stream.peek() == ("LOGIC", "OR"):
             stream.consume()
-            return {"type": "not", "expr": cls._parse_not(stream)}
-        return cls._parse_primary(stream)
+            children.append(cls._parse_not(stream, leaf))
+        return cls._join("or", children)
 
     @classmethod
-    def _parse_primary(cls, stream):
+    def _parse_not(cls, stream, leaf):
+        if stream.peek() == ("LOGIC", "NOT"):
+            stream.consume()
+            return {"type": "not", "expr": cls._parse_not(stream, leaf)}
+        return cls._parse_primary(stream, leaf)
+
+    @classmethod
+    def _parse_primary(cls, stream, leaf):
         token = stream.peek()
         if token is None:
             raise ValueError("Unexpected end of Cloud Logging filter expression")
 
         if token[0] == "LPAREN":
             stream.consume()
-            node = cls._parse_or(stream)
-            closing = stream.consume()
-            if not closing or closing[0] != "RPAREN":
-                raise ValueError("Missing closing parenthesis in filter expression")
+            node = cls._parse_and(stream, leaf)
+            cls._expect_closing_paren(stream)
             return node
-        return cls._parse_predicate(stream)
+        return leaf(stream)
+
+    @staticmethod
+    def _join(node_type, children):
+        # Flatten nested nodes of the same type so that equivalent
+        # expressions with different grouping share one shape.
+        flat = []
+        for child in children:
+            if child["type"] == node_type:
+                flat.extend(child["children"])
+            else:
+                flat.append(child)
+        if len(flat) == 1:
+            return flat[0]
+        return {"type": node_type, "children": flat}
+
+    @staticmethod
+    def _expect_closing_paren(stream):
+        closing = stream.consume()
+        if not closing or closing[0] != "RPAREN":
+            raise ValueError("Missing closing parenthesis in filter expression")
 
     @classmethod
     def _parse_predicate(cls, stream):
-        # Single-pass: collect lhs tokens until an OP is seen at depth 0,
-        # then switch to collecting rhs tokens.  A LOGIC token or an
-        # unmatched RPAREN at depth 0 terminates the predicate.
-        lhs, rhs = [], []  # left hand side and right hand side
-        op = None  # operator
-        depth = 0  # parenthesis depth
-        target = lhs
+        lhs = cls._parse_operand(stream)
+        token = stream.peek()
+        if token is None or token[0] != "OP":
+            return {"type": "term", "tokens": lhs}
+        op = stream.consume()[1]
 
-        while True:
-            token = stream.peek()
-            if token is None:
-                break
-            kind, value = token
-            if kind == 'RPAREN' and depth == 0:
-                break
-            if kind == 'LOGIC' and depth == 0:
-                break
+        token = stream.peek()
+        if token is None or token[0] not in ("WORD", "STRING", "LPAREN"):
+            raise ValueError("Malformed comparison in Cloud Logging filter expression")
+        if token[0] == "LPAREN":
+            # The field and operator apply to each element of a value list,
+            # e.g. resource.type=("gce_instance" OR "k8s_container").
             stream.consume()
-            if kind == 'LPAREN':
-                depth += 1
-                target.append((kind, value))
-            elif kind == 'RPAREN':
-                depth -= 1
-                target.append((kind, value))
-            elif kind == 'OP' and op is None and target is lhs and depth == 0:
-                op = value
-                target = rhs
-            else:
-                target.append((kind, value))
+            node = cls._parse_and(stream, lambda s: cls._parse_value(s, lhs, op))
+            cls._expect_closing_paren(stream)
+            return node
+        return cls._parse_value(stream, lhs, op)
 
-        if not lhs:
-            raise ValueError('Empty predicate in Cloud Logging filter expression')
-        if op is not None:
-            if not rhs:
-                raise ValueError('Malformed comparison in Cloud Logging filter expression')
-            return {'type': 'predicate', 'lhs_tokens': lhs, 'op': op, 'rhs_tokens': rhs}
-        return {'type': 'term', 'tokens': lhs}
+    @classmethod
+    def _parse_operand(cls, stream):
+        # A field path, value or search term.  A word followed by a
+        # parenthesized argument list is a function call such as
+        # sample(insertId, 0.1) or LOG_ID("...").
+        token = stream.peek()
+        if token is None or token[0] not in ("WORD", "STRING"):
+            raise ValueError("Empty predicate in Cloud Logging filter expression")
+        tokens = [stream.consume()]
+        following = stream.peek()
+        if token[0] == "WORD" and following and following[0] == "LPAREN":
+            depth = 0
+            while True:
+                token = stream.consume()
+                if token is None:
+                    raise ValueError("Missing closing parenthesis in filter expression")
+                tokens.append(token)
+                if token[0] == "LPAREN":
+                    depth += 1
+                elif token[0] == "RPAREN":
+                    depth -= 1
+                    if depth == 0:
+                        break
+        return tokens
+
+    @staticmethod
+    def _parse_value(stream, lhs, op):
+        token = stream.peek()
+        if token is None or token[0] not in ("WORD", "STRING"):
+            raise ValueError("Malformed comparison in Cloud Logging filter expression")
+        stream.consume()
+        return {"type": "predicate", "lhs_tokens": lhs, "op": op, "rhs_tokens": [token]}
 
     @classmethod
     def _build_result(cls, ast):
@@ -218,12 +263,16 @@ class CloudLoggingFilterParser:
     @classmethod
     def _canonicalize_node(cls, node):
         node_type = node["type"]
+        # The canonical form must re-parse to the same expression, so logical
+        # operators stay uppercase.
         if node_type in ("and", "or"):
-            children = sorted(cls._canonicalize_node(c) for c in node["children"])
-            joiner = " and " if node_type == "and" else " or "
+            children = sorted({cls._canonicalize_node(c) for c in node["children"]})
+            if len(children) == 1:
+                return children[0]
+            joiner = " AND " if node_type == "and" else " OR "
             return "(" + joiner.join(children) + ")"
         if node_type == "not":
-            return f"not ({cls._canonicalize_node(node['expr'])})"
+            return f"NOT {cls._canonicalize_node(node['expr'])}"
         if node_type == "predicate":
             lhs = cls._render_tokens(node["lhs_tokens"], canonical=True)
             rhs = cls._render_tokens(node["rhs_tokens"], canonical=True)
@@ -234,7 +283,7 @@ class CloudLoggingFilterParser:
     def _render_tokens(cls, tokens, canonical=False):
         rendered = []
         for token_type, value in tokens:
-            if canonical and token_type in ("WORD", "LOGIC"):
+            if canonical and token_type == "WORD":
                 rendered.append(value.lower())
             else:
                 rendered.append(value)

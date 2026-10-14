@@ -132,9 +132,93 @@ def test_parse_cloud_logging_filter_malformed_comparison_raises():
 
 def test_parse_cloud_logging_filter_handles_parenthesized_rhs_expression():
     parsed = parse_cloud_logging_filter('resource.type=("gce_instance")')
-    assert parsed["predicates"][0]["lhs"] == "resource.type"
-    assert parsed["predicates"][0]["op"] == "="
-    assert parsed["predicates"][0]["rhs"] == '( "gce_instance" )'
+    assert parsed["predicates"] == [
+        {"lhs": "resource.type", "op": "=", "rhs": '"gce_instance"'}
+    ]
+
+
+def test_parse_cloud_logging_filter_distributes_rhs_value_list():
+    parsed = parse_cloud_logging_filter('resource.type=("gce_instance" OR "k8s_container")')
+    assert parsed["predicates"] == [
+        {"lhs": "resource.type", "op": "=", "rhs": '"gce_instance"'},
+        {"lhs": "resource.type", "op": "=", "rhs": '"k8s_container"'},
+    ]
+    assert canonicalize_cloud_logging_filter(
+        'resource.type=("gce_instance" OR "k8s_container")'
+    ) == canonicalize_cloud_logging_filter(
+        'resource.type="k8s_container" OR resource.type="gce_instance"'
+    )
+
+
+def test_parse_cloud_logging_filter_empty_rhs_value_list_raises():
+    with pytest.raises(ValueError, match="Malformed comparison"):
+        parse_cloud_logging_filter("resource.type=()")
+
+
+def test_parse_cloud_logging_filter_lowercase_logical_words_are_search_terms():
+    parsed = parse_cloud_logging_filter('severity>=ERROR and resource.type="gce_instance"')
+    assert parsed["terms"] == ["and"]
+    assert len(parsed["predicates"]) == 2
+
+
+def test_canonicalize_cloud_logging_filter_implicit_and_matches_explicit_and():
+    assert canonicalize_cloud_logging_filter(
+        'severity>=ERROR resource.type="gce_instance"'
+    ) == canonicalize_cloud_logging_filter(
+        'severity>=ERROR AND resource.type="gce_instance"'
+    )
+    assert canonicalize_cloud_logging_filter(
+        'a=1 (b=2 OR c=3)'
+    ) == canonicalize_cloud_logging_filter('a=1 AND (b=2 OR c=3)')
+
+
+def test_canonicalize_cloud_logging_filter_or_binds_tighter_than_and():
+    # Example from the Cloud Logging query language docs.
+    assert canonicalize_cloud_logging_filter(
+        '"a" OR NOT "b" AND NOT "c" OR "d"'
+    ) == canonicalize_cloud_logging_filter(
+        '("a" OR (NOT "b")) AND ((NOT "c") OR "d")'
+    )
+
+
+@pytest.mark.parametrize(
+    "minus,not_",
+    [
+        ('-resource.type="gce_instance"', 'NOT resource.type="gce_instance"'),
+        ('-(a=1 OR b=2)', 'NOT (a=1 OR b=2)'),
+        ('severity>=ERROR -resource.type="gce_instance"',
+         'severity>=ERROR AND NOT resource.type="gce_instance"'),
+    ],
+)
+def test_canonicalize_cloud_logging_filter_minus_is_not(minus, not_):
+    assert canonicalize_cloud_logging_filter(minus) == canonicalize_cloud_logging_filter(not_)
+
+
+def test_parse_cloud_logging_filter_minus_after_operator_is_a_value():
+    parsed = parse_cloud_logging_filter("httpRequest.latency>-1 AND sample=-0.5")
+    assert [p["rhs"] for p in parsed["predicates"]] == ["-1", "-0.5"]
+    assert "not" not in parsed["operators"]
+
+
+@pytest.mark.parametrize(
+    "first,second",
+    [
+        ('a=1 AND (b=2 AND c=3)', '(a=1 AND b=2) AND c=3'),
+        ('a=1 OR (b=2 OR c=3)', '(a=1 OR b=2) OR c=3'),
+        ('a=1 AND a=1', 'a=1'),
+    ],
+)
+def test_canonicalize_cloud_logging_filter_flattens_nested_groups(first, second):
+    assert canonicalize_cloud_logging_filter(first) == canonicalize_cloud_logging_filter(second)
+
+
+def test_canonicalize_cloud_logging_filter_is_idempotent():
+    expression = (
+        'NOT (resource.type="gce_instance" OR severity<ERROR) '
+        'textPayload:"timeout" -labels.env=("a" OR "b")'
+    )
+    canonical = canonicalize_cloud_logging_filter(expression)
+    assert canonicalize_cloud_logging_filter(canonical) == canonical
 
 
 def test_parse_cloud_logging_filter_handles_parenthesized_lhs_expression():
@@ -218,6 +302,18 @@ def test_cloud_logging_filters_overlap_non_coercible_ordered_values_fall_back_to
 
 def test_cloud_logging_filters_overlap_complex_logic_default_is_conservative():
     left = canonicalize_cloud_logging_filter('NOT resource.type="gce_instance"')
+    right = canonicalize_cloud_logging_filter('resource.type="gce_instance"')
+    assert not cloud_logging_filters_overlap(left, right)
+
+
+def test_cloud_logging_filters_overlap_implicit_and_constraints_are_evaluated():
+    left = canonicalize_cloud_logging_filter('severity>=ERROR resource.type="gce_instance"')
+    right = canonicalize_cloud_logging_filter('resource.type="k8s_container"')
+    assert not cloud_logging_filters_overlap(left, right)
+
+
+def test_cloud_logging_filters_overlap_minus_negation_is_not_a_field_name():
+    left = canonicalize_cloud_logging_filter('-resource.type="gce_instance"')
     right = canonicalize_cloud_logging_filter('resource.type="gce_instance"')
     assert not cloud_logging_filters_overlap(left, right)
 
