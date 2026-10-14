@@ -113,10 +113,15 @@ class LogProjectSinkOverlapFilter(Filter):
 
     Disabled sinks are ignored.  A sink whose effective routing cannot be
     parsed is logged and left out of ``overlap`` comparisons; with ``exact``
-    it only matches sinks with the same filter text.  Each matched sink is annotated with the names
-    of the sinks it directly matches under ``c7n:matched-sinks``, and with the
-    names of the sinks it possibly matches under
-    ``c7n:possible-matched-sinks``.
+    it only matches sinks with the same filter text.  Each matched sink is
+    annotated with the names of the sinks it directly matches under
+    ``c7n:matched-sinks``, and with the names of the sinks it possibly matches
+    under ``c7n:possible-matched-sinks``.
+
+    Sinks are only compared with the other sinks that reach this filter, so
+    filters placed before it narrow the comparison.  To compare against every
+    sink in the project and then narrow the results, put ``sink-overlap``
+    first.
 
     :example:
 
