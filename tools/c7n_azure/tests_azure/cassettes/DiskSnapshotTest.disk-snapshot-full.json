@@ -1,0 +1,583 @@
+{
+    "version": 1,
+    "interactions": [
+        {
+            "request": {
+                "method": "GET",
+                "uri": "https://management.azure.com/subscriptions/ea42f556-5106-4743-99b0-c129bfa71a47/providers/Microsoft.Compute/disks?api-version=2024-03-02",
+                "body": null,
+                "headers": {}
+            },
+            "response": {
+                "status": {
+                    "code": 200,
+                    "message": "OK"
+                },
+                "headers": {
+                    "date": [
+                        "Wed, 07 Oct 2026 15:05:53 GMT"
+                    ],
+                    "x-ms-ratelimit-remaining-resource": [
+                        "Microsoft.Compute/HighCostGet3Min;236,Microsoft.Compute/HighCostGet30Min;1916"
+                    ],
+                    "x-msedge-ref": [
+                        "Ref A: 94D4E800D31641ACBD71E13EA4BDE9D4 Ref B: CHI261140508062 Ref C: 2026-10-07T15:05:53Z"
+                    ],
+                    "x-cache": [
+                        "CONFIG_NOCACHE"
+                    ],
+                    "content-type": [
+                        "application/json; charset=utf-8"
+                    ],
+                    "content-length": [
+                        "3804"
+                    ],
+                    "cache-control": [
+                        "no-cache"
+                    ],
+                    "x-ms-original-request-ids": [
+                        "9c1b6303-d7ae-421f-bdef-e4fff83ae304"
+                    ],
+                    "x-ms-ratelimit-remaining-subscription-global-reads": [
+                        "3749"
+                    ]
+                },
+                "body": {
+                    "data": {
+                        "value": [
+                            {
+                                "name": "cctest-snapshot-full-disk",
+                                "id": "/subscriptions/ea42f556-5106-4743-99b0-c129bfa71a47/resourceGroups/TEST_DISK-SNAPSHOT-FULL/providers/Microsoft.Compute/disks/cctest-snapshot-full-disk",
+                                "type": "Microsoft.Compute/disks",
+                                "location": "southcentralus",
+                                "tags": {
+                                    "testtag": "testvalue"
+                                },
+                                "sku": {
+                                    "name": "Standard_LRS",
+                                    "tier": "Standard"
+                                },
+                                "properties": {
+                                    "creationData": {
+                                        "createOption": "Empty"
+                                    },
+                                    "diskSizeGB": 4,
+                                    "diskIOPSReadWrite": 500,
+                                    "diskMBpsReadWrite": 60,
+                                    "encryption": {
+                                        "type": "EncryptionAtRestWithPlatformKey"
+                                    },
+                                    "networkAccessPolicy": "AllowAll",
+                                    "publicNetworkAccess": "Enabled",
+                                    "timeCreated": "2026-10-07T15:04:50.0957295+00:00",
+                                    "provisioningState": "Succeeded",
+                                    "diskState": "Unattached",
+                                    "diskSizeBytes": 4294967296,
+                                    "uniqueId": "57c2a59e-4f59-4bc9-a040-0ad6976d8120"
+                                }
+                            },
+                            {
+                                "name": "cctest-snapshot-limit-a",
+                                "id": "/subscriptions/ea42f556-5106-4743-99b0-c129bfa71a47/resourceGroups/TEST_DISK-SNAPSHOT-TAG-LIMIT/providers/Microsoft.Compute/disks/cctest-snapshot-limit-a",
+                                "type": "Microsoft.Compute/disks",
+                                "location": "southcentralus",
+                                "tags": {
+                                    "tag01": "value",
+                                    "tag02": "value",
+                                    "tag03": "value",
+                                    "tag04": "value",
+                                    "tag05": "value",
+                                    "tag06": "value",
+                                    "tag07": "value",
+                                    "tag08": "value",
+                                    "tag09": "value",
+                                    "tag10": "value",
+                                    "tag11": "value",
+                                    "tag12": "value",
+                                    "tag13": "value",
+                                    "tag14": "value",
+                                    "tag15": "value",
+                                    "tag16": "value",
+                                    "tag17": "value",
+                                    "tag18": "value",
+                                    "tag19": "value",
+                                    "tag20": "value",
+                                    "tag21": "value",
+                                    "tag22": "value",
+                                    "tag23": "value",
+                                    "tag24": "value",
+                                    "tag25": "value",
+                                    "tag26": "value",
+                                    "tag27": "value",
+                                    "tag28": "value",
+                                    "tag29": "value",
+                                    "tag30": "value",
+                                    "tag31": "value",
+                                    "tag32": "value",
+                                    "tag33": "value",
+                                    "tag34": "value",
+                                    "tag35": "value",
+                                    "tag36": "value",
+                                    "tag37": "value",
+                                    "tag38": "value",
+                                    "tag39": "value",
+                                    "tag40": "value",
+                                    "tag41": "value",
+                                    "tag42": "value",
+                                    "tag43": "value",
+                                    "tag44": "value",
+                                    "tag45": "value",
+                                    "tag46": "value",
+                                    "tag47": "value",
+                                    "tag48": "value",
+                                    "tag49": "value",
+                                    "tag50": "value"
+                                },
+                                "sku": {
+                                    "name": "Standard_LRS",
+                                    "tier": "Standard"
+                                },
+                                "properties": {
+                                    "creationData": {
+                                        "createOption": "Empty"
+                                    },
+                                    "diskSizeGB": 4,
+                                    "diskIOPSReadWrite": 500,
+                                    "diskMBpsReadWrite": 60,
+                                    "encryption": {
+                                        "type": "EncryptionAtRestWithPlatformKey"
+                                    },
+                                    "networkAccessPolicy": "AllowAll",
+                                    "publicNetworkAccess": "Enabled",
+                                    "timeCreated": "2026-10-07T15:04:51.0352411+00:00",
+                                    "provisioningState": "Succeeded",
+                                    "diskState": "Unattached",
+                                    "diskSizeBytes": 4294967296,
+                                    "uniqueId": "4acbaeb5-a32e-4ce3-bc6f-a67bd6bf7982"
+                                }
+                            },
+                            {
+                                "name": "cctest-snapshot-limit-b",
+                                "id": "/subscriptions/ea42f556-5106-4743-99b0-c129bfa71a47/resourceGroups/TEST_DISK-SNAPSHOT-TAG-LIMIT/providers/Microsoft.Compute/disks/cctest-snapshot-limit-b",
+                                "type": "Microsoft.Compute/disks",
+                                "location": "southcentralus",
+                                "tags": {
+                                    "testtag": "testvalue"
+                                },
+                                "sku": {
+                                    "name": "Standard_LRS",
+                                    "tier": "Standard"
+                                },
+                                "properties": {
+                                    "creationData": {
+                                        "createOption": "Empty"
+                                    },
+                                    "diskSizeGB": 4,
+                                    "diskIOPSReadWrite": 500,
+                                    "diskMBpsReadWrite": 60,
+                                    "encryption": {
+                                        "type": "EncryptionAtRestWithPlatformKey"
+                                    },
+                                    "networkAccessPolicy": "AllowAll",
+                                    "publicNetworkAccess": "Enabled",
+                                    "timeCreated": "2026-10-07T15:04:51.0352411+00:00",
+                                    "provisioningState": "Succeeded",
+                                    "diskState": "Unattached",
+                                    "diskSizeBytes": 4294967296,
+                                    "uniqueId": "f6b4697f-bf79-4fcf-b989-0aab7e21c455"
+                                }
+                            },
+                            {
+                                "name": "cctest-snapshot-disk",
+                                "id": "/subscriptions/ea42f556-5106-4743-99b0-c129bfa71a47/resourceGroups/TEST_DISK-SNAPSHOT/providers/Microsoft.Compute/disks/cctest-snapshot-disk",
+                                "type": "Microsoft.Compute/disks",
+                                "location": "southcentralus",
+                                "tags": {
+                                    "testtag": "testvalue"
+                                },
+                                "sku": {
+                                    "name": "Standard_LRS",
+                                    "tier": "Standard"
+                                },
+                                "properties": {
+                                    "creationData": {
+                                        "createOption": "Empty"
+                                    },
+                                    "diskSizeGB": 4,
+                                    "diskIOPSReadWrite": 500,
+                                    "diskMBpsReadWrite": 60,
+                                    "encryption": {
+                                        "type": "EncryptionAtRestWithPlatformKey"
+                                    },
+                                    "networkAccessPolicy": "AllowAll",
+                                    "publicNetworkAccess": "Enabled",
+                                    "timeCreated": "2026-10-07T15:04:50.7588432+00:00",
+                                    "provisioningState": "Succeeded",
+                                    "diskState": "Unattached",
+                                    "diskSizeBytes": 4294967296,
+                                    "uniqueId": "08470427-9f14-4b07-834d-a7eed1c1dc39"
+                                }
+                            }
+                        ]
+                    }
+                }
+            }
+        },
+        {
+            "request": {
+                "method": "PUT",
+                "uri": "https://management.azure.com/subscriptions/ea42f556-5106-4743-99b0-c129bfa71a47/resourceGroups/TEST_DISK-SNAPSHOT-FULL/providers/Microsoft.Compute/snapshots/cctest-snapshot-full-disk-20261007235959?api-version=2024-03-02",
+                "body": "mock_body",
+                "headers": {}
+            },
+            "response": {
+                "status": {
+                    "code": 202,
+                    "message": ""
+                },
+                "headers": {
+                    "date": [
+                        "Wed, 07 Oct 2026 15:05:53 GMT"
+                    ],
+                    "x-ms-ratelimit-remaining-subscription-global-writes": [
+                        "2999"
+                    ],
+                    "x-msedge-ref": [
+                        "Ref A: 760FE1A1727A4AD795AD36F663B84D97 Ref B: CHI261140504042 Ref C: 2026-10-07T15:05:54Z"
+                    ],
+                    "x-cache": [
+                        "CONFIG_NOCACHE"
+                    ],
+                    "content-type": [
+                        "application/json; charset=utf-8"
+                    ],
+                    "azure-asyncoperation": [
+                        "https://management.azure.com/subscriptions/ea42f556-5106-4743-99b0-c129bfa71a47/providers/Microsoft.Compute/locations/southcentralus/DiskOperations/151d076e-15a5-4f12-a149-3356e0c0b3d5?p=98acd7d6-03f6-45a6-b0f1-6a08d463d7b7&api-version=2024-03-02&t=639269823547267119&c=redacted&s=redacted&h=redacted"
+                    ],
+                    "x-ms-ratelimit-remaining-subscription-writes": [
+                        "199"
+                    ],
+                    "cache-control": [
+                        "no-cache"
+                    ],
+                    "x-ms-ratelimit-remaining-resource": [
+                        "Microsoft.Compute/HighCostSnapshotCreateHydrate3Min;998,Microsoft.Compute/HighCostSnapshotCreateHydrate30Min;7998"
+                    ],
+                    "location": [
+                        "https://management.azure.com/subscriptions/ea42f556-5106-4743-99b0-c129bfa71a47/providers/Microsoft.Compute/locations/southcentralus/DiskOperations/151d076e-15a5-4f12-a149-3356e0c0b3d5?p=98acd7d6-03f6-45a6-b0f1-6a08d463d7b7&monitor=true&api-version=2024-03-02&t=639269823547267119&c=redacted&s=redacted&h=redacted"
+                    ],
+                    "content-length": [
+                        "748"
+                    ]
+                },
+                "body": {
+                    "data": {
+                        "name": "cctest-snapshot-full-disk-20261007235959",
+                        "id": "/subscriptions/ea42f556-5106-4743-99b0-c129bfa71a47/resourceGroups/TEST_DISK-SNAPSHOT-FULL/providers/Microsoft.Compute/snapshots/cctest-snapshot-full-disk-20261007235959",
+                        "type": "Microsoft.Compute/snapshots",
+                        "location": "southcentralus",
+                        "tags": {
+                            "testtag": "testvalue",
+                            "custodian_snapshot": "test-azure-disk-snapshot"
+                        },
+                        "properties": {
+                            "creationData": {
+                                "createOption": "Copy",
+                                "sourceResourceId": "/subscriptions/ea42f556-5106-4743-99b0-c129bfa71a47/resourceGroups/TEST_DISK-SNAPSHOT-FULL/providers/Microsoft.Compute/disks/cctest-snapshot-full-disk"
+                            },
+                            "incremental": false,
+                            "provisioningState": "Updating"
+                        }
+                    }
+                }
+            }
+        },
+        {
+            "request": {
+                "method": "GET",
+                "uri": "https://management.azure.com/subscriptions/ea42f556-5106-4743-99b0-c129bfa71a47/providers/Microsoft.Compute/locations/southcentralus/DiskOperations/151d076e-15a5-4f12-a149-3356e0c0b3d5?p=98acd7d6-03f6-45a6-b0f1-6a08d463d7b7&api-version=2024-03-02&t=639269823547267119&c=redacted&s=redacted&h=redacted",
+                "body": null,
+                "headers": {}
+            },
+            "response": {
+                "status": {
+                    "code": 200,
+                    "message": ""
+                },
+                "headers": {
+                    "date": [
+                        "Wed, 07 Oct 2026 15:05:54 GMT"
+                    ],
+                    "x-msedge-ref": [
+                        "Ref A: 4ABB3AEE576B47A09098C9B3E0FBF45A Ref B: CHI261140514060 Ref C: 2026-10-07T15:05:54Z"
+                    ],
+                    "x-cache": [
+                        "CONFIG_NOCACHE"
+                    ],
+                    "content-type": [
+                        "application/json; charset=utf-8"
+                    ],
+                    "x-ms-ratelimit-remaining-subscription-global-reads": [
+                        "3749"
+                    ],
+                    "cache-control": [
+                        "no-cache"
+                    ],
+                    "x-ms-ratelimit-remaining-resource": [
+                        "Microsoft.Compute/GetOperation3Min;49984,Microsoft.Compute/GetOperation30Min;399984"
+                    ],
+                    "content-length": [
+                        "134"
+                    ]
+                },
+                "body": {
+                    "data": {
+                        "startTime": "2026-10-07T15:05:54.6590984+00:00",
+                        "status": "InProgress",
+                        "name": "151d076e-15a5-4f12-a149-3356e0c0b3d5"
+                    }
+                }
+            }
+        },
+        {
+            "request": {
+                "method": "GET",
+                "uri": "https://management.azure.com/subscriptions/ea42f556-5106-4743-99b0-c129bfa71a47/providers/Microsoft.Compute/locations/southcentralus/DiskOperations/151d076e-15a5-4f12-a149-3356e0c0b3d5?p=98acd7d6-03f6-45a6-b0f1-6a08d463d7b7&api-version=2024-03-02&t=639269823547267119&c=redacted&s=redacted&h=redacted",
+                "body": null,
+                "headers": {}
+            },
+            "response": {
+                "status": {
+                    "code": 200,
+                    "message": ""
+                },
+                "headers": {
+                    "date": [
+                        "Wed, 07 Oct 2026 15:06:04 GMT"
+                    ],
+                    "x-ms-ratelimit-remaining-resource": [
+                        "Microsoft.Compute/GetOperation3Min;49982,Microsoft.Compute/GetOperation30Min;399982"
+                    ],
+                    "x-msedge-ref": [
+                        "Ref A: 4B77CEAE5D6D48908DB1773CD0E8F0BE Ref B: CHI261140507031 Ref C: 2026-10-07T15:06:05Z"
+                    ],
+                    "x-cache": [
+                        "CONFIG_NOCACHE"
+                    ],
+                    "content-type": [
+                        "application/json; charset=utf-8"
+                    ],
+                    "content-length": [
+                        "1267"
+                    ],
+                    "cache-control": [
+                        "no-cache"
+                    ],
+                    "x-ms-ratelimit-remaining-subscription-global-reads": [
+                        "3749"
+                    ]
+                },
+                "body": {
+                    "data": {
+                        "startTime": "2026-10-07T15:05:54.6590984+00:00",
+                        "endTime": "2026-10-07T15:05:55.8841132+00:00",
+                        "status": "Succeeded",
+                        "properties": {
+                            "output": {
+                                "name": "cctest-snapshot-full-disk-20261007235959",
+                                "id": "/subscriptions/ea42f556-5106-4743-99b0-c129bfa71a47/resourceGroups/TEST_DISK-SNAPSHOT-FULL/providers/Microsoft.Compute/snapshots/cctest-snapshot-full-disk-20261007235959",
+                                "type": "Microsoft.Compute/snapshots",
+                                "location": "southcentralus",
+                                "tags": {
+                                    "testtag": "testvalue",
+                                    "custodian_snapshot": "test-azure-disk-snapshot"
+                                },
+                                "sku": {
+                                    "name": "Standard_LRS",
+                                    "tier": "Standard"
+                                },
+                                "properties": {
+                                    "creationData": {
+                                        "createOption": "Copy",
+                                        "sourceResourceId": "/subscriptions/ea42f556-5106-4743-99b0-c129bfa71a47/resourceGroups/TEST_DISK-SNAPSHOT-FULL/providers/Microsoft.Compute/disks/cctest-snapshot-full-disk",
+                                        "sourceUniqueId": "57c2a59e-4f59-4bc9-a040-0ad6976d8120"
+                                    },
+                                    "diskSizeGB": 4,
+                                    "encryption": {
+                                        "type": "EncryptionAtRestWithPlatformKey"
+                                    },
+                                    "incremental": false,
+                                    "networkAccessPolicy": "AllowAll",
+                                    "publicNetworkAccess": "Enabled",
+                                    "timeCreated": "2026-10-07T15:05:54.6638236+00:00",
+                                    "provisioningState": "Succeeded",
+                                    "diskState": "Unattached",
+                                    "diskSizeBytes": 4294967296,
+                                    "uniqueId": "8553493c-1c9b-4751-8f94-75f2ec0e9bf0"
+                                }
+                            }
+                        },
+                        "name": "151d076e-15a5-4f12-a149-3356e0c0b3d5"
+                    }
+                }
+            }
+        },
+        {
+            "request": {
+                "method": "GET",
+                "uri": "https://management.azure.com/subscriptions/ea42f556-5106-4743-99b0-c129bfa71a47/resourceGroups/TEST_DISK-SNAPSHOT-FULL/providers/Microsoft.Compute/snapshots/cctest-snapshot-full-disk-20261007235959?api-version=2024-03-02",
+                "body": null,
+                "headers": {}
+            },
+            "response": {
+                "status": {
+                    "code": 200,
+                    "message": ""
+                },
+                "headers": {
+                    "date": [
+                        "Wed, 07 Oct 2026 15:06:05 GMT"
+                    ],
+                    "x-ms-ratelimit-remaining-resource": [
+                        "Microsoft.Compute/LowCostGet3Min;14986,Microsoft.Compute/LowCostGet30Min;119986"
+                    ],
+                    "x-msedge-ref": [
+                        "Ref A: E6F6F771342E448FB028A89216D331F5 Ref B: CHI261140512036 Ref C: 2026-10-07T15:06:05Z"
+                    ],
+                    "x-cache": [
+                        "CONFIG_NOCACHE"
+                    ],
+                    "content-type": [
+                        "application/json; charset=utf-8"
+                    ],
+                    "content-length": [
+                        "1244"
+                    ],
+                    "cache-control": [
+                        "no-cache"
+                    ],
+                    "x-ms-ratelimit-remaining-subscription-global-reads": [
+                        "3749"
+                    ]
+                },
+                "body": {
+                    "data": {
+                        "name": "cctest-snapshot-full-disk-20261007235959",
+                        "id": "/subscriptions/ea42f556-5106-4743-99b0-c129bfa71a47/resourceGroups/TEST_DISK-SNAPSHOT-FULL/providers/Microsoft.Compute/snapshots/cctest-snapshot-full-disk-20261007235959",
+                        "type": "Microsoft.Compute/snapshots",
+                        "location": "southcentralus",
+                        "tags": {
+                            "testtag": "testvalue",
+                            "custodian_snapshot": "test-azure-disk-snapshot"
+                        },
+                        "sku": {
+                            "name": "Standard_LRS",
+                            "tier": "Standard"
+                        },
+                        "properties": {
+                            "creationData": {
+                                "createOption": "Copy",
+                                "sourceResourceId": "/subscriptions/ea42f556-5106-4743-99b0-c129bfa71a47/resourceGroups/TEST_DISK-SNAPSHOT-FULL/providers/Microsoft.Compute/disks/cctest-snapshot-full-disk",
+                                "sourceUniqueId": "57c2a59e-4f59-4bc9-a040-0ad6976d8120"
+                            },
+                            "diskSizeGB": 4,
+                            "encryption": {
+                                "type": "EncryptionAtRestWithPlatformKey"
+                            },
+                            "incremental": false,
+                            "networkAccessPolicy": "AllowAll",
+                            "publicNetworkAccess": "Enabled",
+                            "timeCreated": "2026-10-07T15:05:54.6638236+00:00",
+                            "provisioningState": "Succeeded",
+                            "diskState": "Unattached",
+                            "diskSizeBytes": 4294967296,
+                            "uniqueId": "8553493c-1c9b-4751-8f94-75f2ec0e9bf0"
+                        }
+                    }
+                }
+            }
+        },
+        {
+            "request": {
+                "method": "GET",
+                "uri": "https://management.azure.com/subscriptions/ea42f556-5106-4743-99b0-c129bfa71a47/resourceGroups/test_disk-snapshot-full/providers/Microsoft.Compute/snapshots?api-version=2024-03-02",
+                "body": null,
+                "headers": {}
+            },
+            "response": {
+                "status": {
+                    "code": 200,
+                    "message": "OK"
+                },
+                "headers": {
+                    "date": [
+                        "Wed, 07 Oct 2026 15:06:06 GMT"
+                    ],
+                    "x-ms-ratelimit-remaining-resource": [
+                        "Microsoft.Compute/HighCostGet3Min;235,Microsoft.Compute/HighCostGet30Min;1915"
+                    ],
+                    "x-msedge-ref": [
+                        "Ref A: 9BBF03122CEA4EEE8203177C69040FCB Ref B: CHI261140512025 Ref C: 2026-10-07T15:06:06Z"
+                    ],
+                    "x-cache": [
+                        "CONFIG_NOCACHE"
+                    ],
+                    "content-type": [
+                        "application/json; charset=utf-8"
+                    ],
+                    "content-length": [
+                        "1054"
+                    ],
+                    "cache-control": [
+                        "no-cache"
+                    ],
+                    "x-ms-original-request-ids": [
+                        "32d65a0f-441e-49d9-be28-7a7ed5f93705"
+                    ],
+                    "x-ms-ratelimit-remaining-subscription-global-reads": [
+                        "3749"
+                    ]
+                },
+                "body": {
+                    "data": {
+                        "value": [
+                            {
+                                "name": "cctest-snapshot-full-disk-20261007235959",
+                                "id": "/subscriptions/ea42f556-5106-4743-99b0-c129bfa71a47/resourceGroups/test_disk-snapshot-full/providers/Microsoft.Compute/snapshots/cctest-snapshot-full-disk-20261007235959",
+                                "type": "Microsoft.Compute/snapshots",
+                                "location": "southcentralus",
+                                "tags": {
+                                    "testtag": "testvalue",
+                                    "custodian_snapshot": "test-azure-disk-snapshot"
+                                },
+                                "sku": {
+                                    "name": "Standard_LRS",
+                                    "tier": "Standard"
+                                },
+                                "properties": {
+                                    "creationData": {
+                                        "createOption": "Copy",
+                                        "sourceResourceId": "/subscriptions/ea42f556-5106-4743-99b0-c129bfa71a47/resourceGroups/TEST_DISK-SNAPSHOT-FULL/providers/Microsoft.Compute/disks/cctest-snapshot-full-disk",
+                                        "sourceUniqueId": "57c2a59e-4f59-4bc9-a040-0ad6976d8120"
+                                    },
+                                    "diskSizeGB": 4,
+                                    "encryption": {
+                                        "type": "EncryptionAtRestWithPlatformKey"
+                                    },
+                                    "incremental": false,
+                                    "networkAccessPolicy": "AllowAll",
+                                    "publicNetworkAccess": "Enabled",
+                                    "timeCreated": "2026-10-07T15:05:54.6638236+00:00",
+                                    "provisioningState": "Succeeded",
+                                    "diskState": "Unattached",
+                                    "diskSizeBytes": 4294967296,
+                                    "uniqueId": "8553493c-1c9b-4751-8f94-75f2ec0e9bf0"
+                                }
+                            }
+                        ]
+                    }
+                }
+            }
+        }
+    ]
+}

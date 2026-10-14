@@ -1,6 +1,11 @@
 # Copyright The Cloud Custodian Authors.
 # SPDX-License-Identifier: Apache-2.0
-from c7n.reports.csvout import Formatter, strip_output_path
+from c7n.reports.csvout import (
+    Formatter,
+    sanitize_csv_rows,
+    sanitize_csv_value,
+    strip_output_path,
+)
 from .common import BaseTest, load_data
 
 
@@ -164,3 +169,33 @@ class TestMultiReport(BaseTest):
             strip_output_path(p, policy_name) == f"logs/{policy_name}"
             for p in output_paths
         ))
+
+
+class TestCsvSanitize(BaseTest):
+
+    def test_sanitize_csv_value(self):
+        self.assertEqual(sanitize_csv_value("=cmd|'/c calc'!A1"), "'=cmd|'/c calc'!A1")
+        self.assertEqual(sanitize_csv_value("+1+1"), "'+1+1")
+        self.assertEqual(sanitize_csv_value("-2+3"), "'-2+3")
+        self.assertEqual(sanitize_csv_value("@SUM(A1)"), "'@SUM(A1)")
+        self.assertEqual(sanitize_csv_value("\tHYPERLINK"), "'\tHYPERLINK")
+        # ordinary values and non-strings are returned untouched
+        self.assertEqual(sanitize_csv_value("i-0abc123"), "i-0abc123")
+        self.assertEqual(sanitize_csv_value(""), "")
+        self.assertEqual(sanitize_csv_value(5), 5)
+
+    def test_formula_tag_value_is_neutralized(self):
+        # a Name tag an attacker set on a resource reaches a report cell
+        p = self.load_policy({"name": "report-test-ec2", "resource": "ec2"})
+        formatter = Formatter(
+            p.resource_manager.resource_type,
+            extra_fields=["name=tag:Name"],
+            include_default_fields=False,
+        )
+        record = {
+            "LaunchTime": "2020-01-01T00:00:00+00:00",
+            "Tags": [{"Key": "Name", "Value": "=cmd|'/c calc'!A1"}],
+        }
+        rows = formatter.to_csv([record], unique=False)
+        self.assertEqual(rows, [["=cmd|'/c calc'!A1"]])
+        self.assertEqual(sanitize_csv_rows(rows), [["'=cmd|'/c calc'!A1"]])

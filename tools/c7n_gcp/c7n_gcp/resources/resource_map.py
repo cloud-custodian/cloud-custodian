@@ -95,6 +95,7 @@ ResourceMap = {
     "gcp.ml-model": "c7n_gcp.resources.mlengine.MLModel",
     "gcp.ncc-spoke": "c7n_gcp.resources.ncc.NCCSpoke",
     "gcp.notebook": "c7n_gcp.resources.notebook.NotebookInstance",
+    "gcp.notebook-v2": "c7n_gcp.resources.notebook.NotebookInstanceV2",
     "gcp.organization": "c7n_gcp.resources.resourcemanager.Organization",
     "gcp.patch-deployment": "c7n_gcp.resources.osconfig.PatchDeployment",
     "gcp.project": "c7n_gcp.resources.resourcemanager.Project",
@@ -124,9 +125,18 @@ ResourceMap = {
     "gcp.vertex-ai-publisher": "c7n_gcp.resources.vertexai.VertexAIPublisher",
     "gcp.vertex-ai-publisher-model": "c7n_gcp.resources.vertexai.VertexAIPublisherModel",
     "gcp.vertex-ai-batch-prediction-job": "c7n_gcp.resources.vertexai.VertexAIBatchPredictionJob",
+    "gcp.vertex-ai-custom-job": "c7n_gcp.resources.vertexai.VertexAICustomJob",
+    "gcp.vertex-ai-dataset": "c7n_gcp.resources.vertexai.VertexAIDataset",
     "gcp.vertex-ai-endpoint": "c7n_gcp.resources.vertexai.VertexAIEndpoint",
+    "gcp.vertex-ai-evaluation-run": "c7n_gcp.resources.vertexai.VertexAIEvaluationRun",
+    "gcp.vertex-ai-hyperparameter-tuning-job": (
+        "c7n_gcp.resources.vertexai.VertexAIHyperparameterTuningJob"),
     "gcp.vertex-ai-location": "c7n_gcp.resources.vertexai.VertexAILocation",
+    "gcp.vertex-ai-model": "c7n_gcp.resources.vertexai.VertexAIModel",
+    "gcp.vertex-ai-metadata-store-artifact": (
+        "c7n_gcp.resources.vertexai.VertexAIMetadataStoreArtifact"),
     "gcp.vpc": "c7n_gcp.resources.network.Network",
+    "gcp.workspace-user": "c7n_gcp.resources.workspace.WorkspaceUser",
     "gcp.zone": "c7n_gcp.resources.compute.Zone",
 }
 # SPDX-License-Identifier: Apache-2.0

@@ -37,7 +37,8 @@ import threading
 import ssl
 
 from botocore.client import Config
-from botocore.exceptions import ClientError
+from botocore.exceptions import (
+    ClientError, ConnectTimeoutError, EndpointConnectionError, ReadTimeoutError)
 
 from collections import defaultdict
 from concurrent.futures import as_completed
@@ -588,6 +589,10 @@ class BucketAssembly:
             self.region_clients[region] = self.session.client('s3', region_name=region)
             return self.region_clients[region]
 
+    def handle_not_found(self, bucket, method_name, error_code=None):
+        """Allow specialized assembly users to retain a not-found signal."""
+        return
+
     def assemble(self, bucket):
 
         client = self.get_client(self.default_region)
@@ -614,9 +619,18 @@ class BucketAssembly:
                     "Bucket ssl error %s: %s %s",
                     bucket['Name'], bucket.get('Location', 'unknown'), e)
                 continue
+            except (ConnectTimeoutError, ReadTimeoutError, EndpointConnectionError) as e:
+                # Endpoint is unreachable or hung - could be a degraded/
+                # unreachable region, or a bucket deleted between
+                # list_buckets and here.
+                log.warning(
+                    "Bucket: %s unable to invoke method: %s error: %s ",
+                    bucket['Name'], method_name, e)
+                continue
             except ClientError as e:
                 code = e.response['Error']['Code']
                 if code.startswith("NoSuch") or "NotFound" in code:
+                    self.handle_not_found(bucket, method_name, code)
                     value = default
                 elif code == 'PermanentRedirect':  # pragma: no cover
                     # (09/2025)- its not clear how we get here given a client region switch post

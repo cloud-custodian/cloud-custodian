@@ -1,0 +1,134 @@
+{
+    "pytest-terraform": 1,
+    "outputs": {},
+    "resources": {
+        "aws_emrserverless_application": {
+            "autostop_disabled": {
+                "architecture": "X86_64",
+                "arn": "arn:aws:emr-serverless:us-east-1:644160558196:/applications/00g7c4jplrhduu09",
+                "auto_start_configuration": [
+                    {
+                        "enabled": true
+                    }
+                ],
+                "auto_stop_configuration": [
+                    {
+                        "enabled": false,
+                        "idle_timeout_minutes": 15
+                    }
+                ],
+                "id": "00g7c4jplrhduu09",
+                "image_configuration": [],
+                "initial_capacity": [],
+                "interactive_configuration": [
+                    {
+                        "livy_endpoint_enabled": null,
+                        "studio_enabled": null
+                    }
+                ],
+                "job_level_cost_allocation_configuration": [
+                    {
+                        "enabled": false
+                    }
+                ],
+                "maximum_capacity": [
+                    {
+                        "cpu": null,
+                        "disk": null,
+                        "memory": null
+                    }
+                ],
+                "monitoring_configuration": [
+                    {
+                        "cloudwatch_logging_configuration": [],
+                        "managed_persistence_monitoring_configuration": [
+                            {
+                                "enabled": true,
+                                "encryption_key_arn": ""
+                            }
+                        ],
+                        "prometheus_monitoring_configuration": [],
+                        "s3_monitoring_configuration": []
+                    }
+                ],
+                "name": "c7n-test-emr-serverless-autostop-disabled",
+                "network_configuration": [
+                    {
+                        "security_group_ids": null,
+                        "subnet_ids": null
+                    }
+                ],
+                "region": "us-east-1",
+                "release_label": "emr-6.9.0",
+                "runtime_configuration": [],
+                "scheduler_configuration": [],
+                "tags": null,
+                "tags_all": {},
+                "type": "spark"
+            },
+            "autostop_enabled": {
+                "architecture": "X86_64",
+                "arn": "arn:aws:emr-serverless:us-east-1:644160558196:/applications/00g7c4jplnn1si09",
+                "auto_start_configuration": [
+                    {
+                        "enabled": true
+                    }
+                ],
+                "auto_stop_configuration": [
+                    {
+                        "enabled": true,
+                        "idle_timeout_minutes": 15
+                    }
+                ],
+                "id": "00g7c4jplnn1si09",
+                "image_configuration": [],
+                "initial_capacity": [],
+                "interactive_configuration": [
+                    {
+                        "livy_endpoint_enabled": null,
+                        "studio_enabled": null
+                    }
+                ],
+                "job_level_cost_allocation_configuration": [
+                    {
+                        "enabled": false
+                    }
+                ],
+                "maximum_capacity": [
+                    {
+                        "cpu": null,
+                        "disk": null,
+                        "memory": null
+                    }
+                ],
+                "monitoring_configuration": [
+                    {
+                        "cloudwatch_logging_configuration": [],
+                        "managed_persistence_monitoring_configuration": [
+                            {
+                                "enabled": true,
+                                "encryption_key_arn": ""
+                            }
+                        ],
+                        "prometheus_monitoring_configuration": [],
+                        "s3_monitoring_configuration": []
+                    }
+                ],
+                "name": "c7n-test-emr-serverless-autostop-enabled",
+                "network_configuration": [
+                    {
+                        "security_group_ids": null,
+                        "subnet_ids": null
+                    }
+                ],
+                "region": "us-east-1",
+                "release_label": "emr-6.9.0",
+                "runtime_configuration": [],
+                "scheduler_configuration": [],
+                "tags": null,
+                "tags_all": {},
+                "type": "spark"
+            }
+        }
+    }
+}

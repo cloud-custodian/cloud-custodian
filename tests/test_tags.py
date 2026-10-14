@@ -4,12 +4,17 @@
 module to test some universal tagging infrastructure not directly exposed.
 """
 import time
+import jsonschema
+from datetime import datetime
 from freezegun import freeze_time
-from unittest.mock import MagicMock, call
+from unittest.mock import MagicMock, call, patch
 
+from botocore.exceptions import ClientError
+
+from c7n import tags as tagmod
 from c7n.tags import universal_retry, coalesce_copy_user_tags
 from c7n.exceptions import PolicyExecutionError, PolicyValidationError
-from c7n.utils import yaml_load
+from c7n.utils import FormatDate, yaml_load
 
 from .common import BaseTest
 
@@ -603,3 +608,372 @@ class CopyRelatedResourceTag(BaseTest):
             ]
         }
         self.assertRaises(PolicyValidationError, self.load_policy, policy)
+
+
+class TagValueSchemaTest(BaseTest):
+    """Tag values are strings, but unquoted YAML scalars have always been
+    accepted and coerced. The fallback is a newer field and stays strict.
+    """
+
+    def validates(self, value):
+        try:
+            jsonschema.validate(
+                {'X': value},
+                {'type': 'object',
+                 'additionalProperties': tagmod.tag_value_schema()})
+            return True
+        except jsonschema.ValidationError:
+            return False
+
+    def test_scalar_accepts_number_and_boolean(self):
+        self.assertTrue(self.validates('plain'))
+        self.assertTrue(self.validates(12345))
+        self.assertTrue(self.validates(True))
+
+    def test_default_value_must_be_a_string(self):
+        self.assertTrue(
+            self.validates({'type': 'resource', 'key': 'K', 'default-value': 'd'}))
+        self.assertFalse(
+            self.validates({'type': 'resource', 'key': 'K', 'default-value': 5}))
+        self.assertFalse(
+            self.validates({'type': 'resource', 'default-value': True}))
+
+    def test_non_scalar_values_rejected(self):
+        self.assertFalse(self.validates(['a']))
+        self.assertFalse(self.validates(None))
+        self.assertFalse(self.validates({'foo': 'bar'}))
+
+
+class ResolveTagValueTest(BaseTest):
+    def test_static_passthrough(self):
+        self.assertEqual(
+            tagmod.resolve_tag_value("plain", "K", {}, set()), "plain")
+
+    def test_lookup_with_key_hit(self):
+        r = {"State": {"Name": "running"}}
+        spec = {"type": "resource", "key": "State.Name"}
+        self.assertEqual(tagmod.resolve_tag_value(spec, "K", r, set()), "running")
+
+    def test_lookup_with_key_miss_uses_default(self):
+        spec = {"type": "resource", "key": "Nope", "default-value": "dv"}
+        self.assertEqual(tagmod.resolve_tag_value(spec, "K", {}, set()), "dv")
+
+    def test_lookup_with_key_miss_no_default_raises(self):
+        spec = {"type": "resource", "key": "Nope"}
+        with self.assertRaises(Exception):
+            tagmod.resolve_tag_value(spec, "K", {}, set())
+
+    def test_conditional_tag_absent_writes_default(self):
+        spec = {"type": "resource", "default-value": "dv"}
+        self.assertEqual(
+            tagmod.resolve_tag_value(spec, "Owner", {}, set()), "dv")
+
+    def test_conditional_tag_present_skips(self):
+        spec = {"type": "resource", "default-value": "dv"}
+        self.assertIs(
+            tagmod.resolve_tag_value(spec, "Owner", {}, {"Owner"}),
+            tagmod.TAG_VALUE_SKIP)
+
+    def test_resource_tag_keys_list_and_dict(self):
+        self.assertEqual(
+            tagmod.resource_tag_keys({"Tags": [{"Key": "A", "Value": "1"}]}), {"A"})
+        self.assertEqual(
+            tagmod.resource_tag_keys({"Tags": {"B": "2"}}), {"B"})
+        self.assertEqual(tagmod.resource_tag_keys({}), set())
+
+    def test_has_dynamic(self):
+        self.assertFalse(tagmod.has_dynamic_tag_values({"A": "x"}))
+        self.assertTrue(
+            tagmod.has_dynamic_tag_values({"A": {"type": "resource", "key": "k"}}))
+
+
+class DynamicTagTest(BaseTest):
+    def _run(self, resources, tags, resource='ec2'):
+        mock_factory = MagicMock()
+        mock_factory.region = 'us-east-1'
+        create_tags = mock_factory().client(resource).create_tags
+        create_tags.return_value = {}
+        policy = self.load_policy(
+            {"name": "d", "resource": resource,
+             "actions": [{"type": "tag", "tags": tags}]},
+            session_factory=mock_factory)
+        policy.resource_manager.actions[0].process(resources)
+        return create_tags
+
+    def test_lookup_key_hit(self):
+        create_tags = self._run(
+            [{"InstanceId": "i-1", "State": {"Name": "running"}}],
+            {"St": {"type": "resource", "key": "State.Name"}})
+        create_tags.assert_called_once_with(
+            Resources=["i-1"], Tags=[{"Key": "St", "Value": "running"}], DryRun=False)
+
+    def test_lookup_key_miss_default(self):
+        create_tags = self._run(
+            [{"InstanceId": "i-1"}],
+            {"St": {"type": "resource", "key": "Nope", "default-value": "dv"}})
+        create_tags.assert_called_once_with(
+            Resources=["i-1"], Tags=[{"Key": "St", "Value": "dv"}], DryRun=False)
+
+    def test_conditional_skip_and_write_group_separately(self):
+        create_tags = self._run(
+            [{"InstanceId": "i-has", "Tags": [{"Key": "Owner", "Value": "x"}]},
+             {"InstanceId": "i-missing"}],
+            {"Owner": {"type": "resource", "default-value": "dv"}})
+        # i-has -> skipped (empty payload, no call); i-missing -> Owner=dv
+        create_tags.assert_called_once_with(
+            Resources=["i-missing"], Tags=[{"Key": "Owner", "Value": "dv"}],
+            DryRun=False)
+
+    def test_dynamic_grouping_two_payloads(self):
+        create_tags = self._run(
+            [{"InstanceId": "i-1", "State": {"Name": "running"}},
+             {"InstanceId": "i-2", "State": {"Name": "stopped"}},
+             {"InstanceId": "i-3", "State": {"Name": "running"}}],
+            {"St": {"type": "resource", "key": "State.Name"}})
+        self.assertEqual(create_tags.call_count, 2)
+        by_value = {c.kwargs["Tags"][0]["Value"]: set(c.kwargs["Resources"])
+                    for c in create_tags.call_args_list}
+        self.assertEqual(by_value["running"], {"i-1", "i-3"})
+        self.assertEqual(by_value["stopped"], {"i-2"})
+
+    def test_static_fast_path_single_call(self):
+        create_tags = self._run(
+            [{"InstanceId": "i-1"}, {"InstanceId": "i-2"}], {"K": "v"})
+        create_tags.assert_called_once_with(
+            Resources=["i-1", "i-2"], Tags=[{"Key": "K", "Value": "v"}], DryRun=False)
+
+    @freeze_time("2022-06-27 12:34:56")
+    def test_placeholder_interpolated_in_default_value(self):
+        create_tags = self._run(
+            [{"InstanceId": "i-1"}],
+            {"Stamp": {"type": "resource", "key": "Nope",
+                       "default-value": "created-{now}-in-{region}"}})
+        create_tags.assert_called_once_with(
+            Resources=["i-1"],
+            Tags=[{"Key": "Stamp", "Value": "created-2022-06-27 12:34:56-in-us-east-1"}],
+            DryRun=False)
+
+    def test_now_resolved_once_for_the_whole_run(self):
+        # a clock that moves on every read - the run should only read it once,
+        # so every resource lands in one group with one timestamp
+        ticks = [FormatDate(datetime(2022, 6, 27, 12, 34, 56)),
+                 FormatDate(datetime(2022, 6, 27, 12, 34, 57))]
+        with patch.object(FormatDate, "utcnow", side_effect=ticks) as utcnow:
+            create_tags = self._run(
+                [{"InstanceId": "i-1"}, {"InstanceId": "i-2"}],
+                {"Stamp": {"type": "resource", "key": "Nope",
+                           "default-value": "at-{now}"}})
+        self.assertEqual(utcnow.call_count, 1)
+        create_tags.assert_called_once_with(
+            Resources=["i-1", "i-2"],
+            Tags=[{"Key": "Stamp", "Value": "at-2022-06-27 12:34:56"}],
+            DryRun=False)
+
+
+class DynamicUniversalTagTest(BaseTest):
+    def _run(self, resources, tags, resource='rds'):
+        mock_factory = MagicMock()
+        mock_factory.region = 'us-east-1'
+        tag_resources = mock_factory().client('resourcegroupstaggingapi').tag_resources
+        tag_resources.return_value = {}
+        policy = self.load_policy(
+            {"name": "d", "resource": resource,
+             "actions": [{"type": "tag", "tags": tags}]},
+            session_factory=mock_factory)
+        policy.resource_manager.actions[0].process(resources)
+        return tag_resources
+
+    def test_universal_lookup_hit(self):
+        tag_resources = self._run(
+            [{"DBInstanceIdentifier": "x", "DBInstanceArn": "arn:x",
+              "Engine": "postgres"}],
+            {"Eng": {"type": "resource", "key": "Engine"}})
+        tag_resources.assert_called_once_with(
+            ResourceARNList=["arn:x"], Tags={"Eng": "postgres"})
+
+    def test_universal_static_fast_path(self):
+        tag_resources = self._run(
+            [{"DBInstanceIdentifier": "x", "DBInstanceArn": "arn:x"}],
+            {"K": "v"})
+        tag_resources.assert_called_once_with(
+            ResourceARNList=["arn:x"], Tags={"K": "v"})
+
+
+# a syntactically valid instance id that doesn't exist, so ec2 answers the
+# tag call with its real "resource gone" error rather than a malformed id one
+GONE_INSTANCE_ID = 'i-0023456789abcdef0'
+
+
+@terraform('ec2_instance_tag')
+def test_native_tag_skips_gone_instance(test, ec2_instance_tag):
+    """A terminated instance in the batch shouldn't cost the rest their tags.
+
+    ec2 fails the whole create_tags call when any resource in it is gone,
+    so we drop the ids it named and tag the rest. aws.ec2-instance-ami is
+    the resource from #10999 - it tags via instance id.
+    """
+    aws_region = 'us-east-1'
+    session_factory = test.replay_flight_data(
+        'test_native_tag_skips_gone_instance', region=aws_region)
+
+    instance_ids = [
+        ec2_instance_tag['aws_instance.first.id'],
+        ec2_instance_tag['aws_instance.second.id'],
+    ]
+
+    p = test.load_policy({
+        'name': 'ec2-instance-ami-tag',
+        'resource': 'aws.ec2-instance-ami',
+        'actions': [
+            {'type': 'tag', 'tags': {'App': 'Custodian'}},
+            {'type': 'remove-tag', 'tags': ['App']}]},
+        session_factory=session_factory, config={'region': aws_region})
+
+    resources = [r for r in p.resource_manager.resources()
+                 if r['InstanceId'] in instance_ids]
+    test.assertEqual(len(resources), 2)
+
+    # the batch ec2 rejects, plus the ones it should still tag
+    resource_set = resources + [{'InstanceId': GONE_INSTANCE_ID}]
+    tag, remove_tag = p.resource_manager.actions
+
+    tag.process(resource_set)
+    client = session_factory().client('ec2')
+    tags = {
+        i['InstanceId']: {t['Key']: t['Value'] for t in i.get('Tags', [])}
+        for r in client.describe_instances(
+            InstanceIds=instance_ids)['Reservations']
+        for i in r['Instances']}
+    for instance_id in instance_ids:
+        test.assertEqual(tags[instance_id].get('App'), 'Custodian')
+
+    # and the same salvage on the way back out
+    remove_tag.id_key = 'InstanceId'
+    remove_tag.process(resource_set)
+    tags = {
+        i['InstanceId']: {t['Key']: t['Value'] for t in i.get('Tags', [])}
+        for r in client.describe_instances(
+            InstanceIds=instance_ids)['Reservations']
+        for i in r['Instances']}
+    for instance_id in instance_ids:
+        test.assertNotIn('App', tags[instance_id])
+
+
+def test_universal_tag_skips_gone_snapshot(test):
+    """The rgta path passes through the service's own resource gone fault.
+
+    elasticache reports a deleted snapshot as SnapshotNotFoundFault, which
+    universal_retry used to raise on - it only skipped
+    ResourceNotFoundException. No fixture, a snapshot that isn't there is
+    the point.
+    """
+    aws_region = 'us-east-1'
+    session_factory = test.replay_flight_data(
+        'test_universal_tag_skips_gone_snapshot', region=aws_region)
+
+    p = test.load_policy({
+        'name': 'cache-snapshot-tag',
+        'resource': 'aws.cache-snapshot',
+        'actions': [{'type': 'tag', 'tags': {'App': 'Custodian'}}]},
+        session_factory=session_factory,
+        config={'region': aws_region, 'account_id': test.account_id})
+
+    # doesn't raise, the snapshot is skipped
+    p.resource_manager.actions[0].process([{'SnapshotName': 'c7n-deleted'}])
+
+
+class ResourceGoneTest(BaseTest):
+    """Tag actions race with resource deletion, a resource which is gone by
+    the time we tag it should be skipped, not abort the whole resource set.
+
+    The recorded tests above cover what aws actually answers with. These
+    cover our own control flow around it, which needs no api.
+    """
+
+    def client_error(self, code, message, op='CreateTags'):
+        return ClientError(
+            {'Error': {'Code': code, 'Message': message}}, op)
+
+    def get_tag_action(self, name):
+        p = self.load_policy({
+            'name': 'tag-instances',
+            'resource': 'aws.ec2',
+            'actions': [
+                {'type': 'tag', 'tags': {'Env': 'Dev'}},
+                {'type': 'remove-tag', 'tags': ['Env']}]})
+        action = {a.type: a for a in p.resource_manager.actions}[name]
+        action.id_key = 'InstanceId'
+        return action
+
+    def test_extract_bad_resource_ids(self):
+        # message shapes here are the ones in our recorded api data, see
+        # tests/data/placebo - ec2 words them per resource type
+        for code, message, expected in (
+                ('InvalidNetworkInterfaceID.NotFound',
+                 "The networkInterface ID 'eni-d834cdcf' does not exist",
+                 ('eni-d834cdcf',)),
+                ('InvalidVolume.NotFound',
+                 "The volume 'vol-notfound' does not exist.",
+                 ('vol-notfound',)),
+                ('InvalidSnapshotID.Malformed',
+                 'Invalid id: "snap-malformedsnap"',
+                 ('snap-malformedsnap',)),
+                # not an ec2 bad id error, nothing to skip
+                ('UnauthorizedOperation', "You are not authorized", ()),
+                ('SnapshotNotFoundFault', "'snap-1' not found", ())):
+            self.assertEqual(
+                tagmod.extract_bad_resource_ids(
+                    self.client_error(code, message)),
+                expected)
+
+    def test_native_tag_raises_other_errors(self):
+        action = self.get_tag_action('tag')
+        client = MagicMock()
+        client.create_tags.side_effect = self.client_error(
+            'UnauthorizedOperation', "You are not authorized")
+        self.assertRaises(
+            ClientError,
+            action.process_resource_set,
+            client, [{'InstanceId': 'i-1'}], [{'Key': 'Env', 'Value': 'Dev'}])
+
+    def test_native_tag_raises_on_unknown_bad_id(self):
+        # we only skip the resources ec2 actually named, an id we don't
+        # recognize means we don't understand the error - don't swallow it
+        action = self.get_tag_action('tag')
+        client = MagicMock()
+        client.create_tags.side_effect = self.client_error(
+            'InvalidInstanceID.NotFound',
+            "The instance IDs 'i-9' do not exist")
+        self.assertRaises(
+            ClientError,
+            action.process_resource_set,
+            client, [{'InstanceId': 'i-1'}], [{'Key': 'Env', 'Value': 'Dev'}])
+
+    def test_universal_retry_skips_gone_and_retries_throttle(self):
+        # a throttle alongside a skip still retries the throttled arn
+        self.patch(time, "sleep", MagicMock())
+        method = MagicMock()
+        method.side_effect = [
+            {"FailedResourcesMap": {
+                "arn:abc": {"ErrorCode": "ThrottlingException"},
+                "arn:def": {"ErrorCode": "NotFoundException"}}},
+            {"Result": 32},
+        ]
+        self.assertEqual(
+            universal_retry(method, ["arn:abc", "arn:def"]), {"Result": 32})
+        self.assertEqual(
+            method.call_args_list,
+            [call(ResourceARNList=["arn:abc", "arn:def"]),
+             call(ResourceARNList=["arn:abc"])])
+
+    def test_universal_retry_all_skipped_stops(self):
+        # nothing left to retry, and the api rejects an empty arn list
+        sleep = MagicMock()
+        self.patch(time, "sleep", sleep)
+        method = MagicMock()
+        method.side_effect = [{
+            "FailedResourcesMap": {
+                "arn:abc": {"ErrorCode": "SnapshotNotFoundFault"}}}]
+        universal_retry(method, ["arn:abc"])
+        method.assert_called_once()
+        sleep.assert_not_called()

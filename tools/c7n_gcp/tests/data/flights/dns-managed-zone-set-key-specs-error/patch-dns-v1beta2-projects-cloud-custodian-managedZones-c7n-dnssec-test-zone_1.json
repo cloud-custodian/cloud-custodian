@@ -1,0 +1,29 @@
+{
+  "headers": {
+    "content-type": "application/json; charset=UTF-8",
+    "vary": "Origin, X-Origin, Referer",
+    "date": "Tue, 10 Mar 2026 17:00:37 GMT",
+    "server": "ESF",
+    "x-xss-protection": "0",
+    "x-frame-options": "SAMEORIGIN",
+    "x-content-type-options": "nosniff",
+    "alt-svc": "h3=\":443\"; ma=2592000,h3-29=\":443\"; ma=2592000",
+    "transfer-encoding": "chunked",
+    "status": "409",
+    "content-length": "380",
+    "-content-encoding": "gzip"
+  },
+  "body": {
+    "error": {
+      "code": 409,
+      "message": "The resource 'entity.managedZone.dnssecConfig.defaultKeySpecs[1]' named 'KEY_SIGNING' already exists",
+      "errors": [
+        {
+          "message": "The resource 'entity.managedZone.dnssecConfig.defaultKeySpecs[1]' named 'KEY_SIGNING' already exists",
+          "domain": "global",
+          "reason": "alreadyExists"
+        }
+      ]
+    }
+  }
+}

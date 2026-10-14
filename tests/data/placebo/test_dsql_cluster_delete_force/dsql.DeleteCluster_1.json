@@ -1,0 +1,19 @@
+{
+    "status_code": 200,
+    "data": {
+        "ResponseMetadata": {},
+        "identifier": "y5t6ak7knpdufei7vlyn7npruu",
+        "arn": "arn:aws:dsql:us-east-1:644160558196:cluster/y5t6ak7knpdufei7vlyn7npruu",
+        "status": "DELETING",
+        "creationTime": {
+            "__class__": "datetime",
+            "year": 2026,
+            "month": 7,
+            "day": 20,
+            "hour": 14,
+            "minute": 20,
+            "second": 56,
+            "microsecond": 358000
+        }
+    }
+}

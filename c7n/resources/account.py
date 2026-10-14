@@ -2544,6 +2544,60 @@ class BedrockModelInvocationLogging(ListItemFilter):
         return item_values
 
 
+@filters.register('iot-logging')
+class IoTLogging(ValueFilter):
+    """Check account level IoT logging configuration
+
+    IoT device activity logs are delivered to CloudWatch Logs. On top of the
+    fields returned by GetV2LoggingOptions, an extra key, loggingConfigured,
+    is set to true or false to signify whether logging has been configured for
+    the account at all. No other fields are present when it is false, so match
+    on loggingConfigured rather than on a missing field.
+
+    :example:
+
+    .. code-block:: yaml
+
+            policies:
+              - name: iot-logging-not-enabled
+                resource: account
+                filters:
+                  - or:
+                    - type: iot-logging
+                      key: loggingConfigured
+                      value: false
+                    - type: iot-logging
+                      key: disableAllLogs
+                      value: true
+                    - type: iot-logging
+                      key: defaultLogLevel
+                      value: DISABLED
+    """
+    annotation_key = 'c7n:IoTLogging'
+    annotate = False
+    schema = type_schema('iot-logging', rinherit=ValueFilter.schema)
+    schema_alias = False
+    permissions = ('iot:GetV2LoggingOptions',)
+
+    def process(self, resources, event=None):
+        self.augment([r for r in resources if self.annotation_key not in r])
+        return super().process(resources, event)
+
+    def augment(self, resources):
+        client = local_session(self.manager.session_factory).client('iot')
+        for r in resources:
+            try:
+                options = client.get_v2_logging_options()
+                options.pop('ResponseMetadata', None)
+                options['loggingConfigured'] = True
+            except client.exceptions.NotConfiguredException:
+                options = {'loggingConfigured': False}
+            r[self.annotation_key] = options
+
+    def __call__(self, r):
+        return super().__call__(r[self.annotation_key])
+
+
 @actions.register('set-bedrock-model-invocation-logging')
 class SetBedrockModelInvocationLogging(BaseAction):
     """Set Bedrock Model Invocation Logging Configuration on an account.

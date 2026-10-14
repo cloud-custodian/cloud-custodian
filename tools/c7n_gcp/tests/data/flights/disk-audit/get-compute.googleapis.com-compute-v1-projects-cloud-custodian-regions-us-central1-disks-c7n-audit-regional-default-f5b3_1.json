@@ -1,0 +1,39 @@
+{
+  "headers": {
+    "content-type": "application/json; charset=UTF-8",
+    "vary": "Origin, X-Origin, Referer",
+    "date": "Thu, 20 Aug 2026 19:50:12 GMT",
+    "server": "ESF",
+    "x-xss-protection": "0",
+    "x-frame-options": "SAMEORIGIN",
+    "x-content-type-options": "nosniff",
+    "alt-svc": "h3=\":443\"; ma=2592000,h3-29=\":443\"; ma=2592000",
+    "transfer-encoding": "chunked",
+    "status": "200",
+    "content-length": "935",
+    "-content-encoding": "gzip",
+    "content-location": "https://compute.googleapis.com/compute/v1/projects/cloud-custodian/regions/us-central1/disks/c7n-audit-regional-default-f5b3?alt=json"
+  },
+  "body": {
+    "kind": "compute#disk",
+    "id": "685703828320478397",
+    "creationTimestamp": "2026-08-20T12:49:39.196-07:00",
+    "name": "c7n-audit-regional-default-f5b3",
+    "sizeGb": "10",
+    "status": "READY",
+    "selfLink": "https://www.googleapis.com/compute/v1/projects/cloud-custodian/regions/us-central1/disks/c7n-audit-regional-default-f5b3",
+    "type": "https://www.googleapis.com/compute/v1/projects/cloud-custodian/regions/us-central1/diskTypes/pd-ssd",
+    "labels": {
+      "c7n-audit": "recorded"
+    },
+    "labelFingerprint": "zDEAsyrnel8=",
+    "region": "https://www.googleapis.com/compute/v1/projects/cloud-custodian/regions/us-central1",
+    "replicaZones": [
+      "https://www.googleapis.com/compute/v1/projects/cloud-custodian/zones/us-central1-a",
+      "https://www.googleapis.com/compute/v1/projects/cloud-custodian/zones/us-central1-b"
+    ],
+    "physicalBlockSizeBytes": "4096",
+    "enableConfidentialCompute": false,
+    "satisfiesPzi": true
+  }
+}

@@ -1,0 +1,22 @@
+{
+    "status_code": 200,
+    "data": {
+        "ResponseMetadata": {},
+        "TransitionDefaultMinimumObjectSize": "all_storage_classes_128K",
+        "Rules": [
+            {
+                "Expiration": {
+                    "Days": 30
+                },
+                "ID": "evaluation-output-retention",
+                "Filter": {
+                    "Prefix": "evaluations/"
+                },
+                "Status": "Enabled",
+                "NoncurrentVersionExpiration": {
+                    "NoncurrentDays": 10
+                }
+            }
+        ]
+    }
+}

@@ -1,0 +1,41 @@
+{
+    "status_code": 200,
+    "data": {
+        "Stacks": [
+            {
+                "StackId": "arn:aws:cloudformation:us-east-1:123456789012:stack/c7n-mark-stack/11111111-2222-3333-4444-555555555555",
+                "StackName": "c7n-mark-stack",
+                "Description": "Custodian test stack",
+                "CreationTime": {
+                    "__class__": "datetime",
+                    "year": 2024,
+                    "month": 1,
+                    "day": 10,
+                    "hour": 12,
+                    "minute": 30,
+                    "second": 0,
+                    "microsecond": 0
+                },
+                "StackStatus": "CREATE_COMPLETE",
+                "DisableRollback": false,
+                "NotificationARNs": [],
+                "Capabilities": ["CAPABILITY_IAM"],
+                "Parameters": [],
+                "Tags": [
+                    {"Key": "Env", "Value": "Dev"}
+                ]
+            }
+        ],
+        "ResponseMetadata": {
+            "RequestId": "aaaaaaaa-bbbb-cccc-dddd-eeeeeeeeeeee",
+            "HTTPStatusCode": 200,
+            "HTTPHeaders": {
+                "content-length": "123",
+                "content-type": "text/xml",
+                "date": "Thu, 01 Feb 2024 12:00:00 GMT",
+                "x-amzn-requestid": "aaaaaaaa-bbbb-cccc-dddd-eeeeeeeeeeee"
+            },
+            "RetryAttempts": 0
+        }
+    }
+}

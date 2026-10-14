@@ -1,0 +1,104 @@
+{
+  "insertId": "r8vz4af1rld5w",
+  "labels": {
+    "compute.googleapis.com/root_trigger_id": "83bb1aa1-1317-4779-8737-82dd1eed5ce9"
+  },
+  "logName": "projects/cloud-custodian/logs/cloudaudit.googleapis.com%2Factivity",
+  "operation": {
+    "first": true,
+    "id": "operation-1787255378942-6597fd1fc18a3-18e93fdb-2cf54cd4",
+    "producer": "compute.googleapis.com"
+  },
+  "protoPayload": {
+    "@type": "type.googleapis.com/google.cloud.audit.AuditLog",
+    "apiVersionIdentifier": "v1",
+    "authenticationInfo": {
+      "oauthInfo": {
+        "oauthClientId": "764086051850-6qr4p6gpi6hn506pt8ejuq83di341hur.apps.googleusercontent.com"
+      },
+      "principalEmail": "user@example.com",
+      "principalSubject": "user:user@example.com"
+    },
+    "authorizationInfo": [
+      {
+        "granted": true,
+        "permission": "compute.disks.create",
+        "permissionType": "ADMIN_WRITE",
+        "resource": "projects/cloud-custodian/zones/us-central1-a/disks/c7n-audit-zonal-default-f5b3",
+        "resourceAttributes": {
+          "name": "projects/cloud-custodian/zones/us-central1-a/disks/c7n-audit-zonal-default-f5b3",
+          "service": "compute",
+          "type": "compute.disks"
+        }
+      },
+      {
+        "granted": true,
+        "permission": "compute.disks.setLabels",
+        "permissionType": "ADMIN_WRITE",
+        "resource": "projects/cloud-custodian/zones/us-central1-a/disks/c7n-audit-zonal-default-f5b3",
+        "resourceAttributes": {
+          "name": "projects/cloud-custodian/zones/us-central1-a/disks/c7n-audit-zonal-default-f5b3",
+          "service": "compute",
+          "type": "compute.disks"
+        }
+      }
+    ],
+    "methodName": "v1.compute.disks.insert",
+    "request": {
+      "@type": "type.googleapis.com/compute.disks.insert",
+      "labels": [
+        {
+          "key": "goog-terraform-provisioned",
+          "value": "true"
+        }
+      ],
+      "name": "c7n-audit-zonal-default-f5b3",
+      "sizeGb": "10",
+      "type": "projects/cloud-custodian/zones/us-central1-a/diskTypes/pd-ssd"
+    },
+    "requestMetadata": {
+      "callerIp": "198.51.100.1",
+      "callerSuppliedUserAgent": "Terraform/1.13.0 (+https://www.terraform.io) Terraform-Plugin-SDK/2.40.1 terraform-provider-google/dev7,gzip(gfe)",
+      "destinationAttributes": {},
+      "requestAttributes": {
+        "auth": {},
+        "time": "2026-08-20T19:49:39.300360Z"
+      }
+    },
+    "resourceLocation": {
+      "currentLocations": [
+        "us-central1-a"
+      ]
+    },
+    "resourceName": "projects/cloud-custodian/zones/us-central1-a/disks/c7n-audit-zonal-default-f5b3",
+    "response": {
+      "@type": "type.googleapis.com/operation",
+      "id": "1996680382823195836",
+      "insertTime": "2026-08-20T12:49:39.158-07:00",
+      "name": "operation-1787255378942-6597fd1fc18a3-18e93fdb-2cf54cd4",
+      "operationType": "insert",
+      "progress": "0",
+      "selfLink": "https://www.googleapis.com/compute/v1/projects/cloud-custodian/zones/us-central1-a/operations/operation-1787255378942-6597fd1fc18a3-18e93fdb-2cf54cd4",
+      "selfLinkWithId": "https://www.googleapis.com/compute/v1/projects/cloud-custodian/zones/us-central1-a/operations/1996680382823195836",
+      "startTime": "2026-08-20T12:49:39.162-07:00",
+      "status": "RUNNING",
+      "targetId": "4992374716928550077",
+      "targetLink": "https://www.googleapis.com/compute/v1/projects/cloud-custodian/zones/us-central1-a/disks/c7n-audit-zonal-default-f5b3",
+      "user": "user@example.com",
+      "zone": "https://www.googleapis.com/compute/v1/projects/cloud-custodian/zones/us-central1-a"
+    },
+    "serviceName": "compute.googleapis.com",
+    "status": {}
+  },
+  "receiveTimestamp": "2026-08-20T19:49:39.780150948Z",
+  "resource": {
+    "labels": {
+      "disk_id": "4992374716928550077",
+      "project_id": "cloud-custodian",
+      "zone": "us-central1-a"
+    },
+    "type": "gce_disk"
+  },
+  "severity": "NOTICE",
+  "timestamp": "2026-08-20T19:49:38.912796Z"
+}

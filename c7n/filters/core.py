@@ -709,7 +709,7 @@ class ValueFilter(BaseValueFilter):
 
         When using a Value Filter, a ``value_path`` can be specified.
         This means the value(s) the filter will compare against are
-        calculated during the initialization of the filter.
+        recalculated for each resource being filtered.
 
         Note that this option only pulls properties of the resource
         currently being filtered.
@@ -739,12 +739,13 @@ class ValueFilter(BaseValueFilter):
             if 'value_from' in self.data:
                 values = ValuesFrom(self.data['value_from'], self.manager)
                 self.v = values.get_values()
-            elif 'value_path' in self.data:
-                self.v = self.get_path_value(i)
-            else:
+            elif 'value_path' not in self.data:
                 self.v = self.data.get('value')
             self.content_initialized = True
             self.vtype = self.data.get('value_type')
+
+        if 'value_path' in self.data and 'value_from' not in self.data:
+            self.v = self.get_path_value(i)
 
         if i is None:
             return False
@@ -1149,13 +1150,15 @@ class ReduceFilter(BaseValueFilter):
         if 'group-by' in self.data or 'order' in self.data:
             ordered = self.reorder(ordered, key=lambda r: groups[r]['sortkey'])
         for g in ordered:
-            # discard X first
+            # discard X first, computing the per-group count fresh so a larger
+            # group's discard doesn't leak into subsequent, smaller groups
+            gdrop = drop
             if droppct > 0:
                 n = int(droppct / 100 * len(groups[g]['resources']))
-                if n > drop:
-                    drop = n
-            if drop > 0:
-                groups[g]['resources'] = groups[g]['resources'][drop:]
+                if n > gdrop:
+                    gdrop = n
+            if gdrop > 0:
+                groups[g]['resources'] = groups[g]['resources'][gdrop:]
 
             # then limit the remaining
             count = len(groups[g]['resources'])

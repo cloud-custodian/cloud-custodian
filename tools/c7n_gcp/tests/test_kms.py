@@ -1,5 +1,6 @@
 # Copyright The Cloud Custodian Authors.
 # SPDX-License-Identifier: Apache-2.0
+from c7n.exceptions import PolicyExecutionError, PolicyValidationError
 from gcp_common import BaseTest, event_data
 from pytest_terraform import terraform
 
@@ -261,6 +262,72 @@ class KmsCryptoKeyTest(BaseTest):
         )
         test.assertEqual(result['labels']['env'], 'production')
 
+    def test_kms_cryptokey_update_rotation_period_requires_next_rotation_time(test):
+        with test.assertRaisesRegex(PolicyValidationError, "is a dependency of"):
+            test.load_policy(
+                {
+                    'name': 'kms-cryptokey-update-invalid',
+                    'resource': 'gcp.kms-cryptokey',
+                    'actions': [
+                        {'type': 'update', 'rotationPeriod': '7776000s'}
+                    ],
+                }
+            )
+
+    def test_kms_cryptokey_update_version_template_requires_a_field(test):
+        with test.assertRaisesRegex(PolicyValidationError, 'versionTemplate'):
+            test.load_policy(
+                {
+                    'name': 'kms-cryptokey-update-invalid',
+                    'resource': 'gcp.kms-cryptokey',
+                    'actions': [
+                        {'type': 'update', 'versionTemplate': {}}
+                    ],
+                }
+            )
+
+    def test_kms_cryptokey_update_access_justifications_requires_a_reason(test):
+        with test.assertRaisesRegex(PolicyValidationError, 'allowedAccessReasons'):
+            test.load_policy(
+                {
+                    'name': 'kms-cryptokey-update-invalid',
+                    'resource': 'gcp.kms-cryptokey',
+                    'actions': [
+                        {
+                            'type': 'update',
+                            'keyAccessJustificationsPolicy': {
+                                'allowedAccessReasons': [],
+                            },
+                        }
+                    ],
+                }
+            )
+
+    def test_kms_cryptokey_update_rotation_requires_encrypt_decrypt_purpose(test):
+        factory = test.replay_flight_data('kms-cryptokey-update')
+        p = test.load_policy(
+            {
+                'name': 'kms-cryptokey-update-rotation',
+                'resource': 'gcp.kms-cryptokey',
+                'actions': [
+                    {'type': 'update',
+                     'rotationPeriod': '7776000s',
+                     'nextRotationTime': '2027-01-01T00:00:00Z'}
+                ],
+            },
+            session_factory=factory,
+        )
+        action = p.resource_manager.actions[0]
+        resource = {
+            'name': (
+                'projects/cloud-custodian/locations/us-central1/keyRings/'
+                'c7n-test-keyring-redfish/cryptoKeys/asymmetric-key'
+            ),
+            'purpose': 'ASYMMETRIC_SIGN',
+        }
+        with test.assertRaisesRegex(PolicyExecutionError, 'ENCRYPT_DECRYPT'):
+            action.process([resource])
+
 
 class KmsCryptoKeyVersionTest(BaseTest):
     def test_kms_cryptokey_version_query(self):
@@ -374,3 +441,136 @@ def test_kms_keyring_filter(test, kms_location):
     resources = policy.run()
     assert len(resources) == 1
     assert resources[0]['name'] == 'projects/cloud-custodian/locations/us-west1'
+
+
+@terraform('kms_cryptokey')
+def test_kms_cryptokey_update(test, kms_cryptokey):
+    key_name = kms_cryptokey['google_kms_crypto_key.c7n_test_key.id']
+    factory = test.replay_flight_data('kms-cryptokey-update')
+    policy = test.load_policy(
+        {
+            'name': 'kms-cryptokey-update',
+            'resource': 'gcp.kms-cryptokey',
+            'query': [{'location': 'us-central1'}],
+            'filters': [{
+                'type': 'value',
+                'key': 'name',
+                'value': key_name,
+            }],
+            'actions': [
+                {'type': 'update',
+                 'rotationPeriod': '7776000s',
+                 'nextRotationTime': '2027-01-01T00:00:00Z'}
+            ]
+        },
+        session_factory=factory,
+    )
+    resources = policy.run()
+    assert len(resources) == 1
+    assert 'rotationPeriod' not in resources[0]
+
+    client = policy.resource_manager.get_client()
+    result = client.execute_query('get', {'name': key_name})
+    assert result['rotationPeriod'] == '7776000s'
+    assert result['nextRotationTime'] == '2027-01-01T00:00:00Z'
+
+
+# The set-iam-policy tests share one session-scoped fixture because KMS key rings
+# and crypto keys can never be deleted, so each fixture apply leaves a key ring
+# behind in the project. To stay order-independent, each test owns a distinct
+# role: add-bindings adds EncrypterDecrypter, remove-bindings removes Encrypter,
+# and remove-bindings: matched removes Decrypter.
+def _kms_cryptokey_iam_roles_to_members(policy, key_name):
+    client = policy.resource_manager.get_client()
+    result = client.execute_query('getIamPolicy', {'resource': key_name})
+    return {b['role']: b['members'] for b in result.get('bindings', [])}
+
+
+@terraform('kms_cryptokey_set_iam_policy', scope='session')
+def test_kms_cryptokey_set_iam_policy_add_bindings(test, kms_cryptokey_set_iam_policy):
+    key_name = kms_cryptokey_set_iam_policy['google_kms_crypto_key.c7n_test_key.id']
+    member = 'serviceAccount:%s' % (
+        kms_cryptokey_set_iam_policy['google_service_account.c7n_test.email'])
+    factory = test.replay_flight_data('kms-key-iam-add')
+    policy = test.load_policy(
+        {
+            'name': 'kms-cryptokey-set-iam-policy-add-bindings',
+            'resource': 'gcp.kms-cryptokey',
+            'query': [{'location': 'us-central1'}],
+            'filters': [{'type': 'value', 'key': 'name', 'value': key_name}],
+            'actions': [{
+                'type': 'set-iam-policy',
+                'add-bindings': [{
+                    'role': 'roles/cloudkms.cryptoKeyEncrypterDecrypter',
+                    'members': [member],
+                }],
+            }],
+        },
+        session_factory=factory,
+    )
+    resources = policy.run()
+    assert len(resources) == 1
+
+    roles_to_members = _kms_cryptokey_iam_roles_to_members(policy, key_name)
+    assert roles_to_members['roles/cloudkms.cryptoKeyEncrypterDecrypter'] == [member]
+
+
+@terraform('kms_cryptokey_set_iam_policy', scope='session')
+def test_kms_cryptokey_set_iam_policy_remove_bindings(test, kms_cryptokey_set_iam_policy):
+    key_name = kms_cryptokey_set_iam_policy['google_kms_crypto_key.c7n_test_key.id']
+    member = 'serviceAccount:%s' % (
+        kms_cryptokey_set_iam_policy['google_service_account.c7n_test.email'])
+    factory = test.replay_flight_data('kms-key-iam-remove')
+    policy = test.load_policy(
+        {
+            'name': 'kms-cryptokey-set-iam-policy-remove-bindings',
+            'resource': 'gcp.kms-cryptokey',
+            'query': [{'location': 'us-central1'}],
+            'filters': [{'type': 'value', 'key': 'name', 'value': key_name}],
+            'actions': [{
+                'type': 'set-iam-policy',
+                'remove-bindings': [{
+                    'role': 'roles/cloudkms.cryptoKeyEncrypter',
+                    'members': [member],
+                }],
+            }],
+        },
+        session_factory=factory,
+    )
+    resources = policy.run()
+    assert len(resources) == 1
+
+    roles_to_members = _kms_cryptokey_iam_roles_to_members(policy, key_name)
+    assert 'roles/cloudkms.cryptoKeyEncrypter' not in roles_to_members
+
+
+@terraform('kms_cryptokey_set_iam_policy', scope='session')
+def test_kms_cryptokey_set_iam_policy_remove_matched(test, kms_cryptokey_set_iam_policy):
+    key_name = kms_cryptokey_set_iam_policy['google_kms_crypto_key.c7n_test_key.id']
+    member = 'serviceAccount:%s' % (
+        kms_cryptokey_set_iam_policy['google_service_account.c7n_test.email'])
+    factory = test.replay_flight_data('kms-key-iam-matched')
+    policy = test.load_policy(
+        {
+            'name': 'kms-cryptokey-set-iam-policy-remove-matched',
+            'resource': 'gcp.kms-cryptokey',
+            'query': [{'location': 'us-central1'}],
+            'filters': [
+                {'type': 'value', 'key': 'name', 'value': key_name},
+                {'type': 'iam-policy',
+                 'user-role': {
+                     'role': {'op': 'eq', 'value': 'roles/cloudkms.cryptoKeyDecrypter'},
+                     'user': {'op': 'glob', 'value': 'serviceAccount:*'},
+                 }},
+            ],
+            'actions': [{'type': 'set-iam-policy', 'remove-bindings': 'matched'}],
+        },
+        session_factory=factory,
+    )
+    resources = policy.run()
+    assert len(resources) == 1
+    assert resources[0]['c7n:matched-iam-bindings'] == [
+        {'role': 'roles/cloudkms.cryptoKeyDecrypter', 'member': member}]
+
+    roles_to_members = _kms_cryptokey_iam_roles_to_members(policy, key_name)
+    assert 'roles/cloudkms.cryptoKeyDecrypter' not in roles_to_members

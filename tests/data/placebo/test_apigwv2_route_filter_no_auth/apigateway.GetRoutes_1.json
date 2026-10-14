@@ -1,0 +1,22 @@
+{
+    "status_code": 200,
+    "data": {
+        "ResponseMetadata": {},
+        "Items": [
+            {
+                "ApiKeyRequired": false,
+                "AuthorizationType": "AWS_IAM",
+                "RouteId": "ck2ui4k",
+                "RouteKey": "GET /iam-auth",
+                "Target": "integrations/ipp55qs"
+            },
+            {
+                "ApiKeyRequired": false,
+                "AuthorizationType": "NONE",
+                "RouteId": "jxtjrzi",
+                "RouteKey": "GET /no-auth",
+                "Target": "integrations/ipp55qs"
+            }
+        ]
+    }
+}

@@ -6,6 +6,7 @@ import types
 
 import pytest
 from azure.mgmt.managementgroups.models import DescendantInfo
+from c7n_azure import utils
 from c7n_azure.tags import TagHelper
 from c7n_azure.utils import (AppInsightsHelper, ManagedGroupHelper, Math,
                              PortsRangeHelper, ResourceIdParser, StringUtils,
@@ -46,6 +47,42 @@ def _get_descendant_info(**kwargs):
 class UtilsTest(BaseTest):
     def setUp(self):
         super(UtilsTest, self).setUp()
+
+    def test_requests_session_uses_default_scope_and_get_retries(self):
+        azure_session = Mock(resource_endpoint='https://management.azure.com/')
+        azure_session.credentials.get_token.return_value.token = 'test-token'
+
+        session = utils.requests_session(azure_session, max_retries=3)
+
+        azure_session._initialize_session.assert_called_once_with()
+        azure_session.credentials.get_token.assert_called_once_with(
+            'https://management.azure.com/.default',
+        )
+        self.assertEqual('Bearer test-token', session.headers['Authorization'])
+        retry = session.get_adapter('https://').max_retries
+        self.assertEqual(3, retry.total)
+        self.assertEqual((429, 503), retry.status_forcelist)
+        self.assertEqual(('GET',), retry.allowed_methods)
+        self.assertTrue(retry.respect_retry_after_header)
+        self.assertFalse(retry.raise_on_status)
+
+    def test_requests_session_accepts_scope_and_method_overrides(self):
+        azure_session = Mock(resource_endpoint='https://management.azure.com/')
+        azure_session.credentials.get_token.return_value.token = 'test-token'
+
+        session = utils.requests_session(
+            azure_session,
+            token_scope='https://ml.azure.us/.default',
+            max_retries=2,
+            allowed_methods=('POST',),
+        )
+
+        azure_session.credentials.get_token.assert_called_once_with(
+            'https://ml.azure.us/.default',
+        )
+        retry = session.get_adapter('https://').max_retries
+        self.assertEqual(2, retry.total)
+        self.assertEqual(('POST',), retry.allowed_methods)
 
     def test_get_subscription_id(self):
         self.assertEqual(ResourceIdParser.get_subscription_id(RESOURCE_ID), DEFAULT_SUBSCRIPTION_ID)
@@ -144,31 +181,31 @@ class UtilsTest(BaseTest):
 
     def test_build_ports_dict(self):
         securityRules = [
-            {'properties': {'destinationPortRange': '80-84',
-                            'priority': 100,
-                            'direction': 'Outbound',
-                            'access': 'Allow',
-                            'protocol': 'TCP'}},
-            {'properties': {'destinationPortRange': '85-89',
-                            'priority': 110,
-                            'direction': 'Outbound',
-                            'access': 'Allow',
-                            'protocol': 'UDP'}},
-            {'properties': {'destinationPortRange': '80-84',
-                            'priority': 120,
-                            'direction': 'Inbound',
-                            'access': 'Deny',
-                            'protocol': 'TCP'}},
-            {'properties': {'destinationPortRange': '85-89',
-                            'priority': 130,
-                            'direction': 'Inbound',
-                            'access': 'Deny',
-                            'protocol': 'UDP'}},
-            {'properties': {'destinationPortRange': '80-89',
-                            'priority': 140,
-                            'direction': 'Inbound',
-                            'access': 'Allow',
-                            'protocol': '*'}}]
+            {'id': '1', 'properties': {'destinationPortRange': '80-84',
+                                       'priority': 100,
+                                       'direction': 'Outbound',
+                                       'access': 'Allow',
+                                       'protocol': 'TCP'}},
+            {'id': '2', 'properties': {'destinationPortRange': '85-89',
+                                       'priority': 110,
+                                       'direction': 'Outbound',
+                                       'access': 'Allow',
+                                       'protocol': 'UDP'}},
+            {'id': '3', 'properties': {'destinationPortRange': '80-84',
+                                       'priority': 120,
+                                       'direction': 'Inbound',
+                                       'access': 'Deny',
+                                       'protocol': 'TCP'}},
+            {'id': '4', 'properties': {'destinationPortRange': '85-89',
+                                       'priority': 130,
+                                       'direction': 'Inbound',
+                                       'access': 'Deny',
+                                       'protocol': 'UDP'}},
+            {'id': '5', 'properties': {'destinationPortRange': '80-89',
+                                       'priority': 140,
+                                       'direction': 'Inbound',
+                                       'access': 'Allow',
+                                       'protocol': '*'}}]
         nsg = {'properties': {'securityRules': securityRules}}
 
         self.assertEqual(PortsRangeHelper.build_ports_dict(nsg, 'Inbound', 'TCP'),

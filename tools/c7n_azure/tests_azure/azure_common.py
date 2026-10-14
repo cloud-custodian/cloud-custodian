@@ -9,6 +9,7 @@ import os
 import re
 from time import sleep
 from unittest.mock import patch
+from urllib.parse import parse_qsl, urlencode, urlsplit, urlunsplit
 
 import azure.core.polling
 from msrest.pipeline import ClientRawResponse
@@ -115,6 +116,7 @@ class AzureVCRBaseTest(VCRTestCase):
 
     TEST_DATE = None
     cassette_name = None
+    recording_resource_group = None
 
     FILTERED_HEADERS = ['authorization',
                         'accept-encoding',
@@ -131,6 +133,7 @@ class AzureVCRBaseTest(VCRTestCase):
                         'x-ms-keyvault-network-info',
                         'x-ms-keyvault-region',
                         'x-ms-ratelimit-remaining-subscription-reads',
+                        'x-ms-operation-identifier',
                         'x-ms-request-id',
                         'x-ms-routing-request-id',
                         'x-ms-gateway-service-instanceid',
@@ -155,6 +158,26 @@ class AzureVCRBaseTest(VCRTestCase):
     def __init__(self, *args, **kwargs):
         super(AzureVCRBaseTest, self).__init__(*args, **kwargs)
         self.vcr_enabled = not strtobool(os.environ.get('C7N_FUNCTIONAL', 'no'))
+
+    def setUp(self):
+        super(AzureVCRBaseTest, self).setUp()
+
+        # When playing back, if we're in strict mode, make sure
+        # We played the whole cassette.  Otherwise, the default,
+        # we may only play a subset.
+        if self.is_playback() and getattr(
+                getattr(self, self._testMethodName), 'strict_cassette', False):
+            # Registered after the cassette's own cleanup, so it runs first,
+            # while the cassette is still open.
+            self.addCleanup(self._assert_cassette_fully_played)
+
+    def _assert_cassette_fully_played(self):
+        unplayed = [
+            '{0} {1}'.format(r.method, r.uri)
+            for i, r in enumerate(self.cassette.requests)
+            if not self.cassette.play_counts[i]
+            ]
+        self.assertFalse(unplayed, 'unplayed cassette interactions')
 
     def is_playback(self):
         # You can't do this in setup because it is actually required by the base class
@@ -212,6 +235,9 @@ class AzureVCRBaseTest(VCRTestCase):
         """Modify requests before saving"""
         request.uri = AzureVCRBaseTest._replace_subscription_id(request.uri)
         request.uri = AzureVCRBaseTest._replace_tenant_id(request.uri)
+        request.uri = AzureVCRBaseTest._replace_async_operation_signature(
+            request.uri
+        )
 
         if request.body:
             request.body = b'mock_body'
@@ -220,6 +246,18 @@ class AzureVCRBaseTest(VCRTestCase):
         request.headers = None
 
         if re.match('https://login.microsoftonline.com/([^/]+)', request.uri):
+            return None
+
+        # vcrpy also runs this callback over incoming playback requests, where
+        # dropping one means "no match" and falls through to a live call.
+        resource_group = self.recording_resource_group
+        if (
+            resource_group
+            and not self.is_playback()
+            and '/resourcegroups/' in request.uri.lower()
+            and f'/resourcegroups/{resource_group}/'.lower()
+            not in request.uri.lower()
+        ):
             return None
 
         return request
@@ -237,6 +275,21 @@ class AzureVCRBaseTest(VCRTestCase):
                                response['headers'].items()
                                if k.lower() not in self.FILTERED_HEADERS}
 
+        # Headers such as location and azure-asyncoperation can carry IDs
+        # and signed operation parameters not covered by body scrubbing.
+        for header, values in response['headers'].items():
+            response['headers'][header] = [
+                AzureVCRBaseTest._replace_async_operation_signature(
+                    AzureVCRBaseTest._replace_tenant_id(
+                        AzureVCRBaseTest._replace_subscription_id(value)
+                    )
+                )
+                for value in values
+            ]
+
+        if not response['body'].get('string'):
+            return response
+
         content_type = response['headers'].get('content-type', (None,))[0]
         if not content_type or 'application/json' not in content_type:
             return response
@@ -248,6 +301,7 @@ class AzureVCRBaseTest(VCRTestCase):
         body = AzureVCRBaseTest._replace_subscription_id(body)
         body = AzureVCRBaseTest._replace_storage_keys(body)
         body = AzureVCRBaseTest._replace_instrumentation_key(body)
+        body = AzureVCRBaseTest._replace_user_email(body)
 
         try:
             response['body']['data'] = json.loads(body)
@@ -257,7 +311,31 @@ class AzureVCRBaseTest(VCRTestCase):
 
         # Replace some API responses entirely
         response = AzureVCRBaseTest._response_substitutions(response)
+        response = self._scope_recorded_resource_group(response)
 
+        return response
+
+    def _scope_recorded_resource_group(self, response):
+        resource_group = self.recording_resource_group
+        data = response['body']['data']
+        if not resource_group or not isinstance(data, dict):
+            return response
+
+        resources = data.get('value')
+        if not isinstance(resources, list) or not resources:
+            return response
+        if not all(
+            isinstance(resource, dict)
+            and '/resourceGroups/' in resource.get('id', '')
+            for resource in resources
+        ):
+            return response
+
+        marker = f'/resourceGroups/{resource_group}/'.lower()
+        data['value'] = [
+            resource for resource in resources
+            if marker in resource['id'].lower()
+        ]
         return response
 
     @staticmethod
@@ -265,6 +343,7 @@ class AzureVCRBaseTest(VCRTestCase):
         data = response['body']['data']
 
         if isinstance(data, dict):
+            AzureVCRBaseTest._remove_run_history_metadata(data)
             # Replace service tag responses
             if data.get('type', '') == 'Microsoft.Network/serviceTags':
                 response['body']['data'] = SERVICE_TAG_RESPONSE
@@ -300,8 +379,51 @@ class AzureVCRBaseTest(VCRTestCase):
         return response
 
     @staticmethod
+    def _remove_run_history_metadata(data):
+        values = data.get('value')
+        if not isinstance(values, list):
+            return
+
+        for run in values:
+            if not isinstance(run, dict) or not (
+                'runId' in run or 'experimentId' in run
+            ):
+                continue
+            run.pop('createdBy', None)
+            run.pop('lastModifiedBy', None)
+            run.pop('userId', None)
+            properties = run.get('properties')
+            if isinstance(properties, dict):
+                for key in list(properties):
+                    if (
+                        key.startswith('mlflow.source.git.')
+                        or key.startswith('azureml.git.')
+                    ):
+                        properties.pop(key)
+
+    @staticmethod
+    def _replace_async_operation_signature(value):
+        parts = urlsplit(value)
+        path = parts.path.lower()
+        if not any(
+            segment in path
+            for segment in ('operationsstatus/', 'operationstatuses/',
+                            'operationresults/')
+        ):
+            return value
+
+        query = parse_qsl(parts.query, keep_blank_values=True)
+        if not any(key in ('c', 's', 'h') for key, _ in query):
+            return value
+
+        return urlunsplit(parts._replace(query=urlencode([
+            (key, 'redacted' if key in ('c', 's', 'h') else item)
+            for key, item in query
+        ])))
+
+    @staticmethod
     def _replace_subscription_id(s):
-        prefixes = ['(/|%2F)?subscriptions(/|%2F)',
+        prefixes = [r'(\\?/|%2F)?subscriptions(\\?/|%2F)',
                     '"subscription":\\s*"']
         regex = r"(?P<prefix>(%s))" \
                 r"[\da-zA-Z]{8}-([\da-zA-Z]{4}-){3}[\da-zA-Z]{12}" \
@@ -326,12 +448,19 @@ class AzureVCRBaseTest(VCRTestCase):
     @staticmethod
     def _replace_tenant_id(s):
         prefixes = ['(/|%2F)graph.windows.net(/|%2F)',
-                    '"(t|T)enantId":\\s*"']
+                    '"(t|T)enantId":\\s*"',
+                    '"userTenantId":\\s*"',
+                    'https://sts.windows.net/']
         regex = r"(?P<prefix>(%s))" \
                 r"[\da-zA-Z]{8}-([\da-zA-Z]{4}-){3}[\da-zA-Z]{12}" \
                 % '|'.join(['(%s)' % p for p in prefixes])
 
         return re.sub(regex, r"\g<prefix>" + DEFAULT_TENANT_ID, s)
+
+    @staticmethod
+    def _replace_user_email(s):
+        regex = r'(?P<prefix>"(createdBy|lastModifiedBy|userId)":\s*")[^"]+@[^"]+'
+        return re.sub(regex, r'\g<prefix>user@example.com', s)
 
     @staticmethod
     def _replace_storage_keys(s):
@@ -344,7 +473,10 @@ class AzureVCRBaseTest(VCRTestCase):
 
     @staticmethod
     def _replace_instrumentation_key(s):
-        prefixes = ['"InstrumentationKey":\\s*"']
+        prefixes = [
+            '"InstrumentationKey":\\s*"',
+            '"sdkTelemetryAppInsightsKey":\\s*"',
+        ]
 
         regex = r"(?P<prefix>(%s))" \
                 r"[\da-zA-Z]{8}-([\da-zA-Z]{4}-){3}[\da-zA-Z]{12}" \
@@ -535,6 +667,26 @@ def arm_template(template):
 def cassette_name(name):
     def decorator(func):
         func.cassette_name = name
+        return func
+    return decorator
+
+
+def strict_cassette(name):
+    """Name the cassette, and require every recorded interaction to be played.
+
+    ``cassette_name`` constrains a test from one side only: playback rejects a
+    request that was never recorded, but stays silent about a recorded request
+    the code under test stops making. A test whose subject *is* a request --
+    the PUT or POST an action issues -- therefore passes just as happily when
+    the action does nothing at all, because its other assertions read recorded
+    responses either way.
+
+    Mutually exclusive with sharing a cassette between tests, since a shared
+    recording is the union of what each of them replays.
+    """
+    def decorator(func):
+        func.cassette_name = name
+        func.strict_cassette = True
         return func
     return decorator
 

@@ -1,0 +1,30 @@
+{
+  "headers": {
+    "content-type": "application/json; charset=UTF-8",
+    "vary": "Origin, X-Origin, Referer",
+    "date": "Tue, 11 Aug 2026 17:49:29 GMT",
+    "server": "ESF",
+    "x-xss-protection": "0",
+    "x-frame-options": "SAMEORIGIN",
+    "x-content-type-options": "nosniff",
+    "alt-svc": "h3=\":443\"; ma=2592000,h3-29=\":443\"; ma=2592000",
+    "transfer-encoding": "chunked",
+    "status": "200",
+    "content-length": "449",
+    "-content-encoding": "gzip"
+  },
+  "body": {
+    "name": "projects/cloud-custodian/locations/us-east1/models/7412434604465848320/operations/6075877959187562496",
+    "metadata": {
+      "@type": "type.googleapis.com/google.cloud.aiplatform.v1.DeleteOperationMetadata",
+      "genericMetadata": {
+        "createTime": "2026-08-11T17:49:29.876645Z",
+        "updateTime": "2026-08-11T17:49:29.876645Z"
+      }
+    },
+    "done": true,
+    "response": {
+      "@type": "type.googleapis.com/google.protobuf.Empty"
+    }
+  }
+}

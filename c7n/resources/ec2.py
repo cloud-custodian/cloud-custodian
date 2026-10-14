@@ -1,6 +1,7 @@
 # Copyright The Cloud Custodian Authors.
 # SPDX-License-Identifier: Apache-2.0
 import base64
+from collections import defaultdict
 import itertools
 import operator
 import random
@@ -32,6 +33,7 @@ from c7n import query, utils
 from c7n.tags import coalesce_copy_user_tags
 from c7n.utils import type_schema, filter_empty, jmespath_search, jmespath_compile, QueryParser
 
+from c7n.resources.aws import shape_validate
 from c7n.resources.iam import CheckPermissions, SpecificIamProfileManagedPolicy
 from c7n.resources.securityhub import PostFinding
 
@@ -39,6 +41,13 @@ RE_ERROR_INSTANCE_ID = re.compile("'(?P<instance_id>i-.*?)'")
 
 filters = FilterRegistry('ec2.filters')
 actions = ActionRegistry('ec2.actions')
+
+
+# Maximum number of instances to look tags up by id for. Above this, fall back
+# to the region-wide resource-type filter: ec2 allows only 200 total filter
+# values per request, and this keeps the response bounded (100 ids, at ec2's
+# limit of 50 tags each).
+EC2_TAG_AUGMENT_BY_INSTANCES_MAX = 100
 
 
 class DescribeEC2(query.DescribeSource):
@@ -68,7 +77,7 @@ class DescribeEC2(query.DescribeSource):
         reservations = self.query.get(self.manager, ids)
         return self._flatten_reservations(reservations)
 
-    def augment(self, resources):
+    def augment(self, resources, *, ec2_tag_augment_by_instances_max=None):
         """EC2 API and AWOL Tags
 
         While ec2 api generally returns tags when doing describe_x on for
@@ -83,8 +92,7 @@ class DescribeEC2(query.DescribeSource):
         always get tags from describe_x calls.
         """
         if not resources or self.manager.data.get(
-                'mode', {}).get('type', '') in (
-                    'cloudtrail', 'ec2-instance-state'):
+                'mode', {}).get('type', '') == 'ec2-instance-state':
             return resources
 
         # AWOL detector, so we don't make extraneous api calls.
@@ -101,21 +109,37 @@ class DescribeEC2(query.DescribeSource):
         if found:
             return resources
 
-        # Okay go and do the tag lookup
+        # Tag lookup
         client = utils.local_session(self.manager.session_factory).client('ec2')
-        tag_set = self.manager.retry(
-            client.describe_tags,
-            Filters=[{'Name': 'resource-type',
-                      'Values': ['instance']}])['Tags']
+        model = self.manager.get_model()
+        ec2_tag_augment_by_instances_max = (
+            ec2_tag_augment_by_instances_max or EC2_TAG_AUGMENT_BY_INSTANCES_MAX)
+        if len(resources) <= ec2_tag_augment_by_instances_max:
+            # ec2 ignores MaxResults for a resource-id filter, so no paginator.
+            tag_set = self.manager.retry(
+                client.describe_tags,
+                Filters=[{'Name': 'resource-id',
+                          'Values': [r[model.id] for r in resources]}])['Tags']
+        else:
+            # Potentially many instances and tags, so paginate.
+            # Note that we don't specify a page size, and we never saw
+            # a continuation token without one -- but this covers every
+            # instance tag in the region, so the volume is unbounded and
+            # the paginator is insurance.
+            paginator = client.get_paginator('describe_tags')
+            paginator.PAGE_ITERATOR_CLS = query.RetryPageIterator
+            tag_set = paginator.paginate(
+                Filters=[{'Name': 'resource-type',
+                          'Values': ['instance']}]).build_full_result()['Tags']
+
         resource_tags = {}
         for t in tag_set:
             t.pop('ResourceType')
             rid = t.pop('ResourceId')
             resource_tags.setdefault(rid, []).append(t)
 
-        m = self.manager.get_model()
         for r in resources:
-            r['Tags'] = resource_tags.get(r[m.id], [])
+            r['Tags'] = resource_tags.get(r[model.id], [])
         return resources
 
 
@@ -1180,7 +1204,7 @@ class SsmCompliance(Filter):
         filters = [
             {
                 'Key': 'Status',
-                'Values': self.data['states'],
+                'Values': self.data.get('states', ['NON_COMPLIANT']),
                 'Type': 'EQUAL'
             },
             {
@@ -2682,6 +2706,82 @@ class CapacityReservation(query.QueryResourceManager):
         filter_type = 'list'
         cfn_type = 'AWS::EC2::CapacityReservation'
         permissions_enum = ('ec2:DescribeCapacityReservations',)
+
+
+@filters.register('compute-optimizer')
+class ComputeOptimizer(ValueFilter):
+    """Filter EC2 instances based on Compute Optimizer recommendations."""
+    schema = type_schema(
+        'compute-optimizer',
+        filters={'type': 'object'},
+        **{'recommendation-preferences': {'type': 'object'}},
+        rinherit=ValueFilter.schema,
+    )
+    permissions = ('compute-optimizer:GetEC2InstanceRecommendations',)
+    required_keys = ()
+
+    @property
+    def base_req(self) -> dict:
+        """Returns the base request parameters for the API call."""
+        req = {}
+        if 'filters' in self.data:
+            req['filters'] = []
+            for k, v in self.data['filters'].items():
+                req['filters'].append({'name': k, 'values': v})
+        if 'recommendation-preferences' in self.data:
+            req['recommendationPreferences'] = self.data['recommendation-preferences']
+        return req
+
+    @property
+    def is_server_side(self) -> bool:
+        """Returns whether or not the filter is being applied server-side."""
+        return 'filters' in self.data or 'recommendation-preferences' in self.data
+
+    @property
+    def is_client_side(self) -> bool:
+        """Returns whether or not the filter is being applied client-side."""
+        return 'key' in self.data
+
+    def validate(self):
+        return shape_validate(
+            # instanceArns is added in process
+            {**self.base_req, 'instanceArns': []},
+            'GetEC2InstanceRecommendationsRequest',
+            'compute-optimizer',
+        )
+
+    def process(self, resources, event=None):
+        # Get recommendations for all resources, map to arn
+        recommendations = utils.local_session(
+            self.manager.session_factory
+        ).client(
+            'compute-optimizer'
+        ).get_ec2_instance_recommendations(
+            **self.base_req,
+            instanceArns=self.manager.get_arns(resources),
+        )['instanceRecommendations']
+        recs_by_arn = defaultdict(list)
+        for r in recommendations:
+            recs_by_arn[r['instanceArn']].append(r)
+
+        results = []
+        for r in resources:
+            recs = recs_by_arn.get(self.manager.generate_arn(r['InstanceId']), [])
+
+            # If we're filtering server-side, exclude resources that don't have any returned
+            # recommendations.
+            if self.is_server_side and not recs:
+                continue
+
+            # If we're filtering client-side, exclude resources whose recommendations don't match
+            # the filter.
+            if self.is_client_side and not any(self.match(r) for r in recs):
+                continue
+
+            r['c7n:ComputeOptimizerRecommendations'] = recs
+            results.append(r)
+
+        return results
 
 
 @resources.register('ec2-instance-ami')

@@ -1,0 +1,47 @@
+{
+  "insertId": "w7nlbrd4srw",
+  "labels": {
+    "compute.googleapis.com/root_trigger_id": "83bb1aa1-1317-4779-8737-82dd1eed5ce9"
+  },
+  "logName": "projects/cloud-custodian/logs/cloudaudit.googleapis.com%2Factivity",
+  "operation": {
+    "id": "operation-1787255378942-6597fd1fc18a3-18e93fdb-2cf54cd4",
+    "last": true,
+    "producer": "compute.googleapis.com"
+  },
+  "protoPayload": {
+    "@type": "type.googleapis.com/google.cloud.audit.AuditLog",
+    "apiVersionIdentifier": "v1",
+    "authenticationInfo": {
+      "oauthInfo": {
+        "oauthClientId": "764086051850-6qr4p6gpi6hn506pt8ejuq83di341hur.apps.googleusercontent.com"
+      },
+      "principalEmail": "user@example.com",
+      "principalSubject": "user:user@example.com"
+    },
+    "methodName": "v1.compute.disks.insert",
+    "request": {
+      "@type": "type.googleapis.com/compute.disks.insert"
+    },
+    "requestMetadata": {
+      "callerIp": "198.51.100.1",
+      "callerSuppliedUserAgent": "Terraform/1.13.0 (+https://www.terraform.io) Terraform-Plugin-SDK/2.40.1 terraform-provider-google/dev7,gzip(gfe)",
+      "destinationAttributes": {},
+      "requestAttributes": {}
+    },
+    "resourceName": "projects/cloud-custodian/zones/us-central1-a/disks/c7n-audit-zonal-default-f5b3",
+    "serviceName": "compute.googleapis.com",
+    "status": {}
+  },
+  "receiveTimestamp": "2026-08-20T19:49:39.967810613Z",
+  "resource": {
+    "labels": {
+      "disk_id": "4992374716928550077",
+      "project_id": "cloud-custodian",
+      "zone": "us-central1-a"
+    },
+    "type": "gce_disk"
+  },
+  "severity": "NOTICE",
+  "timestamp": "2026-08-20T19:49:39.790299Z"
+}

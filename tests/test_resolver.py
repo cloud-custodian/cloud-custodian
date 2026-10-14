@@ -135,6 +135,79 @@ class ResolverTest(BaseTest):
             fh.flush()
             self.assertEqual(resolver.resolve("file:%s" % fh.name, {'auth': 'token'}), content)
 
+    def test_resolve_cache_key_includes_headers(self):
+        # a response fetched with one set of credentials must not be
+        # served to a caller presenting different ones
+        cache = FakeCache()
+        resolver = URIResolver(None, cache)
+
+        alice_content = json.dumps({"tenant": "alice"})
+        bob_content = json.dumps({"tenant": "bob"})
+
+        with tempfile.NamedTemporaryFile(mode="w+", dir=os.getcwd(), delete=False) as fh:
+            self.addCleanup(os.unlink, fh.name)
+            fh.write(alice_content)
+            fh.flush()
+            uri = "file:%s" % fh.name
+
+            self.assertEqual(
+                resolver.resolve(uri, {"authorization": "alice-token"}),
+                alice_content,
+            )
+
+            # rewrite the file so a cache hit is distinguishable from a fetch
+            fh.seek(0)
+            fh.truncate()
+            fh.write(bob_content)
+            fh.flush()
+
+            self.assertEqual(
+                resolver.resolve(uri, {"authorization": "bob-token"}),
+                bob_content,
+            )
+
+    def test_resolve_cache_hit_on_identical_headers(self):
+        # same uri and same headers is still a cache hit
+        cache = FakeCache()
+        resolver = URIResolver(None, cache)
+        content = json.dumps({"tenant": "alice"})
+
+        fh = tempfile.NamedTemporaryFile(mode="w+", dir=os.getcwd(), delete=False)
+        fh.write(content)
+        fh.flush()
+        fh.close()
+        uri = "file:%s" % fh.name
+
+        headers = {"authorization": "alice-token"}
+        self.assertEqual(resolver.resolve(uri, dict(headers)), content)
+        self.assertEqual(cache.saves, 1)
+
+        # without the file a fetch would fail, so content proves a cache hit
+        os.unlink(fh.name)
+        self.assertEqual(resolver.resolve(uri, dict(headers)), content)
+        self.assertEqual(cache.saves, 1)
+
+    def test_resolve_does_not_mutate_headers(self):
+        # ValuesFrom reuses one headers dict across calls, mutating it
+        # would change the cache key and defeat caching
+        cache = FakeCache()
+        resolver = URIResolver(None, cache)
+        content = json.dumps({"tenant": "alice"})
+
+        fh = tempfile.NamedTemporaryFile(mode="w+", dir=os.getcwd(), delete=False)
+        self.addCleanup(os.unlink, fh.name)
+        fh.write(content)
+        fh.flush()
+        fh.close()
+        uri = "file:%s" % fh.name
+
+        headers = {"authorization": "alice-token"}
+        resolver.resolve(uri, headers)
+        self.assertEqual(headers, {"authorization": "alice-token"})
+
+        resolver.resolve(uri, headers)
+        self.assertEqual(cache.saves, 1)
+
 
 def test_value_from_sqlkv(tmp_path):
 
@@ -432,6 +505,19 @@ class UrlValueTest(BaseTest):
             values = self.get_values_from({"url": "sun.csv", "expr": 1}, out.read())
         os.remove("test_column.csv")
         self.assertEqual(values.get_values(), {"1"})
+
+    def test_csv_column_blank_rows(self):
+        values = self.get_values_from(
+            {"url": "sun.csv", "expr": 1}, "a,b,c\n\n1,2,3\n\n"
+        )
+        self.assertEqual(values.get_values(), {"b", "2"})
+
+    def test_csv_column_ragged_rows_raise(self):
+        values = self.get_values_from(
+            {"url": "sun.csv", "expr": 1}, "a,b,c\n1,2,3\n4\n"
+        )
+        with self.assertRaises(IndexError):
+            values.get_values()
 
     def test_csv_raw(self):
         with open("test_raw.csv", "w") as out:

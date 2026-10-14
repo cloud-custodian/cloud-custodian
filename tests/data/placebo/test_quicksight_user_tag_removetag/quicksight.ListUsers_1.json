@@ -1,0 +1,19 @@
+{
+    "status_code": 200,
+    "data": {
+        "ResponseMetadata": {},
+        "Status": 200,
+        "UserList": [
+            {
+                "Arn": "arn:aws:quicksight:us-east-1:644160558196:user/default/AWSReservedSSO_Org003/abc123",
+                "UserName": "AWSReservedSSO_Org003/abc123",
+                "Email": "test@c7n.com",
+                "Role": "ADMIN_PRO",
+                "IdentityType": "IAM",
+                "Active": true,
+                "PrincipalId": "federated/iam/AROA3FLD2ZISAQPHZK4RY:abc123"
+            }
+        ],
+        "RequestId": "e79e659b-df11-4e5c-8d0a-78f0c87f1163"
+    }
+}

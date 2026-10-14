@@ -1,0 +1,20 @@
+{
+    "status_code": 200,
+    "data": {
+        "ParameterGroups": [
+            {
+                "Name": "c7n-test-custom-params",
+                "Family": "memorydb_redis7",
+                "Description": "c7n db-parameter filter test",
+                "ARN": "arn:aws:memorydb:us-east-1:644160558196:parametergroup/c7n-test-custom-params"
+            },
+            {
+                "Name": "default.memorydb-redis7",
+                "Family": "memorydb_redis7",
+                "Description": "Default parameter group for memorydb_redis7",
+                "ARN": "arn:aws:memorydb:us-east-1:644160558196:parametergroup/default.memorydb-redis7"
+            }
+        ],
+        "ResponseMetadata": {}
+    }
+}

@@ -1,0 +1,15 @@
+{
+    "status_code": 200,
+    "data": {
+        "ResponseMetadata": {},
+        "Status": 200,
+        "CustomPermissions": {
+            "Arn": "arn:aws:quicksight:us-east-1:644160558196:custompermissions/c7n-test-permissions",
+            "CustomPermissionsName": "c7n-test-permissions",
+            "Capabilities": {
+                "SubscribeDashboardEmailReports": "DENY"
+            }
+        },
+        "RequestId": "0d5482aa-b5b4-4bb4-a052-21613ec1d74b"
+    }
+}

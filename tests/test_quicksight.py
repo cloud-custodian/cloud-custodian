@@ -100,6 +100,12 @@ def test_quicksight_dashboard_resource_not_found(test, quicksight_dashboard):
 
 class TestQuicksight(BaseTest):
 
+    @property
+    def account_id(self):
+        # insert account id here if recording as quicksight resources reference
+        # self.config.account_id
+        return '' if self.recording else super().account_id
+
     def test_quicksight_account_query(self):
         factory = self.replay_flight_data("test_quicksight_account_query")
 
@@ -107,10 +113,30 @@ class TestQuicksight(BaseTest):
             "name": "test-aws-quicksight-account",
             "resource": "aws.quicksight-account",
             "filters": [{"PublicSharingEnabled": False}]
-        }, session_factory=factory)
+        }, session_factory=factory, config={'account_id': self.account_id})
 
         resources = policy.run()
         self.assertEqual(len(resources), 1)
+
+    def test_quicksight_account_subscription(self):
+        factory = self.replay_flight_data("test_quicksight_account_subscription")
+
+        policy = self.load_policy({
+            "name": "test-aws-quicksight-account-subscription",
+            "resource": "aws.quicksight-account",
+            "filters": [{
+                "type": "subscription",
+                "key": "AuthenticationType",
+                "op": "ni",
+                "value": ["IAM_IDENTITY_CENTER", "IAM_ONLY"]
+            }]
+        },
+        session_factory=factory, config={'account_id': self.account_id})
+
+        resources = policy.run()
+        self.assertEqual(len(resources), 1)
+        info = resources[0]['c7n:AccountSubscription']
+        self.assertNotIn(info['AuthenticationType'], ["IAM_IDENTITY_CENTER", "IAM_ONLY"])
 
     def test_quicksight_account_get_account_not_found(self):
         factory = self.replay_flight_data("test_quicksight_account_not_found")
@@ -118,7 +144,7 @@ class TestQuicksight(BaseTest):
         policy = self.load_policy({
             "name": "test-aws-quicksight-account",
             "resource": "aws.quicksight-account"
-        }, session_factory=factory)
+        }, session_factory=factory, config={'account_id': self.account_id})
 
         resources = policy.run()
         self.assertEqual(resources, [])
@@ -140,7 +166,7 @@ class TestQuicksight(BaseTest):
         policy = self.load_policy({
             "name": "test-aws-quicksight-account",
             "resource": "aws.quicksight-account",
-        }, session_factory=factory)
+        }, session_factory=factory, config={'account_id': self.account_id})
 
         resources = policy.run()
         self.assertEqual(resources, [])
@@ -152,7 +178,7 @@ class TestQuicksight(BaseTest):
         policy = self.load_policy({
             "name": "test-aws-quicksight-account",
             "resource": "aws.quicksight-account",
-        }, session_factory=factory)
+        }, session_factory=factory, config={'account_id': self.account_id})
 
         with self.assertRaises(ClientError):
             policy.run()
@@ -164,7 +190,7 @@ class TestQuicksight(BaseTest):
         policy = self.load_policy({
             "name": "test-aws-quicksight-account",
             "resource": "aws.quicksight-account",
-        }, session_factory=factory)
+        }, session_factory=factory, config={'account_id': self.account_id})
 
         with self.assertRaises(Exception):
             policy.run()
@@ -175,7 +201,7 @@ class TestQuicksight(BaseTest):
         policy = self.load_policy({
             "name": "test-aws-quicksight-user",
             "resource": "aws.quicksight-user"
-        }, session_factory=factory)
+        }, session_factory=factory, config={'account_id': self.account_id})
 
         resources = policy.run()
         self.assertGreater(len(resources), 0)
@@ -187,19 +213,21 @@ class TestQuicksight(BaseTest):
         policy = self.load_policy({
             "name": "test-aws-quicksight-user-delete",
             "resource": "aws.quicksight-user",
+            "filters": [{"UserName": "c7n-test"}],
             "actions": [{"type": "delete"}]
-        }, session_factory=factory)
+        }, session_factory=factory, config={'account_id': self.account_id})
 
         resources = policy.run()
-        self.assertGreater(len(resources), 0)
-        self.assertIn('UserName', resources[0])
+        self.assertEqual(len(resources), 1)
+        self.assertEqual(resources[0]["UserName"], "c7n-test")
 
         client = local_session(factory).client('quicksight')
-        users = client.list_users(
-            AwsAccountId=self.account_id,
-            Namespace='default'
-        )["UserList"]
-        self.assertEqual(len(users), 0)
+        with self.assertRaises(ClientError):
+            client.describe_user(
+                UserName="c7n-test",
+                AwsAccountId=self.account_id,
+                Namespace="default",
+            )
 
     def test_quicksight_dashboard_standard_edition(self):
         factory = self.replay_flight_data("test_quicksight_dashboard_standard_edition")
@@ -207,7 +235,7 @@ class TestQuicksight(BaseTest):
         policy = self.load_policy({
             "name": "test-aws-quicksight-dashboard",
             "resource": "aws.quicksight-dashboard",
-        }, session_factory=factory)
+        }, session_factory=factory, config={'account_id': self.account_id})
 
         resources = policy.run()
         self.assertEqual(resources, [])
@@ -219,7 +247,7 @@ class TestQuicksight(BaseTest):
         policy = self.load_policy({
             "name": "test-aws-quicksight-dashboard",
             "resource": "aws.quicksight-dashboard",
-        }, session_factory=factory)
+        }, session_factory=factory, config={'account_id': self.account_id})
 
         with self.assertRaises(ClientError):
             policy.run()
@@ -231,7 +259,7 @@ class TestQuicksight(BaseTest):
         policy = self.load_policy({
             "name": "test-aws-quicksight-dashboard",
             "resource": "aws.quicksight-dashboard",
-        }, session_factory=factory)
+        }, session_factory=factory, config={'account_id': self.account_id})
 
         with self.assertRaises(Exception):
             policy.run()
@@ -242,7 +270,7 @@ class TestQuicksight(BaseTest):
         policy = self.load_policy({
             "name": "test-aws-quicksight-datasource",
             "resource": "aws.quicksight-datasource",
-        }, session_factory=factory)
+        }, session_factory=factory, config={'account_id': self.account_id})
 
         resources = policy.run()
         self.assertEqual(resources, [])
@@ -253,7 +281,7 @@ class TestQuicksight(BaseTest):
         policy = self.load_policy({
             "name": "test-aws-quicksight-group",
             "resource": "aws.quicksight-group",
-        }, session_factory=factory)
+        }, session_factory=factory, config={'account_id': self.account_id})
 
         resources = policy.run()
         self.assertEqual(resources, [])
@@ -265,7 +293,7 @@ class TestQuicksight(BaseTest):
         policy = self.load_policy({
             "name": "test-aws-quicksight-group",
             "resource": "aws.quicksight-group",
-        }, session_factory=factory)
+        }, session_factory=factory, config={'account_id': self.account_id})
 
         with self.assertRaises(ClientError):
             policy.run()
@@ -277,7 +305,142 @@ class TestQuicksight(BaseTest):
         policy = self.load_policy({
             "name": "test-aws-quicksight-group",
             "resource": "aws.quicksight-group",
-        }, session_factory=factory)
+        }, session_factory=factory, config={'account_id': self.account_id})
 
         with self.assertRaises(Exception):
             policy.run()
+
+    def test_quicksight_user_tags_augment(self):
+        factory = self.replay_flight_data("test_quicksight_user_tags")
+
+        policy = self.load_policy({
+            "name": "test-aws-quicksight-user-tags",
+            "resource": "aws.quicksight-user",
+            "filters": [{"tag:Owner": "c7n"}],
+        }, session_factory=factory, config={'account_id': self.account_id})
+
+        resources = policy.run()
+        self.assertEqual(len(resources), 1)
+        self.assertIn({"Key": "Owner", "Value": "c7n"}, resources[0]["Tags"])
+
+    def test_quicksight_user_tag_removetag(self):
+        factory = self.replay_flight_data("test_quicksight_user_tag_removetag")
+        client = local_session(factory).client("quicksight")
+
+        tag = self.load_policy({
+            "name": "test-aws-quicksight-user-tag",
+            "resource": "aws.quicksight-user",
+            "filters": [{"tag:Owner": "absent"}],
+            "actions": [{"type": "tag", "key": "Owner", "value": "c7n"}],
+        }, session_factory=factory, config={'account_id': self.account_id})
+        tagged = tag.run()
+        self.assertEqual(len(tagged), 1)
+        arn = tagged[0]["Arn"]
+        self.assertEqual(
+            client.list_tags_for_resource(ResourceArn=arn)["Tags"],
+            [{"Key": "Owner", "Value": "c7n"}])
+
+        untag = self.load_policy({
+            "name": "test-aws-quicksight-user-remove-tag",
+            "resource": "aws.quicksight-user",
+            "filters": [{"tag:Owner": "present"}],
+            "actions": [{"type": "remove-tag", "tags": ["Owner"]}],
+        }, session_factory=factory, config={'account_id': self.account_id})
+        untagged = untag.run()
+        self.assertEqual(len(untagged), 1)
+        self.assertEqual(
+            client.list_tags_for_resource(ResourceArn=arn)["Tags"], [])
+
+    def test_quicksight_user_permissions_filter(self):
+        factory = self.replay_flight_data("test_quicksight_user_permissions")
+
+        policy = self.load_policy({
+            "name": "test-aws-quicksight-user-permissions",
+            "resource": "aws.quicksight-user",
+            "filters": [{
+                "type": "permissions",
+                "key": "Capabilities.ShareDatasets",
+                "value": "absent",
+            }],
+        }, session_factory=factory, config={'account_id': self.account_id})
+
+        resources = policy.run()
+        self.assertEqual(len(resources), 1)
+        self.assertEqual(
+            resources[0]["c7n:CustomPermissions"]["CustomPermissionsName"],
+            "c7n-test-permissions")
+        self.assertNotIn("ShareDataSets", resources[0]["c7n:CustomPermissions"]["Capabilities"])
+
+    def test_quicksight_user_permissions_filter_no_profile(self):
+        factory = self.replay_flight_data("test_quicksight_user_permissions_none")
+
+        policy = self.load_policy({
+            "name": "test-aws-quicksight-user-permissions-none",
+            "resource": "aws.quicksight-user",
+            "filters": [{
+                "type": "permissions",
+                "key": "CustomPermissionsName",
+                "value": "absent",
+            }],
+        }, session_factory=factory, config={'account_id': self.account_id})
+
+        resources = policy.run()
+        self.assertEqual(len(resources), 1)
+        self.assertEqual(resources[0]["c7n:CustomPermissions"], {})
+        self.assertEqual(resources[0]["c7n:MatchedFilters"], ["CustomPermissionsName"])
+
+    def test_quicksight_dashboard_tag_removetag(self):
+        factory = self.replay_flight_data("test_quicksight_dashboard_tag_removetag")
+        client = local_session(factory).client("quicksight")
+
+        tag = self.load_policy({
+            "name": "test-aws-quicksight-dashboard-tag",
+            "resource": "aws.quicksight-dashboard",
+            "filters": [{"tag:Owner": "absent"}],
+            "actions": [{"type": "tag", "key": "Owner", "value": "c7n"}],
+        }, session_factory=factory,)
+        tagged = tag.run()
+        self.assertEqual(len(tagged), 1)
+        arn = tagged[0]["Arn"]
+        self.assertEqual(
+            client.list_tags_for_resource(ResourceArn=arn)["Tags"],
+            [{"Key": "Owner", "Value": "c7n"}])
+
+        untag = self.load_policy({
+            "name": "test-aws-quicksight-dashboard-remove-tag",
+            "resource": "aws.quicksight-dashboard",
+            "filters": [{"tag:Owner": "present"}],
+            "actions": [{"type": "remove-tag", "tags": ["Owner"]}],
+        }, session_factory=factory, config={'account_id': self.account_id})
+        untagged = untag.run()
+        self.assertEqual(len(untagged), 1)
+        self.assertEqual(
+            client.list_tags_for_resource(ResourceArn=arn)["Tags"], [])
+
+    def test_quicksight_datasource_tag_removetag(self):
+        factory = self.replay_flight_data("test_quicksight_datasource_tag_removetag")
+        client = local_session(factory).client("quicksight")
+
+        tag = self.load_policy({
+            "name": "test-aws-quicksight-datasource-tag",
+            "resource": "aws.quicksight-datasource",
+            "filters": [{"tag:Owner": "absent"}],
+            "actions": [{"type": "tag", "key": "Owner", "value": "c7n"}],
+        }, session_factory=factory, config={'account_id': self.account_id})
+        tagged = tag.run()
+        self.assertEqual(len(tagged), 1)
+        arn = tagged[0]["Arn"]
+        self.assertEqual(
+            client.list_tags_for_resource(ResourceArn=arn)["Tags"],
+            [{"Key": "Owner", "Value": "c7n"}])
+
+        untag = self.load_policy({
+            "name": "test-aws-quicksight-datasource-remove-tag",
+            "resource": "aws.quicksight-datasource",
+            "filters": [{"tag:Owner": "present"}],
+            "actions": [{"type": "remove-tag", "tags": ["Owner"]}],
+        }, session_factory=factory, config={'account_id': self.account_id})
+        untagged = untag.run()
+        self.assertEqual(len(untagged), 1)
+        self.assertEqual(
+            client.list_tags_for_resource(ResourceArn=arn)["Tags"], [])

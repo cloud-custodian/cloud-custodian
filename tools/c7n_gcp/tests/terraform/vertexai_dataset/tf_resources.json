@@ -1,0 +1,56 @@
+{
+    "pytest-terraform": 1,
+    "outputs": {},
+    "resources": {
+        "google_vertex_ai_dataset": {
+            "central": {
+                "create_time": "2026-07-18T00:22:01.767870Z",
+                "deletion_policy": "DELETE",
+                "display_name": "c7n-test-dataset-central",
+                "effective_labels": {
+                    "env": "test",
+                    "goog-terraform-provisioned": "true"
+                },
+                "encryption_spec": [],
+                "id": "projects/cloud-custodian/locations/us-central1/datasets/8151709114464993280",
+                "labels": {
+                    "env": "test"
+                },
+                "metadata_schema_uri": "gs://google-cloud-aiplatform/schema/dataset/metadata/image_1.0.0.yaml",
+                "name": "projects/cloud-custodian/locations/us-central1/datasets/8151709114464993280",
+                "project": "stkl-jim-fulton",
+                "region": "us-central1",
+                "terraform_labels": {
+                    "env": "test",
+                    "goog-terraform-provisioned": "true"
+                },
+                "timeouts": null,
+                "update_time": "2026-07-18T00:22:03.251031Z"
+            },
+            "east": {
+                "create_time": "2026-07-18T00:22:01.948094Z",
+                "deletion_policy": "DELETE",
+                "display_name": "c7n-test-dataset-east",
+                "effective_labels": {
+                    "env": "test",
+                    "goog-terraform-provisioned": "true"
+                },
+                "encryption_spec": [],
+                "id": "projects/cloud-custodian/locations/us-east1/datasets/683155161639550976",
+                "labels": {
+                    "env": "test"
+                },
+                "metadata_schema_uri": "gs://google-cloud-aiplatform/schema/dataset/metadata/tabular_1.0.0.yaml",
+                "name": "projects/cloud-custodian/locations/us-east1/datasets/683155161639550976",
+                "project": "stkl-jim-fulton",
+                "region": "us-east1",
+                "terraform_labels": {
+                    "env": "test",
+                    "goog-terraform-provisioned": "true"
+                },
+                "timeouts": null,
+                "update_time": "2026-07-18T00:22:03.703208Z"
+            }
+        }
+    }
+}

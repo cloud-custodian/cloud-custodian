@@ -9,6 +9,7 @@ import logging
 import random
 import re
 import time
+import typing
 import uuid
 from concurrent.futures import as_completed
 from functools import lru_cache
@@ -22,6 +23,8 @@ from c7n.utils import chunks, local_session
 from msrestazure.azure_exceptions import CloudError
 from msrestazure.tools import parse_resource_id
 from netaddr import IPNetwork, IPRange, IPSet
+import requests
+import urllib3.util.retry
 
 from c7n_azure import constants
 
@@ -384,8 +387,21 @@ class PortsRangeHelper:
     @staticmethod
     def build_ports_dict(nsg, direction_key, ip_protocol,
                          source_address=None, destination_address=None):
-        """ Build entire ports array filled with True (Allow), False (Deny) and None(default - Deny)
+        """ Build ports array filled with True (Allow), False (Deny)
             based on the provided Network Security Group object, direction and protocol.
+        """
+        ports_rules = PortsRangeHelper.build_ports_rules_dict(nsg, direction_key, ip_protocol,
+                                                              source_address, destination_address)
+        return {port: info['allowed'] for port, info in ports_rules.items()}
+
+    @staticmethod
+    def build_ports_rules_dict(nsg, direction_key, ip_protocol,
+                                   source_address=None, destination_address=None):
+        """ Build ports dictionary with all rule information that allows/denies them:
+        - allow_rules: set of rule IDs that allow access to the port
+        - deny_rules: set of rule IDs that deny access to the port
+        - min_deny_priority: minimum priority of deny rules
+        - min_allow_priority: minimum priority of allow rules
         """
         rules = nsg['properties']['securityRules']
         rules = sorted(rules, key=lambda k: k['properties']['priority'])
@@ -420,9 +436,13 @@ class PortsRangeHelper:
             ports_set = PortsRangeHelper.get_ports_set_from_rule(rule)
 
             for p in ports_set:
-                if p not in ports:
-                    ports[p] = IsAllowed
-
+                if p in ports:
+                    if IsAllowed != ports[p]['allowed']:
+                        # This rule doesn't apply because one of the previous rules overrides it.
+                        continue
+                    ports[p]['by_rules'].add(rule['id'])
+                else:
+                    ports[p] = {'allowed': IsAllowed, 'by_rules': {rule['id']}}
         return ports
 
 
@@ -589,6 +609,42 @@ def resolve_service_tag_alias(rule):
 
 def get_keyvault_auth_endpoint(cloud_endpoints):
     return 'https://{0}'.format(cloud_endpoints.suffixes.keyvault_dns[1:])
+
+
+def requests_session(
+    azure_session: typing.Any,
+    token_scope: typing.Optional[str] = None,
+    max_retries: int = 0,
+    status_forcelist: tuple[int, ...] = (429, 503),
+    allowed_methods: tuple[str, ...] = ('GET',),
+    **retry_args: typing.Any,
+) -> requests.Session:
+    """Create an Azure-authenticated HTTP session with optional retries."""
+    azure_session._initialize_session()
+    token_scope = token_scope or (
+        f"{azure_session.resource_endpoint.rstrip('/')}/.default"
+    )
+    token = azure_session.credentials.get_token(token_scope)
+
+    session = requests.Session()
+    session.headers['Authorization'] = f'Bearer {token.token}'
+
+    if max_retries:
+        retry_options = {
+            'total': max_retries,
+            'status_forcelist': status_forcelist,
+            'allowed_methods': allowed_methods,
+            'respect_retry_after_header': True,
+            'raise_on_status': False,
+        }
+        retry_options.update(retry_args)
+        retry = urllib3.util.retry.Retry(**retry_options)
+        session.mount(
+            'https://',
+            requests.adapters.HTTPAdapter(max_retries=retry),
+        )
+
+    return session
 
 
 # This function is a workaround for Azure KeyVault objects that lack

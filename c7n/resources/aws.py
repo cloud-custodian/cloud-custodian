@@ -76,7 +76,8 @@ MODEL_SCHEMA_TYPE_MAP = {
     'boolean': 'boolean',
     'long': 'number',
     'double': 'number',
-    'map': 'object'
+    'map': 'object',
+    'timestamp': 'string',
 }
 
 
@@ -157,10 +158,13 @@ def _default_bucket_region(options):
         raise invalid_output
 
 
+def get_service_shape(service, shape_name):
+    model = fake_session()._session.get_service_model(service)
+    return model.shape_for(shape_name)
+
+
 def shape_validate(params, shape_name, service):
-    session = fake_session()._session
-    model = session.get_service_model(service)
-    shape = model.shape_for(shape_name)
+    shape = get_service_shape(service, shape_name)
     validator = ParamValidator()
     report = validator.validate(params, shape)
     if report.has_errors():
@@ -725,12 +729,22 @@ class S3Output(BlobOutput):
             self.ctx.session_factory(region=bucket_region, assume=False).client('s3'))
         return self._transfer
 
+    def get_sse_args(self):
+        # encryption configurable via output url query params, eg
+        # s3://bucket/prefix?sse=aws:kms&kms-key=alias/custodian
+        kms_key = self.config.get('kms-key')
+        sse = self.config.get('sse') or (kms_key and 'aws:kms') or 'AES256'
+        args = {'ServerSideEncryption': sse}
+        if sse == 'aws:kms' and kms_key:
+            args['SSEKMSKeyId'] = kms_key
+        return args
+
     def upload_file(self, path, key):
+        extra_args = {'ACL': 'bucket-owner-full-control'}
+        extra_args.update(self.get_sse_args())
         self.transfer.upload_file(
             path, self.bucket, key,
-            extra_args={
-                'ACL': 'bucket-owner-full-control',
-                'ServerSideEncryption': 'AES256'})
+            extra_args=extra_args)
 
 
 @clouds.register('aws')
@@ -942,8 +956,5 @@ def shape_schema(service, shape_name, drop_fields=()):
             schema[member] = member_schema
         return schema
 
-    session = fake_session()._session
-    model = session.get_service_model(service)
-    shape = model.shape_for(shape_name)
-
+    shape = get_service_shape(service, shape_name)
     return _expand_shape_schema(shape)

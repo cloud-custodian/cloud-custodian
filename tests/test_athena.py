@@ -1,6 +1,8 @@
 # Copyright The Cloud Custodian Authors.
 # SPDX-License-Identifier: Apache-2.0
 
+from unittest import mock
+
 from pytest_terraform import terraform
 from .zpill import ACCOUNT_ID
 
@@ -55,6 +57,50 @@ def test_athena_catalog_tagging(test):
     arn = f"arn:aws:athena:us-east-1:{ACCOUNT_ID}:datacatalog/{resources[0]['CatalogName']}"
     tags = client.list_tags_for_resource(ResourceARN=arn)["Tags"]
     assert len(tags) == 0
+
+
+def test_athena_catalog_skips_aws_data_catalog(test):
+    factory = test.replay_flight_data("test_athena_data_catalog_aws_catalog_skip")
+    policy = test.load_policy(
+        {
+            "name": "test-athena-catalog-skip-aws-managed",
+            "resource": "aws.athena-data-catalog",
+            "actions": [
+                {
+                    "type": "tag",
+                    "key": "c7n",
+                    "value": "test",
+                }
+            ],
+        },
+        config={"account_id": ACCOUNT_ID},
+        session_factory=factory,
+    )
+    resources = policy.run()
+    # AwsDataCatalog is visible to the source (useful for inventory policies)
+    # but the DataCatalogTag mixin silently skips it before calling tag_resources.
+    # If the mixin had not filtered it, the placebo replay would raise because
+    # there is no recorded tagging.TagResources response.
+    assert len(resources) == 1
+    assert resources[0]["CatalogName"] == "AwsDataCatalog"
+
+
+def test_athena_catalog_mixin_skips_aws_managed(test):
+    # DataCatalogTag must not call process_resource_set when only
+    # AwsDataCatalog resources are present.
+    p = test.load_policy(
+        {
+            "name": "test-mixin-skip",
+            "resource": "aws.athena-data-catalog",
+            "actions": [{"type": "tag", "key": "c7n", "value": "test"}],
+        },
+        config={"account_id": ACCOUNT_ID},
+    )
+    action = p.resource_manager.actions[0]
+    aws_managed = [{"CatalogName": "AwsDataCatalog", "Type": "GLUE", "Tags": []}]
+    with mock.patch.object(action, "process_resource_set") as mock_prs:
+        action.process(aws_managed)
+    mock_prs.assert_not_called()
 
 
 def test_athena_cancel_capacity_reservation(test):

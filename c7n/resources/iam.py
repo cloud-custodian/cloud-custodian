@@ -36,12 +36,24 @@ from c7n.query import (
 from c7n.resolver import ValuesFrom
 from c7n.tags import TagActionFilter, TagDelayedAction, Tag, RemoveTag, universal_augment
 from c7n.utils import (
-    get_partition, local_session, type_schema, chunks, filter_empty, QueryParser,
+    get_partition, get_retry, local_session, type_schema, chunks, filter_empty, QueryParser,
     select_keys
 )
 
 from c7n.resources.aws import Arn
 from c7n.resources.securityhub import OtherResourcePostFinding
+
+
+_iam_tag_retry = get_retry((
+    'ConcurrentModification',
+    'TooManyRequestsException',
+    'ThrottlingException',
+    'RequestLimitExceeded',
+    'Throttled',
+    'ThrottledException',
+    'Throttling',
+    'Client.RequestLimitExceeded',
+))
 
 
 class DescribeGroup(DescribeSource):
@@ -149,8 +161,7 @@ class RoleTag(Tag):
     def process_resource_set(self, client, roles, tags):
         for role in roles:
             try:
-                self.manager.retry(
-                    client.tag_role, RoleName=role['RoleName'], Tags=tags)
+                _iam_tag_retry(client.tag_role, RoleName=role['RoleName'], Tags=tags)
             except client.exceptions.NoSuchEntityException:
                 continue
 
@@ -164,8 +175,7 @@ class RoleRemoveTag(RemoveTag):
     def process_resource_set(self, client, roles, tags):
         for role in roles:
             try:
-                self.manager.retry(
-                    client.untag_role, RoleName=role['RoleName'], TagKeys=tags)
+                _iam_tag_retry(client.untag_role, RoleName=role['RoleName'], TagKeys=tags)
             except client.exceptions.NoSuchEntityException:
                 continue
 
@@ -281,8 +291,7 @@ class UserTag(Tag):
     def process_resource_set(self, client, users, tags):
         for u in users:
             try:
-                self.manager.retry(
-                    client.tag_user, UserName=u['UserName'], Tags=tags)
+                _iam_tag_retry(client.tag_user, UserName=u['UserName'], Tags=tags)
             except client.exceptions.NoSuchEntityException:
                 continue
 
@@ -296,8 +305,7 @@ class UserRemoveTag(RemoveTag):
     def process_resource_set(self, client, users, tags):
         for u in users:
             try:
-                self.manager.retry(
-                    client.untag_user, UserName=u['UserName'], TagKeys=tags)
+                _iam_tag_retry(client.untag_user, UserName=u['UserName'], TagKeys=tags)
             except client.exceptions.NoSuchEntityException:
                 continue
 
@@ -1519,14 +1527,17 @@ class AllowAllIamPolicies(Filter):
             statements = [statements]
 
         for s in statements:
+            # Action/Resource are valid as either a bare string ("*") or a
+            # list (["*"]); normalize to a list so both forms are detected.
+            action = s.get('Action')
+            action = [action] if isinstance(action, str) else action
+            resource_val = s.get('Resource')
+            resource_val = [resource_val] if isinstance(resource_val, str) else resource_val
+
             if ('Condition' not in s and
-                    'Action' in s and
-                    isinstance(s['Action'], str) and
-                    s['Action'] == "*" and
-                    'Resource' in s and
-                    isinstance(s['Resource'], str) and
-                    s['Resource'] == "*" and
-                    s['Effect'] == "Allow"):
+                    action is not None and '*' in action and
+                    resource_val is not None and '*' in resource_val and
+                    s.get('Effect') == "Allow"):
                 return True
         return False
 
@@ -2089,8 +2100,9 @@ class UserPolicy(ValueFilter):
         matched = []
         for r in resources:
             for p in r['c7n:Policies']:
-                if self.match(p) and r not in matched:
+                if self.match(p):
                     matched.append(r)
+                    break
         return matched
 
 
