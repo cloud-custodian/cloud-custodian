@@ -12,6 +12,7 @@ from c7n_gcp.utils import (
     CloudLoggingOverlap,
     canonicalize_cloud_logging_filter,
     compare_cloud_logging_filters,
+    parse_cloud_logging_filter,
 )
 
 # TODO .. folder, billing account, org sink
@@ -171,70 +172,85 @@ class LogProjectSinkOverlapFilter(Filter):
     possible_annotation_key = 'c7n:possible-matched-sinks'
     permissions = ('logging.sinks.list',)
 
-    def _effective_filter(self, sink):
+    def _effective_filter(self, sink, exact):
         # A sink routes entries that match its filter and none of its
         # enabled exclusions.
-        parts = []
-        if sink.get('filter'):
-            parts.append('(%s)' % sink['filter'])
-        for exclusion in sink.get('exclusions', ()):
-            if exclusion.get('disabled', False) or not exclusion.get('filter'):
-                continue
-            parts.append('NOT (%s)' % exclusion['filter'])
-        if not parts:
-            return 'true'
-        expression = ' AND '.join(parts)
+        exclusions = [
+            exclusion['filter']
+            for exclusion in sink.get('exclusions', ())
+            if not exclusion.get('disabled', False) and exclusion.get('filter')
+        ]
         try:
-            return canonicalize_cloud_logging_filter(expression)
+            # Each filter is canonicalized on its own first, so unbalanced
+            # parentheses can't change how the filters combine.  A filter that
+            # is empty once canonicalized, e.g. only a comment, is treated
+            # like a missing one.
+            parts = []
+            routed = canonicalize_cloud_logging_filter(sink.get('filter'))
+            if routed:
+                parts.append('(%s)' % routed)
+            for exclusion in exclusions:
+                excluded = canonicalize_cloud_logging_filter(exclusion)
+                if excluded:
+                    parts.append('NOT (%s)' % excluded)
+            key = canonicalize_cloud_logging_filter(' AND '.join(parts))
+            # Overlap comparison parses the key again.
+            parse_cloud_logging_filter(key)
+            return key
         except ValueError as e:
             self.log.warning(
                 f"Unable to parse effective filter of log sink {sink.get('name')}: {e}")
-            if self.data.get('match', 'overlap') == 'overlap':
+            if not exact:
                 return None
             # Identical unparseable filters are still exact duplicates.  A
             # canonical key always parses, so this cannot collide with one.
-            return ' '.join(expression.split())
+            raw = [sink.get('filter') or ''] + ['NOT (%s)' % e for e in exclusions]
+            return ' '.join(' AND '.join(raw).split())
 
-    def _iter_candidate_sinks(self, resources):
+    def process(self, resources, event=None):
+        exact = self.data.get('match', 'overlap') == 'exact'
+        destination_groups = defaultdict(lambda: defaultdict(list))
+
         for sink in resources:
             if sink.get('disabled', False):
                 continue
-            destination = sink.get('destination')
-            yield destination, sink
-
-    def process(self, resources, event=None):
-        destination_groups = defaultdict(lambda: defaultdict(list))
-
-        for destination, sink in self._iter_candidate_sinks(resources):
-            expression = self._effective_filter(sink)
+            expression = self._effective_filter(sink, exact)
             if expression is None:
                 continue
-            destination_groups[destination][expression].append(sink)
+            destination_groups[sink.get('destination')][expression].append(sink)
 
         matched = []
         for relation_groups in destination_groups.values():
-            for sink, peers, possible in self._iter_matches(relation_groups):
+            for sink, peers, possible in self._iter_matches(relation_groups, exact):
                 sink[self.annotation_key] = [p.get('name') for p in peers]
                 sink[self.possible_annotation_key] = [p.get('name') for p in possible]
                 matched.append(sink)
         return matched
 
-    def _iter_matches(self, relation_groups):
+    def _compare(self, left, right, cache):
+        # Overlap is symmetric, so each pair of filters is compared once.
+        pair = (left, right) if left <= right else (right, left)
+        if pair not in cache:
+            result = compare_cloud_logging_filters(*pair)
+            # Identical effective filters route the same entries, so they
+            # overlap unless the filter provably matches nothing.
+            if left == right and result is CloudLoggingOverlap.POSSIBLE:
+                result = CloudLoggingOverlap.OVERLAP
+            cache[pair] = result
+        return cache[pair]
+
+    def _iter_matches(self, relation_groups, exact):
         # Each sink is paired with the sinks it directly matches, not with
         # everything reachable through a chain of overlaps.
-        exact = self.data.get('match', 'overlap') == 'exact'
+        cache = {}
         for expression, sinks in relation_groups.items():
             if exact:
                 results = [(sinks, CloudLoggingOverlap.OVERLAP)]
             else:
-                results = []
-                for other, peers in relation_groups.items():
-                    result = compare_cloud_logging_filters(expression, other)
-                    # Identical effective filters route the same entries, so
-                    # they overlap unless the filter provably matches nothing.
-                    if other == expression and result is CloudLoggingOverlap.POSSIBLE:
-                        result = CloudLoggingOverlap.OVERLAP
-                    results.append((peers, result))
+                results = [
+                    (peers, self._compare(expression, other, cache))
+                    for other, peers in relation_groups.items()
+                ]
             for sink in sinks:
                 peers, possible = [], []
                 for others, result in results:

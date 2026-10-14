@@ -1,5 +1,6 @@
 import functools
 import logging
+import math
 import re
 from dataclasses import dataclass
 from enum import Enum
@@ -8,7 +9,6 @@ from enum import Enum
 log = logging.getLogger('c7n_gcp.utils')
 
 
-_COMPARISON_OPERATORS = {'>=', '<=', '!=', '=~', '!~', '=', '>', '<', ':'}
 _REGEX_OPERATORS = {'=~', '!~'}
 _SEVERITY_ORDER = {
     "default": 0,
@@ -23,15 +23,20 @@ _SEVERITY_ORDER = {
 }
 
 
+_STRING_PATTERN = r'"(?:[^"\\]|\\.)*"|\'(?:[^\'\\]|\\.)*\''
+# A word may contain quoted segments, e.g. the field path jsonPayload."my key".
+_WORD_PATTERN = r'[^\s()=><:!~"\'](?:[^\s()=><:!~"\']|%s)*' % _STRING_PATTERN
 # Regex tokenizer for Cloud Logging filter expressions.
 # Two-character operators must appear before their single-character prefixes so
 # that alternation priority resolves them correctly (e.g. ">=" before ">").
 _TOKEN_RE = re.compile(
-    r'(?P<STRING>"(?:[^"\\]|\\.)*"|\'(?:[^\'\\]|\\.)*\')'
+    rf'(?P<STRING>{_STRING_PATTERN})'
+    r'|(?P<COMMENT>--[^\n]*)'  # "--" starts a comment that runs to the end of the line
     r'|(?P<LPAREN>\()'
     r'|(?P<RPAREN>\))'
     r'|(?P<OP>>=|<=|!=|=~|!~|[=><:])'
-    r'|(?P<WORD>[^\s()=><:!~]+)'
+    rf'|(?P<FUNC>{_WORD_PATTERN}(?=\())'  # a function name directly followed by "("
+    rf'|(?P<WORD>{_WORD_PATTERN})'
     r'|(?P<UNKNOWN>[^\s])'  # catch-all: tolerate uncommon punctuation (but not whitespace)
 )
 # Logical operators are case-sensitive: lowercase and/or/not are search terms.
@@ -43,10 +48,12 @@ def _tokenize_cloud_logging_filter(expression):
     tokens = []
     for m in _TOKEN_RE.finditer(expression):
         kind, value = m.lastgroup, m.group()
-        if kind == 'WORD' and value in _LOGICAL_WORDS:
+        if kind == 'COMMENT':
+            continue
+        if kind in ('WORD', 'FUNC') and value in _LOGICAL_WORDS:
             tokens.append(('LOGIC', value))
         elif (
-            kind == 'WORD'
+            kind in ('WORD', 'FUNC')
             and value.startswith('-')
             and not (tokens and tokens[-1][0] == 'OP')
             and not _NEGATIVE_NUMBER_RE.match(value)
@@ -55,8 +62,11 @@ def _tokenize_cloud_logging_filter(expression):
             # -resource.type="gce_instance".  A minus after a comparison
             # operator or before a digit is part of the value.
             tokens.append(('LOGIC', 'NOT'))
-            if value[1:]:
-                tokens.append(('WORD', value[1:]))
+            if kind == 'FUNC' and value[1:]:
+                tokens.append(('FUNC', value[1:]))
+            elif kind == 'WORD':
+                # The rest may be a quoted string, e.g. -"foo bar".
+                tokens.extend(_tokenize_cloud_logging_filter(value[1:]))
         elif kind == 'UNKNOWN':
             tokens.append(('WORD', value))  # tolerate uncommon punctuation
         else:
@@ -93,16 +103,14 @@ class CloudLoggingFilterParser:
     AND, so ``a OR b AND c`` means ``(a OR b) AND c``.
     """
 
-    comparison_operators = _COMPARISON_OPERATORS
-
     @classmethod
     def parse(cls, expression):
-        normalized = (expression or "").strip()
-        if not normalized:
-            node = {"type": "term", "tokens": [("WORD", "true")]}
-            return cls._build_result(node)
+        tokens = _tokenize_cloud_logging_filter(expression or "")
+        if not tokens:
+            # An empty filter matches every log entry.
+            return cls._build_result({"type": "all"})
 
-        stream = _TokenStream(_tokenize_cloud_logging_filter(normalized))
+        stream = _TokenStream(tokens)
         ast = cls._parse_and(stream, cls._parse_predicate)
         if stream.peek() is not None:
             raise ValueError("Unable to parse full Cloud Logging filter expression")
@@ -201,15 +209,14 @@ class CloudLoggingFilterParser:
 
     @classmethod
     def _parse_operand(cls, stream):
-        # A field path, value or search term.  A word followed by a
+        # A field path, value or search term.  A name directly followed by a
         # parenthesized argument list is a function call such as
         # sample(insertId, 0.1) or LOG_ID("...").
         token = stream.peek()
-        if token is None or token[0] not in ("WORD", "STRING"):
+        if token is None or token[0] not in ("WORD", "STRING", "FUNC"):
             raise ValueError("Empty predicate in Cloud Logging filter expression")
         tokens = [stream.consume()]
-        following = stream.peek()
-        if token[0] == "WORD" and following and following[0] == "LPAREN":
+        if token[0] == "FUNC":
             depth = 0
             while True:
                 token = stream.consume()
@@ -282,25 +289,42 @@ class CloudLoggingFilterParser:
             return "(" + joiner.join(children) + ")"
         if node_type == "not":
             return f"NOT {cls._canonicalize_node(node['expr'])}"
+        if node_type == "all":
+            return ""
         # Comparisons ignore letter case except for regular expressions, but
         # map and struct keys in a field path are case-sensitive.
         if node_type == "predicate":
             lhs = cls._render_tokens(node["lhs_tokens"])
-            rhs = cls._render_tokens(
-                node["rhs_tokens"], lower=node["op"] not in _REGEX_OPERATORS
+            rhs = cls._canonicalize_value(
+                node["rhs_tokens"][0], lower=node["op"] not in _REGEX_OPERATORS
             )
             return f"{lhs} {node['op']} {rhs}"
         return cls._render_tokens(node["tokens"], lower=True)
 
+    @staticmethod
+    def _canonicalize_value(token, lower):
+        # A value means the same quoted or not, so render it double-quoted
+        # where that doesn't need new escapes.
+        token_type, value = token
+        if token_type == "STRING" and value[0] == "'" and '"' not in value:
+            value = f'"{value[1:-1]}"'
+        elif token_type == "WORD" and not set(value) & set("\"'\\"):
+            value = f'"{value}"'
+        return value.lower() if lower else value
+
     @classmethod
     def _render_tokens(cls, tokens, lower=False):
-        rendered = []
+        rendered = ""
+        previous = None
         for token_type, value in tokens:
-            if lower and token_type in ("WORD", "STRING"):
-                rendered.append(value.lower())
-            else:
-                rendered.append(value)
-        return re.sub(r"\s+", " ", " ".join(rendered)).strip()
+            if lower and token_type in ("WORD", "STRING", "FUNC"):
+                value = value.lower()
+            # A function name must stay directly followed by its "(".
+            if rendered and previous not in ("FUNC", "LPAREN") and token_type != "RPAREN":
+                rendered += " "
+            rendered += value
+            previous = token_type
+        return rendered
 
 
 def parse_cloud_logging_filter(expression):
@@ -352,6 +376,10 @@ def compare_cloud_logging_filters(left_expression, right_expression):
     global search terms and functions like ``LOG_ID``, leave the result
     ``POSSIBLE`` unless a contradiction is found.  Filters whose normal form
     grows beyond ``_MAX_DNF_CONJUNCTIONS`` are logged and also ``POSSIBLE``.
+
+    ``jsonPayload`` and ``protoPayload`` fields may hold arrays, and a
+    comparison on an array matches when any element matches, so conflicting
+    comparisons on those fields give ``POSSIBLE`` rather than ``DISJOINT``.
     """
     left = _cloud_logging_filter_dnf(left_expression)
     right = _cloud_logging_filter_dnf(right_expression)
@@ -391,6 +419,9 @@ def _to_cloud_logging_dnf(node, negated=False):
     node_type = node['type']
     if node_type == 'not':
         return _to_cloud_logging_dnf(node['expr'], not negated)
+    if node_type == 'all':
+        # One empty conjunction is always true; no conjunctions is never true.
+        return [] if negated else [[]]
     if node_type not in ('and', 'or'):
         return [[(negated, node)]]
 
@@ -422,11 +453,7 @@ def _cloud_logging_conjunction_satisfiable(literals):
         if polarity.setdefault(key, negated) != negated:
             return CloudLoggingOverlap.DISJOINT
         if node['type'] == 'term':
-            if key == 'true':
-                if negated:
-                    return CloudLoggingOverlap.DISJOINT
-            else:
-                result = CloudLoggingOverlap.POSSIBLE
+            result = CloudLoggingOverlap.POSSIBLE
             continue
         field = CloudLoggingFilterParser._render_tokens(node['lhs_tokens'])
         value = _normalize_cloud_logging_rhs(
@@ -455,6 +482,22 @@ _COMPLEMENT_OPERATORS = {'=': '!=', '!=': '=', '>': '<=', '>=': '<', '<': '>=', 
 
 
 def _cloud_logging_field_satisfiable(field, constraints):
+    result = _cloud_logging_single_value_satisfiable(field, constraints)
+    # A payload field may be an array, and a comparison on an array matches
+    # when any element matches, so one entry can satisfy x="a" AND x="b".
+    # A single-element array behaves like a single value, so proven overlap
+    # still holds.
+    if result is CloudLoggingOverlap.DISJOINT and field.lower().startswith(
+        _REPEATABLE_FIELD_PREFIXES
+    ):
+        return CloudLoggingOverlap.POSSIBLE
+    return result
+
+
+_REPEATABLE_FIELD_PREFIXES = ('jsonpayload.', 'protopayload.')
+
+
+def _cloud_logging_single_value_satisfiable(field, constraints):
     # Built-in LogEntry field names ignore letter case.
     severity = field.lower() == 'severity'
     # Every entry has a severity: LogEntry.severity defaults to DEFAULT.
@@ -486,14 +529,22 @@ def _cloud_logging_field_satisfiable(field, constraints):
             continue
         effective.append((op, value))
 
-    eq = {value for op, value in effective if op == '='}
-    ne = {value for op, value in effective if op == '!='}
+    def value_key(value):
+        # Numbers compare by value, e.g. 5 and 5.0, or ERROR and 500 for severity.
+        number = _coerce_cloud_logging_ordered_value(value, severity)
+        return value if number is None else number
+
+    eq = {value_key(value) for op, value in effective if op == '='}
+    ne = {value_key(value) for op, value in effective if op == '!='}
     if len(eq) > 1 or eq & ne:
         return CloudLoggingOverlap.DISJOINT
 
     interval = _to_cloud_logging_numeric_interval(effective, severity)
+    if interval is None and severity:
+        # Severity is always one of the fixed levels, even unconstrained.
+        interval = _Interval()
     if interval is not None:
-        excluded = {_coerce_cloud_logging_ordered_value(value, severity) for value in ne}
+        excluded = {value for value in ne if isinstance(value, float)}
         if severity:
             # Every entry has exactly one of the fixed severity levels.
             if not any(
@@ -506,11 +557,11 @@ def _cloud_logging_field_satisfiable(field, constraints):
                 return CloudLoggingOverlap.DISJOINT
             if interval.lower == interval.upper and interval.lower in excluded:
                 return CloudLoggingOverlap.DISJOINT
-            if any(v is not None and interval.contains(v) for v in excluded):
+            if any(interval.contains(v) for v in excluded):
                 # Excluding values inside a range only leaves a match if the
                 # field is not restricted to those values, e.g. integers.
                 understood = False
-        if any(_coerce_cloud_logging_ordered_value(v, severity) is None for v in eq):
+        if any(not isinstance(v, float) for v in eq):
             # A non-numeric equality alongside a numeric range.
             understood = False
 
@@ -561,25 +612,17 @@ def _to_cloud_logging_numeric_interval(predicates, severity=False):
             continue
 
         has_numeric = True
-        if op == '=':
-            if numeric_value > lower or (numeric_value == lower and not lower_inclusive):
-                lower, lower_inclusive = numeric_value, True
-            if numeric_value < upper or (numeric_value == upper and not upper_inclusive):
-                upper, upper_inclusive = numeric_value, True
-            continue
-
-        if op == '>':
-            if numeric_value > lower or (numeric_value == lower and lower_inclusive):
-                lower, lower_inclusive = numeric_value, False
-        elif op == '>=':
-            if numeric_value > lower or (numeric_value == lower and not lower_inclusive):
-                lower, lower_inclusive = numeric_value, True
-        elif op == '<':
-            if numeric_value < upper or (numeric_value == upper and upper_inclusive):
-                upper, upper_inclusive = numeric_value, False
-        elif op == '<=':
-            if numeric_value < upper or (numeric_value == upper and not upper_inclusive):
-                upper, upper_inclusive = numeric_value, True
+        # Each comparison can only narrow the interval.  At an equal bound an
+        # exclusive comparison is the narrower one, so an inclusive one never
+        # replaces it.
+        if op in ('=', '>', '>='):
+            inclusive = op != '>'
+            if numeric_value > lower or (numeric_value == lower and not inclusive):
+                lower, lower_inclusive = numeric_value, inclusive
+        if op in ('=', '<', '<='):
+            inclusive = op != '<'
+            if numeric_value < upper or (numeric_value == upper and not inclusive):
+                upper, upper_inclusive = numeric_value, inclusive
 
     if not has_numeric:
         return None
@@ -588,9 +631,13 @@ def _to_cloud_logging_numeric_interval(predicates, severity=False):
 
 def _coerce_cloud_logging_ordered_value(value, severity=False):
     try:
-        return float(value)
+        number = float(value)
     except (TypeError, ValueError):
         pass
+    else:
+        # float() also accepts "inf" and "nan", which are not numbers here.
+        if math.isfinite(number):
+            return number
 
     # Severity names only order the top-level severity field.
     lowered = str(value).strip().lower()

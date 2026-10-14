@@ -81,20 +81,15 @@ def test_canonicalize_cloud_logging_filter_normalizes_structure():
     )
 
 
-def test_parse_cloud_logging_filter_empty_expression_defaults_to_true_term():
-    parsed = parse_cloud_logging_filter("")
-    assert parsed["terms"] == ["true"]
+@pytest.mark.parametrize("expression", ["", None, "  ", "-- only a comment"])
+def test_parse_cloud_logging_filter_empty_expression_matches_everything(expression):
+    parsed = parse_cloud_logging_filter(expression)
+    assert parsed["ast"] == {"type": "all"}
+    assert parsed["terms"] == []
     assert parsed["predicates"] == []
     assert parsed["logical_operators"] == []
     assert parsed["comparison_operators"] == []
-
-
-def test_parse_cloud_logging_filter_none_expression_defaults_to_true_term():
-    parsed = parse_cloud_logging_filter(None)
-    assert parsed["terms"] == ["true"]
-    assert parsed["predicates"] == []
-    assert parsed["logical_operators"] == []
-    assert parsed["comparison_operators"] == []
+    assert canonicalize_cloud_logging_filter(expression) == ""
 
 
 def test_parse_cloud_logging_filter_handles_escaped_quote_in_string():
@@ -255,13 +250,67 @@ def test_canonicalize_cloud_logging_filter_keeps_case_sensitive_parts(first, sec
 
 def test_parse_cloud_logging_filter_handles_parenthesized_lhs_expression():
     parsed = parse_cloud_logging_filter("sample(insertId)=1")
-    assert parsed["predicates"][0]["lhs"] == "sample ( insertId )"
+    assert parsed["predicates"][0]["lhs"] == "sample(insertId)"
     assert parsed["predicates"][0]["op"] == "="
     assert parsed["predicates"][0]["rhs"] == "1"
 
 
 def test_canonicalize_cloud_logging_filter_term_only_expression():
     assert canonicalize_cloud_logging_filter("UNSTRUCTURED_TERM") == "unstructured_term"
+
+
+@pytest.mark.parametrize(
+    "first,second",
+    [
+        # "--" starts a comment that runs to the end of the line.
+        ('severity>=ERROR -- was severity=DEBUG', 'severity>=ERROR'),
+        ('severity>=ERROR\n-- see (ticket\nresource.type="a"',
+         'severity>=ERROR AND resource.type="a"'),
+        # A leading minus applies to a quoted search term as a whole.
+        ('-"foo bar"', 'NOT "foo bar"'),
+        # Only a name directly followed by "(" is a function call.
+        ('unicorn (a=1 OR b=2)', 'unicorn AND (a=1 OR b=2)'),
+        # A value means the same quoted or not.
+        ('resource.type=gce_instance', 'resource.type="gce_instance"'),
+        ("labels.env='prod'", 'labels.env="prod"'),
+    ],
+)
+def test_canonicalize_cloud_logging_filter_equivalent_forms(first, second):
+    assert canonicalize_cloud_logging_filter(first) == canonicalize_cloud_logging_filter(second)
+
+
+@pytest.mark.parametrize(
+    "first,second",
+    [
+        # Whitespace inside a quoted string is significant.
+        ('textPayload="a  b"', 'textPayload="a b"'),
+        # "--" inside a quoted string is not a comment.
+        ('textPayload="a -- b"', 'textPayload="a"'),
+    ],
+)
+def test_canonicalize_cloud_logging_filter_distinct_forms(first, second):
+    assert canonicalize_cloud_logging_filter(first) != canonicalize_cloud_logging_filter(second)
+
+
+@pytest.mark.parametrize(
+    "expression",
+    [
+        'LOG_ID("a") OR -LOG_ID("b")',
+        'sample(insertId, 0.1)=1',
+        'NOT(a=1 OR b=2)',
+        'jsonPayload."my key"="x"',
+        'textPayload="a  b"',
+        'httpRequest.latency>-1',
+    ],
+)
+def test_canonicalize_cloud_logging_filter_round_trips(expression):
+    canonical = canonicalize_cloud_logging_filter(expression)
+    assert canonicalize_cloud_logging_filter(canonical) == canonical
+
+
+def test_parse_cloud_logging_filter_quoted_field_path_segment():
+    parsed = parse_cloud_logging_filter('jsonPayload."my key"="x"')
+    assert parsed["predicates"] == [{"lhs": 'jsonPayload."my key"', "op": "=", "rhs": '"x"'}]
 
 
 def _compare(left, right):
@@ -290,10 +339,16 @@ def _compare(left, right):
         ('severity!=ERROR', 'severity>=WARNING'),
         # Severity is always present, so a negated range is its complement.
         ('NOT severity<ERROR', 'severity>=WARNING'),
+        # Numbers compare by value.
+        ('sample=5', 'sample=5.0'),
+        ('severity=ERROR', 'severity=500'),
+        # Comments are ignored.
+        ('severity>=ERROR -- was severity>=WARNING', 'severity>=ERROR'),
     ],
 )
 def test_compare_cloud_logging_filters_proven_overlap(left, right):
     assert _compare(left, right) is CloudLoggingOverlap.OVERLAP
+    assert _compare(right, left) is CloudLoggingOverlap.OVERLAP
 
 
 @pytest.mark.parametrize(
@@ -322,10 +377,17 @@ def test_compare_cloud_logging_filters_proven_overlap(left, right):
         # Severity is one of a fixed set of levels.
         ('severity>ERROR', 'severity<CRITICAL'),
         ('sample=1', 'sample!=1.0'),
+        # An inclusive bound doesn't widen an exclusive one at the same value.
+        ('severity>WARNING', 'severity=WARNING'),
+        ('sample>5', 'sample=5'),
+        ('sample<5', 'sample=5'),
+        ('sample>5', 'sample>=5 AND sample<=5'),
+        ('sample<5', 'sample>=5 AND sample<=5'),
     ],
 )
 def test_compare_cloud_logging_filters_proven_disjoint(left, right):
     assert _compare(left, right) is CloudLoggingOverlap.DISJOINT
+    assert _compare(right, left) is CloudLoggingOverlap.DISJOINT
 
 
 @pytest.mark.parametrize(
@@ -345,10 +407,20 @@ def test_compare_cloud_logging_filters_proven_disjoint(left, right):
         # distinct map keys.
         ('SEVERITY>=ERROR', 'severity<ERROR'),
         ('labels.Env="a"', 'labels.env="b"'),
+        # A comparison on an array field matches when any element matches.
+        ('protoPayload.authorizationInfo.permission="storage.objects.get"',
+         'protoPayload.authorizationInfo.permission="storage.objects.list"'),
+        ('jsonPayload.shoeSize<7', 'jsonPayload.shoeSize>9'),
+        # "true" is an ordinary search term.
+        ('NOT true', 'resource.type="a"'),
+        # Values that are not severity levels, or not finite numbers.
+        ('severity=BOGUS', ''),
+        ('labels.mode="inf"', 'labels.mode<10'),
     ],
 )
 def test_compare_cloud_logging_filters_possible_overlap(left, right):
     assert _compare(left, right) is CloudLoggingOverlap.POSSIBLE
+    assert _compare(right, left) is CloudLoggingOverlap.POSSIBLE
 
 
 @pytest.mark.parametrize(
@@ -358,9 +430,15 @@ def test_compare_cloud_logging_filters_possible_overlap(left, right):
         'severity>ERROR AND severity<ERROR',
         'resource.type="a" AND resource.type="b"',
         'textPayload:"x" AND NOT textPayload:"x"',
-        'NOT true',
         # Every entry has a severity of at least DEFAULT.
         'NOT severity>=DEFAULT',
+        # Every entry has one of the fixed severity levels.
+        ' AND '.join(
+            f'severity!={level}' for level in (
+                'DEFAULT', 'DEBUG', 'INFO', 'NOTICE', 'WARNING',
+                'ERROR', 'CRITICAL', 'ALERT', 'EMERGENCY',
+            )
+        ),
     ],
 )
 def test_compare_cloud_logging_filters_unsatisfiable_filter_overlaps_nothing(contradiction):

@@ -175,6 +175,23 @@ class LogProjectSinkTest(BaseTest):
             'bad-copy': ['bad'],
         })
 
+    def test_sink_overlap_ignores_comments(self):
+        destination = 'logging.googleapis.com/projects/p/locations/global/buckets/b'
+
+        def sinks():
+            return [
+                {'name': 'base', 'destination': destination, 'filter': 'severity>=ERROR'},
+                {'name': 'commented', 'destination': destination,
+                 'filter': 'severity>=ERROR -- was severity>=WARNING (see ticket'},
+            ]
+
+        # A commented filter used to produce a key that failed to re-parse.
+        for match in ('overlap', 'exact'):
+            self.assertEqual(self._process_sink_overlap(match, sinks()), {
+                'base': ['commented'],
+                'commented': ['base'],
+            })
+
     def test_sink_overlap_applies_enabled_exclusions(self):
         destination = 'logging.googleapis.com/projects/p/locations/global/buckets/b'
 
