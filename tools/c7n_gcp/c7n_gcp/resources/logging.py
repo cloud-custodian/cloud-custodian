@@ -12,6 +12,7 @@ from c7n_gcp.utils import (
     CloudLoggingOverlap,
     canonicalize_cloud_logging_filter,
     compare_cloud_logging_filters,
+    normalize_cloud_logging_filter_spacing,
     parse_cloud_logging_filter,
 )
 
@@ -188,11 +189,11 @@ class LogProjectSinkOverlapFilter(Filter):
             parts = []
             routed = canonicalize_cloud_logging_filter(sink.get('filter'))
             if routed:
-                parts.append('(%s)' % routed)
+                parts.append(f'({routed})')
             for exclusion in exclusions:
                 excluded = canonicalize_cloud_logging_filter(exclusion)
                 if excluded:
-                    parts.append('NOT (%s)' % excluded)
+                    parts.append(f'NOT ({excluded})')
             key = canonicalize_cloud_logging_filter(' AND '.join(parts))
             # Overlap comparison parses the key again.
             parse_cloud_logging_filter(key)
@@ -204,8 +205,12 @@ class LogProjectSinkOverlapFilter(Filter):
                 return None
             # Identical unparseable filters are still exact duplicates.  A
             # canonical key always parses, so this cannot collide with one.
-            raw = [sink.get('filter') or ''] + ['NOT (%s)' % e for e in exclusions]
-            return ' '.join(' AND '.join(raw).split())
+            # Each filter is normalized on its own so a comment can't swallow
+            # the ones after it.
+            raw = [normalize_cloud_logging_filter_spacing(sink.get('filter'))] + [
+                f'NOT ({normalize_cloud_logging_filter_spacing(e)})' for e in exclusions
+            ]
+            return ' AND '.join(raw)
 
     def process(self, resources, event=None):
         exact = self.data.get('match', 'overlap') == 'exact'

@@ -227,6 +227,11 @@ def test_canonicalize_cloud_logging_filter_is_idempotent():
         ('logName="Foo"', 'logName="foo"'),
         ('severity>=ERROR', 'severity>=error'),
         ('"Timeout"', '"timeout"'),
+        # Built-in field names ignore letter case.
+        ('SEVERITY>=ERROR', 'severity>=ERROR'),
+        ('Resource.Type="a"', 'resource.type="a"'),
+        ('RESOURCE.LABELS.zone="a"', 'resource.labels.zone="a"'),
+        ('JSONPAYLOAD.userId="a"', 'jsonPayload.userId="a"'),
     ],
 )
 def test_canonicalize_cloud_logging_filter_ignores_value_case(first, second):
@@ -239,6 +244,8 @@ def test_canonicalize_cloud_logging_filter_ignores_value_case(first, second):
         # Map and struct keys are case-sensitive.
         ('labels.Env="prod"', 'labels.env="prod"'),
         ('jsonPayload.userId="a"', 'jsonPayload.userid="a"'),
+        ('resource.labels.Zone="a"', 'resource.labels.zone="a"'),
+        ('jsonPayload."My Key"="a"', 'jsonPayload."my key"="a"'),
         # Regular expressions are case-sensitive.
         ('labels.env=~"^Prod"', 'labels.env=~"^prod"'),
         ('labels.env!~Prod', 'labels.env!~prod'),
@@ -342,6 +349,8 @@ def _compare(left, right):
         # Numbers compare by value.
         ('sample=5', 'sample=5.0'),
         ('severity=ERROR', 'severity=500'),
+        # The same string written with different escapes.
+        ('labels.k="a\\"b"', "labels.k='a\"b'"),
         # Comments are ignored.
         ('severity>=ERROR -- was severity>=WARNING', 'severity>=ERROR'),
     ],
@@ -383,6 +392,10 @@ def test_compare_cloud_logging_filters_proven_overlap(left, right):
         ('sample<5', 'sample=5'),
         ('sample>5', 'sample>=5 AND sample<=5'),
         ('sample<5', 'sample>=5 AND sample<=5'),
+        # Built-in field names ignore letter case.
+        ('SEVERITY>=ERROR', 'severity<ERROR'),
+        # Only escaped quotes and backslashes are decoded.
+        ('labels.k="a\\"b"', 'labels.k="ab"'),
     ],
 )
 def test_compare_cloud_logging_filters_proven_disjoint(left, right):
@@ -403,9 +416,7 @@ def test_compare_cloud_logging_filters_proven_disjoint(left, right):
         # Excluding a value inside a range may empty it for integer fields.
         ('httpRequest.status>199 AND httpRequest.status<201',
          'httpRequest.status!=200'),
-        # Paths that differ only in case may be one built-in field or two
-        # distinct map keys.
-        ('SEVERITY>=ERROR', 'severity<ERROR'),
+        # Map keys that differ only in case.
         ('labels.Env="a"', 'labels.env="b"'),
         # A comparison on an array field matches when any element matches.
         ('protoPayload.authorizationInfo.permission="storage.objects.get"',

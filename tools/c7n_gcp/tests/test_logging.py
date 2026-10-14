@@ -153,6 +153,11 @@ class LogProjectSinkTest(BaseTest):
                  'filter': 'severity>=ERROR AND (resource.type="gce_instance"'},
                 {'name': 'bad-copy', 'destination': destination,
                  'filter': 'severity>=ERROR  AND (resource.type="gce_instance"'},
+                # Whitespace inside a quoted string is significant.
+                {'name': 'bad-spaced', 'destination': destination,
+                 'filter': 'severity>=ERROR AND (resource.type="gce  instance"'},
+                {'name': 'bad-spaced-copy', 'destination': destination,
+                 'filter': 'severity>=ERROR AND (resource.type="gce instance"'},
                 {'name': 'bad-exclusion', 'destination': destination,
                  'filter': 'severity>=ERROR',
                  'exclusions': [{'name': 'broken', 'filter': 'resource.type="gce_instance")'}]},
@@ -160,14 +165,15 @@ class LogProjectSinkTest(BaseTest):
 
         with self.assertLogs('custodian.filters', level='WARNING') as logs:
             overlap = self._process_sink_overlap('overlap', sinks())
-        self.assertEqual(len(logs.records), 3)
+        self.assertEqual(len(logs.records), 5)
         self.assertIn('log sink bad:', logs.output[0])
         # Unparseable sinks are left out of overlap comparisons.
         self.assertEqual(overlap, {'base': ['copy'], 'copy': ['base']})
 
         with self.assertLogs('custodian.filters', level='WARNING'):
             exact = self._process_sink_overlap('exact', sinks())
-        # Identical unparseable filters, ignoring whitespace, are duplicates.
+        # Identical unparseable filters, ignoring whitespace outside quoted
+        # strings, are duplicates.
         self.assertEqual(exact, {
             'base': ['copy'],
             'copy': ['base'],

@@ -25,7 +25,7 @@ _SEVERITY_ORDER = {
 
 _STRING_PATTERN = r'"(?:[^"\\]|\\.)*"|\'(?:[^\'\\]|\\.)*\''
 # A word may contain quoted segments, e.g. the field path jsonPayload."my key".
-_WORD_PATTERN = r'[^\s()=><:!~"\'](?:[^\s()=><:!~"\']|%s)*' % _STRING_PATTERN
+_WORD_PATTERN = rf'[^\s()=><:!~"\'](?:[^\s()=><:!~"\']|{_STRING_PATTERN})*'
 # Regex tokenizer for Cloud Logging filter expressions.
 # Two-character operators must appear before their single-character prefixes so
 # that alternation priority resolves them correctly (e.g. ">=" before ">").
@@ -42,6 +42,11 @@ _TOKEN_RE = re.compile(
 # Logical operators are case-sensitive: lowercase and/or/not are search terms.
 _LOGICAL_WORDS = {'AND', 'OR', 'NOT'}
 _NEGATIVE_NUMBER_RE = re.compile(r'-\d')
+# One segment of a field path, which may contain quoted parts.
+_FIELD_SEGMENT_RE = re.compile(rf'(?:{_STRING_PATTERN}|[^."\'])+')
+# LogEntry fields whose sub-fields are map or struct keys.
+_KEYED_FIELDS = {'labels', 'jsonpayload', 'protopayload'}
+_ESCAPED_QUOTE_RE = re.compile(r'\\(["\'\\])')
 
 
 def _tokenize_cloud_logging_filter(expression):
@@ -291,15 +296,29 @@ class CloudLoggingFilterParser:
             return f"NOT {cls._canonicalize_node(node['expr'])}"
         if node_type == "all":
             return ""
-        # Comparisons ignore letter case except for regular expressions, but
-        # map and struct keys in a field path are case-sensitive.
+        # Comparisons ignore letter case except for regular expressions.
         if node_type == "predicate":
-            lhs = cls._render_tokens(node["lhs_tokens"])
+            lhs = cls._canonicalize_field(node["lhs_tokens"])
             rhs = cls._canonicalize_value(
                 node["rhs_tokens"][0], lower=node["op"] not in _REGEX_OPERATORS
             )
             return f"{lhs} {node['op']} {rhs}"
         return cls._render_tokens(node["tokens"], lower=True)
+
+    @classmethod
+    def _canonicalize_field(cls, tokens):
+        # Built-in LogEntry field names ignore letter case, but map and struct
+        # keys are case-sensitive, so only the path up to the first keyed
+        # field is lowercased, e.g. resource.labels.Zone keeps "Zone".
+        if len(tokens) != 1 or tokens[0][0] != "WORD":
+            return cls._render_tokens(tokens)
+        path = tokens[0][1]
+        end = 0
+        for m in _FIELD_SEGMENT_RE.finditer(path):
+            end = m.end()
+            if m.group().lower() in _KEYED_FIELDS:
+                break
+        return path[:end].lower() + path[end:]
 
     @staticmethod
     def _canonicalize_value(token, lower):
@@ -341,6 +360,17 @@ def parse_cloud_logging_filter(expression):
 def canonicalize_cloud_logging_filter(expression):
     """Return a canonical string representation of a Cloud Logging filter."""
     return CloudLoggingFilterParser.canonicalize(expression)
+
+
+def normalize_cloud_logging_filter_spacing(expression):
+    """Return a Cloud Logging filter with comments dropped and whitespace
+    normalized outside quoted strings.
+
+    Unlike canonicalization this doesn't parse the filter, so it also works
+    on filters that don't parse.
+    """
+    tokens = _tokenize_cloud_logging_filter(expression or "")
+    return CloudLoggingFilterParser._render_tokens(tokens)
 
 
 class CloudLoggingOverlap(Enum):
@@ -455,14 +485,15 @@ def _cloud_logging_conjunction_satisfiable(literals):
         if node['type'] == 'term':
             result = CloudLoggingOverlap.POSSIBLE
             continue
-        field = CloudLoggingFilterParser._render_tokens(node['lhs_tokens'])
+        field = CloudLoggingFilterParser._canonicalize_field(node['lhs_tokens'])
         value = _normalize_cloud_logging_rhs(
             CloudLoggingFilterParser._render_tokens(node['rhs_tokens'])
         )
         fields.setdefault(field, []).append((negated, node['op'], value))
 
-    # Built-in field names ignore letter case but map and struct keys do
-    # not, so paths that differ only in case may or may not be one field.
+    # Built-in field names are already lowercased, so paths that still
+    # differ only in case differ in a map or struct key.  Don't rely on how
+    # Cloud Logging matches the case of those keys.
     if len({field.lower() for field in fields}) < len(fields):
         result = CloudLoggingOverlap.POSSIBLE
 
@@ -573,7 +604,9 @@ def _normalize_cloud_logging_rhs(rhs):
     if (value.startswith('"') and value.endswith('"')) or (
         value.startswith("'") and value.endswith("'")
     ):
-        value = value[1:-1]
+        # The same value can be written with different escapes, e.g.
+        # "a\"b" and 'a"b'.
+        value = _ESCAPED_QUOTE_RE.sub(r'\1', value[1:-1])
     return value.lower()
 
 
