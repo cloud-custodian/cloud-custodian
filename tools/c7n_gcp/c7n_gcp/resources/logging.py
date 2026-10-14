@@ -88,9 +88,54 @@ class LogProjectSinkBucketFilter(ValueFilter):
         return super().__call__(sink[self.cache_key])
 
 
-class LogProjectSinkRelationshipFilterBase(Filter):
-    """Reusable base for sink relationship filters (exact/overlap)."""
+@LogProjectSink.filter_registry.register('sink-overlap')
+class LogProjectSinkOverlapFilter(Filter):
+    """Match enabled sinks whose effective routing filter is identical to, or
+    overlaps with, at least one other enabled sink targeting the same
+    destination.
 
+    ``match`` controls how sink filters are compared:
+
+    - ``overlap`` (default): two filters overlap when they can both match the
+      same log entry.  The analyser understands equality, inequality, and
+      numeric/severity range constraints.  Filters containing complex logic
+      (OR, NOT) are conservatively treated as non-overlapping to avoid false
+      positives.
+    - ``exact``: filter strings are canonicalized before comparison so that
+      logically equivalent expressions (e.g. different field orderings) are
+      treated as duplicates.
+
+    Disabled sinks are ignored.  Matched sinks are annotated with the names of
+    their peers under ``c7n:matched-sinks``.
+
+    :example:
+
+    Find all project sinks whose log routing overlaps with a sibling sink:
+
+    .. code-block:: yaml
+
+        policies:
+          - name: gcp-log-project-sink-overlapping
+            resource: gcp.log-project-sink
+            filters:
+              - type: sink-overlap
+
+    :example:
+
+    Find all project sinks that are exact duplicates of another sink:
+
+    .. code-block:: yaml
+
+        policies:
+          - name: gcp-log-project-sink-exact-duplicates
+            resource: gcp.log-project-sink
+            filters:
+              - type: sink-overlap
+                match: exact
+
+    """
+
+    schema = type_schema('sink-overlap', match={'enum': ['exact', 'overlap']})
     annotation_key = 'c7n:matched-sinks'
     permissions = ('logging.sinks.list',)
 
@@ -108,9 +153,9 @@ class LogProjectSinkRelationshipFilterBase(Filter):
             yield destination, sink
 
     def _iter_matched_groups(self, relation_groups):
-        raise NotImplementedError(  # pragma: no cover
-            "subclass must implement _iter_matched_groups"
-        )
+        if self.data.get('match', 'overlap') == 'exact':
+            return self._iter_exact_groups(relation_groups)
+        return self._iter_overlap_groups(relation_groups)
 
     def _annotate_group(self, sinks):
         sink_names = [s.get('name') for s in sinks if s.get('name')]
@@ -132,66 +177,12 @@ class LogProjectSinkRelationshipFilterBase(Filter):
                 matched.extend(sinks)
         return matched
 
-
-@LogProjectSink.filter_registry.register('sink-exact')
-class LogProjectSinkExactFilter(LogProjectSinkRelationshipFilterBase):
-    """Match enabled sinks that share an identical effective routing filter with
-    at least one other enabled sink targeting the same destination.
-
-    Filter strings are canonicalized before comparison so that logically
-    equivalent expressions (e.g. different field orderings) are treated as
-    duplicates.  Disabled sinks are ignored.
-
-    :example:
-
-    Find all project sinks that are exact duplicates of another sink:
-
-    .. code-block:: yaml
-
-        policies:
-          - name: gcp-log-project-sink-exact-duplicates
-            resource: gcp.log-project-sink
-            filters:
-              - type: sink-exact
-
-    """
-
-    schema = type_schema('sink-exact')
-
-    def _iter_matched_groups(self, relation_groups):
+    def _iter_exact_groups(self, relation_groups):
         for sinks in relation_groups.values():
             if len(sinks) > 1:
                 yield sinks
 
-
-@LogProjectSink.filter_registry.register('sink-overlap')
-class LogProjectSinkOverlapFilter(LogProjectSinkRelationshipFilterBase):
-    """Match enabled sinks whose effective routing filter overlaps with at least
-    one other enabled sink targeting the same destination.
-
-    Two filters overlap when they can both match the same log entry.  The
-    analyser uses canonicalized filter expressions and understands equality,
-    inequality, and numeric/severity range constraints.  Filters containing
-    complex logic (OR, NOT) are conservatively treated as non-overlapping to
-    avoid false positives.  Disabled sinks are ignored.
-
-    :example:
-
-    Find all project sinks whose log routing overlaps with a sibling sink:
-
-    .. code-block:: yaml
-
-        policies:
-          - name: gcp-log-project-sink-overlapping
-            resource: gcp.log-project-sink
-            filters:
-              - type: sink-overlap
-
-    """
-
-    schema = type_schema('sink-overlap')
-
-    def _iter_matched_groups(self, relation_groups):
+    def _iter_overlap_groups(self, relation_groups):
         relation_items = list(relation_groups.items())
 
         matched_indexes = set()

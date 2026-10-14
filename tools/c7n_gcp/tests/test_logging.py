@@ -114,7 +114,7 @@ class LogProjectSinkTest(BaseTest):
                         'op': 'regex',
                         'value': '^c7n-sink-exact-',
                     },
-                    {'type': 'sink-exact'},
+                    {'type': 'sink-overlap', 'match': 'exact'},
                 ],
             },
             session_factory=session_factory,
