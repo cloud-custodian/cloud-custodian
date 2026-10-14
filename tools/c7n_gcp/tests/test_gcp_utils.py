@@ -28,7 +28,8 @@ from c7n_gcp.utils import (
 def test_parse_cloud_logging_filter_each_comparison_operator(operator, expression):
     parsed = parse_cloud_logging_filter(expression)
     assert {p["op"] for p in parsed["predicates"]} == {operator}
-    assert operator in parsed["operators"]
+    assert parsed["comparison_operators"] == [operator]
+    assert parsed["logical_operators"] == []
 
 
 @pytest.mark.parametrize(
@@ -41,7 +42,7 @@ def test_parse_cloud_logging_filter_each_comparison_operator(operator, expressio
 )
 def test_parse_cloud_logging_filter_each_logical_operator(logical_op, expression):
     parsed = parse_cloud_logging_filter(expression)
-    assert logical_op in parsed["operators"]
+    assert parsed["logical_operators"] == [logical_op]
 
 
 def test_parse_cloud_logging_filter_all_operators_together():
@@ -57,10 +58,10 @@ def test_parse_cloud_logging_filter_all_operators_together():
         'AND retries<=2'
     )
     parsed = parse_cloud_logging_filter(expression)
-    operators = set(parsed["operators"])
 
-    assert operators.issuperset(
-        {"and", "or", "not", "=", "!=", ">", ">=", "<", "<=", ":", "=~", "!~"}
+    assert parsed["logical_operators"] == ["and", "not", "or"]
+    assert parsed["comparison_operators"] == sorted(
+        ["=", "!=", ">", ">=", "<", "<=", ":", "=~", "!~"]
     )
 
 
@@ -84,14 +85,16 @@ def test_parse_cloud_logging_filter_empty_expression_defaults_to_true_term():
     parsed = parse_cloud_logging_filter("")
     assert parsed["terms"] == ["true"]
     assert parsed["predicates"] == []
-    assert parsed["operators"] == []
+    assert parsed["logical_operators"] == []
+    assert parsed["comparison_operators"] == []
 
 
 def test_parse_cloud_logging_filter_none_expression_defaults_to_true_term():
     parsed = parse_cloud_logging_filter(None)
     assert parsed["terms"] == ["true"]
     assert parsed["predicates"] == []
-    assert parsed["operators"] == []
+    assert parsed["logical_operators"] == []
+    assert parsed["comparison_operators"] == []
 
 
 def test_parse_cloud_logging_filter_handles_escaped_quote_in_string():
@@ -198,7 +201,7 @@ def test_canonicalize_cloud_logging_filter_minus_is_not(minus, not_):
 def test_parse_cloud_logging_filter_minus_after_operator_is_a_value():
     parsed = parse_cloud_logging_filter("httpRequest.latency>-1 AND sample=-0.5")
     assert [p["rhs"] for p in parsed["predicates"]] == ["-1", "-0.5"]
-    assert "not" not in parsed["operators"]
+    assert "not" not in parsed["logical_operators"]
 
 
 @pytest.mark.parametrize(

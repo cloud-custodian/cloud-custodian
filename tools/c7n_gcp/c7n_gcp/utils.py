@@ -234,21 +234,22 @@ class CloudLoggingFilterParser:
 
     @classmethod
     def _build_result(cls, ast):
-        operators = set()
+        logical_operators = set()
+        comparison_operators = set()
         predicates = []
         terms = []
 
         def visit(node):
             node_type = node["type"]
             if node_type in ("and", "or"):
-                operators.add(node_type)
+                logical_operators.add(node_type)
                 for child in node["children"]:
                     visit(child)
             elif node_type == "not":
-                operators.add("not")
+                logical_operators.add("not")
                 visit(node["expr"])
             elif node_type == "predicate":
-                operators.add(node["op"])
+                comparison_operators.add(node["op"])
                 predicates.append(
                     {
                         "lhs": cls._render_tokens(node["lhs_tokens"]),
@@ -262,7 +263,8 @@ class CloudLoggingFilterParser:
         visit(ast)
         return {
             "ast": ast,
-            "operators": sorted(operators),
+            "logical_operators": sorted(logical_operators),
+            "comparison_operators": sorted(comparison_operators),
             "predicates": predicates,
             "terms": terms,
         }
@@ -302,7 +304,13 @@ class CloudLoggingFilterParser:
 
 
 def parse_cloud_logging_filter(expression):
-    """Parse a Cloud Logging filter expression into parts and an AST."""
+    """Parse a Cloud Logging filter expression into parts and an AST.
+
+    Returns a dict with ``ast``, ``logical_operators`` (``and``/``or``/
+    ``not``), ``comparison_operators`` (e.g. ``=``, ``>=``, ``:``),
+    ``predicates`` (``lhs``/``op``/``rhs`` dicts) and ``terms`` (bare search
+    terms and function calls).
+    """
     return CloudLoggingFilterParser.parse(expression)
 
 
