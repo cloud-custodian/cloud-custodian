@@ -2,6 +2,10 @@
 # SPDX-License-Identifier: Apache-2.0
 ResourceMap = {
     "azure.advisor-recommendation": "c7n_azure.resources.advisor.AdvisorRecommendation",
+    "azure.ai-foundry-project": "c7n_azure.resources.ai_foundry.AIFoundryProject",
+    "azure.ai-foundry-connection": "c7n_azure.resources.ai_foundry.AIFoundryConnection",
+    "azure.ai-foundry-application": "c7n_azure.resources.ai_foundry.AIFoundryApplication",
+    "azure.ai-foundry-agent": "c7n_azure.resources.ai_foundry.AIFoundryAgent",
     "azure.afd-endpoint": "c7n_azure.resources.afd_endpoint.AfdEndpoint",
     "azure.afd-custom-domain": "c7n_azure.resources.afd_custom_domain.AfdCustomDomain",
     "azure.aks": "c7n_azure.resources.k8s_service.KubernetesService",
@@ -17,10 +21,13 @@ ResourceMap = {
     "azure.backup-vault": "c7n_azure.resources.backup_vault.BackupVault",
     "azure.bastion-host": "c7n_azure.resources.bastion_host.AzureBastionHost",
     "azure.batch": "c7n_azure.resources.batch.Batch",
+    "azure.budget": "c7n_azure.resources.budget.Budget",
     "azure.cdn-custom-domain": "c7n_azure.resources.cdn_custom_domain.CdnCustomDomain",
     "azure.cdn-endpoint": "c7n_azure.resources.cdn_endpoint.CdnEndpoint",
     "azure.cdnprofile": "c7n_azure.resources.cdn.CdnProfile",
-    "azure.cognitiveservice": "c7n_azure.resources.cognitive_service.CognitiveService",
+    "azure.cognitiveservice": "c7n_azure.resources.ai_foundry.CognitiveService",
+    "azure.ai-foundry-deployment": "c7n_azure.resources.ai_foundry.AiFoundryDeployment",
+    "azure.cognitiveservice-deployment": "c7n_azure.resources.ai_foundry.AiFoundryCognitiveServiceDeployment", # noqa
     "azure.container-group": "c7n_azure.resources.aci.ContainerGroup",
     "azure.containerregistry": "c7n_azure.resources.container_registry.ContainerRegistry",
     "azure.container-registry": "c7n_azure.resources.container_registry.ContainerRegistry",
@@ -60,7 +67,13 @@ ResourceMap = {
     "azure.kusto": "c7n_azure.resources.kusto.Kusto",
     "azure.loadbalancer": "c7n_azure.resources.load_balancer.LoadBalancer",
     "azure.logic-app-workflow": "c7n_azure.resources.logic_app.LogicAppWorkflow",
-    "azure.machine-learning-workspace": "c7n_azure.resources.machine_learning_workspace.MachineLearningWorkspace", # noqa
+    "azure.machine-learning-workspace": "c7n_azure.resources.machine_learning.MachineLearningWorkspace", # noqa
+    "azure.machine-learning-compute-cluster": "c7n_azure.resources.machine_learning_compute_cluster.MachineLearningComputeCluster", # noqa
+    "azure.machine-learning-data-container": "c7n_azure.resources.machine_learning.MachineLearningDataContainer", # noqa
+    "azure.machine-learning-environment-version": "c7n_azure.resources.machine_learning_environment_version.MachineLearningEnvironmentVersion", # noqa
+    "azure.machine-learning-job": "c7n_azure.resources.machine_learning_job.MachineLearningJob",
+    "azure.machine-learning-model-version": "c7n_azure.resources.machine_learning_model_version.MachineLearningModelVersion", # noqa
+    "azure.machine-learning-online-endpoint": "c7n_azure.resources.machine_learning_online_endpoint.MachineLearningOnlineEndpoint", # noqa
     "azure.mariadb": "c7n_azure.resources.mariadb.MariaDB",
     "azure.monitor-log-profile": "c7n_azure.resources.monitor_logprofile.MonitorLogprofile",
     "azure.mariadb-server": "c7n_azure.resources.mariadb_server.MariaDBServer",
@@ -73,6 +86,8 @@ ResourceMap = {
     "azure.policyassignments": "c7n_azure.resources.policy_assignments.PolicyAssignments",
     "azure.postgresql-database": "c7n_azure.resources.postgresql_database.PostgresqlDatabase",
     "azure.postgresql-server": "c7n_azure.resources.postgresql_server.PostgresqlServer",
+    "azure.private-dns-zone": "c7n_azure.resources.private_dns_zone.PrivateDnsZone",
+    "azure.private-record-set": "c7n_azure.resources.private_record_set.PrivateRecordSet",
     "azure.publicip": "c7n_azure.resources.public_ip.PublicIPAddress",
     "azure.recordset": "c7n_azure.resources.record_set.RecordSet",
     "azure.recovery-services": "c7n_azure.resources.recovery_services.RecoveryServices",
@@ -109,4 +124,10 @@ ResourceMap = {
     "azure.webapp": "c7n_azure.resources.web_app.WebApp",
     "azure.alert-logs": "c7n_azure.resources.alertlogs.AlertLogs",
     "azure.entraid-user": "c7n_azure.resources.entraid_user.EntraIDUser",
+    "azure.entraid-group": "c7n_azure.resources.entraid_group.EntraIDGroup",
+    "azure.entraid-organization": "c7n_azure.resources.entraid_organization.EntraIDOrganization",
+    "azure.entraid-conditional-access-policy": "c7n_azure.resources.entraid_conditional_access.EntraIDConditionalAccessPolicy", # noqa
+    "azure.entraid-security-defaults": "c7n_azure.resources.entraid_security_defaults.EntraIDSecurityDefaults", # noqa
+    "azure.entraid-authorization-policy": "c7n_azure.resources.entraid_authorization_policy.EntraIDAuthorizationPolicy", # noqa
+    "azure.entraid-named-location": "c7n_azure.resources.entraid_named_locations.EntraIDNamedLocation", # noqa
 }

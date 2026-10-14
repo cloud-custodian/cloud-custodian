@@ -3,7 +3,7 @@
 from ..azure_common import BaseTest, arm_template
 from c7n_azure.session import Session
 from c7n.utils import local_session
-from mock import patch
+from unittest.mock import patch
 
 
 class ResourceGroupTest(BaseTest):

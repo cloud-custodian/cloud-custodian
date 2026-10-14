@@ -78,6 +78,16 @@ def get_default_project():
             return os.environ[k]
 
 
+def get_workspace_subject() -> str | None:
+    """Workspace admin to impersonate via domain-wide delegation."""
+    return os.environ.get('GOOGLE_WORKSPACE_SUBJECT')
+
+
+def get_workspace_customer() -> str:
+    """Workspace customer id; 'my_customer' is the subject's own account."""
+    return os.environ.get('GOOGLE_WORKSPACE_CUSTOMER', 'my_customer')
+
+
 class PaginationNotSupported(Exception):
     """Pagination not supported on this api."""
 
@@ -99,7 +109,7 @@ def is_retryable_exception(e):
        wait_exponential_max=10000,
        stop_max_attempt_number=5)
 def _create_service_api(credentials, service_name, version, developer_key=None,
-                        cache_discovery=False, http=None):
+                        cache_discovery=False, http=None, client_options=None):
     """Builds and returns a cloud API service object.
 
     Args:
@@ -111,6 +121,10 @@ def _create_service_api(credentials, service_name, version, developer_key=None,
             associated with the API call, most API services do not require
             this to be set.
         cache_discovery (bool): Whether or not to cache the discovery doc.
+        http (httplib2.Http): Optional http instance to use for requests.
+        client_options (google.api_core.client_options.ClientOptions): Optional
+            client options to configure the API endpoint. Used for services that
+            require location-specific hostnames (e.g., Vertex AI).
 
     Returns:
         object: A Resource object with methods for interacting with the service.
@@ -132,6 +146,9 @@ def _create_service_api(credentials, service_name, version, developer_key=None,
         discovery_kwargs['http'] = http
     else:
         discovery_kwargs['credentials'] = credentials
+
+    if client_options:
+        discovery_kwargs['client_options'] = client_options
 
     return discovery.build(**discovery_kwargs)
 
@@ -242,25 +259,68 @@ class Session:
         Args:
             repository_class (class): The class to initialize.
             version (str): The gcp service version for the repository.
+            **kw: Additional keyword arguments:
+                - developer_key (str): API key for the service
+                - cache_discovery (bool): Whether to cache discovery docs
+                - client_options (ClientOptions): Custom client options for
+                  location-specific endpoints
+                - scopes (tuple): OAuth scopes for APIs not covered by the
+                  session wide cloud-platform scope
 
         Returns:
             object: An instance of repository_class.
         """
+        credentials = self._credentials
+        if kw.get('scopes'):
+            credentials = self._scoped_credentials(kw['scopes'])
+
         service = _create_service_api(
-            self._credentials,
+            credentials,
             service_name,
             version,
             kw.get('developer_key'),
             kw.get('cache_discovery', False),
-            self._http or _build_http())
+            self._http or _build_http(),
+            kw.get('client_options'))
 
         return ServiceClient(
             gcp_service=service,
             component=component,
-            credentials=self._credentials,
+            credentials=credentials,
             rate_limiter=self._rate_limiter,
-            use_cached_http=self._use_cached_http,
+            # The thread cached http is authorized with the session
+            # credentials, so a client using its own credentials can't share
+            # it.
+            use_cached_http=(
+                self._use_cached_http and credentials is self._credentials),
             http=self._http)
+
+    def _scoped_credentials(self, scopes):
+        """Credentials for an API needing its own scopes and, for Google
+        Workspace, a delegated subject.
+
+        Workspace (Admin SDK) APIs are authorized by domain wide
+        delegation: a service account impersonates a user (the
+        "subject"), who holds needed workspace admin privileges. The
+        service account key is required because with_subject self
+        signs a JWT.
+
+        Credentials that carry fixed scopes, such as the authorized_user
+        credentials used by flight data replay, are returned unchanged.
+        """
+        credentials = self._credentials
+        if hasattr(credentials, 'with_scopes'):
+            credentials = credentials.with_scopes(list(scopes))
+
+        subject = get_workspace_subject()
+        if not subject:
+            return credentials
+        if not hasattr(credentials, 'with_subject'):
+            raise ValueError(
+                "GOOGLE_WORKSPACE_SUBJECT requires service account "
+                "credentials supporting domain wide delegation, got %s" % (
+                    type(credentials).__name__,))
+        return credentials.with_subject(subject)
 
 
 # pylint: disable=too-many-instance-attributes, too-many-arguments
@@ -336,8 +396,12 @@ class ServiceClient:
         Returns:
             httplib2.Http: An Http instance authorized by the credentials.
         """
-        if self._use_cached_http and hasattr(self._local, 'http'):
-            return self._local.http
+        if self._use_cached_http:
+            # Cleanup code may clear thread-local state; only reuse a non-null
+            # cached handle so we don't pass None as the request transport.
+            cached_http = getattr(self._local, 'http', None)
+            if cached_http is not None:
+                return cached_http
         if self._http_replay is not None:
             # httplib2 instance is not thread safe
             http = self._http_replay
@@ -458,7 +522,7 @@ class ServiceClient:
             dict: Service Response.
         """
         # Implementation of search does not follow the standard API pattern.
-        # Fields need to be in the body rather than sent seperately.
+        # Fields need to be in the body rather than sent separately.
         next_page_token = None
         number_of_pages_processed = 0
         while True:

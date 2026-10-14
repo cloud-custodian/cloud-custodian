@@ -1,0 +1,47 @@
+{
+  "status_code": 200,
+  "data": {
+    "ReservedInstances": [
+      {
+        "ReservationName": "test-opensearch-reservation",
+        "ReservedInstanceId": "1234567890abcdef-1234-1234-1234-123456789012",
+        "ReservedInstanceOfferingId": "abcdef12-3456-7890-abcd-ef1234567890",
+        "InstanceType": "t3.small.search",
+        "StartTime": {
+          "__class__": "datetime",
+          "year": 2023,
+          "month": 12,
+          "day": 1,
+          "hour": 10,
+          "minute": 30,
+          "second": 0,
+          "microsecond": 0
+        },
+        "Duration": 31536000,
+        "FixedPrice": 100.0,
+        "UsagePrice": 0.0,
+        "CurrencyCode": "USD",
+        "InstanceCount": 1,
+        "State": "active",
+        "PaymentOption": "PARTIAL_UPFRONT",
+        "RecurringCharges": [
+          {
+            "RecurringChargeAmount": 0.023,
+            "RecurringChargeFrequency": "Hourly"
+          }
+        ]
+      }
+    ],
+    "ResponseMetadata": {
+      "RequestId": "12345678-1234-1234-1234-123456789012",
+      "HTTPStatusCode": 200,
+      "HTTPHeaders": {
+        "content-type": "application/x-amz-json-1.1",
+        "content-length": "542",
+        "date": "Tue, 05 Dec 2023 18:38:03 GMT",
+        "x-amzn-requestid": "12345678-1234-1234-1234-123456789012"
+      },
+      "RetryAttempts": 0
+    }
+  }
+}

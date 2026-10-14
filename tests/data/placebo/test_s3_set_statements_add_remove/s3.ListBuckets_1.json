@@ -1,0 +1,25 @@
+{
+    "status_code": 200,
+    "data": {
+        "ResponseMetadata": {},
+        "Buckets": [
+            {
+                "Name": "custodian-policy-test",
+                "CreationDate": {
+                    "__class__": "datetime",
+                    "year": 2026,
+                    "month": 1,
+                    "day": 15,
+                    "hour": 8,
+                    "minute": 41,
+                    "second": 15,
+                    "microsecond": 0
+                },
+                "BucketArn": "arn:aws:s3:::custodian-policy"
+            }
+        ],
+        "Owner": {
+            "ID": "a962cd26b5db4d42e29492bd038207cc00fc1455fb749fe6b310fd47c4e71cb5"
+        }
+    }
+}

@@ -1,0 +1,17 @@
+{
+    "status_code": 200,
+    "data": {
+        "DeliveryChannels": [
+            {
+                "name": "default",
+                "s3BucketName": "config-bucket-644160558196"
+            }
+        ],
+        "ResponseMetadata": {
+            "RequestId": "b1b2c3d4-0001-0001-0001-000000000003",
+            "HTTPStatusCode": 200,
+            "HTTPHeaders": {},
+            "RetryAttempts": 0
+        }
+    }
+}

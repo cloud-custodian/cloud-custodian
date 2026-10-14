@@ -1,0 +1,40 @@
+{
+  "headers": {
+    "etag": "24eb10405a5fdf8b0000019dac7b5464",
+    "content-type": "application/json; charset=UTF-8",
+    "vary": "Origin, X-Origin, Referer",
+    "date": "Mon, 20 Apr 2026 20:00:57 GMT",
+    "server": "ESF",
+    "x-xss-protection": "0",
+    "x-frame-options": "SAMEORIGIN",
+    "x-content-type-options": "nosniff",
+    "alt-svc": "h3=\":443\"; ma=2592000,h3-29=\":443\"; ma=2592000",
+    "transfer-encoding": "chunked",
+    "status": "200",
+    "content-length": "620",
+    "-content-encoding": "gzip",
+    "content-location": "https://dns.googleapis.com/dns/v1beta2/projects/cloud-custodian/managedZones/c7n-zone-default-1586?alt=json"
+  },
+  "body": {
+    "name": "c7n-zone-default-1586",
+    "dnsName": "c7n-default-1586.example.com.",
+    "description": "Cloud Custodian managed zone label test",
+    "id": "2660237873472593803",
+    "nameServers": [
+      "ns-cloud-e1.googledomains.com.",
+      "ns-cloud-e2.googledomains.com.",
+      "ns-cloud-e3.googledomains.com.",
+      "ns-cloud-e4.googledomains.com."
+    ],
+    "creationTime": "2026-04-20T20:00:55.358Z",
+    "visibility": "public",
+    "labels": {
+      "goog-terraform-provisioned": "true",
+      "env": "not-the-default"
+    },
+    "cloudLoggingConfig": {
+      "kind": "dns#managedZoneCloudLoggingConfig"
+    },
+    "kind": "dns#managedZone"
+  }
+}

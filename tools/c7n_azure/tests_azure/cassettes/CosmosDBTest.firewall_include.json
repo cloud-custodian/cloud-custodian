@@ -11,51 +11,60 @@
             "response": {
                 "status": {
                     "code": 200,
-                    "message": "OK"
+                    "message": ""
                 },
                 "headers": {
+                    "content-type": [
+                        "text/plain;charset=UTF-8"
+                    ],
                     "date": [
-                        "Sat, 31 Oct 2020 04:39:17 GMT"
+                        "Tue, 02 Jun 2026 16:01:33 GMT"
                     ],
                     "content-length": [
                         "13"
-                    ],
-                    "content-type": [
-                        "text/plain"
-                    ],
-                    "via": [
-                        "1.1 vegur"
                     ]
                 },
                 "body": {
-                    "string": "67.185.99.110\n"
+                    "string": "173.2.147.78\n"
                 }
             }
         },
         {
             "request": {
                 "method": "GET",
-                "uri": "https://management.azure.com/subscriptions/ea42f556-5106-4743-99b0-c129bfa71a47/providers/Microsoft.DocumentDB/databaseAccounts?api-version=2019-08-01",
+                "uri": "https://management.azure.com/subscriptions/ea42f556-5106-4743-99b0-c129bfa71a47/providers/Microsoft.DocumentDB/databaseAccounts?api-version=2025-10-15",
                 "body": null,
                 "headers": {}
             },
             "response": {
                 "status": {
                     "code": 200,
-                    "message": "Ok"
+                    "message": "OK"
                 },
                 "headers": {
+                    "content-type": [
+                        "application/json; charset=utf-8"
+                    ],
+                    "x-cache": [
+                        "CONFIG_NOCACHE"
+                    ],
+                    "date": [
+                        "Tue, 02 Jun 2026 16:01:35 GMT"
+                    ],
+                    "x-ms-original-request-ids": [
+                        ""
+                    ],
+                    "x-msedge-ref": [
+                        "Ref A: AEB817ADC0F24826A819F3A29A8F1C46 Ref B: BL2AA2030101009 Ref C: 2026-06-02T16:01:35Z"
+                    ],
+                    "content-length": [
+                        "3314"
+                    ],
                     "cache-control": [
                         "no-store, no-cache"
                     ],
-                    "date": [
-                        "Sat, 31 Oct 2020 04:39:16 GMT"
-                    ],
-                    "content-type": [
-                        "application/json"
-                    ],
-                    "content-length": [
-                        "2336"
+                    "x-ms-ratelimit-remaining-subscription-global-reads": [
+                        "3749"
                     ]
                 },
                 "body": {
@@ -67,17 +76,16 @@
                                 "location": "South Central US",
                                 "type": "Microsoft.DocumentDB/databaseAccounts",
                                 "kind": "GlobalDocumentDB",
-                                "tags": {
-                                    "test-store-throughput": "JZ07ANKIMdw=:4",
-                                    "test-restore-throughput": "JZ07ANKIMdw=:4"
-                                },
+                                "tags": {},
                                 "systemData": {
-                                    "createdAt": "2020-10-31T03:48:04.4977476Z"
+                                    "createdAt": "2026-06-02T15:35:43.1591888+00:00"
                                 },
                                 "properties": {
                                     "provisioningState": "Succeeded",
                                     "documentEndpoint": "https://cctestcosmosdbc129bfa71a47.documents.azure.com:443/",
-                                    "enableAutomaticFailover": false,
+                                    "sqlEndpoint": "https://cctestcosmosdbc129bfa71a47.documents.azure.com:443/",
+                                    "publicNetworkAccess": "Enabled",
+                                    "enableAutomaticFailover": true,
                                     "enableMultipleWriteLocations": false,
                                     "enablePartitionKeyMonitor": false,
                                     "isVirtualNetworkFilterEnabled": false,
@@ -86,16 +94,27 @@
                                     "disableKeyBasedMetadataWriteAccess": false,
                                     "enableFreeTier": false,
                                     "enableAnalyticalStorage": false,
-                                    "instanceId": "4649d200-f0d6-460e-8fd7-eac29464b96a",
-                                    "createMode": "Default",
+                                    "analyticalStorageConfiguration": {},
+                                    "instanceId": "cd33901d-044f-474a-a5a8-c77629c7a17d",
                                     "databaseAccountOfferType": "Standard",
-                                    "ipRangeFilter": "67.185.99.110,104.42.195.92,40.76.54.131,52.176.6.30,52.169.50.45,52.187.184.26",
+                                    "defaultIdentity": "FirstPartyIdentity",
+                                    "networkAclBypass": "None",
+                                    "disableLocalAuth": false,
+                                    "enablePartitionMerge": false,
+                                    "enablePerRegionPerPartitionAutoscale": true,
+                                    "enableBurstCapacity": false,
+                                    "enablePriorityBasedExecution": false,
+                                    "defaultPriorityLevel": "High",
+                                    "minimalTlsVersion": "Tls12",
+                                    "enablePerPartitionAutomaticFailover": false,
                                     "consistencyPolicy": {
                                         "defaultConsistencyLevel": "Session",
                                         "maxIntervalInSeconds": 5,
                                         "maxStalenessPrefix": 100
                                     },
-                                    "configurationOverrides": {},
+                                    "configurationOverrides": {
+                                        "EnablePerRegionPerPartitionAutoscaleOptIn": "True"
+                                    },
                                     "writeLocations": [
                                         {
                                             "id": "cctestcosmosdbc129bfa71a47-southcentralus",
@@ -135,13 +154,52 @@
                                     ],
                                     "cors": [],
                                     "capabilities": [],
+                                    "ipRules": [
+                                        {
+                                            "ipAddressOrRange": "173.2.147.78"
+                                        },
+                                        {
+                                            "ipAddressOrRange": "104.42.195.92"
+                                        },
+                                        {
+                                            "ipAddressOrRange": "40.76.54.131"
+                                        },
+                                        {
+                                            "ipAddressOrRange": "52.176.6.30"
+                                        },
+                                        {
+                                            "ipAddressOrRange": "52.169.50.45"
+                                        },
+                                        {
+                                            "ipAddressOrRange": "52.187.184.26"
+                                        }
+                                    ],
                                     "backupPolicy": {
                                         "type": "Periodic",
                                         "periodicModeProperties": {
                                             "backupIntervalInMinutes": 240,
-                                            "backupRetentionIntervalInHours": 8
+                                            "backupRetentionIntervalInHours": 8,
+                                            "backupStorageRedundancy": "Geo"
+                                        }
+                                    },
+                                    "networkAclBypassResourceIds": [],
+                                    "keysMetadata": {
+                                        "primaryMasterKey": {
+                                            "generationTime": "2026-06-02T15:35:43.1591888+00:00"
+                                        },
+                                        "secondaryMasterKey": {
+                                            "generationTime": "2026-06-02T15:35:43.1591888+00:00"
+                                        },
+                                        "primaryReadonlyMasterKey": {
+                                            "generationTime": "2026-06-02T15:35:43.1591888+00:00"
+                                        },
+                                        "secondaryReadonlyMasterKey": {
+                                            "generationTime": "2026-06-02T15:35:43.1591888+00:00"
                                         }
                                     }
+                                },
+                                "identity": {
+                                    "type": "None"
                                 }
                             }
                         ]

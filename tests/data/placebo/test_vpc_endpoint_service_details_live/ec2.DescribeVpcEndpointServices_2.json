@@ -1,0 +1,32 @@
+{
+    "status_code": 200,
+    "data": {
+        "ServiceDetails": [
+            {
+                "ServiceName": "com.amazonaws.us-west-2.s3",
+                "ServiceId": "vpce-svc-0b8e3a0c52b97c3b4",
+                "ServiceType": [{"ServiceType": "Gateway"}],
+                "ServiceRegion": "us-west-2",
+                "Owner": "amazon",
+                "BaseEndpointDnsNames": ["s3.us-west-2.amazonaws.com"],
+                "VpcEndpointPolicySupported": true,
+                "AcceptanceRequired": false,
+                "ManagesVpcEndpoints": false,
+                "Tags": []
+            },
+            {
+                "ServiceName": "com.amazonaws.us-west-2.s3",
+                "ServiceId": "vpce-svc-0f5b4a6e1c3d7f9e2",
+                "ServiceType": [{"ServiceType": "Interface"}],
+                "ServiceRegion": "us-west-2",
+                "Owner": "amazon",
+                "BaseEndpointDnsNames": ["s3.us-west-2.vpce.amazonaws.com"],
+                "VpcEndpointPolicySupported": true,
+                "AcceptanceRequired": false,
+                "ManagesVpcEndpoints": false,
+                "Tags": []
+            }
+        ],
+        "ResponseMetadata": {}
+    }
+}

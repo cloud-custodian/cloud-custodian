@@ -6,7 +6,7 @@ from azure.mgmt.compute.models import HardwareProfile, VirtualMachineUpdate
 from ..azure_common import BaseTest, arm_template, cassette_name
 from c7n_azure.session import Session
 from dateutil import tz as tzutils
-from mock import patch
+from unittest.mock import patch
 
 from c7n.testing import mock_datetime_now
 from c7n.utils import local_session

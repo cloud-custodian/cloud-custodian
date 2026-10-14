@@ -1,0 +1,32 @@
+{
+    "status_code": 200,
+    "data": {
+        "Connector": {
+            "Arn": "arn:aws:transfer:us-east-1:644160558196:connector/c-fb309b9e41e34d43a",
+            "ConnectorId": "c-fb309b9e41e34d43a",
+            "Url": "sftp://s-0c148654812543d5b.server.transfer.us-east-1.amazonaws.com",
+            "AccessRole": "arn:aws:iam::644160558196:role/Transfer-S3-c7n-Demo-RW",
+            "LoggingRole": "arn:aws:iam::644160558196:role/C7N-Transfer-Connector-Logging-Role",
+            "Tags": [
+                {
+                    "Key": "Name",
+                    "Value": "c7n-test-sftp-connector"
+                }
+            ],
+            "SftpConfig": {
+                "UserSecretId": "arn:aws:secretsmanager:us-east-1:644160558196:secret:aws/transfer/c7n-demo-connector-secret-9kp5eC",
+                "TrustedHostKeys": [
+                    "ssh-rsa AAAAB3NzaC1yc2EAAAADAQABAAACAQCl2Qnb48ZqEnZ1ok0lpv1RNNtmX6G8gPxgbBpXx3QzoE8PmXmuhjhyOu2NDlTefDmZuwEMf1fDawYDOIY3F05vIw4z3u21c2JvwDlX5t5ICm5z3tPyjRRoEUpqSO/Wz4vT9nRHj4m/fzFreiUz2+lZ05nNr+KTRQiHdvH+cEHCKd50j9d0oCLLhCqVBiwzircPi191nxIkjG9Hh7Y3t6W2KneRnInecPN5NJfQlcuKcb5kskNfz1dDm6notN4VTFHdQsfgqN6KxXtqlH8Jy3vWKszR0wGSqfYzDJ35R+zssc8Wf9rCV0IfupDEXMFWnxHFHJNye0XbvoIAoFG1XGJNwheO3dbxdhbI3xhW9/zgHjASE3yglHZNhEIPHltYNsmxi4u7b0s31ELwYWz+RRrnVMGIgIgnRyM8ycPAWOSJbxrH0iOs1+GtrExvBswTxGYZ7UoZl30INaJ14P5vvIuM/4ZI8BxtQs3hQqzcg7bpqwxEhZIrS+r15kGgjJCDlAJVgtVIBlPKzey83iAQc48O+zKBrKwW7oY9YPvDuv4EYh1iCRepKFlcdT1zZjLwMX8t+nj+ByvLTjbxn/7xAxdXCsj5blZle008gE0fsK/tw4yoXZDpuEMB9bYD+cnYceg6xDTzKBUVhTHmozcGUU5oPym09kqd0BCQIB3MaPZ23w=="
+                ],
+                "MaxConcurrentConnections": 5
+            },
+            "ServiceManagedEgressIpAddresses": [
+                "67.202.57.40",
+                "44.209.137.228",
+                "50.19.171.17"
+            ],
+            "SecurityPolicyName": "TransferSFTPConnectorSecurityPolicy-2024-03"
+        },
+        "ResponseMetadata": {}
+    }
+}

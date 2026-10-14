@@ -1,0 +1,43 @@
+{
+  "headers": {
+    "content-type": "application/json; charset=UTF-8",
+    "x-guploader-uploadid": "AGQBYWxdSvO8Fk4UP14NH77Qih5x7nLHVn-XWdWM9-NW16MagWqMLRqtnx1PlWjM1RNCICTT",
+    "etag": "CAU=",
+    "date": "Fri, 27 Feb 2026 12:48:04 GMT",
+    "vary": "Origin, X-Origin",
+    "cache-control": "no-cache, no-store, max-age=0, must-revalidate",
+    "expires": "Mon, 01 Jan 1990 00:00:00 GMT",
+    "pragma": "no-cache",
+    "content-length": "649",
+    "server": "UploadServer",
+    "alt-svc": "h3=\":443\"; ma=2592000,h3-29=\":443\"; ma=2592000",
+    "status": "200"
+  },
+  "body": {
+    "kind": "storage#policy",
+    "resourceId": "projects/cloud-custodian/buckets/iam-test-bucket-wuc48fhtok",
+    "version": 1,
+    "etag": "CAU=",
+    "bindings": [
+      {
+        "role": "roles/storage.legacyBucketOwner",
+        "members": [
+          "projectEditor:stacklet-test-policies",
+          "projectOwner:stacklet-test-policies"
+        ]
+      },
+      {
+        "role": "roles/storage.legacyBucketReader",
+        "members": [
+          "projectViewer:stacklet-test-policies"
+        ]
+      },
+      {
+        "role": "roles/storage.objectViewer",
+        "members": [
+          "serviceAccount:iam-test-sa-wuc48fhtok@stacklet-test-policies.iam.gserviceaccount.com"
+        ]
+      }
+    ]
+  }
+}

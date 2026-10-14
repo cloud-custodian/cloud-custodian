@@ -1,0 +1,121 @@
+{
+  "headers": {
+    "content-type": "application/json; charset=UTF-8",
+    "vary": "Origin, X-Origin, Referer",
+    "date": "Mon, 20 Apr 2026 20:00:56 GMT",
+    "server": "ESF",
+    "x-xss-protection": "0",
+    "x-frame-options": "SAMEORIGIN",
+    "x-content-type-options": "nosniff",
+    "alt-svc": "h3=\":443\"; ma=2592000,h3-29=\":443\"; ma=2592000",
+    "transfer-encoding": "chunked",
+    "status": "200",
+    "content-length": "3055",
+    "-content-encoding": "gzip",
+    "content-location": "https://dns.googleapis.com/dns/v1beta2/projects/cloud-custodian/managedZones?alt=json"
+  },
+  "body": {
+    "managedZones": [
+      {
+        "name": "c7n-dns-good-7a9b",
+        "dnsName": "c7n-good-7a9b.example.com.",
+        "description": "policy: gcp-dns-dnssec-key-uses-rsasha1; case: _good; keySigning uses RSASHA256",
+        "id": "1006307614317896894",
+        "nameServers": [
+          "ns-cloud-c1.googledomains.com.",
+          "ns-cloud-c2.googledomains.com.",
+          "ns-cloud-c3.googledomains.com.",
+          "ns-cloud-c4.googledomains.com."
+        ],
+        "creationTime": "2026-01-27T20:24:06.124Z",
+        "dnssecConfig": {
+          "state": "on",
+          "defaultKeySpecs": [
+            {
+              "keyType": "keySigning",
+              "algorithm": "rsasha256",
+              "keyLength": 2048,
+              "kind": "dns#dnsKeySpec"
+            },
+            {
+              "keyType": "zoneSigning",
+              "algorithm": "rsasha256",
+              "keyLength": 2048,
+              "kind": "dns#dnsKeySpec"
+            }
+          ],
+          "nonExistence": "nsec3",
+          "kind": "dns#managedZoneDnsSecConfig"
+        },
+        "visibility": "public",
+        "labels": {
+          "goog-terraform-provisioned": "true"
+        },
+        "cloudLoggingConfig": {
+          "kind": "dns#managedZoneCloudLoggingConfig"
+        },
+        "kind": "dns#managedZone"
+      },
+      {
+        "name": "c7n-zone-default-1586",
+        "dnsName": "c7n-default-1586.example.com.",
+        "description": "Cloud Custodian managed zone label test",
+        "id": "2660237873472593803",
+        "nameServers": [
+          "ns-cloud-e1.googledomains.com.",
+          "ns-cloud-e2.googledomains.com.",
+          "ns-cloud-e3.googledomains.com.",
+          "ns-cloud-e4.googledomains.com."
+        ],
+        "creationTime": "2026-04-20T20:00:55.358Z",
+        "visibility": "public",
+        "labels": {
+          "env": "default",
+          "goog-terraform-provisioned": "true"
+        },
+        "cloudLoggingConfig": {
+          "kind": "dns#managedZoneCloudLoggingConfig"
+        },
+        "kind": "dns#managedZone"
+      },
+      {
+        "name": "stacklet-sixfeetup",
+        "dnsName": "stacklet.sixfeetup.com.",
+        "description": "",
+        "id": "6681566605601454910",
+        "nameServers": [
+          "ns-cloud-b1.googledomains.com.",
+          "ns-cloud-b2.googledomains.com.",
+          "ns-cloud-b3.googledomains.com.",
+          "ns-cloud-b4.googledomains.com."
+        ],
+        "creationTime": "2024-08-12T12:56:08.145Z",
+        "dnssecConfig": {
+          "state": "on",
+          "defaultKeySpecs": [
+            {
+              "keyType": "keySigning",
+              "algorithm": "rsasha256",
+              "keyLength": 2048,
+              "kind": "dns#dnsKeySpec"
+            },
+            {
+              "keyType": "zoneSigning",
+              "algorithm": "rsasha512",
+              "keyLength": 1024,
+              "kind": "dns#dnsKeySpec"
+            }
+          ],
+          "nonExistence": "nsec3",
+          "kind": "dns#managedZoneDnsSecConfig"
+        },
+        "visibility": "public",
+        "cloudLoggingConfig": {
+          "kind": "dns#managedZoneCloudLoggingConfig"
+        },
+        "kind": "dns#managedZone"
+      }
+    ],
+    "kind": "dns#managedZonesListResponse"
+  }
+}

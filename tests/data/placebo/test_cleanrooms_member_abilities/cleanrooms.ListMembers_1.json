@@ -1,0 +1,106 @@
+{
+    "status_code": 200,
+    "data": {
+        "ResponseMetadata": {},
+        "memberSummaries": [
+            {
+                "accountId": "111111111111",
+                "status": "INVITED",
+                "displayName": "Noncompliant Test Member",
+                "abilities": [
+                    "CAN_QUERY"
+                ],
+                "createTime": {
+                    "__class__": "datetime",
+                    "year": 2026,
+                    "month": 6,
+                    "day": 9,
+                    "hour": 2,
+                    "minute": 19,
+                    "second": 43,
+                    "microsecond": 53000
+                },
+                "updateTime": {
+                    "__class__": "datetime",
+                    "year": 2026,
+                    "month": 6,
+                    "day": 9,
+                    "hour": 2,
+                    "minute": 19,
+                    "second": 43,
+                    "microsecond": 53000
+                },
+                "membershipId": "786a4a30-7dfb-4917-a08d-d06fd6b191a0",
+                "membershipArn": "arn:aws:cleanrooms:us-east-1:644160558196:membership/786a4a30-7dfb-4917-a08d-d06fd6b191a0",
+                "paymentConfiguration": {
+                    "queryCompute": {
+                        "isResponsible": false
+                    },
+                    "machineLearning": {
+                        "modelTraining": {
+                            "isResponsible": false
+                        },
+                        "modelInference": {
+                            "isResponsible": false
+                        },
+                        "syntheticDataGeneration": {
+                            "isResponsible": false
+                        }
+                    },
+                    "jobCompute": {
+                        "isResponsible": false
+                    }
+                }
+            },
+            {
+                "accountId": "644160558196",
+                "status": "ACTIVE",
+                "displayName": "Noncompliant Test creator",
+                "abilities": [
+                    "CAN_RECEIVE_RESULTS"
+                ],
+                "createTime": {
+                    "__class__": "datetime",
+                    "year": 2026,
+                    "month": 6,
+                    "day": 9,
+                    "hour": 2,
+                    "minute": 19,
+                    "second": 43,
+                    "microsecond": 53000
+                },
+                "updateTime": {
+                    "__class__": "datetime",
+                    "year": 2026,
+                    "month": 6,
+                    "day": 9,
+                    "hour": 2,
+                    "minute": 19,
+                    "second": 55,
+                    "microsecond": 367000
+                },
+                "membershipId": "471d06d5-b382-4d18-9ad5-8e61ffe2bfac",
+                "membershipArn": "arn:aws:cleanrooms:us-east-1:644160558196:membership/471d06d5-b382-4d18-9ad5-8e61ffe2bfac",
+                "paymentConfiguration": {
+                    "queryCompute": {
+                        "isResponsible": true
+                    },
+                    "machineLearning": {
+                        "modelTraining": {
+                            "isResponsible": false
+                        },
+                        "modelInference": {
+                            "isResponsible": false
+                        },
+                        "syntheticDataGeneration": {
+                            "isResponsible": false
+                        }
+                    },
+                    "jobCompute": {
+                        "isResponsible": false
+                    }
+                }
+            }
+        ]
+    }
+}

@@ -15,7 +15,7 @@ from azure.identity import (ClientSecretCredential, ManagedIdentityCredential,
 from azure.identity._credentials import azure_cli
 from c7n_azure import constants
 from c7n_azure.session import Session
-from mock import patch
+from unittest.mock import patch
 from msrest.exceptions import AuthenticationError
 from msrestazure.azure_cloud import (AZURE_CHINA_CLOUD, AZURE_US_GOV_CLOUD)
 from requests import HTTPError

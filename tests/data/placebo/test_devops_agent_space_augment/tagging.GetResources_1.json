@@ -1,0 +1,22 @@
+{
+    "status_code": 200,
+    "data": {
+        "PaginationToken": "",
+        "ResourceTagMappingList": [
+            {
+                "ResourceARN": "arn:aws:aidevops:us-east-1:644160558196:agentspace/f68f623c-bb40-4d21-a53c-b36eb3d5a3bc",
+                "Tags": [
+                    {
+                        "Key": "agentAssociation",
+                        "Value": "pretendService"
+                    },
+                    {
+                        "Key": "testAgentSpaceKey",
+                        "Value": "testAgentSpaceValue"
+                    }
+                ]
+            }
+        ],
+        "ResponseMetadata": {}
+    }
+}

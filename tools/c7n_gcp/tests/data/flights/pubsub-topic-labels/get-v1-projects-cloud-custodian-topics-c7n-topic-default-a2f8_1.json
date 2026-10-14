@@ -1,0 +1,24 @@
+{
+  "headers": {
+    "content-type": "application/json; charset=UTF-8",
+    "vary": "Origin, X-Origin, Referer",
+    "date": "Wed, 29 Apr 2026 19:12:23 GMT",
+    "server": "ESF",
+    "x-xss-protection": "0",
+    "x-frame-options": "SAMEORIGIN",
+    "x-content-type-options": "nosniff",
+    "alt-svc": "h3=\":443\"; ma=2592000,h3-29=\":443\"; ma=2592000",
+    "transfer-encoding": "chunked",
+    "status": "200",
+    "content-length": "168",
+    "-content-encoding": "gzip",
+    "content-location": "https://pubsub.googleapis.com/v1/projects/cloud-custodian/topics/c7n-topic-default-a2f8?alt=json"
+  },
+  "body": {
+    "name": "projects/cloud-custodian/topics/c7n-topic-default-a2f8",
+    "labels": {
+      "goog-terraform-provisioned": "true",
+      "env": "not-the-default"
+    }
+  }
+}

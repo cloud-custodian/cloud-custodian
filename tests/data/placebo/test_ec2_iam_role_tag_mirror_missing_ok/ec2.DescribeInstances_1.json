@@ -1,0 +1,163 @@
+{
+    "status_code": 200,
+    "data": {
+        "Reservations": [
+            {
+                "ReservationId": "r-0813b8dc3f33422af",
+                "OwnerId": "644160558196",
+                "Groups": [],
+                "Instances": [
+                    {
+                        "Architecture": "x86_64",
+                        "BlockDeviceMappings": [
+                            {
+                                "DeviceName": "/dev/xvda",
+                                "Ebs": {
+                                    "AttachTime": {
+                                        "__class__": "datetime",
+                                        "year": 2026,
+                                        "month": 4,
+                                        "day": 4,
+                                        "hour": 17,
+                                        "minute": 11,
+                                        "second": 43,
+                                        "microsecond": 0
+                                    },
+                                    "DeleteOnTermination": true,
+                                    "Status": "attached",
+                                    "VolumeId": "vol-0430d78d9320b53d5",
+                                    "EbsCardIndex": 0
+                                }
+                            }
+                        ],
+                        "ClientToken": "06470272-1425-434d-9ca1-5bae231275f0",
+                        "EbsOptimized": true,
+                        "EnaSupport": true,
+                        "Hypervisor": "xen",
+                        "IamInstanceProfile": {
+                            "Arn": "arn:aws:iam::644160558196:instance-profile/CloudCustodianRole",
+                            "Id": "AIPAJO5EMJ3YEMNUF5ZWM"
+                        },
+                        "RootDeviceName": "/dev/xvda",
+                        "RootDeviceType": "ebs",
+                        "SecurityGroups": [
+                            {
+                                "GroupId": "sg-007e9ef58b28a8050",
+                                "GroupName": "launch-wizard-1"
+                            }
+                        ],
+                        "SourceDestCheck": true,
+                        "Tags": [
+                            {
+                                "Key": "Name",
+                                "Value": "test-role-1"
+                            },
+                            {
+                                "Key": "Environment",
+                                "Value": "Development"
+                            }
+                        ],
+                        "InstanceId": "i-051d5a5a07a40d2a3",
+                        "ImageId": "ami-01b14b7ad41e17ba4",
+                        "State": {
+                            "Code": 16,
+                            "Name": "running"
+                        },
+                        "Placement": {
+                            "AvailabilityZoneId": "use1-az4",
+                            "GroupName": "",
+                            "Tenancy": "default",
+                            "AvailabilityZone": "us-east-1a"
+                        },
+                        "SubnetId": "subnet-914763e7",
+                        "VpcId": "vpc-d2d616b5",
+                        "PrivateIpAddress": "172.31.11.4",
+                        "PublicIpAddress": "3.87.123.254"
+                    }
+                ]
+            },
+            {
+                "ReservationId": "r-08f5ba675f215f28a",
+                "OwnerId": "644160558196",
+                "Groups": [],
+                "Instances": [
+                    {
+                        "Architecture": "x86_64",
+                        "BlockDeviceMappings": [
+                            {
+                                "DeviceName": "/dev/xvda",
+                                "Ebs": {
+                                    "AttachTime": {
+                                        "__class__": "datetime",
+                                        "year": 2026,
+                                        "month": 4,
+                                        "day": 4,
+                                        "hour": 17,
+                                        "minute": 10,
+                                        "second": 59,
+                                        "microsecond": 0
+                                    },
+                                    "DeleteOnTermination": true,
+                                    "Status": "attached",
+                                    "VolumeId": "vol-04315cde447d614f1",
+                                    "EbsCardIndex": 0
+                                }
+                            }
+                        ],
+                        "ClientToken": "40d09be7-2b4c-40cf-b111-b061b84024c1",
+                        "EbsOptimized": true,
+                        "EnaSupport": true,
+                        "Hypervisor": "xen",
+                        "IamInstanceProfile": {
+                            "Arn": "arn:aws:iam::644160558196:instance-profile/c7n-pratyush-test",
+                            "Id": "AIPAZL6XWCR2N7Y7JXC2Z"
+                        },
+                        "RootDeviceName": "/dev/xvda",
+                        "RootDeviceType": "ebs",
+                        "SecurityGroups": [
+                            {
+                                "GroupId": "sg-007e9ef58b28a8050",
+                                "GroupName": "launch-wizard-1"
+                            }
+                        ],
+                        "SourceDestCheck": true,
+                        "Tags": [
+                            {
+                                "Key": "Name",
+                                "Value": "test-role"
+                            },
+                            {
+                                "Key": "Environment",
+                                "Value": "Development"
+                            },
+                            {
+                                "Key": "CostCenter",
+                                "Value": "TeamB"
+                            }
+                        ],
+                        "InstanceId": "i-0087ce11c395e5703",
+                        "ImageId": "ami-01b14b7ad41e17ba4",
+                        "State": {
+                            "Code": 16,
+                            "Name": "running"
+                        },
+                        "Placement": {
+                            "AvailabilityZoneId": "use1-az4",
+                            "GroupName": "",
+                            "Tenancy": "default",
+                            "AvailabilityZone": "us-east-1a"
+                        },
+                        "Monitoring": {
+                            "State": "disabled"
+                        },
+                        "SubnetId": "subnet-914763e7",
+                        "VpcId": "vpc-d2d616b5",
+                        "PrivateIpAddress": "172.31.9.22",
+                        "PublicIpAddress": "100.52.242.72"
+                    }
+                ]
+            }
+        ],
+        "ResponseMetadata": {}
+    }
+}

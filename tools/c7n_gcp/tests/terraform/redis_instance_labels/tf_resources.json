@@ -1,0 +1,82 @@
+{
+    "pytest-terraform": 1,
+    "outputs": {},
+    "resources": {
+        "google_redis_instance": {
+            "default": {
+                "alternative_location_id": "",
+                "auth_enabled": false,
+                "auth_string": "",
+                "authorized_network": "projects/cloud-custodian/global/networks/default",
+                "connect_mode": "DIRECT_PEERING",
+                "create_time": "2026-04-27T18:06:30.253765021Z",
+                "current_location_id": "us-central1-c",
+                "customer_managed_key": "",
+                "deletion_protection": null,
+                "display_name": "",
+                "effective_labels": {
+                    "env": "default",
+                    "goog-terraform-provisioned": "true"
+                },
+                "effective_reserved_ip_range": "10.18.222.168/29",
+                "host": "10.18.222.171",
+                "id": "projects/cloud-custodian/locations/us-central1/instances/c7n-redis-default-5b53",
+                "labels": {
+                    "env": "default"
+                },
+                "location_id": "us-central1-c",
+                "maintenance_policy": [],
+                "maintenance_schedule": [],
+                "maintenance_version": "20251007_00_00",
+                "memory_size_gb": 1,
+                "name": "c7n-redis-default-5b53",
+                "nodes": [
+                    {
+                        "id": "node-0",
+                        "zone": "us-central1-c"
+                    }
+                ],
+                "persistence_config": [
+                    {
+                        "persistence_mode": "DISABLED",
+                        "rdb_next_snapshot_time": "",
+                        "rdb_snapshot_period": "",
+                        "rdb_snapshot_start_time": ""
+                    }
+                ],
+                "persistence_iam_identity": "serviceAccount:service-859150599087@cloud-redis.iam.gserviceaccount.com",
+                "port": 6379,
+                "project": "stacklet-test-policies",
+                "read_endpoint": "",
+                "read_endpoint_port": 0,
+                "read_replicas_mode": "READ_REPLICAS_DISABLED",
+                "redis_configs": null,
+                "redis_version": "REDIS_7_0",
+                "region": "us-central1",
+                "replica_count": 0,
+                "reserved_ip_range": null,
+                "secondary_ip_range": "",
+                "server_ca_certs": [],
+                "terraform_labels": {
+                    "env": "default",
+                    "goog-terraform-provisioned": "true"
+                },
+                "tier": "BASIC",
+                "timeouts": null,
+                "transit_encryption_mode": "DISABLED"
+            }
+        },
+        "random_id": {
+            "suffix": {
+                "b64_std": "W1M=",
+                "b64_url": "W1M",
+                "byte_length": 2,
+                "dec": "23379",
+                "hex": "5b53",
+                "id": "W1M",
+                "keepers": null,
+                "prefix": null
+            }
+        }
+    }
+}

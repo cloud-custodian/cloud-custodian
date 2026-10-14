@@ -2,7 +2,7 @@
 # SPDX-License-Identifier: Apache-2.0
 from ..azure_common import BaseTest, arm_template, cassette_name, DEFAULT_SUBSCRIPTION_ID
 from c7n_azure.storage_utils import StorageUtilities
-from mock import patch
+from unittest.mock import patch
 from c7n_azure.constants import CONTAINER_EVENT_TRIGGER_MODE
 from c7n_azure.session import Session
 from c7n_azure.utils import local_session

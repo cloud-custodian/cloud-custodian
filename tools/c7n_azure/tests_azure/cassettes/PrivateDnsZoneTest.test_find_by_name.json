@@ -1,0 +1,82 @@
+{
+    "version": 1,
+    "interactions": [
+        {
+            "request": {
+                "method": "GET",
+                "uri": "https://management.azure.com/subscriptions/ea42f556-5106-4743-99b0-c129bfa71a47/providers/Microsoft.Network/privateDnsZones?api-version=2024-06-01",
+                "body": null,
+                "headers": {}
+            },
+            "response": {
+                "status": {
+                    "code": 200,
+                    "message": "OK"
+                },
+                "headers": {
+                    "date": [
+                        "Mon, 24 Aug 2026 17:59:02 GMT"
+                    ],
+                    "x-ms-original-request-ids": [
+                        "7cc5b210-9fe5-11f1-b82d-757a5d80cdc2"
+                    ],
+                    "cache-control": [
+                        "private"
+                    ],
+                    "content-type": [
+                        "application/json; charset=utf-8"
+                    ],
+                    "x-ms-ratelimit-remaining-subscription-resource-entities-read": [
+                        "60000"
+                    ],
+                    "x-ms-ratelimit-remaining-subscription-resource-requests": [
+                        "1099"
+                    ],
+                    "content-length": [
+                        "1441"
+                    ]
+                },
+                "body": {
+                    "data": {
+                        "value": [
+                            {
+                                "id": "/subscriptions/ea42f556-5106-4743-99b0-c129bfa71a47/resourceGroups/test_private-dns/providers/Microsoft.Network/privateDnsZones/c7n-other.neqbrvxs5rnvm.cloudcustodiantest.com",
+                                "name": "c7n-other.neqbrvxs5rnvm.cloudcustodiantest.com",
+                                "type": "Microsoft.Network/privateDnsZones",
+                                "etag": "b71cd59b-b276-489a-a4b0-fd65eab74b58",
+                                "location": "global",
+                                "properties": {
+                                    "internalId": "SW1tdXRhYmxlWm9uZUlkZW50aXR5OzIyNjU1OGZhLWMyMGYtNGNkMi1hYzdhLWI3MGY1YjYwYzk5NTsw",
+                                    "maxNumberOfRecordSets": 25000,
+                                    "maxNumberOfVirtualNetworkLinks": 1000,
+                                    "maxNumberOfVirtualNetworkLinksWithRegistration": 100,
+                                    "numberOfRecordSets": 1,
+                                    "numberOfVirtualNetworkLinks": 0,
+                                    "numberOfVirtualNetworkLinksWithRegistration": 0,
+                                    "provisioningState": "Succeeded"
+                                }
+                            },
+                            {
+                                "id": "/subscriptions/ea42f556-5106-4743-99b0-c129bfa71a47/resourceGroups/test_private-dns/providers/Microsoft.Network/privateDnsZones/c7n-test.neqbrvxs5rnvm.cloudcustodiantest.com",
+                                "name": "c7n-test.neqbrvxs5rnvm.cloudcustodiantest.com",
+                                "type": "Microsoft.Network/privateDnsZones",
+                                "etag": "fdb23da0-49d1-46f3-8a4f-f17870f67d30",
+                                "location": "global",
+                                "properties": {
+                                    "internalId": "SW1tdXRhYmxlWm9uZUlkZW50aXR5OzlhY2M0ZDViLWY0ZmItNDlhZC1hYzA4LWJlN2RmNzY0MTg0MTsw",
+                                    "maxNumberOfRecordSets": 25000,
+                                    "maxNumberOfVirtualNetworkLinks": 1000,
+                                    "maxNumberOfVirtualNetworkLinksWithRegistration": 100,
+                                    "numberOfRecordSets": 3,
+                                    "numberOfVirtualNetworkLinks": 0,
+                                    "numberOfVirtualNetworkLinksWithRegistration": 0,
+                                    "provisioningState": "Succeeded"
+                                }
+                            }
+                        ]
+                    }
+                }
+            }
+        }
+    ]
+}

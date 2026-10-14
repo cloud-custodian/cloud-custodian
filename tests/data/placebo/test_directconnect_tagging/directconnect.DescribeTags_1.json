@@ -1,0 +1,21 @@
+{
+    "status_code": 200,
+    "data": {
+        "resourceTags": [
+            {
+                "resourceArn": "arn:aws:directconnect::644160558196:dx-gateway/e72d611c-aa39-4fd2-a1d7-da0484ad38fe",
+                "tags": [
+                    {
+                        "key": "existing",
+                        "value": "existing"
+                    },
+                    {
+                        "key": "added",
+                        "value": "added"
+                    }
+                ]
+            }
+        ],
+        "ResponseMetadata": {}
+    }
+}

@@ -1,0 +1,26 @@
+{
+    "status_code": 200,
+    "data": {
+        "DBClusterParameterGroups": [
+            {
+                "DBClusterParameterGroupName": "default.aurora-mysql8.0",
+                "DBParameterGroupFamily": "aurora-mysql8.0",
+                "Description": "Default cluster parameter group for aurora-mysql8.0",
+                "DBClusterParameterGroupArn": "arn:aws:rds:us-east-1:644160558196:cluster-pg:default.aurora-mysql8.0"
+            },
+            {
+                "DBClusterParameterGroupName": "custom-cluster-pg-used",
+                "DBParameterGroupFamily": "aurora-mysql8.0",
+                "Description": "Custom cluster parameter group in use",
+                "DBClusterParameterGroupArn": "arn:aws:rds:us-east-1:644160558196:cluster-pg:custom-cluster-pg-used"
+            },
+            {
+                "DBClusterParameterGroupName": "custom-cluster-pg-orphan",
+                "DBParameterGroupFamily": "aurora-mysql8.0",
+                "Description": "Custom cluster parameter group not in use",
+                "DBClusterParameterGroupArn": "arn:aws:rds:us-east-1:644160558196:cluster-pg:custom-cluster-pg-orphan"
+            }
+        ],
+        "ResponseMetadata": {}
+    }
+}

@@ -1,0 +1,31 @@
+{
+    "status_code": 200,
+    "data": {
+        "VolumeModification": {
+            "VolumeId": "vol-0b0d1b4c01088ed2c",
+            "ModificationState": "modifying",
+            "TargetSize": 8,
+            "TargetIops": 3900,
+            "TargetVolumeType": "gp3",
+            "TargetThroughput": 125,
+            "TargetMultiAttachEnabled": false,
+            "OriginalSize": 8,
+            "OriginalIops": 3000,
+            "OriginalVolumeType": "gp3",
+            "OriginalThroughput": 125,
+            "OriginalMultiAttachEnabled": false,
+            "Progress": 0,
+            "StartTime": {
+                "__class__": "datetime",
+                "year": 2025,
+                "month": 12,
+                "day": 16,
+                "hour": 19,
+                "minute": 32,
+                "second": 27,
+                "microsecond": 0
+            }
+        },
+        "ResponseMetadata": {}
+    }
+}

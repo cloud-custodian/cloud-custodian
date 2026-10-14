@@ -251,10 +251,10 @@ class Metrics:
         self.buf = []
 
     def _format_metric(self, key, value, unit, dimensions):
-        raise NotImplementedError("subclass responsiblity")
+        raise NotImplementedError("subclass responsibility")
 
     def _put_metrics(self, ns, metrics):
-        raise NotImplementedError("subclass responsiblity")
+        raise NotImplementedError("subclass responsibility")
 
     def flush(self):
         if self.buf:

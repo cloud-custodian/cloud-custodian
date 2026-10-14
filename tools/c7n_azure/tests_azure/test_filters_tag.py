@@ -2,7 +2,7 @@
 # SPDX-License-Identifier: Apache-2.0
 from . import tools_tags as tools
 from .azure_common import BaseTest, arm_template
-from mock import Mock
+from unittest.mock import Mock
 
 from c7n.filters.core import ValueFilter
 

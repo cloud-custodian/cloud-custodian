@@ -10,7 +10,7 @@ except ImportError:
 
 from .azure_common import BaseTest
 from c7n_azure.function import main as functionMain
-from mock import patch
+from unittest.mock import patch
 
 
 @unittest.skipIf(sys.version_info < (3, 6), "Functions is not supported in this version")

@@ -9,8 +9,6 @@ PKG_SET := tools/c7n_gcp tools/c7n_kube tools/c7n_openstack tools/c7n_mailer too
 
 PKG_SET_OLD := tools/c7n_logexporter tools/c7n_trailcreator tools/c7n_terraform
 
-FMT_SET := tools/c7n_left tools/c7n_mailer tools/c7n_oci tools/c7n_kube tools/c7n_awscc
-
 COVERAGE_TYPE := html
 ARGS :=
 IMAGE := c7n
@@ -30,10 +28,10 @@ install:
 .PHONY: test
 
 test:
-	. $(PWD)/test.env && uv run pytest -n auto $(ARGS) tests tools
+	uv run pytest -n auto $(ARGS) tests tools
 
 test-coverage:
-	. $(PWD)/test.env && uv run pytest -n auto \
+	uv run pytest -n auto \
             --cov-config .coveragerc \
             --cov-report $(COVERAGE_TYPE) \
             --cov c7n \
@@ -47,24 +45,73 @@ test-coverage:
             --cov tools/c7n_oci/c7n_oci \
             tests tools $(ARGS)
 
+diff-coverage:
+	@echo "Running tests with coverage for changed files..."
+	@CHANGED_TEST_FILES=$$(git diff --name-only origin/main | grep -E "test_.*\.py$$" || true); \
+	if [ -z "$$CHANGED_TEST_FILES" ]; then \
+		echo "Error: No test files changed compared to origin/main"; \
+		echo "Use 'make diff-coverage-full' to run all tests for a provider, or specify TEST_PATH=<path>"; \
+		exit 1; \
+	fi; \
+	echo "Running changed test files:"; \
+	echo "$$CHANGED_TEST_FILES" | sed 's/^/  - /'; \
+	uv run pytest $$CHANGED_TEST_FILES -n auto \
+		--cov-config .coveragerc \
+		--cov-report xml \
+		--cov .
+	@echo ""
+	@echo "Generating diff coverage report..."
+	@uv tool run diff-cover coverage.xml \
+		--compare-branch=origin/main \
+		--src-roots . \
+		--exclude "tests/**" \
+		--exclude "tools/**/tests/**" \
+		--exclude "**/test_*.py" \
+		--html-report htmlcov/diff-coverage.html
+	@echo ""
+	@echo "HTML report generated: htmlcov/diff-coverage.html"
+	@echo "Run 'make view-diff-coverage-linux' to open the report in your browser"
+
+view-coverage-linux:
+	@if [ ! -f htmlcov/index.html ]; then \
+		echo "Error: htmlcov/index.html not found"; \
+		echo "Run 'make test-coverage' first to generate the full coverage report"; \
+		exit 1; \
+	fi
+	@xdg-open htmlcov/index.html 2>/dev/null || open htmlcov/index.html 2>/dev/null || echo "Please open htmlcov/index.html manually"
+
+view-diff-coverage-linux:
+	@if [ ! -f htmlcov/diff-coverage.html ]; then \
+		echo "Error: htmlcov/diff-coverage.html not found"; \
+		echo "Run 'make diff-coverage' first to generate the diff coverage report"; \
+		exit 1; \
+	fi
+	@xdg-open htmlcov/diff-coverage.html 2>/dev/null || open htmlcov/diff-coverage.html 2>/dev/null || echo "Please open htmlcov/diff-coverage.html manually"
+
 test-functional:
 # note this will provision real resources in a cloud environment
 	C7N_FUNCTIONAL=yes AWS_DEFAULT_REGION=us-east-2 pytest tests -m functional $(ARGS)
 
 test-functional-azure:
 # note this will provision real resources in Azure's public cloud environment
-	C7N_FUNCTIONAL=yes uv run pytest tools/c7n_azure/tests_azure/tests_resources/test_entraid.py -k terraform -m functional $(ARGS)
+	C7N_FUNCTIONAL=yes uv run pytest tools/c7n_azure/tests_azure -k terraform -m functional $(ARGS)
+
+test-gcp:
+# run only the GCP test suite
+	. uv run pytest -n auto tools/c7n_gcp/tests $(ARGS)
 
 sphinx:
 	make -f docs/Makefile.sphinx html
 
 lint:
 	uv run --no-project ruff check c7n tests tools
-	uv run --no-project black --check $(FMT_SET)
+# See black config in pyproject.toml for included dirs
+	uv run --no-project black --check .
 	terraform fmt -check -recursive .
 
 format:
-	uv run black $(FMT_SET)
+# See black config in pyproject.toml for included dirs
+	uv run black .
 	uv run ruff check --fix c7n tests tools
 	terraform fmt -recursive .
 
@@ -126,23 +173,26 @@ release-get-artifacts:
 
 data-update:
 # terraform data sets
-	cd tools/c7n_left/scripts && python uv run get_taggable.py \
+	cd tools/c7n_left/scripts && uv run python get_taggable.py \
 		--module-path taggable_providers/latest \
 		--module-path taggable_providers/azurerm-previous \
 		--output ../c7n_left/data/taggable.json
 # aws data sets
-	uv run tools/dev/data_cfntypedb.py -f tests/data/cfn-types.json
-	uv run tools/dev/data_updatearnref.py > tests/data/arn-types.json
-	uv run tools/dev/data_iamdb.py -f tests/data/iam-actions.json
+	uv run python tools/dev/data_cftypedb.py -f tests/data/cfn-types.json
+	uv run python tools/dev/data_updatearnref.py > tests/data/arn-types.json
+	uv run python tools/dev/data_iamdb.py -f tests/data/iam-actions.json
+	uv run python tools/dev/data_awspartitions.py > c7n/data/aws_region_partition_map.json
 # gcp data sets
-	uv run tools/dev/data_gcpiamdb.py -f tools/c7n_gcp/tests/data/iam-permissions.json
-	uv run tools/dev/data_gcpregion.py -f tools/c7n_gcp/c7n_gcp/regions.json
-
+	uv run python tools/dev/data_gcpiamdb.py -f tools/c7n_gcp/tests/data/iam-permissions.json
+	uv run python tools/dev/data_gcpregion.py -f tools/c7n_gcp/c7n_gcp/regions.json
 ###
 # Static analyzers
 
+# For context around skipping the B105 (hardcoded password)
+# rule, see:
+# https://github.com/PyCQA/bandit/issues/1350
 analyzer-bandit:
-	uvx bandit -i -s B101,B311 \
+	uvx bandit -i -s B101,B105,B311 \
 	-r tools/c7n_azure/c7n_azure \
 	 tools/c7n_gcp/c7n_gcp \
 	 tools/c7n_oci/c7n_oci \

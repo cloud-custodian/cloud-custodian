@@ -638,18 +638,18 @@ class TestWorkspacesWeb(BaseTest):
 class TestWorkspacesBundleDelete(BaseTest):
 
     def test_workspaces_bundle_tag(self):
-        session_factory = self.replay_flight_data("test_workspaces_bundle_tag")
+        session_factory = self.replay_flight_data("test_workspaces_bundle_tag", region="us-east-2")
         client = session_factory().client("workspaces")
 
         p = self.load_policy({
             'name': 'workspaces-bundle-tag',
             'resource': 'workspaces-bundle',
-            'filters': [{'Name': 'test'}],
+            'filters': [{'Name': 'c7ntest'}],
             'actions': [{
                 'type': 'tag',
                 'tags': {'test': 'testval'}
             }]
-        }, session_factory=session_factory)
+        }, session_factory=session_factory, config={'region': 'us-east-2'})
         resources = p.run()
         self.assertEqual(len(resources), 1)
 
@@ -657,18 +657,20 @@ class TestWorkspacesBundleDelete(BaseTest):
         self.assertIn({'Key': 'test', 'Value': 'testval'}, response.get('TagList', []))
 
     def test_workspaces_bundle_untag(self):
-        session_factory = self.replay_flight_data("test_workspaces_bundle_untag")
+        session_factory = self.replay_flight_data(
+            "test_workspaces_bundle_untag", region="us-east-2"
+        )
         client = session_factory().client("workspaces")
 
         p = self.load_policy({
             'name': 'workspaces-bundle-untag',
             'resource': 'workspaces-bundle',
-            'filters': [{'Name': 'test'}],
+            'filters': [{'Name': 'c7ntest'}],
             'actions': [{
                 'type': 'remove-tag',
                 'tags': ['test']
             }]
-        }, session_factory=session_factory)
+        }, session_factory=session_factory, config={'region': 'us-east-2'})
         resources = p.run()
         self.assertEqual(len(resources), 1)
 
@@ -676,20 +678,23 @@ class TestWorkspacesBundleDelete(BaseTest):
         self.assertNotIn({'Key': 'test', 'Value': 'testval'}, response.get('TagList', []))
 
     def test_workspaces_bundle_delete(self):
-        session_factory = self.replay_flight_data("test_workspaces_bundle_delete")
+        session_factory = self.replay_flight_data(
+            "test_workspaces_bundle_delete", region="us-east-2"
+        )
         client = session_factory().client("workspaces")
+        bundle_name = 'c7ntest-2'
 
         p = self.load_policy({
             'name': 'workspaces-bundle-delete',
             'resource': 'aws.workspaces-bundle',
-            'filters': [{'Name': 'test'}],
+            'filters': [{'Name': bundle_name}],
             'actions': [{'type': 'delete'}]
-        }, session_factory=session_factory)
+        }, session_factory=session_factory, config={'region': 'us-east-2'})
         resources = p.run()
         self.assertEqual(len(resources), 1)
-        self.assertEqual(resources[0]['Name'], 'test')
+        self.assertEqual(resources[0]['Name'], bundle_name)
         if self.recording:
             time.sleep(5)
 
         response = client.describe_workspace_bundles()['Bundles']
-        self.assertFalse(any(b['Name'] == 'test' for b in response))
+        self.assertFalse(any(b['Name'] == bundle_name for b in response))

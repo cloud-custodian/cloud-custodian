@@ -1,0 +1,58 @@
+{
+    "pytest-terraform": 1,
+    "outputs": {},
+    "resources": {
+        "google_dns_managed_zone": {
+            "default": {
+                "cloud_logging_config": [
+                    {
+                        "enable_logging": false
+                    }
+                ],
+                "creation_time": "2026-04-20T20:00:55.358Z",
+                "description": "Cloud Custodian managed zone label test",
+                "dns_name": "c7n-default-1586.example.com.",
+                "dnssec_config": [],
+                "effective_labels": {
+                    "env": "default",
+                    "goog-terraform-provisioned": "true"
+                },
+                "force_destroy": false,
+                "forwarding_config": [],
+                "id": "projects/cloud-custodian/managedZones/c7n-zone-default-1586",
+                "labels": {
+                    "env": "default"
+                },
+                "managed_zone_id": 2660237873472593803,
+                "name": "c7n-zone-default-1586",
+                "name_servers": [
+                    "ns-cloud-e1.googledomains.com.",
+                    "ns-cloud-e2.googledomains.com.",
+                    "ns-cloud-e3.googledomains.com.",
+                    "ns-cloud-e4.googledomains.com."
+                ],
+                "peering_config": [],
+                "private_visibility_config": [],
+                "project": "stacklet-test-policies",
+                "terraform_labels": {
+                    "env": "default",
+                    "goog-terraform-provisioned": "true"
+                },
+                "timeouts": null,
+                "visibility": "public"
+            }
+        },
+        "random_id": {
+            "suffix": {
+                "b64_std": "FYY=",
+                "b64_url": "FYY",
+                "byte_length": 2,
+                "dec": "5510",
+                "hex": "1586",
+                "id": "FYY",
+                "keepers": null,
+                "prefix": null
+            }
+        }
+    }
+}

@@ -333,7 +333,13 @@ class GlueDatabase(QueryResourceManager):
         date = 'CreatedOn'
         arn_type = 'database'
         state_key = 'State'
-        cfn_type = 'AWS::Glue::Database'
+        cfn_type = config_type = 'AWS::Glue::Database'
+        universal_taggable = object()
+
+    source_mapping = {
+        'describe': query.DescribeWithResourceTags,
+        'config': query.ConfigSource
+    }
 
 
 @GlueDatabase.action_registry.register('delete')

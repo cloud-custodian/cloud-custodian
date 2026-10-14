@@ -1,0 +1,13 @@
+accounts:
+  - name: dev
+    account_id: '112233445566'
+    tags:
+      - red
+      - black
+    role: 'arn:aws:iam::{account_id}:role/CloudCustodian'
+  - name: prod
+    account_id: '998877665544'
+    tags:
+      - blue
+      - production
+    role: 'arn:aws:iam::{account_id}:role/CloudCustodian'

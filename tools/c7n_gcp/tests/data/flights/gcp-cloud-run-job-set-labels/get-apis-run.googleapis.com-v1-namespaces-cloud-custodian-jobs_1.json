@@ -1,0 +1,61 @@
+{
+  "headers": {
+    "content-type": "application/json; charset=UTF-8",
+    "status": "200"
+  },
+  "body": {
+    "items": [
+      {
+        "apiVersion": "run.googleapis.com/v1",
+        "kind": "Job",
+        "metadata": {
+          "name": "job",
+          "namespace": "cloud-custodian",
+          "selfLink": "/apis/run.googleapis.com/v1/namespaces/cloud-custodian/jobs/job",
+          "uid": "97a91db4-0c34-46c1-95cf-10b5c122e04c",
+          "resourceVersion": "AAX4MGKYGq8",
+          "generation": 1,
+          "creationTimestamp": "2023-03-31T11:19:39.625429Z",
+          "labels": {
+            "cloud.googleapis.com/location": "us-central1"
+          },
+          "annotations": {
+            "run.googleapis.com/client-name": "cloud-console"
+          }
+        },
+        "spec": {
+          "template": {
+            "metadata": {
+              "annotations": {}
+            },
+            "spec": {
+              "taskCount": 1,
+              "template": {
+                "spec": {
+                  "containers": [
+                    {
+                      "image": "us-docker.pkg.dev/cloudrun/container/job:latest",
+                      "resources": {
+                        "limits": {"cpu": "1000m", "memory": "512Mi"}
+                      }
+                    }
+                  ],
+                  "maxRetries": 3,
+                  "timeoutSeconds": "600"
+                }
+              }
+            }
+          }
+        },
+        "status": {
+          "observedGeneration": 1,
+          "conditions": [
+            {"type": "Ready", "status": "True"}
+          ]
+        }
+      }
+    ],
+    "apiVersion": "run.googleapis.com/v1",
+    "kind": "JobList"
+  }
+}

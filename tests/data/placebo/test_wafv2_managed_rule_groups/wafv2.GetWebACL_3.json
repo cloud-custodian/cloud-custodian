@@ -1,0 +1,47 @@
+{
+    "status_code": 200,
+    "data": {
+        "WebACL": {
+            "Name": "compliant-waf-4",
+            "Id": "90d30873-92b9-42dd-b24e-b7f22bb25665",
+            "ARN": "arn:aws:wafv2:us-east-1:644160558196:regional/webacl/compliant-waf-4/90d30873-92b9-42dd-b24e-b7f22bb25665",
+            "DefaultAction": {
+                "Allow": {}
+            },
+            "Description": "1 Custum Rule Group and 0 Standalone",
+            "Rules": [
+                {
+                    "Name": "rules",
+                    "Priority": 0,
+                    "Statement": {
+                        "RuleGroupReferenceStatement": {
+                            "ARN": "arn:aws:wafv2:us-east-1:644160558196:regional/rulegroup/with-rules/60616042-d427-4c17-991c-ee3a39012c31"
+                        }
+                    },
+                    "OverrideAction": {
+                        "None": {}
+                    },
+                    "VisibilityConfig": {
+                        "SampledRequestsEnabled": true,
+                        "CloudWatchMetricsEnabled": true,
+                        "MetricName": "rules"
+                    }
+                }
+            ],
+            "VisibilityConfig": {
+                "SampledRequestsEnabled": true,
+                "CloudWatchMetricsEnabled": true,
+                "MetricName": "compliant-waf-4"
+            },
+            "Capacity": 1,
+            "ManagedByFirewallManager": false,
+            "LabelNamespace": "awswaf:644160558196:webacl:compliant-waf-4:",
+            "RetrofittedByFirewallManager": false,
+            "OnSourceDDoSProtectionConfig": {
+                "ALBLowReputationMode": "ACTIVE_UNDER_DDOS"
+            }
+        },
+        "LockToken": "0b7421a4-6cd0-423c-bccc-361f66f2cc79",
+        "ResponseMetadata": {}
+    }
+}

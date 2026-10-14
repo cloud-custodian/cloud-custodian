@@ -1,0 +1,13 @@
+{
+    "status_code": 200,
+    "data": {
+        "PaginationToken": "",
+        "ResourceTagMappingList": [
+            {
+                "ResourceARN": "arn:aws:wafv2:us-east-1:644160558196:regional/webacl/c7n-test-regional/fbfff9a0-70db-402d-8586-07df8322a61b",
+                "Tags": []
+            }
+        ],
+        "ResponseMetadata": {}
+    }
+}

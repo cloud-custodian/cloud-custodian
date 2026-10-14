@@ -9,6 +9,7 @@ import argparse
 import importlib
 import logging
 import os
+import pathlib
 import pdb
 import sys
 import traceback
@@ -74,10 +75,9 @@ def _default_options(p, exclude=[]):
     output.add_argument("--debug", default=False, help=argparse.SUPPRESS,
                         action="store_true")
 
-    if 'vars' not in exclude:
-        # p.add_argument('--vars', default=None,
-        #               help='Vars file to substitute into policy')
-        p.set_defaults(vars=None)
+    if 'vars-file' not in exclude:
+        p.add_argument('--vars-file', default=None, type=_valid_path,
+                      help='Vars file to substitute into policy')
 
     if 'log-group' not in exclude:
         p.add_argument(
@@ -197,6 +197,17 @@ def _key_val_pair(value):
     return value
 
 
+def _valid_path(value):
+    """
+    Type checker to ensure that --vars-file is a path to a file
+    """
+    path = pathlib.Path(value)
+    if not path.is_file():
+        msg = 'vars-file must point to a file'
+        raise argparse.ArgumentTypeError(msg)
+    return value
+
+
 def setup_parser():
     c7n_desc = "Cloud Custodian - Cloud fleet management"
     parser = argparse.ArgumentParser(description=c7n_desc)
@@ -230,7 +241,7 @@ def setup_parser():
     run.add_argument(
         "--skip-validation",
         action="store_true",
-        help="Skips validation of policies (assumes you've run the validate command seperately).")
+        help="Skips validation of policies (assumes you've run the validate command separately).")
 
     metrics_help = ("Emit metrics to provider metrics. Specify 'aws', 'gcp', or 'azure'. "
             "For more details on aws metrics options, see: "

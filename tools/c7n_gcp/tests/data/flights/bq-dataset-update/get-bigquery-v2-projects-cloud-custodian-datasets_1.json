@@ -1,0 +1,38 @@
+{
+  "headers": {
+    "etag": "Py8rNmhnMWDNIF4AqpuRVw==",
+    "content-type": "application/json; charset=UTF-8",
+    "vary": "Origin, X-Origin, Referer",
+    "date": "Fri, 27 Mar 2026 22:31:40 GMT",
+    "server": "ESF",
+    "x-xss-protection": "0",
+    "x-frame-options": "SAMEORIGIN",
+    "x-content-type-options": "nosniff",
+    "alt-svc": "h3=\":443\"; ma=2592000,h3-29=\":443\"; ma=2592000",
+    "transfer-encoding": "chunked",
+    "status": "200",
+    "content-length": "473",
+    "-content-encoding": "gzip",
+    "content-location": "https://bigquery.googleapis.com/bigquery/v2/projects/cloud-custodian/datasets?filter=labels.c7n_test%3Abq_dataset_update&alt=json"
+  },
+  "body": {
+    "kind": "bigquery#datasetList",
+    "etag": "Py8rNmhnMWDNIF4AqpuRVw==",
+    "datasets": [
+      {
+        "kind": "bigquery#dataset",
+        "id": "stacklet-personal-2:c7n_bq_dataset",
+        "datasetReference": {
+          "datasetId": "c7n_bq_dataset",
+          "projectId": "stacklet-personal-2"
+        },
+        "labels": {
+          "c7n_test": "bq_dataset_update",
+          "env": "default",
+          "goog-terraform-provisioned": "true"
+        },
+        "location": "US"
+      }
+    ]
+  }
+}

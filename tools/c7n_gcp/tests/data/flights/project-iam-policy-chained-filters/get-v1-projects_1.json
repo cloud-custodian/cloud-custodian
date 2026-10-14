@@ -1,0 +1,36 @@
+{
+  "headers": {
+    "content-type": "application/json; charset=UTF-8",
+    "vary": "Origin, X-Origin, Referer",
+    "date": "Thu, 05 Mar 2026 15:40:23 GMT",
+    "server": "ESF",
+    "x-xss-protection": "0",
+    "x-frame-options": "SAMEORIGIN",
+    "x-content-type-options": "nosniff",
+    "server-timing": "gfet4t7; dur=350",
+    "alt-svc": "h3=\":443\"; ma=2592000,h3-29=\":443\"; ma=2592000",
+    "transfer-encoding": "chunked",
+    "status": "200",
+    "content-length": "21478",
+    "-content-encoding": "gzip",
+    "content-location": "https://cloudresourcemanager.googleapis.com/v1/projects?alt=json"
+  },
+  "body": {
+    "projects": [
+      {
+        "projectNumber": "859150599087",
+        "projectId": "stacklet-test-policies",
+        "lifecycleState": "ACTIVE",
+        "name": "stacklet-test-policies",
+        "labels": {
+          "generative-language": "enabled"
+        },
+        "createTime": "2024-06-18T00:45:41.145362Z",
+        "parent": {
+          "type": "organization",
+          "id": "728386023487"
+        }
+      }
+    ]
+  }
+}

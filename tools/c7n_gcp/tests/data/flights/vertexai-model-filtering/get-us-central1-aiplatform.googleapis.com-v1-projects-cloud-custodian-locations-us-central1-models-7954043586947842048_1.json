@@ -1,0 +1,56 @@
+{
+  "headers": {
+    "content-type": "application/json; charset=UTF-8",
+    "vary": "Origin, X-Origin, Referer",
+    "date": "Tue, 11 Aug 2026 17:49:37 GMT",
+    "server": "ESF",
+    "x-xss-protection": "0",
+    "x-frame-options": "SAMEORIGIN",
+    "x-content-type-options": "nosniff",
+    "alt-svc": "h3=\":443\"; ma=2592000,h3-29=\":443\"; ma=2592000",
+    "transfer-encoding": "chunked",
+    "status": "200",
+    "content-length": "920",
+    "-content-encoding": "gzip",
+    "content-location": "https://us-central1-aiplatform.googleapis.com/v1/projects/cloud-custodian/locations/us-central1/models/7954043586947842048?alt=json"
+  },
+  "body": {
+    "name": "projects/cloud-custodian/locations/us-central1/models/7954043586947842048",
+    "displayName": "c7n-test-model-owned",
+    "supportedDeploymentResourcesTypes": [
+      "DEDICATED_RESOURCES"
+    ],
+    "supportedInputStorageFormats": [
+      "jsonl",
+      "bigquery",
+      "csv",
+      "tf-record",
+      "tf-record-gzip",
+      "file-list"
+    ],
+    "supportedOutputStorageFormats": [
+      "jsonl",
+      "bigquery"
+    ],
+    "createTime": "2026-08-11T17:49:31.077998Z",
+    "updateTime": "2026-08-11T17:49:31.345692Z",
+    "etag": "AMEw9yPktYMCmPmfuy9PZBSuD9sgO0lmbQZ18qinJf6dLoZUw7Te8ZXpuj0IbGTJkRnA",
+    "labels": {
+      "owner": "c7n"
+    },
+    "supportedExportFormats": [
+      {
+        "id": "custom-trained"
+      }
+    ],
+    "versionId": "1",
+    "versionAliases": [
+      "default"
+    ],
+    "versionCreateTime": "2026-08-11T17:49:31.077998Z",
+    "versionUpdateTime": "2026-08-11T17:49:31.345692Z",
+    "modelSourceInfo": {
+      "sourceType": "CUSTOM"
+    }
+  }
+}

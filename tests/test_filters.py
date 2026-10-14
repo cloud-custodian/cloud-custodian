@@ -9,6 +9,7 @@ from dateutil.parser import parse as parse_date
 import random
 import unittest
 import os
+from unittest import mock
 
 from c7n.exceptions import PolicyValidationError, PolicyExecutionError
 from c7n.executor import MainThreadExecutor
@@ -21,7 +22,7 @@ from .common import instance, event_data, Bag, BaseTest
 from c7n.filters.core import AnnotationSweeper, ValueRegex, parse_date as core_parse_date
 
 
-class BaseFilterTest(unittest.TestCase):
+class BaseFilterTest(BaseTest):
 
     def assertFilter(self, f, i, v):
         """
@@ -302,6 +303,45 @@ class TestValueFilter(unittest.TestCase):
             "op": "intersect"})
         res = vf.match(resource)
         self.assertEqual(res, False)
+
+    def test_value_path_recalculated_per_resource(self):
+        # Regression test for #10521: value_path must be reevaluated
+        # per resource, not cached from the first resource matched.
+        vf = filters.factory({
+            "type": "value",
+            "key": "a",
+            "value_path": "b",
+            "op": "eq"})
+
+        matching = {"a": "x", "b": "x"}
+        non_matching = {"a": "x", "b": "y"}
+
+        # Evaluate the non-matching resource first so a cached value_path
+        # from it (or a prior stale self.v) can't accidentally satisfy
+        # the matching resource that follows.
+        self.assertEqual(vf.match(non_matching), False)
+        self.assertEqual(vf.match(matching), True)
+
+    def test_value_from_takes_precedence_over_value_path(self):
+        # Regression test for #10521 fix: value_from must still take
+        # precedence over value_path (the original elif ordering), and
+        # its cached-once result must not get overwritten by the
+        # per-resource value_path reevaluation.
+        with mock.patch('c7n.filters.core.ValuesFrom') as values_from:
+            values_from.return_value.get_values.return_value = 'x'
+            vf = filters.factory({
+                "type": "value",
+                "key": "a",
+                "value_from": {"url": "s3://bucket/foo.json"},
+                "value_path": "b",
+                "op": "eq"})
+
+            # 'b' differs from the value_from result on both resources;
+            # if value_path incorrectly took precedence, these would not
+            # both match.
+            self.assertEqual(vf.match({"a": "x", "b": "y"}), True)
+            self.assertEqual(vf.match({"a": "x", "b": "z"}), True)
+            values_from.return_value.get_values.assert_called_once()
 
 
 class TestAgeFilter(unittest.TestCase):
@@ -832,6 +872,19 @@ class TestMarkedForAction(BaseFilterTest):
         ]:
             self.assertFilter({"type": "marked-for-op"}, ii, v)
 
+    def test_filter_unparseable_date_without_instance_id(self):
+        # marked-for-op is registered on many non-ec2 resources whose id key
+        # is not InstanceId. An unparseable date on such a resource should be
+        # logged and skipped, not raise KeyError('InstanceId').
+        resource = {
+            "Name": "my-secret",
+            "Tags": [
+                {"Key": "maid_status", "Value": "does not meet policy: stop@notadate"}
+            ],
+        }
+        f = filters.factory({"type": "marked-for-op", "op": "stop"})
+        self.assertFalse(f(resource))
+
 
 class EventFilterTest(BaseFilterTest):
 
@@ -928,6 +981,47 @@ class TestInstanceValue(BaseFilterTest):
             instance(),
             True,
         )
+
+    def test_normalized_keys_filter(self):
+        i = instance(Tags=[{"Key": " foo", "Value": "abcd"}])
+        self.assertFilter({"tag:foo": "abcd"}, i, False)
+        fdata = {
+            "type": "value",
+            "key": "tag:foo",
+            "tag_key_transforms": ["strip"],
+            "value": "abcd",
+        }
+        self.assertFilter(fdata, i, True)
+        self.assertEqual(annotation(i, base_filters.ANNOTATION_KEY), ["tag:foo"])
+
+        i = instance(Tags=[{"Key": " foo_bar", "Value": "abcd"}])
+        self.assertFilter({"tag:FooBar": "abcd"}, i, False)
+        fdata_big = {
+            "type": "value",
+            "key": "tag:FooBar",
+            "tag_key_transforms": ["strip", "title", "nounderscores"],
+            "value": "abcd",
+        }
+        self.assertFilter(fdata_big, i, True)
+        self.assertEqual(
+            annotation(i, base_filters.ANNOTATION_KEY),
+            ["tag:FooBar"],
+        )
+
+        self.assertRaises(
+            PolicyValidationError,
+            filters.factory(
+                {"type": "value", "key": "foo", "tag_key_transforms": ["spam"], "value": "abcd"}
+            ).validate,
+        )
+
+        # make instance tags GCP-like by removing "Tags" and adding "labels"
+        i = instance()
+        del i["Tags"]
+        i["labels"] = {" foo": "abcd"}
+        self.assertFilter({"tag:foo": "abcd"}, i, False)
+        self.assertFilter(fdata, i, True)
+        self.assertEqual(annotation(i, base_filters.ANNOTATION_KEY), ["tag:foo"])
 
 
 class TestEqualValue(unittest.TestCase):
@@ -1218,6 +1312,76 @@ class TestMetricsFilter(BaseTest):
             })
         self.assertIn('cannot exceed 455', str(err.exception))
 
+    def test_metric_period_start_start_of_day_multiple_days(self):
+        """
+        Test that the CloudWatch metric window correctly aligns to full UTC
+        calendar days when `period-start` is set to "start-of-day"
+        and multiple days are specified.
+
+        This ensures that:
+
+        1. The start of the metric window aligns to 00:00:00 UTC
+        N days ago (where N is the number of days specified).
+        2. The end of the metric window aligns to midnight UTC
+        of the current day (00:00:00 UTC).
+        3. The window spans exactly N full UTC calendar days.
+        4. Backward compatibility is preserved when `period-start`
+        is not specified (defaults to "auto").
+
+        Example:
+            days = 3
+            current time = 2020-12-03 04:47:15 UTC
+
+            Expected window:
+                start = 2020-11-30 00:00:00 UTC
+                end   = 2020-12-03 00:00:00 UTC
+
+            Covered days:
+                2020-11-30
+                2020-12-01
+                2020-12-02
+        """
+
+        with mock_datetime_now(
+            parse_date("2020-12-03T04:47:15+00:00"),
+            base_filters.metrics
+        ):
+            p = self.load_policy(
+                {
+                    "name": "sqs-period-start-multi",
+                    "resource": "sqs",
+                    "filters": [
+                        {
+                            "type": "metrics",
+                            "name": "NumberOfMessagesSent",
+                            "statistics": "Sum",
+                            "days": 3,
+                            "period-start": "start-of-day",
+                            "value": 0,
+                            "op": "eq"
+                        }
+                    ]
+                }
+            )
+
+            metrics_filter = p.resource_manager.filters[0]
+            window = metrics_filter.get_metric_window()
+
+            self.assertEqual(
+                parse_date("2020-11-30T00:00:00+00:00"),
+                window.start
+            )
+
+            self.assertEqual(
+                parse_date("2020-12-03T00:00:00+00:00"),
+                window.end
+            )
+
+            self.assertEqual(
+                3,
+                (window.end - window.start).days
+            )
+
 
 class TestReduceFilter(BaseFilterTest):
 
@@ -1312,6 +1476,30 @@ class TestReduceFilter(BaseFilterTest):
         rs = f.process(resources)
         self.assertEqual(len(rs), 3)
         self.assertEqual([r['InstanceId'] for r in rs], ['D', 'E', 'F'])
+
+    def test_discard_percent_by_group(self):
+        # discard-percent must be computed per group; a larger group's discard
+        # count should not leak into subsequent, smaller groups
+        resources = [
+            dict(InstanceId="A", Group="big", Id="1"),
+            dict(InstanceId="B", Group="big", Id="2"),
+            dict(InstanceId="C", Group="big", Id="3"),
+            dict(InstanceId="D", Group="big", Id="4"),
+            dict(InstanceId="E", Group="small", Id="5"),
+            dict(InstanceId="F", Group="small", Id="6"),
+        ]
+        f = filters.factory(
+            {
+                "type": "reduce",
+                "group-by": "Group",
+                "sort-by": "Id",
+                "order": "asc",
+                "discard-percent": 50,
+            }
+        )
+        rs = f.process(resources)
+        # big (4 items) discards 2 -> C, D; small (2 items) discards 1 -> F
+        self.assertEqual([r['InstanceId'] for r in rs], ['C', 'D', 'F'])
 
     def test_discard_and_limit(self):
         resources = self.instances()

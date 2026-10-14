@@ -1,0 +1,394 @@
+{
+  "headers": {
+    "content-type": "application/json; charset=UTF-8",
+    "vary": "Origin, X-Origin, Referer",
+    "date": "Thu, 26 Feb 2026 18:41:31 GMT",
+    "server": "ESF",
+    "x-xss-protection": "0",
+    "x-frame-options": "SAMEORIGIN",
+    "x-content-type-options": "nosniff",
+    "alt-svc": "h3=\":443\"; ma=2592000,h3-29=\":443\"; ma=2592000",
+    "transfer-encoding": "chunked",
+    "status": "200",
+    "content-length": "13486",
+    "-content-encoding": "gzip",
+    "content-location": "https://us-east1-aiplatform.googleapis.com/v1/projects/cloud-custodian/locations/us-east1/batchPredictionJobs?alt=json"
+  },
+  "body": {
+    "batchPredictionJobs": [
+      {
+        "name": "projects/cloud-custodian/locations/us-east1/batchPredictionJobs/7886130120954478592",
+        "displayName": "c7n-test-batch-job-east",
+        "model": "projects/cloud-custodian/locations/us-east1/models/3392736641549336576",
+        "inputConfig": {
+          "instancesFormat": "jsonl",
+          "gcsSource": {
+            "uris": [
+              "gs://c7n-vertex-batch-test-c34c9a39/input/us-east1/test_data.jsonl"
+            ]
+          }
+        },
+        "outputConfig": {
+          "predictionsFormat": "jsonl",
+          "gcsDestination": {
+            "outputUriPrefix": "gs://c7n-vertex-batch-test-c34c9a39/output/us-east1/"
+          }
+        },
+        "dedicatedResources": {
+          "machineSpec": {
+            "machineType": "n1-standard-2"
+          },
+          "startingReplicaCount": 1
+        },
+        "manualBatchTuningParameters": {},
+        "state": "JOB_STATE_RUNNING",
+        "createTime": "2026-02-26T18:41:31.182362Z",
+        "startTime": "2026-02-26T18:41:31.222039Z",
+        "updateTime": "2026-02-26T18:41:31.222039Z",
+        "modelVersionId": "1"
+      },
+      {
+        "name": "projects/cloud-custodian/locations/us-east1/batchPredictionJobs/5073632153661603840",
+        "displayName": "c7n-test-batch-job-east",
+        "model": "projects/cloud-custodian/locations/us-east1/models/3294783349654028288",
+        "inputConfig": {
+          "instancesFormat": "jsonl",
+          "gcsSource": {
+            "uris": [
+              "gs://c7n-vertex-batch-test-5a5249ac/input/us-east1/test_data.jsonl"
+            ]
+          }
+        },
+        "outputConfig": {
+          "predictionsFormat": "jsonl",
+          "gcsDestination": {
+            "outputUriPrefix": "gs://c7n-vertex-batch-test-5a5249ac/output/us-east1/"
+          }
+        },
+        "dedicatedResources": {
+          "machineSpec": {
+            "machineType": "n1-standard-2"
+          },
+          "startingReplicaCount": 1
+        },
+        "manualBatchTuningParameters": {},
+        "state": "JOB_STATE_FAILED",
+        "error": {
+          "code": 3,
+          "message": "The input GCS object doesn't exist: gs://c7n-vertex-batch-test-5a5249ac/input/us-east1/test_data.jsonl"
+        },
+        "createTime": "2026-02-26T18:31:40.651886Z",
+        "startTime": "2026-02-26T18:31:40.701958Z",
+        "endTime": "2026-02-26T18:31:44.288796Z",
+        "updateTime": "2026-02-26T18:31:44.288796Z",
+        "modelVersionId": "1"
+      },
+      {
+        "name": "projects/cloud-custodian/locations/us-east1/batchPredictionJobs/2258882386555043840",
+        "displayName": "c7n-test-batch-job-east",
+        "model": "projects/cloud-custodian/locations/us-east1/models/3294783349654028288",
+        "inputConfig": {
+          "instancesFormat": "jsonl",
+          "gcsSource": {
+            "uris": [
+              "gs://c7n-vertex-batch-test-2e672077/input/us-east1/test_data.jsonl"
+            ]
+          }
+        },
+        "outputConfig": {
+          "predictionsFormat": "jsonl",
+          "gcsDestination": {
+            "outputUriPrefix": "gs://c7n-vertex-batch-test-2e672077/output/us-east1/"
+          }
+        },
+        "dedicatedResources": {
+          "machineSpec": {
+            "machineType": "n1-standard-2"
+          },
+          "startingReplicaCount": 1
+        },
+        "manualBatchTuningParameters": {},
+        "state": "JOB_STATE_FAILED",
+        "error": {
+          "code": 3,
+          "message": "The input GCS object doesn't exist: gs://c7n-vertex-batch-test-2e672077/input/us-east1/test_data.jsonl"
+        },
+        "createTime": "2026-02-26T18:31:22.812994Z",
+        "startTime": "2026-02-26T18:31:22.869896Z",
+        "endTime": "2026-02-26T18:31:24.702648Z",
+        "updateTime": "2026-02-26T18:31:24.702648Z",
+        "modelVersionId": "1"
+      },
+      {
+        "name": "projects/cloud-custodian/locations/us-east1/batchPredictionJobs/4687729960591294464",
+        "displayName": "c7n-test-batch-job-east",
+        "model": "projects/cloud-custodian/locations/us-east1/models/3294783349654028288",
+        "inputConfig": {
+          "instancesFormat": "jsonl",
+          "gcsSource": {
+            "uris": [
+              "gs://c7n-vertex-batch-test-af5894d3/input/us-east1/test_data.jsonl"
+            ]
+          }
+        },
+        "outputConfig": {
+          "predictionsFormat": "jsonl",
+          "gcsDestination": {
+            "outputUriPrefix": "gs://c7n-vertex-batch-test-af5894d3/output/us-east1/"
+          }
+        },
+        "dedicatedResources": {
+          "machineSpec": {
+            "machineType": "n1-standard-2"
+          },
+          "startingReplicaCount": 1
+        },
+        "manualBatchTuningParameters": {},
+        "outputInfo": {
+          "gcsOutputDirectory": "gs://c7n-vertex-batch-test-af5894d3/output/us-east1/prediction-c7n-test-sklearn-model-us-east1-2026_02_26T09_30_53_984Z"
+        },
+        "state": "JOB_STATE_FAILED",
+        "error": {
+          "code": 9,
+          "message": "Model server terminated: model server container terminated: go/debugproto    \nexit_code: 1\nreason: \"Error\"\nstarted_at {\n  seconds: 1772127778\n}\nfinished_at {\n  seconds: 1772127782\n}\n. "
+        },
+        "completionStats": {
+          "incompleteCount": "-1"
+        },
+        "createTime": "2026-02-26T17:30:54.219090Z",
+        "startTime": "2026-02-26T17:30:54.263277Z",
+        "endTime": "2026-02-26T17:43:27Z",
+        "updateTime": "2026-02-26T17:44:28.590513Z",
+        "modelVersionId": "1"
+      },
+      {
+        "name": "projects/cloud-custodian/locations/us-east1/batchPredictionJobs/8519167343576743936",
+        "displayName": "c7n-test-batch-job-east",
+        "model": "projects/cloud-custodian/locations/us-east1/models/3294783349654028288",
+        "inputConfig": {
+          "instancesFormat": "jsonl",
+          "gcsSource": {
+            "uris": [
+              "gs://c7n-vertex-batch-test-2e672077/input/us-east1/test_data.jsonl"
+            ]
+          }
+        },
+        "outputConfig": {
+          "predictionsFormat": "jsonl",
+          "gcsDestination": {
+            "outputUriPrefix": "gs://c7n-vertex-batch-test-2e672077/output/us-east1/"
+          }
+        },
+        "dedicatedResources": {
+          "machineSpec": {
+            "machineType": "n1-standard-2"
+          },
+          "startingReplicaCount": 1
+        },
+        "manualBatchTuningParameters": {},
+        "outputInfo": {
+          "gcsOutputDirectory": "gs://c7n-vertex-batch-test-2e672077/output/us-east1/prediction-c7n-test-sklearn-model-us-east1-2026_02_26T09_43_11_527Z"
+        },
+        "state": "JOB_STATE_FAILED",
+        "error": {
+          "code": 9,
+          "message": "Model server terminated: model server container terminated: go/debugproto    \nexit_code: 1\nreason: \"Error\"\nstarted_at {\n  seconds: 1772127804\n}\nfinished_at {\n  seconds: 1772127807\n}\n. "
+        },
+        "completionStats": {
+          "incompleteCount": "-1"
+        },
+        "createTime": "2026-02-26T17:43:11.660802Z",
+        "startTime": "2026-02-26T17:43:11.704574Z",
+        "endTime": "2026-02-26T17:43:44Z",
+        "updateTime": "2026-02-26T17:43:45.389282Z",
+        "modelVersionId": "1"
+      },
+      {
+        "name": "projects/cloud-custodian/locations/us-east1/batchPredictionJobs/3834297831204585472",
+        "displayName": "c7n-test-batch-job-east",
+        "model": "projects/cloud-custodian/locations/us-east1/models/3294783349654028288",
+        "inputConfig": {
+          "instancesFormat": "jsonl",
+          "gcsSource": {
+            "uris": [
+              "gs://c7n-vertex-batch-test-8ee66081/input/us-east1/test_data.jsonl"
+            ]
+          }
+        },
+        "outputConfig": {
+          "predictionsFormat": "jsonl",
+          "gcsDestination": {
+            "outputUriPrefix": "gs://c7n-vertex-batch-test-8ee66081/output/us-east1/"
+          }
+        },
+        "dedicatedResources": {
+          "machineSpec": {
+            "machineType": "n1-standard-2"
+          },
+          "startingReplicaCount": 1
+        },
+        "manualBatchTuningParameters": {},
+        "state": "JOB_STATE_FAILED",
+        "error": {
+          "code": 3,
+          "message": "The input GCS object doesn't exist: gs://c7n-vertex-batch-test-8ee66081/input/us-east1/test_data.jsonl"
+        },
+        "createTime": "2026-02-26T17:40:07.483986Z",
+        "startTime": "2026-02-26T17:40:07.533720Z",
+        "endTime": "2026-02-26T17:40:09.913282Z",
+        "updateTime": "2026-02-26T17:40:09.913282Z",
+        "modelVersionId": "1"
+      },
+      {
+        "name": "projects/cloud-custodian/locations/us-east1/batchPredictionJobs/3260088878714847232",
+        "displayName": "c7n-test-batch-job-east",
+        "model": "projects/cloud-custodian/locations/us-east1/models/3294783349654028288",
+        "inputConfig": {
+          "instancesFormat": "jsonl",
+          "gcsSource": {
+            "uris": [
+              "gs://c7n-vertex-batch-test-8ee66081/input/us-east1/test_data.jsonl"
+            ]
+          }
+        },
+        "outputConfig": {
+          "predictionsFormat": "jsonl",
+          "gcsDestination": {
+            "outputUriPrefix": "gs://c7n-vertex-batch-test-8ee66081/output/us-east1/"
+          }
+        },
+        "dedicatedResources": {
+          "machineSpec": {
+            "machineType": "n1-standard-2"
+          },
+          "startingReplicaCount": 1
+        },
+        "manualBatchTuningParameters": {},
+        "state": "JOB_STATE_FAILED",
+        "error": {
+          "code": 3,
+          "message": "The input GCS object doesn't exist: gs://c7n-vertex-batch-test-8ee66081/input/us-east1/test_data.jsonl"
+        },
+        "createTime": "2026-02-26T17:39:12.516506Z",
+        "startTime": "2026-02-26T17:39:12.562822Z",
+        "endTime": "2026-02-26T17:39:14.550569Z",
+        "updateTime": "2026-02-26T17:39:14.550569Z",
+        "modelVersionId": "1"
+      },
+      {
+        "name": "projects/cloud-custodian/locations/us-east1/batchPredictionJobs/5970129954485043200",
+        "displayName": "c7n-test-batch-job-east",
+        "model": "projects/cloud-custodian/locations/us-east1/models/3294783349654028288",
+        "inputConfig": {
+          "instancesFormat": "jsonl",
+          "gcsSource": {
+            "uris": [
+              "gs://c7n-vertex-batch-test-8ee66081/input/us-east1/test_data.jsonl"
+            ]
+          }
+        },
+        "outputConfig": {
+          "predictionsFormat": "jsonl",
+          "gcsDestination": {
+            "outputUriPrefix": "gs://c7n-vertex-batch-test-8ee66081/output/us-east1/"
+          }
+        },
+        "dedicatedResources": {
+          "machineSpec": {
+            "machineType": "n1-standard-2"
+          },
+          "startingReplicaCount": 1
+        },
+        "manualBatchTuningParameters": {},
+        "state": "JOB_STATE_FAILED",
+        "error": {
+          "code": 3,
+          "message": "The input GCS object doesn't exist: gs://c7n-vertex-batch-test-8ee66081/input/us-east1/test_data.jsonl"
+        },
+        "createTime": "2026-02-26T17:38:55.045756Z",
+        "startTime": "2026-02-26T17:38:55.235982Z",
+        "endTime": "2026-02-26T17:38:57.074340Z",
+        "updateTime": "2026-02-26T17:38:57.074340Z",
+        "modelVersionId": "1"
+      },
+      {
+        "name": "projects/cloud-custodian/locations/us-east1/batchPredictionJobs/7881846423652663296",
+        "displayName": "c7n-test-batch-job-east",
+        "model": "projects/cloud-custodian/locations/us-east1/models/3294783349654028288",
+        "inputConfig": {
+          "instancesFormat": "jsonl",
+          "gcsSource": {
+            "uris": [
+              "gs://c7n-vertex-batch-test-b01e7bb6/input/us-east1/test_data.jsonl"
+            ]
+          }
+        },
+        "outputConfig": {
+          "predictionsFormat": "jsonl",
+          "gcsDestination": {
+            "outputUriPrefix": "gs://c7n-vertex-batch-test-b01e7bb6/output/us-east1/"
+          }
+        },
+        "dedicatedResources": {
+          "machineSpec": {
+            "machineType": "n1-standard-2"
+          },
+          "startingReplicaCount": 1
+        },
+        "manualBatchTuningParameters": {},
+        "outputInfo": {
+          "gcsOutputDirectory": "gs://c7n-vertex-batch-test-b01e7bb6/output/us-east1/prediction-c7n-test-sklearn-model-us-east1-2026_02_24T16_39_55_734Z"
+        },
+        "state": "JOB_STATE_FAILED",
+        "error": {
+          "code": 9,
+          "message": "Model server terminated: model server container terminated: go/debugproto  \nexit_code: 1\nreason: \"Error\"\nstarted_at {\n  seconds: 1771980250\n}\nfinished_at {\n  seconds: 1771980255\n}\n. "
+        },
+        "completionStats": {
+          "incompleteCount": "-1"
+        },
+        "createTime": "2026-02-25T00:39:55.749012Z",
+        "startTime": "2026-02-25T00:39:55.792421Z",
+        "endTime": "2026-02-25T00:44:27Z",
+        "updateTime": "2026-02-25T00:48:29.595907Z",
+        "modelVersionId": "1"
+      },
+      {
+        "name": "projects/cloud-custodian/locations/us-east1/batchPredictionJobs/1076907386695843840",
+        "displayName": "c7n-test-batch-job-east",
+        "model": "projects/cloud-custodian/locations/us-east1/models/3294783349654028288",
+        "inputConfig": {
+          "instancesFormat": "jsonl",
+          "gcsSource": {
+            "uris": [
+              "gs://c7n-vertex-batch-test-c0b17520/input/us-east1/test_data.jsonl"
+            ]
+          }
+        },
+        "outputConfig": {
+          "predictionsFormat": "jsonl",
+          "gcsDestination": {
+            "outputUriPrefix": "gs://c7n-vertex-batch-test-c0b17520/output/us-east1/"
+          }
+        },
+        "dedicatedResources": {
+          "machineSpec": {
+            "machineType": "n1-standard-2"
+          },
+          "startingReplicaCount": 1
+        },
+        "manualBatchTuningParameters": {},
+        "state": "JOB_STATE_CANCELLED",
+        "error": {
+          "code": 1,
+          "message": "CANCELED"
+        },
+        "createTime": "2026-02-25T00:25:38.141452Z",
+        "startTime": "2026-02-25T00:25:38.184118Z",
+        "endTime": "2026-02-25T00:28:19.675313Z",
+        "updateTime": "2026-02-25T00:28:19.675313Z",
+        "modelVersionId": "1"
+      }
+    ]
+  }
+}

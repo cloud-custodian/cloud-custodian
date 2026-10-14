@@ -1,0 +1,125 @@
+{
+  "headers": {
+    "content-type": "application/json; charset=UTF-8",
+    "x-guploader-uploadid": "AJRbA5XmebBR3ALnGzioWwobSuLZrcwuAaOzgbbUXT1jd1FR7JQ_yioNQi0xLbRlLkH-Gs640nhAG9bMvNV3mg",
+    "etag": "CAM=",
+    "date": "Fri, 06 Feb 2026 15:15:47 GMT",
+    "vary": "Origin, X-Origin",
+    "cache-control": "no-cache, no-store, max-age=0, must-revalidate",
+    "expires": "Mon, 01 Jan 1990 00:00:00 GMT",
+    "pragma": "no-cache",
+    "content-length": "3017",
+    "server": "UploadServer",
+    "alt-svc": "h3=\":443\"; ma=2592000,h3-29=\":443\"; ma=2592000",
+    "status": "200"
+  },
+  "body": {
+    "kind": "storage#bucket",
+    "selfLink": "https://www.googleapis.com/storage/v1/b/c7n-bucket",
+    "id": "c7n-bucket",
+    "name": "c7n-bucket",
+    "projectNumber": "000000000000",
+    "generation": "1770390779058662020",
+    "metageneration": "3",
+    "location": "US",
+    "storageClass": "STANDARD",
+    "etag": "CAM=",
+    "timeCreated": "2026-02-06T15:12:59.596Z",
+    "updated": "2026-02-06T15:15:47.537Z",
+    "acl": [
+      {
+        "kind": "storage#bucketAccessControl",
+        "id": "c7n-bucket/project-owners-000000000000",
+        "selfLink": "https://www.googleapis.com/storage/v1/b/c7n-bucket/acl/project-owners-000000000000",
+        "bucket": "c7n-bucket",
+        "entity": "project-owners-000000000000",
+        "role": "OWNER",
+        "etag": "CAM=",
+        "projectTeam": {
+          "projectNumber": "000000000000",
+          "team": "owners"
+        }
+      },
+      {
+        "kind": "storage#bucketAccessControl",
+        "id": "c7n-bucket/project-editors-000000000000",
+        "selfLink": "https://www.googleapis.com/storage/v1/b/c7n-bucket/acl/project-editors-000000000000",
+        "bucket": "c7n-bucket",
+        "entity": "project-editors-000000000000",
+        "role": "OWNER",
+        "etag": "CAM=",
+        "projectTeam": {
+          "projectNumber": "000000000000",
+          "team": "editors"
+        }
+      },
+      {
+        "kind": "storage#bucketAccessControl",
+        "id": "c7n-bucket/project-viewers-000000000000",
+        "selfLink": "https://www.googleapis.com/storage/v1/b/c7n-bucket/acl/project-viewers-000000000000",
+        "bucket": "c7n-bucket",
+        "entity": "project-viewers-000000000000",
+        "role": "READER",
+        "etag": "CAM=",
+        "projectTeam": {
+          "projectNumber": "000000000000",
+          "team": "viewers"
+        }
+      }
+    ],
+    "defaultObjectAcl": [
+      {
+        "kind": "storage#objectAccessControl",
+        "entity": "project-owners-000000000000",
+        "role": "OWNER",
+        "etag": "CAM=",
+        "projectTeam": {
+          "projectNumber": "000000000000",
+          "team": "owners"
+        }
+      },
+      {
+        "kind": "storage#objectAccessControl",
+        "entity": "project-editors-000000000000",
+        "role": "OWNER",
+        "etag": "CAM=",
+        "projectTeam": {
+          "projectNumber": "000000000000",
+          "team": "editors"
+        }
+      },
+      {
+        "kind": "storage#objectAccessControl",
+        "entity": "project-viewers-000000000000",
+        "role": "READER",
+        "etag": "CAM=",
+        "projectTeam": {
+          "projectNumber": "000000000000",
+          "team": "viewers"
+        }
+      }
+    ],
+    "owner": {
+      "entity": "project-owners-000000000000"
+    },
+    "labels": {
+      "env": "not-the-default",
+      "goog-terraform-provisioned": "true"
+    },
+    "softDeletePolicy": {
+      "retentionDurationSeconds": "604800",
+      "effectiveTime": "2026-02-06T15:12:59.596Z"
+    },
+    "iamConfiguration": {
+      "bucketPolicyOnly": {
+        "enabled": false
+      },
+      "uniformBucketLevelAccess": {
+        "enabled": false
+      },
+      "publicAccessPrevention": "inherited"
+    },
+    "locationType": "multi-region",
+    "rpo": "DEFAULT"
+  }
+}

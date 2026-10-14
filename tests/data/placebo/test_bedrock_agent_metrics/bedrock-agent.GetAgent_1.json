@@ -1,0 +1,36 @@
+{
+    "status_code": 200,
+    "data": {
+        "ResponseMetadata": {},
+        "agent": {
+            "agentId": "D9WNPBVRUQ",
+            "agentName": "agent-quick-start-zqz14",
+            "agentArn": "arn:aws:bedrock:us-east-2:644160558196:agent/D9WNPBVRUQ",
+            "clientToken": "30ed3234-14a2-4127-9404-78b9a01ddeaf",
+            "agentStatus": "NOT_PREPARED",
+            "orchestrationType": "DEFAULT",
+            "idleSessionTTLInSeconds": 600,
+            "createdAt": {
+                "__class__": "datetime",
+                "year": 2026,
+                "month": 6,
+                "day": 9,
+                "hour": 18,
+                "minute": 55,
+                "second": 55,
+                "microsecond": 79269
+            },
+            "updatedAt": {
+                "__class__": "datetime",
+                "year": 2026,
+                "month": 6,
+                "day": 9,
+                "hour": 18,
+                "minute": 55,
+                "second": 55,
+                "microsecond": 776940
+            },
+            "agentCollaboration": "DISABLED"
+        }
+    }
+}

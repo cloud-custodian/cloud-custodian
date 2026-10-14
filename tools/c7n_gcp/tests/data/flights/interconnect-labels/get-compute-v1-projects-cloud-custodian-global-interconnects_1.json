@@ -1,0 +1,13 @@
+{
+    "headers": {},
+    "body": {
+        "items": [
+            {
+                "name": "my-interconnect",
+                "selfLink": "https://compute.googleapis.com/compute/v1/projects/cloud-custodian/global/interconnects/my-interconnect",
+                "labelFingerprint": "old",
+                "labels": {"env": "default"}
+            }
+        ]
+    }
+}

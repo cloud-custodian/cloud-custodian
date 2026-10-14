@@ -14,7 +14,7 @@ from unittest import mock
 from unittest import TestCase
 
 from contextlib import suppress
-from botocore.exceptions import ClientError
+from botocore.exceptions import ClientError, ConnectTimeoutError, EndpointConnectionError
 from dateutil.tz import tzutc
 import pytest
 from pytest_terraform import terraform
@@ -122,6 +122,48 @@ def test_s3_assembly_detect_denied(test):
     assert assembly.detect_augment_fields() == [
         'Location', 'Tags', 'Policy', 'Acl', 'Replication', 'Versioning', 'Website',
         'Logging', 'Notification', 'Lifecycle']
+
+
+def test_s3_assembly_connect_timeout(test):
+    # A bucket whose regional endpoint hangs shouldn't abort assembly of
+    # the other fields/buckets - warn and move on (c7n#10859).
+    policy = test.load_policy({'name': 's3-attrs', 'resource': 's3'})
+    assembly = s3.BucketAssembly(policy.resource_manager)
+    assembly.initialize()
+
+    client = mock.MagicMock()
+    client.meta.region_name = assembly.default_region
+    client.get_bucket_location.side_effect = ConnectTimeoutError(endpoint_url='x')
+    assembly.region_clients[assembly.default_region] = client
+
+    log_mock = mock.MagicMock()
+    test.patch(s3, 'log', log_mock)
+
+    bucket = assembly.assemble({'Name': 'zombie-bucket'})
+    assert bucket['Name'] == 'zombie-bucket'
+    assert 'Location' not in bucket
+    log_mock.warning.assert_called_once_with(
+        "Bucket: %s unable to invoke method: %s error: %s ",
+        'zombie-bucket', 'get_bucket_location', mock.ANY)
+
+
+def test_s3_assembly_endpoint_connection_error(test):
+    # An unreachable bucket endpoint (degraded region, or a bucket deleted
+    # between list_buckets and augment) shouldn't abort assembly of the
+    # rest of the account - warn and move on, same as a connect timeout,
+    # rather than assuming not-found and fabricating a default (c7n#10859).
+    policy = test.load_policy({'name': 's3-attrs', 'resource': 's3'})
+    assembly = s3.BucketAssembly(policy.resource_manager)
+    assembly.initialize()
+
+    client = mock.MagicMock()
+    client.meta.region_name = assembly.default_region
+    client.get_bucket_location.side_effect = EndpointConnectionError(endpoint_url='x')
+    assembly.region_clients[assembly.default_region] = client
+
+    bucket = assembly.assemble({'Name': 'deleted-bucket'})
+    assert bucket['Name'] == 'deleted-bucket'
+    assert 'Location' not in bucket
 
 
 def test_s3_express(test):
@@ -2692,6 +2734,181 @@ class S3Test(BaseTest):
         resources = p.run()
         self.assertEqual(len(resources), 1)
         self.assertRaises(ClientError, client.get_bucket_policy, Bucket=bname)
+
+    def test_set_statements_remove_policy(self):
+        self.patch(
+            s3, "S3_AUGMENT_TABLE", [("get_bucket_policy", "Policy", None, "Policy")]
+        )
+        self.patch(s3.S3, "executor_factory", MainThreadExecutor)
+        self.patch(s3.SetPolicyStatement, "executor_factory", MainThreadExecutor)
+
+        session_factory = self.replay_flight_data("test_s3_remove_policy")
+        bname = "custodian-policy-test"
+        session = session_factory()
+        client = session.client("s3")
+        client.create_bucket(Bucket=bname)
+        client.put_bucket_policy(
+            Bucket=bname,
+            Policy=json.dumps(
+                {
+                    "Version": "2012-10-17",
+                    "Statement": [
+                        {
+                            "Sid": "Zebra",
+                            "Effect": "Deny",
+                            "Principal": "*",
+                            "Action": "s3:PutObject",
+                            "Resource": "arn:aws:s3:::%s/*" % bname,
+                            "Condition": {
+                                "StringNotEquals": {
+                                    "s3:x-amz-server-side-encryption": [
+                                        "AES256", "aws:kms"
+                                    ]
+                                }
+                            },
+                        }
+                    ],
+                }
+            ),
+        )
+        self.addCleanup(destroyBucket, client, bname)
+        p = self.load_policy(
+            {
+                "name": "remove-policy",
+                "resource": "s3",
+                "filters": [{"Name": bname}],
+                "actions": [
+                    {"type": "set-statements", "remove": ["Zebra", "Moon"]}
+                ],
+            },
+            session_factory=session_factory,
+        )
+        resources = p.run()
+        self.assertEqual(len(resources), 1)
+        self.assertRaises(ClientError, client.get_bucket_policy, Bucket=bname)
+
+    def test_set_statements_remove_policy_matched(self):
+        self.patch(
+            s3, "S3_AUGMENT_TABLE", [("get_bucket_policy", "Policy", None, "Policy")]
+        )
+        self.patch(s3.S3, "executor_factory", MainThreadExecutor)
+        self.patch(s3.SetPolicyStatement, "executor_factory", MainThreadExecutor)
+        self.patch(MainThreadExecutor, "c7n_async", False)
+
+        bname = "custodian-policy-test"
+        statement = {
+            "Sid": "Zebra",
+            "Effect": "Deny",
+            "Principal": "*",
+            "Action": "s3:PutObject",
+            "Resource": "arn:aws:s3:::%s/*" % bname,
+            "Condition": {
+                "StringNotEquals": {
+                    "s3:x-amz-server-side-encryption": ["AES256", "aws:kms"]
+                }
+            },
+        }
+
+        process_buckets = s3.SetPolicyStatement.process
+
+        def enrich(self, buckets):
+            buckets[0]["CrossAccountViolations"] = [statement]
+            process_buckets(self, buckets)
+
+        self.patch(s3.SetPolicyStatement, "process", enrich)
+
+        session_factory = self.replay_flight_data("test_s3_remove_policy")
+        session = session_factory()
+        client = session.client("s3")
+        client.create_bucket(Bucket=bname)
+        client.put_bucket_policy(
+            Bucket=bname,
+            Policy=json.dumps({"Version": "2012-10-17", "Statement": [statement]}),
+        )
+        self.addCleanup(destroyBucket, client, bname)
+        p = self.load_policy(
+            {
+                "name": "remove-policy",
+                "resource": "s3",
+                "filters": [{"Name": bname}],
+                "actions": [{"type": "set-statements", "remove": "matched"}],
+            },
+            session_factory=session_factory,
+        )
+        resources = p.run()
+        self.assertEqual(len(resources), 1)
+        self.assertRaises(ClientError, client.get_bucket_policy, Bucket=bname)
+
+    def test_set_statements_add_remove_policy(self):
+        sid = "CustodianTest"
+        self.patch(
+            s3, "S3_AUGMENT_TABLE", [("get_bucket_policy", "Policy", None, "Policy")]
+        )
+        self.patch(s3.S3, "executor_factory", MainThreadExecutor)
+        self.patch(s3.SetPolicyStatement, "executor_factory", MainThreadExecutor)
+
+        session_factory = self.replay_flight_data("test_s3_set_statements_add_remove")
+        bname = "custodian-policy-test"
+        session = session_factory()
+        client = session.client("s3")
+        client.create_bucket(Bucket=bname)
+        client.put_bucket_policy(
+            Bucket=bname,
+            Policy=json.dumps(
+                {
+                    "Version": "2012-10-17",
+                    "Statement": [
+                        {
+                            "Sid": "Zebra",
+                            "Effect": "Deny",
+                            "Principal": "*",
+                            "Action": "s3:PutObject",
+                            "Resource": "arn:aws:s3:::%s/*" % bname,
+                            "Condition": {
+                                "StringNotEquals": {
+                                    "s3:x-amz-server-side-encryption": [
+                                        "AES256", "aws:kms"
+                                    ]
+                                }
+                            },
+                        }
+                    ],
+                }
+            ),
+        )
+        self.addCleanup(destroyBucket, client, bname)
+        p = self.load_policy(
+            {
+                "name": "remove-policy",
+                "resource": "s3",
+                "filters": [{"Name": bname}],
+                "actions": [
+                    {"type": "set-statements", "remove": ["Zebra", "Moon"], "statements": [
+                            {
+                                "Sid": sid,
+                                "Effect": "Deny",
+                                "Action": "s3:GetObject",
+                                "Principal": {"AWS": "*"},
+                                "Resource": "arn:aws:s3:::{bucket_name}/*",
+                                "Condition": {"Bool": {"aws:SecureTransport": False}},
+                            }
+                        ], }
+                ],
+            },
+            session_factory=session_factory,
+        )
+        resources = p.run()
+        self.assertEqual(len(resources), 1)
+        # self.assertRaises(ClientError, client.get_bucket_policy, Bucket=bname)
+
+        policy = client.get_bucket_policy(Bucket=bname).get("Policy")
+        policy = json.loads(policy)
+
+        self.assertTrue(len(policy["Statement"]) == 1)
+        self.assertTrue(
+            len([s for s in policy["Statement"] if s["Sid"] == sid and
+                s["Resource"] == "arn:aws:s3:::%s/*" % (bname)]) == 1
+        )
 
     def test_attach_encrypt_requires_role(self):
         self.assertRaises(

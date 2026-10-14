@@ -2,9 +2,32 @@
 # Copyright The Cloud Custodian Authors.
 # SPDX-License-Identifier: Apache-2.0
 
+import typing
+
 from c7n import deprecated
 from c7n.executor import ThreadPoolExecutor
 from c7n.utils import jmespath_search
+
+
+class ElementJSONSchema(typing.TypedDict, total=False):
+    """The shape of a filter/action's ``schema`` class attribute.
+
+    This is a JSON Schema (draft-07) fragment, not a standalone
+    document: it gets embedded into the combined policy schema (see
+    ``c7n.schema.process_resource``) at
+    ``#/definitions/resources/<resource>/(actions|filters)/<name>``,
+    and is what validates a single filter/action block in policy
+    YAML, e.g. ``{'type': 'update', 'rotationPeriod': '...'}``.
+
+    Elements normally build this via the ``type_schema()`` helper
+    (``c7n.utils.type_schema``) rather than writing it by hand.
+    """
+
+    type: str
+    properties: dict[str, typing.Any]
+    required: list[str]
+    additionalProperties: bool
+    allOf: list[dict[str, typing.Any]]
 
 
 class Element:
@@ -16,7 +39,8 @@ class Element:
 
     executor_factory = ThreadPoolExecutor
 
-    schema = {'type': 'object'}
+    schema: ElementJSONSchema = {'type': 'object'}
+
     # schema aliases get hoisted into a jsonschema definition
     # location, and then referenced inline.
     schema_alias = None
@@ -43,9 +67,15 @@ class Element:
         search_expr = key_expr
         if not search_expr.startswith('[].'):
             search_expr = '[].' + key_expr
-        results = [r for value, r in zip(
-            jmespath_search(search_expr, resources), resources)
-            if value in allowed_values]
+        # Evaluate per-resource so absent keys resolve to None correctly.
+        # Bulk jmespath [] projection silently drops null/absent values, causing
+        # zip to misalign and filter out resources whose key is missing entirely.
+        results = []
+        for r in resources:
+            values = jmespath_search(search_expr, [r])
+            value = values[0] if values else None
+            if value in allowed_values:
+                results.append(r)
         if resource_count != len(results):
             self.log.warning(
                 "%s implicitly filtered %d of %d resources key:%s on %s",

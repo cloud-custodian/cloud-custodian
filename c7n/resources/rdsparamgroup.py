@@ -6,10 +6,10 @@ import itertools
 from botocore.exceptions import ClientError
 
 from c7n.actions import ActionRegistry, BaseAction
-from c7n.filters import FilterRegistry, ValueFilter
+from c7n.filters import FilterRegistry, ValueFilter, Filter
 from c7n.manager import resources
 from c7n.query import QueryResourceManager, TypeInfo
-from c7n.utils import (type_schema, local_session, chunks)
+from c7n.utils import (type_schema, local_session, chunks, jmespath_search)
 from c7n.tags import universal_augment
 from c7n.resources.rds import ParameterFilter
 
@@ -167,6 +167,68 @@ class PGClusterParameterFilter(PGClusterMixin, ParameterGroupFilter):
             for p in paginator.paginate(DBClusterParameterGroupName=pg)]))
 
         return param_list
+
+
+@pg_filters.register('unused')
+class UnusedRDSDBParameterGroup(Filter):
+    """Filters RDS parameter groups that are not associated with any DB instance.
+
+    :example:
+
+    .. code-block:: yaml
+
+            policies:
+              - name: rds-param-group-unused
+                resource: rds-param-group
+                filters:
+                  - unused
+    """
+
+    schema = type_schema('unused')
+
+    def get_permissions(self):
+        return self.manager.get_resource_manager('rds').get_permissions()
+
+    def process(self, resources, event=None):
+        rds = self.manager.get_resource_manager('rds').resources()
+        names = jmespath_search(
+            '[].DBParameterGroups[].DBParameterGroupName', rds)
+        self.used = set(n for n in (names or []) if n)
+        return super().process(resources, event)
+
+    def __call__(self, resource):
+        return resource['DBParameterGroupName'] not in self.used
+
+
+@pg_cluster_filters.register('unused')
+class UnusedRDSClusterParameterGroup(Filter):
+    """Filters RDS cluster parameter groups not associated with any DB cluster.
+
+    :example:
+
+    .. code-block:: yaml
+
+            policies:
+              - name: rds-cluster-param-group-unused
+                resource: rds-cluster-param-group
+                filters:
+                  - unused
+    """
+
+    schema = type_schema('unused')
+
+    def get_permissions(self):
+        return self.manager.get_resource_manager('rds-cluster').get_permissions()
+
+    def process(self, resources, event=None):
+        clusters = self.manager.get_resource_manager(
+            'rds-cluster').resources(augment=False)
+        names = jmespath_search('[].DBClusterParameterGroup', clusters)
+        self.used = set(n for n in (names or []) if n)
+        return super().process(resources, event)
+
+    def __call__(self, resource):
+        return resource['DBClusterParameterGroupName'] not in self.used
 
 
 class Copy(BaseAction):

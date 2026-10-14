@@ -22,6 +22,7 @@ from dateutil import tz as tzutil
 import c7n.filters.backup
 
 from .common import BaseTest, event_data
+from pytest_terraform import terraform
 
 logger = logging.getLogger(name="c7n.tests")
 
@@ -564,6 +565,14 @@ class RDSTest(BaseTest):
             "DBInstanceStatus": "available",
             "Engine": "mysql",
             "ReadReplicaSourceDBInstanceIdentifier": "sbbdev",
+        }
+        self.assertFalse(rds._eligible_start_stop(resource))
+
+        resource = {
+            "DBInstanceIdentifier": "ABC",
+            "DBInstanceStatus": "available",
+            "Engine": "mysql",
+            "DBClusterIdentifier": "my-aurora-cluster",
         }
         self.assertFalse(rds._eligible_start_stop(resource))
 
@@ -2251,3 +2260,79 @@ class RDSProxy(BaseTest):
         resources = p.run()
         self.assertEqual(len(resources), 1)
         self.assertEqual(resources[0]["DBProxyName"], "proxy-test-1")
+
+
+@terraform('rds_delete_aurora_filter')
+def test_rds_delete_logs_aurora_filter(test, rds_delete_aurora_filter):
+    session_factory = test.replay_flight_data('test_rds_delete_aurora_filter')
+
+    output = test.capture_logging('custodian.actions', level=logging.WARNING)
+
+    p = test.load_policy(
+        {
+            'name': 'rds-delete-aurora',
+            'resource': 'rds',
+            'filters': [
+                {'DBInstanceIdentifier': 'aurora-test-instance'}
+            ],
+            'actions': [
+                {'type': 'delete', 'skip-snapshot': True}
+            ],
+        },
+        session_factory=session_factory
+    )
+
+    p.run()
+
+    log_text = output.getvalue()
+    test.assertEqual(
+        log_text.strip(),
+        'delete implicitly filtered 0 of 1 resources key:DBClusterIdentifier on None',
+    )
+
+
+@terraform("rds_recommendations")
+def test_rds_recommendations(test, rds_recommendations):
+    """
+    There's no way to ensure that an RDS database has recommendations via terraform config.
+    For this test, the DB recommendation response structure was pulled directly from the CLI docs:
+    https://docs.aws.amazon.com/cli/latest/reference/rds/describe-db-recommendations.html#examples
+    Only the RecommendationId and Status fields were modified.
+
+    There are three recommendations in the response:
+    - One that does not match the database
+    - One that matches the database but is not active
+    - One that matches the database and is active
+    """
+
+    session_factory = test.replay_flight_data("test_rds_recommendations")
+    policy = test.load_policy(
+        {
+            "name": "rds-recommendations",
+            "resource": "rds",
+            "filters": [
+                {
+                    "type": "recommendations",
+                    "key": "Status",
+                    "value": "active",
+                }
+            ],
+        },
+        session_factory=session_factory,
+    )
+
+    resources = policy.run()
+    test.assertEqual(len(resources), 1)  # Sanity check
+
+    # Should be the two recommendations that match the database.
+    test.assertEqual(
+        {r["RecommendationId"] for r in resources[0]["c7n:db-recommendations"]},
+        {'matches-db-resolved', 'matches-db-active'}
+    )
+
+    # Should be the one recommendation that matches the db AND is active (matches the filters).
+    test.assertEqual(len(resources[0]["c7n:matched-db-recommendations"]), 1)
+    test.assertEqual(
+        resources[0]["c7n:matched-db-recommendations"][0]["RecommendationId"],
+        "matches-db-active",
+    )

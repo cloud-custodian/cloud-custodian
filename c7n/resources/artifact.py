@@ -13,7 +13,7 @@ class ArtifactDomain(QueryResourceManager):
         service = 'codeartifact'
         enum_spec = ('list_domains', 'domains', None)
         detail_spec = ('describe_domain', 'domain', 'name', 'domain')
-        cfn_type = 'AWS::CodeArtifact::Domain'
+        cfn_type = config_type = 'AWS::CodeArtifact::Domain'
         id = name = 'name'
         arn = 'arn'
         permissions_augment = ("codeartifact:ListTagsForResource",)

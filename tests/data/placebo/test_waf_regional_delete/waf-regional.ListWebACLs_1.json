@@ -1,0 +1,16 @@
+{
+    "status_code": 200,
+    "data": {
+        "ResponseMetadata": {
+            "RetryAttempts": 0,
+            "HTTPStatusCode": 200,
+            "RequestId": "test-list-webacls-regional-001"
+        },
+        "WebACLs": [
+            {
+                "WebACLId": "bbb22222-1234-5678-abcd-111111111111",
+                "Name": "FMManagedWebACLregional-test"
+            }
+        ]
+    }
+}

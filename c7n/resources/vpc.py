@@ -886,6 +886,19 @@ class ConfigSG(query.ConfigSource):
         return r
 
 
+class DescribeSecurityGroups(query.DescribeSource):
+
+    def resources(self, query):
+        # Without MaxResults, DescribeSecurityGroups returns every group in the
+        # region in one response, which does not scale to large accounts.
+        # Paging here rather than in the manager keeps the cache key unchanged
+        # and leaves by-id lookups alone since EC2 rejects MaxResults alongside
+        # GroupIds.
+        query = dict(query or {})
+        query.setdefault('MaxResults', 1000)
+        return super().resources(query)
+
+
 @resources.register('security-group')
 class SecurityGroup(query.QueryResourceManager):
 
@@ -902,7 +915,7 @@ class SecurityGroup(query.QueryResourceManager):
 
     source_mapping = {
         'config': ConfigSG,
-        'describe': query.DescribeSource
+        'describe': DescribeSecurityGroups
     }
 
 
@@ -2820,6 +2833,19 @@ class VpcEndpoint(query.QueryResourceManager):
         cfn_type = config_type = "AWS::EC2::VPCEndpoint"
 
 
+@VpcEndpoint.action_registry.register('delete')
+class DeleteVpcEndpoint(BaseAction):
+
+    schema = type_schema('delete')
+    permissions = ('ec2:DeleteVpcEndpoints',)
+
+    def process(self, resources):
+        client = local_session(self.manager.session_factory).client('ec2')
+        for resource_set in chunks(resources, 25):
+            client.delete_vpc_endpoints(
+                VpcEndpointIds=[r['VpcEndpointId'] for r in resource_set])
+
+
 @VpcEndpoint.filter_registry.register('metrics')
 class VpcEndpointMetricsFilter(MetricsFilter):
 
@@ -2885,6 +2911,111 @@ class EndpointSubnetFilter(net_filters.SubnetFilter):
 class EndpointVpcFilter(net_filters.VpcFilter):
 
     RelatedIdsExpression = "VpcId"
+
+
+@VpcEndpoint.filter_registry.register('service-details')
+class EndpointServiceDetailsFilter(ValueFilter):
+    """Filter VPC Endpoints based on their associated endpoint service details.
+
+    :example:
+
+    .. code-block:: yaml
+
+      policies:
+        - name: vpc-endpoints-has-policy-support
+          resource: aws.vpc-endpoint
+          filters:
+            - type: service-details
+              key: VpcEndpointPolicySupported
+              value: true
+    """
+
+    annotation_key = "c7n:ServiceDetails"
+    schema = type_schema(
+        "service-details",
+        rinherit=ValueFilter.schema
+    )
+    permissions = ("ec2:DescribeVpcEndpointServices",)
+
+    def process(self, resources, event=None):
+        client = local_session(self.manager.session_factory).client("ec2")
+        current_region = self.manager.config.region
+
+        # Group unique service names by ServiceRegion, which is set directly on
+        # each endpoint and correctly identifies cross-region endpoints without
+        # any string parsing. Falls back to current region for older endpoints
+        # that pre-date the ServiceRegion field.
+        regional_groups = {}
+        for r in resources:
+            region = r.get("ServiceRegion", current_region)
+            regional_groups.setdefault(region, set()).add(r["ServiceName"])
+
+        service_map = self._describe_services(client, regional_groups, current_region)
+
+        results = []
+        for resource in resources:
+            service_detail = service_map.get(resource["ServiceName"], {})
+            resource[self.annotation_key] = service_detail or {}
+
+            if self.match(resource[self.annotation_key]):
+                results.append(resource)
+
+        return results
+
+    def _describe_services(self, client, regional_groups, current_region):
+        cache = self.manager._cache
+        cache_key = {
+            "account": self.manager.config.account_id,
+            "region": current_region,
+            "ServiceRegions": [
+                (region, sorted(names))
+                for region, names in sorted(regional_groups.items())
+            ],
+        }
+
+        with cache:
+            cached = cache.get(cache_key)
+            if cached is not None:
+                return cached
+
+            service_map = {}
+            for region, names in regional_groups.items():
+                # Cross-region endpoints must be described using a client for
+                # the service's region; using the wrong regional client returns
+                # InvalidServiceName.
+                regional_client = (
+                    client
+                    if region == current_region
+                    else self.manager.session_factory(region=region).client('ec2')
+                )
+                sorted_names = sorted(names)
+                try:
+                    # Query all services in this region in one batch first.
+                    resp = regional_client.describe_vpc_endpoint_services(
+                        ServiceNames=sorted_names)
+                    for d in resp.get("ServiceDetails", []):
+                        service_map[d["ServiceName"]] = d
+                except ClientError as e:
+                    if e.response["Error"]["Code"] != "InvalidServiceName":
+                        raise
+                    for name in sorted_names:
+                        try:
+                            # If the batch fails, query each service individually
+                            # to isolate and skip invalid service names.
+                            resp = regional_client.describe_vpc_endpoint_services(
+                                ServiceNames=[name])
+                            for d in resp.get("ServiceDetails", []):
+                                service_map[d["ServiceName"]] = d
+                        except ClientError as e:
+                            if e.response["Error"]["Code"] != "InvalidServiceName":
+                                raise
+                            self.log.warning(
+                                "Error describing VPC endpoint service %s: %s",
+                                name, e
+                            )
+
+            cache.save(cache_key, service_map)
+            return service_map
 
 
 @Vpc.filter_registry.register("vpc-endpoint")
@@ -3463,9 +3594,25 @@ class CrossAZRouteTable(Filter):
             s['SubnetId']: s for s in
             self.manager.get_resource_manager('aws.subnet').resources()
         }
+        # Filter out Regional NAT Gateways which don't have SubnetId field
+        # Regional NAT Gateways span multiple AZs and cannot be evaluated for cross-AZ traffic
+        all_nat_gateways = self.manager.get_resource_manager('nat-gateway').resources()
+        zonal_nat_gateways = [n for n in all_nat_gateways if 'SubnetId' in n]
+        regional_nat_gateways = [n for n in all_nat_gateways if 'SubnetId' not in n]
+        if regional_nat_gateways:
+            nat_ids = [n['NatGatewayId'] for n in regional_nat_gateways]
+            nat_ids_display = ', '.join(nat_ids[:5])
+            if len(nat_ids) > 5:
+                nat_ids_display += f' (and {len(nat_ids) - 5} more)'
+            self.log.warning(
+                "%s excluding %d Regional NAT Gateway(s) without SubnetId "
+                "(cannot evaluate cross-AZ traffic for regional NAT gateways): %s",
+                self.type,
+                len(regional_nat_gateways),
+                nat_ids_display)
         nat_subnets = {
             nat_gateway['NatGatewayId']: nat_gateway["SubnetId"]
-            for nat_gateway in self.manager.get_resource_manager('nat-gateway').resources()}
+            for nat_gateway in zonal_nat_gateways}
 
         results = []
         self.annotate_subnets_table(resources, subnets)

@@ -1,0 +1,49 @@
+{
+    "status_code": 200,
+    "data": {
+        "ExportDescription": {
+            "ExportArn": "arn:aws:dynamodb:us-east-1:644160558196:table/test-export-description-filter/export/01771006983119-96b7127b",
+            "ExportStatus": "COMPLETED",
+            "StartTime": {
+                "__class__": "datetime",
+                "year": 2026,
+                "month": 2,
+                "day": 13,
+                "hour": 13,
+                "minute": 23,
+                "second": 3,
+                "microsecond": 119000
+            },
+            "EndTime": {
+                "__class__": "datetime",
+                "year": 2026,
+                "month": 2,
+                "day": 13,
+                "hour": 13,
+                "minute": 27,
+                "second": 47,
+                "microsecond": 979000
+            },
+            "ExportManifest": "AWSDynamoDB/01771006983119-96b7127b/manifest-summary.json",
+            "TableArn": "arn:aws:dynamodb:us-east-1:644160558196:table/test-export-description-filter",
+            "TableId": "b9edda4f-dec1-46b2-8dab-b232db7cd965",
+            "ExportTime": {
+                "__class__": "datetime",
+                "year": 2026,
+                "month": 2,
+                "day": 13,
+                "hour": 13,
+                "minute": 23,
+                "second": 3,
+                "microsecond": 119000
+            },
+            "ClientToken": "83b71623-4093-412f-9d07-18103a5380bb",
+            "S3Bucket": "apogeeswbucket",
+            "S3SseAlgorithm": "AES256",
+            "ExportFormat": "DYNAMODB_JSON",
+            "BilledSizeBytes": 0,
+            "ItemCount": 0
+        },
+        "ResponseMetadata": {}
+    }
+}

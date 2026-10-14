@@ -1,0 +1,29 @@
+{
+    "status_code": 200,
+    "data": {
+        "ResponseMetadata": {},
+        "modelSummaries": [
+            {
+                "modelArn": "arn:aws:bedrock:us-east-1::foundation-model/nvidia.nemotron-nano-12b-v2",
+                "modelId": "nvidia.nemotron-nano-12b-v2",
+                "modelName": "NVIDIA Nemotron Nano 12B v2 VL BF16",
+                "providerName": "NVIDIA",
+                "inputModalities": [
+                    "TEXT",
+                    "IMAGE"
+                ],
+                "outputModalities": [
+                    "TEXT"
+                ],
+                "responseStreamingSupported": true,
+                "customizationsSupported": [],
+                "inferenceTypesSupported": [
+                    "ON_DEMAND"
+                ],
+                "modelLifecycle": {
+                    "status": "ACTIVE"
+                }
+            }
+        ]
+    }
+}

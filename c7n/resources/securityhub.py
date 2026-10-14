@@ -11,7 +11,7 @@ import sys
 
 from c7n import deprecated, query
 from c7n.actions import Action
-from c7n.filters import Filter
+from c7n.filters import Filter, ValueFilter
 from c7n.manager import resources
 from c7n.query import DescribeSource
 from c7n.exceptions import PolicyValidationError, PolicyExecutionError
@@ -321,6 +321,27 @@ FindingTypes = {
 
 # Mostly undocumented value size limit
 SECHUB_VALUE_SIZE_LIMIT = 1024
+
+# Appended to a detail value cut down to SECHUB_VALUE_SIZE_LIMIT, so that
+# someone reading the finding can tell the value was cut.
+SECHUB_TRUNCATION_MARKER = '...'
+
+
+def truncate_value(value):
+    """Cap a finding detail value to the Security Hub per-value size limit.
+
+    Security Hub rejects the whole finding if any detail value is over the
+    limit, so an oversize value is cut short and marked as such rather than
+    costing the caller the finding.
+
+    The limit is inclusive. The service rejects with "should NOT be longer
+    than 1024 characters", so a value of exactly that length is accepted;
+    the user guide's "fewer than 1,024" is looser than what is enforced.
+    """
+    if len(value) <= SECHUB_VALUE_SIZE_LIMIT:
+        return value
+    keep = SECHUB_VALUE_SIZE_LIMIT - len(SECHUB_TRUNCATION_MARKER)
+    return value[:keep] + SECHUB_TRUNCATION_MARKER
 
 
 class PostFinding(Action):
@@ -651,9 +672,9 @@ class OtherResourcePostFinding(PostFinding):
                 v = dumps(v)
             elif isinstance(v, (int, float, bool)):
                 v = str(v)
-            else:
+            elif not isinstance(v, str):
                 continue
-            details[k] = v[:SECHUB_VALUE_SIZE_LIMIT]
+            details[k] = truncate_value(v)
 
         details['c7n:resource-type'] = self.manager.type
         other = {
@@ -719,6 +740,82 @@ class DescribeSecurityhubFinding(DescribeSource):
         )
 
         return super().resources(query=query)
+
+
+class DescribeSecurityHub(DescribeSource):
+    def get_hub(self):
+        client = local_session(self.manager.session_factory).client('securityhub')
+        try:
+            hub = client.describe_hub()
+        except client.exceptions.InvalidAccessException:
+            return None
+        hub.pop('ResponseMetadata', None)
+        return hub
+
+    def resources(self, query=None):
+        hub = self.get_hub()
+        return [hub] if hub else []
+
+
+@resources.register("security-hub")
+class SecurityHub(query.QueryResourceManager):
+    """AWS Security Hub configuration for the current account and region.
+
+    :example:
+
+    .. code-block:: yaml
+
+        policies:
+          - name: securityhub-auto-enable-controls-disabled
+            resource: aws.security-hub
+            filters:
+              - AutoEnableControls: false
+    """
+
+    class resource_type(query.TypeInfo):
+        service = "securityhub"
+        arn = id = "HubArn"
+        name = "HubArn"
+        arn_type = "hub"
+        cfn_type = "AWS::SecurityHub::Hub"
+        permissions_enum = ("securityhub:DescribeHub",)
+
+    source_mapping = {"describe": DescribeSecurityHub}
+
+
+@SecurityHub.filter_registry.register('master')
+class HubMasterFilter(ValueFilter):
+    """Filter Security Hub by master account details.
+
+    :example:
+
+    .. code-block:: yaml
+
+        policies:
+          - name: securityhub-master-account
+            resource: aws.security-hub
+            filters:
+              - type: master
+                key: AccountId
+                value: '111111111111'
+    """
+
+    schema = type_schema('master', rinherit=ValueFilter.schema)
+    permissions = ('securityhub:GetMasterAccount',)
+    annotation_key = 'c7n:Master'
+
+    def process(self, resources, event=None):
+        client = local_session(self.manager.session_factory).client('securityhub')
+        results = []
+        for r in resources:
+            if self.annotation_key not in r:
+                try:
+                    r[self.annotation_key] = client.get_master_account().get('Master', {})
+                except client.exceptions.ResourceNotFoundException:
+                    r[self.annotation_key] = {}
+            if self.match(r[self.annotation_key]):
+                results.append(r)
+        return results
 
 
 @resources.register("securityhub-finding")

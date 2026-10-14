@@ -33,6 +33,32 @@ class TestGCPMetricsFilter(BaseTest):
         metric = resources[0]['c7n.metrics'][metric_name]
         self.assertGreater(.1, metric['points'][0]['value']['doubleValue'])
 
+    def test_metrics_with_metric_key_as_instance_id(self):
+
+        session_factory = self.replay_flight_data("filter-metrics-with-metric-key-as-instance-id")
+
+        p = self.load_policy(
+            {
+                "name": "test-metrics",
+                "resource": "gcp.instance",
+                "filters": [
+                    {'type': 'metrics',
+                    'name': 'compute.googleapis.com/instance/cpu/utilization',
+                    'metric-key': 'resource.labels.instance_id',
+                    'aligner': 'ALIGN_MEAN',
+                    'days': 14,
+                    'value': .1,
+                    'filter': ' resource.labels.zone = "us-east4-c"',
+                    'op': 'less-than'}],
+            },
+            session_factory=session_factory,
+        )
+        resources = p.run()
+        self.assertEqual(len(resources), 1)
+        metric_name = 'compute.googleapis.com/instance/cpu/utilization.ALIGN_MEAN.REDUCE_NONE'
+        metric = resources[0]['c7n.metrics'][metric_name]
+        self.assertGreater(.1, metric['points'][0]['value']['doubleValue'])
+
     def test_metrics_resource_regex(self):
 
         session_factory = self.replay_flight_data("filter-metrics")
@@ -81,6 +107,67 @@ class TestGCPMetricsFilter(BaseTest):
         )
         resources = p.run()
         self.assertEqual(len(resources), 0)
+
+    def test_missing_value_zero_resource_has_no_metric(self):
+        # metric-key doesn't match any label on the returned time series, so
+        # this resource has no metric even though the batch's API response
+        # wasn't empty. missing-value must still be applied per-resource.
+        session_factory = self.replay_flight_data("filter-metrics")
+
+        p = self.load_policy(
+            {
+                "name": "test-metrics",
+                "resource": "gcp.instance",
+                "filters": [
+                    {'type': 'metrics',
+                    'name': 'compute.googleapis.com/instance/cpu/utilization',
+                    'metric-key': 'metric.labels.nonexistent',
+                    'aligner': 'ALIGN_MEAN',
+                    'days': 14,
+                    'value': 1,
+                    # 0 is falsy: the bug treated it the same as missing,
+                    # dropping the resource instead of applying it.
+                    'missing-value': 0,
+                    'filter': ' resource.labels.zone = "us-east4-c"',
+                    'op': 'less-than'}],
+            },
+            session_factory=session_factory,
+        )
+        resources = p.run()
+        self.assertEqual(len(resources), 1)
+
+    def test_missing_value_batch_has_no_metrics(self):
+        # No time series data at all is returned for the batch, so
+        # missing-value must still be applied per-resource instead of
+        # short-circuiting the whole batch to no matches. missing-value is
+        # non-zero here to isolate this from the missing-value: 0 fix above:
+        # this test should fail solely because of the early return on an
+        # empty batch, not because of the falsy-zero check.
+        session_factory = self.replay_flight_data("filter-no-metrics")
+
+        p = self.load_policy(
+            {
+                "name": "test-metrics",
+                "resource": "gcp.instance",
+                "filters": [
+                    {'type': 'metrics',
+                    'name': 'compute.googleapis.com/instance/cpu/utilization',
+                    'metric-key': 'metric.labels.instance_name',
+                    'aligner': 'ALIGN_MEAN',
+                    'days': 14,
+                    'value': -1,
+                    'missing-value': -1,
+                    # Recorded flight data has this instance in zone
+                    # us-east4-c, so filtering on us-east4-d matches nothing:
+                    # the API response has no timeSeries at all, and
+                    # time_series_data defaults to [].
+                    'filter': ' resource.labels.zone = "us-east4-d"',
+                    'op': 'equal'}],
+            },
+            session_factory=session_factory,
+        )
+        resources = p.run()
+        self.assertEqual(len(resources), 1)
 
     def test_batch_resources(self):
         policy = self.load_policy({
@@ -131,6 +218,58 @@ class TestGCPMetricsFilter(BaseTest):
         resources = p.run()
         # This should be filtering out the resource, & not erroring..
         self.assertEqual(len(resources), 0)
+
+    def test_metrics_period_start_start_of_day(self):
+        """
+        Ensure GCPMetricsFilter correctly snaps the metric window to full UTC
+        calendar days when 'period-start' is set to "start-of-day".
+
+        This verifies:
+        - start aligns to 00:00:00 UTC N days ago
+        - end aligns to 00:00:00 UTC of the current day
+        - period equals the exact difference between start and end
+        """
+
+        policy = self.load_policy(
+            {
+                "name": "gcp-period-start-test",
+                "resource": "gcp.instance",
+                "filters": [
+                    {
+                        "type": "metrics",
+                        "name": "compute.googleapis.com/instance/cpu/utilization",
+                        "metric-key": "metric.labels.instance_name",
+                        "aligner": "ALIGN_MEAN",
+                        "days": 2,
+                        "period-start": "start-of-day",
+                        "value": 0.1,
+                        "filter": 'resource.labels.zone = "us-east4-c"',
+                        "op": "less-than",
+                    }
+                ],
+            },
+        )
+
+        metrics_filter = policy.resource_manager.filters[0]
+
+        metrics_filter.process([])
+
+        # Start should be midnight UTC
+        self.assertEqual(metrics_filter.start.hour, 0)
+        self.assertEqual(metrics_filter.start.minute, 0)
+        self.assertEqual(metrics_filter.start.second, 0)
+        self.assertEqual(metrics_filter.start.microsecond, 0)
+
+        # End should now be midnight UTC
+        self.assertEqual(metrics_filter.end.hour, 0)
+        self.assertEqual(metrics_filter.end.minute, 0)
+        self.assertEqual(metrics_filter.end.second, 0)
+        self.assertEqual(metrics_filter.end.microsecond, 0)
+
+        # Period should match the difference in seconds
+        expected_period = (metrics_filter.end - metrics_filter.start).total_seconds()
+        actual_period = float(metrics_filter.period.rstrip("s"))
+        self.assertEqual(actual_period, expected_period)
 
 
 class TestSecurityComandCenterFindingsFilter(BaseTest):

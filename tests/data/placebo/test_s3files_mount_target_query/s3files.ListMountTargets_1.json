@@ -1,0 +1,19 @@
+{
+    "status_code": 200,
+    "data": {
+        "ResponseMetadata": {},
+        "mountTargets": [
+            {
+                "availabilityZoneId": "use1-az6",
+                "fileSystemId": "fs-02d120d4ae6209b2d",
+                "ipv4Address": "172.31.21.134",
+                "status": "available",
+                "mountTargetId": "fsmt-0393184a229a68fb1",
+                "networkInterfaceId": "eni-0e83519e717aa2742",
+                "ownerId": "644160558196",
+                "subnetId": "subnet-efbcccb7",
+                "vpcId": "vpc-d2d616b5"
+            }
+        ]
+    }
+}

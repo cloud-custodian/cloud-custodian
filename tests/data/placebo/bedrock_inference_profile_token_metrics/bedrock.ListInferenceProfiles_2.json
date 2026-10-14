@@ -1,0 +1,47 @@
+{
+    "status_code": 200,
+    "data": {
+        "ResponseMetadata": {},
+        "inferenceProfileSummaries": [
+            {
+                "inferenceProfileName": "c7n-token-metrics-default-bf98",
+                "description": "Cloud Custodian combined token metrics test",
+                "createdAt": {
+                    "__class__": "datetime",
+                    "year": 2026,
+                    "month": 7,
+                    "day": 21,
+                    "hour": 19,
+                    "minute": 13,
+                    "second": 39,
+                    "microsecond": 417684
+                },
+                "updatedAt": {
+                    "__class__": "datetime",
+                    "year": 2026,
+                    "month": 7,
+                    "day": 21,
+                    "hour": 19,
+                    "minute": 13,
+                    "second": 39,
+                    "microsecond": 417684
+                },
+                "inferenceProfileArn": "arn:aws:bedrock:us-east-1:644160558196:application-inference-profile/06vsfs68yb4g",
+                "models": [
+                    {
+                        "modelArn": "arn:aws:bedrock:us-east-1::foundation-model/amazon.nova-lite-v1:0"
+                    },
+                    {
+                        "modelArn": "arn:aws:bedrock:us-west-2::foundation-model/amazon.nova-lite-v1:0"
+                    },
+                    {
+                        "modelArn": "arn:aws:bedrock:us-east-2::foundation-model/amazon.nova-lite-v1:0"
+                    }
+                ],
+                "inferenceProfileId": "06vsfs68yb4g",
+                "status": "ACTIVE",
+                "type": "APPLICATION"
+            }
+        ]
+    }
+}

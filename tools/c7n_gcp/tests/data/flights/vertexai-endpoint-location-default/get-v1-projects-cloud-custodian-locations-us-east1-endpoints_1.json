@@ -1,0 +1,31 @@
+{
+  "headers": {
+    "content-type": "application/json; charset=UTF-8",
+    "vary": "Origin, X-Origin, Referer",
+    "date": "Mon, 09 Mar 2026 17:52:10 GMT",
+    "server": "ESF",
+    "x-xss-protection": "0",
+    "x-frame-options": "SAMEORIGIN",
+    "x-content-type-options": "nosniff",
+    "alt-svc": "h3=\":443\"; ma=2592000,h3-29=\":443\"; ma=2592000",
+    "transfer-encoding": "chunked",
+    "status": "200",
+    "content-length": "424",
+    "-content-encoding": "gzip",
+    "content-location": "https://us-east1-aiplatform.googleapis.com/v1/projects/cloud-custodian/locations/us-east1/endpoints?alt=json"
+  },
+  "body": {
+    "endpoints": [
+      {
+        "name": "projects/cloud-custodian/locations/us-east1/endpoints/c7n-endpoint-east",
+        "displayName": "c7n-endpoint-east",
+        "etag": "AMEw9yMbTqP90j0P9pTgi7TBeaNgjp7gbDKDWJn-92W71NB0-hf_Rwz45YqlCPOgKkze",
+        "labels": {
+          "goog-terraform-provisioned": "true"
+        },
+        "createTime": "2026-03-09T17:43:41.285368Z",
+        "updateTime": "2026-03-09T17:43:42.393138Z"
+      }
+    ]
+  }
+}

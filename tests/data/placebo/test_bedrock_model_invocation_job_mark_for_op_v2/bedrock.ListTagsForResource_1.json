@@ -1,0 +1,24 @@
+{
+    "status_code": 200,
+    "data": {
+        "ResponseMetadata": {},
+        "tags": [
+            {
+                "key": "TestRunId",
+                "value": "leading-baboon"
+            },
+            {
+                "key": "Environment",
+                "value": "test"
+            },
+            {
+                "key": "Owner",
+                "value": "c7n"
+            },
+            {
+                "key": "maid_status",
+                "value": "Resource does not meet policy: notify@2026/03/20"
+            }
+        ]
+    }
+}

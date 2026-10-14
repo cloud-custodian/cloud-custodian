@@ -1,0 +1,20 @@
+{
+    "status_code": 200,
+    "data": {
+        "ResponseMetadata": {},
+        "tags": [
+            {
+                "key": "TestRunId",
+                "value": "rare-tuna"
+            },
+            {
+                "key": "Environment",
+                "value": "test"
+            },
+            {
+                "key": "foo",
+                "value": "bar"
+            }
+        ]
+    }
+}

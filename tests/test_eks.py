@@ -183,6 +183,35 @@ class EKS(BaseTest):
                 name='devx')['cluster']['tags'],
             {'App': 'Custodian'})
 
+    def test_tag_deleted_cluster(self):
+        # eks raises NotFoundException (not ResourceNotFoundException) when
+        # a cluster is gone by the time we tag it. No terraform fixture
+        # here - the cluster's absence is the whole point, so we tag an
+        # arn that isn't there rather than spend 20m creating a cluster
+        # to delete it.
+        aws_region = 'us-east-1'
+        factory = self.replay_flight_data(
+            'test_eks_tag_deleted_cluster', region=aws_region)
+
+        p = self.load_policy({
+            'name': 'eks-tag-deleted',
+            'resource': 'aws.eks',
+            'actions': [
+                {'type': 'tag', 'tags': {'App': 'Custodian'}},
+                {'type': 'remove-tag', 'tags': ['Env']}]},
+            session_factory=factory, config={'region': aws_region})
+
+        gone = {
+            'name': 'c7n-deleted',
+            'arn': 'arn:aws:eks:%s:%s:cluster/c7n-deleted' % (
+                aws_region, self.account_id),
+            'tags': {'Env': 'Dev'}}
+        tag, remove_tag = p.resource_manager.actions
+
+        # neither raises, the cluster is simply skipped
+        tag.process([gone])
+        remove_tag.process([gone])
+
     def test_kms_filter(self):
         factory = self.replay_flight_data('test_eks_kms_filter')
         kms = factory().client('kms')
@@ -283,6 +312,82 @@ class EKS(BaseTest):
         self.assertEqual(data['status_code'], 200)
         self.assertEqual(data['data']['update']['type'], 'AssociateEncryptionConfig')
         self.assertEqual(data['data']['update']['status'], 'InProgress')
+
+    def test_upgrade_available_filter(self):
+        factory = self.replay_flight_data('test_eks_upgrade_available')
+        p = self.load_policy(
+            {
+                'name': 'test-eks-upgrade-available',
+                'resource': 'aws.eks',
+                'filters': [
+                    {
+                        'type': 'upgrade-available',
+                        'major': False
+                    }
+                ]
+            },
+            session_factory=factory
+        )
+        resources = p.run()
+        self.assertEqual(len(resources), 3)
+        self.assertTrue('c7n:AvailableUpgrades' in resources[0])
+
+    def test_upgrade_available_filter_upgrades_extant(self):
+        factory = self.replay_flight_data('test_eks_upgrade_available')
+        p = self.load_policy(
+            {
+                'name': 'test-eks-upgrade-available-no-upgrades',
+                'resource': 'aws.eks',
+                'filters': [
+                    {
+                        'type': 'upgrade-available',
+                        # Find clusters WITH upgrades available
+                        'value': True,
+                    }
+                ]
+            },
+            session_factory=factory
+        )
+        resources = p.run()
+        self.assertEqual(len(resources), 3)
+
+    def test_upgrade_available_filter_upgrades_nonextant(self):
+        factory = self.replay_flight_data('test_eks_upgrade_available_no_upgrades_extant')
+        p = self.load_policy(
+            {
+                'name': 'test-eks-upgrade-available-no-upgrades',
+                'resource': 'aws.eks',
+                'filters': [
+                    {
+                        'type': 'upgrade-available',
+                        # Find clusters WITHOUT upgrades available
+                        'value': False,
+                    }
+                ]
+            },
+            session_factory=factory
+        )
+        resources = p.run()
+        self.assertEqual(len(resources), 3)
+
+    def test_upgrade_available_filter_no_upgrades(self):
+        factory = self.replay_flight_data('test_eks_upgrade_available_no_upgrades')
+        p = self.load_policy(
+            {
+                'name': 'test-eks-upgrade-available-no-upgrades',
+                'resource': 'aws.eks',
+                'filters': [
+                    {
+                        'type': 'upgrade-available',
+                        'major': False,
+                        'value': True
+                    }
+                ]
+            },
+            session_factory=factory
+        )
+        resources = p.run()
+        self.assertEqual(len(resources), 0)
 
     def test_associate_encryption_config_key_arn(self):
         factory = self.replay_flight_data("test_eks_associate_encryption_config_key_arn")
@@ -405,3 +510,45 @@ class EKS(BaseTest):
             resources = p.run()
             self.assertEqual(len(resources), 1)
         self.assertEqual(error.exception.response['Error']['Code'], 'InvalidParameterException')
+
+    def test_eks_metrics_filter(self):
+        factory = self.replay_flight_data("test_eks_metrics")
+        p = self.load_policy(
+            {'name': 'test-eks-metrics',
+             'resource': 'aws.eks',
+             'filters': [
+                 {'name': 'serious-bluegrass-ladybug'},
+                 {'type': 'metrics',
+                  'name': 'node_cpu_utilization',
+                  'days': 1,
+                  'op': 'less-than',
+                  'value': 10}
+             ]},
+            session_factory=factory
+        )
+
+        resources = p.run()
+        self.assertEqual(len(resources), 1)
+
+    def test_eks_addons_filter(self):
+        factory = self.replay_flight_data("test_eks_addon_health")
+        p = self.load_policy(
+            {
+                'name': 'test-eks-addons',
+                'resource': 'aws.eks',
+                'filters': [
+                    {'name': 'serious-bluegrass-ladybug'},
+                    {'type': 'addon',
+                     'attrs': [
+                         {'addonName': 'amazon-cloudwatch-observability'},
+                         {'health.issues': 'empty'}
+                         ]
+                     }
+                ]
+            },
+            session_factory=factory
+        )
+
+        resources = p.run()
+        self.assertEqual(len(resources), 1)
+        self.assertEqual(resources[0]['name'], 'serious-bluegrass-ladybug')

@@ -1,11 +1,13 @@
 # Copyright The Cloud Custodian Authors.
 # SPDX-License-Identifier: Apache-2.0
 
+from botocore.exceptions import ClientError
 from .common import BaseTest, event_data
 from c7n.exceptions import PolicyValidationError
 from c7n.executor import MainThreadExecutor
 from c7n.resources.appelb import (
-    AppELB, AppELBTargetGroup, AppELBDeleteListenerAction, serialize_attribute_value,
+    AppELB, AppELBTargetGroup, AppELBDeleteListenerAction,
+    parse_attribute_value, serialize_attribute_value,
 )
 from unittest.mock import patch
 import logging
@@ -16,6 +18,13 @@ def test_serialize():
     assert serialize_attribute_value(False) == 'false'
     assert serialize_attribute_value(60) == '60'
     assert serialize_attribute_value('abc') == 'abc'
+
+
+def test_parse_attribute_value():
+    assert parse_attribute_value('60') == 60
+    assert parse_attribute_value('true') is True
+    assert parse_attribute_value('false') is False
+    assert parse_attribute_value('abc') == 'abc'
 
 
 class AppELBTest(BaseTest):
@@ -1429,3 +1438,228 @@ class TestTargetGroupAttributesFilter(BaseTest):
         self.assertEqual(
             resources[0]['c7n:TargetGroupAttributes']['deregistration_delay.timeout_seconds'], 300
         )
+
+    def test_appelb_listener_rules_fetched(self):
+        """Test that listener rules are fetched and available for filtering"""
+        self.patch(AppELB, "executor_factory", MainThreadExecutor)
+        session_factory = self.replay_flight_data("test_appelb_listener_rules")
+        p = self.load_policy(
+            {
+                "name": "appelb-with-rules",
+                "resource": "app-elb",
+                "filters": [
+                    {
+                        "type": "listener-rule",
+                        "count": 0,
+                        "count_op": "gt"
+                    }
+                ],
+            },
+            session_factory=session_factory,
+        )
+        resources = p.run()
+        self.assertGreater(len(resources), 0)
+
+        # Verify that Rules are attached to ALBs
+        listener_rules = resources[0].get('c7n:ListenerRules', [])
+        self.assertGreater(len(listener_rules), 0)
+
+        # Verify rule structure
+        rule = listener_rules[0]
+        self.assertIn('Actions', rule)
+        self.assertIsInstance(rule['Actions'], list)
+
+    def test_appelb_filter_by_listener_rules(self):
+        """Test filtering ALBs based on listener rule actions"""
+        self.patch(AppELB, "executor_factory", MainThreadExecutor)
+        session_factory = self.replay_flight_data("test_appelb_listener_rules_filter")
+        p = self.load_policy(
+            {
+                "name": "appelb-insecure-rules",
+                "resource": "app-elb",
+                "filters": [
+                    {
+                        "type": "listener-rule",
+                        "attrs": [
+                            {
+                                "type": "value",
+                                "key": "Actions[0].Type",
+                                "value": "redirect"
+                            },
+                            {
+                                "type": "value",
+                                "key": "Actions[0].RedirectConfig.Protocol",
+                                "value": "HTTP"
+                            }
+                        ]
+                    }
+                ],
+            },
+            session_factory=session_factory,
+        )
+        resources = p.run()
+
+        # Should catch ALBs with listener rules redirecting to HTTP
+        self.assertGreater(len(resources), 0)
+
+        # Verify the ALB has listener rules attached
+        listener_rules = resources[0].get('c7n:ListenerRules', [])
+        self.assertGreater(len(listener_rules), 0)
+
+        # Check that at least one rule has redirect to HTTP
+        has_insecure_redirect = False
+        for rule in listener_rules:
+            for action in rule.get('Actions', []):
+                if (action.get('Type') == 'redirect' and
+                    action.get('RedirectConfig', {}).get('Protocol') == 'HTTP'):
+                    has_insecure_redirect = True
+                    break
+
+        self.assertTrue(has_insecure_redirect)
+
+    def test_appelb_listener_rules_fetch_error_listeners(self):
+        # Test exception handling when DescribeListeners fails
+        from unittest import mock
+        session_factory = self.replay_flight_data('test_appelb_listener_rules')
+
+        p = self.load_policy(
+            {
+                'name': 'appelb-listener-rules-error',
+                'resource': 'app-elb',
+                'filters': [
+                    {'type': 'listener-rule', 'count': 0, 'count_op': 'gte'}
+                ]
+            },
+            session_factory=session_factory,
+        )
+
+        # Get the filter and mock its manager's retry method for describe_listeners
+        filter_instance = p.resource_manager.filters[0]
+        original_retry = filter_instance.manager.retry
+
+        def mock_retry(func, *args, **kwargs):
+            if func.__name__ == 'describe_listeners':
+                raise ClientError(
+                    {
+                        'Error': {
+                            'Code': 'SimulatedError',
+                            'Message': 'Simulated DescribeListeners failure',
+                        }
+                    },
+                    'describe_listeners',
+                )
+            return original_retry(func, *args, **kwargs)
+
+        with mock.patch.object(filter_instance.manager, 'retry', side_effect=mock_retry):
+            # Should not raise exception, just log warning and return resources with empty rules
+            resources = p.run()
+            self.assertGreater(len(resources), 0)
+            for alb in resources:
+                self.assertEqual(len(alb.get('c7n:ListenerRules', [])), 0)
+
+    def test_appelb_listener_rules_fetch_error_rules(self):
+        # Test exception handling when DescribeRules fails
+        from unittest import mock
+        session_factory = self.replay_flight_data('test_appelb_listener_rules')
+
+        p = self.load_policy(
+            {
+                'name': 'appelb-listener-rules-error',
+                'resource': 'app-elb',
+                'filters': [
+                    {'type': 'listener-rule', 'count': 0, 'count_op': 'gte'}
+                ]
+            },
+            session_factory=session_factory,
+        )
+
+        # Get the filter and mock its manager's retry method for describe_rules
+        filter_instance = p.resource_manager.filters[0]
+        original_retry = filter_instance.manager.retry
+
+        def mock_retry(func, *args, **kwargs):
+            if func.__name__ == 'describe_rules':
+                raise ClientError(
+                    {
+                        'Error': {
+                            'Code': 'SimulatedError',
+                            'Message': 'Simulated DescribeRules failure',
+                        }
+                    },
+                    'describe_rules',
+                )
+            return original_retry(func, *args, **kwargs)
+
+        with mock.patch.object(filter_instance.manager, 'retry', side_effect=mock_retry):
+            # Should not raise exception, just log warning and return resources with empty rules
+            resources = p.run()
+            self.assertGreater(len(resources), 0)
+            for alb in resources:
+                self.assertEqual(len(alb.get('c7n:ListenerRules', [])), 0)
+
+
+class TestAppElbConnectionLogging(BaseTest):
+    """Tests for connection logging functionality"""
+
+    def test_appelb_enable_connection_logging(self):
+        session_factory = self.replay_flight_data("test_appelb_enable_connection_logging")
+        policy = self.load_policy(
+            {
+                "name": "test-enable-connection-logging",
+                "resource": "app-elb",
+                "filters": [{"LoadBalancerName": "alb-testing-1"}],
+                "actions": [
+                    {
+                        "type": "set-s3-logging",
+                        "log-type": "connection",
+                        "state": "enabled",
+                        "bucket": "hello567-elb-accesslogs-us-east-1",
+                        "prefix": "elbv2",
+                    }
+                ],
+            },
+            session_factory=session_factory,
+        )
+        resources = policy.run()
+        self.assertEqual(len(resources), 1)
+
+        client = session_factory().client("elbv2")
+        attrs = {
+            t["Key"]: t["Value"]
+            for t in client.describe_load_balancer_attributes(
+                LoadBalancerArn=resources[0]["LoadBalancerArn"]
+            ).get("Attributes")
+        }
+        self.assertEqual(attrs["connection_logs.s3.enabled"], "true")
+        self.assertEqual(attrs["connection_logs.s3.bucket"], "hello567-elb-accesslogs-us-east-1")
+        self.assertIn("elbv2", attrs["connection_logs.s3.prefix"])
+
+    def test_appelb_disable_connection_logging(self):
+        session_factory = self.replay_flight_data("test_appelb_disable_connection_logging")
+        policy = self.load_policy(
+            {
+                "name": "test-disable-connection-logging",
+                "resource": "app-elb",
+                "filters": [{"LoadBalancerName": "alb-testing-1"}],
+                "actions": [
+                    {
+                        "type": "set-s3-logging",
+                        "log-type": "connection",
+                        "state": "disabled",
+                    }
+                ],
+            },
+            session_factory=session_factory,
+        )
+
+        resources = policy.run()
+        self.assertEqual(len(resources), 1)
+
+        client = session_factory().client("elbv2")
+        attrs = {
+            t["Key"]: t["Value"]
+            for t in client.describe_load_balancer_attributes(
+                LoadBalancerArn=resources[0]["LoadBalancerArn"]
+            ).get("Attributes")
+        }
+        self.assertEqual(attrs["connection_logs.s3.enabled"], "false")

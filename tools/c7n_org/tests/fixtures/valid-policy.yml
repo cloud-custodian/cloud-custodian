@@ -1,0 +1,39 @@
+policies:
+  - name: ec2-tag-compliance
+    resource: aws.ec2
+    description: Check EC2 instances for required tags
+    tags:
+      - compliance
+      - tagging
+    filters:
+      - tag:Environment: absent
+    actions:
+      - type: notify
+        subject: Missing Environment tag on EC2 instance
+
+  - name: s3-encryption-check
+    resource: aws.s3
+    description: Ensure S3 buckets have encryption enabled
+    tags:
+      - security
+      - encryption
+    filters:
+      - type: bucket-encryption
+        state: false
+    actions:
+      - type: set-bucket-encryption
+
+  - name: lambda-old-runtimes
+    resource: aws.lambda
+    description: Find Lambda functions with old runtimes
+    tags:
+      - compliance
+      - security
+    filters:
+      - type: value
+        key: Runtime
+        op: in
+        value:
+          - python2.7
+          - python3.6
+          - nodejs8.10

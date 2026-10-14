@@ -36,12 +36,24 @@ from c7n.query import (
 from c7n.resolver import ValuesFrom
 from c7n.tags import TagActionFilter, TagDelayedAction, Tag, RemoveTag, universal_augment
 from c7n.utils import (
-    get_partition, local_session, type_schema, chunks, filter_empty, QueryParser,
+    get_partition, get_retry, local_session, type_schema, chunks, filter_empty, QueryParser,
     select_keys
 )
 
 from c7n.resources.aws import Arn
 from c7n.resources.securityhub import OtherResourcePostFinding
+
+
+_iam_tag_retry = get_retry((
+    'ConcurrentModification',
+    'TooManyRequestsException',
+    'ThrottlingException',
+    'RequestLimitExceeded',
+    'Throttled',
+    'ThrottledException',
+    'Throttling',
+    'Client.RequestLimitExceeded',
+))
 
 
 class DescribeGroup(DescribeSource):
@@ -149,8 +161,7 @@ class RoleTag(Tag):
     def process_resource_set(self, client, roles, tags):
         for role in roles:
             try:
-                self.manager.retry(
-                    client.tag_role, RoleName=role['RoleName'], Tags=tags)
+                _iam_tag_retry(client.tag_role, RoleName=role['RoleName'], Tags=tags)
             except client.exceptions.NoSuchEntityException:
                 continue
 
@@ -164,8 +175,7 @@ class RoleRemoveTag(RemoveTag):
     def process_resource_set(self, client, roles, tags):
         for role in roles:
             try:
-                self.manager.retry(
-                    client.untag_role, RoleName=role['RoleName'], TagKeys=tags)
+                _iam_tag_retry(client.untag_role, RoleName=role['RoleName'], TagKeys=tags)
             except client.exceptions.NoSuchEntityException:
                 continue
 
@@ -233,7 +243,7 @@ class DescribeUser(DescribeSource):
         for r in resources:
             ru = self.manager.retry(
                 client.get_user, UserName=r['UserName'],
-                ignore_err_codes=client.exceptions.NoSuchEntityException)
+                ignore_err_codes=('NoSuchEntity',))
             if ru:
                 results.append(ru['User'])
         return list(filter(None, results))
@@ -281,8 +291,7 @@ class UserTag(Tag):
     def process_resource_set(self, client, users, tags):
         for u in users:
             try:
-                self.manager.retry(
-                    client.tag_user, UserName=u['UserName'], Tags=tags)
+                _iam_tag_retry(client.tag_user, UserName=u['UserName'], Tags=tags)
             except client.exceptions.NoSuchEntityException:
                 continue
 
@@ -296,8 +305,7 @@ class UserRemoveTag(RemoveTag):
     def process_resource_set(self, client, users, tags):
         for u in users:
             try:
-                self.manager.retry(
-                    client.untag_user, UserName=u['UserName'], TagKeys=tags)
+                _iam_tag_retry(client.untag_user, UserName=u['UserName'], TagKeys=tags)
             except client.exceptions.NoSuchEntityException:
                 continue
 
@@ -1519,14 +1527,17 @@ class AllowAllIamPolicies(Filter):
             statements = [statements]
 
         for s in statements:
+            # Action/Resource are valid as either a bare string ("*") or a
+            # list (["*"]); normalize to a list so both forms are detected.
+            action = s.get('Action')
+            action = [action] if isinstance(action, str) else action
+            resource_val = s.get('Resource')
+            resource_val = [resource_val] if isinstance(resource_val, str) else resource_val
+
             if ('Condition' not in s and
-                    'Action' in s and
-                    isinstance(s['Action'], str) and
-                    s['Action'] == "*" and
-                    'Resource' in s and
-                    isinstance(s['Resource'], str) and
-                    s['Resource'] == "*" and
-                    s['Effect'] == "Allow"):
+                    action is not None and '*' in action and
+                    resource_val is not None and '*' in resource_val and
+                    s.get('Effect') == "Allow"):
                 return True
         return False
 
@@ -2089,8 +2100,9 @@ class UserPolicy(ValueFilter):
         matched = []
         for r in resources:
             for p in r['c7n:Policies']:
-                if self.match(p) and r not in matched:
+                if self.match(p):
                     matched.append(r)
+                    break
         return matched
 
 
@@ -2364,6 +2376,94 @@ class UserMfaDevice(ValueFilter):
         return matched
 
 
+@User.filter_registry.register('service-specific-credentials')
+class UserServiceSpecificCredentials(ValueFilter):
+    """Filter iam-users based on service-specific-credentials status
+
+    :example:
+
+    .. code-block:: yaml
+
+        policies:
+          - name: old-codecommit-credentials-users
+            resource: iam-user
+            filters:
+              - type: service-specific-credentials
+                key: ServiceName
+                value: codecommit.amazonaws.com
+              - type: service-specific-credentials
+                key: Status
+                value: Active
+              - type: service-specific-credentials
+                key: CreateDate
+                value_type: age
+                value: 90
+
+    """
+
+    schema = type_schema(
+        'service-specific-credentials',
+        rinherit=ValueFilter.schema,
+    )
+    schema_alias = False
+    permissions = ('iam:ListServiceSpecificCredentials',)
+    annotation_key = 'c7n:ServiceSpecificCredentials'
+    matched_annotation_key = 'c7n:matched-service-specific-credentials'
+    annotate = False
+
+    def get_all_service_specific_credentials(self, client):
+        all_credentials = {}
+        # Pagination is different, so we need to look for the lack of truncation.
+        is_truncated = True
+        marker = None
+        # Implement a numeric cap, to prevent infinite loops.
+        # This allows for up to 5000 items to be returned.
+        max_requests = 50
+        num_requests = 0
+
+        while is_truncated is True and num_requests < max_requests:
+            kwargs = {
+                "AllUsers": True,
+                # This needs to be present for paingation to be active.
+                "MaxItems": 100,
+            }
+
+            if marker is not None:
+                kwargs["Marker"] = marker
+
+            resp = client.list_service_specific_credentials(**kwargs)
+            credentials = resp.get("ServiceSpecificCredentials", [])
+
+            for cred_detail in credentials:
+                all_credentials.setdefault(cred_detail["UserName"], [])
+                all_credentials[cred_detail["UserName"]].append(cred_detail)
+
+            # Bookkeeping.
+            num_requests += 1
+            is_truncated = resp.get("IsTruncated", False)
+            marker = resp.get("Marker", None)
+
+        return all_credentials
+
+    def process(self, resources, event=None):
+        client = local_session(self.manager.session_factory).client('iam')
+        all_credentials = self.get_all_service_specific_credentials(client)
+        matched = []
+
+        for r in resources:
+            if r["UserName"] not in all_credentials:
+                continue
+
+            r[self.annotation_key] = all_credentials[r["UserName"]]
+            matched_credentials = [k for k in r[self.annotation_key] if self.match(k)]
+            self.merge_annotation(r, self.matched_annotation_key, matched_credentials)
+
+            if matched_credentials:
+                matched.append(r)
+
+        return matched
+
+
 @User.action_registry.register('post-finding')
 class UserFinding(OtherResourcePostFinding):
 
@@ -2526,6 +2626,7 @@ class UserDelete(BaseAction):
         'iam:DeactivateMFADevice',
         'iam:DeleteAccessKey',
         'iam:DeleteLoginProfile',
+        'iam:DeleteServiceSpecificCredential',
         'iam:DeleteSigningCertificate',
         'iam:DeleteSSHPublicKey',
         'iam:DeleteUser',
@@ -3247,12 +3348,7 @@ class AccessKey(ChildResourceManager):
         date = 'CreateDate'
         # Denotes this resource type exists across regions
         global_resource = True
-        enum_spec = ('list_access_keys', 'AccessKeys', None)
+        enum_spec = ('list_access_keys', 'AccessKeyMetadata', None)
         parent_spec = ('iam-user', 'UserName', None)
         # No detail spec needed as list_access_keys returns full metadata
-        cfn_type = config_type = "AWS::IAM::AccessKey"
-        # config_id = 'AccessKeyId'
-
-    source_mapping = {
-        'config': ConfigSource
-    }
+        cfn_type = "AWS::IAM::AccessKey"

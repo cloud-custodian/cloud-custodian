@@ -1,0 +1,52 @@
+{
+  "headers": {
+    "etag": "SFNbezEQlKIaiKBn9pvbPA==",
+    "content-type": "application/json; charset=UTF-8",
+    "vary": "Origin, X-Origin, Referer",
+    "date": "Thu, 05 Feb 2026 20:14:56 GMT",
+    "server": "ESF",
+    "x-xss-protection": "0",
+    "x-frame-options": "SAMEORIGIN",
+    "x-content-type-options": "nosniff",
+    "alt-svc": "h3=\":443\"; ma=2592000,h3-29=\":443\"; ma=2592000",
+    "transfer-encoding": "chunked",
+    "status": "200",
+    "content-length": "900",
+    "-content-encoding": "gzip",
+    "content-location": "https://bigquery.googleapis.com/bigquery/v2/projects/cloud-custodian/datasets/c7n_bq_dataset/tables/c7n_bq_table?alt=json"
+  },
+  "body": {
+    "kind": "bigquery#table",
+    "etag": "SFNbezEQlKIaiKBn9pvbPA==",
+    "id": "cloud-custodian:c7n_bq_dataset.c7n_bq_table",
+    "selfLink": "https://bigquery.googleapis.com/bigquery/v2/projects/cloud-custodian/datasets/c7n_bq_dataset/tables/c7n_bq_table",
+    "tableReference": {
+      "projectId": "cloud-custodian",
+      "datasetId": "c7n_bq_dataset",
+      "tableId": "c7n_bq_table"
+    },
+    "labels": {
+      "goog-terraform-provisioned": "true",
+      "env": "not-the-default"
+    },
+    "schema": {
+      "fields": [
+        {
+          "name": "id",
+          "type": "INTEGER",
+          "mode": "REQUIRED"
+        }
+      ]
+    },
+    "numBytes": "0",
+    "numLongTermBytes": "0",
+    "numRows": "0",
+    "creationTime": "1770321954878",
+    "lastModifiedTime": "1770322496067",
+    "type": "TABLE",
+    "location": "US",
+    "numTotalLogicalBytes": "0",
+    "numActiveLogicalBytes": "0",
+    "numLongTermLogicalBytes": "0"
+  }
+}

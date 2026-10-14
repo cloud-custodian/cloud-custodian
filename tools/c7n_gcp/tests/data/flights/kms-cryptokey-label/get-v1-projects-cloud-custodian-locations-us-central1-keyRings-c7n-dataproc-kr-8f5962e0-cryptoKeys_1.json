@@ -1,0 +1,44 @@
+{
+  "headers": {
+    "content-type": "application/json; charset=UTF-8",
+    "vary": "Origin, X-Origin, Referer",
+    "date": "Wed, 18 Feb 2026 22:00:21 GMT",
+    "server": "ESF",
+    "x-xss-protection": "0",
+    "x-frame-options": "SAMEORIGIN",
+    "x-content-type-options": "nosniff",
+    "alt-svc": "h3=\":443\"; ma=2592000,h3-29=\":443\"; ma=2592000",
+    "transfer-encoding": "chunked",
+    "status": "200",
+    "content-length": "1019",
+    "-content-encoding": "gzip",
+    "content-location": "https://cloudkms.googleapis.com/v1/projects/cloud-custodian/locations/us-central1/keyRings/c7n-dataproc-kr-8f5962e0/cryptoKeys?alt=json"
+  },
+  "body": {
+    "cryptoKeys": [
+      {
+        "name": "projects/cloud-custodian/locations/us-central1/keyRings/c7n-dataproc-kr-8f5962e0/cryptoKeys/c7n-dataproc-key-8f5962e0",
+        "primary": {
+          "name": "projects/cloud-custodian/locations/us-central1/keyRings/c7n-dataproc-kr-8f5962e0/cryptoKeys/c7n-dataproc-key-8f5962e0/cryptoKeyVersions/1",
+          "state": "DESTROY_SCHEDULED",
+          "createTime": "2026-02-05T16:10:15.175829584Z",
+          "destroyTime": "2026-03-07T16:12:24.628334Z",
+          "protectionLevel": "SOFTWARE",
+          "algorithm": "GOOGLE_SYMMETRIC_ENCRYPTION",
+          "generateTime": "2026-02-05T16:10:15.175829584Z"
+        },
+        "purpose": "ENCRYPT_DECRYPT",
+        "createTime": "2026-02-05T16:10:15.175829584Z",
+        "labels": {
+          "goog-terraform-provisioned": "true"
+        },
+        "versionTemplate": {
+          "protectionLevel": "SOFTWARE",
+          "algorithm": "GOOGLE_SYMMETRIC_ENCRYPTION"
+        },
+        "destroyScheduledDuration": "2592000s"
+      }
+    ],
+    "totalSize": 1
+  }
+}

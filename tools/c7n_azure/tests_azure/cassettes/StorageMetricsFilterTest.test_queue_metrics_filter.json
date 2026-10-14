@@ -1,0 +1,277 @@
+{
+    "version": 1,
+    "interactions": [
+        {
+            "request": {
+                "method": "GET",
+                "uri": "https://management.azure.com/subscriptions/ea42f556-5106-4743-99b0-c129bfa71a47/providers/Microsoft.Storage/storageAccounts?api-version=2024-01-01",
+                "body": null,
+                "headers": {}
+            },
+            "response": {
+                "status": {
+                    "code": 200,
+                    "message": "OK"
+                },
+                "headers": {
+                    "x-msedge-ref": [
+                        "Ref A: E36EDBD52465408EAA1A30605E0F1854 Ref B: CH1AA2020603009 Ref C: 2026-02-19T17:50:39Z"
+                    ],
+                    "x-cache": [
+                        "CONFIG_NOCACHE"
+                    ],
+                    "cache-control": [
+                        "no-cache"
+                    ],
+                    "content-length": [
+                        "6202"
+                    ],
+                    "date": [
+                        "Thu, 19 Feb 2026 17:50:38 GMT"
+                    ],
+                    "content-type": [
+                        "application/json; charset=utf-8"
+                    ]
+                },
+                "body": {
+                    "data": {
+                        "value": [
+                            {
+                                "identity": {
+                                    "type": "None"
+                                },
+                                "sku": {
+                                    "name": "Standard_LRS",
+                                    "tier": "Standard"
+                                },
+                                "kind": "StorageV2",
+                                "id": "/subscriptions/ea42f556-5106-4743-99b0-c129bfa71a47/resourceGroups/stacklet/providers/Microsoft.Storage/storageAccounts/mlwsbad20250522211107",
+                                "name": "mlwsbad20250522211107",
+                                "type": "Microsoft.Storage/storageAccounts",
+                                "location": "eastus",
+                                "tags": {
+                                    "custodian-policy": "azure-machinelearningservices-workspace-public-network-access-disabled"
+                                },
+                                "properties": {
+                                    "dnsEndpointType": "Standard",
+                                    "defaultToOAuthAuthentication": false,
+                                    "publicNetworkAccess": "Enabled",
+                                    "keyCreationTime": {
+                                        "key1": "2025-05-22T21:11:08.4891517Z",
+                                        "key2": "2025-05-22T21:11:08.4891517Z"
+                                    },
+                                    "allowCrossTenantReplication": false,
+                                    "privateEndpointConnections": [],
+                                    "isNfsV3Enabled": false,
+                                    "isLocalUserEnabled": true,
+                                    "isSftpEnabled": false,
+                                    "minimumTlsVersion": "TLS1_2",
+                                    "allowBlobPublicAccess": true,
+                                    "allowSharedKeyAccess": true,
+                                    "isHnsEnabled": false,
+                                    "networkAcls": {
+                                        "ipv6Rules": [],
+                                        "resourceAccessRules": [
+                                            {
+                                                "tenantId": "00000000-0000-0000-0000-000000000003",
+                                                "resourceId": "/subscriptions/ea42f556-5106-4743-99b0-c129bfa71a47/providers/Microsoft.Security/datascanners/storageDataScanner"
+                                            }
+                                        ],
+                                        "bypass": "AzureServices",
+                                        "virtualNetworkRules": [],
+                                        "ipRules": [],
+                                        "defaultAction": "Allow"
+                                    },
+                                    "supportsHttpsTrafficOnly": true,
+                                    "encryption": {
+                                        "services": {
+                                            "file": {
+                                                "keyType": "Account",
+                                                "enabled": true,
+                                                "lastEnabledTime": "2025-05-22T21:11:08.4891517Z"
+                                            },
+                                            "blob": {
+                                                "keyType": "Account",
+                                                "enabled": true,
+                                                "lastEnabledTime": "2025-05-22T21:11:08.4891517Z"
+                                            }
+                                        },
+                                        "keySource": "Microsoft.Storage"
+                                    },
+                                    "accessTier": "Hot",
+                                    "provisioningState": "Succeeded",
+                                    "creationTime": "2025-05-22T21:11:08.3016464Z",
+                                    "primaryEndpoints": {
+                                        "dfs": "https://mlwsbad20250522211107.dfs.core.windows.net/",
+                                        "web": "https://mlwsbad20250522211107.z13.web.core.windows.net/",
+                                        "blob": "https://mlwsbad20250522211107.blob.core.windows.net/",
+                                        "queue": "https://mlwsbad20250522211107.queue.core.windows.net/",
+                                        "table": "https://mlwsbad20250522211107.table.core.windows.net/",
+                                        "file": "https://mlwsbad20250522211107.file.core.windows.net/"
+                                    },
+                                    "primaryLocation": "eastus",
+                                    "statusOfPrimary": "available"
+                                }
+                            },
+                            {
+                                "identity": {
+                                    "type": "None"
+                                },
+                                "sku": {
+                                    "name": "Standard_LRS",
+                                    "tier": "Standard"
+                                },
+                                "kind": "StorageV2",
+                                "id": "/subscriptions/ea42f556-5106-4743-99b0-c129bfa71a47/resourceGroups/stacklet/providers/Microsoft.Storage/storageAccounts/mlwsgood20250522211106",
+                                "name": "mlwsgood20250522211106",
+                                "type": "Microsoft.Storage/storageAccounts",
+                                "location": "eastus",
+                                "tags": {
+                                    "custodian-policy": "azure-machinelearningservices-workspace-public-network-access-disabled"
+                                },
+                                "properties": {
+                                    "dnsEndpointType": "Standard",
+                                    "defaultToOAuthAuthentication": false,
+                                    "publicNetworkAccess": "Enabled",
+                                    "keyCreationTime": {
+                                        "key1": "2025-05-22T21:11:08.4891517Z",
+                                        "key2": "2025-05-22T21:11:08.4891517Z"
+                                    },
+                                    "allowCrossTenantReplication": false,
+                                    "privateEndpointConnections": [],
+                                    "isNfsV3Enabled": false,
+                                    "isLocalUserEnabled": true,
+                                    "isSftpEnabled": false,
+                                    "minimumTlsVersion": "TLS1_2",
+                                    "allowBlobPublicAccess": true,
+                                    "allowSharedKeyAccess": true,
+                                    "isHnsEnabled": false,
+                                    "networkAcls": {
+                                        "ipv6Rules": [],
+                                        "resourceAccessRules": [
+                                            {
+                                                "tenantId": "00000000-0000-0000-0000-000000000003",
+                                                "resourceId": "/subscriptions/ea42f556-5106-4743-99b0-c129bfa71a47/providers/Microsoft.Security/datascanners/storageDataScanner"
+                                            }
+                                        ],
+                                        "bypass": "AzureServices",
+                                        "virtualNetworkRules": [],
+                                        "ipRules": [],
+                                        "defaultAction": "Allow"
+                                    },
+                                    "supportsHttpsTrafficOnly": true,
+                                    "encryption": {
+                                        "services": {
+                                            "file": {
+                                                "keyType": "Account",
+                                                "enabled": true,
+                                                "lastEnabledTime": "2025-05-22T21:11:08.4891517Z"
+                                            },
+                                            "blob": {
+                                                "keyType": "Account",
+                                                "enabled": true,
+                                                "lastEnabledTime": "2025-05-22T21:11:08.4891517Z"
+                                            }
+                                        },
+                                        "keySource": "Microsoft.Storage"
+                                    },
+                                    "accessTier": "Hot",
+                                    "provisioningState": "Succeeded",
+                                    "creationTime": "2025-05-22T21:11:08.3172707Z",
+                                    "primaryEndpoints": {
+                                        "dfs": "https://mlwsgood20250522211106.dfs.core.windows.net/",
+                                        "web": "https://mlwsgood20250522211106.z13.web.core.windows.net/",
+                                        "blob": "https://mlwsgood20250522211106.blob.core.windows.net/",
+                                        "queue": "https://mlwsgood20250522211106.queue.core.windows.net/",
+                                        "table": "https://mlwsgood20250522211106.table.core.windows.net/",
+                                        "file": "https://mlwsgood20250522211106.file.core.windows.net/"
+                                    },
+                                    "primaryLocation": "eastus",
+                                    "statusOfPrimary": "available"
+                                }
+                            },
+                            {
+                                "identity": {
+                                    "type": "None"
+                                },
+                                "sku": {
+                                    "name": "Standard_LRS",
+                                    "tier": "Standard"
+                                },
+                                "kind": "StorageV2",
+                                "id": "/subscriptions/ea42f556-5106-4743-99b0-c129bfa71a47/resourceGroups/stacklet/providers/Microsoft.Storage/storageAccounts/testmariadb615b90cc",
+                                "name": "testmariadb615b90cc",
+                                "type": "Microsoft.Storage/storageAccounts",
+                                "location": "southcentralus",
+                                "tags": {
+                                    "custodian-policy": "azure-mariadb-public-network-access-disabled",
+                                    "test-note": "MariaDB service retired - testing policy validation only"
+                                },
+                                "properties": {
+                                    "dnsEndpointType": "Standard",
+                                    "defaultToOAuthAuthentication": false,
+                                    "publicNetworkAccess": "Enabled",
+                                    "keyCreationTime": {
+                                        "key1": "2025-06-02T20:28:30.2510628Z",
+                                        "key2": "2025-06-02T20:28:30.2510628Z"
+                                    },
+                                    "allowCrossTenantReplication": false,
+                                    "privateEndpointConnections": [],
+                                    "isNfsV3Enabled": false,
+                                    "isLocalUserEnabled": true,
+                                    "isSftpEnabled": false,
+                                    "minimumTlsVersion": "TLS1_2",
+                                    "allowBlobPublicAccess": true,
+                                    "allowSharedKeyAccess": true,
+                                    "isHnsEnabled": false,
+                                    "networkAcls": {
+                                        "ipv6Rules": [],
+                                        "resourceAccessRules": [
+                                            {
+                                                "tenantId": "00000000-0000-0000-0000-000000000003",
+                                                "resourceId": "/subscriptions/ea42f556-5106-4743-99b0-c129bfa71a47/providers/Microsoft.Security/datascanners/storageDataScanner"
+                                            }
+                                        ],
+                                        "bypass": "AzureServices",
+                                        "virtualNetworkRules": [],
+                                        "ipRules": [],
+                                        "defaultAction": "Allow"
+                                    },
+                                    "supportsHttpsTrafficOnly": true,
+                                    "encryption": {
+                                        "services": {
+                                            "file": {
+                                                "keyType": "Account",
+                                                "enabled": true,
+                                                "lastEnabledTime": "2025-06-02T20:28:30.2667171Z"
+                                            },
+                                            "blob": {
+                                                "keyType": "Account",
+                                                "enabled": true,
+                                                "lastEnabledTime": "2025-06-02T20:28:30.2667171Z"
+                                            }
+                                        },
+                                        "keySource": "Microsoft.Storage"
+                                    },
+                                    "accessTier": "Hot",
+                                    "provisioningState": "Succeeded",
+                                    "creationTime": "2025-06-02T20:28:30.1104745Z",
+                                    "primaryEndpoints": {
+                                        "dfs": "https://testmariadb615b90cc.dfs.core.windows.net/",
+                                        "web": "https://testmariadb615b90cc.z21.web.core.windows.net/",
+                                        "blob": "https://testmariadb615b90cc.blob.core.windows.net/",
+                                        "queue": "https://testmariadb615b90cc.queue.core.windows.net/",
+                                        "table": "https://testmariadb615b90cc.table.core.windows.net/",
+                                        "file": "https://testmariadb615b90cc.file.core.windows.net/"
+                                    },
+                                    "primaryLocation": "southcentralus",
+                                    "statusOfPrimary": "available"
+                                }
+                            }
+                        ]
+                    }
+                }
+            }
+        }
+    ]
+}

@@ -1,0 +1,61 @@
+{
+    "status_code": 200,
+    "data": {
+        "ResponseMetadata": {},
+        "jobName": "c7n-evaluation-default-8ebe",
+        "status": "InProgress",
+        "jobArn": "arn:aws:bedrock:us-east-1:644160558196:evaluation-job/ighzy27iw1l6",
+        "jobDescription": "Cloud Custodian Bedrock evaluation job integration test",
+        "roleArn": "arn:aws:iam::644160558196:role/c7n-evaluation-default-8ebe-role",
+        "jobType": "Automated",
+        "applicationType": "ModelEvaluation",
+        "evaluationConfig": {
+            "automated": {
+                "datasetMetricConfigs": [
+                    {
+                        "taskType": "QuestionAndAnswer",
+                        "dataset": {
+                            "name": "Builtin.BoolQ"
+                        },
+                        "metricNames": [
+                            "Builtin.Accuracy"
+                        ]
+                    }
+                ]
+            }
+        },
+        "inferenceConfig": {
+            "models": [
+                {
+                    "bedrockModel": {
+                        "modelIdentifier": "arn:aws:bedrock:us-east-1::foundation-model/amazon.nova-micro-v1:0",
+                        "inferenceParams": "{\"inferenceConfig\": {\"maxTokens\": 512, \"temperature\": 0.0}}"
+                    }
+                }
+            ]
+        },
+        "outputDataConfig": {
+            "s3Uri": "s3://c7n-evaluation-default-8ebe-output/evaluations/"
+        },
+        "creationTime": {
+            "__class__": "datetime",
+            "year": 2026,
+            "month": 7,
+            "day": 16,
+            "hour": 22,
+            "minute": 8,
+            "second": 31,
+            "microsecond": 519203
+        },
+        "lastModifiedTime": {
+            "__class__": "datetime",
+            "year": 2026,
+            "month": 7,
+            "day": 16,
+            "hour": 22,
+            "minute": 8,
+            "second": 31,
+            "microsecond": 519203
+        }
+    }
+}

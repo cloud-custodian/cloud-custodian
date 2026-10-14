@@ -1,0 +1,20 @@
+{
+    "status_code": 200,
+    "data": {
+        "BaselineIdentities": [
+            {
+                "BaselineId": "pb-07e6af47bc1c9377f",
+                "BaselineName": "c7n-test-tagged",
+                "OperatingSystem": "WINDOWS",
+                "DefaultBaseline": false
+            },
+            {
+                "BaselineId": "pb-0cc2829cd0b558694",
+                "BaselineName": "c7n-test-untagged",
+                "OperatingSystem": "WINDOWS",
+                "DefaultBaseline": false
+            }
+        ],
+        "ResponseMetadata": {}
+    }
+}

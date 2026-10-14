@@ -1,9 +1,17 @@
 # Copyright The Cloud Custodian Authors.
 # SPDX-License-Identifier: Apache-2.0
+import logging
+import re
+
+from googleapiclient.errors import HttpError
+
+from c7n.filters.core import ValueFilter
 from c7n.utils import type_schema, local_session
 from c7n_gcp.actions import MethodAction
 from c7n_gcp.provider import resources
 from c7n_gcp.query import QueryResourceManager, TypeInfo
+
+log = logging.getLogger('custodian.gcp.loadbalancer')
 
 
 @resources.register('loadbalancer-address')
@@ -17,6 +25,8 @@ class LoadBalancingAddress(QueryResourceManager):
         enum_spec = ('aggregatedList', 'items.*.addresses[]', None)
         scope = 'project'
         name = id = 'name'
+        labels = True
+        labels_op = 'setLabels'
         default_report_fields = [
             name, "description", "address", "status", "region", "addressType"
         ]
@@ -24,12 +34,39 @@ class LoadBalancingAddress(QueryResourceManager):
         urn_component = "address"
 
         @staticmethod
-        def get(client, resource_info):
+        def parse_params(resc_name):
+            """Takes resourceName (from a log) or selfLink (from a resource) and parses from it the
+            parameters needed to make a request (project, region, and address)"""
+            exp = r".*projects/(.*)/regions/(.*)/addresses/(.*)"
+            return re.match(exp, resc_name).groups()
+
+        @classmethod
+        def get(cls, client, resource_info):
+            project, region, address = cls.parse_params(resource_info['resourceName'])
+
             return client.execute_command('get', {
-                'project': resource_info['project_id'],
-                'region': resource_info['location'],
-                'address': resource_info[
-                    'resourceName'].rsplit('/', 1)[-1]})
+                'project': project,
+                'region': region,
+                'address': address})
+
+        @classmethod
+        def get_label_params(cls, resource, all_labels):
+            project, region, address = cls.parse_params(resource['selfLink'])
+            return {
+                'project': project,
+                'region': region,
+                'resource': address,
+                'body': {
+                    'labels': all_labels,
+                    'labelFingerprint': resource['labelFingerprint']
+                }
+            }
+
+        @classmethod
+        def refresh(cls, client, resource):
+            """This method is used to refresh labelFingerprint when a label action fails because the
+            fingerprint was stale."""
+            return cls.get(client, {'resourceName': resource['selfLink']})
 
 
 @LoadBalancingAddress.action_registry.register('delete')
@@ -44,6 +81,22 @@ class LoadBalancingAddressDelete(MethodAction):
             'project': project,
             'region': resource['region'].rsplit('/', 1)[-1],
             'address': resource['name']}
+
+    def filter_resources(self, resources):
+        resources = super().filter_resources(resources)
+        missing_region = [r for r in resources if 'region' not in r]
+        if missing_region:
+            removed = ', '.join([r.get('name', '<unknown>') for r in missing_region])
+            self.log.warning(
+                "policy:%s action:%s filtered out %d resources without region: %s",
+                self.manager.ctx.policy.name,
+                self.type,
+                len(missing_region),
+                removed,
+            )
+            resources = [r for r in resources if 'region' in r]
+
+        return resources
 
 
 @resources.register('loadbalancer-url-map')
@@ -224,6 +277,93 @@ class LoadBalancingTargetHttpsProxy(QueryResourceManager):
                 'project': resource_info['project_id'],
                 'targetHttpsProxy': resource_info[
                     'resourceName'].rsplit('/', 1)[-1]})
+
+
+@LoadBalancingTargetHttpsProxy.filter_registry.register('ssl-policy')
+@LoadBalancingTargetSslProxy.filter_registry.register('ssl-policy')
+class TargetProxySslPolicyFilter(ValueFilter):
+    """Filter target proxies by the SSL policy attached to them.
+
+    The SSL policy named in the proxy's ``sslPolicy`` field is fetched and
+    the value filter is applied to it. A proxy with no ``sslPolicy`` does
+    not match this filter. Such a proxy uses the GCP default SSL policy,
+    which can be found with a ``sslPolicy: absent`` value filter.
+
+    Note that inside a ``not`` block a proxy with no ``sslPolicy`` fails
+    every ``ssl-policy`` check, so the ``not`` makes it match.
+
+    https://cloud.google.com/compute/docs/reference/rest/v1/sslPolicies
+
+    :example:
+
+    Find HTTPS proxies whose SSL policy uses the COMPATIBLE profile
+
+    .. code-block:: yaml
+
+        policies:
+          - name: https-proxy-weak-ssl-policy
+            resource: gcp.loadbalancer-target-https-proxy
+            filters:
+              - type: ssl-policy
+                key: profile
+                value: COMPATIBLE
+
+    :example:
+
+    Find SSL proxies that use the GCP default SSL policy or an SSL policy
+    that allows TLS versions older than 1.2
+
+    .. code-block:: yaml
+
+        policies:
+          - name: ssl-proxy-old-tls
+            resource: gcp.loadbalancer-target-ssl-proxy
+            filters:
+              - or:
+                - type: value
+                  key: sslPolicy
+                  value: absent
+                - type: ssl-policy
+                  key: minTlsVersion
+                  op: ne
+                  value: TLS_1_2
+    """
+
+    schema = type_schema('ssl-policy', rinherit=ValueFilter.schema)
+    permissions = ('compute.sslPolicies.get',)
+    annotation_key = 'c7n:ssl-policy'
+    policy_link = re.compile(r'.*projects/([^/]+)/global/sslPolicies/([^/]+)$')
+
+    def __init__(self, data, manager=None):
+        super().__init__(data, manager)
+        # ssl policy selfLink -> fetched policy, so proxies sharing a
+        # policy only fetch it once.
+        self.ssl_policies = {}
+
+    def __call__(self, proxy):
+        if self.annotation_key not in proxy:
+            link = proxy.get('sslPolicy')
+            if not link:
+                return False
+            if link not in self.ssl_policies:
+                self.ssl_policies[link] = self.get_ssl_policy(link)
+            if self.ssl_policies[link] is None:
+                return False
+            proxy[self.annotation_key] = self.ssl_policies[link]
+        return super().__call__(proxy[self.annotation_key])
+
+    def get_ssl_policy(self, link):
+        project, name = self.policy_link.match(link).groups()
+        session = local_session(self.manager.session_factory)
+        client = session.client('compute', 'v1', 'sslPolicies')
+        try:
+            return client.execute_command(
+                'get', {'project': project, 'sslPolicy': name})
+        except HttpError as e:
+            if e.resp.status != 404:
+                raise
+            log.warning("ssl policy not found: %s", link)
+            return None
 
 
 @resources.register('loadbalancer-backend-bucket')
@@ -457,7 +597,7 @@ class LoadBalancingTargetPool(QueryResourceManager):
 
 @resources.register('loadbalancer-forwarding-rule')
 class LoadBalancingForwardingRule(QueryResourceManager):
-    """GCP resource: https://cloud.google.com/compute/docs/reference/rest/v1/addresses
+    """GCP resource: https://cloud.google.com/compute/docs/reference/rest/v1/forwardingRules
     """
     class resource_type(TypeInfo):
         service = 'compute'
@@ -466,6 +606,8 @@ class LoadBalancingForwardingRule(QueryResourceManager):
         enum_spec = ('aggregatedList', 'items.*.forwardingRules[]', None)
         scope = 'project'
         name = id = 'name'
+        labels = True
+        labels_op = 'setLabels'
         default_report_fields = [
             "name", "description", "region", "IPAddress", "IPProtocol", "target",
             "loadBalancingScheme", "serviceName", "network"
@@ -474,11 +616,38 @@ class LoadBalancingForwardingRule(QueryResourceManager):
         urn_component = "forwarding-rule"
 
         @staticmethod
-        def get(client, resource_info):
+        def parse_params(resc_name):
+            """Takes resourceName (from a log) or selfLink (from a resource) and parses from it the
+            parameters needed to make a request (project, region, and rule)"""
+            exp = r".*projects/(.*)/regions/(.*)/forwardingRules/(.*)"
+            return re.match(exp, resc_name).groups()
+
+        @classmethod
+        def get(cls, client, resource_info):
+            project, region, rule = cls.parse_params(resource_info['resourceName'])
             return client.execute_command('get', {
-                'project': resource_info['project_id'],
-                'region': resource_info['region'],
-                'forwardingRule': resource_info['resourceName'].rsplit('/', 1)[-1]})
+                'project': project,
+                'region': region,
+                'forwardingRule': rule})
+
+        @classmethod
+        def get_label_params(cls, resource, all_labels):
+            project, region, rule = cls.parse_params(resource['selfLink'])
+            return {
+                'project': project,
+                'region': region,
+                'resource': rule,
+                'body': {
+                    'labels': all_labels,
+                    'labelFingerprint': resource['labelFingerprint']
+                }
+            }
+
+        @classmethod
+        def refresh(cls, client, resource):
+            """This method is used to refresh labelFingerprint when a label action fails because the
+            fingerprint was stale."""
+            return cls.get(client, {'resourceName': resource['selfLink']})
 
 
 @resources.register('loadbalancer-global-forwarding-rule')
@@ -492,6 +661,8 @@ class LoadBalancingGlobalForwardingRule(QueryResourceManager):
         enum_spec = ('list', 'items[]', None)
         scope = 'project'
         name = id = 'name'
+        labels = True
+        labels_op = 'setLabels'
         default_report_fields = [
             "name", "description", "creationTimestamp", "network",
             "networkTier", "loadBalancingScheme", "subnetwork", "allowGlobalAccess"
@@ -500,10 +671,34 @@ class LoadBalancingGlobalForwardingRule(QueryResourceManager):
         urn_component = "global-forwarding-rule"
 
         @staticmethod
-        def get(client, resource_info):
-            return client.execute_command('get', {
-                'project': resource_info['project_id'],
-                'forwardingRule': resource_info['resourceName'].rsplit('/', 1)[-1]})
+        def parse_params(resc_name):
+            """Takes resourceName (from a log) or selfLink (from a resource) and parses from it the
+            parameters needed to make a request (project and rule)"""
+            exp = r".*projects/(.*)/global/forwardingRules/(.*)"
+            return re.match(exp, resc_name).groups()
+
+        @classmethod
+        def get(cls, client, resource_info):
+            project, rule = cls.parse_params(resource_info['resourceName'])
+            return client.execute_command('get', {'project': project, 'forwardingRule': rule})
+
+        @classmethod
+        def get_label_params(cls, resource, all_labels):
+            project, rule = cls.parse_params(resource['selfLink'])
+            return {
+                'project': project,
+                'resource': rule,
+                'body': {
+                    'labels': all_labels,
+                    'labelFingerprint': resource['labelFingerprint']
+                }
+            }
+
+        @classmethod
+        def refresh(cls, client, resource):
+            """This method is used to refresh labelFingerprint when a label action fails because the
+            fingerprint was stale."""
+            return cls.get(client, {'resourceName': resource['selfLink']})
 
 
 @resources.register('loadbalancer-global-address')
@@ -517,6 +712,8 @@ class LoadBalancingGlobalAddress(QueryResourceManager):
         enum_spec = ('list', 'items[]', None)
         scope = 'project'
         name = id = 'name'
+        labels = True
+        labels_op = 'setLabels'
         default_report_fields = [
             "name", "description", "status", "creationTimestamp", "address", "region"
         ]
@@ -524,7 +721,31 @@ class LoadBalancingGlobalAddress(QueryResourceManager):
         urn_component = "global-address"
 
         @staticmethod
-        def get(client, resource_info):
-            return client.execute_command('get', {
-                'project': resource_info['project_id'],
-                'address': resource_info['resourceName'].rsplit('/', 1)[-1]})
+        def parse_params(resc_name):
+            """Takes resourceName (from a log) or selfLink (from a resource) and parses from it the
+            parameters needed to make a request (project and address)"""
+            exp = r".*projects/(.*)/global/addresses/(.*)"
+            return re.match(exp, resc_name).groups()
+
+        @classmethod
+        def get(cls, client, resource_info):
+            project_id, address = cls.parse_params(resource_info['resourceName'])
+            return client.execute_command('get', {'project': project_id, 'address': address})
+
+        @classmethod
+        def get_label_params(cls, resource, all_labels):
+            project_id, address = cls.parse_params(resource['selfLink'])
+            return {
+                'project': project_id,
+                'resource': address,
+                'body': {
+                    'labels': all_labels,
+                    'labelFingerprint': resource['labelFingerprint']
+                }
+            }
+
+        @classmethod
+        def refresh(cls, client, resource):
+            """This method is used to refresh labelFingerprint when a label action fails because the
+            fingerprint was stale."""
+            return cls.get(client, {'resourceName': resource['selfLink']})

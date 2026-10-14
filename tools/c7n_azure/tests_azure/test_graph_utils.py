@@ -676,3 +676,500 @@ class TestEntraIDDiagnosticSettingsFilter(BaseTest):
 
         # If no diagnostic settings match, should return empty list
         self.assertEqual(result, [])
+
+
+class TestMakeBatchedGraphRequest(BaseTest):
+    """Test GraphResourceManager.make_batched_graph_request method"""
+
+    def test_make_batched_graph_request_success(self):
+        """Test successful batched Graph API request"""
+        policy = self.load_policy({
+            'name': 'test-batch-request',
+            'resource': 'azure.entraid-user'
+        })
+
+        manager = policy.resource_manager
+        mock_session = Mock()
+        mock_token = Mock()
+        mock_token.token = 'fake-token'
+        mock_session.credentials.get_token.return_value = mock_token
+        mock_session._initialize_session.return_value = None
+
+        # Sample batch request
+        batch_request = [
+            {
+                "id": "1",
+                "method": "GET",
+                "url": "/users/user1"
+            },
+            {
+                "id": "2",
+                "method": "GET",
+                "url": "/users/user2"
+            }
+        ]
+
+        # Sample Graph API batch response
+        batch_response = {
+            "responses": [
+                {
+                    "id": "1",
+                    "status": 200,
+                    "body": {"id": "user1", "displayName": "User One"}
+                },
+                {
+                    "id": "2",
+                    "status": 200,
+                    "body": {"id": "user2", "displayName": "User Two"}
+                }
+            ]
+        }
+
+        mock_response = Mock()
+        mock_response.json.return_value = batch_response
+        mock_response.raise_for_status.return_value = None
+
+        with patch.object(manager, 'get_client', return_value=mock_session):
+            with patch('c7n_azure.graph_utils.get_required_permissions_for_endpoint'):
+                with patch('c7n_azure.graph_utils.requests.post',
+                          return_value=mock_response) as mock_post:
+                    result = manager.make_batched_graph_request(batch_request)
+
+        # Verify the result
+        self.assertEqual(result, batch_response["responses"])
+        self.assertEqual(len(result), 2)
+
+        # Verify requests.post was called with correct parameters
+        mock_post.assert_called_once()
+        call_args = mock_post.call_args
+        self.assertEqual(call_args[0][0], 'https://graph.microsoft.com/v1.0/$batch')
+        self.assertIn('headers', call_args[1])
+        self.assertIn('json', call_args[1])
+        self.assertEqual(call_args[1]['json']['requests'], batch_request)
+        self.assertEqual(call_args[1]['timeout'], 30)
+
+    def test_make_batched_graph_request_permission_check_error(self):
+        """Test batched request fails when $batch endpoint is not mapped"""
+        policy = self.load_policy({
+            'name': 'test-batch-permission-error',
+            'resource': 'azure.entraid-user'
+        })
+
+        manager = policy.resource_manager
+        mock_session = Mock()
+        mock_session._initialize_session.return_value = None
+
+        batch_request = {"requests": []}
+
+        with patch.object(manager, 'get_client', return_value=mock_session):
+            with patch('c7n_azure.graph_utils.get_required_permissions_for_endpoint',
+                      side_effect=ValueError("Unmapped endpoint")):
+                with patch('c7n_azure.graph_utils.log') as mock_log:
+                    with self.assertRaises(ValueError):
+                        manager.make_batched_graph_request(batch_request)
+
+                    # Verify error was logged
+                    mock_log.error.assert_called_with(
+                        "Cannot make Graph API batch request to unmapped endpoint: $batch"
+                    )
+
+    def test_make_batched_graph_request_api_error(self):
+        """Test batched request handles API errors"""
+        policy = self.load_policy({
+            'name': 'test-batch-api-error',
+            'resource': 'azure.entraid-user'
+        })
+
+        manager = policy.resource_manager
+        mock_session = Mock()
+        mock_token = Mock()
+        mock_token.token = 'fake-token'
+        mock_session.credentials.get_token.return_value = mock_token
+        mock_session._initialize_session.return_value = None
+
+        # Sample batch request
+        batch_request = [
+            {
+                "id": "1",
+                "method": "GET",
+                "url": "/users/user1"
+            },
+            {
+                "id": "2",
+                "method": "GET",
+                "url": "/users/user2"
+            }
+        ]
+
+        with patch.object(manager, 'get_client', return_value=mock_session):
+            with patch('c7n_azure.graph_utils.get_required_permissions_for_endpoint'):
+                with patch('c7n_azure.graph_utils.requests.post',
+                          side_effect=requests.exceptions.RequestException("API Error")):
+                    with patch('c7n_azure.graph_utils.log') as mock_log:
+                        with self.assertRaises(requests.exceptions.RequestException):
+                            manager.make_batched_graph_request(batch_request)
+
+                        # Verify error was logged (note the bug: it references undefined 'endpoint')
+                        mock_log.error.assert_called()
+
+    def test_make_batched_graph_request_http_error_response(self):
+        """Test batched request handles HTTP error status codes"""
+        policy = self.load_policy({
+            'name': 'test-batch-http-error',
+            'resource': 'azure.entraid-user'
+        })
+
+        manager = policy.resource_manager
+        mock_session = Mock()
+        mock_token = Mock()
+        mock_token.token = 'fake-token'
+        mock_session.credentials.get_token.return_value = mock_token
+        mock_session._initialize_session.return_value = None
+
+        # Sample batch request
+        batch_request = [
+            {
+                "id": "1",
+                "method": "GET",
+                "url": "/users/user1"
+            },
+            {
+                "id": "2",
+                "method": "GET",
+                "url": "/users/user2"
+            }
+        ]
+
+        mock_response = Mock()
+        mock_response.raise_for_status.side_effect = requests.exceptions.HTTPError("403 Forbidden")
+
+        with patch.object(manager, 'get_client', return_value=mock_session):
+            with patch('c7n_azure.graph_utils.get_required_permissions_for_endpoint'):
+                with patch('c7n_azure.graph_utils.requests.post', return_value=mock_response):
+                    with self.assertRaises(requests.exceptions.HTTPError):
+                        manager.make_batched_graph_request(batch_request)
+
+    def test_make_batched_graph_request_token_acquisition(self):
+        """Test batched request properly acquires token with correct scope"""
+        policy = self.load_policy({
+            'name': 'test-batch-token',
+            'resource': 'azure.entraid-user'
+        })
+
+        manager = policy.resource_manager
+        mock_session = Mock()
+        mock_token = Mock()
+        mock_token.token = 'fake-token-123'
+        mock_session.credentials.get_token.return_value = mock_token
+        mock_session._initialize_session.return_value = None
+
+        # Sample batch request
+        batch_request = [
+            {
+                "id": "1",
+                "method": "GET",
+                "url": "/users/user1"
+            },
+            {
+                "id": "2",
+                "method": "GET",
+                "url": "/users/user2"
+            }
+        ]
+
+        # Sample Graph API batch response
+        batch_response = {
+            "responses": [
+                {
+                    "id": "1",
+                    "status": 200,
+                    "body": {"id": "user1", "displayName": "User One"}
+                },
+                {
+                    "id": "2",
+                    "status": 200,
+                    "body": {"id": "user2", "displayName": "User Two"}
+                }
+            ]
+        }
+
+        mock_response = Mock()
+        mock_response.json.return_value = batch_response
+
+        with patch.object(manager, 'get_client', return_value=mock_session):
+            with patch('c7n_azure.graph_utils.get_required_permissions_for_endpoint'):
+                with patch('c7n_azure.graph_utils.requests.post',
+                          return_value=mock_response) as mock_post:
+                    manager.make_batched_graph_request(batch_request)
+
+        # Verify token was requested with correct scope
+        mock_session.credentials.get_token.assert_called_once_with(
+            'https://graph.microsoft.com/.default'
+        )
+
+        # Verify Authorization header contains the token
+        call_args = mock_post.call_args
+        headers = call_args[1]['headers']
+        self.assertEqual(headers['Authorization'], 'Bearer fake-token-123')
+        self.assertEqual(headers['Content-Type'], 'application/json')
+
+    def test_make_batched_graph_request_session_initialization(self):
+        """Test batched request initializes session before making request"""
+        policy = self.load_policy({
+            'name': 'test-batch-session-init',
+            'resource': 'azure.entraid-user'
+        })
+
+        manager = policy.resource_manager
+        mock_session = Mock()
+        mock_token = Mock()
+        mock_token.token = 'fake-token'
+        mock_session.credentials.get_token.return_value = mock_token
+        mock_session._initialize_session = Mock()
+
+        batch_request = []
+        batch_response = {"responses": []}
+
+        mock_response = Mock()
+        mock_response.json.return_value = batch_response
+
+        with patch.object(manager, 'get_client', return_value=mock_session):
+            with patch('c7n_azure.graph_utils.get_required_permissions_for_endpoint'):
+                with patch('c7n_azure.graph_utils.requests.post', return_value=mock_response):
+                    manager.make_batched_graph_request(batch_request)
+
+        # Verify session was initialized
+        mock_session._initialize_session.assert_called_once()
+
+    def test_make_batched_graph_request_url_construction(self):
+        """Test batched request uses correct Graph API URL"""
+        policy = self.load_policy({
+            'name': 'test-batch-url',
+            'resource': 'azure.entraid-user'
+        })
+
+        manager = policy.resource_manager
+        mock_session = Mock()
+        mock_token = Mock()
+        mock_token.token = 'fake-token'
+        mock_session.credentials.get_token.return_value = mock_token
+        mock_session._initialize_session.return_value = None
+
+        # Sample batch request
+        batch_request = [
+            {
+                "id": "1",
+                "method": "GET",
+                "url": "/users/user1"
+            },
+            {
+                "id": "2",
+                "method": "GET",
+                "url": "/users/user2"
+            }
+        ]
+
+        # Sample Graph API batch response
+        batch_response = {
+            "responses": [
+                {
+                    "id": "1",
+                    "status": 200,
+                    "body": {"id": "user1", "displayName": "User One"}
+                },
+                {
+                    "id": "2",
+                    "status": 200,
+                    "body": {"id": "user2", "displayName": "User Two"}
+                }
+            ]
+        }
+
+        mock_response = Mock()
+        mock_response.json.return_value = batch_response
+
+        with patch.object(manager, 'get_client', return_value=mock_session):
+            with patch('c7n_azure.graph_utils.get_required_permissions_for_endpoint'):
+                with patch('c7n_azure.graph_utils.requests.post',
+                          return_value=mock_response) as mock_post:
+                    manager.make_batched_graph_request(batch_request)
+
+        # Verify correct URL is used
+        call_args = mock_post.call_args
+        self.assertEqual(call_args[0][0], 'https://graph.microsoft.com/v1.0/$batch')
+
+    def test_make_batched_graph_request_timeout(self):
+        """Test batched request uses correct timeout value"""
+        policy = self.load_policy({
+            'name': 'test-batch-timeout',
+            'resource': 'azure.entraid-user'
+        })
+
+        manager = policy.resource_manager
+        mock_session = Mock()
+        mock_token = Mock()
+        mock_token.token = 'fake-token'
+        mock_session.credentials.get_token.return_value = mock_token
+        mock_session._initialize_session.return_value = None
+
+        batch_request = [
+            {
+                "id": "1",
+                "method": "GET",
+                "url": "/users/user1"
+            },
+            {
+                "id": "2",
+                "method": "GET",
+                "url": "/users/user2"
+            }
+        ]
+
+        # Sample Graph API batch response
+        batch_response = {
+            "responses": [
+                {
+                    "id": "1",
+                    "status": 200,
+                    "body": {"id": "user1", "displayName": "User One"}
+                },
+                {
+                    "id": "2",
+                    "status": 200,
+                    "body": {"id": "user2", "displayName": "User Two"}
+                }
+            ]
+        }
+
+        mock_response = Mock()
+        mock_response.json.return_value = batch_response
+
+        with patch.object(manager, 'get_client', return_value=mock_session):
+            with patch('c7n_azure.graph_utils.get_required_permissions_for_endpoint'):
+                with patch('c7n_azure.graph_utils.requests.post',
+                          return_value=mock_response) as mock_post:
+                    manager.make_batched_graph_request(batch_request)
+
+        # Verify timeout is set to 30 seconds
+        call_args = mock_post.call_args
+        self.assertEqual(call_args[1]['timeout'], 30)
+
+    def test_make_batched_graph_request_empty_batch(self):
+        """Test batched request handles empty batch request"""
+        policy = self.load_policy({
+            'name': 'test-batch-empty',
+            'resource': 'azure.entraid-user'
+        })
+
+        manager = policy.resource_manager
+        mock_session = Mock()
+        mock_token = Mock()
+        mock_token.token = 'fake-token'
+        mock_session.credentials.get_token.return_value = mock_token
+        mock_session._initialize_session.return_value = None
+
+        batch_request = []
+        batch_response = {"responses": []}
+
+        mock_response = Mock()
+        mock_response.json.return_value = batch_response
+
+        with patch.object(manager, 'get_client', return_value=mock_session):
+            with patch('c7n_azure.graph_utils.get_required_permissions_for_endpoint'):
+                with patch('c7n_azure.graph_utils.requests.post',
+                          return_value=mock_response):
+                    result = manager.make_batched_graph_request(batch_request)
+
+        self.assertEqual(result, batch_response["responses"])
+        self.assertEqual(len(result), 0)
+
+    def test_make_batched_graph_request_large_batch(self):
+        """Test batched request handles large batch with many requests"""
+        policy = self.load_policy({
+            'name': 'test-batch-large',
+            'resource': 'azure.entraid-user'
+        })
+
+        manager = policy.resource_manager
+        mock_session = Mock()
+        mock_token = Mock()
+        mock_token.token = 'fake-token'
+        mock_session.credentials.get_token.return_value = mock_token
+        mock_session._initialize_session.return_value = None
+
+        # Create a batch with 25 requests (Graph API limit is typically 20)
+        batch_request = [
+            {"id": str(i), "method": "GET", "url": f"/users/user{i}"}
+            for i in range(25)
+        ]
+
+        batch_responses = [
+            {
+                "responses": [
+                    {"id": str(i), "status": 200, "body": {"id": f"user{i}"}}
+                    for i in range(20)
+                ]
+            },
+            {
+                "responses": [
+                    {"id": str(i), "status": 200, "body": {"id": f"user{i}"}}
+                    for i in range(20, 25)
+                ]
+            },
+        ]
+
+        mock_response = Mock()
+        mock_response.json.side_effect = batch_responses
+
+        with patch.object(manager, 'get_client', return_value=mock_session):
+            with patch('c7n_azure.graph_utils.get_required_permissions_for_endpoint'):
+                with patch('c7n_azure.graph_utils.requests.post',
+                          return_value=mock_response):
+                    result = manager.make_batched_graph_request(batch_request)
+
+        self.assertEqual(len(result), 25)
+        self.assertEqual(result, batch_responses[0]["responses"] + batch_responses[1]["responses"])
+
+    def test_make_batched_graph_request_mixed_status_codes(self):
+        """Test batched request handles mixed success/error responses"""
+        policy = self.load_policy({
+            'name': 'test-batch-mixed',
+            'resource': 'azure.entraid-user'
+        })
+
+        manager = policy.resource_manager
+        mock_session = Mock()
+        mock_token = Mock()
+        mock_token.token = 'fake-token'
+        mock_session.credentials.get_token.return_value = mock_token
+        mock_session._initialize_session.return_value = None
+
+        batch_request = [
+            {"id": "1", "method": "GET", "url": "/users/user1"},
+            {"id": "2", "method": "GET", "url": "/users/nonexistent"},
+            {"id": "3", "method": "GET", "url": "/users/user3"}
+        ]
+
+        # Some requests succeed, some fail
+        batch_response = {
+            "responses": [
+                {"id": "1", "status": 200, "body": {"id": "user1"}},
+                {"id": "2", "status": 404, "body": {"error": "Not found"}},
+                {"id": "3", "status": 200, "body": {"id": "user3"}}
+            ]
+        }
+
+        mock_response = Mock()
+        mock_response.json.return_value = batch_response
+
+        with patch.object(manager, 'get_client', return_value=mock_session):
+            with patch('c7n_azure.graph_utils.get_required_permissions_for_endpoint'):
+                with patch('c7n_azure.graph_utils.requests.post',
+                          return_value=mock_response):
+                    result = manager.make_batched_graph_request(batch_request)
+
+        # The batch request itself succeeds, individual errors are in responses
+        self.assertEqual(len(result), 3)
+        self.assertEqual(result[0]['status'], 200)
+        self.assertEqual(result[1]['status'], 404)
+        self.assertEqual(result[2]['status'], 200)

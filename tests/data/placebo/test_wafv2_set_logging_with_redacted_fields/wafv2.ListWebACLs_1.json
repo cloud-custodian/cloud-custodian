@@ -1,0 +1,16 @@
+{
+    "status_code": 200,
+    "data": {
+        "NextMarker": "tester",
+        "WebACLs": [
+            {
+                "Name": "tester",
+                "Id": "05a86beb-0518-4d89-88a5-e95eb4449218",
+                "Description": "",
+                "LockToken": "6f8b3afc-f0dc-4485-a1ed-0a9eabd14ca7",
+                "ARN": "arn:aws:wafv2:us-east-1:644160558196:regional/webacl/tester/05a86beb-0518-4d89-88a5-e95eb4449218"
+            }
+        ],
+        "ResponseMetadata": {}
+    }
+}

@@ -1,0 +1,49 @@
+{
+    "status_code": 200,
+    "data": {
+        "WebACL": {
+            "Name": "noncompliant-waf-2",
+            "Id": "c08b8eab-6bd8-4458-849b-5328308fb3fe",
+            "ARN": "arn:aws:wafv2:us-east-1:644160558196:regional/webacl/noncompliant-waf-2/c08b8eab-6bd8-4458-849b-5328308fb3fe",
+            "DefaultAction": {
+                "Allow": {}
+            },
+            "Description": "Standalone Rule",
+            "Rules": [
+                {
+                    "Name": "test",
+                    "Priority": 0,
+                    "Statement": {
+                        "GeoMatchStatement": {
+                            "CountryCodes": [
+                                "DZ"
+                            ]
+                        }
+                    },
+                    "Action": {
+                        "Block": {}
+                    },
+                    "VisibilityConfig": {
+                        "SampledRequestsEnabled": true,
+                        "CloudWatchMetricsEnabled": true,
+                        "MetricName": "test"
+                    }
+                }
+            ],
+            "VisibilityConfig": {
+                "SampledRequestsEnabled": true,
+                "CloudWatchMetricsEnabled": true,
+                "MetricName": "noncompliant-waf-2"
+            },
+            "Capacity": 1,
+            "ManagedByFirewallManager": false,
+            "LabelNamespace": "awswaf:644160558196:webacl:noncompliant-waf-2:",
+            "RetrofittedByFirewallManager": false,
+            "OnSourceDDoSProtectionConfig": {
+                "ALBLowReputationMode": "ACTIVE_UNDER_DDOS"
+            }
+        },
+        "LockToken": "556f91cb-f46c-430c-9be3-b5a62f99dba9",
+        "ResponseMetadata": {}
+    }
+}

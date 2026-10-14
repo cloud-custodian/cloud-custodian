@@ -1,0 +1,53 @@
+{
+    "status_code": 200,
+    "data": {
+        "Rules": [
+            {
+                "RuleArn": "arn:aws:elasticloadbalancing:us-east-1:123456789012:listener-rule/app/test-alb/1234567890abcdef/abcdef1234567890/1234567890abcdef",
+                "Priority": "1",
+                "Conditions": [
+                    {
+                        "Field": "path-pattern",
+                        "Values": ["/api/*"]
+                    }
+                ],
+                "Actions": [
+                    {
+                        "Type": "forward",
+                        "TargetGroupArn": "arn:aws:elasticloadbalancing:us-east-1:123456789012:targetgroup/test-tg/1234567890abcdef",
+                        "Order": 1
+                    }
+                ],
+                "IsDefault": false
+            },
+            {
+                "RuleArn": "arn:aws:elasticloadbalancing:us-east-1:123456789012:listener-rule/app/test-alb/1234567890abcdef/abcdef1234567890/default",
+                "Priority": "default",
+                "Conditions": [],
+                "Actions": [
+                    {
+                        "Type": "redirect",
+                        "Order": 1,
+                        "RedirectConfig": {
+                            "Protocol": "HTTPS",
+                            "Port": "443",
+                            "StatusCode": "HTTP_301"
+                        }
+                    }
+                ],
+                "IsDefault": true
+            }
+        ],
+        "ResponseMetadata": {
+            "RetryAttempts": 0,
+            "HTTPStatusCode": 200,
+            "RequestId": "12345678-1234-1234-1234-123456789012",
+            "HTTPHeaders": {
+                "x-amzn-requestid": "12345678-1234-1234-1234-123456789012",
+                "content-type": "text/xml",
+                "date": "Tue, 19 Nov 2025 10:00:00 GMT"
+            }
+        }
+    }
+}
+

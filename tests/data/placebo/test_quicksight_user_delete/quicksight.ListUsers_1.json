@@ -5,15 +5,25 @@
         "Status": 200,
         "UserList": [
             {
-                "Arn": "arn:aws:quicksight:us-east-1:644160558196:user/default/Jerry",
-                "UserName": "Jerry",
-                "Email": "policyfoundry@capitalone.com",
+                "Arn": "arn:aws:quicksight:us-east-1:644160558196:user/default/c7n-test",
+                "UserName": "c7n-test",
+                "Email": "test@c7n.com",
                 "Role": "READER",
+                "IdentityType": "QUICKSIGHT",
+                "Active": false,
+                "PrincipalId": "user/d-90667776ef/44f88488-9011-7006-fecd-c7d4aaea37f4"
+            },
+            {
+                "Arn": "arn:aws:quicksight:us-east-1:644160558196:user/default/AWSReservedSSO/abc123",
+                "UserName": "AWSReservedSSO/abc123",
+                "Email": "test@example.com",
+                "Role": "ADMIN_PRO",
                 "IdentityType": "IAM",
                 "Active": true,
-                "PrincipalId": "federated/iam/AIDAZL6XWCR2GMVVY4IYC"
+                "PrincipalId": "federated/iam/AROA3FLD2ZISAQPHZK4RY:abc123",
+                "CustomPermissionsName": "c7n-test-permissions"
             }
         ],
-        "RequestId": "952dbb33-a2f0-434f-a552-0dcb87fe51b9"
+        "RequestId": "e914c38d-2d3b-4172-8bfe-f41af3b0b457"
     }
 }

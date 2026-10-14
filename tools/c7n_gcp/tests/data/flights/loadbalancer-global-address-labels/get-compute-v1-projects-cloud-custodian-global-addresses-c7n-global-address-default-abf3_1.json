@@ -1,0 +1,34 @@
+{
+  "headers": {
+    "content-type": "application/json; charset=UTF-8",
+    "vary": "Origin, X-Origin, Referer",
+    "date": "Tue, 21 Apr 2026 20:41:01 GMT",
+    "server": "ESF",
+    "x-xss-protection": "0",
+    "x-frame-options": "SAMEORIGIN",
+    "x-content-type-options": "nosniff",
+    "alt-svc": "h3=\":443\"; ma=2592000,h3-29=\":443\"; ma=2592000",
+    "transfer-encoding": "chunked",
+    "status": "200",
+    "content-length": "561",
+    "-content-encoding": "gzip",
+    "content-location": "https://compute.googleapis.com/compute/v1/projects/cloud-custodian/global/addresses/c7n-global-address-default-abf3?alt=json"
+  },
+  "body": {
+    "kind": "compute#address",
+    "id": "1846832603165515296",
+    "creationTimestamp": "2026-04-21T13:40:47.496-07:00",
+    "name": "c7n-global-address-default-abf3",
+    "description": "",
+    "address": "34.102.242.222",
+    "status": "RESERVED",
+    "selfLink": "https://www.googleapis.com/compute/v1/projects/cloud-custodian/global/addresses/c7n-global-address-default-abf3",
+    "networkTier": "PREMIUM",
+    "labels": {
+      "goog-terraform-provisioned": "true",
+      "env": "not-the-default"
+    },
+    "labelFingerprint": "XzoNciJNMTE=",
+    "addressType": "EXTERNAL"
+  }
+}

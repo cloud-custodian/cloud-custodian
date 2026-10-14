@@ -1,7 +1,12 @@
 {
     "status_code": 200,
     "data": {
-        "TagList": [],
+        "TagList": [
+            {
+                "Key": "Owner",
+                "Value": "aj@stacklet.io"
+            }
+        ],
         "ResponseMetadata": {}
     }
 }

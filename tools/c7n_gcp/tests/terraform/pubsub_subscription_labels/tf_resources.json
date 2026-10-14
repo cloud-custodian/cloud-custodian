@@ -1,0 +1,78 @@
+{
+    "pytest-terraform": 1,
+    "outputs": {},
+    "resources": {
+        "google_pubsub_subscription": {
+            "default": {
+                "ack_deadline_seconds": 10,
+                "bigquery_config": [],
+                "cloud_storage_config": [],
+                "dead_letter_policy": [],
+                "effective_labels": {
+                    "env": "default",
+                    "goog-terraform-provisioned": "true"
+                },
+                "enable_exactly_once_delivery": false,
+                "enable_message_ordering": false,
+                "expiration_policy": [
+                    {
+                        "ttl": "2678400s"
+                    }
+                ],
+                "filter": "",
+                "id": "projects/cloud-custodian/subscriptions/c7n-subscription-default-b0fa",
+                "labels": {
+                    "env": "default"
+                },
+                "message_retention_duration": "604800s",
+                "message_transforms": [],
+                "name": "c7n-subscription-default-b0fa",
+                "project": "stacklet-test-policies",
+                "push_config": [],
+                "retain_acked_messages": false,
+                "retry_policy": [],
+                "tags": null,
+                "terraform_labels": {
+                    "env": "default",
+                    "goog-terraform-provisioned": "true"
+                },
+                "timeouts": null,
+                "topic": "projects/cloud-custodian/topics/c7n-topic-default-b0fa"
+            }
+        },
+        "google_pubsub_topic": {
+            "default": {
+                "effective_labels": {
+                    "goog-terraform-provisioned": "true"
+                },
+                "id": "projects/cloud-custodian/topics/c7n-topic-default-b0fa",
+                "ingestion_data_source_settings": [],
+                "kms_key_name": "",
+                "labels": null,
+                "message_retention_duration": "",
+                "message_storage_policy": [],
+                "message_transforms": [],
+                "name": "c7n-topic-default-b0fa",
+                "project": "stacklet-test-policies",
+                "schema_settings": [],
+                "tags": null,
+                "terraform_labels": {
+                    "goog-terraform-provisioned": "true"
+                },
+                "timeouts": null
+            }
+        },
+        "random_id": {
+            "suffix": {
+                "b64_std": "sPo=",
+                "b64_url": "sPo",
+                "byte_length": 2,
+                "dec": "45306",
+                "hex": "b0fa",
+                "id": "sPo",
+                "keepers": null,
+                "prefix": null
+            }
+        }
+    }
+}

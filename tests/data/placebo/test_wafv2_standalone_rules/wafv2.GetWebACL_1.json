@@ -3,19 +3,20 @@
     "data": {
         "WebACL": {
             "Name": "compliant-waf",
-            "Id": "12085f42-13fc-4287-b85d-1f443dd64890",
-            "ARN": "arn:aws:wafv2:us-east-1:644160558196:regional/webacl/compliant-waf/12085f42-13fc-4287-b85d-1f443dd64890",
+            "Id": "d4595dae-518e-4ff7-98ac-609091678beb",
+            "ARN": "arn:aws:wafv2:us-east-1:644160558196:regional/webacl/compliant-waf/d4595dae-518e-4ff7-98ac-609091678beb",
             "DefaultAction": {
                 "Allow": {}
             },
-            "Description": "DELETE ME",
+            "Description": "",
             "Rules": [
                 {
-                    "Name": "delete-me-rule-group",
+                    "Name": "AWS-AWSManagedRulesAmazonIpReputationList",
                     "Priority": 0,
                     "Statement": {
-                        "RuleGroupReferenceStatement": {
-                            "ARN": "arn:aws:wafv2:us-east-1:644160558196:regional/rulegroup/test-rule-group/039e783d-9783-43c2-b21f-e08821ab670d"
+                        "ManagedRuleGroupStatement": {
+                            "VendorName": "AWS",
+                            "Name": "AWSManagedRulesAmazonIpReputationList"
                         }
                     },
                     "OverrideAction": {
@@ -24,7 +25,25 @@
                     "VisibilityConfig": {
                         "SampledRequestsEnabled": true,
                         "CloudWatchMetricsEnabled": true,
-                        "MetricName": "delete-me-rule-group"
+                        "MetricName": "AWS-AWSManagedRulesAmazonIpReputationList"
+                    }
+                },
+                {
+                    "Name": "AWS-AWSManagedRulesAnonymousIpList",
+                    "Priority": 1,
+                    "Statement": {
+                        "ManagedRuleGroupStatement": {
+                            "VendorName": "AWS",
+                            "Name": "AWSManagedRulesAnonymousIpList"
+                        }
+                    },
+                    "OverrideAction": {
+                        "None": {}
+                    },
+                    "VisibilityConfig": {
+                        "SampledRequestsEnabled": true,
+                        "CloudWatchMetricsEnabled": true,
+                        "MetricName": "AWS-AWSManagedRulesAnonymousIpList"
                     }
                 }
             ],
@@ -33,11 +52,15 @@
                 "CloudWatchMetricsEnabled": true,
                 "MetricName": "compliant-waf"
             },
-            "Capacity": 1,
+            "Capacity": 75,
             "ManagedByFirewallManager": false,
-            "LabelNamespace": "awswaf:644160558196:webacl:compliant-waf:"
+            "LabelNamespace": "awswaf:644160558196:webacl:compliant-waf:",
+            "RetrofittedByFirewallManager": false,
+            "OnSourceDDoSProtectionConfig": {
+                "ALBLowReputationMode": "ACTIVE_UNDER_DDOS"
+            }
         },
-        "LockToken": "8a3925d6-73dc-400f-b77d-0c01b8852b27",
+        "LockToken": "e081f73f-8e5c-4916-b485-1969096102d6",
         "ResponseMetadata": {}
     }
 }

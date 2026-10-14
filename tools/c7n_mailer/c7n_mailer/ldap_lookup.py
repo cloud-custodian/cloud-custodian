@@ -13,6 +13,7 @@ else:
     have_sqlite = True
 from ldap3 import Connection
 from ldap3.core.exceptions import LDAPSocketOpenError
+from ldap3.utils.conv import escape_filter_chars
 
 
 class LdapLookup:
@@ -145,7 +146,7 @@ class LdapLookup:
                 cache_msg = "Got ldap metadata from local cache for: %s" % uid
                 self.log.debug(cache_msg)
                 return cache_result
-        ldap_filter = "(%s=%s)" % (self.uid_key, uid)
+        ldap_filter = "(%s=%s)" % (self.uid_key, escape_filter_chars(uid))
         ldap_results = self.search_ldap(self.base_dn, ldap_filter, attributes=self.attributes)
         if ldap_results:
             ldap_user_metadata = self.get_dict_from_ldap_object(self.connection.entries[0])

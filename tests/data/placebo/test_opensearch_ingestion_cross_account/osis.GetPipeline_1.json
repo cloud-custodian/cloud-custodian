@@ -1,0 +1,54 @@
+{
+    "status_code": 200,
+    "data": {
+        "ResponseMetadata": {},
+        "Pipeline": {
+            "PipelineName": "c7n-test",
+            "PipelineArn": "arn:aws:osis:us-east-1:644160558196:pipeline/c7n-test",
+            "MinUnits": 1,
+            "MaxUnits": 1,
+            "Status": "ACTIVE",
+            "StatusReason": {
+                "Description": "The pipeline is ready to ingest data."
+            },
+            "PipelineConfigurationBody": "version: \"2\"\nopensearch-pipeline:\n  source:\n    http:\n      path: \"/\"\n  sink:\n    - s3:\n        aws:\n          sts_role_arn: \"arn:aws:iam::644160558196:role/osis-pipeline-role\"\n          region: \"us-east-1\"\n        bucket: \"c7n-osis-sink\"\n        threshold:\n          event_collect_timeout: \"60s\"\n        codec:\n          ndjson:\n",
+            "CreatedAt": {
+                "__class__": "datetime",
+                "year": 2026,
+                "month": 2,
+                "day": 12,
+                "hour": 8,
+                "minute": 54,
+                "second": 19,
+                "microsecond": 0
+            },
+            "LastUpdatedAt": {
+                "__class__": "datetime",
+                "year": 2026,
+                "month": 2,
+                "day": 12,
+                "hour": 8,
+                "minute": 54,
+                "second": 19,
+                "microsecond": 0
+            },
+            "IngestEndpointUrls": [
+                "c7n-test-dxju5zxehoj33fusmav74fwq6i.us-east-1.osis.amazonaws.com"
+            ],
+            "LogPublishingOptions": {
+                "IsLoggingEnabled": true,
+                "CloudWatchLogDestination": {
+                    "LogGroup": "/aws/vendedlogs/osis/c7n-pipeline-logs"
+                }
+            },
+            "Destinations": [
+                {
+                    "ServiceName": "S3",
+                    "Endpoint": "c7n-osis-sink"
+                }
+            ],
+            "Tags": [],
+            "PipelineRoleArn": "arn:aws:iam::644160558196:role/osis-pipeline-role"
+        }
+    }
+}

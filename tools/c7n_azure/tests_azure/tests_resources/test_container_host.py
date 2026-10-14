@@ -7,7 +7,7 @@ import tempfile
 import yaml
 from azure.common import AzureHttpError
 from azure.storage.queue import QueueMessage
-from mock import ANY, Mock, patch
+from unittest.mock import ANY, Mock, patch
 
 from ..azure_common import BaseTest
 from c7n_azure.container_host.host import Host

@@ -1,0 +1,95 @@
+{
+    "pytest-terraform": 1,
+    "outputs": {},
+    "resources": {
+        "google_firestore_backup_schedule": {
+            "c7n": {
+                "daily_recurrence": [
+                    {}
+                ],
+                "database": "c7nfs-cub",
+                "id": "projects/cloud-custodian/databases/c7nfs-cub/backupSchedules/2fad5953-30ea-4b0e-8c12-fe1a18cadb13",
+                "name": "2fad5953-30ea-4b0e-8c12-fe1a18cadb13",
+                "project": "stacklet-personal-2",
+                "retention": "1209600s",
+                "timeouts": null,
+                "weekly_recurrence": []
+            },
+            "c7n_east": {
+                "daily_recurrence": [
+                    {}
+                ],
+                "database": "c7nfs-cub-east",
+                "id": "projects/cloud-custodian/databases/c7nfs-cub-east/backupSchedules/e69a0f99-c933-4184-bd27-75ffde8ab852",
+                "name": "e69a0f99-c933-4184-bd27-75ffde8ab852",
+                "project": "stacklet-personal-2",
+                "retention": "604800s",
+                "timeouts": null,
+                "weekly_recurrence": []
+            }
+        },
+        "google_firestore_database": {
+            "c7n": {
+                "app_engine_integration_mode": "DISABLED",
+                "cmek_config": [],
+                "concurrency_mode": "PESSIMISTIC",
+                "create_time": "2026-04-02T15:05:21.905859Z",
+                "database_edition": "STANDARD",
+                "delete_protection_state": "DELETE_PROTECTION_DISABLED",
+                "deletion_policy": "DELETE",
+                "earliest_version_time": "2026-04-02T15:05:21.905859Z",
+                "etag": "IPvCpLy4z5MDMMPBl7y4z5MD",
+                "firestore_data_access_mode": "",
+                "id": "projects/cloud-custodian/databases/c7nfs-cub",
+                "key_prefix": "",
+                "location_id": "us-central1",
+                "mongodb_compatible_data_access_mode": "",
+                "name": "c7nfs-cub",
+                "point_in_time_recovery_enablement": "POINT_IN_TIME_RECOVERY_DISABLED",
+                "project": "stacklet-personal-2",
+                "realtime_updates_mode": "REALTIME_UPDATES_MODE_ENABLED",
+                "tags": null,
+                "timeouts": null,
+                "type": "FIRESTORE_NATIVE",
+                "uid": "9b56e2ad-b93e-4002-8e84-5dddfe7f62c1",
+                "update_time": "2026-04-02T15:05:21.905859Z",
+                "version_retention_period": "3600s"
+            },
+            "c7n_east": {
+                "app_engine_integration_mode": "DISABLED",
+                "cmek_config": [],
+                "concurrency_mode": "PESSIMISTIC",
+                "create_time": "2026-04-02T15:05:22.686871Z",
+                "database_edition": "STANDARD",
+                "delete_protection_state": "DELETE_PROTECTION_DISABLED",
+                "deletion_policy": "DELETE",
+                "earliest_version_time": "2026-04-02T15:05:22.686871Z",
+                "etag": "IOGi2Ly4z5MDMJeXx7y4z5MD",
+                "firestore_data_access_mode": "",
+                "id": "projects/cloud-custodian/databases/c7nfs-cub-east",
+                "key_prefix": "",
+                "location_id": "us-east1",
+                "mongodb_compatible_data_access_mode": "",
+                "name": "c7nfs-cub-east",
+                "point_in_time_recovery_enablement": "POINT_IN_TIME_RECOVERY_DISABLED",
+                "project": "stacklet-personal-2",
+                "realtime_updates_mode": "REALTIME_UPDATES_MODE_ENABLED",
+                "tags": null,
+                "timeouts": null,
+                "type": "FIRESTORE_NATIVE",
+                "uid": "e84cabaa-776e-4c04-b7cc-4a4abda31146",
+                "update_time": "2026-04-02T15:05:22.686871Z",
+                "version_retention_period": "3600s"
+            }
+        },
+        "random_pet": {
+            "db": {
+                "id": "c7nfs-cub",
+                "keepers": null,
+                "length": 1,
+                "prefix": "c7nfs",
+                "separator": "-"
+            }
+        }
+    }
+}

@@ -1,0 +1,106 @@
+{
+    "pytest-terraform": 1,
+    "outputs": {},
+    "resources": {
+        "google_compute_disk": {
+            "default": {
+                "access_mode": "",
+                "architecture": null,
+                "async_primary_disk": [],
+                "create_snapshot_before_destroy": false,
+                "create_snapshot_before_destroy_prefix": null,
+                "creation_timestamp": "2026-04-29T11:43:45.192-07:00",
+                "description": "",
+                "disk_encryption_key": [],
+                "disk_id": "3705851477175037838",
+                "effective_labels": {
+                    "goog-terraform-provisioned": "true"
+                },
+                "enable_confidential_compute": false,
+                "guest_os_features": [],
+                "id": "projects/cloud-custodian/zones/us-central1-a/disks/c7n-disk-default-d0b4",
+                "image": "",
+                "label_fingerprint": "vezUS-42LLM=",
+                "labels": null,
+                "last_attach_timestamp": "",
+                "last_detach_timestamp": "",
+                "licenses": [],
+                "name": "c7n-disk-default-d0b4",
+                "params": [],
+                "physical_block_size_bytes": 4096,
+                "project": "stacklet-test-policies",
+                "provisioned_iops": 0,
+                "provisioned_throughput": 0,
+                "self_link": "https://www.googleapis.com/compute/v1/projects/cloud-custodian/zones/us-central1-a/disks/c7n-disk-default-d0b4",
+                "size": 10,
+                "snapshot": "",
+                "source_disk": "",
+                "source_disk_id": "",
+                "source_image_encryption_key": [],
+                "source_image_id": "",
+                "source_instant_snapshot": "",
+                "source_instant_snapshot_id": "",
+                "source_snapshot_encryption_key": [],
+                "source_snapshot_id": "",
+                "source_storage_object": null,
+                "storage_pool": "",
+                "terraform_labels": {
+                    "goog-terraform-provisioned": "true"
+                },
+                "timeouts": null,
+                "type": "pd-standard",
+                "users": [],
+                "zone": "us-central1-a"
+            }
+        },
+        "google_compute_snapshot": {
+            "default": {
+                "chain_name": "",
+                "creation_timestamp": "2026-04-29T11:43:56.576-07:00",
+                "description": "",
+                "disk_size_gb": 10,
+                "effective_labels": {
+                    "env": "default",
+                    "goog-terraform-provisioned": "true"
+                },
+                "id": "projects/cloud-custodian/global/snapshots/c7n-snapshot-default-d0b4",
+                "label_fingerprint": "oWv7t93mrS4=",
+                "labels": {
+                    "env": "default"
+                },
+                "licenses": [],
+                "name": "c7n-snapshot-default-d0b4",
+                "project": "stacklet-test-policies",
+                "self_link": "https://www.googleapis.com/compute/v1/projects/cloud-custodian/global/snapshots/c7n-snapshot-default-d0b4",
+                "snapshot_encryption_key": [],
+                "snapshot_id": 7576125036782677891,
+                "snapshot_type": "",
+                "source_disk": "https://www.googleapis.com/compute/v1/projects/cloud-custodian/zones/us-central1-a/disks/c7n-disk-default-d0b4",
+                "source_disk_encryption_key": [],
+                "source_instant_snapshot": null,
+                "storage_bytes": 0,
+                "storage_locations": [
+                    "us"
+                ],
+                "terraform_labels": {
+                    "env": "default",
+                    "goog-terraform-provisioned": "true"
+                },
+                "timeouts": null,
+                "zone": "us-central1-a"
+            }
+        },
+        "random_id": {
+            "suffix": {
+                "b64_std": "0LQ=",
+                "b64_url": "0LQ",
+                "byte_length": 2,
+                "dec": "53428",
+                "hex": "d0b4",
+                "id": "0LQ",
+                "keepers": null,
+                "prefix": null
+            }
+        }
+    }
+}

@@ -1,0 +1,11 @@
+{
+    "status_code": 200,
+    "data": {
+        "ResourceArns": [],
+        "ResponseMetadata": {
+            "RetryAttempts": 0,
+            "HTTPStatusCode": 200,
+            "RequestId": "test-list-resources-apigw-001"
+        }
+    }
+}

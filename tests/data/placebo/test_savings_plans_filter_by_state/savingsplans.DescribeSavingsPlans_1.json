@@ -1,0 +1,63 @@
+{
+  "status_code": 200,
+  "data": {
+    "ResponseMetadata": {
+      "RequestId": "12345678-1234-1234-1234-123456789012",
+      "HTTPStatusCode": 200,
+      "HTTPHeaders": {
+        "date": "Mon, 02 Dec 2024 09:56:58 GMT",
+        "content-type": "application/x-amz-json-1.0"
+      },
+      "RetryAttempts": 0
+    },
+    "SavingsPlans": [
+      {
+        "SavingsPlanId": "sp-12345678901234567",
+        "SavingsPlanArn": "arn:aws:savingsplans::123456789012:savingsplan/sp-12345678901234567",
+        "Description": "Test active savings plan",
+        "Start": "2023-01-01T00:00:00.000Z",
+        "End": "2026-01-01T00:00:00.000Z",
+        "State": "active",
+        "Region": "us-east-1",
+        "EC2InstanceFamily": "m5",
+        "SavingsPlanType": "Compute",
+        "PaymentOption": "All Upfront",
+        "ProductTypes": [
+          "EC2"
+        ],
+        "CurrencyCode": "USD",
+        "Commitment": "10.00",
+        "UpfrontPaymentAmount": "876.00",
+        "RecurringPaymentAmount": "0.00",
+        "TermDurationInSeconds": 94608000,
+        "Tags": []
+      },
+      {
+        "SavingsPlanId": "sp-87654321098765432",
+        "SavingsPlanArn": "arn:aws:savingsplans::123456789012:savingsplan/sp-87654321098765432", 
+        "Description": "Test expired savings plan",
+        "Start": "2022-01-01T00:00:00.000Z",
+        "End": "2023-01-01T00:00:00.000Z",
+        "State": "retired",
+        "Region": "us-west-2",
+        "EC2InstanceFamily": "c5",
+        "SavingsPlanType": "EC2Instance",
+        "PaymentOption": "Partial Upfront",
+        "ProductTypes": [
+          "EC2"
+        ],
+        "CurrencyCode": "USD",
+        "Commitment": "5.00",
+        "UpfrontPaymentAmount": "438.00",
+        "RecurringPaymentAmount": "0.18",
+        "TermDurationInSeconds": 31536000,
+        "Tags": [
+          {
+            "Key": "Environment",
+            "Value": "test"
+          }
+        ]
+      }
+    ]
+  }
+}

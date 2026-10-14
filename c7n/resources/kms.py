@@ -9,11 +9,12 @@ from collections import defaultdict
 from functools import lru_cache
 
 from c7n.actions import RemovePolicyBase, BaseAction
-from c7n.filters import Filter, CrossAccountAccessFilter, ValueFilter
+from c7n.filters import Filter, CrossAccountAccessFilter, ListItemFilter, ValueFilter
 from c7n.manager import resources
 from c7n.query import (
     ConfigSource, DescribeSource, QueryResourceManager, RetryPageIterator, TypeInfo)
 from c7n.utils import local_session, type_schema, select_keys
+from c7n import tags as tagmod
 from c7n.tags import universal_augment
 
 from .securityhub import PostFinding
@@ -134,6 +135,46 @@ class Key(QueryResourceManager):
         for a in aliases:
             alias_map[a['TargetKeyId']].append(a['AliasName'])
         return alias_map
+
+
+class SkipAwsManagedKey:
+    """Mixin for kms-key actions that cannot operate on AWS managed keys
+    (KeyManager == 'AWS', e.g. the keys backing alias/aws/s3,
+    alias/aws/ebs, etc). AWS owns the lifecycle, policy, and rotation of
+    these keys; ScheduleKeyDeletion, key policy changes, rotation
+    changes, and tag mutations are all rejected by the API for them.
+    Filters them out before delegating to the real action and emits a
+    warning so operators know why they were skipped."""
+
+    def process(self, resources):
+        excluded = [r for r in resources if r.get('KeyManager') == 'AWS']
+        if excluded:
+            self.manager.log.warning(
+                "Skipping %d AWS managed key(s) which cannot be modified "
+                "by any customer account",
+                len(excluded))
+        resources = [r for r in resources if r.get('KeyManager') != 'AWS']
+        if not resources:
+            return
+        return super().process(resources)
+
+
+@Key.action_registry.register('mark')
+@Key.action_registry.register('tag')
+class KeyTag(SkipAwsManagedKey, tagmod.UniversalTag):
+    pass
+
+
+@Key.action_registry.register('unmark')
+@Key.action_registry.register('untag')
+@Key.action_registry.register('remove-tag')
+class KeyRemoveTag(SkipAwsManagedKey, tagmod.UniversalUntag):
+    pass
+
+
+@Key.action_registry.register('mark-for-op')
+class KeyMarkForOp(SkipAwsManagedKey, tagmod.UniversalTagDelayedAction):
+    pass
 
 
 @Key.filter_registry.register('key-rotation-status')
@@ -313,7 +354,6 @@ class ResourceKmsKeyAlias(ValueFilter):
         return matched
 
 
-@Key.action_registry.register('remove-statements')
 @KeyAlias.action_registry.register('remove-statements')
 class RemovePolicyStatement(RemovePolicyBase):
     """Action to remove policy statements from KMS
@@ -380,8 +420,12 @@ class RemovePolicyStatement(RemovePolicyBase):
                 'Statements': found}
 
 
-@Key.action_registry.register('set-rotation')
-class KmsKeyRotation(BaseAction):
+@Key.action_registry.register('remove-statements')
+class KeyRemovePolicyStatement(SkipAwsManagedKey, RemovePolicyStatement):
+    pass
+
+
+class _KmsKeyRotationBase(BaseAction):
     """Toggle KMS key rotation
 
     :example:
@@ -409,6 +453,11 @@ class KmsKeyRotation(BaseAction):
                 client.enable_key_rotation(KeyId=k['KeyId'])
                 continue
             client.disable_key_rotation(KeyId=k['KeyId'])
+
+
+@Key.action_registry.register('set-rotation')
+class KmsKeyRotation(SkipAwsManagedKey, _KmsKeyRotationBase):
+    pass
 
 
 @KeyAlias.action_registry.register('post-finding')
@@ -494,8 +543,120 @@ class LastRotation(ValueFilter):
         return results
 
 
-@Key.action_registry.register("schedule-deletion")
-class KmsKeyScheduleDeletion(BaseAction):
+@Key.filter_registry.register('last-usage')
+class LastUsage(ListItemFilter):
+    """Filters KMS keys by their last usage information.
+
+    Uses the ``GetKeyLastUsage`` API to retrieve key usage metadata,
+    enabling multi-attribute matching on last usage timestamp, operation,
+    tracking start date, and key creation date in a single filter.
+
+    The response fields are returned as a single item for filtering:
+
+    - ``KeyLastUsage.Timestamp`` - when the key was last used (absent if never used)
+    - ``KeyLastUsage.Operation`` - the last cryptographic operation performed
+    - ``KeyLastUsage.CloudTrailEventId`` - CloudTrail event ID for the last operation
+    - ``KeyLastUsage.KmsRequestId`` - KMS request ID for the last operation
+    - ``TrackingStartDate`` - when usage tracking began for this key
+    - ``KeyCreationDate`` - when the key was created
+
+    If the key has never been used since tracking began, ``KeyLastUsage``
+    will be empty.
+
+    For more details, see:
+    https://docs.aws.amazon.com/kms/latest/developerguide/monitoring-keys-determining-usage.html
+
+    .. warning::
+
+       Do not use ``GetKeyLastUsage`` as the sole indicator when scheduling
+       a key for deletion. Instead, first disable the key and monitor
+       CloudTrail for ``DisabledException`` entries, as there could be
+       infrequent workflows that depend on the key.
+
+    :example:
+
+    Find keys not used in the last 30 days:
+
+    .. code-block:: yaml
+
+            policies:
+              - name: kms-unused-keys-30-days
+                resource: kms-key
+                filters:
+                  - type: last-usage
+                    attrs:
+                      - type: value
+                        key: KeyLastUsage.Timestamp
+                        value: 30
+                        value_type: age
+                        op: gte
+
+    Find keys that have never been used since tracking began:
+
+    .. code-block:: yaml
+
+              - name: kms-never-used-keys
+                resource: kms-key
+                filters:
+                  - type: last-usage
+                    attrs:
+                      - type: value
+                        key: KeyLastUsage.Timestamp
+                        value: absent
+
+    Find keys last used for Decrypt with usage tracked since a specific date:
+
+    .. code-block:: yaml
+
+              - name: kms-keys-decrypt-recent-tracking
+                resource: kms-key
+                filters:
+                  - type: last-usage
+                    attrs:
+                      - type: value
+                        key: KeyLastUsage.Operation
+                        value: Decrypt
+                      - type: value
+                        key: TrackingStartDate
+                        value_type: age
+                        op: lte
+                        value: 90
+
+    """
+
+    schema = type_schema(
+        'last-usage',
+        attrs={'$ref': '#/definitions/filters_common/list_item_attrs'},
+        count={'type': 'number'},
+        count_op={'$ref': '#/definitions/filters_common/comparison_operators'},
+    )
+    schema_alias = False
+    permissions = ('kms:GetKeyLastUsage',)
+    item_annotation_key = 'c7n:LastUsage'
+    annotate_items = True
+    _client = None
+
+    def get_client(self):
+        if self._client is None:
+            self._client = local_session(self.manager.session_factory).client('kms')
+        return self._client
+
+    def get_item_values(self, resource):
+        client = self.get_client()
+        try:
+            result = client.get_key_last_usage(KeyId=resource['KeyId'])
+        except ClientError as err:
+            self.log.warning(
+                "error getting last usage for key:%s - %s",
+                resource['KeyId'], err
+            )
+            return []
+
+        result.pop('ResponseMetadata', None)
+        return [result]
+
+
+class _KmsKeyScheduleDeletionBase(BaseAction):
     """Schedule KMS key deletion
 
     If the number of days is not specified, the default value of 30 days is used.
@@ -528,3 +689,8 @@ class KmsKeyScheduleDeletion(BaseAction):
             client.schedule_key_deletion(
                 KeyId=k["KeyId"], PendingWindowInDays=self.data.get("days", 30)
             )
+
+
+@Key.action_registry.register("schedule-deletion")
+class KmsKeyScheduleDeletion(SkipAwsManagedKey, _KmsKeyScheduleDeletionBase):
+    pass

@@ -21,7 +21,6 @@ from .utils import SEVERITY_LEVELS
 from c7n.output import OutputRegistry
 from c7n.utils import jmespath_search, filter_empty
 
-
 report_outputs = OutputRegistry("left")
 
 

@@ -1,0 +1,28 @@
+{
+  "headers": {
+    "content-type": "application/json; charset=UTF-8",
+    "vary": "Origin, X-Origin, Referer",
+    "date": "Thu, 26 Mar 2026 15:43:37 GMT",
+    "server": "ESF",
+    "x-xss-protection": "0",
+    "x-frame-options": "SAMEORIGIN",
+    "x-content-type-options": "nosniff",
+    "alt-svc": "h3=\":443\"; ma=2592000,h3-29=\":443\"; ma=2592000",
+    "transfer-encoding": "chunked",
+    "status": "200",
+    "content-length": "545",
+    "-content-encoding": "gzip"
+  },
+  "body": {
+    "kind": "sql#operation",
+    "targetLink": "https://sqladmin.googleapis.com/sql/v1beta4/projects/cloud-custodian/instances/star-buck",
+    "status": "PENDING",
+    "user": "markos@sixfeetup.com",
+    "insertTime": "2026-03-26T15:43:37.447Z",
+    "operationType": "DELETE_BACKUP",
+    "name": "bf87cf2a-b3b8-4b81-ac14-1a3100000032",
+    "targetId": "star-buck",
+    "selfLink": "https://sqladmin.googleapis.com/sql/v1beta4/projects/cloud-custodian/operations/bf87cf2a-b3b8-4b81-ac14-1a3100000032",
+    "targetProject": "stacklet-test-policies"
+  }
+}

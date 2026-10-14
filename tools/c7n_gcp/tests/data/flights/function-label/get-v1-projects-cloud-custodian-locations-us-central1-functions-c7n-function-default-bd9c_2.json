@@ -1,0 +1,44 @@
+{
+  "headers": {
+    "content-type": "application/json; charset=UTF-8",
+    "vary": "Origin, X-Origin, Referer",
+    "date": "Tue, 28 Apr 2026 15:49:09 GMT",
+    "server": "ESF",
+    "x-xss-protection": "0",
+    "x-frame-options": "SAMEORIGIN",
+    "x-content-type-options": "nosniff",
+    "alt-svc": "h3=\":443\"; ma=2592000,h3-29=\":443\"; ma=2592000",
+    "transfer-encoding": "chunked",
+    "status": "200",
+    "content-length": "1149",
+    "-content-encoding": "gzip",
+    "content-location": "https://cloudfunctions.googleapis.com/v1/projects/cloud-custodian/locations/us-central1/functions/c7n-function-default-bd9c?alt=json"
+  },
+  "body": {
+    "name": "projects/cloud-custodian/locations/us-central1/functions/c7n-function-default-bd9c",
+    "sourceArchiveUrl": "gs://c7n-function-default-bd9c/function-3d0e868c8d5bface0f0bab8a737a0ce7.zip",
+    "httpsTrigger": {
+      "url": "https://us-central1-stacklet-test-policies.cloudfunctions.net/c7n-function-default-bd9c",
+      "securityLevel": "SECURE_OPTIONAL"
+    },
+    "status": "ACTIVE",
+    "entryPoint": "hello_http",
+    "timeout": "60s",
+    "availableMemoryMb": 128,
+    "serviceAccountEmail": "stacklet-test-policies@appspot.gserviceaccount.com",
+    "updateTime": "2026-04-28T15:48:59.853Z",
+    "versionId": "2",
+    "labels": {
+      "goog-terraform-provisioned": "true",
+      "env": "not-the-default"
+    },
+    "runtime": "python310",
+    "ingressSettings": "ALLOW_ALL",
+    "buildId": "ca0e710c-f995-4fdb-a208-ef5d2f92c8ab",
+    "buildName": "projects/cloud-custodian/locations/us-central1/builds/ca0e710c-f995-4fdb-a208-ef5d2f92c8ab",
+    "dockerRegistry": "ARTIFACT_REGISTRY",
+    "automaticUpdatePolicy": {},
+    "buildServiceAccount": "projects/cloud-custodian/serviceAccounts/859150599087-compute@developer.gserviceaccount.com",
+    "satisfiesPzi": true
+  }
+}

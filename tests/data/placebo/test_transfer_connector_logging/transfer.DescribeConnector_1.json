@@ -1,0 +1,29 @@
+{
+    "status_code": 200,
+    "data": {
+        "Connector": {
+            "Arn": "arn:aws:transfer:us-east-1:644160558196:connector/c-3d06182674db43f68",
+            "ConnectorId": "c-3d06182674db43f68",
+            "Url": "sftp://s-0c148654812543d5b.server.transfer.us-east-1.amazonaws.com",
+            "AccessRole": "arn:aws:iam::644160558196:role/Transfer-S3-c7n-Demo-RW",
+            "Tags": [
+                {
+                    "Key": "Name",
+                    "Value": "c7n-test-nologging"
+                }
+            ],
+            "SftpConfig": {
+                "UserSecretId": "arn:aws:secretsmanager:us-east-1:644160558196:secret:aws/transfer/c7n-demo-connector-secret-9kp5eC",
+                "TrustedHostKeys": [],
+                "MaxConcurrentConnections": 5
+            },
+            "ServiceManagedEgressIpAddresses": [
+                "67.202.57.40",
+                "44.209.137.228",
+                "50.19.171.17"
+            ],
+            "SecurityPolicyName": "TransferSFTPConnectorSecurityPolicy-2024-03"
+        },
+        "ResponseMetadata": {}
+    }
+}

@@ -1,0 +1,26 @@
+{
+  "headers": {
+    "etag": "hUMJ5zrK79LvJGjKqnzcI-koov8=/GZ2LvcTazmt1qRb128CgXVjrjLU=",
+    "content-type": "application/json; charset=UTF-8",
+    "vary": "Origin, X-Origin, Referer",
+    "date": "Thu, 12 Feb 2026 11:15:50 GMT",
+    "server": "ESF",
+    "x-xss-protection": "0",
+    "x-frame-options": "SAMEORIGIN",
+    "x-content-type-options": "nosniff",
+    "transfer-encoding": "chunked",
+    "status": "200",
+    "-content-encoding": "gzip",
+    "content-location": "https://compute.googleapis.com/compute/v1/projects/cloud-custodian/regions/us-central1/addresses?alt=json"
+  },
+  "body": {
+    "kind": "compute#addressAggregatedList",
+    "id": "projects/cloud-custodian/aggregated/addresses",
+    "items": {
+      "regions/us-central1": {
+        "addresses": []
+      }
+    },
+    "selfLink": "https://www.googleapis.com/compute/v1/projects/cloud-custodian/regions/us-central1/addresses"
+  }
+}

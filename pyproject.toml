@@ -13,10 +13,10 @@ dependencies = [
     "pyyaml>=5.4.0",
     "tabulate<1.0.0,>=0.9.0",
     # uv hint: to get latest urllib3
-    "urllib3>2"
+    "urllib3>2",
 ]
 name = "c7n"
-version = "0.9.48"
+version = "0.9.53"
 description = "Cloud Custodian - Policy Rules Engine"
 readme = "README.md"
 classifiers = [
@@ -43,25 +43,30 @@ dev = [
     "moto<6.0,>=5.0",
     "openapi-spec-validator<1.0.0,>=0.7.1",
     "placebo<1,>=0",
-    "pytest<8",
-    "pytest-cov<6,>=3",
+    "pytest<10",
+    "pytest-cov<8,>=3",
+    "pytest-env>=1.5.0",
     "pytest-recording<0.14.0,>=0.12.1",
-    "pytest-sugar<1.1.0,>=0.9.2",
-    "pytest-terraform<0.8,>=0.6",
+    "pytest-sugar<2.0,>=0.9.2",
+    "pytest-terraform<1.0.0,>=0.7.0",
     "pytest-xdist<4.0,>=3.0",
     "tomli>=2.2",
     "twine>=6.0.0",
     "vcrpy>=4.0.2",
 ]
 lint = [
-    "black<25.0, >=23.1",
+    "black>=23.1,<27.0",
     "ruff~=0.11",
 ]
 addons = [
     "aws-xray-sdk<3.0,>=2.14",
+    "bs4>=0.0.2",
     "jsonpatch<2.0,>=1.25",
     "psutil>=5.7",
 ]
+
+[tool.uv]
+exclude-newer = "5 days"
 
 [tool.uv.sources]
 c7n = { workspace = true }
@@ -89,6 +94,15 @@ build-backend = "hatchling.build"
 [tool.black]
 skip-string-normalization = true
 line-length = 100
+include = '''
+(
+    tools/c7n_left/.*\.py$
+    | tools/c7n_mailer/.*\.py$
+    | tools/c7n_oci/.*\.py$
+    | tools/c7n_kube/.*\.py$
+    | tools/c7n_awscc/.*\.py$
+)
+'''
 
 [tool.ruff]
 line-length = 100
@@ -120,3 +134,11 @@ filterwarnings = [
 # services removed upstream, we have some minimal fake implementations for
 # temporary compatiblity for existing policies.
 omit = ["c7n/resources/opsworks.py", "c7n/resources/qldb.py"]
+
+[tool.pytest_env]
+env_files = [".env", "test.env"]
+AWS_PROFILE = { unset = true }
+# Set when recording Google Workspace flight data. Left set, they would
+# make the recorded tests depend on the developer's environment.
+GOOGLE_WORKSPACE_SUBJECT = { unset = true }
+GOOGLE_WORKSPACE_CUSTOMER = { unset = true }

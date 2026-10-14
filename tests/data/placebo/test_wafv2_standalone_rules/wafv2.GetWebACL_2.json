@@ -2,21 +2,21 @@
     "status_code": 200,
     "data": {
         "WebACL": {
-            "Name": "noncompliant-waf-1",
-            "Id": "dbf1bdc8-38ed-448c-ad81-24335a0d09a8",
-            "ARN": "arn:aws:wafv2:us-east-1:644160558196:regional/webacl/noncompliant-waf-1/dbf1bdc8-38ed-448c-ad81-24335a0d09a8",
+            "Name": "compliant-waf-3",
+            "Id": "2731e4f8-c467-42ba-a3d6-42d671265f03",
+            "ARN": "arn:aws:wafv2:us-east-1:644160558196:regional/webacl/compliant-waf-3/2731e4f8-c467-42ba-a3d6-42d671265f03",
             "DefaultAction": {
                 "Allow": {}
             },
-            "Description": "",
+            "Description": "1 standalone 1 cust. rule group",
             "Rules": [
                 {
-                    "Name": "custom-rule",
+                    "Name": "standalone2",
                     "Priority": 0,
                     "Statement": {
                         "GeoMatchStatement": {
                             "CountryCodes": [
-                                "AQ"
+                                "AM"
                             ]
                         }
                     },
@@ -26,20 +26,41 @@
                     "VisibilityConfig": {
                         "SampledRequestsEnabled": true,
                         "CloudWatchMetricsEnabled": true,
-                        "MetricName": "custom-rule"
+                        "MetricName": "standalone2"
+                    }
+                },
+                {
+                    "Name": "rules",
+                    "Priority": 1,
+                    "Statement": {
+                        "RuleGroupReferenceStatement": {
+                            "ARN": "arn:aws:wafv2:us-east-1:644160558196:regional/rulegroup/with-rules/60616042-d427-4c17-991c-ee3a39012c31"
+                        }
+                    },
+                    "OverrideAction": {
+                        "None": {}
+                    },
+                    "VisibilityConfig": {
+                        "SampledRequestsEnabled": true,
+                        "CloudWatchMetricsEnabled": true,
+                        "MetricName": "rules"
                     }
                 }
             ],
             "VisibilityConfig": {
                 "SampledRequestsEnabled": true,
                 "CloudWatchMetricsEnabled": true,
-                "MetricName": "noncompliant-waf-1"
+                "MetricName": "compliant-waf-3"
             },
-            "Capacity": 1,
+            "Capacity": 2,
             "ManagedByFirewallManager": false,
-            "LabelNamespace": "awswaf:644160558196:webacl:noncompliant-waf-1:"
+            "LabelNamespace": "awswaf:644160558196:webacl:compliant-waf-3:",
+            "RetrofittedByFirewallManager": false,
+            "OnSourceDDoSProtectionConfig": {
+                "ALBLowReputationMode": "ACTIVE_UNDER_DDOS"
+            }
         },
-        "LockToken": "6a65edef-e52e-409b-b724-0ab3909c62ca",
+        "LockToken": "cf9d8a76-3d84-4260-a954-569559d6b504",
         "ResponseMetadata": {}
     }
 }

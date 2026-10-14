@@ -105,13 +105,6 @@ def test_ec2_stop_protection_disabled(test, ec2_stop_protection_disabled):
         ec2_stop_protection_disabled['aws_instance.no_protection.id'],
         resource_ids)
 
-    # set the api stop protection to false to allow terraform to handle the teardown
-    client = session_factory().client('ec2')
-    client.modify_instance_attribute(
-        InstanceId=ec2_stop_protection_disabled['aws_instance.stop_protection.id'],
-        DisableApiStop={'Value': False}
-    )
-
 
 def test_ec2_stop_protection_filter_permissions(test):
     policy = test.load_policy(
@@ -192,6 +185,147 @@ class TestEc2NetworkLocation(BaseTest):
         )
         resources = policy.run()
         self.assertEqual(len(resources), 0)
+
+
+AUGMENT_REGION = 'us-east-1'
+AUGMENT_TAG_COUNT = 3
+CLOUDTRAIL_MODE = {'type': 'cloudtrail', 'events': ['RunInstances']}
+
+
+def _strip_instance_tags(session_factory) -> None:
+    """Simulate missing DescribeInstances tags in live and replay runs."""
+    def strip_tags(parsed: dict, **kw) -> None:
+        for reservation in parsed['Reservations']:
+            for instance in reservation['Instances']:
+                instance.pop('Tags', None)
+
+    utils.local_session(session_factory).events.register(
+        'after-call.ec2.DescribeInstances', strip_tags)
+
+
+def _capture_tag_filters(test, session_factory):
+    """Collect the Filters sent on each DescribeTags request.
+
+    Placebo stores only responses and replays them regardless of request, so
+    hooking the request is the only way to assert which filter the back-fill
+    chose. It has to be before-parameter-build rather than before-call:
+    placebo answers before-call itself, and botocore stops at the first
+    handler that returns a response.
+    """
+    sent = []
+    utils.local_session(session_factory).events.register(
+        'before-parameter-build.ec2.DescribeTags',
+        lambda params, **kw: sent.append(params['Filters']))
+    return sent
+
+
+def _augment_policy(test, session_factory, mode=None):
+    data = {'name': 'ec2-tags', 'resource': 'ec2'}
+    if mode is not None:
+        data['mode'] = mode
+    return test.load_policy(
+        data,
+        session_factory=session_factory,
+        config={'region': AUGMENT_REGION},
+    )
+
+
+@terraform('ec2_augment_tags', scope='session')
+def test_tag_augment_short_circuit(test, ec2_augment_tags):
+    """Tags in the describe response mean no describe_tags call.
+
+    The flight data has no DescribeTags response on purpose: placebo raises
+    if one is requested.
+    """
+    session_factory = test.replay_flight_data(
+        'test_ec2_augment_tags_short_circuit', region=AUGMENT_REGION)
+    instance_id = ec2_augment_tags['aws_instance.tagged_a.id']
+
+    policy = _augment_policy(test, session_factory, mode=CLOUDTRAIL_MODE)
+    resources = policy.resource_manager.get_resources([instance_id])
+
+    test.assertEqual(len(resources), 1)
+    test.assertEqual(
+        len(resources[0]['Tags']), AUGMENT_TAG_COUNT,
+        'Proof found of AWOL tags!')
+
+
+@terraform('ec2_augment_tags', scope='session')
+def test_tag_augment_skipped_for_instance_state(test, ec2_augment_tags):
+    """ec2-instance-state mode still skips the back-fill.
+
+    The flight data has no DescribeTags response, so placebo raises if the
+    lookup is attempted. Tags stays absent, as it did before this change.
+    """
+    session_factory = test.replay_flight_data(
+        'test_ec2_augment_tags_instance_state', region=AUGMENT_REGION)
+    _strip_instance_tags(session_factory)
+    instance_id = ec2_augment_tags['aws_instance.tagged_a.id']
+
+    policy = _augment_policy(
+        test, session_factory,
+        mode={'type': 'ec2-instance-state', 'events': ['pending']})
+    resources = policy.resource_manager.get_resources([instance_id])
+
+    test.assertEqual(len(resources), 1)
+    test.assertNotIn('Tags', resources[0])
+
+
+@terraform('ec2_augment_tags', scope='session')
+@pytest.mark.parametrize(
+    'mode',
+    [None, {'type': 'pull'}, CLOUDTRAIL_MODE],
+    ids=['no-mode', 'pull', 'cloudtrail'],
+)
+def test_tag_augment_lookup_by_id(test, ec2_augment_tags, mode):
+    """Up to the ceiling, tags are looked up by instance id.
+
+    Parametrized over the modes that should reach the lookup; cloudtrail is
+    the one this change enables.
+    """
+    session_factory = test.replay_flight_data(
+        'test_ec2_augment_tags_lookup', region=AUGMENT_REGION)
+    instance_id = ec2_augment_tags['aws_instance.tagged_a.id']
+    _strip_instance_tags(session_factory)
+    sent = _capture_tag_filters(test, session_factory)
+
+    policy = _augment_policy(test, session_factory, mode=mode)
+    resources = policy.resource_manager.get_resources([instance_id])
+
+    test.assertEqual(len(resources), 1)
+    tags = {t['Key']: t['Value'] for t in resources[0]['Tags']}
+    test.assertEqual(len(tags), AUGMENT_TAG_COUNT)
+    test.assertEqual(tags['Env'], 'Production')
+    test.assertEqual(
+        sent, [[{'Name': 'resource-id', 'Values': [instance_id]}]])
+
+
+@terraform('ec2_augment_tags', scope='session')
+def test_tag_augment_lookup_by_resource_type(test, ec2_augment_tags):
+    """The region-wide lookup recovers instance tags across multiple pages."""
+    session_factory = test.replay_flight_data(
+        'test_ec2_augment_tags_lookup_many', region=AUGMENT_REGION)
+    test.patch(ec2, 'EC2_TAG_AUGMENT_BY_INSTANCES_MAX', 1)
+    ids = [ec2_augment_tags['aws_instance.tagged_a.id'],
+           ec2_augment_tags['aws_instance.tagged_b.id']]
+    _strip_instance_tags(session_factory)
+    # Six instance tags require multiple pages with this page size.
+    utils.local_session(session_factory).events.register(
+        'before-parameter-build.ec2.DescribeTags',
+        lambda params, **kw: params.update(MaxResults=5))
+    sent = _capture_tag_filters(test, session_factory)
+
+    policy = _augment_policy(test, session_factory)
+    resources = policy.resource_manager.get_resources(ids)
+
+    test.assertEqual(sorted(r['InstanceId'] for r in resources), sorted(ids))
+    for r in resources:
+        test.assertEqual(
+            {t['Key']: t['Value'] for t in r['Tags']},
+            {'Env': 'Production', 'Name': 'custodian-tester', 'Owner': 'robot'})
+    test.assertGreater(len(sent), 1)
+    for filters in sent:
+        test.assertEqual(filters, [{'Name': 'resource-type', 'Values': ['instance']}])
 
 
 class TestTagAugmentation(BaseTest):
@@ -497,6 +631,26 @@ class TestSsm(BaseTest):
                      'UNSPECIFIED'
                  ],
                  'states': ['NON_COMPLIANT']}]},
+            session_factory=session_factory,
+            config={'region': 'us-east-2'})
+        resources = policy.run()
+        self.assertEqual(len(resources), 2)
+        self.assertTrue('c7n:ssm-compliance' in resources[0])
+        self.assertEqual(
+            [r['InstanceId'] for r in resources],
+            ['i-0dea82d960d56dc1d', 'i-0ba3874e85bb97244'])
+
+    def test_ssm_compliance_states_default(self):
+        session_factory = self.replay_flight_data('test_ec2_ssm_compliance_filter')
+        policy = self.load_policy({
+            'name': 'ec2-ssm-compliance',
+            'resource': 'aws.ec2',
+            'filters': [
+                {'type': 'ssm-compliance',
+                 'compliance_types': [
+                     'Association',
+                     'Patch'
+                 ]}]},
             session_factory=session_factory,
             config={'region': 'us-east-2'})
         resources = policy.run()
@@ -814,6 +968,67 @@ class TestImageFilter(BaseTest):
         resources = policy.run()
         self.assertEqual(len(resources), 1)
         self.assertEqual(resources[0]["InstanceId"], "i-039628786cabe8c16")
+
+
+@terraform('ec2_image_metadata')
+def test_ec2_image_metadata_filter(test, ec2_image_metadata):
+    """Filter aws.ec2 by image-metadata — covers Amazon-owned, local, and deregistered AMIs."""
+    aws_region = 'us-east-1'
+    session_factory = test.replay_flight_data('ec2_image_metadata_filter', region=aws_region)
+
+    all_instance_ids = [
+        ec2_image_metadata['aws_instance.amazon_ami.id'],
+        ec2_image_metadata['aws_instance.local_ami.id'],
+        ec2_image_metadata['aws_instance.deregistered_ami.id'],
+    ]
+
+    p = test.load_policy({
+        'name': 'ec2-deregistered-image',
+        'resource': 'aws.ec2',
+        'filters': [
+            {'type': 'value', 'op': 'in', 'key': 'InstanceId', 'value': all_instance_ids},
+            {'State.Name': 'running'},
+            {'type': 'image-metadata', 'key': 'State', 'value': 'deregistered'},
+        ],
+    }, session_factory=session_factory, config={'region': aws_region})
+
+    resources = p.run()
+    test.assertEqual(len(resources), 1)
+    test.assertEqual(
+        resources[0]['InstanceId'],
+        ec2_image_metadata['aws_instance.deregistered_ami.id'])
+    test.assertIn('c7n:image-metadata', resources[0])
+    test.assertEqual(resources[0]['c7n:image-metadata']['State'], 'deregistered')
+
+
+@terraform('ec2_image_metadata')
+def test_ec2_image_metadata_resource(test, ec2_image_metadata):
+    """Query aws.ec2-instance-ami resource directly — verifies all 3 AMI ownership scenarios."""
+    aws_region = 'us-east-1'
+    session_factory = test.replay_flight_data('ec2_image_metadata_resource', region=aws_region)
+
+    all_instance_ids = [
+        ec2_image_metadata['aws_instance.amazon_ami.id'],
+        ec2_image_metadata['aws_instance.local_ami.id'],
+        ec2_image_metadata['aws_instance.deregistered_ami.id'],
+    ]
+
+    p = test.load_policy({
+        'name': 'ec2-instance-ami-all',
+        'resource': 'aws.ec2-instance-ami',
+        'filters': [
+            {'type': 'value', 'op': 'in', 'key': 'InstanceId', 'value': all_instance_ids},
+        ],
+    }, session_factory=session_factory, config={'region': aws_region})
+
+    resources = p.run()
+    test.assertEqual(len(resources), 3)
+    test.assertIn('ImageMetadata', resources[0])
+
+    states = {r['InstanceId']: r['ImageMetadata']['State'] for r in resources}
+    test.assertEqual(
+        states[ec2_image_metadata['aws_instance.deregistered_ami.id']],
+        'deregistered')
 
 
 class TestInstanceAge(BaseTest):
@@ -2511,3 +2726,272 @@ class TestCapacityReservation(BaseTest):
             )
         resources = p.run()
         self.assertEqual(len(resources), 2)
+
+
+def test_ec2_compute_optimizer_no_params(test):
+    session_factory = test.replay_flight_data("test_ec2_compute_optimizer_no_params")
+    policy = test.load_policy(
+        {
+            "name": "ec2-optimizations",
+            "resource": "aws.ec2",
+            "filters": [{"type": "compute-optimizer"}],
+        },
+        session_factory=session_factory,
+        config={"account_id": "644160558196"}
+    )
+
+    resources = policy.run()
+
+    # All instances are returned with recommendations annotated.
+    test.assertEqual(len(resources), 2)
+    test.assertEqual(len(resources[0]['c7n:ComputeOptimizerRecommendations']), 2)
+    test.assertEqual(len(resources[1]['c7n:ComputeOptimizerRecommendations']), 0)
+
+
+def test_ec2_compute_optimizer_client_side(test):
+    session_factory = test.replay_flight_data("test_ec2_compute_optimizer_client_side")
+    policy = test.load_policy(
+        {
+            "name": "ec2-non-optimized-instances-client-side-filter",
+            "resource": "aws.ec2",
+            "filters": [
+                {
+                    "type": "compute-optimizer",
+                    "key": "finding",
+                    "op": "not-equal",
+                    "value": "OPTIMIZED",
+                },
+            ],
+        },
+        session_factory=session_factory,
+        config={"account_id": "644160558196"}
+    )
+
+    resources = policy.run()
+
+    test.assertEqual(len(resources), 1)
+    test.assertEqual(resources[0]['InstanceId'], "i-039b21b80b9602a24")
+
+
+def test_ec2_compute_optimizer_server_side_valid(test):
+    session_factory = test.replay_flight_data("test_ec2_compute_optimizer_server_side_valid")
+    policy = test.load_policy(
+        {
+            "name": "ec2-non-optimized-instances-server-side-filter",
+            "resource": "aws.ec2",
+            "filters": [
+                {
+                    "type": "compute-optimizer",
+                    "filters": {"Finding": ["Underprovisioned", "Overprovisioned"]},
+                    "recommendation-preferences": {"cpuVendorArchitectures": ["AWS_ARM64"]},
+                }
+            ],
+        },
+        session_factory=session_factory,
+        config={"account_id": "644160558196"}
+    )
+    policy = policy.run()
+    # What's returned doesn't actually matter, just that our filters passed validation.
+
+
+def test_ec2_compute_optimizer_server_side_invalid(test):
+    with pytest.raises(PolicyValidationError):
+        test.load_policy(
+            {
+                "name": "ec2-graviton-recommendations",
+                "resource": "aws.ec2",
+                "filters": [
+                    {
+                        "type": "compute-optimizer",
+                        "filters": {"invalid-key": ["invalid-value"]},
+                        "recommendation-preferences": {"invalid-key": "invalid-value"},
+                    }
+                ],
+            },
+        )
+
+
+class TestEC2IamRoleFilter(BaseTest):
+    """Tests for EC2 iam-role filter"""
+
+    def test_ec2_iam_role_filter_by_tag(self):
+        """Test filtering EC2 instances by IAM role tag"""
+        session_factory = self.replay_flight_data('test_ec2_iam_role_filter_by_tag')
+        policy = self.load_policy(
+            {
+                'name': 'ec2-iam-role-filter',
+                'resource': 'ec2',
+                'filters': [
+                    {
+                        'type': 'iam-role',
+                        'key': 'tag:Environment',
+                        'value': 'Production'
+                    }
+                ]
+            },
+            session_factory=session_factory
+        )
+        resources = policy.run()
+        self.assertEqual(len(resources), 1)
+        self.assertIn('c7n:matched-iam-role', resources[0])
+        self.assertEqual(resources[0]['c7n:matched-iam-role'], ['c7n-pratyush-test'])
+
+    def test_ec2_iam_role_filter_by_role_name(self):
+        """Test filtering EC2 instances by IAM role name"""
+        factory = self.replay_flight_data('test_ec2_iam_role_filter_by_role_name')
+        policy = self.load_policy(
+            {
+                'name': 'ec2-iam-role-name',
+                'resource': 'ec2',
+                'filters': [
+                    {
+                        'type': 'iam-role',
+                        'key': 'RoleName',
+                        'value': 'c7n-pratyush-test',
+                        'op': 'eq'
+                    }
+                ]
+            },
+            session_factory=factory
+        )
+        resources = policy.run()
+        self.assertEqual(len(resources), 1)
+        self.assertEqual(
+            resources[0].get('InstanceId'), 'i-0087ce11c395e5703')
+
+
+class TestEC2IamRoleTagMirro(BaseTest):
+    """Tests for EC2 iam-role-tag-mirror filter"""
+
+    def test_ec2_iam_role_tag_mirror_equal(self):
+        """Test iam-role-tag-mirror with match: equal"""
+        factory = self.replay_flight_data('test_ec2_iam_role_tag_mirror_equal')
+        policy = self.load_policy(
+            {
+                'name': 'ec2-role-tag-mirror-equal',
+                'resource': 'ec2',
+                'filters': [
+                    {
+                        'type': 'iam-role-tag-mirror',
+                        'key': 'tag:Environment',
+                        'match': 'equal'
+                    }
+                ]
+            },
+            session_factory=factory
+        )
+        resources = policy.run()
+        self.assertEqual(len(resources), 1)
+        # No annotation when tags match
+        self.assertNotIn('c7n:IamRoleTagMirror', resources[0])
+        self.assertEqual(
+            resources[0].get('InstanceId'), 'i-051d5a5a07a40d2a3')
+
+    def test_ec2_iam_role_tag_mirror_ne(self):
+        factory = self.replay_flight_data('test_ec2_iam_role_tag_mirror_ne')
+        policy = self.load_policy(
+            {
+                'name': 'ec2-role-tag-mirror-ignore',
+                'resource': 'ec2',
+                'filters': [
+                    {
+                        'type': 'iam-role-tag-mirror',
+                        'key': 'tag:Environment',
+                        'match': 'not-equal'
+                    }
+                ]
+            },
+            session_factory=factory
+        )
+        resources = policy.run()
+        self.assertEqual(len(resources), 1)
+        self.assertIn('c7n:IamRoleTagMirror', resources[0])
+        self.assertEqual(
+            resources[0].get('InstanceId'), 'i-051d5a5a07a40d2a3')
+        self.assertEqual(
+            resources[0]['c7n:IamRoleTagMirror'][0],
+             {'reason': 'TagMismatch',
+              'key': 'tag:Environment',
+              'resource': 'Development',
+              'iam-roles': {'CloudCustodianRole': 'Production'}})
+
+    def test_ec2_iam_role_tag_mirror_ignore(self):
+        """Test iam-role-tag-mirror with ignore parameter"""
+        factory = self.replay_flight_data('test_ec2_iam_role_tag_mirror_ignore')
+        policy = self.load_policy(
+            {
+                'name': 'ec2-role-tag-mirror-ignore',
+                'resource': 'ec2',
+                'filters': [
+                    {
+                        'type': 'iam-role-tag-mirror',
+                        'key': 'tag:Environment',
+                        'match': 'not-equal',
+                        'ignore': [
+                            {'tag:Owner': 'SharedServices'}
+                        ]
+                    }
+                ]
+            },
+            session_factory=factory
+        )
+        resources = policy.run()
+        self.assertEqual(len(resources), 1)
+        self.assertIn('c7n:IamRoleTagMirror', resources[0])
+        self.assertEqual(
+            resources[0].get('InstanceId'), 'i-0087ce11c395e5703')
+        self.assertEqual(
+            resources[0]['c7n:IamRoleTagMirror'][0],
+             {'reason': 'TagMismatch',
+              'key': 'tag:Environment',
+              'resource': 'Development',
+              'iam-roles': {'c7n-pratyush-test': 'Production'}})
+
+    def test_ec2_iam_role_tag_mirror_match_in(self):
+        """Test iam-role-tag-mirror with match: in"""
+        factory = self.replay_flight_data('test_ec2_iam_role_tag_mirror_match_in')
+        policy = self.load_policy(
+            {
+                'name': 'ec2-role-tag-mirror-in',
+                'resource': 'ec2',
+                'filters': [
+                    {
+                        'type': 'iam-role-tag-mirror',
+                        'key': 'tag:Environment',
+                        'match': 'in',
+                        'value': ['Production', 'Staging', 'Development']
+                    }
+                ]
+            },
+            session_factory=factory
+        )
+        resources = policy.run()
+        self.assertEqual(len(resources), 1)
+        self.assertEqual(
+            resources[0].get('InstanceId'), 'i-051d5a5a07a40d2a3')
+
+    def test_ec2_iam_role_tag_mirror_missing_ok(self):
+        """Test iam-role-tag-mirror with missing-ok: true"""
+        factory = self.replay_flight_data('test_ec2_iam_role_tag_mirror_missing_ok')
+        policy = self.load_policy(
+            {
+                'name': 'ec2-role-tag-mirror-missing-ok',
+                'resource': 'ec2',
+                'filters': [
+                    {
+                        'type': 'iam-role-tag-mirror',
+                        'key': 'tag:CostCenter',
+                        'match': 'not-equal',
+                        'missing-ok': True
+                    }
+                ]
+            },
+            session_factory=factory
+        )
+        resources = policy.run()
+        # Should only flag actual mismatches, not missing tags
+        self.assertEqual(len(resources), 1)
+        evaluation = resources[0]['c7n:IamRoleTagMirror'][0]
+        self.assertEqual(evaluation['reason'], 'TagMismatch')
+        self.assertEqual(
+            resources[0].get('InstanceId'), 'i-0087ce11c395e5703')

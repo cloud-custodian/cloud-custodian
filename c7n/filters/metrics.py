@@ -11,7 +11,11 @@ from datetime import datetime, timedelta
 
 from c7n.exceptions import PolicyValidationError
 from c7n.filters.core import Filter, OPERATORS
-from c7n.utils import local_session, type_schema, chunks
+from c7n.utils import local_session, type_schema, chunks, snap_to_period_start
+
+METRIC_WINDOW_ALIGNMENT = [
+    'auto',
+    'start-of-day']
 
 
 class MetricsFilter(Filter):
@@ -66,8 +70,60 @@ class MetricsFilter(Filter):
     Rather than skipping those resources, "missing-value: 0" causes the
     policy to treat their request counts as 0.
 
+    Missing values only make sense when the statistic represents a
+    total, such as a sum or count.
+
     Note the default statistic for metrics is Average.
+
+    The ``period-start`` key allows you to align the metric window in two ways.
+    By default, using ``auto``, the window is computed relative to the current time.
+    Alternatively, setting it to ``start-of-day`` aligns the window to full UTC calendar days,
+    beginning at 00:00:00 UTC and ending at current day 00:00:00 UTC.
+
+    .. code-block:: yaml
+
+      - name: ec2-low-cpu-last-full-day
+        resource: ec2
+        filters:
+          - type: metrics
+            name: CPUUtilization
+            days: 1
+            period: 86400
+            value: 30
+            op: less-than
+            period-start: start-of-day
+
+    Cloudwatch metrics are time series identified by a metric name,
+    a metric namespace, and by key-value pairs called "dimensions".  A
+    "dimension set" identifies the possible keys and is often as
+    simple as a single element that is a resource identifier, like
+    BucketName.
+
+    Metric filters automatically supply a dimension that is the resource
+    identifier.
+
+    Additional dimensions can be provided to narrow the metric data
+    used:
+
+    .. code-block:: yaml
+
+      dimensions:
+        StorageType: StandardStorage
     """
+    #
+    # Note: metric filters are implemented by:
+    #
+    # - enumerating resources for a resource type.
+    #
+    # - For each resource:
+    #
+    #   - Fetch the metric for the resource, identified by the metric
+    #     name, namespace, and resource dimensions.
+    #
+    #   - Evaluate the condition against the data.
+    #     The filter matches if the condition holds for every data point.
+    #     If there are no data, the filter doesn't match.
+    #     A missing value can be supplied to be used when there are no data.
 
     schema = type_schema(
         'metrics',
@@ -80,6 +136,7 @@ class MetricsFilter(Filter):
            # Type choices
            'statistics': {'type': 'string'},
            'days': {'type': 'number'},
+           'period-start': {'type': 'string', 'enum': METRIC_WINDOW_ALIGNMENT},
            'op': {'type': 'string', 'enum': list(OPERATORS.keys())},
            'value': {'type': 'number'},
            'period': {'type': 'number'},
@@ -125,6 +182,7 @@ class MetricsFilter(Filter):
         'sns': 'AWS/SNS',
         'sqs': 'AWS/SQS',
         'workspaces': 'AWS/WorkSpaces',
+        'bedrock': 'AWS/Bedrock',
     }
 
     standard_stats = {'Average', 'Sum', 'Maximum', 'Minimum', 'SampleCount'}
@@ -133,6 +191,7 @@ class MetricsFilter(Filter):
     def __init__(self, data, manager=None):
         super(MetricsFilter, self).__init__(data, manager)
         self.days = self.data.get('days', 14)
+        self.period_start = self.data.get('period-start', 'auto')
 
     def validate(self):
         stats = self.data.get('statistics', 'Average')
@@ -175,7 +234,11 @@ class MetricsFilter(Filter):
             # CloudWatch retention: 455 days
             end = now.replace(minute=0, second=0, microsecond=0) + timedelta(hours=1)
 
-        return MetricWindow((end - duration), end)
+        start = end - duration
+
+        start, end = snap_to_period_start(start, end, self.period_start)
+
+        return MetricWindow(start, end)
 
     def process(self, resources, event=None):
         self.start, self.end = self.get_metric_window()
@@ -221,6 +284,14 @@ class MetricsFilter(Filter):
             dims.append({'Name': k, 'Value': v})
         return dims
 
+    def get_metric_data(self, client, params):
+        """Retrieve metric datapoints in the filter's normalized shape.
+
+        Resource-specific metric filters may override this method when the
+        metric is not available through GetMetricStatistics.
+        """
+        return client.get_metric_statistics(**params)['Datapoints']
+
     def process_resource_set(self, resource_set):
         client = local_session(
             self.manager.session_factory).client('cloudwatch')
@@ -255,8 +326,7 @@ class MetricsFilter(Filter):
             params[stats_key] = [self.statistics]
 
             if key not in collected_metrics:
-                collected_metrics[key] = client.get_metric_statistics(
-                    **params)['Datapoints']
+                collected_metrics[key] = self.get_metric_data(client, params)
 
             # In certain cases CloudWatch reports no data for a metric.
             # If the policy specifies a fill value for missing data, add

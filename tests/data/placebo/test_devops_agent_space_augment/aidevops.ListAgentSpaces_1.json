@@ -1,0 +1,34 @@
+{
+    "status_code": 200,
+    "data": {
+        "ResponseMetadata": {},
+        "agentSpaces": [
+            {
+                "name": "c7nDevopsAgent",
+                "description": "Testing Custodian",
+                "locale": "en-UK",
+                "createdAt": {
+                    "__class__": "datetime",
+                    "year": 2026,
+                    "month": 5,
+                    "day": 8,
+                    "hour": 16,
+                    "minute": 52,
+                    "second": 1,
+                    "microsecond": 773000
+                },
+                "updatedAt": {
+                    "__class__": "datetime",
+                    "year": 2026,
+                    "month": 5,
+                    "day": 8,
+                    "hour": 16,
+                    "minute": 52,
+                    "second": 1,
+                    "microsecond": 773000
+                },
+                "agentSpaceId": "f68f623c-bb40-4d21-a53c-b36eb3d5a3bc"
+            }
+        ]
+    }
+}

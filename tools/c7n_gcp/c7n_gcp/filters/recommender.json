@@ -7,6 +7,14 @@
     "category": "Cost",
     "permission_prefix": "recommender.bigqueryCapacityCommitmentsRecommendations"
   },
+  "google.bigquery.table.PartitionClusterRecommender": {
+    "name": "BigQuery partition and clustering recommender",
+    "resource": "gcp.bq-table",
+    "id": "google.bigquery.table.PartitionClusterRecommender",
+    "description": "Optimize BigQuery table partitioning and clustering",
+    "category": "Cost",
+    "permission_prefix": "recommender.bigqueryPartitionClusterRecommendations"
+  },
   "google.run.service.CostRecommender": {
     "name": "Cloud Run CPU allocation recommender",
     "resource": "gcp.cloud-run-service",
@@ -31,10 +39,10 @@
     "category": "Cost",
     "permission_prefix": "recommender.cloudsqlOverprovisionedInstanceRecommendations"
   },
-  "google.compute.commitment.UsageCommitmentRecommendergoogle.cloudbilling.commitment.SpendBasedCommitmentRecommender": {
+  "google.compute.commitment.UsageCommitmentRecommender": {
     "name": "Committed use discount recommender",
     "resource": "gcp.compute-project",
-    "id": "google.compute.commitment.UsageCommitmentRecommendergoogle.cloudbilling.commitment.SpendBasedCommitmentRecommender",
+    "id": "google.compute.commitment.UsageCommitmentRecommender",
     "description": "Reduce costs thru commitments",
     "category": "Cost",
     "permission_prefix": "recommender.usageCommitmentRecommendations"

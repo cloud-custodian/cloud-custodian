@@ -3,6 +3,7 @@
 import logging
 import time
 from .common import BaseTest, functional, event_data, load_data
+from unittest import mock
 from unittest.mock import MagicMock
 
 from botocore.exceptions import ClientError as BotoClientError
@@ -18,8 +19,7 @@ from .zpill import ACCOUNT_ID
 @pytest.mark.audited
 @terraform('sg_used_cross_ref')
 def test_sg_used_cross_ref(test, sg_used_cross_ref):
-    aws_region = 'us-west-2'
-    factory = test.replay_flight_data('sg_used_cross_ref', region=aws_region)
+    factory = test.replay_flight_data('sg_used_cross_ref')
     p = test.load_policy({
         'name': 'sg_used_cross_ref',
         'resource': 'security-group',
@@ -2160,6 +2160,49 @@ def test_cross_az_nat_gateway_subnet_resolve(test):
     }
 
 
+def test_cross_az_nat_gateway_regional_nat(test, caplog):
+    """Test that Regional NAT Gateways without SubnetId are handled gracefully and logged."""
+    from c7n.resources.vpc import CrossAZRouteTable
+    from unittest.mock import MagicMock
+
+    # Mock NAT gateways including a Regional NAT Gateway without SubnetId
+    mock_nat_gateways = [
+        {'NatGatewayId': 'nat-zonal-123', 'SubnetId': 'subnet-123'},
+        {'NatGatewayId': 'nat-regional-456'},  # Regional NAT Gateway without SubnetId
+    ]
+
+    # Create a mock filter instance
+    mock_manager = MagicMock()
+    mock_nat_manager = MagicMock()
+    mock_nat_manager.resources.return_value = mock_nat_gateways
+    mock_subnet_manager = MagicMock()
+    mock_subnet_manager.resources.return_value = [
+        {'SubnetId': 'subnet-123', 'AvailabilityZone': 'us-east-1a'}
+    ]
+
+    def get_resource_manager(resource_type):
+        if resource_type == 'nat-gateway':
+            return mock_nat_manager
+        elif resource_type == 'aws.subnet':
+            return mock_subnet_manager
+        return MagicMock()
+
+    mock_manager.get_resource_manager = get_resource_manager
+
+    filter_instance = CrossAZRouteTable({'type': 'cross-az-nat-gateway-route'}, mock_manager)
+
+    # Process with empty route tables - we just want to verify logging
+    with caplog.at_level(logging.WARNING):
+        filter_instance.process([])
+
+    # Verify warning was logged about Regional NAT Gateway exclusion
+    assert any(
+        'excluding 1 Regional NAT Gateway(s) without SubnetId' in record.message
+        and 'nat-regional-456' in record.message
+        for record in caplog.records
+    )
+
+
 class PeeringConnectionTest(BaseTest):
 
     def test_peer_cross_account(self):
@@ -3829,6 +3872,32 @@ class EndpointTest(BaseTest):
         self.assertEqual(len(resources), 1)
         self.assertEqual(resources[0]["c7n:matched-security-groups"], ["sg-6c7fa917"])
 
+    def test_endpoint_delete_action(self):
+        factory = self.replay_flight_data("test_vpc_endpoint_delete")
+        p = self.load_policy(
+            {
+                "name": "endpoint-delete",
+                "resource": "vpc-endpoint",
+                "filters": [{"tag:Name": "c7n-test"}],
+                "actions": ["delete"],
+            },
+            session_factory=factory,
+        )
+        self.assertEqual(
+            p.resource_manager.actions[0].get_permissions(),
+            ("ec2:DeleteVpcEndpoints",))
+        resources = p.run()
+        self.assertEqual(len(resources), 1)
+        self.assertEqual(resources[0]["VpcEndpointId"], "vpce-0f0a1d8b9f7c1a2b3")
+
+        client = factory(region="us-east-1").client("ec2")
+        endpoints = client.describe_vpc_endpoints(
+            Filters=[{"Name": "vpc-endpoint-id", "Values": [resources[0]["VpcEndpointId"]]}]
+        )[
+            "VpcEndpoints"
+        ]
+        self.assertFalse(endpoints)
+
     def test_endpoint_cross_account(self):
         session_factory = self.replay_flight_data('test_vpce_cross_account')
         p = self.load_policy(
@@ -4687,3 +4756,210 @@ class TestVPCEndpointServiceConfiguration(BaseTest):
         resources = p.run()
         self.assertEqual(len(resources), 1)
         self.assertEqual(resources[0]['ServiceId'], 'vpce-svc-042193297e333714e')
+
+
+class TestVpcEndpointServiceDetails(BaseTest):
+    def get_filter(self):
+        p = self.load_policy({
+            "name": "vpc-endpoint-service-details",
+            "resource": "aws.vpc-endpoint",
+            "filters": [{
+                "type": "service-details",
+                "key": "VpcEndpointPolicySupported",
+                "value": True,
+            }],
+        })
+        return p.resource_manager.filters[0]
+
+    def test_endpoint_service_details_unexpected_error_raised(self):
+        service_filter = self.get_filter()
+        client = MagicMock()
+        client.describe_vpc_endpoint_services.side_effect = BotoClientError(
+            {"Error": {"Code": "UnauthorizedOperation", "Message": "denied"}},
+            "DescribeVpcEndpointServices",
+        )
+
+        with self.assertRaises(BotoClientError):
+            service_filter._describe_services(
+                client,
+                {"us-east-1": {"com.amazonaws.us-east-1.s3"}},
+                "us-east-1",
+            )
+
+        self.assertEqual(client.describe_vpc_endpoint_services.call_count, 1)
+
+    def test_endpoint_service_details_cache_key_scoped(self):
+        service_filter = self.get_filter()
+        cache = MagicMock()
+        cache.__enter__.return_value = cache
+        cache.get.return_value = None
+        service_filter.manager._cache = cache
+        client = MagicMock()
+        client.describe_vpc_endpoint_services.return_value = {"ServiceDetails": []}
+        service_filter.manager.session_factory = MagicMock()
+        service_filter.manager.session_factory.return_value.client.return_value = client
+
+        service_filter._describe_services(
+            client,
+            {
+                "us-west-2": {"com.amazonaws.us-west-2.s3"},
+                "us-east-1": {"com.amazonaws.us-east-1.s3"},
+            },
+            "us-east-1",
+        )
+
+        cache_key = cache.get.call_args.args[0]
+        self.assertEqual(cache_key["account"], service_filter.manager.config.account_id)
+        self.assertEqual(cache_key["region"], "us-east-1")
+        self.assertEqual(cache_key["ServiceRegions"], [
+            ("us-east-1", ["com.amazonaws.us-east-1.s3"]),
+            ("us-west-2", ["com.amazonaws.us-west-2.s3"]),
+        ])
+
+    def test_endpoint_service_details_missing_service_region_uses_current(self):
+        service_filter = self.get_filter()
+        service_filter.manager.session_factory = MagicMock()
+        service_filter.manager.session_factory.region = "us-east-1"
+        service_name = "com.amazonaws.us-east-1.s3"
+        service_filter._describe_services = MagicMock(return_value={
+            service_name: {"VpcEndpointPolicySupported": True}
+        })
+
+        resources = service_filter.process([{"ServiceName": service_name}])
+
+        self.assertEqual(len(resources), 1)
+        describe_args = service_filter._describe_services.call_args.args
+        self.assertEqual(describe_args[1], {"us-east-1": {service_name}})
+        self.assertEqual(describe_args[2], "us-east-1")
+
+    def test_endpoint_service_details_policy_supported(self):
+        session_factory = self.replay_flight_data(
+            "test_vpc_endpoint_service_details_filter"
+        )
+
+        p = self.load_policy(
+            {
+                "name": "vpc-endpoint-services-with-policy-support",
+                "resource": "aws.vpc-endpoint",
+                "filters": [
+                    {
+                        "type": "service-details",
+                        "key": "VpcEndpointPolicySupported",
+                        "value": True,
+                    }
+                ],
+            },
+            session_factory=session_factory,
+        )
+
+        resources = p.run()
+        service_details = resources[0]["c7n:ServiceDetails"]
+
+        self.assertEqual(len(resources), 1)
+        self.assertIn("c7n:ServiceDetails", resources[0])
+        self.assertEqual(
+            resources[0]["ServiceName"],
+            "com.amazonaws.us-east-1.s3",
+        )
+        self.assertTrue(service_details["VpcEndpointPolicySupported"])
+
+    def test_endpoint_service_details_cross_region(self):
+        session_factory = self.replay_flight_data(
+            "test_vpc_endpoint_service_details_live"
+        )
+        p = self.load_policy(
+            {
+                "name": "vpc-endpoint-policy-supported-only",
+                "resource": "aws.vpc-endpoint",
+                "filters": [
+                    {
+                        "type": "service-details",
+                        "key": "VpcEndpointPolicySupported",
+                        "value": True,
+                    }
+                ],
+            },
+            session_factory=session_factory,
+        )
+        resources = p.run()
+        service_names = {r["ServiceName"] for r in resources}
+
+        # All endpoints have VpcEndpointPolicySupported=true, including the
+        # cross-region one (com.amazonaws.us-west-2.s3) which requires a
+        # us-west-2 regional client to describe correctly.
+        self.assertEqual(service_names, {
+            "com.amazonaws.us-east-1.s3",
+            "com.amazonaws.us-east-1.dynamodb",
+            "com.amazonaws.us-west-2.s3",
+        })
+        cross_region = next(
+            r for r in resources if r["ServiceName"] == "com.amazonaws.us-west-2.s3"
+        )
+        self.assertEqual(cross_region["c7n:ServiceDetails"]["ServiceRegion"], "us-west-2")
+
+    def test_endpoint_service_details_inaccessible_service_skipped(self):
+        """Inaccessible service names (deprecated or cross-account PrivateLink
+        without permission) trigger a per-service fallback; each inaccessible
+        service is logged as a warning and skipped rather than failing the policy."""
+        session_factory = self.replay_flight_data(
+            "test_vpc_endpoint_service_details_inaccessible"
+        )
+        p = self.load_policy(
+            {
+                "name": "vpc-endpoint-inaccessible-skipped",
+                "resource": "aws.vpc-endpoint",
+                "filters": [
+                    {
+                        "type": "service-details",
+                        "key": "VpcEndpointPolicySupported",
+                        "value": True,
+                    }
+                ],
+            },
+            session_factory=session_factory,
+        )
+        resources = p.run()
+
+        # Only the s3 endpoint matches; the deprecated service endpoint is
+        # skipped (gets empty c7n:ServiceDetails) and does not appear in results.
+        self.assertEqual(len(resources), 1)
+        self.assertEqual(resources[0]["ServiceName"], "com.amazonaws.us-east-1.s3")
+        self.assertTrue(resources[0]["c7n:ServiceDetails"]["VpcEndpointPolicySupported"])
+
+
+class SecurityGroupPaginationTest(BaseTest):
+
+    def test_describe_sends_max_results(self):
+        p = self.load_policy({'name': 'sg', 'resource': 'aws.security-group'})
+        with mock.patch('c7n.query.ResourceQuery.filter', return_value=[]) as filter_:
+            p.resource_manager.resources()
+        self.assertEqual(filter_.call_args.kwargs.get('MaxResults'), 1000)
+
+    def test_get_resources_omits_max_results(self):
+        # EC2 rejects MaxResults alongside GroupIds and get_resources swallows
+        # the ClientError so by-id lookups must not be paged.
+        p = self.load_policy({'name': 'sg', 'resource': 'aws.security-group'})
+        with mock.patch('c7n.query.ResourceQuery.filter', return_value=[]) as filter_:
+            p.resource_manager.get_resources(['sg-0123456789abcdef0'], cache=False)
+        filter_.assert_called_once()
+        self.assertEqual(filter_.call_args.kwargs['GroupIds'], ['sg-0123456789abcdef0'])
+        self.assertNotIn('MaxResults', filter_.call_args.kwargs)
+
+    def test_get_resources_reuses_cached_listing(self):
+        # Paging must not change the listing's cache key or by-id lookups
+        # after a full listing miss the cache and call the API again.
+        p = self.load_policy(
+            {'name': 'sg', 'resource': 'aws.security-group'}, cache=True)
+        sg = {'GroupId': 'sg-0123456789abcdef0'}
+        with mock.patch('c7n.query.ResourceQuery.filter', return_value=[sg]) as filter_:
+            p.resource_manager.resources()
+            found = p.resource_manager.get_resources([sg['GroupId']])
+        self.assertEqual(found, [sg])
+        filter_.assert_called_once()
+
+    def test_config_source_query_untouched(self):
+        p = self.load_policy(
+            {'name': 'sg', 'resource': 'aws.security-group', 'source': 'config'})
+        with mock.patch('c7n.query.ConfigSource.resources', return_value=[]) as res:
+            p.resource_manager.resources()
+        self.assertNotIn('MaxResults', res.call_args.args[0] or {})

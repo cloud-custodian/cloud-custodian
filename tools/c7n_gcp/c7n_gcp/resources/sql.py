@@ -25,6 +25,7 @@ class SqlInstance(QueryResourceManager):
         scope = 'project'
         labels = True
         labels_op = 'patch'
+        labels_perm = 'update'
         name = id = 'name'
         default_report_fields = [
             "name", "state", "databaseVersion", "settings.tier", "settings.dataDiskSizeGb"]
@@ -41,7 +42,7 @@ class SqlInstance(QueryResourceManager):
                         'instance': resource_info['database_id'].rsplit(':', 1)[-1]})
 
         @staticmethod
-        def get_metric_resource_name(resource):
+        def get_metric_resource_name(resource, metric_key=None):
             return "{}:{}".format(resource["project"], resource["name"])
 
         @staticmethod
@@ -263,6 +264,46 @@ class SqlBackupRun(SqlInstanceChildWithSelfLink):
             """
             delta = parse(insert_time).replace(tzinfo=None) - datetime.utcfromtimestamp(0)
             return int(delta.total_seconds()) * 1000 + int(delta.microseconds / 1000)
+
+
+@SqlBackupRun.action_registry.register('delete')
+class SqlBackupRunDelete(MethodAction):
+    """Delete a Cloud SQL backup run.
+
+    https://cloud.google.com/sql/docs/mysql/admin-api/rest/v1/backupRuns/delete
+
+    :example:
+
+    Delete all successful backup runs older than 30 days:
+
+    .. code-block:: yaml
+
+        policies:
+          - name: gcp-sql-backup-run-delete-old
+            resource: gcp.sql-backup-run
+            filters:
+              - type: value
+                key: status
+                op: eq
+                value: SUCCESSFUL
+              - type: value
+                key: endTime
+                op: greater-than
+                value_type: age
+                value: 30
+            actions:
+              - type: delete
+
+    """
+
+    schema = type_schema('delete')
+    method_spec = {'op': 'delete'}
+    permissions = ('cloudsql.backupRuns.delete',)
+
+    def get_resource_params(self, model, resource):
+        parent = self.manager._get_parent_resource_info(resource)
+        return {'project': parent['project_id'], 'instance': resource['instance'],
+                'id': resource['id']}
 
 
 @resources.register('sql-ssl-cert')

@@ -121,6 +121,25 @@ class StructureParserTest(BaseTest):
                 {'resource': 'ec2'}, {'resource': 'gcp.instance'}]}),
             {'aws.ec2', 'gcp.instance'})
 
+    def test_multi_resource_single_provider(self):
+        p = StructureParser()
+        p.validate({'policies': [{
+            'name': 'foo', 'resource': ['aws.ec2', 'aws.s3']}]})
+
+    def test_multi_resource_multi_provider(self):
+        p = StructureParser()
+        with self.assertRaises(PolicyValidationError) as ecm:
+            p.validate({'policies': [{
+                'name': 'foo', 'resource': ['aws.ec2', 'gcp.instance']}]})
+        self.assertIn('single provider', str(ecm.exception))
+
+    def test_get_resource_types_multi_resource(self):
+        p = StructureParser()
+        self.assertEqual(
+            p.get_resource_types({'policies': [
+                {'resource': ['aws.ec2', 'aws.s3']}]}),
+            {'aws.ec2', 'aws.s3'})
+
 
 class SchemaTest(BaseTest):
 

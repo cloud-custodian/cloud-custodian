@@ -1,0 +1,105 @@
+{
+    "pytest-terraform": 1,
+    "outputs": {},
+    "resources": {
+        "google_service_account": {
+            "legitimate_member": {
+                "account_id": "iam-test-sa-wuc48fhtok",
+                "create_ignore_already_exists": null,
+                "description": "",
+                "disabled": false,
+                "display_name": "Legitimate IAM Test Service Account",
+                "email": "iam-test-sa-wuc48fhtok@stacklet-test-policies.iam.gserviceaccount.com",
+                "id": "projects/cloud-custodian/serviceAccounts/iam-test-sa-wuc48fhtok@stacklet-test-policies.iam.gserviceaccount.com",
+                "member": "serviceAccount:iam-test-sa-wuc48fhtok@stacklet-test-policies.iam.gserviceaccount.com",
+                "name": "projects/cloud-custodian/serviceAccounts/iam-test-sa-wuc48fhtok@stacklet-test-policies.iam.gserviceaccount.com",
+                "project": "stacklet-test-policies",
+                "timeouts": null,
+                "unique_id": "100187559211596008082"
+            }
+        },
+        "google_storage_bucket": {
+            "bucket": {
+                "autoclass": [],
+                "cors": [],
+                "custom_placement_config": [],
+                "default_event_based_hold": false,
+                "effective_labels": {
+                    "env": "default",
+                    "goog-terraform-provisioned": "true"
+                },
+                "enable_object_retention": false,
+                "encryption": [],
+                "force_destroy": false,
+                "hierarchical_namespace": [
+                    {
+                        "enabled": false
+                    }
+                ],
+                "id": "iam-test-bucket-wuc48fhtok",
+                "ip_filter": [],
+                "labels": {
+                    "env": "default"
+                },
+                "lifecycle_rule": [],
+                "location": "US",
+                "logging": [],
+                "name": "iam-test-bucket-wuc48fhtok",
+                "project": "stacklet-test-policies",
+                "project_number": 859150599087,
+                "public_access_prevention": "inherited",
+                "requester_pays": false,
+                "retention_policy": [],
+                "rpo": "DEFAULT",
+                "self_link": "https://www.googleapis.com/storage/v1/b/iam-test-bucket-wuc48fhtok",
+                "soft_delete_policy": [
+                    {
+                        "effective_time": "2026-02-27T13:26:16.587Z",
+                        "retention_duration_seconds": 604800
+                    }
+                ],
+                "storage_class": "STANDARD",
+                "terraform_labels": {
+                    "env": "default",
+                    "goog-terraform-provisioned": "true"
+                },
+                "time_created": "2026-02-27T13:26:16.587Z",
+                "timeouts": null,
+                "uniform_bucket_level_access": false,
+                "updated": "2026-02-27T13:26:16.587Z",
+                "url": "gs://iam-test-bucket-wuc48fhtok",
+                "versioning": [],
+                "website": []
+            }
+        },
+        "google_storage_bucket_iam_member": {
+            "authenticated_legacy_reader": {
+                "bucket": "b/iam-test-bucket-wuc48fhtok",
+                "condition": [],
+                "etag": "CAM=",
+                "id": "b/iam-test-bucket-wuc48fhtok/roles/storage.legacyBucketReader/allAuthenticatedUsers",
+                "member": "allAuthenticatedUsers",
+                "role": "roles/storage.legacyBucketReader",
+                "timeouts": null
+            },
+            "public_viewer": {
+                "bucket": "b/iam-test-bucket-wuc48fhtok",
+                "condition": [],
+                "etag": "CAM=",
+                "id": "b/iam-test-bucket-wuc48fhtok/roles/storage.objectViewer/allUsers",
+                "member": "allUsers",
+                "role": "roles/storage.objectViewer",
+                "timeouts": null
+            },
+            "sa_viewer": {
+                "bucket": "b/iam-test-bucket-wuc48fhtok",
+                "condition": [],
+                "etag": "CAQ=",
+                "id": "b/iam-test-bucket-wuc48fhtok/roles/storage.objectViewer/serviceAccount:iam-test-sa-wuc48fhtok@stacklet-test-policies.iam.gserviceaccount.com",
+                "member": "serviceAccount:iam-test-sa-wuc48fhtok@stacklet-test-policies.iam.gserviceaccount.com",
+                "role": "roles/storage.objectViewer",
+                "timeouts": null
+            }
+        }
+    }
+}

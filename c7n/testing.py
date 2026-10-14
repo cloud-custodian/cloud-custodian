@@ -61,6 +61,23 @@ class CustodianTestCore:
         self.addCleanup(fh.close)
         return fh.name
 
+    def write_raw_file(self, contents, format="yaml"):
+        """Write a raw string to disk.
+
+        Input a string and a format/suffix.
+        Returns the file path.
+        """
+        fh = tempfile.NamedTemporaryFile(mode="w+b", suffix="." + format, delete=False)
+        fh.write(contents.encode("utf8"))
+        fh.flush()
+        self.addCleanup(os.unlink, fh.name)
+        self.addCleanup(fh.close)
+        return fh.name
+
+    def get_test_config(self, **kw):
+        temp_dir = self.get_temp_dir()
+        return Config.empty(output_dir=temp_dir, **kw)
+
     def get_temp_dir(self):
         """ Return a temporary directory that will get cleaned up. """
         temp_dir = tempfile.mkdtemp()

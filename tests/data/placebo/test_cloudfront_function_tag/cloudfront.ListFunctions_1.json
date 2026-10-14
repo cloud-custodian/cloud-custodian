@@ -1,0 +1,42 @@
+{
+    "status_code": 200,
+    "data": {
+        "ResponseMetadata": {},
+        "FunctionList": {
+            "MaxItems": 100,
+            "Quantity": 1,
+            "Items": [
+                {
+                    "Name": "test",
+                    "FunctionConfig": {
+                        "Runtime": "cloudfront-js-2.0"
+                    },
+                    "FunctionMetadata": {
+                        "FunctionARN": "arn:aws:cloudfront::644160558196:function/test",
+                        "Stage": "DEVELOPMENT",
+                        "CreatedTime": {
+                            "__class__": "datetime",
+                            "year": 2026,
+                            "month": 6,
+                            "day": 11,
+                            "hour": 13,
+                            "minute": 55,
+                            "second": 57,
+                            "microsecond": 415000
+                        },
+                        "LastModifiedTime": {
+                            "__class__": "datetime",
+                            "year": 2026,
+                            "month": 6,
+                            "day": 11,
+                            "hour": 13,
+                            "minute": 55,
+                            "second": 57,
+                            "microsecond": 441000
+                        }
+                    }
+                }
+            ]
+        }
+    }
+}

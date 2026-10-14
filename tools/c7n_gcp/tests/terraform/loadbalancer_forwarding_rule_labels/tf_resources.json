@@ -1,0 +1,82 @@
+{
+    "pytest-terraform": 1,
+    "outputs": {},
+    "resources": {
+        "google_compute_forwarding_rule": {
+            "default": {
+                "all_ports": false,
+                "allow_global_access": false,
+                "allow_psc_global_access": false,
+                "backend_service": "",
+                "base_forwarding_rule": "",
+                "creation_timestamp": "2026-04-21T13:47:48.047-07:00",
+                "description": "",
+                "effective_labels": {
+                    "env": "default"
+                },
+                "forwarding_rule_id": 330641587841948827,
+                "id": "projects/cloud-custodian/regions/us-central1/forwardingRules/c7n-forwarding-rule-default-d536",
+                "ip_address": "34.172.85.61",
+                "ip_collection": "",
+                "ip_protocol": "TCP",
+                "ip_version": "",
+                "is_mirroring_collector": false,
+                "label_fingerprint": "aMJEA_pTI0o=",
+                "labels": {
+                    "env": "default"
+                },
+                "load_balancing_scheme": "EXTERNAL",
+                "name": "c7n-forwarding-rule-default-d536",
+                "network": "",
+                "network_tier": "PREMIUM",
+                "no_automate_dns_zone": null,
+                "port_range": "80-80",
+                "ports": null,
+                "project": "stacklet-test-policies",
+                "psc_connection_id": "",
+                "psc_connection_status": "",
+                "recreate_closed_psc": false,
+                "region": "us-central1",
+                "self_link": "https://www.googleapis.com/compute/v1/projects/cloud-custodian/regions/us-central1/forwardingRules/c7n-forwarding-rule-default-d536",
+                "service_directory_registrations": [],
+                "service_label": "",
+                "service_name": "",
+                "source_ip_ranges": null,
+                "subnetwork": "",
+                "target": "https://www.googleapis.com/compute/v1/projects/cloud-custodian/regions/us-central1/targetPools/c7n-target-pool-default-d536",
+                "terraform_labels": {
+                    "env": "default"
+                },
+                "timeouts": null
+            }
+        },
+        "google_compute_target_pool": {
+            "default": {
+                "backup_pool": "",
+                "description": "",
+                "failover_ratio": 0,
+                "health_checks": null,
+                "id": "projects/cloud-custodian/regions/us-central1/targetPools/c7n-target-pool-default-d536",
+                "instances": [],
+                "name": "c7n-target-pool-default-d536",
+                "project": "stacklet-test-policies",
+                "region": "us-central1",
+                "self_link": "https://www.googleapis.com/compute/v1/projects/cloud-custodian/regions/us-central1/targetPools/c7n-target-pool-default-d536",
+                "session_affinity": "NONE",
+                "timeouts": null
+            }
+        },
+        "random_id": {
+            "suffix": {
+                "b64_std": "1TY=",
+                "b64_url": "1TY",
+                "byte_length": 2,
+                "dec": "54582",
+                "hex": "d536",
+                "id": "1TY",
+                "keepers": null,
+                "prefix": null
+            }
+        }
+    }
+}

@@ -1,0 +1,49 @@
+{
+    "status_code": 200,
+    "data": {
+        "LoadBalancers": [
+            {
+                "VpcId": "vpc-12345678",
+                "LoadBalancerArn": "arn:aws:elasticloadbalancing:us-east-1:123456789012:loadbalancer/app/insecure-alb/1234567890abcdef",
+                "State": {
+                    "Code": "active"
+                },
+                "DNSName": "insecure-alb-1234567890.us-east-1.elb.amazonaws.com",
+                "SecurityGroups": [
+                    "sg-12345678"
+                ],
+                "LoadBalancerName": "insecure-alb",
+                "CreatedTime": {
+                    "hour": 10,
+                    "__class__": "datetime",
+                    "month": 11,
+                    "second": 0,
+                    "microsecond": 0,
+                    "year": 2025,
+                    "day": 19,
+                    "minute": 0
+                },
+                "Scheme": "internet-facing",
+                "Type": "application",
+                "CanonicalHostedZoneId": "Z35SXDOTRQ7X7K",
+                "AvailabilityZones": [
+                    {
+                        "SubnetId": "subnet-12345678",
+                        "ZoneName": "us-east-1a"
+                    }
+                ]
+            }
+        ],
+        "ResponseMetadata": {
+            "RetryAttempts": 0,
+            "HTTPStatusCode": 200,
+            "RequestId": "12345678-1234-1234-1234-123456789012",
+            "HTTPHeaders": {
+                "x-amzn-requestid": "12345678-1234-1234-1234-123456789012",
+                "content-type": "text/xml",
+                "date": "Tue, 19 Nov 2025 10:00:00 GMT"
+            }
+        }
+    }
+}
+

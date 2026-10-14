@@ -1,0 +1,155 @@
+{
+    "pytest-terraform": 1,
+    "outputs": {
+        "bucket_name": {
+            "value": "c7n-vertex-batch-test-dac6cc6c",
+            "type": "string"
+        },
+        "input_uri_us_central1": {
+            "value": "gs://c7n-vertex-batch-test-dac6cc6c/input/us-central1/test_data.jsonl",
+            "type": "string"
+        },
+        "input_uri_us_east1": {
+            "value": "gs://c7n-vertex-batch-test-dac6cc6c/input/us-east1/test_data.jsonl",
+            "type": "string"
+        },
+        "output_uri_us_central1": {
+            "value": "gs://c7n-vertex-batch-test-dac6cc6c/output/us-central1/",
+            "type": "string"
+        },
+        "output_uri_us_east1": {
+            "value": "gs://c7n-vertex-batch-test-dac6cc6c/output/us-east1/",
+            "type": "string"
+        }
+    },
+    "resources": {
+        "google_storage_bucket": {
+            "batch_job_data": {
+                "autoclass": [],
+                "cors": [],
+                "custom_placement_config": [],
+                "default_event_based_hold": false,
+                "effective_labels": {
+                    "goog-terraform-provisioned": "true"
+                },
+                "enable_object_retention": false,
+                "encryption": [],
+                "force_destroy": true,
+                "hierarchical_namespace": [
+                    {
+                        "enabled": false
+                    }
+                ],
+                "id": "c7n-vertex-batch-test-dac6cc6c",
+                "ip_filter": [],
+                "labels": null,
+                "lifecycle_rule": [],
+                "location": "US",
+                "logging": [],
+                "name": "c7n-vertex-batch-test-dac6cc6c",
+                "project": "stacklet-personal",
+                "project_number": 920795309754,
+                "public_access_prevention": "inherited",
+                "requester_pays": false,
+                "retention_policy": [],
+                "rpo": "DEFAULT",
+                "self_link": "https://www.googleapis.com/storage/v1/b/c7n-vertex-batch-test-dac6cc6c",
+                "soft_delete_policy": [
+                    {
+                        "effective_time": "2026-02-26T23:16:56.846Z",
+                        "retention_duration_seconds": 604800
+                    }
+                ],
+                "storage_class": "STANDARD",
+                "terraform_labels": {
+                    "goog-terraform-provisioned": "true"
+                },
+                "time_created": "2026-02-26T23:16:56.846Z",
+                "timeouts": null,
+                "uniform_bucket_level_access": true,
+                "updated": "2026-02-26T23:16:56.846Z",
+                "url": "gs://c7n-vertex-batch-test-dac6cc6c",
+                "versioning": [],
+                "website": []
+            }
+        },
+        "google_storage_bucket_object": {
+            "input_data_us_central1": {
+                "bucket": "c7n-vertex-batch-test-dac6cc6c",
+                "cache_control": "",
+                "content": null,
+                "content_disposition": "",
+                "content_encoding": "",
+                "content_language": "",
+                "content_type": "text/plain; charset=utf-8",
+                "contexts": [],
+                "crc32c": "qJdBxg==",
+                "customer_encryption": [],
+                "deletion_policy": null,
+                "detect_md5hash": "3h98I2QMCfy4DAlvHUnakw==",
+                "event_based_hold": false,
+                "force_empty_content_type": null,
+                "generation": 1772147818050265,
+                "id": "c7n-vertex-batch-test-dac6cc6c-input/us-central1/test_data.jsonl",
+                "kms_key_name": "",
+                "md5hash": "3h98I2QMCfy4DAlvHUnakw==",
+                "md5hexhash": "de1f7c23640c09fcb80c096f1d49da93",
+                "media_link": "https://storage.googleapis.com/download/storage/v1/b/c7n-vertex-batch-test-dac6cc6c/o/input%2Fus-central1%2Ftest_data.jsonl?generation=1772147818050265&alt=media",
+                "metadata": null,
+                "name": "input/us-central1/test_data.jsonl",
+                "output_name": "input/us-central1/test_data.jsonl",
+                "retention": [],
+                "self_link": "https://www.googleapis.com/storage/v1/b/c7n-vertex-batch-test-dac6cc6c/o/input%2Fus-central1%2Ftest_data.jsonl",
+                "source": "./input_data.jsonl",
+                "source_md5hash": "",
+                "storage_class": "STANDARD",
+                "temporary_hold": false,
+                "timeouts": null
+            },
+            "input_data_us_east1": {
+                "bucket": "c7n-vertex-batch-test-dac6cc6c",
+                "cache_control": "",
+                "content": null,
+                "content_disposition": "",
+                "content_encoding": "",
+                "content_language": "",
+                "content_type": "text/plain; charset=utf-8",
+                "contexts": [],
+                "crc32c": "qJdBxg==",
+                "customer_encryption": [],
+                "deletion_policy": null,
+                "detect_md5hash": "3h98I2QMCfy4DAlvHUnakw==",
+                "event_based_hold": false,
+                "force_empty_content_type": null,
+                "generation": 1772147818050430,
+                "id": "c7n-vertex-batch-test-dac6cc6c-input/us-east1/test_data.jsonl",
+                "kms_key_name": "",
+                "md5hash": "3h98I2QMCfy4DAlvHUnakw==",
+                "md5hexhash": "de1f7c23640c09fcb80c096f1d49da93",
+                "media_link": "https://storage.googleapis.com/download/storage/v1/b/c7n-vertex-batch-test-dac6cc6c/o/input%2Fus-east1%2Ftest_data.jsonl?generation=1772147818050430&alt=media",
+                "metadata": null,
+                "name": "input/us-east1/test_data.jsonl",
+                "output_name": "input/us-east1/test_data.jsonl",
+                "retention": [],
+                "self_link": "https://www.googleapis.com/storage/v1/b/c7n-vertex-batch-test-dac6cc6c/o/input%2Fus-east1%2Ftest_data.jsonl",
+                "source": "./input_data.jsonl",
+                "source_md5hash": "",
+                "storage_class": "STANDARD",
+                "temporary_hold": false,
+                "timeouts": null
+            }
+        },
+        "random_id": {
+            "suffix": {
+                "b64_std": "2sbMbA==",
+                "b64_url": "2sbMbA",
+                "byte_length": 4,
+                "dec": "3670461548",
+                "hex": "dac6cc6c",
+                "id": "2sbMbA",
+                "keepers": null,
+                "prefix": null
+            }
+        }
+    }
+}

@@ -1,0 +1,34 @@
+{
+    "status_code": 200,
+    "data": {
+        "WebApp": {
+            "Arn": "arn:aws:transfer:us-east-1:644160558196:webapp/webapp-51c7877b183149d3b",
+            "WebAppId": "webapp-51c7877b183149d3b",
+            "DescribedIdentityProviderDetails": {
+                "IdentityCenterConfig": {
+                    "ApplicationArn": "arn:aws:sso::644160558196:application/ssoins-7223c7b34441e61a/apl-7223edbcb17000e4",
+                    "InstanceArn": "arn:aws:sso:::instance/ssoins-7223c7b34441e61a",
+                    "Role": "arn:aws:iam::644160558196:role/service-role/AWSTransferWebAppIdentityBearer-us-east-1"
+                }
+            },
+            "AccessEndpoint": "https://webapp-51c7877b183149d3b.transfer-webapp.us-east-1.on.aws",
+            "WebAppEndpoint": "https://webapp-51c7877b183149d3b.transfer-webapp.us-east-1.on.aws",
+            "WebAppUnits": {
+                "Provisioned": 1
+            },
+            "Tags": [
+                {
+                    "Key": "Environment",
+                    "Value": "Production"
+                },
+                {
+                    "Key": "Name",
+                    "Value": "c7n-test"
+                }
+            ],
+            "WebAppEndpointPolicy": "STANDARD",
+            "EndpointType": "PUBLIC"
+        },
+        "ResponseMetadata": {}
+    }
+}

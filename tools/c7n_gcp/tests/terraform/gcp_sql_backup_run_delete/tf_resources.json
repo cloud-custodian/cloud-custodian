@@ -1,0 +1,163 @@
+{
+    "pytest-terraform": 1,
+    "outputs": {},
+    "resources": {
+        "google_sql_database_instance": {
+            "default": {
+                "available_maintenance_versions": [],
+                "backupdr_backup": null,
+                "clone": [],
+                "connection_name": "stacklet-test-policies:us-central1:star-buck",
+                "database_version": "MYSQL_8_0",
+                "deletion_protection": false,
+                "dns_name": "",
+                "dns_names": [],
+                "encryption_key_name": null,
+                "final_backup_description": null,
+                "first_ip_address": "35.238.62.122",
+                "id": "star-buck",
+                "instance_type": "CLOUD_SQL_INSTANCE",
+                "ip_address": [
+                    {
+                        "ip_address": "35.238.62.122",
+                        "time_to_retire": "",
+                        "type": "PRIMARY"
+                    }
+                ],
+                "maintenance_version": "MYSQL_8_0_44.R20260117.02_07",
+                "master_instance_name": "",
+                "name": "star-buck",
+                "node_count": 0,
+                "point_in_time_restore_context": [],
+                "private_ip_address": "",
+                "project": "stacklet-test-policies",
+                "psc_service_attachment_link": "",
+                "public_ip_address": "35.238.62.122",
+                "region": "us-central1",
+                "replica_configuration": [],
+                "replica_names": [],
+                "replication_cluster": [
+                    {
+                        "dr_replica": false,
+                        "failover_dr_replica_name": "",
+                        "psa_write_endpoint": ""
+                    }
+                ],
+                "restore_backup_context": [],
+                "root_password": null,
+                "root_password_wo": null,
+                "root_password_wo_version": null,
+                "self_link": "https://sqladmin.googleapis.com/sql/v1beta4/projects/cloud-custodian/instances/star-buck",
+                "server_ca_cert": [
+                    {
+                        "cert": "-----BEGIN CERTIFICATE-----\nMIIDcTCCAlmgAwIBAgIBADANBgkqhkiG9w0BAQsFADBwMS0wKwYDVQQuEyRjYWFk\nYjg0YS1lMzZkLTQyNzItOTc0YS1kNWJlNjNiNjhlNmMxHDAaBgNVBAMTE0Nsb3Vk\nIFNRTCBTZXJ2ZXIgQ0ExFDASBgNVBAoTC0dvb2dsZSwgSW5jMQswCQYDVQQGEwJV\nUzAeFw0yNjAzMjYxNTE3MDVaFw0zNjAzMjMxNTE4MDVaMHAxLTArBgNVBC4TJGNh\nYWRiODRhLWUzNmQtNDI3Mi05NzRhLWQ1YmU2M2I2OGU2YzEcMBoGA1UEAxMTQ2xv\ndWQgU1FMIFNlcnZlciBDQTEUMBIGA1UEChMLR29vZ2xlLCBJbmMxCzAJBgNVBAYT\nAlVTMIIBIjANBgkqhkiG9w0BAQEFAAOCAQ8AMIIBCgKCAQEA56HKm6UV16/rEV7U\nvTkNurH3edRZIL3CJ1e3MnWajTYdgGsV+0+ktq8/DEH0o8W5OzRRaa8eMS81/SSc\nKrsGJcHKFo3c+eGJelx5g8qwSU17P66FpenauYajbvszWQR8d3c6s7IjfebLIBgo\nootPHN8uWaE1mam/w6cXxMn/+fLdhz92sYB4dEux3u9jzAGiM12YgvI89n2p/WV2\n8mod6DUSh5G65sHhDUh3HkK3E4giZXOukkxf9B2UrLFXFnhLBNesclUDN8efqyIk\ntUus9f55+Dk1KU/voGqycp6GNr8hyuOiPDUSSTA/Kt+TrhcNJlCvcVH/OWNhlzpA\noW2qGQIDAQABoxYwFDASBgNVHRMBAf8ECDAGAQH/AgEAMA0GCSqGSIb3DQEBCwUA\nA4IBAQB6Alo2obkdCu9nIKsjrtNvWRVBAyK3EAE80JhkViMBs33MURaD9TZ6dF0K\nlj6OUD7PxwQl2yA81vg9hz/Mr9nJmVirH4Kw/2CdSMl+Yj00rT/s4EIj+vmGlKVV\nCWZMNEyFAcF1gFG7TLAzb/zzyNdxwG+5xSvJduLY4a7ddJnwSLuELivrMpIyCOWd\nFc4Lo2EtTFSJkT+B8NvG3YlEaBLCakreeB45krk8TQgXNr3zP0y887x0lPeBSe76\ngDeY+aMMeeWAyV+UDVulNeHJYNJTNfRWJT4zCHk3V82KX+1NiimvP/iYORWyIRVn\nYlkuYr57tuj1519axtIXYK9A1j4G\n-----END CERTIFICATE-----",
+                        "common_name": "C=US,O=Google\\, Inc,CN=Cloud SQL Server CA,dnQualifier=caadb84a-e36d-4272-974a-d5be63b68e6c",
+                        "create_time": "2026-03-26T15:17:05.477Z",
+                        "expiration_time": "2036-03-23T15:18:05.477Z",
+                        "sha1_fingerprint": "5c1a7623f1f0933aedc61f40189b24266564ef77"
+                    }
+                ],
+                "service_account_email_address": "p859150599087-hbnmib@gcp-sa-cloud-sql.iam.gserviceaccount.com",
+                "settings": [
+                    {
+                        "activation_policy": "ALWAYS",
+                        "active_directory_config": [],
+                        "advanced_machine_features": [],
+                        "auto_upgrade_enabled": false,
+                        "availability_type": "ZONAL",
+                        "backup_configuration": [
+                            {
+                                "backup_retention_settings": [
+                                    {
+                                        "retained_backups": 7,
+                                        "retention_unit": "COUNT"
+                                    }
+                                ],
+                                "backup_tier": "STANDARD",
+                                "binary_log_enabled": false,
+                                "enabled": true,
+                                "location": "",
+                                "point_in_time_recovery_enabled": false,
+                                "start_time": "15:00",
+                                "transaction_log_retention_days": 7
+                            }
+                        ],
+                        "collation": "",
+                        "connection_pool_config": [],
+                        "connector_enforcement": "NOT_REQUIRED",
+                        "data_api_access": "",
+                        "data_cache_config": [
+                            {
+                                "data_cache_enabled": false
+                            }
+                        ],
+                        "database_flags": [],
+                        "deletion_protection_enabled": false,
+                        "deny_maintenance_period": [],
+                        "disk_autoresize": true,
+                        "disk_autoresize_limit": 0,
+                        "disk_size": 10,
+                        "disk_type": "PD_SSD",
+                        "edition": "ENTERPRISE",
+                        "effective_availability_type": "ZONAL",
+                        "enable_dataplex_integration": false,
+                        "enable_google_ml_integration": false,
+                        "final_backup_config": [],
+                        "insights_config": [],
+                        "ip_configuration": [
+                            {
+                                "allocated_ip_range": "",
+                                "authorized_networks": [],
+                                "custom_subject_alternative_names": [],
+                                "enable_private_path_for_google_cloud_services": false,
+                                "ipv4_enabled": true,
+                                "private_network": "",
+                                "psc_config": [],
+                                "server_ca_mode": "GOOGLE_MANAGED_INTERNAL_CA",
+                                "server_ca_pool": "",
+                                "ssl_mode": "ALLOW_UNENCRYPTED_AND_ENCRYPTED"
+                            }
+                        ],
+                        "location_preference": [
+                            {
+                                "follow_gae_application": "",
+                                "secondary_zone": "",
+                                "zone": "us-central1-a"
+                            }
+                        ],
+                        "maintenance_window": [],
+                        "password_validation_policy": [],
+                        "pricing_plan": "PER_USE",
+                        "read_pool_auto_scale_config": [
+                            {
+                                "disable_scale_in": false,
+                                "enabled": false,
+                                "max_node_count": 0,
+                                "min_node_count": 0,
+                                "scale_in_cooldown_seconds": 0,
+                                "scale_out_cooldown_seconds": 0,
+                                "target_metrics": []
+                            }
+                        ],
+                        "retain_backups_on_delete": false,
+                        "sql_server_audit_config": [],
+                        "tier": "db-f1-micro",
+                        "time_zone": "",
+                        "user_labels": {},
+                        "version": 1
+                    }
+                ],
+                "timeouts": null
+            }
+        },
+        "random_pet": {
+            "server": {
+                "id": "star-buck",
+                "keepers": null,
+                "length": 2,
+                "prefix": null,
+                "separator": "-"
+            }
+        }
+    }
+}

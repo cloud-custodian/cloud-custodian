@@ -3,14 +3,13 @@
 import argparse
 import logging
 import os
-import pkg_resources
+from importlib.metadata import version
 
 import yaml
 
-from c7n_kube.server import init
-
 from c7n.config import Config
 from c7n.loader import DirectoryLoader
+from c7n_kube.server import init
 
 log = logging.getLogger("custodian.k8s.cli")
 logging.basicConfig(
@@ -28,7 +27,7 @@ TEMPLATE = {
         "labels": {
             "app.kubernetes.io/name": "c7n-kates",
             "app.kubernetes.io/instance": "c7n-kates",
-            "app.kubernetes.io/version": pkg_resources.get_distribution("c7n_kube").version,
+            "app.kubernetes.io/version": version("c7n_kube"),
             "app.kubernetes.io/component": "AdmissionController",
             "app.kubernetes.io/part-of": "c7n_kube",
             "app.kubernetes.io/managed-by": "c7n",

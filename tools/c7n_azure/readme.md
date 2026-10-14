@@ -5,7 +5,7 @@ This a plugin to Cloud Custodian that adds Azure support.
 
 ## Install Cloud Custodian and Azure Plugin
 
-The Azure provider must be installed as a separate package in addition to c7n. 
+The Azure provider must be installed as a separate package in addition to c7n.
 
     $ git clone https://github.com/cloud-custodian/cloud-custodian.git
     $ virtualenv custodian
@@ -53,7 +53,7 @@ If successful, you should see output similar to the following on the command lin
 
 You should also find a new ``my-first-policy`` directory with a log and other
 files (subsequent runs will append to the log by default rather than
-overwriting it). 
+overwriting it).
 
 ## Links
 - [Getting Started](https://cloudcustodian.io/docs/azure/gettingstarted.html)
@@ -61,5 +61,17 @@ overwriting it).
 - [Example Policies](https://cloudcustodian.io/docs/azure/policy/index.html)
 
 
+## Running Tests
 
+If you'd like to help with the development of Azure support, you'll need
+[uv](https://docs.astral.sh/uv/) installed. It provides a pip-compatible
+interface, & will handle all the dependencies needed for you.
 
+You can then run the unit tests like this:
+
+```shell
+# Assuming you're in the `cloud-custodian` top-level directory...
+$ cd tools/c7n_azure
+
+$ uv run pytest tests_azure
+```

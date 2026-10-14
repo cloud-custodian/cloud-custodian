@@ -1,0 +1,22 @@
+{
+    "status_code": 200,
+    "data": {
+        "PaginationToken": "",
+        "ResourceTagMappingList": [
+            {
+                "ResourceARN": "arn:aws:vpc-lattice:us-east-1:644160558196:service/svc-0123456789abcdef0/listener/listener-0123456789abcdef0/rule/rule-0123456789abcdef0",
+                "Tags": [
+                    {
+                        "Key": "Env",
+                        "Value": "Test"
+                    }
+                ]
+            },
+            {
+                "ResourceARN": "arn:aws:vpc-lattice:us-east-1:644160558196:service/svc-0123456789abcdef0/listener/listener-0123456789abcdef0/rule/rule-default",
+                "Tags": []
+            }
+        ],
+        "ResponseMetadata": {}
+    }
+}

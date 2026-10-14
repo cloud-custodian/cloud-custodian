@@ -5,6 +5,7 @@ from c7n_gcp.query import QueryResourceManager, TypeInfo
 from c7n_gcp.actions import MethodAction
 from c7n.utils import type_schema, local_session
 from c7n.filters.core import ListItemFilter
+from c7n.exceptions import PolicyValidationError
 
 
 @resources.register('dns-managed-zone')
@@ -19,6 +20,9 @@ class DnsManagedZone(QueryResourceManager):
         scope = 'project'
         id = 'id'
         name = 'name'
+        labels = True
+        labels_op = 'patch'
+        labels_perm = 'update'
         default_report_fields = ['id', 'name', 'dnsName', 'creationTime', 'visibility']
         asset_type = "dns.googleapis.com/ManagedZone"
         scc_type = "google.cloud.dns.ManagedZone"
@@ -30,6 +34,21 @@ class DnsManagedZone(QueryResourceManager):
             return client.execute_query(
                 'get', {'project': resource_info['project_id'],
                         'managedZone': resource_info['zone_name']})
+
+        @staticmethod
+        def get_label_params(resource, all_labels):
+            return {
+                'project': resource['project_id'],
+                'managedZone': resource['name'],
+                'body': {'labels': all_labels}
+            }
+
+    def augment(self, resources):
+        project = local_session(self.session_factory).get_default_project()
+        for resource in resources:
+            # Make the project id accessible for `get_label_params`
+            resource.setdefault('project_id', project)
+        return resources
 
 
 @resources.register('dns-policy')
@@ -54,6 +73,67 @@ class DnsPolicy(QueryResourceManager):
             return client.execute_query(
                 'get', {'project': resource_info['project_id'],
                         'policy': resource_info['policy_name']})
+
+
+@DnsPolicy.action_registry.register('update')
+class UpdatePolicy(MethodAction):
+    """Update DNS policy settings.
+
+    :example:
+
+    .. code-block:: yaml
+
+            policies:
+              - name: gcp-dns-policy-enable-logging
+                resource: gcp.dns-policy
+                filters:
+                  - type: value
+                    key: enableLogging
+                    value: false
+                actions:
+                  - type: update
+                    enableLogging: true
+    """
+
+    schema = type_schema(
+        'update',
+        **{
+            'description': {'type': 'string'},
+            'enableInboundForwarding': {'type': 'boolean'},
+            'enableLogging': {'type': 'boolean'},
+            'alternativeNameServerConfig': {'type': 'object'},
+            'networks': {'type': 'array', 'items': {'type': 'object'}}
+        }
+    )
+    method_spec = {'op': 'patch'}
+    # `update` is the permission name; there is no `dns.policies.patch` IAM permission.
+    method_perm = 'update'
+    update_fields = (
+        'description',
+        'enableInboundForwarding',
+        'enableLogging',
+        'alternativeNameServerConfig',
+        'networks',
+    )
+
+    def get_resource_params(self, model, resource):
+        project = local_session(self.manager.source.query.session_factory).get_default_project()
+        body = {}
+        for field in self.update_fields:
+            if field in self.data:
+                body[field] = self.data[field]
+
+        return {'project': project, 'policy': resource['name'], 'body': body}
+
+    def validate(self):
+        super().validate()
+        if not any(field in self.data for field in self.update_fields):
+            raise PolicyValidationError(
+                "policy:{} action:{} requires at least one mutable policy field".format(
+                    self.manager.ctx.policy.name, self.type
+                )
+            )
+        return self
 
 
 @DnsManagedZone.filter_registry.register('records-sets')
@@ -105,3 +185,152 @@ class Delete(MethodAction):
         return {
             'project': project,
             'managedZone': resource['name']}
+
+
+@DnsManagedZone.action_registry.register('enable-dnssec')
+class EnableDnssec(MethodAction):
+    """Enable DNSSEC on a public DNS managed zone.
+
+    Only applies to zones with ``visibility: public``. Zones that already have
+    DNSSEC enabled (``dnssecConfig.state == 'on'``) are skipped automatically.
+
+    :example:
+
+    .. code-block:: yaml
+
+            policies:
+              - name: gcp-dns-enable-dnssec
+                resource: gcp.dns-managed-zone
+                filters:
+                  - type: value
+                    key: visibility
+                    op: eq
+                    value: public
+                  - type: value
+                    key: dnssecConfig.state
+                    op: ne
+                    value: 'on'
+                actions:
+                  - type: enable-dnssec
+    """
+
+    schema = type_schema('enable-dnssec')
+    method_spec = {'op': 'patch'}
+    method_perm = 'update'
+    attr_filter = ('visibility', ('public',))
+
+    def get_resource_params(self, model, resource):
+        project = local_session(self.manager.session_factory).get_default_project()
+        return {
+            'project': project,
+            'managedZone': resource['name'],
+            'body': {
+                'dnssecConfig': {
+                    'state': 'on'
+                }
+            }
+        }
+
+
+@DnsManagedZone.action_registry.register('set-dnssec-key-specs')
+class SetDnssecKeySpecs(MethodAction):
+    """Set the DNSSEC default key specifications on a public DNS managed zone.
+
+    Configures the ``defaultKeySpecs`` (KSK and ZSK) used when DNSSEC is
+    enabled. This action must be applied while DNSSEC is still ``off`` —
+    key specs become immutable once DNSSEC is turned on. Use the
+    ``enable-dnssec`` action afterwards to activate DNSSEC.
+
+    Valid ``keyType`` values: ``keySigning``, ``zoneSigning``
+
+    Valid ``algorithm`` values: ``rsasha1``, ``rsasha256``, ``rsasha512``,
+    ``ecdsap256sha256``, ``ecdsap384sha384``
+
+    :example:
+
+    .. code-block:: yaml
+
+            policies:
+              - name: gcp-dns-set-dnssec-key-specs
+                resource: gcp.dns-managed-zone
+                filters:
+                  - type: value
+                    key: visibility
+                    op: eq
+                    value: public
+                  - type: value
+                    key: dnssecConfig.state
+                    op: ne
+                    value: 'on'
+                actions:
+                  - type: set-dnssec-key-specs
+                    defaultKeySpecs:
+                      - keyType: keySigning
+                        algorithm: rsasha256
+                        keyLength: 2048
+                      - keyType: zoneSigning
+                        algorithm: rsasha256
+                        keyLength: 1024
+    """
+
+    schema = type_schema(
+        'set-dnssec-key-specs',
+        required=['defaultKeySpecs'],
+        **{
+            'defaultKeySpecs': {
+                'type': 'array',
+                'minItems': 1,
+                'items': {
+                    'type': 'object',
+                    'additionalProperties': False,
+                    'required': ['keyType', 'algorithm', 'keyLength'],
+                    'properties': {
+                        'keyType': {
+                            'type': 'string',
+                            'enum': ['keySigning', 'zoneSigning'],
+                        },
+                        'algorithm': {
+                            'type': 'string',
+                            'enum': [
+                                'rsasha1',
+                                'rsasha256',
+                                'rsasha512',
+                                'ecdsap256sha256',
+                                'ecdsap384sha384',
+                            ],
+                        },
+                        'keyLength': {
+                            'type': 'integer',
+                        },
+                    },
+                },
+            }
+        }
+    )
+    method_spec = {'op': 'patch'}
+    method_perm = 'update'
+    attr_filter = ('visibility', ('public',))
+
+    def get_resource_params(self, model, resource):
+        project = local_session(self.manager.session_factory).get_default_project()
+        return {
+            'project': project,
+            'managedZone': resource['name'],
+            'body': {
+                'dnssecConfig': {
+                    'defaultKeySpecs': self.data['defaultKeySpecs'],
+                }
+            }
+        }
+
+    def handle_resource_error(self, client, model, resource, op_name, params, error):
+        if error.resp.status == 400 and b'immutableField' in error.content:
+            self.log.warning(
+                'policy:%s action:%s skipping zone %s - '
+                'defaultKeySpecs cannot be modified while DNSSEC is enabled',
+                self.manager.ctx.policy.name,
+                self.type,
+                resource['name'],
+            )
+            return error
+        raise error

@@ -66,6 +66,9 @@ GRAPH_ENDPOINT_PERMISSIONS = {
     'settings': ['Directory.Read.All'],
     'settings/{id}': ['Directory.ReadWrite.All'],
     'directorySettingTemplates': ['Directory.Read.All'],
+
+    # Batch endpoint
+    '$batch': ['Directory.Read.All'],  # Inherits permissions from individual requests
 }
 
 
@@ -160,6 +163,12 @@ class GraphResourceManager(QueryResourceManager):
                 'Content-Type': 'application/json'
             }
 
+            # Add ConsistencyLevel header for advanced queries using $count
+            # This is required per Microsoft Graph API documentation:
+            # https://learn.microsoft.com/en-us/graph/aad-advanced-queries
+            if '$count' in endpoint:
+                headers['ConsistencyLevel'] = 'eventual'
+
             url = f'https://graph.microsoft.com/v1.0/{endpoint}'
 
             if method == 'GET':
@@ -173,6 +182,48 @@ class GraphResourceManager(QueryResourceManager):
             return response.json()
         except requests.exceptions.RequestException as e:
             log.error(f"Microsoft Graph API request failed for {endpoint}: {e}")
+            raise
+
+    def make_batched_graph_request(self, batch):
+        """Make a batched request to Microsoft Graph API."""
+        try:
+            session = self.get_client()
+            session._initialize_session()
+
+            try:
+                get_required_permissions_for_endpoint('$batch', 'POST')
+            except ValueError:
+                log.error("Cannot make Graph API batch request to unmapped endpoint: $batch")
+                raise
+
+            # Request token for Microsoft Graph API
+            scope = 'https://graph.microsoft.com/.default'
+            token = session.credentials.get_token(scope)
+            url = 'https://graph.microsoft.com/v1.0/$batch'
+
+            headers = {
+                'Authorization': f'Bearer {token.token}',
+                'Content-Type': 'application/json'
+            }
+
+            mut_batch = batch[:]
+            results = []
+
+            while mut_batch:
+                sub_batch = mut_batch[:20]
+                mut_batch = mut_batch[20:]
+
+                batch_obj = {"requests": sub_batch}
+
+                response = requests.post(url, headers=headers, json=batch_obj, timeout=30)
+                response.raise_for_status()
+
+                results.extend(response.json().get('responses', []))
+
+            return results
+
+        except requests.exceptions.RequestException as e:
+            log.error(f"Microsoft Graph API request failed for $batch: {e}")
             raise
 
     @staticmethod

@@ -1,0 +1,23 @@
+{
+  "headers": {
+    "vary": "Origin, X-Origin, Referer",
+    "content-type": "application/json; charset=UTF-8",
+    "date": "Thu, 12 Mar 2026 03:54:25 GMT",
+    "server": "ESF",
+    "x-xss-protection": "0",
+    "x-frame-options": "SAMEORIGIN",
+    "x-content-type-options": "nosniff",
+    "alt-svc": "h3=\":443\"; ma=2592000,h3-29=\":443\"; ma=2592000",
+    "transfer-encoding": "chunked",
+    "status": "400",
+    "content-length": "1472",
+    "-content-encoding": "gzip"
+  },
+  "body": {
+    "error": {
+      "code": 400,
+      "message": "ModelMonitoring config [model_monitoring_schedule_config \t {\n  monitoring_interval {\n    seconds: 3600\n  }\n  monitoring_window {\n    seconds: 3600\n  }\n}\nlogging_sampling_strategy {\n  random_sample_config {\n    sample_rate: 0.8\n  }\n}\nmodel_monitoring_alert_config {\n  email_alert_config {\n  }\n  enable_logging: true\n}\nbigquery_tables {\n  log_source: SERVING\n  log_type: PREDICT\n  bigquery_table_path: \"bq://stacklet-personal-2.model_deployment_monitoring_8380444641559838720.serving_predict\"\n}\nis_enabled: true\nmodel_monitoring_objective_configs {\n  prediction_drift_detection_config {\n  }\n  deployed_model_id: \"2741330977673445376\"\n}\npredict_instance_schema_uri: \"gs://cloud-ai-platform-29435907-c147-4ebd-8a52-0635558e68b1/instance_schemas/job-4823669180203008000/predict\"\npredict_instance_schema {\n  type_url: \"type.googleapis.com/cloud.ai.platform.openapi.Schema\"\n}\ntfdv_instance_schema_uri: \"gs://cloud-ai-platform-29435907-c147-4ebd-8a52-0635558e68b1/instance_schemas/job-4823669180203008000/analysis\"\ntfdv_instance_schema {\n  type_url: \"type.googleapis.com/cloud.ai.platform.openapi.Schema\"\n  value: \"\\b\\005\\022\\002\\b\\002\"\n}\nlog_ttl {\n}\njob_id: 4823669180203008000\n] already exitsts in Endpoint projects/cloud-custodian/locations/us-east1/endpoints/c7n-endpoint-east, please update the existing ModelMonitoringJob.",
+      "status": "FAILED_PRECONDITION"
+    }
+  }
+}

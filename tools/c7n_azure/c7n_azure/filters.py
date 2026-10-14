@@ -21,9 +21,11 @@ from azure.core.exceptions import HttpResponseError
 from c7n_azure.provider import resources
 from c7n.filters import Filter, FilterValidationError, ValueFilter
 from c7n.filters.core import PolicyValidationError
+from c7n.exceptions import PolicyExecutionError
+from c7n.filters.metrics import METRIC_WINDOW_ALIGNMENT
 from c7n.filters.related import RelatedResourceFilter
 from c7n.filters.offhours import OffHour, OnHour, Time
-from c7n.utils import chunks, get_annotation_prefix, type_schema
+from c7n.utils import chunks, get_annotation_prefix, type_schema, snap_to_period_start
 
 scalar_ops = {
     'eq': operator.eq,
@@ -123,6 +125,65 @@ class MetricFilter(Filter):
                 timeframe: 24
                 filter:  "DatabaseResourceId eq '*'"
 
+    The ``period_start`` key allows you to align the metric window in two ways.
+    By default, using ``auto``, the window is computed relative to the current time.
+    Alternatively, setting it to ``start-of-day`` aligns the window to full UTC calendar days,
+    beginning at 00:00:00 UTC and ending at current day 00:00:00 UTC.
+
+    :example:
+
+    Find VMs with average CPU below 20% for the last full UTC day
+
+    .. code-block:: yaml
+
+        policies:
+          - name: vm-low-cpu-last-full-day
+            resource: azure.vm
+            filters:
+              - type: metric
+                metric: Percentage CPU
+                aggregation: average
+                op: lt
+                threshold: 20
+                timeframe: 24
+                period_start: start-of-day
+
+    The ``dimensions`` key lets a policy filter a resource by a metric of that
+    resource's parent, restricted back to the resource itself with an OData
+    filter clause. When ``dimensions`` is set, the filter queries the parent
+    resource's scope, taken from the ``c7n:parent-id`` annotation, instead of
+    the resource's own id. Each dimension's ``value`` accepts a literal
+    string, or one of two sentinels: ``resource-name`` (the resource's own
+    ``name``) or ``resource-id`` (the resource's own ``id``). Because those
+    two strings are reserved as sentinels, a dimension value can't currently
+    be the literal string ``resource-name`` or ``resource-id`` themselves.
+
+    :example:
+
+    Find Azure OpenAI model deployments with no requests in the last week,
+    by querying the parent Cognitive Services account's ``AzureOpenAIRequests``
+    metric and filtering it back to the deployment via the
+    ``ModelDeploymentName`` dimension
+
+    .. code-block:: yaml
+
+        policies:
+          - name: unused-openai-deployments
+            resource: azure.cognitiveservice-deployment
+            filters:
+              - type: metric
+                metric: AzureOpenAIRequests
+                metric_namespace: Microsoft.CognitiveServices/accounts
+                aggregation: total
+                op: lte
+                threshold: 0
+                timeframe: 168
+                interval: P1D
+                no_data_action: to_zero
+                dimensions:
+                  - name: ModelDeploymentName
+                    value: resource-name
+
     """
 
     DEFAULT_TIMEFRAME = 24
@@ -148,11 +209,24 @@ class MetricFilter(Filter):
             'threshold': {'type': 'number'},
             'metric_namespace': {'type': 'string'},
             'timeframe': {'type': 'number'},
+            'period_start': {'type': 'string', 'enum': METRIC_WINDOW_ALIGNMENT},
             'interval': {'enum': [
                 'PT1M', 'PT5M', 'PT15M', 'PT30M', 'PT1H', 'PT6H', 'PT12H', 'P1D']},
             'aggregation': {'enum': ['total', 'average', 'count', 'minimum', 'maximum']},
             'no_data_action': {'enum': ['include', 'exclude', 'to_zero']},
-            'filter': {'type': 'string'}
+            'filter': {'type': 'string'},
+            'dimensions': {
+                'type': 'array',
+                'items': {
+                    'type': 'object',
+                    'additionalProperties': False,
+                    'required': ['name', 'value'],
+                    'properties': {
+                        'name': {'type': 'string'},
+                        'value': {'type': 'string'},
+                    },
+                },
+            },
         }
     }
     schema_alias = True
@@ -179,6 +253,9 @@ class MetricFilter(Filter):
         self.no_data_action = self.data.get('no_data_action', 'exclude')
         # default to no namespace if not passed in
         self.metricnamespace = self.data.get("metric_namespace", None)
+        # default to false if not passed in
+        self.period_start = self.data.get('period_start', 'auto')
+        self.dimensions = self.data.get('dimensions', [])
 
     def process(self, resources, event=None):
         # Import utcnow function as it may have been overridden for testing purposes
@@ -187,6 +264,9 @@ class MetricFilter(Filter):
         # Get timespan
         end_time = utcnow()
         start_time = end_time - timedelta(hours=self.timeframe)
+
+        start_time, end_time = snap_to_period_start(start_time, end_time, self.period_start)
+
         self.timespan = "{}/{}".format(start_time, end_time)
 
         # Create Azure Monitor client
@@ -232,11 +312,33 @@ class MetricFilter(Filter):
 
         return m
 
+    _DIMENSION_VALUE_SENTINELS = {
+        'resource-name': lambda r: r.get('name'),
+        'resource-id': lambda r: r.get('id'),
+    }
+
+    def resolve_dimension_value(self, resource, value):
+        resolver = self._DIMENSION_VALUE_SENTINELS.get(value)
+        return resolver(resource) if resolver else value
+
     def get_resource_id(self, resource):
+        if self.dimensions and 'c7n:parent-id' in resource:
+            return resource['c7n:parent-id']
         return resource['id']
 
     def get_filter(self, resource):
-        return self.filter
+        if not self.dimensions:
+            return self.filter
+        clauses = []
+        for d in self.dimensions:
+            value = self.resolve_dimension_value(resource, d['value'])
+            if value is None:
+                raise PolicyExecutionError(
+                    "policy:%s Could not resolve dimension %s for resource %s" % (
+                        self.manager.ctx.policy.name, d['name'], resource.get('id')))
+            clauses.append("%s eq '%s'" % (d['name'], str(value).replace("'", "''")))
+        dim_filter = " and ".join(clauses)
+        return "%s and %s" % (self.filter, dim_filter) if self.filter else dim_filter
 
     def _write_metric_to_resource(self, resource, metrics_data, m):
         resource_metrics = resource.setdefault(get_annotation_prefix('metrics'), {})
@@ -246,12 +348,13 @@ class MetricFilter(Filter):
         }
 
     def _get_metrics_cache_key(self):
-        return "{}, {}, {}, {}, {}".format(
+        return "{}, {}, {}, {}, {}, {}".format(
             self.metric,
             self.aggregation,
             self.timeframe,
             self.interval,
             self.filter,
+            self.dimensions,
         )
 
     def _get_cached_metric_data(self, resource):

@@ -1,0 +1,123 @@
+{
+    "pytest-terraform": 1,
+    "outputs": {},
+    "resources": {
+        "google_service_account": {
+            "sa": {
+                "account_id": "c7n-iam-matched-sa-x7r2k",
+                "create_ignore_already_exists": null,
+                "description": "",
+                "disabled": false,
+                "display_name": "C7N IAM Matched Test SA",
+                "email": "c7n-iam-matched-sa-x7r2k@stacklet-test-policies.iam.gserviceaccount.com",
+                "id": "projects/cloud-custodian/serviceAccounts/c7n-iam-matched-sa-x7r2k@stacklet-test-policies.iam.gserviceaccount.com",
+                "member": "serviceAccount:c7n-iam-matched-sa-x7r2k@stacklet-test-policies.iam.gserviceaccount.com",
+                "name": "projects/cloud-custodian/serviceAccounts/c7n-iam-matched-sa-x7r2k@stacklet-test-policies.iam.gserviceaccount.com",
+                "project": "stacklet-test-policies",
+                "timeouts": null,
+                "unique_id": "115290089626129128652"
+            }
+        },
+        "google_storage_bucket": {
+            "bucket": {
+                "autoclass": [],
+                "cors": [],
+                "custom_placement_config": [],
+                "default_event_based_hold": false,
+                "effective_labels": {
+                    "env": "test",
+                    "goog-terraform-provisioned": "true"
+                },
+                "enable_object_retention": false,
+                "encryption": [],
+                "force_destroy": false,
+                "hierarchical_namespace": [
+                    {
+                        "enabled": false
+                    }
+                ],
+                "id": "c7n-iam-matched-test-x7r2k",
+                "ip_filter": [],
+                "labels": {
+                    "env": "test"
+                },
+                "lifecycle_rule": [],
+                "location": "US",
+                "logging": [],
+                "name": "c7n-iam-matched-test-x7r2k",
+                "project": "stacklet-test-policies",
+                "project_number": 859150599087,
+                "public_access_prevention": "inherited",
+                "requester_pays": false,
+                "retention_policy": [],
+                "rpo": "DEFAULT",
+                "self_link": "https://www.googleapis.com/storage/v1/b/c7n-iam-matched-test-x7r2k",
+                "soft_delete_policy": [
+                    {
+                        "effective_time": "2026-03-05T16:18:10.042Z",
+                        "retention_duration_seconds": 604800
+                    }
+                ],
+                "storage_class": "STANDARD",
+                "terraform_labels": {
+                    "env": "test",
+                    "goog-terraform-provisioned": "true"
+                },
+                "time_created": "2026-03-05T16:18:10.042Z",
+                "timeouts": null,
+                "uniform_bucket_level_access": false,
+                "updated": "2026-03-05T16:18:10.042Z",
+                "url": "gs://c7n-iam-matched-test-x7r2k",
+                "versioning": [],
+                "website": []
+            }
+        },
+        "google_storage_bucket_iam_member": {
+            "non_sa_object_admin": {
+                "bucket": "b/c7n-iam-matched-test-x7r2k",
+                "condition": [],
+                "etag": "CAI=",
+                "id": "b/c7n-iam-matched-test-x7r2k/roles/storage.objectAdmin/allAuthenticatedUsers",
+                "member": "allAuthenticatedUsers",
+                "role": "roles/storage.objectAdmin",
+                "timeouts": null
+            },
+            "sa_admin": {
+                "bucket": "b/c7n-iam-matched-test-x7r2k",
+                "condition": [],
+                "etag": "CAY=",
+                "id": "b/c7n-iam-matched-test-x7r2k/roles/storage.admin/serviceAccount:c7n-iam-matched-sa-x7r2k@stacklet-test-policies.iam.gserviceaccount.com",
+                "member": "serviceAccount:c7n-iam-matched-sa-x7r2k@stacklet-test-policies.iam.gserviceaccount.com",
+                "role": "roles/storage.admin",
+                "timeouts": null
+            },
+            "sa_legacy_owner": {
+                "bucket": "b/c7n-iam-matched-test-x7r2k",
+                "condition": [],
+                "etag": "CAY=",
+                "id": "b/c7n-iam-matched-test-x7r2k/roles/storage.legacyBucketOwner/serviceAccount:c7n-iam-matched-sa-x7r2k@stacklet-test-policies.iam.gserviceaccount.com",
+                "member": "serviceAccount:c7n-iam-matched-sa-x7r2k@stacklet-test-policies.iam.gserviceaccount.com",
+                "role": "roles/storage.legacyBucketOwner",
+                "timeouts": null
+            },
+            "sa_object_admin": {
+                "bucket": "b/c7n-iam-matched-test-x7r2k",
+                "condition": [],
+                "etag": "CAM=",
+                "id": "b/c7n-iam-matched-test-x7r2k/roles/storage.objectAdmin/serviceAccount:c7n-iam-matched-sa-x7r2k@stacklet-test-policies.iam.gserviceaccount.com",
+                "member": "serviceAccount:c7n-iam-matched-sa-x7r2k@stacklet-test-policies.iam.gserviceaccount.com",
+                "role": "roles/storage.objectAdmin",
+                "timeouts": null
+            },
+            "sa_viewer": {
+                "bucket": "b/c7n-iam-matched-test-x7r2k",
+                "condition": [],
+                "etag": "CAY=",
+                "id": "b/c7n-iam-matched-test-x7r2k/roles/storage.objectViewer/serviceAccount:c7n-iam-matched-sa-x7r2k@stacklet-test-policies.iam.gserviceaccount.com",
+                "member": "serviceAccount:c7n-iam-matched-sa-x7r2k@stacklet-test-policies.iam.gserviceaccount.com",
+                "role": "roles/storage.objectViewer",
+                "timeouts": null
+            }
+        }
+    }
+}

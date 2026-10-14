@@ -3,14 +3,12 @@
 
 import argparse
 import json
-import pkg_resources
 import tempfile
-
-from common_kube import KubeTest
-
-from unittest.mock import patch, MagicMock
+from importlib.metadata import version
+from unittest.mock import MagicMock, patch
 
 from c7n_kube.cli import _parser, cli
+from common_kube import KubeTest
 
 
 class TestK8sCli(KubeTest):
@@ -50,8 +48,6 @@ class TestK8sCli(KubeTest):
             ]
         }
 
-        version = pkg_resources.get_distribution("c7n_kube").version
-
         expected = {
             "apiVersion": "admissionregistration.k8s.io/v1",
             "kind": "MutatingWebhookConfiguration",
@@ -60,7 +56,7 @@ class TestK8sCli(KubeTest):
                 "labels": {
                     "app.kubernetes.io/name": "c7n-kates",
                     "app.kubernetes.io/instance": "c7n-kates",
-                    "app.kubernetes.io/version": version,
+                    "app.kubernetes.io/version": version("c7n_kube"),
                     "app.kubernetes.io/component": "AdmissionController",
                     "app.kubernetes.io/part-of": "c7n_kube",
                     "app.kubernetes.io/managed-by": "c7n",

@@ -1,0 +1,47 @@
+{
+    "pytest-terraform": 1,
+    "outputs": {},
+    "resources": {
+        "google_compute_global_address": {
+            "default": {
+                "address": "34.102.242.222",
+                "address_type": "EXTERNAL",
+                "creation_timestamp": "2026-04-21T13:40:47.496-07:00",
+                "description": "",
+                "effective_labels": {
+                    "env": "default",
+                    "goog-terraform-provisioned": "true"
+                },
+                "id": "projects/cloud-custodian/global/addresses/c7n-global-address-default-abf3",
+                "ip_version": "",
+                "label_fingerprint": "oWv7t93mrS4=",
+                "labels": {
+                    "env": "default"
+                },
+                "name": "c7n-global-address-default-abf3",
+                "network": "",
+                "prefix_length": 0,
+                "project": "stacklet-test-policies",
+                "purpose": "",
+                "self_link": "https://www.googleapis.com/compute/v1/projects/cloud-custodian/global/addresses/c7n-global-address-default-abf3",
+                "terraform_labels": {
+                    "env": "default",
+                    "goog-terraform-provisioned": "true"
+                },
+                "timeouts": null
+            }
+        },
+        "random_id": {
+            "suffix": {
+                "b64_std": "q/M=",
+                "b64_url": "q_M",
+                "byte_length": 2,
+                "dec": "44019",
+                "hex": "abf3",
+                "id": "q_M",
+                "keepers": null,
+                "prefix": null
+            }
+        }
+    }
+}

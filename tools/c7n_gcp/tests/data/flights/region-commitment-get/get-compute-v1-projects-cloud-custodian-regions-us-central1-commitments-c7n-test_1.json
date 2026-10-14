@@ -1,0 +1,44 @@
+{
+  "headers": {
+    "vary": "Origin, X-Origin, Referer",
+    "content-type": "application/json; charset=UTF-8",
+    "date": "Mon, 06 Apr 2026 16:49:15 GMT",
+    "server": "ESF",
+    "x-xss-protection": "0",
+    "x-frame-options": "SAMEORIGIN",
+    "x-content-type-options": "nosniff",
+    "alt-svc": "h3=\":443\"; ma=2592000,h3-29=\":443\"; ma=2592000",
+    "transfer-encoding": "chunked",
+    "status": "200",
+    "content-length": "1420",
+    "-content-encoding": "gzip",
+    "content-location": "https://compute.googleapis.com/compute/v1/projects/cloud-custodian/regions/us-central1/commitments/c7n-test?alt=json"
+  },
+  "body": {
+    "kind": "compute#commitment",
+    "id": "1234567890123456789",
+    "creationTimestamp": "2026-04-06T10:00:00.000-05:00",
+    "name": "c7n-test",
+    "description": "Synthetic commitment fixture for replay tests",
+    "region": "https://compute.googleapis.com/compute/v1/projects/cloud-custodian/regions/us-central1",
+    "selfLink": "https://compute.googleapis.com/compute/v1/projects/cloud-custodian/regions/us-central1/commitments/c7n-test",
+    "status": "ACTIVE",
+    "statusMessage": "Commitment is active.",
+    "plan": "TWELVE_MONTH",
+    "startTimestamp": "2026-04-01T00:00:00.000-05:00",
+    "endTimestamp": "2027-04-01T00:00:00.000-05:00",
+    "category": "MACHINE",
+    "resources": [
+      {
+        "type": "VCPU",
+        "amount": "1"
+      },
+      {
+        "type": "MEMORY",
+        "amount": "1024"
+      }
+    ],
+    "type": "GENERAL_PURPOSE_E2",
+    "autoRenew": false
+  }
+}

@@ -1,0 +1,517 @@
+{
+    "pytest-terraform": 1,
+    "outputs": {
+        "blob_compressed": {
+            "value": {
+                "name": "compressed-vms.json.gz",
+                "url": "azure://c7ntestpaap1ox4.blob.core.windows.net/test-configs/compressed-vms.json.gz"
+            },
+            "type": [
+                "object",
+                {
+                    "name": "string",
+                    "url": "string"
+                }
+            ]
+        },
+        "blob_csv": {
+            "value": {
+                "name": "resource-groups.csv",
+                "url": "azure://c7ntestpaap1ox4.blob.core.windows.net/test-configs/resource-groups.csv"
+            },
+            "type": [
+                "object",
+                {
+                    "name": "string",
+                    "url": "string"
+                }
+            ]
+        },
+        "blob_empty": {
+            "value": {
+                "name": "empty-list.json",
+                "url": "azure://c7ntestpaap1ox4.blob.core.windows.net/test-configs/empty-list.json"
+            },
+            "type": [
+                "object",
+                {
+                    "name": "string",
+                    "url": "string"
+                }
+            ]
+        },
+        "blob_json_complex": {
+            "value": {
+                "name": "vm-config.json",
+                "url": "azure://c7ntestpaap1ox4.blob.core.windows.net/test-configs/vm-config.json"
+            },
+            "type": [
+                "object",
+                {
+                    "name": "string",
+                    "url": "string"
+                }
+            ]
+        },
+        "blob_json_simple": {
+            "value": {
+                "content_sample": [
+                    "vm-prod-web-01",
+                    "vm-prod-web-02",
+                    "vm-prod-db-01"
+                ],
+                "name": "approved-vms.json",
+                "url": "azure://c7ntestpaap1ox4.blob.core.windows.net/test-configs/approved-vms.json"
+            },
+            "type": [
+                "object",
+                {
+                    "content_sample": [
+                        "tuple",
+                        [
+                            "string",
+                            "string",
+                            "string"
+                        ]
+                    ],
+                    "name": "string",
+                    "url": "string"
+                }
+            ]
+        },
+        "blob_nested": {
+            "value": {
+                "name": "configs/prod/allowed-regions.json",
+                "url": "azure://c7ntestpaap1ox4.blob.core.windows.net/nested-paths/configs/prod/allowed-regions.json"
+            },
+            "type": [
+                "object",
+                {
+                    "name": "string",
+                    "url": "string"
+                }
+            ]
+        },
+        "blob_txt": {
+            "value": {
+                "name": "vm-ids.txt",
+                "url": "azure://c7ntestpaap1ox4.blob.core.windows.net/test-configs/vm-ids.txt"
+            },
+            "type": [
+                "object",
+                {
+                    "name": "string",
+                    "url": "string"
+                }
+            ]
+        },
+        "container_name": {
+            "value": "test-configs",
+            "type": "string"
+        },
+        "nested_container_name": {
+            "value": "nested-paths",
+            "type": "string"
+        },
+        "resource_group_name": {
+            "value": "c7n-resolver-test-paap1ox4",
+            "type": "string"
+        },
+        "storage_account_name": {
+            "value": "c7ntestpaap1ox4",
+            "type": "string"
+        },
+        "storage_account_url": {
+            "value": "https://c7ntestpaap1ox4.blob.core.windows.net/",
+            "type": "string"
+        }
+    },
+    "resources": {
+        "azurerm_subscription": {
+            "current": {
+                "display_name": "Mock Subscription",
+                "id": "/subscriptions/12345678-1234-1234-1234-123456789012",
+                "location_placement_id": "Public_2014-09-01",
+                "quota_id": "PayAsYouGo_2014-09-01",
+                "spending_limit": "Off",
+                "state": "Enabled",
+                "subscription_id": "12345678-1234-1234-1234-123456789012",
+                "tags": {},
+                "tenant_id": "87654321-4321-4321-4321-210987654321",
+                "timeouts": null
+            }
+        },
+        "azurerm_resource_group": {
+            "test": {
+                "id": "/subscriptions/12345678-1234-1234-1234-123456789012/resourceGroups/c7n-resolver-test-paap1ox4",
+                "location": "eastus",
+                "managed_by": "",
+                "name": "c7n-resolver-test-paap1ox4",
+                "tags": {
+                    "component": "azure-blob-resolver",
+                    "purpose": "c7n-testing"
+                },
+                "timeouts": null
+            }
+        },
+        "azurerm_storage_account": {
+            "test": {
+                "access_tier": "Hot",
+                "account_kind": "StorageV2",
+                "account_replication_type": "LRS",
+                "account_tier": "Standard",
+                "allow_nested_items_to_be_public": false,
+                "allowed_copy_scope": "",
+                "azure_files_authentication": [],
+                "blob_properties": [
+                    {
+                        "change_feed_enabled": false,
+                        "change_feed_retention_in_days": 0,
+                        "container_delete_retention_policy": [],
+                        "cors_rule": [],
+                        "default_service_version": "",
+                        "delete_retention_policy": [],
+                        "last_access_time_enabled": false,
+                        "restore_policy": [],
+                        "versioning_enabled": false
+                    }
+                ],
+                "cross_tenant_replication_enabled": true,
+                "custom_domain": [],
+                "customer_managed_key": [],
+                "default_to_oauth_authentication": false,
+                "dns_endpoint_type": "Standard",
+                "edge_zone": "",
+                "enable_https_traffic_only": true,
+                "https_traffic_only_enabled": true,
+                "id": "/subscriptions/12345678-1234-1234-1234-123456789012/resourceGroups/c7n-resolver-test-paap1ox4/providers/Microsoft.Storage/storageAccounts/c7ntestpaap1ox4",
+                "identity": [],
+                "immutability_policy": [],
+                "infrastructure_encryption_enabled": false,
+                "is_hns_enabled": false,
+                "large_file_share_enabled": false,
+                "local_user_enabled": true,
+                "location": "eastus",
+                "min_tls_version": "TLS1_2",
+                "name": "c7ntestpaap1ox4",
+                "network_rules": [],
+                "nfsv3_enabled": false,
+                "primary_access_key": "MOCK_PRIMARY_ACCESS_KEY_BASE64_ENCODED_STRING_PLACEHOLDER==",
+                "primary_blob_connection_string": "DefaultEndpointsProtocol=https;BlobEndpoint=https://c7ntestpaap1ox4.blob.core.windows.net/;AccountName=c7ntestpaap1ox4;AccountKey=MOCK_PRIMARY_ACCESS_KEY_BASE64_ENCODED_STRING_PLACEHOLDER==",
+                "primary_blob_endpoint": "https://c7ntestpaap1ox4.blob.core.windows.net/",
+                "primary_blob_host": "c7ntestpaap1ox4.blob.core.windows.net",
+                "primary_blob_internet_endpoint": "",
+                "primary_blob_internet_host": "",
+                "primary_blob_microsoft_endpoint": "",
+                "primary_blob_microsoft_host": "",
+                "primary_connection_string": "DefaultEndpointsProtocol=https;AccountName=c7ntestpaap1ox4;AccountKey=MOCK_PRIMARY_ACCESS_KEY_BASE64_ENCODED_STRING_PLACEHOLDER==;EndpointSuffix=core.windows.net",
+                "primary_dfs_endpoint": "https://c7ntestpaap1ox4.dfs.core.windows.net/",
+                "primary_dfs_host": "c7ntestpaap1ox4.dfs.core.windows.net",
+                "primary_dfs_internet_endpoint": "",
+                "primary_dfs_internet_host": "",
+                "primary_dfs_microsoft_endpoint": "",
+                "primary_dfs_microsoft_host": "",
+                "primary_file_endpoint": "https://c7ntestpaap1ox4.file.core.windows.net/",
+                "primary_file_host": "c7ntestpaap1ox4.file.core.windows.net",
+                "primary_file_internet_endpoint": "",
+                "primary_file_internet_host": "",
+                "primary_file_microsoft_endpoint": "",
+                "primary_file_microsoft_host": "",
+                "primary_location": "eastus",
+                "primary_queue_endpoint": "https://c7ntestpaap1ox4.queue.core.windows.net/",
+                "primary_queue_host": "c7ntestpaap1ox4.queue.core.windows.net",
+                "primary_queue_microsoft_endpoint": "",
+                "primary_queue_microsoft_host": "",
+                "primary_table_endpoint": "https://c7ntestpaap1ox4.table.core.windows.net/",
+                "primary_table_host": "c7ntestpaap1ox4.table.core.windows.net",
+                "primary_table_microsoft_endpoint": "",
+                "primary_table_microsoft_host": "",
+                "primary_web_endpoint": "https://c7ntestpaap1ox4.z13.web.core.windows.net/",
+                "primary_web_host": "c7ntestpaap1ox4.z13.web.core.windows.net",
+                "primary_web_internet_endpoint": "",
+                "primary_web_internet_host": "",
+                "primary_web_microsoft_endpoint": "",
+                "primary_web_microsoft_host": "",
+                "public_network_access_enabled": true,
+                "queue_encryption_key_type": "Service",
+                "queue_properties": [
+                    {
+                        "cors_rule": [],
+                        "hour_metrics": [
+                            {
+                                "enabled": false,
+                                "include_apis": false,
+                                "retention_policy_days": 0,
+                                "version": "1.0"
+                            }
+                        ],
+                        "logging": [
+                            {
+                                "delete": false,
+                                "read": false,
+                                "retention_policy_days": 0,
+                                "version": "1.0",
+                                "write": false
+                            }
+                        ],
+                        "minute_metrics": [
+                            {
+                                "enabled": false,
+                                "include_apis": false,
+                                "retention_policy_days": 0,
+                                "version": "1.0"
+                            }
+                        ]
+                    }
+                ],
+                "resource_group_name": "c7n-resolver-test-paap1ox4",
+                "routing": [],
+                "sas_policy": [],
+                "secondary_access_key": "MOCK_SECONDARY_ACCESS_KEY_BASE64_ENCODED_STRING_PLACEHOLDER==",
+                "secondary_blob_connection_string": "",
+                "secondary_blob_endpoint": "",
+                "secondary_blob_host": "",
+                "secondary_blob_internet_endpoint": "",
+                "secondary_blob_internet_host": "",
+                "secondary_blob_microsoft_endpoint": "",
+                "secondary_blob_microsoft_host": "",
+                "secondary_connection_string": "DefaultEndpointsProtocol=https;AccountName=c7ntestpaap1ox4;AccountKey=MOCK_SECONDARY_ACCESS_KEY_BASE64_ENCODED_STRING_PLACEHOLDER==;EndpointSuffix=core.windows.net",
+                "secondary_dfs_endpoint": "",
+                "secondary_dfs_host": "",
+                "secondary_dfs_internet_endpoint": "",
+                "secondary_dfs_internet_host": "",
+                "secondary_dfs_microsoft_endpoint": "",
+                "secondary_dfs_microsoft_host": "",
+                "secondary_file_endpoint": "",
+                "secondary_file_host": "",
+                "secondary_file_internet_endpoint": "",
+                "secondary_file_internet_host": "",
+                "secondary_file_microsoft_endpoint": "",
+                "secondary_file_microsoft_host": "",
+                "secondary_location": "",
+                "secondary_queue_endpoint": "",
+                "secondary_queue_host": "",
+                "secondary_queue_microsoft_endpoint": "",
+                "secondary_queue_microsoft_host": "",
+                "secondary_table_endpoint": "",
+                "secondary_table_host": "",
+                "secondary_table_microsoft_endpoint": "",
+                "secondary_table_microsoft_host": "",
+                "secondary_web_endpoint": "",
+                "secondary_web_host": "",
+                "secondary_web_internet_endpoint": "",
+                "secondary_web_internet_host": "",
+                "secondary_web_microsoft_endpoint": "",
+                "secondary_web_microsoft_host": "",
+                "sftp_enabled": false,
+                "share_properties": [
+                    {
+                        "cors_rule": [],
+                        "retention_policy": [
+                            {
+                                "days": 7
+                            }
+                        ],
+                        "smb": []
+                    }
+                ],
+                "shared_access_key_enabled": true,
+                "static_website": [],
+                "table_encryption_key_type": "Service",
+                "tags": {
+                    "component": "azure-blob-resolver",
+                    "purpose": "c7n-testing"
+                },
+                "timeouts": null
+            }
+        },
+        "azurerm_storage_blob": {
+            "csv": {
+                "access_tier": "Hot",
+                "cache_control": "",
+                "content_md5": "",
+                "content_type": "text/csv",
+                "encryption_scope": "",
+                "id": "https://c7ntestpaap1ox4.blob.core.windows.net/test-configs/resource-groups.csv",
+                "metadata": {},
+                "name": "resource-groups.csv",
+                "parallelism": 8,
+                "size": 0,
+                "source": null,
+                "source_content": "name,location,environment\nrg-prod-web,eastus,production\nrg-prod-db,eastus,production\nrg-dev-web,westus,development\n",
+                "source_uri": null,
+                "storage_account_name": "c7ntestpaap1ox4",
+                "storage_container_name": "test-configs",
+                "timeouts": null,
+                "type": "Block",
+                "url": "https://c7ntestpaap1ox4.blob.core.windows.net/test-configs/resource-groups.csv"
+            },
+            "json_complex": {
+                "access_tier": "Hot",
+                "cache_control": "",
+                "content_md5": "",
+                "content_type": "application/json",
+                "encryption_scope": "",
+                "id": "https://c7ntestpaap1ox4.blob.core.windows.net/test-configs/vm-config.json",
+                "metadata": {},
+                "name": "vm-config.json",
+                "parallelism": 8,
+                "size": 0,
+                "source": null,
+                "source_content": "{\"vms\":[{\"region\":\"eastus\",\"tags\":{\"environment\":\"production\",\"tier\":\"web\"},\"vmName\":\"vm-prod-web-01\"},{\"region\":\"eastus\",\"tags\":{\"environment\":\"production\",\"tier\":\"web\"},\"vmName\":\"vm-prod-web-02\"},{\"region\":\"eastus\",\"tags\":{\"environment\":\"production\",\"tier\":\"database\"},\"vmName\":\"vm-prod-db-01\"}]}",
+                "source_uri": null,
+                "storage_account_name": "c7ntestpaap1ox4",
+                "storage_container_name": "test-configs",
+                "timeouts": null,
+                "type": "Block",
+                "url": "https://c7ntestpaap1ox4.blob.core.windows.net/test-configs/vm-config.json"
+            },
+            "json_compressed": {
+                "access_tier": "Hot",
+                "cache_control": "",
+                "content_md5": "",
+                "content_type": "application/gzip",
+                "encryption_scope": "",
+                "id": "https://c7ntestpaap1ox4.blob.core.windows.net/test-configs/compressed-vms.json.gz",
+                "metadata": {},
+                "name": "compressed-vms.json.gz",
+                "parallelism": 8,
+                "size": 0,
+                "source": null,
+                "source_content": "[\"vm-compressed-01\",\"vm-compressed-02\",\"vm-compressed-03\"]",
+                "source_uri": null,
+                "storage_account_name": "c7ntestpaap1ox4",
+                "storage_container_name": "test-configs",
+                "timeouts": null,
+                "type": "Block",
+                "url": "https://c7ntestpaap1ox4.blob.core.windows.net/test-configs/compressed-vms.json.gz"
+            },
+            "json_empty": {
+                "access_tier": "Hot",
+                "cache_control": "",
+                "content_md5": "",
+                "content_type": "application/json",
+                "encryption_scope": "",
+                "id": "https://c7ntestpaap1ox4.blob.core.windows.net/test-configs/empty-list.json",
+                "metadata": {},
+                "name": "empty-list.json",
+                "parallelism": 8,
+                "size": 0,
+                "source": null,
+                "source_content": "[]",
+                "source_uri": null,
+                "storage_account_name": "c7ntestpaap1ox4",
+                "storage_container_name": "test-configs",
+                "timeouts": null,
+                "type": "Block",
+                "url": "https://c7ntestpaap1ox4.blob.core.windows.net/test-configs/empty-list.json"
+            },
+            "json_simple": {
+                "access_tier": "Hot",
+                "cache_control": "",
+                "content_md5": "",
+                "content_type": "application/json",
+                "encryption_scope": "",
+                "id": "https://c7ntestpaap1ox4.blob.core.windows.net/test-configs/approved-vms.json",
+                "metadata": {},
+                "name": "approved-vms.json",
+                "parallelism": 8,
+                "size": 0,
+                "source": null,
+                "source_content": "[\"vm-prod-web-01\",\"vm-prod-web-02\",\"vm-prod-db-01\"]",
+                "source_uri": null,
+                "storage_account_name": "c7ntestpaap1ox4",
+                "storage_container_name": "test-configs",
+                "timeouts": null,
+                "type": "Block",
+                "url": "https://c7ntestpaap1ox4.blob.core.windows.net/test-configs/approved-vms.json"
+            },
+            "nested_json": {
+                "access_tier": "Hot",
+                "cache_control": "",
+                "content_md5": "",
+                "content_type": "application/json",
+                "encryption_scope": "",
+                "id": "https://c7ntestpaap1ox4.blob.core.windows.net/nested-paths/configs/prod/allowed-regions.json",
+                "metadata": {},
+                "name": "configs/prod/allowed-regions.json",
+                "parallelism": 8,
+                "size": 0,
+                "source": null,
+                "source_content": "[\"eastus\",\"westus\",\"centralus\"]",
+                "source_uri": null,
+                "storage_account_name": "c7ntestpaap1ox4",
+                "storage_container_name": "nested-paths",
+                "timeouts": null,
+                "type": "Block",
+                "url": "https://c7ntestpaap1ox4.blob.core.windows.net/nested-paths/configs/prod/allowed-regions.json"
+            },
+            "txt": {
+                "access_tier": "Hot",
+                "cache_control": "",
+                "content_md5": "",
+                "content_type": "text/plain",
+                "encryption_scope": "",
+                "id": "https://c7ntestpaap1ox4.blob.core.windows.net/test-configs/vm-ids.txt",
+                "metadata": {},
+                "name": "vm-ids.txt",
+                "parallelism": 8,
+                "size": 0,
+                "source": null,
+                "source_content": "/subscriptions/sub1/resourceGroups/rg1/providers/Microsoft.Compute/virtualMachines/vm1\n/subscriptions/sub1/resourceGroups/rg1/providers/Microsoft.Compute/virtualMachines/vm2\n/subscriptions/sub1/resourceGroups/rg2/providers/Microsoft.Compute/virtualMachines/vm3\n",
+                "source_uri": null,
+                "storage_account_name": "c7ntestpaap1ox4",
+                "storage_container_name": "test-configs",
+                "timeouts": null,
+                "type": "Block",
+                "url": "https://c7ntestpaap1ox4.blob.core.windows.net/test-configs/vm-ids.txt"
+            }
+        },
+        "azurerm_storage_container": {
+            "nested": {
+                "container_access_type": "private",
+                "default_encryption_scope": "$account-encryption-key",
+                "encryption_scope_override_enabled": true,
+                "has_immutability_policy": false,
+                "has_legal_hold": false,
+                "id": "https://c7ntestpaap1ox4.blob.core.windows.net/nested-paths",
+                "metadata": {},
+                "name": "nested-paths",
+                "resource_manager_id": "/subscriptions/12345678-1234-1234-1234-123456789012/resourceGroups/c7n-resolver-test-paap1ox4/providers/Microsoft.Storage/storageAccounts/c7ntestpaap1ox4/blobServices/default/containers/nested-paths",
+                "storage_account_name": "c7ntestpaap1ox4",
+                "timeouts": null
+            },
+            "test": {
+                "container_access_type": "private",
+                "default_encryption_scope": "$account-encryption-key",
+                "encryption_scope_override_enabled": true,
+                "has_immutability_policy": false,
+                "has_legal_hold": false,
+                "id": "https://c7ntestpaap1ox4.blob.core.windows.net/test-configs",
+                "metadata": {},
+                "name": "test-configs",
+                "resource_manager_id": "/subscriptions/12345678-1234-1234-1234-123456789012/resourceGroups/c7n-resolver-test-paap1ox4/providers/Microsoft.Storage/storageAccounts/c7ntestpaap1ox4/blobServices/default/containers/test-configs",
+                "storage_account_name": "c7ntestpaap1ox4",
+                "timeouts": null
+            }
+        },
+        "random_string": {
+            "suffix": {
+                "id": "paap1ox4",
+                "keepers": null,
+                "length": 8,
+                "lower": true,
+                "min_lower": 0,
+                "min_numeric": 0,
+                "min_special": 0,
+                "min_upper": 0,
+                "number": true,
+                "numeric": true,
+                "override_special": null,
+                "result": "paap1ox4",
+                "special": false,
+                "upper": false
+            }
+        }
+    }
+}

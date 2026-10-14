@@ -1,0 +1,40 @@
+{
+    "status_code": 200,
+    "data": {
+        "ResponseMetadata": {},
+        "items": [
+            {
+                "id": "snva-00b7af8c4603042e9",
+                "arn": "arn:aws:vpc-lattice:us-east-1:644160558196:servicenetworkvpcassociation/snva-00b7af8c4603042e9",
+                "status": "ACTIVE",
+                "createdBy": "644160558196",
+                "createdAt": {
+                    "__class__": "datetime",
+                    "year": 2026,
+                    "month": 3,
+                    "day": 13,
+                    "hour": 15,
+                    "minute": 56,
+                    "second": 36,
+                    "microsecond": 695000
+                },
+                "serviceNetworkId": "sn-0ab42a03731b11e17",
+                "serviceNetworkName": "c7n-test-network-big-herring",
+                "serviceNetworkArn": "arn:aws:vpc-lattice:us-east-1:644160558196:servicenetwork/sn-0ab42a03731b11e17",
+                "privateDnsEnabled": false,
+                "dnsOptions": {},
+                "vpcId": "vpc-0e5ef750468976cb3",
+                "lastUpdatedAt": {
+                    "__class__": "datetime",
+                    "year": 2026,
+                    "month": 3,
+                    "day": 13,
+                    "hour": 15,
+                    "minute": 57,
+                    "second": 54,
+                    "microsecond": 8000
+                }
+            }
+        ]
+    }
+}

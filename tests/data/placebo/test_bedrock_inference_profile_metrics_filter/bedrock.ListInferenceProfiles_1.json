@@ -1,0 +1,80 @@
+{
+    "status_code": 200,
+    "data": {
+        "ResponseMetadata": {},
+        "inferenceProfileSummaries": [
+            {
+                "inferenceProfileName": "Another Inference Profile",
+                "description": "Profile with tag for cost allocation tracking",
+                "createdAt": {
+                    "__class__": "datetime",
+                    "year": 2026,
+                    "month": 5,
+                    "day": 12,
+                    "hour": 19,
+                    "minute": 14,
+                    "second": 21,
+                    "microsecond": 710211
+                },
+                "updatedAt": {
+                    "__class__": "datetime",
+                    "year": 2026,
+                    "month": 5,
+                    "day": 12,
+                    "hour": 19,
+                    "minute": 14,
+                    "second": 21,
+                    "microsecond": 710211
+                },
+                "inferenceProfileArn": "arn:aws:bedrock:us-east-2:644160558196:application-inference-profile/93ksxhaxmgyd",
+                "models": [
+                    {
+                        "modelArn": "arn:aws:bedrock:::foundation-model/anthropic.claude-sonnet-4-20250514-v1:0"
+                    },
+                    {
+                        "modelArn": "arn:aws:bedrock:us-east-2::foundation-model/anthropic.claude-sonnet-4-20250514-v1:0"
+                    }
+                ],
+                "inferenceProfileId": "93ksxhaxmgyd",
+                "status": "ACTIVE",
+                "type": "APPLICATION"
+            },
+            {
+                "inferenceProfileName": "Inference Profile 1",
+                "description": "Profile with tag for cost allocation tracking",
+                "createdAt": {
+                    "__class__": "datetime",
+                    "year": 2026,
+                    "month": 5,
+                    "day": 12,
+                    "hour": 19,
+                    "minute": 14,
+                    "second": 21,
+                    "microsecond": 719770
+                },
+                "updatedAt": {
+                    "__class__": "datetime",
+                    "year": 2026,
+                    "month": 5,
+                    "day": 12,
+                    "hour": 19,
+                    "minute": 14,
+                    "second": 21,
+                    "microsecond": 719770
+                },
+                "inferenceProfileArn": "arn:aws:bedrock:us-east-2:644160558196:application-inference-profile/e1o7cl1twlbo",
+                "models": [
+                    {
+                        "modelArn": "arn:aws:bedrock:::foundation-model/anthropic.claude-sonnet-4-20250514-v1:0"
+                    },
+                    {
+                        "modelArn": "arn:aws:bedrock:us-east-2::foundation-model/anthropic.claude-sonnet-4-20250514-v1:0"
+                    }
+                ],
+                "inferenceProfileId": "e1o7cl1twlbo",
+                "status": "ACTIVE",
+                "type": "APPLICATION"
+            }
+        ]
+    }
+}

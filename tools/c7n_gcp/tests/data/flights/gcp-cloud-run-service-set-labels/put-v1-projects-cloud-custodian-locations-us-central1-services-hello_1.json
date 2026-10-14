@@ -1,0 +1,52 @@
+{
+  "headers": {
+    "content-type": "application/json; charset=UTF-8",
+    "status": "200"
+  },
+  "body": {
+    "apiVersion": "serving.knative.dev/v1",
+    "kind": "Service",
+    "metadata": {
+      "name": "hello",
+      "namespace": "cloud-custodian",
+      "selfLink": "/apis/serving.knative.dev/v1/namespaces/cloud-custodian/services/hello",
+      "uid": "46b28549-6c5c-4245-bc8d-9cec06d262b6",
+      "resourceVersion": "AAX4MBndusc",
+      "generation": 2,
+      "labels": {
+        "cloud.googleapis.com/location": "us-central1",
+        "environment": "test"
+      },
+      "annotations": {
+        "run.googleapis.com/ingress": "all"
+      },
+      "creationTimestamp": "2023-03-31T10:53:45.882066Z"
+    },
+    "spec": {
+      "template": {
+        "metadata": {
+          "name": "hello-00001-tiv",
+          "annotations": {}
+        },
+        "spec": {
+          "containerConcurrency": 80,
+          "timeoutSeconds": 300,
+          "containers": [
+            {
+              "image": "us-docker.pkg.dev/cloudrun/container/hello",
+              "ports": [{"name": "http1", "containerPort": 8080}]
+            }
+          ]
+        }
+      },
+      "traffic": [{"percent": 100, "latestRevision": true}]
+    },
+    "status": {
+      "observedGeneration": 2,
+      "conditions": [
+        {"type": "Ready", "status": "True"}
+      ],
+      "url": "https://hello-g3kdvpt64a-uc.a.run.app"
+    }
+  }
+}

@@ -3,7 +3,7 @@
 
 """Stubs for oci urllib3"""
 
-from oci._vendor.urllib3.connectionpool import HTTPConnection, VerifiedHTTPSConnection
+from urllib3.connection import HTTPConnection, VerifiedHTTPSConnection
 from oci.base_client import OCIConnection, OCIConnectionPool
 
 from vcr.stubs import VCRHTTPConnection, VCRHTTPSConnection

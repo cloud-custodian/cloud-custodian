@@ -1,0 +1,38 @@
+{
+    "status_code": 200,
+    "data": {
+        "ImportSummaryList": [
+            {
+                "ImportArn": "arn:aws:dynamodb:us-east-1:644160558196:table/test-import-description-filter-fullpath/import/01774467713552-101ba9b5",
+                "ImportStatus": "COMPLETED",
+                "TableArn": "arn:aws:dynamodb:us-east-1:644160558196:table/test-import-description-filter-fullpath",
+                "S3BucketSource": {
+                    "S3Bucket": "apogeeac-test-bucket"
+                },
+                "CloudWatchLogGroupArn": "arn:aws:logs:us-east-1:644160558196:log-group:/aws-dynamodb/imports:*",
+                "InputFormat": "DYNAMODB_JSON",
+                "StartTime": {
+                    "__class__": "datetime",
+                    "year": 2026,
+                    "month": 3,
+                    "day": 25,
+                    "hour": 15,
+                    "minute": 41,
+                    "second": 53,
+                    "microsecond": 552000
+                },
+                "EndTime": {
+                    "__class__": "datetime",
+                    "year": 2026,
+                    "month": 3,
+                    "day": 25,
+                    "hour": 15,
+                    "minute": 46,
+                    "second": 22,
+                    "microsecond": 360000
+                }
+            }
+        ],
+        "ResponseMetadata": {}
+    }
+}

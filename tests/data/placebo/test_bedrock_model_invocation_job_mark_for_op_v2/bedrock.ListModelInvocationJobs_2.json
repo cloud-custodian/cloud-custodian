@@ -1,0 +1,3497 @@
+{
+    "status_code": 200,
+    "data": {
+        "ResponseMetadata": {},
+        "invocationJobSummaries": [
+            {
+                "jobArn": "arn:aws:bedrock:us-east-1:644160558196:model-invocation-job/o4gspiyxds21",
+                "jobName": "c7n-batch-invocation-leading-baboon",
+                "modelId": "arn:aws:bedrock:us-east-1::foundation-model/amazon.nova-micro-v1:0",
+                "roleArn": "arn:aws:iam::644160558196:role/c7n-bedrock-batch-leading-baboon",
+                "status": "Submitted",
+                "submitTime": {
+                    "__class__": "datetime",
+                    "year": 2026,
+                    "month": 3,
+                    "day": 13,
+                    "hour": 17,
+                    "minute": 48,
+                    "second": 55,
+                    "microsecond": 259000
+                },
+                "lastModifiedTime": {
+                    "__class__": "datetime",
+                    "year": 2026,
+                    "month": 3,
+                    "day": 13,
+                    "hour": 17,
+                    "minute": 48,
+                    "second": 55,
+                    "microsecond": 259000
+                },
+                "inputDataConfig": {
+                    "s3InputDataConfig": {
+                        "s3Uri": "s3://c7n-bedrock-input-leading-baboon/input.jsonl",
+                        "s3BucketOwner": "644160558196"
+                    }
+                },
+                "outputDataConfig": {
+                    "s3OutputDataConfig": {
+                        "s3Uri": "s3://c7n-bedrock-output-leading-baboon/",
+                        "s3BucketOwner": "644160558196"
+                    }
+                },
+                "timeoutDurationInHours": 24,
+                "jobExpirationTime": {
+                    "__class__": "datetime",
+                    "year": 2026,
+                    "month": 3,
+                    "day": 14,
+                    "hour": 17,
+                    "minute": 48,
+                    "second": 55,
+                    "microsecond": 259000
+                },
+                "modelInvocationType": "InvokeModel"
+            },
+            {
+                "jobArn": "arn:aws:bedrock:us-east-1:644160558196:model-invocation-job/pvtct5eo4jjx",
+                "jobName": "c7n-batch-invocation-rare-tuna",
+                "modelId": "arn:aws:bedrock:us-east-1::foundation-model/amazon.nova-micro-v1:0",
+                "roleArn": "arn:aws:iam::644160558196:role/c7n-bedrock-batch-rare-tuna",
+                "status": "Submitted",
+                "submitTime": {
+                    "__class__": "datetime",
+                    "year": 2026,
+                    "month": 3,
+                    "day": 13,
+                    "hour": 17,
+                    "minute": 48,
+                    "second": 33,
+                    "microsecond": 477000
+                },
+                "lastModifiedTime": {
+                    "__class__": "datetime",
+                    "year": 2026,
+                    "month": 3,
+                    "day": 13,
+                    "hour": 17,
+                    "minute": 48,
+                    "second": 33,
+                    "microsecond": 477000
+                },
+                "inputDataConfig": {
+                    "s3InputDataConfig": {
+                        "s3Uri": "s3://c7n-bedrock-input-rare-tuna/input.jsonl",
+                        "s3BucketOwner": "644160558196"
+                    }
+                },
+                "outputDataConfig": {
+                    "s3OutputDataConfig": {
+                        "s3Uri": "s3://c7n-bedrock-output-rare-tuna/",
+                        "s3BucketOwner": "644160558196"
+                    }
+                },
+                "timeoutDurationInHours": 24,
+                "jobExpirationTime": {
+                    "__class__": "datetime",
+                    "year": 2026,
+                    "month": 3,
+                    "day": 14,
+                    "hour": 17,
+                    "minute": 48,
+                    "second": 33,
+                    "microsecond": 477000
+                },
+                "modelInvocationType": "InvokeModel"
+            },
+            {
+                "jobArn": "arn:aws:bedrock:us-east-1:644160558196:model-invocation-job/9s6039nyrtas",
+                "jobName": "c7n-batch-invocation-kind-ram",
+                "modelId": "arn:aws:bedrock:us-east-1::foundation-model/amazon.nova-micro-v1:0",
+                "roleArn": "arn:aws:iam::644160558196:role/c7n-bedrock-batch-kind-ram",
+                "status": "Failed",
+                "submitTime": {
+                    "__class__": "datetime",
+                    "year": 2026,
+                    "month": 3,
+                    "day": 13,
+                    "hour": 17,
+                    "minute": 30,
+                    "second": 46,
+                    "microsecond": 762000
+                },
+                "lastModifiedTime": {
+                    "__class__": "datetime",
+                    "year": 2026,
+                    "month": 3,
+                    "day": 13,
+                    "hour": 17,
+                    "minute": 33,
+                    "second": 0,
+                    "microsecond": 691000
+                },
+                "endTime": {
+                    "__class__": "datetime",
+                    "year": 2026,
+                    "month": 3,
+                    "day": 13,
+                    "hour": 17,
+                    "minute": 33,
+                    "second": 0,
+                    "microsecond": 575000
+                },
+                "inputDataConfig": {
+                    "s3InputDataConfig": {
+                        "s3Uri": "s3://c7n-bedrock-input-kind-ram/input.jsonl",
+                        "s3BucketOwner": "644160558196"
+                    }
+                },
+                "outputDataConfig": {
+                    "s3OutputDataConfig": {
+                        "s3Uri": "s3://c7n-bedrock-output-kind-ram/",
+                        "s3BucketOwner": "644160558196"
+                    }
+                },
+                "timeoutDurationInHours": 24,
+                "jobExpirationTime": {
+                    "__class__": "datetime",
+                    "year": 2026,
+                    "month": 3,
+                    "day": 14,
+                    "hour": 17,
+                    "minute": 30,
+                    "second": 46,
+                    "microsecond": 762000
+                },
+                "modelInvocationType": "InvokeModel"
+            },
+            {
+                "jobArn": "arn:aws:bedrock:us-east-1:644160558196:model-invocation-job/aqqhtxcz8872",
+                "jobName": "c7n-batch-invocation-complete-clam",
+                "modelId": "arn:aws:bedrock:us-east-1::foundation-model/amazon.nova-micro-v1:0",
+                "roleArn": "arn:aws:iam::644160558196:role/c7n-bedrock-batch-complete-clam",
+                "status": "Failed",
+                "submitTime": {
+                    "__class__": "datetime",
+                    "year": 2026,
+                    "month": 3,
+                    "day": 13,
+                    "hour": 17,
+                    "minute": 13,
+                    "second": 2,
+                    "microsecond": 660000
+                },
+                "lastModifiedTime": {
+                    "__class__": "datetime",
+                    "year": 2026,
+                    "month": 3,
+                    "day": 13,
+                    "hour": 17,
+                    "minute": 14,
+                    "second": 58,
+                    "microsecond": 829000
+                },
+                "endTime": {
+                    "__class__": "datetime",
+                    "year": 2026,
+                    "month": 3,
+                    "day": 13,
+                    "hour": 17,
+                    "minute": 14,
+                    "second": 58,
+                    "microsecond": 799000
+                },
+                "inputDataConfig": {
+                    "s3InputDataConfig": {
+                        "s3Uri": "s3://c7n-bedrock-input-complete-clam/input.jsonl",
+                        "s3BucketOwner": "644160558196"
+                    }
+                },
+                "outputDataConfig": {
+                    "s3OutputDataConfig": {
+                        "s3Uri": "s3://c7n-bedrock-output-complete-clam/",
+                        "s3BucketOwner": "644160558196"
+                    }
+                },
+                "timeoutDurationInHours": 24,
+                "jobExpirationTime": {
+                    "__class__": "datetime",
+                    "year": 2026,
+                    "month": 3,
+                    "day": 14,
+                    "hour": 17,
+                    "minute": 13,
+                    "second": 2,
+                    "microsecond": 660000
+                },
+                "modelInvocationType": "InvokeModel"
+            },
+            {
+                "jobArn": "arn:aws:bedrock:us-east-1:644160558196:model-invocation-job/ocnqlm0o0y6i",
+                "jobName": "c7n-batch-invocation-excited-koala",
+                "modelId": "arn:aws:bedrock:us-east-1::foundation-model/amazon.nova-micro-v1:0",
+                "roleArn": "arn:aws:iam::644160558196:role/c7n-bedrock-batch-excited-koala",
+                "status": "Failed",
+                "submitTime": {
+                    "__class__": "datetime",
+                    "year": 2026,
+                    "month": 3,
+                    "day": 13,
+                    "hour": 17,
+                    "minute": 8,
+                    "second": 49,
+                    "microsecond": 747000
+                },
+                "lastModifiedTime": {
+                    "__class__": "datetime",
+                    "year": 2026,
+                    "month": 3,
+                    "day": 13,
+                    "hour": 17,
+                    "minute": 10,
+                    "second": 59,
+                    "microsecond": 400000
+                },
+                "endTime": {
+                    "__class__": "datetime",
+                    "year": 2026,
+                    "month": 3,
+                    "day": 13,
+                    "hour": 17,
+                    "minute": 10,
+                    "second": 59,
+                    "microsecond": 368000
+                },
+                "inputDataConfig": {
+                    "s3InputDataConfig": {
+                        "s3Uri": "s3://c7n-bedrock-input-excited-koala/input.jsonl",
+                        "s3BucketOwner": "644160558196"
+                    }
+                },
+                "outputDataConfig": {
+                    "s3OutputDataConfig": {
+                        "s3Uri": "s3://c7n-bedrock-output-excited-koala/",
+                        "s3BucketOwner": "644160558196"
+                    }
+                },
+                "timeoutDurationInHours": 24,
+                "jobExpirationTime": {
+                    "__class__": "datetime",
+                    "year": 2026,
+                    "month": 3,
+                    "day": 14,
+                    "hour": 17,
+                    "minute": 8,
+                    "second": 49,
+                    "microsecond": 747000
+                },
+                "modelInvocationType": "InvokeModel"
+            },
+            {
+                "jobArn": "arn:aws:bedrock:us-east-1:644160558196:model-invocation-job/2zphe7ssxixs",
+                "jobName": "c7n-batch-invocation-above-egret",
+                "modelId": "arn:aws:bedrock:us-east-1::foundation-model/amazon.nova-micro-v1:0",
+                "roleArn": "arn:aws:iam::644160558196:role/c7n-bedrock-batch-above-egret",
+                "status": "Failed",
+                "submitTime": {
+                    "__class__": "datetime",
+                    "year": 2026,
+                    "month": 3,
+                    "day": 13,
+                    "hour": 17,
+                    "minute": 7,
+                    "second": 19,
+                    "microsecond": 376000
+                },
+                "lastModifiedTime": {
+                    "__class__": "datetime",
+                    "year": 2026,
+                    "month": 3,
+                    "day": 13,
+                    "hour": 17,
+                    "minute": 8,
+                    "second": 58,
+                    "microsecond": 962000
+                },
+                "endTime": {
+                    "__class__": "datetime",
+                    "year": 2026,
+                    "month": 3,
+                    "day": 13,
+                    "hour": 17,
+                    "minute": 8,
+                    "second": 58,
+                    "microsecond": 932000
+                },
+                "inputDataConfig": {
+                    "s3InputDataConfig": {
+                        "s3Uri": "s3://c7n-bedrock-input-above-egret/input.jsonl",
+                        "s3BucketOwner": "644160558196"
+                    }
+                },
+                "outputDataConfig": {
+                    "s3OutputDataConfig": {
+                        "s3Uri": "s3://c7n-bedrock-output-above-egret/",
+                        "s3BucketOwner": "644160558196"
+                    }
+                },
+                "timeoutDurationInHours": 24,
+                "jobExpirationTime": {
+                    "__class__": "datetime",
+                    "year": 2026,
+                    "month": 3,
+                    "day": 14,
+                    "hour": 17,
+                    "minute": 7,
+                    "second": 19,
+                    "microsecond": 376000
+                },
+                "modelInvocationType": "InvokeModel"
+            },
+            {
+                "jobArn": "arn:aws:bedrock:us-east-1:644160558196:model-invocation-job/rsttedv96gym",
+                "jobName": "c7n-batch-invocation-proper-mammoth",
+                "modelId": "arn:aws:bedrock:us-east-1::foundation-model/amazon.nova-micro-v1:0",
+                "roleArn": "arn:aws:iam::644160558196:role/c7n-bedrock-batch-proper-mammoth",
+                "status": "Failed",
+                "submitTime": {
+                    "__class__": "datetime",
+                    "year": 2026,
+                    "month": 3,
+                    "day": 12,
+                    "hour": 15,
+                    "minute": 38,
+                    "second": 6,
+                    "microsecond": 311000
+                },
+                "lastModifiedTime": {
+                    "__class__": "datetime",
+                    "year": 2026,
+                    "month": 3,
+                    "day": 12,
+                    "hour": 15,
+                    "minute": 46,
+                    "second": 2,
+                    "microsecond": 943000
+                },
+                "endTime": {
+                    "__class__": "datetime",
+                    "year": 2026,
+                    "month": 3,
+                    "day": 12,
+                    "hour": 15,
+                    "minute": 46,
+                    "second": 2,
+                    "microsecond": 846000
+                },
+                "inputDataConfig": {
+                    "s3InputDataConfig": {
+                        "s3Uri": "s3://c7n-bedrock-input-proper-mammoth/input.jsonl",
+                        "s3BucketOwner": "644160558196"
+                    }
+                },
+                "outputDataConfig": {
+                    "s3OutputDataConfig": {
+                        "s3Uri": "s3://c7n-bedrock-output-proper-mammoth/",
+                        "s3BucketOwner": "644160558196"
+                    }
+                },
+                "timeoutDurationInHours": 24,
+                "jobExpirationTime": {
+                    "__class__": "datetime",
+                    "year": 2026,
+                    "month": 3,
+                    "day": 13,
+                    "hour": 15,
+                    "minute": 38,
+                    "second": 6,
+                    "microsecond": 311000
+                },
+                "modelInvocationType": "InvokeModel"
+            },
+            {
+                "jobArn": "arn:aws:bedrock:us-east-1:644160558196:model-invocation-job/u1ta1dkfud02",
+                "jobName": "c7n-batch-invocation-expert-whippet",
+                "modelId": "arn:aws:bedrock:us-east-1::foundation-model/amazon.nova-micro-v1:0",
+                "roleArn": "arn:aws:iam::644160558196:role/c7n-bedrock-batch-expert-whippet",
+                "status": "Failed",
+                "submitTime": {
+                    "__class__": "datetime",
+                    "year": 2026,
+                    "month": 3,
+                    "day": 12,
+                    "hour": 15,
+                    "minute": 37,
+                    "second": 31,
+                    "microsecond": 427000
+                },
+                "lastModifiedTime": {
+                    "__class__": "datetime",
+                    "year": 2026,
+                    "month": 3,
+                    "day": 12,
+                    "hour": 15,
+                    "minute": 46,
+                    "second": 1,
+                    "microsecond": 774000
+                },
+                "endTime": {
+                    "__class__": "datetime",
+                    "year": 2026,
+                    "month": 3,
+                    "day": 12,
+                    "hour": 15,
+                    "minute": 46,
+                    "second": 1,
+                    "microsecond": 731000
+                },
+                "inputDataConfig": {
+                    "s3InputDataConfig": {
+                        "s3Uri": "s3://c7n-bedrock-input-expert-whippet/input.jsonl",
+                        "s3BucketOwner": "644160558196"
+                    }
+                },
+                "outputDataConfig": {
+                    "s3OutputDataConfig": {
+                        "s3Uri": "s3://c7n-bedrock-output-expert-whippet/",
+                        "s3BucketOwner": "644160558196"
+                    }
+                },
+                "timeoutDurationInHours": 24,
+                "jobExpirationTime": {
+                    "__class__": "datetime",
+                    "year": 2026,
+                    "month": 3,
+                    "day": 13,
+                    "hour": 15,
+                    "minute": 37,
+                    "second": 31,
+                    "microsecond": 427000
+                },
+                "modelInvocationType": "InvokeModel"
+            },
+            {
+                "jobArn": "arn:aws:bedrock:us-east-1:644160558196:model-invocation-job/xs80quio4ts2",
+                "jobName": "c7n-batch-invocation-new-beetle",
+                "modelId": "arn:aws:bedrock:us-east-1::foundation-model/amazon.nova-micro-v1:0",
+                "roleArn": "arn:aws:iam::644160558196:role/c7n-bedrock-batch-new-beetle",
+                "status": "Failed",
+                "submitTime": {
+                    "__class__": "datetime",
+                    "year": 2026,
+                    "month": 3,
+                    "day": 12,
+                    "hour": 15,
+                    "minute": 28,
+                    "second": 17,
+                    "microsecond": 192000
+                },
+                "lastModifiedTime": {
+                    "__class__": "datetime",
+                    "year": 2026,
+                    "month": 3,
+                    "day": 12,
+                    "hour": 15,
+                    "minute": 29,
+                    "second": 1,
+                    "microsecond": 851000
+                },
+                "endTime": {
+                    "__class__": "datetime",
+                    "year": 2026,
+                    "month": 3,
+                    "day": 12,
+                    "hour": 15,
+                    "minute": 29,
+                    "second": 1,
+                    "microsecond": 752000
+                },
+                "inputDataConfig": {
+                    "s3InputDataConfig": {
+                        "s3Uri": "s3://c7n-bedrock-input-new-beetle/input.jsonl",
+                        "s3BucketOwner": "644160558196"
+                    }
+                },
+                "outputDataConfig": {
+                    "s3OutputDataConfig": {
+                        "s3Uri": "s3://c7n-bedrock-output-new-beetle/",
+                        "s3BucketOwner": "644160558196"
+                    }
+                },
+                "timeoutDurationInHours": 24,
+                "jobExpirationTime": {
+                    "__class__": "datetime",
+                    "year": 2026,
+                    "month": 3,
+                    "day": 13,
+                    "hour": 15,
+                    "minute": 28,
+                    "second": 17,
+                    "microsecond": 192000
+                },
+                "modelInvocationType": "InvokeModel"
+            },
+            {
+                "jobArn": "arn:aws:bedrock:us-east-1:644160558196:model-invocation-job/zf8yhzivgjik",
+                "jobName": "c7n-batch-invocation-relevant-gar",
+                "modelId": "arn:aws:bedrock:us-east-1::foundation-model/amazon.nova-micro-v1:0",
+                "roleArn": "arn:aws:iam::644160558196:role/c7n-bedrock-batch-relevant-gar",
+                "status": "Failed",
+                "submitTime": {
+                    "__class__": "datetime",
+                    "year": 2026,
+                    "month": 3,
+                    "day": 12,
+                    "hour": 15,
+                    "minute": 27,
+                    "second": 50,
+                    "microsecond": 758000
+                },
+                "lastModifiedTime": {
+                    "__class__": "datetime",
+                    "year": 2026,
+                    "month": 3,
+                    "day": 12,
+                    "hour": 15,
+                    "minute": 29,
+                    "second": 1,
+                    "microsecond": 307000
+                },
+                "endTime": {
+                    "__class__": "datetime",
+                    "year": 2026,
+                    "month": 3,
+                    "day": 12,
+                    "hour": 15,
+                    "minute": 29,
+                    "second": 1,
+                    "microsecond": 204000
+                },
+                "inputDataConfig": {
+                    "s3InputDataConfig": {
+                        "s3Uri": "s3://c7n-bedrock-input-relevant-gar/input.jsonl",
+                        "s3BucketOwner": "644160558196"
+                    }
+                },
+                "outputDataConfig": {
+                    "s3OutputDataConfig": {
+                        "s3Uri": "s3://c7n-bedrock-output-relevant-gar/",
+                        "s3BucketOwner": "644160558196"
+                    }
+                },
+                "timeoutDurationInHours": 24,
+                "jobExpirationTime": {
+                    "__class__": "datetime",
+                    "year": 2026,
+                    "month": 3,
+                    "day": 13,
+                    "hour": 15,
+                    "minute": 27,
+                    "second": 50,
+                    "microsecond": 758000
+                },
+                "modelInvocationType": "InvokeModel"
+            },
+            {
+                "jobArn": "arn:aws:bedrock:us-east-1:644160558196:model-invocation-job/2aisnwgwgmn3",
+                "jobName": "c7n-batch-invocation-working-cowbird",
+                "modelId": "arn:aws:bedrock:us-east-1::foundation-model/amazon.nova-micro-v1:0",
+                "roleArn": "arn:aws:iam::644160558196:role/c7n-bedrock-batch-working-cowbird",
+                "status": "Failed",
+                "submitTime": {
+                    "__class__": "datetime",
+                    "year": 2026,
+                    "month": 3,
+                    "day": 12,
+                    "hour": 14,
+                    "minute": 56,
+                    "second": 6,
+                    "microsecond": 214000
+                },
+                "lastModifiedTime": {
+                    "__class__": "datetime",
+                    "year": 2026,
+                    "month": 3,
+                    "day": 12,
+                    "hour": 14,
+                    "minute": 56,
+                    "second": 58,
+                    "microsecond": 738000
+                },
+                "endTime": {
+                    "__class__": "datetime",
+                    "year": 2026,
+                    "month": 3,
+                    "day": 12,
+                    "hour": 14,
+                    "minute": 56,
+                    "second": 58,
+                    "microsecond": 703000
+                },
+                "inputDataConfig": {
+                    "s3InputDataConfig": {
+                        "s3Uri": "s3://c7n-bedrock-input-working-cowbird/input.jsonl",
+                        "s3BucketOwner": "644160558196"
+                    }
+                },
+                "outputDataConfig": {
+                    "s3OutputDataConfig": {
+                        "s3Uri": "s3://c7n-bedrock-output-working-cowbird/",
+                        "s3BucketOwner": "644160558196"
+                    }
+                },
+                "timeoutDurationInHours": 24,
+                "jobExpirationTime": {
+                    "__class__": "datetime",
+                    "year": 2026,
+                    "month": 3,
+                    "day": 13,
+                    "hour": 14,
+                    "minute": 56,
+                    "second": 6,
+                    "microsecond": 214000
+                },
+                "modelInvocationType": "InvokeModel"
+            },
+            {
+                "jobArn": "arn:aws:bedrock:us-east-1:644160558196:model-invocation-job/8ik9uxdn5l5k",
+                "jobName": "c7n-batch-invocation-needed-chow",
+                "modelId": "arn:aws:bedrock:us-east-1::foundation-model/amazon.nova-micro-v1:0",
+                "roleArn": "arn:aws:iam::644160558196:role/c7n-bedrock-batch-needed-chow",
+                "status": "Failed",
+                "submitTime": {
+                    "__class__": "datetime",
+                    "year": 2026,
+                    "month": 3,
+                    "day": 12,
+                    "hour": 14,
+                    "minute": 55,
+                    "second": 16,
+                    "microsecond": 866000
+                },
+                "lastModifiedTime": {
+                    "__class__": "datetime",
+                    "year": 2026,
+                    "month": 3,
+                    "day": 12,
+                    "hour": 14,
+                    "minute": 56,
+                    "second": 59,
+                    "microsecond": 231000
+                },
+                "endTime": {
+                    "__class__": "datetime",
+                    "year": 2026,
+                    "month": 3,
+                    "day": 12,
+                    "hour": 14,
+                    "minute": 56,
+                    "second": 59,
+                    "microsecond": 203000
+                },
+                "inputDataConfig": {
+                    "s3InputDataConfig": {
+                        "s3Uri": "s3://c7n-bedrock-input-needed-chow/input.jsonl",
+                        "s3BucketOwner": "644160558196"
+                    }
+                },
+                "outputDataConfig": {
+                    "s3OutputDataConfig": {
+                        "s3Uri": "s3://c7n-bedrock-output-needed-chow/",
+                        "s3BucketOwner": "644160558196"
+                    }
+                },
+                "timeoutDurationInHours": 24,
+                "jobExpirationTime": {
+                    "__class__": "datetime",
+                    "year": 2026,
+                    "month": 3,
+                    "day": 13,
+                    "hour": 14,
+                    "minute": 55,
+                    "second": 16,
+                    "microsecond": 866000
+                },
+                "modelInvocationType": "InvokeModel"
+            },
+            {
+                "jobArn": "arn:aws:bedrock:us-east-1:644160558196:model-invocation-job/ck0zrscxcn2o",
+                "jobName": "c7n-batch-invocation-excited-gnu",
+                "modelId": "arn:aws:bedrock:us-east-1::foundation-model/amazon.nova-micro-v1:0",
+                "roleArn": "arn:aws:iam::644160558196:role/c7n-bedrock-batch-excited-gnu",
+                "status": "Failed",
+                "submitTime": {
+                    "__class__": "datetime",
+                    "year": 2026,
+                    "month": 3,
+                    "day": 10,
+                    "hour": 21,
+                    "minute": 42,
+                    "second": 50,
+                    "microsecond": 355000
+                },
+                "lastModifiedTime": {
+                    "__class__": "datetime",
+                    "year": 2026,
+                    "month": 3,
+                    "day": 10,
+                    "hour": 21,
+                    "minute": 44,
+                    "second": 59,
+                    "microsecond": 49000
+                },
+                "endTime": {
+                    "__class__": "datetime",
+                    "year": 2026,
+                    "month": 3,
+                    "day": 10,
+                    "hour": 21,
+                    "minute": 44,
+                    "second": 59,
+                    "microsecond": 20000
+                },
+                "inputDataConfig": {
+                    "s3InputDataConfig": {
+                        "s3Uri": "s3://c7n-bedrock-input-excited-gnu/input.jsonl",
+                        "s3BucketOwner": "644160558196"
+                    }
+                },
+                "outputDataConfig": {
+                    "s3OutputDataConfig": {
+                        "s3Uri": "s3://c7n-bedrock-output-excited-gnu/",
+                        "s3BucketOwner": "644160558196"
+                    }
+                },
+                "timeoutDurationInHours": 24,
+                "jobExpirationTime": {
+                    "__class__": "datetime",
+                    "year": 2026,
+                    "month": 3,
+                    "day": 11,
+                    "hour": 21,
+                    "minute": 42,
+                    "second": 50,
+                    "microsecond": 355000
+                },
+                "modelInvocationType": "InvokeModel"
+            },
+            {
+                "jobArn": "arn:aws:bedrock:us-east-1:644160558196:model-invocation-job/r4u944p0khbm",
+                "jobName": "51d3bea8-d0ba-4529-bd24-7b0b21d39502",
+                "modelId": "arn:aws:bedrock:us-east-1::foundation-model/amazon.nova-micro-v1:0",
+                "roleArn": "arn:aws:iam::644160558196:role/c7n-bedrock-batch-default",
+                "status": "Failed",
+                "submitTime": {
+                    "__class__": "datetime",
+                    "year": 2026,
+                    "month": 3,
+                    "day": 10,
+                    "hour": 20,
+                    "minute": 37,
+                    "second": 43,
+                    "microsecond": 128000
+                },
+                "lastModifiedTime": {
+                    "__class__": "datetime",
+                    "year": 2026,
+                    "month": 3,
+                    "day": 10,
+                    "hour": 20,
+                    "minute": 38,
+                    "second": 59,
+                    "microsecond": 73000
+                },
+                "endTime": {
+                    "__class__": "datetime",
+                    "year": 2026,
+                    "month": 3,
+                    "day": 10,
+                    "hour": 20,
+                    "minute": 38,
+                    "second": 59,
+                    "microsecond": 38000
+                },
+                "inputDataConfig": {
+                    "s3InputDataConfig": {
+                        "s3Uri": "s3://c7n-bedrock-input-default/input.jsonl",
+                        "s3BucketOwner": "644160558196"
+                    }
+                },
+                "outputDataConfig": {
+                    "s3OutputDataConfig": {
+                        "s3Uri": "s3://c7n-bedrock-output-default/",
+                        "s3BucketOwner": "644160558196"
+                    }
+                },
+                "timeoutDurationInHours": 24,
+                "jobExpirationTime": {
+                    "__class__": "datetime",
+                    "year": 2026,
+                    "month": 3,
+                    "day": 11,
+                    "hour": 20,
+                    "minute": 37,
+                    "second": 43,
+                    "microsecond": 128000
+                },
+                "modelInvocationType": "InvokeModel"
+            },
+            {
+                "jobArn": "arn:aws:bedrock:us-east-1:644160558196:model-invocation-job/vmsiqehu6twi",
+                "jobName": "1b9860ce-3b71-427f-898b-2f500fde512d",
+                "modelId": "arn:aws:bedrock:us-east-1::foundation-model/amazon.nova-micro-v1:0",
+                "roleArn": "arn:aws:iam::644160558196:role/c7n-bedrock-batch-default",
+                "status": "Failed",
+                "submitTime": {
+                    "__class__": "datetime",
+                    "year": 2026,
+                    "month": 3,
+                    "day": 10,
+                    "hour": 20,
+                    "minute": 35,
+                    "second": 45,
+                    "microsecond": 798000
+                },
+                "lastModifiedTime": {
+                    "__class__": "datetime",
+                    "year": 2026,
+                    "month": 3,
+                    "day": 10,
+                    "hour": 20,
+                    "minute": 36,
+                    "second": 58,
+                    "microsecond": 852000
+                },
+                "endTime": {
+                    "__class__": "datetime",
+                    "year": 2026,
+                    "month": 3,
+                    "day": 10,
+                    "hour": 20,
+                    "minute": 36,
+                    "second": 58,
+                    "microsecond": 819000
+                },
+                "inputDataConfig": {
+                    "s3InputDataConfig": {
+                        "s3Uri": "s3://c7n-bedrock-input-default/input.jsonl",
+                        "s3BucketOwner": "644160558196"
+                    }
+                },
+                "outputDataConfig": {
+                    "s3OutputDataConfig": {
+                        "s3Uri": "s3://c7n-bedrock-output-default/",
+                        "s3BucketOwner": "644160558196"
+                    }
+                },
+                "timeoutDurationInHours": 24,
+                "jobExpirationTime": {
+                    "__class__": "datetime",
+                    "year": 2026,
+                    "month": 3,
+                    "day": 11,
+                    "hour": 20,
+                    "minute": 35,
+                    "second": 45,
+                    "microsecond": 798000
+                },
+                "modelInvocationType": "InvokeModel"
+            },
+            {
+                "jobArn": "arn:aws:bedrock:us-east-1:644160558196:model-invocation-job/ig5mmnrr3xlb",
+                "jobName": "1a444eec-022d-450a-8bf5-42bb68b93447",
+                "modelId": "arn:aws:bedrock:us-east-1::foundation-model/amazon.nova-micro-v1:0",
+                "roleArn": "arn:aws:iam::644160558196:role/c7n-bedrock-batch-default",
+                "status": "Failed",
+                "submitTime": {
+                    "__class__": "datetime",
+                    "year": 2026,
+                    "month": 3,
+                    "day": 10,
+                    "hour": 20,
+                    "minute": 28,
+                    "second": 7,
+                    "microsecond": 86000
+                },
+                "lastModifiedTime": {
+                    "__class__": "datetime",
+                    "year": 2026,
+                    "month": 3,
+                    "day": 10,
+                    "hour": 20,
+                    "minute": 28,
+                    "second": 59,
+                    "microsecond": 63000
+                },
+                "endTime": {
+                    "__class__": "datetime",
+                    "year": 2026,
+                    "month": 3,
+                    "day": 10,
+                    "hour": 20,
+                    "minute": 28,
+                    "second": 59,
+                    "microsecond": 31000
+                },
+                "inputDataConfig": {
+                    "s3InputDataConfig": {
+                        "s3Uri": "s3://c7n-bedrock-input-default/input.jsonl",
+                        "s3BucketOwner": "644160558196"
+                    }
+                },
+                "outputDataConfig": {
+                    "s3OutputDataConfig": {
+                        "s3Uri": "s3://c7n-bedrock-output-default/",
+                        "s3BucketOwner": "644160558196"
+                    }
+                },
+                "timeoutDurationInHours": 24,
+                "jobExpirationTime": {
+                    "__class__": "datetime",
+                    "year": 2026,
+                    "month": 3,
+                    "day": 11,
+                    "hour": 20,
+                    "minute": 28,
+                    "second": 7,
+                    "microsecond": 86000
+                },
+                "modelInvocationType": "InvokeModel"
+            },
+            {
+                "jobArn": "arn:aws:bedrock:us-east-1:644160558196:model-invocation-job/y7bwht2eheyr",
+                "jobName": "0ac3fac7-67d2-4c26-833e-3424f0c286e8",
+                "modelId": "arn:aws:bedrock:us-east-1::foundation-model/amazon.nova-micro-v1:0",
+                "roleArn": "arn:aws:iam::644160558196:role/c7n-bedrock-batch-default",
+                "status": "Failed",
+                "submitTime": {
+                    "__class__": "datetime",
+                    "year": 2026,
+                    "month": 3,
+                    "day": 10,
+                    "hour": 20,
+                    "minute": 9,
+                    "second": 10,
+                    "microsecond": 887000
+                },
+                "lastModifiedTime": {
+                    "__class__": "datetime",
+                    "year": 2026,
+                    "month": 3,
+                    "day": 10,
+                    "hour": 20,
+                    "minute": 10,
+                    "second": 59,
+                    "microsecond": 801000
+                },
+                "endTime": {
+                    "__class__": "datetime",
+                    "year": 2026,
+                    "month": 3,
+                    "day": 10,
+                    "hour": 20,
+                    "minute": 10,
+                    "second": 59,
+                    "microsecond": 767000
+                },
+                "inputDataConfig": {
+                    "s3InputDataConfig": {
+                        "s3Uri": "s3://c7n-bedrock-input-default/input.jsonl",
+                        "s3BucketOwner": "644160558196"
+                    }
+                },
+                "outputDataConfig": {
+                    "s3OutputDataConfig": {
+                        "s3Uri": "s3://c7n-bedrock-output-default/",
+                        "s3BucketOwner": "644160558196"
+                    }
+                },
+                "timeoutDurationInHours": 24,
+                "jobExpirationTime": {
+                    "__class__": "datetime",
+                    "year": 2026,
+                    "month": 3,
+                    "day": 11,
+                    "hour": 20,
+                    "minute": 9,
+                    "second": 10,
+                    "microsecond": 887000
+                },
+                "modelInvocationType": "InvokeModel"
+            },
+            {
+                "jobArn": "arn:aws:bedrock:us-east-1:644160558196:model-invocation-job/athggoz9qix4",
+                "jobName": "151914f5-b4ed-46c5-8a63-758af75c95d7",
+                "modelId": "arn:aws:bedrock:us-east-1::foundation-model/amazon.nova-micro-v1:0",
+                "roleArn": "arn:aws:iam::644160558196:role/c7n-bedrock-batch-default",
+                "status": "Failed",
+                "submitTime": {
+                    "__class__": "datetime",
+                    "year": 2026,
+                    "month": 3,
+                    "day": 10,
+                    "hour": 18,
+                    "minute": 38,
+                    "second": 26,
+                    "microsecond": 905000
+                },
+                "lastModifiedTime": {
+                    "__class__": "datetime",
+                    "year": 2026,
+                    "month": 3,
+                    "day": 10,
+                    "hour": 18,
+                    "minute": 42,
+                    "second": 2,
+                    "microsecond": 805000
+                },
+                "endTime": {
+                    "__class__": "datetime",
+                    "year": 2026,
+                    "month": 3,
+                    "day": 10,
+                    "hour": 18,
+                    "minute": 42,
+                    "second": 1,
+                    "microsecond": 905000
+                },
+                "inputDataConfig": {
+                    "s3InputDataConfig": {
+                        "s3Uri": "s3://c7n-bedrock-input-default/input.jsonl",
+                        "s3BucketOwner": "644160558196"
+                    }
+                },
+                "outputDataConfig": {
+                    "s3OutputDataConfig": {
+                        "s3Uri": "s3://c7n-bedrock-output-default/",
+                        "s3BucketOwner": "644160558196"
+                    }
+                },
+                "timeoutDurationInHours": 24,
+                "jobExpirationTime": {
+                    "__class__": "datetime",
+                    "year": 2026,
+                    "month": 3,
+                    "day": 11,
+                    "hour": 18,
+                    "minute": 38,
+                    "second": 26,
+                    "microsecond": 905000
+                },
+                "modelInvocationType": "InvokeModel"
+            },
+            {
+                "jobArn": "arn:aws:bedrock:us-east-1:644160558196:model-invocation-job/pdt113r64kyi",
+                "jobName": "f92cf5f0-9ff2-4db8-b0aa-f55297d45575",
+                "modelId": "arn:aws:bedrock:us-east-1::foundation-model/amazon.nova-micro-v1:0",
+                "roleArn": "arn:aws:iam::644160558196:role/c7n-bedrock-batch-default",
+                "status": "Failed",
+                "submitTime": {
+                    "__class__": "datetime",
+                    "year": 2026,
+                    "month": 3,
+                    "day": 10,
+                    "hour": 18,
+                    "minute": 35,
+                    "second": 45,
+                    "microsecond": 304000
+                },
+                "lastModifiedTime": {
+                    "__class__": "datetime",
+                    "year": 2026,
+                    "month": 3,
+                    "day": 10,
+                    "hour": 18,
+                    "minute": 41,
+                    "second": 1,
+                    "microsecond": 583000
+                },
+                "endTime": {
+                    "__class__": "datetime",
+                    "year": 2026,
+                    "month": 3,
+                    "day": 10,
+                    "hour": 18,
+                    "minute": 41,
+                    "second": 1,
+                    "microsecond": 542000
+                },
+                "inputDataConfig": {
+                    "s3InputDataConfig": {
+                        "s3Uri": "s3://c7n-bedrock-input-default/input.jsonl",
+                        "s3BucketOwner": "644160558196"
+                    }
+                },
+                "outputDataConfig": {
+                    "s3OutputDataConfig": {
+                        "s3Uri": "s3://c7n-bedrock-output-default/",
+                        "s3BucketOwner": "644160558196"
+                    }
+                },
+                "timeoutDurationInHours": 24,
+                "jobExpirationTime": {
+                    "__class__": "datetime",
+                    "year": 2026,
+                    "month": 3,
+                    "day": 11,
+                    "hour": 18,
+                    "minute": 35,
+                    "second": 45,
+                    "microsecond": 304000
+                },
+                "modelInvocationType": "InvokeModel"
+            },
+            {
+                "jobArn": "arn:aws:bedrock:us-east-1:644160558196:model-invocation-job/nu1hoiuho2ol",
+                "jobName": "33179a37-da27-4f44-9c0b-83afab7527b9",
+                "modelId": "arn:aws:bedrock:us-east-1::foundation-model/amazon.nova-micro-v1:0",
+                "roleArn": "arn:aws:iam::644160558196:role/c7n-bedrock-batch-default",
+                "status": "Failed",
+                "submitTime": {
+                    "__class__": "datetime",
+                    "year": 2026,
+                    "month": 3,
+                    "day": 10,
+                    "hour": 18,
+                    "minute": 33,
+                    "second": 59,
+                    "microsecond": 940000
+                },
+                "lastModifiedTime": {
+                    "__class__": "datetime",
+                    "year": 2026,
+                    "month": 3,
+                    "day": 10,
+                    "hour": 18,
+                    "minute": 41,
+                    "second": 1,
+                    "microsecond": 473000
+                },
+                "endTime": {
+                    "__class__": "datetime",
+                    "year": 2026,
+                    "month": 3,
+                    "day": 10,
+                    "hour": 18,
+                    "minute": 41,
+                    "second": 1,
+                    "microsecond": 436000
+                },
+                "inputDataConfig": {
+                    "s3InputDataConfig": {
+                        "s3Uri": "s3://c7n-bedrock-input-default/input.jsonl",
+                        "s3BucketOwner": "644160558196"
+                    }
+                },
+                "outputDataConfig": {
+                    "s3OutputDataConfig": {
+                        "s3Uri": "s3://c7n-bedrock-output-default/",
+                        "s3BucketOwner": "644160558196"
+                    }
+                },
+                "timeoutDurationInHours": 24,
+                "jobExpirationTime": {
+                    "__class__": "datetime",
+                    "year": 2026,
+                    "month": 3,
+                    "day": 11,
+                    "hour": 18,
+                    "minute": 33,
+                    "second": 59,
+                    "microsecond": 940000
+                },
+                "modelInvocationType": "InvokeModel"
+            },
+            {
+                "jobArn": "arn:aws:bedrock:us-east-1:644160558196:model-invocation-job/qi5827ides0v",
+                "jobName": "836fbe9c-6ac1-4773-99e4-c2d24ec1c17c",
+                "modelId": "arn:aws:bedrock:us-east-1::foundation-model/amazon.nova-micro-v1:0",
+                "roleArn": "arn:aws:iam::644160558196:role/c7n-bedrock-batch-default",
+                "status": "Failed",
+                "submitTime": {
+                    "__class__": "datetime",
+                    "year": 2026,
+                    "month": 3,
+                    "day": 10,
+                    "hour": 18,
+                    "minute": 33,
+                    "second": 15,
+                    "microsecond": 507000
+                },
+                "lastModifiedTime": {
+                    "__class__": "datetime",
+                    "year": 2026,
+                    "month": 3,
+                    "day": 10,
+                    "hour": 18,
+                    "minute": 40,
+                    "second": 2,
+                    "microsecond": 569000
+                },
+                "endTime": {
+                    "__class__": "datetime",
+                    "year": 2026,
+                    "month": 3,
+                    "day": 10,
+                    "hour": 18,
+                    "minute": 40,
+                    "second": 2,
+                    "microsecond": 186000
+                },
+                "inputDataConfig": {
+                    "s3InputDataConfig": {
+                        "s3Uri": "s3://c7n-bedrock-input-default/input.jsonl",
+                        "s3BucketOwner": "644160558196"
+                    }
+                },
+                "outputDataConfig": {
+                    "s3OutputDataConfig": {
+                        "s3Uri": "s3://c7n-bedrock-output-default/",
+                        "s3BucketOwner": "644160558196"
+                    }
+                },
+                "timeoutDurationInHours": 24,
+                "jobExpirationTime": {
+                    "__class__": "datetime",
+                    "year": 2026,
+                    "month": 3,
+                    "day": 11,
+                    "hour": 18,
+                    "minute": 33,
+                    "second": 15,
+                    "microsecond": 507000
+                },
+                "modelInvocationType": "InvokeModel"
+            },
+            {
+                "jobArn": "arn:aws:bedrock:us-east-1:644160558196:model-invocation-job/cs20o8d4z73h",
+                "jobName": "9d36a0b6-b2ff-44a2-ba5d-85282b0ced33",
+                "modelId": "arn:aws:bedrock:us-east-1::foundation-model/amazon.nova-micro-v1:0",
+                "roleArn": "arn:aws:iam::644160558196:role/c7n-bedrock-batch-default",
+                "status": "Failed",
+                "submitTime": {
+                    "__class__": "datetime",
+                    "year": 2026,
+                    "month": 3,
+                    "day": 10,
+                    "hour": 18,
+                    "minute": 32,
+                    "second": 41,
+                    "microsecond": 44000
+                },
+                "lastModifiedTime": {
+                    "__class__": "datetime",
+                    "year": 2026,
+                    "month": 3,
+                    "day": 10,
+                    "hour": 18,
+                    "minute": 40,
+                    "second": 0,
+                    "microsecond": 961000
+                },
+                "endTime": {
+                    "__class__": "datetime",
+                    "year": 2026,
+                    "month": 3,
+                    "day": 10,
+                    "hour": 18,
+                    "minute": 40,
+                    "second": 0,
+                    "microsecond": 930000
+                },
+                "inputDataConfig": {
+                    "s3InputDataConfig": {
+                        "s3Uri": "s3://c7n-bedrock-input-default/input.jsonl",
+                        "s3BucketOwner": "644160558196"
+                    }
+                },
+                "outputDataConfig": {
+                    "s3OutputDataConfig": {
+                        "s3Uri": "s3://c7n-bedrock-output-default/",
+                        "s3BucketOwner": "644160558196"
+                    }
+                },
+                "timeoutDurationInHours": 24,
+                "jobExpirationTime": {
+                    "__class__": "datetime",
+                    "year": 2026,
+                    "month": 3,
+                    "day": 11,
+                    "hour": 18,
+                    "minute": 32,
+                    "second": 41,
+                    "microsecond": 44000
+                },
+                "modelInvocationType": "InvokeModel"
+            },
+            {
+                "jobArn": "arn:aws:bedrock:us-east-1:644160558196:model-invocation-job/krme5ati3bb3",
+                "jobName": "a0ac681e-f29f-4d04-8b0e-6dbf815db49f",
+                "modelId": "arn:aws:bedrock:us-east-1::foundation-model/amazon.nova-micro-v1:0",
+                "roleArn": "arn:aws:iam::644160558196:role/c7n-bedrock-batch-default",
+                "status": "Failed",
+                "submitTime": {
+                    "__class__": "datetime",
+                    "year": 2026,
+                    "month": 3,
+                    "day": 10,
+                    "hour": 18,
+                    "minute": 31,
+                    "second": 36,
+                    "microsecond": 743000
+                },
+                "lastModifiedTime": {
+                    "__class__": "datetime",
+                    "year": 2026,
+                    "month": 3,
+                    "day": 10,
+                    "hour": 18,
+                    "minute": 40,
+                    "second": 2,
+                    "microsecond": 247000
+                },
+                "endTime": {
+                    "__class__": "datetime",
+                    "year": 2026,
+                    "month": 3,
+                    "day": 10,
+                    "hour": 18,
+                    "minute": 40,
+                    "second": 2,
+                    "microsecond": 114000
+                },
+                "inputDataConfig": {
+                    "s3InputDataConfig": {
+                        "s3Uri": "s3://c7n-bedrock-input-default/input.jsonl",
+                        "s3BucketOwner": "644160558196"
+                    }
+                },
+                "outputDataConfig": {
+                    "s3OutputDataConfig": {
+                        "s3Uri": "s3://c7n-bedrock-output-default/",
+                        "s3BucketOwner": "644160558196"
+                    }
+                },
+                "timeoutDurationInHours": 24,
+                "jobExpirationTime": {
+                    "__class__": "datetime",
+                    "year": 2026,
+                    "month": 3,
+                    "day": 11,
+                    "hour": 18,
+                    "minute": 31,
+                    "second": 36,
+                    "microsecond": 743000
+                },
+                "modelInvocationType": "InvokeModel"
+            },
+            {
+                "jobArn": "arn:aws:bedrock:us-east-1:644160558196:model-invocation-job/2g2730sz4yix",
+                "jobName": "88636173-bd01-4348-9d8e-4247f5ad827d",
+                "modelId": "arn:aws:bedrock:us-east-1::foundation-model/amazon.nova-micro-v1:0",
+                "roleArn": "arn:aws:iam::644160558196:role/c7n-bedrock-batch-default",
+                "status": "Failed",
+                "submitTime": {
+                    "__class__": "datetime",
+                    "year": 2026,
+                    "month": 3,
+                    "day": 10,
+                    "hour": 18,
+                    "minute": 30,
+                    "second": 43,
+                    "microsecond": 524000
+                },
+                "lastModifiedTime": {
+                    "__class__": "datetime",
+                    "year": 2026,
+                    "month": 3,
+                    "day": 10,
+                    "hour": 18,
+                    "minute": 42,
+                    "second": 33,
+                    "microsecond": 415000
+                },
+                "endTime": {
+                    "__class__": "datetime",
+                    "year": 2026,
+                    "month": 3,
+                    "day": 10,
+                    "hour": 18,
+                    "minute": 42,
+                    "second": 33,
+                    "microsecond": 380000
+                },
+                "inputDataConfig": {
+                    "s3InputDataConfig": {
+                        "s3Uri": "s3://c7n-bedrock-input-default/input.jsonl",
+                        "s3BucketOwner": "644160558196"
+                    }
+                },
+                "outputDataConfig": {
+                    "s3OutputDataConfig": {
+                        "s3Uri": "s3://c7n-bedrock-output-default/",
+                        "s3BucketOwner": "644160558196"
+                    }
+                },
+                "timeoutDurationInHours": 24,
+                "jobExpirationTime": {
+                    "__class__": "datetime",
+                    "year": 2026,
+                    "month": 3,
+                    "day": 11,
+                    "hour": 18,
+                    "minute": 30,
+                    "second": 43,
+                    "microsecond": 524000
+                },
+                "modelInvocationType": "InvokeModel"
+            },
+            {
+                "jobArn": "arn:aws:bedrock:us-east-1:644160558196:model-invocation-job/x51ctwem2d3r",
+                "jobName": "62d6fabe-c4fe-4cb6-b35e-ce2959e797a8",
+                "modelId": "arn:aws:bedrock:us-east-1::foundation-model/amazon.nova-micro-v1:0",
+                "roleArn": "arn:aws:iam::644160558196:role/c7n-bedrock-batch-default",
+                "status": "Failed",
+                "submitTime": {
+                    "__class__": "datetime",
+                    "year": 2026,
+                    "month": 3,
+                    "day": 10,
+                    "hour": 18,
+                    "minute": 29,
+                    "second": 57,
+                    "microsecond": 55000
+                },
+                "lastModifiedTime": {
+                    "__class__": "datetime",
+                    "year": 2026,
+                    "month": 3,
+                    "day": 10,
+                    "hour": 18,
+                    "minute": 41,
+                    "second": 37,
+                    "microsecond": 718000
+                },
+                "endTime": {
+                    "__class__": "datetime",
+                    "year": 2026,
+                    "month": 3,
+                    "day": 10,
+                    "hour": 18,
+                    "minute": 41,
+                    "second": 37,
+                    "microsecond": 690000
+                },
+                "inputDataConfig": {
+                    "s3InputDataConfig": {
+                        "s3Uri": "s3://c7n-bedrock-input-default/input.jsonl",
+                        "s3BucketOwner": "644160558196"
+                    }
+                },
+                "outputDataConfig": {
+                    "s3OutputDataConfig": {
+                        "s3Uri": "s3://c7n-bedrock-output-default/",
+                        "s3BucketOwner": "644160558196"
+                    }
+                },
+                "timeoutDurationInHours": 24,
+                "jobExpirationTime": {
+                    "__class__": "datetime",
+                    "year": 2026,
+                    "month": 3,
+                    "day": 11,
+                    "hour": 18,
+                    "minute": 29,
+                    "second": 57,
+                    "microsecond": 55000
+                },
+                "modelInvocationType": "InvokeModel"
+            },
+            {
+                "jobArn": "arn:aws:bedrock:us-east-1:644160558196:model-invocation-job/6flus6fihxbd",
+                "jobName": "9adaa414-cee2-4878-98c5-876a7a10d436",
+                "modelId": "arn:aws:bedrock:us-east-1::foundation-model/amazon.nova-micro-v1:0",
+                "roleArn": "arn:aws:iam::644160558196:role/c7n-bedrock-batch-default",
+                "status": "Failed",
+                "submitTime": {
+                    "__class__": "datetime",
+                    "year": 2026,
+                    "month": 3,
+                    "day": 10,
+                    "hour": 18,
+                    "minute": 20,
+                    "second": 44,
+                    "microsecond": 304000
+                },
+                "lastModifiedTime": {
+                    "__class__": "datetime",
+                    "year": 2026,
+                    "month": 3,
+                    "day": 10,
+                    "hour": 18,
+                    "minute": 44,
+                    "second": 38,
+                    "microsecond": 776000
+                },
+                "endTime": {
+                    "__class__": "datetime",
+                    "year": 2026,
+                    "month": 3,
+                    "day": 10,
+                    "hour": 18,
+                    "minute": 44,
+                    "second": 38,
+                    "microsecond": 744000
+                },
+                "inputDataConfig": {
+                    "s3InputDataConfig": {
+                        "s3Uri": "s3://c7n-bedrock-input-default/input.jsonl",
+                        "s3BucketOwner": "644160558196"
+                    }
+                },
+                "outputDataConfig": {
+                    "s3OutputDataConfig": {
+                        "s3Uri": "s3://c7n-bedrock-output-default/",
+                        "s3BucketOwner": "644160558196"
+                    }
+                },
+                "timeoutDurationInHours": 24,
+                "jobExpirationTime": {
+                    "__class__": "datetime",
+                    "year": 2026,
+                    "month": 3,
+                    "day": 11,
+                    "hour": 18,
+                    "minute": 20,
+                    "second": 44,
+                    "microsecond": 304000
+                },
+                "modelInvocationType": "InvokeModel"
+            },
+            {
+                "jobArn": "arn:aws:bedrock:us-east-1:644160558196:model-invocation-job/usob9e8n70ns",
+                "jobName": "c7n-batch-invocation",
+                "modelId": "arn:aws:bedrock:us-east-1::foundation-model/amazon.nova-micro-v1:0",
+                "roleArn": "arn:aws:iam::644160558196:role/c7n-bedrock-batch-default",
+                "status": "Failed",
+                "submitTime": {
+                    "__class__": "datetime",
+                    "year": 2026,
+                    "month": 3,
+                    "day": 6,
+                    "hour": 21,
+                    "minute": 35,
+                    "second": 54,
+                    "microsecond": 461000
+                },
+                "lastModifiedTime": {
+                    "__class__": "datetime",
+                    "year": 2026,
+                    "month": 3,
+                    "day": 6,
+                    "hour": 21,
+                    "minute": 37,
+                    "second": 4,
+                    "microsecond": 16000
+                },
+                "endTime": {
+                    "__class__": "datetime",
+                    "year": 2026,
+                    "month": 3,
+                    "day": 6,
+                    "hour": 21,
+                    "minute": 37,
+                    "second": 3,
+                    "microsecond": 981000
+                },
+                "inputDataConfig": {
+                    "s3InputDataConfig": {
+                        "s3Uri": "s3://c7n-bedrock-input-default/input.jsonl",
+                        "s3BucketOwner": "644160558196"
+                    }
+                },
+                "outputDataConfig": {
+                    "s3OutputDataConfig": {
+                        "s3Uri": "s3://c7n-bedrock-output-default/",
+                        "s3BucketOwner": "644160558196"
+                    }
+                },
+                "timeoutDurationInHours": 24,
+                "jobExpirationTime": {
+                    "__class__": "datetime",
+                    "year": 2026,
+                    "month": 3,
+                    "day": 7,
+                    "hour": 21,
+                    "minute": 35,
+                    "second": 54,
+                    "microsecond": 461000
+                },
+                "modelInvocationType": "InvokeModel"
+            },
+            {
+                "jobArn": "arn:aws:bedrock:us-east-1:644160558196:model-invocation-job/wuweokeeie09",
+                "jobName": "c7n-batch-invocation-eternal-lion",
+                "modelId": "arn:aws:bedrock:us-east-1::foundation-model/amazon.titan-embed-text-v2:0",
+                "roleArn": "arn:aws:iam::644160558196:role/c7n-bedrock-batch-eternal-lion",
+                "status": "Failed",
+                "submitTime": {
+                    "__class__": "datetime",
+                    "year": 2026,
+                    "month": 3,
+                    "day": 6,
+                    "hour": 20,
+                    "minute": 40,
+                    "second": 57,
+                    "microsecond": 224000
+                },
+                "lastModifiedTime": {
+                    "__class__": "datetime",
+                    "year": 2026,
+                    "month": 3,
+                    "day": 6,
+                    "hour": 20,
+                    "minute": 42,
+                    "second": 59,
+                    "microsecond": 547000
+                },
+                "endTime": {
+                    "__class__": "datetime",
+                    "year": 2026,
+                    "month": 3,
+                    "day": 6,
+                    "hour": 20,
+                    "minute": 42,
+                    "second": 59,
+                    "microsecond": 509000
+                },
+                "inputDataConfig": {
+                    "s3InputDataConfig": {
+                        "s3Uri": "s3://c7n-bedrock-input-eternal-lion/input.jsonl",
+                        "s3BucketOwner": "644160558196"
+                    }
+                },
+                "outputDataConfig": {
+                    "s3OutputDataConfig": {
+                        "s3Uri": "s3://c7n-bedrock-output-eternal-lion/",
+                        "s3BucketOwner": "644160558196"
+                    }
+                },
+                "timeoutDurationInHours": 24,
+                "jobExpirationTime": {
+                    "__class__": "datetime",
+                    "year": 2026,
+                    "month": 3,
+                    "day": 7,
+                    "hour": 20,
+                    "minute": 40,
+                    "second": 57,
+                    "microsecond": 224000
+                },
+                "modelInvocationType": "InvokeModel"
+            },
+            {
+                "jobArn": "arn:aws:bedrock:us-east-1:644160558196:model-invocation-job/iuww9ks2pui2",
+                "jobName": "c7n-batch-invocation-humble-pika",
+                "modelId": "arn:aws:bedrock:us-east-1::foundation-model/amazon.nova-micro-v1:0",
+                "roleArn": "arn:aws:iam::644160558196:role/c7n-bedrock-batch-humble-pika",
+                "status": "Stopped",
+                "submitTime": {
+                    "__class__": "datetime",
+                    "year": 2026,
+                    "month": 3,
+                    "day": 4,
+                    "hour": 20,
+                    "minute": 57,
+                    "second": 13,
+                    "microsecond": 340000
+                },
+                "lastModifiedTime": {
+                    "__class__": "datetime",
+                    "year": 2026,
+                    "month": 3,
+                    "day": 4,
+                    "hour": 20,
+                    "minute": 57,
+                    "second": 52,
+                    "microsecond": 271000
+                },
+                "inputDataConfig": {
+                    "s3InputDataConfig": {
+                        "s3Uri": "s3://c7n-bedrock-input-humble-pika/input.jsonl",
+                        "s3BucketOwner": "644160558196"
+                    }
+                },
+                "outputDataConfig": {
+                    "s3OutputDataConfig": {
+                        "s3Uri": "s3://c7n-bedrock-output-humble-pika/",
+                        "s3BucketOwner": "644160558196"
+                    }
+                },
+                "timeoutDurationInHours": 24,
+                "jobExpirationTime": {
+                    "__class__": "datetime",
+                    "year": 2026,
+                    "month": 3,
+                    "day": 5,
+                    "hour": 20,
+                    "minute": 57,
+                    "second": 13,
+                    "microsecond": 340000
+                },
+                "modelInvocationType": "InvokeModel"
+            },
+            {
+                "jobArn": "arn:aws:bedrock:us-east-1:644160558196:model-invocation-job/grq19g0dxhjt",
+                "jobName": "c7n-batch-invocation-crisp-impala",
+                "modelId": "arn:aws:bedrock:us-east-1::foundation-model/amazon.nova-micro-v1:0",
+                "roleArn": "arn:aws:iam::644160558196:role/c7n-bedrock-batch-crisp-impala",
+                "status": "Stopped",
+                "submitTime": {
+                    "__class__": "datetime",
+                    "year": 2026,
+                    "month": 3,
+                    "day": 4,
+                    "hour": 20,
+                    "minute": 41,
+                    "second": 24,
+                    "microsecond": 380000
+                },
+                "lastModifiedTime": {
+                    "__class__": "datetime",
+                    "year": 2026,
+                    "month": 3,
+                    "day": 4,
+                    "hour": 20,
+                    "minute": 41,
+                    "second": 52,
+                    "microsecond": 337000
+                },
+                "inputDataConfig": {
+                    "s3InputDataConfig": {
+                        "s3Uri": "s3://c7n-bedrock-input-crisp-impala/input.jsonl",
+                        "s3BucketOwner": "644160558196"
+                    }
+                },
+                "outputDataConfig": {
+                    "s3OutputDataConfig": {
+                        "s3Uri": "s3://c7n-bedrock-output-crisp-impala/",
+                        "s3BucketOwner": "644160558196"
+                    }
+                },
+                "timeoutDurationInHours": 24,
+                "jobExpirationTime": {
+                    "__class__": "datetime",
+                    "year": 2026,
+                    "month": 3,
+                    "day": 5,
+                    "hour": 20,
+                    "minute": 41,
+                    "second": 24,
+                    "microsecond": 380000
+                },
+                "modelInvocationType": "InvokeModel"
+            },
+            {
+                "jobArn": "arn:aws:bedrock:us-east-1:644160558196:model-invocation-job/z5j17akehrhh",
+                "jobName": "c7n-batch-invocation-natural-monitor",
+                "modelId": "arn:aws:bedrock:us-east-1::foundation-model/amazon.nova-micro-v1:0",
+                "roleArn": "arn:aws:iam::644160558196:role/c7n-bedrock-batch-natural-monitor",
+                "status": "Failed",
+                "submitTime": {
+                    "__class__": "datetime",
+                    "year": 2026,
+                    "month": 3,
+                    "day": 3,
+                    "hour": 23,
+                    "minute": 6,
+                    "second": 10,
+                    "microsecond": 355000
+                },
+                "lastModifiedTime": {
+                    "__class__": "datetime",
+                    "year": 2026,
+                    "month": 3,
+                    "day": 3,
+                    "hour": 23,
+                    "minute": 6,
+                    "second": 58,
+                    "microsecond": 251000
+                },
+                "endTime": {
+                    "__class__": "datetime",
+                    "year": 2026,
+                    "month": 3,
+                    "day": 3,
+                    "hour": 23,
+                    "minute": 6,
+                    "second": 58,
+                    "microsecond": 217000
+                },
+                "inputDataConfig": {
+                    "s3InputDataConfig": {
+                        "s3Uri": "s3://c7n-bedrock-input-natural-monitor/input.jsonl",
+                        "s3BucketOwner": "644160558196"
+                    }
+                },
+                "outputDataConfig": {
+                    "s3OutputDataConfig": {
+                        "s3Uri": "s3://c7n-bedrock-output-natural-monitor/",
+                        "s3BucketOwner": "644160558196"
+                    }
+                },
+                "timeoutDurationInHours": 24,
+                "jobExpirationTime": {
+                    "__class__": "datetime",
+                    "year": 2026,
+                    "month": 3,
+                    "day": 4,
+                    "hour": 23,
+                    "minute": 6,
+                    "second": 10,
+                    "microsecond": 355000
+                },
+                "modelInvocationType": "InvokeModel"
+            },
+            {
+                "jobArn": "arn:aws:bedrock:us-east-1:644160558196:model-invocation-job/n7iy7q65c5lr",
+                "jobName": "c7n-batch-invocation-renewing-cow",
+                "modelId": "arn:aws:bedrock:us-east-1::foundation-model/amazon.nova-micro-v1:0",
+                "roleArn": "arn:aws:iam::644160558196:role/c7n-bedrock-batch-renewing-cow",
+                "status": "Failed",
+                "submitTime": {
+                    "__class__": "datetime",
+                    "year": 2026,
+                    "month": 3,
+                    "day": 3,
+                    "hour": 23,
+                    "minute": 5,
+                    "second": 3,
+                    "microsecond": 299000
+                },
+                "lastModifiedTime": {
+                    "__class__": "datetime",
+                    "year": 2026,
+                    "month": 3,
+                    "day": 3,
+                    "hour": 23,
+                    "minute": 6,
+                    "second": 58,
+                    "microsecond": 380000
+                },
+                "endTime": {
+                    "__class__": "datetime",
+                    "year": 2026,
+                    "month": 3,
+                    "day": 3,
+                    "hour": 23,
+                    "minute": 6,
+                    "second": 58,
+                    "microsecond": 346000
+                },
+                "inputDataConfig": {
+                    "s3InputDataConfig": {
+                        "s3Uri": "s3://c7n-bedrock-input-renewing-cow/input.jsonl",
+                        "s3BucketOwner": "644160558196"
+                    }
+                },
+                "outputDataConfig": {
+                    "s3OutputDataConfig": {
+                        "s3Uri": "s3://c7n-bedrock-output-renewing-cow/",
+                        "s3BucketOwner": "644160558196"
+                    }
+                },
+                "timeoutDurationInHours": 24,
+                "jobExpirationTime": {
+                    "__class__": "datetime",
+                    "year": 2026,
+                    "month": 3,
+                    "day": 4,
+                    "hour": 23,
+                    "minute": 5,
+                    "second": 3,
+                    "microsecond": 299000
+                },
+                "modelInvocationType": "InvokeModel"
+            },
+            {
+                "jobArn": "arn:aws:bedrock:us-east-1:644160558196:model-invocation-job/njtl44q2adsr",
+                "jobName": "c7n-batch-invocation-fit-hare",
+                "modelId": "arn:aws:bedrock:us-east-1::foundation-model/amazon.nova-micro-v1:0",
+                "roleArn": "arn:aws:iam::644160558196:role/c7n-bedrock-batch-fit-hare",
+                "status": "Failed",
+                "submitTime": {
+                    "__class__": "datetime",
+                    "year": 2026,
+                    "month": 3,
+                    "day": 3,
+                    "hour": 23,
+                    "minute": 4,
+                    "second": 20,
+                    "microsecond": 40000
+                },
+                "lastModifiedTime": {
+                    "__class__": "datetime",
+                    "year": 2026,
+                    "month": 3,
+                    "day": 3,
+                    "hour": 23,
+                    "minute": 4,
+                    "second": 57,
+                    "microsecond": 791000
+                },
+                "endTime": {
+                    "__class__": "datetime",
+                    "year": 2026,
+                    "month": 3,
+                    "day": 3,
+                    "hour": 23,
+                    "minute": 4,
+                    "second": 57,
+                    "microsecond": 761000
+                },
+                "inputDataConfig": {
+                    "s3InputDataConfig": {
+                        "s3Uri": "s3://c7n-bedrock-input-fit-hare/input.jsonl",
+                        "s3BucketOwner": "644160558196"
+                    }
+                },
+                "outputDataConfig": {
+                    "s3OutputDataConfig": {
+                        "s3Uri": "s3://c7n-bedrock-output-fit-hare/",
+                        "s3BucketOwner": "644160558196"
+                    }
+                },
+                "timeoutDurationInHours": 24,
+                "jobExpirationTime": {
+                    "__class__": "datetime",
+                    "year": 2026,
+                    "month": 3,
+                    "day": 4,
+                    "hour": 23,
+                    "minute": 4,
+                    "second": 20,
+                    "microsecond": 40000
+                },
+                "modelInvocationType": "InvokeModel"
+            },
+            {
+                "jobArn": "arn:aws:bedrock:us-east-1:644160558196:model-invocation-job/e877hj6gbbuy",
+                "jobName": "c7n-batch-invocation-simple-whale",
+                "modelId": "arn:aws:bedrock:us-east-1::foundation-model/amazon.nova-micro-v1:0",
+                "roleArn": "arn:aws:iam::644160558196:role/c7n-bedrock-batch-simple-whale",
+                "status": "Failed",
+                "submitTime": {
+                    "__class__": "datetime",
+                    "year": 2026,
+                    "month": 3,
+                    "day": 3,
+                    "hour": 23,
+                    "minute": 3,
+                    "second": 55,
+                    "microsecond": 441000
+                },
+                "lastModifiedTime": {
+                    "__class__": "datetime",
+                    "year": 2026,
+                    "month": 3,
+                    "day": 3,
+                    "hour": 23,
+                    "minute": 4,
+                    "second": 57,
+                    "microsecond": 992000
+                },
+                "endTime": {
+                    "__class__": "datetime",
+                    "year": 2026,
+                    "month": 3,
+                    "day": 3,
+                    "hour": 23,
+                    "minute": 4,
+                    "second": 57,
+                    "microsecond": 957000
+                },
+                "inputDataConfig": {
+                    "s3InputDataConfig": {
+                        "s3Uri": "s3://c7n-bedrock-input-simple-whale/input.jsonl",
+                        "s3BucketOwner": "644160558196"
+                    }
+                },
+                "outputDataConfig": {
+                    "s3OutputDataConfig": {
+                        "s3Uri": "s3://c7n-bedrock-output-simple-whale/",
+                        "s3BucketOwner": "644160558196"
+                    }
+                },
+                "timeoutDurationInHours": 24,
+                "jobExpirationTime": {
+                    "__class__": "datetime",
+                    "year": 2026,
+                    "month": 3,
+                    "day": 4,
+                    "hour": 23,
+                    "minute": 3,
+                    "second": 55,
+                    "microsecond": 441000
+                },
+                "modelInvocationType": "InvokeModel"
+            },
+            {
+                "jobArn": "arn:aws:bedrock:us-east-1:644160558196:model-invocation-job/rqimw8vzpruk",
+                "jobName": "c7n-batch-invocation-gorgeous-catfish",
+                "modelId": "arn:aws:bedrock:us-east-1::foundation-model/amazon.nova-micro-v1:0",
+                "roleArn": "arn:aws:iam::644160558196:role/c7n-bedrock-batch-gorgeous-catfish",
+                "status": "Failed",
+                "submitTime": {
+                    "__class__": "datetime",
+                    "year": 2026,
+                    "month": 3,
+                    "day": 3,
+                    "hour": 23,
+                    "minute": 2,
+                    "second": 5,
+                    "microsecond": 597000
+                },
+                "lastModifiedTime": {
+                    "__class__": "datetime",
+                    "year": 2026,
+                    "month": 3,
+                    "day": 3,
+                    "hour": 23,
+                    "minute": 2,
+                    "second": 58,
+                    "microsecond": 265000
+                },
+                "endTime": {
+                    "__class__": "datetime",
+                    "year": 2026,
+                    "month": 3,
+                    "day": 3,
+                    "hour": 23,
+                    "minute": 2,
+                    "second": 58,
+                    "microsecond": 235000
+                },
+                "inputDataConfig": {
+                    "s3InputDataConfig": {
+                        "s3Uri": "s3://c7n-bedrock-input-gorgeous-catfish/input.jsonl",
+                        "s3BucketOwner": "644160558196"
+                    }
+                },
+                "outputDataConfig": {
+                    "s3OutputDataConfig": {
+                        "s3Uri": "s3://c7n-bedrock-output-gorgeous-catfish/",
+                        "s3BucketOwner": "644160558196"
+                    }
+                },
+                "timeoutDurationInHours": 24,
+                "jobExpirationTime": {
+                    "__class__": "datetime",
+                    "year": 2026,
+                    "month": 3,
+                    "day": 4,
+                    "hour": 23,
+                    "minute": 2,
+                    "second": 5,
+                    "microsecond": 597000
+                },
+                "modelInvocationType": "InvokeModel"
+            },
+            {
+                "jobArn": "arn:aws:bedrock:us-east-1:644160558196:model-invocation-job/s6xbaj4hg457",
+                "jobName": "c7n-batch-invocation-distinct-drum",
+                "modelId": "arn:aws:bedrock:us-east-1::foundation-model/amazon.nova-micro-v1:0",
+                "roleArn": "arn:aws:iam::644160558196:role/c7n-bedrock-batch-distinct-drum",
+                "status": "Failed",
+                "submitTime": {
+                    "__class__": "datetime",
+                    "year": 2026,
+                    "month": 3,
+                    "day": 3,
+                    "hour": 23,
+                    "minute": 1,
+                    "second": 40,
+                    "microsecond": 374000
+                },
+                "lastModifiedTime": {
+                    "__class__": "datetime",
+                    "year": 2026,
+                    "month": 3,
+                    "day": 3,
+                    "hour": 23,
+                    "minute": 2,
+                    "second": 58,
+                    "microsecond": 197000
+                },
+                "endTime": {
+                    "__class__": "datetime",
+                    "year": 2026,
+                    "month": 3,
+                    "day": 3,
+                    "hour": 23,
+                    "minute": 2,
+                    "second": 58,
+                    "microsecond": 158000
+                },
+                "inputDataConfig": {
+                    "s3InputDataConfig": {
+                        "s3Uri": "s3://c7n-bedrock-input-distinct-drum/input.jsonl",
+                        "s3BucketOwner": "644160558196"
+                    }
+                },
+                "outputDataConfig": {
+                    "s3OutputDataConfig": {
+                        "s3Uri": "s3://c7n-bedrock-output-distinct-drum/",
+                        "s3BucketOwner": "644160558196"
+                    }
+                },
+                "timeoutDurationInHours": 24,
+                "jobExpirationTime": {
+                    "__class__": "datetime",
+                    "year": 2026,
+                    "month": 3,
+                    "day": 4,
+                    "hour": 23,
+                    "minute": 1,
+                    "second": 40,
+                    "microsecond": 374000
+                },
+                "modelInvocationType": "InvokeModel"
+            },
+            {
+                "jobArn": "arn:aws:bedrock:us-east-1:644160558196:model-invocation-job/nymvpzax60r4",
+                "jobName": "c7n-batch-invocation-liked-pug",
+                "modelId": "arn:aws:bedrock:us-east-1::foundation-model/amazon.nova-micro-v1:0",
+                "roleArn": "arn:aws:iam::644160558196:role/c7n-bedrock-batch-liked-pug",
+                "status": "Failed",
+                "submitTime": {
+                    "__class__": "datetime",
+                    "year": 2026,
+                    "month": 3,
+                    "day": 3,
+                    "hour": 23,
+                    "minute": 0,
+                    "second": 37,
+                    "microsecond": 180000
+                },
+                "lastModifiedTime": {
+                    "__class__": "datetime",
+                    "year": 2026,
+                    "month": 3,
+                    "day": 3,
+                    "hour": 23,
+                    "minute": 2,
+                    "second": 58,
+                    "microsecond": 138000
+                },
+                "endTime": {
+                    "__class__": "datetime",
+                    "year": 2026,
+                    "month": 3,
+                    "day": 3,
+                    "hour": 23,
+                    "minute": 2,
+                    "second": 58,
+                    "microsecond": 103000
+                },
+                "inputDataConfig": {
+                    "s3InputDataConfig": {
+                        "s3Uri": "s3://c7n-bedrock-input-liked-pug/input.jsonl",
+                        "s3BucketOwner": "644160558196"
+                    }
+                },
+                "outputDataConfig": {
+                    "s3OutputDataConfig": {
+                        "s3Uri": "s3://c7n-bedrock-output-liked-pug/",
+                        "s3BucketOwner": "644160558196"
+                    }
+                },
+                "timeoutDurationInHours": 24,
+                "jobExpirationTime": {
+                    "__class__": "datetime",
+                    "year": 2026,
+                    "month": 3,
+                    "day": 4,
+                    "hour": 23,
+                    "minute": 0,
+                    "second": 37,
+                    "microsecond": 180000
+                },
+                "modelInvocationType": "InvokeModel"
+            },
+            {
+                "jobArn": "arn:aws:bedrock:us-east-1:644160558196:model-invocation-job/e0kkkv1ueynj",
+                "jobName": "c7n-batch-invocation-poetic-griffon",
+                "modelId": "arn:aws:bedrock:us-east-1::foundation-model/amazon.nova-micro-v1:0",
+                "roleArn": "arn:aws:iam::644160558196:role/c7n-bedrock-batch-poetic-griffon",
+                "status": "Failed",
+                "submitTime": {
+                    "__class__": "datetime",
+                    "year": 2026,
+                    "month": 3,
+                    "day": 3,
+                    "hour": 22,
+                    "minute": 59,
+                    "second": 45,
+                    "microsecond": 907000
+                },
+                "lastModifiedTime": {
+                    "__class__": "datetime",
+                    "year": 2026,
+                    "month": 3,
+                    "day": 3,
+                    "hour": 23,
+                    "minute": 1,
+                    "second": 5,
+                    "microsecond": 889000
+                },
+                "endTime": {
+                    "__class__": "datetime",
+                    "year": 2026,
+                    "month": 3,
+                    "day": 3,
+                    "hour": 23,
+                    "minute": 1,
+                    "second": 5,
+                    "microsecond": 764000
+                },
+                "inputDataConfig": {
+                    "s3InputDataConfig": {
+                        "s3Uri": "s3://c7n-bedrock-input-poetic-griffon/input.jsonl",
+                        "s3BucketOwner": "644160558196"
+                    }
+                },
+                "outputDataConfig": {
+                    "s3OutputDataConfig": {
+                        "s3Uri": "s3://c7n-bedrock-output-poetic-griffon/",
+                        "s3BucketOwner": "644160558196"
+                    }
+                },
+                "timeoutDurationInHours": 24,
+                "jobExpirationTime": {
+                    "__class__": "datetime",
+                    "year": 2026,
+                    "month": 3,
+                    "day": 4,
+                    "hour": 22,
+                    "minute": 59,
+                    "second": 45,
+                    "microsecond": 907000
+                },
+                "modelInvocationType": "InvokeModel"
+            },
+            {
+                "jobArn": "arn:aws:bedrock:us-east-1:644160558196:model-invocation-job/h8kk04a1u8t3",
+                "jobName": "c7n-batch-invocation-allowed-ocelot",
+                "modelId": "arn:aws:bedrock:us-east-1::foundation-model/amazon.nova-micro-v1:0",
+                "roleArn": "arn:aws:iam::644160558196:role/c7n-bedrock-batch-allowed-ocelot",
+                "status": "Failed",
+                "submitTime": {
+                    "__class__": "datetime",
+                    "year": 2026,
+                    "month": 3,
+                    "day": 3,
+                    "hour": 22,
+                    "minute": 57,
+                    "second": 41,
+                    "microsecond": 101000
+                },
+                "lastModifiedTime": {
+                    "__class__": "datetime",
+                    "year": 2026,
+                    "month": 3,
+                    "day": 3,
+                    "hour": 22,
+                    "minute": 58,
+                    "second": 57,
+                    "microsecond": 446000
+                },
+                "endTime": {
+                    "__class__": "datetime",
+                    "year": 2026,
+                    "month": 3,
+                    "day": 3,
+                    "hour": 22,
+                    "minute": 58,
+                    "second": 57,
+                    "microsecond": 414000
+                },
+                "inputDataConfig": {
+                    "s3InputDataConfig": {
+                        "s3Uri": "s3://c7n-bedrock-input-allowed-ocelot/input.jsonl",
+                        "s3BucketOwner": "644160558196"
+                    }
+                },
+                "outputDataConfig": {
+                    "s3OutputDataConfig": {
+                        "s3Uri": "s3://c7n-bedrock-output-allowed-ocelot/",
+                        "s3BucketOwner": "644160558196"
+                    }
+                },
+                "timeoutDurationInHours": 24,
+                "jobExpirationTime": {
+                    "__class__": "datetime",
+                    "year": 2026,
+                    "month": 3,
+                    "day": 4,
+                    "hour": 22,
+                    "minute": 57,
+                    "second": 41,
+                    "microsecond": 101000
+                },
+                "modelInvocationType": "InvokeModel"
+            },
+            {
+                "jobArn": "arn:aws:bedrock:us-east-1:644160558196:model-invocation-job/9t46ttth7wrt",
+                "jobName": "c7n-batch-invocation-nice-bat",
+                "modelId": "arn:aws:bedrock:us-east-1::foundation-model/amazon.nova-micro-v1:0",
+                "roleArn": "arn:aws:iam::644160558196:role/c7n-bedrock-batch-nice-bat",
+                "status": "Failed",
+                "submitTime": {
+                    "__class__": "datetime",
+                    "year": 2026,
+                    "month": 3,
+                    "day": 3,
+                    "hour": 22,
+                    "minute": 56,
+                    "second": 21,
+                    "microsecond": 209000
+                },
+                "lastModifiedTime": {
+                    "__class__": "datetime",
+                    "year": 2026,
+                    "month": 3,
+                    "day": 3,
+                    "hour": 22,
+                    "minute": 56,
+                    "second": 57,
+                    "microsecond": 370000
+                },
+                "endTime": {
+                    "__class__": "datetime",
+                    "year": 2026,
+                    "month": 3,
+                    "day": 3,
+                    "hour": 22,
+                    "minute": 56,
+                    "second": 57,
+                    "microsecond": 337000
+                },
+                "inputDataConfig": {
+                    "s3InputDataConfig": {
+                        "s3Uri": "s3://c7n-bedrock-input-nice-bat/input.jsonl",
+                        "s3BucketOwner": "644160558196"
+                    }
+                },
+                "outputDataConfig": {
+                    "s3OutputDataConfig": {
+                        "s3Uri": "s3://c7n-bedrock-output-nice-bat/",
+                        "s3BucketOwner": "644160558196"
+                    }
+                },
+                "timeoutDurationInHours": 24,
+                "jobExpirationTime": {
+                    "__class__": "datetime",
+                    "year": 2026,
+                    "month": 3,
+                    "day": 4,
+                    "hour": 22,
+                    "minute": 56,
+                    "second": 21,
+                    "microsecond": 209000
+                },
+                "modelInvocationType": "InvokeModel"
+            },
+            {
+                "jobArn": "arn:aws:bedrock:us-east-1:644160558196:model-invocation-job/sk9cvf2uct7r",
+                "jobName": "c7n-batch-invocation-suited-raccoon",
+                "modelId": "arn:aws:bedrock:us-east-1::foundation-model/amazon.nova-micro-v1:0",
+                "roleArn": "arn:aws:iam::644160558196:role/c7n-bedrock-batch-suited-raccoon",
+                "status": "Failed",
+                "submitTime": {
+                    "__class__": "datetime",
+                    "year": 2026,
+                    "month": 3,
+                    "day": 3,
+                    "hour": 22,
+                    "minute": 53,
+                    "second": 32,
+                    "microsecond": 784000
+                },
+                "lastModifiedTime": {
+                    "__class__": "datetime",
+                    "year": 2026,
+                    "month": 3,
+                    "day": 3,
+                    "hour": 22,
+                    "minute": 54,
+                    "second": 58,
+                    "microsecond": 320000
+                },
+                "endTime": {
+                    "__class__": "datetime",
+                    "year": 2026,
+                    "month": 3,
+                    "day": 3,
+                    "hour": 22,
+                    "minute": 54,
+                    "second": 58,
+                    "microsecond": 285000
+                },
+                "inputDataConfig": {
+                    "s3InputDataConfig": {
+                        "s3Uri": "s3://c7n-bedrock-input-suited-raccoon/input.jsonl",
+                        "s3BucketOwner": "644160558196"
+                    }
+                },
+                "outputDataConfig": {
+                    "s3OutputDataConfig": {
+                        "s3Uri": "s3://c7n-bedrock-output-suited-raccoon/",
+                        "s3BucketOwner": "644160558196"
+                    }
+                },
+                "timeoutDurationInHours": 24,
+                "jobExpirationTime": {
+                    "__class__": "datetime",
+                    "year": 2026,
+                    "month": 3,
+                    "day": 4,
+                    "hour": 22,
+                    "minute": 53,
+                    "second": 32,
+                    "microsecond": 784000
+                },
+                "modelInvocationType": "InvokeModel"
+            },
+            {
+                "jobArn": "arn:aws:bedrock:us-east-1:644160558196:model-invocation-job/rlqq0ku5zald",
+                "jobName": "c7n-batch-invocation-moral-bengal",
+                "modelId": "arn:aws:bedrock:us-east-1::foundation-model/amazon.nova-micro-v1:0",
+                "roleArn": "arn:aws:iam::644160558196:role/c7n-bedrock-batch-moral-bengal",
+                "status": "Failed",
+                "submitTime": {
+                    "__class__": "datetime",
+                    "year": 2026,
+                    "month": 3,
+                    "day": 3,
+                    "hour": 22,
+                    "minute": 53,
+                    "second": 18,
+                    "microsecond": 164000
+                },
+                "lastModifiedTime": {
+                    "__class__": "datetime",
+                    "year": 2026,
+                    "month": 3,
+                    "day": 3,
+                    "hour": 22,
+                    "minute": 54,
+                    "second": 58,
+                    "microsecond": 215000
+                },
+                "endTime": {
+                    "__class__": "datetime",
+                    "year": 2026,
+                    "month": 3,
+                    "day": 3,
+                    "hour": 22,
+                    "minute": 54,
+                    "second": 58,
+                    "microsecond": 181000
+                },
+                "inputDataConfig": {
+                    "s3InputDataConfig": {
+                        "s3Uri": "s3://c7n-bedrock-input-moral-bengal/input.jsonl",
+                        "s3BucketOwner": "644160558196"
+                    }
+                },
+                "outputDataConfig": {
+                    "s3OutputDataConfig": {
+                        "s3Uri": "s3://c7n-bedrock-output-moral-bengal/",
+                        "s3BucketOwner": "644160558196"
+                    }
+                },
+                "timeoutDurationInHours": 24,
+                "jobExpirationTime": {
+                    "__class__": "datetime",
+                    "year": 2026,
+                    "month": 3,
+                    "day": 4,
+                    "hour": 22,
+                    "minute": 53,
+                    "second": 18,
+                    "microsecond": 164000
+                },
+                "modelInvocationType": "InvokeModel"
+            },
+            {
+                "jobArn": "arn:aws:bedrock:us-east-1:644160558196:model-invocation-job/csq1l2pgsqff",
+                "jobName": "c7n-batch-invocation-positive-yak",
+                "modelId": "arn:aws:bedrock:us-east-1::foundation-model/amazon.nova-micro-v1:0",
+                "roleArn": "arn:aws:iam::644160558196:role/c7n-bedrock-batch-positive-yak",
+                "status": "Failed",
+                "submitTime": {
+                    "__class__": "datetime",
+                    "year": 2026,
+                    "month": 3,
+                    "day": 3,
+                    "hour": 22,
+                    "minute": 49,
+                    "second": 25,
+                    "microsecond": 632000
+                },
+                "lastModifiedTime": {
+                    "__class__": "datetime",
+                    "year": 2026,
+                    "month": 3,
+                    "day": 3,
+                    "hour": 22,
+                    "minute": 50,
+                    "second": 58,
+                    "microsecond": 306000
+                },
+                "endTime": {
+                    "__class__": "datetime",
+                    "year": 2026,
+                    "month": 3,
+                    "day": 3,
+                    "hour": 22,
+                    "minute": 50,
+                    "second": 58,
+                    "microsecond": 273000
+                },
+                "inputDataConfig": {
+                    "s3InputDataConfig": {
+                        "s3Uri": "s3://c7n-bedrock-input-positive-yak/input.jsonl",
+                        "s3BucketOwner": "644160558196"
+                    }
+                },
+                "outputDataConfig": {
+                    "s3OutputDataConfig": {
+                        "s3Uri": "s3://c7n-bedrock-output-positive-yak/",
+                        "s3BucketOwner": "644160558196"
+                    }
+                },
+                "timeoutDurationInHours": 24,
+                "jobExpirationTime": {
+                    "__class__": "datetime",
+                    "year": 2026,
+                    "month": 3,
+                    "day": 4,
+                    "hour": 22,
+                    "minute": 49,
+                    "second": 25,
+                    "microsecond": 632000
+                },
+                "modelInvocationType": "InvokeModel"
+            },
+            {
+                "jobArn": "arn:aws:bedrock:us-east-1:644160558196:model-invocation-job/mfvpdnuboes7",
+                "jobName": "c7n-batch-invocation-curious-turkey",
+                "modelId": "arn:aws:bedrock:us-east-1::foundation-model/amazon.nova-micro-v1:0",
+                "roleArn": "arn:aws:iam::644160558196:role/c7n-bedrock-batch-curious-turkey",
+                "status": "Failed",
+                "submitTime": {
+                    "__class__": "datetime",
+                    "year": 2026,
+                    "month": 3,
+                    "day": 3,
+                    "hour": 22,
+                    "minute": 49,
+                    "second": 11,
+                    "microsecond": 627000
+                },
+                "lastModifiedTime": {
+                    "__class__": "datetime",
+                    "year": 2026,
+                    "month": 3,
+                    "day": 3,
+                    "hour": 22,
+                    "minute": 51,
+                    "second": 10,
+                    "microsecond": 691000
+                },
+                "endTime": {
+                    "__class__": "datetime",
+                    "year": 2026,
+                    "month": 3,
+                    "day": 3,
+                    "hour": 22,
+                    "minute": 51,
+                    "second": 10,
+                    "microsecond": 563000
+                },
+                "inputDataConfig": {
+                    "s3InputDataConfig": {
+                        "s3Uri": "s3://c7n-bedrock-input-curious-turkey/input.jsonl",
+                        "s3BucketOwner": "644160558196"
+                    }
+                },
+                "outputDataConfig": {
+                    "s3OutputDataConfig": {
+                        "s3Uri": "s3://c7n-bedrock-output-curious-turkey/",
+                        "s3BucketOwner": "644160558196"
+                    }
+                },
+                "timeoutDurationInHours": 24,
+                "jobExpirationTime": {
+                    "__class__": "datetime",
+                    "year": 2026,
+                    "month": 3,
+                    "day": 4,
+                    "hour": 22,
+                    "minute": 49,
+                    "second": 11,
+                    "microsecond": 627000
+                },
+                "modelInvocationType": "InvokeModel"
+            },
+            {
+                "jobArn": "arn:aws:bedrock:us-east-1:644160558196:model-invocation-job/d6faxhbbz7yr",
+                "jobName": "c7n-batch-invocation-in-bee",
+                "modelId": "arn:aws:bedrock:us-east-1::foundation-model/amazon.nova-micro-v1:0",
+                "roleArn": "arn:aws:iam::644160558196:role/c7n-bedrock-batch-in-bee",
+                "status": "Failed",
+                "submitTime": {
+                    "__class__": "datetime",
+                    "year": 2026,
+                    "month": 3,
+                    "day": 3,
+                    "hour": 22,
+                    "minute": 37,
+                    "second": 16,
+                    "microsecond": 98000
+                },
+                "lastModifiedTime": {
+                    "__class__": "datetime",
+                    "year": 2026,
+                    "month": 3,
+                    "day": 3,
+                    "hour": 22,
+                    "minute": 38,
+                    "second": 57,
+                    "microsecond": 884000
+                },
+                "endTime": {
+                    "__class__": "datetime",
+                    "year": 2026,
+                    "month": 3,
+                    "day": 3,
+                    "hour": 22,
+                    "minute": 38,
+                    "second": 57,
+                    "microsecond": 852000
+                },
+                "inputDataConfig": {
+                    "s3InputDataConfig": {
+                        "s3Uri": "s3://c7n-bedrock-input-in-bee/input.jsonl",
+                        "s3BucketOwner": "644160558196"
+                    }
+                },
+                "outputDataConfig": {
+                    "s3OutputDataConfig": {
+                        "s3Uri": "s3://c7n-bedrock-output-in-bee/",
+                        "s3BucketOwner": "644160558196"
+                    }
+                },
+                "timeoutDurationInHours": 24,
+                "jobExpirationTime": {
+                    "__class__": "datetime",
+                    "year": 2026,
+                    "month": 3,
+                    "day": 4,
+                    "hour": 22,
+                    "minute": 37,
+                    "second": 16,
+                    "microsecond": 98000
+                },
+                "modelInvocationType": "InvokeModel"
+            },
+            {
+                "jobArn": "arn:aws:bedrock:us-east-1:644160558196:model-invocation-job/402l3shfpbar",
+                "jobName": "c7n-batch-invocation-valued-penguin",
+                "modelId": "arn:aws:bedrock:us-east-1::foundation-model/amazon.nova-micro-v1:0",
+                "roleArn": "arn:aws:iam::644160558196:role/c7n-bedrock-batch-valued-penguin",
+                "status": "Failed",
+                "submitTime": {
+                    "__class__": "datetime",
+                    "year": 2026,
+                    "month": 3,
+                    "day": 3,
+                    "hour": 22,
+                    "minute": 36,
+                    "second": 3,
+                    "microsecond": 418000
+                },
+                "lastModifiedTime": {
+                    "__class__": "datetime",
+                    "year": 2026,
+                    "month": 3,
+                    "day": 3,
+                    "hour": 22,
+                    "minute": 36,
+                    "second": 57,
+                    "microsecond": 715000
+                },
+                "endTime": {
+                    "__class__": "datetime",
+                    "year": 2026,
+                    "month": 3,
+                    "day": 3,
+                    "hour": 22,
+                    "minute": 36,
+                    "second": 57,
+                    "microsecond": 679000
+                },
+                "inputDataConfig": {
+                    "s3InputDataConfig": {
+                        "s3Uri": "s3://c7n-bedrock-input-valued-penguin/input.jsonl",
+                        "s3BucketOwner": "644160558196"
+                    }
+                },
+                "outputDataConfig": {
+                    "s3OutputDataConfig": {
+                        "s3Uri": "s3://c7n-bedrock-output-valued-penguin/",
+                        "s3BucketOwner": "644160558196"
+                    }
+                },
+                "timeoutDurationInHours": 24,
+                "jobExpirationTime": {
+                    "__class__": "datetime",
+                    "year": 2026,
+                    "month": 3,
+                    "day": 4,
+                    "hour": 22,
+                    "minute": 36,
+                    "second": 3,
+                    "microsecond": 418000
+                },
+                "modelInvocationType": "InvokeModel"
+            },
+            {
+                "jobArn": "arn:aws:bedrock:us-east-1:644160558196:model-invocation-job/0codoxejriwr",
+                "jobName": "c7n-batch-invocation-deep-eel",
+                "modelId": "arn:aws:bedrock:us-east-1::foundation-model/amazon.nova-micro-v1:0",
+                "roleArn": "arn:aws:iam::644160558196:role/c7n-bedrock-batch-deep-eel",
+                "status": "Failed",
+                "submitTime": {
+                    "__class__": "datetime",
+                    "year": 2026,
+                    "month": 3,
+                    "day": 3,
+                    "hour": 22,
+                    "minute": 33,
+                    "second": 28,
+                    "microsecond": 381000
+                },
+                "lastModifiedTime": {
+                    "__class__": "datetime",
+                    "year": 2026,
+                    "month": 3,
+                    "day": 3,
+                    "hour": 22,
+                    "minute": 35,
+                    "second": 8,
+                    "microsecond": 14000
+                },
+                "endTime": {
+                    "__class__": "datetime",
+                    "year": 2026,
+                    "month": 3,
+                    "day": 3,
+                    "hour": 22,
+                    "minute": 35,
+                    "second": 7,
+                    "microsecond": 978000
+                },
+                "inputDataConfig": {
+                    "s3InputDataConfig": {
+                        "s3Uri": "s3://c7n-bedrock-input-deep-eel/input.jsonl",
+                        "s3BucketOwner": "644160558196"
+                    }
+                },
+                "outputDataConfig": {
+                    "s3OutputDataConfig": {
+                        "s3Uri": "s3://c7n-bedrock-output-deep-eel/",
+                        "s3BucketOwner": "644160558196"
+                    }
+                },
+                "timeoutDurationInHours": 24,
+                "jobExpirationTime": {
+                    "__class__": "datetime",
+                    "year": 2026,
+                    "month": 3,
+                    "day": 4,
+                    "hour": 22,
+                    "minute": 33,
+                    "second": 28,
+                    "microsecond": 381000
+                },
+                "modelInvocationType": "InvokeModel"
+            },
+            {
+                "jobArn": "arn:aws:bedrock:us-east-1:644160558196:model-invocation-job/09bixzvlv6ty",
+                "jobName": "c7n-batch-invocation-optimum-boxer",
+                "modelId": "arn:aws:bedrock:us-east-1::foundation-model/amazon.nova-micro-v1:0",
+                "roleArn": "arn:aws:iam::644160558196:role/c7n-bedrock-batch-optimum-boxer",
+                "status": "Failed",
+                "submitTime": {
+                    "__class__": "datetime",
+                    "year": 2026,
+                    "month": 3,
+                    "day": 3,
+                    "hour": 22,
+                    "minute": 31,
+                    "second": 34,
+                    "microsecond": 11000
+                },
+                "lastModifiedTime": {
+                    "__class__": "datetime",
+                    "year": 2026,
+                    "month": 3,
+                    "day": 3,
+                    "hour": 22,
+                    "minute": 32,
+                    "second": 58,
+                    "microsecond": 416000
+                },
+                "endTime": {
+                    "__class__": "datetime",
+                    "year": 2026,
+                    "month": 3,
+                    "day": 3,
+                    "hour": 22,
+                    "minute": 32,
+                    "second": 58,
+                    "microsecond": 384000
+                },
+                "inputDataConfig": {
+                    "s3InputDataConfig": {
+                        "s3Uri": "s3://c7n-bedrock-input-optimum-boxer/input.jsonl",
+                        "s3BucketOwner": "644160558196"
+                    }
+                },
+                "outputDataConfig": {
+                    "s3OutputDataConfig": {
+                        "s3Uri": "s3://c7n-bedrock-output-optimum-boxer/",
+                        "s3BucketOwner": "644160558196"
+                    }
+                },
+                "timeoutDurationInHours": 24,
+                "jobExpirationTime": {
+                    "__class__": "datetime",
+                    "year": 2026,
+                    "month": 3,
+                    "day": 4,
+                    "hour": 22,
+                    "minute": 31,
+                    "second": 34,
+                    "microsecond": 11000
+                },
+                "modelInvocationType": "InvokeModel"
+            },
+            {
+                "jobArn": "arn:aws:bedrock:us-east-1:644160558196:model-invocation-job/4nf7mygtvxj6",
+                "jobName": "c7n-batch-invocation-modest-pangolin",
+                "modelId": "arn:aws:bedrock:us-east-1::foundation-model/amazon.nova-micro-v1:0",
+                "roleArn": "arn:aws:iam::644160558196:role/c7n-bedrock-batch-modest-pangolin",
+                "status": "Failed",
+                "submitTime": {
+                    "__class__": "datetime",
+                    "year": 2026,
+                    "month": 3,
+                    "day": 3,
+                    "hour": 22,
+                    "minute": 30,
+                    "second": 17,
+                    "microsecond": 990000
+                },
+                "lastModifiedTime": {
+                    "__class__": "datetime",
+                    "year": 2026,
+                    "month": 3,
+                    "day": 3,
+                    "hour": 22,
+                    "minute": 30,
+                    "second": 58,
+                    "microsecond": 589000
+                },
+                "endTime": {
+                    "__class__": "datetime",
+                    "year": 2026,
+                    "month": 3,
+                    "day": 3,
+                    "hour": 22,
+                    "minute": 30,
+                    "second": 58,
+                    "microsecond": 559000
+                },
+                "inputDataConfig": {
+                    "s3InputDataConfig": {
+                        "s3Uri": "s3://c7n-bedrock-input-modest-pangolin/input.jsonl",
+                        "s3BucketOwner": "644160558196"
+                    }
+                },
+                "outputDataConfig": {
+                    "s3OutputDataConfig": {
+                        "s3Uri": "s3://c7n-bedrock-output-modest-pangolin/",
+                        "s3BucketOwner": "644160558196"
+                    }
+                },
+                "timeoutDurationInHours": 24,
+                "jobExpirationTime": {
+                    "__class__": "datetime",
+                    "year": 2026,
+                    "month": 3,
+                    "day": 4,
+                    "hour": 22,
+                    "minute": 30,
+                    "second": 17,
+                    "microsecond": 990000
+                },
+                "modelInvocationType": "InvokeModel"
+            },
+            {
+                "jobArn": "arn:aws:bedrock:us-east-1:644160558196:model-invocation-job/sedudps5us43",
+                "jobName": "c7n-batch-invocation-electric-quail",
+                "modelId": "arn:aws:bedrock:us-east-1::foundation-model/amazon.nova-micro-v1:0",
+                "roleArn": "arn:aws:iam::644160558196:role/c7n-bedrock-batch-electric-quail",
+                "status": "Failed",
+                "submitTime": {
+                    "__class__": "datetime",
+                    "year": 2026,
+                    "month": 3,
+                    "day": 3,
+                    "hour": 22,
+                    "minute": 25,
+                    "second": 40,
+                    "microsecond": 123000
+                },
+                "lastModifiedTime": {
+                    "__class__": "datetime",
+                    "year": 2026,
+                    "month": 3,
+                    "day": 3,
+                    "hour": 22,
+                    "minute": 26,
+                    "second": 58,
+                    "microsecond": 478000
+                },
+                "endTime": {
+                    "__class__": "datetime",
+                    "year": 2026,
+                    "month": 3,
+                    "day": 3,
+                    "hour": 22,
+                    "minute": 26,
+                    "second": 58,
+                    "microsecond": 442000
+                },
+                "inputDataConfig": {
+                    "s3InputDataConfig": {
+                        "s3Uri": "s3://c7n-bedrock-input-electric-quail/input.jsonl",
+                        "s3BucketOwner": "644160558196"
+                    }
+                },
+                "outputDataConfig": {
+                    "s3OutputDataConfig": {
+                        "s3Uri": "s3://c7n-bedrock-output-electric-quail/",
+                        "s3BucketOwner": "644160558196"
+                    }
+                },
+                "timeoutDurationInHours": 24,
+                "jobExpirationTime": {
+                    "__class__": "datetime",
+                    "year": 2026,
+                    "month": 3,
+                    "day": 4,
+                    "hour": 22,
+                    "minute": 25,
+                    "second": 40,
+                    "microsecond": 123000
+                },
+                "modelInvocationType": "InvokeModel"
+            },
+            {
+                "jobArn": "arn:aws:bedrock:us-east-1:644160558196:model-invocation-job/3lhq9z299uik",
+                "jobName": "c7n-batch-invocation-genuine-chicken",
+                "modelId": "arn:aws:bedrock:us-east-1::foundation-model/amazon.nova-micro-v1:0",
+                "roleArn": "arn:aws:iam::644160558196:role/c7n-bedrock-batch-genuine-chicken",
+                "status": "Failed",
+                "submitTime": {
+                    "__class__": "datetime",
+                    "year": 2026,
+                    "month": 3,
+                    "day": 3,
+                    "hour": 22,
+                    "minute": 18,
+                    "second": 37,
+                    "microsecond": 648000
+                },
+                "lastModifiedTime": {
+                    "__class__": "datetime",
+                    "year": 2026,
+                    "month": 3,
+                    "day": 3,
+                    "hour": 22,
+                    "minute": 21,
+                    "second": 8,
+                    "microsecond": 280000
+                },
+                "endTime": {
+                    "__class__": "datetime",
+                    "year": 2026,
+                    "month": 3,
+                    "day": 3,
+                    "hour": 22,
+                    "minute": 21,
+                    "second": 8,
+                    "microsecond": 150000
+                },
+                "inputDataConfig": {
+                    "s3InputDataConfig": {
+                        "s3Uri": "s3://c7n-bedrock-input-genuine-chicken/input.jsonl",
+                        "s3BucketOwner": "644160558196"
+                    }
+                },
+                "outputDataConfig": {
+                    "s3OutputDataConfig": {
+                        "s3Uri": "s3://c7n-bedrock-output-genuine-chicken/",
+                        "s3BucketOwner": "644160558196"
+                    }
+                },
+                "timeoutDurationInHours": 24,
+                "jobExpirationTime": {
+                    "__class__": "datetime",
+                    "year": 2026,
+                    "month": 3,
+                    "day": 4,
+                    "hour": 22,
+                    "minute": 18,
+                    "second": 37,
+                    "microsecond": 648000
+                },
+                "modelInvocationType": "InvokeModel"
+            },
+            {
+                "jobArn": "arn:aws:bedrock:us-east-1:644160558196:model-invocation-job/ij5q3s8iyru7",
+                "jobName": "c7n-batch-invocation-new-raccoon",
+                "modelId": "arn:aws:bedrock:us-east-1::foundation-model/amazon.nova-micro-v1:0",
+                "roleArn": "arn:aws:iam::644160558196:role/c7n-bedrock-batch-new-raccoon",
+                "status": "Stopped",
+                "submitTime": {
+                    "__class__": "datetime",
+                    "year": 2026,
+                    "month": 3,
+                    "day": 3,
+                    "hour": 22,
+                    "minute": 6,
+                    "second": 31,
+                    "microsecond": 263000
+                },
+                "lastModifiedTime": {
+                    "__class__": "datetime",
+                    "year": 2026,
+                    "month": 3,
+                    "day": 3,
+                    "hour": 22,
+                    "minute": 6,
+                    "second": 52,
+                    "microsecond": 663000
+                },
+                "inputDataConfig": {
+                    "s3InputDataConfig": {
+                        "s3Uri": "s3://c7n-bedrock-input-new-raccoon/input.jsonl",
+                        "s3BucketOwner": "644160558196"
+                    }
+                },
+                "outputDataConfig": {
+                    "s3OutputDataConfig": {
+                        "s3Uri": "s3://c7n-bedrock-output-new-raccoon/",
+                        "s3BucketOwner": "644160558196"
+                    }
+                },
+                "timeoutDurationInHours": 24,
+                "jobExpirationTime": {
+                    "__class__": "datetime",
+                    "year": 2026,
+                    "month": 3,
+                    "day": 4,
+                    "hour": 22,
+                    "minute": 6,
+                    "second": 31,
+                    "microsecond": 263000
+                },
+                "modelInvocationType": "InvokeModel"
+            },
+            {
+                "jobArn": "arn:aws:bedrock:us-east-1:644160558196:model-invocation-job/j8s6cwoy6fi4",
+                "jobName": "c7n-batch-invocation-optimum-mite",
+                "modelId": "arn:aws:bedrock:us-east-1::foundation-model/amazon.nova-micro-v1:0",
+                "roleArn": "arn:aws:iam::644160558196:role/c7n-bedrock-batch-optimum-mite",
+                "status": "Stopped",
+                "submitTime": {
+                    "__class__": "datetime",
+                    "year": 2026,
+                    "month": 3,
+                    "day": 3,
+                    "hour": 22,
+                    "minute": 5,
+                    "second": 55,
+                    "microsecond": 704000
+                },
+                "lastModifiedTime": {
+                    "__class__": "datetime",
+                    "year": 2026,
+                    "month": 3,
+                    "day": 3,
+                    "hour": 22,
+                    "minute": 6,
+                    "second": 52,
+                    "microsecond": 346000
+                },
+                "inputDataConfig": {
+                    "s3InputDataConfig": {
+                        "s3Uri": "s3://c7n-bedrock-input-optimum-mite/input.jsonl",
+                        "s3BucketOwner": "644160558196"
+                    }
+                },
+                "outputDataConfig": {
+                    "s3OutputDataConfig": {
+                        "s3Uri": "s3://c7n-bedrock-output-optimum-mite/",
+                        "s3BucketOwner": "644160558196"
+                    }
+                },
+                "timeoutDurationInHours": 24,
+                "jobExpirationTime": {
+                    "__class__": "datetime",
+                    "year": 2026,
+                    "month": 3,
+                    "day": 4,
+                    "hour": 22,
+                    "minute": 5,
+                    "second": 55,
+                    "microsecond": 704000
+                },
+                "modelInvocationType": "InvokeModel"
+            },
+            {
+                "jobArn": "arn:aws:bedrock:us-east-1:644160558196:model-invocation-job/7w6f11rp8akg",
+                "jobName": "c7n-batch-invocation-handy-weasel",
+                "modelId": "arn:aws:bedrock:us-east-1::foundation-model/amazon.titan-embed-text-v2:0",
+                "roleArn": "arn:aws:iam::644160558196:role/c7n-bedrock-batch-handy-weasel",
+                "status": "Failed",
+                "submitTime": {
+                    "__class__": "datetime",
+                    "year": 2026,
+                    "month": 3,
+                    "day": 3,
+                    "hour": 22,
+                    "minute": 3,
+                    "second": 28,
+                    "microsecond": 450000
+                },
+                "lastModifiedTime": {
+                    "__class__": "datetime",
+                    "year": 2026,
+                    "month": 3,
+                    "day": 3,
+                    "hour": 22,
+                    "minute": 4,
+                    "second": 58,
+                    "microsecond": 465000
+                },
+                "endTime": {
+                    "__class__": "datetime",
+                    "year": 2026,
+                    "month": 3,
+                    "day": 3,
+                    "hour": 22,
+                    "minute": 4,
+                    "second": 58,
+                    "microsecond": 431000
+                },
+                "inputDataConfig": {
+                    "s3InputDataConfig": {
+                        "s3Uri": "s3://c7n-bedrock-input-handy-weasel/input.jsonl",
+                        "s3BucketOwner": "644160558196"
+                    }
+                },
+                "outputDataConfig": {
+                    "s3OutputDataConfig": {
+                        "s3Uri": "s3://c7n-bedrock-output-handy-weasel/",
+                        "s3BucketOwner": "644160558196"
+                    }
+                },
+                "timeoutDurationInHours": 24,
+                "jobExpirationTime": {
+                    "__class__": "datetime",
+                    "year": 2026,
+                    "month": 3,
+                    "day": 4,
+                    "hour": 22,
+                    "minute": 3,
+                    "second": 28,
+                    "microsecond": 450000
+                },
+                "modelInvocationType": "InvokeModel"
+            },
+            {
+                "jobArn": "arn:aws:bedrock:us-east-1:644160558196:model-invocation-job/uv8isv2atywu",
+                "jobName": "c7n-batch-invocation-driven-jackal",
+                "modelId": "arn:aws:bedrock:us-east-1::foundation-model/amazon.nova-micro-v1:0",
+                "roleArn": "arn:aws:iam::644160558196:role/c7n-bedrock-batch-driven-jackal",
+                "status": "Stopped",
+                "submitTime": {
+                    "__class__": "datetime",
+                    "year": 2026,
+                    "month": 3,
+                    "day": 3,
+                    "hour": 22,
+                    "minute": 2,
+                    "second": 13,
+                    "microsecond": 488000
+                },
+                "lastModifiedTime": {
+                    "__class__": "datetime",
+                    "year": 2026,
+                    "month": 3,
+                    "day": 3,
+                    "hour": 22,
+                    "minute": 2,
+                    "second": 52,
+                    "microsecond": 319000
+                },
+                "inputDataConfig": {
+                    "s3InputDataConfig": {
+                        "s3Uri": "s3://c7n-bedrock-input-driven-jackal/input.jsonl",
+                        "s3BucketOwner": "644160558196"
+                    }
+                },
+                "outputDataConfig": {
+                    "s3OutputDataConfig": {
+                        "s3Uri": "s3://c7n-bedrock-output-driven-jackal/",
+                        "s3BucketOwner": "644160558196"
+                    }
+                },
+                "timeoutDurationInHours": 24,
+                "jobExpirationTime": {
+                    "__class__": "datetime",
+                    "year": 2026,
+                    "month": 3,
+                    "day": 4,
+                    "hour": 22,
+                    "minute": 2,
+                    "second": 13,
+                    "microsecond": 488000
+                },
+                "modelInvocationType": "InvokeModel"
+            },
+            {
+                "jobArn": "arn:aws:bedrock:us-east-1:644160558196:model-invocation-job/bwrbi68u2bex",
+                "jobName": "c7n-batch-invocation-lasting-kangaroo",
+                "modelId": "arn:aws:bedrock:us-east-1::foundation-model/amazon.nova-micro-v1:0",
+                "roleArn": "arn:aws:iam::644160558196:role/c7n-bedrock-batch-lasting-kangaroo",
+                "status": "Stopped",
+                "submitTime": {
+                    "__class__": "datetime",
+                    "year": 2026,
+                    "month": 3,
+                    "day": 3,
+                    "hour": 22,
+                    "minute": 0,
+                    "second": 49,
+                    "microsecond": 372000
+                },
+                "lastModifiedTime": {
+                    "__class__": "datetime",
+                    "year": 2026,
+                    "month": 3,
+                    "day": 3,
+                    "hour": 22,
+                    "minute": 1,
+                    "second": 52,
+                    "microsecond": 262000
+                },
+                "inputDataConfig": {
+                    "s3InputDataConfig": {
+                        "s3Uri": "s3://c7n-bedrock-input-lasting-kangaroo/input.jsonl",
+                        "s3BucketOwner": "644160558196"
+                    }
+                },
+                "outputDataConfig": {
+                    "s3OutputDataConfig": {
+                        "s3Uri": "s3://c7n-bedrock-output-lasting-kangaroo/",
+                        "s3BucketOwner": "644160558196"
+                    }
+                },
+                "timeoutDurationInHours": 24,
+                "jobExpirationTime": {
+                    "__class__": "datetime",
+                    "year": 2026,
+                    "month": 3,
+                    "day": 4,
+                    "hour": 22,
+                    "minute": 0,
+                    "second": 49,
+                    "microsecond": 372000
+                },
+                "modelInvocationType": "InvokeModel"
+            },
+            {
+                "jobArn": "arn:aws:bedrock:us-east-1:644160558196:model-invocation-job/dae0t2ovqqio",
+                "jobName": "c7n-batch-invocation-vital-mastiff",
+                "modelId": "arn:aws:bedrock:us-east-1::foundation-model/amazon.nova-micro-v1:0",
+                "roleArn": "arn:aws:iam::644160558196:role/c7n-bedrock-batch-vital-mastiff",
+                "status": "Stopped",
+                "submitTime": {
+                    "__class__": "datetime",
+                    "year": 2026,
+                    "month": 3,
+                    "day": 3,
+                    "hour": 21,
+                    "minute": 55,
+                    "second": 3,
+                    "microsecond": 569000
+                },
+                "lastModifiedTime": {
+                    "__class__": "datetime",
+                    "year": 2026,
+                    "month": 3,
+                    "day": 3,
+                    "hour": 21,
+                    "minute": 55,
+                    "second": 52,
+                    "microsecond": 181000
+                },
+                "inputDataConfig": {
+                    "s3InputDataConfig": {
+                        "s3Uri": "s3://c7n-bedrock-input-vital-mastiff/input.jsonl",
+                        "s3BucketOwner": "644160558196"
+                    }
+                },
+                "outputDataConfig": {
+                    "s3OutputDataConfig": {
+                        "s3Uri": "s3://c7n-bedrock-output-vital-mastiff/",
+                        "s3BucketOwner": "644160558196"
+                    }
+                },
+                "timeoutDurationInHours": 24,
+                "jobExpirationTime": {
+                    "__class__": "datetime",
+                    "year": 2026,
+                    "month": 3,
+                    "day": 4,
+                    "hour": 21,
+                    "minute": 55,
+                    "second": 3,
+                    "microsecond": 569000
+                },
+                "modelInvocationType": "InvokeModel"
+            },
+            {
+                "jobArn": "arn:aws:bedrock:us-east-1:644160558196:model-invocation-job/te1jr3zv0wv8",
+                "jobName": "c7n-batch-invocation-unified-toad",
+                "modelId": "arn:aws:bedrock:us-east-1::foundation-model/amazon.nova-micro-v1:0",
+                "roleArn": "arn:aws:iam::644160558196:role/c7n-bedrock-batch-unified-toad",
+                "status": "Stopped",
+                "submitTime": {
+                    "__class__": "datetime",
+                    "year": 2026,
+                    "month": 3,
+                    "day": 3,
+                    "hour": 21,
+                    "minute": 53,
+                    "second": 55,
+                    "microsecond": 156000
+                },
+                "lastModifiedTime": {
+                    "__class__": "datetime",
+                    "year": 2026,
+                    "month": 3,
+                    "day": 3,
+                    "hour": 21,
+                    "minute": 54,
+                    "second": 52,
+                    "microsecond": 303000
+                },
+                "inputDataConfig": {
+                    "s3InputDataConfig": {
+                        "s3Uri": "s3://c7n-bedrock-input-unified-toad/input.jsonl",
+                        "s3BucketOwner": "644160558196"
+                    }
+                },
+                "outputDataConfig": {
+                    "s3OutputDataConfig": {
+                        "s3Uri": "s3://c7n-bedrock-output-unified-toad/",
+                        "s3BucketOwner": "644160558196"
+                    }
+                },
+                "timeoutDurationInHours": 24,
+                "jobExpirationTime": {
+                    "__class__": "datetime",
+                    "year": 2026,
+                    "month": 3,
+                    "day": 4,
+                    "hour": 21,
+                    "minute": 53,
+                    "second": 55,
+                    "microsecond": 156000
+                },
+                "modelInvocationType": "InvokeModel"
+            },
+            {
+                "jobArn": "arn:aws:bedrock:us-east-1:644160558196:model-invocation-job/5mo84ucf08p0",
+                "jobName": "c7n-batch-invocation-novel-opossum",
+                "modelId": "arn:aws:bedrock:us-east-1::foundation-model/amazon.nova-micro-v1:0",
+                "roleArn": "arn:aws:iam::644160558196:role/c7n-bedrock-batch-novel-opossum",
+                "status": "Stopped",
+                "submitTime": {
+                    "__class__": "datetime",
+                    "year": 2026,
+                    "month": 3,
+                    "day": 3,
+                    "hour": 21,
+                    "minute": 49,
+                    "second": 56,
+                    "microsecond": 431000
+                },
+                "lastModifiedTime": {
+                    "__class__": "datetime",
+                    "year": 2026,
+                    "month": 3,
+                    "day": 3,
+                    "hour": 21,
+                    "minute": 50,
+                    "second": 52,
+                    "microsecond": 252000
+                },
+                "inputDataConfig": {
+                    "s3InputDataConfig": {
+                        "s3Uri": "s3://c7n-bedrock-input-novel-opossum/input.jsonl",
+                        "s3BucketOwner": "644160558196"
+                    }
+                },
+                "outputDataConfig": {
+                    "s3OutputDataConfig": {
+                        "s3Uri": "s3://c7n-bedrock-output-novel-opossum/",
+                        "s3BucketOwner": "644160558196"
+                    }
+                },
+                "timeoutDurationInHours": 24,
+                "jobExpirationTime": {
+                    "__class__": "datetime",
+                    "year": 2026,
+                    "month": 3,
+                    "day": 4,
+                    "hour": 21,
+                    "minute": 49,
+                    "second": 56,
+                    "microsecond": 431000
+                },
+                "modelInvocationType": "InvokeModel"
+            }
+        ]
+    }
+}

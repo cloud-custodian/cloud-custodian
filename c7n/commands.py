@@ -1,6 +1,7 @@
 # Copyright The Cloud Custodian Authors.
 # SPDX-License-Identifier: Apache-2.0
 from collections import Counter, defaultdict
+from collections.abc import Mapping
 from datetime import timedelta, datetime
 from functools import wraps
 import json
@@ -50,7 +51,7 @@ def policy_command(f):
         options.region = ""
         for fp in options.configs:
             try:
-                collection = policy_load(options, fp, validate=validate, vars=vars)
+                collection = policy_load(options, fp, validate=validate)
             except IOError:
                 log.error('policy file does not exist ({})'.format(fp))
                 errors += 1
@@ -123,7 +124,7 @@ def policy_command(f):
 
         # Variable expansion and non schema validation (not optional)
         for p in policies:
-            p.expand_variables(p.get_variables())
+            p.expand_variables(p.get_variables(variables=dict(vars or {})))
             p.validate()
 
         return f(options, list(policies))
@@ -133,11 +134,13 @@ def policy_command(f):
 
 def _load_vars(options):
     vars = None
-    if options.vars:
+    if options.vars_file:
         try:
-            vars = load_file(options.vars)
-        except IOError as e:
-            log.error('Problem loading vars file "{}": {}'.format(options.vars, e.strerror))
+            vars = load_file(options.vars_file)
+            if not isinstance(vars, Mapping):
+                raise ValueError("Invalid vars file type")
+        except (IOError, yaml.YAMLError, ValueError) as e:
+            log.error('Problem loading vars file "{}": {}'.format(options.vars_file, e))
             sys.exit(1)
 
     # TODO - provide builtin vars here (such as account)

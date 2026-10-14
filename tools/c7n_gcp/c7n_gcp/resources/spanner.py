@@ -24,6 +24,7 @@ class SpannerInstance(QueryResourceManager):
             "name", "displayName", "nodeCount", "state", "config"]
         labels = True
         labels_op = 'patch'
+        labels_perm = 'update'
         asset_type = "spanner.googleapis.com/Instance"
         metric_key = "resource.labels.instance_id"
         urn_component = "instance"
@@ -45,7 +46,7 @@ class SpannerInstance(QueryResourceManager):
                         'field_mask': ', '.join(['labels'])}}
 
         @staticmethod
-        def get_metric_resource_name(resource):
+        def get_metric_resource_name(resource, metric_key=None):
             # Extract instance name from the full resource name
             return resource["name"].split("/")[-1]
 

@@ -1,0 +1,65 @@
+{
+  "$schema": "https://schema.management.azure.com/schemas/2018-05-01/subscriptionDeploymentTemplate.json#",
+  "contentVersion": "1.0.0.0",
+  "parameters": {
+    "budgetStartDate": {
+      "type": "string",
+      "defaultValue": "[utcNow('yyyy-MM-01T00:00:00Z')]"
+    }
+  },
+  "variables": {
+    "budgetEndDate": "[dateTimeAdd(parameters('budgetStartDate'), 'P10Y')]"
+  },
+  "resources": [
+    {
+      "type": "Microsoft.Consumption/budgets",
+      "apiVersion": "2023-05-01",
+      "name": "budget_1000",
+      "properties": {
+        "category": "Cost",
+        "amount": 1000,
+        "timeGrain": "Monthly",
+        "timePeriod": {
+          "startDate": "[parameters('budgetStartDate')]",
+          "endDate": "[variables('budgetEndDate')]"
+        },
+        "notifications": {
+          "actual_gte_90": {
+            "enabled": false,
+            "operator": "EqualTo",
+            "threshold": 90,
+            "contactEmails": [
+              "test@example.com"
+            ],
+            "thresholdType": "Actual"
+          }
+        }
+      }
+    },
+    {
+      "type": "Microsoft.Consumption/budgets",
+      "apiVersion": "2023-05-01",
+      "name": "budget_1001",
+      "properties": {
+        "category": "Cost",
+        "amount": 1001,
+        "timeGrain": "Monthly",
+        "timePeriod": {
+          "startDate": "[parameters('budgetStartDate')]",
+          "endDate": "[variables('budgetEndDate')]"
+        },
+        "notifications": {
+          "actual_gte_90": {
+            "enabled": false,
+            "operator": "EqualTo",
+            "threshold": 90,
+            "contactEmails": [
+              "test@example.com"
+            ],
+            "thresholdType": "Actual"
+          }
+        }
+      }
+    }
+  ]
+}

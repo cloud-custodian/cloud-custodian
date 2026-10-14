@@ -2,7 +2,7 @@
 # SPDX-License-Identifier: Apache-2.0
 from azure.mgmt.monitor.models import EventData
 from c7n_azure.actions.tagging import AutoTagBase, AutoTagDate
-from mock import patch, Mock
+from unittest.mock import patch, Mock
 
 from c7n.exceptions import PolicyValidationError
 from c7n.filters import FilterValidationError

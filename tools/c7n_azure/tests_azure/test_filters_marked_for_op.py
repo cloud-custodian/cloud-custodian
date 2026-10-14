@@ -2,7 +2,7 @@
 # SPDX-License-Identifier: Apache-2.0
 import datetime
 
-from mock import Mock
+from unittest.mock import Mock
 
 from . import tools_tags as tools
 from .azure_common import BaseTest

@@ -1,0 +1,29 @@
+{
+    "status_code": 200,
+    "data": {
+        "Label": "ResourceCount",
+        "Datapoints": [
+            {
+                "Timestamp": {
+                    "__class__": "datetime",
+                    "year": 2026,
+                    "month": 4,
+                    "day": 7,
+                    "hour": 12,
+                    "minute": 0,
+                    "second": 0,
+                    "microsecond": 0
+                },
+                "Maximum": 3500.0,
+                "Sum": 12000.0,
+                "Unit": "None"
+            }
+        ],
+        "ResponseMetadata": {
+            "RequestId": "d4e5f6a7-b8c9-0123-defa-234567890123",
+            "HTTPStatusCode": 200,
+            "HTTPHeaders": {},
+            "RetryAttempts": 0
+        }
+    }
+}

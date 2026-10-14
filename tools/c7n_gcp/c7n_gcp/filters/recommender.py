@@ -107,7 +107,7 @@ class RecommenderFilter(Filter):
         results = []
         rec_query = jmespath.compile('content.operationGroups[].operations[].resource')
         for r in recommends:
-            rids = set(rec_query.search(r))
+            rids = set(rec_query.search(r) or [])
             for rid in list(rids):
                 # some resource operations are about creating new resources, ie snapshot disk
                 # before delete, remove those to focus on extant resources.
@@ -136,6 +136,9 @@ class RecommenderFilter(Filter):
         rtype = "gcp.%s" % resource_class.type
         for rec in data.values():
             if rec.get("resource") == rtype:
+                existing = resource_class.filter_registry.get("recommend")
+                if existing and existing is not klass:
+                    continue
                 resource_class.filter_registry.register("recommend", klass)
 
 

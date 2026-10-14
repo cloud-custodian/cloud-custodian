@@ -4,7 +4,7 @@ import datetime
 from collections import namedtuple
 
 from ..azure_common import BaseTest, arm_template, cassette_name
-from mock import patch
+from unittest.mock import patch
 
 from c7n.exceptions import PolicyValidationError
 

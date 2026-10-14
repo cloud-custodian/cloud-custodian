@@ -1,0 +1,25 @@
+{
+    "status_code": 200,
+    "data": {
+        "DBInstances": [
+            {
+                "DBInstanceIdentifier": "mydb",
+                "DBInstanceClass": "db.t3.micro",
+                "Engine": "mysql",
+                "DBInstanceStatus": "available",
+                "MasterUsername": "admin",
+                "DBParameterGroups": [
+                    {
+                        "DBParameterGroupName": "custom-pg-used",
+                        "ParameterApplyStatus": "in-sync"
+                    }
+                ],
+                "DBSubnetGroup": {
+                    "DBSubnetGroupName": "default"
+                },
+                "DBInstanceArn": "arn:aws:rds:us-east-1:644160558196:db:mydb"
+            }
+        ],
+        "ResponseMetadata": {}
+    }
+}

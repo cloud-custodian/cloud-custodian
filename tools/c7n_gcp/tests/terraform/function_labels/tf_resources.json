@@ -1,0 +1,242 @@
+{
+    "pytest-terraform": 1,
+    "outputs": {},
+    "resources": {
+        "archive_file": {
+            "function_source": {
+                "exclude_symlink_directories": null,
+                "excludes": null,
+                "id": "f5ce625cc3d72b3da8007077ceababe615db2432",
+                "output_base64sha256": "2itHvWqYrayHp9KsLcrMckGzjbAi8H6m6LPPyuZa8m8=",
+                "output_base64sha512": "BXRPI2NvOGgjE9dlcKS7nFsmAZQ5C46+tD3Vl1pgIjci6mctLH8X6fKyLk8K2m+Gzp1r8jucMmg2mdUxaWlcew==",
+                "output_file_mode": null,
+                "output_md5": "3d0e868c8d5bface0f0bab8a737a0ce7",
+                "output_path": "./.terraform/function.zip",
+                "output_sha": "f5ce625cc3d72b3da8007077ceababe615db2432",
+                "output_sha256": "da2b47bd6a98adac87a7d2ac2dcacc7241b38db022f07ea6e8b3cfcae65af26f",
+                "output_sha512": "05744f23636f38682313d76570a4bb9c5b260194390b8ebeb43dd5975a60223722ea672d2c7f17e9f2b22e4f0ada6f86ce9d6bf23b9c32683699d53169695c7b",
+                "output_size": 175,
+                "source": [],
+                "source_content": null,
+                "source_content_filename": null,
+                "source_dir": "./source",
+                "source_file": null,
+                "type": "zip"
+            }
+        },
+        "google_project": {
+            "current": {
+                "auto_create_network": null,
+                "billing_account": "0189B3-1C2257-05D123",
+                "deletion_policy": "PREVENT",
+                "effective_labels": {
+                    "generative-language": "enabled"
+                },
+                "folder_id": "",
+                "id": "projects/stacklet-test-policies",
+                "labels": {
+                    "generative-language": "enabled"
+                },
+                "name": "stacklet-test-policies",
+                "number": "859150599087",
+                "org_id": "728386023487",
+                "project_id": "stacklet-test-policies",
+                "tags": null,
+                "terraform_labels": {
+                    "generative-language": "enabled"
+                }
+            }
+        },
+        "google_cloudfunctions_function": {
+            "default": {
+                "automatic_update_policy": [
+                    {}
+                ],
+                "available_memory_mb": 128,
+                "build_environment_variables": null,
+                "build_service_account": "projects/cloud-custodian/serviceAccounts/859150599087-compute@developer.gserviceaccount.com",
+                "build_worker_pool": "",
+                "description": "",
+                "docker_registry": "ARTIFACT_REGISTRY",
+                "docker_repository": "",
+                "effective_labels": {
+                    "env": "default",
+                    "goog-terraform-provisioned": "true"
+                },
+                "entry_point": "hello_http",
+                "environment_variables": null,
+                "event_trigger": [],
+                "https_trigger_security_level": "SECURE_OPTIONAL",
+                "https_trigger_url": "https://us-central1-stacklet-test-policies.cloudfunctions.net/c7n-function-default-bd9c",
+                "id": "projects/cloud-custodian/locations/us-central1/functions/c7n-function-default-bd9c",
+                "ingress_settings": "ALLOW_ALL",
+                "kms_key_name": "",
+                "labels": {
+                    "env": "default"
+                },
+                "max_instances": 0,
+                "min_instances": 0,
+                "name": "c7n-function-default-bd9c",
+                "on_deploy_update_policy": [],
+                "project": "stacklet-test-policies",
+                "region": "us-central1",
+                "runtime": "python310",
+                "secret_environment_variables": [],
+                "secret_volumes": [],
+                "service_account_email": "stacklet-test-policies@appspot.gserviceaccount.com",
+                "source_archive_bucket": "c7n-function-default-bd9c",
+                "source_archive_object": "function-3d0e868c8d5bface0f0bab8a737a0ce7.zip",
+                "source_repository": [],
+                "status": "ACTIVE",
+                "terraform_labels": {
+                    "env": "default",
+                    "goog-terraform-provisioned": "true"
+                },
+                "timeout": 60,
+                "timeouts": null,
+                "trigger_http": true,
+                "version_id": "1",
+                "vpc_connector": "",
+                "vpc_connector_egress_settings": ""
+            }
+        },
+        "google_project_iam_member": {
+            "cloudfunctions_artifactregistry_reader": {
+                "condition": [],
+                "etag": "BwZQhx+HmO0=",
+                "id": "stacklet-test-policies/roles/artifactregistry.reader/serviceAccount:service-859150599087@gcf-admin-robot.iam.gserviceaccount.com",
+                "member": "serviceAccount:service-859150599087@gcf-admin-robot.iam.gserviceaccount.com",
+                "project": "stacklet-test-policies",
+                "role": "roles/artifactregistry.reader"
+            },
+            "compute_artifactregistry_writer": {
+                "condition": [],
+                "etag": "BwZQhx+HmO0=",
+                "id": "stacklet-test-policies/roles/artifactregistry.writer/serviceAccount:859150599087-compute@developer.gserviceaccount.com",
+                "member": "serviceAccount:859150599087-compute@developer.gserviceaccount.com",
+                "project": "stacklet-test-policies",
+                "role": "roles/artifactregistry.writer"
+            },
+            "compute_logs_writer": {
+                "condition": [],
+                "etag": "BwZQhx+HmO0=",
+                "id": "stacklet-test-policies/roles/logging.logWriter/serviceAccount:859150599087-compute@developer.gserviceaccount.com",
+                "member": "serviceAccount:859150599087-compute@developer.gserviceaccount.com",
+                "project": "stacklet-test-policies",
+                "role": "roles/logging.logWriter"
+            },
+            "compute_storage_object_viewer": {
+                "condition": [],
+                "etag": "BwZQhx+HmO0=",
+                "id": "stacklet-test-policies/roles/storage.objectViewer/serviceAccount:859150599087-compute@developer.gserviceaccount.com",
+                "member": "serviceAccount:859150599087-compute@developer.gserviceaccount.com",
+                "project": "stacklet-test-policies",
+                "role": "roles/storage.objectViewer"
+            }
+        },
+        "google_storage_bucket": {
+            "source": {
+                "autoclass": [],
+                "cors": [],
+                "custom_placement_config": [],
+                "default_event_based_hold": false,
+                "effective_labels": {
+                    "goog-terraform-provisioned": "true"
+                },
+                "enable_object_retention": false,
+                "encryption": [],
+                "force_destroy": true,
+                "hierarchical_namespace": [
+                    {
+                        "enabled": false
+                    }
+                ],
+                "id": "c7n-function-default-bd9c",
+                "ip_filter": [],
+                "labels": null,
+                "lifecycle_rule": [],
+                "location": "US",
+                "logging": [],
+                "name": "c7n-function-default-bd9c",
+                "project": "stacklet-test-policies",
+                "project_number": 859150599087,
+                "public_access_prevention": "inherited",
+                "requester_pays": false,
+                "retention_policy": [],
+                "rpo": "DEFAULT",
+                "self_link": "https://www.googleapis.com/storage/v1/b/c7n-function-default-bd9c",
+                "soft_delete_policy": [
+                    {
+                        "effective_time": "2026-04-28T15:45:37.203Z",
+                        "retention_duration_seconds": 604800
+                    }
+                ],
+                "storage_class": "STANDARD",
+                "terraform_labels": {
+                    "goog-terraform-provisioned": "true"
+                },
+                "time_created": "2026-04-28T15:45:37.203Z",
+                "timeouts": null,
+                "uniform_bucket_level_access": true,
+                "updated": "2026-04-28T15:45:37.203Z",
+                "url": "gs://c7n-function-default-bd9c",
+                "versioning": [],
+                "website": []
+            }
+        },
+        "google_storage_bucket_object": {
+            "source": {
+                "bucket": "c7n-function-default-bd9c",
+                "cache_control": "",
+                "content": null,
+                "content_disposition": "",
+                "content_encoding": "",
+                "content_language": "",
+                "content_type": "application/zip",
+                "contexts": [],
+                "crc32c": "yhEdsw==",
+                "customer_encryption": [],
+                "deletion_policy": null,
+                "detect_md5hash": "PQ6GjI1b+s4PC6uKc3oM5w==",
+                "event_based_hold": false,
+                "force_empty_content_type": null,
+                "generation": 1777391137995246,
+                "id": "c7n-function-default-bd9c-function-3d0e868c8d5bface0f0bab8a737a0ce7.zip",
+                "kms_key_name": "",
+                "md5hash": "PQ6GjI1b+s4PC6uKc3oM5w==",
+                "md5hexhash": "3d0e868c8d5bface0f0bab8a737a0ce7",
+                "media_link": "https://storage.googleapis.com/download/storage/v1/b/c7n-function-default-bd9c/o/function-3d0e868c8d5bface0f0bab8a737a0ce7.zip?generation=1777391137995246&alt=media",
+                "metadata": null,
+                "name": "function-3d0e868c8d5bface0f0bab8a737a0ce7.zip",
+                "output_name": "function-3d0e868c8d5bface0f0bab8a737a0ce7.zip",
+                "retention": [],
+                "self_link": "https://www.googleapis.com/storage/v1/b/c7n-function-default-bd9c/o/function-3d0e868c8d5bface0f0bab8a737a0ce7.zip",
+                "source": "./.terraform/function.zip",
+                "source_md5hash": "",
+                "storage_class": "STANDARD",
+                "temporary_hold": false,
+                "timeouts": null
+            }
+        },
+        "random_id": {
+            "suffix": {
+                "b64_std": "vZw=",
+                "b64_url": "vZw",
+                "byte_length": 2,
+                "dec": "48540",
+                "hex": "bd9c",
+                "id": "vZw",
+                "keepers": null,
+                "prefix": null
+            }
+        },
+        "time_sleep": {
+            "iam_propagation": {
+                "create_duration": "90s",
+                "destroy_duration": null,
+                "id": "2026-04-28T15:47:14Z",
+                "triggers": null
+            }
+        }
+    }
+}

@@ -58,7 +58,7 @@ class SpannerInstanceTest(BaseTest):
         )
 
     def test_spanner_instance_delete(self):
-        project_id = 'cloud-custodian'
+        project_id = self.project_id
         deleting_instance_name = 'spanner-instance-0'
         non_deleting_instance_name = 'spanner-instance-1'
         session_factory = self.replay_flight_data('spanner-instance-delete',
@@ -87,7 +87,7 @@ class SpannerInstanceTest(BaseTest):
         self.assertEqual(instances[0]['displayName'], non_deleting_instance_name)
 
     def test_spanner_instance_patch_node_count(self):
-        project_id = 'cloud-custodian'
+        project_id = self.project_id
         patching_instance_name = 'spanner-instance-0'
         non_patching_instance_name = 'spanner-instance-1'
 
@@ -131,7 +131,7 @@ class SpannerInstanceTest(BaseTest):
         - there are existing members in addition to the ones specified in the policy;
         - a new role is added.
         """
-        project_id = 'cloud-custodian'
+        project_id = self.project_id
         resource_name = 'spanner-instance-0'
         resource_full_name = 'projects/%s/instances/%s' % (project_id, resource_name)
         session_factory = self.replay_flight_data(
@@ -182,7 +182,7 @@ class SpannerInstanceTest(BaseTest):
         - a part of the existing members is filtered out by the policy;
         - a role is removed completely.
         """
-        project_id = 'cloud-custodian'
+        project_id = self.project_id
         resource_name = 'spanner-instance-0'
         resource_full_name = 'projects/%s/instances/%s' % (project_id, resource_name)
         session_factory = self.replay_flight_data('spanner-instance-set-iam-policy-remove',
@@ -226,7 +226,7 @@ class SpannerInstanceTest(BaseTest):
                            'role': 'roles/viewer'}])
 
     def test_spanner_instance_filter_iam_query(self):
-        project_id = 'gcp-lab-custodian'
+        project_id = self.project_id
         factory = self.replay_flight_data('spanner-instance-filter-iam', project_id=project_id)
         p = self.load_policy({
             'name': 'spanner-instance-filter-iam',
@@ -328,7 +328,7 @@ class SpannerDatabaseInstanceTest(BaseTest):
         Among the two possible cases of getting no IAM policies in a resource, the one tested there
         involves filtering everything out with mentioning all the members in a policy.
         """
-        project_id = 'cloud-custodian'
+        project_id = self.project_id
         instance_name = 'spanner-instance-0'
         resource_name = 'custodian-database-0'
         resource_full_name = 'projects/%s/instances/%s/databases/%s' % (
@@ -381,11 +381,47 @@ class SpannerDatabaseInstanceTest(BaseTest):
 
         self.assertEqual(test_method(existing_bindings, bindings_to_remove), expected_bindings)
 
+    def test_set_iam_policy_remove_bindings_preserves_condition(self):
+        """
+        Tests that a binding's ``condition`` field is preserved when only some members are
+        removed and the binding survives. Previously, ``_remove_bindings`` constructed a fresh
+        ``{'role': ..., 'members': ...}`` dict, silently dropping any extra fields such as
+        ``condition``. The fix uses ``{**existing_binding, 'members': updated_members}`` so
+        that all original fields are retained.
+        """
+        policy = self.load_policy(
+            {'name': 'spanner-database-instance-set-iam-policy-condition',
+             'resource': 'gcp.spanner-database-instance',
+             'actions': [{'type': 'set-iam-policy'}]})
+        test_method = policy.resource_manager.actions[0]._remove_bindings
+
+        condition = {
+            'title': 'Expires 2025',
+            'expression': "request.time < timestamp('2025-01-01T00:00:00Z')",
+        }
+        existing_bindings = [
+            {'role': 'roles/owner',
+             'members': ['serviceAccount:sa@project.iam.gserviceaccount.com',
+                         'user:alice@example.com'],
+             'condition': condition},
+        ]
+        bindings_to_remove = [
+            {'role': 'roles/owner',
+             'members': ['serviceAccount:sa@project.iam.gserviceaccount.com']},
+        ]
+        expected_bindings = [
+            {'role': 'roles/owner',
+             'members': ['user:alice@example.com'],
+             'condition': condition},
+        ]
+
+        self.assertEqual(test_method(existing_bindings, bindings_to_remove), expected_bindings)
+
 
 class TestSpannerInstanceBackup(BaseTest):
 
     def test_query(self):
-        project_id = 'cloud-custodian'
+        project_id = self.project_id
         session_factory = self.replay_flight_data('test-spanner-instance-backup',
                                                   project_id=project_id)
         policy = self.load_policy(

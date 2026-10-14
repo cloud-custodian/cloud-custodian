@@ -1,0 +1,101 @@
+{
+    "pytest-terraform": 1,
+    "outputs": {},
+    "resources": {
+        "google_storage_bucket": {
+            "artifacts": {
+                "autoclass": [],
+                "cors": [],
+                "custom_placement_config": [],
+                "default_event_based_hold": false,
+                "deletion_policy": "DELETE",
+                "effective_labels": {
+                    "goog-terraform-provisioned": "true"
+                },
+                "enable_object_retention": false,
+                "encryption": [],
+                "force_destroy": true,
+                "hierarchical_namespace": [
+                    {
+                        "enabled": false
+                    }
+                ],
+                "id": "c7n-vertex-metrics-default-7509",
+                "ip_filter": [],
+                "labels": null,
+                "lifecycle_rule": [],
+                "location": "US",
+                "logging": [],
+                "name": "c7n-vertex-metrics-default-7509",
+                "project": "stacklet-test-policies",
+                "project_number": 859150599087,
+                "public_access_prevention": "inherited",
+                "requester_pays": false,
+                "retention_policy": [],
+                "rpo": "DEFAULT",
+                "self_link": "https://www.googleapis.com/storage/v1/b/c7n-vertex-metrics-default-7509",
+                "soft_delete_policy": [
+                    {
+                        "effective_time": "2026-07-08T21:36:12.778Z",
+                        "retention_duration_seconds": 604800
+                    }
+                ],
+                "storage_class": "STANDARD",
+                "terraform_labels": {
+                    "goog-terraform-provisioned": "true"
+                },
+                "time_created": "2026-07-08T21:36:12.778Z",
+                "timeouts": null,
+                "uniform_bucket_level_access": true,
+                "updated": "2026-07-08T21:36:12.778Z",
+                "url": "gs://c7n-vertex-metrics-default-7509",
+                "versioning": [],
+                "website": []
+            }
+        },
+        "google_vertex_ai_endpoint": {
+            "default": {
+                "create_time": "2026-07-08T21:36:11.999740Z",
+                "dedicated_endpoint_dns": "",
+                "dedicated_endpoint_enabled": false,
+                "deletion_policy": "DELETE",
+                "deployed_models": [],
+                "description": "",
+                "display_name": "c7n-endpoint-default-7509",
+                "effective_labels": {
+                    "goog-terraform-provisioned": "true"
+                },
+                "encryption_spec": [],
+                "etag": null,
+                "id": "projects/cloud-custodian/locations/us-central1/endpoints/c7n-endpoint-default-7509",
+                "labels": null,
+                "location": "us-central1",
+                "model_deployment_monitoring_job": "",
+                "name": "c7n-endpoint-default-7509",
+                "network": "",
+                "predict_request_response_logging_config": [],
+                "private_service_connect_config": [],
+                "project": "stacklet-test-policies",
+                "region": "us-central1",
+                "terraform_labels": {
+                    "goog-terraform-provisioned": "true"
+                },
+                "timeouts": null,
+                "traffic_split": "",
+                "update_time": "2026-07-08T21:36:13.486352Z"
+            }
+        },
+        "random_id": {
+            "suffix": {
+                "b64_std": "dQk=",
+                "b64_url": "dQk",
+                "byte_length": 2,
+                "dec": "29961",
+                "hex": "7509",
+                "id": "dQk",
+                "keepers": null,
+                "prefix": null
+            }
+        }
+    }
+}

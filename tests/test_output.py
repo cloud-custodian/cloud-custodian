@@ -11,7 +11,7 @@ from dateutil.parser import parse as date_parse
 
 from c7n.ctx import ExecutionContext
 from c7n.config import Config
-from c7n.output import DirectoryOutput, BlobOutput, LogFile, metrics_outputs
+from c7n.output import DirectoryOutput, BlobOutput, LogFile, Metrics, metrics_outputs
 from c7n.resources.aws import S3Output, MetricsOutput, inspect_bucket_region
 from c7n.testing import mock_datetime_now, TestUtils
 
@@ -22,6 +22,25 @@ import vcr
 
 
 class MetricsTest(BaseTest):
+    def test_metrics_abstract_methods(self):
+        conf = Bag({'region': 'us-east-2', 'scheme': 'aws', 'netloc': 'master'})
+        ctx = Bag(
+            session_factory=None,
+            options=Bag(account_id='001100', region='us-east-1'),
+            policy=Bag(name='test', resource_type='ec2'),
+        )
+        moutput = Metrics(ctx, conf)
+
+        datapoint = {'MetricName': 'Calories', 'Value': 400, 'Unit': 'Count'}
+
+        self.assertRaisesRegex(
+            NotImplementedError,
+            "subclass responsibility",
+            moutput.put_metric,
+            *datapoint.values()
+        )
+        moutput.buf = [datapoint]
+        self.assertRaisesRegex(NotImplementedError, "subclass responsibility", moutput.flush)
 
     def test_boolean_config_compatibility(self):
         self.assertTrue(
@@ -176,6 +195,50 @@ class S3OutputTest(TestUtils):
             "cloud-custodian",
             "%s/foo.txt" % output.key_prefix.lstrip('/'),
             extra_args={"ACL": "bucket-owner-full-control", "ServerSideEncryption": "AES256"},
+        )
+
+    def test_sse_args_default_aes256(self):
+        output = self.get_s3_output()
+        self.assertEqual(
+            output.get_sse_args(),
+            {"ServerSideEncryption": "AES256"})
+
+    def test_sse_args_kms_managed_key(self):
+        output = self.get_s3_output(
+            output_url="s3://cloud-custodian/policies?sse=aws:kms")
+        self.assertEqual(
+            output.get_sse_args(),
+            {"ServerSideEncryption": "aws:kms"})
+
+    def test_sse_args_kms_customer_key(self):
+        output = self.get_s3_output(
+            output_url="s3://cloud-custodian/policies?kms-key=alias/custodian-logs")
+        self.assertEqual(
+            output.get_sse_args(),
+            {"ServerSideEncryption": "aws:kms",
+             "SSEKMSKeyId": "alias/custodian-logs"})
+
+    def test_upload_sse_kms(self):
+        with mock_datetime_now(date_parse('2018/09/01 13:00'), datetime):
+            output = self.get_s3_output(
+                output_url="s3://cloud-custodian/policies?kms-key=alias/custodian-logs")
+
+        with open(os.path.join(output.root_dir, "foo.txt"), "w") as fh:
+            fh.write("abc")
+
+        output._transfer = mock.MagicMock()
+        output._transfer.upload_file = m = mock.MagicMock()
+
+        output.upload()
+
+        m.assert_called_with(
+            fh.name,
+            "cloud-custodian",
+            "%s/foo.txt" % output.key_prefix.lstrip('/'),
+            extra_args={
+                "ACL": "bucket-owner-full-control",
+                "ServerSideEncryption": "aws:kms",
+                "SSEKMSKeyId": "alias/custodian-logs"},
         )
 
 

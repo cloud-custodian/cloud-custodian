@@ -1,0 +1,31 @@
+{
+    "status_code": 200,
+    "data": {
+        "ResponseMetadata": {},
+        "modelSummaries": [
+            {
+                "modelArn": "arn:aws:bedrock:us-east-1::foundation-model/amazon.nova-2-multimodal-embeddings-v1:0",
+                "modelId": "amazon.nova-2-multimodal-embeddings-v1:0",
+                "modelName": "Amazon Nova Multimodal Embeddings",
+                "providerName": "Amazon",
+                "inputModalities": [
+                    "TEXT",
+                    "IMAGE",
+                    "AUDIO",
+                    "VIDEO"
+                ],
+                "outputModalities": [
+                    "EMBEDDING"
+                ],
+                "responseStreamingSupported": false,
+                "customizationsSupported": [],
+                "inferenceTypesSupported": [
+                    "ON_DEMAND"
+                ],
+                "modelLifecycle": {
+                    "status": "ACTIVE"
+                }
+            }
+        ]
+    }
+}

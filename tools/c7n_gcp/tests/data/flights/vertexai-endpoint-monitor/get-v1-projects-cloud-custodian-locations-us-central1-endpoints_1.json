@@ -1,0 +1,54 @@
+{
+  "headers": {
+    "content-type": "application/json; charset=UTF-8",
+    "vary": "Origin, X-Origin, Referer",
+    "date": "Thu, 12 Mar 2026 03:53:51 GMT",
+    "server": "ESF",
+    "x-xss-protection": "0",
+    "x-frame-options": "SAMEORIGIN",
+    "x-content-type-options": "nosniff",
+    "alt-svc": "h3=\":443\"; ma=2592000,h3-29=\":443\"; ma=2592000",
+    "transfer-encoding": "chunked",
+    "status": "200",
+    "content-length": "1172",
+    "-content-encoding": "gzip",
+    "content-location": "https://us-central1-aiplatform.googleapis.com/v1/projects/cloud-custodian/locations/us-central1/endpoints?alt=json"
+  },
+  "body": {
+    "endpoints": [
+      {
+        "name": "projects/cloud-custodian/locations/us-central1/endpoints/c7n-endpoint-central",
+        "displayName": "c7n-endpoint-central",
+        "deployedModels": [
+          {
+            "id": "1793004947495714816",
+            "model": "projects/cloud-custodian/locations/us-central1/models/557161024701071360",
+            "displayName": "c7n-test-deployment-us-central1",
+            "createTime": "2026-03-12T03:32:11.706537Z",
+            "dedicatedResources": {
+              "machineSpec": {
+                "machineType": "n1-standard-2"
+              },
+              "minReplicaCount": 1,
+              "maxReplicaCount": 1
+            },
+            "modelVersionId": "1",
+            "status": {
+              "lastUpdateTime": "2026-03-12T03:53:47.871350Z",
+              "availableReplicaCount": 1
+            }
+          }
+        ],
+        "trafficSplit": {
+          "1793004947495714816": 100
+        },
+        "etag": "AMEw9yOWgOM6oooGlhVPuKMnl0RQXNV8Pr71h5i3mx7-hvnk_vM1ezS5Kqv_RRDjeYY=",
+        "labels": {
+          "goog-terraform-provisioned": "true"
+        },
+        "createTime": "2026-03-12T03:30:42.036373Z",
+        "updateTime": "2026-03-12T03:51:47.191152Z"
+      }
+    ]
+  }
+}

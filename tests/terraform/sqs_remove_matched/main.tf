@@ -5,6 +5,8 @@ provider "aws" {
   region = "us-east-2"
 }
 
+data "aws_caller_identity" "current" {}
+
 resource "aws_sqs_queue" "test_sqs" {
   name = uuid()
 }
@@ -20,16 +22,18 @@ resource "aws_sqs_queue_policy" "test_sqs_policy" {
       "Sid": "SpecificAllow",
       "Effect": "Allow",
       "Principal": {
-        "AWS": "arn:aws:iam::644160558196:root"
+        "AWS": "arn:aws:iam::${data.aws_caller_identity.current.account_id}:root"
       },
+      "Resource": "${aws_sqs_queue.test_sqs.arn}",
       "Action": [
-        "sqs:Subscribe"
+        "sqs:SetQueueAttributes"
       ]
     },
     {
       "Sid": "Public",
       "Effect": "Allow",
       "Principal": "*",
+      "Resource": "${aws_sqs_queue.test_sqs.arn}",
       "Action": [
         "sqs:GetqueueAttributes"
       ]

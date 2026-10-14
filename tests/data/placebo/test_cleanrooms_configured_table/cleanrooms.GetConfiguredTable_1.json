@@ -1,0 +1,67 @@
+{
+    "status_code": 200,
+    "data": {
+        "ResponseMetadata": {},
+        "configuredTable": {
+            "id": "b7401977-f670-42ba-873b-eed937073127",
+            "arn": "arn:aws:cleanrooms:us-east-1:644160558196:configuredtable/b7401977-f670-42ba-873b-eed937073127",
+            "name": "Compliant Table",
+            "tableReference": {
+                "glue": {
+                    "region": "us-east-1",
+                    "tableName": "elb_logs",
+                    "databaseName": "sampledb"
+                }
+            },
+            "createTime": {
+                "__class__": "datetime",
+                "year": 2026,
+                "month": 6,
+                "day": 10,
+                "hour": 21,
+                "minute": 34,
+                "second": 1,
+                "microsecond": 87000
+            },
+            "updateTime": {
+                "__class__": "datetime",
+                "year": 2026,
+                "month": 6,
+                "day": 10,
+                "hour": 21,
+                "minute": 34,
+                "second": 1,
+                "microsecond": 87000
+            },
+            "analysisRuleTypes": [
+                "CUSTOM"
+            ],
+            "analysisMethod": "MULTIPLE",
+            "allowedColumns": [
+                "request_timestamp",
+                "elb_name",
+                "request_ip",
+                "request_port",
+                "backend_ip",
+                "backend_port",
+                "request_processing_time",
+                "backend_processing_time",
+                "client_response_time",
+                "elb_response_code",
+                "backend_response_code",
+                "received_bytes",
+                "sent_bytes",
+                "request_verb",
+                "url",
+                "protocol",
+                "user_agent",
+                "ssl_cipher",
+                "ssl_protocol"
+            ],
+            "selectedAnalysisMethods": [
+                "DIRECT_JOB",
+                "DIRECT_QUERY"
+            ]
+        }
+    }
+}

@@ -1,0 +1,95 @@
+{
+  "headers": {
+    "content-type": "application/json; charset=UTF-8",
+    "vary": "Origin, X-Origin, Referer",
+    "date": "Mon, 01 Jan 2024 00:00:00 GMT",
+    "server": "ESF",
+    "x-xss-protection": "0",
+    "x-frame-options": "SAMEORIGIN",
+    "x-content-type-options": "nosniff",
+    "transfer-encoding": "chunked",
+    "status": "200",
+    "content-length": "3629",
+    "-content-encoding": "gzip",
+    "content-location": "https://networkconnectivity.googleapis.com/v1/projects/cloud-custodian/locations/-/spokes?alt=json"
+  },
+  "body": {
+    "spokes": [
+      {
+        "name": "projects/cloud-custodian/locations/global/spokes/custodian-center-spoke",
+        "createTime": "2024-01-01T00:00:00.000000000Z",
+        "updateTime": "2024-01-01T00:01:00.000000000Z",
+        "labels": {},
+        "hub": "projects/cloud-custodian/locations/global/hubs/custodian-ncc-hub",
+        "uniqueId": "00000000-0000-0000-0000-000000000001",
+        "state": "ACTIVE",
+        "linkedVpcNetwork": {
+          "uri": "https://www.googleapis.com/compute/v1/projects/cloud-custodian/global/networks/custodian-vpc"
+        },
+        "spokeType": "VPC_NETWORK",
+        "group": "projects/cloud-custodian/locations/global/hubs/custodian-ncc-hub/groups/center",
+        "etag": "2"
+      },
+      {
+        "name": "projects/cloud-custodian/locations/global/spokes/custodian-edge-spoke-1",
+        "createTime": "2024-01-02T00:00:00.000000000Z",
+        "updateTime": "2024-01-02T00:01:00.000000000Z",
+        "labels": {},
+        "hub": "projects/cloud-custodian/locations/global/hubs/custodian-ncc-hub",
+        "uniqueId": "00000000-0000-0000-0000-000000000002",
+        "state": "ACTIVE",
+        "linkedVpcNetwork": {
+          "uri": "https://www.googleapis.com/compute/v1/projects/cloud-custodian/global/networks/custodian-network-1"
+        },
+        "spokeType": "VPC_NETWORK",
+        "group": "projects/cloud-custodian/locations/global/hubs/custodian-ncc-hub/groups/edge",
+        "etag": "2"
+      },
+      {
+        "name": "projects/cloud-custodian/locations/global/spokes/custodian-edge-spoke-2",
+        "createTime": "2024-01-03T00:00:00.000000000Z",
+        "updateTime": "2024-01-03T00:01:00.000000000Z",
+        "labels": {},
+        "hub": "projects/cloud-custodian/locations/global/hubs/custodian-ncc-hub",
+        "uniqueId": "00000000-0000-0000-0000-000000000003",
+        "state": "ACTIVE",
+        "linkedVpcNetwork": {
+          "uri": "https://www.googleapis.com/compute/v1/projects/cloud-custodian/global/networks/custodian-network-2"
+        },
+        "spokeType": "VPC_NETWORK",
+        "group": "projects/cloud-custodian/locations/global/hubs/custodian-ncc-hub/groups/edge",
+        "etag": "2"
+      },
+      {
+        "name": "projects/cloud-custodian/locations/global/spokes/custodian-edge-spoke-3",
+        "createTime": "2024-01-04T00:00:00.000000000Z",
+        "updateTime": "2024-01-04T00:01:00.000000000Z",
+        "labels": {},
+        "hub": "projects/cloud-custodian/locations/global/hubs/custodian-ncc-hub",
+        "uniqueId": "00000000-0000-0000-0000-000000000004",
+        "state": "ACTIVE",
+        "linkedVpcNetwork": {
+          "uri": "https://www.googleapis.com/compute/v1/projects/cloud-custodian/global/networks/custodian-network-3"
+        },
+        "spokeType": "VPC_NETWORK",
+        "group": "projects/cloud-custodian/locations/global/hubs/custodian-ncc-hub/groups/edge",
+        "etag": "2"
+      },
+      {
+        "name": "projects/cloud-custodian/locations/global/spokes/custodian-edge-spoke-4",
+        "createTime": "2024-01-05T00:00:00.000000000Z",
+        "updateTime": "2024-01-05T00:01:00.000000000Z",
+        "labels": {},
+        "hub": "projects/cloud-custodian/locations/global/hubs/custodian-ncc-hub",
+        "uniqueId": "00000000-0000-0000-0000-000000000005",
+        "state": "ACTIVE",
+        "linkedVpcNetwork": {
+          "uri": "https://www.googleapis.com/compute/v1/projects/cloud-custodian/global/networks/custodian-network-4"
+        },
+        "spokeType": "VPC_NETWORK",
+        "group": "projects/cloud-custodian/locations/global/hubs/custodian-ncc-hub/groups/edge",
+        "etag": "2"
+      }
+    ]
+  }
+}

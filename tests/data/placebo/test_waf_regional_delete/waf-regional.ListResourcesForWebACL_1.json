@@ -1,0 +1,13 @@
+{
+    "status_code": 200,
+    "data": {
+        "ResourceArns": [
+            "arn:aws:elasticloadbalancing:us-east-1:123456789012:loadbalancer/app/my-alb/1234567890"
+        ],
+        "ResponseMetadata": {
+            "RetryAttempts": 0,
+            "HTTPStatusCode": 200,
+            "RequestId": "test-list-resources-alb-001"
+        }
+    }
+}

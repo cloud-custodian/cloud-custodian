@@ -1,0 +1,17 @@
+{
+    "status_code": 200,
+    "data": {
+        "PaginationToken": "",
+        "ResourceTagMappingList": [
+            {
+                "ResourceARN": "arn:aws:waf-regional:us-east-1:123456789012:webacl/bbb22222-1234-5678-abcd-111111111111",
+                "Tags": []
+            }
+        ],
+        "ResponseMetadata": {
+            "RetryAttempts": 0,
+            "HTTPStatusCode": 200,
+            "RequestId": "test-get-resources-tags-001"
+        }
+    }
+}

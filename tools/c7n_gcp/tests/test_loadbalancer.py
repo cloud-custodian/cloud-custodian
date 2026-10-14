@@ -1,7 +1,18 @@
 # Copyright The Cloud Custodian Authors.
 # SPDX-License-Identifier: Apache-2.0
+import logging
 from time import sleep
+from unittest import mock
+
 from gcp_common import BaseTest, event_data
+from googleapiclient.errors import HttpError
+from httplib2 import Response
+from pytest_terraform import terraform
+from c7n_gcp.client import ServiceClient
+from c7n_gcp.resources.loadbalancer import LoadBalancingAddress
+from c7n_gcp.resources.loadbalancer import LoadBalancingGlobalAddress
+from c7n_gcp.resources.loadbalancer import LoadBalancingGlobalForwardingRule
+from c7n_gcp.resources.loadbalancer import LoadBalancingForwardingRule
 
 
 class LoadBalancingAddressTest(BaseTest):
@@ -49,7 +60,7 @@ class LoadBalancingAddressTest(BaseTest):
 
     def test_loadbalancer_address_delete(self):
         region = 'us-central1'
-        project_id = 'cloud-custodian'
+        project_id = self.project_id
         factory = self.replay_flight_data('lb-addresses-delete',
                                           project_id=project_id)
         policy = self.load_policy(
@@ -60,6 +71,28 @@ class LoadBalancingAddressTest(BaseTest):
 
         resources = policy.run()
         self.assertEqual(resources[0]['name'], 'new322')
+
+        client = policy.resource_manager.get_client()
+        result = client.execute_query(
+            'list', {'project': project_id,
+                     'region': region})
+
+        self.assertEqual(len(result['items']["regions/{}".format(region)]['addresses']), 0)
+
+    def test_loadbalancer_address_filter_global_addresses(self):
+        project_id = self.project_id
+        region = 'us-central1'
+        factory = self.replay_flight_data('lb-addresses-global-addresses',
+                                          project_id=project_id)
+        policy = self.load_policy(
+        {
+            'name': 'delete-unused-gcp-ip-addresses',
+            'resource': 'gcp.loadbalancer-address',
+            'actions': ['delete']
+        },
+        session_factory=factory)
+        resources = policy.run()
+        self.assertEqual(len(resources), 2)
 
         client = policy.resource_manager.get_client()
         result = client.execute_query(
@@ -242,7 +275,7 @@ class LoadBalancingSslPolicyTest(BaseTest):
         )
 
     def test_loadbalancer_ssl_policy_delete(self):
-        project_id = 'custodian-test-project-0'
+        project_id = self.project_id
         session_factory = self.replay_flight_data('lb-ssl-policy-delete',
                                                   project_id=project_id)
         base_policy = {'name': 'lb-ssl-policy-delete',
@@ -401,7 +434,7 @@ class LoadBalancingBackendBucketTest(BaseTest):
         )
 
     def test_loadbalancer_backend_bucket_delete(self):
-        project_id = 'cloud-custodian'
+        project_id = self.project_id
         session_factory = self.replay_flight_data('lb-backend-buckets-delete',
                                                   project_id=project_id)
         base_policy = {'name': 'lb-addresses-delete',
@@ -862,3 +895,238 @@ class LoadBalancingGlobalAddressTest(BaseTest):
                 'gcp:compute::cloud-custodian:global-address/custodian-global-address-0',
             ],
         )
+
+
+@terraform('loadbalancer_address_labels')
+def test_loadbalancer_address_labels(test, loadbalancer_address_labels):
+    address = loadbalancer_address_labels.resources['google_compute_address']['default']
+    project_id = address['project']
+    name = address['name']
+    label_fingerprint = address['label_fingerprint']
+    labels = address['labels']
+
+    # Confirm the starting label
+    assert labels['env'] == 'default'
+
+    # Update the label using the action
+    factory = test.replay_flight_data('loadbalancer-address-labels', project_id=project_id)
+    policy = test.load_policy(
+        {
+            'name': 'loadbalancer-address-labels',
+            'resource': 'gcp.loadbalancer-address',
+            'filters': [{'name': name}],
+            'actions': [
+                {'type': 'set-labels',
+                 'labels': {'env': 'not-the-default'}}
+            ],
+        },
+        session_factory=factory,
+    )
+    resources = policy.run()
+    assert len(resources) == 1
+
+    # Refresh and confirm that the label and fingerprint updated
+    client = policy.resource_manager.get_client()
+    resource = LoadBalancingAddress.resource_type.refresh(client, resources[0])
+    assert resource['labels']['env'] == 'not-the-default'
+    assert resource['labelFingerprint'] != label_fingerprint
+
+
+@terraform('loadbalancer_forwarding_rule_labels')
+def test_loadbalancer_forwarding_rule_labels(test, loadbalancer_forwarding_rule_labels):
+    forwarding_rule = loadbalancer_forwarding_rule_labels.resources[
+        'google_compute_forwarding_rule']['default']
+    project_id = forwarding_rule['project']
+    name = forwarding_rule['name']
+    label_fingerprint = forwarding_rule['label_fingerprint']
+    labels = forwarding_rule['labels']
+
+    # Confirm the starting label
+    assert labels['env'] == 'default'
+
+    # Update the label using the action
+    factory = test.replay_flight_data('loadbalancer-forwarding-rule-labels', project_id=project_id)
+    policy = test.load_policy(
+        {
+            'name': 'loadbalancer-forwarding-rule-labels',
+            'resource': 'gcp.loadbalancer-forwarding-rule',
+            'filters': [{'name': name}],
+            'actions': [
+                {'type': 'set-labels',
+                 'labels': {'env': 'not-the-default'}}
+            ],
+        },
+        session_factory=factory,
+    )
+    resources = policy.run()
+    assert len(resources) == 1
+
+    # Refresh and confirm that the label and fingerprint updated
+    client = policy.resource_manager.get_client()
+    resource = LoadBalancingForwardingRule.resource_type.refresh(client, resources[0])
+    assert resource['labels']['env'] == 'not-the-default'
+    assert resource['labelFingerprint'] != label_fingerprint
+
+
+@terraform('loadbalancer_global_address_labels')
+def test_loadbalancer_global_address_labels(test, loadbalancer_global_address_labels):
+    global_address = loadbalancer_global_address_labels.resources[
+        'google_compute_global_address']['default']
+    project_id = global_address['project']
+    name = global_address['name']
+    label_fingerprint = global_address['label_fingerprint']
+    labels = global_address['labels']
+
+    # Confirm the starting label
+    assert labels['env'] == 'default'
+
+    # Update the label using the action
+    factory = test.replay_flight_data('loadbalancer-global-address-labels', project_id=project_id)
+    policy = test.load_policy(
+        {
+            'name': 'loadbalancer-global-address-labels',
+            'resource': 'gcp.loadbalancer-global-address',
+            'filters': [{'name': name}],
+            'actions': [
+                {'type': 'set-labels',
+                 'labels': {'env': 'not-the-default'}}
+            ],
+        },
+        session_factory=factory,
+    )
+    resources = policy.run()
+    assert len(resources) == 1
+
+    # Refresh and confirm that the label and fingerprint updated
+    client = policy.resource_manager.get_client()
+    resource = LoadBalancingGlobalAddress.resource_type.refresh(client, resources[0])
+    assert resource['labels']['env'] == 'not-the-default'
+    assert resource['labelFingerprint'] != label_fingerprint
+
+
+@terraform('loadbalancer_global_forwarding_rule_labels')
+def test_loadbalancer_global_forwarding_rule_labels(
+        test, loadbalancer_global_forwarding_rule_labels):
+    global_forwarding_rule = loadbalancer_global_forwarding_rule_labels.resources[
+        'google_compute_global_forwarding_rule']['default']
+    project_id = global_forwarding_rule['project']
+    name = global_forwarding_rule['name']
+    label_fingerprint = global_forwarding_rule['label_fingerprint']
+    labels = global_forwarding_rule['labels']
+
+    # Confirm the starting label
+    assert labels['env'] == 'default'
+
+    # Update the label using an action
+    factory = test.replay_flight_data(
+        'loadbalancer-global-forwarding-rule-labels',
+        project_id=project_id,
+    )
+    policy = test.load_policy(
+        {
+            'name': 'loadbalancer-global-forwarding-rule-labels',
+            'resource': 'gcp.loadbalancer-global-forwarding-rule',
+            'filters': [{'name': name}],
+            'actions': [
+                {'type': 'set-labels',
+                 'labels': {'env': 'not-the-default'}}
+            ],
+        },
+        session_factory=factory,
+    )
+    resources = policy.run()
+    assert len(resources) == 1
+
+    # Refresh and confirm that the label and fingerprint updated
+    client = policy.resource_manager.get_client()
+    resource = LoadBalancingGlobalForwardingRule.resource_type.refresh(client, resources[0])
+    assert resource['labels']['env'] == 'not-the-default'
+    assert resource['labelFingerprint'] != label_fingerprint
+
+
+def _run_ssl_policy_filter(test, resource, flight, names, ssl_filter=None):
+    if ssl_filter is None:
+        ssl_filter = {'type': 'ssl-policy', 'key': 'profile', 'value': 'COMPATIBLE'}
+    factory = test.replay_flight_data(flight)
+    policy = test.load_policy(
+        {
+            'name': flight,
+            'resource': resource,
+            'filters': [
+                {'type': 'value', 'key': 'name', 'op': 'in', 'value': names},
+                ssl_filter,
+            ],
+        },
+        session_factory=factory,
+    )
+    return policy.run()
+
+
+@terraform('lb_https_proxy_ssl_policy', scope='session')
+def test_lb_https_proxy_ssl_policy_good(test, lb_https_proxy_ssl_policy):
+    proxy = lb_https_proxy_ssl_policy.resources['google_compute_target_https_proxy']['good']
+    resources = _run_ssl_policy_filter(
+        test, 'gcp.loadbalancer-target-https-proxy', 'lb-https-ssl-good',
+        [proxy['name']])
+    assert resources == []
+
+
+@terraform('lb_https_proxy_ssl_policy', scope='session')
+def test_lb_https_proxy_ssl_policy_none(test, lb_https_proxy_ssl_policy):
+    proxy = lb_https_proxy_ssl_policy.resources['google_compute_target_https_proxy']['none']
+    resources = _run_ssl_policy_filter(
+        test, 'gcp.loadbalancer-target-https-proxy', 'lb-https-ssl-none',
+        [proxy['name']])
+    assert resources == []
+
+
+@terraform('lb_https_proxy_ssl_policy', scope='session')
+def test_lb_https_proxy_ssl_policy_shared(test, lb_https_proxy_ssl_policy):
+    # Both proxies use the same ssl policy, which is only fetched once.
+    proxies = lb_https_proxy_ssl_policy.resources['google_compute_target_https_proxy']
+    names = [proxies['weak']['name'], proxies['weak2']['name']]
+    resources = _run_ssl_policy_filter(
+        test, 'gcp.loadbalancer-target-https-proxy', 'lb-https-ssl-shared',
+        names)
+    assert sorted(r['name'] for r in resources) == sorted(names)
+    assert all(r['c7n:ssl-policy']['profile'] == 'COMPATIBLE' for r in resources)
+
+
+@terraform('lb_https_proxy_ssl_policy', scope='session')
+def test_lb_https_proxy_ssl_policy_not_found(test, lb_https_proxy_ssl_policy, caplog):
+    # A 404 happens when the policy is deleted after the proxies were listed
+    # (or cached). GCP won't delete an in-use policy, so it can't be recorded
+    # live. Replay the proxy list and fail the ssl policy get.
+    proxies = lb_https_proxy_ssl_policy.resources['google_compute_target_https_proxy']
+    names = [proxies['weak']['name'], proxies['weak2']['name']]
+    not_found = HttpError(Response({'status': 404}), b'not found')
+    with mock.patch.object(
+            ServiceClient, 'execute_command', side_effect=not_found) as get:
+        with caplog.at_level(logging.WARNING, logger='custodian.gcp.loadbalancer'):
+            resources = _run_ssl_policy_filter(
+                test, 'gcp.loadbalancer-target-https-proxy', 'lb-https-ssl-shared',
+                names)
+    assert resources == []
+    assert get.call_count == 1
+    assert 'ssl policy not found' in caplog.text
+
+
+@terraform('lb_https_proxy_ssl_policy', scope='session')
+def test_lb_https_proxy_ssl_policy_not_none(test, lb_https_proxy_ssl_policy):
+    # A proxy with no sslPolicy fails the ssl-policy check, so not matches it.
+    proxy = lb_https_proxy_ssl_policy.resources['google_compute_target_https_proxy']['none']
+    resources = _run_ssl_policy_filter(
+        test, 'gcp.loadbalancer-target-https-proxy', 'lb-https-ssl-not-none',
+        [proxy['name']],
+        ssl_filter={'not': [{'type': 'ssl-policy', 'key': 'profile', 'value': 'MODERN'}]})
+    assert [r['name'] for r in resources] == [proxy['name']]
+
+
+@terraform('lb_ssl_proxy_ssl_policy', scope='session')
+def test_lb_ssl_proxy_ssl_policy_weak(test, lb_ssl_proxy_ssl_policy):
+    proxy = lb_ssl_proxy_ssl_policy.resources['google_compute_target_ssl_proxy']['weak']
+    resources = _run_ssl_policy_filter(
+        test, 'gcp.loadbalancer-target-ssl-proxy', 'lb-sslproxy-ssl-weak',
+        [proxy['name']])
+    assert [r['name'] for r in resources] == [proxy['name']]
+    assert resources[0]['c7n:ssl-policy']['profile'] == 'COMPATIBLE'

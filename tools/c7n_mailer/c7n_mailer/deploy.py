@@ -7,7 +7,6 @@ import os
 
 from c7n.mu import CloudWatchEventSource, LambdaFunction, LambdaManager, PythonPackageArchive
 
-
 log = logging.getLogger("custodian-mailer")
 
 entry_source = """\
@@ -33,8 +32,6 @@ CORE_DEPS = [
     "pyasn1",
     "redis",
     "jmespath",
-    # for other dependencies
-    "pkg_resources",
     # transport datadog - recursive deps
     "datadog",
     "decorator",

@@ -30,6 +30,7 @@ import fnmatch
 import logging
 import json
 
+from c7n.exceptions import PolicyValidationError
 from c7n.filters import Filter
 from c7n.resolver import ValuesFrom
 from c7n.utils import type_schema
@@ -90,6 +91,14 @@ class PolicyChecker:
     @property
     def allowed_orgid(self):
         return self.checker_config.get('allowed_orgid', ())
+
+    @property
+    def allowed_org_units(self):
+        return self.checker_config.get('allowed_org_units', ())
+
+    @property
+    def whitelist_patterns(self):
+        return self.checker_config.get('whitelist_patterns', ())
 
     # Policy statement handling
     def check(self, policy_text):
@@ -154,6 +163,9 @@ class PolicyChecker:
                 continue
             elif pid.startswith('arn:aws:iam::cloudfront:user'):
                 continue
+            elif self.whitelist_patterns and any(
+                    fnmatch.fnmatch(pid, pattern) for pattern in self.whitelist_patterns):
+                continue
             else:
                 account_id = _account(pid)
                 if account_id not in self.allowed_accounts:
@@ -165,11 +177,59 @@ class PolicyChecker:
         if not conditions:
             return False
 
-        results = []
-        for c in conditions:
-            results.append(self.handle_condition(s, c))
+        # Evaluate each condition
+        # handle_condition returns True if the condition whitelists (handler returned False)
+        # handle_condition returns False if the condition is a violation (handler returned True)
+        # handle_condition returns None if handler doesn't exist (unknown condition)
 
-        return all(results)
+        results = []
+        has_whitelisted_org = False
+
+        for c in conditions:
+            result = self.handle_condition(s, c)
+
+            # Unknown handler - be conservative and reject immediately
+            if result is None:
+                return False
+
+            # Track if we have a whitelisted org condition
+            if result is True and c['key'] in (
+                    'aws:principalorgid', 'aws:resourceorgid',
+                    'aws:principalorgpaths'):
+                has_whitelisted_org = True
+
+            results.append(result)
+
+        # If all conditions whitelist, return True
+        if all(results):
+            return True
+
+        # Special case: org ID whitelisted + only wildcard principal conditions fail
+        if has_whitelisted_org and not all(results):
+            principal_conditions = {
+                'aws:principalarn', 'aws:principalaccount',
+                'aws:sourceaccount', 'aws:sourcearn',
+                's3:dataaccesspointaccount'
+            }
+
+            # Check which conditions failed
+            for i, c in enumerate(conditions):
+                if not results[i]:  # This condition failed (didn't whitelist)
+                    if c['key'] not in principal_conditions:
+                        # Non-principal condition failed, can't be saved by org ID
+                        return False
+                    # Check if it's a wildcard or already whitelisted account
+                    if not all(
+                        '*' in str(v) or _account(str(v)) in self.allowed_accounts
+                        for v in c['values']
+                    ):
+                        # Not a wildcard and not a whitelisted account, it's a real violation
+                        return False
+            # All failures are wildcard principals, org ID saves it
+            return True
+
+        # Some conditions failed and not covered by special case
+        return False
 
     def handle_condition(self, s, c):
         if not c['op']:
@@ -197,7 +257,7 @@ class PolicyChecker:
             'ArnLike',
             'IpAddress',
             'NotIpAddress')
-        set_conditions = ('ForAllValues', 'ForAnyValues')
+        set_conditions = ('ForAllValues', 'ForAnyValue')
 
         for s_cond_op in list(s['Condition'].keys()):
             if s_cond_op not in conditions:
@@ -245,9 +305,26 @@ class PolicyChecker:
             return True
         return bool(set(map(_account, c['values'])).difference(self.allowed_orgid))
 
+    def handle_aws_principalorgpaths(self, s, c):
+        if not self.allowed_orgid and not self.allowed_org_units:
+            return True
+        return any(not self._org_path_allowed(v) for v in c['values'])
+
+    def _org_path_allowed(self, condition_ou_path):
+        segs = condition_ou_path.split('/')
+        org_seg = segs[0]
+        if org_seg in self.allowed_orgid:
+            return True
+        for whitelist_ou_path in self.allowed_org_units:
+            w_segs = whitelist_ou_path.strip('/').split('/')
+            if w_segs[0] != org_seg:
+                continue
+            if w_segs[-1] in segs[1:]:
+                return True
+        return False
+
     def handle_aws_principalarn(self, s, c):
         """Handle the aws:PrincipalArn condition key."""
-
         return bool(set(map(_account, c['values'])).difference(self.allowed_accounts))
 
     def handle_aws_resourceorgid(self, s, c):
@@ -268,6 +345,43 @@ class PolicyChecker:
 
 class CrossAccountAccessFilter(Filter):
     """Check a resource's embedded iam policy for cross account access.
+
+    Supports a ``whitelist_patterns`` option to skip principals whose identifier
+    matches any of the provided `fnmatch
+    <https://docs.python.org/3/library/fnmatch.html>`_ patterns.  This is
+    useful for ignoring unique identifiers left behind by deleted IAM principals
+    (e.g. ``AIDA*`` for deleted IAM users, ``AROA*`` for deleted IAM roles)
+    which AWS substitutes into resource policies when the original principal is
+    removed.  See `IAM unique identifiers
+    <https://docs.aws.amazon.com/IAM/latest/UserGuide/reference_identifiers.html#identifiers-unique-ids>`_
+    for the full list of prefixes.
+
+    .. code-block:: yaml
+
+      - type: cross-account
+        whitelist_patterns:
+          - "AIDA*"
+          - "AROA*"
+
+    Supports a ``whitelist_org_units`` option for trusting principals via
+    ``aws:PrincipalOrgPaths`` conditions. Each entry must be a full OU path
+    starting with the org ID and ending with the OU ID to trust:
+
+    .. code-block:: yaml
+
+      - type: cross-account
+        whitelist_org_units:
+          - "o-abc1234567/r-ab12/ou-ab12-prod"
+
+    Wildcards (``*``, ``?``) are not permitted in whitelist entries. The org
+    ID prefix is required because OU IDs are only unique within an
+    organization. A whitelist matches a policy path when the path's leading
+    segment equals the whitelist's org ID *and* the whitelist's leaf OU ID
+    appears as a literal segment in the path; this means a parent-OU whitelist
+    will not implicitly cover policies that only name a descendant OU. List
+    each OU level you actually want to trust. ``aws:PrincipalOrgPaths`` matching
+    also respects ``whitelist_orgids``. Any policy path whose leading segment
+    matches a whitelisted org ID is accepted regardless of the OU whitelist.
     """
 
     schema = type_schema(
@@ -285,16 +399,37 @@ class CrossAccountAccessFilter(Filter):
         whitelist={'type': 'array', 'items': {'type': 'string'}},
         whitelist_orgids_from={'$ref': '#/definitions/filters_common/value_from'},
         whitelist_orgids={'type': 'array', 'items': {'type': 'string'}},
+        whitelist_org_units_from={'$ref': '#/definitions/filters_common/value_from'},
+        whitelist_org_units={'type': 'array', 'items': {'type': 'string'}},
         whitelist_vpce_from={'$ref': '#/definitions/filters_common/value_from'},
         whitelist_vpce={'type': 'array', 'items': {'type': 'string'}},
         whitelist_vpc_from={'$ref': '#/definitions/filters_common/value_from'},
-        whitelist_vpc={'type': 'array', 'items': {'type': 'string'}})
+        whitelist_vpc={'type': 'array', 'items': {'type': 'string'}},
+        # fnmatch patterns for principals to ignore (e.g. deleted IAM unique IDs)
+        whitelist_patterns_from={'$ref': '#/definitions/filters_common/value_from'},
+        whitelist_patterns={'type': 'array', 'items': {'type': 'string'}})
 
     policy_attribute = 'Policy'
     annotation_key = 'CrossAccountViolations'
     allowlist_key = 'CrossAccountAllowlists'
 
     checker_factory = PolicyChecker
+
+    @staticmethod
+    def _validate_org_unit_path(path):
+        if '*' in path or '?' in path:
+            raise PolicyValidationError(
+                "whitelist_org_units entries must not contain wildcards: %r" % path)
+        segments = path.strip('/').split('/')
+        if len(segments) < 2 or not segments[0].startswith('o-'):
+            raise PolicyValidationError(
+                "whitelist_org_units entries must be full paths starting with "
+                "the org ID (e.g. 'o-abc/r-xyz/ou-target'): %r" % path)
+
+    def validate(self):
+        for path in self.data.get('whitelist_org_units', ()):
+            self._validate_org_unit_path(path)
+        return self
 
     def process(self, resources, event=None):
         self.everyone_only = self.data.get('everyone_only', False)
@@ -307,15 +442,19 @@ class CrossAccountAccessFilter(Filter):
         self.vpcs = self.get_vpcs()
         self.vpces = self.get_vpces()
         self.orgid = self.get_orgids()
+        self.org_units = self.get_org_units()
+        self.patterns = self.get_whitelist_patterns()
         self.checker_config = getattr(self, 'checker_config', None) or {}
         self.checker_config.update(
             {'allowed_accounts': self.accounts,
              'allowed_vpc': self.vpcs,
              'allowed_vpce': self.vpces,
              'allowed_orgid': self.orgid,
+             'allowed_org_units': self.org_units,
              'check_actions': self.actions,
              'everyone_only': self.everyone_only,
              'whitelist_conditions': self.conditions,
+             'whitelist_patterns': self.patterns,
              'return_allowed': self.return_allowed})
         self.checker = self.checker_factory(self.checker_config)
         return super(CrossAccountAccessFilter, self).process(resources, event)
@@ -349,6 +488,22 @@ class CrossAccountAccessFilter(Filter):
             values = ValuesFrom(self.data['whitelist_orgids_from'], self.manager)
             org_ids = org_ids.union(values.get_values())
         return org_ids
+
+    def get_org_units(self):
+        org_units = set(self.data.get('whitelist_org_units', ()))
+        if 'whitelist_org_units_from' in self.data:
+            values = ValuesFrom(self.data['whitelist_org_units_from'], self.manager)
+            org_units = org_units.union(values.get_values())
+        for path in org_units:
+            self._validate_org_unit_path(path)
+        return org_units
+
+    def get_whitelist_patterns(self):
+        patterns = list(self.data.get('whitelist_patterns', ()))
+        if 'whitelist_patterns_from' in self.data:
+            values = ValuesFrom(self.data['whitelist_patterns_from'], self.manager)
+            patterns = patterns + list(values.get_values())
+        return patterns
 
     def get_resource_policy(self, r):
         return r.get(self.policy_attribute, None)

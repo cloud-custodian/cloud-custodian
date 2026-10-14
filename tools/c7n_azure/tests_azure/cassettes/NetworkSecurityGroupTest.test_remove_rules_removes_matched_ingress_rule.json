@@ -1,0 +1,578 @@
+{
+    "version": 1,
+    "interactions": [
+        {
+            "request": {
+                "method": "GET",
+                "uri": "https://management.azure.com/subscriptions/ea42f556-5106-4743-99b0-c129bfa71a47/providers/Microsoft.Network/networkSecurityGroups?api-version=2024-05-01",
+                "body": null,
+                "headers": {}
+            },
+            "response": {
+                "status": {
+                    "code": 200,
+                    "message": "OK"
+                },
+                "headers": {
+                    "x-ms-throttle-levels": [
+                        "operationConcurrencyPct=0.5, subscriptionReadRatePct=0.2, etc"
+                    ],
+                    "x-ms-original-request-ids": [
+                        "2e07a321-a603-46b9-9d1b-e1a9272a34e0"
+                    ],
+                    "x-ms-ratelimit-remaining-subscription-global-reads": [
+                        "3749"
+                    ],
+                    "x-ms-arm-service-request-id": [
+                        "786eca44-f386-4add-80c2-3fb207691add"
+                    ],
+                    "content-length": [
+                        "5862"
+                    ],
+                    "cache-control": [
+                        "no-cache"
+                    ],
+                    "x-msedge-ref": [
+                        "Ref A: 86290B88D35F4B4097035C9D4483F825 Ref B: CH1AA2020620035 Ref C: 2026-09-28T20:26:34Z"
+                    ],
+                    "x-cache": [
+                        "CONFIG_NOCACHE"
+                    ],
+                    "date": [
+                        "Mon, 28 Sep 2026 20:26:34 GMT"
+                    ],
+                    "content-type": [
+                        "application/json; charset=utf-8"
+                    ]
+                },
+                "body": {
+                    "data": {
+                        "value": [
+                            {
+                                "name": "c7n-nsg-remove-rules",
+                                "id": "/subscriptions/ea42f556-5106-4743-99b0-c129bfa71a47/resourceGroups/test_networksecuritygroup-remove-rules/providers/Microsoft.Network/networkSecurityGroups/c7n-nsg-remove-rules",
+                                "etag": "W/\"9d4bec51-8412-4d9d-b846-4c5a724292ff\"",
+                                "type": "Microsoft.Network/networkSecurityGroups",
+                                "location": "southcentralus",
+                                "properties": {
+                                    "provisioningState": "Succeeded",
+                                    "resourceGuid": "7a749cea-eac1-420b-9cc9-66b20cd394c5",
+                                    "securityRules": [
+                                        {
+                                            "name": "allow-all-inbound",
+                                            "id": "/subscriptions/ea42f556-5106-4743-99b0-c129bfa71a47/resourceGroups/test_networksecuritygroup-remove-rules/providers/Microsoft.Network/networkSecurityGroups/c7n-nsg-remove-rules/securityRules/allow-all-inbound",
+                                            "etag": "W/\"9d4bec51-8412-4d9d-b846-4c5a724292ff\"",
+                                            "type": "Microsoft.Network/networkSecurityGroups/securityRules",
+                                            "properties": {
+                                                "provisioningState": "Succeeded",
+                                                "protocol": "*",
+                                                "sourcePortRange": "*",
+                                                "destinationPortRange": "*",
+                                                "sourceAddressPrefix": "*",
+                                                "destinationAddressPrefix": "*",
+                                                "access": "Allow",
+                                                "priority": 100,
+                                                "direction": "Inbound",
+                                                "sourcePortRanges": [],
+                                                "destinationPortRanges": [],
+                                                "sourceAddressPrefixes": [],
+                                                "destinationAddressPrefixes": []
+                                            }
+                                        }
+                                    ],
+                                    "defaultSecurityRules": [
+                                        {
+                                            "name": "AllowVnetInBound",
+                                            "id": "/subscriptions/ea42f556-5106-4743-99b0-c129bfa71a47/resourceGroups/test_networksecuritygroup-remove-rules/providers/Microsoft.Network/networkSecurityGroups/c7n-nsg-remove-rules/defaultSecurityRules/AllowVnetInBound",
+                                            "etag": "W/\"9d4bec51-8412-4d9d-b846-4c5a724292ff\"",
+                                            "type": "Microsoft.Network/networkSecurityGroups/defaultSecurityRules",
+                                            "properties": {
+                                                "provisioningState": "Succeeded",
+                                                "description": "Allow inbound traffic from all VMs in VNET",
+                                                "protocol": "*",
+                                                "sourcePortRange": "*",
+                                                "destinationPortRange": "*",
+                                                "sourceAddressPrefix": "VirtualNetwork",
+                                                "destinationAddressPrefix": "VirtualNetwork",
+                                                "access": "Allow",
+                                                "priority": 65000,
+                                                "direction": "Inbound",
+                                                "sourcePortRanges": [],
+                                                "destinationPortRanges": [],
+                                                "sourceAddressPrefixes": [],
+                                                "destinationAddressPrefixes": []
+                                            }
+                                        },
+                                        {
+                                            "name": "AllowAzureLoadBalancerInBound",
+                                            "id": "/subscriptions/ea42f556-5106-4743-99b0-c129bfa71a47/resourceGroups/test_networksecuritygroup-remove-rules/providers/Microsoft.Network/networkSecurityGroups/c7n-nsg-remove-rules/defaultSecurityRules/AllowAzureLoadBalancerInBound",
+                                            "etag": "W/\"9d4bec51-8412-4d9d-b846-4c5a724292ff\"",
+                                            "type": "Microsoft.Network/networkSecurityGroups/defaultSecurityRules",
+                                            "properties": {
+                                                "provisioningState": "Succeeded",
+                                                "description": "Allow inbound traffic from azure load balancer",
+                                                "protocol": "*",
+                                                "sourcePortRange": "*",
+                                                "destinationPortRange": "*",
+                                                "sourceAddressPrefix": "AzureLoadBalancer",
+                                                "destinationAddressPrefix": "*",
+                                                "access": "Allow",
+                                                "priority": 65001,
+                                                "direction": "Inbound",
+                                                "sourcePortRanges": [],
+                                                "destinationPortRanges": [],
+                                                "sourceAddressPrefixes": [],
+                                                "destinationAddressPrefixes": []
+                                            }
+                                        },
+                                        {
+                                            "name": "DenyAllInBound",
+                                            "id": "/subscriptions/ea42f556-5106-4743-99b0-c129bfa71a47/resourceGroups/test_networksecuritygroup-remove-rules/providers/Microsoft.Network/networkSecurityGroups/c7n-nsg-remove-rules/defaultSecurityRules/DenyAllInBound",
+                                            "etag": "W/\"9d4bec51-8412-4d9d-b846-4c5a724292ff\"",
+                                            "type": "Microsoft.Network/networkSecurityGroups/defaultSecurityRules",
+                                            "properties": {
+                                                "provisioningState": "Succeeded",
+                                                "description": "Deny all inbound traffic",
+                                                "protocol": "*",
+                                                "sourcePortRange": "*",
+                                                "destinationPortRange": "*",
+                                                "sourceAddressPrefix": "*",
+                                                "destinationAddressPrefix": "*",
+                                                "access": "Deny",
+                                                "priority": 65500,
+                                                "direction": "Inbound",
+                                                "sourcePortRanges": [],
+                                                "destinationPortRanges": [],
+                                                "sourceAddressPrefixes": [],
+                                                "destinationAddressPrefixes": []
+                                            }
+                                        },
+                                        {
+                                            "name": "AllowVnetOutBound",
+                                            "id": "/subscriptions/ea42f556-5106-4743-99b0-c129bfa71a47/resourceGroups/test_networksecuritygroup-remove-rules/providers/Microsoft.Network/networkSecurityGroups/c7n-nsg-remove-rules/defaultSecurityRules/AllowVnetOutBound",
+                                            "etag": "W/\"9d4bec51-8412-4d9d-b846-4c5a724292ff\"",
+                                            "type": "Microsoft.Network/networkSecurityGroups/defaultSecurityRules",
+                                            "properties": {
+                                                "provisioningState": "Succeeded",
+                                                "description": "Allow outbound traffic from all VMs to all VMs in VNET",
+                                                "protocol": "*",
+                                                "sourcePortRange": "*",
+                                                "destinationPortRange": "*",
+                                                "sourceAddressPrefix": "VirtualNetwork",
+                                                "destinationAddressPrefix": "VirtualNetwork",
+                                                "access": "Allow",
+                                                "priority": 65000,
+                                                "direction": "Outbound",
+                                                "sourcePortRanges": [],
+                                                "destinationPortRanges": [],
+                                                "sourceAddressPrefixes": [],
+                                                "destinationAddressPrefixes": []
+                                            }
+                                        },
+                                        {
+                                            "name": "AllowInternetOutBound",
+                                            "id": "/subscriptions/ea42f556-5106-4743-99b0-c129bfa71a47/resourceGroups/test_networksecuritygroup-remove-rules/providers/Microsoft.Network/networkSecurityGroups/c7n-nsg-remove-rules/defaultSecurityRules/AllowInternetOutBound",
+                                            "etag": "W/\"9d4bec51-8412-4d9d-b846-4c5a724292ff\"",
+                                            "type": "Microsoft.Network/networkSecurityGroups/defaultSecurityRules",
+                                            "properties": {
+                                                "provisioningState": "Succeeded",
+                                                "description": "Allow outbound traffic from all VMs to Internet",
+                                                "protocol": "*",
+                                                "sourcePortRange": "*",
+                                                "destinationPortRange": "*",
+                                                "sourceAddressPrefix": "*",
+                                                "destinationAddressPrefix": "Internet",
+                                                "access": "Allow",
+                                                "priority": 65001,
+                                                "direction": "Outbound",
+                                                "sourcePortRanges": [],
+                                                "destinationPortRanges": [],
+                                                "sourceAddressPrefixes": [],
+                                                "destinationAddressPrefixes": []
+                                            }
+                                        },
+                                        {
+                                            "name": "DenyAllOutBound",
+                                            "id": "/subscriptions/ea42f556-5106-4743-99b0-c129bfa71a47/resourceGroups/test_networksecuritygroup-remove-rules/providers/Microsoft.Network/networkSecurityGroups/c7n-nsg-remove-rules/defaultSecurityRules/DenyAllOutBound",
+                                            "etag": "W/\"9d4bec51-8412-4d9d-b846-4c5a724292ff\"",
+                                            "type": "Microsoft.Network/networkSecurityGroups/defaultSecurityRules",
+                                            "properties": {
+                                                "provisioningState": "Succeeded",
+                                                "description": "Deny all outbound traffic",
+                                                "protocol": "*",
+                                                "sourcePortRange": "*",
+                                                "destinationPortRange": "*",
+                                                "sourceAddressPrefix": "*",
+                                                "destinationAddressPrefix": "*",
+                                                "access": "Deny",
+                                                "priority": 65500,
+                                                "direction": "Outbound",
+                                                "sourcePortRanges": [],
+                                                "destinationPortRanges": [],
+                                                "sourceAddressPrefixes": [],
+                                                "destinationAddressPrefixes": []
+                                            }
+                                        }
+                                    ]
+                                }
+                            }
+                        ]
+                    }
+                }
+            }
+        },
+        {
+            "request": {
+                "method": "DELETE",
+                "uri": "https://management.azure.com/subscriptions/ea42f556-5106-4743-99b0-c129bfa71a47/resourceGroups/test_networksecuritygroup-remove-rules/providers/Microsoft.Network/networkSecurityGroups/c7n-nsg-remove-rules/securityRules/allow-all-inbound?api-version=2024-05-01",
+                "body": null,
+                "headers": {}
+            },
+            "response": {
+                "status": {
+                    "code": 202,
+                    "message": "Accepted"
+                },
+                "headers": {
+                    "content-length": [
+                        "0"
+                    ],
+                    "x-msedge-ref": [
+                        "Ref A: 0CDB434A7CE64774A469896F45425667 Ref B: CHI261140506042 Ref C: 2026-09-28T20:26:35Z"
+                    ],
+                    "location": [
+                        "https://management.azure.com/subscriptions/ea42f556-5106-4743-99b0-c129bfa71a47/providers/Microsoft.Network/locations/southcentralus/operationResults/2e31ee44-4ca9-4b74-8025-ac68c1e03891?api-version=2024-05-01&t=639262239954280163&c=MIIHlDCCBnygAwIBAgIQEWqq0LXHm9_RoSQk3rtLtzANBgkqhkiG9w0BAQsFADA2MTQwMgYDVQQDEytDQ01FIEcxIFRMUyBSU0EgMjA0OCBTSEEyNTYgMjA0OSBXVVMyIENBIDAxMB4XDTI2MDkyMzA2MDIzOVoXDTI2MTIxODEyMDIzOVowQDE-MDwGA1UEAxM1YXN5bmNvcGVyYXRpb25zaWduaW5nY2VydGlmaWNhdGUubWFuYWdlbWVudC5henVyZS5jb20wggEiMA0GCSqGSIb3DQEBAQUAA4IBDwAwggEKAoIBAQCTL3s1G4HRJxCxQWgaa1QhZF9rCHBTzLl8phyc14DtHqFD1UEEvU8TdKIkn63TfPvm-CD5nDTQJhmqP3TQ4a1zbeIZvN26UwO-f2zs8v284_6vqmQYpp074W-XCE3yUu6xZi0c2RjrWXRE0C83U9RwiZBkm4sAg6EaNrBTlMtlbtByJMhA9KOAfS_ME_eoDeS2P_o__hD4yg538D4itpA1Yp3-XcF3vu3MgpyPUf4o8rU8J3Y9-jIPfdgYdhE-QPuKdwKQu0Aov3aNNHzv_aJivc4z22sXdAC9MeLP59Q0e1QaF_moRqk0Sr9AyE7J1ohMafagWSkQ-fj_5H83r6J9AgMBAAGjggSSMIIEjjCBnQYDVR0gBIGVMIGSMAwGCisGAQQBgjd7AQEwZgYKKwYBBAGCN3sCAjBYMFYGCCsGAQUFBwICMEoeSAAzADMAZQAwADEAOQAyADEALQA0AGQANgA0AC0ANABmADgAYwAtAGEAMAA1ADUALQA1AGIAZABhAGYAZgBkADUAZQAzADMAZDAMBgorBgEEAYI3ewMCMAwGCisGAQQBgjd7BAIwDAYDVR0TAQH_BAIwADAdBgNVHSUEFjAUBggrBgEFBQcDAQYIKwYBBQUHAwIwDgYDVR0PAQH_BAQDAgWgMB0GA1UdDgQWBBTI83RcASQN5gnS06-jdiNGf7b_JDAfBgNVHSMEGDAWgBSs43L6A7Jznj2VyO-HW67dG6HtaDCCAbIGA1UdHwSCAakwggGlMGmgZ6BlhmNodHRwOi8vcHJpbWFyeS1jZG4ucGtpLmNvcmUud2luZG93cy5uZXQvd2VzdHVzMi9jcmxzL2NjbWV3ZXN0dXMycGtpL2NjbWV3ZXN0dXMyaWNhMDEvOTcvY3VycmVudC5jcmwwa6BpoGeGZWh0dHA6Ly9zZWNvbmRhcnktY2RuLnBraS5jb3JlLndpbmRvd3MubmV0L3dlc3R1czIvY3Jscy9jY21ld2VzdHVzMnBraS9jY21ld2VzdHVzMmljYTAxLzk3L2N1cnJlbnQuY3JsMFqgWKBWhlRodHRwOi8vY3JsLm1pY3Jvc29mdC5jb20vd2VzdHVzMi9jcmxzL2NjbWV3ZXN0dXMycGtpL2NjbWV3ZXN0dXMyaWNhMDEvOTcvY3VycmVudC5jcmwwb6BtoGuGaWh0dHA6Ly9jY21ld2VzdHVzMnBraS53ZXN0dXMyLnBraS5jb3JlLndpbmRvd3MubmV0L2NlcnRpZmljYXRlQXV0aG9yaXRpZXMvY2NtZXdlc3R1czJpY2EwMS85Ny9jdXJyZW50LmNybDCCAbcGCCsGAQUFBwEBBIIBqTCCAaUwbAYIKwYBBQUHMAKGYGh0dHA6Ly9wcmltYXJ5LWNkbi5wa2kuY29yZS53aW5kb3dzLm5ldC93ZXN0dXMyL2NhY2VydHMvY2NtZXdlc3R1czJwa2kvY2NtZXdlc3R1czJpY2EwMS9jZXJ0LmNlcjBuBggrBgEFBQcwAoZiaHR0cDovL3NlY29uZGFyeS1jZG4ucGtpLmNvcmUud2luZG93cy5uZXQvd2VzdHVzMi9jYWNlcnRzL2NjbWV3ZXN0dXMycGtpL2NjbWV3ZXN0dXMyaWNhMDEvY2VydC5jZXIwXQYIKwYBBQUHMAKGUWh0dHA6Ly9jcmwubWljcm9zb2Z0LmNvbS93ZXN0dXMyL2NhY2VydHMvY2NtZXdlc3R1czJwa2kvY2NtZXdlc3R1czJpY2EwMS9jZXJ0LmNlcjBmBggrBgEFBQcwAoZaaHR0cDovL2NjbWV3ZXN0dXMycGtpLndlc3R1czIucGtpLmNvcmUud2luZG93cy5uZXQvY2VydGlmaWNhdGVBdXRob3JpdGllcy9jY21ld2VzdHVzMmljYTAxMA0GCSqGSIb3DQEBCwUAA4IBAQBtlTS-mdvGIKziCDp4X9OVPqRLuoH48ib0L8ZVUxxNXw-O3sl-lio6Y7V0Xqv47B1Ru94KfFJZpXsF6u0Gk7IcfpKl2PltvEAmAKSdpsOElmGW0MeH-AsmLU-uRKqaIGsDrnsyJuLqtILSJ_GCMnG1VbnaqOJFmoBMj7f_unbCkVhb6MmyJC4sd_klisVbuUnjtp_Cgp2Wc_HeRKPemyn8alnsmHVOO0NHWIR41o6dNQCt7LJ5nM5rQd2Fww6uP0eqn3jQiNE0nl_zOqY8Me96xb0gWGe9D4aRXyAG_j-B4_gTga7SVfy92csbUhBWi9huq3gKSoRRpuS_4dQqvDVj&s=gOGnZMZu_2DMKE27tRTfgUIgMGCsgccDFOIJi2YUaE1O1pLpGly4S1JdiubxcY68dCDej-WTV3OpM3MCfbl13DYt51zOa6QcS0IKk-7SAQCMhBSqiW5KbUrV7ym2cdWTHMS4L2sG9J7tt4ssITnSr__feBDP9WEePF2AyPF8QcuF4kXwXkSxbtKT867YUtQqAal_vWgZCswKv9UbW7vbic59meYn5J9r92LdTqsk67_cSXGs6rRk61-OzyROMUxMlt65QLJwMjlgThyFO0F1yKM1VYQ6szbF4NY1hEVlWb2e_EnFJKBIDTVgJ4N29t6TS7Gq8P8B3Tn86sc7GbB15A&h=wWaJRu2WikkPOzX9OZ973fqFt3Sacq2pKYdENISV98E"
+                    ],
+                    "x-ms-throttle-levels": [
+                        "operationRatePct=0.1, operationConcurrencyPct=0.3, subscriptionWriteRatePct=0.4, etc"
+                    ],
+                    "date": [
+                        "Mon, 28 Sep 2026 20:26:35 GMT"
+                    ],
+                    "x-cache": [
+                        "CONFIG_NOCACHE"
+                    ],
+                    "cache-control": [
+                        "no-cache"
+                    ],
+                    "x-ms-arm-service-request-id": [
+                        "f8d30418-d7ba-4f10-a8bd-3cdedbc49c76"
+                    ],
+                    "x-ms-ratelimit-remaining-subscription-global-deletes": [
+                        "2999"
+                    ],
+                    "x-ms-ratelimit-remaining-subscription-deletes": [
+                        "199"
+                    ],
+                    "azure-asyncnotification": [
+                        "Enabled"
+                    ],
+                    "azure-asyncoperation": [
+                        "https://management.azure.com/subscriptions/ea42f556-5106-4743-99b0-c129bfa71a47/providers/Microsoft.Network/locations/southcentralus/operations/2e31ee44-4ca9-4b74-8025-ac68c1e03891?api-version=2024-05-01&t=639262239954280163&c=MIIHlDCCBnygAwIBAgIQEWqq0LXHm9_RoSQk3rtLtzANBgkqhkiG9w0BAQsFADA2MTQwMgYDVQQDEytDQ01FIEcxIFRMUyBSU0EgMjA0OCBTSEEyNTYgMjA0OSBXVVMyIENBIDAxMB4XDTI2MDkyMzA2MDIzOVoXDTI2MTIxODEyMDIzOVowQDE-MDwGA1UEAxM1YXN5bmNvcGVyYXRpb25zaWduaW5nY2VydGlmaWNhdGUubWFuYWdlbWVudC5henVyZS5jb20wggEiMA0GCSqGSIb3DQEBAQUAA4IBDwAwggEKAoIBAQCTL3s1G4HRJxCxQWgaa1QhZF9rCHBTzLl8phyc14DtHqFD1UEEvU8TdKIkn63TfPvm-CD5nDTQJhmqP3TQ4a1zbeIZvN26UwO-f2zs8v284_6vqmQYpp074W-XCE3yUu6xZi0c2RjrWXRE0C83U9RwiZBkm4sAg6EaNrBTlMtlbtByJMhA9KOAfS_ME_eoDeS2P_o__hD4yg538D4itpA1Yp3-XcF3vu3MgpyPUf4o8rU8J3Y9-jIPfdgYdhE-QPuKdwKQu0Aov3aNNHzv_aJivc4z22sXdAC9MeLP59Q0e1QaF_moRqk0Sr9AyE7J1ohMafagWSkQ-fj_5H83r6J9AgMBAAGjggSSMIIEjjCBnQYDVR0gBIGVMIGSMAwGCisGAQQBgjd7AQEwZgYKKwYBBAGCN3sCAjBYMFYGCCsGAQUFBwICMEoeSAAzADMAZQAwADEAOQAyADEALQA0AGQANgA0AC0ANABmADgAYwAtAGEAMAA1ADUALQA1AGIAZABhAGYAZgBkADUAZQAzADMAZDAMBgorBgEEAYI3ewMCMAwGCisGAQQBgjd7BAIwDAYDVR0TAQH_BAIwADAdBgNVHSUEFjAUBggrBgEFBQcDAQYIKwYBBQUHAwIwDgYDVR0PAQH_BAQDAgWgMB0GA1UdDgQWBBTI83RcASQN5gnS06-jdiNGf7b_JDAfBgNVHSMEGDAWgBSs43L6A7Jznj2VyO-HW67dG6HtaDCCAbIGA1UdHwSCAakwggGlMGmgZ6BlhmNodHRwOi8vcHJpbWFyeS1jZG4ucGtpLmNvcmUud2luZG93cy5uZXQvd2VzdHVzMi9jcmxzL2NjbWV3ZXN0dXMycGtpL2NjbWV3ZXN0dXMyaWNhMDEvOTcvY3VycmVudC5jcmwwa6BpoGeGZWh0dHA6Ly9zZWNvbmRhcnktY2RuLnBraS5jb3JlLndpbmRvd3MubmV0L3dlc3R1czIvY3Jscy9jY21ld2VzdHVzMnBraS9jY21ld2VzdHVzMmljYTAxLzk3L2N1cnJlbnQuY3JsMFqgWKBWhlRodHRwOi8vY3JsLm1pY3Jvc29mdC5jb20vd2VzdHVzMi9jcmxzL2NjbWV3ZXN0dXMycGtpL2NjbWV3ZXN0dXMyaWNhMDEvOTcvY3VycmVudC5jcmwwb6BtoGuGaWh0dHA6Ly9jY21ld2VzdHVzMnBraS53ZXN0dXMyLnBraS5jb3JlLndpbmRvd3MubmV0L2NlcnRpZmljYXRlQXV0aG9yaXRpZXMvY2NtZXdlc3R1czJpY2EwMS85Ny9jdXJyZW50LmNybDCCAbcGCCsGAQUFBwEBBIIBqTCCAaUwbAYIKwYBBQUHMAKGYGh0dHA6Ly9wcmltYXJ5LWNkbi5wa2kuY29yZS53aW5kb3dzLm5ldC93ZXN0dXMyL2NhY2VydHMvY2NtZXdlc3R1czJwa2kvY2NtZXdlc3R1czJpY2EwMS9jZXJ0LmNlcjBuBggrBgEFBQcwAoZiaHR0cDovL3NlY29uZGFyeS1jZG4ucGtpLmNvcmUud2luZG93cy5uZXQvd2VzdHVzMi9jYWNlcnRzL2NjbWV3ZXN0dXMycGtpL2NjbWV3ZXN0dXMyaWNhMDEvY2VydC5jZXIwXQYIKwYBBQUHMAKGUWh0dHA6Ly9jcmwubWljcm9zb2Z0LmNvbS93ZXN0dXMyL2NhY2VydHMvY2NtZXdlc3R1czJwa2kvY2NtZXdlc3R1czJpY2EwMS9jZXJ0LmNlcjBmBggrBgEFBQcwAoZaaHR0cDovL2NjbWV3ZXN0dXMycGtpLndlc3R1czIucGtpLmNvcmUud2luZG93cy5uZXQvY2VydGlmaWNhdGVBdXRob3JpdGllcy9jY21ld2VzdHVzMmljYTAxMA0GCSqGSIb3DQEBCwUAA4IBAQBtlTS-mdvGIKziCDp4X9OVPqRLuoH48ib0L8ZVUxxNXw-O3sl-lio6Y7V0Xqv47B1Ru94KfFJZpXsF6u0Gk7IcfpKl2PltvEAmAKSdpsOElmGW0MeH-AsmLU-uRKqaIGsDrnsyJuLqtILSJ_GCMnG1VbnaqOJFmoBMj7f_unbCkVhb6MmyJC4sd_klisVbuUnjtp_Cgp2Wc_HeRKPemyn8alnsmHVOO0NHWIR41o6dNQCt7LJ5nM5rQd2Fww6uP0eqn3jQiNE0nl_zOqY8Me96xb0gWGe9D4aRXyAG_j-B4_gTga7SVfy92csbUhBWi9huq3gKSoRRpuS_4dQqvDVj&s=IIM5yZ_dqv6pUZWUNuCMYBXRMkq1JZTuTLDxl8GnEkd-RiRyEQzQBEDun8WZxg3lydJPvufsjGIe3SvdgeODJYB_JmgqSlrtef8ZZzf1z6mZDbl4BeDrH2xSMDdDUtQ0Gs2Su1_dOA-GFLtWfEKpaB_E2y3SNH3s7CyasirJaYSFf_4SXbA_FUNIJZCx0kdxf8WH7DzTG7QXYreMwSpWBFIYG5zuVF7ulEt_5_CeAsy-Nx9iU5wTbWKvJszX5t5UrUcn4xT5k2tuGLY8iw4t8BtUiBaxvf3zuCUI96GHFl78_qqiwY1RQYkrBUokdZd-peQGb0gza7BhIYMHdiAXBQ&h=YEzgNXSlESFSNW-Rf64v5VkWsb9D6hd3M96uDb_KNOM"
+                    ]
+                },
+                "body": {
+                    "string": ""
+                }
+            }
+        },
+        {
+            "request": {
+                "method": "GET",
+                "uri": "https://management.azure.com/subscriptions/ea42f556-5106-4743-99b0-c129bfa71a47/providers/Microsoft.Network/locations/southcentralus/operations/2e31ee44-4ca9-4b74-8025-ac68c1e03891?api-version=2024-05-01&t=639262239954280163&c=MIIHlDCCBnygAwIBAgIQEWqq0LXHm9_RoSQk3rtLtzANBgkqhkiG9w0BAQsFADA2MTQwMgYDVQQDEytDQ01FIEcxIFRMUyBSU0EgMjA0OCBTSEEyNTYgMjA0OSBXVVMyIENBIDAxMB4XDTI2MDkyMzA2MDIzOVoXDTI2MTIxODEyMDIzOVowQDE-MDwGA1UEAxM1YXN5bmNvcGVyYXRpb25zaWduaW5nY2VydGlmaWNhdGUubWFuYWdlbWVudC5henVyZS5jb20wggEiMA0GCSqGSIb3DQEBAQUAA4IBDwAwggEKAoIBAQCTL3s1G4HRJxCxQWgaa1QhZF9rCHBTzLl8phyc14DtHqFD1UEEvU8TdKIkn63TfPvm-CD5nDTQJhmqP3TQ4a1zbeIZvN26UwO-f2zs8v284_6vqmQYpp074W-XCE3yUu6xZi0c2RjrWXRE0C83U9RwiZBkm4sAg6EaNrBTlMtlbtByJMhA9KOAfS_ME_eoDeS2P_o__hD4yg538D4itpA1Yp3-XcF3vu3MgpyPUf4o8rU8J3Y9-jIPfdgYdhE-QPuKdwKQu0Aov3aNNHzv_aJivc4z22sXdAC9MeLP59Q0e1QaF_moRqk0Sr9AyE7J1ohMafagWSkQ-fj_5H83r6J9AgMBAAGjggSSMIIEjjCBnQYDVR0gBIGVMIGSMAwGCisGAQQBgjd7AQEwZgYKKwYBBAGCN3sCAjBYMFYGCCsGAQUFBwICMEoeSAAzADMAZQAwADEAOQAyADEALQA0AGQANgA0AC0ANABmADgAYwAtAGEAMAA1ADUALQA1AGIAZABhAGYAZgBkADUAZQAzADMAZDAMBgorBgEEAYI3ewMCMAwGCisGAQQBgjd7BAIwDAYDVR0TAQH_BAIwADAdBgNVHSUEFjAUBggrBgEFBQcDAQYIKwYBBQUHAwIwDgYDVR0PAQH_BAQDAgWgMB0GA1UdDgQWBBTI83RcASQN5gnS06-jdiNGf7b_JDAfBgNVHSMEGDAWgBSs43L6A7Jznj2VyO-HW67dG6HtaDCCAbIGA1UdHwSCAakwggGlMGmgZ6BlhmNodHRwOi8vcHJpbWFyeS1jZG4ucGtpLmNvcmUud2luZG93cy5uZXQvd2VzdHVzMi9jcmxzL2NjbWV3ZXN0dXMycGtpL2NjbWV3ZXN0dXMyaWNhMDEvOTcvY3VycmVudC5jcmwwa6BpoGeGZWh0dHA6Ly9zZWNvbmRhcnktY2RuLnBraS5jb3JlLndpbmRvd3MubmV0L3dlc3R1czIvY3Jscy9jY21ld2VzdHVzMnBraS9jY21ld2VzdHVzMmljYTAxLzk3L2N1cnJlbnQuY3JsMFqgWKBWhlRodHRwOi8vY3JsLm1pY3Jvc29mdC5jb20vd2VzdHVzMi9jcmxzL2NjbWV3ZXN0dXMycGtpL2NjbWV3ZXN0dXMyaWNhMDEvOTcvY3VycmVudC5jcmwwb6BtoGuGaWh0dHA6Ly9jY21ld2VzdHVzMnBraS53ZXN0dXMyLnBraS5jb3JlLndpbmRvd3MubmV0L2NlcnRpZmljYXRlQXV0aG9yaXRpZXMvY2NtZXdlc3R1czJpY2EwMS85Ny9jdXJyZW50LmNybDCCAbcGCCsGAQUFBwEBBIIBqTCCAaUwbAYIKwYBBQUHMAKGYGh0dHA6Ly9wcmltYXJ5LWNkbi5wa2kuY29yZS53aW5kb3dzLm5ldC93ZXN0dXMyL2NhY2VydHMvY2NtZXdlc3R1czJwa2kvY2NtZXdlc3R1czJpY2EwMS9jZXJ0LmNlcjBuBggrBgEFBQcwAoZiaHR0cDovL3NlY29uZGFyeS1jZG4ucGtpLmNvcmUud2luZG93cy5uZXQvd2VzdHVzMi9jYWNlcnRzL2NjbWV3ZXN0dXMycGtpL2NjbWV3ZXN0dXMyaWNhMDEvY2VydC5jZXIwXQYIKwYBBQUHMAKGUWh0dHA6Ly9jcmwubWljcm9zb2Z0LmNvbS93ZXN0dXMyL2NhY2VydHMvY2NtZXdlc3R1czJwa2kvY2NtZXdlc3R1czJpY2EwMS9jZXJ0LmNlcjBmBggrBgEFBQcwAoZaaHR0cDovL2NjbWV3ZXN0dXMycGtpLndlc3R1czIucGtpLmNvcmUud2luZG93cy5uZXQvY2VydGlmaWNhdGVBdXRob3JpdGllcy9jY21ld2VzdHVzMmljYTAxMA0GCSqGSIb3DQEBCwUAA4IBAQBtlTS-mdvGIKziCDp4X9OVPqRLuoH48ib0L8ZVUxxNXw-O3sl-lio6Y7V0Xqv47B1Ru94KfFJZpXsF6u0Gk7IcfpKl2PltvEAmAKSdpsOElmGW0MeH-AsmLU-uRKqaIGsDrnsyJuLqtILSJ_GCMnG1VbnaqOJFmoBMj7f_unbCkVhb6MmyJC4sd_klisVbuUnjtp_Cgp2Wc_HeRKPemyn8alnsmHVOO0NHWIR41o6dNQCt7LJ5nM5rQd2Fww6uP0eqn3jQiNE0nl_zOqY8Me96xb0gWGe9D4aRXyAG_j-B4_gTga7SVfy92csbUhBWi9huq3gKSoRRpuS_4dQqvDVj&s=IIM5yZ_dqv6pUZWUNuCMYBXRMkq1JZTuTLDxl8GnEkd-RiRyEQzQBEDun8WZxg3lydJPvufsjGIe3SvdgeODJYB_JmgqSlrtef8ZZzf1z6mZDbl4BeDrH2xSMDdDUtQ0Gs2Su1_dOA-GFLtWfEKpaB_E2y3SNH3s7CyasirJaYSFf_4SXbA_FUNIJZCx0kdxf8WH7DzTG7QXYreMwSpWBFIYG5zuVF7ulEt_5_CeAsy-Nx9iU5wTbWKvJszX5t5UrUcn4xT5k2tuGLY8iw4t8BtUiBaxvf3zuCUI96GHFl78_qqiwY1RQYkrBUokdZd-peQGb0gza7BhIYMHdiAXBQ&h=YEzgNXSlESFSNW-Rf64v5VkWsb9D6hd3M96uDb_KNOM",
+                "body": null,
+                "headers": {}
+            },
+            "response": {
+                "status": {
+                    "code": 200,
+                    "message": "OK"
+                },
+                "headers": {
+                    "x-ms-throttle-levels": [
+                        "operationConcurrencyPct=0.5, subscriptionReadRatePct=0.2, etc"
+                    ],
+                    "x-ms-ratelimit-remaining-subscription-global-reads": [
+                        "3749"
+                    ],
+                    "x-ms-arm-service-request-id": [
+                        "4844ce2c-f7d6-4621-b6f5-e31173ff00ac"
+                    ],
+                    "content-length": [
+                        "22"
+                    ],
+                    "cache-control": [
+                        "no-cache"
+                    ],
+                    "x-msedge-ref": [
+                        "Ref A: 82C65C3FDD2D40E9A19B09D94B00C158 Ref B: CHI261140511036 Ref C: 2026-09-28T20:26:35Z"
+                    ],
+                    "x-cache": [
+                        "CONFIG_NOCACHE"
+                    ],
+                    "date": [
+                        "Mon, 28 Sep 2026 20:26:35 GMT"
+                    ],
+                    "content-type": [
+                        "application/json; charset=utf-8"
+                    ]
+                },
+                "body": {
+                    "data": {
+                        "status": "Succeeded"
+                    }
+                }
+            }
+        },
+        {
+            "request": {
+                "method": "GET",
+                "uri": "https://management.azure.com/subscriptions/ea42f556-5106-4743-99b0-c129bfa71a47/providers/Microsoft.Network/locations/southcentralus/operationResults/2e31ee44-4ca9-4b74-8025-ac68c1e03891?api-version=2024-05-01&t=639262239954280163&c=MIIHlDCCBnygAwIBAgIQEWqq0LXHm9_RoSQk3rtLtzANBgkqhkiG9w0BAQsFADA2MTQwMgYDVQQDEytDQ01FIEcxIFRMUyBSU0EgMjA0OCBTSEEyNTYgMjA0OSBXVVMyIENBIDAxMB4XDTI2MDkyMzA2MDIzOVoXDTI2MTIxODEyMDIzOVowQDE-MDwGA1UEAxM1YXN5bmNvcGVyYXRpb25zaWduaW5nY2VydGlmaWNhdGUubWFuYWdlbWVudC5henVyZS5jb20wggEiMA0GCSqGSIb3DQEBAQUAA4IBDwAwggEKAoIBAQCTL3s1G4HRJxCxQWgaa1QhZF9rCHBTzLl8phyc14DtHqFD1UEEvU8TdKIkn63TfPvm-CD5nDTQJhmqP3TQ4a1zbeIZvN26UwO-f2zs8v284_6vqmQYpp074W-XCE3yUu6xZi0c2RjrWXRE0C83U9RwiZBkm4sAg6EaNrBTlMtlbtByJMhA9KOAfS_ME_eoDeS2P_o__hD4yg538D4itpA1Yp3-XcF3vu3MgpyPUf4o8rU8J3Y9-jIPfdgYdhE-QPuKdwKQu0Aov3aNNHzv_aJivc4z22sXdAC9MeLP59Q0e1QaF_moRqk0Sr9AyE7J1ohMafagWSkQ-fj_5H83r6J9AgMBAAGjggSSMIIEjjCBnQYDVR0gBIGVMIGSMAwGCisGAQQBgjd7AQEwZgYKKwYBBAGCN3sCAjBYMFYGCCsGAQUFBwICMEoeSAAzADMAZQAwADEAOQAyADEALQA0AGQANgA0AC0ANABmADgAYwAtAGEAMAA1ADUALQA1AGIAZABhAGYAZgBkADUAZQAzADMAZDAMBgorBgEEAYI3ewMCMAwGCisGAQQBgjd7BAIwDAYDVR0TAQH_BAIwADAdBgNVHSUEFjAUBggrBgEFBQcDAQYIKwYBBQUHAwIwDgYDVR0PAQH_BAQDAgWgMB0GA1UdDgQWBBTI83RcASQN5gnS06-jdiNGf7b_JDAfBgNVHSMEGDAWgBSs43L6A7Jznj2VyO-HW67dG6HtaDCCAbIGA1UdHwSCAakwggGlMGmgZ6BlhmNodHRwOi8vcHJpbWFyeS1jZG4ucGtpLmNvcmUud2luZG93cy5uZXQvd2VzdHVzMi9jcmxzL2NjbWV3ZXN0dXMycGtpL2NjbWV3ZXN0dXMyaWNhMDEvOTcvY3VycmVudC5jcmwwa6BpoGeGZWh0dHA6Ly9zZWNvbmRhcnktY2RuLnBraS5jb3JlLndpbmRvd3MubmV0L3dlc3R1czIvY3Jscy9jY21ld2VzdHVzMnBraS9jY21ld2VzdHVzMmljYTAxLzk3L2N1cnJlbnQuY3JsMFqgWKBWhlRodHRwOi8vY3JsLm1pY3Jvc29mdC5jb20vd2VzdHVzMi9jcmxzL2NjbWV3ZXN0dXMycGtpL2NjbWV3ZXN0dXMyaWNhMDEvOTcvY3VycmVudC5jcmwwb6BtoGuGaWh0dHA6Ly9jY21ld2VzdHVzMnBraS53ZXN0dXMyLnBraS5jb3JlLndpbmRvd3MubmV0L2NlcnRpZmljYXRlQXV0aG9yaXRpZXMvY2NtZXdlc3R1czJpY2EwMS85Ny9jdXJyZW50LmNybDCCAbcGCCsGAQUFBwEBBIIBqTCCAaUwbAYIKwYBBQUHMAKGYGh0dHA6Ly9wcmltYXJ5LWNkbi5wa2kuY29yZS53aW5kb3dzLm5ldC93ZXN0dXMyL2NhY2VydHMvY2NtZXdlc3R1czJwa2kvY2NtZXdlc3R1czJpY2EwMS9jZXJ0LmNlcjBuBggrBgEFBQcwAoZiaHR0cDovL3NlY29uZGFyeS1jZG4ucGtpLmNvcmUud2luZG93cy5uZXQvd2VzdHVzMi9jYWNlcnRzL2NjbWV3ZXN0dXMycGtpL2NjbWV3ZXN0dXMyaWNhMDEvY2VydC5jZXIwXQYIKwYBBQUHMAKGUWh0dHA6Ly9jcmwubWljcm9zb2Z0LmNvbS93ZXN0dXMyL2NhY2VydHMvY2NtZXdlc3R1czJwa2kvY2NtZXdlc3R1czJpY2EwMS9jZXJ0LmNlcjBmBggrBgEFBQcwAoZaaHR0cDovL2NjbWV3ZXN0dXMycGtpLndlc3R1czIucGtpLmNvcmUud2luZG93cy5uZXQvY2VydGlmaWNhdGVBdXRob3JpdGllcy9jY21ld2VzdHVzMmljYTAxMA0GCSqGSIb3DQEBCwUAA4IBAQBtlTS-mdvGIKziCDp4X9OVPqRLuoH48ib0L8ZVUxxNXw-O3sl-lio6Y7V0Xqv47B1Ru94KfFJZpXsF6u0Gk7IcfpKl2PltvEAmAKSdpsOElmGW0MeH-AsmLU-uRKqaIGsDrnsyJuLqtILSJ_GCMnG1VbnaqOJFmoBMj7f_unbCkVhb6MmyJC4sd_klisVbuUnjtp_Cgp2Wc_HeRKPemyn8alnsmHVOO0NHWIR41o6dNQCt7LJ5nM5rQd2Fww6uP0eqn3jQiNE0nl_zOqY8Me96xb0gWGe9D4aRXyAG_j-B4_gTga7SVfy92csbUhBWi9huq3gKSoRRpuS_4dQqvDVj&s=gOGnZMZu_2DMKE27tRTfgUIgMGCsgccDFOIJi2YUaE1O1pLpGly4S1JdiubxcY68dCDej-WTV3OpM3MCfbl13DYt51zOa6QcS0IKk-7SAQCMhBSqiW5KbUrV7ym2cdWTHMS4L2sG9J7tt4ssITnSr__feBDP9WEePF2AyPF8QcuF4kXwXkSxbtKT867YUtQqAal_vWgZCswKv9UbW7vbic59meYn5J9r92LdTqsk67_cSXGs6rRk61-OzyROMUxMlt65QLJwMjlgThyFO0F1yKM1VYQ6szbF4NY1hEVlWb2e_EnFJKBIDTVgJ4N29t6TS7Gq8P8B3Tn86sc7GbB15A&h=wWaJRu2WikkPOzX9OZ973fqFt3Sacq2pKYdENISV98E",
+                "body": null,
+                "headers": {}
+            },
+            "response": {
+                "status": {
+                    "code": 204,
+                    "message": "No Content"
+                },
+                "headers": {
+                    "x-msedge-ref": [
+                        "Ref A: 5F06D461FF6B4E03BAA2334CACA170ED Ref B: CHI261140509040 Ref C: 2026-09-28T20:26:36Z"
+                    ],
+                    "location": [
+                        "https://management.azure.com/subscriptions/ea42f556-5106-4743-99b0-c129bfa71a47/providers/Microsoft.Network/locations/southcentralus/operationResults/2e31ee44-4ca9-4b74-8025-ac68c1e03891?api-version=2024-05-01&t=639262239964451012&c=MIIHxDCCBqygAwIBAgIRAK3GpGj7DjHLrjRJRX_HEXgwDQYJKoZIhvcNAQELBQAwNTEzMDEGA1UEAxMqQ0NNRSBHMSBUTFMgUlNBIDIwNDggU0hBMjU2IDIwNDkgQ1VTIENBIDAxMB4XDTI2MDkxNzE5NDgyOFoXDTI2MTIxMzAxNDgyOFowQDE-MDwGA1UEAxM1YXN5bmNvcGVyYXRpb25zaWduaW5nY2VydGlmaWNhdGUubWFuYWdlbWVudC5henVyZS5jb20wggEiMA0GCSqGSIb3DQEBAQUAA4IBDwAwggEKAoIBAQC1snhTC6g_4xx4ZrHyiUqTYGCsPZny3WTFt1HNTpetNpb_Y4Ect_LxssSA3PaPbNW5xiK2g0l84t8tlBb4NJt4iWD9ZwS9IRxGg0UuWjhyi4BQ5nI7V4c80TQ3W166AA9VV-hnq8DlFZxA4jhgbhfitgCsrhHu-0To9jdy2yVo7Ou3R57j51u2Des7d-kBfWmS0Bfd_rg2U-JsWvitd4mXfjVmh0hIeD8PJAVxRczpzyxghRX3mYtuvxUHM0nYb39mkKTBJyFzkEdLMQXLeDBqfD7O80rXsQ0zETCpv5pYUNhLvtOvWmOOIdBJbNx5pzxskbmMOFz9HgF_Ze6P-F4tAgMBAAGjggTCMIIEvjCBnQYDVR0gBIGVMIGSMAwGCisGAQQBgjd7AQEwZgYKKwYBBAGCN3sCAjBYMFYGCCsGAQUFBwICMEoeSAAzADMAZQAwADEAOQAyADEALQA0AGQANgA0AC0ANABmADgAYwAtAGEAMAA1ADUALQA1AGIAZABhAGYAZgBkADUAZQAzADMAZDAMBgorBgEEAYI3ewMCMAwGCisGAQQBgjd7BAIwDAYDVR0TAQH_BAIwADAdBgNVHSUEFjAUBggrBgEFBQcDAQYIKwYBBQUHAwIwDgYDVR0PAQH_BAQDAgWgMB0GA1UdDgQWBBQa8-eemI0KngUPnocA3BYB2hcHRTAfBgNVHSMEGDAWgBT85FoKL4UO50S5B3N44NREB6IZETCCAcoGA1UdHwSCAcEwggG9MG-gbaBrhmlodHRwOi8vcHJpbWFyeS1jZG4ucGtpLmNvcmUud2luZG93cy5uZXQvY2VudHJhbHVzL2NybHMvY2NtZWNlbnRyYWx1c3BraS9jY21lY2VudHJhbHVzaWNhMDEvNjYvY3VycmVudC5jcmwwcaBvoG2Ga2h0dHA6Ly9zZWNvbmRhcnktY2RuLnBraS5jb3JlLndpbmRvd3MubmV0L2NlbnRyYWx1cy9jcmxzL2NjbWVjZW50cmFsdXNwa2kvY2NtZWNlbnRyYWx1c2ljYTAxLzY2L2N1cnJlbnQuY3JsMGCgXqBchlpodHRwOi8vY3JsLm1pY3Jvc29mdC5jb20vY2VudHJhbHVzL2NybHMvY2NtZWNlbnRyYWx1c3BraS9jY21lY2VudHJhbHVzaWNhMDEvNjYvY3VycmVudC5jcmwwdaBzoHGGb2h0dHA6Ly9jY21lY2VudHJhbHVzcGtpLmNlbnRyYWx1cy5wa2kuY29yZS53aW5kb3dzLm5ldC9jZXJ0aWZpY2F0ZUF1dGhvcml0aWVzL2NjbWVjZW50cmFsdXNpY2EwMS82Ni9jdXJyZW50LmNybDCCAc8GCCsGAQUFBwEBBIIBwTCCAb0wcgYIKwYBBQUHMAKGZmh0dHA6Ly9wcmltYXJ5LWNkbi5wa2kuY29yZS53aW5kb3dzLm5ldC9jZW50cmFsdXMvY2FjZXJ0cy9jY21lY2VudHJhbHVzcGtpL2NjbWVjZW50cmFsdXNpY2EwMS9jZXJ0LmNlcjB0BggrBgEFBQcwAoZoaHR0cDovL3NlY29uZGFyeS1jZG4ucGtpLmNvcmUud2luZG93cy5uZXQvY2VudHJhbHVzL2NhY2VydHMvY2NtZWNlbnRyYWx1c3BraS9jY21lY2VudHJhbHVzaWNhMDEvY2VydC5jZXIwYwYIKwYBBQUHMAKGV2h0dHA6Ly9jcmwubWljcm9zb2Z0LmNvbS9jZW50cmFsdXMvY2FjZXJ0cy9jY21lY2VudHJhbHVzcGtpL2NjbWVjZW50cmFsdXNpY2EwMS9jZXJ0LmNlcjBsBggrBgEFBQcwAoZgaHR0cDovL2NjbWVjZW50cmFsdXNwa2kuY2VudHJhbHVzLnBraS5jb3JlLndpbmRvd3MubmV0L2NlcnRpZmljYXRlQXV0aG9yaXRpZXMvY2NtZWNlbnRyYWx1c2ljYTAxMA0GCSqGSIb3DQEBCwUAA4IBAQBp0qSFIPxsO9-AAkHEku0ZFsMQQDXzDwru9rO_zch628Re4yuZQiurXQmd_7RdfMOTB8Bpy0TLqDaFsVzhDV6VVXcq5tbuMwjxgwFhwDMBRKGkvtXfojeQ5a2wNFt-Pk-_FxKYvNZ4EVdNbJk6d4ify7yuugiGxToKqqxmwp_mgkz71K-9wTj2SvITSyg43qHdnc5fhGdG0VkvOsjuQzgNR02mqPSkLzkVQNwM71gx5P_WA0n3PfHnBKalXfb2chNsstaOtnYkkJcYcNESFK-srFA6sijtKWm_7sbIQcnAJYR5l-eaXxcu2xMuuskUFmgq6njXPHx5tPSNB77zeeFd&s=a9cBDthpadtcSzQoW6tc3u9QOspl8bE1-SOwwSCo1gVofZHt7P_jfpI6OrU96u7X9wGd8_1r95NmG0YawDlRDjvPS9NMDYbX4uITVVPZ6ALMnq0PVBDIOpaba1fVT5GOiOp40dd9LEx_ClkU4RduZRTJqKwIF7pqzvrKtvpRKD5wfbl-FwbA_1c_Vg-C-I6Qc7YUek1-06WJMuB-f1LDD0s9VVfiqm3HVel7v19gwfUpjbVZtidAx6N6p5oYqzQ625b48gL89Sp6aRcBQqhEmLChyV0ZJrdaYtbckxi8rKimmYzfYXdbr1FOqK9689zXHqc8lwWKVgCJEUv3FxgeLg&h=VWLQXyhHVmG9XXiy4T_UzSkDxh3IRTsngwQ7xCjYX5Y"
+                    ],
+                    "x-ms-throttle-levels": [
+                        "operationConcurrencyPct=0.5, subscriptionReadRatePct=0.2, etc"
+                    ],
+                    "date": [
+                        "Mon, 28 Sep 2026 20:26:36 GMT"
+                    ],
+                    "x-cache": [
+                        "CONFIG_NOCACHE"
+                    ],
+                    "content-type": [
+                        "application/json; charset=utf-8"
+                    ],
+                    "x-ms-arm-service-request-id": [
+                        "f8d30418-d7ba-4f10-a8bd-3cdedbc49c76"
+                    ],
+                    "x-ms-ratelimit-remaining-subscription-global-reads": [
+                        "3749"
+                    ],
+                    "cache-control": [
+                        "no-cache"
+                    ],
+                    "azure-asyncnotification": [
+                        "Enabled"
+                    ],
+                    "azure-asyncoperation": [
+                        "https://management.azure.com/subscriptions/ea42f556-5106-4743-99b0-c129bfa71a47/providers/Microsoft.Network/locations/southcentralus/operations/2e31ee44-4ca9-4b74-8025-ac68c1e03891?api-version=2024-05-01&t=639262239964294856&c=MIIHxDCCBqygAwIBAgIRAK3GpGj7DjHLrjRJRX_HEXgwDQYJKoZIhvcNAQELBQAwNTEzMDEGA1UEAxMqQ0NNRSBHMSBUTFMgUlNBIDIwNDggU0hBMjU2IDIwNDkgQ1VTIENBIDAxMB4XDTI2MDkxNzE5NDgyOFoXDTI2MTIxMzAxNDgyOFowQDE-MDwGA1UEAxM1YXN5bmNvcGVyYXRpb25zaWduaW5nY2VydGlmaWNhdGUubWFuYWdlbWVudC5henVyZS5jb20wggEiMA0GCSqGSIb3DQEBAQUAA4IBDwAwggEKAoIBAQC1snhTC6g_4xx4ZrHyiUqTYGCsPZny3WTFt1HNTpetNpb_Y4Ect_LxssSA3PaPbNW5xiK2g0l84t8tlBb4NJt4iWD9ZwS9IRxGg0UuWjhyi4BQ5nI7V4c80TQ3W166AA9VV-hnq8DlFZxA4jhgbhfitgCsrhHu-0To9jdy2yVo7Ou3R57j51u2Des7d-kBfWmS0Bfd_rg2U-JsWvitd4mXfjVmh0hIeD8PJAVxRczpzyxghRX3mYtuvxUHM0nYb39mkKTBJyFzkEdLMQXLeDBqfD7O80rXsQ0zETCpv5pYUNhLvtOvWmOOIdBJbNx5pzxskbmMOFz9HgF_Ze6P-F4tAgMBAAGjggTCMIIEvjCBnQYDVR0gBIGVMIGSMAwGCisGAQQBgjd7AQEwZgYKKwYBBAGCN3sCAjBYMFYGCCsGAQUFBwICMEoeSAAzADMAZQAwADEAOQAyADEALQA0AGQANgA0AC0ANABmADgAYwAtAGEAMAA1ADUALQA1AGIAZABhAGYAZgBkADUAZQAzADMAZDAMBgorBgEEAYI3ewMCMAwGCisGAQQBgjd7BAIwDAYDVR0TAQH_BAIwADAdBgNVHSUEFjAUBggrBgEFBQcDAQYIKwYBBQUHAwIwDgYDVR0PAQH_BAQDAgWgMB0GA1UdDgQWBBQa8-eemI0KngUPnocA3BYB2hcHRTAfBgNVHSMEGDAWgBT85FoKL4UO50S5B3N44NREB6IZETCCAcoGA1UdHwSCAcEwggG9MG-gbaBrhmlodHRwOi8vcHJpbWFyeS1jZG4ucGtpLmNvcmUud2luZG93cy5uZXQvY2VudHJhbHVzL2NybHMvY2NtZWNlbnRyYWx1c3BraS9jY21lY2VudHJhbHVzaWNhMDEvNjYvY3VycmVudC5jcmwwcaBvoG2Ga2h0dHA6Ly9zZWNvbmRhcnktY2RuLnBraS5jb3JlLndpbmRvd3MubmV0L2NlbnRyYWx1cy9jcmxzL2NjbWVjZW50cmFsdXNwa2kvY2NtZWNlbnRyYWx1c2ljYTAxLzY2L2N1cnJlbnQuY3JsMGCgXqBchlpodHRwOi8vY3JsLm1pY3Jvc29mdC5jb20vY2VudHJhbHVzL2NybHMvY2NtZWNlbnRyYWx1c3BraS9jY21lY2VudHJhbHVzaWNhMDEvNjYvY3VycmVudC5jcmwwdaBzoHGGb2h0dHA6Ly9jY21lY2VudHJhbHVzcGtpLmNlbnRyYWx1cy5wa2kuY29yZS53aW5kb3dzLm5ldC9jZXJ0aWZpY2F0ZUF1dGhvcml0aWVzL2NjbWVjZW50cmFsdXNpY2EwMS82Ni9jdXJyZW50LmNybDCCAc8GCCsGAQUFBwEBBIIBwTCCAb0wcgYIKwYBBQUHMAKGZmh0dHA6Ly9wcmltYXJ5LWNkbi5wa2kuY29yZS53aW5kb3dzLm5ldC9jZW50cmFsdXMvY2FjZXJ0cy9jY21lY2VudHJhbHVzcGtpL2NjbWVjZW50cmFsdXNpY2EwMS9jZXJ0LmNlcjB0BggrBgEFBQcwAoZoaHR0cDovL3NlY29uZGFyeS1jZG4ucGtpLmNvcmUud2luZG93cy5uZXQvY2VudHJhbHVzL2NhY2VydHMvY2NtZWNlbnRyYWx1c3BraS9jY21lY2VudHJhbHVzaWNhMDEvY2VydC5jZXIwYwYIKwYBBQUHMAKGV2h0dHA6Ly9jcmwubWljcm9zb2Z0LmNvbS9jZW50cmFsdXMvY2FjZXJ0cy9jY21lY2VudHJhbHVzcGtpL2NjbWVjZW50cmFsdXNpY2EwMS9jZXJ0LmNlcjBsBggrBgEFBQcwAoZgaHR0cDovL2NjbWVjZW50cmFsdXNwa2kuY2VudHJhbHVzLnBraS5jb3JlLndpbmRvd3MubmV0L2NlcnRpZmljYXRlQXV0aG9yaXRpZXMvY2NtZWNlbnRyYWx1c2ljYTAxMA0GCSqGSIb3DQEBCwUAA4IBAQBp0qSFIPxsO9-AAkHEku0ZFsMQQDXzDwru9rO_zch628Re4yuZQiurXQmd_7RdfMOTB8Bpy0TLqDaFsVzhDV6VVXcq5tbuMwjxgwFhwDMBRKGkvtXfojeQ5a2wNFt-Pk-_FxKYvNZ4EVdNbJk6d4ify7yuugiGxToKqqxmwp_mgkz71K-9wTj2SvITSyg43qHdnc5fhGdG0VkvOsjuQzgNR02mqPSkLzkVQNwM71gx5P_WA0n3PfHnBKalXfb2chNsstaOtnYkkJcYcNESFK-srFA6sijtKWm_7sbIQcnAJYR5l-eaXxcu2xMuuskUFmgq6njXPHx5tPSNB77zeeFd&s=fax8iu0CpbursaC7BpMQ6OsjYQMiTmPrSTEkH-myM8fnzkX0b0Ra5ySDA4Ki-dl7D7SHg6GLHvFypmgEglnBkbVjE-EpALskU6uZjYvls2o34Wc1e9FwTVruCL1ySLL0fS-mpVA0dA0sQ4CFg5arMnnr81zpVK-SlXnbvk4h8u8YC2_AM40rqj9LuNyBfTmZxWL2c6pnGAZzQllejT9wCwvtEods3RWSSYOWXAEEb6SMvNqpAotC5-iyOss8aRFkLl9RojOp8shnBVJ1ESeyrR4huu9vwKKCymFMtCb_BAhrIxs5nzKcpApeEPzmzVOaNExNEiLQlOiThQ5Mq7aa7w&h=EvzVbq2_4ZvEJFpozbzTvEHSlEml3LvUocnKoyJ_Lvc"
+                    ]
+                },
+                "body": {
+                    "string": ""
+                }
+            }
+        },
+        {
+            "request": {
+                "method": "GET",
+                "uri": "https://management.azure.com/subscriptions/ea42f556-5106-4743-99b0-c129bfa71a47/providers/Microsoft.Network/networkSecurityGroups?api-version=2024-05-01",
+                "body": null,
+                "headers": {}
+            },
+            "response": {
+                "status": {
+                    "code": 200,
+                    "message": "OK"
+                },
+                "headers": {
+                    "x-ms-throttle-levels": [
+                        "operationConcurrencyPct=0.5, subscriptionReadRatePct=0.2, etc"
+                    ],
+                    "x-ms-original-request-ids": [
+                        "4a3d3a2e-6246-43a6-ad96-7fbaead8535c"
+                    ],
+                    "x-ms-ratelimit-remaining-subscription-global-reads": [
+                        "3749"
+                    ],
+                    "x-ms-arm-service-request-id": [
+                        "379c2433-5cde-4c88-9303-aaaaf17dee89"
+                    ],
+                    "content-length": [
+                        "5173"
+                    ],
+                    "cache-control": [
+                        "no-cache"
+                    ],
+                    "x-msedge-ref": [
+                        "Ref A: 1BCB9CB92C7244D5A3FF51416ACB0264 Ref B: CHI261140505023 Ref C: 2026-09-28T20:26:36Z"
+                    ],
+                    "x-cache": [
+                        "CONFIG_NOCACHE"
+                    ],
+                    "date": [
+                        "Mon, 28 Sep 2026 20:26:37 GMT"
+                    ],
+                    "content-type": [
+                        "application/json; charset=utf-8"
+                    ]
+                },
+                "body": {
+                    "data": {
+                        "value": [
+                            {
+                                "name": "c7n-nsg-remove-rules",
+                                "id": "/subscriptions/ea42f556-5106-4743-99b0-c129bfa71a47/resourceGroups/test_networksecuritygroup-remove-rules/providers/Microsoft.Network/networkSecurityGroups/c7n-nsg-remove-rules",
+                                "etag": "W/\"a446b369-ca57-4571-affb-c6864a34ac90\"",
+                                "type": "Microsoft.Network/networkSecurityGroups",
+                                "location": "southcentralus",
+                                "properties": {
+                                    "provisioningState": "Succeeded",
+                                    "resourceGuid": "7a749cea-eac1-420b-9cc9-66b20cd394c5",
+                                    "securityRules": [],
+                                    "defaultSecurityRules": [
+                                        {
+                                            "name": "AllowVnetInBound",
+                                            "id": "/subscriptions/ea42f556-5106-4743-99b0-c129bfa71a47/resourceGroups/test_networksecuritygroup-remove-rules/providers/Microsoft.Network/networkSecurityGroups/c7n-nsg-remove-rules/defaultSecurityRules/AllowVnetInBound",
+                                            "etag": "W/\"a446b369-ca57-4571-affb-c6864a34ac90\"",
+                                            "type": "Microsoft.Network/networkSecurityGroups/defaultSecurityRules",
+                                            "properties": {
+                                                "provisioningState": "Succeeded",
+                                                "description": "Allow inbound traffic from all VMs in VNET",
+                                                "protocol": "*",
+                                                "sourcePortRange": "*",
+                                                "destinationPortRange": "*",
+                                                "sourceAddressPrefix": "VirtualNetwork",
+                                                "destinationAddressPrefix": "VirtualNetwork",
+                                                "access": "Allow",
+                                                "priority": 65000,
+                                                "direction": "Inbound",
+                                                "sourcePortRanges": [],
+                                                "destinationPortRanges": [],
+                                                "sourceAddressPrefixes": [],
+                                                "destinationAddressPrefixes": []
+                                            }
+                                        },
+                                        {
+                                            "name": "AllowAzureLoadBalancerInBound",
+                                            "id": "/subscriptions/ea42f556-5106-4743-99b0-c129bfa71a47/resourceGroups/test_networksecuritygroup-remove-rules/providers/Microsoft.Network/networkSecurityGroups/c7n-nsg-remove-rules/defaultSecurityRules/AllowAzureLoadBalancerInBound",
+                                            "etag": "W/\"a446b369-ca57-4571-affb-c6864a34ac90\"",
+                                            "type": "Microsoft.Network/networkSecurityGroups/defaultSecurityRules",
+                                            "properties": {
+                                                "provisioningState": "Succeeded",
+                                                "description": "Allow inbound traffic from azure load balancer",
+                                                "protocol": "*",
+                                                "sourcePortRange": "*",
+                                                "destinationPortRange": "*",
+                                                "sourceAddressPrefix": "AzureLoadBalancer",
+                                                "destinationAddressPrefix": "*",
+                                                "access": "Allow",
+                                                "priority": 65001,
+                                                "direction": "Inbound",
+                                                "sourcePortRanges": [],
+                                                "destinationPortRanges": [],
+                                                "sourceAddressPrefixes": [],
+                                                "destinationAddressPrefixes": []
+                                            }
+                                        },
+                                        {
+                                            "name": "DenyAllInBound",
+                                            "id": "/subscriptions/ea42f556-5106-4743-99b0-c129bfa71a47/resourceGroups/test_networksecuritygroup-remove-rules/providers/Microsoft.Network/networkSecurityGroups/c7n-nsg-remove-rules/defaultSecurityRules/DenyAllInBound",
+                                            "etag": "W/\"a446b369-ca57-4571-affb-c6864a34ac90\"",
+                                            "type": "Microsoft.Network/networkSecurityGroups/defaultSecurityRules",
+                                            "properties": {
+                                                "provisioningState": "Succeeded",
+                                                "description": "Deny all inbound traffic",
+                                                "protocol": "*",
+                                                "sourcePortRange": "*",
+                                                "destinationPortRange": "*",
+                                                "sourceAddressPrefix": "*",
+                                                "destinationAddressPrefix": "*",
+                                                "access": "Deny",
+                                                "priority": 65500,
+                                                "direction": "Inbound",
+                                                "sourcePortRanges": [],
+                                                "destinationPortRanges": [],
+                                                "sourceAddressPrefixes": [],
+                                                "destinationAddressPrefixes": []
+                                            }
+                                        },
+                                        {
+                                            "name": "AllowVnetOutBound",
+                                            "id": "/subscriptions/ea42f556-5106-4743-99b0-c129bfa71a47/resourceGroups/test_networksecuritygroup-remove-rules/providers/Microsoft.Network/networkSecurityGroups/c7n-nsg-remove-rules/defaultSecurityRules/AllowVnetOutBound",
+                                            "etag": "W/\"a446b369-ca57-4571-affb-c6864a34ac90\"",
+                                            "type": "Microsoft.Network/networkSecurityGroups/defaultSecurityRules",
+                                            "properties": {
+                                                "provisioningState": "Succeeded",
+                                                "description": "Allow outbound traffic from all VMs to all VMs in VNET",
+                                                "protocol": "*",
+                                                "sourcePortRange": "*",
+                                                "destinationPortRange": "*",
+                                                "sourceAddressPrefix": "VirtualNetwork",
+                                                "destinationAddressPrefix": "VirtualNetwork",
+                                                "access": "Allow",
+                                                "priority": 65000,
+                                                "direction": "Outbound",
+                                                "sourcePortRanges": [],
+                                                "destinationPortRanges": [],
+                                                "sourceAddressPrefixes": [],
+                                                "destinationAddressPrefixes": []
+                                            }
+                                        },
+                                        {
+                                            "name": "AllowInternetOutBound",
+                                            "id": "/subscriptions/ea42f556-5106-4743-99b0-c129bfa71a47/resourceGroups/test_networksecuritygroup-remove-rules/providers/Microsoft.Network/networkSecurityGroups/c7n-nsg-remove-rules/defaultSecurityRules/AllowInternetOutBound",
+                                            "etag": "W/\"a446b369-ca57-4571-affb-c6864a34ac90\"",
+                                            "type": "Microsoft.Network/networkSecurityGroups/defaultSecurityRules",
+                                            "properties": {
+                                                "provisioningState": "Succeeded",
+                                                "description": "Allow outbound traffic from all VMs to Internet",
+                                                "protocol": "*",
+                                                "sourcePortRange": "*",
+                                                "destinationPortRange": "*",
+                                                "sourceAddressPrefix": "*",
+                                                "destinationAddressPrefix": "Internet",
+                                                "access": "Allow",
+                                                "priority": 65001,
+                                                "direction": "Outbound",
+                                                "sourcePortRanges": [],
+                                                "destinationPortRanges": [],
+                                                "sourceAddressPrefixes": [],
+                                                "destinationAddressPrefixes": []
+                                            }
+                                        },
+                                        {
+                                            "name": "DenyAllOutBound",
+                                            "id": "/subscriptions/ea42f556-5106-4743-99b0-c129bfa71a47/resourceGroups/test_networksecuritygroup-remove-rules/providers/Microsoft.Network/networkSecurityGroups/c7n-nsg-remove-rules/defaultSecurityRules/DenyAllOutBound",
+                                            "etag": "W/\"a446b369-ca57-4571-affb-c6864a34ac90\"",
+                                            "type": "Microsoft.Network/networkSecurityGroups/defaultSecurityRules",
+                                            "properties": {
+                                                "provisioningState": "Succeeded",
+                                                "description": "Deny all outbound traffic",
+                                                "protocol": "*",
+                                                "sourcePortRange": "*",
+                                                "destinationPortRange": "*",
+                                                "sourceAddressPrefix": "*",
+                                                "destinationAddressPrefix": "*",
+                                                "access": "Deny",
+                                                "priority": 65500,
+                                                "direction": "Outbound",
+                                                "sourcePortRanges": [],
+                                                "destinationPortRanges": [],
+                                                "sourceAddressPrefixes": [],
+                                                "destinationAddressPrefixes": []
+                                            }
+                                        }
+                                    ]
+                                }
+                            }
+                        ]
+                    }
+                }
+            }
+        }
+    ]
+}

@@ -1,0 +1,383 @@
+{
+    "status_code": 200,
+    "data": {
+        "AutoScalingGroups": [
+            {
+                "AutoScalingGroupName": "c7n-image-age-test",
+                "AutoScalingGroupARN": "arn:aws:autoscaling:us-east-1:644160558196:autoScalingGroup:9edc8896-61e5-4e7a-b4ab-62b41ea7064d:autoScalingGroupName/c7n-image-age-test",
+                "LaunchConfigurationName": "test-offhours",
+                "MinSize": 0,
+                "MaxSize": 0,
+                "DesiredCapacity": 0,
+                "DefaultCooldown": 300,
+                "AvailabilityZones": [
+                    "us-east-1a"
+                ],
+                "LoadBalancerNames": [],
+                "TargetGroupARNs": [],
+                "HealthCheckType": "EC2",
+                "HealthCheckGracePeriod": 300,
+                "Instances": [],
+                "CreatedTime": {
+                    "__class__": "datetime",
+                    "year": 2019,
+                    "month": 11,
+                    "day": 4,
+                    "hour": 2,
+                    "minute": 49,
+                    "second": 1,
+                    "microsecond": 105000
+                },
+                "SuspendedProcesses": [
+                    {
+                        "ProcessName": "AZRebalance",
+                        "SuspensionReason": "User suspended at 2024-01-25T16:45:06Z"
+                    }
+                ],
+                "VPCZoneIdentifier": "subnet-914763e7",
+                "EnabledMetrics": [],
+                "Tags": [
+                    {
+                        "ResourceId": "c7n-image-age-test",
+                        "ResourceType": "auto-scaling-group",
+                        "Key": "AmazonECSManaged",
+                        "Value": "Right",
+                        "PropagateAtLaunch": true
+                    }
+                ],
+                "TerminationPolicies": [
+                    "Default"
+                ],
+                "NewInstancesProtectedFromScaleIn": false,
+                "ServiceLinkedRoleARN": "arn:aws:iam::644160558196:role/aws-service-role/autoscaling.amazonaws.com/AWSServiceRoleForAutoScaling",
+                "TrafficSources": [],
+                "AvailabilityZoneDistribution": {
+                    "CapacityDistributionStrategy": "balanced-best-effort"
+                },
+                "CapacityReservationSpecification": {
+                    "CapacityReservationPreference": "default"
+                },
+                "InstanceLifecyclePolicy": {
+                    "RetentionTriggers": {
+                        "TerminateHookAbandon": "terminate"
+                    }
+                }
+            },
+            {
+                "AutoScalingGroupName": "c7n-public-test",
+                "AutoScalingGroupARN": "arn:aws:autoscaling:us-east-1:644160558196:autoScalingGroup:0cfe2036-353e-4ed2-8a03-4b9223b7eb52:autoScalingGroupName/c7n-public-test",
+                "MixedInstancesPolicy": {
+                    "LaunchTemplate": {
+                        "LaunchTemplateSpecification": {
+                            "LaunchTemplateId": "lt-05f69d0ff49a3bf33",
+                            "LaunchTemplateName": "c7n-public-test",
+                            "Version": "$Default"
+                        },
+                        "Overrides": [
+                            {
+                                "InstanceRequirements": {
+                                    "VCpuCount": {
+                                        "Min": 0,
+                                        "Max": 1
+                                    },
+                                    "MemoryMiB": {
+                                        "Min": 0
+                                    }
+                                }
+                            }
+                        ]
+                    },
+                    "InstancesDistribution": {
+                        "OnDemandAllocationStrategy": "lowest-price",
+                        "OnDemandBaseCapacity": 0,
+                        "OnDemandPercentageAboveBaseCapacity": 100,
+                        "SpotAllocationStrategy": "lowest-price",
+                        "SpotInstancePools": 2
+                    }
+                },
+                "MinSize": 0,
+                "MaxSize": 1,
+                "DesiredCapacity": 0,
+                "DefaultCooldown": 300,
+                "AvailabilityZones": [
+                    "us-east-1a"
+                ],
+                "LoadBalancerNames": [],
+                "TargetGroupARNs": [],
+                "HealthCheckType": "EC2",
+                "HealthCheckGracePeriod": 300,
+                "Instances": [],
+                "CreatedTime": {
+                    "__class__": "datetime",
+                    "year": 2023,
+                    "month": 12,
+                    "day": 14,
+                    "hour": 21,
+                    "minute": 1,
+                    "second": 22,
+                    "microsecond": 328000
+                },
+                "SuspendedProcesses": [],
+                "VPCZoneIdentifier": "subnet-914763e7",
+                "EnabledMetrics": [],
+                "Tags": [],
+                "TerminationPolicies": [
+                    "Default"
+                ],
+                "NewInstancesProtectedFromScaleIn": false,
+                "ServiceLinkedRoleARN": "arn:aws:iam::644160558196:role/aws-service-role/autoscaling.amazonaws.com/AWSServiceRoleForAutoScaling",
+                "CapacityRebalance": true,
+                "DesiredCapacityType": "units",
+                "TrafficSources": [],
+                "AvailabilityZoneDistribution": {
+                    "CapacityDistributionStrategy": "balanced-best-effort"
+                },
+                "CapacityReservationSpecification": {
+                    "CapacityReservationPreference": "default"
+                },
+                "InstanceLifecyclePolicy": {
+                    "RetentionTriggers": {
+                        "TerminateHookAbandon": "terminate"
+                    }
+                }
+            },
+            {
+                "AutoScalingGroupName": "custodian-suspend-force-recording",
+                "AutoScalingGroupARN": "arn:aws:autoscaling:us-east-1:644160558196:autoScalingGroup:3bb73ea1-805e-43f9-9898-a5a1e03ae202:autoScalingGroupName/custodian-suspend-force-recording",
+                "LaunchTemplate": {
+                    "LaunchTemplateId": "lt-0d738e17104c32f39",
+                    "LaunchTemplateName": "custodian-suspend-force-recording-lt",
+                    "Version": "$Default"
+                },
+                "MinSize": 0,
+                "MaxSize": 1,
+                "DesiredCapacity": 1,
+                "DefaultCooldown": 300,
+                "AvailabilityZones": [
+                    "us-east-1a",
+                    "us-east-1b",
+                    "us-east-1d",
+                    "us-east-1e"
+                ],
+                "LoadBalancerNames": [],
+                "TargetGroupARNs": [],
+                "HealthCheckType": "EC2",
+                "HealthCheckGracePeriod": 0,
+                "Instances": [
+                    {
+                        "InstanceId": "i-08f351a51522595da",
+                        "InstanceType": "t3.micro",
+                        "AvailabilityZone": "us-east-1b",
+                        "LifecycleState": "InService",
+                        "HealthStatus": "Healthy",
+                        "LaunchTemplate": {
+                            "LaunchTemplateId": "lt-0d738e17104c32f39",
+                            "LaunchTemplateName": "custodian-suspend-force-recording-lt",
+                            "Version": "1"
+                        },
+                        "ProtectedFromScaleIn": false
+                    }
+                ],
+                "CreatedTime": {
+                    "__class__": "datetime",
+                    "year": 2026,
+                    "month": 2,
+                    "day": 26,
+                    "hour": 18,
+                    "minute": 39,
+                    "second": 29,
+                    "microsecond": 12000
+                },
+                "SuspendedProcesses": [
+                    {
+                        "ProcessName": "AddToLoadBalancer",
+                        "SuspensionReason": "User suspended at 2026-02-26T18:56:36Z"
+                    },
+                    {
+                        "ProcessName": "Terminate",
+                        "SuspensionReason": "User suspended at 2026-02-26T18:56:36Z"
+                    },
+                    {
+                        "ProcessName": "HealthCheck",
+                        "SuspensionReason": "User suspended at 2026-02-26T18:56:36Z"
+                    },
+                    {
+                        "ProcessName": "AlarmNotification",
+                        "SuspensionReason": "User suspended at 2026-02-26T18:56:36Z"
+                    },
+                    {
+                        "ProcessName": "ReplaceUnhealthy",
+                        "SuspensionReason": "User suspended at 2026-02-26T18:56:36Z"
+                    },
+                    {
+                        "ProcessName": "InstanceRefresh",
+                        "SuspensionReason": "User suspended at 2026-02-26T18:56:36Z"
+                    },
+                    {
+                        "ProcessName": "ScheduledActions",
+                        "SuspensionReason": "User suspended at 2026-02-26T18:56:36Z"
+                    },
+                    {
+                        "ProcessName": "Launch",
+                        "SuspensionReason": "User suspended at 2026-02-26T18:56:36Z"
+                    },
+                    {
+                        "ProcessName": "AZRebalance",
+                        "SuspensionReason": "User suspended at 2026-02-26T18:56:36Z"
+                    }
+                ],
+                "VPCZoneIdentifier": "subnet-efbcccb7,subnet-e3b194de,subnet-044d9e3b66dccd75a,subnet-914763e7",
+                "EnabledMetrics": [],
+                "Tags": [
+                    {
+                        "ResourceId": "custodian-suspend-force-recording",
+                        "ResourceType": "auto-scaling-group",
+                        "Key": "Name",
+                        "Value": "custodian-suspend-force-recording",
+                        "PropagateAtLaunch": false
+                    },
+                    {
+                        "ResourceId": "custodian-suspend-force-recording",
+                        "ResourceType": "auto-scaling-group",
+                        "Key": "SuspendTag",
+                        "Value": "record-test",
+                        "PropagateAtLaunch": false
+                    }
+                ],
+                "TerminationPolicies": [
+                    "Default"
+                ],
+                "NewInstancesProtectedFromScaleIn": false,
+                "ServiceLinkedRoleARN": "arn:aws:iam::644160558196:role/aws-service-role/autoscaling.amazonaws.com/AWSServiceRoleForAutoScaling",
+                "TrafficSources": [],
+                "AvailabilityZoneDistribution": {
+                    "CapacityDistributionStrategy": "balanced-best-effort"
+                },
+                "CapacityReservationSpecification": {
+                    "CapacityReservationPreference": "default"
+                },
+                "InstanceLifecyclePolicy": {
+                    "RetentionTriggers": {
+                        "TerminateHookAbandon": "terminate"
+                    }
+                }
+            },
+            {
+                "AutoScalingGroupName": "public",
+                "AutoScalingGroupARN": "arn:aws:autoscaling:us-east-1:644160558196:autoScalingGroup:a81eff7e-fbf5-4623-9aa3-f16510c790df:autoScalingGroupName/public",
+                "LaunchConfigurationName": "public",
+                "MinSize": 0,
+                "MaxSize": 0,
+                "DesiredCapacity": 0,
+                "DefaultCooldown": 300,
+                "AvailabilityZones": [
+                    "us-east-1d"
+                ],
+                "LoadBalancerNames": [],
+                "TargetGroupARNs": [],
+                "HealthCheckType": "EC2",
+                "HealthCheckGracePeriod": 300,
+                "Instances": [],
+                "CreatedTime": {
+                    "__class__": "datetime",
+                    "year": 2020,
+                    "month": 6,
+                    "day": 22,
+                    "hour": 18,
+                    "minute": 3,
+                    "second": 25,
+                    "microsecond": 639000
+                },
+                "SuspendedProcesses": [],
+                "VPCZoneIdentifier": "subnet-3a334610",
+                "EnabledMetrics": [],
+                "Tags": [
+                    {
+                        "ResourceId": "public",
+                        "ResourceType": "auto-scaling-group",
+                        "Key": "AmazonECSManaged",
+                        "Value": "",
+                        "PropagateAtLaunch": true
+                    },
+                    {
+                        "ResourceId": "public",
+                        "ResourceType": "auto-scaling-group",
+                        "Key": "custodian-marked",
+                        "Value": "AutoScaleGroup does not meet org policy: delete@2023/09/27 1833 UTC",
+                        "PropagateAtLaunch": false
+                    }
+                ],
+                "TerminationPolicies": [
+                    "Default"
+                ],
+                "NewInstancesProtectedFromScaleIn": false,
+                "ServiceLinkedRoleARN": "arn:aws:iam::644160558196:role/aws-service-role/autoscaling.amazonaws.com/AWSServiceRoleForAutoScaling",
+                "TrafficSources": [],
+                "AvailabilityZoneDistribution": {
+                    "CapacityDistributionStrategy": "balanced-best-effort"
+                },
+                "CapacityReservationSpecification": {
+                    "CapacityReservationPreference": "default"
+                },
+                "InstanceLifecyclePolicy": {
+                    "RetentionTriggers": {
+                        "TerminateHookAbandon": "terminate"
+                    }
+                }
+            },
+            {
+                "AutoScalingGroupName": "test",
+                "AutoScalingGroupARN": "arn:aws:autoscaling:us-east-1:644160558196:autoScalingGroup:1d527d68-6043-462c-8fcd-2c2c5c46f410:autoScalingGroupName/test",
+                "LaunchTemplate": {
+                    "LaunchTemplateId": "lt-0fe86658990d7b147",
+                    "LaunchTemplateName": "c7n-test",
+                    "Version": "$Default"
+                },
+                "MinSize": 0,
+                "MaxSize": 0,
+                "DesiredCapacity": 0,
+                "DefaultCooldown": 300,
+                "AvailabilityZones": [
+                    "us-east-1a"
+                ],
+                "LoadBalancerNames": [],
+                "TargetGroupARNs": [],
+                "HealthCheckType": "EC2",
+                "HealthCheckGracePeriod": 300,
+                "Instances": [],
+                "CreatedTime": {
+                    "__class__": "datetime",
+                    "year": 2023,
+                    "month": 11,
+                    "day": 22,
+                    "hour": 19,
+                    "minute": 2,
+                    "second": 36,
+                    "microsecond": 917000
+                },
+                "SuspendedProcesses": [],
+                "VPCZoneIdentifier": "subnet-083ab4dd1a8b6eaa6",
+                "EnabledMetrics": [],
+                "Tags": [],
+                "TerminationPolicies": [
+                    "Default"
+                ],
+                "NewInstancesProtectedFromScaleIn": false,
+                "ServiceLinkedRoleARN": "arn:aws:iam::644160558196:role/aws-service-role/autoscaling.amazonaws.com/AWSServiceRoleForAutoScaling",
+                "TrafficSources": [],
+                "AvailabilityZoneDistribution": {
+                    "CapacityDistributionStrategy": "balanced-best-effort"
+                },
+                "CapacityReservationSpecification": {
+                    "CapacityReservationPreference": "default"
+                },
+                "InstanceLifecyclePolicy": {
+                    "RetentionTriggers": {
+                        "TerminateHookAbandon": "terminate"
+                    }
+                }
+            }
+        ],
+        "ResponseMetadata": {}
+    }
+}
