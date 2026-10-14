@@ -1,0 +1,111 @@
+{
+    "status_code": 200,
+    "data": {
+        "PaginationToken": "",
+        "ResourceTagMappingList": [
+            {
+                "ResourceARN": "arn:aws:ec2:us-east-1:644160558196:security-group/sg-0a7ffda39b37c79e2",
+                "Tags": [
+                    {
+                        "Key": "kubernetes.io/cluster/app-dev",
+                        "Value": "owned"
+                    }
+                ],
+                "ComplianceDetails": {
+                    "NoncompliantKeys": [],
+                    "KeysWithNoncompliantValues": [],
+                    "MissingTagKeys": [
+                        "Owner",
+                        "Env"
+                    ],
+                    "ComplianceStatus": false
+                }
+            },
+            {
+                "ResourceARN": "arn:aws:ec2:us-east-1:644160558196:security-group/sg-016dffc44c4b20b1b",
+                "Tags": [
+                    {
+                        "Key": "aws:cloudformation:stack-name",
+                        "Value": "eksctl-app-dev-nodegroup-k8s-skunk-workers"
+                    },
+                    {
+                        "Key": "alpha.eksctl.io/nodegroup-name",
+                        "Value": "k8s-skunk-workers"
+                    },
+                    {
+                        "Key": "alpha.eksctl.io/cluster-name",
+                        "Value": "app-dev"
+                    },
+                    {
+                        "Key": "aws:cloudformation:stack-id",
+                        "Value": "arn:aws:cloudformation:us-east-1:644160558196:stack/eksctl-app-dev-nodegroup-k8s-skunk-workers/899a4920-5ff9-11ef-9c50-0e651dc79821"
+                    },
+                    {
+                        "Key": "eksctl.cluster.k8s.io/v1alpha1/cluster-name",
+                        "Value": "app-dev"
+                    },
+                    {
+                        "Key": "kubernetes.io/cluster/app-dev",
+                        "Value": "owned"
+                    },
+                    {
+                        "Key": "aws:cloudformation:logical-id",
+                        "Value": "SG"
+                    },
+                    {
+                        "Key": "alpha.eksctl.io/nodegroup-type",
+                        "Value": "unmanaged"
+                    },
+                    {
+                        "Key": "alpha.eksctl.io/eksctl-version",
+                        "Value": "0.189.0-dev+c9afc4260.2024-08-19T12:43:03Z"
+                    },
+                    {
+                        "Key": "Name",
+                        "Value": "eksctl-app-dev-nodegroup-k8s-skunk-workers/SG"
+                    },
+                    {
+                        "Key": "eksctl.io/v1alpha2/nodegroup-name",
+                        "Value": "k8s-skunk-workers"
+                    }
+                ],
+                "ComplianceDetails": {
+                    "NoncompliantKeys": [],
+                    "KeysWithNoncompliantValues": [],
+                    "MissingTagKeys": [
+                        "Owner",
+                        "Env"
+                    ],
+                    "ComplianceStatus": false
+                }
+            },
+            {
+                "ResourceARN": "arn:aws:ec2:us-east-1:644160558196:security-group/sg-09f477b3d193ffe74",
+                "Tags": [
+                    {
+                        "Key": "aws:eks:cluster-name",
+                        "Value": "app-dev"
+                    },
+                    {
+                        "Key": "kubernetes.io/cluster/app-dev",
+                        "Value": "owned"
+                    },
+                    {
+                        "Key": "Name",
+                        "Value": "eks-cluster-sg-app-dev-795116951"
+                    }
+                ],
+                "ComplianceDetails": {
+                    "NoncompliantKeys": [],
+                    "KeysWithNoncompliantValues": [],
+                    "MissingTagKeys": [
+                        "Owner",
+                        "Env"
+                    ],
+                    "ComplianceStatus": false
+                }
+            }
+        ],
+        "ResponseMetadata": {}
+    }
+}
