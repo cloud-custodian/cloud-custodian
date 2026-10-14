@@ -8,7 +8,7 @@ dependencies = [
     "c7n",
     "click>=8.0",
     "python-hcl2>=8.1.0,<9.0.0",
-    "rich<15.0,>=14.0",
+    "rich>=14.0,<16.0",
     "tfparse<1.0,>=0.6",
 ]
 name = "c7n_left"
