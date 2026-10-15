@@ -15,6 +15,7 @@ from c7n.filters.costhub import CostHubRecommendation
 from c7n.filters.kms import KmsRelatedFilter
 import c7n.filters.vpc as net_filters
 import c7n.filters.iamrole as iam_filters
+from c7n.exceptions import PolicyExecutionError
 from c7n.manager import resources
 from c7n import query, utils
 from c7n.resources.aws import shape_validate
@@ -1300,7 +1301,7 @@ class WebFunctionRemovePolicyStatement(RemovePolicyBase):
 
     def process(self, resources):
         client = local_session(self.manager.session_factory).client('lambda-web')
-        results = []
+        results, failed = [], []
         for r in resources:
             try:
                 if self.process_resource(client, r):
@@ -1308,6 +1309,11 @@ class WebFunctionRemovePolicyStatement(RemovePolicyBase):
             except Exception:
                 self.log.exception(
                     "Error processing lambda web function %s", r['functionArn'])
+                failed.append(r['functionArn'])
+        if failed:
+            raise PolicyExecutionError(
+                "remove-statements failed for %d web function(s): %s" % (
+                    len(failed), ", ".join(failed)))
         return results
 
     def process_resource(self, client, resource):
@@ -1442,10 +1448,6 @@ class LambdaWebEndpoint(query.ChildResourceManager):
                     client.get_web_function_endpoint,
                     functionName=function_name, endpointName=endpoint_name)
             except client.exceptions.ResourceNotFoundException:
-                continue
-            except ClientError as err:
-                self.log.warning(
-                    "web function endpoint %s not resolved: %s", rid, err)
                 continue
             e.pop('ResponseMetadata', None)
             e[query.ChildResourceQuery.parent_key] = function_name

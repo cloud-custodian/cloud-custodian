@@ -5,7 +5,9 @@ from unittest import mock
 
 from botocore.exceptions import ClientError
 
+from .apicallcaptor import ApiCallCaptor
 from .common import BaseTest
+from c7n.exceptions import PolicyExecutionError
 from c7n.executor import MainThreadExecutor
 from c7n.resources.awslambda import (
     DeleteWebFunction,
@@ -124,8 +126,12 @@ class LambdaWebFunctionTest(LambdaWebTest):
             'test_lambda_web_function_delete', 'aws.lambda-web-function',
             filters=[{'type': 'endpoint', 'key': 'authType', 'value': 'ApplicationManaged'}],
             actions=['delete'])
+        captor = ApiCallCaptor.start_capture()
         resources = p.run()
         self.assertEqual([r['functionName'] for r in resources], ['public-api'])
+        self.assertEqual(
+            [c['params'] for c in captor.calls if c['operation'] == 'DeleteWebFunction'],
+            [{'functionName': 'public-api'}])
         client = factory().client('lambda-web')
         with self.assertRaises(client.exceptions.ResourceNotFoundException):
             client.get_web_function(functionName='public-api')
@@ -201,6 +207,24 @@ class LambdaWebFunctionTest(LambdaWebTest):
             p.resource_manager.actions[0].process(
                 [{'functionName': 'a'}, {'functionName': 'b'}])
         self.assertEqual(client.delete_web_function.call_count, 2)
+
+    def test_remove_statements_failure_is_reported(self):
+        action = self.get_remove_statements_action(['Drop'])
+        client = self.policy_client([{'Sid': 'Drop', 'Effect': 'Allow'}])
+        client.delete_resource_policy.side_effect = ClientError(
+            {'Error': {'Code': 'ConflictException'}}, 'DeleteResourcePolicy')
+        good = {'functionName': 'ok', 'functionArn': FUNCTION_ARN}
+        bad = {'functionName': 'bad', 'functionArn': FUNCTION_ARN + '-bad'}
+        client.get_resource_policy.side_effect = lambda resourceArn: (
+            self.policy_client([{'Sid': 'Keep'}]).get_resource_policy.return_value
+            if resourceArn == FUNCTION_ARN
+            else self.policy_client([{'Sid': 'Drop'}]).get_resource_policy.return_value)
+        with mock.patch('c7n.resources.awslambda.local_session') as session:
+            session.return_value.client.return_value = client
+            with self.assertRaises(PolicyExecutionError) as ctx:
+                action.process([good, bad])
+        self.assertIn('failed for 1 web function', str(ctx.exception))
+        self.assertIn(FUNCTION_ARN + '-bad', str(ctx.exception))
 
     def test_remove_statements_no_match_or_no_policy(self):
         action = self.get_remove_statements_action(['Nope'])
@@ -280,7 +304,12 @@ class LambdaWebEndpointTest(LambdaWebTest):
         p, factory = self.load(
             'test_lambda_web_endpoint_delete', 'aws.lambda-web-endpoint',
             filters=[{'authType': 'ApplicationManaged'}], actions=['delete'])
+        captor = ApiCallCaptor.start_capture()
         self.assertEqual(len(p.run()), 1)
+        self.assertEqual(
+            [c['params'] for c in captor.calls
+             if c['operation'] == 'DeleteWebFunctionEndpoint'],
+            [{'functionName': 'public-api', 'endpointName': 'prod'}])
         client = factory().client('lambda-web')
         with self.assertRaises(client.exceptions.ResourceNotFoundException):
             client.get_web_function_endpoint(
@@ -329,6 +358,21 @@ class ParseEndpointArnTest(BaseTest):
                     'arn:aws:lambda:us-east-1:%s:function:x/endpoint/y' % ACCOUNT):
             with self.assertRaises(ValueError):
                 parse_endpoint_arn(bad)
+
+    def test_get_resources_propagates_non_not_found_errors(self):
+        p = self.load_policy({'name': 'e', 'resource': 'aws.lambda-web-endpoint'})
+        client = mock.MagicMock()
+
+        class NotFound(Exception):
+            pass
+
+        client.exceptions.ResourceNotFoundException = NotFound
+        client.get_web_function_endpoint.side_effect = ClientError(
+            {'Error': {'Code': 'AccessDeniedException'}}, 'GetWebFunctionEndpoint')
+        with mock.patch('c7n.resources.awslambda.local_session') as session:
+            session.return_value.client.return_value = client
+            with self.assertRaises(ClientError):
+                p.resource_manager.get_resources([FUNCTION_ARN + '/endpoint/prod'])
 
     def test_get_resources_skips_invalid_ids(self):
         p = self.load_policy({'name': 'e', 'resource': 'aws.lambda-web-endpoint'})
