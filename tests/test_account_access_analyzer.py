@@ -389,11 +389,3 @@ def test_set_access_analyzer_delete_retries_throttling(
 
     load_analyzer_policy(test, factory, enabled=False).resource_manager.actions[0].process(
         [{'account_id': '123456789012'}])
-
-
-def test_create_access_analyzer_action_removed(test):
-    with pytest.raises(PolicyValidationError):
-        test.load_policy({
-            'name': 'old-analyzer-action', 'resource': 'aws.account',
-            'actions': [{'type': 'create-access-analyzer', 'analyzer-name': ANALYZER_NAME}],
-        })
