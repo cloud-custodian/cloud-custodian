@@ -19,10 +19,14 @@ NAME_TEMPLATE = "{name}"
     default=('Enabled',),
     help="File to store the generated config (default stdout)")
 @click.option(
+    '-q', '--quota_id',
+    default="",
+    help="Filter based on spectic quotaID property e.g., EnterpriseAgreement")
+@click.option(
     '--name',
     default=NAME_TEMPLATE,
     help="Name template for subscriptions in the config, defaults to %s" % NAME_TEMPLATE)
-def main(output, state, name):
+def main(output, state, quota_id, name):
     """
     Generate a c7n-org subscriptions config file
     """
@@ -33,6 +37,10 @@ def main(output, state, name):
     for sub in subs:
         if state and sub['state'] not in state:
             continue
+        if quota_id:
+            sub_policies = sub['subscriptionPolicies']
+            if quota_id not in sub_policies['quotaId']:
+              continue
         sub_info = {
             'subscription_id': sub['subscriptionId'],
             'name': sub['displayName']
