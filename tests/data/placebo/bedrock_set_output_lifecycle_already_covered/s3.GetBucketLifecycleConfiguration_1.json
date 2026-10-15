@@ -1,0 +1,18 @@
+{
+    "status_code": 200,
+    "data": {
+        "ResponseMetadata": {},
+        "Rules": [
+            {
+                "ID": "existing",
+                "Status": "Enabled",
+                "Filter": {
+                    "Prefix": "evaluations/"
+                },
+                "Expiration": {
+                    "Days": 30
+                }
+            }
+        ]
+    }
+}
