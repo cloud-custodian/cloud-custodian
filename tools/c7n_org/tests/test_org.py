@@ -855,6 +855,24 @@ accounts:
         # Should fail - staging account doesn't have the required vars
         self.assertEqual(result.exit_code, 1)
 
+    def test_worker_count_windows_cap(self):
+        with mock.patch('sys.platform', 'win32'):
+            with mock.patch('multiprocessing.cpu_count', return_value=32):
+                with mock.patch.dict(os.environ, {}, clear=True):
+                    self.assertEqual(org.get_worker_count(), 61)
+
+            with mock.patch.dict(os.environ, {'C7N_ORG_PARALLEL': '100'}):
+                self.assertEqual(org.get_worker_count(), 61)
+
+            with mock.patch('multiprocessing.cpu_count', return_value=4):
+                with mock.patch.dict(os.environ, {}, clear=True):
+                    self.assertEqual(org.get_worker_count(), 16)
+
+        with mock.patch('sys.platform', 'linux'):
+            with mock.patch('multiprocessing.cpu_count', return_value=32):
+                with mock.patch.dict(os.environ, {}, clear=True):
+                    self.assertEqual(org.get_worker_count(), 128)
+
 
 # Tests for extract_framework_runtime_variables function
 class TestExtractFrameworkRuntimeVariables(TestUtils):
