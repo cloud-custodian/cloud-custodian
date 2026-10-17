@@ -873,3 +873,10 @@ class QueueTests(BaseTest):
         )
         resources = policy.run()
         self.assertEqual(len(resources), 2)
+        self.assertEqual(
+            sorted(r["QueueArn"] for r in resources),
+            [
+                "arn:aws:sqs:us-east-1:644160558196:bar_dlq",
+                "arn:aws:sqs:us-east-1:644160558196:test-dlq",
+            ],
+        )
