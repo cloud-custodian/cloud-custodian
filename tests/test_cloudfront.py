@@ -540,6 +540,37 @@ class CloudFront(BaseTest):
         self.assertEqual(len(resources), 1)
         self.assertEqual(resources[0]['c7n:mismatched-s3-origin'][0], 'c7n-test-bucket')
 
+    def test_distribution_check_s3_origin_vpc_origin_no_unbound_error(self):
+        factory = self.replay_flight_data("test_distribution_check_s3_origin_missing_bucket")
+
+        p = self.load_policy(
+            {
+                "name": "test_distribution_check_s3_origin",
+                "resource": "distribution",
+                "filters": [{"type": "mismatch-s3-origin", "check_custom_origins": True}],
+            },
+            session_factory=factory,
+        )
+
+        resource = {
+            "Id": "E3Q5UC7SQLL7MN",
+            "Origins": {
+                "Items": [
+                    {
+                        "DomainName": "vpc-origin.example.com",
+                        "VpcOriginConfig": {
+                            "VpcOriginId": "vo_abc123",
+                        },
+                    }
+                ]
+            },
+        }
+
+        resources = p.resource_manager.filters[0].process([resource])
+
+        self.assertEqual(resources, [])
+        self.assertEqual(resource['c7n:mismatched-s3-origin'], [])
+
     def test_distribution_check_logging_enabled(self):
         factory = self.replay_flight_data("test_distribution_check_logging_enabled")
 
