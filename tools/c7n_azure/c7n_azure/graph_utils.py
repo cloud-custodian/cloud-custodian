@@ -53,6 +53,10 @@ GRAPH_ENDPOINT_PERMISSIONS = {
     # Organization endpoints
     'organization': ['Organization.Read.All'],
 
+    # Application and service principal endpoints
+    'applications': ['Application.Read.All'],
+    'servicePrincipals': ['Application.Read.All'],
+
     # Policy endpoints (require beta API)
     'identity/conditionalAccess/policies': ['Policy.Read.All'],
     'identity/conditionalAccess/namedLocations': ['Policy.Read.All'],
