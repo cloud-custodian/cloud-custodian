@@ -6,6 +6,7 @@ from c7n.exceptions import ClientError, PolicyValidationError
 from c7n.resources.ami import ErrorHandler
 from c7n.query import DescribeSource
 from c7n.utils import jmespath_search
+from .apicallcaptor import ApiCallCaptor
 from .common import BaseTest
 
 import pytest
@@ -479,7 +480,8 @@ class TestAMI(BaseTest):
 
     def test_ami_set_disabled_disable(self):
         factory = self.replay_flight_data('test_ami_set_disabled_disable')
-        image_ids = ['ami-06902a5fc08ba032e', 'ami-00415e659887728c0']
+        # The last image is shared from another account and should be skipped
+        image_ids = ['ami-06902a5fc08ba032e', 'ami-00415e659887728c0', 'ami-0a1b2c3d4e5f60718']
 
         p = self.load_policy(
             {
@@ -491,8 +493,13 @@ class TestAMI(BaseTest):
             session_factory=factory,
         )
         p.validate()
+        captor = ApiCallCaptor.start_capture()
         resources = p.run()
-        self.assertEqual(len(resources), 2)
+        self.assertEqual(len(resources), 3)
+        disabled = [
+            c['params']['ImageId'] for c in captor.calls if c['operation'] == 'DisableImage'
+        ]
+        self.assertEqual(sorted(disabled), ['ami-00415e659887728c0', 'ami-06902a5fc08ba032e'])
 
     def test_ami_set_disabled_enable(self):
         factory = self.replay_flight_data('test_ami_set_disabled_enable')
@@ -508,8 +515,13 @@ class TestAMI(BaseTest):
             session_factory=factory,
         )
         p.validate()
+        captor = ApiCallCaptor.start_capture()
         resources = p.run()
         self.assertEqual(len(resources), 2)
+        enabled = [
+            c['params']['ImageId'] for c in captor.calls if c['operation'] == 'EnableImage'
+        ]
+        self.assertEqual(sorted(enabled), sorted(image_ids))
 
     def test_ami_set_disabled_ignores_not_found(self):
         p = self.load_policy(

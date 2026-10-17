@@ -149,6 +149,44 @@
                 "Public": false,
                 "Architecture": "x86_64",
                 "ImageType": "machine"
+            },
+            {
+                "PlatformDetails": "Linux/UNIX",
+                "UsageOperation": "RunInstances",
+                "BlockDeviceMappings": [
+                    {
+                        "Ebs": {
+                            "DeleteOnTermination": true,
+                            "Iops": 3000,
+                            "SnapshotId": "snap-0123456789abcdef0",
+                            "VolumeSize": 100,
+                            "VolumeType": "gp3",
+                            "Throughput": 125,
+                            "Encrypted": false
+                        },
+                        "DeviceName": "/dev/xvda"
+                    }
+                ],
+                "Description": "AMI shared from another account",
+                "EnaSupport": true,
+                "Hypervisor": "xen",
+                "Name": "shared-base-image",
+                "RootDeviceName": "/dev/xvda",
+                "RootDeviceType": "ebs",
+                "Tags": [],
+                "VirtualizationType": "hvm",
+                "BootMode": "uefi-preferred",
+                "ImdsSupport": "v2.0",
+                "DeregistrationProtection": "disabled",
+                "FreeTierEligible": true,
+                "ImageId": "ami-0a1b2c3d4e5f60718",
+                "ImageLocation": "123456789012/shared-base-image",
+                "State": "available",
+                "OwnerId": "123456789012",
+                "CreationDate": "2025-12-12T07:31:45.000Z",
+                "Public": false,
+                "Architecture": "x86_64",
+                "ImageType": "machine"
             }
         ],
         "ResponseMetadata": {}
