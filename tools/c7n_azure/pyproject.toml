@@ -23,7 +23,7 @@ dependencies = [
     "azure-mgmt-appconfiguration==0.7.0",
     "azure-mgmt-applicationinsights<2.0.0,>=1.0.0",
     "azure-mgmt-appplatform<9.0.0,>=8.0.0",
-    "azure-mgmt-authorization<2.0.0,>=1.0.0",
+    "azure-mgmt-authorization<5.0.0,>=4.0.0",
     "azure-mgmt-automation==0.1.1",
     "azure-mgmt-batch<16.0.0,>=15.0.0",
     "azure-mgmt-cdn<13.0.0,>=12.0.0",

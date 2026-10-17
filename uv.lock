@@ -526,16 +526,16 @@ wheels = [
 
 [[package]]
 name = "azure-mgmt-authorization"
-version = "1.0.0"
+version = "4.0.0"
 source = { registry = "https://pypi.org/simple" }
 dependencies = [
     { name = "azure-common" },
     { name = "azure-mgmt-core" },
-    { name = "msrest" },
+    { name = "isodate" },
 ]
-sdist = { url = "https://files.pythonhosted.org/packages/3a/26/ba81fe1ad5934ab67711939d6680f9937057b5563522f0cdc5bb44ed3620/azure-mgmt-authorization-1.0.0.zip", hash = "sha256:9a9fc16866b46387853381ab4fa0f84c1765e0afea5b0124709ea9fae10ee752", size = 183163, upload-time = "2020-11-25T04:36:04.446Z" }
+sdist = { url = "https://files.pythonhosted.org/packages/9e/ab/e79874f166eed24f4456ce4d532b29a926fb4c798c2c609eefd916a3f73d/azure-mgmt-authorization-4.0.0.zip", hash = "sha256:69b85abc09ae64fc72975bd43431170d8c7eb5d166754b98aac5f3845de57dc4", size = 1134795, upload-time = "2023-07-25T04:47:46.033Z" }
 wheels = [
-    { url = "https://files.pythonhosted.org/packages/90/92/3cef9fef8d4053ccbf2e2eebf6401d1e8280dea263480a359c5e986fadd6/azure_mgmt_authorization-1.0.0-py2.py3-none-any.whl", hash = "sha256:151bebe4352dd5c73d1df8bfc861d6ae6c9697d09ad761c59ce7ec50c476dff7", size = 141979, upload-time = "2020-11-25T04:36:02.455Z" },
+    { url = "https://files.pythonhosted.org/packages/32/b3/8ec1268082f4d20cc8bf723a1a8e6b9e330bcc338a4dbcee9c7737e9dc1c/azure_mgmt_authorization-4.0.0-py3-none-any.whl", hash = "sha256:d8feeb3842e6ddf1a370963ca4f61fb6edc124e8997b807dd025bc9b2379cd1a", size = 1072620, upload-time = "2023-07-25T04:47:49.26Z" },
 ]
 
 [[package]]
@@ -1739,7 +1739,7 @@ requires-dist = [
     { name = "azure-mgmt-appconfiguration", specifier = "==0.7.0" },
     { name = "azure-mgmt-applicationinsights", specifier = ">=1.0.0,<2.0.0" },
     { name = "azure-mgmt-appplatform", specifier = ">=8.0.0,<9.0.0" },
-    { name = "azure-mgmt-authorization", specifier = ">=1.0.0,<2.0.0" },
+    { name = "azure-mgmt-authorization", specifier = ">=4.0.0,<5.0.0" },
     { name = "azure-mgmt-automation", specifier = "==0.1.1" },
     { name = "azure-mgmt-batch", specifier = ">=15.0.0,<16.0.0" },
     { name = "azure-mgmt-cdn", specifier = ">=12.0.0,<13.0.0" },
@@ -2857,7 +2857,7 @@ name = "exceptiongroup"
 version = "1.3.1"
 source = { registry = "https://pypi.org/simple" }
 dependencies = [
-    { name = "typing-extensions" },
+    { name = "typing-extensions", marker = "python_full_version < '3.11'" },
 ]
 sdist = { url = "https://files.pythonhosted.org/packages/50/79/66800aadf48771f6b62f7eb014e352e5d06856655206165d775e675a02c9/exceptiongroup-1.3.1.tar.gz", hash = "sha256:8b412432c6055b0b7d14c310000ae93352ed6754f70fa8f7c34141f91c4e3219", size = 30371, upload-time = "2025-11-21T23:01:54.787Z" }
 wheels = [
@@ -3601,12 +3601,12 @@ resolution-markers = [
     "python_full_version < '3.11'",
 ]
 dependencies = [
-    { name = "iso8601" },
-    { name = "os-service-types", version = "1.8.2", source = { registry = "https://pypi.org/simple" } },
-    { name = "pbr" },
-    { name = "requests" },
-    { name = "stevedore", version = "5.8.0", source = { registry = "https://pypi.org/simple" } },
-    { name = "typing-extensions" },
+    { name = "iso8601", marker = "python_full_version < '3.11'" },
+    { name = "os-service-types", version = "1.8.2", source = { registry = "https://pypi.org/simple" }, marker = "python_full_version < '3.11'" },
+    { name = "pbr", marker = "python_full_version < '3.11'" },
+    { name = "requests", marker = "python_full_version < '3.11'" },
+    { name = "stevedore", version = "5.8.0", source = { registry = "https://pypi.org/simple" }, marker = "python_full_version < '3.11'" },
+    { name = "typing-extensions", marker = "python_full_version < '3.11'" },
 ]
 sdist = { url = "https://files.pythonhosted.org/packages/02/d9/a01a3898657626cbcca9fa0e8fa58facb4632e172bdac622d47950f7e12a/keystoneauth1-5.14.0.tar.gz", hash = "sha256:7b942084d3db27dd285c13253cdfee10b05be0436db1c01e15dc744902197a7f", size = 288739, upload-time = "2026-05-13T09:09:26.125Z" }
 wheels = [
@@ -3624,11 +3624,11 @@ resolution-markers = [
     "python_full_version == '3.11.*'",
 ]
 dependencies = [
-    { name = "iso8601" },
-    { name = "os-service-types", version = "1.9.0", source = { registry = "https://pypi.org/simple" } },
-    { name = "requests" },
-    { name = "stevedore", version = "5.9.1", source = { registry = "https://pypi.org/simple" } },
-    { name = "typing-extensions" },
+    { name = "iso8601", marker = "python_full_version >= '3.11'" },
+    { name = "os-service-types", version = "1.9.0", source = { registry = "https://pypi.org/simple" }, marker = "python_full_version >= '3.11'" },
+    { name = "requests", marker = "python_full_version >= '3.11'" },
+    { name = "stevedore", version = "5.9.1", source = { registry = "https://pypi.org/simple" }, marker = "python_full_version >= '3.11'" },
+    { name = "typing-extensions", marker = "python_full_version >= '3.11'" },
 ]
 sdist = { url = "https://files.pythonhosted.org/packages/68/84/a76c0819add727693d89b152c11452650036fcd481274756a33172e386e7/keystoneauth1-5.17.0.tar.gz", hash = "sha256:82359acc20c754fcb22818e090e2fea647e4c5c1137a6addb4984e9fba708ab3", size = 316782, upload-time = "2026-08-28T16:16:24.767Z" }
 wheels = [
@@ -4361,8 +4361,8 @@ resolution-markers = [
     "python_full_version < '3.11'",
 ]
 dependencies = [
-    { name = "pbr" },
-    { name = "typing-extensions" },
+    { name = "pbr", marker = "python_full_version < '3.11'" },
+    { name = "typing-extensions", marker = "python_full_version < '3.11'" },
 ]
 sdist = { url = "https://files.pythonhosted.org/packages/51/62/31e39aa8f2ac5bff0b061ce053f0610c9fe659e12aeca20bfb26d1665024/os_service_types-1.8.2.tar.gz", hash = "sha256:ab7648d7232849943196e1bb00a30e2e25e600fa3b57bb241d15b7f521b5b575", size = 27476, upload-time = "2025-11-21T13:55:47.726Z" }
 wheels = [
@@ -4380,8 +4380,8 @@ resolution-markers = [
     "python_full_version == '3.11.*'",
 ]
 dependencies = [
-    { name = "pbr" },
-    { name = "typing-extensions" },
+    { name = "pbr", marker = "python_full_version >= '3.11'" },
+    { name = "typing-extensions", marker = "python_full_version >= '3.11'" },
 ]
 sdist = { url = "https://files.pythonhosted.org/packages/86/ae/fe7ac23155ae0b4b9779e06e9c5bb4070f2315dc4ca886a88fa3230d344b/os_service_types-1.9.0.tar.gz", hash = "sha256:1f2e5fb71d1f6f4ff31d8992674f2368465bc2f25cd94018015c3ddbfc5c617f", size = 28087, upload-time = "2026-08-04T13:07:43.171Z" }
 wheels = [
@@ -4887,7 +4887,7 @@ resolution-markers = [
     "python_full_version < '3.11'",
 ]
 dependencies = [
-    { name = "cffi" },
+    { name = "cffi", marker = "python_full_version < '3.11'" },
 ]
 sdist = { url = "https://files.pythonhosted.org/packages/2e/ea/762d00f6f518423cd889e39b12028844cc95f91a6413cf7136e184864821/pygit2-1.18.2.tar.gz", hash = "sha256:eca87e0662c965715b7f13491d5e858df2c0908341dee9bde2bc03268e460f55", size = 797200, upload-time = "2025-08-16T13:52:36.853Z" }
 wheels = [
@@ -4940,7 +4940,7 @@ resolution-markers = [
     "python_full_version == '3.11.*'",
 ]
 dependencies = [
-    { name = "cffi" },
+    { name = "cffi", marker = "python_full_version >= '3.11'" },
 ]
 sdist = { url = "https://files.pythonhosted.org/packages/9c/11/592cc7854795830a7257ab6025a1fc803b58b0e7bf7d31f619bc7288ed4d/pygit2-1.20.1.tar.gz", hash = "sha256:36dff84d237f2b8f18b0b146d6e7c3f99a7bce2da98cc4103a14387f53319f95", size = 888235, upload-time = "2026-09-12T10:33:12.681Z" }
 wheels = [
