@@ -1,0 +1,217 @@
+{
+    "pytest-terraform": 1,
+    "outputs": {
+        "central_index_name": {
+            "value": "projects/cloud-custodian/locations/us-central1/indexes/7999331921140121600",
+            "type": "string"
+        },
+        "deployed_index_id": {
+            "value": "c7n_test_index_413a81aa",
+            "type": "string"
+        },
+        "index_display_names": {
+            "value": {
+                "central": "c7n-test-index-central-413a81aa",
+                "east": "c7n-test-index-east-413a81aa"
+            },
+            "type": [
+                "object",
+                {
+                    "central": "string",
+                    "east": "string"
+                }
+            ]
+        }
+    },
+    "resources": {
+        "google_vertex_ai_index": {
+            "central": {
+                "create_time": "2026-10-15T13:06:48.101510Z",
+                "deletion_policy": "DELETE",
+                "deployed_indexes": [],
+                "description": "",
+                "display_name": "c7n-test-index-central-413a81aa",
+                "effective_labels": {
+                    "goog-terraform-provisioned": "true",
+                    "owner": "custodian"
+                },
+                "encryption_spec": [],
+                "etag": null,
+                "id": "projects/cloud-custodian/locations/us-central1/indexes/7999331921140121600",
+                "index_stats": [
+                    {
+                        "shards_count": 1,
+                        "vectors_count": ""
+                    }
+                ],
+                "index_update_method": "STREAM_UPDATE",
+                "labels": {
+                    "owner": "custodian"
+                },
+                "metadata": [
+                    {
+                        "config": [
+                            {
+                                "algorithm_config": [
+                                    {
+                                        "brute_force_config": [
+                                            {}
+                                        ],
+                                        "tree_ah_config": []
+                                    }
+                                ],
+                                "approximate_neighbors_count": 0,
+                                "dimensions": 2,
+                                "distance_measure_type": "DOT_PRODUCT_DISTANCE",
+                                "feature_norm_type": "NONE",
+                                "shard_size": "SHARD_SIZE_SMALL"
+                            }
+                        ],
+                        "contents_delta_uri": "",
+                        "is_complete_overwrite": false
+                    }
+                ],
+                "metadata_schema_uri": "gs://google-cloud-aiplatform/schema/matchingengine/metadata/nearest_neighbor_search_1.0.0.yaml",
+                "name": "7999331921140121600",
+                "project": "stkl-jim-fulton",
+                "region": "us-central1",
+                "terraform_labels": {
+                    "goog-terraform-provisioned": "true",
+                    "owner": "custodian"
+                },
+                "timeouts": null,
+                "update_time": "2026-10-15T13:07:16.134834Z"
+            },
+            "east": {
+                "create_time": "2026-10-15T13:06:48.262371Z",
+                "deletion_policy": "DELETE",
+                "deployed_indexes": [],
+                "description": "",
+                "display_name": "c7n-test-index-east-413a81aa",
+                "effective_labels": {
+                    "goog-terraform-provisioned": "true"
+                },
+                "encryption_spec": [],
+                "etag": null,
+                "id": "projects/cloud-custodian/locations/us-east1/indexes/560324319654182912",
+                "index_stats": [
+                    {
+                        "shards_count": 1,
+                        "vectors_count": ""
+                    }
+                ],
+                "index_update_method": "STREAM_UPDATE",
+                "labels": null,
+                "metadata": [
+                    {
+                        "config": [
+                            {
+                                "algorithm_config": [
+                                    {
+                                        "brute_force_config": [
+                                            {}
+                                        ],
+                                        "tree_ah_config": []
+                                    }
+                                ],
+                                "approximate_neighbors_count": 0,
+                                "dimensions": 2,
+                                "distance_measure_type": "DOT_PRODUCT_DISTANCE",
+                                "feature_norm_type": "NONE",
+                                "shard_size": "SHARD_SIZE_SMALL"
+                            }
+                        ],
+                        "contents_delta_uri": "",
+                        "is_complete_overwrite": false
+                    }
+                ],
+                "metadata_schema_uri": "gs://google-cloud-aiplatform/schema/matchingengine/metadata/nearest_neighbor_search_1.0.0.yaml",
+                "name": "560324319654182912",
+                "project": "stkl-jim-fulton",
+                "region": "us-east1",
+                "terraform_labels": {
+                    "goog-terraform-provisioned": "true"
+                },
+                "timeouts": null,
+                "update_time": "2026-10-15T13:07:16.671946Z"
+            }
+        },
+        "google_vertex_ai_index_endpoint": {
+            "central": {
+                "create_time": "2026-10-15T13:06:48.094376Z",
+                "deletion_policy": "DELETE",
+                "description": "",
+                "display_name": "c7n-test-index-endpoint-413a81aa",
+                "effective_labels": {
+                    "goog-terraform-provisioned": "true"
+                },
+                "encryption_spec": [],
+                "etag": null,
+                "id": "projects/cloud-custodian/locations/us-central1/indexEndpoints/5704871056297164800",
+                "labels": null,
+                "name": "5704871056297164800",
+                "network": "",
+                "private_service_connect_config": [
+                    {
+                        "enable_private_service_connect": false,
+                        "project_allowlist": [],
+                        "psc_automation_configs": []
+                    }
+                ],
+                "project": "stkl-jim-fulton",
+                "public_endpoint_domain_name": "927510565.us-central1-693936050605.vdb.vertexai.goog",
+                "public_endpoint_enabled": true,
+                "region": "us-central1",
+                "terraform_labels": {
+                    "goog-terraform-provisioned": "true"
+                },
+                "timeouts": null,
+                "update_time": "2026-10-15T13:06:49.399613Z"
+            }
+        },
+        "google_vertex_ai_index_endpoint_deployed_index": {
+            "central": {
+                "automatic_resources": [],
+                "create_time": "2026-10-15T13:07:20.615251Z",
+                "dedicated_resources": [
+                    {
+                        "machine_spec": [
+                            {
+                                "machine_type": "e2-standard-2"
+                            }
+                        ],
+                        "max_replica_count": 1,
+                        "min_replica_count": 1
+                    }
+                ],
+                "deletion_policy": "DELETE",
+                "deployed_index_auth_config": [],
+                "deployed_index_id": "c7n_test_index_413a81aa",
+                "deployment_group": "default",
+                "display_name": "",
+                "enable_access_logging": false,
+                "id": "projects/cloud-custodian/locations/us-central1/indexEndpoints/5704871056297164800/deployedIndex/c7n_test_index_413a81aa",
+                "index": "projects/cloud-custodian/locations/us-central1/indexes/7999331921140121600",
+                "index_endpoint": "projects/cloud-custodian/locations/us-central1/indexEndpoints/5704871056297164800",
+                "index_sync_time": "2026-10-15T13:38:16.206793Z",
+                "name": "",
+                "private_endpoints": [],
+                "region": "us-central1",
+                "reserved_ip_ranges": null,
+                "timeouts": null
+            }
+        },
+        "random_id": {
+            "suffix": {
+                "b64_std": "QTqBqg==",
+                "b64_url": "QTqBqg",
+                "byte_length": 4,
+                "dec": "1094353322",
+                "hex": "413a81aa",
+                "id": "QTqBqg",
+                "keepers": null,
+                "prefix": null
+            }
+        }
+    }
+}

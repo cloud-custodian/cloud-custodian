@@ -1,0 +1,48 @@
+{
+  "headers": {
+    "content-type": "application/json; charset=UTF-8",
+    "vary": "Origin, X-Origin, Referer",
+    "date": "Thu, 15 Oct 2026 13:38:20 GMT",
+    "server": "ESF",
+    "x-xss-protection": "0",
+    "x-frame-options": "SAMEORIGIN",
+    "x-content-type-options": "nosniff",
+    "alt-svc": "h3=\":443\"; ma=2592000,h3-29=\":443\"; ma=2592000",
+    "transfer-encoding": "chunked",
+    "status": "200",
+    "content-length": "986",
+    "-content-encoding": "gzip",
+    "content-location": "https://us-east1-aiplatform.googleapis.com/v1/projects/cloud-custodian/locations/us-east1/indexes?alt=json"
+  },
+  "body": {
+    "indexes": [
+      {
+        "name": "projects/cloud-custodian/locations/us-east1/indexes/560324319654182912",
+        "displayName": "c7n-test-index-east-413a81aa",
+        "metadataSchemaUri": "gs://google-cloud-aiplatform/schema/matchingengine/metadata/nearest_neighbor_search_1.0.0.yaml",
+        "metadata": {
+          "config": {
+            "dimensions": 2,
+            "distanceMeasureType": "DOT_PRODUCT_DISTANCE",
+            "featureNormType": "NONE",
+            "algorithmConfig": {
+              "bruteForceConfig": {}
+            },
+            "shardSize": "SHARD_SIZE_SMALL"
+          }
+        },
+        "etag": "AMEw9yN_G33UDi86GTTRDex4Aa8k3US8yFMOKve5ce4ZU7dSXgiezvGr3ukhSmLqqFhR",
+        "labels": {
+          "goog-terraform-provisioned": "true"
+        },
+        "createTime": "2026-10-15T13:06:48.262371Z",
+        "updateTime": "2026-10-15T13:07:16.671946Z",
+        "indexStats": {
+          "shardsCount": 1
+        },
+        "indexUpdateMethod": "STREAM_UPDATE",
+        "encryptionSpec": {}
+      }
+    ]
+  }
+}
