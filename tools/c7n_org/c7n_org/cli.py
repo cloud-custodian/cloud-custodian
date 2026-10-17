@@ -59,8 +59,17 @@ if sys.platform == 'darwin' and (
     multiprocessing.set_start_method('spawn')
 
 
-WORKER_COUNT = int(
-    os.environ.get('C7N_ORG_PARALLEL', multiprocessing.cpu_count() * 4))
+def get_worker_count():
+    count = int(
+        os.environ.get('C7N_ORG_PARALLEL', multiprocessing.cpu_count() * 4))
+    if sys.platform == 'win32':
+        import concurrent.futures.process
+        max_win_workers = getattr(concurrent.futures.process, '_MAX_WINDOWS_WORKERS', 61)
+        count = min(count, max_win_workers)
+    return count
+
+
+WORKER_COUNT = get_worker_count()
 
 
 CONFIG_SCHEMA = {
