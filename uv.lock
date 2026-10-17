@@ -960,16 +960,17 @@ wheels = [
 
 [[package]]
 name = "azure-mgmt-monitor"
-version = "2.0.0"
+version = "7.0.0"
 source = { registry = "https://pypi.org/simple" }
 dependencies = [
     { name = "azure-common" },
     { name = "azure-mgmt-core" },
-    { name = "msrest" },
+    { name = "isodate" },
+    { name = "typing-extensions" },
 ]
-sdist = { url = "https://files.pythonhosted.org/packages/d1/07/6109120151e9bb768a581fccea4adfc1016bcf3cfe7a167431d400b277ac/azure-mgmt-monitor-2.0.0.zip", hash = "sha256:e7f7943fe8f0efe98b3b1996cdec47c709765257a6e09e7940f7838a0f829e82", size = 701884, upload-time = "2021-01-13T08:01:32.234Z" }
+sdist = { url = "https://files.pythonhosted.org/packages/0e/12/25874f6b894e972646244f570a23298969b58f57cfb7a188e2740017b43a/azure_mgmt_monitor-7.0.0.tar.gz", hash = "sha256:b75f536441d430f69ff873a1646e5f5dbcb3080a10768a59d0adc01541623816", size = 195496, upload-time = "2025-07-28T07:46:17.031Z" }
 wheels = [
-    { url = "https://files.pythonhosted.org/packages/92/52/012f082405ae3d9e22ee9b46474394fd74116db52deb694277613a524a70/azure_mgmt_monitor-2.0.0-py2.py3-none-any.whl", hash = "sha256:af4917df2fe685e3daf25750f3586f11ccd2e7c2da68df392ca093fc3b7b8089", size = 607381, upload-time = "2021-01-13T08:01:30.341Z" },
+    { url = "https://files.pythonhosted.org/packages/c6/d1/f6ea4731edfa02c14756770d7c3d5202b40c5c72744f15142c0d89b6d957/azure_mgmt_monitor-7.0.0-py3-none-any.whl", hash = "sha256:ad63b5d187e21d2d34366271ade6abbeea1fcf76e313ff0f83d394d9c124aa1b", size = 245243, upload-time = "2025-07-28T07:46:18.594Z" },
 ]
 
 [[package]]
@@ -1768,7 +1769,7 @@ requires-dist = [
     { name = "azure-mgmt-logic", specifier = ">=9.0.0,<10.0.0" },
     { name = "azure-mgmt-machinelearningservices", specifier = "==2.0.0b2" },
     { name = "azure-mgmt-managementgroups", specifier = "==1.0.0b1" },
-    { name = "azure-mgmt-monitor", specifier = ">=2.0.0,<3.0.0" },
+    { name = "azure-mgmt-monitor", specifier = ">=7.0.0,<8.0.0" },
     { name = "azure-mgmt-msi", specifier = ">=1.0.0,<2.0.0" },
     { name = "azure-mgmt-network", specifier = ">=28.0.0,<29.0.0" },
     { name = "azure-mgmt-policyinsights", specifier = ">=1.0.0,<2.0.0" },
