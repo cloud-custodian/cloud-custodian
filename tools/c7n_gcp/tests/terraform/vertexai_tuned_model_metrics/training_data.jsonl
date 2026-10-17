@@ -1,0 +1,20 @@
+{"contents": [{"role": "user", "parts": [{"text": "What is the capital of France?"}]}, {"role": "model", "parts": [{"text": "Paris."}]}]}
+{"contents": [{"role": "user", "parts": [{"text": "What is the capital of Japan?"}]}, {"role": "model", "parts": [{"text": "Tokyo."}]}]}
+{"contents": [{"role": "user", "parts": [{"text": "What is the capital of Italy?"}]}, {"role": "model", "parts": [{"text": "Rome."}]}]}
+{"contents": [{"role": "user", "parts": [{"text": "What is the capital of Germany?"}]}, {"role": "model", "parts": [{"text": "Berlin."}]}]}
+{"contents": [{"role": "user", "parts": [{"text": "What is the capital of Spain?"}]}, {"role": "model", "parts": [{"text": "Madrid."}]}]}
+{"contents": [{"role": "user", "parts": [{"text": "What is the capital of Canada?"}]}, {"role": "model", "parts": [{"text": "Ottawa."}]}]}
+{"contents": [{"role": "user", "parts": [{"text": "What is the capital of Brazil?"}]}, {"role": "model", "parts": [{"text": "Brasilia."}]}]}
+{"contents": [{"role": "user", "parts": [{"text": "What is the capital of Egypt?"}]}, {"role": "model", "parts": [{"text": "Cairo."}]}]}
+{"contents": [{"role": "user", "parts": [{"text": "What is the capital of India?"}]}, {"role": "model", "parts": [{"text": "New Delhi."}]}]}
+{"contents": [{"role": "user", "parts": [{"text": "What is the capital of Australia?"}]}, {"role": "model", "parts": [{"text": "Canberra."}]}]}
+{"contents": [{"role": "user", "parts": [{"text": "What is the capital of Mexico?"}]}, {"role": "model", "parts": [{"text": "Mexico City."}]}]}
+{"contents": [{"role": "user", "parts": [{"text": "What is the capital of Russia?"}]}, {"role": "model", "parts": [{"text": "Moscow."}]}]}
+{"contents": [{"role": "user", "parts": [{"text": "What is the capital of China?"}]}, {"role": "model", "parts": [{"text": "Beijing."}]}]}
+{"contents": [{"role": "user", "parts": [{"text": "What is the capital of South Korea?"}]}, {"role": "model", "parts": [{"text": "Seoul."}]}]}
+{"contents": [{"role": "user", "parts": [{"text": "What is the capital of Sweden?"}]}, {"role": "model", "parts": [{"text": "Stockholm."}]}]}
+{"contents": [{"role": "user", "parts": [{"text": "What is the capital of Norway?"}]}, {"role": "model", "parts": [{"text": "Oslo."}]}]}
+{"contents": [{"role": "user", "parts": [{"text": "What is the capital of Poland?"}]}, {"role": "model", "parts": [{"text": "Warsaw."}]}]}
+{"contents": [{"role": "user", "parts": [{"text": "What is the capital of Greece?"}]}, {"role": "model", "parts": [{"text": "Athens."}]}]}
+{"contents": [{"role": "user", "parts": [{"text": "What is the capital of Portugal?"}]}, {"role": "model", "parts": [{"text": "Lisbon."}]}]}
+{"contents": [{"role": "user", "parts": [{"text": "What is the capital of Turkey?"}]}, {"role": "model", "parts": [{"text": "Ankara."}]}]}

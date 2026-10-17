@@ -1,0 +1,68 @@
+{
+  "headers": {
+    "content-type": "application/json; charset=UTF-8",
+    "vary": "Origin, X-Origin, Referer",
+    "date": "Wed, 23 Sep 2026 18:17:02 GMT",
+    "server": "ESF",
+    "x-xss-protection": "0",
+    "x-frame-options": "SAMEORIGIN",
+    "x-content-type-options": "nosniff",
+    "alt-svc": "h3=\":443\"; ma=2592000,h3-29=\":443\"; ma=2592000",
+    "transfer-encoding": "chunked",
+    "status": "200",
+    "content-length": "1227",
+    "-content-encoding": "gzip",
+    "content-location": "https://monitoring.googleapis.com/v3/projects/cloud-custodian/timeSeries?filter=metric.type+%3D+%22aiplatform.googleapis.com%2Ftuned_model%2Fonline_serving%2Ftokens%22+AND+%28+resource.labels.endpoint_id+%3D+%225347660069397856256%22+%29+&interval.startTime=2026-09-22T18%3A17%3A01Z&interval.endTime=2026-09-23T18%3A17%3A01Z&aggregation.alignmentPeriod=86400.0s&aggregation.perSeriesAligner=ALIGN_SUM&aggregation.crossSeriesReducer=REDUCE_SUM&aggregation.groupByFields=resource.labels.endpoint_id&view=FULL&alt=json"
+  },
+  "body": {
+    "timeSeries": [
+      {
+        "metric": {
+          "type": "aiplatform.googleapis.com/tuned_model/online_serving/tokens"
+        },
+        "resource": {
+          "type": "aiplatform.googleapis.com/Endpoint",
+          "labels": {
+            "project_id": "cloud-custodian",
+            "endpoint_id": "5347660069397856256"
+          }
+        },
+        "metricKind": "DELTA",
+        "valueType": "DISTRIBUTION",
+        "points": [
+          {
+            "interval": {
+              "startTime": "2026-09-22T18:17:01Z",
+              "endTime": "2026-09-23T18:17:01Z"
+            },
+            "value": {
+              "distributionValue": {
+                "count": "10",
+                "mean": 28.3,
+                "sumOfSquaredDeviation": 6496.1,
+                "bucketOptions": {
+                  "exponentialBuckets": {
+                    "numFiniteBuckets": 17,
+                    "growthFactor": 2,
+                    "scale": 1
+                  }
+                },
+                "bucketCounts": [
+                  "0",
+                  "0",
+                  "0",
+                  "5",
+                  "0",
+                  "2",
+                  "1",
+                  "2"
+                ]
+              }
+            }
+          }
+        ]
+      }
+    ],
+    "unit": "1"
+  }
+}
