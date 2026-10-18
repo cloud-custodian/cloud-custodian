@@ -4,10 +4,12 @@ import copy
 from unittest import mock
 import os
 
+import botocore.session
 import pytest
 import yaml
 
 from c7n.testing import TestUtils
+from c7n.utils import get_partition
 from click.testing import CliRunner
 
 from c7n_org import cli as org
@@ -232,6 +234,59 @@ class OrgTest(TestUtils):
         self.assertEqual(
             org.resolve_regions([], account),
             ('us-east-1', 'us-west-2'))
+
+    def _all_regions_bootstrap(self, account):
+        # the region resolve_regions('all') asks ec2:DescribeRegions from
+        session = mock.MagicMock()
+        session.client.return_value.describe_regions.return_value = {
+            'Regions': [{'RegionName': 'region-a'}, {'RegionName': 'region-b'}]}
+        get_session = mock.MagicMock(return_value=session)
+        self.patch(org, 'get_session', get_session)
+        self.assertEqual(org.resolve_regions(['all'], account), ['region-a', 'region-b'])
+        get_session.assert_called_once()
+        return get_session.call_args[0][2]
+
+    def test_resolve_regions_all_asks_from_the_accounts_partition(self):
+        for partition in botocore.session.get_session().get_available_partitions():
+            account = {
+                'name': 'dev', 'account_id': '112233445566',
+                'role': f'arn:{partition}:iam::112233445566:role/foobar'}
+            bootstrap = self._all_regions_bootstrap(account)
+            # us-east-1 only exists in the commercial partition
+            self.assertEqual(get_partition(bootstrap), partition)
+            if partition == 'aws':
+                self.assertEqual(bootstrap, 'us-east-1')
+
+    def test_resolve_regions_all_unknown_partition_keeps_default(self):
+        account = {
+            'name': 'dev', 'account_id': '112233445566',
+            'role': 'arn:aws-not-a-partition:iam::112233445566:role/foobar'}
+        self.assertEqual(self._all_regions_bootstrap(account), 'us-east-1')
+
+    def test_resolve_regions_all_chained_roles_use_the_last(self):
+        account = {
+            'name': 'dev', 'account_id': '112233445566',
+            'role': ['arn:aws:iam::998877665544:role/hop',
+                     'arn:aws-us-gov:iam::112233445566:role/foobar']}
+        self.assertEqual(get_partition(self._all_regions_bootstrap(account)), 'aws-us-gov')
+
+    def test_resolve_regions_all_profile_partition(self):
+        for profile_region, partition in (
+                ('us-gov-east-1', 'aws-us-gov'),
+                ('cn-northwest-1', 'aws-cn'),
+                ('eu-west-1', 'aws'),
+                # a profile with no region configured keeps the historical default
+                (None, 'aws')):
+            account = {'name': 'dev', 'account_id': '112233445566', 'profile': 'dev'}
+            profile_session = mock.MagicMock(region_name=profile_region)
+            self.patch(org, 'SessionFactory', mock.MagicMock(
+                return_value=mock.MagicMock(return_value=profile_session)))
+            bootstrap = self._all_regions_bootstrap(account)
+            self.assertEqual(get_partition(bootstrap), partition)
+            if partition == 'aws':
+                # get_partition answers 'aws' for any region it doesn't know,
+                # so check the fallback region itself
+                self.assertEqual(bootstrap, 'us-east-1')
 
     def test_filter_accounts(self):
 
