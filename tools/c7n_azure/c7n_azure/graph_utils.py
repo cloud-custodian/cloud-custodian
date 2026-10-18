@@ -22,13 +22,13 @@ class GraphSource(DescribeSource):
     """
 
     def get_resources(self, query=None):
-        """Get resources from Microsoft Graph API."""
-        try:
-            # Use the manager's Graph API methods to retrieve resources
-            return self.manager.get_graph_resources()
-        except Exception as e:
-            log.error(f"Error retrieving resources via Graph API: {e}")
-            return []
+        """Get resources from Microsoft Graph API.
+
+        Errors are not swallowed here: an empty list would look like an empty
+        tenant to the policy, so failures propagate like they do for ARM sources.
+        ``make_graph_request`` already logs request errors.
+        """
+        return self.manager.get_graph_resources()
 
 
 # Microsoft Graph API Endpoint to Permissions Mapping
@@ -173,7 +173,11 @@ class GraphResourceManager(QueryResourceManager):
             if '$count' in endpoint:
                 headers['ConsistencyLevel'] = 'eventual'
 
-            url = f'https://graph.microsoft.com/v1.0/{endpoint}'
+            # An absolute URL (such as an @odata.nextLink) is used as-is
+            if endpoint.startswith('https://'):
+                url = endpoint
+            else:
+                url = f'https://graph.microsoft.com/v1.0/{endpoint}'
 
             if method == 'GET':
                 response = requests.get(url, headers=headers, timeout=30)
@@ -187,6 +191,20 @@ class GraphResourceManager(QueryResourceManager):
         except requests.exceptions.RequestException as e:
             log.error(f"Microsoft Graph API request failed for {endpoint}: {e}")
             raise
+
+    def list_graph_collection(self, endpoint):
+        """Return every item of a Microsoft Graph collection, following ``@odata.nextLink``.
+
+        Collections such as applications, service principals, users and groups can span
+        several pages. ``@odata.nextLink`` is an absolute URL and is passed back to
+        ``make_graph_request`` unchanged, so subclasses that override it pick it up.
+        """
+        items = []
+        while endpoint:
+            response = self.make_graph_request(endpoint)
+            items.extend(response.get('value', []))
+            endpoint = response.get('@odata.nextLink')
+        return items
 
     def make_batched_graph_request(self, batch):
         """Make a batched request to Microsoft Graph API."""

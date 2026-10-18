@@ -4,6 +4,7 @@
 import logging
 from datetime import datetime, timedelta, timezone
 
+import requests
 from dateutil.parser import parse as parse_date
 
 from c7n.exceptions import PolicyValidationError
@@ -14,29 +15,10 @@ from c7n_azure.provider import resources
 
 log = logging.getLogger('custodian.azure.entraid.application')
 
-GRAPH_BASE_URL = 'https://graph.microsoft.com/v1.0/'
 CREDENTIAL_PROPERTIES = {
     'password': 'passwordCredentials',
     'key': 'keyCredentials',
 }
-
-
-def list_graph_collection(manager, endpoint):
-    """Return every item of a Microsoft Graph collection, following ``@odata.nextLink``.
-
-    Applications and service principals routinely exceed one page (100 items by default),
-    so the paging links are followed until the collection is exhausted.
-    """
-    items = []
-    while endpoint:
-        response = manager.make_graph_request(endpoint)
-        items.extend(response.get('value', []))
-        next_link = response.get('@odata.nextLink')
-        if next_link and next_link.startswith(GRAPH_BASE_URL):
-            endpoint = next_link[len(GRAPH_BASE_URL):]
-        else:
-            endpoint = None
-    return items
 
 
 class EntraIDCredentialResource(GraphResourceManager):
@@ -51,17 +33,16 @@ class EntraIDCredentialResource(GraphResourceManager):
     def get_graph_resources(self):
         """Get all objects of this collection from Microsoft Graph API."""
         try:
-            resources = list_graph_collection(self, f'{self.collection}?$top=999')
-            log.debug(f"Retrieved {len(resources)} {self.collection} from Graph API")
-            return resources
-        except Exception as e:
-            log.error(f"Error retrieving EntraID {self.collection}: {e}")
-            if "Insufficient privileges" in str(e) or "403" in str(e):
+            resources = self.list_graph_collection(f'{self.collection}?$top=999')
+        except requests.exceptions.HTTPError as e:
+            if e.response is not None and e.response.status_code in (401, 403):
                 log.error(
                     f"Insufficient privileges to read {self.collection}. "
                     "Required permission: Application.Read.All"
                 )
-            return []
+            raise
+        log.debug(f"Retrieved {len(resources)} {self.collection} from Graph API")
+        return resources
 
 
 @resources.register('entraid-application')
@@ -243,7 +224,7 @@ class CredentialExpirationFilter(Filter):
             expiring = []
             for kind in kinds:
                 for credential in resource.get(CREDENTIAL_PROPERTIES[kind]) or []:
-                    end = self._end_date(credential)
+                    end = self._end_date(credential, resource.get('id'))
                     if end is None or end > threshold:
                         continue
                     if end <= now and not include_expired:
@@ -261,7 +242,7 @@ class CredentialExpirationFilter(Filter):
         return matched
 
     @staticmethod
-    def _end_date(credential):
+    def _end_date(credential, resource_id=None):
         """Return the credential's end date as an aware datetime, or None if unusable."""
         value = credential.get('endDateTime')
         if not value:
@@ -269,7 +250,9 @@ class CredentialExpirationFilter(Filter):
         try:
             end = parse_date(value)
         except (TypeError, ValueError, OverflowError):
-            log.warning(f"Unable to parse credential endDateTime: {value}")
+            log.warning(
+                f"Unable to parse credential endDateTime on {resource_id} "
+                f"(keyId {credential.get('keyId')}): {value}")
             return None
         if end.tzinfo is None:
             end = end.replace(tzinfo=timezone.utc)

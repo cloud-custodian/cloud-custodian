@@ -39,19 +39,13 @@ class TestGraphSource(BaseTest):
         mock_manager.get_graph_resources.assert_called_once()
 
     def test_get_resources_exception_handling(self):
-        """Test GraphSource exception handling in get_resources"""
+        """GraphSource lets errors propagate instead of reporting an empty tenant"""
         mock_manager = Mock()
         mock_manager.get_graph_resources.side_effect = Exception("Graph API error")
 
         source = GraphSource(mock_manager)
-        with patch('c7n_azure.graph_utils.log') as mock_log:
-            resources = source.get_resources()
-
-        # Should return empty list on error
-        self.assertEqual(resources, [])
-        mock_log.error.assert_called_once_with(
-            "Error retrieving resources via Graph API: Graph API error"
-        )
+        with self.assertRaisesRegex(Exception, "Graph API error"):
+            source.get_resources()
 
 
 class TestGetRequiredPermissions(BaseTest):

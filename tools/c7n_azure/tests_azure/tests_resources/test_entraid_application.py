@@ -2,7 +2,9 @@
 # SPDX-License-Identifier: Apache-2.0
 
 from datetime import datetime, timedelta, timezone
-from unittest.mock import patch
+from unittest.mock import MagicMock, patch
+
+import requests
 
 from c7n.exceptions import PolicyValidationError
 from c7n_azure.graph_utils import get_required_permissions_for_endpoint
@@ -48,6 +50,12 @@ def _app(app_id, password_days=(), key_days=()):
             for index, days in enumerate(key_days)
         ],
     }
+
+
+def _http_error(status, message=None):
+    response = requests.models.Response()
+    response.status_code = status
+    return requests.exceptions.HTTPError(message or f'{status} Error', response=response)
 
 
 class EntraIDApplicationTest(BaseTest):
@@ -114,7 +122,8 @@ class EntraIDApplicationTest(BaseTest):
         self.assertEqual([r['id'] for r in resources], ['a1', 'a2'])
         self.assertEqual(
             [c.args[0] for c in mock_request.call_args_list],
-            ['applications?$top=999', 'applications?$top=999&$skiptoken=abc'])
+            ['applications?$top=999',
+             'https://graph.microsoft.com/v1.0/applications?$top=999&$skiptoken=abc'])
 
     @patch(SP_REQUEST)
     def test_service_principal_endpoint(self, mock_request):
@@ -127,12 +136,57 @@ class EntraIDApplicationTest(BaseTest):
         mock_request.assert_called_once_with('servicePrincipals?$top=999')
 
     @patch(APP_REQUEST)
-    def test_get_resources_permission_error(self, mock_request):
-        mock_request.side_effect = Exception('403 Forbidden: Insufficient privileges')
+    def test_permission_error_is_raised(self, mock_request):
+        mock_request.side_effect = _http_error(403)
         p = self.load_policy({'name': 'apps', 'resource': 'azure.entraid-application'})
         with self.assertLogs('custodian.azure.entraid.application', 'ERROR') as logs:
-            self.assertEqual(p.resource_manager.get_graph_resources(), [])
+            with self.assertRaises(requests.exceptions.HTTPError):
+                p.run()
         self.assertTrue(any('Application.Read.All' in line for line in logs.output))
+
+    @patch(APP_REQUEST)
+    def test_server_error_on_second_page_is_raised(self, mock_request):
+        mock_request.side_effect = [
+            {
+                'value': [_app('a1')],
+                '@odata.nextLink':
+                    'https://graph.microsoft.com/v1.0/applications?$top=999&$skiptoken=abc',
+            },
+            _http_error(500),
+        ]
+        p = self.load_policy({
+            'name': 'expiring',
+            'resource': 'azure.entraid-application',
+            'filters': [{'type': 'credential-expiration', 'days': 30}],
+        })
+        with self.assertRaises(requests.exceptions.HTTPError):
+            p.run()
+
+    @patch(APP_REQUEST)
+    def test_403_text_in_message_is_not_a_permission_error(self, mock_request):
+        # The status code decides, not "403" appearing in an id or $skiptoken
+        mock_request.side_effect = _http_error(
+            500, 'Server error for url: ...$skiptoken=X403Y')
+        p = self.load_policy({'name': 'apps', 'resource': 'azure.entraid-application'})
+        with patch('c7n_azure.resources.entraid_application.log') as mock_log:
+            with self.assertRaises(requests.exceptions.HTTPError):
+                p.resource_manager.get_graph_resources()
+        mock_log.error.assert_not_called()
+
+    @patch('c7n_azure.graph_utils.requests.get')
+    def test_make_graph_request_accepts_absolute_url(self, mock_get):
+        mock_get.return_value.json.return_value = {'value': []}
+        p = self.load_policy({'name': 'apps', 'resource': 'azure.entraid-application'})
+        manager = p.resource_manager
+        session = MagicMock()
+        session.credentials.get_token.return_value.token = 'token'
+        with patch.object(manager, 'get_client', return_value=session):
+            next_link = 'https://graph.microsoft.com/v1.0/applications?$skiptoken=abc'
+            manager.make_graph_request(next_link)
+            manager.make_graph_request('applications?$top=999')
+        self.assertEqual(
+            [c.args[0] for c in mock_get.call_args_list],
+            [next_link, 'https://graph.microsoft.com/v1.0/applications?$top=999'])
 
     @patch(APP_REQUEST)
     def test_policy_run_reports_expiring_credentials(self, mock_request):
@@ -210,7 +264,9 @@ class CredentialExpirationFilterTest(BaseTest):
             {'keyId': 'bad', 'endDateTime': 'not-a-date'},
         ]
         app['keyCredentials'] = None
-        self.assertEqual(self._filter([app], days=3650), [])
+        with self.assertLogs('custodian.azure.entraid.application', 'WARNING') as logs:
+            self.assertEqual(self._filter([app], days=3650), [])
+        self.assertTrue(any('odd' in line and 'keyId bad' in line for line in logs.output))
 
     def test_fractional_seconds_and_naive_dates(self):
         soon = datetime.now(timezone.utc) + timedelta(days=2)
