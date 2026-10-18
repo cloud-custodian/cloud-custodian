@@ -304,7 +304,7 @@ class AIFoundryApplication(ChildArmResourceManager):
     def enumerate_resources(self, parent_resource, type_info, vault_url=None, **params):
         management_endpoint = self.get_session().cloud_endpoints.endpoints.resource_manager
         url = (
-            f"{management_endpoint}{parent_resource['id'].lstrip('/')}"
+            f"{management_endpoint.rstrip('/')}/{parent_resource['id'].lstrip('/')}"
             "/applications"
         )
         return self._arm_rest_get(
