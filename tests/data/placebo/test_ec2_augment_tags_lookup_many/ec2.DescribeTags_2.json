@@ -1,0 +1,14 @@
+{
+    "status_code": 200,
+    "data": {
+        "Tags": [
+            {
+                "Key": "Owner",
+                "ResourceId": "i-0877d42a6928968d2",
+                "ResourceType": "instance",
+                "Value": "robot"
+            }
+        ],
+        "ResponseMetadata": {}
+    }
+}

@@ -1,0 +1,62 @@
+{
+    "status_code": 200,
+    "data": {
+        "ResponseMetadata": {},
+        "items": [
+            {
+                "arn": "arn:aws:vpc-lattice:us-east-1:644160558196:service/svc-0ecf63fb91f2b5537/listener/listener-010148a46dc5dfa6f/rule/rule-0f191013ad64dd340",
+                "id": "rule-0f191013ad64dd340",
+                "name": "default",
+                "isDefault": true,
+                "priority": 99999,
+                "createdAt": {
+                    "__class__": "datetime",
+                    "year": 2026,
+                    "month": 3,
+                    "day": 13,
+                    "hour": 15,
+                    "minute": 46,
+                    "second": 13,
+                    "microsecond": 76000
+                },
+                "lastUpdatedAt": {
+                    "__class__": "datetime",
+                    "year": 2026,
+                    "month": 3,
+                    "day": 13,
+                    "hour": 15,
+                    "minute": 46,
+                    "second": 13,
+                    "microsecond": 76000
+                }
+            },
+            {
+                "arn": "arn:aws:vpc-lattice:us-east-1:644160558196:service/svc-0ecf63fb91f2b5537/listener/listener-010148a46dc5dfa6f/rule/rule-07e791dc458a1967f",
+                "id": "rule-07e791dc458a1967f",
+                "name": "test-rule",
+                "isDefault": false,
+                "priority": 10,
+                "createdAt": {
+                    "__class__": "datetime",
+                    "year": 2026,
+                    "month": 3,
+                    "day": 13,
+                    "hour": 15,
+                    "minute": 46,
+                    "second": 13,
+                    "microsecond": 610000
+                },
+                "lastUpdatedAt": {
+                    "__class__": "datetime",
+                    "year": 2026,
+                    "month": 3,
+                    "day": 13,
+                    "hour": 15,
+                    "minute": 46,
+                    "second": 13,
+                    "microsecond": 610000
+                }
+            }
+        ]
+    }
+}

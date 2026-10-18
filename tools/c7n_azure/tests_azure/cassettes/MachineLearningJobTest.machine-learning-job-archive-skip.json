@@ -1,0 +1,138 @@
+{
+    "version": 1,
+    "interactions": [
+        {
+            "request": {
+                "method": "GET",
+                "uri": "https://management.azure.com/subscriptions/ea42f556-5106-4743-99b0-c129bfa71a47/resourceGroups/test_machine-learning-job-archive/providers/Microsoft.MachineLearningServices/workspaces/cctest-mlws-archive/jobs/cctest-archive-job?api-version=2023-04-01",
+                "body": null,
+                "headers": {}
+            },
+            "response": {
+                "status": {
+                    "code": 200,
+                    "message": "OK"
+                },
+                "headers": {
+                    "x-ms-ratelimit-remaining-subscription-global-reads": [
+                        "3749"
+                    ],
+                    "x-msedge-ref": [
+                        "Ref A: B16EB549D7BA447BBD1CC612ED077F38 Ref B: CYS013050704035 Ref C: 2026-08-13T19:26:00Z"
+                    ],
+                    "x-request-time": [
+                        "0.062"
+                    ],
+                    "x-cache": [
+                        "CONFIG_NOCACHE"
+                    ],
+                    "request-context": [
+                        "appId=cid-v1:2d2e8e63-272e-4b3c-8598-4ee570a0e70d"
+                    ],
+                    "content-type": [
+                        "application/json; charset=utf-8"
+                    ],
+                    "x-ms-operation-identifier": [
+                        "tenantId=72d876e4-6b6f-4622-8566-8200130e81d4,objectId=e89404a5-c7db-4cdf-aed3-31daf7739325/southcentralus/889b23fb-e4cb-43c4-a0e8-82d40363ec4b"
+                    ],
+                    "content-length": [
+                        "3375"
+                    ],
+                    "cache-control": [
+                        "no-cache"
+                    ],
+                    "date": [
+                        "Thu, 13 Aug 2026 19:25:59 GMT"
+                    ],
+                    "x-ms-response-type": [
+                        "standard"
+                    ],
+                    "azureml-served-by-cluster": [
+                        "vienna-southcentralus-01"
+                    ]
+                },
+                "body": {
+                    "data": {
+                        "id": "/subscriptions/ea42f556-5106-4743-99b0-c129bfa71a47/resourceGroups/test_machine-learning-job-archive/providers/Microsoft.MachineLearningServices/workspaces/cctest-mlws-archive/jobs/cctest-archive-job",
+                        "name": "cctest-archive-job",
+                        "type": "Microsoft.MachineLearningServices/workspaces/jobs",
+                        "properties": {
+                            "description": null,
+                            "tags": {
+                                "_aml_system_ComputeTargetStatus": "{\"AllocationState\":\"steady\",\"PreparingNodeCount\":0,\"RunningNodeCount\":0,\"CurrentNodeCount\":0}"
+                            },
+                            "properties": {
+                                "mlflow.source.git.repoURL": "test@example.com",
+                                "mlflow.source.git.branch": "jimfulton/feat/10949-azure-ml-job-archive",
+                                "mlflow.source.git.commit": "c1ce0dce0b77346d223400d93f5f598eec874f2d",
+                                "azureml.git.dirty": "False",
+                                "_azureml.ComputeTargetType": "amlctrain",
+                                "_azureml.ClusterName": "cctestcpuarchive",
+                                "ProcessInfoFile": "azureml-logs/process_info.json",
+                                "ProcessStatusFile": "azureml-logs/process_status.json",
+                                "StartTimeUtc": "2026-08-13 19:19:44",
+                                "EndTimeUtc": "2026-08-13 19:20:44"
+                            },
+                            "displayName": "cctest_archive_job",
+                            "status": "Completed",
+                            "experimentName": "cctest_archive",
+                            "services": {
+                                "Tracking": {
+                                    "jobServiceType": "Tracking",
+                                    "port": null,
+                                    "endpoint": "azureml://southcentralus.api.azureml.ms/mlflow/v1.0/subscriptions/ea42f556-5106-4743-99b0-c129bfa71a47/resourceGroups/test_machine-learning-job-archive/providers/Microsoft.MachineLearningServices/workspaces/cctest-mlws-archive?",
+                                    "status": null,
+                                    "errorMessage": null,
+                                    "properties": null,
+                                    "nodes": null
+                                },
+                                "Studio": {
+                                    "jobServiceType": "Studio",
+                                    "port": null,
+                                    "endpoint": "https://ml.azure.com/runs/cctest-archive-job?wsid=/subscriptions/ea42f556-5106-4743-99b0-c129bfa71a47/resourcegroups/test_machine-learning-job-archive/workspaces/cctest-mlws-archive",
+                                    "status": null,
+                                    "errorMessage": null,
+                                    "properties": null,
+                                    "nodes": null
+                                }
+                            },
+                            "computeId": "/subscriptions/ea42f556-5106-4743-99b0-c129bfa71a47/resourceGroups/test_machine-learning-job-archive/providers/Microsoft.MachineLearningServices/workspaces/cctest-mlws-archive/computes/cctestcpuarchive",
+                            "isArchived": true,
+                            "identity": null,
+                            "componentId": null,
+                            "jobType": "Command",
+                            "resources": {
+                                "instanceCount": 1,
+                                "instanceType": null,
+                                "properties": null,
+                                "shmSize": "2g",
+                                "dockerArgs": null
+                            },
+                            "codeId": null,
+                            "command": "echo hello",
+                            "environmentId": "/subscriptions/ea42f556-5106-4743-99b0-c129bfa71a47/resourceGroups/test_machine-learning-job-archive/providers/Microsoft.MachineLearningServices/workspaces/cctest-mlws-archive/environments/cctest-archive-env/versions/1",
+                            "inputs": {},
+                            "outputs": {
+                                "default": {
+                                    "description": null,
+                                    "uri": "azureml://datastores/workspaceartifactstore/ExperimentRun/dcid.cctest-archive-job",
+                                    "mode": "ReadWriteMount",
+                                    "jobOutputType": "uri_folder"
+                                }
+                            },
+                            "distribution": null,
+                            "limits": null,
+                            "environmentVariables": {},
+                            "parameters": {}
+                        },
+                        "systemData": {
+                            "createdAt": "2026-08-13T19:17:35.6842089+00:00",
+                            "createdBy": "Jim Fulton",
+                            "createdByType": "User"
+                        }
+                    }
+                }
+            }
+        }
+    ]
+}

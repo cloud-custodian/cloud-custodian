@@ -1,0 +1,10 @@
+{
+    "status_code": 400,
+    "data": {
+        "Error": {
+            "Code": "InvalidInstanceID.NotFound",
+            "Message": "The instance ID 'i-0023456789abcdef0' does not exist"
+        },
+        "ResponseMetadata": {}
+    }
+}

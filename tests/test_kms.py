@@ -3,7 +3,7 @@
 import json
 import time
 from datetime import datetime, timedelta
-from unittest.mock import patch
+from unittest.mock import patch, MagicMock
 
 import boto3
 import moto
@@ -1002,3 +1002,75 @@ class KMSMotoTests(BaseTest):
         deletion_date = key_meta["DeletionDate"].astimezone(tzutc())
         assert deletion_date > thirty_days_away
         assert deletion_date < (thirty_days_away + timedelta(days=1))
+
+
+class KMSSkipAwsManagedKeyTest(BaseTest):
+    # https://github.com/cloud-custodian/cloud-custodian/issues/11027
+    # AWS managed keys (KeyManager == 'AWS') can't have their policy,
+    # rotation, or tags modified by any customer account - actions
+    # should skip them rather than let the API call fail.
+
+    aws_key = {
+        'KeyId': 'aws-key-1',
+        'Arn': 'arn:aws:kms:us-east-1:111111111111:key/aws-key-1',
+        'KeyManager': 'AWS',
+    }
+    customer_key = {
+        'KeyId': 'cust-key-1',
+        'Arn': 'arn:aws:kms:us-east-1:111111111111:key/cust-key-1',
+        'KeyManager': 'CUSTOMER',
+    }
+
+    def _policy(self, action, client_name='kms'):
+        mock_factory = MagicMock()
+        mock_factory.region = 'us-east-1'
+        client = mock_factory().client(client_name)
+        policy = self.load_policy(
+            {'name': 'k', 'resource': 'kms-key', 'actions': [action]},
+            session_factory=mock_factory)
+        return policy, client
+
+    def test_schedule_deletion_skips_aws_managed(self):
+        policy, client = self._policy({'type': 'schedule-deletion', 'days': 7})
+        policy.resource_manager.actions[0].process([self.aws_key, self.customer_key])
+        client.schedule_key_deletion.assert_called_once_with(
+            KeyId='cust-key-1', PendingWindowInDays=7)
+
+    def test_schedule_deletion_all_aws_managed_noop(self):
+        policy, client = self._policy({'type': 'schedule-deletion'})
+        policy.resource_manager.actions[0].process([self.aws_key])
+        client.schedule_key_deletion.assert_not_called()
+
+    def test_set_rotation_skips_aws_managed(self):
+        policy, client = self._policy({'type': 'set-rotation', 'state': True})
+        policy.resource_manager.actions[0].process([self.aws_key, self.customer_key])
+        client.enable_key_rotation.assert_called_once_with(KeyId='cust-key-1')
+
+    def test_remove_statements_skips_aws_managed(self):
+        policy, client = self._policy({'type': 'remove-statements', 'statement_ids': 'matched'})
+        policy.resource_manager.actions[0].process([self.aws_key])
+        client.get_key_policy.assert_not_called()
+
+    def _tag_policy(self, action):
+        mock_factory = MagicMock()
+        mock_factory.region = 'us-east-1'
+        tag_resources = mock_factory().client('resourcegroupstaggingapi').tag_resources
+        tag_resources.return_value = {}
+        policy = self.load_policy(
+            {'name': 'k', 'resource': 'kms-key', 'actions': [action]},
+            session_factory=mock_factory)
+        return policy, tag_resources
+
+    def test_tag_skips_aws_managed(self):
+        policy, tag_resources = self._tag_policy(
+            {'type': 'tag', 'tags': {'Owner': 'platform'}})
+        policy.resource_manager.actions[0].process([self.aws_key, self.customer_key])
+        tag_resources.assert_called_once_with(
+            ResourceARNList=['arn:aws:kms:us-east-1:111111111111:key/cust-key-1'],
+            Tags={'Owner': 'platform'})
+
+    def test_tag_all_aws_managed_noop(self):
+        policy, tag_resources = self._tag_policy(
+            {'type': 'tag', 'tags': {'Owner': 'platform'}})
+        policy.resource_manager.actions[0].process([self.aws_key])
+        tag_resources.assert_not_called()
