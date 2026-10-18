@@ -338,7 +338,6 @@ class TestCFN(BaseTest):
         self.assertTrue(cfn._cfn_stack_updatable({'StackStatus': 'UPDATE_ROLLBACK_COMPLETE'}))
         self.assertTrue(cfn._cfn_stack_updatable({'StackStatus': 'IMPORT_COMPLETE'}))
         self.assertTrue(cfn._cfn_stack_updatable({'StackStatus': 'IMPORT_ROLLBACK_COMPLETE'}))
-        self.assertTrue(cfn._cfn_stack_updatable({'StackStatus': 'ROLLBACK_COMPLETE'}))
 
         # Non-updateable states - should return False
         self.assertFalse(cfn._cfn_stack_updatable({'StackStatus': 'CREATE_IN_PROGRESS'}))
@@ -349,6 +348,12 @@ class TestCFN(BaseTest):
         self.assertFalse(cfn._cfn_stack_updatable({'StackStatus': 'CREATE_FAILED'}))
         self.assertFalse(cfn._cfn_stack_updatable({'StackStatus': 'ROLLBACK_IN_PROGRESS'}))
         self.assertFalse(cfn._cfn_stack_updatable({'StackStatus': 'UPDATE_ROLLBACK_IN_PROGRESS'}))
+        # A stack whose creation rolled back can only be deleted
+        self.assertFalse(cfn._cfn_stack_updatable({'StackStatus': 'ROLLBACK_COMPLETE'}))
+        self.assertFalse(cfn._cfn_stack_updatable({'StackStatus': 'ROLLBACK_FAILED'}))
+        self.assertFalse(cfn._cfn_stack_updatable({'StackStatus': 'UPDATE_ROLLBACK_FAILED'}))
+        self.assertFalse(cfn._cfn_stack_updatable({'StackStatus': 'IMPORT_ROLLBACK_FAILED'}))
+        self.assertFalse(cfn._cfn_stack_updatable({'StackStatus': 'REVIEW_IN_PROGRESS'}))
 
         # Edge cases
         self.assertFalse(cfn._cfn_stack_updatable({}))  # Missing StackStatus
@@ -361,6 +366,8 @@ class TestCFN(BaseTest):
             {'StackName': 'stack-ok', 'StackStatus': 'CREATE_COMPLETE', 'Tags': []},
             {'StackName': 'stack-in-progress', 'StackStatus': 'UPDATE_IN_PROGRESS', 'Tags': []},
             {'StackName': 'stack-failed', 'StackStatus': 'DELETE_FAILED', 'Tags': []},
+            {'StackName': 'stack-rolled-back', 'StackStatus': 'ROLLBACK_COMPLETE', 'Tags': []},
+            {'StackName': 'stack-after', 'StackStatus': 'UPDATE_COMPLETE', 'Tags': []},
         ]
 
         action = MagicMock(spec=CloudFormationAddTag)
@@ -371,17 +378,16 @@ class TestCFN(BaseTest):
             CloudFormationAddTag.process_resource_set(
                 action, MagicMock(), stacks, tags)
 
-            # Should only tag the one stack in updateable state
-            self.assertEqual(mock_tag_stack.call_count, 1)
-            # Verify the stack that was tagged (positional args: client, stack, add=tags)
-            call_args = mock_tag_stack.call_args
-            tagged_stack = call_args[0][1]  # Second positional arg is the stack
-            self.assertEqual(tagged_stack['StackName'], 'stack-ok')
+            # Only stacks in an updateable state are tagged, including one
+            # that comes after the skipped stacks
+            # (positional args: client, stack, add=tags)
+            tagged = [c[0][1]['StackName'] for c in mock_tag_stack.call_args_list]
+            self.assertEqual(tagged, ['stack-ok', 'stack-after'])
 
         # Verify warning was logged for skipped stacks
         action.log.warning.assert_called_once()
         warning_args = action.log.warning.call_args[0]
-        self.assertIn('2', str(warning_args))  # 2 stacks skipped
+        self.assertIn('3', str(warning_args))  # 3 stacks skipped
 
     def test_cfn_remove_tag_skip_non_updateable(self):
         """Test that removing tags skips stacks in non-updateable states."""

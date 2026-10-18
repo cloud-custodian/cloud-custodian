@@ -993,7 +993,8 @@ class PolicyMetaLint(BaseTest):
             'healthcheck', 'event-rule-target', 'log-metric',
             'support-case', 'transit-attachment', 'config-recorder',
             'apigw-domain-name', 'backup-job', 'quicksight-account', 'codedeploy-config',
-            'cleanrooms-collaboration-member', 's3files-mount-target'}
+            'cleanrooms-collaboration-member', 's3files-mount-target',
+            'kafka-broker'}
 
         missing_method = []
         for k, v in manager.resources.items():

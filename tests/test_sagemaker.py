@@ -6,13 +6,14 @@ from unittest import mock
 import pytest
 from pytest_terraform import terraform
 
+from .apicallcaptor import ApiCallCaptor
 from .common import BaseTest
 
 from c7n.filters.metrics import MetricsFilter
 from c7n.resources.sagemaker import (
     SAGEMAKER_METRICS, SagemakerEndpoint, SagemakerJobQueryParser,
     CompilationJobQueryParser)
-from c7n.exceptions import PolicyValidationError
+from c7n.exceptions import PolicyExecutionError, PolicyValidationError
 
 import botocore.exceptions as b_exc
 
@@ -1582,6 +1583,178 @@ def test_sagemaker_space(test, sagemaker_studio):
     [resource] = p.run()
     assert resource['SpaceName'] == sagemaker_studio[
         'aws_sagemaker_space.untagged.space_name']
+
+
+def space_settings(factory, fixture, space):
+    return factory().client('sagemaker').describe_space(
+        DomainId=fixture['aws_sagemaker_domain.main.id'],
+        SpaceName=fixture[f'aws_sagemaker_space.{space}.space_name'],
+    ).get('SpaceSettings', {})
+
+
+def sent_updates(captor):
+    # Flight data replays the same responses whatever is sent, so the tests
+    # check the UpdateSpace requests themselves.
+    return [c['params'] for c in captor.calls if c.get('operation') == 'UpdateSpace']
+
+
+@pytest.mark.audited
+@terraform('sagemaker_space_update', scope='module')
+def test_sagemaker_space_update(test, sagemaker_space_update):
+    # GPU defaults are reset to CPU. Each space only gets the app settings it
+    # already has, and the Code Editor space, which has neither, is skipped.
+    factory = test.replay_flight_data('test_sagemaker_space_update')
+    fixture = sagemaker_space_update
+    cpu = {'DefaultResourceSpec': {'InstanceType': 'ml.t3.medium'}}
+    p = test.load_policy(
+        {
+            'name': 'sagemaker-space-update',
+            'resource': 'aws.sagemaker-space',
+            'filters': [
+                {'DomainId': fixture['aws_sagemaker_domain.main.id']},
+                {'or': [
+                    {'type': 'value', 'op': 'glob', 'value': 'ml.g*',
+                     'key': 'SpaceSettings.JupyterLabAppSettings'
+                            '.DefaultResourceSpec.InstanceType'},
+                    {'type': 'value', 'op': 'glob', 'value': 'ml.g*',
+                     'key': 'SpaceSettings.CodeEditorAppSettings'
+                            '.DefaultResourceSpec.InstanceType'},
+                    {'type': 'value', 'op': 'glob', 'value': 'ml.g*',
+                     'key': 'SpaceSettings.KernelGatewayAppSettings'
+                            '.DefaultResourceSpec.InstanceType'},
+                ]},
+            ],
+            'actions': [{
+                'type': 'update',
+                'SpaceSettings': {
+                    'JupyterLabAppSettings': cpu,
+                    'KernelGatewayAppSettings': cpu,
+                },
+            }],
+        },
+        session_factory=factory,
+    )
+    captor = ApiCallCaptor.start_capture()
+    resources = p.run()
+    assert {r['SpaceName'] for r in resources} == {
+        fixture['aws_sagemaker_space.jupyterlab.space_name'],
+        fixture['aws_sagemaker_space.codeeditor.space_name'],
+        fixture['aws_sagemaker_space.classic.space_name'],
+    }
+    assert {u['SpaceName']: u['SpaceSettings'] for u in sent_updates(captor)} == {
+        fixture['aws_sagemaker_space.jupyterlab.space_name']: {'JupyterLabAppSettings': cpu},
+        fixture['aws_sagemaker_space.classic.space_name']: {'KernelGatewayAppSettings': cpu},
+    }
+
+    if test.recording:
+        # UpdateSpace returns while the space is still Updating.
+        time.sleep(30)
+    jupyterlab = space_settings(factory, fixture, 'jupyterlab')
+    assert jupyterlab['JupyterLabAppSettings'] == cpu
+    assert jupyterlab['CodeEditorAppSettings']['DefaultResourceSpec'] == {
+        'InstanceType': 'ml.g4dn.xlarge'}
+    assert 'KernelGatewayAppSettings' not in jupyterlab
+
+    classic = space_settings(factory, fixture, 'classic')
+    assert classic['KernelGatewayAppSettings'] == cpu
+    assert 'JupyterLabAppSettings' not in classic
+
+    codeeditor = space_settings(factory, fixture, 'codeeditor')
+    assert codeeditor['CodeEditorAppSettings']['DefaultResourceSpec'] == {
+        'InstanceType': 'ml.g4dn.xlarge'}
+    assert 'JupyterLabAppSettings' not in codeeditor
+    assert 'KernelGatewayAppSettings' not in codeeditor
+
+
+@pytest.mark.audited
+@terraform('sagemaker_space_update', scope='module')
+def test_sagemaker_space_update_error(test, sagemaker_space_update):
+    # SageMaker refuses to set an AppType on the classic space, which has none.
+    # It's listed first, so this also checks the cpu space after it is still
+    # updated before the failure is raised.
+    factory = test.replay_flight_data('test_sagemaker_space_update_error')
+    fixture = sagemaker_space_update
+    cpu_default = {'DefaultResourceSpec': {'InstanceType': 'ml.t3.xlarge'}}
+    p = test.load_policy(
+        {
+            'name': 'sagemaker-space-update-error',
+            'resource': 'aws.sagemaker-space',
+            'filters': [
+                {'DomainId': fixture['aws_sagemaker_domain.main.id']},
+                {'type': 'value', 'key': 'SpaceName', 'op': 'in', 'value': [
+                    fixture['aws_sagemaker_space.classic.space_name'],
+                    fixture['aws_sagemaker_space.cpu.space_name'],
+                ]},
+            ],
+            'actions': [{
+                'type': 'update',
+                'SpaceSettings': {
+                    'AppType': 'JupyterLab',
+                    'JupyterLabAppSettings': cpu_default,
+                },
+            }],
+        },
+        session_factory=factory,
+    )
+    captor = ApiCallCaptor.start_capture()
+    with pytest.raises(PolicyExecutionError, match='1 of 2 spaces failed'):
+        p.run()
+    assert [(u['SpaceName'], u['SpaceSettings']) for u in sent_updates(captor)] == [
+        (fixture['aws_sagemaker_space.classic.space_name'],
+         {'AppType': 'JupyterLab'}),
+        (fixture['aws_sagemaker_space.cpu.space_name'],
+         {'AppType': 'JupyterLab', 'JupyterLabAppSettings': cpu_default}),
+    ]
+
+    if test.recording:
+        time.sleep(30)
+    cpu = space_settings(factory, fixture, 'cpu')
+    assert cpu['JupyterLabAppSettings'] == cpu_default
+
+
+def test_sagemaker_space_update_validation(test):
+    with pytest.raises(PolicyValidationError, match='InstnaceType'):
+        test.load_policy(
+            {
+                'name': 'sagemaker-space-update-typo',
+                'resource': 'aws.sagemaker-space',
+                'actions': [{
+                    'type': 'update',
+                    'SpaceSettings': {
+                        'JupyterLabAppSettings': {
+                            'DefaultResourceSpec': {'InstnaceType': 'ml.t3.medium'}},
+                    },
+                }],
+            },
+            validate=True,
+        )
+
+
+def test_sagemaker_space_update_fit_to_space(test):
+    # Flight data replays without checking what was sent, so the recorded
+    # tests can't catch a space being sent app settings it doesn't have.
+    cpu = {'DefaultResourceSpec': {'InstanceType': 'ml.t3.medium'}}
+    p = test.load_policy({
+        'name': 'sagemaker-space-update-fit',
+        'resource': 'aws.sagemaker-space',
+        'actions': [{
+            'type': 'update',
+            'SpaceSettings': {
+                'JupyterLabAppSettings': cpu,
+                'KernelGatewayAppSettings': cpu,
+            },
+        }],
+    })
+    action = p.resource_manager.actions[0]
+
+    jupyterlab = {'SpaceSettings': {'AppType': 'JupyterLab', 'JupyterLabAppSettings': {}}}
+    classic = {'SpaceSettings': {'KernelGatewayAppSettings': {}}}
+    codeeditor = {'SpaceSettings': {'CodeEditorAppSettings': {}}}
+    assert action.fit_to_space(jupyterlab) == {
+        'SpaceSettings': {'JupyterLabAppSettings': cpu}}
+    assert action.fit_to_space(classic) == {
+        'SpaceSettings': {'KernelGatewayAppSettings': cpu}}
+    assert action.fit_to_space(codeeditor) == {}
 
 
 @pytest.mark.audited
