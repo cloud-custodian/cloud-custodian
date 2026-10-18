@@ -21,11 +21,13 @@ from c7n_azure.utils import ResourceIdParser
 # ARM resources which do not currently support tagging
 # for database it is a C7N known issue (#4543)
 arm_tags_unsupported = ['microsoft.network/dnszones/',
+                        'microsoft.network/privatednszones/',
                         'microsoft.sql/servers/databases',
                         'microsoft.storage/storageaccounts/blobservices/containers',
                         'microsoft.cognitiveservices/accounts/deployments',
                         'microsoft.cognitiveservices/accounts/projects/connections',
-                        'microsoft.machinelearningservices/workspaces/jobs']
+                        'microsoft.machinelearningservices/workspaces/jobs',
+                        'microsoft.machinelearningservices/workspaces/schedules']
 
 
 class ArmTypeInfo(TypeInfo, metaclass=TypeMeta):

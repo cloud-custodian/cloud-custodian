@@ -60,6 +60,17 @@
                     }
                 },
                 "BudgetType": "COST",
+                "FilterExpression": {
+                    "Dimensions": {
+                        "Key": "SERVICE",
+                        "Values": [
+                            "Amazon Elastic Compute Cloud - Compute"
+                        ],
+                        "MatchOptions": [
+                            "EQUALS"
+                        ]
+                    }
+                },
                 "LastUpdatedTime": {
                     "__class__": "datetime",
                     "year": 2023,

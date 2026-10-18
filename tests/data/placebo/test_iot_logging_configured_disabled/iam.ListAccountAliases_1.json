@@ -1,0 +1,10 @@
+{
+    "status_code": 200,
+    "data": {
+        "AccountAliases": [
+            "cloud-compass-xacc"
+        ],
+        "IsTruncated": false,
+        "ResponseMetadata": {}
+    }
+}

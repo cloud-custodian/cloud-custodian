@@ -183,6 +183,35 @@ class EKS(BaseTest):
                 name='devx')['cluster']['tags'],
             {'App': 'Custodian'})
 
+    def test_tag_deleted_cluster(self):
+        # eks raises NotFoundException (not ResourceNotFoundException) when
+        # a cluster is gone by the time we tag it. No terraform fixture
+        # here - the cluster's absence is the whole point, so we tag an
+        # arn that isn't there rather than spend 20m creating a cluster
+        # to delete it.
+        aws_region = 'us-east-1'
+        factory = self.replay_flight_data(
+            'test_eks_tag_deleted_cluster', region=aws_region)
+
+        p = self.load_policy({
+            'name': 'eks-tag-deleted',
+            'resource': 'aws.eks',
+            'actions': [
+                {'type': 'tag', 'tags': {'App': 'Custodian'}},
+                {'type': 'remove-tag', 'tags': ['Env']}]},
+            session_factory=factory, config={'region': aws_region})
+
+        gone = {
+            'name': 'c7n-deleted',
+            'arn': 'arn:aws:eks:%s:%s:cluster/c7n-deleted' % (
+                aws_region, self.account_id),
+            'tags': {'Env': 'Dev'}}
+        tag, remove_tag = p.resource_manager.actions
+
+        # neither raises, the cluster is simply skipped
+        tag.process([gone])
+        remove_tag.process([gone])
+
     def test_kms_filter(self):
         factory = self.replay_flight_data('test_eks_kms_filter')
         kms = factory().client('kms')

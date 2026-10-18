@@ -1,0 +1,29 @@
+{
+    "status_code": 200,
+    "data": {
+        "ResponseMetadata": {},
+        "Items": [
+            {
+                "ApiEndpoint": "https://sozi1cborg.execute-api.us-east-1.amazonaws.com",
+                "ApiId": "sozi1cborg",
+                "ApiKeySelectionExpression": "$request.header.x-api-key",
+                "CreatedDate": {
+                    "__class__": "datetime",
+                    "year": 2025,
+                    "month": 12,
+                    "day": 12,
+                    "hour": 23,
+                    "minute": 7,
+                    "second": 48,
+                    "microsecond": 0
+                },
+                "DisableExecuteApiEndpoint": false,
+                "IpAddressType": "ipv4",
+                "Name": "example-api-sharing-duck",
+                "ProtocolType": "HTTP",
+                "RouteSelectionExpression": "$request.method $request.path",
+                "Tags": {}
+            }
+        ]
+    }
+}

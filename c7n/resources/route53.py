@@ -616,6 +616,46 @@ class ResolverRule(QueryResourceManager):
     }
 
 
+class SkipAutoDefinedResolverRule:
+    """Mixin for ResolverRule actions that cannot operate on Route 53's
+    global auto-defined rules (e.g. rslvr-autodefined-rr-internet-resolver).
+    These have no owning account and cannot be tagged or modified by any
+    customer. Filters them out before delegating to the real action and
+    emits a warning so operators know why they were skipped."""
+
+    def process(self, resources):
+        excluded = [r for r in resources
+                    if r.get('Id', '').startswith('rslvr-autodefined-rr-')]
+        if excluded:
+            self.manager.log.warning(
+                "Skipping %d AWS auto-defined resolver rule(s) which "
+                "have no owning account and cannot be modified",
+                len(excluded))
+        resources = [r for r in resources
+                     if not r.get('Id', '').startswith('rslvr-autodefined-rr-')]
+        if not resources:
+            return
+        return super().process(resources)
+
+
+@ResolverRule.action_registry.register('mark')
+@ResolverRule.action_registry.register('tag')
+class ResolverRuleTag(SkipAutoDefinedResolverRule, tags.UniversalTag):
+    pass
+
+
+@ResolverRule.action_registry.register('unmark')
+@ResolverRule.action_registry.register('untag')
+@ResolverRule.action_registry.register('remove-tag')
+class ResolverRuleRemoveTag(SkipAutoDefinedResolverRule, tags.UniversalUntag):
+    pass
+
+
+@ResolverRule.action_registry.register('mark-for-op')
+class ResolverRuleMarkForOp(SkipAutoDefinedResolverRule, tags.UniversalTagDelayedAction):
+    pass
+
+
 @resources.register('resolver-logs')
 class ResolverQueryLogConfig(QueryResourceManager):
 
