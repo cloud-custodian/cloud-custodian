@@ -1,5 +1,6 @@
 # Copyright The Cloud Custodian Authors.
 # SPDX-License-Identifier: Apache-2.0
+import logging
 import time
 from unittest import mock
 
@@ -2012,6 +2013,88 @@ def test_sagemaker_metrics_missing_value(test):
     test.patch(SageMakerMetricsFilter, 'get_metric_data', zero)
     assert selected()
     assert selected(**{'missing-value': 0})
+
+
+def endpoints_selected(test, metric, **extra):
+    """Which of a classic and a component endpoint an idle policy selects.
+
+    With the endpoints asked about, the endpoints as annotated, and the
+    filter's log records.
+    """
+    from c7n.resources.sagemaker import SageMakerMetricsFilter
+
+    asked = []
+
+    def no_data(self, client, params):
+        asked.append({d['Name']: d['Value'] for d in params['Dimensions']})
+        return []
+
+    test.patch(SageMakerMetricsFilter, 'get_metric_data', no_data)
+    policy = test.load_policy(
+        {'name': 'endpoints', 'resource': 'sagemaker-endpoint'})
+    f = SagemakerEndpoint.filter_registry.get('metrics')(
+        dict(type='metrics', name=metric, statistics='Sum',
+             value=0, op='lte', **extra),
+        policy.resource_manager)
+    f.endpoint_components = {'component': ['comp']}
+    variants = [{'VariantName': 'AllTraffic'}]
+    endpoints = {name: {'EndpointName': name, 'ProductionVariants': variants}
+                 for name in ('classic', 'component')}
+
+    selected = [r['EndpointName'] for r in f.process(list(endpoints.values()))]
+    return selected, asked, endpoints
+
+
+def test_sagemaker_endpoint_metrics_unpublished_kind_ignores_missing_value(
+        test, caplog):
+    # a kind that doesn't publish the metric has no series to be missing,
+    # so a missing value doesn't decide it: otherwise a classic-only
+    # metric with a missing value reports every component endpoint idle
+    with caplog.at_level(logging.WARNING, logger='custodian.filters'):
+        selected, asked, endpoints = endpoints_selected(
+            test, 'InvocationsPerInstance', **{'missing-value': 0})
+    assert selected == ['classic']
+    # nor is cloudwatch asked about the component endpoint
+    assert [dims['EndpointName'] for dims in asked] == ['classic']
+    assert endpoints['classic']['c7n:metrics-kind'] == 'classic'
+    assert endpoints['component']['c7n:metrics-kind'] == 'inference-component'
+    # which the author is told about, since it changed the outcome
+    [record] = caplog.records
+    assert record.levelno == logging.WARNING
+    assert record.getMessage() == (
+        "metrics skipped 1 of 2 sagemaker-endpoint whose kind doesn't"
+        " publish InvocationsPerInstance: 1 inference-component")
+
+    # and the same the other way about
+    caplog.clear()
+    with caplog.at_level(logging.WARNING, logger='custodian.filters'):
+        selected, asked, _ = endpoints_selected(
+            test, 'CPUReservation', **{'missing-value': 0})
+    assert selected == ['component']
+    assert [dims['EndpointName'] for dims in asked] == ['component']
+    assert 'publish CPUReservation: 1 classic' in caplog.text
+
+    # nor do real-time endpoints need guarding from an async-only metric
+    caplog.clear()
+    with caplog.at_level(logging.WARNING, logger='custodian.filters'):
+        selected, asked, _ = endpoints_selected(
+            test, 'InvocationsProcessed', **{'missing-value': 0})
+    assert selected == []
+    assert asked == []
+    assert ('skipped 2 of 2 sagemaker-endpoint whose kind doesn\'t publish'
+            ' InvocationsProcessed: 1 classic, 1 inference-component') in caplog.text
+
+
+def test_sagemaker_endpoint_metrics_unpublished_kind_quiet_without_missing_value(
+        test, caplog):
+    # without a missing value an endpoint with no series is passed over
+    # anyway, so skipping its kind changes nothing worth a warning
+    with caplog.at_level(logging.DEBUG, logger='custodian.filters'):
+        selected, asked, _ = endpoints_selected(test, 'InvocationsPerInstance')
+    assert selected == []
+    assert [dims['EndpointName'] for dims in asked] == ['classic']
+    assert not [r for r in caplog.records if r.levelno >= logging.WARNING]
+    assert "doesn't publish InvocationsPerInstance" in caplog.text
 
 
 def test_sagemaker_metrics_percentile_statistics(test):
