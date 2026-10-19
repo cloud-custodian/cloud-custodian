@@ -21,6 +21,32 @@ class BigtableInstanceTest(BaseTest):
                                                '/test-260/clusters/test-260-c1/'
                                                'backups/test-backup-258')
 
+    def test_bigtable_instance_cluster_query(self):
+        # The instance's displayName differs from its id, so clusters
+        # have to be listed under the instance name.
+        factory = self.replay_flight_data('bigtable-instance-cluster-query')
+        p = self.load_policy({
+            'name': 'bigtable-instance-cluster',
+            'resource': 'gcp.bigtable-instance-cluster',
+            'filters': [{
+                'type': 'value',
+                'key': 'state',
+                'value': 'READY'
+            }, {
+                'type': 'value',
+                'key': 'clusterConfig.clusterAutoscalingConfig',
+                'value': 'absent'
+            }]
+        }, session_factory=factory)
+        resources = p.run()
+
+        self.assertEqual(len(resources), 1)
+        self.assertEqual(resources[0]['name'], 'projects/cloud-custodian/instances'
+                                               '/c7n-bigtable-instance/clusters'
+                                               '/c7n-bigtable-instance-c1')
+        self.assertEqual(resources[0]['c7n:bigtable-instance']['displayName'],
+                         'Custodian Bigtable')
+
     def test_bigtable_instance_label(self):
         # Set the "env" label to not the default
         factory = self.replay_flight_data('bigtable-instance-label')
@@ -73,6 +99,22 @@ class BigtableTimeRangeFilterTest(BaseTest):
 
 
 class BigTableInstanceTableTest(BaseTest):
+
+    def test_bigtable_instance_table_query(self):
+        # The instance's displayName differs from its id, so tables
+        # have to be listed under the instance name.
+        factory = self.replay_flight_data('bigtable-instance-table-query')
+        p = self.load_policy({
+            'name': 'bigtable-instance-table',
+            'resource': 'gcp.bigtable-instance-table',
+        }, session_factory=factory)
+        resources = p.run()
+
+        self.assertEqual(len(resources), 1)
+        self.assertEqual(resources[0]['name'], 'projects/cloud-custodian/instances'
+                                               '/c7n-bigtable-instance/tables/c7n-table')
+        self.assertEqual(resources[0]['c7n:bigtable-instance']['displayName'],
+                         'Custodian Bigtable')
 
     def test_bigtable_instance_table_filter_iam_query(self):
         factory = self.replay_flight_data('bigtable-instance-table-filter-iam')
