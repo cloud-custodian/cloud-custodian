@@ -1,0 +1,29 @@
+{
+  "headers": {
+    "content-type": "application/json; charset=UTF-8",
+    "etag": "CAI=",
+    "date": "Wed, 07 Oct 2026 14:22:40 GMT",
+    "vary": "Origin, X-Origin",
+    "cache-control": "no-cache, no-store, max-age=0, must-revalidate",
+    "expires": "Mon, 01 Jan 1990 00:00:00 GMT",
+    "pragma": "no-cache",
+    "x-goog-gcs-base-ts": "1a116beb997",
+    "content-length": "288",
+    "server": "UploadServer",
+    "alt-svc": "h3=\":443\"; ma=2592000,h3-29=\":443\"; ma=2592000",
+    "status": "200"
+  },
+  "body": {
+    "iamConfiguration": {
+      "bucketPolicyOnly": {
+        "enabled": true,
+        "lockedTime": "2027-01-05T14:22:38.534Z"
+      },
+      "uniformBucketLevelAccess": {
+        "enabled": true,
+        "lockedTime": "2027-01-05T14:22:38.534Z"
+      },
+      "publicAccessPrevention": "inherited"
+    }
+  }
+}

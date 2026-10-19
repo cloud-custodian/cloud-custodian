@@ -9,9 +9,10 @@ import typing
 import yaml
 
 from c7n.actions import BaseAction
-from c7n.exceptions import PolicyValidationError
+from c7n.exceptions import PolicyExecutionError, PolicyValidationError
 from c7n.manager import resources
 from c7n.query import QueryResourceManager, TypeInfo, DescribeSource, ConfigSource
+from c7n.resources.aws import shape_schema, shape_validate
 from c7n.utils import local_session, type_schema, QueryParser
 from c7n.tags import RemoveTag, Tag, TagActionFilter, TagDelayedAction, universal_augment
 from c7n.filters.vpc import SubnetFilter, SecurityGroupFilter, NetworkLocation
@@ -1797,6 +1798,103 @@ class SagemakerSpace(QueryResourceManager):
         universal_taggable = object()
 
     source_mapping = {'describe': SagemakerSpaceDescribe}
+
+
+@SagemakerSpace.action_registry.register('update')
+class UpdateSagemakerSpace(BaseAction):
+    """Update a SageMaker Studio space's settings with ``UpdateSpace``.
+
+    Options are the ``UpdateSpace`` request without ``DomainId`` and
+    ``SpaceName``, which come from each space. SageMaker merges what you send
+    into the space's current settings, so anything you leave out is kept.
+
+    App settings blocks (``JupyterLabAppSettings``, ``CodeEditorAppSettings``,
+    ``KernelGatewayAppSettings`` and ``JupyterServerAppSettings``) are only sent
+    to spaces that already have them. SageMaker rejects some blocks on some
+    spaces, which fails the whole update, and silently adds others. Only spaces
+    in the ``InService`` state are updated.
+
+    A new default instance type doesn't change an app that is already running.
+    It applies the next time the app starts.
+
+    :example:
+
+    Reset spaces whose JupyterLab default is a GPU instance to a CPU one:
+
+    .. code-block:: yaml
+
+        policies:
+          - name: sagemaker-space-cpu-default
+            resource: aws.sagemaker-space
+            filters:
+              - type: value
+                key: SpaceSettings.JupyterLabAppSettings.DefaultResourceSpec.InstanceType
+                op: glob
+                value: 'ml.g*'
+            actions:
+              - type: update
+                SpaceSettings:
+                  JupyterLabAppSettings:
+                    DefaultResourceSpec:
+                      InstanceType: ml.t3.medium
+    """
+
+    schema = type_schema(
+        'update',
+        **shape_schema(
+            'sagemaker', 'UpdateSpaceRequest', drop_fields=('DomainId', 'SpaceName')),
+    )
+    permissions = ('sagemaker:UpdateSpace',)
+    shape = 'UpdateSpaceRequest'
+    valid_origin_states = ('InService',)
+    app_settings = (
+        'JupyterServerAppSettings',
+        'KernelGatewayAppSettings',
+        'CodeEditorAppSettings',
+        'JupyterLabAppSettings',
+    )
+
+    def validate(self):
+        params = {k: v for k, v in self.data.items() if k != 'type'}
+        params.update(DomainId='validate', SpaceName='validate')
+        shape_validate(params, self.shape, self.manager.resource_type.service)
+        return self
+
+    def process(self, resources):
+        resources = self.filter_resources(resources, 'Status', self.valid_origin_states)
+        client = local_session(self.manager.session_factory).client('sagemaker')
+        skipped = errors = 0
+        for r in resources:
+            update = self.fit_to_space(r)
+            if not update:
+                skipped += 1
+                continue
+            try:
+                self.manager.retry(
+                    client.update_space,
+                    DomainId=r['DomainId'], SpaceName=r['SpaceName'], **update)
+            except client.exceptions.ResourceNotFound:
+                continue
+            except Exception:
+                self.log.exception("Unable to update space %s", r['SpaceArn'])
+                errors += 1
+        if skipped:
+            self.log.warning(
+                "Skipped %d of %d spaces with none of the policy's app settings",
+                skipped, len(resources))
+        if errors:
+            raise PolicyExecutionError(
+                "%d of %d spaces failed to update" % (errors, len(resources)))
+
+    def fit_to_space(self, space):
+        update = {k: v for k, v in self.data.items() if k != 'type'}
+        current = space.get('SpaceSettings', {})
+        settings = {
+            k: v for k, v in update.pop('SpaceSettings', {}).items()
+            if k not in self.app_settings or k in current}
+        if settings:
+            update['SpaceSettings'] = settings
+        return update
 
 
 class SagemakerAppDescribe(DescribeSource):

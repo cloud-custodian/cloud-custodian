@@ -17,14 +17,15 @@ from c7n.tags import RemoveTag, Tag, TagActionFilter, TagDelayedAction
 
 log = logging.getLogger('custodian.cfn')
 
-# Stable states that allow UpdateStack operations (including tagging)
+# Stable states that allow UpdateStack operations (including tagging).
+# ROLLBACK_COMPLETE is not one of them: after a failed stack creation the
+# only operation CloudFormation allows is a delete.
 CFN_UPDATEABLE_STATES = frozenset([
     'CREATE_COMPLETE',
     'UPDATE_COMPLETE',
     'UPDATE_ROLLBACK_COMPLETE',
     'IMPORT_COMPLETE',
     'IMPORT_ROLLBACK_COMPLETE',
-    'ROLLBACK_COMPLETE',
 ])
 
 
