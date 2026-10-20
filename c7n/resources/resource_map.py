@@ -228,6 +228,8 @@ ResourceMap = {
   "aws.lambda": "c7n.resources.awslambda.AWSLambda",
   "aws.lambda-layer": "c7n.resources.awslambda.LambdaLayerVersion",
   "aws.lambda-event-source-mapping": "c7n.resources.awslambda.LambdaEventSourceMapping",
+  "aws.lambda-web-endpoint": "c7n.resources.awslambda.LambdaWebEndpoint",
+  "aws.lambda-web-function": "c7n.resources.awslambda.LambdaWebFunction",
   "aws.launch-config": "c7n.resources.asg.LaunchConfig",
   "aws.launch-template-version": "c7n.resources.ec2.LaunchTemplate",
   "aws.lex-bot": "c7n.resources.lex.LexBot",
