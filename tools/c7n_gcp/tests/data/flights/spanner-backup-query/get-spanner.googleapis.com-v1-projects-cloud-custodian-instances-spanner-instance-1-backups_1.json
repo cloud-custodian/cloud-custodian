@@ -1,0 +1,24 @@
+{
+  "headers": {
+    "content-type": "application/json; charset=UTF-8",
+    "status": "200",
+    "content-location": "https://spanner.googleapis.com/v1/projects/cloud-custodian/instances/spanner-instance-1/backups?alt=json"
+  },
+  "body": {
+    "backups": [
+      {
+        "name": "projects/cloud-custodian/instances/spanner-instance-1/backups/backup-1",
+        "database": "projects/cloud-custodian/instances/spanner-instance-1/databases/database-1",
+        "expireTime": "2026-10-30T09:00:00Z",
+        "createTime": "2026-10-01T09:12:44.512371Z",
+        "state": "READY",
+        "encryptionInfo": {
+          "encryptionType": "GOOGLE_DEFAULT_ENCRYPTION"
+        },
+        "versionTime": "2026-10-01T09:12:44.512371Z",
+        "databaseDialect": "GOOGLE_STANDARD_SQL",
+        "maxExpireTime": "2027-10-01T09:12:44.512371Z"
+      }
+    ]
+  }
+}
