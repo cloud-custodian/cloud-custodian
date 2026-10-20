@@ -4,6 +4,7 @@
 import logging
 import requests
 import re
+from urllib.parse import urlsplit
 
 from c7n.utils import local_session, type_schema
 from c7n.filters import ValueFilter
@@ -12,6 +13,31 @@ from c7n_azure.query import QueryResourceManager, TypeInfo, TypeMeta, DescribeSo
 from c7n_azure.provider import resources
 
 log = logging.getLogger('custodian.azure.graph')
+
+# Hosts of the published Microsoft Graph service root endpoints (global, US Government L4,
+# US Government L5 (DOD) and China operated by 21Vianet):
+# https://learn.microsoft.com/en-us/graph/deployments#microsoft-graph-and-graph-explorer-service-root-endpoints
+GRAPH_SERVICE_ROOT_HOSTS = frozenset({
+    'graph.microsoft.com',
+    'graph.microsoft.us',
+    'dod-graph.microsoft.us',
+    'microsoftgraph.chinacloudapi.cn',
+})
+
+
+def is_graph_service_url(url):
+    """Return True if an absolute URL points at a Microsoft Graph service root host.
+
+    The host is compared exactly, so a look-alike such as ``graph.microsoft.com.example.net``
+    or a URL carrying credentials or a non-default port is refused.
+    """
+    parts = urlsplit(url)
+    return (
+        parts.scheme == 'https'
+        and parts.hostname in GRAPH_SERVICE_ROOT_HOSTS
+        and parts.port is None
+        and parts.username is None
+    )
 
 
 class GraphSource(DescribeSource):
@@ -142,7 +168,16 @@ class GraphResourceManager(QueryResourceManager):
         return session.get_session_for_resource(MSGRAPH_RESOURCE_ID)
 
     def make_graph_request(self, endpoint, method='GET', data=None):
-        """Make a request to Microsoft Graph API with minimum required permissions."""
+        """Make a request to Microsoft Graph API with minimum required permissions.
+
+        ``endpoint`` is a path relative to the v1.0 root, or an absolute URL such as an
+        ``@odata.nextLink``. An absolute URL must be on a Microsoft Graph service root host,
+        so the bearer token is never sent anywhere else.
+        """
+        absolute = endpoint.startswith(('https://', 'http://'))
+        if absolute and not is_graph_service_url(endpoint):
+            log.error(f"Refusing Graph API request to a non-Graph URL: {endpoint}")
+            raise ValueError(f"Not a Microsoft Graph service URL: {endpoint}")
         try:
             session = self.get_client()
             session._initialize_session()
@@ -173,8 +208,8 @@ class GraphResourceManager(QueryResourceManager):
             if '$count' in endpoint:
                 headers['ConsistencyLevel'] = 'eventual'
 
-            # An absolute URL (such as an @odata.nextLink) is used as-is
-            if endpoint.startswith('https://'):
+            # An absolute URL (such as an @odata.nextLink) was checked above and is used as-is
+            if absolute:
                 url = endpoint
             else:
                 url = f'https://graph.microsoft.com/v1.0/{endpoint}'
