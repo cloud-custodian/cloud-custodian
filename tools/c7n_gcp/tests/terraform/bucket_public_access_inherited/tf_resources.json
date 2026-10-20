@@ -1,0 +1,57 @@
+{
+    "pytest-terraform": 1,
+    "outputs": {},
+    "resources": {
+        "google_storage_bucket": {
+            "bucket": {
+                "autoclass": [],
+                "cors": [],
+                "custom_placement_config": [],
+                "default_event_based_hold": false,
+                "deletion_policy": "DELETE",
+                "effective_labels": {
+                    "goog-terraform-provisioned": "true"
+                },
+                "enable_object_retention": false,
+                "encryption": [],
+                "force_destroy": true,
+                "hierarchical_namespace": [
+                    {
+                        "enabled": false
+                    }
+                ],
+                "id": "c7n-pap-inh-r7t2wd5n",
+                "ip_filter": [],
+                "labels": null,
+                "lifecycle_rule": [],
+                "location": "US",
+                "logging": [],
+                "name": "c7n-pap-inh-r7t2wd5n",
+                "project": "cloud-custodian",
+                "project_number": 0,
+                "public_access_prevention": "enforced",
+                "requester_pays": false,
+                "retention_policy": [],
+                "rpo": "DEFAULT",
+                "self_link": "https://www.googleapis.com/storage/v1/b/c7n-pap-inh-r7t2wd5n",
+                "soft_delete_policy": [
+                    {
+                        "effective_time": "2026-10-07T14:22:38.534Z",
+                        "retention_duration_seconds": 604800
+                    }
+                ],
+                "storage_class": "STANDARD",
+                "terraform_labels": {
+                    "goog-terraform-provisioned": "true"
+                },
+                "time_created": "2026-10-07T14:22:38.534Z",
+                "timeouts": null,
+                "uniform_bucket_level_access": true,
+                "updated": "2026-10-07T14:22:38.534Z",
+                "url": "gs://c7n-pap-inh-r7t2wd5n",
+                "versioning": [],
+                "website": []
+            }
+        }
+    }
+}

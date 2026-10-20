@@ -1,0 +1,7 @@
+{
+    "status_code": 200,
+    "data": {
+        "SpaceArn": "arn:aws:sagemaker:us-east-1:644160558196:space/d-000000000001/c7n-cpu-selected-quail",
+        "ResponseMetadata": {}
+    }
+}

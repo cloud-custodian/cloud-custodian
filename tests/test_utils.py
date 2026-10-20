@@ -15,7 +15,7 @@ from c7n import query
 from c7n import utils
 from c7n.config import Config
 from .common import BaseTest
-from datetime import datetime
+from datetime import datetime, timedelta
 
 
 class TestTesting(BaseTest):
@@ -972,6 +972,34 @@ def test_parse_date_floor():
     assert utils.parse_date(1) is None
     assert utils.parse_date('3000') is None
     assert utils.parse_date('30') is None
+
+
+@pytest.mark.parametrize('value, expected', [
+    ('PT30M', timedelta(minutes=30)),
+    ('P1DT12H', timedelta(days=1, hours=12)),
+    ('P2W', timedelta(weeks=2)),
+    ('PT1.5H', timedelta(minutes=90)),
+    ('PT1,5H', timedelta(minutes=90)),
+    ('PT1M30S', timedelta(seconds=90)),
+    ('P1DT1.5H', timedelta(days=1, minutes=90)),
+    ('PT0S', timedelta(0)),
+    ('P0W', timedelta(0)),
+    (' PT1H\n', timedelta(hours=1)),
+])
+def test_parse_duration(value, expected):
+    assert utils.parse_duration(value) == expected
+
+
+# P1Y and P1M (a month) vary in length, so they're rejected, as are durations
+# too large for a timedelta (including one that overflows to infinity) and
+# non-ASCII digits. Weeks can't be combined with other units, and only the
+# smallest unit may have a fraction.
+@pytest.mark.parametrize('value', [
+    'P', 'PT', 'P1DT', 'PT1', 'P1Y', 'P1M', 'pt1h', '1h', None, 3600,
+    'P1000000000D', 'P' + '9' * 20 + 'D', 'P' + '9' * 400 + 'D', 'PT١H',
+    'P1W1D', 'P1WT1H', 'PT1.5H30M'])
+def test_parse_duration_invalid(value):
+    assert utils.parse_duration(value) is None
 
 
 def test_output_path_join():

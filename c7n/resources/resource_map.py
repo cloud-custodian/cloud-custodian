@@ -213,6 +213,7 @@ ResourceMap = {
   "aws.iot-ota-update": "c7n.resources.iot.IoTOTAUpdate",
   "aws.iot-policy": "c7n.resources.iot.IoTPolicy",
   "aws.kafka": "c7n.resources.kafka.Kafka",
+  "aws.kafka-broker": "c7n.resources.kafka.KafkaBroker",
   "aws.kafka-config": "c7n.resources.kafka.KafkaClusterConfiguration",
   "aws.kendra": "c7n.resources.kendra.KendraIndex",
   "aws.key-pair": "c7n.resources.vpc.KeyPair",
