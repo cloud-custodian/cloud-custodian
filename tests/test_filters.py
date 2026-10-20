@@ -615,6 +615,14 @@ class TestValueTypes(BaseFilterTest):
         self.assertFilter(fdata, i("PT60M"), True)
         self.assertFilter(fdata, i("PT30M"), False)
 
+        # nor are they unequal to anything
+        fdata["op"] = "not-equal"
+        self.assertFilter(fdata, i("PT30M"), True)
+        self.assertFilter(fdata, i("PT60M"), False)
+        self.assertFilter(fdata, i("30 minutes"), False)
+        self.assertFilter(fdata, instance(), False)
+        self.assertFilter(fdata, i("P1000000000D"), False)
+
     def test_duration_validation(self):
         fdata = {
             "type": "value",

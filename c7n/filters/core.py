@@ -781,6 +781,9 @@ class ValueFilter(BaseValueFilter):
         # value type conversion
         if self.vtype is not None:
             v, r = self.process_value_type(self.v, r, i)
+            # a resource value that isn't a duration never matches, even for not-equal
+            if self.vtype == 'duration' and r is None:
+                return False
         else:
             v = self.v
 
