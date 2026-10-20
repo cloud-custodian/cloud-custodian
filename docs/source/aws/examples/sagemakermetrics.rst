@@ -179,8 +179,8 @@ endpoint created part way through the window.  Then ``missing-value: 0``
 reads the absence as a zero, and leaving it out passes the endpoint over.
 
 A metric its kind of endpoint doesn't publish is different: there is no
-series to be missing, so the endpoint is passed over whatever the
-``missing-value``.  ``InvocationsPerInstance`` with ``missing-value: 0``
+series to be missing, so the endpoint is skipped regardless of the
+``missing-value`` setting.  ``InvocationsPerInstance`` with ``missing-value: 0``
 looks only at classic endpoints, rather than reporting every component
 endpoint as idle.  Given a ``missing-value``, the filter logs a warning
 when it passes endpoints over this way.  Either way it records the kind it
