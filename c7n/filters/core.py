@@ -667,7 +667,9 @@ class ValueFilter(BaseValueFilter):
             if 'op' in self.data and self.data['op'] not in DURATION_OPERATORS:
                 raise PolicyValidationError(
                     "value_type: duration can't be used with op: %s" % self.data['op'])
-            if 'value' not in self.data:
+            if ('value' not in self.data or
+                    'value_from' in self.data or
+                    'value_path' in self.data):
                 raise PolicyValidationError(
                     "value_type: duration needs a literal value; "
                     "value_from and value_path aren't supported")
