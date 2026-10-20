@@ -259,9 +259,10 @@ Value Type Transformations
   - ``swap`` - swap the value and the evaluated key
   - ``date`` - parse the filter's value as a date.
   - ``duration`` - parse ISO 8601 durations such as ``PT30M`` or ``P1DT12H``
-    (weeks, days, hours, minutes and seconds; not years or months) for comparison
-    operators such as ``greater-than``. A resource value in any other format, such
-    as ``P1Y`` or a number of seconds, never matches.
+    (days, hours, minutes and seconds, or a week on its own; not years or months).
+    Only the smallest unit may have a fraction. Use with comparison operators such as
+    ``greater-than``. A resource value in any other format, such as ``P1Y`` or a
+    number of seconds, never matches.
 
   Note that the `age` and `expiration` transformations expect a value given as
   a number of days. Use a floating point value to match time periods shorter than
