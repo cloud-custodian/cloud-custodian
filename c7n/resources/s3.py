@@ -4178,7 +4178,18 @@ class S3DirectoryInventory(Inventory):
     def process(self, buckets, event=None):
         # directory buckets are subject to a low per-account quota,
         # so thread-pool concurrency here doesnt seem necessary
-        return [b for b in buckets if self.process_bucket(b)]
+        results = []
+        for b in buckets:
+            try:
+                matched = self.process_bucket(b)
+            except ClientError as e:
+                b.setdefault('c7n:DeniedMethods', []).append('GetInventoryConfiguration')
+                self.log.error(
+                    "Error processing bucket: %s error: %s", b['Name'], e)
+                continue
+            if matched:
+                results.append(b)
+        return results
 
     def process_bucket(self, b):
         if 'c7n:inventories' not in b:
@@ -4214,6 +4225,9 @@ class S3DirectorySetInventory(SetInventory):
                 state: enabled
     """
     permissions = ('s3express:PutInventoryConfiguration', 's3express:GetInventoryConfiguration')
+
+    def process(self, buckets):
+        return self._process_with_futures(buckets)
 
 
 @S3Directory.filter_registry.register('cross-account')

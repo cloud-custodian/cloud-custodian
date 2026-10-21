@@ -203,7 +203,7 @@ class DirectoryAccessPoint(QueryResourceManager):
         id = name = 'Name'
         enum_spec = ('list_access_points_for_directory_buckets', 'AccessPointList', None)
         arn = 'AccessPointArn'
-        arn_service = 's3'
+        arn_service = 's3express'
         arn_type = 'accesspoint'
         permission_prefix = 's3express'
 
@@ -222,14 +222,15 @@ class DirectoryAccessPointCrossAccount(CrossAccountAccessFilter):
             if self.policy_attribute in r:
                 continue
             try:
-                r['c7n:Policy'] = client.get_access_point_policy(
-                    AccountId=account_id, Name=r['Name']).get('Policy')
+                resp = self.manager.retry(
+                    client.get_access_point_policy,
+                    AccountId=account_id, Name=r['Name'],
+                    ignore_err_codes=('NoSuchAccessPointPolicy',),
+                )
             except ClientError as e:
-                code = e.response['Error']['Code']
-                if code == 'NoSuchAccessPointPolicy':
-                    r['c7n:Policy'] = None
-                elif code == 'AccessDenied':
-                    r.setdefault('c7n:DeniedMethods', []).append('get_access_point_policy')
-                else:
+                if e.response['Error']['Code'] != 'AccessDenied':
                     raise
+                r.setdefault('c7n:DeniedMethods', []).append('get_access_point_policy')
+                resp = None
+            r[self.policy_attribute] = resp.get('Policy') if resp else None
         return super().process(resources, event)

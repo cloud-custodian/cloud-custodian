@@ -236,11 +236,11 @@ def test_s3_directory_set_inventory(test):
         config={'account_id': ACCOUNT_ID},
         session_factory=factory,
     )
-    resources = p.run()
-    assert len(resources) == 1
     test.addCleanup(
         client.delete_bucket_inventory_configuration,
         Bucket=bucket_name, Id=inventory_id)
+    resources = p.run()
+    assert len(resources) == 1
 
     invs = client.list_bucket_inventory_configurations(
         Bucket=bucket_name).get('InventoryConfigurationList')
@@ -248,6 +248,52 @@ def test_s3_directory_set_inventory(test):
     assert len(matching) == 1
     assert matching[0]['IsEnabled'] is True
     assert sorted(matching[0]['OptionalFields']) == ['LastModifiedDate', 'Size']
+
+
+def test_s3_directory_set_inventory_partial_failure(test):
+    p = test.load_policy(
+        {
+            'name': 's3-directory-set-inventory-partial-failure',
+            'resource': 's3-directory',
+            'actions': [
+                {
+                    'type': 'set-inventory',
+                    'name': 'c7n-set-inventory-new',
+                    'destination': 'c7n-test-inventory-dest',
+                    'state': 'enabled',
+                }
+            ],
+        },
+        config={'account_id': ACCOUNT_ID},
+    )
+    action = p.resource_manager.actions[0]
+    buckets = [
+        {'Name': 'c7n-test-inventory-ok--use1-az4--x-s3'},
+        {'Name': 'c7n-test-inventory-denied--use1-az4--x-s3'},
+    ]
+
+    client = mock.MagicMock()
+    client.list_bucket_inventory_configurations.return_value = {
+        'InventoryConfigurationList': []}
+
+    def fake_put_bucket_inventory_configuration(Bucket, **kwargs):
+        if Bucket == 'c7n-test-inventory-denied--use1-az4--x-s3':
+            raise ClientError(
+                {'Error': {'Code': 'AccessDenied', 'Message': 'not authorized'}},
+                'PutBucketInventoryConfiguration')
+
+    client.put_bucket_inventory_configuration.side_effect = (
+        fake_put_bucket_inventory_configuration)
+
+    with mock.patch.object(s3, 'local_session') as ls:
+        ls.return_value.client.return_value = client
+        with pytest.raises(PolicyExecutionError):
+            action.process(buckets)
+
+    put_calls = {
+        c.kwargs['Bucket'] for c in
+        client.put_bucket_inventory_configuration.call_args_list}
+    assert put_calls == {b['Name'] for b in buckets}
 
 
 def test_s3_directory_cross_account_no_policy(test):
