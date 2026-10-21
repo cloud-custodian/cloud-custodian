@@ -5,6 +5,7 @@ import time
 from dateutil.parser import parse as date_parse
 
 import c7n.resources.fsx
+import c7n.resources.directory
 from c7n.testing import mock_datetime_now
 from .common import BaseTest
 import c7n.filters.backup
@@ -1147,6 +1148,84 @@ class TestFSx(BaseTest):
         self.assertEqual(len(resources), 1)
         self.assertEqual(len(resources[0]['c7n:matched-vpcs']), 1)
 
+    def test_fsx_security_group_filter(self):
+        session_factory = self.replay_flight_data("test_fsx_network_location_sg")
+        p = self.load_policy({
+            "name": "fsx_security_group_filter",
+            "resource": "aws.fsx",
+            "filters": [{
+                "type": "security-group",
+                "key": "tag:Env",
+                "value": "Staging"
+            }]
+        }, session_factory=session_factory)
+        resources = p.run()
+        self.assertEqual(len(resources), 1)
+        self.assertEqual(resources[0]["FileSystemId"], "fs-0bc98cbfb6b356896")
+        self.assertEqual(
+            resources[0]["c7n:matched-security-groups"],
+            ["sg-0stag00000000000b"])
+
+    def test_fsx_security_group_filter_multiple_enis(self):
+        # an ontap file system carries an eni per ha pair, both of which
+        # have to resolve back to the same file system.
+        session_factory = self.replay_flight_data("test_fsx_network_location_sg")
+        p = self.load_policy({
+            "name": "fsx_security_group_filter_multi_eni",
+            "resource": "aws.fsx",
+            "filters": [{
+                "type": "security-group",
+                "key": "GroupName",
+                "value": "fsx-prod"
+            }]
+        }, session_factory=session_factory)
+        resources = p.run()
+        self.assertEqual(len(resources), 1)
+        self.assertEqual(resources[0]["FileSystemId"], "fs-0e3e2a9e1f5ff7a13")
+        # both of the file system's enis carry the same group, and it
+        # resolves once rather than twice
+        self.assertEqual(
+            resources[0]["c7n:matched-security-groups"], ["sg-0prod00000000000a"])
+
+    def test_fsx_network_location_sg_mismatch(self):
+        session_factory = self.replay_flight_data("test_fsx_network_location_sg")
+        p = self.load_policy({
+            "name": "fsx_network_location_sg",
+            "resource": "aws.fsx",
+            "filters": [{
+                "type": "network-location",
+                "compare": ["resource", "security-group"],
+                "key": "tag:Env"
+            }]
+        }, session_factory=session_factory)
+        resources = p.run()
+        # the ontap file system's tag matches its security group, the
+        # windows one (Dev) does not match its group (Staging).
+        self.assertEqual(len(resources), 1)
+        self.assertEqual(resources[0]["FileSystemId"], "fs-0bc98cbfb6b356896")
+        self.assertEqual(
+            resources[0]["c7n:NetworkLocation"],
+            [{"reason": "ResourceLocationMismatch",
+              "resource": "Dev",
+              "security-groups": {"sg-0stag00000000000b": "Staging"}},
+             {"reason": "SecurityGroupMismatch",
+              "resource": "Dev",
+              "security-groups": {"sg-0stag00000000000b": "Staging"}}])
+
+    def test_fsx_network_location_permissions(self):
+        p = self.load_policy({
+            "name": "fsx_network_location_permissions",
+            "resource": "aws.fsx",
+            "filters": [{
+                "type": "network-location",
+                "compare": ["resource", "security-group"],
+                "key": "tag:Env"
+            }]
+        })
+        # security groups come off the file system's enis, which the base
+        # network-location filter doesn't account for.
+        self.assertIn("ec2:DescribeNetworkInterfaces", p.get_permissions())
+
     def test_fsx_metrics_filter(self):
         session_factory = self.replay_flight_data('test_fsx_metrics_filter')
         p = self.load_policy(
@@ -1372,3 +1451,356 @@ class TestFSxBackup(BaseTest):
         self.assertEqual(len(resources), 3)
         for r in resources:
             self.assertEqual(len(r['c7n:matched-kms-key']), 1)
+
+
+class TestFSxStorageVirtualMachine(BaseTest):
+
+    def test_svm_query(self):
+        session_factory = self.replay_flight_data("test_fsx_svm_managed_ad")
+        p = self.load_policy({
+            "name": "fsx_svm_query",
+            "resource": "aws.fsx-storage-virtual-machine",
+        }, session_factory=session_factory)
+        resources = p.run()
+        self.assertEqual(
+            sorted(r["StorageVirtualMachineId"] for r in resources),
+            ["svm-05b1f4f80089ba22d", "svm-097e3d446a223c732"])
+
+    def test_svm_not_joined_to_managed_ad(self):
+        session_factory = self.replay_flight_data("test_fsx_svm_managed_ad")
+        p = self.load_policy({
+            "name": "fsx-ontap-svm-must-use-managed-ad",
+            "resource": "aws.fsx-storage-virtual-machine",
+            "filters": [{
+                "type": "active-directory",
+                "key": "Type",
+                "value": ["MicrosoftAD", "SharedMicrosoftAD"],
+                "op": "not-in"}],
+        }, session_factory=session_factory)
+        resources = p.run()
+        self.assertEqual(len(resources), 1)
+        self.assertEqual(resources[0]["StorageVirtualMachineId"], "svm-05b1f4f80089ba22d")
+        # nothing resolved, so no directory is annotated and the value filter
+        # matches rather than clearing it
+        self.assertEqual(resources[0]["c7n:ActiveDirectory"], {})
+        self.assertEqual(
+            resources[0]["c7n:ActiveDirectoryResolution"],
+            {"reason": "NoActiveDirectory"})
+
+    def test_svm_joined_to_managed_ad_annotates_the_directory(self):
+        session_factory = self.replay_flight_data("test_fsx_svm_managed_ad")
+        p = self.load_policy({
+            "name": "fsx_svm_managed_ad",
+            "resource": "aws.fsx-storage-virtual-machine",
+            "filters": [{
+                "type": "active-directory",
+                "key": "Type",
+                "value": ["MicrosoftAD", "SharedMicrosoftAD"],
+                "op": "in"}],
+        }, session_factory=session_factory)
+        resources = p.run()
+        self.assertEqual(len(resources), 1)
+        r = resources[0]
+        self.assertEqual(r["StorageVirtualMachineId"], "svm-097e3d446a223c732")
+        # fsx reports CORP.C7NTEST.COM, directory service corp.c7ntest.com
+        self.assertEqual(
+            r["ActiveDirectoryConfiguration"][
+                "SelfManagedActiveDirectoryConfiguration"]["DomainName"],
+            "CORP.C7NTEST.COM")
+        # the annotation is the directory as directory service returns it
+        self.assertEqual(r["c7n:ActiveDirectory"]["DirectoryId"], "d-90667bfee0")
+        self.assertEqual(r["c7n:ActiveDirectory"]["Type"], "MicrosoftAD")
+        self.assertEqual(
+            r["c7n:ActiveDirectoryResolution"]["matched-on"], "dns-ips,domain-name")
+
+    def test_svm_permissions(self):
+        p = self.load_policy({
+            "name": "fsx_svm_permissions",
+            "resource": "aws.fsx-storage-virtual-machine",
+            "filters": [{"type": "active-directory", "key": "Type", "value": "MicrosoftAD"}],
+        })
+        perms = p.get_permissions()
+        self.assertIn("ds:DescribeDirectories", perms)
+        self.assertIn("fsx:DescribeStorageVirtualMachines", perms)
+
+
+class TestFSxActiveDirectoryResolution(BaseTest):
+    """Resolution cases that can't be provoked against a live account."""
+
+    def filter(self):
+        return c7n.resources.fsx.SvmActiveDirectoryFilter(
+            {"type": "active-directory", "key": "Type", "value": "MicrosoftAD"}, None)
+
+    def directories(self):
+        return [{"DirectoryId": "d-managed", "Name": "corp.example.com",
+                 "Type": "MicrosoftAD", "DnsIpAddrs": ["10.0.0.10", "10.0.0.11"]}]
+
+    def svm(self, **ad):
+        return {"Subtype": "DEFAULT", "Lifecycle": "CREATED",
+                "ActiveDirectoryConfiguration": {
+                    "SelfManagedActiveDirectoryConfiguration": ad}}
+
+    def test_dns_ip_match_resolves(self):
+        directory, resolution = self.filter().resolve(
+            self.svm(DomainName="CORP.EXAMPLE.COM", DnsIps=["10.0.0.10"]),
+            self.directories())
+        self.assertEqual(directory["DirectoryId"], "d-managed")
+        self.assertEqual(resolution["matched-on"], "dns-ips,domain-name")
+
+    def test_domain_name_alone_does_not_resolve(self):
+        # an on premises domain of the same name resolves by name too, so a
+        # name match on its own can't establish which controllers are in use.
+        directory, resolution = self.filter().resolve(
+            self.svm(DomainName="CORP.EXAMPLE.COM", DnsIps=["192.168.50.5"]),
+            self.directories())
+        self.assertIsNone(directory)
+        self.assertEqual(resolution["reason"], "DomainNameOnlyMatch")
+        self.assertEqual(resolution["DirectoryId"], "d-managed")
+
+    def test_duplicate_domain_names_resolve_deterministically(self):
+        svm = self.svm(DomainName="CORP.EXAMPLE.COM", DnsIps=["192.168.50.5"])
+        directories = [
+            {"DirectoryId": "d-1", "Name": "corp.example.com",
+             "Type": "MicrosoftAD", "DnsIpAddrs": ["10.0.0.1"]},
+            {"DirectoryId": "d-2", "Name": "corp.example.com",
+             "Type": "SimpleAD", "DnsIpAddrs": ["10.0.0.2"]}]
+        self.assertEqual(
+            self.filter().resolve(svm, directories)[1]["DirectoryId"], "d-1")
+        self.assertEqual(
+            self.filter().resolve(svm, list(reversed(directories)))[1]["DirectoryId"],
+            "d-2")
+
+    def test_shared_managed_directory(self):
+        # a directory shared from another account reports the owning account's
+        # domain controllers. unverified against live aws.
+        directories = [{"DirectoryId": "d-shared", "Name": "corp.example.com",
+                        "Type": "SharedMicrosoftAD", "DnsIpAddrs": [],
+                        "OwnerDirectoryDescription": {
+                            "DirectoryId": "d-owner", "AccountId": "111111111111",
+                            "DnsIpAddrs": ["10.9.0.10"]}}]
+        directory, _ = self.filter().resolve(
+            self.svm(DomainName="CORP.EXAMPLE.COM", DnsIps=["10.9.0.10"]), directories)
+        self.assertEqual(directory["Type"], "SharedMicrosoftAD")
+
+    def test_unresolved_directory(self):
+        directory, resolution = self.filter().resolve(
+            self.svm(DomainName="OTHER.EXAMPLE.COM", DnsIps=["192.168.1.1"]),
+            self.directories())
+        self.assertIsNone(directory)
+        self.assertEqual(resolution["reason"], "UnresolvedDirectory")
+
+    def test_replication_targets_and_transient_svms_out_of_scope(self):
+        f = self.filter()
+        self.assertFalse(f.in_scope({"Subtype": "DP_DESTINATION", "Lifecycle": "CREATED"}))
+        self.assertFalse(f.in_scope({"Subtype": "SYNC_SOURCE", "Lifecycle": "CREATED"}))
+        self.assertFalse(f.in_scope({"Subtype": "DEFAULT", "Lifecycle": "CREATING"}))
+        self.assertTrue(f.in_scope({"Subtype": "DEFAULT", "Lifecycle": "CREATED"}))
+        # a misconfigured svm stays in scope, a policy pairs the directory
+        # check with its lifecycle
+        self.assertTrue(f.in_scope({"Subtype": "DEFAULT", "Lifecycle": "MISCONFIGURED"}))
+
+    def forwarder_svm(self):
+        # joined to the managed ad, but pointed at a resolver endpoint rather
+        # than at the domain controllers themselves
+        return dict(self.svm(DomainName="CORP.EXAMPLE.COM", DnsIps=["10.0.0.2"]),
+                    FileSystemId="fs-1")
+
+    def vpc_directories(self):
+        return [dict(self.directories()[0], VpcSettings={"VpcId": "vpc-1"})]
+
+    def test_resolve_on_defaults_to_dns_ips(self):
+        f = self.filter()
+        directory, resolution = f.resolve(
+            self.forwarder_svm(), self.vpc_directories(), {"fs-1": "vpc-1"})
+        self.assertIsNone(directory)
+        self.assertEqual(resolution["reason"], "DomainNameOnlyMatch")
+
+    def test_resolve_on_same_vpc(self):
+        f = c7n.resources.fsx.SvmActiveDirectoryFilter(
+            {"type": "active-directory", "key": "Type", "value": "MicrosoftAD",
+             "resolve-on": "same-vpc"}, None)
+        directory, resolution = f.resolve(
+            self.forwarder_svm(), self.vpc_directories(), {"fs-1": "vpc-1"})
+        self.assertEqual(directory["DirectoryId"], "d-managed")
+        self.assertEqual(resolution["matched-on"], "domain-name,same-vpc")
+
+    def test_resolve_on_same_vpc_rejects_a_different_vpc(self):
+        # an on premises domain of the same name reached from another vpc
+        # still doesn't resolve
+        f = c7n.resources.fsx.SvmActiveDirectoryFilter(
+            {"type": "active-directory", "key": "Type", "value": "MicrosoftAD",
+             "resolve-on": "same-vpc"}, None)
+        directory, resolution = f.resolve(
+            self.forwarder_svm(), self.vpc_directories(), {"fs-1": "vpc-2"})
+        self.assertIsNone(directory)
+        self.assertEqual(resolution["reason"], "DomainNameOnlyMatch")
+
+    def test_resolve_on_same_vpc_is_order_independent(self):
+        # several directories can carry the same domain name, the one in the
+        # file system's vpc has to be found wherever the api returns it
+        f = c7n.resources.fsx.SvmActiveDirectoryFilter(
+            {"type": "active-directory", "key": "Type", "value": "MicrosoftAD",
+             "resolve-on": "same-vpc"}, None)
+        directories = [
+            {"DirectoryId": "d-other", "Name": "corp.example.com",
+             "Type": "MicrosoftAD", "DnsIpAddrs": ["10.5.0.1"],
+             "VpcSettings": {"VpcId": "vpc-other"}},
+            {"DirectoryId": "d-same", "Name": "corp.example.com",
+             "Type": "MicrosoftAD", "DnsIpAddrs": ["10.0.0.10"],
+             "VpcSettings": {"VpcId": "vpc-1"}}]
+        for order in (directories, list(reversed(directories))):
+            directory, resolution = f.resolve(
+                self.forwarder_svm(), order, {"fs-1": "vpc-1"})
+            self.assertEqual(directory["DirectoryId"], "d-same")
+            self.assertEqual(resolution["matched-on"], "domain-name,same-vpc")
+
+    def test_resolve_on_domain_name(self):
+        f = c7n.resources.fsx.SvmActiveDirectoryFilter(
+            {"type": "active-directory", "key": "Type", "value": "MicrosoftAD",
+             "resolve-on": "domain-name"}, None)
+        directory, resolution = f.resolve(
+            self.forwarder_svm(), self.vpc_directories(), None)
+        self.assertEqual(directory["DirectoryId"], "d-managed")
+        self.assertEqual(resolution["matched-on"], "domain-name")
+
+    def test_resolve_on_same_vpc_declares_the_extra_permission(self):
+        p = self.load_policy({
+            "name": "fsx_svm_same_vpc",
+            "resource": "aws.fsx-storage-virtual-machine",
+            "filters": [{"type": "active-directory", "key": "Type",
+                         "value": "MicrosoftAD", "resolve-on": "same-vpc"}]})
+        self.assertIn("fsx:DescribeFileSystems", p.get_permissions())
+
+
+class TestFSxDirectory(BaseTest):
+
+    def test_windows_directory_no_longer_exists(self):
+        # ActiveDirectoryId outlives the directory it names, so relating it
+        # catches an id left behind by a deleted directory.
+        session_factory = self.replay_flight_data("test_fsx_active_directory")
+        p = self.load_policy({
+            "name": "fsx-windows-must-use-managed-ad",
+            "resource": "aws.fsx",
+            "filters": [
+                {"FileSystemType": "WINDOWS"},
+                {"or": [
+                    # a related resource that can't be resolved is only a
+                    # match for value: absent, so the deleted directory has
+                    # to be asked for separately
+                    {"type": "directory", "key": "DirectoryId", "value": "absent"},
+                    {"type": "directory", "key": "Type",
+                     "value": ["MicrosoftAD", "SharedMicrosoftAD"],
+                     "op": "not-in"}]}],
+        }, session_factory=session_factory)
+        resources = p.run()
+        self.assertEqual(
+            [r["FileSystemId"] for r in resources], ["fs-0bc98cbfb6b356896"])
+
+    def test_ontap_without_storage_virtual_machine(self):
+        session_factory = self.replay_flight_data("test_fsx_active_directory")
+        p = self.load_policy({
+            "name": "fsx-ontap-without-svm",
+            "resource": "aws.fsx",
+            "filters": [
+                {"FileSystemType": "ONTAP"},
+                {"type": "svm", "count": 0}],
+        }, session_factory=session_factory)
+        resources = p.run()
+        # the recorded ontap file system has two svms
+        self.assertEqual(resources, [])
+
+    def test_windows_self_managed_join_is_flagged(self):
+        # a self managed join reports no ActiveDirectoryId at all, so the
+        # related resource filter has no id to resolve and can't match it
+        directories = [{"DirectoryId": "d-managed", "Name": "corp.example.com",
+                        "Type": "MicrosoftAD", "DnsIpAddrs": ["10.0.0.10"]}]
+        self.patch(c7n.resources.directory.Directory, "augment",
+                   lambda self, r: r)
+        p = self.load_policy({
+            "name": "fsx-windows-must-use-managed-ad",
+            "resource": "aws.fsx",
+            "filters": [
+                {"FileSystemType": "WINDOWS"},
+                {"or": [
+                    {"type": "value",
+                     "key": "WindowsConfiguration.ActiveDirectoryId",
+                     "value": "absent"},
+                    {"type": "directory", "key": "DirectoryId", "value": "absent"},
+                    {"type": "directory", "key": "Type",
+                     "value": ["MicrosoftAD", "SharedMicrosoftAD"],
+                     "op": "not-in"}]}]})
+        selfmanaged = {
+            "FileSystemId": "fs-self", "FileSystemType": "WINDOWS",
+            "WindowsConfiguration": {
+                "SelfManagedActiveDirectoryConfiguration": {
+                    "DomainName": "corp.example.com", "DnsIps": ["192.168.1.1"]}}}
+        managed = {
+            "FileSystemId": "fs-managed", "FileSystemType": "WINDOWS",
+            "WindowsConfiguration": {"ActiveDirectoryId": "d-managed"}}
+        self.patch(c7n.resources.fsx.FSxDirectoryFilter, "get_related",
+                   lambda self, resources: {"d-managed": directories[0]})
+        matched = self.run_filters(p, [selfmanaged, managed])
+        self.assertEqual([r["FileSystemId"] for r in matched], ["fs-self"])
+
+    def run_filters(self, policy, resources):
+        for f in policy.resource_manager.filters:
+            resources = f.process(resources)
+        return resources
+
+
+class TestFSxStorageVirtualMachineTags(BaseTest):
+
+    def test_svm_tag_and_remove_tag(self):
+        session_factory = self.replay_flight_data("test_fsx_svm_tag")
+        p = self.load_policy({
+            "name": "fsx_svm_tag",
+            "resource": "aws.fsx-storage-virtual-machine",
+            "filters": [{"tag:Env": "absent"}],
+            "actions": [{"type": "tag", "key": "Env", "value": "Prod"}],
+        }, session_factory=session_factory)
+        resources = p.run()
+        self.assertEqual(len(resources), 1)
+
+        p = self.load_policy({
+            "name": "fsx_svm_remove_tag",
+            "resource": "aws.fsx-storage-virtual-machine",
+            "filters": [{"tag:Env": "Prod"}],
+            "actions": [{"type": "remove-tag", "tags": ["Env"]}],
+        }, session_factory=session_factory)
+        resources = p.run()
+        self.assertEqual(len(resources), 1)
+        self.assertEqual(
+            {t["Key"]: t["Value"] for t in resources[0]["Tags"]}["Env"], "Prod")
+
+
+class TestFSxOntapWithoutStorageVirtualMachine(BaseTest):
+
+    def test_ontap_with_no_svm_is_matched(self):
+        session_factory = self.replay_flight_data("test_fsx_ontap_without_svm")
+        p = self.load_policy({
+            "name": "fsx-ontap-without-svm",
+            "resource": "aws.fsx",
+            "filters": [
+                {"FileSystemType": "ONTAP"},
+                {"type": "svm", "count": 0}],
+        }, session_factory=session_factory)
+        resources = p.run()
+        self.assertEqual(len(resources), 1)
+        self.assertEqual(resources[0]["c7n:StorageVirtualMachines"], [])
+
+
+class TestFSxSecurityGroupStaleEni(BaseTest):
+
+    def test_a_departed_eni_doesnt_discard_the_batch(self):
+        # a file system being deleted can still reference an eni that has
+        # gone, the batch lookup fails and the rest are resolved singly.
+        session_factory = self.replay_flight_data("test_fsx_security_group_stale_eni")
+        p = self.load_policy({
+            "name": "fsx_sg_stale_eni",
+            "resource": "aws.fsx",
+            "filters": [{"type": "security-group", "key": "GroupName", "value": "fsx-prod"}],
+        }, session_factory=session_factory)
+        resources = p.run()
+        self.assertEqual(len(resources), 1)
+        self.assertEqual(
+            resources[0]["c7n:matched-security-groups"], ["sg-0prod00000000000a"])
