@@ -18,6 +18,7 @@ import botocore.session
 from botocore.stub import Stubber
 from c7n.exceptions import PolicyValidationError
 from c7n.executor import MainThreadExecutor
+from c7n import tags as c7n_tags
 from c7n.filters.iamaccess import CrossAccountAccessFilter, PolicyChecker
 from c7n.mu import LambdaManager, LambdaFunction, PythonPackageArchive
 from botocore.exceptions import ClientError
@@ -1482,6 +1483,74 @@ class IamInstanceProfileFilterUsage(BaseTest):
         self.assertEqual(len(resources), 1)
         self.assertEqual(resources[0]["Arn"], "arn:aws:iam::644160558196:instance-profile/mandeep")
         self.assertEqual(resources[0]["InstanceProfileName"], "mandeep")
+
+
+class IamInstanceProfileTags(BaseTest):
+
+    def test_iam_profile_tag_filter(self):
+        session_factory = self.replay_flight_data("test_iam_profile_tag_filter")
+        p = self.load_policy(
+            {
+                "name": "iam-profile-missing-owner",
+                "resource": "iam-profile",
+                "filters": [{"tag:Owner": "absent"}],
+            },
+            session_factory=session_factory,
+        )
+        resources = p.run()
+        self.assertEqual(
+            [r["InstanceProfileName"] for r in resources], ["untagged-profile"])
+        self.assertEqual(resources[0]["Tags"], [])
+
+        p = self.load_policy(
+            {
+                "name": "iam-profile-owner",
+                "resource": "iam-profile",
+                "filters": [{"tag:Owner": "platform"}],
+            },
+            session_factory=session_factory,
+        )
+        resources = p.run()
+        # pathed-profile has a non-root path, its arn carries the path
+        self.assertEqual(
+            [r["InstanceProfileName"] for r in resources],
+            ["app-profile", "pathed-profile"])
+        self.assertEqual(
+            {t["Key"]: t["Value"] for t in resources[0]["Tags"]},
+            {"Owner": "platform", "Environment": "dev"})
+
+    def test_iam_profile_tag_actions(self):
+        session_factory = self.replay_flight_data("test_iam_profile_tag_actions")
+        p = self.load_policy(
+            {
+                "name": "iam-profile-tag",
+                "resource": "iam-profile",
+                "filters": [{"tag:Owner": "absent"}],
+                "actions": [
+                    {"type": "tag", "key": "Owner", "value": "platform"},
+                    {"type": "remove-tag", "tags": ["Stale"]},
+                ],
+            },
+            session_factory=session_factory,
+        )
+        self.assertIn("mark-for-op", p.resource_manager.action_registry)
+        self.assertIn("marked-for-op", p.resource_manager.filter_registry)
+        # placebo replay does not record request parameters, so spy on the
+        # tagging api calls made by the actions and assert what was sent.
+        with mock.patch.object(
+                c7n_tags, "universal_retry", wraps=c7n_tags.universal_retry) as retry:
+            resources = p.run()
+        self.assertEqual(
+            [r["InstanceProfileName"] for r in resources], ["app-profile"])
+        arn = "arn:aws:iam::123456789012:instance-profile/app-profile"
+        calls = {c.args[0].__name__: c.kwargs for c in retry.call_args_list}
+        self.assertEqual(sorted(calls), ["tag_resources", "untag_resources"])
+        self.assertEqual(
+            calls["tag_resources"],
+            {"ResourceARNList": [arn], "Tags": {"Owner": "platform"}})
+        self.assertEqual(
+            calls["untag_resources"],
+            {"ResourceARNList": [arn], "TagKeys": ["Stale"]})
 
 
 class IamInstanceProfileActions(BaseTest):
