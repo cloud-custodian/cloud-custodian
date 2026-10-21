@@ -1,0 +1,164 @@
+{
+    "pytest-terraform": 1,
+    "outputs": {
+        "job_display_name": {
+            "value": "c7n-test-tuning-job-default-7dbe",
+            "type": "string"
+        },
+        "service_account_email": {
+            "value": "c7n-tune-7dbe@cloud-custodian.iam.gserviceaccount.com",
+            "type": "string"
+        },
+        "training_data_uri": {
+            "value": "gs://c7n-vertex-tune-7dbe/train.jsonl",
+            "type": "string"
+        }
+    },
+    "resources": {
+        "google_project_iam_member": {
+            "tuning_aiplatform_user": {
+                "condition": [],
+                "etag": "BwZczKIUGws=",
+                "id": "cloud-custodian/roles/aiplatform.user/serviceAccount:c7n-tune-7dbe@cloud-custodian.iam.gserviceaccount.com",
+                "member": "serviceAccount:c7n-tune-7dbe@cloud-custodian.iam.gserviceaccount.com",
+                "project": "cloud-custodian",
+                "role": "roles/aiplatform.user"
+            }
+        },
+        "google_service_account": {
+            "tuning": {
+                "account_id": "c7n-tune-7dbe",
+                "create_ignore_already_exists": null,
+                "deletion_policy": "DELETE",
+                "description": "",
+                "disabled": false,
+                "display_name": "c7n Vertex AI tuning test",
+                "email": "c7n-tune-7dbe@cloud-custodian.iam.gserviceaccount.com",
+                "id": "projects/cloud-custodian/serviceAccounts/c7n-tune-7dbe@cloud-custodian.iam.gserviceaccount.com",
+                "member": "serviceAccount:c7n-tune-7dbe@cloud-custodian.iam.gserviceaccount.com",
+                "name": "projects/cloud-custodian/serviceAccounts/c7n-tune-7dbe@cloud-custodian.iam.gserviceaccount.com",
+                "project": "cloud-custodian",
+                "timeouts": null,
+                "unique_id": "111474800236605011804"
+            }
+        },
+        "google_service_account_iam_member": {
+            "tuning_agent_token_creator": {
+                "condition": [],
+                "etag": "BwZczKHiCUg=",
+                "id": "projects/cloud-custodian/serviceAccounts/c7n-tune-7dbe@cloud-custodian.iam.gserviceaccount.com/roles/iam.serviceAccountTokenCreator/serviceAccount:service-123456789012@gcp-sa-vertex-tune.iam.gserviceaccount.com",
+                "member": "serviceAccount:service-123456789012@gcp-sa-vertex-tune.iam.gserviceaccount.com",
+                "role": "roles/iam.serviceAccountTokenCreator",
+                "service_account_id": "projects/cloud-custodian/serviceAccounts/c7n-tune-7dbe@cloud-custodian.iam.gserviceaccount.com"
+            }
+        },
+        "google_storage_bucket": {
+            "tuning_data": {
+                "autoclass": [],
+                "cors": [],
+                "custom_placement_config": [],
+                "default_event_based_hold": false,
+                "deletion_policy": "DELETE",
+                "effective_labels": {
+                    "goog-terraform-provisioned": "true"
+                },
+                "enable_object_retention": false,
+                "encryption": [],
+                "force_destroy": true,
+                "hierarchical_namespace": [
+                    {
+                        "enabled": false
+                    }
+                ],
+                "id": "c7n-vertex-tune-7dbe",
+                "ip_filter": [],
+                "labels": null,
+                "lifecycle_rule": [],
+                "location": "US-CENTRAL1",
+                "logging": [],
+                "name": "c7n-vertex-tune-7dbe",
+                "project": "cloud-custodian",
+                "project_number": 123456789012,
+                "public_access_prevention": "inherited",
+                "requester_pays": false,
+                "retention_policy": [],
+                "rpo": null,
+                "self_link": "https://www.googleapis.com/storage/v1/b/c7n-vertex-tune-7dbe",
+                "soft_delete_policy": [
+                    {
+                        "effective_time": "2026-10-01T19:43:27.553Z",
+                        "retention_duration_seconds": 604800
+                    }
+                ],
+                "storage_class": "STANDARD",
+                "terraform_labels": {
+                    "goog-terraform-provisioned": "true"
+                },
+                "time_created": "2026-10-01T19:43:27.553Z",
+                "timeouts": null,
+                "uniform_bucket_level_access": true,
+                "updated": "2026-10-01T19:43:27.553Z",
+                "url": "gs://c7n-vertex-tune-7dbe",
+                "versioning": [],
+                "website": []
+            }
+        },
+        "google_storage_bucket_iam_member": {
+            "tuning_data_reader": {
+                "bucket": "b/c7n-vertex-tune-7dbe",
+                "condition": [],
+                "etag": "CAI=",
+                "id": "b/c7n-vertex-tune-7dbe/roles/storage.objectViewer/serviceAccount:c7n-tune-7dbe@cloud-custodian.iam.gserviceaccount.com",
+                "member": "serviceAccount:c7n-tune-7dbe@cloud-custodian.iam.gserviceaccount.com",
+                "role": "roles/storage.objectViewer",
+                "timeouts": null
+            }
+        },
+        "google_storage_bucket_object": {
+            "training_data": {
+                "bucket": "c7n-vertex-tune-7dbe",
+                "cache_control": "",
+                "content": null,
+                "content_disposition": "",
+                "content_encoding": "",
+                "content_language": "",
+                "content_type": "text/plain; charset=utf-8",
+                "contexts": [],
+                "crc32c": "kN8JQw==",
+                "customer_encryption": [],
+                "deletion_policy": "DELETE",
+                "detect_md5hash": "/pgte6lh7YfziPNI/+A/4w==",
+                "event_based_hold": false,
+                "force_empty_content_type": null,
+                "generation": 1790883808324938,
+                "id": "c7n-vertex-tune-7dbe-train.jsonl",
+                "kms_key_name": "",
+                "md5hash": "/pgte6lh7YfziPNI/+A/4w==",
+                "md5hexhash": "fe982d7ba961ed87f388f348ffe03fe3",
+                "media_link": "https://storage.googleapis.com/download/storage/v1/b/c7n-vertex-tune-7dbe/o/train.jsonl?generation=1790883808324938&alt=media",
+                "metadata": null,
+                "name": "train.jsonl",
+                "output_name": "train.jsonl",
+                "retention": [],
+                "self_link": "https://www.googleapis.com/storage/v1/b/c7n-vertex-tune-7dbe/o/train.jsonl",
+                "source": "./train.jsonl",
+                "source_md5hash": "",
+                "storage_class": "STANDARD",
+                "temporary_hold": false,
+                "timeouts": null
+            }
+        },
+        "random_id": {
+            "suffix": {
+                "b64_std": "fb4=",
+                "b64_url": "fb4",
+                "byte_length": 2,
+                "dec": "32190",
+                "hex": "7dbe",
+                "id": "fb4",
+                "keepers": null,
+                "prefix": null
+            }
+        }
+    }
+}
