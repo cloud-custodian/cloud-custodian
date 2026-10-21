@@ -1,0 +1,33 @@
+{
+  "status_code": 200,
+  "data": {
+    "BackupSelectionsList": [
+      {
+        "SelectionId": "a1b2c3d4-e5f6-4a5b-8c9d-0e1f2a3b4c5d",
+        "SelectionName": "DatabaseSelection",
+        "BackupPlanId": "test-backup-plan-id",
+        "CreationDate": "2024-01-15T10:30:00.000Z",
+        "CreatorRequestId": "creator-request-1",
+        "IamRoleArn": "arn:aws:iam::644160558196:role/BackupRole"
+      },
+      {
+        "SelectionId": "f6e7d8c9-b0a1-4d3e-9f8a-7b6c5d4e3f2a",
+        "SelectionName": "EC2Selection",
+        "BackupPlanId": "test-backup-plan-id",
+        "CreationDate": "2024-01-15T10:35:00.000Z",
+        "CreatorRequestId": "creator-request-2",
+        "IamRoleArn": "arn:aws:iam::644160558196:role/BackupRole"
+      }
+    ],
+    "ResponseMetadata": {
+      "RequestId": "12345678-1234-1234-1234-123456789012",
+      "HTTPStatusCode": 200,
+      "HTTPHeaders": {
+        "content-type": "application/x-amz-json-1.1",
+        "date": "Mon, 15 Jan 2024 10:30:00 GMT",
+        "x-amzn-requestid": "12345678-1234-1234-1234-123456789012"
+      },
+      "RetryAttempts": 0
+    }
+  }
+}

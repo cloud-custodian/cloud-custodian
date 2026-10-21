@@ -1,0 +1,15 @@
+{
+  "status_code": 200,
+  "data": {
+    "ResponseMetadata": {
+      "RequestId": "12345678-1234-1234-1234-123456789013",
+      "HTTPStatusCode": 200,
+      "HTTPHeaders": {
+        "content-type": "application/x-amz-json-1.1",
+        "date": "Mon, 15 Jan 2024 10:30:01 GMT",
+        "x-amzn-requestid": "12345678-1234-1234-1234-123456789013"
+      },
+      "RetryAttempts": 0
+    }
+  }
+}
