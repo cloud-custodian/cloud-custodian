@@ -1,0 +1,18 @@
+{
+    "status_code": 200,
+    "data": {
+        "queryLanguage": "CWLI",
+        "results": [],
+        "statistics": {
+            "recordsMatched": 0.0,
+            "recordsScanned": 0.0,
+            "estimatedRecordsSkipped": 0.0,
+            "bytesScanned": 0.0,
+            "estimatedBytesSkipped": 0.0,
+            "logGroupsScanned": 1.0,
+            "resultCount": 0.0
+        },
+        "status": "Running",
+        "ResponseMetadata": {}
+    }
+}
