@@ -1,0 +1,18 @@
+{
+  "headers": {
+    "content-type": "application/json; charset=UTF-8",
+    "status": "200",
+    "content-location": "https://bigtableadmin.googleapis.com/v2/projects/cloud-custodian/instances/c7n-bigtable-instance/clusters?alt=json"
+  },
+  "body": {
+    "clusters": [
+      {
+        "name": "projects/cloud-custodian/instances/c7n-bigtable-instance/clusters/c7n-bigtable-instance-c1",
+        "location": "projects/cloud-custodian/locations/us-central1-b",
+        "state": "READY",
+        "serveNodes": 1,
+        "defaultStorageType": "SSD"
+      }
+    ]
+  }
+}

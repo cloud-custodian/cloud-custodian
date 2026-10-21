@@ -5,7 +5,6 @@ from c7n_gcp.provider import resources
 from c7n_gcp.query import (
     QueryResourceManager, TypeInfo, ChildResourceManager, ChildTypeInfo
 )
-from c7n.utils import local_session
 from c7n_gcp.filters.timerange import TimeRangeFilter
 
 
@@ -52,20 +51,12 @@ class BigTableInstanceCluster(ChildResourceManager):
         parent_spec = {
             'resource': 'bigtable-instance',
             'child_enum_params': {
-                ('displayName', 'parent')},
+                ('name', 'parent')},
             'use_child_query': True,
         }
         default_report_fields = ['name', 'expireTime']
         permissions = ('bigtable.clusters.list',)
         asset_type = "bigtableadmin.googleapis.com/Cluster"
-
-    def _get_child_enum_args(self, parent_instance):
-        return {
-            'parent': 'projects/{}/instances/{}'.format(
-                local_session(self.session_factory).get_default_project(),
-                parent_instance['displayName'],
-            )
-        }
 
 
 @resources.register('bigtable-instance-cluster-backup')
@@ -138,14 +129,6 @@ class BigTableInstanceTable(ChildResourceManager):
         default_report_fields = ['name']
         permissions = ('bigtable.tables.list',)
         asset_type = "bigtableadmin.googleapis.com/Table"
-
-    def _get_child_enum_args(self, parent_instance):
-        return {
-            'parent': 'projects/{}/instances/{}'.format(
-                local_session(self.session_factory).get_default_project(),
-                parent_instance['displayName'],
-            )
-        }
 
 
 @BigTableInstanceTable.filter_registry.register('iam-policy')
