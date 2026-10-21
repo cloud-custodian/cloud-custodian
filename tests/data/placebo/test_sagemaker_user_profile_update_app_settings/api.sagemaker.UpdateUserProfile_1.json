@@ -1,0 +1,7 @@
+{
+    "status_code": 200,
+    "data": {
+        "UserProfileArn": "arn:aws:sagemaker:us-east-1:644160558196:user-profile/d-msjtvfwmgld1/c7n-apps-proud-tahr",
+        "ResponseMetadata": {}
+    }
+}

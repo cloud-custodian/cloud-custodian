@@ -6,13 +6,20 @@ import functools
 import importlib.resources
 import typing
 
+import botocore.model
+import jsonschema
 import yaml
 
 from c7n.actions import BaseAction
 from c7n.exceptions import PolicyExecutionError, PolicyValidationError
 from c7n.manager import resources
 from c7n.query import QueryResourceManager, TypeInfo, DescribeSource, ConfigSource
-from c7n.resources.aws import shape_schema, shape_validate
+from c7n.resources.aws import (
+    MODEL_SCHEMA_TYPE_MAP,
+    get_service_shape,
+    shape_schema,
+    shape_validate,
+)
 from c7n.utils import local_session, type_schema, QueryParser
 from c7n.tags import RemoveTag, Tag, TagActionFilter, TagDelayedAction, universal_augment
 from c7n.filters.vpc import SubnetFilter, SecurityGroupFilter, NetworkLocation
@@ -1786,6 +1793,241 @@ class SagemakerUserProfile(QueryResourceManager):
         universal_taggable = object()
 
     source_mapping = {'describe': SagemakerUserProfileDescribe}
+
+
+def _user_profile_schema(
+    shape: botocore.model.Shape,
+    fields: dict[str, typing.Any] | None,
+) -> dict:
+    """Select supported fields and apply optional scalar schema overrides."""
+    schema = {'type': MODEL_SCHEMA_TYPE_MAP[shape.type_name]}
+    if shape.type_name == 'structure':
+        schema.update({
+            'additionalProperties': False,
+            'minProperties': 1,
+            'properties': {
+                name: _user_profile_schema(shape.members[name], children)
+                for name, children in fields.items()
+                if name in shape.members
+            },
+        })
+        if shape.metadata.get('union'):
+            schema['maxProperties'] = 1
+        if shape.required_members:
+            schema['required'] = shape.required_members
+    elif shape.type_name == 'list':
+        schema['items'] = _user_profile_schema(shape.member, fields)
+    for name in ('enum', 'pattern'):
+        if name in shape.metadata:
+            schema[name] = shape.metadata[name]
+    bounds = {
+        'string': ('minLength', 'maxLength'),
+        'array': ('minItems', 'maxItems'),
+        'integer': ('minimum', 'maximum'),
+    }
+    if schema['type'] in bounds:
+        for model_name, schema_name in zip(('min', 'max'), bounds[schema['type']]):
+            if model_name in shape.metadata:
+                schema[schema_name] = shape.metadata[model_name]
+    if shape.type_name not in ('structure', 'list') and fields:
+        schema.update(fields)
+    return schema
+
+
+@SagemakerUserProfile.action_registry.register('update')
+class UpdateSagemakerUserProfile(BaseAction):
+    """Update SageMaker Studio user settings.
+
+    Changing default instance types does not resize running apps. KernelGateway
+    instance-type defaults apply to CLI and CloudFormation app creation, not the
+    Studio UI. JupyterServer requires an AWS-managed image and does not accept
+    image-version ARNs. For JupyterServer, KernelGateway, CodeEditor, and
+    JupyterLab, include LifecycleConfigArn in each DefaultResourceSpec update
+    to retain the default lifecycle config; omitting it removes the default.
+    Choose an RStudio UserGroup when enabling RStudio access for the first time.
+
+    :example:
+
+    .. code-block:: yaml
+
+        policies:
+          - name: sagemaker-user-profile-cpu-default
+            resource: aws.sagemaker-user-profile
+            filters:
+              - type: value
+                key: UserSettings.KernelGatewayAppSettings.DefaultResourceSpec.InstanceType
+                op: regex
+                value: '^ml[.](g|p)[a-z0-9.]+$'
+            actions:
+              - type: update
+                UserSettings:
+                  KernelGatewayAppSettings:
+                    DefaultResourceSpec:
+                      InstanceType: ml.t3.medium
+    """
+
+    # TODO: Record TrainingPlanArn updates for JupyterLab and CodeEditor.
+    _resource_spec_fields = dict.fromkeys((
+        'SageMakerImageArn',
+        'SageMakerImageVersionArn',
+        'SageMakerImageVersionAlias',
+        'InstanceType',
+    ))
+    _lifecycle_resource_spec_fields = {
+        **_resource_spec_fields,
+        'LifecycleConfigArn': None,
+    }
+    _custom_image_fields = dict.fromkeys((
+        'ImageName',
+        'ImageVersionNumber',
+        'AppImageConfigName',
+    ))
+    _app_lifecycle_fields = {
+        'IdleSettings': dict.fromkeys((
+            'LifecycleManagement',
+            'IdleTimeoutInMinutes',
+            'MinIdleTimeoutInMinutes',
+            'MaxIdleTimeoutInMinutes',
+        )),
+    }
+
+    schema = type_schema(
+        'update',
+        required=['UserSettings'],
+        UserSettings=_user_profile_schema(
+            get_service_shape('sagemaker', 'UserSettings'),
+            {
+                'ExecutionRole': None,
+                'SecurityGroups': None,
+                'SharingSettings': {
+                    'NotebookOutputOption': None,
+                    'S3OutputPath': None,
+                    'S3KmsKeyId': None,
+                },
+                'DefaultLandingUri': None,
+                'StudioWebPortal': None,
+                'SpaceStorageSettings': {
+                    'DefaultEbsStorageSettings': {
+                        'DefaultEbsVolumeSizeInGb': None,
+                        'MaximumEbsVolumeSizeInGb': None,
+                    },
+                },
+                'AutoMountHomeEFS': None,
+                'CustomFileSystemConfigs': {
+                    'EFSFileSystemConfig': {
+                        'FileSystemId': None,
+                        'FileSystemPath': None,
+                    },
+                    'FSxLustreFileSystemConfig': {
+                        'FileSystemId': None,
+                        'FileSystemPath': None,
+                    },
+                },
+                'StudioWebPortalSettings': {
+                    'HiddenMlTools': None,
+                    'HiddenAppTypes': None,
+                    'HiddenInstanceTypes': None,
+                    'HiddenSageMakerImageVersionAliases': {
+                        'SageMakerImageName': None,
+                        'VersionAliases': None,
+                    },
+                    'ExecutionRoleSessionNameMode': None,
+                },
+                'RStudioServerProAppSettings': {
+                    'AccessStatus': None,
+                    'UserGroup': None,
+                },
+                'CanvasAppSettings': {
+                    'TimeSeriesForecastingSettings': {
+                        'Status': None,
+                        'AmazonForecastRoleArn': None,
+                    },
+                    'ModelRegisterSettings': {
+                        'Status': None,
+                        'CrossAccountModelRegisterRoleArn': None,
+                    },
+                    'WorkspaceSettings': {
+                        'S3ArtifactPath': None,
+                        'S3KmsKeyId': None,
+                    },
+                    'IdentityProviderOAuthSettings': {
+                        'DataSourceName': None,
+                        'Status': None,
+                        'SecretArn': None,
+                    },
+                    'DirectDeploySettings': {'Status': None},
+                    'KendraSettings': {'Status': None},
+                    'GenerativeAiSettings': {'AmazonBedrockRoleArn': None},
+                    'EmrServerlessSettings': {
+                        'Status': None,
+                        'ExecutionRoleArn': None,
+                    },
+                },
+                'JupyterServerAppSettings': {
+                    'DefaultResourceSpec': {
+                        'SageMakerImageArn': None,
+                        'SageMakerImageVersionAlias': None,
+                        'InstanceType': {'enum': ['system']},
+                        'LifecycleConfigArn': {
+                            'pattern': (
+                                r'^arn:aws[a-z\-]*:sagemaker:[a-z0-9\-]*:'
+                                r'[0-9]{12}:studio-lifecycle-config/.*$'
+                            ),
+                        },
+                    },
+                    'LifecycleConfigArns': None,
+                    'CodeRepositories': {'RepositoryUrl': None},
+                },
+                'KernelGatewayAppSettings': {
+                    'DefaultResourceSpec': _lifecycle_resource_spec_fields,
+                    'LifecycleConfigArns': None,
+                    'CustomImages': _custom_image_fields,
+                },
+                'TensorBoardAppSettings': {'DefaultResourceSpec': _resource_spec_fields},
+                'RSessionAppSettings': {
+                    'DefaultResourceSpec': _resource_spec_fields,
+                    'CustomImages': _custom_image_fields,
+                },
+                'CodeEditorAppSettings': {
+                    'DefaultResourceSpec': _lifecycle_resource_spec_fields,
+                    'LifecycleConfigArns': None,
+                    'CustomImages': _custom_image_fields,
+                    'AppLifecycleManagement': _app_lifecycle_fields,
+                    'BuiltInLifecycleConfigArn': None,
+                },
+                'JupyterLabAppSettings': {
+                    'DefaultResourceSpec': _lifecycle_resource_spec_fields,
+                    'LifecycleConfigArns': None,
+                    'CustomImages': _custom_image_fields,
+                    'CodeRepositories': {'RepositoryUrl': None},
+                    'AppLifecycleManagement': _app_lifecycle_fields,
+                    'BuiltInLifecycleConfigArn': None,
+                    'EmrSettings': {
+                        'AssumableRoleArns': None,
+                        'ExecutionRoleArns': None,
+                    },
+                },
+            },
+        ),
+    )
+    permissions = ('sagemaker:UpdateUserProfile', 'iam:PassRole')
+
+    def validate(self):
+        try:
+            jsonschema.validate(self.data, self.schema)
+        except jsonschema.ValidationError as error:
+            raise PolicyValidationError(error.message) from error
+        return self
+
+    def process(self, resources):
+        client = local_session(self.manager.session_factory).client('sagemaker')
+        for resource in resources:
+            self.manager.retry(
+                client.update_user_profile,
+                DomainId=resource['DomainId'],
+                UserProfileName=resource['UserProfileName'],
+                UserSettings=self.data['UserSettings'],
+            )
 
 
 class SagemakerSpaceDescribe(DescribeSource):

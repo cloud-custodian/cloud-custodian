@@ -1,0 +1,61 @@
+{
+    "status_code": 200,
+    "data": {
+        "DomainId": "d-msjtvfwmgld1",
+        "UserProfileArn": "arn:aws:sagemaker:us-east-1:644160558196:user-profile/d-msjtvfwmgld1/c7n-settings-proud-tahr",
+        "UserProfileName": "c7n-settings-proud-tahr",
+        "HomeEfsFileSystemUid": "200005",
+        "Status": "Updating",
+        "LastModifiedTime": {
+            "__class__": "datetime",
+            "year": 2026,
+            "month": 10,
+            "day": 20,
+            "hour": 10,
+            "minute": 31,
+            "second": 15,
+            "microsecond": 114000
+        },
+        "CreationTime": {
+            "__class__": "datetime",
+            "year": 2026,
+            "month": 10,
+            "day": 20,
+            "hour": 10,
+            "minute": 30,
+            "second": 9,
+            "microsecond": 139000
+        },
+        "UserSettings": {
+            "ExecutionRole": "arn:aws:iam::644160558196:role/c7n-profile-update-proud-tahr",
+            "SecurityGroups": [
+                "sg-0b99c92ca578e33be"
+            ],
+            "SharingSettings": {
+                "NotebookOutputOption": "Disabled"
+            },
+            "SpaceStorageSettings": {
+                "DefaultEbsStorageSettings": {
+                    "DefaultEbsVolumeSizeInGb": 5,
+                    "MaximumEbsVolumeSizeInGb": 20
+                }
+            },
+            "DefaultLandingUri": "app:JupyterServer:",
+            "StudioWebPortal": "ENABLED",
+            "CustomFileSystemConfigs": [],
+            "StudioWebPortalSettings": {
+                "HiddenMlTools": [
+                    "Experiments"
+                ],
+                "HiddenAppTypes": [
+                    "Canvas"
+                ],
+                "HiddenInstanceTypes": [
+                    "ml.g5.xlarge"
+                ]
+            },
+            "AutoMountHomeEFS": "DefaultAsDomain"
+        },
+        "ResponseMetadata": {}
+    }
+}
