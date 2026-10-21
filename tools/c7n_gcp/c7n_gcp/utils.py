@@ -5,6 +5,8 @@ import re
 from dataclasses import dataclass
 from enum import Enum
 
+import jmespath
+
 
 log = logging.getLogger('c7n_gcp.utils')
 
@@ -677,6 +679,39 @@ def _coerce_cloud_logging_ordered_value(value, severity=False):
     if severity and lowered in _SEVERITY_ORDER:
         return float(_SEVERITY_ORDER[lowered])
     return None
+
+
+def filter_tree_has_key(node, key):
+    """Check whether a policy filter structure references `key`.
+
+    Recurses only through boolean clauses (and/or/not) so literal filter
+    arguments are never mistaken for filters. Leaf `key` values may be
+    JMESPath expressions, so parse them and look for a field reference to
+    `key`; string literals within an expression do not count.
+    """
+    if isinstance(node, list):
+        return any(filter_tree_has_key(item, key) for item in node)
+    if not isinstance(node, dict):
+        return False
+    for op in ('and', 'or', 'not'):
+        if op in node:
+            return filter_tree_has_key(node[op], key)
+    leaf_key = node.get('key')
+    if not isinstance(leaf_key, str):
+        return False
+    try:
+        ast = jmespath.compile(leaf_key).parsed
+    except jmespath.exceptions.JMESPathError:
+        return leaf_key == key
+    return _ast_has_field(ast, key)
+
+
+def _ast_has_field(ast, name):
+    if ast.get('type') == 'field' and ast.get('value') == name:
+        return True
+    # slice nodes carry raw ints/None as children
+    return any(_ast_has_field(child, name) for child in ast.get('children', ())
+               if isinstance(child, dict))
 
 
 def get_firewall_port_ranges(firewall_resources):
