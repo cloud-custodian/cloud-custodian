@@ -66,6 +66,31 @@ class OutputTest(BaseTest):
             fh.name
         )
 
+    def test_azure_output_upload_nested(self):
+        # Files in nested directories must produce forward-slash blob keys on
+        # every platform. On Windows os.walk yields OS-native separators, so the
+        # relative path fragment has to be normalized before it is used as a
+        # blob name.
+        AzureStorageOutput.get_blob_client_wrapper = gm = mock.MagicMock()
+        gm.return_value = None, "logs", 'xyz'
+
+        output = self.get_azure_output()
+
+        output.blob_service = mock.MagicMock()
+        output.blob_service.create_blob_from_path = m = mock.MagicMock()
+
+        # Simulate a Windows walk over a nested output tree by using backslash
+        # separators for both root_dir and the walked path.
+        output.root_dir = output.root_dir.replace(os.sep, "\\")
+        fake_walk = [(output.root_dir + "\\sub", [], ["foo.txt"])]
+        with mock.patch("c7n_azure.output.os.walk", return_value=fake_walk), \
+                mock.patch("c7n_azure.output.os.sep", "\\"):
+            output.upload()
+
+        blob_name = m.call_args[0][1]
+        self.assertEqual(blob_name, "xyz/sub/foo.txt")
+        self.assertNotIn("\\", blob_name)
+
     def test_azure_output_get_default_output_dir(self):
         AzureStorageOutput.get_blob_client_wrapper = gm = mock.MagicMock()
         gm.return_value = None, "logs", 'xyz'
