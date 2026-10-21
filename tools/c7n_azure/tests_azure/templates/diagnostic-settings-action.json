@@ -1,0 +1,53 @@
+{
+    "$schema": "https://schema.management.azure.com/schemas/2019-04-01/deploymentTemplate.json#",
+    "contentVersion": "1.0.0.0",
+    "parameters": {
+        "uniqueId": {
+            "type": "string"
+        }
+    },
+    "variables": {
+        "planName": "cctest-diag-action-plan",
+        "siteName": "[concat('cctestdiagaction', parameters('uniqueId'))]",
+        "workspaceName": "cctest-diag-action-workspace"
+    },
+    "resources": [
+        {
+            "type": "Microsoft.Web/serverfarms",
+            "apiVersion": "2022-09-01",
+            "name": "[variables('planName')]",
+            "location": "southcentralus",
+            "sku": {
+                "name": "B1",
+                "tier": "Basic"
+            },
+            "kind": "app"
+        },
+        {
+            "type": "Microsoft.Web/sites",
+            "apiVersion": "2022-09-01",
+            "name": "[variables('siteName')]",
+            "location": "southcentralus",
+            "kind": "app",
+            "dependsOn": [
+                "[resourceId('Microsoft.Web/serverfarms', variables('planName'))]"
+            ],
+            "properties": {
+                "serverFarmId": "[resourceId('Microsoft.Web/serverfarms', variables('planName'))]",
+                "httpsOnly": true
+            }
+        },
+        {
+            "type": "Microsoft.OperationalInsights/workspaces",
+            "apiVersion": "2022-10-01",
+            "name": "[variables('workspaceName')]",
+            "location": "southcentralus",
+            "properties": {
+                "sku": {
+                    "name": "PerGB2018"
+                },
+                "retentionInDays": 30
+            }
+        }
+    ]
+}
