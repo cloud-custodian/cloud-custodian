@@ -1,0 +1,255 @@
+{
+    "version": 1,
+    "interactions": [
+        {
+            "request": {
+                "method": "GET",
+                "uri": "https://management.azure.com/subscriptions/ea42f556-5106-4743-99b0-c129bfa71a47?api-version=2022-12-01",
+                "body": null,
+                "headers": {}
+            },
+            "response": {
+                "status": {
+                    "code": 200,
+                    "message": "OK"
+                },
+                "headers": {
+                    "content-length": [
+                        "478"
+                    ],
+                    "x-ms-ratelimit-remaining-subscription-global-reads": [
+                        "3749"
+                    ],
+                    "content-type": [
+                        "application/json; charset=utf-8"
+                    ],
+                    "x-cache": [
+                        "CONFIG_NOCACHE"
+                    ],
+                    "x-msedge-ref": [
+                        "Ref A: 660B06DAB99845EAA257E03BDB0DF75F Ref B: CHI261140507036 Ref C: 2026-09-23T15:31:38Z"
+                    ],
+                    "date": [
+                        "Wed, 23 Sep 2026 15:31:37 GMT"
+                    ],
+                    "cache-control": [
+                        "no-cache"
+                    ]
+                },
+                "body": {
+                    "data": {
+                        "id": "/subscriptions/ea42f556-5106-4743-99b0-c129bfa71a47",
+                        "authorizationSource": "RoleBased",
+                        "managedByTenants": [],
+                        "subscriptionId": "ea42f556-5106-4743-99b0-c129bfa71a47",
+                        "tenantId": "00000000-0000-0000-0000-000000000003",
+                        "displayName": "Stacklet Dev 2",
+                        "state": "Enabled",
+                        "subscriptionPolicies": {
+                            "locationPlacementId": "Public_2014-09-01",
+                            "quotaId": "PayAsYouGo_2014-09-01",
+                            "spendingLimit": "Off"
+                        },
+                        "promotions": [
+                            {
+                                "category": "freetier",
+                                "endDateTime": "2025-09-13T21:06:45.7634916Z"
+                            }
+                        ]
+                    }
+                }
+            }
+        },
+        {
+            "request": {
+                "method": "GET",
+                "uri": "https://management.azure.com/subscriptions/ea42f556-5106-4743-99b0-c129bfa71a47/providers/microsoft.insights/diagnosticSettings?api-version=2017-05-01-preview",
+                "body": null,
+                "headers": {}
+            },
+            "response": {
+                "status": {
+                    "code": 200,
+                    "message": "OK"
+                },
+                "headers": {
+                    "content-length": [
+                        "995"
+                    ],
+                    "x-ms-ratelimit-remaining-subscription-global-reads": [
+                        "3749"
+                    ],
+                    "content-type": [
+                        "application/json; charset=utf-8"
+                    ],
+                    "x-cache": [
+                        "CONFIG_NOCACHE"
+                    ],
+                    "x-msedge-ref": [
+                        "Ref A: DB746FE2623E4F0F85FBF2922B386342 Ref B: CHI261140508040 Ref C: 2026-09-23T15:31:39Z"
+                    ],
+                    "date": [
+                        "Wed, 23 Sep 2026 15:31:38 GMT"
+                    ],
+                    "cache-control": [
+                        "no-cache"
+                    ]
+                },
+                "body": {
+                    "data": {
+                        "value": [
+                            {
+                                "id": "/subscriptions/ea42f556-5106-4743-99b0-c129bfa71a47/providers/microsoft.insights/diagnosticSettings/cctest-subscription-diagnostic-storage",
+                                "type": "Microsoft.Insights/diagnosticSettings",
+                                "name": "cctest-subscription-diagnostic-storage",
+                                "location": "global",
+                                "properties": {
+                                    "storageAccountId": "/subscriptions/ea42f556-5106-4743-99b0-c129bfa71a47/resourceGroups/test_subscription-diagnostic-storage/providers/Microsoft.Storage/storageAccounts/cctestsubdiagjjieqmqz",
+                                    "logs": [
+                                        {
+                                            "category": "Administrative",
+                                            "enabled": true,
+                                            "categoryGroup": null
+                                        },
+                                        {
+                                            "category": "Security",
+                                            "enabled": false,
+                                            "categoryGroup": null
+                                        },
+                                        {
+                                            "category": "ServiceHealth",
+                                            "enabled": false,
+                                            "categoryGroup": null
+                                        },
+                                        {
+                                            "category": "Alert",
+                                            "enabled": false,
+                                            "categoryGroup": null
+                                        },
+                                        {
+                                            "category": "Recommendation",
+                                            "enabled": false,
+                                            "categoryGroup": null
+                                        },
+                                        {
+                                            "category": "Policy",
+                                            "enabled": false,
+                                            "categoryGroup": null
+                                        },
+                                        {
+                                            "category": "Autoscale",
+                                            "enabled": false,
+                                            "categoryGroup": null
+                                        },
+                                        {
+                                            "category": "ResourceHealth",
+                                            "enabled": false,
+                                            "categoryGroup": null
+                                        }
+                                    ]
+                                }
+                            }
+                        ]
+                    }
+                }
+            }
+        },
+        {
+            "request": {
+                "method": "GET",
+                "uri": "https://management.azure.com/subscriptions/ea42f556-5106-4743-99b0-c129bfa71a47/resourceGroups/test_subscription-diagnostic-storage/providers/Microsoft.Storage/storageAccounts/cctestsubdiagjjieqmqz?api-version=2024-01-01",
+                "body": null,
+                "headers": {}
+            },
+            "response": {
+                "status": {
+                    "code": 200,
+                    "message": "OK"
+                },
+                "headers": {
+                    "content-length": [
+                        "1541"
+                    ],
+                    "x-ms-ratelimit-remaining-subscription-global-reads": [
+                        "3749"
+                    ],
+                    "content-type": [
+                        "application/json"
+                    ],
+                    "x-cache": [
+                        "CONFIG_NOCACHE"
+                    ],
+                    "x-msedge-ref": [
+                        "Ref A: 1F552E3AE8FA4F279914D241BFAE31CF Ref B: CHI261140504029 Ref C: 2026-09-23T15:31:39Z"
+                    ],
+                    "date": [
+                        "Wed, 23 Sep 2026 15:31:40 GMT"
+                    ],
+                    "cache-control": [
+                        "no-cache"
+                    ]
+                },
+                "body": {
+                    "data": {
+                        "sku": {
+                            "name": "Standard_LRS",
+                            "tier": "Standard"
+                        },
+                        "kind": "StorageV2",
+                        "id": "/subscriptions/ea42f556-5106-4743-99b0-c129bfa71a47/resourceGroups/test_subscription-diagnostic-storage/providers/Microsoft.Storage/storageAccounts/cctestsubdiagjjieqmqz",
+                        "name": "cctestsubdiagjjieqmqz",
+                        "type": "Microsoft.Storage/storageAccounts",
+                        "location": "southcentralus",
+                        "tags": {},
+                        "properties": {
+                            "keyCreationTime": {
+                                "key1": "2026-09-23T15:30:53.9813750Z",
+                                "key2": "2026-09-23T15:30:53.9813750Z"
+                            },
+                            "allowCrossTenantReplication": false,
+                            "privateEndpointConnections": [],
+                            "minimumTlsVersion": "TLS1_2",
+                            "allowBlobPublicAccess": false,
+                            "networkAcls": {
+                                "ipv6Rules": [],
+                                "bypass": "None",
+                                "virtualNetworkRules": [],
+                                "ipRules": [],
+                                "defaultAction": "Allow"
+                            },
+                            "supportsHttpsTrafficOnly": true,
+                            "encryption": {
+                                "services": {
+                                    "file": {
+                                        "keyType": "Account",
+                                        "enabled": true,
+                                        "lastEnabledTime": "2026-09-23T15:30:53.9918799Z"
+                                    },
+                                    "blob": {
+                                        "keyType": "Account",
+                                        "enabled": true,
+                                        "lastEnabledTime": "2026-09-23T15:30:53.9918799Z"
+                                    }
+                                },
+                                "keySource": "Microsoft.Storage"
+                            },
+                            "accessTier": "Hot",
+                            "provisioningState": "Succeeded",
+                            "creationTime": "2026-09-23T15:30:53.6718938Z",
+                            "primaryEndpoints": {
+                                "dfs": "https://cctestsubdiagjjieqmqz.dfs.core.windows.net/",
+                                "web": "https://cctestsubdiagjjieqmqz.z21.web.core.windows.net/",
+                                "blob": "https://cctestsubdiagjjieqmqz.blob.core.windows.net/",
+                                "queue": "https://cctestsubdiagjjieqmqz.queue.core.windows.net/",
+                                "table": "https://cctestsubdiagjjieqmqz.table.core.windows.net/",
+                                "file": "https://cctestsubdiagjjieqmqz.file.core.windows.net/"
+                            },
+                            "primaryLocation": "southcentralus",
+                            "statusOfPrimary": "available"
+                        }
+                    }
+                }
+            }
+        }
+    ]
+}

@@ -1,9 +1,13 @@
 # Copyright The Cloud Custodian Authors.
 # SPDX-License-Identifier: Apache-2.0
 
+import logging
+
+from azure.core.exceptions import ResourceNotFoundError
 from azure.mgmt.resource.policy.models import PolicyAssignment
 from azure.mgmt.resource import SubscriptionClient
 from azure.mgmt.monitor import MonitorManagementClient
+from azure.mgmt.storage import StorageManagementClient
 
 from c7n.actions import BaseAction
 from c7n.exceptions import PolicyValidationError
@@ -16,6 +20,7 @@ from c7n_azure.actions.tagging import Tag, RemoveTag, TagTrim, TagDelayedAction
 from c7n_azure.filters import TagActionFilter
 from c7n_azure.provider import resources
 from c7n_azure.query import QueryMeta, TypeInfo
+from c7n_azure.utils import ResourceIdParser
 
 
 @resources.register('subscription')
@@ -186,6 +191,99 @@ class SubscriptionDiagnosticSettingFilter(ValueFilter):
                 matched.append(resource)
 
         return matched
+
+
+@Subscription.filter_registry.register('diagnostic-settings-storage')
+class SubscriptionDiagnosticSettingsStorageFilter(SubscriptionDiagnosticSettingFilter):
+    """Filter by the storage accounts that subscription diagnostic settings export to
+
+    The storage account referenced by ``properties.storageAccountId`` of each
+    subscription diagnostic setting (i.e. the activity log export destination) is
+    fetched, and the value filter is applied to it. The data format matches the
+    ``azure.storage`` resource. A subscription matches if any of these storage
+    accounts match. Subscriptions without a diagnostic setting exporting to a
+    storage account never match.
+
+    Matched storage accounts are annotated on the subscription under
+    ``c7n:DiagnosticSettingsStorage``.
+
+    :example:
+
+    Find subscriptions whose activity logs are exported to a storage account that is
+    not encrypted with a customer managed key
+
+    .. code-block:: yaml
+
+        policies:
+          - name: activity-log-storage-not-cmk-encrypted
+            resource: azure.subscription
+            filters:
+              - type: diagnostic-settings-storage
+                key: properties.encryption.keySource
+                op: ne
+                value_type: normalize
+                value: microsoft.keyvault
+
+    """
+
+    schema = type_schema('diagnostic-settings-storage', rinherit=ValueFilter.schema)
+    schema_alias = False
+    annotation_key = 'c7n:DiagnosticSettingsStorage'
+    log = logging.getLogger('custodian.azure.subscription.diagnostic-settings-storage')
+
+    def process(self, resources, event=None):
+        session = local_session(self.manager.session_factory)
+        accounts = {}
+
+        matched = []
+        for resource in resources:
+            if self.cache_key in resource:
+                settings = resource[self.cache_key]
+            else:
+                settings = self._get_subscription_diagnostic_settings(
+                    session,
+                    resource['subscriptionId']
+                )
+                resource[self.cache_key] = settings
+
+            storage_ids = {
+                s['properties']['storageAccountId'].lower(): s['properties']['storageAccountId']
+                for s in settings
+                if s.get('properties', {}).get('storageAccountId')
+            }
+            for key, storage_id in storage_ids.items():
+                if key not in accounts:
+                    accounts[key] = self._get_storage_account(session, storage_id)
+
+            matched_accounts = [
+                accounts[key] for key in storage_ids
+                if accounts[key] is not None and self.match(accounts[key])
+            ]
+            if matched_accounts:
+                resource[self.annotation_key] = matched_accounts
+                matched.append(resource)
+
+        return matched
+
+    def _get_storage_account(self, session, storage_id):
+        # the storage account may live in a different subscription than the one
+        # being evaluated, so build a client scoped to the storage account's subscription
+        client = StorageManagementClient(
+            session.get_credentials(),
+            subscription_id=ResourceIdParser.get_subscription_id(storage_id)
+        )
+        try:
+            account = client.storage_accounts.get_properties(
+                ResourceIdParser.get_resource_group(storage_id),
+                ResourceIdParser.get_resource_name(storage_id)
+            )
+        except ResourceNotFoundError:
+            self.log.warning(
+                "Diagnostic settings storage account %s not found", storage_id)
+            return None
+        account = account.serialize(True)
+        account['resourceGroup'] = ResourceIdParser.get_resource_group(storage_id)
+        return account
 
 
 @Subscription.action_registry.register('add-policy')
