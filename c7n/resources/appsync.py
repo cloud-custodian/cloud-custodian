@@ -3,6 +3,7 @@
 import re
 
 from c7n.actions import BaseAction, Action
+from c7n.exceptions import PolicyExecutionError
 from c7n.filters import ValueFilter, WafV2FilterBase
 from c7n.manager import resources
 from c7n.query import (
@@ -275,13 +276,14 @@ class ChannelNamespaceDescribe(ChildDescribeSource):
         # list_channel_namespaces omits auth modes and handler config
         client = local_session(self.manager.session_factory).client('appsync')
         results = []
-        for r in super().augment(resources):
+        for r in resources:
             try:
                 results.append(self.manager.retry(
                     client.get_channel_namespace,
                     apiId=r['apiId'], name=r['name'])['channelNamespace'])
             except client.exceptions.NotFoundException:
-                continue
+                self.manager.log.warning(
+                    "channel namespace not found: %s/%s", r['apiId'], r['name'])
         return _normalize_tags(results)
 
 
@@ -352,16 +354,18 @@ class ChannelNamespaceAuthModes(ValueFilter):
 
     def process(self, resources, event=None):
         unresolved = [r for r in resources if self.annotation_key not in r]
-        if unresolved:
-            parent = self.manager.get_parent_manager()
-            apis = {
-                a['apiId']: a for a in parent.get_resources(
-                    list({r['apiId'] for r in unresolved}))}
+        api_ids = {r['apiId'] for r in unresolved}
+        apis = {
+            a['apiId']: a for a in
+            self.manager.get_parent_manager().get_resources(list(api_ids))}
+        if api_ids - set(apis):
+            raise PolicyExecutionError(
+                "unable to resolve event api(s): %s" % sorted(api_ids - set(apis)))
         for r in unresolved:
-            defaults = apis.get(r['apiId'], {}).get('eventConfig', {})
+            defaults = apis[r['apiId']]['eventConfig']
             r[self.annotation_key] = {
                 op: [m['authType'] for m in (
                     r.get('%sAuthModes' % op) or
-                    defaults.get('default%sAuthModes' % op.title(), []))]
+                    defaults['default%sAuthModes' % op.title()])]
                 for op in ('publish', 'subscribe')}
         return [r for r in resources if self.match(r[self.annotation_key])]
