@@ -1,0 +1,36 @@
+{
+  "headers": {
+    "content-type": "application/json; charset=UTF-8",
+    "vary": "Origin, X-Origin, Referer",
+    "date": "Wed, 23 Sep 2026 19:43:52 GMT",
+    "server": "ESF",
+    "x-xss-protection": "0",
+    "x-frame-options": "SAMEORIGIN",
+    "x-content-type-options": "nosniff",
+    "alt-svc": "h3=\":443\"; ma=2592000,h3-29=\":443\"; ma=2592000",
+    "transfer-encoding": "chunked",
+    "status": "200",
+    "content-length": "631",
+    "-content-encoding": "gzip",
+    "content-location": "https://us-central1-aiplatform.googleapis.com/v1/projects/cloud-custodian/locations/us-central1/metadataStores?alt=json"
+  },
+  "body": {
+    "metadataStores": [
+      {
+        "name": "projects/cloud-custodian/locations/us-central1/metadataStores/c7n-store-a",
+        "createTime": "2026-09-23T19:43:36.038232Z",
+        "updateTime": "2026-09-23T19:43:36.717721Z"
+      },
+      {
+        "name": "projects/cloud-custodian/locations/us-central1/metadataStores/c7n-store-b",
+        "createTime": "2026-09-23T19:43:36.016150Z",
+        "updateTime": "2026-09-23T19:43:36.774454Z"
+      },
+      {
+        "name": "projects/cloud-custodian/locations/us-central1/metadataStores/default",
+        "createTime": "2026-07-18T00:09:48.520332Z",
+        "updateTime": "2026-07-18T00:09:49.411914Z"
+      }
+    ]
+  }
+}

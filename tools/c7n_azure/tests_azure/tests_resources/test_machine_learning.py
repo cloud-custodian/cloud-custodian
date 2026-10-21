@@ -7,7 +7,15 @@ from azure.mgmt.machinelearningservices.models import (
     SystemData
 )
 
-from ..azure_common import BaseTest, arm_template, cassette_name
+from c7n.utils import local_session
+from c7n_azure.session import Session
+from c7n_azure.utils import ResourceIdParser
+from ..azure_common import (
+    BaseTest,
+    arm_template,
+    cassette_name,
+    strict_cassette,
+    )
 
 
 class MachineLearningWorkspaceTest(BaseTest):
@@ -74,6 +82,52 @@ class MachineLearningWorkspaceComputeInstancesFilterTest(BaseTest):
         self.assertEqual(resources[0]['c7n:ComputeInstances'][0]['name'], 'vvmlwrkspc11')
 
 
+class MachineLearningWorkspaceComputeIdleShutdownTest(BaseTest):
+
+    recording_resource_group = 'test_machine-learning-compute-instance'
+
+    @arm_template('machine-learning-compute-instance.json')
+    def test_idle_shutdown_duration(self):
+        p = self.load_policy({
+            'name': 'compute-instance-idle-shutdown-over-an-hour',
+            'resource': 'azure.machine-learning-workspace',
+            'filters': [
+                {
+                    'type': 'value',
+                    'key': 'resourceGroup',
+                    'value_type': 'normalize',
+                    'value': self.recording_resource_group
+                },
+                {
+                    'type': 'compute-instances',
+                    'attrs': [
+                        {
+                            'type': 'value',
+                            'key': 'properties.computeType',
+                            'value': 'ComputeInstance'
+                        },
+                        {
+                            'type': 'value',
+                            'key': 'properties.properties.idleTimeBeforeShutdown',
+                            'op': 'greater-than',
+                            'value_type': 'duration',
+                            'value': 'PT1H'
+                        },
+                    ]
+                },
+            ],
+        })
+        resources = p.run()
+
+        assert len(resources) == 1
+        # Azure stores the template's PT2H as PT120M. cctest-ci-idle-60m (PT60M)
+        # equals the threshold, so only the 2h instance matches.
+        assert [
+            (c['name'], c['properties']['properties']['idleTimeBeforeShutdown'])
+            for c in resources[0]['c7n:ComputeInstances']
+        ] == [('cctest-ci-idle-2h', 'PT120M')]
+
+
 class MachineLearningWorkspaceResourceLockFilterTest(BaseTest):
 
     def test_query(self):
@@ -106,6 +160,13 @@ class MachineLearningDataContainerTest(BaseTest):
             }, validate=True)
             assert p
 
+            p = self.load_policy({
+                'name': 'archive-machine-learning-data-containers',
+                'resource': 'azure.machine-learning-data-container',
+                'actions': [{'type': 'archive'}]
+            }, validate=True)
+            assert p
+
     @arm_template('machine-learning.json')
     @cassette_name('machine-learning-data-container')
     def test_machine_learning_data_container_policy_run(self):
@@ -130,6 +191,57 @@ class MachineLearningDataContainerTest(BaseTest):
         assert '/data/' in resources[0]['id'].lower()
         assert resources[0]['properties']['isArchived'] is False
         assert 'systemData' in resources[0]
+
+    @arm_template('machine-learning-data-container-archive.json')
+    @strict_cassette('machine-learning-data-container-archive')
+    def test_machine_learning_data_container_archive(self):
+        p = self.load_policy({
+            'name': 'archive-stale-ml-data-containers',
+            'resource': 'azure.machine-learning-data-container',
+            'filters': [{
+                'type': 'value',
+                'key': 'resourceGroup',
+                'value': 'test_machine-learning-data-container-archive'
+            }],
+            'actions': [{'type': 'archive'}]
+        }, validate=True, session_factory=Session)
+
+        resources = p.run()
+        assert sorted(r['name'] for r in resources) == [
+            'cctest-dc-active',
+            'cctest-dc-archived',
+            ]
+
+        active = next(r for r in resources if r['name'] == 'cctest-dc-active')
+        client = local_session(Session).client(
+            'azure.mgmt.machinelearningservices.MachineLearningServicesMgmtClient')
+        container = client.data_containers.get(
+            active['resourceGroup'],
+            ResourceIdParser.get_resource_name(active['c7n:parent-id']),
+            active['name'],
+            )
+        assert container.properties.is_archived
+
+    @arm_template('machine-learning-data-container-archive.json')
+    @cassette_name('machine-learning-data-container-archived-included')
+    def test_machine_learning_data_container_query_includes_archived(self):
+        p = self.load_policy({
+            'name': 'find-cctest-archive-fixture-data-containers',
+            'resource': 'azure.machine-learning-data-container',
+            'filters': [{
+                'type': 'value',
+                'key': 'resourceGroup',
+                'value': 'test_machine-learning-data-container-archive'
+            }]
+        })
+        resources = p.run()
+        assert {
+            r['name']: r['properties']['isArchived']
+            for r in resources
+            } == {
+                'cctest-dc-active': False,
+                'cctest-dc-archived': True,
+                }
 
     def test_machine_learning_data_container_child_query(self):
         parent_id = (
@@ -174,7 +286,8 @@ class MachineLearningDataContainerTest(BaseTest):
 
         client.data_containers.list.assert_called_once_with(
             resource_group_name='VV',
-            workspace_name='vvmlwrkspc'
+            workspace_name='vvmlwrkspc',
+            list_view_type='All',
         )
         assert len(resources) == 1
         assert resources[0]['id'] == data_container_id

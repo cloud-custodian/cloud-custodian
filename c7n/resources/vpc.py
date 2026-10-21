@@ -886,6 +886,19 @@ class ConfigSG(query.ConfigSource):
         return r
 
 
+class DescribeSecurityGroups(query.DescribeSource):
+
+    def resources(self, query):
+        # Without MaxResults, DescribeSecurityGroups returns every group in the
+        # region in one response, which does not scale to large accounts.
+        # Paging here rather than in the manager keeps the cache key unchanged
+        # and leaves by-id lookups alone since EC2 rejects MaxResults alongside
+        # GroupIds.
+        query = dict(query or {})
+        query.setdefault('MaxResults', 1000)
+        return super().resources(query)
+
+
 @resources.register('security-group')
 class SecurityGroup(query.QueryResourceManager):
 
@@ -902,7 +915,7 @@ class SecurityGroup(query.QueryResourceManager):
 
     source_mapping = {
         'config': ConfigSG,
-        'describe': query.DescribeSource
+        'describe': DescribeSecurityGroups
     }
 
 
@@ -2928,19 +2941,30 @@ class EndpointServiceDetailsFilter(ValueFilter):
         client = local_session(self.manager.session_factory).client("ec2")
         current_region = self.manager.config.region
 
+        # VPC Lattice Resource/ServiceNetwork endpoints have no ServiceName,
+        # so they can't be matched against endpoint service details; skip them.
+        named_resources = []
+        for r in resources:
+            if "ServiceName" not in r:
+                self.log.warning(
+                    "Skipping VPC endpoint %s (type=%s) with no ServiceName",
+                    r.get("VpcEndpointId"), r.get("VpcEndpointType"))
+                continue
+            named_resources.append(r)
+
         # Group unique service names by ServiceRegion, which is set directly on
         # each endpoint and correctly identifies cross-region endpoints without
         # any string parsing. Falls back to current region for older endpoints
         # that pre-date the ServiceRegion field.
         regional_groups = {}
-        for r in resources:
+        for r in named_resources:
             region = r.get("ServiceRegion", current_region)
             regional_groups.setdefault(region, set()).add(r["ServiceName"])
 
         service_map = self._describe_services(client, regional_groups, current_region)
 
         results = []
-        for resource in resources:
+        for resource in named_resources:
             service_detail = service_map.get(resource["ServiceName"], {})
             resource[self.annotation_key] = service_detail or {}
 

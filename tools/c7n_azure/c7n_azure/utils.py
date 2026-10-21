@@ -9,6 +9,7 @@ import logging
 import random
 import re
 import time
+import typing
 import uuid
 from concurrent.futures import as_completed
 from functools import lru_cache
@@ -22,6 +23,8 @@ from c7n.utils import chunks, local_session
 from msrestazure.azure_exceptions import CloudError
 from msrestazure.tools import parse_resource_id
 from netaddr import IPNetwork, IPRange, IPSet
+import requests
+import urllib3.util.retry
 
 from c7n_azure import constants
 
@@ -606,6 +609,42 @@ def resolve_service_tag_alias(rule):
 
 def get_keyvault_auth_endpoint(cloud_endpoints):
     return 'https://{0}'.format(cloud_endpoints.suffixes.keyvault_dns[1:])
+
+
+def requests_session(
+    azure_session: typing.Any,
+    token_scope: typing.Optional[str] = None,
+    max_retries: int = 0,
+    status_forcelist: tuple[int, ...] = (429, 503),
+    allowed_methods: tuple[str, ...] = ('GET',),
+    **retry_args: typing.Any,
+) -> requests.Session:
+    """Create an Azure-authenticated HTTP session with optional retries."""
+    azure_session._initialize_session()
+    token_scope = token_scope or (
+        f"{azure_session.resource_endpoint.rstrip('/')}/.default"
+    )
+    token = azure_session.credentials.get_token(token_scope)
+
+    session = requests.Session()
+    session.headers['Authorization'] = f'Bearer {token.token}'
+
+    if max_retries:
+        retry_options = {
+            'total': max_retries,
+            'status_forcelist': status_forcelist,
+            'allowed_methods': allowed_methods,
+            'respect_retry_after_header': True,
+            'raise_on_status': False,
+        }
+        retry_options.update(retry_args)
+        retry = urllib3.util.retry.Retry(**retry_options)
+        session.mount(
+            'https://',
+            requests.adapters.HTTPAdapter(max_retries=retry),
+        )
+
+    return session
 
 
 # This function is a workaround for Azure KeyVault objects that lack
