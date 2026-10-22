@@ -1,0 +1,17 @@
+{
+    "status_code": 200,
+    "data": {
+        "PaginationToken": "",
+        "ResourceTagMappingList": [
+            {
+                "ResourceARN": "arn:aws:connect-campaigns:us-east-1:644160558196:campaign/be86a7da-93d5-41f4-969e-cae6903faeaa",
+                "Tags": []
+            },
+            {
+                "ResourceARN": "arn:aws:connect-campaigns:us-east-1:644160558196:campaign/eb09f6bf-0c1b-416a-8c6f-3a4239491c10",
+                "Tags": []
+            }
+        ],
+        "ResponseMetadata": {}
+    }
+}

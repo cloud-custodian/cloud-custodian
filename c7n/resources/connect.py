@@ -1,8 +1,9 @@
 # Copyright The Cloud Custodian Authors.
 # SPDX-License-Identifier: Apache-2.0
 from c7n.manager import resources
-from c7n.query import QueryResourceManager, TypeInfo
+from c7n.query import DescribeWithResourceTags, QueryResourceManager, TypeInfo
 from c7n.filters import ValueFilter
+from c7n.tags import universal_augment
 from c7n.utils import local_session, type_schema
 from c7n.actions import Action
 from c7n.filters.kms import KmsRelatedFilter
@@ -17,6 +18,9 @@ class Connect(QueryResourceManager):
         arn_type = 'instance'
         name = "InstanceAlias"
         id = "Id"
+        universal_taggable = object()
+
+    augment = universal_augment
 
 
 @Connect.filter_registry.register('instance-attribute')
@@ -173,11 +177,13 @@ class ConnectCampaign(QueryResourceManager):
         name = "name"
         id = "id"
         permission_prefix = "connect-campaigns"
+        universal_taggable = object()
 
     permissions = (
         'connect-campaigns:ListCampaigns',
         'connect-campaigns:GetConnectInstanceConfig',
     )
+    source_mapping = {'describe': DescribeWithResourceTags}
 
 
 @ConnectCampaign.filter_registry.register('kms-key')
