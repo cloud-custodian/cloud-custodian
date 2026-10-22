@@ -1,0 +1,44 @@
+{
+  "$schema": "https://schema.management.azure.com/schemas/2019-04-01/deploymentTemplate.json#",
+  "contentVersion": "1.0.0.0",
+  "parameters": {
+    "uniqueId": {"type": "string"}
+  },
+  "variables": {
+    "suffix": "[uniqueString(resourceGroup().id, parameters('uniqueId'))]"
+  },
+  "resources": [
+    {
+      "type": "Microsoft.Storage/storageAccounts",
+      "apiVersion": "2024-01-01",
+      "name": "[concat('cctupd', variables('suffix'))]",
+      "location": "[resourceGroup().location]",
+      "kind": "StorageV2",
+      "sku": {"name": "Standard_LRS"},
+      "tags": {"c7n-test": "storage-update", "role": "scalar"},
+      "properties": {
+        "supportsHttpsTrafficOnly": true,
+        "minimumTlsVersion": "TLS1_2",
+        "allowBlobPublicAccess": false
+      }
+    },
+    {
+      "type": "Microsoft.Storage/storageAccounts",
+      "apiVersion": "2024-01-01",
+      "name": "[concat('ccthns', variables('suffix'))]",
+      "location": "[resourceGroup().location]",
+      "kind": "StorageV2",
+      "sku": {"name": "Standard_LRS"},
+      "tags": {"c7n-test": "storage-update", "role": "hns"},
+      "properties": {
+        "isHnsEnabled": true,
+        "isSftpEnabled": false,
+        "isLocalUserEnabled": true,
+        "supportsHttpsTrafficOnly": true,
+        "minimumTlsVersion": "TLS1_2",
+        "allowBlobPublicAccess": false,
+        "defaultToOAuthAuthentication": true
+      }
+    }
+  ]
+}
