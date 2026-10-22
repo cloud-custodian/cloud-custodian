@@ -1,0 +1,1872 @@
+{
+    "status_code": 200,
+    "data": {
+        "RequiredTags": [
+            {
+                "ResourceType": "access-analyzer:analyzer",
+                "CloudFormationResourceTypes": [
+                    "AWS::AccessAnalyzer::Analyzer"
+                ],
+                "ReportingTagKeys": [
+                    "Owner"
+                ]
+            },
+            {
+                "ResourceType": "acm:certificate",
+                "CloudFormationResourceTypes": [
+                    "AWS::CertificateManager::Certificate"
+                ],
+                "ReportingTagKeys": [
+                    "Owner"
+                ]
+            },
+            {
+                "ResourceType": "airflow:environment",
+                "CloudFormationResourceTypes": [
+                    "AWS::MWAA::Environment"
+                ],
+                "ReportingTagKeys": [
+                    "Owner"
+                ]
+            },
+            {
+                "ResourceType": "amplify:apps",
+                "CloudFormationResourceTypes": [
+                    "AWS::Amplify::App"
+                ],
+                "ReportingTagKeys": [
+                    "Owner"
+                ]
+            },
+            {
+                "ResourceType": "aoss:collection",
+                "CloudFormationResourceTypes": [
+                    "AWS::OpenSearchServerless::Collection"
+                ],
+                "ReportingTagKeys": [
+                    "Owner"
+                ]
+            },
+            {
+                "ResourceType": "app-integrations:application",
+                "CloudFormationResourceTypes": [
+                    "AWS::AppIntegrations::Application"
+                ],
+                "ReportingTagKeys": [
+                    "Owner"
+                ]
+            },
+            {
+                "ResourceType": "app-integrations:data-integration",
+                "CloudFormationResourceTypes": [
+                    "AWS::AppIntegrations::DataIntegration"
+                ],
+                "ReportingTagKeys": [
+                    "Owner"
+                ]
+            },
+            {
+                "ResourceType": "app-integrations:event-integration",
+                "CloudFormationResourceTypes": [
+                    "AWS::AppIntegrations::EventIntegration"
+                ],
+                "ReportingTagKeys": [
+                    "Owner"
+                ]
+            },
+            {
+                "ResourceType": "appconfig:application",
+                "CloudFormationResourceTypes": [
+                    "AWS::AppConfig::Application"
+                ],
+                "ReportingTagKeys": [
+                    "Owner"
+                ]
+            },
+            {
+                "ResourceType": "appconfig:application/configurationprofile",
+                "CloudFormationResourceTypes": [
+                    "AWS::AppConfig::ConfigurationProfile"
+                ],
+                "ReportingTagKeys": [
+                    "Owner"
+                ]
+            },
+            {
+                "ResourceType": "appconfig:application/environment",
+                "CloudFormationResourceTypes": [
+                    "AWS::AppConfig::Environment"
+                ],
+                "ReportingTagKeys": [
+                    "Owner"
+                ]
+            },
+            {
+                "ResourceType": "appconfig:deploymentstrategy",
+                "CloudFormationResourceTypes": [
+                    "AWS::AppConfig::DeploymentStrategy"
+                ],
+                "ReportingTagKeys": [
+                    "Owner"
+                ]
+            },
+            {
+                "ResourceType": "appconfig:extension",
+                "CloudFormationResourceTypes": [
+                    "AWS::AppConfig::Extension"
+                ],
+                "ReportingTagKeys": [
+                    "Owner"
+                ]
+            },
+            {
+                "ResourceType": "appconfig:extensionassociation",
+                "CloudFormationResourceTypes": [
+                    "AWS::AppConfig::ExtensionAssociation"
+                ],
+                "ReportingTagKeys": [
+                    "Owner"
+                ]
+            },
+            {
+                "ResourceType": "appflow:flow",
+                "CloudFormationResourceTypes": [
+                    "AWS::AppFlow::Flow"
+                ],
+                "ReportingTagKeys": [
+                    "Owner"
+                ]
+            },
+            {
+                "ResourceType": "application-signals:slo",
+                "CloudFormationResourceTypes": [
+                    "AWS::ApplicationSignals::ServiceLevelObjective"
+                ],
+                "ReportingTagKeys": [
+                    "Owner"
+                ]
+            },
+            {
+                "ResourceType": "applicationinsights:application",
+                "CloudFormationResourceTypes": [
+                    "AWS::ApplicationInsights::Application"
+                ],
+                "ReportingTagKeys": [
+                    "Owner"
+                ]
+            },
+            {
+                "ResourceType": "appmesh:mesh",
+                "CloudFormationResourceTypes": [
+                    "AWS::AppMesh::Mesh"
+                ],
+                "ReportingTagKeys": [
+                    "Owner"
+                ]
+            },
+            {
+                "ResourceType": "appmesh:mesh/virtualGateway",
+                "CloudFormationResourceTypes": [
+                    "AWS::AppMesh::VirtualGateway"
+                ],
+                "ReportingTagKeys": [
+                    "Owner"
+                ]
+            },
+            {
+                "ResourceType": "appmesh:mesh/virtualGateway/gatewayRoute",
+                "CloudFormationResourceTypes": [
+                    "AWS::AppMesh::GatewayRoute"
+                ],
+                "ReportingTagKeys": [
+                    "Owner"
+                ]
+            },
+            {
+                "ResourceType": "appmesh:mesh/virtualNode",
+                "CloudFormationResourceTypes": [
+                    "AWS::AppMesh::VirtualNode"
+                ],
+                "ReportingTagKeys": [
+                    "Owner"
+                ]
+            },
+            {
+                "ResourceType": "appmesh:mesh/virtualRouter",
+                "CloudFormationResourceTypes": [
+                    "AWS::AppMesh::VirtualRouter"
+                ],
+                "ReportingTagKeys": [
+                    "Owner"
+                ]
+            },
+            {
+                "ResourceType": "appmesh:mesh/virtualRouter/route",
+                "CloudFormationResourceTypes": [
+                    "AWS::AppMesh::Route"
+                ],
+                "ReportingTagKeys": [
+                    "Owner"
+                ]
+            },
+            {
+                "ResourceType": "appmesh:mesh/virtualService",
+                "CloudFormationResourceTypes": [
+                    "AWS::AppMesh::VirtualService"
+                ],
+                "ReportingTagKeys": [
+                    "Owner"
+                ]
+            },
+            {
+                "ResourceType": "apprunner:autoscalingconfiguration",
+                "CloudFormationResourceTypes": [
+                    "AWS::AppRunner::AutoScalingConfiguration"
+                ],
+                "ReportingTagKeys": [
+                    "Owner"
+                ]
+            },
+            {
+                "ResourceType": "apprunner:observabilityconfiguration",
+                "CloudFormationResourceTypes": [
+                    "AWS::AppRunner::ObservabilityConfiguration"
+                ],
+                "ReportingTagKeys": [
+                    "Owner"
+                ]
+            },
+            {
+                "ResourceType": "apprunner:service",
+                "CloudFormationResourceTypes": [
+                    "AWS::AppRunner::Service"
+                ],
+                "ReportingTagKeys": [
+                    "Owner"
+                ]
+            },
+            {
+                "ResourceType": "apprunner:vpcconnector",
+                "CloudFormationResourceTypes": [
+                    "AWS::AppRunner::VpcConnector"
+                ],
+                "ReportingTagKeys": [
+                    "Owner"
+                ]
+            },
+            {
+                "ResourceType": "apprunner:vpcingressconnection",
+                "CloudFormationResourceTypes": [
+                    "AWS::AppRunner::VpcIngressConnection"
+                ],
+                "ReportingTagKeys": [
+                    "Owner"
+                ]
+            },
+            {
+                "ResourceType": "athena:capacity-reservation",
+                "CloudFormationResourceTypes": [
+                    "AWS::Athena::CapacityReservation"
+                ],
+                "ReportingTagKeys": [
+                    "Owner"
+                ]
+            },
+            {
+                "ResourceType": "athena:datacatalog",
+                "CloudFormationResourceTypes": [
+                    "AWS::Athena::DataCatalog"
+                ],
+                "ReportingTagKeys": [
+                    "Owner"
+                ]
+            },
+            {
+                "ResourceType": "athena:workgroup",
+                "CloudFormationResourceTypes": [
+                    "AWS::Athena::WorkGroup"
+                ],
+                "ReportingTagKeys": [
+                    "Owner"
+                ]
+            },
+            {
+                "ResourceType": "batch:compute-environment",
+                "CloudFormationResourceTypes": [
+                    "AWS::Batch::ComputeEnvironment"
+                ],
+                "ReportingTagKeys": [
+                    "Owner"
+                ]
+            },
+            {
+                "ResourceType": "batch:consumable-resource",
+                "CloudFormationResourceTypes": [
+                    "AWS::Batch::ConsumableResource"
+                ],
+                "ReportingTagKeys": [
+                    "Owner"
+                ]
+            },
+            {
+                "ResourceType": "batch:job-definition",
+                "CloudFormationResourceTypes": [
+                    "AWS::Batch::JobDefinition"
+                ],
+                "ReportingTagKeys": [
+                    "Owner"
+                ]
+            },
+            {
+                "ResourceType": "batch:job-queue",
+                "CloudFormationResourceTypes": [
+                    "AWS::Batch::JobQueue"
+                ],
+                "ReportingTagKeys": [
+                    "Owner"
+                ]
+            },
+            {
+                "ResourceType": "batch:scheduling-policy",
+                "CloudFormationResourceTypes": [
+                    "AWS::Batch::SchedulingPolicy"
+                ],
+                "ReportingTagKeys": [
+                    "Owner"
+                ]
+            },
+            {
+                "ResourceType": "bedrock:agent",
+                "CloudFormationResourceTypes": [
+                    "AWS::Bedrock::Agent"
+                ],
+                "ReportingTagKeys": [
+                    "Owner"
+                ]
+            },
+            {
+                "ResourceType": "bedrock:agent-alias",
+                "CloudFormationResourceTypes": [
+                    "AWS::Bedrock::AgentAlias"
+                ],
+                "ReportingTagKeys": [
+                    "Owner"
+                ]
+            },
+            {
+                "ResourceType": "bedrock:application-inference-profile",
+                "CloudFormationResourceTypes": [
+                    "AWS::Bedrock::ApplicationInferenceProfile"
+                ],
+                "ReportingTagKeys": [
+                    "Owner"
+                ]
+            },
+            {
+                "ResourceType": "bedrock:blueprint",
+                "CloudFormationResourceTypes": [
+                    "AWS::Bedrock::Blueprint"
+                ],
+                "ReportingTagKeys": [
+                    "Owner"
+                ]
+            },
+            {
+                "ResourceType": "bedrock:data-automation-project",
+                "CloudFormationResourceTypes": [
+                    "AWS::Bedrock::DataAutomationProject"
+                ],
+                "ReportingTagKeys": [
+                    "Owner"
+                ]
+            },
+            {
+                "ResourceType": "bedrock:flow",
+                "CloudFormationResourceTypes": [
+                    "AWS::Bedrock::Flow"
+                ],
+                "ReportingTagKeys": [
+                    "Owner"
+                ]
+            },
+            {
+                "ResourceType": "bedrock:guardrail",
+                "CloudFormationResourceTypes": [
+                    "AWS::Bedrock::Guardrail"
+                ],
+                "ReportingTagKeys": [
+                    "Owner"
+                ]
+            },
+            {
+                "ResourceType": "bedrock:knowledge-base",
+                "CloudFormationResourceTypes": [
+                    "AWS::Bedrock::KnowledgeBase"
+                ],
+                "ReportingTagKeys": [
+                    "Owner"
+                ]
+            },
+            {
+                "ResourceType": "bedrock:prompt",
+                "CloudFormationResourceTypes": [
+                    "AWS::Bedrock::Prompt"
+                ],
+                "ReportingTagKeys": [
+                    "Owner"
+                ]
+            },
+            {
+                "ResourceType": "cassandra:keyspace",
+                "CloudFormationResourceTypes": [
+                    "AWS::Cassandra::Keyspace"
+                ],
+                "ReportingTagKeys": [
+                    "Owner"
+                ]
+            },
+            {
+                "ResourceType": "cloudformation:stack",
+                "CloudFormationResourceTypes": [
+                    "AWS::CloudFormation::Stack"
+                ],
+                "ReportingTagKeys": [
+                    "Owner"
+                ]
+            },
+            {
+                "ResourceType": "cloudformation:stackset",
+                "CloudFormationResourceTypes": [
+                    "AWS::CloudFormation::StackSet"
+                ],
+                "ReportingTagKeys": [
+                    "Owner"
+                ]
+            },
+            {
+                "ResourceType": "cloudfront:connection-group",
+                "CloudFormationResourceTypes": [
+                    "AWS::CloudFront::ConnectionGroup"
+                ],
+                "ReportingTagKeys": [
+                    "Owner"
+                ]
+            },
+            {
+                "ResourceType": "cloudfront:distribution",
+                "CloudFormationResourceTypes": [
+                    "AWS::CloudFront::Distribution"
+                ],
+                "ReportingTagKeys": [
+                    "Owner"
+                ]
+            },
+            {
+                "ResourceType": "cloudwatch:alarm",
+                "CloudFormationResourceTypes": [
+                    "AWS::CloudWatch::Alarm"
+                ],
+                "ReportingTagKeys": [
+                    "Owner"
+                ]
+            },
+            {
+                "ResourceType": "cloudwatch:insight-rule",
+                "CloudFormationResourceTypes": [
+                    "AWS::CloudWatch::InsightRule"
+                ],
+                "ReportingTagKeys": [
+                    "Owner"
+                ]
+            },
+            {
+                "ResourceType": "cloudwatch:metric-stream",
+                "CloudFormationResourceTypes": [
+                    "AWS::CloudWatch::MetricStream"
+                ],
+                "ReportingTagKeys": [
+                    "Owner"
+                ]
+            },
+            {
+                "ResourceType": "codeartifact:domain",
+                "CloudFormationResourceTypes": [
+                    "AWS::CodeArtifact::Domain"
+                ],
+                "ReportingTagKeys": [
+                    "Owner"
+                ]
+            },
+            {
+                "ResourceType": "codeartifact:repository",
+                "CloudFormationResourceTypes": [
+                    "AWS::CodeArtifact::Repository"
+                ],
+                "ReportingTagKeys": [
+                    "Owner"
+                ]
+            },
+            {
+                "ResourceType": "codebuild:project",
+                "CloudFormationResourceTypes": [
+                    "AWS::CodeBuild::Project"
+                ],
+                "ReportingTagKeys": [
+                    "Owner"
+                ]
+            },
+            {
+                "ResourceType": "codebuild:report-group",
+                "CloudFormationResourceTypes": [
+                    "AWS::CodeBuild::ReportGroup"
+                ],
+                "ReportingTagKeys": [
+                    "Owner"
+                ]
+            },
+            {
+                "ResourceType": "codecommit:repository",
+                "CloudFormationResourceTypes": [
+                    "AWS::CodeCommit::Repository"
+                ],
+                "ReportingTagKeys": [
+                    "Owner"
+                ]
+            },
+            {
+                "ResourceType": "codedeploy:application",
+                "CloudFormationResourceTypes": [
+                    "AWS::CodeDeploy::Application"
+                ],
+                "ReportingTagKeys": [
+                    "Owner"
+                ]
+            },
+            {
+                "ResourceType": "codedeploy:deploymentconfig",
+                "CloudFormationResourceTypes": [
+                    "AWS::CodeDeploy::DeploymentConfig"
+                ],
+                "ReportingTagKeys": [
+                    "Owner"
+                ]
+            },
+            {
+                "ResourceType": "codepipeline:actiontype",
+                "CloudFormationResourceTypes": [
+                    "AWS::CodePipeline::CustomActionType"
+                ],
+                "ReportingTagKeys": [
+                    "Owner"
+                ]
+            },
+            {
+                "ResourceType": "codepipeline:pipeline",
+                "CloudFormationResourceTypes": [
+                    "AWS::CodePipeline::Pipeline"
+                ],
+                "ReportingTagKeys": [
+                    "Owner"
+                ]
+            },
+            {
+                "ResourceType": "codepipeline:webhook",
+                "CloudFormationResourceTypes": [
+                    "AWS::CodePipeline::Webhook"
+                ],
+                "ReportingTagKeys": [
+                    "Owner"
+                ]
+            },
+            {
+                "ResourceType": "config:aggregation-authorization",
+                "CloudFormationResourceTypes": [
+                    "AWS::Config::AggregationAuthorization"
+                ],
+                "ReportingTagKeys": [
+                    "Owner"
+                ]
+            },
+            {
+                "ResourceType": "config:config-aggregator",
+                "CloudFormationResourceTypes": [
+                    "AWS::Config::ConfigurationAggregator"
+                ],
+                "ReportingTagKeys": [
+                    "Owner"
+                ]
+            },
+            {
+                "ResourceType": "config:config-rule",
+                "CloudFormationResourceTypes": [
+                    "AWS::Config::ConfigRule"
+                ],
+                "ReportingTagKeys": [
+                    "Owner"
+                ]
+            },
+            {
+                "ResourceType": "config:conformance-pack",
+                "CloudFormationResourceTypes": [
+                    "AWS::Config::ConformancePack"
+                ],
+                "ReportingTagKeys": [
+                    "Owner"
+                ]
+            },
+            {
+                "ResourceType": "config:stored-query",
+                "CloudFormationResourceTypes": [
+                    "AWS::Config::StoredQuery"
+                ],
+                "ReportingTagKeys": [
+                    "Owner"
+                ]
+            },
+            {
+                "ResourceType": "ec2:capacity-reservation",
+                "CloudFormationResourceTypes": [
+                    "AWS::EC2::CapacityReservation"
+                ],
+                "ReportingTagKeys": [
+                    "Env",
+                    "Owner"
+                ]
+            },
+            {
+                "ResourceType": "ec2:capacity-reservation-fleet",
+                "CloudFormationResourceTypes": [
+                    "AWS::EC2::CapacityReservationFleet"
+                ],
+                "ReportingTagKeys": [
+                    "Env",
+                    "Owner"
+                ]
+            },
+            {
+                "ResourceType": "ec2:carrier-gateway",
+                "CloudFormationResourceTypes": [
+                    "AWS::EC2::CarrierGateway"
+                ],
+                "ReportingTagKeys": [
+                    "Env",
+                    "Owner"
+                ]
+            },
+            {
+                "ResourceType": "ec2:client-vpn-endpoint",
+                "CloudFormationResourceTypes": [
+                    "AWS::EC2::ClientVpnEndpoint"
+                ],
+                "ReportingTagKeys": [
+                    "Env",
+                    "Owner"
+                ]
+            },
+            {
+                "ResourceType": "ec2:customer-gateway",
+                "CloudFormationResourceTypes": [
+                    "AWS::EC2::CustomerGateway"
+                ],
+                "ReportingTagKeys": [
+                    "Env",
+                    "Owner"
+                ]
+            },
+            {
+                "ResourceType": "ec2:dedicated-host",
+                "CloudFormationResourceTypes": [
+                    "AWS::EC2::Host"
+                ],
+                "ReportingTagKeys": [
+                    "Env",
+                    "Owner"
+                ]
+            },
+            {
+                "ResourceType": "ec2:dhcp-options",
+                "CloudFormationResourceTypes": [
+                    "AWS::EC2::DHCPOptions"
+                ],
+                "ReportingTagKeys": [
+                    "Env",
+                    "Owner"
+                ]
+            },
+            {
+                "ResourceType": "ec2:egress-only-internet-gateway",
+                "CloudFormationResourceTypes": [
+                    "AWS::EC2::EgressOnlyInternetGateway"
+                ],
+                "ReportingTagKeys": [
+                    "Env",
+                    "Owner"
+                ]
+            },
+            {
+                "ResourceType": "ec2:elastic-ip",
+                "CloudFormationResourceTypes": [
+                    "AWS::EC2::EIP"
+                ],
+                "ReportingTagKeys": [
+                    "Env",
+                    "Owner"
+                ]
+            },
+            {
+                "ResourceType": "ec2:fleet",
+                "CloudFormationResourceTypes": [
+                    "AWS::EC2::EC2Fleet"
+                ],
+                "ReportingTagKeys": [
+                    "Env",
+                    "Owner"
+                ]
+            },
+            {
+                "ResourceType": "ec2:instance",
+                "CloudFormationResourceTypes": [
+                    "AWS::EC2::Instance"
+                ],
+                "ReportingTagKeys": [
+                    "Env",
+                    "Owner"
+                ]
+            },
+            {
+                "ResourceType": "ec2:instance-connect-endpoint",
+                "CloudFormationResourceTypes": [
+                    "AWS::EC2::InstanceConnectEndpoint"
+                ],
+                "ReportingTagKeys": [
+                    "Env",
+                    "Owner"
+                ]
+            },
+            {
+                "ResourceType": "ec2:internet-gateway",
+                "CloudFormationResourceTypes": [
+                    "AWS::EC2::InternetGateway"
+                ],
+                "ReportingTagKeys": [
+                    "Env",
+                    "Owner"
+                ]
+            },
+            {
+                "ResourceType": "ec2:ipam",
+                "CloudFormationResourceTypes": [
+                    "AWS::EC2::IPAM"
+                ],
+                "ReportingTagKeys": [
+                    "Env",
+                    "Owner"
+                ]
+            },
+            {
+                "ResourceType": "ec2:ipam-pool",
+                "CloudFormationResourceTypes": [
+                    "AWS::EC2::IPAMPool"
+                ],
+                "ReportingTagKeys": [
+                    "Env",
+                    "Owner"
+                ]
+            },
+            {
+                "ResourceType": "ec2:ipam-resource-discovery",
+                "CloudFormationResourceTypes": [
+                    "AWS::EC2::IPAMResourceDiscovery"
+                ],
+                "ReportingTagKeys": [
+                    "Env",
+                    "Owner"
+                ]
+            },
+            {
+                "ResourceType": "ec2:ipam-resource-discovery-association",
+                "CloudFormationResourceTypes": [
+                    "AWS::EC2::IPAMResourceDiscoveryAssociation"
+                ],
+                "ReportingTagKeys": [
+                    "Env",
+                    "Owner"
+                ]
+            },
+            {
+                "ResourceType": "ec2:ipam-scope",
+                "CloudFormationResourceTypes": [
+                    "AWS::EC2::IPAMScope"
+                ],
+                "ReportingTagKeys": [
+                    "Env",
+                    "Owner"
+                ]
+            },
+            {
+                "ResourceType": "ec2:key-pair",
+                "CloudFormationResourceTypes": [
+                    "AWS::EC2::KeyPair"
+                ],
+                "ReportingTagKeys": [
+                    "Env",
+                    "Owner"
+                ]
+            },
+            {
+                "ResourceType": "ec2:launch-template",
+                "CloudFormationResourceTypes": [
+                    "AWS::EC2::LaunchTemplate"
+                ],
+                "ReportingTagKeys": [
+                    "Env",
+                    "Owner"
+                ]
+            },
+            {
+                "ResourceType": "ec2:local-gateway-route-table",
+                "CloudFormationResourceTypes": [
+                    "AWS::EC2::LocalGatewayRouteTable"
+                ],
+                "ReportingTagKeys": [
+                    "Env",
+                    "Owner"
+                ]
+            },
+            {
+                "ResourceType": "ec2:local-gateway-route-table-virtual-interface-group-association",
+                "CloudFormationResourceTypes": [
+                    "AWS::EC2::LocalGatewayRouteTableVirtualInterfaceGroupAssociation"
+                ],
+                "ReportingTagKeys": [
+                    "Env",
+                    "Owner"
+                ]
+            },
+            {
+                "ResourceType": "ec2:local-gateway-route-table-vpc-association",
+                "CloudFormationResourceTypes": [
+                    "AWS::EC2::LocalGatewayRouteTableVPCAssociation"
+                ],
+                "ReportingTagKeys": [
+                    "Env",
+                    "Owner"
+                ]
+            },
+            {
+                "ResourceType": "ec2:natgateway",
+                "CloudFormationResourceTypes": [
+                    "AWS::EC2::NatGateway"
+                ],
+                "ReportingTagKeys": [
+                    "Env",
+                    "Owner"
+                ]
+            },
+            {
+                "ResourceType": "ec2:network-acl",
+                "CloudFormationResourceTypes": [
+                    "AWS::EC2::NetworkAcl"
+                ],
+                "ReportingTagKeys": [
+                    "Env",
+                    "Owner"
+                ]
+            },
+            {
+                "ResourceType": "ec2:network-insights-access-scope",
+                "CloudFormationResourceTypes": [
+                    "AWS::EC2::NetworkInsightsAccessScope"
+                ],
+                "ReportingTagKeys": [
+                    "Env",
+                    "Owner"
+                ]
+            },
+            {
+                "ResourceType": "ec2:network-insights-access-scope-analysis",
+                "CloudFormationResourceTypes": [
+                    "AWS::EC2::NetworkInsightsAccessScopeAnalysis"
+                ],
+                "ReportingTagKeys": [
+                    "Env",
+                    "Owner"
+                ]
+            },
+            {
+                "ResourceType": "ec2:network-insights-analysis",
+                "CloudFormationResourceTypes": [
+                    "AWS::EC2::NetworkInsightsAnalysis"
+                ],
+                "ReportingTagKeys": [
+                    "Env",
+                    "Owner"
+                ]
+            },
+            {
+                "ResourceType": "ec2:network-insights-path",
+                "CloudFormationResourceTypes": [
+                    "AWS::EC2::NetworkInsightsPath"
+                ],
+                "ReportingTagKeys": [
+                    "Env",
+                    "Owner"
+                ]
+            },
+            {
+                "ResourceType": "ec2:network-interface",
+                "CloudFormationResourceTypes": [
+                    "AWS::EC2::NetworkInterface"
+                ],
+                "ReportingTagKeys": [
+                    "Env",
+                    "Owner"
+                ]
+            },
+            {
+                "ResourceType": "ec2:placement-group",
+                "CloudFormationResourceTypes": [
+                    "AWS::EC2::PlacementGroup"
+                ],
+                "ReportingTagKeys": [
+                    "Env",
+                    "Owner"
+                ]
+            },
+            {
+                "ResourceType": "ec2:prefix-list",
+                "CloudFormationResourceTypes": [
+                    "AWS::EC2::PrefixList"
+                ],
+                "ReportingTagKeys": [
+                    "Env",
+                    "Owner"
+                ]
+            },
+            {
+                "ResourceType": "ec2:route-table",
+                "CloudFormationResourceTypes": [
+                    "AWS::EC2::RouteTable"
+                ],
+                "ReportingTagKeys": [
+                    "Env",
+                    "Owner"
+                ]
+            },
+            {
+                "ResourceType": "ec2:security-group",
+                "CloudFormationResourceTypes": [
+                    "AWS::EC2::SecurityGroup"
+                ],
+                "ReportingTagKeys": [
+                    "Env",
+                    "Owner"
+                ]
+            },
+            {
+                "ResourceType": "ec2:spot-fleet-request",
+                "CloudFormationResourceTypes": [
+                    "AWS::EC2::SpotFleet"
+                ],
+                "ReportingTagKeys": [
+                    "Env",
+                    "Owner"
+                ]
+            },
+            {
+                "ResourceType": "ec2:subnet",
+                "CloudFormationResourceTypes": [
+                    "AWS::EC2::Subnet"
+                ],
+                "ReportingTagKeys": [
+                    "Env",
+                    "Owner"
+                ]
+            },
+            {
+                "ResourceType": "ec2:traffic-mirror-filter",
+                "CloudFormationResourceTypes": [
+                    "AWS::EC2::TrafficMirrorFilter"
+                ],
+                "ReportingTagKeys": [
+                    "Env",
+                    "Owner"
+                ]
+            },
+            {
+                "ResourceType": "ec2:traffic-mirror-filter-rule",
+                "CloudFormationResourceTypes": [
+                    "AWS::EC2::TrafficMirrorFilterRule"
+                ],
+                "ReportingTagKeys": [
+                    "Env",
+                    "Owner"
+                ]
+            },
+            {
+                "ResourceType": "ec2:traffic-mirror-session",
+                "CloudFormationResourceTypes": [
+                    "AWS::EC2::TrafficMirrorSession"
+                ],
+                "ReportingTagKeys": [
+                    "Env",
+                    "Owner"
+                ]
+            },
+            {
+                "ResourceType": "ec2:traffic-mirror-target",
+                "CloudFormationResourceTypes": [
+                    "AWS::EC2::TrafficMirrorTarget"
+                ],
+                "ReportingTagKeys": [
+                    "Env",
+                    "Owner"
+                ]
+            },
+            {
+                "ResourceType": "ec2:transit-gateway",
+                "CloudFormationResourceTypes": [
+                    "AWS::EC2::TransitGateway"
+                ],
+                "ReportingTagKeys": [
+                    "Env",
+                    "Owner"
+                ]
+            },
+            {
+                "ResourceType": "ec2:transit-gateway-attachment",
+                "CloudFormationResourceTypes": [
+                    "AWS::EC2::TransitGatewayAttachment"
+                ],
+                "ReportingTagKeys": [
+                    "Env",
+                    "Owner"
+                ]
+            },
+            {
+                "ResourceType": "ec2:transit-gateway-connect-peer",
+                "CloudFormationResourceTypes": [
+                    "AWS::EC2::TransitGatewayConnectPeer"
+                ],
+                "ReportingTagKeys": [
+                    "Env",
+                    "Owner"
+                ]
+            },
+            {
+                "ResourceType": "ec2:transit-gateway-multicast-domain",
+                "CloudFormationResourceTypes": [
+                    "AWS::EC2::TransitGatewayMulticastDomain"
+                ],
+                "ReportingTagKeys": [
+                    "Env",
+                    "Owner"
+                ]
+            },
+            {
+                "ResourceType": "ec2:transit-gateway-route-table",
+                "CloudFormationResourceTypes": [
+                    "AWS::EC2::TransitGatewayRouteTable"
+                ],
+                "ReportingTagKeys": [
+                    "Env",
+                    "Owner"
+                ]
+            },
+            {
+                "ResourceType": "ec2:verified-access-endpoint",
+                "CloudFormationResourceTypes": [
+                    "AWS::EC2::VerifiedAccessEndpoint"
+                ],
+                "ReportingTagKeys": [
+                    "Env",
+                    "Owner"
+                ]
+            },
+            {
+                "ResourceType": "ec2:verified-access-group",
+                "CloudFormationResourceTypes": [
+                    "AWS::EC2::VerifiedAccessGroup"
+                ],
+                "ReportingTagKeys": [
+                    "Env",
+                    "Owner"
+                ]
+            },
+            {
+                "ResourceType": "ec2:verified-access-instance",
+                "CloudFormationResourceTypes": [
+                    "AWS::EC2::VerifiedAccessInstance"
+                ],
+                "ReportingTagKeys": [
+                    "Env",
+                    "Owner"
+                ]
+            },
+            {
+                "ResourceType": "ec2:verified-access-trust-provider",
+                "CloudFormationResourceTypes": [
+                    "AWS::EC2::VerifiedAccessTrustProvider"
+                ],
+                "ReportingTagKeys": [
+                    "Env",
+                    "Owner"
+                ]
+            },
+            {
+                "ResourceType": "ec2:volume",
+                "CloudFormationResourceTypes": [
+                    "AWS::EC2::Volume"
+                ],
+                "ReportingTagKeys": [
+                    "Env",
+                    "Owner"
+                ]
+            },
+            {
+                "ResourceType": "ec2:vpc",
+                "CloudFormationResourceTypes": [
+                    "AWS::EC2::VPC"
+                ],
+                "ReportingTagKeys": [
+                    "Env",
+                    "Owner"
+                ]
+            },
+            {
+                "ResourceType": "ec2:vpc-block-public-access-exclusion",
+                "CloudFormationResourceTypes": [
+                    "AWS::EC2::VPCBlockPublicAccessExclusion"
+                ],
+                "ReportingTagKeys": [
+                    "Env",
+                    "Owner"
+                ]
+            },
+            {
+                "ResourceType": "ec2:vpc-endpoint",
+                "CloudFormationResourceTypes": [
+                    "AWS::EC2::VPCEndpoint"
+                ],
+                "ReportingTagKeys": [
+                    "Env",
+                    "Owner"
+                ]
+            },
+            {
+                "ResourceType": "ec2:vpc-endpoint-service",
+                "CloudFormationResourceTypes": [
+                    "AWS::EC2::VPCEndpointService"
+                ],
+                "ReportingTagKeys": [
+                    "Env",
+                    "Owner"
+                ]
+            },
+            {
+                "ResourceType": "ec2:vpc-endpoint-service-permission",
+                "CloudFormationResourceTypes": [
+                    "AWS::EC2::VPCEndpointServicePermissions"
+                ],
+                "ReportingTagKeys": [
+                    "Env",
+                    "Owner"
+                ]
+            },
+            {
+                "ResourceType": "ec2:vpc-flow-log",
+                "CloudFormationResourceTypes": [
+                    "AWS::EC2::FlowLog"
+                ],
+                "ReportingTagKeys": [
+                    "Env",
+                    "Owner"
+                ]
+            },
+            {
+                "ResourceType": "ec2:vpc-peering-connection",
+                "CloudFormationResourceTypes": [
+                    "AWS::EC2::VPCPeeringConnection"
+                ],
+                "ReportingTagKeys": [
+                    "Env",
+                    "Owner"
+                ]
+            },
+            {
+                "ResourceType": "ec2:vpn-connection",
+                "CloudFormationResourceTypes": [
+                    "AWS::EC2::VPNConnection"
+                ],
+                "ReportingTagKeys": [
+                    "Env",
+                    "Owner"
+                ]
+            },
+            {
+                "ResourceType": "ec2:vpn-gateway",
+                "CloudFormationResourceTypes": [
+                    "AWS::EC2::VPNGateway"
+                ],
+                "ReportingTagKeys": [
+                    "Env",
+                    "Owner"
+                ]
+            },
+            {
+                "ResourceType": "ecr:repository",
+                "CloudFormationResourceTypes": [
+                    "AWS::ECR::Repository"
+                ],
+                "ReportingTagKeys": [
+                    "Owner"
+                ]
+            },
+            {
+                "ResourceType": "ecs:capacity-provider",
+                "CloudFormationResourceTypes": [
+                    "AWS::ECS::CapacityProvider"
+                ],
+                "ReportingTagKeys": [
+                    "Owner"
+                ]
+            },
+            {
+                "ResourceType": "ecs:cluster",
+                "CloudFormationResourceTypes": [
+                    "AWS::ECS::Cluster"
+                ],
+                "ReportingTagKeys": [
+                    "Owner"
+                ]
+            },
+            {
+                "ResourceType": "ecs:service",
+                "CloudFormationResourceTypes": [
+                    "AWS::ECS::Service"
+                ],
+                "ReportingTagKeys": [
+                    "Owner"
+                ]
+            },
+            {
+                "ResourceType": "ecs:task-definition",
+                "CloudFormationResourceTypes": [
+                    "AWS::ECS::TaskDefinition"
+                ],
+                "ReportingTagKeys": [
+                    "Owner"
+                ]
+            },
+            {
+                "ResourceType": "ecs:task-set",
+                "CloudFormationResourceTypes": [
+                    "AWS::ECS::TaskSet"
+                ],
+                "ReportingTagKeys": [
+                    "Owner"
+                ]
+            },
+            {
+                "ResourceType": "elasticache:cluster",
+                "CloudFormationResourceTypes": [
+                    "AWS::ElastiCache::CacheCluster"
+                ],
+                "ReportingTagKeys": [
+                    "Owner"
+                ]
+            },
+            {
+                "ResourceType": "elasticache:parametergroup",
+                "CloudFormationResourceTypes": [
+                    "AWS::ElastiCache::ParameterGroup"
+                ],
+                "ReportingTagKeys": [
+                    "Owner"
+                ]
+            },
+            {
+                "ResourceType": "elasticache:replicationgroup",
+                "CloudFormationResourceTypes": [
+                    "AWS::ElastiCache::ReplicationGroup"
+                ],
+                "ReportingTagKeys": [
+                    "Owner"
+                ]
+            },
+            {
+                "ResourceType": "elasticache:securitygroup",
+                "CloudFormationResourceTypes": [
+                    "AWS::ElastiCache::SecurityGroup"
+                ],
+                "ReportingTagKeys": [
+                    "Owner"
+                ]
+            },
+            {
+                "ResourceType": "elasticache:subnetgroup",
+                "CloudFormationResourceTypes": [
+                    "AWS::ElastiCache::SubnetGroup"
+                ],
+                "ReportingTagKeys": [
+                    "Owner"
+                ]
+            },
+            {
+                "ResourceType": "elasticache:user",
+                "CloudFormationResourceTypes": [
+                    "AWS::ElastiCache::User"
+                ],
+                "ReportingTagKeys": [
+                    "Owner"
+                ]
+            },
+            {
+                "ResourceType": "elasticache:usergroup",
+                "CloudFormationResourceTypes": [
+                    "AWS::ElastiCache::UserGroup"
+                ],
+                "ReportingTagKeys": [
+                    "Owner"
+                ]
+            },
+            {
+                "ResourceType": "elasticloadbalancing:listener",
+                "CloudFormationResourceTypes": [
+                    "AWS::ElasticLoadBalancingV2::Listener"
+                ],
+                "ReportingTagKeys": [
+                    "Owner"
+                ]
+            },
+            {
+                "ResourceType": "elasticloadbalancing:listener-rule",
+                "CloudFormationResourceTypes": [
+                    "AWS::ElasticLoadBalancingV2::ListenerRule"
+                ],
+                "ReportingTagKeys": [
+                    "Owner"
+                ]
+            },
+            {
+                "ResourceType": "elasticloadbalancing:loadbalancer",
+                "CloudFormationResourceTypes": [
+                    "AWS::ElasticLoadBalancingV2::LoadBalancer"
+                ],
+                "ReportingTagKeys": [
+                    "Owner"
+                ]
+            },
+            {
+                "ResourceType": "elasticloadbalancing:targetgroup",
+                "CloudFormationResourceTypes": [
+                    "AWS::ElasticLoadBalancingV2::TargetGroup"
+                ],
+                "ReportingTagKeys": [
+                    "Owner"
+                ]
+            },
+            {
+                "ResourceType": "elasticloadbalancing:truststore",
+                "CloudFormationResourceTypes": [
+                    "AWS::ElasticLoadBalancingV2::TrustStore"
+                ],
+                "ReportingTagKeys": [
+                    "Owner"
+                ]
+            },
+            {
+                "ResourceType": "events:event-bus",
+                "CloudFormationResourceTypes": [
+                    "AWS::Events::EventBus"
+                ],
+                "ReportingTagKeys": [
+                    "Owner"
+                ]
+            },
+            {
+                "ResourceType": "events:rule",
+                "CloudFormationResourceTypes": [
+                    "AWS::Events::Rule"
+                ],
+                "ReportingTagKeys": [
+                    "Owner"
+                ]
+            },
+            {
+                "ResourceType": "firehose:deliverystream",
+                "CloudFormationResourceTypes": [
+                    "AWS::KinesisFirehose::DeliveryStream"
+                ],
+                "ReportingTagKeys": [
+                    "Owner"
+                ]
+            },
+            {
+                "ResourceType": "grafana:workspaces",
+                "CloudFormationResourceTypes": [
+                    "AWS::Grafana::Workspace"
+                ],
+                "ReportingTagKeys": [
+                    "Owner"
+                ]
+            },
+            {
+                "ResourceType": "guardduty:detector",
+                "CloudFormationResourceTypes": [
+                    "AWS::GuardDuty::Detector"
+                ],
+                "ReportingTagKeys": [
+                    "Owner"
+                ]
+            },
+            {
+                "ResourceType": "guardduty:detector/filter",
+                "CloudFormationResourceTypes": [
+                    "AWS::GuardDuty::Filter"
+                ],
+                "ReportingTagKeys": [
+                    "Owner"
+                ]
+            },
+            {
+                "ResourceType": "guardduty:detector/ipset",
+                "CloudFormationResourceTypes": [
+                    "AWS::GuardDuty::IPSet"
+                ],
+                "ReportingTagKeys": [
+                    "Owner"
+                ]
+            },
+            {
+                "ResourceType": "guardduty:detector/threatintelset",
+                "CloudFormationResourceTypes": [
+                    "AWS::GuardDuty::ThreatIntelSet"
+                ],
+                "ReportingTagKeys": [
+                    "Owner"
+                ]
+            },
+            {
+                "ResourceType": "guardduty:malware-protection-plan",
+                "CloudFormationResourceTypes": [
+                    "AWS::GuardDuty::MalwareProtectionPlan"
+                ],
+                "ReportingTagKeys": [
+                    "Owner"
+                ]
+            },
+            {
+                "ResourceType": "iam:instance-profile",
+                "CloudFormationResourceTypes": [
+                    "AWS::IAM::InstanceProfile"
+                ],
+                "ReportingTagKeys": [
+                    "Owner"
+                ]
+            },
+            {
+                "ResourceType": "iam:mfa",
+                "CloudFormationResourceTypes": [
+                    "AWS::IAM::VirtualMFADevice"
+                ],
+                "ReportingTagKeys": [
+                    "Owner"
+                ]
+            },
+            {
+                "ResourceType": "iam:oidc-provider",
+                "CloudFormationResourceTypes": [
+                    "AWS::IAM::OIDCProvider"
+                ],
+                "ReportingTagKeys": [
+                    "Owner"
+                ]
+            },
+            {
+                "ResourceType": "iam:role",
+                "CloudFormationResourceTypes": [
+                    "AWS::IAM::Role"
+                ],
+                "ReportingTagKeys": [
+                    "Owner"
+                ]
+            },
+            {
+                "ResourceType": "iam:saml-provider",
+                "CloudFormationResourceTypes": [
+                    "AWS::IAM::SAMLProvider"
+                ],
+                "ReportingTagKeys": [
+                    "Owner"
+                ]
+            },
+            {
+                "ResourceType": "iam:server-certificate",
+                "CloudFormationResourceTypes": [
+                    "AWS::IAM::ServerCertificate"
+                ],
+                "ReportingTagKeys": [
+                    "Owner"
+                ]
+            },
+            {
+                "ResourceType": "iam:user",
+                "CloudFormationResourceTypes": [
+                    "AWS::IAM::User"
+                ],
+                "ReportingTagKeys": [
+                    "Owner"
+                ]
+            },
+            {
+                "ResourceType": "kinesis:stream",
+                "CloudFormationResourceTypes": [
+                    "AWS::Kinesis::Stream"
+                ],
+                "ReportingTagKeys": [
+                    "Owner"
+                ]
+            },
+            {
+                "ResourceType": "kinesis:stream/consumer",
+                "CloudFormationResourceTypes": [
+                    "AWS::Kinesis::StreamConsumer"
+                ],
+                "ReportingTagKeys": [
+                    "Owner"
+                ]
+            },
+            {
+                "ResourceType": "kinesisanalytics:application",
+                "CloudFormationResourceTypes": [
+                    "AWS::KinesisAnalytics::Application"
+                ],
+                "ReportingTagKeys": [
+                    "Owner"
+                ]
+            },
+            {
+                "ResourceType": "lambda:code-signing-config",
+                "CloudFormationResourceTypes": [
+                    "AWS::Lambda::CodeSigningConfig"
+                ],
+                "ReportingTagKeys": [
+                    "Owner"
+                ]
+            },
+            {
+                "ResourceType": "lambda:event-source-mapping",
+                "CloudFormationResourceTypes": [
+                    "AWS::Lambda::EventSourceMapping"
+                ],
+                "ReportingTagKeys": [
+                    "Owner"
+                ]
+            },
+            {
+                "ResourceType": "lambda:function",
+                "CloudFormationResourceTypes": [
+                    "AWS::Lambda::Function"
+                ],
+                "ReportingTagKeys": [
+                    "Owner"
+                ]
+            },
+            {
+                "ResourceType": "logs:anomaly-detector",
+                "CloudFormationResourceTypes": [
+                    "AWS::Logs::LogAnomalyDetector"
+                ],
+                "ReportingTagKeys": [
+                    "Owner"
+                ]
+            },
+            {
+                "ResourceType": "logs:delivery",
+                "CloudFormationResourceTypes": [
+                    "AWS::Logs::Delivery"
+                ],
+                "ReportingTagKeys": [
+                    "Owner"
+                ]
+            },
+            {
+                "ResourceType": "logs:delivery-destination",
+                "CloudFormationResourceTypes": [
+                    "AWS::Logs::DeliveryDestination"
+                ],
+                "ReportingTagKeys": [
+                    "Owner"
+                ]
+            },
+            {
+                "ResourceType": "logs:delivery-source",
+                "CloudFormationResourceTypes": [
+                    "AWS::Logs::DeliverySource"
+                ],
+                "ReportingTagKeys": [
+                    "Owner"
+                ]
+            },
+            {
+                "ResourceType": "logs:destination",
+                "CloudFormationResourceTypes": [
+                    "AWS::Logs::Destination"
+                ],
+                "ReportingTagKeys": [
+                    "Owner"
+                ]
+            },
+            {
+                "ResourceType": "logs:log-group",
+                "CloudFormationResourceTypes": [
+                    "AWS::Logs::LogGroup"
+                ],
+                "ReportingTagKeys": [
+                    "Owner"
+                ]
+            },
+            {
+                "ResourceType": "memorydb:acl",
+                "CloudFormationResourceTypes": [
+                    "AWS::MemoryDB::ACL"
+                ],
+                "ReportingTagKeys": [
+                    "Owner"
+                ]
+            },
+            {
+                "ResourceType": "memorydb:cluster",
+                "CloudFormationResourceTypes": [
+                    "AWS::MemoryDB::Cluster"
+                ],
+                "ReportingTagKeys": [
+                    "Owner"
+                ]
+            },
+            {
+                "ResourceType": "memorydb:parametergroup",
+                "CloudFormationResourceTypes": [
+                    "AWS::MemoryDB::ParameterGroup"
+                ],
+                "ReportingTagKeys": [
+                    "Owner"
+                ]
+            },
+            {
+                "ResourceType": "memorydb:subnetgroup",
+                "CloudFormationResourceTypes": [
+                    "AWS::MemoryDB::SubnetGroup"
+                ],
+                "ReportingTagKeys": [
+                    "Owner"
+                ]
+            },
+            {
+                "ResourceType": "memorydb:user",
+                "CloudFormationResourceTypes": [
+                    "AWS::MemoryDB::User"
+                ],
+                "ReportingTagKeys": [
+                    "Owner"
+                ]
+            },
+            {
+                "ResourceType": "mq:broker",
+                "CloudFormationResourceTypes": [
+                    "AWS::AmazonMQ::Broker"
+                ],
+                "ReportingTagKeys": [
+                    "Owner"
+                ]
+            },
+            {
+                "ResourceType": "mq:configuration",
+                "CloudFormationResourceTypes": [
+                    "AWS::AmazonMQ::Configuration"
+                ],
+                "ReportingTagKeys": [
+                    "Owner"
+                ]
+            },
+            {
+                "ResourceType": "network-firewall:firewall",
+                "CloudFormationResourceTypes": [
+                    "AWS::NetworkFirewall::Firewall"
+                ],
+                "ReportingTagKeys": [
+                    "Owner"
+                ]
+            },
+            {
+                "ResourceType": "network-firewall:firewall-policy",
+                "CloudFormationResourceTypes": [
+                    "AWS::NetworkFirewall::FirewallPolicy"
+                ],
+                "ReportingTagKeys": [
+                    "Owner"
+                ]
+            },
+            {
+                "ResourceType": "network-firewall:stateless-rulegroup",
+                "CloudFormationResourceTypes": [
+                    "AWS::NetworkFirewall::RuleGroup"
+                ],
+                "ReportingTagKeys": [
+                    "Owner"
+                ]
+            },
+            {
+                "ResourceType": "networkmanager:connect-peer",
+                "CloudFormationResourceTypes": [
+                    "AWS::NetworkManager::ConnectPeer"
+                ],
+                "ReportingTagKeys": [
+                    "Owner"
+                ]
+            },
+            {
+                "ResourceType": "networkmanager:core-network",
+                "CloudFormationResourceTypes": [
+                    "AWS::NetworkManager::CoreNetwork"
+                ],
+                "ReportingTagKeys": [
+                    "Owner"
+                ]
+            },
+            {
+                "ResourceType": "networkmanager:device",
+                "CloudFormationResourceTypes": [
+                    "AWS::NetworkManager::Device"
+                ],
+                "ReportingTagKeys": [
+                    "Owner"
+                ]
+            },
+            {
+                "ResourceType": "networkmanager:global-network",
+                "CloudFormationResourceTypes": [
+                    "AWS::NetworkManager::GlobalNetwork"
+                ],
+                "ReportingTagKeys": [
+                    "Owner"
+                ]
+            },
+            {
+                "ResourceType": "networkmanager:link",
+                "CloudFormationResourceTypes": [
+                    "AWS::NetworkManager::Link"
+                ],
+                "ReportingTagKeys": [
+                    "Owner"
+                ]
+            },
+            {
+                "ResourceType": "networkmanager:site",
+                "CloudFormationResourceTypes": [
+                    "AWS::NetworkManager::Site"
+                ],
+                "ReportingTagKeys": [
+                    "Owner"
+                ]
+            },
+            {
+                "ResourceType": "rds:cev",
+                "CloudFormationResourceTypes": [
+                    "AWS::RDS::CustomDBEngineVersion"
+                ],
+                "ReportingTagKeys": [
+                    "Owner"
+                ]
+            },
+            {
+                "ResourceType": "rds:cluster",
+                "CloudFormationResourceTypes": [
+                    "AWS::DocDB::DBCluster"
+                ],
+                "ReportingTagKeys": [
+                    "Owner"
+                ]
+            },
+            {
+                "ResourceType": "rds:cluster-pg",
+                "CloudFormationResourceTypes": [
+                    "AWS::DocDB::DBClusterParameterGroup",
+                    "AWS::Neptune::DBClusterParameterGroup",
+                    "AWS::RDS::DBClusterParameterGroup"
+                ],
+                "ReportingTagKeys": [
+                    "Owner"
+                ]
+            },
+            {
+                "ResourceType": "rds:db",
+                "CloudFormationResourceTypes": [
+                    "AWS::Neptune::DBInstance"
+                ],
+                "ReportingTagKeys": [
+                    "Owner"
+                ]
+            },
+            {
+                "ResourceType": "rds:db-proxy",
+                "CloudFormationResourceTypes": [
+                    "AWS::RDS::DBProxy"
+                ],
+                "ReportingTagKeys": [
+                    "Owner"
+                ]
+            },
+            {
+                "ResourceType": "rds:db-proxy-endpoint",
+                "CloudFormationResourceTypes": [
+                    "AWS::RDS::DBProxyEndpoint"
+                ],
+                "ReportingTagKeys": [
+                    "Owner"
+                ]
+            },
+            {
+                "ResourceType": "rds:es",
+                "CloudFormationResourceTypes": [
+                    "AWS::DocDB::EventSubscription",
+                    "AWS::RDS::EventSubscription"
+                ],
+                "ReportingTagKeys": [
+                    "Owner"
+                ]
+            },
+            {
+                "ResourceType": "rds:global-cluster",
+                "CloudFormationResourceTypes": [
+                    "AWS::RDS::GlobalCluster"
+                ],
+                "ReportingTagKeys": [
+                    "Owner"
+                ]
+            },
+            {
+                "ResourceType": "rds:og",
+                "CloudFormationResourceTypes": [
+                    "AWS::RDS::OptionGroup"
+                ],
+                "ReportingTagKeys": [
+                    "Owner"
+                ]
+            },
+            {
+                "ResourceType": "rds:pg",
+                "CloudFormationResourceTypes": [
+                    "AWS::Neptune::DBParameterGroup",
+                    "AWS::RDS::DBParameterGroup"
+                ],
+                "ReportingTagKeys": [
+                    "Owner"
+                ]
+            }
+        ],
+        "NextToken": "AgV4rmblWFaFyQyIWRUdCDYQW7+oJeZn6iYlyfgPb0aD1LsAXwABABVhd3MtY3J5cHRvLXB1YmxpYy1rZXkAREFrNnAyeVE3UFNmUEp6Q2JoTG5ZS0ovQkVUMWIrNjRrR0pSVnZCQldiMmlpQW9aQVdseTFBQVBUaHF4ZFRwbTZ1UT09AAEAB2F3cy1rbXMAS2Fybjphd3M6a21zOnVzLWVhc3QtMTowMDIyMTMyNTkyOTM6a2V5LzgwYzkyNTQyLWE3Y2UtNDI1Ni1iNzhmLTliYjA0MjY4NWQzMAC4AQIBAHix3xYfetIWm6DbBBR5GHHBpEvjnqS6TkYyV37zCUbY2wE5e5/ecTJ3gMCBCTVKt116AAAAfjB8BgkqhkiG9w0BBwagbzBtAgEAMGgGCSqGSIb3DQEHATAeBglghkgBZQMEAS4wEQQMOoZmNEon6GAOS+eoAgEQgDv2svnCR39dMurSvJVQ39by2RYsv1pPoiVzb1a2Xur9b9gQXwAfQ9WXt8jnip97PSA4ROOZupVm132aHAIAABAA8IbI7ZRlwxzhLpijGWFPZff4CCLaVPbVsCuyZ1pL1IPbCvdfc1Xcgo8ztpVxIcYK/////wAAAAEAAAAAAAAAAAAAAAEAAABkRtJKizQZlL0GFNBShMBvuR0iszY3/ynKRHkQzcWMzPEz0qTIFrXlpuHIIUjq8VDsFWGLEqaOizrFfgObj6z6z/IaInz2o3HE69S2jefZluI5U0TGYtkODitfCqU0vWxI4mmbQ5ph2BgaYxuP6spKpITAk6IAZzBlAjBuvu82+1mb+3JhdrfIq1B00SKUX7SEZoZZTj5PWt4D6cI+2i93B6BiJ8Jwfk2RLo4CMQDCVgTXv7d3avCPjykfB8J85lqxoN7ocnGR1Zgm23hsWGGq+iSG4AXqd7GxokQwEnI=",
+        "ResponseMetadata": {}
+    }
+}
