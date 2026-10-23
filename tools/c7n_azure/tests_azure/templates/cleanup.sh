@@ -61,6 +61,11 @@ delete_resource() {
 
     az group delete --name $rgName --yes --output None
 
+    if [[ "$fileName" == "effective-access.json" ]]; then
+        # Deleting the group soft-deletes the account, which keeps the name reserved.
+        az cognitiveservices account purge --location eastus --resource-group $rgName --name cctest-eff-access --output None
+    fi
+
     echo "Delete for $filenameNoExtension complete"
 }
 
