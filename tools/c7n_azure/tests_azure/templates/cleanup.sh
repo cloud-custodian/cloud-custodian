@@ -57,6 +57,12 @@ delete_resource() {
         dbid=$(az sql db list --ids $sqlid --query [0].id --output tsv)
         az lock delete --ids "${dbid}/providers/Microsoft.Authorization/locks/dblock"
         sleep 10s
+    elif [[ "$fileName" == "vnet.json" ]]; then
+        # The flow log lives in the network watcher's resource group, not test_vnet
+        watcher_rg=$(az network watcher list --query "[?location=='southcentralus'].resourceGroup" --output tsv)
+        if [[ -n "${watcher_rg}" ]]; then
+            az network watcher flow-log delete --location southcentralus --name c7n-vnet-flowlog --output None
+        fi
     fi
 
     az group delete --name $rgName --yes --output None
