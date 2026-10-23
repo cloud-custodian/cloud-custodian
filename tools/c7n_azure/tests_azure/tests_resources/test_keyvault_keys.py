@@ -5,6 +5,8 @@ from unittest import mock
 
 from azure.keyvault.keys import KeyRotationPolicyAction
 
+from c7n.exceptions import PolicyValidationError
+
 from ..azure_common import BaseTest, arm_template
 
 
@@ -191,12 +193,18 @@ class KeyVaultKeyTest(BaseTest):
             {'lifetime_actions': []},
             {'expires_in': 'P1Y', 'lifetime_actions': [{'action': 'Rotate'}]},
             {'lifetime_actions': [{'action': 'Rotate', 'trigger': {}}]},
+            {'expires_in': 'one year', 'lifetime_actions': [
+                {'action': 'Rotate', 'trigger': {'time_after_create': 'P1D'}}]},
+            {'lifetime_actions': [
+                {'action': 'Rotate', 'trigger': {'time_before_expiry': '30 days'}}]},
+            {'expires_in': 'P', 'lifetime_actions': [
+                {'action': 'Rotate', 'trigger': {'time_after_create': 'P1D'}}]},
             {'lifetime_actions': [{'action': 'Delete', 'trigger': {'time_after_create': 'P1D'}}]},
             {'lifetime_actions': [{
                 'action': 'Rotate',
                 'trigger': {'time_after_create': 'P1D', 'time_before_expiry': 'P2D'}}]},
         ):
-            with self.assertRaises(Exception, msg=action):
+            with self.assertRaises(PolicyValidationError, msg=action):
                 self.load_policy({
                     'name': 'test-key-vault-key-set-rotation-policy',
                     'resource': 'azure.keyvault-key',

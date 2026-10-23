@@ -19,6 +19,10 @@ from c7n_azure.utils import ThreadHelper, ResourceIdParser
 
 log = logging.getLogger('custodian.azure.keyvault.keys')
 
+# ISO 8601 duration, e.g. P90D, P1Y2M, PT48H, P1W
+DURATION_PATTERN = (
+    r'^P(?!$)(\d+Y)?(\d+M)?(\d+W)?(\d+D)?(T(?=\d)(\d+H)?(\d+M)?(\d+S)?)?$')
+
 
 @resources.register('keyvault-key', aliases=['keyvault-keys'])
 class KeyVaultKeys(ChildResourceManager):
@@ -300,7 +304,7 @@ class KeyVaultKeySetRotationPolicyAction(AzureBaseAction):
 
     schema = type_schema(
         "set-rotation-policy",
-        expires_in={"type": "string"},
+        expires_in={"type": "string", "pattern": DURATION_PATTERN},
         lifetime_actions={
             "type": "array",
             "minItems": 1,
@@ -318,8 +322,8 @@ class KeyVaultKeySetRotationPolicyAction(AzureBaseAction):
                             {"required": ["time_before_expiry"]},
                         ],
                         "properties": {
-                            "time_after_create": {"type": "string"},
-                            "time_before_expiry": {"type": "string"},
+                            "time_after_create": {"type": "string", "pattern": DURATION_PATTERN},
+                            "time_before_expiry": {"type": "string", "pattern": DURATION_PATTERN},
                         },
                     },
                 },
