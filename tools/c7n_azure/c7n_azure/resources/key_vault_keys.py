@@ -4,7 +4,8 @@
 import datetime
 import logging
 
-from azure.keyvault.keys import KeyProperties
+from azure.keyvault.keys import (
+    KeyProperties, KeyRotationLifetimeAction, KeyRotationPolicyAction)
 
 from c7n.filters import Filter
 from c7n.utils import type_schema
@@ -263,4 +264,90 @@ class KeyVaultKeyUpdateAction(AzureBaseAction):
             tags=self.data.get("tags"),
             not_before=not_before,
             expires_on=expires_on,
+        )
+
+
+@KeyVaultKeys.action_registry.register("set-rotation-policy")
+class KeyVaultKeySetRotationPolicyAction(AzureBaseAction):
+    """
+    Configure the rotation policy of a key, which enables automatic key rotation.
+
+    ``expires_in`` and the ``time_after_create`` / ``time_before_expiry`` triggers
+    are ISO 8601 durations (for example ``P90D``). Each lifetime action needs exactly
+    one trigger. At least one of ``expires_in`` or ``lifetime_actions`` is required.
+    Settings that are not specified keep the value of the key's current rotation policy.
+
+    :example:
+
+    Rotate keys that have no rotation policy 30 days before they expire
+
+    .. code-block:: yaml
+
+        policies:
+          - name: key-vault-keys-enable-rotation
+            resource: azure.keyvault-key
+            filters:
+              - type: rotation-policy
+                state: Disabled
+            actions:
+              - type: set-rotation-policy
+                expires_in: P1Y
+                lifetime_actions:
+                  - action: Rotate
+                    trigger:
+                      time_before_expiry: P30D
+    """
+
+    schema = type_schema(
+        "set-rotation-policy",
+        expires_in={"type": "string"},
+        lifetime_actions={
+            "type": "array",
+            "minItems": 1,
+            "items": {
+                "type": "object",
+                "additionalProperties": False,
+                "required": ["action", "trigger"],
+                "properties": {
+                    "action": {"enum": ["Rotate", "Notify"]},
+                    "trigger": {
+                        "type": "object",
+                        "additionalProperties": False,
+                        "oneOf": [
+                            {"required": ["time_after_create"]},
+                            {"required": ["time_before_expiry"]},
+                        ],
+                        "properties": {
+                            "time_after_create": {"type": "string"},
+                            "time_before_expiry": {"type": "string"},
+                        },
+                    },
+                },
+            },
+        },
+    )
+    schema['anyOf'] = [
+        {"required": ["expires_in"]},
+        {"required": ["lifetime_actions"]},
+    ]
+
+    def _process_resource(self, resource):
+        id = KeyProperties(key_id=resource['id'])
+        client = self.manager.get_client(vault_url=id.vault_url)
+        current = client.get_key_rotation_policy(id.name)
+
+        lifetime_actions = [
+            KeyRotationLifetimeAction(
+                KeyRotationPolicyAction(a['action']),
+                time_after_create=a['trigger'].get('time_after_create'),
+                time_before_expiry=a['trigger'].get('time_before_expiry'),
+            )
+            for a in self.data.get('lifetime_actions', [])
+        ]
+
+        client.update_key_rotation_policy(
+            id.name,
+            current,
+            expires_in=self.data.get('expires_in'),
+            lifetime_actions=lifetime_actions or None,
         )
