@@ -4,16 +4,19 @@ import collections
 import datetime
 import enum
 import hashlib
+import inspect
 import itertools
 import logging
 import random
 import re
 import time
+import types
 import typing
 import uuid
 from urllib.parse import urlsplit
 from concurrent.futures import as_completed
 from functools import lru_cache
+from typing import Union, ForwardRef, get_args, get_origin
 
 from azure.core.pipeline.policies import CustomHookPolicy, RetryMode, RetryPolicy
 from azure.graphrbac.models import DirectoryObject, GetObjectsParameters
@@ -771,3 +774,76 @@ def cost_query_override_api_version(request):
     request.http_request.url = request.http_request.url.replace(
         'query?api-version=2020-06-01',
         'query?api-version=2019-11-01')
+
+
+# Optional[X] and X | None (python 3.10+)
+UNION_TYPES = (Union, getattr(types, "UnionType", Union))
+
+
+def type_to_jsonschema(input_type, sdk_models=None):
+    """
+    Takes a python type hint and turns into jsonschema
+
+    When given an SDK models module, forward references such as
+    '_models.Sku' are resolved against it and SDK models are expanded
+    into nested schemas.
+    """
+
+    if input_type is str or input_type == datetime.datetime:
+        return {"type": "string"}
+    elif input_type is int:
+        return {"type": "integer"}
+    elif input_type is bool:
+        return {"type": "boolean"}
+    elif isinstance(input_type, (ForwardRef, str)):
+        ref = getattr(input_type, "__forward_arg__", input_type).rsplit(".", 1)[-1]
+        model = getattr(sdk_models, ref, None)
+        if model is None:
+            return {"type": "object"}
+        return type_to_jsonschema(model, sdk_models)
+    elif get_origin(input_type) in UNION_TYPES:
+        schemas = [
+            type_to_jsonschema(x, sdk_models)
+            for x in get_args(input_type) if x is not type(None)
+        ]
+        return schemas[0] if len(schemas) == 1 else {"anyOf": schemas}
+    # get_origin covers both typing.List[X] and list[X]
+    elif get_origin(input_type) is list:
+        return {
+            "type": "array",
+            "items": type_to_jsonschema(get_args(input_type)[0], sdk_models),
+        }
+    elif get_origin(input_type) is dict:
+        return {
+            "anyOf": [
+                type_to_jsonschema(x, sdk_models) for x in get_args(input_type)
+            ]
+        }
+    elif inspect.isclass(input_type) and issubclass(input_type, enum.Enum):
+        return {"type": "string", "enum": [e.value for e in input_type]}
+    elif inspect.isclass(input_type) and sdk_models is not None and \
+            getattr(sdk_models, input_type.__name__, None) is input_type:
+        return model_to_jsonschema(input_type, sdk_models)
+    else:
+        return {"type": "object"}
+
+
+def model_to_jsonschema(model, sdk_models):
+    """
+    Builds an object schema from an SDK model's constructor; parameters
+    without a default are required. Unknown fields are rejected, since the
+    SDK drops them with only a log warning.
+    """
+    properties = {}
+    required = []
+    for name, param in inspect.signature(model).parameters.items():
+        if param.kind is param.VAR_KEYWORD:
+            continue
+        properties[name] = type_to_jsonschema(param.annotation, sdk_models)
+        if param.default is param.empty:
+            required.append(name)
+
+    schema = {"type": "object", "properties": properties, "additionalProperties": False}
+    if required:
+        schema["required"] = required
+    return schema

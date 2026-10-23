@@ -10,11 +10,13 @@ from c7n_azure.session import Session
 from c7n_azure.utils import GraphHelper
 from unittest.mock import patch, Mock
 from azure.core.exceptions import HttpResponseError
+from azure.mgmt.keyvault.operations import VaultsOperations
 from netaddr import IPSet
 from parameterized import parameterized
 import pytest
 from requests import Response
 
+from c7n.exceptions import PolicyValidationError
 from c7n.utils import local_session
 
 
@@ -403,4 +405,213 @@ class KeyVaultFirewallBypassFilterTest(BaseTest):
     def test_run(self, properties, expected):
         resource = {'properties': properties}
         f = KeyVaultFirewallBypassFilter({'mode': 'equal', 'list': []})
+
         self.assertEqual(expected, f._query_bypass(resource))
+
+
+UPDATE_NETWORK_ACLS = {
+    'bypass': 'None',
+    'default_action': 'Allow',
+    'ip_rules': [{'value': '123.45.67.89'}],
+    'virtual_network_rules': [{'id': '/subnet', 'ignore_missing_vnet_service_endpoint': True}],
+}
+
+UPDATE_ACCESS_POLICY = {
+    'tenant_id': 'tenant',
+    'object_id': 'object',
+    'permissions': {'keys': ['get', 'list'], 'secrets': ['get']},
+}
+
+
+class KeyVaultUpdateActionTest(BaseTest):
+
+    def _load_update_policy(self, configuration):
+        with self.sign_out_patch():
+            return self.load_policy({
+                'name': 'test-azure-keyvault',
+                'resource': 'azure.keyvault',
+                'actions': [{'type': 'update', 'configuration': configuration}]
+            }, validate=True)
+
+    @parameterized.expand([
+        ('public_network_access', {'public_network_access': 'Disabled'}),
+        ('keep_tenant_current_sku', {'tenant_id': 'keep', 'sku': {'current': True}}),
+        ('explicit_sku', {'sku': {'family': 'A', 'name': 'premium'}}),
+        ('network_acls', {'network_acls': UPDATE_NETWORK_ACLS}),
+        ('access_policies', {'access_policies': [UPDATE_ACCESS_POLICY]}),
+        ('retention_days', {'soft_delete_retention_in_days': 7}),
+    ])
+    def test_update_action_schema_valid(self, _, configuration):
+        p = self._load_update_policy(configuration)
+        assert p.resource_manager.actions[0].data['configuration'] == configuration
+
+    @parameterized.expand([
+        ('network_acls_missing_bypass', {'network_acls': {'default_action': 'Allow'}}),
+        ('ip_rule_missing_value', {'network_acls': {**UPDATE_NETWORK_ACLS, 'ip_rules': [{}]}}),
+        ('vnet_rule_missing_id',
+         {'network_acls': {**UPDATE_NETWORK_ACLS, 'virtual_network_rules': [{}]}}),
+        ('access_policy_missing_object_id',
+         {'access_policies': [{'tenant_id': 'tenant', 'permissions': {}}]}),
+        ('access_policy_not_a_list', {'access_policies': UPDATE_ACCESS_POLICY}),
+        ('sku_missing_name', {'sku': {'family': 'A'}}),
+        ('sku_current_false', {'sku': {'current': False}}),
+        ('retention_days_fractional', {'soft_delete_retention_in_days': 7.5}),
+        ('unknown_property', {'public_netwrok_access': 'Disabled'}),
+        ('unknown_nested_property', {'network_acls': {
+            **UPDATE_NETWORK_ACLS, 'ip_rules': [{'value': '1.2.3.4', 'actoin': 'Allow'}]}}),
+    ])
+    def test_update_action_schema_invalid(self, _, configuration):
+        with pytest.raises(PolicyValidationError):
+            self._load_update_policy(configuration)
+
+    def test_update_action_keep_tenant_and_current_sku(self):
+        action = self._load_update_policy({
+            'tenant_id': 'keep',
+            'sku': {'current': True},
+            'public_network_access': 'Disabled',
+        }).resource_manager.actions[0]
+        action.client = Mock()
+
+        action._process_resource({
+            'name': 'cckeyvault1',
+            'resourceGroup': 'test_keyvault',
+            'location': 'southcentralus',
+            'properties': {
+                'tenantId': 'tenant',
+                'sku': {'family': 'A', 'name': 'standard'},
+            },
+        })
+
+        props = action.client.vaults.update.call_args.kwargs['parameters'].properties
+        assert props.as_dict() == {
+            'tenant_id': 'tenant',
+            'sku': {'family': 'A', 'name': 'standard'},
+            'public_network_access': 'Disabled',
+        }
+
+    @arm_template("keyvault.json")
+    def test_update_action(self):
+        p = self.load_policy(
+            {
+                'name': 'test-azure-keyvault',
+                'resource': 'azure.keyvault',
+                'filters': [
+                    {
+                        'type': 'value',
+                        'key': 'name',
+                        'op': 'glob',
+                        'value_type': 'normalize',
+                        'value': 'cckeyvault1*'
+                    },
+                    {
+                        "properties.publicNetworkAccess": "Enabled"
+                    }
+                ],
+                'actions': [
+                    {
+                        "type": "update",
+                        "configuration": {
+                            "public_network_access": "Disabled",
+                        }
+                    }
+                ]
+            }
+        )
+        with patch.object(
+            VaultsOperations, 'update', autospec=True, side_effect=VaultsOperations.update
+        ) as update:
+            resources = p.run()
+        assert len(resources) == 1
+        vault_before = resources[0]
+
+        # Only the configured property is sent; a full VaultProperties would
+        # also send defaults such as enable_rbac_authorization=False and
+        # soft_delete_retention_in_days=90, overwriting the vault's settings.
+        assert update.call_args.kwargs['parameters'].properties.as_dict() == {
+            'public_network_access': 'Disabled'
+        }
+
+        client = self.session.client('azure.mgmt.keyvault.KeyVaultManagementClient')
+        vault_after = client.vaults.get(
+            vault_before['resourceGroup'], vault_before['name']
+        )
+        assert vault_after.properties.public_network_access == "Disabled"
+        # Settings not in the configuration are left as they were
+        assert vault_after.properties.tenant_id == vault_before['properties']['tenantId']
+        assert vault_after.properties.sku.name.lower() == \
+            vault_before['properties']['sku']['name'].lower()
+        assert vault_after.properties.network_acls.default_action == \
+            vault_before['properties']['networkAcls']['defaultAction']
+
+    @arm_template("keyvault.json")
+    def test_update_action_network_access(self):
+        sub = self.session.get_subscription_id()
+        rg = "test_keyvault"
+        id_prefix = f"/subscriptions/{sub}/resourceGroups/{rg}/providers"
+        subnet_id = f"{id_prefix}/Microsoft.Network/virtualNetworks/cckvvnet/subnets/default"
+
+        p = self.load_policy(
+            {
+                'name': 'test-azure-keyvault',
+                'resource': 'azure.keyvault',
+                'filters': [
+                    {
+                        'type': 'value',
+                        'key': 'name',
+                        'op': 'glob',
+                        'value_type': 'normalize',
+                        'value': 'cckeyvault1*'
+                    },
+                ],
+                'actions': [
+                    {
+                        "type": "update",
+                        "configuration": {
+                            "tenant_id": "keep",
+                            "sku": {"current": True},
+                            "network_acls": {
+                                "bypass": "None",
+                                "default_action": "Allow",
+                                "ip_rules": [
+                                    {
+                                        "value": "123.45.67.89"
+                                    }
+                                ],
+                                "virtual_network_rules": [
+                                    {
+                                        "id": subnet_id,
+                                        "ignore_missing_vnet_service_endpoint": True
+                                    }
+                                ]
+
+                            }
+                        }
+                    }
+                ]
+            }
+        )
+        resources = p.run()
+        assert len(resources) == 1
+        vault_before = resources[0]
+
+        # all the network acls before were the default from the arm template
+        assert vault_before['properties']['networkAcls']['bypass'] == "AzureServices"
+
+        client = self.session.client('azure.mgmt.keyvault.KeyVaultManagementClient')
+        vault_after = client.vaults.get(
+            vault_before['resourceGroup'], vault_before['name']
+        )
+
+        assert vault_after.properties.network_acls.bypass == "None"
+        assert vault_after.properties.network_acls.default_action == "Allow"
+
+        assert len(vault_after.properties.network_acls.ip_rules) == 1
+        # azure inserts the /32
+        assert vault_after.properties.network_acls.ip_rules[0].value == "123.45.67.89/32"
+
+        assert len(vault_after.properties.network_acls.virtual_network_rules) == 1
+        vn_rules = vault_after.properties.network_acls.virtual_network_rules[0]
+
+        # azure lowercases the id string
+        assert vn_rules.id == subnet_id.lower()
+        assert vn_rules.ignore_missing_vnet_service_endpoint is True
