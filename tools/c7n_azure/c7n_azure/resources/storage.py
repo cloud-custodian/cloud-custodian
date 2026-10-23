@@ -825,7 +825,9 @@ class SetBlobPublicAccessAction(AzureBaseAction):
 
     :example:
 
-    Disable anonymous blob access on all storage accounts that currently allow it.
+    Disable anonymous blob access on all storage accounts that currently allow it,
+    including accounts where ``allowBlobPublicAccess`` has never been set (Azure
+    then allows anonymous access by default).
 
     .. code-block:: yaml
 
@@ -833,8 +835,7 @@ class SetBlobPublicAccessAction(AzureBaseAction):
             - name: disable-blob-anonymous-access
               resource: azure.storage
               filters:
-                - type: value
-                  key: properties.allowBlobPublicAccess
+                - type: blob-public-access
                   value: true
               actions:
                 - type: set-blob-public-access
