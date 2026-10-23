@@ -2,8 +2,10 @@
 # SPDX-License-Identifier: Apache-2.0
 
 import os
+from unittest.mock import MagicMock
 
 from c7n.exceptions import PolicyValidationError
+from c7n_azure.resources.ai_foundry import AIFoundryApplication
 
 from ..azure_common import BaseTest, arm_template, cassette_name, requires_arm_polling
 
@@ -472,6 +474,23 @@ class AIFoundryApplicationTest(BaseTest):
         resources = p.run()
         self.assertGreaterEqual(len(resources), 1)
         self.assertTrue(all(r.get('name') == 'cctest-aifoundry-application' for r in resources))
+
+    def test_ai_foundry_application_url(self):
+        # The China cloud endpoint has no trailing slash
+        parent = {'id': '/subscriptions/s/resourceGroups/rg/providers/'
+                        'Microsoft.CognitiveServices/accounts/a/projects/p'}
+        for endpoint in ('https://management.azure.com/', 'https://management.chinacloudapi.cn'):
+            manager = AIFoundryApplication(self.test_context, {})
+            session = MagicMock()
+            session.cloud_endpoints.endpoints.resource_manager = endpoint
+            manager.get_session = MagicMock(return_value=session)
+            manager._arm_rest_get = MagicMock(return_value=[])
+
+            manager.enumerate_resources(parent, None)
+
+            self.assertEqual(
+                manager._arm_rest_get.call_args.args[0],
+                endpoint.rstrip('/') + parent['id'] + '/applications')
 
 
 class AIFoundryAgentTest(BaseTest):
