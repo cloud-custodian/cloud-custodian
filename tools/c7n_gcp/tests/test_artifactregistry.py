@@ -67,18 +67,18 @@ class ArtifactRegistryRepositoryTest(BaseTest):
         """Test setting Artifact Registry cleanup policy."""
         flight_name = 'artifact-repository-set-cleanup-policy'
         location = 'us-central1'
-
-        if C7N_FUNCTIONAL:
-            functional_project_id = get_default_project()
-            session_factory = self.record_flight_data(
-                flight_name, project_id=functional_project_id)
-        else:
-            session_factory = self.replay_flight_data(flight_name)
+        session_factory = self.replay_flight_data(flight_name)
 
         policy = self.load_policy(
             {
                 'name': 'artifact-repository-set-cleanup-policy',
                 'resource': 'gcp.artifact-repository',
+                'filters': [{
+                    'type': 'value',
+                    'key': 'name',
+                    'op': 'glob',
+                    'value': '*/c7n-artifact-repo',
+                }],
                 'actions': [{
                     'type': 'set-cleanup-policy',
                     'cleanup-policies': {
