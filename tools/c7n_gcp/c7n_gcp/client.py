@@ -29,6 +29,7 @@ import threading
 import os
 import socket
 import ssl
+import time
 from contextlib import nullcontext as no_rate_limiter
 from urllib.error import URLError
 
@@ -43,6 +44,8 @@ import httplib2
 from pyrate_limiter import Limiter, RequestRate
 
 from retrying import retry
+
+from c7n.output import APICallStats, api_stats_outputs, record_api_call
 
 
 HTTPLIB_CA_BUNDLE = os.environ.get('HTTPLIB_CA_BUNDLE')
@@ -552,11 +555,27 @@ class ServiceClient:
         request = self._build_request(verb, verb_arguments)
         return self._execute(request)
 
+    def _execute(self, request):
+        """Run execute with retries and rate limiting, recording the api call.
+
+        Args:
+            request (object): The HttpRequest object to execute.
+
+        Returns:
+            dict: The response from the API.
+        """
+        start = time.perf_counter()
+        try:
+            return self._execute_with_retry(request)
+        finally:
+            # e.g. compute.instances.list, once per call however many attempts
+            record_api_call(request.methodId, time.perf_counter() - start)
+
     @retry(retry_on_exception=is_retryable_exception,
            wait_exponential_multiplier=1000,
            wait_exponential_max=10000,
            stop_max_attempt_number=5)
-    def _execute(self, request):
+    def _execute_with_retry(self, request):
         """Run execute with retries and rate limiting.
 
         Args:
@@ -567,3 +586,8 @@ class ServiceClient:
         """
         with self._rate_limiter:
             return request.execute(http=self.http, num_retries=self._num_retries)
+
+
+@api_stats_outputs.register('gcp')
+class ApiStats(APICallStats):
+    """Count gcp api calls by method id, e.g. compute.instances.list, and their time."""

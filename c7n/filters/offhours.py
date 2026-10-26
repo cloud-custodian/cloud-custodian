@@ -649,7 +649,10 @@ class ScheduleParser:
         # parse schedule components
         pieces = tag_value.split(';')
         for piece in pieces:
-            kv = piece.split('=')
+            # strip surrounding whitespace so values with a space after the
+            # ';' separator (e.g. "off=(m-f,19); on=(m-f,7)") parse correctly.
+            # keys_are_valid()/raw_data() already tolerate such spacing.
+            kv = piece.strip().split('=')
             # components must by key=value
             if not len(kv) == 2:
                 return None

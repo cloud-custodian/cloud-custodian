@@ -1,5 +1,6 @@
 # Copyright The Cloud Custodian Authors.
 # SPDX-License-Identifier: Apache-2.0
+from c7n.exceptions import PolicyValidationError
 from c7n.utils import type_schema
 from c7n_gcp.actions import MethodAction
 from c7n_gcp.actions.iampolicy import SetIamPolicy
@@ -148,6 +149,132 @@ class BucketSetPublicAccess(MethodAction):
                 'fields': 'iamConfiguration',
                 'projection': 'noAcl',
                 'body': {'iamConfiguration': {'publicAccessPrevention': self.data['state']}}}
+
+
+@Bucket.action_registry.register('set-lifecycle-rule')
+class BucketSetLifecycleRule(MethodAction):
+    '''Add a lifecycle rule to a bucket, keeping its existing rules.
+
+    ``rule`` is one Cloud Storage lifecycle rule, an ``action`` and a
+    ``condition``, in the API's format:
+    https://cloud.google.com/storage/docs/lifecycle. ``sizeAboveBytes`` and
+    ``sizeBelowBytes`` are strings, as the API returns them.
+
+    Buckets that already have the rule are skipped. If a bucket changes while
+    the rule is being added, the update fails rather than overwriting the
+    change. ``SetStorageClass`` rules and ``matchesStorageClass`` conditions
+    are rejected on Autoclass buckets.
+
+    Rules can take up to 24 hours to take effect, and ``age`` counts from each
+    object's creation, so a ``Delete`` rule applies to existing objects as
+    well as new ones.
+
+    :example:
+
+    Add a 90 day delete rule to buckets that have no lifecycle rules:
+
+    .. code-block:: yaml
+
+        policies:
+          - name: gcp-bucket-add-delete-lifecycle-rule
+            resource: gcp.bucket
+            filters:
+              - type: value
+                key: lifecycle.rule
+                value: absent
+            actions:
+              - type: set-lifecycle-rule
+                rule:
+                  action:
+                    type: Delete
+                  condition:
+                    age: 90
+    '''
+
+    schema = type_schema(
+        'set-lifecycle-rule',
+        required=['rule'],
+        rule={
+            'type': 'object',
+            'additionalProperties': False,
+            'required': ['action', 'condition'],
+            'properties': {
+                'action': {
+                    'type': 'object',
+                    'additionalProperties': False,
+                    'required': ['type'],
+                    'properties': {
+                        'type': {'enum': [
+                            'Delete', 'SetStorageClass', 'AbortIncompleteMultipartUpload']},
+                        'storageClass': {'enum': [
+                            'STANDARD', 'NEARLINE', 'COLDLINE', 'ARCHIVE',
+                            'MULTI_REGIONAL', 'REGIONAL', 'DURABLE_REDUCED_AVAILABILITY']},
+                    },
+                },
+                'condition': {
+                    'type': 'object',
+                    'additionalProperties': False,
+                    'minProperties': 1,
+                    'properties': {
+                        'age': {'type': 'integer', 'minimum': 0},
+                        'createdBefore': {
+                            'type': 'string', 'pattern': '^[0-9]{4}-[0-9]{2}-[0-9]{2}$'},
+                        'customTimeBefore': {
+                            'type': 'string', 'pattern': '^[0-9]{4}-[0-9]{2}-[0-9]{2}$'},
+                        'daysSinceCustomTime': {'type': 'integer', 'minimum': 0},
+                        'daysSinceNoncurrentTime': {'type': 'integer', 'minimum': 0},
+                        'isLive': {'type': 'boolean'},
+                        'matchesPattern': {'type': 'string'},
+                        'matchesPrefix': {'type': 'array', 'items': {'type': 'string'}},
+                        'matchesStorageClass': {'type': 'array', 'items': {'type': 'string'}},
+                        'matchesSuffix': {'type': 'array', 'items': {'type': 'string'}},
+                        'noncurrentTimeBefore': {
+                            'type': 'string', 'pattern': '^[0-9]{4}-[0-9]{2}-[0-9]{2}$'},
+                        'numNewerVersions': {'type': 'integer', 'minimum': 0},
+                        'sizeAboveBytes': {'type': 'string', 'pattern': '^[0-9]+$'},
+                        'sizeBelowBytes': {'type': 'string', 'pattern': '^[0-9]+$'},
+                    },
+                },
+            },
+        })
+    method_spec = {'op': 'patch'}
+    permissions = ('storage.buckets.get', 'storage.buckets.update')
+
+    def validate(self):
+        super().validate()
+        action = self.data['rule']['action']
+        condition = self.data['rule']['condition']
+        if (action['type'] == 'SetStorageClass') != ('storageClass' in action):
+            raise PolicyValidationError(
+                "policy:%s action:%s storageClass is required for SetStorageClass "
+                "and not allowed otherwise" % (self.manager.ctx.policy.name, self.type))
+        if (action['type'] == 'AbortIncompleteMultipartUpload' and
+                condition.keys() - {'age', 'matchesPrefix', 'matchesSuffix'}):
+            raise PolicyValidationError(
+                "policy:%s action:%s AbortIncompleteMultipartUpload only allows the age, "
+                "matchesPrefix and matchesSuffix conditions" % (
+                    self.manager.ctx.policy.name, self.type))
+        return self
+
+    def process_resource_set(self, client, model, resources):
+        rule = self.data['rule']
+        for resource in resources:
+            # Read the rules now: the listed resource can be stale, for example
+            # after an earlier action in the same policy added a rule.
+            bucket = client.execute_query(
+                'get', {'bucket': resource['name'], 'fields': 'lifecycle,metageneration'})
+            rules = bucket.get('lifecycle', {}).get('rule', [])
+            if rule in rules:
+                self.log.info(
+                    "policy:%s action:%s bucket:%s already has the rule",
+                    self.manager.ctx.policy.name, self.type, resource['name'])
+                continue
+            self.invoke_api(client, 'patch', {
+                'bucket': resource['name'],
+                'ifMetagenerationMatch': bucket['metageneration'],
+                'fields': 'lifecycle',
+                'projection': 'noAcl',
+                'body': {'lifecycle': {'rule': rules + [rule]}}})
 
 
 @Bucket.action_registry.register('set-iam-policy')

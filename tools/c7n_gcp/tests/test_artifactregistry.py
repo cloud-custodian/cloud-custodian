@@ -1,4 +1,5 @@
 from gcp_common import BaseTest
+from c7n.exceptions import PolicyValidationError
 
 
 class ArtifactRegistryRepositoryTest(BaseTest):
@@ -49,3 +50,53 @@ class ArtifactRegistryRepositoryTest(BaseTest):
             {'name': repo_name}
         )
         self.assertEqual(result['labels']['env'], 'production')
+
+    def test_artifact_repository_cleanup_policy_validation(self):
+        with self.assertRaises(PolicyValidationError):
+            self.load_policy({
+                'name': 'artifact-repository-cleanup-policy-invalid',
+                'resource': 'gcp.artifact-repository',
+                'actions': [
+                    {'type': 'set-cleanup-policy'}
+                ]
+            }, config={'region': 'us-central1'})
+
+    def test_artifact_repository_set_cleanup_policy(self):
+        """Test setting Artifact Registry cleanup policy."""
+        flight_name = 'artifact-repository-set-cleanup-policy'
+        location = 'us-central1'
+        session_factory = self.replay_flight_data(flight_name)
+
+        policy = self.load_policy(
+            {
+                'name': 'artifact-repository-set-cleanup-policy',
+                'resource': 'gcp.artifact-repository',
+                'filters': [{
+                    'type': 'value',
+                    'key': 'name',
+                    'op': 'glob',
+                    'value': '*/c7n-artifact-repo',
+                }],
+                'actions': [{
+                    'type': 'set-cleanup-policy',
+                    'cleanup-policies': {
+                        'delete-old': {
+                            'id': 'delete-old',
+                            'action': 'DELETE',
+                            'condition': {
+                                'olderThan': '2592000s'
+                            }
+                        }
+                    }
+                }]
+            },
+            config={'region': location},
+            session_factory=session_factory,
+        )
+
+        resources = policy.run()
+        self.assertEqual(len(resources), 1)
+
+        client = policy.resource_manager.get_client()
+        repository = client.execute_query('get', {'name': resources[0]['name']})
+        self.assertIn('delete-old', repository.get('cleanupPolicies', {}))

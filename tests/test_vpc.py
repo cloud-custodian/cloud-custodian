@@ -2438,6 +2438,18 @@ class SecurityGroupTest(BaseTest):
         except PolicyValidationError:
             self.fail("should pass validation")
 
+        self.assertRaises(
+            PolicyValidationError,
+            self.load_policy,
+            {'name': 'related-sg-no-key',
+             'resource': 'elb',
+             'filters': [
+                 {'type': 'security-group',
+                  'match-resource': True,
+                  'op': 'not-equal',
+                  'operator': 'or'}]},
+            validate=True)
+
     @functional
     def test_only_ports(self):
         factory = self.replay_flight_data("test_security_group_only_ports")
@@ -4946,6 +4958,152 @@ class TestVpcEndpointServiceDetails(BaseTest):
         self.assertEqual(len(resources), 1)
         self.assertEqual(resources[0]["ServiceName"], "com.amazonaws.us-east-1.s3")
         self.assertTrue(resources[0]["c7n:ServiceDetails"]["VpcEndpointPolicySupported"])
+
+
+@terraform("transit_gateway_route_table", scope="session")
+def test_transit_gateway_route_table_associations(test, transit_gateway_route_table):
+    factory = test.replay_flight_data(
+        "test_transit_gateway_route_table_associations", region="us-east-2")
+    tgw_id = transit_gateway_route_table["aws_ec2_transit_gateway.example.id"]
+    attachment_id = transit_gateway_route_table["aws_ec2_transit_gateway_vpc_attachment.test.id"]
+
+    policy = test.load_policy(
+        {
+            "name": "tgw-route-table-associated",
+            "resource": "aws.transit-gateway-route-table",
+            "filters": [
+                {"TransitGatewayId": tgw_id},
+                {
+                    "type": "associations",
+                    "attrs": [{"TransitGatewayAttachmentId": attachment_id}],
+                },
+            ],
+        },
+        session_factory=factory,
+        config={"region": "us-east-2"},
+    )
+    resources = policy.run()
+
+    assert [r["TransitGatewayRouteTableId"] for r in resources] == [
+        transit_gateway_route_table[
+            "aws_ec2_transit_gateway.example.association_default_route_table_id"
+        ]
+    ]
+    associations = resources[0]["c7n:Associations"]
+    assert len(associations) == 1
+    assert associations[0]["ResourceId"] == transit_gateway_route_table["aws_vpc.test.id"]
+    assert associations[0]["State"] == "associated"
+    assert resources[0]["c7n:MatchedAssociations"] == associations
+
+    policy = test.load_policy(
+        {
+            "name": "tgw-route-table-unassociated",
+            "resource": "aws.transit-gateway-route-table",
+            "filters": [
+                {"TransitGatewayId": tgw_id},
+                {"type": "associations", "count": 0},
+            ],
+        },
+        session_factory=factory,
+        config={"region": "us-east-2"},
+    )
+    resources = policy.run()
+
+    assert [r["TransitGatewayRouteTableId"] for r in resources] == [
+        transit_gateway_route_table["aws_ec2_transit_gateway_route_table.available.id"]
+    ]
+    assert resources[0]["c7n:Associations"] == []
+
+
+@terraform("transit_gateway_route_table", scope="session")
+def test_transit_gateway_route_table_propagations(test, transit_gateway_route_table):
+    factory = test.replay_flight_data(
+        "test_transit_gateway_route_table_propagations", region="us-east-2")
+    tgw_id = transit_gateway_route_table["aws_ec2_transit_gateway.example.id"]
+    attachment_id = transit_gateway_route_table["aws_ec2_transit_gateway_vpc_attachment.test.id"]
+
+    policy = test.load_policy(
+        {
+            "name": "tgw-route-table-vpc-propagation",
+            "resource": "aws.transit-gateway-route-table",
+            "filters": [
+                {"TransitGatewayId": tgw_id},
+                {"type": "propagations", "attrs": [{"ResourceType": "vpc"}]},
+            ],
+        },
+        session_factory=factory,
+        config={"region": "us-east-2"},
+    )
+    resources = policy.run()
+
+    assert [r["TransitGatewayRouteTableId"] for r in resources] == [
+        transit_gateway_route_table[
+            "aws_ec2_transit_gateway.example.propagation_default_route_table_id"
+        ]
+    ]
+    propagations = resources[0]["c7n:Propagations"]
+    assert len(propagations) == 1
+    assert propagations[0]["TransitGatewayAttachmentId"] == attachment_id
+    assert propagations[0]["State"] == "enabled"
+    assert resources[0]["c7n:MatchedPropagations"] == propagations
+
+    policy = test.load_policy(
+        {
+            "name": "tgw-route-table-no-propagation",
+            "resource": "aws.transit-gateway-route-table",
+            "filters": [
+                {"TransitGatewayId": tgw_id},
+                {"type": "propagations", "count": 0},
+            ],
+        },
+        session_factory=factory,
+        config={"region": "us-east-2"},
+    )
+    resources = policy.run()
+
+    assert [r["TransitGatewayRouteTableId"] for r in resources] == [
+        transit_gateway_route_table["aws_ec2_transit_gateway_route_table.available.id"]
+    ]
+    assert resources[0]["c7n:Propagations"] == []
+
+
+def test_transit_gateway_route_table_not_found(test, caplog):
+    factory = test.replay_flight_data(
+        "test_transit_gateway_route_table_not_found", region="us-east-2")
+    policy = test.load_policy(
+        {
+            "name": "tgw-route-table-any-associations",
+            "resource": "aws.transit-gateway-route-table",
+            "filters": [{"type": "associations", "count": 0, "count_op": "gte"}],
+        },
+        session_factory=factory,
+        config={"region": "us-east-2"},
+    )
+
+    with caplog.at_level(logging.WARNING, logger="custodian.filters"):
+        resources = policy.run()
+
+    assert [r["TransitGatewayRouteTableId"] for r in resources] == ["tgw-rtb-00000000000000001"]
+    assert "tgw-rtb-00000000000000002" in caplog.text
+
+
+def test_transit_gateway_route_table_config_source(test):
+    policy = test.load_policy(
+        {
+            "name": "tgw-route-table-config",
+            "resource": "aws.transit-gateway-route-table",
+            "source": "config",
+        },
+        config={"region": "us-east-2", "account_id": ACCOUNT_ID},
+    )
+    item = event_data("transit-gateway-route-table.json", "config")
+
+    resource = policy.resource_manager.get_source("config").load_resource(item)
+
+    assert resource["TransitGatewayRouteTableId"] == "tgw-rtb-00000000000000002"
+    assert policy.resource_manager.get_arns([resource]) == [
+        f"arn:aws:ec2:us-east-2:{ACCOUNT_ID}:transit-gateway-route-table/tgw-rtb-00000000000000002"
+    ]
 
 
 class SecurityGroupPaginationTest(BaseTest):

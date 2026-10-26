@@ -111,6 +111,11 @@ class SetDiagnosticSettingsAction(AzureBaseAction):
                 "workspaceId, storageAccountId or eventHubAuthorizationRuleId"
             )
 
+        if self.data.get('eventHubName') and not self.data.get('eventHubAuthorizationRuleId'):
+            raise PolicyValidationError(
+                "set-diagnostic-settings: eventHubName needs eventHubAuthorizationRuleId"
+            )
+
         if not self.data.get('logs') and not self.data.get('metrics'):
             raise PolicyValidationError(
                 "set-diagnostic-settings needs logs or metrics to send"

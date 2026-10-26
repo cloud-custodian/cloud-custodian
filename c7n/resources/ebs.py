@@ -1592,10 +1592,15 @@ class ModifyableVolume(Filter):
         ec2 = self.manager.get_resource_manager('ec2')
         instance_map = {}
         for v in attached:
-            instance_map.setdefault(
-                v['Attachments'][0]['InstanceId'], []).append(v)
+            instance_id = v['Attachments'][0].get('InstanceId')
+            if instance_id is None:
+                # Volumes not attached to an ec2 instance (ie. managed by ecs)
+                # have no instance type to check.
+                results.append(v)
+                continue
+            instance_map.setdefault(instance_id, []).append(v)
 
-        instances = ec2.get_resources(list(instance_map.keys()))
+        instances = ec2.get_resources(list(instance_map.keys())) if instance_map else []
         for i in instances:
             if i['InstanceType'] in self.older_generation:
                 stats['instance-type'] += len(instance_map[i['InstanceId']])

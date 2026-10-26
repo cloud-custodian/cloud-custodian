@@ -279,6 +279,9 @@ class SetDiagnosticSettingsActionTest(BaseTest):
              {'workspaceId': WORKSPACE_ID,
               'logs': [{'category': 'AppServiceHTTPLogs', 'categoryGroup': 'allLogs',
                         'enabled': True}]}),
+            ('eventHubName needs eventHubAuthorizationRuleId',
+             {'workspaceId': WORKSPACE_ID, 'eventHubName': 'c7n-logs',
+              'logs': [{'category': 'AppServiceHTTPLogs', 'enabled': True}]}),
         ]
         for message, fields in cases:
             action = {'type': 'set-diagnostic-settings', 'name': 'c7n-http-logs'}
