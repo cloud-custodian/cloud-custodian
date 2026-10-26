@@ -71,7 +71,7 @@ class ArmResourceManager(QueryResourceManager, metaclass=QueryMeta):
         """
         session = self.get_session()
         session._initialize_session()
-        token_scope = session.cloud_endpoints.endpoints.resource_manager + '.default'
+        token_scope = session.cloud_endpoints.endpoints.resource_manager.rstrip('/') + '/.default'
         token = session.credentials.get_token(token_scope)
         headers = {
             'Authorization': f'Bearer {token.token}',
