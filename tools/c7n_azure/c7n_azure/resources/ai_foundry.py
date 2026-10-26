@@ -4,7 +4,7 @@
 import requests
 
 from azure.mgmt.cognitiveservices.models import ConnectionPropertiesV2
-from azure.mgmt.resource.resources.models import GenericResource
+from azure.mgmt.resource.resources.models import GenericResource, Sku
 from msrestazure.tools import parse_resource_id
 
 from c7n.utils import type_schema
@@ -366,6 +366,59 @@ class AIFoundryAgent(ChildArmResourceManager):
         return [r for r in normalized if self._is_agent_of_parent(r, parent_resource['id'])]
 
 
+class AiFoundryCognitiveServiceDeploymentSetCapacityAction(AzureBaseAction):
+    """Set the SKU capacity of an Azure Cognitive Services deployment.
+
+    PATCHes the ``sku.capacity`` field, enabling safe scale-in of idle
+    PTU (provisioned throughput unit) deployments without deleting the
+    resource.  A ``capacity`` of ``0`` removes the PTU reservation while
+    retaining the deployment.
+
+    :example:
+
+    Scale idle PTU deployments to 0 PTUs:
+
+    .. code-block:: yaml
+
+        policies:
+          - name: scale-in-idle-ptu-deployments
+            resource: azure.cognitiveservice-deployment
+            filters:
+              - type: metric
+                metric: AzureOpenAIProvisionedManagedUtilizationV2
+                op: lt
+                threshold: 10
+                aggregation: average
+                timeframe: 72
+            actions:
+              - type: set-capacity
+                capacity: 0
+    """
+
+    schema = type_schema(
+        'set-capacity',
+        capacity={'type': 'integer', 'minimum': 0},
+    )
+    schema_alias = True
+
+    def _prepare_processing(self):
+        self.client = self.manager.get_client('azure.mgmt.resource.ResourceManagementClient')
+
+    def _process_resource(self, resource):
+        capacity = self.data.get('capacity', 0)
+        sku = resource.get('sku', {})
+        payload = GenericResource(sku=Sku(
+            name=sku.get('name'),
+            capacity=capacity,
+        ))
+        self.client.resources.begin_update_by_id(
+            resource['id'],
+            self.manager.resource_type.api_version,
+            payload,
+        ).result()
+        return 'capacity-updated'
+
+
 class AiFoundryCognitiveServiceDeploymentDeleteAction(AzureBaseAction):
     """Delete AI Foundry Cognitive Services deployments."""
 
@@ -389,6 +442,10 @@ def register_ai_foundry_cognitive_service_deployment_actions(registry, resource_
         resource_class.action_registry.register(
             'delete',
             AiFoundryCognitiveServiceDeploymentDeleteAction,
+        )
+        resource_class.action_registry.register(
+            'set-capacity',
+            AiFoundryCognitiveServiceDeploymentSetCapacityAction,
         )
 
 
@@ -414,6 +471,10 @@ def register_ai_foundry_deployment_actions(registry, resource_class):
         resource_class.action_registry.register(
             'delete',
             AiFoundryCognitiveServiceDeploymentDeleteAction
+        )
+        resource_class.action_registry.register(
+            'set-capacity',
+            AiFoundryCognitiveServiceDeploymentSetCapacityAction,
         )
 
 

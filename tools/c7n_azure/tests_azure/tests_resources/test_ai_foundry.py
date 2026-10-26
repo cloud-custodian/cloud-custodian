@@ -2,10 +2,17 @@
 # SPDX-License-Identifier: Apache-2.0
 
 import os
+from unittest.mock import MagicMock
 
 from c7n.exceptions import PolicyValidationError
 
-from ..azure_common import BaseTest, arm_template, cassette_name, requires_arm_polling
+from ..azure_common import (
+    BaseTest,
+    arm_template,
+    cassette_name,
+    requires_arm_polling,
+    strict_cassette,
+)
 
 
 class AiFoundryDeploymentTest(BaseTest):
@@ -36,6 +43,70 @@ class AiFoundryDeploymentTest(BaseTest):
 
         self.assertGreaterEqual(len(resources), 1)
         self.assertTrue(any(r['name'].endswith(deployment_name) for r in resources))
+
+    def test_ai_foundry_deployment_set_capacity_schema_validate(self):
+        with self.sign_out_patch():
+            p = self.load_policy(
+                {
+                    'name': 'test-ai-foundry-deployment-set-capacity',
+                    'resource': 'azure.ai-foundry-deployment',
+                    'actions': [{'type': 'set-capacity', 'capacity': 0}],
+                },
+                validate=True,
+            )
+            self.assertTrue(p)
+
+    def test_ai_foundry_deployment_set_capacity_schema_invalid_negative(self):
+        with self.sign_out_patch():
+            self.assertRaises(
+                PolicyValidationError,
+                self.load_policy,
+                {
+                    'name': 'test-ai-foundry-deployment-set-capacity-invalid',
+                    'resource': 'azure.ai-foundry-deployment',
+                    'actions': [{'type': 'set-capacity', 'capacity': -1}],
+                },
+                validate=True,
+            )
+
+    @strict_cassette('ai-foundry-deployment-set-capacity')
+    @arm_template('cognitive-service-deployment.json')
+    def test_z_ai_foundry_deployment_set_capacity(self):
+        p = self.load_policy(
+            {
+                'name': 'test-azure-ai-foundry-deployment-set-capacity',
+                'resource': 'azure.ai-foundry-deployment',
+                'actions': [{'type': 'set-capacity', 'capacity': 0}],
+            }
+        )
+        resources = p.run()
+        self.assertGreaterEqual(len(resources), 1)
+
+    def test_ai_foundry_deployment_set_capacity_payload(self):
+        with self.sign_out_patch():
+            p = self.load_policy(
+                {
+                    'name': 'test-set-capacity-payload',
+                    'resource': 'azure.ai-foundry-deployment',
+                    'actions': [{'type': 'set-capacity', 'capacity': 42}],
+                }
+            )
+
+        action = p.resource_manager.actions[0]
+        mock_client = MagicMock()
+        action.client = mock_client
+        resource = {
+            'id': '/subscriptions/sub/resourceGroups/rg/providers/'
+                  'Microsoft.CognitiveServices/accounts/acct/deployments/dep',
+            'name': 'dep',
+            'sku': {'name': 'ProvisionedManaged', 'capacity': 100},
+        }
+        action._process_resource(resource)
+
+        call_args = mock_client.resources.begin_update_by_id.call_args[0]
+        payload = call_args[2]
+        self.assertEqual(payload.sku.capacity, 42)
+        self.assertEqual(payload.sku.name, 'ProvisionedManaged')
 
     def test_ai_foundry_deployment_tagging_not_implemented(self):
         with self.assertRaises(PolicyValidationError):
@@ -167,6 +238,44 @@ class AiFoundryCognitiveServiceDeploymentTest(BaseTest):
         resources = p.run()
 
         self.assertEqual(len(resources), 1)
+
+    def test_cognitiveservice_deployment_set_capacity_schema_validate(self):
+        with self.sign_out_patch():
+            p = self.load_policy(
+                {
+                    'name': 'test-cognitiveservice-deployment-set-capacity',
+                    'resource': 'azure.cognitiveservice-deployment',
+                    'actions': [{'type': 'set-capacity', 'capacity': 0}],
+                },
+                validate=True,
+            )
+            self.assertTrue(p)
+
+    def test_cognitiveservice_deployment_set_capacity_schema_invalid_negative(self):
+        with self.sign_out_patch():
+            self.assertRaises(
+                PolicyValidationError,
+                self.load_policy,
+                {
+                    'name': 'test-cognitiveservice-deployment-set-capacity-invalid',
+                    'resource': 'azure.cognitiveservice-deployment',
+                    'actions': [{'type': 'set-capacity', 'capacity': -1}],
+                },
+                validate=True,
+            )
+
+    @strict_cassette('ai-foundry-cognitiveservice-deployment-set-capacity')
+    @arm_template('cognitive-service-deployment.json')
+    def test_z_cognitiveservice_deployment_set_capacity(self):
+        p = self.load_policy(
+            {
+                'name': 'test-cognitiveservice-deployment-set-capacity',
+                'resource': 'azure.cognitiveservice-deployment',
+                'actions': [{'type': 'set-capacity', 'capacity': 0}],
+            }
+        )
+        resources = p.run()
+        self.assertGreaterEqual(len(resources), 1)
 
     def test_cognitiveservice_deployment_tagging_not_implemented(self):
         with self.assertRaises(PolicyValidationError):
