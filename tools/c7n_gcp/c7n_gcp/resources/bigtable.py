@@ -187,8 +187,7 @@ class BigTableInstanceTableGcRuleFilter(ValueFilter):
             filters:
               - type: gc-rule
                 key: columnFamilies.*.gcRule.maxAge
-                op: ne
-                value: null
+                value: not-null
     """
 
     schema = type_schema('gc-rule', rinherit=ValueFilter.schema)
