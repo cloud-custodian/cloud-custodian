@@ -320,7 +320,8 @@ class KMSPolicyAccessDenied(Filter):
             key_id = r.get('TargetKeyId', r.get('KeyId'))
             assert key_id, "Invalid key resources %s" % r
             try:
-                client.get_key_policy(KeyId=key_id, PolicyName='default')
+                self.manager.retry(
+                    client.get_key_policy, KeyId=key_id, PolicyName='default')
             except ClientError as e:
                 if e.response['Error']['Code'] == 'AccessDeniedException':
                     self.log.warning(
