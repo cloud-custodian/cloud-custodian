@@ -8,8 +8,10 @@ from azure.mgmt.resource.resources.models import GenericResource
 from msrestazure.tools import parse_resource_id
 
 from c7n.utils import type_schema
+from c7n_azure import utils
 from c7n_azure.actions.base import AzureBaseAction
 from c7n_azure.provider import resources
+from c7n_azure.query import ChildResourceManager, ChildTypeInfo
 from c7n_azure.resources.arm import ArmResourceManager, ChildArmResourceManager
 
 
@@ -84,6 +86,79 @@ class CognitiveService(ArmResourceManager):
             'sku.name'
         )
         resource_type = 'Microsoft.CognitiveServices/accounts'
+
+
+@resources.register('cognitiveservice-usage')
+class CognitiveServiceUsage(ChildResourceManager):
+    """Cognitive Services account usage and quota metrics.
+
+    :example:
+
+    Find provisioned-capacity metrics that are over quota or blocked.
+
+    .. code-block:: yaml
+
+        policies:
+          - name: cognitiveservice-provisioned-overage
+            resource: azure.cognitiveservice-usage
+            filters:
+              - type: value
+                key: name.value
+                op: contains
+                value: Provisioned
+              - type: value
+                key: status
+                op: in
+                value: [InOverage, Blocked]
+    """
+
+    class resource_type(ChildTypeInfo):
+        doc_groups = ['AI + Machine Learning']
+        service = 'azure.mgmt.cognitiveservices'
+        client = 'CognitiveServicesManagementClient'
+        api_version = '2025-06-01'
+        parent_manager_name = 'cognitiveservice'
+        id = 'c7n:usage-id'
+        name = 'name.value'
+        default_report_fields = (
+            'name.value',
+            'status',
+            'currentValue',
+            'limit',
+            '"c7n:parent-id"',
+        )
+
+    def enumerate_resources(
+        self,
+        parent_resource: dict,
+        type_info: type[ChildTypeInfo],
+        vault_url: str | None = None,
+        **params: object,
+    ) -> list[dict]:
+        session = self.get_session()
+        url = (
+            f'{session.cloud_endpoints.endpoints.resource_manager.rstrip("/")}'
+            f'{parent_resource["id"]}/usages'
+        )
+        query = {'api-version': type_info.api_version}
+        values = []
+        with utils.requests_session(session, max_retries=3) as http:
+            while url:
+                response = http.get(
+                    url,
+                    params=query,
+                    timeout=30,
+                )
+                response.raise_for_status()
+                payload = response.json()
+                for usage in payload['value']:
+                    usage['c7n:usage-id'] = (
+                        f'{parent_resource["id"]}/usages/{usage["name"]["value"]}'
+                    )
+                    values.append(usage)
+                url = payload.get('nextLink')
+                query = None
+        return values
 
 
 @resources.register('ai-foundry-project')
