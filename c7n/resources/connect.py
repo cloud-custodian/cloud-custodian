@@ -18,6 +18,7 @@ class Connect(QueryResourceManager):
         arn_type = 'instance'
         name = "InstanceAlias"
         id = "Id"
+        arn = "Arn"
         universal_taggable = object()
 
     augment = universal_augment
@@ -176,6 +177,7 @@ class ConnectCampaign(QueryResourceManager):
         arn_type = 'campaign'
         name = "name"
         id = "id"
+        arn = "arn"
         permission_prefix = "connect-campaigns"
         universal_taggable = object()
 
