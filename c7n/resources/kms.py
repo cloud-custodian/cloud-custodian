@@ -14,6 +14,7 @@ from c7n.manager import resources
 from c7n.query import (
     ConfigSource, DescribeSource, QueryResourceManager, RetryPageIterator, TypeInfo)
 from c7n.utils import local_session, type_schema, select_keys
+from c7n import tags as tagmod
 from c7n.tags import universal_augment
 
 from .securityhub import PostFinding
@@ -136,6 +137,46 @@ class Key(QueryResourceManager):
         return alias_map
 
 
+class SkipAwsManagedKey:
+    """Mixin for kms-key actions that cannot operate on AWS managed keys
+    (KeyManager == 'AWS', e.g. the keys backing alias/aws/s3,
+    alias/aws/ebs, etc). AWS owns the lifecycle, policy, and rotation of
+    these keys; ScheduleKeyDeletion, key policy changes, rotation
+    changes, and tag mutations are all rejected by the API for them.
+    Filters them out before delegating to the real action and emits a
+    warning so operators know why they were skipped."""
+
+    def process(self, resources):
+        excluded = [r for r in resources if r.get('KeyManager') == 'AWS']
+        if excluded:
+            self.manager.log.warning(
+                "Skipping %d AWS managed key(s) which cannot be modified "
+                "by any customer account",
+                len(excluded))
+        resources = [r for r in resources if r.get('KeyManager') != 'AWS']
+        if not resources:
+            return
+        return super().process(resources)
+
+
+@Key.action_registry.register('mark')
+@Key.action_registry.register('tag')
+class KeyTag(SkipAwsManagedKey, tagmod.UniversalTag):
+    pass
+
+
+@Key.action_registry.register('unmark')
+@Key.action_registry.register('untag')
+@Key.action_registry.register('remove-tag')
+class KeyRemoveTag(SkipAwsManagedKey, tagmod.UniversalUntag):
+    pass
+
+
+@Key.action_registry.register('mark-for-op')
+class KeyMarkForOp(SkipAwsManagedKey, tagmod.UniversalTagDelayedAction):
+    pass
+
+
 @Key.filter_registry.register('key-rotation-status')
 class KeyRotationStatus(ValueFilter):
     """Filters KMS keys by the rotation status
@@ -231,8 +272,15 @@ class KMSCrossAccountAccessFilter(CrossAccountAccessFilter):
         def _augment(r):
             key_id = r.get('TargetKeyId', r.get('KeyId'))
             assert key_id, "Invalid key resources %s" % r
-            r['Policy'] = client.get_key_policy(
-                KeyId=key_id, PolicyName='default')['Policy']
+            try:
+                r['Policy'] = client.get_key_policy(
+                    KeyId=key_id, PolicyName='default')['Policy']
+            except ClientError as e:
+                if e.response['Error']['Code'] == 'AccessDeniedException':
+                    self.log.warning(
+                        "Access denied when getting policy on key:%s", key_id)
+                    return None
+                raise
             return r
 
         self.log.debug("fetching policy for %d kms keys" % len(resources))
@@ -354,7 +402,6 @@ class ResourceKmsKeyAlias(ValueFilter):
         return matched
 
 
-@Key.action_registry.register('remove-statements')
 @KeyAlias.action_registry.register('remove-statements')
 class RemovePolicyStatement(RemovePolicyBase):
     """Action to remove policy statements from KMS
@@ -421,8 +468,12 @@ class RemovePolicyStatement(RemovePolicyBase):
                 'Statements': found}
 
 
-@Key.action_registry.register('set-rotation')
-class KmsKeyRotation(BaseAction):
+@Key.action_registry.register('remove-statements')
+class KeyRemovePolicyStatement(SkipAwsManagedKey, RemovePolicyStatement):
+    pass
+
+
+class _KmsKeyRotationBase(BaseAction):
     """Toggle KMS key rotation
 
     :example:
@@ -450,6 +501,11 @@ class KmsKeyRotation(BaseAction):
                 client.enable_key_rotation(KeyId=k['KeyId'])
                 continue
             client.disable_key_rotation(KeyId=k['KeyId'])
+
+
+@Key.action_registry.register('set-rotation')
+class KmsKeyRotation(SkipAwsManagedKey, _KmsKeyRotationBase):
+    pass
 
 
 @KeyAlias.action_registry.register('post-finding')
@@ -648,8 +704,7 @@ class LastUsage(ListItemFilter):
         return [result]
 
 
-@Key.action_registry.register("schedule-deletion")
-class KmsKeyScheduleDeletion(BaseAction):
+class _KmsKeyScheduleDeletionBase(BaseAction):
     """Schedule KMS key deletion
 
     If the number of days is not specified, the default value of 30 days is used.
@@ -682,3 +737,8 @@ class KmsKeyScheduleDeletion(BaseAction):
             client.schedule_key_deletion(
                 KeyId=k["KeyId"], PendingWindowInDays=self.data.get("days", 30)
             )
+
+
+@Key.action_registry.register("schedule-deletion")
+class KmsKeyScheduleDeletion(SkipAwsManagedKey, _KmsKeyScheduleDeletionBase):
+    pass

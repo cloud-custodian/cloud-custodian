@@ -29,6 +29,7 @@ import threading
 import os
 import socket
 import ssl
+import time
 from contextlib import nullcontext as no_rate_limiter
 from urllib.error import URLError
 
@@ -43,6 +44,8 @@ import httplib2
 from pyrate_limiter import Limiter, RequestRate
 
 from retrying import retry
+
+from c7n.output import APICallStats, api_stats_outputs, record_api_call
 
 
 HTTPLIB_CA_BUNDLE = os.environ.get('HTTPLIB_CA_BUNDLE')
@@ -76,6 +79,16 @@ def get_default_project():
               'GOOGLE_CLOUD_PROJECT', 'CLOUDSDK_CORE_PROJECT'):
         if k in os.environ:
             return os.environ[k]
+
+
+def get_workspace_subject() -> str | None:
+    """Workspace admin to impersonate via domain-wide delegation."""
+    return os.environ.get('GOOGLE_WORKSPACE_SUBJECT')
+
+
+def get_workspace_customer() -> str:
+    """Workspace customer id; 'my_customer' is the subject's own account."""
+    return os.environ.get('GOOGLE_WORKSPACE_CUSTOMER', 'my_customer')
 
 
 class PaginationNotSupported(Exception):
@@ -254,12 +267,18 @@ class Session:
                 - cache_discovery (bool): Whether to cache discovery docs
                 - client_options (ClientOptions): Custom client options for
                   location-specific endpoints
+                - scopes (tuple): OAuth scopes for APIs not covered by the
+                  session wide cloud-platform scope
 
         Returns:
             object: An instance of repository_class.
         """
+        credentials = self._credentials
+        if kw.get('scopes'):
+            credentials = self._scoped_credentials(kw['scopes'])
+
         service = _create_service_api(
-            self._credentials,
+            credentials,
             service_name,
             version,
             kw.get('developer_key'),
@@ -270,10 +289,41 @@ class Session:
         return ServiceClient(
             gcp_service=service,
             component=component,
-            credentials=self._credentials,
+            credentials=credentials,
             rate_limiter=self._rate_limiter,
-            use_cached_http=self._use_cached_http,
+            # The thread cached http is authorized with the session
+            # credentials, so a client using its own credentials can't share
+            # it.
+            use_cached_http=(
+                self._use_cached_http and credentials is self._credentials),
             http=self._http)
+
+    def _scoped_credentials(self, scopes):
+        """Credentials for an API needing its own scopes and, for Google
+        Workspace, a delegated subject.
+
+        Workspace (Admin SDK) APIs are authorized by domain wide
+        delegation: a service account impersonates a user (the
+        "subject"), who holds needed workspace admin privileges. The
+        service account key is required because with_subject self
+        signs a JWT.
+
+        Credentials that carry fixed scopes, such as the authorized_user
+        credentials used by flight data replay, are returned unchanged.
+        """
+        credentials = self._credentials
+        if hasattr(credentials, 'with_scopes'):
+            credentials = credentials.with_scopes(list(scopes))
+
+        subject = get_workspace_subject()
+        if not subject:
+            return credentials
+        if not hasattr(credentials, 'with_subject'):
+            raise ValueError(
+                "GOOGLE_WORKSPACE_SUBJECT requires service account "
+                "credentials supporting domain wide delegation, got %s" % (
+                    type(credentials).__name__,))
+        return credentials.with_subject(subject)
 
 
 # pylint: disable=too-many-instance-attributes, too-many-arguments
@@ -505,11 +555,27 @@ class ServiceClient:
         request = self._build_request(verb, verb_arguments)
         return self._execute(request)
 
+    def _execute(self, request):
+        """Run execute with retries and rate limiting, recording the api call.
+
+        Args:
+            request (object): The HttpRequest object to execute.
+
+        Returns:
+            dict: The response from the API.
+        """
+        start = time.perf_counter()
+        try:
+            return self._execute_with_retry(request)
+        finally:
+            # e.g. compute.instances.list, once per call however many attempts
+            record_api_call(request.methodId, time.perf_counter() - start)
+
     @retry(retry_on_exception=is_retryable_exception,
            wait_exponential_multiplier=1000,
            wait_exponential_max=10000,
            stop_max_attempt_number=5)
-    def _execute(self, request):
+    def _execute_with_retry(self, request):
         """Run execute with retries and rate limiting.
 
         Args:
@@ -520,3 +586,8 @@ class ServiceClient:
         """
         with self._rate_limiter:
             return request.execute(http=self.http, num_retries=self._num_retries)
+
+
+@api_stats_outputs.register('gcp')
+class ApiStats(APICallStats):
+    """Count gcp api calls by method id, e.g. compute.instances.list, and their time."""

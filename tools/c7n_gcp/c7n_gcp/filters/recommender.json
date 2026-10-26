@@ -39,10 +39,10 @@
     "category": "Cost",
     "permission_prefix": "recommender.cloudsqlOverprovisionedInstanceRecommendations"
   },
-  "google.compute.commitment.UsageCommitmentRecommendergoogle.cloudbilling.commitment.SpendBasedCommitmentRecommender": {
+  "google.compute.commitment.UsageCommitmentRecommender": {
     "name": "Committed use discount recommender",
     "resource": "gcp.compute-project",
-    "id": "google.compute.commitment.UsageCommitmentRecommendergoogle.cloudbilling.commitment.SpendBasedCommitmentRecommender",
+    "id": "google.compute.commitment.UsageCommitmentRecommender",
     "description": "Reduce costs thru commitments",
     "category": "Cost",
     "permission_prefix": "recommender.usageCommitmentRecommendations"

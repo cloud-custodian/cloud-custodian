@@ -1,0 +1,180 @@
+{
+    "pytest-terraform": 1,
+    "outputs": {},
+    "resources": {
+        "google_logging_project_sink": {
+            "base": {
+                "bigquery_options": [],
+                "custom_writer_identity": null,
+                "deletion_policy": "DELETE",
+                "description": "",
+                "destination": "logging.googleapis.com/projects/cloud-custodian/locations/global/buckets/_Default",
+                "disabled": false,
+                "exclusions": [],
+                "filter": "severity>=ERROR",
+                "id": "projects/cloud-custodian/sinks/c7n-sink-overlap-base",
+                "name": "c7n-sink-overlap-base",
+                "project": "cloud-custodian",
+                "unique_writer_identity": true,
+                "writer_identity": ""
+            },
+            "base_copy": {
+                "bigquery_options": [],
+                "custom_writer_identity": null,
+                "deletion_policy": "DELETE",
+                "description": "",
+                "destination": "logging.googleapis.com/projects/cloud-custodian/locations/global/buckets/_Default",
+                "disabled": false,
+                "exclusions": [],
+                "filter": "severity>=ERROR",
+                "id": "projects/cloud-custodian/sinks/c7n-sink-overlap-base-copy",
+                "name": "c7n-sink-overlap-base-copy",
+                "project": "cloud-custodian",
+                "unique_writer_identity": true,
+                "writer_identity": ""
+            },
+            "disabled": {
+                "bigquery_options": [],
+                "custom_writer_identity": null,
+                "deletion_policy": "DELETE",
+                "description": "",
+                "destination": "logging.googleapis.com/projects/cloud-custodian/locations/global/buckets/_Default",
+                "disabled": true,
+                "exclusions": [],
+                "filter": "severity>=ERROR",
+                "id": "projects/cloud-custodian/sinks/c7n-sink-overlap-disabled",
+                "name": "c7n-sink-overlap-disabled",
+                "project": "cloud-custodian",
+                "unique_writer_identity": true,
+                "writer_identity": ""
+            },
+            "exclusion_all": {
+                "bigquery_options": [],
+                "custom_writer_identity": null,
+                "deletion_policy": "DELETE",
+                "description": "",
+                "destination": "logging.googleapis.com/projects/cloud-custodian/locations/global/buckets/_Default",
+                "disabled": false,
+                "exclusions": [
+                    {
+                        "description": "",
+                        "disabled": false,
+                        "filter": "severity>=ERROR",
+                        "name": "all"
+                    }
+                ],
+                "filter": "severity>=ERROR",
+                "id": "projects/cloud-custodian/sinks/c7n-sink-overlap-excl-all",
+                "name": "c7n-sink-overlap-excl-all",
+                "project": "cloud-custodian",
+                "unique_writer_identity": true,
+                "writer_identity": ""
+            },
+            "exclusion_partial": {
+                "bigquery_options": [],
+                "custom_writer_identity": null,
+                "deletion_policy": "DELETE",
+                "description": "",
+                "destination": "logging.googleapis.com/projects/cloud-custodian/locations/global/buckets/_Default",
+                "disabled": false,
+                "exclusions": [
+                    {
+                        "description": "",
+                        "disabled": false,
+                        "filter": "resource.type=\"gce_instance\"",
+                        "name": "gce"
+                    }
+                ],
+                "filter": "severity>=ERROR",
+                "id": "projects/cloud-custodian/sinks/c7n-sink-overlap-excl-partial",
+                "name": "c7n-sink-overlap-excl-partial",
+                "project": "cloud-custodian",
+                "unique_writer_identity": true,
+                "writer_identity": ""
+            },
+            "non_match": {
+                "bigquery_options": [],
+                "custom_writer_identity": null,
+                "deletion_policy": "DELETE",
+                "description": "",
+                "destination": "logging.googleapis.com/projects/cloud-custodian/locations/global/buckets/_Default",
+                "disabled": false,
+                "exclusions": [],
+                "filter": "severity<ERROR",
+                "id": "projects/cloud-custodian/sinks/c7n-sink-overlap-non-match",
+                "name": "c7n-sink-overlap-non-match",
+                "project": "cloud-custodian",
+                "unique_writer_identity": true,
+                "writer_identity": ""
+            },
+            "not_clause": {
+                "bigquery_options": [],
+                "custom_writer_identity": null,
+                "deletion_policy": "DELETE",
+                "description": "",
+                "destination": "logging.googleapis.com/projects/cloud-custodian/locations/global/buckets/_Default",
+                "disabled": false,
+                "exclusions": [],
+                "filter": "severity>=ERROR AND NOT resource.type=\"gce_instance\"",
+                "id": "projects/cloud-custodian/sinks/c7n-sink-overlap-not-clause",
+                "name": "c7n-sink-overlap-not-clause",
+                "project": "cloud-custodian",
+                "unique_writer_identity": true,
+                "writer_identity": ""
+            },
+            "other_destination": {
+                "bigquery_options": [],
+                "custom_writer_identity": null,
+                "deletion_policy": "DELETE",
+                "description": "",
+                "destination": "pubsub.googleapis.com/projects/cloud-custodian/topics/c7n-sink-overlap-other",
+                "disabled": false,
+                "exclusions": [],
+                "filter": "severity>=ERROR",
+                "id": "projects/cloud-custodian/sinks/c7n-sink-overlap-other-dest",
+                "name": "c7n-sink-overlap-other-dest",
+                "project": "cloud-custodian",
+                "unique_writer_identity": true,
+                "writer_identity": "serviceAccount:service-12345678901@gcp-sa-logging.iam.gserviceaccount.com"
+            },
+            "subset": {
+                "bigquery_options": [],
+                "custom_writer_identity": null,
+                "deletion_policy": "DELETE",
+                "description": "",
+                "destination": "logging.googleapis.com/projects/cloud-custodian/locations/global/buckets/_Default",
+                "disabled": false,
+                "exclusions": [],
+                "filter": "severity>=CRITICAL",
+                "id": "projects/cloud-custodian/sinks/c7n-sink-overlap-subset",
+                "name": "c7n-sink-overlap-subset",
+                "project": "cloud-custodian",
+                "unique_writer_identity": true,
+                "writer_identity": ""
+            }
+        },
+        "google_pubsub_topic": {
+            "other": {
+                "deletion_policy": "DELETE",
+                "effective_labels": {
+                    "goog-terraform-provisioned": "true"
+                },
+                "id": "projects/cloud-custodian/topics/c7n-sink-overlap-other",
+                "ingestion_data_source_settings": [],
+                "kms_key_name": "",
+                "labels": null,
+                "message_retention_duration": "",
+                "message_storage_policy": [],
+                "message_transforms": [],
+                "name": "c7n-sink-overlap-other",
+                "project": "cloud-custodian",
+                "schema_settings": [],
+                "tags": null,
+                "terraform_labels": {
+                    "goog-terraform-provisioned": "true"
+                },
+                "timeouts": null
+            }
+        }
+    }
+}

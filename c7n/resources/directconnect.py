@@ -7,6 +7,8 @@ from c7n.query import QueryResourceManager, TypeInfo, DescribeWithResourceTags
 @resources.register('directconnect')
 class DirectConnect(QueryResourceManager):
 
+    source_mapping = {"describe": DescribeWithResourceTags}
+
     class resource_type(TypeInfo):
         service = 'directconnect'
         enum_spec = ('describe_connections', 'connections', None)

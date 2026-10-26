@@ -1,0 +1,62 @@
+{
+    "pytest-terraform": 1,
+    "outputs": {},
+    "resources": {
+        "google_kms_crypto_key": {
+            "c7n_test_key": {
+                "crypto_key_backend": "",
+                "deletion_policy": "DELETE",
+                "destroy_scheduled_duration": "2592000s",
+                "effective_labels": {
+                    "env": "default",
+                    "goog-terraform-provisioned": "true"
+                },
+                "id": "projects/cloud-custodian/locations/us-central1/keyRings/c7n-test-keyring-redfish/cryptoKeys/c7n-test-cryptokey",
+                "import_only": false,
+                "key_ring": "projects/cloud-custodian/locations/us-central1/keyRings/c7n-test-keyring-redfish",
+                "labels": {
+                    "env": "default"
+                },
+                "name": "c7n-test-cryptokey",
+                "primary": [
+                    {
+                        "name": "projects/cloud-custodian/locations/us-central1/keyRings/c7n-test-keyring-redfish/cryptoKeys/c7n-test-cryptokey/cryptoKeyVersions/1",
+                        "state": "ENABLED"
+                    }
+                ],
+                "purpose": "ENCRYPT_DECRYPT",
+                "rotation_period": "",
+                "skip_initial_version_creation": false,
+                "terraform_labels": {
+                    "env": "default",
+                    "goog-terraform-provisioned": "true"
+                },
+                "timeouts": null,
+                "version_template": [
+                    {
+                        "algorithm": "GOOGLE_SYMMETRIC_ENCRYPTION",
+                        "protection_level": "SOFTWARE"
+                    }
+                ]
+            }
+        },
+        "google_kms_key_ring": {
+            "c7n_test": {
+                "id": "projects/cloud-custodian/locations/us-central1/keyRings/c7n-test-keyring-redfish",
+                "location": "us-central1",
+                "name": "c7n-test-keyring-redfish",
+                "project": "stkl-jim-fulton",
+                "timeouts": null
+            }
+        },
+        "random_pet": {
+            "keyring": {
+                "id": "redfish",
+                "keepers": null,
+                "length": 1,
+                "prefix": null,
+                "separator": "-"
+            }
+        }
+    }
+}

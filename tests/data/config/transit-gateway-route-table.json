@@ -1,0 +1,20 @@
+{
+    "version": "1.3",
+    "accountId": "644160558196",
+    "configurationItemCaptureTime": "2026-10-21T21:12:31.000Z",
+    "configurationItemStatus": "ResourceDiscovered",
+    "configurationStateId": "1792617151000",
+    "arn": "arn:aws:ec2:us-east-2:644160558196:transit-gateway-route-table/tgw-rtb-00000000000000002",
+    "resourceType": "AWS::EC2::TransitGatewayRouteTable",
+    "resourceId": "tgw-rtb-00000000000000002",
+    "awsRegion": "us-east-2",
+    "tags": {
+        "Name": "c7n-test-available-rt"
+    },
+    "relationships": [],
+    "configuration": {
+        "Id": "tgw-rtb-00000000000000002",
+        "TransitGatewayId": "tgw-00000000000000001"
+    },
+    "supplementaryConfiguration": {}
+}

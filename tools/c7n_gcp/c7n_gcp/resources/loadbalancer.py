@@ -1,11 +1,17 @@
 # Copyright The Cloud Custodian Authors.
 # SPDX-License-Identifier: Apache-2.0
+import logging
 import re
 
+from googleapiclient.errors import HttpError
+
+from c7n.filters.core import ValueFilter
 from c7n.utils import type_schema, local_session
 from c7n_gcp.actions import MethodAction
 from c7n_gcp.provider import resources
 from c7n_gcp.query import QueryResourceManager, TypeInfo
+
+log = logging.getLogger('custodian.gcp.loadbalancer')
 
 
 @resources.register('loadbalancer-address')
@@ -271,6 +277,93 @@ class LoadBalancingTargetHttpsProxy(QueryResourceManager):
                 'project': resource_info['project_id'],
                 'targetHttpsProxy': resource_info[
                     'resourceName'].rsplit('/', 1)[-1]})
+
+
+@LoadBalancingTargetHttpsProxy.filter_registry.register('ssl-policy')
+@LoadBalancingTargetSslProxy.filter_registry.register('ssl-policy')
+class TargetProxySslPolicyFilter(ValueFilter):
+    """Filter target proxies by the SSL policy attached to them.
+
+    The SSL policy named in the proxy's ``sslPolicy`` field is fetched and
+    the value filter is applied to it. A proxy with no ``sslPolicy`` does
+    not match this filter. Such a proxy uses the GCP default SSL policy,
+    which can be found with a ``sslPolicy: absent`` value filter.
+
+    Note that inside a ``not`` block a proxy with no ``sslPolicy`` fails
+    every ``ssl-policy`` check, so the ``not`` makes it match.
+
+    https://cloud.google.com/compute/docs/reference/rest/v1/sslPolicies
+
+    :example:
+
+    Find HTTPS proxies whose SSL policy uses the COMPATIBLE profile
+
+    .. code-block:: yaml
+
+        policies:
+          - name: https-proxy-weak-ssl-policy
+            resource: gcp.loadbalancer-target-https-proxy
+            filters:
+              - type: ssl-policy
+                key: profile
+                value: COMPATIBLE
+
+    :example:
+
+    Find SSL proxies that use the GCP default SSL policy or an SSL policy
+    that allows TLS versions older than 1.2
+
+    .. code-block:: yaml
+
+        policies:
+          - name: ssl-proxy-old-tls
+            resource: gcp.loadbalancer-target-ssl-proxy
+            filters:
+              - or:
+                - type: value
+                  key: sslPolicy
+                  value: absent
+                - type: ssl-policy
+                  key: minTlsVersion
+                  op: ne
+                  value: TLS_1_2
+    """
+
+    schema = type_schema('ssl-policy', rinherit=ValueFilter.schema)
+    permissions = ('compute.sslPolicies.get',)
+    annotation_key = 'c7n:ssl-policy'
+    policy_link = re.compile(r'.*projects/([^/]+)/global/sslPolicies/([^/]+)$')
+
+    def __init__(self, data, manager=None):
+        super().__init__(data, manager)
+        # ssl policy selfLink -> fetched policy, so proxies sharing a
+        # policy only fetch it once.
+        self.ssl_policies = {}
+
+    def __call__(self, proxy):
+        if self.annotation_key not in proxy:
+            link = proxy.get('sslPolicy')
+            if not link:
+                return False
+            if link not in self.ssl_policies:
+                self.ssl_policies[link] = self.get_ssl_policy(link)
+            if self.ssl_policies[link] is None:
+                return False
+            proxy[self.annotation_key] = self.ssl_policies[link]
+        return super().__call__(proxy[self.annotation_key])
+
+    def get_ssl_policy(self, link):
+        project, name = self.policy_link.match(link).groups()
+        session = local_session(self.manager.session_factory)
+        client = session.client('compute', 'v1', 'sslPolicies')
+        try:
+            return client.execute_command(
+                'get', {'project': project, 'sslPolicy': name})
+        except HttpError as e:
+            if e.resp.status != 404:
+                raise
+            log.warning("ssl policy not found: %s", link)
+            return None
 
 
 @resources.register('loadbalancer-backend-bucket')

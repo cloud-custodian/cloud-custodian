@@ -1,0 +1,240 @@
+{
+    "pytest-terraform": 1,
+    "outputs": {},
+    "resources": {
+        "google_dataproc_cluster": {
+            "default": {
+                "cluster_config": [
+                    {
+                        "autoscaling_config": [],
+                        "auxiliary_node_groups": [],
+                        "bucket": "dataproc-staging-us-east1-693936050605-v0rw1hor",
+                        "cluster_tier": "",
+                        "cluster_type": "",
+                        "dataproc_metric_config": [],
+                        "encryption_config": [],
+                        "endpoint_config": [
+                            {
+                                "enable_http_port_access": false,
+                                "http_ports": {}
+                            }
+                        ],
+                        "engine": "",
+                        "gce_cluster_config": [
+                            {
+                                "confidential_instance_config": [],
+                                "internal_ip_only": false,
+                                "metadata": {},
+                                "network": "https://www.googleapis.com/compute/v1/projects/cloud-custodian/global/networks/default",
+                                "node_group_affinity": [],
+                                "reservation_affinity": [],
+                                "resource_manager_tags": {},
+                                "service_account": "",
+                                "service_account_scopes": [
+                                    "https://www.googleapis.com/auth/cloud-platform"
+                                ],
+                                "shielded_instance_config": [
+                                    {
+                                        "enable_integrity_monitoring": true,
+                                        "enable_secure_boot": true,
+                                        "enable_vtpm": true
+                                    }
+                                ],
+                                "subnetwork": "",
+                                "tags": null,
+                                "zone": "us-east1-b"
+                            }
+                        ],
+                        "initialization_action": [],
+                        "lifecycle_config": [],
+                        "master_config": [
+                            {
+                                "accelerators": [],
+                                "disk_config": [
+                                    {
+                                        "boot_disk_provisioned_iops": 0,
+                                        "boot_disk_provisioned_throughput": 0,
+                                        "boot_disk_size_gb": 30,
+                                        "boot_disk_type": "pd-standard",
+                                        "local_ssd_interface": "",
+                                        "num_local_ssds": 0
+                                    }
+                                ],
+                                "image_uri": "https://www.googleapis.com/compute/v1/projects/cloud-custodian/global/images/dataproc-2-2-deb12-20260619-045100-rc01",
+                                "instance_flexibility_policy": [
+                                    {
+                                        "instance_selection_list": null,
+                                        "instance_selection_results": null
+                                    }
+                                ],
+                                "instance_names": [
+                                    "c7n-test-f4c79164-m"
+                                ],
+                                "machine_type": "e2-medium",
+                                "min_cpu_platform": "AUTOMATIC",
+                                "num_instances": 1
+                            }
+                        ],
+                        "metastore_config": [],
+                        "preemptible_worker_config": [
+                            {
+                                "disk_config": [
+                                    {
+                                        "boot_disk_provisioned_iops": null,
+                                        "boot_disk_provisioned_throughput": null,
+                                        "boot_disk_size_gb": null,
+                                        "boot_disk_type": null,
+                                        "local_ssd_interface": null,
+                                        "num_local_ssds": null
+                                    }
+                                ],
+                                "instance_flexibility_policy": [
+                                    {
+                                        "instance_selection_list": null,
+                                        "instance_selection_results": null,
+                                        "provisioning_model_mix": null
+                                    }
+                                ],
+                                "instance_names": [],
+                                "num_instances": 0,
+                                "preemptibility": ""
+                            }
+                        ],
+                        "security_config": [],
+                        "software_config": [
+                            {
+                                "image_version": "2.2.84-debian12",
+                                "optional_components": [],
+                                "override_properties": {},
+                                "properties": {
+                                    "capacity-scheduler:yarn.scheduler.capacity.resource-calculator": "org.apache.hadoop.yarn.util.resource.DominantResourceCalculator",
+                                    "capacity-scheduler:yarn.scheduler.capacity.root.default.ordering-policy": "fair",
+                                    "core:fs.gs.block.size": "134217728",
+                                    "core:fs.gs.metadata.cache.enable": "false",
+                                    "core:fs.gs.operation.move.enable": "true",
+                                    "core:hadoop.ssl.enabled.protocols": "TLSv1,TLSv1.1,TLSv1.2",
+                                    "distcp:mapreduce.map.java.opts": "-Xmx576m",
+                                    "distcp:mapreduce.map.memory.mb": "768",
+                                    "distcp:mapreduce.reduce.java.opts": "-Xmx576m",
+                                    "distcp:mapreduce.reduce.memory.mb": "768",
+                                    "hadoop-env:HADOOP_DATANODE_OPTS": "-Xmx512m",
+                                    "hdfs:dfs.datanode.address": "0.0.0.0:9866",
+                                    "hdfs:dfs.datanode.http.address": "0.0.0.0:9864",
+                                    "hdfs:dfs.datanode.https.address": "0.0.0.0:9865",
+                                    "hdfs:dfs.datanode.ipc.address": "0.0.0.0:9867",
+                                    "hdfs:dfs.namenode.handler.count": "20",
+                                    "hdfs:dfs.namenode.http-address": "0.0.0.0:9870",
+                                    "hdfs:dfs.namenode.https-address": "0.0.0.0:9871",
+                                    "hdfs:dfs.namenode.lifeline.rpc-address": "c7n-test-f4c79164-m:8050",
+                                    "hdfs:dfs.namenode.secondary.http-address": "0.0.0.0:9868",
+                                    "hdfs:dfs.namenode.secondary.https-address": "0.0.0.0:9869",
+                                    "hdfs:dfs.namenode.service.handler.count": "10",
+                                    "hdfs:dfs.namenode.servicerpc-address": "c7n-test-f4c79164-m:8051",
+                                    "mapred-env:HADOOP_JOB_HISTORYSERVER_HEAPSIZE": "1024",
+                                    "mapred:mapreduce.job.maps": "9",
+                                    "mapred:mapreduce.job.reduce.slowstart.completedmaps": "0.95",
+                                    "mapred:mapreduce.job.reduces": "1",
+                                    "mapred:mapreduce.jobhistory.recovery.store.class": "org.apache.hadoop.mapreduce.v2.hs.HistoryServerLeveldbStateStoreService",
+                                    "mapred:mapreduce.map.cpu.vcores": "1",
+                                    "mapred:mapreduce.map.java.opts": "-Xmx1311m",
+                                    "mapred:mapreduce.map.memory.mb": "1639",
+                                    "mapred:mapreduce.reduce.cpu.vcores": "2",
+                                    "mapred:mapreduce.reduce.java.opts": "-Xmx2622m",
+                                    "mapred:mapreduce.reduce.memory.mb": "3278",
+                                    "mapred:mapreduce.task.io.sort.mb": "256",
+                                    "mapred:yarn.app.mapreduce.am.command-opts": "-Xmx1311m",
+                                    "mapred:yarn.app.mapreduce.am.resource.cpu-vcores": "1",
+                                    "mapred:yarn.app.mapreduce.am.resource.mb": "1639",
+                                    "spark-env:SPARK_DAEMON_MEMORY": "1024m",
+                                    "spark:spark.driver.maxResultSize": "512m",
+                                    "spark:spark.driver.memory": "1024m",
+                                    "spark:spark.executor.cores": "1",
+                                    "spark:spark.executor.instances": "2",
+                                    "spark:spark.executor.memory": "1255m",
+                                    "spark:spark.executorEnv.OPENBLAS_NUM_THREADS": "1",
+                                    "spark:spark.plugins.defaultList": "com.google.cloud.dataproc.DataprocSparkPlugin",
+                                    "spark:spark.scheduler.mode": "FAIR",
+                                    "spark:spark.sql.cbo.enabled": "true",
+                                    "spark:spark.sql.optimizer.runtime.bloomFilter.join.pattern.enabled": "true",
+                                    "spark:spark.ui.port": "0",
+                                    "spark:spark.yarn.am.memory": "640m",
+                                    "yarn-env:YARN_NODEMANAGER_HEAPSIZE": "409",
+                                    "yarn-env:YARN_RESOURCEMANAGER_HEAPSIZE": "1024",
+                                    "yarn-env:YARN_TIMELINESERVER_HEAPSIZE": "1024",
+                                    "yarn:yarn.nodemanager.address": "0.0.0.0:8026",
+                                    "yarn:yarn.nodemanager.resource.cpu-vcores": "2",
+                                    "yarn:yarn.nodemanager.resource.memory-mb": "3278",
+                                    "yarn:yarn.resourcemanager.decommissioning-nodes-watcher.decommission-if-no-shuffle-data": "true",
+                                    "yarn:yarn.resourcemanager.nodemanager-graceful-decommission-timeout-secs": "86400",
+                                    "yarn:yarn.scheduler.maximum-allocation-mb": "3278",
+                                    "yarn:yarn.scheduler.minimum-allocation-mb": "1"
+                                }
+                            }
+                        ],
+                        "staging_bucket": "",
+                        "temp_bucket": "dataproc-temp-us-east1-693936050605-xolpqygx",
+                        "worker_config": [
+                            {
+                                "accelerators": [],
+                                "disk_config": [
+                                    {
+                                        "boot_disk_provisioned_iops": 0,
+                                        "boot_disk_provisioned_throughput": 0,
+                                        "boot_disk_size_gb": 30,
+                                        "boot_disk_type": "pd-standard",
+                                        "local_ssd_interface": "",
+                                        "num_local_ssds": 0
+                                    }
+                                ],
+                                "image_uri": "https://www.googleapis.com/compute/v1/projects/cloud-custodian/global/images/dataproc-2-2-deb12-20260619-045100-rc01",
+                                "instance_flexibility_policy": [
+                                    {
+                                        "instance_selection_list": null,
+                                        "instance_selection_results": null
+                                    }
+                                ],
+                                "instance_names": [
+                                    "c7n-test-f4c79164-w-0",
+                                    "c7n-test-f4c79164-w-1"
+                                ],
+                                "machine_type": "e2-medium",
+                                "min_cpu_platform": "AUTOMATIC",
+                                "min_num_instances": 0,
+                                "num_instances": 2
+                            }
+                        ]
+                    }
+                ],
+                "deletion_policy": "DELETE",
+                "effective_labels": {
+                    "goog-dataproc-cluster-create-timestamp": "1784039146",
+                    "goog-dataproc-cluster-name": "c7n-test-f4c79164",
+                    "goog-dataproc-cluster-uuid": "879e0c1f-07cc-419f-8a29-918e62c6a80a",
+                    "goog-dataproc-drz-resource-uuid": "cluster-879e0c1f-07cc-419f-8a29-918e62c6a80a",
+                    "goog-dataproc-location": "us-east1"
+                },
+                "graceful_decommission_timeout": "0s",
+                "id": "projects/cloud-custodian/regions/us-east1/clusters/c7n-test-f4c79164",
+                "labels": null,
+                "name": "c7n-test-f4c79164",
+                "project": "cloud-custodian",
+                "region": "us-east1",
+                "terraform_labels": {},
+                "timeouts": null,
+                "virtual_cluster_config": []
+            }
+        },
+        "random_id": {
+            "suffix": {
+                "b64_std": "9MeRZA==",
+                "b64_url": "9MeRZA",
+                "byte_length": 4,
+                "dec": "4106719588",
+                "hex": "f4c79164",
+                "id": "9MeRZA",
+                "keepers": null,
+                "prefix": null
+            }
+        }
+    }
+}

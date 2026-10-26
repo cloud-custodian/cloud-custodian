@@ -236,3 +236,116 @@ class AddPolicy(BaseAction):
 
         for s in subscriptions:
             self._add_policy(s)
+
+
+@Subscription.action_registry.register('set-activity-log-alert')
+class SetActivityLogAlert(BaseAction):
+    """Create or update an activity log alert on the subscription.
+
+    The alert watches the subscription's activity log and fires when an event
+    matches every entry in ``conditions``. It is identified by ``resource-group``
+    and ``name``. If that alert already exists it is replaced as a whole: its tags,
+    and any action groups or description the policy doesn't set, are removed.
+
+    - ``name``: the alert's name.
+    - ``resource-group``: the resource group to create the alert in. It must
+      already exist.
+    - ``conditions``: a list of ``field`` and ``equals`` pairs. An event must
+      match all of them to fire the alert.
+    - ``action-groups``: optional list of action group IDs to notify. Defaults
+      to none.
+    - ``description``: optional description for the alert.
+    - ``enabled``: optional, defaults to ``true``.
+
+    Needs ``Microsoft.Insights/ActivityLogAlerts/Write`` on the resource group.
+
+    :example:
+
+    Create an alert for network security group writes on any subscription that
+    doesn't have one:
+
+    .. code-block:: yaml
+
+        policies:
+          - name: azure-subscription-nsg-write-alert
+            resource: azure.subscription
+            filters:
+              - type: missing
+                policy:
+                  resource: azure.alert-logs
+                  filters:
+                    - type: value
+                      key: "properties.condition.allOf[].join('=', [field, equals]) | sort(@)"
+                      op: eq
+                      value:
+                        - category=Administrative
+                        - operationName=Microsoft.Network/networkSecurityGroups/write
+            actions:
+              - type: set-activity-log-alert
+                name: nsg-write-alert
+                resource-group: my-alerts-rg
+                conditions:
+                  - field: category
+                    equals: Administrative
+                  - field: operationName
+                    equals: Microsoft.Network/networkSecurityGroups/write
+    """
+
+    schema = type_schema(
+        'set-activity-log-alert',
+        required=['name', 'resource-group', 'conditions'],
+        name={'type': 'string', 'minLength': 1, 'maxLength': 260},
+        conditions={
+            'type': 'array',
+            'minItems': 1,
+            'items': {
+                'type': 'object',
+                'additionalProperties': False,
+                'required': ['field', 'equals'],
+                'properties': {
+                    'field': {'type': 'string', 'minLength': 1},
+                    'equals': {'type': 'string', 'minLength': 1},
+                },
+            },
+        },
+        description={'type': 'string'},
+        enabled={'type': 'boolean'},
+        **{
+            'resource-group': {'type': 'string', 'minLength': 1, 'maxLength': 90},
+            'action-groups': {
+                'type': 'array',
+                'uniqueItems': True,
+                'items': {'type': 'string', 'minLength': 1},
+            },
+        }
+    )
+
+    def alert_body(self, subscription):
+        """Return the request body that creates the alert on ``subscription``."""
+        properties = {
+            'scopes': [subscription['id']],
+            'condition': {'allOf': self.data['conditions']},
+            'actions': {'actionGroups': [
+                {'actionGroupId': group_id}
+                for group_id in self.data.get('action-groups', [])
+            ]},
+            'enabled': self.data.get('enabled', True),
+        }
+        if 'description' in self.data:
+            properties['description'] = self.data['description']
+        # The REST API's own request shape, so the body doesn't depend on the
+        # SDK reshaping a flattened dict.
+        return {'location': 'Global', 'properties': properties}
+
+    def process(self, subscriptions):
+        client = self.manager.get_session().client(
+            'azure.mgmt.monitor.MonitorManagementClient')
+
+        for s in subscriptions:
+            # Positional on purpose: the body parameter's name differs between
+            # azure-mgmt-monitor major versions.
+            client.activity_log_alerts.create_or_update(
+                self.data['resource-group'], self.data['name'], self.alert_body(s))
+            self.log.info(
+                "Set activity log alert %s in resource group %s on subscription %s",
+                self.data['name'], self.data['resource-group'], s['subscriptionId'])

@@ -32,6 +32,52 @@ def test_apigwv2_stage_query(test, apigatewayv2_stage):
     ]
 
 
+@terraform("apigatewayv2_route")
+def test_apigwv2_route_query(test, apigatewayv2_route):
+    factory = test.replay_flight_data("test_apigwv2_route_query")
+
+    policy = test.load_policy({
+        "name": "test-aws-apigwv2-route",
+        "resource": "aws.apigwv2-route"
+    }, session_factory=factory)
+
+    resources = policy.run()
+
+    assert len(resources) > 0
+    assert 'RouteId' in resources[0]
+    assert 'RouteKey' in resources[0]
+    assert 'AuthorizationType' in resources[0]
+    assert 'c7n:parent-id' in resources[0]
+
+    assert policy.resource_manager.get_arns(resources) == [
+        'arn:aws:apigateway:us-east-1::/apis/sozi1cborg/routes/ms6wuq0',
+        'arn:aws:apigateway:us-east-1::/apis/sozi1cborg/routes/v7guotm'
+    ]
+
+
+@terraform("apigatewayv2_route")
+def test_apigwv2_route_filter_no_auth(test, apigatewayv2_route):
+    factory = test.replay_flight_data("test_apigwv2_route_filter_no_auth")
+
+    policy = test.load_policy({
+        "name": "test-aws-apigwv2-route-no-auth",
+        "resource": "aws.apigwv2-route",
+        "filters": [
+            {
+                "type": "value",
+                "key": "AuthorizationType",
+                "value": "NONE"
+            }
+        ]
+    }, session_factory=factory)
+
+    resources = policy.run()
+
+    assert len(resources) >= 1
+    for r in resources:
+        assert r['AuthorizationType'] == 'NONE'
+
+
 class TestRestAccount(BaseTest):
 
     def test_missing_rest_account(self):
@@ -1110,6 +1156,26 @@ class TestCustomDomainName(BaseTest):
         self.assertEqual(
             p.resource_manager.get_arns(resources)[0],
             "arn:aws:apigateway:us-east-1::/domainnames/bad.example.com"
+        )
+
+    def test_private_domain_name_arn(self):
+        factory = self.replay_flight_data("test_apigw_domain_name_private_arn")
+        p = self.load_policy(
+            {
+                "name": "apigw-domain-name-private-arn",
+                "resource": "apigw-domain-name",
+            },
+            session_factory=factory,
+        )
+        resources = p.run()
+        self.assertEqual(len(resources), 2)
+        self.assertEqual(
+            p.resource_manager.get_arns(resources),
+            [
+                "arn:aws:apigateway:us-east-1::/domainnames/public.example.com",
+                "arn:aws:apigateway:us-east-1:644160558196:"
+                "/domainnames/private.example.com+abcd1234",
+            ],
         )
 
 

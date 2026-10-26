@@ -1,7 +1,9 @@
 # Copyright The Cloud Custodian Authors.
 # SPDX-License-Identifier: Apache-2.0
 from .common import BaseTest, event_data
+from c7n.exceptions import PolicyValidationError
 from c7n.resources.aws import shape_validate
+from c7n.resources.waf import WAFV2, DescribeWafV2
 from c7n.utils import local_session, jmespath_compile
 from unittest.mock import MagicMock, patch
 from botocore.exceptions import ClientError
@@ -245,6 +247,32 @@ class CloudFrontWaf(BaseTest):
 
         resources = policy.push(event_data("event-cloud-trail-tag-distribution.json"))
         self.assertEqual(len(resources), 1)
+
+    def test_set_wafv2_cloudfront_scope(self):
+        """Test that set-wafv2 on distributions uses CLOUDFRONT scope for WebACL lookup."""
+        factory = self.replay_flight_data("test_distribution_set_wafv2_cloudfront_scope")
+        policy = self.load_policy(
+            {
+                "name": "set-wafv2-cloudfront-scope",
+                "resource": "distribution",
+                "filters": [{"type": "wafv2-enabled", "state": False}],
+                "actions": [
+                    {
+                        "type": "set-wafv2",
+                        "state": True,
+                        "force": True,
+                        "web-acl": "BR_IPs_OWASP_Block",
+                    }
+                ],
+            },
+            session_factory=factory,
+        )
+        action = policy.resource_manager.actions[0]
+        # Verify the wafv2 manager is created with CLOUDFRONT scope
+        data = {'query': [{'Scope': 'CLOUDFRONT'}]}
+        mgr = action.manager.get_resource_manager('wafv2', data)
+        self.assertEqual(mgr.scope, 'CLOUDFRONT')
+        self.assertEqual(mgr.scope_region, 'us-east-1')
 
     def test_set_wafv2_pricing_plan_distribution(self):
         """Test that WAFv2 action gracefully skips CloudFront distributions
@@ -1131,3 +1159,43 @@ class CloudFrontWafV2(BaseTest):
             manager = WAFV2(ctx, {})
             manager.get_client()
             mock_session.client.assert_called_once_with('wafv2', region_name='us-west-2')
+
+    def test_wafv2_filter_uses_cloudfront_scope(self):
+        """The wafv2-enabled filter must list CLOUDFRONT-scoped web acls.
+
+        A distribution with a CLOUDFRONT WebACL attached must not be reported by
+        `state: false`. If the filter's requested scope is dropped in favor of the
+        REGIONAL default, the distribution's CLOUDFRONT WebACL ARN is never found
+        and the distribution is incorrectly reported as unprotected.
+        """
+        factory = self.replay_flight_data("test_distribution_wafv2_filter_scope")
+        p = self.load_policy(
+            {
+                "name": "wafv2-cloudfront-scope",
+                "resource": "distribution",
+                "filters": [{"type": "wafv2-enabled", "state": False}],
+            },
+            session_factory=factory,
+        )
+
+        scopes = []
+        original = DescribeWafV2.get_query_params
+
+        def record(self, query):
+            params = original(self, query)
+            scopes.append(params.get('Scope'))
+            return params
+
+        with patch.object(DescribeWafV2, 'get_query_params', record):
+            resources = p.run()
+
+        self.assertEqual(scopes, ['CLOUDFRONT'])
+        self.assertEqual(len(resources), 0)
+
+    def test_wafv2_filter_scope_conflict_raises(self):
+        """A Scope passed via resources(query=) that conflicts with the resource
+        manager's own scope is an error rather than being silently ignored."""
+        p = self.load_policy({"name": "wafv2", "resource": "distribution"})
+        mgr = WAFV2(p.ctx, {'query': [{'Scope': 'REGIONAL'}]})
+        with self.assertRaises(PolicyValidationError):
+            mgr.source.get_query_params({'Scope': 'CLOUDFRONT'})

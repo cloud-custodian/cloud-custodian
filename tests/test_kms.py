@@ -3,7 +3,7 @@
 import json
 import time
 from datetime import datetime, timedelta
-from unittest.mock import patch
+from unittest.mock import patch, MagicMock
 
 import boto3
 import moto
@@ -941,6 +941,120 @@ class KMSCrossAccount(BaseTest):
         self.assertEqual(len(resources), 1)
         self.assertEqual(resources[0]["KeyId"], key_info["KeyId"])
 
+    def test_kms_cross_account_access_denied_skipped(self):
+        # A single key that raises AccessDeniedException must be silently
+        # skipped; the rest of the scan must continue (issue #10962).
+        from unittest import mock
+        from botocore.exceptions import ClientError
+        from c7n.resources import kms as kms_module
+
+        self.patch(CrossAccountAccessFilter, "executor_factory", MainThreadExecutor)
+        p = self.load_policy(
+            {
+                "name": "kms-cross-access-denied",
+                "resource": "kms-key",
+                "filters": ["cross-account"],
+            }
+        )
+        f = p.resource_manager.filters[0]
+
+        denied_key = {"KeyId": "denied-key-id", "KeyArn": "arn:aws:kms:us-east-1:123:key/denied"}
+        mock_client = mock.MagicMock()
+        mock_client.get_key_policy.side_effect = ClientError(
+            {"Error": {"Code": "AccessDeniedException", "Message": "Access Denied"}},
+            "GetKeyPolicy",
+        )
+        with mock.patch.object(kms_module, "local_session") as ls:
+            ls.return_value.client.return_value = mock_client
+            results = f.process([denied_key])
+
+        self.assertEqual(results, [])
+        mock_client.get_key_policy.assert_called_once_with(
+            KeyId="denied-key-id", PolicyName="default"
+        )
+
+    def test_kms_cross_account_access_denied_does_not_suppress_batch(self):
+        # One denied key must not silently drop the remaining keys in the same
+        # batch.  On main, list() consumed the generator and the second key was
+        # never reached when the first raised.
+        from unittest import mock
+        from botocore.exceptions import ClientError
+        from c7n.resources import kms as kms_module
+
+        self.patch(CrossAccountAccessFilter, "executor_factory", MainThreadExecutor)
+        p = self.load_policy(
+            {
+                "name": "kms-cross-access-denied-batch",
+                "resource": "kms-key",
+                "filters": ["cross-account"],
+            }
+        )
+        f = p.resource_manager.filters[0]
+
+        denied_key = {
+            "KeyId": "denied-key-id",
+            "KeyArn": "arn:aws:kms:us-east-1:123456789012:key/denied",
+        }
+        readable_key = {
+            "KeyId": "readable-key-id",
+            "KeyArn": "arn:aws:kms:us-east-1:123456789012:key/readable",
+        }
+        cross_account_policy = json.dumps({
+            "Version": "2012-10-17",
+            "Statement": [{
+                "Effect": "Allow",
+                "Principal": {"AWS": "*"},
+                "Action": "kms:*",
+                "Resource": "*",
+            }],
+        })
+        access_denied = ClientError(
+            {"Error": {"Code": "AccessDeniedException", "Message": "Access Denied"}},
+            "GetKeyPolicy",
+        )
+        mock_client = mock.MagicMock()
+        mock_client.get_key_policy.side_effect = [
+            access_denied,
+            {"Policy": cross_account_policy},
+        ]
+
+        with mock.patch.object(kms_module, "local_session") as ls:
+            ls.return_value.client.return_value = mock_client
+            results = f.process([denied_key, readable_key])
+
+        # Both keys were attempted — the denial did not short-circuit the batch.
+        self.assertEqual(mock_client.get_key_policy.call_count, 2)
+        # Denied key is dropped; readable key has cross-account access so it is returned.
+        self.assertEqual(len(results), 1)
+        self.assertEqual(results[0]["KeyId"], "readable-key-id")
+
+    def test_kms_cross_account_other_error_reraises(self):
+        # Non-AccessDenied ClientErrors must still propagate (issue #10962).
+        from unittest import mock
+        from botocore.exceptions import ClientError
+        from c7n.resources import kms as kms_module
+
+        self.patch(CrossAccountAccessFilter, "executor_factory", MainThreadExecutor)
+        p = self.load_policy(
+            {
+                "name": "kms-cross-other-error",
+                "resource": "kms-key",
+                "filters": ["cross-account"],
+            }
+        )
+        f = p.resource_manager.filters[0]
+
+        bad_key = {"KeyId": "some-key-id", "KeyArn": "arn:aws:kms:us-east-1:123:key/some"}
+        mock_client = mock.MagicMock()
+        mock_client.get_key_policy.side_effect = ClientError(
+            {"Error": {"Code": "InternalFailure", "Message": "Something broke"}},
+            "GetKeyPolicy",
+        )
+        with mock.patch.object(kms_module, "local_session") as ls:
+            ls.return_value.client.return_value = mock_client
+            with self.assertRaises(ClientError):
+                f.process([bad_key])
+
 
 class KMSPolicyAccessDeniedTest(BaseTest):
 
@@ -1089,3 +1203,75 @@ class KMSMotoTests(BaseTest):
         deletion_date = key_meta["DeletionDate"].astimezone(tzutc())
         assert deletion_date > thirty_days_away
         assert deletion_date < (thirty_days_away + timedelta(days=1))
+
+
+class KMSSkipAwsManagedKeyTest(BaseTest):
+    # https://github.com/cloud-custodian/cloud-custodian/issues/11027
+    # AWS managed keys (KeyManager == 'AWS') can't have their policy,
+    # rotation, or tags modified by any customer account - actions
+    # should skip them rather than let the API call fail.
+
+    aws_key = {
+        'KeyId': 'aws-key-1',
+        'Arn': 'arn:aws:kms:us-east-1:111111111111:key/aws-key-1',
+        'KeyManager': 'AWS',
+    }
+    customer_key = {
+        'KeyId': 'cust-key-1',
+        'Arn': 'arn:aws:kms:us-east-1:111111111111:key/cust-key-1',
+        'KeyManager': 'CUSTOMER',
+    }
+
+    def _policy(self, action, client_name='kms'):
+        mock_factory = MagicMock()
+        mock_factory.region = 'us-east-1'
+        client = mock_factory().client(client_name)
+        policy = self.load_policy(
+            {'name': 'k', 'resource': 'kms-key', 'actions': [action]},
+            session_factory=mock_factory)
+        return policy, client
+
+    def test_schedule_deletion_skips_aws_managed(self):
+        policy, client = self._policy({'type': 'schedule-deletion', 'days': 7})
+        policy.resource_manager.actions[0].process([self.aws_key, self.customer_key])
+        client.schedule_key_deletion.assert_called_once_with(
+            KeyId='cust-key-1', PendingWindowInDays=7)
+
+    def test_schedule_deletion_all_aws_managed_noop(self):
+        policy, client = self._policy({'type': 'schedule-deletion'})
+        policy.resource_manager.actions[0].process([self.aws_key])
+        client.schedule_key_deletion.assert_not_called()
+
+    def test_set_rotation_skips_aws_managed(self):
+        policy, client = self._policy({'type': 'set-rotation', 'state': True})
+        policy.resource_manager.actions[0].process([self.aws_key, self.customer_key])
+        client.enable_key_rotation.assert_called_once_with(KeyId='cust-key-1')
+
+    def test_remove_statements_skips_aws_managed(self):
+        policy, client = self._policy({'type': 'remove-statements', 'statement_ids': 'matched'})
+        policy.resource_manager.actions[0].process([self.aws_key])
+        client.get_key_policy.assert_not_called()
+
+    def _tag_policy(self, action):
+        mock_factory = MagicMock()
+        mock_factory.region = 'us-east-1'
+        tag_resources = mock_factory().client('resourcegroupstaggingapi').tag_resources
+        tag_resources.return_value = {}
+        policy = self.load_policy(
+            {'name': 'k', 'resource': 'kms-key', 'actions': [action]},
+            session_factory=mock_factory)
+        return policy, tag_resources
+
+    def test_tag_skips_aws_managed(self):
+        policy, tag_resources = self._tag_policy(
+            {'type': 'tag', 'tags': {'Owner': 'platform'}})
+        policy.resource_manager.actions[0].process([self.aws_key, self.customer_key])
+        tag_resources.assert_called_once_with(
+            ResourceARNList=['arn:aws:kms:us-east-1:111111111111:key/cust-key-1'],
+            Tags={'Owner': 'platform'})
+
+    def test_tag_all_aws_managed_noop(self):
+        policy, tag_resources = self._tag_policy(
+            {'type': 'tag', 'tags': {'Owner': 'platform'}})
+        policy.resource_manager.actions[0].process([self.aws_key])
+        tag_resources.assert_not_called()

@@ -490,6 +490,92 @@ class TestGlueDatabases(BaseTest):
         databases = client.get_databases()
         self.assertFalse("test" in [t.get("Name") for t in databases.get("DatabaseList", [])])
 
+    def test_glue_database_tags(self):
+        session_factory = self.replay_flight_data("test_glue_database_tags")
+        p = self.load_policy(
+            {"name": "glue-database-tags", "resource": "glue-database"},
+            session_factory=session_factory,
+        )
+        resources = p.run()
+        self.assertEqual(len(resources), 2)
+        by_name = {r["Name"]: r for r in resources}
+        self.assertEqual(
+            by_name["test"]["Tags"], [{"Key": "Environment", "Value": "prod"}])
+        self.assertEqual(by_name["untagged-db"]["Tags"], [])
+
+    def test_glue_database_tag_absent(self):
+        session_factory = self.replay_flight_data("test_glue_database_tags")
+        p = self.load_policy(
+            {
+                "name": "glue-database-tag-absent",
+                "resource": "glue-database",
+                "filters": [{"tag:Environment": "absent"}],
+            },
+            session_factory=session_factory,
+        )
+        resources = p.run()
+        self.assertEqual(len(resources), 1)
+        self.assertEqual(resources[0]["Name"], "untagged-db")
+
+    def test_glue_database_tag_present(self):
+        session_factory = self.replay_flight_data("test_glue_database_tags")
+        p = self.load_policy(
+            {
+                "name": "glue-database-tag-present",
+                "resource": "glue-database",
+                "filters": [{"tag:Environment": "present"}],
+            },
+            session_factory=session_factory,
+        )
+        resources = p.run()
+        self.assertEqual(len(resources), 1)
+        self.assertEqual(resources[0]["Name"], "test")
+
+    def test_glue_database_tag(self):
+        session_factory = self.replay_flight_data("test_glue_database_tags")
+        client = session_factory().client("glue")
+
+        policy = {
+            "name": "glue-database-tag",
+            "resource": "glue-database",
+            "filters": [{"tag:abcd": "absent"}],
+            "actions": [{"type": "tag", "key": "abcd", "value": "xyz"}],
+        }
+        p = self.load_policy(
+            policy,
+            config={"account_id": "644160558196"},
+            session_factory=session_factory)
+
+        resources = p.run()
+        by_name = {r["Name"]: r for r in resources}
+        self.assertEqual(set(by_name), {"test", "untagged-db"})
+        arn = p.resource_manager.generate_arn(by_name["test"]["Name"])
+        self.assertEqual(arn, "arn:aws:glue:us-east-1:644160558196:database/test")
+        tags = client.get_tags(ResourceArn=arn)
+        self.assertEqual(tags.get("Tags"), {"abcd": "xyz"})
+
+    def test_glue_database_untag(self):
+        session_factory = self.replay_flight_data("test_glue_database_untag")
+        client = session_factory().client("glue")
+
+        policy = {
+            "name": "glue-database-untag",
+            "resource": "glue-database",
+            "filters": [{"tag:Environment": "present"}],
+            "actions": [{"type": "remove-tag", "tags": ["Environment"]}],
+        }
+        p = self.load_policy(
+            policy,
+            config={"account_id": "644160558196"},
+            session_factory=session_factory)
+
+        resources = p.run()
+        self.assertEqual(len(resources), 1)
+        arn = p.resource_manager.generate_arn(resources[0]["Name"])
+        self.assertEqual(arn, "arn:aws:glue:us-east-1:644160558196:database/test")
+        tags = client.get_tags(ResourceArn=arn)
+        self.assertEqual(tags.get("Tags"), {})
+
 
 class TestGlueClassifiers(BaseTest):
 

@@ -1,0 +1,12 @@
+{
+    "status_code": 200,
+    "data": {
+        "TagList": [
+            {
+                "Key": "custodian_next",
+                "Value": "Resource does not meet policy: notify@2026/09/10"
+            }
+        ],
+        "ResponseMetadata": {}
+    }
+}
