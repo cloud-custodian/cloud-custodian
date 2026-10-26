@@ -1,0 +1,14 @@
+{
+    "status_code": 200,
+    "data": {
+        "TransitGatewayRouteTablePropagations": [
+            {
+                "TransitGatewayAttachmentId": "tgw-attach-00000000000000001",
+                "ResourceId": "vpc-00000000000000001",
+                "ResourceType": "vpc",
+                "State": "enabled"
+            }
+        ],
+        "ResponseMetadata": {}
+    }
+}

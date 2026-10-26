@@ -19,6 +19,9 @@ from msrestazure.azure_cloud import AZURE_CHINA_CLOUD, AZURE_PUBLIC_CLOUD
 
 from .azure_common import DEFAULT_SUBSCRIPTION_ID, BaseTest
 
+# A request as the legacy client send override receives it.
+LEGACY_REQUEST = Mock(method='GET', url='https://graph.windows.net/tenant/users')
+
 try:
     from importlib import reload
 except Exception:
@@ -260,7 +263,7 @@ class UtilsTest(BaseTest):
             'status_code': 200
         }
         mock.orig_send.return_value = type(str('response'), (), response_dict)
-        mock.send('')
+        mock.send(LEGACY_REQUEST)
 
         self.assertEqual(mock.orig_send.call_count, 1)
         self.assertEqual(logger.call_count, 2)
@@ -276,7 +279,7 @@ class UtilsTest(BaseTest):
             'status_code': 429
         }
         mock.orig_send.return_value = type(str('response'), (), response_dict)
-        mock.send('')
+        mock.send(LEGACY_REQUEST)
 
         self.assertEqual(mock.orig_send.call_count, 8)
         self.assertEqual(logger_debug.call_count, 8)
@@ -292,7 +295,7 @@ class UtilsTest(BaseTest):
             'status_code': 429
         }
         mock.orig_send.return_value = type(str('response'), (), response_dict)
-        mock.send('')
+        mock.send(LEGACY_REQUEST)
 
         self.assertEqual(mock.orig_send.call_count, 1)
         self.assertEqual(logger.call_count, 1)
@@ -310,7 +313,7 @@ class UtilsTest(BaseTest):
         mock.orig_send.return_value = type(str('response'), (), response_dict)
 
         with patch('time.sleep', new_callable=time.sleep(0)):
-            mock.send('')
+            mock.send(LEGACY_REQUEST)
 
         self.assertEqual(mock.orig_send.call_count, 8)
         self.assertEqual(logger_debug.call_count, 8)
