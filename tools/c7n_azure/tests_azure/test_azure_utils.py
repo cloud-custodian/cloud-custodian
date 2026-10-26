@@ -19,6 +19,9 @@ from msrestazure.azure_cloud import AZURE_CHINA_CLOUD, AZURE_PUBLIC_CLOUD
 
 from .azure_common import DEFAULT_SUBSCRIPTION_ID, BaseTest
 
+# A request as the legacy client send override receives it.
+LEGACY_REQUEST = Mock(method='GET', url='https://graph.windows.net/tenant/users')
+
 try:
     from importlib import reload
 except Exception:
@@ -227,6 +230,14 @@ class UtilsTest(BaseTest):
         self.assertEqual(StringUtils.snake_to_camel("test_abc"), "testAbc")
         self.assertEqual(StringUtils.snake_to_camel("test_abc_def"), "testAbcDef")
 
+    def test_camel_to_snake(self):
+        self.assertEqual(StringUtils.camel_to_snake(""), "")
+        self.assertEqual(StringUtils.camel_to_snake("test"), "test")
+        self.assertEqual(StringUtils.camel_to_snake("Test"), "test")
+        self.assertEqual(StringUtils.camel_to_snake("testAbc"), "test_abc")
+        self.assertEqual(StringUtils.camel_to_snake("eventHubAuthorizationRuleId"),
+                         "event_hub_authorization_rule_id")
+
     def test_naming_hash(self):
         source = 'Lorem ipsum dolor sit amet'
         source2 = 'amet sit dolor ipsum Lorem'
@@ -252,7 +263,7 @@ class UtilsTest(BaseTest):
             'status_code': 200
         }
         mock.orig_send.return_value = type(str('response'), (), response_dict)
-        mock.send('')
+        mock.send(LEGACY_REQUEST)
 
         self.assertEqual(mock.orig_send.call_count, 1)
         self.assertEqual(logger.call_count, 2)
@@ -268,7 +279,7 @@ class UtilsTest(BaseTest):
             'status_code': 429
         }
         mock.orig_send.return_value = type(str('response'), (), response_dict)
-        mock.send('')
+        mock.send(LEGACY_REQUEST)
 
         self.assertEqual(mock.orig_send.call_count, 8)
         self.assertEqual(logger_debug.call_count, 8)
@@ -284,7 +295,7 @@ class UtilsTest(BaseTest):
             'status_code': 429
         }
         mock.orig_send.return_value = type(str('response'), (), response_dict)
-        mock.send('')
+        mock.send(LEGACY_REQUEST)
 
         self.assertEqual(mock.orig_send.call_count, 1)
         self.assertEqual(logger.call_count, 1)
@@ -302,7 +313,7 @@ class UtilsTest(BaseTest):
         mock.orig_send.return_value = type(str('response'), (), response_dict)
 
         with patch('time.sleep', new_callable=time.sleep(0)):
-            mock.send('')
+            mock.send(LEGACY_REQUEST)
 
         self.assertEqual(mock.orig_send.call_count, 8)
         self.assertEqual(logger_debug.call_count, 8)

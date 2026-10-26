@@ -1,0 +1,342 @@
+{
+    "version": 1,
+    "interactions": [
+        {
+            "request": {
+                "method": "GET",
+                "uri": "https://management.azure.com/subscriptions/ea42f556-5106-4743-99b0-c129bfa71a47/providers/Microsoft.MachineLearningServices/workspaces?api-version=2023-04-01",
+                "body": null,
+                "headers": {}
+            },
+            "response": {
+                "status": {
+                    "code": 200,
+                    "message": "OK"
+                },
+                "headers": {
+                    "content-length": [
+                        "12953"
+                    ],
+                    "date": [
+                        "Fri, 16 Oct 2026 19:21:37 GMT"
+                    ],
+                    "x-cache": [
+                        "CONFIG_NOCACHE"
+                    ],
+                    "x-msedge-ref": [
+                        "Ref A: 00000000000000000000000000000000 Ref B: 000000000000000 Ref C: 2026-10-16T19:21:37Z"
+                    ],
+                    "cache-control": [
+                        "no-cache"
+                    ],
+                    "content-type": [
+                        "application/json; charset=utf-8"
+                    ],
+                    "x-ms-ratelimit-remaining-subscription-global-reads": [
+                        "3749"
+                    ],
+                    "x-ms-original-request-ids": [
+                        "",
+                        "",
+                        ""
+                    ]
+                },
+                "body": {
+                    "data": {
+                        "value": [
+                            {
+                                "id": "/subscriptions/ea42f556-5106-4743-99b0-c129bfa71a47/resourceGroups/test_machine-learning-compute-instance/providers/Microsoft.MachineLearningServices/workspaces/cctestml000000000000",
+                                "name": "cctestml000000000000",
+                                "type": "Microsoft.MachineLearningServices/workspaces",
+                                "location": "southcentralus",
+                                "tags": {},
+                                "etag": null,
+                                "properties": {
+                                    "friendlyName": "cctest-machine-learning-workspace",
+                                    "description": "",
+                                    "storageAccount": "/subscriptions/ea42f556-5106-4743-99b0-c129bfa71a47/resourceGroups/test_machine-learning-compute-instance/providers/Microsoft.Storage/storageAccounts/cctestmlst000000000000",
+                                    "keyVault": "/subscriptions/ea42f556-5106-4743-99b0-c129bfa71a47/resourceGroups/test_machine-learning-compute-instance/providers/Microsoft.Keyvault/vaults/cctestmlkv000000000000",
+                                    "applicationInsights": "/subscriptions/ea42f556-5106-4743-99b0-c129bfa71a47/resourceGroups/test_machine-learning-compute-instance/providers/Microsoft.insights/components/cctestmlai000000000000",
+                                    "hbiWorkspace": false,
+                                    "tenantId": "00000000-0000-0000-0000-000000000003",
+                                    "imageBuildCompute": null,
+                                    "provisioningState": "Succeeded",
+                                    "managedNetwork": {
+                                        "changeableIsolationModes": [
+                                            "AllowInternetOutbound",
+                                            "AllowOnlyApprovedOutbound"
+                                        ],
+                                        "isolationMode": "Disabled",
+                                        "enableNetworkMonitor": false
+                                    },
+                                    "allowRoleAssignmentOnRG": true,
+                                    "v1LegacyMode": false,
+                                    "softDeleteEnabled": false,
+                                    "creationTime": "2026-10-16T19:14:34.4587925Z",
+                                    "notebookInfo": {
+                                        "resourceId": "00000000000000000000000000000006",
+                                        "fqdn": "ml-cctestml-southcentralus-00000000-0000-0000-0000-000000000005.southcentralus.notebooks.azure.net",
+                                        "isPrivateLinkEnabled": false,
+                                        "notebookPreparationError": null
+                                    },
+                                    "storageHnsEnabled": false,
+                                    "workspaceId": "00000000-0000-0000-0000-000000000005",
+                                    "linkedModelInventoryArmId": null,
+                                    "privateLinkCount": 0,
+                                    "publicNetworkAccess": "Enabled",
+                                    "discoveryUrl": "https://southcentralus.api.azureml.ms/discovery",
+                                    "mlFlowTrackingUri": "azureml://southcentralus.api.azureml.ms/mlflow/v1.0/subscriptions/ea42f556-5106-4743-99b0-c129bfa71a47/resourceGroups/test_machine-learning-compute-instance/providers/Microsoft.MachineLearningServices/workspaces/cctestml000000000000",
+                                    "sdkTelemetryAppInsightsKey": "00000000-0000-0000-0000-000000000004",
+                                    "enableDataIsolation": false
+                                },
+                                "identity": {
+                                    "type": "SystemAssigned",
+                                    "principalId": "00000000-0000-0000-0000-000000000002",
+                                    "tenantId": "00000000-0000-0000-0000-000000000003"
+                                },
+                                "kind": "Default",
+                                "sku": {
+                                    "name": "Basic",
+                                    "tier": "Basic"
+                                },
+                                "systemData": {
+                                    "createdAt": "2026-10-16T19:14:34.4587925Z",
+                                    "createdBy": "user@example.com",
+                                    "createdByType": "User",
+                                    "lastModifiedAt": "2026-10-16T19:14:34.4587925Z",
+                                    "lastModifiedBy": "user@example.com",
+                                    "lastModifiedByType": "User"
+                                }
+                            }
+                        ]
+                    }
+                }
+            }
+        },
+        {
+            "request": {
+                "method": "GET",
+                "uri": "https://management.azure.com/subscriptions/ea42f556-5106-4743-99b0-c129bfa71a47/resourceGroups/test_machine-learning-compute-instance/providers/Microsoft.MachineLearningServices/workspaces/cctestml000000000000/computes?api-version=2023-04-01",
+                "body": null,
+                "headers": {}
+            },
+            "response": {
+                "status": {
+                    "code": 200,
+                    "message": "OK"
+                },
+                "headers": {
+                    "cache-control": [
+                        "no-cache"
+                    ],
+                    "content-type": [
+                        "application/json; charset=utf-8"
+                    ],
+                    "date": [
+                        "Fri, 16 Oct 2026 19:21:38 GMT"
+                    ],
+                    "x-request-time": [
+                        "0.261"
+                    ],
+                    "x-ms-response-type": [
+                        "standard"
+                    ],
+                    "x-msedge-ref": [
+                        "Ref A: 00000000000000000000000000000000 Ref B: 000000000000000 Ref C: 2026-10-16T19:21:38Z"
+                    ],
+                    "x-ms-ratelimit-remaining-subscription-global-reads": [
+                        "3749"
+                    ],
+                    "request-context": [
+                        "appId=cid-v1:00000000-0000-0000-0000-000000000007"
+                    ],
+                    "content-length": [
+                        "6278"
+                    ],
+                    "x-cache": [
+                        "CONFIG_NOCACHE"
+                    ],
+                    "azureml-served-by-cluster": [
+                        "vienna-southcentralus-02"
+                    ]
+                },
+                "body": {
+                    "data": {
+                        "value": [
+                            {
+                                "id": "/subscriptions/ea42f556-5106-4743-99b0-c129bfa71a47/resourceGroups/test_machine-learning-compute-instance/providers/Microsoft.MachineLearningServices/workspaces/cctestml000000000000/computes/cctest-ci-idle-60m",
+                                "name": "cctest-ci-idle-60m",
+                                "type": "Microsoft.MachineLearningServices/workspaces/computes",
+                                "location": "southcentralus",
+                                "tags": {},
+                                "properties": {
+                                    "createdOn": "2026-10-16T19:15:10.8772613+00:00",
+                                    "modifiedOn": "2026-10-16T19:19:58.454628+00:00",
+                                    "disableLocalAuth": false,
+                                    "description": null,
+                                    "resourceId": null,
+                                    "computeType": "ComputeInstance",
+                                    "computeLocation": "southcentralus",
+                                    "provisioningState": "Succeeded",
+                                    "provisioningErrors": null,
+                                    "provisioningWarnings": {},
+                                    "isAttachedCompute": false,
+                                    "properties": {
+                                        "vmSize": "Standard_D2as_v4",
+                                        "imageVersion": null,
+                                        "imageSku": null,
+                                        "subnet": null,
+                                        "sshSettings": {
+                                            "sshPublicAccess": "Disabled",
+                                            "adminUserName": "azureuser",
+                                            "sshPort": 50000,
+                                            "adminPublicKey": null
+                                        },
+                                        "autologgerSettings": null,
+                                        "errors": [],
+                                        "connectivityEndpoints": {
+                                            "publicIpAddress": "192.0.2.1",
+                                            "privateIpAddress": "10.0.0.4"
+                                        },
+                                        "applications": [
+                                            {
+                                                "displayName": "Jupyter",
+                                                "endpointUri": "https://cctest-ci-idle-60m.southcentralus.instances.azureml.ms/tree/"
+                                            },
+                                            {
+                                                "displayName": "Jupyter Lab",
+                                                "endpointUri": "https://cctest-ci-idle-60m.southcentralus.instances.azureml.ms/lab"
+                                            }
+                                        ],
+                                        "state": "Running",
+                                        "lastOperation": {
+                                            "operationName": "Create",
+                                            "operationTime": "2026-10-16T19:15:19.222+00:00",
+                                            "operationStatus": "Succeeded",
+                                            "operationTrigger": "User"
+                                        },
+                                        "createdBy": {
+                                            "userOrgId": "00000000-0000-0000-0000-000000000003",
+                                            "userId": "00000000-0000-0000-0000-000000000001"
+                                        },
+                                        "applicationSharingPolicy": "Shared",
+                                        "computeInstanceAuthorizationType": null,
+                                        "personalComputeInstanceSettings": null,
+                                        "setupScripts": null,
+                                        "idleTimeBeforeShutdown": "PT60M",
+                                        "schedules": {
+                                            "computeStartStop": []
+                                        },
+                                        "enableBatchPrivateLink": false,
+                                        "enableOSPatching": false,
+                                        "releaseQuotaOnStop": false,
+                                        "enableSSO": true,
+                                        "dataMounts": null,
+                                        "dataDisks": null,
+                                        "containers": null,
+                                        "updateStatus": "InProgress",
+                                        "versions": {
+                                            "runtime": "3.0.03560.0001"
+                                        },
+                                        "customServices": [],
+                                        "osImageMetadata": {
+                                            "currentImageVersion": "26.09.09",
+                                            "latestImageVersion": "26.09.09",
+                                            "isLatestOsImageVersion": true,
+                                            "osPatchingStatus": null
+                                        }
+                                    }
+                                }
+                            },
+                            {
+                                "id": "/subscriptions/ea42f556-5106-4743-99b0-c129bfa71a47/resourceGroups/test_machine-learning-compute-instance/providers/Microsoft.MachineLearningServices/workspaces/cctestml000000000000/computes/cctest-ci-idle-2h",
+                                "name": "cctest-ci-idle-2h",
+                                "type": "Microsoft.MachineLearningServices/workspaces/computes",
+                                "location": "southcentralus",
+                                "tags": {},
+                                "properties": {
+                                    "createdOn": "2026-10-16T19:15:11.1144512+00:00",
+                                    "modifiedOn": "2026-10-16T19:19:58.3667919+00:00",
+                                    "disableLocalAuth": false,
+                                    "description": null,
+                                    "resourceId": null,
+                                    "computeType": "ComputeInstance",
+                                    "computeLocation": "southcentralus",
+                                    "provisioningState": "Succeeded",
+                                    "provisioningErrors": null,
+                                    "provisioningWarnings": {},
+                                    "isAttachedCompute": false,
+                                    "properties": {
+                                        "vmSize": "Standard_D2as_v4",
+                                        "imageVersion": null,
+                                        "imageSku": null,
+                                        "subnet": null,
+                                        "sshSettings": {
+                                            "sshPublicAccess": "Disabled",
+                                            "adminUserName": "azureuser",
+                                            "sshPort": 50000,
+                                            "adminPublicKey": null
+                                        },
+                                        "autologgerSettings": null,
+                                        "errors": [],
+                                        "connectivityEndpoints": {
+                                            "publicIpAddress": "192.0.2.2",
+                                            "privateIpAddress": "10.0.0.4"
+                                        },
+                                        "applications": [
+                                            {
+                                                "displayName": "Jupyter",
+                                                "endpointUri": "https://cctest-ci-idle-2h.southcentralus.instances.azureml.ms/tree/"
+                                            },
+                                            {
+                                                "displayName": "Jupyter Lab",
+                                                "endpointUri": "https://cctest-ci-idle-2h.southcentralus.instances.azureml.ms/lab"
+                                            }
+                                        ],
+                                        "state": "Running",
+                                        "lastOperation": {
+                                            "operationName": "Create",
+                                            "operationTime": "2026-10-16T19:15:19.483+00:00",
+                                            "operationStatus": "Succeeded",
+                                            "operationTrigger": "User"
+                                        },
+                                        "createdBy": {
+                                            "userOrgId": "00000000-0000-0000-0000-000000000003",
+                                            "userId": "00000000-0000-0000-0000-000000000001"
+                                        },
+                                        "applicationSharingPolicy": "Shared",
+                                        "computeInstanceAuthorizationType": null,
+                                        "personalComputeInstanceSettings": null,
+                                        "setupScripts": null,
+                                        "idleTimeBeforeShutdown": "PT120M",
+                                        "schedules": {
+                                            "computeStartStop": []
+                                        },
+                                        "enableBatchPrivateLink": false,
+                                        "enableOSPatching": false,
+                                        "releaseQuotaOnStop": false,
+                                        "enableSSO": true,
+                                        "dataMounts": null,
+                                        "dataDisks": null,
+                                        "containers": null,
+                                        "updateStatus": "InProgress",
+                                        "versions": {
+                                            "runtime": "3.0.03560.0001"
+                                        },
+                                        "customServices": [],
+                                        "osImageMetadata": {
+                                            "currentImageVersion": "26.09.09",
+                                            "latestImageVersion": "26.09.09",
+                                            "isLatestOsImageVersion": true,
+                                            "osPatchingStatus": null
+                                        }
+                                    }
+                                }
+                            }
+                        ]
+                    }
+                }
+            }
+        }
+    ]
+}

@@ -14,10 +14,12 @@ import logging
 import os
 import shutil
 import tempfile
+import threading
 import time
 import uuid
 
 from abc import ABC, abstractmethod
+from collections import Counter
 
 from c7n.exceptions import InvalidOutputConfig
 from c7n.registry import PluginRegistry
@@ -175,6 +177,55 @@ class NullStats:
     def __exit__(self, exc_type=None, exc_value=None, exc_traceback=None):
         """Pop a snapshot
         """
+
+
+# Api call stats collectors active for the current policy execution, for
+# providers whose clients have no event hooks of their own to subscribe to.
+_api_call_recorders = []
+
+
+def record_api_call(name, elapsed):
+    """Record an api call, and its duration in seconds, with the active collectors."""
+    for r in _api_call_recorders:
+        r.record(name, elapsed)
+
+
+class APICallStats(DeltaStats):
+    """Count api calls by name, and their total time, for a policy execution.
+
+    Recorded counts are the api-stats execution metadata, and ApiCalls and
+    ApiTime metrics are emitted when the execution ends. Providers either
+    call `record_api_call` from their client, or subscribe the collector's
+    `record` to their client's own events.
+    """
+
+    def __init__(self, ctx, config=None):
+        super().__init__(ctx, config)
+        self.api_calls = Counter()
+        self.api_time = 0.0
+        # Calls are recorded from the thread pools filters and actions use.
+        self.lock = threading.Lock()
+
+    def get_snapshot(self):
+        return dict(self.api_calls)
+
+    def get_metadata(self):
+        return self.get_snapshot()
+
+    def record(self, name, elapsed):
+        with self.lock:
+            self.api_calls[name] += 1
+            self.api_time += elapsed
+
+    def __enter__(self):
+        _api_call_recorders.append(self)
+        self.push_snapshot()
+
+    def __exit__(self, exc_type=None, exc_value=None, exc_traceback=None):
+        _api_call_recorders.remove(self)
+        self.ctx.metrics.put_metric("ApiCalls", sum(self.api_calls.values()), "Count")
+        self.ctx.metrics.put_metric("ApiTime", round(self.api_time, 3), "Seconds")
+        self.pop_snapshot()
 
 
 @sys_stats_outputs.register('psutil', condition=HAVE_PSUTIL)

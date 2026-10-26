@@ -508,7 +508,8 @@ class SageMakerMetricsFilter(MetricsFilter):
         We don't expect most resources to have different kinds, but
         endpoint do. None when this kind doesn't publish the metric: the
         resource has no series, rather than the policy being wrong, which
-        published_dimension_sets decides.
+        published_dimension_sets decides. process passes over such a
+        resource whatever the missing value.
         """
         return (
             SAGEMAKER_METRICS
@@ -744,7 +745,32 @@ class SageMakerMetricsFilter(MetricsFilter):
         # fail on an undocumented metric name even if we weren't validated
         self.published_dimension_sets()
 
-        return super().process(resources, event)
+        # Classified before the base filter fans out to threads, so a kind
+        # needing an api call to decide makes it once rather than per chunk.
+        published = []
+        skipped = collections.Counter()
+        for resource in resources:
+            kind = self.resource_kind(resource)
+            if kind is not None:
+                resource['c7n:metrics-kind'] = kind
+            if self.resource_published_metric(resource) is None:
+                skipped[kind] += 1
+            else:
+                published.append(resource)
+
+        if skipped:
+            # A kind that doesn't publish the metric has no series to read
+            # as missing, so the missing value doesn't decide it. That only
+            # changes the outcome when there is a missing value, which is
+            # when a policy author needs telling.
+            log = self.log.warning if 'missing-value' in self.data else self.log.debug
+            log("%s skipped %d of %d %s whose kind doesn't publish %s: %s",
+                self.type, sum(skipped.values()), len(resources),
+                self.manager.type, self.data['name'],
+                ', '.join(f"{count} {kind}"
+                          for kind, count in sorted(skipped.items())))
+
+        return super().process(published, event)
 
 
 @SagemakerEndpoint.filter_registry.register('metrics')
@@ -758,6 +784,7 @@ class SagemakerEndpointMetricsFilter(SageMakerMetricsFilter):
     VariantName = "VariantName"
     ProductionVariants = "ProductionVariants"
     InferenceComponentName = "InferenceComponentName"
+    AsyncInferenceConfig = "AsyncInferenceConfig"
 
     permissions = MetricsFilter.permissions + (
         'sagemaker:ListInferenceComponents',)
@@ -766,7 +793,7 @@ class SagemakerEndpointMetricsFilter(SageMakerMetricsFilter):
     def endpoint_components(self):
         """Map each endpoint to the inference components hosted on it.
 
-        An endpoint without inference components is assumed to be a classic endpoint.
+        An endpoint without inference components is assumed to be classic or async.
         """
         client = local_session(
             self.manager.session_factory).client('sagemaker')
@@ -781,6 +808,9 @@ class SagemakerEndpointMetricsFilter(SageMakerMetricsFilter):
     def resource_kind(self, resource) -> Kind:
         """How this endpoint hosts its models.
 
+        An async endpoint is classified first, since it publishes the async
+        metrics; DescribeEndpoint already carries its AsyncInferenceConfig.
+
         An endpoint built to host components but hosting none right now
         is reported classic, which costs nothing: its invocations aren't
         published per variant, and nothing is reserving the instance, so
@@ -789,6 +819,8 @@ class SagemakerEndpointMetricsFilter(SageMakerMetricsFilter):
         execution role and no variant naming a model -- would classify it
         correctly at the price of a DescribeEndpointConfig per endpoint.
         """
+        if self.AsyncInferenceConfig in resource:
+            return 'async'
         if self.endpoint_components.get(resource[self.resource_dimension_name]):
             return 'inference-component'
         return 'classic'

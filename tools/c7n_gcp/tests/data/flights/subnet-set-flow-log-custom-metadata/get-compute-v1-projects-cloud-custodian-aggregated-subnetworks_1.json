@@ -1,0 +1,50 @@
+{
+  "headers": {
+    "etag": "_mDMyCB_joghqub3yk4h-yRuZGY=/qcru2oEddgA2X-qJ4Uwp_jpWTfE=",
+    "content-type": "application/json; charset=UTF-8",
+    "vary": "Origin, X-Origin, Referer",
+    "date": "Sun, 15 Mar 2026 19:22:40 GMT",
+    "server": "ESF",
+    "x-xss-protection": "0",
+    "x-frame-options": "SAMEORIGIN",
+    "x-content-type-options": "nosniff",
+    "alt-svc": "h3=\":443\"; ma=2592000,h3-29=\":443\"; ma=2592000",
+    "transfer-encoding": "chunked",
+    "status": "200",
+    "content-length": "45276",
+    "-content-encoding": "gzip",
+    "content-location": "https://compute.googleapis.com/compute/v1/projects/cloud-custodian/aggregated/subnetworks?alt=json"
+  },
+  "body": {
+    "kind": "compute#subnetworkAggregatedList",
+    "id": "projects/cloud-custodian/aggregated/subnetworks",
+    "items": {
+      "regions/us-central1": {
+        "subnetworks": [
+          {
+            "kind": "compute#subnetwork",
+            "id": "8594914635421497354",
+            "creationTimestamp": "2026-03-15T12:22:13.589-07:00",
+            "name": "apparent-beetle-subnet",
+            "network": "https://www.googleapis.com/compute/v1/projects/cloud-custodian/global/networks/apparent-beetle-vpc",
+            "ipCidrRange": "10.2.0.0/16",
+            "gatewayAddress": "10.2.0.1",
+            "region": "https://www.googleapis.com/compute/v1/projects/cloud-custodian/regions/us-central1",
+            "selfLink": "https://www.googleapis.com/compute/v1/projects/cloud-custodian/regions/us-central1/subnetworks/apparent-beetle-subnet",
+            "privateIpGoogleAccess": false,
+            "fingerprint": "mrTGuvuTYXI=",
+            "allowSubnetCidrRoutesOverlap": false,
+            "enableFlowLogs": false,
+            "privateIpv6GoogleAccess": "DISABLE_GOOGLE_ACCESS",
+            "purpose": "PRIVATE",
+            "logConfig": {
+              "enable": false
+            },
+            "stackType": "IPV4_ONLY"
+          }
+        ]
+      }
+    },
+    "selfLink": "https://www.googleapis.com/compute/v1/projects/cloud-custodian/aggregated/subnetworks"
+  }
+}
