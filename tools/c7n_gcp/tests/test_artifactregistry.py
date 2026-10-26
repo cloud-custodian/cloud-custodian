@@ -1,7 +1,5 @@
 from gcp_common import BaseTest
 from c7n.exceptions import PolicyValidationError
-from c7n.testing import C7N_FUNCTIONAL
-from c7n_gcp.client import get_default_project
 
 
 class ArtifactRegistryRepositoryTest(BaseTest):
