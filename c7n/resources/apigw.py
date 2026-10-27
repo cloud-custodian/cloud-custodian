@@ -1116,6 +1116,16 @@ class CustomDomainName(query.QueryResourceManager):
                 resource_type=self.resource_type.arn_type)
         return self._generate_arn
 
+    def get_arns(self, resources):
+        # Private custom domain names have an account-scoped ARN that
+        # includes the domain name id, e.g.
+        # arn:aws:apigateway:us-east-1:111122223333:/domainnames/example.com+abcd1234
+        # so prefer the ARN returned by the API when it is present.
+        return [
+            r.get('domainNameArn') or self.generate_arn(r['domainName'])
+            for r in resources
+        ]
+
 
 @CustomDomainName.action_registry.register('update-security')
 class DomainNameRemediateTls(BaseAction):

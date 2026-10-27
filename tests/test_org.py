@@ -10,6 +10,7 @@ import pytest
 
 from botocore.exceptions import ClientError
 
+from c7n.exceptions import PolicyValidationError
 from c7n.executor import MainThreadExecutor
 from c7n.resources import org as org_module
 
@@ -534,3 +535,31 @@ def test_policy_query(policy_org, test):
     assert p.resource_manager.parse_query() == {"Filter": "SERVICE_CONTROL_POLICY"}
     resources = p.run()
     assert {r["Name"] for r in resources} == {"FullAWSAccess", "ec2-diet"}
+
+
+def test_policy_filter_invalid_type(test):
+    with pytest.raises(PolicyValidationError) as ecm:
+        test.load_policy(
+            {
+                "name": "policy-enforce",
+                "resource": "aws.org-unit",
+                "filters": [{"type": "policy", "policy-type": "BOGUS_POLICY"}],
+            },
+            validate=False,
+        )
+    assert "BOGUS_POLICY" in str(ecm.value)
+
+
+def test_set_policy_invalid_type(test):
+    with pytest.raises(PolicyValidationError) as ecm:
+        test.load_policy(
+            {
+                "name": "policy-enforce",
+                "resource": "aws.org-unit",
+                "actions": [
+                    {"type": "set-policy", "name": "gopher", "policy-type": "BOGUS_POLICY"}
+                ],
+            },
+            validate=False,
+        )
+    assert "BOGUS_POLICY" in str(ecm.value)

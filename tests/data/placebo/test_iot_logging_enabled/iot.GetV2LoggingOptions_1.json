@@ -1,0 +1,19 @@
+{
+    "status_code": 200,
+    "data": {
+        "ResponseMetadata": {},
+        "roleArn": "arn:aws:iam::644160558196:role/c7n-test-iot-logging-role",
+        "defaultLogLevel": "ERROR",
+        "disableAllLogs": false,
+        "eventConfigurations": [
+            {
+                "eventType": "Connection.AuthNError",
+                "logLevel": "DISABLED"
+            },
+            {
+                "eventType": "Ping",
+                "logLevel": "DISABLED"
+            }
+        ]
+    }
+}

@@ -1,0 +1,120 @@
+{
+  "headers": {
+    "content-type": "application/json; charset=UTF-8",
+    "vary": "Origin, X-Origin, Referer",
+    "date": "Wed, 14 Oct 2026 02:50:31 GMT",
+    "server": "ESF",
+    "x-xss-protection": "0",
+    "x-frame-options": "SAMEORIGIN",
+    "x-content-type-options": "nosniff",
+    "server-timing": "gfet4t7; dur=129",
+    "alt-svc": "h3=\":443\"; ma=2592000,h3-29=\":443\"; ma=2592000",
+    "transfer-encoding": "chunked",
+    "status": "200",
+    "content-length": "5160",
+    "-content-encoding": "gzip",
+    "content-location": "https://logging.googleapis.com/v2/projects/cloud-custodian/sinks?alt=json"
+  },
+  "body": {
+    "sinks": [
+      {
+        "name": "c7n-sink-overlap-base",
+        "destination": "logging.googleapis.com/projects/cloud-custodian/locations/global/buckets/_Default",
+        "filter": "severity>=ERROR",
+        "createTime": "2026-10-14T02:50:27.494737431Z",
+        "updateTime": "2026-10-14T02:50:27.494737431Z",
+        "resourceName": "projects/cloud-custodian/sinks/c7n-sink-overlap-base"
+      },
+      {
+        "name": "c7n-sink-overlap-base-copy",
+        "destination": "logging.googleapis.com/projects/cloud-custodian/locations/global/buckets/_Default",
+        "filter": "severity>=ERROR",
+        "createTime": "2026-10-14T02:50:27.495304868Z",
+        "updateTime": "2026-10-14T02:50:27.495304868Z",
+        "resourceName": "projects/cloud-custodian/sinks/c7n-sink-overlap-base-copy"
+      },
+      {
+        "name": "c7n-sink-overlap-disabled",
+        "destination": "logging.googleapis.com/projects/cloud-custodian/locations/global/buckets/_Default",
+        "filter": "severity>=ERROR",
+        "createTime": "2026-10-14T02:50:27.488386725Z",
+        "updateTime": "2026-10-14T02:50:27.488386725Z",
+        "disabled": true,
+        "resourceName": "projects/cloud-custodian/sinks/c7n-sink-overlap-disabled"
+      },
+      {
+        "name": "c7n-sink-overlap-excl-all",
+        "destination": "logging.googleapis.com/projects/cloud-custodian/locations/global/buckets/_Default",
+        "filter": "severity>=ERROR",
+        "createTime": "2026-10-14T02:50:27.488468249Z",
+        "updateTime": "2026-10-14T02:50:27.488468249Z",
+        "exclusions": [
+          {
+            "name": "all",
+            "filter": "severity>=ERROR"
+          }
+        ],
+        "resourceName": "projects/cloud-custodian/sinks/c7n-sink-overlap-excl-all"
+      },
+      {
+        "name": "c7n-sink-overlap-excl-partial",
+        "destination": "logging.googleapis.com/projects/cloud-custodian/locations/global/buckets/_Default",
+        "filter": "severity>=ERROR",
+        "createTime": "2026-10-14T02:50:27.488694002Z",
+        "updateTime": "2026-10-14T02:50:27.488694002Z",
+        "exclusions": [
+          {
+            "name": "gce",
+            "filter": "resource.type=\"gce_instance\""
+          }
+        ],
+        "resourceName": "projects/cloud-custodian/sinks/c7n-sink-overlap-excl-partial"
+      },
+      {
+        "name": "c7n-sink-overlap-non-match",
+        "destination": "logging.googleapis.com/projects/cloud-custodian/locations/global/buckets/_Default",
+        "filter": "severity<ERROR",
+        "createTime": "2026-10-14T02:50:27.488702702Z",
+        "updateTime": "2026-10-14T02:50:27.488702702Z",
+        "resourceName": "projects/cloud-custodian/sinks/c7n-sink-overlap-non-match"
+      },
+      {
+        "name": "c7n-sink-overlap-not-clause",
+        "destination": "logging.googleapis.com/projects/cloud-custodian/locations/global/buckets/_Default",
+        "filter": "severity>=ERROR AND NOT resource.type=\"gce_instance\"",
+        "createTime": "2026-10-14T02:50:27.494946027Z",
+        "updateTime": "2026-10-14T02:50:27.494946027Z",
+        "resourceName": "projects/cloud-custodian/sinks/c7n-sink-overlap-not-clause"
+      },
+      {
+        "name": "c7n-sink-overlap-other-dest",
+        "destination": "pubsub.googleapis.com/projects/cloud-custodian/topics/c7n-sink-overlap-other",
+        "filter": "severity>=ERROR",
+        "writerIdentity": "serviceAccount:service-12345678901@gcp-sa-logging.iam.gserviceaccount.com",
+        "createTime": "2026-10-14T02:50:30.038994256Z",
+        "updateTime": "2026-10-14T02:50:30.038994256Z",
+        "resourceName": "projects/cloud-custodian/sinks/c7n-sink-overlap-other-dest"
+      },
+      {
+        "name": "c7n-sink-overlap-subset",
+        "destination": "logging.googleapis.com/projects/cloud-custodian/locations/global/buckets/_Default",
+        "filter": "severity>=CRITICAL",
+        "createTime": "2026-10-14T02:50:27.381915096Z",
+        "updateTime": "2026-10-14T02:50:27.381915096Z",
+        "resourceName": "projects/cloud-custodian/sinks/c7n-sink-overlap-subset"
+      },
+      {
+        "name": "_Required",
+        "destination": "logging.googleapis.com/projects/cloud-custodian/locations/global/buckets/_Required",
+        "filter": "LOG_ID(\"cloudaudit.googleapis.com/activity\") OR LOG_ID(\"externalaudit.googleapis.com/activity\") OR LOG_ID(\"cloudaudit.googleapis.com/system_event\") OR LOG_ID(\"externalaudit.googleapis.com/system_event\") OR LOG_ID(\"cloudaudit.googleapis.com/access_transparency\") OR LOG_ID(\"externalaudit.googleapis.com/access_transparency\")",
+        "resourceName": "projects/cloud-custodian/sinks/_Required"
+      },
+      {
+        "name": "_Default",
+        "destination": "logging.googleapis.com/projects/cloud-custodian/locations/global/buckets/_Default",
+        "filter": "NOT LOG_ID(\"cloudaudit.googleapis.com/activity\") AND NOT LOG_ID(\"externalaudit.googleapis.com/activity\") AND NOT LOG_ID(\"cloudaudit.googleapis.com/system_event\") AND NOT LOG_ID(\"externalaudit.googleapis.com/system_event\") AND NOT LOG_ID(\"cloudaudit.googleapis.com/access_transparency\") AND NOT LOG_ID(\"externalaudit.googleapis.com/access_transparency\")",
+        "resourceName": "projects/cloud-custodian/sinks/_Default"
+      }
+    ]
+  }
+}

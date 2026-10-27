@@ -3,11 +3,12 @@
 
 from c7n_azure.provider import resources
 from c7n_azure.resources.arm import ChildArmResourceManager
+from c7n_azure.resources.machine_learning import MachineLearningWorkspaceChildMixin
 from c7n_azure.utils import ResourceIdParser
 
 
 @resources.register('machine-learning-model-version')
-class MachineLearningModelVersion(ChildArmResourceManager):
+class MachineLearningModelVersion(MachineLearningWorkspaceChildMixin, ChildArmResourceManager):
     """Machine Learning Model Version Resource
 
     Enumerates every model version registered in each Machine Learning
@@ -42,7 +43,7 @@ class MachineLearningModelVersion(ChildArmResourceManager):
             '"c7n:parent-id"'
         )
 
-    def enumerate_resources(self, parent_resource, type_info, vault_url=None, **params):
+    def enumerate_workspace_children(self, parent_resource, type_info, vault_url=None, **params):
         client = self.get_client()
         resource_group = ResourceIdParser.get_resource_group(parent_resource['id'])
         workspace_name = parent_resource['name']
@@ -53,6 +54,7 @@ class MachineLearningModelVersion(ChildArmResourceManager):
             for version in client.model_versions.list(
                     resource_group_name=resource_group,
                     workspace_name=workspace_name,
-                    name=container.name):
+                    name=container.name,
+                    list_view_type="All"):
                 versions.append(version.serialize(True))
         return versions

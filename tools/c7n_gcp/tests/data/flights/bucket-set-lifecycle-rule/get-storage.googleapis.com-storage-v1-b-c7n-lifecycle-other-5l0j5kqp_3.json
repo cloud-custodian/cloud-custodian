@@ -1,0 +1,90 @@
+{
+  "headers": {
+    "content-type": "application/json; charset=UTF-8",
+    "etag": "CAM=",
+    "date": "Mon, 12 Oct 2026 15:11:40 GMT",
+    "vary": "Origin, X-Origin",
+    "cache-control": "private, max-age=0, must-revalidate, no-transform",
+    "expires": "Mon, 12 Oct 2026 15:11:40 GMT",
+    "x-goog-gcs-base-ts": "1a130ab62ab",
+    "content-length": "1652",
+    "server": "UploadServer",
+    "alt-svc": "h3=\":443\"; ma=2592000,h3-29=\":443\"; ma=2592000",
+    "status": "200",
+    "content-location": "https://storage.googleapis.com/storage/v1/b/c7n-lifecycle-other-5l0j5kqp?alt=json"
+  },
+  "body": {
+    "kind": "storage#bucket",
+    "selfLink": "https://www.googleapis.com/storage/v1/b/c7n-lifecycle-other-5l0j5kqp",
+    "id": "c7n-lifecycle-other-5l0j5kqp",
+    "name": "c7n-lifecycle-other-5l0j5kqp",
+    "projectNumber": "000000000000",
+    "generation": "1791817896182417922",
+    "metageneration": "3",
+    "location": "US",
+    "storageClass": "STANDARD",
+    "etag": "CAM=",
+    "timeCreated": "2026-10-12T15:11:36.486Z",
+    "updated": "2026-10-12T15:11:40.176Z",
+    "lifecycle": {
+      "rule": [
+        {
+          "action": {
+            "type": "Delete"
+          },
+          "condition": {
+            "age": 120
+          }
+        },
+        {
+          "action": {
+            "storageClass": "NEARLINE",
+            "type": "SetStorageClass"
+          },
+          "condition": {
+            "age": 30,
+            "matchesPrefix": [
+              "logs/"
+            ]
+          }
+        },
+        {
+          "action": {
+            "type": "Delete"
+          },
+          "condition": {
+            "age": 90
+          }
+        },
+        {
+          "action": {
+            "type": "Delete"
+          },
+          "condition": {
+            "daysSinceNoncurrentTime": 7
+          }
+        }
+      ]
+    },
+    "labels": {
+      "goog-terraform-provisioned": "true"
+    },
+    "softDeletePolicy": {
+      "retentionDurationSeconds": "604800",
+      "effectiveTime": "2026-10-12T15:11:36.486Z"
+    },
+    "iamConfiguration": {
+      "bucketPolicyOnly": {
+        "enabled": true,
+        "lockedTime": "2027-01-10T15:11:36.486Z"
+      },
+      "uniformBucketLevelAccess": {
+        "enabled": true,
+        "lockedTime": "2027-01-10T15:11:36.486Z"
+      },
+      "publicAccessPrevention": "inherited"
+    },
+    "locationType": "multi-region",
+    "rpo": "DEFAULT"
+  }
+}

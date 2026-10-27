@@ -9,7 +9,7 @@ RUN apt-get --yes install --no-install-recommends build-essential     curl pytho
 RUN adduser --disabled-login --gecos "" custodian
 # wheel installation cache
 RUN --mount=type=cache,target=/root/.cache/uv
-COPY --from=ghcr.io/astral-sh/uv:0.7.6 /uv /uvx /bin/
+COPY --from=ghcr.io/astral-sh/uv:0.12.19 /uv /uvx /bin/
 ARG PATH="/root/.local/bin:$PATH"
 
 WORKDIR /src

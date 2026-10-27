@@ -1,0 +1,294 @@
+{
+    "version": 1,
+    "interactions": [
+        {
+            "request": {
+                "method": "GET",
+                "uri": "https://management.azure.com/subscriptions/ea42f556-5106-4743-99b0-c129bfa71a47/providers/Microsoft.MachineLearningServices/workspaces?api-version=2023-04-01",
+                "body": null,
+                "headers": {}
+            },
+            "response": {
+                "status": {
+                    "code": 200,
+                    "message": "OK"
+                },
+                "headers": {
+                    "cache-control": [
+                        "no-cache"
+                    ],
+                    "content-type": [
+                        "application/json; charset=utf-8"
+                    ],
+                    "date": [
+                        "Thu, 15 Oct 2026 20:31:17 GMT"
+                    ],
+                    "x-msedge-ref": [
+                        "Ref A: 22B2167BB30944E2A33225A38455CBA5 Ref B: CHI261140503025 Ref C: 2026-10-15T20:31:17Z"
+                    ],
+                    "content-length": [
+                        "15497"
+                    ],
+                    "x-ms-original-request-ids": [
+                        "",
+                        "",
+                        ""
+                    ],
+                    "x-ms-ratelimit-remaining-subscription-global-reads": [
+                        "3749"
+                    ],
+                    "x-cache": [
+                        "CONFIG_NOCACHE"
+                    ]
+                },
+                "body": {
+                    "data": {
+                        "value": [
+                            {
+                                "id": "/subscriptions/ea42f556-5106-4743-99b0-c129bfa71a47/resourceGroups/test_machine-learning-schedule/providers/Microsoft.MachineLearningServices/workspaces/cctest-mlws-129259718319",
+                                "name": "cctest-mlws-129259718319",
+                                "type": "Microsoft.MachineLearningServices/workspaces",
+                                "location": "eastus",
+                                "tags": {},
+                                "etag": null,
+                                "properties": {
+                                    "friendlyName": "",
+                                    "description": "",
+                                    "storageAccount": "/subscriptions/ea42f556-5106-4743-99b0-c129bfa71a47/resourceGroups/test_machine-learning-schedule/providers/Microsoft.Storage/storageAccounts/cctestml129259718319",
+                                    "keyVault": "/subscriptions/ea42f556-5106-4743-99b0-c129bfa71a47/resourceGroups/test_machine-learning-schedule/providers/Microsoft.Keyvault/vaults/cctestmlkv129259718319",
+                                    "applicationInsights": "/subscriptions/ea42f556-5106-4743-99b0-c129bfa71a47/resourceGroups/test_machine-learning-schedule/providers/Microsoft.insights/components/cctestmlai129259718319",
+                                    "hbiWorkspace": false,
+                                    "tenantId": "00000000-0000-0000-0000-000000000003",
+                                    "imageBuildCompute": null,
+                                    "provisioningState": "Succeeded",
+                                    "managedNetwork": {
+                                        "changeableIsolationModes": [
+                                            "AllowInternetOutbound",
+                                            "AllowOnlyApprovedOutbound"
+                                        ],
+                                        "isolationMode": "Disabled",
+                                        "enableNetworkMonitor": false
+                                    },
+                                    "allowRoleAssignmentOnRG": true,
+                                    "v1LegacyMode": false,
+                                    "softDeleteEnabled": false,
+                                    "creationTime": "2026-10-15T20:29:26.4599550Z",
+                                    "notebookInfo": {
+                                        "resourceId": "ef5452aef35c42ff84b691117ac1d605",
+                                        "fqdn": "ml-cctest-mlws-1292-eastus-00000000-0000-0000-0000-000000000005.eastus.notebooks.azure.net",
+                                        "isPrivateLinkEnabled": false,
+                                        "notebookPreparationError": null
+                                    },
+                                    "storageHnsEnabled": false,
+                                    "workspaceId": "00000000-0000-0000-0000-000000000005",
+                                    "linkedModelInventoryArmId": null,
+                                    "privateLinkCount": 0,
+                                    "publicNetworkAccess": "Enabled",
+                                    "discoveryUrl": "https://eastus.api.azureml.ms/discovery",
+                                    "mlFlowTrackingUri": "azureml://eastus.api.azureml.ms/mlflow/v1.0/subscriptions/ea42f556-5106-4743-99b0-c129bfa71a47/resourceGroups/test_machine-learning-schedule/providers/Microsoft.MachineLearningServices/workspaces/cctest-mlws-129259718319",
+                                    "sdkTelemetryAppInsightsKey": "00000000-0000-0000-0000-000000000004",
+                                    "enableDataIsolation": false
+                                },
+                                "identity": {
+                                    "type": "SystemAssigned",
+                                    "principalId": "00000000-0000-0000-0000-000000000002",
+                                    "tenantId": "00000000-0000-0000-0000-000000000003"
+                                },
+                                "kind": "Default",
+                                "sku": {
+                                    "name": "Basic",
+                                    "tier": "Basic"
+                                },
+                                "systemData": {
+                                    "createdAt": "2026-10-15T20:29:26.459955Z",
+                                    "createdBy": "user@example.com",
+                                    "createdByType": "User",
+                                    "lastModifiedAt": "2026-10-15T20:29:26.459955Z",
+                                    "lastModifiedBy": "user@example.com",
+                                    "lastModifiedByType": "User"
+                                }
+                            }
+                        ]
+                    }
+                }
+            }
+        },
+        {
+            "request": {
+                "method": "GET",
+                "uri": "https://management.azure.com/subscriptions/ea42f556-5106-4743-99b0-c129bfa71a47/resourceGroups/test_machine-learning-schedule/providers/Microsoft.MachineLearningServices/workspaces/cctest-mlws-129259718319/schedules?api-version=2023-04-01&listViewType=All",
+                "body": null,
+                "headers": {}
+            },
+            "response": {
+                "status": {
+                    "code": 200,
+                    "message": "OK"
+                },
+                "headers": {
+                    "request-context": [
+                        "appId=cid-v1:2d2e8e63-272e-4b3c-8598-4ee570a0e70d"
+                    ],
+                    "content-length": [
+                        "4505"
+                    ],
+                    "x-cache": [
+                        "CONFIG_NOCACHE"
+                    ],
+                    "x-msedge-ref": [
+                        "Ref A: F37F6FEC51BE4DBEA48DD1F2337282F0 Ref B: CH1AA2020610049 Ref C: 2026-10-15T20:31:20Z"
+                    ],
+                    "x-ms-response-type": [
+                        "standard"
+                    ],
+                    "azureml-served-by-cluster": [
+                        "vienna-eastus-01"
+                    ],
+                    "date": [
+                        "Thu, 15 Oct 2026 20:31:20 GMT"
+                    ],
+                    "content-type": [
+                        "application/json; charset=utf-8"
+                    ],
+                    "cache-control": [
+                        "no-cache"
+                    ],
+                    "x-ms-ratelimit-remaining-subscription-global-reads": [
+                        "3749"
+                    ],
+                    "x-request-time": [
+                        "0.140"
+                    ]
+                },
+                "body": {
+                    "data": {
+                        "value": [
+                            {
+                                "id": "/subscriptions/ea42f556-5106-4743-99b0-c129bfa71a47/resourceGroups/test_machine-learning-schedule/providers/Microsoft.MachineLearningServices/workspaces/cctest-mlws-129259718319/schedules/cctest-schedule-minute",
+                                "name": "cctest-schedule-minute",
+                                "properties": {
+                                    "description": null,
+                                    "tags": null,
+                                    "properties": null,
+                                    "displayName": null,
+                                    "isEnabled": false,
+                                    "trigger": {
+                                        "endTime": null,
+                                        "startTime": "2026-10-15T20:30:37",
+                                        "timeZone": "UTC",
+                                        "triggerType": "Recurrence",
+                                        "frequency": "Minute",
+                                        "interval": 1,
+                                        "schedule": null
+                                    },
+                                    "action": {
+                                        "actionType": "CreateJob",
+                                        "jobDefinition": {
+                                            "description": null,
+                                            "tags": null,
+                                            "properties": null,
+                                            "displayName": null,
+                                            "status": "NotStarted",
+                                            "experimentName": "Default",
+                                            "services": {},
+                                            "computeId": null,
+                                            "isArchived": false,
+                                            "identity": null,
+                                            "componentId": null,
+                                            "jobType": "Command",
+                                            "resources": {
+                                                "instanceCount": 1,
+                                                "instanceType": null,
+                                                "properties": null,
+                                                "shmSize": "2g",
+                                                "dockerArgs": null
+                                            },
+                                            "codeId": null,
+                                            "command": "echo hello",
+                                            "environmentId": "/subscriptions/ea42f556-5106-4743-99b0-c129bfa71a47/resourceGroups/test_machine-learning-schedule/providers/Microsoft.MachineLearningServices/workspaces/cctest-mlws-129259718319/environments/cctest-schedule-environment/versions/1",
+                                            "inputs": {},
+                                            "outputs": {},
+                                            "distribution": null,
+                                            "limits": null,
+                                            "environmentVariables": null,
+                                            "parameters": null
+                                        }
+                                    },
+                                    "provisioningState": "Succeeded"
+                                },
+                                "systemData": {
+                                    "createdAt": "2026-10-15T20:30:27.9843568+00:00",
+                                    "createdBy": "user@example.com",
+                                    "createdByType": "User",
+                                    "lastModifiedAt": "2026-10-15T20:30:27.9843568+00:00",
+                                    "lastModifiedBy": "user@example.com",
+                                    "lastModifiedByType": "User"
+                                }
+                            },
+                            {
+                                "id": "/subscriptions/ea42f556-5106-4743-99b0-c129bfa71a47/resourceGroups/test_machine-learning-schedule/providers/Microsoft.MachineLearningServices/workspaces/cctest-mlws-129259718319/schedules/cctest-schedule-yearly",
+                                "name": "cctest-schedule-yearly",
+                                "properties": {
+                                    "description": null,
+                                    "tags": null,
+                                    "properties": null,
+                                    "displayName": null,
+                                    "isEnabled": true,
+                                    "trigger": {
+                                        "endTime": null,
+                                        "startTime": "2026-10-15T20:30:36",
+                                        "timeZone": "UTC",
+                                        "triggerType": "Cron",
+                                        "expression": "0 0 1 1 *"
+                                    },
+                                    "action": {
+                                        "actionType": "CreateJob",
+                                        "jobDefinition": {
+                                            "description": null,
+                                            "tags": null,
+                                            "properties": null,
+                                            "displayName": null,
+                                            "status": "NotStarted",
+                                            "experimentName": "Default",
+                                            "services": {},
+                                            "computeId": null,
+                                            "isArchived": false,
+                                            "identity": null,
+                                            "componentId": null,
+                                            "jobType": "Command",
+                                            "resources": {
+                                                "instanceCount": 1,
+                                                "instanceType": null,
+                                                "properties": null,
+                                                "shmSize": "2g",
+                                                "dockerArgs": null
+                                            },
+                                            "codeId": null,
+                                            "command": "echo hello",
+                                            "environmentId": "/subscriptions/ea42f556-5106-4743-99b0-c129bfa71a47/resourceGroups/test_machine-learning-schedule/providers/Microsoft.MachineLearningServices/workspaces/cctest-mlws-129259718319/environments/cctest-schedule-environment/versions/1",
+                                            "inputs": {},
+                                            "outputs": {},
+                                            "distribution": null,
+                                            "limits": null,
+                                            "environmentVariables": null,
+                                            "parameters": null
+                                        }
+                                    },
+                                    "provisioningState": "Succeeded"
+                                },
+                                "systemData": {
+                                    "createdAt": "2026-10-15T20:30:21.9389572+00:00",
+                                    "createdBy": "user@example.com",
+                                    "createdByType": "User",
+                                    "lastModifiedAt": "2026-10-15T20:30:21.9389572+00:00",
+                                    "lastModifiedBy": "user@example.com",
+                                    "lastModifiedByType": "User"
+                                }
+                            }
+                        ]
+                    }
+                }
+            }
+        }
+    ]
+}
