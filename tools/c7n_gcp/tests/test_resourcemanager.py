@@ -1,11 +1,14 @@
 # Copyright The Cloud Custodian Authors.
 # SPDX-License-Identifier: Apache-2.0
+import datetime
 import logging
 import os
 import sys
 import time
 from unittest import mock
 
+import google.auth
+from google.auth.transport.requests import AuthorizedSession
 import pytest
 from pytest_terraform import terraform
 
@@ -16,7 +19,15 @@ from c7n_gcp.resources.resourcemanager import (
 from gcp_common import BaseTest
 
 
-from c7n.exceptions import ResourceLimitExceeded
+from c7n.exceptions import (
+    PolicyExecutionError,
+    PolicyValidationError,
+    ResourceLimitExceeded,
+)
+
+
+TOKEN_COUNT_METRIC = 'aiplatform.googleapis.com/publisher/online_serving/token_count'
+TOKEN_COUNT_ANNOTATION = f'{TOKEN_COUNT_METRIC}.ALIGN_SUM.REDUCE_SUM'
 
 ORG_ID = '999999999999'
 FOLDER_ID = '111111111111'
@@ -299,6 +310,49 @@ class FolderTest(BaseTest):
 
 class ProjectTest(BaseTest):
 
+    def generate_token_count_metric(self):
+        credentials, _ = google.auth.default(
+            scopes=['https://www.googleapis.com/auth/cloud-platform']
+        )
+        session = AuthorizedSession(credentials)
+        model = 'gemini-2.5-flash'
+        response = session.post(
+            'https://us-central1-aiplatform.googleapis.com/v1/'
+            f'projects/{self.project_id}/locations/us-central1/'
+            f'publishers/google/models/{model}:generateContent',
+            json={
+                'contents': [
+                    {
+                        'role': 'user',
+                        'parts': [{'text': 'Reply with: metric recording test'}],
+                    },
+                ],
+            },
+        )
+        response.raise_for_status()
+
+        deadline = time.time() + 300
+        while True:
+            end = datetime.datetime.now(datetime.timezone.utc).replace(microsecond=0)
+            response = session.get(
+                f'https://monitoring.googleapis.com/v3/projects/'
+                f'{self.project_id}/timeSeries',
+                params={
+                    'filter': f'metric.type = "{TOKEN_COUNT_METRIC}"',
+                    'interval.startTime': (
+                        end - datetime.timedelta(days=1)
+                    ).isoformat(),
+                    'interval.endTime': end.isoformat(),
+                    'view': 'FULL',
+                },
+            )
+            response.raise_for_status()
+            if response.json().get('timeSeries'):
+                return
+            if time.time() >= deadline:
+                raise RuntimeError('timed out waiting for token-count metric')
+            time.sleep(10)
+
     def test_project_get(self):
         factory = self.replay_flight_data(
             'project-get-resource', project_id='cloud-custodian')
@@ -315,6 +369,246 @@ class ProjectTest(BaseTest):
                 "gcp:cloudresourcemanager:::project/cloud-custodian",
             ],
         )
+
+    def test_project_metric_filter_rejects_resource_grouping(self):
+        for field, value in (
+            ('metric-key', 'resource.labels.project_id'),
+            ('group-by-fields', ['resource.labels.project_id']),
+        ):
+            with self.subTest(field=field):
+                with self.assertRaises(PolicyValidationError):
+                    self.load_policy(
+                        {
+                            'name': 'project-metric-invalid',
+                            'resource': 'gcp.project',
+                            'filters': [
+                                {
+                                    'type': 'metrics',
+                                    'name': 'example.googleapis.com/metric',
+                                    'op': 'gt',
+                                    'value': 0,
+                                    field: value,
+                                },
+                            ],
+                        },
+                    )
+
+    def test_project_metric_filter_rejects_paginated_series(self):
+        policy = self.load_policy(
+            {
+                'name': 'project-metric-paginated',
+                'resource': 'gcp.project',
+                'filters': [
+                    {
+                        'type': 'metrics',
+                        'name': TOKEN_COUNT_METRIC,
+                        'days': 1,
+                        'aligner': 'ALIGN_SUM',
+                        'op': 'gt',
+                        'value': 0,
+                    },
+                ],
+            },
+        )
+        metric_filter = policy.resource_manager.filters[0]
+        series = {
+            'metric': {'type': TOKEN_COUNT_METRIC},
+            'resource': {
+                'type': 'aiplatform.googleapis.com/PublisherModel',
+                'labels': {'project_id': 'resource-project'},
+            },
+            'points': [
+                {
+                    'interval': {
+                        'startTime': '2026-09-24T00:00:00Z',
+                        'endTime': '2026-09-25T00:00:00Z',
+                    },
+                    'value': {'int64Value': '1'},
+                },
+            ],
+        }
+        client = mock.Mock()
+        client.execute_query.return_value = {
+            'timeSeries': [series],
+            'nextPageToken': 'next-page',
+        }
+        client.execute_paged_query.return_value = iter(
+            [
+                {'timeSeries': [series], 'nextPageToken': 'next-page'},
+                {'timeSeries': [series]},
+            ]
+        )
+        session = mock.Mock()
+        session.client.return_value = client
+
+        with mock.patch(
+            'c7n_gcp.resources.resourcemanager.local_session',
+            return_value=session,
+        ):
+            with self.assertRaisesRegex(
+                PolicyExecutionError,
+                'project metric query returned more than one time series',
+            ):
+                metric_filter.process([{'projectId': 'resource-project'}])
+
+    def test_project_metric_filter_uses_resource_project(self):
+        policy = self.load_policy(
+            {
+                'name': 'project-metric-scope',
+                'resource': 'gcp.project',
+                'filters': [
+                    {
+                        'type': 'metrics',
+                        'name': TOKEN_COUNT_METRIC,
+                        'missing-value': 0,
+                        'op': 'eq',
+                        'value': 0,
+                    },
+                ],
+            },
+        )
+        metric_filter = policy.resource_manager.filters[0]
+        requests = []
+
+        class Client:
+            def execute_paged_query(self, verb, arguments):
+                requests.append((verb, arguments))
+                yield {}
+
+        class Session:
+            def client(self, service, version, component):
+                return Client()
+
+            def get_default_project(self):
+                return 'default-project'
+
+        with mock.patch(
+            'c7n_gcp.resources.resourcemanager.local_session',
+            return_value=Session(),
+        ):
+            resources = metric_filter.process([{'projectId': 'resource-project'}])
+
+        self.assertEqual(len(resources), 1)
+        self.assertEqual(requests[0][1]['name'], 'projects/resource-project')
+
+    def test_project_metric_filter(self):
+        project_id = self.project_id
+        session_factory = self.replay_flight_data(
+            'project-metric-filter', project_id=project_id)
+        if self.recording:
+            self.generate_token_count_metric()
+        policy = self.load_policy(
+            {
+                'name': 'project-metric',
+                'resource': 'gcp.project',
+                'query': [{'filter': f'id:{project_id}'}],
+                'filters': [
+                    {
+                        'type': 'metrics',
+                        'name': TOKEN_COUNT_METRIC,
+                        'days': 1,
+                        'aligner': 'ALIGN_SUM',
+                        'reducer': 'REDUCE_SUM',
+                        'op': 'gt',
+                        'value': 0,
+                    },
+                ],
+            },
+            session_factory=session_factory,
+        )
+
+        resources = policy.run()
+
+        self.assertEqual(len(resources), 1)
+        metric = resources[0]['c7n.metrics'][TOKEN_COUNT_ANNOTATION]
+        self.assertGreater(
+            int(metric['points'][0]['value']['int64Value']),
+            0,
+        )
+
+        nonmatching_policy = self.load_policy(
+            {
+                'name': 'project-metric-nonmatching',
+                'resource': 'gcp.project',
+                'query': [{'filter': f'id:{project_id}'}],
+                'filters': [
+                    {
+                        'type': 'metrics',
+                        'name': TOKEN_COUNT_METRIC,
+                        'days': 1,
+                        'aligner': 'ALIGN_SUM',
+                        'reducer': 'REDUCE_SUM',
+                        'op': 'gt',
+                        'value': 10**12,
+                    },
+                ],
+            },
+            session_factory=session_factory,
+        )
+        self.assertEqual(nonmatching_policy.run(), [])
+
+    def test_project_metric_filter_missing_value(self):
+        project_id = self.project_id
+        session_factory = self.replay_flight_data(
+            'project-metric-filter-missing-value', project_id=project_id)
+        policy = self.load_policy(
+            {
+                'name': 'project-metric-missing-value',
+                'resource': 'gcp.project',
+                'query': [{'filter': f'id:{project_id}'}],
+                'filters': [
+                    {
+                        'type': 'metrics',
+                        'name': TOKEN_COUNT_METRIC,
+                        'days': 1,
+                        'aligner': 'ALIGN_SUM',
+                        'reducer': 'REDUCE_SUM',
+                        'filter': 'metric.labels.type = "does-not-exist"',
+                        'missing-value': 0,
+                        'op': 'eq',
+                        'value': 0,
+                    },
+                ],
+            },
+            session_factory=session_factory,
+        )
+
+        resources = policy.run()
+
+        self.assertEqual(len(resources), 1)
+        self.assertIsNone(resources[0]['c7n.metrics'][TOKEN_COUNT_ANNOTATION])
+
+    def test_project_metric_filter_rejects_multiple_series(self):
+        project_id = self.project_id
+        session_factory = self.replay_flight_data(
+            'project-metric-filter-multiple-series', project_id=project_id)
+        if self.recording:
+            self.generate_token_count_metric()
+
+        policy = self.load_policy(
+            {
+                'name': 'project-metric-multiple-series',
+                'resource': 'gcp.project',
+                'query': [{'filter': f'id:{project_id}'}],
+                'filters': [
+                    {
+                        'type': 'metrics',
+                        'name': TOKEN_COUNT_METRIC,
+                        'days': 1,
+                        'aligner': 'ALIGN_SUM',
+                        'op': 'gt',
+                        'value': 0,
+                    },
+                ],
+            },
+            session_factory=session_factory,
+        )
+
+        with self.assertRaisesRegex(
+            PolicyExecutionError,
+            'project metric query returned more than one time series',
+        ):
+            policy.run()
 
     @pytest.mark.skipif(
         sys.platform.startswith('win'), reason='windows file path fun')
@@ -1121,3 +1415,261 @@ def test_dlp_discovery_configs_inherited_permissions(test):
 
     assert permissions() == ('dlp.jobTriggers.list',)
     assert permissions(inherited=True) == ('dlp.jobTriggers.list', 'resourcemanager.projects.get')
+
+
+@terraform("gcp_project_set_iam_policy_audit_config")
+def test_project_set_iam_policy_audit_configs(test, gcp_project_set_iam_policy_audit_config):
+    project_id = gcp_project_set_iam_policy_audit_config.resources[
+        'google_project']['project']['project_id']
+    sa_email = (
+        'serviceAccount:'
+        + gcp_project_set_iam_policy_audit_config.resources[
+            'google_service_account']['sa']['email']
+    )
+
+    def audit_log_types(policy, service):
+        for ac in policy.get('auditConfigs', []):
+            if ac['service'] == service:
+                return {lc['logType'] for lc in ac.get('auditLogConfigs', [])}
+        return set()
+
+    def exempted_members(policy, service, log_type):
+        for ac in policy.get('auditConfigs', []):
+            if ac['service'] == service:
+                for lc in ac.get('auditLogConfigs', []):
+                    if lc['logType'] == log_type:
+                        return set(lc.get('exemptedMembers', []))
+        return set()
+
+    def wait_for_policy(client, predicate, attempts=10):
+        # IAM policy writes are eventually consistent. Replay consumes the same
+        # recorded getIamPolicy responses in order, so the loop is deterministic.
+        for _ in range(attempts):
+            current = client.execute_query('getIamPolicy', {'resource': project_id})
+            if predicate(current):
+                break
+            if test.recording:
+                time.sleep(3)
+        return current
+
+    factory = test.replay_flight_data(
+        'project-set-iam-policy-audit-configs',
+        project_id=project_id,
+    )
+    policy1 = test.load_policy(
+        {
+            'name': 'add-audit-configs',
+            'resource': 'gcp.project',
+            'filters': [{'type': 'value', 'key': 'projectId', 'value': project_id}],
+            'actions': [
+                {
+                    'type': 'set-iam-policy',
+                    'add-audit-configs': [
+                        {
+                            'service': 'allServices',
+                            'audit-log-configs': [
+                                {'log-type': 'DATA_READ'},
+                                {'log-type': 'DATA_WRITE'},
+                            ],
+                        }
+                    ],
+                }
+            ],
+        },
+        session_factory=factory,
+    )
+    resources = policy1.run()
+    assert len(resources) == 1
+
+    client1 = policy1.resource_manager.get_client()
+    updated1 = wait_for_policy(
+        client1,
+        lambda p: {'DATA_READ', 'DATA_WRITE'} <= audit_log_types(p, 'allServices'),
+    )
+    log_types1 = audit_log_types(updated1, 'allServices')
+    assert 'DATA_READ' in log_types1
+    assert 'DATA_WRITE' in log_types1
+
+    policy2 = test.load_policy(
+        {
+            'name': 'remove-audit-config',
+            'resource': 'gcp.project',
+            'filters': [{'type': 'value', 'key': 'projectId', 'value': project_id}],
+            'actions': [
+                {
+                    'type': 'set-iam-policy',
+                    'remove-audit-configs': [
+                        {
+                            'service': 'allServices',
+                            'audit-log-configs': [{'log-type': 'DATA_WRITE'}],
+                        }
+                    ],
+                }
+            ],
+        },
+        session_factory=factory,
+    )
+    resources = policy2.run()
+    assert len(resources) == 1
+
+    client2 = policy2.resource_manager.get_client()
+    updated2 = wait_for_policy(
+        client2,
+        lambda p: 'DATA_WRITE' not in audit_log_types(p, 'allServices'),
+    )
+    log_types2 = audit_log_types(updated2, 'allServices')
+    assert 'DATA_READ' in log_types2
+    assert 'DATA_WRITE' not in log_types2
+
+    policy3 = test.load_policy(
+        {
+            'name': 'audit-with-bindings',
+            'resource': 'gcp.project',
+            'filters': [{'type': 'value', 'key': 'projectId', 'value': project_id}],
+            'actions': [
+                {
+                    'type': 'set-iam-policy',
+                    'add-audit-configs': [
+                        {
+                            'service': 'allServices',
+                            'audit-log-configs': [
+                                {
+                                    'log-type': 'DATA_READ',
+                                    'exempted-members': [sa_email],
+                                }
+                            ],
+                        }
+                    ],
+                    'add-bindings': [
+                        {
+                            'role': 'roles/logging.viewer',
+                            'members': [sa_email],
+                        }
+                    ],
+                }
+            ],
+        },
+        session_factory=factory,
+    )
+    resources = policy3.run()
+    assert len(resources) == 1
+
+    client3 = policy3.resource_manager.get_client()
+    updated3 = wait_for_policy(
+        client3,
+        lambda p: sa_email in exempted_members(p, 'allServices', 'DATA_READ') and any(
+            b['role'] == 'roles/logging.viewer' and sa_email in b['members']
+            for b in p.get('bindings', [])),
+    )
+
+    exempted = exempted_members(updated3, 'allServices', 'DATA_READ')
+    assert sa_email in exempted
+
+    bindings3 = {b['role']: b['members'] for b in updated3.get('bindings', [])}
+    assert sa_email in bindings3.get('roles/logging.viewer', [])
+    assert sa_email in bindings3.get('roles/viewer', [])
+
+
+def audit_log_configs(policy):
+    return {
+        (ac['service'], lc['logType']): set(lc.get('exemptedMembers', []))
+        for ac in policy.get('auditConfigs', []) for lc in ac.get('auditLogConfigs', [])}
+
+
+def wait_for_iam_policy(test, client, project_id, predicate, attempts=10):
+    # IAM policy writes are eventually consistent. Replay consumes the same
+    # recorded getIamPolicy responses in order, so the loop is deterministic.
+    for _ in range(attempts):
+        current = client.execute_query('getIamPolicy', {'resource': project_id})
+        if predicate(current):
+            break
+        if test.recording:
+            time.sleep(3)
+    return current
+
+
+def run_audit_wildcard_policy(test, fixture, flight, action):
+    project_id = fixture.resources['google_project']['project']['project_id']
+    sa_email = 'serviceAccount:' + fixture.resources['google_service_account']['sa']['email']
+    factory = test.replay_flight_data(flight, project_id=project_id)
+    p = test.load_policy({
+        'name': flight,
+        'resource': 'gcp.project',
+        'filters': [
+            {'type': 'value', 'key': 'projectId', 'value': project_id},
+            {'type': 'iam-policy', 'doc': {
+                'key': 'auditConfigs[].auditLogConfigs[].exemptedMembers[]',
+                'value': 'not-null'}},
+        ],
+        'actions': [dict({'type': 'set-iam-policy'}, **action)],
+    }, session_factory=factory)
+
+    assert len(p.run()) == 1
+
+    updated = wait_for_iam_policy(
+        test, p.resource_manager.get_client(), project_id,
+        lambda policy: not any(audit_log_configs(policy).values()))
+    # The audit-only update must leave existing role bindings untouched.
+    bindings = {b['role']: b['members'] for b in updated.get('bindings', [])}
+    assert sa_email in bindings.get('roles/viewer', [])
+    return audit_log_configs(updated)
+
+
+CLEAR_ALL_EXEMPTIONS = [{'service': '*', 'audit-log-configs': [
+    {'log-type': t, 'exempted-members': '*'}
+    for t in ('ADMIN_READ', 'DATA_READ', 'DATA_WRITE')]}]
+
+
+@terraform("gcp_project_iam_audit_wildcard")
+def test_project_set_iam_policy_audit_wildcard_remove(test, gcp_project_iam_audit_wildcard):
+    configs = run_audit_wildcard_policy(
+        test, gcp_project_iam_audit_wildcard, 'project-audit-wildcard-remove',
+        {'remove-audit-configs': CLEAR_ALL_EXEMPTIONS})
+
+    # Exemptions are cleared on every service, but each log type stays enabled.
+    assert configs[('allServices', 'DATA_WRITE')] == set()
+    assert configs[('storage.googleapis.com', 'DATA_READ')] == set()
+    assert not any(configs.values())
+
+
+@terraform("gcp_project_iam_audit_wildcard")
+def test_project_set_iam_policy_audit_wildcard_add_remove(test, gcp_project_iam_audit_wildcard):
+    configs = run_audit_wildcard_policy(
+        test, gcp_project_iam_audit_wildcard, 'project-audit-wildcard-add-remove', {
+            'add-audit-configs': [{'service': 'allServices', 'audit-log-configs': [
+                {'log-type': t} for t in ('ADMIN_READ', 'DATA_READ', 'DATA_WRITE')]}],
+            'remove-audit-configs': CLEAR_ALL_EXEMPTIONS,
+        })
+
+    # One setIamPolicy enables every log type and clears every exemption.
+    for log_type in ('ADMIN_READ', 'DATA_READ', 'DATA_WRITE'):
+        assert configs[('allServices', log_type)] == set()
+    assert configs[('storage.googleapis.com', 'DATA_READ')] == set()
+    assert not any(configs.values())
+
+
+def set_iam_policy_action(test, **data):
+    p = test.load_policy({
+        'name': 'set-iam-policy-audit-configs',
+        'resource': 'gcp.project',
+        'actions': [dict({'type': 'set-iam-policy'}, **data)],
+    }, validate=True)
+    return p.resource_manager.actions[0]
+
+
+@pytest.mark.parametrize('data, match', [
+    ({'add-audit-configs': [
+        {'service': '*', 'audit-log-configs': [{'log-type': 'DATA_READ'}]}]},
+     "add-audit-configs does not support service"),
+    ({'remove-audit-configs': [
+        {'service': '*', 'audit-log-configs': [
+            {'log-type': 'DATA_READ', 'exempted-members': '*'}, {'log-type': 'DATA_WRITE'}]}]},
+     "requires exempted-members"),
+    ({'add-audit-configs': [
+        {'service': 'allServices', 'audit-log-configs': [
+            {'log-type': 'DATA_READ', 'exempted-members': '*'}]}]},
+     None),
+])
+def test_set_iam_policy_audit_configs_wildcard_validation(test, data, match):
+    with pytest.raises(PolicyValidationError, match=match):
+        set_iam_policy_action(test, **data)

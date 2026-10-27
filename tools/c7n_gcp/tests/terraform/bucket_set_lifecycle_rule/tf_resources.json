@@ -1,0 +1,246 @@
+{
+    "pytest-terraform": 1,
+    "outputs": {},
+    "resources": {
+        "google_storage_bucket": {
+            "no_rules": {
+                "autoclass": [],
+                "cors": [],
+                "custom_placement_config": [],
+                "default_event_based_hold": false,
+                "deletion_policy": "DELETE",
+                "effective_labels": {
+                    "goog-terraform-provisioned": "true"
+                },
+                "enable_object_retention": false,
+                "encryption": [],
+                "force_destroy": true,
+                "hierarchical_namespace": [
+                    {
+                        "enabled": false
+                    }
+                ],
+                "id": "c7n-lifecycle-none-5l0j5kqp",
+                "ip_filter": [],
+                "labels": null,
+                "lifecycle_rule": [],
+                "location": "US",
+                "logging": [],
+                "name": "c7n-lifecycle-none-5l0j5kqp",
+                "project": "cloud-custodian",
+                "project_number": 0,
+                "public_access_prevention": "inherited",
+                "requester_pays": false,
+                "retention_policy": [],
+                "rpo": "DEFAULT",
+                "self_link": "https://www.googleapis.com/storage/v1/b/c7n-lifecycle-none-5l0j5kqp",
+                "soft_delete_policy": [
+                    {
+                        "effective_time": "2026-10-12T15:11:36.406Z",
+                        "retention_duration_seconds": 604800
+                    }
+                ],
+                "storage_class": "STANDARD",
+                "terraform_labels": {
+                    "goog-terraform-provisioned": "true"
+                },
+                "time_created": "2026-10-12T15:11:36.406Z",
+                "timeouts": null,
+                "uniform_bucket_level_access": true,
+                "updated": "2026-10-12T15:11:36.406Z",
+                "url": "gs://c7n-lifecycle-none-5l0j5kqp",
+                "versioning": [],
+                "website": []
+            },
+            "other_rules": {
+                "autoclass": [],
+                "cors": [],
+                "custom_placement_config": [],
+                "default_event_based_hold": false,
+                "deletion_policy": "DELETE",
+                "effective_labels": {
+                    "goog-terraform-provisioned": "true"
+                },
+                "enable_object_retention": false,
+                "encryption": [],
+                "force_destroy": true,
+                "hierarchical_namespace": [
+                    {
+                        "enabled": false
+                    }
+                ],
+                "id": "c7n-lifecycle-other-5l0j5kqp",
+                "ip_filter": [],
+                "labels": null,
+                "lifecycle_rule": [
+                    {
+                        "action": [
+                            {
+                                "storage_class": "",
+                                "type": "Delete"
+                            }
+                        ],
+                        "condition": [
+                            {
+                                "age": 120,
+                                "created_before": "",
+                                "custom_time_before": "",
+                                "days_since_custom_time": 0,
+                                "days_since_noncurrent_time": 0,
+                                "matches_prefix": [],
+                                "matches_storage_class": [],
+                                "matches_suffix": [],
+                                "noncurrent_time_before": "",
+                                "num_newer_versions": 0,
+                                "send_age_if_zero": false,
+                                "send_days_since_custom_time_if_zero": false,
+                                "send_days_since_noncurrent_time_if_zero": false,
+                                "send_num_newer_versions_if_zero": false,
+                                "size_above_bytes": 0,
+                                "size_below_bytes": 0,
+                                "with_state": "ANY"
+                            }
+                        ]
+                    },
+                    {
+                        "action": [
+                            {
+                                "storage_class": "NEARLINE",
+                                "type": "SetStorageClass"
+                            }
+                        ],
+                        "condition": [
+                            {
+                                "age": 30,
+                                "created_before": "",
+                                "custom_time_before": "",
+                                "days_since_custom_time": 0,
+                                "days_since_noncurrent_time": 0,
+                                "matches_prefix": [
+                                    "logs/"
+                                ],
+                                "matches_storage_class": [],
+                                "matches_suffix": [],
+                                "noncurrent_time_before": "",
+                                "num_newer_versions": 0,
+                                "send_age_if_zero": false,
+                                "send_days_since_custom_time_if_zero": false,
+                                "send_days_since_noncurrent_time_if_zero": false,
+                                "send_num_newer_versions_if_zero": false,
+                                "size_above_bytes": 0,
+                                "size_below_bytes": 0,
+                                "with_state": "ANY"
+                            }
+                        ]
+                    }
+                ],
+                "location": "US",
+                "logging": [],
+                "name": "c7n-lifecycle-other-5l0j5kqp",
+                "project": "cloud-custodian",
+                "project_number": 0,
+                "public_access_prevention": "inherited",
+                "requester_pays": false,
+                "retention_policy": [],
+                "rpo": "DEFAULT",
+                "self_link": "https://www.googleapis.com/storage/v1/b/c7n-lifecycle-other-5l0j5kqp",
+                "soft_delete_policy": [
+                    {
+                        "effective_time": "2026-10-12T15:11:36.486Z",
+                        "retention_duration_seconds": 604800
+                    }
+                ],
+                "storage_class": "STANDARD",
+                "terraform_labels": {
+                    "goog-terraform-provisioned": "true"
+                },
+                "time_created": "2026-10-12T15:11:36.486Z",
+                "timeouts": null,
+                "uniform_bucket_level_access": true,
+                "updated": "2026-10-12T15:11:36.486Z",
+                "url": "gs://c7n-lifecycle-other-5l0j5kqp",
+                "versioning": [],
+                "website": []
+            },
+            "same_rule": {
+                "autoclass": [],
+                "cors": [],
+                "custom_placement_config": [],
+                "default_event_based_hold": false,
+                "deletion_policy": "DELETE",
+                "effective_labels": {
+                    "goog-terraform-provisioned": "true"
+                },
+                "enable_object_retention": false,
+                "encryption": [],
+                "force_destroy": true,
+                "hierarchical_namespace": [
+                    {
+                        "enabled": false
+                    }
+                ],
+                "id": "c7n-lifecycle-same-5l0j5kqp",
+                "ip_filter": [],
+                "labels": null,
+                "lifecycle_rule": [
+                    {
+                        "action": [
+                            {
+                                "storage_class": "",
+                                "type": "Delete"
+                            }
+                        ],
+                        "condition": [
+                            {
+                                "age": 90,
+                                "created_before": "",
+                                "custom_time_before": "",
+                                "days_since_custom_time": 0,
+                                "days_since_noncurrent_time": 0,
+                                "matches_prefix": [],
+                                "matches_storage_class": [],
+                                "matches_suffix": [],
+                                "noncurrent_time_before": "",
+                                "num_newer_versions": 0,
+                                "send_age_if_zero": false,
+                                "send_days_since_custom_time_if_zero": false,
+                                "send_days_since_noncurrent_time_if_zero": false,
+                                "send_num_newer_versions_if_zero": false,
+                                "size_above_bytes": 0,
+                                "size_below_bytes": 0,
+                                "with_state": "ANY"
+                            }
+                        ]
+                    }
+                ],
+                "location": "US",
+                "logging": [],
+                "name": "c7n-lifecycle-same-5l0j5kqp",
+                "project": "cloud-custodian",
+                "project_number": 0,
+                "public_access_prevention": "inherited",
+                "requester_pays": false,
+                "retention_policy": [],
+                "rpo": "DEFAULT",
+                "self_link": "https://www.googleapis.com/storage/v1/b/c7n-lifecycle-same-5l0j5kqp",
+                "soft_delete_policy": [
+                    {
+                        "effective_time": "2026-10-12T15:11:36.235Z",
+                        "retention_duration_seconds": 604800
+                    }
+                ],
+                "storage_class": "STANDARD",
+                "terraform_labels": {
+                    "goog-terraform-provisioned": "true"
+                },
+                "time_created": "2026-10-12T15:11:36.235Z",
+                "timeouts": null,
+                "uniform_bucket_level_access": true,
+                "updated": "2026-10-12T15:11:36.235Z",
+                "url": "gs://c7n-lifecycle-same-5l0j5kqp",
+                "versioning": [],
+                "website": []
+            }
+        }
+    }
+}

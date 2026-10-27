@@ -58,8 +58,8 @@ specify a region::
 When running the metrics in a centralized account or when centralizing to a specific
 region, additional account and region dimensions will be included.
 
-Typically, the following 5 metrics are included: PolicyException, ResourceCount, ResourceTime,
-ActionTime, and ApiCalls. Value zero will be recorded as well. To filter the metrics
+Typically, the following 6 metrics are included: PolicyException, ResourceCount, ResourceTime,
+ActionTime, ApiCalls, and ApiTime. Value zero will be recorded as well. To filter the metrics
 and save costs, you can use the ``active_metrics`` and/or ``ignore_zero`` query parameters::
 
   custodian run -s . --metrics aws://?ignore_zero=true&active_metrics=ResourceCount,ApiCalls

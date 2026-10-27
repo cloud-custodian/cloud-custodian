@@ -6,6 +6,7 @@ import types
 
 import pytest
 from azure.mgmt.managementgroups.models import DescendantInfo
+from c7n_azure import utils
 from c7n_azure.tags import TagHelper
 from c7n_azure.utils import (AppInsightsHelper, ManagedGroupHelper, Math,
                              PortsRangeHelper, ResourceIdParser, StringUtils,
@@ -17,6 +18,9 @@ from unittest.mock import patch, Mock
 from msrestazure.azure_cloud import AZURE_CHINA_CLOUD, AZURE_PUBLIC_CLOUD
 
 from .azure_common import DEFAULT_SUBSCRIPTION_ID, BaseTest
+
+# A request as the legacy client send override receives it.
+LEGACY_REQUEST = Mock(method='GET', url='https://graph.windows.net/tenant/users')
 
 try:
     from importlib import reload
@@ -46,6 +50,42 @@ def _get_descendant_info(**kwargs):
 class UtilsTest(BaseTest):
     def setUp(self):
         super(UtilsTest, self).setUp()
+
+    def test_requests_session_uses_default_scope_and_get_retries(self):
+        azure_session = Mock(resource_endpoint='https://management.azure.com/')
+        azure_session.credentials.get_token.return_value.token = 'test-token'
+
+        session = utils.requests_session(azure_session, max_retries=3)
+
+        azure_session._initialize_session.assert_called_once_with()
+        azure_session.credentials.get_token.assert_called_once_with(
+            'https://management.azure.com/.default',
+        )
+        self.assertEqual('Bearer test-token', session.headers['Authorization'])
+        retry = session.get_adapter('https://').max_retries
+        self.assertEqual(3, retry.total)
+        self.assertEqual((429, 503), retry.status_forcelist)
+        self.assertEqual(('GET',), retry.allowed_methods)
+        self.assertTrue(retry.respect_retry_after_header)
+        self.assertFalse(retry.raise_on_status)
+
+    def test_requests_session_accepts_scope_and_method_overrides(self):
+        azure_session = Mock(resource_endpoint='https://management.azure.com/')
+        azure_session.credentials.get_token.return_value.token = 'test-token'
+
+        session = utils.requests_session(
+            azure_session,
+            token_scope='https://ml.azure.us/.default',
+            max_retries=2,
+            allowed_methods=('POST',),
+        )
+
+        azure_session.credentials.get_token.assert_called_once_with(
+            'https://ml.azure.us/.default',
+        )
+        retry = session.get_adapter('https://').max_retries
+        self.assertEqual(2, retry.total)
+        self.assertEqual(('POST',), retry.allowed_methods)
 
     def test_get_subscription_id(self):
         self.assertEqual(ResourceIdParser.get_subscription_id(RESOURCE_ID), DEFAULT_SUBSCRIPTION_ID)
@@ -190,6 +230,14 @@ class UtilsTest(BaseTest):
         self.assertEqual(StringUtils.snake_to_camel("test_abc"), "testAbc")
         self.assertEqual(StringUtils.snake_to_camel("test_abc_def"), "testAbcDef")
 
+    def test_camel_to_snake(self):
+        self.assertEqual(StringUtils.camel_to_snake(""), "")
+        self.assertEqual(StringUtils.camel_to_snake("test"), "test")
+        self.assertEqual(StringUtils.camel_to_snake("Test"), "test")
+        self.assertEqual(StringUtils.camel_to_snake("testAbc"), "test_abc")
+        self.assertEqual(StringUtils.camel_to_snake("eventHubAuthorizationRuleId"),
+                         "event_hub_authorization_rule_id")
+
     def test_naming_hash(self):
         source = 'Lorem ipsum dolor sit amet'
         source2 = 'amet sit dolor ipsum Lorem'
@@ -215,7 +263,7 @@ class UtilsTest(BaseTest):
             'status_code': 200
         }
         mock.orig_send.return_value = type(str('response'), (), response_dict)
-        mock.send('')
+        mock.send(LEGACY_REQUEST)
 
         self.assertEqual(mock.orig_send.call_count, 1)
         self.assertEqual(logger.call_count, 2)
@@ -231,7 +279,7 @@ class UtilsTest(BaseTest):
             'status_code': 429
         }
         mock.orig_send.return_value = type(str('response'), (), response_dict)
-        mock.send('')
+        mock.send(LEGACY_REQUEST)
 
         self.assertEqual(mock.orig_send.call_count, 8)
         self.assertEqual(logger_debug.call_count, 8)
@@ -247,7 +295,7 @@ class UtilsTest(BaseTest):
             'status_code': 429
         }
         mock.orig_send.return_value = type(str('response'), (), response_dict)
-        mock.send('')
+        mock.send(LEGACY_REQUEST)
 
         self.assertEqual(mock.orig_send.call_count, 1)
         self.assertEqual(logger.call_count, 1)
@@ -265,7 +313,7 @@ class UtilsTest(BaseTest):
         mock.orig_send.return_value = type(str('response'), (), response_dict)
 
         with patch('time.sleep', new_callable=time.sleep(0)):
-            mock.send('')
+            mock.send(LEGACY_REQUEST)
 
         self.assertEqual(mock.orig_send.call_count, 8)
         self.assertEqual(logger_debug.call_count, 8)
