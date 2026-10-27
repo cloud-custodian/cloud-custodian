@@ -6,10 +6,11 @@ import logging
 
 from azure.keyvault.keys import KeyProperties
 
+from c7n.exceptions import PolicyValidationError
 from c7n.filters import Filter
 from c7n.utils import type_schema
 
-from c7n_azure import constants
+from c7n_azure import constants, utils
 from c7n_azure.actions.base import AzureBaseAction
 from c7n_azure.provider import resources
 from c7n_azure.query import ChildResourceManager, ChildTypeInfo
@@ -201,11 +202,16 @@ class KeyVaultKeyUpdateAction(AzureBaseAction):
     """
     Update a key's properties. This does not update its cryptographic material.
 
-    expires_on and not_before require isoformatted dates
+    expires_on and not_before require isoformatted dates.
+
+    expires_in sets the expiration relative to the time the policy runs. It takes
+    ``days``, ``hours``, and ``minutes``, and excludes expires_on. It replaces any existing
+    expiration, so filter out keys that already have one.
 
     :example:
 
-    .. code-block: yaml
+    .. code-block:: yaml
+
         policies:
             - name: update-expires-on
               resource: azure.keyvault-keys
@@ -214,6 +220,24 @@ class KeyVaultKeyUpdateAction(AzureBaseAction):
               actions:
                 - type: update
                   expires_on: "2025-12-12 00:00:00"
+
+    :example:
+
+    Give keys without an expiration one that ends 90 days after the run.
+
+    .. code-block:: yaml
+
+        policies:
+            - name: azure-keyvault-keys-set-missing-expiration
+              resource: azure.keyvault-keys
+              filters:
+                - type: value
+                  key: attributes.data.exp
+                  value: absent
+              actions:
+                - type: update
+                  expires_in:
+                    days: 90
     """
 
     schema = type_schema(
@@ -238,7 +262,32 @@ class KeyVaultKeyUpdateAction(AzureBaseAction):
         tags={"type": "object"},
         not_before={"type": "string", "format": "date-time"},
         expires_on={"type": "string", "format": "date-time"},
+        expires_in={
+            "type": "object",
+            "properties": {
+                "days": {"type": "integer", "minimum": 0},
+                "hours": {"type": "integer", "minimum": 0},
+                "minutes": {"type": "integer", "minimum": 0},
+            },
+            "additionalProperties": False,
+            "minProperties": 1,
+        },
     )
+
+    def validate(self):
+        expires_in = self.data.get("expires_in")
+        if expires_in is None:
+            return self
+        if "expires_on" in self.data:
+            raise PolicyValidationError(
+                "expires_in and expires_on are mutually exclusive")
+        if sum(expires_in.values()) == 0:
+            raise PolicyValidationError("expires_in must be greater than zero")
+        try:
+            utils.utcnow() + datetime.timedelta(**expires_in)
+        except OverflowError:
+            raise PolicyValidationError("expires_in is too large")
+        return self
 
     def _process_resource(self, resource):
         name = resource['vault_id']['resource_id']['name']
@@ -255,6 +304,9 @@ class KeyVaultKeyUpdateAction(AzureBaseAction):
 
         if expires_on:
             expires_on = datetime.datetime.fromisoformat(expires_on)
+
+        if self.data.get("expires_in"):
+            expires_on = utils.utcnow() + datetime.timedelta(**self.data["expires_in"])
 
         client.update_key_properties(
             name=name,
