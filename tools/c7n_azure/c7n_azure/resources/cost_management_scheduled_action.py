@@ -114,10 +114,10 @@ class CostManagementScheduledAction(QueryResourceManager):
         return super().get_source(source_type)
 
 
-@CostManagementScheduledAction.action_registry.register('update')
-class UpdateScheduledAction(AzureBaseAction):
-    """Enable a disabled Cost Management scheduled action (for example an
-    ``InsightAlert`` anomaly alert).
+@CostManagementScheduledAction.action_registry.register('set-status')
+class SetStatusScheduledAction(AzureBaseAction):
+    """Set the status of a Cost Management scheduled action (for example an
+    ``InsightAlert`` anomaly alert) to ``Enabled`` or ``Disabled``.
 
     ScheduledActionsOperations.create_or_update_by_scope has the same
     upstream SDK bug as list_by_scope (see
@@ -146,10 +146,15 @@ class UpdateScheduledAction(AzureBaseAction):
                 op: ne
                 value: Enabled
             actions:
-              - type: update
+              - type: set-status
+                status: Enabled
     """
 
-    schema = type_schema('update')
+    schema = type_schema(
+        'set-status',
+        required=['status'],
+        status={'type': 'string', 'enum': ['Enabled', 'Disabled']},
+    )
     permissions = ('Microsoft.CostManagement/scheduledActions/write',)
 
     def _prepare_processing(self):
@@ -162,12 +167,13 @@ class UpdateScheduledAction(AzureBaseAction):
             .format(self.subscription_id, resource['name'])
         )
         params = {'api-version': SCHEDULED_ACTIONS_API_VERSION}
+        status = self.data['status']
         body = {
             'kind': resource['kind'],
-            'properties': {**resource['properties'], 'status': 'Enabled'},
+            'properties': {**resource['properties'], 'status': status},
         }
 
         response = self.client._send_request(
             HttpRequest('PUT', url, params=params, json=body))
         response.raise_for_status()
-        return 'enabled'
+        return f'status set to {status}'

@@ -1,5 +1,7 @@
 # Copyright The Cloud Custodian Authors.
 # SPDX-License-Identifier: Apache-2.0
+from c7n.exceptions import PolicyValidationError
+
 from ..azure_common import BaseTest, arm_template, cassette_name
 
 
@@ -65,13 +67,23 @@ class CostManagementScheduledActionTest(BaseTest):
         resources = p.run()
         self.assertEqual(len(resources), 0)
 
-    def test_update_schema_validate(self):
-        p = self.load_policy({
-            'name': 'cost-management-scheduled-action-enable',
-            'resource': 'azure.cost-management-scheduled-action',
-            'actions': [{'type': 'update'}]
-        }, validate=True)
-        self.assertTrue(p)
+    def test_set_status_schema_validate(self):
+        for status in ('Enabled', 'Disabled'):
+            p = self.load_policy({
+                'name': 'cost-management-scheduled-action-set-status',
+                'resource': 'azure.cost-management-scheduled-action',
+                'actions': [{'type': 'set-status', 'status': status}]
+            }, validate=True)
+            self.assertTrue(p)
+
+    def test_set_status_schema_invalid(self):
+        for action in ({'type': 'set-status'}, {'type': 'set-status', 'status': 'Expired'}):
+            with self.assertRaises(PolicyValidationError):
+                self.load_policy({
+                    'name': 'cost-management-scheduled-action-set-status',
+                    'resource': 'azure.cost-management-scheduled-action',
+                    'actions': [action]
+                }, validate=True)
 
     @arm_template('cost-management-scheduled-action.json')
     @cassette_name('enable-disabled-alert')
@@ -102,7 +114,7 @@ class CostManagementScheduledActionTest(BaseTest):
                     'value': 'cctestscheduledaction'
                 }
             ],
-            'actions': [{'type': 'update'}]
+            'actions': [{'type': 'set-status', 'status': 'Enabled'}]
         })
         enable_policy.run()
         self.sleep_in_live_mode(10)
@@ -110,3 +122,41 @@ class CostManagementScheduledActionTest(BaseTest):
         after = read_policy.run()
         self.assertEqual(len(after), 1)
         self.assertEqual(after[0]['properties']['status'], 'Enabled')
+
+    @arm_template('cost-management-scheduled-action.json')
+    @cassette_name('disable-enabled-alert')
+    def test_z_disable_enabled_alert(self):
+        read_policy = self.load_policy({
+            'name': 'cost-management-scheduled-action-read-before-disable',
+            'resource': 'azure.cost-management-scheduled-action',
+            'filters': [
+                {
+                    'type': 'value',
+                    'key': 'name',
+                    'value': 'cctestscheduledaction'
+                }
+            ]
+        })
+
+        before = read_policy.run()
+        self.assertEqual(len(before), 1)
+        self.assertEqual(before[0]['properties']['status'], 'Enabled')
+
+        disable_policy = self.load_policy({
+            'name': 'cost-management-scheduled-action-disable',
+            'resource': 'azure.cost-management-scheduled-action',
+            'filters': [
+                {
+                    'type': 'value',
+                    'key': 'name',
+                    'value': 'cctestscheduledaction'
+                }
+            ],
+            'actions': [{'type': 'set-status', 'status': 'Disabled'}]
+        })
+        disable_policy.run()
+        self.sleep_in_live_mode(10)
+
+        after = read_policy.run()
+        self.assertEqual(len(after), 1)
+        self.assertEqual(after[0]['properties']['status'], 'Disabled')
