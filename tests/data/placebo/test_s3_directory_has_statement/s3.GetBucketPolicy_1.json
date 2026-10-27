@@ -1,0 +1,7 @@
+{
+    "status_code": 200,
+    "data": {
+        "ResponseMetadata": {},
+        "Policy": "{\"Version\":\"2012-10-17\",\"Statement\":[{\"Sid\":\"DenyNonSecureTransport\",\"Effect\":\"Deny\",\"Principal\":\"*\",\"Action\":\"s3express:*\",\"Resource\":\"arn:aws:s3express:us-east-1:644160558196:bucket/c7n-test--use1-az4--x-s3\",\"Condition\":{\"Bool\":{\"aws:SecureTransport\":\"false\"}}}]}"
+    }
+}
