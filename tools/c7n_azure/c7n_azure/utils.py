@@ -9,19 +9,24 @@ import logging
 import random
 import re
 import time
+import typing
 import uuid
+from urllib.parse import urlsplit
 from concurrent.futures import as_completed
 from functools import lru_cache
 
-from azure.core.pipeline.policies import RetryMode, RetryPolicy
+from azure.core.pipeline.policies import CustomHookPolicy, RetryMode, RetryPolicy
 from azure.graphrbac.models import DirectoryObject, GetObjectsParameters
 from azure.identity import ManagedIdentityCredential
 from azure.keyvault.secrets import SecretClient, SecretProperties
 from azure.mgmt.web.models import NameValuePair
+from c7n.output import record_api_call
 from c7n.utils import chunks, local_session
 from msrestazure.azure_exceptions import CloudError
 from msrestazure.tools import parse_resource_id
 from netaddr import IPNetwork, IPRange, IPSet
+import requests
+import urllib3.util.retry
 
 from c7n_azure import constants
 
@@ -94,6 +99,10 @@ class StringUtils:
         return components[0] + ''.join(x.title() for x in components[1:])
 
     @staticmethod
+    def camel_to_snake(string):
+        return re.sub(r'(?<!^)(?=[A-Z])', '_', string).lower()
+
+    @staticmethod
     def naming_hash(val, length=8):
         if isinstance(val, str):
             val = val.encode('utf8')
@@ -125,7 +134,11 @@ def custodian_azure_send_override(self, request, headers=None, content=None, **k
     retries = 0
     max_retries = 8
     while retries < max_retries:
-        response = self.orig_send(request, headers, content, **kwargs)
+        start = time.perf_counter()
+        try:
+            response = self.orig_send(request, headers, content, **kwargs)
+        finally:
+            record_api_call(api_call_name(request.method, request.url), time.perf_counter() - start)
 
         send_logger.debug(response.status_code)
         for k, v in response.headers.items():
@@ -608,6 +621,42 @@ def get_keyvault_auth_endpoint(cloud_endpoints):
     return 'https://{0}'.format(cloud_endpoints.suffixes.keyvault_dns[1:])
 
 
+def requests_session(
+    azure_session: typing.Any,
+    token_scope: typing.Optional[str] = None,
+    max_retries: int = 0,
+    status_forcelist: tuple[int, ...] = (429, 503),
+    allowed_methods: tuple[str, ...] = ('GET',),
+    **retry_args: typing.Any,
+) -> requests.Session:
+    """Create an Azure-authenticated HTTP session with optional retries."""
+    azure_session._initialize_session()
+    token_scope = token_scope or (
+        f"{azure_session.resource_endpoint.rstrip('/')}/.default"
+    )
+    token = azure_session.credentials.get_token(token_scope)
+
+    session = requests.Session()
+    session.headers['Authorization'] = f'Bearer {token.token}'
+
+    if max_retries:
+        retry_options = {
+            'total': max_retries,
+            'status_forcelist': status_forcelist,
+            'allowed_methods': allowed_methods,
+            'respect_retry_after_header': True,
+            'raise_on_status': False,
+        }
+        retry_options.update(retry_args)
+        retry = urllib3.util.retry.Retry(**retry_options)
+        session.mount(
+            'https://',
+            requests.adapters.HTTPAdapter(max_retries=retry),
+        )
+
+    return session
+
+
 # This function is a workaround for Azure KeyVault objects that lack
 # standard serialization method.
 # These objects store variables with an underscore prefix, so we strip it.
@@ -656,6 +705,68 @@ def log_response_data(response):
     for k, v in http_response.headers.items():
         if k.startswith('x-ms-ratelimit'):
             send_logger.debug(k + ':' + v)
+
+
+# The first path segment of resource manager urls, as opposed to data plane
+# urls such as storage accounts and key vaults.
+ARM_PATH_ROOTS = ('subscriptions', 'providers', 'tenants')
+
+
+def api_call_name(method, url):
+    """Name an api call by its http method and the resource type it is on.
+
+    Resource manager calls are named by resource type, taken from the url path
+    with resource names left out, e.g. GET Microsoft.Compute/virtualMachines;
+    an action or child resource type on a resource follows its type, e.g. POST
+    Microsoft.Compute/virtualMachines/powerOff. Other calls are named by host,
+    leaving out an account or vault name in its first label, e.g. GET
+    blob.core.windows.net.
+    """
+    parts = urlsplit(url)
+    segments = [s for s in parts.path.split('/') if s]
+    lowered = [s.lower() for s in segments]
+    if lowered and lowered[0] in ARM_PATH_ROOTS:
+        if 'providers' in lowered:
+            # The last provider namespace, so an extension resource such as
+            # diagnostic settings on a vm is named by its own type.
+            i = len(lowered) - 1 - lowered[::-1].index('providers')
+            after = segments[i + 1:]
+            target = after[:1] + after[1::2]
+        else:
+            # e.g. subscriptions/{id}/resourceGroups/{name}
+            target = segments[0::2]
+        return "%s %s" % (method.upper(), "/".join(target))
+    host = parts.hostname or ''
+    if host.count('.') > 2:
+        host = host.split('.', 1)[1]
+    return "%s %s" % (method.upper(), host)
+
+
+class ApiStatsHookPolicy(CustomHookPolicy):
+    """Record each api request attempt, by name, with its duration.
+
+    Used as a client's custom hook policy, which its pipeline runs inside the
+    retry policy, so each retry of a request is recorded as a call.
+    """
+
+    def on_request(self, request):
+        request.context['c7n_api_stats_start'] = time.perf_counter()
+        super().on_request(request)
+
+    def on_response(self, request, response):
+        super().on_response(request, response)
+        self._record(request)
+
+    def on_exception(self, request):
+        # A failed attempt with no response, e.g. a connection error.
+        self._record(request)
+
+    def _record(self, request):
+        start = request.context.get('c7n_api_stats_start')
+        http_request = request.http_request
+        record_api_call(
+            api_call_name(http_request.method, http_request.url),
+            time.perf_counter() - start if start is not None else 0.0)
 
 
 # This workaround will replace used api-version for costmanagement requests

@@ -371,6 +371,66 @@ class InstanceSetMetadata(InstanceAction):
         return params
 
 
+@Instance.action_registry.register('set-ip-forwarding')
+class InstanceSetIpForwarding(InstanceAction):
+    """Enable or disable IP forwarding on a Compute Engine instance.
+
+    The ``enabled`` parameter is required and must be a boolean.
+
+    :example:
+
+    Enable IP forwarding on all instances that have it disabled:
+
+    .. code-block:: yaml
+
+        policies:
+          - name: gcp-instance-enable-ip-forward
+            resource: gcp.instance
+            filters:
+              - type: value
+                key: canIpForward
+                op: eq
+                value: false
+            actions:
+              - type: set-ip-forwarding
+                enabled: true
+
+    Disable IP forwarding on instances that should not have it:
+
+    .. code-block:: yaml
+
+        policies:
+          - name: gcp-instance-disable-ip-forward
+            resource: gcp.instance
+            filters:
+              - type: value
+                key: canIpForward
+                op: eq
+                value: true
+            actions:
+              - type: set-ip-forwarding
+                enabled: false
+
+    """
+    schema = type_schema(
+        'set-ip-forwarding',
+        required=['enabled'],
+        enabled={'type': 'boolean'})
+    method_spec = {'op': 'update'}
+    permissions = ('compute.instances.update',)
+
+    def get_resource_params(self, model, resource):
+        params = super().get_resource_params(model, resource)
+        body = dict(resource)
+        body['canIpForward'] = self.data['enabled']
+        params.update({
+            'minimalAction': 'REFRESH',
+            'mostDisruptiveAllowedAction': 'REFRESH',
+            'body': body,
+        })
+        return params
+
+
 @resources.register('image')
 class Image(QueryResourceManager):
 

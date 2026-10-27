@@ -886,6 +886,19 @@ class ConfigSG(query.ConfigSource):
         return r
 
 
+class DescribeSecurityGroups(query.DescribeSource):
+
+    def resources(self, query):
+        # Without MaxResults, DescribeSecurityGroups returns every group in the
+        # region in one response, which does not scale to large accounts.
+        # Paging here rather than in the manager keeps the cache key unchanged
+        # and leaves by-id lookups alone since EC2 rejects MaxResults alongside
+        # GroupIds.
+        query = dict(query or {})
+        query.setdefault('MaxResults', 1000)
+        return super().resources(query)
+
+
 @resources.register('security-group')
 class SecurityGroup(query.QueryResourceManager):
 
@@ -902,7 +915,7 @@ class SecurityGroup(query.QueryResourceManager):
 
     source_mapping = {
         'config': ConfigSG,
-        'describe': query.DescribeSource
+        'describe': DescribeSecurityGroups
     }
 
 
@@ -2928,19 +2941,30 @@ class EndpointServiceDetailsFilter(ValueFilter):
         client = local_session(self.manager.session_factory).client("ec2")
         current_region = self.manager.config.region
 
+        # VPC Lattice Resource/ServiceNetwork endpoints have no ServiceName,
+        # so they can't be matched against endpoint service details; skip them.
+        named_resources = []
+        for r in resources:
+            if "ServiceName" not in r:
+                self.log.warning(
+                    "Skipping VPC endpoint %s (type=%s) with no ServiceName",
+                    r.get("VpcEndpointId"), r.get("VpcEndpointType"))
+                continue
+            named_resources.append(r)
+
         # Group unique service names by ServiceRegion, which is set directly on
         # each endpoint and correctly identifies cross-region endpoints without
         # any string parsing. Falls back to current region for older endpoints
         # that pre-date the ServiceRegion field.
         regional_groups = {}
-        for r in resources:
+        for r in named_resources:
             region = r.get("ServiceRegion", current_region)
             regional_groups.setdefault(region, set()).add(r["ServiceName"])
 
         service_map = self._describe_services(client, regional_groups, current_region)
 
         results = []
-        for resource in resources:
+        for resource in named_resources:
             service_detail = service_map.get(resource["ServiceName"], {})
             resource[self.annotation_key] = service_detail or {}
 
@@ -3726,3 +3750,158 @@ class ResolverQueryLoggingFilter(Filter):
                 results.append(r)
 
         return results
+
+
+class TransitGatewayRouteTableConfigSource(query.ConfigSource):
+
+    def load_resource(self, item):
+        resource = super().load_resource(item)
+        resource['TransitGatewayRouteTableId'] = item['resourceId']
+        return resource
+
+
+@resources.register('transit-gateway-route-table')
+class TransitGatewayRouteTable(query.QueryResourceManager):
+    """Transit gateway route tables.
+
+    https://docs.aws.amazon.com/vpc/latest/tgw/tgw-route-tables.html
+
+    Associations and propagations take an API call per route table, so only
+    the ``associations`` and ``propagations`` filters fetch them. To include
+    them for every route table, match any count.
+
+    :example:
+
+    .. code-block:: yaml
+
+        policies:
+          - name: tgw-route-table-inventory
+            resource: aws.transit-gateway-route-table
+            filters:
+              - type: associations
+                count: 0
+                count_op: gte
+              - type: propagations
+                count: 0
+                count_op: gte
+    """
+
+    class resource_type(query.TypeInfo):
+        id = name = 'TransitGatewayRouteTableId'
+        service = 'ec2'
+        enum_spec = ('describe_transit_gateway_route_tables', 'TransitGatewayRouteTables', None)
+        filter_name = 'TransitGatewayRouteTableIds'
+        filter_type = 'list'
+
+        arn_type = 'transit-gateway-route-table'
+        date = 'CreationTime'
+        cfn_type = config_type = 'AWS::EC2::TransitGatewayRouteTable'
+        id_prefix = 'tgw-rtb-'
+
+    source_mapping = {
+        'describe': query.DescribeSource,
+        'config': TransitGatewayRouteTableConfigSource,
+    }
+
+
+class TransitGatewayRouteTableAttachmentFilter(ListItemFilter):
+    """Base for filters on the attachments listed against a route table."""
+    schema_alias = False
+    annotate_items = True
+    operation = None
+    result_key = None
+
+    def process(self, resources, event=None):
+        client = local_session(self.manager.session_factory).client('ec2')
+        paginator = client.get_paginator(self.operation)
+        paginator.PAGE_ITERATOR_CLS = query.RetryPageIterator
+        found = []
+        for r in resources:
+            if self.annotation_key not in r:
+                try:
+                    r[self.annotation_key] = paginator.paginate(
+                        TransitGatewayRouteTableId=r['TransitGatewayRouteTableId']
+                    ).build_full_result().get(self.result_key, [])
+                except ClientError as e:
+                    if e.response['Error']['Code'] != 'InvalidRouteTableID.NotFound':
+                        raise
+                    self.log.warning(
+                        "Resource not found: %s using %s",
+                        self.operation, r['TransitGatewayRouteTableId'])
+                    continue
+            found.append(r)
+        return super().process(found, event)
+
+    def get_item_values(self, resource):
+        return resource[self.annotation_key]
+
+
+@TransitGatewayRouteTable.filter_registry.register('associations')
+class TransitGatewayRouteTableAssociations(TransitGatewayRouteTableAttachmentFilter):
+    """Filter transit gateway route tables by their associated attachments.
+
+    Calls ``GetTransitGatewayRouteTableAssociations`` for each route table and
+    stores the list under ``c7n:Associations``. Each item has
+    ``TransitGatewayAttachmentId``, ``ResourceId``, ``ResourceType`` and
+    ``State``. ``attrs`` matches items, ``count`` and ``count_op`` compare how
+    many match, and matched items are stored under ``c7n:MatchedAssociations``.
+
+    :example:
+
+    Find route tables that no attachment is associated with:
+
+    .. code-block:: yaml
+
+        policies:
+          - name: tgw-route-table-unassociated
+            resource: aws.transit-gateway-route-table
+            filters:
+              - type: associations
+                count: 0
+    """
+    schema = type_schema(
+        'associations',
+        attrs={'$ref': '#/definitions/filters_common/list_item_attrs'},
+        count={'type': 'number'},
+        count_op={'$ref': '#/definitions/filters_common/comparison_operators'})
+    permissions = ('ec2:GetTransitGatewayRouteTableAssociations',)
+    annotation_key = 'c7n:Associations'
+    item_annotation_key = 'c7n:MatchedAssociations'
+    operation = 'get_transit_gateway_route_table_associations'
+    result_key = 'Associations'
+
+
+@TransitGatewayRouteTable.filter_registry.register('propagations')
+class TransitGatewayRouteTablePropagations(TransitGatewayRouteTableAttachmentFilter):
+    """Filter transit gateway route tables by the attachments propagating routes to them.
+
+    Calls ``GetTransitGatewayRouteTablePropagations`` for each route table and
+    stores the list under ``c7n:Propagations``. Each item has
+    ``TransitGatewayAttachmentId``, ``ResourceId``, ``ResourceType`` and
+    ``State``. ``attrs`` matches items, ``count`` and ``count_op`` compare how
+    many match, and matched items are stored under ``c7n:MatchedPropagations``.
+
+    :example:
+
+    Find route tables that learn routes from a VPN attachment:
+
+    .. code-block:: yaml
+
+        policies:
+          - name: tgw-route-table-vpn-propagation
+            resource: aws.transit-gateway-route-table
+            filters:
+              - type: propagations
+                attrs:
+                  - ResourceType: vpn
+    """
+    schema = type_schema(
+        'propagations',
+        attrs={'$ref': '#/definitions/filters_common/list_item_attrs'},
+        count={'type': 'number'},
+        count_op={'$ref': '#/definitions/filters_common/comparison_operators'})
+    permissions = ('ec2:GetTransitGatewayRouteTablePropagations',)
+    annotation_key = 'c7n:Propagations'
+    item_annotation_key = 'c7n:MatchedPropagations'
+    operation = 'get_transit_gateway_route_table_propagations'
+    result_key = 'TransitGatewayRouteTablePropagations'

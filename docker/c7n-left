@@ -1,6 +1,6 @@
 FROM cgr.dev/chainguard/wolfi-base AS builder
 
-ARG UV_VERSION="0.7.6"
+ARG UV_VERSION="0.12.19"
 ARG PY_VERSION=3.12
 WORKDIR /app
 
@@ -10,7 +10,7 @@ USER nonroot
 
 # Install uv and mount wheel cache
 RUN --mount=type=cache,target=/home/nonroot/.cache/uv 
-COPY --from=ghcr.io/astral-sh/uv:0.7.6 /uv /uvx /bin/
+COPY --from=ghcr.io/astral-sh/uv:${UV_VERSION} /uv /uvx /bin/
 ENV UV_PROJECT_ENVIRONMENT=/home/nonroot/venv
 
 # Copy enough of the c7n source that poetry can

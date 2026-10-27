@@ -1,0 +1,221 @@
+{
+    "version": 1,
+    "interactions": [
+        {
+            "request": {
+                "method": "GET",
+                "uri": "https://management.azure.com/subscriptions/ea42f556-5106-4743-99b0-c129bfa71a47/providers/Microsoft.MachineLearningServices/workspaces?api-version=2023-04-01",
+                "body": null,
+                "headers": {}
+            },
+            "response": {
+                "status": {
+                    "code": 200,
+                    "message": "OK"
+                },
+                "headers": {
+                    "x-ms-original-request-ids": [
+                        "",
+                        "",
+                        ""
+                    ],
+                    "cache-control": [
+                        "no-cache"
+                    ],
+                    "x-cache": [
+                        "CONFIG_NOCACHE"
+                    ],
+                    "x-msedge-ref": [
+                        "Ref A: E3134DDE540845DC84ADBAE4677C7E12 Ref B: CYS013050704051 Ref C: 2026-09-28T20:39:30Z"
+                    ],
+                    "content-length": [
+                        "12926"
+                    ],
+                    "x-ms-ratelimit-remaining-subscription-global-reads": [
+                        "3749"
+                    ],
+                    "content-type": [
+                        "application/json; charset=utf-8"
+                    ],
+                    "date": [
+                        "Mon, 28 Sep 2026 20:39:30 GMT"
+                    ]
+                },
+                "body": {
+                    "data": {
+                        "value": [
+                            {
+                                "id": "/subscriptions/ea42f556-5106-4743-99b0-c129bfa71a47/resourceGroups/test_machine-learning-compute-cluster/providers/Microsoft.MachineLearningServices/workspaces/cctestml898871372560",
+                                "name": "cctestml898871372560",
+                                "type": "Microsoft.MachineLearningServices/workspaces",
+                                "location": "southcentralus",
+                                "tags": {},
+                                "etag": null,
+                                "properties": {
+                                    "friendlyName": "cctest-machine-learning-workspace",
+                                    "description": "",
+                                    "storageAccount": "/subscriptions/ea42f556-5106-4743-99b0-c129bfa71a47/resourceGroups/test_machine-learning-compute-cluster/providers/Microsoft.Storage/storageAccounts/cctestmlst898871372560",
+                                    "keyVault": "/subscriptions/ea42f556-5106-4743-99b0-c129bfa71a47/resourceGroups/test_machine-learning-compute-cluster/providers/Microsoft.Keyvault/vaults/cctestmlkv898871372560",
+                                    "applicationInsights": "/subscriptions/ea42f556-5106-4743-99b0-c129bfa71a47/resourceGroups/test_machine-learning-compute-cluster/providers/Microsoft.insights/components/cctestmlai898871372560",
+                                    "hbiWorkspace": false,
+                                    "tenantId": "00000000-0000-0000-0000-000000000003",
+                                    "imageBuildCompute": null,
+                                    "provisioningState": "Succeeded",
+                                    "managedNetwork": {
+                                        "changeableIsolationModes": [
+                                            "AllowInternetOutbound",
+                                            "AllowOnlyApprovedOutbound"
+                                        ],
+                                        "isolationMode": "Disabled",
+                                        "enableNetworkMonitor": false
+                                    },
+                                    "allowRoleAssignmentOnRG": true,
+                                    "v1LegacyMode": false,
+                                    "softDeleteEnabled": false,
+                                    "creationTime": "2026-09-28T20:38:44.2714557Z",
+                                    "notebookInfo": {
+                                        "resourceId": "6039dc9fa1cb446abe8ca5dc8dcc8299",
+                                        "fqdn": "ml-cctestml-southcentralus-d0150ca1-0c13-4f91-9c20-60d6c28b26bc.southcentralus.notebooks.azure.net",
+                                        "isPrivateLinkEnabled": false,
+                                        "notebookPreparationError": null
+                                    },
+                                    "storageHnsEnabled": false,
+                                    "workspaceId": "d0150ca1-0c13-4f91-9c20-60d6c28b26bc",
+                                    "linkedModelInventoryArmId": null,
+                                    "privateLinkCount": 0,
+                                    "publicNetworkAccess": "Enabled",
+                                    "discoveryUrl": "https://southcentralus.api.azureml.ms/discovery",
+                                    "mlFlowTrackingUri": "azureml://southcentralus.api.azureml.ms/mlflow/v1.0/subscriptions/ea42f556-5106-4743-99b0-c129bfa71a47/resourceGroups/test_machine-learning-compute-cluster/providers/Microsoft.MachineLearningServices/workspaces/cctestml898871372560",
+                                    "sdkTelemetryAppInsightsKey": "00000000-0000-0000-0000-000000000004",
+                                    "enableDataIsolation": false
+                                },
+                                "identity": {
+                                    "type": "SystemAssigned",
+                                    "principalId": "d658c321-7e68-4c7d-bfab-c932b24d467c",
+                                    "tenantId": "00000000-0000-0000-0000-000000000003"
+                                },
+                                "kind": "Default",
+                                "sku": {
+                                    "name": "Basic",
+                                    "tier": "Basic"
+                                },
+                                "systemData": {
+                                    "createdAt": "2026-09-28T20:38:44.2714557Z",
+                                    "createdBy": "user@example.com",
+                                    "createdByType": "User",
+                                    "lastModifiedAt": "2026-09-28T20:38:44.2714557Z",
+                                    "lastModifiedBy": "user@example.com",
+                                    "lastModifiedByType": "User"
+                                }
+                            }
+                        ]
+                    }
+                }
+            }
+        },
+        {
+            "request": {
+                "method": "GET",
+                "uri": "https://management.azure.com/subscriptions/ea42f556-5106-4743-99b0-c129bfa71a47/resourceGroups/test_machine-learning-compute-cluster/providers/Microsoft.MachineLearningServices/workspaces/cctestml898871372560/computes?api-version=2023-04-01",
+                "body": null,
+                "headers": {}
+            },
+            "response": {
+                "status": {
+                    "code": 200,
+                    "message": "OK"
+                },
+                "headers": {
+                    "content-length": [
+                        "1864"
+                    ],
+                    "content-type": [
+                        "application/json; charset=utf-8"
+                    ],
+                    "date": [
+                        "Mon, 28 Sep 2026 20:39:43 GMT"
+                    ],
+                    "x-cache": [
+                        "CONFIG_NOCACHE"
+                    ],
+                    "x-msedge-ref": [
+                        "Ref A: F18D99272CD64134A7DDC1C433945C78 Ref B: CYS013050703047 Ref C: 2026-09-28T20:39:43Z"
+                    ],
+                    "x-request-time": [
+                        "0.073"
+                    ],
+                    "x-ms-response-type": [
+                        "standard"
+                    ],
+                    "cache-control": [
+                        "no-cache"
+                    ],
+                    "x-ms-ratelimit-remaining-subscription-global-reads": [
+                        "3749"
+                    ],
+                    "request-context": [
+                        "appId=cid-v1:2d2e8e63-272e-4b3c-8598-4ee570a0e70d"
+                    ],
+                    "azureml-served-by-cluster": [
+                        "vienna-southcentralus-02"
+                    ]
+                },
+                "body": {
+                    "data": {
+                        "value": [
+                            {
+                                "id": "/subscriptions/ea42f556-5106-4743-99b0-c129bfa71a47/resourceGroups/test_machine-learning-compute-cluster/providers/Microsoft.MachineLearningServices/workspaces/cctestml898871372560/computes/cctest-ml-cluster",
+                                "name": "cctest-ml-cluster",
+                                "type": "Microsoft.MachineLearningServices/workspaces/computes",
+                                "location": "southcentralus",
+                                "tags": {},
+                                "properties": {
+                                    "createdOn": "2026-09-28T20:39:03.5706968+00:00",
+                                    "modifiedOn": "2026-09-28T20:39:14.5378582+00:00",
+                                    "disableLocalAuth": false,
+                                    "description": null,
+                                    "resourceId": null,
+                                    "computeType": "AmlCompute",
+                                    "computeLocation": "southcentralus",
+                                    "provisioningState": "Succeeded",
+                                    "provisioningErrors": null,
+                                    "provisioningWarnings": {},
+                                    "isAttachedCompute": false,
+                                    "properties": {
+                                        "vmSize": "Standard_DS2_v2",
+                                        "vmPriority": "Dedicated",
+                                        "scaleSettings": {
+                                            "maxNodeCount": 1,
+                                            "minNodeCount": 0,
+                                            "nodeIdleTimeBeforeScaleDown": "PT2M"
+                                        },
+                                        "subnet": null,
+                                        "currentNodeCount": 0,
+                                        "targetNodeCount": 0,
+                                        "nodeStateCounts": {
+                                            "preparingNodeCount": 0,
+                                            "runningNodeCount": 0,
+                                            "idleNodeCount": 0,
+                                            "unusableNodeCount": 0,
+                                            "leavingNodeCount": 0,
+                                            "preemptedNodeCount": 0
+                                        },
+                                        "allocationState": "Steady",
+                                        "allocationStateTransitionTime": "2026-09-28T20:39:13.648+00:00",
+                                        "errors": null,
+                                        "remoteLoginPortPublicAccess": "Enabled",
+                                        "osType": "Linux",
+                                        "virtualMachineImage": null,
+                                        "isolatedNetwork": false,
+                                        "enableBatchPrivateLink": false,
+                                        "propertyBag": {}
+                                    }
+                                }
+                            }
+                        ]
+                    }
+                }
+            }
+        }
+    ]
+}

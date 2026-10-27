@@ -12,7 +12,7 @@ from dateutil.parser import parse as parse_date
 from dateutil.tz import tzutc
 
 from c7n.actions import ActionRegistry, BaseAction
-from c7n.exceptions import PolicyValidationError
+from c7n.exceptions import PolicyExecutionError, PolicyValidationError
 from c7n.filters import Filter, FilterRegistry, ValueFilter
 from c7n.filters.kms import KmsRelatedFilter
 from c7n.filters.multiattr import MultiAttrFilter
@@ -623,6 +623,145 @@ class AccessAnalyzer(ValueFilter):
                 matched_analyzers.append(analyzer)
         account[self.annotation_key] = matched_analyzers
         return matched_analyzers and resources or []
+
+
+@actions.register('set-access-analyzer')
+class SetAccessAnalyzer(BaseAction):
+    """Enable or delete an external access analyzer in the policy's account and region.
+
+    ``enabled`` defaults to ``true`` and ensures an analyzer is present.
+    ``analyzer-type`` defaults to ``ACCOUNT`` and also supports ``ORGANIZATION``.
+    Organization analyzers require the management or delegated administrator
+    account, with trusted access to IAM Access Analyzer already enabled.
+
+    When enabled, an existing analyzer of the requested type in the region is left unchanged,
+    regardless of its name, including its tags and archive rules. Non-active
+    analyzers are logged with their status and status reason; they are not
+    replaced. When enabled, the configured name is used only when creating an analyzer.
+    When creation is needed, a name already used by a different type raises an error.
+    This action does not create unused-access or internal-access analyzers.
+    ``archive-rules`` accepts the ``ruleName`` and ``filter`` fields from the
+    Access Analyzer ``CreateAnalyzer`` API.
+
+    With ``enabled: false``, only the analyzer with the configured ``analyzer-name``
+    is deleted, after checking that its type matches ``analyzer-type``. A different
+    type raises an error; a missing analyzer is a no-op. Other analyzers are left
+    unchanged. Deleting an analyzer permanently deletes all of its findings and
+    cannot be undone. ``tags`` and ``archive-rules`` apply only to creation.
+    This action does not update existing analyzers; AWS ``UpdateAnalyzer`` does
+    not support external access analyzers.
+
+    IAM Access Analyzer creates its service-linked role automatically when needed.
+    Creation therefore needs ``iam:CreateServiceLinkedRole`` for
+    ``access-analyzer.amazonaws.com``, ``access-analyzer:ListAnalyzers`` and
+    ``access-analyzer:CreateAnalyzer``, plus ``access-analyzer:TagResource`` when
+    tags are supplied. Deletion needs only ``access-analyzer:ListAnalyzers`` and
+    ``access-analyzer:DeleteAnalyzer``.
+
+    :example:
+
+    .. code-block:: yaml
+
+        policies:
+          - name: enable-missing-access-analyzer
+            resource: aws.account
+            filters:
+              - not:
+                  - type: access-analyzer
+                    key: "[type, status]"
+                    value: [ACCOUNT, ACTIVE]
+            actions:
+              - type: set-access-analyzer
+                enabled: true
+                analyzer-name: custodian-external-access
+                analyzer-type: ACCOUNT
+                tags:
+                  Owner: Security
+
+          - name: delete-named-access-analyzer
+            resource: aws.account
+            actions:
+              - type: set-access-analyzer
+                enabled: false
+                analyzer-name: custodian-external-access
+                analyzer-type: ACCOUNT
+    """
+
+    schema = type_schema(
+        'set-access-analyzer', required=['analyzer-name'], **{
+            'enabled': {'type': 'boolean', 'default': True},
+            'analyzer-name': {'type': 'string', 'minLength': 1, 'maxLength': 255,
+                              'pattern': '^[A-Za-z][A-Za-z0-9_.-]*$'},
+            'analyzer-type': {'enum': ['ACCOUNT', 'ORGANIZATION']},
+            'archive-rules': {'type': 'array', 'items': {'type': 'object'}},
+            'tags': {'type': 'object', 'additionalProperties': {'type': 'string'}},
+        })
+    permissions = (
+        'access-analyzer:ListAnalyzers', 'access-analyzer:CreateAnalyzer',
+        'iam:CreateServiceLinkedRole')
+
+    def get_permissions(self):
+        if not self.data.get('enabled', True):
+            return ('access-analyzer:ListAnalyzers', 'access-analyzer:DeleteAnalyzer')
+        if self.data.get('tags'):
+            return self.permissions + ('access-analyzer:TagResource',)
+        return self.permissions
+
+    def get_params(self):
+        params = {
+            'analyzerName': self.data['analyzer-name'],
+            'type': self.data.get('analyzer-type', 'ACCOUNT'),
+        }
+        for key, api_key in (('archive-rules', 'archiveRules'), ('tags', 'tags')):
+            if key in self.data:
+                params[api_key] = self.data[key]
+        return params
+
+    def validate(self):
+        if self.data.get('enabled', True):
+            shape_validate(self.get_params(), 'CreateAnalyzerRequest', 'accessanalyzer')
+        return self
+
+    def process(self, resources):
+        client = local_session(self.manager.session_factory).client('accessanalyzer')
+        params = self.get_params()
+        analyzers = []
+        list_params = {}
+        while True:
+            response = self.manager.retry(client.list_analyzers, **list_params)
+            analyzers.extend(response['analyzers'])
+            if not response.get('nextToken'):
+                break
+            list_params['nextToken'] = response['nextToken']
+        if not self.data.get('enabled', True):
+            for analyzer in analyzers:
+                if analyzer['name'] != params['analyzerName']:
+                    continue
+                if analyzer['type'] != params['type']:
+                    raise PolicyExecutionError(
+                        "Access analyzer %s already has type %s, requested %s" % (
+                            params['analyzerName'], analyzer['type'], params['type']))
+                self.manager.retry(
+                    client.delete_analyzer, analyzerName=params['analyzerName'],
+                    ignore_err_codes=('ResourceNotFoundException',))
+                return
+            return
+        existing = [a for a in analyzers if a['type'] == params['type']]
+        if existing:
+            for analyzer in existing:
+                log = self.log.info if analyzer['status'] == 'ACTIVE' else self.log.warning
+                log(
+                    "Access analyzer %s of type %s already exists with status %s "
+                    "(reason: %s); skipping creation",
+                    analyzer['name'], analyzer['type'], analyzer['status'],
+                    analyzer.get('statusReason', {}).get('code', 'unspecified'))
+            return
+        for analyzer in analyzers:
+            if analyzer['name'] == params['analyzerName']:
+                raise PolicyExecutionError(
+                    "Access analyzer %s already has type %s, requested %s" % (
+                        params['analyzerName'], analyzer['type'], params['type']))
+        self.manager.retry(client.create_analyzer, **params)
 
 
 @filters.register('password-policy')

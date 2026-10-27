@@ -1,0 +1,43 @@
+{
+  "headers": {
+    "content-type": "application/json; charset=UTF-8",
+    "vary": "Origin, X-Origin, Referer",
+    "date": "Fri, 25 Sep 2026 19:08:54 GMT",
+    "server": "ESF",
+    "x-xss-protection": "0",
+    "x-frame-options": "SAMEORIGIN",
+    "x-content-type-options": "nosniff",
+    "alt-svc": "h3=\":443\"; ma=2592000,h3-29=\":443\"; ma=2592000",
+    "transfer-encoding": "chunked",
+    "status": "200",
+    "content-length": "939",
+    "-content-encoding": "gzip",
+    "content-location": "https://cloudkms.googleapis.com/v1/projects/cloud-custodian/locations/us-central1/keyRings/c7n-test-keyring-gibbon/cryptoKeys?alt=json"
+  },
+  "body": {
+    "cryptoKeys": [
+      {
+        "name": "projects/cloud-custodian/locations/us-central1/keyRings/c7n-test-keyring-gibbon/cryptoKeys/c7n-test-cryptokey",
+        "primary": {
+          "name": "projects/cloud-custodian/locations/us-central1/keyRings/c7n-test-keyring-gibbon/cryptoKeys/c7n-test-cryptokey/cryptoKeyVersions/1",
+          "state": "ENABLED",
+          "createTime": "2026-09-25T19:08:31.380929898Z",
+          "protectionLevel": "SOFTWARE",
+          "algorithm": "GOOGLE_SYMMETRIC_ENCRYPTION",
+          "generateTime": "2026-09-25T19:08:31.380929898Z"
+        },
+        "purpose": "ENCRYPT_DECRYPT",
+        "createTime": "2026-09-25T19:08:31.380929898Z",
+        "labels": {
+          "goog-terraform-provisioned": "true"
+        },
+        "versionTemplate": {
+          "protectionLevel": "SOFTWARE",
+          "algorithm": "GOOGLE_SYMMETRIC_ENCRYPTION"
+        },
+        "destroyScheduledDuration": "2592000s"
+      }
+    ],
+    "totalSize": 1
+  }
+}
