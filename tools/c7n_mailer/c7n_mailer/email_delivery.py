@@ -186,10 +186,7 @@ class EmailDelivery:
 
         account_emails = self.get_account_emails(sqs_message)
 
-        # bcc addresses receive every email, but get_mimetext_message keeps them out of the headers
-        bcc_emails = get_bcc_addrs(sqs_message["action"])
-
-        policy_to_emails = policy_to_emails + event_owner_email + account_emails + bcc_emails
+        policy_to_emails = policy_to_emails + event_owner_email + account_emails
         for resource in sqs_message["resources"]:
             # this is the list of emails that will be sent for this resource
             resource_emails = []
@@ -220,9 +217,13 @@ class EmailDelivery:
 
     def get_emails_to_mimetext_map(self, sqs_message):
         emails_to_resources_map = self.get_emails_to_resources_map(sqs_message)
+        # bcc addresses receive every email, but get_mimetext_message keeps them out of the headers.
+        # They're added here rather than per resource, so slack://owners doesn't message them.
+        bcc_addrs = get_bcc_addrs(sqs_message["action"])
         emails_to_mimetext_map = {}
         for to_addrs, resources in emails_to_resources_map.items():
-            emails_to_mimetext_map[to_addrs] = get_mimetext_message(
+            recipients = tuple(sorted(set(to_addrs) | set(bcc_addrs)))
+            emails_to_mimetext_map[recipients] = get_mimetext_message(
                 self.config, self.logger, sqs_message, resources, list(to_addrs)
             )
         # eg: { ('milton@initech.com', 'peter@initech.com'): mimetext_message }

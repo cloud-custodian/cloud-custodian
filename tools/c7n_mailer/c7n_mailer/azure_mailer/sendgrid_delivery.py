@@ -7,7 +7,7 @@ from python_http_client import exceptions
 from sendgrid.helpers.mail import Content, Email, Header, Mail, To
 
 from c7n_mailer.utils import decrypt
-from c7n_mailer.utils_email import get_bcc_addrs, get_mimetext_message, is_email
+from c7n_mailer.utils_email import get_mimetext_message, is_email
 
 
 class SendGridDelivery:
@@ -35,8 +35,9 @@ class SendGridDelivery:
     # are sent, while only ever sending emails to the respective parties.
     def get_emails_to_resources_map(self, queue_message):
         email_to_addrs_to_resources_map = {}
-        # SendGrid sends one email per address, so bcc addresses stay hidden from the others
-        targets = queue_message["action"].get("to", []) + get_bcc_addrs(queue_message["action"])
+        # SendGrid sends one email per address, so bcc addresses stay hidden from the others.
+        # This path doesn't send to cc, so an address in cc as well still gets the bcc copy.
+        targets = queue_message["action"].get("to", []) + queue_message["action"].get("bcc", [])
 
         for resource in queue_message["resources"]:
             # this is the list of emails that will be sent for this resource
