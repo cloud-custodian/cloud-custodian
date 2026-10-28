@@ -50,6 +50,7 @@ class Notify(BaseNotify):
             'to_from': ValuesFrom.schema,
             'cc': {'type': 'array', 'items': {'type': 'string'}},
             'cc_from': ValuesFrom.schema,
+            'bcc': {'type': 'array', 'items': {'type': 'string'}},
             'cc_manager': {'type': 'boolean'},
             'from': {'type': 'string'},
             'subject': {'type': 'string'},

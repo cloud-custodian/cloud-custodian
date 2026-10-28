@@ -86,7 +86,8 @@ def set_mimetext_headers(
 
     message["Subject"] = subject
     message["From"] = from_addr
-    message["To"] = ", ".join(to_addrs)
+    if to_addrs:
+        message["To"] = ", ".join(to_addrs)
     if cc_addrs:
         # NOTE filter out unenhanced cc_addrs added by self.get_mimetext_message
         cc_addrs = [cc for cc in cc_addrs if is_email(cc)]
@@ -103,7 +104,16 @@ def set_mimetext_headers(
     return message
 
 
+def get_bcc_addrs(action):
+    """Returns the bcc addresses of a notify action that aren't also in to or cc"""
+    visible = set(action.get("to", [])) | set(action.get("cc", []))
+    return [bcc for bcc in action.get("bcc", []) if is_email(bcc) and bcc not in visible]
+
+
 def get_mimetext_message(config, logger, message, resources, to_addrs):
+    # bcc recipients are only part of the envelope, never of the headers or the body
+    bcc_addrs = get_bcc_addrs(message["action"])
+    to_addrs = [addr for addr in to_addrs if addr not in bcc_addrs]
     body = get_rendered_jinja(
         to_addrs, message, resources, logger, "template", "default", config["templates_folders"]
     )
