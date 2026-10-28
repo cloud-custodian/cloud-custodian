@@ -191,6 +191,30 @@ class TestSlackDelivery(unittest.TestCase):
         assert kwargs["url"] == webhook
         assert "Authorization" not in kwargs["headers"]
 
+    def test_map_sending_to_http_webhook_has_no_channel(self):
+        self.config["slack_webhook_prefixes"] = ["http://mattermost.internal/hooks/"]
+        webhook = "http://mattermost.internal/hooks/xyz"
+        self.message["action"]["to"] = [webhook]
+        self.message["policy"]["actions"][1]["to"] = [webhook]
+
+        slack = SlackDelivery(self.config, self.logger, self.email_delivery)
+        result = slack.get_to_addrs_slack_messages_map(self.message)
+
+        assert "channel" not in json.loads(result[webhook])
+
+    def test_map_sending_to_tag_webhook(self):
+        webhook = "https://hooks.slack.com/services/T0/B0/XXX"
+        self.resource["Tags"].append({"Key": "SlackChannel", "Value": webhook})
+        self.message["action"]["to"] = ["slack://tag/SlackChannel"]
+        self.message["policy"]["actions"][1]["to"] = ["slack://tag/SlackChannel"]
+
+        slack = SlackDelivery(self.config, self.logger, self.email_delivery)
+        result = slack.get_to_addrs_slack_messages_map(self.message)
+
+        # a webhook URL in the tag is posted to as is, not treated as a channel name
+        assert list(result) == [webhook]
+        assert "channel" not in json.loads(result[webhook])
+
     @patch("c7n_mailer.slack_delivery.requests.post")
     def test_send_slack_msg_configured_webhook(self, mock_post):
         mock_post.return_value.status_code = 200

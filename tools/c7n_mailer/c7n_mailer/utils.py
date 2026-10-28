@@ -171,7 +171,9 @@ def is_slack_webhook(config, target):
     """Returns whether a target is an incoming webhook URL, from Slack or a compatible service"""
     if target == config.get("slack_webhook"):
         return True
-    prefixes = config.get("slack_webhook_prefixes") or SLACK_WEBHOOK_PREFIXES
+    prefixes = config.get("slack_webhook_prefixes")
+    if prefixes is None:
+        prefixes = SLACK_WEBHOOK_PREFIXES
     return any(target.startswith(prefix) for prefix in prefixes)
 
 
