@@ -100,7 +100,8 @@ class TestSlackDelivery(unittest.TestCase):
 
     def test_map_sending_to_tag_channel_groups_resources_by_tag_value(self):
         slack = SlackDelivery(self.config, self.logger, self.email_delivery)
-        self._tagged_resources("team-a", "#team-b", "team-a")
+        # "team-a" and "#team-a" resolve to the same channel and share one message.
+        self._tagged_resources("team-a", "#team-b", "#team-a")
 
         result = slack.get_to_addrs_slack_messages_map(self.message)
 
@@ -127,9 +128,20 @@ class TestSlackDelivery(unittest.TestCase):
             e: "U-" + e.split("@")[0] for e in emails if e != "unknown@initech.com"
         }
         slack = SlackDelivery(self.config, self.logger, self.email_delivery)
-        self._tagged_resources("milton@initech.com", "peter@initech.com", "unknown@initech.com")
+        self._tagged_resources(
+            "milton@initech.com", "peter@initech.com", "unknown@initech.com", "milton@initech.com"
+        )
 
         result = slack.get_to_addrs_slack_messages_map(self.message)
+
+        # One lookup for all owners, with each email only once.
+        mock_retrieve_user_im.assert_called_once()
+        assert sorted(mock_retrieve_user_im.call_args[0][0]) == [
+            "milton@initech.com",
+            "peter@initech.com",
+            "unknown@initech.com",
+        ]
+        assert "vol-3" in result["milton@initech.com"]
 
         assert sorted(result) == ["milton@initech.com", "peter@initech.com"]
         assert json.loads(result["milton@initech.com"])["channel"] == "U-milton"
