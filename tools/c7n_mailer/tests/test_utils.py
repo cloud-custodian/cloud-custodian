@@ -54,6 +54,33 @@ def test_config_defaults():
     )
 
 
+class SlackUrls(unittest.TestCase):
+    def test_is_slack_webhook_default(self):
+        self.assertTrue(utils.is_slack_webhook({}, "https://hooks.slack.com/services/x"))
+        self.assertFalse(utils.is_slack_webhook({}, "https://mattermost.example.com/hooks/x"))
+        self.assertFalse(utils.is_slack_webhook({}, "slack://#channel"))
+
+    def test_is_slack_webhook_prefixes(self):
+        config = {"slack_webhook_prefixes": ["https://mattermost.example.com/hooks/"]}
+        self.assertTrue(utils.is_slack_webhook(config, "https://mattermost.example.com/hooks/x"))
+        # the configured prefixes replace the default
+        self.assertFalse(utils.is_slack_webhook(config, "https://hooks.slack.com/services/x"))
+
+    def test_is_slack_webhook_configured_webhook(self):
+        config = {"slack_webhook": "https://chat.example.com/hooks/x"}
+        self.assertTrue(utils.is_slack_webhook(config, "https://chat.example.com/hooks/x"))
+
+    def test_get_slack_api_url(self):
+        self.assertEqual(
+            utils.get_slack_api_url({}, "chat.postMessage"),
+            "https://slack.com/api/chat.postMessage",
+        )
+        self.assertEqual(
+            utils.get_slack_api_url({"slack_api_url": "https://slack-gov.com/api/"}, "a.b"),
+            "https://slack-gov.com/api/a.b",
+        )
+
+
 class GetResourceTagTargets(unittest.TestCase):
     def test_target_tag_list(self):
         self.assertEqual(

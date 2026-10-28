@@ -149,6 +149,67 @@ class TestSlackDelivery(unittest.TestCase):
         assert kwargs["data"] == result[self.target_channel]
 
     @patch("c7n_mailer.slack_delivery.requests.post")
+    def test_send_slack_msg_custom_api_url(self, mock_post):
+        mock_post.return_value.status_code = 200
+        mock_post.return_value.json.return_value = {"ok": True}
+        self.config["slack_api_url"] = "https://slack-gov.com/api/"
+
+        slack = SlackDelivery(self.config, self.logger, self.email_delivery)
+        result = slack.get_to_addrs_slack_messages_map(self.message)
+        slack.send_slack_msg(self.target_channel, result[self.target_channel])
+
+        _, kwargs = mock_post.call_args
+        assert kwargs["url"] == "https://slack-gov.com/api/chat.postMessage"
+
+    @patch("c7n_mailer.slack_delivery.requests.post")
+    def test_retrieve_user_im_custom_api_url(self, mock_post):
+        mock_post.return_value.json.return_value = {"ok": True, "user": {"id": "U123"}}
+        self.config["slack_api_url"] = "https://slack-gov.com/api"
+
+        slack = SlackDelivery(self.config, self.logger, self.email_delivery)
+        assert slack.retrieve_user_im(["foo@example.com"]) == {"foo@example.com": "U123"}
+
+        _, kwargs = mock_post.call_args
+        assert kwargs["url"] == "https://slack-gov.com/api/users.lookupByEmail"
+
+    @patch("c7n_mailer.slack_delivery.requests.post")
+    def test_send_slack_msg_custom_webhook_prefix(self, mock_post):
+        mock_post.return_value.status_code = 200
+        mock_post.return_value.json.return_value = {"ok": True}
+        self.config["slack_webhook_prefixes"] = ["https://mattermost.example.com/hooks/"]
+
+        webhook = "https://mattermost.example.com/hooks/xyz"
+        self.message["action"]["to"] = [webhook]
+        self.message["policy"]["actions"][1]["to"] = [webhook]
+
+        slack = SlackDelivery(self.config, self.logger, self.email_delivery)
+        result = slack.get_to_addrs_slack_messages_map(self.message)
+        assert "channel" not in json.loads(result[webhook])
+        slack.send_slack_msg(webhook, result[webhook])
+
+        _, kwargs = mock_post.call_args
+        assert kwargs["url"] == webhook
+        assert "Authorization" not in kwargs["headers"]
+
+    @patch("c7n_mailer.slack_delivery.requests.post")
+    def test_send_slack_msg_configured_webhook(self, mock_post):
+        mock_post.return_value.status_code = 200
+        mock_post.return_value.json.return_value = {"ok": True}
+        # slack://webhook/# targets post to slack_webhook, which may not be a Slack URL
+        webhook = "https://mattermost.example.com/hooks/xyz"
+        self.config["slack_webhook"] = webhook
+        self.message["action"]["to"] = ["slack://webhook/#custodian"]
+        self.message["policy"]["actions"][1]["to"] = ["slack://webhook/#custodian"]
+
+        slack = SlackDelivery(self.config, self.logger, self.email_delivery)
+        result = slack.get_to_addrs_slack_messages_map(self.message)
+        slack.send_slack_msg(webhook, result[webhook])
+
+        _, kwargs = mock_post.call_args
+        assert kwargs["url"] == webhook
+        assert "Authorization" not in kwargs["headers"]
+
+    @patch("c7n_mailer.slack_delivery.requests.post")
     def test_send_slack_msg_retry_after(self, mock_post):
         retry_after_delay = 1
         mock_post.return_value.status_code = 429
