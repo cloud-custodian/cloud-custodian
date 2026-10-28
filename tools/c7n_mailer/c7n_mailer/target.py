@@ -4,7 +4,7 @@
 import traceback
 
 from .email_delivery import EmailDelivery
-from .utils import decrypt
+from .utils import decrypt, is_slack_webhook
 
 
 class MessageTargetMixin(object):
@@ -26,7 +26,7 @@ class MessageTargetMixin(object):
 
         # this section sends a notification to the resource owner via Slack
         if any(
-            e.startswith("slack") or e.startswith("https://hooks.slack.com/")
+            e.startswith("slack") or is_slack_webhook(self.config, e)
             for e in message.get("action", {}).get("to", [])
             + message.get("action", {}).get("owner_absent_contact", [])
         ):
