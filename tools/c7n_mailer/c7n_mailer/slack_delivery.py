@@ -107,7 +107,7 @@ class SlackDelivery:
                 # Each resource goes to the Slack user or channel in its own tag, so that resources
                 # with different owners are not all sent to the owner of the first resource.
                 tag_name = target.split("tag/", 1)[1]
-                targets_to_resources = {}
+                resources_by_value = {}
                 for resource in resource_list:
                     result = next(
                         (item for item in resource.get("Tags", []) if item["Key"] == tag_name),
@@ -116,19 +116,23 @@ class SlackDelivery:
                     if not result:
                         self.logger.debug("No %s tag found in resource." % tag_name)
                         continue
+                    resources_by_value.setdefault(result["Value"], []).append(resource)
 
-                    resolved_addr = slack_target = result["Value"]
-                    if is_email(resolved_addr):
-                        ims = self.retrieve_user_im([resolved_addr])
-                        if resolved_addr not in ims:
+                # Look up each email once, however many resources it owns.
+                emails = [value for value in resources_by_value if is_email(value)]
+                ims = self.retrieve_user_im(emails) if emails else {}
+
+                targets_to_resources = {}
+                for value, resources in resources_by_value.items():
+                    resolved_addr = slack_target = value
+                    if is_email(value):
+                        if value not in ims:
                             continue
-                        slack_target = ims[resolved_addr]
-                    elif not resolved_addr.startswith("#"):
-                        resolved_addr = "#" + resolved_addr
-                        slack_target = resolved_addr
-
-                    targets_to_resources.setdefault((resolved_addr, slack_target), []).append(
-                        resource
+                        slack_target = ims[value]
+                    elif not value.startswith("#"):
+                        resolved_addr = slack_target = "#" + value
+                    targets_to_resources.setdefault((resolved_addr, slack_target), []).extend(
+                        resources
                     )
 
                 for (resolved_addr, slack_target), resources in targets_to_resources.items():
