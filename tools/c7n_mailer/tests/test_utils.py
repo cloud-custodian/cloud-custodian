@@ -66,6 +66,10 @@ class SlackUrls(unittest.TestCase):
         # the configured prefixes replace the default
         self.assertFalse(utils.is_slack_webhook(config, "https://hooks.slack.com/services/x"))
 
+    def test_is_slack_webhook_no_prefixes(self):
+        config = {"slack_webhook_prefixes": []}
+        self.assertFalse(utils.is_slack_webhook(config, "https://hooks.slack.com/services/x"))
+
     def test_is_slack_webhook_configured_webhook(self):
         config = {"slack_webhook": "https://chat.example.com/hooks/x"}
         self.assertTrue(utils.is_slack_webhook(config, "https://chat.example.com/hooks/x"))
