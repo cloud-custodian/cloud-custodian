@@ -3,8 +3,10 @@
 import sys
 import time
 import types
+from typing import List, Optional, Union
 
 import pytest
+from azure.mgmt.keyvault import models as keyvault_models
 from azure.mgmt.managementgroups.models import DescendantInfo
 from c7n_azure import utils
 from c7n_azure.tags import TagHelper
@@ -13,7 +15,8 @@ from c7n_azure.utils import (AppInsightsHelper, ManagedGroupHelper, Math,
                              custodian_azure_send_override,
                              get_keyvault_auth_endpoint, get_keyvault_secret,
                              get_service_tag_ip_space, is_resource_group,
-                             is_resource_group_id)
+                             is_resource_group_id, model_to_jsonschema,
+                             type_to_jsonschema)
 from unittest.mock import patch, Mock
 from msrestazure.azure_cloud import AZURE_CHINA_CLOUD, AZURE_PUBLIC_CLOUD
 
@@ -391,3 +394,48 @@ class UtilsTest(BaseTest):
     def test_get_keyvault_auth_china(self):
         auth = get_keyvault_auth_endpoint(AZURE_CHINA_CLOUD)
         self.assertEqual('https://vault.azure.cn', auth)
+
+
+@pytest.mark.parametrize('input_type, expected', [
+    (str, {'type': 'string'}),
+    (int, {'type': 'integer'}),
+    (bool, {'type': 'boolean'}),
+    (Optional[str], {'type': 'string'}),
+    (str | None, {'type': 'string'}),
+    (list[str], {'type': 'array', 'items': {'type': 'string'}}),
+    (List[str], {'type': 'array', 'items': {'type': 'string'}}),
+    (Union[int, bool], {'anyOf': [{'type': 'integer'}, {'type': 'boolean'}]}),
+])
+def test_type_to_jsonschema(input_type, expected):
+    assert type_to_jsonschema(input_type) == expected
+
+
+def test_type_to_jsonschema_unresolved_reference():
+    assert type_to_jsonschema('_models.Sku') == {'type': 'object'}
+
+
+def test_type_to_jsonschema_enum():
+    assert type_to_jsonschema(keyvault_models.SkuFamily, keyvault_models) == {
+        'type': 'string', 'enum': ['A'],
+    }
+
+
+def test_model_to_jsonschema_required_fields():
+    # family has a default, name does not
+    assert model_to_jsonschema(keyvault_models.Sku, keyvault_models)['required'] == ['name']
+
+
+def test_model_to_jsonschema_nested_models():
+    schema = model_to_jsonschema(keyvault_models.NetworkRuleSet, keyvault_models)
+
+    assert 'required' not in schema
+    assert schema['additionalProperties'] is False
+    assert schema['properties']['ip_rules'] == {
+        'type': 'array',
+        'items': {
+            'type': 'object',
+            'properties': {'value': {'type': 'string'}},
+            'additionalProperties': False,
+            'required': ['value'],
+        },
+    }
