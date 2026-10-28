@@ -1487,5 +1487,8 @@ class TestFSxStorageVirtualMachineTags(BaseTest):
         }, session_factory=session_factory)
         resources = p.run()
         self.assertEqual(len(resources), 1)
-        self.assertEqual(
-            {t["Key"]: t["Value"] for t in resources[0]["Tags"]}["Env"], "Prod")
+
+        tags = session_factory().client('resourcegroupstaggingapi').get_resources(
+            ResourceARNList=[resources[0]['ResourceARN']]
+        )['ResourceTagMappingList'][0]['Tags']
+        self.assertEqual([t['Key'] for t in tags], ['Name'])
