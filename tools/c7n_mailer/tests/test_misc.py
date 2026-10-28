@@ -2,6 +2,7 @@
 # SPDX-License-Identifier: Apache-2.0
 # -*- coding: utf-8 -*-
 import argparse
+import io
 import unittest
 import logging
 import os
@@ -73,6 +74,19 @@ class AWSMailerTests(unittest.TestCase):
         self.assertIs(parser.__class__, argparse.ArgumentParser)
         session = cli.session_factory(MAILER_CONFIG)
         self.assertEqual([session.region_name, session.profile_name], ["us-east-1", "default"])
+
+    def test_cli_version(self):
+        parser = cli.get_c7n_mailer_parser()
+        # --version works without the otherwise required arguments
+        with patch("sys.stdout", new_callable=io.StringIO) as stdout:
+            with self.assertRaises(SystemExit) as ctx:
+                parser.parse_args(["--version"])
+        self.assertEqual(ctx.exception.code, 0)
+        self.assertEqual(stdout.getvalue().split()[-1], cli.get_c7n_mailer_version())
+
+    @patch("c7n_mailer.cli.version", side_effect=cli.PackageNotFoundError)
+    def test_cli_version_not_installed(self, _):
+        self.assertEqual(cli.get_c7n_mailer_version(), "unknown")
 
 
 class DeployTests(unittest.TestCase):
