@@ -1166,7 +1166,7 @@ class TestFSx(BaseTest):
             ["sg-0stag00000000000b"])
 
     def test_fsx_security_group_filter_multiple_enis(self):
-        # an ontap file system carries an eni per ha pair, both of which
+        # an ontap file system carries more than one eni, all of which
         # have to resolve back to the same file system.
         session_factory = self.replay_flight_data("test_fsx_network_location_sg")
         p = self.load_policy({
