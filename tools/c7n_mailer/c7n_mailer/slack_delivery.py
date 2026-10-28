@@ -103,35 +103,45 @@ class SlackDelivery:
                     "slack_default",
                     self.config["templates_folders"],
                 )
-            elif target.startswith("slack://tag/") and "Tags" in resource_list[0]:
+            elif target.startswith("slack://tag/"):
+                # Each resource goes to the Slack user or channel in its own tag, so that resources
+                # with different owners are not all sent to the owner of the first resource.
                 tag_name = target.split("tag/", 1)[1]
-                result = next(
-                    (item for item in resource_list[0].get("Tags", []) if item["Key"] == tag_name),
-                    None,
-                )
-                if not result:
-                    self.logger.debug("No %s tag found in resource." % tag_name)
-                    continue
+                targets_to_resources = {}
+                for resource in resource_list:
+                    result = next(
+                        (item for item in resource.get("Tags", []) if item["Key"] == tag_name),
+                        None,
+                    )
+                    if not result:
+                        self.logger.debug("No %s tag found in resource." % tag_name)
+                        continue
 
-                resolved_addr = slack_target = result["Value"]
+                    resolved_addr = slack_target = result["Value"]
+                    if is_email(resolved_addr):
+                        ims = self.retrieve_user_im([resolved_addr])
+                        if resolved_addr not in ims:
+                            continue
+                        slack_target = ims[resolved_addr]
+                    elif not resolved_addr.startswith("#"):
+                        resolved_addr = "#" + resolved_addr
+                        slack_target = resolved_addr
 
-                if is_email(resolved_addr):
-                    ims = self.retrieve_user_im([resolved_addr])
-                    slack_target = ims[resolved_addr]
-                elif not resolved_addr.startswith("#"):
-                    resolved_addr = "#" + resolved_addr
-                    slack_target = resolved_addr
+                    targets_to_resources.setdefault((resolved_addr, slack_target), []).append(
+                        resource
+                    )
 
-                slack_messages[resolved_addr] = get_rendered_jinja(
-                    slack_target,
-                    sqs_message,
-                    resource_list,
-                    self.logger,
-                    "slack_template",
-                    "slack_default",
-                    self.config["templates_folders"],
-                )
-                self.logger.debug("Generating message for specified Slack channel.")
+                for (resolved_addr, slack_target), resources in targets_to_resources.items():
+                    slack_messages[resolved_addr] = get_rendered_jinja(
+                        slack_target,
+                        sqs_message,
+                        resources,
+                        self.logger,
+                        "slack_template",
+                        "slack_default",
+                        self.config["templates_folders"],
+                    )
+                    self.logger.debug("Generating message for specified Slack channel.")
         return slack_messages
 
     def slack_handler(self, sqs_message, slack_messages):
