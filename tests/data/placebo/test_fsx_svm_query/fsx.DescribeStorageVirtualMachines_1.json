@@ -1,0 +1,113 @@
+{
+  "status_code": 200,
+  "data": {
+    "StorageVirtualMachines": [
+      {
+        "ActiveDirectoryConfiguration": {
+          "NetBiosName": "C7NSVM",
+          "SelfManagedActiveDirectoryConfiguration": {
+            "DomainName": "CORP.C7NTEST.COM",
+            "OrganizationalUnitDistinguishedName": "OU=Computers,OU=C7NTEST,DC=corp,DC=c7ntest,DC=com",
+            "UserName": "Admin",
+            "DnsIps": [
+              "172.31.1.151",
+              "172.31.23.220"
+            ]
+          }
+        },
+        "CreationTime": {
+          "__class__": "datetime",
+          "year": 2026,
+          "month": 8,
+          "day": 7,
+          "hour": 18,
+          "minute": 4,
+          "second": 35,
+          "microsecond": 248000
+        },
+        "Endpoints": {
+          "Iscsi": {
+            "DNSName": "iscsi.svm-097e3d446a223c732.fs-0a584801db948c940.fsx.us-east-1.amazonaws.com",
+            "IpAddresses": [
+              "172.31.26.185",
+              "172.31.21.105"
+            ],
+            "Ipv6Addresses": []
+          },
+          "Management": {
+            "DNSName": "svm-097e3d446a223c732.fs-0a584801db948c940.fsx.us-east-1.amazonaws.com",
+            "IpAddresses": [
+              "172.31.24.68"
+            ],
+            "Ipv6Addresses": []
+          },
+          "Nfs": {
+            "DNSName": "svm-097e3d446a223c732.fs-0a584801db948c940.fsx.us-east-1.amazonaws.com",
+            "IpAddresses": [
+              "172.31.24.68"
+            ],
+            "Ipv6Addresses": []
+          },
+          "Smb": {
+            "DNSName": "C7NSVM.CORP.C7NTEST.COM",
+            "IpAddresses": [
+              "172.31.24.68"
+            ],
+            "Ipv6Addresses": []
+          }
+        },
+        "FileSystemId": "fs-0a584801db948c940",
+        "Lifecycle": "CREATED",
+        "Name": "c7nsvm",
+        "ResourceARN": "arn:aws:fsx:us-east-1:644160558196:storage-virtual-machine/fs-0a584801db948c940/svm-097e3d446a223c732",
+        "StorageVirtualMachineId": "svm-097e3d446a223c732",
+        "Subtype": "DEFAULT",
+        "UUID": "02d65013-92ac-11f1-9f99-c1c14f82a044"
+      },
+      {
+        "CreationTime": {
+          "__class__": "datetime",
+          "year": 2026,
+          "month": 8,
+          "day": 7,
+          "hour": 19,
+          "minute": 44,
+          "second": 34,
+          "microsecond": 986000
+        },
+        "Endpoints": {
+          "Iscsi": {
+            "DNSName": "iscsi.svm-05b1f4f80089ba22d.fs-0a584801db948c940.fsx.us-east-1.amazonaws.com",
+            "IpAddresses": [
+              "172.31.18.201",
+              "172.31.23.216"
+            ],
+            "Ipv6Addresses": []
+          },
+          "Management": {
+            "DNSName": "svm-05b1f4f80089ba22d.fs-0a584801db948c940.fsx.us-east-1.amazonaws.com",
+            "IpAddresses": [
+              "172.31.30.18"
+            ],
+            "Ipv6Addresses": []
+          },
+          "Nfs": {
+            "DNSName": "svm-05b1f4f80089ba22d.fs-0a584801db948c940.fsx.us-east-1.amazonaws.com",
+            "IpAddresses": [
+              "172.31.30.18"
+            ],
+            "Ipv6Addresses": []
+          }
+        },
+        "FileSystemId": "fs-0a584801db948c940",
+        "Lifecycle": "CREATED",
+        "Name": "c7nsvmnoad",
+        "ResourceARN": "arn:aws:fsx:us-east-1:644160558196:storage-virtual-machine/fs-0a584801db948c940/svm-05b1f4f80089ba22d",
+        "StorageVirtualMachineId": "svm-05b1f4f80089ba22d",
+        "Subtype": "DEFAULT",
+        "UUID": "0118403b-92ba-11f1-9f99-c1c14f82a044"
+      }
+    ],
+    "ResponseMetadata": {}
+  }
+}

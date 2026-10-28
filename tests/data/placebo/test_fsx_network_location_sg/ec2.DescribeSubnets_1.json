@@ -1,0 +1,42 @@
+{
+  "status_code": 200,
+  "data": {
+    "Subnets": [
+      {
+        "SubnetId": "subnet-3a334610",
+        "VpcId": "vpc-d2d616b5",
+        "OwnerId": "644160558196",
+        "State": "available",
+        "AvailabilityZone": "us-east-1b",
+        "CidrBlock": "172.31.7.0/24",
+        "AvailableIpAddressCount": 250,
+        "DefaultForAz": false,
+        "MapPublicIpOnLaunch": false,
+        "Tags": [
+          {
+            "Key": "Env",
+            "Value": "Prod"
+          }
+        ]
+      },
+      {
+        "SubnetId": "subnet-efbcccb7",
+        "VpcId": "vpc-d2d616b5",
+        "OwnerId": "644160558196",
+        "State": "available",
+        "AvailabilityZone": "us-east-1b",
+        "CidrBlock": "172.31.7.0/24",
+        "AvailableIpAddressCount": 250,
+        "DefaultForAz": false,
+        "MapPublicIpOnLaunch": false,
+        "Tags": [
+          {
+            "Key": "Env",
+            "Value": "Dev"
+          }
+        ]
+      }
+    ],
+    "ResponseMetadata": {}
+  }
+}
