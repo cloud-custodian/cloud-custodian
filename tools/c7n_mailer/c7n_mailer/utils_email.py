@@ -1,5 +1,6 @@
 # Copyright The Cloud Custodian Authors.
 # SPDX-License-Identifier: Apache-2.0
+import copy
 import logging
 from email.mime.text import MIMEText
 from email.utils import parseaddr
@@ -110,10 +111,20 @@ def get_bcc_addrs(action):
     return [bcc for bcc in action.get("bcc", []) if is_email(bcc) and bcc not in visible]
 
 
+def without_bcc(message):
+    """Returns a copy of a queue message without the bcc lists, for rendering templates"""
+    message = copy.deepcopy(message)
+    for action in [message["action"]] + message.get("policy", {}).get("actions", []):
+        if isinstance(action, dict):
+            action.pop("bcc", None)
+    return message
+
+
 def get_mimetext_message(config, logger, message, resources, to_addrs):
     # bcc recipients are only part of the envelope, never of the headers or the body
     bcc_addrs = get_bcc_addrs(message["action"])
     to_addrs = [addr for addr in to_addrs if addr not in bcc_addrs]
+    message = without_bcc(message)
     body = get_rendered_jinja(
         to_addrs, message, resources, logger, "template", "default", config["templates_folders"]
     )

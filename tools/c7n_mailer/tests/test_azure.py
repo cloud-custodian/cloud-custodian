@@ -119,6 +119,20 @@ class AzureTest(unittest.TestCase):
         address_two = mock_send.call_args_list[1][0][0].personalizations[0].tos[0]["email"]
         self.assertEqual("user@domain.com", address_two)
 
+    @patch("sendgrid.SendGridAPIClient.send")
+    def test_sendgrid_handler_bcc(self, mock_send):
+        message = json.loads(ASQ_MESSAGE)
+        # this path doesn't send to cc, so an address in cc as well still gets the bcc copy
+        message["action"]["cc"] = ["audit@domain.com"]
+        message["action"]["bcc"] = ["audit@domain.com"]
+        sendgrid_delivery = SendGridDelivery(MAILER_CONFIG_AZURE, Mock(), logger)
+        sendgrid_messages = sendgrid_delivery.get_to_addrs_sendgrid_messages_map(message)
+        sendgrid_delivery.sendgrid_handler(message, sendgrid_messages)
+
+        addresses = [c[0][0].personalizations[0].tos[0]["email"] for c in mock_send.call_args_list]
+        self.assertIn("audit@domain.com", addresses)
+        self.assertEqual(len(addresses), 2)
+
     def test_azure_mailer_requirements(self):
         reqs = deploy.get_mailer_requirements()
         self.assertIn("adal", reqs)

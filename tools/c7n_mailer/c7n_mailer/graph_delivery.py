@@ -1,5 +1,5 @@
 import json
-from email.utils import getaddresses
+from email.utils import getaddresses, parseaddr
 
 import requests
 
@@ -34,13 +34,17 @@ class GraphDelivery:
                     "subject": mimetext.get("Subject"),
                     "body": {"contentType": contentType, "content": content},
                     "toRecipients": [
-                        {"emailAddress": {"address": e}} for e in emails if e in to_header
+                        {"emailAddress": {"address": e}}
+                        for e in emails
+                        if parseaddr(e)[1] in to_header
                     ],
                     # NOTE cc has been included into "to" field when creating mimetext map,
                     # so skipping it
                     # "ccRecipients": [],
                     "bccRecipients": [
-                        {"emailAddress": {"address": e}} for e in emails if e not in to_header
+                        {"emailAddress": {"address": e}}
+                        for e in emails
+                        if parseaddr(e)[1] not in to_header
                     ],
                 },
                 "isDraft": "false",

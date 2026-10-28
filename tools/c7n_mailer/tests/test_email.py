@@ -354,10 +354,30 @@ class EmailTest(unittest.TestCase):
     def test_bcc_added_to_every_email(self):
         sqs_msg = copy.deepcopy(SQS_MESSAGE_1)
         sqs_msg["action"]["bcc"] = ["audit@example.com"]
-        emails_to_resources_map = self.email_delivery.get_emails_to_resources_map(sqs_msg)
-        self.assertTrue(emails_to_resources_map)
-        for emails in emails_to_resources_map:
+        emails_to_mimetext_map = self.email_delivery.get_emails_to_mimetext_map(sqs_msg)
+        self.assertTrue(emails_to_mimetext_map)
+        for emails in emails_to_mimetext_map:
             self.assertIn("audit@example.com", emails)
+        # slack://owners uses the resources map, so it doesn't message bcc addresses
+        for emails in self.email_delivery.get_emails_to_resources_map(sqs_msg):
+            self.assertNotIn("audit@example.com", emails)
+
+    def test_bcc_not_in_template_context(self):
+        sqs_msg = copy.deepcopy(SQS_MESSAGE_1)
+        sqs_msg["action"]["bcc"] = ["audit@example.com"]
+        sqs_msg["policy"]["actions"][1]["bcc"] = ["audit@example.com"]
+        with patch("c7n_mailer.utils_email.get_rendered_jinja", return_value="") as render:
+            get_mimetext_message(
+                self.email_delivery.config,
+                self.email_delivery.logger,
+                sqs_msg,
+                sqs_msg["resources"],
+                ["bill_lumberg@initech.com"],
+            )
+        rendered_message = render.call_args[0][1]
+        self.assertNotIn("audit@example.com", json.dumps(rendered_message))
+        # the caller's message is left as it was
+        self.assertEqual(sqs_msg["action"]["bcc"], ["audit@example.com"])
 
     def test_ses_send_raw_email_bcc(self):
         config = copy.deepcopy(MAILER_CONFIG)
@@ -450,7 +470,8 @@ class EmailTest(unittest.TestCase):
         delivery = MockEmailDelivery(config, self.aws_session, MagicMock())
 
         sqs_msg = copy.deepcopy(SQS_MESSAGE_1)
-        sqs_msg["action"]["bcc"] = ["audit@example.com"]
+        sqs_msg["action"]["bcc"] = ["Audit <audit@example.com>"]
+        sqs_msg["action"]["to"].append("Bill <bill@example.com>")
         with patch("requests.post") as req:
             with patch("c7n_mailer.utils.kms_decrypt") as mock_decrypt:
                 mock_decrypt.return_value = "xyz"
@@ -460,8 +481,9 @@ class EmailTest(unittest.TestCase):
         to = [r["emailAddress"]["address"] for r in message["toRecipients"]]
         bcc = [r["emailAddress"]["address"] for r in message["bccRecipients"]]
         self.assertIn("bill_lumberg@initech.com", to)
-        self.assertNotIn("audit@example.com", to)
-        self.assertEqual(bcc, ["audit@example.com"])
+        # an address with a display name is compared by its address part
+        self.assertIn("Bill <bill@example.com>", to)
+        self.assertEqual(bcc, ["Audit <audit@example.com>"])
 
     def test_ses_send_raw_email(self):
         config = copy.deepcopy(MAILER_CONFIG)
