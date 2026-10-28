@@ -1,7 +1,6 @@
 # Copyright The Cloud Custodian Authors.
 # SPDX-License-Identifier: Apache-2.0
 
-import datetime
 import logging
 
 from azure.keyvault.keys import KeyProperties
@@ -10,9 +9,9 @@ from c7n.filters import Filter
 from c7n.utils import type_schema
 
 from c7n_azure import constants
-from c7n_azure.actions.base import AzureBaseAction
 from c7n_azure.provider import resources
 from c7n_azure.query import ChildResourceManager, ChildTypeInfo
+from c7n_azure.resources.key_vault import KeyVaultPropertiesUpdateAction
 from c7n_azure.utils import ThreadHelper, ResourceIdParser
 
 
@@ -197,7 +196,7 @@ class KeyVaultKeyRotationFilter(Filter):
 
 
 @KeyVaultKeys.action_registry.register("update")
-class KeyVaultKeyUpdateAction(AzureBaseAction):
+class KeyVaultKeyUpdateAction(KeyVaultPropertiesUpdateAction):
     """
     Update a key's properties. This does not update its cryptographic material.
 
@@ -247,20 +246,11 @@ class KeyVaultKeyUpdateAction(AzureBaseAction):
 
         client = self.manager.get_client(vault_url=id.vault_url)
 
-        not_before = self.data.get("not_before")
-        expires_on = self.data.get("expires_on")
-
-        if not_before:
-            not_before = datetime.datetime.fromisoformat(not_before)
-
-        if expires_on:
-            expires_on = datetime.datetime.fromisoformat(expires_on)
-
         client.update_key_properties(
             name=name,
             key_operations=self.data.get("key_operations"),
             enabled=self.data.get("enabled"),
             tags=self.data.get("tags"),
-            not_before=not_before,
-            expires_on=expires_on,
+            not_before=self.not_before,
+            expires_on=self.expires_on,
         )
