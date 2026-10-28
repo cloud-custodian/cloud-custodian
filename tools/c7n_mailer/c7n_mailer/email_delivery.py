@@ -15,7 +15,7 @@ from .utils import (
     get_resource_tag_targets,
     unique,
 )
-from .utils_email import get_mimetext_message, is_email
+from .utils_email import get_bcc_addrs, get_mimetext_message, is_email
 
 
 class EmailDelivery:
@@ -186,7 +186,10 @@ class EmailDelivery:
 
         account_emails = self.get_account_emails(sqs_message)
 
-        policy_to_emails = policy_to_emails + event_owner_email + account_emails
+        # bcc addresses receive every email, but get_mimetext_message keeps them out of the headers
+        bcc_emails = get_bcc_addrs(sqs_message["action"])
+
+        policy_to_emails = policy_to_emails + event_owner_email + account_emails + bcc_emails
         for resource in sqs_message["resources"]:
             # this is the list of emails that will be sent for this resource
             resource_emails = []
@@ -243,7 +246,11 @@ class EmailDelivery:
             # use aws ses normally.
             else:
                 for emails, mimetext_msg in emails_to_mimetext_map.items():
-                    self.aws_ses.send_raw_email(RawMessage={"Data": mimetext_msg.as_string()})
+                    # bcc recipients aren't in the headers, so name all of them explicitly
+                    self.aws_ses.send_raw_email(
+                        Destinations=list(emails),
+                        RawMessage={"Data": mimetext_msg.as_string()},
+                    )
         except Exception as error:
             self.logger.error(
                 "policy:%s account:%s sending to:%s \n\n error: %s\n\n mailer.yml: %s"
