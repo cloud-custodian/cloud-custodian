@@ -7,7 +7,9 @@ import logging
 import os
 import tempfile
 import boto3
-from unittest.mock import patch
+from unittest.mock import MagicMock, patch
+
+from botocore.exceptions import ClientError
 
 from c7n_mailer import replay
 from c7n_mailer import handle
@@ -16,7 +18,8 @@ from c7n_mailer import cli
 from c7n_mailer import deploy
 from c7n_mailer.azure_mailer import azure_queue_processor
 from c7n_mailer.gcp_mailer import gcp_queue_processor
-from c7n.mu import PythonPackageArchive
+from c7n.mu import PythonPackageArchive, SQSSubscription
+from c7n.utils import reset_session_cache
 from common import MAILER_CONFIG, MAILER_CONFIG_GCP, MAILER_CONFIG_AZURE, SQS_MESSAGE_1_ENCODED
 
 
@@ -52,6 +55,34 @@ class AWSMailerTests(unittest.TestCase):
 
         mailer_sqs_queue_processor.process_sqs_message(SQS_MESSAGE_1_ENCODED)
         assert mock_sns_delivery.called
+
+    @patch("c7n_mailer.target.EmailDelivery")
+    @patch("c7n_mailer.sns_delivery.SnsDelivery")
+    def test_sqs_queue_processor_lambda_event(self, mock_sns_delivery, mock_email_delivery):
+        processor = sqs_queue_processor.MailerSqsQueueProcessor(
+            MAILER_CONFIG, boto3.Session(), logging.getLogger("c7n_mailer")
+        )
+        good = {
+            "messageId": "good",
+            "body": SQS_MESSAGE_1_ENCODED["Body"].decode("ascii"),
+            "attributes": {"SentTimestamp": "1672574400000"},
+            "messageAttributes": {
+                "mtype": {"stringValue": sqs_queue_processor.DATA_MESSAGE, "dataType": "String"}
+            },
+        }
+        bad = {"messageId": "bad", "body": "not a custodian message"}
+        result = processor.process_event({"Records": [good, bad]})
+        # Only the failed message is reported, so lambda deletes the other one from the queue.
+        self.assertEqual(result, {"batchItemFailures": [{"itemIdentifier": "bad"}]})
+        assert mock_sns_delivery.called
+
+    @patch("c7n_mailer.handle.MailerSqsQueueProcessor")
+    def test_mailer_handle_sqs(self, mock_processor):
+        mock_processor.return_value.process_event.return_value = {"batchItemFailures": []}
+        event = {"Records": []}
+        result = handle.start_c7n_mailer_sqs(logging.getLogger("c7n_mailer"), event, MAILER_CONFIG)
+        self.assertEqual(result, {"batchItemFailures": []})
+        mock_processor.return_value.process_event.assert_called_once_with(event)
 
     def test_azure_queue_processor(self):
         processor = azure_queue_processor.MailerAzureQueueProcessor(
@@ -106,3 +137,78 @@ class DeployTests(unittest.TestCase):
             assert checksum1 == checksum2
             archive1.remove()
             archive2.remove()
+
+
+@patch("c7n_mailer.deploy.LambdaManager")
+@patch("c7n_mailer.deploy.get_archive")
+class ProvisionTests(unittest.TestCase):
+    queue_url = "https://sqs.us-east-1.amazonaws.com/123456789012/mailer"
+    queue_arn = "arn:aws:sqs:us-east-1:123456789012:mailer"
+
+    def setUp(self):
+        reset_session_cache()
+        self.addCleanup(reset_session_cache)
+        self.session = MagicMock()
+        self.sqs = MagicMock()
+        self.sqs.get_queue_attributes.return_value = {"Attributes": {"QueueArn": self.queue_arn}}
+        self.lambda_client = MagicMock()
+        self.lambda_client.list_event_source_mappings.return_value = {"EventSourceMappings": []}
+        self.session.client.side_effect = lambda service, **kw: {
+            "sqs": self.sqs,
+            "lambda": self.lambda_client,
+        }.get(service, MagicMock())
+
+    def config(self, **kw):
+        config = {
+            "queue_url": self.queue_url,
+            "role": "arn:aws:iam::123456789012:role/mailer",
+            "runtime": "python3.12",
+            "memory": 1024,
+            "timeout": 300,
+            "subnets": None,
+            "security_groups": None,
+        }
+        config.update(kw)
+        return config
+
+    def published(self, manager):
+        return manager.return_value.publish.call_args[0][0]
+
+    @patch("c7n_mailer.deploy.CloudWatchEventSource.remove")
+    def test_provision_sqs_trigger(self, remove_schedule, get_archive, manager):
+        deploy.provision(
+            self.config(lambda_trigger="sqs", lambda_sqs_batch_size=5), lambda: self.session
+        )
+        func = self.published(manager)
+        self.assertEqual(func.handler, "periodic.sqs_dispatch")
+        [subscription] = func.get_events(lambda: self.session)
+        self.assertIsInstance(subscription, SQSSubscription)
+        self.assertEqual(subscription.queue_arns, [self.queue_arn])
+        self.assertEqual(subscription.batch_size, 5)
+        self.assertEqual(subscription.response_types, ["ReportBatchItemFailures"])
+        # the periodic rule of an earlier deployment is removed
+        remove_schedule.assert_called_once_with(func, func_deleted=False)
+
+    def test_provision_schedule_removes_sqs_trigger(self, get_archive, manager):
+        other_queue = "arn:aws:sqs:us-east-1:123456789012:other"
+        self.lambda_client.list_event_source_mappings.return_value = {
+            "EventSourceMappings": [
+                {"UUID": "mailer-uuid", "EventSourceArn": self.queue_arn},
+                {"UUID": "other-uuid", "EventSourceArn": other_queue},
+            ]
+        }
+        deploy.provision(self.config(), lambda: self.session)
+        func = self.published(manager)
+        self.assertEqual(func.handler, "periodic.dispatch")
+        self.sqs.get_queue_attributes.assert_not_called()
+        # only the trigger on the mailer queue is removed
+        self.lambda_client.delete_event_source_mapping.assert_called_once_with(UUID="mailer-uuid")
+
+    def test_provision_schedule_without_list_permission(self, get_archive, manager):
+        self.lambda_client.list_event_source_mappings.side_effect = ClientError(
+            {"Error": {"Code": "AccessDeniedException", "Message": "denied"}},
+            "ListEventSourceMappings",
+        )
+        deploy.provision(self.config(), lambda: self.session)
+        manager.return_value.publish.assert_called_once()
+        self.lambda_client.delete_event_source_mapping.assert_not_called()
