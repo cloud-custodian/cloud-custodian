@@ -1214,6 +1214,113 @@ class VertexAICustomJobCancel(VertexAIMethodAction):
         return {'name': resource['name']}
 
 
+@resources.register('vertex-ai-pipeline-job')
+class VertexAIPipelineJob(VertexAIQueryManager):
+    """Vertex AI pipeline runs.
+
+    Find completed runs past a 30-day retention window:
+
+    .. code-block:: yaml
+
+        policies:
+          - name: pipeline-job-retention
+            resource: gcp.vertex-ai-pipeline-job
+            filters:
+              - type: value
+                key: state
+                op: in
+                value:
+                  - PIPELINE_STATE_SUCCEEDED
+                  - PIPELINE_STATE_FAILED
+                  - PIPELINE_STATE_CANCELLED
+              - type: value
+                key: endTime
+                value_type: age
+                op: greater-than
+                value: 30
+    """
+
+    class resource_type(VertexAITypeInfo):
+        component = 'projects.locations.pipelineJobs'
+        enum_spec = ('list', 'pipelineJobs[]', None)
+        default_report_fields = [
+            'name',
+            'displayName',
+            'state',
+            'createTime',
+            'endTime',
+        ]
+        asset_type = 'aiplatform.googleapis.com/PipelineJob'
+        permissions = ('aiplatform.pipelineJobs.list',)
+        urn_component = 'pipeline-job'
+
+
+@VertexAIPipelineJob.action_registry.register('delete')
+class VertexAIPipelineJobDelete(VertexAIMethodAction):
+    """Delete succeeded, failed, or cancelled pipeline job records.
+
+    Deletion returns a long-running operation; this action does not wait for it.
+    Cloud Storage output cleanup requires separate policies.
+    """
+
+    schema = type_schema('delete')
+    method_spec = {'op': 'delete'}
+    permissions = ('aiplatform.pipelineJobs.delete',)
+    attr_filter = (
+        'state',
+        (
+            'PIPELINE_STATE_SUCCEEDED',
+            'PIPELINE_STATE_FAILED',
+            'PIPELINE_STATE_CANCELLED',
+        ),
+    )
+
+    def get_resource_params(
+        self,
+        model: type[VertexAITypeInfo],
+        resource: dict,
+    ) -> dict[str, str]:
+        return {'name': resource['name']}
+
+
+@VertexAIPipelineJob.action_registry.register('cancel')
+class VertexAIPipelineJobCancel(VertexAIMethodAction):
+    """Request cancellation of queued, pending, running, or paused pipeline jobs.
+
+    Cancellation is asynchronous and best-effort; the job record is retained.
+
+    .. code-block:: yaml
+
+        policies:
+          - name: cancel-running-pipelines
+            resource: gcp.vertex-ai-pipeline-job
+            filters:
+              - state: PIPELINE_STATE_RUNNING
+            actions:
+              - cancel
+    """
+
+    schema = type_schema('cancel')
+    method_spec = {'op': 'cancel'}
+    permissions = ('aiplatform.pipelineJobs.cancel',)
+    attr_filter = (
+        'state',
+        (
+            'PIPELINE_STATE_QUEUED',
+            'PIPELINE_STATE_PENDING',
+            'PIPELINE_STATE_RUNNING',
+            'PIPELINE_STATE_PAUSED',
+        ),
+    )
+
+    def get_resource_params(
+        self,
+        model: type[VertexAITypeInfo],
+        resource: dict,
+    ) -> dict[str, str]:
+        return {'name': resource['name']}
+
+
 @resources.register('vertex-ai-hyperparameter-tuning-job')
 class VertexAIHyperparameterTuningJob(VertexAIQueryManager):
     """GCP Vertex AI Hyperparameter Tuning Job Resource
