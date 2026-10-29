@@ -317,8 +317,11 @@ lambda_sqs_batch_size: 10  # messages per invocation, 1 to 10 (default 10)
 - A message the mailer fails to process is returned to the queue and retried, without
   resending the other messages of the same batch. Configure a redrive policy on the queue
   to move messages that keep failing to a dead-letter queue.
+- With a FIFO queue, the messages after a failed one are retried as well, so they are
+  not delivered out of order.
 - `--update-lambda` removes the trigger that is no longer used, so switching between
-  `schedule` and `sqs` doesn't leave the mailer running both ways.
+  `schedule` and `sqs` doesn't leave the mailer running both ways. With `sqs`, it also
+  removes the triggers on other queues, such as the previous `queue_url`.
 
 ### Standard Azure Functions Config
 

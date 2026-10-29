@@ -129,6 +129,10 @@ class MailerSqsQueueProcessor(MessageTargetMixin):
         """
         failures = []
         for record in event.get("Records", []):
+            if failures and record.get("eventSourceARN", "").endswith(".fifo"):
+                # Keep the order of a FIFO queue: retry everything after the first failure.
+                failures.append({"itemIdentifier": record["messageId"]})
+                continue
             # Lambda uses camel case keys and lower case attribute types.
             sqs_message = {
                 "MessageId": record["messageId"],

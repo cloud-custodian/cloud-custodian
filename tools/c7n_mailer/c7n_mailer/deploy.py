@@ -1,6 +1,7 @@
 # Copyright The Cloud Custodian Authors.
 # SPDX-License-Identifier: Apache-2.0
 import copy
+from functools import partial
 import logging
 import json
 import os
@@ -88,23 +89,25 @@ def get_queue_arn(config, session_factory):
     ]["QueueArn"]
 
 
-def remove_queue_subscription(func, config, session_factory):
-    """Removes the SQS trigger of an earlier deployment on the mailer queue"""
-    # queue_url ends with /<account>/<name>, the queue arn with :<account>:<name>
-    account, name = config["queue_url"].rstrip("/").split("/")[-2:]
+def remove_queue_subscriptions(func, session_factory, should_remove):
+    """Removes the SQS triggers of the mailer lambda whose queue arn matches should_remove"""
     client = session_factory().client("lambda")
     try:
         mappings = client.list_event_source_mappings(FunctionName=func.name)["EventSourceMappings"]
     except ClientError as e:
-        log.warning("Could not check mailer lambda %s for an SQS trigger: %s" % (func.name, e))
+        log.warning("Could not check mailer lambda %s for SQS triggers: %s" % (func.name, e))
         return False
     arns = [
         m["EventSourceArn"]
         for m in mappings
-        if m["EventSourceArn"].split(":")[2] == "sqs"
-        and m["EventSourceArn"].split(":")[4:] == [account, name]
+        if m["EventSourceArn"].split(":")[2] == "sqs" and should_remove(m["EventSourceArn"])
     ]
-    return arns and SQSSubscription(session_factory, arns).remove(func)
+    return bool(arns) and SQSSubscription(session_factory, arns).remove(func)
+
+
+def is_mailer_queue(config, queue_arn):
+    # queue_url ends with /<account>/<name>, the queue arn with :<account>:<name>
+    return queue_arn.split(":")[4:] == config["queue_url"].rstrip("/").split("/")[-2:]
 
 
 def provision(config, session_factory):
@@ -115,9 +118,10 @@ def provision(config, session_factory):
     sqs_trigger = config.get("lambda_trigger", "schedule") == "sqs"
     if sqs_trigger:
         # Invoked by SQS as messages arrive, instead of polling the queue on a schedule.
+        queue_arn = get_queue_arn(config, session_factory)
         subscription = SQSSubscription(
             session_factory,
-            [get_queue_arn(config, session_factory)],
+            [queue_arn],
             batch_size=config.get("lambda_sqs_batch_size", 10),
             report_batch_item_failures=True,
         )
@@ -151,5 +155,8 @@ def provision(config, session_factory):
     if sqs_trigger:
         if schedule.remove(func, func_deleted=False):
             log.info("Removed the periodic schedule of mailer lambda %s" % func.name)
-    elif remove_queue_subscription(func, config, session_factory):
+        # The mailer only reads queue_url: drop the triggers on queues it used before.
+        if remove_queue_subscriptions(func, session_factory, lambda arn: arn != queue_arn):
+            log.info("Removed the SQS triggers of earlier queues of mailer lambda %s" % func.name)
+    elif remove_queue_subscriptions(func, session_factory, partial(is_mailer_queue, config)):
         log.info("Removed the SQS trigger of mailer lambda %s" % func.name)

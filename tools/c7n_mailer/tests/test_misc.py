@@ -76,6 +76,26 @@ class AWSMailerTests(unittest.TestCase):
         self.assertEqual(result, {"batchItemFailures": [{"itemIdentifier": "bad"}]})
         assert mock_sns_delivery.called
 
+    @patch("c7n_mailer.target.EmailDelivery")
+    @patch("c7n_mailer.sns_delivery.SnsDelivery")
+    def test_sqs_queue_processor_lambda_event_fifo(self, mock_sns_delivery, mock_email_delivery):
+        processor = sqs_queue_processor.MailerSqsQueueProcessor(
+            MAILER_CONFIG, boto3.Session(), logging.getLogger("c7n_mailer")
+        )
+        fifo = "arn:aws:sqs:us-east-1:123456789012:mailer.fifo"
+        bad = {"messageId": "bad", "body": "not a custodian message", "eventSourceARN": fifo}
+        good = {
+            "messageId": "good",
+            "body": SQS_MESSAGE_1_ENCODED["Body"].decode("ascii"),
+            "eventSourceARN": fifo,
+        }
+        result = processor.process_event({"Records": [bad, good]})
+        # The message after the failed one is retried too, so it isn't delivered out of order.
+        self.assertEqual(
+            result, {"batchItemFailures": [{"itemIdentifier": "bad"}, {"itemIdentifier": "good"}]}
+        )
+        assert not mock_sns_delivery.called
+
     @patch("c7n_mailer.handle.MailerSqsQueueProcessor")
     def test_mailer_handle_sqs(self, mock_processor):
         mock_processor.return_value.process_event.return_value = {"batchItemFailures": []}
@@ -176,6 +196,13 @@ class ProvisionTests(unittest.TestCase):
 
     @patch("c7n_mailer.deploy.CloudWatchEventSource.remove")
     def test_provision_sqs_trigger(self, remove_schedule, get_archive, manager):
+        old_queue = "arn:aws:sqs:us-east-1:123456789012:old-mailer"
+        self.lambda_client.list_event_source_mappings.return_value = {
+            "EventSourceMappings": [
+                {"UUID": "mailer-uuid", "EventSourceArn": self.queue_arn},
+                {"UUID": "old-uuid", "EventSourceArn": old_queue},
+            ]
+        }
         deploy.provision(
             self.config(lambda_trigger="sqs", lambda_sqs_batch_size=5), lambda: self.session
         )
@@ -186,8 +213,9 @@ class ProvisionTests(unittest.TestCase):
         self.assertEqual(subscription.queue_arns, [self.queue_arn])
         self.assertEqual(subscription.batch_size, 5)
         self.assertEqual(subscription.response_types, ["ReportBatchItemFailures"])
-        # the periodic rule of an earlier deployment is removed
+        # the periodic rule and the trigger on the queue of an earlier deployment are removed
         remove_schedule.assert_called_once_with(func, func_deleted=False)
+        self.lambda_client.delete_event_source_mapping.assert_called_once_with(UUID="old-uuid")
 
     def test_provision_schedule_removes_sqs_trigger(self, get_archive, manager):
         other_queue = "arn:aws:sqs:us-east-1:123456789012:other"
@@ -209,6 +237,8 @@ class ProvisionTests(unittest.TestCase):
             {"Error": {"Code": "AccessDeniedException", "Message": "denied"}},
             "ListEventSourceMappings",
         )
-        deploy.provision(self.config(), lambda: self.session)
+        with self.assertLogs("custodian-mailer", level="WARNING") as logs:
+            deploy.provision(self.config(), lambda: self.session)
         manager.return_value.publish.assert_called_once()
         self.lambda_client.delete_event_source_mapping.assert_not_called()
+        self.assertIn("cloud-custodian-mailer", logs.output[0])
