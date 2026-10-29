@@ -121,6 +121,36 @@ class MailerSqsQueueProcessor(MessageTargetMixin):
         self.logger.info("No sqs_messages left on the queue, exiting c7n_mailer.")
         return
 
+    def process_event(self, event):
+        """Processes the messages of an SQS-triggered lambda invocation.
+
+        Returns the ids of the messages that failed, so that only those are retried:
+        https://docs.aws.amazon.com/lambda/latest/dg/services-sqs-errorhandling.html
+        """
+        failures = []
+        for record in event.get("Records", []):
+            # Lambda uses camel case keys and lower case attribute types.
+            sqs_message = {
+                "MessageId": record["messageId"],
+                "Body": record["body"],
+                "Attributes": record.get("attributes", {}),
+                "MessageAttributes": {
+                    k: {"StringValue": v.get("stringValue")}
+                    for k, v in record.get("messageAttributes", {}).items()
+                },
+            }
+            msg_kind = sqs_message["MessageAttributes"].get("mtype", {}).get("StringValue")
+            if msg_kind != DATA_MESSAGE:
+                self.logger.warning(
+                    "Unknown sqs_message or sns format %s" % (sqs_message["Body"][:50])
+                )
+            try:
+                self.process_sqs_message(sqs_message)
+            except Exception:
+                self.logger.exception("Error processing message %s", record["messageId"])
+                failures.append({"itemIdentifier": record["messageId"]})
+        return {"batchItemFailures": failures}
+
     # This function when processing sqs messages will only deliver messages over email or sns
     # If you explicitly declare which tags are aws_usernames (synonymous with ldap uids)
     # in the ldap_uid_tags section of your mailer.yml, we'll do a lookup of those emails
