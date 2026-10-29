@@ -1,0 +1,60 @@
+{
+    "status_code": 200,
+    "data": {
+        "DomainId": "d-msjtvfwmgld1",
+        "UserProfileArn": "arn:aws:sagemaker:us-east-1:644160558196:user-profile/d-msjtvfwmgld1/c7n-canvas-proud-tahr",
+        "UserProfileName": "c7n-canvas-proud-tahr",
+        "HomeEfsFileSystemUid": "200010",
+        "Status": "InService",
+        "LastModifiedTime": {
+            "__class__": "datetime",
+            "year": 2026,
+            "month": 10,
+            "day": 20,
+            "hour": 10,
+            "minute": 30,
+            "second": 16,
+            "microsecond": 105000
+        },
+        "CreationTime": {
+            "__class__": "datetime",
+            "year": 2026,
+            "month": 10,
+            "day": 20,
+            "hour": 10,
+            "minute": 30,
+            "second": 11,
+            "microsecond": 46000
+        },
+        "UserSettings": {
+            "ExecutionRole": "arn:aws:iam::644160558196:role/c7n-profile-update-proud-tahr",
+            "CanvasAppSettings": {
+                "TimeSeriesForecastingSettings": {
+                    "Status": "DISABLED"
+                },
+                "ModelRegisterSettings": {
+                    "Status": "DISABLED"
+                },
+                "IdentityProviderOAuthSettings": [
+                    {
+                        "DataSourceName": "SalesforceGenie",
+                        "Status": "DISABLED",
+                        "SecretArn": "arn:aws:secretsmanager:us-east-1:644160558196:secret:c7n-profile-oauth-initial-85acbb583fda086c7c0bf940df-YcMp9T"
+                    }
+                ],
+                "DirectDeploySettings": {
+                    "Status": "DISABLED"
+                },
+                "KendraSettings": {
+                    "Status": "DISABLED"
+                },
+                "EmrServerlessSettings": {
+                    "Status": "DISABLED"
+                }
+            },
+            "CustomFileSystemConfigs": [],
+            "AutoMountHomeEFS": "DefaultAsDomain"
+        },
+        "ResponseMetadata": {}
+    }
+}

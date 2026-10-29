@@ -1,0 +1,104 @@
+{
+    "status_code": 200,
+    "data": {
+        "DomainId": "d-msjtvfwmgld1",
+        "UserProfileArn": "arn:aws:sagemaker:us-east-1:644160558196:user-profile/d-msjtvfwmgld1/c7n-apps-proud-tahr",
+        "UserProfileName": "c7n-apps-proud-tahr",
+        "HomeEfsFileSystemUid": "200020",
+        "Status": "InService",
+        "LastModifiedTime": {
+            "__class__": "datetime",
+            "year": 2026,
+            "month": 10,
+            "day": 20,
+            "hour": 10,
+            "minute": 32,
+            "second": 49,
+            "microsecond": 104000
+        },
+        "CreationTime": {
+            "__class__": "datetime",
+            "year": 2026,
+            "month": 10,
+            "day": 20,
+            "hour": 10,
+            "minute": 30,
+            "second": 14,
+            "microsecond": 659000
+        },
+        "UserSettings": {
+            "ExecutionRole": "arn:aws:iam::644160558196:role/c7n-profile-update-proud-tahr",
+            "JupyterServerAppSettings": {
+                "DefaultResourceSpec": {
+                    "SageMakerImageArn": "arn:aws:sagemaker:us-east-1:644160558196:image/jupyter-server-3",
+                    "SageMakerImageVersionAlias": "1",
+                    "InstanceType": "system"
+                },
+                "LifecycleConfigArns": [],
+                "CodeRepositories": []
+            },
+            "KernelGatewayAppSettings": {
+                "DefaultResourceSpec": {
+                    "SageMakerImageArn": "arn:aws:sagemaker:us-east-1:644160558196:image/c7n-profile-image-proud-tahr",
+                    "SageMakerImageVersionAlias": "2.0.0",
+                    "InstanceType": "ml.t3.medium"
+                },
+                "CustomImages": [],
+                "LifecycleConfigArns": []
+            },
+            "TensorBoardAppSettings": {
+                "DefaultResourceSpec": {
+                    "SageMakerImageArn": "arn:aws:sagemaker:us-east-1:644160558196:image/c7n-profile-image-proud-tahr",
+                    "SageMakerImageVersionAlias": "2.0.0",
+                    "InstanceType": "ml.t3.medium"
+                }
+            },
+            "RSessionAppSettings": {
+                "DefaultResourceSpec": {
+                    "SageMakerImageArn": "arn:aws:sagemaker:us-east-1:644160558196:image/c7n-profile-image-proud-tahr",
+                    "SageMakerImageVersionAlias": "2.0.0",
+                    "InstanceType": "ml.t3.medium"
+                },
+                "CustomImages": []
+            },
+            "CodeEditorAppSettings": {
+                "DefaultResourceSpec": {
+                    "SageMakerImageArn": "arn:aws:sagemaker:us-east-1:644160558196:image/c7n-profile-image-proud-tahr",
+                    "SageMakerImageVersionAlias": "2.0.0",
+                    "InstanceType": "ml.t3.medium"
+                },
+                "CustomImages": [],
+                "LifecycleConfigArns": [],
+                "AppLifecycleManagement": {
+                    "IdleSettings": {
+                        "LifecycleManagement": "DISABLED"
+                    }
+                },
+                "BuiltInLifecycleConfigArn": "arn:aws:sagemaker:us-east-1:644160558196:studio-lifecycle-config/c7n-codeeditor-builtin-proud-tahr"
+            },
+            "JupyterLabAppSettings": {
+                "DefaultResourceSpec": {
+                    "SageMakerImageArn": "arn:aws:sagemaker:us-east-1:644160558196:image/c7n-profile-image-proud-tahr",
+                    "SageMakerImageVersionAlias": "2.0.0",
+                    "InstanceType": "ml.t3.medium"
+                },
+                "CustomImages": [],
+                "LifecycleConfigArns": [],
+                "CodeRepositories": [],
+                "AppLifecycleManagement": {
+                    "IdleSettings": {
+                        "LifecycleManagement": "DISABLED"
+                    }
+                },
+                "EmrSettings": {
+                    "AssumableRoleArns": [],
+                    "ExecutionRoleArns": []
+                },
+                "BuiltInLifecycleConfigArn": "arn:aws:sagemaker:us-east-1:644160558196:studio-lifecycle-config/c7n-jupyterlab-builtin-proud-tahr"
+            },
+            "CustomFileSystemConfigs": [],
+            "AutoMountHomeEFS": "DefaultAsDomain"
+        },
+        "ResponseMetadata": {}
+    }
+}

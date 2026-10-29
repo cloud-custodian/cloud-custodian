@@ -1,0 +1,133 @@
+{
+    "status_code": 200,
+    "data": {
+        "UserProfiles": [
+            {
+                "DomainId": "d-msjtvfwmgld1",
+                "UserProfileName": "c7n-apps-proud-tahr",
+                "Status": "InService",
+                "CreationTime": {
+                    "__class__": "datetime",
+                    "year": 2026,
+                    "month": 10,
+                    "day": 20,
+                    "hour": 10,
+                    "minute": 30,
+                    "second": 14,
+                    "microsecond": 659000
+                },
+                "LastModifiedTime": {
+                    "__class__": "datetime",
+                    "year": 2026,
+                    "month": 10,
+                    "day": 20,
+                    "hour": 10,
+                    "minute": 30,
+                    "second": 17,
+                    "microsecond": 833000
+                }
+            },
+            {
+                "DomainId": "d-msjtvfwmgld1",
+                "UserProfileName": "c7n-rstudio-proud-tahr",
+                "Status": "InService",
+                "CreationTime": {
+                    "__class__": "datetime",
+                    "year": 2026,
+                    "month": 10,
+                    "day": 20,
+                    "hour": 10,
+                    "minute": 30,
+                    "second": 14,
+                    "microsecond": 601000
+                },
+                "LastModifiedTime": {
+                    "__class__": "datetime",
+                    "year": 2026,
+                    "month": 10,
+                    "day": 20,
+                    "hour": 10,
+                    "minute": 30,
+                    "second": 18,
+                    "microsecond": 502000
+                }
+            },
+            {
+                "DomainId": "d-msjtvfwmgld1",
+                "UserProfileName": "c7n-canvas-proud-tahr",
+                "Status": "InService",
+                "CreationTime": {
+                    "__class__": "datetime",
+                    "year": 2026,
+                    "month": 10,
+                    "day": 20,
+                    "hour": 10,
+                    "minute": 30,
+                    "second": 11,
+                    "microsecond": 46000
+                },
+                "LastModifiedTime": {
+                    "__class__": "datetime",
+                    "year": 2026,
+                    "month": 10,
+                    "day": 20,
+                    "hour": 10,
+                    "minute": 30,
+                    "second": 16,
+                    "microsecond": 105000
+                }
+            },
+            {
+                "DomainId": "d-msjtvfwmgld1",
+                "UserProfileName": "c7n-profile-update-proud-tahr",
+                "Status": "InService",
+                "CreationTime": {
+                    "__class__": "datetime",
+                    "year": 2026,
+                    "month": 10,
+                    "day": 20,
+                    "hour": 10,
+                    "minute": 30,
+                    "second": 10,
+                    "microsecond": 907000
+                },
+                "LastModifiedTime": {
+                    "__class__": "datetime",
+                    "year": 2026,
+                    "month": 10,
+                    "day": 20,
+                    "hour": 10,
+                    "minute": 31,
+                    "second": 7,
+                    "microsecond": 839000
+                }
+            },
+            {
+                "DomainId": "d-msjtvfwmgld1",
+                "UserProfileName": "c7n-settings-proud-tahr",
+                "Status": "InService",
+                "CreationTime": {
+                    "__class__": "datetime",
+                    "year": 2026,
+                    "month": 10,
+                    "day": 20,
+                    "hour": 10,
+                    "minute": 30,
+                    "second": 9,
+                    "microsecond": 139000
+                },
+                "LastModifiedTime": {
+                    "__class__": "datetime",
+                    "year": 2026,
+                    "month": 10,
+                    "day": 20,
+                    "hour": 10,
+                    "minute": 31,
+                    "second": 22,
+                    "microsecond": 675000
+                }
+            }
+        ],
+        "ResponseMetadata": {}
+    }
+}

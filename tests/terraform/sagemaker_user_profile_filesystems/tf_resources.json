@@ -1,0 +1,375 @@
+{
+    "pytest-terraform": 1,
+    "outputs": {},
+    "resources": {
+        "aws_subnets": {
+            "default": {
+                "filter": [
+                    {
+                        "name": "vpc-id",
+                        "values": [
+                            "vpc-049c0030ea410c65b"
+                        ]
+                    }
+                ],
+                "id": "us-west-2",
+                "ids": [
+                    "subnet-07a2e2bf822e05340",
+                    "subnet-0852c84454fce57fb",
+                    "subnet-0edf582952264fae7",
+                    "subnet-011ae610c2fc0d95c"
+                ],
+                "region": "us-west-2",
+                "tags": null,
+                "timeouts": null
+            }
+        },
+        "aws_vpc": {
+            "default": {
+                "arn": "arn:aws:ec2:us-west-2:644160558196:vpc/vpc-049c0030ea410c65b",
+                "cidr_block": "172.31.0.0/16",
+                "cidr_block_associations": [
+                    {
+                        "association_id": "vpc-cidr-assoc-0b0da40777c963104",
+                        "cidr_block": "172.31.0.0/16",
+                        "state": "associated"
+                    }
+                ],
+                "default": true,
+                "dhcp_options_id": "dopt-0dbdccfec9f090246",
+                "enable_dns_hostnames": true,
+                "enable_dns_support": true,
+                "enable_network_address_usage_metrics": false,
+                "filter": null,
+                "id": "vpc-049c0030ea410c65b",
+                "instance_tenancy": "default",
+                "ipv6_association_id": "",
+                "ipv6_cidr_block": "",
+                "ipv6_cidr_block_associations": [],
+                "main_route_table_id": "rtb-0e75669d6db84ded1",
+                "owner_id": "644160558196",
+                "region": "us-west-2",
+                "state": null,
+                "tags": {},
+                "timeouts": null
+            }
+        },
+        "aws_efs_file_system": {
+            "custom": {
+                "arn": "arn:aws:elasticfilesystem:us-west-2:644160558196:file-system/fs-07ec296bbb63f0ca0",
+                "availability_zone_id": "",
+                "availability_zone_name": "",
+                "creation_token": "terraform-kkOwk1cgIItThS81EkWoxMbyem",
+                "dns_name": "fs-07ec296bbb63f0ca0.efs.us-west-2.amazonaws.com",
+                "encrypted": true,
+                "id": "fs-07ec296bbb63f0ca0",
+                "kms_key_id": "arn:aws:kms:us-west-2:644160558196:key/d549ffa0-9248-495d-9f94-f8b6ff727381",
+                "lifecycle_policy": [],
+                "name": "c7n-profile-superb-tiger",
+                "number_of_mount_targets": 0,
+                "owner_id": "644160558196",
+                "performance_mode": "generalPurpose",
+                "protection": [
+                    {
+                        "replication_overwrite": "ENABLED"
+                    }
+                ],
+                "provisioned_throughput_in_mibps": 0,
+                "region": "us-west-2",
+                "size_in_bytes": [
+                    {
+                        "value": 6144,
+                        "value_in_ia": 0,
+                        "value_in_standard": 6144
+                    }
+                ],
+                "tags": {
+                    "Name": "c7n-profile-superb-tiger"
+                },
+                "tags_all": {
+                    "Name": "c7n-profile-superb-tiger"
+                },
+                "throughput_mode": "bursting"
+            }
+        },
+        "aws_efs_mount_target": {
+            "custom": {
+                "availability_zone_id": "usw2-az4",
+                "availability_zone_name": "us-west-2d",
+                "dns_name": "fs-07ec296bbb63f0ca0.efs.us-west-2.amazonaws.com",
+                "file_system_arn": "arn:aws:elasticfilesystem:us-west-2:644160558196:file-system/fs-07ec296bbb63f0ca0",
+                "file_system_id": "fs-07ec296bbb63f0ca0",
+                "id": "fsmt-072c0bfb44f490c86",
+                "ip_address": "172.31.58.106",
+                "ip_address_type": "IPV4_ONLY",
+                "ipv6_address": "",
+                "mount_target_dns_name": "us-west-2d.fs-07ec296bbb63f0ca0.efs.us-west-2.amazonaws.com",
+                "network_interface_id": "eni-05150e4897aad512d",
+                "owner_id": "644160558196",
+                "region": "us-west-2",
+                "security_groups": [
+                    "sg-0cc56d3adad13f7e0"
+                ],
+                "subnet_id": "subnet-07a2e2bf822e05340",
+                "timeouts": null
+            }
+        },
+        "aws_fsx_lustre_file_system": {
+            "custom": {
+                "arn": "arn:aws:fsx:us-west-2:644160558196:file-system/fs-0ff29cdfc3e167ae5",
+                "auto_import_policy": "",
+                "automatic_backup_retention_days": 0,
+                "backup_id": null,
+                "copy_tags_to_backups": false,
+                "daily_automatic_backup_start_time": "",
+                "data_compression_type": "NONE",
+                "data_read_cache_configuration": [],
+                "deployment_type": "SCRATCH_2",
+                "dns_name": "fs-0ff29cdfc3e167ae5.fsx.us-west-2.amazonaws.com",
+                "drive_cache_type": "",
+                "efa_enabled": false,
+                "export_path": "",
+                "file_system_type_version": "2.10",
+                "final_backup_tags": null,
+                "id": "fs-0ff29cdfc3e167ae5",
+                "import_path": "",
+                "imported_file_chunk_size": 0,
+                "kms_key_id": "",
+                "log_configuration": [
+                    {
+                        "destination": "",
+                        "level": "DISABLED"
+                    }
+                ],
+                "metadata_configuration": [],
+                "mount_name": "kug5vb4v",
+                "network_interface_ids": [
+                    "eni-02e84f268dc3b69f7",
+                    "eni-06720520d04727e50"
+                ],
+                "owner_id": "644160558196",
+                "per_unit_storage_throughput": 0,
+                "region": "us-west-2",
+                "root_squash_configuration": [],
+                "security_group_ids": [
+                    "sg-0cc56d3adad13f7e0"
+                ],
+                "skip_final_backup": true,
+                "storage_capacity": 1200,
+                "storage_type": "SSD",
+                "subnet_ids": [
+                    "subnet-07a2e2bf822e05340"
+                ],
+                "tags": {
+                    "Name": "c7n-profile-superb-tiger"
+                },
+                "tags_all": {
+                    "Name": "c7n-profile-superb-tiger"
+                },
+                "throughput_capacity": 0,
+                "timeouts": null,
+                "vpc_id": "vpc-049c0030ea410c65b",
+                "weekly_maintenance_start_time": "1:10:30"
+            }
+        },
+        "aws_iam_role": {
+            "execution": {
+                "arn": "arn:aws:iam::644160558196:role/c7n-profile-fs-superb-tiger",
+                "assume_role_policy": "{\"Statement\":[{\"Action\":\"sts:AssumeRole\",\"Effect\":\"Allow\",\"Principal\":{\"Service\":\"sagemaker.amazonaws.com\"}}],\"Version\":\"2012-10-17\"}",
+                "create_date": "2026-10-20T12:50:14Z",
+                "description": "",
+                "force_detach_policies": false,
+                "id": "c7n-profile-fs-superb-tiger",
+                "inline_policy": [],
+                "managed_policy_arns": [],
+                "max_session_duration": 3600,
+                "name": "c7n-profile-fs-superb-tiger",
+                "name_prefix": "",
+                "path": "/",
+                "permissions_boundary": "",
+                "tags": null,
+                "tags_all": {},
+                "unique_id": "AROAV7EQQKWXZBAIYEIMF"
+            }
+        },
+        "aws_iam_role_policy": {
+            "filesystems": {
+                "id": "c7n-profile-fs-superb-tiger:terraform-3b805f8bf0b2f5cf72b53e8445",
+                "name": "terraform-3b805f8bf0b2f5cf72b53e8445",
+                "name_prefix": "terraform-",
+                "policy": "{\"Version\":\"2012-10-17\",\"Statement\":[{\"Action\":[\"elasticfilesystem:DescribeFileSystems\",\"elasticfilesystem:DescribeMountTargets\",\"fsx:DescribeFileSystems\"],\"Effect\":\"Allow\",\"Resource\":\"*\"}]}",
+                "role": "c7n-profile-fs-superb-tiger"
+            }
+        },
+        "aws_sagemaker_domain": {
+            "main": {
+                "app_network_access_type": "PublicInternetOnly",
+                "app_security_group_management": "",
+                "arn": "arn:aws:sagemaker:us-west-2:644160558196:domain/d-1lndajqoikmx",
+                "auth_mode": "IAM",
+                "default_space_settings": [],
+                "default_user_settings": [
+                    {
+                        "auto_mount_home_efs": "Enabled",
+                        "canvas_app_settings": [],
+                        "code_editor_app_settings": [],
+                        "custom_file_system_config": [],
+                        "custom_posix_user_config": [],
+                        "default_landing_uri": "studio::",
+                        "execution_role": "arn:aws:iam::644160558196:role/c7n-profile-fs-superb-tiger",
+                        "jupyter_lab_app_settings": [],
+                        "jupyter_server_app_settings": [],
+                        "kernel_gateway_app_settings": [],
+                        "r_session_app_settings": [],
+                        "r_studio_server_pro_app_settings": [],
+                        "security_groups": [
+                            "sg-0cc56d3adad13f7e0"
+                        ],
+                        "sharing_settings": [],
+                        "space_storage_settings": [],
+                        "studio_web_portal": "ENABLED",
+                        "studio_web_portal_settings": [
+                            {
+                                "hidden_app_types": null,
+                                "hidden_instance_types": null,
+                                "hidden_ml_tools": null
+                            }
+                        ],
+                        "tensor_board_app_settings": []
+                    }
+                ],
+                "domain_name": "c7n-profile-fs-superb-tiger",
+                "domain_settings": [],
+                "home_efs_file_system_id": "fs-0c882993dab34a9e1",
+                "id": "d-1lndajqoikmx",
+                "kms_key_id": "",
+                "region": "us-west-2",
+                "retention_policy": [
+                    {
+                        "home_efs_file_system": "Delete"
+                    }
+                ],
+                "security_group_id_for_domain_boundary": "",
+                "single_sign_on_application_arn": "",
+                "single_sign_on_managed_application_instance_id": "",
+                "subnet_ids": [
+                    "subnet-07a2e2bf822e05340"
+                ],
+                "tag_propagation": "DISABLED",
+                "tags": null,
+                "tags_all": {},
+                "url": "https://d-1lndajqoikmx.studio.us-west-2.sagemaker.aws",
+                "vpc_id": "vpc-049c0030ea410c65b"
+            }
+        },
+        "aws_sagemaker_user_profile": {
+            "main": {
+                "arn": "arn:aws:sagemaker:us-west-2:644160558196:user-profile/d-1lndajqoikmx/c7n-filesystems-superb-tiger",
+                "domain_id": "d-1lndajqoikmx",
+                "home_efs_file_system_uid": "200005",
+                "id": "d-1lndajqoikmx/c7n-filesystems-superb-tiger",
+                "region": "us-west-2",
+                "single_sign_on_user_identifier": "",
+                "single_sign_on_user_value": "",
+                "tags": null,
+                "tags_all": {},
+                "user_profile_name": "c7n-filesystems-superb-tiger",
+                "user_settings": [
+                    {
+                        "auto_mount_home_efs": "DefaultAsDomain",
+                        "canvas_app_settings": [],
+                        "code_editor_app_settings": [],
+                        "custom_file_system_config": [],
+                        "custom_posix_user_config": [],
+                        "default_landing_uri": "",
+                        "execution_role": "arn:aws:iam::644160558196:role/c7n-profile-fs-superb-tiger",
+                        "jupyter_lab_app_settings": [],
+                        "jupyter_server_app_settings": [],
+                        "kernel_gateway_app_settings": [],
+                        "r_session_app_settings": [],
+                        "r_studio_server_pro_app_settings": [],
+                        "security_groups": null,
+                        "sharing_settings": [],
+                        "space_storage_settings": [],
+                        "studio_web_portal": "",
+                        "studio_web_portal_settings": [],
+                        "tensor_board_app_settings": []
+                    }
+                ]
+            }
+        },
+        "aws_security_group": {
+            "filesystems": {
+                "arn": "arn:aws:ec2:us-west-2:644160558196:security-group/sg-0cc56d3adad13f7e0",
+                "description": "Managed by Terraform",
+                "egress": [
+                    {
+                        "cidr_blocks": [],
+                        "description": "",
+                        "from_port": 0,
+                        "ipv6_cidr_blocks": [],
+                        "prefix_list_ids": [],
+                        "protocol": "-1",
+                        "security_groups": [],
+                        "self": true,
+                        "to_port": 0
+                    }
+                ],
+                "id": "sg-0cc56d3adad13f7e0",
+                "ingress": [
+                    {
+                        "cidr_blocks": [],
+                        "description": "",
+                        "from_port": 1018,
+                        "ipv6_cidr_blocks": [],
+                        "prefix_list_ids": [],
+                        "protocol": "tcp",
+                        "security_groups": [],
+                        "self": true,
+                        "to_port": 1023
+                    },
+                    {
+                        "cidr_blocks": [],
+                        "description": "",
+                        "from_port": 2049,
+                        "ipv6_cidr_blocks": [],
+                        "prefix_list_ids": [],
+                        "protocol": "tcp",
+                        "security_groups": [],
+                        "self": true,
+                        "to_port": 2049
+                    },
+                    {
+                        "cidr_blocks": [],
+                        "description": "",
+                        "from_port": 988,
+                        "ipv6_cidr_blocks": [],
+                        "prefix_list_ids": [],
+                        "protocol": "tcp",
+                        "security_groups": [],
+                        "self": true,
+                        "to_port": 988
+                    }
+                ],
+                "name": "c7n-profile-fs-5704c96c983d8e163976e7c46c",
+                "name_prefix": "c7n-profile-fs-",
+                "owner_id": "644160558196",
+                "region": "us-west-2",
+                "revoke_rules_on_delete": false,
+                "tags": null,
+                "tags_all": {},
+                "timeouts": null,
+                "vpc_id": "vpc-049c0030ea410c65b"
+            }
+        },
+        "random_pet": {
+            "profile": {
+                "id": "superb-tiger",
+                "keepers": null,
+                "length": 2,
+                "prefix": null,
+                "separator": "-"
+            }
+        }
+    }
+}
