@@ -5,7 +5,7 @@ from c7n_gcp.provider import resources
 from c7n_gcp.query import (
     QueryResourceManager, TypeInfo, ChildResourceManager, ChildTypeInfo
 )
-from c7n.utils import local_session, type_schema
+from c7n.utils import type_schema
 from c7n_gcp.filters.timerange import TimeRangeFilter
 from c7n.filters.core import ValueFilter
 
@@ -53,20 +53,12 @@ class BigTableInstanceCluster(ChildResourceManager):
         parent_spec = {
             'resource': 'bigtable-instance',
             'child_enum_params': {
-                ('displayName', 'parent')},
+                ('name', 'parent')},
             'use_child_query': True,
         }
         default_report_fields = ['name', 'expireTime']
         permissions = ('bigtable.clusters.list',)
         asset_type = "bigtableadmin.googleapis.com/Cluster"
-
-    def _get_child_enum_args(self, parent_instance):
-        return {
-            'parent': 'projects/{}/instances/{}'.format(
-                local_session(self.session_factory).get_default_project(),
-                parent_instance['displayName'],
-            )
-        }
 
 
 @resources.register('bigtable-instance-cluster-backup')
@@ -145,14 +137,6 @@ class BigTableInstanceTable(ChildResourceManager):
         @staticmethod
         def get(client, resource_info):
             return client.execute_command('get', {'name': resource_info['name']})
-
-    def _get_child_enum_args(self, parent_instance):
-        return {
-            'parent': 'projects/{}/instances/{}'.format(
-                local_session(self.session_factory).get_default_project(),
-                parent_instance['displayName'],
-            )
-        }
 
     def get_table_detail(self, resource):
         annotation_key = self.table_detail_annotation_key

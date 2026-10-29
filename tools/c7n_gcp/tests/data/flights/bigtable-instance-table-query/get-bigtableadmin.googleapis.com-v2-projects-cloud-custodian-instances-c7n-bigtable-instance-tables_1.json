@@ -1,0 +1,14 @@
+{
+  "headers": {
+    "content-type": "application/json; charset=UTF-8",
+    "status": "200",
+    "content-location": "https://bigtableadmin.googleapis.com/v2/projects/cloud-custodian/instances/c7n-bigtable-instance/tables?alt=json"
+  },
+  "body": {
+    "tables": [
+      {
+        "name": "projects/cloud-custodian/instances/c7n-bigtable-instance/tables/c7n-table"
+      }
+    ]
+  }
+}
