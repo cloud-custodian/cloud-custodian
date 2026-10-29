@@ -47,6 +47,7 @@ GRAPH_ENDPOINT_PERMISSIONS = {
     'groups/{id}': ['Group.Read.All'],
     'groups/{id}/members': ['GroupMember.Read.All'],
     'groups/{id}/members/$count': ['GroupMember.Read.All'],
+    'groups/{id}/transitiveMembers': ['GroupMember.ReadBasic.All'],
     'groups/{id}/owners': ['Group.Read.All'],
     'groups/{id}/owners/$count': ['Group.Read.All'],
 

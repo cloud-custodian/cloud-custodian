@@ -1,0 +1,68 @@
+{
+    "$schema": "https://schema.management.azure.com/schemas/2015-01-01/deploymentTemplate.json#",
+    "contentVersion": "1.0.0.0",
+    "parameters": {
+        "accountName": {
+            "type": "String",
+            "defaultValue": "cctest-eff-access"
+        },
+        "location": {
+            "type": "String",
+            "defaultValue": "eastus"
+        }
+    },
+    "variables": {
+        "openAiUserRole": "[subscriptionResourceId('Microsoft.Authorization/roleDefinitions', '5e0bd9bd-7b93-4f28-af87-19fc36ad61bd')]"
+    },
+    "resources": [
+        {
+            "type": "Microsoft.CognitiveServices/accounts",
+            "apiVersion": "2023-05-01",
+            "name": "[parameters('accountName')]",
+            "location": "[parameters('location')]",
+            "kind": "OpenAI",
+            "sku": {"name": "S0"},
+            "properties": {"customSubDomainName": "[parameters('accountName')]"}
+        },
+        {
+            "type": "Microsoft.ManagedIdentity/userAssignedIdentities",
+            "apiVersion": "2023-01-31",
+            "name": "c7n-eff-approved",
+            "location": "[parameters('location')]"
+        },
+        {
+            "type": "Microsoft.ManagedIdentity/userAssignedIdentities",
+            "apiVersion": "2023-01-31",
+            "name": "c7n-eff-unapproved",
+            "location": "[parameters('location')]"
+        },
+        {
+            "type": "Microsoft.Authorization/roleAssignments",
+            "apiVersion": "2022-04-01",
+            "name": "[guid(resourceGroup().id, parameters('accountName'), 'approved')]",
+            "scope": "[format('Microsoft.CognitiveServices/accounts/{0}', parameters('accountName'))]",
+            "dependsOn": [
+                "[resourceId('Microsoft.CognitiveServices/accounts', parameters('accountName'))]",
+                "[resourceId('Microsoft.ManagedIdentity/userAssignedIdentities', 'c7n-eff-approved')]"
+            ],
+            "properties": {
+                "roleDefinitionId": "[variables('openAiUserRole')]",
+                "principalId": "[reference(resourceId('Microsoft.ManagedIdentity/userAssignedIdentities', 'c7n-eff-approved')).principalId]",
+                "principalType": "ServicePrincipal"
+            }
+        },
+        {
+            "type": "Microsoft.Authorization/roleAssignments",
+            "apiVersion": "2022-04-01",
+            "name": "[guid(resourceGroup().id, parameters('accountName'), 'unapproved')]",
+            "dependsOn": [
+                "[resourceId('Microsoft.ManagedIdentity/userAssignedIdentities', 'c7n-eff-unapproved')]"
+            ],
+            "properties": {
+                "roleDefinitionId": "[variables('openAiUserRole')]",
+                "principalId": "[reference(resourceId('Microsoft.ManagedIdentity/userAssignedIdentities', 'c7n-eff-unapproved')).principalId]",
+                "principalType": "ServicePrincipal"
+            }
+        }
+    ]
+}
