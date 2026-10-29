@@ -8,6 +8,7 @@ from mock import patch, MagicMock
 
 from common import RESOURCE_3, SQS_MESSAGE_5
 
+import c7n_mailer
 from c7n_mailer.slack_delivery import SlackDelivery
 from c7n_mailer.email_delivery import EmailDelivery
 
@@ -41,6 +42,28 @@ class TestSlackDelivery(unittest.TestCase):
 
         assert self.target_channel in result
         assert json.loads(result[self.target_channel])["channel"] == self.target_channel
+
+    def test_default_template_escapes_values(self):
+        # Render the template that ships with the mailer, not the test copy.
+        self.config["templates_folders"] = [
+            os.path.join(os.path.dirname(c7n_mailer.__file__), "msg-templates")
+        ]
+        action_desc = 'Revoke the "root" session\nand check C:\\logs\n'
+        self.message["action"]["action_desc"] = action_desc
+        self.message["action"].pop("violation_desc", None)
+        self.message["region"] = 'us-east-1 "test"'
+
+        slack = SlackDelivery(self.config, self.logger, self.email_delivery)
+        result = slack.get_to_addrs_slack_messages_map(self.message)
+
+        # Quotes, backslashes and line breaks no longer break the payload.
+        payload = json.loads(result[self.target_channel])
+        fields = {f["title"]: f["value"] for f in payload["attachments"][0]["fields"]}
+        assert fields["Action Description"] == action_desc
+        assert fields["Violation Description"] == ""
+        assert fields["Region"] == 'us-east-1 "test"'
+        assert fields["Resources"].startswith(self.resource["VolumeId"])
+        assert payload["channel"] == self.target_channel
 
     def test_map_sending_to_tag_channel_with_hash(self):
         self.target_channel = "#tag-channel"
