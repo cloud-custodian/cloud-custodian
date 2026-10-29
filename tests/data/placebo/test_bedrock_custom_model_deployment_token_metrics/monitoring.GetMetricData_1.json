@@ -1,0 +1,29 @@
+{
+    "status_code": 200,
+    "data": {
+        "MetricDataResults": [
+            {
+                "Id": "total",
+                "Label": "c7n:TotalTokenCount",
+                "Timestamps": [
+                    {
+                        "__class__": "datetime",
+                        "year": 2026,
+                        "month": 9,
+                        "day": 25,
+                        "hour": 14,
+                        "minute": 19,
+                        "second": 0,
+                        "microsecond": 0
+                    }
+                ],
+                "Values": [
+                    426.0
+                ],
+                "StatusCode": "Complete"
+            }
+        ],
+        "Messages": [],
+        "ResponseMetadata": {}
+    }
+}
