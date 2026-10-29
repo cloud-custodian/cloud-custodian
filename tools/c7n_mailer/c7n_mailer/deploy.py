@@ -31,7 +31,7 @@ def dispatch(event, context):
     return handle.start_c7n_mailer(logger)
 
 def sqs_dispatch(event, context):
-    return handle.start_c7n_mailer_sqs(logger, event)
+    return handle.start_c7n_mailer_sqs(logger, event, context=context)
 """
 
 CORE_DEPS = [

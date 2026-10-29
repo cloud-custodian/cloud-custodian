@@ -36,7 +36,7 @@ def start_c7n_mailer(logger, config=None, parallel=False):
         logger.exception("Error starting mailer MailerSqsQueueProcessor(). \n Error: %s \n" % (e))
 
 
-def start_c7n_mailer_sqs(logger, event, config=None):
+def start_c7n_mailer_sqs(logger, event, config=None, context=None):
     """Entry point when the mailer lambda is triggered by its SQS queue"""
     session = boto3.Session()
     if not config:
@@ -44,4 +44,5 @@ def start_c7n_mailer_sqs(logger, event, config=None):
     logger.info("c7n_mailer processing %d messages", len(event.get("Records", [])))
     processor = MailerSqsQueueProcessor(config, session, logger)
     # Lambda deletes the messages that are not reported as failures.
-    return processor.process_event(event)
+    remaining_ms = context.get_remaining_time_in_millis if context else None
+    return processor.process_event(event, remaining_ms)

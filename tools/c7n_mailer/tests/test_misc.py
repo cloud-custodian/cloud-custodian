@@ -96,13 +96,41 @@ class AWSMailerTests(unittest.TestCase):
         )
         assert not mock_sns_delivery.called
 
+    @patch("c7n_mailer.target.EmailDelivery")
+    @patch("c7n_mailer.sns_delivery.SnsDelivery")
+    def test_sqs_queue_processor_lambda_event_timeout(self, mock_sns_delivery, mock_email_delivery):
+        processor = sqs_queue_processor.MailerSqsQueueProcessor(
+            MAILER_CONFIG, boto3.Session(), logging.getLogger("c7n_mailer")
+        )
+        records = [
+            {
+                "messageId": str(i),
+                "body": SQS_MESSAGE_1_ENCODED["Body"].decode("ascii"),
+                "attributes": {"SentTimestamp": "1672574400000"},
+            }
+            for i in range(3)
+        ]
+        remaining = iter([60000, 1000, 1000])
+        result = processor.process_event({"Records": records}, lambda: next(remaining))
+        # Close to the timeout, the rest is left for a later invocation instead of being
+        # retried together with the messages that were already sent.
+        self.assertEqual(
+            result, {"batchItemFailures": [{"itemIdentifier": "1"}, {"itemIdentifier": "2"}]}
+        )
+        self.assertEqual(mock_sns_delivery.call_count, 1)
+
     @patch("c7n_mailer.handle.MailerSqsQueueProcessor")
     def test_mailer_handle_sqs(self, mock_processor):
         mock_processor.return_value.process_event.return_value = {"batchItemFailures": []}
         event = {"Records": []}
-        result = handle.start_c7n_mailer_sqs(logging.getLogger("c7n_mailer"), event, MAILER_CONFIG)
+        context = MagicMock()
+        result = handle.start_c7n_mailer_sqs(
+            logging.getLogger("c7n_mailer"), event, MAILER_CONFIG, context
+        )
         self.assertEqual(result, {"batchItemFailures": []})
-        mock_processor.return_value.process_event.assert_called_once_with(event)
+        mock_processor.return_value.process_event.assert_called_once_with(
+            event, context.get_remaining_time_in_millis
+        )
 
     def test_azure_queue_processor(self):
         processor = azure_queue_processor.MailerAzureQueueProcessor(

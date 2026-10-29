@@ -319,6 +319,9 @@ lambda_sqs_batch_size: 10  # messages per invocation, 1 to 10 (default 10)
   to move messages that keep failing to a dead-letter queue.
 - With a FIFO queue, the messages after a failed one are retried as well, so they are
   not delivered out of order.
+- When less than 30 seconds of the lambda `timeout` are left, the messages not processed
+  yet are returned to the queue for the next invocation, so a timeout doesn't resend the
+  ones that were already delivered.
 - `--update-lambda` removes the trigger that is no longer used, so switching between
   `schedule` and `sqs` doesn't leave the mailer running both ways. With `sqs`, it also
   removes the triggers on other queues, such as the previous `queue_url`.
