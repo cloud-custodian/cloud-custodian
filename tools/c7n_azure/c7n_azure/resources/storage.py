@@ -4,7 +4,7 @@
 import logging
 
 from azure.cosmosdb.table import TableService
-from azure.mgmt.storage.models import (IPRule, NetworkRuleSet,
+from azure.mgmt.storage.models import (BlobServiceProperties, IPRule, NetworkRuleSet,
                                        StorageAccountUpdateParameters,
                                        VirtualNetworkRule)
 from azure.storage.blob import BlobServiceClient
@@ -13,7 +13,7 @@ from azure.storage.file import FileService
 from azure.storage.queue import QueueServiceClient
 from c7n.exceptions import PolicyValidationError
 from c7n.filters.core import type_schema, ListItemFilter
-from c7n.utils import get_annotation_prefix, local_session
+from c7n.utils import get_annotation_prefix, local_session, merge_dict
 from c7n_azure.actions.base import AzureBaseAction
 from c7n_azure.actions.firewall import SetFirewallAction
 from c7n_azure.constants import BLOB_TYPE, FILE_TYPE, QUEUE_TYPE, TABLE_TYPE
@@ -832,3 +832,118 @@ class BlobServicesFilter(ValueFilter):
                 result.append(resource)
 
         return result
+
+
+@Storage.action_registry.register('set-blob-services')
+class SetBlobServicesAction(AzureBaseAction):
+    """Action that updates Blob Service Properties on Storage Accounts, using the
+    same keys as the ``blob-services`` filter. Properties not set are left as-is.
+
+    On accounts with point-in-time restore, Azure rejects soft delete days that
+    are not greater than the restore days. Versioning is not supported on accounts
+    with a hierarchical namespace, and Azure rejects the whole update there.
+
+    :example:
+
+    Enable blob and container soft delete with a 7 day retention period.
+
+    .. code-block:: yaml
+
+        policies:
+          - name: storage-enable-soft-delete
+            resource: azure.storage
+            filters:
+              - or:
+                  - type: blob-services
+                    key: deleteRetentionPolicy.enabled
+                    value: false
+                  - type: blob-services
+                    key: containerDeleteRetentionPolicy.enabled
+                    value: false
+            actions:
+              - type: set-blob-services
+                properties:
+                  deleteRetentionPolicy:
+                    enabled: true
+                    days: 7
+                  containerDeleteRetentionPolicy:
+                    enabled: true
+                    days: 7
+
+    :example:
+
+    Enable blob versioning. Accounts that never set it don't return the key, so
+    match anything that isn't true, and skip hierarchical namespace accounts.
+
+    .. code-block:: yaml
+
+        policies:
+          - name: storage-enable-blob-versioning
+            resource: azure.storage
+            filters:
+              - type: value
+                key: properties.isHnsEnabled
+                value: true
+                op: ne
+              - type: blob-services
+                key: isVersioningEnabled
+                value: true
+                op: ne
+            actions:
+              - type: set-blob-services
+                properties:
+                  isVersioningEnabled: true
+    """
+
+    # Azure keeps no days while a retention policy is off: it drops days sent with
+    # enabled false. Days are required when enabled because blob soft delete rejects
+    # a missing value, and container soft delete accepts it but reports no period.
+    RETENTION_POLICY_SCHEMA = {
+        'type': 'object',
+        'additionalProperties': False,
+        'required': ['enabled'],
+        'properties': {
+            'enabled': {'type': 'boolean'},
+            'days': {'type': 'integer', 'minimum': 1, 'maximum': 365},
+        },
+        'if': {'properties': {'enabled': {'const': True}}},
+        'then': {'required': ['days']},
+        'else': {'not': {'required': ['days']}},
+    }
+
+    schema = type_schema(
+        'set-blob-services',
+        required=['properties'],
+        properties={
+            'type': 'object',
+            'additionalProperties': False,
+            'minProperties': 1,
+            'properties': {
+                'deleteRetentionPolicy': RETENTION_POLICY_SCHEMA,
+                'containerDeleteRetentionPolicy': RETENTION_POLICY_SCHEMA,
+                'isVersioningEnabled': {'type': 'boolean'},
+            },
+        },
+    )
+
+    log = logging.getLogger('custodian.azure.storage.SetBlobServicesAction')
+
+    def _prepare_processing(self):
+        self.client = self.manager.get_client()
+
+    def _process_resource(self, resource):
+        # Read fresh rather than reuse the blob-services filter's annotation,
+        # then write back the whole object so unset properties are kept.
+        current = self.client.blob_services.get_service_properties(
+            resource['resourceGroup'], resource['name']).serialize()
+        updated = merge_dict(current, {'properties': self.data['properties']})
+
+        if updated == current:
+            return 'Blob service properties already up to date.'
+
+        self.client.blob_services.set_service_properties(
+            resource['resourceGroup'],
+            resource['name'],
+            parameters=BlobServiceProperties.deserialize(updated))
+
+        return 'Updated blob service properties.'

@@ -1,7 +1,7 @@
 # Copyright The Cloud Custodian Authors.
 # SPDX-License-Identifier: Apache-2.0
 import pytest
-from azure.mgmt.storage.models import StorageAccountUpdateParameters
+from azure.mgmt.storage.models import BlobServiceProperties, StorageAccountUpdateParameters
 from c7n_azure.constants import BLOB_TYPE, FILE_TYPE, QUEUE_TYPE, TABLE_TYPE
 from c7n_azure.resources.storage import StorageSettingsUtilities, StorageFirewallRulesFilter, \
     StorageFirewallBypassFilter
@@ -15,7 +15,7 @@ from c7n_azure.resources.storage import StorageMetricsFilter
 from c7n.exceptions import PolicyValidationError
 from c7n.utils import get_annotation_prefix
 from c7n.utils import local_session
-from ..azure_common import BaseTest, arm_template, cassette_name
+from ..azure_common import BaseTest, arm_template, cassette_name, strict_cassette
 
 
 class StorageTest(BaseTest):
@@ -1131,3 +1131,213 @@ class StorageMetricsFilterTest(BaseTest):
         expected_id = mock_resource['id'] + '/fileServices/default'
         actual_id = storage_filter.get_resource_id(mock_resource)
         self.assertEqual(actual_id, expected_id)
+
+
+class StorageSetBlobServicesActionTest(BaseTest):
+    recording_resource_group = 'test_storage-blob-services'
+
+    @arm_template('storage-blob-services.json')
+    @strict_cassette('set-blob-services')
+    def test_set_blob_services(self):
+        p = self.load_policy({
+            'name': 'test-set-blob-services',
+            'resource': 'azure.storage',
+            'filters': [
+                {'type': 'value',
+                 'key': 'resourceGroup',
+                 'value': self.recording_resource_group},
+                {'or': [
+                    {'type': 'blob-services',
+                     'key': 'deleteRetentionPolicy.enabled',
+                     'value': False},
+                    {'type': 'blob-services',
+                     'key': 'containerDeleteRetentionPolicy.enabled',
+                     'value': False},
+                    {'type': 'blob-services',
+                     'key': 'isVersioningEnabled',
+                     'value': True,
+                     'op': 'ne'},
+                ]},
+            ],
+            'actions': [{
+                'type': 'set-blob-services',
+                'properties': {
+                    'deleteRetentionPolicy': {'enabled': True, 'days': 7},
+                    'containerDeleteRetentionPolicy': {'enabled': True, 'days': 14},
+                    'isVersioningEnabled': True,
+                },
+            }]
+        })
+        resources = p.run()
+        self.assertEqual(len(resources), 1)
+
+        client = self.session.client('azure.mgmt.storage.StorageManagementClient')
+        after = client.blob_services.get_service_properties(
+            resources[0]['resourceGroup'], resources[0]['name'])
+        self.assertTrue(after.delete_retention_policy.enabled)
+        self.assertEqual(after.delete_retention_policy.days, 7)
+        self.assertTrue(after.container_delete_retention_policy.enabled)
+        self.assertEqual(after.container_delete_retention_policy.days, 14)
+        self.assertTrue(after.is_versioning_enabled)
+
+    def _load_action(self, properties):
+        with self.sign_out_patch():
+            p = self.load_policy({
+                'name': 'test-set-blob-services',
+                'resource': 'azure.storage',
+                'actions': [{'type': 'set-blob-services', 'properties': properties}]
+            }, validate=True)
+        return p.resource_manager.actions[0]
+
+    def _process(self, action, current_properties, resource=None):
+        action.client = MagicMock()
+        action.client.blob_services.get_service_properties.return_value = \
+            BlobServiceProperties.deserialize({
+                'id': '/subscriptions/ea42f556-5106-4743-99b0-c129bfa71a47/resourceGroups/'
+                      'test_rg/providers/Microsoft.Storage/storageAccounts/cctstorage/'
+                      'blobServices/default',
+                'name': 'default',
+                'type': 'Microsoft.Storage/storageAccounts/blobServices',
+                'sku': {'name': 'Standard_LRS', 'tier': 'Standard'},
+                'properties': current_properties,
+            })
+        action._process_resource(
+            resource or {'resourceGroup': 'test_rg', 'name': 'cctstorage', 'properties': {}})
+        return action.client.blob_services
+
+    @parameterized.expand([
+        ('days_minimum', {'deleteRetentionPolicy': {'enabled': True, 'days': 1}}),
+        ('days_maximum', {'deleteRetentionPolicy': {'enabled': True, 'days': 365}}),
+        ('disabled', {'deleteRetentionPolicy': {'enabled': False}}),
+        ('container_only', {'containerDeleteRetentionPolicy': {'enabled': True, 'days': 7}}),
+        ('blob_and_container', {
+            'deleteRetentionPolicy': {'enabled': True, 'days': 7},
+            'containerDeleteRetentionPolicy': {'enabled': False}}),
+        ('versioning', {'isVersioningEnabled': True}),
+    ])
+    def test_schema_accepts(self, _name, properties):
+        action = self._load_action(properties)
+        self.assertEqual(action.data['properties'], properties)
+
+    @parameterized.expand([
+        ('days_below_range', {'deleteRetentionPolicy': {'enabled': True, 'days': 0}}),
+        ('days_above_range', {'deleteRetentionPolicy': {'enabled': True, 'days': 366}}),
+        ('days_not_integer', {'deleteRetentionPolicy': {'enabled': True, 'days': 1.5}}),
+        ('enabled_without_days', {'deleteRetentionPolicy': {'enabled': True}}),
+        ('days_without_enabled', {'deleteRetentionPolicy': {'days': 30}}),
+        ('days_while_disabled', {'deleteRetentionPolicy': {'enabled': False, 'days': 30}}),
+        ('unsupported_policy_field', {'deleteRetentionPolicy': {
+            'enabled': True, 'days': 7, 'allowPermanentDelete': True}}),
+        ('unsupported_property', {'changeFeed': {'enabled': True}}),
+        ('versioning_not_boolean', {'isVersioningEnabled': 'true'}),
+        ('null_versioning', {'isVersioningEnabled': None}),
+        ('empty_properties', {}),
+        ('empty_retention_policy', {'deleteRetentionPolicy': {}}),
+        ('null_retention_policy', {'deleteRetentionPolicy': None}),
+        ('null_days', {'deleteRetentionPolicy': {'enabled': True, 'days': None}}),
+        # Azure accepts this for containers but then reports no retention period.
+        ('container_enabled_without_days', {'containerDeleteRetentionPolicy': {'enabled': True}}),
+        ('container_days_while_disabled', {'containerDeleteRetentionPolicy': {
+            'enabled': False, 'days': 30}}),
+    ])
+    def test_schema_rejects(self, _name, properties):
+        with self.assertRaises(PolicyValidationError):
+            self._load_action(properties)
+
+    def test_schema_requires_properties(self):
+        with self.sign_out_patch():
+            with self.assertRaises(PolicyValidationError):
+                self.load_policy({
+                    'name': 'test-set-blob-services',
+                    'resource': 'azure.storage',
+                    'actions': [{'type': 'set-blob-services'}]
+                }, validate=True)
+
+    def test_enable_keeps_other_properties(self):
+        action = self._load_action({'deleteRetentionPolicy': {'enabled': True, 'days': 7}})
+        blob_services = self._process(action, {
+            'isVersioningEnabled': True,
+            'cors': {'corsRules': []},
+            'deleteRetentionPolicy': {'enabled': False, 'allowPermanentDelete': False},
+        })
+
+        blob_services.get_service_properties.assert_called_once_with('test_rg', 'cctstorage')
+        args, kwargs = blob_services.set_service_properties.call_args
+        self.assertEqual(args, ('test_rg', 'cctstorage'))
+        self.assertEqual(kwargs['parameters'].serialize(), {'properties': {
+            'isVersioningEnabled': True,
+            'cors': {'corsRules': []},
+            'deleteRetentionPolicy': {
+                'enabled': True, 'days': 7, 'allowPermanentDelete': False},
+        }})
+
+    def test_change_days(self):
+        action = self._load_action({'deleteRetentionPolicy': {'enabled': True, 'days': 30}})
+        blob_services = self._process(action, {
+            'deleteRetentionPolicy': {'enabled': True, 'days': 7},
+        })
+
+        sent = blob_services.set_service_properties.call_args.kwargs['parameters']
+        self.assertEqual(sent.serialize(), {'properties': {
+            'deleteRetentionPolicy': {'enabled': True, 'days': 30},
+        }})
+
+    def test_enable_container_keeps_blob_policy(self):
+        action = self._load_action(
+            {'containerDeleteRetentionPolicy': {'enabled': True, 'days': 14}})
+        blob_services = self._process(action, {
+            'deleteRetentionPolicy': {'enabled': True, 'days': 7},
+            'containerDeleteRetentionPolicy': {'enabled': False},
+        })
+
+        sent = blob_services.set_service_properties.call_args.kwargs['parameters']
+        self.assertEqual(sent.serialize(), {'properties': {
+            'deleteRetentionPolicy': {'enabled': True, 'days': 7},
+            'containerDeleteRetentionPolicy': {'enabled': True, 'days': 14},
+        }})
+
+    def test_enable_versioning_keeps_policies(self):
+        # Accounts that never set versioning don't return the key at all.
+        action = self._load_action({'isVersioningEnabled': True})
+        blob_services = self._process(action, {
+            'deleteRetentionPolicy': {'enabled': True, 'days': 7},
+        })
+
+        sent = blob_services.set_service_properties.call_args.kwargs['parameters']
+        self.assertEqual(sent.serialize(), {'properties': {
+            'deleteRetentionPolicy': {'enabled': True, 'days': 7},
+            'isVersioningEnabled': True,
+        }})
+
+    def test_disable(self):
+        # The old days ride along; Azure drops them while disabled, so the next run
+        # reads no days and skips the write.
+        action = self._load_action({'deleteRetentionPolicy': {'enabled': False}})
+        blob_services = self._process(action, {
+            'deleteRetentionPolicy': {'enabled': True, 'days': 7},
+        })
+
+        sent = blob_services.set_service_properties.call_args.kwargs['parameters']
+        self.assertEqual(sent.serialize(), {'properties': {
+            'deleteRetentionPolicy': {'enabled': False, 'days': 7},
+        }})
+
+    def test_already_up_to_date_skips_write(self):
+        action = self._load_action({'deleteRetentionPolicy': {'enabled': True, 'days': 7}})
+        blob_services = self._process(action, {
+            'deleteRetentionPolicy': {'enabled': True, 'days': 7},
+        })
+
+        blob_services.set_service_properties.assert_not_called()
+
+    def test_reads_live_properties_not_filter_annotation(self):
+        # The blob-services filter caches what it read; the action must not trust it.
+        action = self._load_action({'deleteRetentionPolicy': {'enabled': True, 'days': 7}})
+        stale = {'resourceGroup': 'test_rg', 'name': 'cctstorage', 'properties': {
+            'c7n:blobServices': {'deleteRetentionPolicy': {'enabled': True, 'days': 7}},
+        }}
+        blob_services = self._process(action, {
+            'deleteRetentionPolicy': {'enabled': False},
+        }, resource=stale)
+
+        blob_services.set_service_properties.assert_called_once()
