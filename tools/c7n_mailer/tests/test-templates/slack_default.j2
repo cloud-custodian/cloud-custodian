@@ -1,37 +1,40 @@
+{%- set resource_lines -%}
+{%- for resource in resources -%}
+{{ format_resource(resource, policy['resource']) }}
+{%- endfor -%}
+{%- endset -%}
 {
    "attachments":[
       {
          "fallback":"Cloud Custodian Policy Violation",
          "title":"Custodian",
-         "color":"{{ action['slack_msg_color']|default("danger") }}",
+         "color":{{ action['slack_msg_color']|default("danger") | tojson }},
          "fields":[
             {
                "title":"Resources",
-               "value":"{%- for resource in resources -%}
-                        {{ format_resource(resource, policy['resource']) | replace('\\"', '"') | replace('"', '\\"') }}
-                        {%- endfor -%}"
+               "value":{{ resource_lines | tojson }}
             },
             {
                "title":"Account",
-               "value":"{{ account }}"
+               "value":{{ account | default('') | tojson }}
             },
             {
                "title":"Region",
-               "value":"{{ region }}"
+               "value":{{ region | default('') | tojson }}
             },
             {
                "title":"Violation Description",
-               "value":"{{ action['violation_desc'] }}"
+               "value":{{ action['violation_desc'] | default('') | tojson }}
             },
             {
                "title":"Action Description",
-               "value":"{{ action['action_desc'] }}"
+               "value":{{ action['action_desc'] | default('') | tojson }}
             }
          ]
       }
    ],
    {%- if not recipient.startswith('https://') %}
-   "channel":"{{ recipient }}",
+   "channel":{{ recipient | tojson }},
    {%- endif -%}
    "username":"cloud-custodian"
 }
