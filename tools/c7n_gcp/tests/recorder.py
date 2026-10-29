@@ -13,9 +13,26 @@ from httplib2 import Http, Response
 PROJECT_ID = "cloud-custodian"
 
 
-def sanitize_project_name(dirty_str):
-    sanitized = 'projects/{}/'.format(PROJECT_ID)
-    return re.sub(r'projects/([0-9a-zA-Z_-]+)/', sanitized, dirty_str)
+def sanitize_project_name(dirty_str: str) -> str:
+    # State also includes bare project attributes and service-account email domains.
+    project_ids = set(re.findall(r'projects/([0-9a-zA-Z_-]+)/', dirty_str))
+    project_ids.update(re.findall(
+        r'"(?:project|project_id|projectId)"\s*:\s*"([0-9a-zA-Z_-]+)"',
+        dirty_str,
+    ))
+
+    for project_id in project_ids:
+        dirty_str = re.sub(
+            rf'("(?:project|project_id|projectId)"\s*:\s*)"{re.escape(project_id)}"',
+            rf'\1"{PROJECT_ID}"',
+            dirty_str,
+        )
+        dirty_str = dirty_str.replace(
+            f'@{project_id}.iam.gserviceaccount.com',
+            f'@{PROJECT_ID}.iam.gserviceaccount.com',
+        )
+
+    return re.sub(r'projects/([0-9a-zA-Z_-]+)/', f'projects/{PROJECT_ID}/', dirty_str)
 
 
 class FlightRecorder(Http):

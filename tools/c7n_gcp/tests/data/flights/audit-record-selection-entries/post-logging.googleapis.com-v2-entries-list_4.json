@@ -1,0 +1,223 @@
+{
+  "headers": {
+    "content-type": "application/json; charset=UTF-8",
+    "vary": "Origin, X-Origin, Referer",
+    "date": "Sat, 24 Oct 2026 15:58:54 GMT",
+    "server": "ESF",
+    "x-xss-protection": "0",
+    "x-frame-options": "SAMEORIGIN",
+    "x-content-type-options": "nosniff",
+    "server-timing": "gfet4t7; dur=222",
+    "alt-svc": "h3=\":443\"; ma=2592000,h3-29=\":443\"; ma=2592000",
+    "transfer-encoding": "chunked",
+    "status": "200",
+    "content-length": "8200",
+    "-content-encoding": "gzip"
+  },
+  "body": {
+    "entries": [
+      {
+        "protoPayload": {
+          "@type": "type.googleapis.com/google.cloud.audit.AuditLog",
+          "status": {},
+          "authenticationInfo": {
+            "principalEmail": "user@example.com",
+            "principalSubject": "user:user@example.com",
+            "oauthInfo": {
+              "oauthClientId": "764086051850-6qr4p6gpi6hn506pt8ejuq83di341hur.apps.googleusercontent.com"
+            }
+          },
+          "requestMetadata": {
+            "callerIp": "198.51.100.1",
+            "callerSuppliedUserAgent": "Terraform/1.5.5 (+https://www.terraform.io) Terraform-Plugin-SDK/2.40.1 terraform-provider-google/8.8.1,gzip(gfe)",
+            "requestAttributes": {
+              "time": "2026-10-24T15:58:21.153025Z",
+              "auth": {}
+            },
+            "destinationAttributes": {}
+          },
+          "serviceName": "compute.googleapis.com",
+          "methodName": "v1.compute.instances.insert",
+          "authorizationInfo": [
+            {
+              "resource": "projects/cloud-custodian/zones/us-central1-a/instances/c7n-selection-380a8d93",
+              "permission": "compute.instances.create",
+              "granted": true,
+              "resourceAttributes": {
+                "service": "compute",
+                "name": "projects/cloud-custodian/zones/us-central1-a/instances/c7n-selection-380a8d93",
+                "type": "compute.instances"
+              },
+              "permissionType": "ADMIN_WRITE"
+            },
+            {
+              "resource": "projects/cloud-custodian/zones/us-central1-a/disks/c7n-selection-380a8d93",
+              "permission": "compute.disks.create",
+              "granted": true,
+              "resourceAttributes": {
+                "service": "compute",
+                "name": "projects/cloud-custodian/zones/us-central1-a/disks/c7n-selection-380a8d93",
+                "type": "compute.disks"
+              },
+              "permissionType": "ADMIN_WRITE"
+            },
+            {
+              "resource": "projects/cloud-custodian/regions/us-central1/subnetworks/c7n-selection-380a8d93-subnet",
+              "permission": "compute.subnetworks.use",
+              "granted": true,
+              "resourceAttributes": {
+                "service": "compute",
+                "name": "projects/cloud-custodian/regions/us-central1/subnetworks/c7n-selection-380a8d93-subnet",
+                "type": "compute.subnetworks"
+              },
+              "permissionType": "ADMIN_WRITE"
+            },
+            {
+              "resource": "projects/cloud-custodian/zones/us-central1-a/instances/c7n-selection-380a8d93",
+              "permission": "compute.instances.setLabels",
+              "granted": true,
+              "resourceAttributes": {
+                "service": "compute",
+                "name": "projects/cloud-custodian/zones/us-central1-a/instances/c7n-selection-380a8d93",
+                "type": "compute.instances"
+              },
+              "permissionType": "ADMIN_WRITE"
+            }
+          ],
+          "resourceName": "projects/cloud-custodian/zones/us-central1-a/instances/c7n-selection-380a8d93",
+          "request": {
+            "name": "c7n-selection-380a8d93",
+            "deletionProtection": false,
+            "networkInterfaces": [
+              {
+                "subnetwork": "projects/cloud-custodian/regions/us-central1/subnetworks/c7n-selection-380a8d93-subnet"
+              }
+            ],
+            "machineType": "projects/cloud-custodian/zones/us-central1-a/machineTypes/e2-micro",
+            "canIpForward": false,
+            "disks": [
+              {
+                "autoDelete": true,
+                "boot": true,
+                "initializeParams": {
+                  "sourceImage": "projects/cloud-custodian/global/images/family/ubuntu-2204-lts"
+                },
+                "mode": "READ_WRITE"
+              }
+            ],
+            "scheduling": {
+              "automaticRestart": true
+            },
+            "labels": [
+              {
+                "value": "true",
+                "key": "goog-terraform-provisioned"
+              }
+            ],
+            "@type": "type.googleapis.com/compute.instances.insert"
+          },
+          "response": {
+            "targetId": "5596281590158289779",
+            "id": "4648628890593487730",
+            "@type": "type.googleapis.com/operation",
+            "name": "operation-1792857500547-65e982a73fafb-03b2f8f3-61aa8b25",
+            "status": "RUNNING",
+            "operationType": "insert",
+            "selfLink": "https://www.googleapis.com/compute/v1/projects/cloud-custodian/zones/us-central1-a/operations/operation-1792857500547-65e982a73fafb-03b2f8f3-61aa8b25",
+            "progress": "0",
+            "targetLink": "https://www.googleapis.com/compute/v1/projects/cloud-custodian/zones/us-central1-a/instances/c7n-selection-380a8d93",
+            "zone": "https://www.googleapis.com/compute/v1/projects/cloud-custodian/zones/us-central1-a",
+            "user": "user@example.com",
+            "insertTime": "2026-10-24T08:58:21.081-07:00",
+            "startTime": "2026-10-24T08:58:21.105-07:00"
+          },
+          "metadata": {
+            "usedResources": {
+              "attachedDisks": [
+                {
+                  "isBootDisk": true,
+                  "sourceImageId": "8458814414621311273",
+                  "sourceImage": "https://www.googleapis.com/compute/v1/projects/cloud-custodian/global/images/ubuntu-2204-jammy-v20261021"
+                }
+              ]
+            }
+          },
+          "resourceLocation": {
+            "currentLocations": [
+              "us-central1-a"
+            ]
+          },
+          "apiVersionIdentifier": "v1"
+        },
+        "insertId": "-63r04pe3ob3u",
+        "resource": {
+          "type": "gce_instance",
+          "labels": {
+            "zone": "us-central1-a",
+            "instance_id": "5596281590158289779",
+            "project_id": "cloud-custodian"
+          }
+        },
+        "timestamp": "2026-10-24T15:58:20.611468Z",
+        "severity": "NOTICE",
+        "labels": {
+          "compute.googleapis.com/root_trigger_id": "7ca98a2e-4526-4295-8765-cc27d16f2804"
+        },
+        "logName": "projects/cloud-custodian/logs/cloudaudit.googleapis.com%2Factivity",
+        "operation": {
+          "id": "operation-1792857500547-65e982a73fafb-03b2f8f3-61aa8b25",
+          "producer": "compute.googleapis.com",
+          "first": true
+        },
+        "receiveTimestamp": "2026-10-24T15:58:21.771246325Z"
+      },
+      {
+        "protoPayload": {
+          "@type": "type.googleapis.com/google.cloud.audit.AuditLog",
+          "status": {},
+          "authenticationInfo": {
+            "principalEmail": "user@example.com",
+            "principalSubject": "user:user@example.com",
+            "oauthInfo": {
+              "oauthClientId": "764086051850-6qr4p6gpi6hn506pt8ejuq83di341hur.apps.googleusercontent.com"
+            }
+          },
+          "requestMetadata": {
+            "callerIp": "198.51.100.1",
+            "callerSuppliedUserAgent": "Terraform/1.5.5 (+https://www.terraform.io) Terraform-Plugin-SDK/2.40.1 terraform-provider-google/8.8.1,gzip(gfe)",
+            "requestAttributes": {},
+            "destinationAttributes": {}
+          },
+          "serviceName": "compute.googleapis.com",
+          "methodName": "v1.compute.instances.insert",
+          "resourceName": "projects/cloud-custodian/zones/us-central1-a/instances/c7n-selection-380a8d93",
+          "request": {
+            "@type": "type.googleapis.com/compute.instances.insert"
+          },
+          "apiVersionIdentifier": "v1"
+        },
+        "insertId": "-omsyowd708g",
+        "resource": {
+          "type": "gce_instance",
+          "labels": {
+            "project_id": "cloud-custodian",
+            "zone": "us-central1-a",
+            "instance_id": "5596281590158289779"
+          }
+        },
+        "timestamp": "2026-10-24T15:58:35.367697Z",
+        "severity": "NOTICE",
+        "labels": {
+          "compute.googleapis.com/root_trigger_id": "7ca98a2e-4526-4295-8765-cc27d16f2804"
+        },
+        "logName": "projects/cloud-custodian/logs/cloudaudit.googleapis.com%2Factivity",
+        "operation": {
+          "id": "operation-1792857500547-65e982a73fafb-03b2f8f3-61aa8b25",
+          "producer": "compute.googleapis.com",
+          "last": true
+        },
+        "receiveTimestamp": "2026-10-24T15:58:35.852816883Z"
+      }
+    ]
+  }
+}
