@@ -220,11 +220,16 @@ class EmailDelivery:
         # bcc addresses receive every email, but get_mimetext_message keeps them out of the headers.
         # They're added here rather than per resource, so slack://owners doesn't message them.
         bcc_addrs = get_bcc_addrs(sqs_message["action"])
-        emails_to_mimetext_map = {}
+        # Groups whose recipients only differ by a bcc address end up with the same recipients and
+        # the same visible To list, so they get one email covering the resources of both.
+        recipients_to_resources_map = {}
         for to_addrs, resources in emails_to_resources_map.items():
             recipients = tuple(sorted(set(to_addrs) | set(bcc_addrs)))
+            recipients_to_resources_map.setdefault(recipients, []).extend(resources)
+        emails_to_mimetext_map = {}
+        for recipients, resources in recipients_to_resources_map.items():
             emails_to_mimetext_map[recipients] = get_mimetext_message(
-                self.config, self.logger, sqs_message, resources, list(to_addrs)
+                self.config, self.logger, sqs_message, resources, list(recipients)
             )
         # eg: { ('milton@initech.com', 'peter@initech.com'): mimetext_message }
         return emails_to_mimetext_map
