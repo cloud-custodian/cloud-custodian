@@ -6,6 +6,15 @@ import requests
 from .utils import decrypt
 
 
+def graph_recipient(email):
+    """Returns a Graph recipient, with the display name of "Name <address>" in its own field"""
+    name, address = parseaddr(email)
+    recipient = {"address": address}
+    if name:
+        recipient["name"] = name
+    return {"emailAddress": recipient}
+
+
 class GraphDelivery:
     def __init__(self, config, session, logger):
         self.token = self.get_token(
@@ -34,14 +43,10 @@ class GraphDelivery:
                     "subject": mimetext.get("Subject"),
                     "body": {"contentType": contentType, "content": content},
                     "toRecipients": [
-                        {"emailAddress": {"address": e}}
-                        for e in emails
-                        if parseaddr(e)[1] in to_header
+                        graph_recipient(e) for e in emails if parseaddr(e)[1] in to_header
                     ],
                     "ccRecipients": [
-                        {"emailAddress": {"address": e}}
-                        for e in emails
-                        if parseaddr(e)[1] not in to_header
+                        graph_recipient(e) for e in emails if parseaddr(e)[1] not in to_header
                     ],
                 },
                 "isDraft": "false",
