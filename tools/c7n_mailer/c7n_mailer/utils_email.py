@@ -86,7 +86,8 @@ def set_mimetext_headers(
 
     message["Subject"] = subject
     message["From"] = from_addr
-    message["To"] = ", ".join(to_addrs)
+    if to_addrs:
+        message["To"] = ", ".join(to_addrs)
     if cc_addrs:
         # NOTE filter out unenhanced cc_addrs added by self.get_mimetext_message
         cc_addrs = [cc for cc in cc_addrs if is_email(cc)]
@@ -101,6 +102,17 @@ def set_mimetext_headers(
             message[key] = priority[key]
 
     return message
+
+
+def get_header_to_addrs(action, to_addrs):
+    """Returns the addresses for the To header, leaving out the ones only there for cc"""
+    # cc addresses are part of the recipients, so a policy with only cc addresses still sends,
+    # but they belong in the Cc header unless the policy also lists them in to
+    explicit_to = set(action.get("to", []))
+    cc_mailboxes = {parseaddr(cc)[1] for cc in action.get("cc", []) if is_email(cc)}
+    return [
+        addr for addr in to_addrs if addr in explicit_to or parseaddr(addr)[1] not in cc_mailboxes
+    ]
 
 
 def get_mimetext_message(config, logger, message, resources, to_addrs):
@@ -118,7 +130,7 @@ def get_mimetext_message(config, logger, message, resources, to_addrs):
         message=MIMEText(body, email_format, "utf-8"),
         subject=get_message_subject(message),
         from_addr=message["action"].get("from", config["from_address"]),
-        to_addrs=to_addrs,
+        to_addrs=get_header_to_addrs(message["action"], to_addrs),
         # FIXME cc has been processed and enhanced in get_emails_to_resources_map
         cc_addrs=message["action"].get("cc", []),
         additional_headers=config.get("additional_email_headers", {}),

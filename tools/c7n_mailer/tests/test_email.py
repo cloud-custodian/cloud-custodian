@@ -3,6 +3,7 @@
 
 import boto3
 import copy
+import json
 import os
 import unittest
 
@@ -321,6 +322,40 @@ class EmailTest(unittest.TestCase):
         )
         self.assertEqual(email["Cc"], "hello@example.com, cc@example.com")
 
+    def test_cc_addresses_not_in_to_header(self):
+        email = get_mimetext_message(
+            self.email_delivery.config,
+            self.email_delivery.logger,
+            SQS_MESSAGE_4,
+            SQS_MESSAGE_4["resources"],
+            ["cc@example.com", "hello@example.com", "owner@example.com"],
+        )
+        self.assertEqual(email["To"], "owner@example.com")
+        self.assertEqual(email["Cc"], "hello@example.com, cc@example.com")
+
+    def test_cc_address_also_in_to_stays_in_to_header(self):
+        sqs_msg = copy.deepcopy(SQS_MESSAGE_4)
+        sqs_msg["action"]["to"].append("hello@example.com")
+        email = get_mimetext_message(
+            self.email_delivery.config,
+            self.email_delivery.logger,
+            sqs_msg,
+            sqs_msg["resources"],
+            ["cc@example.com", "hello@example.com", "owner@example.com"],
+        )
+        self.assertEqual(email["To"], "hello@example.com, owner@example.com")
+
+    def test_cc_only_email_has_no_to_header(self):
+        email = get_mimetext_message(
+            self.email_delivery.config,
+            self.email_delivery.logger,
+            SQS_MESSAGE_4,
+            SQS_MESSAGE_4["resources"],
+            ["cc@example.com", "hello@example.com"],
+        )
+        self.assertIsNone(email["To"])
+        self.assertEqual(email["Cc"], "hello@example.com, cc@example.com")
+
     def test_sendgrid(self):
         config = copy.deepcopy(MAILER_CONFIG)
         logger_mock = MagicMock()
@@ -381,6 +416,32 @@ class EmailTest(unittest.TestCase):
                 '{"message": {"subject": "core-services-dev AWS EBS Volumes'
                 ' will be DELETED in 15 DAYS!"'
             )
+
+    def test_ms_graph_cc_recipients(self):
+        config = copy.deepcopy(MAILER_CONFIG)
+        del config["smtp_server"]
+        config.update(
+            {
+                "graph_sendmail_endpoint": "my_graph_sendmail_endpoint",
+                "graph_token_endpoint": "my_graph_token_endpoint",
+                "graph_client_id": "graph_client_id",
+                "graph_client_secret": "graph_client_secret",
+            }
+        )
+        delivery = MockEmailDelivery(config, self.aws_session, MagicMock())
+
+        sqs_msg = copy.deepcopy(SQS_MESSAGE_1)
+        sqs_msg["action"]["cc"] = ["CC <cc@example.com>"]
+        with patch("requests.post") as req:
+            with patch("c7n_mailer.utils.kms_decrypt", return_value="xyz"):
+                delivery.send_c7n_email(sqs_msg)
+
+        message = json.loads(req.call_args_list[1][1]["data"])["message"]
+        to = [r["emailAddress"]["address"] for r in message["toRecipients"]]
+        cc = [r["emailAddress"]["address"] for r in message["ccRecipients"]]
+        self.assertTrue(to)
+        self.assertNotIn("CC <cc@example.com>", to)
+        self.assertEqual(cc, ["CC <cc@example.com>"])
 
     def test_ses_send_raw_email(self):
         config = copy.deepcopy(MAILER_CONFIG)
