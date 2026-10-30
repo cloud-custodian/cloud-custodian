@@ -21,7 +21,12 @@ from common import (
 )
 from mock import patch, call, MagicMock
 
-from c7n_mailer.utils_email import is_email, priority_header_is_valid, get_mimetext_message
+from c7n_mailer.utils_email import (
+    get_bcc_addrs,
+    get_mimetext_message,
+    is_email,
+    priority_header_is_valid,
+)
 
 # note principalId is very org/domain specific for federated?, it would be good to get
 # confirmation from capone on this event / test.
@@ -338,6 +343,14 @@ class EmailTest(unittest.TestCase):
         self.assertIsNone(email["Bcc"])
         self.assertNotIn("audit@example.com", email.as_string())
 
+    def test_bcc_addrs_compare_mailboxes(self):
+        action = {
+            "to": ["Audit <audit@example.com>"],
+            "cc": ["cc@example.com"],
+            "bcc": ["audit@example.com", "CC <cc@example.com>", "hidden@example.com"],
+        }
+        self.assertEqual(get_bcc_addrs(action), ["hidden@example.com"])
+
     def test_bcc_only_email_has_no_to_header(self):
         sqs_msg = copy.deepcopy(SQS_MESSAGE_1)
         sqs_msg["action"]["bcc"] = ["audit@example.com"]
@@ -361,6 +374,25 @@ class EmailTest(unittest.TestCase):
         # slack://owners uses the resources map, so it doesn't message bcc addresses
         for emails in self.email_delivery.get_emails_to_resources_map(sqs_msg):
             self.assertNotIn("audit@example.com", emails)
+
+    def test_bcc_groups_with_the_same_recipients_share_an_email(self):
+        sqs_msg = copy.deepcopy(SQS_MESSAGE_1)
+        sqs_msg["action"]["bcc"] = ["audit@example.com"]
+        first, second = {"id": "first"}, {"id": "second"}
+        groups = {
+            ("owner@example.com",): [first],
+            ("audit@example.com", "owner@example.com"): [second],
+        }
+        get_groups = patch.object(
+            self.email_delivery, "get_emails_to_resources_map", return_value=groups
+        )
+        with get_groups, patch("c7n_mailer.email_delivery.get_mimetext_message") as get_message:
+            emails_to_mimetext_map = self.email_delivery.get_emails_to_mimetext_map(sqs_msg)
+
+        # Both groups go to the same mailboxes, so neither overwrites the other
+        self.assertEqual(list(emails_to_mimetext_map), [("audit@example.com", "owner@example.com")])
+        get_message.assert_called_once()
+        self.assertEqual(get_message.call_args[0][3], [first, second])
 
     def test_bcc_not_in_template_context(self):
         sqs_msg = copy.deepcopy(SQS_MESSAGE_1)

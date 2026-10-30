@@ -2,6 +2,8 @@
 # SPDX-License-Identifier: Apache-2.0
 
 
+from email.utils import parseaddr
+
 import sendgrid
 from python_http_client import exceptions
 from sendgrid.helpers.mail import Content, Email, Header, Mail, To
@@ -52,7 +54,11 @@ class SendGridDelivery:
                 elif is_email(target):
                     resource_emails.append(target)
 
-            resource_emails = tuple(sorted(set(resource_emails)))
+            # One email per mailbox, even when to and bcc spell an address differently
+            mailboxes = {}
+            for email in resource_emails:
+                mailboxes.setdefault(parseaddr(email)[1], email)
+            resource_emails = tuple(sorted(set(mailboxes.values())))
 
             if resource_emails:
                 email_to_addrs_to_resources_map.setdefault(resource_emails, []).append(resource)

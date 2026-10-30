@@ -107,8 +107,11 @@ def set_mimetext_headers(
 
 def get_bcc_addrs(action):
     """Returns the bcc addresses of a notify action that aren't also in to or cc"""
-    visible = set(action.get("to", [])) | set(action.get("cc", []))
-    return [bcc for bcc in action.get("bcc", []) if is_email(bcc) and bcc not in visible]
+    # Compare mailboxes, so "Audit <audit@example.com>" in to hides audit@example.com in bcc
+    visible = {parseaddr(addr)[1] for addr in action.get("to", []) + action.get("cc", [])}
+    return [
+        bcc for bcc in action.get("bcc", []) if is_email(bcc) and parseaddr(bcc)[1] not in visible
+    ]
 
 
 def without_bcc(message):

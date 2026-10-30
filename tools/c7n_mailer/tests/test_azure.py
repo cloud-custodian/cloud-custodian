@@ -133,6 +133,15 @@ class AzureTest(unittest.TestCase):
         self.assertIn("audit@domain.com", addresses)
         self.assertEqual(len(addresses), 2)
 
+    def test_sendgrid_bcc_same_mailbox_as_to(self):
+        message = json.loads(ASQ_MESSAGE)
+        message["action"]["to"] = ["User <user@domain.com>"]
+        message["action"]["bcc"] = ["user@domain.com"]
+        sendgrid_delivery = SendGridDelivery(MAILER_CONFIG_AZURE, Mock(), logger)
+        emails_to_resources_map = sendgrid_delivery.get_emails_to_resources_map(message)
+        # the mailbox gets one email, not one per spelling of its address
+        self.assertEqual(list(emails_to_resources_map), [("User <user@domain.com>",)])
+
     def test_azure_mailer_requirements(self):
         reqs = deploy.get_mailer_requirements()
         self.assertIn("adal", reqs)
