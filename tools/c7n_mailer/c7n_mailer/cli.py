@@ -3,6 +3,7 @@
 import argparse
 import functools
 import logging
+from importlib.metadata import PackageNotFoundError, version
 from os import path
 
 import jsonschema
@@ -194,8 +195,21 @@ def get_and_validate_mailer_config(args):
     return config
 
 
+def get_c7n_mailer_version():
+    try:
+        return version("c7n_mailer")
+    except PackageNotFoundError:
+        return "unknown"
+
+
 def get_c7n_mailer_parser():
     parser = argparse.ArgumentParser()
+    parser.add_argument(
+        "--version",
+        action="version",
+        version="%(prog)s " + get_c7n_mailer_version(),
+        help="print the c7n-mailer version and exit",
+    )
     parser.add_argument("-c", "--config", required=True, help="mailer.yml config file")
     debug_help_msg = "sets c7n_mailer logger to debug, for maximum output (the default is INFO)"
     parser.add_argument("--debug", action="store_true", help=debug_help_msg)
