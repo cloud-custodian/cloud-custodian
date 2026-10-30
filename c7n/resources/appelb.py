@@ -39,11 +39,12 @@ class DescribeAppElb(DescribeSource):
     def get_resources(self, ids, cache=True):
         """Support server side filtering on arns or names
         """
-        if ids[0].startswith('arn:'):
-            params = {'LoadBalancerArns': ids}
-        else:
-            params = {'Names': ids}
-        return self.query.filter(self.manager, **params)
+        key = 'LoadBalancerArns' if ids[0].startswith('arn:') else 'Names'
+        resources = []
+        # DescribeLoadBalancers accepts at most 20 arns or names per call.
+        for id_set in chunks(ids, 20):
+            resources.extend(self.query.filter(self.manager, **{key: list(id_set)}) or [])
+        return resources
 
     def augment(self, albs):
         _describe_appelb_tags(

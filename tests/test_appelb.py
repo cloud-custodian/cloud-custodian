@@ -6,10 +6,10 @@ from .common import BaseTest, event_data
 from c7n.exceptions import PolicyValidationError
 from c7n.executor import MainThreadExecutor
 from c7n.resources.appelb import (
-    AppELB, AppELBTargetGroup, AppELBDeleteListenerAction,
+    AppELB, AppELBTargetGroup, AppELBDeleteListenerAction, DescribeAppElb,
     parse_attribute_value, serialize_attribute_value,
 )
-from unittest.mock import patch
+from unittest.mock import MagicMock, patch
 import logging
 
 
@@ -25,6 +25,27 @@ def test_parse_attribute_value():
     assert parse_attribute_value('true') is True
     assert parse_attribute_value('false') is False
     assert parse_attribute_value('abc') == 'abc'
+
+
+def test_describe_get_resources_in_batches_of_20():
+    # DescribeLoadBalancers rejects more than 20 arns or names per call.
+    source = DescribeAppElb.__new__(DescribeAppElb)
+    source.manager = None
+    source.query = MagicMock()
+    source.query.filter.side_effect = lambda manager, **params: [
+        {'LoadBalancerArn': i} for i in next(iter(params.values()))]
+
+    arns = ['arn:aws:elasticloadbalancing:us-east-1:123456789012:loadbalancer/app/lb%d/x' % i
+            for i in range(45)]
+    resources = source.get_resources(arns)
+
+    assert [r['LoadBalancerArn'] for r in resources] == arns
+    calls = source.query.filter.call_args_list
+    assert [len(call.kwargs['LoadBalancerArns']) for call in calls] == [20, 20, 5]
+
+    source.query.filter.reset_mock()
+    source.get_resources(['lb-a', 'lb-b'])
+    assert source.query.filter.call_args_list[0].kwargs == {'Names': ['lb-a', 'lb-b']}
 
 
 class AppELBTest(BaseTest):
