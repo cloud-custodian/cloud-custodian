@@ -13,7 +13,8 @@ from c7n.tags import Tag, TagDelayedAction, RemoveTag, coalesce_copy_user_tags, 
 from c7n.utils import type_schema, local_session, chunks, group_by, get_retry
 from c7n.filters import Filter, ListItemFilter, MetricsFilter
 from c7n.filters.kms import KmsRelatedFilter
-from c7n.filters.vpc import SubnetFilter, VpcFilter
+from c7n.filters.vpc import (
+    SecurityGroupFilter, SubnetFilter, VpcFilter, NetworkLocation)
 from c7n.filters.backup import ConsecutiveAwsBackupsFilter
 
 
@@ -107,6 +108,26 @@ class FSxVolumesFilter(ListItemFilter):
         for res in resources:
             res[self.annotation_key] = mapping.get(res[model.id], [])
         return super().process(resources, event)
+
+
+@resources.register('fsx-storage-virtual-machine')
+class FSxStorageVirtualMachine(QueryResourceManager):
+
+    class resource_type(TypeInfo):
+        service = 'fsx'
+        enum_spec = ('describe_storage_virtual_machines', 'StorageVirtualMachines', None)
+        name = 'Name'
+        id = 'StorageVirtualMachineId'
+        arn = 'ResourceARN'
+        date = 'CreationTime'
+        cfn_type = 'AWS::FSx::StorageVirtualMachine'
+        filter_name = 'StorageVirtualMachineIds'
+        filter_type = 'list'
+        universal_taggable = object()
+
+    source_mapping = {
+        'describe': DescribeWithResourceTags
+    }
 
 
 @resources.register('fsx-backup')
@@ -724,6 +745,62 @@ class Subnet(SubnetFilter):
 class VpcFilter(VpcFilter):
 
     RelatedIdsExpression = "VpcId"
+
+
+@FSx.filter_registry.register('security-group')
+class FSxSecurityGroupFilter(SecurityGroupFilter):
+    """Filter fsx file systems by their attached security groups.
+
+    describe_file_systems does not report security groups; they are attached
+    to the file system's elastic network interfaces, so they're resolved via
+    the file system's NetworkInterfaceIds.
+
+    :example:
+
+    .. code-block:: yaml
+
+        policies:
+          - name: fsx-public-security-group
+            resource: aws.fsx
+            filters:
+              - type: security-group
+                key: GroupName
+                value: default
+    """
+
+    RelatedIdsExpression = ""
+    eni_groups = None
+
+    def get_permissions(self):
+        return tuple(super().get_permissions()) + ('ec2:DescribeNetworkInterfaces',)
+
+    def get_related_ids(self, resources):
+        eni_ids = {e for r in resources for e in r.get('NetworkInterfaceIds', ())}
+        if self.eni_groups is None:
+            self.eni_groups = self.describe_eni_groups(eni_ids)
+        return list({g for e in eni_ids for g in self.eni_groups.get(e, ())})
+
+    def describe_eni_groups(self, eni_ids):
+        client = local_session(self.manager.session_factory).client('ec2')
+        groups = {}
+        for eni_set in chunks(sorted(eni_ids), 50):
+            # a departed eni on a file system being deleted is omitted by
+            # the filter form rather than failing the batch.
+            enis = self.manager.retry(
+                client.describe_network_interfaces,
+                Filters=[{'Name': 'network-interface-id', 'Values': eni_set}]
+            )['NetworkInterfaces']
+            groups.update({
+                e['NetworkInterfaceId']: [g['GroupId'] for g in e.get('Groups', ())]
+                for e in enis})
+        return groups
+
+
+@FSx.filter_registry.register('network-location')
+class FSxNetworkLocation(NetworkLocation):
+    # security groups come off the file system's network interfaces
+    permissions = ('ec2:DescribeSecurityGroups', 'ec2:DescribeSubnets',
+                   'ec2:DescribeNetworkInterfaces')
 
 
 FSx.filter_registry.register('consecutive-aws-backups', ConsecutiveAwsBackupsFilter)
