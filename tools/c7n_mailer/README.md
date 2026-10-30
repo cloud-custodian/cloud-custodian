@@ -281,20 +281,50 @@ and here is a description of the options:
 
 ### Standard Lambda Function Config
 
-| Required? | Key                  | Type             |
-|:---------:|:---------------------|:-----------------|
-| &#x2705;  | `role`               | string           |
-|           | `dead_letter_config` | object           |
-|           | `memory`             | integer          |
-|           | `region`             | string           |
-|           | `runtime`            | string           |
-|           | `security_groups`    | array of strings |
-|           | `subnets`            | array of strings |
-|           | `timeout`            | integer          |
-|           | `lambda_name`        | string           |
-|           | `lambda_description` | string           |
-|           | `lambda_tags`        | object           |
-|           | `lambda_schedule`    | string           |
+| Required? | Key                     | Type             |
+|:---------:|:------------------------|:-----------------|
+| &#x2705;  | `role`                  | string           |
+|           | `dead_letter_config`    | object           |
+|           | `memory`                | integer          |
+|           | `region`                | string           |
+|           | `runtime`               | string           |
+|           | `security_groups`       | array of strings |
+|           | `subnets`               | array of strings |
+|           | `timeout`               | integer          |
+|           | `lambda_name`           | string           |
+|           | `lambda_description`    | string           |
+|           | `lambda_tags`           | object           |
+|           | `lambda_schedule`       | string           |
+|           | `lambda_trigger`        | string           |
+|           | `lambda_sqs_batch_size` | integer          |
+
+By default the mailer lambda runs every 5 minutes (`lambda_schedule`) and polls the
+queue. With `lambda_trigger: sqs` it is invoked by the queue itself, so notifications
+are sent as soon as a policy queues them, and the lambda only runs when there is
+something to send:
+
+```yaml
+queue_url: https://sqs.us-east-1.amazonaws.com/123456789012/cloud-custodian-mailer
+role: arn:aws:iam::123456789012:role/cloud-custodian-mailer
+lambda_trigger: sqs
+lambda_sqs_batch_size: 10  # messages per invocation, 1 to 10 (default 10)
+```
+
+- The queue has to be in the same region as the lambda, and its visibility timeout has
+  to be at least the lambda `timeout` (300 seconds by default).
+- The lambda role needs `sqs:ReceiveMessage`, `sqs:DeleteMessage` and
+  `sqs:GetQueueAttributes` on the queue.
+- A message the mailer fails to process is returned to the queue and retried, without
+  resending the other messages of the same batch. Configure a redrive policy on the queue
+  to move messages that keep failing to a dead-letter queue.
+- With a FIFO queue, the messages after a failed one are retried as well, so they are
+  not delivered out of order.
+- When less than 30 seconds of the lambda `timeout` are left, the messages not processed
+  yet are returned to the queue for the next invocation, so a timeout doesn't resend the
+  ones that were already delivered.
+- `--update-lambda` removes the trigger that is no longer used, so switching between
+  `schedule` and `sqs` doesn't leave the mailer running both ways. With `sqs`, it also
+  removes the triggers on other queues, such as the previous `queue_url`.
 
 ### Standard Azure Functions Config
 

@@ -1630,10 +1630,15 @@ class SQSSubscription:
     """ Subscribe a lambda to one or more SQS queues.
     """
 
-    def __init__(self, session_factory, queue_arns, batch_size=10):
+    def __init__(self, session_factory, queue_arns, batch_size=10,
+                 report_batch_item_failures=False):
         self.queue_arns = queue_arns
         self.session_factory = session_factory
         self.batch_size = batch_size
+        # Lets the function return the ids of the messages it failed to process, so
+        # that only those are retried instead of the whole batch.
+        self.response_types = (
+            ['ReportBatchItemFailures'] if report_batch_item_failures else [])
 
     def add(self, func, existing):
         client = local_session(self.session_factory).client('lambda')
@@ -1643,33 +1648,28 @@ class SQSSubscription:
 
         modified = False
         for queue_arn in self.queue_arns:
-            mapping = None
-            if queue_arn in event_mappings:
-                mapping = event_mappings[queue_arn]
-                if (mapping['State'] == 'Enabled' or
-                        mapping['BatchSize'] != self.batch_size):
-                    continue
-                modified = True
-            else:
-                modified = True
-
-            if not modified:
-                return modified
-
+            mapping = event_mappings.get(queue_arn)
             if mapping is not None:
+                if (mapping['State'] == 'Enabled' and
+                        mapping['BatchSize'] == self.batch_size and
+                        mapping.get('FunctionResponseTypes', []) == self.response_types):
+                    continue
                 log.info(
                     "Updating subscription %s on %s", func.name, queue_arn)
                 client.update_event_source_mapping(
                     UUID=mapping['UUID'],
                     Enabled=True,
-                    BatchSize=self.batch_size)
+                    BatchSize=self.batch_size,
+                    FunctionResponseTypes=self.response_types)
             else:
                 log.info("Subscribing %s to %s", func.name, queue_arn)
                 client.create_event_source_mapping(
                     FunctionName=func.name,
                     EventSourceArn=queue_arn,
-                    BatchSize=self.batch_size)
-            return modified
+                    BatchSize=self.batch_size,
+                    FunctionResponseTypes=self.response_types)
+            modified = True
+        return modified
 
     def remove(self, func, func_deleted=True):
         client = local_session(self.session_factory).client('lambda')

@@ -1634,6 +1634,61 @@ class AddPyFile(PycCase):
         self.assertRaises(IOError, archive.add_py_file, py + "c")
 
 
+class SQSSubscriptionTest(unittest.TestCase):
+
+    queue_arns = ["arn:aws:sqs:us-east-1:123456789012:a", "arn:aws:sqs:us-east-1:123456789012:b"]
+
+    def add(self, mappings, **kw):
+        client = mock.MagicMock()
+        client.list_event_source_mappings.return_value = {"EventSourceMappings": mappings}
+        session = mock.MagicMock()
+        session.client.return_value = client
+        func = mock.MagicMock()
+        func.name = "func"
+        subscription = SQSSubscription(lambda: session, self.queue_arns, **kw)
+        with patch("c7n.mu.local_session", return_value=session):
+            modified = subscription.add(func, None)
+        return modified, client
+
+    def mapping(self, arn, **kw):
+        mapping = {"UUID": arn[-1], "EventSourceArn": arn, "State": "Enabled", "BatchSize": 10}
+        mapping.update(kw)
+        return mapping
+
+    def test_subscribe_all_queues(self):
+        modified, client = self.add([], batch_size=5, report_batch_item_failures=True)
+        self.assertTrue(modified)
+        self.assertEqual(
+            [c.kwargs["EventSourceArn"] for c in client.create_event_source_mapping.call_args_list],
+            self.queue_arns)
+        self.assertEqual(
+            client.create_event_source_mapping.call_args.kwargs["FunctionResponseTypes"],
+            ["ReportBatchItemFailures"])
+
+    def test_unchanged(self):
+        modified, client = self.add([self.mapping(arn) for arn in self.queue_arns])
+        self.assertFalse(modified)
+        client.update_event_source_mapping.assert_not_called()
+        client.create_event_source_mapping.assert_not_called()
+
+    def test_update_changed_mappings(self):
+        modified, client = self.add([
+            self.mapping(self.queue_arns[0], BatchSize=1),
+            self.mapping(self.queue_arns[1], State="Disabled")])
+        self.assertTrue(modified)
+        self.assertEqual(
+            [c.kwargs["UUID"] for c in client.update_event_source_mapping.call_args_list],
+            ["a", "b"])
+        client.update_event_source_mapping.assert_called_with(
+            UUID="b", Enabled=True, BatchSize=10, FunctionResponseTypes=[])
+
+    def test_update_response_types(self):
+        modified, client = self.add(
+            [self.mapping(arn) for arn in self.queue_arns], report_batch_item_failures=True)
+        self.assertTrue(modified)
+        self.assertEqual(client.update_event_source_mapping.call_count, 2)
+
+
 class DiffTags(unittest.TestCase):
 
     def test_empty(self):
