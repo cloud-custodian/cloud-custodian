@@ -1,12 +1,14 @@
 # Copyright The Cloud Custodian Authors.
 # SPDX-License-Identifier: Apache-2.0
 
+import copy
 from unittest.mock import Mock, patch
 import pytest
 import requests
 from datetime import datetime, timezone
 from pytest_terraform import terraform
 
+from c7n.exceptions import PolicyValidationError
 from c7n_azure.resources.entraid_user import (
     EntraIDUser
 )
@@ -16,7 +18,7 @@ from c7n_azure.resources.entraid_conditional_access import EntraIDConditionalAcc
 from c7n_azure.resources.entraid_security_defaults import EntraIDSecurityDefaults
 from c7n_azure.resources.entraid_authorization_policy import EntraIDAuthorizationPolicy
 from c7n_azure.resources.entraid_named_locations import EntraIDNamedLocation
-from tests_azure.azure_common import BaseTest
+from tests_azure.azure_common import BaseTest, strict_cassette
 
 
 class EntraIDUserTest(BaseTest):
@@ -3831,6 +3833,177 @@ class EntraIDAuthorizationPolicyTest(BaseTest):
 
         # Verify that the source is a GraphSource instance
         self.assertIsInstance(resource_mgr.source, GraphSource)
+
+    def test_update_schema_validate(self):
+        with self.sign_out_patch():
+            p = self.load_policy({
+                'name': 'update-authorization-policy',
+                'resource': 'azure.entraid-authorization-policy',
+                'actions': [{
+                    'type': 'update',
+                    'properties': {
+                        'allowInvitesFrom': 'adminsAndGuestInviters',
+                        'defaultUserRolePermissions': {
+                            'allowedToCreateApps': False,
+                            'permissionGrantPoliciesAssigned': [],
+                        },
+                    },
+                }],
+            }, validate=True)
+            self.assertTrue(p)
+
+    def test_update_schema_rejects(self):
+        rejected = [
+            {},
+            {'defaultUserRolePermissions': {}},
+            # Microsoft documents that this must never be set to false
+            {'defaultUserRolePermissions': {'allowedToReadOtherUsers': False}},
+            {'blockMsolPowershell': True},
+            {'allowInvitesFrom': 'anyone'},
+            # Global Administrator role template id
+            {'guestUserRoleId': '62e90394-69f5-4237-9190-012177145e10'},
+            {'defaultUserRolePermissions': {'permissionGrantPoliciesAssigned': ['a', 'a']}},
+        ]
+        with self.sign_out_patch():
+            for properties in rejected:
+                with self.subTest(properties=properties), \
+                        self.assertRaises(PolicyValidationError):
+                    self.load_policy({
+                        'name': 'update-authorization-policy',
+                        'resource': 'azure.entraid-authorization-policy',
+                        'actions': [{'type': 'update', 'properties': properties}],
+                    }, validate=True)
+
+    def test_update_sends_only_supplied_properties(self):
+        # Cassettes record request bodies as mock_body, so the payload is
+        # checked against the helper call instead.
+        payloads = [
+            {'defaultUserRolePermissions': {'allowedToCreateApps': False}},
+            {
+                'blockMsolPowerShell': True,
+                'defaultUserRolePermissions': {'allowedToCreateSecurityGroups': False},
+            },
+            {'defaultUserRolePermissions': {'permissionGrantPoliciesAssigned': []}},
+        ]
+        for properties in payloads:
+            with self.subTest(properties=properties), \
+                    patch.object(EntraIDAuthorizationPolicy, 'make_graph_request') as mock_request:
+                p = self.load_policy({
+                    'name': 'update-authorization-policy',
+                    'resource': 'azure.entraid-authorization-policy',
+                    'actions': [{'type': 'update', 'properties': copy.deepcopy(properties)}],
+                })
+
+                p.resource_manager.actions[0].process([{'id': 'authorizationPolicy'}])
+
+                mock_request.assert_called_once_with(
+                    'policies/authorizationPolicy', method='PATCH', data=properties)
+
+    def test_update_raises_graph_errors(self):
+        # An admin login can't record a real 403, so the response is built here
+        response = requests.models.Response()
+        response.status_code = 403
+        response.url = 'https://graph.microsoft.com/v1.0/policies/authorizationPolicy'
+        p = self.load_policy({
+            'name': 'update-authorization-policy',
+            'resource': 'azure.entraid-authorization-policy',
+            'actions': [{'type': 'update', 'properties': {'blockMsolPowerShell': True}}],
+        })
+
+        with patch.object(EntraIDAuthorizationPolicy, 'get_client', return_value=Mock()), \
+                patch('c7n_azure.graph_utils.requests.patch', return_value=response):
+            with self.assertRaises(requests.exceptions.HTTPError):
+                p.resource_manager.actions[0].process([{'id': 'authorizationPolicy'}])
+
+    @staticmethod
+    def _comparable(policy):
+        # Drop keys c7n adds (c7n:MatchedFilters), and sort the grant list,
+        # which Graph reorders on write
+        policy = {k: copy.deepcopy(v) for k, v in policy.items() if not k.startswith('c7n:')}
+        permissions = policy.get('defaultUserRolePermissions', {})
+        if 'permissionGrantPoliciesAssigned' in permissions:
+            permissions['permissionGrantPoliciesAssigned'].sort()
+        return policy
+
+    def _assert_update_round_trip(self, properties, filters=()):
+        """Apply properties, check only they changed, then put the originals back."""
+        p = self.load_policy({
+            'name': 'update-authorization-policy',
+            'resource': 'azure.entraid-authorization-policy',
+            'filters': list(filters),
+            'actions': [{'type': 'update', 'properties': properties}],
+        })
+        manager = p.resource_manager
+        resources = p.run()
+        self.assertEqual(len(resources), 1)
+        before = resources[0]
+
+        expected = copy.deepcopy(before)
+        restore = {}
+        for key, value in properties.items():
+            if isinstance(value, dict):
+                expected[key].update(value)
+                restore[key] = {k: before[key][k] for k in value}
+            else:
+                expected[key] = value
+                restore[key] = before[key]
+
+        try:
+            # A target equal to the current value would prove nothing
+            self.assertNotEqual(self._comparable(expected), self._comparable(before))
+            self.sleep_in_live_mode(10)
+            after = manager.get_graph_resources()[0]
+            self.assertEqual(self._comparable(after), self._comparable(expected))
+        finally:
+            # These settings are tenant-wide, so always put them back
+            manager.make_graph_request(
+                'policies/authorizationPolicy', method='PATCH', data=restore)
+
+        self.sleep_in_live_mode(10)
+        restored = manager.get_graph_resources()[0]
+        self.assertEqual(self._comparable(restored), self._comparable(before))
+
+    @strict_cassette('authorization-policy-update-allowed-to-create-apps')
+    def test_update_allowed_to_create_apps(self):
+        # The CIS 6.14 remediation from the action's docstring
+        self._assert_update_round_trip(
+            {'defaultUserRolePermissions': {'allowedToCreateApps': False}},
+            filters=[{
+                'type': 'value',
+                'key': 'defaultUserRolePermissions.allowedToCreateApps',
+                'value': True,
+            }])
+
+    @strict_cassette('authorization-policy-update-permission-grant-policies')
+    def test_update_permission_grant_policies(self):
+        # An empty list turns off user consent to apps
+        self._assert_update_round_trip(
+            {'defaultUserRolePermissions': {'permissionGrantPoliciesAssigned': []}})
+
+    @strict_cassette('authorization-policy-update-top-level-and-nested')
+    def test_update_top_level_and_nested_together(self):
+        self._assert_update_round_trip({
+            'blockMsolPowerShell': True,
+            'defaultUserRolePermissions': {'allowedToCreateSecurityGroups': False},
+        })
+
+    @strict_cassette('authorization-policy-update-no-match')
+    def test_update_skipped_when_filter_does_not_match(self):
+        # Playback has no PATCH to serve, so an unwanted one fails the test
+        p = self.load_policy({
+            'name': 'update-authorization-policy',
+            'resource': 'azure.entraid-authorization-policy',
+            'filters': [{
+                'type': 'value',
+                'key': 'defaultUserRolePermissions.allowedToCreateApps',
+                'value': False,
+            }],
+            'actions': [{
+                'type': 'update',
+                'properties': {'defaultUserRolePermissions': {'allowedToCreateApps': False}},
+            }],
+        })
+        self.assertEqual(p.run(), [])
 
 
 # Terraform-based integration tests

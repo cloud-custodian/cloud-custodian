@@ -1,0 +1,70 @@
+{
+    "version": 1,
+    "interactions": [
+        {
+            "request": {
+                "method": "GET",
+                "uri": "https://graph.microsoft.com/v1.0/policies/authorizationPolicy",
+                "body": null,
+                "headers": {}
+            },
+            "response": {
+                "status": {
+                    "code": 200,
+                    "message": "OK"
+                },
+                "headers": {
+                    "request-id": [
+                        "00000000-0000-0000-0000-000000000054"
+                    ],
+                    "cache-control": [
+                        "no-cache"
+                    ],
+                    "odata-version": [
+                        "4.0"
+                    ],
+                    "x-ms-resource-unit": [
+                        "1"
+                    ],
+                    "content-type": [
+                        "application/json;odata.metadata=minimal;odata.streaming=true;IEEE754Compatible=false;charset=utf-8"
+                    ],
+                    "date": [
+                        "Fri, 30 Oct 2026 15:42:08 GMT"
+                    ],
+                    "content-length": [
+                        "1082"
+                    ]
+                },
+                "body": {
+                    "data": {
+                        "@odata.context": "https://graph.microsoft.com/v1.0/$metadata#policies/authorizationPolicy/$entity",
+                        "id": "authorizationPolicy",
+                        "allowInvitesFrom": "everyone",
+                        "allowedToSignUpEmailBasedSubscriptions": true,
+                        "allowedToUseSSPR": true,
+                        "allowEmailVerifiedUsersToJoinOrganization": true,
+                        "allowUserConsentForRiskyApps": false,
+                        "blockMsolPowerShell": false,
+                        "displayName": "Authorization Policy",
+                        "description": "Used to manage authorization related settings across the company.",
+                        "guestUserRoleId": "10dae51f-b6af-4016-8d66-8c2a99b929b3",
+                        "defaultUserRolePermissions": {
+                            "allowedToCreateApps": true,
+                            "allowedToCreateSecurityGroups": true,
+                            "allowedToCreateTenants": true,
+                            "allowedToReadBitlockerKeysForOwnedDevice": true,
+                            "allowedToReadOtherUsers": true,
+                            "permissionGrantPoliciesAssigned": [
+                                "ManagePermissionGrantsForOwnedResource.microsoft-dynamically-managed-permissions-for-chat",
+                                "ManagePermissionGrantsForOwnedResource.microsoft-dynamically-managed-permissions-for-team",
+                                "ManagePermissionGrantsForSelf.microsoft-user-default-allow-consent-apps",
+                                "ManagePermissionGrantsForSelf.microsoft-user-default-recommended"
+                            ]
+                        }
+                    }
+                }
+            }
+        }
+    ]
+}
