@@ -7,6 +7,8 @@ import time
 import pytest
 from c7n.exceptions import PolicyValidationError
 from c7n_gcp.actions import MethodAction
+from googleapiclient.errors import HttpError
+
 from gcp_common import BaseTest
 from pytest_terraform import terraform
 
@@ -480,3 +482,29 @@ class BucketTest(BaseTest):
         client = p.resource_manager.get_client()
         result = client.execute_query('get', {'bucket': 'c7n-bucket'})
         self.assertEqual(result['labels']['env'], 'not-the-default')
+
+    @terraform("gcs_bucket")
+    def test_bucket_delete(self):
+        project_id = "custodian-1291"
+        bucket_name = "c7n-bucket-delete-test"
+        factory = self.replay_flight_data("bucket-delete", project_id)
+        p = self.load_policy(
+            {
+                "name": "delete-bucket",
+                "resource": "gcp.bucket",
+                "filters": [{"name": bucket_name}],
+                "actions": ["delete"],
+            },
+            session_factory=factory,
+        )
+        resources = p.run()
+        self.assertEqual(len(resources), 1)
+
+        if self.recording:
+            time.sleep(1)
+
+        client = p.resource_manager.get_client()
+
+        with pytest.raises(HttpError):
+            client.execute_command("get", {"bucket": bucket_name})
+            self.fail("found deleted bucket")

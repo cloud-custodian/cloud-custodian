@@ -2,7 +2,10 @@
 # SPDX-License-Identifier: Apache-2.0
 import re
 
-from c7n.utils import type_schema
+from googleapiclient.errors import HttpError
+
+from c7n.exceptions import PolicyExecutionError
+from c7n.utils import local_session, type_schema
 from c7n_gcp.filters.iampolicy import IamPolicyFilter
 from c7n_gcp.provider import resources
 from c7n_gcp.query import QueryResourceManager, TypeInfo, ChildResourceManager, ChildTypeInfo
@@ -200,6 +203,102 @@ class Role(QueryResourceManager):
                 'get', {
                     'name': 'roles/{}'.format(
                         resource_info['name'])})
+
+
+@Role.action_registry.register('delete')
+class RoleDeleteAction(MethodAction):
+    """Action to delete GCP custom roles
+
+    Note: This action only works for custom roles. Predefined GCP roles are
+    implicitly filtered out, as they cannot be deleted.
+
+    It is recommended to use a filter to avoid unwanted deletion of IAM roles
+
+    :example:
+
+    .. code-block:: yaml
+
+            policies:
+              - name: gcp-delete-testing-org-roles
+                resource: gcp.iam-role
+                filters:
+                  - type: value
+                    key: name
+                    op: regex
+                    value: 'organizations/.*/roles/.*test.*'
+                actions:
+                  - type: delete
+    """
+
+    # The `iam-role` resource is a blend of:
+    #
+    # * pre-defined roles (GCP-defined, not allowed to delete)
+    # * organization-wide roles
+    # * project-specific roles (also available via the `project-role` resource)
+    #
+    # Organization & project roles are deleted through different API components,
+    # so the resources are split up by role type before processing.
+
+    schema = type_schema('delete')
+    method_spec = {'op': 'delete'}
+    permissions = ('iam.roles.delete',)
+    role_components = {
+        'organizations': 'organizations.roles',
+        'projects': 'projects.roles',
+    }
+
+    def get_resource_params(self, model, resource):
+        return {'name': resource['name']}
+
+    def filter_resources(self, resources):
+        """Drop predefined roles (`roles/...`), which can't be deleted."""
+        rcount = len(resources)
+        resources = [r for r in resources if r['name'].partition('/')[0] in self.role_components]
+        if len(resources) != rcount:
+            self.log.warning(
+                "policy:%s action:%s implicitly filtered %d resources to %d "
+                "(only custom organization & project roles can be deleted)",
+                self.manager.ctx.policy.name,
+                self.type,
+                rcount,
+                len(resources),
+            )
+        return resources
+
+    def process(self, resources):
+        resources = self.filter_resources(resources)
+        model = self.manager.get_model()
+        session = local_session(self.manager.session_factory)
+
+        roles_by_type = {}
+        for r in resources:
+            roles_by_type.setdefault(r['name'].partition('/')[0], []).append(r)
+
+        errors = []
+        for role_type, component in self.role_components.items():
+            if not roles_by_type.get(role_type):
+                continue
+            client = session.client('iam', 'v1', component)
+            errors.extend(self.process_resource_set(client, model, roles_by_type[role_type]))
+
+        if errors:
+            raise PolicyExecutionError(
+                "failed to delete %d role(s): %s" % (
+                    len(errors), "; ".join("%s: %s" % err for err in errors)))
+
+    def process_resource_set(self, client, model, resources):
+        """Attempt every role, returning (name, error) pairs for any failures."""
+        errors = []
+        for resource in resources:
+            try:
+                super().process_resource_set(client, model, [resource])
+            except HttpError as e:
+                self.log.error("Failed to delete role %s: %s", resource['name'], e)
+                errors.append((resource['name'], e))
+        return errors
+
+
+ProjectRole.action_registry.register('delete', RoleDeleteAction)
 
 
 @resources.register('api-key')

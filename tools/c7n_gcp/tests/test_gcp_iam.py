@@ -2,10 +2,17 @@
 # SPDX-License-Identifier: Apache-2.0
 
 import time
+from unittest import mock
+
+import pytest
+from pytest_terraform import terraform
 
 from gcp_common import BaseTest, event_data
 from googleapiclient.errors import HttpError
-from pytest_terraform import terraform
+
+from c7n.exceptions import PolicyExecutionError
+from c7n.utils import local_session
+from c7n_gcp.actions import MethodAction
 
 
 class ProjectRoleTest(BaseTest):
@@ -277,6 +284,143 @@ class IAMRoleTest(BaseTest):
             [
                 "gcp:iam:::role/accesscontextmanager.policyAdmin",
             ],
+        )
+
+    def _delete_action(self, resources):
+        p = self.load_policy(
+            {"name": "role-delete", "resource": "gcp.iam-role", "actions": ["delete"]}
+        )
+        return p.resource_manager.actions[0]
+
+    def test_iam_role_delete_filters_predefined(self):
+        action = self._delete_action([])
+        org_role = {"name": "organizations/111111111111/roles/customRole1"}
+        proj_role = {"name": "projects/cloud-custodian/roles/customRole2"}
+        predefined = {"name": "roles/viewer"}
+
+        self.assertEqual(
+            action.filter_resources([org_role, predefined, proj_role]),
+            [org_role, proj_role],
+        )
+
+    def test_iam_role_delete_splits_by_role_type(self):
+        action = self._delete_action([])
+        org_role = {"name": "organizations/111111111111/roles/customRole1"}
+        proj_role = {"name": "projects/cloud-custodian/roles/customRole2"}
+        predefined = {"name": "roles/viewer"}
+
+        clients = {}
+
+        def get_client(service, version, component):
+            return clients.setdefault(component, mock.MagicMock(name=component))
+
+        session = mock.MagicMock()
+        session.client.side_effect = get_client
+
+        with mock.patch("c7n_gcp.resources.iam.local_session", return_value=session), \
+                mock.patch.object(action, "process_resource_set") as prs:
+            action.process([proj_role, predefined, org_role])
+
+        self.assertEqual(
+            prs.call_args_list,
+            [
+                mock.call(clients["organizations.roles"], mock.ANY, [org_role]),
+                mock.call(clients["projects.roles"], mock.ANY, [proj_role]),
+            ],
+        )
+
+    def test_iam_role_delete_skips_unused_clients(self):
+        action = self._delete_action([])
+        proj_role = {"name": "projects/cloud-custodian/roles/customRole2"}
+
+        session = mock.MagicMock()
+        with mock.patch("c7n_gcp.resources.iam.local_session", return_value=session), \
+                mock.patch.object(action, "process_resource_set") as prs:
+            action.process([proj_role, {"name": "roles/viewer"}])
+
+        session.client.assert_called_once_with("iam", "v1", "projects.roles")
+        prs.assert_called_once()
+
+    def test_iam_role_delete_only_predefined(self):
+        action = self._delete_action([])
+        session = mock.MagicMock()
+        with mock.patch("c7n_gcp.resources.iam.local_session", return_value=session), \
+                mock.patch.object(action, "process_resource_set") as prs:
+            action.process([{"name": "roles/viewer"}])
+
+        session.client.assert_not_called()
+        prs.assert_not_called()
+
+    def test_iam_role_delete_continues_after_failure(self):
+        action = self._delete_action([])
+        org_role = {"name": "organizations/111111111111/roles/customRole1"}
+        proj_role1 = {"name": "projects/cloud-custodian/roles/customRole2"}
+        proj_role2 = {"name": "projects/cloud-custodian/roles/customRole3"}
+
+        def invoke(client, op_name, params):
+            if params["name"] == proj_role1["name"]:
+                raise HttpError(resp=mock.MagicMock(status=403), content=b"{}")
+
+        with mock.patch("c7n_gcp.resources.iam.local_session"), \
+                mock.patch.object(action, "invoke_api", side_effect=invoke) as api:
+            with pytest.raises(PolicyExecutionError, match=proj_role1["name"]):
+                action.process([org_role, proj_role1, proj_role2])
+
+        self.assertEqual(
+            [c.args[2]["name"] for c in api.call_args_list],
+            [org_role["name"], proj_role1["name"], proj_role2["name"]],
+        )
+
+    def _run_delete(self, flight, resource, full_role_name, component, project_id):
+        factory = self.replay_flight_data(flight, project_id)
+        p = self.load_policy(
+            {
+                "name": "role-delete",
+                "resource": resource,
+                "filters": [{"name": full_role_name}],
+                "actions": ["delete"],
+            },
+            session_factory=factory,
+        )
+        with mock.patch.object(
+            MethodAction, "invoke_api", autospec=True, side_effect=MethodAction.invoke_api
+        ) as invoke_api:
+            resources = p.run()
+        self.assertEqual(len(resources), 1)
+
+        # The DELETE request itself was issued, for the right role.
+        invoke_api.assert_called_once_with(
+            mock.ANY, mock.ANY, "delete", {"name": full_role_name}
+        )
+
+        if self.recording:
+            time.sleep(1)
+
+        # Deleted custom roles are soft-deleted, & remain retrievable for a while
+        client = local_session(factory).client("iam", "v1", component)
+        result = client.execute_query("get", {"name": full_role_name})
+        self.assertTrue(result.get("deleted"))
+
+    @terraform('iam_organization_role')
+    def test_iam_role_delete(self):
+        org_id = "111111111111"
+        self._run_delete(
+            "iam-role-delete",
+            "gcp.iam-role",
+            f"organizations/{org_id}/roles/customAccessContextManagerAdmin",
+            "organizations.roles",
+            org_id,
+        )
+
+    @terraform('iam_project_role')
+    def test_iam_role_project_delete(self):
+        project_id = "cloud-custodian"
+        self._run_delete(
+            "iam-role-delete-proj",
+            "gcp.project-role",
+            f"projects/{project_id}/roles/customAccessContextManagerAdmin",
+            "projects.roles",
+            project_id,
         )
 
 

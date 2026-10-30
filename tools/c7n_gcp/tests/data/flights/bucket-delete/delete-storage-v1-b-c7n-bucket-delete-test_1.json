@@ -1,0 +1,12 @@
+{
+  "body": {},
+  "headers": {
+    "status": "204",
+    "content-length": "0",
+    "vary": "Origin, X-Origin",
+    "server": "UploadServer",
+    "date": "Mon, 12 Jan 2026 23:20:01 GMT",
+    "alt-svc": "h3=\":443\"; ma=2592000,h3-29=\":443\"; ma=2592000",
+    "content-type": "application/json; charset=UTF-8"
+  }
+}

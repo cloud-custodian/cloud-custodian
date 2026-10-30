@@ -1,0 +1,91 @@
+{
+  "body": {
+    "items": [
+      {
+        "kind": "storage#bucket",
+        "name": "c7n-bucket-delete-test",
+        "timeCreated": "2026-01-10T15:30:00.000Z",
+        "updated": "2026-01-10T15:30:00.000Z",
+        "projectNumber": "1234567890",
+        "defaultObjectAcl": [
+          {
+            "kind": "storage#objectAccessControl",
+            "projectTeam": {
+              "projectNumber": "1234567890",
+              "team": "owners"
+            },
+            "role": "OWNER",
+            "etag": "CAE=",
+            "entity": "project-owners-1234567890"
+          },
+          {
+            "kind": "storage#objectAccessControl",
+            "projectTeam": {
+              "projectNumber": "1234567890",
+              "team": "editors"
+            },
+            "role": "OWNER",
+            "etag": "CAE=",
+            "entity": "project-editors-1234567890"
+          },
+          {
+            "kind": "storage#objectAccessControl",
+            "projectTeam": {
+              "projectNumber": "1234567890",
+              "team": "viewers"
+            },
+            "role": "READER",
+            "etag": "CAE=",
+            "entity": "project-viewers-1234567890"
+          }
+        ],
+        "metageneration": "1",
+        "location": "US",
+        "iamConfiguration": {
+          "bucketPolicyOnly": {
+            "enabled": false
+          },
+          "uniformBucketLevelAccess": {
+            "enabled": false
+          }
+        },
+        "owner": {
+          "entity": "project-owners-1234567890"
+        },
+        "etag": "CAE=",
+        "acl": [
+          {
+            "kind": "storage#bucketAccessControl",
+            "bucket": "c7n-bucket-delete-test",
+            "entity": "project-owners-1234567890",
+            "etag": "CAE=",
+            "role": "OWNER",
+            "projectTeam": {
+              "projectNumber": "1234567890",
+              "team": "owners"
+            },
+            "id": "c7n-bucket-delete-test/project-owners-1234567890",
+            "selfLink": "https://www.googleapis.com/storage/v1/b/c7n-bucket-delete-test/acl/project-owners-1234567890"
+          }
+        ],
+        "id": "c7n-bucket-delete-test",
+        "selfLink": "https://www.googleapis.com/storage/v1/b/c7n-bucket-delete-test",
+        "storageClass": "STANDARD"
+      }
+    ],
+    "kind": "storage#buckets"
+  },
+  "headers": {
+    "status": "200",
+    "content-length": "2845",
+    "content-location": "https://www.googleapis.com/storage/v1/b?project=custodian-1291&alt=json&projection=full",
+    "cache-control": "private, max-age=0, must-revalidate, no-transform",
+    "expires": "Mon, 12 Jan 2026 23:20:00 GMT",
+    "vary": "Origin, X-Origin",
+    "server": "UploadServer",
+    "x-guploader-uploadid": "AEnB2UpSR4IxdUFknZKIuoaduRvzAopNX4xp8naqUMiEoJLbFtIEXsOiwruUHPaErWHiW4XvHgE0UfjPHI2uzlZpKfMi2S6Cow",
+    "date": "Mon, 12 Jan 2026 23:20:00 GMT",
+    "alt-svc": "h3=\":443\"; ma=2592000,h3-29=\":443\"; ma=2592000",
+    "content-type": "application/json; charset=UTF-8"
+  }
+}
