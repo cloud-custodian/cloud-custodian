@@ -1,4 +1,5 @@
 import json
+from email.utils import getaddresses, parseaddr
 
 import requests
 
@@ -25,15 +26,23 @@ class GraphDelivery:
         for emails, mimetext in emails_to_mimetext_map.items():
             contentType = mimetext.get_content_type().lower().endswith("html") and "html" or "text"
             content = mimetext.get_payload(decode=True).decode(mimetext.get_content_charset())
+            # cc addresses are in emails but not in the To header, see get_mimetext_message
+            to_header = {addr for _, addr in getaddresses(mimetext.get_all("To", []))}
             # reference: https://learn.microsoft.com/en-us/graph/api/resources/message?view=graph-rest-1.0
             data = {
                 "message": {
                     "subject": mimetext.get("Subject"),
                     "body": {"contentType": contentType, "content": content},
-                    "toRecipients": [{"emailAddress": {"address": e}} for e in emails],
-                    # NOTE cc has been included into "to" field when creating mimetext map,
-                    # so skipping it
-                    # "ccRecipients": [],
+                    "toRecipients": [
+                        {"emailAddress": {"address": e}}
+                        for e in emails
+                        if parseaddr(e)[1] in to_header
+                    ],
+                    "ccRecipients": [
+                        {"emailAddress": {"address": e}}
+                        for e in emails
+                        if parseaddr(e)[1] not in to_header
+                    ],
                 },
                 "isDraft": "false",
             }
