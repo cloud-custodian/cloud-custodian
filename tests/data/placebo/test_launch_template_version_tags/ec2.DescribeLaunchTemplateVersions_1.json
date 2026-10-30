@@ -1,0 +1,50 @@
+{
+    "status_code": 200,
+    "data": {
+        "LaunchTemplateVersions": [
+            {
+                "LaunchTemplateId": "lt-0aaaaaaaaaaaaaaa1",
+                "LaunchTemplateName": "tagged-template",
+                "VersionNumber": 2,
+                "CreateTime": {
+                    "__class__": "datetime",
+                    "year": 2026,
+                    "month": 9,
+                    "day": 2,
+                    "hour": 10,
+                    "minute": 0,
+                    "second": 0,
+                    "microsecond": 0
+                },
+                "CreatedBy": "arn:aws:iam::123456789012:user/test",
+                "DefaultVersion": false,
+                "LaunchTemplateData": {
+                    "ImageId": "ami-0123456789abcdef0",
+                    "InstanceType": "t3.micro"
+                }
+            },
+            {
+                "LaunchTemplateId": "lt-0aaaaaaaaaaaaaaa1",
+                "LaunchTemplateName": "tagged-template",
+                "VersionNumber": 1,
+                "CreateTime": {
+                    "__class__": "datetime",
+                    "year": 2026,
+                    "month": 9,
+                    "day": 1,
+                    "hour": 10,
+                    "minute": 0,
+                    "second": 0,
+                    "microsecond": 0
+                },
+                "CreatedBy": "arn:aws:iam::123456789012:user/test",
+                "DefaultVersion": true,
+                "LaunchTemplateData": {
+                    "ImageId": "ami-0123456789abcdef0",
+                    "InstanceType": "t3.micro"
+                }
+            }
+        ],
+        "ResponseMetadata": {}
+    }
+}
