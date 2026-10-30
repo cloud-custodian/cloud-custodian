@@ -994,7 +994,10 @@ class ConfigRuleMode(LambdaMode):
     See `AWS Config <https://aws.amazon.com/config/>`_ for more details.
     """
     cfg_event = None
-    schema = utils.type_schema('config-rule', rinherit=LambdaMode.schema)
+    schema = utils.type_schema(
+        'config-rule',
+        rinherit=LambdaMode.schema,
+        **{"match-compliant": {'type': 'boolean'}})
 
     def validate(self):
         super(ConfigRuleMode, self).validate()
