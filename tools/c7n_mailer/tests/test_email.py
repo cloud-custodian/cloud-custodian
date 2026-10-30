@@ -438,10 +438,13 @@ class EmailTest(unittest.TestCase):
 
         message = json.loads(req.call_args_list[1][1]["data"])["message"]
         to = [r["emailAddress"]["address"] for r in message["toRecipients"]]
-        cc = [r["emailAddress"]["address"] for r in message["ccRecipients"]]
         self.assertTrue(to)
-        self.assertNotIn("CC <cc@example.com>", to)
-        self.assertEqual(cc, ["CC <cc@example.com>"])
+        self.assertNotIn("cc@example.com", to)
+        # Graph takes the bare address, with the display name in its own field
+        self.assertEqual(
+            message["ccRecipients"],
+            [{"emailAddress": {"address": "cc@example.com", "name": "CC"}}],
+        )
 
     def test_ses_send_raw_email(self):
         config = copy.deepcopy(MAILER_CONFIG)
