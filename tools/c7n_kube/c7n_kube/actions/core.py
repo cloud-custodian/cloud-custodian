@@ -71,6 +71,11 @@ class PatchAction(MethodAction):
 
         op = getattr(client, self.manager.get_model().patch)
         namespaced = self.manager.get_model().namespaced
+        query = self.manager.get_resource_query()
+        if query and all(k in query for k in ("group", "version", "plural")):
+            patch_args.update(
+                group=query["group"], version=query["version"], plural=query["plural"]
+            )
         for r in resources:
             patch_args["name"] = r["metadata"]["name"]
             if namespaced:
@@ -240,6 +245,11 @@ class DeleteAction(MethodAction):
     def delete_resources(self, client, resources, **delete_args):
         op = getattr(client, self.manager.get_model().delete)
         namespaced = self.manager.get_model().namespaced
+        query = self.manager.get_resource_query()
+        if query and all(k in query for k in ("group", "version", "plural")):
+            delete_args.update(
+                group=query["group"], version=query["version"], plural=query["plural"]
+            )
         for r in resources:
             delete_args["name"] = r["metadata"]["name"]
             if namespaced:
